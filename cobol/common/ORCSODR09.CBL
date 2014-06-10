@@ -254,7 +254,7 @@
                    MOVE    PTNYUINRRK-REC
                                        TO  TRRK-REC
                ELSE
-                   MOVE    "0131"      TO  ERRCD-ORDER
+                   MOVE    "0051"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -381,7 +381,7 @@
       *
       *    入院中であること
            IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
-               MOVE    "0132"      TO  ERRCD-ORDER
+               MOVE    "0052"      TO  ERRCD-ORDER
            END-IF
       *
            IF    ( ERRCD-ITEM-G    =   SPACE )

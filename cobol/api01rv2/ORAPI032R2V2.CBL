@@ -134,6 +134,7 @@
            COPY    "CPORCSAPIHKN.INC".
       *
       *    °åÎÅ¶èÊ¬¡¦£Á£Ä£ÌÅÀ¿ô¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSNINF04.INC".
            COPY    "CPORCHCN68S01.INC".
       *
       *    API XMLÆÉ¤ß¹þ¤ßÍÑÄêµÁÂÎ
@@ -401,449 +402,82 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           PERFORM 2001-PTINF-EDIT-SEC
-      *
-           PERFORM 2001-SRYYM-EDIT-SEC
-      *
-           PERFORM 2001-MEDKBN-EDIT-SEC
-      *
-           PERFORM 2001-ADLTEN-EDIT-SEC
-      *
-           PERFORM 2001-PTEVAL-EDIT-SEC
+           PERFORM 2001-RESPONSE-EDIT-SEC
       *
            .
        200-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ´µ¼ÔÊóÊÔ½¸½èÍý
+      *    ¥ì¥¹¥Ý¥ó¥¹ÊÔ½¸½èÍý
       *****************************************************************
-       2001-PTINF-EDIT-SEC                 SECTION.
+       2001-RESPONSE-EDIT-SEC          SECTION.
       *
-           MOVE    SPA-PTNUM           TO  HSPTEVALRES-PTNUM
-           MOVE    PTINF-NAME          TO  HSPTEVALRES-NAME
-           MOVE    PTINF-KANANAME      TO  HSPTEVALRES-KANANAME
-           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
-           PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE            TO  HSPTEVALRES-BIRTHDAY
-           MOVE    PTINF-SEX           TO  HSPTEVALRES-SEX
+           INITIALIZE                  SNINF04-AREA
+                                       HCN68S01-AREA
       *
-          .
-       2001-PTINF-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¿ÇÎÅÇ¯·îÊÔ½¸½èÍý
-      *****************************************************************
-       2001-SRYYM-EDIT-SEC             SECTION.
+           MOVE    "1"             TO  HCN68S01-RANGE
+           MOVE    SPA-PTID        TO  HCN68S01-PTID
+           MOVE    KEY-SRYYM       TO  HCN68S01-SRYYM
+           MOVE    SPA-SRYYMD      TO  HCN68S01-SRYYMD
+           CALL    "ORCSNINF04"        USING 
+                                       SNINF04-AREA
+                                       HCN68S01-AREA
+                                       SPA-AREA
       *
-           MOVE    KEY-SRYYM       TO  WRK-SYMD
-           MOVE    "01"            TO  WRK-SYMD(7:2)
-           PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE (1:7)  TO  HSPTEVALRES-SRYYM
+           MOVE    SNINF04-PTNUM       TO HSPTEVALRES-PTNUM
+           MOVE    SNINF04-NAME        TO HSPTEVALRES-NAME
+           MOVE    SNINF04-KANANAME    TO HSPTEVALRES-KANANAME
+           MOVE    SNINF04-BIRTHDAY    TO HSPTEVALRES-BIRTHDAY
+           MOVE    SNINF04-SEX         TO HSPTEVALRES-SEX
       *
-           MOVE    ZERO            TO      IDXA
-           PERFORM VARYING IDX0    FROM    SNTYMD-MAX   BY  -1
+           PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
-                    OR   ( IDX0    <   1)
       *
-               IF    ( KEY-SRYYM   >=  SNTYMD-NYUINYMD (IDX0)(1:6))
-                AND  ( KEY-SRYYM   <=  SNTYMD-TAIINYMD (IDX0)(1:6))
-                   COMPUTE IDXA    =   IDXA    +   1
-                   MOVE    SNTYMD-NYUINYMD (IDX0)
-                                   TO  WRK-SYMD
-                   PERFORM 800-DATE-SEC
-                   MOVE    WRK-DATE    TO  HSPTEVALRES-NYUINYMD (IDXA)
-      *
-                   MOVE    SNTYMD-TAIINYMD (IDX0)
-                                       TO  WRK-SYMD
-                   PERFORM 800-DATE-SEC
-                   MOVE    WRK-DATE    TO  HSPTEVALRES-TAIINYMD (IDXA)
-               END-IF
+               MOVE    SNINF04-NYUINYMD (IDXA)
+                                       TO HSPTEVALRES-NYUINYMD (IDXA)
+               MOVE    SNINF04-TAIINYMD (IDXA)
+                                       TO HSPTEVALRES-TAIINYMD (IDXA)
       *
            END-PERFORM
       *
-          .
-       2001-SRYYM-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    °åÎÅ¶èÊ¬ÊÔ½¸½èÍý
-      *****************************************************************
-       2001-MEDKBN-EDIT-SEC     SECTION.
+           MOVE    SNINF04-SRYYM       TO HSPTEVALRES-SRYYM
       *
-           MOVE    ZERO                TO  WRK-MEDKBN-MAX
+           PERFORM VARYING IDXA FROM 1 BY 1  UNTIL IDXA > 41
       *
-           PERFORM VARYING IDXM    FROM    1    BY  1
-                   UNTIL ( IDXM    >   HCN68S01-RYOLIST-MAX )
-      *
-               IF    ( HCN68S01-TZAISKBKBN (IDXM)  =   "2" )
-                   EVALUATE    TRUE
-                   WHEN  ( HCN68S01-TALLKBN (IDXM) =   1 )
-                    AND  ( HCN68S01-TDAYALL (IDXM) =   1 )
-                   WHEN  ( HCN68S01-TALLKBN (IDXM) =   ZERO )
-                    AND  ( HCN68S01-TDAY-G  (IDXM) NOT = ZERO )
-                       PERFORM 20011-MEDKBN-EDIT-SEC
-                   END-EVALUATE
-               END-IF
-      *
+               MOVE    SNINF04-MEDKBN-LV (IDXA)
+                                       TO HSPTEVALRES-MEDKBN-LV (IDXA)
+               MOVE    SNINF04-MEDKBN-ID (IDXA)
+                                       TO HSPTEVALRES-MEDKBN-ID (IDXA)
+               MOVE    SNINF04-MEDKBN-NAME (IDXA)
+                                       TO HSPTEVALRES-MEDKBN-NAME (IDXA)
+               MOVE    SNINF04-MEDKBN-MON (IDXA)
+                                       TO HSPTEVALRES-MEDKBN-MON (IDXA)
+               MOVE    SNINF04-MEDKBN-DAY (IDXA)
+                                       TO HSPTEVALRES-MEDKBN-DAY (IDXA)
            END-PERFORM
       *
-           IF    ( HCN68S01-MEDKBN-DAYALL (1)  =   1 )
-            OR   ( HCN68S01-MEDKBN-DAY-G  (1)  NOT =   ZERO )
-               MOVE    1       TO   IDXM
-               PERFORM 20011-MEDKBN-TUKI-HYOKA-EDIT-SEC
-           END-IF
+           PERFORM VARYING IDXA FROM 1 BY 1  UNTIL IDXA > 4
       *
-           IF    ( HCN68S01-MEDKBN-DAYALL (2)  =   1 )
-            OR   ( HCN68S01-MEDKBN-DAY-G  (2)  NOT =   ZERO )
-               MOVE    2       TO   IDXM
-               PERFORM 20011-MEDKBN-TUKI-HYOKA-EDIT-SEC
-           END-IF
-      *
-           INITIALIZE      TDAY-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-               IF    ( HCN68S01-RYOYO-CD (IDXD)        NOT =   SPACE )
-                   IF    ( HCN68S01-MEDKBN-DAYALL (1)      =   ZERO )
-                    AND  ( HCN68S01-MEDKBN-DAY (1 IDXD)    =   ZERO )
-                    AND  ( HCN68S01-MEDKBN-DAYALL (2)      =   ZERO )
-                    AND  ( HCN68S01-MEDKBN-DAY (2 IDXD)    =   ZERO )
-                       MOVE    1       TO  TDAY-DAY (IDXD)
-                   END-IF
-               END-IF
+               MOVE    SNINF04-ADLKBN-ID (IDXA)
+                                       TO HSPTEVALRES-ADLKBN-ID (IDXA)
+               MOVE    SNINF04-ADLKBN-NAME (IDXA)
+                                       TO HSPTEVALRES-ADLKBN-NAME (IDXA)
+               MOVE    SNINF04-ADLKBN-DAY (IDXA)
+                                       TO HSPTEVALRES-ADLKBN-DAY (IDXA)
            END-PERFORM
       *
-           IF    ( TDAY-DAY-G          NOT =   ZERO )
-               COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-               MOVE    WRK-MEDKBN-MAX  TO  IDXA
-               MOVE    "1"         TO  HSPTEVALRES-MEDKBN-LV (IDXA)
-               MOVE    "M1"        TO  HSPTEVALRES-MEDKBN-ID (IDXA)
-               MOVE    "°åÎÅ¶èÊ¬£³¡¦£²¤¤¤º¤ì¤â£°¡Ê°åÎÅ¶èÊ¬£±¡Ë"
-                                   TO  HSPTEVALRES-MEDKBN-NAME (IDXA)
-               PERFORM 20111-DAY-CSV-SEC
-               MOVE    TDAY-CSV    TO  HSPTEVALRES-MEDKBN-DAY(IDXA)
-           END-IF
+           MOVE    SNINF04-MEDKBN-LV-DAY
+                                       TO HSPTEVALRES-MEDKBN-LV-DAY
+           MOVE    SNINF04-ADLKBN-TTL-DAY
+                                       TO HSPTEVALRES-ADLKBN-TTL-DAY
+           MOVE    SNINF04-PTEVAL-DAY
+                                       TO HSPTEVALRES-PTEVAL-DAY
+           MOVE    SNINF04-PTEVAL-DIFF
+                                       TO HSPTEVALRES-PTEVAL-DIFF
       *
-           INITIALIZE                  TDAY-AREA
-           MOVE    1              TO   TDAY-POS
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-               IF    ( IDXD        =   1 )
-                   CONTINUE
-               ELSE
-                   STRING    ","   DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-               IF    ( HCN68S01-RYOYO-CD (IDXD)        NOT =   SPACE )
-                   MOVE    SPACE       TO  WRK-MEDKBN
-                   EVALUATE    TRUE
-                   WHEN  ( HCN68S01-MEDKBN-DAYALL (1)      =   1 )
-                   WHEN  ( HCN68S01-MEDKBN-DAY (1 IDXD)    >   ZERO )
-                       MOVE    "3"     TO  WRK-MEDKBN
-                   WHEN  ( HCN68S01-MEDKBN-DAYALL (2)      =   1 )
-                   WHEN  ( HCN68S01-MEDKBN-DAY (2 IDXD)    >   ZERO )
-                       MOVE    "2"     TO  WRK-MEDKBN
-                   WHEN  OTHER
-                       MOVE    "1"     TO  WRK-MEDKBN
-                   END-EVALUATE
-                   IF    ( WRK-MEDKBN  NOT =    SPACE )
-                       STRING    WRK-MEDKBN     DELIMITED BY SIZE
-                       INTO  TDAY-CSV
-                       WITH  POINTER   TDAY-POS
-                       END-STRING
-                   END-IF
-               END-IF
-      *
-           END-PERFORM
-           MOVE    TDAY-CSV            TO  HSPTEVALRES-MEDKBN-LV-DAY
-      *
-          .
-       2001-MEDKBN-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    °åÎÅ¶èÊ¬ÊÔ½¸½èÍý
-      *****************************************************************
-       20011-MEDKBN-EDIT-SEC     SECTION.
-      *
-           COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-           MOVE    WRK-MEDKBN-MAX  TO  IDXA
-      *
-           IF    ( HCN68S01-TMEDKBN (IDXM) =   "2" OR "3" )
-               MOVE    HCN68S01-TMEDKBN (IDXM)
-                                   TO  HSPTEVALRES-MEDKBN-LV (IDXA)
-           END-IF
-           MOVE    HCN68S01-TID (IDXM)
-                                   TO  HSPTEVALRES-MEDKBN-ID (IDXA)
-           MOVE    HCN68S01-TNAME (IDXM)
-                                   TO  HSPTEVALRES-MEDKBN-NAME (IDXA)
-           IF    ( HSPTEVALRES-MEDKBN-ID (IDXA)(1:1)   =   "0" )
-               MOVE    SPACE       TO  HSPTEVALRES-MEDKBN-ID (IDXA)(1:1)
-           END-IF
-           IF    ( HCN68S01-TDAYALL (IDXM)
-                                   =   1 )
-               MOVE    "1"         TO  HSPTEVALRES-MEDKBN-MON (IDXA)
-           END-IF
-      *
-           IF    ( HCN68S01-TDAY-G (IDXM)  NOT =   ZERO )
-               INITIALIZE      TDAY-AREA
-               PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-                   MOVE    HCN68S01-TDAY (IDXM IDXD)
-                                   TO  TDAY-DAY (IDXD)
-               END-PERFORM
-               PERFORM 20111-DAY-CSV-SEC
-               MOVE    TDAY-CSV    TO  HSPTEVALRES-MEDKBN-DAY(IDXA)
-           END-IF
-      *
-          .
-       20011-MEDKBN-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    °åÎÅ¶èÊ¬ÊÔ½¸½èÍý
-      *****************************************************************
-       20011-MEDKBN-TUKI-HYOKA-EDIT-SEC     SECTION.
-      *
-           COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-           MOVE    WRK-MEDKBN-MAX  TO  IDXA
-      *
-           EVALUATE    IDXM
-           WHEN    1
-               MOVE    "3"     TO  HSPTEVALRES-MEDKBN-LV (IDXA)
-               MOVE    "M3"    TO  HSPTEVALRES-MEDKBN-ID (IDXA)
-               MOVE    "°åÎÅ¶èÊ¬£³¤Î³ºÅöÍ­Ìµ"
-                               TO  HSPTEVALRES-MEDKBN-NAME (IDXA)
-           WHEN    2
-               MOVE    "2"     TO  HSPTEVALRES-MEDKBN-LV (IDXA)
-               MOVE    "M2"    TO  HSPTEVALRES-MEDKBN-ID (IDXA)
-               MOVE    "°åÎÅ¶èÊ¬£²¤Î³ºÅöÍ­Ìµ"
-                               TO  HSPTEVALRES-MEDKBN-NAME (IDXA)
-           END-EVALUATE
-      *
-           IF    ( HCN68S01-MEDKBN-DAYALL (IDXM)   =   1 )
-               MOVE    "1"         TO  HSPTEVALRES-MEDKBN-MON (IDXA)
-           END-IF
-      *
-           INITIALIZE      TDAY-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               MOVE    HCN68S01-MEDKBN-DAY (IDXM IDXD)
-                                   TO  TDAY-DAY (IDXD)
-           END-PERFORM
-           PERFORM 20111-DAY-CSV-SEC
-           MOVE    TDAY-CSV        TO  HSPTEVALRES-MEDKBN-DAY(IDXA)
-      *
-          .
-       20011-MEDKBN-TUKI-HYOKA-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    £Á£Ä£ÌÅÀ¿ôÊÔ½¸½èÍý
-      *****************************************************************
-       2001-ADLTEN-EDIT-SEC                SECTION.
-      *
-           MOVE    ZERO            TO  IDXA
-      *
-           PERFORM VARYING IDXM    FROM    1   BY  1
-                   UNTIL ( IDXM    >   HCN68S01-RYOLIST-MAX )
-      *
-               IF    ( HCN68S01-TZAISKBKBN (IDXM)  =   "1" )
-      *
-                   COMPUTE IDXA    =   IDXA    +   1
-      *
-                   MOVE    HCN68S01-TID (IDXM)
-                                   TO  HSPTEVALRES-ADLKBN-ID (IDXA)
-                   MOVE    HCN68S01-TNAME (IDXM)
-                                   TO  HSPTEVALRES-ADLKBN-NAME (IDXA)
-                   INITIALIZE          TDAY-AREA
-                   PERFORM VARYING IDXD    FROM    1   BY  1
-                           UNTIL ( IDXD    >   31 )
-                       MOVE    HCN68S01-TDAY (IDXM IDXD)
-                                       TO  TDAY-DAY (IDXD)
-                   END-PERFORM
-                   PERFORM 20112-DAY-CSV-SEC
-                   MOVE    TDAY-CSV    TO  HSPTEVALRES-ADLKBN-DAY (IDXA)
-               END-IF
-      *
-           END-PERFORM
-      *
-           INITIALIZE          TDAY-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               MOVE    HCN68S01-ADLTEN-DAY (IDXD)
-                               TO  TDAY-DAY (IDXD)
-           END-PERFORM
-           PERFORM 20112-DAY-CSV-SEC
-           MOVE    TDAY-CSV    TO  HSPTEVALRES-ADLKBN-TTL-DAY
-      *
-          .
-       2001-ADLTEN-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ´µ¼Ô¤Î¾õÂÖÁüÉ¾²ÁÊÔ½¸½èÍý
-      *****************************************************************
-       2001-PTEVAL-EDIT-SEC                SECTION.
-      *
-           INITIALIZE              TDAY-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               MOVE    HCN68S01-PTSTS-DAY3 (IDXD)
-                                   TO  TDAY-DAY (IDXD)
-           END-PERFORM
-           PERFORM 20113-DAY-CSV-SEC
-           MOVE    TDAY-CSV        TO  HSPTEVALRES-PTEVAL-DAY
-      *
-           INITIALIZE              TDAY-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               IF    ( HCN68S01-PTSTS-DAY (IDXD)
-                               NOT =   HCN68S01-PTSTS-DAY2 (IDXD))
-                   MOVE    HCN68S01-PTSTS-DAY (IDXD)
-                                   TO  TDAY-DAY (IDXD)
-               END-IF
-           END-PERFORM
-           IF    ( TDAY-DAY-G      NOT =   ZERO )
-               INITIALIZE              TDAY-AREA
-               PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-                   MOVE    HCN68S01-PTSTS-DAY   (IDXD)
-                                   TO  TDAY-DAY (IDXD)
-               END-PERFORM
-               PERFORM 20113-DAY-CSV-SEC
-               MOVE    TDAY-CSV    TO  HSPTEVALRES-PTEVAL-DIFF
-           END-IF
-      *
-          .
-       2001-PTEVAL-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    É¾²ÁÆü¾ðÊó£Ã£Ó£ÖÊÔ½¸½èÍý¡Ê°åÎÅ¶èÊ¬¡Ë
-      *****************************************************************
-       20111-DAY-CSV-SEC                   SECTION.
-      *
-           MOVE    SPACE               TO  TDAY-CSV
-      *
-           MOVE    1                   TO  TDAY-POS
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-      *
-               IF    ( IDXD        =   1 )
-                   CONTINUE
-               ELSE
-                   STRING    ","   DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-               IF    ( TDAY-DAY (IDXD) >   ZERO )
-                   STRING    "1"   DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-           END-PERFORM
-      *
-          .
-       20111-DAY-CSV-EXT.
-           EXIT.
-      *****************************************************************
-      *    É¾²ÁÆü¾ðÊó£Ã£Ó£ÖÊÔ½¸½èÍý¡Ê£Á£Ä£ÌÅÀ¿ô¡Ë
-      *****************************************************************
-       20112-DAY-CSV-SEC                   SECTION.
-      *
-           MOVE    SPACE               TO  TDAY-CSV
-      *
-           MOVE    1                   TO  TDAY-POS
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-      *
-               IF    ( IDXD        =   1 )
-                   CONTINUE
-               ELSE
-                   STRING    ","   DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-               IF    ( HCN68S01-RYOYO-CD (IDXD)
-                                       NOT =   SPACE )
-                   MOVE    TDAY-DAY (IDXD)
-                                   TO  WRK-ADLTEN
-                   IF    ( WRK-ADLTEN (1:1)    =   "0" )
-                       STRING    WRK-ADLTEN-G(2:) 
-                                               DELIMITED BY SIZE
-                       INTO  TDAY-CSV
-                       WITH  POINTER   TDAY-POS
-                       END-STRING
-                   ELSE
-                       STRING    WRK-ADLTEN-G  DELIMITED BY SIZE
-                       INTO  TDAY-CSV
-                       WITH  POINTER   TDAY-POS
-                       END-STRING
-                   END-IF
-               END-IF
-      *
-           END-PERFORM
-      *
-          .
-       20112-DAY-CSV-EXT.
-           EXIT.
-      *****************************************************************
-      *    É¾²ÁÆü¾ðÊó£Ã£Ó£ÖÊÔ½¸½èÍý¡Ê´µ¼Ô¾õÂÖ¡Ë
-      *****************************************************************
-       20113-DAY-CSV-SEC                   SECTION.
-      *
-           MOVE    SPACE               TO  TDAY-CSV
-      *
-           MOVE    1                   TO  TDAY-POS
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-      *
-               IF    ( IDXD        =   1 )
-                   CONTINUE
-               ELSE
-                   STRING    ","   DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-               MOVE    SPACE       TO  WRK-PTEVAL
-               EVALUATE    TDAY-DAY (IDXD)
-               WHEN    1
-                   MOVE    "A"     TO  WRK-PTEVAL
-               WHEN    2
-                   MOVE    "B"     TO  WRK-PTEVAL
-               WHEN    3
-                   MOVE    "C"     TO  WRK-PTEVAL
-               WHEN    4
-                   MOVE    "D"     TO  WRK-PTEVAL
-               WHEN    5
-                   MOVE    "E"     TO  WRK-PTEVAL
-               WHEN    6
-                   MOVE    "F"     TO  WRK-PTEVAL
-               WHEN    7
-                   MOVE    "G"     TO  WRK-PTEVAL
-               WHEN    8
-                   MOVE    "H"     TO  WRK-PTEVAL
-               WHEN    9
-                   MOVE    "I"     TO  WRK-PTEVAL
-               END-EVALUATE
-      *
-               IF    ( WRK-PTEVAL  NOT =   SPACE )
-                   STRING    WRK-PTEVAL    DELIMITED BY SIZE
-                   INTO  TDAY-CSV
-                   WITH  POINTER   TDAY-POS
-                   END-STRING
-               END-IF
-      *
-           END-PERFORM
-      *
-          .
-       20113-DAY-CSV-EXT.
+           .
+       2001-RESPONSE-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ½ªÎ»½èÍý

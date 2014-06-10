@@ -254,7 +254,7 @@
                    MOVE    PTNYUINRRK-REC
                                        TO  TRRK-REC
                ELSE
-                   MOVE    "0131"      TO  ERRCD-ORDER
+                   MOVE    "0051"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *

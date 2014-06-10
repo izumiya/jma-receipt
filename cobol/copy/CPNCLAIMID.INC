@@ -145,6 +145,48 @@
                                 PIC X(05)   VALUE  "00017".
                07  NCLAIMID-SKJTYPEMES
                                 PIC X(100)  VALUE  "ø©ªˆ§ŒºÔŒ‡".
+             05  NCLAIMID-MEDID-G.
+               07  NCLAIMID-MEDID
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-MEDIDJMA
+                                PIC X(05)   VALUE  "00018".
+               07  NCLAIMID-MEDIDMES
+                                PIC X(100)  VALUE  "∞ÂŒ≈∂Ë ¨π‡Ã‹»÷πÊ".
+             05  NCLAIMID-MEDDATA-G.
+               07  NCLAIMID-MEDDATA
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-MEDDATAJMA
+                                PIC X(05)   VALUE  "00019".
+               07  NCLAIMID-MEDDATAMES
+                       PIC X(100)  VALUE  "∞ÂŒ≈∂Ë ¨π‡Ã‹ø«Œ≈∆¸§Œæı¬÷".
+             05  NCLAIMID-MEDALL-G.
+               07  NCLAIMID-MEDALL
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-MEDALLJMA
+                                PIC X(05)   VALUE  "00020".
+               07  NCLAIMID-MEDALLMES
+                       PIC X(100)  VALUE  "∞ÂŒ≈∂Ë ¨π‡Ã‹ £øÙ∆¸¿ﬂƒÍ".
+             05  NCLAIMID-ADLID-G.
+               07  NCLAIMID-ADLID
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ADLIDJMA
+                                PIC X(05)   VALUE  "00021".
+               07  NCLAIMID-ADLIDMES
+                       PIC X(100)  VALUE  "£¡£ƒ£Ãπ‡Ã‹»÷πÊ".
+             05  NCLAIMID-ADLTEN-G.
+               07  NCLAIMID-ADLTEN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ADLTENJMA
+                                PIC X(05)   VALUE  "00022".
+               07  NCLAIMID-ADLTENMES
+                       PIC X(100)  VALUE  "£¡£ƒ£Ãπ‡Ã‹ø«Œ≈∆¸§Œ≈¿øÙ".
+             05  NCLAIMID-ADLALL-G.
+               07  NCLAIMID-ADLALL
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ADLALLJMA
+                                PIC X(05)   VALUE  "00023".
+               07  NCLAIMID-ADLALLMES
+                       PIC X(100)  VALUE  "£¡£ƒ£Ã≈¿øÙ £øÙ∆¸¿ﬂƒÍ".
              05  NCLAIMID-UNCHKECK-G.
                07  NCLAIMID-UNCHKECK
                                 PIC X(20)   VALUE  "XXXXXXX".
@@ -153,8 +195,8 @@
                07  NCLAIMID-UNCHKECKMES
                                 PIC X(100)  VALUE  "…‘Ã¿".
            03  NCLAIMID-ITEM-R          REDEFINES   NCLAIMID-ITEM-VAL.
-             05  NCLAIMID-ITEM-OCC      OCCURS  18.
+             05  NCLAIMID-ITEM-OCC      OCCURS  24.
                07  NCLAIMID-ITEM        PIC X(20).
                07  NCLAIMID-ITEMJMA     PIC X(05).
                07  NCLAIMID-ITEMMES     PIC X(100).
-           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   18.
+           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   24.

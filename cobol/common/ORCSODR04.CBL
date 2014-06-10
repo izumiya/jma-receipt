@@ -96,8 +96,8 @@
        01  ERRCD-AREA.
            03  ERRCD-ITEM-G.
                05  ERRCD-ITEM          PIC X(04).
-               05  ERRCD-ERRCD         PIC X(04).
-           03  ERRCD-ORDER             PIC X(04).
+               05  ERRCD-ORDER         PIC X(04).
+           03  ERRCD-ERRCD             PIC X(04).
       *
        01  CONST-AREA.
            03  CONST-ITEMNUM-MAX       PIC 9(05)   VALUE 30.
@@ -235,7 +235,7 @@
                IF    ( FLG-PTNYUINRRK  =   ZERO )
                    MOVE    PTNYUINRRK-REC  TO  TRRK-REC
                ELSE
-                   MOVE    "0083"          TO  ERRCD-ORDER
+                   MOVE    "0075"          TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -360,13 +360,13 @@
                                        TO  ITEM-NYUINKA
       *
                ELSE
-                   MOVE    "0079"      TO  ERRCD-ERRCD
+                   MOVE    "0002"      TO  ERRCD-ERRCD
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0080"      TO  ERRCD-ERRCD
+               MOVE    "0040"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -393,17 +393,17 @@
                        MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-HKNCOMBI
                    ELSE
-                       MOVE    "0081"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                     END-IF
                ELSE
-                       MOVE    "0081"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0082"      TO  ERRCD-ERRCD
+               MOVE    "0041"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -666,7 +666,7 @@
                                         OR NORDERID-FSTOPID
                                                             )
                IF    ( ITEM-NYUINKA    =   SPACE )
-                   MOVE    "0079"          TO  ERRCD-ORDER
+                   MOVE    "0002"          TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -685,7 +685,7 @@
                                         OR NORDERID-FSTOPID
                                                             )
                IF    ( ITEM-HKNCOMBI   =   ZERO )
-                   MOVE    "0081"          TO  ERRCD-ORDER
+                   MOVE    "0005"          TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -758,13 +758,13 @@
                                         OR NORDERID-FSTOPID
                                                             )
                IF    ( PTNYUINRRK-NYUINKA  NOT =   ITEM-NYUINKA )
-                   MOVE    "0087"      TO  ERRCD-ORDER
+                   MOVE    "0069"      TO  ERRCD-ORDER
                    GO  TO  20021-NYUINRRK-CHK-EXT
                END-IF
            END-IF
       *
       *    IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
-      *        MOVE    "0088"      TO  ERRCD-ORDER
+      *        MOVE    "0070"      TO  ERRCD-ORDER
       *        GO  TO  20021-NYUINRRK-CHK-EXT
       *    END-IF
       *

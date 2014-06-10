@@ -115,6 +115,7 @@
            03  IDX                 PIC 9(05).
            03  IDY                 PIC 9(05).
            03  IDZ                 PIC 9(05).
+           03  IDXL                PIC 9(05).
       *
       *    パラメタ領域
        01  WRK-PARA.
@@ -139,6 +140,7 @@
            03  WRK-SAKYMDWH        PIC X(09).
            03  WRK-SYORIKBN        PIC X(12).
            03  WRK-ITEM            PIC X(10000).
+           03  WRK-ITEM-SIZE       PIC 9(05).
       *
            03  WRK-SYSYMD.
                05  WRK-SYSYY       PIC 9(04).
@@ -300,6 +302,10 @@
            MOVE    "BD009ZZ"       TO  BD009PARA-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID
                                    TO  BD009PARA-TERMID
+      *
+           MOVE    ZERO            TO  WRK-ITEM-SIZE
+           MOVE    SPACE           TO  WRK-ITEM
+           INSPECT WRK-ITEM  TALLYING  WRK-ITEM-SIZE  FOR ALL " "
       *
       *    パラメタ編集処理
            PERFORM 110-PARA-HENSYU-SEC
@@ -595,7 +601,19 @@
                        END-STRING
                    END-IF
                END-PERFORM
-               MOVE    WRK-ITEM(1:100) TO  HCM45-ITEM(CNT-LINE)
+               MOVE    1               TO  IDXL
+               PERFORM UNTIL ( IDXL    >   WRK-ITEM-SIZE )
+                        OR   ( WRK-ITEM(IDXL :)    =   SPACE )
+                   MOVE    WRK-ITEM(IDXL:100) TO  HCM45-ITEM(CNT-LINE)
+                   COMPUTE IDXL = IDXL +   100
+                   IF    ( WRK-ITEM(IDXL :)    NOT =   SPACE )
+                      ADD     1               TO  CNT-LINE
+                      IF      CNT-LINE    >   40
+                         PERFORM 390-PRINT-OUT-SEC
+                         PERFORM 310-HEAD-HEN-SEC
+                      END-IF
+                   END-IF
+               END-PERFORM
            END-IF
       *
            ADD     1               TO  CNT-LINE

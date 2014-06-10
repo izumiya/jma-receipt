@@ -410,7 +410,7 @@
        10011-PTNUM-CHECK-SEC       SECTION.
       *
            IF    ( HSPTINFMREQ-PTNUM    =   SPACE )
-               MOVE    "8004"           TO  WRK-ERRCD
+               MOVE    "0004"           TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
            ELSE
                INITIALIZE                  ORCSPTIDAREA
@@ -420,7 +420,7 @@
                                        ORCSPTIDAREA
                                        SPA-AREA
                IF    ( SPTID-RC        NOT =   ZERO )
-                   MOVE    "8004"      TO  WRK-ERRCD
+                   MOVE    "0004"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                END-IF
       *
@@ -430,7 +430,7 @@
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
            IF    ( FLG-PTINF       NOT =   ZERO )
-               MOVE    "8004"          TO  WRK-ERRCD
+               MOVE    "0004"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
            END-IF
       *
@@ -457,7 +457,7 @@
                    MOVE    WRK-SYMD   TO  REG-NYUINYMD
                END-IF
       *
-               IF    (  HSPTINFMREQ-REQNUM  NOT =   "01" )
+               IF    (  HSPTINFMREQ-REQNUM      =   "01" )
                    IF    (  REG-NYUINYMD    NOT =   SPACE )
                     AND  (  REG-NYUINYMD  <   CONST-H240401 )
                        MOVE    "8002"     TO  WRK-ERRCD
@@ -1926,7 +1926,7 @@
                     OR   ( WRK-ERRMSG  NOT =   SPACE )
       *
                IF    ( NCLAIMERRCDL (IDXE) =   WRK-ERRCD )
-                   MOVE    NCLAIMERRCDLMEI2  (IDXE)
+                   MOVE    NCLAIMERRCDLMEI  (IDXE)
                                        TO  WRK-ERRMSG
                END-IF
       *

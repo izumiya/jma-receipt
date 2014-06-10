@@ -531,13 +531,13 @@
                                        TO  ITEM-NYUINKA
       *
                ELSE
-                   MOVE    "0065"      TO  ERRCD-ERRCD
+                   MOVE    "0002"      TO  ERRCD-ERRCD
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0066"      TO  ERRCD-ERRCD
+               MOVE    "0040"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -564,17 +564,17 @@
                        MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-HKNCOMBI
                    ELSE
-                       MOVE    "0067"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                     END-IF
                ELSE
-                       MOVE    "0067"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0068"      TO  ERRCD-ERRCD
+               MOVE    "0041"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -684,7 +684,7 @@
       *
            IF    ( SODR-ORDERID        =   NORDERID-TAIINID )
                IF    ( ITEM-NYUINKA    =   SPACE )
-                   MOVE    "0065"      TO  ERRCD-ORDER
+                   MOVE    "0002"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -698,7 +698,7 @@
       *
            IF    ( SODR-ORDERID        =   NORDERID-TAIINID )
                IF    ( ITEM-HKNCOMBI   =   ZERO )
-                   MOVE    "0067"      TO  ERRCD-ORDER
+                   MOVE    "0005"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -833,7 +833,7 @@
                MOVE    MCPDATA-REC     TO  PTTEIKIRRK-REC
                IF    ( PTTEIKIRRK-SKYEDYMD
                                        >=  SODR-SRYYMD )
-                   MOVE    "0057"      TO  ERRCD-ORDER
+                   MOVE    "0055"      TO  ERRCD-ORDER
                    GO  TO  20021-SKYSTYMD-GET-EXT
                END-IF
       *
@@ -1188,9 +1188,9 @@
            ELSE
                EVALUATE LNK-S02-RC
                WHEN    13
-                   MOVE    "0062"      TO  ERRCD-ORDER
+                   MOVE    "0061"      TO  ERRCD-ORDER
                WHEN    OTHER
-                   MOVE    "0063"      TO  ERRCD-ORDER
+                   MOVE    "0061"      TO  ERRCD-ORDER
                END-EVALUATE
            END-IF
       *

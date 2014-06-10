@@ -183,6 +183,10 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  MEDINF-AREA
       *
+           IF    ( HCN68S01-RANGE      =   SPACE )
+               MOVE    "0"             TO  HCN68S01-RANGE
+           END-IF
+      *
            MOVE    6                   TO  CONST-ADLTEN-MAX
            MOVE    4                   TO  CONST-ADLKBN-MAX
       *
@@ -251,6 +255,8 @@
                        UNTIL ( IDX-DAY >   31 )
                    IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
                        MOVE    1   TO  HCN68S01-NYUIN-DAY (IDX-DAY)
+                       COMPUTE HCN68S01-NYUIN-NISSU
+                           =   HCN68S01-NYUIN-NISSU    +   1
                    END-IF
                END-PERFORM
            END-IF
@@ -413,14 +419,18 @@
       *
                    PERFORM VARYING IDX-DAY FROM    1   BY  1
                            UNTIL ( IDX-DAY >   31 )
-                       IF    ( HCN68S01-RANGE      =   "1" )
-                        AND  ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                                   =   SPACE )
-                           CONTINUE
-                       ELSE
+      *
+                       EVALUATE    TRUE
+                       WHEN  ( HCN68S01-RANGE      =   "1" )
+                         AND ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                               NOT =   SPACE )
+                       WHEN  ( HCN68S01-RANGE      =   "0" )
+                         AND ( HCN68S01-NYUIN-DAY (IDX-DAY)
+                                                   >   ZERO )
                            MOVE    RYOCOM-DAY (IDX-DAY)
                                    TO  HCN68S01-TDAY (IDX-LST IDX-DAY)
-                       END-IF
+                       END-EVALUATE
+      *
                    END-PERFORM
       *
                ELSE
@@ -461,26 +471,34 @@
                     AND  ( RYOCOM-DAY-TBL2 =   ZERO )
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   31 )
-                           IF    ( HCN68S01-RANGE      =   "1" )
-                            AND  ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                                       =   SPACE )
-                               CONTINUE
-                           ELSE
+      *
+                           EVALUATE    TRUE
+                           WHEN  ( HCN68S01-RANGE      =   "1" )
+                             AND ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                               NOT =   SPACE )
+                           WHEN  ( HCN68S01-RANGE      =   "0" )
+                             AND ( HCN68S01-NYUIN-DAY (IDX-DAY)
+                                                   >   ZERO )
                                MOVE    RYOCOM-MONTH
                                    TO  HCN68S01-TDAY (IDX-LST IDX-DAY)
-                           END-IF
+                           END-EVALUATE
+      *
                        END-PERFORM
                    ELSE
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   31 )
-                           IF    ( HCN68S01-RANGE      =   "1" )
-                            AND  ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                                       =   SPACE )
-                               CONTINUE
-                           ELSE
+      *
+                           EVALUATE    TRUE
+                           WHEN  ( HCN68S01-RANGE      =   "1" )
+                             AND ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                               NOT =   SPACE )
+                           WHEN  ( HCN68S01-RANGE      =   "0" )
+                             AND ( HCN68S01-NYUIN-DAY (IDX-DAY)
+                                                   >   ZERO )
                                MOVE    RYOCOM-DAY (IDX-DAY)
                                    TO  HCN68S01-TDAY (IDX-LST IDX-DAY)
-                           END-IF
+                           END-EVALUATE
+      *
                        END-PERFORM
                    END-IF
                END-IF
@@ -554,14 +572,8 @@
                            MOVE    MEDH20-MEIL (IDX0)
                                            TO MEDINF-NAME (IDXM)
                        END-IF
-                       MOVE    MEDH20-NUML (IDX0)(1:2)
-                                           TO WRK-NUM-ZEN
-                       PERFORM 800-NUM-HANKAKU-SEC
-                       MOVE    WRK-NUM-HAN TO MEDINF-ID (IDXM)(1:1)
-                       MOVE    MEDH20-NUML (IDX0)(3:2)
-                                           TO WRK-NUM-ZEN
-                       PERFORM 800-NUM-HANKAKU-SEC
-                       MOVE    WRK-NUM-HAN TO MEDINF-ID (IDXM)(2:1)
+                       MOVE    MEDH20-ID   (IDX0)
+                                           TO MEDINF-ID (IDXM)
                    END-IF
                END-PERFORM
            END-EVALUATE
@@ -609,11 +621,8 @@
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
-               IF    ( HCN68S01-RANGE      =   "1" )
-                AND  ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                           =   SPACE )
-                   CONTINUE
-               ELSE
+               IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                       NOT =   SPACE )
                    MOVE    SS011-DAY  (IDX-DAY)
                                 TO  HCN68S01-PTSTS-DAY (IDX-DAY)
                    MOVE    SS011-DAY2  (IDX-DAY)
@@ -645,16 +654,22 @@
                     AND  ( HCN68S01-TDAY-G  (IDX-LST)   =   ZERO )
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   31 )
-                           COMPUTE HCN68S01-ADLTEN-DAY (IDX-DAY)
-                               =   HCN68S01-ADLTEN-DAY (IDX-DAY)
-                               +   HCN68S01-TDAYALL (IDX-LST)
+                           IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                       NOT =   SPACE )
+                               COMPUTE HCN68S01-ADLTEN-DAY (IDX-DAY)
+                                   =   HCN68S01-ADLTEN-DAY (IDX-DAY)
+                                   +   HCN68S01-TDAYALL (IDX-LST)
+                           END-IF
                        END-PERFORM
                    ELSE
                        PERFORM VARYING IDX-DAY FROM    1   BY  1
                                UNTIL ( IDX-DAY >   31 )
-                           COMPUTE HCN68S01-ADLTEN-DAY (IDX-DAY)
-                               =   HCN68S01-ADLTEN-DAY (IDX-DAY)
-                               +   HCN68S01-TDAY  (IDX-LST IDX-DAY)
+                           IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                       NOT =   SPACE )
+                               COMPUTE HCN68S01-ADLTEN-DAY (IDX-DAY)
+                                   =   HCN68S01-ADLTEN-DAY (IDX-DAY)
+                                   +   HCN68S01-TDAY  (IDX-LST IDX-DAY)
+                           END-IF
                        END-PERFORM
                    END-IF
                END-IF
@@ -681,6 +696,8 @@
                            UNTIL ( IDX-DAY >   31 )
                        IF    ( HCN68S01-TDAY   (IDX-LST IDX-DAY)
                                            >   ZERO )
+                        AND  ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                       NOT =   SPACE )
                            MOVE    HCN68S01-TDAY   (IDX-LST IDX-DAY)
                                TO  HCN68S01-MEDKBN-DAY (IDX-MED IDX-DAY)
                        END-IF

@@ -500,7 +500,7 @@
            END-IF
       *
            IF    ( CNT-IDOKBN          <=  ZERO )
-               MOVE    "0010"          TO  ERRCD-KHNERR
+               MOVE    "0008"          TO  ERRCD-KHNERR
                PERFORM 1001-KIHON-ERRSET-SEC
                GO  TO  20011-NYUINIDOKBN-CHK-EXT
            END-IF

@@ -264,7 +264,7 @@
                    MOVE    PTNYUINRRK-REC
                                        TO  TRRK-REC
                ELSE
-                   MOVE    "0131"      TO  ERRCD-ORDER
+                   MOVE    "0051"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -383,13 +383,13 @@
                                        TO  ITEM-NYUINKA
       *
                ELSE
-                   MOVE    "0127"      TO  ERRCD-ERRCD
+                   MOVE    "0002"      TO  ERRCD-ERRCD
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0128"      TO  ERRCD-ERRCD
+               MOVE    "0040"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -416,17 +416,17 @@
                        MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-HKNCOMBI
                    ELSE
-                       MOVE    "0129"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                     END-IF
                ELSE
-                       MOVE    "0129"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0130"      TO  ERRCD-ERRCD
+               MOVE    "0041"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -492,7 +492,7 @@
            IF    ( SODR-ORDERID        =   NORDERID-DELNYUINID
                                         OR NORDERID-ALLDELNYUINID  )
                IF    ( ITEM-NYUINKA    =   SPACE )
-                   MOVE    "0127"          TO  ERRCD-ORDER
+                   MOVE    "0002"          TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -507,7 +507,7 @@
            IF    ( SODR-ORDERID        =   NORDERID-DELNYUINID
                                         OR NORDERID-ALLDELNYUINID  )
                IF    ( ITEM-HKNCOMBI   =   ZERO )
-                   MOVE    "0129"          TO  ERRCD-ORDER
+                   MOVE    "0005"          TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -523,7 +523,7 @@
       *
       *    入院中であること
            IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
-               MOVE    "0132"      TO  ERRCD-ORDER
+               MOVE    "0052"      TO  ERRCD-ORDER
                GO  TO  20021-NYUINRRK-CHK-EXT
            END-IF
       *

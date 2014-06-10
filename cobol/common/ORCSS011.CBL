@@ -196,6 +196,7 @@
       *    初期　処理
       *****************************************************************
        100-INIT-SEC                    SECTION.
+           DISPLAY "SS011-NYUUPDFLG=" SS011-NYUUPDFLG
       *
            INITIALIZE                  IDX-AREA
                                        FLG-AREA
@@ -239,11 +240,11 @@
            PERFORM 1001-INIT-TNACCT-SEC
       *
            IF    ( SS011-DAYFLG        =   ZERO )
-               PERFORM 1001-EDIT-RYOYO-DAY-SEC
-           END-IF
       *
-           IF    ( SS011-DAYFLG        =   ZERO )
+               PERFORM 1001-EDIT-RYOYO-DAY-SEC
+      *
                PERFORM 1001-EDIT-MEDADL-SEC
+      *
            END-IF
       *
            .
@@ -350,6 +351,39 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           DISPLAY "SS011-DAY->"
+                    SS011-DAY (1) ","
+                    SS011-DAY (2) ","
+                    SS011-DAY (3) ","
+                    SS011-DAY (4) ","
+                    SS011-DAY (5) ","
+                    SS011-DAY (6) ","
+                    SS011-DAY (7) ","
+                    SS011-DAY (8) ","
+                    SS011-DAY (9) ","
+                    SS011-DAY (10) ","
+                    SS011-DAY (11) ","
+                    SS011-DAY (12) ","
+                    SS011-DAY (13) ","
+                    SS011-DAY (14) ","
+                    SS011-DAY (15) ","
+                    SS011-DAY (16) ","
+                    SS011-DAY (17) ","
+                    SS011-DAY (18) ","
+                    SS011-DAY (19) ","
+                    SS011-DAY (20) ","
+                    SS011-DAY (21) ","
+                    SS011-DAY (22) ","
+                    SS011-DAY (23) ","
+                    SS011-DAY (24) ","
+                    SS011-DAY (25) ","
+                    SS011-DAY (26) ","
+                    SS011-DAY (27) ","
+                    SS011-DAY (28) ","
+                    SS011-DAY (29) ","
+                    SS011-DAY (30) ","
+                    SS011-DAY (31)
+      *
            .
        10011-EDIT-RYOYO-DAY-EXT.
            EXIT.
@@ -407,7 +441,7 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            PERFORM VARYING IDX-DAY FROM    1   BY  1
-                   UNTIL ( IDX-DAY >   ZERO )
+                   UNTIL ( IDX-DAY >   31 )
       *
                IF    ( SS011-DAY (IDX-DAY) >   ZERO )
                    IF    ( SS011-MEDKBN (IDX-DAY)  =   ZERO )
@@ -530,7 +564,7 @@
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
-               DISPLAY IDX-DAY ":SS011-DAY [" SS011-DAY (IDX-DAY)   "]"
+      *        DISPLAY IDX-DAY ":SS011-DAY [" SS011-DAY (IDX-DAY)   "]"
       *
                IF    ( SS011-DAY (IDX-DAY) >   ZERO )
       *
@@ -767,9 +801,6 @@
                        MOVE    ZERO    TO  FLG-TARGET
                END-IF
       *
-               DISPLAY IDX-RYO ":" WNACCT-RYOYOCD (IDX-RYO)
-                        "[" FLG-TARGET "]"
-      *
                IF    ( FLG-TARGET  =   1 )
                    MOVE    WNACCT-OCC (IDX-RYO)
                                            TO  NYUINACCT-REC
@@ -864,11 +895,6 @@
            CALL    "ORCSHYOUKETU"      USING
                                        ORCSHYOUKETU-AREA
                                        SPA-AREA
-           DISPLAY "LNK-HYOUKETU-RC[" LNK-HYOUKETU-RC "]"
-           DISPLAY "1:HST[" LNK-HYOUKETU-STARTYM(1) "]"
-                     "HED[" LNK-HYOUKETU-ENDYM  (1) "]"
-           DISPLAY "2:HST[" LNK-HYOUKETU-STARTYM(2) "]"
-                     "HED[" LNK-HYOUKETU-ENDYM  (2) "]"
            IF    ( LNK-HYOUKETU-RC     =   ZERO )
                CONTINUE
            ELSE
@@ -892,11 +918,6 @@
            MOVE    "0"                 TO  LNK-TEISU-TOKUTEINYUIN-KBN
            CALL    "ORCSTEISU"         USING   ORCSTEISU-AREA
                                                SPA-AREA
-           DISPLAY "LNK-TEISU-RC[" LNK-HYOUKETU-RC "]"
-           DISPLAY "1:HST[" LNK-TEISU-STARTYM(1) "]"
-                     "HED[" LNK-TEISU-ENDYM  (1) "]"
-           DISPLAY "2:HST[" LNK-TEISU-STARTYM(2) "]"
-                     "HED[" LNK-TEISU-ENDYM  (2) "]"
            IF    ( LNK-TEISU-RC        =   ZERO )
                CONTINUE
            ELSE

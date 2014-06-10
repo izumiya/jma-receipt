@@ -80,8 +80,8 @@
        01  ERRCD-AREA.
            03  ERRCD-ITEM-G.
                05  ERRCD-ITEM          PIC X(04).
-               05  ERRCD-ERRCD         PIC X(04).
-           03  ERRCD-ORDER             PIC X(04).
+               05  ERRCD-ORDER         PIC X(04).
+           03  ERRCD-ERRCD             PIC X(04).
       *
        01  CONST-AREA.
            03  CONST-ITEMNUM-MAX               PIC 9(05)   VALUE 30.
@@ -318,13 +318,13 @@
                                        TO  ITEM-NYUINKA
       *
                ELSE
-                   MOVE    "0071"      TO  ERRCD-ERRCD
+                   MOVE    "0002"      TO  ERRCD-ERRCD
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0072"      TO  ERRCD-ERRCD
+               MOVE    "0040"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -351,17 +351,17 @@
                        MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-HKNCOMBI
                    ELSE
-                       MOVE    "0073"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                     END-IF
                ELSE
-                       MOVE    "0073"  TO  ERRCD-ERRCD
+                       MOVE    "0005"  TO  ERRCD-ERRCD
                        PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
            ELSE
                PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0074"      TO  ERRCD-ERRCD
+               MOVE    "0041"      TO  ERRCD-ERRCD
                PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
@@ -444,7 +444,7 @@
                                         OR NORDERID-GBACKID
                                                              )
                IF    ( ITEM-NYUINKA    =   SPACE )
-                   MOVE    "0071"      TO  ERRCD-ORDER
+                   MOVE    "0002"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -460,7 +460,7 @@
                                         OR NORDERID-GBACKID
                                                              )
                IF    ( ITEM-HKNCOMBI   =   ZERO )
-                   MOVE    "0073"      TO  ERRCD-ORDER
+                   MOVE    "0005"      TO  ERRCD-ORDER
                END-IF
            END-IF
       *
@@ -480,12 +480,12 @@
       *
       *        診療科と保険組合せの変更は不可
                IF    ( PTNYUINRRK-NYUINKA  NOT =   ITEM-NYUINKA )
-                   MOVE    "0077"      TO  ERRCD-ORDER
+                   MOVE    "0069"      TO  ERRCD-ORDER
                    GO  TO  20021-NYUINRRK-CHK-EXT
                END-IF
       *
                IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
-                   MOVE    "0078"      TO  ERRCD-ORDER
+                   MOVE    "0070"      TO  ERRCD-ORDER
                    GO  TO  20021-NYUINRRK-CHK-EXT
                END-IF
            END-IF

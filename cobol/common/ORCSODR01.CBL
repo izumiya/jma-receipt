@@ -128,9 +128,10 @@
            03  ITEM-TEIKIKBN           PIC X(01).
       *
        01  ERRCD-AREA.
-           03  ERRCD-ITEM              PIC X(04).
+           03  ERRCD-ITEM-G.
+               05  ERRCD-ITEM          PIC X(04).
+               05  ERRCD-ORDER         PIC X(04).
            03  ERRCD-ERRCD             PIC X(04).
-           03  ERRCD-ORDER             PIC X(04).
       *
       *    Æþ±¡CLAIM¹àÌÜID¥³¥Ô¡¼¶ç
            COPY    "CPNCLAIMID.INC".
@@ -678,7 +679,7 @@
                                        TO  ITEM-NYUINKA
       *
                ELSE
-                   MOVE    "0031"      TO  ERRCD-ERRCD
+                   MOVE    "0002"      TO  ERRCD-ERRCD
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
@@ -844,7 +845,7 @@
                       MOVE    "2"          TO  ITEM-DOUJITSUKBN
                    ELSE
                        MOVE    2           TO  WRK-DIALOG
-                       MOVE    "0045"      TO  ERRCD-ORDER
+                       MOVE    "0044"      TO  ERRCD-ORDER
                    END-IF
                END-EVALUATE
            END-IF
@@ -930,7 +931,7 @@
        20021-NYUINKA-CHK-SEC           SECTION.
       *
            IF    ( ITEM-NYUINKA    =   SPACE )
-               MOVE    "0031"          TO  ERRCD-ORDER
+               MOVE    "0002"          TO  ERRCD-ORDER
            END-IF
       *
            .

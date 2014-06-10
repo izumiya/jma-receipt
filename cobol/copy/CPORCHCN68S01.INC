@@ -29,6 +29,7 @@
            03  HCN68S01-PTID                       PIC 9(10).
            03  HCN68S01-SRYYM                      PIC X(06).
            03  HCN68S01-SRYYMD                     PIC X(08).
+           03  HCN68S01-NYUIN-NISSU                PIC 9(03).
            03  HCN68S01-NYUIN-DAY-G.
                05  HCN68S01-NYUIN-DAY              PIC 9(01)
                                                    OCCURS  31.

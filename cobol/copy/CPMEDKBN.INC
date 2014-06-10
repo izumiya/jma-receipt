@@ -32,7 +32,7 @@
                05  MEDH20-01FL04    PIC 9(03)    VALUE  7.
                05  MEDH20-01FL05    PIC 9(01)    VALUE  0.
                05  MEDH20-01FL06    PIC 9(04)    VALUE  2004.
-               05  MEDH20-01FL07    PIC X(04)    VALUE  "£°£±".
+               05  MEDH20-01FL07    PIC X(02)    VALUE  "01".
                05  MEDH20-01FL08    PIC X(06)    VALUE  "¡¡£±¡¡".
                05  MEDH20-01FL09    PIC X(100)   VALUE  
            "£²£´»þ´Ö»ýÂ³¤·¤ÆÅÀÅ©¤ò¼Â»Ü".
@@ -44,7 +44,7 @@
                05  MEDH20-02FL04    PIC 9(03)    VALUE 14.
                05  MEDH20-02FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-02FL06    PIC 9(04)    VALUE  2020.
-               05  MEDH20-02FL07    PIC X(04)    VALUE  "£°£²".
+               05  MEDH20-02FL07    PIC X(02)    VALUE  "02".
                05  MEDH20-02FL08    PIC X(06)    VALUE  "¡¡£²¡¡".
                05  MEDH20-02FL09    PIC X(100)   VALUE  
            "Ç¢Ï©´¶À÷¾É¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
@@ -56,7 +56,7 @@
                05  MEDH20-03FL04    PIC 9(03)    VALUE 30.
                05  MEDH20-03FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-03FL06    PIC 9(04)    VALUE  2021.
-               05  MEDH20-03FL07    PIC X(04)    VALUE  "£°£³".
+               05  MEDH20-03FL07    PIC X(02)    VALUE  "03".
                05  MEDH20-03FL08    PIC X(06)    VALUE  "¡¡£³¡¡".
                05  MEDH20-03FL09    PIC X(100)   VALUE  
            "½ýÉÂÅù¤Ë¤è¤ê¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤¬É¬Í×¤Ê¾õÂÖ".
@@ -68,7 +68,7 @@
                05  MEDH20-04FL04    PIC 9(03)    VALUE 7.
                05  MEDH20-04FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-04FL06    PIC 9(04)    VALUE  2022.
-               05  MEDH20-04FL07    PIC X(04)    VALUE  "£°£´".
+               05  MEDH20-04FL07    PIC X(02)    VALUE  "04".
                05  MEDH20-04FL08    PIC X(06)    VALUE  "¡¡£´¡¡".
                05  MEDH20-04FL09    PIC X(100)   VALUE  
            "Ã¦¿å¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü¡¢¤«¤Ä¡¢È¯Ç®¤òÈ¼¤¦¾õÂÖ".
@@ -80,7 +80,7 @@
                05  MEDH20-05FL04    PIC 9(03)    VALUE 7.
                05  MEDH20-05FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-05FL06    PIC 9(04)    VALUE  2023.
-               05  MEDH20-05FL07    PIC X(04)    VALUE  "£°£µ".
+               05  MEDH20-05FL07    PIC X(02)    VALUE  "05".
                05  MEDH20-05FL08    PIC X(06)    VALUE  "¡¡£µ¡¡".
                05  MEDH20-05FL09    PIC X(100)   VALUE  
            "¾Ã²½´ÉÅù¤ÎÂÎÆâ¤«¤é¤Î½Ð·ì¤¬È¿Éü·ÑÂ³".
@@ -92,7 +92,7 @@
                05  MEDH20-06FL04    PIC 9(03)    VALUE 3.
                05  MEDH20-06FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-06FL06    PIC 9(04)    VALUE  2024.
-               05  MEDH20-06FL07    PIC X(04)    VALUE  "£°£¶".
+               05  MEDH20-06FL07    PIC X(02)    VALUE  "06".
                05  MEDH20-06FL08    PIC X(06)    VALUE  "¡¡£¶¡¡".
                05  MEDH20-06FL09    PIC X(100)   VALUE  
            "ÉÑ²ó¤ÎÓÒÅÇ¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü¡¢¤«¤Ä¡¢È¯Ç®¤òÈ¼¤¦¾õÂÖ".
@@ -104,7 +104,7 @@
                05  MEDH20-07FL04    PIC 9(03)    VALUE 7.
                05  MEDH20-07FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-07FL06    PIC 9(04)    VALUE  2027.
-               05  MEDH20-07FL07    PIC X(04)    VALUE  "£°£·".
+               05  MEDH20-07FL07    PIC X(02)    VALUE  "07".
                05  MEDH20-07FL08    PIC X(06)    VALUE  "¡¡£·¡¡".
                05  MEDH20-07FL09    PIC X(100)   VALUE  
            "¤»¤óÌÑ¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
@@ -116,7 +116,7 @@
                05  MEDH20-08FL04    PIC 9(03)    VALUE 7.
                05  MEDH20-08FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-08FL06    PIC 9(04)    VALUE  2031.
-               05  MEDH20-08FL07    PIC X(04)    VALUE  "£°£¸".
+               05  MEDH20-08FL07    PIC X(02)    VALUE  "08".
                05  MEDH20-08FL08    PIC X(06)    VALUE  "¡¡£¸¡¡".
                05  MEDH20-08FL09    PIC X(100)   VALUE  
            "·ÐÉ¡°ß´É¤ä·ÐÄ²±ÉÍÜ¤¬¹Ô¤ï¤ì¤Æ¤ª¤ê¡¢È¯Ç®Ëô¤ÏÓÒÅÇ¤òÈ¼¤¦¾õÂÖ".
@@ -128,7 +128,7 @@
                05  MEDH20-09FL04    PIC 9(03)    VALUE 3.
                05  MEDH20-09FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-09FL06    PIC 9(04)    VALUE  2034.
-               05  MEDH20-09FL07    PIC X(04)    VALUE  "£°£¹".
+               05  MEDH20-09FL07    PIC X(02)    VALUE  "09".
                05  MEDH20-09FL08    PIC X(06)    VALUE  "¡¡£¹¡¡".
                05  MEDH20-09FL09    PIC X(100)   VALUE  
            "ÉÑ²ó¤Î·ìÅü¸¡ºº¤ò¼Â»Ü".
@@ -140,7 +140,7 @@
                05  MEDH20-10FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-10FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-10FL06    PIC 9(04)    VALUE  2001.
-               05  MEDH20-10FL07    PIC X(04)    VALUE  "£±£°".
+               05  MEDH20-10FL07    PIC X(02)    VALUE  "10".
                05  MEDH20-10FL08    PIC X(06)    VALUE  "£±£°¡¡".
                05  MEDH20-10FL09    PIC X(100)   VALUE  
            "¥¹¥â¥ó".
@@ -152,7 +152,7 @@
                05  MEDH20-11FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-11FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-11FL06    PIC 9(04)    VALUE  2010.
-               05  MEDH20-11FL07    PIC X(04)    VALUE  "£±£±".
+               05  MEDH20-11FL07    PIC X(02)    VALUE  "11".
                05  MEDH20-11FL08    PIC X(06)    VALUE  "£±£±¡¡".
                05  MEDH20-11FL09    PIC X(100)   VALUE  
          "Ãí£±¡§½ÅÅÙ¤Î»èÂÎÉÔ¼«Í³»ù¡Ê¼Ô¡ËÅù¡Ê¾ã³²¼Ô»ÜÀßÅùÆþ±¡´ðËÜÎÁ¡ËÅù".
@@ -164,7 +164,7 @@
                05  MEDH20-12FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-12FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-12FL06    PIC 9(04)    VALUE  2002.
-               05  MEDH20-12FL07    PIC X(04)    VALUE  "£±£²".
+               05  MEDH20-12FL07    PIC X(02)    VALUE  "12".
                05  MEDH20-12FL08    PIC X(06)    VALUE  "£±£²¡¡".
                05  MEDH20-12FL09    PIC X(100)   VALUE  
            "°å»ÕµÚ¤Ó´Ç¸î¿¦°÷¤Ë¤è¤ê¡¢¾ï»þ¡¢´Æ»ëµÚ¤Ó´ÉÍý¤ò¼Â»Ü".
@@ -176,7 +176,7 @@
                05  MEDH20-13FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-13FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-13FL06    PIC 9(04)    VALUE  2003.
-               05  MEDH20-13FL07    PIC X(04)    VALUE  "£±£³".
+               05  MEDH20-13FL07    PIC X(02)    VALUE  "13".
                05  MEDH20-13FL08    PIC X(06)    VALUE  "£±£³¡¡".
                05  MEDH20-13FL09    PIC X(100)   VALUE  
            "Ãæ¿´ÀÅÌ®±ÉÍÜ¤ò¼Â»Ü".
@@ -188,7 +188,7 @@
                05  MEDH20-14FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-14FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-14FL06    PIC 9(04)    VALUE  2005.
-               05  MEDH20-14FL07    PIC X(04)    VALUE  "£±£´".
+               05  MEDH20-14FL07    PIC X(02)    VALUE  "14".
                05  MEDH20-14FL08    PIC X(06)    VALUE  "£±£´¡¡".
                05  MEDH20-14FL09    PIC X(100)   VALUE  
            "¿Í¹©¸ÆµÛ´ï¤ò»ÈÍÑ".
@@ -200,7 +200,7 @@
                05  MEDH20-15FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-15FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-15FL06    PIC 9(04)    VALUE  2006.
-               05  MEDH20-15FL07    PIC X(04)    VALUE  "£±£µ".
+               05  MEDH20-15FL07    PIC X(02)    VALUE  "15".
                05  MEDH20-15FL08    PIC X(06)    VALUE  "£±£µ¡¡".
                05  MEDH20-15FL09    PIC X(100)   VALUE  
            "¥É¥ì¡¼¥óË¡Ëô¤Ï¶»¹Ð¼ã¤·¤¯¤ÏÊ¢¹Ð¤ÎÀö¾ô¤ò¼Â»Ü".
@@ -212,7 +212,7 @@
                05  MEDH20-16FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-16FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-16FL06    PIC 9(04)    VALUE  2007.
-               05  MEDH20-16FL07    PIC X(04)    VALUE  "£±£¶".
+               05  MEDH20-16FL07    PIC X(02)    VALUE  "16".
                05  MEDH20-16FL08    PIC X(06)    VALUE  "£±£¶¡¡".
                05  MEDH20-16FL09    PIC X(100)   VALUE  
            "µ¤´ÉÀÚ³«Ëô¤Ïµ¤´ÉÆâÁÞ´É¤¬¹Ô¤ï¤ì¤Æ¤ª¤ê¡¢¤«¤Ä¡¢È¯Ç®¤òÈ¼¤¦¾õÂÖ".
@@ -224,7 +224,7 @@
                05  MEDH20-17FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-17FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-17FL06    PIC 9(04)    VALUE  2008.
-               05  MEDH20-17FL07    PIC X(04)    VALUE  "£±£·".
+               05  MEDH20-17FL07    PIC X(02)    VALUE  "17".
                05  MEDH20-17FL08    PIC X(06)    VALUE  "£±£·¡¡".
                05  MEDH20-17FL09    PIC X(100)   VALUE  
            "»ÀÁÇÎÅË¡¤ò¼Â»Ü".
@@ -236,7 +236,7 @@
                05  MEDH20-18FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-18FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-18FL06    PIC 9(04)    VALUE  2009.
-               05  MEDH20-18FL07    PIC X(04)    VALUE  "£±£¸".
+               05  MEDH20-18FL07    PIC X(02)    VALUE  "18".
                05  MEDH20-18FL08    PIC X(06)    VALUE  "£±£¸¡¡".
                05  MEDH20-18FL09    PIC X(100)   VALUE  
            "´¶À÷¾É¤Î¼£ÎÅ¤ÎÉ¬Í×À­¤«¤é³ÖÎ¥¼¼¤Ç¤Î´ÉÍý¤ò¼Â»Ü".
@@ -248,7 +248,7 @@
                05  MEDH20-19FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-19FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-19FL06    PIC 9(04)    VALUE  2011.
-               05  MEDH20-19FL07    PIC X(04)    VALUE  "£±£¹".
+               05  MEDH20-19FL07    PIC X(02)    VALUE  "19".
                05  MEDH20-19FL08    PIC X(06)    VALUE  "£±£¹¡¡".
                05  MEDH20-19FL09    PIC X(100)   VALUE  
            "¶Ú¥¸¥¹¥È¥í¥Õ¥£¡¼¾É".
@@ -260,7 +260,7 @@
                05  MEDH20-20FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-20FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-20FL06    PIC 9(04)    VALUE  2012.
-               05  MEDH20-20FL07    PIC X(04)    VALUE  "£²£°".
+               05  MEDH20-20FL07    PIC X(02)    VALUE  "20".
                05  MEDH20-20FL08    PIC X(06)    VALUE  "£²£°¡¡".
                05  MEDH20-20FL09    PIC X(100)   VALUE  
            "Â¿È¯À­¹Å²½¾É".
@@ -272,7 +272,7 @@
                05  MEDH20-21FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-21FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-21FL06    PIC 9(04)    VALUE  2013.
-               05  MEDH20-21FL07    PIC X(04)    VALUE  "£²£±".
+               05  MEDH20-21FL07    PIC X(02)    VALUE  "21".
                05  MEDH20-21FL08    PIC X(06)    VALUE  "£²£±¡¡".
                05  MEDH20-21FL09    PIC X(100)   VALUE  
            "¶Ú°à½ÌÀ­Â¦º÷¹Å²½¾É".
@@ -284,7 +284,7 @@
                05  MEDH20-22FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-22FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-22FL06    PIC 9(04)    VALUE  2014.
-               05  MEDH20-22FL07    PIC X(04)    VALUE  "£²£²".
+               05  MEDH20-22FL07    PIC X(02)    VALUE  "22".
                05  MEDH20-22FL08    PIC X(06)    VALUE  "£²£²¡¡".
                05  MEDH20-22FL09    PIC X(100)   VALUE  
            "¥Ñ¡¼¥­¥ó¥½¥óÉÂ´ØÏ¢¼À´µ".
@@ -296,7 +296,7 @@
                05  MEDH20-23FL04    PIC 9(03)    VALUE  0.
                05  MEDH20-23FL05    PIC 9(01)    VALUE  1.
                05  MEDH20-23FL06    PIC 9(04)    VALUE  2015.
-               05  MEDH20-23FL07    PIC X(04)    VALUE  "£²£³".
+               05  MEDH20-23FL07    PIC X(02)    VALUE  "23".
                05  MEDH20-23FL08    PIC X(06)    VALUE  "£²£³¡¡".
                05  MEDH20-23FL09    PIC X(100)   VALUE  
            "¤½¤ÎÂ¾¤ÎÆñÉÂ¡Ê¥¹¥â¥óµÚ¤Ó£²£°¡Á£²£²¤Þ¤Ç¤ò½ü¤¯¡£¡Ë".
@@ -308,7 +308,7 @@
                05  MEDH20-24FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-24FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-24FL06    PIC 9(04)    VALUE  2016.
-               05  MEDH20-24FL07    PIC X(04)    VALUE  "£²£´".
+               05  MEDH20-24FL07    PIC X(02)    VALUE  "24".
                05  MEDH20-24FL08    PIC X(06)    VALUE  "£²£´¡¡".
                05  MEDH20-24FL09    PIC X(100)   VALUE  
            "ÀÔ¿ñÂ»½ý".
@@ -320,7 +320,7 @@
                05  MEDH20-25FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-25FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-25FL06    PIC 9(04)    VALUE  2017.
-               05  MEDH20-25FL07    PIC X(04)    VALUE  "£²£µ".
+               05  MEDH20-25FL07    PIC X(02)    VALUE  "25".
                05  MEDH20-25FL08    PIC X(06)    VALUE  "£²£µ¡¡".
                05  MEDH20-25FL09    PIC X(100)   VALUE  
            "ËýÀ­ÊÄºÉÀ­ÇÙ¼À´µ".
@@ -332,7 +332,7 @@
                05  MEDH20-26FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-26FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-26FL06    PIC 9(04)    VALUE  2030.
-               05  MEDH20-26FL07    PIC X(04)    VALUE  "£²£¶".
+               05  MEDH20-26FL07    PIC X(02)    VALUE  "26".
                05  MEDH20-26FL08    PIC X(06)    VALUE  "£²£¶¡¡".
                05  MEDH20-26FL09    PIC X(100)   VALUE  
            "¿Í¹©¿ÕÂ¡¡¢»ýÂ³´Ë½ù¼°·ì±ÕßÉ²á¡¢Ê¢ËìÞõÎ®Ëô¤Ï·ìÞù¸ò´¹¤ò¼Â»Ü".
@@ -344,7 +344,7 @@
                05  MEDH20-27FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-27FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-27FL06    PIC 9(04)    VALUE  2036.
-               05  MEDH20-27FL07    PIC X(04)    VALUE  "£²£·".
+               05  MEDH20-27FL07    PIC X(02)    VALUE  "27".
                05  MEDH20-27FL08    PIC X(06)    VALUE  "£²£·¡¡".
                05  MEDH20-27FL09    PIC X(100)   VALUE  
          "Ãí£²¡§½ÅÅÙ¤Î»èÂÎÉÔ¼«Í³»ù¡Ê¼Ô¡ËÅù¡Ê¾ã³²¼Ô»ÜÀßÅùÆþ±¡´ðËÜÎÁ¡ËÅù".
@@ -356,7 +356,7 @@
                05  MEDH20-28FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-28FL05    PIC 9(01)    VALUE 1.
                05  MEDH20-28FL06    PIC 9(04)    VALUE  2037.
-               05  MEDH20-28FL07    PIC X(04)    VALUE  "£²£¸".
+               05  MEDH20-28FL07    PIC X(02)    VALUE  "28".
                05  MEDH20-28FL08    PIC X(06)    VALUE  "£²£¸¡¡".
                05  MEDH20-28FL09    PIC X(100)   VALUE  
            "´ðËÜ¿ÇÎÅÎÁ¤Î»ÜÀß´ð½àÅù¤ÎÊÌÉ½Âè¸Þ¤Î»°¤Î»°¤Î´µ¼Ô".
@@ -368,7 +368,7 @@
                05  MEDH20-29FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-29FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-29FL06    PIC 9(04)    VALUE  2018.
-               05  MEDH20-29FL07    PIC X(04)    VALUE  "£²£¹".
+               05  MEDH20-29FL07    PIC X(02)    VALUE  "29".
                05  MEDH20-29FL08    PIC X(06)    VALUE  "£²£¹¡¡".
                05  MEDH20-29FL09    PIC X(100)   VALUE  
            "°­À­¼ðáç".
@@ -380,7 +380,7 @@
                05  MEDH20-30FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-30FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-30FL06    PIC 9(04)    VALUE  2019.
-               05  MEDH20-30FL07    PIC X(04)    VALUE  "£³£°".
+               05  MEDH20-30FL07    PIC X(02)    VALUE  "30".
                05  MEDH20-30FL08    PIC X(06)    VALUE  "£³£°¡¡".
                05  MEDH20-30FL09    PIC X(100)   VALUE  
            "ÇÙ±ê¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
@@ -392,7 +392,7 @@
                05  MEDH20-31FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-31FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-31FL06    PIC 9(04)    VALUE  2025.
-               05  MEDH20-31FL07    PIC X(04)    VALUE  "£³£±".
+               05  MEDH20-31FL07    PIC X(02)    VALUE  "31".
                05  MEDH20-31FL08    PIC X(06)    VALUE  "£³£±¡¡".
                05  MEDH20-31FL09    PIC X(100)   VALUE  
            "êóáì¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
@@ -404,7 +404,7 @@
                05  MEDH20-32FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-32FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-32FL06    PIC 9(04)    VALUE  2026.
-               05  MEDH20-32FL07    PIC X(04)    VALUE  "£³£²".
+               05  MEDH20-32FL07    PIC X(02)    VALUE  "32".
                05  MEDH20-32FL08    PIC X(06)    VALUE  "£³£²¡¡".
                05  MEDH20-32FL09    PIC X(100)   VALUE  
            "Ëö¾¿½Û´Ä¾ã³²¤Ë¤è¤ë²¼»èËöÃ¼¤Î³«ÊüÁÏ¤Î¼£ÎÅ¤ò¼Â»Ü".
@@ -416,7 +416,7 @@
                05  MEDH20-33FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-33FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-33FL06    PIC 9(04)    VALUE  2028.
-               05  MEDH20-33FL07    PIC X(04)    VALUE  "£³£³".
+               05  MEDH20-33FL07    PIC X(02)    VALUE  "33".
                05  MEDH20-33FL08    PIC X(06)    VALUE  "£³£³¡¡".
                05  MEDH20-33FL09    PIC X(100)   VALUE  
            "¤¦¤Ä¾É¾õ¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
@@ -428,7 +428,7 @@
                05  MEDH20-34FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-34FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-34FL06    PIC 9(04)    VALUE  2029.
-               05  MEDH20-34FL07    PIC X(04)    VALUE  "£³£´".
+               05  MEDH20-34FL07    PIC X(02)    VALUE  "34".
                05  MEDH20-34FL08    PIC X(06)    VALUE  "£³£´¡¡".
                05  MEDH20-34FL09    PIC X(100)   VALUE  
            "Â¾¼Ô¤ËÂÐ¤¹¤ëË½¹Ô¤¬ËèÆüÇ§¤á¤é¤ì¤ë¾õÂÖ".
@@ -440,7 +440,7 @@
                05  MEDH20-35FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-35FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-35FL06    PIC 9(04)    VALUE  2032.
-               05  MEDH20-35FL07    PIC X(04)    VALUE  "£³£µ".
+               05  MEDH20-35FL07    PIC X(02)    VALUE  "35".
                05  MEDH20-35FL08    PIC X(06)    VALUE  "£³£µ¡¡".
                05  MEDH20-35FL09    PIC X(100)   VALUE  
            "£±Æü£¸²ó°Ê¾å¤ÎÓ½áâµÛ°ú¤ò¼Â»Ü".
@@ -452,7 +452,7 @@
                05  MEDH20-36FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-36FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-36FL06    PIC 9(04)    VALUE  2033.
-               05  MEDH20-36FL07    PIC X(04)    VALUE  "£³£¶".
+               05  MEDH20-36FL07    PIC X(02)    VALUE  "36".
                05  MEDH20-36FL08    PIC X(06)    VALUE  "£³£¶¡¡".
                05  MEDH20-36FL09    PIC X(100)   VALUE  
            "µ¤´ÉÀÚ³«Ëô¤Ïµ¤´ÉÆâÁÞ´É¤¬¹Ô¤ï¤ì¤Æ¤¤¤ë¾õÂÖ".
@@ -464,31 +464,31 @@
                05  MEDH20-37FL04    PIC 9(03)    VALUE 0.
                05  MEDH20-37FL05    PIC 9(01)    VALUE 0.
                05  MEDH20-37FL06    PIC 9(04)    VALUE  2035.
-               05  MEDH20-37FL07    PIC X(04)    VALUE  "£³£·".
+               05  MEDH20-37FL07    PIC X(02)    VALUE  "37".
                05  MEDH20-37FL08    PIC X(06)    VALUE  "£³£·¡¡".
                05  MEDH20-37FL09    PIC X(100)   VALUE  
            "ÁÏ½ý¡¢ÈéÉæÄÙáçËô¤ÏËªÁã±ê¡¢Ç¿Åù¤Î´¶À÷¾É¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü".
                05  MEDH20-91FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-91FLE     PIC X(08)    VALUE  "20120331".
-               05  MEDH22-91FL01    PIC X(09)    VALUE  "000000000".
+               05  MEDH22-91FL01    PIC X(09)    VALUE  "820000158".
                05  MEDH22-91FL02    PIC X(09)    VALUE  "820000158".
                05  MEDH22-91FL03    PIC X(01)    VALUE  "0".
                05  MEDH22-91FL04    PIC 9(03)    VALUE 0.
                05  MEDH22-91FL05    PIC 9(01)    VALUE 0.
                05  MEDH22-91FL06    PIC 9(04)    VALUE  2091.
-               05  MEDH22-91FL07    PIC X(04)    VALUE  "£¹£±".
+               05  MEDH22-91FL07    PIC X(02)    VALUE  "91".
                05  MEDH22-91FL08    PIC X(06)    VALUE  "£¹£±¡¡".
                05  MEDH22-91FL09    PIC X(100)   VALUE  
            "êóáì¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü¤·¤Æ¤¤¤ë¾õÂÖ¡Ê£³£±¤Î¾ì¹ç¤ò½ü¤¯¡Ë".
                05  MEDH20-92FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-92FLE     PIC X(08)    VALUE  "20120331".
-               05  MEDH22-92FL01    PIC X(09)    VALUE  "000000000".
+               05  MEDH22-92FL01    PIC X(09)    VALUE  "820000159".
                05  MEDH22-92FL02    PIC X(09)    VALUE  "820000159".
                05  MEDH22-92FL03    PIC X(01)    VALUE  "0".
                05  MEDH22-92FL04    PIC 9(03)    VALUE 0.
                05  MEDH22-92FL05    PIC 9(01)    VALUE 0.
                05  MEDH22-92FL06    PIC 9(04)    VALUE  2092.
-               05  MEDH22-92FL07    PIC X(04)    VALUE  "£¹£²".
+               05  MEDH22-92FL07    PIC X(02)    VALUE  "92".
                05  MEDH22-92FL08    PIC X(06)    VALUE  "£¹£²¡¡".
                05  MEDH22-92FL09    PIC X(100)   VALUE  
            "¿ÈÂÎÍÞÀ©¤ò¼Â»Ü¤·¤Æ¤¤¤ë".
@@ -500,7 +500,7 @@
                05  MEDH24-91FL04    PIC 9(03)    VALUE 0.
                05  MEDH24-91FL05    PIC 9(01)    VALUE 0.
                05  MEDH24-91FL06    PIC 9(04)    VALUE  2092.
-               05  MEDH24-91FL07    PIC X(04)    VALUE  "£¹£±".
+               05  MEDH24-91FL07    PIC X(02)    VALUE  "91".
                05  MEDH24-91FL08    PIC X(06)    VALUE  "£¹£±¡¡".
                05  MEDH24-91FL09    PIC X(100)   VALUE  
            "¿ÈÂÎÍÞÀ©¤ò¼Â»Ü¤·¤Æ¤¤¤ë".
@@ -518,6 +518,6 @@
                    07  MEDH20-LIMIT    PIC 9(03).
                    07  MEDH20-ALLKBN   PIC 9(01).
                    07  MEDH20-ZAINUM   PIC 9(04).
-                   07  MEDH20-NUML     PIC X(04).
+                   07  MEDH20-ID      PIC X(02).
                    07  MEDH20-MEIL     PIC X(106).
        01  MEDH20-MAX                  PIC 9(03)     VALUE  40.
