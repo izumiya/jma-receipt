@@ -5580,14 +5580,14 @@
            ELSE
                MOVE    1                   TO  FLG-IN-ATAI
            END-IF
-      *
+      *H26.6   入院では対象なし
       *    小児科外来診療科の時、年齢エラーはそのまま
-           IF     (SPA-SYONIKA-ARI     NOT =   ZERO )  AND
-                  (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
-               IF      SPA-ERRCD           =   "0032"
-                   MOVE    SPACE               TO  SPA-ERRCD
-               END-IF
-           END-IF
+      *    IF     (SPA-SYONIKA-ARI     NOT =   ZERO )  AND
+      *           (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
+      *        IF      SPA-ERRCD           =   "0032"
+      *            MOVE    SPACE               TO  SPA-ERRCD
+      *        END-IF
+      *    END-IF
       *---(01.00.01) LINE ADD  START  ----
       *    警告判定
            IF      SPA-ERRCD(1:1)      =   "K"
