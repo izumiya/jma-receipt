@@ -295,7 +295,8 @@
            END-IF
       *    入院期間で１回
            IF     (PTNYUINRRK-NYUINYMD NOT =   WRK-OLD-NYUINYMD ) AND
-                  (PTNYUINRRK-NYUINYMD     <=  WRK-SRYYMD       )
+      ************(PTNYUINRRK-NYUINYMD     <=  WRK-SRYYMD       )
+                  (PTNYUINRRK-NYUINYMD(1:6)    <=  WRK-SRYYM    )
                IF     (PTNYUINRRK-NYUINYMD(1:6)
                                            <=  WRK-SRYYM  ) AND
                       (PTNYUINRRK-TAIINYMD (1:6)
