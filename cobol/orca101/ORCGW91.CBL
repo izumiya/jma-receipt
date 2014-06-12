@@ -247,11 +247,11 @@
            INITIALIZE                  SPA-W91
       *
       *    薬剤情報提供料
-           MOVE    "0 データ作成しない"
-                                       TO  SPA-GMN-COOPBASE-LST(1)
-           MOVE    "1 データ作成する"
-                                       TO  SPA-GMN-COOPBASE-LST(2)
-           MOVE    2                   TO  SPA-GMN-COOPBASE-MAX
+           MOVE    "0 作成しない"      TO  SPA-GMN-COOPBASE-LST(1)
+           MOVE    "1 作成する"        TO  SPA-GMN-COOPBASE-LST(2)
+           MOVE    "2 作成する（全件）"
+                                       TO  SPA-GMN-COOPBASE-LST(3)
+           MOVE    3                   TO  SPA-GMN-COOPBASE-MAX
       *
       *    システム管理検索
            MOVE    SPACE               TO  SYSKANRI-REC

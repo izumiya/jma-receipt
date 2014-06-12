@@ -811,7 +811,7 @@ grpsys                                         SPA-AREA
                                        TO  SPA-GMN-PRTKBNMEIL    (2)
            MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
            IF      SPA-NAI-9101-COOPBASE
-                                       =   "1"
+                                       =   "1" OR  "2"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
                MOVE    "Ï¢·È´ðÈ×ÍÑ"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
@@ -1772,7 +1772,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            TO  SPA-GMN-PRTKBNMEIL    (2)
                MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
                IF      SPA-NAI-9101-COOPBASE
-                                           =   "1"
+                                           =   "1" OR  "2"
                    MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
                    MOVE    "Ï¢·È´ðÈ×ÍÑ"        TO  SPA-GMN-PRTKBNMEIL(3)
                    MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
@@ -1797,7 +1797,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            TO  SPA-GMN-PRTKBNMEIL    (1)
                MOVE    1                   TO  SPA-GMN-PRTKBN-MAX
                IF      SPA-NAI-9101-COOPBASE
-                                           =   "1"
+                                           =   "1" OR  "2"
                    MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (2)
                    MOVE    "Ï¢·È´ðÈ×ÍÑ"        TO  SPA-GMN-PRTKBNMEIL(2)
                    MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (3)
@@ -7377,7 +7377,12 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                        MOVE    "¡ÚÅÀ¸¡ÍÑ¡Û"        TO  TID2-LABEL
                    END-IF
                    IF      SPA-GMN-PRTKBN      =   "6" OR  "7"
-                       MOVE    "¡ÚÏ¢·ÈÍÑ¡Û"        TO  TID2-LABEL
+                       IF      SPA-NAI-9101-COOPBASE   =   "2"
+                           MOVE    "¡ÚÏ¢·ÈÍÑ¡ÊÁ´·ï¡§Ì¤Æ±°ÕÊ¬´Þ¡Ë¡Û"
+                                                       TO  TID2-LABEL
+                       ELSE
+                           MOVE    "¡ÚÏ¢·ÈÍÑ¡Û"        TO  TID2-LABEL
+                       END-IF
                    END-IF
       *
                    EVALUATE    SPA-TIDCD

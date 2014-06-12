@@ -657,7 +657,7 @@
                                        TO  SPA-GMN-PRTKBNMEIL    (2)
            MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
            IF      SPA-NAI-9101-COOPBASE
-                                       =   "1"
+                                       =   "1" OR  "2"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
                MOVE    "Ï¢·È´ðÈ×ÍÑ"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
@@ -985,7 +985,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                                        TO  SPA-GMN-PRTKBNMEIL    (2)
            MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
            IF      SPA-NAI-9101-COOPBASE
-                                       =   "1"
+                                       =   "1" OR  "2"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
                MOVE    "Ï¢·È´ðÈ×ÍÑ"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
@@ -1010,7 +1010,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                                                TO  SPA-GMN-PRTKBN-G
                WHEN    "8"
                    IF      SPA-NAI-9101-COOPBASE
-                                           =   "1"
+                                           =   "1" OR  "2"
                        MOVE    SPA-GMN-PRTKBNLST (4)
                                                TO  SPA-GMN-PRTKBN-G
                    ELSE
@@ -3667,7 +3667,12 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
            IF    ( SPA-GMN-PRTKBN       =   "6" )
            AND   ( SPA-RIDCD (1:1)      =   "1" )
-               MOVE    "¡ÚÏ¢·È´ðÈ×ÍÑ¥ì¥»¥×¥È¡Û" TO  RID1-LABEL
+               IF      SPA-NAI-9101-COOPBASE    =   "2"
+                   MOVE    "¡ÚÏ¢·È´ðÈ×ÍÑ¥ì¥»¥×¥È¡ÊÁ´·ï¡§Ì¤Æ±°ÕÊ¬´Þ¡Ë¡Û"
+                                                    TO  RID1-LABEL
+               ELSE
+                   MOVE    "¡ÚÏ¢·È´ðÈ×ÍÑ¥ì¥»¥×¥È¡Û" TO  RID1-LABEL
+               END-IF
            END-IF
            IF    ( SPA-GMN-PRTKBN       =   "7" )
            AND   ( SPA-RIDCD (1:1)      =   "1" )
