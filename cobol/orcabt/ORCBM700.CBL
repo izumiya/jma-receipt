@@ -33,6 +33,7 @@
       *  04.07.03    NACL-Æ£¸¶    13/10/07  ÊÖÌáÂÐ±þ
       *  04.07.04    NACL-Æ£¸¶    14/02/13  Ï«ºÒ»ØÄê°åÎÅµ¡´ØÈÖ¹æ¤Îµ­Ï¿
       *                                     ÊýË¡¤Î½¤Àµ
+      *  04.07.05    NACL-Æ£¸¶    14/05/28  ÀÁµá¾ðÊó¤ÎÊÔ½¸¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -803,7 +804,7 @@
                                            WRK-KETA2
                PERFORM VARYING IDXX    FROM    1   BY  1
                        UNTIL   IDXX    >       2500
-                       OR      WRK-REC (IDX:1)
+                       OR      WRK-REC (IDXX:1)
                                        =   WRK-KAIGYO
                    IF      WRK-REC (IDXX:1) =   ","
                        ADD     1               TO  IDYY
@@ -825,6 +826,8 @@
                              WRK-REC (WRK-KETA2:)  DELIMITED  BY  SIZE
                              INTO                  RECEDEN-RECEDATA
                    END-STRING
+               ELSE
+                   DISPLAY "ERROR WRK-KETA1=0!!"
                END-IF
            END-IF
       *
