@@ -75,6 +75,8 @@
       *  04.07.02    NACL-藤原    13/03/26  システム管理がチェックしない
       *                                     設定時の推奨病名チェックの修正
       *  04.07.03    NACL-藤原    13/07/30  自院病名のセット登録対応
+      *  04.07.03    NACL-藤原    13/07/30  セット登録選択時のコード置換え
+      *                                     画面表示後の初期化
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1287,6 +1289,9 @@
            INITIALIZE                  SPA-CIDCD-AREA
                                        SPA-CID1-AREA
            INITIALIZE                  SPA-C04-IKOSAKI-AREA
+                                       SPA-C04-CHANGE-AREA
+                                       SPA-ERRCD
+                                       WRK-HAISIYMDH
       *
            IF      SPA-C04-BYOSET-INDEX-MAX
                                        >   ZERO
