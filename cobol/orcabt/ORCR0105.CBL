@@ -193,7 +193,9 @@
       *  04.07.13    NACL-藤原    13/12/09  点検用レセプトの医師名記載修正
       *  04.07.14    NACL-小豆沢  14/04/25  平成２６年４月改正対応
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
-      *  04.07.16    NACL-藤原    14/06/06  未請求解除時の削除処理追加
+      *  04.07.16    NACL-藤原    14/06/02  医保分で受診日指定時、医保＋
+      *                                     第三者行為も対象とする
+      *  04.07.17    NACL-藤原    14/06/06  未請求解除時の削除処理追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -10790,13 +10792,14 @@
                                                    TO  PTINF-ED-SRYYMD
                        MOVE    "2"                 TO  PTINF-NYUGAIKBN
                        MOVE    ZERO                TO  PTINF-HKNKBN
+                       MOVE    "7"                 TO  PTINF-HKNKBN2
                        MOVE    PTINF-REC           TO  MCPDATA-REC
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key11"             TO  MCP-PATHNAME
+                       MOVE    "key16"             TO  MCP-PATHNAME
                        PERFORM 900-DBSELECT-SEC
                        IF      MCP-RC              =   ZERO
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key11"             TO  MCP-PATHNAME
+                           MOVE    "key16"             TO  MCP-PATHNAME
                            PERFORM 900-PTINF-READ-N-SEC
                        ELSE
                            MOVE    1                  TO  FLG-PTINF
@@ -10974,12 +10977,12 @@
                            END-IF
       *
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key11"             TO  MCP-PATHNAME
+                           MOVE    "key16"             TO  MCP-PATHNAME
                            PERFORM 900-PTINF-READ-N-SEC
                        END-PERFORM
       *
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key11"             TO  MCP-PATHNAME
+                       MOVE    "key16"             TO  MCP-PATHNAME
                        PERFORM 900-CLOSE-SEC
                END-EVALUATE
            END-IF

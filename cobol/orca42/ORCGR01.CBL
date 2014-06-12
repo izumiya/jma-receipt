@@ -164,6 +164,8 @@
       *                                     様式追加対応
       *  04.07.09    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *                                     医療情報連携基盤対応
+      *  04.07.10    NACL-藤原    14/06/02  医保分で受診日指定時、医保＋
+      *                                     第三者行為も対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3775,6 +3777,7 @@ grpsys             MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                    EVALUATE    SPA-R01-RECEKBN
                        WHEN    "0"
                            MOVE    ZERO           TO  PTINF-HKNKBN
+                           MOVE    "7"            TO  PTINF-HKNKBN2
                        WHEN    "3"
                            MOVE    "1"            TO  PTINF-HKNKBN
                            MOVE    "5"            TO  PTINF-HKNKBN2
@@ -3797,6 +3800,14 @@ grpsys             MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                    END-IF 
                    MOVE    PTINF-REC           TO  MCPDATA-REC
                    EVALUATE    SPA-R01-RECEKBN
+                       WHEN    "0"
+                           IF      SPA-GMN-R01-SYORI   =   "2"
+                               MOVE    "tbl_ptinf" TO  WRK-MCP-TABLE
+                               MOVE    "key13"     TO  WRK-MCP-PATHNAME
+                           ELSE
+                               MOVE    "tbl_ptinf" TO  WRK-MCP-TABLE
+                               MOVE    "key16"     TO  WRK-MCP-PATHNAME
+                           END-IF
                        WHEN    "3"
                        WHEN    "5"
                            IF      SPA-GMN-R01-SYORI   =   "2"

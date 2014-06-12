@@ -230,10 +230,12 @@
       *  04.07.02    NACL-藤原    12/03/25  公費記載順設定対応
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-藤原    13/08/01  公費記載順設定時の条件の修正
-      *  04.07.05    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.06    NACL-藤原    14/03/30  平成２６年４月改正対応
       *  04.07.07    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.08    NACL-門脇    14/06/10  施設入所情報処理修正
+      *  04.07.09    NACL-藤原    14/06/02  医保分で受診日指定時、医保＋
+      *                                     第三者行為も対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3195,9 +3197,10 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                                                    TO  PTINF-ED-SRYYMD
                        MOVE    "2"                 TO  PTINF-NYUGAIKBN
                        MOVE    ZERO                TO  PTINF-HKNKBN
+                       MOVE    "7"                 TO  PTINF-HKNKBN2
                        MOVE    PTINF-REC           TO  MCPDATA-REC
                        MOVE    "tbl_ptinf"         TO  WRK-MCP-TABLE
-                       MOVE    "key12"             TO  WRK-MCP-PATHNAME
+                       MOVE    "key17"             TO  WRK-MCP-PATHNAME
                        PERFORM 20022-JYUSINYMD-HENSYU-SEC
                    END-IF
            END-EVALUATE
