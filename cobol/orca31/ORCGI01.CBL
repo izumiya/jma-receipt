@@ -14106,9 +14106,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190134270"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14153,9 +14153,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190135670"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14201,9 +14201,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190143370"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14249,9 +14249,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190142970"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14297,9 +14297,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190152470"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14345,9 +14345,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190177170"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
@@ -14392,9 +14392,9 @@
                PERFORM  910-NYUINACCT-READ-SEC
                IF   FLG-NYUINACCT      =    0
                     IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
-                         ADD    1      TO   IDX9
+      **                   ADD    1      TO   IDX8
                          MOVE   "190135470"
-                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
                     END-IF
                END-IF
            END-IF
