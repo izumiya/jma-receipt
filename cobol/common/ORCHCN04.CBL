@@ -2342,7 +2342,13 @@
            END-EVALUATE
            MOVE    HCM34S01-SRYSYUKBN(IDX) TO  TBL-SRYSYUKBN
       *    剤点数
-           MOVE    HCM34S01-ZAITEN (IDX)   TO  TBL-ZAITENSU
+      *    マイナス判定
+           IF      HCM34S01-ZAIMINUS (IDX) =   1
+               COMPUTE TBL-ZAITENSU        =   HCM34S01-ZAITEN (IDX)
+                                           *   -1
+           ELSE
+               MOVE    HCM34S01-ZAITEN (IDX)   TO  TBL-ZAITENSU
+           END-IF
       *    剤回数
            MOVE    HCM34S01-ZAIKAISU(IDX)  TO  TBL-KAISU
       *    金額
