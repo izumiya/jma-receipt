@@ -58,6 +58,7 @@
       *                                     レセプト記載対応
       *  04.06.02    NACL-門脇    13/02/27  平成２５年４月改正対応
       *  04.07.01    NACL-門脇    12/08/28  薬剤料減点対応
+      *  04.07.02    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -611,6 +612,9 @@
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *    薬剤料減点（合算薬剤料上限超）
            03  CONS-GENTEN2    PIC X(09)   VALUE   "630010001".
+      *    栄養管理体制減算規定該当
+           03  CONS-EIYOGEN1   PIC X(09)   VALUE   "190182590".
+           03  CONS-EIYOGEN2   PIC X(09)   VALUE   "190182690".
       *
       *フリーコメント
       *    フリーコメント 
@@ -1257,6 +1261,11 @@
                        IF      RECE230-SRYCD(IDX) =   CONS-TEIGEN
                                                   OR  CONS-GENTEN
                                                   OR  CONS-GENTEN2
+                           MOVE    1             TO  FLG-TEIGEN
+                       END-IF
+                       IF     (RECE220-SRYKBN     =   "90" OR "92" )
+                       AND    (RECE230-SRYCD(IDX) =   CONS-EIYOGEN1
+                                                  OR  CONS-EIYOGEN2)
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
                      END-IF

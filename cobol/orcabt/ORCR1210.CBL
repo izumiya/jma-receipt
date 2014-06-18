@@ -45,6 +45,7 @@
       *
       *  04.07.01    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    14/04/08  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    14/06/17  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -140,8 +141,8 @@
                05  WRK-DAY2                            PIC 9(04).
                05  WRK-DAY5                            PIC 9(04).
                05  WRK-DAY6                            PIC 9(04).
-               05  WRK-DAY6-ZAITEN                     PIC 9(08).
-               05  WRK-ACCT90                          PIC 9(08).
+               05  WRK-DAY6-ZAITEN                     PIC S9(08).
+               05  WRK-ACCT90                          PIC S9(08).
       *
        01  WRK-KOGAI-TABLE.
            03  WRK-KOGAI-T                             OCCURS    4.
@@ -634,7 +635,14 @@
       *
                IF     NACCT-ZAISKBKBN    =    "6"
                     MOVE   NACCT-DAY(IDY)   TO  WRK-DAY6(IDY) 
-                    ADD    NACCT-ZAITEN     TO  WRK-DAY6-ZAITEN(IDY)
+                    IF   NACCT-SRYCDTOTAL  =  190182590   OR
+                                              190182690
+                      COMPUTE  WRK-DAY6-ZAITEN(IDY) =
+                               WRK-DAY6-ZAITEN(IDY) -
+                               NACCT-ZAITEN
+                    ELSE
+                      ADD  NACCT-ZAITEN     TO  WRK-DAY6-ZAITEN(IDY)
+                    END-IF
                END-IF 
       *
              END-IF
@@ -747,9 +755,15 @@
            PERFORM    VARYING   ACCT-IDX   FROM   1    BY   1
                        UNTIL    ACCT-IDX    >    31
              IF  ACCT-DAY(1 ACCT-IDX)   NOT =    ZERO
+              IF   ACCT-SRYCDTOTAL  =  190182590  OR  190182690
+               COMPUTE  WRK-ACCT90(ACCT-IDX) =
+                        WRK-ACCT90(ACCT-IDX) -
+                       (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+              ELSE
                COMPUTE  WRK-ACCT90(ACCT-IDX) =
                         WRK-ACCT90(ACCT-IDX) +
                        (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+              END-IF
              END-IF
            END-PERFORM
       *
@@ -1285,11 +1299,19 @@
       *****************************************************************
        2001125-RECE200-TENSOU22-SEC                 SECTION.
       *
-           EVALUATE   WRK-DAY1-NYUTENTTLKBN(IDY)
+           IF    NACCT-SRYCDTOTAL   =   190182590  OR  190182690
+             EVALUATE   WRK-DAY1-NYUTENTTLKBN(IDY)
+              WHEN   903
+                    COMPUTE  RECE200-NYUKHNKEI2  =
+                             RECE200-NYUKHNKEI2  -  NACCT-ZAITEN
+             END-EVALUATE
+           ELSE
+             EVALUATE   WRK-DAY1-NYUTENTTLKBN(IDY)
               WHEN   903
                     COMPUTE  RECE200-NYUKHNKEI2  =
                              RECE200-NYUKHNKEI2  +  NACCT-ZAITEN
-           END-EVALUATE
+             END-EVALUATE
+           END-IF
       *
            IF  (WRK-DAY1(IDY)             = ZERO)
            AND (RECE200-NYUINDAY-KBN(IDY) = "1" )
@@ -1626,12 +1648,21 @@
                             RECE200-NYUTOKKEI2  -
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
                  ELSE
+                  IF   ACCT-SRYCDTOTAL  =  190182590  OR  190182690
+                   EVALUATE   WRK-DAY1-NYUTENTTLKBN(ACCT-IDX)
+                      WHEN   903
+                       COMPUTE  RECE200-NYUKHNKEI2  =
+                                RECE200-NYUKHNKEI2  -
+                               (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                   END-EVALUATE
+                  ELSE
                    EVALUATE   WRK-DAY1-NYUTENTTLKBN(ACCT-IDX)
                       WHEN   903
                        COMPUTE  RECE200-NYUKHNKEI2  =
                                 RECE200-NYUKHNKEI2  +
                                (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
                    END-EVALUATE
+                  END-IF
                  END-IF
       *
                  IF  (WRK-DAY1(ACCT-IDX)             = ZERO)

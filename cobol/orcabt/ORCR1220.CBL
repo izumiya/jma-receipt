@@ -118,6 +118,7 @@
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *  04.07.09    NACL-ÌçÏÆ    14/05/13  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
+      *  04.07.10    NACL-ÌçÏÆ    14/06/17  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1707,6 +1708,10 @@
            INITIALIZE                           RECE220-REC
            MOVE    RECE200-KEY          TO      RECE220-KEY1
            MOVE    ACCT-SRYKBN          TO      RECE220-SRYKBN
+           IF     (ACCT-SRYKBN      =  "90"     )
+           AND    (ACCT-SRYCDTOTAL  =  190182690)
+             MOVE    "92"               TO      RECE220-SRYKBN
+           END-IF
            IF      ACCT-SRYKBN = "90" OR "92"
                  MOVE    "6"            TO      RECE220-ZAISKBKBN
            ELSE 
@@ -1837,6 +1842,11 @@
            MOVE    SRY-SRYKA            TO      RECE230-SRYKA
            MOVE    SRY-SRYKBN           TO      RECE230-SRYKBN
            MOVE    SRY-SRYSYUKBN        TO      RECE230-SRYSYUKBN
+           IF     (ACCT-SRYKBN      =  "90"     )
+           AND    (ACCT-SRYCDTOTAL  =  190182690)
+             MOVE    "92"               TO      RECE230-SRYKBN
+             MOVE    "920"              TO      RECE230-SRYSYUKBN
+           END-IF
            MOVE    SRY-JIHIMONEYTOTAL   TO      RECE230-JIHIMONEY
       *
            MOVE    ZERO                 TO      IDX4

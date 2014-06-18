@@ -157,6 +157,7 @@
       *  04.07.07    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    14/03/26  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡ÊÌë¶Ð»þ´Ö·Ð²á¸º»»¤ÎÁªÄêÂÐ±þ¡Ë
+      *  04.07.09    NACL-ÌçÏÆ    14/06/17  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3259,9 +3260,19 @@ grpsys                            SPA-AREA
                        AND ((TBL-GAIHAKU(SYU-IDX)            =  ZERO) OR
                             (TBL-GAIHAKU(SYU-IDX)           >=    4 ))
                        AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
+                         IF   NACCT-SRYCDTOTAL  =  190182590
+                                               OR  190182690
+                           COMPUTE  SYU-HKNTEN(15) =
+                                    SYU-HKNTEN(15) -
+                                    NACCT-ZAITEN
+                           COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                    SDAY-HKNTEN(SYU-IDX) -
+                                    NACCT-ZAITEN
+                         ELSE
                            ADD   NACCT-ZAITEN   TO
                                              SYU-HKNTEN(15)
                                              SDAY-HKNTEN(SYU-IDX)      
+                         END-IF
                        END-IF
                    END-PERFORM
                END-IF
@@ -5716,14 +5727,16 @@ grpsys                                     SPA-AREA
                                 (ACCT-ZAITEN  *  TBL-ZAIKAISU(SYU-IDX))
                       END-PERFORM
                      ELSE
-                      IF     ACCT-SRYCDTOTAL    =   190080470  OR
+                      IF    (ACCT-SRYCDTOTAL    =   190080470  OR
                                                     190799670  OR
                                                     190080570  OR
                                                     190799770  OR
                                                     190111690  OR
                                                     190809090  OR
                                                     190111790  OR
-                                                    190809190
+                                                    190809190)
+                      OR    (ACCT-SRYCDTOTAL    =   190182590  OR
+                                                    190182690)
                         COMPUTE SYU-HKNTEN (15)   =  SYU-HKNTEN (15) -
                                (ACCT-ZAITEN  *   SINRYO-COUNT)
                         PERFORM  VARYING  SYU-IDX  FROM  1  BY  1      

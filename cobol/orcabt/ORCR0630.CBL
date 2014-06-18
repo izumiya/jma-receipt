@@ -115,6 +115,7 @@
       *                                     ¡ÊÌë¶Ð»þ´Ö·Ð²á¸º»»¤ÎÁªÄêÂÐ±þ¡Ë
       *  04.07.03    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.04    NACL-ÌçÏÆ    14/04/08  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.05    NACL-ÌçÏÆ    14/06/17  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
       *****************************************************************
       *
       *
@@ -277,10 +278,10 @@
                05  WRK-DAY41                           PIC 9(04).
                05  WRK-DAY5                            PIC 9(04).
                05  WRK-DAY6                            PIC 9(04).
-               05  WRK-DAY6-ZAITEN                     PIC 9(08).
+               05  WRK-DAY6-ZAITEN                     PIC S9(08).
                05  WRK-DAY7                            PIC 9(04).
                05  WRK-DAY7-ZAITEN                     PIC 9(08).
-               05  WRK-ACCT90                          PIC 9(08).
+               05  WRK-ACCT90                          PIC S9(08).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -1247,7 +1248,14 @@
                                              190809190                  
                       CONTINUE                                          
                     ELSE                                                
+                     IF NACCT-SRYCDTOTAL  =  190182590   OR
+                                             190182690
+                      COMPUTE  WRK-DAY6-ZAITEN(IDY) =
+                               WRK-DAY6-ZAITEN(IDY) -
+                               NACCT-ZAITEN
+                     ELSE
                       ADD    NACCT-ZAITEN   TO  WRK-DAY6-ZAITEN(IDY)
+                     END-IF
                     END-IF
                END-IF 
       *
@@ -2581,9 +2589,15 @@
                                            190111790  OR  190809190
                       CONTINUE
                    ELSE
+                    IF ACCT-SRYCDTOTAL  =  190182590  OR  190182690
+                      COMPUTE  WRK-ACCT90(IDY) =
+                               WRK-ACCT90(IDY) -
+                              (ACCT-ZAITEN * ACCT-DAY(1 IDY))
+                    ELSE
                       COMPUTE  WRK-ACCT90(IDY) =
                                WRK-ACCT90(IDY) +
                               (ACCT-ZAITEN * ACCT-DAY(1 IDY))
+                    END-IF
                    END-IF
                  END-IF
                  MOVE    "tbl_sryacct"     TO   MCP-TABLE
@@ -2680,6 +2694,29 @@
               CONTINUE                                                  
            ELSE                                                         
       *
+             IF    NACCT-SRYCDTOTAL   =   190182590  OR  190182690
+              EVALUATE   WRK-DAY1-NYUTENTTLKBN(IDY)
+                 WHEN   903
+                    IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
+                    AND    KH-IDX                >   1
+                       CONTINUE
+                    ELSE
+                       COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
+                                WRK-NYUKHNKEI2(KH-IDX)  -  NACCT-ZAITEN
+                    END-IF
+                    COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
+                             RECE62-NYUKHNKEI2(KH-IDX)  -  NACCT-ZAITEN
+                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
+                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
+                                WRK-NYUKHNKEI2-XX(KH-IDX)  -
+                                NACCT-ZAITEN
+                      IF   FLG-SEIHO-HENSYU  =  2
+                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
+                                WRK-NYUKHNKEI2-XX(1)  -  NACCT-ZAITEN
+                      END-IF
+                    END-IF
+              END-EVALUATE
+             ELSE
               EVALUATE   WRK-DAY1-NYUTENTTLKBN(IDY)
                  WHEN   903
                     IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
@@ -2701,6 +2738,7 @@
                       END-IF
                     END-IF
               END-EVALUATE
+             END-IF
       *
            END-IF
       *
@@ -3243,6 +3281,29 @@
                       END-IF
                     END-IF
                  ELSE
+                  IF   ACCT-SRYCDTOTAL  =  190182590  OR  190182690
+                    IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
+                    AND    KH-IDX                >   1
+                       CONTINUE
+                    ELSE
+                       COMPUTE  WRK-NYUKHNKEI2(KH-IDX)  =
+                                WRK-NYUKHNKEI2(KH-IDX)  -
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                    END-IF
+                    COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
+                             RECE62-NYUKHNKEI2(KH-IDX)  -
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
+                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
+                                WRK-NYUKHNKEI2-XX(KH-IDX)  -
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                      IF   FLG-SEIHO-HENSYU  =  2
+                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
+                                WRK-NYUKHNKEI2-XX(1)  -
+                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
+                      END-IF
+                    END-IF
+                  ELSE
                     IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
                     AND    KH-IDX                >   1
                        CONTINUE
@@ -3264,6 +3325,7 @@
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
                       END-IF
                     END-IF
+                  END-IF
                  END-IF
               WHEN   920
                  IF       (ACCT-SRYCDTOTAL    =    190080470

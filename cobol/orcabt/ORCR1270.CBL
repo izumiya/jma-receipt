@@ -67,6 +67,7 @@
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
       *  04.07.02    NACL-門脇    12/10/12  保険別請求チェック表（標準帳票）
       *                                     の機能追加対応
+      *  04.07.03    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1907,8 +1908,13 @@
            END-IF
       *
       *    <入院基本料・加算>
-           MOVE    RECE200-NYUKHNKEI2  TO  WRK-TENSUZ
-           MOVE    WRK-TENSU           TO  HCN58-NYUTENSU (1 5)
+           IF      RECE200-NYUKHNKEI2  <   ZERO
+               MOVE    RECE200-NYUKHNKEI2  TO  WRK-TENSU2Z
+               MOVE    WRK-TENSU2          TO  HCN58-NYUTENSU (1 5)
+           ELSE
+               MOVE    RECE200-NYUKHNKEI2  TO  WRK-TENSUZ
+               MOVE    WRK-TENSU           TO  HCN58-NYUTENSU (1 5)
+           END-IF
       *
       *    公害入院療養指導
            MOVE    5           TO      IDX4

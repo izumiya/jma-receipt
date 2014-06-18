@@ -185,6 +185,7 @@
       *                                     種別不明レセ対応
       *                                     コメントのチェックを自費分は
       *                                     対象としない
+      *  04.07.06    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -821,6 +822,19 @@
       *    薬剤料減点（合算薬剤料上限超）
            03  CONS-GENTEN2    PIC X(09)   VALUE   "630010001".
       *
+      *    未実施減算
+           03  CONS-GENZAN1    PIC X(09)   VALUE   "190080470".
+           03  CONS-GENZAN2    PIC X(09)   VALUE   "190799670".
+           03  CONS-GENZAN3    PIC X(09)   VALUE   "190080570".
+           03  CONS-GENZAN4    PIC X(09)   VALUE   "190799770".
+           03  CONS-GENZAN5    PIC X(09)   VALUE   "190111690".
+           03  CONS-GENZAN6    PIC X(09)   VALUE   "190809090".
+           03  CONS-GENZAN7    PIC X(09)   VALUE   "190111790".
+           03  CONS-GENZAN8    PIC X(09)   VALUE   "190809190".
+      *    栄養管理体制減算規定該当
+           03  CONS-EIYOGEN1   PIC X(09)   VALUE   "190182590".
+           03  CONS-EIYOGEN2   PIC X(09)   VALUE   "190182690".
+      *
       *フリーコメント
       *    フリーコメント 
            03  CONS-COMMENT3   PIC X(09)   VALUE   "810000001".
@@ -938,15 +952,6 @@
            03  WRK-CONS-SYOSIN-KASAN32 PIC X(09)   VALUE 
                                                    "111012610".
       *
-      *    未実施減算
-           03  CONS-GENZAN1            PIC X(09)   VALUE   "190080470".
-           03  CONS-GENZAN2            PIC X(09)   VALUE   "190799670".
-           03  CONS-GENZAN3            PIC X(09)   VALUE   "190080570".
-           03  CONS-GENZAN4            PIC X(09)   VALUE   "190799770".
-           03  CONS-GENZAN5            PIC X(09)   VALUE   "190111690".
-           03  CONS-GENZAN6            PIC X(09)   VALUE   "190809090".
-           03  CONS-GENZAN7            PIC X(09)   VALUE   "190111790".
-           03  CONS-GENZAN8            PIC X(09)   VALUE   "190809190".
       *    外来迅速検体検査加算
            03  WRK-CONS-GAIJINKEN      PIC X(09)   VALUE 
                                                    "160177770".
@@ -1799,6 +1804,11 @@
                                                      CONS-GENZAN6  OR
                                                      CONS-GENZAN7  OR
                                                      CONS-GENZAN8      )
+                           MOVE    1             TO  FLG-TEIGEN
+                       END-IF
+                       IF    ( RECE64-SRYKBN     =   "90" OR "92"      )
+                       AND   ( RECE65-SRYCD(IDX) =   CONS-EIYOGEN1
+                                                 OR  CONS-EIYOGEN2     )
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
       *

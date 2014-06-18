@@ -647,6 +647,7 @@
       *  04.07.24    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
       *                                     ないものとみなす
       *  04.07.25    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.26    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -6330,6 +6331,10 @@
            PERFORM 500-RECE64-KEY-HENSYU-SEC
            MOVE    ZERO                 TO      RECE64-KOHBUNRI
            MOVE    ACCT-SRYKBN          TO      RECE64-SRYKBN
+           IF     (ACCT-SRYKBN      =  "90"     )
+           AND    (ACCT-SRYCDTOTAL  =  190182690)
+             MOVE    "92"               TO      RECE64-SRYKBN
+           END-IF
            IF      ACCT-SRYKBN = "90" OR "92"
                  MOVE    "6"            TO      RECE64-ZAISKBKBN
            ELSE 
@@ -6471,6 +6476,12 @@
            MOVE    SRY-SRYKBN           TO      RECE65-SRYKBN
            MOVE    SRY-SRYSYUKBN        TO      RECE65-SRYSYUKBN
                                                 RECE64-SRYSYUKBN
+           IF     (ACCT-SRYKBN      =  "90"     )
+           AND    (ACCT-SRYCDTOTAL  =  190182690)
+             MOVE    "92"               TO      RECE65-SRYKBN
+             MOVE    "920"              TO      RECE65-SRYSYUKBN
+                                                RECE64-SRYSYUKBN
+           END-IF
            MOVE    SRY-JIHIMONEYTOTAL   TO      RECE65-JIHIMONEY
       *
            MOVE    ZERO                 TO      IDX4
