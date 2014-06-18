@@ -714,6 +714,10 @@
                "190111790".
            03  CONST-GENZAN8               PIC X(09)   VALUE
                "190809190".
+           03  CONST-GENZAN9               PIC X(09)   VALUE
+               "190182590".
+           03  CONST-GENZAN10              PIC X(09)   VALUE
+               "190182690".
            03  CONST-SRYKAMEI-LEN          PIC 9(05)   VALUE   32.
            03  CONST-GAZOU-TANICD          PIC X(03)   VALUE   "006".
            03  CONST-SRYACCT-MAX           PIC 9(05)   VALUE   2000.
@@ -3722,7 +3726,9 @@
                                                    OR  CONST-GENZAN5
                                                    OR  CONST-GENZAN6
                                                    OR  CONST-GENZAN7
-                                                   OR  CONST-GENZAN8 )
+                                                   OR  CONST-GENZAN8 
+                                                   OR  CONST-GENZAN9
+                                                   OR  CONST-GENZAN10  )
                            MOVE    1       TO  FLG-MINUS
                        END-IF
                    END-IF

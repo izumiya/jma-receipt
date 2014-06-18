@@ -93,6 +93,8 @@
                        09  HCM34S01-PRIORITY3  PIC  9(03).
       *剤点数
                    07  HCM34S01-ZAITEN         PIC  9(08).
+      *マイナスフラグ(剤点数がプラス:0/マイナス:1)
+                   07  HCM34S01-ZAIMINUS       PIC  9(01).
       *剤回数
                    07  HCM34S01-ZAIKAISU       PIC  9(07).
       *明細数

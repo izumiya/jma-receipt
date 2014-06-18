@@ -5242,6 +5242,12 @@
                                    =   HCM34S01-RUIKEITOTAL(IDXE)
                                    +   WRK-SRYCD-9 
                            END-IF
+      *
+                           IF    ( WRK-SRYCD   =   "190182590"
+                                               OR  "190182690" )
+                               MOVE    1   TO  HCM34S01-ZAIMINUS (IDXE)
+                           END-IF
+      *
                        END-IF
       *
                    END-PERFORM
