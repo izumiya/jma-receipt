@@ -20,7 +20,7 @@
       *****************************************************************
       *  システム名        :   ＯＲＣＡ
       *  サブシステム名    :   月次帳票
-      *  コンポーネント名  :   向精神薬使用患者リスト
+      *  コンポーネント名  :   向精神薬投与患者リスト
       *  管理者            : 
       *  作成日付    作業者        記述
       *  14/06/XX    NACL-多々納   新規作成
@@ -202,7 +202,7 @@
            03  LST-PRT-HEAD1.
                05  FILLER              PIC X(02)   VALUE   SPACE.
                05  FILLER              PIC X(40)   VALUE
-                   "＃＃　向精神薬使用患者一覧表　＃＃".
+                   "＃＃　向精神薬投与患者一覧　＃＃".
                05  FILLER              PIC X(16)   VALUE   SPACE.
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
@@ -235,18 +235,19 @@
       *
            03  LST-PRT-BODY-02.
                05  PRT-FIL20           PIC X(15).
-               05  PRT-SRYYMD          PIC X(12).
+               05  PRT-SRYYMD          PIC X(09).
+               05  PRT-FIL21           PIC X(02).
                05  PRT-SRYKA           PIC X(10).
-               05  PRT-FIL21           PIC X(01).
-               05  PRT-HKNCOMBI        PIC X(04).
                05  PRT-FIL22           PIC X(01).
-               05  PRT-SRYKBN          PIC X(06).
+               05  PRT-HKNCOMBI        PIC X(04).
                05  PRT-FIL23           PIC X(01).
-               05  PRT-KBN             PIC X(06).
+               05  PRT-SRYKBN          PIC X(06).
                05  PRT-FIL24           PIC X(01).
-               05  PRT-YAKKCD          PIC X(09).
+               05  PRT-KBN             PIC X(06).
                05  PRT-FIL25           PIC X(01).
-               05  PRT-TNS-NAME        PIC X(60).
+               05  PRT-YAKKCD          PIC X(09).
+               05  PRT-FIL26           PIC X(01).
+               05  PRT-TNS-NAME        PIC X(44).
       *
            03  LST-PRT-BODY-03.
                05  PRT-FIL31           PIC X(10)   VALUE   SPACE.
@@ -349,9 +350,9 @@
            03  FILLER              PIC X(01)   VALUE   ",".
            03  FILLER              PIC X(08)   VALUE   "患者氏名".
            03  FILLER              PIC X(01)   VALUE   ",".
-           03  FILLER              PIC X(08)   VALUE   "診療日付".
+           03  FILLER              PIC X(06)   VALUE   "診療日".
            03  FILLER              PIC X(01)   VALUE   ",".
-           03  FILLER              PIC X(10)   VALUE   "診療科名称".
+           03  FILLER              PIC X(08)   VALUE   "診療科名".
            03  FILLER              PIC X(01)   VALUE   ",".
            03  FILLER              PIC X(14)   VALUE   "保険組合せ番号".
            03  FILLER              PIC X(01)   VALUE   ",".
@@ -359,13 +360,13 @@
            03  FILLER              PIC X(01)   VALUE   ",".
            03  FILLER              PIC X(12)   VALUE   "向精神薬種類".
            03  FILLER              PIC X(01)   VALUE   ",".
-           03  FILLER              PIC X(12)   VALUE   "種類グループ".
+           03  FILLER              PIC X(14)   VALUE   "一般名グループ".
            03  FILLER              PIC X(01)   VALUE   ",".
            03  FILLER              PIC X(08)   VALUE   "臨時投与".
            03  FILLER              PIC X(01)   VALUE   ",".
-           03  FILLER              PIC X(10)   VALUE   "診療コード".
+           03  FILLER              PIC X(12)   VALUE   "医薬品コード".
            03  FILLER              PIC X(01)   VALUE   ",".
-           03  FILLER              PIC X(08)   VALUE   "薬剤名称".
+           03  FILLER              PIC X(06)   VALUE   "薬剤名".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -512,7 +513,7 @@
            MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
            MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
            MOVE    "ORCBG022"          TO  JOB-PGID
-           MOVE    "向精神薬使用患者一覧表"
+           MOVE    "向精神薬投与患者一覧"
                                        TO  JOB-SHELLMSG
            CALL    "ORCSJOB"               USING
                                            ORCSJOBKANRIAREA
@@ -824,7 +825,7 @@
            END-IF
       *
            PERFORM VARYING     IDS     FROM    1   BY  1
-                   UNTIL      (IDS         >   5         )
+                   UNTIL      (IDS         >   5   )
                          OR   (SRY-SRYCD (IDS) =   SPACE )
                          OR   (IDX-TBL         >=  50    )
                IF      SRY-SRYCD (IDS)(1:1)    =   "6"
@@ -1450,7 +1451,7 @@
            MOVE    WRK-TO-DATA         TO  STOUKEICSV-TO-DATA
            MOVE    "2"                 TO  STOUKEICSV-CODE-TYPE
            MOVE    WRK-CSV-REC         TO  STOUKEICSV-CSVDATA
-           MOVE    "向精神薬使用患者一覧ＣＳＶ作成"
+           MOVE    "向精神薬投与患者一覧ＣＳＶ作成"
                                        TO  STOUKEICSV-TITLE
       *
            CALL    "ORCSTOUKEICSV"     USING

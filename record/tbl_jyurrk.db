@@ -1179,14 +1179,18 @@ path	key57	{
 	DBSELECT	{
 		DECLARE tbl_jyurrk_key57_csr CURSOR FOR
 		SELECT a.*
-                FROM tbl_jyurrk a,tbl_ptnum b
+                FROM tbl_jyurrk a,tbl_ptnum b,tbl_ptinf c
 			WHERE a.HOSPNUM      =   :HOSPNUM
 			AND   a.NYUGAIKBN    =   :NYUGAIKBN
 			AND   a.SRYYMD     like :SRYYMD
 			AND   a.HKNCOMBINUM  <>  '9999'
 	        	AND   a.HOSPNUM     =  b.HOSPNUM
 	        	AND   a.PTID        =  b.PTID
-			ORDER   BY        b.PTNUM,
+	        	AND   a.HOSPNUM     =  c.HOSPNUM
+	        	AND   a.PTID        =  c.PTID
+        		AND   c.TSTPTNUMKBN  <> '1'
+			ORDER   BY        c.KANANAME,
+			                  b.PTNUM,
 			                  a.SRYYMD,
 			                  a.DENPNUM,
 			                  a.EDANUM
