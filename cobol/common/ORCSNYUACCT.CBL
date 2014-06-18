@@ -77,6 +77,10 @@
            03  FLG-CHK             PIC 9(01).
            03  FLG-TANKI           PIC 9(01).
            03  FLG-TANKI-NASI      PIC 9(01).
+           03  FLG-TANKI2          PIC 9(01).
+           03  FLG-TANKI3          PIC 9(01).
+           03  FLG-HOSPSBT         PIC 9(01).
+           03  FLG-EIYOUKSNKBN     PIC 9(01).
       *    選定療養費
            03  FLG-SENTEI              PIC 9(01).
       *    食事
@@ -221,6 +225,9 @@
       *    救急・在宅等支援療養病床初期加算の算定済日数
            03  WRK-KYUKYU-NISSU                 PIC 9(05).
       *
+      *    栄養管理体制減算の減算コード
+           03  WRK-EIYOU-GENSANCD               PIC X(09).
+      *
       *    加算算定済回数カウント用
            03  WRK-KSN-YMD.
                05  WRK-KSN-YY          PIC 9(04).
@@ -288,6 +295,8 @@
            COPY    "CPPTINF.INC".
       *
       *    システム管理（自動算定情報・チェック機能）
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1001.INC".
            COPY    "CPSK1007.INC".
            COPY    "CPSK5000.INC".
       *
@@ -613,12 +622,149 @@
            IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
               CONTINUE
            ELSE
-              PERFORM 2009-HYOU-TEISU-SEC
+              PERFORM 2001-HYOU-TEISU-SEC
            END-IF
       *
            MOVE    WRK-STYMD           TO  WRK-KHN-STYMD
            MOVE    WRK-EDYMD           TO  WRK-KHN-EDYMD
            MOVE    WRK-STYMD           TO  WRK-ENDYMD
+      *
+      *    共通処理
+      *    システム管理検索（療養入院の区分取得）
+      *    療養病棟（病床）入院料の会計表示対応
+      *    短期滞在手術等入院基本料の判定
+           PERFORM   2001-KYOUTSU-SEC
+      *
+      *    加算により剤を決定する
+           PERFORM VARYING     IDX-K   FROM    1   BY  1
+                   UNTIL       IDX-K   >   10
+      *      開始日が対象であること
+             IF     (LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
+                                               >=  WRK-STYMD) AND
+                    (LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
+                                               <=  WRK-EDYMD)
+      *
+               IF      LNK-SCNYUACCT-KAGEN-SRYCD (IDX-K) =   SPACE
+                   IF      WRK-EDYMD           >=  WRK-ENDYMD
+                       MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
+                       MOVE    WRK-EDYMD       TO  WRK-KHN-EDYMD
+                       MOVE    SPACE           TO  WRK-KAGEN-SRYCD
+                       PERFORM 2001-NYUKHN-HENSYU-SEC
+                   END-IF
+                   MOVE    10                  TO  IDX-K
+               ELSE
+      *            対象期間により決定する
+                   IF      LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
+                                               >   WRK-ENDYMD
+      *                前回分より以降の時、次の前日まで
+                       MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
+                       MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
+                                               TO  WRK-INYMD
+                       MOVE    -1              TO  WRK-ZOGEN
+                       PERFORM 800-HIZUKE-KEI-SEC
+                       MOVE    WRK-OTYMD       TO  WRK-KHN-EDYMD
+                       MOVE    SPACE           TO  WRK-KAGEN-SRYCD
+                       PERFORM 2001-NYUKHN-HENSYU-SEC
+                   END-IF
+                   MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
+                                               TO  WRK-KHN-STYMD
+                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD (IDX-K)
+                                               TO  WRK-KHN-EDYMD
+                   MOVE    LNK-SCNYUACCT-KAGEN-SRYCD (IDX-K)
+                                               TO  WRK-KAGEN-SRYCD
+                   PERFORM 2001-NYUKHN-HENSYU-SEC
+               END-IF
+             END-IF
+           END-PERFORM
+      *
+      *    残りの日で作成する
+           IF      WRK-EDYMD           >=  WRK-ENDYMD
+               MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
+               MOVE    WRK-EDYMD       TO  WRK-KHN-EDYMD
+               MOVE    SPACE           TO  WRK-KAGEN-SRYCD
+               PERFORM 2001-NYUKHN-HENSYU-SEC
+           END-IF
+      *
+           .
+       200-NYUKHN-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    標欠・超過情報取得処理
+      *****************************************************************
+       2001-HYOU-TEISU-SEC            SECTION.
+      *
+           INITIALIZE                  WRK-HYOU-TEISU-TBL
+      *    標欠情報取得
+           INITIALIZE                  ORCSHYOUKETU-AREA
+           MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
+                                       TO  LNK-HYOUKETU-SANTEIYM
+           CALL    "ORCSHYOUKETU"      USING   ORCSHYOUKETU-AREA
+                                               SPA-AREA
+           IF      LNK-HYOUKETU-RC     =   ZERO
+               CONTINUE
+           ELSE
+               INITIALIZE                  LNK-HYOUKETU-HENKYAKU-AREA
+           END-IF
+           MOVE    ZERO                TO  IDH-MAX
+           PERFORM VARYING     IDH     FROM    1   BY  1
+                   UNTIL      (IDH     >   2   )
+               MOVE    LNK-HYOUKETU-SRYCD (IDH)
+                                       TO  WRK-HYOU-TEISU-SRYCD (IDH)
+               MOVE    LNK-HYOUKETU-STARTYM(IDH)
+                                       TO  WRK-HYOU-TEISU-STYM (IDH)
+               MOVE    LNK-HYOUKETU-ENDYM(IDH)
+                                       TO  WRK-HYOU-TEISU-EDYM (IDH)
+           END-PERFORM
+      *
+      *    定数超過
+           INITIALIZE                  ORCSTEISU-AREA
+           MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
+                                       TO  LNK-TEISU-SANTEIYM
+      *    算定入院料
+           MOVE    LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                                       TO  LNK-TEISU-SANTEISRYCD
+      *    特定入院料区分
+           MOVE    LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+                                       TO  LNK-TEISU-TOKUTEINYUIN-KBN
+           CALL    "ORCSTEISU"         USING   ORCSTEISU-AREA
+                                               SPA-AREA
+           IF      LNK-TEISU-RC        =   ZERO
+               CONTINUE
+           ELSE
+               INITIALIZE              LNK-TEISU-HENKYAKU-AREA
+           END-IF
+           PERFORM VARYING     IDH     FROM    1   BY  1
+                   UNTIL      (IDH     >   2   )
+               IF      LNK-TEISU-SRYCD (IDH)   NOT =   SPACE
+                   MOVE    LNK-TEISU-SRYCD (IDH)
+                                       TO  WRK-HYOU-TEISU-SRYCD
+                                                             (IDH)
+                   MOVE    LNK-TEISU-STARTYM(IDH)
+                                       TO  WRK-HYOU-TEISU-STYM
+                                                             (IDH)
+                   MOVE    LNK-TEISU-ENDYM(IDH)
+                                       TO  WRK-HYOU-TEISU-EDYM
+                                                             (IDH)
+               END-IF
+           END-PERFORM
+           IF     (WRK-HYOU-TEISU-SRYCD(1)     =   SPACE )  AND
+                  (WRK-HYOU-TEISU-SRYCD(2) NOT =   SPACE )
+               MOVE    WRK-HYOU-TEISU-OCC (2)
+                                       TO  WRK-HYOU-TEISU-OCC (1)
+               MOVE    SPACE           TO  WRK-HYOU-TEISU-OCC (2)
+           END-IF
+           .
+       2001-HYOU-TEISU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    共通処理
+      *    システム管理検索（療養入院の区分取得）
+      *    療養病棟（病床）入院料の会計表示対応
+      *    短期滞在手術等入院基本料の判定
+      *****************************************************************
+       2001-KYOUTSU-SEC            SECTION.
       *
       *    システム管理検索（療養入院の区分取得）
            MOVE    SPACE               TO  SYS-5000-REC
@@ -639,8 +785,12 @@
                MOVE    "key10"             TO  MCP-PATHNAME
                PERFORM 920-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
+                   DISPLAY  "SYS-5000  FETCH MCP-RC = " MCP-RC
                    MOVE    ZERO                TO  FLG-SYSKANRI
                    MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                   IF      SYS-5000-EIYOUKSNKBN  =   "1"
+                        MOVE    1              TO  FLG-EIYOUKSNKBN
+                   END-IF
                ELSE
                    MOVE    1                   TO  FLG-SYSKANRI
                END-IF
@@ -1177,6 +1327,12 @@
                      IF   TNS-NYUKHNKSNKBN  =  226  OR
                                                240
                          MOVE    1         TO  FLG-TANKI
+                         IF   TNS-NYUKHNKSNKBN  =  226
+                             MOVE    1         TO  FLG-TANKI2
+                         END-IF
+                         IF   TNS-NYUKHNKSNKBN  =  240
+                             MOVE    1         TO  FLG-TANKI3
+                         END-IF
                      END-IF
                      MOVE    ZERO          TO  FLG-TENSU
                  ELSE
@@ -1193,128 +1349,8 @@
              PERFORM 990-DBCLOSE-SEC
       *
            END-IF
-      *
-      *    加算により剤を決定する
-           PERFORM VARYING     IDX-K   FROM    1   BY  1
-                   UNTIL       IDX-K   >   10
-      *      開始日が対象であること
-             IF     (LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
-                                               >=  WRK-STYMD) AND
-                    (LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
-                                               <=  WRK-EDYMD)
-      *
-               IF      LNK-SCNYUACCT-KAGEN-SRYCD (IDX-K) =   SPACE
-                   IF      WRK-EDYMD           >=  WRK-ENDYMD
-                       MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
-                       MOVE    WRK-EDYMD       TO  WRK-KHN-EDYMD
-                       MOVE    SPACE           TO  WRK-KAGEN-SRYCD
-                       PERFORM 2001-NYUKHN-HENSYU-SEC
-                   END-IF
-                   MOVE    10                  TO  IDX-K
-               ELSE
-      *            対象期間により決定する
-                   IF      LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
-                                               >   WRK-ENDYMD
-      *                前回分より以降の時、次の前日まで
-                       MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
-                       MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
-                                               TO  WRK-INYMD
-                       MOVE    -1              TO  WRK-ZOGEN
-                       PERFORM 800-HIZUKE-KEI-SEC
-                       MOVE    WRK-OTYMD       TO  WRK-KHN-EDYMD
-                       MOVE    SPACE           TO  WRK-KAGEN-SRYCD
-                       PERFORM 2001-NYUKHN-HENSYU-SEC
-                   END-IF
-                   MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD (IDX-K)
-                                               TO  WRK-KHN-STYMD
-                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD (IDX-K)
-                                               TO  WRK-KHN-EDYMD
-                   MOVE    LNK-SCNYUACCT-KAGEN-SRYCD (IDX-K)
-                                               TO  WRK-KAGEN-SRYCD
-                   PERFORM 2001-NYUKHN-HENSYU-SEC
-               END-IF
-             END-IF
-           END-PERFORM
-      *
-      *    残りの日で作成する
-           IF      WRK-EDYMD           >=  WRK-ENDYMD
-               MOVE    WRK-ENDYMD      TO  WRK-KHN-STYMD
-               MOVE    WRK-EDYMD       TO  WRK-KHN-EDYMD
-               MOVE    SPACE           TO  WRK-KAGEN-SRYCD
-               PERFORM 2001-NYUKHN-HENSYU-SEC
-           END-IF
-      *
            .
-       200-NYUKHN-SYORI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    標欠・超過情報取得処理
-      *****************************************************************
-       2009-HYOU-TEISU-SEC            SECTION.
-      *
-           INITIALIZE                  WRK-HYOU-TEISU-TBL
-      *    標欠情報取得
-           INITIALIZE                  ORCSHYOUKETU-AREA
-           MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
-                                       TO  LNK-HYOUKETU-SANTEIYM
-           CALL    "ORCSHYOUKETU"      USING   ORCSHYOUKETU-AREA
-                                               SPA-AREA
-           IF      LNK-HYOUKETU-RC     =   ZERO
-               CONTINUE
-           ELSE
-               INITIALIZE                  LNK-HYOUKETU-HENKYAKU-AREA
-           END-IF
-           MOVE    ZERO                TO  IDH-MAX
-           PERFORM VARYING     IDH     FROM    1   BY  1
-                   UNTIL      (IDH     >   2   )
-               MOVE    LNK-HYOUKETU-SRYCD (IDH)
-                                       TO  WRK-HYOU-TEISU-SRYCD (IDH)
-               MOVE    LNK-HYOUKETU-STARTYM(IDH)
-                                       TO  WRK-HYOU-TEISU-STYM (IDH)
-               MOVE    LNK-HYOUKETU-ENDYM(IDH)
-                                       TO  WRK-HYOU-TEISU-EDYM (IDH)
-           END-PERFORM
-      *
-      *    定数超過
-           INITIALIZE                  ORCSTEISU-AREA
-           MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
-                                       TO  LNK-TEISU-SANTEIYM
-      *    算定入院料
-           MOVE    LNK-SCNYUACCT-NYUKHN-SRYCD (1)
-                                       TO  LNK-TEISU-SANTEISRYCD
-      *    特定入院料区分
-           MOVE    LNK-SCNYUACCT-TOKUTEINYUIN-KBN
-                                       TO  LNK-TEISU-TOKUTEINYUIN-KBN
-           CALL    "ORCSTEISU"         USING   ORCSTEISU-AREA
-                                               SPA-AREA
-           IF      LNK-TEISU-RC        =   ZERO
-               CONTINUE
-           ELSE
-               INITIALIZE              LNK-TEISU-HENKYAKU-AREA
-           END-IF
-           PERFORM VARYING     IDH     FROM    1   BY  1
-                   UNTIL      (IDH     >   2   )
-               IF      LNK-TEISU-SRYCD (IDH)   NOT =   SPACE
-                   MOVE    LNK-TEISU-SRYCD (IDH)
-                                       TO  WRK-HYOU-TEISU-SRYCD
-                                                             (IDH)
-                   MOVE    LNK-TEISU-STARTYM(IDH)
-                                       TO  WRK-HYOU-TEISU-STYM
-                                                             (IDH)
-                   MOVE    LNK-TEISU-ENDYM(IDH)
-                                       TO  WRK-HYOU-TEISU-EDYM
-                                                             (IDH)
-               END-IF
-           END-PERFORM
-           IF     (WRK-HYOU-TEISU-SRYCD(1)     =   SPACE )  AND
-                  (WRK-HYOU-TEISU-SRYCD(2) NOT =   SPACE )
-               MOVE    WRK-HYOU-TEISU-OCC (2)
-                                       TO  WRK-HYOU-TEISU-OCC (1)
-               MOVE    SPACE           TO  WRK-HYOU-TEISU-OCC (2)
-           END-IF
-           .
-       2009-HYOU-TEISU-EXT.
+       2001-KYOUTSU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1468,6 +1504,11 @@
       *    入院料加算作成処理
       *****************************************************************
        210-NYUKHNKSN-SYORI-SEC            SECTION.
+      *
+      *    栄養管理体制減算の判定処理（該当減算コードの取得）２６年７月改定
+           IF     LNK-SCNYUACCT-STSRYYMD    >=   "20140701"
+               PERFORM    210-EIYOU-GENSAN-SEC
+           END-IF
       *
       *    加算により剤を決定する
            PERFORM VARYING     IDX-K   FROM    1   BY  1
@@ -1777,6 +1818,13 @@
                    INITIALIZE                  TBL-NYUIN-AREA
                    MOVE    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
                                                TO  TBL-SRYCD (1)
+      *            栄養管理体制減算（短期滞在手術等基本料２は終了日を
+      *                              開始日と同じにする）
+                   IF   (FLG-TANKI2     =     1)   AND
+                        (LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)  =
+                                                 "190182690")
+                           MOVE   WRK-STYMD    TO  WRK-OTYMD2
+                   END-IF
                    MOVE    WRK-STYMD           TO  WRK-KHN-STYMD
                    MOVE    WRK-OTYMD2          TO  WRK-KHN-EDYMD
                    IF      WRK-KHN-EDYMD       >   WRK-EDYMD
@@ -1795,6 +1843,142 @@
       *
            .
        210-NYUKHNKSN-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    栄養管理体制減算の判定処理（該当減算コードの取得）２６年７月改定
+      *****************************************************************
+       210-EIYOU-GENSAN-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  WRK-EIYOU-GENSANCD
+      *
+      *    病院診療所の判定（システム管理テーブルより）
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "1001"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    LNK-SCNYUACCT-STSRYYMD
+                                       TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-FETCH-SEC
+               IF  FLG-SYSKANRI     =      ZERO
+                   IF   SYS-1001-HOSPSBT  =  1
+                       MOVE    1       TO  FLG-HOSPSBT
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    システム管理検索（栄養管理体制減算の取得）
+           MOVE    SPACE               TO  SYS-5000-REC
+           INITIALIZE                      SYS-5000-REC
+           MOVE    "5000"              TO  SYS-5000-KANRICD
+           MOVE    "*"                 TO  SYS-5000-KBNCD
+           MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
+                                       TO  SYS-5000-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-5000-STYUKYMD(7:2)
+           MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+           MOVE    SYS-5000-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   DISPLAY  "SYS-5000  FETCH MCP-RC = " MCP-RC
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                   IF      SYS-5000-EIYOUKSNKBN  =   "1"
+                        MOVE    1              TO  FLG-EIYOUKSNKBN
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    SPACE               TO  SYS-5000-REC
+               INITIALIZE                  SYS-5000-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    点数マスタから入院基本料、特定入院料を判定し減算コードを決定
+      *    （短期滞在は事前にセットしたフラグも参照）
+           DISPLAY  "============ORCSNYUACCT===================="
+           DISPLAY  "LNK-SCNYUACCT-NYUKHN-SRYCD(1) = "
+                     LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+           DISPLAY  "LNK-SCNYUACCT-KAGEN-SRYCD(1) = "
+                     LNK-SCNYUACCT-KAGEN-SRYCD(1)
+           IF    (FLG-HOSPSBT          =   1)   AND
+                 (FLG-EIYOUKSNKBN      =   1)
+               MOVE    SPACE           TO  TNS-TENSU-REC
+               IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)  NOT = SPACE
+                   MOVE    LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                       TO  TNS-SRYCD
+               ELSE
+                   MOVE    LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                       TO  TNS-SRYCD
+               END-IF
+               MOVE    WRK-STYMD       TO  WRK-YMD
+               PERFORM 910-TENSU-READ-SEC
+               IF      FLG-TENSU       =   ZERO
+                    DISPLAY  "TNS-NYUKHNKBN = "
+                              TNS-NYUKHNKBN
+                    IF  TNS-NYUTENTTLKBN   =   903
+      *                 特別入院基本料は除く
+                        IF  (TNS-NYUKHNKBN   =  79  OR  88)  OR
+                            (TNS-SRYCD       =  "190121810"  OR
+                                                "190799510")
+                            CONTINUE
+                        ELSE
+                            MOVE   "190182590"
+                                       TO   WRK-EIYOU-GENSANCD
+                        END-IF
+                    END-IF
+                    IF   TNS-NYUTENTTLKBN   =   920
+      *                 短期滞在手術等基本料３は除く
+                        IF    FLG-TANKI3    =   1
+                            CONTINUE
+                        ELSE
+                            MOVE   "190182690"
+                                       TO   WRK-EIYOU-GENSANCD
+                        END-IF
+                    END-IF
+               END-IF
+           END-IF
+      *
+           PERFORM VARYING     IDX-K   FROM    1   BY  1
+                   UNTIL      (IDX-K       >   20  )  OR
+                              (LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
+                                          =   SPACE )
+                  CONTINUE
+           END-PERFORM
+           MOVE      WRK-EIYOU-GENSANCD   TO
+                               LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
+      *
+           .
+       210-EIYOU-GENSAN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4370,9 +4554,22 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        7001-NYUKHN-SYORI-SEC            SECTION.
       *
+      *    標欠・超過情報取得（医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+              PERFORM 2001-HYOU-TEISU-SEC
+           END-IF
+      *
            MOVE    WRK-STYMD           TO  WRK-KHN-STYMD
            MOVE    WRK-EDYMD           TO  WRK-KHN-EDYMD
            MOVE    WRK-STYMD           TO  WRK-ENDYMD
+      *
+      *    共通処理
+      *    システム管理検索（療養入院の区分取得）
+      *    療養病棟（病床）入院料の会計表示対応
+      *    短期滞在手術等入院基本料の判定
+           PERFORM   2001-KYOUTSU-SEC
       *
       *    加算により剤を決定する
            PERFORM VARYING     IDX-K   FROM    1   BY  1
@@ -4666,6 +4863,11 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 920-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+      *            栄養管理体制減算の場合は点数識別を変更
+                   IF    TNS-SRYCD         =   "190182590"  OR
+                                               "190182690"
+                        MOVE    3          TO   TNS-TENSIKIBETU
+                   END-IF
                    MOVE    ZERO                TO  FLG-TENSU
                ELSE
                    INITIALIZE                  TNS-TENSU-REC
@@ -4816,6 +5018,28 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        910-NYUINACCT-FETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    システム管理マスター読込
+      *****************************************************************
+       910-SYSKANRI-FETCH-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1001-REC
+               MOVE    ZERO                TO  FLG-SYSKANRI
+           ELSE
+               INITIALIZE                      SYS-1001-REC
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           .
+       910-SYSKANRI-FETCH-EXT.
            EXIT.
       *
       *****************************************************************

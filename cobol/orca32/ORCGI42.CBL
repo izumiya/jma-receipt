@@ -252,7 +252,7 @@
        01  TBL-NYUIN-TENSU-AREA.
            03  TBL-NYUIN-TENSU-G.
                05  TBL-NYUIN-TENSU-OCC     OCCURS   100.
-                   07  TBL-ZAITEN          PIC 9(07).
+                   07  TBL-ZAITEN          PIC S9(07).
                    07  TBL-DAY-G.
                        09  TBL-DAY         PIC 9(03)
                                                OCCURS   31.
@@ -1807,8 +1807,8 @@
                        MOVE    NACCT-DAY-AREA  TO  TBL-DAY-G  (IDX-N)
                    WHEN    "2"
       *            外泊
-                       MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
                        MOVE    NACCT-SRYYM     TO  TBL-GAIHAKU-SRYYYMM
+                       MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
       *            食事関係
                    WHEN    "4"
                        CONTINUE
@@ -1819,7 +1819,15 @@
                    WHEN    OTHER
                        IF      NACCT-ZAITEN    >   ZERO
                            ADD     1               TO  IDX-N
-                           MOVE    NACCT-ZAITEN    TO  TBL-ZAITEN(IDX-N)
+      *                    栄養管理体制減算に該当する場合はマイナス
+                           IF     (NACCT-MEISAISU   =    1)   AND
+                                  (NACCT-SRYCDTOTAL =    190182590  OR
+                                                         190182690)
+                               COMPUTE  TBL-ZAITEN(IDX-N)  =
+                                        NACCT-ZAITEN    *   -1
+                           ELSE
+                               MOVE  NACCT-ZAITEN  TO  TBL-ZAITEN(IDX-N)
+                           END-IF
                            MOVE    NACCT-DAY-AREA  TO  TBL-DAY-G (IDX-N)
                        END-IF
                END-EVALUATE
