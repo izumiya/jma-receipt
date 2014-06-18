@@ -206,7 +206,7 @@
                05  FILLER              PIC X(16)   VALUE   SPACE.
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
-                   "∑Ó ¨".
+                   " ¨".
                05  FILLER              PIC X(09)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
