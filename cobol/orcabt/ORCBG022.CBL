@@ -1252,7 +1252,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                         TO  SPRT-PRIORITY
            MOVE    "HCMSL80.red"        TO  SPRT-PRTID
-           MOVE    "向精神薬使用患者一覧表"
+           MOVE    "向精神薬投与患者一覧"
                                         TO  SPRT-TITLE
            MOVE    HCMSL80              TO  SPRT-PRTDATA
            MOVE    LNK-PRTKANRI-TERMID
