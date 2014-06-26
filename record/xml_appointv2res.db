@@ -8,6 +8,7 @@ xml_appointv2res {
         Information_Time				varchar(8);
         Api_Result					varchar(2);
         Api_Result_Message				varchar(100);
+        Api_Warning_Message				varchar(100);
         Reskey						varchar(100);
         Appointment_Date				varchar(10);
         Appointment_Time				varchar(8);

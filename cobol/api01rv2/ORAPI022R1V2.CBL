@@ -189,9 +189,9 @@
       *****************************************************************
        000-MAIN-SEC                SECTION.
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept start*"
-           DISPLAY   "***************"
+           DISPLAY   "*********************"
+           DISPLAY   "* disease_info start*"
+           DISPLAY   "*********************"
       *
            INITIALIZE                      FLG-AREA
            INITIALIZE                      IDX-AREA
@@ -209,9 +209,9 @@
       *    返却領域編集
            PERFORM 300-APTXMLMAKE-SEC
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept end  *"
-           DISPLAY   "***************"
+           DISPLAY   "*********************"
+           DISPLAY   "* disease_info end  *"
+           DISPLAY   "*********************"
            .
        000-MAIN-EXIT.
            EXIT    PROGRAM.
@@ -443,7 +443,7 @@
                MOVE    "application/xml"   TO  APILST7-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "appoint xml write failure "
+               DISPLAY "disease_info xml write failure "
            END-IF
       *
           .
@@ -534,7 +534,6 @@
                                        LNK-DAY2-AREA
            IF      STS-DAY-RC1     NOT =   ZERO
                MOVE    "11"                TO  WRK-ERRCD
-               DISPLAY "Accept Ymd =  " WRK-BASE-YMD
            END-IF
            MOVE    WRK-BASE-YMD        TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
@@ -811,13 +810,13 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "01"
-               MOVE    "患者番号未設定"
+               MOVE    "患者番号の設定がありません"
                                                TO  WRK-ERRMSG
            WHEN    "10"
-               MOVE    "該当患者番号なし"
+               MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "基準日設定誤り"
+               MOVE    "基準日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "20"
                MOVE    "対象病名が２００件以上存在します。"

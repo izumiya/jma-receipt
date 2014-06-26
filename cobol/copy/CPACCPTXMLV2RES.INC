@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * 擔堛昗弨儗僙僾僩僜僼僩乮JMA standard receipt software乯
+      * 泣板筛洁レセプトソフト∈JMA standard receipt software∷
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
       ******************************************************************
-      *    俙俹俬儗僗億儞僗庴晅忣曬           COPY (CPACCPTXMLV2RES.INC)
+      *    ＡＰＩレスポンス减烧攫鼠           COPY (CPACCPTXMLV2RES.INC)
       ******************************************************************
         01  XML-ACCEPTRES.
             02  ACCPTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -24,96 +24,98 @@
             02  ACCPTRES-MODE             PIC S9(9)   BINARY.
             02  ACCPTRES-RECORDNAME       PIC X(128).
             02  ACCPTRES-REGISTRES.
-      *       幚巤擔
+      *       悸卉泣
               03  ACCPTRES-INFORMATION-DATE           PIC X(10).
-      *       幚巤帪娫
+      *       悸卉箕粗
               03  ACCPTRES-INFORMATION-TIME           PIC X(8).
-      *       曉媝僐乕僪
+      *       手笛コ〖ド
               03  ACCPTRES-API-RESULT                 PIC X(2).
-      *       曉媝儊僢僙乕僕
+      *       手笛メッセ〖ジ
               03  ACCPTRES-API-RESULT-MSG             PIC X(100).
+      *       ワ〖ニングメッセ〖ジ
+              03  ACCPTRES-API-WARNING-MSG            PIC X(100).
       *
               03  ACCPTRES-RESKEY                     PIC X(100).
-      *       庴晅擔
+      *       减烧泣
               03  ACCPTRES-REGIST-DATE                PIC X(10).
-      *       庴晅帪娫
+      *       减烧箕粗
               03  ACCPTRES-REGIST-TIME                PIC X(8).
-      *       庴晅俬俢
+      *       减烧ＩＤ
               03  ACCPTRES-REGIST-ID                  PIC X(5).
-      *       恌椕壢
+      *       壳闻彩
               03  ACCPTRES-REGIST-DEP-CODE            PIC X(2).
-      *       恌椕壢柤徧
+      *       壳闻彩叹疚
               03  ACCPTRES-REGIST-DEP-NAME            PIC X(80).
-      *       僪僋僞乕僐乕僪
+      *       ドクタ〖コ〖ド
               03  ACCPTRES-REGIST-DR-CODE             PIC X(5).
-      *       僪僋僞乕巵柤
+      *       ドクタ〖会叹
               03  ACCPTRES-REGIST-DR-NAME             PIC X(80).
-      *       恌椕撪梕嬫暘
+      *       壳闻柒推惰尸
               03  ACCPTRES-REGIST-DEP-INFO            PIC X(2).
       *
               03  ACCPTRES-PATIENT-INFOMATION.
-      *         姵幰斣崋
+      *         吹荚戎规
                 04  ACCPTRES-PATIENTID                PIC X(20).
-      *         姵幰巵柤
+      *         吹荚会叹
                 04  ACCPTRES-NAME                     PIC X(100).
-      *         姵幰僇僫巵柤
+      *         吹荚カナ会叹
                 04  ACCPTRES-KANANAME                 PIC X(100).
-      *         惗擭寧擔
+      *         栏钳奉泣
                 04  ACCPTRES-BIRTHDAY                 PIC X(10).
-      *         惈暿
+      *         拉侍
                 04  ACCPTRES-SEX                      PIC X(1).
-      *         帺戭忣曬
+      *         极吗攫鼠
                 04  ACCPTRES-ADDRESS-INFO.
-      *           梄曋斣崋
+      *           凸守戎规
                   05  ACCPTRES-HOME-ZIP-CODE          PIC X(7).
-      *           廧強
+      *           交疥
                   05  ACCPTRES-HOME-ADDRESSES         PIC X(100).
-      *         曐尟忣曬
+      *         瘦副攫鼠
                 04  ACCPTRES-INSURANCE-G.
                   05  ACCPTRES-INSURANCE-INFO          OCCURS 20 TIMES.
-      *             曐尟偺庬椶
+      *             瘦副の硷梧
                     06  ACCPTRES-MAIN-INSURANCE-CLASS   PIC X(03).
-      *             曐尟幰斣崋
+      *             瘦副荚戎规
                     06  ACCPTRES-MAIN-INSURANCE-NUMBER  PIC X(08).
-      *             曐尟偺庬椶柤徧
+      *             瘦副の硷梧叹疚
                     06  ACCPTRES-MAIN-INSURANCE-NAME    PIC X(20).
-      *             婰崋
+      *             淡规
                     06  ACCPTRES-MAIN-MARK              PIC X(80).
-      *             斣崋
+      *             戎规
                     06  ACCPTRES-MAIN-NUMBER            PIC X(80).
-      *             宲懕嬫暘
+      *             费鲁惰尸
                     06  ACCPTRES-MAIN-CONTINUATION      PIC X(01).
-      *             曗彆嬫暘
+      *             输锦惰尸
                     06  ACCPTRES-MAIN-ASSISTANCE        PIC X(01).
-      *             杮恖壠懓嬫暘
+      *             塑客踩虏惰尸
                     06  ACCPTRES-MAIN-FAMILY            PIC X(01).
-      *             旐曐尟幰柤
+      *             蕊瘦副荚叹
                     06  ACCPTRES-MAIN-POLICYHOLDER      PIC X(100).
-      *             桳岠奐巒擔
+      *             铜跟倡幌泣
                     06  ACCPTRES-MAIN-START-DATE        PIC X(10).
-      *             桳岠廔椆擔
+      *             铜跟姜位泣
                     06  ACCPTRES-MAIN-END-DATE          PIC X(10).
-      *             岞旓忣曬
+      *             给锐攫鼠
                     06  ACCPTRES-PUBLIC-INSURANCE-INFO           
                                               OCCURS  4 TIMES.
-      *               岞旓偺庬椶
+      *               给锐の硷梧
                       07  ACCPTRES-INSURANCE-CLASS         PIC X(03).
-      *               岞旓偺庬椶柤徧
+      *               给锐の硷梧叹疚
                       07  ACCPTRES-INSURANCE-NAME          PIC X(20).
-      *               晧扴幰斣崋
+      *               砷么荚戎规
                       07  ACCPTRES-PROVIDER-NUMBER         PIC X(08).
-      *               庴媼幰斣崋
+      *               减惦荚戎规
                       07  ACCPTRES-RECIPIENT-NUMBER        PIC X(20).
-      *               擖堾亅晧扴棪乮妱乯
+      *               掐薄≥砷么唯∈充∷
                       07  ACCPTRES-RATE-ADMISSION          PIC X(04).
-      *               擖堾亅屌掕妟
+      *               掐薄≥盖年驰
                       07  ACCPTRES-MONEY-ADMISSION         PIC X(06).
-      *               奜棃亅晧扴棪乮妱乯
+      *               嘲丸≥砷么唯∈充∷
                       07  ACCPTRES-RATE-OUTPATIENT         PIC X(04).
-      *               奜棃亅屌掕妟
+      *               嘲丸≥盖年驰
                       07  ACCPTRES-MONEY-OUTPATIENT        PIC X(06).
-      *               桳岠奐巒擔
+      *               铜跟倡幌泣
                       07  ACCPTRES-INSURANCE-START-DATE    PIC X(10).
-      *               桳岠廔椆擔
+      *               铜跟姜位泣
                       07  ACCPTRES-INSURANCE-END-DATE      PIC X(10).
       *

@@ -2589,39 +2589,30 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "01"
-               MOVE    "患者番号未設定"
+               MOVE    "患者番号の設定がありません"
                                                TO  WRK-ERRMSG
            WHEN    "02"
-               MOVE    "診療科未設定"
+               MOVE    "診療科の設定がありません"
                                                TO  WRK-ERRMSG
            WHEN    "03"
-               MOVE    "時間外加算区分が違います"
+               MOVE    "時間外加算区分が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "10"
-               MOVE    "該当患者番号なし"
+               MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "診療日設定誤り"
+               MOVE    "診療日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "12"
-               MOVE    "保険組合せ誤り"
+               MOVE    "該当する保険組合せがありません"
                                                TO  WRK-ERRMSG
            WHEN    "13"
                MOVE    "診療科が存在しません"
-                                               TO  WRK-ERRMSG
-           WHEN    "20"
-               MOVE    "中途終了データの登録ができません"
-                                               TO  WRK-ERRMSG
-           WHEN    "22"
-               MOVE    "登録対象のデータがありません"
                                                TO  WRK-ERRMSG
       *
       *警告
            WHEN    "K1"
                MOVE    "診療日を設定しました"
-                                               TO  WRK-ERRMSG
-           WHEN    "K2"
-               MOVE    "保険組合せをゼロで登録しました"
                                                TO  WRK-ERRMSG
       *共通エラー
            WHEN    "89"

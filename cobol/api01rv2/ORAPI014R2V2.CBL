@@ -856,13 +856,13 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "01"
-               MOVE    "患者番号未設定"
+               MOVE    "患者番号の設定がありません"
                                                TO  WRK-ERRMSG
            WHEN    "10"
-               MOVE    "該当患者番号なし"
+               MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "予約日設定誤り"
+               MOVE    "予約日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "20"
                MOVE    "予約対象件数が５０件以上あります。"
@@ -901,7 +901,7 @@
            WHEN    "91"
                MOVE    "処理区分未設定"        TO  WRK-ERRMSG
            WHEN    "97"
-               MOVE   "送信内容に誤りがあります。"
+               MOVE    "送信内容に誤りがあります。"
                                                TO  WRK-ERRMSG
            WHEN    "98"
                MOVE   "送信内容の読込ができませんでした"

@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  14/06/XX  ワーニングメッセージ対応他
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -470,12 +471,12 @@
       *****************************************************************
        300-APTXMLMAKE-SEC   SECTION.
       *
-      *    エラーメッセージ編集
-           IF      WRK-ERRCD           =   SPACE
-               IF      FLG-SYORI           =   1
-                   MOVE    WRK-KEICD           TO  WRK-ERRCD
-               END-IF
-           END-IF
+      ***  エラーメッセージ編集
+      *    IF      WRK-ERRCD           =   SPACE
+      *        IF      FLG-SYORI           =   1
+      *            MOVE    WRK-KEICD           TO  WRK-ERRCD
+      *        END-IF
+      ***  END-IF
            IF      WRK-ERRCD           =   SPACE
       *        正常終了
                EVALUATE    FLG-SYORI
@@ -492,6 +493,16 @@
                MOVE    WRK-ERRCD           TO  APNTRES-API-RESULT
                MOVE    WRK-ERRMSG          TO  APNTRES-API-RESULT-MSG
            END-IF
+      *H26.6
+      *    警告メッセージ
+           IF     (WRK-ERRCD           =   SPACE )  AND
+                  (WRK-KEICD       NOT =   SPACE )
+               MOVE    WRK-KEICD           TO  WRK-ERRCD
+               PERFORM 890-ERRCD-MSG-SEC
+               MOVE    WRK-ERRCD           TO  APNTRES-API-RESULT
+               MOVE    WRK-ERRMSG          TO  APNTRES-API-WARNING-MSG
+           END-IF
+      *
       *
            IF      APIMOD-BODY     NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
@@ -1007,11 +1018,7 @@
            END-IF
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-1028-REC
-               IF      WRK-YYKNAIYO        =   SPACE
-      *            設定がなければ１件目を対象とする
-                   MOVE    "K3"                TO  WRK-KEICD
-               END-IF
-               MOVE    SYS-1028-KBNCD(1:2)     TO  WRK-YYKNAIYO
+               MOVE    SYS-1028-KBNCD(1:2) TO  WRK-YYKNAIYO
            ELSE
                MOVE    "16"                TO  WRK-ERRCD
            END-IF
@@ -2033,25 +2040,28 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "01"
-               MOVE    "患者番号・予約氏名・予約カナ氏名未設定"
-                                               TO  WRK-ERRMSG
+               STRING  "患者番号・予約氏名・予約カナ氏名のいずれかを"
+                       "設定して下さい"
+                                               DELIMITED  BY  SIZE
+                                               INTO  WRK-ERRMSG
+               END-STRING
            WHEN    "02"
-               MOVE    "予約日未設定"
+               MOVE    "予約日が未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "03"
-               MOVE    "予約時間未設定"
+               MOVE    "予約時間が未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "04"
-               MOVE    "診療科未設定"
+               MOVE    "診療科が未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "05"
-               MOVE    "ドクター未設定"
+               MOVE    "ドクターが未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "10"
-               MOVE    "該当患者番号なし"
+               MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "予約日設定誤り"
+               MOVE    "予約日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "12"
                MOVE    "予約時間設定誤り"
@@ -2069,13 +2079,13 @@
                MOVE    "予約内容が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "17"
-               MOVE    "予約メモエラー"
+               MOVE    "予約メモに登録できない文字があります"
                                                TO  WRK-ERRMSG
            WHEN    "18"
-               MOVE    "予約氏名エラー"
+               MOVE    "予約氏名に登録できない文字があります"
                                                TO  WRK-ERRMSG
            WHEN    "19"
-               MOVE    "予約カナ氏名エラー"
+               MOVE    "予約カナ氏名に登録できない文字があります"
                                                TO  WRK-ERRMSG
            WHEN    "20"
                STRING  "診療内容・ドクター・予約時間帯で予約登録済み"
@@ -2084,16 +2094,18 @@
                                                INTO    WRK-ERRMSG
                END-STRING
            WHEN    "25"
-               MOVE    "削除予約レコードが存在しません"
+               MOVE    "削除対象の予約レコードが存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "26"
                MOVE    "予約ＩＤ設定誤り"
                                                TO  WRK-ERRMSG
            WHEN    "27"
-               MOVE    "予約ＩＤと患者番号が不一致"
+      *****    MOVE    "予約ＩＤと患者番号が一致しません"
+               MOVE    "予約ＩＤの予約情報と患者情報が一致しません"
                                                TO  WRK-ERRMSG
            WHEN    "50"
-               STRING  "予約ＩＤが９９です。これ以上予約できません。"
+               STRING  "予約ＩＤが９９まで登録済みです。"
+                       "これ以上予約できません。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
@@ -2111,17 +2123,17 @@
                                                TO  WRK-ERRMSG
       *警告
            WHEN    "K3"
-               MOVE    "警告！診療内容情報を設定しました"
+               MOVE    "診療内容情報を自動設定しました"
                                                TO  WRK-ERRMSG
            WHEN    "K4"
-               STRING  "警告！"
-                       "予約枠の最大件数以上登録。"
+               STRING  "予約枠の最大件数以上の登録です。"
+                       "予約件数がオーバーしています"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
            WHEN    "K5"
-               STRING  "警告！"
-                       "予約日＜システム日付です"
+               STRING  "予約日＜システム日付です。"
+                       "過去日の予約です"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING

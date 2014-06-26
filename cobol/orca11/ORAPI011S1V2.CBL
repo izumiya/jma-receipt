@@ -28,7 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  13/09/26  CLAIM診療区分名称編集
-      *
+      *  04.07.00    NACL-多々納  14/06/XX  ワーニングメッセージ対応他
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -500,11 +500,11 @@
        300-RGTXMLMAKE-SEC   SECTION.
       *
       *    エラーメッセージ編集
-           IF      WRK-ERRCD           =   SPACE
-               IF      FLG-SYORI           =   1
-                   MOVE    WRK-KEICD           TO  WRK-ERRCD
-               END-IF
-           END-IF
+      *    IF      WRK-ERRCD           =   SPACE
+      *        IF      FLG-SYORI           =   1
+      *            MOVE    WRK-KEICD           TO  WRK-ERRCD
+      *        END-IF
+      **** END-IF
            IF      WRK-ERRCD           =   SPACE
       *        正常終了
                EVALUATE    FLG-SYORI
@@ -520,6 +520,15 @@
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD           TO  ACCPTRES-API-RESULT
                MOVE    WRK-ERRMSG          TO  ACCPTRES-API-RESULT-MSG
+           END-IF
+      *    警告メッセージ
+           IF     (WRK-ERRCD           =   SPACE )
+             AND  (WRK-KEICD       NOT =   SPACE )
+               MOVE    WRK-KEICD           TO  WRK-ERRCD
+      *        警告メッセージ
+               PERFORM 890-ERRCD-MSG-SEC
+               MOVE    WRK-ERRCD           TO  ACCPTRES-API-RESULT
+               MOVE    WRK-ERRMSG          TO  ACCPTRES-API-WARNING-MSG
            END-IF
       *
            IF      APIMOD-BODY        NOT =   LOW-VALUE
@@ -943,7 +952,8 @@
            END-IF
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-1012-REC
-               IF      WRK-SRYNAIYO        =   SPACE
+               IF     (WRK-SRYNAIYO        =   SPACE )
+                  AND (WRK-KEICD           =   SPACE )
       *            設定がなければ１件目を対象とする
                    MOVE    "K3"                TO  WRK-KEICD
                END-IF
@@ -1309,6 +1319,18 @@
       *    診療内容
            MOVE    WRK-SRYNAIYO        TO  ACCPTRES-REGIST-DEP-INFO
       *
+      *    受付ＩＤ登録チェック
+           INITIALIZE                      UKETUKE-REC
+           MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+           MOVE    WRK-UKEID           TO  UKE-UKEID
+           PERFORM 900-UKETUKE-READ-SEC
+           IF      FLG-UKETUKE         =   ZERO
+               MOVE    "52"                TO  WRK-ERRCD
+               DISPLAY "UKETUKE INS ERR KEY:"  UKE-KEY
+               GO  TO  20022-UKEADD-SYORI-EXT
+           END-IF
+      *
       *    明細レコード追加
            INITIALIZE                      UKETUKE-REC
            MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
@@ -1334,16 +1356,8 @@
       *
            MOVE    WRK-OPID            TO  UKE-OPID
       *
-           MOVE    UKETUKE-REC         TO  WRK-UKETUKE-REC
-      *    受付ＩＤ登録チェック
-           PERFORM 900-UKETUKE-READ-SEC
-           IF      FLG-UKETUKE         =   ZERO
-               MOVE    "52"                TO  WRK-ERRCD
-               DISPLAY "UKETUKE INS ERR KEY:"  UKE-KEY
-               GO  TO  20022-UKEADD-SYORI-EXT
-           END-IF
       *    受付登録
-           MOVE    WRK-UKETUKE-REC     TO  MCPDATA-REC
+           MOVE    UKETUKE-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -2081,19 +2095,19 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "01"
-               MOVE    "患者番号未設定"
+               MOVE    "患者番号が未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "02"
-               MOVE    "診療科未設定"
+               MOVE    "診療科が未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "03"
-               MOVE    "ドクター未設定"
+               MOVE    "ドクターが未設定です"
                                                TO  WRK-ERRMSG
            WHEN    "10"
-               MOVE    "該当患者番号なし"
+               MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "受付日設定誤り"
+               MOVE    "受付日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "12"
                MOVE    "受付時間設定誤り"
@@ -2114,13 +2128,13 @@
                                                INTO    WRK-ERRMSG
                END-STRING
            WHEN    "17"
-               MOVE    "削除受付レコードが存在しません"
+               MOVE    "削除対象の受付レコードが存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "19"
                MOVE    "受付ＩＤ設定誤り"
                                                TO  WRK-ERRMSG
            WHEN    "20"
-               MOVE    "受付ＩＤと患者番号が不一致"
+               MOVE    "受付ＩＤの受付患者番号と患者番号が一致しません"
                                                TO  WRK-ERRMSG
            WHEN    "21"
                MOVE    "保険の一致する患者保険情報がありません"
@@ -2132,7 +2146,7 @@
                MOVE    "保険情報と一致する保険組合せがありません"
                                                TO  WRK-ERRMSG
            WHEN    "50"
-               STRING  "受付登録件数うが上限以上となります。"
+               STRING  "受付登録件数が上限以上となります。"
                        "登録できません。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
@@ -2151,13 +2165,13 @@
                                                TO  WRK-ERRMSG
       *警告
            WHEN    "K1"
-               MOVE    "受付日を設定しました"
+               MOVE    "受付日を自動設定しました"
                                                TO  WRK-ERRMSG
            WHEN    "K2"
-               MOVE    "受付時間を設定しました"
+               MOVE    "受付時間を自動設定しました"
                                                TO  WRK-ERRMSG
            WHEN    "K3"
-               MOVE    "診療内容情報を設定しました"
+               MOVE    "診療内容情報を自動設定しました"
                                                TO  WRK-ERRMSG
       *共通エラー
            WHEN    "89"

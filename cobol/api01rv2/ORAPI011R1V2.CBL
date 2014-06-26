@@ -1139,7 +1139,7 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "11"
-               MOVE    "受付日設定誤り"
+               MOVE    "受付日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "12"
                MOVE    "診療科が存在しません"

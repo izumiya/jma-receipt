@@ -1176,32 +1176,33 @@
            MOVE    SPACE               TO  WRK-ERRMSG
            EVALUATE    WRK-ERRCD
            WHEN    "10"
-               MOVE    "検索氏名に外字があります。"
+               MOVE    "検索氏名に外字があります"
                                                TO  WRK-ERRMSG
            WHEN    "11"
-               MOVE    "開始生年月日の暦日エラーです。"
+               MOVE    "開始生年月日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "12"
-               MOVE    "終了生年月日の暦日エラーです。"
+               MOVE    "終了生年月日が暦日ではありません"
                                                TO  WRK-ERRMSG
            WHEN    "13"
-               MOVE    "開始生年月日がありません"
+      *******  MOVE    "開始生年月日がありません"
+               MOVE    "開始生年月日の設定がありません"
                                                TO  WRK-ERRMSG
            WHEN    "14"
                MOVE    "開始生年月日＞終了生年月日です。"
                                                TO  WRK-ERRMSG
            WHEN    "15"
-               MOVE    "性別がありません。"
+               MOVE    "性別が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "16"
-               MOVE    "入外区分がありません"
+               MOVE    "入外区分が存在しません"
                                                TO  WRK-ERRMSG
            WHEN    "17"
       ******** MOVE    "検索氏名か開始生年月日を設定して下さい。"
                MOVE    "検索氏名を設定して下さい。"
                                                TO  WRK-ERRMSG
            WHEN    "20"
-               MOVE    "該当患者がありません。"
+               MOVE    "該当患者が存在しません。"
                                                TO  WRK-ERRMSG
            WHEN    "21"
                MOVE    "該当患者が１００件以上となります。"
