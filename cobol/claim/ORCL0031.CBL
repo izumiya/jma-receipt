@@ -1299,6 +1299,7 @@
                                                TO  WRK-HKNCOMBI
                        MOVE    IDH-MAX         TO  IDH
                    ELSE
+                       MOVE    ZERO                TO  WRK-HKNCOMBI
                        PERFORM 200112-KOH-CHK-SEC
                        IF      WRK-HKNCOMBI    NOT =   ZERO
                            MOVE    IDH-MAX         TO  IDH
