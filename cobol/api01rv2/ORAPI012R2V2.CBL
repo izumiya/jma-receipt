@@ -691,6 +691,9 @@
            WHEN    "01"
                MOVE    "開始日付＞終了日付です。"
                                                TO  WRK-ERRMSG
+           WHEN    "02"
+               MOVE    "テスト患者区分がありません。"
+                                               TO  WRK-ERRMSG
            WHEN    "10"
                MOVE    "該当患者が１０００件以上となります。"
                                                TO  WRK-ERRMSG
