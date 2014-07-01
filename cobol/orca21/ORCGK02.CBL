@@ -7895,7 +7895,7 @@
            IF     (SPA-SYONIKA-ARI3    NOT =   ZERO )   AND
                   (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
       *H26.6
-             AND  (SPA-COM-SRYKBN  (SPA-GMN-IDX)       =   "13")
+             AND  (SPA-COM-TNSSRYKBN (SPA-GMN-IDX)     =   "13")
                IF      SPA-ERRCD           =   "0032"
                    MOVE    SPACE               TO  SPA-ERRCD
                END-IF
