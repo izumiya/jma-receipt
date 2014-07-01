@@ -590,6 +590,11 @@
       *    レセプトプレビュー業務区分
            03  WRK-GYOUMUKBN           PIC X(01).
       *
+      *
+           03  WRK-OLD-NYUINYMD        PIC X(08).
+           03  WRK-OLD-TAIINYMD        PIC X(08).
+      *
+      *
        01  TBL-GRP-AREA.
            03  TBL-GRP-OCC             OCCURS   10.
                05  TBL-SRYKA           PIC X(02).
@@ -4416,6 +4421,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "2"             TO  SPA-NYUGAIKBN
            END-IF
            MOVE    ZERO                TO  FLG-OK
+           MOVE    SPACE               TO  WRK-OLD-NYUINYMD
+           MOVE    SPACE               TO  WRK-OLD-TAIINYMD
            PERFORM
                    UNTIL      (FLG-PTNYUINRRK      =   1 )
       ******************* OR  (FLG-OK              =   1 )
@@ -4483,13 +4490,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      (PTNYUINRRK-TAIINYMD    =   SPACE )  OR
                            (PTNYUINRRK-TAIINYMD(1:6)
                                                >=  SPA-NAI-SRYYM )
-      *                入院日＝転入日のデータを対象
-                       IF      PTNYUINRRK-NYUINYMD
-                                               =  PTNYUINRRK-TENNYUYMD
+      *****            入院日＝転入日のデータを対象
+      *****            IF      PTNYUINRRK-NYUINYMD
+      *****                                    =  PTNYUINRRK-TENNYUYMD
+      *                入退院日で１回
+                       IF     (PTNYUINRRK-NYUINYMD
+                                               =  WRK-OLD-NYUINYMD)
+                        AND   (PTNYUINRRK-TAIINYMD
+                                               =  WRK-OLD-TAIINYMD)
+                           CONTINUE
+                       ELSE
       *                    入院期間設定
                            PERFORM 4101012-NYUINKIKAN-SEC
                        END-IF
                    END-IF
+      *
+                   MOVE    PTNYUINRRK-NYUINYMD TO  WRK-OLD-NYUINYMD
+                   MOVE    PTNYUINRRK-TAIINYMD TO  WRK-OLD-TAIINYMD
       *
       *            最終退院日
                    IF     (WRK-TAIINYMD        =   SPACE   )  OR
