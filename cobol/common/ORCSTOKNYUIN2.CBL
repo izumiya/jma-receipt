@@ -2000,6 +2000,13 @@
                                          LNK-TOKNYUIN2-IPN-KAIKEI-YMD
            END-IF
       *
+      *    療養病棟（病床）の入院時は特定入院料算定後の一般入院会計は
+      *    作成しない
+           IF     LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(2)    =    "1"
+               MOVE    SPACE      TO     LNK-TOKNYUIN2-IPN-KAIKEI-FLG
+                                         LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+           END-IF
+      *
            DISPLAY  "====  ORCSTOKNYUIN2 HENKYAKU  ===="
            DISPLAY  "LNK-TOKNYUIN2-SRYCD(1) = " LNK-TOKNYUIN2-SRYCD(1)
                  " " LNK-TOKNYUIN2-STYMD(1) " " LNK-TOKNYUIN2-EDYMD(1)

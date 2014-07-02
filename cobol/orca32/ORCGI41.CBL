@@ -6844,6 +6844,25 @@
            IF    LNK-AKYUSEI-RC          =   1
               MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
            END-IF
+      *    療養病棟（病床）入院のフラグセット
+           INITIALIZE                       SYS-5001-REC
+           MOVE    "5001"               TO  SYS-5001-KANRICD
+           MOVE    PTNYUINRRK-BTUNUM    TO  SYS-5001-KBNCD
+           MOVE    SYOKIKSN-IN-SANTEISTYMD
+                                        TO  SYS-5001-STYUKYMD (1:6)
+           MOVE    "01"                 TO  SYS-5001-STYUKYMD (7:2)
+           MOVE    SYS-5001-STYUKYMD    TO  SYS-5001-EDYUKYMD
+           MOVE    SPA-HOSPNUM          TO  SYS-5001-HOSPNUM
+           MOVE    SYS-5001-REC         TO  MCPDATA-REC
+           PERFORM  900-SYSKANRI-KEY-READ-SEC
+           IF    FLG-SYSKANRI       =   ZERO
+                 MOVE   MCPDATA-REC     TO  SYS-5001-REC
+                 IF    SYS-5001-BTU-SBT    =   "04"  OR  "09"
+                     MOVE    "1"        TO
+                                  LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(2)
+                 END-IF
+           END-IF
+      *
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            IF     LNK-TOKNYUIN2-RC      =   ZERO
