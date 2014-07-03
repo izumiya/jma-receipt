@@ -8,6 +8,9 @@ xml_subjectivesmodv2res {
 		Information_Time		varchar(8);
 		Api_Result			varchar(2);
 		Api_Result_Message		varchar(100);
+		Api_Warning_Message_Information {
+			Api_Warning_Message		varchar(100);
+            	} [5];
 		Reskey				varchar(100);
 		InOut				varchar(1);
 		Patient_Information {

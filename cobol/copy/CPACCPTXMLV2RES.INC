@@ -33,7 +33,9 @@
       *       返却メッセージ
               03  ACCPTRES-API-RESULT-MSG             PIC X(100).
       *       ワーニングメッセージ
-              03  ACCPTRES-API-WARNING-MSG            PIC X(100).
+              03  ACCPTRES-API-WARNING-MSG-G.
+                  05  ACCPTRES-API-WARNING-MSG-TBL    OCCURS  5.
+                      07  ACCPTRES-API-WARNING-MSG    PIC X(100).
       *
               03  ACCPTRES-RESKEY                     PIC X(100).
       *       受付日

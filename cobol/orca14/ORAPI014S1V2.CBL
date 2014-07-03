@@ -57,6 +57,7 @@
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
            03  IDY2                    PIC 9(04).
+           03  IDK                     PIC 9(04).
       *
       *    カウント領域
       *01  CNT-AREA.
@@ -94,7 +95,9 @@
       *    エラーコード
            03  WRK-ERRCD               PIC X(02).
            03  WRK-ERRMSG              PIC X(100).
-           03  WRK-KEICD               PIC X(02).
+           03  WRK-KEICD-G.
+               05  WRK-KEICD               PIC X(02)
+                                           OCCURS   5.
       *
            03  WRK-MCP-PATHNAME        PIC X(62).
            03  WRK-MCP-WINDOW          PIC X(62).
@@ -363,7 +366,8 @@
       *
            MOVE    ZERO                TO  APNTRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
-           MOVE    SPACE               TO  WRK-KEICD
+           MOVE    SPACE               TO  WRK-KEICD-G
+           MOVE    ZERO                TO  IDK
       *
            MOVE    ZERO                TO  FLG-SYORI
            EVALUATE    APIMOD-CLASS
@@ -496,11 +500,18 @@
       *H26.6
       *    警告メッセージ
            IF     (WRK-ERRCD           =   SPACE )  AND
-                  (WRK-KEICD       NOT =   SPACE )
-               MOVE    WRK-KEICD           TO  WRK-ERRCD
-               PERFORM 890-ERRCD-MSG-SEC
-               MOVE    WRK-ERRCD           TO  APNTRES-API-RESULT
-               MOVE    WRK-ERRMSG          TO  APNTRES-API-WARNING-MSG
+                  (WRK-KEICD-G     NOT =   SPACE )
+               PERFORM VARYING     IDK     FROM    1   BY  1
+                       UNTIL      (IDK     >   5   )
+                              OR  (WRK-KEICD (IDK) =   SPACE )
+                   MOVE    WRK-KEICD (IDK)     TO  WRK-ERRCD
+                   PERFORM 890-ERRCD-MSG-SEC
+                   IF      IDK             =   1
+                       MOVE    WRK-ERRCD       TO  APNTRES-API-RESULT
+                   END-IF
+                   MOVE    WRK-ERRMSG      TO  APNTRES-API-WARNING-MSG
+                                                                 (IDK)
+               END-PERFORM
            END-IF
       *
       *
@@ -961,7 +972,8 @@
                MOVE    MCPDATA-REC         TO  SYS-1012-REC
                IF      WRK-SRYNAIYO        =   SPACE
       *            設定がなければ１件目を対象とする
-                   MOVE    "K3"                TO  WRK-KEICD
+                   ADD     1                   TO  IDK
+                   MOVE    "K3"                TO  WRK-KEICD (IDK)
                END-IF
                MOVE    SYS-1012-KBNCD(1:2)     TO  WRK-SRYNAIYO
                MOVE    SYS-1012-SRYNAIYODSP    TO  WRK-SRYNAIYO-NAME
@@ -1507,7 +1519,8 @@
                MOVE    YYK-YYKCNT          TO  WRK-YYKCNT
       *        予約最大件数
                IF      WRK-YYKCNT          >   WRK-YYKMAXCNT
-                   MOVE    "K4"            TO  WRK-KEICD
+                   ADD     1                   TO  IDK
+                   MOVE    "K4"            TO  WRK-KEICD (IDK)
                END-IF
       *
                MOVE    SMCNDATE-YMD        TO  YYK-UPYMD
@@ -1573,7 +1586,8 @@
            MOVE    WRK-YYKNAIYO        TO  APNTRES-APPOINT-INFO
       *    予約日＜システム日付
            IF      WRK-APPOINT-YMD     <   SPA-SYSYMD
-               MOVE    "K5"            TO  WRK-KEICD
+               ADD     1                   TO  IDK
+               MOVE    "K5"                TO  WRK-KEICD (IDK)
            END-IF
       *
       *    明細レコード追加

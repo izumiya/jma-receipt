@@ -75,6 +75,7 @@
            03  IDY1                    PIC 9(04).
            03  IDX1                    PIC 9(04).
            03  TBL-MAX                 PIC 9(04).
+           03  IDK                     PIC 9(04).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -112,7 +113,9 @@
       *    エラーコード
            03  WRK-ERRCD               PIC X(02).
            03  WRK-ERRMSG              PIC X(100).
-           03  WRK-KEICD               PIC X(02).
+           03  WRK-KEICD-G.
+               05  WRK-KEICD               PIC X(02)
+                                           OCCURS   5.
       *    ユーザプログラム
            03  WRK-PTID                PIC X(10).
            03  WRK-RENNUM              PIC 9(02).
@@ -392,7 +395,8 @@
       *
            MOVE    ZERO                TO  ACCPTRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
-           MOVE    SPACE               TO  WRK-KEICD
+           MOVE    SPACE               TO  WRK-KEICD-G
+           MOVE    ZERO                TO  IDK
       *
            MOVE    ZERO                TO  FLG-SYORI
            EVALUATE    APIMOD-CLASS
@@ -523,12 +527,17 @@
            END-IF
       *    警告メッセージ
            IF     (WRK-ERRCD           =   SPACE )
-             AND  (WRK-KEICD       NOT =   SPACE )
-               MOVE    WRK-KEICD           TO  WRK-ERRCD
-      *        警告メッセージ
-               PERFORM 890-ERRCD-MSG-SEC
-               MOVE    WRK-ERRCD           TO  ACCPTRES-API-RESULT
-               MOVE    WRK-ERRMSG          TO  ACCPTRES-API-WARNING-MSG
+               PERFORM VARYING     IDK     FROM    1   BY  1
+                       UNTIL      (IDK     >   5   )
+                              OR  (WRK-KEICD (IDK) =   SPACE )
+                   MOVE    WRK-KEICD (IDK)     TO  WRK-ERRCD
+                   PERFORM 890-ERRCD-MSG-SEC
+                   IF      IDK             =   1
+                       MOVE    WRK-ERRCD       TO  ACCPTRES-API-RESULT
+                   END-IF
+                   MOVE    WRK-ERRMSG      TO  ACCPTRES-API-WARNING-MSG
+                                                                 (IDK)
+               END-PERFORM
            END-IF
       *
            IF      APIMOD-BODY        NOT =   LOW-VALUE
@@ -748,11 +757,13 @@
       *    未設定時はシステム情報設定
            IF      WRK-REGIST-YMD      =   SPACE
                MOVE    SMCNDATE-YMD        TO  WRK-REGIST-YMD
-               MOVE    "K1"                TO  WRK-KEICD
+               ADD     1                   TO  IDK
+               MOVE    "K1"                TO  WRK-KEICD (IDK)
            END-IF
            IF     (WRK-REGIST-TIME     =   SPACE  )
                MOVE    SMCNDATE-HMS        TO  WRK-REGIST-TIME
-               MOVE    "K2"                TO  WRK-KEICD
+               ADD     1                   TO  IDK
+               MOVE    "K2"                TO  WRK-KEICD (IDK)
            END-IF
       *    受付日とシステム日付が違う時、受付日をＳＰＡへ
            IF      SPA-SYSYMD      NOT =   WRK-REGIST-YMD
@@ -953,9 +964,9 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-1012-REC
                IF     (WRK-SRYNAIYO        =   SPACE )
-                  AND (WRK-KEICD           =   SPACE )
       *            設定がなければ１件目を対象とする
-                   MOVE    "K3"                TO  WRK-KEICD
+                   ADD     1                   TO  IDK
+                   MOVE    "K3"                TO  WRK-KEICD (IDK)
                END-IF
                MOVE    SYS-1012-KBNCD(1:2)     TO  WRK-SRYNAIYO
                MOVE    SYS-1012-SRYNAIYODSP    TO  WRK-SRYNAIYO-NAME
@@ -2472,25 +2483,3 @@
        990-DBCLOSE-EXT.
            EXIT.
       *
-      **************************************************************************
-       010-INIT                SECTION.
-           DISPLAY 'init'
-      *    CALL    "coblog"    USING   "*************"
-      *    CALL    "coblog"    USING   "api start"
-      *    CALL    "coblog"    USING   "*************"
-           MOVE   'NEW'        TO  MCP-PUTTYPE.
-           MOVE   'windowtitle'     TO  MCP-WINDOW.
-           PERFORM 900-PUT-WINDOW.
-      **************************************************************************
-       800-CLICKED             SECTION.
-      *    CALL    "coblog"    USING   "api clicked"
-           DISPLAY 'CLICKED'
-           PERFORM 900-PUT-WINDOW.
-      **************************************************************************
-       900-PUT-WINDOW          SECTION.
-           MOVE   'PUTWINDOW'  TO  MCP-FUNC.
-           CALL    "ORCDBMAIN"         USING
-                                           MCPAREA
-                                           MCPDATA-REC
-                                           SPA-AREA
-                MCPAREA.

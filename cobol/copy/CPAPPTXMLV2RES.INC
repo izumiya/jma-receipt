@@ -33,7 +33,9 @@
       *       返却メッセージ
               03  APNTRES-API-RESULT-MSG      PIC X(100).
       *       ワーニングメッセージ
-              03  APNTRES-API-WARNING-MSG     PIC X(100).
+              03  APNTRES-API-WARNING-MSG-G.
+                  05  APNTRES-API-WARNING-MSG-TBL     OCCURS   5.
+                      07  APNTRES-API-WARNING-MSG     PIC X(100).
       *
               03  APNTRES-RESKEY              PIC X(100).
       *       予約日

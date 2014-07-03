@@ -37,6 +37,10 @@
               05  SUBJETRES-API-RESULT          PIC X(2).
       *       返却メッセージ
               05  SUBJETRES-API-RESULT-MSG      PIC X(100).
+      *       返却ワーニングメッセージ
+              05  SUBJETRES-API-WARNING-MSG-G.
+                  07  SUBJETRES-API-WARNING-MSG      PIC X(100)
+                                                OCCURS   5.
       *
               05  SUBJETRES-RESKEY              PIC X(100).
       *       登録情報
