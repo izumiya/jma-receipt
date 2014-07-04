@@ -142,6 +142,8 @@ if $0 == __FILE__
       manager.update
     when "upgrade"
       manager.upgrade
+    when "upgrade2"
+      parse_package_list(ARGV).each{|p| manager.upgrade2(p[0],p[1])}
     when "list"
       yaml = YAML.dump(manager.list(ARGV[0]))
       puts yaml

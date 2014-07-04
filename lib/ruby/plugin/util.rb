@@ -28,10 +28,10 @@ module JMA::Plugin
       return dir
     end
 
-    def exec_script(path,name,version)
+    def exec_script(path,name,version,action)
       FileUtils.cd(File.dirname(path)) {
         FileUtils.chmod(0755,path)
-        out = `#{path} #{name} #{version}`
+        out = `#{path} #{name} #{version} #{action}`
         unless $?.exitstatus == 0
           raise "exec_script failure : #{path} #{$?.exitstatus} #{out}"
         end
@@ -54,7 +54,7 @@ module JMA::Plugin
         FileUtils.chmod(0700,dir)
         return dir
       rescue Errno::EEXIST
-        redo
+        retry
       end
     end
 

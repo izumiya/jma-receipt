@@ -385,7 +385,7 @@
                WHEN    "0105"
                    IF      SPA-M80ID1-FLG      =   "OK"
                        IF      SPA-NAI-LINK        =   2
-                           MOVE    "install"       TO  WRK-COMMAND
+                           MOVE    "upgrade2"      TO  WRK-COMMAND
                        ELSE
                            MOVE    "upgrade"       TO  WRK-COMMAND
                        END-IF
@@ -1244,6 +1244,7 @@
                WHEN    "install"
                WHEN    "install+enable"
                WHEN    "upgrade"
+               WHEN    "upgrade2"
                    MOVE    SPA-NAI-VERSION2    TO  WRK-VERSION
                WHEN    "uninstall"
                    MOVE    SPA-NAI-VERSION     TO  WRK-VERSION

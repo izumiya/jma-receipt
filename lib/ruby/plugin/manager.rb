@@ -61,28 +61,35 @@ module JMA::Plugin
     def install(name,version)
       lock {
         @log.info("install #{name}-#{version}")
-        _install(name,version)
+        _install(name,version,"install")
       }
     end
 
     def uninstall(name,version)
       lock {
         @log.info("uninstall #{name}-#{version}")
-        _uninstall(name,version)
+        _uninstall(name,version,"uninstall")
       }
     end
 
     def link(name,version)
       lock {
         @log.info("link #{name}-#{version}")
-        _link(name,version)
+        _link(name,version,"link")
       }
     end
 
     def unlink(name,version)
       lock {
         @log.info("unlink #{name}-#{version}")
-        _unlink(name,version)
+        _unlink(name,version,"unlink")
+      }
+    end
+
+    def upgrade2(name,version)
+      lock {
+        @log.info("upgrade2 #{name}-#{version}")
+        _install(name,version,"upgrade")
       }
     end
 
@@ -94,7 +101,7 @@ module JMA::Plugin
             new = c[:new]
             old = c[:old]
             @log.info("upgrade #{old[:name]}-#{old[:version]} to #{new[:name]}-#{new[:version]} ...")
-            _install(new[:name],new[:version])
+            _install(new[:name],new[:version],"upgrade")
           rescue Exception => ex
             raise ex
           end
@@ -153,7 +160,7 @@ module JMA::Plugin
 
     private
 
-    def _install(name,version)
+    def _install(name,version,action)
       control = @db.get_control(name,version)
       unless control
         raise "#{name}-#{version} is not in the list"
@@ -170,16 +177,16 @@ module JMA::Plugin
       unless old.empty?
         old.each {|o|
           @log.info("uninstall old version ... #{o[:name]}-#{o[:version]}")
-          _uninstall(o[:name],o[:version]) #rescue nil
+          _uninstall(o[:name],o[:version],action) #rescue nil
           do_link = o[:link] == "TRUE"
         }
       end
-      @store.install(name,version,package_path)
+      @store.install(name,version,package_path,action)
       @db.install(name,version)
-      _link(name,version) if do_link
+      _link(name,version,action) if do_link
     end
 
-    def _uninstall(name,version)
+    def _uninstall(name,version,action)
       control = @db.get_control(name,version)
       unless control
         raise "#{name}-#{version} is not in the list"
@@ -187,13 +194,13 @@ module JMA::Plugin
       unless @db.install?(name,version)
         raise "#{name}-#{version} does not installed"
       end
-      @store.unlink(name,version) rescue nil
-      @store.uninstall(name,version)
+      @store.unlink(name,version,action) rescue nil
+      @store.uninstall(name,version,action)
       @db.unlink(name,version) if @db.link?(name,version)
       @db.uninstall(name,version)
     end
 
-    def _link(name,version)
+    def _link(name,version,action)
       control = @db.get_control(name,version)
       unless control
         raise "#{name}-#{version} is not in the list"
@@ -204,11 +211,11 @@ module JMA::Plugin
       if @db.link?(name,version)
         raise "#{name}-#{version} already linked"
       end
-      @store.link(name,version)
+      @store.link(name,version,action)
       @db.link(name,version)
     end
 
-    def _unlink(name, version)
+    def _unlink(name,version,action)
       control = @db.get_control(name,version)
       unless control
         raise "#{name}-#{version} is not in the list"
@@ -219,7 +226,7 @@ module JMA::Plugin
       unless @db.link?(name,version)
         raise "#{name}-#{version} does not linked"
       end
-      @store.unlink(name,version)
+      @store.unlink(name,version,action)
       @db.unlink(name,version)
     end
 

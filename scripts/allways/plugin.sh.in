@@ -41,7 +41,7 @@ case "${COMMAND}" in
     ${PLUGIN_SHELL} -c ${JPPINFO} list
     list4cobol
     ;;
-  install|uninstall|enable|disable)
+  install|uninstall|enable|disable|upgrade2)
     ${PLUGIN_SHELL} -c ${JPPINFO} ${COMMAND} ${PACKAGE}-${VERSION}
     list4cobol
     ;;

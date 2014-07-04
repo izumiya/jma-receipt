@@ -37,7 +37,7 @@ module JMA::Plugin
       @cachedir = FileUtils.mkdir_p(File.join(@root,"cache"))
     end
 
-    def install(name,version,path)
+    def install(name,version,path,action)
       @log.debug("install #{name}-#{version}")
       begin
         tmpdir = JMA::Plugin::Util::extract_tar(path)
@@ -45,9 +45,8 @@ module JMA::Plugin
         raise "can not find contents" unless File.exist?(tmpstoredir)
         preinst = File.join(tmpstoredir,"meta","preinst")
         if File.exist?(preinst)
-          @log.debug("exec #{preinst}")
-          JMA::Plugin::Util::exec_script(preinst,name,version) 
-          @log.debug("exec #{preinst} end")
+          @log.debug("exec #{preinst} #{action}")
+          JMA::Plugin::Util::exec_script(preinst,name,version,action)
         end
 
         storedir = File.join(@root,"#{name}-#{version}") 
@@ -57,12 +56,11 @@ module JMA::Plugin
 
         postinst = File.join(storedir,"meta","postinst")
         if File.exist?(postinst)
-          @log.debug("exec #{postinst}")
-          JMA::Plugin::Util::exec_script(postinst,name,version)
-          @log.debug("exec #{postinst} end")
+          @log.debug("exec #{postinst} #{action}")
+          JMA::Plugin::Util::exec_script(postinst,name,version,action)
         end
       rescue Exception => ex
-        @log.debug("install failed:" + ex)
+        @log.debug("install failed:#{ex}")
         FileUtils.rm_rf(storedir) if storedir
         raise ex
       ensure
@@ -71,7 +69,7 @@ module JMA::Plugin
       @log.debug("install #{name}-#{version} end")
     end
 
-    def uninstall(name, version)
+    def uninstall(name, version,action)
       @log.debug("uninstall #{name}-#{version}")
       begin
         storedir = File.join(@root,"#{name}-#{version}") 
@@ -87,20 +85,18 @@ module JMA::Plugin
         end
 
         if File.exist?(prerm)
-          @log.debug("exec #{prerm}")
-          JMA::Plugin::Util::exec_script(prerm,name,version) 
-          @log.debug("exec #{prerm} end")
+          @log.debug("exec #{prerm} #{action}")
+          JMA::Plugin::Util::exec_script(prerm,name,version,action)
         end
 
         FileUtils.rm_rf(storedir)
  
         if postrm
-          @log.debug("exec #{postrm.path}")
-          JMA::Plugin::Util::exec_script(postrm.path,name,version)
-          @log.debug("exec #{postrm.path} end")
+          @log.debug("exec #{postrm.path} #{action}")
+          JMA::Plugin::Util::exec_script(postrm.path,name,version,action)
         end
       rescue Exception => ex
-        @log.debug("uninstall failed:" + ex)
+        @log.debug("uninstall failed:#{ex}")
         raise ex
       ensure
         postrm.close(true) if postrm
@@ -108,7 +104,7 @@ module JMA::Plugin
       @log.debug("uninstall #{name}-#{version} end")
     end
  
-    def link(name,version)
+    def link(name,version,action)
       @log.debug("link #{name}-#{version}")
       begin
         storedir = File.join(@root,"#{name}-#{version}") 
@@ -120,9 +116,8 @@ module JMA::Plugin
         list = YAML.load(File.read(link))
         prelink = File.join(storedir,"meta","prelink")
         if File.exist?(prelink)
-          @log.debug("exec #{prelink}")
-          JMA::Plugin::Util::exec_script(prelink,name,version) 
-          @log.debug("exec #{prelink} end")
+          @log.debug("exec #{prelink} #{action}")
+          JMA::Plugin::Util::exec_script(prelink,name,version,action)
         end
         linked = []
         begin
@@ -135,9 +130,8 @@ module JMA::Plugin
           }
           postlink = File.join(storedir,"meta","postlink")
           if File.exist?(postlink)
-            @log.debug("exec #{postlink}")
-            JMA::Plugin::Util::exec_script(postlink,name,version) 
-            @log.debug("exec #{postlink} end")
+            @log.debug("exec #{postlink} #{action}")
+            JMA::Plugin::Util::exec_script(postlink,name,version,action) 
           end
         rescue Exception => ex
           linked.each{|f| FileUtils.rm_f(f) }
@@ -145,13 +139,13 @@ module JMA::Plugin
         end
         FileUtils.touch(dotlinked)
       rescue Exception => ex
-        @log.debug("link failed:" + ex)
+        @log.debug("link failed:#{ex}")
         raise ex
       end
       @log.debug("link #{name}-#{version} end")
     end
 
-    def unlink(name,version)
+    def unlink(name,version,action)
       @log.debug("unlink #{name}-#{version}")
       begin
         storedir = File.join(@root,"#{name}-#{version}") 
@@ -163,9 +157,8 @@ module JMA::Plugin
         list = YAML.load(File.read(link))
         preunlink = File.join(storedir,"meta","preunlink")
         if File.exist?(preunlink)
-          @log.debug("exec #{preunlink}")
-          JMA::Plugin::Util::exec_script(preunlink,name,version) 
-          @log.debug("exec #{preunlink} end")
+          @log.debug("exec #{preunlink} #{action}")
+          JMA::Plugin::Util::exec_script(preunlink,name,version,action)
         end
         list.each{|l|
           begin
@@ -182,15 +175,14 @@ module JMA::Plugin
         FileUtils.rm_f(dotlinked)
         postunlink = File.join(storedir,"meta","postunlink")
         if File.exist?(postunlink)
-          @log.debug("exec #{postunlink}")
-          JMA::Plugin::Util::exec_script(postunlink,name,version) 
-          @log.debug("exec #{postunlink} end")
+          @log.debug("exec #{postunlink} #{action}")
+          JMA::Plugin::Util::exec_script(postunlink,name,version,action)
         end
       rescue Errno::ENOENT => ex
-        @log.debug("unlink failed:" + ex)
+        @log.debug("unlink failed:${ex}")
         raise "#{name}-#{version} not linked"
       rescue Exception => ex
-        @log.debug("unlink failed:" + ex)
+        @log.debug("unlink failed:#{ex}")
         raise ex
       end
       @log.debug("unlink #{name}-#{version} end")
@@ -231,7 +223,7 @@ module JMA::Plugin
         }
         link_list.sort!
       rescue Exception => ex
-        @log.debug("list_link failed:" + ex)
+        @log.debug("list_link failed:#{ex}")
         raise ex
       end
       @log.debug("list_link #{name}-#{version} end")
