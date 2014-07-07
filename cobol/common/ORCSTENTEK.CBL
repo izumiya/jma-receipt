@@ -156,7 +156,7 @@
       *
       *    液量集計用
        01  TBL-AREA.
-           03  TBL-AREA-OCC            OCCURS   50.
+           03  TBL-AREA-OCC            OCCURS   100.
                05  TBL-SRYCD           PIC X(09).
                05  TBL-TEN             PIC 9(07)V9(5).
                05  TBL-CSYYOURYO       PIC 9(07)V9(5).
@@ -687,7 +687,7 @@
       *
       *    同一コードチェック
            PERFORM VARYING IDX-T       FROM    1   BY  1
-                   UNTIL   IDX-T       >   50
+                   UNTIL   IDX-T       >   100
                IF      SRY-SRYCD (IDX2)    =   TBL-SRYCD (IDX-T)
                    IF      SRY-SRYSYUKBN       =   "330"
                        PERFORM 100121-DAY-HEN-SEC
@@ -707,7 +707,7 @@
       *
                    MOVE    IDX-T           TO  IDX-YAK
       *
-                   MOVE    50              TO  IDX-T
+                   MOVE    100              TO  IDX-T
                ELSE
                    IF      TBL-SRYCD (IDX-T)   =   SPACE
                        MOVE    SRY-SRYCD (IDX2)    TO  TBL-SRYCD (IDX-T)
@@ -751,7 +751,7 @@
       *
                        MOVE    IDX-T           TO  IDX-YAK
       *
-                       MOVE    50              TO  IDX-T
+                       MOVE    100              TO  IDX-T
                    END-IF
                END-IF
            END-PERFORM
@@ -1605,7 +1605,7 @@
        2001-TBL-CHEK-SEC            SECTION.
       *
            PERFORM VARYING     IDX-T   FROM    1   BY  1
-                   UNTIL      (IDX-T   >   50  )  OR
+                   UNTIL      (IDX-T   >   100  )  OR
                               (TBL-SRYCD (IDX-T)   =   SPACE)
                IF     (TBL-D-SRYCD (IDX-D IDX3)
                                            =   TBL-SRYCD (IDX-T))
@@ -1620,7 +1620,7 @@
                            PERFORM 2001-TBL-HENSYU-SEC
                        END-IF
                    END-IF
-                   MOVE    50                 TO  IDX-T
+                   MOVE    100                 TO  IDX-T
                END-IF
            END-PERFORM
       *
