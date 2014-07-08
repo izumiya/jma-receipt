@@ -67,6 +67,7 @@
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    14/04/07  平成２６年４月改正対応
+      *  04.07.04    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -435,7 +436,7 @@
                                    BY          //WRK-RECE130//.
       *
        01  WRK-RECE130XX-REC.
-         02 WRK-RECE130XX-TBL      OCCURS 50.
+         02 WRK-RECE130XX-TBL      OCCURS 100.
            COPY    "CPRCF130.INC"  REPLACING   //RECE130//
                                    BY          //WRK-RECE130XX//.
       *
@@ -1694,7 +1695,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          UNTIL   (IDX       >    5)   OR
                                  (FLG-WRKRECE130   =   1)
                    ADD         1             TO    IDX-RECE130
-                   IF  WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE
+                   IF (WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE)
+                   OR (IDX-RECE130                        >  100 )
                        MOVE    1             TO    FLG-WRKRECE130
                    ELSE
                        MOVE  WRK-RECE130XX-SRYACT-TBL (IDX-RECE130 1)
@@ -2641,7 +2643,8 @@ grpsys                   MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
                           UNTIL   (IDX             >    5)   OR
                                   (FLG-WRKRECE130   =    1)
                    ADD         1             TO    IDX-RECE130
-                   IF  WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE
+                   IF (WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE)
+                   OR (IDX-RECE130                        >  100 )
                        MOVE    1             TO    FLG-WRKRECE130
                    ELSE
                        MOVE  WRK-RECE130XX-SRYACT-TBL (IDX-RECE130 1)
@@ -5374,7 +5377,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                              UNTIL   (IDX       >    5)   OR
                                      (FLG-WRKRECE130   =   1)
                        ADD       1    TO   IDX-RECE130
-                       IF  WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE
+                       IF (WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE)
+                       OR (IDX-RECE130                        >  100 )
                            MOVE  1    TO   FLG-WRKRECE130
                        ELSE
                            MOVE WRK-RECE130XX-SRYACT-TBL(IDX-RECE130 1)
@@ -6346,7 +6350,8 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
                          UNTIL   (IDX       >    5)   OR
                                  (FLG-WRKRECE130   =   1)
                    ADD         1             TO    IDX-RECE130
-                   IF  WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE
+                   IF (WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE)
+                   OR (IDX-RECE130                        >  100 )
                        MOVE    1             TO    FLG-WRKRECE130
                    ELSE
                        MOVE  WRK-RECE130XX-SRYACT-TBL(IDX-RECE130 1)
@@ -7211,7 +7216,8 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
                          UNTIL   (IDX       >    5)   OR
                                  (FLG-WRKRECE130   =   1)
                    ADD         1              TO   IDX-RECE130
-                   IF  WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE
+                   IF (WRK-RECE130XX-SRYCD(IDX-RECE130 1) = SPACE)
+                   OR (IDX-RECE130                        >  100 )
                        MOVE    1              TO   FLG-WRKRECE130
                    ELSE
                        MOVE  WRK-RECE130XX-SRYACT-TBL(IDX-RECE130 1)

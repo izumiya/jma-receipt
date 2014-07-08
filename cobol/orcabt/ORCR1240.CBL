@@ -76,6 +76,7 @@
       *                                     コメント自動記載修正
       *  04.07.05    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     コメント自動記載修正
+      *  04.07.06    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -484,7 +485,7 @@
                                    BY          //WRK-RECE230//.
       *
        01  WRK-RECE230XX-REC.
-         02 WRK-RECE230XX-TBL       OCCURS 50.
+         02 WRK-RECE230XX-TBL       OCCURS 100.
            COPY    "CPRCF230.INC"  REPLACING   //RECE230//
                                    BY          //WRK-RECE230XX//.
       *
@@ -2229,7 +2230,8 @@
                           UNTIL   (IDX             >    5)   OR
                                   (FLG-WRKRECE230  =    1)
                    ADD         1             TO    IDX-RECE230
-                   IF  WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE
+                   IF (WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE)
+                   OR (IDX-RECE230                        >  100 )
                        MOVE    1             TO    FLG-WRKRECE230
                    ELSE
                        MOVE  WRK-RECE230XX-SRYACT-TBL (IDX-RECE230 1)
@@ -4518,7 +4520,8 @@
                              UNTIL   (IDX       >    5)   OR
                                      (FLG-WRKRECE230   =   1)
                        ADD         1             TO    IDX-RECE230
-                       IF  WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE
+                       IF (WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE)
+                       OR (IDX-RECE230                        >  100 )
                            MOVE    1             TO    FLG-WRKRECE230
                        ELSE
                            MOVE  WRK-RECE230XX-SRYACT-TBL(IDX-RECE230 1)
@@ -6201,7 +6204,8 @@
                              UNTIL   (IDX       >    5)   OR
                                      (FLG-WRKRECE230   =   1)
                        ADD         1             TO    IDX-RECE230
-                       IF  WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE
+                       IF (WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE)
+                       OR (IDX-RECE230                        >  100 )
                            MOVE    1             TO    FLG-WRKRECE230
                        ELSE
                            MOVE  WRK-RECE230XX-SRYACT-TBL(IDX-RECE230 1)
@@ -6708,7 +6712,8 @@
                              UNTIL   (IDX       >    5)   OR
                                      (FLG-WRKRECE230   =   1)
                        ADD         1             TO    IDX-RECE230
-                       IF  WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE
+                       IF (WRK-RECE230XX-SRYCD(IDX-RECE230 1) = SPACE)
+                       OR (IDX-RECE230                        >  100 )
                            MOVE    1             TO    FLG-WRKRECE230
                        ELSE
                            MOVE  WRK-RECE230XX-SRYACT-TBL(IDX-RECE230 1)
@@ -7134,7 +7139,8 @@
                          UNTIL   (IDX             >   5)
                           OR     (FLG-WRKRECE230   =   1)
                    ADD        1             TO   IDX-RECE230
-                   IF  WRK-RECE230XX2-SRYCD(IDX-RECE230 1) = SPACE
+                   IF (WRK-RECE230XX2-SRYCD(IDX-RECE230 1) = SPACE)
+                   OR (IDX-RECE230                         >  300 )
                       MOVE    1             TO    FLG-WRKRECE230
                    ELSE
                       MOVE  WRK-RECE230XX2-SRYACT-TBL(IDX-RECE230 1)

@@ -38,6 +38,7 @@
       *                                     やめる
       *  04.07.07    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     コメント自動記載修正
+      *  04.07.08    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -502,7 +503,7 @@
                                    BY          //WRK-RECE85//.
       *
        01  WRK-RECE85XX-REC.
-         02 WRK-RECE85XX-TBL       OCCURS 50.
+         02 WRK-RECE85XX-TBL       OCCURS 100.
            COPY    "CPRCF085.INC"  REPLACING   //RECE85//
                                    BY          //WRK-RECE85XX//.
       *
@@ -2344,7 +2345,8 @@
                           UNTIL   (IDX             >    5)   OR
                                   (FLG-WRKRECE85   =    1)
                    ADD         1            TO  IDX-RECE85
-                   IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                   IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                   OR (IDX-RECE85                       >  100 )
                        MOVE    1            TO  FLG-WRKRECE85
                    ELSE
                        MOVE  WRK-RECE85XX-SRYACT-TBL (IDX-RECE85 1)
@@ -2666,7 +2668,8 @@
                           UNTIL   (IDX             >    5)   OR
                                   (FLG-WRKRECE85   =    1)
                    ADD         1            TO  IDX-RECE85
-                   IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                   IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                   OR (IDX-RECE85                       >  100 )
                        MOVE    1            TO  FLG-WRKRECE85
                    ELSE
                        MOVE  WRK-RECE85XX-SRYACT-TBL (IDX-RECE85 1)
@@ -5285,7 +5288,8 @@
                            UNTIL   (IDX       >    5)   OR
                                    (FLG-WRKRECE85   =   1)
                      ADD         1             TO    IDX-RECE85
-                     IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                     IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                     OR (IDX-RECE85                       >  100 )
                          MOVE    1             TO    FLG-WRKRECE85
                      ELSE
                          MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
@@ -6974,7 +6978,8 @@
                          UNTIL   (IDX       >    5)   OR
                                  (FLG-WRKRECE85   =   1)
                    ADD        1             TO    IDX-RECE85
-                   IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                   IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                   OR (IDX-RECE85                       >  100 )
                        MOVE   1             TO    FLG-WRKRECE85
                    ELSE
                        MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
@@ -7302,7 +7307,8 @@
                          UNTIL   (IDX       >    5)   OR
                                  (FLG-WRKRECE85   =   1)
                    ADD        1             TO    IDX-RECE85
-                   IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                   IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                   OR (IDX-RECE85                       >  100 )
                        MOVE   1             TO    FLG-WRKRECE85
                    ELSE
                        MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
@@ -7642,7 +7648,8 @@
                            UNTIL   (IDX       >    5)   OR
                                    (FLG-WRKRECE85   =   1)
                      ADD         1             TO    IDX-RECE85
-                     IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                     IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                     OR (IDX-RECE85                       >  100 )
                          MOVE    1             TO    FLG-WRKRECE85
                      ELSE
                          MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
@@ -8178,7 +8185,8 @@
                            UNTIL   (IDX       >    5)   OR
                                    (FLG-WRKRECE85   =   1)
                      ADD         1             TO    IDX-RECE85
-                     IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                     IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                     OR (IDX-RECE85                       >  100 )
                          MOVE    1             TO    FLG-WRKRECE85
                      ELSE
                          MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
@@ -8630,7 +8638,8 @@
                             UNTIL   (IDX             >   5)
                              OR     (FLG-WRKRECE85   =   1)
                      ADD         1             TO    IDX-RECE85
-                     IF  WRK-RECE85XX2-SRYCD(IDX-RECE85 1) = SPACE
+                     IF (WRK-RECE85XX2-SRYCD(IDX-RECE85 1) = SPACE)
+                     OR (IDX-RECE85                        >  300 )
                          MOVE    1             TO    FLG-WRKRECE85
                      ELSE
                          MOVE  WRK-RECE85XX2-SRYACT-TBL(IDX-RECE85 1)
@@ -8978,7 +8987,8 @@
                              UNTIL   (IDX       >    5)   OR
                                      (FLG-WRKRECE85   =   1)
                        ADD         1             TO    IDX-RECE85
-                       IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
+                       IF (WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE)
+                       OR (IDX-RECE85                       >  100 )
                            MOVE    1             TO    FLG-WRKRECE85
                        ELSE
                            MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)

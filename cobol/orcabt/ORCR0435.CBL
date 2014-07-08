@@ -52,6 +52,7 @@
       *  04.07.02    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    14/05/08  µßµÞ°åÎÅ´ÉÍý²Ã»»¤Î»»ÄêÆüµ­ºÜ
       *                                     ¤ä¤á¤ë
+      *  04.07.04    NACL-ÌçÏÆ    14/07/08  ÌÀºÙ¤¬£µ£°¤òÄ¶¤¨¤ë¾ì¹ç¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -209,7 +210,7 @@
                                    BY          //WRK-RECE45//.
       *
        01  WRK-RECE45XX-REC.
-         02 WRK-RECE45XX-TBL       OCCURS 50.
+         02 WRK-RECE45XX-TBL       OCCURS 100.
            COPY    "CPRCF045.INC"  REPLACING   //RECE45//
                                    BY          //WRK-RECE45XX//.
       *
@@ -788,7 +789,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                            UNTIL   (IDX       >    5)   OR
                                    (FLG-WRKRECE45   =   1)
                      ADD         1             TO    IDX-RECE45
-                     IF  WRK-RECE45XX-SRYCD(IDX-RECE45 1) = SPACE
+                     IF (WRK-RECE45XX-SRYCD(IDX-RECE45 1) = SPACE)
+                     OR (IDX-RECE45                       >  100 )
                          MOVE    1             TO    FLG-WRKRECE45
                      ELSE
                          MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
@@ -965,7 +967,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                            UNTIL   (IDX       >    5)   OR
                                    (FLG-WRKRECE45   =   1)
                      ADD         1             TO    IDX-RECE45
-                     IF  WRK-RECE45XX-SRYCD(IDX-RECE45 1) = SPACE
+                     IF (WRK-RECE45XX-SRYCD(IDX-RECE45 1) = SPACE)
+                     OR (IDX-RECE45                       >  100 )
                          MOVE    1             TO    FLG-WRKRECE45
                      ELSE
                          MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
