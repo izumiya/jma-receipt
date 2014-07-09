@@ -120,6 +120,14 @@
                                    RECORD  KEY     IS  DTCHK013-KEY
                                    FILE    STATUS  IS  STS-DTCHK013.
       *
+      *    データチェック中間ファイル（チェックマスタ）
+           SELECT  DTCHK018-FILE
+                                   ASSIGN  DTCHK018PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  DTCHK018-KEY
+                                   FILE    STATUS  IS  STS-DTCHK018.
+      *
       *    エラーファイル
            SELECT  DTCHKERR-FILE   ASSIGN  DTCHKERRPARA
                                    FILE    STATUS  IS  STS-DTCHKERR.
@@ -189,6 +197,12 @@
        FD  DTCHK013-FILE.
            COPY    "CPDTCHK013.INC".
       *
+      *    データチェック中間ファイル（チェックマスタ）
+       FD  DTCHK018-FILE.
+       01  DTCHK018-REC.
+           COPY    "CPCHK.INC"      REPLACING  //CHK-//
+                                    BY         //DTCHK018-//.
+      *
       *    エラーファイル
        FD  DTCHKERR-FILE.
        01  DTCHKERR-REC                PIC X(200). 
@@ -235,6 +249,9 @@
                                    BY         //DTCHK013PARA//.
            COPY    "CPCOMMONDAT3.INC"
                                    REPLACING  //TMPFLPARA//
+                                   BY         //DTCHK018PARA//.
+           COPY    "CPCOMMONDAT3.INC"
+                                   REPLACING  //TMPFLPARA//
                                    BY         //DTCHKSRYPARA//.
            COPY    "CPCOMMONDAT3.INC"
                                    REPLACING  //TMPFLPARA//
@@ -253,6 +270,7 @@
            03  STS-DTCHK011                            PIC X(02).
            03  STS-DTCHK012                            PIC X(02).
            03  STS-DTCHK013                            PIC X(02).
+           03  STS-DTCHK018                            PIC X(02).
            03  STS-DTCHKERR                            PIC X(02).
            03  STS-DCACCT                              PIC X(02).
            03  STS-DCSRY                               PIC X(02).
@@ -287,6 +305,7 @@
            03  FLG-DTCHK011                            PIC 9(01).
            03  FLG-DTCHK012                            PIC 9(01).
            03  FLG-DTCHK013                            PIC 9(01).
+           03  FLG-DTCHK018                            PIC 9(01).
            03  FLG-YKZBYO                              PIC 9(01).
            03  FLG-SRYBYO                              PIC 9(01).
            03  FLG-YKZHEI                              PIC 9(01).
@@ -296,6 +315,7 @@
            03  FLG-YKZKNKBYO                           PIC 9(01).
            03  FLG-SRYSNT                              PIC 9(01).
            03  FLG-SRYHEIA                             PIC 9(01).
+           03  FLG-SRYHEIB                             PIC 9(01).
            03  FLG-CHKEND-G.
                05  FLG-CHKEND                          PIC 9(01)
                                                        OCCURS  50.
@@ -482,7 +502,9 @@
            03  IDXE                                    PIC 9(05).
            03  IDXH                                    PIC 9(05).
            03  IDXI                                    PIC 9(05).
+           03  IDXJ                                    PIC 9(05).
            03  IDXK                                    PIC 9(05).
+           03  IDXN                                    PIC 9(05).
            03  IDXP                                    PIC 9(05).
            03  IDXR                                    PIC 9(05).
            03  IDX-TSRYKA                              PIC 9(05).
@@ -759,6 +781,10 @@
            03  PTZAI-KOHNUM                    PIC X(03).
            03  PTZAI-DAY                       PIC 9(05)
                                                OCCURS  31.
+           03  PTZAI-DENPNUM-OCC               OCCURS  100.
+               05  PTZAI-DENPNUM               PIC 9(07).
+               05  PTZAI-DENPNUM-KAISU         PIC 9(09).
+               05  PTZAI-DENPNUM-DAY           PIC 9(02).
       *
       *    データチェック診療会計（患者別）
        01  PTACCT-AREA.
@@ -799,6 +825,8 @@
                                                    VALUE   1000.
            03  CONST-TSRYCD-MAX                    PIC 9(05)
                                                    VALUE   2000.
+           03  CONST-DENPNUM-MAX                   PIC 9(05)
+                                                   VALUE   100.
            03  CONST-TJNISSU-MAX                   PIC 9(05)
                                                    VALUE   20.
            03  CONST-TKAISU-MAX                    PIC 9(05)
@@ -1385,6 +1413,10 @@
            MOVE    "DTCHK013"          TO  DTCHK013PARA-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID TO  DTCHK013PARA-TERMID
       *
+           MOVE    WRK-PARA-HOSPNUM    TO  DTCHK018PARA-HOSPNUM
+           MOVE    "DTCHK018"          TO  DTCHK018PARA-FILE-ID
+           MOVE    LNK-PRTKANRI-TERMID TO  DTCHK018PARA-TERMID
+      *
            OPEN    INPUT               DCACCT-FILE
                                        DCSRY-FILE
                                        DTCHK003-FILE
@@ -1405,11 +1437,9 @@
            CLOSE   DTCHK012-FILE
            OPEN    I-O                 DTCHK012-FILE
       *
-           IF    ( ORCBSD01-CHKKBN (20)    =   ZERO )
-               OPEN    OUTPUT          DTCHK013-FILE
-               CLOSE   DTCHK013-FILE
-           END-IF
            OPEN    INPUT               DTCHK013-FILE
+      *
+           OPEN    INPUT               DTCHK018-FILE
       *
       *    初期値設定処理
            PERFORM 1001-INIT-VAL-SET-SEC
@@ -1546,6 +1576,7 @@
                                            FLG-BYOYKZ
                                            FLG-BYOSRY
                                            FLG-SRYHEIA
+                                           FLG-SRYHEIB
       *
       *    薬剤と病名
       *    MOVE    "1"                 TO  WRK-CHK-CHKKBN
@@ -1568,20 +1599,24 @@
            MOVE    1                   TO  FLG-SRYBYO
       *
       *    併用禁忌の薬剤
-           MOVE    "4"                 TO  WRK-CHK-CHKKBN
-           MOVE    "2"                 TO  WRK-CHK-CDKBN
-           PERFORM 900-CHK-KEY5-SEL-SEC
-           IF    ( FLG-CHKMST          =   ZERO )
-               MOVE    1               TO  FLG-YKZHEI
-           END-IF
+      *    MOVE    "4"                 TO  WRK-CHK-CHKKBN
+      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
+      *    PERFORM 900-CHK-KEY5-SEL-SEC
+      *    IF    ( FLG-CHKMST          =   ZERO )
+      *        MOVE    1               TO  FLG-YKZHEI
+      *    END-IF
+      *
+           MOVE    1                   TO  FLG-YKZHEI
       *
       *    併用算定の診療行為
-           MOVE    "5"                 TO  WRK-CHK-CHKKBN
-           MOVE    "2"                 TO  WRK-CHK-CDKBN
-           PERFORM 900-CHK-KEY5-SEL-SEC
-           IF    ( FLG-CHKMST          =   ZERO )
-               MOVE    1               TO  FLG-SRYHEI
-           END-IF
+      *    MOVE    "5"                 TO  WRK-CHK-CHKKBN
+      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
+      *    PERFORM 900-CHK-KEY5-SEL-SEC
+      *    IF    ( FLG-CHKMST          =   ZERO )
+      *        MOVE    1               TO  FLG-SRYHEI
+      *    END-IF
+      *
+           MOVE    1                   TO  FLG-SRYHEI
       *
       *    薬剤と投与禁忌病名
            MOVE    "6"                 TO  WRK-CHK-CHKKBN
@@ -1616,12 +1651,24 @@
            END-IF
       *
       *    併用算定の診療行為（同一日）
-           MOVE    "A"                 TO  WRK-CHK-CHKKBN
-           MOVE    "2"                 TO  WRK-CHK-CDKBN
-           PERFORM 900-CHK-KEY5-SEL-SEC
-           IF    ( FLG-CHKMST          =   ZERO )
-               MOVE    1               TO  FLG-SRYHEIA
-           END-IF
+      *    MOVE    "A"                 TO  WRK-CHK-CHKKBN
+      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
+      *    PERFORM 900-CHK-KEY5-SEL-SEC
+      *    IF    ( FLG-CHKMST          =   ZERO )
+      *        MOVE    1               TO  FLG-SRYHEIA
+      *    END-IF
+      *
+           MOVE    1                   TO  FLG-SRYHEIA
+      *
+      *    併用算定の診療行為（同一会計）
+      *    MOVE    "B"                 TO  WRK-CHK-CHKKBN
+      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
+      *    PERFORM 900-CHK-KEY5-SEL-SEC
+      *    IF    ( FLG-CHKMST          =   ZERO )
+      *        MOVE    1               TO  FLG-SRYHEIB
+      *    END-IF
+      *
+           MOVE    1                   TO  FLG-SRYHEIB
       *
            IF    ( ORCBSD01-CHKKBN (9) NOT =   ZERO )
             AND  ( FLG-SRYBYO              =   1   )
@@ -2802,15 +2849,58 @@
                    MOVE    DCACCT-DAYCNT   TO  PTZAI-DAY
                                                  (PTZAI-MAX DCACCT-DAY)
       *
+                   MOVE    PTZAI-MAX       TO  IDX-ZAI
+                   PERFORM 2001111-PTZAI-TAIHI-SEC
+      *
                END-IF
            ELSE
                COMPUTE PTZAI-DAY (IDX-ZAI DCACCT-DAY)
                    =   PTZAI-DAY (IDX-ZAI DCACCT-DAY)
                    +   DCACCT-DAYCNT
+               PERFORM 2001111-PTZAI-TAIHI-SEC
            END-IF
       *
            .
        200111-PTZAI-TAIHI-EXT.
+           EXIT.
+      *****************************************************************
+      *    剤番号退避処理
+      *****************************************************************
+       2001111-PTZAI-TAIHI-SEC         SECTION.
+      *
+           PERFORM VARYING IDXN    FROM    1   BY  1
+                   UNTIL ( IDXN    >   9 )
+      *
+               IF    ( DCACCT-DAYCNT2-IDX (IDXN)
+                                   NOT =   ZERO )
+      *
+                   MOVE    DCACCT-DAYCNT2-IDX (IDXN)
+                                   TO  IDXI
+      *
+                   IF    ( PTZAI-DENPNUM (IDX-ZAI IDXI)
+                                       =   ZERO )
+                       MOVE    DCACCT-DAYCNT2-DENPNUM (IDXN)
+                                   TO  PTZAI-DENPNUM (IDX-ZAI IDXI)
+                       MOVE    DCACCT-DAY
+                                   TO  PTZAI-DENPNUM-DAY(IDX-ZAI IDXI)
+                   END-IF
+      *
+                   IF    ( IDXN    <  3 )
+                       COMPUTE PTZAI-DENPNUM-KAISU(IDX-ZAI IDXI)
+                           =   PTZAI-DENPNUM-KAISU(IDX-ZAI IDXI)
+                           +   DCACCT-DAYCNT2  (IDXN)
+                   ELSE
+                       COMPUTE PTZAI-DENPNUM-KAISU(IDX-ZAI IDXI)
+                           =   PTZAI-DENPNUM-KAISU(IDX-ZAI IDXI)
+                           +   DCACCT-DAYCNT2  (3)
+                   END-IF
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2001111-PTZAI-TAIHI-EXT.
            EXIT.
       *****************************************************************
       *    診療行為情報退避処理
@@ -3626,6 +3716,7 @@
       *
                MOVE    IDX0  TO  IDX26
       *
+      *
            END-IF
       *
            IF    ( IDX26               >   ZERO )
@@ -3693,10 +3784,44 @@
       *
                END-PERFORM
       *
+               PERFORM 2001111-TSRYCD-HEN-SEC
+      *
            END-IF
       *
            .
        200111-TSRYCD-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為コード退避ワーク編集処理
+      *****************************************************************
+       2001111-TSRYCD-HEN-SEC              SECTION.
+      *
+           PERFORM VARYING IDXI   FROM    1    BY  1
+                   UNTIL ( IDXI   >   CONST-DENPNUM-MAX )
+      *
+               IF    ( PTZAI-DENPNUM (IDX-ZAI IDXI)
+                                          NOT  =   ZERO )
+                   IF    ( TSRYCD-DENPNUM (IDX26 IDXI)    =   ZERO )
+                       MOVE    PTZAI-DENPNUM (IDX-ZAI IDXI)
+                               TO  TSRYCD-DENPNUM (IDX26 IDXI)
+                       MOVE    PTZAI-DENPNUM-KAISU (IDX-ZAI IDXI)
+                               TO  TSRYCD-DENPNUM-KAISU (IDX26 IDXI)
+                       MOVE    PTZAI-DENPNUM-DAY (IDX-ZAI IDXI)
+                               TO  TSRYCD-DENPNUM-DAY   (IDX26 IDXI)
+                   END-IF
+                   COMPUTE TSRYCD-DENPNUM-KAISU (IDX26 IDXI)
+                       =   TSRYCD-DENPNUM-KAISU (IDX26 IDXI)
+                       +   PTZAI-DENPNUM-KAISU (IDX-ZAI IDXI)
+                   IF    ( WRK-HKNFLG  =   1 )
+                       MOVE    1    TO  TSRYCD-DENPNUM-HKNFLG
+                                                    (IDX26 IDXI)
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2001111-TSRYCD-HEN-EXT.
            EXIT.
       *****************************************************************
       *    労災レセ電チェックファイル編集処理
@@ -6602,7 +6727,7 @@
            END-PERFORM
            .
       *
-       2001121-MICODKASYOBYOMEI-CHK-EXT.
+       2001121-MICODKA-CHK-EXT.
            EXIT.
       *****************************************************************
       *    病名編集処理
@@ -8207,11 +8332,15 @@
                    UNTIL ( IDX0    >   TSRYCD-MAX )
                     OR   ( WRK-FLG-CHKEND      =   1 )
       *
-               IF    ( WRK-CHKKBN      =   "4" OR  "5" )
+               EVALUATE    WRK-CHKKBN
+               WHEN    "4"
+               WHEN    "5"
                    PERFORM 20011211-HEIYOU-M-SET-CHK-SEC
-               ELSE
+               WHEN    "A"
                    PERFORM 20011211-HEIYOU-D-SET-CHK-SEC
-               END-IF
+               WHEN    "B"
+                   PERFORM 20011211-HEIYOU-T-SET-CHK-SEC
+               END-EVALUATE
       *
                IF    ( FLG-THEIYOU-SET =   1 )
                    IF    ( CONST-THEIYOU-MAX   > THEIYOU-MAX )
@@ -8508,6 +8637,82 @@
       *
            .
        20011211-HEIYOU-D-SET-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    併用算定エラー設定対象チェック処理（同一会計）
+      *****************************************************************
+       20011211-HEIYOU-T-SET-CHK-SEC   SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SRYHEI1-DAY-G
+                                       FLG-SRYHEI2-DAY-G
+      *
+           MOVE    1               TO  FLG-THEIYOU-SET
+      *
+           IF    ( WRK-CHK-CD      =   TSRYCD-SRYCD (IDX0) )
+               PERFORM VARYING IDXI    FROM    1   BY  1
+                       UNTIL ( IDXI  > CONST-DENPNUM-MAX )
+                   IF    ( TSRYCD-DENPNUM (IDX-TSRYCD IDXI)
+                               NOT =   ZERO )
+                    AND  ( TSRYCD-DENPNUM (IDX-TSRYCD IDXI)
+                                   =   TSRYCD-DENPNUM  (IDX0 IDXI))
+                       PERFORM 200112111-HEIYOU-T-SET-CHK-SEC
+                   END-IF
+               END-PERFORM
+           ELSE
+               MOVE    ZERO        TO  FLG-THEIYOU-SET
+           END-IF
+      *
+           IF    ( FLG-SRYHEI1-DAY-G       =   ZERO )
+            OR   ( FLG-SRYHEI2-DAY-G       =   ZERO )
+                MOVE    ZERO       TO  FLG-THEIYOU-SET
+           ELSE
+                MOVE    1          TO  FLG-THEIYOU-SET
+           END-IF
+      *
+           .
+       20011211-HEIYOU-T-SET-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    併用算定エラー設定対象チェック処理（同一会計）
+      *****************************************************************
+       200112111-HEIYOU-T-SET-CHK-SEC   SECTION.
+      *
+           IF    ( IDX-TSRYCD  =   IDX0 )
+               IF    ( TSRYCD-DENPNUM-KAISU (IDX0 IDXI)
+                                   >   1 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO    TO  FLG-THEIYOU-SET
+               END-IF
+           ELSE
+               IF    ( TSRYCD-DENPNUM-KAISU (IDX-TSRYCD IDXI)
+                                   >   ZERO )
+               AND   ( TSRYCD-DENPNUM-KAISU (IDX0 IDXI)
+                                   >   ZERO )
+                           CONTINUE
+               ELSE
+                   MOVE    ZERO    TO  FLG-THEIYOU-SET
+               END-IF
+           END-IF
+      *
+           IF    ( TSRYCD-DENPNUM-HKNFLG   (IDX-TSRYCD IDXI)
+                                           =   1 )
+            OR   ( TSRYCD-DENPNUM-HKNFLG   (IDX0 IDXI)
+                                           =   1 )
+                    CONTINUE
+           ELSE
+               MOVE    ZERO        TO  FLG-THEIYOU-SET
+           END-IF
+      *
+           IF    ( FLG-THEIYOU-SET     =   1 )
+               MOVE    TSRYCD-DENPNUM-DAY (IDX-TSRYCD IDXI)
+                               TO  IDX-DAY
+               MOVE    1       TO  FLG-SRYHEI1-DAY (IDX-DAY)
+                                   FLG-SRYHEI2-DAY (IDX-DAY)
+           END-IF
+      *
+           .
+       200112111-HEIYOU-T-SET-CHK-EXT.
            EXIT.
       *****************************************************************
       *    併用禁忌の薬剤チェック処理（相互作用テーブル）
@@ -8984,6 +9189,17 @@
                        END-IF
                    END-IF
       *
+                   IF    ( FLG-CHKEND (11)     =   ZERO )
+                       MOVE    "B"         TO  WRK-CHK-CHKKBN
+                       MOVE    "2"         TO  WRK-CHK-CDKBN
+                       MOVE    TSRYCD-SRYCD (IDX6)
+                                           TO  WRK-CHK-SRYCD
+                       PERFORM 900-DTCHK008-READ-SEC
+                       IF    ( FLG-DTCHK008    =   1 )
+                           PERFORM 200112-CHKMST-HEI-SRY-CHK-SEC
+                       END-IF
+                   END-IF
+      *
                END-IF
       *
            END-PERFORM
@@ -9306,9 +9522,14 @@
                    WITH    POINTER    WRK-PNT
                    END-STRING
       *
-                   MOVE    "110002"    TO   WRK-ERRCD
+                   IF    ( THEIYOU-CHKKBN (IDX0)   =   "A" )
+                       MOVE    "110002"    TO   WRK-ERRCD
+                   ELSE
+                       MOVE    "110003"    TO   WRK-ERRCD
+                   END-IF
                    INITIALIZE              TERRINF-AREA
-                   MOVE    "A"         TO  TERRINF-CHKKBN
+                   MOVE    THEIYOU-CHKKBN (IDX0)
+                                       TO  TERRINF-CHKKBN
                    MOVE    THEIYOU-SRYCD1 (IDX0)
                                        TO  TERRINF-SRYCD
                    MOVE    THEIYOU-SRYCD2 (IDX0)
@@ -12231,6 +12452,7 @@
            WHEN    "4"
            WHEN    "5"
            WHEN    "A"
+           WHEN    "B"
                MOVE    TERRINF-CHKKBN  TO  WRK-REIGAI-CHKKBN
                MOVE    WRK-ERRCD (1:2) TO  WRK-REIGAI-CHKNUM
                MOVE    TERRINF-SRYCD   TO  WRK-REIGAI-CD
@@ -12850,26 +13072,12 @@
            PERFORM 2301-TCHK-CHK-SEC
            IF    ( TCHK-FLG            =   ZERO )
       *
-               INITIALIZE                      CHK-REC
-               MOVE    TCHK-CHK-CHKKBN     TO  CHK-CHKKBN
-               MOVE    TCHK-CHK-CDKBN      TO  CHK-CDKBN
-               MOVE    TCHK-CHK-SRYCD      TO  CHK-SRYCD
-               MOVE    TCHK-CHK-YMD        TO  CHK-YUKOSTYMD
-                                               CHK-YUKOEDYMD
-               MOVE    WRK-PARA-HOSPNUM    TO  CHK-HOSPNUM
-               MOVE    CHK-REC             TO  MCPDATA-REC
-               MOVE    "tbl_chk"           TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC TO  CHK-REC
-               ELSE
-                   INITIALIZE              CHK-REC
-                   MOVE    1           TO  FLG-CHKMST
-               END-IF
+               PERFORM 900-DTCHK018-START-SEC
       *
                PERFORM UNTIL ( FLG-CHKMST  NOT =   ZERO )
                         OR   ( IDX-MAX    >=  CONST-TCHK-STK-CD-MAX )
+      *
+                   MOVE    DTCHK018-REC    TO  CHK-REC
       *
                    MOVE    ZERO            TO  FLG-KIKANCHKCD
       *
@@ -12909,23 +13117,12 @@
                        MOVE    CHK-SYORIKBN
                                            TO  TCHK-ACT-SYORIKBN
                                                            (IDX-MAX)
+      *
                    END-IF
       *
-                   MOVE "tbl_chk"          TO  MCP-TABLE
-                   MOVE "key3"             TO  MCP-PATHNAME
-                   PERFORM 910-DBFETCH-SEC
-                   IF    ( MCP-RC          =   ZERO )
-                       MOVE    MCPDATA-REC TO  CHK-REC
-                   ELSE
-                       INITIALIZE              CHK-REC
-                       MOVE    1           TO  FLG-CHKMST
-                   END-IF
+                   PERFORM 900-DTCHK018-READ-SEC
       *
                END-PERFORM
-      *
-               MOVE "tbl_chk"          TO  MCP-TABLE
-               MOVE "key3"             TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
       *
                IF    ( IDX-MAX         >   ZERO )
                    MOVE    IDX-MAX     TO  TCHK-ACT-CD-MAX
@@ -13274,6 +13471,8 @@
                                        DTCHK010-FILE
                                        DTCHK011-FILE
                                        DTCHK012-FILE
+                                       DTCHK013-FILE
+                                       DTCHK018-FILE
       *
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
            MOVE    "tmpkey"        TO  MCP-PATHNAME
@@ -13384,6 +13583,7 @@
                    WHEN    "4"
                    WHEN    "5"
                    WHEN    "A"
+                   WHEN    "B"
                        IF    ( DTCHK011-CHKKBN     = WRK-REIGAI-CHKKBN )
                            IF    ( DTCHK011-SRYCD  = WRK-REIGAI-CD )
                              AND ( DTCHK011-TEKCD  = WRK-REIGAI-TEKCD )
@@ -14842,6 +15042,70 @@
            .
       *
        900-DTCHK013-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタファイルSTART処理
+      *****************************************************************
+       900-DTCHK018-START-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKMST
+      *
+           INITIALIZE                      DTCHK018-REC
+           MOVE    SPA-HOSPNUM         TO  DTCHK018-HOSPNUM
+           MOVE    TCHK-CHK-CHKKBN     TO  DTCHK018-CHKKBN
+           MOVE    TCHK-CHK-SRYCD      TO  DTCHK018-SRYCD
+           START   DTCHK018-FILE
+               KEY IS  >=   DTCHK018-KEY
+           INVALID
+               MOVE    1               TO  FLG-CHKMST
+           NOT INVALID
+               PERFORM 900-DTCHK018-READ-SEC
+           END-START
+      *
+           .
+      *
+       900-DTCHK018-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタファイルREAD処理
+      *****************************************************************
+       900-DTCHK018-READ-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHKMST
+           MOVE    ZERO            TO  FLG-LOOP-END
+      *
+           PERFORM UNTIL ( FLG-CHKMST  NOT =   ZERO )
+                    OR   ( FLG-LOOP-END NOT =   ZERO )
+      *
+               READ    DTCHK018-FILE       NEXT
+               AT  END
+                   MOVE    1           TO  FLG-CHKMST
+               NOT AT END
+      *
+                   IF    ( SPA-HOSPNUM     NOT =   DTCHK018-HOSPNUM )
+                    OR   ( TCHK-CHK-CHKKBN NOT =   DTCHK018-CHKKBN )
+                    OR   ( TCHK-CHK-SRYCD  NOT =   DTCHK018-SRYCD )
+                       MOVE    1       TO  FLG-CHKMST
+                   ELSE
+                       MOVE    1       TO  FLG-LOOP-END
+      *
+                       IF    ( TCHK-CHK-CDKBN  NOT =   DTCHK018-CDKBN )
+                           MOVE    ZERO    TO  FLG-LOOP-END
+                       END-IF
+      *
+                       IF    ( DTCHK018-CHKERR =   8 )
+                           MOVE    ZERO    TO  FLG-LOOP-END
+                       END-IF
+      *
+                   END-IF
+      *
+               END-READ
+      *
+           END-PERFORM
+      *
+           .
+      *
+       900-DTCHK018-READ-EXT.
            EXIT.
       *****************************************************************
       *    患者病名読込処理

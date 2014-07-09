@@ -56,6 +56,7 @@
        01  FLG-AREA.
            03  FLG-END                     PIC 9(01).
            03  FLG-ERR                     PIC 9(01).
+           03  FLG-ETENSU3                 PIC 9(01).
            03  FLG-ETENSU5                 PIC 9(01).
            03  FLG-CHKMST                  PIC 9(01).
            03  FLG-CHKSND                  PIC 9(01).
@@ -81,13 +82,16 @@
            03  FLG-INPUTCD                 PIC 9(01).
            03  FLG-TEKIOUBYOMEI            PIC 9(01).
            03  FLG-GET-TEKBYO              PIC 9(01).
+           03  FLG-SKIP                    PIC 9(01).
+           03  FLG-ERROR                   PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-2001                    PIC 9(05).
            03  CNT-RENNUM                  PIC 9(05).
            03  CNT-CHK004                  PIC 9(05).
-           03  CNT-TEKBYO                  PIC 9(05).
+           03  CNT-ANOTHER                  PIC 9(05).
+           03  CNT-SKIP                    PIC 9(05).
       *
       *    添字領域
        01  IDX-AREA.
@@ -100,6 +104,7 @@
            03  IDXK                        PIC 9(05).
            03  IDXL                        PIC 9(05).
            03  IDXM                        PIC 9(05).
+           03  IDXN                        PIC 9(05).
            03  IDXH                        PIC 9(05).
            03  IDXR                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
@@ -158,6 +163,8 @@
            03  WRK-KAISU                   PIC 9(05).
            03  WRK-EOMYMD                  PIC X(08).
            03  WRK-STIDX                   PIC 9(05).
+           03  WRK-TABLE                   PIC X(64).
+           03  WRK-PATHNAME                PIC X(64).
       *
        01  TDOJITSU-AREA.
            03  TDOJITSU-MAX                PIC 9(05).
@@ -171,6 +178,11 @@
                05  TNYUINRRK-RRKNUM        PIC 9(03).
                05  TNYUINRRK-SRYSTYMD      PIC X(08).
                05  TNYUINRRK-SRYEDYMD      PIC X(08).
+      *
+       01  TSKIP-AREA.
+           03  TSKIP-MAX                  PIC 9(05).
+           03  TSKIP-OCC                  OCCURS    500.
+               05  TSKIP-CD               PIC X(09).
       *
        01  TKAISU-AREA.
            03  TKAISU-MAX                  PIC 9(05).
@@ -189,6 +201,7 @@
            03  CONST-ERRLST-MAX            PIC 9(05)   VALUE   200.
            03  CONST-BYOLST-MAX            PIC 9(05)   VALUE   300.
            03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   500.
+           03  CONST-TSKIP-MAX             PIC 9(05)   VALUE   500.
            03  CONST-MKCD-MAX              PIC 9(05)   VALUE   21.
       *
       *    データチェック一括処理パラメータ
@@ -206,6 +219,9 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+       01  ETENSU3-REC.
+           COPY    "CPETENSU3.INC".
       *
        01  ETENSU5-REC.
            COPY    "CPETENSU5.INC".
@@ -440,7 +456,7 @@
                                                SPA-GMN-CHKLST-SEL
                        INITIALIZE              SPA-GMN-CHKLST-AREA
                                                SPA-NAI-CHKLST-AREA
-                       PERFORM 3101-CHKLST-SEC
+                       PERFORM 31011-CHKLST-SEC
                        IF    ( SPA-GMN-TCHKBYOMEI (WRK-CHKLST-SEL)
                                            =   WRK-BYOMEI )
                         AND  ( SPA-GMN-TCHKHOSOKU (WRK-CHKLST-SEL)
@@ -552,6 +568,13 @@
            ELSE
               MOVE    SYS-1101-TEKBYOSRYKBN
                                    TO  SPA-NAI-TEKBYOSRYKBN
+           END-IF
+      *
+           IF    ( SYS-1101-SRYHEIMSTKBN   =   SPACE )
+               MOVE    "2"         TO  SPA-NAI-SRYHEIMSTKBN
+           ELSE
+               MOVE    SYS-1101-SRYHEIMSTKBN
+                                   TO  SPA-NAI-SRYHEIMSTKBN
            END-IF
       *
            INITIALIZE                  SYSKANRI-REC
@@ -815,12 +838,14 @@
                WHEN    "10"
                    MOVE    "4"         TO  WRK-CHKKBN
                WHEN    "11"
-                   IF    ( SPA-NAI-TERRCD  (IDXL)
-                                       =   "160001" )
-                       MOVE    "A"     TO  WRK-CHKKBN
-                   ELSE
+                   EVALUATE    SPA-NAI-TERRCD  (IDXL)
+                   WHEN  "110001"
                        MOVE    "5"     TO  WRK-CHKKBN
-                   END-IF
+                   WHEN  "110002"
+                       MOVE    "A"     TO  WRK-CHKKBN
+                   WHEN  "110003"
+                       MOVE    "B"     TO  WRK-CHKKBN
+                   END-EVALUATE
                WHEN    "15"
                    MOVE    "6"         TO  WRK-CHKKBN
                WHEN    "16"
@@ -1056,40 +1081,55 @@
             AND  ( SPA-NAI-CHKLST-BYOMEI   =   SPA-GMN-CBYOMEI)
                CONTINUE
            ELSE
-      *
-               INITIALIZE                      SPA-GMN-CHKLST-AREA
-                                               SPA-NAI-CHKLST-AREA
-      *
-               MOVE    SPA-NAI-CHKNUM      TO  SPA-NAI-CHKLST-CHKNUM
-               MOVE    SPA-NAI-CHKKBN      TO  SPA-NAI-CHKLST-CHKKBN
-               MOVE    SPA-GMN-SRYCD       TO  SPA-NAI-CHKLST-SRYCD
-               MOVE    SPA-GMN-CBYOMEI     TO  SPA-NAI-CHKLST-BYOMEI
-      *
-               EVALUATE    SPA-NAI-CHKLST-CHKKBN
-               WHEN    SPACE
-                   IF    ( SPA-NAI-CHKNUM  =   "20" )
-                    AND  ( SPA-GMN-ERRCD   =   "200001" )
-                       PERFORM 31011-CHKLST-KAISU-SEC
-                   END-IF
-               WHEN    "1"
-               WHEN    "2"
-               WHEN    "6"
-                   PERFORM 31011-CHKLST-CHKSND-SEC
-               WHEN    "4"
-               WHEN    "5"
-               WHEN    "A"
-                   PERFORM 31011-CHKLST-CHKMST-SEC
-               WHEN    "7"
-                   PERFORM 31011-CHKLST-CHKTRD-SEC
-               WHEN    "8"
-               WHEN    "9"
-                   PERFORM 31011-CHKLST-CHK005-SEC
-               END-EVALUATE
-      *
+               MOVE    1           TO  SPA-GMN-CHKLST-PAGE
+               PERFORM 31011-CHKLST-SEC
            END-IF
       *
            .
        3101-CHKLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタコラムリスト編集処理
+      *****************************************************************
+       31011-CHKLST-SEC                 SECTION.
+      *
+           COMPUTE SPA-GMN-CHKLST-SKIP
+               = ( SPA-GMN-CHKLST-PAGE - 1 )
+               *   CONST-CHKLST-MAX
+      *
+           INITIALIZE                      SPA-GMN-CHKLST-AREA
+                                           SPA-NAI-CHKLST-AREA
+                                           TSKIP-AREA
+      *
+           MOVE    SPA-NAI-CHKNUM      TO  SPA-NAI-CHKLST-CHKNUM
+           MOVE    SPA-NAI-CHKKBN      TO  SPA-NAI-CHKLST-CHKKBN
+           MOVE    SPA-GMN-SRYCD       TO  SPA-NAI-CHKLST-SRYCD
+           MOVE    SPA-GMN-CBYOMEI     TO  SPA-NAI-CHKLST-BYOMEI
+      *
+           EVALUATE    SPA-NAI-CHKLST-CHKKBN
+           WHEN    SPACE
+               IF    ( SPA-NAI-CHKNUM  =   "20" )
+                AND  ( SPA-GMN-ERRCD   =   "200001" )
+                   PERFORM 31011-CHKLST-KAISU-SEC
+               END-IF
+           WHEN    "1"
+           WHEN    "2"
+           WHEN    "6"
+               PERFORM 31011-CHKLST-CHKSND-SEC
+           WHEN    "4"
+           WHEN    "5"
+           WHEN    "A"
+           WHEN    "B"
+               PERFORM 31011-CHKLST-CHKMST-SEC
+           WHEN    "7"
+               PERFORM 31011-CHKLST-CHKTRD-SEC
+           WHEN    "8"
+           WHEN    "9"
+               PERFORM 31011-CHKLST-CHK005-SEC
+           END-EVALUATE
+      *
+           .
+       31011-CHKLST-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタコラムリスト編集処理（回数）
@@ -1140,7 +1180,8 @@
            PERFORM VARYING IDXL    FROM    1   BY  1
                    UNTIL ( IDXL    >   TKAISU-MAX )
       *
-               MOVE    TKAISU-SRYYMD (IDXL)
+              MOVE    IDXL         TO  SPA-GMN-TCHKLSTNUM  (IDXL)
+              MOVE    TKAISU-SRYYMD (IDXL)
                                    TO  SPA-NAI-TSNTYMD (IDXL)
                MOVE    TKAISU-SRYYMD (IDXL)
                                    TO  WRK-YMD
@@ -1426,6 +1467,7 @@
        31011-CHKLST-CHKSND-SEC         SECTION.
       *
            MOVE    ZERO                TO  IDXL
+                                           IDXN
            MOVE    ZERO                TO  FLG-GET-TEKBYO
       *
            MOVE    1                   TO  FLG-CHKLST-ROW
@@ -1464,12 +1506,27 @@
            END-IF
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+      *
+               PERFORM 31011-CHKSND-SKIP-CHK-SEC
+               IF    ( FLG-SKIP  =     ZERO )
+                   COMPUTE IDXN  = IDXN  + 1
+               END-IF
+      *
+               PERFORM 900-CHKSND-KEY2-FET-SEC
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
                     OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
       *
-               IF    ( CHKSND-BYOMEI     NOT =   SPACE )
+               PERFORM 31011-CHKSND-SKIP-CHK-SEC
+               IF    ( FLG-SKIP  =     ZERO )
       *
                    COMPUTE IDXL =   IDXL +   1
                    MOVE    IDXL         TO  SPA-GMN-CHKLST-MAX
+      *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN         TO  SPA-GMN-TCHKLSTNUM  (IDXL)
       *
                    IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
       *
@@ -1515,10 +1572,28 @@
       *
            IF    ( FLG-GET-TEKBYO  =   1 )
                PERFORM 31011-CHKLST-TEKBYO-SEC
+           ELSE
+               IF    ( FLG-CHKSND  =   ZERO )
+                   MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+               END-IF
            END-IF
       *
            .
        31011-CHKLST-CHKSND-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-CHKSND-SKIP-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           IF    ( CHKSND-BYOMEI   = SPACE )
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-CHKSND-SKIP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタコラムリスト編集処理
@@ -1530,6 +1605,26 @@
            PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-TEKIOUBYOMEI  NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+      *
+               INITIALIZE              SS012-AREA
+      *
+               MOVE    TEKBYO-BYOMEI   TO  SS012-I-BYOMEI
+               CALL    "ORCSS012"      USING
+                                       SS012-AREA
+                                       SPA-AREA
+      *
+               PERFORM 31011-TEKBYO-SKIP-CHK-SEC
+               IF    ( FLG-SKIP        =   ZERO )
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    1           TO  SPA-NAI-CHKLST-ANOTHER
+               END-IF
+      *
+               PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-TEKIOUBYOMEI  NOT =   ZERO )
                     OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
       *
                INITIALIZE              SS012-AREA
@@ -1539,11 +1634,14 @@
                                        SS012-AREA
                                        SPA-AREA
       *
-               IF    ( SS012-HAISHI    =   ZERO )
+               PERFORM 31011-TEKBYO-SKIP-CHK-SEC
+               IF    ( FLG-SKIP        =   ZERO )
       *
                    COMPUTE IDXL    =   IDXL    +   1
                    MOVE    IDXL         TO  SPA-GMN-CHKLST-MAX
       *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN         TO  SPA-GMN-TCHKLSTNUM  (IDXL)
                    MOVE    SS012-O-BYOMEI
                                         TO  SPA-GMN-TCHKBYOMEI
                                                                (IDXL)
@@ -1553,7 +1651,7 @@
                    MOVE    WRK-EDIT-COMPKBN-MEI
                                             TO  SPA-GMN-TCOMPKBN
                                                            (IDXL)
-                   MOVE    "1"              TO  SPA-GMN-TTEKBYOMST
+                   MOVE    "1"              TO  SPA-GMN-TANOTHERMST
                                                            (IDXL)
                END-IF
       *
@@ -1565,8 +1663,28 @@
            MOVE    "key2"              TO   MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( FLG-TEKIOUBYOMEI    =   ZERO )
+               MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+           END-IF
+      *
            .
        31011-CHKLST-TEKBYO-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-TEKBYO-SKIP-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           IF    ( SS012-HAISHI    =   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-TEKBYO-SKIP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタコラムリスト編集処理
@@ -1582,17 +1700,42 @@
            PERFORM 900-CHKMST-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKMST  NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+      *
+               MOVE    CHKMST-CD       TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHKMST-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
+                   COMPUTE IDXN =   IDXN +   1
+                   PERFORM 900-CHKMST-KEY2-FET-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-CHKMST  NOT =   ZERO )
                     OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
       *
                MOVE    CHKMST-CD       TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHKMST-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
       *
                    COMPUTE IDXL =   IDXL +   1
                    MOVE    IDXL        TO  SPA-GMN-CHKLST-MAX
       *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN        TO  SPA-GMN-TCHKLSTNUM  (IDXL)
                    MOVE    TNS-SRYCD   TO  SPA-GMN-TCHKTEKCD   (IDXL)
                    MOVE    TNS-NAME    TO  SPA-GMN-TCHKSRYNAME (IDXL)
+                   IF    ( CHKMST-CHKERR   =   9 )
+                       MOVE    "警告"  TO  SPA-GMN-TCOMPKBN (IDXL)
+                   END-IF
       *
                END-IF
       *
@@ -1604,8 +1747,144 @@
            MOVE    "key2"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( SPA-NAI-CHKLST-CHKKBN   =   "5" OR "A" OR "B" )
+             AND ( SPA-NAI-SRYHEIMSTKBN    =   "1" )
+               PERFORM 31011-CHKLST-ETENSU3-SEC
+           ELSE
+               IF    ( FLG-CHKMST  =   ZERO )
+                   MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+               END-IF
+           END-IF
+      *
            .
        31011-CHKLST-CHKMST-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-CHKMST-SKIP-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           IF    ( CHKMST-CHKERR   =   8 )
+               MOVE    1           TO  FLG-SKIP
+               IF    ( TSKIP-MAX   <   CONST-TSKIP-MAX )
+                   COMPUTE TSKIP-MAX = TSKIP-MAX +   1
+                   MOVE    CHKMST-CD   TO  TSKIP-CD (TSKIP-MAX)
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-ERROR   NOT =   ZERO )
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-CHKMST-SKIP-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタコラムリスト編集処理（電子点数表より）
+      *****************************************************************
+       31011-CHKLST-ETENSU3-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-CHKLST-MAX  TO    IDXL
+      *
+           EVALUATE    SPA-NAI-CHKLST-CHKKBN
+           WHEN    "5"
+               MOVE    "tbl_etensu_3_2"    TO  WRK-TABLE
+               MOVE    "key3"              TO  WRK-PATHNAME
+           WHEN    "A"
+               MOVE    "tbl_etensu_3_1"    TO  WRK-TABLE
+               MOVE    "key3"              TO  WRK-PATHNAME
+           WHEN    "B"
+               MOVE    "tbl_etensu_3_3"    TO  WRK-TABLE
+               MOVE    "key3"              TO  WRK-PATHNAME
+           END-EVALUATE
+      *
+           MOVE    SPA-NAI-SRYYM       TO  WRK-KJNYMD
+           MOVE    "01"                TO  WRK-KJNYMD(7:2)
+           PERFORM 900-ETENSU3-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-ETENSU3 NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+      *
+               MOVE    ETENSU3-SRYCD2  TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-ETENSU3-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP =   ZERO )
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    1           TO  SPA-NAI-CHKLST-ANOTHER
+               END-IF
+      *
+               PERFORM 900-ETENSU3-FET-SEC
+      *
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-ETENSU3 NOT =   ZERO )
+                    OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
+      *
+               MOVE    ETENSU3-SRYCD2  TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-ETENSU3-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP =   ZERO )
+      *
+                   COMPUTE IDXL =   IDXL +   1
+                   MOVE    IDXL        TO  SPA-GMN-CHKLST-MAX
+      *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN        TO  SPA-GMN-TCHKLSTNUM  (IDXL)
+                   MOVE    TNS-SRYCD   TO  SPA-GMN-TCHKTEKCD   (IDXL)
+                   MOVE    TNS-NAME    TO  SPA-GMN-TCHKSRYNAME (IDXL)
+                   IF    ( ETENSU3-TOKUREI     NOT =   ZERO )
+                       MOVE    "特例条件あり"
+                                       TO  SPA-GMN-TCOMPKBN (IDXL)
+                   END-IF
+                   MOVE    "2"         TO  SPA-GMN-TANOTHERMST
+                                                           (IDXL)
+      *
+               END-IF
+      *
+               PERFORM 900-ETENSU3-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    WRK-TABLE           TO   MCP-TABLE
+           MOVE    WRK-PATHNAME        TO   MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( FLG-ETENSU3     =   ZERO )
+               MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+           END-IF
+      *
+           .
+       31011-CHKLST-ETENSU3-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-ETENSU3-SKIP-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   TSKIP-MAX )
+                    OR   ( FLG-SKIP    NOT =   ZERO )
+               IF    ( TSKIP-CD (IDX0) =   ETENSU3-SRYCD2 )
+                   MOVE    1       TO  FLG-SKIP
+               END-IF
+           END-PERFORM
+      *
+           IF    ( FLG-ERROR   NOT =   ZERO )
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-ETENSU3-SKIP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ３コラムリスト編集処理
@@ -1621,15 +1900,35 @@
            PERFORM 900-CHKTRD-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKTRD  NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+               MOVE    CHKTRD-CD       TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHKTRD-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
+                   COMPUTE IDXN  = IDXN  + 1
+               END-IF
+               PERFORM 900-CHKTRD-KEY2-FET-SEC
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-CHKTRD  NOT =   ZERO )
                     OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
       *
                MOVE    CHKTRD-CD       TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHKTRD-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
       *
                    COMPUTE IDXL =   IDXL +   1
                    MOVE    IDXL        TO  SPA-GMN-CHKLST-MAX
       *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN         TO  SPA-GMN-TCHKLSTNUM  (IDXL)
                    MOVE    TNS-NAME    TO  SPA-GMN-TCHKSRYNAME (IDXL)
       *
                    IF    ( CHKTRD-DAYMONTHKBN  =   "1" )
@@ -1647,8 +1946,26 @@
            MOVE    "key2"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( FLG-CHKTRD      =   ZERO )
+               MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+           END-IF
+      *
            .
        31011-CHKLST-CHKTRD-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-CHKTRD-SKIP-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           IF    ( FLG-ERROR   NOT =   ZERO )
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-CHKTRD-SKIP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ５コラムリスト編集処理
@@ -1664,15 +1981,35 @@
            PERFORM 900-CHK005-KEY11-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHK005  NOT =   ZERO )
+                    OR   ( IDXN           >=   SPA-GMN-CHKLST-SKIP )
+               MOVE    CHK005-SRYCD    TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHK005-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
+                   COMPUTE IDXN  = IDXN  + 1
+               END-IF
+               PERFORM 900-CHK005-KEY11-FET-SEC
+           END-PERFORM
+      *
+           PERFORM UNTIL ( FLG-CHK005  NOT =   ZERO )
                     OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
       *
                MOVE    CHK005-SRYCD    TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
+               MOVE    FLG-TENSU       TO  FLG-ERROR
+      *
+               PERFORM 31011-CHK005-SKIP-CHK-SEC
+      *
+               IF    ( FLG-SKIP        =   ZERO )
       *
                    COMPUTE IDXL =   IDXL +   1
                    MOVE    IDXL        TO  SPA-GMN-CHKLST-MAX
       *
+                   COMPUTE IDXN =   IDXN +   1
+                   MOVE    IDXN        TO  SPA-GMN-TCHKLSTNUM  (IDXL)
                    MOVE    TNS-NAME    TO  SPA-GMN-TCHKSRYNAME (IDXL)
       *
                    IF    ( CHK005-DAYMONTHKBN  =   "1" )
@@ -1690,8 +2027,26 @@
            MOVE    "key11"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( FLG-CHK005      =   ZERO )
+               MOVE    1       TO  SPA-GMN-CHKLST-NEXT
+           END-IF
+      *
            .
        31011-CHKLST-CHK005-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データチェック処理
+      *****************************************************************
+       31011-CHK005-SKIP-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SKIP
+      *
+           IF    ( FLG-ERROR   NOT =   ZERO )
+               MOVE    1           TO  FLG-SKIP
+           END-IF
+      *
+           .
+       31011-CHK005-SKIP-CHK-EXT.
            EXIT.
       *****************************************************************
       *    確認画面（ＤＩＤ１）ＯＫ処理
@@ -1733,8 +2088,12 @@
                PERFORM 240-D05-SENI-SEC
            WHEN    "CLICKED"       ALSO    "B06"
                PERFORM 260-PREVPAGE-SEC
+           WHEN    "CLICKED"       ALSO    "B06C"
+               PERFORM 261-PREVPAGE-SEC
            WHEN    "CLICKED"       ALSO    "B07"
                PERFORM 270-NEXTPAGE-SEC
+           WHEN    "CLICKED"       ALSO    "B07C"
+               PERFORM 271-NEXTPAGE-SEC
            WHEN    "CLICKED"       ALSO    "B08"
                PERFORM 280-C02-SENI-SEC
            WHEN    "CLICKED"       ALSO    "B09"
@@ -2012,12 +2371,19 @@
            MOVE    ZERO            TO  WRK-CHKLST-SEL
       *
            IF    ( SPA-GMN-CHKLST-SELNUM  >   ZERO )
+               PERFORM VARYING IDXM    FROM   1   BY   1
+                       UNTIL ( IDXM    >   SPA-GMN-CHKLST-MAX )
+                        OR   ( WRK-CHKLST-SEL
+                                   NOT =   ZERO )
       *
-               IF    ( SPA-GMN-CHKLST-SELNUM
-                                       <= SPA-GMN-CHKLST-MAX )
-                   MOVE    SPA-GMN-CHKLST-SELNUM
-                                       TO  WRK-CHKLST-SEL
-               ELSE
+                   IF    ( SPA-GMN-TCHKLSTNUM (IDXM)
+                                   =   SPA-GMN-CHKLST-SELNUM )
+                       MOVE    IDXM    TO  WRK-CHKLST-SEL
+                   END-IF
+      *
+               END-PERFORM
+      *
+               IF    ( WRK-CHKLST-SEL  =   ZERO )
                    MOVE    "0005"      TO  SPA-ERRCD
                    MOVE    6           TO  SPA-GMN-CUR
                END-IF
@@ -2304,6 +2670,7 @@
            WHEN    "4"
            WHEN    "5"
            WHEN    "A"
+           WHEN    "B"
                MOVE    CK4-1201-TEKCD      TO  SPA-GMN-TEKCD
                                                WRK-SRYCD
                MOVE    CK4-1201-LASTYMD    TO  WRK-KJNYMD
@@ -2450,6 +2817,38 @@
       *
            .
        270-NEXTPAGE-EXT.
+           EXIT.
+      *****************************************************************
+      *    前頁処理
+      *****************************************************************
+       261-PREVPAGE-SEC                SECTION.
+      *
+           IF    ( SPA-GMN-CHKLST-PAGE >   1 )
+      *
+               COMPUTE SPA-GMN-CHKLST-PAGE
+                   =   SPA-GMN-CHKLST-PAGE     -   1
+      *
+               PERFORM 31011-CHKLST-SEC
+           END-IF
+      *
+           .
+       261-PREVPAGE-EXT.
+           EXIT.
+      *****************************************************************
+      *    次頁処理
+      *****************************************************************
+       271-NEXTPAGE-SEC                SECTION.
+      *
+           IF    ( SPA-GMN-CHKLST-NEXT  =   1 )
+      *
+               COMPUTE SPA-GMN-CHKLST-PAGE
+                   =   SPA-GMN-CHKLST-PAGE     +   1
+      *
+               PERFORM 31011-CHKLST-SEC
+           END-IF
+      *
+           .
+       271-NEXTPAGE-EXT.
            EXIT.
       *****************************************************************
       *    病名登録画面遷移処理
@@ -2654,6 +3053,7 @@
            WHEN    "4"
            WHEN    "5"
            WHEN    "A"
+           WHEN    "B"
                MOVE    SPA-GMN-SRYCD   TO  CHKREIGAI-SRYCD
                MOVE    SPA-GMN-TEKCD   TO  CHKREIGAI-TEKCD
            WHEN    "6"
@@ -2926,6 +3326,7 @@
            WHEN    "4"
            WHEN    "5"
            WHEN    "A"
+           WHEN    "B"
                STRING  SPA-GMN-SRYCD   DELIMITED BY SIZE
                        " "             DELIMITED BY SIZE
                        SPA-GMN-SRYNAME DELIMITED BY SPACE
@@ -3099,7 +3500,7 @@
                MOVE    "日／月"        TO  D04-CHKLST-LBLCOMPKBN
            END-EVALUATE
       *
-           MOVE    ZERO                TO  CNT-TEKBYO
+           MOVE    ZERO                TO  CNT-ANOTHER
                                            IDXM
       *
            PERFORM VARYING IDXL FROM    1   BY  1
@@ -3107,18 +3508,33 @@
       *
                COMPUTE IDXM    =   IDXM    +   1
       *
-               IF    ( SPA-GMN-TTEKBYOMST (IDXL)   =   "1" )
-                   COMPUTE CNT-TEKBYO  =   CNT-TEKBYO  +   1
-                   IF    ( CNT-TEKBYO  =   1 )
-                       MOVE    "―――　以下適応病名マスタより　―――"
-                                       TO  D04-TCHKBYOMEI
-                                                    (IDXM)
+               IF   ( SPA-NAI-CHKLST-ANOTHER       =   ZERO )
+                AND ( SPA-GMN-TANOTHERMST (IDXL)
+                                               NOT =   SPACE )
       *
+                   COMPUTE CNT-ANOTHER =   CNT-ANOTHER  +   1
+      *
+                   IF    ( CNT-ANOTHER =   1 )
+                       EVALUATE    SPA-GMN-TANOTHERMST (IDXL)
+                       WHEN    "1"
+                           MOVE
+                           "―――　以下適応病名マスタより　―――"
+                                       TO  D04-TCHKBYOMEI  (IDXM)
+      *
+                       WHEN    "2"
+                           MOVE
+                           "―――　以下電子点数表マスタより　―――"
+                                       TO  D04-TCHKBYOMEI  (IDXM)
+      *
+                       END-EVALUATE
                        COMPUTE IDXM    =   IDXM    +   1
                    END-IF
+      *
+      *
                END-IF
       *
-               MOVE    IDXL         TO  WRK-ZZZ9
+               MOVE    SPA-GMN-TCHKLSTNUM (IDXL)
+                                       TO  WRK-ZZZ9
                MOVE    WRK-ZZZ9        TO  D04-TCHKLSTNO (IDXM)
       *
                EVALUATE    SPA-NAI-CHKKBN
@@ -3173,9 +3589,12 @@
                WHEN    "4"
                WHEN    "5"
                WHEN    "A"
+               WHEN    "B"
                    MOVE    SPA-GMN-TCHKSRYNAME(IDXL)
                                        TO  D04-TCHKBYOMEI
                                                   (IDXM)(2:)
+                   MOVE    SPA-GMN-TCOMPKBN   (IDXL)
+                                       TO  D04-TCOMPKBN     (IDXM)
                WHEN    "8"
                WHEN    "9"
                    MOVE    SPA-GMN-TCHKSRYNAME(IDXL)
@@ -3243,7 +3662,9 @@
       *
            MOVE    WIDGET-NORMAL       TO  D04-B06-STATE
                                            D04-B07-STATE
-                                           D04-B08-STATE
+                                           D04-B06C-STATE
+                                           D04-B07C-STATE
+                                           D04-B09-STATE
                                            D04-B09-STATE
                                            D04-B12-STATE
                                            D04-BEHAVE-STATE
@@ -3255,6 +3676,14 @@
       *
            IF    ( SPA-GMN-ERRLST-NEXT     =   ZERO )
                MOVE    WIDGET-INSENSITIVE  TO  D04-B07-STATE
+           END-IF
+      *
+           IF    ( SPA-GMN-CHKLST-PAGE    <=   1 )
+               MOVE    WIDGET-INSENSITIVE  TO  D04-B06C-STATE
+           END-IF
+      *
+           IF    ( SPA-GMN-CHKLST-NEXT     =   ZERO )
+               MOVE    WIDGET-INSENSITIVE  TO  D04-B07C-STATE
            END-IF
       *
            IF    ( SPA-NAI-GSRAUTH-22      =   SPACE )
@@ -4238,6 +4667,7 @@
            WHEN    "4"
            WHEN    "5"
            WHEN    "A"
+           WHEN    "B"
                MOVE    CK4-1201-SRYCD
                                        TO  CHKREIGAI-SRYCD
                MOVE    CK4-1201-TEKCD
@@ -4347,6 +4777,53 @@
            .
       *
        900-TEKIOUBYOMEI-KEY2-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    電子点数表（背反）検索処理
+      *****************************************************************
+       900-ETENSU3-SEL-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ETENSU3
+      *
+           INITIALIZE                      ETENSU3-REC
+           MOVE    SPA-GMN-SRYCD       TO  ETENSU3-SRYCD1
+           MOVE    WRK-KJNYMD          TO  ETENSU3-YUKOSTYMD
+                                           ETENSU3-YUKOEDYMD
+           MOVE    ETENSU3-REC         TO  MCPDATA-REC
+           MOVE    WRK-TABLE           TO  MCP-TABLE
+           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  ETENSU3-REC
+           ELSE
+               MOVE    1               TO  FLG-ETENSU3
+               INITIALIZE                  ETENSU3-REC
+           END-IF
+      *
+           .
+      *
+       900-ETENSU3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    電子点数表（背反）FETCH処理
+      *****************************************************************
+       900-ETENSU3-FET-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ETENSU3
+      *
+           MOVE    WRK-TABLE           TO  MCP-TABLE
+           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  ETENSU3-REC
+           ELSE
+               MOVE    1               TO  FLG-ETENSU3
+               INITIALIZE                  ETENSU3-REC
+           END-IF
+      *
+           .
+      *
+       900-ETENSU3-FET-EXT.
            EXIT.
       *****************************************************************
       *    電子点数表（算定回数）検索処理

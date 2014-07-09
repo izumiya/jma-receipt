@@ -18,7 +18,9 @@
         02  D04.
       *     02  D04-FIXED6.
               03  D04-B06-STATE        PIC S9(9)   BINARY.
+              03  D04-B06C-STATE       PIC S9(9)   BINARY.
               03  D04-B07-STATE        PIC S9(9)   BINARY.
+              03  D04-B07C-STATE       PIC S9(9)   BINARY.
               03  D04-B08-STATE        PIC S9(9)   BINARY.
               03  D04-B09-STATE        PIC S9(9)   BINARY.
               03  D04-B12-STATE        PIC S9(9)   BINARY.

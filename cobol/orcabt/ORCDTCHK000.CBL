@@ -288,7 +288,6 @@
            END-IF
       *
            IF    ( DTCHK-RC            =   ZERO )
-            AND  ( ORCBSD01-CHKKBN (20)    =   "2" )
                    PERFORM 800-MCNDATE-SEC
                    DISPLAY SMCNDATE-HMS "ST:ORCDTCHK011"
                    CALL    "ORCDTCHK011"       USING

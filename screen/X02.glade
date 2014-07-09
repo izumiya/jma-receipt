@@ -3066,7 +3066,7 @@
       <y>672</y>
       <width>300</width>
       <height>20</height>
-      <label>　　　　８：マスタ提供分　：チェックしない</label>
+      <label>　　　　８：チェックしない</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>
@@ -3147,22 +3147,6 @@
       <width>270</width>
       <height>20</height>
       <label>　　　　１：入院・外来の区別をする</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label187</name>
-      <x>672</x>
-      <y>692</y>
-      <width>300</width>
-      <height>20</height>
-      <label>　　　　　　ユーザー登録分：削除する</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>

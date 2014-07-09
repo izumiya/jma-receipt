@@ -436,6 +436,7 @@
                    WHEN    "4"
                    WHEN    "5"
                    WHEN    "A"
+                   WHEN    "B"
                        MOVE    CHKREIGAI-SRYCD
                                            TO  WRK-TNS-SRYCD
                        PERFORM 900-TENSU-KEY-SEL-SEC

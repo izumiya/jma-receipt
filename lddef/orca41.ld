@@ -72,6 +72,9 @@ db	{
 	tbl_inputcd;
 	tbl_tekioubyomei;
 	tbl_byomei ;
+	tbl_etensu_3_1 ;
+	tbl_etensu_3_2 ;
+	tbl_etensu_3_3 ;
 	tbl_etensu_5 ;
 	tbl_nsrysrh ;
 	tbl_nrrksrh ;

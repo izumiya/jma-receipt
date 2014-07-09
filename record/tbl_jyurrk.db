@@ -1198,4 +1198,31 @@ path	key57	{
 	};
 };
 
+path	key58	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key58_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID         =   :PTID
+			AND   SRYYMD    LIKE   :SRYYMD
+			ORDER   BY        NYUGAIKBN,
+			                  DENPNUM
+		;
+	};
+};
+
+path	key59 {
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key59_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     SRYYMD    LIKE :SRYYMD
+			ORDER   BY        NYUGAIKBN,
+			                  PTID,
+			                  DENPNUM
+		;
+	};
+};
 

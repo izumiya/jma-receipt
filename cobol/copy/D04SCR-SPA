@@ -28,6 +28,8 @@
          02  SPA-D04.
            03  SPA-GMN-CUR                     PIC 9(03).
            03  SPA-GMN-ERRLST-PAGE             PIC 9(05).
+           03  SPA-GMN-CHKLST-PAGE             PIC 9(05).
+           03  SPA-GMN-CHKLST-SKIP             PIC 9(05).
            03  SPA-GMN-AREA.
                05  SPA-GMN-ERR-AREA.
                    07  SPA-GMN-LBLSRYYM        PIC X(30).
@@ -89,14 +91,16 @@
                    07  SPA-GMN-CHKLST-MAX      PIC 9(5).
                    07  SPA-GMN-CHKLST-SELNUM   PIC 9(5).
                    07  SPA-GMN-CHKLST-SEL      PIC 9(5).
+                   07  SPA-GMN-CHKLST-NEXT     PIC 9(1).
                    07  SPA-GMN-CHKLST-OCC      OCCURS  500.
+                       09  SPA-GMN-TCHKLSTNUM  PIC 9(05).
                        09  SPA-GMN-TCHKBYOMEI  PIC X(100).
                        09  SPA-GMN-TGRPID      PIC X(1).
                        09  SPA-GMN-TCOMPKBN    PIC X(12).
                        09  SPA-GMN-TDAYMONTHKBN PIC X(4).
                        09  SPA-GMN-TCHKSRYNAME PIC X(100).
                        09  SPA-GMN-TCHKTEKCD   PIC X(9).
-                       09  SPA-GMN-TTEKBYOMST  PIC X(1).
+                       09  SPA-GMN-TANOTHERMST  PIC X(1).
                        09  SPA-GMN-TCHKHOSOKU  PIC X(40).
                        09  SPA-GMN-TSNTYMD     PIC X(10).
                        09  SPA-GMN-TKAISU      PIC 9(05).
@@ -120,6 +124,7 @@
                05  SPA-NAI-TEKBYOYKZKBN        PIC X(01).
                05  SPA-NAI-TEKBYOSRYKBN        PIC X(01).
                05  SPA-NAI-TENKIBYOMEIKBN      PIC X(01).
+               05  SPA-NAI-SRYHEIMSTKBN        PIC X(01).
                05  SPA-NAI-GSRAUTH-22          PIC X(01).
                05  SPA-NAI-GSRAUTH-103         PIC X(01).
                05  SPA-NAI-ERR-AREA.
@@ -147,6 +152,7 @@
                05  SPA-NAI-BYOLST-AREA.
                    07  SPA-NAI-BYOLST-PTID     PIC 9(10).
                05  SPA-NAI-CHKLST-AREA.
+                   07  SPA-NAI-CHKLST-ANOTHER  PIC 9(01).
                    07  SPA-NAI-CHKLST-NOCHK    PIC X(01).
                    07  SPA-NAI-CHKLST-CHKKBN   PIC X(01).
                    07  SPA-NAI-CHKLST-CHKNUM   PIC X(02).

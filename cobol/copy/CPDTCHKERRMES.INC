@@ -452,6 +452,12 @@
            05 PIC  X(30)   VALUE   "日）                          ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "110003".
+           05 PIC  X(30)   VALUE   "診療行為が併用算定誤りです（同".
+           05 PIC  X(30)   VALUE   "会計）                        ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
       *
       *    ** 12xxxx 実日数
       *                            +---------+---------+---------+.
@@ -797,10 +803,10 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  122.
+           05 ERRMES-OCC   OCCURS  123.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   122.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   123.
 
 
 

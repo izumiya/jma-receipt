@@ -44,8 +44,12 @@
            03  DCACCT-DAY              PIC 9(02).
            03  DCACCT-DAYCNT           PIC 9(03).
            03  DCACCT-DAYCNT2-G.
-               05  DCACCT-DAYCNT2      PIC 9(03)
-                                       OCCURS 9.
+               05  DCACCT-DAYCNT2-OCC  OCCURS 9.
+                   07  DCACCT-DAYCNT2  PIC 9(03).
+                   07  DCACCT-DAYCNT2-DENPNUM
+                                       PIC 9(07).
+                   07  DCACCT-DAYCNT2-IDX
+                                       PIC 9(03).
            03  DCACCT-NYUGAIKBN        PIC X(01).
            03  DCACCT-ZAIKBN           PIC 9(03).
            03  DCACCT-STATUS-G.

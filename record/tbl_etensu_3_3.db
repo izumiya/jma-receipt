@@ -71,3 +71,16 @@ path	upd1	{
 		;
 	};
 };
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_etensu_3_3_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_etensu_3_3
+		WHERE   SRYCD1   =   :SRYCD1
+ 		AND   YUKOSTYMD  <=  :YUKOSTYMD
+		AND   YUKOEDYMD  >=  :YUKOEDYMD
+		;
+	};
+};
+

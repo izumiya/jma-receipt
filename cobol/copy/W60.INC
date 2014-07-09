@@ -86,6 +86,16 @@
                 04  W60-SRYHEIWRNKBN        PIC X(32).
                 04  W60-SRYHEIWRNKBN-COUNT  PIC S9(9)   BINARY.
                 04  W60-SRYHEIWRNKBN-ITEM   PIC X(32)   OCCURS  5.
+              03  W60-CMB-SRYHEIMSTKBN.
+                04  W60-SRYHEIMSTKBN        PIC X(32).
+                04  W60-SRYHEIMSTKBN-COUNT  PIC S9(9)   BINARY.
+                04  W60-SRYHEIMSTKBN-ITEM   PIC X(32)   OCCURS  5.
+              03  W60-CMB-SRYHEIEXPKBN.
+                04  W60-SRYHEIEXPKBN       PIC X(40).
+                04  W60-SRYHEIEXPKBN-STATE PIC S9(9)   BINARY.
+                04  W60-SRYHEIEXPKBN-COUNT PIC S9(9)   BINARY.
+                04  W60-SRYHEIEXPKBN-ITEM  PIC X(40)   OCCURS  5.
+                04  W60-SRYHEIEXPKBN-ITEM-STATE PIC S9(9)   BINARY.
               03  W60-CMB-SRYKAISUMSTKBN.
                 04  W60-SRYKAISUMSTKBN        PIC X(22).
                 04  W60-SRYKAISUMSTKBN-COUNT  PIC S9(9)   BINARY.

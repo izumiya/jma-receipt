@@ -157,6 +157,12 @@
                05  TSRYCD-DAY-HKNFLG-G.
                    07  TSRYCD-DAY-HKNFLG               PIC 9(01)
                                                        OCCURS  31.
+               05  TSRYCD-DENPNUM-G.
+                   07  TSRYCD-DENPNUM-OCC              OCCURS 100.
+                       09  TSRYCD-DENPNUM              PIC 9(07).
+                       09  TSRYCD-DENPNUM-HKNFLG       PIC 9(01).
+                       09  TSRYCD-DENPNUM-KAISU        PIC 9(09).
+                       09  TSRYCD-DENPNUM-DAY          PIC 9(02).
       *
       *    実日数退避ワーク（実日数チェック用）
          02  TJNISSU-AREA.

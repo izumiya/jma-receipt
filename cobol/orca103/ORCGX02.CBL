@@ -525,7 +525,7 @@
       *
                MOVE    SPA-GMN-TTEKCD (IDX-LINE)
                                        TO  WRK-SRYCD
-               PERFORM 900-CHKMST-KEY-SEL-SEC
+               PERFORM 900-CHKMST-KEY21-SEL-SEC
                IF    ( FLG-CHKMST      =   ZERO )
                    MOVE    CHK-CHKERR  TO  SPA-GMN-TCHKERR2
                                                   (IDX-LINE)
@@ -838,13 +838,13 @@
                    MOVE    SPACE               TO  SPA-GMN-TTEKCD (IDZ)
                END-IF
       *
-               IF    ( SPA-GMN-TCHKERR (IDZ)   =   8 )
-                   IF    ( SPA-GMN-TDATAKBN (IDZ)  =   "1" )
-                       CONTINUE
-                   ELSE
-                       MOVE    SPACE           TO  SPA-GMN-TTEKCD (IDZ)
-                   END-IF
-               END-IF
+      *        IF    ( SPA-GMN-TCHKERR (IDZ)   =   8 )
+      *            IF    ( SPA-GMN-TDATAKBN (IDZ)  =   "1" )
+      *                CONTINUE
+      *            ELSE
+      *                MOVE    SPACE           TO  SPA-GMN-TTEKCD (IDZ)
+      *            END-IF
+      *        END-IF
       *
       *        全角入力の時、１０文字まで
                INITIALIZE                  ORCSKANACHKAREA
@@ -1091,7 +1091,7 @@
       *
            IF    ( SPA-ERRCD           =   SPACE )
       *
-               PERFORM 900-CHKMST-KEY-SEL-SEC
+               PERFORM 900-CHKMST-KEY21-SEL-SEC
                IF    ( FLG-CHKMST      =   ZERO )
                    MOVE    CHK-CHKERR  TO  SPA-GMN-TCHKERR2 (IDX-LINE)
                ELSE
@@ -2201,7 +2201,7 @@
       *****************************************************************
       *    チェックマスタ検索処理
       *****************************************************************
-       900-CHKMST-KEY-SEL-SEC          SECTION.
+       900-CHKMST-KEY21-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKMST
       *
@@ -2211,11 +2211,11 @@
            MOVE    WRK-SRYCD           TO  CHK-SRYCD
       *
            IF    ( SPA-X01-SEL-STYUKYMD    =    SPACE )
-               MOVE    SPA-X01-STYUKYMD        TO  CHK-YUKOSTYMD
-                                                   CHK-YUKOEDYMD
+               MOVE    SPA-X01-STYUKYMD        TO  CHK-YUKOEDYMD
+               MOVE    SPA-X01-EDYUKYMD        TO  CHK-YUKOSTYMD
            ELSE
-               MOVE    SPA-X01-SEL-STYUKYMD    TO  CHK-YUKOSTYMD
-                                                   CHK-YUKOEDYMD
+               MOVE    SPA-X01-SEL-STYUKYMD    TO  CHK-YUKOEDYMD
+               MOVE    SPA-X01-SEL-EDYUKYMD    TO  CHK-YUKOSTYMD
            END-IF
            MOVE    "2"                 TO  CHK-CDKBN
            MOVE    SPA-X01-SRYCD       TO  CHK-CD
@@ -2223,7 +2223,7 @@
            MOVE    SPA-HOSPNUM         TO  CHK-HOSPNUM
            MOVE    CHK-REC             TO  MCPDATA-REC
            MOVE    "tbl_chk"           TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key21"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  CHK-REC
@@ -2233,11 +2233,11 @@
            END-IF
       *
            MOVE    "tbl_chk"           TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key21"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-CHKMST-KEY-SEL-EXT.
+       900-CHKMST-KEY21-SEL-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ検索処理 (KEY2)
