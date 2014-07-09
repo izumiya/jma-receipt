@@ -1497,10 +1497,11 @@
                PERFORM 10052-KASAN-CHK05-SEC
            END-IF
       *
-      *    通則加算は通則加算対象外とする（告示２で判定）
+      *    通則加算は通則加算対象外とする（告示１で判定）
            IF      (SPA-ERRCD                  =   SPACE )  AND
                    (WRK-COM-TENSIKIBETU (IDX-Z)    =   3    )  AND
-                   (WRK-COM-KOKUJISKBKBN2(IDX-Z)   =   "9"  )  AND
+      *********    (WRK-COM-KOKUJISKBKBN2(IDX-Z)   =   "9"  )  AND
+                   (WRK-COM-KOKUJISKBKBN1(IDX-Z)   =   "9"  )  AND
                    (WRK-COM-TUSOKUGAIKBN (IDX-Z)   =   "0" )
                MOVE    "1"                 TO  WRK-COM-TUSOKUGAIKBN
                                                                (IDX-Z)
