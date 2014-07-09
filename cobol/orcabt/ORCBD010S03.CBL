@@ -486,7 +486,7 @@
                =   SYURRK-CHOSEI2
       *
            COMPUTE TSRRK-GENMEN
-               =   SYURRK-DISCOUNT-MONEY
+               =   SYURRK-DISCOUNT-MONEY * -1
       *
            COMPUTE WRK-SAGAKU
                =   TSRRK-SEIKYU
