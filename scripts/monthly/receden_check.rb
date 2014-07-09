@@ -37,7 +37,7 @@ class KsnSort
     @khn_exists = false
     @tsusoku_exists = false
     @chuksncd = 0
-    @chuksntsuban = 0
+    @chuksntsuban = ''
   end
 
   def clear
@@ -1031,12 +1031,12 @@ class Receden_check < Receden_common
                           @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                         when tbl_tensu["CHUKSNCD"].to_i != ksnsort.chuksncd
                           @errors.push("46411",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
-                        when tbl_tensu["CHUKSNTSUBAN"].to_i == ksnsort.chuksntsuban
+                        when tbl_tensu["CHUKSNTSUBAN"].strip == ksnsort.chuksntsuban
                           @errors.push("46120",rece,zai,"CHUKSNTSUBAN",nil,tbl_tensu["NAME"])
-                        when tbl_tensu["CHUKSNTSUBAN"].to_i < ksnsort.chuksntsuban
+                        when tbl_tensu["CHUKSNTSUBAN"].strip < ksnsort.chuksntsuban
                           @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                         else
-                          ksnsort.chuksntsuban = tbl_tensu["CHUKSNTSUBAN"].to_i
+                          ksnsort.chuksntsuban = tbl_tensu["CHUKSNTSUBAN"].strip
                         end
                       end
                     end

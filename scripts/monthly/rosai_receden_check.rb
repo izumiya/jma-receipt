@@ -31,7 +31,7 @@ class KsnSort
     @khn_exists = false
     @tsusoku_exists = false
     @chuksncd = 0
-    @chuksntsuban = 0
+    @chuksntsuban = ''
   end
 
   def clear
@@ -852,12 +852,12 @@ class Receden_check < Receden_common
                         @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                       when tbl_tensu["CHUKSNCD"].to_i != ksnsort.chuksncd
                         @errors.push("46411",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
-                      when tbl_tensu["CHUKSNTSUBAN"].to_i == ksnsort.chuksntsuban
+                      when tbl_tensu["CHUKSNTSUBAN"].strip == ksnsort.chuksntsuban
                         @errors.push("46120",rece,zai,"CHUKSNTSUBAN",nil,tbl_tensu["NAME"])
-                      when tbl_tensu["CHUKSNTSUBAN"].to_i < ksnsort.chuksntsuban
+                      when tbl_tensu["CHUKSNTSUBAN"].strip < ksnsort.chuksntsuban
                         @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                       else
-                        ksnsort.chuksntsuban = tbl_tensu["CHUKSNTSUBAN"].to_i
+                        ksnsort.chuksntsuban = tbl_tensu["CHUKSNTSUBAN"].strip
                       end
                     end
                   end
@@ -1311,6 +1311,20 @@ class Receden_check < Receden_common
       #    REレコードは配列としているが、レセプト毎に通常は１件
       re=rece.re.first
 
+      if re["RECENUM"].num != nil
+        if re["RECENUM"].value.bytesize > 6
+          @errors.push("19100",rece,re,"RECENUM")
+        else
+          if  re["RECENUM"].value.to_i != receNum
+            @errors.push("19170",rece,re,"RECENUM")
+          end
+          receNum = re["RECENUM"].value.to_i + 1
+        end
+      else
+        @errors.push("19100",rece,re,"RECENUM")
+        receNum += 1
+      end
+
       if wtos(rece.sryym) == ""
         @errors.push("21611",rece,re,"SKYINF")
         next
@@ -1339,21 +1353,6 @@ class Receden_check < Receden_common
       check_rr(r,rece)
       check_sy_tekiyo(r,rece)
       check_sj(r,rece)
-
-      if re["RECENUM"].num != nil
-        if re["RECENUM"].value.bytesize > 6
-          @errors.push("19100",rece,re,"RECENUM")
-        else
-          if  re["RECENUM"].value.to_i != receNum
-            @errors.push("19170",rece,re,"RECENUM")
-          end
-          receNum = re["RECENUM"].value.to_i + 1
-        end
-      else
-        @errors.push("19100",rece,re,"RECENUM")
-        receNum += 1
-      end
-
 
     }
   end
