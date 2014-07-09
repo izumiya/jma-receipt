@@ -198,6 +198,8 @@
       *                                     ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤ÎÉÂÌ¾µ­ºÜÂÐ±þ¡Ë
       *  04.07.14    NACL-Æ£¸¶    14/04/22  £Å£Æ¥Õ¥¡¥¤¥ëºîÀ®ÂÐ±þ
       *  04.07.15    NACL-ÌçÏÆ    14/06/05  Âè»°¼Ô¹Ô°Ù¤Î¥³¥á¥ó¥Èµ­ºÜ½¤Àµ
+      *  04.07.16    NACL-ÌçÏÆ    14/07/10  ¡Ê´¶À÷¾É¡ÜÀ¸ÊÝ¡ÜÀ¸ÊÝ¡Ë¥ì¥»¥×¥È
+      *                                     ¤ÎÅÀ¿ôÍóµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2617,13 +2619,16 @@
            END-PERFORM
       *
            MOVE     ZERO       TO    FLG-JIRITU-HENSYU
-           IF (( RECE62-HKNNUM     =   SPACE                 ) AND
-               ( RECE62-KOHNUM (1) =   "021"                 ) AND
-               ( RECE62-KOHNUM (2) =   "012"                 ))
-           OR (( RECE62-HKNNUM     =   SPACE                 ) AND
-               ( RECE62-KOHNUM (1) =   "015" OR "016"        ) AND
-               ( RECE62-KOHNUM (2) =   "012"                 ))
+           IF ((RECE62-HKNNUM     =  SPACE                  ) AND
+               (RECE62-KOHNUM(1)  =  "021" OR "015" OR "016") AND
+               (RECE62-KOHNUM(2)  =  "012"                  ))
                     MOVE       1       TO    FLG-JIRITU-HENSYU
+           END-IF
+           IF ((RECE62-HKNNUM     =  SPACE                  ) AND
+               (RECE62-KOHNUM(1)  =  "010"                  ) AND
+               (RECE62-KOHNUM(2)  =  "012"                  ) AND
+               (RECE62-KOHNUM(3)  =  "012"                  ))
+                    MOVE       2       TO    FLG-JIRITU-HENSYU
            END-IF
       *
       *    ¸©Ã±ÍÑ¹àÌÜ¥Õ¥¡¥¤¥ëÆÉ¹þ½èÍý
@@ -5755,6 +5760,10 @@
                MOVE    2                  TO  IDX2
            END-IF      
       *
+           IF    FLG-JIRITU-HENSYU   =  2
+               MOVE    3                  TO  IDX3
+           END-IF
+      *
       *    £±£±½é¿Ç¡Á£¸£°Â¾         
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   22
@@ -5762,10 +5771,17 @@
                MOVE    RECE62-KAISU(IDX)         TO  WRK-KAISUZ
                MOVE    WRK-KAISU                 TO  HC06-KAISU   (IDX)
       *        <ÅÀ¿ô¡¦¸øÈñÅÀ¿ô>
-               IF    FLG-JIRITU-HENSYU  =  1
-                  COMPUTE WRK-SUM-TENSU   =     RECE62-TENSU(IDX IDX1)
-                                          +     RECE62-TENSU(IDX IDX2)
-                  MOVE    WRK-SUM-TENSU          TO  WRK-TENSUZ
+               IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                 EVALUATE  FLG-JIRITU-HENSYU
+                   WHEN      1
+                     COMPUTE WRK-SUM-TENSU = RECE62-TENSU(IDX IDX1)
+                                           + RECE62-TENSU(IDX IDX2)
+                     MOVE    WRK-SUM-TENSU       TO  WRK-TENSUZ
+                   WHEN      2
+                     COMPUTE WRK-SUM-TENSU = RECE62-TENSU(IDX IDX1)
+                                           + RECE62-TENSU(IDX IDX3)
+                     MOVE    WRK-SUM-TENSU       TO  WRK-TENSUZ
+                 END-EVALUATE
                ELSE
                   MOVE    RECE62-TENSU(IDX IDX1) TO  WRK-TENSUZ
                END-IF
@@ -5806,10 +5822,17 @@
                                              TO  WRK-KAISUZ
                MOVE    WRK-KAISU             TO  HC06-NYUKAISU  (IDX)
       *        <¶â³Û¡¦¸øÈñ¶â³Û>
-               IF    FLG-JIRITU-HENSYU  =  1
-                   COMPUTE WRK-SUM-TENSU =  RECE62-NYUKHNKEI(IDX IDX1)
-                                         +  RECE62-NYUKHNKEI(IDX IDX2)
-                   MOVE    WRK-SUM-TENSU     TO  WRK-TENSUZ
+               IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                 EVALUATE  FLG-JIRITU-HENSYU
+                   WHEN      1
+                     COMPUTE WRK-SUM-TENSU = RECE62-NYUKHNKEI(IDX IDX1)
+                                           + RECE62-NYUKHNKEI(IDX IDX2)
+                     MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                   WHEN      2
+                     COMPUTE WRK-SUM-TENSU = RECE62-NYUKHNKEI(IDX IDX1)
+                                           + RECE62-NYUKHNKEI(IDX IDX3)
+                     MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                 END-EVALUATE
                ELSE
                    MOVE    RECE62-NYUKHNKEI(IDX IDX1)
                                              TO  WRK-TENSUZ
@@ -5848,10 +5871,19 @@
                    ADD     RECE62-NYUKHNNISSU(IDX)
                                                  TO  SUM-NYUKHNNISSU
       *            <¶â³Û¡¦¸øÈñ¶â³Û>
-                   IF    FLG-JIRITU-HENSYU  =  1
-                     COMPUTE WRK-SUM-TENSU = RECE62-NYUKHNKEI(IDX IDX1)
-                                           + RECE62-NYUKHNKEI(IDX IDX2)
-                     ADD     WRK-SUM-TENSU       TO  SUM-NYUKHNKEI (1)
+                   IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                     EVALUATE  FLG-JIRITU-HENSYU
+                       WHEN      1
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUKHNKEI(IDX IDX1) +
+                                 RECE62-NYUKHNKEI(IDX IDX2)
+                         ADD   WRK-SUM-TENSU     TO  SUM-NYUKHNKEI (1)
+                       WHEN      2
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUKHNKEI(IDX IDX1) +
+                                 RECE62-NYUKHNKEI(IDX IDX3)
+                         ADD   WRK-SUM-TENSU     TO  SUM-NYUKHNKEI (1)
+                     END-EVALUATE
                    ELSE
                      ADD     RECE62-NYUKHNKEI(IDX IDX1)
                                                  TO  SUM-NYUKHNKEI (1)
@@ -5889,11 +5921,19 @@
                END-IF
            END-IF
       *        <Æþ±¡´ðËÜÎÁ¡¦²Ã»»>
-           IF    FLG-JIRITU-HENSYU  =  1
-             COMPUTE WRK-SUM-TENSU =  RECE62-NYUKHNKEI2 (IDX1)
-                                   +  RECE62-NYUKHNKEI2 (IDX2)
-             MOVE    WRK-SUM-TENSU            TO  WRK-TENSUZ
-             MOVE    WRK-TENSU                TO  HC06-NYUTENSU  (5)
+           IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+             EVALUATE  FLG-JIRITU-HENSYU
+               WHEN      1
+                 COMPUTE WRK-SUM-TENSU =  RECE62-NYUKHNKEI2 (IDX1)
+                                       +  RECE62-NYUKHNKEI2 (IDX2)
+                 MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                 MOVE    WRK-TENSU       TO  HC06-NYUTENSU  (5)
+               WHEN      2
+                 COMPUTE WRK-SUM-TENSU =  RECE62-NYUKHNKEI2 (IDX1)
+                                       +  RECE62-NYUKHNKEI2 (IDX3)
+                 MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                 MOVE    WRK-TENSU       TO  HC06-NYUTENSU  (5)
+             END-EVALUATE
              IF      WRK-SUM-TENSU              <   ZERO
                PERFORM VARYING IDZ FROM    6   BY  -1
                        UNTIL   IDZ <       1
@@ -5982,10 +6022,19 @@
                                              TO  WRK-KAISUZ
                    MOVE    WRK-KAISU         TO  HC06-NYUKAISU  (IDY)
       *            <¶â³Û¡¦¸øÈñ¶â³Û>
-                   IF    FLG-JIRITU-HENSYU  =  1
-                     COMPUTE WRK-SUM-TENSU =  RECE62-NYUTOKKEI(IDX IDX1)
-                                           +  RECE62-NYUTOKKEI(IDX IDX2)
-                     MOVE  WRK-SUM-TENSU              TO  WRK-TENSUZ
+                   IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                     EVALUATE  FLG-JIRITU-HENSYU
+                       WHEN      1
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUTOKKEI(IDX IDX1) +
+                                 RECE62-NYUTOKKEI(IDX IDX2)
+                         MOVE  WRK-SUM-TENSU          TO  WRK-TENSUZ
+                       WHEN      2
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUTOKKEI(IDX IDX1) +
+                                 RECE62-NYUTOKKEI(IDX IDX3)
+                         MOVE  WRK-SUM-TENSU          TO  WRK-TENSUZ
+                     END-EVALUATE
                    ELSE
                      MOVE  RECE62-NYUTOKKEI(IDX IDX1) TO  WRK-TENSUZ
                    END-IF
@@ -6025,10 +6074,19 @@
                    ADD     RECE62-NYUTOKNISSU(IDX)
                                                  TO  SUM-NYUKHNNISSU
       *            <¶â³Û¡¦¸øÈñ¶â³Û>
-                   IF    FLG-JIRITU-HENSYU  =  1
-                     COMPUTE WRK-SUM-TENSU = RECE62-NYUTOKKEI(IDX IDX1)
-                                           + RECE62-NYUTOKKEI(IDX IDX2)
-                     ADD     WRK-SUM-TENSU       TO  SUM-NYUKHNKEI (1)
+                   IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                     EVALUATE  FLG-JIRITU-HENSYU
+                       WHEN      1
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUTOKKEI(IDX IDX1) +
+                                 RECE62-NYUTOKKEI(IDX IDX2)
+                         ADD  WRK-SUM-TENSU      TO  SUM-NYUKHNKEI (1)
+                       WHEN      2
+                         COMPUTE WRK-SUM-TENSU              =
+                                 RECE62-NYUTOKKEI(IDX IDX1) +
+                                 RECE62-NYUTOKKEI(IDX IDX3)
+                         ADD  WRK-SUM-TENSU      TO  SUM-NYUKHNKEI (1)
+                     END-EVALUATE
                    ELSE
                      ADD     RECE62-NYUTOKKEI(IDX IDX1)
                                                  TO  SUM-NYUKHNKEI (1)
@@ -6068,11 +6126,19 @@
                END-IF
            END-IF
       *        <ÆÃÄêÆþ±¡ÎÁ¡¦¤½¤ÎÂ¾>
-           IF    FLG-JIRITU-HENSYU  =  1
-             COMPUTE WRK-SUM-TENSU =  RECE62-NYUTOKKEI2 (IDX1)
-                                   +  RECE62-NYUTOKKEI2 (IDX2)
-             MOVE    WRK-SUM-TENSU            TO  WRK-TENSUZ
-             MOVE    WRK-TENSU                TO  HC06-NYUTENSU  (10)
+           IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+             EVALUATE  FLG-JIRITU-HENSYU
+               WHEN      1
+                 COMPUTE WRK-SUM-TENSU =  RECE62-NYUTOKKEI2 (IDX1)
+                                       +  RECE62-NYUTOKKEI2 (IDX2)
+                 MOVE    WRK-SUM-TENSU    TO  WRK-TENSUZ
+                 MOVE    WRK-TENSU        TO  HC06-NYUTENSU (10)
+               WHEN      2
+                 COMPUTE WRK-SUM-TENSU =  RECE62-NYUTOKKEI2 (IDX1)
+                                       +  RECE62-NYUTOKKEI2 (IDX3)
+                 MOVE    WRK-SUM-TENSU    TO  WRK-TENSUZ
+                 MOVE    WRK-TENSU        TO  HC06-NYUTENSU (10)
+             END-EVALUATE
              IF      WRK-SUM-TENSU            <   ZERO
                PERFORM VARYING IDZ FROM    6   BY  -1
                        UNTIL   IDZ <       1

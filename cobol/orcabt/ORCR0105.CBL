@@ -196,6 +196,8 @@
       *  04.07.16    NACL-藤原    14/06/02  医保分で受診日指定時、医保＋
       *                                     第三者行為も対象とする
       *  04.07.17    NACL-藤原    14/06/06  未請求解除時の削除処理追加
+      *  04.07.18    NACL-門脇    14/07/10  （感染症＋生保＋生保）レセプト
+      *                                     の点数欄記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -393,6 +395,7 @@
            03  FLG-RECECOM-SJKBN   PIC 9(01).
            03  FLG-STS             PIC 9(04).
            03  FLG-MEISYO-HENSYU   PIC 9(01).
+           03  FLG-JIRITU-HENSYU   PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -2549,6 +2552,19 @@
                    MOVE     IDX         TO  SESNIDX
                END-IF
            END-PERFORM
+      *
+           MOVE     ZERO       TO    FLG-JIRITU-HENSYU
+           IF ((RECE02-HKNNUM     =  SPACE                  ) AND
+               (RECE02-KOHNUM(1)  =  "021" OR "015" OR "016") AND
+               (RECE02-KOHNUM(2)  =  "012"                  ))
+                    MOVE       1       TO    FLG-JIRITU-HENSYU
+           END-IF
+           IF ((RECE02-HKNNUM     =  SPACE                  ) AND
+               (RECE02-KOHNUM(1)  =  "010"                  ) AND
+               (RECE02-KOHNUM(2)  =  "012"                  ) AND
+               (RECE02-KOHNUM(3)  =  "012"                  ))
+                    MOVE       2       TO    FLG-JIRITU-HENSYU
+           END-IF
       *
       *    県単用項目ファイル読込処理
            PERFORM 301-RECE11-HENSYU-SEC
@@ -5122,6 +5138,10 @@
                MOVE    1                  TO  IDX1
                MOVE    2                  TO  IDX2
            END-IF      
+      *
+           IF    FLG-JIRITU-HENSYU   =  2
+               MOVE    3                  TO  IDX3
+           END-IF
       *            
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   WRK-TEKIYOU-LINE
@@ -5155,15 +5175,17 @@
                MOVE    WRK-KAISU                 TO  HC06-KAISU   (IDX)
       *        <点数・公費点数>
       *        自立支援医療と生活保護の併用の時、点数欄に総医療費分を記載
-               IF (( RECE02-HKNNUM     =   SPACE                 ) AND
-                   ( RECE02-KOHNUM (1) =   "021"                 ) AND
-                   ( RECE02-KOHNUM (2) =   "012"                 ))
-               OR (( RECE02-HKNNUM     =   SPACE                 ) AND
-                   ( RECE02-KOHNUM (1) =   "015" OR "016"        ) AND
-                   ( RECE02-KOHNUM (2) =   "012"                 ))
-                   COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX1)
-                                           +     RECE02-TENSU(IDX IDX2)
-                   MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+               IF    FLG-JIRITU-HENSYU  NOT =  ZERO
+                   EVALUATE  FLG-JIRITU-HENSYU
+                     WHEN      1
+                       COMPUTE WRK-SUM-TENSU = RECE02-TENSU(IDX IDX1)
+                                             + RECE02-TENSU(IDX IDX2)
+                       MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                     WHEN      2
+                       COMPUTE WRK-SUM-TENSU = RECE02-TENSU(IDX IDX1)
+                                             + RECE02-TENSU(IDX IDX3)
+                       MOVE    WRK-SUM-TENSU   TO  WRK-TENSUZ
+                   END-EVALUATE
                ELSE
                    MOVE    RECE02-TENSU(IDX IDX1)
                                            TO  WRK-TENSUZ
