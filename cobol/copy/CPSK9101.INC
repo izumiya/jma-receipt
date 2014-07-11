@@ -41,8 +41,10 @@
                05  SYS-9101-COOPBASE    PIC X(01).
       *連携基盤用データファイルデイレクトリ
                05  SYS-9101-FILE-DIR    PIC X(200).
+      *傷病名レコード記録
+               05  SYS-9101-SYREC       PIC X(01).
       *予備
-               05  SYS-9101-YOBI        PIC X(299).
+               05  SYS-9101-YOBI        PIC X(298).
       *端末ＩＤ
            03  SYS-9101-TERMID          PIC  X(16).
       *オペーレータＩＤ

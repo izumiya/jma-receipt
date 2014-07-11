@@ -76,6 +76,7 @@
                05  SPA-GMN-COOPBASE-MAX        PIC 9(02).
       *
                05  SPA-GMN-FILE-DIR            PIC X(200).
+               05  SPA-GMN-CHKSYREC            PIC X(01).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -269,12 +270,18 @@
                MOVE    SYS-9101-COOPBASE   TO  SPA-GMN-COOPBASE
       *        連携基盤用データファイルデイレクトリ
                MOVE    SYS-9101-FILE-DIR   TO  SPA-GMN-FILE-DIR
+      *        傷病名レコード記録
+               MOVE    SYS-9101-SYREC      TO  SPA-GMN-CHKSYREC
            END-IF
       *    連携基盤用データ作成初期
            IF      SPA-GMN-COOPBASE    =   SPACE
                MOVE    "0"             TO  SPA-GMN-COOPBASE
            END-IF
            PERFORM 4102-COOPBASE-CHK-SEC
+      *    傷病名レコード記録初期
+           IF      SPA-GMN-CHKSYREC    =   SPACE
+               MOVE    "F"             TO  SPA-GMN-CHKSYREC
+           END-IF
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    1                   TO  SPA-GMN-CUR
@@ -330,6 +337,13 @@
       *    登録
            WHEN    "CLICKED"       ALSO    "B12"
                PERFORM 480-TOUROKU-SEC
+      *    傷病名レコード記録
+           WHEN    "CLICKED"       ALSO    "CHKSYREC"
+               IF      SPA-GMN-CHKSYREC    =   "T"
+                   MOVE    "F"                 TO  SPA-GMN-CHKSYREC
+               ELSE
+                   MOVE    "T"                 TO  SPA-GMN-CHKSYREC
+               END-IF
            END-EVALUATE
            .
       *
@@ -385,6 +399,7 @@
       *
            MOVE    W91-COOPBASE        TO  SPA-GMN-COOPBASE-G
            MOVE    W91-FILEDIR         TO  SPA-GMN-FILE-DIR
+           MOVE    W91-CHKSYREC        TO  SPA-GMN-CHKSYREC
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -626,6 +641,8 @@
            MOVE    SPA-GMN-COOPBASE        TO  SYS-9101-COOPBASE
       *    連携基盤用データファイルデイレクトリ
            MOVE    SPA-GMN-FILE-DIR        TO  SYS-9101-FILE-DIR
+      *    傷病名レコード記録
+           MOVE    SPA-GMN-CHKSYREC        TO  SYS-9101-SYREC
       *
            MOVE    SYS-9101-REC            TO  SYSKANRI-REC
       *    ＤＢ更新処理
@@ -754,6 +771,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-COOPBASE-MAX    TO  W91-COOPBASE-COUNT
       *
            MOVE    SPA-GMN-FILE-DIR    TO  W91-FILEDIR
+           MOVE    SPA-GMN-CHKSYREC    TO  W91-CHKSYREC
       *
            PERFORM 5001-MAPCUR-SEC
       *

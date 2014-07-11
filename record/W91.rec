@@ -15,5 +15,8 @@ W91	{
 			count	int;
 			item	varchar(20)[10];
 		};
+		CHKSYREC	{
+			value	bool;
+		};
 	};
 };

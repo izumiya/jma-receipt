@@ -13,3 +13,5 @@
                 05  W91-COOPBASE-COUNT   PIC S9(9)   BINARY.
                 05  W91-COOPBASE-ITEM
                         PIC X(20)   OCCURS  10 TIMES.
+              04  W91-CHKSYREC.
+                06  W91-CHKSYREC-VALUE   PIC X.
