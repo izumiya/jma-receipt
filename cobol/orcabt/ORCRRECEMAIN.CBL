@@ -65,6 +65,7 @@
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.04    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
+      *  04.07.05    NACL-藤原    14/07/11  医療情報連携基盤、ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -731,19 +732,6 @@
            MOVE     SPACE       TO WRK-ARG
            STRING   WRK-PARA0      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
-                    WRK-PARA-HOSPNUM
-                                   DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
-                    RECEERR        DELIMITED   BY  SPACE
-                                   INTO    WRK-ARG
-           END-STRING
-           DISPLAY "ORCR0600 start = [" WRK-ARG "]"
-           CALL    "ORCR0600"          USING
-                                       WRK-ARG
-      *
-           MOVE     SPACE       TO WRK-ARG
-           STRING   WRK-PARA0      DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -753,6 +741,9 @@
                     RECEERR        DELIMITED   BY  SPACE
                                    INTO    WRK-ARG
            END-STRING
+           DISPLAY "ORCR0600 start = [" WRK-ARG "]"
+           CALL    "ORCR0600"          USING
+                                       WRK-ARG
            DISPLAY "ORCR0610 start = [" WRK-ARG "]"
            CALL    "ORCR0610"          USING
                                        WRK-ARG
@@ -2682,6 +2673,9 @@
            MOVE     SPACE       TO WRK-ARG
            STRING   WRK-PARA0      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -2692,6 +2686,16 @@
            CALL    "ORCR0600"          USING
                                        WRK-ARG
       *
+      *
+           MOVE     SPACE       TO WRK-ARG
+           STRING   WRK-PARA0      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-HOSPNUM
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    RECEERR        DELIMITED   BY  SPACE
+                                   INTO    WRK-ARG
+           END-STRING
            CALL    "ORCR1200"          USING
                                        WRK-ARG
       *

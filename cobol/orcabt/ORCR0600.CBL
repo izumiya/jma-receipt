@@ -74,6 +74,7 @@
       *  04.06.01    NACL-門脇    13/03/27  エラー時終了処理対応
       *  04.07.01    NACL-門脇    12/08/28  薬剤料減点対応
       *  04.07.02    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.03    NACL-藤原    14/07/11  医療情報連携基盤、ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -158,6 +159,7 @@
            03  WRK-PARA-SHELLID                        PIC X(08).
            03  WRK-PARA-PTID                           PIC X(10).
            03  WRK-PARA-SRYYM-O                        PIC X(06).
+           03  WRK-PARA-PRTKBN                         PIC X(01).
        01  WRK-PARA-HOSPNUM                            PIC 9(02).
       *
       *    エラーメッセージ編集領域
@@ -216,6 +218,7 @@
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
+           03  WRK-SRYACCT-PATHNAME    PIC X(64).
       *
            COPY    "MCPAREA".
            COPY    "COMMON-SPA".
@@ -350,10 +353,17 @@
       *
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+      *
+           DISPLAY "WRK-PARA-HOSPNUM=" WRK-PARA-HOSPNUM
+           DISPLAY "WRK-PARA-SYOKBN =" WRK-PARA-SYOKBN
+           DISPLAY "WRK-PARA-SRYYM  =" WRK-PARA-SRYYM
+           DISPLAY "WRK-PARA-PRTKBN =" WRK-PARA-PRTKBN
+      *
       *
            MOVE    WRK-PARA-SRYYM      TO  SYS-2001-SRYYM
            MOVE    WRK-PARA-SYOKBN     TO  SYS-2001-SYOKBN 
@@ -614,11 +624,18 @@
                MOVE    "1"                 TO  ACCT-NYUGAIKBN
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key36"             TO  MCP-PATHNAME
+               IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
+                   MOVE    "key60"             TO  WRK-SRYACCT-PATHNAME
+               ELSE
+                   MOVE    "key36"             TO  WRK-SRYACCT-PATHNAME
+               END-IF
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM    900-DBSELECT-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key36"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                ELSE
                    INITIALIZE                  SRYACCT-REC
@@ -632,7 +649,8 @@
       *        カーソルクロース
                IF   FLG-ERR   =   ZERO
                  MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                 MOVE    "key36"             TO  MCP-PATHNAME
+                 MOVE    WRK-SRYACCT-PATHNAME
+                                             TO  MCP-PATHNAME
                  PERFORM 900-CLOSE-SEC
                END-IF
            END-IF
@@ -710,7 +728,8 @@
                                OR      FLG-ERR         =   1
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key36"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            ELSE
@@ -792,7 +811,8 @@
                                    OR      KEY-N-PTID  
                                                    NOT =   KEY-O-PTID
                                MOVE    "tbl_sryacct"   TO  MCP-TABLE
-                               MOVE    "key36"         TO  MCP-PATHNAME
+                               MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                                PERFORM 900-SRYACCT-READ-SEC
                            END-PERFORM
                          ELSE
@@ -802,7 +822,8 @@
                                        OR      FLG-ERR     =   1
                                        OR      KEY-NEW NOT =   KEY-OLD
                                MOVE    "tbl_sryacct"   TO  MCP-TABLE
-                               MOVE    "key36"         TO  MCP-PATHNAME
+                               MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                                PERFORM 900-SRYACCT-READ-SEC
                            END-PERFORM
                          END-IF    
@@ -1550,11 +1571,14 @@
            MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
+           MOVE    "key37"         TO  WRK-SRYACCT-PATHNAME
+           MOVE    WRK-SRYACCT-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM    900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-SRYACCT-READ-SEC
            ELSE
                INITIALIZE                  SRYACCT-REC
@@ -1567,7 +1591,8 @@
            END-PERFORM
       *    カーソルクロース
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key37"             TO  MCP-PATHNAME
+           MOVE    WRK-SRYACCT-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
       *    処理対象のとき仮収納作成
@@ -1682,11 +1707,18 @@
                MOVE    SYS-2002-NYUGAIKBN  TO  ACCT-NYUGAIKBN
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
+                   MOVE    "key61"         TO  WRK-SRYACCT-PATHNAME
+               ELSE
+                   MOVE    "key37"         TO  WRK-SRYACCT-PATHNAME
+               END-IF
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM    900-DBSELECT-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key37"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                ELSE
                    INITIALIZE                  SRYACCT-REC
@@ -1699,7 +1731,8 @@
                END-PERFORM
       *        カーソルクロース
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
       *
       *        処理対象のとき仮収納作成
@@ -1830,7 +1863,8 @@
                                OR      FLG-ERR         =   1  
                                OR      KEY-NEW     NOT =   KEY-OLD
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       MOVE    "key37"             TO  MCP-PATHNAME
+                       MOVE    WRK-SRYACCT-PATHNAME
+                                                   TO  MCP-PATHNAME
                        PERFORM 900-SRYACCT-READ-SEC
                    END-PERFORM
                  END-IF
@@ -2146,6 +2180,13 @@
       *    未請求フラグチェック処理（医保のみ）
       *****************************************************************
        800-MISEIKYU-CHECK-SEC          SECTION.
+      *
+      *    ＥＦファイル作成、連係基盤用のとき未請求設定分も作成する
+           IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
+               INITIALIZE                      SYUKA-REC
+               GO  TO  800-MISEIKYU-CHECK-EXT
+           END-IF
+      *
       *
            EVALUATE    WRK-PARA-RECEKBN
                WHEN    "0"
