@@ -164,6 +164,14 @@
            03  WRK-DDAY                PIC 9(02).
            03  WRK-RENNUM              PIC 9(01).
       *
+      *H26.7
+      *    前月からの入院日
+           03  WRK-NYUINYMD            PIC X(08).
+           03  WRK-CHK-SRYYMD.
+               05  WRK-CHK-SRYYM       PIC X(06).
+               05  WRK-CHK-DD          PIC 9(02).
+      *H26.7
+      *
       *    投薬日
        01  TBL-TOUYAKU-AREA.
            03  TBL-TOUYAKU-OCC1        OCCURS   3.
@@ -461,12 +469,32 @@
       *        薬評は対象外とする
                AND  (ACCT-ZAIKBN   NOT =   1      )
       *
+      *H26.7
+      *        前月分で入院日が診療年月以前の時
+               IF      (WRK-SRYYM      NOT =   ORCSCHO-SRYYM)
+                   AND (WRK-NYUINYMD   NOT =   SPACE)
+                   MOVE    ACCT-SRYYM       TO  WRK-CHK-SRYYM
+               ELSE
+                   MOVE    SPACE            TO  WRK-CHK-SRYYM
+               END-IF
+      *
       *        最初の日を保存（点数マスタ検索のため）
                MOVE    01                  TO  WRK-DD
                PERFORM VARYING     IDY2    FROM    1   BY  1
                        UNTIL       IDY2    >   31
                    IF      ACCT-DAY (1 IDY2)   >   ZERO
                        MOVE    IDY2                TO  WRK-DD
+      *
+      *H26.7           前月の入院日より前の算定はなし
+                       IF      WRK-CHK-SRYYM       NOT =   SPACE
+                           MOVE    IDY2            TO  WRK-CHK-DD
+                           IF     (WRK-NYUINYMD    >   WRK-CHK-SRYYMD)
+                               MOVE    ZERO        TO  ACCT-DAY (1 IDY2)
+                               MOVE    ZERO        TO  ACCT-DAY (2 IDY2)
+                               MOVE    ZERO        TO  ACCT-DAY (3 IDY2)
+                           END-IF
+                       END-IF
+      *!!
                    END-IF
                END-PERFORM
       *        診療行為より麻毒判定
@@ -989,6 +1017,10 @@
                END-IF
                IF      PTNYUINRRK-NYUINYMD(1:6)  <   ORCSCHO-SRYYM
                    MOVE    1                         TO  IDX-S
+      *H26.7
+      *            前月からの入院日
+                   MOVE    PTNYUINRRK-NYUINYMD   TO  WRK-NYUINYMD
+      *H26.7
                END-IF
       *        退院日
                IF     PTNYUINRRK-TAIINYMD(1:6)   =   ORCSCHO-SRYYM
