@@ -794,6 +794,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "COOPBASE"          TO  MCP-WIDGET
                WHEN    02
                    MOVE    "FILEDIR"           TO  MCP-WIDGET
+               WHEN    03
+                   MOVE    "CHKSYREC"          TO  MCP-WIDGET
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -811,6 +813,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "COOPBASE"
                    MOVE    2               TO  SPA-GMN-CUR
                WHEN    "FILEDIR"
+                   MOVE    3               TO  SPA-GMN-CUR
+               WHEN    "CHKSYREC"
                    MOVE    90              TO  SPA-GMN-CUR
            END-EVALUATE
       *
