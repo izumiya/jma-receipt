@@ -32,6 +32,8 @@
       *                                     出力しない
       *  00.00.00    NACL-伊藤    14. 6.12  R2,R3レコード編集
       *                                     HO,KOレコード編集
+      *  00.00.00    NACL-伊藤    14. 6.20  C1レコード編集
+      *  00.00.00    NACL-伊藤    14. 7. 8  SYレコード編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -52,7 +54,7 @@
       *
       *    レセプト電算ファイル
        FD  RECE30-FILE.
-       01  RECE30-R         PIC X(2500).
+       01  RECE30-R                PIC X(2500).
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -90,10 +92,12 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-ONRECE-B            PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
-           03  FLG-RENKEI-TMP             PIC 9(01).
+           03  FLG-RENKEI-TMP          PIC 9(01).
            03  FLG-PTPUBLIC            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
-      *
+           03  FLG-SRYACCT             PIC 9(01).
+           03  FLG-SRYACT              PIC 9(01).
+           03  FLG-PTCOM               PIC 9(01).
            03  FLG-DATA                PIC 9(01).
            03  FLG-ERR                 PIC 9(01).
       *
@@ -105,6 +109,8 @@
        01  INDEX-AREA.
            03  IDW                     PIC 9(05).
            03  IDX                     PIC 9(05).
+           03  IDX2                    PIC 9(05).
+           03  IDX3                    PIC 9(05).
            03  IDY                     PIC 9(05).
            03  IDZ                     PIC 9(05).
            03  IDY1                    PIC 9(05).
@@ -114,6 +120,7 @@
            03  IDXX                    PIC 9(05).
            03  IDYY                    PIC 9(05).
            03  IDZZ                    PIC 9(05).
+           03  IDF                     PIC 9(05).
       *
       *    一時領域
       *    パラメタエリア
@@ -142,7 +149,6 @@
            03  WRK-TAIYMD              PIC 9(07).
       *
            03  WRK-MOJISU              PIC 9(02).
-      *
       *    データ長
            03  WRK-DATA-LENGTH         PIC 9(07).
       *
@@ -164,6 +170,13 @@
                05  WRK-ST              PIC 9(02).
                05  WRK-SYOSUU          PIC 9(01).
                05  WRK-END             PIC 9(01).
+           03  WRK-FTNKBN              PIC X(01).
+           03  WRK-FTNKBN-TBL.
+               05  WRK-FTNKBN-TBL-OCC  OCCURS  5.
+                   07  WRK-FTNKBN-VAL  PIC X(01).
+               05  WRK-FTNKBN-TBL-MAX  PIC 9(01).
+           03  WRK-SV-PTID             PIC 9(10).
+           03  WRK-SV-HKNCOMBI         PIC 9(04).
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
            03  WRK-NYUTAIYMD.
@@ -245,6 +258,18 @@
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
       *
+      *    診療会計
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
+      *
+      *    診療行為
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
+      *
+      *    患者コメント
+       01  PTCOM-REC.
+           COPY    "CPPTCOM.INC".
+      *
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
@@ -265,6 +290,9 @@
       *
       *    CSV分割サブ
            COPY    "CPORCSDIVCSV.INC".
+      *
+      *    負担区分コード取得サブ
+           COPY    "CPORCSGETFTNKBN.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -302,7 +330,7 @@
                                    WRK-AREA
                                    FLG-AREA
                                    SPA-AREA
-           MOVE    ZERO            TO  WRK-VOLNUM
+           MOVE    ZERO                TO  WRK-VOLNUM
       *
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    LNK-PRTKANRI-RENNUM
@@ -559,6 +587,9 @@
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       TABLE-MAX
                    IF      TBL-RECEDATA (IDX) (1:2)    =   "RE"
+      *                負担区分クリア
+                       MOVE    SPACE               TO  WRK-FTNKBN
+                       INITIALIZE  WRK-FTNKBN-TBL
       *                データ提出同意か確認
                        PERFORM 900-PTPUBLIC-READ-SEC
                        EVALUATE    SYS-9101-COOPBASE
@@ -618,6 +649,9 @@
                        PERFORM     20021-HENSYU-SEC
                    END-IF
       *
+      *            レセ電データから負担区分を退避
+                   PERFORM 20021-FTNKBN-SAVE-SEC
+      *
                    MOVE    TBL-RECEDATA (IDX)  TO  RECE30-R
                    WRITE   RECE30-R
       *
@@ -644,6 +678,12 @@
                        PERFORM 20023-R2-HENSYU-SEC
                        PERFORM 20024-R3-HENSYU-SEC
                    END-IF
+      *
+      *            C1レコードを編集して出力
+      *            レセプト電算データがなくなったら診療データから編集
+                   IF      IDX                 =   TABLE-MAX
+                       PERFORM 20025-C1-HENSYU-SEC
+                   END-IF
                END-PERFORM
            END-IF
       *
@@ -653,9 +693,46 @@
            EXIT.
       *
       *****************************************************************
+      *    レセ電データから負担区分を退避処理
+      *****************************************************************
+       20021-FTNKBN-SAVE-SEC       SECTION.
+      *
+           IF      TBL-RECEDATA (IDX) (1:2)    =   "SI"    OR
+                                                   "IY"    OR
+                                                   "TO"
+               INITIALIZE  ORCSDIVCSV-AREA
+               MOVE    TBL-RECEDATA (IDX)  TO  ORCSDIVCSV-REC
+               MOVE    5                   TO  ORCSDIVCSV-ELE-C
+               MOVE    ","                 TO  ORCSDIVCSV-DELI
+               MOVE    ZERO                TO  ORCSDIVCSV-DQ
+               CALL    "ORCSDIVCSV"     USING  ORCSDIVCSV-AREA
+               IF      ORCSDIVCSV-RC       =   ZERO
+                   IF      ORCSDIVCSV-D (3)
+                                           NOT =   SPACE
+                       PERFORM VARYING IDF FROM    1   BY  1
+                               UNTIL   IDF >   WRK-FTNKBN-TBL-MAX
+                           IF      ORCSDIVCSV-D (3)
+                                           =   WRK-FTNKBN-VAL (IDF)
+                               GO  TO    20021-FTNKBN-SAVE-EXT
+                           END-IF
+                       END-PERFORM
+                       IF      IDF             >   5
+                           GO  TO    20021-FTNKBN-SAVE-EXT
+                       END-IF
+                       MOVE    ORCSDIVCSV-D (3)
+                                               TO  WRK-FTNKBN-VAL (IDF)
+                       MOVE    IDF             TO  WRK-FTNKBN-TBL-MAX
+                   END-IF
+               END-IF
+           END-IF
+           .
+       20021-FTNKBN-SAVE-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    医療機関情報レコード編集処理
       *****************************************************************
-       20021-HENSYU-SEC              SECTION.
+       20021-HENSYU-SEC            SECTION.
       *
            COMPUTE WRK-FILE-RENNUM =   WRK-VOLNUM  +   1
            MOVE    WRK-PARA-HOSPNUM    TO  RECE30PARA-HOSPNUM
@@ -918,6 +995,209 @@
            EXIT.
       *
       *****************************************************************
+      *    連携用コメントレコード編集処理
+      *****************************************************************
+       20025-C1-HENSYU-SEC         SECTION.
+      *
+           INITIALIZE  SRYACCT-REC
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+           MOVE    WRK-PARA-NYUGAIKBN  TO  ACCT-NYUGAIKBN
+           MOVE    SPA-PTID            TO  ACCT-PTID
+           MOVE    LNK-PRTKANRI-SRYYM  TO  ACCT-SRYYM
+           MOVE    "99"                TO  ACCT-SRYKBN
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key14"             TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SRYACCT
+                   MOVE    MCPDATA-REC         TO  SRYACCT-REC
+               ELSE
+                   INITIALIZE  SRYACCT-REC
+                   MOVE    1               TO  FLG-SRYACCT
+               END-IF
+           ELSE
+               INITIALIZE  SRYACCT-REC
+               MOVE    1                   TO  FLG-SRYACCT
+           END-IF
+      *
+           PERFORM             UNTIL   FLG-SRYACCT     =   1
+               PERFORM 200251-C1-HENSYU-SEC
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key14"             TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SRYACCT
+                   MOVE    MCPDATA-REC         TO  SRYACCT-REC
+               ELSE
+                   INITIALIZE  SRYACCT-REC
+                   MOVE    1                   TO  FLG-SRYACCT
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       20025-C1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    連携用コメントレコード編集処理
+      *****************************************************************
+       200251-C1-HENSYU-SEC        SECTION.
+      *
+           INITIALIZE  SRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SRYACT
+                   MOVE    MCPDATA-REC         TO  SRYACT-REC
+               ELSE
+                   INITIALIZE  SRYACT-REC
+                   MOVE    1               TO  FLG-SRYACT
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           PERFORM             UNTIL   FLG-SRYACT    =    1
+               PERFORM 200252-C1-HENSYU-SEC
+               MOVE    "tbl_sryact"    TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SRYACT
+                   MOVE    MCPDATA-REC         TO  SRYACT-REC
+               ELSE
+                   INITIALIZE  SRYACT-REC
+                   MOVE    1                   TO  FLG-SRYACT
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       200251-C1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    連携用コメントレコード編集処理
+      *****************************************************************
+       200252-C1-HENSYU-SEC        SECTION.
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL   IDX2    >   5
+                   OR      SRY-SRYCD (IDX2)    =   SPACE
+               IF     (SRY-SRYCD (IDX2)    =   "008600000")  AND
+                      (SRY-INPUTNUM (IDX2)
+                                       NOT =   ZERO)
+                   MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
+                   MOVE    SRY-PTID                TO  PTCOM-PTID
+                   MOVE    SRY-ZAINUM              TO  PTCOM-ZAINUM
+                   MOVE    SRY-SRYCD   (IDX2)      TO  PTCOM-SRYCD
+                   MOVE    SRY-INPUTNUM(IDX2)      TO  PTCOM-RENNUM
+                   PERFORM 900-PTCOM-READ-SEC
+                   PERFORM 200253-C1-HENSYU-SEC
+               END-IF
+           END-PERFORM
+           .
+       200252-C1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    連携用コメントレコード編集処理
+      *****************************************************************
+       200253-C1-HENSYU-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  WRK-DATA-LENGTH
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+           MOVE    "C1,01,"            TO  WRK-REC
+           MOVE    6                   TO  WRK-REC-LENGTH
+      *
+           IF     (ACCT-PTID       NOT =   WRK-SV-PTID)        OR
+                  (ACCT-HKNCOMBI   NOT =   WRK-SV-HKNCOMBI)
+               MOVE    SPA-HOSPNUM         TO  ORCSGETFK-HOSPNUM
+               MOVE    ACCT-PTID           TO  ORCSGETFK-PTID
+               MOVE    ACCT-SRYYM          TO  ORCSGETFK-SRYYM
+               MOVE    ACCT-HKNCOMBI       TO  ORCSGETFK-HKNCOMBINUM
+      *
+               CALL    "ORCSGETFTNKBN" USING   ORCSGETFTNKBNAREA
+                                               SPA-AREA
+               MOVE    ORCSGETFK-FTNKBN    TO  WRK-FTNKBN
+               MOVE    ACCT-PTID           TO  WRK-SV-PTID
+               MOVE    ACCT-HKNCOMBI       TO  WRK-SV-HKNCOMBI
+           END-IF
+      *
+           IF      WRK-FTNKBN-TBL-MAX  >   ZERO
+               PERFORM VARYING IDF FROM    1   BY  1
+                       UNTIL   IDF >   WRK-FTNKBN-TBL-MAX
+                   IF      WRK-FTNKBN          =   WRK-FTNKBN-VAL (IDF)
+                       EXIT    PERFORM
+                   ELSE
+                       IF      IDF             =   WRK-FTNKBN-TBL-MAX
+                           MOVE    SPACE           TO  WRK-FTNKBN
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF      WRK-FTNKBN          =   SPACE
+               GO  TO  200253-C1-HENSYU-EXT
+           ELSE
+               MOVE    WRK-FTNKBN          TO  WRK-DATA
+           END-IF
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    "819990001"         TO  WRK-DATA
+           MOVE    9                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    PTCOM-INPUTCOMENT   TO  WRK-DATA
+           MOVE    76                  TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           PERFORM VARYING IDX3    FROM    1   BY  1
+                   UNTIL   IDX3    >   31
+               IF      IDX3                =   31
+                   MOVE    1                   TO  WRK-END
+               END-IF
+               IF      ACCT-DAY(1 IDX3)    =   ZERO
+                   MOVE    SPACE               TO  WRK-DATA
+                   MOVE    1                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC
+               ELSE
+                   MOVE    ACCT-DAY(1 IDX3)    TO  WRK-NUM
+                   MOVE    3                   TO  WRK-NAGASA
+                   PERFORM 5005-NUM-HENSYU-SEC
+               END-IF
+           END-PERFORM
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       200253-C1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    終了処理
       *****************************************************************
        300-TERM-SEC                SECTION.
@@ -1119,7 +1399,6 @@
        5004-MOJI-HENSYU-EXT.
            EXIT.
       *
-      *
       *****************************************************************
       *    出力レコード処理（数字）ZZZZZZZZZ9.999の編集
       *****************************************************************
@@ -1262,6 +1541,7 @@
                    WHEN    "RE"
                    WHEN    "HO"
                    WHEN    "KO"
+                   WHEN    "SY"
                        MOVE    SPACE           TO  WRK-SRYKBN
                    WHEN    "TO"
                    WHEN    "IY"
@@ -1282,6 +1562,12 @@
                    WHEN    "HO"
                    WHEN    "KO"
                        CONTINUE
+                   WHEN    "SY"
+                       IF      SYS-9101-SYREC      =   "T"
+                           CONTINUE
+                       ELSE
+                           GO  TO  900-RENKEI-TMP-READ-SEC
+                       END-IF
                    WHEN    "IY"
                        IF      WRK-SRYKBN   =   "14"    OR  "21"    OR
                                                 "22"    OR  "23"    OR
@@ -1517,6 +1803,39 @@
            PERFORM 900-CLOSE-SEC
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者コメントマスタ読み込み
+      *****************************************************************
+       900-PTCOM-READ-SEC          SECTION.
+      *
+           MOVE    PTCOM-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcom"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTCOM
+                   MOVE    MCPDATA-REC         TO  PTCOM-REC
+               ELSE
+                   INITIALIZE  PTCOM-REC
+                   MOVE    1                   TO  FLG-PTCOM
+               END-IF
+           ELSE
+               INITIALIZE  PTCOM-REC
+               MOVE    1                   TO  FLG-PTCOM
+           END-IF
+      *
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-PTCOM-READ-EXT.
            EXIT.
       *
       *****************************************************************
