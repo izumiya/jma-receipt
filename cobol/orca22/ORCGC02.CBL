@@ -309,6 +309,7 @@
       *  04.07.13    NACL-藤原    14/01/29  病名入力時のコード置換え画面
       *                                     の表示時のチェック追加
       *                                     病名コード削除時の修正 
+      *  04.07.14    NACL-藤原    14/07/14  第三者行為の重複チェック修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10217,11 +10218,11 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                        MOVE    1               TO  FLG-HKNCOMBI-DABURI
                END-EVALUATE
              END-IF
-           END-IF
       *
-      *    保険組合せで登録不可のとき
-           IF      FLG-HKNCOMBI-DABURI =   ZERO
+      *      保険組合せで登録不可のとき
+             IF      FLG-HKNCOMBI-DABURI =   ZERO
                GO  TO   45021-HKNCOMBI-DABURI-CHK-EXT
+             END-IF
            END-IF
       *
       *    第三者行為の設定がない場合はチェックしない
@@ -10230,24 +10231,38 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                GO  TO   45021-HKNCOMBI-DABURI-CHK-EXT
            END-IF
       *
-      *    同じ第三者行為の場合は登録不可とする
-           IF      WRK-CHK-KOHID1   =   WRK-CHK-KOHID2
-               MOVE    ZERO             TO  FLG-HKNCOMBI-DABURI
+      *    第三者行為の設定が両方の場合
+           IF    ( WRK-CHK-KOHID1
+                               NOT =   ZERO )
+           AND   ( WRK-CHK-KOHID2
+                               NOT =   ZERO )
+      *        同じ第三者行為の場合は登録不可とする
+               IF      WRK-CHK-KOHID1  =   WRK-CHK-KOHID2
+                   MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
+               ELSE
+                   MOVE    1               TO  FLG-HKNCOMBI-DABURI
+               END-IF
                GO  TO  45021-HKNCOMBI-DABURI-CHK-EXT
-           END-IF
-      *
-      *    片方が医保以外のときチェックしない
-           IF    ( WRK-CHK-COMB-HKNNUM (1) (1:2)
-                                   =   "98"    OR  "97" )
-           OR    ( WRK-CHK-COMB-HKNNUM (2) (1:2)
-                                   =   "98"    OR  "97" ) 
-               GO  TO  45021-HKNCOMBI-DABURI-CHK-EXT
+           ELSE
+      *        片方が医保以外のときチェックしない
+               IF    ( WRK-CHK-KOHID1
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (2) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  45021-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
+               IF    ( WRK-CHK-KOHID2
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (1) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  45021-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
            END-IF
       *
       *    医保と第三者行為のため登録不可とする
            MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
       *
-           .                   
+           .
        45021-HKNCOMBI-DABURI-CHK-EXT.
            EXIT.
       *

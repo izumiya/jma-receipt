@@ -70,6 +70,7 @@
       *  04.06.02    NACL-藤原    10/11/05  補足コメント対応
       *
       *  04.07.01    NACL-藤原    13/07/12  第三者行為対応
+      *  04.07.02    NACL-藤原    14/07/14  第三者行為の重複チェック修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1742,11 +1743,11 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                        MOVE    1               TO  FLG-HKNCOMBI-DABURI
                END-EVALUATE
              END-IF
-           END-IF
       *
-      *    保険組合せで登録不可のとき
-           IF      FLG-HKNCOMBI-DABURI =   ZERO
-               GO  TO   410112-HKNCOMBI-DABURI-CHK-EXT
+      *      保険組合せで登録不可のとき
+             IF      FLG-HKNCOMBI-DABURI =   ZERO
+                 GO  TO   410112-HKNCOMBI-DABURI-CHK-EXT
+             END-IF
            END-IF
       *
       *    第三者行為の設定がない場合はチェックしない
@@ -1755,18 +1756,32 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                GO  TO   410112-HKNCOMBI-DABURI-CHK-EXT
            END-IF
       *
-      *    同じ第三者行為の場合は登録不可とする
-           IF      WRK-CHK-KOHID1   =   WRK-CHK-KOHID2
-               MOVE    ZERO             TO  FLG-HKNCOMBI-DABURI
-               GO  TO   410112-HKNCOMBI-DABURI-CHK-EXT
-           END-IF
-      *
-      *    片方が医保以外のときチェックしない
-           IF    ( WRK-CHK-COMB-HKNNUM (1) (1:2)
-                                   =   "98"    OR  "97" )
-           OR    ( WRK-CHK-COMB-HKNNUM (2) (1:2)
-                                   =   "98"    OR  "97" ) 
-               GO  TO   410112-HKNCOMBI-DABURI-CHK-EXT
+      *    第三者行為の設定が両方の場合
+           IF    ( WRK-CHK-KOHID1
+                               NOT =   ZERO )
+           AND   ( WRK-CHK-KOHID2
+                               NOT =   ZERO )
+      *        同じ第三者行為の場合は登録不可とする
+               IF      WRK-CHK-KOHID1  =   WRK-CHK-KOHID2
+                   MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
+               ELSE
+                   MOVE    1               TO  FLG-HKNCOMBI-DABURI
+               END-IF
+               GO  TO  410112-HKNCOMBI-DABURI-CHK-EXT
+           ELSE
+      *        片方が医保以外のときチェックしない
+               IF    ( WRK-CHK-KOHID1
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (2) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  410112-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
+               IF    ( WRK-CHK-KOHID2
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (1) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  410112-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
            END-IF
       *
       *    医保と第三者行為のため登録不可とする
@@ -2386,11 +2401,11 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                        MOVE    1               TO  FLG-HKNCOMBI-DABURI
                END-EVALUATE
              END-IF
-           END-IF
       *
-      *    保険組合せで登録不可のとき
-           IF      FLG-HKNCOMBI-DABURI =   ZERO
-               GO  TO   410321-HKNCOMBI-DABURI-CHK-EXT
+      *      保険組合せで登録不可のとき
+             IF      FLG-HKNCOMBI-DABURI =   ZERO
+                 GO  TO   410321-HKNCOMBI-DABURI-CHK-EXT
+             END-IF
            END-IF
       *
       *    第三者行為の設定がない場合はチェックしない
@@ -2399,18 +2414,32 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                GO  TO   410321-HKNCOMBI-DABURI-CHK-EXT
            END-IF
       *
-      *    同じ第三者行為の場合は登録不可とする
-           IF      WRK-CHK-KOHID1   =   WRK-CHK-KOHID2
-               MOVE    ZERO             TO  FLG-HKNCOMBI-DABURI
+      *    第三者行為の設定が両方の場合
+           IF    ( WRK-CHK-KOHID1
+                               NOT =   ZERO )
+           AND   ( WRK-CHK-KOHID2
+                               NOT =   ZERO )
+      *        同じ第三者行為の場合は登録不可とする
+               IF      WRK-CHK-KOHID1  =   WRK-CHK-KOHID2
+                   MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
+               ELSE
+                   MOVE    1               TO  FLG-HKNCOMBI-DABURI
+               END-IF
                GO  TO  410321-HKNCOMBI-DABURI-CHK-EXT
-           END-IF
-      *
-      *    片方が医保以外のときチェックしない
-           IF    ( WRK-CHK-COMB-HKNNUM (1) (1:2)
-                                   =   "98"    OR  "97" )
-           OR    ( WRK-CHK-COMB-HKNNUM (2) (1:2)
-                                   =   "98"    OR  "97" ) 
-               GO  TO  410321-HKNCOMBI-DABURI-CHK-EXT
+           ELSE
+      *        片方が医保以外のときチェックしない
+               IF    ( WRK-CHK-KOHID1
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (2) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  410321-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
+               IF    ( WRK-CHK-KOHID2
+                                   NOT =   ZERO             )
+               AND   ( WRK-CHK-COMB-HKNNUM (1) (1:2)
+                                       =   "98"    OR  "97" )
+                   GO  TO  410321-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
            END-IF
       *
       *    医保と第三者行為のため登録不可とする
