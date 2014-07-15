@@ -49,6 +49,7 @@
       *  04.07.00    NACL-多々納  11/11/28  同日再入院対応
       *                                     継続初回入院日対応
       *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
+      *  04.07.00    NACL-多々納  13/07/14  他月数　６０（５年）対応
       *****************************************************************
       *
       *
@@ -121,6 +122,8 @@
            03  WRK-DOCNT-P             PIC 9(04).
            03  WRK-DCNT                PIC 9(04).
            03  WRK-JGNCNTETCM          PIC 9(02).
+      *    他月数
+           03  WRK-CHK-JGNCNTETCM      PIC 9(02).
       *
            03  WRK-SRYCD               PIC X(09).
            03  WRK-CODE                PIC X(03).
@@ -880,6 +883,11 @@
                IF     (LNK-SC91-ERRCD  NOT =   SPACE  )  AND
                       (WRK-RSI-KBN     NOT =   SPACE  )
                    MOVE    "0094"          TO  LNK-SC91-ERRCD
+      *H25.10
+      *            上限回数エラー処理＝９の時、警告とする
+                   IF       TNS-JGNCNTERR      =   9
+                       MOVE    "K094"          TO  LNK-SC91-ERRCD
+                   END-IF
                END-IF
            END-IF
       *
@@ -1264,6 +1272,7 @@
                MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
            END-IF
+      *
            IF      WRK-RSI-SRYCD   NOT =   SPACE
                IF     (LNK-SC91-SYORIFLG   =   1 )
                   AND (WRK-TEI-CNT         =   ZERO )
@@ -1639,6 +1648,11 @@
       *****************************************************************
        10012-RSI-MCNT-SEC      SECTION.
       *
+      *    月上限チェックなし
+           IF      SPA-SRYYMD          >=  "20100401"
+               GO      TO      10012-RSI-MCNT-EXT
+           END-IF
+      *
       *    システム月＜傷病日＋３月
            IF       SPA-SRYYMD(1:6)    <   SPA-RSI-SHOBYOYMD3(1:6)
                MOVE    ZERO            TO  WRK-RSI-CNT
@@ -1665,18 +1679,34 @@
       *
       *    算定開始年月
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-STRYM
-           IF      WRK-STRMM           <   TNS-JGNCNTETCM
-               COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
-               COMPUTE WRK-STRMM       =   WRK-STRMM
-                                       +   12
-                                       -  (TNS-JGNCNTETCM   -  1 )
-           ELSE
-               COMPUTE WRK-STRMM       =   WRK-STRMM
-                                       -  (TNS-JGNCNTETCM   -  1 )
-           END-IF
-      *    上限他月数が９９の時は、全履歴１回とする
+      *
+           MOVE    TNS-JGNCNTETCM      TO  WRK-CHK-JGNCNTETCM
+      *
            IF      TNS-JGNCNTETCM      =   99
+      *        上限他月数が９９の時は、全履歴１回とする
                MOVE    ZERO                TO  WRK-STRYM
+           ELSE
+      *
+      *        最長５年とする
+               IF      WRK-CHK-JGNCNTETCM  >   60
+                   MOVE    60                  TO  WRK-CHK-JGNCNTETCM
+               END-IF
+      *
+               PERFORM UNTIL   WRK-CHK-JGNCNTETCM  <=  12
+                   COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
+                   COMPUTE WRK-CHK-JGNCNTETCM  =   WRK-CHK-JGNCNTETCM
+                                       -   12
+               END-PERFORM
+      *
+               IF      WRK-STRMM           <   WRK-CHK-JGNCNTETCM
+                   COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
+                   COMPUTE WRK-STRMM       =   WRK-STRMM
+                                           +   12
+                                       -  (WRK-CHK-JGNCNTETCM   -  1 )
+               ELSE
+                   COMPUTE WRK-STRMM       =   WRK-STRMM
+                                       -  (WRK-CHK-JGNCNTETCM   -  1 )
+               END-IF
            END-IF
       *
       *    保険毎のコードの判定
@@ -2035,8 +2065,10 @@
                            ADD     WRK-DODAYCNT    TO  WRK-DAYCNT-SUM
                       END-IF
       *
-      *               上限他月数
-                      IF      TNS-JGNCNTETCM     >   ZERO
+      *               上限他月数のみ設定
+                      IF     (TNS-JGNCNTETCM     >   ZERO )
+                        AND  (TNS-JGNCNT         =   ZERO )
+                        AND  (TNS-JGNCNT1D       =   ZERO )
                           PERFORM 2002-DOJSANTEI-ETC-SEC
                       ELSE
                           PERFORM 2001-DOJSANTEI-YMD-SEC
@@ -2191,19 +2223,36 @@
       *
       *    算定開始年月
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-STRYM
-           IF      WRK-STRMM           <   TNS-JGNCNTETCM
-               COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
-               COMPUTE WRK-STRMM       =   WRK-STRMM
-                                       +   12
-                                       -  (TNS-JGNCNTETCM   -  1 )
-           ELSE
-               COMPUTE WRK-STRMM       =   WRK-STRMM
-                                       -  (TNS-JGNCNTETCM   -  1 )
-           END-IF
-      *    上限他月数が９９の時は、全履歴１回とする
+      *
+           MOVE    TNS-JGNCNTETCM      TO  WRK-CHK-JGNCNTETCM
+      *
            IF      TNS-JGNCNTETCM      =   99
+      *        上限他月数が９９の時は、全履歴１回とする
                MOVE    ZERO                TO  WRK-STRYM
+           ELSE
+      *
+      *        最長５年とする
+               IF      WRK-CHK-JGNCNTETCM  >   60
+                   MOVE    60                  TO  WRK-CHK-JGNCNTETCM
+               END-IF
+      *
+               PERFORM UNTIL   WRK-CHK-JGNCNTETCM  <=  12
+                   COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
+                   COMPUTE WRK-CHK-JGNCNTETCM  =   WRK-CHK-JGNCNTETCM
+                                       -   12
+               END-PERFORM
+      *
+               IF      WRK-STRMM           <   WRK-CHK-JGNCNTETCM
+                   COMPUTE WRK-STRYY       =   WRK-STRYY    -   1
+                   COMPUTE WRK-STRMM       =   WRK-STRMM
+                                           +   12
+                                       -  (WRK-CHK-JGNCNTETCM   -  1 )
+               ELSE
+                   COMPUTE WRK-STRMM       =   WRK-STRMM
+                                       -  (WRK-CHK-JGNCNTETCM   -  1 )
+               END-IF
            END-IF
+      *
       *    保険毎のコードの判定
            PERFORM 1000-SANTEI-CHK-SEC
       *    算定履歴検索
