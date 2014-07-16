@@ -1027,7 +1027,7 @@ class Receden_check < Receden_common
                   if latest_sryymd[0,6] < wtos(rece.sryym)[0,6]
                     date_error["44510"] = true
                   end
-                  if rr["SHINKEIKBN"].value == "1" && rr["RYOSTYMD"].wYmdtos == mysryymd
+                  if rr["RYOSTYMD"].wYmdtos == mysryymd
                   else
                     date_error["46340"] = true
                   end
