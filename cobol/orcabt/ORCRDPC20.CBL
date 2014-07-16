@@ -77,6 +77,8 @@
       *              NACL-伊藤    14/04/21  出来高点数
       *                                       検査で包括区分が０でない
       *                                       場合薬剤器材の点数を引く
+      *              NACL-伊藤    14/07/16  行為明細点数、出来高点数
+      *                                       端数処理
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -84,7 +86,7 @@
        INPUT-OUTPUT            SECTION.
        FILE-CONTROL.
       *
-      *    レセプト明細書  
+      *    レセプト明細書
            SELECT  RECE02-FILE     ASSIGN  RECE02PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
@@ -117,7 +119,7 @@
        DATA                    DIVISION.
        FILE                    SECTION.
       *
-      *    レセプト明細書  
+      *    レセプト明細書
        FD  RECE02-FILE.
        01  RECE02-REC. 
            COPY    "CPRCF002.INC".
@@ -2838,7 +2840,9 @@
                                        TO  WRK-FEDT-TANICD
       *行為明細点数
            IF      TBL-KOUI-TENSIKIBETU (IDX)  =   3
-             MOVE  TBL-KOUI-TEN (IDX)  TO  WRK-FEDT-MEISAI-TEN
+             COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TBL-KOUI-TEN (IDX)
+                                       +   0.5
            ELSE
              MOVE  ZERO                TO  WRK-FEDT-MEISAI-TEN
            END-IF
@@ -2956,8 +2960,9 @@
                    IF    TBL-KOUI-KZMCOMPSIKIBETU (IDX)  =   1
                          PERFORM 200799-KZM-DEKIDAKA-SEC
                    ELSE
-                     MOVE    TBL-KOUI-TEN (IDX)
-                                       TO  WRK-FEDT-DEKIDAKA-TEN
+                     COMPUTE WRK-FEDT-DEKIDAKA-TEN
+                                       =   TBL-KOUI-TEN (IDX)
+                                       +   0.5
                    END-IF
                  END-IF
                END-IF
@@ -4178,18 +4183,23 @@
       *****MOVE    ZERO                TO  WRK-FEDT-TANICD
       *行為明細点数
            IF      TNS-TENSIKIBETU     =   3
-             MOVE  TNS-TEN             TO  WRK-FEDT-MEISAI-TEN
+             COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TNS-TEN
+                                       +   0.5
            ELSE
             IF     TNS-TENSIKIBETU     =   6
               MOVE WRK-FEDT-ZAITEN     TO  WRK-FEDT-MEISAI-TEN
             ELSE
              IF    TNS-SRYKBN          =   "97"
                IF  WRK-FEDT-SRYSURYO   =   ZERO
-                   MOVE    TNS-TEN     TO  WRK-FEDT-MEISAI-TEN
+                   COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TNS-TEN
+                                       +   0.5
                ELSE
                    COMPUTE WRK-FEDT-MEISAI-TEN
                                        =   TNS-TEN
                                        *   WRK-FEDT-SRYSURYO
+                                       +   0.5
                END-IF
              ELSE
                MOVE  ZERO              TO  WRK-FEDT-MEISAI-TEN

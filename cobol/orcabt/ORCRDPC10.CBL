@@ -70,6 +70,8 @@
       *              NACL-伊藤    14/05/12  出来高・包括フラグ
       *                                       平成26年 4月診療分からは
       *                                       点数マスタのDPCKBNを設定
+      *              NACL-伊藤    14/07/16  行為明細点数、出来高点数
+      *                                       端数処理
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3155,7 +3157,9 @@
                                        TO  WRK-FEDT-TANICD
       *行為明細点数
            IF      TBL-KOUI-TENSIKIBETU (IDX)  =   3
-             MOVE  TBL-KOUI-TEN (IDX)  TO  WRK-FEDT-MEISAI-TEN
+             COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TBL-KOUI-TEN (IDX)
+                                       +   0.5
            ELSE
              MOVE  ZERO                TO  WRK-FEDT-MEISAI-TEN
            END-IF
@@ -3273,8 +3277,9 @@
                    IF    TBL-KOUI-KZMCOMPSIKIBETU (IDX)  =   1
                          PERFORM 200799-KZM-DEKIDAKA-SEC
                    ELSE
-                     MOVE    TBL-KOUI-TEN (IDX)
-                                       TO  WRK-FEDT-DEKIDAKA-TEN
+                     COMPUTE WRK-FEDT-DEKIDAKA-TEN
+                                       =   TBL-KOUI-TEN (IDX)
+                                       +   0.5
                    END-IF
                  END-IF
                END-IF
@@ -4338,18 +4343,23 @@
       *****MOVE    ZERO                TO  WRK-FEDT-TANICD
       *行為明細点数
            IF      TNS-TENSIKIBETU     =   3
-             MOVE  TNS-TEN             TO  WRK-FEDT-MEISAI-TEN
+             COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TNS-TEN
+                                       +   0.5
            ELSE
             IF     TNS-TENSIKIBETU     =   6
               MOVE WRK-FEDT-ZAITEN     TO  WRK-FEDT-MEISAI-TEN
             ELSE
              IF    TNS-SRYKBN          =   "97"
                IF  WRK-FEDT-SRYSURYO   =   ZERO
-                   MOVE    TNS-TEN     TO  WRK-FEDT-MEISAI-TEN
+                   COMPUTE WRK-FEDT-MEISAI-TEN
+                                       =   TNS-TEN
+                                       +   0.5
                ELSE
                    COMPUTE WRK-FEDT-MEISAI-TEN
                                        =   TNS-TEN
                                        *   WRK-FEDT-SRYSURYO
+                                       +   0.5
                END-IF
              ELSE
                MOVE  ZERO              TO  WRK-FEDT-MEISAI-TEN
