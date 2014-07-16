@@ -419,7 +419,7 @@
                                    TO  TSRYCD-SRYVALCOMP(TSRYCD-IDX)
                    MOVE    SPA-Q01-SRYCD (IDX0)
                                    TO  TSRYCD-SRYCD     (TSRYCD-IDX)
-                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   PERFORM 900-TENSU-KEY34-SEL-SEC
                    IF    ( TNS-NAME    NOT =   SPACE )
                        MOVE    TNS-NAME
                                    TO  TSRYCD-NAME      (TSRYCD-IDX)
@@ -1641,7 +1641,7 @@
       *****************************************************************
       *    点数マスタ検索処理
       *****************************************************************
-       900-TENSU-KEY-SEL-SEC          SECTION.
+       900-TENSU-KEY34-SEL-SEC        SECTION.
       *
            MOVE    ZERO            TO FLG-TENSU
       *
@@ -1649,11 +1649,11 @@
            MOVE    SPA-HOSPNUM     TO TNS-HOSPNUM
            MOVE    TSRYCD-SRYCD (TSRYCD-IDX)
                                    TO TNS-SRYCD
-           MOVE    SEL-STSRYYMD    TO TNS-YUKOSTYMD
-                                      TNS-YUKOEDYMD
+           MOVE    SEL-STSRYYMD    TO TNS-YUKOEDYMD
+           MOVE    SEL-EDSRYYMD    TO TNS-YUKOSTYMD
            MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
            MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key34"         TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  TNS-TENSU-REC
@@ -1663,11 +1663,11 @@
            END-IF
       *
            MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key34"         TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-TENSU-KEY-SEL-EXT.
+       900-TENSU-KEY34-SEL-EXT.
            EXIT.
       *****************************************************************
       *    診療行為数値検索チェックファイル読込処理
