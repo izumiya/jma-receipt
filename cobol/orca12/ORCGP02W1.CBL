@@ -6007,8 +6007,13 @@
            MOVE    ZERO                TO  FLG-RJN-02
            IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
              AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  "20140501")
-             AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  SPA-BYMD-70)
-               MOVE    1               TO  FLG-RJN-02
+      ****** AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  SPA-BYMD-70)
+      *        前期高齢者到達後は、対象
+               IF     (SPA-PTHKN-TEKSTYMD (IDX)   >=  SPA-BYMD-70)
+                  OR ((SPA-SYSYMD                 >=  SPA-BYMD-70 ) AND
+                      (SPA-PTHKN-TEKEDYMD (IDX)   >=  SPA-BYMD-70))
+                   MOVE    1               TO  FLG-RJN-02
+               END-IF
            END-IF
       *
            EVALUATE    SPA-PTHKN-HKNNUM  (IDX)
