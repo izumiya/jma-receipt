@@ -2347,7 +2347,8 @@
                    EVALUATE    RECE65-SRYCD (IDX) (1:1)
                        WHEN    "0"
                        WHEN    "8"
-                           IF   (RECE65-SRYKBN = "21" OR "22" OR "23")
+                           IF   (RECE65-SRYKBN = "21" OR "22" OR "23" OR
+                                                 "14")
                            AND ((RECE65-SRYCD(IDX)
                                                = "840000006")
                            OR   (RECE65-SRYCD(IDX)
