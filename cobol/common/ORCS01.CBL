@@ -423,6 +423,8 @@
       *                                     上限額修正
       *  04.07.14    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
       *                                     ないものとみなす
+      *  04.07.15    NACL-門脇    14/07/17  マル長患者で、月途中に公費が追加と
+      *                                     なった場合の対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -988,6 +990,13 @@
            03  WK-JYOSEI-KOHIKIN-RUI                    PIC 9(07).
            03  WK-JYOSEI-KOHIKIN-RUI2                   PIC 9(07).
            03  WK-JYOSEI-KOHIKIN-RUI3                   PIC 9(07).
+      *
+           03  WK-CHECK-TEKYMD.
+               05  WK-CHECK-TEKYM                       PIC 9(06).
+               05  WK-CHECK-TEKDD                       PIC 9(02).
+           03  WK-CHECK2-TEKYMD.
+               05  WK-CHECK2-TEKYM                      PIC 9(06).
+               05  WK-CHECK2-TEKDD                      PIC 9(02).
       *
       *    公費の患者負担上限回数と上限金額の退避用エリア
        01  HOKEN-MAX-AREA.
@@ -11872,6 +11881,14 @@
            INITIALIZE                 WK-GENGAKU-TEN-TBL.
            MOVE     ZERO        TO    IDX14.
       *
+      *    保険組み合わせ適用開始日チェック
+           MOVE      LNK-SYU-SRYYMD(1:6)    TO   WK-CHECK-TEKYM.
+           IF   COMB-TEKSTYMD(1:6)  >=  LNK-SYU-SRYYMD(1:6)
+              MOVE   COMB-TEKSTYMD(7:2)     TO   WK-CHECK-TEKDD
+           ELSE
+              MOVE   01                     TO   WK-CHECK-TEKDD
+           END-IF.
+      *
            PERFORM     2205-FLG-HENSYU-SEC.
       *
            IF  (COMB-KOH1-GAIJGNKBN        =       "1")      OR
@@ -16087,6 +16104,14 @@
              END-IF
            END-IF
       *
+      *    保険組み合わせ適用開始日チェック
+           MOVE      SYU-SRYYMD(1:6)        TO   WK-CHECK2-TEKYM
+           IF   WRK-COMB-TEKSTYMD(1:6)  >=  SYU-SRYYMD(1:6)
+              MOVE   WRK-COMB-TEKSTYMD(7:2) TO   WK-CHECK2-TEKDD
+           ELSE
+              MOVE   01                     TO   WK-CHECK2-TEKDD
+           END-IF
+      *
            .
       *
        2202B-SYUNOU-HKN-HENSYU-EXT.
@@ -16632,6 +16657,7 @@
                       AND ( SYU-KOH2HKNNUM    =   SPACE         )
                       AND ( SYU-KOH3HKNNUM    =   SPACE         )
                       AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                      AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                          MOVE    ZERO            TO  WK-SYU-SYUCOMPFTN
                          MOVE    ZERO            TO  WK-ENTANI
                          MOVE    1               TO  FLG-TAISYO
@@ -16721,6 +16747,7 @@
                  AND ( SYU-KOH2HKNNUM    =   SPACE         )
                  AND ( SYU-KOH3HKNNUM    =   SPACE         )
                  AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                 AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                     MOVE    ZERO            TO  WK-SYU-SYUCOMPFTN
                     MOVE    ZERO            TO  WK-ENTANI
                     MOVE    1               TO  FLG-TAISYO
@@ -16738,14 +16765,14 @@
       **>             MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>             MOVE    ZERO TO  WK-ENTANI
       **>             MOVE    1    TO  FLG-TAISYO
-                      IF  (COMB-KOH1HKNNUM  = "972" OR "974")
-                      AND (COMB-KOH2HKNNUM  = SPACE         )
-                      AND (COMB-KOH3HKNNUM  = SPACE         )
-                      AND (COMB-KOH4HKNNUM  = SPACE         )
-                        CONTINUE
-                      ELSE
+      **>             IF  (COMB-KOH1HKNNUM  = "972" OR "974")
+      **>             AND (COMB-KOH2HKNNUM  = SPACE         )
+      **>             AND (COMB-KOH3HKNNUM  = SPACE         )
+      **>             AND (COMB-KOH4HKNNUM  = SPACE         )
+      **>               CONTINUE
+      **>             ELSE
                         MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
-                      END-IF
+      **>             END-IF
                     END-IF
                END-IF
                ADD   WK-SYU-SYUCOMPFTN      TO  FTN-SYU-M
@@ -16771,6 +16798,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                        MOVE    ZERO            TO  WK-SYU-SYUCOMPFTN
                        MOVE    ZERO            TO  WK-ENTANI
                        MOVE    1               TO  FLG-TAISYO
@@ -16788,14 +16816,14 @@
       **>                MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>                MOVE    ZERO TO  WK-ENTANI
       **>                MOVE    1    TO  FLG-TAISYO
-                         IF  (COMB-KOH1HKNNUM  = "972" OR "974")
-                         AND (COMB-KOH2HKNNUM  = SPACE         )
-                         AND (COMB-KOH3HKNNUM  = SPACE         )
-                         AND (COMB-KOH4HKNNUM  = SPACE         )
-                           CONTINUE
-                         ELSE
+      **>                IF  (COMB-KOH1HKNNUM  = "972" OR "974")
+      **>                AND (COMB-KOH2HKNNUM  = SPACE         )
+      **>                AND (COMB-KOH3HKNNUM  = SPACE         )
+      **>                AND (COMB-KOH4HKNNUM  = SPACE         )
+      **>                  CONTINUE
+      **>                ELSE
                            MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
-                         END-IF
+      **>                END-IF
                        END-IF
                  END-IF
                  ADD   WK-SYU-SYUCOMPFTN       TO  FTN-SYU-M
@@ -18009,6 +18037,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO
@@ -18039,6 +18068,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO
@@ -18070,6 +18100,7 @@
                    AND ( SYU-KOH2HKNNUM    =   SPACE         )
                    AND ( SYU-KOH3HKNNUM    =   SPACE         )
                    AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                   AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO
@@ -18135,6 +18166,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO
@@ -18165,6 +18197,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO
@@ -18196,6 +18229,7 @@
                     AND ( SYU-KOH2HKNNUM    =   SPACE         )
                     AND ( SYU-KOH3HKNNUM    =   SPACE         )
                     AND ( SYU-KOH4HKNNUM    =   SPACE         )
+                    AND ( WK-CHECK-TEKYMD  <= WK-CHECK2-TEKYMD)
                       MOVE  ZERO                TO   WK-SYU-SYUCOMPFTN
                       MOVE  ZERO                TO   WK-ENTANI
                       MOVE  1                   TO   FLG-TAISYO

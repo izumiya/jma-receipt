@@ -158,6 +158,8 @@
       *  04.07.08    NACL-門脇    14/03/26  平成２６年４月改正対応
       *                                     （夜勤時間経過減算の選定対応）
       *  04.07.09    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
+      *  04.07.10    NACL-門脇    14/07/17  マル長患者で、月途中に公費が追加と
+      *                                     なった場合の対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -324,10 +326,14 @@
            02  WRK-HANBETU-TBL OCCURS   10.
               03 WRK-HANBETU-KEY.
                 05 WRK-HANBETU-SKYYM       PIC X(06).
+                05 WRK-HANBETU-DAISANFLG   PIC X(01).
                 05 WRK-HANBETU-YUSENYMD.
                    07 WRK-HANBETU-YUSENYM  PIC 9(06).
                    07 WRK-HANBETU-YUSENDD  PIC 9(02).
                 05 WRK-HANBETU-YUSENBAN    PIC 9(03).
+                05 WRK-HANBETU-CYOKIYMD.
+                   07 WRK-HANBETU-CYOKIYM  PIC 9(06).
+                   07 WRK-HANBETU-CYOKIDD  PIC 9(02).
                 05 WRK-HANBETU-YUSENBAN2   PIC 9(03).
                 05 WRK-HANBETU-KAISHI      PIC X(02).
               03 WRK-HANBETU-HKNCOMBINUM   PIC 9(04).
@@ -359,7 +365,7 @@
               03 WRK-HANBETU3-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU3-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(136).
+       01  WRK-HANBETU-DATA                PIC X(145).
       *
       *    入院点数算定用ワークエリア
        01  WRK-NYUIN-TENSU-AREA.
@@ -401,6 +407,19 @@
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
+      *
+      * マル長チェック用テーブル
+       01  TABLE-CYOKI.
+         02  TABLE-CYOKI-XXX               OCCURS  10.
+           03  TABLE-CYOKI-SKYYM           PIC X(06).
+           03  TABLE-CYOKI-YUSENYMD        PIC X(08).
+           03  TABLE-CYOKI-HENSYU1         PIC 9(02).
+           03  TABLE-CYOKI-YMD1            PIC X(08).
+           03  TABLE-CYOKI-HENSYU2         PIC 9(02).
+           03  TABLE-CYOKI-YMD21           PIC X(08).
+           03  TABLE-CYOKI-YMD22           PIC X(08).
+           03  TABLE-CYOKI-YMD23           PIC X(08).
+           03  TABLE-CYOKI-HANTEI          PIC 9(01).
       *
       * 室料差額退避用テーブル     
        01  TABLE-RMSAGAKU.
@@ -481,6 +500,7 @@
            03  IDX6                        PIC 9(02).
            03  IDX7                        PIC 9(02).
            03  IDX8                        PIC 9(02).
+           03  IDX9                        PIC 9(02).
            03  SYU-IDX                     PIC 9(02).
            03  NYUINACT-IDX                PIC 9(02).
            03  RMSAGAKU-IDX                PIC 9(02).
@@ -1702,6 +1722,8 @@
       ******************************************************************
        HKNNUM-SYUTOKU-SYORI-SEC        SECTION.
       *
+           INITIALIZE         TABLE-CYOKI.
+      *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX            >    10)
                                 OR   (WRK-HANBETU-SKYYM(IDX) =  SPACE)
@@ -1917,10 +1939,153 @@
                 IF   WRK-HANBETU-YUSENBAN2(IDX)  =   ZERO
                    MOVE   999   TO  WRK-HANBETU-YUSENBAN2(IDX)
                 END-IF
+      *         保険組み合わせ適用開始日チェック
+                MOVE  WRK-HANBETU-SKYYM(IDX)
+                                TO  WRK-HANBETU-CYOKIYM(IDX)
+                IF   COMB-TEKSTYMD(1:6)  >=  WRK-HANBETU-SKYYM(IDX)
+                  MOVE  COMB-TEKSTYMD(7:2)
+                                TO  WRK-HANBETU-CYOKIDD(IDX)
+                ELSE
+                  MOVE  01      TO  WRK-HANBETU-CYOKIDD(IDX)
+                END-IF
               ELSE
                    MOVE   999   TO  WRK-HANBETU-YUSENBAN2(IDX)
               END-IF
       *
+              IF  WRK-HANBETU-YUSENBAN(IDX)  =   1
+                IF   (WRK-HANBETU-KOH1HKNNUM(IDX) =  "972" OR "974")
+                AND  (WRK-HANBETU-KOH2HKNNUM(IDX) =  SPACE         )
+                AND  (WRK-HANBETU-KOH3HKNNUM(IDX) =  SPACE         )
+                AND  (WRK-HANBETU-KOH4HKNNUM(IDX) =  SPACE         )
+                  MOVE    ZERO    TO    FLG-HANBETU
+                  PERFORM  VARYING  IDX9  FROM  1  BY  1
+                            UNTIL  (IDX9                    >   10  )
+                              OR   (TABLE-CYOKI-SKYYM(IDX9) =  SPACE)
+                    IF  (WRK-HANBETU-SKYYM(IDX)
+                                        = TABLE-CYOKI-SKYYM(IDX9)   )
+                    AND (WRK-HANBETU-YUSENYMD(IDX)
+                                        = TABLE-CYOKI-YUSENYMD(IDX9))
+                      ADD     1   TO  TABLE-CYOKI-HENSYU1(IDX9)
+                      MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD1(IDX9)
+                      MOVE    1   TO  FLG-HANBETU
+                      MOVE   10   TO  IDX9
+                    END-IF
+                  END-PERFORM
+                  IF   FLG-HANBETU   =   ZERO
+                      MOVE WRK-HANBETU-SKYYM(IDX)
+                                  TO  TABLE-CYOKI-SKYYM(IDX9)
+                      MOVE WRK-HANBETU-YUSENYMD(IDX)
+                                  TO  TABLE-CYOKI-YUSENYMD(IDX9)
+                      ADD     1   TO  TABLE-CYOKI-HENSYU1(IDX9)
+                      MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD1(IDX9)
+                  END-IF
+                ELSE
+                  MOVE    ZERO    TO    FLG-HANBETU
+                  PERFORM  VARYING  IDX9  FROM  1  BY  1
+                            UNTIL  (IDX9                    >   10  )
+                              OR   (TABLE-CYOKI-SKYYM(IDX9) =  SPACE)
+                    IF  (WRK-HANBETU-SKYYM(IDX)
+                                        = TABLE-CYOKI-SKYYM(IDX9)   )
+                    AND (WRK-HANBETU-YUSENYMD(IDX)
+                                        = TABLE-CYOKI-YUSENYMD(IDX9))
+                      ADD     1   TO  TABLE-CYOKI-HENSYU2(IDX9)
+                      EVALUATE  TABLE-CYOKI-HENSYU2(IDX9)
+                        WHEN      1
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD21(IDX9)
+                        WHEN      2
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD22(IDX9)
+                        WHEN      3
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD23(IDX9)
+                      END-EVALUATE
+                      MOVE    1   TO  FLG-HANBETU
+                      MOVE   10   TO  IDX9
+                    END-IF
+                  END-PERFORM
+                  IF   FLG-HANBETU   =   ZERO
+                      MOVE WRK-HANBETU-SKYYM(IDX)
+                                  TO  TABLE-CYOKI-SKYYM(IDX9)
+                      MOVE WRK-HANBETU-YUSENYMD(IDX)
+                                  TO  TABLE-CYOKI-YUSENYMD(IDX9)
+                      ADD     1   TO  TABLE-CYOKI-HENSYU2(IDX9)
+                      EVALUATE  TABLE-CYOKI-HENSYU2(IDX9)
+                        WHEN      1
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD21(IDX9)
+                        WHEN      2
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD22(IDX9)
+                        WHEN      3
+                          MOVE WRK-HANBETU-CYOKIYMD(IDX)
+                                  TO  TABLE-CYOKI-YMD23(IDX9)
+                      END-EVALUATE
+                  END-IF
+                END-IF
+              END-IF
+      *
+           END-PERFORM.
+      *
+      ***
+      *
+           PERFORM  VARYING  IDX9  FROM  1  BY  1
+                     UNTIL  (IDX9                    >   10  )
+                       OR   (TABLE-CYOKI-SKYYM(IDX9) =  SPACE)
+             IF   TABLE-CYOKI-HENSYU1(IDX9)  =   1
+               EVALUATE  TABLE-CYOKI-HENSYU2(IDX9)
+                 WHEN     1
+                   IF  (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD21(IDX9))
+                     MOVE   1  TO  TABLE-CYOKI-HANTEI(IDX9)
+                   END-IF
+                 WHEN     2
+                   IF  (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD21(IDX9))
+                   AND (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD22(IDX9))
+                     MOVE   1  TO  TABLE-CYOKI-HANTEI(IDX9)
+                   END-IF
+                 WHEN     3
+                   IF  (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD21(IDX9))
+                   AND (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD22(IDX9))
+                   AND (TABLE-CYOKI-YMD1(IDX9) <
+                                     TABLE-CYOKI-YMD23(IDX9))
+                     MOVE   1  TO  TABLE-CYOKI-HANTEI(IDX9)
+                   END-IF
+               END-EVALUATE
+             END-IF
+           END-PERFORM.
+      *
+      ***
+      *
+           PERFORM  VARYING  IDX  FROM  1  BY  1
+                     UNTIL  (IDX                    >   10  )
+                      OR    (WRK-HANBETU-SKYYM(IDX) =  SPACE)
+             IF  WRK-HANBETU-YUSENBAN(IDX)  =   1
+               MOVE     ZERO    TO    FLG-HANBETU
+               PERFORM  VARYING  IDX9  FROM  1  BY  1
+                         UNTIL  (IDX9                    >   10  )
+                          OR    (TABLE-CYOKI-SKYYM(IDX9) =  SPACE)
+                 IF  (WRK-HANBETU-SKYYM(IDX)
+                                     = TABLE-CYOKI-SKYYM(IDX9)   )
+                 AND (WRK-HANBETU-YUSENYMD(IDX)
+                                     = TABLE-CYOKI-YUSENYMD(IDX9))
+                   IF  TABLE-CYOKI-HANTEI(IDX9)  =  ZERO
+                     MOVE  "00000000"  TO  WRK-HANBETU-CYOKIYMD(IDX)
+                   END-IF
+                   MOVE    1   TO  FLG-HANBETU
+                   MOVE   10   TO  IDX9
+                 END-IF
+               END-PERFORM
+               IF   FLG-HANBETU   =   ZERO
+                     MOVE  "00000000"  TO  WRK-HANBETU-CYOKIYMD(IDX)
+               END-IF
+             END-IF
            END-PERFORM.
       *
        HKNNUM-SYUTOKU-SYORI-EXT.
