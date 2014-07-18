@@ -890,6 +890,9 @@
                    07  FILLER              PIC X(03)   VALUE   "3AR".
                    07  FILLER              PIC X(03)   VALUE   "3AS".
       *
+                   07  FILLER              PIC X(03)   VALUE   "3AW".
+                   07  FILLER              PIC X(03)   VALUE   "3AX".
+      *
                    07  FILLER              PIC X(03)   VALUE   "241".
                    07  FILLER              PIC X(03)   VALUE   "242".
       *
@@ -902,12 +905,12 @@
                    07  FILLER              PIC X(03)   VALUE   "247".
                    07  FILLER              PIC X(03)   VALUE   "248".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS   66.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS   67.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   66.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   67.
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
                05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   8.
@@ -987,7 +990,6 @@
                                                    OCCURS  10000.
       *
            COPY    "CPLNKS08.INC".
-           COPY    "CPTANKI3.INC".
       *
       *****************************************************************
       *    ファイルレイアウト

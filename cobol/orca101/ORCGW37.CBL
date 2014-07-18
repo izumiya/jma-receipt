@@ -83,6 +83,7 @@
            03  WRK-MCP-WIDGET                      PIC X(64).
            03  WRK-WIDMSG                          PIC X(200).
            03  WRK-TNS-SRYCD                       PIC X(09).
+           03  WRK-TNS-KJNYMD                      PIC X(08).
            03  WRK-WIDGET-TANKI3-G.
                05  WRK-WIDGET-TANKI3-LBL           PIC X(11).
                05  WRK-WIDGET-TANKI3               PIC 9(02).
@@ -251,6 +252,10 @@
                    UNTIL ( IDX1    >   TANKI3-MAX )
       *
                IF    ( TANKI3-LIFEKBN (IDX1)   =   ZERO )
+                AND  ( TANKI3-YUKOSTYMD (IDX1)
+                                 <=   SPA-W01-EDYUKYMD )
+                AND  ( TANKI3-YUKOEDYMD (IDX1)
+                                 >=   SPA-W01-STYUKYMD )
                    PERFORM 3101-SPASET-SEC
                END-IF
       *
@@ -296,6 +301,8 @@
            MOVE    TANKI3-TANKICD (IDX1)
                                        TO  SPA-NAI-TANKI3-SRYCD (IDX2)
                                            WRK-TNS-SRYCD
+           MOVE    TANKI3-YUKOEDYMD (IDX1)
+                                       TO  WRK-TNS-KJNYMD
            PERFORM 900-TENSU-KEY-SEL-SEC
       *
            MOVE    SPACE               TO  SPA-GMN-CHK-LBLTANKI3 (IDX2)
@@ -1044,7 +1051,7 @@
            INITIALIZE                  TNS-TENSU-REC
       *
            MOVE    WRK-TNS-SRYCD   TO  TNS-SRYCD
-           MOVE    SPA-W01-EDYUKYMD TO TNS-YUKOSTYMD
+           MOVE    WRK-TNS-KJNYMD  TO TNS-YUKOSTYMD
                                        TNS-YUKOEDYMD
            MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC   TO  MCPDATA-REC

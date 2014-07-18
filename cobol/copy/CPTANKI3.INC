@@ -132,6 +132,18 @@
                05  FILLER          PIC X(09)   VALUE "190179310".
                05  FILLER          PIC X(08)   VALUE "20140401".
                05  FILLER          PIC X(08)   VALUE "99999999".
+      *        リ（水晶体嚢拡張リングを用いた場合　縫着なし）
+               05  FILLER          PIC X(01)   VALUE "0".
+               05  FILLER          PIC X(02)   VALUE "AW".
+               05  FILLER          PIC X(09)   VALUE "190182750".
+               05  FILLER          PIC X(08)   VALUE "20140701".
+               05  FILLER          PIC X(08)   VALUE "99999999".
+      *        リ（水晶体嚢拡張リングを用いた場合　縫着なし）（生活療養）
+               05  FILLER          PIC X(01)   VALUE "1".
+               05  FILLER          PIC X(02)   VALUE "AX".
+               05  FILLER          PIC X(09)   VALUE "190182850".
+               05  FILLER          PIC X(08)   VALUE "20140701".
+               05  FILLER          PIC X(08)   VALUE "99999999".
       *        ヌ
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "9P".
@@ -301,10 +313,10 @@
                05  FILLER          PIC X(08)   VALUE "20140401".
                05  FILLER          PIC X(08)   VALUE "99999999".
            03  TANKI3-R  REDEFINES TANKI3-VAL.
-               05  TANKI3-OCC      OCCURS      46.
+               05  TANKI3-OCC      OCCURS      48.
                    07  TANKI3-LIFEKBN          PIC X(01).
                    07  TANKI3-TOKCD            PIC X(02).
                    07  TANKI3-TANKICD          PIC X(09).
                    07  TANKI3-YUKOSTYMD        PIC X(08).
                    07  TANKI3-YUKOEDYMD        PIC X(08).
-       01  TANKI3-MAX                          PIC 9(03)   VALUE 46.
+       01  TANKI3-MAX                          PIC 9(03)   VALUE 48.

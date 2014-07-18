@@ -637,6 +637,9 @@
                    07  FILLER              PIC X(03)   VALUE   "3AP".
                    07  FILLER              PIC X(03)   VALUE   "3AQ".
       *
+                   07  FILLER              PIC X(03)   VALUE   "3AW".
+                   07  FILLER              PIC X(03)   VALUE   "3AX".
+      *
                    07  FILLER              PIC X(03)   VALUE   "3AR".
                    07  FILLER              PIC X(03)   VALUE   "3AS".
       *
@@ -652,12 +655,12 @@
                    07  FILLER              PIC X(03)   VALUE   "247".
                    07  FILLER              PIC X(03)   VALUE   "248".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS  66.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS  67.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   66.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   67.
       *
       *    スパ領域 ワーク
            COPY    "COMMON-SPA"      REPLACING
