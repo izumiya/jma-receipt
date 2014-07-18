@@ -446,9 +446,11 @@
            03   FILLER                     PIC X(09) VALUE "190181710".
       *    短手３
            03   FILLER                     PIC X(09) VALUE "190181910".
-      *64  短手３
+      *    短手３
            03   FILLER                     PIC X(09) VALUE "190182110".
-      *65  地域包括ケア病棟入院料１（生活療養）
+      *65  短手３
+           03   FILLER                     PIC X(09) VALUE "190182850".
+      *66  地域包括ケア病棟入院料１（生活療養）
            03   FILLER                     PIC X(09) VALUE "190175410".
       *    地域包括ケア入院医療管理料１（生活療養）
            03   FILLER                     PIC X(09) VALUE "190175610".
@@ -462,16 +464,16 @@
            03   FILLER                     PIC X(09) VALUE "190176410".
       *    地域包括ケア病棟入院料２（生活療養）（特定地域）
            03   FILLER                     PIC X(09) VALUE "190176610".
-      *72  地域包括ケア入院医療管理料２（生活療養）（特定地域）
+      *73  地域包括ケア入院医療管理料２（生活療養）（特定地域）
            03   FILLER                     PIC X(09) VALUE "190176810".
       *
-      *73  有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
+      *74  有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
            03   FILLER                     PIC X(09) VALUE "190124810".
-      *74  療養病棟入院基本料（特別入院基本料）（生活療養）
+      *75  療養病棟入院基本料（特別入院基本料）（生活療養）
            03   FILLER                     PIC X(09) VALUE "190124210".
       *
        01  TBL-H26-SEIKATSU-R     REDEFINES  TBL-H26-SEIKATSU-AREA.
-           03   TBL-H26-SEISRYCD           PIC X(09)  OCCURS  74.
+           03   TBL-H26-SEISRYCD           PIC X(09)  OCCURS  75.
       *
       *    一時領域
        01  WRK-AREA.
@@ -967,7 +969,7 @@
                        MOVE       ZERO        TO   FLG-SEI
                                                    IDX-SEI2
                        PERFORM    VARYING   IDX-SEI  FROM 1  BY  1
-                         UNTIL   (IDX-SEI   >   74)    OR
+                         UNTIL   (IDX-SEI   >   75)    OR
                                  (FLG-SEI   =    1)
                              IF  NSRY-SRYCD(1) = TBL-H26-SEISRYCD
                                                         (IDX-SEI)
@@ -991,7 +993,7 @@
       *                        病状の程度、治療の内容をしん酌して標準
       *                        負担額を軽減する患者の判定（特別入院基本料算定時の
       *                                                    ＡＤＬ入力判断）
-                               IF (IDX-SEI2   =   73  OR  74)    AND
+                               IF (IDX-SEI2   =   74  OR  75)    AND
                                   (SS008-MEDKBNDAY(IDX1)  =  "2" OR
                                                              "3" )
                                    MOVE   "1"   TO   
