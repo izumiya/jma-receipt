@@ -144,6 +144,9 @@
       *      Ã»¼ê£³¡Ê»ÒµÜ¶À²¼»ÒµÜ¶Ú¼ðÅ¦½Ð½Ñ¡Ë
              05   FILLER                   PIC X(02) VALUE "AF".
              05   FILLER                   PIC X(09) VALUE "190182010".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡¦¿å¾½ÂÎÇ¹³ÈÄ¥¥ê¥ó¥°¡¦Ë¥Ãå¤Ê¤·¡Ë
+             05   FILLER                   PIC X(02) VALUE "AW".
+             05   FILLER                   PIC X(09) VALUE "190182750".
       *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£±¡Ê·ÈÂÓÍÑÁõÃÖ»ÈÍÑ¡Ë¡Ë¡ÊÀ¸³è¡Ë
              05   FILLER                   PIC X(02) VALUE "98".
              05   FILLER                   PIC X(09) VALUE "190177710".
@@ -213,9 +216,12 @@
       *      Ã»¼ê£³¡Ê»ÒµÜ¶À²¼»ÒµÜ¶Ú¼ðÅ¦½Ð½Ñ¡Ë¡ÊÀ¸³è¡Ë
              05   FILLER                   PIC X(02) VALUE "AG".
              05   FILLER                   PIC X(09) VALUE "190182110".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡¦¿å¾½ÂÎÇ¹³ÈÄ¥¥ê¥ó¥°¡¦Ë¥Ãå¤Ê¤·¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "AX".
+             05   FILLER                   PIC X(09) VALUE "190182850".
       *
            03  CONS-TANKI3-H26-AREA-R  REDEFINES  CONS-TANKI3-H26-AREA.
-             05   CONS-TANKI3-H26-TBL      OCCURS  46.
+             05   CONS-TANKI3-H26-TBL      OCCURS  48.
                 07   CONS-TANKI3-H26-KBNCD PIC X(02).
                 07   CONS-TANKI3-H26-SRYCD PIC X(09).
       *
@@ -717,7 +723,7 @@
       *    Æþ±¡ÍúÎò¤è¤êÃ»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ£³¡ÊÀ¸³èÎÅÍÜ°Ê³°¡Ë¤Î»»ÄêÍ­Ìµ¤òÆÃÄê
            IF       LNK-NYUINDAY-SANTEIYM   >=   "201404"
             PERFORM     VARYING   IDX-TK3  FROM   1  BY  1
-             UNTIL     IDX-TK3   >   23
+             UNTIL     IDX-TK3   >   24
              INITIALIZE                     PTNYUINRRK-REC
              MOVE    LNK-NYUINDAY-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
              MOVE    LNK-NYUINDAY-PTID      TO  PTNYUINRRK-PTID
@@ -785,8 +791,8 @@
       *
       *
       *    Æþ±¡ÍúÎò¤è¤êÃ»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë¤Î»»ÄêÍ­Ìµ¤òÆÃÄê
-            PERFORM     VARYING   IDX-TK3  FROM   24  BY  1
-             UNTIL     IDX-TK3   >   46
+            PERFORM     VARYING   IDX-TK3  FROM   25  BY  1
+             UNTIL     IDX-TK3   >   48
              INITIALIZE                     PTNYUINRRK-REC
              MOVE    LNK-NYUINDAY-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
              MOVE    LNK-NYUINDAY-PTID      TO  PTNYUINRRK-PTID
@@ -922,7 +928,9 @@
                                             CONS-TANKI3-H26-SRYCD(43) OR
                                             CONS-TANKI3-H26-SRYCD(44) OR
                                             CONS-TANKI3-H26-SRYCD(45) OR
-                                            CONS-TANKI3-H26-SRYCD(46)
+                                            CONS-TANKI3-H26-SRYCD(46) OR
+                                            CONS-TANKI3-H26-SRYCD(47) OR
+                                            CONS-TANKI3-H26-SRYCD(48)
                           PERFORM    VARYING   IDX   FROM   1   BY   1
                                   UNTIL     IDX   >   WRK-GETSUMATSU-DD
                             IF     NACCT-DAY(IDX)  NOT =  ZERO

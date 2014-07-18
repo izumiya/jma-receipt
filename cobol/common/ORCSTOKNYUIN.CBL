@@ -2094,6 +2094,12 @@
                WHEN    "AV"
       *                特定一般病棟入院料（地域包括ケア入院医療管理２）
                        MOVE   "190182410"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "AW"
+      *                短手３（水晶体再建術・水晶体嚢拡張リング・縫着なし）
+                       MOVE   "190182750"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "AX"
+      *                短手３（水晶体再建術・水晶体嚢拡張リング・縫着なし）（生活）
+                       MOVE   "190182850"   TO  LNK-TOKNYUIN-SRYCD
              END-EVALUATE
            END-IF
       *
