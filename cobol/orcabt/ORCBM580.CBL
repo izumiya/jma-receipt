@@ -116,6 +116,7 @@
            03  IDYY                    PIC 9(05).
            03  IDZZ                    PIC 9(05).
            03  IDF                     PIC 9(05).
+           03  IDF1                    PIC 9(05).
       *
       *    一時領域
       *    パラメタエリア
@@ -167,6 +168,12 @@
                05  WRK-FTNKBN-TBL-MAX  PIC 9(01).
            03  WRK-SV-PTID             PIC 9(10).
            03  WRK-SV-HKNCOMBI         PIC 9(04).
+           03  WRK-HK-TBL.
+               05  WRK-HKNJANUM        PIC X(08).
+               05  WRK-FTNJANUM-G.
+                   07  WRK-FTNJANUM    PIC X(08)
+                                       OCCURS  4.
+               05  WRK-FTNJANUM-MAX    PIC 9(01).
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
            03  WRK-NYUTAIYMD.
@@ -455,7 +462,7 @@
                MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
            END-IF
       *
-           DISPLAY "RECEDEN-DISASTER=" SYS-200501-RECEDEN-DISASTER
+      *    DISPLAY "RECEDEN-DISASTER=" SYS-200501-RECEDEN-DISASTER
       *
       *    医療情報連携基盤情報
            MOVE    SPACE               TO  SYS-9101-REC
@@ -595,6 +602,7 @@
       *                負担区分クリア
                        MOVE    SPACE               TO  WRK-FTNKBN
                        INITIALIZE  WRK-FTNKBN-TBL
+                       INITIALIZE  WRK-HK-TBL
       *                データ提出同意か確認
                        PERFORM 900-PTPUBLIC-READ-SEC
                        EVALUATE    SYS-9101-COOPBASE
@@ -654,6 +662,8 @@
                        PERFORM     20021-HENSYU-SEC
                    END-IF
       *
+      *            レセ電データから保険者・負担者番号を退避
+                   PERFORM 20021-HK-SAVE-SEC
       *            レセ電データから負担区分を退避
                    PERFORM 20021-FTNKBN-SAVE-SEC
       *
@@ -696,6 +706,58 @@
       *
            .
        2002-FILE-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセ電データから保険者・負担者番号を退避処理
+      *****************************************************************
+       20021-HK-SAVE-SEC           SECTION.
+      *
+           IF      TBL-RECEDATA (IDX) (1:2)    =   "HO"    OR
+                                                   "KO"
+               INITIALIZE  ORCSDIVCSV-AREA
+               MOVE    TBL-RECEDATA (IDX)  TO  ORCSDIVCSV-REC
+               MOVE    3                   TO  ORCSDIVCSV-ELE-C
+               MOVE    ","                 TO  ORCSDIVCSV-DELI
+               MOVE    ZERO                TO  ORCSDIVCSV-DQ
+               CALL    "ORCSDIVCSV"     USING  ORCSDIVCSV-AREA
+               IF      ORCSDIVCSV-RC       =   ZERO
+                   IF      ORCSDIVCSV-D (2)
+                                           NOT =   SPACE
+                       IF      ORCSDIVCSV-D (1)    =   "HO"
+                           IF      ORCSDIVCSV-D (2)(1:1)
+                                                   NOT = SPACE
+                               STRING  ORCSDIVCSV-D (2)
+                                   DELIMITED   BY  SPACE
+                                   INTO    WRK-HKNJANUM
+                               END-STRING
+                           END-IF
+                           IF      ORCSDIVCSV-D (2)(1:2)   =   SPACE
+                               STRING  ORCSDIVCSV-D (2)(3:)
+                                   DELIMITED   BY  SPACE
+                                   INTO    WRK-HKNJANUM
+                               END-STRING
+                           END-IF
+                           IF      ORCSDIVCSV-D (2)(1:4)   =   SPACE
+                               STRING  ORCSDIVCSV-D (2)(5:)
+                                   DELIMITED   BY  SPACE
+                                   INTO    WRK-HKNJANUM
+                               END-STRING
+                           END-IF
+                       ELSE
+                           COMPUTE WRK-FTNJANUM-MAX
+                                               =   WRK-FTNJANUM-MAX
+                                               +   1
+                           STRING  ORCSDIVCSV-D (2)
+                               DELIMITED   BY  SPACE
+                               INTO    WRK-FTNJANUM (WRK-FTNJANUM-MAX)
+                           END-STRING
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+           .
+       20021-HK-SAVE-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1141,6 +1203,7 @@
       *
            IF     (ACCT-PTID       NOT =   WRK-SV-PTID)        OR
                   (ACCT-HKNCOMBI   NOT =   WRK-SV-HKNCOMBI)
+               INITIALIZE  ORCSGETFTNKBNAREA
                MOVE    SPA-HOSPNUM         TO  ORCSGETFK-HOSPNUM
                MOVE    ACCT-PTID           TO  ORCSGETFK-PTID
                MOVE    ACCT-SRYYM          TO  ORCSGETFK-SRYYM
@@ -1148,22 +1211,9 @@
       *
                CALL    "ORCSGETFTNKBN" USING   ORCSGETFTNKBNAREA
                                                SPA-AREA
-               MOVE    ORCSGETFK-FTNKBN    TO  WRK-FTNKBN
+               PERFORM 2002531-FIX-FTNKBN-SEC
                MOVE    ACCT-PTID           TO  WRK-SV-PTID
                MOVE    ACCT-HKNCOMBI       TO  WRK-SV-HKNCOMBI
-           END-IF
-      *
-           IF      WRK-FTNKBN-TBL-MAX  >   ZERO
-               PERFORM VARYING IDF FROM    1   BY  1
-                       UNTIL   IDF >   WRK-FTNKBN-TBL-MAX
-                   IF      WRK-FTNKBN          =   WRK-FTNKBN-VAL (IDF)
-                       EXIT    PERFORM
-                   ELSE
-                       IF      IDF             =   WRK-FTNKBN-TBL-MAX
-                           MOVE    SPACE           TO  WRK-FTNKBN
-                       END-IF
-                   END-IF
-               END-PERFORM
            END-IF
       *
            IF      WRK-FTNKBN          =   SPACE
@@ -1201,6 +1251,70 @@
            PERFORM 5001-FILE-WRITE-SEC
            .
        200253-C1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    連携用コメントレコード編集処理
+      *****************************************************************
+       2002531-FIX-FTNKBN-SEC      SECTION.
+      *
+      *     DISPLAY ""
+      *     DISPLAY "PTID { " ORCSGETFK-PTID " ]"
+      *     DISPLAY "PTCOM-INPUTCOMENT     [ " PTCOM-INPUTCOMENT " ]"
+      *     DISPLAY "ORCSGETFK-HKNJANUM    [ " ORCSGETFK-HKNJANUM " ]"
+      *     DISPLAY "WRK-HKNJANUM          [ " WRK-HKNJANUM " ]"
+      *     DISPLAY ""
+      *     DISPLAY "ORCSGETFK-FTNJANUM(1) [ " ORCSGETFK-FTNJANUM(1) " ]"
+      *     DISPLAY "WRK-FTNJANUM(1)       [ " WRK-FTNJANUM(1) " ]"
+      *     DISPLAY "ORCSGETFK-FTNJANUM(2) [ " ORCSGETFK-FTNJANUM(2) " ]"
+      *     DISPLAY "WRK-FTNJANUM(2)       [ " WRK-FTNJANUM(2) " ]"
+      *     DISPLAY "ORCSGETFK-FTNJANUM(3) [ " ORCSGETFK-FTNJANUM(3) " ]"
+      *     DISPLAY "WRK-FTNJANUM(3)       [ " WRK-FTNJANUM(3) " ]"
+      *
+      *保険者番号が同じ？
+           IF     (ORCSGETFK-HKNJANUM  =   SPACE)  AND
+                  (WRK-HKNJANUM        =   SPACE)
+               CONTINUE
+           ELSE
+               IF      ORCSGETFK-HKNJANUM  =   WRK-HKNJANUM
+                   MOVE    ORCSGETFK-FTNKBN    TO  WRK-FTNKBN
+               ELSE
+                   MOVE    SPACE               TO  WRK-FTNKBN
+                   GO  TO  2002531-FIX-FTNKBN-EXT
+               END-IF
+           END-IF
+      *
+           PERFORM VARYING IDF FROM    1   BY  1
+                   UNTIL  (ORCSGETFK-FTNJANUM (IDF) =   SPACE) OR
+                          (IDF >   4)
+      *負担者番号が同じ
+               PERFORM VARYING IDF1    FROM    1   BY  1
+                       UNTIL   IDF1    >   4
+                   IF      ORCSGETFK-FTNJANUM (IDF)
+                                           =   WRK-FTNJANUM (IDF1)
+                       MOVE    ORCSGETFK-FTNKBN    TO  WRK-FTNKBN
+                       EXIT    PERFORM
+                   END-IF
+                   IF      IDF1                =   4
+                       MOVE    SPACE               TO  WRK-FTNKBN
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+           IF      WRK-FTNKBN-TBL-MAX  >   ZERO
+               PERFORM VARYING IDF FROM    1   BY  1
+                       UNTIL   IDF >   WRK-FTNKBN-TBL-MAX
+                   IF      WRK-FTNKBN          =   WRK-FTNKBN-VAL (IDF)
+                       EXIT    PERFORM
+                   ELSE
+                       IF      IDF             =   WRK-FTNKBN-TBL-MAX
+                           MOVE    SPACE           TO  WRK-FTNKBN
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+           .
+       2002531-FIX-FTNKBN-EXT.
            EXIT.
       *
       *****************************************************************

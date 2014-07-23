@@ -40,6 +40,8 @@
       *
        01  FLG-AREA.
            03  FLG-HKNCOMBI            PIC 9(01).
+           03  FLG-PTHKNINF            PIC 9(01).
+           03  FLG-PTKOHINF            PIC 9(01).
       *
        01  INDEX-AREA.
            03  IDX                     PIC 9(03).
@@ -53,6 +55,12 @@
       *
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
+      *
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
+      *
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -107,6 +115,7 @@
       *    平成２０年４月改正以降の負担区分設定
            IF      ORCSGETFK-SRYYM     >=  "200804"
                PERFORM 200-FTNKBN-HENSYU-200804-SEC
+               PERFORM 300-HKNJA-FTNJA-SEC
            END-IF
       *
       *???
@@ -232,6 +241,42 @@
            EXIT.
       *
       *****************************************************************
+      *    保険者番号・負担者番号設定処理
+      *****************************************************************
+       300-HKNJA-FTNJA-SEC         SECTION.
+      *
+           INITIALIZE  PTHKNINF-REC
+           MOVE    COMB-HOSPNUM        TO  PTHKN-HOSPNUM
+           MOVE    COMB-PTID           TO  PTHKN-PTID
+           MOVE    COMB-HKNID          TO  PTHKN-HKNID
+           MOVE    COMB-TEKSTYMD       TO  PTHKN-TEKSTYMD
+           MOVE    COMB-TEKSTYMD       TO  PTHKN-TEKEDYMD
+           MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+           PERFORM 900-PTHKNINF-READ-SEC
+           IF      FLG-PTHKNINF        =   ZERO
+               MOVE    PTHKN-HKNJANUM      TO  ORCSGETFK-HKNJANUM
+           END-IF
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX         >   4
+                   OR      COMB-KOHID (IDX)    =   ZERO
+               MOVE    COMB-HOSPNUM        TO  PTKOH-HOSPNUM
+               MOVE    COMB-PTID           TO  PTKOH-PTID
+               MOVE    COMB-KOHID (IDX)    TO  PTKOH-KOHID
+               MOVE    COMB-TEKSTYMD       TO  PTKOH-TEKSTYMD
+               MOVE    COMB-TEKSTYMD       TO  PTKOH-TEKEDYMD
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               PERFORM 900-PTKOHINF-READ-SEC
+               IF      FLG-PTKOHINF        =   ZERO
+                   MOVE    PTKOH-FTNJANUM      TO
+                                           ORCSGETFK-FTNJANUM (IDX)
+               END-IF
+           END-PERFORM
+           .
+       300-HKNJA-FTNJA-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    保険組合せマスタ読込
       *****************************************************************
        900-HKNCOMBI-READ-SEC       SECTION.
@@ -260,6 +305,70 @@
            PERFORM 900-CLOSE-SEC
            .
        900-HKNCOMBI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者保険情報マスタ読込
+      *****************************************************************
+       900-PTHKNINF-READ-SEC       SECTION.
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTHKNINF
+                   MOVE    MCPDATA-REC         TO  PTHKNINF-REC
+                   IF      PTHKN-SAKJOKBN      =   "1"
+                       MOVE    1                   TO  FLG-PTHKNINF
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-PTHKNINF
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTHKNINF
+           END-IF
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-PTHKNINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報マスタ読込
+      *****************************************************************
+       900-PTKOHINF-READ-SEC       SECTION.
+      *
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTKOHINF
+                   MOVE    MCPDATA-REC         TO  PTKOHINF-REC
+                   IF      PTKOH-SAKJOKBN      =   "1"
+                       MOVE    1                   TO  FLG-PTKOHINF
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-PTKOHINF
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF
+           END-IF
+      *
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-PTKOHINF-READ-EXT.
            EXIT.
       *
       *****************************************************************

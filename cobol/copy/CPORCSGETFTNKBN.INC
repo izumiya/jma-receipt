@@ -34,4 +34,10 @@
            03  ORCSGETFK-HKNCOMBINUM   PIC 9(04).
       *…È√¥∂Ë ¨•≥°º•…
            03  ORCSGETFK-FTNKBN        PIC X(01).
+      * ›∏±º‘»÷πÊ
+           03  ORCSGETFK-HKNJANUM      PIC X(08).
+      *…È√¥º‘»÷πÊ
+           03  ORCSGETFK-FTNJANUM-G.
+               05  ORCSGETFK-FTNJANUM  PIC X(08)
+                                       OCCURS  4.
       *
