@@ -516,9 +516,13 @@
                05  FILLER          PIC X(09)   VALUE   "190182010".
       * A400  短手３（子宮鏡下子宮筋腫摘出術）（生活）
                05  FILLER          PIC X(09)   VALUE   "190182110".
+      * A400  短手３（水晶体再建術・水晶体嚢拡張リング・縫着なし）
+               05  FILLER          PIC X(09)   VALUE   "190182750".
+      * A400  短手３（水晶体再建術・水晶体嚢拡張リング・縫着なし）（生活）
+               05  FILLER          PIC X(09)   VALUE   "190182850".
       *
        01  TBL-TOKUTEINYUIN26-AREA-R  REDEFINES TBL-TOKUTEINYUIN26-AREA.
-           03  TBL-TOKUTEINYUIN26-OCC OCCURS      95
+           03  TBL-TOKUTEINYUIN26-OCC OCCURS      97
                                        INDEXED TBL-TOKUTEINYUIN26-IDX.
                05  TBL-TOKUTEINYUIN26-SRYCD PIC X(09).
       *
