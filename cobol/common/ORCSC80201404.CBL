@@ -53,7 +53,8 @@
       * 04.07.00     NACL-多々納  13/05/15  疾患別リハビリ月上限対応
       * 04.07.00     NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
       * 04.07.00     NACL-多々納  14/04/XX  精２０歳未満加算削除対応等
-      * 04.07.00     NACL-多々納  14/05/XX  労災リハビリ％加算対応
+      * 04.07.00     NACL-多々納  14/05/02  労災リハビリ加算計算対応
+      * 04.07.00     NACL-多々納  14/07/25  労災リハ（1.2倍）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1991,13 +1992,13 @@
       *            施設基準不適合（脳血管疾患リハビリ）
                    IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
                       AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "001")
-      **廃止*****      MOVE    "180042770"         TO  WRK-SRYCD
+      **廃止*******    MOVE    "180042770"         TO  WRK-SRYCD
                        MOVE    1                   TO  WRK-ERRCHK
                    END-IF
       *            施設基準不適合（運動器リハビリ）
                    IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
                       AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
-      **廃止*****      MOVE    "180043370"         TO  WRK-SRYCD
+      **廃止*******    MOVE    "180043370"         TO  WRK-SRYCD
                        MOVE    1                   TO  WRK-ERRCHK
                    END-IF
       *            不適合あり
@@ -2730,31 +2731,38 @@
                    OR (WRK-COM-DATAKBN (IDX-Z) =   "2"  )
                    GO      TO      1001131-RSIKASAN-AUTO-EXT
                END-IF
+      *H26.7
+      *        合成コードは対象外
+               IF     (WRK-COM-KOKUJISKBKBN1 (IDX-Z) =   3 )
+                   GO      TO      1001131-RSIKASAN-AUTO-EXT
+               END-IF
            END-IF
       *
            MOVE    SPACE                TO  WRK-SRYCD
            MOVE    ZERO                 TO  FLG-ROUSAI
+      *労災コードのみ対象
       *    労災用　区分番号
-           IF      WRK-COM-CDKBN-KBN (IDX-Z)  =   "H"
-             AND  (WRK-COM-DATAKBN (IDX-Z) =   "1"  )
-               EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-Z)
-                   WHEN    "000"
-                   WHEN    "001"
-                   WHEN    "002"
-                   WHEN    "003"
+      *    IF      WRK-COM-CDKBN-KBN (IDX-Z)  =   "H"
+      *      AND  (WRK-COM-DATAKBN (IDX-Z) =   "1"  )
+      *        EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-Z)
+      *            WHEN    "000"
+      *            WHEN    "001"
+      *            WHEN    "002"
+      *            WHEN    "003"
       *疾患別リハビリのみ対象
       *********    WHEN    "004"
       *********    WHEN    "005"
-                       EVALUATE    SPA-RSI-SISIKBN
-                           WHEN    1
-                           WHEN    2
+      *                EVALUATE    SPA-RSI-SISIKBN
+      *                    WHEN    1
+      *                    WHEN    2
       *                        １．５倍
-                               MOVE    "101800010"      TO  WRK-SRYCD
-                       END-EVALUATE
-                       MOVE    1                    TO  FLG-ROUSAI
-               END-EVALUATE
-           END-IF
-      *    労災コードのリハビリ料
+      *                        MOVE    "101800010"      TO  WRK-SRYCD
+      *                END-EVALUATE
+      *                MOVE    1                    TO  FLG-ROUSAI
+      *        END-EVALUATE
+      *****END-IF
+      *
+      *    労災コードのリハビリ料のみ対応
            IF     (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "101" )
               AND (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H"  )
               AND (WRK-COM-DATAKBN   (IDX-Z)   =   "1"  )
@@ -2819,6 +2827,11 @@
                    IF     (WRK-COM-INPUTCD (IDX1)(1:1) =  "1" ) AND
                           (WRK-COM-DATAKBN (IDX1)      =  "1" )
                       MOVE    SPA-MAX-LINE          TO  IDX1
+                   END-IF
+      *H26.7
+      *            労災リハ（1.2）より下
+                   IF     (WRK-COM-INPUTCD (IDX1)   =  "101800080")
+                       MOVE    IDX1            TO  IDX-T
                    END-IF
                END-IF
            END-PERFORM
@@ -3388,11 +3401,13 @@
       *        労災リハ（１．２）加算
                IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
-                      (WRK-COM-SANFLG     (IDX)    =   0   )
+      *??             (WRK-COM-SANFLG     (IDX)    =   0   )
+                      (WRK-COM-INPUTCD (IDX)       =   "101800080")
+      *
+      *            基礎点数の１.2倍
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
-                                                             (IDX-SYU)
-                                               -   WRK-TENSUKEI-G )
+                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-TEN
+                                                             (IDX-SYU))
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                                                +   0.5
@@ -3425,9 +3440,9 @@
                          OR   (FLG-RIHAEND =   1        )
       *
       *        労災１．５ ％加算
-               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
-                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
-                      (WRK-COM-SANFLG     (IDX)    =   2   )
+               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")
+                 AND  (WRK-COM-TENSIKIBETU(IDX)    =   5   )
+                 AND  (WRK-COM-SANFLG     (IDX)    =   2   )
       *        リハビリの労災加算は単位点数毎とする（他の加算なし）
       *            点数の％加算
                    COMPUTE WRK-TENSUKEI        =   WRK-COM-TEN
