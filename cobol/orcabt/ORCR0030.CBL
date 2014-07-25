@@ -868,6 +868,7 @@
            03  FLG-DAISAN-NG                           PIC 9(01).
            03  FLG-ZAITAKU-CHECK                       PIC 9(01).
            03  FLG-CYOKI-HENSYU                        PIC 9(01).
+           03  FLG-CYOKI-HENSYU2                       PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1165,7 +1166,6 @@
                  07  WRK-SYUNOU-CYOKI-TEKSTYMD           PIC  X(08).
              05  WRK-SYUNOU-CYOKI-HKNNUM                 PIC  X(03).
              05  WRK-SYUNOU-CYOKI-FTNMONEY               PIC  9(07).
-             05  WRK-SYUNOU-CYOKI-FTNMONEY-KOH           PIC  9(07).
              05  WRK-SYUNOU-CYOKI-FTNMONEY2              PIC  9(07).
              05  WRK-SYUNOU-CYOKI-TEKSTYMD-XXX           PIC  X(08).
              05  WRK-SYUNOU-CYOKI-HANTEIFLG              PIC  9(01).
@@ -3274,6 +3274,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO   CNT-CYOKI-HENSYU1
            MOVE      ZERO       TO   CNT-CYOKI-HENSYU2
            MOVE      ZERO       TO   FLG-CYOKI-HENSYU
+           MOVE      ZERO       TO   FLG-CYOKI-HENSYU2
            INITIALIZE                WRK-SYUNOU-CYOKI-AREA
            IF  (RECE02-SRYYM     >=    "200804")
            AND (RECE02-ZAITAKU    =  "1" OR "2")
@@ -14311,11 +14312,11 @@ grpsys           PERFORM 900-DBSELECT-SEC
            MOVE    "__"                 TO   SYU-SRYYMD(7:2)
            MOVE    SYUNOU-REC           TO   MCPDATA-REC
            MOVE    "tbl_syunou"         TO   MCP-TABLE
-           MOVE    "key26"              TO   MCP-PATHNAME
+           MOVE    "key14"              TO   MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =    ZERO
              MOVE    "tbl_syunou"       TO   MCP-TABLE
-             MOVE    "key26"            TO   MCP-PATHNAME
+             MOVE    "key14"            TO   MCP-PATHNAME
              PERFORM  900-SYUNOU-READ-SEC
              PERFORM  UNTIL  (FLG-SYUNOU  =  1)
                PERFORM  VARYING  IDX1   FROM  1   BY  1
@@ -14347,12 +14348,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  END-IF
                END-PERFORM
                MOVE      "tbl_syunou"   TO   MCP-TABLE
-               MOVE      "key26"        TO   MCP-PATHNAME
+               MOVE      "key14"        TO   MCP-PATHNAME
                PERFORM    900-SYUNOU-READ-SEC
              END-PERFORM
            END-IF
            MOVE    "tbl_syunou"         TO   MCP-TABLE
-           MOVE    "key26"              TO   MCP-PATHNAME
+           MOVE    "key14"              TO   MCP-PATHNAME
            PERFORM  900-CLOSE-SEC
       *
            IF   WRK-CYOKI-TOTAL-HKNTEN2     = ZERO
@@ -14495,10 +14496,14 @@ grpsys           PERFORM 900-DBSELECT-SEC
                                  + SYU-GRP-SGKMONEY
              ADD   WRK-FTNKEI
                       TO   WRK-SYUNOU-CYOKI-FTNMONEY
+             IF    FLG-CYOKI-HENSYU2  =  1
+               MOVE   9   TO   FLG-CYOKI-HENSYU2
+             END-IF
            ELSE
              MOVE  2  TO   WRK-SYUNOU-CYOKI-KOHFLG(IDX1)
-             ADD   SYU-KOH-HKNFTNMONEY(1)
-                      TO   WRK-SYUNOU-CYOKI-FTNMONEY-KOH
+             IF    FLG-CYOKI-HENSYU2  =  ZERO
+               MOVE   1   TO   FLG-CYOKI-HENSYU2
+             END-IF
            END-IF
       *
            .
@@ -14597,17 +14602,15 @@ grpsys           PERFORM 900-DBSELECT-SEC
              END-EVALUATE
       *
              IF    FTN-KOH-XXX   <   WRK-KINGAKU
-               IF  WRK-KINGAKU < WRK-SYUNOU-CYOKI-FTNMONEY
-                 MOVE   WRK-KINGAKU
+               COMPUTE  WRK-SYUNOU-CYOKI-FTNMONEY2 = WRK-KINGAKU
+                                                   - FTN-KOH-XXX
+               IF  WRK-SYUNOU-CYOKI-FTNMONEY2 <
+                                   WRK-SYUNOU-CYOKI-FTNMONEY
+                 MOVE   WRK-SYUNOU-CYOKI-FTNMONEY2
                                TO  WRK-SYUNOU-CYOKI-FTNMONEY
                END-IF
-               COMPUTE  WRK-SYUNOU-CYOKI-FTNMONEY2 =
-                        WRK-KINGAKU                -
-                        WRK-SYUNOU-CYOKI-FTNMONEY
-      *
-               IF  (WRK-SYUNOU-CYOKI-FTNMONEY  NOT = ZERO      )
-               AND (WRK-SYUNOU-CYOKI-FTNMONEY2 >=
-                                  WRK-SYUNOU-CYOKI-FTNMONEY-KOH)
+               IF  WRK-SYUNOU-CYOKI-FTNMONEY  NOT = ZERO
+               AND FLG-CYOKI-HENSYU2          NOT =  9
                  ADD    WRK-SYUNOU-CYOKI-FTNMONEY
                                TO  FTN-KOH-XXX
                                    WRK-CHK-ICHIBUGAKU

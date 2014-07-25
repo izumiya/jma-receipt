@@ -1140,7 +1140,6 @@
                  07  WRK-SYUNOU-CYOKI-TEKSTYMD         PIC X(08).
              05  WRK-SYUNOU-CYOKI-HKNNUM               PIC X(03).
              05  WRK-SYUNOU-CYOKI-FTNMONEY             PIC 9(07).
-             05  WRK-SYUNOU-CYOKI-FTNMONEY-KOH         PIC 9(07).
              05  WRK-SYUNOU-CYOKI-FTNMONEY2            PIC 9(07).
              05  WRK-SYUNOU-CYOKI-TEKSTYMD-XXX         PIC X(08).
              05  WRK-SYUNOU-CYOKI-HANTEIFLG            PIC 9(01).
@@ -17132,8 +17131,6 @@
                       TO   WRK-SYUNOU-CYOKI-FTNMONEY
            ELSE
              MOVE  2  TO   WRK-SYUNOU-CYOKI-KOHFLG(IDX1)
-             ADD   SYU-KOH-HKNFTNMONEY(1)
-                      TO   WRK-SYUNOU-CYOKI-FTNMONEY-KOH
            END-IF
       *
            .
@@ -17223,17 +17220,14 @@
              END-EVALUATE
       *
              IF    FTN-KOH-XXX   <   WRK-KINGAKU
-               IF  WRK-KINGAKU < WRK-SYUNOU-CYOKI-FTNMONEY
-                 MOVE   WRK-KINGAKU
+               COMPUTE  WRK-SYUNOU-CYOKI-FTNMONEY2 = WRK-KINGAKU
+                                                   - FTN-KOH-XXX
+               IF  WRK-SYUNOU-CYOKI-FTNMONEY2 <
+                                   WRK-SYUNOU-CYOKI-FTNMONEY
+                 MOVE   WRK-SYUNOU-CYOKI-FTNMONEY2
                                TO  WRK-SYUNOU-CYOKI-FTNMONEY
                END-IF
-               COMPUTE  WRK-SYUNOU-CYOKI-FTNMONEY2 =
-                        WRK-KINGAKU                -
-                        WRK-SYUNOU-CYOKI-FTNMONEY
-      *
-               IF  (WRK-SYUNOU-CYOKI-FTNMONEY  NOT = ZERO      )
-               AND (WRK-SYUNOU-CYOKI-FTNMONEY2 >=
-                                  WRK-SYUNOU-CYOKI-FTNMONEY-KOH)
+               IF  WRK-SYUNOU-CYOKI-FTNMONEY  NOT = ZERO
                  ADD    WRK-SYUNOU-CYOKI-FTNMONEY
                                TO  FTN-KOH-XXX
                                    WRK-CHK-ICHIBUGAKU
