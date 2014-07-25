@@ -1599,14 +1599,14 @@
            MOVE    1                   TO  FLG-SRYBYO
       *
       *    Ê»ÍÑ¶Ø´÷¤ÎÌôºÞ
-      *    MOVE    "4"                 TO  WRK-CHK-CHKKBN
-      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
-      *    PERFORM 900-CHK-KEY5-SEL-SEC
-      *    IF    ( FLG-CHKMST          =   ZERO )
-      *        MOVE    1               TO  FLG-YKZHEI
-      *    END-IF
+           MOVE    "4"                 TO  WRK-CHK-CHKKBN
+           MOVE    "2"                 TO  WRK-CHK-CDKBN
+           PERFORM 900-CHK-KEY5-SEL-SEC
+           IF    ( FLG-CHKMST          =   ZERO )
+               MOVE    1               TO  FLG-YKZHEI
+           END-IF
       *
-           MOVE    1                   TO  FLG-YKZHEI
+      *    MOVE    1                   TO  FLG-YKZHEI
       *
       *    Ê»ÍÑ»»Äê¤Î¿ÇÎÅ¹Ô°Ù
       *    MOVE    "5"                 TO  WRK-CHK-CHKKBN
