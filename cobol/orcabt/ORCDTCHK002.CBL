@@ -3804,8 +3804,6 @@
                    IF    ( TSRYCD-DENPNUM (IDX26 IDXI)    =   ZERO )
                        MOVE    PTZAI-DENPNUM (IDX-ZAI IDXI)
                                TO  TSRYCD-DENPNUM (IDX26 IDXI)
-                       MOVE    PTZAI-DENPNUM-KAISU (IDX-ZAI IDXI)
-                               TO  TSRYCD-DENPNUM-KAISU (IDX26 IDXI)
                        MOVE    PTZAI-DENPNUM-DAY (IDX-ZAI IDXI)
                                TO  TSRYCD-DENPNUM-DAY   (IDX26 IDXI)
                    END-IF
