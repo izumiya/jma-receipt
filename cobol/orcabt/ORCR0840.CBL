@@ -252,6 +252,7 @@
       *  04.07.16    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     コメント自動記載修正
       *  04.07.17    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
+      *  04.07.18    NACL-門脇    14/07/31  栄養管理体制減算規定該当対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2053,6 +2054,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE  "101900130"  TO  WRK-CHUKSNSRYCD(IDX14)
            ADD     1          TO  IDX14
            MOVE  "101900140"  TO  WRK-CHUKSNSRYCD(IDX14)
+      *
+           ADD     1          TO  IDX14
+           MOVE  "101900150"  TO  WRK-CHUKSNSRYCD(IDX14)
+           ADD     1          TO  IDX14
+           MOVE  "101900160"  TO  WRK-CHUKSNSRYCD(IDX14)
       *
            ADD     1          TO  IDX14
            MOVE  "190182690"  TO  WRK-CHUKSNSRYCD(IDX14)
