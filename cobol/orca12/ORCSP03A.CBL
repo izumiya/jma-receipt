@@ -2889,6 +2889,16 @@
                    MOVE    IDX             TO  WRK-IDX
                    MOVE    16              TO  SPA-GMN-CUR
                END-IF
+      *H26.7
+      *        ²ÈÂ²¤Î»þ¡¢Êä½õ¶èÊ¬È½Äê¤Ê¤·
+               IF     (SPA-PTHKN-HKNNUM  (IDX) =   "002") AND
+                     ((SPA-GMN-HONKZKKBN       =   "2"  ) AND
+                      (SPA-PTHKN-HONKZKKBN (IDX)
+                                               =   SPA-GMN-HONKZKKBN))
+                   MOVE    "0064"          TO  SPA-ERRCD
+                   MOVE    IDX             TO  WRK-IDX
+                   MOVE    16              TO  SPA-GMN-CUR
+               END-IF
                GO      TO      20041-KIKAN-CHK1-EXT
            END-IF
       *    ¶¦ºÑ¤Î²¼Á¥£³·î
@@ -2923,7 +2933,7 @@
            MOVE    "0064"              TO  SPA-ERRCD
            MOVE    IDX                 TO  WRK-IDX
            MOVE    16                  TO  SPA-GMN-CUR
-            .
+           .
        20041-KIKAN-CHK1-EXT.
            EXIT.
       *****************************************************************
