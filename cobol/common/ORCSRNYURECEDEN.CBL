@@ -1016,6 +1016,20 @@
                    MOVE   7            TO   TNS-KOKUJISKBKBN1
                END-IF
       *
+      *-------------------------------------------------------------
+      *        栄養管理体制減算規定該当の労災用マスタは告示等識別
+      *        区分（１）は９（通則加算項目）だが、並べ替えの為
+      *        ７（加算項目）をセットしておく
+      *-------------------------------------------------------------
+      *        栄養管理体制減算規定該当（入院基本料）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190182590"
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *        栄養管理体制減算規定該当（特定入院料短期滞在手術基２）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190182690"
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *
       *        告示等識別区分（１）が７（加算項目）以外の入院料加算の退避
                IF   TNS-KOKUJISKBKBN1   NOT =   7
       *          病衣貸与料と労災治療計画加算は処理対象外
@@ -2007,6 +2021,12 @@
                             MOVE "101900140" TO WRK-SO-SRYCD(IDX1 IDX3)
                          END-IF
       *
+      *                栄養管理体制減算規定該当の労災用置き換え（平成２６年７月追加）
+      *                  栄養管理体制減算規定該当（入院基本料）（労災用）
+                         IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190182590"
+                            MOVE "101900150" TO WRK-SO-SRYCD(IDX1 IDX3)
+                         END-IF
+      *
                          MOVE  WRK-SO-SRYCD(IDX1 IDX3) TO
                                     LNK-RNYURECEDEN-SRYCD(1 IDX2 IDX3)
                          MOVE   WRK-SO-KAISU(IDX1)   TO
@@ -2363,6 +2383,13 @@
                                MOVE   WRK-SO-SRYKBN(IDX1)  TO   
                                     LNK-RNYURECEDEN-SRYSKB(2 IDX2 IDX3)
                          END-IF
+      *
+      *                栄養管理体制減算規定該当の労災用置き換え（平成２６年７月追加）
+      *                  栄養管理体制減算規定該当（特定入院料短期滞在手術基２）（労災用）
+                         IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190182690"
+                            MOVE "101900160" TO WRK-SO-SRYCD(IDX1 IDX3)
+                         END-IF
+      *
                          MOVE  WRK-SO-SRYCD(IDX1 IDX3) TO
                                     LNK-RNYURECEDEN-SRYCD(2 IDX2 IDX3)
                          MOVE   WRK-SO-KAISU(IDX1)   TO
