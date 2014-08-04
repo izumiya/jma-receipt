@@ -122,6 +122,7 @@
       *  04.07.03    NACL-門脇    14/05/08  053児童保護と地方公費の
       *                                     保険組合せ作成
       *  04.07.04    NACL-門脇    14/05/16  地公等の下船後の短縮制度名修正
+      *  04.07.05    NACL-門脇    13/08/04  更生と特定負無の保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3938,6 +3939,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                "51463032"
                                IF  WRK-SRT-HJO-KOHNO  =
                                    "021" OR "015" OR "051"
+                                  PERFORM 5701413-SYUKOH-HJO-SEC
+                               END-IF
+                             ELSE
+                               IF  WRK-SRT-HJO-KOHNO  =
+                                   "015"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
                              END-IF
