@@ -3473,6 +3473,9 @@
       *
       *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
            EVALUATE    TRUE
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H260401 )
+            AND  ( SPA-GMN-W20-SBT        =   "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN  =   79 )
            WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H241001 )
             AND  ( SPA-GMN-W20-SBT        =   "01" )
             AND  ( SPA-NAI-W20-NYUKHNKBN  =   56 OR 57 )
@@ -5435,11 +5438,15 @@
                                NOT =   WRK-SRYCD )
                    IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
                     AND  ( SPA-GMN-W20-SBT         =  "01" )
+      *
                        INITIALIZE      SPA-GMN-W20-RYOYOKBNLST-G
                                        SPA-GMN-W20-RYOYOKBN-G
-                       IF    ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
+                       EVALUATE    TRUE
+                       WHEN  ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H260401)
+                         AND ( SPA-NAI-W20-NYUKHNKBN   =  79 )
+                       WHEN  ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
                            PERFORM 4100-RYOYOKBN-CMB-EDT-SEC
-                       END-IF
+                       END-EVALUATE
                    END-IF
                    INITIALIZE      SPA-GMN-W20-YKNCHOKAKBNLST-G
                                    SPA-GMN-W20-YKNCHOKAKBN-G
@@ -5836,11 +5843,15 @@
            PERFORM 4200-YKNCHOKAKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-YKNCHOKAKBN-G
       *
-           IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
+           EVALUATE    TRUE
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H260401 )
+            AND  ( SPA-GMN-W20-SBT         =  "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN   =  79 )
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
             AND  ( SPA-GMN-W20-SBT         =  "01" )
             AND  ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
                PERFORM 4100-RYOYOKBN-CMB-EDT-SEC
-           END-IF
+           END-EVALUATE
       *
       *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
            MOVE    SYS-5001-CRYOYOKBN  TO  WRK-CMB-CD
@@ -8939,11 +8950,15 @@
            END-PERFORM
       *
       *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
-           IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
+           EVALUATE    TRUE
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H260401 )
+            AND  ( SPA-GMN-W20-SBT         =  "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN   =  79 )
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
             AND  ( SPA-GMN-W20-SBT         =  "01" )
             AND  ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
                MOVE    "£¹£°ÆüÄ¶¤¨¤Î»»Äê" TO W20-LBLRYOYOKBN
-           END-IF
+           END-EVALUATE
       *
            IF    ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H240401 )
             AND  ( SPA-GMN-W20-SBT          =  "08" OR "09" )
