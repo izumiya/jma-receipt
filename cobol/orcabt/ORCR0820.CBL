@@ -53,6 +53,7 @@
       *  04.07.02    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *  04.07.03    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *  04.07.04    NACL-ÌçÏÆ    14/05/08  Ï«ºÒ¥ì¥»¡Ö¿··ÑºÆÊÌ¡×µ­ºÜ½¤Àµ
+      *  04.07.05    NACL-ÌçÏÆ    14/08/07  Ï«ºÒ¥ì¥»¡Ö¿··ÑºÆÊÌ¡×µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -420,10 +421,17 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE82-RECEKAISU
       *
-              IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
-                CONTINUE
+              IF   (RECE82-SINKEI          =  "3"         )
+              AND  (RECE82-SHOSHINYMD(1:6) =  RECE82-SRYYM)
+              AND  (RECE82-KIJYUNYM-KSI    =  RECE82-SRYYM)
+              AND  (RECE82-KAISU-KSI       >  1           )
+                IF  LNK-ORCSROUKAISU-RECEKAISU  >  RECE82-KAISU-KSI
+                  MOVE     "5"           TO  RECE82-SINKEI
+                END-IF
               ELSE
-                MOVE   "5"               TO  RECE82-SINKEI
+                IF  LNK-ORCSROUKAISU-RECEKAISU  >  1
+                  MOVE     "5"           TO  RECE82-SINKEI
+                END-IF
               END-IF
              END-IF
            END-IF

@@ -113,6 +113,7 @@
       *  04.07.12    NACL-門脇    14/05/08  労災レセ「新継再別」記載修正
       *  04.07.13    NACL-門脇    14/05/27  第三者行為の給付割合の設定
       *                                     （社保前期高齢２割）
+      *  04.07.15    NACL-門脇    14/08/07  労災レセ「新継再別」記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1242,10 +1243,17 @@ grpsys         PERFORM 900-DBSELECT-SEC
               MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE41-RECEKAISU
       *
-              IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
-                CONTINUE
+              IF   (RECE41-SINKEI        =  "3"         )
+              AND  (RECE41-RYOSTYMD(1:6) =  RECE41-SRYYM)
+              AND  (RECE41-KIJYUNYM-KSI  =  RECE41-SRYYM)
+              AND  (RECE41-KAISU-KSI     >  1           )
+                IF  LNK-ORCSROUKAISU-RECEKAISU  >  RECE41-KAISU-KSI
+                  MOVE     "5"           TO  RECE41-SINKEI
+                END-IF
               ELSE
-                MOVE   "5"               TO  RECE41-SINKEI
+                IF  LNK-ORCSROUKAISU-RECEKAISU  >  1
+                  MOVE     "5"           TO  RECE41-SINKEI
+                END-IF
               END-IF
              END-IF
            END-IF
