@@ -425,6 +425,7 @@
       *                                     ないものとみなす
       *  04.07.15    NACL-門脇    14/07/17  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応
+      *  04.07.17    NACL-門脇    14/08/08  特定負有＋特定負有の負担金計算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -17071,6 +17072,20 @@
              WHEN        1
                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM )
                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID)
+                IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH2ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ) AND
+                     (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+      ***       OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
+      ***            (COMB-KOH2ID         =  WRK-COMB-KOH2ID) AND
+      ***            (LNK-SYU-KOH2HKNNUM  =  "051"          ))
+                 CONTINUE
+                ELSE
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
@@ -17082,9 +17097,21 @@
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH1ID
                      END-IF
                  END-EVALUATE
+                END-IF
                END-IF
                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM )
                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID)
+                IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH2ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                 CONTINUE
+                ELSE
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
@@ -17096,6 +17123,7 @@
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH1ID
                      END-IF
                  END-EVALUATE
+                END-IF
                END-IF
                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM )
                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH1ID)
@@ -17128,6 +17156,17 @@
              WHEN        2
                IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM )
                AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID)
+                IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH2ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH2ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ))
+                 CONTINUE
+                ELSE
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
@@ -17139,9 +17178,21 @@
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH2ID
                      END-IF
                  END-EVALUATE
+                END-IF
                END-IF
                IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM )
                AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID)
+                IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH2ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ))
+                OR  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                     (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
+                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                 CONTINUE
+                ELSE
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
@@ -17153,6 +17204,7 @@
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH2ID
                      END-IF
                  END-EVALUATE
+                END-IF
                END-IF
                IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM )
                AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH2ID)

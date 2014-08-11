@@ -123,6 +123,7 @@
       *                                     保険組合せ作成
       *  04.07.04    NACL-門脇    14/05/16  地公等の下船後の短縮制度名修正
       *  04.07.05    NACL-門脇    13/08/04  更生と特定負無の保険組合せ作成
+      *  04.07.06    NACL-門脇    13/08/08  特定負有と特定負有の保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3925,28 +3926,29 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                           ELSE
                            IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
       *                      （精神通院、更生、特定負有）＋特定負無（水俣）
-                             IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
-                                           =   "51153013" OR
-                                               "51153021" OR
-                                               "51153039" OR
-                                               "51153047" OR
-                                               "51433019" OR
-                                               "51433027" OR
-                                               "51433035" OR
-                                               "51433043" OR
-                                               "51463016" OR
-                                               "51463024" OR
-                                               "51463032"
+      ***                    IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
+      ***                                  =   "51153013" OR
+      ***                                      "51153021" OR
+      ***                                      "51153039" OR
+      ***                                      "51153047" OR
+      ***                                      "51433019" OR
+      ***                                      "51433027" OR
+      ***                                      "51433035" OR
+      ***                                      "51433043" OR
+      ***                                      "51463016" OR
+      ***                                      "51463024" OR
+      ***                                      "51463032"
                                IF  WRK-SRT-HJO-KOHNO  =
-                                   "021" OR "015" OR "051"
+                                   "021" OR "015" OR "051" OR "091"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
-                             ELSE
+      ***                    END-IF
+                           END-IF
+                           IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "051"
                                IF  WRK-SRT-HJO-KOHNO  =
-                                   "015"
+                                   "051"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
-                             END-IF
                            END-IF
                            IF  (SPA-PREFNUM                     =  19  )
                            AND (WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
