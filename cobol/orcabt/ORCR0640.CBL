@@ -653,6 +653,7 @@
       *                                     なった場合の対応
       *  04.07.29    NACL-門脇    14/07/28  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応修正
+      *  04.07.31    NACL-門脇    14/08/11  ７５歳以上の海外居住者２割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16022,6 +16023,8 @@
       *
            MOVE    ZERO                 TO      WRK-CYOKI-JGNGAK
       *
+           MOVE    ZERO                 TO      FLG-KOKI-HIGAITO
+      *
            IF  (RECE62-NYUINRYOFLG   =   "1"     )
            AND (RECE62-KOUREI        =   "1"     )
            AND (RECE62-SRYYM        >=   "200904")
@@ -18492,7 +18495,8 @@
                      (RECE62-KYURATE  =  20      )) OR
                     ((RECE62-SRYYM   >=  "201405") AND
                      (RECE62-KYURATE  =  20      ) AND
-                     (RECE62-BIRTHDAY <  19440402))    )
+                     (RECE62-BIRTHDAY <  19440402) AND
+                     (FLG-KOKI-HIGAITO  =   ZERO ))    )
               AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
               AND  (  FLG-KOHYONKAIME      =  ZERO     )
                 IF    RECE62-SRYYM   >=  "200610"
@@ -24313,7 +24317,8 @@
                       (RECE62-KYURATE  =  20      )) OR
                      ((RECE62-SRYYM   >=  "201405") AND
                       (RECE62-KYURATE  =  20      ) AND
-                      (RECE62-BIRTHDAY <  19440402))    )
+                      (RECE62-BIRTHDAY <  19440402) AND
+                      (FLG-KOKI-HIGAITO  =   ZERO ))    )
                 AND (  RECE62-RJNGENMENKBN  =  SPACE    )
                 AND (  FLG-KOHYONKAIME      =  ZERO     )
                  IF    RECE62-SRYYM  >=  "200610"
@@ -25154,7 +25159,8 @@
                   (RECE62-KYURATE  =  20      )) OR
                  ((RECE62-SRYYM   >=  "201405") AND
                   (RECE62-KYURATE  =  20      ) AND
-                  (RECE62-BIRTHDAY <  19440402))    )
+                  (RECE62-BIRTHDAY <  19440402) AND
+                  (FLG-KOKI-HIGAITO  =   ZERO ))    )
            AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
       *
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
@@ -25946,7 +25952,6 @@
                CONTINUE
              ELSE
                IF   RECE62-KOUREI-HANTEIFLG   =   "1"
-                 MOVE    ZERO                TO  FLG-KOKI-HIGAITO
                  INITIALIZE                      PTKOHINF-REC
                  MOVE    RECE62-HOSPNUM      TO  PTKOH-HOSPNUM
                  MOVE    RECE62-PTID         TO  PTKOH-PTID

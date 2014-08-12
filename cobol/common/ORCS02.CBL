@@ -390,6 +390,7 @@
       *  04.07.17    NACL-門脇    14/07/17  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応
       *  04.07.19    NACL-門脇    14/08/08  特定負有＋特定負有の負担金計算対応
+      *  04.07.20    NACL-門脇    14/08/11  ７５歳以上の海外居住者２割対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4651,11 +4652,11 @@
            MOVE      ZERO       TO    FLG-TOKU75
                                       FLG-TOKU75-KIZON
            MOVE      SPACE      TO    WK-TOKU75-BIRTHDAY
+           MOVE      ZERO       TO    FLG-KOKI-HIGAITO
            IF   ((LNK-S02-KOUREI-NYUIN-KBN    =  "1") OR
                  (FLG-KOREI-TANYUIN           =   1 ))
            AND  (COMB-HKNNUM         NOT =   SPACE   )
            AND  (LNK-SYU-SRYYMD(1:6)    >=   "200901")
-               MOVE    ZERO                 TO  FLG-KOKI-HIGAITO
                INITIALIZE                       PTKOHINF-REC
                MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
@@ -6547,6 +6548,8 @@
                            IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
                            OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
                                 (WK-BIRTHDAY  >=  "19440402"     ))
+                           OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
+                                (FLG-KOKI-HIGAITO     =  1       ))
                             IF    FLG-KEIKASOCHI-IPAN  =  1
                              MOVE   44400       TO   MAX-KIN-SYU-M
                             ELSE
