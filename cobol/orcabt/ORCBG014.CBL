@@ -3575,7 +3575,8 @@
       *
            EVALUATE    TOKEI-HKNKBN    ALSO    TOKEI-KBN
                WHEN    "1"     ALSO    "001"
-                   MOVE    TOKEI-KBN                   TO  WRK-KBN
+                   MOVE    TOKEI-KBN       TO  WRK-KBN
+                   MOVE    WRK-KBN         TO  CSV-KBN
                    GO  TO  3201-KBN-BODY-HEN-EXT
                WHEN    "1"     ALSO    "002"
                    IF      TOKEI-SRYYM     <   CONST-H2010
