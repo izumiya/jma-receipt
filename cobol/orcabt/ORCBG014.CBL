@@ -1354,7 +1354,8 @@
                    END-IF
                ELSE
                    IF        ( RECE10-AGE      >=  70 )
-                       AND   ( RECE10-AGE      <=  74 )
+      *                海外在住の高齢者は前期高齢扱いのため
+      *                 AND   ( RECE10-AGE      <=  74 )
       *                船員保険の補助区分が前期高齢者の時
                        IF      RECE10-HKNNUM           =   "002"
                            EVALUATE    RECE10-HOJOKBN
@@ -1714,7 +1715,8 @@
                WHEN    "068"
       *            一般前期高齢者
                    IF        ( RECE10-AGE      >=  70 )
-                       AND   ( RECE10-AGE      <=  74 )
+      *                海外在住の高齢者は前期高齢扱いのため
+      *                 AND   ( RECE10-AGE      <=  74 )
                        EVALUATE    RECE10-KYURATE
                            WHEN    9
                                MOVE    "1"         TO  WRK-SYUBETUKBN
