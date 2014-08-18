@@ -1240,7 +1240,7 @@
                    MOVE    "1"                 TO  WRK-BIKOU-FTN
                WHEN    2
                    IF     (SPA-SRYYMD          >=  "20140501" )
-                     AND  (PTINF-BIRTHDAY      >=  "19440402" )
+      *H26.8 ***     AND  (PTINF-BIRTHDAY      >=  "19440402" )
                        MOVE    "（高一）"          TO  WRK-BIKOU
                        MOVE    "1"                 TO  WRK-BIKOU-FTN
                    ELSE
