@@ -59,6 +59,7 @@
       * 04.05.00     NACL-多々納  10/08/24  高齢者非該当追加
       * 04.08.00     NACL-多々納  13/07/XX  第三者行為対応
       * 04.08.00     NACL-多々納  14/03/XX  前期高齢者２割対応
+      * 04.07.00     NACL-多々納  14/08/08  高齢非該当２割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -100,6 +101,7 @@
            03  FLG-HI-ROUJIN2      PIC 9(01).
       *
            03  FLG-ROU-02          PIC 9(01).
+           03  FLG-ROU-03          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1038,6 +1040,7 @@
                        IF      FLG-ROU-02      =   1
                            MOVE    ZERO            TO  FLG-ERR
                            IF      PTHKN-HOJOKBN       =   "1"
+                           AND     FLG-ROU-03          =   ZERO
                                MOVE    1               TO  FLG-ERR
                            END-IF
                        END-IF
@@ -1438,6 +1441,13 @@
                            MOVE    ZERO            TO  AGECHK-ROUJIN
                        END-IF
                        MOVE    AGECHK-ROUJIN       TO  AGECHK-ROUJIN2
+      *H26.8
+      *                後期非該当
+                       IF     (FLG-HI-ROUJIN       =   1 )
+                         AND  (AGECHK-SRYYMD       >=  "20140501" )
+                           MOVE    1                   TO  FLG-ROU-02
+                           MOVE    1                   TO  FLG-ROU-03
+                       END-IF
                    END-IF
                END-IF
            END-IF

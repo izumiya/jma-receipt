@@ -49,6 +49,7 @@
       * 04.06.00     NACL-多々納  10/06/30  本人家族区分、補助区分変更対応
       * 04.07.00     NACL-多々納  12/07/XX  全後期高齢者の開始日対応
       * 04.07.00     NACL-多々納  14/03/XX  前期期高齢者２割対応
+      * 04.07.00     NACL-多々納  14/08/08  高齢非該当２割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -77,6 +78,7 @@
            03  FLG-RJNCHK          PIC 9(01).
       *H26.5
            03  FLG-RJN-02          PIC 9(01).
+           03  FLG-RJNCHK2         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -951,6 +953,23 @@
                    MOVE    1               TO  FLG-RJN-02
                END-IF
            END-IF
+      *    後期高齢者も対象
+           IF    ((SPA-GMN-HKNNUM(1:1) =   "9"   )  OR
+                  (SPA-GMN-HKNNUM      =   "039"
+                                       OR  "040" ))
+               CONTINUE
+           ELSE
+               IF      (FLG-RJNCHK2        =   1   )
+                  AND ((SPA-NAI-HTEKSTYMD  >=  SPA-BYMD-75-2 ) OR
+                       (SPA-SYSYMD         >=  SPA-BYMD-75-2 ))
+                   IF      (SPA-NAI-HTEKSTYMD  >=  "20140501")
+                       OR ((SPA-NAI-HTEKSTYMD  =   SPACE     ) AND
+                           (SPA-SYSYMD         >=  "20140501"))
+                       MOVE    1               TO  FLG-RJN-02
+                   END-IF
+               END-IF
+           END-IF
+      *
            IF      FLG-RJN-02          =   1
                PERFORM 3101104-HOJOKBN-HEN02-SEC
            ELSE
@@ -1297,12 +1316,19 @@
        310111-HIGAITOU-CHK-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-RJNCHK
+           MOVE    ZERO                TO  FLG-RJNCHK2
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   3
               IF     (SPA-GMN-KOHNUM (IDX)     =   "976" ) 
                AND   (SPA-NAI-KTEKSTYMD(IDX)   <=  SPA-NAI-HTEKSTYMD)
                AND   (SPA-NAI-KTEKEDYMD(IDX)   >=  SPA-NAI-HTEKEDYMD)
                    MOVE    1                   TO  FLG-RJNCHK
+               END-IF
+      *H26.8
+               IF    (SPA-GMN-KOHNUM (IDX)     =   "977" ) 
+               AND   (SPA-NAI-KTEKSTYMD(IDX)   <=  SPA-NAI-HTEKSTYMD)
+               AND   (SPA-NAI-KTEKEDYMD(IDX)   >=  SPA-NAI-HTEKEDYMD)
+                   MOVE    1                   TO  FLG-RJNCHK2
                END-IF
            END-PERFORM
       *
@@ -1316,6 +1342,10 @@
                  AND  (SPA-PTKOH-SAKJOKBN (IDX) NOT =  "1"        )
                    IF     (SPA-PTKOH-KOHNUM  (IDX) =   "976" )
                        MOVE    1                   TO  FLG-RJNCHK
+                   END-IF
+      *H26.8
+                   IF     (SPA-PTKOH-KOHNUM  (IDX) =   "977" )
+                       MOVE    1                   TO  FLG-RJNCHK2
                    END-IF
                END-IF
            END-PERFORM

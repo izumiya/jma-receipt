@@ -615,6 +615,14 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+      *H26,8
+                WHEN    "0129"
+                   STRING  "後期高齢非該当者です。"
+                           "保険の補助区分の１割はＨ２６年５月から"
+                           "２割に変更して下さい"
+                                               DELIMITED   BY  SPACE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
                WHEN    "K122"
                    STRING  "警告！！"
                            "適用開始日が７５歳以上です。"

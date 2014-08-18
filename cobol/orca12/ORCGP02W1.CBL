@@ -102,6 +102,7 @@
       * 04.07.00     NACL-多々納  13/11/13  生活保護重複警告対応
       * 04.07.00     NACL-多々納  14/01/20  出生時体重追加対応
       * 04.07.00     NACL-多々納  14/03/XX  前期期高齢者２割対応
+      * 04.07.00     NACL-多々納  14/08/08  高齢非該当２割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -109,30 +110,10 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-      *    パラメタデータ
-      *    SELECT  PARA-FILE       ASSIGN  FILE-NAME1
-      *                            ORGANIZATION    IS  INDEXED
-      *                            ACCESS  MODE    IS  DYNAMIC
-      *                            RECORD  KEY     IS  PAR-KEY
-      *                            FILE    STATUS  IS  STS-PARA.
-      *
        DATA                    DIVISION.
       *FILE                        SECTION.
       *
-      *    パラメタデータ
-      *FD  PARA-FILE.
-      *01  PARA-REC.
-      *    03  PAR-KEY.
-      *        05  PAR-FILEMEI         PIC X(08).
-      *        05  PAR-EDANUM          PIC 9(04).
-      *    03  PAR-DATA-REC            PIC X(3000).
-      *
        WORKING-STORAGE             SECTION.
-      *    パラメタファイル名
-      *01  FILE-NAME1.
-      *    03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
-      *    03  FILLER              PIC X(07)   VALUE   "P01PARA".
-      *    03  FILE-TERMID1        PIC X(64)   VALUE   SPACE.
       *
       *    画面非表示
            COPY    "ENUM-VALUE".
@@ -143,10 +124,6 @@
            COPY    "P02COMMON-SPA".
       **    患者画面スパ領域
            COPY    "P02SCR-SPA".
-      *
-      *    フラグ領域
-       01  STS-AREA.
-           03  STS-PARA            PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -235,6 +212,8 @@
            03  FLG-KOH-03              PIC 9(01).
       *H26.5
            03  FLG-RJN-02              PIC 9(01).
+      *H26.8
+           03  FLG-RJNCHK5             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -851,7 +830,6 @@
        000-PROC-SEC                SECTION.
       *
            INITIALIZE                  FLG-AREA
-           INITIALIZE                  STS-AREA
            INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
       *
@@ -894,7 +872,6 @@
        100-INIT-SEC                    SECTION.
       *
            INITIALIZE                  FLG-AREA
-           INITIALIZE                  STS-AREA
            INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
       *
@@ -1239,11 +1216,26 @@
       *
       *H26.4
       *        H26.5.1以降のS19.4.2生の高齢者負担割合
+               MOVE    ZERO                TO  FLG-RJN-02
                IF      (SPA-NAI-BIRTHDAY        >=  "19440402")
                    AND (SPA-PTHKN-TEKSTYMD(IDX) >=  "20140501")
                    AND (SPA-PTHKN-HKNNUM(IDX)(1:1)
                                              NOT =  "9"       )
                    AND (SPA-PTHKN-TEKSTYMD(IDX) >=  SPA-BYMD-70)
+                   MOVE    1                 TO  FLG-RJN-02
+               END-IF
+      *H26.8
+               IF      (SPA-PTHKN-TEKSTYMD(IDX) >=  "20140501")
+                   AND (SPA-PTHKN-HKNNUM(IDX)(1:1)
+                                             NOT =  "9"       )
+                   AND (SPA-PTHKN-TEKSTYMD(IDX) >=  SPA-BYMD-75-2)
+      *            高齢者非該当判定
+                   PERFORM 310111-HIGAITOU-CHK-SEC
+                   IF      FLG-RJNCHK5          =   1
+                       MOVE    1                 TO  FLG-RJN-02
+                   END-IF
+               END-IF
+               IF      FLG-RJN-02          =   1
                    PERFORM 31002-HKNTBL-HOJKBNHEN-SEC
                ELSE
       *
@@ -1390,6 +1382,33 @@
       *
            .
        3100-HKNTBL-KBNHEN-EXT.
+           EXIT.
+      *H26.8
+      ****************************************************************
+      *    高齢非該当判定処理
+      ****************************************************************
+       310111-HIGAITOU-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RJNCHK4
+           MOVE    ZERO                TO  FLG-RJNCHK5
+           PERFORM VARYING     IDXK    FROM    1   BY  1
+                   UNTIL      (IDXK    >   SPA-PTKOH-MAX   )
+      *        高齢者非該当
+               IF     (SPA-PTKOH-TEKSTYMD (IDXK)  <=
+                                               SPA-PTHKN-TEKEDYMD(IDX))
+                 AND  (SPA-PTKOH-TEKEDYMD (IDXK)  >=
+                                               SPA-PTHKN-TEKSTYMD(IDX))
+                 AND  (SPA-PTKOH-SAKJOKBN (IDXK) NOT =  "1"        )
+                   IF     (SPA-PTKOH-KOHNUM  (IDXK) =   "976" )
+                       MOVE    1                   TO  FLG-RJNCHK4
+                   END-IF
+                   IF     (SPA-PTKOH-KOHNUM  (IDXK) =   "977" )
+                       MOVE    1                   TO  FLG-RJNCHK5
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       310111-HIGAITOU-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1822,6 +1841,10 @@
       *****************************************************************
        31011-HKN-HEN-SEC      SECTION.
       *
+      *H26.8
+      *    高齢者非該当判定
+           PERFORM 310111-HIGAITOU-CHK-SEC
+      *
       *    本人家族
            MOVE    ZERO                TO  SPA-GMN-HONKZK-MAX
            PERFORM VARYING     IDT     FROM    1  BY  1
@@ -1881,11 +1904,23 @@
       *
       *H26.4
       *    H26.5.1以降のS19.4.2生の高齢者負担割合
+           MOVE    ZERO                TO  FLG-RJN-02
            IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
                AND (SPA-NAI-HTEKSTYMD      >=  "20140501")
                AND (SPA-GMN-HKNNUM(1:1) NOT =  "9"       )
                AND (SPA-NAI-HTEKSTYMD      >=  SPA-BYMD-70)
+               MOVE    1                   TO  FLG-RJN-02
+           END-IF
+           IF      (FLG-RJNCHK5        =   1  )
+               AND (SPA-NAI-HTEKSTYMD  >=  SPA-BYMD-75-2)
+               AND (SPA-NAI-HTEKSTYMD  >=  "20140501")
+               AND (SPA-GMN-HKNNUM(1:1) NOT =  "9"       )
+               MOVE    1                   TO  FLG-RJN-02
+           END-IF
+      *
+           IF      FLG-RJN-02          =   1
                PERFORM 310112-HKN-HOJOHEN2-SEC
+      *
            ELSE
       *
       *    負担割合
@@ -5731,27 +5766,27 @@
            MOVE    ZERO                TO  FLG-KOKUHO-CHK
            MOVE    ZERO                TO  WRK-KOKUHO-CHK
       *!!
-           PERFORM VARYING     IDX     FROM    1  BY  1
-                   UNTIL       IDX     >   SPA-PTHKN-MAX
-               IF     (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
-                      (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
-                      (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
-                   IF      SPA-PTHKN-HKNNUM(IDX)(1:1)  NOT =   "9"
+      **   PERFORM VARYING     IDX     FROM    1  BY  1
+      *            UNTIL       IDX     >   SPA-PTHKN-MAX
+      *        IF     (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
+      *               (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
+      *               (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
+      *            IF      SPA-PTHKN-HKNNUM(IDX)(1:1)  NOT =   "9"
       *                前期高齢者・後期高齢者区分判定
-                       PERFORM 4103311-HKNKBN-CHK-SEC
-                   END-IF
+      *                PERFORM 4103311-HKNKBN-CHK-SEC
+      *            END-IF
       *            保険が存在すること
-                   IF      SPA-PTHKN-HKN-SBTKBN (IDX)   =   "1"
-                       MOVE    1               TO  FLG-HKNCHK
-                       IF      SPA-HKN-IDX1    =   ZERO
-                           MOVE    IDX             TO  SPA-HKN-IDX1
-                       END-IF
-                   ELSE
+      *            IF      SPA-PTHKN-HKN-SBTKBN (IDX)   =   "1"
+      *                MOVE    1               TO  FLG-HKNCHK
+      *                IF      SPA-HKN-IDX1    =   ZERO
+      *                    MOVE    IDX             TO  SPA-HKN-IDX1
+      *                END-IF
+      *            ELSE
       *            他の自費等が存在すること
-                       MOVE    1               TO  FLG-HKNCHK2
-                   END-IF
-               END-IF
-           END-PERFORM
+      *                MOVE    1               TO  FLG-HKNCHK2
+      *            END-IF
+      **       END-IF
+      *****END-PERFORM
       *
       *    公費
            MOVE    ZERO                TO  SPA-KOH-IDX2
@@ -5806,6 +5841,30 @@
                    MOVE    1                   TO  FLG-27KOH-OK
                END-IF
            END-PERFORM
+      *!!
+      *H26.8   保険を後
+           PERFORM VARYING     IDX     FROM    1  BY  1
+                   UNTIL       IDX     >   SPA-PTHKN-MAX
+               IF     (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
+                      (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD ) AND
+                      (SPA-PTHKN-SAKJOKBN (IDX) NOT =  "1"        )
+                   IF      SPA-PTHKN-HKNNUM(IDX)(1:1)  NOT =   "9"
+      *                前期高齢者・後期高齢者区分判定
+                       PERFORM 4103311-HKNKBN-CHK-SEC
+                   END-IF
+      *            保険が存在すること
+                   IF      SPA-PTHKN-HKN-SBTKBN (IDX)   =   "1"
+                       MOVE    1               TO  FLG-HKNCHK
+                       IF      SPA-HKN-IDX1    =   ZERO
+                           MOVE    IDX             TO  SPA-HKN-IDX1
+                       END-IF
+                   ELSE
+      *            他の自費等が存在すること
+                       MOVE    1               TO  FLG-HKNCHK2
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
            IF      SPA-SYSYMD          <   "20080401"
       *        前期高齢者区分があり、老人公費がない時
                IF     (FLG-RJNCHK          =   1   )
@@ -5853,6 +5912,12 @@
                        MOVE    11                  TO  SPA-GMN-CUR
                    END-IF
       *!!
+      *H26.8       後期非該当で１割エラー（H26.5から）
+                   IF      FLG-RJNERR          =   4
+                       MOVE    "0129"              TO  SPA-ERRCD
+                       MOVE    11                  TO  SPA-GMN-CUR
+                   END-IF
+      *
       *            終了する保険を再表示
                    IF     (SPA-ERRCD           =   "0121" )
                       AND (SPA-HKN-IDX1    NOT =   ZERO   )
@@ -6015,6 +6080,18 @@
                    MOVE    1               TO  FLG-RJN-02
                END-IF
            END-IF
+      *H26.8
+      *    高齢者非該当も負担割合変更
+           IF      FLG-RJN-02          =   ZERO
+               IF     (SPA-PTHKN-TEKSTYMD (IDX)   >=  SPA-BYMD-75-2)
+                  OR ((SPA-SYSYMD                 >=  SPA-BYMD-75-2) AND
+                      (SPA-PTHKN-TEKEDYMD (IDX)   >=  SPA-BYMD-75-2))
+                   IF     (FLG-RJNCHK5         =   1   )
+                       MOVE    2               TO  FLG-RJN-02
+                   END-IF
+               END-IF
+           END-IF
+      *
       *
            EVALUATE    SPA-PTHKN-HKNNUM  (IDX)
       *        国保
@@ -6047,12 +6124,12 @@
                            END-IF
                        END-IF
       *H26.4
-                       IF     FLG-RJN-02           =   1
-      *                    １割エラー
-                           MOVE    "1"             TO  WRK-HOJO-ERR
-                       ELSE
+                       IF     FLG-RJN-02           =   ZERO
       *                    ２割エラー
                            MOVE    "2"             TO  WRK-HOJO-ERR
+                       ELSE
+      *                    １割エラー
+                           MOVE    "1"             TO  WRK-HOJO-ERR
                        END-IF
       *                組合国保以外は２割エラー
                        IF    (SPA-PTHKN-HKNJANUM(IDX)(3:1)
@@ -6109,6 +6186,19 @@
                            END-IF
                        END-IF
                    END-IF
+      *H26.8
+      *           高齢者非該当チェック
+                  IF      (FLG-RJN-02         =   2  )
+                       IF     (SPA-PTHKN-HOJOKBN (IDX) =   "9"
+                                                       OR  "A"
+                                                       OR  "B"
+                                                       OR  "C"  )
+                          AND (SPA-PTHKN-HONKZKKBN (IDX) =   "2"  )
+                           MOVE    4               TO  FLG-RJNERR
+                           MOVE    IDX             TO  SPA-HKN-IDX1
+                       END-IF
+                   END-IF
+      *
       *            本人で下船後なら後期高齢者扱いとする
                    IF      (SPA-PTHKN-HOJOKBN (IDX)    =   "A"
                                                        OR  "B"
@@ -6152,6 +6242,17 @@
                                MOVE    IDX             TO  SPA-HKN-IDX1
                            END-IF
                        END-IF
+      *H26.8
+      *               高齢者非該当チェック
+                      IF      (FLG-RJN-02         =   2  )
+                           IF     (SPA-PTHKN-HOJOKBN (IDX) =   "9"
+                                                           OR  "B"  )
+                              AND (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
+                               MOVE    4               TO  FLG-RJNERR
+                               MOVE    IDX             TO  SPA-HKN-IDX1
+                           END-IF
+                       END-IF
+      *
                        MOVE    1                   TO  FLG-RJNCHK
                    END-IF
       *        後期高齢者
@@ -6170,6 +6271,15 @@
                        IF     (SPA-PTHKN-HOJOKBN (IDX) =   "8" )
                           AND (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
                            MOVE    1               TO  FLG-RJNERR
+                           MOVE    IDX             TO  SPA-HKN-IDX1
+                        END-IF
+                   END-IF
+      *H26.8
+      *            高齢者非該当チェック
+                   IF      (FLG-RJN-02         =   2  )
+                      AND  (SPA-PTHKN-HOJOKBN (IDX)   =   "9" )
+                       IF     (SPA-PTHKN-CONTKBN (IDX) =   SPACE)
+                           MOVE    4               TO  FLG-RJNERR
                            MOVE    IDX             TO  SPA-HKN-IDX1
                         END-IF
                    END-IF
