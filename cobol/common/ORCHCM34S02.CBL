@@ -1161,6 +1161,9 @@
                        PERFORM VARYING     IDX1    FROM    1   BY  1
                                UNTIL     ( IDX1    >   31 )
                            IF   ( NACCT-DAY(IDX1)  >   ZERO )
+                            OR (( LNK-NYUINDAY-KBN(IDX1)   =   "1" )
+                             AND( LNK-NYUINDAY-TANKI2-KBN (IDX1)
+                                                       NOT = SPACE))
                                MOVE    1   TO  FLG-TOKTEIDAY (IDX1)
                            END-IF
                        END-PERFORM
@@ -3259,8 +3262,7 @@
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
                       OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4 )
-                    AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                    AND  ( FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
