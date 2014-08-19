@@ -114,6 +114,8 @@
       *                                     で入院料未算定日の対応
       *  04.04.04    NACL-藤原    14/06/05  月途中のまとめのとき第二公費
       *                                     マル長のときも対象とする
+      *
+      *  04.07.01    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2547,6 +2549,55 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
            END-IF
            MOVE    LNK-SYUBETU-BIRTHDAY
                                    TO  LNK-SYUBETUGET-BIRTHDAY
+      *
+      *    国保のとき９７７の公費の有無
+           IF    ( LNK-SYUBETUGET-BIRTHDAY
+                                       <   19440402 )
+           AND   ( LNK-SYUBETUGET-HKNNUM
+                                       =   "060"    )
+           AND   ( LNK-SYUBETUGET-SRYYM
+                                       >   "201404" )
+               MOVE    "99"                TO  LNK-SYUBETUGET-RJNPAYKBN
+      *
+               MOVE    LNK-SYUBETUGET-SRYYM
+                                           TO  WRK-TEKSTYYMM
+               IF      WRK-RECE61-TEKSTYMDX (1) (1:6)
+                                           >=  LNK-SYUBETU-SRYYM
+                    MOVE  WRK-RECE61-TEKSTYMDX (1) (7:2)
+                                               TO  WRK-TEKSTDD
+               ELSE
+                    MOVE  01                   TO  WRK-TEKSTDD
+               END-IF
+      *
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYUBETU-PTID    TO  PTKOH-PTID
+               MOVE    "977"               TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 900-PTKOHINF-READ-N-SEC
+                   PERFORM UNTIL   FLG-PTKOHINF    =   1
+                       IF    ( PTKOH-TEKSTYMD  <=  WRK-TEKSTYMD   )
+                       AND   ( WRK-TEKSTYMD    <=  PTKOH-TEKEDYMD )
+                           MOVE    SPACE           TO
+                                               LNK-SYUBETUGET-RJNPAYKBN
+                           MOVE    1               TO  FLG-PTKOHINF
+                       ELSE
+                           MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                           MOVE    "key4"          TO  MCP-PATHNAME
+                           PERFORM  900-PTKOHINF-READ-N-SEC
+                       END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM  900-CLOSE-SEC
+           END-IF
       *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *

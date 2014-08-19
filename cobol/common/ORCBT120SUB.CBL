@@ -42,6 +42,7 @@
       *  04.05.00    NACL-¾®Æ¦Âô  10/01/07  ¼£¸³¤Î¥ì¥»¥×¥È¼ïÊÌÂÐ±þ
       *
       *  04.07.01    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    14/08/18  £·£µºÐ°Ê¾å¤Î³¤³°µï½»¼Ô£²³äÂÐ±þ
       *****************************************************************
       *
       *
@@ -1471,6 +1472,56 @@
            MOVE    LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
                                        TO  LNK-SYUBETUGET-HKNNUM
            MOVE    PTINF-BIRTHDAY      TO  LNK-SYUBETUGET-BIRTHDAY 
+      *
+      *    ¹ñÊÝ¤Î¤È¤­£¹£·£·¤Î¸øÈñ¤ÎÍ­Ìµ
+           IF    ( LNK-SYUBETUGET-BIRTHDAY
+                                       <   19440402 )
+           AND   ( LNK-SYUBETUGET-HKNNUM
+                                       =   "060"    )
+           AND   ( LNK-SYUBETUGET-SRYYM
+                                       >   "201404" )
+               MOVE    "99"                TO  LNK-SYUBETUGET-RJNPAYKBN
+      *
+               MOVE      LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                                           TO  WRK-TEKSTYYMM
+               IF      COMB-TEKSTYMD(1:6)  >=
+                                       LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                   MOVE    COMB-TEKSTYMD (7:2) TO  WRK-TEKSTDD
+               ELSE
+                   MOVE    01                  TO  WRK-TEKSTDD
+               END-IF
+      *
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    LNK-ORCBT120SUB-HOSPNUM
+                                           TO  PTKOH-HOSPNUM
+               MOVE    COMB-PTID           TO  PTKOH-PTID
+               MOVE    "977"               TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 900-PTKOHINF-READ-N-SEC
+                   PERFORM UNTIL   FLG-PTKOHINF    =   1
+                       IF    ( PTKOH-TEKSTYMD  <=  WRK-TEKSTYMD   )
+                       AND   ( WRK-TEKSTYMD    <=  PTKOH-TEKEDYMD )
+                           MOVE    SPACE           TO
+                                               LNK-SYUBETUGET-RJNPAYKBN
+                           MOVE    1               TO  FLG-PTKOHINF
+                       ELSE
+                           MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                           MOVE    "key4"          TO  MCP-PATHNAME
+                           PERFORM  900-PTKOHINF-READ-N-SEC
+                       END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM  910-DB-CLOSE-SEC
+           END-IF
+      *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU  TO    WRK-RECESYUBETU
