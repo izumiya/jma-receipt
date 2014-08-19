@@ -1618,7 +1618,8 @@
                        ELSE
                            MOVE    RECEDEN-RECEDATA (4:2)
                                                    TO  WRK-SRYKBN
-                           IF      RECEDEN-RECEDATA (1:2)  =   "CO"
+                           IF      RECEDEN-RECEDATA (1:2)  =   "TO"
+                                                           OR  "CO"
                                MOVE    1               TO  FLG-SRYKBN
                            ELSE
                                MOVE    ZERO            TO  FLG-SRYKBN
