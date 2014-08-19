@@ -100,6 +100,7 @@
            03  FLG-PTCOM               PIC 9(01).
            03  FLG-DATA                PIC 9(01).
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-SRYKBN              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1657,6 +1658,7 @@
                    WHEN    "KO"
                    WHEN    "SY"
                        MOVE    SPACE           TO  WRK-SRYKBN
+                       MOVE    ZERO            TO  FLG-SRYKBN
                    WHEN    "TO"
                    WHEN    "IY"
                    WHEN    "SI"
@@ -1666,10 +1668,29 @@
                        ELSE
                            MOVE    RECEDEN-RECEDATA (4:2)
                                                    TO  WRK-SRYKBN
+                           IF      RECEDEN-RECEDATA (1:2)  =   "TO"
+                                                           OR  "CO"
+                               MOVE    1               TO  FLG-SRYKBN
+                           ELSE
+                               MOVE    ZERO            TO  FLG-SRYKBN
+                           END-IF
                        END-IF
                    WHEN    OTHER
                        GO  TO  900-RENKEI-TMP-READ-SEC
                END-EVALUATE
+      *
+               IF     (RECEDEN-RECEDATA (1:2)  =   "SI"  OR  "IY") AND
+                      (RECEDEN-RECEDATA (4:1)  =   ",")  AND
+                      (FLG-SRYKBN              =   1)
+                   MOVE    SPACE               TO  WRK-REC
+                   STRING  RECEDEN-RECEDATA (1:3)  DELIMITED   BY  SIZE
+                           WRK-SRYKBN              DELIMITED   BY  SIZE
+                           RECEDEN-RECEDATA (4:)   DELIMITED   BY  SIZE
+                                                   INTO        WRK-REC
+                   END-STRING
+                   MOVE    WRK-REC         TO  RECEDEN-RECEDATA
+                   MOVE    ZERO            TO  FLG-SRYKBN
+               END-IF
       *
                EVALUATE    RECEDEN-RECEDATA (1:2)
                    WHEN    "RE"
