@@ -663,6 +663,9 @@
       *  04.07.26    NACL-門脇    14/07/28  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応修正
       *  04.07.28    NACL-門脇    14/08/11  ７５歳以上の海外居住者２割対応
+      *  04.07.29    NACL-藤原    14/08/19  患者コメントの入力コメントの
+      *                                     改行コードチェック
+      *                                     エラー時処理終了
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -989,6 +992,9 @@
            03  SEIHIDX             PIC 9(02).
            03  KAKKIDX             PIC 9(02).
            03  SESNIDX             PIC 9(02).
+      *
+           03 IDZ1                 PIC 9(02).
+           03 IDZ2                 PIC 9(02).
       *
       *    ＯＣＲ編集領域
        01  OCR1-AREA.
@@ -1637,6 +1643,8 @@
            03  WRK-DAISAN-DAISANKBN            PIC X(01).
            03  WRK-DAISAN-TOTALTEN-SYUNOU      PIC 9(08).
            03  WRK-DAISAN-ACCT-UPDKBN          PIC X(01).
+      *
+           03  WRK-COL                         PIC 9(03).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -2367,6 +2375,9 @@
                                    "0100007FZZZZZZZZZZZZZZZZZZZZZZZZ".
       * 
            03  WRK-CONS-SRYYM-200604  PIC 9(06)   VALUE   200604. 
+      *
+      *    改行コード
+           03  WRK-CONS-RETURN      PIC X(01)   VALUE   X"0A".
       *
            COPY    "MCPAREA".
       *
@@ -23774,6 +23785,62 @@ grpsys         PERFORM 900-DBFETCH-SEC
            MOVE    "tbl_ptcom"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+           IF      FLG-PTCOM           =   ZERO
+               IF      PTCOM-INPUTCOMENT   NOT =   SPACE
+                   MOVE    ZERO            TO  WRK-COL
+                                               IDZ1
+                                               IDZ2 
+                   INSPECT PTCOM-INPUTCOMENT   TALLYING    WRK-COL
+                                               FOR ALL WRK-CONS-RETURN
+                   IF      WRK-COL         >   ZERO
+                       DISPLAY "PTCOM=" PTCOM-KEY
+                       PERFORM VARYING IDZ1    FROM    1   BY  1
+                               UNTIL   IDZ1    >       80
+                           IF      PTCOM-INPUTCOMENT(IDZ1:1)
+                                               =   WRK-CONS-RETURN
+                               COMPUTE IDZ2    =   IDZ1    -   1
+                               MOVE    80      TO  IDZ1
+                           END-IF
+                       END-PERFORM
+      *
+                       CALL    "coblog" USING   "ptcom returncd err"
+                       MOVE    SPACE               TO  WRK-RECEERR
+                       MOVE    SPACE               TO  WRK-ERRMSG
+                       STRING
+                        "コメント文字コード不正　患者番号="
+                                                   DELIMITED  BY  SIZE
+                               RECE02-PTNUM        DELIMITED  BY  SPACE
+                               "　診療区分="       DELIMITED  BY  SIZE
+                               SRY-SRYKBN          DELIMITED  BY  SPACE
+                                                   INTO    WRK-ERRMSG
+                       END-STRING
+                       IF      IDZ2        >   1    
+                           STRING   WRK-ERRMSG     DELIMITED  BY  SPACE
+                                   "　コメント="   DELIMITED  BY  SIZE
+                                   PTCOM-INPUTCOMENT(1:IDZ2)
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-RECEERR
+                           END-STRING
+                       ELSE
+                           STRING   WRK-ERRMSG     DELIMITED  BY  SPACE
+                                    "　コメント="  DELIMITED  BY  SIZE
+                                    PTCOM-SRYCD    DELIMITED  BY  SPACE
+                                                   INTO    WRK-RECEERR
+                           END-STRING
+                       END-IF
+                       PERFORM 500-ERR-HENSYU-SEC
+      *
+                       MOVE    SPACE               TO  WRK-ERRMSG
+                       STRING  "ORCR0030 "         DELIMITED  BY  SIZE
+                               WRK-RECEERR         DELIMITED  BY  SIZE
+                               LOW-VALUE           DELIMITED  BY  SIZE
+                                                   INTO    WRK-ERRMSG
+                       END-STRING
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+               END-IF
+           END-IF
       *
            .
        950-PTCOM-READ-EXT.
