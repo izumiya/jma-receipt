@@ -936,7 +936,7 @@
            MOVE    ZERO                TO  IDX
            PERFORM
                    UNTIL      (FLG-SYSKANRI    =   1 )  OR
-                              (IDX             >=  30)
+                              (IDX             >=  50)
                MOVE    MCPDATA-REC         TO  SYS-4002-REC
                ADD     1                   TO  IDX
                MOVE    IDX                 TO  SPA-GMN2D-SONSHOUKBN-MAX

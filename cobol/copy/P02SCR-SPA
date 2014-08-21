@@ -1478,7 +1478,7 @@
                        09  SPA-GMN2D-SONSHOUKBNMEI PIC X(36).
                    07  SPA-GMN2D-SONSHOUKBN-COMB.
                        09  SPA-GMN2D-SONSHOUKBN-LST   PIC X(40)
-                                                   OCCURS   30.
+                                                   OCCURS   50.
                    07  SPA-GMN2D-SONSHOUKBN-MAX    PIC 9(04).
       *
                    07  SPA-GMN2D-SINSATUYMD        PIC X(10).

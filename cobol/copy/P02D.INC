@@ -48,7 +48,7 @@
                 04  P02D-SONSHOUKBN.
                   05  P02D-VALUE  PIC X(40).
                 04  P02D-SONSHOUKBN-COUNT  PIC S9(9)   BINARY.
-                04  P02D-SONSHOUKBN-ITEM   PIC X(40)   OCCURS  30 TIMES.
+                04  P02D-SONSHOUKBN-ITEM   PIC X(40)   OCCURS  50 TIMES.
               03  P02D-PREFNAMECOMBO.
                 04  P02D-PREFNAME.
                   05  P02D-VALUE  PIC X(20).

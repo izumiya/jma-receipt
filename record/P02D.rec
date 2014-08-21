@@ -45,7 +45,7 @@ P02D	{
 				value	varchar(40);
 			};
 			count	int;
-			item	varchar(40)[30];
+			item	varchar(40)[50];
 		};
 		PREFNAMECOMBO	{
 			PREFNAME	{
