@@ -119,6 +119,9 @@
       *  04.07.09    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     コメント自動記載修正
       *  04.07.10    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
+      *  04.07.11    NACL-藤原    14/08/19  患者コメントの入力コメントの
+      *                                     改行コードチェック
+      *                                     エラー時処理終了
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -283,6 +286,9 @@
            03  SYSKAN-IDX          PIC 9(03).
            03  SYSKAN-IDX2         PIC 9(03).
            03  FUKA-IDX            PIC 9(03).
+      *
+           03 IDZ1                 PIC 9(02).
+           03 IDZ2                 PIC 9(02).
       *
       *    剤情報退避領域
        01  WK-ZAIKAISU             PIC S9(07).
@@ -488,8 +494,6 @@
            03  WRK-FILMTEN         PIC 9(07)V9(02).
            03  WRK-FILMTEN2        PIC 9(07)V9(02).
       *
-           03  WRK-RECEERR         PIC X(200).
-      *
            03  WRK-SRYYM-5000      PIC X(06).
       *
            03  WRK-SYS5000-COUNT   PIC 9(02).
@@ -568,6 +572,8 @@
       *
            03  WRK-TOTALTEN1                   PIC  9(08).
            03  WRK-TOTALTEN2                   PIC  9(08).
+      *
+           03  WRK-COL                         PIC 9(03).
       *
       *    固定値
        01  CONST-AREA.
@@ -944,6 +950,9 @@
        01  TBL-SUJI-X-R        REDEFINES   TBL-SUJI-AREA-X.
            03  TBL-SUJI-X      PIC X(01)   OCCURS   10.
       *
+      *    改行コード
+       01  WRK-CONS-RETURN     PIC X(01)   VALUE   X"0A".
+      *
            COPY    "MCPAREA".
       *
            COPY    "COMMON-SPA".
@@ -962,6 +971,19 @@
        01  WRK-RECE200C-REC. 
            COPY    "CPRCF200.INC"  REPLACING  //RECE200//
                                    BY         //WRK-RECE200C//.
+      *
+       01  WRK-ERR-AREA.
+           03  WRK-RECEERR                         PIC X(200).
+           03  WRK-ERRMSG                          PIC X(300).
+           03  WRK-MCP-RC                          PIC 9(9).
+           03  WRK-ERR-FILE-STS                    PIC X(02).
+           03  WRK-ERR-FILE-MSG                    PIC X(100).
+           03  WRK-ERR-FILE-MSG1                   PIC X(17).
+           03  WRK-ERR-FLG                         PIC 9(01).
+      *    エラーファイル名称領域 
+           COPY    "CPRECEDAT1.INC"
+                                   REPLACING  //RECEDAT1PARA//
+                                   BY         //WRK-ERR-FILE-NM//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -7781,6 +7803,62 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
+           IF      FLG-PTCOM           =   ZERO
+               IF      PTCOM-INPUTCOMENT   NOT =   SPACE
+                   MOVE    ZERO            TO  WRK-COL
+                                               IDZ1
+                                               IDZ2 
+                   INSPECT PTCOM-INPUTCOMENT   TALLYING    WRK-COL
+                                               FOR ALL WRK-CONS-RETURN
+                   IF      WRK-COL         >   ZERO
+                       DISPLAY "PTCOM=" PTCOM-KEY
+                       PERFORM VARYING IDZ1    FROM    1   BY  1
+                               UNTIL   IDZ1    >       80
+                           IF      PTCOM-INPUTCOMENT(IDZ1:1)
+                                               =   WRK-CONS-RETURN
+                               COMPUTE IDZ2    =   IDZ1    -   1
+                               MOVE    80      TO  IDZ1
+                           END-IF
+                       END-PERFORM
+      *
+                       CALL    "coblog" USING   "ptcom returncd err"
+                       MOVE    SPACE               TO  WRK-RECEERR
+                       MOVE    SPACE               TO  WRK-ERRMSG
+                       STRING
+                        "コメント文字コード不正　患者番号="
+                                                   DELIMITED  BY  SIZE
+                               RECE200-PTNUM       DELIMITED  BY  SPACE
+                               "　診療区分="       DELIMITED  BY  SIZE
+                               SRY-SRYKBN          DELIMITED  BY  SPACE
+                                                   INTO    WRK-ERRMSG
+                       END-STRING
+                       IF      IDZ2        >   1    
+                           STRING   WRK-ERRMSG     DELIMITED  BY  SPACE
+                                   "　コメント="   DELIMITED  BY  SIZE
+                                   PTCOM-INPUTCOMENT(1:IDZ2)
+                                                   DELIMITED  BY  SPACE
+                                                   INTO    WRK-RECEERR
+                           END-STRING
+                       ELSE
+                           STRING   WRK-ERRMSG     DELIMITED  BY  SPACE
+                                    "　コメント="  DELIMITED  BY  SIZE
+                                    PTCOM-SRYCD    DELIMITED  BY  SPACE
+                                                   INTO    WRK-RECEERR
+                           END-STRING
+                       END-IF
+                       PERFORM 500-ERR-HENSYU-SEC
+      *
+                       MOVE    SPACE               TO  WRK-ERRMSG
+                       STRING  "ORCR1220 "         DELIMITED  BY  SIZE
+                               WRK-RECEERR         DELIMITED  BY  SIZE
+                               LOW-VALUE           DELIMITED  BY  SIZE
+                                                   INTO    WRK-ERRMSG
+                       END-STRING
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
            .
        950-PTCOM-READ-EXT.
            EXIT.
@@ -8068,6 +8146,17 @@
       *
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
            EXIT.
       *
       *****************************************************************
