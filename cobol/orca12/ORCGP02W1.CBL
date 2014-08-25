@@ -5793,6 +5793,7 @@
            MOVE    ZERO                TO  FLG-27KOH-OK
            MOVE    ZERO                TO  FLG-RJNCHK3
            MOVE    ZERO                TO  FLG-RJNCHK4
+           MOVE    ZERO                TO  FLG-RJNCHK5
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-PTKOH-MAX
                IF     (SPA-PTKOH-TEKSTYMD (IDX)    <=  SPA-SYSYMD ) AND
@@ -5812,6 +5813,7 @@
       *!!          後期高齢者非該当(H21.3)
                    IF      SPA-PTKOH-KOHNUM  (IDX) =   "977"
                        MOVE    1                   TO  FLG-RJNCHK3
+                       MOVE    1                   TO  FLG-RJNCHK5
                    END-IF
       *!!
       *!!          高齢者非該当(H22.9)
