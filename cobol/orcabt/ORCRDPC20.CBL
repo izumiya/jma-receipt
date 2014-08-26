@@ -2208,6 +2208,11 @@
                                      TBL-KOUI-SRYACTINF (WRK-TBLMAX1)
                MOVE    RECE05-NAMEINF (IDX)    TO
                                      TBL-KOUI-NAMEINF   (WRK-TBLMAX1)
+      *        皮内、皮下及び筋肉内注射と静脈内注射は名称の再セット
+               IF      RECE05-NAME (IDX)  =   SPACE
+                   MOVE    RECE05-INPUTCOMENT (IDX)    TO
+                                     TBL-KOUI-NAME   (WRK-TBLMAX1)
+               END-IF
       *
                IF    ( RECE04-SRYKBN      =   "13"  OR  "14" )
                    IF      TBL-KOUI-KOKUJISKBKBN1(WRK-TBLMAX1)
