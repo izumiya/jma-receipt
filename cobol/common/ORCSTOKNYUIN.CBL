@@ -1608,6 +1608,9 @@
                            MOVE   "190162210"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190162210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "26"
       *                療養病棟入院基本料１（入院基本料Ｂ）
                        MOVE   "190121410"   TO  LNK-TOKNYUIN-SRYCD
@@ -1617,6 +1620,9 @@
                          ELSE
                            MOVE   "190162410"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190162410"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "27"
       *                療養病棟入院基本料１（入院基本料Ｃ）
@@ -1628,6 +1634,9 @@
                            MOVE   "190162610"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190162610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "28"
       *                療養病棟入院基本料１（入院基本料Ｄ）
                        MOVE   "190121610"   TO  LNK-TOKNYUIN-SRYCD
@@ -1638,6 +1647,9 @@
                            MOVE   "190162810"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190162810"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "29"
       *                療養病棟入院基本料１（入院基本料Ｅ）
                        MOVE   "190121710"   TO  LNK-TOKNYUIN-SRYCD
@@ -1647,6 +1659,9 @@
                          ELSE
                            MOVE   "190163010"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190163010"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "30"
       *                療養病棟入院基本料（特別入院基本料）
@@ -1797,6 +1812,9 @@
                            MOVE   "190163210"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190163210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "64"
       *                療養病棟入院基本料１（入院基本料Ｆ）（生活療養）
                        MOVE   "190131710"   TO  LNK-TOKNYUIN-SRYCD
@@ -1809,6 +1827,9 @@
                          ELSE
                            MOVE   "190163410"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190163410"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "66"
       *                療養病棟入院基本料１（入院基本料Ｇ）（生活療養）
@@ -1823,6 +1844,9 @@
                            MOVE   "190163610"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190163610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "68"
       *                療養病棟入院基本料１（入院基本料Ｈ）（生活療養）
                        MOVE   "190132110"   TO  LNK-TOKNYUIN-SRYCD
@@ -1835,6 +1859,9 @@
                          ELSE
                            MOVE   "190163810"   TO  LNK-TOKNYUIN-SRYCD
                          END-IF
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "06")
+                           MOVE   "190163810"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "70"
       *                療養病棟入院基本料１（入院基本料Ｉ）（生活療養）
