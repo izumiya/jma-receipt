@@ -598,6 +598,7 @@
            03  WRK-NYUREKILST-ROW          PIC S9(9)   BINARY.
       *
        01  CONST-AREA.
+           03  CONST-H261001               PIC X(08)   VALUE "20141001".
            03  CONST-H260401               PIC X(08)   VALUE "20140401".
            03  CONST-H241001               PIC X(08)   VALUE "20121001".
            03  CONST-H240401               PIC X(08)   VALUE "20120401".
@@ -5572,6 +5573,17 @@
            END-IF
       *
            IF    ( FLG-EDIT            =   1 )
+               IF    ( WRK-KJNYMD      =  CONST-H261001 )
+                   IF    ( SPA-NAI-I01-BTUSBT  =   "05" )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-EDIT
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-EDIT            =   1 )
+      *
                MOVE    "5111"      TO  WRK-KANRICD
                MOVE    "22"        TO  WRK-KBNCD
                MOVE    "3"         TO  WRK-TOKNYUIN-KBN
