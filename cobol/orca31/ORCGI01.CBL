@@ -5538,6 +5538,12 @@
                        MOVE    5         TO  FLG-RYOYOKHN
                        PERFORM 410111-RYOYOKHN-EDIT-SEC
                    END-IF
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "06" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   IF    ( WRK-KJNYMD     >=  CONST-H261001 )
+                       MOVE    5         TO  FLG-RYOYOKHN
+                       PERFORM 410111-RYOYOKHN-EDIT-SEC
+                   END-IF
                END-EVALUATE
            END-IF
       *
