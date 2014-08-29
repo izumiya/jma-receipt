@@ -100,6 +100,7 @@
       *  04.07.04    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.07    NACL-ÌçÏÆ    14/08/29  Åçº¬¡¦ÆàÎÉ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -772,7 +773,8 @@
                     MOVE  "1"  TO WRK-KOHSKYFLG-G
                   END-IF
                  WHEN      29
-                  IF  (HKN-HBTNUM    = "71" OR "81" OR "91"   )
+                  IF  (HKN-HBTNUM    = "71" OR "81" OR "91" OR
+                                       "80"                   )
                   AND (PTHKN-HKNNUM  = "060" OR "067" OR "039") 
                     MOVE  "1"  TO WRK-KOHSKYFLG-G
                   END-IF
@@ -811,7 +813,8 @@
              WHEN      SPACE
                EVALUATE   LNK-FTNJGNCHK-PREFNUM
                  WHEN      29
-                  IF  (HKN-HBTNUM    = "71" OR "81" OR "91"   )
+                  IF  (HKN-HBTNUM    = "71" OR "81" OR "91" OR
+                                       "80"                   )
                   AND (PTHKN-HKNNUM  = "060" OR "067" OR "039") 
                     MOVE  "1"  TO WRK-KOHSKYFLG-N
                   END-IF
@@ -1080,6 +1083,16 @@
                IF  (LNK-FTNJGNCHK-KOHNUM  = "182" OR "282")
                AND (LNK-FTNJGNCHK-SRYYM   < "201012"      )
                  MOVE  SPACE  TO  WRK-CHKJGNFLG-N
+               END-IF
+           END-EVALUATE
+      *
+           EVALUATE  LNK-FTNJGNCHK-PREFNUM
+             WHEN      29
+               IF  (HKN-HBTNUM            = "80"           )
+               AND (PTHKN-HKNNUM  = "060" OR "067" OR "039")
+               AND (LNK-FTNJGNCHK-SRYYM   < "201410"       )
+                 MOVE  SPACE  TO  WRK-KOHSKYFLG-G
+                 MOVE  SPACE  TO  WRK-KOHSKYFLG-N
                END-IF
            END-EVALUATE
       *
@@ -1634,6 +1647,7 @@
       *
                   IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "200708")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "001"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE   4001  TO   WRK-HKNMST-JGNGAK2
@@ -1643,6 +1657,7 @@
                   END-IF
                   IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "200904")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "005"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE   3001  TO   WRK-HKNMST-JGNGAK2
@@ -1652,6 +1667,7 @@
                   END-IF
                   IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "200912")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "002"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE   4001  TO   WRK-HKNMST-JGNGAK2
@@ -1661,6 +1677,7 @@
                   END-IF
                   IF  (WRK-TEISYOTOKU           =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "200912")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "002"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE  30001  TO   WRK-HKNMST-JGNGAK2
@@ -1670,6 +1687,7 @@
                   END-IF
                   IF  (WRK-TEISYOTOKU      NOT  =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "201302")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "003"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE   5001  TO   WRK-HKNMST-JGNGAK2
@@ -1679,12 +1697,30 @@
                   END-IF
                   IF  (WRK-TEISYOTOKU           =   SPACE  )
                   AND (LNK-FTNJGNCHK-SRYYM     >=  "201302")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201409")
                   AND (PTKOH-FTNJANUM(5:3)      =  "003"   )
                     IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        MOVE  10001  TO   WRK-HKNMST-JGNGAK2
                     ELSE
                        MOVE   6001  TO   WRK-HKNMST-JGNGAK2
                     END-IF
+                  END-IF
+                  IF  (WRK-TEISYOTOKU           =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "201410")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201509")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "003"   )
+                    IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
+                       MOVE  10001  TO   WRK-HKNMST-JGNGAK2
+                    END-IF
+                  END-IF
+      *
+                  IF  (WRK-TEISYOTOKU           =   SPACE  )
+                  AND (LNK-FTNJGNCHK-SRYYM     >=  "200804")
+                  AND (LNK-FTNJGNCHK-SRYYM     <=  "201301")
+                  AND (PTKOH-FTNJANUM(5:3)      =  "003"   )
+                  AND (LNK-FTNJGNCHK-NYUGAIKBN  =  "2"     )
+                    MOVE    01      TO   LNK-FTNJGNCHK-RC
+                    MOVE     1      TO   FLG-CHECK
                   END-IF
       *
                END-IF

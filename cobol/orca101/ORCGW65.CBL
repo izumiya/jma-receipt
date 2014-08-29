@@ -9700,9 +9700,10 @@
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-NARA )
-                 AND ( THKN-HBTNUM      =   "71" OR "81" OR "91" )
-               WHEN  ( SPA-PREFNUM     =   CONST-SHIMANE )
-                 AND ( SPA-GMN-KOHNUM  =   "790" OR "493")
+                 AND ( THKN-HBTNUM      =   "71" OR "81" OR "91" OR
+                                            "80"      )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-SHIMANE )
+      *          AND ( SPA-GMN-KOHNUM  =   "790"         )
                WHEN  ( SPA-PREFNUM     =   CONST-YAMAGUCHI )
                  AND ( SPA-GMN-KOHNUM  =   "781" )
       *        WHEN  ( SPA-PREFNUM     =   CONST-TOKUSHIMA )
@@ -9719,9 +9720,10 @@
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-NARA )
-                 AND ( THKN-HBTNUM      =   "71" OR "81" OR "91" )
-               WHEN  ( SPA-PREFNUM     =   CONST-SHIMANE )
-                 AND ( SPA-GMN-KOHNUM  =   "790" OR "493")
+                 AND ( THKN-HBTNUM      =   "71" OR "81" OR "91" OR
+                                            "80"      )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-SHIMANE )
+      *          AND ( SPA-GMN-KOHNUM  =   "790"         )
                WHEN  ( SPA-PREFNUM     =   CONST-YAMAGUCHI )
                  AND ( SPA-GMN-KOHNUM  =   "781" )
       *        WHEN  ( SPA-PREFNUM     =   CONST-TOKUSHIMA )
@@ -9801,7 +9803,8 @@
                 AND  ( THKN-HBTNUM      =   "80" OR "82" OR "84"
                                         OR "86" OR "00" )
                WHEN  ( SPA-PREFNUM     =   CONST-NARA )
-                AND  ( THKN-HBTNUM      =   "71" OR "81" OR "91" )
+                AND  ( THKN-HBTNUM      =   "71" OR "81" OR "91" OR
+                                            "80"      )
                    MOVE    "1"         TO  SPA-GMN-KOHSKYKBNG
                    MOVE    "1"         TO  SPA-GMN-KOHSKYTAIKBNG
                WHEN  ( SPA-PREFNUM     =   CONST-FUKUOKA )
@@ -9812,7 +9815,8 @@
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-NARA )
-                AND  ( THKN-HBTNUM      =   "71" OR "81" OR "91" )
+                AND  ( THKN-HBTNUM      =   "71" OR "81" OR "91" OR
+                                            "80"      )
                    MOVE    "1"         TO  SPA-GMN-KOHSKYKBNN
                    MOVE    "1"         TO  SPA-GMN-KOHSKYTAIKBNN
                WHEN  ( SPA-PREFNUM     =   CONST-FUKUOKA )

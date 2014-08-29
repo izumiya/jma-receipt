@@ -666,6 +666,7 @@
       *  04.07.29    NACL-藤原    14/08/19  患者コメントの入力コメントの
       *                                     改行コードチェック
       *                                     エラー時処理終了
+      *  04.07.30    NACL-門脇    14/08/29  島根・奈良県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -983,6 +984,7 @@
            03  IDX21                                   PIC 9(03).
            03  IDX22                                   PIC 9(02).
            03  IDX-SAI                                 PIC 9(03).
+           03  IDX-NEXT                                PIC 9(03).
       *
            03  IDA                 PIC 9(04).
            03  IDB                 PIC 9(04).
@@ -7290,27 +7292,30 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              WHEN      SPACE
                EVALUATE   SYS-1001-PREFNUM
                  WHEN     "29"
-                  IF  (RECE02-TEISYUTUSAKI   =   2 OR 6    )
+                  IF  (RECE02-TEISYUTUSAKI   =   2 OR 6            )
                   AND (RECE02-KOHHBTNUM(KOHFTN-IDX)
-                                    =  "71" OR "81" OR "91")
+                                    =  "71" OR "81" OR "91" OR "80")
                     MOVE "1" TO
                           RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "32"
                   IF ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "790"  ) AND
-                      (RECE02-SRYYM         >=  "201107"   ))
+                      (RECE02-SRYYM         >=  "201107"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
                   OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
                       (RECE02-SRYYM         >=  "201007"   ) AND
                       (RECE02-SRYYM         <=  "201309"   ))
                   OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
-                      (RECE02-SRYYM         >=  "201107"   ))
+                      (RECE02-SRYYM         >=  "201107"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
                   OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =
                          "625" OR "627" OR "628" OR "629"  ) AND
-                      (RECE02-SRYYM         >=  "201302"   ))
+                      (RECE02-SRYYM         >=  "201302"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
                     MOVE "1" TO
                           RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
                   END-IF
@@ -7342,6 +7347,19 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
                       (RECE02-SRYYM         >=  "201007"   ) AND
                       (RECE02-SRYYM         <=  "201309"   ))
+                  OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE02-KOHNUM(KOHFTN-IDX) =  "790"  ) AND
+                      (RECE02-SRYYM         >=  "201107"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
+                  OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE02-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
+                      (RECE02-SRYYM         >=  "201107"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
+                  OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE02-KOHNUM(KOHFTN-IDX) =
+                         "625" OR "627" OR "628" OR "629"  ) AND
+                      (RECE02-SRYYM         >=  "201302"   ) AND
+                      (RECE02-SRYYM         <=  "201409"   ))
                     MOVE "1" TO
                           RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
                   END-IF
@@ -8458,6 +8476,12 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
        211R3-ETCKISAIFLGINF-KURIA-SEC               SECTION.
       *
            EVALUATE   SYS-1001-PREFNUM
+             WHEN     "29"
+              IF  (RECE02-TEISYUTUSAKI   =   2 OR 6   )
+              AND (RECE02-KOHHBTNUM(KOHFTN-IDX) = "80")
+              AND (RECE02-SRYYM          <  "201410"  )
+                MOVE  SPACE TO RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+              END-IF
              WHEN     "32"
               IF ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE02-KOHNUM(KOHFTN-IDX) =  "790"  ) AND
@@ -8469,6 +8493,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                   (RECE02-KOHNUM(KOHFTN-IDX) =
                      "625" OR "627" OR "628" OR "629"  ) AND
                   (RECE02-SRYYM          <  "201302"   ))
+              OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
+                  (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
+                  (RECE02-SRYYM          <  "201007"   ))
                 MOVE  SPACE TO RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
               END-IF
              WHEN     "35"
@@ -17157,6 +17184,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              WHEN    "32"
       *
                IF    RECE02-SRYYM         >=   "200708"
+               AND   RECE02-SRYYM         <=   "201409"
       *
                  IF  SYU-KOH-HKNNUM(IDX3)  =  "191"
       *
@@ -17181,6 +17209,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
        210524-FTNMONEY-HENSYU-SEC               SECTION.
       *
            IF       RECE02-SRYYM      >=  "200604"
+      *
+              IF  (SYS-1001-PREFNUM  =   32                    )
+              AND (RECE02-KOHNUM(KH-IDX - 1)
+                            =  "190" OR "290" OR "191" OR "291")
+              AND (RECE02-SRYYM     >=  "201410"               )
+              AND (IDX3             <=   3                     )
+                COMPUTE   IDX-NEXT   =   IDX3   +   1
+                IF  SYU-KOH-HKNNUM(IDX-NEXT)(1:1) >=  "1" AND <=  "8"
+                   MOVE   IDX-NEXT  TO   IDX3
+                END-IF
+              END-IF
+      *
               COMPUTE  RECE02-YKZFTN(KH-IDX) = RECE02-YKZFTN(KH-IDX)
                                              + SYU-KOH-COMPYKZFTN(IDX3)
               ADD      1      TO   RECE02-KOHKENSU(KH-IDX - 1)
@@ -21614,6 +21654,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 OR  (RECE02-HON-GAIMJGNCNT(KOHFTN-IDX)    NOT = ZERO)
                 OR  (RECE02-HON-GAIKJGNGAK(KOHFTN-IDX)    NOT = ZERO)
                     MOVE  "1"   TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    MOVE  "1"   TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                 END-IF
       *
                 IF    RECE02-SRYYM        >=  "200404"
@@ -21624,18 +21665,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   OR ((SYS-1001-PREFNUM          =   34           ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "391" OR "392"))
                     MOVE  "1"   TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
-                  END-IF
-                  IF  (SYS-1001-PREFNUM          =   08            )
-                  AND (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
-                                                >=  "1" AND <=  "8")
-                   IF (RECE02-HON-GAIDJGNGAK(KOHFTN-IDX)    NOT = ZERO)
-                   OR (RECE02-HON-GAIDJGNCNT(KOHFTN-IDX)    NOT = ZERO)
-                   OR (RECE02-HON-GAIMNAIJGNGAK(KOHFTN-IDX) NOT = ZERO)
-                   OR (RECE02-HON-GAIMGAIJGNGAK(KOHFTN-IDX) NOT = ZERO)
-                   OR (RECE02-HON-GAIMJGNCNT(KOHFTN-IDX)    NOT = ZERO)
-                   OR (RECE02-HON-GAIKJGNGAK(KOHFTN-IDX)    NOT = ZERO)
-                      MOVE  "1"   TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
-                   END-IF
                   END-IF
                 END-IF
       *
@@ -21687,6 +21716,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
       *
                 PERFORM   21114-ETCHENSYU-SEC
+      *
+                IF    RECE02-SRYYM        >=  "201410"
+                   IF  (SYS-1001-PREFNUM   =  32             )
+                   AND (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
+                                          >=  "1" AND <=  "8")
+                         MOVE SPACE TO
+                                   RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                   END-IF
+                END-IF
       *
                 IF   (WRK-ZEROKISAIFLG(KOHFTN-IDX + 1)       =  "2")
                 AND  (RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)    =  "1")
@@ -21979,6 +22017,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
             WHEN    "32"
       *
              IF  (RECE02-SRYYM                    >=   "200708")
+             AND (RECE02-SRYYM                    <=   "201409")
              AND (RECE02-KOHNUM(KOHFTN-IDX)        =   "191"   )
              AND (RECE02-KYURATE                   =    10     )
       *
