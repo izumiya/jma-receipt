@@ -5579,7 +5579,7 @@
            END-IF
       *
            IF    ( FLG-EDIT            =   1 )
-               IF    ( WRK-KJNYMD      =  CONST-H261001 )
+               IF    ( WRK-KJNYMD     >=  CONST-H261001 )
                    IF    ( SPA-NAI-I01-BTUSBT  =   "05" )
                        CONTINUE
                    ELSE
