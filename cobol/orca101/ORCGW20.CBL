@@ -78,7 +78,6 @@
            03  FLG-KSNERR                          PIC 9(01).
            03  FLG-LOOPEND                         PIC 9(01).
            03  FLG-HIT                             PIC 9(01).
-           03  FLG-RYOYOSANTEI                     PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -420,7 +419,6 @@
            03  CONST-H240401           PIC X(08) VALUE "20120401".
            03  CONST-H241001           PIC X(08) VALUE "20121001".
            03  CONST-H260401           PIC X(08) VALUE "20140401".
-           03  CONST-H261001           PIC X(08) VALUE "20141001".
       *
            COPY    "CPSK5001.INC"  REPLACING  //SYS-//
                                    BY         //TMP-//.
@@ -3474,9 +3472,10 @@
                                        TO  SYS-5001-RECEDSPKBN
       *
       *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
-           PERFORM 42011-RYOYOSANTEI-CHK-SEC
            EVALUATE    TRUE
-           WHEN  ( FLG-RYOYOSANTEI =   1 )
+           WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H241001 )
+            AND  ( SPA-GMN-W20-SBT        =   "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN  =   56 OR 57 )
            WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H240401 )
             AND  ( SPA-GMN-W20-SBT        =   "08" OR "09" )
                MOVE    SPA-GMN-W20-RYOYOKBN
@@ -3492,30 +3491,6 @@
       *
            .
        4201-BTU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¥Á¥§¥Ã¥¯½èÍý
-      *****************************************************************
-       42011-RYOYOSANTEI-CHK-SEC       SECTION.
-      *
-           MOVE    ZERO            TO  FLG-RYOYOSANTEI
-      *
-           EVALUATE    TRUE
-           WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H261001 )
-            AND  ( SPA-GMN-W20-SBT        =   "01" OR "06" )
-           WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H260401 )
-            AND  ( SPA-GMN-W20-SBT        =   "01" )
-            AND  ( SPA-NAI-W20-NYUKHNKBN  =   79 )
-           WHEN  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H241001 )
-            AND  ( SPA-GMN-W20-SBT        =   "01" )
-            AND  ( SPA-NAI-W20-NYUKHNKBN  =   56 OR 57 )
-      *
-               MOVE    1           TO  FLG-RYOYOSANTEI
-      *
-           END-EVALUATE
-      *
-           .
-       42011-RYOYOSANTEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ÉÂÅï¾ðÊóÊÔ½¸½èÍý
@@ -5321,8 +5296,6 @@
              AND ( WRK-STYMD                   <   CONST-H241001 )
            WHEN  ( WRK-EDYMD                  >=   CONST-H260401 )
              AND ( WRK-STYMD                   <   CONST-H260401 )
-           WHEN  ( WRK-EDYMD                  >=   CONST-H261001 )
-             AND ( WRK-STYMD                   <   CONST-H261001 )
                    PERFORM 4101-NYUINRYO-CLEAR-SEC
            END-EVALUATE
       *
@@ -5358,8 +5331,6 @@
                  AND ( WRK-STYMD          <    CONST-H241001 )
                WHEN  ( WRK-EDYMD          >=   CONST-H260401 )
                  AND ( WRK-STYMD          <    CONST-H260401 )
-               WHEN  ( WRK-EDYMD          >=   CONST-H261001 )
-                 AND ( WRK-STYMD          <    CONST-H261001 )
                    PERFORM 41001-INPUT-AREA-EDIT-SEC
                END-EVALUATE
            END-IF
@@ -5462,14 +5433,14 @@
            IF    ( SPA-ERRCD       =   SPACE )
                IF    ( SPA-NAI-W20-KHNSRYCD
                                NOT =   WRK-SRYCD )
-                   INITIALIZE      SPA-GMN-W20-RYOYOKBNLST-G
-                                   SPA-GMN-W20-RYOYOKBN-G
-      *
-                   PERFORM 42011-RYOYOSANTEI-CHK-SEC
-                   IF    ( FLG-RYOYOSANTEI =   1 )
-                       PERFORM 4100-RYOYOKBN-CMB-EDT-SEC
+                   IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
+                    AND  ( SPA-GMN-W20-SBT         =  "01" )
+                       INITIALIZE      SPA-GMN-W20-RYOYOKBNLST-G
+                                       SPA-GMN-W20-RYOYOKBN-G
+                       IF    ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
+                           PERFORM 4100-RYOYOKBN-CMB-EDT-SEC
+                       END-IF
                    END-IF
-      *
                    INITIALIZE      SPA-GMN-W20-YKNCHOKAKBNLST-G
                                    SPA-GMN-W20-YKNCHOKAKBN-G
                    IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H260401 )
@@ -5865,8 +5836,9 @@
            PERFORM 4200-YKNCHOKAKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-YKNCHOKAKBN-G
       *
-           PERFORM 42011-RYOYOSANTEI-CHK-SEC
-           IF    ( FLG-RYOYOSANTEI =   1 )
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
+            AND  ( SPA-GMN-W20-SBT         =  "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
                PERFORM 4100-RYOYOKBN-CMB-EDT-SEC
            END-IF
       *
@@ -8967,8 +8939,9 @@
            END-PERFORM
       *
       *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
-           PERFORM 42011-RYOYOSANTEI-CHK-SEC
-           IF    ( FLG-RYOYOSANTEI =   1 )
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H241001 )
+            AND  ( SPA-GMN-W20-SBT         =  "01" )
+            AND  ( SPA-NAI-W20-NYUKHNKBN   =  56 OR 57 )
                MOVE    "£¹£°ÆüÄ¶¤¨¤Î»»Äê" TO W20-LBLRYOYOKBN
            END-IF
       *
