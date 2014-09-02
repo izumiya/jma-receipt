@@ -82,6 +82,7 @@
       *
        01  CONST-AREA.
            03  CONST-NYUIN                 PIC X(02)   VALUE "01".
+           03  CONST-H261001               PIC X(08)   VALUE "20141001".
            03  CONST-H260401               PIC X(08)   VALUE "20140401".
            03  CONST-H241001               PIC X(08)   VALUE "20121001".
            03  CONST-H240401               PIC X(08)   VALUE "20120401".
@@ -675,9 +676,15 @@
                                      =  "33" OR "34" )
                    MOVE    3         TO  FLG-RYOYOKHN
                    PERFORM 20011-RYOYOKHN-EDIT-SEC
-               WHEN  ( SYS-5001-BTU-SBT  =   "01" )
+               WHEN  ( SYS-5001-BTU-SBT    =   "01" )
                 AND  ( SYS-5001-CRYOYOKBN  =   "1" )
                    IF    ( SNYUINRYO-SRYYMD   >=  CONST-H241001 )
+                       MOVE    5         TO  FLG-RYOYOKHN
+                       PERFORM 20011-RYOYOKHN-EDIT-SEC
+                   END-IF
+               WHEN  ( SYS-5001-BTU-SBT    =   "06" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   IF    ( SNYUINRYO-SRYYMD   >=  CONST-H261001 )
                        MOVE    5         TO  FLG-RYOYOKHN
                        PERFORM 20011-RYOYOKHN-EDIT-SEC
                    END-IF
@@ -710,6 +717,16 @@
            ELSE
                IF  ( FLG-KOKI     =   1 )
                    MOVE    1      TO  FLG-EDIT
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-EDIT            =   1 )
+               IF    ( SNYUINRYO-SRYYMD   >=  CONST-H261001 )
+                   IF    ( SYS-5001-BTU-SBT = "05" )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-EDIT
+                   END-IF
                END-IF
            END-IF
       *
