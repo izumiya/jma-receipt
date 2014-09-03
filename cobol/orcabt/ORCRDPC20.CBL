@@ -3529,7 +3529,8 @@
       **** END-IF
            IF     (WRK-FEDT-SRYKBN     =   "21" OR "22" OR "23")
       *       IF (WRK-FEDT-DEKIDAKA-TEN    NOT =   ZERO)
-              IF (WRK-FEDT-ZAITEN    NOT =   ZERO)
+              IF (WRK-FEDT-ZAITEN    NOT =   ZERO)    OR
+                 (TBL-ZAIW-SRYCD (1 IDX)  =  WRK-CONS-TEIGEN2)
                 MOVE    "1"                TO  WRK-FEDT-HOUKATU-FLG
               ELSE
       *         ±¡³°½èÊý
