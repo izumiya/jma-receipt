@@ -964,8 +964,10 @@
            03  WRK-CONS-HKNNUM5       PIC X(03)   VALUE  "075".
       *        ¹ñÊÝ
            03  WRK-CONS-HKNNUM6       PIC X(03)   VALUE  "067".
-      *    ÌôºÞÎÁÄþ¸º
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¹£°¡¿£±£°£°¡Ë¡ÊÆâÉþÌô¡Ë
            03  WRK-CONS-TEIGEN        PIC X(09)   VALUE   "630010002".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¹³Àº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  WRK-CONS-TEIGEN2       PIC X(09)   VALUE   "630010005".
       *****Âà±¡»þÅêÌô
       *****03  WRK-CONS-TAITOYAKU     PIC X(09)   VALUE   "840000006".
       *****03  WRK-CONS-TAITOYAKU1    PIC X(09)   VALUE   "008400002".
@@ -2237,7 +2239,8 @@
       *****************************************************************
        200711-YKZ-TAIHI-SEC          SECTION.
       *
-           IF      RECE05-SRYCD (IDX)  =   WRK-CONS-TEIGEN
+           IF      RECE05-SRYCD (IDX)  =  (WRK-CONS-TEIGEN  OR
+                                           WRK-CONS-TEIGEN2)
                CONTINUE
            ELSE
       *         IF      RECE04-YKZTEN    =   ZERO
@@ -2251,7 +2254,8 @@
       *
            IF      WRK-TBLMAX6         =   1
                IF      RECE05-SRYCD (IDX)
-                                       =   WRK-CONS-TEIGEN
+                                       =  (WRK-CONS-TEIGEN  OR
+                                           WRK-CONS-TEIGEN2)
                    MOVE    1               TO  FLG-TEIGEN
                END-IF
            END-IF
@@ -2272,7 +2276,8 @@
                                    TBL-ZAIW-TENSIKIBETU(1 WRK-TBLMAX6)
                MOVE    RECE05-TEN        (IDX) TO
                                    TBL-ZAIW-TEN        (1 WRK-TBLMAX6)
-               IF      RECE05-SRYCD (IDX)  =   WRK-CONS-TEIGEN
+               IF      RECE05-SRYCD (IDX)  =  (WRK-CONS-TEIGEN  OR
+                                               WRK-CONS-TEIGEN2)
                        MOVE   RECE04-ZAITEN    TO
                                    TBL-ZAIW-TEN        (1 WRK-TBLMAX6)
                END-IF
@@ -3334,7 +3339,8 @@
       *¹Ô°ÙÅÀ¿ô
            IF      IDX                 =   WRK-TBLMAX6
              IF    TBL-ZAIW-SRYCD (1 IDX)
-                                       =   WRK-CONS-TEIGEN
+                                       =  (WRK-CONS-TEIGEN  OR
+                                           WRK-CONS-TEIGEN2)
                MOVE  RECE04-ZAITEN    TO  WRK-FEDT-ZAITEN
                COMPUTE  WRK-FEDT-ZAITEN =  WRK-FEDT-ZAITEN  *  -1
              ELSE
@@ -3347,7 +3353,8 @@
       *¹Ô°ÙÌôºÞÎÁ
            MOVE    RECE04-YKZTEN      TO  WRK-FEDT-YKZTEN
       *ÌôºÞÎÁÄþ¸º
-           IF    TBL-ZAIW-SRYCD (1 IDX)  =   WRK-CONS-TEIGEN
+           IF    TBL-ZAIW-SRYCD (1 IDX)  =  (WRK-CONS-TEIGEN  OR
+                                             WRK-CONS-TEIGEN2)
                MOVE  RECE04-ZAITEN    TO  WRK-FEDT-YKZTEN
                COMPUTE   WRK-FEDT-YKZTEN  =  WRK-FEDT-YKZTEN  *  -1
            END-IF
@@ -3471,7 +3478,8 @@
            PERFORM 200799-ZAI-HENSYU-2-SEC
       *»ÈÍÑÎÌ
            IF      TBL-ZAIW-SRYCD (1 IDX)
-                                       =   WRK-CONS-TEIGEN
+                                       =  (WRK-CONS-TEIGEN  OR
+                                           WRK-CONS-TEIGEN2)
                    MOVE    ZERO        TO  WRK-FEDT-SRYSURYO
            ELSE
                    MOVE    TBL-ZAIW-SRYSURYO (1 IDX)
@@ -3487,7 +3495,8 @@
                                        *   WRK-FEDT-SRYSURYO
       *ÌôºÞÎÁÄþ¸º
            IF      TBL-ZAIW-SRYCD (1 IDX)
-                                       =   WRK-CONS-TEIGEN
+                                       =  (WRK-CONS-TEIGEN  OR
+                                           WRK-CONS-TEIGEN2)
                    COMPUTE   WRK-FEDT-MEISAI-YKZ
                                        =   TBL-ZAIW-TEN (1 IDX) * -1
            END-IF
