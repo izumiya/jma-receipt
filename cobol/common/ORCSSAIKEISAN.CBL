@@ -68,6 +68,7 @@
       *  04.07.01    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.02    NACL-門脇    14/02/13  労災・自賠責の施術加算対応
       *  04.07.03    NACL-門脇    14/03/01  労災マスタ追加対応
+      *  04.07.00    NACL-多々納  14/09/04  マイナス剤点数判定対応他
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1309,6 +1310,15 @@
                  (ACCT-JIHOKBN          = SPACE                 ))
            OR   ( FLG-TAISYO            =   1                    )
       *
+      *H26.10
+      *       診療行為附加情報からマイナス点数剤の判定
+              IF      ACCT-ZAIREQFLG     =   "1"
+      *           付加情報あり
+                  PERFORM  44011-SRYACCTPLUS-KENSAKU-SEC
+              ELSE
+                  MOVE     ZERO          TO  ACCTP-PLUSKBN
+              END-IF
+      *
               MOVE    ACCT-SRYKBN    TO  TBL-SRYKBN(IDX1)
               MOVE    ACCT-ZAINUM    TO  TBL-ZAIBAN(IDX1)
               MOVE    ACCT-DAY(SAI-IDX  WRK-SAIKEISAN-DD)
@@ -1317,8 +1327,11 @@
                    MOVE  ACCT-ZAITEN TO  TBL-GENTEN(IDX1)
                    MOVE  ACCT-ZAIKBN TO  TBL-ZAIKBN(IDX1)
               ELSE
-                IF  (ACCT-SRYCDTOTAL =    630010002)   AND
-                    (ACCT-MEISAISU   =    1)
+                IF ((ACCT-SRYCDTOTAL =    630010002)   AND
+                    (ACCT-MEISAISU   =    1 ))
+      *H26.10   マイナス判定
+                OR  (ACCTP-PLUSKBN   =   1  )
+      *
                    COMPUTE   TBL-ZAITEN(IDX1)  =  TBL-ZAITEN(IDX1) +
                                                 (ACCT-ZAITEN * -1)
                 ELSE
@@ -1329,6 +1342,8 @@
               OR   ((  ACCT-SRYCDTOTAL   =    630010002      )  AND     
                     (  ACCT-MEISAISU     =    1              ))         
               OR   (   ACCT-ZAIKBN       =    2               )
+      *H26.10   マイナス判定
+              OR  (    ACCTP-PLUSKBN   =   1  )
                  CONTINUE                                               
               ELSE                                                      
                  COMPUTE  TBL-SYUTEN(IDX1)  =  ACCT-SYUTEN1
@@ -1746,6 +1761,9 @@
                                        WHEN   "221"
                                        WHEN   "231"
                                        WHEN   "291"
+      *H26.10
+                                       WHEN   "293"
+                                       WHEN   "294"
                                        WHEN   "   "
                                           PERFORM  44021-YAKUZAI-SET-SEC
                                    END-EVALUATE       
@@ -1755,6 +1773,8 @@
                                        WHEN   "221"
                                        WHEN   "231"
                                        WHEN   "291"
+      *H26.10
+                                       WHEN   "294"
                                           PERFORM  44021-YAKUZAI-SET-SEC
                                    END-EVALUATE       
                           END-EVALUATE
