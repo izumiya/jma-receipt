@@ -667,6 +667,7 @@
       *                                     改行コードチェック
       *                                     エラー時処理終了
       *  04.07.30    NACL-門脇    14/08/29  島根・奈良県地方公費対応
+      *  04.07.31    NACL-門脇    14/09/01  訪問診療にかかる記録書コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9672,6 +9673,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       CONTINUE
                   ELSE
                       MOVE      1         TO    WRK-DAISAN-INGAI(IDX1)
+                  END-IF
+               END-IF
+      *
+               IF      SRY-SRYKBN   =   "99"
+                  IF      SRY-SRYCD(IDX2)     =   "099140011"
+                      MOVE     "1"        TO    RECE04-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE05-SRYCD(IDX4)
+                  END-IF
+                  IF      SRY-SRYCD(IDX2)     =   "099140012"
+                      MOVE     "2"        TO    RECE04-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE05-SRYCD(IDX4)
+                  END-IF
+                  IF      RECE04-HOMONCOMFLG  =   "2"
+                      MOVE     "1"        TO    RECE02-COMCNTFLG
+                      MOVE     "1"        TO    RECE05-RECEDENFLG(IDX4)
+                      MOVE     "1"        TO    RECE05-RECEPTFLG(IDX4)
                   END-IF
                END-IF
       *
