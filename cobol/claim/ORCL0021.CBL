@@ -1474,6 +1474,8 @@
                WHEN    "7"
       *             ÌôºÞÎÁÄþ¸º¤Î»þ¡¢ÅÀ¿ô¤ò¡Ý¤È¤¹¤ë
                    IF      SRY-SRYCD (IDXA)    =   "630010002"
+      *H26.10          ¸ºÅÀ
+                     OR   (TNS-TENSIKIBETU     =   7   )
       *                ¿ÇÎÅ¥³¡¼¥É
                        MOVE    SRY-SRYCD(IDXA)     TO  TBL-IJICD
                                                        (IDX-LF IDX-IJ)

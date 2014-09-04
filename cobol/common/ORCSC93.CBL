@@ -63,6 +63,8 @@
       * 04.06.00     NACL-多々納  10/12/01  自賠責金額入力対応
       * 04.07.00     NACL-多々納  12/08/28  薬剤料減点対応
       * 04.07.00     NACL-多々納  13/07/XX  第三者行為対応
+      * 04.07.00     NACL-多々納  14/06/XX  外用薬（臨時投薬）対応
+      * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *****************************************************************
       *
       *
@@ -801,6 +803,16 @@
                            END-IF
                        END-IF
                    END-IF
+      *ver.4.7.0
+      *            臨時投薬（外用）はH２６年４月から
+                   IF      WRK-SRYSYUKBN       =   "293"
+                                               OR  "294"
+                                               OR  "295"
+                       IF      SPA-SRYYMD          <   "20140401"
+                           MOVE    "0504"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  SPA-COM-CUR(IDX)
+                       END-IF
+                   END-IF
                WHEN    OTHER
       *        その他
                    IF      FLG-JIHI            =   1
@@ -915,6 +927,9 @@
                           (SPA-COM-KAIFLG (IDX - 1 )   =   "1" ) OR
                           (SPA-GMN-INPUTCD(IDX - 1 )(1:1)  =  "#"
                                                            OR "$")
+      *H26.10
+                       OR (SPA-COM-INPUTCD(IDX - 1)
+                                               =   "099140012" )
       *                薬剤料逓減の時、内服薬剤とする
                        IF      SPA-COM-INPUTCD (IDX)   =   "820000047"
                            MOVE    "21"            TO  SPA-COM-SRYKBN
@@ -1019,6 +1034,10 @@
                                                    "232"
                                                OR  "233"
                                                OR  "234"
+      *H26.4 から　臨時投薬追加
+                                               OR  "293"
+                                               OR  "294"
+                                               OR  "295"
                        MOVE    "23"            TO  WRK-SRYKBN
                    END-IF
       *!
@@ -1359,13 +1378,18 @@
       *        在総診算定終了
                                            OR  "099140001"
                                            OR  "099140004" )
+      *H26.10  在宅訪問診療他
+            OR    (SPA-COM-INPUTCD(IDX)    =   "099140011"
+                                           OR  "099140012" )
                MOVE    1               TO  FLG-HASSYO
            ELSE
                IF      FLG-HASSYO          =   1
                    IF     (SPA-COM-SRYKBN(IDX)
                                        =   SPA-COM-SRYKBN(IDX - 1)) AND
-                          (SPA-COM-INPUTCD(IDX)(1:1)
-                                               =   "8"  )
+                         ((SPA-COM-INPUTCD(IDX)(1:1)
+                                               =   "8"  )  OR
+                          (SPA-COM-INPUTCD(IDX)(1:3)
+                                               =   "008"  ))
                        CONTINUE
                    ELSE
                        MOVE    ZERO            TO  FLG-HASSYO
@@ -1849,7 +1873,10 @@
                           (SPA-COM-KAIFLG (IDX - 1 )   =   "1")
                        OR (SPA-GMN-INPUTCD(IDX - 1 )(1:1)
                                                        =   "#"
-                                                       OR  "$" ))
+                                                       OR  "$" )
+      *H26.10
+                       OR (SPA-COM-INPUTCD(IDX - 1)
+                                               =   "099140012" ))
                        MOVE    "99"            TO  SPA-COM-SRYKBN(IDX)
                        MOVE    "990"           TO  SPA-COM-SRYSYUKBN
                                                                  (IDX)
@@ -1860,14 +1887,6 @@
                                                TO  SPA-COM-ZAIEND(IDX)
                        MOVE    SPACE           TO  SPA-COM-ZAIEND
                                                               (IDX - 1)
-      *                診療種別入力
-      *                 IF      WRK-SRYSYUKBN   NOT =   SPACE
-      *                     MOVE    WRK-SRYSYUKBN
-      *                                             TO  SPA-COM-SRYSYUKBN
-      *                                                          (IDX)
-      *                     MOVE    SPACE           TO  SPA-COM-ZAIEND
-      *                                                          (IDX)
-      **                 END-IF
                    END-IF
       *        フリーの時、点数マスタより、決定
                WHEN    OTHER
@@ -1946,6 +1965,39 @@
                                                                   (IDX)
                            MOVE    "140"           TO  SPA-COM-SRYSYUKBN
                                                                   (IDX)
+      *                    １剤１明細とする
+                           MOVE    "1"             TO  SPA-COM-ZAIEND
+                                                                  (IDX)
+                           MOVE    1               TO  FLG-ZAI
+      *H26.10
+      *                訪問診療に掛かる記録書
+                       WHEN    "099140011"
+                           MOVE    "99"            TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+      *                    1行前が診療種別以外
+                           IF     (IDX             >   1  )  AND
+                                  (SPA-GMN-INPUTCD(IDX - 1)(1:4)
+                                                   =   ".990"
+                                                   OR  ".991" )
+                               CONTINUE
+                           ELSE
+                               MOVE    "991"       TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+                           END-IF
+      *                診療人数合計
+                       WHEN    "099140012"
+                           MOVE    "99"            TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+      *                    1行前が診療種別以外
+                           IF     (IDX             >   1  )  AND
+                                  (SPA-GMN-INPUTCD(IDX - 1)(1:4)
+                                                   =   ".990"
+                                                   OR  ".991" )
+                               CONTINUE
+                           ELSE
+                               MOVE    "991"       TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+                           END-IF
       *                    １剤１明細とする
                            MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                   (IDX)

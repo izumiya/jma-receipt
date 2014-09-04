@@ -65,6 +65,7 @@
       *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *  04.07.00    NACL-多々納  13/10/XX  第三者行為対応
       *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
+      *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1762,7 +1763,9 @@
       *            削除できるかの判定（減）対象外
                    IF     (LNK-WKSRY-AUTOKBN (IDX IDZ)   =   "3" ) AND
                           (LNK-WKSRY-INPUTCD (IDX IDZ)
-                                                   =   "820000047")
+                                                   =   "820000047"
+      *H26.10
+                                                   OR  "820000166")
                        MOVE    ZERO                TO  SPA-NAI-JIDFLG
                                                               (IDX-NAI)
                    END-IF
@@ -2445,6 +2448,13 @@
       *
       *    行為名称
            MOVE    TNS-NAME            TO  SPA-GMN-TMEISYO2(IDG)
+      *
+      *H26.10
+      *    在宅　診療人数合計　再編集
+           IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099140012"
+                PERFORM 31001214-ZAICOM-MEISYO-SEC
+           END-IF
+      *
       *    薬剤服用コメントの時、再編集
            IF      LNK-WKSRY-SRYCD (IDX IDZ)(1:3)  =   "001"
                 PERFORM 3100121-FUKIYO-MEISYO-SEC
@@ -2640,6 +2650,7 @@
            END-IF
       *    行為名称
            MOVE    TNS-NAME            TO  SPA-GMN-TMEISYO2(IDG)
+      *
       *    薬剤服用コメントの時、再編集
            IF      LNK-WKSRY-SRYCD (IDX IDZ)(1:3)  =   "001"
                 PERFORM 3100121-FUKIYO-MEISYO-SEC
@@ -3023,6 +3034,47 @@
       *
       *H24.4
       *
+      *H26.10
+      *****************************************************************
+      *    在宅　診療人数合計　再編集処理
+      *****************************************************************
+       31001214-ZAICOM-MEISYO-SEC            SECTION.
+      *
+      *    回数を合計人数
+           MOVE    WRK-SRYKAISUKEI     TO  WRK-KAISU
+           MOVE    ZERO                TO  IDK2
+           MOVE    SPACE               TO  WRK-KAISU-H
+           PERFORM VARYING     IDK1    FROM    1   BY  1
+                   UNTIL       IDK1    >   3
+               IF      WRK-KAISU-X (IDK1:1)    NOT =   SPACE
+                   ADD     1           TO  IDK2
+                   MOVE    WRK-KAISU-X (IDK1:1)
+                                           TO  WRK-KAISU-H (IDK2:1)
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPACE               TO  WRK-MEISYO
+           STRING  TNS-NAME            DELIMITED  BY  SPACE
+                   "　　　　【"        DELIMITED  BY  SIZE
+                   SPA-SRYYMD(7:2)     DELIMITED  BY  SPACE
+                   "日（"              DELIMITED  BY  SIZE
+                   WRK-KAISU-H         DELIMITED  BY  SPACE
+                   "人）"              DELIMITED  BY  SIZE
+                   "】"                DELIMITED  BY  SIZE
+                                               INTO    WRK-MEISYO
+           END-STRING
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MEISYO          TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-TMEISYO2(IDG)
+      *
+           .
+       31001214-ZAICOM-MEISYO-EXT.
+           EXIT.
+      *H26.10
+      *
       *****************************************************************
       *    数量表示用編集処理
       *****************************************************************
@@ -3296,7 +3348,10 @@
       *            院外処方は対象外
                    IF     (LNK-WKSRY-SRYSYUKBN (IDX)   =   "212"
                                                        OR  "222"
-                                                       OR  "232")
+                                                       OR  "232"
+      *H26.10           臨時追加
+                                                       OR  "292"
+                                                       OR  "295")
                        CONTINUE
                    ELSE
                        MOVE    1               TO  SPA-NAI-SYOHOU
@@ -4788,12 +4843,14 @@
                IF     (WRK-CHK-SRYSYUKBN           =   "211"  OR
                                                        "221"  OR
                                                        "231"  OR
-                                                       "291" )  OR
+                                                       "291"  OR
+                                                       "294" )  OR
                      ((SPA-INGAIKBN            NOT =   "1"   ) AND
                       (WRK-CHK-SRYSYUKBN           =   "210"  OR
                                                        "220"  OR
                                                        "230"  OR
-                                                       "290" ))
+                                                       "290"  OR
+                                                       "293" ))
                    ADD     1                   TO  IDY
                    IF      IDY                 >   40
                        GO      TO      45051-ORCS01-SET-EXT
@@ -4938,6 +4995,12 @@
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
                GO      TO      45052-JIBAI-SYORI-EXT
            END-IF
+      *H26.10
+      *    薬剤料逓減は対象外
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1  )
+               GO      TO      45052-JIBAI-SYORI-EXT
+           END-IF
       *
       *    画像診断の時、フィルム点数を対象外とする
            IF      LNK-WKSRY-SRYKBN (IDX)  =   "70"
@@ -5027,6 +5090,12 @@
       *
       *    薬剤料逓減は対象外
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
+               GO      TO      45052-KOGAI-SYORI-EXT
+           END-IF
+      *H26.10
+      *    薬剤料逓減は対象外
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1  )
                GO      TO      45052-KOGAI-SYORI-EXT
            END-IF
       *

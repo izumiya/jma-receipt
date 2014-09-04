@@ -3259,6 +3259,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SRY-AUTOKBN (IDZ)   =   "3"         )
                MOVE    2                   TO  SPA-NAI-ZAITENFLG (IDX)
            END-IF
+      *H26.10
+      *    ﹋擎蛹﹌及譴蛹及覆擂坌
+           IF     (SRY-SRYCD  (IDZ)    =   "820000166" )  AND
+                  (SRY-SRYKBN          =   "21"
+                                       OR  "22"
+                                       OR  "23"        )  AND
+                  (SRY-AUTOKBN (IDZ)   =   "3"         )
+               MOVE    2                   TO  SPA-NAI-ZAITENFLG (IDX)
+           END-IF
       *    遙爛咺昳樹扷﹋管ま及瘉賡卞覆擂午卅月手及﹌
            IF     (TNS-SRYCD(1:1)      =   "1"  )  AND
                   (TNS-DATAKBN         =   "1"  )  AND
@@ -8864,12 +8873,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
-      *    ま汋譴蛹及管反覆擂陸
+      *    ま汋(髑泔﹌譴蛹及管反覆擂陸
            IF     (SPA-NAI-ZAITENFLG (SPA-NAI-BANGO)
                                        =   1
                                        OR  2       )  AND
                   (SPA-NAI-SRYKBN  (SPA-NAI-BANGO)
-                                       =   "21" )
+                                       =   "21"
+                                       OR  "22"
+                                       OR  "23"   )
                MOVE    "0027"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN-CUR
            END-IF
@@ -14265,7 +14276,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        INTO    WRK-ERRMSG
                    END-STRING
                WHEN    "0027"
-                   STRING  "覆擂及管反ま汋泔管恔譴蛹卞楮允月管匹允﹝"
+      *************STRING  "覆擂及管反ま汋泔管恔譴蛹卞楮允月管匹允﹝"
+                   STRING  "覆擂及管反泔管恔譴蛹卞楮允月管匹允﹝"
                            "管庍凳反匹五引六氏﹝"
                                        DELIMITED  BY  SIZE
                                        INTO    WRK-ERRMSG

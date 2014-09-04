@@ -3617,6 +3617,8 @@
                    MOVE    "B05"             TO  MCP-WIDGET
                WHEN    31
                    MOVE    "B06"             TO  MCP-WIDGET
+               WHEN    91
+                   MOVE    "B01"             TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -6139,6 +6141,11 @@
                    MOVE    1               TO  SPA-KEI-FLG
                 END-IF
            END-IF
+      *H26.10
+      *    外用回数エラー、戻るへ
+           IF      SPA-ERRCD           =   "0052"
+               MOVE    91              TO  SPA-GMN-CUR
+           END-IF
            .
        450012-GAIRAI-CALL-EXT.
            EXIT.
@@ -7266,6 +7273,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-ERRMSG2     TO  SPA-ERRMSG
       *D           MOVE    SPACE           TO  SPA-ERRMSG2
                    MOVE    SPA-ERRCD       TO  SPA-ERRMSG2
+      *H26.10
+               WHEN    "0052"
+                   STRING  "外用薬剤の回数が１回以上になります。"
+                           "同じ剤は回数をまとめて入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    OTHER
                    MOVE    SPA-ERRCD   TO  SPA-ERRMSG
            END-EVALUATE

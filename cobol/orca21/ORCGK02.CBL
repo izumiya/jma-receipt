@@ -106,6 +106,7 @@
       *  04.08.00    NACL-多々納  13/06/28  ドクターカーソル移動対応
       *  04.07.00    NACL-多々納  14/03/19  .123 処理対応他
       *  04.08.00    NACL-多々納  14/04/XX  行挿入・カーソル移動位置変更
+      *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -833,6 +834,7 @@
                05  WRK-KSN-ZAIEND          PIC X(01).
                05  WRK-KSN-HKTKBN          PIC 9(01).
            03  WRK-KSN-IDX             PIC 9(04).
+      *
       *
       *    画面ＳＰＡ領域ワーク
        01  WRK-SCR-REC.
@@ -1684,6 +1686,12 @@
                    MOVE    ZERO            TO  SPA-TOKUTEIFLG
                    MOVE    ZERO            TO  SPA-NAIFUKU-CHK
                    MOVE    ZERO            TO  SPA-NAIFUKU-OK
+      *H26.10      向精神薬多剤
+      *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-OK
+      *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-CHK
+                   MOVE    ZERO            TO  SPA-K01-YOBI(1:1)
+                   MOVE    ZERO            TO  SPA-K01-YOBI(2:1)
+      *
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
                    MOVE    ZERO            TO  SPA-SYOHOU-CHK
@@ -3105,6 +3113,23 @@
       *            画面制御
                    MOVE    "JOIN"              TO  WRK-PUTTYPE
                    PERFORM 41002-KOUSIN-SYORI-SEC
+      *H26.10
+      *        向精神薬剤多剤投与
+               WHEN    "2006"
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   IF      SPA-KID1-FLG        =   "OK"
+      *v4.7           MOVE    1                TO  SPA-PSYCHO-OK
+                      MOVE    "1"              TO  SPA-K01-YOBI(1:1)
+                   ELSE
+      *v4.7           MOVE    ZERO             TO  SPA-PSYCHO-OK
+                      MOVE    ZERO             TO  SPA-K01-YOBI(1:1)
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            画面制御
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *
       *        クリア確認チェック
                WHEN    "0125"
                    IF      SPA-KID1-FLG        =   "OK"
@@ -10661,26 +10686,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      FLG-F6              =   ZERO
                MOVE    "1"                 TO  SPA-COM-CUR (1)
            END-IF
-      *TEST
-      *TEST
-      *TEST
-      *TEST
-      *TEST
-           GO      TO      450-MAEGMN-EXT
-      *TEST
-      *    １行へカーソル移動
-           MOVE    "1"                 TO  SPA-COM-CUR (1)
-           GO      TO      450-MAEGMN-EXT
-      *TEST
       *
-           IF      SPA-GMN-PAGE        =   1
-               MOVE    1               TO  SPA-GMN-PAGE
-           ELSE
-               COMPUTE SPA-GMN-PAGE    =   SPA-GMN-PAGE   -   1
-           END-IF
-      *
-           MOVE    1                   TO  SPA-MAP-IDX
-           MOVE    99                  TO  SPA-GMN-CUR
            .
        450-MAEGMN-EXT.
            EXIT.
@@ -10732,39 +10738,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    1                   TO  SPA-GMN-CUR
-      *TEST
-      *TEST
-           GO      TO      460-ATOGMN-EXT
-      *TEST
-      *TEST
-      *
-      *TEST
-      *    最終行へカーソル移動
-           IF      SPA-GMN-MAX         <   SPA-MAX-LINE
-               MOVE    "1"             TO  SPA-COM-CUR (SPA-GMN-MAX + 1)
-           ELSE
-               MOVE    "1"             TO  SPA-COM-CUR (SPA-MAX-LINE)
-           END-IF
-           GO      TO      460-ATOGMN-EXT
-      *TEST
-           IF      SPA-GMN-PAGE        =   MAX-PAGE
-               MOVE    1                   TO  SPA-GMN-CUR
-               MOVE    "7002"              TO  SPA-ERRCD
-           END-IF
-      *
-           IF      SPA-ERRCD           =   SPACE
-               COMPUTE WRK-FREE            =   SPA-GMN-PAGE  *  MAX-GMN
-               IF      SPA-GMN-INPUTCD(WRK-FREE)   =   SPACE
-                   CONTINUE
-               ELSE
-      *            次ページ表示
-                   ADD     1                   TO  SPA-GMN-PAGE
-                   IF      SPA-GMN-PAGE        =   MAX-PAGE
-                       MOVE    "7003"              TO  SPA-ERRCD
-                   END-IF
-                   MOVE    88                  TO  SPA-GMN-CUR
-               END-IF
-           END-IF
       *
            .
        460-ATOGMN-EXT.
@@ -11865,6 +11838,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                   "222"  OR
                                                   "232"  OR
                                                   "292"
+      *            外用臨時
+                                               OR "295"
                    MOVE    1               TO  FLG-SYOHOU-ARI
                END-IF
       *        在宅注射院外処方
@@ -12601,7 +12576,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    1                   TO  SPA-GMN-PAGE
       *
       *
-      *
            GO      TO      5002-GMNSPA-HEN-EXT
       *
       *
@@ -12734,9 +12708,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-GMN-MEISYO-G(WRK-IDX)
                                                TO  K02-MEISYO(IDX)
                    PERFORM 5002-SURYO-HEN-SEC
+      *H26.10
+      *            診療人数合計
+                   IF      SPA-COM-INPUTCD (WRK-IDX)
+                                               =   "099140012"
+                       PERFORM 50021-MEISYOHEN-SEC
+                   END-IF
       *@
       *            包括行
                    IF     (SPA-COM-HOUKATU-ZAI (WRK-IDX) NOT =   ZERO)
+      *H26.10 （包括エラー分も）
+                      OR  (SPA-COM-HOUKATU-ERR (WRK-IDX) NOT =   ZERO)
                       OR ((SPA-COM-HKNCOMBI(WRK-IDX)     =   "9999" )
                       AND (SPA-HKNCOMBINUM    NOT =   "9999" ))
       ****************     MOVE    "blue"         TO
@@ -12811,19 +12793,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    WRK-HEN-PAGE1       DELIMITED  BY  SIZE
                                        INTO      K02-MODE
            END-STRING
-      *
-      *****前頁表示の時、１行目へ
-      *    IF      SPA-GMN-CUR         =   99  OR  88
-      *        MOVE    1                   TO  SPA-GMN-CUR
-      * *******MOVE    1                   TO  SPA-MAP-IDX
-      *****END-IF
-      *
-      *    明細入力の時、コードが入力されていること
-      *    IF      SPA-GMN-CUR         =   2
-      *        IF      K02-INPUTCD(SPA-MAP-IDX)    =   SPACE
-      *            MOVE    1               TO  SPA-GMN-CUR
-      *        END-IF
-      **** END-IF
       *
            MOVE    SPA-GMN-PTNUM       TO  K02-PTNUM
            MOVE    SPA-GMN-KANANAME    TO  K02-KANANAME
@@ -13216,8 +13185,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                         END-IF
       *ver.4.7
                    ELSE
+      *H26.10
+      *                診療人数合計
+                       IF      SPA-COM-INPUTCD (WRK-IDX)
+                                                   =   "099140012"
+                           MOVE    " X "               TO  WRK-KAKERU
+                       ELSE
+      *!! 
                        MOVE    SPACE               TO  WRK-KAISU-H
                        MOVE    SPACE               TO  WRK-KAKERU
+      *!! 
+                       END-IF
                    END-IF
                ELSE
                    MOVE    " X "               TO  WRK-KAKERU
@@ -13257,6 +13235,36 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        5002-SURYO-HEN-EXT.
            EXIT.
+      *TEST
+      *H26.10
+      *****************************************************************
+      *    診療人数合計編集処理
+      *****************************************************************
+       50021-MEISYOHEN-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  WRK-MEISYO-G
+           STRING  SPA-COM-NAME (WRK-IDX)  DELIMITED  BY  SPACE
+                   "　　　【"              DELIMITED  BY  SIZE
+                   SPA-SRYYMD (7:2)        DELIMITED  BY  SPACE
+                   "日（"
+                   WRK-KAISU-H             DELIMITED  BY  SPACE
+                   "人）】"                DELIMITED  BY  SIZE
+                   INTO                    WRK-MEISYO
+           END-STRING
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MEISYO          TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  WRK-MEISYO
+      *
+           MOVE    WRK-MEISYO-G        TO  K02-MEISYO(IDX)
+           MOVE    WRK-MEISYO-G        TO  SPA-GMN-MEISYO-G(WRK-IDX)
+           .
+       50021-MEISYOHEN-SEC-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    リハビリ・患者情報編集処理
@@ -13809,6 +13817,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H26.10　改正
+               WHEN    "2006"
+                   STRING  "向精神薬多剤投与となります。"
+                           "逓減しますか？"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+      ***
       *ver.4.7
       *
                WHEN    "0140"
@@ -13915,6 +13931,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
                WHEN    "2004"
                WHEN    "2005"
+               WHEN    "2006"
                    MOVE    "ＮＯ"            TO  KID1-B01
            END-EVALUATE
       *

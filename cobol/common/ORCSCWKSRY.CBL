@@ -42,6 +42,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/04/03  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -328,6 +329,13 @@
                05  TBL-TM-YOBI         PIC X(01).
       *
                05  TBL-TM-SRYCD        PIC X(09).
+      *
+      *
+      *H26.10
+      * ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¸º»»¥³¡¼¥É
+       01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
+      * ¡ÊÀº¸º¡Ë
+       01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
       *
       *
       *****************************************************************
@@ -1749,6 +1757,8 @@
                                                    "210" OR
                                                    "220" OR
                                                    "230" OR
+      *H26.10
+                                                   "293" OR
                                                    "290" )  AND
                   (LNK-WKSRY-SRYKBN    (IDX)   =   "21" OR "22"
                                                OR  "23" )
@@ -3069,6 +3079,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-COM-INPUTCD(IDW2)   =   "820000047")
                MOVE    1                   TO  WKSRYP-TEI-NKBN
            END-IF
+      *H26.10
+      *    ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿Äþ¸ºÂÐ¾Ý
+           IF     (SPA-COM-SRYKBN(IDW2)    =   "21"
+                                           OR  "22"
+                                           OR  "23" )  AND
+                  (SPA-COM-INPUTCD(IDW2)   =   CONS-SGEN-SRYCD )
+               MOVE    1                   TO  WKSRYP-TEI-NKBN
+           END-IF
       *
            .
        30022-WKSRYACTPLUS-HEN-EXT.
@@ -4132,6 +4150,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                ÌôºÞÎÁÄþ¸º¡¡¤ò¸º»»
                        IF      ORCSCWKSRY-KSN-SRYCD (IDX)
                                                      =   "630010002"
+      *H26.10                  ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿
+                                                 OR  CONS-TAZAI-SRYCD
                            COMPUTE SUM-SYU-HKNTEN (04)
                                                =   SUM-SYU-HKNTEN(04)
                                                -   ORCSCWKSRY-KSN-TENSU
@@ -4341,6 +4361,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ÌôºÞÎÁÄþ¸º¡¡¤ò¸º»»
            IF      ORCSCWKSRY-KSN-SRYCD (IDX)  =   "630010002"
+      *H26.10      ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿
+                                               OR  CONS-TAZAI-SRYCD
                MOVE    1                   TO  WKSRYP-PLUSKBN
       *        ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
                MOVE    2                   TO  WKSRYP-TEI-NKBN

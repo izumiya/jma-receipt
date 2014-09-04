@@ -1626,7 +1626,8 @@
       *            綽輪匹五月井及�衝瞗妐滿侁郋摀�
                    IF     (LNK-WKSRY-AUTOKBN (IDX IDZ)   =   "3" ) AND
                           (LNK-WKSRY-INPUTCD (IDX IDZ)
-                                                   =   "820000047")
+                                                   =   "820000047"
+                                                   OR  "820000166")
                        MOVE    ZERO                TO  SPA-NAI-JIDFLG
                                                               (IDX-NAI)
                    END-IF
@@ -4555,6 +4556,12 @@
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
                GO      TO      45052-JIBAI-SYORI-EXT
            END-IF
+      *H26.10
+      *    泔管恔譴蛹反覆擂陸
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1   )
+               GO      TO      45052-JIBAI-SYORI-EXT
+           END-IF
       *
       *    脰颶褲蠅及凜﹜白奴伙丞鰾醒毛覆擂陸午允月
            IF      LNK-WKSRY-SRYKBN (IDX)  =   "70"
@@ -4611,6 +4618,12 @@
       *
       *    泔管恔譴蛹反覆擂陸
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
+               GO      TO      45052-KOGAI-SYORI-EXT
+           END-IF
+      *H26.10
+      *    泔管恔譴蛹反覆擂陸
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1   )
                GO      TO      45052-KOGAI-SYORI-EXT
            END-IF
       *

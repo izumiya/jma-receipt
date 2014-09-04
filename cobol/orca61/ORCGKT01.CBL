@@ -33,6 +33,7 @@
       *  04.05.00    NACL-多々納  10/01/XX  治験対応
       *  04.06.00    NACL-多々納  10/08/12  診療科変更対応
       *  04.06.00    NACL-多々納  11/02/16  用法コメント対応
+      *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1298,6 +1299,11 @@
                    MOVE    ZERO            TO  SPA-TOKUTEIFLG
                    MOVE    ZERO            TO  SPA-NAIFUKU-CHK
                    MOVE    ZERO            TO  SPA-NAIFUKU-OK
+      *H26.10      向精神薬多剤
+      *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-OK
+      *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-CHK
+                   MOVE    ZERO            TO  SPA-K01-YOBI(1:1)
+                   MOVE    ZERO            TO  SPA-K01-YOBI(2:1)
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
                    MOVE    ZERO            TO  SPA-SYOHOU-CHK
@@ -1775,6 +1781,23 @@
       *            画面制御
                    MOVE    "JOIN"              TO  WRK-PUTTYPE
                    PERFORM 41002-KOUSIN-SYORI-SEC
+      *H26.10
+      *        向精神薬剤多剤投与
+               WHEN    "2006"
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   IF      SPA-KID1-FLG        =   "OK"
+      *v4.7           MOVE    1                TO  SPA-PSYCHO-OK
+                      MOVE    "1"              TO  SPA-K01-YOBI(1:1)
+                   ELSE
+      *v4.7           MOVE    ZERO             TO  SPA-PSYCHO-OK
+                      MOVE    ZERO             TO  SPA-K01-YOBI(1:1)
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            画面制御
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *
       *        クリア確認チェック
                WHEN    "0125"
                    IF      SPA-KID1-FLG        =   "OK"
@@ -9299,6 +9322,13 @@
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H26.10　改正
+               WHEN    "2006"
+                   STRING  "向精神薬多剤投与となります。"
+                           "逓減しますか？"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
       *ver.4.7
       *!!
                WHEN    OTHER
@@ -9326,6 +9356,7 @@
       *ver.4.7
                WHEN    "2004"
                WHEN    "2005"
+               WHEN    "2006"
                    MOVE    "ＮＯ"            TO  KTID1-B01
            END-EVALUATE
       *

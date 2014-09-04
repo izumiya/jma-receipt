@@ -9267,7 +9267,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            院外処方は対象外
                    IF     (SPA-COM-SRYSYUKBN (IDX) =   "212"
                                                    OR  "222"
-                                                   OR  "232")
+                                                   OR  "232"
+      *H26.10           臨時追加
+                                                   OR  "292"
+                                                   OR  "295")
                        CONTINUE
                    ELSE
                        MOVE    1               TO  SPA-NAI-SYOHOU

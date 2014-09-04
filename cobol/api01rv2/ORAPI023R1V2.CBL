@@ -2223,6 +2223,12 @@
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
                GO      TO      45052-JIBAI-SYORI-EXT
            END-IF
+      *H26.10
+      *    泔管恔譴蛹反覆擂陸
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1  )
+               GO      TO      45052-JIBAI-SYORI-EXT
+           END-IF
       *
       *    脰颶褲蠅及凜﹜白奴伙丞鰾醒毛覆擂陸午允月
            IF      LNK-WKSRY-SRYKBN (IDX)  =   "70"
@@ -2279,6 +2285,12 @@
       *
       *    泔管恔譴蛹反覆擂陸
            IF      LNK-WKSRY-SRYCD (IDX 01)    =   "630010002"
+               GO      TO      45052-KOGAI-SYORI-EXT
+           END-IF
+      *H26.10
+      *    泔管恔譴蛹反覆擂陸
+           IF     (LNK-WKSRY-SRYCD (IDX 01)(1:1)   =   "6" )
+             AND  (LNK-WKSRYP-PLUSKBN (01)     =   1  )
                GO      TO      45052-KOGAI-SYORI-EXT
            END-IF
       *

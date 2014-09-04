@@ -214,7 +214,7 @@
            COPY    "CPORCSC96.INC".
       *
       *    診療行為入力項目変換パラメタ
-           COPY    "CPORCSC97.INC".
+      *****COPY    "CPORCSC97.INC".
       *
       *    投与量等チェックパラメタ
            COPY    "CPORCSC98.INC".
@@ -603,6 +603,13 @@
                                                      OR  "33"  )
                         MOVE    1               TO  FLG-TAISYO
                    END-IF
+      *H26.10      （減）（精減）の自動コメントは対象外
+                   IF     ( SPA-COM-INPUTCD (IDX)  =   "820000047"
+                                                   OR  "820000166")
+                     AND  ( SPA-COM-AUTOKBN (IDX)  =   "3"        )
+                        MOVE    1               TO  FLG-TAISYO
+                   END-IF
+      *
       *            自動追加コメントで入力値ありの時対象外
                    IF      (SPA-COM-INPUTCD (IDX)(1:2)   =  "84")  OR
                            (SPA-COM-INPUTCD (IDX)(1:4)   =  "0084")
@@ -2619,6 +2626,24 @@
            INITIALIZE                  ORCSC00AREA
            MOVE    "3"                 TO  LNK-ORCSC-KBN
            PERFORM 520-ALL-CHEK-SEC
+      *TEST
+      *H26.10
+      *    （減）の自動発生行は削除
+           IF     (SPA-ERRCD       NOT =   SPACE )
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-MAX-LINE      )   OR
+                                  (SPA-GMN-INPUTCD (IDX)   =   SPACE )
+                   IF     ( SPA-COM-INPUTCD (IDX)  =   "820000047"
+                                                   OR  "820000166")
+                     AND  ( SPA-COM-AUTOKBN (IDX)  =   "3"        )
+                        MOVE    SPACE       TO  SPA-GMN-INPUTCD(IDX)
+                        MOVE    SPACE       TO  SPA-COM-INPUTCD(IDX)
+                   END-IF
+               END-PERFORM
+      *        空白行をなくす
+               PERFORM 420-SYOKYO-SEC
+           END-IF
+      *TEST
       *
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD       NOT =   SPACE )

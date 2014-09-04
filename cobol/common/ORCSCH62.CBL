@@ -33,6 +33,8 @@
       *  04.06.00    NACL-多々納  11/02/22  用法コードコメント対応
       *  04.07.00    NACL-多々納  12/09/27  商品コード対応
       *  04.07.00    NACL-多々納  13/07/XX  電子版お薬手帳アプリ連携対応他
+      *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
+      *                                     外用薬（臨時投薬）対応
       *****************************************************************
       *
       *
@@ -70,6 +72,8 @@
            03  FLG-ZAITAKU-ARI     PIC 9(01).
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-YKJOKUKBN       PIC 9(01).
+      *H26.10
+           03  FLG-NO              PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -885,7 +889,8 @@
                                                    "211"  OR
                                                    "221"  OR
                                                    "231"  OR
-                                                   "291" )
+                                                   "291"  OR
+                                                   "294" )
       *                院内処方種別
                        MOVE    1               TO  FLG-TAIGAI
                    END-IF
@@ -907,7 +912,8 @@
                    IF     (WRK-SRYSYUKBN       =   "212"  OR
                                                    "222"  OR
                                                    "232"  OR
-                                                   "292")
+                                                   "292"  OR
+                                                   "295")
                        MOVE    1               TO  FLG-TAIGAI
                    END-IF
            END-EVALUATE
@@ -922,6 +928,7 @@
                                            OR  "220"
                                            OR  "230" 
                                            OR  "290" 
+                                           OR  "293" 
                                            OR  SPACE )
                    IF     (ORCSCH62-KBN        =   "1"  )
       *                剤点数ゼロで院内処方印刷
@@ -1056,6 +1063,17 @@
                    MOVE    WRK-SRY-SRYCD(IDXA)     TO  WRK-SHO-SRYCD
                END-IF
       *
+      *H26.10
+               MOVE    ZERO            TO  FLG-NO
+               IF     (WRK-SRY-SRYCD (IDXA)(1:1) =   "6" )
+      *            点数マスタを検索
+                   MOVE    WRK-SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+                   PERFORM 910-TENSU-READ-SEC
+                   IF      TNS-TENSIKIBETU     =   7
+      *                減点は対象外
+                       MOVE    1               TO  FLG-NO
+                   END-IF
+               END-IF
       *        薬剤・器材・用法・コメントのみ
                IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"
                                                    OR  "7"
@@ -1066,6 +1084,9 @@
                    IF     (WRK-SRY-SRYCD (IDXA)    =   "630010002" )
                      OR   (WRK-SRY-SRYCD (IDXA)    =   "630010004" )
                      OR   (WRK-SRY-SRYCD (IDXA)(1:4)   =   "0086"  )
+      *H26.10        （精減）
+                     OR   (WRK-SRY-SRYCD (IDXA)    =   "820000166" )
+                     OR   (FLG-NO                  =   1   )
                        CONTINUE
                    ELSE
                        ADD     1               TO  IDX-T3
@@ -1500,6 +1521,7 @@
                                            OR  "222"
                                            OR  "232"
                                            OR  "292"
+                                           OR  "295"
                    MOVE    1               TO  FLG-OK2
                END-IF
       *        院内の診療種別
@@ -1507,6 +1529,7 @@
                                            OR  "221"
                                            OR  "231"
                                            OR  "291"
+                                           OR  "294"
                                            OR  "213"
                                            OR  "223"
                                            OR  "233"
@@ -1526,6 +1549,7 @@
                                            OR  "221"
                                            OR  "231"
                                            OR  "291"
+                                           OR  "294"
                                            OR  "213"
                                            OR  "223"
                                            OR  "233"

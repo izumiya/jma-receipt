@@ -328,6 +328,8 @@
                IF      (LNK-WKSRY-SRYSYUKBN(1) =   "212"
                                                OR  "222"
                                                OR  "232"
+                                               OR  "292"
+                                               OR  "295"
                                                OR  "148"
                                                OR  "149")
                    CONTINUE

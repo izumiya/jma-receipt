@@ -334,6 +334,8 @@
       *
            03  WRK-SRYCD               PIC X(09).
       *
+           03  WRK-DAY                 PIC X(02).
+      *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -355,14 +357,6 @@
       *H25.7
       *    労災コード置換えテーブル 
            COPY   "CMRSICNGTBL.INC".
-      *
-      *   日本語数字
-      * 01  TBL-SUJI-AREA.
-      *     03  FILLER          PIC X(20)   VALUE
-      *        "１２３４５６７８９０".
-      * 01  TBL-SUJI-R          REDEFINES   TBL-SUJI-AREA.
-      *     03  TBL-SUJI        PIC X(02)   OCCURS   10.
-      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -2563,6 +2557,13 @@
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
       *!
+      *H26.10
+      *    在宅　診療人数合計　再編集
+           IF      LNK-WKSRY-SRYCD(IDX IDZ)    =   "099140012"
+                PERFORM 31001214-ZAICOM-MEISYO-SEC
+           END-IF
+      *!!
+      *!
       *    器材商品名の器材コード
            IF     (LNK-WKSRY-SRYCD(IDX IDZ)(1:1)   =   "7"  )  AND
                   (LNK-WKSRY-AUTOKBN (IDX IDZ)     =   "T"  )
@@ -2869,6 +2870,50 @@
            .
        3005-INPUT-MEISYO4-EXT.
            EXIT.
+      *
+      *H26.10
+      *****************************************************************
+      *    在宅　診療人数合計　再編集処理
+      *****************************************************************
+       31001214-ZAICOM-MEISYO-SEC            SECTION.
+      *
+      *    回数を合計人数
+           MOVE    WRK-SRYKAISUKEI     TO  WRK-KAISU
+           MOVE    ZERO                TO  IDK2
+           MOVE    SPACE               TO  WRK-KAISU-H
+           PERFORM VARYING     IDK1    FROM    1   BY  1
+                   UNTIL       IDK1    >   8
+               IF      WRK-KAISU-X (IDK1:1)    NOT =   SPACE
+                   ADD     1           TO  IDK2
+                   MOVE    WRK-KAISU-X (IDK1:1)
+                                           TO  WRK-KAISU-H (IDK2:1)
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPA-K09NAI-RRKYMD(SPA-K09-DOSELNUM)(7:2)
+                                       TO  WRK-DAY
+      *
+           MOVE    SPACE               TO  WRK-MEISYO
+           STRING  TNS-NAME            DELIMITED  BY  SPACE
+                   "　　　　【"        DELIMITED  BY  SIZE
+                   WRK-DAY             DELIMITED  BY  SPACE
+                   "日（"              DELIMITED  BY  SIZE
+                   WRK-KAISU-H         DELIMITED  BY  SPACE
+                   "人）"              DELIMITED  BY  SIZE
+                   "】"                DELIMITED  BY  SIZE
+                                               INTO    WRK-MEISYO
+           END-STRING
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MEISYO          TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-TMEISYO2(IDG)
+      *
+           .
+       31001214-ZAICOM-MEISYO-EXT.
+           EXIT.
+      *H26.10
       *
       *****************************************************************
       *    数量表示用編集処理

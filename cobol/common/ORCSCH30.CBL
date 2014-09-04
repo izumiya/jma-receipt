@@ -44,6 +44,7 @@
       * 04.05.00     NACL-多々納  09/10/XX  換算値数量対応
       * 04.06.00     NACL-多々納  11/02/22  用法コメント対応
       * 04.07.00     NACL-多々納  12/11/02  薬剤毎のコメント対応
+      * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *****************************************************************
       *
       *
@@ -79,6 +80,8 @@
            03  FLG-YSET            PIC 9(01).
            03  FLG-YKJOKUKBN       PIC 9(01).
            03  FLG-INNAI           PIC 9(01).
+      *
+           03  FLG-NO              PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -192,6 +195,12 @@
                05  TBL-SRY-COM-NAME        PIC  X(80).
       *
            03  TBL-SRY-MAX                 PIC 9(03).
+      *
+      *H26.10
+      * 向精神薬多剤投与減算コード
+       01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
+      * （精減）
+       01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -652,13 +661,26 @@
                    PERFORM VARYING     IDXA    FROM    1   BY  1
                            UNTIL      (IDXA    >   5   )  OR
                                       (SRY-SRYCD (IDXA)   =   SPACE)
+      *H26.10
+                       MOVE    ZERO                TO  FLG-NO
                        IF      SRY-SRYCD (IDXA)(1:1)      =   "6"
-                           MOVE    1                   TO  FLG-OK
+      *                    点数マスタを検索
+                           MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+                           PERFORM 910-TENSU-READ-SEC
+                           IF      TNS-TENSIKIBETU     =   7
+      *                        減点は対象外
+                               MOVE    1               TO  FLG-NO
+                           ELSE
+                               MOVE    1               TO  FLG-OK
+                           END-IF
                        END-IF
-                       IF      SRY-SRYCD (IDXA)    =   "630010002"
+                       IF     (SRY-SRYCD (IDXA)    =   "630010002"
                                                    OR  "630010004"
       *H25.4               （減）対象外
                                                    OR  "820000047"
+      *H26.10               (精減）
+                                                   OR  CONS-SGEN-SRYCD)
+                       OR     (FLG-NO              =   1           )
                            CONTINUE
                        ELSE
                            ADD     1               TO  IDX
@@ -754,7 +776,8 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF      ACCT-ZAIKBN         =   1
+           IF     (ACCT-ZAIKBN         =   1    )
+              OR  (FLG-OK              =   ZERO )
       *        薬評は対象外
                MOVE    ZERO                TO  FLG-OK
            ELSE
@@ -1275,10 +1298,24 @@
            PERFORM VARYING     IDXA    FROM    1   BY  1
                    UNTIL      (IDXA    >   5   )  OR
                               (WKSRY-SRYCD (IDXA)  =   SPACE)
+      *H26.10
+               MOVE    ZERO            TO  FLG-NO
+               IF     (WKSRY-SRYCD (IDXA)(1:1) =   "6" )
+      *            点数マスタを検索
+                   MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+                   PERFORM 910-TENSU-READ-SEC
+                   IF      TNS-TENSIKIBETU     =   7
+      *                減点は対象外
+                       MOVE    1               TO  FLG-NO
+                   END-IF
+               END-IF
                IF     (WKSRY-SRYCD (IDXA)      =   "630010002" )
                  OR   (WKSRY-SRYCD (IDXA)(1:4)     =   "0086" )
       *          （減）は対象外
                  OR   (WKSRY-SRYCD (IDXA)      =   "820000047" )
+      *H26.10     （精減）
+                 OR   (WKSRY-SRYCD (IDXA)      =   CONS-SGEN-SRYCD)
+                 OR   (FLG-NO                  =   1           )
                    CONTINUE
                ELSE
                    ADD    1                        TO  IDX

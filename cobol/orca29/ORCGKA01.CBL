@@ -426,6 +426,9 @@
       *   明細最大数
        01  MAX-LINE                PIC 9(04)   VALUE   400.
       *  
+      * （精減）
+       01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1437,6 +1440,19 @@
                OR      (SRY-SRYCD (1)  =  "630010004")
                    MOVE    1                   TO  FLG-SRYACT
                END-IF
+      *H26.10
+               IF     (FLG-SRYACT      =   ZERO )
+                 AND  (SRY-SRYCD (1)(1:1)  =   "6"  )
+                   MOVE    SRY-SRYCD (1)   TO  TNS-SRYCD
+                   MOVE    JYURRK-SRYYMD   TO  TNS-YUKOSTYMD
+                   MOVE    JYURRK-SRYYMD   TO  TNS-YUKOEDYMD
+                   PERFORM 910-TENSU-READ-SEC
+      *            減点は対象外
+                   IF      TNS-TENSIKIBETU     =   7
+                       MOVE    1                   TO  FLG-SRYACT
+                   END-IF
+               END-IF
+      *
            ELSE
                MOVE    1                   TO  FLG-SRYACT
            END-IF
@@ -1611,7 +1627,8 @@
                   (ACCT-ZAITEN         >   ZERO )  AND
                   (FLG-YAKUZAI         =   1    )  AND
                  ((WKSRY-SRYSYUKBN     =   SPACE   )  OR
-                  (WKSRY-SRYSYUKBN(3:1)    =   "0" ))
+                  (WKSRY-SRYSYUKBN(3:1)    =   "0" )  OR
+                  (WKSRY-SRYSYUKBN         =   "293"))
                MOVE    WKSRY-SRYKBN        TO  WKSRY-UPHMS(1:2)
                MOVE    "1"                 TO  WKSRY-UPHMS(3:1)
                MOVE    1                   TO  FLG-INNAI
@@ -1620,6 +1637,7 @@
                                        OR  "221"
                                        OR  "231"
                                        OR  "291"
+                                       OR  "294"
                                        OR  "141"
                                        OR  "142")
             OR   ((WKSRY-SRYSYUKBN     =   "140") AND
@@ -1632,6 +1650,7 @@
                                        OR  "222"
                                        OR  "232"
                                        OR  "292"
+                                       OR  "295"
                                        OR  "148"
                                        OR  "149")
                MOVE    "1"                     TO  SPA-NAI-INNAI
@@ -3835,10 +3854,10 @@
                                                OR  "221"
                                                OR  "231"
                                                OR  "291"
+                                               OR  "294"
                                                OR  "213"
                                                OR  "223"
-                                               OR  "233"
-                                               OR  "293" )
+                                               OR  "233" )
                            MOVE    ZERO            TO  FLG-CHK2
                        END-IF
                    END-IF
@@ -3983,10 +4002,10 @@
                                                OR  "221"
                                                OR  "231"
                                                OR  "291"
+                                               OR  "294"
                                                OR  "213"
                                                OR  "223"
-                                               OR  "233"
-                                               OR  "293" )
+                                               OR  "233" )
                            MOVE    ZERO            TO  FLG-CHK2
                        END-IF
                    END-IF
@@ -4015,6 +4034,8 @@
                                                    =   ZERO )  OR
                               (SPA-WKSRY-SRYCD (IDX-W IDX-W2)
                                                    =   "820000047"
+      *H26.10 (精減）
+                                                   OR  CONS-SGEN-SRYCD
                                                    OR  "099209902" )
                            CONTINUE
                        ELSE
@@ -4143,10 +4164,10 @@
                                                OR  "221"
                                                OR  "231"
                                                OR  "291"
+                                               OR  "294"
                                                OR  "213"
                                                OR  "223"
-                                               OR  "233"
-                                               OR  "293" )
+                                               OR  "233" )
                            MOVE    ZERO            TO  FLG-CHK2
                        END-IF
                    END-IF
@@ -4175,6 +4196,8 @@
                                                    =   ZERO )  OR
                               (SPA-WKSRY-SRYCD (IDX-W IDX-W2)
                                                    =   "820000047"
+      *H26.10 (精減）
+                                                   OR  CONS-SGEN-SRYCD
                                                    OR  "099209902" )
                            CONTINUE
                        ELSE

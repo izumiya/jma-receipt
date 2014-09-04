@@ -396,6 +396,16 @@
            03  WRK-CONS-KYUSEI-MOJISU
                                    PIC 9(02)   VALUE   4. 
       *
+      *H26.10
+      * 向精神薬多剤投与処方せん料
+       01  CONS-TAZAI-SYOSEN       PIC X(09)   VALUE    "120003710".
+      * 向精神薬多剤投与処方料
+       01  CONS-TAZAI-SYOHOU       PIC X(09)   VALUE    "120003610".
+      * 向精神薬多剤投与減算コード
+       01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
+      * （精減）
+       01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1888,6 +1898,15 @@
       *H24.4
       *    一般名処方加算（処方せん料）
            IF      WRK-SRYCD           =   "120003570"
+               MOVE    1               TO  FLG-CHK
+           END-IF
+      *
+      *H26.10
+      *    向精神薬多剤投与 対応
+           IF      WRK-SRYCD           =   CONS-TAZAI-SYOSEN
+                                       OR  CONS-TAZAI-SYOHOU
+                                       OR  CONS-TAZAI-SRYCD
+                                       OR  CONS-SGEN-SRYCD
                MOVE    1               TO  FLG-CHK
            END-IF
       *
