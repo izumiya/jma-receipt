@@ -7152,7 +7152,8 @@
            END-IF
       *
            MOVE    1                   TO  SPA-NAI-DOSELNUM
-           MOVE    SPA-GMN-NO (1)      TO  SPA-NAI-SELNUM
+      *****MOVE    SPA-GMN-NO (1)      TO  SPA-NAI-SELNUM
+           MOVE    1                   TO  SPA-NAI-SELNUM
       *    ＤＯ検索処理へ
            PERFORM 4801-KT012-SYORI-SEC
            .
@@ -8504,6 +8505,12 @@
                    MOVE    SPA-GMN-MEISYO-G(WRK-IDX)
                                                TO  KT01-MEISYO(IDX)
                    PERFORM 5002-SURYO-HEN-SEC
+      *H26.10
+      *            診療人数合計
+                   IF     (SPA-COM-INPUTCD (WRK-IDX)
+                                                   =   "099140012" )
+                       PERFORM 50021-MEISYOHEN-SEC
+                   END-IF
       *@
       *            包括行
                    IF     (SPA-COM-HOUKATU-ZAI (WRK-IDX) NOT =   ZERO)
@@ -8835,8 +8842,17 @@
                         END-IF
       *ver.4.7
                    ELSE
+      *H26.10
+      *                診療人数合計
+                       IF      SPA-COM-INPUTCD (WRK-IDX)
+                                                   =   "099140012"
+                           MOVE    " X "               TO  WRK-KAKERU
+                       ELSE
+      *!! 
                        MOVE    SPACE               TO  WRK-KAISU-H
                        MOVE    SPACE               TO  WRK-KAKERU
+      *!! 
+                       END-IF
                    END-IF
                ELSE
                    MOVE    " X "               TO  WRK-KAKERU
@@ -8875,6 +8891,43 @@
            .
        5002-SURYO-HEN-EXT.
            EXIT.
+      *TEST
+      *H26.10
+      *****************************************************************
+      *    診療人数合計編集処理
+      *****************************************************************
+       50021-MEISYOHEN-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  WRK-MEISYO-G
+           IF     (SPA-GMN-INPUTCD(WRK-IDX + 1)(1:1)
+                                       =   "*"         )
+               MOVE    SPA-COM-NAME (WRK-IDX)  TO  WRK-MEISYO
+               MOVE    WRK-MEISYO-G            TO  KT01-MEISYO(IDX)
+               GO      TO      50021-MEISYOHEN-EXT
+           END-IF
+      *
+           STRING  SPA-COM-NAME (WRK-IDX)  DELIMITED  BY  SPACE
+                   "　　　【"              DELIMITED  BY  SIZE
+                   SPA-SRYYMD (7:2)        DELIMITED  BY  SPACE
+                   "日（"
+                   WRK-KAISU-H             DELIMITED  BY  SPACE
+                   "人）】"                DELIMITED  BY  SIZE
+                   INTO                    WRK-MEISYO
+           END-STRING
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-MEISYO          TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  WRK-MEISYO
+      *
+           MOVE    WRK-MEISYO-G        TO  KT01-MEISYO(IDX)
+           .
+       50021-MEISYOHEN-EXT.
+           EXIT.
+      *TEST
+      *
       *
       *****************************************************************
       *    リハビリ・患者情報編集処理

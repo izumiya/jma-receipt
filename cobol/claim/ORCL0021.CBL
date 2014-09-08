@@ -1167,6 +1167,8 @@
                    ELSE
       *                ¡Ê¸º¡Ë¤òºï½ü
                        IF      SRY-SRYCD (IDXA)    =   "820000047"
+      *H26.10            (Àº¸º¡Ë
+                                                   OR  "820000166"
                            CONTINUE
                        ELSE
                            ADD     1               TO  IDX-IJ
@@ -1473,7 +1475,7 @@
                WHEN    "6"
                WHEN    "7"
       *             ÌôºÞÎÁÄþ¸º¤Î»þ¡¢ÅÀ¿ô¤ò¡Ý¤È¤¹¤ë
-                   IF      SRY-SRYCD (IDXA)    =   "630010002"
+                   IF     (SRY-SRYCD (IDXA)    =   "630010002")
       *H26.10          ¸ºÅÀ
                      OR   (TNS-TENSIKIBETU     =   7   )
       *                ¿ÇÎÅ¥³¡¼¥É
