@@ -125,6 +125,7 @@
       *  04.07.04    NACL-Æ£¸¶    14/06/05  ·îÅÓÃæ¤Î¤Þ¤È¤á¤Î¤È¤­ÂèÆó¸øÈñ
       *                                     ¥Þ¥ëÄ¹¤Î¤È¤­¤âÂÐ¾Ý¤È¤¹¤ë
       *  04.07.05    NACL-Æ£¸¶    14/08/18  £·£µºÐ°Ê¾å¤Î³¤³°µï½»¼Ô£²³äÂÐ±þ
+      *  04.07.06    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -462,6 +463,8 @@
            03  WRK-CONS-SRYCD2         PIC X(09)   VALUE   "630010002".
       *    Êñ³çÅÀ¿ô¤Î¼£¸³¸ºÅÀÊ¬
            03  WRK-CONS-SRYCD3         PIC X(09)   VALUE   "199000210".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  WRK-CONS-SRYCD4         PIC X(09)   VALUE   "630010005".
       *
       *    µ¿¤¤
            03  WRK-CONS-UTAGAI     PIC X(06)   VALUE   "¤Îµ¿¤¤".
@@ -3319,6 +3322,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1
                                            OR  WRK-CONS-SRYCD2
                                            OR  WRK-CONS-SRYCD3
+                                           OR  WRK-CONS-SRYCD4
                    COMPUTE TOUKEI02-ZAITEN     =   TOUKEI02-ZAITEN *
                                                    (-1)
                    IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1

@@ -67,6 +67,7 @@
       *  04.06.02    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.02    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -731,10 +732,13 @@
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   70.
+      *    ½èÊýÎÁ¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  FILLER          PIC X(09)   VALUE   "120003610".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   70.
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   71.
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   71.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -753,8 +757,8 @@
            03  CONS-GAIRAI     PIC X(09)   VALUE   "112005610".
       *    ÌôºÞÎÁÄþ¸º
            03  CONS-TEIGEN     PIC X(09)   VALUE   "630010002".
-      *    ÌôºÞ¡Ê¸º¡Ë
-           03  CONS-YKZ20      PIC X(09)   VALUE   "820000047".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  CONS-TEIGEN2    PIC X(09)   VALUE   "630010005".
       *    Êñ³çÅÀ¿ô¤Î¼£¸³¸ºÅÀÊ¬
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *---- (01.00.05) LINE ADD START --------------------------------
@@ -1408,6 +1412,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                        END-IF                                           
       *
                        IF      RECE130-SRYCD(IDX) =   CONS-TEIGEN
+                                                  OR  CONS-TEIGEN2
                                                   OR  CONS-GENTEN
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
@@ -3502,7 +3507,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
-                                       "120003570"
+                                       "120003570" OR "120003710"
                        MOVE   ZERO   TO   RECE140-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE140-SYOHOUFLG

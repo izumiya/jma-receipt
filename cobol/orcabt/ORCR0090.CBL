@@ -258,6 +258,7 @@
       *                                     ¥³¥á¥ó¥È¤Î¥Á¥§¥Ã¥¯¤ò¼«ÈñÊ¬¤Ï
       *                                     ÂÐ¾Ý¤È¤·¤Ê¤¤
       *  04.07.05    NACL-ÌçÏÆ    14/09/01  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.07.06    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -998,10 +999,13 @@
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   70.
+      *    ½èÊýÎÁ¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  FILLER          PIC X(09)   VALUE   "120003610".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   70.
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   71.
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   71.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -1020,8 +1024,8 @@
            03  CONS-GAIRAI     PIC X(09)   VALUE   "112005610".
       *    ÌôºÞÎÁÄþ¸º
            03  CONS-TEIGEN     PIC X(09)   VALUE   "630010002".
-      *    ÌôºÞ¡Ê¸º¡Ë
-           03  CONS-YKZ20      PIC X(09)   VALUE   "820000047".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  CONS-TEIGEN2    PIC X(09)   VALUE   "630010005".
       *    Êñ³çÅÀ¿ô¤Î¼£¸³¸ºÅÀÊ¬
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *---- (01.00.05) LINE ADD START --------------------------------
@@ -2044,6 +2048,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *---- (01.00.05) LINE ADD END --------------------------------
       *
                        IF      RECE05-SRYCD(IDX) =   CONS-TEIGEN
+                                                 OR  CONS-TEIGEN2
                                                  OR  CONS-GENTEN
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
@@ -2602,27 +2607,6 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF    
       *
            IF  WRK-TBLMAX           >   ZERO
-      ********* --- ÌôºÞÅÀ¿ô20ÅÀ°Ê²¼¤Î¾ì¹ç ---¡ÊÆâÉþ¡Ë
-      **       IF      RECE04-SRYKBN     =   "21" 
-      **       AND     RECE04-ZAITEN     <=  20
-      **           IF      TBL-ZAIW-SRYCD (1 1)
-      **                                 NOT = CONS-TEIGEN
-      ***              ÌÀºÙ¶õÇò½èÍý
-      **               PERFORM 410-MEISAI-SPACE-SEC
-      **           END-IF     
-      **           IF      WRK-ZAIW-SRYCD1     =   CONS-YKZ20
-      **               MOVE    TBL-ZAIW-NAME (1 1) TO  TBL-ZAI (1)(3:)
-      **           END-IF    
-      **       END-IF
-      ***      --- ÌôºÞÅÀ¿ô20ÅÀ°Ê²¼¤Î¾ì¹ç ---¡ÊÆÜÉþ¡¦³°ÍÑ¡Ë
-      **       IF  RECE04-SRYKBN         =   "22"  OR  "23"
-      **       AND RECE04-ZAITEN         <=  20
-      **       AND TBL-ZAIW-SRYCD (1 1)
-      **                             NOT =   CONS-TEIGEN
-      ***          ÌÀºÙ¶õÇò½èÍý
-      **           PERFORM 410-MEISAI-SPACE-SEC
-      *********END-IF
-      *
                IF      RECE04-SRYKBN      >=  "33"
                AND     RECE04-ZAIKBN   NOT =   1
                AND     RECE04-JIHOKBN      =   SPACE
@@ -5073,7 +5057,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
-                                       "120003570"
+                                       "120003570" OR "120003710"
                        MOVE   ZERO   TO   RECE06-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE06-SYOHOUFLG

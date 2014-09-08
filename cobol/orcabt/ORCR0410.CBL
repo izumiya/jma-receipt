@@ -114,6 +114,7 @@
       *  04.07.13    NACL-門脇    14/05/27  第三者行為の給付割合の設定
       *                                     （社保前期高齢２割）
       *  04.07.15    NACL-門脇    14/08/07  労災レセ「新継再別」記載修正
+      *  04.07.16    NACL-門脇    14/09/01  平成２６年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2153,6 +2154,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          CONTINUE
                    ELSE
                      IF        ACCT-SRYCDTOTAL    =    630010002
+                                                  OR   630010005
                          COMPUTE  TBL-YKZTEN-JI(ID1)  =
                                   TBL-YKZTEN-JI(ID1)  -
                                  ( WRK-ZAIKAISU-JI * ACCT-ZAITEN   )
@@ -2412,6 +2414,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      CONTINUE
                  ELSE
                    IF        ACCT-SRYCDTOTAL    =    630010002
+                                                OR   630010005
                      COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                  (ACCT-ZAITEN    *  
                                                   ACCT-ZAIKAISU)
@@ -2683,6 +2686,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    CONTINUE
                ELSE
                  IF        ACCT-SRYCDTOTAL    =    630010002
+                                              OR   630010005
                    COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                (ACCT-ZAITEN    *  
                                                 WRK-ZAIKAISU)

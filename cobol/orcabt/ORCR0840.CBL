@@ -257,6 +257,7 @@
       *                                     改行コードチェック
       *                                     エラー時処理終了
       *  04.07.21    NACL-門脇    14/09/01  訪問診療にかかる記録書コメント対応
+      *  04.07.22    NACL-門脇    14/09/01  平成２６年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2888,7 +2889,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
                         IF   SRY-SRYSYUKBN  =  "212" OR "292" OR
-                                               "222" OR "232"
+                                               "222" OR "232" OR
+                                               "295"
                           IF   RECE84-TOYAKUFLG = SPACE
                             MOVE   "2"    TO    RECE84-TOYAKUFLG
                           END-IF

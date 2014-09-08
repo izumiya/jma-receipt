@@ -114,6 +114,7 @@
       *                                     ²þ¹Ô¥³¡¼¥É¥Á¥§¥Ã¥¯
       *                                     ¥¨¥é¡¼»þ½èÍý½ªÎ»
       *  04.07.08    NACL-ÌçÏÆ    14/09/01  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.07.09    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -470,6 +471,7 @@
            03  CONS-SHOHOSEN2 PIC X(09)   VALUE    "120002810".
            03  CONS-SHOHOSEN3 PIC X(09)   VALUE    "120002910".
            03  CONS-SHOHOSEN4 PIC X(09)   VALUE    "120003010".
+           03  CONS-SHOHOSEN5 PIC X(09)   VALUE    "120003710".
       *    ½èÊý¤»¤ó¡ÊÆýÍÄ»ù¡Ë²Ã»»
            03  CONS-SHOHOKSN1  PIC X(09)   VALUE   "120002470".
            03  CONS-SHOHOKSN2  PIC X(09)   VALUE   "120002570".
@@ -481,6 +483,12 @@
            03  CONS-SHOHOKSN5  PIC X(09)   VALUE   "120003570".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¹£°¡¿£±£°£°¡Ë¡ÊÆâÉþÌô¡Ë
            03  CONS-YAKTEIGEN  PIC X(09)   VALUE   "630010002".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  CONS-YAKTEIGEN2 PIC X(09)   VALUE   "630010005".
+      *    ¡Ê¸º¡Ë
+           03  CONS-GEN        PIC X(09)   VALUE   "820000047".
+      *    ¡ÊÀº¸º¡Ë
+           03  CONS-GEN2       PIC X(09)   VALUE   "820000166".
       *    Ê´ºÕ¡Ê¥³¥á¥ó¥È¡Ë
            03  CONS-FUNSAI-COMMENT PIC X(09) VALUE "099209901".
       *    ºÎ·ì¡Ê£Â¡Ý£Á¡Ë
@@ -1840,15 +1848,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                IF    ( SRY-SRYKBN   =  "21" OR "22" OR "23" )
-               AND   ( RECE120-ZAITEN     =     ZERO        )
+               AND   ( RECE120-ZAITEN    =     ZERO         )
                AND   ( ACCT-ZAIKBN   NOT =     1            )
+                IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
+                                         OR CONS-YAKTEIGEN2
+                  CONTINUE
+                ELSE
                   IF     RECE120-SAFLG   NOT =  SPACE
                         MOVE   SPACE      TO    RECE120-TOYAKUFLG
                   ELSE
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
                         IF   SRY-SRYSYUKBN  =  "212" OR "292" OR
-                                               "222" OR "232"
+                                               "222" OR "232" OR
+                                               "295"
                           IF   RECE120-TOYAKUFLG = SPACE
                             MOVE   "2"    TO    RECE120-TOYAKUFLG
                           END-IF
@@ -1857,6 +1870,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE    "1"       TO    RECE120-TOYAKUFLG
                     END-IF
                   END-IF
+                END-IF
                END-IF
       *
                IF    ( SRY-SRYKBN        =     "14" )
@@ -2217,9 +2231,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    MOVE    TNS-YUKOKETA    TO    RECE130-YUKOKETA(IDX4)
                END-IF
       *
-               IF          SRY-SRYKBN       =  "21"
-                    IF   SRY-SRYCD(IDX2)  =  "820000047" OR 
-                                             "630010002"
+               IF          SRY-SRYKBN       =  "21" OR "22" OR "23"
+                    IF    SRY-SRYCD(IDX2)  =  CONS-YAKTEIGEN
+                                           OR CONS-YAKTEIGEN2
+                                           OR CONS-GEN
+                                           OR CONS-GEN2
                         MOVE     "2"       TO    RECE120-COMCDFLG
                     END-IF
                END-IF
@@ -2230,15 +2246,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     END-IF
                END-IF
       *
-               IF    RECE120-COMCDFLG       =   "2"
-                 IF  SRY-SRYCD(IDX2)  =  "820000047" OR
-                                         "630010002"
-                   CONTINUE
-                 ELSE
-                   ADD   999               TO  WRK-SURYOU-COUNT
-                   ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
-                 END-IF
-               END-IF
+      ***      IF    RECE120-COMCDFLG       =   "2"
+      ***        IF    SRY-SRYCD(IDX2)  =  CONS-YAKTEIGEN
+      ***                               OR CONS-YAKTEIGEN2
+      ***                               OR CONS-GEN
+      ***                               OR CONS-GEN2
+      ***          CONTINUE
+      ***        ELSE
+      ***          ADD   999               TO  WRK-SURYOU-COUNT
+      ***          ADD   WRK-SURYOU-COUNT  TO  RECE120-SURYOUTOTAL
+      ***        END-IF
+      ***      END-IF
       *
                IF          SRY-SRYKBN       =     "31" OR "32"
                  IF        SRY-SRYCD(IDX2)  =    CONS-HIKAKIN
@@ -4191,7 +4209,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
                    OR    (SRY-SRYCD(IDX3)        = "099999903"      )
-                     IF   SRY-SRYCD(IDX3)  =    CONS-YAKTEIGEN
+                     IF    SRY-SRYCD(IDX3)  =  CONS-YAKTEIGEN
+                                            OR CONS-YAKTEIGEN2
                            COMPUTE   RECE100-TENSU(16 2)  =
                                      RECE100-TENSU(16 2)  -
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
@@ -4224,10 +4243,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                      END-IF
                    END-IF
                WHEN    "22"
+                 IF    SRY-SRYCD(IDX3)      =  CONS-YAKTEIGEN2
+                   COMPUTE   RECE100-TENSU(18 2)  =
+                             RECE100-TENSU(18 2)  -
+                            (WK-ZAITEN   *   WK-ZAIKAISU)
+                 ELSE
                    ADD    WK-ZAIKAISU    TO   RECE100-KAISU(18)
                    COMPUTE   RECE100-TENSU(18 2)  =
                              RECE100-TENSU(18 2)  +
                             (WK-ZAITEN   *   WK-ZAIKAISU)
+                 END-IF
                WHEN    "23"
                    IF    (SRY-SRYCD(IDX3) (1:1)  = "6" OR "S" OR "8"
                                                        OR "7"       )
@@ -4235,10 +4260,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                          OR "059"   )
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
                    OR    (SRY-SRYCD(IDX3)        = "099999903"      )
+                     IF    SRY-SRYCD(IDX3)  =  CONS-YAKTEIGEN2
+                       COMPUTE   RECE100-TENSU(19 2)  =
+                                 RECE100-TENSU(19 2)  -
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                     ELSE
                        ADD    WK-ZAIKAISU    TO   RECE100-KAISU(19)
                        COMPUTE   RECE100-TENSU(19 2)  =
                                  RECE100-TENSU(19 2)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-IF
                    ELSE
                        IF    RECE100-KHNTEN(20)   =   ZERO
                           MOVE  WRK-TNS-TEN(IDX3) TO  RECE100-KHNTEN(20)
@@ -4452,6 +4483,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                 CONS-SHOHOSEN2 OR
                                                 CONS-SHOHOSEN3 OR
                                                 CONS-SHOHOSEN4 OR
+                                                CONS-SHOHOSEN5 OR
                                                 CONS-SHOHOKSN1 OR
                                                 CONS-SHOHOKSN2 OR
                                                 CONS-SHOHOKSN3 OR
@@ -4466,6 +4498,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                 CONS-SHOHOSEN2 OR
                                                 CONS-SHOHOSEN3 OR
                                                 CONS-SHOHOSEN4 OR
+                                                CONS-SHOHOSEN5 OR
                                                 CONS-SHOHOKSN1 OR
                                                 CONS-SHOHOKSN2 OR
                                                 CONS-SHOHOKSN3 OR

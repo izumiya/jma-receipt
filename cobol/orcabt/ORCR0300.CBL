@@ -406,6 +406,7 @@
       *  04.07.04    NACL-ÌçÏÆ    13/12/09  °åÎÅ¾ðÊóÏ¢·ÈÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    14/02/03  Âè»°¼Ô¹Ô°ÙÂÐ±þ¡Ê±¡³°½èÊý¤Î¤ß¤Î
       *                                     ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤ÎÉÂÌ¾µ­ºÜÂÐ±þ¡Ë
+      *  04.07.07    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1418,6 +1419,8 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-CONS-HKNNUM6       PIC X(03)   VALUE  "067".
       *    ÌôºÞÎÁÄþ¸º
            03  WRK-CONS-TEIGEN        PIC X(09)   VALUE   "630010002".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
+           03  WRK-CONS-TEIGEN2       PIC X(09)   VALUE   "630010005".
       *
       *    ºÆ¿Ç¤Î»þ´Ö²Ã»»
            03  WRK-CONS-JIKANGAI-TABLE. 
@@ -4689,6 +4692,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
        200711-YKZ-TAIHI-SEC          SECTION.
       *
            IF      RECE05-SRYCD (IDX)  =   WRK-CONS-TEIGEN
+                                       OR  WRK-CONS-TEIGEN2
                CONTINUE
            ELSE
                IF    ( RECE041-YKZTEN    =   ZERO  )
@@ -4702,6 +4706,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
            IF      WRK-TBLMAX6         =   1
                IF      RECE05-SRYCD (IDX)
                                        =   WRK-CONS-TEIGEN
+                                       OR  WRK-CONS-TEIGEN2
                    MOVE    1               TO  FLG-TEIGEN
                END-IF
            END-IF
@@ -5681,6 +5686,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
       *    »ÈÍÑÎÌ
            IF      TBL-ZAIW-SRYCD (1 IDX)
                                        =   WRK-CONS-TEIGEN
+                                       OR  WRK-CONS-TEIGEN2
                CONTINUE
            ELSE
                IF      TBL-ZAIW-SRYSURYO (1 IDX) >   ZERO
@@ -5695,6 +5701,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            IF      IDX                 =   WRK-TBLMAX6
                IF      TBL-ZAIW-SRYCD (1 IDX)
                                        =   WRK-CONS-TEIGEN
+                                       OR  WRK-CONS-TEIGEN2
                    MOVE    RECE041-ZAITEN      TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
                ELSE
