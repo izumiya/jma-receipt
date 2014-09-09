@@ -61,7 +61,7 @@ Z03	{
 						value	varchar(20);
 					};
 					count	int;
-					item	varchar(20)[100];
+					item	varchar(20)[200];
 				};
 				TENSIKIBETUCOB	{
 					TENSIKIBETU	{
@@ -82,7 +82,7 @@ Z03	{
 						value	varchar(74);
 					};
 					count	int;
-					item	varchar(74)[100];
+					item	varchar(74)[200];
 				};
 				DATAKBNCOB	{
 					DATAKBN	{

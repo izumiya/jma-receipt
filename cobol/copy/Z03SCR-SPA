@@ -25,6 +25,7 @@
       * 01.00.01     MCC-多々納   01/07/17  正式名称、血液採取料等追加
       * 01.00.02     MCC-多々納   02/03/17  施設基準不適合追加
       * 01.00.03     NACL-多々納  02/10/09  診療種別の最大数を１００へ
+      * 04.07.00     NACL-多々納  14/09/09  診療種別の最大数を２００へ
       *****************************************************************
        01  SPA-Z03.
       *
@@ -52,7 +53,7 @@
                        09  SPA-GMN-F1              PIC X(1).
                        09  SPA-GMN-SRYKBNMEI       PIC X(10).
                    07  SPA-GMN-SRYKBNCOB-G.
-                       09  SPA-GMN-SRYKBNCOB       OCCURS  100.
+                       09  SPA-GMN-SRYKBNCOB       OCCURS  200.
                            11  SPA-GMN-SRYKBN-L    PIC X(02).
                            11  SPA-GMN-FL1         PIC X(01).
                            11  SPA-GMN-SRYKBNME-L  PIC X(10).
@@ -64,7 +65,7 @@
                        09  SPA-GMN-SRYSYUKBNMEI    PIC X(40).
                    07  SPA-GMN-SRYSYUKBNCOB-G.
                        09  SPA-GMN-SRYSYUKBNCOB    PIC X(44)
-                                                   OCCURS  100.
+                                                   OCCURS  200.
                    07  SPA-SRYSYUKBN-MAX           PIC 9(04).
       *
                    07  SPA-GMN-DATAKBN-G.

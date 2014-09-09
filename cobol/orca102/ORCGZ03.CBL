@@ -1094,7 +1094,7 @@
       *                                                      (IDX-2)
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   100  )   OR
+                   UNTIL      (IDX     >   200  )   OR
                               (MSYU-SRYKBN (IDX)   =   SPACE )
       *        ø«Œ≈∂Ë ¨
                IF      (IDX-1          =   ZERO )  OR
