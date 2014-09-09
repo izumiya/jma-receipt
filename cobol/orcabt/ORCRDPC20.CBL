@@ -4544,6 +4544,9 @@
                PERFORM 5005-NUM-HENSYU-SEC
            END-IF
       *出来高・包括フラグ
+           IF      WRK-FEDT-HOUKATU-FLG   =    "6"
+               MOVE   "1"              TO  WRK-FEDT-HOUKATU-FLG
+           END-IF
            MOVE    WRK-FEDT-HOUKATU-FLG
                                        TO  WRK-DATA
            MOVE    1                   TO  WRK-NAGASA
