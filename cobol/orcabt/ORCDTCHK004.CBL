@@ -124,6 +124,7 @@
                05  DTCHKTMP01-PTID     PIC 9(10).
                05  DTCHKTMP01-ZAINUM   PIC 9(08).
            03  DTCHKTMP01-INGAITEN     PIC 9(07).
+           03  DTCHKTMP01-MINUS        PIC 9(01).
       *
       *    データチェック受診履歴
        FD  DTCHK020-FILE.
@@ -194,6 +195,7 @@
            03  FLG-DTCHK020                            PIC 9(01).
            03  FLG-DTCHK021                            PIC 9(01).
            03  FLG-DCACCT                              PIC 9(01).
+           03  FLG-MINUS                               PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -589,11 +591,11 @@
        20011-SRYACCTPLUS-EDIT-SEC      SECTION.
       *
            IF    ( ACCTP-RENNUM        =   1 )
-            AND  ( ACCTP-INGAITEN      >   ZERO )
                INITIALIZE              DTCHKTMP01-REC
                MOVE    ACCTP-PTID      TO  DTCHKTMP01-PTID
                MOVE    ACCTP-ZAINUM    TO  DTCHKTMP01-ZAINUM
                MOVE    ACCTP-INGAITEN  TO  DTCHKTMP01-INGAITEN
+               MOVE    ACCTP-PLUSKBN   TO  DTCHKTMP01-MINUS
                WRITE   DTCHKTMP01-REC
            END-IF
       *
@@ -674,11 +676,14 @@
            IF    ( ACCT-ZAIKAISU   >   ZERO )
       *
                MOVE    ZERO            TO  WRK-INGAITEN
+               MOVE    ZERO            TO  FLG-MINUS
                IF    ( ACCT-ZAIREQFLG  =   "1" )
                    PERFORM 900-DTCHKTMP01-READ-SEC
                    IF    ( FLG-DTCHKTMP01  =   ZERO )
                        MOVE    DTCHKTMP01-INGAITEN
                                        TO  WRK-INGAITEN
+                       MOVE    DTCHKTMP01-MINUS
+                                       TO  FLG-MINUS
                    END-IF
                END-IF
       *
@@ -694,6 +699,7 @@
                MOVE    ACCT-NYUGAIKBN  TO  DTCHK005-NYUGAIKBN
                MOVE    ACCT-ZAIKBN     TO  DTCHK005-ZAIKBN
                MOVE    WRK-INGAITEN    TO  DTCHK005-INGAITEN
+               MOVE    FLG-MINUS       TO  DTCHK005-MINUS
                MOVE    ACCT-SRYYM      TO  WRK-SRYYM
       *
                PERFORM VARYING IDX0    FROM    1   BY  1
@@ -856,6 +862,7 @@
            MOVE    DTCHK005-DAYCNT     TO  DCACCT-DAYCNT
            MOVE    DTCHK005-DAYCNT2-G  TO  DCACCT-DAYCNT2-G
            MOVE    DTCHK005-INGAITEN   TO  DCACCT-INGAITEN
+           MOVE    DTCHK005-MINUS      TO  DCACCT-MINUS
       *
            PERFORM 800-MCNDATE-SEC
       *

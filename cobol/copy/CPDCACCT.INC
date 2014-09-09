@@ -62,6 +62,7 @@
                05  DCACCT-STS-SNTDAY   PIC 9(01).
                05  DCACCT-STS-NODATA   PIC 9(01).
            03  DCACCT-INGAITEN         PIC 9(07).
+           03  DCACCT-MINUS            PIC 9(01).
            03  DCACCT-TERMID           PIC X(16).
            03  DCACCT-OPID             PIC X(16).
            03  DCACCT-CREYMD           PIC X(08).

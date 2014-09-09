@@ -5243,8 +5243,9 @@
                                    +   WRK-SRYCD-9 
                            END-IF
       *
-                           IF    ( WRK-SRYCD   =   "190182590"
-                                               OR  "190182690" )
+                           MOVE    WRK-SRYCD   TO  WRK-TNS-SRYCD
+                           PERFORM 900-TENSU-KEY-SEL-SEC
+                           IF    ( TNS-TENSIKIBETU     =   7 OR 8 )
                                MOVE    1   TO  HCM34S01-ZAIMINUS (IDXE)
                            END-IF
       *

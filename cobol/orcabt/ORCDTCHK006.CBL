@@ -110,8 +110,7 @@
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-HKNCOMBI                PIC 9(01).
            03  FLG-PTNYUINRRK              PIC 9(01).
-           03  FLG-TNYUINRRK             PIC 9(01).
-           03  FLG-GENZAN                  PIC 9(01).
+           03  FLG-TNYUINRRK               PIC 9(01).
            03  FLG-DTCHK002                PIC 9(01).
            03  FLG-LOOP-END                PIC 9(01).
            03  FLG-NODATA                  PIC 9(01).
@@ -171,17 +170,6 @@
        01  CONST-AREA.
            03  CONST-HKNCOMBICD            PIC X(09) VALUE  "999999912".
            03  CONST-HBTSRYKA-MAX          PIC 9(05) VALUE  100.
-           03  CONST-GENZAN-G.
-               05  CONST-GENZAN-VAL.
-                   07  CONST-GENKNS-IPNCD  PIC X(09) VALUE "190080570".
-                   07  CONST-GENKNS-RJNCD  PIC X(09) VALUE "190799770".
-                   07  CONST-GENANZ-IPNCD  PIC X(09) VALUE "190111690".
-                   07  CONST-GENANZ-RJNCD  PIC X(09) VALUE "190809090".
-                   07  CONST-GENJKS-IPNCD  PIC X(09) VALUE "190111790".
-                   07  CONST-GENJKS-RJNCD  PIC X(09) VALUE "190809190".
-               05  CONST-GENZAN-R  REDEFINES   CONST-GENZAN-VAL.
-                   07  CONST-GENZANCD      PIC X(09) OCCURS 6.
-               05  CONST-GENZAN-MAX        PIC 9(05) VALUE  6.
            03  CONST-SRYCD-MAX             PIC 9(05) VALUE 20.
            03  CONST-TCOMBI-MAX            PIC 9(05) VALUE 50.
       *
@@ -754,8 +742,6 @@
       *****************************************************************
        200111-DCACCT-INS-SEC           SECTION.
       *
-           MOVE    ZERO            TO  FLG-GENZAN
-      *
            COMPUTE CNT-ZAINUM  =   CNT-ZAINUM  +   1
       *
            PERFORM 200111-DCSRY-INS-SEC
@@ -772,6 +758,8 @@
            MOVE    COMB-HKNCOMBINUM    TO  DCACCT-HKNCOMBI
            MOVE    HCM34S01-ZAITEN (IDX4)
                                        TO  DCACCT-ZAITEN
+           MOVE    HCM34S01-ZAIMINUS (IDX4)
+                                       TO  DCACCT-MINUS
       *
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
@@ -797,7 +785,7 @@
            END-IF
       *
            IF    ( HCM34S01-ZAISKBKBN (IDX4)  =   "6" )
-               IF    ( FLG-GENZAN  =   ZERO )
+               IF    ( HCM34S01-ZAIMINUS (IDX4)    =   ZERO )
                    MOVE    1           TO  DCACCT-STS-NYUKSN
                ELSE
                    MOVE    1           TO  DCACCT-STS-NYUGEN
@@ -844,13 +832,6 @@
                                    TO  DCSRY-SRYCD
                MOVE    HCM34S01-SURYO (IDX4 IDX8)
                                    TO  DCSRY-SURYO
-      *
-               PERFORM VARYING IDX0    FROM    1   BY  1
-                       UNTIL ( IDX0    >   CONST-GENZAN-MAX )
-                   IF    ( DCSRY-SRYCD =   CONST-GENZANCD (IDX0) )
-                       MOVE    1   TO  FLG-GENZAN
-                   END-IF
-               END-PERFORM
       *
                MOVE    SMCNDATE-YMD    TO  DCSRY-CREYMD
                                            DCSRY-UPYMD

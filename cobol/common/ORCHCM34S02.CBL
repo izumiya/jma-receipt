@@ -3782,6 +3782,13 @@
                                    =   HCM34S01-RUIKEITOTAL(IDXE)
                                    +   WRK-SRYCD-9 
                            END-IF
+      *
+                           MOVE    WRK-SRYCD   TO  WRK-TNS-SRYCD
+                           PERFORM 900-TENSU-KEY-SEL-SEC
+                           IF    ( TNS-TENSIKIBETU     =   7 OR 8 )
+                               MOVE    1   TO  HCM34S01-ZAIMINUS (IDXE)
+                           END-IF
+      *
                        END-IF
       *
                    END-PERFORM

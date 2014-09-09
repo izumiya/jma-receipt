@@ -52,3 +52,4 @@
            03  DTCHK005-NYUGAIKBN      PIC X(01).
            03  DTCHK005-ZAIKBN         PIC 9(03).
            03  DTCHK005-INGAITEN       PIC 9(07).
+           03  DTCHK005-MINUS          PIC 9(01).
