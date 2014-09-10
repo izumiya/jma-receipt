@@ -18305,6 +18305,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  WHEN       1           ALSO     ZERO
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                  WHEN       ANY         ALSO     1
+                   MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                    IF  FLG-KOHYONKAIME = 1
                     IF  FLG-TOKU75 = 3
                      MOVE  12300                TO  WRK-CHK-KINGAKU2
@@ -18779,6 +18780,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  WHEN       1           ALSO     ZERO
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                  WHEN       ANY         ALSO     1
+                   MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                    IF  FLG-TOKU75 = 1 OR 2
                       MOVE      4000      TO   WRK-CHK-KINGAKU2
                    ELSE
