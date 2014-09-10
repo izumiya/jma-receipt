@@ -263,6 +263,8 @@
       *  04.07.09    NACL-藤原    14/06/05  月途中のまとめのとき第二公費
       *                                     マル長のときも対象とする
       *  04.07.11    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
+      *  04.07.12    NACL-藤原    14/09/10  月途中のまとめのとき第二公費
+      *                                     マル長のときの修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2117,7 +2119,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                IF    ( RECE02-KOHNUM (1)       =   "012"   OR  "025"
                                                OR  "015"   OR  "016"
                                                OR  "021"   OR  "053" )
-               AND   ( RECE02-KOHNUM (2)       =   SPACE             )
+               AND   ( RECE02-KOHNUM (2)       =   SPACE   OR  "972"
+                                               OR  "974"             )
                    MOVE    "1"                 TO  RECE02-SEIHOFLG
                END-IF
            END-IF
