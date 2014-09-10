@@ -1728,6 +1728,10 @@
            IF     (WRK-ERRCD           =   SPACE  )
              AND  (LNK-ORCSC-PG        =   "K02"  )
              AND  (WRK-COM-INPUTCD (IDX-Z) =   CON-RIHAKSN )
+      *      包括まとめ入力は対象外
+             AND  (WRK-COM-HKNCOMBI (IDX-Z)
+                                   NOT =   "9999"   )
+      *
                PERFORM 20011-RIHAKSN-CHK-SEC
            END-IF
       *H24.4
@@ -1735,6 +1739,10 @@
            IF     (WRK-ERRCD           =   SPACE  )
              AND  (LNK-ORCSC-PG        =   "K02"  )
              AND  (WRK-COM-INPUTCD (IDX-Z) =   CON-SYOKIKSN)
+      *      包括まとめ入力は対象外
+             AND  (WRK-COM-HKNCOMBI (IDX-Z)
+                                   NOT =   "9999"   )
+      *
                PERFORM 20011-SYOKIKSN-CHK-SEC
            END-IF
       *
@@ -1748,6 +1756,10 @@
                                            OR  CON-KEAKSN3
                                            OR  CON-KEAKSN4
                                            OR  CON-KEAKSN5)
+      *      包括まとめ入力は対象外
+             AND  (WRK-COM-HKNCOMBI (IDX-Z)
+                                   NOT =   "9999"   )
+      *
                PERFORM 10053-KEAKASAN-CHK-SEC
            END-IF
            .
@@ -2112,6 +2124,7 @@
       *
       *    包括まとめ入力は対象外
            IF      SPA-HKNCOMBINUM     =   "9999"
+             OR   (WRK-COM-HKNCOMBI(IDX-Z) =   "9999")
                GO      TO      100112-RIGAKU-CHK-EXT
            END-IF
       *
