@@ -259,6 +259,9 @@
       *                                     対象としない
       *  04.07.05    NACL-門脇    14/09/01  訪問診療にかかる記録書コメント対応
       *  04.07.06    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.07    NACL-門脇    14/09/11  摘要欄に印字しない診療行為コードの
+      *                                     データ区分２、かつ、診療区分が点数
+      *                                     マスタの診療区分と異なる場合の対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -827,6 +830,8 @@
                    07  TBL-ZAIW-KENTAICOMMENT-SRYCD PIC  9(09).
       *            レセ用特定器材商品名編集フラグ
                    07  TBL-ZAIW-RECEHENFLG          PIC  X(01).
+      *            点数マスタの診療区分
+                   07  TBL-ZAIW-TNSSRYKBN           PIC  X(02).
       *
        01  TBL-ZAI-MAX         PIC  9(03)  VALUE   100.              
       *
@@ -1960,6 +1965,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                      TO  TBL-ZAIW-RECEHENFLG(IDY IDZ)
                        MOVE    RECE05-SRYSYUKBN  TO
                                      TBL-ZAIW-SRYSYUKBN-INPUT(IDY IDZ)
+                       MOVE    RECE05-TNSSRYKBN(IDX)
+                                     TO  TBL-ZAIW-TNSSRYKBN(IDY IDZ)
                        IF      WRK-KENTAICOMMENT-SRYCD  NOT =  ZERO
                            STRING  TBL-ZAIW-NAME (IDY IDZ)
                                      DELIMITED   BY  SPACE
@@ -3146,6 +3153,13 @@ grpsys         PERFORM 900-DBSELECT-SEC
                IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                 =   TBL-NOSRYCD (IDY)
                    MOVE    1                 TO  FLG-NOPRT
+               END-IF
+      *
+      *        データ区分２で、診療区分が点数マスタの診療区分と異なる場合
+               IF  (TBL-ZAIW-DATAKBN(WRK-WIDX1 WRK-WIDX2)  =  2 )
+               AND (RECE04-SRYKBN  NOT =
+                         TBL-ZAIW-TNSSRYKBN(WRK-WIDX1 WRK-WIDX2))
+                   MOVE    ZERO              TO  FLG-NOPRT
                END-IF
              END-PERFORM
            END-IF

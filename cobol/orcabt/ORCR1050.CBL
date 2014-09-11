@@ -68,6 +68,9 @@
       *
       *  04.07.01    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.02    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.03    NACL-門脇    14/09/11  摘要欄に印字しない診療行為コードの
+      *                                     データ区分２、かつ、診療区分が点数
+      *                                     マスタの診療区分と異なる場合の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -562,6 +565,8 @@
                    07  TBL-ZAIW-KENTAICOMMENT-SRYCD PIC  9(09).
       *            レセ用特定器材商品名編集フラグ
                    07  TBL-ZAIW-RECEHENFLG          PIC  X(01).
+      *            点数マスタの診療区分
+                   07  TBL-ZAIW-TNSSRYKBN           PIC  X(02).
       *
        01  TBL-ZAI-MAX         PIC  9(03)  VALUE   100.              
       *
@@ -1326,6 +1331,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                      TO  TBL-ZAIW-RECEHENFLG(IDY IDZ)
                        MOVE    RECE130-SRYSYUKBN  TO
                                      TBL-ZAIW-SRYSYUKBN-INPUT(IDY IDZ)
+                       MOVE    RECE130-TNSSRYKBN(IDX)
+                                     TO  TBL-ZAIW-TNSSRYKBN(IDY IDZ)
                        IF      WRK-KENTAICOMMENT-SRYCD  NOT =  ZERO
                            STRING  TBL-ZAIW-NAME (IDY IDZ)
                                      DELIMITED   BY  SPACE
@@ -2267,6 +2274,13 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                 =   TBL-NOSRYCD (IDY)
                    MOVE    1                 TO  FLG-NOPRT
+               END-IF
+      *
+      *        データ区分２で、診療区分が点数マスタの診療区分と異なる場合
+               IF  (TBL-ZAIW-DATAKBN(WRK-WIDX1 WRK-WIDX2)  =  2 )
+               AND (RECE120-SRYKBN  NOT =
+                         TBL-ZAIW-TNSSRYKBN(WRK-WIDX1 WRK-WIDX2))
+                   MOVE    ZERO              TO  FLG-NOPRT
                END-IF
            END-PERFORM
       *
