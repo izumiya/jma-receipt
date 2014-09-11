@@ -660,6 +660,8 @@
       *  04.07.33    NACL-門脇    14/08/29  島根・奈良県地方公費対応
       *  04.07.34    NACL-門脇    14/09/01  訪問診療にかかる記録書コメント対応
       *  04.07.35    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.36    NACL-門脇    14/09/10  感３７の２（０１０）の一部負担金
+      *                                     記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -22883,6 +22885,13 @@
       *
                   IF  FTN-KOH-XX3   NOT =   ZERO
                     MOVE   FTN-KOH-XX3  TO  RECE62-KOUREI-SAIKEI2
+                    IF  (FLG-KOH           =   2   )
+                    AND (RECE62-KOHNUM(2)  =  "010")
+                      COMPUTE WRK-CYOKI-KEISAN3 = RECE62-FTNMONEY(1)
+                                                - FTN-KOH-XX3
+                      ADD WRK-CYOKI-KEISAN3 TO RECE62-FTNMONEY(3)
+                                               RECE62-FTNMONEY-KOJ(3)
+                    END-IF
                   ELSE
                    IF FTN-KOH-XX4   NOT =   ZERO
                     MOVE   FTN-KOH-XX4  TO  RECE62-KOUREI-SAIKEI2
