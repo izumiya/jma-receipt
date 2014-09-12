@@ -6347,11 +6347,11 @@
       *
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC               =  ZERO
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key9"              TO  MCP-PATHNAME
+               MOVE    "key62"             TO  MCP-PATHNAME
                PERFORM 970-PTNYUINRRK-READ-SEC
                MOVE    PTNYUINRRK-SHONUM   TO  WRK-SHONUM
                MOVE    PTNYUINRRK-TENNYUYMD
@@ -6370,7 +6370,7 @@
                MOVE    1               TO  FLG-PTNYUINRRK
            END-IF
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC.
       *
       *    通算日数を求める（通算日数取得サブを使用）
@@ -7219,11 +7219,11 @@
       *
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC               =  ZERO
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key9"              TO  MCP-PATHNAME
+               MOVE    "key62"             TO  MCP-PATHNAME
                PERFORM 970-PTNYUINRRK-READ-SEC
                MOVE    PTNYUINRRK-SHONUM
                                        TO  WRK-SHONUM
@@ -7236,7 +7236,7 @@
                MOVE    1               TO  FLG-PTNYUINRRK
            END-IF
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC.
       *
       *    通算日数を求める（通算日数取得サブを使用）

@@ -1249,11 +1249,11 @@
            MOVE    WRK-PTID            TO  PTNYUINRRK-PTID
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM  900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key9"              TO  MCP-PATHNAME
+               MOVE    "key62"             TO  MCP-PATHNAME
                PERFORM 910-PTNYUINRRK-READ-SEC
                MOVE    PTNYUINRRK-SHONUM   TO  WRK-SHONUM
                MOVE    PTNYUINRRK-TENNYUYMD
@@ -1273,7 +1273,7 @@
            END-IF
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
       *    通算日数を求める（通算日数取得サブを使用）
@@ -2063,7 +2063,7 @@
       *****************************************************************
        410191-IPNNYUACCT-SAKUSEI-SEC   SECTION.
       *
-           DISPLAY "PTID = " WRK-PTID
+      *     DISPLAY "PTID = " WRK-PTID
       *     DISPLAY   "410191-NYUACCT-SAKUSEI-SEC"
            INITIALIZE      ORCSSYOKIKSNAREA
            MOVE    IPN-SANTEISTYMD(1:6)  TO WRK-NAI-SRYYM-41(1:6)
@@ -2075,11 +2075,11 @@
            MOVE    WRK-PTID            TO  PTNYUINRRK-PTID
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM   900-DBSELECT-SEC
            IF      MCP-RC               =  ZERO
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key9"              TO  MCP-PATHNAME
+               MOVE    "key62"             TO  MCP-PATHNAME
                PERFORM 910-PTNYUINRRK-READ-SEC
                MOVE    PTNYUINRRK-SHONUM
                                        TO  WRK-SHONUM
@@ -2093,7 +2093,7 @@
            END-IF
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key9"              TO  MCP-PATHNAME
+           MOVE    "key62"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
       *    通算日数を求める（通算日数取得サブを使用）
@@ -2460,6 +2460,7 @@
        4801-BTUSEL-SEC             SECTION.
       *
            INITIALIZE              SYSKANRI-REC
+           INITIALIZE              SYS-5001-REC
            MOVE    ZERO            TO  FLG-SYSKANRI
       *
            MOVE    "5001"          TO  SYS-KANRICD

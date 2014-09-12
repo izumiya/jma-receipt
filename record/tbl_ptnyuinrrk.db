@@ -1094,3 +1094,17 @@ path	key61		{
 	};
 };
 
+path	key62		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptnyuinrrk_key62_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnyuinrrk
+			WHERE	HOSPNUM      =   :HOSPNUM 
+			AND		PTID        =   :PTID
+			AND		JTIKBN    <> '5'
+			AND		JTIKBN    <> '6' 
+			ORDER BY RRKNUM DESC,RRKEDANUM DESC
+		;
+	};
+};
+
