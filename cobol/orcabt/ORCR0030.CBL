@@ -883,6 +883,7 @@
            03  FLG-ZAITAKU-CHECK                       PIC 9(01).
            03  FLG-CYOKI-HENSYU                        PIC 9(01).
            03  FLG-CYOKI-HENSYU2                       PIC 9(01).
+           03  FLG-ARI                                 PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -990,6 +991,7 @@
            03  IDX20                                   PIC 9(03).
            03  IDX21                                   PIC 9(03).
            03  IDX22                                   PIC 9(02).
+           03  IDX24                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
       *
@@ -1654,6 +1656,13 @@
            03  WRK-DAISAN-ACCT-UPDKBN          PIC X(01).
       *
            03  WRK-COL                         PIC 9(03).
+      *
+           03  WRK-KOHHBTNUM                   PIC X(02).
+      *
+           03  WRK-HKNNUM-CHECK-T.
+               05  WRK-HKNNUM-CHECK-OCC        OCCURS 100.
+                 07  WRK-HKNNUM                PIC X(03).
+                 07  WRK-HKNNUM-KOHHBTNUM      PIC X(02).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -2482,6 +2491,10 @@
       *    診療会計マスタ付加
        01  SRYACCTPLUS-REC.
            COPY    "CPSRYACCTPLUS.INC".
+      *
+      *    保険番号
+       01  HKNNUM-REC.
+           COPY    "CPHKNNUM.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -17315,7 +17328,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               AND (IDX3             <=   3                     )
                 COMPUTE   IDX-NEXT   =   IDX3   +   1
                 IF  SYU-KOH-HKNNUM(IDX-NEXT)(1:1) >=  "1" AND <=  "8"
+                  PERFORM   2105241-KOHHBTNUM-CHECK-SEC
+                  IF  RECE02-KOHHBTNUM(KH-IDX - 1) =  WRK-KOHHBTNUM
                    MOVE   IDX-NEXT  TO   IDX3
+                  END-IF
                 END-IF
               END-IF
       *
@@ -17571,6 +17587,59 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        210524-FTNMONEY-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    法別番号チェック
+      *****************************************************************
+       2105241-KOHHBTNUM-CHECK-SEC               SECTION.
+      *
+           MOVE     SPACE    TO    WRK-KOHHBTNUM
+           MOVE     ZERO     TO    FLG-ARI
+           PERFORM  VARYING  IDX24   FROM    1   BY  1
+                     UNTIL  (IDX24             >  100 )
+                      OR    (WRK-HKNNUM(IDX24) = SPACE)
+                      OR    (FLG-ARI           =  1   )
+             IF  SYU-KOH-HKNNUM(IDX-NEXT) = WRK-HKNNUM(IDX24)
+                MOVE    1    TO    FLG-ARI
+                MOVE    WRK-HKNNUM-KOHHBTNUM(IDX24)
+                             TO    WRK-KOHHBTNUM
+             END-IF
+           END-PERFORM
+           IF    FLG-ARI  =   ZERO
+             INITIALIZE                     HKNNUM-REC
+             MOVE    RECE02-HOSPNUM     TO  HKN-HOSPNUM
+             MOVE    SYU-KOH-HKNNUM(IDX-NEXT)
+                                        TO  HKN-HKNNUM
+             MOVE    RECE02-SRYYM       TO  HKN-TEKSTYMD(1:6)
+                                            HKN-TEKEDYMD(1:6)
+             MOVE    "01"               TO  HKN-TEKSTYMD(7:2)
+                                            HKN-TEKEDYMD(7:2)
+             MOVE    "00"               TO  HKN-PAYKBN
+             MOVE    HKNNUM-REC         TO  MCPDATA-REC
+             MOVE    "tbl_hknnum"       TO  MCP-TABLE
+             MOVE    "key"              TO  MCP-PATHNAME
+             PERFORM   900-DBSELECT-SEC
+             IF     MCP-RC   =   ZERO
+               MOVE  "tbl_hknnum"       TO  MCP-TABLE
+               MOVE  "key"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF   MCP-RC   =   ZERO
+                 MOVE    MCPDATA-REC    TO  HKNNUM-REC
+                 IF  IDX24 <= 100
+                   MOVE  HKN-HKNNUM     TO  WRK-HKNNUM(IDX24)
+                   MOVE  HKN-HBTNUM     TO  WRK-HKNNUM-KOHHBTNUM(IDX24)
+                 END-IF
+                 MOVE    HKN-HBTNUM     TO  WRK-KOHHBTNUM
+               END-IF
+             END-IF
+             MOVE    "tbl_hknnum"       TO  MCP-TABLE
+             MOVE    "key"              TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+           END-IF
+      *
+           .
+       2105241-KOHHBTNUM-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
