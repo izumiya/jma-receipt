@@ -160,6 +160,8 @@
       *  04.07.09    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *  04.07.10    NACL-門脇    14/07/17  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応
+      *  04.07.12    NACL-門脇    14/09/16  包括診療分のみの場合も仮収納
+      *                                     データを作成する
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1481,21 +1483,24 @@
               MOVE    SRYACCT-REC           TO      MCPDATA-REC
               MOVE    "DBSELECT"            TO      MCP-FUNC
               MOVE    "tbl_sryacct"         TO      MCP-TABLE
-              MOVE    "key33"               TO      MCP-PATHNAME
+      ***     MOVE    "key33"               TO      MCP-PATHNAME
+              MOVE    "key63"               TO      MCP-PATHNAME
               CALL "ORCDBMAIN"    USING MCPAREA
                                         MCPDATA-REC
                                         SPA-AREA
               IF      MCP-RC             =       ZERO
       *
                   MOVE    "tbl_sryacct"     TO      MCP-TABLE
-                  MOVE    "key33"           TO      MCP-PATHNAME
+      ***         MOVE    "key33"           TO      MCP-PATHNAME
+                  MOVE    "key63"           TO      MCP-PATHNAME
                   PERFORM  SRYACCT-READ-SEC
                   PERFORM  UNTIL  (FLG-SRYACCT  =    "1")
       *
                     PERFORM    NYUIN-DAY-TAIHI2-SEC
       *
                     MOVE    "tbl_sryacct"   TO      MCP-TABLE
-                    MOVE    "key33"         TO      MCP-PATHNAME
+      ***           MOVE    "key33"         TO      MCP-PATHNAME
+                    MOVE    "key63"         TO      MCP-PATHNAME
                     PERFORM        SRYACCT-READ-SEC
       *
                   END-PERFORM
@@ -1504,7 +1509,8 @@
       *
               MOVE    "DBCLOSECURSOR"         TO  MCP-FUNC
               MOVE    "tbl_sryacct"   TO      MCP-TABLE
-              MOVE    "key33"         TO      MCP-PATHNAME
+      ***     MOVE    "key33"         TO      MCP-PATHNAME
+              MOVE    "key63"         TO      MCP-PATHNAME
               CALL "ORCDBMAIN" USING MCPAREA
                                      MCPDATA-REC
                                      SPA-AREA
@@ -1574,6 +1580,7 @@
                                     UNTIL    IDY    >    WRK-HI-ED(IDX)
       *
              IF        ACCT-DAY(1 IDY)   NOT =  ZERO 
+              IF   ACCT-JIHOKBN   =  SPACE
                  MOVE   ZERO     TO    FLG-HANBETU
                  PERFORM    VARYING   IDZ  FROM   1   BY   1
                               UNTIL  ( IDZ    >    10 )
@@ -1593,6 +1600,25 @@
                                        TO  WRK-HANBETU2-HKNCOMBINUM(IDZ)
                      MOVE   "2"        TO  WRK-HANBETU2-DAY(IDZ IDY)
                  END-IF
+              ELSE
+                 MOVE   ZERO     TO    FLG-HANBETU
+                 PERFORM    VARYING   IDZ  FROM   1   BY   1
+                              UNTIL  ( IDZ    >    10 )
+                                OR   ( WRK-HANBETU2-SKYYM(IDZ) = SPACE )
+                   IF    WRK-HANBETU2-SKYYM(IDZ)    = WRK-SKYYM(IDX) 
+                   AND   WRK-HANBETU2-HKNCOMBINUM(IDZ)
+                                                    = ACCT-HKNCOMBI
+                     MOVE    1         TO  FLG-HANBETU
+                     MOVE    10        TO  IDZ
+                   END-IF
+                 END-PERFORM
+                 IF   FLG-HANBETU   =   ZERO
+                     MOVE   WRK-SKYYM(IDX) 
+                                       TO  WRK-HANBETU2-SKYYM(IDZ)
+                     MOVE   ACCT-HKNCOMBI      
+                                       TO  WRK-HANBETU2-HKNCOMBINUM(IDZ)
+                 END-IF
+              END-IF
              END-IF
       *
            END-PERFORM.
