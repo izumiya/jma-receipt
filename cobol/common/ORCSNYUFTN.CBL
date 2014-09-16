@@ -2198,8 +2198,13 @@
               MOVE LNK-S02-PTID       TO LNK-SYU-PTID(IDX)
               MOVE WRK-HANBETU-SKYYM(IDX)
                                       TO LNK-SYU-SRYYMD(IDX)(1:6)
-              MOVE WRK-HANBETU-KAISHI(IDX)
+              IF   WRK-HANBETU-KAISHI(IDX)  NOT = SPACE
+                MOVE WRK-HANBETU-KAISHI(IDX)
                                       TO LNK-SYU-SRYYMD(IDX)(7:2)
+              ELSE
+                MOVE WRK-HANBETU-KAISHI2(IDX)
+                                      TO LNK-SYU-SRYYMD(IDX)(7:2)
+              END-IF
               EVALUATE    LNK-S02-SYORI-KBN
                    WHEN    " "
                    WHEN    "1"
