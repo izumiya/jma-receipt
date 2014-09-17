@@ -2890,17 +2890,22 @@
                                                            "232" OR
                                                            "290" OR
                                                            "292" OR
+                                                           "293" OR
                                                            SPACE )) OR
                                  ( SPA-COM-SRYSYUKBN(IDX)
                                                        =   "212" OR
                                                            "222" OR
                                                            "232" OR
-                                                           "292" )
+                                                           "292" OR
+                                                           "295" )
                                CONTINUE
                            ELSE
       *                      処方のみはＯＫ
-                             IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                             IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3"  )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "0044"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                                 (IDX)
@@ -3126,12 +3131,14 @@
                                                        "232" OR
                                                        "290" OR
                                                        "292" OR
+                                                       "293" OR
                                                        SPACE  ))  OR
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
                                                        "232" OR
-                                                       "292"  )
+                                                       "292" OR
+                                                       "295"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF      SPA-ROUMANSEI-ARI   =   2
       *                      処方のみはＯＫ
@@ -3145,8 +3152,11 @@
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
-                           IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                           IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3"  )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "0052"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                                (IDX)
@@ -3204,12 +3214,14 @@
                                                        "232" OR
                                                        "290" OR
                                                        "292" OR
+                                                       "293" OR
                                                        SPACE  ))  OR
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
                                                        "232" OR
-                                                       "292"  )
+                                                       "292" OR
+                                                       "295"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF     (SPA-SEIKATU-ARI     =   2 )  OR
       *                           (SPA-SEIKATU-ARI2    =   2 )
@@ -3224,8 +3236,11 @@
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
-                           IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                           IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3" )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "0068"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
@@ -3276,12 +3291,14 @@
                                                        "232" OR
                                                        "290" OR
                                                        "292" OR
+                                                       "293" OR
                                                        SPACE  ))  OR
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
                                                        "232" OR
-                                                       "292"  )
+                                                       "292" OR
+                                                       "295"  )
       *!!                  院外処方箋を交付しない場合の時、エラー
       *                    IF     (SPA-SEIKATU-ARI     =   2 )  OR
       *                           (SPA-SEIKATU-ARI2    =   2 )
@@ -3296,8 +3313,11 @@
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
-                           IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                           IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3"  )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "1402"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
@@ -3356,17 +3376,22 @@
                                                        "232" OR
                                                        "290" OR
                                                        "292" OR
+                                                       "293" OR
                                                        SPACE  ))  OR
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
                                                        "232" OR
-                                                       "292"  )
+                                                       "292" OR
+                                                       "295"  )
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
-                           IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                           IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3"  )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "1401"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
@@ -3378,7 +3403,8 @@
                        WHEN    OTHER
       *                    算定エラー
                            MOVE    "1401"          TO  SPA-ERRCD
-                           MOVE    "1"             TO  SPA-COM-CUR (IDX)
+                           MOVE    "1"             TO  SPA-COM-CUR
+                                                                 (IDX)
                    END-EVALUATE
                END-IF
             END-IF
@@ -3514,17 +3540,22 @@
                                                        "232" OR
                                                        "290" OR
                                                        "292" OR
+                                                       "293" OR
                                                        SPACE  ))  OR
                              ( SPA-COM-SRYSYUKBN(IDX)
                                                    =   "212" OR
                                                        "222" OR
                                                        "232" OR
-                                                       "292"  )
+                                                       "292" OR
+                                                       "295"  )
                            CONTINUE
                        ELSE
       *                    処方のみはＯＫ
-                           IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
-                                                   NOT =   "3" 
+                           IF     (SPA-COM-SRYSYUKBN(IDX)(3:1)
+                                                   NOT =   "3"  )
+      *                       外用（臨時
+                              OR  (SPA-COM-SRYSYUKBN(IDX)
+                                                       =   "293" )
                                MOVE    "1402"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
