@@ -3484,6 +3484,14 @@
       *
            MOVE    ZERO                TO  FLG-SYOHORYO
       *
+      *H26.9
+      *    院内処方がなければ対象外
+           IF     (FLG-NAIYAK          =   ZERO )  AND
+                  (FLG-TONPUK          =   ZERO )  AND
+                  (FLG-GAIYAK          =   ZERO )
+               GO      TO      3002-INNAI-SYORI-EXT
+           END-IF
+      *
       *H26.10
       *    院内処方のみの時
            IF     (FLG-NAIYAK2         =   1    )
