@@ -772,51 +772,43 @@
       *    排他管理情報
            MOVE    SPACE               TO  SYS-9800-REC
            INITIALIZE                      SYS-9800-REC
-           MOVE    "9800"                  TO  SYS-9800-KANRICD
-           MOVE    "*"                     TO  SYS-9800-KBNCD
-           MOVE    SPA-W01-STYUKYMD        TO  SYS-9800-STYUKYMD
-           MOVE    SPA-W01-STYUKYMD        TO  SYS-9800-EDYUKYMD
-           MOVE    SPA-HOSPNUM             TO  SYS-9800-HOSPNUM
-           MOVE    SYS-9800-REC            TO  MCPDATA-REC
-           MOVE    "SYSKANRI-KEY"          TO  WRK-PATH
-           PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI            =   ZERO
-               MOVE    MCPDATA-REC             TO  SYS-9800-REC
-           ELSE
-               MOVE    SPACE                   TO  SYS-9800-REC
-               INITIALIZE                      SYS-9800-REC
-               MOVE    "9800"                  TO  SYS-9800-KANRICD
-               MOVE    "*"                     TO  SYS-9800-KBNCD
-           END-IF
-      *
-           MOVE    SPA-GMN-HAITA           TO  SYS-9800-HAITA
-           MOVE    SPA-W01-STYUKYMD        TO  SYS-9800-STYUKYMD
-           MOVE    SPA-W01-EDYUKYMD        TO  SYS-9800-EDYUKYMD
-           MOVE    SYS-9800-REC            TO  SYSKANRI-REC
-      *
-           IF      FLG-SYSKANRI            =   ZERO
-               MOVE    SYS-KANRICD             TO  SYSUP-KANRICD
-               MOVE    SYS-KBNCD               TO  SYSUP-KBNCD
-               MOVE    SPA-W01-STYUKYMD        TO  SYSUP-STYUKYMD
-               MOVE    SPA-W01-EDYUKYMD        TO  SYSUP-EDYUKYMD
-               MOVE    SPA-HOSPNUM             TO  SYSUP-HOSPNUM
-               MOVE    "tbl_syskanri"          TO  MCP-TABLE
-               MOVE    "key"                   TO  MCP-PATHNAME
-               MOVE    "DBUPDATE"              TO  MCP-FUNC
-           ELSE
-               MOVE    "tbl_syskanri"          TO  MCP-TABLE
-               MOVE    "key"                   TO  MCP-PATHNAME
-               MOVE    "DBINSERT"              TO  MCP-FUNC
-           END-IF
-           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
-           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+           MOVE    SPA-HOSPNUM         TO  SYS-9800-HOSPNUM
+           MOVE    "9800"              TO  SYS-9800-KANRICD
+           MOVE    "99999999"          TO  SYS-9800-STYUKYMD
+           MOVE    "00000000"          TO  SYS-9800-EDYUKYMD
+           MOVE    SYS-9800-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "del11"             TO  MCP-PATHNAME
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
-           IF      MCP-RC              NOT =   ZERO 
+           IF    ( MCP-RC              NOT =   ZERO )
                MOVE    "1003"                  TO  SPA-ERRCD
                GO  TO  490-KOUSHIN-EXT
-           END-IF      
+           END-IF
+      *
+      *    排他管理情報
+           MOVE    SPACE               TO  SYS-9800-REC
+           INITIALIZE                      SYS-9800-REC
+           MOVE    "9800"              TO  SYS-9800-KANRICD
+           MOVE    "*"                 TO  SYS-9800-KBNCD
+           MOVE    "00000000"          TO  SYS-9800-STYUKYMD
+           MOVE    "99999999"          TO  SYS-9800-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-9800-HOSPNUM
+           MOVE    SPA-GMN-HAITA       TO  SYS-9800-HAITA
+           MOVE    SYS-9800-REC        TO  SYSKANRI-REC
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    (  MCP-RC             NOT =   ZERO )
+               MOVE    "1003"                  TO  SPA-ERRCD
+               GO  TO  490-KOUSHIN-EXT
+           END-IF
       *
            PERFORM 4901-LDMAP-KOUSHIN-SEC
       *    カーソルクロース
@@ -1043,6 +1035,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "更新ができませんでした"
                                                TO  SPA-ERRMSG
                WHEN    "1002"
+               WHEN    "1003"
                    MOVE    "削除ができませんでした"
                                                TO  SPA-ERRMSG
            END-EVALUATE

@@ -2232,9 +2232,11 @@
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE
                    ELSE
-                       MOVE    3                   TO  SPA-GMN-CUR
-                       MOVE    "0021"              TO  SPA-ERRCD
-                       GO  TO  4101-KAKUTEI-CHK-EXT
+                       IF    (SPA-GMN-SELNUM   =   ZERO )
+                           MOVE    3           TO  SPA-GMN-CUR
+                           MOVE    "0021"      TO  SPA-ERRCD
+                           GO  TO  4101-KAKUTEI-CHK-EXT
+                       END-IF
                    END-IF
       *
                WHEN    "5014"
