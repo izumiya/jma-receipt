@@ -77,6 +77,9 @@
       *                                     包括分は行為点数、行為薬剤料、
       *                                     行為材料料にゼロ点をセット
       *                                     する
+      *              NACL-小豆沢  14/09/19  Ｆファイル編集処理
+      *                                     栄養管理体制減算をマイナス
+      *                                     記録する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1259,7 +1262,7 @@
            03  WRK-FEDT-MEISAI-TEN     PIC 9(08).
            03  WRK-FEDT-MEISAI-YKZ     PIC 9(09)V9(03).
            03  WRK-FEDT-MEISAI-KIZ     PIC 9(09)V9(03).
-           03  WRK-FEDT-DEKIDAKA-TEN   PIC 9(08).
+           03  WRK-FEDT-DEKIDAKA-TEN   PIC S9(08).
            03  WRK-FEDT-DEKIDAKA-SUM   PIC 9(08).
            03  WRK-FEDT-DEKIDAKA-SUB   PIC 9(01).
            03  WRK-FEDT-HOUKATU-FLG    PIC X(01).
@@ -4407,6 +4410,13 @@
                    MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
                END-IF
            END-IF
+      *    栄養管理体制減算規定該当（入院基本料）
+      *    栄養管理体制減算規定該当（特定入院料及び短期滞在手術等基本料２）
+      *    は出来高実績点数をマイナス記録
+           IF   TNS-SRYCD              =   "190182590"   OR
+                                           "190182690"
+               MOVE    -40             TO  WRK-FEDT-DEKIDAKA-TEN
+           END-IF
       *出来高・包括フラグ
       * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
            MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
@@ -4708,7 +4718,8 @@
            MOVE    WRK-FEDT-DEKIDAKA-TEN
                                        TO  WRK-NUM
            MOVE    8                   TO  WRK-NAGASA
-           IF      WRK-FEDT-DEKIDAKA-SUB   =  1
+           IF     (WRK-FEDT-DEKIDAKA-SUB   =  1)   OR
+                  (WRK-FEDT-DEKIDAKA-TEN   <  0)
                MOVE    WRK-NUM-X (3:8) TO  WRK-DATA
                MOVE    "-"             TO  WRK-DATA (1:1)
                PERFORM 5004-MOJI-HENSYU-SEC
