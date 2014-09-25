@@ -2244,7 +2244,6 @@
       *****************************************************************
        30091-HKTCD-CHK-SEC          SECTION.
       *
-      *
            MOVE    ZERO                TO  SPA-NAI-HKTERR
            MOVE    ZERO                TO  SPA-NAI-HKTKEI
            IF      SPA-GMN-NYUGAIKBN   =   "1"
@@ -2264,6 +2263,7 @@
            ELSE
                MOVE    ZERO                    TO  SPA-NAI-NYUHKTKBN
            END-IF
+      *
            .
        30091-HKTCD-CHK-EXT.
            EXIT.
@@ -4739,6 +4739,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 410181-SRYACCT-HEN-SEC
       *    ¼ýÇ¼¹¹¿·¥Á¥§¥Ã¥¯
            PERFORM 3104-SYUNOU-CHECK-SEC
+      *
+      *    Æþ±¡ÎÁÊñ³ç¿ÇÎÅ¥Á¥§¥Ã¥¯½èÍý
+           PERFORM 30091-HKTCD-CHK-SEC
       *
            IF      SPA-GMN-MAX         =   ZERO
                MOVE    6                   TO  SPA-GMN-CUR
