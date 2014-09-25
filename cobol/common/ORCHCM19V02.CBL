@@ -2598,7 +2598,7 @@
                                                    "222"  OR
                                                    "232"  OR
                                                    "292"  OR
-                                                   "292")
+                                                   "295")
                        MOVE    1               TO  FLG-TAIGAI
                    END-IF
            END-EVALUATE

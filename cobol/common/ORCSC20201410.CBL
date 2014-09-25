@@ -2416,10 +2416,21 @@
       *    ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿½èÊý¤»¤óÎÁ¤Î¥Á¥§¥Ã¥¯
            IF     (SPA-ERRCD           =   SPACE )
              AND  (FLG-TAZAI1          =   1     )
-      *        Â¿ºÞÅêÍ¿ÂÐ¾Ý³°¤Ç¡¢¸þÀº¿ÀÌô½èÊý¤»¤óÎÁ¤Ï¥¨¥é¡¼
+             AND ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))
+      *        Â¿ºÞÅêÍ¿ÂÐ¾Ý³°¤Ç¡¢¸þÀº¿ÀÌô½èÊý¤»¤óÎÁ¤Ï·Ù¹ð
                IF      FLG-TAZAI-ARI   =   ZERO
-                   MOVE    "0250"          TO  SPA-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-SYOHOU)
+                   IF     (WRK-COM-KZMFLG (IDX-SYOHOU)
+                                                   =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX       =   ZERO )
+                       MOVE    "K252"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SYOHOU)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SYOHOU)
+                       MOVE    IDX-SYOHOU      TO  LNK-ORCSC-KEI-IDX
+                   END-IF
                END-IF
            END-IF
            IF     (SPA-ERRCD           =   SPACE )

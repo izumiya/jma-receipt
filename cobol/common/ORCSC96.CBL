@@ -3023,8 +3023,9 @@
                    END-STRING
       *
       *H26.10　改正から
-               WHEN    "0250"
-                   STRING  "向精神薬多剤投与ではありません。"
+               WHEN    "K252"
+                   STRING  "警告！"
+                           "向精神薬多剤投与ではありません。"
                            "処方せん料を確認して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
