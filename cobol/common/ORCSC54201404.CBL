@@ -584,6 +584,7 @@
            MOVE    ZERO                TO  IDX-SYU
            MOVE    ZERO                TO  IDX-NEN
            MOVE    ZERO                TO  IDX-TUS
+           MOVE    ZERO                TO  FLG-ADD
       *
            PERFORM VARYING     IDX1    FROM    1    BY  1
                    UNTIL      (IDX1        >   SPA-MAX-LINE   )   OR
