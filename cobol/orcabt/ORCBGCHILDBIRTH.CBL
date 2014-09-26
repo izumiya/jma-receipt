@@ -43,6 +43,7 @@
       *                                     保険者番号欄へ記載する
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
+      *  04.07.02    NACL-藤原    14/09/26  システム管理対象月設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -167,6 +168,7 @@
            03  WRK-PARA-TEISYUTUSAKI
                                    PIC X(01).
            03  WRK-PARA-PRTKBN     PIC X(01).
+           03  WRK-PARA-SYSYM      PIC X(06).
       *
       *    一時領域
        01  WRK-AREA.
@@ -357,7 +359,7 @@
        LINKAGE                     SECTION.
       *
        01  COMMAND-PARAM.
-           02  FILLER                  PIC X(1000).
+           02  FILLER                  PIC X(400).
       *
       ******************************************************************
       *
@@ -413,12 +415,14 @@
                                        WRK-PARA-TEISYUTUBIKBN
                                        WRK-PARA-TEISYUTUSAKI
                                        WRK-PARA-PRTKBN
+                                       WRK-PARA-SYSYM
            END-UNSTRING
       *
            DISPLAY "SKYYM        =" WRK-PARA-SKYYM
            DISPLAY "TEISYUTUBIKBN=" WRK-PARA-TEISYUTUBIKBN
            DISPLAY "TEISYUTUSAKI =" WRK-PARA-TEISYUTUSAKI
            DISPLAY "PRTKBN       =" WRK-PARA-PRTKBN
+           DISPLAY "SYSYM        =" WRK-PARA-SYSYM
       *
            MOVE    WRK-PARA-HOSPNUM
                                    TO  SPA-HOSPNUM
@@ -460,6 +464,9 @@
                                        TO  WRK-SRYYM
            END-IF    
       *
+      *    システム管理情報取得 
+           PERFORM 1001-SYSKANRI-HENSYU-SEC
+      *
       *    更新用ファイル名設定
            MOVE    "BUNBUPD"       TO  BUNBENUPD-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID
@@ -471,9 +478,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
-      *
-      *    システム管理情報取得 
-           PERFORM 1001-SYSKANRI-HENSYU-SEC
       *
            IF      WRK-PARA-TEISYUTUBIKBN
                                    =   "1" OR  "2"
@@ -526,6 +530,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *    システム管理情報取得 
       *****************************************************************
        1001-SYSKANRI-HENSYU-SEC      SECTION.
+      *
+           IF      WRK-PARA-SYSYM NOT =   SPACE
+               MOVE     WRK-PARA-SYSYM    TO  WRK-SYMD (1:6)
+               DISPLAY "SYSYM --> SYMD=" WRK-SYMD
+           END-IF
       *
            INITIALIZE                  SYS-1001-REC
            MOVE    WRK-PARA-HOSPNUM    TO  SYS-1001-HOSPNUM
