@@ -372,6 +372,8 @@
       *  04.07.06    NACL-Æ£¸¶    13/12/09  °åÎÅ¾ðÊóÏ¢·¸´ðÈ×ÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/02/03  Âè»°¼Ô¹Ô°ÙÂÐ±þ¡Ê±¡³°½èÊý¤Î¤ß¤Î
       *                                     ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤ÎÉÂÌ¾µ­ºÜÂÐ±þ¡Ë
+      *  04.07.08    NACL-Æ£¸¶    14/09/24  Á´³Ñ¤ÎÉéÃ´¼ÔÈÖ¹æ¡¢¼õµë¼ÔÈÖ¹æ¤Î
+      *                                     µ­Ï¿ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -577,6 +579,7 @@
            03  FLG-TOYAKUFLG           PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
            03  FLG-SKJ-HANTEI          PIC 9(01).
+           03  FLG-SUUJI               PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -774,6 +777,9 @@
       *
            03  WRK-CO-COMMENT          PIC X(76).
            03  WRK-CO-SRYCD            PIC X(09).
+      *
+           03 WRK-KOHFTNJANUM          PIC X(08).
+           03 WRK-KOHJKYSNUM           PIC X(20).
       *
       *    ºÒ³²ÍÑ¥³¥á¥ó¥È
            03  WRK-DISASTER-COMMENT    PIC X(76).
@@ -1391,6 +1397,33 @@
       *
          02  TBL-KENSA-RECE64-MAX PIC 9(03).
          02  TBL-KENSA-RECE65-MAX PIC 9(03).
+      *
+      *    Á´³ÑÊÑ´¹ÎÎ°è
+       01  TBL-SUUJI-AREA.
+           03  FILLER              PIC X(02)   VALUE   "£±".
+           03  FILLER              PIC X(01)   VALUE   "1".
+           03  FILLER              PIC X(02)   VALUE   "£²".
+           03  FILLER              PIC X(01)   VALUE   "2".
+           03  FILLER              PIC X(02)   VALUE   "£³".
+           03  FILLER              PIC X(01)   VALUE   "3".
+           03  FILLER              PIC X(02)   VALUE   "£´".
+           03  FILLER              PIC X(01)   VALUE   "4".
+           03  FILLER              PIC X(02)   VALUE   "£µ".
+           03  FILLER              PIC X(01)   VALUE   "5".
+           03  FILLER              PIC X(02)   VALUE   "£¶".
+           03  FILLER              PIC X(01)   VALUE   "6".
+           03  FILLER              PIC X(02)   VALUE   "£·".
+           03  FILLER              PIC X(01)   VALUE   "7".
+           03  FILLER              PIC X(02)   VALUE   "£¸".
+           03  FILLER              PIC X(01)   VALUE   "8".
+           03  FILLER              PIC X(02)   VALUE   "£¹".
+           03  FILLER              PIC X(01)   VALUE   "9".
+           03  FILLER              PIC X(02)   VALUE   "£°".
+           03  FILLER              PIC X(01)   VALUE   "0".
+       01  TBL-SUUJI-AREA-R        REDEFINES   TBL-SUUJI-AREA.
+           03  TBL-SUUJI-G         OCCURS  10.   
+               05  TBL-SUUJI-X     PIC X(02).
+               05  TBL-SUUJI-9     PIC X(01).
       *
        01  WRK-CONS-AREA.
       *    Æü·×É½¥ì¥³¡¼¥Éµ­ºÜ¤Î¾ò·ïÅÀ¿ô
@@ -3268,9 +3301,43 @@
                MOVE    RECE62-KOHFTNJANUM (IDY)
                                        TO  KANACHK-MAE-INPUT
                CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
-               IF      KANACHK-SYUBETU =   "1"
-                   MOVE    RECE62-KOHFTNJANUM (IDY)
-                                           TO  WRK-DATA
+               IF      KANACHK-RC      =   ZERO
+                   IF      KANACHK-SYUBETU =   "1"
+                       MOVE    RECE62-KOHFTNJANUM (IDY)
+                                               TO  WRK-DATA
+                   ELSE
+                       IF      KANACHK-SYUBETU =   "2"
+                           MOVE    SPACE           TO  WRK-KOHFTNJANUM
+                           MOVE    ZERO            TO  IDXY 
+                           PERFORM VARYING IDYY     FROM    1   BY  2
+                                   UNTIL   IDYY     >       8
+                                   OR      RECE62-KOHFTNJANUM
+                                                           (IDY)(IDYY:2)
+                                                   =   SPACE
+                               MOVE    ZERO            TO  FLG-SUUJI
+                               PERFORM VARYING IDXX    FROM    1   BY  1
+                                       UNTIL   IDXX    >       10
+                                   IF      RECE62-KOHFTNJANUM
+                                                           (IDY)(IDYY:2)
+                                                   =   TBL-SUUJI-X(IDXX)
+                                       MOVE    1           TO  FLG-SUUJI
+                                       ADD     1           TO  IDXY
+                                       MOVE    TBL-SUUJI-9(IDXX)
+                                                           TO
+                                               WRK-KOHFTNJANUM (IDXY:1)
+                                       MOVE    10          TO  IDXX
+                                   END-IF
+                               END-PERFORM
+                               IF    ( FLG-SUUJI   =   ZERO )
+                                   MOVE    SPACE   TO  WRK-KOHFTNJANUM
+                                   MOVE    8       TO  IDYY
+                               END-IF
+                           END-PERFORM
+                           IF      WRK-KOHFTNJANUM  NOT =   SPACE
+                               MOVE    WRK-KOHFTNJANUM TO  WRK-DATA
+                           END-IF
+                       END-IF
+                   END-IF
                END-IF
            END-IF
            EVALUATE    RECE62-2006-RECEDEN-FTNJANUMKBN  (IDY)
@@ -3319,22 +3386,14 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    ¼õµë¼ÔÈÖ¹æ                             
-      *****IF    ( RECE62-PREFNUM      =   "23"                    )
-      *****AND   ( RECE62-TEISYUTUSAKI =   "2"                     )
-      *****AND   ( RECE62-KOHNUM (IDY) (1:1)
-      *****                            >=  "1" AND <= "8"          )
-      *****AND   ( RECE62-KOHHBTNUM (IDY)
-      *****                            =   "81" OR  "82"  OR 
-      *****                                "83" OR  "84"  OR  "85" )
-      *****    MOVE    "0000000"           TO  WRK-DATA
-      *****ELSE                          
-               IF      RECE62-KOHJKYSNUM  (IDY)
-                                           NOT =   SPACE
-                   INITIALIZE              ORCSKANACHKAREA
-                   MOVE    "1"             TO  KANACHK-SYORI 
-                   MOVE    RECE62-KOHJKYSNUM  (IDY)
-                                           TO  KANACHK-MAE-INPUT
-                   CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           IF      RECE62-KOHJKYSNUM  (IDY)
+                                       NOT =   SPACE
+               INITIALIZE              ORCSKANACHKAREA
+               MOVE    "1"             TO  KANACHK-SYORI 
+               MOVE    RECE62-KOHJKYSNUM  (IDY)
+                                       TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF      KANACHK-RC      =   ZERO
                    IF      KANACHK-SYUBETU =   "1"
                        INITIALIZE                   ORCSNUMAREA
                        MOVE    RECE62-KOHJKYSNUM  (IDY) (1:KANACHK-MAX)
@@ -3344,9 +3403,49 @@
                            MOVE   SNUM-OUTEDT (9:7)
                                                TO  WRK-DATA
                        END-IF
+                   ELSE
+                       IF      KANACHK-SYUBETU =   "2"
+                           MOVE    SPACE           TO  WRK-KOHJKYSNUM
+                           MOVE    ZERO            TO  IDXY 
+                           PERFORM VARYING IDYY     FROM    1   BY  2
+                                   UNTIL   IDYY     >       20
+                                   OR      RECE62-KOHJKYSNUM
+                                                           (IDY)(IDYY:2)
+                                                   =   SPACE
+                               MOVE    ZERO            TO  FLG-SUUJI
+                               PERFORM VARYING IDXX    FROM    1   BY  1
+                                       UNTIL   IDXX    >       10
+                                   IF      RECE62-KOHJKYSNUM
+                                                           (IDY)(IDYY:2)
+                                                   =   TBL-SUUJI-X(IDXX)
+                                       MOVE    1           TO  FLG-SUUJI
+                                       ADD     1           TO  IDXY
+                                       MOVE    TBL-SUUJI-9(IDXX)
+                                                           TO
+                                               WRK-KOHJKYSNUM (IDXY:1)
+                                       MOVE    10          TO  IDXX
+                                   END-IF
+                               END-PERFORM
+                               IF    ( FLG-SUUJI   =   ZERO )
+                               OR    ( IDXY        >   7    )
+                                   MOVE    SPACE   TO  WRK-KOHJKYSNUM
+                                   MOVE    20      TO  IDYY
+                               END-IF
+                           END-PERFORM
+                           IF      WRK-KOHJKYSNUM  NOT =   SPACE
+                               INITIALIZE                  ORCSNUMAREA
+                               MOVE    WRK-KOHJKYSNUM  TO  SNUM-INX
+                               CALL    "ORCSNUM"       USING
+                                                       ORCSNUMAREA
+                               IF      SNUM-RC         =   ZERO
+                                   MOVE   SNUM-OUTEDT (9:7)
+                                                       TO  WRK-DATA
+                               END-IF
+                           END-IF
+                       END-IF
                    END-IF
                END-IF
-      *****END-IF
+           END-IF
            EVALUATE    RECE62-2006-RECEDEN-JKYSNUMKBN  (IDY)
                WHEN    SPACE
                    CONTINUE
