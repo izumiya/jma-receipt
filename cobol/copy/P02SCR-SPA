@@ -1521,6 +1521,29 @@
                    07  SPA-GMN2D-SYOCD             PIC X(05).
                    07  SPA-GMN2D-SYOCDNAME         PIC X(30).
       *
+      *            第三者行為　現物給付区分
+                   07  SPA-GMN2D-D3-GENBTKBN-G.
+                       09  SPA-GMN2D-D3-GENBTKBN          PIC X(01).
+                       09  SPA-GMN2D-D3-GENBTKBNH1        PIC X(01).
+                       09  SPA-GMN2D-D3-GENBTKBNMEI       PIC X(18).
+                   07  SPA-GMN2D-D3-GENBTKBNLST-G.
+                       09  SPA-GMN2D-D3-GENBTKBNLST       OCCURS  5.
+                           11  SPA-GMN2D-D3-GENBTKBN-CD   PIC X(01).
+                           11  SPA-GMN2D-D3-GENBTKBN-H    PIC X(01).
+                           11  SPA-GMN2D-D3-GENBTKBN-MEI  PIC X(18).
+                   07  SPA-GMN2D-D3-GENBTKBN-MAX        PIC 9(02).
+      *            第三者行為　特記事項区分
+                   07  SPA-GMN2D-D3-TOKKIKBN-G.
+                       09  SPA-GMN2D-D3-TOKKIKBN          PIC X(01).
+                       09  SPA-GMN2D-D3-TOKKIKBNH1        PIC X(01).
+                       09  SPA-GMN2D-D3-TOKKIKBNMEI       PIC X(28).
+                   07  SPA-GMN2D-D3-TOKKIKBNLST-G.
+                       09  SPA-GMN2D-D3-TOKKIKBNLST       OCCURS  5.
+                           11  SPA-GMN2D-D3-TOKKIKBN-CD   PIC X(01).
+                           11  SPA-GMN2D-D3-TOKKIKBN-H    PIC X(01).
+                           11  SPA-GMN2D-D3-TOKKIKBN-MEI  PIC X(28).
+                   07  SPA-GMN2D-D3-TOKKIKBN-MAX        PIC 9(02).
+      *
                05  SPA-NAI2D-AREA.
                    07  SPA-NAI2D-HKNKBN-MAE        PIC X(01).
                    07  SPA-NAI2D-HKNKBN-HZN        PIC X(01).

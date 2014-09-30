@@ -158,5 +158,19 @@ P02D	{
 		SELNUM	{
 			value	number(3);
 		};
+		DAI3_GENBTKBN_COMB	{
+			DAI3_GENBTKBN	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[5];
+		};
+		DAI3_TOKKIKBN_COMB	{
+			DAI3_TOKKIKBN	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[5];
+		};
 	};
 };

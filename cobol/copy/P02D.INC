@@ -131,6 +131,18 @@
                           PIC X       OCCURS  50 TIMES.
               03  P02D-SELNUM.
                 04  P02D-VALUE  PIC S9(3).
+              03  P02D-DAI3-GENBTKBN-COMB.
+                04  P02D-DAI3-GENBTKBN.
+                  05  P02D-TEXTDATA   PIC X(20).
+                04  P02D-DAI3-GENBTKBN-COUNT  PIC S9(9)   BINARY.
+                04  P02D-DAI3-GENBTKBN-ITEM
+                        PIC X(20)   OCCURS  5 TIMES.
+              03  P02D-DAI3-TOKKIKBN-COMB.
+                04  P02D-DAI3-TOKKIKBN.
+                  05  P02D-TEXTDATA   PIC X(30).
+                04  P02D-DAI3-TOKKIKBN-COUNT  PIC S9(9)   BINARY.
+                04  P02D-DAI3-TOKKIKBN-ITEM
+                        PIC X(30)   OCCURS  5 TIMES.
 
 
 
