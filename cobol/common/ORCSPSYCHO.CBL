@@ -149,7 +149,7 @@
                                            OR  "22")
                  AND  (WRK-CLASS           =   3
                                            OR  4    )
-                   IF      ORCSPSYCHO-KAISU (IDX)   <  14
+                   IF      ORCSPSYCHO-KAISU (IDX)  <=  14
                        MOVE    1               TO  FLG-ERR
                        MOVE    "1"             TO  ORCSPSYCHO-RINJI-KBN
                                                                   (IDX)
