@@ -145,10 +145,10 @@
                MOVE    ZERO                TO  FLG-ERR
       *        Î×»þÅêÌôÂÐ¾Ý³°
                IF     (ORCSPSYCHO-SRYSYUKBN(IDX)(1:2)
-                                           =   "29"
-                                           OR  "22")
+                                           =   "29" )
                  AND  (WRK-CLASS           =   3
                                            OR  4    )
+      *            £±£´Æü°ÊÆâ¤ÏÂÐ¾Ý³°
                    IF      ORCSPSYCHO-KAISU (IDX)  <=  14
                        MOVE    1               TO  FLG-ERR
                        MOVE    "1"             TO  ORCSPSYCHO-RINJI-KBN
