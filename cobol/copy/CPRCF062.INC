@@ -139,6 +139,7 @@
       *                                     フラグ追加
       *  04.07.09    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     算定フラグ追加
+      *  04.07.10    NACL-門脇    14/07/31  第三者行為に関するフラグ追加
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -890,6 +891,8 @@
                05  RECE62-DAISANFLG             PIC 9(01).
       *第三者行為公費ＩＤ
                05  RECE62-DAISAN-KOHID          PIC 9(10).
+      *第三者行為保険組合せ現物給付フラグ
+               05  RECE62-DAISAN-GENBUTUFLG     PIC 9(01).
       *第三者行為請求点数又は食事あり
                05  RECE62-DAISAN-SKYFLG         PIC 9(01).
       *リハビリ開始日編集用公費分離区分
@@ -915,7 +918,7 @@
            03  RECE62-DAISAN-GAITO              PIC 9(01).
       *第三者行為請求点数合計
            03  RECE62-DAISAN-TOTALTEN           PIC 9(08).
-      *第三者行為一部負担金相当額合計（１円単位）
+      *第三者行為一部負担金相当額合計
            03  RECE62-DAISAN-FTNMONEY           PIC 9(09).
       *第三者行為食事合計
            03  RECE62-DAISAN-SKJ-NISSU-KEI      PIC 9(02).
@@ -923,6 +926,12 @@
            03  RECE62-DAISAN-SKJ-FTN-KEI        PIC 9(08).
       *第三者行為高齢者フラグ（第三者行為のみ＋高齢者）
            03  RECE62-DAISAN-KOUREI             PIC 9(01).
+      *第三者行為レセプト現物給付該当フラグ
+           03  RECE62-DAISAN-GENBUTU-GAITO      PIC 9(01).
+      *第三者行為一部負担金金額置換フラグ
+           03  RECE62-DAISAN-CHIKAN             PIC 9(01).
+      *第三者行為特記事項有無フラグ
+           03  RECE62-DAISAN-TOKKI              PIC 9(01).
       *
       *請求点数がない保険組み合わせ有りフラグ
            03  RECE62-SKYTENFLG                 PIC 9(01).

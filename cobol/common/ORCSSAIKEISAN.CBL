@@ -68,7 +68,8 @@
       *  04.07.01    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.02    NACL-門脇    14/02/13  労災・自賠責の施術加算対応
       *  04.07.03    NACL-門脇    14/03/01  労災マスタ追加対応
-      *  04.07.00    NACL-多々納  14/09/04  マイナス剤点数判定対応他
+      *  04.07.04    NACL-門脇    14/07/31  第三者行為の現物給付対応
+      *  04.07.00    NACL-多々納  14/09/02  マイナス剤点数判定対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3373,6 +3374,7 @@
                   END-IF
                   IF  (SYU-SYUHKNNUM   NOT = SPACE)
                   AND (SYU-KOH1HKNNUM  NOT = SPACE)
+                  AND (SYU-KOH1HKNNUM  NOT = "970")
                      MOVE    1     TO  FLG-GENBUTU3
                   END-IF
                 END-IF

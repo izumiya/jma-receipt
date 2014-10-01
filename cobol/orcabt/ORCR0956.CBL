@@ -73,6 +73,7 @@
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
       *  04.07.03    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/07/31  Âè»°¼Ô¹Ô°Ù¤Î¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -431,6 +432,7 @@
            03  WRK-SEIKYUZ         PIC ZZ,ZZZ,ZZ9.
            03  WRK-ZZ              PIC ZZ.
            03  WRK-ZZZ             PIC ZZZ.
+           03  WRK-ZZ9             PIC ZZ9.
            03  WRK-KGK2            PIC ZZ.
            03  WRK-TANKA.
                05  WRK-TANKA1      PIC Z9.
@@ -1246,23 +1248,24 @@ grpsys        PERFORM 900-DBSELECT-SEC
            EVALUATE    WRK-PARA-RECEKBN
                WHEN    "8"
       *          ¼Ò²ñÊÝ¸±¤Ø¤ÎÀÁµá³Û
-                 MOVE    RECE82-SKYMONEY        TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ           TO  HC23-SEIKYU(1)
+                 MOVE    RECE82-SKYMONEY        TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ            TO  HC23-SEIKYU(1)
       *          ´µ¼ÔÉéÃ´
-                 IF   RECE82-FTNMONEY  NOT =  ZERO
-                   MOVE  RECE82-FTNRATE         TO  WRK-ZZZ
-                   MOVE  WRK-ZZZ                TO  HC23-FTNWARIAI
-                 END-IF
-                 MOVE    RECE82-FTNMONEY        TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ           TO  HC23-SEIKYU(2)
+                 MOVE    RECE82-FTNRATE         TO  WRK-ZZ9
+                 MOVE    WRK-ZZ9                TO  HC23-FTNWARIAI
+      *
+                 MOVE    RECE82-FTNMONEY        TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ            TO  HC23-SEIKYU(2)
+      *
                  MOVE    RECE82-SHOKUJITOTALDAY TO  WRK-ZZZ
                  MOVE    WRK-ZZZ                TO  HC23-FTNNISSU
                  MOVE    RECE82-SKJFTNMONEY     TO  WRK-KINGAKUZ
                  MOVE    WRK-KINGAKUZ           TO  HC23-SEIKYU(3)
+      *
                  COMPUTE WRK-GOKEI   =    RECE82-FTNMONEY
                                      +    RECE82-SKJFTNMONEY
-                 MOVE    WRK-GOKEI              TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ           TO  HC23-SEIKYU(4)
+                 MOVE    WRK-GOKEI              TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ            TO  HC23-SEIKYU(4)
            END-EVALUATE
       *
       *    ¿ÇÃÇ½ñÎÁ
@@ -1314,8 +1317,8 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                      +    RECE82-MEISAI-KIN
                                      +    RECE82-SITURYO-JYU
                                      +    RECE82-SONOTAKIN-JYU
-                 MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+                 MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUG
            END-EVALUATE
       *
       *    ÅÀ¿ôÃ±²Á
@@ -3575,7 +3578,11 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                           AND   ( RECE82-MEISAI-KIN       =   ZERO )
                           AND   ( RECE82-SITURYO-JYU      =   ZERO )
                           AND   ( RECE82-SONOTAKIN-JYU    =   ZERO )
+                            IF  RECE82-TOTALKIN-JYU  NOT = ZERO
+                                  CONTINUE
+                            ELSE
                                   GO  TO  990-RECE82-READ-SEC
+                            END-IF
                           END-IF
                        END-EVALUATE
       *

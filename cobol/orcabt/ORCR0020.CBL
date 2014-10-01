@@ -262,6 +262,7 @@
       *  04.07.08    NACL-藤原    14/04/30  治験が複数あるときの対応
       *  04.07.09    NACL-藤原    14/06/05  月途中のまとめのとき第二公費
       *                                     マル長のときも対象とする
+      *  04.07.10    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *  04.07.11    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
       *  04.07.12    NACL-藤原    14/09/10  月途中のまとめのとき第二公費
       *                                     マル長のときの修正
@@ -396,6 +397,7 @@
            03  FLG-TAISYO                              PIC 9(01).
            03  FLG-SEIHO                               PIC 9(01).
            03  FLG-RIREKI-HEN                          PIC 9(01).
+           03  FLG-PTRSIINF                            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -944,6 +946,10 @@
       *    患者特記事項情報
        01  PTTOKKI-REC.
            COPY    "CPPTTOKKI.INC".
+      *
+      *    労災患者保険情報
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -1880,6 +1886,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        MOVE    1        TO   RECE02-DAISANFLG(IDX)
                        MOVE    RECE01-KOHIDHC(IDX IDY2)
                                         TO   RECE02-DAISAN-KOHID(IDX)
+      *                第三者行為現物給付フラグ編集
+                       PERFORM   2101-DAISAN-GENBUTU-HENSYU-SEC
                        MOVE    4        TO   IDY2
                    END-IF
                END-PERFORM
@@ -2610,6 +2618,46 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
            .
        2101-KOREI-HIGAITO-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    第三者行為現物給付フラグ編集
+      *****************************************************************
+       2101-DAISAN-GENBUTU-HENSYU-SEC                   SECTION.
+      *
+           INITIALIZE                     PTRSIINF-REC
+           MOVE    RECE01-HOSPNUM    TO   PTRSI-HOSPNUM
+           MOVE    RECE01-PTID       TO   PTRSI-PTID
+           MOVE    RECE01-KOHIDHC(IDX IDY2)
+                                     TO   PTRSI-KOHID
+           MOVE    PTRSIINF-REC      TO   MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"    TO   MCP-TABLE
+           MOVE    "key"             TO   MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_ptrsiinf"  TO   MCP-TABLE
+             MOVE    "key"           TO   MCP-PATHNAME
+             PERFORM  PTRSIINF-READ-SEC
+             IF    FLG-PTRSIINF     =  ZERO
+      *        現物給付対象とする
+               IF     RECE01-SRYYM   >=  "201204"
+                 IF   PTRSI-DAISAN-GENBTKBN  =  "2"
+                   MOVE   1   TO   RECE02-DAISAN-GENBUTUFLG(IDX)
+                   MOVE   1   TO   RECE02-DAISAN-GENBUTU-GAITO
+                 END-IF
+               END-IF
+      *        特記事項「１０第三」記載しない
+               IF     PTRSI-DAISAN-TOKKIKBN  =  "2"
+                   MOVE   1   TO   RECE02-DAISAN-TOKKI
+               END-IF
+             END-IF
+           END-IF
+           MOVE    "tbl_ptrsiinf"    TO   MCP-TABLE
+           MOVE    "key"             TO   MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           .
+       2101-DAISAN-GENBUTU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -5004,6 +5052,23 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        PTKOHINF-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者労災保険情報読込
+      *****************************************************************
+       PTRSIINF-READ-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+               MOVE    ZERO            TO  FLG-PTRSIINF
+           ELSE
+               INITIALIZE                  PTRSIINF-REC
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+      *
+           .
+       PTRSIINF-READ-EXT.
            EXIT.
       *****************************************************************
       *    保険番号マスタ検索処理

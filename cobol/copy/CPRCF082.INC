@@ -61,6 +61,7 @@
       *  04.07.05    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.06    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     算定フラグ追加
+      *  04.07.07    NACL-門脇    14/07/31  第三者行為に関するフラグ追加
       ************************************************************
       *01  RECE82-REC.
            03  RECE82-KEY.
@@ -266,7 +267,7 @@
                05  RECE82-SHOKUJIKHNNISSU PIC  9(02).
       *
       *食事種別情報‐基本（生活）
-           03  RECE82-SHOKUJISYUBETU-KHNSEI   PIC  X(02).
+           03  RECE82-SHOKUJISYUBETU-SEI  PIC  X(02).
       *
       *食事基本料情報（生活）
            03  RECE82-SHOKUJIKHNINF-SEI   OCCURS   2.
@@ -423,6 +424,11 @@
            03  RECE82-FTNRATE             PIC  9(03).
       *第三者行為（食事標準負担）
            03  RECE82-SKJFTNMONEY         PIC  9(09).
+      *第三者行為レセプト現物給付該当フラグ
+           03  RECE82-DAISAN-GENBUTU-GAITO
+                                          PIC  9(01).
+      *第三者行為一部負担金金額置換フラグ
+           03  RECE82-DAISAN-CHIKAN       PIC  9(01).
       *
       *超重症児（者）入院診療加算等の算定フラグ
            03  RECE82-CYOJKSNFLG          PIC  X(01).

@@ -1759,3 +1759,67 @@ path	key87 	{
 	};
 };
 
+path	key88 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key88_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   KOH1HKNNUM  <>  '970'
+			ORDER   BY    SAIKEISANKBN,DENPNUM
+		;
+	};
+};
+
+path	key89 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key89_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   KOH1HKNNUM  <>  '970'
+			ORDER   BY    SAIKEISANKBN,SRYYMD,DENPNUM
+		;
+	};
+};
+
+path	key90 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key90_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   KOH1HKNNUM  =   '970'
+			ORDER   BY    DENPNUM
+		;
+	};
+};
+
+path	key91 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key91_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   KOH1HKNNUM  =   '970'
+			ORDER   BY    SRYYMD,DENPNUM
+		;
+	};
+};
+

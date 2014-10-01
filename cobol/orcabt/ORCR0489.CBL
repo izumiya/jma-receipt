@@ -58,6 +58,7 @@
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
       *  04.07.03    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/07/31  Âè»°¼Ô¹Ô°Ù¤Î¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -379,6 +380,7 @@
            03  WRK-Z9              PIC Z9.
            03  WRK-ZZ              PIC ZZ.
            03  WRK-ZZZ             PIC ZZZ.
+           03  WRK-ZZ9             PIC ZZ9.
            03  WRK-TANKA.
                05  WRK-TANKA1      PIC Z9.
                05  WRK-TANKA2      PIC X(01).
@@ -1213,15 +1215,14 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            EVALUATE    WRK-PARA-RECEKBN
                WHEN    "8"
       *          ¼Ò²ñÊÝ¸±¤Ø¤ÎÀÁµá³Û
-                 MOVE    RECE41-SKYMONEY      TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYU(1)
+                 MOVE    RECE41-SKYMONEY      TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYU(1)
       *          ´µ¼ÔÉéÃ´
-                 IF   RECE41-FTNMONEY  NOT =  ZERO
-                   MOVE  RECE41-FTNRATE       TO  WRK-ZZZ
-                   MOVE  WRK-ZZZ              TO  HC23-FTNWARIAI
-                 END-IF
-                 MOVE    RECE41-FTNMONEY      TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYU(2)
+                 MOVE    RECE41-FTNRATE       TO  WRK-ZZ9
+                 MOVE    WRK-ZZ9              TO  HC23-FTNWARIAI
+      *
+                 MOVE    RECE41-FTNMONEY      TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYU(2)
                                                   HC23-SEIKYU(4)
            END-EVALUATE
       *
@@ -1263,8 +1264,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                                      +    RECE41-SONOTAKIN-JYU
                                      +    RECE41-SINDAN-KIN
                                      +    RECE41-MEISAI-KIN
-                 MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+                 MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUG
            END-EVALUATE
       *
       *    ÅÀ¿ôÃ±²Á
@@ -3364,7 +3365,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                           AND   ( RECE41-SONOTAKIN-JYU =   ZERO )
                           AND   ( RECE41-SINDAN-KIN    =   ZERO )
                           AND   ( RECE41-MEISAI-KIN    =   ZERO )
+                            IF  RECE41-TOTALKIN-JYU  NOT = ZERO
+                              CONTINUE
+                            ELSE
                               GO  TO  990-RECE41-READ-SEC
+                            END-IF
                           END-IF
                        END-EVALUATE
       *

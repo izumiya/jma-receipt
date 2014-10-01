@@ -318,6 +318,8 @@
                    MOVE    "£·£°ºÐÌ¤Ëþ"    TO  SPA-GMN-TKBNMEI (IDXL)
                WHEN  ( SYU-SECMONEY    =   2 )
                    MOVE    "¹âÎð¼Ô"        TO  SPA-GMN-TKBNMEI (IDXL)
+               WHEN  ( SYU-SECMONEY    =   4 )
+                   MOVE    "Âè»°¼Ô¹Ô°Ù"    TO  SPA-GMN-TKBNMEI (IDXL)
                WHEN  ( SYU-ACCT-UPDKBN NOT =   SPACE )
                    MOVE    "¼ýÇ¼¹¹¿·Ì¤½èÍý"
                                            TO  SPA-GMN-TKBNMEI (IDXL)
@@ -739,7 +741,7 @@
                    MOVE    MCPDATA-REC     TO  SYUNOU-REC
       *
                    MOVE    1               TO  FLG-LOOP-END
-                   IF    ( SYU-SECMONEY    =   1 OR 2 OR 3 )
+                   IF    ( SYU-SECMONEY    =   1 OR 2 OR 3 OR 4 )
                      OR  ( SYU-ACCT-UPDKBN NOT = SPACE  )
                        CONTINUE
                    ELSE

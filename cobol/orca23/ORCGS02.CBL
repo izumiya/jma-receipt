@@ -110,6 +110,8 @@
       *
       *  04.06.01    NACL-門脇    10/06/25  会計照会【収納更新】未処理分
       *                                     メッセージ対応
+      *
+      *  04.07.01    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -391,6 +393,7 @@
            03  FLG-GENBUTU         PIC 9(01).
            03  FLG-GENBUTU2        PIC 9(01).
            03  FLG-GENBUTU3        PIC 9(01).
+           03  FLG-GENBUTU4        PIC 9(01).
            03  FLG-CLIENT-OK       PIC 9(01).
            03  FLG-S10-CHK         PIC 9(01).
       *
@@ -523,6 +526,9 @@
            03  WRK-OLD-NYUHEN-YMD  PIC X(08).
            03  WRK-S01-NYUGAIKBN   PIC X(01).
            03  WRK-S01-DENPNUM     PIC 9(07).
+      *
+           03  WRK-IKT-TABLE       PIC X(64).
+           03  WRK-IKT-PATHNAME    PIC X(64).
       *
        01  WRK-ROW.
            05  WRK-SYULIST-ROW     PIC S9(9)   BINARY.
@@ -2597,13 +2603,17 @@
            IF      SYU-DENPJTIKBN  NOT =   "3"
                 IF  (SPA-NAI-SRYYM(1:6)  IS  NUMERIC     )
       **********OR  (SYU-SRYYMD(1:6)  =   SPA-SYSYMD(1:6))
+                 IF  SYU-NYUGAIKBN  =  "2"
                   EVALUATE  SYU-SECMONEY
                     WHEN      1
                     WHEN      3
                        MOVE      "1"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                     WHEN      2
                        MOVE      "2"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
+                    WHEN      4
+                       MOVE      "4"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                   END-EVALUATE
+                 END-IF
                 END-IF
                 IF  SYU-ACCT-UPDKBN NOT = SPACE
                    MOVE   "☆"    TO   SPA-GMN-TNYUGAIKBN(IDXL)(3:2)
@@ -3100,9 +3110,15 @@
                END-IF
                EVALUATE  SPA-GMN-SIKIBETUFLG(IDXL)
                  WHEN        "1"
-                   MOVE     1          TO  FLG-MISYORI2
+                   IF  FLG-MISYORI2   NOT =  4
+                     MOVE   1          TO  FLG-MISYORI2
+                   END-IF
                  WHEN        "2"
-                   MOVE     2          TO  FLG-MISYORI2
+                   IF  FLG-MISYORI2   NOT =  4
+                     MOVE   2          TO  FLG-MISYORI2
+                   END-IF
+                 WHEN        "4"
+                   MOVE     4          TO  FLG-MISYORI2
                END-EVALUATE
       *
            END-PERFORM
@@ -3120,9 +3136,14 @@
                                   TO    S02-LBLMSG(1:56)
        MOVE "★★"                TO    S02-LBLMSG(57:)
                WHEN       2
-                 MOVE    "blue"   TO    S02-LBLMSG-STYLE
+                 MOVE    "red"    TO    S02-LBLMSG-STYLE
        MOVE "★★　【高齢者現物給付】一括再計算を行ってください　★★"
                                   TO    S02-LBLMSG
+               WHEN       4
+                 MOVE    "red"    TO    S02-LBLMSG-STYLE
+       MOVE "★★　【第三者行為現物給付】一括再計算を行ってください　"
+                                  TO    S02-LBLMSG(1:56)
+       MOVE "★★"                TO    S02-LBLMSG(57:)
              END-EVALUATE
            ELSE
              IF    FLG-MISYORI    =      1
@@ -5821,6 +5842,7 @@
            MOVE    ZERO                TO  FLG-GENBUTU
            MOVE    ZERO                TO  FLG-GENBUTU2
            MOVE    ZERO                TO  FLG-GENBUTU3
+           MOVE    ZERO                TO  FLG-GENBUTU4
       *
            MOVE    ZERO                TO  FLG-SYUNOU
            INITIALIZE                      SYUNOU-REC
@@ -5840,7 +5862,12 @@
                  END-IF
                  IF  (SYU-SYUHKNNUM   NOT = SPACE)
                  AND (SYU-KOH1HKNNUM  NOT = SPACE)
+                 AND (SYU-KOH1HKNNUM  NOT = "970")
                     MOVE    1     TO  FLG-GENBUTU3
+                 END-IF
+      *
+                 IF   SYU-KOH1HKNNUM  = "970"
+                    MOVE    1     TO  FLG-GENBUTU4
                  END-IF
                END-IF
                MOVE    "tbl_syunou"    TO  WRK-TABLE
@@ -5851,126 +5878,57 @@
            MOVE    "key35"        TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF   FLG-GENBUTU2  =   1
-           AND  FLG-GENBUTU3  =   1
+           IF     FLG-GENBUTU4  =   1
+                    MOVE    2     TO  FLG-GENBUTU
+           ELSE
+             IF  (FLG-GENBUTU2  =   1)
+             AND (FLG-GENBUTU3  =   1)
                     MOVE    1     TO  FLG-GENBUTU
+             END-IF
            END-IF
       *
-           MOVE    ZERO                TO  FLG-SYUNOU
-           INITIALIZE                      SYUNOU-REC
-           MOVE    SPA-HOSPNUM          TO  SYU-HOSPNUM
-           MOVE    WRK-NYUGAIKBN       TO  SYU-NYUGAIKBN
-           MOVE    SPA-GMN-PTID        TO  SYU-PTID
-           MOVE    WRK-SKYYM           TO  SYU-SRYYMD (1:6)
-           MOVE    "__"                TO  SYU-SRYYMD (7:)
-           IF   FLG-GENBUTU = ZERO
-             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                MOVE    "tbl_syunou"   TO  WRK-TABLE
-                MOVE    "key35"        TO  WRK-PATHNAME
+      *    第三者行為診療分が１件でもある場合
+           IF     FLG-GENBUTU   =   2
+      *      通常診療分の計算
+             IF     SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key88"        TO  WRK-IKT-PATHNAME
              ELSE
-                MOVE    "tbl_syunou"   TO  WRK-TABLE
-                MOVE    "key69"        TO  WRK-PATHNAME
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key89"        TO  WRK-IKT-PATHNAME
              END-IF
+             PERFORM  4402-IKATUSAIKEI-HENSYU-SEC
+      *      第三者行為診療分の計算
+             IF     SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key90"        TO  WRK-IKT-PATHNAME
+             ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key91"        TO  WRK-IKT-PATHNAME
+             END-IF
+             PERFORM  4402-IKATUSAIKEI-HENSYU-SEC
            ELSE
-             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                MOVE    "tbl_syunou"   TO  WRK-TABLE
-                MOVE    "key82"        TO  WRK-PATHNAME
-             ELSE
-                MOVE    "tbl_syunou"   TO  WRK-TABLE
-                MOVE    "key83"        TO  WRK-PATHNAME
-             END-IF
-           END-IF
-           PERFORM 900-SYUNOU-SEL-IKT-SEC
-      *
-           PERFORM   UNTIL ( FLG-SYUNOU  =   1 )
-      *
-               MOVE    MCPDATA-REC     TO   SYUNOU-REC
-      *
-               MOVE    ZERO            TO   FLG-ARI
-               PERFORM    VARYING   IDX3   FROM   1   BY   1
-                       UNTIL  (IDX3                   >  100 )
-                         OR   (WRK-DENPNUM-END(IDX3)  =  ZERO)
-                         OR   (FLG-ARI                =   1  )
-                   IF  WRK-DENPNUM-END(IDX3)  =   SYU-DENPNUM
-                         MOVE   1    TO   FLG-ARI
-                   END-IF
-               END-PERFORM
-      *
-               IF   SYU-DENPJTIKBN  NOT =   "3"
-               AND  FLG-ARI             =   ZERO
-                  INITIALIZE                   LNK-ORCSSAIKEISAN-REC
-      *
-                  MOVE     SYU-HOSPNUM     TO   LNK-ORCSSKS-HOSPNUM
-                  MOVE     SYU-NYUGAIKBN  TO   LNK-ORCSSKS-NYUGAIKBN
-                  MOVE     SYU-PTID       TO   LNK-ORCSSKS-PTID
-                  MOVE     SYU-DENPNUM    TO   LNK-ORCSSKS-DENPNUM
-                  MOVE     SYU-SRYKA      TO   LNK-ORCSSKS-SRYKA
-                  MOVE     SYS-1039-IKTSORTKBN
-                                          TO   LNK-ORCSSKS-IKTSORTKBN
-                  MOVE     SYS-1039-IKTKEISANKBN
-                                          TO   LNK-ORCSSKS-IKTKEISANKBN
-                  IF   FLG-GENBUTU  =  1
-                    MOVE     "1"          TO   LNK-ORCSSKS-IKTKEISANKBN
-                    MOVE     "1"          TO   LNK-ORCSSKS-IKTGENKEIFLG
-                  END-IF
-      *
-                  CALL    "ORCSSAIKEISAN"     USING
-                                              SPA-AREA
-                                              LNK-ORCSSAIKEISAN-REC
-      *
-                  PERFORM    VARYING   IDX3   FROM   1   BY   1
-                       UNTIL  (IDX3                          >   15 )
-                         OR   (LNK-ORCSSKS-DENPNUM-END(IDX3) =  ZERO)
-                      ADD    1     TO   IDX6
-                      MOVE   LNK-ORCSSKS-DENPNUM-END(IDX3)
-                                   TO   WRK-DENPNUM-END(IDX6)
-                  END-PERFORM
-      *
-               END-IF
-      *
-               IF   FLG-GENBUTU = ZERO
-                 IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                    MOVE    "tbl_syunou"   TO  WRK-TABLE
-                    MOVE    "key35"        TO  WRK-PATHNAME
-                 ELSE
-                    MOVE    "tbl_syunou"   TO  WRK-TABLE
-                    MOVE    "key69"        TO  WRK-PATHNAME
-                 END-IF
+      *      第三者行為診療分がない場合
+             IF   FLG-GENBUTU = ZERO
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key35"        TO  WRK-IKT-PATHNAME
                ELSE
-                 IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                    MOVE    "tbl_syunou"   TO  WRK-TABLE
-                    MOVE    "key82"        TO  WRK-PATHNAME
-                 ELSE
-                    MOVE    "tbl_syunou"   TO  WRK-TABLE
-                    MOVE    "key83"        TO  WRK-PATHNAME
-                 END-IF
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key69"        TO  WRK-IKT-PATHNAME
                END-IF
-               PERFORM 900-SYUNOU-FET-SEC
-      *
-               IF    SPA-ERRCD   NOT =  SPACE
-                   MOVE    1           TO  FLG-SYUNOU
+             ELSE
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key82"        TO  WRK-IKT-PATHNAME
+               ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key83"        TO  WRK-IKT-PATHNAME
                END-IF
-      *
-           END-PERFORM
-      *
-           IF   FLG-GENBUTU = ZERO
-             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-               MOVE    "tbl_syunou"   TO  MCP-TABLE
-               MOVE    "key35"        TO  MCP-PATHNAME
-             ELSE
-               MOVE    "tbl_syunou"   TO  MCP-TABLE
-               MOVE    "key69"        TO  MCP-PATHNAME
              END-IF
-           ELSE
-             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-               MOVE    "tbl_syunou"   TO  MCP-TABLE
-               MOVE    "key82"        TO  MCP-PATHNAME
-             ELSE
-               MOVE    "tbl_syunou"   TO  MCP-TABLE
-               MOVE    "key83"        TO  MCP-PATHNAME
-             END-IF
+             PERFORM  4402-IKATUSAIKEI-HENSYU-SEC
            END-IF
-           PERFORM 910-DBCLOSECURSOR-SEC
+      *
            IF    ( SPA-ERRCD      NOT =   "0070" )
                PERFORM 4401-IKATUSAIKEI-SEC
            ELSE
@@ -6017,6 +5975,87 @@
            .
        4401-IKATUSAIKEI-EXT.
            EXIT.
+      *
+      **************************************************************
+      *    外来分一括再計算編集処理
+      **************************************************************
+       4402-IKATUSAIKEI-HENSYU-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+           INITIALIZE                      SYUNOU-REC
+           MOVE    SPA-HOSPNUM         TO  SYU-HOSPNUM
+           MOVE    WRK-NYUGAIKBN       TO  SYU-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  SYU-PTID
+           MOVE    WRK-SKYYM           TO  SYU-SRYYMD (1:6)
+           MOVE    "__"                TO  SYU-SRYYMD (7:)
+           MOVE    WRK-IKT-TABLE       TO  WRK-TABLE
+           MOVE    WRK-IKT-PATHNAME    TO  WRK-PATHNAME
+           PERFORM 900-SYUNOU-SEL-IKT-SEC
+      *
+           PERFORM   UNTIL ( FLG-SYUNOU  =   1 )
+      *
+               MOVE    MCPDATA-REC     TO   SYUNOU-REC
+      *
+               MOVE    ZERO            TO   FLG-ARI
+               PERFORM    VARYING   IDX3   FROM   1   BY   1
+                       UNTIL  (IDX3                   >  100 )
+                         OR   (WRK-DENPNUM-END(IDX3)  =  ZERO)
+                         OR   (FLG-ARI                =   1  )
+                   IF  WRK-DENPNUM-END(IDX3)  =   SYU-DENPNUM
+                         MOVE   1    TO   FLG-ARI
+                   END-IF
+               END-PERFORM
+      *
+               IF   SYU-DENPJTIKBN  NOT =   "3"
+               AND  FLG-ARI             =   ZERO
+                  INITIALIZE                   LNK-ORCSSAIKEISAN-REC
+      *
+                  MOVE     SYU-HOSPNUM    TO   LNK-ORCSSKS-HOSPNUM
+                  MOVE     SYU-NYUGAIKBN  TO   LNK-ORCSSKS-NYUGAIKBN
+                  MOVE     SYU-PTID       TO   LNK-ORCSSKS-PTID
+                  MOVE     SYU-DENPNUM    TO   LNK-ORCSSKS-DENPNUM
+                  MOVE     SYU-SRYKA      TO   LNK-ORCSSKS-SRYKA
+                  MOVE     SYS-1039-IKTSORTKBN
+                                          TO   LNK-ORCSSKS-IKTSORTKBN
+                  MOVE     SYS-1039-IKTKEISANKBN
+                                          TO   LNK-ORCSSKS-IKTKEISANKBN
+                  IF   FLG-GENBUTU  =  1 OR 2
+                    MOVE     "1"          TO   LNK-ORCSSKS-IKTKEISANKBN
+                    MOVE     "1"          TO   LNK-ORCSSKS-IKTGENKEIFLG
+                  END-IF
+      *
+                  CALL    "ORCSSAIKEISAN"     USING
+                                              SPA-AREA
+                                              LNK-ORCSSAIKEISAN-REC
+      *
+                  PERFORM    VARYING   IDX3   FROM   1   BY   1
+                       UNTIL  (IDX3                          >   15 )
+                         OR   (LNK-ORCSSKS-DENPNUM-END(IDX3) =  ZERO)
+                      ADD    1     TO   IDX6
+                      MOVE   LNK-ORCSSKS-DENPNUM-END(IDX3)
+                                   TO   WRK-DENPNUM-END(IDX6)
+                  END-PERFORM
+      *
+               END-IF
+      *
+               MOVE    WRK-IKT-TABLE       TO  WRK-TABLE
+               MOVE    WRK-IKT-PATHNAME    TO  WRK-PATHNAME
+               PERFORM 900-SYUNOU-FET-SEC
+      *
+               IF    SPA-ERRCD   NOT =  SPACE
+                   MOVE    1           TO  FLG-SYUNOU
+               END-IF
+      *
+           END-PERFORM
+      *
+           MOVE    WRK-IKT-TABLE       TO  MCP-TABLE
+           MOVE    WRK-IKT-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       4402-IKATUSAIKEI-HENSYU-EXT.
+           EXIT.
+      *
       **************************************************************
       *    返金処理
       **************************************************************
