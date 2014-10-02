@@ -567,6 +567,13 @@
                05  WRK-CHK-SRYYR           PIC 9(04).
                05  WRK-CHK-SRYMR           PIC 9(02).
       *
+      *    入院会計カレンダーチェック用
+           03  WRK-CHK2-SRYYM              PIC X(06).
+           03  WRK-CHK2-SRYYMR     REDEFINES  WRK-CHK2-SRYYM.
+               05  WRK-CHK2-SRYYR          PIC 9(04).
+               05  WRK-CHK2-SRYMR          PIC 9(02).
+           03  WRK-CHK2-FLG                PIC 9(01).
+      *
       *    出生児体重
            03  WRK-WEIGHT                  PIC 9(04).
       *
@@ -3712,6 +3719,160 @@
                INTO    SPA-GMN-I01-LBLINFO
                END-STRING
            END-IF
+      *
+      *    療養病棟で特定入院料算定時に、上限日数超えで療養病棟入院料の
+      *    算定が行われていない場合の注意メッセージ表示
+      *    １．最終入院履歴から入院病棟が療養病棟であるか判定
+      *    ２．入院会計テーブルの作成済最終月から剤識別区分１（入院料）
+      *        のデータを取得（剤識別区分１は複数あり）
+      *    ３．該当月の最終日カレンダーに１が記録されていない場合、
+      *        エラーメッセージのセット
+      *    注意：入退院登録画面で「１入院料を算定しない」に設定されている
+      *          場合は、エラーメッセージを表示しない
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-NAI-I01-PTID    TO  PTNYUINRRK-PTID
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+      *
+      *     入院中患者の療養病棟（病床）の判定
+      *    （最終入院履歴が歴作成した自院歴、他院歴の場合は処理しない）
+            IF   PTNYUINRRK-JTIKBN   =    "5"   OR  "6"
+                 CONTINUE
+            ELSE
+      *       （入退院登録画面で入院料を算定する設定時のみ）
+              IF   (PTNYUINRRK-TAIINYMD    =   "99999999")   AND
+                   (PTNYUINRRK-NYUCALKBN   =   "2")
+                INITIALIZE                      SYS-5001-REC
+                MOVE    "5001"              TO  SYS-5001-KANRICD
+                MOVE    PTNYUINRRK-BTUNUM   TO  SYS-5001-KBNCD
+                MOVE    PTNYUINRRK-TENNYUYMD
+                                            TO  SYS-5001-STYUKYMD (1:6)
+                MOVE    "01"                TO  SYS-5001-STYUKYMD (7:2)
+                MOVE    SYS-5001-STYUKYMD   TO  SYS-5001-EDYUKYMD
+                MOVE    SPA-HOSPNUM         TO  SYS-5001-HOSPNUM
+                MOVE    SYS-5001-REC        TO  MCPDATA-REC
+                MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                MOVE    "key10"             TO  MCP-PATHNAME
+                PERFORM 910-DBSELECT-SEC
+                IF      MCP-RC              =   ZERO
+                   MOVE  MCPDATA-REC   TO  SYS-5001-REC
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key10"             TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+      *            最終入院履歴が療養病棟（病床）の時、特定入院料で
+      *            あるか判定を行い、そうであれば入院会計の参照して
+      *            会計最終日のカレンダーに１が立っているかをチェック
+                   IF    SYS-5001-BTU-SBT    =   "04"  OR  "09"
+                     INITIALIZE              ORCSTOKNYUIN-AREA
+                     MOVE    PTNYUINRRK-TOKUTEI-KBN
+                                           TO  LNK-TOKNYUIN-KBN
+                     MOVE    PTNYUINRRK-TOKUTEI-NYUIN
+                                           TO  LNK-TOKNYUIN-NYUIN
+                     MOVE    PTNYUINRRK-BTUNUM
+                                           TO  LNK-TOKNYUIN-BTUNUM
+                     MOVE    PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                       TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+                     MOVE    PTNYUINRRK-TENNYUYMD
+                                           TO  LNK-TOKNYUIN-SANTEIYM
+                     CALL    "ORCSTOKNYUIN"  USING ORCSTOKNYUIN-AREA
+                                                   SPA-AREA
+                     IF      LNK-TOKNYUIN-RC    =   ZERO
+                       IF    LNK-TOKNYUIN-SRYCD   NOT =  SPACE
+      *                    点数マスタを参照し、特定入院料か判定
+                           INITIALIZE                TNS-TENSU-REC
+                           MOVE   SPA-HOSPNUM    TO  TNS-HOSPNUM
+                           MOVE   LNK-TOKNYUIN-SRYCD
+                                                 TO  TNS-SRYCD
+                           MOVE   PTNYUINRRK-TENNYUYMD
+                                                 TO  TNS-YUKOSTYMD
+                                                     TNS-YUKOEDYMD
+                           MOVE   TNS-TENSU-REC  TO  MCPDATA-REC
+                           MOVE   "tbl_tensu"    TO  MCP-TABLE
+                           MOVE   "key"          TO  MCP-PATHNAME
+                           PERFORM 910-DBSELECT-SEC
+                           IF      MCP-RC        =   ZERO
+                             MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+                             IF   TNS-NYUTENTTLKBN   =   920
+      *                        短期滞在はチェック対象外
+                               IF  TNS-NYUKHNKSNKBN  =  226  OR 240
+                                 CONTINUE
+                               ELSE
+      *                          入院会計を検索
+                                 INITIALIZE               NYUINACCT-REC
+                                 MOVE  SPA-HOSPNUM    TO  NACCT-HOSPNUM
+                                 MOVE  "1"            TO
+                                                         NACCT-NYUGAIKBN
+                                 MOVE  SPA-NAI-I01-PTID
+                                                      TO NACCT-PTID
+                                 MOVE  NYUINACCT-REC  TO  MCPDATA-REC
+                                 MOVE  "tbl_nyuinacct"
+                                                      TO  MCP-TABLE
+                                 MOVE  "key55"        TO  MCP-PATHNAME
+                                 PERFORM 910-NYUINACCT-SELECT-SEC
+                                 IF    FLG-NYUINACCT  =   ZERO
+                                   MOVE  "tbl_nyuinacct"
+                                                      TO  MCP-TABLE
+                                   MOVE  "key55"      TO  MCP-PATHNAME
+                                   PERFORM 910-NYUINACCT-READ-SEC
+                                   MOVE   NACCT-SRYYM TO  WRK-CHK2-SRYYM
+      *                            月末日を取得
+                                   INITIALIZE             STS-AREA-DAY
+                                   INITIALIZE             LNK-DAY7-AREA
+                                   MOVE  "71"         TO  LNK-DAY7-IRAI
+                                   MOVE  WRK-CHK2-SRYYM
+                                                      TO  LNK-DAY7-YM
+                                   CALL "ORCSDAY"    USING
+                                                     STS-AREA-DAY
+                                                     LNK-DAY7-AREA
+                                   MOVE  LNK-DAY7-KOYOMI
+                                                      TO  IDX-MATSUBI
+                                   MOVE  ZERO         TO  WRK-CHK2-FLG
+                                   PERFORM UNTIL
+                                          (FLG-NYUINACCT =  1)  OR
+                                          (NACCT-SRYYM   NOT = 
+                                                        WRK-CHK2-SRYYM)
+                                      IF   NACCT-DAY(IDX-MATSUBI)
+                                                      NOT =   ZERO
+                                           MOVE  1    TO   WRK-CHK2-FLG
+                                      END-IF
+                                      MOVE    "tbl_nyuinacct"
+                                                      TO  MCP-TABLE
+                                      MOVE    "key55" TO  MCP-PATHNAME
+                                      PERFORM 910-NYUINACCT-READ-SEC
+                                   END-PERFORM
+      *
+                                   IF    WRK-CHK2-FLG   =   ZERO
+                                     MOVE  SPACE TO  SPA-GMN-I01-LBLINFO
+             MOVE "特定入院料上限日数以降の異動処理を行ってください"
+                                                 TO  SPA-GMN-I01-LBLINFO
+                                   END-IF
+                                 END-IF
+                                 MOVE    "tbl_nyuinacct"
+                                                      TO  MCP-TABLE
+                                 MOVE    "key55"      TO  MCP-PATHNAME
+                                 PERFORM 910-DBCLOSECURSOR-SEC
+                               END-IF
+                             END-IF
+                           END-IF
+                           MOVE    "tbl_tensu"      TO  MCP-TABLE
+                           MOVE    "key"            TO  MCP-PATHNAME
+                           PERFORM 910-DBCLOSECURSOR-SEC
+                       END-IF
+                     END-IF
+                   END-IF
+                END-IF
+              END-IF
+            END-IF
+           END-IF
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
       *
       *    入院履歴編集処理
            PERFORM 4101-NYUREKI-EDIT-SEC

@@ -1027,3 +1027,34 @@ path	key53	{
 		;
 	};
 };
+
+path	key54 	{
+	DBSELECT	{
+		DECLARE tbl_nyuinacct_key54_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuinacct
+			WHERE   HOSPNUM     =   :HOSPNUM
+			AND     NYUGAIKBN   =   :NYUGAIKBN
+			AND     PTID        =   :PTID
+			AND     ZAISKBKBN   =   :ZAISKBKBN
+			ORDER  BY   SRYYM   DESC
+		;
+	};
+};
+
+path	key55 	{
+	DBSELECT	{
+		DECLARE tbl_nyuinacct_key55_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuinacct
+			WHERE   HOSPNUM      =   :HOSPNUM
+			AND     NYUGAIKBN   =   :NYUGAIKBN
+			AND     PTID        =   :PTID
+                        AND     ZAISKBKBN   =   '1'
+                        AND     SRYCDTOTAL  <>   99999916
+			AND     ZAIKAISU    >    0 
+			ORDER  BY   SRYYM   DESC
+		;
+	};
+};
+
