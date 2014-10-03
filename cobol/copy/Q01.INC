@@ -23,9 +23,9 @@
               04  Q01-B06-LABEL                PIC X(10).
               04  Q01-B07-LABEL                PIC X(10).
               04  Q01-CMB-SELPATTERN.
-                05  Q01-SELPATTERN             PIC X(33).
+                05  Q01-SELPATTERN             PIC X(103).
                 05  Q01-CMB-SELPATTERN-COUNT   PIC S9(9)   BINARY.
-                05  Q01-CMB-SELPATTERN-ITEM    PIC X(33)   OCCURS  50.
+                05  Q01-CMB-SELPATTERN-ITEM    PIC X(103)  OCCURS  50.
               04  Q01-STSRYYMD                 PIC X(10).
               04  Q01-EDSRYYMD                 PIC X(10).
               04  Q01-LBLSENISAKI              PIC X(40).
@@ -59,7 +59,11 @@
                     07  Q01-DEATH              PIC         X(10).
                     07  Q01-CMB-DEATH-COUNT    PIC S9(9)   BINARY.
                     07  Q01-CMB-DEATH-ITEM     PIC X(10)   OCCURS  2.
-                  06  Q01-CHKTSTPT             PIC X.
+                  06  Q01-LBLTSTPT             PIC         X(20).
+                  06  Q01-CMB-TSTPT.
+                    07  Q01-TSTPT              PIC         X(32).
+                    07  Q01-CMB-TSTPT-COUNT    PIC S9(9)   BINARY.
+                    07  Q01-CMB-TSTPT-ITEM     PIC X(32)   OCCURS 5.
                   06  Q01-POST-TBL.
                     07  Q01-POST               PIC X(07)   OCCURS 5.
                   06  Q01-JYUSHO-TBL.

@@ -2215,10 +2215,16 @@
       *****************************************************************
        500-GMNHEN-SEC                  SECTION.
       *
+           MOVE    Q02-KEKKALST-ROW       TO  WRK-KEKKALST-ROW
+      *
+           MOVE    SPACE                   TO  Q02
+           INITIALIZE                          Q02
+      *
            IF    ( FLG-GMN-INIT            =   1 )
                MOVE    ZERO                TO  Q02-KEKKALST-ROW
                MOVE    ZERO                TO  Q02-KEKKALST-ROWATTR
            ELSE
+               MOVE    WRK-KEKKALST-ROW    TO  Q02-KEKKALST-ROW
                MOVE    ZERO                TO  Q02-KEKKALST-ROWATTR
            END-IF
       *

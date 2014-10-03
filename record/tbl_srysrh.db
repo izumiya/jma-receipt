@@ -58,7 +58,15 @@ path	del1 	{
 	};
 };
 
-path	ins1 	{
+path    key     {
+        DBSELECT        {
+                DECLARE tbl_srysrh_key_csr CURSOR FOR
+                :SQL
+                ;
+        };
+};
+
+path	ins1_1 	{
 	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
@@ -166,8 +174,11 @@ path	ins1 	{
 	      SRYCD5
 	     ))
 	    )
-	;
-	
+		;
+	};
+};
+path	ins1_2 	{
+	DBUPDATE	{
 	UPDATE TBL_SRYSRH
 	SET    HKNCOMBINUM = A.HKNCOMBI,
 	       HOKATSUKBN  = A.JIHOKBN
@@ -176,7 +187,10 @@ path	ins1 	{
 	 AND   TBL_SRYSRH.PTID    = A.PTID
 	 AND   TBL_SRYSRH.ZAINUM  = A.ZAINUM
 	;
-	
+	};
+};
+path	ins1_3	{
+	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
 	       HOSPNUM,
@@ -245,7 +259,7 @@ path	ins1 	{
 	};
 };
 
-path	ins2 	{
+path	ins2_1 	{
 	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
@@ -384,7 +398,11 @@ path	ins2 	{
 	     ))
 	    )
      ;
+	};
+};
 
+path	ins2_2 	{
+	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
 	       HOSPNUM,
@@ -462,7 +480,7 @@ path	ins2 	{
 };
 
 #-----> 診療区分、診療種別のみでの検索
-path	ins3 	{
+path	ins3_1 	{
 	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
@@ -511,7 +529,10 @@ path	ins3 	{
          AND A.SRYKBN LIKE :SRYKBN
          AND A.SRYSYUKBN LIKE :SRYSYUKBN
 	;
-
+	};
+};
+path	ins3_2 	{
+	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
 	       HOSPNUM,
@@ -561,7 +582,7 @@ path	ins3 	{
 };
 
 #-----> 診療区分、診療種別のみでの検索
-path	ins4 	{
+path	ins4_1 	{
 	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
@@ -639,7 +660,10 @@ path	ins4 	{
            B.ZAINUM14 ,
            B.ZAINUM15 )
      ;
-
+	};
+};
+path	ins4_2	{
+	DBINSERT	{
 	INSERT INTO TBL_SRYSRH
 	    ( 
 	       HOSPNUM,
@@ -695,12 +719,3 @@ path	ins4 	{
 	;
 	};
 };
-
-path    key     {
-        DBSELECT        {
-                DECLARE tbl_srysrh_key_csr CURSOR FOR
-                :SQL
-                ;
-        };
-};
-

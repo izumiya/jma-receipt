@@ -1357,6 +1357,8 @@
       *****************************************************************
        900-RRKSRH-INS1-SEC             SECTION.
       *
+           DISPLAY "RRKSRH-INS1"
+      *
            PERFORM 900-RRKSRH-DEL1-SEC
       *
            INITIALIZE                  RRKSRH-REC
@@ -1371,7 +1373,12 @@
            MOVE    SEL-UPHMS    TO  RRKSRH-UPHMS
            MOVE    RRKSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_rrksrh"    TO  MCP-TABLE
-           MOVE    "ins1"          TO  MCP-PATHNAME
+           MOVE    "ins1_1"        TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           MOVE    RRKSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_rrksrh"    TO  MCP-TABLE
+           MOVE    "ins1_2"        TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
            .
@@ -1403,7 +1410,17 @@
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
-           MOVE    "ins1"          TO  MCP-PATHNAME
+           MOVE    "ins1_1"        TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins1_2"        TO  MCP-PATHNAME
+           PERFORM 910-DBUPDATE-SEC
+      *
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins1_3"        TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
            .
@@ -1419,7 +1436,12 @@
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
-           MOVE    "ins2"          TO  MCP-PATHNAME
+           MOVE    "ins2_1"        TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins2_2"        TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
            .
@@ -1435,7 +1457,12 @@
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
-           MOVE    "ins3"          TO  MCP-PATHNAME
+           MOVE    "ins3_1"        TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins3_2"        TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
            .
@@ -1451,7 +1478,12 @@
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
-           MOVE    "ins4"          TO  MCP-PATHNAME
+           MOVE    "ins4_1"        TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "ins4_2"        TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
            .

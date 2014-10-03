@@ -65,7 +65,7 @@
                            11  SPA-GMN-Q01-SELPATTERNFL
                                                        PIC X(01).
                            11  SPA-GMN-Q01-SELPATTERNMEI
-                                                       PIC X(30).
+                                                       PIC X(100).
       *
       *                診療年月日開始日
                        09  SPA-GMN-Q01-STSRYYMD        PIC X(10).
@@ -122,8 +122,12 @@
                                13  SPA-GMN-Q01-DEATHFL PIC X(01).
                                13  SPA-GMN-Q01-DEATHMEI
                                                        PIC X(08).
-      *                    テスト患者チェックボタン
-                           11  SPA-GMN-Q01-CHKTSTPT    PIC X.
+      *                    テスト患者
+                           11  SPA-GMN-Q01-TSTPT-G.
+                               13  SPA-GMN-Q01-TSTPT   PIC X(01).
+                               13  SPA-GMN-Q01-TSTPTFL PIC X(01).
+                               13  SPA-GMN-Q01-TSTPTMEI
+                                                       PIC X(30).
       *                    郵便番号
                            11  SPA-GMN-Q01-POSTTBL.
                                13  SPA-GMN-Q01-POST    PIC X(07)
@@ -556,7 +560,7 @@
                               13  SPA-GMN-Q01-SELPATTERNFLL
                                                            PIC X(01).
                               13  SPA-GMN-Q01-SELPATTERNMEIL
-                                                           PIC X(30).
+                                                           PIC X(100).
                        09  SPA-GMN-Q01-SEXLST-G.
                            11  SPA-GMN-Q01-SEXLST-MAX      PIC 9(05).
                            11  SPA-GMN-Q01-SEXLST          OCCURS  3.
@@ -584,6 +588,12 @@
                                13  SPA-GMN-Q01-DEATHL      PIC X(01).
                                13  SPA-GMN-Q01-DEATHFLL    PIC X(01).
                                13  SPA-GMN-Q01-DEATHMEIL   PIC X(08).
+                       09  SPA-GMN-Q01-TSTPTLST-G.
+                           11  SPA-GMN-Q01-TSTPTLST-MAX    PIC 9(05).
+                           11  SPA-GMN-Q01-TSTPTLST        OCCURS  10.
+                               13  SPA-GMN-Q01-TSTPTL      PIC X(01).
+                               13  SPA-GMN-Q01-TSTPTFLL    PIC X(01).
+                               13  SPA-GMN-Q01-TSTPTMEIL   PIC X(30).
                        09  SPA-GMN-Q01-CONDITION1LST-G.
                            11  SPA-GMN-Q01-CONDITION1LST-MAX
                                                            PIC 9(05).
@@ -998,7 +1008,7 @@
                05  SPA-Q04-AREA.
                    07  SPA-GMN-Q04-CUR                 PIC 9(03).
                    07  SPA-GMN-Q04-AREA.
-                       09  SPA-GMN-Q04-NAME            PIC X(30).
+                       09  SPA-GMN-Q04-NAME            PIC X(100).
                        09  SPA-GMN-Q04-TITLEKBN        PIC X(01).
       *
       *
@@ -1335,7 +1345,7 @@
                05  SPA-Q01-Q04-SENI-AREA.
                    07  SPA-Q01-Q04-UPDKBN              PIC  X(03).
                    07  SPA-Q01-Q04-UID                 PIC  X(36).
-                   07  SPA-Q01-Q04-NAME                PIC  X(30).
+                   07  SPA-Q01-Q04-NAME                PIC  X(100).
                    07  SPA-Q01-Q04-TITLEKBN            PIC  X(01).
       *
       *        Q02←→Q03遷移情報

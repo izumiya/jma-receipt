@@ -33,7 +33,7 @@ path	del1 	{
 	};
 };
 
-path	ins1 	{
+path	ins1_1 	{
 	DBINSERT	{
 	INSERT INTO TBL_RRKSRH
 	( 
@@ -65,7 +65,11 @@ path	ins1 	{
           AND SRYYMD >= :STSRYYMD
           AND SRYYMD <= :EDSRYYMD
      ;
+	};
+};
 
+path	ins1_2 	{
+	DBINSERT	{
 	INSERT INTO TBL_RRKSRH
 	( 
               HOSPNUM,

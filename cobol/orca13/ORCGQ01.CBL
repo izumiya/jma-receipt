@@ -197,7 +197,7 @@
            03  WRK-SELPATTERN-G.
                05  WRK-SELPATTERN       PIC 9(02).
                05  WRK-SELPATTERNFL     PIC X(01).
-               05  WRK-SELPATTERNMEI    PIC X(30).
+               05  WRK-SELPATTERNMEI    PIC X(100).
            03  WRK-RENNUM               PIC 9(05).
            03  WRK-UID                  PIC X(36).
            03  WRK-CMB-CD                          PIC X(50).
@@ -745,8 +745,8 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
-           MOVE    SPACE               TO  SPA-Q01
-           INITIALIZE                      SPA-Q01
+           MOVE    SPACE               TO  SPA-Q01FREE
+           INITIALIZE                      SPA-Q01FREE
       *
            MOVE    SPACE               TO  SPA-Q01KYOUTU
            INITIALIZE                      SPA-Q01KYOUTU
@@ -758,9 +758,6 @@
            MOVE    SPA-SYSYMDWH        TO  SPA-GMN-Q01-KJYNYMD
       *    基準日開始日西暦
            MOVE    SPA-SYSYMD          TO  SPA-NAI-Q01-KJYNYMD
-      *
-      *    テスト患者チェックボックス
-           MOVE   "F"                  TO  SPA-GMN-Q01-CHKTSTPT
       *
       *    性別コンボ初期処理
            PERFORM 3101-SEX-CMB-SYOKI-SEC
@@ -778,6 +775,11 @@
       *
       *    死亡コンボ初期処理
            PERFORM 3101-DEATH-CMB-SYOKI-SEC
+      *
+      *    テスト患者コンボ初期処理
+           PERFORM 3101-TSTPT-CMB-SYOKI-SEC
+           MOVE    SPA-GMN-Q01-TSTPTLST (1)
+                                       TO  SPA-GMN-Q01-TSTPT-G
       *
       *    状態１コンボ初期処理
            PERFORM 3101-CONDITION1-CMB-SYOKI-SEC
@@ -1059,6 +1061,27 @@
       *
            .
        3101-DEATH-CMB-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    テスト患者コンボボックス初期処理
+      *****************************************************************
+       3101-TSTPT-CMB-SYOKI-SEC        SECTION.
+      *
+           INITIALIZE                      SPA-GMN-Q01-TSTPTLST-G
+      *
+           MOVE    3                   TO  SPA-GMN-Q01-TSTPTLST-MAX
+      *
+           MOVE    "a"                 TO  SPA-GMN-Q01-TSTPTL    (1)
+           MOVE    "テスト患者を除く"  TO  SPA-GMN-Q01-TSTPTMEIL (1)
+      *
+           MOVE    "b"                 TO  SPA-GMN-Q01-TSTPTL    (2)
+           MOVE    "テスト患者を含める" TO SPA-GMN-Q01-TSTPTMEIL (2)
+      *
+           MOVE    "1"                 TO  SPA-GMN-Q01-TSTPTL    (3)
+           MOVE    "テスト患者のみ"    TO  SPA-GMN-Q01-TSTPTMEIL (3)
+      *
+           .
+       3101-TSTPT-CMB-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    状態１コンボ初期処理
@@ -2114,9 +2137,6 @@
       *    検索
            WHEN    "CLICKED"           ALSO    "B12"
                PERFORM 490-KENSAKU-SEC
-      *    テスト患者チェックボタン
-           WHEN    "CLICKED"           ALSO    "CHKTSTPT"
-               PERFORM 410-CHKTSTPT-SET-SEC
       *    住所ボタン
            WHEN    "CLICKED"           ALSO    "JYUSHOBT1"
            WHEN    "CLICKED"           ALSO    "JYUSHOBT2"
@@ -2360,6 +2380,8 @@
            MOVE    Q01-SRYKA               TO  SPA-GMN-Q01-SRYKA-G
       *    死亡
            MOVE    Q01-DEATH               TO  SPA-GMN-Q01-DEATH-G
+      *    テスト患者
+           MOVE    Q01-TSTPT               TO  SPA-GMN-Q01-TSTPT-G
       *    開始患者番号
            MOVE    Q01-STPTNUM             TO  SPA-GMN-Q01-STPTNUM
       *    終了患者番号
@@ -2632,6 +2654,12 @@
       *
       *    死亡チェック
            PERFORM 4117-DEATH-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4101-KHN-INPUT-CHK-EXT
+           END-IF
+      *
+      *    テスト患者チェック
+           PERFORM 4117-TSTPT-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4101-KHN-INPUT-CHK-EXT
            END-IF
@@ -3470,6 +3498,37 @@
       *
            .
        4117-DEATH-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    テスト患者チェック
+      *****************************************************************
+       4117-TSTPT-CHK-SEC      SECTION.
+      *
+           IF    ( SPA-GMN-Q01-TSTPT-G     =   SPACE )
+               MOVE    SPA-GMN-Q01-TSTPTLST (1)
+                                           TO  SPA-GMN-Q01-TSTPT-G
+           ELSE
+      *
+               PERFORM VARYING IDX2    FROM    1   BY  1
+                       UNTIL ( IDX2    >   SPA-GMN-Q01-TSTPTLST-MAX )
+                          OR ( SPA-GMN-Q01-TSTPT
+                                       =   SPA-GMN-Q01-TSTPTL (IDX2))
+      *
+                   CONTINUE
+      *
+               END-PERFORM
+      *
+               IF    ( IDX2            <=  SPA-GMN-Q01-TSTPTLST-MAX )
+                   MOVE    SPA-GMN-Q01-TSTPTLST (IDX2)
+                                           TO  SPA-GMN-Q01-TSTPT-G
+               ELSE
+                   MOVE    "0149"          TO  SPA-ERRCD
+                   MOVE    165             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           .
+       4117-TSTPT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6648,20 +6707,6 @@
        4200-JKNSRYACTLST-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    テスト患者チェックボタン編集処理
-      *****************************************************************
-       410-CHKTSTPT-SET-SEC              SECTION.
-      *
-      *    画面ＳＰＡ編集処理
-           PERFORM 4101-GMN-SPA-SET-SEC
-      *
-           MOVE    Q01-CHKTSTPT    TO  SPA-GMN-Q01-CHKTSTPT
-      *
-           .
-      *
-       410-CHKTSTPT-SET-EXT.
-           EXIT.
-      *****************************************************************
       *    住所編集処理
       *****************************************************************
        410-JYUSHO-SET-SEC              SECTION.
@@ -7338,7 +7383,9 @@
       *        電話番号コンボ
                MOVE    SPA-GMN-Q01-TEL-TOLST (1)
                                    TO  SPA-GMN-Q01-TEL-TO-G
-               MOVE    "F"         TO  SPA-GMN-Q01-CHKTSTPT
+      *        テスト患者コンボボックス
+               MOVE    SPA-GMN-Q01-TSTPTLST (1)
+                                   TO  SPA-GMN-Q01-TSTPT-G
       *
       *        コメント選択コンボ
                MOVE    SPA-GMN-Q01-SELCOMMENTLST (1)
@@ -8093,7 +8140,7 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-EDPTNUM
       *
-           MOVE    SPA-GMN-Q01-CHKTSTPT    TO  PTSRH-DBSTR
+           MOVE    SPA-GMN-Q01-TSTPT TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-CHKTSTPT
       *
@@ -8777,6 +8824,7 @@
             OR ( SPA-Q01-SEX               NOT =   SPACE )
             OR ( SPA-Q01-TEL-G             NOT =   SPACE )
             OR ( SPA-Q01-DEATH             NOT =   SPACE )
+            OR ( SPA-Q01-CHKTSTPT              =   "1"  )
       *
                MOVE    "1"                 TO  SPA-Q01-GPTINF
       *
@@ -9160,8 +9208,17 @@
            MOVE    SPA-GMN-Q01-STPTNUM     TO  Q01-STPTNUM
       *    終了患者番号
            MOVE    SPA-GMN-Q01-EDPTNUM     TO  Q01-EDPTNUM
-      *    テスト患者チェックボタン
-           MOVE    SPA-GMN-Q01-CHKTSTPT    TO  Q01-CHKTSTPT
+      *    テスト患者
+           MOVE    SPA-GMN-Q01-TSTPT-G     TO  Q01-TSTPT
+           MOVE    SPA-GMN-Q01-TSTPTLST-MAX
+                                           TO  Q01-CMB-TSTPT-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   SPA-GMN-Q01-TSTPTLST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-TSTPTLST (IDX1)
+                           TO  Q01-CMB-TSTPT-ITEM (IDX1)
+      *
+           END-PERFORM
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL   IDX1    >       5
@@ -9855,6 +9912,8 @@
                                                Q01-CMB-SRYSYUKBN-STATE
            END-IF
       *
+           MOVE    "テスト患者"            TO  Q01-LBLTSTPT
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
@@ -10015,6 +10074,8 @@
                MOVE  "SAIGAIKBN"   TO  MCP-WIDGET
            WHEN   164
                MOVE  "TENKENRECE"  TO  MCP-WIDGET
+           WHEN   165
+               MOVE  "TSTPT"       TO  MCP-WIDGET
       *
       *    保険・公費タブ
            WHEN   201
@@ -10277,6 +10338,8 @@
            WHEN   "STPTNUM"
                MOVE  111           TO  SPA-GMN-Q01-CUR
            WHEN   "EDPTNUM"
+               MOVE  165           TO  SPA-GMN-Q01-CUR
+           WHEN   "TSTPT"
                MOVE  127           TO  SPA-GMN-Q01-CUR
            WHEN   "POST1"
                MOVE  113           TO  SPA-GMN-Q01-CUR
@@ -10811,6 +10874,9 @@
            WHEN    "0148"
                MOVE    "包括分入力エラー"
                                        TO  SPA-ERRMSG
+           WHEN    "0149"
+               MOVE    "テスト患者入力エラー"
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "開始診療年月日＞終了診療年月日となっています"
                                        TO  SPA-ERRMSG
@@ -11053,14 +11119,16 @@
            WHEN    SHKITEMID-EDPTNUM
                MOVE    SHODATA-ITEM    TO  Q01-EDPTNUM
                MOVE    1               TO  FLG-PAGENO-00
+           WHEN    SHKITEMID-TSTPT
+               MOVE    SHODATA-ITEM    TO  Q01-TSTPT
+               MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-CHKTSTPT
                IF    ( SHODATA-ITEM        =   "1" )
-                   MOVE    "T"         TO  Q01-CHKTSTPT
-                                           SPA-GMN-Q01-CHKTSTPT
+                   MOVE    "b"         TO  Q01-TSTPT
                ELSE
-                   MOVE    "F"         TO  Q01-CHKTSTPT
-                                           SPA-GMN-Q01-CHKTSTPT
+                   MOVE    "a"         TO  Q01-TSTPT
                END-IF
+               MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-POST01
                MOVE    SHODATA-ITEM    TO  Q01-POST (1)
                MOVE    1               TO  FLG-PAGENO-00
@@ -11786,15 +11854,17 @@
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
       *
-           IF    ( SPA-GMN-Q01-CHKTSTPT    =   "T" )
-               MOVE    SHKITEMID-CHKTSTPT
+           IF    ( SPA-GMN-Q01-TSTPT       NOT =   SPACE )
+               MOVE    SHKITEMID-TSTPT
                                    TO  SHODATA-ITEMID
-               MOVE    "1"         TO  SHODATA-ITEM
+               MOVE    SPA-GMN-Q01-TSTPT
+                                   TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            ELSE
-               MOVE    SHKITEMID-CHKTSTPT
+               MOVE    SHKITEMID-TSTPT
                                    TO  SHODATA-ITEMID
-               MOVE    "0"         TO  SHODATA-ITEM
+               MOVE    SPA-GMN-Q01-TSTPTL (1)
+                                   TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
       *

@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -379,10 +379,10 @@
         <y>8</y>
         <width>720</width>
         <height>24</height>
-        <sensitive>True</sensitive>
         <can_focus>True</can_focus>
-        <has_focus>False</has_focus>
         <editable>True</editable>
+        <text_visible>True</text_visible>
+        <text_max_length>100</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>True</xim_enabled>
@@ -408,6 +408,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>True</editable>
+        <text_max_length>100</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>True</xim_enabled>
@@ -433,6 +434,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>True</editable>
+        <text_max_length>100</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>True</xim_enabled>
