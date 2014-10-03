@@ -1760,6 +1760,8 @@
       *H26.10
                                        WHEN   "293"
                                        WHEN   "294"
+                                       WHEN   "296"
+                                       WHEN   "297"
                                        WHEN   "   "
                                           PERFORM  44021-YAKUZAI-SET-SEC
                                    END-EVALUATE       
@@ -1771,6 +1773,7 @@
                                        WHEN   "291"
       *H26.10
                                        WHEN   "294"
+                                       WHEN   "297"
                                           PERFORM  44021-YAKUZAI-SET-SEC
                                    END-EVALUATE       
                           END-EVALUATE

@@ -1188,7 +1188,6 @@
                  07  WRK-SYUNOU-CYOKI-HKNCOMBINUM        PIC  X(04).
                  07  WRK-SYUNOU-CYOKI-KOHFLG             PIC  9(01).
                  07  WRK-SYUNOU-CYOKI-TEKSTYMD           PIC  X(08).
-             05  WRK-SYUNOU-CYOKI-HKNNUM                 PIC  X(03).
              05  WRK-SYUNOU-CYOKI-FTNMONEY               PIC  9(07).
              05  WRK-SYUNOU-CYOKI-FTNMONEY2              PIC  9(07).
              05  WRK-SYUNOU-CYOKI-TEKSTYMD-XXX           PIC  X(08).
@@ -9867,7 +9866,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
                         IF   SRY-SRYSYUKBN  =  "212" OR "292" OR
                                                "222" OR "232" OR
-                                               "295"
+                                               "295" OR "298"
                           IF   RECE04-TOYAKUFLG = SPACE
                             MOVE   "2"    TO    RECE04-TOYAKUFLG
                           END-IF
@@ -15041,8 +15040,6 @@ grpsys           PERFORM 900-DBSELECT-SEC
            AND  (SYU-KOH-HKNNUM(3) =  SPACE         )
            AND  (SYU-KOH-HKNNUM(4) =  SPACE         )
              MOVE  1  TO   WRK-SYUNOU-CYOKI-KOHFLG(IDX1)
-             MOVE  SYU-KOH-HKNNUM(1)
-                      TO   WRK-SYUNOU-CYOKI-HKNNUM
       *
              COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                  * 10
@@ -15068,17 +15065,18 @@ grpsys           PERFORM 900-DBSELECT-SEC
              END-IF
            ELSE
              MOVE  2  TO   WRK-SYUNOU-CYOKI-KOHFLG(IDX1)
+             MOVE  9999999           TO  FTN-CYOKI-XX2
            END-IF
       *
-           IF  FTN-CYOKI-XX2  >  WRK-KINGAKU
-             MOVE  WRK-KINGAKU   TO  FTN-CYOKI-XX2
-           END-IF
-           COMPUTE FTN-CYOKI-YY2 = WRK-KINGAKU - FTN-CYOKI-XX2
-           IF  WRK-FTNKEI     >  FTN-CYOKI-YY2
-             ADD  FTN-CYOKI-YY2  TO  FTN-CYOKI-XX2
-           ELSE
-             ADD  WRK-FTNKEI     TO  FTN-CYOKI-XX2
-           END-IF
+      ***  IF  FTN-CYOKI-XX2  >  WRK-KINGAKU
+      ***    MOVE  WRK-KINGAKU   TO  FTN-CYOKI-XX2
+      ***  END-IF
+      ***  COMPUTE FTN-CYOKI-YY2 = WRK-KINGAKU - FTN-CYOKI-XX2
+      ***  IF  WRK-FTNKEI     >  FTN-CYOKI-YY2
+      ***    ADD  FTN-CYOKI-YY2  TO  FTN-CYOKI-XX2
+      ***  ELSE
+      ***    ADD  WRK-FTNKEI     TO  FTN-CYOKI-XX2
+      ***  END-IF
       *
            .
        211TX1-CYOKI-HENSYU1-EXT.

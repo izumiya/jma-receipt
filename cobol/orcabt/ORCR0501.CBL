@@ -40,6 +40,8 @@
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.02    NACL-藤原    13/08/20  ０９５９３で始まるコードの有
       *                                     無区分を追加
+      *  04.07.03    NACL-門脇    13/10/02  摘要欄の最終行まで記載してから
+      *                                     改ページするよう修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1982,54 +1984,89 @@
       *****************************************************************
        3410-RECE47-HENSYU-SEC           SECTION.
       *
-           IF  CNT-ZAIMEISAISU           =   1
+      ***  IF  CNT-ZAIMEISAISU           =   1
       *        次の行為明細数を追加すると何行になるか
-               COMPUTE   WRK-WLINETEK    =   WRK-LINETEK
-                                         +   RECE47-ZAIMEISAISU
-               IF  CNT-RECE47           >   1
+      ***      COMPUTE   WRK-WLINETEK    =   WRK-LINETEK
+      ***                                +   RECE47-ZAIMEISAISU
+      ***      IF  CNT-RECE47           >   1
       *            診療区分が変更している場合、診療区切り線分を追加
-                   IF  RECE47-SRYKBN    NOT =   WRK-R061-SRYKBN-O
-                       ADD     1             TO  WRK-WLINETEK
-                       MOVE    1             TO  FLG-KUGIRI
-                   END-IF
-               END-IF
+      ***          IF  RECE47-SRYKBN    NOT =   WRK-R061-SRYKBN-O
+      ***              ADD     1             TO  WRK-WLINETEK
+      ***              MOVE    1             TO  FLG-KUGIRI
+      ***          END-IF
+      ***      END-IF
       *
-               IF  WRK-WLINETEK          >         WRK-LINE-MAX
-
-                   PERFORM 34120-PAGE-SEC
+      ***      IF  WRK-WLINETEK          >         WRK-LINE-MAX
+      ***          PERFORM 34120-PAGE-SEC
       *
       *            区切り線
-                   IF  FLG-KUGIRI        =   2
-                       PERFORM 34110-KUGIRI-LINE-SEC
-                   END-IF
+      ***          IF  FLG-KUGIRI        =   2
+      ***              PERFORM 34110-KUGIRI-LINE-SEC
+      ***          END-IF
       *            診療区分
-                   ADD     1               TO  WRK-LINETEK
-                   IF      CNT-PAGE        =   1
-                       MOVE    RECE47-SRYKBN  TO  HCM69-SRYKBN
-                                                       (WRK-LINETEK)
-                   ELSE
-                       MOVE    RECE47-SRYKBN  TO  HC24-SRYKBN
-                                                       (WRK-LINETEK)
-                   END-IF                                    
-               ELSE
+      ***          ADD     1               TO  WRK-LINETEK
+      ***          IF      CNT-PAGE        =   1
+      ***              MOVE    RECE47-SRYKBN  TO  HCM69-SRYKBN
+      ***                                              (WRK-LINETEK)
+      ***          ELSE
+      ***              MOVE    RECE47-SRYKBN  TO  HC24-SRYKBN
+      ***                                              (WRK-LINETEK)
+      ***          END-IF                                    
+      ***      ELSE
       *            区切り線
-                   IF  FLG-KUGIRI    NOT =   ZERO
-                       PERFORM 34110-KUGIRI-LINE-SEC
-                   END-IF
+      ***          IF  FLG-KUGIRI    NOT =   ZERO
+      ***              PERFORM 34110-KUGIRI-LINE-SEC
+      ***          END-IF
       *            診療区分
-                   ADD     1             TO  WRK-LINETEK
-                   IF  RECE47-SRYKBN    NOT =   WRK-R061-SRYKBN-O
-                       IF      CNT-PAGE        =   1
-                           MOVE    RECE47-SRYKBN  TO  HCM69-SRYKBN
-                                                       (WRK-LINETEK)
-                       ELSE
-                           MOVE    RECE47-SRYKBN  TO  HC24-SRYKBN
-                                                       (WRK-LINETEK)
-                       END-IF                                    
-                   END-IF
-               END-IF
+      ***          ADD     1             TO  WRK-LINETEK
+      ***          IF  RECE47-SRYKBN    NOT =   WRK-R061-SRYKBN-O
+      ***              IF      CNT-PAGE        =   1
+      ***                  MOVE    RECE47-SRYKBN  TO  HCM69-SRYKBN
+      ***                                              (WRK-LINETEK)
+      ***              ELSE
+      ***                  MOVE    RECE47-SRYKBN  TO  HC24-SRYKBN
+      ***                                              (WRK-LINETEK)
+      ***              END-IF                                    
+      ***          END-IF
+      ***      END-IF
+      ***  ELSE
+      ***      ADD     1                 TO  WRK-LINETEK
+      ***  END-IF
+      *
+           IF  CNT-ZAIMEISAISU           =   1
+             IF  CNT-RECE47            >   1
+      *          診療区分が変更している場合、診療区切り線分を追加
+                 IF  RECE47-SRYKBN    NOT =   WRK-R061-SRYKBN-O
+                     MOVE    1             TO  FLG-KUGIRI
+                 END-IF
+             END-IF
+           END-IF
+      *
+           IF      WRK-LINETEK          >=   WRK-LINE-MAX
+             PERFORM 34120-PAGE-SEC
            ELSE
-               ADD     1                 TO  WRK-LINETEK
+      *      区切り線
+             IF      FLG-KUGIRI    NOT =   ZERO
+                 PERFORM 34110-KUGIRI-LINE-SEC
+             END-IF
+           END-IF
+      *
+      *    診療区分
+           IF      WRK-LINETEK          >=   WRK-LINE-MAX
+             PERFORM 34120-PAGE-SEC
+           END-IF
+      *
+           ADD     1                TO  WRK-LINETEK
+      *
+           IF   ( WRK-R061-SRYKBN-O  =   SPACE  )
+           OR   ( FLG-KUGIRI     NOT =   ZERO   )
+           OR   ((CNT-PAGE           >   1     ) AND
+                 (WRK-LINETEK        =   1     ))
+             IF      CNT-PAGE        =   1
+               MOVE  RECE47-SRYKBN  TO  HCM69-SRYKBN(WRK-LINETEK)
+             ELSE
+               MOVE  RECE47-SRYKBN  TO  HC24-SRYKBN(WRK-LINETEK)
+             END-IF
            END-IF
       *
       *    明細
