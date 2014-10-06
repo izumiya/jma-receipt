@@ -152,6 +152,8 @@
       *  04.07.07    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *  04.07.08    NACL-門脇    14/09/01  訪問診療にかかる記録書コメント対応
       *  04.07.09    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.10    NACL-門脇    14/10/06  第三者行為の複数診療科受診コメント
+      *                                     編集修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1837,7 +1839,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "key24"             TO  MCP-PATHNAME
                PERFORM   900-JYURRK-READ-SEC
                PERFORM   UNTIL   FLG-JYURRK   =    1
-                   IF    JYURRK-HKNKBN    =       "0"
+                   IF    JYURRK-HKNKBN    =    "0" OR "7"
                       MOVE   JYURRK-HKNCOMBINUM
                                        TO  WRK-HKNCOMBINUMX
                       IF  WRK-HKNCOMBINUM9  =  RECE02-HKNCOMBI(1) OR
