@@ -122,8 +122,10 @@
       *  04.07.03    NACL-門脇    14/05/08  053児童保護と地方公費の
       *                                     保険組合せ作成
       *  04.07.04    NACL-門脇    14/05/16  地公等の下船後の短縮制度名修正
-      *  04.07.05    NACL-門脇    13/08/04  更生と特定負無の保険組合せ作成
-      *  04.07.06    NACL-門脇    13/08/08  特定負有と特定負有の保険組合せ作成
+      *  04.07.05    NACL-門脇    14/08/04  更生と特定負無の保険組合せ作成
+      *  04.07.06    NACL-門脇    14/08/08  特定負有と特定負有の保険組合せ作成
+      *  04.07.07    NACL-門脇    14/10/07  011結核入院と地方公費の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -131,58 +133,10 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-      *    パラメタデータ
-      *    SELECT  PARA-FILE       ASSIGN  FILE-NAME1
-      *                            ORGANIZATION    IS  INDEXED
-      *                            ACCESS  MODE    IS  DYNAMIC
-      *                            RECORD  KEY     IS  PAR-KEY
-      *                            FILE    STATUS  IS  STS-PARA.
-      *
-      *    新組合せパラメタデータ
-      *    SELECT  NC01PARA-FILE   ASSIGN  FILE-NAME2
-      *                            ORGANIZATION    IS  INDEXED
-      *                            ACCESS  MODE    IS  DYNAMIC
-      *                            RECORD  KEY     IS  PARA-NC01-KEY
-      *                            FILE    STATUS  IS  STS-PARA.
-      *
-      *
        DATA                    DIVISION.
       *FILE                        SECTION.
       *
-      *    パラメタデータ
-      *FD  PARA-FILE.
-      *01  PARA-REC.
-      *    03  PAR-KEY.
-      *        05  PAR-FILEMEI         PIC X(08).
-      *        05  PAR-EDANUM          PIC 9(04).
-      *    03  PAR-DATA-REC            PIC X(3000).
-      *
-      *    新組合せパラメタデータ
-      *FD  NC01PARA-FILE.
-      *01  NC01PARA-REC.
-      *    03  PARA-NC01-KEY.
-      *        05  PARA-NC01-TERMID    PIC X(64).
-      *        05  PARA-NC01-EDANUM    PIC 9(04).
-      *    03  PARA-NC01-REC           PIC X(500).
-      ***  03  PARA-NC01-FLG           PIC 9(01).
-      *
        WORKING-STORAGE             SECTION.
-      *
-      *    パラメタファイル名
-      *01  FILE-NAME1.
-      *    03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
-      *    03  FILLER              PIC X(07)   VALUE   "P01PARA".
-      *    03  FILE-TERMID1        PIC X(64)   VALUE   SPACE.
-      *
-      *    パラメタファイル名
-      *01  FILE-NAME2.
-      *    03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
-      *    03  FILLER              PIC X(08)   VALUE   "NC01PARA".
-      *    03  FILE-TERMID2        PIC X(64)   VALUE   SPACE.
-      *
-      *    フラグ領域
-       01  STS-AREA.
-           03  STS-PARA            PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -4740,30 +4694,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            IF    FLG-HANTEI   =    1
-             IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                  (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "021"))
-             OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "021" )
-                IF  (WRK-GAI-KBN (1)         =   "2")  AND
-                    (WRK-GAI-KBN (2)         =   "2")  AND
-                    (WRK-GAI-KBN (3)         =   "2")  AND
-                    (WRK-NYU-KBN (1)         =   "0")  AND
-                    (WRK-NYU-KBN (2)         =   "0")  AND
-                    (WRK-NYU-KBN (3)         =   "0")
-                   MOVE    "3"            TO  WRK-FTN-FLG
-                END-IF
-             END-IF
-             IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                  (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "020"))
-             OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "020" )
-                IF  (WRK-GAI-KBN (1)         =   "0")  AND
-                    (WRK-GAI-KBN (2)         =   "0")  AND
-                    (WRK-GAI-KBN (3)         =   "0")  AND
-                    (WRK-NYU-KBN (1)         =   "2")  AND
-                    (WRK-NYU-KBN (2)         =   "2")  AND
-                    (WRK-NYU-KBN (3)         =   "2")
-                   MOVE    "3"            TO  WRK-FTN-FLG
-                END-IF
-             END-IF
              IF   SPA-PREFNUM  =  42
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "186"))
@@ -4771,15 +4701,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "3"            TO  WRK-FTN-FLG
                END-IF
              END-IF
-             IF    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "091"))
-             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "091" )
-             OR    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "019"))
-             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "019" )
-             OR    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "053"))
-             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "053" )
+      *
+             IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
+                  (WRK-KCOMB-KOH2HKNNUM (IDX2)
+                        = "021" OR "020" OR "091" OR "019" OR
+                          "053" OR "011"                      ))
+             OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)
+                        = "021" OR "020" OR "091" OR "019" OR
+                          "053" OR "011"                       )
                    MOVE    "3"            TO  WRK-FTN-FLG
              END-IF
            END-IF
