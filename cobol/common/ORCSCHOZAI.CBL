@@ -862,6 +862,7 @@
                                        OR  "232"
                                        OR  "292"
       *H26.10
+                                       OR  "298"
                                        OR  "295" )
                MOVE    1                   TO  FLG-SRYACT
                MOVE    1                   TO  FLG-NASI

@@ -739,6 +739,8 @@
                    MOVE    SPACE               TO  SPA-COM-ZAIEND (IDX)
       *            自費の時、回数入力まで自費とする
                    IF      WRK-SRYSYUKBN       =   "950"  OR  "960"
+      *H25.10
+                                                          OR  "961"
                        MOVE    1                   TO  FLG-JIHI
                    ELSE
                        MOVE    ZERO                TO  FLG-JIHI
@@ -810,6 +812,15 @@
                                                OR  "295"
                        IF      SPA-SRYYMD          <   "20140401"
                            MOVE    "0504"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  SPA-COM-CUR(IDX)
+                       END-IF
+                   END-IF
+      *            臨時投薬（頓服）はH２６年１０月から
+                   IF      WRK-SRYSYUKBN       =   "296"
+                                               OR  "297"
+                                               OR  "298"
+                       IF      SPA-SRYYMD          <   "20141001"
+                           MOVE    "0505"          TO  SPA-ERRCD
                            MOVE    "1"             TO  SPA-COM-CUR(IDX)
                        END-IF
                    END-IF
@@ -2315,6 +2326,9 @@
            IF      SPA-COM-SRYSYUKBN (IDX) =   "960"  OR
                                                "950"  OR
                                                SPACE
+      *H26.10
+                                           OR  "961"
+      *
                MOVE    SPA-COM-TNSSRYSYUKBN(IDX)
                                            TO  SPA-COM-SRYSYUKBN (IDX)
                MOVE    SPACE               TO  SPA-COM-KEIFLG    (IDX)

@@ -60,6 +60,8 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/06/XX  ³°ÍÑÌô¡ÊÎ×»þÅêÌô¡ËÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/10/07  ÆÜÉþ¡ÊÎ×»þÅêÌô¡ËÂÐ±þ
+      *                                     Êñ³ç¥¨¥é¡¼Ê¬ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -794,7 +796,8 @@
       *            À¸³è½¬´·ÉÂ»ØÆ³´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-SEIKATU-ARI     NOT =   ZERO )  OR
                           (SPA-SEIKATU-ARI2    NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-203   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-203   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-203       =   1
                            MOVE    "0"             TO  WRK-SRYSYUKBN
                                                                (3:1) 
                            MOVE    "0"             TO  WRK-GMN-INPUTCD
@@ -804,7 +807,8 @@
                    END-IF
       *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
                    IF      (LNK-ORCSC-SYONIKA-ARI  NOT =   ZERO)
-                       IF      SPA-HKTSANTEI-202   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-202   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-202       =   1
                            MOVE    "0"             TO  WRK-SRYSYUKBN
                                                                (3:1) 
                            MOVE    "0"             TO  WRK-GMN-INPUTCD
@@ -816,7 +820,8 @@
       *            ºßÂð»þ°å³ØÁí¹ç´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-ZAIKANRI-ARI    NOT =   ZERO )  OR
                           (SPA-ZAIKANRI-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-204   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-204   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-204       =   1
                            MOVE    "0"             TO  WRK-SRYSYUKBN
                                                                (3:1) 
                            MOVE    "0"             TO  WRK-GMN-INPUTCD
@@ -827,7 +832,8 @@
       *            ÆÃÄê»ÜÀßÆþµï»þÅù°å³Ø´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-IGAKUKAN-ARI    NOT =   ZERO )  OR
                           (SPA-IGAKUKAN-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-205   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-205   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-205       =   1
                            MOVE    "0"             TO  WRK-SRYSYUKBN
                                                                (3:1) 
                            MOVE    "0"             TO  WRK-GMN-INPUTCD
@@ -838,7 +844,8 @@
       *            ºßÂðËö´ü°åÎÅÁí¹ç¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-ZAIMATU-ARI    NOT =   ZERO )  OR
                           (SPA-ZAIMATU-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-206   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-206   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-206       =   1
                            MOVE    "0"             TO  WRK-SRYSYUKBN
                                                                (3:1) 
                            MOVE    "0"             TO  WRK-GMN-INPUTCD
@@ -1154,12 +1161,14 @@
                                                    "222"  OR
                                                    "232"  OR
                                                    "292"  OR
+                                                   "298"  OR
                                                    "295" )  OR
                  ((LNK-ORCSC-INGAIKBN          =   "1"   ) AND
                   (WRK-CHK-SRYSYUKBN           =   "210"  OR
                                                    "220"  OR
                                                    "230"  OR
                                                    "293"  OR
+                                                   "296"  OR
                                                    "290" ))  OR
                  ( WRK-CHK-SRYSYUKBN           =   "213"  OR
                                                    "223"  OR
@@ -1221,12 +1230,10 @@
                    (WRK-COM-SRYKBN (IDX-Z)     =   "21" )
       *        ±¡³°ÆâÉþÅêÌô
                IF    (WRK-COM-SRYSYUKBN(IDX-Z) =   "212"
-                                               OR  "292"
-                                               OR  "295" )  OR
+                                               OR  "292" )  OR
                     ((WRK-COM-SRYSYUKBN(IDX-Z)  =   SPACE
                                                 OR  "210"
-                                                OR  "290"
-                                                OR  "293" ) AND
+                                                OR  "290" ) AND
                      (LNK-ORCSC-INGAIKBN       =   "1"   ))
       *            °ìÈÌÌ¾µ­ºÜÍ­Ìµ
                    MOVE    ZERO                TO  FLG-CHK-P
@@ -1646,6 +1653,7 @@
                    WHEN    "292"
                        MOVE     1              TO  FLG-NAIYAK2
                    WHEN    "221"
+                   WHEN    "297"
                        MOVE     1              TO  FLG-TONPUK
                        IF      WRK-NAI-HKNCOMBI    =   SPACE
                            MOVE    WRK-COM-HKNCOMBI (IDX)
@@ -1654,6 +1662,7 @@
                                                    TO  WRK-NAI-CHIKENKBN
                        END-IF
                    WHEN    "222"
+                   WHEN    "298"
                        MOVE     1              TO  FLG-TONPUK2
                    WHEN    "231"
                    WHEN    "294"
@@ -1775,7 +1784,7 @@
                                                    "120001710"  )
                    MOVE    IDX                 TO  IDX-CHOKI
                END-IF
-      *TEST
+      *
       *H26.10
       *        ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿½èÊý¤»¤óÎÁ
                IF      WRK-COM-INPUTCD (IDX)   =   CONS-TAZAI-SYOSEN
@@ -1888,6 +1897,9 @@
       *H26.4
                    WHEN    "293"
                        MOVE    "295"          TO  WRK-CHK-SRYSYUKBN
+      *H26.10      ÆÜÉþÎ×»þ
+                   WHEN    "296"
+                       MOVE    "298"          TO  WRK-CHK-SRYSYUKBN
                END-EVALUATE
            ELSE
                EVALUATE    WRK-CHK-SRYSYUKBN
@@ -1902,6 +1914,9 @@
       *H26.4
                    WHEN    "293"
                        MOVE    "294"          TO  WRK-CHK-SRYSYUKBN
+      *H26.10      ÆÜÉþÎ×»þ
+                   WHEN    "296"
+                       MOVE    "297"          TO  WRK-CHK-SRYSYUKBN
                END-EVALUATE
            END-IF
           .
@@ -2692,6 +2707,7 @@
                    WHEN    "231"
                    WHEN    "291"
                    WHEN    "294"
+                   WHEN    "297"
       *            ÆâÉþ¡¡ËãÆÇ¶èÊ¬È½Äê
                       IF      WRK-COM-MADOKUKBN (IDX) NOT =   ZERO
                            MOVE    1           TO  FLG-MADOKU
@@ -2718,6 +2734,7 @@
                    WHEN    "232"
                    WHEN    "292"
                    WHEN    "295"
+                   WHEN    "298"
       *                ±¡³°½èÊý¡¡°ìÈÌÌ¾µ­ºÜÈ½Äê
                        MOVE    ZERO                TO  FLG-CHK-P
       ***************  IF     (WRK-COM-KOKUJISKBKBN2(IDX)  =   9  )
@@ -2770,6 +2787,13 @@
                IF      (WRK-CHK-SRYSYUKBN       =   "293"
                                                 OR  "294"
                                                 OR  "295")
+                   MOVE    ZERO                TO  FLG-NAIFUKU
+               END-IF
+      *H26.10
+      *        ÆÜÉþ¡ÊÎ×»þ¡Ë¤ÏÂÐ¾Ý³°
+               IF      (WRK-CHK-SRYSYUKBN       =   "296"
+                                                OR  "297"
+                                                OR  "298")
                    MOVE    ZERO                TO  FLG-NAIFUKU
                END-IF
            ELSE
@@ -3052,34 +3076,39 @@
       *            À¸³è½¬´·ÉÂ»ØÆ³´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-SEIKATU-ARI     NOT =   ZERO )  OR
                           (SPA-SEIKATU-ARI2    NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-203   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-203   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-203       =   1
                            MOVE    1               TO  FLG-SYOHO-CHK
                        END-IF
                    END-IF
       *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
                    IF      (LNK-ORCSC-SYONIKA-ARI  NOT =   ZERO)
-                       IF      SPA-HKTSANTEI-202   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-202   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-202       =   1
                            MOVE    1               TO  FLG-SYOHO-CHK
                        END-IF
                    END-IF
       *            ºßÂð»þ°å³ØÁí¹ç´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-ZAIKANRI-ARI    NOT =   ZERO )  OR
                           (SPA-ZAIKANRI-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-204   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-204   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-204       =   1
                            MOVE    1               TO  FLG-SYOHO-CHK
                        END-IF
                    END-IF
       *            ÆÃÄê»ÜÀßÆþµï»þÅù°å³Ø´ÉÍýÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-IGAKUKAN-ARI    NOT =   ZERO )  OR
                           (SPA-IGAKUKAN-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-205   NOT =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-205   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-205       =   1
                            MOVE    1               TO  FLG-SYOHO-CHK
                        END-IF
                    END-IF
       *            ºßÂðËö´ü°åÎÅÁí¹ç¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
                    IF     (SPA-ZAIMATU-ARI    NOT =   ZERO )  OR
                           (SPA-ZAIMATU-ARI2   NOT =   ZERO )
-                       IF      SPA-HKTSANTEI-206  NOT  =   ZERO
+      *H26.10          IF      SPA-HKTSANTEI-206   NOT =   ZERO
+                       IF      SPA-HKTSANTEI-206       =   1
                            MOVE    1               TO  FLG-SYOHO-CHK
                        END-IF
                    END-IF
@@ -3495,7 +3524,7 @@
       *
            MOVE    ZERO                TO  FLG-SYOHORYO
       *
-      *H26.9
+      *H26.10
       *    ±¡Æâ½èÊý¤¬¤Ê¤±¤ì¤ÐÂÐ¾Ý³°
            IF     (FLG-NAIYAK          =   ZERO )  AND
                   (FLG-TONPUK          =   ZERO )  AND
@@ -3522,7 +3551,7 @@
       *H26.10
       *
       *H26.4
-      *    ÃÏ°èÊñ³ç¿ÇÎÅ»»Äê»þ¡¡Äþ¸º¤Ê¤·
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ»»Äê»þ¡¡ÆâÉþÄþ¸º¤Ê¤·
            IF      FLG-CHKCARKSN       =   1
                IF      WRK-ZAICNT      >=  7
                    MOVE    6               TO  WRK-ZAICNT
@@ -4461,7 +4490,8 @@
                                            OR  "291"
                                            OR  "221"
                                            OR  "231"
-                                           OR  "294" )
+                                           OR  "294"
+                                           OR  "297" )
                    MOVE    1               TO  FLG-NAIFUKU
       *            ÌôºÞÎÁÄþ¸º¥Á¥§¥Ã¥¯½èÍý
                    PERFORM 300110-GENTUIKA-CHK-SEC
@@ -4474,6 +4504,7 @@
                    EVALUATE    WRK-CHK-SRYSYUKBN
       *            ÆÜÉþ
                    WHEN    "221"
+                   WHEN    "297"
                        PERFORM 30022-TAZAI22-GENCHK-SEC
       *            ³°ÍÑ
                    WHEN    "231"

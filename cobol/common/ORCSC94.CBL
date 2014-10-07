@@ -534,6 +534,9 @@
                   (SPA-COM-KAIFLG (IDX)    =   "1" )  OR
                   (WRK-MOJI                =   "S" )  OR
                   (SPA-COM-SRYSYUKBN(IDX)  =   "950"  OR "960" )
+      *H26.10
+              OR  (SPA-COM-SRYSYUKBN(IDX)  =   "961"          )
+      *
       *        ÅÀ¿ô
                IF      SPA-COM-PLUSKBN (IDX)   =   1
                    COMPUTE WRK-TENSU           =   SPA-COM-TENSU(IDX)

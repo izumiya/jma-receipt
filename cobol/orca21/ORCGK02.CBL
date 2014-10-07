@@ -11840,6 +11840,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                   "292"
       *            外用臨時
                                                OR "295"
+                                               OR "298"
                    MOVE    1               TO  FLG-SYOHOU-ARI
                END-IF
       *        在宅注射院外処方

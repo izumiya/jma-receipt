@@ -81,6 +81,7 @@
       * 04.07.00     NACL-多々納  14/01/08  第三者行為対応
       * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       * 04.07.00     NACL-多々納  14/09/XX  外用薬（臨時投薬）対応
+      * 04.07.00     NACL-多々納  14/10/07  頓服薬（臨時投薬）対応
       *****************************************************************
       *
       *
@@ -1205,7 +1206,8 @@
       *        老人保険
                EVALUATE    COMB-HKNNUM
                    WHEN    "060"
-      *                国保
+                   WHEN    "068"
+      *                国保・特別療養費
                        EVALUATE    COMB-HOJOKBN
                            WHEN    "1"
                                MOVE    1           TO  FLG-RJNHKN
@@ -2659,6 +2661,7 @@
                                                    "221"  OR
                                                    "231"  OR
                                                    "291"  OR
+                                                   "297"  OR
                                                    "294" )
       *                院内処方種別
                        MOVE    1               TO  FLG-TAIGAI
@@ -2677,6 +2680,7 @@
                                                    "222"  OR
                                                    "232"  OR
                                                    "292"  OR
+                                                   "298"  OR
                                                    "295")
                        MOVE    1               TO  FLG-TAIGAI
                    END-IF
@@ -2695,7 +2699,8 @@
                   OR  (WRK-SRYSYUKBN(3:1)  =   "0"   )
       *H26.4
       *           外用臨時投薬
-                  OR  (WRK-SRYSYUKBN       =   "293"  ))
+                  OR  (WRK-SRYSYUKBN       =   "293"  )
+                  OR  (WRK-SRYSYUKBN       =   "296"  ))
                    IF     (FLG-SYOHO-IN        =   2    )
       *                剤点数ゼロで院内処方印刷
                        IF     (ACCT-ZAITEN         =   ZERO )
@@ -3734,6 +3739,7 @@
            END-IF
            COMPUTE WRK-SURYO2          =   WRK-KANZANCHI
                                        *   WRK-SURYO
+      *
            MOVE    SPACE               TO  WRK-SURYO-X
            IF      WRK-SURYO2-S2(4:2)  =   ZERO
       *        小数点３桁まで
@@ -3818,6 +3824,7 @@
            .
        100112-SURYO-HEN05-EXT.
            EXIT.
+      *
       *---(03.04.00) LINE ADD END   ------------------------------------
       *****************************************************************
       *    患者コメントから編集する
@@ -4102,6 +4109,7 @@
                                            OR  "221"
                                            OR  "231"
                                            OR  "291"
+                                           OR  "297"
                                            OR  "294" )
                    MOVE    ZERO            TO  FLG-OK2
                END-IF
@@ -4110,6 +4118,7 @@
                                            OR  "222"
                                            OR  "232"
                                            OR  "292"
+                                           OR  "298"
                                            OR  "295" )
                    MOVE    1               TO  FLG-OK2
                END-IF
@@ -4127,6 +4136,7 @@
                                            OR  "221"
                                            OR  "231"
                                            OR  "291"
+                                           OR  "297"
                                            OR  "294" )
                    MOVE    1               TO  FLG-OK2
                END-IF
@@ -4135,6 +4145,7 @@
                                            OR  "222"
                                            OR  "232"
                                            OR  "292"
+                                           OR  "298"
                                            OR  "295" )
                    MOVE    ZERO            TO  FLG-OK2
                END-IF

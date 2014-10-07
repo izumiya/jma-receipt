@@ -3351,6 +3351,7 @@
                                                        OR  "232"
       *H26.10           Î×»þÄÉ²Ã
                                                        OR  "292"
+                                                       OR  "298"
                                                        OR  "295")
                        CONTINUE
                    ELSE
@@ -4844,12 +4845,14 @@
                                                        "221"  OR
                                                        "231"  OR
                                                        "291"  OR
+                                                       "297"  OR
                                                        "294" )  OR
                      ((SPA-INGAIKBN            NOT =   "1"   ) AND
                       (WRK-CHK-SRYSYUKBN           =   "210"  OR
                                                        "220"  OR
                                                        "230"  OR
                                                        "290"  OR
+                                                       "296"  OR
                                                        "293" ))
                    ADD     1                   TO  IDY
                    IF      IDY                 >   40
