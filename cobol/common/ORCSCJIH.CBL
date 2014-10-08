@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-多々納  02/11/20  自賠責器材追加
       * 01.00.02     NACL-多々納  03/04/30  剤別点数追加
+      * 04.07.00     NACL-多々納  14/10/03  消費税計算＠、.961対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -102,6 +103,9 @@
       *
       *    診療行為点数編集・基本チェック
            COPY    "CPORCSC92.INC".
+      *
+      *    画面再編集パラメタ
+           COPY    "CPORCSC94.INC".
       *
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -355,10 +359,37 @@
        1002-TENSU-KEI-EXT.
            EXIT.
       *
+      *
       *****************************************************************
       *    自費計算処理
       *****************************************************************
        10021-JIHI-KEI-SEC                  SECTION.
+      *
+      *H26.10
+      *    金額＠　で消費税計算
+           IF     (WRK-COM-AUTOFLG2 (IDX-Z)    =   "1"   )
+               IF     (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "095" OR
+                                                       "096" ) AND
+                      (WRK-COM-SRYSYUKBN(IDX-Z)    =   "960" ) AND
+                      (WRK-COM-KISOTEN(IDX-Z)      =   ZERO  ) AND
+                      (WRK-COM-KEIFLG   (IDX-Z)    =   "1"   ) AND
+                      (WRK-COM-JIHIMONEY(IDX-Z)    >   ZERO  )
+                   PERFORM 100211-JIHI-KEISAN-SEC
+               ELSE
+      *            ＠の削除
+                   MOVE    SPACE           TO  WRK-COM-AUTOFLG2 (IDX-Z)
+      *            表示
+                   INITIALIZE                  ORCSC94AREA
+                   MOVE    "1"                 TO  LNK-SC94-KBN
+                   MOVE    "K02"               TO  LNK-SC94-PG
+                   MOVE    IDX-Z               TO  LNK-SC94-IDX
+                   CALL    "ORCSC94"           USING
+                                               ORCSC94AREA
+                                               WRK-SCR-REC
+                                               SPA-AREA
+               END-IF
+           END-IF
+      *
       *
            IF      WRK-COM-KISOTEN(IDX-Z)      =   ZERO
                CONTINUE
@@ -367,13 +398,26 @@
                IF      (SPA-SRYYMD     >=  "20070401" )  AND
                        (WRK-COM-SRYKBN(IDX-Z)  =   "96")  AND
                        (WRK-COM-TENSIKIBETU(IDX-Z)  =  0 )
-                   MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
-                   PERFORM 10021-ZEIKEISEN-SEC
+      *
+      *H26.10      単価×数量を対象
+                   IF      WRK-COM-SRYSYUKBN(IDX-Z) =   "961"
+                       COMPUTE WRK-KISOTEN     =   WRK-COM-KISOTEN
+                                                            (IDX-Z)
+                                               *   WRK-COM-SURYO(IDX-Z)
+                       PERFORM 10021-ZEIKEISEN-SEC
+                       MOVE    WRK-TANKA       TO  WRK-KINGAK
+                   ELSE
+      *
+                       MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
+                       PERFORM 10021-ZEIKEISEN-SEC
+                       COMPUTE WRK-KINGAK      =   WRK-TANKA
+                                               *   WRK-COM-SURYO(IDX-Z)
+                   END-IF
                ELSE
                    MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-TANKA
+                   COMPUTE WRK-KINGAK      =   WRK-TANKA
+                                           *   WRK-COM-SURYO(IDX-Z)
                END-IF
-               COMPUTE WRK-KINGAK      =   WRK-TANKA
-                                       *   WRK-COM-SURYO(IDX-Z)
            END-IF
       *
            .
@@ -384,6 +428,7 @@
       *    消費税計算処理
       *****************************************************************
        10021-ZEIKEISEN-SEC                  SECTION.
+      *
       *
            COMPUTE WRK-ZEIKIN-9        =   WRK-KISOTEN
                                        *   WRK-ZEIRITU
@@ -416,6 +461,50 @@
        10021-ZEIKEISEN-EXT.
            EXIT.
       *
+      *H26.10
+      *****************************************************************
+      *    入力金額の消費税計算処理
+      *****************************************************************
+       100211-JIHI-KEISAN-SEC                  SECTION.
+      *
+      *
+           COMPUTE WRK-ZEIKIN-9        =   WRK-COM-JIHIMONEY(IDX-Z)
+                                       *   WRK-ZEIRITU
+      *
+           EVALUATE    SPA-TAX-HASU-KBN
+               WHEN    "1"
+      *        小数点以下四捨五入
+                   COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+                                           +   0.5
+               WHEN    "3"
+      *        小数点以下切り上げ
+                   COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+                                           +   0.99999
+               WHEN    OTHER
+      *            小数点以下切り捨て
+                   MOVE    WRK-ZEIKIN-9        TO  WRK-ZEIKIN
+           END-EVALUATE
+           COMPUTE WRK-TANKA           =   WRK-COM-JIHIMONEY(IDX-Z)
+                                       +   WRK-ZEIKIN
+      *
+           MOVE    WRK-TANKA           TO  WRK-COM-JIHIMONEY(IDX-Z)
+           MOVE    WRK-TANKA           TO  WRK-COM-KEI      (IDX-Z)
+           MOVE    WRK-TANKA           TO  WRK-GMN-KEI      (IDX-Z)
+           MOVE    SPACE               TO  WRK-COM-AUTOFLG2 (IDX-Z)
+      *    表示
+           INITIALIZE                  ORCSC94AREA
+           MOVE    "1"                 TO  LNK-SC94-KBN
+           MOVE    "K02"               TO  LNK-SC94-PG
+           MOVE    IDX-Z               TO  LNK-SC94-IDX
+           CALL    "ORCSC94"           USING
+                                       ORCSC94AREA
+                                       WRK-SCR-REC
+                                       SPA-AREA
+           .
+       100211-JIHI-KEISAN-EXT.
+           EXIT.
+      *!!
+      *
       *****************************************************************
       *    点数計算処理
       *****************************************************************
@@ -433,9 +522,21 @@
       *        金額
                WHEN    1
       *            消費税計算
+                   IF      (WRK-COM-SRYSYUKBN(IDX-Z)  =   "961")
+      *H26.10          単価×数量　に税
+                       COMPUTE WRK-KISOTEN     =   WRK-COM-KISOTEN
+                                                            (IDX-Z)
+                                               *   WRK-COM-SURYO(IDX-Z)
+                       PERFORM 10021-ZEIKEISEN-SEC
+                       COMPUTE WRK-KINGAK-9    =   WRK-TANKA
+                                               +   0.5
+                       MOVE    WRK-KINGAK-9    TO  WRK-KINGAK
+                   ELSE
+      *
                    IF      (SPA-SRYYMD     >=  "20070401" )  AND
                            (WRK-COM-SRYKBN(IDX-Z)  =   "96")
-                       MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
+                       MOVE    WRK-COM-KISOTEN (IDX-Z)
+                                                   TO  WRK-KISOTEN
                        PERFORM 10021-ZEIKEISEN-SEC
                    ELSE
                        MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-TANKA
@@ -447,6 +548,8 @@
                                                *   WRK-COM-SURYO(IDX-Z)
                                                +   0.5
                        MOVE    WRK-KINGAK-9    TO  WRK-KINGAK
+                   END-IF
+      *
                    END-IF
       *        点数
                WHEN    3

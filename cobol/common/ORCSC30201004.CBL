@@ -1370,8 +1370,10 @@
              IF   (WRK-COM-HKNCOMBI (IDX) NOT =   "9999")
       *        点滴は１回のみとする（外来のみ）
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-                      (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
-                                                       "960") AND
+      *               (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
+      *                                                "960") AND
+                      (WRK-COM-SRYKBN   (IDX)  NOT =   "95"   AND
+                                                       "96" ) AND
                       (WRK-COM-INPUTCD  (IDX)      =   "130009310" OR
                                                        "130003710" OR
                                                        "130003810")
@@ -1383,8 +1385,10 @@
                END-IF
       *        動脈注射は１回のみとする
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-                      (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
-                                                       "960") AND
+      **              (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
+      **                                               "960") AND
+                      (WRK-COM-SRYKBN   (IDX)  NOT =   "95"   AND
+                                                       "96" ) AND
                       (WRK-COM-INPUTCD  (IDX)      =   "130006110" OR
                                                        "130006210")
                    IF      FLG-DOUCHU          =   1
@@ -1799,8 +1803,10 @@
              AND  (WRK-COM-YAKUHYO  (IDX) NOT =   "1"   )
       *        点滴は１回のみとする（外来のみ）
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-                      (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
-                                                       "960") AND
+      **              (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
+      **                                               "960") AND
+                      (WRK-COM-SRYKBN   (IDX)  NOT =   "95"   AND
+                                                       "96" ) AND
                       (WRK-COM-INPUTCD  (IDX)      =   "130009310" OR
                                                        "130003710" OR
                                                        "130003810")

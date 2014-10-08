@@ -3162,8 +3162,10 @@
       *        点滴は１回のみとする
       *        外来の時のみ（入院は点滴でチェック）
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-                      (WRK-COM-SRYSYUKBN(IDX-Z) NOT =  "950"  AND
-                                                       "960") AND
+      **              (WRK-COM-SRYSYUKBN(IDX-Z) NOT =  "950"  AND
+      **                                               "960") AND
+                      (WRK-COM-SRYKBN   (IDX-Z) NOT =  "95"   AND
+                                                       "96" ) AND
                       (WRK-COM-INPUTCD  (IDX-Z)    =   "130009310" OR
                                                        "130003710" OR
                                                        "130003810")
