@@ -1453,6 +1453,10 @@
                                        TO  SPA-I0FREE
                MOVE    I0SUB01-COMMON  TO  SPA-I0KYOUTU
       *
+      *        療養病棟で特定入院料算定時に、上限日数超えで療養病棟入院料の
+      *        算定が行われていない場合の注意メッセージ表示
+               PERFORM   4101-RYOYO-CHK-SEC
+      *
                GO  TO  300-SCREEN-EXT
            WHEN    "S08"
                INITIALIZE                  I0SUB01-LNK
@@ -3722,6 +3726,130 @@
       *
       *    療養病棟で特定入院料算定時に、上限日数超えで療養病棟入院料の
       *    算定が行われていない場合の注意メッセージ表示
+           IF    SPA-GMN-I01-LBLINFO   =   SPACE
+              PERFORM    4101-RYOYO-CHK-SEC
+           END-IF
+      *
+      *    入院履歴編集処理
+           PERFORM 4101-NYUREKI-EDIT-SEC
+      *
+           MOVE    ZERO                TO  FLG-SYORIPTN
+      *
+      *    入院履歴マスタ検索処理（入力領域表示用）
+           PERFORM 4101-PTNYUINRRK-SEL1-SEC
+      *    入院歴なし（初入院）
+           IF  (   FLG-PTNYUINRRK  NOT =   ZERO )
+               MOVE    1               TO  FLG-SYORIPTN
+           ELSE
+      *
+               EVALUATE    TRUE
+      *        歴作成データあり
+               WHEN    PTNYUINRRK-JTIKBN   =   "5"
+               WHEN    PTNYUINRRK-JTIKBN   =   "6"
+                   MOVE    2           TO  FLG-SYORIPTN
+      *        入院中
+               WHEN    PTNYUINRRK-TAIINYMD =   "99999999"
+                   MOVE    3           TO  FLG-SYORIPTN
+      *        退院済み
+               WHEN    OTHER
+                   MOVE    4           TO  FLG-SYORIPTN
+               END-EVALUATE
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   "9999" )
+               MOVE        1           TO  SPA-NAI-I01-LOCK
+               IF    ( FLG-SYORIPTN    =   1 )
+                   MOVE    5           TO  FLG-SYORIPTN
+               ELSE
+                   MOVE    6           TO  FLG-SYORIPTN
+               END-IF
+           ELSE
+               MOVE        ZERO        TO  SPA-NAI-I01-LOCK
+           END-IF
+      *
+           EVALUATE    FLG-SYORIPTN
+           WHEN    1
+               MOVE    3           TO  SPA-GMN-I01-CUR
+               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
+               PERFORM 310-CMB-SYOKI-SEC
+               PERFORM 4201-INPUT-AREA-CLEAR-SEC
+      *        保険組み合わせコンボ設定処理
+               MOVE    SPA-SYSYMD      TO  WRK-KJNYMD
+               PERFORM 4101-CMB-HKNCOMBI-SET-SEC
+      *        受付マスタより入院科等を確定する
+               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
+               PERFORM 4101-UKETUKE-SEL-SEC
+      *        受診履歴検索処理
+               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
+               PERFORM 4101-JYURRK-SEL-SEC
+               PERFORM 310-CMB-SYORIKBN-SET2-SEC
+      *        デフォルトの処理区分に入院登録を設定
+               MOVE    SPA-GMN-I01-SYORIKBN-ITM (01)
+                                   TO  SPA-GMN-I01-SYORIKBN
+           WHEN    2
+               MOVE    2           TO  SPA-GMN-I01-CUR
+      *
+               PERFORM 4101-INPUT-AREA-EDIT2-SEC
+               PERFORM 310-CMB-SYORIKBN-SET5-SEC
+      *        デフォルトの処理区分に照会を設定
+               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
+                                   TO  SPA-GMN-I01-SYORIKBN
+      *
+      *
+           WHEN    3
+               MOVE    2               TO  SPA-GMN-I01-CUR
+               PERFORM 4101-INPUT-AREA-EDIT-SEC
+               IF    ( PTNYUINRRK-RRKEDANUM    >   1   )
+                   PERFORM 310-CMB-SYORIKBN-SET6-SEC
+               ELSE
+                   PERFORM 310-CMB-SYORIKBN-SET3-SEC
+               END-IF
+      *        デフォルトの処理区分に変更を設定
+               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
+                                   TO  SPA-GMN-I01-SYORIKBN
+           WHEN    4
+               MOVE    2               TO  SPA-GMN-I01-CUR
+               PERFORM 4101-INPUT-AREA-EDIT-SEC
+      *
+               PERFORM 310-CMB-SYORIKBN-SET4-SEC
+      *        デフォルトの処理区分に照会を設定
+               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
+                                   TO  SPA-GMN-I01-SYORIKBN
+      *
+           WHEN    5
+               MOVE    1               TO  SPA-GMN-I01-CUR
+               INITIALIZE                  SPA-GMN-I01-CMB-SYORIKBN
+                                           SPA-GMN-I01-SYORIKBN
+      *
+           WHEN    6
+               MOVE    1               TO  SPA-GMN-I01-CUR
+               PERFORM 4101-INPUT-AREA-EDIT-SEC
+      *
+               PERFORM 310-CMB-SYORIKBN-SET7-SEC
+      *        デフォルトの処理区分に照会を設定
+               MOVE    SPA-GMN-I01-SYORIKBN-ITM (01)
+                                   TO  SPA-GMN-I01-SYORIKBN
+           END-EVALUATE
+      *
+           IF    ( SPA-GMN-I01-NYUREKILST-CNT  >   ZERO )
+               MOVE    1           TO  SPA-GMN-I01-NYUREKILST-SEL
+                                       SPA-GMN-I01-SELNUM
+           END-IF
+      *
+           MOVE    SPA-GMN-I01-PTNUM   TO  SPA-LAST-PTNUM
+           MOVE    SPA-NAI-I01-PTID    TO  SPA-LAST-PTID
+      *
+           .
+      *
+       4101-PTINF-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    療養病棟の特定入院料算定上限日数超えチェック
+      *****************************************************************
+       4101-RYOYO-CHK-SEC            SECTION.
+      *
+      *    療養病棟で特定入院料算定時に、上限日数超えで療養病棟入院料の
+      *    算定が行われていない場合の注意メッセージ表示
       *    １．最終入院履歴から入院病棟が療養病棟であるか判定
       *    ２．入院会計テーブルの作成済最終月から剤識別区分１（入院料）
       *        のデータを取得（剤識別区分１は複数あり）
@@ -3878,119 +4006,9 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-      *
-      *    入院履歴編集処理
-           PERFORM 4101-NYUREKI-EDIT-SEC
-      *
-           MOVE    ZERO                TO  FLG-SYORIPTN
-      *
-      *    入院履歴マスタ検索処理（入力領域表示用）
-           PERFORM 4101-PTNYUINRRK-SEL1-SEC
-      *    入院歴なし（初入院）
-           IF  (   FLG-PTNYUINRRK  NOT =   ZERO )
-               MOVE    1               TO  FLG-SYORIPTN
-           ELSE
-      *
-               EVALUATE    TRUE
-      *        歴作成データあり
-               WHEN    PTNYUINRRK-JTIKBN   =   "5"
-               WHEN    PTNYUINRRK-JTIKBN   =   "6"
-                   MOVE    2           TO  FLG-SYORIPTN
-      *        入院中
-               WHEN    PTNYUINRRK-TAIINYMD =   "99999999"
-                   MOVE    3           TO  FLG-SYORIPTN
-      *        退院済み
-               WHEN    OTHER
-                   MOVE    4           TO  FLG-SYORIPTN
-               END-EVALUATE
-           END-IF
-      *
-           IF    ( SPA-ERRCD           =   "9999" )
-               MOVE        1           TO  SPA-NAI-I01-LOCK
-               IF    ( FLG-SYORIPTN    =   1 )
-                   MOVE    5           TO  FLG-SYORIPTN
-               ELSE
-                   MOVE    6           TO  FLG-SYORIPTN
-               END-IF
-           ELSE
-               MOVE        ZERO        TO  SPA-NAI-I01-LOCK
-           END-IF
-      *
-           EVALUATE    FLG-SYORIPTN
-           WHEN    1
-               MOVE    3           TO  SPA-GMN-I01-CUR
-               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
-               PERFORM 310-CMB-SYOKI-SEC
-               PERFORM 4201-INPUT-AREA-CLEAR-SEC
-      *        保険組み合わせコンボ設定処理
-               MOVE    SPA-SYSYMD      TO  WRK-KJNYMD
-               PERFORM 4101-CMB-HKNCOMBI-SET-SEC
-      *        受付マスタより入院科等を確定する
-               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
-               PERFORM 4101-UKETUKE-SEL-SEC
-      *        受診履歴検索処理
-               MOVE    SPA-SYSYMD  TO  WRK-KJNYMD
-               PERFORM 4101-JYURRK-SEL-SEC
-               PERFORM 310-CMB-SYORIKBN-SET2-SEC
-      *        デフォルトの処理区分に入院登録を設定
-               MOVE    SPA-GMN-I01-SYORIKBN-ITM (01)
-                                   TO  SPA-GMN-I01-SYORIKBN
-           WHEN    2
-               MOVE    2           TO  SPA-GMN-I01-CUR
-      *
-               PERFORM 4101-INPUT-AREA-EDIT2-SEC
-               PERFORM 310-CMB-SYORIKBN-SET5-SEC
-      *        デフォルトの処理区分に照会を設定
-               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
-                                   TO  SPA-GMN-I01-SYORIKBN
-      *
-      *
-           WHEN    3
-               MOVE    2               TO  SPA-GMN-I01-CUR
-               PERFORM 4101-INPUT-AREA-EDIT-SEC
-               IF    ( PTNYUINRRK-RRKEDANUM    >   1   )
-                   PERFORM 310-CMB-SYORIKBN-SET6-SEC
-               ELSE
-                   PERFORM 310-CMB-SYORIKBN-SET3-SEC
-               END-IF
-      *        デフォルトの処理区分に変更を設定
-               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
-                                   TO  SPA-GMN-I01-SYORIKBN
-           WHEN    4
-               MOVE    2               TO  SPA-GMN-I01-CUR
-               PERFORM 4101-INPUT-AREA-EDIT-SEC
-      *
-               PERFORM 310-CMB-SYORIKBN-SET4-SEC
-      *        デフォルトの処理区分に照会を設定
-               MOVE    SPA-GMN-I01-SYORIKBN-ITM (02)
-                                   TO  SPA-GMN-I01-SYORIKBN
-      *
-           WHEN    5
-               MOVE    1               TO  SPA-GMN-I01-CUR
-               INITIALIZE                  SPA-GMN-I01-CMB-SYORIKBN
-                                           SPA-GMN-I01-SYORIKBN
-      *
-           WHEN    6
-               MOVE    1               TO  SPA-GMN-I01-CUR
-               PERFORM 4101-INPUT-AREA-EDIT-SEC
-      *
-               PERFORM 310-CMB-SYORIKBN-SET7-SEC
-      *        デフォルトの処理区分に照会を設定
-               MOVE    SPA-GMN-I01-SYORIKBN-ITM (01)
-                                   TO  SPA-GMN-I01-SYORIKBN
-           END-EVALUATE
-      *
-           IF    ( SPA-GMN-I01-NYUREKILST-CNT  >   ZERO )
-               MOVE    1           TO  SPA-GMN-I01-NYUREKILST-SEL
-                                       SPA-GMN-I01-SELNUM
-           END-IF
-      *
-           MOVE    SPA-GMN-I01-PTNUM   TO  SPA-LAST-PTNUM
-           MOVE    SPA-NAI-I01-PTID    TO  SPA-LAST-PTID
-      *
            .
       *
-       4101-PTINF-SET-EXT.
+       4101-RYOYO-CHK-EXT.
            EXIT.
       *****************************************************************
       *    受付マスタ検索処理
