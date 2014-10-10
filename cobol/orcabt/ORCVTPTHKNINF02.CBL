@@ -1451,12 +1451,20 @@
            END-IF
            PERFORM UNTIL      (FLG-HKNNUM  =   1 )
                            OR (IDX-HKN-MAX >=  300 )
+      *       国保の支払区分＝空白は対象外
+              IF      (HKN-HKNNUM              =   "060" )
+                 AND  (HKN-PAYKBN          NOT =   "00"  )
+                   CONTINUE
+              ELSE
+      *
       *       保険のもの
               IF       HKN-HKNKOHSBTKBN        =   "1"  OR  "4"
                                                OR  "8"  OR  "9"
                    ADD     1                   TO  IDX-HKN-MAX
                    MOVE    HKNNUM-REC          TO  TBL-HKNNUM-REC
                                              (IDX-HKN-MAX)
+               END-IF
+      *
                END-IF
       *
                MOVE    "tbl_hknnum"        TO  MCP-TABLE
