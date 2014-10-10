@@ -107,6 +107,7 @@
       *  04.07.00    NACL-多々納  14/03/19  .123 処理対応他
       *  04.08.00    NACL-多々納  14/04/XX  行挿入・カーソル移動位置変更
       *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
+      *  04.07.00    NACL-多々納  14/10/09  患者登録戻り処理変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -693,8 +694,9 @@
       *    挿入行数
            03  WRK-INSCNT              PIC 9(02).
            03  WRK-GYO                 PIC 9(04).
-      *改頁行数
-      **** 03  WRK-PAGE-LINE           PIC 9(02).
+      *
+      *H26.10
+           03  WRK-MAE-BIRTHDAY        PIC X(08).
       *
       *    訂正時の内容保存
        01  WRK-ORCSC95AREA             PIC X(150).
@@ -2112,6 +2114,8 @@
       *
            MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
+      *H26.10
+           MOVE    SPA-BIRTHDAY        TO  WRK-MAE-BIRTHDAY
       *
            INITIALIZE                  ORCSC95AREA
            MOVE    "2"                 TO  LNK-SC95-KBN
@@ -2154,16 +2158,29 @@
                GO      TO      30011-INIT-HEN-EXT
            END-IF
       *
-      *    診察料のみ変換する
+      *****診察料のみ変換する
+      *H26.10
+      *    診療算定回数編集
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
            INITIALIZE                      ORCSC10SAREA
-           MOVE    "S"                 TO  LNK-SC10S-SYORI
+           MOVE    "3"                 TO  LNK-SC10S-SYORI
            CALL    "ORCSC10S"          USING
                                        ORCSC10SAREA
                                        SPA-AREA
                                        SPA-SCR-REC
                                        SPA-K02
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+      *    年齢チェックの為、前項目の再チェック
+           IF      SPA-BIRTHDAY    NOT =   WRK-MAE-BIRTHDAY
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   (IDX        >   SPA-MAX-LINE )  OR
+                          ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
+                           (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+                   MOVE    SPACE               TO  SPA-COM-CHKFLG
+                                                           (IDX)
+               END-PERFORM
+           END-IF
+      *!!!
       *
       *    診療行為、計計算処理、編集
            MOVE    SPACE               TO  FLG-TOROKU
