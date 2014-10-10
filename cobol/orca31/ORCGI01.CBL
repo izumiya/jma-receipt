@@ -3976,11 +3976,11 @@
       *
                                    IF    WRK-CHK2-FLG   =   ZERO
                                      MOVE  SPACE TO  SPA-GMN-I01-LBLINFO
-      **       MOVE "特定入院料上限日数以降の異動処理を行ってください"
-      **                                         TO  SPA-GMN-I01-LBLINFO
-               STRING  "作成済みの入院会計に入院料未算定日があります。"
+               STRING  "特定入院料算定後に入院料未算定日が"
                                     DELIMITED  BY  SIZE
-                       "異動処理を行い入院料を算定してください。"
+                       "あります。異動処理を行い"
+                                    DELIMITED  BY  SIZE
+                       "入院料を算定してください。"
                                     DELIMITED  BY  SIZE
                INTO    SPA-GMN-I01-LBLINFO
                                    END-IF
