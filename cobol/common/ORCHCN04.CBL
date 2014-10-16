@@ -45,6 +45,7 @@
       *  04.07.00    NACL-多々納  11/12/22  商品名コード単価対応
       *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
       *  04.07.00    NACL-多々納  14/03/XX  平成２６年４月改正対応
+      *  04.07.00    NACL-多々納  14/10/15  コメント・自費ゼロ対象対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -90,6 +91,7 @@
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
+           03  FLG-PTCOM           PIC 9(01).
       *
            03  FLG-SP              PIC 9(01).
            03  FLG-OK              PIC 9(01).
@@ -102,6 +104,8 @@
            03  FLG-RSIKIN          PIC 9(01).
       *
            03  FLG-HIZUKECHK       PIC 9(01).
+      *H26.10
+           03  FLG-JEND            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -125,6 +129,9 @@
       *
            03  IDX-STR             PIC 9(02).
            03  IDX-END             PIC 9(02).
+      *H26.10
+           03  IDXC                PIC 9(04).
+           03  IDXJ2               PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -249,6 +256,22 @@
                05  WRK-HOSPADRS2       PIC X(50).
            03  WRK-HOSPTEL             PIC X(15).
       *
+      *H26.10
+      *    コメントコード範囲
+           03  WRK-COMMNT.
+               05  WRK-COM-STR         PIC X(09).
+               05  WRK-COM-FIL         PIC X(01).
+               05  WRK-COM-END         PIC X(09).
+      *    剤番号
+           03  WRK-ZAINUM              PIC 9(07).
+      *
+      *H26.10
+       01  TBL-COM-HYOJI-AREA.
+           03  TBL-COM-HYOJI-OCC       OCCURS   5.
+               05  TBL-COM-STR             PIC X(09).
+               05  TBL-COM-END             PIC X(09).
+      *
+      *
        01  TBL-DATA-AREA.
            03  TBL-SRYKBN              PIC X(02).
            03  TBL-SRYSYUKBN           PIC X(03).
@@ -274,6 +297,8 @@
                05  TBL-JIHI-SRYCD           PIC X(09).
                05  TBL-JIHI-NAME            PIC X(80).
                05  TBL-JIHI-JIHIMONEY       PIC S9(07).
+      *        剤番号
+               05  TBL-JIHI-ZAINUM          PIC 9(07).
            03  IDX-JIHI                PIC 9(04).
       *
       *
@@ -330,6 +355,18 @@
            03  PARA-CHUI-YUKOSTYMD     PIC X(08).
            03  PARA-CHUI-YUKOEDYMD     PIC X(08).
            03  PARA-CHUI               PIC X(100).
+      *H26.10
+      *    対象コメントコード
+           03  PARA-COM-HYOJI-G.
+               05  PARA-COM-HYOJI01        PIC X(20).
+               05  PARA-COM-HYOJI02        PIC X(20).
+               05  PARA-COM-HYOJI03        PIC X(20).
+               05  PARA-COM-HYOJI04        PIC X(20).
+               05  PARA-COM-HYOJI05        PIC X(20).
+           03  PARA-COM-HYOJI-G2       REDEFINES   PARA-COM-HYOJI-G.
+               05  PARA-COM-HYOJI          PIC X(20)  OCCURS  5.
+      *    自費対象
+           03  PARA-JIHIKBN            PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(100).
@@ -403,6 +440,10 @@
       *    入院履歴
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
+      *
+      *    患者コメント
+       01  PTCOM-REC.
+           COPY    "CPPTCOM.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -588,6 +629,29 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA            TO  PARA-CHUI
       *
+      *H26.10
+      *    対象コメントコード
+           MOVE    "COM_HYOUJI_1"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-COM-HYOJI01
+           MOVE    "COM_HYOUJI_2"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-COM-HYOJI02
+           MOVE    "COM_HYOUJI_3"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-COM-HYOJI03
+           MOVE    "COM_HYOUJI_4"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-COM-HYOJI04
+           MOVE    "COM_HYOUJI_5"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-COM-HYOJI05
+           MOVE    "JIHIKBN"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-JIHIKBN
+      *    コメント範囲編集
+           PERFORM 1001-COMHYOJI-HEN-SEC
+      *
       *
            .
        100-OPTION-SELECT-EXT.
@@ -611,6 +675,10 @@
                                            OR  "CHUI_YUKOEDYMD"
                    MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
                END-IF
+      *H26.10
+               IF      WRK-PARA-NAME(1:3)  =   "COM"
+                   MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
+               END-IF
            ELSE
       *
                INITIALIZE                  ORCSKANACHKAREA
@@ -623,6 +691,46 @@
            .
        1001-OPTION-CALL-EXT.
            EXIT.
+      *
+      *H26.10
+      *****************************************************************
+      *    対象コメントコード編集処理
+      *****************************************************************
+       1001-COMHYOJI-HEN-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  TBL-COM-HYOJI-AREA
+           MOVE    ZERO                TO  IDX
+           PERFORM VARYING    IDXC     FROM    1   BY  1
+                   UNTIL      IDXC     >   5
+               MOVE    PARA-COM-HYOJI (IDXC)   TO  WRK-COMMNT
+               PERFORM 10011-COMHYOJI-HENSYU-SEC
+           END-PERFORM
+           .
+       1001-COMHYOJI-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象コメントコード編集処理
+      *****************************************************************
+       10011-COMHYOJI-HENSYU-SEC                SECTION.
+      *
+           IF     (WRK-COM-STR(1:1)    =   "8"  )
+               OR (WRK-COM-STR(1:3)    =   "008")
+               ADD     1                   TO  IDX
+               MOVE    WRK-COM-STR         TO  TBL-COM-STR (IDX)
+               IF     (WRK-COM-END(1:1)    =   "8"  )
+                   OR (WRK-COM-END(1:3)    =   "008")
+                   MOVE    WRK-COM-END         TO  TBL-COM-END (IDX)
+               ELSE
+                   MOVE    WRK-COM-STR         TO  TBL-COM-END (IDX)
+               END-IF
+               IF      TBL-COM-STR (IDX)   >   TBL-COM-END (IDX)
+                   MOVE    WRK-COM-STR         TO  TBL-COM-END (IDX)
+               END-IF
+           END-IF
+           .
+       10011-COMHYOJI-HENSYU-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -1251,8 +1359,17 @@
       *
       *    自費金額・点数＝ゼロは対象外
            IF     (ACCT-ZAITEN         =   ZERO )  AND
-                  (SRY-JIHIMONEYTOTAL  =   ZERO )
+                  (SRY-JIHIMONEYTOTAL  =   ZERO )  AND
+                  (FLG-SRYACT          =   ZERO )
                MOVE    1                   TO  FLG-SRYACT
+      *H26.10
+      *        自費対象であれば、点数ゼロも対象とする
+               IF      PARA-JIHIKBN       =   "1"
+                   IF     (ACCT-SRYKBN         =   "95"
+                                               OR  "96" )
+                       MOVE    ZERO            TO  FLG-SRYACT
+                   END-IF
+               END-IF
            END-IF
       *
            MOVE    ZERO                TO  IDX-S
@@ -1274,6 +1391,13 @@
       *                器材商品名対象
                            OR  (SRY-SRYCD (IDXA)(1:3)      =   "058")
                            PERFORM 200321-MEISAI-HEN-SEC
+                       END-IF
+      *H26.10
+      *                コメント対象
+                       IF    ( TBL-COM-STR (1)     NOT =   SPACE )
+                        AND  ((SRY-SRYCD (IDXA)(1:1)   =   "8" )
+                         OR   (SRY-SRYCD (IDXA)(1:3)   =   "008"))
+                           PERFORM 200322-COMMENT-CHKHEN-SEC
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_sryact"        TO  MCP-TABLE
@@ -1407,6 +1531,62 @@
            .
        200321-MEISAI-HEN-EXT.
            EXIT.
+      *H26.10
+      *****************************************************************
+      *    コメント判定追加処理
+      *****************************************************************
+       200322-COMMENT-CHKHEN-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDXC    FROM    1   BY  1
+                   UNTIL      (IDXC    >   5 )
+                        OR    (TBL-COM-STR (IDXC)  =   SPACE)
+                        OR    (FLG-OK      =   1   )
+               IF     (SRY-SRYCD (IDXA)    >=  TBL-COM-STR (IDXC))
+                 AND  (SRY-SRYCD (IDXA)    <=  TBL-COM-END (IDXC))
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               GO      TO      200322-COMMENT-CHKHEN-EXT
+           END-IF
+      *
+      *    対象
+           MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+      *
+           ADD     1                   TO  IDX-S
+           MOVE    SRY-SRYCD (IDXA)    TO  TBL-SRYCD (IDX-S)
+      *
+      *    コメント名称
+           IF     (SRY-INPUTNUM (IDXA) NOT =   ZERO )
+               PERFORM 2003221-PTCOM-SET-SEC
+           END-IF
+           MOVE    TNS-NAME            TO  TBL-NAME  (IDX-S)
+           MOVE    SRY-SRYSYUKBN       TO  WRK-SRYSYUKBN
+           MOVE    SRY-ZAINUM          TO  WRK-ZAINUM
+           .
+       200322-COMMENT-CHKHEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者コメントから編集する
+      *****************************************************************
+       2003221-PTCOM-SET-SEC              SECTION.
+      *
+           MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
+           MOVE    SRY-PTID            TO  PTCOM-PTID
+           MOVE    SRY-ZAINUM          TO  PTCOM-ZAINUM
+           MOVE    SRY-SRYCD (IDXA)    TO  PTCOM-SRYCD
+           MOVE    SRY-INPUTNUM(IDXA)  TO  PTCOM-RENNUM
+      *    主キーで検索
+           PERFORM 950-PTCOM-READ-SEC
+           IF      FLG-PTCOM           =   ZERO
+               MOVE    PTCOM-INPUTCOMENT   TO  TNS-NAME
+           END-IF
+           .
+       2003221-PTCOM-SET-EXT.
+           EXIT.
+      *
       *****************************************************************
       *        テーブル編集処理
       *****************************************************************
@@ -1589,6 +1769,9 @@
                    MOVE    ACCT-SRYKBN     TO  TBL-JIHI-SRYKBN(IDX-JIHI)
                    MOVE    WRK-KAISU       TO  TBL-JIHI-KAISU(IDX-JIHI)
                    MOVE    WRK-SRYSYUKBN   TO  TBL-JIHI-SRYSYUKBN
+                                                            (IDX-JIHI)
+      *H26.10
+                   MOVE    WRK-ZAINUM      TO  TBL-JIHI-ZAINUM
                                                             (IDX-JIHI)
                    MOVE    TBL-SRYCD (IDXJ)
                                            TO  TBL-JIHI-SRYCD
@@ -2409,8 +2592,9 @@
       *****************************************************************
        2005-JIHI-SYORI-SEC                SECTION.
       *
-           PERFORM VARYING     IDXJ    FROM    1   BY  1
-                   UNTIL      (IDXJ    >   50  )   OR
+           MOVE    1                   TO  IDXJ
+           PERFORM
+                   UNTIL      (IDXJ    >=   300  )   OR
                               (TBL-JIHI-SRYCD(IDXJ)    =   SPACE)
       *        １明細１剤とする
                INITIALIZE                  TBL-DATA-AREA
@@ -2422,6 +2606,34 @@
                MOVE    TBL-JIHI-NAME(IDXJ)     TO  TBL-NAME(1)
                MOVE    TBL-JIHI-JIHIMONEY(IDXJ)
                                                TO  TBL-JIHIMONEY(1)
+      *        コメント行は剤を分けない
+               MOVE    1                       TO  IDXJ2
+               MOVE    TBL-JIHI-ZAINUM (IDXJ)
+                                               TO  WRK-ZAINUM
+               MOVE    ZERO                    TO  FLG-JEND
+               PERFORM UNTIL   (IDXJ           >=  300 )
+                           OR  (IDXJ2          >=  50  )
+                           OR  (FLG-JEND       =   1  )
+                   ADD     1                   TO  IDXJ
+                   IF     (TBL-JIHI-SRYCD(IDXJ)    =   SPACE)
+                      OR  (TBL-JIHI-ZAINUM (IDXJ)  NOT =   WRK-ZAINUM)
+                       MOVE    1                   TO  FLG-JEND
+                   ELSE
+                       IF     (TBL-JIHI-SRYCD(IDXJ)(1:1)   =   "8")
+                           OR (TBL-JIHI-SRYCD(IDXJ)(1:3)   =   "008")
+                           ADD     1                   TO  IDXJ2
+                           MOVE    TBL-JIHI-SRYCD(IDXJ)
+                                                   TO  TBL-SRYCD(IDXJ2)
+                           MOVE    TBL-JIHI-NAME(IDXJ)
+                                                   TO  TBL-NAME(IDXJ2)
+                           MOVE    TBL-JIHI-JIHIMONEY(IDXJ)
+                                               TO  TBL-JIHIMONEY(IDXJ2)
+                       ELSE
+                           MOVE    1                   TO  FLG-JEND
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *
       *        帳票印刷編集
                PERFORM 2005-PRINT-SYORI-SEC
            END-PERFORM
@@ -2971,6 +3183,39 @@
            .
        950-PTNYUINRRK-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    患者コメントマスタ読み込み
+      *****************************************************************
+       950-PTCOM-READ-SEC           SECTION.
+      *
+           MOVE    PTCOM-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcom"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTCOM-REC
+                   MOVE    ZERO                TO  FLG-PTCOM
+               ELSE
+                   MOVE    1                   TO  FLG-PTCOM
+                   INITIALIZE                  PTCOM-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTCOM
+               INITIALIZE                  PTCOM-REC
+           END-IF
+      *
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       950-PTCOM-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

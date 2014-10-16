@@ -1707,7 +1707,9 @@
       *
       *    画像診断で部位から始まる場合
            IF     (LNK-WKSRY-SRYKBN (IDX)      =   "70" )  AND
-                  (LNK-WKSRY-SRYKBN (IDX - 1 ) =   "70" )  AND
+                  (LNK-WKSRY-SRYKBN (IDX - 1 ) =   "70"
+                                               OR  "95"
+                                               OR  "96" )  AND
                   (LNK-WKSRY-SRYCD (IDX IDY)(1:3)  =   "002")  AND
                   (LNK-WKSRY-SRYSYUKBN (IDX)   =   SPACE )
                 MOVE    1               TO  FLG-SYUBETU

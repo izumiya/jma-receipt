@@ -31,6 +31,7 @@
       *  04.07.00    NACL-多々納  11/12/19  商品名コード単価対応
       *  04.08.00    NACL-多々納  13/01/11  診療回数テーブル１０対応
       *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
+      *  04.07.00    NACL-多々納  14/10/14  コメント対象他追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -61,6 +62,7 @@
            03  FLG-PTHKNINF        PIC 9(01).
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
+           03  FLG-PTCOM           PIC 9(01).
       *
            03  FLG-SP              PIC 9(01).
            03  FLG-OK              PIC 9(01).
@@ -240,6 +242,10 @@
       *    受診履歴
        01  JYURRK-REC.
            COPY    "CPJYURRK.INC".
+      *
+      *    患者コメント
+       01  PTCOM-REC.
+           COPY    "CPPTCOM.INC".
       *
       *    保存用収納ワーク
        01  TBL-SYUNOU-AREA.
@@ -470,8 +476,17 @@
       *
       *    自費金額・点数＝ゼロは対象外
            IF     (ACCT-ZAITEN         =   ZERO )  AND
-                  (SRY-JIHIMONEYTOTAL  =   ZERO )
+                  (SRY-JIHIMONEYTOTAL  =   ZERO )  AND
+                  (FLG-SRYACT          =   ZERO )
                MOVE    1                   TO  FLG-SRYACT
+      *H26.10
+      *        自費対象であれば、点数ゼロも対象とする
+               IF      ORCHC04SUB-PARAJIHIKBN  =   "1"
+                   IF     (ACCT-SRYKBN         =   "95"
+                                               OR  "96" )
+                       MOVE    ZERO            TO  FLG-SRYACT
+                   END-IF
+               END-IF
            END-IF
       *
            INITIALIZE                  WRK-MEISAI-AREA
@@ -493,6 +508,12 @@
                                                        OR  "096")
       *            器材商品名対象
                        OR  (SRY-SRYCD (IDXA)(1:3)      =   "058")
+      *H26.10
+      *            コメントコード対象
+                       OR ((ORCHC04SUB-PARACOMKBN  =   "1"  )  AND
+                           ((SRY-SRYCD (IDXA)(1:3)  =   "008") OR
+                            (SRY-SRYCD (IDXA)(1:1)  =   "8"  )))
+      *
                        PERFORM 200211-MEISE-HEN-SEC
                    END-IF
                END-PERFORM
@@ -530,6 +551,13 @@
            ELSE
       *        薬剤以外で帳票名があれば帳票名称
                MOVE    TNSP-SHONAME        TO  TNS-NAME
+           END-IF
+      *
+      *    コメント対象
+           IF    ((SRY-SRYCD (IDXA)(1:1)   =   "8" )  OR
+                  (SRY-SRYCD (IDXA)(1:3)   =   "008"))
+              AND (SRY-INPUTNUM (IDXA) NOT =   ZERO )
+               PERFORM 2002110-PTCOM-SET-SEC
            END-IF
       *
            MOVE    TNS-NAME            TO  WRK-TBL-NAME  (IDX-S)
@@ -621,6 +649,24 @@
        200211-MEISE-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    患者コメントから編集する
+      *****************************************************************
+       2002110-PTCOM-SET-SEC              SECTION.
+      *
+           MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
+           MOVE    SRY-PTID            TO  PTCOM-PTID
+           MOVE    SRY-ZAINUM          TO  PTCOM-ZAINUM
+           MOVE    SRY-SRYCD (IDXA)    TO  PTCOM-SRYCD
+           MOVE    SRY-INPUTNUM(IDXA)  TO  PTCOM-RENNUM
+      *    主キーで検索
+           PERFORM 950-PTCOM-READ-SEC
+           IF      FLG-PTCOM           =   ZERO
+               MOVE    PTCOM-INPUTCOMENT   TO  TNS-NAME
+           END-IF
+           .
+       2002110-PTCOM-SET-EXT.
+           EXIT.
+      *****************************************************************
       *        テーブル編集処理
       *****************************************************************
        20023-TBL-HENSYU-SEC      SECTION.
@@ -700,8 +746,8 @@
                    MOVE    ZERO            TO  TBL-ZAITENSU (IDX-TBL)
                    MOVE    ZERO            TO  FLG-MEISAI
       *            その他とする
-                   IF     (WRK-SRYSYUKBN       =   "800"  )  AND
-                          (ACCT-SRYKBN         =   "80"   )
+                   IF     (ACCT-SRYKBN         =   "80"  )
+                     AND  (WRK-SRYSYUKBN       =   "800" )
                        MOVE    "86"            TO  TBL-SRYKBN (IDX-TBL)
                    END-IF
                END-IF
@@ -1471,6 +1517,39 @@
            PERFORM 990-DBCLOSE-SEC
            .
        9101-TENSUPLUS-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者コメントマスタ読み込み
+      *****************************************************************
+       950-PTCOM-READ-SEC           SECTION.
+      *
+           MOVE    PTCOM-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcom"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTCOM-REC
+                   MOVE    ZERO                TO  FLG-PTCOM
+               ELSE
+                   MOVE    1                   TO  FLG-PTCOM
+                   INITIALIZE                  PTCOM-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTCOM
+               INITIALIZE                  PTCOM-REC
+           END-IF
+      *
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       950-PTCOM-READ-EXT.
            EXIT.
       *
       *****************************************************************
