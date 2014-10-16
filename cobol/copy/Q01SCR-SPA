@@ -235,6 +235,8 @@
                                13  SPA-GMN-Q01-TENKENRECEMEI PIC X(20).
       *                ÊÝ¸±¡¡¸øÈñ
                        09  SPA-GMN-Q01-HOKEN-AREA.
+      *                    ÊÝ¸±Í­¸ú´ü´Ö
+                           11  SPA-GMN-Q01-HKNEDYM     PIC X(07).
                            11  SPA-GMN-Q01-HONKZKKBN-G.
                                13  SPA-GMN-Q01-HONKZKKBN
                                                        PIC X(1).
@@ -265,6 +267,9 @@
                            11  SPA-GMN-Q01-NUMTBL.
                                13  SPA-GMN-Q01-NUM     PIC X(40)
                                                        OCCURS  5.
+      *                    ¸øÈñÍ­¸ú´ü´Ö
+                           11  SPA-GMN-Q01-KOHEDYM     PIC X(07).
+      *                    ¸øÈñ¤Î¼ïÎà
                            11  SPA-GMN-Q01-CMB-KOHNUMTBL.
                                13  SPA-GMN-Q01-KOHNUM-G
                                                        OCCURS 5.
@@ -523,7 +528,8 @@
                            11  SPA-NAI-Q01-TOKKICD-BF  PIC X(02).
       *                ÊÝ¸±¡¡¸øÈñ
                        09  SPA-NAI-Q01-HOKEN-AREA.
-                           11  SPA-NAI-Q01-HOKEN-DMY   PIC X(01).
+                           11  SPA-NAI-Q01-HKNEDYM     PIC X(06).
+                           11  SPA-NAI-Q01-KOHEDYM     PIC X(06).
       *                ÉÂÌ¾¡¡¿ÇÎÅ¹Ô°Ù
                        09  SPA-NAI-Q01-BYOMEI-AREA.
                            11  SPA-NAI-Q01-STBYOYMD    PIC X(08).
@@ -1256,6 +1262,7 @@
                        09  SPA-Q01-TENKENRECE          PIC X(01).
       *            ÊÝ¸±¡¡¸øÈñ
                    07  SPA-Q01-HOKEN-AREA.
+                       09  SPA-Q01-HKNEDYM             PIC X(06).
                        09  SPA-Q01-HONKZKKBN           PIC X(01).
                        09  SPA-Q01-HKNJANUM-G.
                            11  SPA-Q01-HKNJANUM        PIC X(08)
@@ -1276,6 +1283,7 @@
                        09  SPA-Q01-HKNNUM-JKN          PIC X(01).
                        09  SPA-Q01-KOHNUM-JKN          PIC X(01).
       *
+                       09  SPA-Q01-KOHEDYM             PIC X(06).
                        09  SPA-Q01-KOHNUM-G.
                            11  SPA-Q01-KOHNUM          PIC X(04)
                                                        OCCURS  5.

@@ -48,6 +48,7 @@
            03  FLG-JOKEN-AND                      PIC 9(01).
            03  FLG-JOKEN-OR                       PIC 9(01).
            03  FLG-PTBYOMEI-SQL                    PIC 9(01).
+           03  FLG-TMPVQ001-SQL                    PIC 9(01).
            03  FLG-TBLNAME                         PIC 9(01).
            03  FLG-RECECOM-SQL                     PIC 9(01).
            03  FLG-HKNSELPTN                       PIC 9(01).
@@ -818,6 +819,8 @@
                            ",BB.HKNJANUM,BB.HONKZKKBN,BB.HKNNUM"
                                                    DELIMITED  BY  SIZE
                            ",AA.HKNID,BB.KIGO,BB.NUM,AA.HKNCOMBINUM "
+                                                   DELIMITED  BY  SIZE
+                           ",BB.TEKEDYMD "
                                                    DELIMITED  BY  SIZE
                            "FROM TBL_HKNCOMBI AA"
                                                    DELIMITED  BY  SIZE
@@ -2107,6 +2110,8 @@
       *****************************************************************
        1001-TMPVQ001-SQL-AND-EDIT-SEC  SECTION.
       *
+           MOVE    1                   TO  FLG-TMPVQ001-SQL
+      *
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
       *
@@ -2140,14 +2145,13 @@
                        PERFORM 10011-SRYKA-SQL-EDIT-SEC
                    END-IF
       *
-                   IF   ( SPA-Q01-GKOHINF  =   "1" )
-      *                ¥µº‘∏¯»Òæ Û£”£—£Ã ‘Ω∏ΩËÕ˝
-                       MOVE    SPA-Q01-KOHNUM (IDXA)
+      *            ¥µº‘∏¯»Òæ Û£”£—£Ã ‘Ω∏ΩËÕ˝
+                   MOVE    SPA-Q01-KOHNUM (IDXA)
                                            TO  WRK-KOHNUM
-                       MOVE    SPA-Q01-PAYKBN (IDXA)
+                   MOVE    SPA-Q01-PAYKBN (IDXA)
                                            TO  WRK-PAYKBN
-                       PERFORM 10012-PTKOHINF-KOHNUM-EDIT-SEC
-                   END-IF
+                   PERFORM 10012-PTKOHINF-KOHNUM-EDIT-SEC
+                   PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
       *
                    PERFORM 900-SQL-JOKEN-EDIT4-SEC
       *
@@ -2156,35 +2160,6 @@
                END-IF
       *
            END-PERFORM
-      *
-      *    ∏¯»Ò…È√¥º‘»÷πÊ£”£—£Ã ‘Ω∏ΩËÕ˝
-           IF    ( SPA-Q01-FTNJANUM-G      NOT =   SPACE )
-               MOVE    ZERO            TO  FLG-JOKEN-OR
-      *
-               PERFORM 900-SQL-JOKEN-EDIT5-SEC
-      *
-               PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   5 )
-      *
-                   IF    (SPA-Q01-KOHNUM (IDXA) NOT =   SPACE )
-                       MOVE    ZERO    TO  FLG-JOKEN-AND
-      *
-                       MOVE    IDXA        TO  WRK-NAME-SEQ
-                       MOVE    "D"         TO  WRK-SQL-TBL-NAME
-                       MOVE    WRK-NAME-SEQ
-                                           TO  WRK-SQL-TBL-NAME (2 : 1)
-      *
-                       PERFORM 900-SQL-JOKEN-EDIT6-SEC
-                       PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
-                       PERFORM 900-SQL-JOKEN-EDIT4-SEC
-                   END-IF
-      *
-               END-PERFORM
-      *
-               PERFORM 900-SQL-JOKEN-EDIT4-SEC
-      *
-               MOVE    1               TO  FLG-JOKEN
-           END-IF
       *
       *    ¥µº‘ ›∏±æ Û£”£—£Ã ‘Ω∏ΩËÕ˝
            IF   ( SPA-Q01-GHKNINF   =   "1" )
@@ -2229,6 +2204,8 @@
       *
            MOVE    "D"                 TO  WRK-SQL-TBL-NAME
       *
+           MOVE    1                   TO  FLG-TMPVQ001-SQL
+      *
            PERFORM 900-SQL-JOKEN-EDIT1-SEC
       *
            STRING "((D.SRYYMD <= '"
@@ -2258,6 +2235,7 @@
       *        ¥µº‘∏¯»Òæ Û£”£—£Ã ‘Ω∏ΩËÕ˝
                PERFORM 10011-PTKOHINF-KOHNUM-EDIT-SEC
                PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
+               PERFORM 10011-PTKOHINF-ETC-EDIT-SEC
            END-IF
       *
       *
@@ -2344,6 +2322,66 @@
                INTO    WRK-SQL
                WITH    POINTER WRK-SQL-PNT
                END-STRING
+      *
+               PERFORM 900-SQL-JOKEN-EDIT3-SEC
+           END-IF
+      *
+           IF      ( SPA-Q01-HKNEDYM   NOT =   SPACE )
+      *
+               MOVE    1                   TO  CNT-JOKEN
+      *
+               PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
+               IF    ( FLG-TMPVQ001-SQL    =   1 )
+                   STRING  "("
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".HKNEDYMD LIKE '"  DELIMITED   BY  SIZE
+                           SPA-Q01-HKNEDYM     DELIMITED   BY  SIZE
+                           "%')"               DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               ELSE
+                   STRING  "("
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".TEKEDYMD LIKE '"  DELIMITED   BY  SIZE
+                           SPA-Q01-HKNEDYM     DELIMITED   BY  SIZE
+                           "%')"               DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
+      *        ##¿Ë§Œ¥¸¥÷§À∑—¬≥√Ê§Œ ›∏±§¨§¢§√§ø§È¬–æ›§´§ÈΩ¸§ØæÏπÁ"
+      *        ##(ª√ƒÍ°À
+      *        STRING  "AND (("            DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".HOSPNUM,"         DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".PTID,"            DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".HKNNUM,"          DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".HKNJANUM,"        DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".KIGO,"            DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".NUM"              DELIMITED   BY  SIZE
+      *                ")NOT IN(SELECT HOSPNUM,PTID,HKNNUM,HKNJANUM,"
+      *                                    DELIMITED   BY  SIZE
+      *                "KIGO,NUM FROM TBL_PTHKNINF WHERE HOSPNUM="
+      *                                    DELIMITED   BY  SIZE
+      *                SPA-HOSPNUM         DELIMITED   BY  SIZE
+      *                " AND PTID="        DELIMITED   BY  SIZE
+      *                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+      *                ".PTID AND TEKSTYMD>'"
+      *                                    DELIMITED   BY  SIZE
+      *                SPA-Q01-HKNEDYM     DELIMITED   BY  SIZE
+      *                "31'))"             DELIMITED   BY  SIZE
+      *        INTO    WRK-SQL
+      *        WITH    POINTER WRK-SQL-PNT
+      *        END-STRING
+      *        ##########################
       *
                PERFORM 900-SQL-JOKEN-EDIT3-SEC
            END-IF
@@ -2758,6 +2796,44 @@
        10011-PTKOHINF-FTNNUM-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    ¥µº‘∏¯»Ò•ﬁ•π•ø° ≈¨Õ—Ω™Œª∆¸°À∏°∫˜æÚ∑Ô ‘Ω∏ΩËÕ˝
+      *****************************************************************
+       10011-PTKOHINF-ETC-EDIT-SEC   SECTION.
+      *
+           IF    ( SPA-Q01-KOHEDYM     NOT =   SPACE )
+      *
+               MOVE    1       TO      CNT-JOKEN
+      *
+               PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
+               IF    ( FLG-TMPVQ001-SQL    =   1 )
+                   STRING  "("                 DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".KOHEDYMD LIKE '"  DELIMITED   BY  SIZE
+                           SPA-Q01-KOHEDYM     DELIMITED   BY  SIZE
+                           "%')"               DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               ELSE
+                   STRING  "("                 DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".TEKEDYMD LIKE '"  DELIMITED   BY  SIZE
+                           SPA-Q01-KOHEDYM     DELIMITED   BY  SIZE
+                           "%')"               DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH    POINTER WRK-SQL-PNT
+                   END-STRING
+               END-IF
+      *
+               PERFORM 900-SQL-JOKEN-EDIT3-SEC
+      *
+           END-IF
+      *
+           .
+       10011-PTKOHINF-ETC-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    ¥µº‘ ›∏±•ﬁ•π•ø∏°∫˜æÚ∑Ô ‘Ω∏ΩËÕ˝
       *****************************************************************
        1001-PTHKNINF-SQL-EDIT-SEC      SECTION.
@@ -2792,6 +2868,7 @@
       *    ∏¯»Òæ Û£”£—£Ã ‘Ω∏ΩËÕ˝
            PERFORM 10011-PTKOHINF-KOHNUM-EDIT-SEC
            PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
+           PERFORM 10011-PTKOHINF-ETC-EDIT-SEC
       *
            STRING "AND (E.SAKJOKBN = ' ')  "
            DELIMITED   BY  SIZE
@@ -2827,58 +2904,8 @@
                    MOVE    SPA-Q01-PAYKBN (IDXA)
                                            TO  WRK-PAYKBN
                    PERFORM 10012-PTKOHINF-KOHNUM-EDIT-SEC
-      *
-                   PERFORM 900-SQL-JOKEN-EDIT4-SEC
-      *
-                   MOVE    1               TO  FLG-JOKEN
-      *
-               END-IF
-      *
-           END-PERFORM
-      *
-           IF    ( SPA-Q01-FTNJANUM-G      NOT =   SPACE )
-               MOVE    ZERO                TO  FLG-JOKEN-OR
-      *
-               PERFORM 900-SQL-JOKEN-EDIT5-SEC
-      *
-               PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   5 )
-      *
-                   IF    (SPA-Q01-KOHNUM (IDXA) NOT =   SPACE )
-      *
-                       MOVE    ZERO        TO  FLG-JOKEN-AND
-      *
-                       MOVE    IDXA        TO  WRK-NAME-SEQ
-                       MOVE    "E"         TO  WRK-SQL-TBL-NAME
-                       MOVE    WRK-NAME-SEQ
-                                           TO  WRK-SQL-TBL-NAME (2 : 1)
-      *
-                       PERFORM 900-SQL-JOKEN-EDIT6-SEC
-                       PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
-                       PERFORM 900-SQL-JOKEN-EDIT4-SEC
-      *
-                   END-IF
-      *
-               END-PERFORM
-      *
-               PERFORM 900-SQL-JOKEN-EDIT4-SEC
-      *
-               MOVE    1               TO  FLG-JOKEN
-           END-IF
-      *
-           PERFORM 900-SQL-JOKEN-EDIT5-SEC
-      *
-           MOVE    ZERO                TO  FLG-JOKEN-AND
-           PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   5 )
-      *
-               IF    (SPA-Q01-KOHNUM (IDXA) NOT =   SPACE )
-      *
-                   MOVE    IDXA        TO  WRK-NAME-SEQ
-                   MOVE    "E"         TO  WRK-SQL-TBL-NAME
-                   MOVE    WRK-NAME-SEQ
-                                       TO  WRK-SQL-TBL-NAME (2 : 1)
-      *
+                   PERFORM 10011-PTKOHINF-FTNNUM-EDIT-SEC
+                   PERFORM 10011-PTKOHINF-ETC-EDIT-SEC
                    MOVE    1           TO  CNT-JOKEN
                    PERFORM 900-SQL-JOKEN-EDIT2-SEC
                    STRING  "("                 DELIMITED   BY  SIZE
@@ -2890,11 +2917,13 @@
       *
                    PERFORM 900-SQL-JOKEN-EDIT3-SEC
       *
+                   PERFORM 900-SQL-JOKEN-EDIT4-SEC
+      *
+                   MOVE    1               TO  FLG-JOKEN
+      *
                END-IF
       *
            END-PERFORM
-      *
-           PERFORM 900-SQL-JOKEN-EDIT4-SEC
       *
            .
        1001-PTKOHINF-SQL-AND-EDIT-EXT.

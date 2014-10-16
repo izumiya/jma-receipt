@@ -192,3 +192,5 @@
            03  SHKITEMID-EDBYOYMD      PIC 9(05)   VALUE   167.
            03  SHKITEMID-HOKATSUKBN    PIC 9(05)   VALUE   168.
            03  SHKITEMID-TSTPT         PIC 9(05)   VALUE   169.
+           03  SHKITEMID-HKNEDYM       PIC 9(05)   VALUE   170.
+           03  SHKITEMID-KOHEDYM       PIC 9(05)   VALUE   171.

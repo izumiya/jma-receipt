@@ -107,6 +107,10 @@
                05  FLG-PAGENO-03                   PIC 9(01).
       *
            03  FLG-OK                              PIC 9(01).
+           03  FLG-ITEM-HKNNUM                     PIC 9(01).
+           03  FLG-ITEM-HKNJANUM                   PIC 9(01).
+           03  FLG-ITEM-KOHNUM                     PIC 9(01).
+           03  FLG-ITEM-FTNJANUM                   PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2428,9 +2432,6 @@
                MOVE    Q01-TEL (IDXB)  TO  SPA-GMN-Q01-TEL (IDXB)
            END-PERFORM
       *
-      *    本人家族
-           MOVE    Q01-HONKZKKBN       TO  SPA-GMN-Q01-HONKZKKBN-G
-      *
       *    コメント選択
            MOVE    Q01-SELCOMMENT      TO  SPA-GMN-Q01-SELCOMMENT-G
       *
@@ -2453,6 +2454,15 @@
       *
       *    ０点公費記載分
            MOVE    Q01-TENKENRECE      TO  SPA-GMN-Q01-TENKENRECE-G
+      *
+      *    保険有効期間終了月
+           MOVE    Q01-HKNEDYM         TO  SPA-GMN-Q01-HKNEDYM
+      *
+      *    本人家族
+           MOVE    Q01-HONKZKKBN       TO  SPA-GMN-Q01-HONKZKKBN-G
+      *
+      *    公費適用期間終了月
+           MOVE    Q01-KOHEDYM         TO  SPA-GMN-Q01-KOHEDYM
       *
            PERFORM VARYING IDXB    FROM    1   BY  1
                    UNTIL   IDXB    >       5
@@ -2856,6 +2866,11 @@
       *****************************************************************
        4101-HKN-INPUT-CHK-SEC          SECTION.
       *
+      *    保険有効期間終了月チェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-HKNEDYM-CHK-SEC
+           END-IF
+      *
       *    本人家族チェック
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4114-HONKZKKBN-CHK-SEC
@@ -2898,6 +2913,11 @@
                     OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4115-NUM-CHK-SEC
            END-PERFORM
+      *
+      *    公費適用期間終了月チェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-KOHEDYM-CHK-SEC
+           END-IF
       *
       *    公費の種類AND/OR/NOTチェック
            IF    ( SPA-ERRCD   =   SPACE )
@@ -4552,11 +4572,49 @@
        4117-TENKENRECE-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    保険有効期間終了月チェック処理
+      *****************************************************************
+       4114-HKNEDYM-CHK-SEC            SECTION.
+      *
+           COMPUTE WRK-ERR-CUR         =   201
+           MOVE    SPACE           TO  SPA-NAI-Q01-HKNEDYM
+      *
+           IF    ( SPA-GMN-Q01-HKNEDYM NOT =   SPACE )
+      *
+               INITIALIZE                  ORCSGDAYAREA
+               MOVE    SPA-GMN-Q01-HKNEDYM TO  SGDAY-INDAY
+               MOVE    "1"                 TO  SGDAY-INTYPE
+               CALL    "ORCSGDAY"          USING
+                                           ORCSGDAYAREA
+               IF    ( SGDAY-RC            =   ZERO )
+                   MOVE    SGDAY-OTDAY (1:6)
+                                           TO  SPA-GMN-Q01-HKNEDYM
+                   MOVE    SGDAY-SDAY  (1:6)
+                                           TO  SPA-NAI-Q01-HKNEDYM
+               ELSE
+                   MOVE    SPA-GMN-Q01-HKNEDYM
+                                           TO  WRK-YMD
+                   PERFORM 5002-HIZUKE-CHK-SEC
+                   IF  ( SPA-ERRCD         =   SPACE )
+                       MOVE    WRK-SYMD    TO  SPA-NAI-Q01-HKNEDYM
+                       MOVE    WRK-HENYMDG (1:6)
+                                           TO  SPA-GMN-Q01-HKNEDYM
+                   ELSE
+                       MOVE    "0150"      TO  SPA-ERRCD
+                       MOVE    WRK-ERR-CUR TO  SPA-GMN-Q01-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       4114-HKNEDYM-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    本人家族チェック処理
       *****************************************************************
        4114-HONKZKKBN-CHK-SEC             SECTION.
       *
-           COMPUTE WRK-ERR-CUR         =   201
+           COMPUTE WRK-ERR-CUR         =   235
       *
            IF    ( SPA-GMN-Q01-HONKZKKBN-G =   SPACE )
                GO  TO  4114-HONKZKKBN-CHK-EXT
@@ -4682,6 +4740,44 @@
        4115-NUM-CHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    公費適用期間終了月チェック処理
+      *****************************************************************
+       4114-KOHEDYM-CHK-SEC            SECTION.
+      *
+           COMPUTE WRK-ERR-CUR         =   236
+           MOVE    SPACE           TO  SPA-NAI-Q01-KOHEDYM
+      *
+           IF    ( SPA-GMN-Q01-KOHEDYM NOT =   SPACE )
+      *
+               INITIALIZE                  ORCSGDAYAREA
+               MOVE    SPA-GMN-Q01-KOHEDYM TO  SGDAY-INDAY
+               MOVE    "1"                 TO  SGDAY-INTYPE
+               CALL    "ORCSGDAY"          USING
+                                           ORCSGDAYAREA
+               IF    ( SGDAY-RC            =   ZERO )
+                   MOVE    SGDAY-OTDAY (1:6)
+                                           TO  SPA-GMN-Q01-KOHEDYM
+                   MOVE    SGDAY-SDAY  (1:6)
+                                           TO  SPA-NAI-Q01-KOHEDYM
+               ELSE
+                   MOVE    SPA-GMN-Q01-KOHEDYM
+                                           TO  WRK-YMD
+                   PERFORM 5002-HIZUKE-CHK-SEC
+                   IF  ( SPA-ERRCD         =   SPACE )
+                       MOVE    WRK-SYMD    TO  SPA-NAI-Q01-KOHEDYM
+                       MOVE    WRK-HENYMDG (1:6)
+                                           TO  SPA-GMN-Q01-KOHEDYM
+                   ELSE
+                       MOVE    "0151"      TO  SPA-ERRCD
+                       MOVE    WRK-ERR-CUR TO  SPA-GMN-Q01-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       4114-KOHEDYM-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    公費保険番号チェック処理
       *****************************************************************
@@ -8269,9 +8365,17 @@
                MOVE    "2"                 TO  SPA-Q01-HKNKOH-JKN
            END-IF
       *
+           MOVE    SPA-NAI-Q01-HKNEDYM TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR         TO  SPA-Q01-HKNEDYM
+      *
            MOVE    SPA-GMN-Q01-HONKZKKBN   TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-HONKZKKBN
+      *
+           MOVE    SPA-NAI-Q01-KOHEDYM TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR       TO  SPA-Q01-KOHEDYM
       *
            PERFORM VARYING IDXC    FROM    1   BY  1
                    UNTIL ( IDXC    >   5 )
@@ -8892,10 +8996,110 @@
       *****************************************************************
        4901-TAB2-CHK-SEC               SECTION.
       *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-NAI-Q01-HKNEDYM NOT =   SPACE )
+                   PERFORM 49011-HKNEDYM-CHK-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-NAI-Q01-KOHEDYM NOT =   SPACE )
+                   PERFORM 49011-KOHEDYM-CHK-SEC
+               END-IF
+           END-IF
+      *
            .
        4901-TAB2-CHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    保険有効終了月チェック処理
+      *****************************************************************
+       49011-HKNEDYM-CHK-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ITEM-HKNNUM
+                                           FLG-ITEM-HKNJANUM
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   5 )
+      *
+               IF    ( SPA-GMN-Q01-HKNJANUM (IDX0)   NOT =   SPACE )
+                   MOVE    1           TO  FLG-ITEM-HKNJANUM
+               END-IF
+      *
+               IF    ( SPA-GMN-Q01-HKNNUM (IDX0)   NOT =   SPACE )
+                   MOVE    1           TO  FLG-ITEM-HKNNUM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-ITEM-HKNJANUM   =   ZERO )
+                AND  ( FLG-ITEM-HKNNUM     =   ZERO )
+                   MOVE    "1023"          TO  SPA-ERRCD
+                   MOVE    207             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-ITEM-HKNJANUM   NOT =   ZERO )
+                AND  ( SPA-GMN-Q01-JKNHKNJANUM =   "9" )
+                   MOVE    "1024"          TO  SPA-ERRCD
+                   MOVE    232             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-ITEM-HKNNUM   NOT =   ZERO )
+                AND  ( SPA-GMN-Q01-JKNHKNNUM =   "9" )
+                   MOVE    "1024"          TO  SPA-ERRCD
+                   MOVE    233             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           .
+       49011-HKNEDYM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    公費有効終了月チェック処理
+      *****************************************************************
+       49011-KOHEDYM-CHK-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ITEM-KOHNUM
+                                           FLG-ITEM-FTNJANUM
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   5 )
+      *
+               IF    ( SPA-GMN-Q01-FTNJANUM (IDX0)   NOT =   SPACE )
+                   MOVE    1           TO  FLG-ITEM-FTNJANUM
+               END-IF
+      *
+               IF    ( SPA-GMN-Q01-KOHNUM (IDX0)   NOT =   SPACE )
+                   MOVE    1           TO  FLG-ITEM-KOHNUM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-ITEM-FTNJANUM   =   ZERO )
+                AND  ( FLG-ITEM-KOHNUM     =   ZERO )
+                   MOVE    "1025"          TO  SPA-ERRCD
+                   MOVE    222             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-ITEM-KOHNUM   NOT =   ZERO )
+                AND  ( SPA-GMN-Q01-JKNKOHNUM =   "9" )
+                   MOVE    "1026"          TO  SPA-ERRCD
+                   MOVE    234             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           .
+       49011-KOHEDYM-CHK-EXT.
+           EXIT.
       *****************************************************************
       *       病名・診療行為情報タブの関連チェック処理
       *****************************************************************
@@ -9413,6 +9617,9 @@
       *
            END-PERFORM
       *
+      *    保険有効期間終了月
+           MOVE    SPA-GMN-Q01-HKNEDYM     TO  Q01-HKNEDYM
+      *
       *    本人家族
            MOVE    SPA-GMN-Q01-HONKZKKBN-G TO  Q01-HONKZKKBN
            MOVE    SPA-GMN-Q01-HONKZKKBNLST-MAX
@@ -9424,6 +9631,9 @@
                                    TO  Q01-CMB-HONKZKKBN-ITEM (IDX1)
       *
            END-PERFORM
+      *
+      *    公費適用期間終了月
+           MOVE    SPA-GMN-Q01-KOHEDYM     TO  Q01-KOHEDYM
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   5 )
@@ -10079,7 +10289,7 @@
       *
       *    保険・公費タブ
            WHEN   201
-               MOVE  "HONKZKKBN"   TO  MCP-WIDGET
+               MOVE  "HKNEDYM"     TO  MCP-WIDGET
            WHEN   202
                MOVE  "HKNJANUM1"   TO  MCP-WIDGET
            WHEN   203
@@ -10146,6 +10356,10 @@
                MOVE  "JKNHKNNUM"   TO  MCP-WIDGET
            WHEN   234
                MOVE  "JKNKOHNUM"   TO  MCP-WIDGET
+           WHEN   235
+               MOVE  "HONKZKKBN"   TO  MCP-WIDGET
+           WHEN   236
+               MOVE  "KOHEDYM"     TO  MCP-WIDGET
       *
       *    病名・診療行為タブ
            WHEN   301
@@ -10433,6 +10647,8 @@
                MOVE  001           TO  SPA-GMN-Q01-CUR
       *
       *    保険・公費タブ
+           WHEN   "HKNEDYM"
+               MOVE  235           TO  SPA-GMN-Q01-CUR
            WHEN   "HONKZKKBN"
                MOVE  232           TO  SPA-GMN-Q01-CUR
            WHEN   "JKNHKNJANUM"
@@ -10478,6 +10694,8 @@
            WHEN   "KIGO5"
                MOVE  221           TO  SPA-GMN-Q01-CUR
            WHEN   "NUM5"
+               MOVE  236           TO  SPA-GMN-Q01-CUR
+           WHEN   "KOHEDYM"
                MOVE  234           TO  SPA-GMN-Q01-CUR
            WHEN   "JKNKOHNUM"
                MOVE  222           TO  SPA-GMN-Q01-CUR
@@ -10877,6 +11095,12 @@
            WHEN    "0149"
                MOVE    "テスト患者入力エラー"
                                        TO  SPA-ERRMSG
+           WHEN    "0150"
+               MOVE    "保険有効期間終了月入力エラー"
+                                       TO  SPA-ERRMSG
+           WHEN    "0151"
+               MOVE    "公費適用期間終了月入力エラー"
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "開始診療年月日＞終了診療年月日となっています"
                                        TO  SPA-ERRMSG
@@ -10980,6 +11204,42 @@
                        "診療行為を入力してください"
                                            DELIMITED BY SIZE
                INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1023"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING     "保険有効期間終了月の検索を行う場合、"
+                                           DELIMITED BY SIZE
+                          "保険者番号または保険の種類を"
+                                           DELIMITED BY SIZE
+                          "入力してください"
+                                           DELIMITED BY SIZE
+               INTO  SPA-ERRMSG
+               END-STRING
+           WHEN    "1024"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING     "保険有効期間終了月の検索を行う場合、"
+                                           DELIMITED BY SIZE
+                          "ＮＯＴ検索はできません"
+                                           DELIMITED BY SIZE
+               INTO  SPA-ERRMSG
+               END-STRING
+           WHEN    "1025"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING     "公費適用期間終了月の検索を行う場合、"
+                                           DELIMITED BY SIZE
+                          "公費の種類または負担者番号を"
+                                           DELIMITED BY SIZE
+                          "入力してください"
+                                           DELIMITED BY SIZE
+               INTO  SPA-ERRMSG
+               END-STRING
+           WHEN    "1026"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING     "公費適用期間終了月の検索を行う場合、"
+                                           DELIMITED BY SIZE
+                          "ＮＯＴ検索はできません"
+                                           DELIMITED BY SIZE
+               INTO  SPA-ERRMSG
                END-STRING
            WHEN    "4001"      THRU    "4999"
                MOVE    "更新処理に失敗しました"
@@ -11121,7 +11381,9 @@
                MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-TSTPT
                MOVE    SHODATA-ITEM    TO  Q01-TSTPT
-               MOVE    1               TO  FLG-PAGENO-00
+               IF    ( SHODATA-ITEM        =   "1" )
+                   MOVE    1           TO  FLG-PAGENO-00
+               END-IF
            WHEN    SHKITEMID-CHKTSTPT
                IF    ( SHODATA-ITEM        =   "1" )
                    MOVE    "b"         TO  Q01-TSTPT
@@ -11285,8 +11547,14 @@
            WHEN    SHKITEMID-TENKENRECE
                MOVE    SHODATA-ITEM    TO  Q01-TENKENRECE
                MOVE    1               TO  FLG-PAGENO-00
+           WHEN    SHKITEMID-HKNEDYM
+               MOVE    SHODATA-ITEM    TO  Q01-HKNEDYM
+               MOVE    1               TO  FLG-PAGENO-01
            WHEN    SHKITEMID-HONKZKKBN
                MOVE    SHODATA-ITEM    TO  Q01-HONKZKKBN
+               MOVE    1               TO  FLG-PAGENO-01
+           WHEN    SHKITEMID-KOHEDYM
+               MOVE    SHODATA-ITEM    TO  Q01-KOHEDYM
                MOVE    1               TO  FLG-PAGENO-01
            WHEN    SHKITEMID-HKNJANUM01
                MOVE    SHODATA-ITEM    TO  Q01-HKNJANUM (1)
@@ -11473,19 +11741,14 @@
                MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-BYOCOMP1
                MOVE    SHODATA-ITEM    TO  Q01-BYOCOMP  (1)
-               MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-BYOCOMP2
                MOVE    SHODATA-ITEM    TO  Q01-BYOCOMP  (2)
-               MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-BYOCOMP3
                MOVE    SHODATA-ITEM    TO  Q01-BYOCOMP  (3)
-               MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-BYOCOMP4
                MOVE    SHODATA-ITEM    TO  Q01-BYOCOMP  (4)
-               MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-BYOCOMP5
                MOVE    SHODATA-ITEM    TO  Q01-BYOCOMP  (5)
-               MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-SRYKBN
                MOVE    SHODATA-ITEM    TO  Q01-SRYKBN
                MOVE    1               TO  FLG-PAGENO-02
@@ -11855,15 +12118,10 @@
            END-IF
       *
            IF    ( SPA-GMN-Q01-TSTPT       NOT =   SPACE )
+            AND  ( SPA-GMN-Q01-TSTPT       NOT =   "a" )
                MOVE    SHKITEMID-TSTPT
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-TSTPT
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           ELSE
-               MOVE    SHKITEMID-TSTPT
-                                   TO  SHODATA-ITEMID
-               MOVE    SPA-GMN-Q01-TSTPTL (1)
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
@@ -12222,6 +12480,14 @@
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
       *
+           IF    ( SPA-NAI-Q01-HKNEDYM     NOT =   SPACE )
+               MOVE    SHKITEMID-HKNEDYM
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-HKNEDYM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
            IF    ( SPA-GMN-Q01-HONKZKKBN   NOT =   SPACE )
                MOVE    SHKITEMID-HONKZKKBN
                                    TO  SHODATA-ITEMID
@@ -12230,6 +12496,13 @@
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
       *
+           IF    ( SPA-NAI-Q01-KOHEDYM     NOT =   SPACE )
+               MOVE    SHKITEMID-KOHEDYM
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-KOHEDYM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
       *
            IF    ( SPA-GMN-Q01-HKNJANUM (1)  NOT =   SPACE )
                MOVE    SHKITEMID-HKNJANUM01

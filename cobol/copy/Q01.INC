@@ -140,6 +140,7 @@
                     07  Q01-CMB-TENKENRECE-COUNT    PIC S9(9) BINARY.
                     07  Q01-CMB-TENKENRECE-ITEM     PIC X(22) OCCURS 5.
                 05  Q01-FIXED17.
+                  06  Q01-HKNEDYM              PIC X(07).
                   06  Q01-CMB-HONKZKKBN.
                     07  Q01-HONKZKKBN          PIC X(10).
                     07  Q01-CMB-HONKZKKBN-COUNT
@@ -157,6 +158,7 @@
                     07  Q01-KIGO               PIC X(40)   OCCURS 5.
                   06  Q01-NUM-TBL.
                     07  Q01-NUM                PIC X(40)   OCCURS 5.
+                  06  Q01-KOHEDYM              PIC X(07).
                   06  Q01-CMB-KOHNUM-TBL.
                     07  Q01-CMB-KOHNUM-OCC                 OCCURS 5.
                       08  Q01-KOHNUM           PIC X(20).

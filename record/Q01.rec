@@ -319,6 +319,9 @@ Q01 {
         };
       };
       fixed17 {
+        HKNEDYM {
+          textdata varchar(07);
+        };
         CMB_HONKZKKBN {
           HONKZKKBN {
             textdata varchar(10);
@@ -405,6 +408,9 @@ Q01 {
         };
         NUM5 {
           textdata varchar(40);
+        };
+        KOHEDYM {
+          textdata varchar(07);
         };
         CMB_KOHNUM1 {
           KOHNUM1 {
