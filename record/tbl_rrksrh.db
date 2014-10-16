@@ -185,3 +185,14 @@ path drtv01	{
 		DROP VIEW TMPV_Q001;
 	};
 };
+
+path	del2 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_rrksrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     CREYMD    <     :CREYMD
+		;
+	};
+};
+

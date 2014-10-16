@@ -346,7 +346,15 @@
       *
            PERFORM 1001-INIT-SEC
       *
+           MOVE    SEL-UPYMD           TO  WRK-YMD
+           COMPUTE WRK-ZOGEN   =   -3
+           MOVE    "1"                 TO  WRK-ZOGENPTN
+           PERFORM 800-CALENDAR-SEC
+           MOVE    WRK-KEISANYMD       TO  WRK-DELYMD
+      *
            PERFORM 900-PTSRH-DEL2-SEC
+           PERFORM 900-SRYSRH-DEL2-SEC
+           PERFORM 900-RRKSRH-DEL2-SEC
            PERFORM 910-DBCOMMIT-SEC
            PERFORM 910-DBSTART-SEC
       *
@@ -1593,16 +1601,8 @@
        900-PTSRH-DEL2-SEC              SECTION.
       *
            INITIALIZE                  PTSRH-REC
-           MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
-           INITIALIZE                  STS-AREA-DAY
-           INITIALIZE                  LNK-DAY6-AREA
-           MOVE    "61"                TO  LNK-DAY6-IRAI
-           MOVE    SEL-UPYMD           TO  LNK-DAY6-KIJUN
-           MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-           MOVE    -3                  TO  LNK-DAY6-ZOGEN
-           CALL  "ORCSDAY"             USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-           MOVE    LNK-DAY6-KEISAN TO  PTSRH-CREYMD
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    WRK-DELYMD      TO  PTSRH-CREYMD
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
            MOVE    "del2"          TO  MCP-PATHNAME
@@ -1610,6 +1610,38 @@
       *
            .
        900-PTSRH-DEL2-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¾È²ñºï½ü½èÍý
+      *****************************************************************
+       900-SRYSRH-DEL2-SEC              SECTION.
+      *
+           INITIALIZE                  SRYSRH-REC
+           MOVE    SPA-HOSPNUM     TO  SRYSRH-HOSPNUM
+           MOVE    WRK-DELYMD      TO  SRYSRH-CREYMD
+           MOVE    SRYSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_srysrh"    TO  MCP-TABLE
+           MOVE    "del2"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-SRYSRH-DEL2-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼õ¿ÇÍúÎò¾È²ñºï½ü½èÍý
+      *****************************************************************
+       900-RRKSRH-DEL2-SEC              SECTION.
+      *
+           INITIALIZE                  RRKSRH-REC
+           MOVE    SPA-HOSPNUM     TO  RRKSRH-HOSPNUM
+           MOVE    WRK-DELYMD      TO  RRKSRH-CREYMD
+           MOVE    RRKSRH-REC      TO  MCPDATA-REC
+           MOVE    "tbl_rrksrh"    TO  MCP-TABLE
+           MOVE    "del2"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-RRKSRH-DEL2-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ¹Ô°Ù¾È²ñºï½ü½èÍý
