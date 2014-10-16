@@ -825,107 +825,26 @@
                PERFORM 2001111-DTCHK013-EDIT-SEC
       *    月
            WHEN   131
-               INITIALIZE                  DTCHK013-REC
-               MOVE    WRK-BOMYMD      TO  DTCHK013-SRYSTYMD
-               MOVE    WRK-EOMYMD      TO  DTCHK013-SRYEDYMD
-               PERFORM 900-DTCHK013-READ-SEC
-               MOVE    DCACCT-SRYYMD (1:6)
-                                       TO  DTCHK013-SRYYM
-               PERFORM 2001111-DTCHK013-EDIT-SEC
+               IF    ( DCACCT-SRYKBN   =   "90" OR "92" )
+                   PERFORM 2001111-NYUIN-EDIT-SEC
+               ELSE
+                   INITIALIZE                  DTCHK013-REC
+                   MOVE    WRK-BOMYMD      TO  DTCHK013-SRYSTYMD
+                   MOVE    WRK-EOMYMD      TO  DTCHK013-SRYEDYMD
+                   PERFORM 900-DTCHK013-READ-SEC
+                   MOVE    DCACCT-SRYYMD (1:6)
+                                           TO  DTCHK013-SRYYM
+                   PERFORM 2001111-DTCHK013-EDIT-SEC
+               END-IF
       *    入院初日
            WHEN   132
-               PERFORM VARYING IDX4    FROM    1   BY  1
-                       UNTIL ( IDX4    >   2 )
-                   IF    ( TNYUINRRK-DAY-RRKNUM (IDX4 DCACCT-DAY)
-                                       >   ZERO )
-      *
-      *                算定日チェック用
-                       INITIALIZE          DTCHK013-REC
-                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-SHONUM
-                       MOVE    DCACCT-SRYYMD
-                                       TO  DTCHK013-SRYSTYMD
-                                           DTCHK013-SRYEDYMD
-                                           DTCHK013-SRYYMD
-                       MOVE    DTCHK013-REC
-                                       TO  TMP013-REC
-                       PERFORM 900-DTCHK013-READ-SEC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-NYUINYMD
-                       PERFORM 2001111-DTCHK013-EDIT-SEC
-      *
-      *                算定回数チェック用
-                       MOVE    TMP013-REC
-                                       TO  DTCHK013-REC
-                       MOVE    "00000000"
-                                       TO  DTCHK013-SRYYMD
-                       PERFORM 900-DTCHK013-READ-SEC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-NYUINYMD
-                       PERFORM 2001111-DTCHK013-EDIT-SEC
-                   END-IF
-               END-PERFORM
+               PERFORM 2001111-NYUIN-EDIT-SEC
       *    入院中
            WHEN   133
-               PERFORM VARYING IDX4    FROM    1   BY  1
-                       UNTIL ( IDX4    >   2 )
-                   IF    ( TNYUINRRK-DAY-RRKNUM (IDX4 DCACCT-DAY)
-                                       >   ZERO )
-                       INITIALIZE          DTCHK013-REC
-                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-SHONUM
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-SRYSTYMD
-                       MOVE    WRK-EOMYMD
-                                       TO  DTCHK013-SRYEDYMD
-                       MOVE    DCACCT-SRYYMD
-                                       TO  DTCHK013-SRYYMD
-                       PERFORM 900-DTCHK013-READ-SEC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-NYUINYMD
-                       PERFORM 2001111-DTCHK013-EDIT-SEC
-                   END-IF
-               END-PERFORM
+               PERFORM 2001111-NYUIN-EDIT-SEC
       *    退院時
            WHEN   134
-               PERFORM VARYING IDX4    FROM    1   BY  1
-                       UNTIL ( IDX4    >   2 )
-                   IF    ( TNYUINRRK-DAY-RRKNUM (IDX4 DCACCT-DAY)
-                                       >   ZERO )
-      *                算定日チェック用
-                       INITIALIZE          DTCHK013-REC
-                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-SHONUM
-                       MOVE    DCACCT-SRYYMD
-                                       TO  DTCHK013-SRYSTYMD
-                                           DTCHK013-SRYEDYMD
-                                           DTCHK013-SRYYMD
-                       MOVE    DTCHK013-REC
-                                       TO  TMP013-REC
-                       PERFORM 900-DTCHK013-READ-SEC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-NYUINYMD
-                       MOVE    TNYUINRRK-DAY-TAIINYMD2(IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-TAIINYMD
-                       PERFORM 2001111-DTCHK013-EDIT-SEC
-      *
-      *                算定回数チェック用
-                       MOVE    TMP013-REC
-                                       TO  DTCHK013-REC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-SRYSTYMD
-                       MOVE    WRK-EOMYMD
-                                       TO  DTCHK013-SRYEDYMD
-                       MOVE    "00000000"
-                                       TO  DTCHK013-SRYYMD
-                       PERFORM 900-DTCHK013-READ-SEC
-                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-NYUINYMD
-                       MOVE    TNYUINRRK-DAY-TAIINYMD (IDX4 DCACCT-DAY)
-                                       TO  DTCHK013-TAIINYMD
-                       PERFORM 2001111-DTCHK013-EDIT-SEC
-                   END-IF
-               END-PERFORM
+               PERFORM 2001111-NYUIN-EDIT-SEC
       *    週
            WHEN   138
                INITIALIZE              DTCHK013-REC
@@ -1035,6 +954,107 @@
       *
            .
        200111-DTCHK013-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者・単位別算定回数ファイル編集処理（入院）
+      *****************************************************************
+       2001111-NYUIN-EDIT-SEC          SECTION.
+      *
+           PERFORM VARYING IDX4    FROM    1   BY  1
+                   UNTIL ( IDX4    >   2 )
+               IF    ( TNYUINRRK-DAY-RRKNUM (IDX4 DCACCT-DAY)
+                                       >   ZERO )
+                   EVALUATE    MASTER-TANICD
+      *            月
+                   WHEN   131
+                       INITIALIZE          DTCHK013-REC
+                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
+                                           TO  DTCHK013-SHONUM
+                       MOVE    WRK-BOMYMD  TO  DTCHK013-SRYSTYMD
+                       MOVE    WRK-EOMYMD  TO  DTCHK013-SRYEDYMD
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    DCACCT-SRYYMD (1:6)
+                                           TO  DTCHK013-SRYYM
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+      *            入院時
+                   WHEN   132
+      *                算定日チェック用
+                       INITIALIZE          DTCHK013-REC
+                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-SHONUM
+                       MOVE    DCACCT-SRYYMD
+                                       TO  DTCHK013-SRYSTYMD
+                                           DTCHK013-SRYEDYMD
+                                           DTCHK013-SRYYMD
+                       MOVE    DTCHK013-REC
+                                       TO  TMP013-REC
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-NYUINYMD
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+      *
+      *                算定回数チェック用
+                       MOVE    TMP013-REC
+                                       TO  DTCHK013-REC
+                       MOVE    "00000000"
+                                       TO  DTCHK013-SRYYMD
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-NYUINYMD
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+      *            入院中
+                   WHEN   133
+                       INITIALIZE          DTCHK013-REC
+                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-SHONUM
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-SRYSTYMD
+                       MOVE    WRK-EOMYMD
+                                       TO  DTCHK013-SRYEDYMD
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-NYUINYMD
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+      *            退院時
+                   WHEN   134
+      *                算定日チェック用
+                       INITIALIZE          DTCHK013-REC
+                       MOVE    TNYUINRRK-DAY-SHONUM   (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-SHONUM
+                       MOVE    DCACCT-SRYYMD
+                                       TO  DTCHK013-SRYSTYMD
+                                           DTCHK013-SRYEDYMD
+                                           DTCHK013-SRYYMD
+                       MOVE    DTCHK013-REC
+                                       TO  TMP013-REC
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-NYUINYMD
+                       MOVE    TNYUINRRK-DAY-TAIINYMD2(IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-TAIINYMD
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+      *
+      *                算定回数チェック用
+                       MOVE    TMP013-REC
+                                       TO  DTCHK013-REC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-SRYSTYMD
+                       MOVE    WRK-EOMYMD
+                                       TO  DTCHK013-SRYEDYMD
+                       MOVE    "00000000"
+                                       TO  DTCHK013-SRYYMD
+                       PERFORM 900-DTCHK013-READ-SEC
+                       MOVE    TNYUINRRK-DAY-NYUINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-NYUINYMD
+                       MOVE    TNYUINRRK-DAY-TAIINYMD (IDX4 DCACCT-DAY)
+                                       TO  DTCHK013-TAIINYMD
+                       PERFORM 2001111-DTCHK013-EDIT-SEC
+                   END-EVALUATE
+               END-IF
+           END-PERFORM
+      *
+           .
+       2001111-NYUIN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    患者・単位別算定回数ファイル編集処理
@@ -1280,9 +1300,12 @@
                COMPUTE IDX2    =   IDX2    +   1
                MOVE    IDX2    TO  TNYUINRRK-RRK-MAX (IDX1)
       *
-               IF    ( PTNYUINRRK-SHOKAIKBN    =   "1" )
-                   MOVE    PTNYUINRRK-NYUINYMD
+               IF    ( PTNYUINRRK-JTIKBN   NOT =   "5" )
+                   IF    ( PTNYUINRRK-NYUINYMD
+                                   <   TNYUINRRK-NYUINYMD (IDX1) )
+                       MOVE    PTNYUINRRK-NYUINYMD
                                TO  TNYUINRRK-NYUINYMD (IDX1)
+                   END-IF
                END-IF
       *
                IF    ( PTNYUINRRK-TAIINYMD
@@ -1392,13 +1415,18 @@
                MOVE    "月"            TO  MASTER-TANINAME
                MOVE    TNSCHK-JGNCNT     TO  MASTER-KAISU
       *
-               INITIALIZE                  DTCHK013-REC
-               MOVE    WRK-BOMYMD      TO  DTCHK013-SRYSTYMD
-               MOVE    WRK-EOMYMD      TO  DTCHK013-SRYEDYMD
-               PERFORM 900-DTCHK013-READ-SEC
-               MOVE    DCACCT-SRYYMD (1:6)
-                                       TO  DTCHK013-SRYYM
-               PERFORM 2001111-DTCHK013-EDIT-SEC
+               IF    ( DCACCT-SRYKBN   =   "90" OR "92" )
+                   PERFORM 2001111-NYUIN-EDIT-SEC
+               ELSE
+      *
+                   INITIALIZE                  DTCHK013-REC
+                   MOVE    WRK-BOMYMD      TO  DTCHK013-SRYSTYMD
+                   MOVE    WRK-EOMYMD      TO  DTCHK013-SRYEDYMD
+                   PERFORM 900-DTCHK013-READ-SEC
+                   MOVE    DCACCT-SRYYMD (1:6)
+                                           TO  DTCHK013-SRYYM
+                   PERFORM 2001111-DTCHK013-EDIT-SEC
+               END-IF
            END-IF
       *
       *    日
@@ -2737,6 +2765,8 @@
        900-PTNYUINRRK-KEY38-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           COMPUTE PTNYUINRRK-RRKNUM = PTNYUINRRK-RRKNUM + 1
       *
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
