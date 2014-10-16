@@ -60,6 +60,7 @@
       *  04.07.02    NACL-藤原    12/01/24  monpe-0.6.20対応
       *  04.07.03    NACL-門脇    14/10/02  摘要欄の最終行まで記載してから
       *                                     改ページするよう修正
+      *  04.07.04    NACL-門脇    14/10/15  療養期間の記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1296,42 +1297,44 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                    MOVE    RECE41-RYOEDYMD(7:2)
                                                TO  IDX6
                END-IF
-      *        診療期間（開始）
-      ***      PERFORM VARYING   IDX4   FROM   IDX5    BY  1
-      ***              UNTIL     IDX4    >     IDX6
-      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE)  OR
-      ***                ( RECE41-JNISSUTBL (IDX4) =   "1"  )
-      ***              MOVE    IDX4                TO  WRK-ZZ
-      ***              INITIALIZE                      ORCSKANACHKAREA
-      ***              MOVE    "2"                 TO  KANACHK-SYORI
-      ***              MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
-      ***              CALL    "ORCSKANACHK"       USING
-      ***                                          ORCSKANACHKAREA
-      ***              IF      KANACHK-RC      =   ZERO
-      ***                   MOVE    KANACHK-OUT-INPUT(1:4)
-      ***                                          TO  WRK-HCM56-STRDD
-      ***              END-IF
-      ***              MOVE    IDX6                TO  IDX4
-      ***          END-IF
-      ***      END-PERFORM
-      *        診療期間（終了）
-      ***      PERFORM VARYING   IDX4   FROM   IDX6    BY  -1
-      ***              UNTIL     IDX4    <     IDX5
-      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE ) OR
-      ***                ( RECE41-JNISSUTBL (IDX4) =   "1"   )
-      ***              MOVE    IDX4                    TO  WRK-ZZ
-      ***              INITIALIZE                      ORCSKANACHKAREA
-      ***              MOVE    "2"                 TO  KANACHK-SYORI
-      ***              MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
-      ***              CALL    "ORCSKANACHK"       USING
-      ***                                          ORCSKANACHKAREA
-      ***              IF      KANACHK-RC      =   ZERO
-      ***                   MOVE    KANACHK-OUT-INPUT(1:4)
-      ***                                          TO  WRK-HCM56-ENDDD
-      ***              END-IF
-      ***              MOVE    IDX5                    TO  IDX4
-      ***          END-IF
-      ***      END-PERFORM
+               IF    RECE41-NYUINFLG  =  1
+      *          診療期間（開始）
+                 PERFORM VARYING   IDX4   FROM   IDX5    BY  1
+                         UNTIL     IDX4    >     IDX6
+                   IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE)  OR
+                         ( RECE41-JNISSUTBL (IDX4) =   "1"  )
+                     MOVE    IDX4                TO  WRK-ZZ
+                     INITIALIZE                      ORCSKANACHKAREA
+                     MOVE    "2"                 TO  KANACHK-SYORI
+                     MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
+                     CALL    "ORCSKANACHK"       USING
+                                                 ORCSKANACHKAREA
+                     IF      KANACHK-RC      =   ZERO
+                          MOVE    KANACHK-OUT-INPUT(1:4)
+                                                 TO  WRK-HCM56-STRDD
+                     END-IF
+                     MOVE    IDX6                TO  IDX4
+                   END-IF
+                 END-PERFORM
+      *          診療期間（終了）
+                 PERFORM VARYING   IDX4   FROM   IDX6    BY  -1
+                         UNTIL     IDX4    <     IDX5
+                   IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE ) OR
+                         ( RECE41-JNISSUTBL (IDX4) =   "1"   )
+                     MOVE    IDX4                TO  WRK-ZZ
+                     INITIALIZE                      ORCSKANACHKAREA
+                     MOVE    "2"                 TO  KANACHK-SYORI
+                     MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
+                     CALL    "ORCSKANACHK"       USING
+                                                 ORCSKANACHKAREA
+                     IF      KANACHK-RC      =   ZERO
+                          MOVE    KANACHK-OUT-INPUT(1:4)
+                                                 TO  WRK-HCM56-ENDDD
+                     END-IF
+                     MOVE    IDX5                TO  IDX4
+                   END-IF
+                 END-PERFORM
+               END-IF
            END-IF
            MOVE    "から"              TO  WRK-HCM56-STRFL 
            MOVE    "まで"              TO  WRK-HCM56-ENDFL 

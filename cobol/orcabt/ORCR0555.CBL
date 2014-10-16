@@ -31,6 +31,7 @@
       *                                     ¤ë¥ì¥»¥×¥È¤ÏÂÐ¾Ý³°¤È¤¹¤ë
       *  04.07.02    NACL-ÌçÏÆ    13/10/07  ÎÅÍÜ´ü´Öµ­ºÜ½¤Àµ
       *  04.07.04    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.05    NACL-ÌçÏÆ    14/10/15  ÎÅÍÜ´ü´Ö¤Îµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1672,22 +1673,24 @@
                    MOVE    RECE41-RYOEDYMD (7:2)
                                                TO  IDX6
                END-IF    
-      ***      PERFORM VARYING IDX4    FROM    IDX5    BY  1
-      ***              UNTIL   IDX4    >       IDX6
-      ***          IF    ( RECE41-NYUINBITBL(IDX4) =  SPACE )
-      ***          OR    ( RECE41-JNISSUTBL (IDX4) =  "1"   )
-      ***              MOVE    IDX4                TO  WRK-RYOSTYMD-DD
-      ***              MOVE    IDX6                TO  IDX4
-      ***          END-IF
-      ***      END-PERFORM
-      ***      PERFORM VARYING IDX4    FROM    IDX6    BY  -1
-      ***              UNTIL   IDX4    <       IDX5
-      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE )
-      ***          OR    ( RECE41-JNISSUTBL (IDX4) =   "1"   )
-      ***              MOVE    IDX4                TO  WRK-RYOEDYMD-DD
-      ***              MOVE    IDX5                TO  IDX4
-      ***          END-IF
-      ***      END-PERFORM
+               IF    RECE41-NYUINFLG  =  1
+                 PERFORM VARYING IDX4    FROM    IDX5    BY  1
+                         UNTIL   IDX4    >       IDX6
+                     IF    ( RECE41-NYUINBITBL(IDX4) =  SPACE )
+                     OR    ( RECE41-JNISSUTBL (IDX4) =  "1"   )
+                         MOVE    IDX4          TO  WRK-RYOSTYMD-DD
+                         MOVE    IDX6          TO  IDX4
+                     END-IF
+                 END-PERFORM
+                 PERFORM VARYING IDX4    FROM    IDX6    BY  -1
+                         UNTIL   IDX4    <       IDX5
+                     IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE )
+                     OR    ( RECE41-JNISSUTBL (IDX4) =   "1"   )
+                         MOVE    IDX4          TO  WRK-RYOEDYMD-DD
+                         MOVE    IDX5          TO  IDX4
+                     END-IF
+                 END-PERFORM
+               END-IF
            END-IF
       *
       *    ÎÅÍÜ´ü´Ö¡Ý½éÆü

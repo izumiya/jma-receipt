@@ -106,6 +106,7 @@
       *  04.07.05    NACL-藤原    14/03/10  誕生日に平成の元号を追加
       *  04.07.06    NACL-門脇    14/10/02  摘要欄の最終行まで記載してから
       *                                     改ページするよう修正
+      *  04.07.07    NACL-門脇    14/10/15  療養期間の記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1367,26 +1368,28 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE    WRK-HENYMD          TO  HC21-RYOEDYMD
                MOVE  RECE41-RYOEDYMD(7:2)  TO  IDX6
            END-IF    
-      *    療養開始年月日再セット
-      ***  PERFORM   VARYING   IDX4   FROM   IDX5   BY  1
-      ***            UNTIL     IDX4    >     IDX6
-      ***        IF  (RECE41-NYUINBITBL(IDX4)  =  SPACE)  OR
-      ***            (RECE41-JNISSUTBL(IDX4)   =  "1"  )
-      ***            MOVE    IDX4                TO  WRK-KGK2
-      ***            MOVE    WRK-KGK2            TO  HC21-RYOSTYMD(5:2)
-      ***            MOVE    IDX6                TO  IDX4
-      ***        END-IF
-      ***  END-PERFORM
-      *    療養終了年月日再セット
-      ***  PERFORM   VARYING   IDX4   FROM   IDX6   BY  -1
-      ***            UNTIL     IDX4    <     IDX5
-      ***        IF  (RECE41-NYUINBITBL(IDX4)   =  SPACE) OR
-      ***            (RECE41-JNISSUTBL(IDX4)    =  "1"  )
-      ***            MOVE    IDX4                TO  WRK-KGK2
-      ***            MOVE    WRK-KGK2            TO  HC21-RYOEDYMD(5:2)
-      ***            MOVE    IDX5                TO  IDX4
-      ***        END-IF
-      ***  END-PERFORM
+           IF    RECE41-NYUINFLG  =  1
+      *      療養開始年月日再セット
+             PERFORM   VARYING   IDX4   FROM   IDX5   BY  1
+                       UNTIL     IDX4    >     IDX6
+                   IF  (RECE41-NYUINBITBL(IDX4)  =  SPACE)  OR
+                       (RECE41-JNISSUTBL(IDX4)   =  "1"  )
+                       MOVE    IDX4            TO  WRK-KGK2
+                       MOVE    WRK-KGK2        TO  HC21-RYOSTYMD(5:2)
+                       MOVE    IDX6            TO  IDX4
+                   END-IF
+             END-PERFORM
+      *      療養終了年月日再セット
+             PERFORM   VARYING   IDX4   FROM   IDX6   BY  -1
+                       UNTIL     IDX4    <     IDX5
+                   IF  (RECE41-NYUINBITBL(IDX4)   =  SPACE) OR
+                       (RECE41-JNISSUTBL(IDX4)    =  "1"  )
+                       MOVE    IDX4            TO  WRK-KGK2
+                       MOVE    WRK-KGK2        TO  HC21-RYOEDYMD(5:2)
+                       MOVE    IDX5            TO  IDX4
+                   END-IF
+             END-PERFORM
+           END-IF
       *
            IF      RECE41-JNISSU  =  999
               IF  (RECE41-KYUGYOFLG      =   SPACE)

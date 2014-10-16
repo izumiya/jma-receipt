@@ -116,6 +116,7 @@
       *  04.07.14    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *  04.07.15    NACL-門脇    14/08/07  労災レセ「新継再別」記載修正
       *  04.07.16    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.17    NACL-門脇    14/10/15  療養期間の記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -198,6 +199,9 @@
            03  FLG-PTHKNINF                            PIC 9(01).
            03  FLG-HKNJAINF                            PIC 9(01).
            03  FLG-HKNNUM                              PIC 9(01).
+           03  FLG-NYUIN-ARI                           PIC 9(01).
+           03  FLG-NYUIN-ARI2                          PIC 9(01).
+           03  FLG-NYUINACCT                           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -491,6 +495,10 @@
       *    保険番号
        01  HKNNUM-REC.
            COPY    "CPHKNNUM.INC".
+      *
+      *    入院会計
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -1455,6 +1463,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2102-NYUINBI-SET-SEC              SECTION.
       *
+           MOVE    ZERO                TO  FLG-NYUIN-ARI
+           MOVE    ZERO                TO  FLG-NYUIN-ARI2
       *    診療月内の入退院情報
            INITIALIZE                      PTNYUINRRK-REC
 grpsys     MOVE    RECE41-HOSPNUM      TO  PTNYUINRRK-HOSPNUM
@@ -1492,6 +1502,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM  VARYING IDX2 FROM    IDX3    BY  1
                         UNTIL   IDX2   >     IDX4
                    MOVE    "1"    TO   RECE41-NYUINBITBL(IDX2)
+                   MOVE     1     TO   FLG-NYUIN-ARI
                END-PERFORM
       *                 
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
@@ -1503,8 +1514,90 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "key23"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
+      ***
+      *
+           IF   FLG-NYUIN-ARI   =   1
+             PERFORM 21021-NYUINBI-CHECK-SEC
+           END-IF
+      *
            .
        2102-NYUINBI-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院日に同一保険組み合わせの入力があるかチェック
+      *****************************************************************
+       21021-NYUINBI-CHECK-SEC              SECTION.
+      *
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    RECE41-HOSPNUM     TO   NACCT-HOSPNUM
+           MOVE    RECE41-PTID        TO   NACCT-PTID
+           MOVE    RECE41-SRYYM       TO   NACCT-SRYYM
+           MOVE    "5"                TO   NACCT-ZAISKBKBN
+           MOVE    NYUINACCT-REC      TO   MCPDATA-REC
+           MOVE    "tbl_nyuinacct"    TO   MCP-TABLE
+           MOVE    "key17"            TO   MCP-PATHNAME
+           PERFORM  900-DBSELECT-SEC
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_nyuinacct"  TO   MCP-TABLE
+             MOVE    "key17"          TO   MCP-PATHNAME
+             PERFORM  800-NYUINACCT-READ-SEC
+             IF    FLG-NYUINACCT  =  ZERO
+               PERFORM  VARYING  IDX2  FROM  1  BY  1
+                         UNTIL   IDX2   >   31
+                 IF   (RECE41-NYUINBITBL(IDX2)  =  "1"  )
+                 AND  (NACCT-DAY(IDX2) = RECE41-HKNCOMBI)
+                   MOVE      1        TO   FLG-NYUIN-ARI2
+                 END-IF
+               END-PERFORM
+             END-IF
+           END-IF
+           MOVE    "tbl_nyuinacct"    TO   MCP-TABLE
+           MOVE    "key17"            TO   MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           IF   FLG-NYUIN-ARI2  =  ZERO
+             INITIALIZE                      SRYACCT-REC
+             MOVE    RECE41-HOSPNUM     TO   ACCT-HOSPNUM
+             MOVE    "1"                TO   ACCT-NYUGAIKBN
+             MOVE    RECE41-PTID        TO   ACCT-PTID
+             MOVE    RECE41-SRYYM       TO   ACCT-SRYYM
+             MOVE    RECE41-HKNCOMBI    TO   ACCT-HKNCOMBI
+             MOVE    SRYACCT-REC        TO   MCPDATA-REC
+             MOVE    "tbl_sryacct"      TO   MCP-TABLE
+             MOVE    "key22"            TO   MCP-PATHNAME
+             PERFORM  900-DBSELECT-SEC
+             IF      MCP-RC  =  ZERO
+               MOVE    "tbl_sryacct"    TO   MCP-TABLE
+               MOVE    "key22"          TO   MCP-PATHNAME
+               PERFORM  800-SRYACCT-READ-SEC
+               PERFORM  UNTIL  (FLG-SRYACCT    =  1)
+                         OR    (FLG-NYUIN-ARI2 =  1)
+                 IF    ACCT-SRYKBN   =  "95"  OR  "96"
+                   CONTINUE
+                 ELSE
+                   IF   (ACCT-ZAITEN    NOT =    ZERO)
+                   AND  (ACCT-ZAIKAISU  NOT =    ZERO)
+                   AND  (ACCT-JIHOKBN       =   SPACE)
+                     MOVE      1        TO   FLG-NYUIN-ARI2
+                   END-IF
+                 END-IF
+                 MOVE    "tbl_sryacct"  TO   MCP-TABLE
+                 MOVE    "key22"        TO   MCP-PATHNAME
+                 PERFORM  800-SRYACCT-READ-SEC
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_sryacct"      TO   MCP-TABLE
+             MOVE    "key22"            TO   MCP-PATHNAME
+             PERFORM  900-CLOSE-SEC
+           END-IF
+      *
+           IF   FLG-NYUIN-ARI2  =   1
+             MOVE    "1"    TO    RECE41-NYUINFLG
+           END-IF
+      *
+           .
+       21021-NYUINBI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3334,6 +3427,24 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        800-PTNYUINRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院会計読込
+      *****************************************************************
+       800-NYUINACCT-READ-SEC    SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  NYUINACCT-REC
+               MOVE    ZERO                TO  FLG-NYUINACCT
+           ELSE
+               INITIALIZE                      NYUINACCT-REC
+               MOVE    1                   TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       800-NYUINACCT-READ-EXT.
            EXIT.
       *
       *****************************************************************
