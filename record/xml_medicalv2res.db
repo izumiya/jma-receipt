@@ -49,5 +49,28 @@ xml_medicalv2res {
             	} [4];
         	};
     	};
+	Medical_Message_Information {
+        Medical_Result				varchar(2);
+        Medical_Result_Message			varchar(100);
+        Medical_Warning_Inf {
+       		 Medical_Warning        	varchar(3);
+       		 Medical_Warning_Message	varchar(100);
+       		 Medical_Warning_Position      	varchar(2);
+       		 Medical_Warning_Item_Position  varchar(2);
+       		 Medical_Warning_Code		varchar(9);
+            	} [50];
+        };
+	Disease_Message_Information {
+        Disease_Result				varchar(2);
+        Disease_Result_Message			varchar(100);
+        Disease_Warning_Inf {
+       		 Disease_Warning        	varchar(3);
+       		 Disease_Warning_Message	varchar(100);
+       		 Disease_Warning_Item_Position  varchar(2);
+       		 Disease_Warning_Name		varchar(80);
+       		 Disease_Warning_Code		varchar(50);
+       		 Disease_Warning_Change 	varchar(2);
+            	} [50];
+        };
    	};
 };

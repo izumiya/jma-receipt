@@ -35,6 +35,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 03.05.00     NACL-多々納  07/05/10  グループ診療対応
       * 04.07.00     NACL-多々納  11/10/05  OPENエラー対応追加
+      * 04.07.00     NACL-多々納  14/09/XX  COPY対応追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -123,13 +124,19 @@
       
       *
       *    claim連携リターンエリア
-       01  WRK-ERROR-AREA.
-           03  WRK-KBN-CODE            PIC X(01).
-           03  WRK-ERR-CODE            PIC 9(02).
-           03  WRK-ERR-MSG             PIC X(100).
-           03  WRK-OUT-HKNCOMBI        PIC X(04).
-           03  WRK-OUT-CNT1            PIC 9(04).
-           03  WRK-OUT-CNT2            PIC 9(04).
+      *01  WRK-ERROR-AREA.
+      *    03  WRK-KBN-CODE            PIC X(01).
+      *    03  WRK-KBN-CODE2           PIC X(01).
+      *    03  WRK-KBN-V2              PIC X(01).
+      *    03  WRK-ERR-CODE            PIC 9(02).
+      *    03  WRK-ERR-MSG             PIC X(100).
+      *    03  WRK-OUT-HKNCOMBI        PIC X(04).
+      *    03  WRK-OUT-CNT1            PIC 9(04).
+      *    03  WRK-OUT-CNT2            PIC 9(04).
+      *H26.8
+      *    API連携パラメタ領域
+           COPY    "CPORCL0031.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -174,7 +181,8 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
-           INITIALIZE                  WRK-ERROR-AREA
+      **** INITIALIZE                  WRK-ERROR-AREA
+           INITIALIZE                  LNK-ORCL0031AREA
            MOVE    SPACE               TO  WRK-DATA-REC 
                                            WRK-LF04-REC
       *
@@ -261,7 +269,8 @@
        200-MAIN-SEC                SECTION.
       *
            CALL    "ORCL0031"          USING   WRK-LF04-REC
-                                               WRK-ERROR-AREA
+                                               LNK-ORCL0031AREA
+      *****                                    WRK-ERROR-AREA
       *
       *    MOVE    WRK-LF04-REC        TO  LF04-REC
       *     

@@ -30,6 +30,7 @@
       *  04.07.00    NACL-多々納  11/10/XX  削除・置換え対応
       *  04.07.00    NACL-多々納  11/11/XX  同日再入院対応
       *  04.07.00    NACL=多々納  12/03/XX  平成２４年４月改正対応
+      *  04.07.00    NACL-多々納  14/10/XX  パラメタ変更対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -140,15 +141,19 @@
            03  WRK-LEN                 PIC 9(04).
       *
       *    claim連携リターンエリア
-       01  WRK-ERROR-AREA.
-           03  WRK-KBN-CODE            PIC X(01).
-           03  WRK-KBN-CODE2           PIC X(01).
-           03  WRK-KBN-V2              PIC X(01).
-           03  WRK-ERR-CODE            PIC 9(02).
-           03  WRK-ERR-MSG             PIC X(100).
-           03  WRK-OUT-HKNCOMBI        PIC X(04).
-           03  WRK-OUT-CNT1            PIC 9(04).
-           03  WRK-OUT-CNT2            PIC 9(04).
+      *01  WRK-ERROR-AREA.
+      *    03  WRK-KBN-CODE            PIC X(01).
+      *    03  WRK-KBN-CODE2           PIC X(01).
+      *    03  WRK-KBN-V2              PIC X(01).
+      *    03  WRK-ERR-CODE            PIC 9(02).
+      *    03  WRK-ERR-MSG             PIC X(100).
+      *    03  WRK-OUT-HKNCOMBI        PIC X(04).
+      *    03  WRK-OUT-CNT1            PIC 9(04).
+      *    03  WRK-OUT-CNT2            PIC 9(04).
+      *!
+      *H26.10
+      *    claim連携サブリターンエリア
+           COPY    "CPORCL0031.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -481,8 +486,8 @@
                    WHEN    1
                        MOVE    "登録処理終了"
                                            TO  MDCRES-API-RESULT-MSG
-                       IF     (WRK-OUT-CNT1        =   ZERO )
-                         AND  (WRK-OUT-CNT2        >   ZERO )
+                       IF     (LNK-OUT-CNT1        =   ZERO )
+                         AND  (LNK-OUT-CNT2        >   ZERO )
                            MOVE    "病名登録処理終了"
                                            TO  MDCRES-API-RESULT-MSG
                        END-IF
@@ -1178,34 +1183,41 @@
                GO      TO      20021-CLAIM-CALL-EXT
            END-IF
       *
-           INITIALIZE                  WRK-ERROR-AREA
-           MOVE    "1"                 TO  WRK-KBN-CODE
+      **** INITIALIZE                  WRK-ERROR-AREA
+           INITIALIZE                  LNK-ORCL0031AREA
+           MOVE    "1"                 TO  LNK-KBN-CODE
       *    診療行為なし
            IF     (CNT-SRYCNT          =   ZERO )
-               MOVE    "1"                 TO  WRK-KBN-CODE2
+               MOVE    "1"                 TO  LNK-KBN-CODE2
            END-IF
            CALL    "ORCL0031"          USING LF04-REC
-                                             WRK-ERROR-AREA
-           IF      WRK-OUT-HKNCOMBI    NOT =   ZERO
+      ****                                   WRK-ERROR-AREA
+                                             LNK-ORCL0031AREA
+           IF      LNK-OUT-HKNCOMBI    NOT =   ZERO
       *        対象保険組合せ情報編集
                PERFORM 200210-HKNCOMBI-HEN-SEC
            END-IF
-           IF      WRK-ERR-CODE    NOT =   ZERO
-      ******** MOVE    WRK-ERR-CODE        TO  WRK-ERRCD
+           IF      LNK-ERR1-CODE   NOT =   SPACE
                MOVE    "80"                TO  WRK-ERRCD
-               MOVE    WRK-ERR-MSG         TO  WRK-ERRMSG
+               MOVE    LNK-ERR1-MSG        TO  WRK-ERRMSG
            ELSE
-               IF     (WRK-OUT-HKNCOMBI    =   ZERO
+               IF      LNK-ERR2-CODE   NOT =   SPACE
+                   MOVE    "80"                TO  WRK-ERRCD
+                   MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG
+               END-IF
+           END-IF
+           IF      WRK-ERRCD           =   SPACE
+               IF     (LNK-OUT-HKNCOMBI    =   ZERO
                                            OR  SPACE)
                AND    (CNT-SRYCNT          >   ZERO )
                    MOVE    "K2"                TO  WRK-KEICD
                END-IF
                IF     (CNT-SRYCNT          >   ZERO )  AND
-                      (WRK-OUT-CNT1        =   ZERO )
+                      (LNK-OUT-CNT1        =   ZERO )
                    MOVE    "20"                TO  WRK-ERRCD
                END-IF
                IF     (CNT-BYOCNT          >   ZERO )  AND
-                      (WRK-OUT-CNT2        =   ZERO )
+                      (LNK-OUT-CNT2        =   ZERO )
                    MOVE    "21"                TO  WRK-ERRCD
                END-IF
                IF     (CNT-SRYCNT          =   ZERO )  AND
@@ -1214,7 +1226,7 @@
                END-IF
            END-IF
       *
-           IF      WRK-OUT-CNT1        =   ZERO
+           IF      LNK-OUT-CNT1        =   ZERO
       *        中途終了データ登録なしは、ＵＩＤのクリア
                MOVE    SPACE           TO  MDCRES-MEDICAL-UID
            END-IF
@@ -1280,7 +1292,7 @@
       *    診療科
            MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
       *    保険組合せ
-           MOVE    WRK-OUT-HKNCOMBI    TO  ORCSAPIHKN-IN-HKNCOMBI
+           MOVE    LNK-OUT-HKNCOMBI    TO  ORCSAPIHKN-IN-HKNCOMBI
            CALL    "ORCSAPIHKN"        USING
                                        SPA-AREA
                                        ORCSAPIHKNAREA
@@ -1290,7 +1302,7 @@
                    UNTIL      (IDX     >   20  )
                          OR   (ORCSAPIHKN-THKNCOMBI (IDX)
                                            =   SPACE  )
-               IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   WRK-OUT-HKNCOMBI
+               IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   LNK-OUT-HKNCOMBI
                    PERFORM 2002101-HKNHEN-TBL-SEC
                    MOVE    20                  TO  IDX
                END-IF
