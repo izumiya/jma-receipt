@@ -40,6 +40,8 @@
       *        ≈¿≈©√ÌºÕ
                05  LNK-ORCSTEN2-TENTEK-AREA.
                    07  LNK-ORCSTEN2-TENTEK-DAY            OCCURS   31.
+      *              ø«Œ≈≤ 
+                     09  LNK-ORCSTEN2-TENTEK-SRYKA        PIC X(02).
       *              Ã¿∫ŸøÙ
                      09  LNK-ORCSTEN2-TENTEK-MEISAISU     PIC 9(03).
       *              ∫ﬁ≈¿øÙ
@@ -67,6 +69,8 @@
       *        √Êø¥¿≈ÃÆ
                05  LNK-ORCSTEN2-CHUJOU-AREA.
                    07  LNK-ORCSTEN2-CHUJOU-DAY            OCCURS   31.
+      *              ø«Œ≈≤ 
+                     09  LNK-ORCSTEN2-CHUJOU-SRYKA        PIC X(02).
       *              Ã¿∫ŸøÙ
                      09  LNK-ORCSTEN2-CHUJOU-MEISAISU     PIC 9(03).
       *              ∫ﬁ≈¿øÙ
