@@ -89,6 +89,7 @@
       *                                     包括分は行為点数、行為薬剤料、
       *                                     行為材料料にゼロ点をセット
       *                                     する
+      *              NACL-伊藤    14/10/17  レセプト科区分クリア漏れ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2752,6 +2753,7 @@
            MOVE    RECE04-SRYYM       TO  WRK-FEDT-SRYYM
       *    WRK-FEDT-DD はすでにセット済み
       *レセプト科区分
+           MOVE    SPACE               TO  WRK-FEDT-RECESRYKA
            PERFORM VARYING SYSKAN-IDX2 FROM  1  BY  1
                    UNTIL   SYSKAN-IDX2 >   TBL-SRYKA-MAX
              IF    RECE04-SRYKA       =   TBL-SRYKA (SYSKAN-IDX2)
@@ -3405,6 +3407,7 @@
       ****      MOVE    "0"                TO  WRK-FEDT-HOUKATU-FLG
       **** END-IF
       *レセプト科区分
+           MOVE    SPACE               TO  WRK-FEDT-RECESRYKA
            PERFORM VARYING SYSKAN-IDX2 FROM  1  BY  1
                    UNTIL   SYSKAN-IDX2 >   TBL-SRYKA-MAX
              IF    RECE04-SRYKA       =   TBL-SRYKA (SYSKAN-IDX2)
@@ -3739,6 +3742,7 @@
            MOVE    RECE04-SRYYM       TO  WRK-FEDT-SRYYM
       *    WRK-FEDT-DD はすでにセット済み
       *レセプト科区分
+           MOVE    SPACE               TO  WRK-FEDT-RECESRYKA
            PERFORM VARYING SYSKAN-IDX2 FROM  1  BY  1
                    UNTIL   SYSKAN-IDX2 >   TBL-SRYKA-MAX
              IF    RECE04-SRYKA       =   TBL-SRYKA (SYSKAN-IDX2)
@@ -4147,6 +4151,7 @@
            MOVE    RECE02-SRYYM       TO  WRK-FEDT-SRYYM
       *    WRK-FEDT-DD はすでにセット済み
       *レセプト科区分
+           MOVE    SPACE               TO  WRK-FEDT-RECESRYKA
            PERFORM VARYING SYSKAN-IDX2 FROM  1  BY  1
                    UNTIL   SYSKAN-IDX2 >   TBL-SRYKA-MAX
              IF    LNK-DPCNYUIN-SRYKA (IDZ1 IDZ2)
