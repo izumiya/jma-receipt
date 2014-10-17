@@ -448,11 +448,11 @@
       *
            EVALUATE    FLG-DIAG
                WHEN    1
-                   MOVE    "01"                TO  LNK-ERR2-CODE
+                   MOVE    "02"                TO  LNK-ERR2-CODE
                    MOVE    "警告がある病名が存在します"
                                                TO  LNK-ERR2-MSG
                WHEN    9
-                   MOVE    "02"                TO  LNK-ERR2-CODE
+                   MOVE    "01"                TO  LNK-ERR2-CODE
                    MOVE    "登録出来ない病名が存在します"
                                                TO  LNK-ERR2-MSG
            END-EVALUATE
