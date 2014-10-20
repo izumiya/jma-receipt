@@ -43,6 +43,8 @@
                05  ORCSTEN-YAKZI-TBL           OCCURS   31.
       *            ∫ﬁ≈¿øÙ
                    07  ORCSTEN-ZAITEN          PIC  9(08).
+      *            ø«Œ≈≤ 
+                   07  ORCSTEN-YK-SRYKA        PIC  X(02).
       *            πÁ∑◊±’ŒÃ
                    07  ORCSTEN-CHUSYARYO       PIC  9(07)V9(05).
       *
@@ -82,6 +84,9 @@
                            11  ORCSTEN-KIZ-DAY2-G      OCCURS  31.
                                13  ORCSTEN-KIZ-DAY2    PIC 9(03)
                                                        OCCURS  2.
+      *                    ø«Œ≈≤ 
+                           11  ORCSTEN-KIZ-SRYKA       PIC X(02)
+                                                       OCCURS  31.
       *
       *≈¿≈©ºÍµªŒ¡ªªƒÍ
            03  ORCSTEN-DAY-AREA.

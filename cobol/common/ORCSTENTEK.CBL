@@ -39,6 +39,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/11/30  ÆüËè¤ÎÉ½¼¨½çÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/11/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/10/16  ¿ÇÎÅ²ÊÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
       *
@@ -180,6 +181,8 @@
                05  TBL-DAY-AREA2       OCCURS   31.
                    07  TBL-DAY2            PIC 9(03).
                    07  TBL-SURYO2          PIC 9(05)V9(05).
+      *H26.10      ¿ÇÎÅ²Ê
+                   07  TBL-SRYKA2          PIC X(02).
       *            ÇÑ´þ¥Õ¥é¥°
                    07  TBL-HAIKI2          PIC 9(01).
                    07  TBL-HAIKI-SURYO2    PIC 9(05)V9(05).
@@ -432,17 +435,22 @@
            END-IF
       *
       *TEST
-           PERFORM VARYING    IDX  FROM   1   BY  1
-                   UNTIL      IDX  >   31
-              IF  ORCSTEN-ZAITEN(IDX)  >   ZERO
-                 DISPLAY "IDX:"  IDX
-                  ",ORCSTEN-ZAITEN:" ORCSTEN-ZAITEN (IDX)
-                  ",ORCSTEN-CHUSYARYO:" ORCSTEN-CHUSYARYO (IDX)
-                  ",SRYCD:" ORCSTEN-SRYCD (IDX 1)
-               ",ORCSTEN-DOU-ZAITEN 1:"  ORCSTEN-DOU-ZAITEN (IDX 1) 
-               ",ORCSTEN-DOU-ZAITEN 2:"  ORCSTEN-DOU-ZAITEN (IDX 2) 
-              END-IF
-            END-PERFORM
+      *    PERFORM VARYING    IDX  FROM   1   BY  1
+      *            UNTIL      IDX  >   31
+      *       IF  ORCSTEN-ZAITEN(IDX)  >   ZERO
+      *          DISPLAY "IDX:"  IDX
+      *           ",ORCSTEN-ZAITEN:" ORCSTEN-ZAITEN (IDX)
+      *           ",ORCSTEN-CHUSYARYO:" ORCSTEN-CHUSYARYO (IDX)
+      *           ",SRYKA:" ORCSTEN-YK-SRYKA (IDX)
+      *           ",SRYCD:" ORCSTEN-SRYCD (IDX 1)
+      *      END-IF
+      *       IF  ORCSTEN-KIZ-DAY(1 IDX)  >   ZERO
+      *          DISPLAY "IDX:"  IDX
+      *           ",ORCSTEN-KIZ-ZAITEN:" ORCSTEN-KIZ-ZAITEN (IDX)
+      *           ",SRYKA:" ORCSTEN-KIZ-SRYKA (1 IDX)
+      *           ",SRYCD:" ORCSTEN-KIZ-SRYCD (1 1)
+      *      END-IF
+      *     END-PERFORM
       *TEST
            . 
        000-PROC-EXT.
@@ -876,6 +884,10 @@
                    END-IF
                    ADD     WRK-SURYO            TO  TBL-SURYO2
                                                           (IDX-T IDX-D)
+      *H26.10
+      *            ¿ÇÎÅ²ÊÊÔ½¸
+                   MOVE    ACCT-SRYKA          TO  TBL-SRYKA2
+                                                      (IDX-T IDX-D)
       *ver.4.7
       *            Æ±ÆüºÆÆþ±¡¿ôÎÌ·×»»
                    IF      ACCT-DAY (2 IDX-D)  >   ZERO
@@ -1229,6 +1241,13 @@
                                                       (IDX-T IDX-T2 1)
                ADD     ACCT-DAY (3 IDX-T2) TO  ORCSTEN-KIZ-DAY2
                                                       (IDX-T IDX-T2 2)
+      *H26.10
+      *        ¿ÇÎÅ²Ê
+               IF      ORCSTEN-KIZ-SRYKA  (IDX-T IDX-T2)
+                                           =   SPACE
+                   MOVE    ACCT-SRYKA      TO  ORCSTEN-KIZ-SRYKA
+                                                          (IDX-T IDX-T2)
+               END-IF
            END-PERFORM
       *
            .
@@ -1636,21 +1655,46 @@
            MOVE    TBL-SRYCD (IDX-T)   TO  ORCSTEN-SRYCD (IDX-D IDX)
            MOVE    TBL-SURYO (IDX-T IDX-D)
                                        TO  ORCSTEN-SURYO (IDX-D IDX)
+      *H26.10
+      *    ¿ÇÎÅ²ÊÊÔ½¸
+           MOVE    TBL-SRYKA (IDX-T IDX-D)
+                                       TO  ORCSTEN-YK-SRYKA (IDX-D)
+      *
            IF      TBL-DAY2 (IDX-T IDX-D)  >   ZERO
                ADD     TBL-SURYO2(IDX-T IDX-D)
                                        TO  ORCSTEN-SURYO (IDX-D IDX)
+      *
+               IF      ORCSTEN-YK-SRYKA (IDX-D)    =   SPACE
+                   MOVE    TBL-SRYKA2 (IDX-T IDX-D)
+                                       TO  ORCSTEN-YK-SRYKA (IDX-D)
+               END-IF
            END-IF
            IF      TBL-DAY4 (IDX-T IDX-D)  >   ZERO
                ADD     TBL-SURYO4(IDX-T IDX-D)
                                        TO  ORCSTEN-SURYO (IDX-D IDX)
+      *
+               IF      ORCSTEN-YK-SRYKA (IDX-D)    =   SPACE
+                   MOVE    TBL-SRYKA4 (IDX-T IDX-D)
+                                       TO  ORCSTEN-YK-SRYKA (IDX-D)
+               END-IF
            END-IF
            IF      TBL-DAY3 (IDX-T IDX-D)  >   ZERO
                ADD     TBL-SURYO3(IDX-T IDX-D)
                                        TO  ORCSTEN-SURYO (IDX-D IDX)
+      *
+               IF      ORCSTEN-YK-SRYKA (IDX-D)    =   SPACE
+                   MOVE    TBL-SRYKA3 (IDX-T IDX-D)
+                                       TO  ORCSTEN-YK-SRYKA (IDX-D)
+               END-IF
            END-IF
            IF      TBL-DAY5 (IDX-T IDX-D)  >   ZERO
                ADD     TBL-SURYO5(IDX-T IDX-D)
                                        TO  ORCSTEN-SURYO (IDX-D IDX)
+      *
+               IF      ORCSTEN-YK-SRYKA (IDX-D)    =   SPACE
+                   MOVE    TBL-SRYKA5 (IDX-T IDX-D)
+                                       TO  ORCSTEN-YK-SRYKA (IDX-D)
+               END-IF
            END-IF
       *
            COMPUTE WRK-TENSU-KEI       =   TBL-TEN  (IDX-T)
