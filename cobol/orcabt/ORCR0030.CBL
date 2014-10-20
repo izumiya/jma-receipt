@@ -14927,11 +14927,11 @@ grpsys           PERFORM 900-DBSELECT-SEC
            MOVE    "__"                 TO   SYU-SRYYMD(7:2)
            MOVE    SYUNOU-REC           TO   MCPDATA-REC
            MOVE    "tbl_syunou"         TO   MCP-TABLE
-           MOVE    "key69"              TO   MCP-PATHNAME
+           MOVE    "key35"              TO   MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =    ZERO
              MOVE    "tbl_syunou"       TO   MCP-TABLE
-             MOVE    "key69"            TO   MCP-PATHNAME
+             MOVE    "key35"            TO   MCP-PATHNAME
              PERFORM  900-SYUNOU-READ-SEC
              PERFORM  UNTIL  (FLG-SYUNOU  =  1)
                PERFORM  VARYING  IDX1   FROM  1   BY  1
@@ -14952,12 +14952,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  END-IF
                END-PERFORM
                MOVE      "tbl_syunou"   TO   MCP-TABLE
-               MOVE      "key69"        TO   MCP-PATHNAME
+               MOVE      "key35"        TO   MCP-PATHNAME
                PERFORM    900-SYUNOU-READ-SEC
              END-PERFORM
            END-IF
            MOVE    "tbl_syunou"         TO   MCP-TABLE
-           MOVE    "key69"              TO   MCP-PATHNAME
+           MOVE    "key35"              TO   MCP-PATHNAME
            PERFORM  900-CLOSE-SEC
       *
            PERFORM  VARYING  IDX1   FROM  1   BY  1

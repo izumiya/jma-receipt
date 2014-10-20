@@ -12534,6 +12534,8 @@
                        MOVE  1                     TO   FLG-ZAITAKU      
                       END-IF
                  ELSE                                                   
+                      PERFORM  2202C-CYOKI-HANTEI-SEC
+      *
                       MOVE     SYU-SYUCOMPFTN   TO  WK-SYU-SYUCOMPFTN
       ***
                       IF   (SYU-SYUHKNNUM      NOT = SPACE)
@@ -16752,8 +16754,7 @@
                           MOVE   1   TO  FLG-SYUKEI3
                         END-IF
                       END-IF
-                      IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                           (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                      IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                            (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                            (COMB-KOH4HKNNUM   =  "972" OR "974"))
                       AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -16867,8 +16868,7 @@
                      END-IF
                    END-IF
                ELSE
-                   IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                        (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                   IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                         (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                         (COMB-KOH4HKNNUM   =  "972" OR "974"))
                    AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -16925,8 +16925,7 @@
                         END-IF
                       END-IF
                  ELSE
-                      IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                           (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                      IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                            (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                            (COMB-KOH4HKNNUM   =  "972" OR "974"))
                       AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18197,8 +18196,7 @@
                       (SYU-KOH2HKNNUM  = "972" OR "974") OR
                       (SYU-KOH3HKNNUM  = "972" OR "974") OR
                       (SYU-KOH4HKNNUM  = "972" OR "974"))
-                    IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                         (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH4HKNNUM   =  "972" OR "974"))
                     AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18228,8 +18226,7 @@
                       (SYU-KOH2HKNNUM   = "972" OR "974") OR
                       (SYU-KOH3HKNNUM   = "972" OR "974") OR
                       (SYU-KOH4HKNNUM   = "972" OR "974"))
-                    IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                         (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH4HKNNUM   =  "972" OR "974"))
                     AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18260,8 +18257,7 @@
                     (SYU-KOH3HKNNUM   = "972" OR "974") OR
                     (SYU-KOH4HKNNUM   = "972" OR "974"))
                  IF    FLG-MARUKO  =  ZERO
-                   IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                        (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                   IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                         (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                         (COMB-KOH4HKNNUM   =  "972" OR "974"))
                    AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18326,8 +18322,7 @@
                       (SYU-KOH2HKNNUM  = "972" OR "974") OR
                       (SYU-KOH3HKNNUM  = "972" OR "974") OR
                       (SYU-KOH4HKNNUM  = "972" OR "974"))
-                    IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                         (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH4HKNNUM   =  "972" OR "974"))
                     AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18357,8 +18352,7 @@
                       (SYU-KOH2HKNNUM   = "972" OR "974") OR
                       (SYU-KOH3HKNNUM   = "972" OR "974") OR
                       (SYU-KOH4HKNNUM   = "972" OR "974"))
-                    IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                         (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH4HKNNUM   =  "972" OR "974"))
                     AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18389,8 +18383,7 @@
                     (SYU-KOH3HKNNUM   = "972" OR "974") OR
                     (SYU-KOH4HKNNUM   = "972" OR "974"))
                  IF    FLG-MARUKO  =  ZERO
-                    IF  ((COMB-KOH1HKNNUM   =  "972" OR "974") OR
-                         (COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                          (COMB-KOH4HKNNUM   =  "972" OR "974"))
                     AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
@@ -18438,6 +18431,39 @@
            .
       *
        22029-CYOKI-ARI-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    長期の判定
+      ******************************************************************
+       2202C-CYOKI-HANTEI-SEC          SECTION.
+      *
+           IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH3HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH4HKNNUM   =  "972" OR "974"))
+           AND ((SYU-KOH2HKNNUM    =  "972" OR "974") OR
+                (SYU-KOH3HKNNUM    =  "972" OR "974") OR
+                (SYU-KOH4HKNNUM    =  "972" OR "974"))
+               MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+           END-IF
+      *
+           IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH3HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH4HKNNUM   =  "972" OR "974"))
+           AND ( SYU-KOH1HKNNUM    =  "972" OR "974" )
+           AND ( SYU-KOH2HKNNUM    =   SPACE         )
+           AND ( SYU-KOH3HKNNUM    =   SPACE         )
+           AND ( SYU-KOH4HKNNUM    =   SPACE         )
+             IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
+             AND (LNK-SYU-DENPNUM     NOT =  ZERO)
+             AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+               MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+             END-IF
+           END-IF
+      *
+           .
+      *
+       2202C-CYOKI-HANTEI-EXT.
            EXIT.
       *
       ******************************************************************

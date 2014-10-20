@@ -124,6 +124,7 @@
       *                                     ¥¨¥é¡¼»þ½èÍý½ªÎ»
       *  04.07.12    NACL-ÌçÏÆ    14/09/01  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
       *  04.07.13    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.14    NACL-ÌçÏÆ    14/10/17  ÅÀÅ©¤Î¿ÇÎÅ²ÊÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -403,6 +404,7 @@
                                                        OCCURS   20.
       *
                05  WRK-TENTEKI2-T-AREA                 OCCURS   31.
+                 06  WRK-TENTEKI2-T-SRYKA              PIC X(02).
                  06  WRK-TENTEKI2-T-MEISAISU           PIC 9(03).
                  06  WRK-TENTEKI2-T-ZAITEN             PIC 9(07).
                  06  WRK-TENTEKI2-T-SRYCDTOTAL         PIC 9(13).
@@ -417,6 +419,7 @@
                05  WRK-TENTEKI2-T-ERRCD                PIC 9(01).
       *
                05  WRK-TENTEKI2-C-AREA                 OCCURS   31.
+                 06  WRK-TENTEKI2-C-SRYKA              PIC X(02).
                  06  WRK-TENTEKI2-C-MEISAISU           PIC 9(03).
                  06  WRK-TENTEKI2-C-ZAITEN             PIC 9(07).
                  06  WRK-TENTEKI2-C-SRYCDTOTAL         PIC 9(13).
@@ -437,6 +440,7 @@
                05  WRK-ORCSTEN-COM-MEI                 PIC X(80).
            03  WRK-ORCSTEN-T2                          OCCURS   31.
                05  WRK-ORCSTEN-DAY                     PIC 9(03).
+               05  WRK-ORCSTEN-KIZ-SRYKA               PIC X(02).
            03  WRK-ORCSTEN-ZAIKAISU                    PIC 9(04).
       *
       *    »ÜÀß´ð½à¾ðÊóÂàÈòÍÑÎÎ°è
@@ -5978,7 +5982,7 @@
       ***  MOVE    WRK-ZAINUM           TO  RECE220-ZAINUM
            MOVE    RECE200-PTNUM        TO  RECE220-PTNUM
       *
-           MOVE    SPACE                TO  RECE220-SRYKA
+           MOVE    "00"                 TO  RECE220-SRYKA
            MOVE    RECE200-HKNCOMBI     TO  RECE220-HKNCOMBI
            MOVE    SPACE                TO  RECE220-JIHOKBN
       *
@@ -6016,7 +6020,7 @@
            MOVE    WRK-ZAINUM           TO  RECE220-ZAINUM
            MOVE    RECE200-PTNUM        TO  RECE220-PTNUM
       *
-           MOVE    SPACE                TO  RECE220-SRYKA
+           MOVE    "00"                 TO  RECE220-SRYKA
            MOVE    RECE200-HKNCOMBI     TO  RECE220-HKNCOMBI
            MOVE    SPACE                TO  RECE220-JIHOKBN
       *
@@ -6062,7 +6066,7 @@
            MOVE    1                    TO   RECE230-RENNUM
            MOVE    RECE200-PTNUM        TO   RECE230-PTNUM
       *
-           MOVE    SPACE                TO   RECE230-SRYKA
+           MOVE    "00"                 TO   RECE230-SRYKA
            MOVE    "97"                 TO   RECE230-SRYKBN
            MOVE    "970"                TO   RECE230-SRYSYUKBN
            MOVE    ZERO                 TO   RECE230-JIHIMONEY
@@ -6182,7 +6186,7 @@
            MOVE    1                    TO   RECE230-RENNUM
            MOVE    RECE200-PTNUM        TO   RECE230-PTNUM
       *
-           MOVE    SPACE                TO   RECE230-SRYKA
+           MOVE    "00"                 TO   RECE230-SRYKA
            MOVE    "97"                 TO   RECE230-SRYKBN
            MOVE    "970"                TO   RECE230-SRYSYUKBN
            MOVE    ZERO                 TO   RECE230-JIHIMONEY
@@ -6349,6 +6353,8 @@
                                       WRK-ORCSTEN-DAY  (IDX5)
                           ADD   ORCSTEN-KIZ-DAY  (IDY IDX5)  TO
                                       WRK-ORCSTEN-ZAIKAISU
+                          MOVE  ORCSTEN-KIZ-SRYKA(IDY IDX5)  TO
+                                      WRK-ORCSTEN-KIZ-SRYKA(IDX5)
                        END-PERFORM
       *
                        PERFORM   21032-RECE220-TENSOU3-SEC
@@ -6419,7 +6425,20 @@
            MOVE    WRK-ZAINUM           TO      RECE220-ZAINUM
            MOVE    RECE200-PTNUM        TO      RECE220-PTNUM
       *
-           MOVE    "00"                 TO      RECE220-SRYKA
+           IF    FLG-SIKIBETU  =  1
+             MOVE  ORCSTEN-YK-SRYKA(IDY)
+                                        TO      RECE220-SRYKA
+           ELSE
+             PERFORM  VARYING  IDX2  FROM  1  BY  1
+                       UNTIL   IDX2   >   31
+               IF   WRK-ORCSTEN-DAY(IDX2)  NOT =   ZERO
+                  MOVE  WRK-ORCSTEN-KIZ-SRYKA(IDX2)
+                                        TO      RECE220-SRYKA
+                  MOVE  31              TO      IDX2
+               END-IF
+             END-PERFORM
+           END-IF
+      *
            MOVE    RECE200-HKNCOMBI     TO      RECE220-HKNCOMBI
            MOVE    SPACE                TO      RECE220-JIHOKBN
            IF    FLG-SIKIBETU  =  1
@@ -6489,7 +6508,14 @@
            MOVE    WRK-ZAINUM           TO      RECE220-ZAINUM
            MOVE    RECE200-PTNUM        TO      RECE220-PTNUM
       *
-           MOVE    "00"                 TO      RECE220-SRYKA
+           IF    FLG-SIKIBETU  =  3
+             MOVE  WRK-TENTEKI2-T-SRYKA(IDY)
+                                        TO      RECE220-SRYKA
+           ELSE
+             MOVE  WRK-TENTEKI2-C-SRYKA(IDY)
+                                        TO      RECE220-SRYKA
+           END-IF
+      *
            MOVE    RECE200-HKNCOMBI     TO      RECE220-HKNCOMBI
            MOVE    SPACE                TO      RECE220-JIHOKBN
       *
@@ -6549,7 +6575,7 @@
               MOVE    WRK-RENNUM           TO   RECE230-RENNUM
               MOVE    RECE200-PTNUM        TO   RECE230-PTNUM
       *
-              MOVE    "00"                 TO   RECE230-SRYKA
+              MOVE    RECE220-SRYKA        TO   RECE230-SRYKA
               MOVE    "33"                 TO   RECE230-SRYKBN
               MOVE    "330"                TO   RECE230-SRYSYUKBN
               MOVE    ZERO                 TO   RECE230-JIHIMONEY
@@ -6825,7 +6851,7 @@
            MOVE    WRK-RENNUM           TO   RECE230-RENNUM
            MOVE    RECE200-PTNUM        TO   RECE230-PTNUM
       *
-           MOVE    "00"                 TO   RECE230-SRYKA
+           MOVE    RECE220-SRYKA        TO   RECE230-SRYKA
            MOVE    "33"                 TO   RECE230-SRYKBN
            IF    FLG-SIKIBETU  =  3
               MOVE    "330"             TO   RECE230-SRYSYUKBN
