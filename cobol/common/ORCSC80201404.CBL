@@ -3436,6 +3436,21 @@
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-RSI
                END-IF
+      *        ¤½¤ÎÂ¾¤ÎÏ«ºÒ²Ã»»
+               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   5    )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   0    )
+                 AND  (WRK-COM-INPUTCD (IDX)   NOT =   "101800080")
+                   MOVE    ZERO                TO  WRK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
+                                                             (IDX-SYU)
+                                               -   WRK-TENSUKEI-G )
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-RSI
+               END-IF
            END-PERFORM
       *
            COMPUTE LNK-SC90-TENSU      =   LNK-SC90-TENSU
