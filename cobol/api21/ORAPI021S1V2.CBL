@@ -105,7 +105,7 @@
            03  WRK-ERRMSG              PIC X(100).
            03  WRK-WERRCD              PIC X(03).
            03  WRK-KEICD-G.
-               05  WRK-KEICD           PIC X(03)   OCCURS   5.
+               05  WRK-KEICD           PIC X(03)   OCCURS   10.
       *
            03  WRK-ERRCD-1             PIC X(02).
            03  WRK-ERRMSG-1            PIC X(100).
@@ -603,7 +603,7 @@
            END-IF
            MOVE    ZERO                TO  IDM1
            PERFORM VARYING     IDK     FROM    1   BY  1
-                   UNTIL      (IDK     >   5   )   OR
+                   UNTIL      (IDK     >   10   )   OR
                               (WRK-KEICD (IDK) =   SPACE)
                MOVE    WRK-KEICD (IDK)     TO  WRK-WERRCD
       *        エラー・警告メッセージ
@@ -1347,6 +1347,13 @@
            END-IF
       *!!!
       *    中途データエラー
+           IF      LNK-ERR1-CODE       =   "02"
+      *        「内容を置き換えました」は警告へ
+               ADD     1                   TO  IDK
+               MOVE    "W03"               TO  WRK-KEICD(IDK)
+               MOVE    SPACE               TO  LNK-ERR1-CODE
+               MOVE    SPACE               TO  LNK-ERR1-MSG
+           END-IF
            IF      LNK-ERR1-CODE   NOT =   SPACE
                IF      CNT-BYOCNT          =   ZERO
                    MOVE    LNK-ERR1-CODE       TO  WRK-ERRCD
@@ -1361,14 +1368,13 @@
                IF      (CNT-SRYCNT         =   ZERO)
                  AND   (CNT-BYOCNT         >   ZERO)
                  AND   (LNK-OUT-CNT2       =   ZERO)
-      *            病名登録なし
-                   MOVE    LNK-ERR2-CODE       TO  WRK-ERRCD
+      *            病名登録エラー
                    MOVE    "80"                TO  WRK-ERRCD
-                   MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG
-               ELSE
-                   MOVE    LNK-ERR2-CODE       TO  WRK-ERRCD-2
-                   MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG-2
+                   MOVE    "病名の登録ができません"
+                                               TO  WRK-ERRMSG
                END-IF
+               MOVE    LNK-ERR2-CODE       TO  WRK-ERRCD-2
+               MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG-2
            END-IF
            IF      WRK-ERRCD           =   SPACE
       *        対象なし
@@ -2097,7 +2103,7 @@
       *                                        TO  WRK-ERRMSG
       *    WHEN    "21"
       *        MOVE    "病名の登録ができません"
-      ***                                      TO  WRK-ERRMSG
+      **                                       TO  WRK-ERRMSG
            WHEN    "22"
                MOVE    "登録対象のデータがありません"
                                                TO  WRK-ERRMSG
@@ -2186,6 +2192,11 @@
            WHEN    "W02"
                MOVE    "保険組合せをゼロで登録しました。"
                                                TO  WRK-ERRMSG
+           WHEN    "W03"
+               STRING  "内容を置き換えました。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
            WHEN    "W04"
                STRING  "入院期間中です。"
                        "外来で展開できない保険組合せです。"

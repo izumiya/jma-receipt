@@ -1506,7 +1506,7 @@
            IF      WRK-SRYSYUKBN       =   SPACE
                MOVE    LF04-SRYCD (IDX1)(1:2)  TO  WRK-SRYKBN
       *        診療種別なし
-               MOVE    "M06"               TO  WRK-ERRCD
+               MOVE    "M05"               TO  WRK-ERRCD
                PERFORM 400-ERRHENSYU-SEC
            END-IF
       *
@@ -3008,19 +3008,19 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            MOVE    WRK-ERRCD           TO  LNK-MEDI-CODE (IDE1)
            MOVE    IDX1                TO  LNK-MEDI-POSITION (IDE1)
-           IF      WRK-ERRCD       NOT =   "M06"
+           IF      WRK-ERRCD       NOT =   "M05"
                MOVE    IDX2                TO  LNK-MEDI-ITEM (IDE1)
            END-IF
       *
            MOVE    SPACE               TO  WRK-MSG1
-           IF      WRK-ERRCD           =   "M06"
+           IF      WRK-ERRCD           =   "M05"
                MOVE    LF04-SRYCD (IDX1)(1:3)  TO  LNK-MEDI-SRYCD(IDE1)
            ELSE
                MOVE    WRK-SRYCD           TO  LNK-MEDI-SRYCD(IDE1)
            END-IF
       *
            EVALUATE    WRK-ERRCD
-               WHEN    "M06"
+               WHEN    "M05"
                    STRING  "診療種別区分がありません。"
                                            DELIMITED  BY  SIZE
                                            INTO  LNK-MEDI-MSG (IDE1)
