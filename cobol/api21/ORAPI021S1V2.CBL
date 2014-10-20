@@ -1354,18 +1354,19 @@
                    MOVE    LNK-ERR1-MSG        TO  WRK-ERRMSG
                ELSE
                    MOVE    LNK-ERR1-CODE       TO  WRK-ERRCD-1
-                   MOVE    "80"                TO  WRK-ERRCD-1
                    MOVE    LNK-ERR1-MSG        TO  WRK-ERRMSG-1
                END-IF
            END-IF
            IF      LNK-ERR2-CODE   NOT =   SPACE
-               IF      CNT-SRYCNT          =   ZERO
+               IF      (CNT-SRYCNT         =   ZERO)
+                 AND   (CNT-BYOCNT         >   ZERO)
+                 AND   (LNK-OUT-CNT2       =   ZERO)
+      *            病名登録なし
                    MOVE    LNK-ERR2-CODE       TO  WRK-ERRCD
                    MOVE    "80"                TO  WRK-ERRCD
                    MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG
                ELSE
                    MOVE    LNK-ERR2-CODE       TO  WRK-ERRCD-2
-                   MOVE    "80"                TO  WRK-ERRCD-2
                    MOVE    LNK-ERR2-MSG        TO  WRK-ERRMSG-2
                END-IF
            END-IF
@@ -2091,12 +2092,12 @@
                    MOVE    "病名開始日付＞転帰日付です。"
                                                TO  WRK-ERRMSG
                END-IF
-           WHEN    "20"
-               MOVE    "中途終了データの登録ができません"
-                                               TO  WRK-ERRMSG
-           WHEN    "21"
-               MOVE    "病名の登録ができません"
-                                               TO  WRK-ERRMSG
+      **   WHEN    "20"
+      *        MOVE    "中途終了データの登録ができません"
+      *                                        TO  WRK-ERRMSG
+      *    WHEN    "21"
+      *        MOVE    "病名の登録ができません"
+      ***                                      TO  WRK-ERRMSG
            WHEN    "22"
                MOVE    "登録対象のデータがありません"
                                                TO  WRK-ERRMSG
