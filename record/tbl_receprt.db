@@ -1343,19 +1343,3 @@ path	key52	{
 		;
 	};
 };
-
-path	upd3	{
-	DBUPDATE	{
-		UPDATE  tbl_receprt
-                    SET     PRTJYUN_SYUKA      =   0,
-                            PRTRENNUM    =   0,
-                            PRTNM        =   ''
-		WHERE 	HOSPNUM	= :HOSPNUM
-                    AND   PRTID          =   :PRTID
-                    AND     RECEYM       =   :RECEYM
-                    AND     CREYMD       =   :CREYMD
-                    AND     CREHMS       =   :CREHMS
-                    AND     NYUGAIKBN    =   :NYUGAIKBN 
-		;
-	};
-};
