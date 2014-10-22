@@ -79,6 +79,8 @@
       *  04.07.01    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
       *                                     自費レセプト対象の有無設定
       *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.03    NACL-藤原    14/08/19  改行コードチェック（病名）
+      *                                     エラー時処理終了
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -158,6 +160,9 @@ grpsys     COPY    "COMMON-SPA".
            03  IDY                 PIC 9(03). 
            03  IDZ                 PIC 9(03).
       *
+           03  IDZ1                PIC 9(03).
+           03  IDZ2                PIC 9(03).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-PARA.
@@ -183,11 +188,17 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
+           03  WRK-COL             PIC 9(03).
+      *
        01  KEY-AREA.
            03  KEY-NEW.
                05  KEY-N-SRYYMD    PIC 9(08).
            03  KEY-OLD.
                05  KEY-O-SRYYMD    PIC 9(08).
+      *
+       01  WRK-CONS-AREA.    
+      *    改行コード
+           03  WRK-CONS-RETURN     PIC X(01)   VALUE   X"0A".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -484,6 +495,44 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        RECE02-PTNUM            DELIMITED  BY  SPACE
                                        INTO    WRK-RECEERR
                END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+      *    改行コードチェック
+           MOVE    ZERO                TO  WRK-COL
+                                           IDZ1
+                                           IDZ2 
+           INSPECT PTBYO-BYOMEI        TALLYING    WRK-COL
+                                       FOR ALL WRK-CONS-RETURN
+           IF      WRK-COL             >   ZERO
+               DISPLAY "PTBYO=" PTBYO-KEY
+               PERFORM VARYING IDZ1    FROM    1   BY  1
+                       UNTIL   IDZ1    >       160
+                   IF      PTBYO-BYOMEI (IDZ1:1)
+                                               =   WRK-CONS-RETURN
+                       COMPUTE IDZ2    =   IDZ1    -   1
+                       MOVE    160             TO  IDZ1
+                   END-IF
+               END-PERFORM
+      *
+               CALL    "coblog" USING   "ptbyomei returncd err"
+               MOVE    SPACE               TO  WRK-RECEERR
+               MOVE    SPACE               TO  WRK-ERRMSG
+               STRING  "病名名称文字コード不正　患者番号="
+                                               DELIMITED  BY  SIZE
+                       RECE02-PTNUM            DELIMITED  BY  SPACE
+                       "　開始日="             DELIMITED  BY  SIZE
+                       PTBYO-SRYYMD            DELIMITED  BY  SPACE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+               IF      IDZ2                >   1
+                   STRING  WRK-ERRMSG              DELIMITED  BY  SPACE
+                           "　病名="               DELIMITED  BY  SIZE
+                           PTBYO-BYOMEI(1:IDZ2)    DELIMITED  BY  SPACE
+                                                   INTO    WRK-RECEERR
+                   END-STRING
+               END-IF
                PERFORM 500-ERR-HENSYU-SEC
                PERFORM 500-COBABORT-SEC
            END-IF
@@ -888,7 +937,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
 grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-PTBYOMEI
-               MOVE    MCPDATA-REC     TO  PTBYOMEI-REC 
+               MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
+      *??
+               DISPLAY "PTBYO=" PTBYO-RENNUM
+      *??
            ELSE
                MOVE    1               TO  FLG-PTBYOMEI
            END-IF
