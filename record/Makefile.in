@@ -491,6 +491,7 @@ RECORD_files = \
 	hsacctmodv2.rec \
 	hsptinfmodv2.rec \
     hsptevalmodv2.rec \
+	systeminfv2.rec \
 
 DEF_files = \
 
@@ -784,6 +785,8 @@ DB_files = \
 	xml_hsptinfmodv2req.db \
     xml_hsptevalmodv2req.db \
     xml_hsptevalmodv2res.db \
+	xml_systeminfv2req.db \
+	xml_systeminfv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
