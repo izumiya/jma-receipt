@@ -148,7 +148,6 @@
       *  04.06.01    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *
       *  04.07.01    NACL-藤原    12/09/24  点検用レセプトの医師名記載対応
-      *  04.07.02    NACL-藤原    14/06/09  帳票データクリア時の更新方法変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -619,7 +618,16 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
            CLOSE                       PRT-FILE
       *
       *    帳票クリア処理
+           MOVE    "tbl_receprt"       TO  WRK-MCP-TABLE
+           MOVE    "key13"             TO  WRK-MCP-PATHNAME
+           PERFORM 900-RECEPRT-SELECT-SEC
+      *
            PERFORM 2002-RECEPRT-CLEAR-SEC
+                                       UNTIL   FLG-RECEPRT  =   1
+      *
+           MOVE    "tbl_receprt"       TO  WRK-MCP-TABLE
+           MOVE    "key13"             TO  WRK-MCP-PATHNAME
+           PERFORM 900-RECEPRT-CLS-SEC
       *
       *    処理中止設定処理
            IF      FLG-END             =   1
@@ -1317,24 +1325,21 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
       *
       *    出力順エリアのクリア
       *
-           INITIALIZE                  RECE08-REC
-           MOVE    SPA-HOSPNUM              TO  RECE08-HOSPNUM
-           MOVE    WRK-PARA-RECE09-PRTID    TO  RECE08-PRTID
-           MOVE    WRK-PARA-RECE09-SRYYM    TO  RECE08-RECEYM
-           MOVE    WRK-PARA-RECE09-CREYMD   TO  RECE08-CREYMD
-           MOVE    WRK-PARA-RECE09-CREHMS   TO  RECE08-CREHMS
-           MOVE    WRK-PARA-RECE09-NYUGAIKBN
-                                            TO  RECE08-NYUGAIKBN
+               DISPLAY "PTNUM=" RECE08-PTNUM
+      *
+grpsys     MOVE    SPA-HOSPNUM          TO  RECE08-HOSPNUM
+           MOVE    ZERO                 TO  RECE08-PRTJYUN-SYUKA
+           MOVE    ZERO                 TO  RECE08-PRTRENNUM
+           MOVE    SPACE                TO  RECE08-PRTNM     
       *
            MOVE    RECE08-REC           TO  MCPDATA-REC
-           MOVE    "DBUPDATE"           TO  MCP-FUNC
            MOVE    "tbl_receprt"        TO  MCP-TABLE
-           MOVE    "upd3"               TO  MCP-PATHNAME
+           MOVE    "key"                TO  MCP-PATHNAME
            MOVE    "DBUPDATE"           TO  MCP-FUNC
 grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            IF      MCP-RC             =   ZERO
-               CONTINUE
+               PERFORM 900-RECEPRT-FET-SEC
            ELSE
                MOVE    MCP-RC          TO  WRK-MCP-RC
                STRING
