@@ -97,6 +97,7 @@
            03  FLG-PTBYOMEI-UMU    PIC 9(01).
            03  FLG-USERBYOMEI      PIC 9(01).
            03  FLG-SYNONYM         PIC 9(01).
+           03  FLG-HKNCOMBI        PIC 9(01).
       *
            03  FLG-HOSOKU-CHK      PIC 9(01). 
       *    0:正常 1:エラー  2:単独病名エラー
@@ -110,6 +111,7 @@
            03  FLG-ERR             PIC 9(01).
            03  FLG-DABURI-CHK      PIC 9(01).
            03  FLG-DIAG            PIC 9(01).
+           03  FLG-HKNCOMBI-DABURI PIC 9(01).
       *
       *    キー領域
        01  KEY-AREA                    VALUE   LOW-VALUE.
@@ -304,6 +306,10 @@
       *    同義語マスタ
        01  SYNONYM-REC.
            COPY    "CPSYNONYM.INC".
+      *
+      *    保険組み合わせ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -2336,9 +2342,11 @@
       *
                    IF      FLG-DABURI-CHK      >   0
       *                同一病名における保険限定の重複チェック
-                       IF      PTBYO-HKNCOMBI      >   ZERO
-                           MOVE    ZERO            TO  FLG-DABURI-CHK
-                       ELSE
+                       PERFORM 20091-HKNCOMBI-DABURI-CHK-SEC
+                       IF      FLG-HKNCOMBI-DABURI =   1
+                           MOVE    ZERO        TO  FLG-DABURI-CHK
+                       END-IF
+                       IF      FLG-DABURI-CHK      >   0
                            MOVE    PTBYO-SRYYMD    TO  WRK-SYMD
                            PERFORM 5002-HIZUKE-HEN-SEC
                            MOVE    LNK-DAY2-EDTYMD3
@@ -2438,9 +2446,11 @@
       *
                    IF      FLG-DABURI-CHK      >   0
       *                同一病名における保険限定の重複チェック
-                       IF      PTBYO-HKNCOMBI      >   ZERO
-                           MOVE    ZERO            TO  FLG-DABURI-CHK
-                       ELSE
+                       PERFORM 20091-HKNCOMBI-DABURI-CHK-SEC
+                       IF      FLG-HKNCOMBI-DABURI =   1
+                           MOVE    ZERO        TO  FLG-DABURI-CHK
+                       END-IF
+                       IF      FLG-DABURI-CHK      >   0
                            IF    ( SYS-9000-BYOMEI-SYU-FLG
                                                        =   "1"   )
                            AND   ( SYS-9000-BYOMEI-DOUKI-FLG
@@ -2499,6 +2509,55 @@
            END-IF
            .
        2009-BYOMEI-DABURI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同一病名における保険限定の重複チェック処理
+      *****************************************************************
+       20091-HKNCOMBI-DABURI-CHK-SEC   SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HKNCOMBI-DABURI
+      *
+      *    保険限定の設定がない場合はチェックしない
+           IF    ( PTBYO-HKNCOMBI      =   ZERO )
+           AND   ( PTBYO-KOHID         =   ZERO )
+               GO  TO  20091-HKNCOMBI-DABURI-CHK-EXT
+           END-IF
+      *
+      *    保険組合せの重複チェック
+           IF      PTBYO-HKNCOMBI      =   ZERO
+             CONTINUE
+           ELSE
+               MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
+               MOVE    WRK-PTID            TO  COMB-PTID
+               MOVE    PTBYO-HKNCOMBI      TO  COMB-HKNCOMBINUM
+               MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+               PERFORM 900-COMB-READ-SEC
+      *        労災または自賠責または公害の場合は登録可能とする
+               EVALUATE    COMB-HKNNUM
+                   WHEN    "971"
+                   WHEN    "973"
+                   WHEN    "975"
+                       MOVE    1               TO  FLG-HKNCOMBI-DABURI
+                   WHEN    OTHER
+                       MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
+               END-EVALUATE
+      *
+      *        保険組合せで登録不可のとき
+               IF      FLG-HKNCOMBI-DABURI =   ZERO
+                   GO  TO   20091-HKNCOMBI-DABURI-CHK-EXT
+               END-IF
+           END-IF
+      *
+      *    第三者行為の重複チェック
+           IF      PTBYO-KOHID     =   ZERO
+               CONTINUE
+           ELSE 
+      *        第三者行為設定時は登録不可とする
+               MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
+           END-IF
+           .                   
+       20091-HKNCOMBI-DABURI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2899,6 +2958,38 @@
       *
            .
        900-SYNONYM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せマスタ読込
+      *****************************************************************
+       900-COMB-READ-SEC                SECTION.
+      *
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+                   MOVE    ZERO            TO  FLG-HKNCOMBI
+               ELSE
+                   INITIALIZE                  HKNCOMBI-REC
+                   MOVE    1               TO  FLG-HKNCOMBI
+               END-IF
+           ELSE
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+      *
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-COMB-READ-EXT.
            EXIT.
       *
       *****************************************************************
