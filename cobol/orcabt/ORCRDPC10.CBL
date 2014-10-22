@@ -81,6 +81,13 @@
       *                                     ±…Õ‹¥…Õ˝¬Œ¿©∏∫ªª§Ú•ﬁ•§• •π
       *                                     µ≠œø§π§Î
       *              NACL-∞À∆£    14/10/17  •Ï•ª•◊•»≤ ∂Ë ¨•Ø•Í•¢œ≥§Ï
+      *              NACL-æÆ∆¶¬Ù  14/10/20  £≈•’•°•§•Î ‘Ω∏ΩËÕ˝
+      *                                      Ò≥Á ¨§œπ‘∞Ÿ≈¿øÙ°¢π‘∞ŸÃÙ∫ﬁŒ¡°¢
+      *                                     π‘∞Ÿ∫‡Œ¡Œ¡§À•º•Ì≈¿§Ú•ª•√•»
+      *                                     §π§Î
+      *              NACL-æÆ∆¶¬Ù  14/10/20  £∆•’•°•§•Î ‘Ω∏ΩËÕ˝
+      *                                      Ò≥Á ¨§œΩ–ÕËπ‚≈¿øÙ§À•º•Ì≈¿§Ú
+      *                                     •ª•√•»§π§Î
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4586,14 +4593,12 @@
       *
       *****************************************************************
       *    £≈•’•°•§•Î ‘Ω∏ΩËÕ˝° π‘∞Ÿ≈¿øÙ§´§Èª‹¿ﬂ•ø•§•◊°À
-      *     ø¿Æ£≤£∂«Ø£±£∞∑Óø«Œ≈ ¨§´§È§Œ Ò≥Á ¨§œπ‘∞Ÿ≈¿øÙ°¢π‘∞ŸÃÙ∫ﬁŒ¡°¢
-      *    π‘∞Ÿ∫‡Œ¡Œ¡§À•º•Ì≈¿§Ú•ª•√•»§π§Î
+      *     Ò≥Á ¨§œπ‘∞Ÿ≈¿øÙ°¢π‘∞ŸÃÙ∫ﬁŒ¡°¢π‘∞Ÿ∫‡Œ¡Œ¡§À•º•Ì≈¿§Ú•ª•√•»§π§Î
       *****************************************************************
        200799-ZAI-HENSYU-E-SEC     SECTION.
       *
       *π‘∞Ÿ≈¿øÙ
-           IF      (RECE641-SRYYM      >=  201410)  AND
-                   (RECE641-JIHOKBN    =  "1")
+           IF      (RECE641-JIHOKBN    =  "1")
                MOVE    ZERO            TO  WRK-TENSU
            ELSE
                MOVE    WRK-FEDT-ZAITEN TO  WRK-TENSU
@@ -4602,8 +4607,7 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *π‘∞ŸÃÙ∫ﬁŒ¡
-           IF      (RECE641-SRYYM      >=  201410)  AND
-                   (RECE641-JIHOKBN    =  "1")
+           IF      (RECE641-JIHOKBN    =  "1")
                MOVE    ZERO            TO  WRK-TENSU
            ELSE
                MOVE    WRK-FEDT-YKZTEN TO  WRK-TENSU
@@ -4612,8 +4616,7 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *π‘∞Ÿ∫‡Œ¡Œ¡
-           IF      (RECE641-SRYYM      >=  201410)  AND
-                   (RECE641-JIHOKBN    =  "1")
+           IF      (RECE641-JIHOKBN    =  "1")
                MOVE    ZERO            TO  WRK-TENSU
            ELSE
                MOVE    WRK-FEDT-KIZAITEN
@@ -4720,6 +4723,9 @@
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *Ω–ÕËπ‚º¬¿”≈¿øÙ
+           IF      WRK-FEDT-HOUKATU-FLG   =   "6"
+                MOVE    ZERO           TO  WRK-FEDT-DEKIDAKA-TEN
+           END-IF
            MOVE    WRK-FEDT-DEKIDAKA-TEN
                                        TO  WRK-NUM
            MOVE    8                   TO  WRK-NAGASA
