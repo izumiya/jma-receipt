@@ -82,6 +82,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/09/XX  ³°ÍÑÌô¡ÊÎ×»þÅêÌô¡ËÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/10/07  ÆÜÉþÌô¡ÊÎ×»þÅêÌô¡ËÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/10/20  ¸øÈñÈ÷¹ÍÊÔ½¸¸ÄÊÌÂÐ±þ
       *****************************************************************
       *
       *
@@ -228,6 +229,8 @@
       *H24.4
            03  IDX-M                   PIC 9(04).
            03  IDX-SH                  PIC 9(04).
+      *H26.10
+           03  IDP                     PIC 9(01).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -533,6 +536,11 @@
            03  PARA-QR-DRCD             PIC X(01).
       *    £Ñ£Ò´µ¼ÔÈÖ¹æ
            03  PARA-QR-PTNUM            PIC X(01).
+      *H26.10
+      *    ¸øÈñÈ÷¹ÍÊÔ½¸
+           03  PARA-KOHNUM-G.
+               05  PARA-KOHNUM         PIC X(03)
+                                       OCCURS   5.
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -777,6 +785,18 @@
            MOVE    "QRPTNUM"           TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-QR-PTNUM
+      *H24.10
+      *    ¸øÈñÈ÷¹ÍÊÔ½¸
+           PERFORM VARYING     IDP     FROM    1   BY  1
+                   UNTIL       IDP     >   5
+               MOVE    SPACE           TO  WRK-PARA-NAME
+               STRING  "KOHNUM_"
+                       IDP             DELIMITED  BY  SIZE
+                                       INTO    WRK-PARA-NAME
+               END-STRING
+               PERFORM 1001-OPTION-CALL-SEC
+               MOVE    WRK-PARA            TO  PARA-KOHNUM (IDP)
+           END-PERFORM
       *
            .
        100-OPTION-SELECT-EXT.
@@ -795,6 +815,10 @@
            IF      ORCSPRGOPTION-OT-TYPE   =   1
       *        È¾³Ñ¤Ç£±Ê¸»úÌÜ¤òÃÍ¤È¤¹¤ë
                MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+      *H26.10
+               IF      WRK-PARA-NAME(1:6)      =   "KOHNUM"
+                   MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
+               END-IF
            END-IF
            .
        1001-OPTION-CALL-EXT.
@@ -1343,6 +1367,7 @@
                                            TO  WRK-HEN-KOH(IDX-K3)
                MOVE    SPACE               TO  WRK-FTNSNO
                MOVE    SPACE               TO  WRK-JKYSNO
+               MOVE    1                   TO  FLG-KOH-NO
            END-IF
       *
       *@@@ ºë¶Ì¸©ÂÐ±þ
@@ -1353,12 +1378,21 @@
                                            OR  "343"
                                            OR  "344"
                    MOVE    SPACE           TO  WRK-FTNSNO
+                   MOVE    SPACE           TO  PTKOH-FTNJANUM
                END-IF
            END-IF
       *@@@ ºë¶Ì¸©ÂÐ±þ
       *
+      *H26.10
+      *    ¸øÈñÈ÷¹ÍÉ½¼¨¸ÄÊÌÂÐ±þ
+           IF     (PARA-KOHNUM-G   NOT =   SPACE)
+             AND  (FLG-KOH-NO          =   ZERO)
+               PERFORM 40013-USER-KOHNUM-BHEN-SEC
+           END-IF
+      *
       *    ÃÏÊý¸øÈñ¤òÈ÷¹ÍÉ½¼¨
-           IF      PARA-KOHKBN         =   "1"
+           IF     (PARA-KOHKBN         =   "1" )
+             AND  (FLG-KOH-NO          =   ZERO)
                PERFORM 40012-USER-KOHBIKOHEN-SEC
            END-IF
       *
@@ -1400,6 +1434,36 @@
            END-IF
            .
        40012-USER-KOHBIKOHEN-EXT.
+           EXIT.
+      *
+      *H26.10
+      *****************************************************************
+      *    ¸øÈñ¤Î¸ÄÊÌÈ÷¹ÍÉ½¼¨ÂÐ±þ½èÍý
+      *****************************************************************
+       40013-USER-KOHNUM-BHEN-SEC      SECTION.
+      *
+           PERFORM VARYING     IDP     FROM    1   BY  1
+                   UNTIL       IDP     >   5
+               IF     (PARA-KOHNUM (IDP)   NOT =   SPACE  )
+                 AND  (PARA-KOHNUM (IDP)       =   PTKOH-KOHNUM)
+                   ADD     1               TO  IDX-K3
+                   STRING  COMB-KOH-TANSEIDONAME (IDX-K)
+                                           DELIMITED  BY  SPACE
+                       "¡¡ÉéÃ´¼ÔÈÖ¹æ¡§"    DELIMITED  BY  SIZE
+                       PTKOH-FTNJANUM      DELIMITED  BY  SPACE
+                       "¡¡¼õµë¼ÔÈÖ¹æ¡§"    DELIMITED  BY  SIZE
+                       PTKOH-JKYSNUM       DELIMITED  BY  SPACE
+                                       INTO    WRK-HEN-KOH(IDX-K3)
+                   END-STRING
+                   MOVE    SPACE               TO  WRK-JKYSNO
+                   MOVE    ZERO                TO  WRK-JKYSNO-MAX
+                   MOVE    SPACE               TO  WRK-FTNSNO
+                   MOVE    1                   TO  FLG-KOH-NO
+                   MOVE    5                   TO  IDP
+               END-IF
+           END-PERFORM
+           .
+       40013-USER-KOHNUM-BHEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4434,6 +4498,21 @@
            IF      COMB-KOHHKNNUM (IDX-K)  =   "970"
       *        Âè»°¼Ô¹Ô°Ù¤ÏÂÐ¾Ý³°
                MOVE    1               TO  FLG-KOHERR
+           END-IF
+      *
+      *H26.10
+      *    ¸øÈñ¸ÄÊÌÈ½Äê
+           IF     (FLG-KOHERR          =   ZERO )
+             AND  (PARA-KOHNUM-G   NOT =   SPACE)
+               PERFORM VARYING     IDP     FROM    1   BY  1
+                       UNTIL       IDP     >   5
+                   IF     (PARA-KOHNUM (IDP)   NOT =   SPACE  )
+                     AND  (PARA-KOHNUM (IDP)       =   COMB-KOHHKNNUM
+                                                           (IDX-K))
+                       MOVE    1                   TO  FLG-KOHERR
+                       MOVE    5                   TO  IDP
+                   END-IF
+               END-PERFORM
            END-IF
       *
            IF      FLG-KOHERR          =   ZERO

@@ -475,10 +475,10 @@
       *H26.10
       *K01COMMON-SPA ¤ÎÍ½È÷ÆâÍÆ
       *    Í½È÷
-       01  WRK-SPA-K01-YOBI.
-           03  SPA-PSYCHO-OK           PIC 9(01).
-           03  SPA-PSYCHO-CHK          PIC 9(01).
-           03  SPA-K01-FILL            PIC X(08).
+      *01  WRK-SPA-K01-YOBI.
+      *    03  SPA-PSYCHO-OK           PIC 9(01).
+      *    03  SPA-PSYCHO-CHK          PIC 9(01).
+      *    03  SPA-K01-FILL            PIC X(08).
       *
       *
       *****************************************************************
@@ -4353,12 +4353,9 @@
       *H26.10 ¤«¤é
       *    Àº¿À²Ê·ÑÂ³³°Íè»Ù±ç
            IF      SPA-SRYYMD          >=  "20141001"
-               MOVE    SPA-K01-YOBI        TO  WRK-SPA-K01-YOBI
-               IF      SPA-K01-YOBI        =   SPACE
-                   INITIALIZE                      WRK-SPA-K01-YOBI
-               END-IF
       *        ¸þÀº¿ÀÌôÂ¿ºÞÄþ¸º¤¢¤ê¤Î»þ¡¢¥Á¥§¥Ã¥¯
-               IF      SPA-PSYCHO-OK       =   1
+      *v4.7    IF      SPA-PSYCHO-OK       =   1
+               IF      SPA-K01-YOBI(1:1)   =   "1"
                    PERFORM 3001-SEISINSYORI-SEC
                END-IF
            END-IF
