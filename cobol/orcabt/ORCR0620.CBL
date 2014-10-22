@@ -225,6 +225,7 @@
       *  04.07.10    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
       *  04.07.11    NACL-藤原    14/09/10  月途中のまとめのとき第二公費
       *                                     マル長のときの修正
+      *  04.07.12    NACL-門脇    14/10/21  低所得フラグ編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2029,8 +2030,8 @@
       *
            IF   RECE62-SRYYM   >=  "200604"
               IF  RECE62-HKNNUM      NOT = SPACE
-                IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
-                    MOVE   RECE62-TEKSTYMD-X(7:2)  TO   SYOTOKU-IDX
+                IF   RECE62-TEKSTYMD(1:6)  >=  RECE62-SRYYM
+                    MOVE   RECE62-TEKSTYMD(7:2)    TO   SYOTOKU-IDX
                 ELSE
                     MOVE   1                       TO   SYOTOKU-IDX
                 END-IF

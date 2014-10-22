@@ -6967,6 +6967,15 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  ELSE
                    MOVE    01                   TO   WRK-GEN70-DD
                  END-IF
+      *
+                 MOVE      RECE02-SRYYM         TO   WRK-GEN702-YM
+                 IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+                   MOVE    RECE02-TEKSTYMD-X(7:2)
+                                                TO   WRK-GEN702-DD
+                 ELSE
+                   MOVE    01                   TO   WRK-GEN702-DD
+                 END-IF
+      *
                  IF   RECE02-KOUREI-HANTEIFLG   =   "1"
                    IF    RECE02-KYURATE     =   30
                         MOVE    1    TO   FLG-TOKUSITU
@@ -7023,6 +7032,15 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ELSE
                      MOVE    01                   TO   WRK-GEN70-DD
                    END-IF
+      *
+                   MOVE      RECE02-SRYYM         TO   WRK-GEN702-YM
+                   IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+                     MOVE    RECE02-TEKSTYMD-X(7:2)
+                                                  TO   WRK-GEN702-DD
+                   ELSE
+                     MOVE    01                   TO   WRK-GEN702-DD
+                   END-IF
+      *
                    IF   RECE02-KOUREI-HANTEIFLG   =   "1"
                      INITIALIZE                      SSRHKOH-AREA
                      MOVE    RECE02-PTID         TO  SSRHKOH-PTID
@@ -7112,9 +7130,12 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                 MOVE    "key4"            TO  MCP-PATHNAME
                 PERFORM  900-PTKOHINF-READ-SEC
                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                   IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                   AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                   AND (PTKOH-SAKJOKBN   =   SPACE         )
+                   IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                       (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                       (PTKOH-SAKJOKBN   =   SPACE         ))
+                   OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                       (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                       (PTKOH-SAKJOKBN   =   SPACE         ))
                      MOVE     1      TO  FLG-TOKUSITU
                      MOVE     1      TO  FLG-PTKOHINF
                    ELSE
@@ -14619,6 +14640,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  IF  SYU-HKNCOMBINUM  =  RECE02-HKNCOMBI(IDX1)
                    IF  (SYU-DENPJTIKBN         NOT =  "3")
                    AND (SYU-TOTAL-HKNTEN       NOT = ZERO)
+                   AND (SYU-SKJ-FTNGAKU(2)     NOT = ZERO)
                     IF   RECE02-DAISANFLG(IDX1) =  1
                      IF   (RECE02-DAISAN-GAITO    =   1 OR 2)
                      AND  (RECE02-DAISAN-GENBUTU-GAITO  =  1)

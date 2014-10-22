@@ -1690,6 +1690,10 @@
                05  WRK-KOHYONKAIME-YM          PIC  9(06).
                05  WRK-KOHYONKAIME-DD          PIC  9(02).
       *
+           03  WRK-KOHYONKAIME2-YMD.
+               05  WRK-KOHYONKAIME2-YM         PIC  9(06).
+               05  WRK-KOHYONKAIME2-DD         PIC  9(02).
+      *
            03  WRK-KOH-GENDOGAKU               PIC  9(07).
            03  WRK-GEN70-GENDOGAKU             PIC  9(07).
            03  WRK-SEIHO-GENDO                 PIC  9(07).
@@ -25777,6 +25781,14 @@
               MOVE   01                    TO   WRK-KOHYONKAIME-DD
            END-IF
       *
+           MOVE      RECE62-SRYYM          TO   WRK-KOHYONKAIME2-YM
+           IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+              MOVE   RECE62-TEKSTYMD-X(7:2)
+                                           TO   WRK-KOHYONKAIME2-DD
+           ELSE
+              MOVE   01                    TO   WRK-KOHYONKAIME2-DD
+           END-IF
+      *
            INITIALIZE                      PTKOHINF-REC
            MOVE    RECE62-HOSPNUM      TO  PTKOH-HOSPNUM
            MOVE    RECE62-PTID         TO  PTKOH-PTID
@@ -25790,9 +25802,12 @@
                MOVE    "key4"          TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD      <=   WRK-KOHYONKAIME-YMD)
-                  AND (WRK-KOHYONKAIME-YMD <=   PTKOH-TEKEDYMD     )
-                  AND (PTKOH-SAKJOKBN       =   SPACE              )
+                  IF ((PTKOH-TEKSTYMD       <= WRK-KOHYONKAIME-YMD ) AND
+                      (WRK-KOHYONKAIME-YMD  <= PTKOH-TEKEDYMD      ) AND
+                      (PTKOH-SAKJOKBN        = SPACE               ))
+                  OR ((PTKOH-TEKSTYMD       <= WRK-KOHYONKAIME2-YMD) AND
+                      (WRK-KOHYONKAIME2-YMD <= PTKOH-TEKEDYMD      ) AND
+                      (PTKOH-SAKJOKBN        = SPACE               ))
                       MOVE     1          TO  FLG-KOHYONKAIME
                       MOVE     1          TO  FLG-PTKOHINF
                   ELSE
@@ -26842,6 +26857,15 @@
                  ELSE
                    MOVE    01                   TO   WRK-GEN70-DD
                  END-IF
+      *
+                 MOVE      RECE62-SRYYM         TO   WRK-GEN702-YM
+                 IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+                   MOVE    RECE62-TEKSTYMD-X(7:2)
+                                                TO   WRK-GEN702-DD
+                 ELSE
+                   MOVE    01                   TO   WRK-GEN702-DD
+                 END-IF
+      *
                  IF   RECE62-KOUREI-HANTEIFLG   =   "1"
                    IF    RECE62-KYURATE     =   30
                         MOVE    1    TO   FLG-TOKUSITU
@@ -26912,6 +26936,15 @@
                    ELSE
                      MOVE    01                   TO   WRK-GEN70-DD
                    END-IF
+      *
+                   MOVE      RECE62-SRYYM         TO   WRK-GEN702-YM
+                   IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+                     MOVE    RECE62-TEKSTYMD-X(7:2)
+                                                  TO   WRK-GEN702-DD
+                   ELSE
+                     MOVE    01                   TO   WRK-GEN702-DD
+                   END-IF
+      *
                    IF   RECE62-KOUREI-HANTEIFLG   =   "1"
                      INITIALIZE                      SSRHKOH-AREA
                      MOVE    RECE62-PTID         TO  SSRHKOH-PTID
@@ -27013,9 +27046,12 @@
                 MOVE    "key4"            TO  MCP-PATHNAME
                 PERFORM  900-PTKOHINF-READ-SEC
                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                   IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                   AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                   AND (PTKOH-SAKJOKBN   =   SPACE         )
+                   IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                       (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                       (PTKOH-SAKJOKBN   =   SPACE         ))
+                   OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                       (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                       (PTKOH-SAKJOKBN   =   SPACE         ))
                      MOVE     1      TO  FLG-TOKUSITU
                      MOVE     1      TO  FLG-PTKOHINF
                    ELSE
