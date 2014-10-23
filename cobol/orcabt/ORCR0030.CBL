@@ -15936,10 +15936,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF ((WRK-SYUNOU-GENBUTU70T-HANTEIFLG  =  1) AND
                      (RECE02-SRYYM     >= "201204"         ))
                  OR ( RECE02-SRYYM     <= "201203"          )
+                   IF   SYU-SKJ-FTNGAKU(2)  NOT = ZERO
                      MOVE      1         TO   FLG-GENBUTU-TAISYOOK
+                     ADD  SYU-TOTAL-HKNTEN
+                                         TO   WRK-KOH-GAI-GEN70-TEN
+                   END-IF
                  END-IF
                  ADD    SYU-SYUCOMPFTN   TO   WRK-KOH-GAI-GEN70
-                 ADD    SYU-TOTAL-HKNTEN TO   WRK-KOH-GAI-GEN70-TEN
                  ADD    SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN
                                               WRK-JYOGENKBN-TEN3
                                               WRK-JYOGENKBN-TEN4

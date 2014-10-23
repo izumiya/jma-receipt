@@ -18361,9 +18361,9 @@
                  MOVE   1                TO   FLG-JYOGENKBN
                  IF     SYU-KOHTAIYKZKBN  =   "9"
                      MOVE      1            TO  FLG-GENBUTU-TAISYOOK
+                     ADD  SYU-TOTAL-HKNTEN  TO  WRK-KOH-GAI-GEN70-TEN
                  END-IF
                  ADD    SYU-SYUCOMPFTN      TO  WRK-KOH-GAI-GEN70
-                 ADD    SYU-TOTAL-HKNTEN    TO  WRK-KOH-GAI-GEN70-TEN
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
                                                 WRK-JYOGENKBN-TEN3
                                                 WRK-JYOGENKBN-TEN4
