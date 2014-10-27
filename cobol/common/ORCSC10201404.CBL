@@ -3417,6 +3417,20 @@
                END-IF
            END-IF
       *
+      *H26.11
+      *    月初回で算定履歴の初回算定日よりコメント年月が後の場合
+           IF     (LNK-ORCSC-SYORIFLG  =   ZERO     )
+              AND (WRK-SYOKAI-YMD  NOT =   SPACE    )
+              AND (WRK-SYOKAI-YMD      <   SPA-SRYYMD)
+              AND (WRK-SYOKAI          =   ZERO     )
+               IF      (WRK-COM-YM     NOT =   SPACE )
+                 AND   (WRK-COM-YM         >   WRK-SYOKAI-YMD(1:6))
+                 AND   (WRK-COM-YM         =   SPA-SRYYMD (1:6))
+                   MOVE    SPACE           TO  WRK-SYOKAI-YMD
+               END-IF
+           END-IF
+      *
+      *
       *    すでに初回算定日がある時、初回算定日に入れる
            IF      LNK-ORCSC-TOKTEI-YMD    NOT =   SPACE
                MOVE    LNK-ORCSC-TOKTEI-YMD    TO  WRK-SYOKAI-YMD
