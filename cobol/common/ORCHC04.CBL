@@ -1765,7 +1765,7 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   ORCHC04SUB-TBL-MAX
       *H26.10
-             IF      ORCHC04SUB-SRYCD (IDX)    NOT =   SPACE
+             IF      ORCHC04SUB-SRYCD (IDX)    NOT =   "999999999"
       *
                ADD     1                   TO  IDX-H
                IF      IDX-H               >=  LINE-MAX
@@ -1895,8 +1895,7 @@
                    END-PERFORM
                    IF      FLG-OK              =   ZERO
       *                ÂÐ¾Ý³°
-                       IF     (ORCHC04SUB-ZAIEND (IDX) =   "1" )
-                       AND    (ORCHC04SUB-H-ZAIHEN(IDX)
+                       IF     (ORCHC04SUB-H-ZAIHEN(IDX)
                                                    NOT =   "¡ö")
       *                    ºÞ¤ÎºÇ¸å
                            MOVE    ORCHC04SUB-H-KAISU (IDX)
@@ -1905,7 +1904,14 @@
                            MOVE    ORCHC04SUB-H-TENSU (IDX)
                                                TO  ORCHC04SUB-H-TENSU
                                                              (IDX - 1)
-                           MOVE    "1"         TO  ORCHC04SUB-ZAIEND
+                           MOVE    ORCHC04SUB-H-KINGAKU (IDX)
+                                               TO  ORCHC04SUB-H-KINGAKU
+                                                             (IDX - 1)
+                           MOVE    ORCHC04SUB-H-ENKBN (IDX)
+                                               TO  ORCHC04SUB-H-ENKBN
+                                                             (IDX - 1)
+                           MOVE    ORCHC04SUB-ZAIEND (IDX)
+                                               TO  ORCHC04SUB-ZAIEND
                                                              (IDX - 1)
                        END-IF
                        IF     (ORCHC04SUB-H-ZAIHEN(IDX)
@@ -1919,7 +1925,7 @@
                                                TO  ORCHC04SUB-H-ZAIHEN
                                                              (IDX + 1)
                        END-IF
-                       MOVE    SPACE           TO ORCHC04SUB-SRYCD (IDX)
+                       MOVE    "999999999"     TO ORCHC04SUB-SRYCD (IDX)
                    END-IF
                END-IF
            END-PERFORM
@@ -2096,7 +2102,7 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   ORCHC04SUB-TBL-MAX
       *H26.10
-             IF      ORCHC04SUB-SRYCD (IDX)    NOT =   SPACE
+             IF      ORCHC04SUB-SRYCD (IDX)    NOT =   "999999999"
       *
                ADD     1                   TO  IDX-H
                IF      IDX-H               >=  LINE-MAX2
