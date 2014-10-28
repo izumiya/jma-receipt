@@ -1869,6 +1869,10 @@
       *                ÂÐ¾Ý³°
                        IF     (ORCHC04SUB-H-ZAIHEN(IDX)
                                                    NOT =   "¡ö")
+                         AND  (ORCHC04SUB-H-TENSU(IDX - 1)
+                                                       =   SPACE )
+                         AND  (ORCHC04SUB-H-KINGAKU(IDX - 1)
+                                                       =   SPACE )
       *                    ºÞ¤ÎºÇ¸å
                            MOVE    ORCHC04SUB-H-KAISU (IDX)
                                                TO  ORCHC04SUB-H-KAISU
