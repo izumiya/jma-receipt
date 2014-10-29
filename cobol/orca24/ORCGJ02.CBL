@@ -594,6 +594,9 @@
            03  WRK-OLD-NYUINYMD        PIC X(08).
            03  WRK-OLD-TAIINYMD        PIC X(08).
       *
+           03  WRK-ERRFLG              PIC X(01).
+           03  WRK-ERRFLG2             PIC X(01).
+      *
       *
        01  TBL-GRP-AREA.
            03  TBL-GRP-OCC             OCCURS   10.
@@ -8124,14 +8127,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE                  SRYACCT-REC
                MOVE    1               TO  FLG-SRYACCT
            END-IF
+           MOVE    SPACE               TO  WRK-ERRCD
+           MOVE    SPACE               TO  WRK-ERRFLG2
            PERFORM
                UNTIL      (FLG-SRYACCT     =   1   )  OR
                           (SPA-ERRCD   NOT =   SPACE)
       *        受診履歴に存在しないこと
                PERFORM 420012-JYURRKDEL-CHK-SEC
-               IF      SPA-ERRCD           =   SPACE
+               IF     (SPA-ERRCD           =   SPACE )
+                 AND  (WRK-ERRFLG          =   SPACE )
       *            診療行為削除
                    PERFORM 420011-SRYACT-DEL-SEC
+                   MOVE    "1"                 TO  WRK-ERRFLG2
                END-IF
       *
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
@@ -8142,6 +8149,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
            MOVE    "key39"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *H26.11
+           IF     (SPA-ERRCD           =   SPACE )
+              AND (WRK-ERRCD       NOT =   SPACE )
+               MOVE    WRK-ERRCD           TO  SPA-ERRCD
+           END-IF
       *
       *    入院の時、受診履歴の削除
            IF      SPA-GMN-NYUGAIKBN   =   "1"
@@ -8163,8 +8176,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *
-           IF      SPA-ERRCD           =   SPACE
-              AND  SPA-JIDCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE
+              AND  SPA-JIDCD           =   SPACE )
+            OR   ((WRK-ERRCD       NOT =   SPACE    ) AND
+                  (SPA-ERRCD           =   WRK-ERRCD) AND
+                  (WRK-ERRFLG2         =   "1"      ))
       *        保存用パラメタ作成
                PERFORM 4201-SRYACCT-PARA-SEC
                MOVE    1                   TO  SPA-GMN-PAGE
@@ -8209,7 +8225,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-JYURRK          =   ZERO
-               MOVE    "1009"          TO  SPA-ERRCD
+      ******   MOVE    "1009"          TO  SPA-ERRCD
+               MOVE    "1009"          TO  WRK-ERRCD
+               MOVE    "1"             TO  WRK-ERRFLG
            END-IF
       *
            .
@@ -10420,6 +10438,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
                    END-IF
       *ver.4.7
+      *
+      *H26.11
+               ELSE
+      *            回数ゼロで受診履歴に存在する時、削除
+                   IF     (SPA-GNAI-DAY (IDR4 SPA-DAY-IDX)
+                                           =   ZERO  )  AND
+                          (SPA-NAI-DAY (IDX IDR4 SPA-DAY-IDX)
+                                           =   ZERO  )
+      *v.4.7       入院のみ
+                    AND   (SPA-NYUGAIKBN   =   "1"   )
+                       PERFORM 41012203-RRKZAINUM-DEL-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -10449,6 +10479,55 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        41012202-JYURRK-ZAINUM-EXT.
            EXIT.
+      *
+      *H26.11
+      *****************************************************************
+      *    受診履歴剤番号削除処理
+      *****************************************************************
+       41012203-RRKZAINUM-DEL-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  IDX-RRK2
+           MOVE    ZERO            TO  IDX-RRK3
+           MOVE    ZERO            TO  IDR6
+           PERFORM VARYING IDR5    FROM    IDX-RRK   BY   1
+                   UNTIL  (IDR5        >   SPA-RRK-MAX )  OR
+                          (IDX-RRK2    >   ZERO        )
+               IF     (SPA-RRK-RRKYMD(IDX-RRK)
+                                           =   SPA-RRK-RRKYMD(IDR5)) AND
+                      (SPA-RRK-SRYKA   (IDR5)
+                                           =   SPA-NAIGMN-SRYKA  ) AND
+                      (SPA-RRK-HKNCOMBI(IDR5)
+                                           =   SPA-GMN-HKNCOMBI )
+                   IF      SPA-RRK-RENNUM (IDR5)   >   3
+                       MOVE    4                   TO  WRK-REN
+                   ELSE
+                       MOVE    SPA-RRK-RENNUM (IDR5)
+                                                   TO  WRK-REN
+                       ADD     1                   TO  WRK-REN
+                   END-IF
+                   IF      WRK-REN             =   IDR4
+                       MOVE    IDR5            TO  IDX-RRK2
+                       PERFORM 41012202-JYURRK-ZAINUM-SEC
+      *                剤番号存在判定
+                       IF      WRK-IDR         >   ZERO
+      *                    剤削除
+                           MOVE    ZERO            TO  SPA-RRK-ZAINUM
+                                                 (IDX-RRK2 WRK-IDR)
+                           MOVE    SPACE           TO  SPA-RRK-SRYKBN
+                                                 (IDX-RRK2 WRK-IDR)
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF      SPA-RRK-RRKYMD(IDX-RRK)
+                                           NOT =   SPA-RRK-RRKYMD(IDR5)
+                   MOVE    SPA-RRK-MAX     TO  IDR5
+               END-IF
+           END-PERFORM
+           .
+       41012203-RRKZAINUM-DEL-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    受診履歴テーブル追加処理
