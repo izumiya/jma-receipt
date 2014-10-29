@@ -8133,6 +8133,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                UNTIL      (FLG-SRYACCT     =   1   )  OR
                           (SPA-ERRCD   NOT =   SPACE)
       *        受診履歴に存在しないこと
+               MOVE    SPACE               TO  WRK-ERRFLG
                PERFORM 420012-JYURRKDEL-CHK-SEC
                IF     (SPA-ERRCD           =   SPACE )
                  AND  (WRK-ERRFLG          =   SPACE )
