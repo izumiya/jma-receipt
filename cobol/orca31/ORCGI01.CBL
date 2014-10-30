@@ -17130,6 +17130,35 @@
               END-IF
            END-IF
       *
+      *    異動取消日が既に特定入院料の上限日を超過している場合は、
+      *    点数マスタを参照し、特定入院料であればパラメタをクリアする
+           IF      (IPN-NYUKAIKEI-SAKUSEI-FLG   =   "1")   AND
+                   (LNK-TOKNYUIN2-SRYCD(1)      =   SPACE)
+               INITIALIZE                     TNS-TENSU-REC
+               MOVE   PTNYUINRRK-HOSPNUM  TO  TNS-HOSPNUM
+               MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                          TO  TNS-SRYCD
+               MOVE   IPN-SANTEISTYMD     TO  TNS-YUKOSTYMD
+                                              TNS-YUKOEDYMD
+               MOVE   TNS-TENSU-REC  TO  MCPDATA-REC
+               MOVE   "tbl_tensu"    TO  MCP-TABLE
+               MOVE   "key"          TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC        =   ZERO
+                   MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+                   IF   TNS-NYUTENTTLKBN   =   920
+      *                 短期滞在はチェック対象外
+                      IF  TNS-NYUKHNKSNKBN  =  226  OR 240
+                          CONTINUE
+                      ELSE
+                          MOVE  SPACE TO  LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                      END-IF
+                   END-IF
+               END-IF
+               MOVE    "tbl_tensu"      TO  MCP-TABLE
+               MOVE    "key"            TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
       *
       *-------特定入院対応ここまで-----------------------------------
       *
