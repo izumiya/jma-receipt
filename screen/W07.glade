@@ -354,7 +354,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>False</editable>
-        <max_length>9</max_length>
+        <text_max_length>9</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -370,7 +370,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>False</editable>
-        <max_length>9</max_length>
+        <text_max_length>9</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -417,7 +417,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -466,7 +466,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -504,7 +504,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -542,7 +542,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -580,7 +580,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -618,7 +618,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -656,7 +656,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -694,7 +694,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -732,7 +732,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -770,7 +770,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -808,7 +808,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -846,7 +846,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -884,7 +884,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -922,7 +922,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -960,7 +960,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -998,7 +998,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -1036,7 +1036,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -1342,7 +1342,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>16</max_length>
+              <text_max_length>16</text_max_length>
               <text>1 診療区分順</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1380,7 +1380,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text>1 表示する</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1418,7 +1418,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>30</max_length>
+              <text_max_length>30</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1456,7 +1456,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1494,7 +1494,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1532,7 +1532,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1570,7 +1570,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1608,7 +1608,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>32</max_length>
+              <text_max_length>32</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1790,7 +1790,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1828,7 +1828,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1866,7 +1866,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1904,7 +1904,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2050,7 +2050,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2214,7 +2214,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>30</max_length>
+              <text_max_length>30</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2288,7 +2288,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2326,7 +2326,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2400,7 +2400,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>30</max_length>
+              <text_max_length>30</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2450,7 +2450,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2488,7 +2488,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2526,7 +2526,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2576,7 +2576,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2614,7 +2614,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2652,7 +2652,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text>1 算定する（月１回）</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2690,7 +2690,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>22</max_length>
+              <text_max_length>22</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2728,7 +2728,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2766,7 +2766,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>30</max_length>
+              <text_max_length>30</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2804,7 +2804,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2842,7 +2842,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2880,7 +2880,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2918,7 +2918,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>12</max_length>
+              <text_max_length>12</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3245,7 +3245,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>30</max_length>
+              <text_max_length>30</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3298,7 +3298,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <max_length>2</max_length>
+            <text_max_length>2</text_max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -3335,7 +3335,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3373,7 +3373,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3411,7 +3411,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3449,7 +3449,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3487,7 +3487,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3525,7 +3525,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>60</max_length>
+              <text_max_length>60</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3563,7 +3563,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3601,7 +3601,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3639,7 +3639,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3713,7 +3713,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3751,7 +3751,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3789,7 +3789,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3827,7 +3827,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3865,7 +3865,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>40</max_length>
+              <text_max_length>40</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3903,7 +3903,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -4049,7 +4049,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -4087,7 +4087,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>28</max_length>
+              <text_max_length>28</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -4349,7 +4349,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <max_length>40</max_length>
+              <text_max_length>40</text_max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -7318,9 +7318,9 @@
           <widget>
             <class>GtkLabel</class>
             <name>label311</name>
-            <x>628</x>
-            <y>184</y>
-            <width>120</width>
+            <x>632</x>
+            <y>160</y>
+            <width>152</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -7329,7 +7329,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>２：診療費明細書</label>
+            <label>８：診療費明細書（外来）</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -7374,8 +7374,8 @@
             <class>GtkLabel</class>
             <name>label270</name>
             <x>52</x>
-            <y>184</y>
-            <width>136</width>
+            <y>160</y>
+            <width>160</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -7384,7 +7384,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>１：請求書兼領収書</label>
+            <label>７：請求書兼領収書（外来）</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -7643,8 +7643,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSRYPRTN_COMBO</name>
-            <x>520</x>
-            <y>236</y>
+            <x>572</x>
+            <y>184</y>
             <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7753,7 +7753,7 @@
             <class>GtkPandaCombo</class>
             <name>SYUSKYPRTN_COMBO</name>
             <x>228</x>
-            <y>236</y>
+            <y>184</y>
             <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7789,9 +7789,9 @@
           <widget>
             <class>GtkLabel</class>
             <name>label310</name>
-            <x>400</x>
-            <y>236</y>
-            <width>120</width>
+            <x>404</x>
+            <y>184</y>
+            <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -7800,7 +7800,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>２：診療費明細書</label>
+            <label>１０：診療費明細書（入院）</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -7826,7 +7826,7 @@
             <class>GtkPandaCombo</class>
             <name>SYUSKYPRTG_COMBO</name>
             <x>228</x>
-            <y>184</y>
+            <y>160</y>
             <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8230,7 +8230,7 @@
             <class>GtkLabel</class>
             <name>label322</name>
             <x>52</x>
-            <y>8</y>
+            <y>16</y>
             <width>248</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8248,7 +8248,7 @@
             <class>GtkLabel</class>
             <name>label1</name>
             <x>52</x>
-            <y>56</y>
+            <y>64</y>
             <width>176</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8259,24 +8259,6 @@
             <xpad>0</xpad>
             <ypad>0</ypad>
             <label>２：月別請求書兼領収書</label>
-            <justify>GTK_JUSTIFY_LEFT</justify>
-            <wrap>False</wrap>
-          </widget>
-          <widget>
-            <class>GtkLabel</class>
-            <name>label274</name>
-            <x>52</x>
-            <y>160</y>
-            <width>252</width>
-            <height>24</height>
-            <sensitive>True</sensitive>
-            <can_focus>False</can_focus>
-            <has_focus>False</has_focus>
-            <xalign>0</xalign>
-            <yalign>0.5</yalign>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <label>＜(S03)収納登録−請求確認（外来)＞</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -8339,8 +8321,8 @@
             <class>GtkLabel</class>
             <name>label276</name>
             <x>52</x>
-            <y>236</y>
-            <width>136</width>
+            <y>184</y>
+            <width>160</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8349,7 +8331,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>１：請求書兼領収書</label>
+            <label>９：請求書兼領収書（入院）</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -8357,7 +8339,7 @@
             <class>GtkPandaCombo</class>
             <name>S03SKYMISYUPRT_COMBO</name>
             <x>404</x>
-            <y>184</y>
+            <y>160</y>
             <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8394,7 +8376,7 @@
             <class>GtkLabel</class>
             <name>label360</name>
             <x>52</x>
-            <y>104</y>
+            <y>112</y>
             <width>136</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8412,7 +8394,7 @@
             <class>GtkLabel</class>
             <name>label323</name>
             <x>52</x>
-            <y>32</y>
+            <y>40</y>
             <width>176</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8430,7 +8412,7 @@
             <class>GtkLabel</class>
             <name>label362</name>
             <x>52</x>
-            <y>128</y>
+            <y>136</y>
             <width>176</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8447,9 +8429,9 @@
           <widget>
             <class>GtkLabel</class>
             <name>label361</name>
-            <x>356</x>
-            <y>128</y>
-            <width>136</width>
+            <x>368</x>
+            <y>136</y>
+            <width>132</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8466,7 +8448,7 @@
             <class>GtkPandaCombo</class>
             <name>S02SKYMISYUPRT_COMBO</name>
             <x>492</x>
-            <y>32</y>
+            <y>40</y>
             <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8503,7 +8485,7 @@
             <class>GtkPandaCombo</class>
             <name>S02SORTKBN_COMBO</name>
             <x>228</x>
-            <y>104</y>
+            <y>112</y>
             <width>120</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8539,8 +8521,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>IKTKEISANKBN_COMBO</name>
-            <x>492</x>
-            <y>128</y>
+            <x>500</x>
+            <y>136</y>
             <width>336</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8577,7 +8559,7 @@
             <class>GtkPandaCombo</class>
             <name>IKTSORTKBN_COMBO</name>
             <x>228</x>
-            <y>128</y>
+            <y>136</y>
             <width>120</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8686,8 +8668,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSRYPRTG_COMBO</name>
-            <x>748</x>
-            <y>184</y>
+            <x>786</x>
+            <y>160</y>
             <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8724,7 +8706,7 @@
             <class>GtkPandaCombo</class>
             <name>S02SKYSAI_COMBO</name>
             <x>228</x>
-            <y>32</y>
+            <y>40</y>
             <width>256</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8761,7 +8743,7 @@
             <class>GtkPandaCombo</class>
             <name>TUKIGRP_COMBO</name>
             <x>228</x>
-            <y>56</y>
+            <y>64</y>
             <width>256</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8798,7 +8780,7 @@
             <class>GtkPandaCombo</class>
             <name>TUKISKYMISYUPRT_COMBO</name>
             <x>492</x>
-            <y>56</y>
+            <y>64</y>
             <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8835,7 +8817,7 @@
             <class>GtkPandaCombo</class>
             <name>TUKISUM_COMBO</name>
             <x>228</x>
-            <y>80</y>
+            <y>88</y>
             <width>284</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9003,8 +8985,8 @@
             <name>label275</name>
             <x>52</x>
             <y>212</y>
-            <width>260</width>
-            <height>24</height>
+            <width>912</width>
+            <height>48</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
@@ -9012,15 +8994,16 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>＜(S03)収納登録−請求確認（入院）＞</label>
+            <label>　７：請求書兼領収書（外来）、８：診療費明細書（外来）、　９：請求書兼領収書（入院）、１０：診療費明細書（入院）の設定は、
+　［(S03)収納登録−請求確認画面］でも参照します。</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
           <widget>
             <class>GtkLabel</class>
             <name>label9</name>
-            <x>356</x>
-            <y>104</y>
+            <x>368</x>
+            <y>112</y>
             <width>200</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9037,8 +9020,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SAIKEISANSKYCHK_COMBO</name>
-            <x>556</x>
-            <y>104</y>
+            <x>572</x>
+            <y>112</y>
             <width>380</width>
             <height>24</height>
             <sensitive>True</sensitive>

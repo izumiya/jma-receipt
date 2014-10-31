@@ -791,7 +791,7 @@
            INITIALIZE                      SPA-GMN-SKYPRTLST-G
       *
            MOVE    "0"                 TO  SPA-GMN-SKYPRTL (1)
-           MOVE    "発行なし"          TO  SPA-GMN-SKYPRTMEIL (1)
+           MOVE    "発行しない"        TO  SPA-GMN-SKYPRTMEIL (1)
       *
            MOVE    "1"                 TO  SPA-GMN-SKYPRTL (2)
            MOVE    "発行する"          TO  SPA-GMN-SKYPRTMEIL (2)
@@ -2293,7 +2293,11 @@
       *****************************************************************
        4102-RRKSYU-KIHON-CHK-SEC       SECTION.
       *
-           PERFORM 4101-SELNUM-CHK-SEC
+           IF    ( WRK-MCP-WIDGET      =   "SKYPRT" OR "SRYPRT" )
+               CONTINUE
+           ELSE
+               PERFORM 4101-SELNUM-CHK-SEC
+           END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
                PERFORM 4101-NYUKINYMD-CHK-SEC

@@ -121,14 +121,14 @@ S02	{
 				select	bool[500];
 			};
 		};
-		SRYKACOMBO	{
+		CMB_SRYKA	{
 			SRYKA	{
 				value	varchar(21);
 			};
 			count	int;
 			item	varchar(21)[99];
 		};
-		NYUGAIKBNCOMBO	{
+		CMB_NYUGAIKBN	{
 			NYUGAIKBN	{
 				value	varchar(8);
 			};
@@ -170,7 +170,7 @@ S02	{
 			value	varchar(10);
 			state	int;
 		};
-		NYUKINHOUHOU_COMBO	{
+		CMB_NYUKINHOUHOU	{
 			NYUKINHOUHOU	{
 				value	varchar(33);
 				state	int;
@@ -179,7 +179,7 @@ S02	{
 			item	varchar(33)[50];
 			state	int;
 		};
-		SKYPRT_COMBO	{
+		CMB_SKYPRT	{
 			SKYPRT	{
 				value	varchar(24);
 				state	int;
@@ -188,7 +188,7 @@ S02	{
 			item	varchar(24)[5];
 			state	int;
 		};
-		SRYPRT_COMBO	{
+		CMB_SRYPRT	{
 			SRYPRT	{
 				value	varchar(24);
 				state	int;
