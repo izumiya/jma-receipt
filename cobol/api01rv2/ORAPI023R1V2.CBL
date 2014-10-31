@@ -2075,6 +2075,11 @@
            MOVE    ZERO                TO  WRK-LNK-S01-SYUTEN
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   LNK-WKSRYACT-MAX
+      *        Êñ³çºÞÂÐ¾Ý³°
+               IF      LNK-WKSRY-CONTKBN (IDX) =   "H"
+                   CONTINUE
+               ELSE
+      *
       *            ¼«ÇåÀÕ¤Î»þ¡¢µ»½ÑÅÀ¤ò½¸·×¤¹¤ë
                    IF      (SPA-HKNKBN         =   1   )  AND
                            (SPA-RSI-HKNKBN     =   "4"
@@ -2088,6 +2093,7 @@
                            (LNK-WKSRY-SYUTEN1 (IDX)    NOT =  ZERO )
                        PERFORM 45052-KOGAI-SYORI-SEC
                    END-IF
+               END-IF
            END-PERFORM
            MOVE    WRK-LNK-S01-SYUTEN  TO  LNK-S01-SYUTEN
                                                    (LNK-SYUNOU2-MAX)

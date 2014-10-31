@@ -4769,6 +4769,8 @@
                       (LNK-WKSRY-HKNCOMBI(IDX) NOT =   SYU-HKNCOMBINUM)
                   OR  ((SYU-SRYKA              NOT =   ZERO  )  AND
                       (LNK-WKSRY-SRYKA   (IDX) NOT =   SYU-SRYKA  ))
+      *           Êñ³çºÞÂÐ¾Ý³°
+                  OR  (LNK-WKSRY-CONTKBN (IDX)     =   "H"   )
                    CONTINUE
                ELSE
       *            ¼«ÇåÀÕ¤Î»þ¡¢µ»½ÑÅÀ¤ò½¸·×¤¹¤ë

@@ -77,6 +77,7 @@
            03  FLG-HKTINP              PIC 9(01).
       *ver.4.7
            03  FLG-INPUTOK2            PIC 9(01).
+           03  FLG-INPUTOK6            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1011,6 +1012,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    ZERO                TO  FLG-SANTEIOK
            MOVE    ZERO                TO  FLG-INPUTOK
            MOVE    ZERO                TO  FLG-INPUTOK2
+           MOVE    ZERO                TO  FLG-INPUTOK6
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
                IF     (SPA-COM-HKNCOMBI (IDX-Z)    =   "9999")
@@ -1018,6 +1020,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    OR (SPA-COM-HOUKATU-ERR(IDX-Z)  =   1     )
                    OR (SPA-GMN-INPUTCD (IDX-Z)(1:1)
                                                    =   "#"
+                                                   OR  "." 
                                                    OR  "$"   )
       *            治験対象外
                    OR (SPA-COM-CHIKENKBN(IDX-Z)    =   "1"   )
@@ -1032,6 +1035,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                                         OR  "6"
                                                         OR  "7" )
                        MOVE    1                   TO  FLG-INPUTOK
+      *H26.11
+      *                電子点数表からのチェックは、薬剤・器材のみ
+                       IF     (TBL-HKTSRYCD (1)        =   SPACE )
+                           IF     (SPA-COM-INPUTCD (IDX-Z)(1:1) =   "6"
+                                                                OR  "7")
+                               MOVE    1               TO  FLG-INPUTOK6
+                           END-IF
+                       END-IF
                    END-IF
       *H24.8       （サ）、ユーザ器材
                    IF     (SPA-COM-INPUTCD (IDX-Z)     =   "820000046")
@@ -1045,7 +1056,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *************  AND  (SPA-COM-TENSU  (IDX-Z)  >   ZERO )
                      AND  (FLG-SANTEIOK            =   ZERO )
                      AND  (FLG-INPUTOK             =   1    )
-                       PERFORM 20022-SRYKBN-CHECK-SEC
+      *H26.11
+      *                電子点数表からのチェックは、薬剤・器材のみ
+                       IF     (TBL-HKTSRYCD (1)        =   SPACE )
+                         AND  (FLG-INPUTOK6            =   ZERO  )
+                           CONTINUE
+                       ELSE
+                           PERFORM 20022-SRYKBN-CHECK-SEC
+                       END-IF
                    END-IF
                END-IF
       *        出来高算定判定
@@ -1099,6 +1117,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    1                   TO  FLG-SANTEIOK
                END-IF
            END-PERFORM
+      *
       *    包括診療コード編集
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
