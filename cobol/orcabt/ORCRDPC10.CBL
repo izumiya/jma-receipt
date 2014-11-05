@@ -1832,7 +1832,7 @@
                    PERFORM     2007-HENSYU-SEC
       *
                    ADD     1           TO  CNT-COMMIT
-                   IF      CNT-COMMIT      =    300
+                   IF      CNT-COMMIT      =    10
                        MOVE  ZERO      TO      CNT-COMMIT
                        PERFORM 900-DBCOMMIT-SEC
                       PERFORM 900-DBSTART-SEC
