@@ -406,9 +406,15 @@
       *  04.07.04    NACL-門脇    13/12/09  医療情報連携対応
       *  04.07.05    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
+      *  04.07.06    NACL-藤原    14/10/15  平成２６年４月改正対応
+      *                                     使用量、単価の小数部の記録方
+      *                                     法の変更
+      *                                     漢字モードの継続するスペース
+      *                                     の記録方法の変更
       *  04.07.07    NACL-門脇    14/09/01  平成２６年１０月改正対応
       *  04.07.08    NACL-藤原    14/09/24  全角の負担者番号、受給者番号の
       *                                     記録対応
+      *  04.07.09    NACL-藤原    14/10/17  請求情報への更新日設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -630,6 +636,9 @@ grpsys     COPY    "COMMON-SPA".
            03  IDXZ                    PIC 9(03).
            03  IDW1                    PIC 9(03).
            03  IDW2                    PIC 9(04).
+           03  IDW3                    PIC 9(04).
+           03  IDW4                    PIC 9(04).
+           03  IDW5                    PIC 9(04).
            03  IDZ1                    PIC 9(03).
            03  IDZ2                    PIC 9(03).
            03  IDZ3                    PIC 9(03).
@@ -702,11 +711,19 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-REC-LENGTH          PIC 9(04).
            03  WRK-HENSYU-AREA.
                05  WRK-DATA            PIC X(2400).
-               05  WRK-NUM             PIC ZZZZZZZZZ9.99999. 
+               05  WRK-NUM             PIC ZZZZZZZZZ9.99999.
+               05  WRK-NUM-R           REDEFINES   WRK-NUM.
+                   07  WRK-NUM-R-1     PIC X(10).
+                   07  FILLER          PIC X(01).
+                   07  WRK-NUM-R-2     PIC X(05).
                05  WRK-NAGASA          PIC 9(04).
                05  WRK-ST              PIC 9(02). 
                05  WRK-SYOSUU          PIC 9(01).
                05  WRK-END             PIC 9(01).
+               05  WRK-MOJI-CHK        PIC 9(01).
+      *
+           03  WRK-CO-COMMENT      PIC X(76).
+           03  WRK-CO-SRYCD        PIC X(09).
       *    傷病名レコード編集用
            03  WRK-BYOMEI-AREA.
                05  WRK-BYOMEICD        PIC X(07).
@@ -755,7 +772,7 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-SURYO               PIC 9(08).
            03  WRK-TENSU               PIC 9(07).
            03  WRK-KAISU               PIC 9(03).
-           03  WRK-TANKA               PIC 9(07)V9(02).
+           03  WRK-TANKA               PIC 9(08)V9(02).
            03  WRK-SRYSURYO            PIC 9(05)V9(05).
            03  WRK-FTNKBN-AREA.                            
                05  WRK-FTNKBN          PIC X(01).
@@ -781,9 +798,6 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-MCP-PATHNAME        PIC X(64).
       *
            03  WRK-ACCTP-SYUTEN        PIC 9(07).
-      *
-           03  WRK-CO-COMMENT          PIC X(76).
-           03  WRK-CO-SRYCD            PIC X(09).
       *
            03 WRK-KOHFTNJANUM          PIC X(08).
            03 WRK-KOHJKYSNUM           PIC X(20).
@@ -2290,9 +2304,14 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    氏名
            INITIALIZE                      ORCSKANACHK2AREA
            MOVE    "1"                 TO  KANACHK2-SYORI
+           MOVE    "1"                 TO  KANACHK2-SYORIKBN 
            MOVE    RECE02-NAME         TO  KANACHK2-MAE-INPUT
            CALL    "ORCSKANACHK2"      USING   ORCSKANACHK2AREA
            IF      KANACHK2-RC4        =   ZERO
+               MOVE    SPACE               TO  RECE02-NAME
+               MOVE    KANACHK2-OUT-INPUT (1:KANACHK2-MAX)
+                                           TO  RECE02-NAME
+      *
                PERFORM VARYING IDX FROM    1   BY  2
                        UNTIL   IDX >       49
       *                                            F4A5 F4A6
@@ -2489,7 +2508,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    記録条件仕様年月情報
            PERFORM 5004-MOJI-HENSYU-SEC         
-      *    請求情報
+      *    請求情報（作成日時）
+           STRING  WRK-PARA-CREYMD     DELIMITED  BY SIZE
+                   WRK-PARA-CREHMS     DELIMITED  BY SIZE
+                                       INTO  WRK-DATA
+           END-STRING
+           MOVE    14                  TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    診療科名１
            IF      RECE02-SYUKA    NOT =   SPACE
@@ -4244,6 +4268,24 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                        END-IF
                                    END-PERFORM
                                END-IF
+                               IF      WRK-SJ-CHK      =   1
+      *                            後ろの全角空白を削除する
+                                   INITIALIZE          ORCSKANACHKAREA
+                                   MOVE    "1"     TO  KANACHK-SYORI
+                                   MOVE    "1"     TO  KANACHK-SYORIKBN 
+                                   MOVE    RECE05-NAME(IDX)
+                                                   TO  KANACHK-MAE-INPUT
+                                   CALL    "ORCSKANACHK"
+                                               USING   ORCSKANACHKAREA
+                                   IF    ( KANACHK-RC  =   ZERO )
+                                   AND   ( KANACHK-MAX >   ZERO )
+                                       MOVE    SPACE
+                                                   TO  RECE05-NAME(IDX)
+                                       MOVE    KANACHK-OUT-INPUT
+                                                       (1:KANACHK-MAX)
+                                                   TO  RECE05-NAME(IDX)
+                                   END-IF
+                               END-IF
                            ELSE
                                MOVE    1               TO  WRK-SJ-CHK
                            END-IF
@@ -5421,6 +5463,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
       *                文字データ
                        MOVE    TBL-KOUI-NAME(IDX)  TO  WRK-DATA
                        MOVE    76                  TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                        MOVE    1                   TO  WRK-END 
                        PERFORM 5004-MOJI-HENSYU-SEC  
       *
@@ -5524,6 +5567,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                            MOVE    TBL-RECE055-NAME  (1)
                                                        TO  WRK-DATA
                            MOVE    100                 TO  WRK-NAGASA
+                           MOVE    1                   TO  WRK-MOJI-CHK
                        END-IF
                        PERFORM 5004-MOJI-HENSYU-SEC  
       *                コメントコード２
@@ -5538,6 +5582,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                            MOVE    TBL-RECE055-NAME  (2)
                                                        TO  WRK-DATA
                            MOVE    100                 TO  WRK-NAGASA
+                           MOVE    1                   TO  WRK-MOJI-CHK
                        END-IF
                        PERFORM 5004-MOJI-HENSYU-SEC  
       *                コメントコード３
@@ -5552,6 +5597,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                            MOVE    TBL-RECE055-NAME  (3)
                                                        TO  WRK-DATA
                            MOVE    100                 TO  WRK-NAGASA
+                           MOVE    1                   TO  WRK-MOJI-CHK
                        END-IF
                        PERFORM 5004-MOJI-HENSYU-SEC  
       *                日付情報
@@ -5725,6 +5771,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                                        TO  WRK-DATA
            MOVE    76                  TO  WRK-NAGASA
            MOVE    1                   TO  WRK-END 
+           MOVE    1                   TO  WRK-MOJI-CHK
            PERFORM 5004-MOJI-HENSYU-SEC  
       *
            IF      TBL-COMMENT-NAME(IDX) (77:)
@@ -5832,6 +5879,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME (1)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード２
@@ -5846,6 +5894,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (2)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード３
@@ -5860,6 +5909,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (3)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    
@@ -6027,6 +6077,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-ZAIW-NAME (2 IDX)     TO  WRK-DATA
            END-IF
            MOVE    40                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-MOJI-CHK
            PERFORM 5004-MOJI-HENSYU-SEC
       *    商品名及び規格名及びサイズ
            IF      TBL-ZAIW-RECEDENNAME (2 IDX)
@@ -6048,6 +6099,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME (1)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード２
@@ -6062,6 +6114,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (2)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード３
@@ -6076,6 +6129,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (3)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    日付情報
@@ -6208,6 +6262,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                                            TO  WRK-DATA
            END-IF
            MOVE    40                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-MOJI-CHK
            PERFORM 5004-MOJI-HENSYU-SEC
       *    商品名及び規格名及びサイズ
            IF      ORCSRECESORT-RECEDENNAME (IDXX IDX)
@@ -6229,6 +6284,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME (1)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード２
@@ -6243,6 +6299,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (2)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    コメントコード３
@@ -6257,6 +6314,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME  (3)
                                            TO  WRK-DATA
                MOVE    100                 TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-MOJI-CHK
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC  
       *    日付情報
@@ -6360,6 +6418,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
       *            文字データ
                    MOVE    WRK-RECE05-NAME (1) TO  WRK-DATA
                    MOVE    76                  TO  WRK-NAGASA
+                   MOVE    1                   TO  WRK-MOJI-CHK
                    MOVE    1                   TO  WRK-END 
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *
@@ -6449,6 +6508,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (1)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            コメントコード２
@@ -6463,6 +6523,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (2)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            コメントコード３
@@ -6477,6 +6538,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (3)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            日付情報
@@ -6574,6 +6636,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (1)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            コメントコード２
@@ -6588,6 +6651,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (2)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            コメントコード３
@@ -6602,6 +6666,7 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                        MOVE    TBL-RECE055-NAME  (3)
                                                    TO  WRK-DATA
                        MOVE    100                 TO  WRK-NAGASA
+                       MOVE    1                   TO  WRK-MOJI-CHK
                    END-IF
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *            日付情報
@@ -6748,7 +6813,8 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    TBL-RECE055-NAME (IDVV)
                                            TO  WRK-DATA
                MOVE    76                  TO  WRK-NAGASA
-               MOVE    1                   TO  WRK-END 
+               MOVE    1                   TO  WRK-MOJI-CHK
+               MOVE    1                   TO  WRK-END
                PERFORM 5004-MOJI-HENSYU-SEC
       *
                IF      TBL-RECE055-NAME (IDVV) (77:)
@@ -7613,18 +7679,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
        200921-SJ-HENSYU-SEC       SECTION.
       *
       *    全角スペースのみのレコードは記載しない
-           MOVE    ZERO                TO  WRK-SJ-CHK
-           PERFORM VARYING IDX FROM    1   BY  2
-                   UNTIL   IDX >       WRK-CONS-RECECOM-LENGTH-MAX
-                   OR      WRK-COMMENT-G(IDX:2)    =   SPACE
-                   OR      WRK-SJ-CHK              =   1
-               IF      WRK-COMMENT-G(IDX:2)    NOT =   "　"
-                   MOVE    1               TO  WRK-SJ-CHK
-               END-IF
-           END-PERFORM 
-           IF      WRK-SJ-CHK          =   ZERO
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    "1"                 TO  KANACHK-SYORIKBN 
+           MOVE    WRK-COMMENT-G       TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           IF       KANACHK-RC2        =   2
                GO  TO  200921-SJ-HENSYU-EXT
-           END-IF   
+           END-IF
+           IF    ( KANACHK-RC          =   ZERO )
+           AND   ( KANACHK-MAX         =   ZERO )
+               GO  TO  200921-SJ-HENSYU-EXT
+           END-IF
+      *    後ろの全角空白を削除する
+           IF      KANACHK-RC          =   ZERO
+               MOVE    SPACE               TO  WRK-COMMENT-G
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                           TO  WRK-COMMENT-G
+           END-IF
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
@@ -7659,18 +7731,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    全角スペースのみのレコードは記載しない
-           MOVE    ZERO                TO  WRK-SJ-CHK
-           PERFORM VARYING IDX FROM    1   BY  2
-                   UNTIL   IDX >       2500
-                   OR      RECEDEN-RECEDATA(IDX:2) =   SPACE
-                   OR      WRK-SJ-CHK              =   1
-               IF      RECEDEN-RECEDATA(IDX:2) NOT =   "　"
-                   MOVE    1               TO  WRK-SJ-CHK
-               END-IF
-           END-PERFORM 
-           IF      WRK-SJ-CHK          =   ZERO
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    "1"                 TO  KANACHK-SYORIKBN 
+           MOVE    RECEDEN-RECEDATA    TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           IF      KANACHK-RC2         =   2
                GO  TO  20099-COMMENT-HENSYU-EXT
-           END-IF   
+           END-IF
+           IF    ( KANACHK-RC          =   ZERO )
+           AND   ( KANACHK-MAX         =   ZERO )
+               GO  TO  20099-COMMENT-HENSYU-EXT
+           END-IF
+      *    後ろの全角空白を削除する
+           IF      KANACHK-RC          =   ZERO
+               MOVE    SPACE               TO  RECEDEN-RECEDATA
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                           TO  RECEDEN-RECEDATA
+           END-IF
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
@@ -8011,6 +8089,22 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            IF      WRK-DATA        =   SPACE
                CONTINUE
            ELSE                   
+               IF      WRK-MOJI-CHK    =   1
+      *            後ろの全角空白を削除する
+                   INITIALIZE                      ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    "1"                 TO  KANACHK-SYORIKBN
+                   MOVE    WRK-NAGASA          TO  KANACHK-MAX-CNT
+                   MOVE    WRK-DATA            TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+                   IF    ( KANACHK-RC          =   ZERO )
+                   AND   ( KANACHK-MAX         >   ZERO )
+                       MOVE    SPACE               TO  WRK-DATA
+                       MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                                   TO  WRK-DATA
+                   END-IF
+               END-IF
+      *
                PERFORM VARYING IDW2    FROM    WRK-NAGASA  BY  -1
                        UNTIL   IDW2    <       1
                    IF      WRK-DATA (IDW2:1)   NOT =   SPACE
@@ -8048,6 +8142,21 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            IF      WRK-NAGASA          =   ZERO
                CONTINUE
            ELSE                   
+      *        小数ありのとき、小数部がゼロの場合
+               IF      WRK-SYOSUU          >   ZERO
+                   IF      WRK-NUM-R-2         =   "00000"
+                      MOVE    ZERO                TO  WRK-SYOSUU
+                   ELSE
+                       PERFORM VARYING IDW2    FROM    WRK-SYOSUU  BY -1
+                               UNTIL   IDW2    <       1
+                           IF      WRK-NUM-R-2 (IDW2:1)    NOT =   "0"
+                               MOVE   IDW2             TO  WRK-SYOSUU
+                               MOVE    1               TO  IDW2
+                           END-IF
+                       END-PERFORM
+                   END-IF
+               END-IF
+      *
       *        開始位置
                COMPUTE WRK-ST  =   11      -   WRK-NAGASA
                IF      WRK-SYOSUU          >   ZERO
@@ -8089,9 +8198,29 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    コメントレコード記録処理
+      *    コメントレコード記録処理（７６バイトを超えるとき）
       *****************************************************************
        5010-CO-RECORD-NEXT-HENSYU-SEC  SECTION.
+      *
+      *    全角スペースのみのレコードは記載しない
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    "1"                 TO  KANACHK-SYORIKBN 
+           MOVE    WRK-CO-COMMENT      TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           IF       KANACHK-RC2        =   2
+               GO  TO  5010-CO-RECORD-NEXT-HENSYU-EXT
+           END-IF
+           IF    ( KANACHK-RC          =   ZERO )
+           AND   ( KANACHK-MAX         =   ZERO )
+               GO  TO  5010-CO-RECORD-NEXT-HENSYU-EXT
+           END-IF
+      *    後ろの全角空白を削除する
+           IF      KANACHK-RC          =   ZERO
+               MOVE    SPACE               TO  WRK-CO-COMMENT
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                           TO  WRK-CO-COMMENT
+           END-IF
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
@@ -8111,8 +8240,12 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *    文字データ
            MOVE    WRK-CO-COMMENT      TO  WRK-DATA
            MOVE    76                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-MOJI-CHK
            MOVE    1                   TO  WRK-END 
            PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           INITIALIZE                      WRK-CO-SRYCD
+                                           WRK-CO-COMMENT
            .
        5010-CO-RECORD-NEXT-HENSYU-EXT.
            EXIT.

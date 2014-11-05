@@ -32,6 +32,9 @@
       *                                     るレセプトは対象外とする
       *  04.07.02    NACL-門脇    13/09/25  労災マスタ追加対応
       *                                     （電話再診料　等）
+      *  04.07.03    NACL-藤原    14/10/15  平成２６年４月改正対応
+      *                                     漢字モードの継続するスペース
+      *                                     の記録方法の変更
       *  04.07.04    NACL-門脇    14/04/07  平成２６年４月改正対応
       *  04.07.05    NACL-門脇    14/05/08  救急医療管理加算の算定日記載
       *                                     やめる
@@ -9336,7 +9339,32 @@
            MOVE    WRK-HEN-SEQNO         TO  RECE455-SEQNO
       *
            MOVE    RECE451-SRYCD(IDX)    TO  RECE455-SRYCD
+      *    後ろの全角空白を削除する
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    "1"                 TO  KANACHK-SYORIKBN
+           MOVE    RECE451-NAME(IDX)   TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           IF    ( KANACHK-RC          =   ZERO )
+           AND   ( KANACHK-MAX         >   ZERO )
+               MOVE    SPACE           TO  RECE451-NAME(IDX) 
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                       TO  RECE451-NAME(IDX) 
+           END-IF
            MOVE    RECE451-NAME(IDX)     TO  RECE455-NAME
+      *    後ろの全角空白を削除する
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    "1"                 TO  KANACHK-SYORIKBN
+           MOVE    RECE451-INPUTCOMENT(IDX)
+                                       TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           IF    ( KANACHK-RC          =   ZERO )
+           AND   ( KANACHK-MAX         >   ZERO )
+               MOVE    SPACE           TO  RECE451-INPUTCOMENT(IDX)
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                       TO  RECE451-INPUTCOMENT(IDX)
+           END-IF
            MOVE    RECE451-INPUTCOMENT(IDX)
                                          TO  RECE455-INPUTCOMENT
       *
