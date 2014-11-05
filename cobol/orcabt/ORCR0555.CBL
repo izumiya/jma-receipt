@@ -1518,9 +1518,7 @@
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    Í½È÷£¸
            PERFORM 5004-MOJI-HENSYU-SEC         
-      *    Í½È÷£¹TO  WRK-SYMD
-           PERFORM 5002-HIZUKE-HEN-SEC
-           MOVE    WRK-HENYMD          TO  WRK-DATA
+      *    Í½È÷£¹
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    ÅÅ»»½èÍý¼õÉÕÈÖ¹æ
            PERFORM 5004-MOJI-HENSYU-SEC         
