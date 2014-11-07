@@ -3659,7 +3659,7 @@
                    MOVE    1           TO  FLG-ROSAI
                END-IF
       *
-               IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" )
+               IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" OR "80")
                    MOVE    1           TO  FLG-RSIJBI-AREA-HEN
                END-IF
       *
