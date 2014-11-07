@@ -246,6 +246,8 @@
            03  IDXZ                    PIC 9(03).
            03  IDW1                    PIC 9(03).
            03  IDW2                    PIC 9(04).
+           03  IDW3                    PIC 9(03).
+           03  IDW4                    PIC 9(04).
            03  IDZ1                    PIC 9(03).
            03  IDZ2                    PIC 9(03).
            03  IDZ3                    PIC 9(03).
@@ -4320,9 +4322,35 @@
            MOVE    10                  TO  WRK-REC-LENGTH
       *データ識別番号
            IF      SYS-9102-NUMBER     =   "0"
-               MOVE    ALL"0"              TO  WRK-DATA(1:WRK-ZEROKETA)
-               MOVE    RECE02-PTNUM        TO  WRK-DATA
-                                                   (WRK-PTNUMKETA:10)
+               MOVE    11                  TO  IDW3
+               MOVE    "0000000000"        TO  WRK-DATA
+               PERFORM VARYING IDW4    FROM    20  BY  -1
+                       UNTIL   IDW4    <       1
+                   IF      RECE02-PTNUM (IDW4:1)    NOT =   SPACE
+                       IF      IDW3        =   1
+                           MOVE    SPACE               TO  WRK-ERR-AREA
+                           INITIALIZE                      WRK-ERR-AREA
+                           MOVE    MCP-RC              TO  WRK-MCP-RC
+      *
+                           STRING "患者番号の桁数が１０桁を超えています"
+                                               DELIMITED   BY  SIZE
+                           " 患者番号＝"           DELIMITED   BY  SIZE
+                           RECE02-PTNUM        DELIMITED   BY  SIZE
+                                               INTO    WRK-RECEERR
+                           END-STRING
+                           PERFORM 500-ERR-HENSYU-SEC
+                           MOVE   "ptnum err"     TO  WRK-ERRMSG
+                           PERFORM 500-COBABORT-SEC
+                       ELSE
+                           COMPUTE IDW3    =   IDW3    -   1
+                           MOVE    RECE02-PTNUM (IDW4:1)
+                                               TO  WRK-DATA (IDW3:1)
+                       END-IF
+                   END-IF    
+               END-PERFORM
+      ***      MOVE    ALL"0"              TO  WRK-DATA(1:WRK-ZEROKETA)
+      ***      MOVE    RECE02-PTNUM        TO  WRK-DATA
+      ***                                          (WRK-PTNUMKETA:10)
            ELSE
                MOVE    RECE02-PTID         TO  WRK-DATA
            END-IF
