@@ -21,8 +21,14 @@ S02	{
 		B08	{
 	           	label	varchar(10);
 		};
+		B11S	{
+			label	varchar(10);
+		};
 		B12	{
 	           	state	int;
+		};
+		B12S	{
+			label	varchar(10);
 		};
 		B12C	{
 			state	int;

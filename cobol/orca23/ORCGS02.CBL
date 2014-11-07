@@ -552,6 +552,7 @@
       *
            03  WRK-IKT-TABLE       PIC X(64).
            03  WRK-IKT-PATHNAME    PIC X(64).
+           03  WRK-NAI-SYORINO     PIC X(02).
       *
        01  WRK-ROW.
            05  WRK-SYULIST-ROW     PIC S9(9)   BINARY.
@@ -2950,6 +2951,56 @@
            .
        490-KAKUNIN-EXT.
            EXIT.
+      *****************************************************************
+      *    請求書兼領収書・診療費明細書発行処理
+      *****************************************************************
+       490-PRINT-SEC                   SECTION.
+      *
+           INITIALIZE                      TSMEI-REC
+      *
+           IF    ( SPA-GMN-SMEILIST-SEL    =   ZERO )
+               IF    ( WRK-SKYPRT          =   "1" )
+                   MOVE    13          TO  SPA-GMN-CUR
+                   MOVE    "3006"      TO  SPA-ERRCD
+               END-IF
+           ELSE
+               MOVE    SPA-GMN-TMDENPEDANUM (SPA-GMN-SMEILIST-SEL)
+                                       TO  TSMEI-DENPEDANUM
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+      *
+               INITIALIZE                  SPA-S01KYOUTU
+               PERFORM 4901-SPAKYOTUKEY-SET-SEC
+      *
+      *        印刷制御情報取得サブ
+               CALL    "ORCSONPRTSET"  USING   SPA-AREA
+               IF    ( WRK-SKYPRT      =   "1" )
+                 OR  ( WRK-SRYPRT      =   "1" )
+                   IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                       PERFORM 800-CLIENT-PRT-SEC
+                   END-IF
+               END-IF
+      *
+               MOVE    SPA-AREA            TO  WRK-SPA-AREA
+      *
+               INITIALIZE                      SSUB03-AREA
+               MOVE    2                   TO  SSUB03-REQNO
+               MOVE    TSMEI-DENPEDANUM    TO  SSUB03-DENPEDANUM
+               MOVE    WRK-SKYPRT          TO  SSUB03-SKYPRT
+               MOVE    WRK-SRYPRT          TO  SSUB03-SRYPRT
+               CALL    "ORCGSSUB03"        USING
+                                           WRK-SPA-AREA
+                                           SPA-S01KYOUTU
+                                           SSUB03-AREA
+      *
+               PERFORM 800-CLIENT-DUMMY-PRT-SEC
+      *
+           END-IF
+      *
+           .
+       490-PRINT-EXT.
+           EXIT.
       *----(03.04.01)--UPD-END-----
       *****************************************************************
       *    再印刷処理
@@ -3277,6 +3328,15 @@
                MOVE    "前日"          TO  S02-B06-LABEL
                MOVE    "次日"          TO  S02-B07-LABEL
            END-EVALUATE
+      *
+           IF    ( SPA-NAI-SYORINO         =   SPACE )
+            AND  ( SPA-GMN-SMEILIST-SEL    =   ZERO )
+               MOVE    "再印刷"        TO  S02-B11S-LABEL
+               MOVE    "処理結果"      TO  S02-B12S-LABEL
+           ELSE
+               MOVE    "明細書印刷"    TO  S02-B11S-LABEL
+               MOVE    "請求書印刷"    TO  S02-B12S-LABEL
+           END-IF
       *
            IF    ( SPA-GMN-MODE        =   CONST-MODE-NORMON
                                         OR CONST-MODE-NORYEAR
@@ -3788,13 +3848,27 @@
       *----(01.01.19)--ADD-END-----
       *    処理結果画面
            WHEN    "CLICKED"       ALSO    "B12S"
-               PERFORM 490-KAKUNIN-SEC
+               IF    ( SPA-NAI-SYORINO         =   SPACE )
+                AND  ( SPA-GMN-SMEILIST-SEL    =  ZERO  )
+                   PERFORM 490-KAKUNIN-SEC
+               ELSE
+                   MOVE    "1"     TO  WRK-SKYPRT
+                   MOVE    "0"     TO  WRK-SRYPRT
+                   PERFORM 490-PRINT-SEC
+               END-IF
       *    登録
            WHEN    "CLICKED"       ALSO    "B09S"
                    PERFORM 490-KAKUTEI-SEC
       *    再印刷
            WHEN    "CLICKED"       ALSO    "B11S"
-               PERFORM 450-REPRINT-SEC
+               IF    ( SPA-NAI-SYORINO         =   SPACE )
+                AND  ( SPA-GMN-SMEILIST-SEL    =  ZERO  )
+                   PERFORM 450-REPRINT-SEC
+               ELSE
+                   MOVE    "0"     TO  WRK-SKYPRT
+                   MOVE    "1"     TO  WRK-SRYPRT
+                   PERFORM 490-PRINT-SEC
+               END-IF
       *    外来分一括再計算
            WHEN    "CLICKED"       ALSO    "B04S"
                PERFORM 440-IKATUSAIKEI-CHK-SEC
@@ -3910,6 +3984,8 @@
       *
            IF    ( SPA-GMN-TBL-SEL     >   ZERO )
                EVALUATE    SPA-NAI-SYORINO
+               WHEN    SPACE
+                   PERFORM 4102-SHOKAI-KIHON-CHK-SEC
                WHEN    CONST-PROC-NYUKIN
                    PERFORM 4102-NYUKIN-KIHON-CHK-SEC
       *
@@ -3924,6 +4000,16 @@
            .
       *
        4102-KIHON-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    照会基本チェック処理
+      *****************************************************************
+       4102-SHOKAI-KIHON-CHK-SEC       SECTION.
+      *
+           PERFORM 4101-EDANUM-CHK-SEC
+      *
+           .
+       4102-SHOKAI-KIHON-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入金処理基本チェック処理
@@ -4620,11 +4706,7 @@
            INITIALIZE                  SPA-GMN-SMEILIST-SEL
                                        SPA-GMN-EDANUM
       *
-           IF    ( SPA-NAI-SYORINO     =   CONST-PROC-RRKSYU )
-               INITIALIZE              SPA-GMN-SYUMEI-AREA
-                                       SPA-NAI-SYUMEI-AREA
-               MOVE    CONST-PROC-RRKSYU
-                                       TO  SPA-NAI-SYORINO
+           IF    ( SPA-GMN-TBL-SEL     >   ZERO )
       *
                PERFORM VARYING IDXM    FROM    1   BY  1
                        UNTIL ( IDXM    >   SPA-GMN-SMEILIST-MAX )
@@ -4652,6 +4734,7 @@
            INITIALIZE                  SPA-GMN-SMEILIST-SEL
       *
            IF    ( SPA-NAI-SYORINO     =   CONST-PROC-RRKSYU )
+      *
                INITIALIZE              SPA-GMN-SYUMEI-AREA
                                        SPA-NAI-SYUMEI-AREA
                MOVE    CONST-PROC-RRKSYU
@@ -4662,19 +4745,21 @@
                MOVE    WRK-HENYMDG     TO  SPA-GMN-NYUKINYMD
                MOVE    WRK-SYMD        TO  SPA-NAI-NYUKINYMD
       *
-               MOVE    S02-RIREKIIN    TO  SPA-GMN-EDANUM
+           END-IF
       *
-               IF    ( SPA-GMN-EDANUM  NOT =   ZERO )
-                   PERFORM 41001-EDANUM-CHK-SEC
+           MOVE    S02-RIREKIIN        TO  SPA-GMN-EDANUM
       *
-                   IF    ( SPA-ERRCD       =   SPACE )
+           IF    ( SPA-GMN-EDANUM  NOT =   ZERO )
+               PERFORM 41001-EDANUM-CHK-SEC
+               IF    ( SPA-ERRCD       =   SPACE )
+                   IF    ( SPA-NAI-SYORINO =   CONST-PROC-RRKSYU )
                        PERFORM 41001-INPUT-AREA-HEN-SEC
                    END-IF
                END-IF
+           END-IF
       *
-               IF    ( SPA-ERRCD       =   SPACE )
-                   MOVE    10          TO  SPA-GMN-CUR
-               END-IF
+           IF    ( SPA-ERRCD           =   SPACE )
+               MOVE    10              TO  SPA-GMN-CUR
            END-IF
       *
            .
@@ -4802,6 +4887,7 @@
            PERFORM 41011-EDANUM-CHK-SEC
       *
            IF    ( SPA-ERRCD   NOT =   SPACE )
+            AND  ( SPA-NAI-SYORINO =   CONST-PROC-RRKSYU )
       *
                INITIALIZE              SPA-GMN-SYUMEI-AREA
                                        SPA-NAI-SYUMEI-AREA
@@ -6837,8 +6923,6 @@
       *
                INITIALIZE              SPA-GMN-SYUMEI-AREA
                                        SPA-NAI-SYUMEI-AREA
-                                       SPA-GMN-EDANUM
-                                       SPA-GMN-SMEILIST-SEL
       *
                MOVE    CONST-PROC-RRKSYU
                                    TO  SPA-NAI-SYORINO
@@ -6848,7 +6932,16 @@
                MOVE    WRK-HENYMDG TO  SPA-GMN-NYUKINYMD
                MOVE    WRK-SYMD    TO  SPA-NAI-NYUKINYMD
       *
-               MOVE    13          TO  SPA-GMN-CUR
+               IF    ( SPA-GMN-SMEILIST-SEL
+                                   >   ZERO )
+                   MOVE    SPA-GMN-SMEILIST-SEL
+                                   TO   S02-RIREKIIN
+                   PERFORM 4100-EDANUM-CHK-SEC
+               ELSE
+                   MOVE    ZERO    TO  SPA-GMN-EDANUM
+                   MOVE    13      TO  SPA-GMN-CUR
+               END-IF
+      *
            END-IF
       *
            .
@@ -6912,8 +7005,8 @@
            IF    ( SPA-ERRCD       =   SPACE )
             AND  ( SPA-SIDCD       =   SPACE )
       *
-               MOVE    WRK-SKYPRT      TO  SPA-GMN-SKYPRT
-               MOVE    WRK-SRYPRT      TO  SPA-GMN-SRYPRT
+               INITIALIZE                  SPA-GMN-SKYPRT-G
+                                           SPA-GMN-SRYPRT-G
       *
                PERFORM 410011-INPUT-AREA-HEN-SEC
       *
@@ -8356,13 +8449,18 @@
       *****************************************************************
        420-CLEAR-SEC        SECTION.
       *
-           IF    ( SPA-NAI-SYORINO     =   SPACE )
+           IF    ( SPA-NAI-SYORINO         =   SPACE )
+            AND  ( SPA-GMN-SMEILIST-SEL    =  ZERO  )
                PERFORM 4201-CLEAR-SEC
            ELSE
                INITIALIZE              SPA-GMN-SYUMEI-AREA
                                        SPA-NAI-SYUMEI-AREA
                                        SPA-GMN-EDANUM
                                        SPA-GMN-SMEILIST-SEL
+                                       SPA-GMN-SKYPRT-G
+                                       SPA-GMN-SRYPRT-G
+      *
+               PERFORM 410011-INPUT-AREA-HEN-SEC
            END-IF
       *
            .
@@ -8682,7 +8780,7 @@
                MOVE    "明細番号入力エラー"
                                        TO  SPA-ERRMSG
            WHEN    "3006"
-               MOVE    "明細番号が未入力です"
+               MOVE    "明細を選択してください"
                                        TO  SPA-ERRMSG
            WHEN    "3007"
                MOVE    "入金額を入力してください"
