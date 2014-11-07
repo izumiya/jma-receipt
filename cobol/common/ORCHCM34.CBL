@@ -4010,7 +4010,8 @@
                                                            (RSIJBI-MAX)
            MOVE    TNS-NAME                TO  RSIJBI-NAME (RSIJBI-MAX)
       *
-           IF    ( TNS-TENSIKIBETU     =   1 )
+           IF    ( TNS-SRYCD (1:3)     =   "101" )
+            AND  ( TNS-TENSIKIBETU     =   1 )
                COMPUTE RSIJBI-KINGAKU  =   RSIJBI-KINGAKU + TNS-TEN
                COMPUTE RSIJBI-TEN      =   RSIJBI-TEN - ( TNS-TEN / 10 )
       *
