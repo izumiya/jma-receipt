@@ -92,6 +92,10 @@
       *                                     300 => 10
       *              NACL-小豆沢  14/11/07  データ識別番号への患者番号
       *                                     セット修正
+      *              NACL-小豆沢  14/11/11  Ｆファイル編集処理
+      *                                     平成２６年１０月診療分からの
+      *                                     包括分は出来高点数をセット
+      *                                     する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4756,7 +4760,9 @@
            PERFORM 5004-MOJI-HENSYU-SEC
       *出来高実績点数
            IF      WRK-FEDT-HOUKATU-FLG   =   "6"
-                MOVE    ZERO           TO  WRK-FEDT-DEKIDAKA-TEN
+                IF   RECE641-SRYYM     <   201410
+                   MOVE    ZERO        TO  WRK-FEDT-DEKIDAKA-TEN
+                END-IF
            END-IF
            MOVE    WRK-FEDT-DEKIDAKA-TEN
                                        TO  WRK-NUM
