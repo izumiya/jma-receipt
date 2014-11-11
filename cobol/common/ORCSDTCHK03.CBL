@@ -617,6 +617,10 @@
                    IF    ( QDTCHK-REZEFLG  =   "1" )
                        MOVE    ZERO        TO  FLG-LOOP-END
                    END-IF
+      *
+                   IF    ( QDTCHK-TENKIKBN =   "8" )
+                       MOVE    ZERO        TO  FLG-LOOP-END
+                   END-IF
                ELSE
                    INITIALIZE                  QDTCHK-REC
                    MOVE    1               TO  FLG-QDTCHK

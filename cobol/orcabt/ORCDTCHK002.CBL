@@ -6268,6 +6268,11 @@
                    MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
            END-IF
       *
+      *    転帰に移行が設定されていないか
+           IF    ( PTBYO-TENKIKBN  =   "8" )
+                   MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+           END-IF
+      *
            IF    ( PTBYO-HKNCOMBI  NOT =   ZERO )
             OR   ( PTBYO-KOHID     NOT =   ZERO )
       *
@@ -6968,6 +6973,7 @@
       *
                IF    ( PTBYO-SRYYMD =   TSRYKA-SYOSAIYMD-SAISINYMD
                                                             (IDX4 IDX0))
+                AND  ( FLG-TAISYO-BYOMEI       =   1 )
                    IF    ( SYS-1101-BYOSRYKAKBN
                                                =   "1" OR SPACE )
                        IF    ( PTBYO-SRYKA     =   TSRYKA-SRYKA  (IDX4))
