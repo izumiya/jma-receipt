@@ -623,7 +623,9 @@ path	tmpkey	{
 		FROM   tbl_chksnd
 		WHERE  HOSPNUM	  = :HOSPNUM
 		;
+	};
 		
+	DBCREATEINDEX	{
 		CREATE INDEX idx_chksnd_tmp ON pg_temp.tbl_chksnd (SRYCD)
 		;
 	};
@@ -714,6 +716,29 @@ path	key28		{
 			AND   CD          =   ''   
 			ORDER   BY    SRYCD,RENNUM
 		;
+	};
+};
+
+path	tmpdel1	{ 	
+	DBDELETE	{
+		DELETE FROM   pg_temp.tbl_chksnd
+		WHERE HOSPNUM	  =   :HOSPNUM
+		AND   CHKKBN      =   :CHKKBN
+		AND   SRYCD       =   :SRYCD
+        AND   TERMID      =   :TERMID
+        AND   OPID		  =   :OPID
+		AND   YUKOSTYMD  <=   :YUKOSTYMD
+		AND   YUKOEDYMD  >=   :YUKOEDYMD
+		AND   (BYOMEI) IN  (
+        SELECT BYOMEI from pg_temp.tbl_chksnd
+		WHERE HOSPNUM	  =   :HOSPNUM
+		AND   CHKKBN      =   :CHKKBN
+		AND   SRYCD       =   :SRYCD
+		AND   TERMID     <>   :TERMID   
+        AND   OPID		 <>   :OPID
+		AND   YUKOSTYMD  <=   :YUKOSTYMD
+		AND   YUKOEDYMD  >=   :YUKOEDYMD
+		);
 	};
 };
 

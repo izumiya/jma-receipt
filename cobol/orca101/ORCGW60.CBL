@@ -109,6 +109,10 @@
                    07  SPA-GMN-YBUTAGAIKBN     PIC X(01).
                    07  SPA-GMN-YBUTAGAIKBNFL   PIC X(01).
                    07  SPA-GMN-YBUTAGAIKBNMEI  PIC X(30).
+               05  SPA-GMN-YKZHEIMSTKBN-G.
+                   07  SPA-GMN-YKZHEIMSTKBN    PIC X(01).
+                   07  SPA-GMN-YKZHEIMSTKBNFL  PIC X(01).
+                   07  SPA-GMN-YKZHEIMSTKBNMEI PIC X(30).
                05  SPA-GMN-SRYHEIWRNKBN-G.
                    07  SPA-GMN-SRYHEIWRNKBN    PIC X(01).
                    07  SPA-GMN-SRYHEIWRNKBNFL  PIC X(01).
@@ -239,6 +243,12 @@
                        09  SPA-GMN-YBUTAGAIKBNL    PIC X(01).
                        09  SPA-GMN-YBUTAGAIKBNFLL  PIC X(01).
                        09  SPA-GMN-YBUTAGAIKBNMEIL PIC X(30).
+               05  SPA-GMN-YKZHEIMSTKBNLST-G.
+                   07  SPA-GMN-YKZHEIMSTKBN-MAX    PIC 9(03).
+                   07  SPA-GMN-YKZHEIMSTKBNLST     OCCURS   2.
+                       09  SPA-GMN-YKZHEIMSTKBNL   PIC X(01).
+                       09  SPA-GMN-YKZHEIMSTKBNFLL PIC X(01).
+                       09  SPA-GMN-YKZHEIMSTKBNMEIL PIC X(30).
                05  SPA-GMN-SRYHEIWRNKBNLST-G.
                    07  SPA-GMN-SRYHEIWRNKBN-MAX    PIC 9(03).
                    07  SPA-GMN-SRYHEIWRNKBNLST     OCCURS   2.
@@ -618,6 +628,15 @@
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-YBUTAGAIKBN-G
            END-IF
       *
+           MOVE    SPA-GMN-YKZHEIMSTKBN TO  WRK-CMB-CD
+           PERFORM 4200-YKZHEIMSTKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-YKZHEIMSTKBNLST (2)
+                                       TO  SPA-GMN-YKZHEIMSTKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-YKZHEIMSTKBN-G
+           END-IF
+      *
            MOVE    SPA-GMN-SRYHEIWRNKBN TO  WRK-CMB-CD
            PERFORM 4200-SRYHEIWRNKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
@@ -790,6 +809,9 @@
                MOVE    SYS-1101-YBUTAGAIKBN
                                        TO  SPA-GMN-YBUTAGAIKBN
       *
+               MOVE    SYS-1101-YKZHEIMSTKBN
+                                       TO  SPA-GMN-YKZHEIMSTKBN
+      *
                MOVE    SYS-1101-SRYHEIWRNKBN
                                        TO  SPA-GMN-SRYHEIWRNKBN
       *
@@ -938,6 +960,9 @@
       *
       *    薬剤と病名疑いコンボ設定処理
            PERFORM 3101-YBUTAGAIKBNLST-SEC
+      *
+      *    相互作用マスタ参照コンボ設定処理
+           PERFORM 3101-YKZHEIMSTKBNLST-SEC
       *
       *    併用算定警告エラーコンボ設定処理
            PERFORM 3101-SRYHEIWRNKBNLST-SEC
@@ -1279,6 +1304,29 @@
       *
            . 
        3101-YBUTAGAIKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    相互作用マスタ参照コンボ設定処理
+      *****************************************************************
+       3101-YKZHEIMSTKBNLST-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-YKZHEIMSTKBNLST-G
+      *
+           MOVE    2               TO  SPA-GMN-YKZHEIMSTKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-YKZHEIMSTKBNL    (1)
+           MOVE    "参照する"
+                                   TO  SPA-GMN-YKZHEIMSTKBNMEIL (1)
+      *
+           MOVE    "2"             TO  SPA-GMN-YKZHEIMSTKBNL    (2)
+           MOVE    "参照しない"
+                                   TO  SPA-GMN-YKZHEIMSTKBNMEIL (2)
+      *
+           MOVE    SPA-GMN-YKZHEIMSTKBNLST  (2)
+                                   TO  SPA-GMN-YKZHEIMSTKBN-G
+      *
+           . 
+       3101-YKZHEIMSTKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    併用算定警告エラーコンボ設定処理
@@ -1683,6 +1731,7 @@
            MOVE    W60-YBMSIYKZKBN     TO  SPA-GMN-YBMSIYKZKBN-G
            MOVE    W60-YBSHOHOYKZKBN   TO  SPA-GMN-YBSHOHOYKZKBN-G
            MOVE    W60-YBUTAGAIKBN     TO  SPA-GMN-YBUTAGAIKBN-G
+           MOVE    W60-YKZHEIMSTKBN    TO  SPA-GMN-YKZHEIMSTKBN-G
            MOVE    W60-SRYHEIWRNKBN    TO  SPA-GMN-SRYHEIWRNKBN-G
            MOVE    W60-SRYHEIMSTKBN    TO  SPA-GMN-SRYHEIMSTKBN-G
            MOVE    W60-SRYHEIEXPKBN    TO  SPA-GMN-SRYHEIEXPKBN-G
@@ -1763,6 +1812,10 @@
       *
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4101-YBUTAGAIKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-YKZHEIMSTKBN-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
@@ -2068,6 +2121,24 @@
            .
       *
        4101-YBUTAGAIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    相互作用マスタ参照区分チェック処理
+      *****************************************************************
+       4101-YKZHEIMSTKBN-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-YKZHEIMSTKBN TO  WRK-CMB-CD
+           PERFORM 4200-YKZHEIMSTKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-YKZHEIMSTKBNLST (2)
+                                   TO  SPA-GMN-YKZHEIMSTKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-YKZHEIMSTKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-YKZHEIMSTKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    併用算定警告エラー区分チェック処理
@@ -2560,6 +2631,30 @@
       *
            .
        4200-YBUTAGAIKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    相互作用マスタ参照コンボチェック処理
+      *****************************************************************
+       4200-YKZHEIMSTKBNLST-CHK-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB         >   SPA-GMN-YKZHEIMSTKBN-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-YKZHEIMSTKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-YKZHEIMSTKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-YKZHEIMSTKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    併用算定警告エラー区分コンボチェック処理
@@ -3103,6 +3198,8 @@
       *
            MOVE    SPA-GMN-YBUTAGAIKBN TO   SYS-1101-YBUTAGAIKBN
       *
+           MOVE    SPA-GMN-YKZHEIMSTKBN TO   SYS-1101-YKZHEIMSTKBN
+      *
            MOVE    SPA-GMN-SRYHEIWRNKBN TO   SYS-1101-SRYHEIWRNKBN
       *
            MOVE    SPA-GMN-SRYHEIMSTKBN TO   SYS-1101-SRYHEIMSTKBN
@@ -3464,6 +3561,19 @@
       *
            END-PERFORM
       *
+           MOVE    SPA-GMN-YKZHEIMSTKBN-G   TO  W60-YKZHEIMSTKBN
+      *
+           MOVE    SPA-GMN-YKZHEIMSTKBN-MAX
+                                       TO  W60-YKZHEIMSTKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0        >   SPA-GMN-YKZHEIMSTKBN-MAX )
+      *
+               MOVE    SPA-GMN-YKZHEIMSTKBNLST (IDX0)
+                                       TO  W60-YKZHEIMSTKBN-ITEM (IDX0)
+      *
+           END-PERFORM
+      *
+      *
            MOVE    SPA-GMN-SRYHEIWRNKBN-G   TO  W60-SRYHEIWRNKBN
       *
            MOVE    SPA-GMN-SRYHEIWRNKBN-MAX
@@ -3694,6 +3804,8 @@
                MOVE    "SRYHEIMSTKBN"   TO  MCP-WIDGET
            WHEN    122
                MOVE    "SRYHEIEXPKBN"   TO  MCP-WIDGET
+           WHEN    123
+               MOVE    "YKZHEIMSTKBN"   TO  MCP-WIDGET
            WHEN    201
                MOVE    "ERR990009KBN"   TO  MCP-WIDGET
            WHEN    202
@@ -3777,6 +3889,8 @@
            WHEN    "YBSHOHOYKZKBN"
                MOVE    119         TO  SPA-GMN-CUR
            WHEN    "YBUTAGAIKBN"
+               MOVE    123         TO  SPA-GMN-CUR
+           WHEN    "YKZHEIMSTKBN"
                MOVE    120         TO  SPA-GMN-CUR
            WHEN    "SRYHEIWRNKBN"
                MOVE    121         TO  SPA-GMN-CUR

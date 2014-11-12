@@ -720,6 +720,7 @@
            03  WRK-TEKYMD.
                05  WRK-TEKYM                           PIC X(06).
                05  WRK-TEKDD                           PIC 9(02).
+           03  WRK-TEMP-KEY                            PIC X(16).
       *
        01  TERRINF-AREA.
            03  TERRINF-CHKKBN                          PIC X(01).
@@ -1358,12 +1359,17 @@
                                        SPA-AREA
       *
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
+      *
            MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
            MOVE    CHKSND-REC      TO  MCPDATA-REC
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
            MOVE    "tmpkey"        TO  MCP-PATHNAME
            PERFORM 910-DBCREATE-SEC
-           CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
+      *
+           MOVE    CHKSND-REC      TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "tmpkey"        TO  MCP-PATHNAME
+           PERFORM 910-DBCREATEINDEX-SEC
       *
            MOVE    ZERO                TO  FLG-END
                                            FLG-ERR
@@ -2137,6 +2143,9 @@
            END-IF
            IF    ( SYS-1101-SRYKAISUWRNKBN =   SPACE )
                MOVE    "2"             TO  SYS-1101-SRYKAISUWRNKBN
+           END-IF
+           IF    ( SYS-1101-YKZHEIMSTKBN   =   SPACE )
+               MOVE    "2"             TO  SYS-1101-YKZHEIMSTKBN
            END-IF
       *
            .
@@ -8233,7 +8242,9 @@
       *
       *            Áê¸ßºîÍÑ¥Æ¡¼¥Ö¥ë¤è¤ê¥Á¥§¥Ã¥¯
                    IF    ( FLG-CHKEND (10)     =   ZERO )
-                       PERFORM 200112-INTERACT-CHK-SEC
+                       IF    ( SYS-1101-YKZHEIMSTKBN   =   "1" )
+                           PERFORM 200112-INTERACT-CHK-SEC
+                       END-IF
                    END-IF
       *
       *            ¥Á¥§¥Ã¥¯¥Þ¥¹¥¿¤è¤ê¥Á¥§¥Ã¥¯
@@ -14118,6 +14129,9 @@
       *****************************************************************
        80011-TMPSND-EDIT-SEC            SECTION.
       *
+           MOVE    SMCNDATE-YMD        TO  WRK-TEMP-KEY
+           MOVE    SMCNDATE-HMS        TO  WRK-TEMP-KEY(9:)
+      *
            PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-TEKBYO  NOT =   ZERO )
@@ -14175,6 +14189,7 @@
                                            TO  TMPSND-BYOMEIHENFLG
       *
                    MOVE    CONST-TEMP      TO  TMPSND-TERMID
+                   MOVE    WRK-TEMP-KEY    TO  TMPSND-OPID
       *
                    MOVE    TMPSND-REC      TO  MCPDATA-REC
                    MOVE    "tbl_chksnd"    TO  MCP-TABLE
@@ -14190,6 +14205,19 @@
            MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
            MOVE    "key2"              TO   MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           INITIALIZE                  CHKSND-REC
+           MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
+           MOVE    WRK-CHK-CHKKBN  TO  CHKSND-CHKKBN
+           MOVE    WRK-CHK-SRYCD   TO  CHKSND-SRYCD
+           MOVE    WRK-KJNYMD      TO  CHKSND-YUKOSTYMD
+                                       CHKSND-YUKOEDYMD
+           MOVE    CONST-TEMP      TO  CHKSND-TERMID
+           MOVE    WRK-TEMP-KEY    TO  CHKSND-OPID
+           MOVE    CHKSND-REC      TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"    TO   MCP-TABLE
+           MOVE    "tmpdel1"       TO   MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
       *
            .
        80011-TMPSND-EDIT-EXT.
@@ -16214,6 +16242,18 @@
        910-DBINSERT-EXT.
            EXIT.
       *****************************************************************
+      *    £Ä£Â£Ä£Å£Ì£Å£Ô£Å½èÍý
+      *****************************************************************
+       910-DBDELETE-SEC                SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
       *    £Ä£Â£Ã£Ò£Å£Á£Ô£Å½èÍý
       *****************************************************************
        910-DBCREATE-SEC                SECTION.
@@ -16227,6 +16267,21 @@
            .
       *
        910-DBCREATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â£Ã£Ò£Å£Á£Ô£Å£É£Î£Ä£Å£Ø½èÍý
+      *****************************************************************
+       910-DBCREATEINDEX-SEC           SECTION.
+      *
+           MOVE    "DBCREATEINDEX"     TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCREATEINDEX-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â£Ä£Ò£Ï£Ð½èÍý

@@ -82,6 +82,10 @@
                 04  W60-YBUTAGAIKBN        PIC X(32).
                 04  W60-YBUTAGAIKBN-COUNT  PIC S9(9)   BINARY.
                 04  W60-YBUTAGAIKBN-ITEM   PIC X(32)   OCCURS  5.
+              03  W60-CMB-YKZHEIMSTKBN.
+                04  W60-YKZHEIMSTKBN        PIC X(32).
+                04  W60-YKZHEIMSTKBN-COUNT  PIC S9(9)   BINARY.
+                04  W60-YKZHEIMSTKBN-ITEM   PIC X(32)   OCCURS  5.
               03  W60-CMB-SRYHEIWRNKBN.
                 04  W60-SRYHEIWRNKBN        PIC X(32).
                 04  W60-SRYHEIWRNKBN-COUNT  PIC S9(9)   BINARY.

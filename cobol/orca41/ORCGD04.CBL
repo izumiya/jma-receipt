@@ -1683,6 +1683,20 @@
                MOVE    1           TO  FLG-SKIP
            END-IF
       *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-CHKLST-MAX )
+                    OR   ( SPA-GMN-TANOTHERMST (IDX0)
+                               NOT =   SPACE )
+                    OR   ( FLG-SKIP
+                               NOT =   ZERO )
+      *
+               IF    ( SPA-GMN-TCHKBYOMEI (IDX0)
+                                   =   SS012-O-BYOMEI )
+                   MOVE    1       TO  FLG-SKIP
+               END-IF
+      *
+           END-PERFORM
+      *
            .
        31011-TEKBYO-SKIP-CHK-EXT.
            EXIT.
