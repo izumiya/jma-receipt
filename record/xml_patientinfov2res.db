@@ -34,8 +34,19 @@ xml_patientinfov2res {
 		Comment2			varchar(200);
 		Community_Cid			varchar(20);
 		Community_Cid_Agree		varchar(5);
+#-----> 初回来院日等
+		FirstVisit_Date			varchar(10);
+		LastVisit_Date			varchar(10);
+		Outpatient_Class		varchar(1);
+		Admission_Date			varchar(10);
+		Discharge_Date			varchar(10);
+#-----> 
 		HealthInsurance_Information	{
 		Insurance_Combination_Number		varchar(04);
+#-----> 保険組合せ負担割合
+		InsuranceCombination_Rate_Admission	varchar(04);
+		InsuranceCombination_Rate_Outpatient	varchar(04);
+#-----> 
 		InsuranceProvider_Class			varchar(03);
             	InsuranceProvider_Number		varchar(08);
             	InsuranceProvider_WholeName		varchar(20);
@@ -48,6 +59,9 @@ xml_patientinfov2res {
             	HealthInsuredPerson_WholeName		varchar(100);
             	Certificate_StartDate			varchar(10);
             	Certificate_ExpiredDate			varchar(10);
+#-----> 最終確認日
+            	Insurance_CheckDate			varchar(10);
+#-----> 
             	PublicInsurance_Information   {
                 	PublicInsurance_Class		varchar(03);
                 	PublicInsurance_Name		varchar(20);

@@ -30,7 +30,13 @@
       *    APIバージョン（1:ver.2)
            03  LNK-KBN-V2              PIC X(01).
       *
-      *    保険組合せ番号
+      *    保険組合せ番号指定（ver.2のみ）
+           03  LNK-IN-HKNCOMBI         PIC X(04).
+      *    外来中途データ追加（ver.2のみ）
+           03  LNK-ADDKBN              PIC X(01).
+           03  LNK-MAX-ZAINUM          PIC 9(08).
+      *
+      *    保険組合せ番号（作成）
            03  LNK-OUT-HKNCOMBI        PIC X(04).
       *    中途データ作成件数
            03  LNK-OUT-CNT1            PIC 9(04).

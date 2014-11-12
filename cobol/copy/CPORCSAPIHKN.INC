@@ -21,6 +21,7 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.07.00     NACL-多々納  14/11/12  確認日付他追加
       ************************************************************
        01  ORCSAPIHKNAREA.
       *入力
@@ -93,6 +94,11 @@
       *            資格取得日
                    07  ORCSAPIHKN-SKKGETYMD        PIC  X(10).
                    07  ORCSAPIHKN-NAI-SKKGETYMD    PIC  X(08).
+      *            確認日付
+                   07  ORCSAPIHKN-KAKUNINYMD       PIC  X(10).
+                   07  ORCSAPIHKN-NAI-KAKUNINYMD   PIC  X(08).
+      *            保険ＩＤ
+                   07  ORCSAPIHKN-NAI-HKNID        PIC  9(10).
       *            労災区分
                    07  ORCSAPIHKN-RSI-HKNKBN       PIC  X(01).
       *            非表示区分
@@ -115,6 +121,8 @@
                            11  ORCSAPIHKN-RATE-OUTPATIENT  PIC X(05).
       *                     外来−固定額
                            11  ORCSAPIHKN-MONEY-OUTPATIENT PIC X(06).
+      *                    公費ＩＤ
+                           11  ORCSAPIHKN-NAI-KOHID        PIC 9(10).
       *エラーコード
            03  ORCSAPIHKN-ERRCD                    PIC 9(01).
       *

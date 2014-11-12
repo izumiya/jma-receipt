@@ -24,6 +24,7 @@ xml_medicalv2res {
         	BirthDate			varchar(10);
         	Sex				varchar(1);
 		HealthInsurance_Information  {
+		Insurance_Combination_Number		varchar(04);
 		InsuranceProvider_Class			varchar(03);
             	InsuranceProvider_Number		varchar(08);
             	InsuranceProvider_WholeName		varchar(20);

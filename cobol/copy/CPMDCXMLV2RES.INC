@@ -58,6 +58,8 @@
                 04  MDCRES-SEX             PIC X(1).
       *         保険情報
                 04  MDCRES-INSURANCE-G.
+      *             保険組合せ番号
+                    06  MDCRES-COMBINATION-NUMBER     PIC X(04).
       *             保険の種類
                     06  MDCRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *             保険者番号

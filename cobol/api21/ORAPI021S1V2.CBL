@@ -29,6 +29,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  13/08/XX  病名補足コメント追加対応
       *  04.07.00    NACL-多々納  14/10/XX  詳細メッセージ追加等対応
+      *  04.07.00    NACL-多々納  14/11/XX  保険組合せ設定対応
+      *  04.07.00    NACL-多々納  14/11/XX  CLASS=4 外来追加対応他
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -55,6 +57,8 @@
            03  FLG-SYORI               PIC 9(01).
            03  FLG-CHKWK               PIC 9(01).
            03  FLG-DOUJITU             PIC 9(01).
+      *
+           03  FLG-WKSRYACT-INS        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -127,6 +131,8 @@
       *    保険組合せ内容
            03  WRK-HKNNUM              PIC X(03).
            03  WRK-RSI-HKNKBN          PIC X(01).
+      *
+           03  WRK-MAX-ZAINUM          PIC 9(08).
       *
        01  WRK-XML-AREA.
            03  WRK-PERFORM-DATE        PIC X(10).
@@ -401,8 +407,11 @@
       *        削除
                MOVE    2                   TO  FLG-SYORI
            WHEN    "03"
-      *        置換（入院）
+      *        置換
                MOVE    3                   TO  FLG-SYORI
+           WHEN    "04"
+      *        外来の追加
+               MOVE    4                   TO  FLG-SYORI
            WHEN    OTHER
                MOVE    "91"                TO  WRK-ERRCD
            END-EVALUATE
@@ -430,6 +439,9 @@
            WHEN    "03"
       *        置換処理（入院）
                PERFORM 2004-WKSRYACT-UPD-SEC
+           WHEN    "04"
+      *        外来追加処理
+               PERFORM 2005-WKSRYACT-GAI-SEC
            END-EVALUATE
       *
            .
@@ -524,6 +536,9 @@
                                            TO  MDCRES-API-RESULT-MSG
                    WHEN    3
                        MOVE    "置換処理終了"
+                                           TO  MDCRES-API-RESULT-MSG
+                   WHEN    4
+                       MOVE    "登録処理終了"
                                            TO  MDCRES-API-RESULT-MSG
                END-EVALUATE
            ELSE
@@ -1133,6 +1148,15 @@
       *    UIDコード取得処理
            PERFORM 200211-UID-GET-SEC
       *
+      *H26.11
+           IF      FLG-WKSRYACT-INS    =   1
+      *        追加は決定済み
+               CONTINUE
+           ELSE
+      *        保険組合せの決定
+               PERFORM 200215-HKNCOMBI-SET-SEC
+           END-IF
+      *
            MOVE    SPACE               TO  LF04-REC
            INITIALIZE                  LF04-REC
       *    入外区分
@@ -1158,6 +1182,8 @@
            IF      FLG-DOUJITU         =   1
                MOVE    "1"                 TO  LF04-DOUJITSUKBN
            END-IF
+      **
+      *H26.11   保険情報使用なし
       *    保険情報
            MOVE    MDCREQ-MAIN-INSURANCE-CLASS
                                        TO  LF04-HKN-HKNSBTCODE (01)
@@ -1177,6 +1203,7 @@
                MOVE    MDCREQ-RECIPIENT-NUMBER (IDY)
                                        TO  LF04-HKNKOH-JKYSNUM(1 IDY)
            END-PERFORM
+      **
       *    診療情報設定
            PERFORM VARYING   IDY   FROM    1   BY  1
                    UNTIL    (IDY           >   40)
@@ -1338,19 +1365,43 @@
            END-IF
       *    V2区分
            MOVE    "1"                 TO  LNK-KBN-V2
+      *H26.11
+      *    保険組合せ
+           MOVE    WRK-HKNCOMBI        TO  LNK-IN-HKNCOMBI
+           IF      FLG-WKSRYACT-INS    =   1
+      *        追加（外来）
+               MOVE    "1"                 TO  LNK-ADDKBN
+      *        追加開始の剤番号
+               MOVE    WRK-MAX-ZAINUM      TO  LNK-MAX-ZAINUM
+           END-IF
+      *
            CALL    "ORCL0031"          USING LF04-REC
                                              LNK-ORCL0031AREA
       *
-           IF      LNK-OUT-HKNCOMBI    NOT =   ZERO
+           IF      LNK-OUT-HKNCOMBI        =   ZERO
+                                           OR  "9999"
+               CONTINUE
+           ELSE
       *        対象保険組合せ情報編集
                PERFORM 200210-HKNCOMBI-HEN-SEC
            END-IF
+      *H26.11
+      *    保険組合せ番号
+           MOVE    LNK-OUT-HKNCOMBI    TO  MDCRES-COMBINATION-NUMBER
+      *
       *!!!
       *    中途データエラー
            IF      LNK-ERR1-CODE       =   "02"
       *        「内容を置き換えました」は警告へ
                ADD     1                   TO  IDK
                MOVE    "W03"               TO  WRK-KEICD(IDK)
+               MOVE    SPACE               TO  LNK-ERR1-CODE
+               MOVE    SPACE               TO  LNK-ERR1-MSG
+           END-IF
+           IF      LNK-ERR1-CODE       =   "K1"
+      *        剤番号最大値の警告
+               ADD     1                   TO  IDK
+               MOVE    "W10"               TO  WRK-KEICD(IDK)
                MOVE    SPACE               TO  LNK-ERR1-CODE
                MOVE    SPACE               TO  LNK-ERR1-MSG
            END-IF
@@ -1549,6 +1600,92 @@
        2002-KOHNUM-SET-EXT.
            EXIT.
       *
+      *H26.11
+      *****************************************************************
+      *    保険組合せの決定処理
+      *****************************************************************
+       200215-HKNCOMBI-SET-SEC     SECTION.
+      *
+      *    包括分入力
+           IF      MDCREQ-MAIN-INSURANCE-CLASS =   "999"
+               MOVE    9999            TO  WRK-HKNCOMBI
+           ELSE
+               PERFORM 2002151-HKNCOMBI-CALL-SEC
+           END-IF
+      *    保険組合せ番号
+           MOVE    WRK-HKNCOMBI        TO  MDCRES-COMBINATION-NUMBER
+           .
+       200215-HKNCOMBI-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険種類変換処理
+      *****************************************************************
+       2002151-HKNCOMBI-CALL-SEC     SECTION.
+      *
+      *    保険組合せ編集処理
+           INITIALIZE                      ORCSAPIHKNAREA
+      *    保険組合せ決定
+           MOVE    "2"                 TO  ORCSAPIHKN-KBN
+      *    診療科
+           MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
+      *    保険種類
+           MOVE    MDCREQ-MAIN-INSURANCE-CLASS 
+                                       TO  ORCSAPIHKN-IN-HKNNUM
+      *    保険者番号
+           MOVE    MDCREQ-MAIN-INSURANCE-NUMBER
+                                       TO  ORCSAPIHKN-IN-HKNJANUM
+      *    保険種類
+           MOVE    MDCREQ-MAIN-INSURANCE-NAME 
+                                       TO  ORCSAPIHKN-IN-HKNNUM-NAME
+      *    記号
+           MOVE    MDCREQ-MAIN-MARK  TO  ORCSAPIHKN-IN-MARK
+      *    番号
+           MOVE    MDCREQ-MAIN-NUMBER
+                                       TO  ORCSAPIHKN-IN-NUMBER
+      *    有効期間
+           MOVE    MDCREQ-MAIN-START-DATE
+                                       TO  WRK-HEN-DATE
+           MOVE    SPACE               TO  WRK-HEN-TIME
+           PERFORM 802-DAYHEN02-SEC
+           MOVE    WRK-SYMD            TO  ORCSAPIHKN-IN-TEKSTYMD
+           MOVE    MDCREQ-MAIN-END-DATE
+                                       TO  WRK-HEN-DATE
+           PERFORM 802-DAYHEN02-SEC
+           MOVE    WRK-SYMD            TO  ORCSAPIHKN-IN-TEKEDYMD
+      *    公費情報
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   4
+      *        公費種類
+               MOVE    MDCREQ-INSURANCE-CLASS (IDX)
+                                       TO  ORCSAPIHKN-IN-KOHNUM (IDX)
+      *        公費名称
+               MOVE    MDCREQ-INSURANCE-NAME  (IDX)
+                                       TO  ORCSAPIHKN-IN-KOHNUM-NAME
+                                                                 (IDX)
+      *        負担者番号
+               MOVE    MDCREQ-PROVIDER-NUMBER(IDX)
+                                       TO  ORCSAPIHKN-IN-FTNJANUM (IDX)
+      *        受給者番号
+               MOVE    MDCREQ-RECIPIENT-NUMBER (IDX)
+                                       TO  ORCSAPIHKN-IN-JKYSNUM  (IDX)
+           END-PERFORM
+           CALL    "ORCSAPIHKN"        USING
+                                       SPA-AREA
+                                       ORCSAPIHKNAREA
+           IF      ORCSAPIHKN-OT-HKNCOMBI  =   SPACE
+               MOVE    ZERO                    TO  WRK-HKNCOMBI
+           ELSE
+               MOVE    ORCSAPIHKN-OT-HKNCOMBI  TO  WRK-HKNCOMBI
+      *
+      *        出力領域保険情報編集
+               MOVE    1                   TO  IDX
+               PERFORM 2002101-HKNHEN-TBL-SEC
+           END-IF
+           .
+       2002151-HKNCOMBI-CALL-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    保険種類変換処理
       *****************************************************************
@@ -1557,7 +1694,9 @@
       *    保険組合せ編集処理
            INITIALIZE                      ORCSAPIHKNAREA
       *    追加処理
-           MOVE    "1"                 TO  ORCSAPIHKN-KBN
+      **** MOVE    "1"                 TO  ORCSAPIHKN-KBN
+      *    指定保険組合せのみ編集
+           MOVE    "2"                 TO  ORCSAPIHKN-KBN
       *    診療科
            MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
       *    保険組合せ
@@ -1567,15 +1706,19 @@
                                        ORCSAPIHKNAREA
       *
       *    出力領域保険情報編集
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   20  )
-                         OR   (ORCSAPIHKN-THKNCOMBI (IDX)
-                                           =   SPACE  )
-               IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   LNK-OUT-HKNCOMBI
-                   PERFORM 2002101-HKNHEN-TBL-SEC
-                   MOVE    20                  TO  IDX
-               END-IF
-           END-PERFORM
+           MOVE    1                   TO  IDX
+           PERFORM 2002101-HKNHEN-TBL-SEC
+      *
+      *    出力領域保険情報編集
+      *     PERFORM VARYING     IDX     FROM    1   BY  1
+      *             UNTIL      (IDX     >   20  )
+      *                   OR   (ORCSAPIHKN-THKNCOMBI (IDX)
+      *                                     =   SPACE  )
+      *         IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   LNK-OUT-HKNCOMBI
+      *             PERFORM 2002101-HKNHEN-TBL-SEC
+      *             MOVE    20                  TO  IDX
+      *         END-IF
+      *     END-PERFORM
            .
        200210-HKNCOMBI-HEN-EXT.
       *
@@ -1936,14 +2079,15 @@
       *
       *    患者情報内容編集
            PERFORM 20021-MDCRES-HEN-SEC
-      *    入院であること
-           IF      MDCREQ-OUTPATIENT-CLASS =  "I"
-               CONTINUE
-           ELSE
-               MOVE    "05"            TO  WRK-ERRCD
-               MOVE    SPACE           TO  WRK-KEICD-G
-               GO      TO      2004-WKSRYACT-UPD-EXT
-           END-IF
+      *H26.11 廃止
+      **** 入院であること
+      *    IF      MDCREQ-OUTPATIENT-CLASS =  "I"
+      *        CONTINUE
+      *    ELSE
+      *        MOVE    "05"            TO  WRK-ERRCD
+      *        MOVE    SPACE           TO  WRK-KEICD-G
+      *        GO      TO      2004-WKSRYACT-UPD-EXT
+      **** END-IF
       *
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
@@ -1955,6 +2099,15 @@
       *
       *    ワーク診療行為削除処理
            PERFORM 20031-WKSRYACT-DEL-SEC
+      *H26.11 
+      *    外来は、追加処理を行う
+           IF      MDCREQ-OUTPATIENT-CLASS =  "I"
+               CONTINUE
+           ELSE
+      *        ワーク診療行為追加チェック処理
+               PERFORM 20051-WKSRYACT-CHK-SEC
+           END-IF
+      *
       *    診療行為登録処理
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20021-CLAIM-CALL-SEC
@@ -1966,6 +2119,150 @@
            END-IF
            .
        2004-WKSRYACT-UPD-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外来中途終了データ追加処理
+      *****************************************************************
+       2005-WKSRYACT-GAI-SEC        SECTION.
+      *
+      *    患者情報内容編集
+           PERFORM 20021-MDCRES-HEN-SEC
+      *
+      *    外来であること
+           IF      MDCREQ-OUTPATIENT-CLASS =  "I"
+               MOVE    "40"            TO  WRK-ERRCD
+               MOVE    SPACE           TO  WRK-KEICD-G
+               GO      TO      2005-WKSRYACT-GAI-EXT
+           END-IF
+      *
+      *    排他チェック & ロック処理
+           PERFORM 990-LOCK-IN-SEC
+           IF      SLOCK-RETURN    NOT =   ZERO
+               MOVE    "90"            TO  WRK-ERRCD
+               MOVE    SPACE           TO  WRK-KEICD-G
+               GO      TO      2005-WKSRYACT-GAI-EXT
+           END-IF
+      *
+      *    ワーク診療行為チェック処理
+           PERFORM 20051-WKSRYACT-CHK-SEC
+      *    診療行為登録処理
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 20021-CLAIM-CALL-SEC
+           END-IF
+      *
+           PERFORM 990-LOCK-OUT-SEC
+           IF      SLOCK-RETURN    NOT =   ZERO
+               DISPLAY "ロック解除失敗"
+           END-IF
+           .
+       2005-WKSRYACT-GAI-EXT.
+           EXIT.
+      *****************************************************************
+      *    中途終了データ追加チェック処理
+      *****************************************************************
+       20051-WKSRYACT-CHK-SEC        SECTION.
+      *
+      *    外来追加処理
+           MOVE    1                   TO  FLG-WKSRYACT-INS
+      *    保険組合せの決定
+           PERFORM 200215-HKNCOMBI-SET-SEC
+      *
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  WKSRY-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
+           MOVE    WRK-PERFORM-YMD     TO  WKSRY-SRYYMD
+           MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
+      *    同日再入院区分
+           IF      FLG-DOUJITU         =   1
+               MOVE    "1"                 TO  WKSRY-DOUJITSUKBN
+           END-IF
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "tbl_wksryact"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_wksryact"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 940-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           MOVE    "tbl_wksryact"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO                TO  WRK-MAX-ZAINUM
+      *    対象チェック
+           IF      FLG-WKSRYACT        =   ZERO
+      *        ドクターが一致すること
+               IF      WKSRY-DRCD      NOT =   WRK-DRCD
+                   MOVE    "41"                TO  WRK-ERRCD
+               END-IF
+      *        中途終了での作成分
+               IF      WKSRY-KARTE-FLG     =   1
+                   IF      WRK-ERRCD           =   SPACE
+                       MOVE    "42"                TO  WRK-ERRCD
+                   END-IF
+               END-IF
+      *        最大剤番号検索
+               IF      WRK-ERRCD           =   SPACE
+                   PERFORM 200511-WKSRYACT-ZAINUM-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20051-WKSRYACT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    中途終了データ追加剤番号処理
+      *****************************************************************
+       200511-WKSRYACT-ZAINUM-SEC                SECTION.
+      *
+      *
+           INITIALIZE                  WKSRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  WKSRY-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  WKSRY-PTID
+           MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
+           MOVE    WRK-PERFORM-YMD     TO  WKSRY-SRYYMD
+           MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
+      *    同日再入院区分
+           IF      FLG-DOUJITU         =   1
+               MOVE    "1"                 TO  WKSRY-DOUJITSUKBN
+           END-IF
+      *
+           MOVE    WKSRYACT-REC        TO  MCPDATA-REC
+           MOVE    "tbl_wksryact"      TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_wksryact"      TO  MCP-TABLE
+               MOVE    "key16"             TO  MCP-PATHNAME
+               PERFORM 940-WKSRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  WKSRYACT-REC
+               MOVE    1               TO  FLG-WKSRYACT
+           END-IF
+           MOVE    "tbl_wksryact"      TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    対象チェック
+           IF      FLG-WKSRYACT        =   ZERO
+               MOVE    WKSRY-ZAINUM        TO  WRK-MAX-ZAINUM
+               IF      WKSRY-ZAINUM        =   99999999
+                   MOVE    "43"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       200511-WKSRYACT-ZAINUM-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2135,6 +2432,27 @@
            WHEN    "34"
                MOVE    "中途終了データ削除エラー"
                                                TO  WRK-ERRMSG
+      *H26.11
+           WHEN    "40"
+               MOVE    "追加処理は、外来のみ可能です"
+                                               TO  WRK-ERRMSG
+           WHEN    "41"
+               STRING  "追加対象の中途終了データとドクターコードが"
+                       "違います。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "42"
+               STRING  "追加対象の中途終了データの登録方法が違います。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "43"
+               STRING  "中途終了データの剤番号が最大です。"
+                       "追加できません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
       *共通エラー
            WHEN    "89"
       *        ORCSCOMMON のエラー
@@ -2206,6 +2524,11 @@
            WHEN    "W05"
                STRING  "入院中ではありません。"
                        "入院で展開できません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "W10"
+               STRING  "中途終了データの剤番号が最大になりました。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING

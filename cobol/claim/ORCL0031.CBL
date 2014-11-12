@@ -78,6 +78,8 @@
       *  04.07.04    NACL-藤原    13/10/08  病名更新時のuserid 設定
       *  04.07.05    NACL-多々納  14/09/08  Ｈ２６年１０月改正対応
       *  04.07.05    NACL-多々納  14/09/XX  病名サブプロ対応他
+      *  04.07.06    NACL-多々納  14/11/XX  保険組合せ・外来追加対応
+      *                                     v2診療科レセ電廃止対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -114,14 +116,9 @@
            03  FLG-ZAIEND          PIC 9(01).
            03  FLG-CHK             PIC 9(01).
            03  FLG-OK              PIC 9(01).
-           03  FLG-HOSOKU-CHK      PIC 9(01). 
-      *    0:正常 1:エラー  2:単独病名エラー
-      *    3:コード順エラー 4:修飾語のみ
-      *    5:未コード化傷病名コード
-           03  FLG-BYOMEI-CHK      PIC 9(01). 
-           03  FLG-BYOMEI-DELETE   PIC 9(01). 
       *
            03  FLG-ERR             PIC 9(01).
+           03  FLG-ERR2            PIC 9(01).
            03  FLG-OK1             PIC 9(01).
            03  FLG-OK2             PIC 9(01).
            03  FLG-KOHARI          PIC 9(01).
@@ -175,11 +172,6 @@
            03  IDK1                PIC 9(04).
            03  HZN-IDK             PIC 9(04).
            03  IDX-IMAX            PIC 9(04).
-      *
-      *    03  PTBYO-CNT           PIC 9(02).
-      *    03  PTBYOMEI-CNT        PIC 9(02).
-      *    03  PTBYOMEI-SRYKA-CNT  PIC 9(02).
-      *    03  PTBYOMEI-DOUKI-CNT  PIC 9(02).
       *
            03  IDE1                PIC 9(04).
       *
@@ -746,8 +738,16 @@
            IF      WRK-NYUGAIKBN       =   "1"
                PERFORM 2009-WKSRYACT-CHK-SEC
            ELSE
-      *    外来の時、同じワーク診療行為の判定
-               PERFORM 20010-WKSRYACT-CHK2-SEC
+      *H26.11
+      *        外来追加の時、最大剤番号の設定
+               IF     (LNK-KBN-CODE        =   "1" )
+                  AND (LNK-KBN-V2          =   "1" )
+                  AND (LNK-ADDKBN          =   "1" )
+                   MOVE    LNK-MAX-ZAINUM      TO  WRK-ZAINUM
+               ELSE
+      *        外来の時、同じワーク診療行為の判定
+                   PERFORM 20010-WKSRYACT-CHK2-SEC
+               END-IF
            END-IF
       *
            DISPLAY "診療情報 ================== " 
@@ -762,6 +762,7 @@
                              (LF04-SRYCD (IDX1)   =   SPACE)  OR
                              (FLG-END             =   1    )
                          OR  (FLG-ERR             =   1    )
+                         OR  (FLG-ERR2            =   1    )
                DISPLAY "  " IDX1 " " LF04-SRYCD (IDX1) 
       *        入院移動判定
                IF     (WRK-NYUGAIKBN       =   "1"   ) AND
@@ -784,6 +785,14 @@
                    END-IF
                END-IF
                DISPLAY "  " 
+      *
+      *H26.11
+      *        最大剤番号判定
+               IF      WRK-ZAINUM          =   99999999
+                   MOVE    "K1"                TO  LNK-ERR1-CODE
+                   MOVE    1                   TO  FLG-ERR2
+               END-IF
+      *
            END-PERFORM
       *
            IF      FLG-END             =   ZERO
@@ -896,6 +905,13 @@
            DISPLAY "診療科   = ["    WRK-SRYKA "]"
       *
            MOVE    WRK-SRYKA           TO  WRK-SRYKA-KEY
+      *H26.11
+      *    API v2 は、レセ電科の変換なしとする
+           IF     (LNK-KBN-CODE        =   "1" )
+             AND  (LNK-KBN-V2          =   "1" )
+               MOVE    SPACE           TO  SYS-9000-RECEDEN-FLG
+           END-IF
+      *
       *    レセ電の科から診療科へ変更
            IF      SYS-9000-RECEDEN-FLG    =   "1"
                PERFORM 2002-RECDEN-SRYKA-SEC
@@ -1024,20 +1040,16 @@
       *****************************************************************
        2001-HKNCOMBI-SET-SEC                SECTION.
       *
-      ***  OPEN    INPUT               LF03-FILE
-      *    OPEN    I-O                 LF03-FILE
+      *H26.11
+      *    API(v2)保険組合せあり
+           IF     (LNK-KBN-CODE        =   "1" )
+              AND (LNK-KBN-V2          =   "1" )
+              AND (LNK-IN-HKNCOMBI NOT =   SPACE)
+               MOVE    LNK-IN-HKNCOMBI     TO  WRK-HKNCOMBI
+               MOVE    LNK-IN-HKNCOMBI     TO  LNK-OUT-HKNCOMBI
+               GO      TO      2001-HKNCOMBI-SET-EXT
+           END-IF
       *
-      *    MOVE    SPA-HOSPNUM         TO  LF03-HOSPNUM
-      *    MOVE    WRK-PTID            TO  LF03-PTID
-      *    MOVE    WRK-SRYKA-KEY       TO  LF03-SRYKA
-      *D   DISPLAY "LF03-HOSPNUM = " "[" LF03-HOSPNUM "]"
-      *D   DISPLAY "LF03-PTID = " "[" LF03-PTID "]"
-      *D   DISPLAY "LF03-SRYKA = " "[" LF03-SRYKA "]"
-      *    PERFORM 900-LF03-READ-SEC
-      *    IF      FLG-LF03        =   1
-      *        DISPLAY "*** ORCL0031 LF03 INVALID ***"
-      *        ACCEPT  WRK-IN
-      *****END-IF
       *    UID検索
            INITIALIZE                      CLMUID-REC
            MOVE    SPA-HOSPNUM         TO  CLMUID-HOSPNUM
@@ -1062,7 +1074,6 @@
            END-IF
       *
            DISPLAY "保険組合せ = [" WRK-HKNCOMBI "]"
-      **** CLOSE                       LF03-FILE
       *
            MOVE    WRK-HKNCOMBI        TO  LNK-OUT-HKNCOMBI
       *

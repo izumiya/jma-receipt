@@ -30,6 +30,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  13/12/11  地域連携ＩＤ等対応
       * 04.07.00     NACL-多々納  14/05/13  介護情報他追加対応
+      * 04.07.00     NACL-多々納  14/11/XX  初回最終来院日他追加対応
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -52,6 +53,7 @@
            03  FLG-PTCARE-HKNINF       PIC 9(01).
            03  FLG-PTCARE-NINTEI       PIC 9(01).
            03  FLG-PTCONF              PIC 9(01).
+           03  FLG-JYURRK              PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
@@ -94,6 +96,11 @@
            03  WRK-ERRMSG              PIC X(100).
            03  WRK-KEICD               PIC X(02).
       *
+      *    負担率・額編集
+           03  WRK-FTNRATE             PIC 9(02)V99.
+           03  WRK-Z9                  PIC 9.ZZ.
+           03  WRK-FTNRATEMEI          PIC X(04).
+      *
        01  WRK-XML-AREA.
            03  WRK-PTNUM               PIC X(20).
       *
@@ -118,6 +125,11 @@
       *    保険組合せセット領域
            COPY    "CPORCSAPIHKN.INC".
       *
+      *    前回来院日設定パラメタ
+           COPY    "CPORCSLASTYMD.INC".
+      *
+      *    年齢・負担割合サブ
+           COPY    "CPORCSAGECHK.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -150,6 +162,9 @@
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
       *
+      *    受診履歴
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -379,6 +394,9 @@
       *H26.5
       *    患者個別情報編集
            PERFORM 20022-PTCONF-HEN-SEC
+      *H26.11
+      *    最終来院日他編集
+           PERFORM 20023-LASTYMDHEN-SEC
       *
            .
        2002-PTINF-HENSYU-EXT.
@@ -611,6 +629,69 @@
        20022-PTCONF-HEN-EXT.
            EXIT.
       *
+      *H26.11
+      *****************************************************************
+      *    最終来院日他編集処理
+      *****************************************************************
+       20023-LASTYMDHEN-SEC               SECTION.
+      *
+      *    前回来院日編集
+           INITIALIZE                  ORCSLASTYMDAREA
+           MOVE    SPA-PTID            TO  ORCSLASTYMD-PTID
+           CALL    "ORCSLASTYMD"       USING
+                                       ORCSLASTYMDAREA
+                                       SPA-AREA
+      *    入院中は病棟で判断
+           IF      ORCSLASTYMD-BRMNUM  =   SPACE
+               IF      ORCSLASTYMD-LASTYMD NOT =   SPACE
+      *            最終来院日
+                   MOVE    ORCSLASTYMD-LASTYMD TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE        TO  PTRES-LAST-DATE
+               END-IF
+           ELSE
+      *        入院中
+               MOVE    "1"                 TO  PTRES-OUTPATIENT-CLASS
+      *        入院日付
+               MOVE    ORCSLASTYMD-NYUINYMD    TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-ADMISSION-DATE
+      *        退院日
+               IF      ORCSLASTYMD-LASTYMD     =   SPA-SYSYMD
+                   MOVE    ORCSLASTYMD-LASTYMD TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE        TO  PTRES-DISCHARGE-DATE
+               END-IF
+           END-IF
+      *    初回来院日（受診履歴の１件目）
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-PTID            TO  JYURRK-PTID
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key46"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key46"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key46"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-JYURRK          =   ZERO
+               MOVE    JYURRK-SRYYMD       TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-FIRST-DATE
+           END-IF
+      *
+           .
+       20023-LASTYMDHEN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    XML情報書き込み処理
@@ -746,6 +827,9 @@
       *    有効終了日
            MOVE    ORCSAPIHKN-TEKEDYMD  (IDX)
                                    TO  PTRES-MAIN-END-DATE   (IDX)
+      *    確認年月日
+           MOVE    ORCSAPIHKN-KAKUNINYMD  (IDX)
+                                   TO  PTRES-MAIN-CHECK-DATE (IDX)
       *
       *    保険組合せ
            MOVE    ORCSAPIHKN-THKNCOMBI  (IDX)
@@ -753,6 +837,10 @@
       *    補助区分名称
            MOVE    ORCSAPIHKN-HOJOKBN-NAME  (IDX)
                                    TO  PTRES-MAIN-ASSISTANCE-NAME (IDX)
+      *H26.11
+      *    保険組合せ負担割合
+           PERFORM 20021011-HKNCOMBI-FTNHEN-SEC
+      *
       *    公費情報
            PERFORM VARYING     IDY2    FROM    1   BY  1
                    UNTIL       IDY2    >   4
@@ -800,6 +888,52 @@
       *
            .
        2002101-HKNHENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ負担割合編集処理
+      *****************************************************************
+       20021011-HKNCOMBI-FTNHEN-SEC                SECTION.
+      *
+      *    入院
+           INITIALIZE                  ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+           MOVE    SPA-PTID            TO  AGECHK-PTID
+           MOVE    SPA-SYSYMD          TO  AGECHK-SRYYMD
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           MOVE    "1"                 TO  AGECHK-NYUGAIKBN
+           MOVE    ORCSAPIHKN-THKNCOMBI  (IDX)
+                                       TO  AGECHK-HKNCOMBINUM
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+           COMPUTE WRK-FTNRATE         =   AGECHK-FTNRATE
+                                       /   100
+           MOVE    WRK-FTNRATE         TO  WRK-Z9
+           MOVE    WRK-Z9              TO  WRK-FTNRATEMEI
+           MOVE    WRK-FTNRATEMEI      TO  PTRES-COMBINATION-RATE-ADM
+                                                        (IDX)
+      *    外来
+           INITIALIZE                  ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+           MOVE    SPA-PTID            TO  AGECHK-PTID
+           MOVE    SPA-SYSYMD          TO  AGECHK-SRYYMD
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           MOVE    "2"                 TO  AGECHK-NYUGAIKBN
+           MOVE    ORCSAPIHKN-THKNCOMBI  (IDX)
+                                       TO  AGECHK-HKNCOMBINUM
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+           COMPUTE WRK-FTNRATE         =   AGECHK-FTNRATE
+                                       /   100
+           MOVE    WRK-FTNRATE         TO  WRK-Z9
+           MOVE    WRK-Z9              TO  WRK-FTNRATEMEI
+           MOVE    WRK-FTNRATEMEI      TO  PTRES-COMBINATION-RATE-OUT
+                                                        (IDX)
+      *
+           .
+       20021011-HKNCOMBI-FTNHEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1026,6 +1160,25 @@
            .
        930-PTCARENINTEI-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    受診履歴マスター読込
+      *****************************************************************
+       970-JYURRK-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+               MOVE    ZERO            TO  FLG-JYURRK
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           .
+       970-JYURRK-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

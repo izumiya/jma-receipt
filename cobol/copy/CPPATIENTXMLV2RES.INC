@@ -23,6 +23,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  14/05/12  介護保険情報等追加
+      * 04.07.00     NACL-多々納  14/11/XX  初回・最終来院日他追加
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -88,11 +89,28 @@
                   04  PTRES-COMMUNITY-CID        PIC  X(20).
       *           同意フラグ
                   04  PTRES-COMMUNITY-CID-AGREE  PIC  X(05).
+      *H26.11
+      *           初回来院日
+                  04  PTRES-FIRST-DATE           PIC  X(10).
+      *           最終来院日（退院日）
+                  04  PTRES-LAST-DATE            PIC  X(10).
+      *           入院中区分（１：入院中）
+                  04  PTRES-OUTPATIENT-CLASS     PIC  X(01).
+      *           入院日（入院中のみ）
+                  04  PTRES-ADMISSION-DATE       PIC  X(10).
+      *           退院日（当日退院時のみ）
+                  04  PTRES-DISCHARGE-DATE       PIC  X(10).
       *
       *           保険情報
                   04  PTRES-INSURANCE-INFO     OCCURS  20 TIMES.
       *               保険組合せ番号
                       06  PTRES-COMBINATION-NUMBER     PIC X(04).
+      *H26.11
+      *               保険組合せ　負担割合（入院）
+                      06  PTRES-COMBINATION-RATE-ADM   PIC X(04).
+      *               保険組合せ　負担割合（外来）
+                      06  PTRES-COMBINATION-RATE-OUT   PIC X(04).
+      *
       *               保険の種類
                       06  PTRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *               保険者番号
@@ -117,6 +135,10 @@
                       06  PTRES-MAIN-START-DATE        PIC X(10).
       *               有効終了日
                       06  PTRES-MAIN-END-DATE          PIC X(10).
+      *H26.11
+      *               最終確認日
+                      06  PTRES-MAIN-CHECK-DATE        PIC X(10).
+      *
       *               公費情報
                       06  PTRES-PUBLIC-INSURANCE-INFO           
                                               OCCURS  4 TIMES.
