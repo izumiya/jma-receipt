@@ -156,6 +156,7 @@
       *  04.07.08    NACL-ÌçÏÆ    14/05/13  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *  04.07.09    NACL-ÌçÏÆ    14/07/08  ÌÀºÙ¤¬£µ£°¤òÄ¶¤¨¤ë¾ì¹ç¤ÎÂÐ±þ
+      *  04.07.10    NACL-ÌçÏÆ    14/11/12  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -10164,10 +10165,14 @@
            PERFORM   VARYING   IDX20   FROM    1   BY  1
                       UNTIL    IDX20     >     3
               IF  WRK-CHAR-X(IDX20:1)  IS   NUMERIC
-                 MOVE   WRK-CHAR-X(IDX20:1)
+                 IF   WRK-CHAR-X(IDX20:1) = "0"
+                   MOVE   "£°"      TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 ELSE
+                   MOVE   WRK-CHAR-X(IDX20:1)
                                     TO  IDX21
-                 MOVE   TBL-DAY(IDX21)(3:2)
+                   MOVE   TBL-DAY(IDX21)(3:2)
                                     TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 END-IF
                  ADD    2           TO  WRK-CHAR-IDX
                                         WRK-CHAR-N-CNT
               END-IF

@@ -186,6 +186,7 @@
       *                                     コメントのチェックを自費分は
       *                                     対象としない
       *  04.07.06    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
+      *  04.07.07    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -452,7 +453,7 @@
            03  WRK-WKETA                       PIC 9(03).
       *    分画数編集用     
            03  WRK-BUNKAKUKETA                 PIC 9(02).
-           03  WRK-BUNKAKU-N                   PIC X(06).
+           03  WRK-BUNKAKU-N                   PIC X(10).
            03  WRK-SRYKAISU-X                  PIC ZZ9.
       *    数量編集用     
            03  WRK-SURYOKETA                   PIC 9(02).

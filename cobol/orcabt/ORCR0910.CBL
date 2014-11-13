@@ -125,6 +125,7 @@
       *  04.07.03    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *  04.07.04    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
       *                                     追加対応
+      *  04.07.05    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -332,7 +333,7 @@
            03  WRK-WKETA                       PIC 9(03).
       *    分画数編集用     
            03  WRK-BUNKAKUKETA                 PIC 9(02).
-           03  WRK-BUNKAKU-N                   PIC X(06).
+           03  WRK-BUNKAKU-N                   PIC X(10).
            03  WRK-SRYKAISU-X                  PIC ZZ9.
       *    数量編集用     
            03  WRK-SURYOKETA                   PIC 9(02).

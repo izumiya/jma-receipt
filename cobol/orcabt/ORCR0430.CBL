@@ -133,6 +133,7 @@
       *  04.07.06    NACL-ÌçÏÆ    14/04/07  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/07/08  ÌÀºÙ¤¬£µ£°¤òÄ¶¤¨¤ë¾ì¹ç¤ÎÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.09    NACL-ÌçÏÆ    14/11/12  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8515,10 +8516,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
            PERFORM   VARYING   IDX18   FROM    1   BY  1
                       UNTIL    IDX18     >     3
               IF  WRK-CHAR-X(IDX18:1)  IS   NUMERIC
-                 MOVE   WRK-CHAR-X(IDX18:1)
+                 IF   WRK-CHAR-X(IDX18:1) = "0"
+                   MOVE   "£°"      TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 ELSE
+                   MOVE   WRK-CHAR-X(IDX18:1)
                                     TO  IDX19
-                 MOVE   TBL-DAY(IDX19)(3:2)
+                   MOVE   TBL-DAY(IDX19)(3:2)
                                     TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 END-IF
                  ADD    2           TO  WRK-CHAR-IDX
                                         WRK-CHAR-N-CNT
               END-IF
