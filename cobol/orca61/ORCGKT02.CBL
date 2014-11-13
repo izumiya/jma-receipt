@@ -3897,6 +3897,11 @@
                                            ORCSCGAIRAIAREA
       *
            END-PERFORM
+      *H26.11
+      *    外用回数エラー、戻るへ
+           IF      SPA-ERRCD           =   "0052"
+               MOVE    91                  TO  SPA-GMN-CUR
+           END-IF
       *
            .
        4503-KOUSIN-SYORI-EXT.
@@ -5758,6 +5763,8 @@
                    MOVE    "B12"             TO  MCP-WIDGET
       *        WHEN    13
       *            MOVE    "USERPG"          TO  MCP-WIDGET
+               WHEN    91
+                   MOVE    "B01"             TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -5891,6 +5898,15 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H26.11
+               WHEN    "0052"
+                   STRING  WRK-DAY "日の"
+                           "外用薬剤の回数が１回以上になります。"
+                           "同じ剤は回数をまとめて入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
       *!
                WHEN    "K001"
                    MOVE    SPA-ERRMSG2     TO  SPA-ERRMSG
