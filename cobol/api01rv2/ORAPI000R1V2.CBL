@@ -436,95 +436,12 @@
                MOVE    MSTKANRI-DBRVERSION2
                                        TO  SYSINFRES-MST-NEW (IDXM)
       *
-               EVALUATE    MSTKANRI-KANRICD
-               WHEN    "ORCADB00"
-                   MOVE    "点数マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB01"
-                   MOVE    "保険番号マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB02"
-                   MOVE    "システム管理マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB03"
-                   MOVE    "病名マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB04"
-                   MOVE    "チェックマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB05"
-                   MOVE    "一般老人置換マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB06"
-                   MOVE    "検査分類マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB07"
-                   MOVE    "相互作用マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB08"
-                   MOVE    "症状措置マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB09"
-                   MOVE    "保険者マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB10"
-                   MOVE    "住所マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB11"
-                   MOVE    "適応病名マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB12"
-                   MOVE    "一般名マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB13"
-                   MOVE    "包括チェックマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB14"
-                   MOVE    "包括診療コードマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB15"
-                   MOVE    "統計メモマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB16"
-                   MOVE    "オプションマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB17"
-                   MOVE    "感染症判定マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB18"
-                   MOVE    "入院基本料マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB19"
-                   MOVE    "入院料加算チェックマスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB20"
-                   MOVE    "入院レセプト記載略称マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB21"
-                   MOVE    "同義語マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB22"
-                   MOVE    "電子点数表マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB23"
-                   MOVE    "労働基準監督署マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB24"
-                   MOVE    "最低薬価マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB25"
-                   MOVE    "介護保険者マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB26"
-                   MOVE    "選定療養費一般コード振替マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    "ORCADB27"
-                   MOVE    "入院料置換マスタ"
-                                          TO  SYSINFRES-MST-NAME (IDXM)
-               WHEN    OTHER
+               IF    ( MSTKANRI-NAME   NOT =   SPACE )
+                   MOVE    MSTKANRI-NAME  TO  SYSINFRES-MST-NAME (IDXM)
+               ELSE
                    MOVE    MSTKANRI-KANRICD
                                           TO  SYSINFRES-MST-NAME (IDXM)
-               END-EVALUATE
+               END-IF
       *
                PERFORM 900-MSTKANRI-ALL-FET-SEC
       *

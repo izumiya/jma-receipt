@@ -647,95 +647,13 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
            MOVE    MSTKANRI-DBRVERSION1 TO  SPA-GMN-DBRVERSION1 (IDX2)
            MOVE    MSTKANRI-DBRVERSION2 TO  SPA-GMN-DBRVERSION2 (IDX2)
       *
-           EVALUATE    MSTKANRI-KANRICD
-               WHEN    "ORCADB00"
-                   MOVE    "点数マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB01"
-                   MOVE    "保険番号マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB02"
-                   MOVE    "システム管理マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB03"
-                   MOVE    "病名マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB04"
-                   MOVE    "チェックマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB05"
-                   MOVE    "一般老人置換マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB06"
-                   MOVE    "検査分類マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB07"
-                   MOVE    "相互作用マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB08"
-                   MOVE    "症状措置マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB09"
-                   MOVE    "保険者マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB10"
-                   MOVE    "住所マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB11"
-                   MOVE    "適応病名マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB12"
-                   MOVE    "一般名マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB13"
-                   MOVE    "包括チェックマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB14"
-                   MOVE    "包括診療コードマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB15"
-                   MOVE    "統計メモマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB16"
-                   MOVE    "オプションマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB17"
-                   MOVE    "感染症判定マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB18"
-                   MOVE    "入院基本料マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB19"
-                   MOVE    "入院料加算チェックマスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB20"
-                   MOVE    "入院レセプト記載略称マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB21"
-                   MOVE    "同義語マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB22"
-                   MOVE    "電子点数表マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB23"
-                   MOVE    "労働基準監督署マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB24"
-                   MOVE    "最低薬価マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB25"
-                   MOVE    "介護保険者マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB26"
-                   MOVE    "選定療養費一般コード振替マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    "ORCADB27"
-                   MOVE    "入院料置換マスタ"
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-               WHEN    OTHER
+           IF    ( MSTKANRI-NAME    NOT =   SPACE )
+               MOVE    MSTKANRI-NAME    TO  SPA-GMN-MASTNAME(IDX2)
+           ELSE
                    MOVE    MSTKANRI-KANRICD
-                                          TO  SPA-GMN-MASTNAME(IDX2)
-           END-EVALUATE
+                                         TO  SPA-GMN-MASTNAME(IDX2)
+           END-IF
+      *
            .
        3102-LIST3-HENSYU-EXT.
            EXIT.
