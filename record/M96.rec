@@ -3,35 +3,31 @@ M96	{
 		B10	{
 	       		state	int;
 		};
-		scrolledwindow2	{
-			LIST1	{
-				count	int;
-				row	int;
-				rowattr	int;
-				item	{
-					value0	varchar(64);
-					value1	varchar(64);
-					value2	varchar(64);
-					value3	varchar(9);
-				}	[1];
-				select	bool[1];
-			};
+		LIST1	{
+			count	int;
+			row	int;
+			rowattr	int;
+			item	{
+				value0	varchar(64);
+				value1	varchar(64);
+				value2	varchar(64);
+				value3	varchar(9);
+			}	[1];
+			select	bool[1];
 		};
-		scrolledwindow3	{
-			LIST2	{
-				count	int;
-				row	int;
-				rowattr	int;
-				item	{
-					value0	varchar(40);
-					value1	varchar(9);
-					value2	varchar(8);
-					value3	varchar(9);
-					value4	varchar(8);
-					value5	varchar(9);
-				}	[2];
-				select	bool[2];
-			};
+		LIST2	{
+			count	int;
+			row	int;
+			rowattr	int;
+			item	{
+				value0	varchar(40);
+				value1	varchar(9);
+				value2	varchar(8);
+				value3	varchar(9);
+				value4	varchar(8);
+				value5	varchar(9);
+			}	[2];
+			select	bool[2];
 		};
 		scrolledwindow1	{
 			LIST3	{
