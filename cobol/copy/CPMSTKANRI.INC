@@ -28,6 +28,8 @@
                05  MSTKANRI-HOSPNUM        PIC 9(2).
       *管理コード
                05  MSTKANRI-KANRICD        PIC  X(08).
+      *名称
+               05  MSTKANRI-NAME           PIC  X(64).
       *ＤＢレコードバージョン１
            03  MSTKANRI-DBRVERSION1        PIC  X(64).
       *ＤＢレコードバージョン２
