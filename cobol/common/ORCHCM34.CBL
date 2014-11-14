@@ -3820,8 +3820,6 @@
       *
                END-EVALUATE
       *
-           WHEN  ( FLG-RSIJBI-AREA-HEN =   1 )
-               PERFORM 200111-RSIJBI-SRYACT-HEN-SEC
       *
            WHEN  ( WRK-JBI-SONOTA-KBN      NOT =   SPACE )
                PERFORM 200111-JBI-SONOTA-HEN-SEC
@@ -3829,6 +3827,8 @@
                PERFORM 200111-RSI-SONOTA-HEN-SEC
            WHEN  ( WRK-JBI-RYOYO-TEATE-KBN NOT =   SPACE )
                PERFORM 200111-JBI-RYOYO-TEATE-HEN-SEC
+           WHEN  ( FLG-RSIJBI-AREA-HEN =   1 )
+               PERFORM 200111-RSIJBI-SRYACT-HEN-SEC
       *
            WHEN  ( ACCT-SRYKBN         =   "95"  OR  "96" )
                CONTINUE
