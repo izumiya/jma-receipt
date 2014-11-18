@@ -200,8 +200,6 @@
            03  CNT-HOUSRYACT                       PIC 9(05).
            03  CNT-RENPAKU                         PIC 9(03).
            03  CNT-PTNYUINRRK                      PIC 9(05).
-           03  CNT-RSIJBI-KIN                      PIC 9(05).
-           03  CNT-RSIJBI-TEN                      PIC 9(05).
            03  CNT-RENNUM                          PIC 9(05).
            03  CNT-SRYACCT                         PIC 9(05).
            03  CNT-COMB-ACCT                       PIC 9(05).
@@ -252,6 +250,7 @@
            03  IDX34                               PIC 9(05).
            03  IDX35                               PIC 9(05).
            03  IDX36                               PIC 9(05).
+           03  IDX37                               PIC 9(05).
            03  IDXA                                PIC 9(05).
            03  IDXB                                PIC 9(05).
            03  IDXC                                PIC 9(05).
@@ -372,6 +371,7 @@
            03  WRK-TNS-HOUKNSKBN                   PIC 9(02).
            03  WRK-KUGIRI                          PIC X(02).
            03  WRK-TTL-TEN                         PIC S9(11).
+           03  WRK-TTL-KINGAKU                         PIC S9(11).
            03  WRK-TTL-JIHI                        PIC 9(09).
            03  WRK-TTL-JIHI-TAX                    PIC 9(09).
            03  WRK-TTL-BRMSAGAKU                   PIC 9(09).
@@ -488,11 +488,14 @@
            03  WRK-SRYACT-HKNCOMBI                 PIC X(04).
            03  WRK-SRYACT-JIHOKBN                  PIC X(01).
       *    TANI 1:TEN 2:EN
-           03  WRK-SRYACT-TANI                     PIC 9(01).
-           03  WRK-SRYACT-TOTAL                    PIC S9(11).
-           03  WRK-SRYACT-DAY-OCC                  OCCURS  31.
-               05  WRK-SRYACT-DAY-X                PIC X(03).
-               05  WRK-SRYACT-DAY-Z    REDEFINES   WRK-SRYACT-DAY-X
+           03  WRK-SRYACT-TOTAL-G.
+               05  WRK-SRYACT-TOTAL-OCC            OCCURS 2.
+                   07  WRK-SRYACT-POS              PIC 9(05).
+                   07  WRK-SRYACT-TANI             PIC 9(01).
+                   07  WRK-SRYACT-TOTAL            PIC S9(11).
+               05  WRK-SRYACT-DAY-OCC              OCCURS  31.
+                   07  WRK-SRYACT-DAY-X            PIC X(03).
+                   07  WRK-SRYACT-DAY-Z    REDEFINES   WRK-SRYACT-DAY-X
                                                    PIC Z(03).
       *
        01  TCOMBI-AREA.
@@ -599,10 +602,9 @@
            03  RSIJBI-IDX1                         PIC 9(05).
            03  RSIJBI-IDX2                         PIC 9(05).
            03  RSIJBI-MAX                          PIC 9(05).
+           03  RSIJBI-COM-MAX                      PIC S9(05).
            03  RSIJBI-TEN-MAX                      PIC S9(05).
-           03  RSIJBI-TEN-COM-MAX                  PIC S9(05).
            03  RSIJBI-KIN-MAX                      PIC S9(05).
-           03  RSIJBI-KIN-COM-MAX                  PIC S9(05).
            03  RSIJBI-TEN                          PIC 9(08).
            03  RSIJBI-KINGAKU                      PIC 9(08).
            03  RSIJBI-ZAIKAISU                     PIC 9(07).
@@ -1069,6 +1071,7 @@
            MOVE    ZERO                TO  CNT-ZAIHKT
            MOVE    LOW-VALUE           TO  WRK-KEY-HKNCOMBI
            MOVE    ZERO                TO  WRK-TTL-TEN
+           MOVE    ZERO                TO  WRK-TTL-KINGAKU
            MOVE    ZERO                TO  WRK-TTL-JIHI
            MOVE    ZERO                TO  WRK-TTL-JIHI-TAX
            MOVE    ZERO                TO  WRK-TTL-BRMSAGAKU
@@ -3659,7 +3662,7 @@
                    MOVE    1           TO  FLG-ROSAI
                END-IF
       *
-               IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" OR "80")
+               IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" )
                    MOVE    1           TO  FLG-RSIJBI-AREA-HEN
                END-IF
       *
@@ -4017,27 +4020,19 @@
       *
                COMPUTE RSIJBI-KIN-MAX  =   RSIJBI-KIN-MAX  +   1
       *
-               IF   (( TNS-SRYCD   (1:1)       =   "8"  )
-                 OR  ( TNS-SRYCD   (1:3)       =   "008"  ))
-                AND  ( SRY-INPUTNUM(IDX9)  NOT =   ZERO )
-                   COMPUTE RSIJBI-KIN-COM-MAX
-                       =   RSIJBI-KIN-COM-MAX  +   1
-               END-IF
-      *
-      *
                MOVE    ZERO            TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
                MOVE    RSIJBI-KIN-MAX  TO  RSIJBI-GRP-CNT  (RSIJBI-MAX)
            ELSE
-               COMPUTE RSIJBI-TEN-MAX  =   RSIJBI-TEN-MAX  +   1
       *
                IF   (( TNS-SRYCD   (1:1)       =   "8"  )
                  OR  ( TNS-SRYCD   (1:3)       =   "008"  ))
                 AND  ( SRY-INPUTNUM(IDX9)  NOT =   ZERO )
-                   COMPUTE RSIJBI-TEN-COM-MAX
-                       =   RSIJBI-TEN-COM-MAX  +   1
+                   COMPUTE RSIJBI-COM-MAX
+                       =   RSIJBI-COM-MAX  +   1
                END-IF
       *
                MOVE    1               TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
+               COMPUTE RSIJBI-TEN-MAX  =   RSIJBI-TEN-MAX  +   1
                MOVE    RSIJBI-TEN-MAX  TO  RSIJBI-GRP-CNT  (RSIJBI-MAX)
            END-IF
       *
@@ -4048,6 +4043,17 @@
       *   労災自賠診療行為編集処理
       *****************************************************************
        200111-RSIJBI-SRYACT-HEN-SEC    SECTION.
+      *
+           IF    ( RSIJBI-KIN-MAX      >   ZERO )
+            AND  ( RSIJBI-COM-MAX      >   ZERO )
+            AND  ( RSIJBI-COM-MAX      =   RSIJBI-TEN-MAX )
+               PERFORM VARYING IDX19   FROM    1   BY  1
+                       UNTIL ( IDX19   >   RSIJBI-MAX )
+                   MOVE    ZERO        TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
+                   MOVE    IDX19       TO  RSIJBI-KIN-MAX
+                                           RSIJBI-GRP-CNT  (RSIJBI-MAX)
+               END-PERFORM
+           END-IF
       *
       *    労災自賠編集領域をソート
            PERFORM VARYING RSIJBI-IDX1    FROM    2   BY  1
@@ -4065,9 +4071,6 @@
                MOVE    RSIJBI-OCC (21)
                                    TO  RSIJBI-OCC (RSIJBI-IDX2 + 1)
            END-PERFORM
-      *
-           MOVE    ZERO            TO  CNT-RSIJBI-KIN
-                                       CNT-RSIJBI-TEN
       *
            PERFORM VARYING IDX19   FROM    1   BY  1
                    UNTIL ( IDX19   >   RSIJBI-MAX )
@@ -4107,18 +4110,17 @@
       *
                    MOVE    RSIJBI-NAME (IDX19)     TO  WRK-SRYACT-STR
                    PERFORM 210-WRK-SRYACT-TBL-HEN-SEC
+      *
                    IF    ( RSIJBI-TEN-FLG (IDX19)  =   ZERO )
-                       COMPUTE CNT-RSIJBI-KIN  =   CNT-RSIJBI-KIN  +   1
-                       IF    ( RSIJBI-KIN-MAX  -   RSIJBI-KIN-COM-MAX
-                                               =   CNT-RSIJBI-KIN )
+                       IF    ( RSIJBI-KIN-MAX  =   RSIJBI-GRP-CNT
+                                                             (IDX19))
                            MOVE    RSIJBI-KINGAKU  TO  WRK-ZAITEN
                            MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
                            PERFORM 205-KINGAKUKAISU-HEN-SEC
                        END-IF
                    ELSE
-                       COMPUTE CNT-RSIJBI-TEN  =   CNT-RSIJBI-TEN  +   1
-                       IF    ( RSIJBI-TEN-MAX  -   RSIJBI-TEN-COM-MAX
-                                               =   CNT-RSIJBI-TEN )
+                       IF    ( RSIJBI-TEN-MAX  =   RSIJBI-GRP-CNT
+                                                             (IDX19))
                            MOVE    RSIJBI-TEN      TO  WRK-ZAITEN
                            MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
                            IF    ( WRK-ZAITEN          >   ZERO )
@@ -4390,50 +4392,64 @@
                END-IF
            END-IF
       *
+           IF    ( SRY-SRYKBN          =   "80" )
       *
-           IF    ( FLG-JIBAI           =   1 )
-            AND  ( SRY-SRYKBN          =   "80" )
+               IF    ( FLG-ROSAI       =   1 )
+                OR   ( FLG-JIBAI       =   1 )
       *
-               IF    ( SRY-SRYCD (IDX9)(1:5)   >=  "09591" )
-                AND  ( SRY-SRYCD (IDX9)(1:5)   <=  "09594" )
-                   MOVE    SRY-SRYCD (IDX9)(5:1)
-                                           TO  WRK-JBI-SONOTA-KBN
-                   IF    ( SRY-SRYSYUKBN   =   "809" )
-                       MOVE    SRY-JIHIMONEY  (IDX9)
+                   IF    ( SRY-SRYCD (IDX9)(1:5)   >=  "09591" )
+                    AND  ( SRY-SRYCD (IDX9)(1:5)   <=  "09594" )
+      *
+                       IF    ( FLG-ROSAI       =   1 )
+      *
+                           IF    ( SRY-SRYSYUKBN   =   "809" )
+                               MOVE    SRY-JIHIMONEY  (IDX9)
+                                           TO  WRK-RSI-SONOTA-TEN
+                           ELSE
+                               MOVE    TNS-TEN
+                                           TO  WRK-RSI-SONOTA-TEN
+                           END-IF
+      *
+                           MOVE    "1"     TO  WRK-RSI-SONOTA-KBN
+      *
+                       ELSE
+                           IF    ( SRY-SRYSYUKBN   =   "809" )
+                               MOVE    SRY-JIHIMONEY  (IDX9)
                                            TO  WRK-JBI-SONOTA-TEN
-                   ELSE
-                       MOVE    TNS-TEN     TO  WRK-JBI-SONOTA-TEN
-                   END-IF
-                   MOVE    SRY-SRYCD (IDX9)
+                           ELSE
+                               MOVE    TNS-TEN
+                                           TO  WRK-JBI-SONOTA-TEN
+                           END-IF
+      *
+                           MOVE    SRY-SRYCD (IDX9)
                                            TO  WRK-JBI-SONOTA-SRYCD
-               ELSE
+      *
+                           MOVE    SRY-SRYCD (IDX9)(5:1)
+                                           TO  WRK-JBI-SONOTA-KBN
+                       END-IF
+      *
+                   END-IF
+      *
+                   IF    ( SRY-SRYCD (IDX9) (1:3)  =   "101" )
+                    AND  ( TNS-TENSIKIBETU         =   1 )
+                       MOVE    "1"         TO  WRK-RSI-SONOTA-KBN
+                       MOVE    TNS-TEN     TO  WRK-RSI-SONOTA-TEN
+                   END-IF
+      *
+               END-IF
+      *
+               IF    ( FLG-JIBAI       =   1 )
                    IF    ( SRY-SRYCD (IDX9)
-                                       =   CONST-RYOYO-TEATE-GAI )
+                                   =   CONST-RYOYO-TEATE-GAI )
                        MOVE    "2"     TO  WRK-JBI-RYOYO-TEATE-KBN
                    END-IF
       *
                    IF    ( SRY-SRYCD (IDX9)
-                                       =   CONST-RYOYO-TEATE-NYU )
+                                   =   CONST-RYOYO-TEATE-NYU )
                        MOVE    "1"     TO  WRK-JBI-RYOYO-TEATE-KBN
                    END-IF
                END-IF
       *
-           END-IF
-      *
-           IF    ( FLG-ROSAI           =   1 )
-            AND  ( SRY-SRYKBN          =   "80" )
-      *
-               IF    ( SRY-SRYCD (IDX9)(1:5)   >=  "09591" )
-                AND  ( SRY-SRYCD (IDX9)(1:5)   <=  "09594" )
-                   MOVE    SRY-SRYCD (IDX9)(5:1)
-                                           TO  WRK-RSI-SONOTA-KBN
-                   IF    ( SRY-SRYSYUKBN   =   "809" )
-                       MOVE    SRY-JIHIMONEY  (IDX9)
-                                           TO  WRK-RSI-SONOTA-TEN
-                   ELSE
-                       MOVE    TNS-TEN     TO  WRK-RSI-SONOTA-TEN
-                   END-IF
-               END-IF
            END-IF
       *
            IF    ( SRY-SRYCD (IDX9)(1:1)   =   "7")
@@ -4533,6 +4549,19 @@
       *
                PERFORM 210-WRK-SRYACT-TBL-SYOKI-SEC
                MOVE    ZERO                TO  WRK-TTL-TEN
+           END-IF
+      *
+           IF    ( WRK-TTL-KINGAKU    >   ZERO )
+      *
+               PERFORM 210-WRK-SRYACT-TBL-SYOKI-SEC
+      *
+               MOVE    "　　　　　金額合計"
+                                           TO  WRK-TENSU-LBL
+               MOVE    WRK-TTL-KINGAKU         TO  WRK-TENSU
+               PERFORM 2001111-KINGAKU-HEN-SEC
+      *
+               PERFORM 210-WRK-SRYACT-TBL-SYOKI-SEC
+               MOVE    ZERO                TO  WRK-TTL-KINGAKU
            END-IF
       *
            .
@@ -6212,7 +6241,8 @@
            PERFORM 800-ZENKAKU-HEN-SEC
            MOVE    WRK-OUT-INPUT   TO  WRK-SRYACT-STR
            PERFORM 210-WRK-SRYACT-TBL-HEN3-SEC
-           MOVE    1               TO  WRK-SRYACT-TANI
+           MOVE    WRK-SRYACT-MAX  TO  WRK-SRYACT-POS (1)
+           MOVE    1               TO  WRK-SRYACT-TANI (1)
            PERFORM 220-ZAI-TOTAL-HEN-SEC
       *
            .
@@ -6254,7 +6284,8 @@
            PERFORM 800-ZENKAKU-HEN-SEC
            MOVE    WRK-OUT-INPUT   TO  WRK-SRYACT-STR
            PERFORM 210-WRK-SRYACT-TBL-HEN3-SEC
-           MOVE    2               TO  WRK-SRYACT-TANI
+           MOVE    WRK-SRYACT-MAX  TO  WRK-SRYACT-POS (2)
+           MOVE    2               TO  WRK-SRYACT-TANI (2)
            PERFORM 221-ZAI-TOTAL-HEN-SEC
       *
            .
@@ -6575,7 +6606,9 @@
                            MOVE    WRK-SRYACT-HKNCOMBI
                                            TO   WRK-KEY-HKNCOMBI
                        END-IF
-                       IF  ( IDX4            =   WRK-SRYACT-MAX )
+                       IF  ( IDX4            =   WRK-SRYACT-POS (1)
+                                              OR WRK-SRYACT-POS (2)
+                                              OR WRK-SRYACT-MAX )
                            PERFORM VARYING IDXF    FROM    1   BY  1
                                    UNTIL ( IDXF    >   31 )
                                MOVE    WRK-SRYACT-DAY-X (IDXF)
@@ -6583,11 +6616,14 @@
                            END-PERFORM
                        END-IF
                    END-IF
-                   IF    ( IDX4            =   WRK-SRYACT-MAX )
-                    AND  ( WRK-SRYACT-TANI NOT =   ZERO )
-                       PERFORM 210-SRYACT-TOTAL-HEN-SEC
-                       MOVE    WRK-TOTAL-G TO  HCM341-TOTAL (IDXC)
-                   END-IF
+                   PERFORM VARYING IDX37   FROM    1   BY  1
+                           UNTIL ( IDX37   >   2 )
+                       IF    ( IDX4        =   WRK-SRYACT-POS (IDX37))
+                        AND  ( WRK-SRYACT-TANI (IDX37) NOT =   ZERO )
+                           PERFORM 210-SRYACT-TOTAL-HEN-SEC
+                           MOVE    WRK-TOTAL-G TO  HCM341-TOTAL (IDXC)
+                       END-IF
+                   END-PERFORM
                    MOVE    WRK-SRYACT (IDX4)
                                            TO  HCM341-TEKIYO (IDXC)
                ELSE
@@ -6609,7 +6645,9 @@
                            MOVE    WRK-SRYACT-HKNCOMBI
                                            TO   WRK-KEY-HKNCOMBI
                        END-IF
-                       IF  ( IDX4            =   WRK-SRYACT-MAX )
+                       IF  ( IDX4            =   WRK-SRYACT-POS (1)
+                                              OR WRK-SRYACT-POS (2)
+                                              OR WRK-SRYACT-MAX )
                            PERFORM VARYING IDXF    FROM    1   BY  1
                                    UNTIL ( IDXF    >   31 )
                                MOVE    WRK-SRYACT-DAY-X (IDXF)
@@ -6617,11 +6655,14 @@
                            END-PERFORM
                        END-IF
                    END-IF
-                   IF    ( IDX4            =   WRK-SRYACT-MAX )
-                    AND  ( WRK-SRYACT-TANI NOT =   ZERO )
-                       PERFORM 210-SRYACT-TOTAL-HEN-SEC
-                       MOVE    WRK-TOTAL-G TO  HCM342-TOTAL (IDXC)
-                   END-IF
+                   PERFORM VARYING IDX37   FROM    1   BY  1
+                           UNTIL ( IDX37   >   2 )
+                       IF    ( IDX4        =   WRK-SRYACT-POS (IDX37))
+                        AND  ( WRK-SRYACT-TANI (IDX37) NOT =   ZERO )
+                           PERFORM 210-SRYACT-TOTAL-HEN-SEC
+                           MOVE    WRK-TOTAL-G TO  HCM342-TOTAL (IDXC)
+                       END-IF
+                   END-PERFORM
                    MOVE    WRK-SRYACT (IDX4)
                                            TO  HCM342-TEKIYO (IDXC)
                END-IF
@@ -6677,13 +6718,13 @@
       *
            INITIALIZE                  WRK-TOTAL-G
       *
-           EVALUATE    WRK-SRYACT-TANI
+           EVALUATE    WRK-SRYACT-TANI (IDX37)
            WHEN    1
-               MOVE    WRK-SRYACT-TOTAL
+               MOVE    WRK-SRYACT-TOTAL (IDX37)
                                    TO  WRK-TOTALZ
                MOVE    "点"        TO  WRK-TOTAL-TANI
            WHEN    2
-               MOVE    WRK-SRYACT-TOTAL
+               MOVE    WRK-SRYACT-TOTAL (IDX37)
                                    TO  WRK-TOTALZ
                MOVE    "円"        TO  WRK-TOTAL-TANI
            END-EVALUATE
@@ -6719,13 +6760,13 @@
        210-KAIPEGE-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    剤合計点数（剤点×金額）編集処理
+      *    剤合計点数（点数×回数）編集処理
       *****************************************************************
        220-ZAI-TOTAL-HEN-SEC           SECTION.
       *
            IF    ( FLG-MINUS       =   ZERO )
-               COMPUTE WRK-SRYACT-TOTAL
-                   =   WRK-SRYACT-TOTAL
+               COMPUTE WRK-SRYACT-TOTAL (1)
+                   =   WRK-SRYACT-TOTAL (1)
                    + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
                IF    ( ACCT-JIHOKBN    =   "1" )
@@ -6736,8 +6777,8 @@
                        + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
                END-IF
            ELSE
-               COMPUTE WRK-SRYACT-TOTAL
-                   =   WRK-SRYACT-TOTAL
+               COMPUTE WRK-SRYACT-TOTAL (1)
+                   =   WRK-SRYACT-TOTAL (1)
                    - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
                IF    ( ACCT-JIHOKBN    =   "1" )
@@ -6753,20 +6794,26 @@
        220-ZAI-TOTAL-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    剤合計点数（剤点×金額）編集処理
+      *    剤合計点数（金額×回数）編集処理
       *****************************************************************
        221-ZAI-TOTAL-HEN-SEC           SECTION.
       *
            IF    ( FLG-MINUS       =   ZERO )
-               COMPUTE WRK-SRYACT-TOTAL
-                   =   WRK-SRYACT-TOTAL
+               COMPUTE WRK-SRYACT-TOTAL (2)
+                   =   WRK-SRYACT-TOTAL (2)
                    + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
+               COMPUTE WRK-TTL-KINGAKU
+                   =   WRK-TTL-KINGAKU
+                   + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
            ELSE
-               COMPUTE WRK-SRYACT-TOTAL
-                   =   WRK-SRYACT-TOTAL
+               COMPUTE WRK-SRYACT-TOTAL (2)
+                   =   WRK-SRYACT-TOTAL (2)
                    - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
+               COMPUTE WRK-TTL-KINGAKU
+                   =   WRK-TTL-KINGAKU
+                   - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
            END-IF
       *
            .
