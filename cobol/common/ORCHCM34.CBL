@@ -159,6 +159,7 @@
            03  FLG-RSIJBI-AREA-HEN                 PIC 9(01).
            03  FLG-JIBAI                           PIC 9(01).
            03  FLG-ROSAI                           PIC 9(01).
+           03  FLG-DAISAN                          PIC 9(01).
            03  FLG-AFTER-CARE                      PIC 9(01).
            03  FLG-TBLCOMBI                        PIC 9(01).
            03  FLG-SRYACT-HEN5                     PIC 9(01).
@@ -2833,6 +2834,7 @@
            MOVE    SPACE               TO  WRK-HKNCOMBI-KEY
                                            WRK-HKNCOMBI-KEY-MAE
                                            WRK-HKNNUM
+                                           WRK-KOHNUM
            INITIALIZE                      WKCOMB-REC
       *
       *    診療会計マスターを編集
@@ -3616,6 +3618,7 @@
            MOVE    ZERO                TO  FLG-RSIJBI-AREA-HEN
            MOVE    ZERO                TO  FLG-JIBAI
            MOVE    ZERO                TO  FLG-ROSAI
+           MOVE    ZERO                TO  FLG-DAISAN
            MOVE    SPACE               TO  WRK-JBI-RYOYO-TEATE-KBN
            INITIALIZE                      WRK-JBI-SONOTA-G
                                            WRK-RSI-SONOTA-G
@@ -3660,6 +3663,10 @@
       *
                IF   ( WRK-HKNNUM       =   "971" )
                    MOVE    1           TO  FLG-ROSAI
+               END-IF
+      *
+               IF   ( WRK-KOHNUM       =   "970" )
+                   MOVE    1           TO  FLG-DAISAN
                END-IF
       *
                IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" )
@@ -3880,6 +3887,7 @@
                                                WRK-HKNCOMBINUM
                PERFORM 900-HKNCOMBI-KEY-SEL-SEC
                MOVE    COMB-HKNNUM         TO  WRK-HKNNUM
+               MOVE    COMB-KOHHKNNUM (1)  TO  WRK-KOHNUM
                MOVE    HKNCOMBI-REC        TO  WKCOMB-REC
            WHEN  ( IDX1                >   1 )
                IF    ( ACCT-HKNCOMBI   NOT =   WRK-HKNCOMBI-KEY )
@@ -3908,6 +3916,8 @@
                                                WRK-HKNCOMBINUM
                    PERFORM 900-HKNCOMBI-KEY-SEL-SEC
                    MOVE    COMB-HKNNUM     TO  WRK-HKNNUM
+                   MOVE    COMB-KOHHKNNUM (1)
+                                           TO  WRK-KOHNUM
                    MOVE    HKNCOMBI-REC    TO  WKCOMB-REC
       *
                    MOVE    1               TO  FLG-LINE
@@ -4165,12 +4175,6 @@
            MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
       *
            EVALUATE    WRK-JBI-SONOTA-KBN
-           WHEN    "1"
-           WHEN    "2"
-                IF   ( SYS-4001-TAXKBN         =   "2" )
-                 COMPUTE  WRK-ZAITEN
-                     =  ( WRK-ZAITEN   *   WRK-RATE2 )  +  WRK-HASU
-                END-IF
            WHEN    "3"
                MOVE    ZERO        TO  FLG-JBI-KZI-OUT
                IF    ( SYS-4001-TAXKBN-KZI     =   "2" )
@@ -4202,6 +4206,11 @@
                            =  ( WRK-ZAITEN   *   WRK-RATE2 ) + WRK-HASU
                    END-IF
                END-IF
+           WHEN    OTHER
+                IF   ( SYS-4001-TAXKBN         =   "2" )
+                 COMPUTE  WRK-ZAITEN
+                     =  ( WRK-ZAITEN   *   WRK-RATE2 )  +  WRK-HASU
+                END-IF
            END-EVALUATE
       *
            PERFORM 205-KINGAKUKAISU-HEN-SEC
@@ -4396,6 +4405,7 @@
       *
                IF    ( FLG-ROSAI       =   1 )
                 OR   ( FLG-JIBAI       =   1 )
+                OR   ( FLG-DAISAN      =   1 )
       *
                    IF    ( SRY-SRYCD (IDX9)(1:5)   >=  "09591" )
                     AND  ( SRY-SRYCD (IDX9)(1:5)   <=  "09594" )
