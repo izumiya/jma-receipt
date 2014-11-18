@@ -7944,20 +7944,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      FLG-F6              =   ZERO
                MOVE    "1"                 TO  SPA-COM-CUR (1)
            END-IF
-      *TEST
-      *TEST
-      *TEST
-           GO      TO      450-MAEGMN-EXT
-      *TEST
-      *
-           IF      SPA-GMN-PAGE        =   1
-               MOVE    1               TO  SPA-GMN-PAGE
-           ELSE
-               COMPUTE SPA-GMN-PAGE    =   SPA-GMN-PAGE   -   1
-           END-IF
-      *
-           MOVE    1                   TO  SPA-MAP-IDX
-           MOVE    99                  TO  SPA-GMN-CUR
            .
        450-MAEGMN-EXT.
            EXIT.
@@ -8007,30 +7993,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    1                   TO  SPA-GMN-CUR
-      *TEST
-      *TEST
-      *TEST
-           GO      TO      460-ATOGMN-EXT
-      *TEST
-      *TEST
-      *
-           IF      SPA-GMN-PAGE        =   MAX-PAGE2
-               MOVE    1                   TO  SPA-GMN-CUR
-               MOVE    "7002"              TO  SPA-ERRCD
-               GO      TO      460-ATOGMN-EXT
-           END-IF
-      *
-           COMPUTE WRK-FREE            =   SPA-GMN-PAGE  *  MAX-GMN
-           IF      SPA-GMN-INPUTCD(WRK-FREE)   =   SPACE
-               GO  TO                 460-ATOGMN-EXT
-           END-IF
-      *
-           ADD     1                   TO  SPA-GMN-PAGE
-           IF      SPA-GMN-PAGE        >=   MAX-PAGE
-               MOVE    "7003"              TO  SPA-ERRCD
-           END-IF
-      *
-           MOVE    88                  TO  SPA-GMN-CUR
            .
        460-ATOGMN-EXT.
            EXIT.
@@ -10198,46 +10160,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        +   1
            MOVE    1                   TO  SPA-GMN-PAGE
       *
-      *TEST
-      *TEST
-      *TEST
-           GO      TO      5002-GMNSPA-HEN-EXT
-      *    後画面へ
-           IF      SPA-GMN-CUR         =   88  OR  99
-               IF      WRK-MAP-MAXPAGE     =   SPA-GMN-PAGE
-                   COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                               +   1
-               ELSE
-                   MOVE    1                   TO  SPA-MAP-IDX
-               END-IF
-           ELSE
-               COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                           +   1
-               IF      SPA-SINSATU-SAI     =   ZERO
-      *            初期表示の時１ページ目へ
-                   IF     (SPA-MAP-IDX         >   MAX-GMN  )
-                       OR (SPA-GMN-PAGE        <   WRK-MAP-MAXPAGE)
-      *ver.4.7 ******  MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       IF      SPA-GMN-PAGE    >   WRK-MAP-MAXPAGE
-                           MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                       END-IF
-                   END-IF
-               ELSE
-                   MOVE    ZERO            TO  SPA-SINSATU-SAI
-      *            最終行へ
-                   IF     (SPA-MAP-IDX         >   MAX-GMN )
-      *ver.4.7 ******* MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                   END-IF
-               END-IF
-           END-IF
-           IF      SPA-GMN-PAGE        =   ZERO
-               MOVE    1               TO  SPA-GMN-PAGE
-           END-IF
       *
            .
        5002-GMNSPA-HEN-EXT.

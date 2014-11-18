@@ -12594,47 +12594,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    1                   TO  SPA-GMN-PAGE
       *
       *
-           GO      TO      5002-GMNSPA-HEN-EXT
-      *
-      *
-      *    カーソル指定のない時、次ぎの空白行へ
-      *    後画面へ
-           IF      SPA-GMN-CUR         =   88  OR  99
-               IF      WRK-MAP-MAXPAGE     =   SPA-GMN-PAGE
-                   COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                               +   1
-               ELSE
-                   MOVE    1                   TO  SPA-MAP-IDX
-               END-IF
-           ELSE
-               COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                           +   1
-               IF      SPA-SINSATU-SAI     =   ZERO
-      *            初期表示の時１ページ目へ
-                   IF     (SPA-MAP-IDX         >   MAX-GMN )
-                       OR (SPA-GMN-PAGE        <   WRK-MAP-MAXPAGE)
-      *ver.4.7 ******  MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       IF      SPA-GMN-PAGE    >   WRK-MAP-MAXPAGE
-                           MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                       END-IF
-                   END-IF
-               ELSE
-                   MOVE    ZERO            TO  SPA-SINSATU-SAI
-      *            最終行へ
-                   IF      SPA-MAP-IDX         >   MAX-GMN
-      *ver.4.7 ******* MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                   END-IF
-               END-IF
-           END-IF
-           IF      SPA-GMN-PAGE        =   ZERO
-               MOVE    1               TO  SPA-GMN-PAGE
-           END-IF
-      *
            .
        5002-GMNSPA-HEN-EXT.
            EXIT.
@@ -13847,14 +13806,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                WHEN    "0140"
                    STRING  "初回算定日を算定履歴に作成します。"
-                                           DELIMITED  BY  SIZE
                            "取消はできません。よろしいですか？"
                                            DELIMITED  BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
                WHEN    "0150"
                    STRING  "包括算定エラーの項目があります。"
-                                           DELIMITED  BY  SIZE
                            "エラー項目を削除します。"
                                            DELIMITED  BY  SIZE
                                        INTO    WRK-KIDMSG
