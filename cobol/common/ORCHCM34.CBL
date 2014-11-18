@@ -4175,6 +4175,12 @@
            MOVE    ACCT-ZAIKAISU       TO  WRK-ZAIKAISU
       *
            EVALUATE    WRK-JBI-SONOTA-KBN
+           WHEN    "1"
+           WHEN    "2"
+                IF   ( SYS-4001-TAXKBN         =   "2" )
+                 COMPUTE  WRK-ZAITEN
+                     =  ( WRK-ZAITEN   *   WRK-RATE2 )  +  WRK-HASU
+                END-IF
            WHEN    "3"
                MOVE    ZERO        TO  FLG-JBI-KZI-OUT
                IF    ( SYS-4001-TAXKBN-KZI     =   "2" )
@@ -4207,10 +4213,7 @@
                    END-IF
                END-IF
            WHEN    OTHER
-                IF   ( SYS-4001-TAXKBN         =   "2" )
-                 COMPUTE  WRK-ZAITEN
-                     =  ( WRK-ZAITEN   *   WRK-RATE2 )  +  WRK-HASU
-                END-IF
+               CONTINUE
            END-EVALUATE
       *
            PERFORM 205-KINGAKUKAISU-HEN-SEC
