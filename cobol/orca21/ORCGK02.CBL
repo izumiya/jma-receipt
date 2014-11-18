@@ -14143,6 +14143,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        900-PTINF-READ-SEC         SECTION.
       *
            IF    ( PTINF-HOSPNUM       =   ZERO )
+            OR   ( PTINF-HOSPNUM       IS  NOT NUMERIC )
                PERFORM 900-PTINF-LOG-SEC
            END-IF
       *

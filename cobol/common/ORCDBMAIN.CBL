@@ -182,27 +182,30 @@
                MOVE    MCPDATA-REC     TO  PTINF-REC
       *
                IF    ( MCP-FUNC        =   "DBSELECT" )
-                AND  ( PTINF-HOSPNUM   =   ZERO )
       *
-                   MOVE    SPACE           TO  WRK-TEXT
-                   STRING  "DBMAIN:"       DELIMITED BY SIZE
-                       ":PTINF-HOSPNUM["   DELIMITED BY SIZE
-                       PTINF-HOSPNUM       DELIMITED BY SIZE
-                       "]"                 DELIMITED BY SIZE
-                       "PTINF-PTID["       DELIMITED BY SIZE
-                       PTINF-PTID          DELIMITED BY SIZE
-                       "]"                 DELIMITED BY SIZE
-                       "SPA-HOSPNUM["      DELIMITED BY SIZE
-                       SPA-HOSPNUM         DELIMITED BY SIZE
-                       "]"                 DELIMITED BY SIZE
-                       "SPA-PTID["         DELIMITED BY SIZE
-                       SPA-PTID            DELIMITED BY SIZE
-                       "]"                 DELIMITED BY SIZE
-                       LOW-VALUE           DELIMITED BY SIZE
-                   INTO    WRK-TEXT
-                   END-STRING
-                   CALL    "coblog"        USING WRK-TEXT
+                   IF  ( PTINF-HOSPNUM =   ZERO )
+                    OR ( PTINF-HOSPNUM IS  NOT NUMERIC )
       *
+                       MOVE    SPACE       TO  WRK-TEXT
+                       STRING  "DBMAIN"        DELIMITED BY SIZE
+                           ":PTINF-HOSPNUM["   DELIMITED BY SIZE
+                           PTINF-HOSPNUM       DELIMITED BY SIZE
+                           "]"                 DELIMITED BY SIZE
+                           "PTINF-PTID["       DELIMITED BY SIZE
+                           PTINF-PTID          DELIMITED BY SIZE
+                           "]"                 DELIMITED BY SIZE
+                           "SPA-HOSPNUM["      DELIMITED BY SIZE
+                           SPA-HOSPNUM         DELIMITED BY SIZE
+                           "]"                 DELIMITED BY SIZE
+                           "SPA-PTID["         DELIMITED BY SIZE
+                           SPA-PTID            DELIMITED BY SIZE
+                           "]"                 DELIMITED BY SIZE
+                           LOW-VALUE           DELIMITED BY SIZE
+                       INTO    WRK-TEXT
+                       END-STRING
+                       CALL    "coblog"        USING WRK-TEXT
+      *
+                   END-IF
                END-IF
            END-IF
       *
