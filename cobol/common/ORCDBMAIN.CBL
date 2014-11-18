@@ -59,6 +59,7 @@
            03  WRK-PATHNAME            PIC X(64).
            03  WRK-FUNC                PIC X(64).
            03  WRK-TABLE               PIC X(64).
+           03  WRK-TEXT                PIC X(1024).
       *
        01  ORCXKANACONVAREA.
       *   IN/OUTの長さをMCPDARA-RECに合せるため独自に引数領域を編集
@@ -98,6 +99,9 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
@@ -170,6 +174,36 @@
                        END-IF
                    END-IF
                END-EVALUATE
+           END-IF
+      *
+           IF    ( MCP-TABLE           =   "tbl_ptinf" )
+            AND  ( MCP-PATHNAME        =   "key" )
+      *
+               MOVE    MCPDATA-REC     TO  PTINF-REC
+      *
+               IF    ( MCP-FUNC        =   "DBSELECT" )
+                AND  ( PTINF-HOSPNUM   =   ZERO )
+      *
+                   MOVE    SPACE           TO  WRK-TEXT
+                   STRING  "DBMAIN:"       DELIMITED BY SIZE
+                       ":PTINF-HOSPNUM["   DELIMITED BY SIZE
+                       PTINF-HOSPNUM       DELIMITED BY SIZE
+                       "]"                 DELIMITED BY SIZE
+                       "PTINF-PTID["       DELIMITED BY SIZE
+                       PTINF-PTID          DELIMITED BY SIZE
+                       "]"                 DELIMITED BY SIZE
+                       "SPA-HOSPNUM["      DELIMITED BY SIZE
+                       SPA-HOSPNUM         DELIMITED BY SIZE
+                       "]"                 DELIMITED BY SIZE
+                       "SPA-PTID["         DELIMITED BY SIZE
+                       SPA-PTID            DELIMITED BY SIZE
+                       "]"                 DELIMITED BY SIZE
+                       LOW-VALUE           DELIMITED BY SIZE
+                   INTO    WRK-TEXT
+                   END-STRING
+                   CALL    "coblog"        USING WRK-TEXT
+      *
+               END-IF
            END-IF
       *
            IF    ( FLG-ERR         =   ZERO )

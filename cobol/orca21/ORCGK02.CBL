@@ -871,6 +871,8 @@
       *
        01  WRK-SYSTIME               PIC 9(08).
       *
+       01  WRK-TEXT                  PIC X(1024).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -14140,6 +14142,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        900-PTINF-READ-SEC         SECTION.
       *
+           IF    ( PTINF-HOSPNUM       =   ZERO )
+               PERFORM 900-PTINF-LOG-SEC
+           END-IF
+      *
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -14168,6 +14174,33 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        900-PTINF-READ-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    患者マスター読込（主キー）
+      *****************************************************************
+       900-PTINF-LOG-SEC               SECTION.
+      *
+           MOVE    SPACE           TO  WRK-TEXT
+           STRING  "K02:"              DELIMITED BY SIZE
+                   "PTINF-HOSPNUM["    DELIMITED BY SIZE
+                   PTINF-HOSPNUM       DELIMITED BY SIZE
+                   "]"                 DELIMITED BY SIZE
+                   "PTINF-PTID["       DELIMITED BY SIZE
+                   PTINF-PTID          DELIMITED BY SIZE
+                   "]"                 DELIMITED BY SIZE
+                   "SPA-HOSPNUM["      DELIMITED BY SIZE
+                   SPA-HOSPNUM         DELIMITED BY SIZE
+                   "]"                 DELIMITED BY SIZE
+                   "SPA-PTID["         DELIMITED BY SIZE
+                   SPA-PTID            DELIMITED BY SIZE
+                   "]"                 DELIMITED BY SIZE
+                   LOW-VALUE           DELIMITED BY SIZE
+           INTO    WRK-TEXT
+           END-STRING
+           CALL    "coblog"        USING    WRK-TEXT
+      *
+           .
+       900-PTINF-LOG-EXT.
+           EXIT.
       *****************************************************************
       *    パラメタデータ順読み
       *****************************************************************
