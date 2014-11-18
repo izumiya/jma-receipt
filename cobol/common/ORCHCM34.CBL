@@ -3665,14 +3665,14 @@
                    MOVE    1           TO  FLG-ROSAI
                END-IF
       *
-               IF   ( WRK-KOHNUM       =   "970" )
-                   MOVE    1           TO  FLG-DAISAN
-               END-IF
-      *
                IF   ( ACCT-SRYKBN      =   "11" OR "12" OR "13" )
                    MOVE    1           TO  FLG-RSIJBI-AREA-HEN
                END-IF
       *
+           END-IF
+      *
+           IF   ( WRK-KOHNUM       =   "970" )
+               MOVE    1           TO  FLG-DAISAN
            END-IF
       *
            PERFORM 210-WRK-SRYACT-TBL-SYOKI-SEC
