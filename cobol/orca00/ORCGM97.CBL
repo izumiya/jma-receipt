@@ -1330,7 +1330,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE                  JOBKANRI-REC
                MOVE    1               TO  JOB-JOBID
                MOVE    "MSTMLI"        TO  JOB-SHELLID
-               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+               MOVE    SYSBASE-HOSPNUM TO  JOB-HOSPNUM
                CALL    "ORCSJOB"           USING
                                            ORCSJOBKANRIAREA
                                            JOBKANRI-REC
