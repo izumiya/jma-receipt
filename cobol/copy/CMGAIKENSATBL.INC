@@ -23,6 +23,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  12/08/03  改正対応追加
+      * 04.07.00     NACL-多々納  14/11/21  （尿）削除対応
       *****************************************************************
       *
        01  TBL-KENSA-TAI-AREA.
@@ -43,21 +44,21 @@
            03  FILLER          PIC X(09)  VALUE    "160017410".
            03  FILLER          PIC X(09)  VALUE    "160018910".
            03  FILLER          PIC X(09)  VALUE    "160019010".
-           03  FILLER          PIC X(09)  VALUE    "160131950".
+      *****03  FILLER          PIC X(09)  VALUE    "160131950". 
            03  FILLER          PIC X(09)  VALUE    "160019210".
-           03  FILLER          PIC X(09)  VALUE    "160132150".
+      *****03  FILLER          PIC X(09)  VALUE    "160132150".
            03  FILLER          PIC X(09)  VALUE    "160019310".
-           03  FILLER          PIC X(09)  VALUE    "160132250".
+      *****03  FILLER          PIC X(09)  VALUE    "160132250".
            03  FILLER          PIC X(09)  VALUE    "160020010".
            03  FILLER          PIC X(09)  VALUE    "160020210".
            03  FILLER          PIC X(09)  VALUE    "160020410".
            03  FILLER          PIC X(09)  VALUE    "160020910".
            03  FILLER          PIC X(09)  VALUE    "160021110".
-           03  FILLER          PIC X(09)  VALUE    "160132450".
+      *****03  FILLER          PIC X(09)  VALUE    "160132450".
            03  FILLER          PIC X(09)  VALUE    "160021410".
-           03  FILLER          PIC X(09)  VALUE    "160132650".
+      *****03  FILLER          PIC X(09)  VALUE    "160132650".
            03  FILLER          PIC X(09)  VALUE    "160021510".
-           03  FILLER          PIC X(09)  VALUE    "160132750".
+      *****03  FILLER          PIC X(09)  VALUE    "160132750".
            03  FILLER          PIC X(09)  VALUE    "160019410".
            03  FILLER          PIC X(09)  VALUE    "160137950".
            03  FILLER          PIC X(09)  VALUE    "160138150".
@@ -82,7 +83,8 @@
       *
        01  TBL-KENSA-TAI-AREA-R    REDEFINES  TBL-KENSA-TAI-AREA.
       *    03  TBL-KENSA-TAI-OCC        OCCURS  49  INDEXED  TAI-IDX.
-           03  TBL-KENSA-TAI-OCC        OCCURS  51  INDEXED  TAI-IDX.
+      *****03  TBL-KENSA-TAI-OCC        OCCURS  51  INDEXED  TAI-IDX.
+           03  TBL-KENSA-TAI-OCC        OCCURS  45  INDEXED  TAI-IDX.
                05  TBL-TAI-SRYCD        PIC X(09).
-       01  KEN-TAI-MAX                  PIC 9(04)   VALUE   51.
+       01  KEN-TAI-MAX                  PIC 9(04)   VALUE   45.
       *
