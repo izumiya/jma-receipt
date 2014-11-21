@@ -255,8 +255,7 @@
            03  WRK-CONS-JOB-JOBID  PIC 9(07)   VALUE   1.
       *
        01  SHELL-AREA.
-           05  SHELL-NAME          PIC X(32) VALUE
-                                   "scripts/allways/das-profile.sh".
+           05  SHELL-NAME          PIC X(14)   VALUE   "das-profile.sh".
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -446,8 +445,8 @@
       *
       *    シェル起動処理
            MOVE    SPACE           TO  SHELLTBL
-           INITIALIZE                  ORCSMKPASSAREA
-           MOVE    SHELL-NAME      TO  MKPASS-IN-01
+      *     INITIALIZE                  ORCSMKPASSAREA
+      *     MOVE    SHELL-NAME      TO  MKPASS-IN-01
       *     MOVE    SPA-TERMID      TO  SHELLTBL-ARG1
       *     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
       *     MOVE    WRK-CONS-JOB-JOBID
@@ -458,13 +457,14 @@
       *     MOVE    0               TO  SHELLTBL-ARG6
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG1
            MOVE    SPA-HOSPID      TO  SHELLTBL-ARG2
-           CALL    "ORCSMKPASS"        USING
-                                       ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+      *     CALL    "ORCSMKPASS"        USING
+      *                                 ORCSMKPASSAREA
+      *     MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+           MOVE    SHELL-NAME      TO  SHELLTBL-NAME
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "allways"       TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
