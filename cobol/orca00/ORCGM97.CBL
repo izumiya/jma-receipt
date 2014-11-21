@@ -109,6 +109,7 @@
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
            03  FLG-PGKANRI         PIC 9(01).
+           03  FLG-SYSBASE         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -179,6 +180,10 @@
       *    ジョブ管理
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
+      *
+      *    システム基本
+       01  SYSBASE-REC.
+           COPY    "CPSYSBASE.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -1258,47 +1263,95 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE           TO  MST-RUN
       *
-           MOVE    "CHK"           TO  SJOBKANRI-MODE
-           INITIALIZE                  JOBKANRI-REC
-           MOVE    1               TO  JOB-JOBID
-           MOVE    "MSTMNT"        TO  JOB-SHELLID
-           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
-      *
-           IF      SJOBKANRI-RETURN    =   ZERO
-               IF     (JOB-ENDTIME     NOT =   SPACE)  AND
-                      (JOB-ENDYMD      NOT =   SPACE)
-                   CONTINUE
-               ELSE
-                   MOVE    "RUN"       TO  MST-RUN
-               END-IF
+           MOVE    ZERO                TO  FLG-SYSBASE
+           INITIALIZE                      SYSBASE-REC
+           MOVE    SYSBASE-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE 
+           MOVE    "all"               TO  MCP-PATHNAME 
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sysbase"   TO  MCP-TABLE 
+               MOVE    "all"           TO  MCP-PATHNAME 
+               PERFORM 900-SYSBASE-READ-SEC
+           ELSE
+               INITIALIZE                  SYSBASE-REC
+               MOVE    1               TO  FLG-SYSBASE
            END-IF
+           PERFORM UNTIL   FLG-SYSBASE =   1
+      *
+               MOVE    "CHK"           TO  SJOBKANRI-MODE
+               INITIALIZE                  JOBKANRI-REC
+               MOVE    1               TO  JOB-JOBID
+               MOVE    "MSTMNT"        TO  JOB-SHELLID
+               MOVE    SYSBASE-HOSPNUM TO  JOB-HOSPNUM
+               CALL    "ORCSJOB"           USING
+                                           ORCSJOBKANRIAREA
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+               IF      SJOBKANRI-RETURN    =   ZERO
+                   IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+                          (JOB-ENDYMD      NOT =   SPACE)
+                       CONTINUE
+                   ELSE
+                       MOVE    "RUN"       TO  MST-RUN
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_sysbase"   TO  MCP-TABLE 
+               MOVE    "all"           TO  MCP-PATHNAME 
+               PERFORM 900-SYSBASE-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE 
+           MOVE    "all"               TO  MCP-PATHNAME 
+           PERFORM 990-DBCLOSE-SEC
       *
            IF      MST-RUN         =   "RUN"
                GO  TO  820-JOBKANRI-READ3-EXT
            END-IF
       *
-           MOVE    "CHK"           TO  SJOBKANRI-MODE
-           INITIALIZE                  JOBKANRI-REC
-           MOVE    1               TO  JOB-JOBID
-           MOVE    "MSTMLI"        TO  JOB-SHELLID
-           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
-      *
-           IF      SJOBKANRI-RETURN    =   ZERO
-               IF     (JOB-ENDTIME     NOT =   SPACE)  AND
-                      (JOB-ENDYMD      NOT =   SPACE)
-                   CONTINUE
-               ELSE
-                   MOVE    "RUN"       TO  MST-RUN
-               END-IF
+           MOVE    ZERO                TO  FLG-SYSBASE
+           INITIALIZE                      SYSBASE-REC
+           MOVE    SYSBASE-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE 
+           MOVE    "all"               TO  MCP-PATHNAME 
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sysbase"   TO  MCP-TABLE 
+               MOVE    "all"           TO  MCP-PATHNAME 
+               PERFORM 900-SYSBASE-READ-SEC
+           ELSE
+               INITIALIZE                  SYSBASE-REC
+               MOVE    1               TO  FLG-SYSBASE
            END-IF
+           PERFORM UNTIL   FLG-SYSBASE =   1
+      *
+               MOVE    "CHK"           TO  SJOBKANRI-MODE
+               INITIALIZE                  JOBKANRI-REC
+               MOVE    1               TO  JOB-JOBID
+               MOVE    "MSTMLI"        TO  JOB-SHELLID
+               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+               CALL    "ORCSJOB"           USING
+                                           ORCSJOBKANRIAREA
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+               IF      SJOBKANRI-RETURN    =   ZERO
+                   IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+                          (JOB-ENDYMD      NOT =   SPACE)
+                       CONTINUE
+                   ELSE
+                       MOVE    "RUN"       TO  MST-RUN
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_sysbase"   TO  MCP-TABLE 
+               MOVE    "all"           TO  MCP-PATHNAME 
+               PERFORM 900-SYSBASE-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE 
+           MOVE    "all"               TO  MCP-PATHNAME 
+           PERFORM 990-DBCLOSE-SEC
       *
            .
       *
@@ -1424,6 +1477,63 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-SYSDB-INV-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム基本読込処理
+      *****************************************************************
+       900-SYSBASE-READ-SEC            SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYSBASE-REC
+               MOVE    ZERO            TO  FLG-SYSBASE
+           ELSE
+               MOVE    1               TO  FLG-SYSBASE
+           END-IF
+           .
+       900-SYSBASE-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブルFETCH処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           .
+       910-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブルクローズ処理
+      *****************************************************************
+       990-DBCLOSE-SEC                 SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           .
+       990-DBCLOSE-EXT.
            EXIT.
       *
       *****************************************************************
