@@ -234,12 +234,14 @@
       *
            IF    ( SSUB03-SKYPRT       =   SPACE )
                IF    ( SPA-NYUGAIKBN   =   "1" )
-                   IF    ( SYS-1039-SKYPRTNKBN =   "1" )
-                       MOVE    "1"     TO  SSUB03-SKYPRT
+                   IF    ( SYS-1039-SKYPRTNKBN NOT =   SPACE )
+                       MOVE    SYS-1039-SKYPRTNKBN
+                                       TO  SSUB03-SKYPRT
                    END-IF
                ELSE
-                   IF    ( SYS-1039-SKYPRTGKBN =   "1" )
-                       MOVE    "1"     TO  SSUB03-SKYPRT
+                   IF    ( SYS-1039-SKYPRTGKBN NOT =   SPACE )
+                       MOVE    SYS-1039-SKYPRTGKBN
+                                       TO  SSUB03-SKYPRT
                    END-IF
                END-IF
       *
@@ -247,12 +249,20 @@
       *
            IF    ( SSUB03-SKYPRT       =   SPACE )
                IF    ( SPA-NYUGAIKBN   =   "1" )
-                   IF    ( SYS-5000-SKYPRTKBN  =   "1" OR  "2" )
-                       MOVE    "1"     TO  SSUB03-SKYPRT
+                   IF    ( SYS-5000-SKYPRTKBN  NOT =   SPACE )
+                       IF    ( SYS-5000-SKYPRTKBN  =   "1" OR  "2" )
+                           MOVE    "1"     TO  SSUB03-SKYPRT
+                       END-IF
+                   ELSE
+                       MOVE    "0"         TO  SSUB03-SKYPRT
                    END-IF
                ELSE
-                   IF    ( SYS-1001-SKYPRTFLG  =   "1" OR  "2" )
-                       MOVE    "1"     TO  SSUB03-SKYPRT
+                   IF    ( SYS-1001-SKYPRTFLG  NOT =   SPACE )
+                       IF    ( SYS-1001-SKYPRTFLG      =   "1" OR  "2" )
+                           MOVE    "1"     TO  SSUB03-SKYPRT
+                       END-IF
+                   ELSE
+                       MOVE    "0"         TO  SSUB03-SKYPRT
                    END-IF
                END-IF
            END-IF
@@ -277,12 +287,14 @@
       *
            IF    ( SSUB03-SRYPRT   =   SPACE )
                IF    ( SPA-NYUGAIKBN   =   "1" )
-                   IF    ( SYS-1039-SRYPRTNKBN =   "1" )
-                       MOVE    "1"     TO  SSUB03-SRYPRT
+                   IF    ( SYS-1039-SRYPRTNKBN NOT =   SPACE )
+                       MOVE    SYS-1039-SRYPRTNKBN
+                                       TO  SSUB03-SRYPRT
                    END-IF
                ELSE
-                   IF    ( SYS-1039-SRYPRTGKBN =   "1" )
-                       MOVE    "1"     TO  SSUB03-SRYPRT
+                   IF    ( SYS-1039-SRYPRTGKBN NOT =   SPACE )
+                       MOVE    SYS-1039-SRYPRTGKBN
+                                       TO  SSUB03-SRYPRT
                    END-IF
                END-IF
            END-IF
