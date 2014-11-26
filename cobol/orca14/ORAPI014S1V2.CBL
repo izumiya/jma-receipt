@@ -1055,7 +1055,7 @@
            IF      WRK-YYKMEMO     NOT =   SPACE
       *        半角空白を全角空白へ
                MOVE    WRK-YYKMEMO         TO  WRK-MAE-INPUT
-               MOVE    50                  TO  WRK-LEN
+               MOVE    80                  TO  WRK-LEN
                PERFORM 890-HALF-ZEN-SEC
                MOVE    WRK-ATO-INPUT       TO  WRK-YYKMEMO
                IF      FLG-ERR             =   1
