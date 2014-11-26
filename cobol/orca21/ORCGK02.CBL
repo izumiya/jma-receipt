@@ -2047,6 +2047,12 @@
                MOVE    "0178"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-NAI-JYURRKFLG
            END-IF
+      *H26.12
+      *    警告をエラーにする
+           IF      SPA-NAI-JYURRKFLG   =   2
+               MOVE    "0178"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-NAI-JYURRKFLG
+           END-IF
            .
        30041-JYURRK-J02CHK-EXT.
            EXIT.
@@ -10625,6 +10631,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
+      *H26.12
+      *    会計照会変更エラーは解除
+           IF      SPA-ERRCD           =   "0178"
+               MOVE    SPACE           TO  SPA-ERRCD
+               MOVE    SPACE           TO  SPA-KIDCD
+           END-IF
            IF     (SPA-ERRCD       NOT =   SPACE  )  OR
                   (SPA-KIDCD       NOT =   SPACE  )
                GO      TO      4110-KYOSEIEND-EXT
@@ -12386,6 +12398,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
+      *H26.12  中途終了は可能
+             AND  (SPA-KIDCD2          =   SPACE )
                IF      SPA-NAI-JYURRKFLG   =   1
                    MOVE    "0178"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR
