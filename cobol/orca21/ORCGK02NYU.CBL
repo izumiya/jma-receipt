@@ -1639,6 +1639,12 @@
                MOVE    90                  TO  SPA-GMN-CUR
                MOVE    1                   TO  SPA-NAI-JYURRKFLG
            END-IF
+      *H26.12
+      *    警告をエラーにする
+           IF      SPA-NAI-JYURRKFLG   =   2
+               MOVE    "0178"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-NAI-JYURRKFLG
+           END-IF
            .
        30041-JYURRK-J02CHK-EXT.
            EXIT.
@@ -3459,6 +3465,8 @@
       *    患者番号入力処理
       *****************************************************************
        41010-PTNUM-SYORI-SEC           SECTION.
+      *
+           MOVE    SPACE               TO  SPA-KIDCD
       *
            MOVE    ZERO                TO  WRK-GMN-PTID
            IF      SPA-PTID        NOT =   ZERO
@@ -8118,6 +8126,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
+      *H26.12
+           IF      SPA-ERRCD           =   "0178"
+               MOVE    SPACE           TO  SPA-ERRCD
+               MOVE    SPACE           TO  SPA-KIDCD
+           END-IF
+      *
            IF     (SPA-ERRCD       NOT =   SPACE  )  OR
                   (SPA-KIDCD           =   "0180" )
                GO      TO      4110-KYOSEIEND-EXT
@@ -9054,7 +9068,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
-           IF      SPA-ERRCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE  )
+      *H26.12     中途終了時は行う
+            AND   (SPA-KIDCD       NOT =   "0117" )
                IF      SPA-NAI-JYURRKFLG   =   1
                    MOVE    "0178"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR

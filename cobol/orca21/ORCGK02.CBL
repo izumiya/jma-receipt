@@ -2083,6 +2083,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "0178"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-NAI-JYURRKFLG
            END-IF
+      *H26.12
+      *    警告をエラーにする
+           IF      SPA-NAI-JYURRKFLG   =   2
+               MOVE    "0178"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-NAI-JYURRKFLG
+           END-IF
            .
        30041-JYURRK-J02CHK-EXT.
            EXIT.
@@ -5352,6 +5358,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    患者番号入力処理
       *****************************************************************
        41010-PTNUM-SYORI-SEC           SECTION.
+      *
+           MOVE    SPACE               TO  SPA-KIDCD
       *
            MOVE    ZERO                TO  WRK-GMN-PTID
            IF      SPA-PTID        NOT =   ZERO
@@ -10840,6 +10848,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
+      *H26.12
+           IF      SPA-ERRCD           =   "0178"
+               MOVE    SPACE           TO  SPA-ERRCD
+               MOVE    SPACE           TO  SPA-KIDCD
+           END-IF
+      *
            IF     (SPA-ERRCD       NOT =   SPACE  )  OR
                   (SPA-KIDCD       NOT =   SPACE  )
                GO      TO      4110-KYOSEIEND-EXT
@@ -12606,7 +12620,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
-           IF      SPA-ERRCD           =   SPACE
+           IF     (SPA-ERRCD           =   SPACE )
+      *H26.12  中途終了は可能
+             AND  (SPA-KIDCD2          =   SPACE )
                IF      SPA-NAI-JYURRKFLG   =   1
                    MOVE    "0178"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR
@@ -12815,48 +12831,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
                                        +   1
            MOVE    1                   TO  SPA-GMN-PAGE
-      *
-      *
-      *
-           GO      TO      5002-GMNSPA-HEN-EXT
-      *
-      *    カーソル指定のない時、次ぎの空白行へ
-      *    後画面へ
-           IF      SPA-GMN-CUR         =   88  OR  99
-               IF      WRK-MAP-MAXPAGE     =   SPA-GMN-PAGE
-                   COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                               +   1
-               ELSE
-                   MOVE    1                   TO  SPA-MAP-IDX
-               END-IF
-           ELSE
-               COMPUTE SPA-MAP-IDX         =   WRK-MAP-MAX
-                                           +   1
-               IF      SPA-SINSATU-SAI     =   ZERO
-      *            初期表示の時１ページ目へ
-                   IF     (SPA-MAP-IDX         >   MAX-GMN )
-                       OR (SPA-GMN-PAGE        <   WRK-MAP-MAXPAGE)
-      *ver.4.7 ******  MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       IF      SPA-GMN-PAGE    >   WRK-MAP-MAXPAGE
-                           MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                       END-IF
-                   END-IF
-               ELSE
-                   MOVE    ZERO            TO  SPA-SINSATU-SAI
-      *            最終行へ
-                   IF      SPA-MAP-IDX         >   MAX-GMN
-      *ver.4.7 ******* MOVE    99                  TO  SPA-MAP-IDX
-                       MOVE    MAX-GMN             TO  SPA-MAP-IDX
-                   ELSE
-                       MOVE    WRK-MAP-MAXPAGE     TO  SPA-GMN-PAGE
-                   END-IF
-               END-IF
-           END-IF
-           IF      SPA-GMN-PAGE        =   ZERO
-               MOVE    1               TO  SPA-GMN-PAGE
-           END-IF
       *
            .
        5002-GMNSPA-HEN-EXT.
