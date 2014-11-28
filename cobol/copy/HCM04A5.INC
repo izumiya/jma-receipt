@@ -17,7 +17,7 @@
                         PIC X(20).
             02  HCM04A5-HOKEN
                         PIC X(20).
-            02  HCM04A5-FUTAN
+            02  HCM04A5-FUTAN-OLD
                         PIC X(3).
             02  HCM04A5-FUTANLABEL
                         PIC X(2).
@@ -55,3 +55,5 @@
                         PIC X(50).
             02  HCM04A5-CHUI
                         PIC X(100).
+            02  HCM04A5-FUTAN
+                        PIC X(10).

@@ -15,7 +15,7 @@
                         PIC X(22).
             02  HCM03V03B-HOKEN
                         PIC X(20).
-            02  HCM03V03B-FUTAN
+            02  HCM03V03B-FUTAN-OLD
                         PIC X(3).
             02  HCM03V03B-TUKISRYKA
                         PIC X(100).
@@ -125,3 +125,5 @@
                         PIC X(50).
             02  HCM03V03B-CHUI
                         PIC X(100).
+            02  HCM03V03B-FUTAN
+                        PIC X(10).

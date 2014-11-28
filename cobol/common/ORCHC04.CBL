@@ -169,7 +169,7 @@
                05  WRK-EDDD            PIC X(06).
            03  WRK-H-SRYYMD            PIC X(50).
            03  WRK-H-HAKYMD            PIC X(22).
-           03  WRK-FUTAN               PIC X(03).
+           03  WRK-FUTAN               PIC X(04).
            03  WRK-FUTAN-MEI           PIC X(02).
            03  WRK-SRYKA-MEI           PIC X(30).
            03  WRK-HKNCOMBIMEI         PIC X(40).
@@ -195,7 +195,7 @@
            03  WRK-NO                  PIC Z(7).
            03  WRK-WARI                PIC 9(02)V9.
            03  WRK-Z6                  PIC ZZ9.
-           03  WRK-Z62                 PIC 9.9.
+           03  WRK-Z62                 PIC Z9.9.
       *
            03  WRK-DENPNUM             PIC 9(07).
            03  WRK-GRP-DENPNUM         PIC 9(07).

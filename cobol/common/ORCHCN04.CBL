@@ -171,7 +171,7 @@
       *
            03  WRK-HEAD-SRYKA-MEI      PIC X(30).
            03  WRK-HEAD-HKNCOMBIMEI    PIC X(40).
-           03  WRK-HEAD-FUTAN          PIC X(03).
+           03  WRK-HEAD-FUTAN          PIC X(04).
            03  WRK-HEAD-FUTAN-MEI      PIC X(02).
            03  WRK-HEAD-HAKYMD         PIC X(22).
            03  WRK-HEAD-NYUINSTRYMD    PIC X(22).
@@ -202,7 +202,7 @@
            03  WRK-NO                  PIC Z(7).
            03  WRK-WARI                PIC 9(02)V9.
            03  WRK-Z6                  PIC ZZ9.
-           03  WRK-Z62                 PIC 9.9.
+           03  WRK-Z62                 PIC Z9.9.
       *
            03  WRK-HKNCOMBIMEI         PIC X(40).
            03  WRK-HEN-SRYYM           PIC X(16).
