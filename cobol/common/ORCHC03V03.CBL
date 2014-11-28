@@ -161,7 +161,7 @@
       *****03  WRK-Z6              PIC ZZZZZZ.
       *****03  WRK-Z62             PIC ZZZ9.9.
            03  WRK-HKNFTN          PIC ZZ9.
-           03  WRK-HKNFTN2         PIC 9.9.
+           03  WRK-HKNFTN2         PIC Z9.9.
       *
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-NO              PIC Z(7).
