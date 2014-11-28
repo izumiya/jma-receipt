@@ -150,79 +150,91 @@
         </signal>
       </widget>
       <widget>
-        <class>GtkPandaCList</class>
-        <name>LIST1</name>
+        <class>GtkScrolledWindow</class>
+        <name>scrolledwindow1</name>
         <x>40</x>
         <y>44</y>
-        <width>584</width>
+        <width>650</width>
         <height>64</height>
         <sensitive>True</sensitive>
-        <can_focus>True</can_focus>
+        <can_focus>False</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <show_titles>True</show_titles>
-        <columns>4</columns>
-        <column_widths>100,180,180,60</column_widths>
-        <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+        <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+        <vscrollbar_policy>GTK_POLICY_NEVER</vscrollbar_policy>
         <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label109</name>
+          <class>GtkPandaCList</class>
+          <name>LIST1</name>
+          <width>650</width>
+          <height>64</height>
           <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
+          <can_focus>True</can_focus>
           <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>ORCAver</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label110</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>構造ver(自)</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label111</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>構造ver(ORCA)</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label112</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>日付</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
+          <border_width>0</border_width>
+          <show_titles>True</show_titles>
+          <columns>4</columns>
+          <column_widths>180,180,180,80</column_widths>
+          <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label109</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>ORCAver</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label110</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>構造ver(自)</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label111</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>構造ver(ORCA)</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label112</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>日付</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
         </widget>
       </widget>
       <widget>
@@ -263,17 +275,17 @@
       </widget>
       <widget>
         <class>GtkScrolledWindow</class>
-        <name>scrolledwindow1</name>
+        <name>scrolledwindow3</name>
         <x>40</x>
         <y>136</y>
-        <width>584</width>
-        <height>264</height>
+        <width>650</width>
+        <height>356</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
         <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
-        <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+        <vscrollbar_policy>GTK_POLICY_AUTOMATIC</vscrollbar_policy>
         <widget>
           <class>GtkPandaCList</class>
           <name>LIST3</name>
@@ -285,7 +297,7 @@
           <border_width>0</border_width>
           <show_titles>True</show_titles>
           <columns>3</columns>
-          <column_widths>196,167,170</column_widths>
+          <column_widths>262,167,170</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <widget>
             <class>GtkLabel</class>
@@ -355,7 +367,7 @@
         <class>GtkLabel</class>
         <name>label67</name>
         <x>40</x>
-        <y>404</y>
+        <y>496</y>
         <width>170</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -370,116 +382,128 @@
         <wrap>True</wrap>
       </widget>
       <widget>
-        <class>GtkPandaCList</class>
-        <name>LIST2</name>
+        <class>GtkScrolledWindow</class>
+        <name>scrolledwindow2</name>
         <x>40</x>
-        <y>428</y>
-        <width>584</width>
+        <y>520</y>
+        <width>650</width>
         <height>80</height>
         <sensitive>True</sensitive>
-        <can_focus>True</can_focus>
+        <can_focus>False</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <show_titles>True</show_titles>
-        <columns>6</columns>
-        <column_widths>120,80,80,80,80,80</column_widths>
-        <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+        <hscrollbar_policy>GTK_POLICY_NEVER</hscrollbar_policy>
+        <vscrollbar_policy>GTK_POLICY_NEVER</vscrollbar_policy>
         <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label215</name>
+          <class>GtkPandaCList</class>
+          <name>LIST2</name>
+          <width>650</width>
+          <height>80</height>
           <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
+          <can_focus>True</can_focus>
           <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>処理名</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label115</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>処理開始</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label116</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>時間</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label117</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>処理終了</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label118</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>時間</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
-        </widget>
-        <widget>
-          <class>GtkLabel</class>
-          <child_name>CList:title</child_name>
-          <name>label130</name>
-          <sensitive>True</sensitive>
-          <can_focus>False</can_focus>
-          <has_focus>False</has_focus>
-          <xalign>0.5</xalign>
-          <yalign>0.5</yalign>
-          <xpad>0</xpad>
-          <ypad>0</ypad>
-          <label>前回処理日</label>
-          <justify>GTK_JUSTIFY_CENTER</justify>
-          <wrap>False</wrap>
+          <border_width>0</border_width>
+          <show_titles>True</show_titles>
+          <columns>6</columns>
+          <column_widths>192,84,84,84,84,84</column_widths>
+          <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label215</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>処理名</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label115</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>処理開始</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label116</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>時間</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label117</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>処理終了</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label118</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>時間</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label130</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>前回処理日</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
         </widget>
       </widget>
       <widget>
         <class>GtkLabel</class>
         <name>label131</name>
-        <x>20</x>
-        <y>520</y>
+        <x>44</x>
+        <y>608</y>
         <width>115</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -496,8 +520,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label132</name>
-        <x>396</x>
-        <y>632</y>
+        <x>740</x>
+        <y>656</y>
         <width>248</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -514,8 +538,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label1</name>
-        <x>396</x>
-        <y>608</y>
+        <x>740</x>
+        <y>632</y>
         <width>248</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -532,8 +556,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label2</name>
-        <x>20</x>
-        <y>560</y>
+        <x>44</x>
+        <y>656</y>
         <width>115</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -550,8 +574,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>MSG1PLUS</name>
-        <x>144</x>
-        <y>540</y>
+        <x>168</x>
+        <y>632</y>
         <width>500</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -568,8 +592,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>MSG2</name>
-        <x>144</x>
-        <y>560</y>
+        <x>168</x>
+        <y>656</y>
         <width>500</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -586,8 +610,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>MSG2PLUS</name>
-        <x>144</x>
-        <y>580</y>
+        <x>168</x>
+        <y>680</y>
         <width>500</width>
         <height>20</height>
         <sensitive>True</sensitive>
@@ -604,8 +628,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>MSG1</name>
-        <x>144</x>
-        <y>520</y>
+        <x>168</x>
+        <y>608</y>
         <width>500</width>
         <height>20</height>
         <sensitive>True</sensitive>
