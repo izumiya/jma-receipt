@@ -49,6 +49,7 @@
       * 04.07.00     NACL-多々納  12/09/25  生活保護重複対応
       * 04.07.00     NACL-多々納  12/11/16  長期高額療養重複不可
       * 04.07.00     NACL-多々納  13/11/13  生活保護重複警告対応
+      * 04.07.00     NACL-多々納  14/12/XX  難病等対応、公費名称編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -187,6 +188,14 @@
            03  WRK-CHK-KOHNUM          PIC X(03).
            03  WRK-HBTCNT              PIC 9(02).
            03  WRK-MAE-HBTNUM          PIC X(02).
+      *H26.12
+      *    公費種別編集
+           03  WRK-HKNNUM              PIC X(03).
+           03  WRK-PAYKBN              PIC X(02).
+           03  WRK-HKNKOHSBTKBN        PIC X(01).
+           03  WRK-TANSEIDONAME        PIC X(20).
+           03  WRK-TEKSTYMD            PIC X(08).
+           03  WRK-HZN-STYMD           PIC X(08).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMD.
@@ -933,12 +942,16 @@
                        END-IF
                    END-IF
       *
+      *            日付なしのみ
+                   IF      SPA-NAI-KTEKSTYMD(IDX-K)    =   SPACE
+      *
                    MOVE    SPA-GMN-KOHNUMLST (IDX)
                                            TO  SPA-GMN-KOHNUM-G(IDX-K)
-      *
                    MOVE    SPA-NAI-KOHSBTKBN (IDX)
                                            TO  SPA-NAI-PTKOH-SBTKBN
                                                               (IDX-K)
+                   END-IF
+      *
                    MOVE    SPA-NAI-KOHPAYKBN (IDX)
                                            TO  SPA-NAI-PTKOH-PAYKBN
                                                               (IDX-K)
@@ -1184,6 +1197,21 @@
                    MOVE    23                  TO  SPA-GMN-CUR
                END-IF
            END-IF
+      *
+      *!!
+      *H26.12
+      *    新規で開始日変更時に名称編集
+           IF     (FLG-KOHINS          =   1     )
+              AND (SPA-ERRCD           =   SPACE )
+               IF     (SPA-NAI-KTEKSTYMD(IDX-K)
+                                       NOT =   WRK-HZN-STYMD)
+                OR    (SPA-GMN-KTEKEDYMD (IDX-K)
+                                           =   SPACE )
+                   MOVE    IDX-K               TO  IDX-K1
+                   PERFORM 3101-HKNNUM-SET-SEC
+               END-IF
+           END-IF
+      *
            .
        1001-KTEKSTYMD-CHK-EXT.
            EXIT.
@@ -2041,7 +2069,7 @@
                        IF     (SPA-GMN-KOHNUM (IDX-K)
                                            =   SPA-GMN-KOHNUM(IDK2))
                        AND   ((SPA-GMN-KOHNUM(IDX-K)
-                                           =   "051"  OR  "052"
+                                           =   "051"
                                            OR  "091"
       *                肝炎治療　追加
                                            OR  "038"
@@ -2054,7 +2082,12 @@
                                SPA-PREFNUM             =   01    )
       *H25.7
       *                第三者行為
-                          OR  (SPA-GMN-KOHNUM(IDX-K)   =   "970" ) )
+                          OR  (SPA-GMN-KOHNUM(IDX-K)   =   "970" )
+      *H26.11
+      *                小児特定　Ｈ２６．１２まで
+                          OR ((SPA-GMN-KOHNUM(IDX-K)   =   "052" ) AND
+                              (SPA-NAI-KTEKSTYMD (IDX-K)
+                                                       <=  "20141231")))
                            CONTINUE
                        ELSE
       *
@@ -2369,7 +2402,7 @@
            MOVE    SPA-SYSYMDWH    TO  SPA-GMN-KKAKUNINYMD(SPA-KOH-IDX1)
       *    公費名編集
            MOVE    SPA-KOH-IDX1    TO  IDX-K1
-           PERFORM 3101-HKNNUM-SET-SEC
+      **** PERFORM 3101-HKNNUM-SET-SEC
       *
       *    老人公費の時、新規公費を追加する
       *    Ｈ１４．１０改正分のみ
@@ -2417,18 +2450,65 @@
       *****************************************************************
        3101-HKNNUM-SET-SEC           SECTION.
       *
-           MOVE    ZERO                TO  FLG-OK
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN-KOHMAX
-               IF     (SPA-GMN-KOHNUM(IDX-K1)
-                                      =    SPA-GMN-KOHNUML (IDX)) AND
-                      (SPA-GMN-KOHKBN(IDX-K1)
-                                      =    SPA-GMN-KOHKBNL (IDX))
-                   MOVE    SPA-GMN-KOHNUMLST (IDX)
-                                           TO  SPA-GMN-KOHNUM-G(IDX-K1)
-                   MOVE    SPA-GMN-KOHMAX      TO  IDX
-               END-IF
-           END-PERFORM
+      *    MOVE    ZERO                TO  FLG-OK
+      *    PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL       IDX     >   SPA-GMN-KOHMAX
+      *        IF     (SPA-GMN-KOHNUM(IDX-K1)
+      *                               =    SPA-GMN-KOHNUML (IDX)) AND
+      *               (SPA-GMN-KOHKBN(IDX-K1)
+      *                               =    SPA-GMN-KOHKBNL (IDX))
+      *            MOVE    SPA-GMN-KOHNUMLST (IDX)
+      *                                    TO  SPA-GMN-KOHNUM-G(IDX-K1)
+      *            MOVE    SPA-GMN-KOHMAX      TO  IDX
+      *        END-IF
+      *    END-PERFORM
+      *
+      *H26.12
+      *    保険番号マスタの開始日の名称編集
+           MOVE    SPA-GMN-KOHNUM (IDX-K1)     TO  WRK-HKNNUM
+           MOVE    SPA-GMN-KOHKBN (IDX-K1)     TO  WRK-PAYKBN
+           MOVE    SPA-NAI-KTEKSTYMD(IDX-K1)   TO  WRK-TEKSTYMD
+      *
+           INITIALIZE                  HKNNUM-REC
+           MOVE    SPA-HOSPNUM         TO  HKN-HOSPNUM
+           MOVE    WRK-HKNNUM          TO  HKN-HKNNUM
+           IF      WRK-PAYKBN          =   SPACE
+               MOVE    ZERO                TO  HKN-PAYKBN
+           ELSE
+               MOVE    WRK-PAYKBN          TO  HKN-PAYKBN
+           END-IF
+           MOVE    WRK-TEKSTYMD        TO  HKN-TEKSTYMD
+           MOVE    WRK-TEKSTYMD        TO  HKN-TEKEDYMD
+      *
+           MOVE    HKNNUM-REC          TO  MCPDATA-REC
+           MOVE    "tbl_hknnum"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hknnum"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 921-HKNMST-NEXT-SEC
+           ELSE
+               INITIALIZE              HKNNUM-REC
+               MOVE    1               TO  FLG-HKNNUM
+           END-IF
+           MOVE    "tbl_hknnum"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    SPACE               TO  WRK-HKNKOHSBTKBN
+           MOVE    SPACE               TO  WRK-TANSEIDONAME
+           IF      FLG-HKNNUM          =   ZERO
+               MOVE    HKN-HKNKOHSBTKBN    TO  WRK-HKNKOHSBTKBN
+               MOVE    HKN-TANSEIDONAME    TO  WRK-TANSEIDONAME
+      *        リストの名称より長くする
+      *****    INSPECT WRK-TANSEIDONAME    REPLACING ALL "  " BY "　"
+      *
+               MOVE    WRK-TANSEIDONAME    TO  SPA-GMN-KOHNUMMEI
+                                                            (IDX-K1)
+               MOVE    WRK-HKNKOHSBTKBN    TO  SPA-NAI-PTKOH-SBTKBN
+                                                            (IDX-K1)
+           END-IF
       *
            .
        3101-HKNNUM-SET-EXT.
@@ -2673,6 +2753,11 @@
            MOVE    SPA-PTKOH-HKN-SBTKBN (IDX)
                                        TO  SPA-NAI-PTKOH-SBTKBN(IDX-K)
       *
+      *H26.12
+      *    保険番号マスタから名称編集
+           MOVE    IDX-K           TO  IDX-K1
+           PERFORM 3101-HKNNUM-SET-SEC
+      *
            .
        31012-IPN-KOHHEN-EXT.
            EXIT.
@@ -2801,6 +2886,11 @@
                                                               (IDX-K)
            MOVE    SPA-SYSYMDWH        TO  SPA-GMN-KKAKUNINYMD
                                                               (IDX-K)
+      *H26.12
+      *    保険番号マスタから名称編集
+           MOVE    IDX-K           TO  IDX-K1
+           PERFORM 3101-HKNNUM-SET-SEC
+      *
       *
            MOVE    ZERO                TO  SPA-KOH-ADD
            EVALUATE    IDX-K

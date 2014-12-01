@@ -1171,6 +1171,18 @@
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "2614"
+                   STRING  "この特記事項の開始は"
+                           "平成２７年１月からです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2615"
+                   STRING  "この特記事項の開始は"
+                           "平成２６年１１月からです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "2620"
                    STRING  "特記事項は５０件までの登録です。"
                            "これ以上追加できません。"

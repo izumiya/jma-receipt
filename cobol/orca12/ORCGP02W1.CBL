@@ -103,6 +103,7 @@
       * 04.07.00     NACL-多々納  14/01/20  出生時体重追加対応
       * 04.07.00     NACL-多々納  14/03/XX  前期期高齢者２割対応
       * 04.07.00     NACL-多々納  14/08/08  高齢非該当２割対応
+      * 04.07.00     NACL-多々納  14/12/XX  難病等対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1806,7 +1807,10 @@
                MOVE    WRK-PAYKBN          TO  HKN-PAYKBN
            END-IF
            MOVE    WRK-TEKSTYMD        TO  HKN-TEKSTYMD
-           MOVE    WRK-TEKEDYMD        TO  HKN-TEKEDYMD
+      *H26.12
+      *    開始日の内容を設定
+           MOVE    WRK-TEKSTYMD        TO  HKN-TEKEDYMD
+      **** MOVE    WRK-TEKEDYMD        TO  HKN-TEKEDYMD
       *
            MOVE    HKNNUM-REC          TO  MCPDATA-REC
            MOVE    "tbl_hknnum"        TO  MCP-TABLE
@@ -1827,11 +1831,10 @@
            MOVE    SPACE               TO  WRK-HKNKOHSBTKBN
            MOVE    SPACE               TO  WRK-TANSEIDONAME
            IF      FLG-HKNNUM          =   ZERO
-               IF     (WRK-TEKSTYMD        >=  HKN-TEKSTYMD )  AND
-                      (WRK-TEKEDYMD        <=  HKN-TEKEDYMD )
-                   MOVE    HKN-HKNKOHSBTKBN    TO  WRK-HKNKOHSBTKBN
-                   MOVE    HKN-TANSEIDONAME    TO  WRK-TANSEIDONAME
-               END-IF
+               MOVE    HKN-HKNKOHSBTKBN    TO  WRK-HKNKOHSBTKBN
+               MOVE    HKN-TANSEIDONAME    TO  WRK-TANSEIDONAME
+      *        リストの名称より長くする
+      ***      INSPECT WRK-TANSEIDONAME    REPLACING ALL "  " BY "　"
            END-IF
       *
            .
@@ -7587,6 +7590,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            残留邦人（０２５）（Ｈ２０．４以降）
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "025" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20080401"))
+      *H26.12
+      *            難病（０５４）（Ｈ２７．１から）
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "054" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20150101"))
       *ver.4.7
       *        地方公費で上限額設定対象
                  OR  ( SPA-PTKOH-JYOGENKBN (IDX)   NOT =   SPACE )
