@@ -623,7 +623,8 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
-               WHEN    "K122"
+      *
+              WHEN    "K122"
                    STRING  "警告！！"
                            "適用開始日が７５歳以上です。"
                                                DELIMITED   BY  SPACE
@@ -1167,6 +1168,18 @@
                WHEN    "2613"
                    STRING  "この特記事項の開始は"
                            "平成２１年１０月からです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2614"
+                   STRING  "この特記事項の開始は"
+                           "平成２７年１月からです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2615"
+                   STRING  "この特記事項の開始は"
+                           "平成２６年１１月からです。"
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING

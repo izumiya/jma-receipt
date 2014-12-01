@@ -38,6 +38,7 @@
       *  04.06.00    NACL-多々納  10/09/29  入外非表示区分対応
       *  04.06.00    NACL-多々納  12/09/25  生活保護重複対応
       *  04.08.00    NACL-多々納  13/07/XX  第三者行為対応
+      *  04.07.00    NACL-多々納  14/12/XX  難病等対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -107,6 +108,7 @@
            03  IDX4                PIC 9(04).
            03  IDX5                PIC 9(04).
            03  IDY                 PIC 9(04).
+           03  IDKH                PIC 9(04).
       *
            03  IDX-STR             PIC 9(04).
       *
@@ -612,74 +614,37 @@
                    PERFORM 3202-DAI3-HENSYU-SEC
                END-IF
       *
+      *H26.12  （テーブル判定へ修正）
       *        特定負有の時、受給者番号設定
-               IF     (LNK-COMB-KOH1HKNNUM (IDX)   =   "051"
-                                                   OR  "052"
+               PERFORM VARYING     IDKH    FROM    1   BY  1
+                       UNTIL       IDKH    >   4
+                   IF      (LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =   "051"
                                                    OR  "091"
                                                    OR  "015"
                                                    OR  "016"
                                                    OR  "038" )
       *            北海道の地方公費
-                   OR ((LNK-COMB-KOH1HKNNUM (IDX)  =   "183" ) AND
-                       (SPA-PREFNUM                 =   01   ))
+                   OR     ((LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =   "183" ) AND
+                           (SPA-PREFNUM            =   01   ))
       *            生活保護　追加
-                   OR  (LNK-COMB-KOH1HKNNUM (IDX)   =  "012" )
+                   OR      (LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =  "012"  )
+      *H26.12
+      *            小児特定　Ｈ２６．１２まで
+                   OR     ((LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =   "052" ) AND
+                           (LNK-COMB-TEKSTYMD(IDX) <=  "20141231"))
       *
-                   MOVE    LNK-COMB-KOH1HKNNUM (IDX)   TO  WRK-KOHNUM
-                   MOVE    LNK-COMB-KOH1ID (IDX)       TO  WRK-KOHID
-                   PERFORM 3202-JKYSNUM-HENSYU-SEC
-               END-IF
-               IF     (LNK-COMB-KOH2HKNNUM (IDX)   =   "051"
-                                                   OR  "052"
-                                                   OR  "091"
-                                                   OR  "015"
-                                                   OR  "016"
-                                                   OR  "038" )
-      *            北海道の地方公費
-                   OR ((LNK-COMB-KOH2HKNNUM (IDX)  =   "183" ) AND
-                       (SPA-PREFNUM                 =   01   ))
+                       MOVE    LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   TO  WRK-KOHNUM
+                       MOVE    LNK-COMB-KOHID (IDX IDKH)
+                                                   TO  WRK-KOHID
+                       PERFORM 3202-JKYSNUM-HENSYU-SEC
+                   END-IF
+               END-PERFORM
       *
-      *            生活保護　追加
-                   OR  (LNK-COMB-KOH2HKNNUM (IDX)   =  "012" )
-      *
-                   MOVE    LNK-COMB-KOH2HKNNUM (IDX)   TO  WRK-KOHNUM
-                   MOVE    LNK-COMB-KOH2ID (IDX)       TO  WRK-KOHID
-                   PERFORM 3202-JKYSNUM-HENSYU-SEC
-               END-IF
-               IF     (LNK-COMB-KOH3HKNNUM (IDX)   =   "051"
-                                                   OR  "052"
-                                                   OR  "091"
-                                                   OR  "015"
-                                                   OR  "016"
-                                                   OR  "038")
-      *            北海道の地方公費
-                   OR ((LNK-COMB-KOH3HKNNUM (IDX)  =   "183" ) AND
-                       (SPA-PREFNUM                 =   01   ))
-      *
-      *            生活保護　追加
-                   OR  (LNK-COMB-KOH3HKNNUM (IDX)   =  "012" )
-      *
-                   MOVE    LNK-COMB-KOH3HKNNUM (IDX)   TO  WRK-KOHNUM
-                   MOVE    LNK-COMB-KOH3ID (IDX)       TO  WRK-KOHID
-                   PERFORM 3202-JKYSNUM-HENSYU-SEC
-               END-IF
-               IF     (LNK-COMB-KOH4HKNNUM (IDX)   =   "051"
-                                                   OR  "052"
-                                                   OR  "091"
-                                                   OR  "015"
-                                                   OR  "016"
-                                                   OR  "038" )
-      *            北海道の地方公費
-                   OR ((LNK-COMB-KOH4HKNNUM (IDX)  =   "183" ) AND
-                       (SPA-PREFNUM                 =   01   ))
-      *
-      *            生活保護　追加
-                   OR  (LNK-COMB-KOH4HKNNUM (IDX)   =  "012" )
-      *
-                   MOVE    LNK-COMB-KOH4HKNNUM (IDX)   TO  WRK-KOHNUM
-                   MOVE    LNK-COMB-KOH4ID (IDX)       TO  WRK-KOHID
-                   PERFORM 3202-JKYSNUM-HENSYU-SEC
-               END-IF
       *        パラメタ位置
                MOVE    LNK-COMB-EDANUM (IDX)   TO  SPA-NAI27-EDANUM(IDY)
       *        表示区分

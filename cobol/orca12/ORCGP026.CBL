@@ -30,6 +30,7 @@
       *  04.04.00    NACL-Â¿¡¹Ç¼  09/04/09  £È£²£±¡¥£µÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/28  £È£²£±Ç¯£±£°·îÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/12/25  ¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£°£±·îÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -195,12 +196,25 @@
            03  FILLER              PIC X(15)   VALUE   "23 £²£³Â¿°ì".
            03  FILLER              PIC X(15)   VALUE   "24 £²£´Â¿Äã".
            03  FILLER              PIC X(15)   VALUE   "25 £²£µ½Ð»º".
+      *H27.1 ¤«¤é
+           03  FILLER              PIC X(15)   VALUE   "26 £²£¶¶è¥¢".
+           03  FILLER              PIC X(15)   VALUE   "27 £²£·¶è¥¤".
+           03  FILLER              PIC X(15)   VALUE   "28 £²£¸¶è¥¦".
+           03  FILLER              PIC X(15)   VALUE   "29 £²£¹¶è¥¨".
+           03  FILLER              PIC X(15)   VALUE   "30 £³£°¶è¥ª".
+           03  FILLER              PIC X(15)   VALUE   "31 £³£±Â¿¥¢".
+           03  FILLER              PIC X(15)   VALUE   "32 £³£²Â¿¥¤".
+           03  FILLER              PIC X(15)   VALUE   "33 £³£³Â¿¥¦".
+           03  FILLER              PIC X(15)   VALUE   "34 £³£´Â¿¥¨".
+           03  FILLER              PIC X(15)   VALUE   "35 £³£µÂ¿¥ª".
+           03  FILLER              PIC X(15)   VALUE   "36 £³£¶²Ã¼£".
        01  TBL-TOKKI-AREA-R        REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI-OCC       OCCURS   23.
+      **** 03  TBL-TOKKI-OCC       OCCURS   23.
+           03  TBL-TOKKI-OCC       OCCURS   34.
                05  TBL-TOKK-CD     PIC X(02).
                05  TBL-TOKK-K      PIC X(01).
                05  TBL-TOKK-NAIYO  PIC X(12).
-       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   23.
+       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   34.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1722,6 +1736,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "24"
       *        ½Ð»º¤Ï³°Íè²Ä
       ***                              OR  "25"
+      *H26.12   Â¿¥¢¤«¤éÂ¿¥ª
+                                       OR  "31"
+                                       OR  "32"
+                                       OR  "33"
+                                       OR  "34"
+                                       OR  "35"
       *        Æþ±¡
                MOVE    SPA-GMN26-NYUGAI-LST (2)
                                            TO  SPA-GMN26-NYUGAI-G
@@ -1846,6 +1866,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *!!!
       *
+      *H26.12
+      *    ¶è¥¢¤«¤éÂ¿¥ª¡¡Ê¿À®£²£·Ç¯£±·î¤«¤é
+           IF     (SPA-GMN26-CD        >=  "26"  AND
+                                       <=  "35"  )
+           AND    (SPA-ERRCD           =   SPACE )
+           AND    (SPA-NAI26-STYM  NOT =   ZERO  )
+               IF      SPA-NAI26-STYM      <   "201501"
+                   MOVE    "2614"              TO  SPA-ERRCD
+                   MOVE    05                  TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *    ²Ã¼£¡¡Ê¿À®£²£¶Ç¯£±£±·î¤«¤é
+           IF     (SPA-GMN26-CD        =   "36"  )
+           AND    (SPA-ERRCD           =   SPACE )
+           AND    (SPA-NAI26-STYM  NOT =   ZERO  )
+               IF      SPA-NAI26-STYM      <   "201411"
+                   MOVE    "2615"              TO  SPA-ERRCD
+                   MOVE    05                  TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *
            .
        41012-STYM-CHK-EXT.
            EXIT.
@@ -1906,6 +1947,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (SPA-NAI26-STYM      >   SPA-NAI26-EDYM)
                    MOVE    "2610"              TO  SPA-ERRCD
                    MOVE    6                   TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *H26.12
+           IF      SPA-ERRCD           =   SPACE
+               IF     (SPA-GMN26-CD    NOT =   SPACE )
+                  AND (SPA-GMN26-NYUGAI    =   SPACE )
+      *            Æþ³°¶èÊ¬Ì¤ÀßÄê
+                   MOVE    SPA-GMN26-NYUGAI-LST (1)
+                                           TO  SPA-GMN26-NYUGAI-G
                END-IF
            END-IF
       *

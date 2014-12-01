@@ -45,6 +45,7 @@
       *                                     公費負担額未入力警告対応
       *  04.07.00    NACL-多々納  11/11/07  地方公費負担額変更対応
       *  04.07.00    NACL-多々納  14/06/04  公費負担額上限件数対応
+      * 04.07.00     NACL-多々納  14/12/XX  難病等対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -609,7 +610,7 @@
            IF      SPA-GMN24-FTNSELNUM >   ZERO
                IF      (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "051" 
-                                           OR  "052"
+     *****                                 OR  "052"
                                            OR  "015"
                                            OR  "016"
                                            OR  "091"
@@ -622,6 +623,13 @@
                  OR   ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "183" ) AND
                        (SPA-PREFNUM        =    01   )) 
+      *H26.12
+      *            小児特定　Ｈ２６．１２まで
+                 OR   ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "052" ) AND
+                       (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           <=  "20141231" ))
+      *
                    MOVE    "受給者番号："      TO  SPA-GMN24-JKYSNUM
                    MOVE    SPA-NAI24-TJKYSNUM (SPA-NAI24-FTNSELNUM)
                                                TO  SPA-GMN24-JKYSNUM
@@ -672,6 +680,16 @@
                                            =   "038"   )  AND
                       (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
                                            >=   "20061001"  )
+                   MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
+                   MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+               END-IF
+      *H26.12
+      *        難病・小児特定(H27.1から）名称
+               IF    ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "052"
+                                           OR  "054"       )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=   "20150101"  ))
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
                END-IF
@@ -803,6 +821,13 @@
                                                OR  "016"
                                                OR  "021"
                                                OR  "038"    )
+      *H26.12
+      *                難病・小児特定（H26.1から）
+                     OR  ((SPA-NAI24-KOHNUM  (WRK-FTN1-IDX)
+                                               =   "052"
+                                               OR  "054"   )  AND
+                          (SPA-NAI24-TKOHSTYMD (WRK-FTN1-IDX)
+                                               >=  "20150101" ))
       ***            OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
       *                                        =   "281" ) AND
       ***                 (SPA-PREFNUM         =    07   ))
@@ -1410,6 +1435,13 @@
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
+      *H26.12
+      *            難病・小児特定（H26.1から）
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "052"
+                                           OR  "054"   )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=  "20150101" ))
       ***        OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "281" ) AND
       ***             (SPA-PREFNUM         =    07   ))
@@ -1573,6 +1605,14 @@
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
+      *H26.12
+      *            難病・小児特定（H26.1から）
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "052"
+                                           OR  "054"   )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=  "20150101" ))
+      *
       **         OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "281" ) AND
       **              (SPA-PREFNUM         =    07   ))
@@ -2577,6 +2617,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "016"
                                                OR  "021"
                                                OR  "038"    )
+      *H26.12
+      *              難病・小児特定（H26.1から）
+                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+                                               =   "052"
+                                               OR  "054"   )  AND
+                          (SPA-NAI24-TKOHSTYMD (WRK-FTN1-IDX)
+                                               >=  "20150101" ))
+      *
       *ver.4.7
       ****           OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
       **                                       =   "281" ) AND
@@ -2880,6 +2928,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
+      *H26.12
+      *          難病・小児特定（H26.1から）
+                 OR  ((SPA-NAI24-KOHNUM  (IDX2)
+                                           =   "052"
+                                           OR  "054"   )  AND
+                      (SPA-NAI24-TKOHSTYMD (IDX2)
+                                           >=  "20150101" ))
       ***        OR  ((SPA-NAI24-KOHNUM (IDX2)
       *                                    =   "281" ) AND
       **              (SPA-PREFNUM         =    07   ))
