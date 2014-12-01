@@ -98,6 +98,7 @@
       *
        01  CONST-AREA.
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
+           03  CONST-H270101               PIC X(08)   VALUE "20150101".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1576,22 +1577,32 @@
       *****************************************************************
        4101-DAIRI-MONEY-CHK-SEC        SECTION.
       *
+           MOVE    ZERO    TO  SPA-GMN-DAIRI-MONEY
+      *
            IF    ( SPA-GMN-RIYOUKBN        =   "1" )
                IF    ( SPA-NAI-SANKANUM    NOT =   ZERO )
                 AND  ( SPA-GMN-ZAIWEEK        >=   22 )
                    COMPUTE SPA-GMN-DAIRI-MONEY
                        =   420000      *   SPA-GMN-BIRTHCNT
                ELSE
-                   COMPUTE SPA-GMN-DAIRI-MONEY
-                       =   390000      *   SPA-GMN-BIRTHCNT
+                   IF    ( SPA-NAI-BIRTHDAY-BABY   NOT =   SPACE )
+                       EVALUATE    TRUE
+                       WHEN  ( SPA-NAI-BIRTHDAY-BABY
+                                          >= CONST-H270101 )
+                           COMPUTE SPA-GMN-DAIRI-MONEY
+                               =   404000  *   SPA-GMN-BIRTHCNT
+                       WHEN    OTHER
+                           COMPUTE SPA-GMN-DAIRI-MONEY
+                               =   390000  *   SPA-GMN-BIRTHCNT
+                       END-EVALUATE
+                   END-IF
                END-IF
+           END-IF
       *
-               IF    ( SPA-GMN-DAIRI-MONEY >   SPA-GMN-NINPUFTN-MONEY )
-                   MOVE    SPA-GMN-NINPUFTN-MONEY
+           IF  ( SPA-GMN-DAIRI-MONEY >   ZERO )
+            AND( SPA-GMN-DAIRI-MONEY >   SPA-GMN-NINPUFTN-MONEY )
+               MOVE    SPA-GMN-NINPUFTN-MONEY
                                    TO  SPA-GMN-DAIRI-MONEY
-               END-IF
-           ELSE
-                   MOVE    ZERO    TO  SPA-GMN-DAIRI-MONEY
            END-IF
       *
            .

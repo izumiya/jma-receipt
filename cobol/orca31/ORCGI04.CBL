@@ -263,6 +263,7 @@
        01  CONST-AREA.
            03  CONST-H180401               PIC X(08)   VALUE "20060401".
            03  CONST-H200401               PIC X(08)   VALUE "20080401".
+           03  CONST-H270101               PIC X(08)   VALUE "20150101".
            03  CONST-JOB-SHELLID           PIC X(08)   VALUE   "TEIKI1".
            03  CONST-JOB-JOBID             PIC 9(07)   VALUE   1.
            03  CONST-EDIT-RSIJBI           PIC 9(01)   VALUE   ZERO.
@@ -5842,8 +5843,14 @@
                    COMPUTE BUNBEN-DAIRI-MONEY
                        =   420000      *   BUNBEN-BIRTHCNT
                ELSE
-                   COMPUTE BUNBEN-DAIRI-MONEY
-                       =   390000      *   BUNBEN-BIRTHCNT
+                   EVALUATE   TRUE
+                   WHEN    ( BUNBEN-BIRTHDAY  >= CONST-H270101 )
+                       COMPUTE BUNBEN-DAIRI-MONEY
+                           =   404000      *   BUNBEN-BIRTHCNT
+                   WHEN    OTHER
+                       COMPUTE BUNBEN-DAIRI-MONEY
+                           =   390000      *   BUNBEN-BIRTHCNT
+                   END-EVALUATE
                END-IF
       *
                IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )
