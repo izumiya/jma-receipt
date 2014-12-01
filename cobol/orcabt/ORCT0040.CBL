@@ -212,6 +212,9 @@
                    07  SRH-1041-BUNRUIL    PIC X(02).
                    07  SRH-1041-JYOTAIL    PIC X(01).
       *
+       01  CONST-AREA.
+           03  CONST-H270101               PIC X(08)   VALUE "20150101".
+      *
        01  ERR-EDIT-AREA.
            03  ERR-WARNING             PIC 9(01).
            03  ERR-PTID                PIC 9(10).
@@ -1751,8 +1754,14 @@
                    COMPUTE BUNBEN-DAIRI-MONEY
                        =   420000      *   BUNBEN-BIRTHCNT
                ELSE
-                   COMPUTE BUNBEN-DAIRI-MONEY
-                       =   390000      *   BUNBEN-BIRTHCNT
+                   EVALUATE   TRUE
+                   WHEN    ( BUNBEN-BIRTHDAY  >=   CONST-H270101 )
+                       COMPUTE BUNBEN-DAIRI-MONEY
+                           =   404000      *   BUNBEN-BIRTHCNT
+                   WHEN    OTHER
+                       COMPUTE BUNBEN-DAIRI-MONEY
+                           =   390000      *   BUNBEN-BIRTHCNT
+                   END-EVALUATE
                END-IF
       *
                IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )
