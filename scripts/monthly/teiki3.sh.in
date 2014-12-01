@@ -35,6 +35,8 @@ cleanup () {
 	echo
 }
 
+[ -e ${ERR_FILE_FULL} ] && rm  ${ERR_FILE_FULL} 
+
 ##   -- ORCT0070 START --  
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCT0070 -parameter "${ERR_FILE_BASE},$2,$3,$4,$5,$6,$7,$8,$9,${10},${11}"
         if  [ -e ${ERR_FILE_FULL} ]; then

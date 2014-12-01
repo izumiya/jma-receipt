@@ -1873,12 +1873,7 @@
            MOVE    2                   TO  TEIKIERR-SYOKBN1
       *
            MOVE    SPACE               TO  SHELLTBL
-           MOVE    "teiki1.sh"         TO  WRK-SHELL-SHELL
-      *    ファイルデイレクトリ位置指定
-           INITIALIZE              ORCSMKPASSAREA
-           MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+           MOVE    "teiki1.sh"         TO  SHELLTBL-NAME
       *
            MOVE    ZERO                TO  WRK-SHELL-SRYYM
            MOVE    SPA-TERMID          TO  WRK-SHELL-TERMID
@@ -1922,7 +1917,7 @@
                    MOVE    SHELLTBL            TO  MCPDATA-REC
                    MOVE    "SHELL"             TO  MCP-FUNC
                    MOVE    "shell"             TO  MCP-TABLE
-                   MOVE    "shell"             TO  MCP-PATHNAME
+                   MOVE    "monthly"           TO  MCP-PATHNAME
                    CALL    "ORCDBMAIN"         USING
                                                MCPAREA
                                                MCPDATA-REC

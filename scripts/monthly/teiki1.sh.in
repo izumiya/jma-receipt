@@ -40,9 +40,12 @@ echo $LOGFILE
 ERR_FILE_BASE=$(basename ${10})
 ERR_FILE_FULL=${MCP_TEMPDIR}/${ERR_FILE_BASE}
 
+
 cleanup () {
 	rm -f ${MCP_TEMPDIR}/${HOSPNUM}00TEIKI*
 }
+
+[ -e ${ERR_FILE_FULL} ] && rm  ${ERR_FILE_FULL} 
 
 BATCH_PARAM=$1,$2,$3,$4,$5,$6,$7,$8,$9,${ERR_FILE_BASE},${11},${12},${13}
 

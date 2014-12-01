@@ -387,6 +387,7 @@
            CALL    "ORCSGETTEMP"       USING
                                        SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAME   TO  TEIKIERR
+           MOVE    SGETTEMP-ST         TO  TEIKIERR-ST
       *
       *    Äê´üÀÁµá¾ðÊó
            INITIALIZE                      SYS-5010-REC
@@ -947,11 +948,7 @@
            MOVE    ZERO                    TO  WRK-STPAGE
            MOVE    99999                   TO  WRK-EDPAGE
       *
-           INITIALIZE                  ORCSMKPASSAREA
-           MOVE    "/scripts/allways/print_prv.sh"
-                                           TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01            TO  SHELLTBL-NAME
+           MOVE    "print_prv.sh"          TO  SHELLTBL-NAME
       *
            MOVE    "print_prv.sh"          TO  LNK-PRTKANRI-SHELLID
       *
@@ -969,7 +966,7 @@
            MOVE    LNK-PRTKANRI-OPID       TO  SHELLTBL-ARG10
            MOVE    LNK-PRTKANRI-PRTNM      TO  SHELLTBL-ARG11
       *
-           MOVE    TEIKIERR                TO  SHELLTBL-ARG12
+           MOVE    TEIKIERR (TEIKIERR-ST:) TO  SHELLTBL-ARG12
            MOVE    TEIKI2P-JOBID           TO  SHELLTBL-ARG13
            MOVE    TEIKI2P-SHELLID         TO  SHELLTBL-ARG14
            MOVE    WRK-STPAGE              TO  SHELLTBL-ARG15
@@ -987,7 +984,7 @@
            MOVE    SHELLTBL                TO  MCPDATA-REC
            MOVE    "SHELL"                 TO  MCP-FUNC
            MOVE    "shell"                 TO  MCP-TABLE
-           MOVE    "shell"                 TO  MCP-PATHNAME
+           MOVE    "allways"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
