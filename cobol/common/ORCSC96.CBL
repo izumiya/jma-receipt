@@ -1769,7 +1769,8 @@
                    END-STRING
       *
                WHEN    "0221"
-                   STRING   "薬評・器評は診療種別の直下に入力して下さい"
+                   STRING   "薬評・器評・加評は診療種別の直下に"
+                            "入力して下さい"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
@@ -1793,7 +1794,7 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "0225"
-                   STRING   "薬評・器評での入力はできません。"
+                   STRING   "薬評・器評・加評での入力はできません。"
                             "剤分離して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
