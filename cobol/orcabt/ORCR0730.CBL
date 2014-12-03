@@ -200,6 +200,7 @@
       *  04.07.15    NACL-門脇    14/06/05  第三者行為のコメント記載修正
       *  04.07.16    NACL-門脇    14/07/10  （感染症＋生保＋生保）レセプト
       *                                     の点数欄記載修正
+      *  04.07.17    NACL-藤原    14/12/03  平成２６年１１月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -942,8 +943,10 @@
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(52)   VALUE
                "【廃用症候群に係る評価表】".
+           03  FILLER              PIC X(52)   VALUE
+               "【医薬品医療機器等法に規定する治験に係る治験概要】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   11.
       *
       *   退職者保険番号
        01  WRK-RETIRE-AREA.
@@ -7846,8 +7849,13 @@
                                                TO  WRK-RECECOM-NAME
                    WHEN    "50"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
-                       MOVE    TBL-RECECOM-NAME (8)
-                                               TO  WRK-RECECOM-NAME
+                       IF      RECE62-SRYYM    <   201412
+                           MOVE    TBL-RECECOM-NAME (8)
+                                                   TO  WRK-RECECOM-NAME
+                       ELSE
+                           MOVE    TBL-RECECOM-NAME (11)
+                                                   TO  WRK-RECECOM-NAME
+                       END-IF
                    WHEN    "51"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (9)

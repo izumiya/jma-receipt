@@ -34,8 +34,10 @@
       *  04.06.02    NACL-藤原    13/05/27  症状詳記の表題を平成２５年７月
       *                                     診療分以降は全て記載
       *  04.06.03    NACL-門脇    13/06/07  合計額ワーク領域のクリア
+      *
       *  04.07.01    NACL-門脇    14/10/02  摘要欄の最終行まで記載してから
       *                                     改ページするよう修正
+      *  04.07.02    NACL-藤原    14/12/03  平成２６年１１月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -400,8 +402,10 @@
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(52)   VALUE
                "【廃用症候群に係る評価表】".
+           03  FILLER              PIC X(52)   VALUE
+               "【医薬品医療機器等法に規定する治験に係る治験概要】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   11.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1662,8 +1666,13 @@
                                                TO  WRK-RECECOM-NAME
                    WHEN    "50"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
-                       MOVE    TBL-RECECOM-NAME (8)
-                                               TO  WRK-RECECOM-NAME
+                       IF      RECE41-SRYYM    <   201412
+                           MOVE    TBL-RECECOM-NAME (8)
+                                                   TO  WRK-RECECOM-NAME
+                       ELSE
+                           MOVE    TBL-RECECOM-NAME (11)
+                                                   TO  WRK-RECECOM-NAME
+                       END-IF
                    WHEN    "51"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (9)
