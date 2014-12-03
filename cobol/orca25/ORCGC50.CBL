@@ -2851,9 +2851,17 @@
                    END-IF
                END-IF
            END-IF
+      *
            IF     (SPA-ERRCD           =   SPACE ) AND
-                  (SPA-C50IDCD         =   SPACE ) 
+                  (SPA-C50IDCD         =   SPACE )
                PERFORM 2120-RECECOM-SEL-SEC
+      *H26.12
+               IF     (SPA-NAI-RENNUM      >   ZERO )  AND
+                      (FLG-RECECOM         =   1    )
+      *            連番で登録がない時、最大連番で追加
+                   PERFORM 21201-RECECOM-CHKSEL-SEC
+               END-IF
+      *
                IF      FLG-RECECOM         =   ZERO
                    MOVE    "0105"              TO  SPA-C50IDCD
                    IF      SPA-GMN-SYORI       =   1  OR  5
@@ -3242,9 +3250,59 @@
                   (FLG-RECECOM         =   ZERO )
                MOVE    RECECOM-RENNUM      TO  WRK-RENNUM-MAX
             END-IF
-      *
            .
        2120-RECECOM-SEL-EXT.
+           EXIT.
+      *
+      *H26.12
+      *****************************************************************
+      *    レセプトコメントチェック処理
+      *****************************************************************
+       21201-RECECOM-CHKSEL-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  RECECOM-REC
+           INITIALIZE                  RECECOM-REC
+           MOVE    SPA-HOSPNUM         TO  RECECOM-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  RECECOM-PTID
+           MOVE    SPA-GMN-NYUGAIKBN   TO  RECECOM-NYUGAIKBN
+           MOVE    SPA-GMN-SRYKA       TO  RECECOM-SRYKA
+           MOVE    SPA-NAI-SRYYM       TO  RECECOM-SRYYM
+           MOVE    SPA-GMN-HKNCOMBINUM
+                                       TO  RECECOM-HKNCOMBI
+           IF      SPA-GMN-RSI-HKNKBN     =   "3"
+               MOVE    SPA-GMN-JYURRKYMD (SPA-GMN-JYURRKNUM)(7:2)
+                                           TO  RECECOM-SRYDD
+           ELSE
+               MOVE    ZERO                TO  RECECOM-SRYDD
+           END-IF
+           MOVE    SPA-GMN-SJKBN       TO  RECECOM-SJKBN
+      *
+           MOVE    "key14"             TO  WRK-DBPATH
+      *
+           MOVE    RECECOM-REC         TO  MCPDATA-REC
+           MOVE    "tbl_rececom"       TO  MCP-TABLE
+           MOVE    WRK-DBPATH          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_rececom"       TO  MCP-TABLE
+               MOVE    WRK-DBPATH          TO  MCP-PATHNAME
+               PERFORM 920-RECECOM-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-RECECOM
+               INITIALIZE                  RECECOM-REC
+           END-IF
+           MOVE    "tbl_rececom"       TO  MCP-TABLE
+           MOVE    WRK-DBPATH          TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO                TO  WRK-RENNUM-MAX
+           IF     (FLG-RECECOM         =   ZERO )
+               MOVE    RECECOM-RENNUM      TO  WRK-RENNUM-MAX
+               MOVE    ZERO                TO  SPA-NAI-RENNUM
+           END-IF
+      *
+           .
+       21201-RECECOM-CHKSEL-EXT.
            EXIT.
       *****************************************************************
       *    レセプトコメントチェック処理
@@ -4968,7 +5026,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    STRING  "表示されているコメントをすべて登録します。"
                                        DELIMITED  BY  SIZE
       **                   "登録済みのコメントは内容を更新します。"
-                           "登録済みのコメントは連番追加で登録します。"
+                           "登録済みのコメントは連番追加で登録。"
                                        DELIMITED  BY  SIZE
                                        INTO    WRK-C50IDMSG
                    END-STRING
