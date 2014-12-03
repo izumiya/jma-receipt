@@ -56,6 +56,8 @@
        01  FLG-AREA.
            03  FLG-END                                 PIC 9(01).
            03  FLG-JOBKANRI                            PIC S9(03).
+           03  FLG-MONBATCH                            PIC 9(01).
+           03  FLG-LOOPEND                             PIC 9(01).
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
            03  CNT-IN                                  PIC 9(06).
@@ -80,6 +82,7 @@
        01  WRK-JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC"    REPLACING   //JOB-//
                                        BY          //WRK-JOB-//.
+           COPY    "CPSHELLTBL.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -177,6 +180,7 @@ grpsys         SPA-AREA
                WHEN    "ALL"
                        PERFORM 170-DELALL-SEC
                WHEN    "CHK"
+               WHEN    "CH2"
                        PERFORM 150-CHK-SEC
                WHEN    "STP"
                        PERFORM 900-DBCOMMIT-SEC
@@ -460,6 +464,15 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                        TO  JOBKANRI-REC
            END-IF
       *
+           IF    ( SJOBKANRI-MODE  =   "CH2" )
+               PERFORM 910-MONBATCH-SEL-SEC
+               IF    ( FLG-MONBATCH    =   ZERO )
+                   MOVE    ZERO        TO  SJOBKANRI-RETURN
+                   MOVE    SPACE       TO  JOB-ENDYMD
+                                           JOB-ENDTIME
+               END-IF
+           END-IF
+      *
            .
        150-CHK-EXT.
            EXIT.
@@ -691,6 +704,69 @@ grpsys     PERFORM 900-CLOSE-SEC
        910-JOBKANRI-INV2-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    MONBATCH¸¡º÷½èÍý
+      *****************************************************************
+       910-MONBATCH-SEL-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MONBATCH
+      *
+           INITIALIZE                      SHELLTBL
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-HOSPNUM
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               PERFORM 910-MONBATCH-FET-SEC
+           ELSE
+               MOVE    1               TO  FLG-MONBATCH
+           END-IF
+      *
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       910-MONBATCH-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    MONBATCH FETCH½èÍý
+      *****************************************************************
+       910-MONBATCH-FET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MONBATCH
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-MONBATCH    NOT =   ZERO )
+                    OR   ( FLG-LOOPEND     NOT =   ZERO )
+      *
+               MOVE    "shell"         TO  MCP-TABLE
+               MOVE    LOW-VALUE       TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF    ( MCP-RC          =   ZERO )
+      *
+                   MOVE    MCPDATA-REC TO  SHELLTBL
+      *
+                   MOVE    1           TO  FLG-LOOPEND
+      *
+                   IF    ( SHELLTBL-HOSPNUM    =  SPA-HOSPNUM )
+                    AND  ( SHELLTBL-SHELLID    =  JOB-SHELLID )
+                    AND  ( SHELLTBL-JOBID      =  JOB-JOBID )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-LOOPEND
+                   END-IF
+      *
+               ELSE
+                   MOVE    1           TO  FLG-MONBATCH
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       910-MONBATCH-FET-EXT.
+           EXIT.
       *****************************************************************
       *    £Ä£Â£Ó£Å£Ì£Å£Ã£Ô½èÍý
       *****************************************************************

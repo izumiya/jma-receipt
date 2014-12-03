@@ -81,6 +81,9 @@
            03  FLG-INIT            PIC 9(01).
            03  FLG-SJOBKANRI       PIC 9(01).
            03  FLG-SJOBKANRI1      PIC 9(01).
+           03  FLG-RUNNING         PIC 9(01).
+           03  FLG-MONBATCH        PIC 9(01).
+           03  FLG-LOOPEND         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -283,13 +286,17 @@
            EVALUATE    SPA-MMID1CD
                WHEN    "0100"
                    IF      SPA-MMID1-FLG       =   "OK"
-                       MOVE    "0101"      TO  WRK-MIDCD
+                       PERFORM 2011-RUNNING-JOB-CHK-SEC
+                       IF    ( SPA-ERRCD       =   SPACE )
+                           PERFORM 30011-DELETE-SYORI-SEC
+                       END-IF
+      *
+                       IF  ( SPA-ERRCD     NOT =   SPACE )
+                           PERFORM 510-ERRSET-SEC
+                       END-IF
+      *
                    END-IF
-               WHEN    "0101"
-      *            削除処理
-                   IF      SPA-MMID1-FLG       =   "OK"
-                       PERFORM 30011-DELETE-SYORI-SEC
-                   END-IF
+      *
                WHEN    "0102"
       *            削除処理
                    IF      SPA-MMID1-FLG       =   "OK"
@@ -365,7 +372,7 @@
            MOVE    DBKANRI-REC         TO  MCPDATA-REC
            MOVE    "tbl_dbkanri"       TO  MCP-TABLE 
            MOVE    "key"               TO  MCP-PATHNAME 
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_dbkanri"   TO  MCP-TABLE 
                MOVE    "key"           TO  MCP-PATHNAME 
@@ -379,7 +386,7 @@
            END-IF
            MOVE    "tbl_dbkanri"       TO  MCP-TABLE 
            MOVE    "key"               TO  MCP-PATHNAME 
-           PERFORM 990-DBCLOSE-SEC
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
       *    マスタ管理検索処理(医療機関識別番号01の処理)
            INITIALIZE                  MSTKANRI-REC
@@ -387,7 +394,7 @@ grpsys     MOVE    1                   TO  MSTKANRI-HOSPNUM
            MOVE    MSTKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_mstkanri"      TO  MCP-TABLE 
            MOVE    "all"               TO  MCP-PATHNAME 
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_mstkanri"  TO  MCP-TABLE 
                MOVE    "all"           TO  MCP-PATHNAME 
@@ -406,7 +413,7 @@ grpsys     MOVE    1                   TO  MSTKANRI-HOSPNUM
            END-PERFORM
            MOVE    "tbl_mstkanri"      TO  MCP-TABLE 
            MOVE    "all"               TO  MCP-PATHNAME 
-           PERFORM 990-DBCLOSE-SEC
+           PERFORM 910-DBCLOSECURSOR-SEC
       *    マスタ管理検索処理(医療機関識別番号02以降の処理)
            IF      SPA-HOSPNUM         >   1
              INITIALIZE                  MSTKANRI-REC
@@ -414,7 +421,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
              MOVE    MSTKANRI-REC        TO  MCPDATA-REC
              MOVE    "tbl_mstkanri"      TO  MCP-TABLE 
              MOVE    "all"               TO  MCP-PATHNAME 
-             PERFORM 910-DBSELECT-SEC
+             PERFORM 911-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                  MOVE    "tbl_mstkanri"  TO  MCP-TABLE 
                  MOVE    "all"           TO  MCP-PATHNAME 
@@ -433,7 +440,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
              END-PERFORM
              MOVE    "tbl_mstkanri"      TO  MCP-TABLE 
              MOVE    "all"               TO  MCP-PATHNAME 
-             PERFORM 990-DBCLOSE-SEC
+             PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
       *    ＪＯＢ管理検索
@@ -762,6 +769,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    PERFORM 210-BACK
       *        情報削除
                WHEN    "CLICKED"       ALSO    "B02"
+                   PERFORM 211-JYOUKYOU-SEC
                    PERFORM 201-DELETE-SEC
       *        再印刷画面
                WHEN    "CLICKED"       ALSO    "B09"
@@ -776,6 +784,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    PERFORM 211-JYOUKYOU-SEC
       *        更新
                WHEN    "CLICKED"       ALSO    "B12"
+                   PERFORM 211-JYOUKYOU-SEC
                    PERFORM 212-UPDATE-SEC
            END-EVALUATE.
       *
@@ -787,19 +796,113 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *****************************************************************
        201-DELETE-SEC                  SECTION.
       *
-      *    ＪＯＢ管理検索
-           PERFORM 820-JOBKANRI-READ-SEC
-      *
-           IF    ( FLG-SJOBKANRI       =   ZERO )
-            OR   ( FLG-SJOBKANRI1      =   ZERO )
-               MOVE    "0100"              TO  SPA-MMID1CD
-           ELSE
-               MOVE    "0005"              TO  SPA-ERRCD
+           PERFORM 2011-RUNNING-JOB-CHK-SEC
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( FLG-RUNNING     =   ZERO )
+                   MOVE    "0005"      TO  SPA-ERRCD
+               ELSE
+                   MOVE    "0100"      TO  SPA-MMID1CD
+               END-IF
            END-IF
+      *
            .
        201-DELETE-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    実行中ジョブチェック処理
+      *****************************************************************
+       2011-RUNNING-JOB-CHK-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-RUNNING
+      *
+           MOVE    "CH2"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    CONST-MNTJOBID  TO  JOB-JOBID
+           MOVE    CONST-MNTSHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"       USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           IF    ( SJOBKANRI-RETURN    =   ZERO  )
+      *
+               MOVE    2           TO  FLG-RUNNING
+      *
+               IF    ( JOB-PGID            =   "ORCXRMST2" )
+                AND  ( JOB-STEPENDTIME     =   SPACE OR ZERO )
+                   MOVE    "1104"  TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    "CH2"           TO  SJOBKANRI-MODE
+               INITIALIZE                  JOBKANRI-REC
+               MOVE    CONST-MLIJOBID  TO  JOB-JOBID
+               MOVE    CONST-MLISHELLID
+                                       TO  JOB-SHELLID
+               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+               CALL    "ORCSJOB"       USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+               IF    ( SJOBKANRI-RETURN    =   ZERO  )
+      *
+                   MOVE    2           TO  FLG-RUNNING
+      *
+                   IF    ( JOB-PGID        =   "ORCXRMST4" )
+                    AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
+                       MOVE    "1104"  TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       2011-RUNNING-JOB-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    実行中ジョブチェック処理
+      *****************************************************************
+       2012-RUNNING-JOB-CHK-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-RUNNING
+      *
+           MOVE    "CH2"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    CONST-MNTJOBID  TO  JOB-JOBID
+           MOVE    CONST-MNTSHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA
+                                   JOBKANRI-REC
+                                   SPA-AREA
+           IF    ( SJOBKANRI-RETURN    =   ZERO  )
+               IF    ( JOB-ENDYMD      =  SPACE )
+                   MOVE    1       TO  FLG-RUNNING
+               END-IF
+           END-IF
+      *
+           MOVE    "CH2"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    CONST-MLIJOBID  TO  JOB-JOBID
+           MOVE    CONST-MLISHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA
+                                   JOBKANRI-REC
+                                   SPA-AREA
+           IF    ( SJOBKANRI-RETURN    =   ZERO  )
+               IF    ( JOB-ENDYMD      =  SPACE )
+                   MOVE    1       TO  FLG-RUNNING
+               END-IF
+           END-IF
+      *
+           .
+       2012-RUNNING-JOB-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    再印刷画面へ
       *****************************************************************
@@ -882,26 +985,11 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *****************************************************************
        212-UPDATE-SEC             SECTION.
       *
-      *    ＪＯＢ管理検索
-           PERFORM 820-JOBKANRI-READ-SEC
-      *
            MOVE    ZERO                 TO  FLG-ERR
-           IF    ( FLG-SJOBKANRI         =   ZERO )
-               IF    ( JOB-ENDTIME   NOT =   SPACE)
-                 AND ( JOB-ENDYMD    NOT =   SPACE)
-                   CONTINUE
-               ELSE
-                   MOVE    1             TO  FLG-ERR
-               END-IF
-           END-IF
       *
-           IF    ( FLG-SJOBKANRI1        =   ZERO )
-               IF    (  JOB1-ENDTIME NOT =   SPACE )
-                AND  (  JOB1-ENDYMD  NOT =   SPACE )
-                   CONTINUE
-               ELSE
-                   MOVE    1             TO  FLG-ERR
-               END-IF
+           PERFORM 2012-RUNNING-JOB-CHK-SEC
+           IF    ( FLG-RUNNING NOT =   ZERO )
+               MOVE    1                TO  FLG-ERR
            END-IF
       *
            IF    ( FLG-ERR                 =   1 )
@@ -1013,6 +1101,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *    マスタ更新処理
            MOVE    SPACE                TO  SHELLTBL
            MOVE    SHELL-NAME           TO  SHELLTBL-NAME
+           MOVE    SPA-HOSPNUM          TO  SHELLTBL-HOSPNUM
+           MOVE    CONST-MNTJOBID       TO  SHELLTBL-JOBID
+           MOVE    CONST-MNTSHELLID     TO  SHELLTBL-SHELLID
            MOVE    SPA-HOSPNUM          TO  SHELLTBL-ARG1
            MOVE    SPA-SUPERVISOR       TO  SHELLTBL-ARG2
            MOVE    SPA-HOSPID           TO  SHELLTBL-ARG3
@@ -1067,8 +1158,34 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                    JOBKANRI1-REC
                                    SPA-AREA
       *
-           INITIALIZE                  SPA-GMN-TBLG2
-           INITIALIZE                  SPA-GMN-MSG-G
+           PERFORM 900-MONBATCH-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-MONBATCH    NOT =   ZERO )
+                    OR   ( SPA-ERRCD       NOT =   SPACE )
+      *
+               IF    ( SHELLTBL-SHELLID    =   CONST-MNTSHELLID
+                                            OR CONST-MLISHELLID
+                                                                )
+                   MOVE    "shell"         TO  MCP-TABLE
+                   MOVE    LOW-VALUE       TO  MCP-PATHNAME
+                   PERFORM 910-DBDELETE-SEC
+                   IF    ( MCP-RC          NOT =   ZERO )
+                       MOVE    "1103"      TO  SPA-ERRCD
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-MONBATCH-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               INITIALIZE              SPA-GMN-TBLG2
+               INITIALIZE              SPA-GMN-MSG-G
+           END-IF
       *
            .
        30011-DELETE-SYORI-EXT.
@@ -1079,27 +1196,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        210-BACK                    SECTION.
       *
-           PERFORM 820-JOBKANRI-READ-SEC
+           PERFORM 2012-RUNNING-JOB-CHK-SEC
+           IF    ( FLG-RUNNING NOT =   ZERO )
+               MOVE    "0301"  TO  SPA-MMID1CD
+           END-IF
       *
-           MOVE    SPACE                TO  SPA-MMID1CD
-           IF    ( FLG-SJOBKANRI        =   ZERO )
-               IF    ( JOB-ENDTIME  NOT =   SPACE )
-                AND  ( JOB-ENDYMD   NOT =   SPACE )
-                   CONTINUE
-               ELSE
-      *            マスタ更新中
-                   MOVE    "0301"              TO  SPA-MMID1CD
-               END-IF
-           END-IF
-           IF    ( FLG-SJOBKANRI1       =   ZERO )
-               IF    ( JOB1-ENDTIME NOT =   SPACE )
-                AND  ( JOB1-ENDYMD  NOT =   SPACE )
-                   CONTINUE
-               ELSE
-      *            マスタ更新中
-                   MOVE    "0301"              TO  SPA-MMID1CD
-               END-IF
-           END-IF
            IF      SPA-MMID1CD         =   SPACE
                PERFORM 2001-BACK-SYORI-SEC
            END-IF
@@ -1294,6 +1395,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    "0005"
                     MOVE    "ＪＯＢ管理情報は、ありません"
                                                 TO  SPA-ERRMSG
+               WHEN     "1103"
+               WHEN     "1104"
+                   MOVE    "削除不可な処理実行中です。削除できません"
+                                                TO  SPA-ERRMSG
                 WHEN    "0501"
                     MOVE    "プログラム更新が実行中です。"
                                                 TO  SPA-ERRMSG
@@ -1332,10 +1437,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EVALUATE    SPA-MMID1CD
                WHEN    "0100"
                    MOVE
-                   "更新処理の動作中は情報削除を行わないでください"
-                                       TO  MMID1-ID1MSG
-               WHEN    "0101"
-                   MOVE
                    "ＪＯＢ管理情報を削除します。よろしいですか？"
                                        TO  MMID1-ID1MSG
                WHEN    "0102"
@@ -1357,7 +1458,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "B12"               TO  MCP-WIDGET
            EVALUATE    SPA-MMID1CD
                WHEN    "0100"
-               WHEN    "0101"
                    MOVE    "B01"               TO  MCP-WIDGET
            END-EVALUATE
       *
@@ -1516,9 +1616,81 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
+      *    MONBATCH検索処理
+      *****************************************************************
+       900-MONBATCH-SEL-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MONBATCH
+      *
+           INITIALIZE                      SHELLTBL
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-HOSPNUM
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME
+           PERFORM 911-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               PERFORM 900-MONBATCH-FET-SEC
+           ELSE
+               MOVE    1               TO  FLG-MONBATCH
+           END-IF
+      *
+           .
+       900-MONBATCH-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    MONBATCH FETCH処理
+      *****************************************************************
+       900-MONBATCH-FET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MONBATCH
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-MONBATCH    NOT =   ZERO )
+                    OR   ( FLG-LOOPEND     NOT =   ZERO )
+      *
+               MOVE    "shell"         TO  MCP-TABLE
+               MOVE    LOW-VALUE       TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC          =   ZERO )
+      *
+                   MOVE    MCPDATA-REC TO  SHELLTBL
+      *
+                   MOVE    1           TO  FLG-LOOPEND
+      *
+                   IF    ( SHELLTBL-HOSPNUM    NOT =  SPA-HOSPNUM )
+                       MOVE    ZERO    TO  FLG-LOOPEND
+                   END-IF
+      *
+               ELSE
+                   MOVE    1           TO  FLG-MONBATCH
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       900-MONBATCH-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＳＥＬＥＣＴ処理
+      *****************************************************************
+       910-DBSELECT-SEC               SECTION.
+      *
+           MOVE    "DBSELECT"          TO      MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
       *    テーブル検索処理
       *****************************************************************
-       910-DBSELECT-SEC                SECTION.
+       911-DBSELECT-SEC                SECTION.
       *
            MOVE    ZERO            TO  MCP-RC
       *
@@ -1528,13 +1700,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
       *
            .
-       910-DBSELECT-EXT.
+       911-DBSELECT-EXT.
            EXIT.
       *
       *****************************************************************
+      *    ＤＢＦＥＴＣＨ処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
       *    ＤＢクロース処理
       *****************************************************************
-       990-DBCLOSE-SEC           SECTION.
+       910-DBCLOSECURSOR-SEC           SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
@@ -1542,9 +1728,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
       *
            .
-       990-DBCLOSE-EXT.
+       910-DBCLOSECURSOR-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    ＤＢＤＥＬＥＴＥ処理
+      *****************************************************************
+       910-DBDELETE-SEC                SECTION.
+      *
+           MOVE    "DBDELETE"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
+           EXIT.
       *****************************************************************
       *    ＰＵＴ　処理
       *****************************************************************
