@@ -53,6 +53,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    12/01/13  ·òÊÝÁÈ¹ç¤Ø¤ÎÄ¾ÀÜÀÁµá¤È¿³ºº
       *                                     »ÙÊ§µ¡´ØÀÁµáÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    14/12/03  Ê¿À®£²£¶Ç¯£±£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -196,6 +197,9 @@
            03  WRK-MOJI12.
                05  FILLER121           PIC X(50)   VALUE
                    "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
+           03  WRK-MOJI13.
+               05  FILLER              PIC X(50)   VALUE
+               "¡Ú°åÌôÉÊ°åÎÅµ¡´ïÅùË¡¤Ëµ¬Äê¤¹¤ë¼£¸³¤Ë·¸¤ë¼£¸³³µÍ×¡Û".
       *
        01  CONST-AREA.
            03  CONST-H2004             PIC X(06)   VALUE    "200804".
@@ -530,8 +534,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        TO  HCM37-NAIYO(CNT-LINE)
       *----(03.04.02)--ADD-START---
                            WHEN    "50"
-                               MOVE    WRK-MOJI9
-                                       TO  HCM37-NAIYO(CNT-LINE)
+                               IF      RECE10-SRYYM    <   201412
+                                   MOVE    WRK-MOJI9
+                                           TO  HCM37-NAIYO(CNT-LINE)
+                               ELSE
+                                   MOVE    WRK-MOJI13
+                                           TO  HCM37-NAIYO(CNT-LINE)
+                               END-IF
                            WHEN    "51"
                                MOVE    WRK-MOJI10
                                        TO  HCM37-NAIYO(CNT-LINE)
