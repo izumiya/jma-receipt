@@ -64,6 +64,7 @@
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
       *  04.07.02    NACL-門脇    12/10/12  保険別請求チェック表（標準帳票）
       *                                     の機能追加対応
+      *  04.07.03    NACL-藤原    14/12/03  平成２６年１１月改正対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -450,8 +451,10 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(52)   VALUE
                "【廃用症候群に係る評価表】".
+           03  FILLER              PIC X(52)   VALUE
+               "【医薬品医療機器等法に規定する治験に係る治験概要】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   11.
       *
       *    疑い編集
        01  WRK-UTAGAI-AREA.
@@ -2067,8 +2070,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                TO  WRK-RECECOM-NAME
                    WHEN    "50"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
-                       MOVE    TBL-RECECOM-NAME (8)
-                                               TO  WRK-RECECOM-NAME
+                       IF      RECE100-SRYYM   <   201412
+                           MOVE    TBL-RECECOM-NAME (8)
+                                                   TO  WRK-RECECOM-NAME
+                       ELSE
+                           MOVE    TBL-RECECOM-NAME (11)
+                                                   TO  WRK-RECECOM-NAME
+                       END-IF
                    WHEN    "51"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (9)

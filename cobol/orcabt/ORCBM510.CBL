@@ -53,6 +53,7 @@
       *
       *  04.07.01    NACL-藤原    12/01/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.02    NACL-藤原    14/12/03  平成２６年１１月改正対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -192,6 +193,9 @@
            03  WRK-MOJI12.
                05  FILLER121           PIC X(50)   VALUE
                    "【上記以外の診療報酬明細書】".
+           03  WRK-MOJI13.
+               05  FILLER              PIC X(50)   VALUE
+               "【医薬品医療機器等法に規定する治験に係る治験概要】".
       *
        01  CONST-AREA.
            03  CONST-H2004             PIC X(06)   VALUE    "200804".
@@ -535,8 +539,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        TO  HCM37-NAIYO(CNT-LINE)
       *----(03.04.02)--ADD-START---
                            WHEN    "50"
-                               MOVE    WRK-MOJI9
-                                       TO  HCM37-NAIYO(CNT-LINE)
+                               IF      RECE10-SRYYM    <   201412
+                                   MOVE    WRK-MOJI9
+                                           TO  HCM37-NAIYO(CNT-LINE)
+                               ELSE
+                                   MOVE    WRK-MOJI13
+                                           TO  HCM37-NAIYO(CNT-LINE)
+                               END-IF
                            WHEN    "51"
                                MOVE    WRK-MOJI10
                                        TO  HCM37-NAIYO(CNT-LINE)
