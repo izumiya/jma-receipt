@@ -1226,3 +1226,23 @@ path	key59 {
 	};
 };
 
+path	key60	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key60_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+                        AND   SRYYMD      <=  :SRYYMD
+                        AND   EDANUM      =    1
+			ORDER   BY        SRYYMD  DESC,
+                                          DENPNUM,
+			                  RENNUM,
+			                  DOUJI_RENNUM,
+			                  EDANUM
+		;
+	};
+};
+
+
