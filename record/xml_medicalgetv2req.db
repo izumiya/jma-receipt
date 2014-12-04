@@ -6,6 +6,7 @@ xml_medicalgetv2req {
 	medicalgetreq {
 		Patient_ID		varchar(20);
     		Perform_Date		varchar(10);
+		For_Months		varchar(2);
 		Medical_Information  {
 		Department_Code		varchar(2);
 		Sequential_Number		varchar(1);

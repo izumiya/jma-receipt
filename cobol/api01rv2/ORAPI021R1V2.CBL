@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *
       * 04.08.00     NACL-多々納  13/12/XX  診療行為剤点数情報対応
+      * 04.07.00     NACL-多々納  14/12/XX  診療月数対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -98,6 +99,7 @@
            03  IDX-D               PIC 9(02).
       *
            03  TBL-MAX             PIC 9(04).
+           03  IDX-MAX             PIC 9(04).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -160,6 +162,13 @@
            03  WRK-ZAITEN              PIC S9(07).
            03  WRK-SUM-TENSU           PIC 9(07).
            03  WRK-SUM-KINGAKU         PIC 9(07).
+      *H26.12
+      *    月数
+           03  WRK-TUKICNT             PIC 9(02).
+           03  WRK-END-SRYYM.
+               05  WRK-END-SRYYY           PIC 9(04).
+               05  WRK-END-SRYMM           PIC 9(02).
+           03  WRK-SRYYMD              PIC X(08).
       *
       *    数値変換用
            03  WRK-SURYO               PIC S9(08)V9(05).
@@ -885,6 +894,7 @@
       *    診療科コードチェック
            IF     (WRK-SRYKA       NOT =   SPACE  )
            AND    (WRK-ERRCD           =   SPACE  )
+               MOVE    SPA-SYSYMD          TO  WRK-SRYYMD
                PERFORM 20011-SRYKA-CHK-SEC
            END-IF
       *
@@ -1002,8 +1012,10 @@
            INITIALIZE                  SYS-1005-REC
            MOVE    "1005"              TO  SYS-1005-KANRICD
            MOVE    WRK-SRYKA           TO  SYS-1005-KBNCD
-           MOVE    SPA-SYSYMD          TO  SYS-1005-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-1005-EDYUKYMD
+      **** MOVE    SPA-SYSYMD          TO  SYS-1005-STYUKYMD
+      **** MOVE    SPA-SYSYMD          TO  SYS-1005-EDYUKYMD
+           MOVE    WRK-SRYYMD          TO  SYS-1005-STYUKYMD
+           MOVE    WRK-SRYYMD          TO  SYS-1005-EDYUKYMD
            MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
       *    システム管理検索
            MOVE    SYS-1005-REC        TO  SYSKANRI-REC
@@ -1026,21 +1038,63 @@
       *
       *    患者情報内容編集
            PERFORM 20021-MDC01RES-HEN-SEC
+      *
+      *H26.12
+      *    診療月数チェック
+           PERFORM 20023-TUKICNT-CHK-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      2002-SYORI-01-EXT
+           END-IF
       *!
       *    外来とする
            MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
-      *    受診歴を検索する  医療機関、患者ＩＤ
-           INITIALIZE                  JYURRK-REC
-           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
-           MOVE    SPA-PTID            TO  JYURRK-PTID
-           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
-           MOVE    WRK-PERFORM-YM      TO  JYURRK-SRYYMD(1:6)
-           MOVE    "01"                TO  JYURRK-SRYYMD(7:2)
-           MOVE    WRK-PERFORM-YM      TO  JYURRK-UPSRYYMD(1:6)
-           MOVE    "31"                TO  JYURRK-UPSRYYMD(7:2)
+      *H26.12
+      *    検索終了診療年月
+           MOVE    ZERO                TO  WRK-END-SRYYM
+           IF      WRK-TUKICNT         >   ZERO
+               MOVE    WRK-PERFORM-YM      TO  WRK-END-SRYYM
+               IF      WRK-END-SRYMM       <=  WRK-TUKICNT
+                   COMPUTE WRK-END-SRYYY       =   WRK-END-SRYYY
+                                               -   1
+                   COMPUTE WRK-END-SRYMM       =  (WRK-END-SRYMM
+                                               +   12 )
+                                               -   WRK-TUKICNT
+               ELSE
+                   COMPUTE WRK-END-SRYMM       =   WRK-END-SRYMM
+                                               -   WRK-TUKICNT
+               END-IF
+               IF      WRK-TUKICNT         =   99
+                   MOVE    ZERO            TO  WRK-END-SRYYM
+               END-IF
+           END-IF
       *
-           MOVE    "key14"             TO  WRK-MCP-PATHNAME
+      *    受診歴を検索する  医療機関、患者ＩＤ
+      *H26.12
+           IF      WRK-TUKICNT         =   ZERO
+      *        月数指定なし（昇順）
+               INITIALIZE                  JYURRK-REC
+               MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+               MOVE    SPA-PTID            TO  JYURRK-PTID
+               MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+               MOVE    WRK-PERFORM-YM      TO  JYURRK-SRYYMD(1:6)
+               MOVE    "01"                TO  JYURRK-SRYYMD(7:2)
+               MOVE    WRK-PERFORM-YM      TO  JYURRK-UPSRYYMD(1:6)
+               MOVE    "31"                TO  JYURRK-UPSRYYMD(7:2)
+      *
+               MOVE    "key14"             TO  WRK-MCP-PATHNAME
+      *
+           ELSE
+      *        月数指定あり（降順）
+               INITIALIZE                  JYURRK-REC
+               MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+               MOVE    SPA-PTID            TO  JYURRK-PTID
+               MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+               MOVE    WRK-PERFORM-YM      TO  JYURRK-SRYYMD(1:6)
+               MOVE    "31"                TO  JYURRK-SRYYMD(7:2)
+      *
+               MOVE    "key60"             TO  WRK-MCP-PATHNAME
+           END-IF
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -1055,11 +1109,20 @@
                MOVE    1               TO  FLG-JYURRK
            END-IF
       *
+           MOVE    ZERO                TO  IDX-MAX
            MOVE    ZERO                TO  TBL-MAX
            INITIALIZE                      TBL-JYURRK-AREA
            PERFORM
                UNTIL   (FLG-JYURRK         =   1    )  OR
                        (WRK-ERRCD      NOT =   SPACE)
+      *H26.12
+               IF      WRK-TUKICNT         >   ZERO
+                   IF      JYURRK-SRYYMD(1:6)  <=  WRK-END-SRYYM
+                       MOVE    1               TO  FLG-JYURRK
+                   END-IF
+               END-IF
+      *
+               IF      FLG-JYURRK          =   ZERO
       *
                MOVE    ZERO            TO  FLG-ARI
       *        診療日、連番で１行とする
@@ -1078,11 +1141,12 @@
                END-PERFORM
       *
                IF      FLG-ARI             =   ZERO
-                   ADD     1               TO  TBL-MAX
-                   IF      TBL-MAX         >   150
+                   ADD     1               TO  IDX-MAX
+                   IF      IDX-MAX         >   150
                        MOVE    "14"            TO  WRK-ERRCD
                    ELSE
       *                明細項目退避
+                       ADD     1               TO  TBL-MAX
                        MOVE    JYURRK-SRYYMD   TO  TBL-RRK-SRYYMD
                                                              (TBL-MAX)
                        MOVE    JYURRK-SRYKA    TO  TBL-RRK-SRYKA
@@ -1101,6 +1165,9 @@
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
+      *
+               END-IF
+      *
            END-PERFORM
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
@@ -1136,6 +1203,36 @@
            EXIT.
       *
       *****************************************************************
+      *    診療月数チェック処理
+      *****************************************************************
+       20023-TUKICNT-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  WRK-TUKICNT
+           IF      MDCREQ-FOR-MONTHS   NOT =   SPACE
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    MDCREQ-FOR-MONTHS   TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+                      (SNUM-MINKBN     NOT =   SPACE )   OR
+                      (SNUM-SYOKBN     NOT =   SPACE )
+                   MOVE    "16"                TO  WRK-ERRCD
+               ELSE
+                   MOVE    SNUM-OUTNUM         TO  WRK-TUKICNT
+               END-IF
+           END-IF
+      *
+           IF     (WRK-TUKICNT         >=  0  AND  <=  12 )
+              OR  (WRK-TUKICNT         =   99      )
+               CONTINUE
+           ELSE
+               MOVE    "16"                TO  WRK-ERRCD
+           END-IF
+           .
+       20023-TUKICNT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    受診履歴内容編集処理
       *****************************************************************
        20021-XMLHENSYU-SEC        SECTION.
@@ -1147,6 +1244,8 @@
                PERFORM 801-DAYHEN01-SEC
                MOVE    WRK-HEN-DATE        TO  MDC01RES-PERFORM-DATE
                                                                  (IDX)
+      *
+               MOVE    TBL-RRK-SRYYMD (IDX)    TO  WRK-SRYYMD
       *        診療科
                MOVE    TBL-RRK-SRYKA (IDX) TO  MDC01RES-DEP-CODE
                                                                 (IDX)
@@ -3202,6 +3301,9 @@
                                                TO  WRK-ERRMSG
            WHEN    "15"
                MOVE    "対象がありません"
+                                               TO  WRK-ERRMSG
+           WHEN    "16"
+               MOVE    "月数は０〜１２、９９を設定して下さい。"
                                                TO  WRK-ERRMSG
            WHEN    "20"
      ******    MOVE    "保険組合せがありません"
