@@ -187,6 +187,7 @@
       *  04.07.06    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.07    NACL-藤原    14/03/30  平成２６年４月改正対応
       *  04.07.08    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.09    NACL-藤原    14/12/05  平成２７年１月改正対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -490,6 +491,7 @@
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -520,8 +522,8 @@
                05  FILLER              PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
-      *********05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
                05  FILLER              PIC X(03)   VALUE   "014".  
                05  FILLER              PIC X(03)   VALUE   "018".  
@@ -551,13 +553,45 @@
                05  FILLER              PIC X(03)   VALUE   "012".
                05  FILLER              PIC X(03)   VALUE   "972".
                05  FILLER              PIC X(03)   VALUE   "974".
+               05  FILLER              PIC X(03)   VALUE   SPACE.
+      *
+               05  FILLER              PIC X(03)   VALUE   "013".  
+               05  FILLER              PIC X(03)   VALUE   "014".  
+               05  FILLER              PIC X(03)   VALUE   "018".  
+               05  FILLER              PIC X(03)   VALUE   "029".  
+               05  FILLER              PIC X(03)   VALUE   "030".  
+               05  FILLER              PIC X(03)   VALUE   "010".  
+               05  FILLER              PIC X(03)   VALUE   "011".  
+               05  FILLER              PIC X(03)   VALUE   "020".  
+               05  FILLER              PIC X(03)   VALUE   "021".  
+               05  FILLER              PIC X(03)   VALUE   "015".  
+               05  FILLER              PIC X(03)   VALUE   "016".  
+               05  FILLER              PIC X(03)   VALUE   "024".  
+               05  FILLER              PIC X(03)   VALUE   "022".  
+               05  FILLER              PIC X(03)   VALUE   "028".  
+               05  FILLER              PIC X(03)   VALUE   "017".  
+               05  FILLER              PIC X(03)   VALUE   "079".  
+               05  FILLER              PIC X(03)   VALUE   "019".  
+               05  FILLER              PIC X(03)   VALUE   "023".  
+               05  FILLER              PIC X(03)   VALUE   "052".  
+               05  FILLER              PIC X(03)   VALUE   "054".  
+               05  FILLER              PIC X(03)   VALUE   "051".  
+               05  FILLER              PIC X(03)   VALUE   "091".  
+               05  FILLER              PIC X(03)   VALUE   "038".  
+               05  FILLER              PIC X(03)   VALUE   "053".  
+               05  FILLER              PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "062".  
+               05  FILLER              PIC X(03)   VALUE   "025".  
+               05  FILLER              PIC X(03)   VALUE   "012".
+               05  FILLER              PIC X(03)   VALUE   "972".
+               05  FILLER              PIC X(03)   VALUE   "974".
       *
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
-               05  WRK-SRT-OCC         OCCURS  3.
+               05  WRK-SRT-OCC         OCCURS  4.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  29.
+                                       PIC X(03)   OCCURS  30.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   29.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   30.
       *     
       *    ワーク保険組合せ（入院会計用） 
        01  WRK-HKNCOMBI-TABLE.
@@ -590,6 +624,8 @@
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
       *
            03  WRK-CONS-SRYYM-201004   PIC 9(06)   VALUE   201004.      
+      *
+           03  WRK-CONS-SRYYM-201501   PIC 9(06)   VALUE   201501.     
       *     
       * 
        01  WRK-RECE61-REC. 
@@ -3083,7 +3119,11 @@
                IF      WRK-RECE61-SRYYM    <   WRK-CONS-SRYYM-200804
                    MOVE    2                   TO  IDXX
                ELSE
-                   MOVE    3                   TO  IDXX
+                   IF      WRK-RECE61-SRYYM    <   WRK-CONS-SRYYM-201501
+                       MOVE    3                   TO  IDXX
+                   ELSE
+                       MOVE    4                   TO  IDXX
+                   END-IF
                END-IF
            END-IF
            PERFORM VARYING IDX FROM    1   BY  1
