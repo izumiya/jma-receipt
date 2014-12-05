@@ -723,6 +723,8 @@
                    END-IF
       *
                    IF    ( QDTCHK-TENKIKBN =   "8" )
+                    AND  ( QDTCHK-TENKIYMD (1:6)
+                                          <=   SDTCHK06-KJNYMD (1:6))
                        MOVE    ZERO        TO  FLG-LOOP-END
                    END-IF
       *
