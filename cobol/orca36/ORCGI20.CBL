@@ -755,7 +755,7 @@
            MOVE    SPACE           TO  SYS-KEY
            MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
            MOVE    "1005"          TO  SYS-1005-KANRICD
-                                       SYS-1005-STYUKYMD
+           MOVE    SPA-SYSYMD      TO  SYS-1005-STYUKYMD
                                        SYS-1005-EDYUKYMD
       *    システム管理検索
            MOVE    SYS-1005-REC    TO  MCPDATA-REC
