@@ -1337,7 +1337,7 @@
       *****************************************************************
        3101-TOKKIINFO-CMB-SYOKI-SEC        SECTION.
       *
-           MOVE    23              TO  SPA-GMN-Q01-TOKKIINFOLST-MAX
+           MOVE    34              TO  SPA-GMN-Q01-TOKKIINFOLST-MAX
       *
            MOVE    "01"            TO  SPA-GMN-Q01-TOKKIINFOL    (01)
            MOVE    "¸ø"            TO  SPA-GMN-Q01-TOKKIINFOMEIL (01)
@@ -1407,6 +1407,39 @@
       *
            MOVE    "25"            TO  SPA-GMN-Q01-TOKKIINFOL    (23)
            MOVE    "½Ð»º"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (23)
+      *
+           MOVE    "26"            TO  SPA-GMN-Q01-TOKKIINFOL    (24)
+           MOVE    "¶è¥¢"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (24)
+      *
+           MOVE    "27"            TO  SPA-GMN-Q01-TOKKIINFOL    (25)
+           MOVE    "¶è¥¤"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (25)
+      *
+           MOVE    "28"            TO  SPA-GMN-Q01-TOKKIINFOL    (26)
+           MOVE    "¶è¥¦"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (26)
+      *
+           MOVE    "29"            TO  SPA-GMN-Q01-TOKKIINFOL    (27)
+           MOVE    "¶è¥¨"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (27)
+      *
+           MOVE    "30"            TO  SPA-GMN-Q01-TOKKIINFOL    (28)
+           MOVE    "¶è¥ª"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (28)
+      *
+           MOVE    "31"            TO  SPA-GMN-Q01-TOKKIINFOL    (29)
+           MOVE    "Â¿¥¢"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (29)
+      *
+           MOVE    "32"            TO  SPA-GMN-Q01-TOKKIINFOL    (30)
+           MOVE    "Â¿¥¤"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (30)
+      *
+           MOVE    "33"            TO  SPA-GMN-Q01-TOKKIINFOL    (31)
+           MOVE    "Â¿¥¦"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (31)
+      *
+           MOVE    "34"            TO  SPA-GMN-Q01-TOKKIINFOL    (32)
+           MOVE    "Â¿¥¨"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (32)
+      *
+           MOVE    "35"            TO  SPA-GMN-Q01-TOKKIINFOL    (33)
+           MOVE    "Â¿¥ª"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (33)
+      *
+           MOVE    "36"            TO  SPA-GMN-Q01-TOKKIINFOL    (34)
+           MOVE    "²Ã¼£"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (34)
       *
            .
        3101-TOKKIINFO-CMB-SYOKI-EXT.

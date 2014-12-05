@@ -620,6 +620,7 @@
       *
        01  CONST-AREA.
            03  CONST-H2710             PIC X(08)   VALUE "999999".
+           03  CONST-H2612             PIC X(08)   VALUE "201412".
            03  CONST-H2604             PIC X(08)   VALUE "201404".
            03  CONST-H190401           PIC X(08)   VALUE "20070401".
            03  CONST-H141001           PIC X(08)   VALUE "20021001".
@@ -697,8 +698,10 @@
                "¡Ú¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡Ë¥ì¥»¥×¥ÈÅ¦Í×Íó¥³¥á¥ó¥È¡Û".
                05  FILLER                       PIC X(52)   VALUE
                "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
+               05  FILLER                       PIC X(52)   VALUE
+               "¡Ú°åÌôÉÊ°åÎÅµ¡´ïÅùË¡¤Ëµ¬Äê¤¹¤ë¼£¸³¤Ë·¸¤ë¼£¸³³µÍ×¡Û".
            03  CONST-RECECOM-R     REDEFINES   CONST-RECECOM-VAL.
-               05  CONST-RECECOM   PIC X(52)   OCCURS   14.
+               05  CONST-RECECOM   PIC X(52)   OCCURS   15.
       *    ÌôºÞÎÁÄþ¸º
            03  CONST-TEIGEN                PIC X(09)   VALUE
                "630010002".
@@ -5941,8 +5944,13 @@
                            MOVE    CONST-RECECOM  (WRK-SJKBN)
                                                TO  WRK-LONGSTR
                        WHEN    "50"
-                           MOVE    CONST-RECECOM (8)
+                           IF    ( ORCHCM34-SRYYM >=   CONST-H2612 )
+                               MOVE    CONST-RECECOM (15)
                                                TO  WRK-LONGSTR
+                           ELSE
+                               MOVE    CONST-RECECOM (8)
+                                               TO  WRK-LONGSTR
+                           END-IF
                        WHEN    "51"
                            MOVE    CONST-RECECOM (9)
                                                TO  WRK-LONGSTR
