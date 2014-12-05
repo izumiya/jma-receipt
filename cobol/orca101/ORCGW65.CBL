@@ -2638,8 +2638,36 @@
            INTO                        SPA-GMN-NINNASIKBNMEIL (5)
            END-STRING
       *
+           MOVE  "5"               TO  SPA-GMN-NINNASIKBNL    (6)
+           STRING      "区分（エ）の月上限額超の額を患者負担に加算"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-NINNASIKBNMEIL (6)
+           END-STRING
       *
-           MOVE    5               TO  SPA-GMN-NINNASIKBN-MAX
+           MOVE  "6"               TO  SPA-GMN-NINNASIKBNL    (7)
+           STRING      "区分（エ）の月上限額超の額を患者負担に加算"
+                                       DELIMITED BY SIZE
+                       "（高額４回目適用）"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-NINNASIKBNMEIL (7)
+           END-STRING
+      *
+           MOVE  "7"               TO  SPA-GMN-NINNASIKBNL    (8)
+           STRING      "区分（エ・オ）の月上限額超の額を患者負担に加算"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-NINNASIKBNMEIL (8)
+           END-STRING
+      *
+           MOVE  "8"               TO  SPA-GMN-NINNASIKBNL    (9)
+           STRING      "区分（エ・オ）の月上限額超の額を患者負担に加算"
+                                       DELIMITED BY SIZE
+                       "（高額４回目適用）"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-NINNASIKBNMEIL (9)
+           END-STRING
+      *
+      *
+           MOVE    9               TO  SPA-GMN-NINNASIKBN-MAX
       *
            .
        3110-NINNASIKBNLST-EXT.
@@ -10285,18 +10313,18 @@
                 AND  ( SPA-GMN-KOHNUM  =   "145" OR "245"
                                         OR "146" OR "246"
                                         OR "143" OR "243" )
-                   MOVE    "4"         TO  SPA-GMN-NINNASIKBN
+                   MOVE    "8"         TO  SPA-GMN-NINNASIKBN
                    MOVE    "1"         TO  SPA-GMN-NINNASITAIKBN
                END-EVALUATE
       *
-               EVALUATE    TRUE
-               WHEN  ( SPA-PREFNUM     =   CONST-GUNMA )
-                AND  ( SPA-GMN-KOHNUM  =   "145" OR "245"
-                                        OR "146" OR "246"
-                                        OR "143" OR "243" )
-                   MOVE    "2"         TO  SPA-GMN-NINJYOKBN
-                   MOVE    "1"         TO  SPA-GMN-NINJYOTAIKBN
-               END-EVALUATE
+      *        EVALUATE    TRUE
+      *        WHEN  ( SPA-PREFNUM     =   CONST-GUNMA )
+      *         AND  ( SPA-GMN-KOHNUM  =   "145" OR "245"
+      *                                 OR "146" OR "246"
+      *                                 OR "143" OR "243" )
+      *            MOVE    "2"         TO  SPA-GMN-NINJYOKBN
+      *            MOVE    "1"         TO  SPA-GMN-NINJYOTAIKBN
+      *        END-EVALUATE
       *
            .
        42012-COMBO-SET-DEFAULT-ETXT.
