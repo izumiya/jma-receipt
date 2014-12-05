@@ -8,6 +8,7 @@ begin
   require "monthly/receden_error"
   require "date"
   require "json"
+  require "nkf"
 
 rescue LoadError => err
     STDERR.puts "#{err.class}\n#{err.message}\n#{err.backtrace.join("\n")}"
