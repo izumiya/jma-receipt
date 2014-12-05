@@ -3374,11 +3374,6 @@
       *
            MOVE    1               TO  FLG-TAISYO-SRY
       *
-           DISPLAY "DCSRY-SRYCD [" DCSRY-SRYCD "]"
-                   "DCACCT-SRYKBN[" DCACCT-SRYKBN "]"
-                   "DCACCT-ZAITEN[" DCACCT-ZAITEN "]"
-                   "DCACCT-MINUS[" DCACCT-MINUS "]"
-      *
       *    薬剤の場合、院外処方の処理対象チェックを行う
            EVALUATE    TRUE
            WHEN  ( DCSRY-SRYSYUKBN     =   "213" OR "223" OR "233" )
@@ -6279,6 +6274,8 @@
       *
       *    転帰に移行が設定されていないか
            IF    ( PTBYO-TENKIKBN  =   "8" )
+            AND  ( PTBYO-TENKIYMD (1:6) 
+                                  <=   ORCBSD01-SRYYM )
                    MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
            END-IF
       *
