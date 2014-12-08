@@ -201,6 +201,7 @@
       *  04.07.16    NACL-ÌçÏÆ    14/07/10  ¡Ê´¶À÷¾É¡ÜÀ¸ÊÝ¡ÜÀ¸ÊÝ¡Ë¥ì¥»¥×¥È
       *                                     ¤ÎÅÀ¿ôÍóµ­ºÜ½¤Àµ
       *  04.07.17    NACL-Æ£¸¶    14/12/03  Ê¿À®£²£¶Ç¯£±£±·î²þÀµÂÐ±þ
+      *  04.07.18    NACL-ÌçÏÆ    14/12/05  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -911,15 +912,37 @@
            03  FILLER          PIC X(10)   VALUE   "£²£´Â¿Äã".
            03  FILLER          PIC X(02)   VALUE   "25".
            03  FILLER          PIC X(10)   VALUE   "£²£µ½Ð»º".
+           03  FILLER          PIC X(02)   VALUE   "26".
+           03  FILLER          PIC X(10)   VALUE   "£²£¶¶è¥¢".
+           03  FILLER          PIC X(02)   VALUE   "27".
+           03  FILLER          PIC X(10)   VALUE   "£²£·¶è¥¤".
+           03  FILLER          PIC X(02)   VALUE   "28".
+           03  FILLER          PIC X(10)   VALUE   "£²£¸¶è¥¦".
+           03  FILLER          PIC X(02)   VALUE   "29".
+           03  FILLER          PIC X(10)   VALUE   "£²£¹¶è¥¨".
+           03  FILLER          PIC X(02)   VALUE   "30".
+           03  FILLER          PIC X(10)   VALUE   "£³£°¶è¥ª".
+           03  FILLER          PIC X(02)   VALUE   "31".
+           03  FILLER          PIC X(10)   VALUE   "£³£±Â¿¥¢".
+           03  FILLER          PIC X(02)   VALUE   "32".
+           03  FILLER          PIC X(10)   VALUE   "£³£²Â¿¥¤".
+           03  FILLER          PIC X(02)   VALUE   "33".
+           03  FILLER          PIC X(10)   VALUE   "£³£³Â¿¥¦".
+           03  FILLER          PIC X(02)   VALUE   "34".
+           03  FILLER          PIC X(10)   VALUE   "£³£´Â¿¥¨".
+           03  FILLER          PIC X(02)   VALUE   "35".
+           03  FILLER          PIC X(10)   VALUE   "£³£µÂ¿¥ª".
+           03  FILLER          PIC X(02)   VALUE   "36".
+           03  FILLER          PIC X(10)   VALUE   "£³£¶²Ã¼£".
            03  FILLER          PIC X(02)   VALUE   "96".
            03  FILLER          PIC X(10)   VALUE   "£¹£¶".
            03  FILLER          PIC X(02)   VALUE   "97".
            03  FILLER          PIC X(10)   VALUE   "£¹£·".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   25.
+           03  TBL-TOKKI       OCCURS   36.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   25.
+       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   36.
       *
       *   ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê
        01  TBL-RECECOM-AREA.

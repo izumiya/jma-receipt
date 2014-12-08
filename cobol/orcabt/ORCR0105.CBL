@@ -199,6 +199,7 @@
       *  04.07.18    NACL-ÌçÏÆ    14/07/10  ¡Ê´¶À÷¾É¡ÜÀ¸ÊÝ¡ÜÀ¸ÊÝ¡Ë¥ì¥»¥×¥È
       *                                     ¤ÎÅÀ¿ôÍóµ­ºÜ½¤Àµ
       *  04.07.19    NACL-Æ£¸¶    14/12/03  Ê¿À®£²£¶Ç¯£±£±·î²þÀµÂÐ±þ
+      *  04.07.20    NACL-ÌçÏÆ    14/12/05  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -880,15 +881,27 @@
            03  FILLER          PIC X(10)   VALUE   "£²£±¹âÈ¾".
            03  FILLER          PIC X(02)   VALUE   "25".
            03  FILLER          PIC X(10)   VALUE   "£²£µ½Ð»º".
+           03  FILLER          PIC X(02)   VALUE   "26".
+           03  FILLER          PIC X(10)   VALUE   "£²£¶¶è¥¢".
+           03  FILLER          PIC X(02)   VALUE   "27".
+           03  FILLER          PIC X(10)   VALUE   "£²£·¶è¥¤".
+           03  FILLER          PIC X(02)   VALUE   "28".
+           03  FILLER          PIC X(10)   VALUE   "£²£¸¶è¥¦".
+           03  FILLER          PIC X(02)   VALUE   "29".
+           03  FILLER          PIC X(10)   VALUE   "£²£¹¶è¥¨".
+           03  FILLER          PIC X(02)   VALUE   "30".
+           03  FILLER          PIC X(10)   VALUE   "£³£°¶è¥ª".
+           03  FILLER          PIC X(02)   VALUE   "36".
+           03  FILLER          PIC X(10)   VALUE   "£³£¶²Ã¼£".
            03  FILLER          PIC X(02)   VALUE   "96".
            03  FILLER          PIC X(10)   VALUE   "£¹£¶".
            03  FILLER          PIC X(02)   VALUE   "97".
            03  FILLER          PIC X(10)   VALUE   "£¹£·".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   22.
+           03  TBL-TOKKI       OCCURS   28.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   22.
+       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   28.
       *
       *   ¾É¾õ¾Üµ­¶èÊ¬¤ÎÉ½Âê
        01  TBL-RECECOM-AREA.
