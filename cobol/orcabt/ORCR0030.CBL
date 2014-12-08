@@ -9910,7 +9910,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE   10    TO      FLG-TOKKI
                   PERFORM   21045-TOKKI-HENSYU-SEC
                END-IF
-               IF      SRY-SRYCD(IDX2)  =  "820000171"
+               IF     (RECE02-SRYYM    >=  "201411"   )
+               AND    (SRY-SRYCD(IDX2)  =  "820000171")
                   MOVE   17    TO      FLG-TOKKI
                   PERFORM   21045-TOKKI-HENSYU-SEC
                END-IF
