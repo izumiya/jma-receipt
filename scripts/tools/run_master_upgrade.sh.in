@@ -84,7 +84,13 @@ for hospnum in ${HNLIST} ; do
     exit 105
   fi
 
-  master_upgrade.sh "${HOSPNUM}" "T" "${HOSPID}" "${MNTERRFS}" "0000001" "MSTMNT" "${MLIERRFS}" "0000001" "MSTMLI"
+export MON_BATCH_ID=$(uuidgen)
+export MON_BATCH_NAME="master_upgrade.sh"
+export MON_BATCH_GROUPNAME="${HOSPNUM}"
+export MON_BATCH_EXTRA="0000001MSTMNT"
+export MCP_TENANT=1
+
+  /usr/lib/panda/bin/monbatch  -dir ${LDDIRECTORY} "master_upgrade.sh \"${HOSPNUM}\" T \"${HOSPID}\" \"${MNTERRFS}\" 0000001 MSTMNT \"${MLIERRFS}\" 0000001 MSTMLI"
   MSTMNT=$?
   delete_tempdir 
   if [ ${MSTMNT} -ne 0 ] ; then
