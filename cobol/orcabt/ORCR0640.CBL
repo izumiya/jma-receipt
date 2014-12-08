@@ -6954,7 +6954,8 @@
                   MOVE   10    TO      FLG-TOKKI
                   PERFORM   21013-TOKKI-HENSYU-SEC
                END-IF
-               IF   SRY-SRYCD(IDX2)  =  "820000171"
+               IF  (RECE62-SRYYM    >=  "201411"   )
+               AND (SRY-SRYCD(IDX2)  =  "820000171")
                   MOVE   17    TO      FLG-TOKKI
                   PERFORM   21013-TOKKI-HENSYU-SEC
                END-IF
