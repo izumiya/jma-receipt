@@ -180,6 +180,7 @@
       *  04.07.14    NACL-藤原    14/01/30  労災の光ディスク等送付書作成
       *                                     対応
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.16    NACL-藤原    14/12/05  入力チェックの修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3176,6 +3177,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                MOVE    SPA-GMN-DATAKBNLST (4)
                                            TO  SPA-GMN-DATAKBN-G
            ELSE
+               MOVE    SPACE               TO   SPA-GMN-DATAKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-DATAKBN-MAX
                    IF        SPA-GMN-DATAKBN
@@ -3218,6 +3220,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                MOVE    SPA-GMN-NYUGAIKBNLST (1)
                                            TO  SPA-GMN-NYUGAIKBN-G
            ELSE
+               MOVE    SPACE               TO  SPA-GMN-NYUGAIKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-NYUGAIKBN-MAX
                    IF        SPA-GMN-NYUGAIKBN
@@ -3246,7 +3249,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                MOVE    SPA-GMN-PRTKBNLST (1)
                                            TO  SPA-GMN-PRTKBN-G
            ELSE
-                PERFORM VARYING IDX FROM    1   BY  1
+               MOVE    SPACE               TO  SPA-GMN-PRTKBNMEI
+               PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-PRTKBN-MAX
                    IF        SPA-GMN-PRTKBN
                                    =   SPA-GMN-PRTKBNL (IDX)
@@ -3331,7 +3335,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
            IF      SPA-GMN-RECEDEN-CHK =   SPACE
                MOVE    SPACE               TO  SPA-GMN-RECEDEN-CHK-G
            ELSE
-                PERFORM VARYING IDX FROM    1   BY  1
+               MOVE    SPACE               TO  SPA-GMN-RECEDEN-CHKMEI
+               PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-RECEDEN-CHK-MAX
                    IF        SPA-GMN-RECEDEN-CHK
                                    =   SPA-GMN-RECEDEN-CHKL (IDX)

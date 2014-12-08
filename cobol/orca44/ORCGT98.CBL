@@ -42,6 +42,7 @@
       *  04.07.03    NACL-藤原    13/11/01  労災レセ電データチェック機能
       *                                     対応
       *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.05    NACL-藤原    14/12/05  入力チェックの修正
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -417,6 +418,7 @@
            IF      SPA-GMN-T98-DATAKBN =   SPACE
                MOVE    SPACE               TO  SPA-GMN-T98-DATAKBN-G
            ELSE
+               MOVE    SPACE               TO   SPA-GMN-T98-DATAKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-T98-DATAKBN-MAX
                    IF        SPA-GMN-T98-DATAKBN
@@ -457,6 +459,7 @@
                MOVE    SPA-GMN-T98-PRTKBNLST (1)
                                            TO  SPA-GMN-T98-PRTKBN-G
            ELSE
+               MOVE    SPACE               TO   SPA-GMN-T98-PRTKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-T98-PRTKBN-MAX
                    IF        SPA-GMN-T98-PRTKBN
