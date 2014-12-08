@@ -42,6 +42,7 @@
       *  04.07.03    NACL-藤原    13/11/01  労災レセ電データチェック機能
       *                                     対応
       *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.05    NACL-藤原    14/12/05  入力チェックの修正
       *
       *  04.08.01    NACL-藤原    14/08/26  fdd 廃止に伴う対応
       *  04.08.02    NACL-藤原    14/08/28  ４．８ミドル対応
@@ -432,6 +433,7 @@
                                                TO  SPA-GMN-T98-DATAKBN-G
                END-IF
            ELSE
+               MOVE    SPACE               TO   SPA-GMN-T98-DATAKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-T98-DATAKBN-MAX
                    IF        SPA-GMN-T98-DATAKBN
@@ -444,20 +446,20 @@
                END-PERFORM
            END-IF
       *
-           IF      SPA-GMN-T98-DATAKBNMEI  =   SPACE
-               IF      SPA-GMN-T06-TEISYUTUSAKI4
-                                       =   "T"
-                   MOVE    SPA-GMN-T98-DATAKBNLST (1)
-                                           TO  SPA-GMN-T98-DATAKBN-G
-               ELSE
-                   MOVE    SPA-GMN-T98-DATAKBNLST (4)
-                                           TO  SPA-GMN-T98-DATAKBN-G
-               END-IF
-           END-IF
-      *
-           IF      SPA-T01-PRTKBN      =   "6" OR  "7"
-               MOVE    SPA-GMN-T98-DATAKBNLST (4)
-                                           TO  SPA-GMN-T98-DATAKBN-G
+           IF    ( SPA-GMN-T98-DATAKBNMEI
+                                       =   SPACE       )
+           OR    ( SPA-T01-PRTKBN      =   "6" OR  "7" )
+               MOVE    "4"                 TO  SPA-GMN-T98-DATAKBN
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       SPA-GMN-T98-DATAKBN-MAX
+                   IF        SPA-GMN-T98-DATAKBN
+                                   =   SPA-GMN-T98-DATAKBNL (IDX)
+                       MOVE    SPA-GMN-T98-DATAKBNMEIL (IDX)
+                                           TO  SPA-GMN-T98-DATAKBNMEI
+                       MOVE    SPA-GMN-T98-DATAKBN-MAX
+                                           TO  IDX
+                   END-IF
+               END-PERFORM
            END-IF
            .
        41021-DATAKBN-CHK-EXT.
@@ -472,6 +474,7 @@
                MOVE    SPA-GMN-T98-PRTKBNLST (1)
                                            TO  SPA-GMN-T98-PRTKBN-G
            ELSE
+               MOVE    SPACE               TO   SPA-GMN-T98-PRTKBNMEI
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-T98-PRTKBN-MAX
                    IF        SPA-GMN-T98-PRTKBN
