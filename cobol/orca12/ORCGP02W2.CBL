@@ -126,6 +126,8 @@
       *  04.07.06    NACL-門脇    14/08/08  特定負有と特定負有の保険組合せ作成
       *  04.07.07    NACL-門脇    14/10/07  011結核入院と地方公費の
       *                                     保険組合せ作成
+      *  04.07.08    NACL-門脇    14/11/04  平成２７年１月改正対応
+      *                                     （０５４対応）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3894,6 +3896,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       ***                                      "51463032"
                                IF  WRK-SRT-HJO-KOHNO  =
                                    "021" OR "015" OR "051" OR "091"
+                                         OR "054"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
       ***                    END-IF
@@ -4221,28 +4224,28 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  IF (( WRK-KCOMB-KOH1HKNNUM(IDX2)  = 
                        "010" OR "011" OR "015" OR "016" OR "019" OR
                        "020" OR "021" OR "024" OR "038" OR "051" OR
-                       "052" OR "079" OR "091"                     ) OR
+                       "052" OR "079" OR "091" OR "054"            ) OR
                      ((WRK-KCOMB-KOH1HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH1HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH1HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH2HKNNUM(IDX2)  =
                        "010" OR "011" OR "015" OR "016" OR "019" OR
                        "020" OR "021" OR "024" OR "038" OR "051" OR
-                       "052" OR "079" OR "091"                     ) OR
+                       "052" OR "079" OR "091" OR "054"            ) OR
                      ((WRK-KCOMB-KOH2HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH2HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH2HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH3HKNNUM(IDX2)  =
                        "010" OR "011" OR "015" OR "016" OR "019" OR
                        "020" OR "021" OR "024" OR "038" OR "051" OR
-                       "052" OR "079" OR "091"                     ) OR
+                       "052" OR "079" OR "091" OR "054"            ) OR
                      ((WRK-KCOMB-KOH3HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH3HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH3HKNNUM(IDX2)(1:2)  =  "99"    )) OR
                     (( WRK-KCOMB-KOH4HKNNUM(IDX2)  =
                        "010" OR "011" OR "015" OR "016" OR "019" OR
                        "020" OR "021" OR "024" OR "038" OR "051" OR
-                       "052" OR "079" OR "091"                     ) OR
+                       "052" OR "079" OR "091" OR "054"            ) OR
                      ((WRK-KCOMB-KOH4HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH4HKNNUM(IDX2) <=  "899")       ) OR
                      ( WRK-KCOMB-KOH4HKNNUM(IDX2)(1:2)  =  "99"    ))   
@@ -4251,25 +4254,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                         "027" AND "010" AND "011" AND "015" AND
                         "016" AND "019" AND "020" AND "021" AND
                         "024" AND "038" AND "051" AND "052" AND
-                        "079" AND "091"                         ) AND
+                        "079" AND "091" AND "054"               ) AND
                        (WRK-KCOMB-KOH1HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH2HKNNUM(IDX2)  NOT =
                         "027" AND "010" AND "011" AND "015" AND
                         "016" AND "019" AND "020" AND "021" AND
                         "024" AND "038" AND "051" AND "052" AND
-                        "079" AND "091"                         ) AND
+                        "079" AND "091" AND "054"               ) AND
                        (WRK-KCOMB-KOH2HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH3HKNNUM(IDX2)  NOT =
                         "027" AND "010" AND "011" AND "015" AND
                         "016" AND "019" AND "020" AND "021" AND
                         "024" AND "038" AND "051" AND "052" AND
-                        "079" AND "091"                         ) AND
+                        "079" AND "091" AND "054"               ) AND
                        (WRK-KCOMB-KOH3HKNNUM(IDX2)(1:1) =  "0"  ))  OR
                       ((WRK-KCOMB-KOH4HKNNUM(IDX2)  NOT =
                         "027" AND "010" AND "011" AND "015" AND
                         "016" AND "019" AND "020" AND "021" AND
                         "024" AND "038" AND "051" AND "052" AND
-                        "079" AND "091"                         ) AND
+                        "079" AND "091" AND "054"               ) AND
                        (WRK-KCOMB-KOH4HKNNUM(IDX2)(1:1) =  "0"  ))
                      CONTINUE
                    ELSE

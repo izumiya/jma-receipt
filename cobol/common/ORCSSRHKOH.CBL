@@ -30,6 +30,8 @@
       *  03.05.00    NACL-ÂÀÅÄ    07/05/28  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.05.01    NACL-ÌçÏÆ    10/01/07  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.01    NACL-ÌçÏÆ    14/11/04  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡Ê£°£µ£´¡¢£°£µ£²ÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -56,6 +58,7 @@
            03  FLG-KOHNUM-G.
                05  FLG-KOH051          PIC 9(01).
                05  FLG-KOH052          PIC 9(01).
+               05  FLG-KOH054          PIC 9(01).
                05  FLG-KOH091          PIC 9(01).
                05  FLG-KOH151          PIC 9(01).
                05  FLG-KOH152          PIC 9(01).
@@ -301,6 +304,7 @@
            IF    ( KEY-HKNNUM      =   COMB-HKNNUM )
             AND  (     FLG-KOH051  =   1
                     OR FLG-KOH052  =   1
+                    OR FLG-KOH054  =   1
                     OR FLG-KOH091  =   1
                     OR FLG-KOH151  =   1
                     OR FLG-KOH152  =   1           )
@@ -313,19 +317,38 @@
                     AND  ( KEY-HKNJANUM    =   PTHKN-HKNJANUM )
                        EVALUATE    TRUE
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
-                                           =   "051" OR "052"
-                                            OR "091" OR "151"
-                                            OR "152"          )
+                                           =   "051" OR "091" )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
                                            =   "601" OR "602" )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
-                                           =   "51" OR "52"   )
+                                           =   "51"           )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "151"          )
+                        AND  ( SYS-1001-PREFNUM   =  13       )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
+                                           =   "601" OR "602" )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "51"           )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "054"          )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
+                                           =   "601" OR "501" )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "54"           )
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
                                            =   "052"          )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
                                            =   "60"           )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
                                            =   "52"           )
+                        AND  ( SSRHKOH-SRYYM    <=   "201412" )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "052"          )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
+                                           =   "80" OR "70"   )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "52"           )
+                        AND  ( SSRHKOH-SRYYM    >=   "201501" )
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
                                            =   "152"          )
                         AND  ( SYS-1001-PREFNUM   =  23 OR 24 )
@@ -333,6 +356,15 @@
                                            =   "60"           )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
                                            =   "52"           )
+                        AND  ( SSRHKOH-SRYYM    <=   "201412" )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "152"          )
+                        AND  ( SYS-1001-PREFNUM   =  23 OR 24 )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
+                                           =   "80" OR "70"   )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "52"           )
+                        AND  ( SSRHKOH-SRYYM    >=   "201501" )
                            IF    ( KEY-HKNNUM  =   "060" OR "039" )
                             OR   ( AGECHK-NENREI   >=    70 )
                                MOVE    1       TO  SSRHKOH-RC
@@ -388,6 +420,10 @@
                END-IF
                IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "052" )
                    MOVE    1       TO  FLG-KOH052
+               END-IF
+               IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "054"    )
+                AND  ( SSRHKOH-SRYYM              >=   "201501" )
+                   MOVE    1       TO  FLG-KOH054
                END-IF
                IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "091" )
                    MOVE    1       TO  FLG-KOH091
