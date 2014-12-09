@@ -4465,9 +4465,12 @@
                     (RECE62-SRYYM   >  "201903")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE62-SRYYM   <  "200901"              ))
-               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
-                                    "22" OR "23" OR "24"     ) AND
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "22"     ) AND
                    ( RECE62-SRYYM   <  "200905"              ))
+               OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                                    "23" OR "24"             ) AND
+                   ((RECE62-SRYYM   <  "200905") OR
+                    (RECE62-SRYYM   >  "201412")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
                    ( RECE62-SRYYM   <  "200910"              ))
                  CONTINUE
@@ -10219,9 +10222,15 @@
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
              WHEN      "22"
+               IF  (RECE62-SRYYM   <   "200905")
+                   GO  TO  21013-TOKKI-HENSYU-EXT
+               END-IF
              WHEN      "23"
              WHEN      "24"
-               IF  (RECE62-SRYYM   <   "200905")
+               IF  (RECE62-SRYYM   >=  "200905")
+               AND (RECE62-SRYYM   <=  "201412")
+                   CONTINUE
+               ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
                END-IF
              WHEN      "25"
