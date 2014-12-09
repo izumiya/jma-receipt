@@ -431,6 +431,7 @@
       *  04.07.19    NACL-ÌçÏÆ    14/11/04  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê£°£µ£´¡¢£°£µ£²ÂÐ±þ¡Ë
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÂÐ±þ¡Ë
+      *  04.07.20    NACL-ÌçÏÆ    14/12/09  ÅìµþÅÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13729,8 +13730,7 @@
                              AND (COMB-KOH2ID  =  WRK-COMB-KOH2ID)
                              AND (WK-HKNJANUM3-TBL
                                                =  WK-HKNJANUM-TBL)
-                              IF  (WK-1001-PREFNUM    =  13           )
-                              AND (LNK-SYU-KOH1HKNNUM = "182" OR "382")
+                              IF WK-2010-KINJYOKBN-G(1) = "1"
                                ADD   WK-RUI-TAIHI-HKNFTNMONEY
                                                 TO  WK-RUI-FTN1-M
                                ADD   WK-RUI-TAIHI-COMPFTN
@@ -18986,9 +18986,8 @@
                 OR ((LNK-SYU-KOH-HKNNUM(1) = "054"      ) AND
                     (LNK-SYU-SRYYMD(1:6)  >= "201501"   ))
                 OR ( WK-TOKATUKAI(1)       =   1         )
-                OR ((WK-1001-PREFNUM       =  13        ) AND
-                    (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                          OR "382"      ))
+                OR ( WK-2010-KINJYOKBN-G(1)
+                                           =  "1"        )
                    MOVE    1    TO   FLG-RUIKEIYO
                 END-IF
            END-IF
@@ -23085,9 +23084,8 @@
       *
            IF  (KOH-IDX               =  2   )
            AND (WK-RUI-TAISYO         =  1   )
-           AND (WK-1001-PREFNUM       =  13  )
-           AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                     OR "382")
+           AND (WK-2010-KINJYOKBN-G(1)
+                                      = "1"  )
            AND (WK-GAIKFTNRATE    NOT =  ZERO)
            AND (COMB-KOH-GAIJGNKBN(2) = "1"  )
              MOVE       1    TO   FLG-MARUTOARI
@@ -23188,8 +23186,7 @@
                ADD  WK-RUI-FTN1-M4-JI        TO  WK-RUI-COMPFTN-ENTANI2
               END-IF
            ELSE
-            IF  (WK-1001-PREFNUM    =  13           )
-            AND (LNK-SYU-KOH1HKNNUM = "182" OR "382")
+            IF   WK-2010-KINJYOKBN-G(1) = "1"
                ADD  WK-RUI-FTN1-M            TO  WK-RUI-HKNFTNMONEY
                ADD  WK-RUI-FTN1-M2           TO  WK-RUI-COMPFTN
                ADD  WK-RUI-FTN1-M3           TO  WK-RUI-COMPFTN-ENTANI
@@ -23397,9 +23394,8 @@
       *
                IF  (KOH-IDX               =  2   )
                AND (WK-RUI-TAISYO         =  1   )
-               AND (WK-1001-PREFNUM       =  13  )
-               AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                         OR "382")
+               AND (WK-2010-KINJYOKBN-G(1)
+                                          = "1"  )
                AND (FLG-MARUTOARI         =  1   )
                AND (FLG-MARUTOARI2        =  1   )
                  IF  HKN-RECEFTNDSPKBN  =  "2"
@@ -23472,9 +23468,8 @@
                AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                 IF  (KOH-IDX               =  2   )
                 AND (WK-RUI-TAISYO         =  1   )
-                AND (WK-1001-PREFNUM       =  13  )
-                AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                          OR "382")
+                AND (WK-2010-KINJYOKBN-G(1)
+                                           = "1"  )
                 AND (FLG-MARUTOARI         =  1   )
                  CONTINUE
                 ELSE
@@ -23517,9 +23512,8 @@
                  AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                   IF  (KOH-IDX               =  2   )
                   AND (WK-RUI-TAISYO         =  1   )
-                  AND (WK-1001-PREFNUM       =  13  )
-                  AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                            OR "382")
+                  AND (WK-2010-KINJYOKBN-G(1)
+                                             = "1"  )
                   AND (FLG-MARUTOARI         =  1   )
                    CONTINUE
                   ELSE
@@ -23547,9 +23541,8 @@
       *
                IF  (KOH-IDX               =  2   )
                AND (WK-RUI-TAISYO         =  1   )
-               AND (WK-1001-PREFNUM       =  13  )
-               AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                         OR "382")
+               AND (WK-2010-KINJYOKBN-G(1)
+                                          = "1"  )
                AND (FLG-MARUTOARI         =  1   )
                AND (FLG-MARUTOARI2        =  1   )
                  IF  HKN-RECEFTNDSPKBN  =  "2"
@@ -23583,9 +23576,8 @@
                AND (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                 IF  (KOH-IDX               =  2   )
                 AND (WK-RUI-TAISYO         =  1   )
-                AND (WK-1001-PREFNUM       =  13  )
-                AND (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                          OR "382")
+                AND (WK-2010-KINJYOKBN-G(1)
+                                           = "1"  )
                 AND (FLG-MARUTOARI         =  1   )
                  CONTINUE
                 ELSE
@@ -26522,9 +26514,8 @@
                  IF ((LNK-SYU-SRYYMD(1:6)   >= "200804"      ) AND
                      (LNK-SYU-KOH2HKNNUM     = "972" OR "974"))
                  OR ((WK-RUI-TAISYO         =  1   ) AND
-                     (WK-1001-PREFNUM       =  13  ) AND
-                     (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                           OR "382") AND
+                     (WK-2010-KINJYOKBN-G(1)
+                                            = "1"  ) AND
                      (FLG-MARUTOARI         =  1   ))
                    CONTINUE
                  ELSE
@@ -26580,9 +26571,8 @@
                  IF ((LNK-SYU-SRYYMD(1:6)   >= "200804"      ) AND
                      (LNK-SYU-KOH2HKNNUM     = "972" OR "974"))
                  OR ((WK-RUI-TAISYO         =  1   ) AND
-                     (WK-1001-PREFNUM       =  13  ) AND
-                     (LNK-SYU-KOH-HKNNUM(1) = "182"
-                                           OR "382") AND
+                     (WK-2010-KINJYOKBN-G(1)
+                                            = "1"  ) AND
                      (FLG-MARUTOARI         =  1   ))
                    CONTINUE
                  ELSE
@@ -27513,9 +27503,8 @@
                END-IF
            END-IF
       *
-           IF  (WK-1001-PREFNUM       =  13           )
-           AND (LNK-SYU-KOH-HKNNUM(1) = "182" OR "382")
-           AND (FLG-MARUTOARI         =  1            )
+           IF  (WK-2010-KINJYOKBN-G(1) = "1")
+           AND (FLG-MARUTOARI          =  1 )
              CONTINUE
            ELSE
              IF   COMB-KOH1HKNNUM        NOT   =   "027" 
@@ -27559,9 +27548,8 @@
                END-IF
            END-IF
       *
-           IF  (WK-1001-PREFNUM       =  13           )
-           AND (LNK-SYU-KOH-HKNNUM(1) = "182" OR "382")
-           AND (FLG-MARUTOARI         =  1            )
+           IF  (WK-2010-KINJYOKBN-G(1) = "1")
+           AND (FLG-MARUTOARI          =  1 )
              CONTINUE
            ELSE
              IF   COMB-KOH1HKNNUM        NOT   =   "027" 
@@ -27631,9 +27619,8 @@
                END-IF
            END-IF
       *
-           IF  (WK-1001-PREFNUM       =  13           )
-           AND (LNK-SYU-KOH-HKNNUM(1) = "182" OR "382")
-           AND (FLG-MARUTOARI         =  1            )
+           IF  (WK-2010-KINJYOKBN-G(1) = "1")
+           AND (FLG-MARUTOARI          =  1 )
              CONTINUE
            ELSE
              IF   COMB-KOH1HKNNUM        NOT   =   "027" 
@@ -27689,9 +27676,8 @@
                END-IF
            END-IF
       *
-           IF  (WK-1001-PREFNUM       =  13           )
-           AND (LNK-SYU-KOH-HKNNUM(1) = "182" OR "382")
-           AND (FLG-MARUTOARI         =  1            )
+           IF  (WK-2010-KINJYOKBN-G(1) = "1")
+           AND (FLG-MARUTOARI          =  1 )
              CONTINUE
            ELSE
              IF   COMB-KOH1HKNNUM        NOT   =   "027" 
