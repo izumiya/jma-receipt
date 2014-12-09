@@ -69,7 +69,9 @@
       *  04.07.02    NACL-門脇    14/02/13  労災・自賠責の施術加算対応
       *  04.07.03    NACL-門脇    14/03/01  労災マスタ追加対応
       *  04.07.04    NACL-門脇    14/07/31  第三者行為の現物給付対応
-      *  04.07.00    NACL-多々納  14/09/02  マイナス剤点数判定対応
+      *  04.07.05    NACL-多々納  14/09/02  マイナス剤点数判定対応
+      *  04.07.06    NACL-門脇    14/12/09  平成２７年１月改正対応
+      *                                     （初再診料・低妥結率対応）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -226,11 +228,12 @@
            03  FILLER          PIC X(09)   VALUE    "113003710".
            03  FILLER          PIC X(09)   VALUE    "099110001".
            03  FILLER          PIC X(09)   VALUE    "111012510".
+           03  FILLER          PIC X(09)   VALUE    "111012710".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    8.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    9.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     8.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     9.
       *
       *****************************************************************
       *    ファイルレイアウト
