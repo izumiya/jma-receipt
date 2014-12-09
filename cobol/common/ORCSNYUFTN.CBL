@@ -163,6 +163,8 @@
       *  04.07.11    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *  04.07.12    NACL-門脇    14/09/16  包括診療分のみの場合も仮収納
       *                                     データを作成する
+      *  04.07.13    NACL-門脇    14/12/09  平成２７年１月改正対応
+      *                                     （初再診料・低妥結率対応）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -544,11 +546,13 @@
            03  FILLER          PIC X(09)   VALUE    "099110001".
       *    初診料（紹介状なし）
            03  FILLER          PIC X(09)   VALUE    "111012510".
+      *    初診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE    "111012710".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    6.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    7.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     6.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     7.
       *
       *    初診料算定フラグ用テーブル（福岡用）
        01  TBL-SYOSIN2-AREA.
@@ -566,11 +570,13 @@
            03  FILLER          PIC X(09)   VALUE    "111012510".
       *    初診料（同一日２科目：紹介状なし）
            03  FILLER          PIC X(09)   VALUE    "111012610".
+      *    初診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE    "111012710".
       *
        01  TBL-SYOSIN2-R       REDEFINES   TBL-SYOSIN2-AREA.
-           03  TBL-SYOSIN2     PIC X(09)   OCCURS    7.
+           03  TBL-SYOSIN2     PIC X(09)   OCCURS    8.
       *
-       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     7.
+       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     8.
       *
       *    福岡県公費の給付対象外判定用の初診退避テーブル
        01  TBL-FUKUOKA.
