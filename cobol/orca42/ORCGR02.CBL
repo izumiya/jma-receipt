@@ -147,6 +147,7 @@
       *  04.07.06    NACL-藤原    13/07/24  入力順指定時の画面表示の修正
       *  04.07.07    NACL-藤原    14/06/10  ターミナルデジットのときは
       *                                     特別療養費等の処理はしない
+      *  04.07.08    NACL-藤原    14/11/19  診療科の初期表示
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -1414,6 +1415,25 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"    OR  "13"
                MOVE    SPACE               TO  SPA-GMN-SYUKA-G
+           ELSE
+               IF      SPA-GMN-PRTJYUN     =  "11"
+                   MOVE    SPA-GMN-SYUKALST (1) TO  SPA-GMN-SYUKA-G
+               ELSE
+                   IF    ( SPA-R01-RECE07-SRYKA
+                                           =   "00" )
+                   AND   ( SPA-R01-RECE07-SRYKA-KOKUHO
+                                           =   "00" )
+                   AND   ( SPA-R01-RECE07-SRYKA-KOUIKI
+                                           =   "00" )
+                       MOVE    SPACE           TO  SPA-GMN-SYUKA-G
+                   ELSE
+                       IF    ( SPA-GMN-SYUKA-MAX   >   ZERO )
+                       AND   ( SPA-GMN-SYUKA   NOT =   "00" )
+                           MOVE    SPA-GMN-SYUKALST (1)
+                                                   TO  SPA-GMN-SYUKA-G
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
       *    出力先プリンタ名割り当て情報編集
@@ -4322,6 +4342,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            ELSE
                                MOVE    SPACE       TO  SPA-GMN-SYUKA-G
                            END-IF 
+                           MOVE    SPACE       TO  SPA-GMN-SYUKA-G
                        ELSE
                            IF    ( SPA-GMN-SYUKA-MAX   >   ZERO )
                            AND   ( SPA-GMN-SYUKA   NOT =   "00" )
