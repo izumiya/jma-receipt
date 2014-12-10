@@ -602,16 +602,13 @@
            03  RSIJBI-IDX1                         PIC 9(05).
            03  RSIJBI-IDX2                         PIC 9(05).
            03  RSIJBI-MAX                          PIC 9(05).
-           03  RSIJBI-COM-MAX                      PIC S9(05).
-           03  RSIJBI-TEN-MAX                      PIC S9(05).
-           03  RSIJBI-KIN-MAX                      PIC S9(05).
+           03  RSIJBI-COM-IDX                      PIC S9(05).
+           03  RSIJBI-TEN-IDX                      PIC S9(05).
+           03  RSIJBI-KIN-IDX                      PIC S9(05).
            03  RSIJBI-TEN                          PIC 9(08).
            03  RSIJBI-KINGAKU                      PIC 9(08).
            03  RSIJBI-ZAIKAISU                     PIC 9(07).
-           03  RSIJBI-OCC                          OCCURS  21.
-               05  RSIJBI-KEY.
-                   07  RSIJBI-TEN-FLG              PIC 9(1).
-                   07  RSIJBI-GRP-CNT              PIC 9(3).
+           03  RSIJBI-OCC                          OCCURS  20.
                05  RSIJBI-SRYCD                    PIC X(09).
                05  RSIJBI-INPUTNUM                 PIC 9(3).
                05  RSIJBI-NAME                     PIC X(200).
@@ -4039,28 +4036,18 @@
                                                            (RSIJBI-MAX)
            MOVE    TNS-NAME                TO  RSIJBI-NAME (RSIJBI-MAX)
       *
-           IF    ( TNS-SRYCD (1:3)     =   "101" )
+           EVALUATE    TRUE
+           WHEN  ( TNS-SRYCD (1:3)     =   "101" )
             AND  ( TNS-TENSIKIBETU     =   1 )
                COMPUTE RSIJBI-KINGAKU  =   RSIJBI-KINGAKU + TNS-TEN
                COMPUTE RSIJBI-TEN      =   RSIJBI-TEN - ( TNS-TEN / 10 )
-      *
-               COMPUTE RSIJBI-KIN-MAX  =   RSIJBI-KIN-MAX  +   1
-      *
-               MOVE    ZERO            TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
-               MOVE    RSIJBI-KIN-MAX  TO  RSIJBI-GRP-CNT  (RSIJBI-MAX)
-           ELSE
-      *
-               IF   (( TNS-SRYCD   (1:1)       =   "8"  )
-                 OR  ( TNS-SRYCD   (1:3)       =   "008"  ))
-                AND  ( SRY-INPUTNUM(IDX9)  NOT =   ZERO )
-                   COMPUTE RSIJBI-COM-MAX
-                       =   RSIJBI-COM-MAX  +   1
-               END-IF
-      *
-               MOVE    1               TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
-               COMPUTE RSIJBI-TEN-MAX  =   RSIJBI-TEN-MAX  +   1
-               MOVE    RSIJBI-TEN-MAX  TO  RSIJBI-GRP-CNT  (RSIJBI-MAX)
-           END-IF
+               MOVE    RSIJBI-MAX      TO  RSIJBI-KIN-IDX
+           WHEN  (( TNS-SRYCD   (1:1)  =   "8"  )
+              OR  ( TNS-SRYCD   (1:3)  =   "008"  ))
+               CONTINUE
+           WHEN    OTHER
+               MOVE    RSIJBI-MAX      TO  RSIJBI-TEN-IDX
+           END-EVALUATE
       *
            .
        200111-RSIJBI-HEN-EXT.
@@ -4070,33 +4057,15 @@
       *****************************************************************
        200111-RSIJBI-SRYACT-HEN-SEC    SECTION.
       *
-           IF    ( RSIJBI-KIN-MAX      >   ZERO )
-            AND  ( RSIJBI-COM-MAX      >   ZERO )
-            AND  ( RSIJBI-COM-MAX      =   RSIJBI-TEN-MAX )
-               PERFORM VARYING IDX19   FROM    1   BY  1
-                       UNTIL ( IDX19   >   RSIJBI-MAX )
-                   MOVE    ZERO        TO  RSIJBI-TEN-FLG  (RSIJBI-MAX)
-                   MOVE    IDX19       TO  RSIJBI-KIN-MAX
-                                           RSIJBI-GRP-CNT  (RSIJBI-MAX)
-               END-PERFORM
+           IF    ( RSIJBI-TEN-IDX      >  ZERO )
+               MOVE    RSIJBI-MAX      TO  RSIJBI-TEN-IDX
+           ELSE
+               IF    ( RSIJBI-KIN-IDX  >  ZERO )
+                   MOVE    RSIJBI-MAX  TO  RSIJBI-KIN-IDX
+               ELSE
+                   MOVE    RSIJBI-MAX  TO  RSIJBI-TEN-IDX
+               END-IF
            END-IF
-      *
-      *    Ï«ºÒ¼«ÇåÊÔ½¸ÎÎ°è¤ò¥½¡¼¥È
-           PERFORM VARYING RSIJBI-IDX1    FROM    2   BY  1
-                   UNTIL ( RSIJBI-IDX1    >   RSIJBI-MAX )
-               COMPUTE RSIJBI-STIDX   =   RSIJBI-IDX1    -   1
-               MOVE    RSIJBI-OCC (RSIJBI-IDX1)
-                                   TO  RSIJBI-OCC (21)
-               PERFORM VARYING RSIJBI-IDX2 FROM    RSIJBI-STIDX   BY  -1
-                       UNTIL ( RSIJBI-IDX2    <   1 )
-                          OR ( RSIJBI-KEY (21)
-                                       >=  RSIJBI-KEY (RSIJBI-IDX2) )
-                       MOVE    RSIJBI-OCC (RSIJBI-IDX2)
-                                   TO  RSIJBI-OCC (RSIJBI-IDX2 + 1)
-               END-PERFORM
-               MOVE    RSIJBI-OCC (21)
-                                   TO  RSIJBI-OCC (RSIJBI-IDX2 + 1)
-           END-PERFORM
       *
            PERFORM VARYING IDX19   FROM    1   BY  1
                    UNTIL ( IDX19   >   RSIJBI-MAX )
@@ -4133,35 +4102,29 @@
                    PERFORM 210-WRK-SRYACT-TBL-HEN-SEC
       *
                ELSE
-      *
                    MOVE    RSIJBI-NAME (IDX19)     TO  WRK-SRYACT-STR
                    PERFORM 210-WRK-SRYACT-TBL-HEN-SEC
-      *
-                   IF    ( RSIJBI-TEN-FLG (IDX19)  =   ZERO )
-                       IF    ( RSIJBI-KIN-MAX  =   RSIJBI-GRP-CNT
-                                                             (IDX19))
-                           MOVE    RSIJBI-KINGAKU  TO  WRK-ZAITEN
-                           MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
-                           PERFORM 205-KINGAKUKAISU-HEN-SEC
-                       END-IF
-                   ELSE
-                       IF    ( RSIJBI-TEN-MAX  =   RSIJBI-GRP-CNT
-                                                             (IDX19))
-                           MOVE    RSIJBI-TEN      TO  WRK-ZAITEN
-                           MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
-                           IF    ( WRK-ZAITEN          >   ZERO )
-                               PERFORM 205-TENSUKAISU-HEN-SEC
-                           ELSE
-                               EVALUATE    FLG-SRYSTATUS
-                               WHEN    2
-                                   PERFORM 205-KAISU-HEN-SEC
-                               WHEN    OTHER
-                                   PERFORM 205-TENSUKAISU-HEN-SEC
-                               END-EVALUATE
-                           END-IF
-                       END-IF
-                   END-IF
                END-IF
+      *
+               EVALUATE    TRUE
+               WHEN  ( RSIJBI-KIN-IDX  =   IDX19 )
+                   MOVE    RSIJBI-KINGAKU  TO  WRK-ZAITEN
+                   MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
+                   PERFORM 205-KINGAKUKAISU-HEN-SEC
+               WHEN  ( RSIJBI-TEN-IDX  =   IDX19 )
+                   MOVE    RSIJBI-TEN      TO  WRK-ZAITEN
+                   MOVE    RSIJBI-ZAIKAISU TO  WRK-ZAIKAISU
+                   IF    ( WRK-ZAITEN          >   ZERO )
+                       PERFORM 205-TENSUKAISU-HEN-SEC
+                   ELSE
+                       EVALUATE    FLG-SRYSTATUS
+                       WHEN    2
+                           PERFORM 205-KAISU-HEN-SEC
+                       WHEN    OTHER
+                           PERFORM 205-TENSUKAISU-HEN-SEC
+                       END-EVALUATE
+                   END-IF
+               END-EVALUATE
            END-PERFORM
       *
            .
