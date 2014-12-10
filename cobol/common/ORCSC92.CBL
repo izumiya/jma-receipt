@@ -208,7 +208,7 @@
       *
            03  WRK-SRYCD               PIC X(09).
            03  WRK-SRYCD2              PIC X(09).
-           03  WRK-SRYCD-3             PIC X(09).
+           03  WRK-SRYCD3              PIC X(09).
       *H25.7
            03  WRK-CHK-SRYCD           PIC X(09).
       *
@@ -3227,22 +3227,6 @@
            EXIT.
       *
       *****************************************************************
-      *     リハビリ料チェック処理
-      *****************************************************************
-      *200542-RIHA-HENKAN-SEC        SECTION.
-      *
-      *    SET     TBL-RIH             TO  1
-      *    SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-      *            AT  END
-      *                MOVE    ZERO            TO  FLG-RIHA-OK
-      *            WHEN    WRK-SRYCD-3     =   TBL-RIHA-SRYCD(TBL-RIH)
-      *                MOVE    1               TO  FLG-RIHA-OK
-      *    END-SEARCH
-      *    .
-      *200542-RIHA-HENKAN-EXT.
-      *    EXIT.
-      *
-      *****************************************************************
       *    入院中の場合、算定なしとする
       *****************************************************************
        200541-NYUIN-CHK-SEC                SECTION.
@@ -3449,11 +3433,15 @@
            MOVE    "111000110"         TO  WRK-SRYCD
       *    初診料（紹介状なし）
            MOVE    "111012510"         TO  WRK-SRYCD2
+      *H27.1
+      *    初診料（妥結率５割以下）
+           MOVE    "111012710"         TO  WRK-SRYCD3
       *
            MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
            MOVE    ZERO                TO  FLG-SYO-ERR
            IF      CHK-CD              =   WRK-SRYCD
                                        OR  WRK-SRYCD2
+                                       OR  WRK-SRYCD3
       *        初診以外入力時、前に初診算定があればエラー
                PERFORM VARYING     IDX-Y3  FROM    1   BY   1
                        UNTIL       IDX-Y3  >   31
@@ -5595,7 +5583,7 @@
                MOVE    SPACE               TO  TENSUPLUS-REC
                INITIALIZE                      TENSUPLUS-REC
            END-IF
-          .
+           .
        910-TENSU-READ-EXT.
            EXIT.
       *

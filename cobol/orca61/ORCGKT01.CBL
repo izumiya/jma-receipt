@@ -5580,6 +5580,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "101110010"
       *        ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
                                        OR  "111012510"
+      *        ÂÅ·ëÎ¨£µ³ä°Ê²¼
+                                       OR  "111012710"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -5596,6 +5598,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
                   AND  (SGDAY-SDAY             <   "20130401" )
                    MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
+      *H27.1   ÂÅ·ëÎ¨£µ³ä°Ê²¼¡¡£È£²£·.£±¤«¤é
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012710")
+                  AND  (SGDAY-SDAY             <   "20150101" )
+                   MOVE    "1104"              TO  SPA-ERRCD
                    GO      TO      4101125-SYOSIN-CHK-EXT
                END-IF
       *

@@ -35,6 +35,7 @@
       *  01.00.05    NACL-多々納  06/08/18  同日初診追加
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.08.00    NACL-多々納  12/03/XX  Ｈ２５年４月改正対応
+      *  04.08.00    NACL-多々納  12/03/XX  Ｈ２７年１月改正対応
       *****************************************************************
       *
       *
@@ -168,10 +169,13 @@
            03  FILLER              PIC X(13)   VALUE   "111012510 1 0".
       *    同日初診（紹介状なし）
            03  FILLER              PIC X(13)   VALUE   "111012610 110".
+      *H27.1 から
+      *    初診料（妥結率５割以下）
+           03  FILLER              PIC X(13)   VALUE   "111012710 1 0".
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       *****03  TBL-SINSATU-OCC         OCCURS  18    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  25    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  26    INDEXED  TBL-IDX.
       *        診療コード
                05  TBL-SRYCD           PIC X(09).
       *

@@ -80,6 +80,7 @@
       * 04.08.00     NACL-多々納  14/03/XX  平成２６年４月改正対応
       * 04.07.00     NACL-多々納  14/09/XX  外用臨時投薬対応
       * 04.07.00     NACL-多々納  14/10/02  頓服（臨時投薬）対応
+      * 04.08.00     NACL-多々納  14/12/XX  Ｈ２７年１月改正対応
       *****************************************************************
       *
       *
@@ -449,42 +450,45 @@
       *H25.4 から
       *    初診料（紹介状なし）
            03  FILLER              PIC X(14)   VALUE   "110F 111012510".
-      *    同日初診（紹介状なし）
+      *    同日初診（同一日２科目・減点規格該当）（共通）
            03  FILLER              PIC X(14)   VALUE   "110FD111012610".
       *    外来診療料（他医療機関へ紹介）
            03  FILLER              PIC X(14)   VALUE   "311  112016310".
-      *    外来診療料（同一日２科目）（他医療機関へ紹介）
+      *    外来診療料（同一日２科目・減点規格該当）（共通）
            03  FILLER              PIC X(14)   VALUE   "310KD112016410".
       *    同日外来診療料（他医療機関へ紹介）
            03  FILLER              PIC X(14)   VALUE   "311D 112016550".
       *
-      *H27.4 から
+      *H27.1 から
       *    初診（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120F 111012710".
+           03  FILLER              PIC X(14)   VALUE   "120F 111012710".
       *    再診料（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120  112016610".
+           03  FILLER              PIC X(14)   VALUE   "120  112016610".
       *    電話等再診（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120T 112016750".
+           03  FILLER              PIC X(14)   VALUE   "120T 112016750".
       *    同日再診（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120D 112016850".
+           03  FILLER              PIC X(14)   VALUE   "120D 112016850".
       *    同日電話等再診（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120S 112016950".
+           03  FILLER              PIC X(14)   VALUE   "120S 112016950".
       *    再診料（同一日２科目・妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120KD112017010".
+           03  FILLER              PIC X(14)   VALUE   "120KD112017010".
       *    電話等再診（同一日２科目・妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "120JD112017150".
+           03  FILLER              PIC X(14)   VALUE   "120JD112017150".
       *    外来診療料（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "321  112017310".
+           03  FILLER              PIC X(14)   VALUE   "321  112017310".
       *    同日外来診療料（妥結率５割以下）
-      *    03  FILLER              PIC X(14)   VALUE   "321D 112017450".
-      *??* 外来診療料（同一日２科目）（妥結率５割以下）
-      *??* 03  FILLER              PIC X(14)   VALUE   "320KD112016410".
-      *
+           03  FILLER              PIC X(14)   VALUE   "321D 112017450".
+      *?
+      *    同日初診（同一日２科目・減点規格該当）（共通）
+           03  FILLER              PIC X(14)   VALUE   "120FD111012610".
+      *    外来診療料（同一日２科目・減点規格該当）（共通）
+           03  FILLER              PIC X(14)   VALUE   "321KD112016410".
       *
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
-           03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
-      **** 03  TBL-SINSATU-OCC         OCCURS  29    INDEXED  TBL-IDX.
+      **** 03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
+      *?   03  TBL-SINSATU-OCC         OCCURS  29    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  31    INDEXED  TBL-IDX.
       *        １：一般、２：小児科外来診察料、３：外来診療料
                05  TBL-KAISU           PIC 9(01).
       *        １:紹介なし、２：妥結率５割以下
@@ -547,7 +551,9 @@
            03  TBL-RSI-SINSATU-OCC     OCCURS  8    INDEXED  TBL-RSI.
       *        回数
                05  TBLR-KAISU           PIC 9(01).
-               05  FILLER               PIC X(01).
+      *******  05  FILLER               PIC X(01).
+      *        ２：妥結率５割以下
+               05  TBLR-ETCKBN          PIC X(01).
       *********F:初診、S:再診、G:外来管理加算
       *        F:初診、 :再診
       *        D:同日再診、T:電話再診,S:同日電話再診,J:電話２科目
@@ -807,7 +813,7 @@
       *H25.4           紹介なし
                    WHEN    "111012510"
                        MOVE    1              TO  SPA-SYOSIN
-      *H26.4           妥結率５割以下
+      *H27.1           妥結率５割以下
                    WHEN    "111012710"
                        MOVE    1              TO  SPA-SYOSIN
                END-EVALUATE
@@ -1588,15 +1594,22 @@
                END-IF
            WHEN    "2"
       *    在宅がん医総合
-               IF      WRK-ZS-KBN          =   "1"
-      *            処方せん有（院外）
-                   IF      SANTEI-MSANTEICNT   >   ZERO
-                       MOVE    1                   TO  SPA-ZAIMATU-ARI2
-                   END-IF
+               IF      SPA-SYORIFLG        =   1
+      *        訂正時は当日分の編集なし
+                   CONTINUE
                ELSE
+      *        当日の算定
+                   MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+                   IF      WRK-ZS-KBN          =   "1"
+      *            処方せん有（院外）
+                       IF      SANTEI-DAY (IDX-Y2) >   ZERO
+                           MOVE    1               TO  SPA-ZAIMATU-ARI2
+                       END-IF
+                   ELSE
       *            処方せん無（院内）
-                   IF      SANTEI-MSANTEICNT   >   ZERO
-                       MOVE    2                   TO  SPA-ZAIMATU-ARI2
+                       IF      SANTEI-DAY (IDX-Y2) >   ZERO
+                           MOVE    2               TO  SPA-ZAIMATU-ARI2
+                       END-IF
                    END-IF
                END-IF
            END-EVALUATE
@@ -1609,58 +1622,7 @@
                WHEN    "113003810"
                    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
                    ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
-      *
-      *ここから*******************************
-      *        在宅がん医総合（在宅末期医療総合診察料）（院外処方）
-      *        WHEN    "114007610"
       *H24.4
-      *        WHEN    "114019510"
-      *        WHEN    "114019710"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    1                   TO  SPA-ZAIMATU-ARI2
-      *            END-IF
-      *        在宅がん医総合（在宅末期医療総合診察料）（院内処方）
-      *        WHEN    "114007710"
-      *H24.4
-      *        WHEN    "114019610"
-      *        WHEN    "114019810"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    2                   TO  SPA-ZAIMATU-ARI2
-      *            END-IF
-      **ここまで************************************
-      *ここから廃止*************************************
-      *        在宅時医学総合管理料算定（院外処方）
-      *        WHEN    "114012210"
-      *        WHEN    "114007510"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    1                   TO  SPA-ZAIKANRI-ARI2
-      *            END-IF
-      *        在宅時医学総合管理料算定（院内処方）
-      *        WHEN    "114012310"
-      *        WHEN    "114012410"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    2                   TO  SPA-ZAIKANRI-ARI2
-      *            END-IF
-      *H24.4
-      *        在医総管（機能強化した在支診等）（処方せん）
-      *        WHEN    "114018710"
-      *        WHEN    "114018910"
-      *        WHEN    "114019110"
-      *        WHEN    "114019310"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    1                   TO  SPA-ZAIKANRI-ARI2
-      *            END-IF
-      *        在医総管（機能強化した在支診等）（処方せんなし）
-      *        WHEN    "114018810"
-      *        WHEN    "114019010"
-      *        WHEN    "114019210"
-      *        WHEN    "114019410"
-      *            IF      SANTEI-MSANTEICNT   >   ZERO
-      *                MOVE    2                   TO  SPA-ZAIKANRI-ARI2
-      *            END-IF
-      **ここまで************************************
-      *H24.4
-      *
       *        高血圧症
                WHEN    "113003910"
                WHEN    "113004010"
@@ -3063,9 +3025,10 @@
            ELSE
                MOVE    "0"             TO  WRK-ETCKBN
            END-IF
-      *H26.4
-      *    妥結率５０%
-           IF      SPA-DAKT50-KBN      =   1
+      *H27.1
+      *    妥結率５割以下
+           IF     (SPA-SRYYMD          >=  "20150101" )
+             AND  (SPA-DAKT50-KBN      =   1          )
                MOVE    "2"             TO  WRK-ETCKBN
            END-IF
       *
@@ -6938,7 +6901,7 @@
                        MOVE    1               TO  FLG-DOUSYOSIN
                    END-IF
       *H25.4
-      *            初診料・外来診察料　２科目（紹介なし）
+      *            初診料・外来診察料　２科目（減点規格該当）
                    IF      SPA-COM-INPUTCD (IDX)   =   "111012610"
                                                    OR  "112016410"
                        MOVE    1               TO  FLG-DOUSYOSIN
@@ -6986,7 +6949,7 @@
                    IF      SPA-COM-INPUTCD (IDX)   =   "111011810"
       *TE          労災
                                                    OR  "101110040"
-      *H25.4       初診料２科目（紹介なし）
+      *H25.4       初診料２科目（減点規格該当）
                                                    OR  "111012610"
                        MOVE    1               TO  FLG-DOUSYOSIN
                    END-IF
@@ -7199,6 +7162,11 @@
                    IF     FLG-SYOKAINASI       =   1
                        MOVE   "111012610"          TO  WRK-SRYCD
                    END-IF
+      *H26.12
+      *            妥結率５０%
+                   IF      SPA-DAKT50-KBN      =   1
+                       MOVE   "111012610"          TO  WRK-SRYCD
+                   END-IF
                ELSE
       *            労災
                    MOVE   "101110040"          TO  WRK-SRYCD
@@ -7208,6 +7176,11 @@
       *H25.4
       *        紹介なし
                IF     FLG-SYOKAINASI       =   1
+                   MOVE   "111012610"          TO  WRK-SRYCD
+               END-IF
+      *H26.12
+      *        妥結率５０%
+               IF      SPA-DAKT50-KBN      =   1
                    MOVE   "111012610"          TO  WRK-SRYCD
                END-IF
       *

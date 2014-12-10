@@ -1171,10 +1171,6 @@
       *    パラメタファイルより、診療会計マスターを編集
       *    パラメタファイルよりワーク編集とＳＯＲＴ
            PERFORM 3101-WKSRYACT-SORT-SEC
-      *TEST
-           DISPLAY "K08 IDG:"  IDG
-                ",SPA-ERRCD:"  SPA-ERRCD
-      *TEST
       *
       *    最大件数
            IF      IDG                 >   MAX-GMN
@@ -4390,7 +4386,7 @@
                        WHEN    "099110001"
       *                紹介状なし追加
                        WHEN    "111012510"
-      *                妥結率５割以下
+      *H27.1           妥結率５割以下
                        WHEN    "111012710"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
@@ -4939,7 +4935,7 @@
                       (LNK-WKSRY-HKNCOMBI(IDX) NOT =   SYU-HKNCOMBINUM)
                   OR  ((SYU-SRYKA              NOT =   ZERO  )  AND
                       (LNK-WKSRY-SRYKA   (IDX) NOT =   SYU-SRYKA  ))
-      *           包括剤の設定
+      *           包括剤対象外
                   OR  (LNK-WKSRY-CONTKBN (IDX)     =   "H"   )
                    CONTINUE
                ELSE

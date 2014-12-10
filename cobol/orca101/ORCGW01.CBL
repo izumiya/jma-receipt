@@ -100,6 +100,7 @@
       *  04.08.00    NACL-多々納  12/12/14  1920 患者情報通知追加
       *  04.08.00    NACL-多々納  13/12/09  9101 医療情報連携基盤情報
       *  04.08.01    NACL-森脇    14/06/16  期間変更不可チェックに排他制御追加
+      *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -320,6 +321,10 @@
                "1101 データチェック機能情報２".
            03  FILLER              PIC X(35)   VALUE
                "1102 データチェック機能情報３".
+      *H26.12
+           03  FILLER              PIC X(35)   VALUE
+               "1201 点数算定基準情報".
+      *
            03  FILLER              PIC X(35)   VALUE
                "1901 医療機関編集情報".
            03  FILLER              PIC X(35)   VALUE
@@ -351,11 +356,11 @@
       *
        01  TBL-KANRICD-AREAR           REDEFINES   TBL-KANRICD-AREA.
       **** 03  TBL-KANRICD-TBL         OCCURS   46.
-           03  TBL-KANRICD-TBL         OCCURS   47.
+           03  TBL-KANRICD-TBL         OCCURS   48.
                05  TBL-KANRICD             PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI          PIC X(30).
-       01  TBL-KANRICD-MAX                 PIC 9(04)   VALUE   47.
+       01  TBL-KANRICD-MAX                 PIC 9(04)   VALUE   48.
       *
       *外来のみ
        01  TBL-KANRICD-G-AREA.
@@ -1266,6 +1271,10 @@
       *        施設基準は、１　を対象
                OR (   (SYS-KANRICD            =   "1006"      )       
                   AND (SYS-KBNCD (1:2)        =   "1 "        ))
+      *        点数算定基準
+               OR (   (SYS-KANRICD            =   "1201"      )
+                  AND (SYS-KBNCD              =   "A0000001"  ))
+      *
                    ADD     1              TO  IDX
                    MOVE    IDX            TO  SPA-GMN-TBANGO    (IDX)
                    MOVE    SYS-STYUKYMD   TO  SPA-NAI-TSTYUKYMD (IDX)
@@ -2046,6 +2055,9 @@
                WHEN    "1042"
                WHEN    "1043"
                WHEN    "1045"
+                   MOVE    "W07"               TO  SPA-SAKIPG
+      *H26.12
+               WHEN    "1201"
                    MOVE    "W07"               TO  SPA-SAKIPG
                WHEN    "1046"
                    MOVE    "W67"               TO  SPA-SAKIPG

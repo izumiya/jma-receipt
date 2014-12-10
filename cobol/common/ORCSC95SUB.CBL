@@ -33,6 +33,7 @@
       * 04.08.00     NACL-多々納  13/07/XX  時間外緊急院内チェック追加
       * 04.08.00     NACL-多々納  14/03/XX  平成２６年４月改正対応
       * 04.07.00     NACL-多々納  14/09/XX  包括算定エラー対応
+      * 04.08.00     NACL-多々納  14/12/XX  平成２７年１月改正対応
       *****************************************************************
       *
       *
@@ -98,6 +99,10 @@
            COPY    "CPSK1014.INC".
       *
            COPY    "CPSK1050.INC".
+      *
+      *    点数算定基準
+           COPY    "CPSK1201.INC".
+      *
       *    患者情報通知
            COPY    "CPSK1920.INC".
       *    ＣＬＡＩＭ接続情報 
@@ -538,6 +543,9 @@
            PERFORM 1009-SISETU-KIJUN-SEC
       *    ステム管理共通（1007,1038)
            PERFORM 1002-SYSKANRI-KYOTU-SEC
+      *H27.1
+      *    ステム管理（妥結率）
+           PERFORM 1003-SYSKANRI-DAKETU-SEC
       *
       *    包括診療行為算定
            PERFORM 10010-HKTSANTEI-SEC
@@ -1241,6 +1249,10 @@
            PERFORM 1009-SISETU-KIJUN-SEC
       *    ステム管理共通（1007,1038)
            PERFORM 1002-SYSKANRI-KYOTU-SEC
+      *H27.1
+      *    ステム管理共通（妥結率）
+           PERFORM 1003-SYSKANRI-DAKETU-SEC
+      *
       *    システム管理訂正分(1008）
            PERFORM 2001-SYSKANRI-SAISET-SEC
       *    包括診療行為算定
@@ -1381,6 +1393,40 @@
       *
            .
        2001-SYSKANRI-SAISET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ステム管理（妥結率）設定処理
+      *****************************************************************
+       1003-SYSKANRI-DAKETU-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  SPA-DAKT50-KBN
+      *
+      *    病院・許可病床数２００以上
+           IF     (SPA-HOSPSBT         =   1  )
+              AND (SPA-BEDSU           >=  200)
+              AND (SPA-SRYYMD          >=  "20150101")
+      *
+               MOVE    SPACE               TO  SYS-1201-REC
+               INITIALIZE                  SYS-1201-REC
+               MOVE    "1201"              TO  SYS-1201-KANRICD
+               MOVE    "A0000001"          TO  SYS-1201-KBNCD
+               MOVE    SPA-SRYYMD          TO  SYS-1201-STYUKYMD
+               MOVE    SPA-SRYYMD          TO  SYS-1201-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
+               MOVE    SYS-1201-REC        TO  SYSKANRI-REC
+      *
+               PERFORM 900-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1201-REC
+      *            妥結率以下
+                   IF      SYS-1201-DAKETUKBN  =   "1"
+                       MOVE    1                   TO  SPA-DAKT50-KBN
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       1003-SYSKANRI-DAKETU-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ読み込み処理

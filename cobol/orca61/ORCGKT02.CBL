@@ -3944,6 +3944,8 @@
                        WHEN    "099110001"
       *                ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
                        WHEN    "111012510"
+      *H27.1           ÂÅ·ëÎ¨£µ³ä°Ê²¼
+                       WHEN    "111012710"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
                END-PERFORM

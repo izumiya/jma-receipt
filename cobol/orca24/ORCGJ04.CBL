@@ -57,6 +57,7 @@
       * 04.06.00     NACL-多々納  10/10/XX  包括算定（剤）対応
       * 04.08.00     NACL-多々納  13/06/XX  労災レセ電対応
       * 04.07.00     NACL-多々納  14/02/13  労災金額％加算対応
+      * 04.08.00     NACL-多々納  14/12/XX  平成２７年１月改正対応
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -595,6 +596,11 @@
       *
        01  WRK-HOZ-IDX             PIC 9(04).
       *
+      *H26.12
+      *    スパ領域ワーク
+           COPY    "COMMON-SPA"    REPLACING
+                                       //SPA-// BY //WRK-SPA-//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -614,6 +620,9 @@
       *
       *    レセプト印刷情報
            COPY  "CPSK200501.INC".
+      *
+      *    点数算定基準
+           COPY    "CPSK1201.INC".
       *
       *    点数マスタ−
       *01  TENSU-REC.
@@ -1112,6 +1121,21 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    OTHER
                    PERFORM 3000-SCREEN-INIT-SEC
            END-EVALUATE
+      *
+      *H26.12
+           IF      FLG-GMN         NOT =   ZERO
+               IF      SPA-ERRCD       NOT =   SPACE
+      *            画面編集
+                   PERFORM 500-GMNHEN-SEC
+      *            エラー編集
+      *            数量ゼロの場合、エラー表示しない
+                   IF      SPA-ERRCD           =   "A001"
+                       MOVE    SPACE               TO  SPA-ERRCD
+                   ELSE
+                       PERFORM 510-ERRSET-SEC
+                   END-IF
+               END-IF
+           END-IF
            .
        300-SCREEN-EXT.
            EXIT.
@@ -1353,7 +1377,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            MOVE    SPA-ZAINUM          TO  SPA-MAE-ZAINUM
-      *
            .
        310-SPA-SET-EXT.
            EXIT.
@@ -1496,9 +1519,46 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                    TO  SPA-ROURECEKBN
            END-IF
       *
+      *H27.1
+      *    ステム管理共通（妥結率）
+           PERFORM 1003-SYSKANRI-DAKETU-SEC
       *
            .
        3101-SYSKANRI-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ステム管理（妥結率）設定処理
+      *****************************************************************
+       1003-SYSKANRI-DAKETU-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  SPA-DAKT50-KBN
+      *
+      *    病院・許可病床数２００以上
+           IF     (SPA-HOSPSBT         =   1  )
+              AND (SPA-BEDSU           >=  200)
+              AND (SPA-SRYYMD          >=  "20150101")
+      *
+               MOVE    SPACE               TO  SYS-1201-REC
+               INITIALIZE                  SYS-1201-REC
+               MOVE    "1201"              TO  SYS-1201-KANRICD
+               MOVE    "A0000001"          TO  SYS-1201-KBNCD
+               MOVE    SPA-SRYYMD          TO  SYS-1201-STYUKYMD
+               MOVE    SPA-SRYYMD          TO  SYS-1201-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
+               MOVE    SYS-1201-REC        TO  SYSKANRI-REC
+      *
+               PERFORM 900-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1201-REC
+      *            妥結率以下
+                   IF      SYS-1201-DAKETUKBN  =   "1"
+                       MOVE    1                   TO  SPA-DAKT50-KBN
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       1003-SYSKANRI-DAKETU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1990,7 +2050,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-AREA
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    SPACE           TO  SPA-ERRCD
-           END-IF 
+           END-IF
       *
       *    フィルムの判定
            IF      SRY-SRYKBN          =   "70"
@@ -4257,18 +4317,28 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    労災レセ電対応あり
            MOVE    SPA-ROURECEKBN      TO  LNK-ORCSC-ROURECEKBN
       *
+      *
            EVALUATE    WRK-COM-SRYKBN (01)
       *            診療
                WHEN    "11"
                WHEN    "12"
                WHEN    "13"
                WHEN    "14"
+      *H26.12
+                   MOVE    SPA-AREA            TO  WRK-SPA-AREA
+      *            妥結率以下の設定
+                   IF     (SPA-SRYYMD          >=  "20150101")
+                       MOVE    SPA-DAKT50-KBN      TO  SPA-WORK(1:1)
+                   END-IF
                    CALL    "ORCSC10"       USING
                                            MCPAREA
                                            ORCSC00AREA
                                            WRK-SCR-REC
                                            SPA-AREA
-                   ADD     1               TO  SPA-SRYKBN-CNT (01)
+      *H26.12
+                   MOVE    WRK-SPA-WORK        TO  SPA-WORK
+      *
+                   ADD     1                   TO  SPA-SRYKBN-CNT (01)
       *            特定薬剤治療管理加算の初回算定日
                    MOVE    LNK-ORCSC-TOKTEI-YMD    TO  SPA-TOKTEI-YMD
       *            薬剤

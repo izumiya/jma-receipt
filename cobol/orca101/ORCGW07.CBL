@@ -123,6 +123,7 @@
       *  04.07.00    NACL-多々納  12/05/08  確認画面処方名称区分追加
       *  04.07.00    NACL-太田    12/07/04  再計算該当者チェック設定追加
       *  04.07.00    NACL-多々納  13/08/01  時間外緊急院内チェック区分追加
+      *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1276,6 +1277,19 @@
                            11  SPA-GMN-UKEHKNCHK-LIST      PIC X(50)
                                                            OCCURS  5.
                        09  SPA-GMN-UKEHKNCHK-MAX           PIC 9(04).
+      *H26.12
+      *            点数算定基準情報
+                   07  SPA-GMN-PAGE8-AREA.
+      *                妥結率区分
+                       09  SPA-GMN-DAKETUKBN-G.
+                           11  SPA-GMN-DAKETUKBN          PIC X(01).
+                           11  SPA-GMN-DAKETU-F1          PIC X(01).
+                           11  SPA-GMN-DAKETUKBN-MEI      PIC X(48).
+                       09  SPA-GMN-DAKETUKBN-COMB.
+                           11  SPA-GMN-DAKETUKBN-LIST     PIC X(50)
+                                                          OCCURS  5.
+                       09  SPA-GMN-DAKETUKBN-MAX          PIC 9(04).
+      *
       *
                    07  SPA-GMN-DATALST        OCCURS  2.
                        09  SPA-GMN-DATAL      PIC X(01).
@@ -1394,6 +1408,9 @@
       *
       *    予約機能情報
            COPY  "CPSK1045.INC".
+      *
+      *    点数算定基準情報
+           COPY  "CPSK1201.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1586,6 +1603,12 @@
                    WHEN   "1014"
       *                予約情報の削除
                        PERFORM  4033-DEL-1045-SEC
+                   WHEN   "1201"
+      *                点数算定基準の更新
+                       PERFORM  493-KOUSHIN-1201-SEC
+                   WHEN   "1202"
+      *                点数算定基準の削除
+                       PERFORM  4033-DEL-1201-SEC
                END-EVALUATE
            ELSE
                EVALUATE    SPA-W01-KANRICD
@@ -1599,6 +1622,8 @@
                        MOVE    601          TO  SPA-GMN-CUR
                    WHEN    "1045"
                        MOVE    701          TO  SPA-GMN-CUR
+                   WHEN    "1201"
+                       MOVE    800          TO  SPA-GMN-CUR
                END-EVALUATE
            END-IF
       *
@@ -2230,6 +2255,15 @@
            MOVE    "2 空白チェックあり（予約設定有）"
                                        TO  SPA-GMN-UKEHKNCHK-LIST(3)
            MOVE    3                   TO  SPA-GMN-UKEHKNCHK-MAX
+      *H26.12
+      *    妥結率区分
+           MOVE    "0 低妥結率でない"
+                                       TO  SPA-GMN-DAKETUKBN-LIST(1)
+           MOVE    "1 低妥結率である"
+                                       TO  SPA-GMN-DAKETUKBN-LIST(2)
+           MOVE    2                   TO  SPA-GMN-DAKETUKBN-MAX
+      *
+      *
       *ver.4.7
       *    背景色初期設定
            PERFORM 3109-COLORS-INIT-SEC
@@ -2256,6 +2290,9 @@
       *        予約機能情報
                WHEN    "1045"
                    PERFORM 310-SPASET-1045-SEC
+      *        点数算定基準
+               WHEN    "1201"
+                   PERFORM 310-SPASET-1201-SEC
            END-EVALUATE
       *
            . 
@@ -4940,6 +4977,53 @@
            . 
        310-SPASET-1045-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    点数算定基準スパ初期編集処理
+      *****************************************************************
+       310-SPASET-1201-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1201"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1201-REC
+           ELSE
+               INITIALIZE  SYS-1201-REC
+           END-IF
+      *
+      *    妥結率区分
+           MOVE    SYS-1201-DAKETUKBN  TO  SPA-GMN-DAKETUKBN
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-DAKETUKBN-MAX
+               IF      SPA-GMN-DAKETUKBN
+                                       =   SPA-GMN-DAKETUKBN-LIST(IDY)
+                                                             (1:1)
+                   MOVE    SPA-GMN-DAKETUKBN-LIST(IDY)
+                                           TO  SPA-GMN-DAKETUKBN-G
+                   MOVE    1               TO  FLG-OK
+                   MOVE    SPA-GMN-DAKETUKBN-MAX
+                                           TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-DAKETUKBN-LIST (1)
+                                       TO  SPA-GMN-DAKETUKBN-G
+           END-IF
+      *
+           MOVE    800                 TO  SPA-GMN-CUR
+      *
+           . 
+       310-SPASET-1201-EXT.
+           EXIT.
       *****************************************************************
       *    画面遷移処理
       *****************************************************************
@@ -5214,6 +5298,9 @@
            MOVE    W07-YYKUKE-KBN      TO  SPA-GMN-YYKUKE-KBN-G
            MOVE    W07-YYKPTNUM-KBN    TO  SPA-GMN-YYKPTNUM-KBN-G
            MOVE    W07-UKEHKNCHK       TO  SPA-GMN-UKEHKNCHK-KBN-G
+      *
+      *    点数算定基準情報
+           MOVE    W07-DAKETUKBN       TO  SPA-GMN-DAKETUKBN-G
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -5733,6 +5820,12 @@
       *            受付保険組合せ区分
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4511-UKEHKNCHK-KBN-CHK-SEC
+                   END-IF
+      *
+               WHEN    "1201"
+      *            妥結率区分
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4611-DAKETUKBN-CHK-SEC
                    END-IF
            END-EVALUATE
       *
@@ -9272,6 +9365,32 @@
            EXIT.
       *
       *****************************************************************
+      *    妥結率区分チェック処理（点数算定基準情報）
+      *****************************************************************
+       4611-DAKETUKBN-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-DAKETUKBN-MAX )
+                          OR  (FLG-OK  =   1    )
+               IF      SPA-GMN-DAKETUKBN
+                                       =   SPA-GMN-DAKETUKBN-LIST(IDX)
+                                                             (1:1)
+                   MOVE    SPA-GMN-DAKETUKBN-LIST(IDX)
+                                           TO  SPA-GMN-DAKETUKBN-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    800             TO  SPA-GMN-CUR
+               MOVE    "8001"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       44611-DAKETUKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    戻る　処理
       *****************************************************************
        210-BACK                    SECTION.
@@ -9312,6 +9431,8 @@
                    MOVE    "1012"              TO  SPA-WIDCD
                WHEN    "1045"
                    MOVE    "1014"              TO  SPA-WIDCD
+               WHEN    "1201"
+                   MOVE    "1202"              TO  SPA-WIDCD
            END-EVALUATE
       *
            .    
@@ -9579,6 +9700,40 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        4033-DEL-1045-EXT.
            EXIT.
       *
+      *
+      *****************************************************************
+      *    削除処理１２０１（点数算定基準の削除）
+      *****************************************************************
+       4033-DEL-1201-SEC           SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1201-REC
+           INITIALIZE                      SYS-1201-REC
+           MOVE    "1201"              TO  SYS-1201-KANRICD
+           MOVE    "A0000001"          TO  SYS-1201-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-1201-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
+           MOVE    SYS-1201-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "9001"              TO  SPA-ERRCD
+               DISPLAY "SYSKANRI-KEY =>" SYS-1201-KEY 
+                       ",MCP-RC:" MCP-RC 
+               GO  TO  4033-DEL-1201-EXT
+           END-IF
+      *
+           MOVE   "JOIN"               TO  MCP-PUTTYPE
+           PERFORM 210-BACK
+           .
+       4033-DEL-1201-EXT.
+           EXIT.
+      *
       *****************************************************************
       *       登録前処理
       *****************************************************************
@@ -9618,6 +9773,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "1045"
                    IF      SPA-ERRCD        =   SPACE
                        MOVE    "1013"           TO  SPA-WIDCD
+                   END-IF
+               WHEN    "1201"
+                   IF      SPA-ERRCD        =   SPACE
+                       MOVE    "1201"           TO  SPA-WIDCD
                    END-IF
               END-EVALUATE
           END-IF
@@ -9674,6 +9833,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      FLG-SYSKANRI            =   ZERO
       *
+               MOVE    SPA-OPID                TO  SYS-OPID
+      *
                MOVE    SMCNDATE-YMD            TO  SYS-UPYMD
                MOVE    SMCNDATE-HMS            TO  SYS-UPHMS
       *
@@ -9697,6 +9858,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                            ",MCP-RC:" MCP-RC 
                END-IF 
            ELSE
+               MOVE    SPA-OPID                TO  SYS-OPID
+      *
                MOVE    SMCNDATE-YMD            TO  SYS-CREYMD
                                                    SYS-UPYMD
                MOVE    SMCNDATE-HMS            TO  SYS-UPHMS
@@ -10228,6 +10391,47 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        493-KOUSHIN-1045-EXT.
            EXIT.
+      *H26.12
+      ******************************************************************
+      *       登録処理（点数算定基準）
+      *****************************************************************
+       493-KOUSHIN-1201-SEC        SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1201-REC
+           INITIALIZE                      SYS-1201-REC
+           MOVE    "1201"              TO  SYS-1201-KANRICD
+           MOVE    "A0000001"          TO  SYS-1201-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
+           MOVE    SYS-1201-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI            =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1201-REC
+           ELSE
+               MOVE    SPACE               TO  SYS-1201-REC
+               INITIALIZE                      SYS-1201-REC
+               MOVE    "1201"              TO  SYS-1201-KANRICD
+               MOVE    "A0000001"          TO  SYS-1201-KBNCD
+           END-IF
+      *
+           MOVE    SPA-W01-STYUKYMD        TO  SYS-1201-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD        TO  SYS-1201-EDYUKYMD
+           MOVE    SPA-GMN-DAKETUKBN       TO  SYS-1201-DAKETUKBN
+      *
+           MOVE    SYS-1201-REC            TO  SYSKANRI-REC
+      *
+      *    ＤＢ更新処理
+           PERFORM 4910-DBKOUSIN-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE   "JOIN"               TO  MCP-PUTTYPE
+               PERFORM 210-BACK
+           END-IF
+           .
+       493-KOUSHIN-1201-EXT.
+           EXIT.
+      *
       *****************************************************************
       *       入力項目の関連チェック処理
       *****************************************************************
@@ -11530,6 +11734,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-UKEHKNCHK-MAX    TO  W07-UKEHKNCHK-COUNT
       *
+      *点数算定基準
+      *    妥結率区分
+           MOVE    SPA-GMN-DAKETUKBN-G     TO  W07-DAKETUKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-DAKETUKBN-MAX
+               MOVE    SPA-GMN-DAKETUKBN-LIST (IDX)
+                                      TO  W07-DAKETUKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-DAKETUKBN-MAX    TO  W07-DAKETUKBN-COUNT
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
@@ -11550,6 +11764,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            W07-TAGNAME6-STATE
                                            W07-TAGNAME7-STATE
                                            W07-SRYKACD-STATE
+                                           W07-TAGNAME8-STATE
       *
            IF      SPA-W01-SELNUM          >   ZERO
                MOVE    WIDGET-NORMAL   TO  W07-B03-STATE
@@ -11570,6 +11785,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WIDGET-NORMAL   TO  W07-TAGNAME6-STATE
                WHEN    "1045" 
                    MOVE    WIDGET-NORMAL   TO  W07-TAGNAME7-STATE
+               WHEN    "1201" 
+                   MOVE    WIDGET-NORMAL   TO  W07-TAGNAME8-STATE
            END-EVALUATE
       *
            IF      SPA-GMN-DATA(7)         =   "1"
@@ -12015,6 +12232,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "受付保険組合せ区分がありません。"
                                                        TO  SPA-ERRMSG
       *
+               WHEN    "8001"
+                   MOVE    "妥結率区分がありません。"
+                                                       TO  SPA-ERRMSG
+      *
                WHEN    "0099"
                    MOVE    "未入力の項目があります"    TO  SPA-ERRMSG
                WHEN    "9001"
@@ -12094,6 +12315,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    TO  WRK-WIDMSG
                WHEN    "1014"
                    MOVE    "予約・受付機能情報を削除します"
+                                                   TO  WRK-WIDMSG
+      *
+               WHEN    "1201"
+                   MOVE    "点数算定基準情報を登録します"
+                                                   TO  WRK-WIDMSG
+               WHEN    "1202"
+                   MOVE    "点数算定基準情報を削除します"
                                                    TO  WRK-WIDMSG
            END-EVALUATE
       *
@@ -12483,6 +12711,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "YYKUKE_KBN"      TO   MCP-WIDGET
                WHEN    706
                    MOVE  "UKEHKNCHK"       TO   MCP-WIDGET
+      *点数算定基準
+               WHEN    800
+                   MOVE  "DAKETUKBN"       TO   MCP-WIDGET
       *
                WHEN    999
                    MOVE  "B12"             TO   MCP-WIDGET
@@ -12512,6 +12743,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    700 THRU    799
                    MOVE    6               TO  W07-PAGENO
                    MOVE    6               TO  SPA-GMN-PAGENO
+               WHEN    800 THRU    899
+                   MOVE    7               TO  W07-PAGENO
+                   MOVE    7               TO  SPA-GMN-PAGENO
                WHEN    OTHER
                    MOVE    SPA-GMN-PAGENO  TO  W07-PAGENO
            END-EVALUATE
@@ -12914,6 +13148,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "YYKUKE_KBN"
                    MOVE    706             TO  SPA-GMN-CUR
                WHEN    "UKEHKNCHK"
+                   MOVE    999             TO  SPA-GMN-CUR
+      *点数算定基準
+               WHEN    "DAKETUKBN"
                    MOVE    999             TO  SPA-GMN-CUR
            END-EVALUATE
       *

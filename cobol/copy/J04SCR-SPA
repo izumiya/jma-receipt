@@ -76,6 +76,9 @@
       *ver.4.8
       *労災レセ電対応あり
                05  SPA-ROURECEKBN          PIC 9(01).
+      *H27.1
+      *        妥結率５割以下区分
+               05  SPA-DAKT50-KBN          PIC 9(01).
       *
       *        展開時の変更
                05  SPA-TENKAI-ERR          PIC 9(01).

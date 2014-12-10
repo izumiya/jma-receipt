@@ -6935,6 +6935,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        ·Ù¹ð¥Õ¥é¥°¥¯¥ê¥¢
                    EVALUATE    SPA-ERRCD
                    WHEN    "K236"
+                   WHEN    "K112"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
                    WHEN    "K839"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
@@ -8347,6 +8348,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
                   AND  (SGDAY-SDAY             <   "20130401" )
                    MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
+      *H27.1   ÂÅ·ëÎ¨£µ³ä°Ê²¼¡¡£È£²£·.£±¤«¤é
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012710")
+                  AND  (SGDAY-SDAY             <   "20150101" )
+                   MOVE    "1104"              TO  SPA-ERRCD
                    GO      TO      4101125-SYOSIN-CHK-EXT
                END-IF
       *
@@ -12653,6 +12661,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 530-KID2SET-SEC
                GO      TO      500-SET-SCREEN-EXT
            END-IF
+      *
       *
            MOVE    "CURRENT"           TO  MCP-PUTTYPE.
            MOVE    "K02    "           TO  MCP-WINDOW.

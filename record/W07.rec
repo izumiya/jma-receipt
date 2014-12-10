@@ -1103,6 +1103,18 @@ W07 {
       TAGNAME7 {
         state int;
       };
+      TAG8 { #GtkFixed
+        DAKETUKBN_COMB { #GtkPandaCombo
+          count int;
+          item varchar(50)[5];
+          DAKETUKBN { #GtkPandaEntry
+            textdata varchar(50);
+          };
+        };
+      };
+      TAGNAME8 {
+        state int;
+      };
     };
   };
 };

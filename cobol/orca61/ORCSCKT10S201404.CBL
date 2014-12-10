@@ -32,6 +32,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/03/XX  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -302,6 +303,9 @@
            03  WRK-SYODD               PIC 9(02).
       *    ¾Ò²ðÂÐ±þ
            03  WRK-KBN4                PIC X(01).
+      *H27.1
+      *    ¾Ò²ð¡¦ÂÅ·ëÎ¨£µ³ä
+           03  WRK-ETCKBN              PIC X(01).
       *H26.4
       *    ºß°åÁí´ÉÈ½Äê
            03  WRK-ZS-GRP                  PIC X(02).
@@ -370,9 +374,37 @@
       *    Æ±Æü³°Íè¿ÇÎÅÎÁ¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
            03  FILLER              PIC X(14)   VALUE   "311D 112016550".
       *
+      *
+      *H27.1 ¤«¤é
+      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120F 111012710".
+      *    ºÆ¿ÇÎÁ¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120  112016610".
+      *    ÅÅÏÃÅùºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120T 112016750".
+      *    Æ±ÆüºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120D 112016850".
+      *    Æ±ÆüÅÅÏÃÅùºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120S 112016950".
+      *    ºÆ¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡¦ÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120KD112017010".
+      *    ÅÅÏÃÅùºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡¦ÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120JD112017150".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "321  112017310".
+      *    Æ±Æü³°Íè¿ÇÎÅÎÁ¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  FILLER              PIC X(14)   VALUE   "321D 112017450".
+      *?
+      *    Æ±Æü½é¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡¦¸ºÅÀµ¬³Ê³ºÅö¡Ë¡Ê¶¦ÄÌ¡Ë
+           03  FILLER              PIC X(14)   VALUE   "120FD111012610".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡¦¸ºÅÀµ¬³Ê³ºÅö¡Ë¡Ê¶¦ÄÌ¡Ë
+           03  FILLER              PIC X(14)   VALUE   "321KD112016410".
+      *
+      *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       **** 03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
+      *****03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  31    INDEXED  TBL-IDX.
       *        £±¡§°ìÈÌ¡¢£²¡§¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡¢£³¡§³°Íè¿ÇÎÅÎÁ
                05  TBL-KAISU           PIC 9(01).
       *        £±:¾Ò²ð¤Ê¤·¡¢£²¡§ÂÅ·ëÎ¨£µ³ä°Ê²¼
@@ -969,9 +1001,19 @@
                MOVE    SPA-HOSPSBT         TO  WRK-HOSPSBT
            END-IF
       *H25.4
-           IF      WRK-KBN4        NOT =   "1"
-               MOVE    "0"             TO  WRK-KBN4
+           IF      WRK-ETCKBN          =   "1"
+                                       OR  "2"
+               CONTINUE
+           ELSE
+               MOVE    "0"             TO  WRK-ETCKBN
            END-IF
+      *H27.1
+      *    ÂÅ·ëÎ¨£µ³ä°Ê²¼
+           IF     (SPA-SRYYMD          >=  "20150101" )
+             AND  (SPA-DAKT50-KBN      =   1          )
+               MOVE    "2"             TO  WRK-ETCKBN
+           END-IF
+      *
       *    ¿Ç»¡ÎÁ¥»¥Ã¥È
            SET     TBL-IDX             TO  1
            SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
@@ -984,7 +1026,7 @@
                      AND  (WRK-SRYKBN          =   TBL-SRYCD(TBL-IDX)
                                                                 (2:2))
       *H25.4         ¾Ò²ð¤Ê¤·
-                     AND  (WRK-KBN4            =   TBL-ETCKBN(TBL-IDX))
+                     AND  (WRK-ETCKBN          =   TBL-ETCKBN(TBL-IDX))
                        MOVE    TBL-SRYCD (TBL-IDX)
                                                TO  WRK-SRYCD
            END-SEARCH
