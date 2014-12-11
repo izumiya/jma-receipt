@@ -1166,21 +1166,11 @@
            MOVE    SPA-SRYYMD          TO  SYS-1001-STYUKYMD
            MOVE    SPA-SRYYMD          TO  SYS-1001-EDYUKYMD
            MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
-           MOVE    SYS-1001-REC        TO  MCPDATA-REC
+           MOVE    SYS-1001-REC        TO  SYSKANRI-REC
       *
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key10"             TO  MCP-PATHNAME
-               PERFORM 900-SYSKANRI-READ-SEC
-           ELSE
-               MOVE    SPACE               TO  SYS-1001-REC
-               INITIALIZE                  SYS-1001-REC
-               MOVE    1               TO  FLG-SYSKANRI
-           END-IF
+           PERFORM 900-SYSKANRI-INV-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
       *        ÉÂ±¡¼ïÊÌ
                MOVE    SYS-1001-HOSPSBT    TO  SPA-HOSPSBT
                IF      SPA-BEDKBN          =   ZERO
@@ -1201,9 +1191,6 @@
            ELSE
                MOVE    SPACE                   TO  SPA-TAX-HASU-KBN
            END-IF
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
       *
       *    ¿ÇÎÅ²Ê
            INITIALIZE                  SPA-GMN-SRYKA-AREA
@@ -1406,14 +1393,13 @@
               AND (SPA-BEDSU           >=  200)
               AND (SPA-SRYYMD          >=  "20150101")
       *
-               MOVE    SPACE               TO  SYS-1201-REC
-               INITIALIZE                  SYS-1201-REC
-               MOVE    "1201"              TO  SYS-1201-KANRICD
-               MOVE    "A0000001"          TO  SYS-1201-KBNCD
-               MOVE    SPA-SRYYMD          TO  SYS-1201-STYUKYMD
-               MOVE    SPA-SRYYMD          TO  SYS-1201-EDYUKYMD
-               MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
-               MOVE    SYS-1201-REC        TO  SYSKANRI-REC
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "1201"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
+               MOVE    SPA-SRYYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SRYYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
       *
                PERFORM 900-SYSKANRI-INV-SEC
                IF      FLG-SYSKANRI        =   ZERO

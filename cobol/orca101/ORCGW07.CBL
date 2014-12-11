@@ -1409,9 +1409,6 @@
       *    Í½Ìóµ¡Ç½¾ðÊó
            COPY  "CPSK1045.INC".
       *
-      *    ÅÀ¿ô»»Äê´ð½à¾ðÊó
-           COPY  "CPSK1201.INC".
-      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
@@ -4992,14 +4989,13 @@
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               MOVE    SYSKANRI-REC        TO  SYS-1201-REC
-           ELSE
-               INITIALIZE  SYS-1201-REC
+           IF      FLG-SYSKANRI    NOT =   ZERO
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                      SYSKANRI-REC
            END-IF
       *
       *    ÂÅ·ëÎ¨¶èÊ¬
-           MOVE    SYS-1201-DAKETUKBN  TO  SPA-GMN-DAKETUKBN
+           MOVE    SYS-KANRITBL(1:1)   TO  SPA-GMN-DAKETUKBN
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDY         FROM    1   BY  1
@@ -9706,14 +9702,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4033-DEL-1201-SEC           SECTION.
       *
-           MOVE    SPACE               TO  SYS-1201-REC
-           INITIALIZE                      SYS-1201-REC
-           MOVE    "1201"              TO  SYS-1201-KANRICD
-           MOVE    "A0000001"          TO  SYS-1201-KBNCD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-STYUKYMD
-           MOVE    SPA-W01-EDYUKYMD    TO  SYS-1201-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
-           MOVE    SYS-1201-REC        TO  MCPDATA-REC
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1201"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -9723,7 +9720,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      MCP-RC              NOT =   ZERO 
                MOVE    "9001"              TO  SPA-ERRCD
-               DISPLAY "SYSKANRI-KEY =>" SYS-1201-KEY 
+               DISPLAY "SYSKANRI-KEY =>" SYS-KEY 
                        ",MCP-RC:" MCP-RC 
                GO  TO  4033-DEL-1201-EXT
            END-IF
@@ -10397,29 +10394,26 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        493-KOUSHIN-1201-SEC        SECTION.
       *
-           MOVE    SPACE               TO  SYS-1201-REC
-           INITIALIZE                      SYS-1201-REC
-           MOVE    "1201"              TO  SYS-1201-KANRICD
-           MOVE    "A0000001"          TO  SYS-1201-KBNCD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-STYUKYMD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-1201-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
-           MOVE    SYS-1201-REC        TO  MCPDATA-REC
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1201"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI            =   ZERO
-               MOVE    SYSKANRI-REC        TO  SYS-1201-REC
-           ELSE
-               MOVE    SPACE               TO  SYS-1201-REC
-               INITIALIZE                      SYS-1201-REC
-               MOVE    "1201"              TO  SYS-1201-KANRICD
-               MOVE    "A0000001"          TO  SYS-1201-KBNCD
+           IF      FLG-SYSKANRI        NOT =   ZERO
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    "1201"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
            END-IF
       *
-           MOVE    SPA-W01-STYUKYMD        TO  SYS-1201-STYUKYMD
-           MOVE    SPA-W01-EDYUKYMD        TO  SYS-1201-EDYUKYMD
-           MOVE    SPA-GMN-DAKETUKBN       TO  SYS-1201-DAKETUKBN
-      *
-           MOVE    SYS-1201-REC            TO  SYSKANRI-REC
+           MOVE    SPA-W01-STYUKYMD        TO  SYS-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD        TO  SYS-EDYUKYMD
+      *    ÂÅ·ëÎ¨¶èÊ¬
+           MOVE    SPA-GMN-DAKETUKBN       TO  SYS-KANRITBL(1:1)
       *
       *    £Ä£Â¹¹¿·½èÍý
            PERFORM 4910-DBKOUSIN-SEC

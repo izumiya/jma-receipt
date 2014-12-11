@@ -7163,7 +7163,7 @@
                        MOVE   "111012610"          TO  WRK-SRYCD
                    END-IF
       *H26.12
-      *            ÂÅ·ëÎ¨£µ£°%
+      *            ÂÅ·ëÎ¨£µ³ä°Ê²¼
                    IF      SPA-DAKT50-KBN      =   1
                        MOVE   "111012610"          TO  WRK-SRYCD
                    END-IF
@@ -7179,7 +7179,7 @@
                    MOVE   "111012610"          TO  WRK-SRYCD
                END-IF
       *H26.12
-      *        ÂÅ·ëÎ¨£µ£°%
+      *        ÂÅ·ëÎ¨£µ³ä°Ê²¼
                IF      SPA-DAKT50-KBN      =   1
                    MOVE   "111012610"          TO  WRK-SRYCD
                END-IF

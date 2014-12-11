@@ -1538,14 +1538,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
               AND (SPA-BEDSU           >=  200)
               AND (SPA-SRYYMD          >=  "20150101")
       *
-               MOVE    SPACE               TO  SYS-1201-REC
-               INITIALIZE                  SYS-1201-REC
-               MOVE    "1201"              TO  SYS-1201-KANRICD
-               MOVE    "A0000001"          TO  SYS-1201-KBNCD
-               MOVE    SPA-SRYYMD          TO  SYS-1201-STYUKYMD
-               MOVE    SPA-SRYYMD          TO  SYS-1201-EDYUKYMD
-               MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
-               MOVE    SYS-1201-REC        TO  SYSKANRI-REC
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "1201"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
+               MOVE    SPA-SRYYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SRYYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
       *
                PERFORM 900-SYSKANRI-INV-SEC
                IF      FLG-SYSKANRI        =   ZERO
