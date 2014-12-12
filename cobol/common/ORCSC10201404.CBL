@@ -74,6 +74,7 @@
       * 04.08.00     NACL-¬ø°π«º  13/03/XX  œ´∫“•≥°º•…•Ï•ª≈≈•≥°º•…¬–±˛
       * 04.08.00     NACL-¬ø°π«º  13/09/XX  œ´∫“∆±∆¸∫∆ø«•≥°º•…ƒ…≤√¬–±˛
       * 04.08.00     NACL-¬ø°π«º  14/03/XX  £»£≤£∂«Ø£¥∑Ó≤˛¿µ¬–±˛
+      * 04.07.00     NACL-¬ø°π«º  14/12/XX  £»£≤£∑«Ø£±∑Ó≤˛¿µ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -287,12 +288,12 @@
            03  WRK-KBN                 PIC X(01).
            03  WRK-KBN2                PIC X(01).
            03  WRK-ETCKBN              PIC X(01).
-           03  WRK-KAISU               PIC 9(04).
-           03  WRK-SAN-KAISU           PIC 9(04).
+           03  WRK-KAISU               PIC 9(01).
+      *****03  WRK-SAN-KAISU           PIC 9(04).
            03  WRK-HOSPSBT             PIC 9(01).
            03  WRK-SINSATU-KBN         PIC X(01).
            03  WRK-SINSATU-KBN2        PIC X(01).
-           03  WRK-SINSATU-KAISU       PIC 9(01).
+      *****03  WRK-SINSATU-KAISU       PIC 9(01).
       *    ø«ª°Œ¡•¡•ß•√•ØÕ—
            03  WRK-KEICD               PIC X(04).
            03  WRK-KEICD-IDX           PIC 9(04).
@@ -369,6 +370,7 @@
            03  WRK-SPA-CHIIKKBN        PIC 9(01).
            03  WRK-SPA-MEISAKBN        PIC 9(01).
            03  WRK-SPA-INITAUTO-FLG    PIC X(01).
+           03  WRK-SPA-DAKT50-KBN      PIC 9(01).
       *H25.3
            03  WRK-SYOUKAI             PIC 9(01).
            03  FLG-SYOKAINASI          PIC 9(01).
@@ -444,40 +446,38 @@
       *H25.4 §´§È
       *    ΩÈø«Œ¡° æ“≤æı§ §∑°À
            03  FILLER              PIC X(14)   VALUE   "110F 111012510".
-      *    ∆±∆¸ΩÈø«° æ“≤æı§ §∑°À
+      *    ∆±∆¸ΩÈø«° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À° ∂¶ƒÃ°À
            03  FILLER              PIC X(14)   VALUE   "110FD111012610".
       *    ≥∞ÕËø«Œ≈Œ¡° ¬æ∞ÂŒ≈µ°¥ÿ§ÿæ“≤°À
            03  FILLER              PIC X(14)   VALUE   "311  112016310".
-      *    ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À° ¬æ∞ÂŒ≈µ°¥ÿ§ÿæ“≤°À
+      *    ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À° ∂¶ƒÃ°À
            03  FILLER              PIC X(14)   VALUE   "310KD112016410".
       *    ∆±∆¸≥∞ÕËø«Œ≈Œ¡° ¬æ∞ÂŒ≈µ°¥ÿ§ÿæ“≤°À
            03  FILLER              PIC X(14)   VALUE   "311D 112016550".
       *
-      *H27.4 §´§È§ŒÕΩƒÍ
+      *H27.1 §´§È
       *    ΩÈø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120F 111012710".
+           03  FILLER              PIC X(14)   VALUE   "120F 111012710".
       *    ∫∆ø«Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120  112016610".
+           03  FILLER              PIC X(14)   VALUE   "120  112016610".
       *    ≈≈œ√≈˘∫∆ø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120T 112016750".
+           03  FILLER              PIC X(14)   VALUE   "120T 112016750".
       *    ∆±∆¸∫∆ø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120D 112016850".
+           03  FILLER              PIC X(14)   VALUE   "120D 112016850".
       *    ∆±∆¸≈≈œ√≈˘∫∆ø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120S 112016950".
-      *    ∫∆ø«Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°¶¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120KD112017010".
-      *    ≈≈œ√≈˘∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°¶¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "120JD112017150".
+           03  FILLER              PIC X(14)   VALUE   "120S 112016950".
+      *    ∫∆ø«Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À
+           03  FILLER              PIC X(14)   VALUE   "120KD112017010".
+      *    ≈≈œ√≈˘∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À
+           03  FILLER              PIC X(14)   VALUE   "120JD112017150".
       *    ≥∞ÕËø«Œ≈Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "321  112017310".
+           03  FILLER              PIC X(14)   VALUE   "321  112017310".
       *    ∆±∆¸≥∞ÕËø«Œ≈Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *    03  FILLER              PIC X(14)   VALUE   "321D 112017450".
-      *??* ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
-      *??* 03  FILLER              PIC X(14)   VALUE   "320KD112016410".
+           03  FILLER              PIC X(14)   VALUE   "321D 112017450".
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
-           03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
-      *??  03  TBL-SINSATU-OCC         OCCURS  29    INDEXED  TBL-IDX.
+      **   03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  29    INDEXED  TBL-IDX.
       *        £±°ß∞Ï»Ã°¢£≤°ßæÆª˘≤ ≥∞ÕËø«ª°Œ¡°¢£≥°ß≥∞ÕËø«Œ≈Œ¡
                05  TBL-KAISU           PIC 9(01).
       *        £±:æ“≤§ §∑°¢£≤°ß¬≈∑ÎŒ®£µ≥‰∞ ≤º
@@ -811,6 +811,12 @@
                    MOVE    SPA-CHIIKKBN        TO  WRK-SPA-CHIIKKBN
                    MOVE    SPA-MEISAKBN        TO  WRK-SPA-MEISAKBN
                    MOVE    SPA-INITAUTO-FLG    TO  WRK-SPA-INITAUTO-FLG
+                   MOVE    SPA-DAKT50-KBN      TO  WRK-SPA-DAKT50-KBN
+               END-IF
+      *        ≤Ò∑◊æ»≤Ò§œSPA-WORK§À ‘Ω∏
+               IF     (LNK-ORCSC-PG        =   "J04" )
+                AND   (SPA-SRYYMD          >=  "20150101")
+                  MOVE    SPA-WORK(1:1)        TO  WRK-SPA-DAKT50-KBN
                END-IF
                INITIALIZE                      SPA-K01KYOUTU
       *ver.4.8
@@ -818,6 +824,7 @@
                MOVE    WRK-SPA-CHIIKKBN    TO  SPA-CHIIKKBN
                MOVE    WRK-SPA-MEISAKBN    TO  SPA-MEISAKBN
                MOVE    WRK-SPA-INITAUTO-FLG    TO  SPA-INITAUTO-FLG
+               MOVE    WRK-SPA-DAKT50-KBN      TO  SPA-DAKT50-KBN
            END-IF
       *
            EVALUATE    LNK-ORCSC-KBN
@@ -870,7 +877,7 @@
            MOVE    ZERO                TO  IDX-SYU
            INITIALIZE                  WRK-AREA
            MOVE    SPACE               TO  WRK-NYU-SRYCD
-           MOVE    ZERO                TO  WRK-SINSATU-KAISU
+      *****MOVE    ZERO                TO  WRK-SINSATU-KAISU
       *
            MOVE    ZERO                TO  FLG-TIME-NYU
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
@@ -1184,6 +1191,8 @@
                    PERFORM 100111-HOUMON-CHK-SEC
       *        ∫ﬂ¬Àˆ¥¸∞ÂŒ≈¡ÌπÁø«ª°Œ¡
                WHEN    SPA-ZAIMATU-ARI NOT =   ZERO
+      *H26.12     ° ∆¸ÀË°À
+                  OR  (SPA-ZAIMATU-ARI2    =   1   )
                    PERFORM 100111-HOUMON-CHK-SEC
       *
       *        ≥´ ¸∑ø…¬±°∂¶∆±ªÿ∆≥Œ¡° £±°À≈˘§Œ»ΩƒÍ
@@ -1510,9 +1519,24 @@
                GO      TO      100114-SYUGISYORI-CHK-EXT
            END-IF
       *
-           IF      WRK-KAISU       NOT =   ZERO
-               MOVE    WRK-KAISU       TO  WRK-SINSATU-KAISU
+      *H27.1
+      *  ø«Œ≈π‘∞Ÿ§œ¡¥¬Œ§«•¡•ß•√•Ø
+      *    ¬≈∑ÎŒ®£µ≥‰∞ ≤º§Œ•¡•ß•√•Ø
+           IF     (LNK-ORCSC-PG        =   "J04"
+                                       OR  "KT01" )
+             AND  (FLG-TBL             =   1    )
+             AND  (WRK-ERRCD           =   SPACE)
+             AND  (SPA-SRYYMD          >=  "20150101" )
+               PERFORM 20012-DAKETU-CHK-SEC
+               IF      WRK-ERRCD       NOT =   SPACE
+                   GO      TO      100114-SYUGISYORI-CHK-EXT
+               END-IF
            END-IF
+      *
+      *
+      *    IF      WRK-KAISU       NOT =   ZERO
+      *        MOVE    WRK-KAISU       TO  WRK-SINSATU-KAISU
+      *    END-IF
       *
       *    œ´∫“§Œø«ª°Œ¡§Œ»ΩƒÍ
            IF      SPA-HKNKBN          =   1
@@ -1888,7 +1912,45 @@
            .
        1001140-CHIKIJIKAN-SET-EXT.
            EXIT.
-      *???????????????????????????????????????
+      *
+      *H26.12
+      *****************************************************************
+      *    ¬≈∑ÎŒ®§Œ•¡•ß•√•ØΩËÕ˝
+      *****************************************************************
+       20012-DAKETU-CHK-SEC               SECTION.
+      *
+           IF      WRK-ETCKBN          =   "2"
+      *        ¬≈∑ÎŒ®£µ≥‰∞ ≤º§Œ•≥°º•…§Ú¬–æ›§«§ §§ª˛§À∆˛Œœ
+               IF      SPA-DAKT50-KBN  NOT =   1
+                   MOVE    "K111"          TO  WRK-ERRCD
+               END-IF
+           ELSE
+      *        æ“≤æı§ §∑°¶æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡§œ•¡•ß•√•Ø§ §∑
+               IF     (WRK-ETCKBN          =   "1")
+                  OR  (WRK-KAISU           =   2  )
+                   CONTINUE
+               ELSE
+                   IF      SPA-DAKT50-KBN      =   1
+                       MOVE    "K112"          TO  WRK-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+           IF     (WRK-ERRCD       NOT =   SPACE )
+               IF     (WRK-COM-KZMFLG2(IDX-Z)
+                                           =   SPACE ) AND
+                      (LNK-ORCSC-KEI-IDX   =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-CUR    (IDX-Z)
+                   MOVE    "1"             TO  WRK-COM-KZMFLG2(IDX-Z)
+               ELSE
+                   MOVE    SPACE           TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       20012-DAKETU-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    π‘∫ÔΩ¸ΩËÕ˝
       *****************************************************************
@@ -2016,6 +2078,8 @@
       *H25.4   æ“≤§ §∑
                WHEN    "111012510"
                WHEN    "111012610"
+      *H27.1   ¬≈∑ÎŒ®
+               WHEN    "111012710"
       *            ºıø«Õ˙ŒÚ»ΩƒÍ
                    PERFORM 100131-RSIJYURRKCHK-SEC
            END-EVALUATE
@@ -5590,6 +5654,20 @@
       *
       *    ø«ª°Œ¡§Œ»ΩƒÍ
            PERFORM 2001-SINSATU-CHK-SEC
+      *
+      *H27.1
+      *    ¬≈∑ÎŒ®£µ≥‰∞ ≤º§Œ•¡•ß•√•Ø
+           IF     (FLG-TBL             =   1    )
+             AND  (SPA-ERRCD           =   SPACE)
+             AND  (WRK-ERRCD           =   SPACE)
+             AND  (SPA-SRYYMD          >=  "20150101" )
+               PERFORM 20012-DAKETU-CHK-SEC
+               MOVE    WRK-ERRCD       TO  SPA-ERRCD
+               IF      SPA-ERRCD       NOT =   SPACE
+                   GO      TO      20001-SINSATURYOCHK-EXT
+               END-IF
+           END-IF
+      *
       *H25.9
            IF     (FLG-TBL             =   ZERO )
              AND  (SPA-ERRCD           =   SPACE )
@@ -5605,7 +5683,7 @@
       *        ø«ª°Œ¡§Œ£±§ƒÃ‹
                IF      IDX-SINSATU         =   ZERO
                    MOVE    WRK-KBN         TO  WRK-SINSATU-KBN
-                   MOVE    WRK-KAISU       TO  WRK-SINSATU-KAISU
+      ****         MOVE    WRK-KAISU       TO  WRK-SINSATU-KAISU
                    MOVE    WRK-KBN2        TO  WRK-SINSATU-KBN2
                    MOVE    IDX-Z           TO  IDX-SINSATU
                END-IF

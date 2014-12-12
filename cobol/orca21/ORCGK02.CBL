@@ -108,6 +108,7 @@
       *  04.08.00    NACL-多々納  14/04/XX  行挿入・カーソル移動位置変更
       *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *  04.07.00    NACL-多々納  14/10/09  患者登録戻り処理変更
+      *  04.07.00    NACL-多々納  14/12/11  Ｈ２７年１月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6721,6 +6722,8 @@
       *        警告フラグクリア
                    EVALUATE    SPA-ERRCD
                    WHEN    "K236"
+                   WHEN    "K111"
+                   WHEN    "K112"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
                    WHEN    "K839"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
@@ -8102,6 +8105,8 @@
                                        OR  "101110010"
       *        紹介状なし追加
                                        OR  "111012510"
+      *        妥結率５割以下
+                                       OR  "111012710"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -8117,6 +8122,13 @@
                IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
                   AND  (SGDAY-SDAY             <   "20130401" )
                    MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
+      *H27.1   妥結率５割以下　Ｈ２７.１から
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012710")
+                  AND  (SGDAY-SDAY             <   "20150101" )
+                   MOVE    "1104"              TO  SPA-ERRCD
                    GO      TO      4101125-SYOSIN-CHK-EXT
                END-IF
       *
@@ -8159,6 +8171,8 @@
                                            OR  "101110010"
       *                紹介状なし追加
                                            OR  "111012510"
+      *                妥結率５割以下
+                                           OR  "111012710"
                    IF      SPA-SYOSINFLG       =   ZERO
                        MOVE    "099110001"         TO  WRK-SRYCD
                    ELSE

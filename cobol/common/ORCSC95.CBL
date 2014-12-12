@@ -63,6 +63,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/07/XX  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -3980,6 +3981,22 @@
                IF     (WRK-SYO-YMD1    =   SPACE        )
                OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
                   MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+               END-IF
+           END-IF
+      *
+      *H27.1 
+      *    ½é¿ÇÎÁ¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           IF      SPA-SRYYMD          >=  "20150101"
+               MOVE    "111012710"         TO  WRK-SRYCD
+               PERFORM 30091-SANTEI-CHK-SEC
+               IF      WRK-YMDS        NOT =   SPACE
+                   IF      WRK-YMDS        >   WRK-SYO-YMD
+                       MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+                   END-IF
+                   IF     (WRK-SYO-YMD1    =   SPACE        )
+                   OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                      MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+                   END-IF
                END-IF
            END-IF
       *

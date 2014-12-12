@@ -3537,6 +3537,22 @@
                END-IF
            END-IF
       *
+      *H27.1 
+      *    ½é¿ÇÎÁ¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           IF      SPA-SRYYMD          >=  "20150101"
+               MOVE    "111012710"         TO  WRK-SRYCD
+               PERFORM 30091-SANTEI-CHK-SEC
+               IF      WRK-YMDS        NOT =   SPACE
+                   IF      WRK-YMDS        >   WRK-SYO-YMD
+                       MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+                   END-IF
+                   IF     (WRK-SYO-YMD1    =   SPACE        )
+                   OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                      MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+                   END-IF
+               END-IF
+           END-IF
+      *
       *    ¾®»ù²Ê¿Ç»¡ÎÁ
       *    ±¡³°½èÊý   ½é¿Ç
            MOVE    "113003510"         TO  WRK-SRYCD

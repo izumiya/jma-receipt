@@ -773,3 +773,12 @@
                             PIC X(50)   OCCURS  5 TIMES.
                 04  W07-TAGNAME7.
                   05  W07-TAGNAME7-STATE   PIC S9(9)   BINARY.
+                04  W07-TAG8.
+                  05  W07-DAKETUKBN-COMB.
+                    06  W07-DAKETUKBN.
+                      07  W07-VALUE   PIC X(50).
+                    06  W07-DAKETUKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W07-DAKETUKBN-ITEM
+                            PIC X(50)   OCCURS  5 TIMES.
+                04  W07-TAGNAME8.
+                  05  W07-TAGNAME8-STATE   PIC S9(9)   BINARY.

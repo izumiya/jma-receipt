@@ -52,6 +52,7 @@
       * 04.05.00     NACL-¬ø°π«º  10/01/15  º£∏≥°¶≥»ƒ•¥¡ª˙¬–±˛
       * 04.05.00     NACL-¬ø°π«º  10/03/XX   ø¿Æ£≤£≤«Ø£¥∑Ó≤˛¿µ¬–±˛
       * 04.07.00     NACL-¬ø°π«º  14/11/XX  ∏¯»ÒSORT«—ªﬂ¬–±˛
+      * 04.08.00     NACL-¬ø°π«º  14/12/XX  £»£≤£∑«Ø£±∑Ó≤˛¿µ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -165,9 +166,13 @@
            03  FLG-SYONIKA             PIC 9(01).
            03  FLG-SYOSIN              PIC 9(01).
       *    ø«ª°Œ¡
-           03  FLG-SINSATU         PIC 9(01).
+           03  FLG-SINSATU             PIC 9(01).
       *    œ∑øÕ
-           03  FLG-ROUJIN         PIC 9(01).
+           03  FLG-ROUJIN              PIC 9(01).
+      *H27.1
+      *    ¬≈∑ÎŒ®∂Ë ¨
+           03  WRK-DAKT50-KBN          PIC 9(01).
+      *
       *    «ØŒ»ΩƒÍÕ—
            03  WRK-BIRTHDAY.
                05  WRK-BIRTH-YY    PIC 9(04).
@@ -193,6 +198,7 @@
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-KBN                 PIC X(01).
            03  WRK-KBN2                PIC X(01).
+           03  WRK-ETCKBN              PIC X(01).
            03  FLG-ARI                 PIC 9(01).
       *
            03  FLG-ARIS                PIC 9(01).
@@ -477,6 +483,57 @@
       *01  TBL-SIN-MAX                 PIC 9(04)   VALUE   84.
        01  TBL-SIN-MAX                 PIC 9(04)   VALUE   88.
       *
+      *H26.4
+      *ΩÈø«§»∫∆ø«§Œ§ﬂ§»§π§Î
+      *    ø«ª°Œ¡•∆°º•÷•Î
+       01  TBL-SINSATU-AREA02.
+      *    ΩÈø«Œ¡
+           03  FILLER              PIC X(14)   VALUE   "100F 111000110".
+      *    ∫∆ø«Œ¡° ∞Ï»Ã …¬±°°À
+           03  FILLER              PIC X(14)   VALUE   "100  112007410".
+      *    ∆±∆¸∫∆ø«° ∞Ï»Ã …¬±°°À
+           03  FILLER              PIC X(14)   VALUE   "100D 112008350".
+      *
+      *    æÆª˘≤ ≥∞ÕËø«ª°Œ¡(±°≥∞ΩË ˝ ΩÈø«)
+           03  FILLER              PIC X(14)   VALUE   "200FG113003510".
+      *    æÆª˘≤ ≥∞ÕËø«ª°Œ¡(±°∆‚ΩË ˝ ΩÈø«)
+           03  FILLER              PIC X(14)   VALUE   "200FN113003710".
+      *    æÆª˘≤ ≥∞ÕËø«ª°Œ¡(±°≥∞ΩË ˝ ∫∆ø«)
+           03  FILLER              PIC X(14)   VALUE   "200 G113003610".
+      *    æÆª˘≤ ≥∞ÕËø«ª°Œ¡(±°∆‚ΩË ˝ ∫∆ø«)
+           03  FILLER              PIC X(14)   VALUE   "200 N113003810".
+      *
+      *    ≥∞ÕËø«Œ≈Œ¡
+           03  FILLER              PIC X(14)   VALUE   "301  112011310".
+      *    ∆±∆¸≥∞ÕËø«Œ≈Œ¡
+           03  FILLER              PIC X(14)   VALUE   "301D 112011710".
+      *
+      *    ΩÈø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
+           03  FILLER              PIC X(14)   VALUE   "120F 111012710".
+      *    ∫∆ø«Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
+           03  FILLER              PIC X(14)   VALUE   "120  112016610".
+      *    ∆±∆¸∫∆ø«° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
+           03  FILLER              PIC X(14)   VALUE   "120D 112016850".
+      *    ≥∞ÕËø«Œ≈Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
+           03  FILLER              PIC X(14)   VALUE   "321  112017310".
+      *    ∆±∆¸≥∞ÕËø«Œ≈Œ¡° ¬≈∑ÎŒ®£µ≥‰∞ ≤º°À
+           03  FILLER              PIC X(14)   VALUE   "321D 112017450".
+      *
+       01  TBL-SINSATU-AREA02R         REDEFINES   TBL-SINSATU-AREA02.
+           03  TBL2-SINSATU-OCC        OCCURS  14    INDEXED  TBL2-IDX.
+      *        £±°ß∞Ï»Ã°¢£≤°ßæÆª˘≤ ≥∞ÕËø«ª°Œ¡°¢£≥°ß≥∞ÕËø«Œ≈Œ¡
+               05  TBL2-KAISU           PIC 9(01).
+      *        £±:æ“≤§ §∑°¢£≤°ß¬≈∑ÎŒ®£µ≥‰∞ ≤º
+               05  TBL2-ETCKBN          PIC 9(01).
+      *        …¬±°ºÔ Ã° £±°ß…¬±°°¢£≤°ßø«Œ≈ΩÍ°À
+               05  TBL2-HOSPSBT         PIC 9(01).
+      *        D:∆±∆¸∫∆ø«,F:ΩÈø«
+               05  TBL2-KBN             PIC X(01).
+      *        G:±°≥∞°¢N:±°∆‚° æÆª˘≤ ≥∞ÕËø«ª°Œ¡°À
+               05  TBL2-KBN2            PIC X(01).
+      *        ø«Œ≈•≥°º•…
+               05  TBL2-SRYCD           PIC X(09).
+      *
       *****************************************************************
       *    •’•°•§•Î•Ï•§•¢•¶•»
       *****************************************************************
@@ -516,6 +573,9 @@
            COPY    "CPSK1002.INC".
       *
            COPY    "CPSK1010.INC".
+      *
+      *    ≈¿øÙªªƒÍ¥Ω‡
+           COPY    "CPSK1201.INC".
       *
       *    £√£Ã£¡£…£Õ¿‹¬≥æ Û
            COPY  "CPSK9000.INC".
@@ -1428,6 +1488,10 @@
                MOVE    SYS-1010-NAME   TO  WRK-LF01-CRE301-FULLNAME
                MOVE    SPA-DRCD        TO  WRK-LF01-CRE301-PERSONALID
            END-IF
+      *H27.1
+      *    •π•∆•‡¥…Õ˝ ¬≈∑ÎŒ®∏°∫˜
+           PERFORM 2003-SYSKANRI-DAKETU-SEC
+      *
       *    ø«ª°Œ¡•≥°º•…§Ú∑ËƒÍ§π§Î
            PERFORM 2020-SRYCD-SET-SEC
       *
@@ -1460,6 +1524,41 @@
       *
            .
        200-MAIN-EXT.
+           EXIT.
+      *H26.12
+      *****************************************************************
+      *    •π•∆•‡¥…Õ˝° ¬≈∑ÎŒ®°À¿ﬂƒÍΩËÕ˝
+      *****************************************************************
+       2003-SYSKANRI-DAKETU-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  WRK-DAKT50-KBN
+      *
+      *    …¬±°°¶µˆ≤ƒ…¬æ≤øÙ£≤£∞£∞∞ æÂ
+           IF     (SYS-1001-HOSPSBT    =   "1"  )
+              AND (SYS-1001-BEDSU      >=  200  )
+              AND (SPA-SYSYMD          >=  "20150101")
+      *
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "1201"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+               PERFORM 900-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1201-REC
+      *            ¬≈∑ÎŒ®∞ ≤º
+                   IF      SYS-1201-DAKETUKBN  =   "1"
+                       MOVE    1                   TO  WRK-DAKT50-KBN
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       2003-SYSKANRI-DAKETU-EXT.
            EXIT.
       * 
       *****************************************************************
@@ -1811,6 +1910,13 @@
                IF      FLG-ARIS        =   1
                    GO      TO      2020-SRYCD-SET-EXT
                END-IF
+           END-IF
+      *
+      *H27.1
+           IF      SPA-SYSYMD          >=  "20150101"
+      *        H27.1§´§È§Œ•≥°º•…¿ﬂƒÍ
+               PERFORM 20210-SRYCD-SET02-SEC
+               GO      TO      2020-SRYCD-SET-EXT
            END-IF
       *
       *    ø«ª°Œ¡•≥°º•…§Ú∑ËƒÍ§π§Î
@@ -2205,6 +2311,83 @@
            .
        20201-SYONIKA-HEN-EXT.
            EXIT.
+      *H27.1
+      *****************************************************************
+      *    ø«ª°Œ¡•≥°º•…∑ËƒÍΩËÕ˝° £»£≤£∑«Ø£±∑Ó§´§È°À
+      *****************************************************************
+       20210-SRYCD-SET02-SEC        SECTION.
+      *
+      *    ø«ª°Œ¡•≥°º•…§Ú∑ËƒÍ§π§Î
+           IF      WRK-SYOSIN          =   1
+               MOVE    "11"                TO  WRK-SRYKBN
+               MOVE    "F"                 TO  WRK-KBN
+      *        ø«ª°•≥°º•…§Ú•∆°º•÷•Î§Ë§Í∑ËƒÍ
+               PERFORM 20210-SRYCD-TBL02-SEC
+               MOVE    "110"               TO  WRK-LF01-BUNDLE-CLASSCODE
+           ELSE
+      *        ∆±∆¸∫∆ø«Œ¡ªªƒÍ
+               IF      WRK-LSTYMD          =   SPA-SYSYMD
+                   MOVE    "12"                TO  WRK-SRYKBN
+                   MOVE    "D"                 TO  WRK-KBN
+      *            ø«ª°•≥°º•…§Ú•∆°º•÷•Î§Ë§Í∑ËƒÍ
+                   PERFORM 20210-SRYCD-TBL02-SEC
+               ELSE
+      *        ∫∆ø«Œ¡ªªƒÍ
+                   MOVE    "12"                TO  WRK-SRYKBN
+                   MOVE    SPACE               TO  WRK-KBN
+      *            ø«ª°•≥°º•…§Ú•∆°º•÷•Î§Ë§Í∑ËƒÍ
+                   PERFORM 20210-SRYCD-TBL02-SEC
+               END-IF
+               MOVE    "120"               TO  WRK-LF01-BUNDLE-CLASSCODE
+           END-IF
+      *
+           .
+       20210-SRYCD-SET02-EXT.
+           EXIT.
+      *****************************************************************
+      *    ø«ª°Œ¡§Ú•∆°º•÷•Î§Ë§Í∑ËƒÍΩËÕ˝
+      *****************************************************************
+       20210-SRYCD-TBL02-SEC              SECTION.
+      *
+           MOVE    1                   TO  WRK-KAISU
+           IF      WRK-SRYKBN          =   "12"
+      *        ∞Ï»Ã…¬æ≤øÙ
+               IF     (SYS-1001-HOSPSBT    =   "1"  )  AND
+                      (SYS-1001-BEDSUIPN   >=  200  )
+      *            200æ≤∞ æÂ§œ≥∞ÕËø«ª°Œ¡
+                   MOVE    3               TO  WRK-KAISU
+               END-IF
+           END-IF
+      *
+           IF      WRK-SRYKBN          =   "11"
+               MOVE    ZERO                TO  WRK-HOSPSBT
+           ELSE
+               MOVE    SPA-HOSPSBT         TO  WRK-HOSPSBT
+           END-IF
+      *H27.1
+      *    ¬≈∑ÎŒ®£µ≥‰∞ ≤º
+           IF     (WRK-DAKT50-KBN      =   1          )
+               MOVE    "2"             TO  WRK-ETCKBN
+           ELSE
+               MOVE    "0"             TO  WRK-ETCKBN
+           END-IF
+      *
+      *    ø«ª°Œ¡•ª•√•»
+           SET     TBL2-IDX             TO  1
+           SEARCH  TBL2-SINSATU-OCC     VARYING   TBL2-IDX
+               AT   END
+                   MOVE    SPACE           TO  WRK-LF01-IJICD
+               WHEN   (WRK-KAISU           =   TBL2-KAISU(TBL2-IDX))
+                 AND  (WRK-KBN             =   TBL2-KBN  (TBL2-IDX))
+                 AND  (WRK-ETCKBN          =   TBL2-ETCKBN(TBL2-IDX))
+                   MOVE    TBL2-SRYCD (TBL2-IDX)
+                                               TO  WRK-LF01-IJICD
+           END-SEARCH
+      *
+           .
+       20210-SRYCD-TBL02-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ºı…’•·•‚ ‘Ω∏ΩËÕ˝
       *****************************************************************

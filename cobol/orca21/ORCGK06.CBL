@@ -2152,6 +2152,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "099110001"
       *H25.4           ¾Ò²ð¤Ê¤·
                                        OR  "111012510"
+      *H27.1           ÂÅ·ëÎ¨£µ³ä°Ê²¼
+                                       OR  "111012710"
                CONTINUE
            ELSE
                GO      TO      4510-KARRK-UPD-EXT

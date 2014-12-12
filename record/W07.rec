@@ -1103,6 +1103,18 @@ W07	{
 			TAGNAME7    {
 			  	state   int;
 			};
+			TAG8	{
+				DAKETUKBN_COMB	{
+					DAKETUKBN	{
+						value	varchar(50);
+					};
+					count	int;
+					item	varchar(50)[5];
+				};
+			};
+			TAGNAME8    {
+			  	state   int;
+			};
 		};
 	};
 };

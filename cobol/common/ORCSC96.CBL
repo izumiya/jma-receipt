@@ -1854,13 +1854,13 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
-      *
       *Ｈ２２．４から
                WHEN    "0270"
                    STRING  "ＣＴ、ＭＲＩが逓減になります。"
                            "剤を分けて入力して下さい"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0260"
                    STRING  "組織診断料を算定できる検査を入力して"
                            "下さい。"
@@ -2136,6 +2136,27 @@
                            "至急、点数マスタをチェックしてください。"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
+                   END-STRING
+      *H27.1 改正から
+               WHEN    "K111"
+                   STRING  "警告！"
+                           "妥結率５割以下の設定ではありません。"
+                           "確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K112"
+                   STRING  "警告！"
+                           "妥結率５割以下の設定です。"
+                           "妥結率５割以下のコードを入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "1104"
+                   STRING  "この初診の初診算定日は平成２７年１月以降"
+                           "にして下さい。"
+                                           DELIMITED   BY  SIZE
+                                           INTO    SPA-ERRMSG
                    END-STRING
            END-EVALUATE
            .

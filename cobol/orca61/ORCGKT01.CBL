@@ -34,6 +34,7 @@
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/08/12  ¿ÇÎÅ²ÊÊÑ¹¹ÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  11/02/16  ÍÑË¡¥³¥á¥ó¥ÈÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/12/11  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4368,6 +4369,8 @@
       *        ·Ù¹ð¥Õ¥é¥°¥¯¥ê¥¢
                    EVALUATE    SPA-ERRCD
                    WHEN    "K236"
+                   WHEN    "K111"
+                   WHEN    "K112"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
                    WHEN    "K839"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
@@ -5430,6 +5433,8 @@
                                        OR  "101110010"
       *        ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
                                        OR  "111012510"
+      *        ÂÅ·ëÎ¨£µ³ä°Ê²¼
+                                       OR  "111012710"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -5446,6 +5451,13 @@
                IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
                   AND  (SGDAY-SDAY             <   "20130401" )
                    MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
+      *H27.1   ÂÅ·ëÎ¨£µ³ä°Ê²¼¡¡£È£²£·.£±¤«¤é
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012710")
+                  AND  (SGDAY-SDAY             <   "20150101" )
+                   MOVE    "1104"              TO  SPA-ERRCD
                    GO      TO      4101125-SYOSIN-CHK-EXT
                END-IF
       *
