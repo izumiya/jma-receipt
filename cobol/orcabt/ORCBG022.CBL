@@ -90,6 +90,7 @@
            03  IDS                     PIC 9(05).
            03  IDX-TBL                 PIC 9(05).
            03  IDS2                    PIC 9(05).
+           03  IDS3                    PIC 9(05).
            03  IDX-DAY                 PIC 9(02).
            03  IDX-AC                  PIC 9(02).
       *
@@ -865,27 +866,38 @@
       *****************************************************************
        2002-HENSYU-SYORI-SEC        SECTION.
       *
-      *
       *    ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¥Á¥§¥Ã¥¯
+           MOVE    ZERO                TO  IDS3
            INITIALIZE                  ORCSPSYCHOAREA
            PERFORM VARYING     IDS     FROM    1   BY  1
                    UNTIL      (IDS         >   50  )   OR
                               (TBL-SRY-SRYCD (IDS) =   SPACE )
                MOVE    TBL-SRY-SRYCD (IDS) TO  TNS-SRYCD
                PERFORM 910-TENSU-READ-SEC
-               MOVE    TBL-SRY-SRYCD (IDS) TO  ORCSPSYCHO-SRYCD (IDS)
+      *H26.12
+      *        ¸ºÅÀ¤ÏÂÐ¾Ý³°
+               IF     (TNS-TENSIKIBETU     =   7     )
+                 OR   (TNS-YAKKAKJNCD      =   SPACE )
+                   CONTINUE
+               ELSE
+      *
+               ADD     1                   TO  IDS3
+      *
+               MOVE    TBL-SRY-SRYCD (IDS) TO  ORCSPSYCHO-SRYCD (IDS3)
                MOVE    TNS-YAKKAKJNCD      TO  ORCSPSYCHO-YAKKAKJNCD
-                                                                 (IDS)
+                                                                 (IDS3)
       *
                MOVE    TBL-SRY-SRYSYUKBN(IDS)
                                            TO  ORCSPSYCHO-SRYSYUKBN
-                                                                 (IDS)
+                                                                 (IDS3)
                MOVE    TBL-ZAIKAISU (IDS)
                                            TO  ORCSPSYCHO-KAISU
-                                                                 (IDS)
+                                                                 (IDS3)
       *
-               MOVE    TNS-NAME            TO  TBL-NAME      (IDS)
-               MOVE    TNS-YAKKAKJNCD      TO  TBL-YAKKAKJNCD(IDS)
+               MOVE    TNS-NAME            TO  TBL-NAME      (IDS3)
+               MOVE    TNS-YAKKAKJNCD      TO  TBL-YAKKAKJNCD(IDS3)
+      *
+               END-IF
            END-PERFORM
       *
            MOVE    WRK-KEY-SRYYMD      TO  ORCSPSYCHO-SRYYMD
