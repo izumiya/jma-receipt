@@ -6935,6 +6935,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        警告フラグクリア
                    EVALUATE    SPA-ERRCD
                    WHEN    "K236"
+                   WHEN    "K111"
                    WHEN    "K112"
                        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
                    WHEN    "K839"
