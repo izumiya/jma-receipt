@@ -274,6 +274,8 @@
       *  04.07.20    NACL-門脇    14/09/11  摘要欄に印字しない診療行為コードの
       *                                     データ区分２、かつ、診療区分が点数
       *                                     マスタの診療区分と異なる場合の対応
+      *  04.07.21    NACL-門脇    14/12/15  平成２７年１月改正対応
+      *                                     （初再診料・低妥結率対応）
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -800,6 +802,8 @@
            03  CONS-GAIRAIRYO3 PIC X(09)     VALUE "112011710".
            03  CONS-GAIRAIRYO4 PIC X(09)     VALUE "112016310".
            03  CONS-GAIRAIRYO5 PIC X(09)     VALUE "112016550".
+           03  CONS-GAIRAIRYO6 PIC X(09)     VALUE "112017310".
+           03  CONS-GAIRAIRYO7 PIC X(09)     VALUE "112017450".
       *    処方せん料
            03  CONS-SHOHOSEN1 PIC X(09)      VALUE "120002710".
            03  CONS-SHOHOSEN2 PIC X(09)      VALUE "120002810".
@@ -1406,8 +1410,12 @@
       *
       *    再診料（同一日２科目）
            03  CONS-DOUJITU-SAI      PIC X(09)  VALUE  "112015810".
+      *    再診料（同一日２科目・減点規定該当の場合）
+           03  CONS-DOUJITU-SAI2     PIC X(09)  VALUE  "112017010".
       *    電話等再診（同一日２科目）
            03  CONS-DOUJITU-DEN      PIC X(09)  VALUE  "112015950".
+      *    電話等再診（同一日２科目・減点規定該当の場合）
+           03  CONS-DOUJITU-DEN2     PIC X(09)  VALUE  "112017150".
       *    外来診療料（同一日２科目）
            03  CONS-DOUJITU-GAI      PIC X(09)  VALUE  "112016210".
       *    外来診療料（同一日２科目：紹介する旨申し出）
@@ -2647,6 +2655,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 CONS-GAIRAIRYO3  OR
                                                 CONS-GAIRAIRYO4  OR
                                                 CONS-GAIRAIRYO5  OR
+                                                CONS-GAIRAIRYO6  OR
+                                                CONS-GAIRAIRYO7  OR
                                                 CONS-DOUJITU-GAI OR
                                                 CONS-DOUJITU2-GAI
                         MOVE   "2"      TO    RECE41-KEIZOKU-PRTKBN
@@ -3958,7 +3968,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *       再診料算定科：
               IF ( SRY-SRYCD(IDX2)    =     "830000021"
                                       OR    CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-SAI2
                                       OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-DEN2
                                       OR    CONS-DOUJITU-GAI
                                       OR    CONS-DOUJITU2-GAI)
               OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI19   ) AND
@@ -4014,6 +4026,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE41-SRYYM      >=    "201004"       ))
               OR  ((SRY-SRYCD(IDX2)   =     "101120050"    ) AND
                    (RECE41-SRYYM      >=    "201307"       ))
+              OR  ((SRY-SRYCD(IDX2)   =     "112016750"    ) AND
+                   (RECE41-SRYYM      >=    "201501"       ))
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DENWASAI-COMMENT
               END-IF
@@ -4067,6 +4081,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE41-SRYYM      >=    "201004"       ))
               OR  ((SRY-SRYCD(IDX2)   =     "101120060"    ) AND
                    (RECE41-SRYYM      >=    "201307"       ))
+              OR  ((SRY-SRYCD(IDX2)   =     "112016850"    ) AND
+                   (RECE41-SRYYM      >=    "201501"       ))
+              OR  ((SRY-SRYCD(IDX2)   =     "112017450"    ) AND
+                   (RECE41-SRYYM      >=    "201501"       ))
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
               END-IF
@@ -4075,13 +4093,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE41-SRYYM      >=    "201004"       ))
               OR  ((SRY-SRYCD(IDX2)   =     "101120070"    ) AND
                    (RECE41-SRYYM      >=    "201307"       ))
+              OR  ((SRY-SRYCD(IDX2)   =     "112016950"    ) AND
+                   (RECE41-SRYYM      >=    "201501"       ))
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUDENSAI-COMMENT
               END-IF
       *
       *       再診（同一日２科目）
               IF ( SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-SAI2
                                       OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-DEN2
                                       OR    CONS-DOUJITU-GAI
                                       OR    CONS-DOUJITU2-GAI)
               OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI19   ) AND
@@ -5219,7 +5241,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            END-IF
       *    再診（同一日２科目）
            IF    RECE45-SRYCD(IDX4)   = CONS-DOUJITU-SAI
+                                     OR CONS-DOUJITU-SAI2
                                      OR CONS-DOUJITU-DEN
+                                     OR CONS-DOUJITU-DEN2
                                      OR CONS-DOUJITU-GAI
                                      OR CONS-DOUJITU2-GAI
                  MOVE   25            TO  WRK-SETCOM-JIDO
@@ -8098,9 +8122,11 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
-                      IF    SRY-SRYCD(IDX3) =  CONS-DOUJITU-SAI OR
-                                               CONS-DOUJITU-DEN OR
-                                               CONS-DOUJITU-GAI OR
+                      IF    SRY-SRYCD(IDX3) =  CONS-DOUJITU-SAI   OR
+                                               CONS-DOUJITU-SAI2  OR
+                                               CONS-DOUJITU-DEN   OR
+                                               CONS-DOUJITU-DEN2  OR
+                                               CONS-DOUJITU-GAI   OR
                                                CONS-DOUJITU2-GAI
                         IF   WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
                             CONTINUE
@@ -9011,6 +9037,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                              CONS-GAIRAIRYO3  OR
                                              CONS-GAIRAIRYO4  OR
                                              CONS-GAIRAIRYO5  OR
+                                             CONS-GAIRAIRYO6  OR
+                                             CONS-GAIRAIRYO7  OR
                                              CONS-DOUJITU-GAI OR
                                              CONS-DOUJITU2-GAI
                          IF    RECE41-KHNTEN(3)   =   ZERO
@@ -9038,7 +9066,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                            ELSE
                              ADD    WK-ZAIKAISU  TO  RECE41-KAISU(2)
                              IF  SRY-SRYCD(IDX3)  =  CONS-DOUJITU-SAI
+                                                 OR  CONS-DOUJITU-SAI2
                                                  OR  CONS-DOUJITU-DEN
+                                                 OR  CONS-DOUJITU-DEN2
                                                  OR  CONS-DOUJITU-GAI
                                                  OR  CONS-DOUJITU2-GAI
                                ADD  WK-ZAIKAISU  TO  CNT-SAISIN-DOUJITU

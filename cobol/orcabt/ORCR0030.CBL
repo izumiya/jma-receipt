@@ -678,6 +678,7 @@
       *                                     ° £∞£µ£¥°¢£∞£µ£≤¬–±˛°À
       *                                     ° π‚≥€Œ≈Õ‹»Ò¬–±˛°À
       *                                     ° ÃÙªˆÀ°¬–±˛°À
+      *                                     ° ΩÈ∫∆ø«Œ¡°¶ƒ„¬≈∑ÎŒ®¬–±˛°À
       *
       *  04.08.01    NACL-ÃÁœ∆    13/01/22  ∆¸øÙ≤ÛøÙ•∆°º•÷•Î£±£∞≤Û¬–±˛
       *  04.08.02    NACL-ÃÁœ∆    13/01/25   Ò≥Áø«Œ≈ ¨§Œ≈¿∏°Õ—•Ï•ª•◊•»µ≠∫‹¬–±˛
@@ -2321,8 +2322,12 @@
       *
       *    ∫∆ø«Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À
            03  CONS-DOUJITU-SAI    PIC X(09) VALUE "112015810".
+      *    ∫∆ø«Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À
+           03  CONS-DOUJITU-SAI2   PIC X(09) VALUE "112017010".
       *    ≈≈œ√≈˘∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
            03  CONS-DOUJITU-DEN    PIC X(09) VALUE "112015950".
+      *    ≈≈œ√≈˘∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°¶∏∫≈¿µ¨ƒÍ≥∫≈ˆ§ŒæÏπÁ°À
+           03  CONS-DOUJITU-DEN2   PIC X(09) VALUE "112017150".
       *    ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À
            03  CONS-DOUJITU-GAI    PIC X(09) VALUE "112016210".
       *    ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°ßæ“≤§π§Îª›øΩ§∑Ω–°À
@@ -10340,7 +10345,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112015950"
                                               OR "112016210"
                                               OR "112016410"
-                                              OR "113015810"      )
+                                              OR "113015810"
+                                              OR "112016850"
+                                              OR "112016950"
+                                              OR "112017010"
+                                              OR "112017150"
+                                              OR "112017450"      )
       *
                              MOVE    1      TO    FLG-SHOSAISIN         
       *
@@ -11024,7 +11034,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *       ∫∆ø«Œ¡ªªƒÍ≤ °ß
               IF   SRY-SRYCD(IDX2)    =     "830000021"
                                       OR    CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-SAI2
                                       OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-DEN2
                                       OR    CONS-DOUJITU-GAI
                                       OR    CONS-DOUJITU2-GAI
                         MOVE   "1"    TO    RECE02-COMCNTFLG
@@ -11071,8 +11083,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DENWASAI-COMMENT
               END-IF
-              IF  (SRY-SRYCD(IDX2)    =     "112007950"     )
-              AND (RECE02-SRYYM       >=    "201004"        )
+              IF ((SRY-SRYCD(IDX2)    =     "112007950"     ) AND
+                  (RECE02-SRYYM       >=    "201004"        ))
+              OR ((SRY-SRYCD(IDX2)    =     "112016750"     ) AND
+                  (RECE02-SRYYM       >=    "201501"        ))
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DENWASAI-COMMENT
               END-IF
@@ -11120,16 +11134,22 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT
               END-IF
-              IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
+              IF ((SRY-SRYCD(IDX2)    =     "112008350"   OR
                                             "112011710"   OR
-                                            "112016550"     )
-              AND (RECE02-SRYYM       >=    "201004"        )
+                                            "112016550"     ) AND
+                  (RECE02-SRYYM       >=    "201004"        ))
+              OR ((SRY-SRYCD(IDX2)    =     "112016850"     ) AND
+                  (RECE02-SRYYM       >=    "201501"        ))
+              OR ((SRY-SRYCD(IDX2)    =     "112017450"     ) AND
+                  (RECE02-SRYYM       >=    "201501"        ))
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT
               END-IF
       *       ∆±∆¸≈≈œ√∫∆ø«
-              IF  (SRY-SRYCD(IDX2)    =     "112008850"     )
-              AND (RECE02-SRYYM       >=    "201004"        )
+              IF ((SRY-SRYCD(IDX2)    =     "112008850"     ) AND
+                  (RECE02-SRYYM       >=    "201004"        ))
+              OR ((SRY-SRYCD(IDX2)    =     "112016950"     ) AND
+                  (RECE02-SRYYM       >=    "201501"        ))
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DOUDENSAI-COMMENT
               END-IF
@@ -11156,7 +11176,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
       *       ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
               IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-SAI2
                                       OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-DEN2
                                       OR    CONS-DOUJITU-GAI
                                       OR    CONS-DOUJITU2-GAI)
               AND (FLG-SAIDOU-COM     =     ZERO             )
@@ -12162,7 +12184,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            END-IF
       *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
            IF    RECE05-SRYCD(IDX4)   = CONS-DOUJITU-SAI
+                                     OR CONS-DOUJITU-SAI2
                                      OR CONS-DOUJITU-DEN
+                                     OR CONS-DOUJITU-DEN2
                                      OR CONS-DOUJITU-GAI
                                      OR CONS-DOUJITU2-GAI
                  MOVE   25            TO  WRK-SETCOM-JIDO
@@ -12992,7 +13016,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        ELSE
                            ADD   WK-ZAIKAISU    TO   RECE02-KAISU(2)
                            IF    SRY-SRYCD(IDX3)   =   CONS-DOUJITU-SAI
+                                                  OR   CONS-DOUJITU-SAI2
                                                   OR   CONS-DOUJITU-DEN
+                                                  OR   CONS-DOUJITU-DEN2
                                                   OR   CONS-DOUJITU-GAI
                                                   OR   CONS-DOUJITU2-GAI
                              ADD  WK-ZAIKAISU   TO   CNT-SAISIN-DOUJITU

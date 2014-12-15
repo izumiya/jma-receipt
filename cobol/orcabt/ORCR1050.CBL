@@ -72,6 +72,8 @@
       *                                     データ区分２、かつ、診療区分が点数
       *                                     マスタの診療区分と異なる場合の対応
       *  04.07.04    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
+      *  04.07.05    NACL-門脇    14/12/15  平成２７年１月改正対応
+      *                                     （初再診料・低妥結率対応）
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -762,10 +764,21 @@
       *    処方料（向精神薬多剤投与）
            03  FILLER          PIC X(09)   VALUE   "120003610".
       *
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   71.
+      *    初診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "111012710".
+      *    再診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "112016610".
+      *    電話等再診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "112016750".
+      *    同日再診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "112016850".
+      *    同日電話等再診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "112016950".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   71.
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   76.
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   76.
       *
       *    固定値
        01  CONST-AREA.
