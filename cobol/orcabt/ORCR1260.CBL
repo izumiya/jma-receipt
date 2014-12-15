@@ -60,6 +60,8 @@
       *  04.07.01    NACL-門脇    12/08/28  薬剤料減点対応
       *  04.07.02    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *  04.07.03    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
+      *  04.07.04    NACL-門脇    14/12/15  平成２７年１月改正対応
+      *                                     （初再診料・低妥結率対応）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -590,10 +592,13 @@
       *    寝たきり老人在宅総合診療科算定終了
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.       
+      *    初診（妥結率５割以下）
+           03  FILLER          PIC X(09)   VALUE   "111012710".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.         
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   16.
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   16.
       *
       *    固定値
        01  CONST-AREA.
