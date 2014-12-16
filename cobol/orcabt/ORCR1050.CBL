@@ -743,21 +743,10 @@
       *    処方料（向精神薬多剤投与）
            03  FILLER          PIC X(09)   VALUE   "120003610".
       *
-      *    初診（妥結率５割以下）
-           03  FILLER          PIC X(09)   VALUE   "111012710".
-      *    再診（妥結率５割以下）
-           03  FILLER          PIC X(09)   VALUE   "112016610".
-      *    電話等再診（妥結率５割以下）
-           03  FILLER          PIC X(09)   VALUE   "112016750".
-      *    同日再診（妥結率５割以下）
-           03  FILLER          PIC X(09)   VALUE   "112016850".
-      *    同日電話等再診（妥結率５割以下）
-           03  FILLER          PIC X(09)   VALUE   "112016950".
-      *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   76.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   71.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   76.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   71.
       *
       *    固定値
        01  CONST-AREA.
@@ -913,6 +902,9 @@
       *    初診料（同一日２科目：紹介状なし）
            03  WRK-CONS-SYOSIN-KASAN32 PIC X(09)   VALUE 
                                                    "111012610".
+      *    初診（妥結率５割以下）
+           03  WRK-CONS-SYOSIN-KASAN33 PIC X(09)   VALUE 
+                                                   "111012710".
       *
       *    外来迅速検体検査加算
            03  WRK-CONS-GAIJINKEN      PIC X(09)   VALUE 
@@ -1552,6 +1544,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                             OR  WRK-CONS-SYOSIN-KASAN30
                                             OR  WRK-CONS-SYOSIN-KASAN31
                                             OR  WRK-CONS-SYOSIN-KASAN32
+                                            OR  WRK-CONS-SYOSIN-KASAN33
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
