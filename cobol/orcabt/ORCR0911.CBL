@@ -524,13 +524,10 @@
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
-           03  FILLER          PIC X(09)   VALUE   "111012710".
-      *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS  13.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS  12.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  13.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  12.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -665,6 +662,9 @@
       *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
            03  WRK-CONS-SYOSIN-KASAN32 PIC X(09)   VALUE 
                                                    "111012610".
+      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  WRK-CONS-SYOSIN-KASAN33 PIC X(09)   VALUE 
+                                                   "111012710".
       *
       *    Ì¤¼Â»Ü¸º»»
            03  CONS-GENZAN1            PIC X(09)   VALUE   "190080470".
@@ -1472,6 +1472,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                             OR  WRK-CONS-SYOSIN-KASAN30
                                             OR  WRK-CONS-SYOSIN-KASAN31
                                             OR  WRK-CONS-SYOSIN-KASAN32
+                                            OR  WRK-CONS-SYOSIN-KASAN33
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         

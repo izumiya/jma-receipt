@@ -803,13 +803,10 @@
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
-           03  FILLER          PIC X(09)   VALUE   "111012710".
-      *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   16.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   16.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -957,6 +954,9 @@
       *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
            03  WRK-CONS-SYOSIN-KASAN32 PIC X(09)   VALUE 
                                                    "111012610".
+      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  WRK-CONS-SYOSIN-KASAN33 PIC X(09)   VALUE 
+                                                   "111012710".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  WRK-CONS-GAIJINKEN      PIC X(09)   VALUE 
@@ -2067,6 +2067,7 @@
                                             OR  WRK-CONS-SYOSIN-KASAN30
                                             OR  WRK-CONS-SYOSIN-KASAN31
                                             OR  WRK-CONS-SYOSIN-KASAN32
+                                            OR  WRK-CONS-SYOSIN-KASAN33
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
