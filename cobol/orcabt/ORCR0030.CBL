@@ -7397,11 +7397,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                MOVE      1   TO   FLG-KISAIOK
              ELSE
                IF  RECE02-TEISYOTOKU  =  SPACE
-                 IF   RECE02-SRYYM  >= "201501"
-                   MOVE  1   TO   FLG-KISAIOK
-                 ELSE
-                   PERFORM  211C2-TOKUSITU-HANTEI3-SEC
-                 END-IF
+                 PERFORM 211C2-TOKUSITU-HANTEI3-SEC
                ELSE
                  MOVE    1   TO   FLG-KISAIOK
                END-IF

@@ -28633,11 +28633,7 @@
                MOVE      1   TO   FLG-KISAIOK
              ELSE
                IF  RECE62-TEISYOTOKU  =  SPACE
-                 IF   RECE62-SRYYM  >= "201501"
-                   MOVE  1   TO   FLG-KISAIOK
-                 ELSE
-                   PERFORM  2104E3-TOKUSITU-HANTEI4-SEC
-                 END-IF
+                 PERFORM 2104E3-TOKUSITU-HANTEI4-SEC
                ELSE
                  MOVE    1   TO   FLG-KISAIOK
                END-IF
