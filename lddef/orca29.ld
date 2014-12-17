@@ -63,6 +63,7 @@ db	{
         tbl_ptconf;
 	tbl_tnkrrk;
 	tbl_spa_tmp;
+	tbl_med_image;
 };
 
 /* #include "orcadb.inc" */
