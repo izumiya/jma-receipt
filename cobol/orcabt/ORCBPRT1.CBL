@@ -124,6 +124,7 @@ grpsys COPY    "COMMON-SPA".
        01  CNT-AREA.
            03  CNT-IN              PIC 9(05).
            03  CNT-OUT             PIC 9(10).
+           03  CNT-GROUP           PIC 9(05).
       *  01.01.02  ADD START 
            03  CNT-KETA            PIC 9(05).
            03  WRK-MOJISU          PIC 9(05).
@@ -156,7 +157,10 @@ grpsys COPY    "COMMON-SPA".
            COPY    "CPPRTCONST.INC".          
       *
            COPY    "CPSHELLTBL.INC".
-      *     
+      *
+       01  TPRT-REC.
+           COPY    "CPPRTKANRI.INC"        REPLACING  //PRTKANRI//
+                                           BY         //TPRT//.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -243,6 +247,7 @@ grpsys COPY    "COMMON-SPA".
            INITIALIZE                  WRK-AREA
            INITIALIZE                  CNT-AREA
                                        SPA-AREA
+                                       TPRT-REC
       *
            ACCEPT  SYS-TIME            FROM    TIME     
       *
@@ -333,6 +338,22 @@ grpsys           PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
+           IF    ( WRK-PARA-PRTFLG     =  "5" OR "6" )
+               PERFORM 2001-BIND-PRINT-SEC
+           ELSE
+               PERFORM 2001-COMMON-PRINT-SEC
+           END-IF
+      *
+           MOVE    1                   TO  FLG-END     
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¢É¼Ëè°õºþ½èÍý
+      *****************************************************************
+       2001-BIND-PRINT-SEC             SECTION.
+      *
       *    °õºþÍÑ¥Õ¥¡¥¤¥ëºîÀ®  
            MOVE    "HC99"          TO  HC01PARA-FORM-ID
 grpsys     MOVE    WRK-PARA-HOSPNUM
@@ -340,11 +361,19 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            MOVE    LNK-PRTKANRI-TERMID
                                    TO  HC01PARA-TERMID
            MOVE    SYS-TIME        TO  HC01PARA-SYOHMS
-           MOVE    1               TO  HC01PARA-CNT
-           OPEN    OUTPUT              PRT-FILE
+           MOVE    ZERO            TO  HC01PARA-CNT
       *
            PERFORM                     UNTIL   FLG-PRTKANRI =   1
                                        OR      FLG-END      =   1   
+      *
+               MOVE    PRTKANRI-REC    TO  TPRT-REC
+      *
+               MOVE    ZERO            TO  CNT-GROUP
+      *
+               COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
+      *
+               OPEN    OUTPUT              PRT-FILE
+      *
       *        °õºþ£Ä£ÂÊÔ½¸½èÍý
                PERFORM 900-PRTDATA-SELECT-SEC
                PERFORM                     UNTIL   FLG-PRTDATA  =   1
@@ -357,19 +386,88 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
       *
-               PERFORM 2003-PRTKANRI-UPD-SEC
+               CLOSE   PRT-FILE
+      *
+               PERFORM 210-PRINT-SEC
+      *
+               IF    ( TPRT-PRTFLG    =    "D" )
+                   PERFORM 2003-PRTKANRI-DEL-SEC
+               ELSE
+                   PERFORM 2003-PRTKANRI-UPD-SEC
+               END-IF
+      *
                PERFORM 900-PRTKANRI-FET-SEC
+      *
+           END-PERFORM                                
+      *
+           .
+       2001-BIND-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¶¦ÄÌ°õºþ½èÍý
+      *****************************************************************
+       2001-COMMON-PRINT-SEC           SECTION.
+      *
+      *    °õºþÍÑ¥Õ¥¡¥¤¥ëºîÀ®  
+           MOVE    "HC99"          TO  HC01PARA-FORM-ID
+grpsys     MOVE    WRK-PARA-HOSPNUM
+                                   TO  HC01PARA-HOSPNUM
+           MOVE    LNK-PRTKANRI-TERMID
+                                   TO  HC01PARA-TERMID
+           MOVE    SYS-TIME        TO  HC01PARA-SYOHMS
+           MOVE    1               TO  HC01PARA-CNT
+           OPEN    OUTPUT              PRT-FILE
+      *
+           MOVE    ZERO            TO  CNT-GROUP
+      *
+           PERFORM                     UNTIL   FLG-PRTKANRI =   1
+                                       OR      FLG-END      =   1   
+      *
+               MOVE    PRTKANRI-REC    TO  TPRT-REC
+      *
+      *        °õºþ£Ä£ÂÊÔ½¸½èÍý
+               PERFORM 900-PRTDATA-SELECT-SEC
+               PERFORM                     UNTIL   FLG-PRTDATA  =   1
+                                           OR      FLG-END      =   1
+                   PERFORM 2001-PRTDATA-PRINT-SEC
+                   PERFORM 900-PRTDATA-FET-SEC
+               END-PERFORM    
+      *
+               MOVE    "tbl_prtdata"       TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+      *
+      *
+               IF    ( TPRT-PRTFLG    =    "D" )
+                   PERFORM 2003-PRTKANRI-DEL-SEC
+               ELSE
+                   PERFORM 2003-PRTKANRI-UPD-SEC
+               END-IF
+      *
+               PERFORM 900-PRTKANRI-FET-SEC
+      *
            END-PERFORM                                
       *
            CLOSE                       PRT-FILE
       *     
+           PERFORM 210-PRINT-SEC
+      *
+           .
+       2001-COMMON-PRINT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    °õºþ½èÍý
+      *****************************************************************
+       210-PRINT-SEC                   SECTION.
+      *
       *   °õºþÍÑ¥¹¥¯¥ê¥×¥È½èÍý
       *
-               DISPLAY "------------- ORCBPRT1 start ----------------"
-               DISPLAY "CNT-OUT = " CNT-OUT
-               DISPLAY "FLG-ERR = " FLG-ERR
-               DISPLAY "------------- ORCBPRT1 end   ----------------"
-           IF      CNT-OUT             >   ZERO
+           DISPLAY "------------- ORCBPRT1 start ----------------"
+           DISPLAY "CNT-GROUP = " CNT-GROUP
+           DISPLAY "FLG-ERR   = " FLG-ERR
+           DISPLAY "------------- ORCBPRT1 end   ----------------"
+           IF      CNT-GROUP           >   ZERO
            AND     FLG-ERR             =   ZERO 
       *
                MOVE    SPACE           TO  SHELLTBL
@@ -426,12 +524,9 @@ grpsys           PERFORM 900-ORCDBMAIN-SEC
               END-IF
            END-IF                                                
       *
-           MOVE    1                   TO  FLG-END     
            .
-       200-MAIN-EXT.
+       210-PRINT-EXT.
            EXIT.
-      *
-      *
       *****************************************************************
       *    Ä¢É¼°õºþ½èÍý
       *****************************************************************
@@ -503,8 +598,14 @@ grpsys           PERFORM 900-ORCDBMAIN-SEC
       *  01.01.02  END
       *
            ADD     1                   TO  CNT-OUT     
+           ADD     1                   TO  CNT-GROUP
       *
-           PERFORM 2002-PRTDATA-UPD-SEC
+           IF    ( TPRT-PRTFLG    =    "D" )
+               PERFORM 2002-PRTDATA-DEL-SEC
+           ELSE
+               PERFORM 2002-PRTDATA-UPD-SEC
+           END-IF
+      *
            .
        2001-PRTDATA-PRINT-EXT.
            EXIT.
@@ -580,6 +681,27 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            .
        2001-PRTDATA-UPD-EXT.
            EXIT.
+      *****************************************************************
+      *    °õºþ£Ä£Âºï½ü½èÍý
+      *****************************************************************
+       2002-PRTDATA-DEL-SEC            SECTION.
+      *
+           MOVE    PRTDATA-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_prtdata"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           IF      MCP-RC             =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    "°õºþ£Ä£Â¤Î¹¹¿·¤Ç¥¨¥é¡¼¤Ë¤Ê¤ê¤Þ¤·¤¿"
+                                          TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+          END-IF    
+           .
+       2002-PRTDATA-DEL-EXT.
+           EXIT.
       *
       *****************************************************************
       *    °õºþ¥Õ¥é¥°¥»¥Ã¥È½èÍý
@@ -602,6 +724,26 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-IF    
            .
        2003-PRTKANRI-UPD-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþ´ÉÍýºï½ü½èÍý
+      *****************************************************************
+       2003-PRTKANRI-DEL-SEC          SECTION.
+      *
+           MOVE    PRTKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC               =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    "°õºþ´ÉÍý£Ä£Â¤Î¹¹¿·¤Ç¥¨¥é¡¼¤Ë¤Ê¤ê¤Þ¤·¤¿"
+                                        TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF    
+           .
+       2003-PRTKANRI-DEL-EXT.
            EXIT.
       *
       *****************************************************************
@@ -861,6 +1003,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
 grpsys     MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
            MOVE    LNK-PRTKANRI-TBL-UUID
                                        TO  PRTKANRI-TBL-UUID
+      *
            MOVE    PRTKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME

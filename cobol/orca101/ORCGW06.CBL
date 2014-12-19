@@ -219,6 +219,11 @@
                        09  SPA-GMN-CLIENT-PRT-LST  PIC X(40)
                                                    OCCURS  2. 
                    07  SPA-CLIENT-PRT-MAX      PIC 9(04).  
+      *            プリンタへのデータ送信単位
+                   07  SPA-GMN-PRTCONF-LSTG.
+                       09  SPA-GMN-PRTCONF-LST    PIC X(40)
+                                                   OCCURS  2. 
+                   07  SPA-PRTCONF-MAX            PIC 9(04).  
       *            ダイアログ表示
                    07  SPA-GMN-DIALOGFLG-LSTG.
                        09  SPA-GMN-DIALOGFLG-LST   PIC X(40)
@@ -276,6 +281,11 @@
                        09  SPA-GMN-CLIENT-PRT      PIC X(01).
                        09  SPA-GMN-CLIENT-PRT-F1   PIC X(01).
                        09  SPA-GMN-CLIENT-PRT-MEI  PIC X(24).
+      *            プリンタへのデータ送信単位
+                   07  SPA-GMN-PRTCONF-G. 
+                       09  SPA-GMN-PRTCONF        PIC X(01).
+                       09  SPA-GMN-PRTCONF-F1     PIC X(01).
+                       09  SPA-GMN-PRTCONF-MEI    PIC X(24).
       *            ダイアログ表示
                    07  SPA-GMN-DIALOGFLG-G. 
                        09  SPA-GMN-DIALOGFLG       PIC X(01).
@@ -361,6 +371,10 @@
                        09  SPA-MAE-CLIENT-PRT      PIC X(01).
                        09  SPA-MAE-CLIENT-PRT-F1   PIC X(01).
                        09  SPA-MAE-CLIENT-PRT-MEI  PIC X(24).
+                   07  SPA-MAE-PRTCONF-G. 
+                       09  SPA-MAE-PRTCONF        PIC X(01).
+                       09  SPA-MAE-PRTCONF-F1     PIC X(01).
+                       09  SPA-MAE-PRTCONF-MEI    PIC X(24).
                    07  SPA-MAE-DIALOGFLG-G. 
                        09  SPA-MAE-DIALOGFLG       PIC X(01).
                        09  SPA-MAE-DIALOGFLG-F1    PIC X(01).
@@ -741,6 +755,12 @@
                                        TO  SPA-GMN-USER-KANRI-LST(4)
            MOVE    "4 更新も可(全て)"  TO  SPA-GMN-USER-KANRI-LST(5)
            MOVE    5                   TO  SPA-USER-KANRI-MAX
+      *    プリンタへのデータ送信単位
+           MOVE    "0 １ページ毎に送信"
+                                       TO  SPA-GMN-PRTCONF-LST(1)
+           MOVE    "1 帳票毎に送信"
+                                       TO  SPA-GMN-PRTCONF-LST(2)
+           MOVE    2                   TO  SPA-PRTCONF-MAX
       *    クライアント印刷可否
            MOVE    "0 しない"          TO  SPA-GMN-CLIENT-PRT-LST(1)
            MOVE    "1 する"            TO  SPA-GMN-CLIENT-PRT-LST(2)
@@ -1374,6 +1394,7 @@
       *
            MOVE    "0"                 TO  SPA-GMN-CLIENT-SAVE
            MOVE    "0"                 TO  SPA-GMN-USER-KANRI
+           MOVE    "0"                 TO  SPA-GMN-PRTCONF
            MOVE    "0"                 TO  SPA-GMN-CLIENT-PRT
            MOVE    "0"                 TO  SPA-GMN-DIALOGFLG
            MOVE    "0"                 TO  SPA-GMN-ICCARDRW
@@ -1572,6 +1593,7 @@
                MOVE    SYS-1010-CLIENT-PRT     TO  SPA-GMN-CLIENT-PRT
                MOVE    SYS-1010-DIALOGFLG      TO  SPA-GMN-DIALOGFLG
                MOVE    SYS-1050-ICCARDRW       TO  SPA-GMN-ICCARDRW
+               MOVE    SYS-1050-PRTCONF       TO  SPA-GMN-PRTCONF
       *H26.5
       *        入力スクロール行数
                IF      SYS-1050-GLINECNT   NOT NUMERIC
@@ -1615,6 +1637,9 @@
            END-IF
            IF    ( SPA-GMN-USER-KANRI  =   SPACE )
                MOVE    "0"             TO  SPA-GMN-USER-KANRI
+           END-IF
+           IF    ( SPA-GMN-PRTCONF    =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-PRTCONF
            END-IF
            IF    ( SPA-GMN-CLIENT-PRT  =   SPACE )
                MOVE    "0"             TO  SPA-GMN-CLIENT-PRT
@@ -1704,6 +1729,16 @@
                    MOVE    SPA-GMN-USER-KANRI-LST (IDX)
                                            TO  SPA-GMN-USER-KANRI-G
                    MOVE    SPA-USER-KANRI-MAX  TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-PRTCONF-MAX
+               IF      SPA-GMN-PRTCONF  =   SPA-GMN-PRTCONF-LST
+                                                      (IDX)(1:1)
+                   MOVE    SPA-GMN-PRTCONF-LST (IDX)
+                                           TO  SPA-GMN-PRTCONF-G
+                   MOVE    SPA-PRTCONF-MAX  TO  IDX
                END-IF
            END-PERFORM
       *
@@ -2066,6 +2101,7 @@
            MOVE    W06-FORMALFLG       TO  SPA-GMN-FORMALFLG-G
            MOVE    W06-CLIENT-SAVE     TO  SPA-GMN-CLIENT-SAVE-G
            MOVE    W06-USER-KANRI      TO  SPA-GMN-USER-KANRI-G
+           MOVE    W06-PRTCONF        TO  SPA-GMN-PRTCONF-G
            MOVE    W06-CLIENT-PRT      TO  SPA-GMN-CLIENT-PRT-G
            MOVE    W06-DIALOGFLG       TO  SPA-GMN-DIALOGFLG-G
            MOVE    W06-ICCARDRW        TO  SPA-GMN-ICCARDRW-G
@@ -2123,6 +2159,7 @@
            MOVE    SPA-GMN-FORMALFLG-G     TO  SPA-MAE-FORMALFLG-G
            MOVE    SPA-GMN-CLIENT-SAVE-G   TO  SPA-MAE-CLIENT-SAVE-G
            MOVE    SPA-GMN-USER-KANRI-G    TO  SPA-MAE-USER-KANRI-G
+           MOVE    SPA-GMN-PRTCONF-G      TO  SPA-MAE-PRTCONF-G
            MOVE    SPA-GMN-CLIENT-PRT-G    TO  SPA-MAE-CLIENT-PRT-G
            MOVE    SPA-GMN-DIALOGFLG-G     TO  SPA-MAE-DIALOGFLG-G
            MOVE    SPA-GMN-ICCARDRW-G      TO  SPA-MAE-ICCARDRW-G
@@ -2230,6 +2267,10 @@
            END-IF
            IF      SPA-GMN-USER-KANRI-G
                                        NOT =   SPA-MAE-USER-KANRI-G
+               MOVE    1               TO  FLG-OK
+           END-IF
+           IF      SPA-GMN-PRTCONF-G
+                                       NOT =   SPA-MAE-PRTCONF-G
                MOVE    1               TO  FLG-OK
            END-IF
            IF      SPA-GMN-CLIENT-PRT-G
@@ -2347,6 +2388,10 @@
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4121-USER-KANRI-CHK-SEC
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4121-PRTCONF-CHK-SEC
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
@@ -3060,6 +3105,34 @@
       *
            .
        4121-USER-KANRI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    プリンタへのデータ送信単位チェック処理
+      *****************************************************************
+       4121-PRTCONF-CHK-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-PRTCONF-MAX
+               IF      SPA-GMN-PRTCONF =   SPA-GMN-PRTCONF-LST
+                                                       (IDX)(1:1)
+                   MOVE    SPA-GMN-PRTCONF-LST (IDX)
+                                               TO  SPA-GMN-PRTCONF-G
+                   MOVE    1                   TO  FLG-CHK
+                   MOVE    SPA-PRTCONF-MAX  TO  IDX
+               END-IF
+           END-PERFORM
+           IF     (FLG-CHK             =   ZERO )
+               IF      SPA-GMN-PRTCONF  =   SPACE
+                   MOVE    SPACE           TO  SPA-GMN-PRTCONF-G
+               ELSE
+                   MOVE    "0033"          TO  SPA-ERRCD
+                   MOVE    103              TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           .
+       4121-PRTCONF-CHK-EXT.
            EXIT.
       *****************************************************************
       *    クライアント印刷可否チェック処理
@@ -4182,6 +4255,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-GLINECNT    TO  SYS-1050-GLINECNT
            MOVE    SPA-GMN-NLINECNT    TO  SYS-1050-NLINECNT
       *
+      *    プリンタへのデータ送信単位
+           MOVE    SPA-GMN-PRTCONF    TO  SYS-1050-PRTCONF
+      *
           .
        49051-SYS1050-UPD-EXT.
            EXIT.
@@ -4466,6 +4542,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE  SPA-USER-KANRI-MAX    TO  W06-USER-KANRI-COUNT
            MOVE  SPA-GMN-USER-KANRI-G  TO  W06-USER-KANRI
+      *    プリンタへのデータ送信単位
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-PRTCONF-MAX
+               MOVE    SPA-GMN-PRTCONF-LST(IDX)
+                                       TO  W06-PRTCONF-ITEM(IDX)
+           END-PERFORM
+           MOVE  SPA-PRTCONF-MAX    TO  W06-PRTCONF-COUNT
+           MOVE  SPA-GMN-PRTCONF-G  TO  W06-PRTCONF
       *    クライアント印刷可否表示
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-CLIENT-PRT-MAX
@@ -4797,6 +4881,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0032"
                    MOVE    "ＩＣカードリーダ／ライタ入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0033"
+                   MOVE    "プリンタへのデータ送信単位入力エラー"
+                                               TO  SPA-ERRMSG
                WHEN    "0100"
                    MOVE
                    "オルカマスターはシステム管理を有効にして下さい"
@@ -4953,6 +5040,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "DIALOGFLG"      TO   MCP-WIDGET
                 WHEN    30
                     MOVE  "ICCARDRW"       TO   MCP-WIDGET
+                WHEN    103
+                    MOVE  "PRTCONF"       TO   MCP-WIDGET
       *
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
@@ -5064,6 +5153,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN     "CLIENT_SAVE"
                    MOVE    27              TO  SPA-GMN-CUR
                WHEN     "USER_KANRI"
+                   MOVE    103             TO  SPA-GMN-CUR
+               WHEN     "PRTCONF"
                    MOVE    28              TO  SPA-GMN-CUR
                WHEN     "CLIENT_PRT"
                    MOVE    29              TO  SPA-GMN-CUR

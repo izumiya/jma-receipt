@@ -1316,6 +1316,9 @@
            END-IF
            IF      SPA-ERRCD           =   SPACE
       *
+      *        再印刷なし
+      *        印刷制御情報取得サブ
+               CALL    "ORCSONPRTSET"  USING   SPA-AREA
                IF      SPA-CLIENT-PRT-FLG  =   2
       *            クライアント印刷制御情報取得処理
                    PERFORM 4901-CLIENT-PRT-SEC
@@ -1417,7 +1420,7 @@
                END-IF
            END-PERFORM
       *
-           IF      FLG-CLIENT-OK       =   1
+           IF      SPA-CLIENT-PRT-FLG     =   1
                MOVE    "01"                TO  SPA-PRT-FLG
                MOVE    2                   TO  SPA-CLIENT-TEMP-FLG
            END-IF
@@ -1450,7 +1453,7 @@
                END-IF
            END-PERFORM
       *
-           IF      FLG-CLIENT-OK       =   1
+           IF      SPA-CLIENT-PRT-FLG     =   1
                MOVE    "02"                TO  SPA-PRT-FLG
                MOVE    2                   TO  SPA-CLIENT-TEMP-FLG
            END-IF
@@ -1483,7 +1486,7 @@
                END-IF
            END-PERFORM
       *
-           IF      FLG-CLIENT-OK       =   1
+           IF      SPA-CLIENT-PRT-FLG     =   1
                MOVE    "03"                TO  SPA-PRT-FLG
                MOVE    2                   TO  SPA-CLIENT-TEMP-FLG
            END-IF
@@ -1499,9 +1502,6 @@
       *****************************************************************
        4901-CLIENT-PRT-SEC         SECTION.
       *
-      * 再印刷なし
-      *    印刷制御情報取得サブ
-           CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
            INITIALIZE                  KDMY01
            MOVE    SPACE               TO  KDMY01-PANDAPRINT1

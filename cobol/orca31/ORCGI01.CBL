@@ -8975,6 +8975,12 @@
                MOVE    SPACE           TO      WRK-SPA-PRT-FLG
            END-IF
       *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
            .
        480-TAIIN-PRT-EXT.
            EXIT.
@@ -9020,6 +9026,15 @@
       *    入院診療禄サブ呼出処理
       *****************************************************************
        4801-ORCHCN01-CALL-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  SPA-PRT-FLG
+      *
+      *    印刷制御情報取得サブ
+           CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   1 )
+               MOVE     2              TO  SPA-CLIENT-TEMP-FLG
+               MOVE    "02"            TO  SPA-PRT-FLG
+           END-IF
       *
            MOVE    SPA-AREA            TO  WRK-SPA-AREA
            INITIALIZE                      WRK-SPA-KYOTUKEY
@@ -9081,6 +9096,13 @@
       *
            CALL    WRK-PRINT-PG    USING   WRK-SPA-AREA
                                            ORCHCN01AREA
+           MOVE    SPACE               TO  SPA-PRT-FLG
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
       *
            .
        4801-ORCHCN01-CALL-EXT.

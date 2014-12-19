@@ -559,7 +559,7 @@
            END-IF
       *
       *    クライアント印刷
-           IF      FLG-CLIENT-OK       =   1
+           IF     (SPA-CLIENT-PRT-FLG   =   1  )
                PERFORM 600-CLIENT-DMY-SEC
            END-IF
       *
@@ -4582,6 +4582,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        49002-PRINT-SYORI-SEC             SECTION.
       *
+           CALL    "ORCSONPRTSET"      USING   SPA-AREA
            IF      SPA-CLIENT-PRT-FLG  =   2
       *        クライアント印刷制御情報取得処理
                PERFORM 4951-CLIENT-PRT-SEC
@@ -4658,8 +4659,6 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        4951-CLIENT-PRT-SEC         SECTION.
       *
-           CALL    "ORCSONPRTSET"      USING   SPA-AREA
-      *
            INITIALIZE                  UDMY01
            MOVE    SPACE               TO  UDMY01-PANDAPRINT1
       *    クライアント印刷制御情報取得サブ
@@ -4681,19 +4680,19 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        600-CLIENT-DMY-SEC              SECTION.
       *
-           IF     (SPA-CLIENT-PRT-FLG   =   1  )
       *    印刷ダミー処理
-               MOVE    "99"                TO  SPA-PRT-FLG
-               CALL    "ORCHCDUMMY"    USING   SPA-AREA
-               MOVE    ZERO                TO  SPA-CLIENT-TEMP-FLG
+           MOVE    "99"                    TO  SPA-PRT-FLG
+           CALL    "ORCHCDUMMY"    USING       SPA-AREA
+           MOVE    ZERO                    TO  SPA-CLIENT-TEMP-FLG
+      *
+           IF     (FLG-CLIENT-OK        =  1 )
+               MOVE    MCP-WINDOW          TO  SPA-SAKIPG
+               MOVE    MCP-PUTTYPE         TO  SPA-PUTTYPE
+               MOVE    "_UDMY01"           TO  MCP-WINDOW
+               MOVE    "NEW"               TO  MCP-PUTTYPE
+      *
+               PERFORM 900-PUT-WINDOW
            END-IF
-      *
-           MOVE    MCP-WINDOW          TO  SPA-SAKIPG
-           MOVE    MCP-PUTTYPE         TO  SPA-PUTTYPE
-           MOVE    "_UDMY01"           TO  MCP-WINDOW
-           MOVE    "NEW"               TO  MCP-PUTTYPE
-      *
-           PERFORM 900-PUT-WINDOW
       *
            .
        600-CLIENT-DMY-EXT.

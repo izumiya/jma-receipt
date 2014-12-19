@@ -138,7 +138,11 @@
       *
       *    処方内容編集
            PERFORM 400-PRINT-SEC
-           MOVE    2                   TO  SPA-CLIENT-PRT-FLG
+           IF    ( SPA-GSRAUTH-31  =   "1" )
+               MOVE    ZERO            TO  SPA-CLIENT-PRT-FLG
+           ELSE
+               MOVE    2               TO  SPA-CLIENT-PRT-FLG
+           END-IF
       *
            .
        000-PROC-EXT.

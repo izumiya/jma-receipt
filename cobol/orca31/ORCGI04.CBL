@@ -6147,6 +6147,8 @@
            IF      SPA-GMN-I04-SHOHOU-CD   =   "1"
                PERFORM 451-SHOHOSEN-PRINT-SEC
            END-IF
+      *
+           PERFORM 800-CLIENT-DUMMY-PRT-SEC
       *!!
            .
        451-PRTOUT-EXT.
@@ -7107,6 +7109,20 @@
       *
            .
        800-ORCUIDSET-EXT.
+           EXIT.
+      *****************************************************************
+      *    クライアントダミー印刷　処理
+      *****************************************************************
+       800-CLIENT-DUMMY-PRT-SEC        SECTION.
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
+           .
+       800-CLIENT-DUMMY-PRT-EXT.
            EXIT.
       *****************************************************************
       *    患者情報検索処理

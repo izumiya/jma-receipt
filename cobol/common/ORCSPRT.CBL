@@ -225,8 +225,8 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
                END-EVALUATE
       * ¡ú end
                MOVE    1                   TO  PRTKANRI-PAGE
-               IF      SPRT-PRTFLG         =   "1"
-                   MOVE    "1"                 TO  PRTKANRI-PRTFLG
+               IF      SPRT-PRTFLG         =   "1" OR "D"
+                   MOVE    SPRT-PRTFLG         TO  PRTKANRI-PRTFLG
                ELSE
                    MOVE    SPACE               TO  PRTKANRI-PRTFLG
                END-IF
@@ -324,8 +324,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
                END-EVALUATE
       * ¡ú end
            MOVE    PRTKANRI-PAGE       TO  PRTDATA-PAGE
-           IF      SPRT-PRTFLG         =   "1"
-               MOVE    "1"                 TO  PRTDATA-PRTFLG
+           IF      SPRT-PRTFLG         =   "1" OR "D"
+               MOVE    SPRT-PRTFLG         TO  PRTDATA-PRTFLG
            ELSE
                MOVE    SPACE               TO  PRTDATA-PRTFLG
            END-IF

@@ -2169,8 +2169,8 @@
                            PERFORM 800-CLIENT-PRT-SEC
                        END-IF
                        PERFORM 22011-PRINT-SEC
-                       PERFORM 800-CLIENT-DUMMY-PRT-SEC
                    END-IF
+                   PERFORM 800-CLIENT-DUMMY-PRT-SEC
       *
                END-IF
       *

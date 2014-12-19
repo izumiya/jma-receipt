@@ -3024,9 +3024,15 @@
       *    帳票プログラム取得
            PERFORM 21000-PRINT-PG-SEC
       *
+      *    印刷制御情報取得サブ
+           CALL    "ORCSONPRTSET"      USING   SPA-AREA
            IF      SPA-CLIENT-PRT-FLG  =   2
       *        クライアント印刷制御情報取得処理
                PERFORM 4901-CLIENT-PRT-SEC
+           END-IF
+           IF      SPA-CLIENT-PRT-FLG  =   1
+      *        再印刷指示なし
+               MOVE    2               TO  SPA-CLIENT-TEMP-FLG
            END-IF
       *
       *    基本画面のカルテ出力
@@ -3110,9 +3116,6 @@
       *****************************************************************
        4901-CLIENT-PRT-SEC         SECTION.
       *
-      *    印刷制御情報取得サブ
-           CALL    "ORCSONPRTSET"      USING   SPA-AREA
-      *
            INITIALIZE                  PDMY01
            MOVE    SPACE               TO  PDMY01-PANDAPRINT1
       *
@@ -3125,8 +3128,6 @@
                                                MCPAREA
            MOVE    ORCSPRTCTRL-OUT     TO  PDMY01-PANDAPRINT1
       *
-      *    再印刷指示なし
-           MOVE    2                   TO  SPA-CLIENT-TEMP-FLG
            MOVE    1                   TO  FLG-CLIENT-OK
       *
            .
@@ -3167,7 +3168,7 @@
                MOVE    "4"             TO  ORCHC01-SYORIKBN
            END-IF
       *    クライアント印刷
-           IF      FLG-CLIENT-OK       =   1
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
                MOVE    "01"                TO  SPA-PRT-FLG
            END-IF
       *
@@ -3202,7 +3203,7 @@
                MOVE    "4"             TO  ORCHC01-SYORIKBN
            END-IF
       *    クライアント印刷
-           IF      FLG-CLIENT-OK       =   1
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
                MOVE    "01"                TO  SPA-PRT-FLG
            END-IF
       *
@@ -3229,7 +3230,7 @@
            MOVE    SPA-NAI20-DRCD    (IDX2)       TO  SPA-DRCD (2:)
            MOVE    SPA-GMN20-THKNCOMBI(IDX2)       TO  SPA-HKNCOMBINUM
       *    クライアント印刷
-           IF      FLG-CLIENT-OK       =   1
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
                MOVE    "02"                TO  SPA-PRT-FLG
       *        再印刷指示なし
                MOVE    2                   TO  SPA-CLIENT-TEMP-FLG

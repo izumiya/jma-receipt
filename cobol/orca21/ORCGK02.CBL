@@ -10087,9 +10087,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            頭書
                    MOVE    "2"                 TO  ORCHC19-KBN
                    MOVE    SPACE               TO  SPA-PRT-FLG
+      *
+      *            印刷制御情報取得サブ
+                   CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *            クライアント印刷用
                    IF      SPA-CLIENT-PRT-FLG  =   2
                        PERFORM 41241-SYOHOU-CLIENTPRT-SEC
+                   END-IF
+                   IF      SPA-CLIENT-PRT-FLG  =   1
+                       MOVE    "01"            TO  SPA-PRT-FLG
+                       MOVE    2               TO  SPA-CLIENT-TEMP-FLG
                    END-IF
                WHEN    3
       *            中途終了時（院外）
@@ -10121,11 +10128,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        41241-SYOHOU-CLIENTPRT-SEC         SECTION.
       *
-      *    印刷制御情報取得サブ
-           CALL    "ORCSONPRTSET"      USING   SPA-AREA
-      *
-           MOVE    "01"                TO  SPA-PRT-FLG
-           MOVE    2                   TO  SPA-CLIENT-TEMP-FLG
       *
            INITIALIZE                  KDMY01
            MOVE    SPACE               TO  KDMY01-PANDAPRINT1

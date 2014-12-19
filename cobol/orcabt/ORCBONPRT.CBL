@@ -108,6 +108,7 @@
                    07  WRK-PARA-SRYYM            PIC X(06).
                    07  WRK-PARA-TERMID           PIC X(16).
                    07  WRK-PARA-HOSPNUM          PIC 9(02).
+                   07  WRK-PARA-PRTFLG           PIC X(01).
       *
            COPY    "CPORCSPRTLNK.INC".
       *
@@ -210,6 +211,7 @@
                                              WRK-PARA-PARA-CNT
                                              WRK-PARA-DATASETNAME
                                              WRK-PARA-HOSPNUM
+                                             WRK-PARA-PRTFLG
            END-UNSTRING                                  
       *
            MOVE    WRK-PARA-HOSPNUM    TO    SPA-HOSPNUM 
@@ -283,7 +285,11 @@
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
            MOVE    WRK-PARA-SITE-KBN   TO  SPRT-SITEKBN
-           MOVE    "1"                 TO  SPRT-PRTFLG
+           IF    ( WRK-PARA-PRTFLG     =   "D" )
+               MOVE    "D"             TO  SPRT-PRTFLG
+           ELSE
+               MOVE    "1"             TO  SPRT-PRTFLG
+           END-IF
       *    
            MOVE    WRK-PARA-PTID       TO  SPRT-PTID
       *

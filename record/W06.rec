@@ -260,6 +260,13 @@ W06	{
 					count	int;
 					item	varchar(40)[5];
 				};
+				PRTCONF_COMB	{
+					PRTCONF	{
+						value	varchar(40);
+					};
+					count	int;
+					item	varchar(40)[5];
+				};
 				CLIENT_PRT_COMB	{
 					CLIENT_PRT	{
 						value	varchar(40);

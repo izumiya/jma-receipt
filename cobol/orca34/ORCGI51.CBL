@@ -2445,6 +2445,12 @@
                PERFORM 4501-GAISANPRT-SEC
            END-IF
       *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"        TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
            PERFORM 900-SYUNOU-DEL6-SEC
       *
            .

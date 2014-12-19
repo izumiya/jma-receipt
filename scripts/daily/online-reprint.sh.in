@@ -34,33 +34,12 @@ fi
 #        $20 PARA-CNT
 #        $21 DATASETNAME
 #        $22 TITLE
+#        $23 PRTFLG（再印刷データを作成しない場合"D")
 #            END
 #-------------------------------------------#
 ##      エラーファイル削除
-	echo $#
-        echo $1 >/tmp/onreprint.log
-        echo $2 >>/tmp/onreprint.log
-        echo $3 >>/tmp/onreprint.log
-        echo $4 >>/tmp/onreprint.log
-        echo $5 >>/tmp/onreprint.log
-        echo $6 >>/tmp/onreprint.log
-        echo $7 >>/tmp/onreprint.log
-        echo $8 >>/tmp/onreprint.log
-        echo $9 >>/tmp/onreprint.log
-        echo ${10} >>/tmp/onreprint.log
-        echo ${11} >>/tmp/onreprint.log
-        echo ${12} >>/tmp/onreprint.log
-        echo ${13} >>/tmp/onreprint.log
-        echo ${14} >>/tmp/onreprint.log
-        echo ${15} >>/tmp/onreprint.log
-        echo ${16} >>/tmp/onreprint.log
-        echo ${17} >>/tmp/onreprint.log
-        echo ${18} >>/tmp/onreprint.log
-        echo ${19} >>/tmp/onreprint.log
-        echo ${20} >>/tmp/onreprint.log
-        echo ${21} >>/tmp/onreprint.log
-        echo ${22} >>/tmp/onreprint.log
+	echo $0 $@ > /tmp/onreprint.log 
 
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBONPRT -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20},${21},${22}, >>/tmp/onreprint.log
+	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBONPRT -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20},${21},${22},${23}, >>/tmp/onreprint.log
 	rm ${21}
         exit

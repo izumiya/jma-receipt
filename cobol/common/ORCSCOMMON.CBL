@@ -98,6 +98,7 @@
       *    システム管理マスタ領域
       *    職員情報
            COPY  "CPSK1010.INC".
+           COPY  "CPSK1050.INC".
       *    医療機関情報
            COPY  "CPSK1001.INC".
       *    自動算定情報
@@ -451,6 +452,18 @@
                GO      TO      1003-SYS1010-SPA-EXT
            END-IF
       *
+           INITIALIZE                  SYS-1050-REC
+           MOVE    "1050"              TO  SYS-1050-KANRICD
+           MOVE    SYS-1010-KBNCD      TO  SYS-1050-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-1050-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-1050-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1050-HOSPNUM
+           MOVE    SYS-1050-REC        TO  SYSKANRI-REC
+           PERFORM 900-SYSKANRI-KEY10-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC    TO  SYS-1050-REC
+           END-IF
+      *
       *    職員コード設定
            MOVE    SYS-1010-KBNCD(1:5) TO  SPA-STAFFCD
       *    クライアント印刷情報セット
@@ -464,6 +477,12 @@
            ELSE
                MOVE  ZERO              TO  SPA-CLIENT-SHOWDIALOG
            END-IF
+      **** 4.7ではSPA-GSRAUTH-31を印刷順制御区分に流用
+           IF    ( SPA-CLIENT-PRT-FLG  =   ZERO )
+            AND  ( SYS-1050-PRTCONF   =   "1" )
+               MOVE    "1"             TO  SPA-GSRAUTH-31
+           END-IF
+      **** 
       *
       *2001.9.27 強制プロテクト（ＰＧ未作成）
       *   （マスターメニュー表示用）
@@ -727,7 +746,7 @@
       *    会計照会
            MOVE    SYS-1010-GSRAUTH(24:1)  TO  SPA-GSRAUTH-24
       *    入退院登録
-           MOVE    SYS-1010-GSRAUTH(36:1)  TO  SPA-GSRAUTH-31
+      *    MOVE    SYS-1010-GSRAUTH(36:1)  TO  SPA-GSRAUTH-31
       *    入院会計照会
            MOVE    SYS-1010-GSRAUTH(37:1)  TO  SPA-GSRAUTH-32
       *

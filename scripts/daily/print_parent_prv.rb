@@ -124,7 +124,7 @@ PDF = "ps2pdf"
 # 領域の初期化
 
 # ファイル名領域
-temp_file = ''; exec_file = ''; dia_file = ''; def_file = ''; data_file = ''; lp_name = ''; offset_x = ''; offset_y = ''; offset_xy = ''
+temp_file = ''; exec_file = ''; dia_file = ''; def_file = ''; data_file = ''; lp_name = ''; lp_main = ''; offset_x = ''; offset_y = ''; offset_xy = ''
 temp_file2 = ''; exec_file2 = ''; dia_file2 = ''; def_file2 = ''; data_file2 = ''; lp_name2 = ''
 site_flag = ''; base_dir = ''
 #---- (2003/01/20 ) start
@@ -423,8 +423,7 @@ end
 #---- (2003/01/20 ) start
 #		w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -p ' + lp_name
 #   労災の枠なし帳票をスイッチする st
-	puts prt_flg
-	puts ls_w1
+	puts "prt_flg[#{prt_flg}] form[#{puts ls_w1}]"
 	if prt_flg == '3' || prt_flg == '4'
 		case	ls_w1
 #   -----------> 労災分
@@ -727,7 +726,7 @@ puts "is_portlait[" +  is_portlait + "]"
 					w_exec << "pdftk #{fpdf.path} cat #{optRotate} output #{pdffile_name}"
                 end
 			end
-		when	'5'     # クライアント印刷指示
+		when	'5' ,'6'    # クライアント印刷指示
 			# 出力ファイル名が指定されていなかったら、通常の印刷処理を行う
 			if pdffile_name == ''
 				puts	'出力ファイル名未設定'
@@ -766,6 +765,7 @@ puts "is_portlait[" +  is_portlait + "]"
 		puts	'Print Start [' + String(li_cnt1) + ']'
 #クライアント印刷処理
 		if (li_cnt1 == 1)
+			lp_main=lp_name
 			ADD_File=d2[257, 5].strip
 			if	d2[262,36].strip == ''
 		#		ADD_File=pdffile_name[-5..-1]
@@ -794,25 +794,30 @@ end
 
 
 #クライアント印刷処理
-        case    prt_flg
-        when    '5'     # PSファイル出力の指示
-	if	on_flg == '1'
-	puts "on_flg set 1"
-		BS_File="/tmp/" + File.basename(pdffile_name)[0,30] + "99999" + ADD_File + File.basename(pdffile_name)[35,36]
-	else
-	puts "on_flg set 0"
-		BS_File="/tmp/" + File.basename(pdffile_name).sub(/.pdf/,'') + ADD_File
-	end
-		PDF_File=BS_File + ".pdf"
-		API_File=PDF_File.sub("pdf","api")
-		puts "--------------------------------------"
-		puts API_File
-		puts "--------------------------------------"
-		system("pdftk " + Print_Area.join(' ') + ' cat output ' + PDF_File)
-		api_file = File.open(API_File,'w')
-		api_file.close
-	end
-
+case    prt_flg
+when    '5'     # PSファイル出力の指示
+   if on_flg == '1'
+      puts "on_flg set 1"
+      BS_File="/tmp/" + File.basename(pdffile_name)[0,30] + "99999" + ADD_File + File.basename(pdffile_name)[35,36]
+   else
+      puts "on_flg set 0"
+      BS_File="/tmp/" + File.basename(pdffile_name).sub(/.pdf/,'') + ADD_File
+   end
+   PDF_File=BS_File + ".pdf"
+   API_File=PDF_File.sub("pdf","api")
+   puts "--------------------------------------"
+   puts API_File
+   puts "--------------------------------------"
+   system('pdftk ' + Print_Area.join(' ') + ' cat output ' + PDF_File)
+   api_file = File.open(API_File,'w')
+   api_file.close
+when    '6'     # PSファイル出力の指示
+    pdf_name = "/tmp/" + File.basename(pdffile_name)
+    command_str="pdftk #{Print_Area.join(' ')} cat output #{pdf_name}  ; lpr -P #{lp_main}  #{pdf_name}"
+    puts "command #{command_str}"
+    system(command_str)
+	File.delete(pdf_name) if File.exist?(pdf_name)
+end
 
 	puts '[end ' + `date` + ']'
 # ============================================================

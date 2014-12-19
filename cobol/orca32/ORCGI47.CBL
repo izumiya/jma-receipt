@@ -2115,6 +2115,12 @@
                                    ONPRTDATA
            MOVE    SPACE           TO    SPA-PRT-FLG
       *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"        TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
            .
        21011-HYOKAHYO-EXT.
            EXIT.

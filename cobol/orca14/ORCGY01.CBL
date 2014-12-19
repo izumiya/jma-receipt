@@ -3942,6 +3942,13 @@
            END-IF
       *
            MOVE    HZN-SPA-AREA        TO  SPA-AREA
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
           .
        4908-YYKHYO-PRINT-EXT.
            EXIT.

@@ -1185,6 +1185,10 @@
       *
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"      USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   1 )
+               MOVE    "01"            TO  SPA-PRT-FLG
+               MOVE    2               TO  SPA-CLIENT-TEMP-FLG
+           END-IF
       *
       *    予約・未院一覧出力
            INITIALIZE                      ORCSPRTNMAREA
@@ -1215,6 +1219,13 @@
                CALL    "ORCHCOMMON"        USING
                                            SPA-AREA
                                            ONPRTDATA
+               MOVE    SPACE           TO  SPA-PRT-FLG
+           END-IF
+      *
+           IF    ( SPA-CLIENT-PRT-FLG  =   1 )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
            END-IF
       *
            .

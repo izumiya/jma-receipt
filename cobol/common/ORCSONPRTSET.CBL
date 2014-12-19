@@ -112,6 +112,9 @@
            CALL    "orcuidset" USING ST UIDIO-AREA
            DISPLAY "UUID CALL" UIDIO-AREA.
            MOVE    C-UID           TO  SPA-PRT-UUID
+           IF    ( SPA-GSRAUTH-31  =   "1" )
+               MOVE    1           TO  SPA-CLIENT-PRT-FLG
+           END-IF
       *
            DISPLAY "ORCSONPRTSET ED ="
       *???     

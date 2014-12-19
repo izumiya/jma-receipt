@@ -45,9 +45,11 @@
                05  SYS-1050-GLINECNT    PIC  X(02).
       *入力スクロール行数　入院
                05  SYS-1050-NLINECNT    PIC  X(02).
+      *プリンタへのデータ送信単位
+               05  SYS-1050-PRTCONF    PIC  X(01).
       *予備
       **** 03  SYS-1050-YOBI            PIC  X(499).
-           03  SYS-1050-YOBI            PIC  X(495).
+           03  SYS-1050-YOBI            PIC  X(494).
       *端末ＩＤ
            03  SYS-1050-TERMID          PIC  X(16).
       *オペーレータＩＤ

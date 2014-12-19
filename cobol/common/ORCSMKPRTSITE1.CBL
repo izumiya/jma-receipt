@@ -223,19 +223,33 @@
            IF      SPA-PRT-FLG     =   SPACE
                CONTINUE
            ELSE
-               PERFORM 300-REPRINT-SEC
-             IF    SPA-CLIENT-PRT-FLG  =   1
-               IF  MKPRT-DIA           =  "ORCDUMMMY.red"
-               PERFORM 301-ALLPRINT-SEC
-             DISPLAY "ダミー印刷が来た!! " SPA-PRT-FLG " " HC01PARA
-               PERFORM 301-CLIENTPRINT-SEC
+               IF    ( SPA-GSRAUTH-31  =   "1" )
+                   IF    ( SPA-CLIENT-PRT-FLG  =   1 )
+                       IF  MKPRT-DIA           =  "ORCDUMMMY.red"
+                           PERFORM 301-CLIENTPRINT-SEC
+                           DISPLAY "ダミー印刷が来た!! " 
+                                   SPA-PRT-FLG " " HC01PARA
+                       ELSE
+                           PERFORM 300-REPRINT-SEC
+                       END-IF
+                       MOVE  ZERO          TO  SPA-CLIENT-TEMP-FLG
+                   END-IF
+               ELSE
+                   PERFORM 300-REPRINT-SEC
+                   IF    SPA-CLIENT-PRT-FLG  =   1
+                       IF  MKPRT-DIA           =  "ORCDUMMMY.red"
+                           PERFORM 301-ALLPRINT-SEC
+                           DISPLAY "ダミー印刷が来た!! " 
+                                   SPA-PRT-FLG " " HC01PARA
+                           PERFORM 301-CLIENTPRINT-SEC
+                       END-IF
+      *                PERFORM 301-CLIENTPRINT-SEC
+      *                IF  SPA-CLIENT-TEMP-FLG =   2
+                           PERFORM 302-PRTDBINSERT-SEC
+                           MOVE  ZERO          TO  SPA-CLIENT-TEMP-FLG
+      *                END-IF
+                   END-IF
                END-IF
-      *        PERFORM 301-CLIENTPRINT-SEC
-      *        IF  SPA-CLIENT-TEMP-FLG =   2
-                   PERFORM 302-PRTDBINSERT-SEC
-                   MOVE  ZERO          TO  SPA-CLIENT-TEMP-FLG
-      *        END-IF
-             END-IF
            END-IF
       *
            .
@@ -539,6 +553,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    データ内容
            MOVE    PRTOUTPARA      TO  SHELLTBL-ARG21
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG22
+           IF    ( SPA-GSRAUTH-31      =   "1" )
+            AND  ( SPA-CLIENT-PRT-FLG  =   1 )
+            AND  ( SPA-CLIENT-TEMP-FLG =   2 )
+               MOVE    "D"         TO  SHELLTBL-ARG23
+           ELSE
+               MOVE    "1"         TO  SHELLTBL-ARG23
+           END-IF
 
       *
 grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
@@ -679,7 +700,11 @@ grpsys       CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-TERMID          TO  LNK-PRTKANRI-TERMID
            MOVE    SPA-OPID            TO  LNK-PRTKANRI-OPID
            MOVE    SPA-PRT-UUID        TO  LNK-PRTKANRI-TBL-UUID
-           MOVE    SPA-PRT-FLG         TO  LNK-PRTKANRI-SHORI-RENNUM
+           IF    ( SPA-GSRAUTH-31      =   "1" )
+               MOVE    ZERO            TO  LNK-PRTKANRI-SHORI-RENNUM
+           ELSE
+               MOVE    SPA-PRT-FLG     TO  LNK-PRTKANRI-SHORI-RENNUM
+           END-IF
            MOVE    "print_prv.sh"      TO  LNK-PRTKANRI-SHELLID
            MOVE    LNK-PRTKANRI-RENNUM TO  SHELLTBL-ARG1       
            MOVE    LNK-PRTKANRI-TBL-KEY
@@ -708,7 +733,11 @@ grpsys       CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SHELLTBL-ARG19      
            MOVE    LNK-PRTKANRI-GYOUMU-CD
                                        TO  SHELLTBL-ARG20      
-           MOVE    "5"                 TO  SHELLTBL-ARG17
+           IF    ( SPA-GSRAUTH-31      =   "1" )
+               MOVE    "6"             TO  SHELLTBL-ARG17
+           ELSE
+               MOVE    "5"             TO  SHELLTBL-ARG17
+           END-IF
            MOVE    HC01PARA            TO  SHELLTBL-ARG21
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
