@@ -1322,7 +1322,8 @@
            END-IF
            IF      SPA-ERRCD           =   SPACE
       *
-               IF      SPA-CLIENT-PRT-FLG  =   2
+               IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                 OR  ( SPA-PRTCONF         =   "1" )
       *            クライアント印刷制御情報取得処理
                    PERFORM 4901-CLIENT-PRT-SEC
                END-IF

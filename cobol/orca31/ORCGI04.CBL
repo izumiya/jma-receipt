@@ -517,6 +517,9 @@
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
       *
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *
       *   ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
       *
@@ -6133,6 +6136,14 @@
       *
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
       *
@@ -6170,6 +6181,12 @@
                PERFORM 451-SHOHOSEN-PRINT-SEC
            END-IF
       *!!
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
            .
        451-PRTOUT-EXT.
            EXIT.

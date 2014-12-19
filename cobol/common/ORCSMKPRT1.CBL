@@ -234,6 +234,8 @@
                END-IF
            END-IF
       *
+           MOVE    ZERO            TO SPA-CLIENT-TEMP-FLG
+      *
            .
        000-PROC-EXT.
       *
@@ -523,6 +525,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG13
            MOVE    SPA-CLIENT-SHOWDIALOG
                                        TO  SHELLTBL-ARG14
+           MOVE    SPA-PRTCONF         TO  SHELLTBL-ARG15
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE

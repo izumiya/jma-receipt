@@ -2680,6 +2680,7 @@
               AND( SPA-GMN-SKYPRTKBN   =   "1" ))
       *
                IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                OR   ( SPA-PRTCONF         =   "1" )
                    PERFORM 800-CLIENT-PRT-SEC
                END-IF
       *

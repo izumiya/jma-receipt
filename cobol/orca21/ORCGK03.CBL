@@ -6347,7 +6347,8 @@
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
-           IF      SPA-CLIENT-PRT-FLG  =   2
+           IF     (SPA-CLIENT-PRT-FLG  =   2 )
+             OR   (SPA-PRTCONF         =   "1" )
                IF     (SPA-GMN-SYOHOPRTFLG =   ZERO)
                AND    (SPA-GMN-HAKFLG      =   ZERO)
                AND    (SPA-GMN-YAKJYOFLG   =   ZERO)

@@ -595,7 +595,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *ver.4.8
       *    クライアント印刷
-           IF      SPA-CLIENT-PRT-FLG  =   2
+           IF     (SPA-CLIENT-PRT-FLG  =   2 )
+             OR   (SPA-PRTCONF         =   "1" )
       *        クライアント印刷制御情報取得処理
                PERFORM 23010-CLIENT-PRT-SEC
            END-IF

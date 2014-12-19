@@ -6285,7 +6285,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
-           IF     (SPA-CLIENT-PRT-FLG  =   2      )
+           IF    ((SPA-CLIENT-PRT-FLG  =   2      )
+             OR   (SPA-PRTCONF         =   "1"    ))
              AND  (SPA-ERRCD           =   SPACE  )
       *        クライアント印刷制御情報取得処理
                PERFORM 4901-CLIENT-PRT-SEC

@@ -10303,7 +10303,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "2"                 TO  ORCHC19-KBN
                    MOVE    SPACE               TO  SPA-PRT-FLG
       *            クライアント印刷用
-                   IF      SPA-CLIENT-PRT-FLG  =   2
+                   IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                     OR  ( SPA-PRTCONF         =   "1" )
                        PERFORM 41241-SYOHOU-CLIENTPRT-SEC
                    END-IF
                WHEN    3
@@ -12124,7 +12125,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
       *
-           IF      SPA-CLIENT-PRT-FLG  =   2
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
                IF      SPA-KID2-FLG        =   "OK"
                                            OR  SPACE
                    CONTINUE

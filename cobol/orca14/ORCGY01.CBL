@@ -3917,7 +3917,8 @@
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"      USING   SPA-AREA
       *
-           IF      SPA-CLIENT-PRT-FLG  =   2
+           IF     (SPA-CLIENT-PRT-FLG  =   2 )
+             OR   (SPA-PRTCONF         =   "1" )
       *        クライアント印刷制御情報取得サブ
                PERFORM 4901-CLIENT-PRT-SEC
            END-IF
@@ -3955,6 +3956,8 @@
                                            ONPRTDATA
            END-IF
       *
+           MOVE    HZN-SPA-AREA        TO  SPA-AREA
+      *
            IF      (SPA-CLIENT-PRT-FLG =   1  )
       *        印刷ダミー処理
                MOVE    "99"                TO  SPA-PRT-FLG
@@ -3962,7 +3965,6 @@
                MOVE    ZERO                TO  SPA-CLIENT-TEMP-FLG
            END-IF
       *
-           MOVE    HZN-SPA-AREA        TO  SPA-AREA
           .
        4908-YYKHYO-PRINT-EXT.
            EXIT.

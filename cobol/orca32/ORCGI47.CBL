@@ -1267,6 +1267,9 @@
            COPY    "CPORCHCN68.INC".
            COPY    "CPONPRTDATA.INC".
       *
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -2102,6 +2105,14 @@
       *
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
       *
            MOVE    SPA-SYSYMD      TO    SPA-SRYYMD
            MOVE    SPA-I40-SRYYMD (1:6)
@@ -2114,6 +2125,13 @@
                                    SPA-AREA
                                    ONPRTDATA
            MOVE    SPACE           TO    SPA-PRT-FLG
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+               MOVE    ZERO                TO  SPA-CLIENT-TEMP-FLG
+           END-IF
       *
            .
        21011-HYOKAHYO-EXT.

@@ -234,7 +234,7 @@ grpsys COPY    "COMMON-SPA".
                    PERFORM 900-PRV-RRKSET-SEC
            END-IF
       *
-           IF  PRT-PRTKBN              =   "4"
+           IF  PRT-PRTKBN              =   "4" OR "5" OR "6"
                DISPLAY "For PREVIW SKIP" 
                MOVE    1               TO  FLG-END 
                GO  TO  100-INIT-EXT

@@ -85,7 +85,11 @@
                                        ORCSMKPRTAREA
                                        SPA-AREA
       *
-           MOVE    2                   TO  SPA-CLIENT-PRT-FLG
+           IF    ( SPA-PRTCONF     =   "1" )
+               MOVE    ZERO            TO  SPA-CLIENT-PRT-FLG
+           ELSE
+               MOVE    2               TO  SPA-CLIENT-PRT-FLG
+           END-IF
            MOVE    ZERO                TO  SPA-CLIENT-TEMP-FLG
       *
            .

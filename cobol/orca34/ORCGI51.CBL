@@ -385,6 +385,9 @@
       *    排他制御サブパラメタ
            COPY    "CPORCSLOCK.INC".
       *
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -2409,6 +2412,14 @@
            INITIALIZE                      SUMSYUNOU-REC
       *
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
       *
@@ -2443,6 +2454,12 @@
       *
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4501-GAISANPRT-SEC
+           END-IF
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
            END-IF
       *
            PERFORM 900-SYUNOU-DEL6-SEC

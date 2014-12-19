@@ -109,7 +109,8 @@ MONPE = 'monpe'
 DEFAULT_LP = 'lp1'
 
 # クライアント印刷用(複数ps をまとめる)
-Print_Area = []
+Print_Area = Array.new
+Print_Area2 = Array.new
 PDF = "ps2pdf"
 
 
@@ -117,7 +118,7 @@ PDF = "ps2pdf"
 # 領域の初期化
 
 # ファイル名領域
-temp_file = '';   data_file = ''; lp_name = ''; offset_x = ''; offset_y = ''; offset_xy = ''
+temp_file = '';   data_file = ''; lp_name = '';pdf_name = ''; offset_x = ''; offset_y = ''; offset_xy = ''
 temp_file2 = '';  lp_name2 = ''
 site_flag = ''; base_dir = ''
 #---- (2003/01/20 ) start
@@ -282,7 +283,6 @@ word2.each do |d2|
 	fred.close
 	fpdf=Tempfile.new(['tmppdf','.pdf'])
 	fpdf.close
-  
     layeroption = d2.scan(/MonpeLayerIn(.*)MonpeLayerOut/).join.gsub(/ *-L */,",").sub(/,/,"-H ")
 #  puts  'layer = '
 #  puts  layeroption
@@ -673,7 +673,7 @@ w_exec.clear
 				w_exec << "#{MONPE} #{fred.path} #{offset_xy} #{layeroption} -e #{fpdf.path}"
 				w_exec << "mv #{fpdf.path} #{pdffile_name}"
 			end
-		when	'5'     # クライアント印刷指示
+		when	'5' , '6'    # クライアント印刷指示
 			# 出力ファイル名が指定されていなかったら、通常の印刷処理を行う
 			if pdffile_name == ''
 				puts	'出力ファイル名未設定'
@@ -683,6 +683,7 @@ w_exec.clear
 				w_exec << "#{MONPE} #{fred.path} #{offset_xy} #{layeroption} -e #{fpdf.path}"
 				w_exec << "mv #{fpdf.path} #{pdffile_name}"
 				Print_Area.push(pdffile_name)
+				Print_Area2.push([lp_name,pdffile_name])
 			end
 		else
 			puts	'出力区分内容設定エラー'
@@ -737,36 +738,57 @@ end
 
 #クライアント印刷処理
 case    prt_flg
-when    '5'     # PSファイル出力の指示
-	monupload_options=""
-	if ( show_dialog == "1" )
-		monupload_options = "-s"
-	else
-		monupload_options ="-p #{lp_name}"
-	end
-	if	on_flg == '1'
-		puts "on_flg set 1"
-		BS_File=mcp_tempdir + File.basename(pdffile_name)[0,30] + "99999" + ADD_File + File.basename(pdffile_name)[35,36]
-	else
-		puts "on_flg set 0"
-		BS_File=mcp_tempdir + File.basename(pdffile_name).sub(/.pdf/,'') + ADD_File
-	end
-		PDF_File=BS_File + ".pdf"
-		system("pdftk #{Print_Area.join(' ')} cat output #{PDF_File}" )
-		system("echo monupload -t report -T \"#{report_title}\" #{monupload_options} #{PDF_File}" )
-		system("monupload -t report -T \"#{report_title}\" #{monupload_options} #{PDF_File}" )
-		File.delete(PDF_File)
+when    '5'     # PDFファイル出力の指示
+   monupload_options=""
+   if ( show_dialog == "1" )
+      monupload_options = "-s"
+   else
+      monupload_options ="-p #{lp_name}"
+   end
+   if on_flg == '1'
+      puts "on_flg set 1"
+      BS_File=mcp_tempdir + File.basename(pdffile_name)[0,30] + "99999" + ADD_File + File.basename(pdffile_name)[35,36]
+   else
+      puts "on_flg set 0"
+      BS_File=mcp_tempdir + File.basename(pdffile_name).sub(/.pdf/,'') + ADD_File
+   end
+   pdf_name=BS_File + ".pdf"
+   system("pdftk #{Print_Area.join(' ')} cat output #{pdf_name}" )
+   system("echo monupload -t report -T \"#{report_title}\" #{monupload_options} #{pdf_name}" )
+   system("monupload -t report -T \"#{report_title}\" #{monupload_options} #{pdf_name}" )
+   File.delete(pdf_name) if File.exist?(pdf_name)
+when    '6'     # PDFファイル出力の指示
+   if Print_Area2.size > 0
+      seq_num=1
+      printer_name=Print_Area2[0][0]
+      pdf_basename=File.basename(Print_Area2[0][1].gsub(/(-|\.pdf$)/,''))[0,54]
+      pdf_names=Array.new
+      command_strs=Array.new
+      Print_Area2.each{|print_inf|
+         if printer_name != print_inf[0]
+            pdf_name = mcp_tempdir + pdf_basename + sprintf("_%05d.pdf",seq_num)
+            command_strs.push("pdftk #{pdf_names.join(' ')} cat output #{pdf_name}  ; lpr -P #{printer_name}  #{pdf_name}")
+            pdf_names.clear
+            printer_name = print_inf[0]
+            seq_num+=1
+         end
+         pdf_names.push(print_inf[1])
+      }
+      pdf_name = mcp_tempdir + pdf_basename + sprintf("_%05d.pdf",seq_num)
+      command_strs.push("pdftk #{pdf_names.join(' ')} cat output #{pdf_name}  ; lpr -P #{printer_name}  #{pdf_name}")
+      command_strs.each{|command_str|
+         puts "command #{command_str}"
+         system(command_str)
+         File.delete(pdf_name) if File.exist?(pdf_name)
+      }
+   end
 end
 	puts '[end ' + `date` + ']'
 # ============================================================
 
 # 一時ファイル削除
 begin
-	if nil != File.size(temp_file)
-		# 一時ファイルが存在する
-		# 一時ファイルの削除
-		File.delete(temp_file)
-	end
+	File.delete(temp_file) if File.exist?(temp_file)
 rescue
 # 例外が発生すれば、一時ファイルが存在しない
 end

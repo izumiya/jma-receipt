@@ -1204,6 +1204,9 @@
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
       *
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *
       *   ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
       *
@@ -8938,6 +8941,14 @@
       *
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
       *
@@ -8982,6 +8993,12 @@
                CALL    WRK-PRINT-PG    USING   WRK-SPA-AREA
                                                PTNYUINRRK-REC
                MOVE    SPACE           TO      WRK-SPA-PRT-FLG
+           END-IF
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
            END-IF
       *
            .
@@ -9029,6 +9046,25 @@
       *    入院診療禄サブ呼出処理
       *****************************************************************
        4801-ORCHCN01-CALL-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  SPA-PRT-FLG
+      *
+      *    印刷制御情報取得サブ
+           CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
+      *
+           IF    ( SPA-CLIENT-PRT-FLG  =   1 )
+               MOVE     2              TO  SPA-CLIENT-TEMP-FLG
+               MOVE    "02"            TO  SPA-PRT-FLG
+           END-IF
+      *
       *
            MOVE    SPA-AREA            TO  WRK-SPA-AREA
            INITIALIZE                      WRK-SPA-KYOTUKEY
@@ -9090,6 +9126,12 @@
       *
            CALL    WRK-PRINT-PG    USING   WRK-SPA-AREA
                                            ORCHCN01AREA
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
       *
            .
        4801-ORCHCN01-CALL-EXT.

@@ -2747,6 +2747,7 @@
            IF    ( WRK-SKYPRT      =   "1" )
              OR  ( WRK-SRYPRT      =   "1" )
                IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                OR   ( SPA-PRTCONF         =   "1" )
                    PERFORM 800-CLIENT-PRT-SEC
                END-IF
            END-IF

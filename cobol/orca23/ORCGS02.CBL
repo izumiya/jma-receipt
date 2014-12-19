@@ -2194,11 +2194,14 @@
                WHEN    "PV"
                    MOVE    "3"             TO  SHELLTBL-ARG17
                WHEN    "OK"
-                   IF      (SPA-CLIENT-PRT-FLG =   2  )
+                   EVALUATE    TRUE
+                   WHEN  ( SPA-CLIENT-PRT-FLG =   2  )
                        MOVE    "5"         TO  SHELLTBL-ARG17
-                   ELSE
+                   WHEN  ( SPA-PRTCONF        =   "1"  )
+                       MOVE    "6"         TO  SHELLTBL-ARG17
+                   WHEN    OTHER
                        MOVE    "2"         TO  SHELLTBL-ARG17
-                   END-IF
+                   END-EVALUATE
                END-EVALUATE
                MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SPA-CLIENT-SHOWDIALOG
@@ -2976,6 +2979,7 @@
                IF    ( WRK-SKYPRT      =   "1" )
                  OR  ( WRK-SRYPRT      =   "1" )
                    IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                    OR   ( SPA-PRTCONF         =   "1" )
                        PERFORM 800-CLIENT-PRT-SEC
                    END-IF
                END-IF
@@ -4984,6 +4988,7 @@
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
            IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+            OR   ( SPA-PRTCONF         =   "1" )
                PERFORM 800-CLIENT-PRT-SEC
            END-IF
       *
@@ -5008,6 +5013,7 @@
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
            IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+            OR   ( SPA-PRTCONF         =   "1" )
                PERFORM 800-CLIENT-PRT-SEC
            END-IF
       *
@@ -5030,6 +5036,7 @@
       *    印刷制御情報取得サブ
            CALL    "ORCSONPRTSET"  USING   SPA-AREA
            IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+            OR   ( SPA-PRTCONF         =   "1" )
                PERFORM 800-CLIENT-PRT-SEC
            END-IF
       *
@@ -7045,6 +7052,7 @@
                IF    ( SPA-GMN-SKYPRT  =   "1" )
                  OR  ( SPA-GMN-SRYPRT  =   "1" )
                    IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                    OR   ( SPA-PRTCONF         =   "1" )
                        PERFORM 800-CLIENT-PRT-SEC
                    END-IF
                END-IF

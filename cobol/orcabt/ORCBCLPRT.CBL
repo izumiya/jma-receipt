@@ -125,6 +125,7 @@
                                        LNK-PRTKANRI-TBL-UUID
                                        SPA-HOSPNUM
                                        SPA-CLIENT-SHOWDIALOG
+                                       SPA-PRTCONF
            END-UNSTRING
       *
            .
@@ -160,7 +161,11 @@
              MOVE    "REPRINT"           TO  SHELLTBL-ARG14
              MOVE    "00001"             TO  SHELLTBL-ARG15
              MOVE    "99999"             TO  SHELLTBL-ARG16
-             MOVE    "5"                 TO  SHELLTBL-ARG17
+             IF    ( SPA-PRTCONF         =   "1" )
+                 MOVE    "6"             TO  SHELLTBL-ARG17
+             ELSE
+                 MOVE    "5"             TO  SHELLTBL-ARG17
+             END-IF
              MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
              MOVE    PRTKANRI-TBL-UUID   TO  SHELLTBL-ARG19
              MOVE    PRTKANRI-GYOUMU-CD  TO  SHELLTBL-ARG20

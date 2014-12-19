@@ -2155,15 +2155,12 @@
                IF    ( SPA-GMN-MEIPRTKBN   =   "1" )
       *
                    CALL    "ORCSONPRTSET"  USING   SPA-AREA
-                   IF    ( SPA-S08-MOTOPG  =   "I04" )
-                       PERFORM 22011-PRINT-SEC
-                   ELSE
-                       IF    ( SPA-CLIENT-PRT-FLG  =   2 )
-                           PERFORM 800-CLIENT-PRT-SEC
-                       END-IF
-                       PERFORM 22011-PRINT-SEC
-                       PERFORM 800-CLIENT-DUMMY-PRT-SEC
+                   IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                    OR   ( SPA-PRTCONF         =   "1" )
+                       PERFORM 800-CLIENT-PRT-SEC
                    END-IF
+                   PERFORM 22011-PRINT-SEC
+                   PERFORM 800-CLIENT-DUMMY-PRT-SEC
       *
                END-IF
       *
