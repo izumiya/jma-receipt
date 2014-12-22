@@ -67,6 +67,8 @@
            03  WRK-OLD-NYUINYMD        PIC X(08).
            03  WRK-OLD-TAIINYMD        PIC X(08).
       *
+           03  WRK-OLD-RRKNUM          PIC 9(03).
+      *
            03  WRK-TAI-TAIINYMD        PIC X(08).
       *
            03  WRK-TAIINYMD            PIC X(08).
@@ -187,6 +189,7 @@
            MOVE    SPACE               TO  WRK-OLD-NYUINYMD
            MOVE    SPACE               TO  WRK-OLD-TAIINYMD
            MOVE    SPACE               TO  WRK-TAI-TAIINYMD
+           MOVE    ZERO                TO  WRK-OLD-RRKNUM
            PERFORM
                    UNTIL      (FLG-PTNYUINRRK      =   1 )
                           OR  (FLG-SYORI-END       =   1 )
@@ -217,6 +220,7 @@
                END-IF
                MOVE    PTNYUINRRK-NYUINYMD TO  WRK-OLD-NYUINYMD
                MOVE    PTNYUINRRK-TAIINYMD TO  WRK-OLD-TAIINYMD
+               MOVE    PTNYUINRRK-RRKNUM   TO  WRK-OLD-RRKNUM
            END-IF
       *
       *       他院退院日編集
@@ -258,8 +262,11 @@
        1001-SRYYMD-SYORI-SEC            SECTION.
       *
       *    前回退院日＝入院日の時、対象とする
-           IF     (PTNYUINRRK-NYUINYMD NOT =   WRK-OLD-NYUINYMD ) AND
-                  (PTNYUINRRK-TAIINYMD NOT =   WRK-OLD-TAIINYMD )
+           IF    ((PTNYUINRRK-NYUINYMD NOT =   WRK-OLD-NYUINYMD ) AND
+                  (PTNYUINRRK-TAIINYMD NOT =   WRK-OLD-TAIINYMD ))
+      *H26.12     連番毎に対象
+             OR  ( PTNYUINRRK-RRKNUM   NOT =   WRK-OLD-RRKNUM   )
+      *
                IF      PTNYUINRRK-TAIINYMD     =   WRK-OLD-NYUINYMD
                    IF      (ORCSCNYUHEN-KBN2   NOT =   "1"     )
                        IF    ( FLG-OK          =   1             )
@@ -277,6 +284,7 @@
                    MOVE    WRK-SDD         TO  ORCSCNYUHEN-DOUNYUIN 
                END-IF
            END-IF
+      *
       *
       *    当日以前の転入日
            IF      PTNYUINRRK-TENNYUYMD    <=  WRK-SRYYMD
