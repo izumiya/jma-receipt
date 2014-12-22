@@ -2244,7 +2244,10 @@
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE
                    ELSE
-                       IF    (SPA-GMN-SELNUM   =   ZERO )
+                       IF    ( SPA-GMN-KANRICD =   "9800" )
+                        AND  ( SPA-GMN-MAX    >=   2    )
+                           CONTINUE
+                       ELSE
                            MOVE    3           TO  SPA-GMN-CUR
                            MOVE    "0021"      TO  SPA-ERRCD
                            GO  TO  4101-KAKUTEI-CHK-EXT
