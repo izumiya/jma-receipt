@@ -444,6 +444,11 @@
       *
            PERFORM 900-CALL-ORCSJOB-SEC
       *
+           MOVE    "STP"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    3               TO  JOB-STOPFLG
+           PERFORM 900-CALL-ORCSJOB-SEC
+      *
       *    ¿¡µ·«Ø∑Ó ‘Ω∏
            MOVE    WRK-PARA-SKYYM  TO  WRK-SYMD (1:6)
            MOVE    "01"            TO  WRK-SYMD (7:2)

@@ -1454,7 +1454,7 @@
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL ( IDX >       SYS-3003-JOBID )
       *            ジョブ管理チェック処理
-                   MOVE    "CHK"           TO  SJOBKANRI-MODE
+                   MOVE    "CH2"           TO  SJOBKANRI-MODE
                    INITIALIZE                  JOBKANRI-REC
                    MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
                    MOVE    IDX             TO  JOB-JOBID
@@ -1563,7 +1563,7 @@
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL ( IDX >       SYS-3003-JOBID )
       *            ジョブ管理チェック処理
-                   MOVE    "CHK"           TO  SJOBKANRI-MODE
+                   MOVE    "CH2"           TO  SJOBKANRI-MODE
                    INITIALIZE                  JOBKANRI-REC
                    MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
                    MOVE    IDX             TO  JOB-JOBID
@@ -1894,6 +1894,13 @@
       *
                    MOVE    SPACE           TO  SHELLTBL
                    MOVE    "execoprg.sh"   TO  SHELLTBL-NAME
+      *
+                   MOVE     SPA-HOSPNUM    TO   SHELLTBL-HOSPNUM
+                   MOVE     WRK-CONS-JOB-JOBID
+                                           TO   SHELLTBL-JOBID
+                   MOVE     WRK-CONS-JOB-SHELLID
+                                           TO   SHELLTBL-SHELLID
+      *
                    MOVE    LNK-PRTKANRI-RENNUM
                                            TO  SHELLTBL-ARG1
                    MOVE    LNK-PRTKANRI-TBL-KEY
@@ -1970,6 +1977,13 @@
       *
                MOVE    SPACE               TO  SHELLTBL
                MOVE    "print_prv.sh"      TO  SHELLTBL-NAME
+      *
+               MOVE    SPA-HOSPNUM         TO  SHELLTBL-HOSPNUM
+               MOVE    WRK-CONS-JOB-JOBID
+                                           TO  SHELLTBL-JOBID
+               MOVE    WRK-CONS-JOB-SHELLID
+                                           TO  SHELLTBL-SHELLID
+      *
                MOVE    SPACE               TO  LNK-PRTKANRI-AREA
                INITIALIZE                      LNK-PRTKANRI-AREA
                MOVE    WRK-CONS-PRTKANRI-TBL-KEY

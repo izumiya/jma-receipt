@@ -863,6 +863,7 @@
       *
                    IF    ( JOB-SHELLID =   SPA-NAI-SHELLID )
                     AND  ( JOB-STOPFLG =   3 )
+                    AND  ( JOB-ENDYMD  =   SPACE )
                        MOVE    "1104"  TO  SPA-ERRCD
                    END-IF
       *

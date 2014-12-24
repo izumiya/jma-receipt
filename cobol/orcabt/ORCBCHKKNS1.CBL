@@ -365,6 +365,14 @@
            MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
            PERFORM 800-ORCSJOB-SEC
       *
+           MOVE    "STP"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
+           MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
+           MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
+           MOVE    3                   TO  JOB-STOPFLG
+           PERFORM 800-ORCSJOB-SEC
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  BCHKKNS101PARA-HOSPNUM
            MOVE    "BCHKK01"           TO  BCHKKNS101PARA-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID TO  BCHKKNS101PARA-TERMID

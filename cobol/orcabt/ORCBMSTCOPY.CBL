@@ -315,6 +315,11 @@
       *
            PERFORM   900-CALL-ORCSJOB-SEC
       *
+           MOVE    "STP"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    3                   TO  JOB-STOPFLG
+           PERFORM   900-CALL-ORCSJOB-SEC
+      *
            IF    ( WRK-PARA-SYORIKBN   =   "1" OR "2" OR "3" )
                CONTINUE
            ELSE

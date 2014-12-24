@@ -937,7 +937,7 @@
            MOVE    SPACE           TO  SPA-ERRCD
       *
       *    ジョブ管理チェック処理
-           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           MOVE    "CH2"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
            MOVE    SPA-HOSPNUM     TO JOB-HOSPNUM
            MOVE    WRK-CONS-JOB-JOBID
@@ -1059,6 +1059,13 @@
            END-IF
       *     
            MOVE    "toukei1.sh"    TO  SHELLTBL-NAME
+      *
+           MOVE    SPA-HOSPNUM     TO  SHELLTBL-HOSPNUM
+           MOVE    WRK-CONS-JOB-JOBID
+                                   TO  SHELLTBL-JOBID
+           MOVE    WRK-CONS-JOB-SHELLID
+                                   TO  SHELLTBL-SHELLID
+      *
            MOVE    SPA-TERMID      TO  SHELLTBL-ARG1
            MOVE    SPA-HOSPID      TO  SHELLTBL-ARG2
            MOVE     SYS-1001-HOSPCD

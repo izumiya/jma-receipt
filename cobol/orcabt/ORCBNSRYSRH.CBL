@@ -247,6 +247,15 @@
                                    TO  JOB-SHELLMSG
            PERFORM 800-ORCSJOB-SEC
       *
+           MOVE    "STP"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
+           MOVE    WRK-PARA-SHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    3               TO  JOB-STOPFLG
+           PERFORM 800-ORCSJOB-SEC
+      *
       *    パラメタ編集処理
            PERFORM 110-PARA-HENSYU-SEC
       *

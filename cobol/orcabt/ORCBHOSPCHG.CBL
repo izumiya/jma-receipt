@@ -237,6 +237,11 @@
                                    TO  JOB-SHELLMSG
            PERFORM   900-CALL-ORCSJOB-SEC
       *
+           MOVE    "STP"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    3               TO  JOB-STOPFLG
+           PERFORM   900-CALL-ORCSJOB-SEC
+      *
            INITIALIZE                  SGETTEMP-AREA
            MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
            CALL    "ORCSGETTEMP" USING SGETTEMP-AREA

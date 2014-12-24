@@ -294,6 +294,11 @@
       *
            PERFORM   900-CALL-ORCSJOB-SEC
       *
+           MOVE    "STP"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    3                   TO  JOB-STOPFLG
+           PERFORM   900-CALL-ORCSJOB-SEC
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  BPTNUMCHGPARA-HOSPNUM
            MOVE    "BCHKS01"           TO  BPTNUMCHGPARA-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID TO  BPTNUMCHGPARA-TERMID
