@@ -181,6 +181,7 @@
       *                                     対応
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.16    NACL-藤原    14/12/05  入力チェックの修正
+      *  04.07.17    NACL-藤原    14/12/24  ＥＦファイル名修正
       *
       *  04.08.01    NACL-森脇    13/04/12  システムＤＢ対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
@@ -5284,7 +5285,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                STRING      SPA-NAI-1001-PREFNUM    DELIMITED   BY  SIZE
                            SPA-NAI-1001-HOSPCD     DELIMITED   BY  SIZE
                            "_"                     DELIMITED   BY  SIZE
-                           SPA-NAI-SKYYM-W         DELIMITED   BY  SIZE
+                           SPA-NAI-SKYYM (3:4)     DELIMITED   BY  SIZE
                                            INTO    SHELLTBL-ARG12
                END-STRING
            ELSE
