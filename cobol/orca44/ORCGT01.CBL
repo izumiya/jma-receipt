@@ -181,6 +181,7 @@
       *                                     対応
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.16    NACL-藤原    14/12/05  入力チェックの修正
+      *  04.07.16    NACL-藤原    14/12/24  ＥＦファイル名修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5408,7 +5409,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                STRING      SPA-NAI-1001-PREFNUM    DELIMITED   BY  SIZE
                            SPA-NAI-1001-HOSPCD     DELIMITED   BY  SIZE
                            "_"                     DELIMITED   BY  SIZE
-                           SPA-NAI-SKYYM-W         DELIMITED   BY  SIZE
+                           SPA-NAI-SKYYM (3:4)     DELIMITED   BY  SIZE
                                            INTO    SHELLTBL-ARG12
                END-STRING
            ELSE
