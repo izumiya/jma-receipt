@@ -396,6 +396,7 @@
       *                                     （０５４、０５２対応）
       *                                     （高額療養費対応）
       *  04.07.22    NACL-門脇    14/12/09  東京都地方公費神奈川県対応
+      *  04.07.23    NACL-門脇    15/01/05  東京都地方公費対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -8992,6 +8993,8 @@
                                                = "051" OR "052") AND
                               (LNK-SYU-SRYYMD(1:6) < "200901"  )    ))
                         AND (  WK-TOKATUKAI(KOH-IDX)          = ZERO )
+                        AND (  WK-KOHJGNGET-TAISYOKBN(KOH-IDX)
+                                                            NOT = 2  )
                           IF  (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
@@ -9482,6 +9485,8 @@
                              ((COMB-KOHHKNNUM(KOH-IDX)
                                                = "051" OR "052") AND
                               (LNK-SYU-SRYYMD(1:6) < "200901"  )    ))
+                        AND (  WK-KOHJGNGET-TAISYOKBN(KOH-IDX)
+                                                            NOT = 2  )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
@@ -9749,6 +9754,8 @@
                         END-IF
                         IF  ( COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                               >= "1" AND <= "8"     )
+                        AND ( WK-KOHJGNGET-TAISYOKBN(KOH-IDX)
+                                                           NOT = 2  )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
@@ -9895,6 +9902,8 @@
                         END-IF
                         IF  ( COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                               >= "1" AND <= "8"     )
+                        AND ( WK-KOHJGNGET-TAISYOKBN(KOH-IDX)
+                                                           NOT = 2  )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972")
@@ -13723,7 +13732,8 @@
                                  (LNK-SYU-KOH1HKNNUM    =
                                             "052" OR "054"         ) AND
                                  (SYU-NYUGAIKBN            = "1"   ))
-                             OR ((WK-TOKATUKAI(1)          =  1    ) AND
+                             OR ((LNK-SYU-KOH1HKNNUM(1:1)
+                                                 >= "1" AND <=  "8") AND
                                  (WK-KOHJGNGET-TAISYOKBN(1)
                                                            =  2    ) AND
                                  (SYU-NYUGAIKBN            = "1"   ))
@@ -13877,6 +13887,11 @@
                              OR ((LNK-SYU-SRYYMD(1:6)  >=  "201501") AND
                                  (LNK-SYU-KOH1HKNNUM    =
                                             "054"                  ) AND
+                                 (SYU-NYUGAIKBN            = "1"   ))
+                             OR ((LNK-SYU-KOH1HKNNUM(1:1)
+                                                 >= "1" AND <=  "8") AND
+                                 (WK-KOHJGNGET-TAISYOKBN(1)
+                                                           =  2    ) AND
                                  (SYU-NYUGAIKBN            = "1"   ))
                                 ADD   SYU-KOH2HKNFTNMONEY
                                                    TO  FTN-KOHI1-M-JI
@@ -14533,6 +14548,11 @@
                                  (LNK-SYU-KOH2HKNNUM    =
                                             "054"                  ) AND
                                  (SYU-NYUGAIKBN            = "1"   ))
+                             OR ((LNK-SYU-KOH2HKNNUM(1:1)
+                                                 >= "1" AND <=  "8") AND
+                                 (WK-KOHJGNGET-TAISYOKBN(2)
+                                                           =  2    ) AND
+                                 (SYU-NYUGAIKBN            = "1"   ))
                                 ADD   SYU-KOH1HKNFTNMONEY
                                                    TO  FTN-KOHI2-M-JI
                                 ADD   SYU-KOH1COMPFTN
@@ -14652,6 +14672,11 @@
                              OR ((LNK-SYU-SRYYMD(1:6)  >=  "201501") AND
                                  (LNK-SYU-KOH2HKNNUM    =
                                             "054"                  ) AND
+                                 (SYU-NYUGAIKBN            = "1"   ))
+                             OR ((LNK-SYU-KOH2HKNNUM(1:1)
+                                                 >= "1" AND <=  "8") AND
+                                 (WK-KOHJGNGET-TAISYOKBN(2)
+                                                           =  2    ) AND
                                  (SYU-NYUGAIKBN            = "1"   ))
                                 ADD   SYU-KOH2HKNFTNMONEY
                                                    TO  FTN-KOHI2-M-JI
@@ -17975,6 +18000,7 @@
       *
            IF  (LNK-SYU-SRYYMD(1:6)  >= "200904")
            AND (COMB-HKNNUM       NOT =  SPACE  )
+           AND (COMB-KOH2HKNNUM   NOT =  SPACE  )
               IF ( LNK-SYU-KOH-HKNNUM(1) =
                    "015" OR "016" OR "021" OR "024" OR
                    "038" OR "051" OR "052" OR "079"    )
@@ -18936,7 +18962,7 @@
                    ( COMB-KOH1HKNNUM = "038"                  ))
                OR (( LNK-SYU-SRYYMD(1:6)   >=  "201501"       ) AND
                    ( COMB-KOH1HKNNUM = "052" OR "054"         ))
-               OR (( WK-TOKATUKAI(1)            =  1          ) AND
+               OR (( COMB-KOH1HKNNUM(1:1)  >= "1" AND <=  "8" ) AND
                    ( WK-KOHJGNGET-TAISYOKBN(1)  =  2          ))
                    IF  ((COMB-KOH2HKNNUM  = "972") OR
                         (COMB-KOH3HKNNUM  = "972") OR
@@ -19005,6 +19031,10 @@
                    IF  ((LNK-S02-KOUREI-NYUIN-KBN  =   "1") OR
                         (FLG-KOREI-TANYUIN         =    1 ))
                    AND ( MAX-KIN-KOHI1-M > WK-KOH-GENDOGAKU)
+                     IF   (WK-TOKATUKAI(1)            =  ZERO)
+                     AND  (WK-KOHJGNGET-TAISYOKBN(1)  =   2  )
+                      CONTINUE
+                     ELSE
                       IF    FTN-KOHI1-M-JI   >=   WK-KOH-GENDOGAKU
                         MOVE    ZERO    TO   WK-ZAN-JIRITU
                       ELSE
@@ -19032,9 +19062,14 @@
                       IF   ZAN-KOHI13 >  WK-ZAN-JIRITU
                         MOVE   WK-ZAN-JIRITU  TO  ZAN-KOHI13
                       END-IF
+                     END-IF
                    END-IF
                    IF  ( FLG-GENBUTU70   NOT =   ZERO        )
                    AND ( MAX-KIN-KOHI1-M > WK-GEN70-GENDOGAKU)
+                     IF   (WK-TOKATUKAI(1)            =  ZERO)
+                     AND  (WK-KOHJGNGET-TAISYOKBN(1)  =   2  )
+                      CONTINUE
+                     ELSE
                       IF    FTN-KOHI1-M-JI   >=   WK-GEN70-GENDOGAKU
                         MOVE    ZERO    TO   WK-ZAN-JIRITU
                       ELSE
@@ -19062,6 +19097,7 @@
                       IF   ZAN-KOHI13 >  WK-ZAN-JIRITU
                         MOVE   WK-ZAN-JIRITU  TO  ZAN-KOHI13
                       END-IF
+                     END-IF
                    END-IF
                END-IF
       *+++
@@ -19403,6 +19439,8 @@
                    ( COMB-KOH2HKNNUM = "024" OR "079"         ))
                OR (( LNK-SYU-SRYYMD(1:6)   >=  "201501"       ) AND
                    ( COMB-KOH2HKNNUM = "054"                  ))
+               OR (( COMB-KOH2HKNNUM(1:1)  >= "1" AND <=  "8" ) AND
+                   ( WK-KOHJGNGET-TAISYOKBN(2)  =  2          ))
                    IF  ((COMB-KOH1HKNNUM  = "972") OR
                         (COMB-KOH3HKNNUM  = "972") OR
                         (COMB-KOH4HKNNUM  = "972"))
@@ -19469,6 +19507,9 @@
                    END-IF
                    IF  ( LNK-S02-KOUREI-NYUIN-KBN  =    "1")
                    AND ( MAX-KIN-KOHI2-M > WK-KOH-GENDOGAKU)
+                     IF    WK-KOHJGNGET-TAISYOKBN(2)  =   2
+                      CONTINUE
+                     ELSE
                       IF    FTN-KOHI2-M-JI   >=   WK-KOH-GENDOGAKU
                         MOVE    ZERO    TO   WK-ZAN-JIRITU
                       ELSE
@@ -19496,6 +19537,7 @@
                       IF   ZAN-KOHI23 >  WK-ZAN-JIRITU
                         MOVE   WK-ZAN-JIRITU  TO  ZAN-KOHI23
                       END-IF
+                     END-IF
                    END-IF
                END-IF
       *+++
