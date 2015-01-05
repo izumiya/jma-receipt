@@ -1949,7 +1949,7 @@
         <yalign>0.5</yalign>
         <response_id>0</response_id>
         <accelerator>
-          <modifiers>0</modifiers>
+          <modifiers>GDK_SHIFT_MASK</modifiers>
           <key>GDK_F6</key>
           <signal>clicked</signal>
         </accelerator>
