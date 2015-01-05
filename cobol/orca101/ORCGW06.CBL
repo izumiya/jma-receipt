@@ -58,6 +58,7 @@
       *                           13/07/17  スーパーバイザー処理変更
       * 04.07.01     NACL-太田    13/07/22  ＩＣカードリーダ／ライタ設定追加
       * 04.07.00     NACL-多々納  14/02/10  入力スクロール行数対応他
+      * 04.08.04     NACL-森脇    14/12/10  職員情報削除時出力先設定削除
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -486,6 +487,16 @@
            COPY  "CPSK1001.INC".
       *    基本情報
            COPY  "CPSK1038.INC".
+      *----(04.08.04)--ADD-START---
+      *    出力先プリンタ名割り当て情報
+           COPY  "CPSK1031.INC".
+      *    帳票プログラム選択情報
+           COPY  "CPSK1032.INC".
+      *    出力先プリンタ名割り当て情報（入院）
+           COPY  "CPSK1034.INC".
+      *    帳票プログラム選択情報 （入院）
+           COPY  "CPSK1035.INC".
+      *----(04.08.04)--ADD-END-----
       *
       *    システムユーザー
        01  SYSUSER-REC.
@@ -3489,6 +3500,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+      *----(04.08.04)--ADD-START---
+           IF      SPA-GMN-TBL-MAX     =   1
+               PERFORM 4031-PRT-DEL-SEC
+           END-IF
+      *----(04.08.04)--ADD-END-----
+      *
       *    ユーザＩＤ登録判定
            MOVE    ZERO                TO  FLG-USERID-UPD
            IF      SPA-GMN-TBL-MAX     >   1
@@ -3521,6 +3538,90 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        4031-DEL-EXT.
            EXIT.
       *
+      *----(04.08.04)--ADD-START---
+      *****************************************************************
+      *    削除処理（プリンタ設定）
+      *****************************************************************
+       4031-PRT-DEL-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1031-REC
+           INITIALIZE                      SYS-1031-REC
+           MOVE    "1031"              TO  SYS-1031-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1031-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1031-KBNCD(2:4)
+           MOVE    "%"                 TO  SYS-1031-KBNCD(6:)
+           MOVE    SPA-HOSPNUM         TO  SYS-1031-HOSPNUM
+           MOVE    SYS-1031-REC        TO  MCPDATA-REC
+           PERFORM 4031-PRT-DEL-SYORI-SEC
+      *
+           MOVE    SPACE               TO  SYS-1034-REC
+           INITIALIZE                      SYS-1034-REC
+           MOVE    "1034"              TO  SYS-1034-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1034-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1034-KBNCD(2:4)
+           MOVE    "%"                 TO  SYS-1034-KBNCD(6:)
+           MOVE    SPA-HOSPNUM         TO  SYS-1034-HOSPNUM
+           MOVE    SYS-1034-REC        TO  MCPDATA-REC
+           PERFORM 4031-PRT-DEL-SYORI-SEC
+      *
+           MOVE    SPACE               TO  SYS-1032-REC
+           INITIALIZE                      SYS-1032-REC
+           MOVE    "1032"              TO  SYS-1032-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1032-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1032-KBNCD(2:4)
+           MOVE    "%"                 TO  SYS-1032-KBNCD(6:)
+           MOVE    SPA-HOSPNUM         TO  SYS-1032-HOSPNUM
+           MOVE    SYS-1032-REC        TO  MCPDATA-REC
+           PERFORM 4031-PRT-DEL-SYORI-SEC
+     *
+           MOVE    SPACE               TO  SYS-1035-REC
+           INITIALIZE                      SYS-1035-REC
+           MOVE    "1035"              TO  SYS-1035-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1035-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1035-KBNCD(2:4)
+           MOVE    "%"                 TO  SYS-1035-KBNCD(6:)
+           MOVE    SPA-HOSPNUM         TO  SYS-1035-HOSPNUM
+           MOVE    SYS-1035-REC        TO  MCPDATA-REC
+           PERFORM 4031-PRT-DEL-SYORI-SEC
+           .
+       4031-PRT-DEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    削除処理（プリンタ設定）
+      *****************************************************************
+       4031-PRT-DEL-SYORI-SEC      SECTION.
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"             USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       4031-PRT-DEL-SYORI-EXT.
+           EXIT.
+      *----(04.08.04)--ADD-END-----
       *****************************************************************
       *    ユーザＩＤチェック処理
       *****************************************************************
@@ -3711,26 +3812,35 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    GO  TO  4900-KANRENCHK-EXT
                END-IF
            END-IF
+      *----(04.08.04)--UPD-START---
       *    期間重複チェック
-      *    IF     (SPA-GMN-SELNUM      =   ZERO  )  OR
-      *           (SPA-NAI-STYUKYMD    NOT =   SPA-MAE-STYUKYMD)
-      *******  MOVE    1               TO  SPA-GMN-SYORI
-               PERFORM VARYING     IDX     FROM    1   BY  1
-                       UNTIL      (IDX     >   SPA-GMN-TBL-MAX )
-                              OR  (SPA-ERRCD   NOT =   SPACE )
-                   IF      SPA-GMN-SELNUM  NOT =   IDX
-                       IF     (SPA-NAI-TEDYUKYMD (IDX)
-                                           <   SPA-NAI-STYUKYMD )  OR
-                              (SPA-NAI-TSTYUKYMD (IDX)
-                                           >   SPA-NAI-EDYUKYMD )
-                           CONTINUE
-                       ELSE
-                           MOVE    "0020"           TO  SPA-ERRCD
-                           MOVE    3                TO  SPA-GMN-CUR
-                       END-IF
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL ( IDX     >   SPA-GMN-TBL-MAX )
+                     OR  ( SPA-ERRCD   NOT =   SPACE )
+               IF      SPA-GMN-SELNUM  NOT =   IDX
+      *            選択された内容の開始日が変更された場合
+                   IF      SPA-NAI-STYUKYMD    =   SPA-NAI-TSTYUKYMD
+                                                               (IDX)
+                       MOVE    2           TO  SPA-GMN-SYORI
+                   ELSE
+                       MOVE    1           TO  SPA-GMN-SYORI
                    END-IF
-               END-PERFORM
-      **** END-IF
+               ELSE
+                   MOVE    1           TO  SPA-GMN-SYORI
+               END-IF
+               IF      SPA-GMN-SYORI   =   1
+                   IF     (SPA-NAI-TEDYUKYMD (IDX)
+                                       <   SPA-NAI-STYUKYMD )  OR
+                          (SPA-NAI-TSTYUKYMD (IDX)
+                                       >   SPA-NAI-EDYUKYMD )
+                       CONTINUE
+                   ELSE
+                       MOVE    "0020"           TO  SPA-ERRCD
+                       MOVE    3                TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-PERFORM
+      *----(04.08.04)--UPD-END-----
       ***
       *    オペレータＩＤ
            IF     (SPA-GMN-USERID      =   SPACE )
