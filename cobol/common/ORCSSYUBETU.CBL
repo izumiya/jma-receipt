@@ -117,6 +117,9 @@
       *
       *  04.07.01    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
       *  04.07.02    NACL-藤原    14/12/05  平成２７年１月改正対応
+      *  04.07.03    NACL-藤原    14/12/08  月途中に公費の負担者番号等の
+      *                                     変更があった場合の記載対応
+      *                                     法別番号、適用開始日の順とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -237,12 +240,20 @@
                                        PIC  X(01).
                    07  WRK-KOHTEKSTYMD-O
                                        PIC  X(08).
+                   07  WRK-KOHHBTNUM-O PIC  X(02).
+                   07  WRK-KOHFTNJANUM-O
+                                       PIC  X(08).
+                   07  WRK-KOHJKYSNUM-O
+                                       PIC  X(20).
            03  WRK-KOHI.
                05  WRK-KOHID           PIC  9(10).
                05  WRK-KOHHKNNUM       PIC  X(03).
                05  WRK-KOHPAYKBN       PIC  X(02).
                05  WRK-RECESKYKBN      PIC  X(01).
                05  WRK-KOHTEKSTYMD     PIC  X(08).
+               05  WRK-KOHHBTNUM       PIC  X(02).
+               05  WRK-KOHFTNJANUM     PIC  X(08).
+               05  WRK-KOHJKYSNUM      PIC  X(20).
       *
            03  TBL-MAX                 PIC 9(03).
       *
@@ -254,8 +265,11 @@
                        09  WRK-SEIKYU-KOHHKNNUM  PIC  X(03).
                        09  WRK-SEIKYU-KOHPAYKBN  PIC  X(02).
                        09  WRK-SEIKYU-RECESKYKBN PIC  X(01).
-                       09  WRK-SEIKYU-KOHTEKSTYMD
+                       09  WRK-SEIKYU-TEKSTYMD   PIC  X(08).
+                       09  WRK-SEIKYU-KOHHBTNUM  PIC  X(02).
+                       09  WRK-SEIKYU-KOHFTNJANUM
                                                  PIC  X(08).
+                       09  WRK-SEIKYU-KOHJKYSNUM PIC  X(20).
       *
        01  WK-RECESYUBETU-AREA.
            03  WK-KOKUHO               PIC X(01).
