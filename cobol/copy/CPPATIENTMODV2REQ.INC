@@ -32,6 +32,8 @@
       *       処理日付
       *       03  PTMODREQ-INFORMATION-DATE    PIC X(10).
       *       03  PTMODREQ-INFORMATION-TIME    PIC X(8).
+      *       処理区分
+              03  PTMODREQ-MOD-KEY             PIC X(01).
       *       患者番号
               03  PTMODREQ-PATIENTID           PIC X(20).
       *       患者情報

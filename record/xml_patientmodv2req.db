@@ -4,6 +4,7 @@ xml_patientmodv2req {
 	mode		int;
 	recordname	varchar(128);
 	patientmodreq {
+		Mod_Key			varchar(1);
 		Patient_ID		varchar(20);
 		WholeName		varchar(100);
 		WholeName_inKana	varchar(100);

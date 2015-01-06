@@ -30,6 +30,7 @@
       * 04.07.00     NACL-多々納  13/10/21  PARA削除追加
       * 04.07.00     NACL-多々納  13/11/01  API保険・公費追加対応
       *                                     保険組合せ番号追加他
+      * 04.07.00     NACL-多々納  15/01/XX  性別・生年月日変更対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -462,8 +463,8 @@
                PERFORM 2001-INPUT-CHK-SEC
            END-IF
            IF      WRK-ERRCD       NOT =   SPACE
-      *TEST!!
                PERFORM 890-ERRCD-MSG-SEC
+      *TEST!!
                DISPLAY "必須項目チェックエラー "    WRK-ERRCD
                        " " WRK-ERRMSG
       *TEST!!
@@ -2642,6 +2643,34 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "10"                TO  WRK-ERRCD
                GO      TO              2003-PTINF-UPDATE-EXT
            END-IF
+      *H27.01
+      *    処理区分
+           EVALUATE    PTMODREQ-MOD-KEY
+      *        氏名変更
+               WHEN    "1"
+               WHEN    " "
+      *            性別・生年月日が一致すること
+                   IF     (PTINF-SEX       =   SPA-GMN-SEX )  AND
+                          (PTINF-BIRTHDAY  =   SPA-NAI-BIRTHDAY )
+                       CONTINUE
+                   ELSE
+                       MOVE    "50"                TO  WRK-ERRCD
+                   END-IF
+      *        性別・生年月日変更
+               WHEN    "2"
+      *            氏名が一致すること
+                   IF     (PTINF-NAME      =   SPA-GMN-NAME   )  AND
+                          (PTINF-KANANAME  =   SPA-GMN-KANANAME)
+                       CONTINUE
+                   ELSE
+                       MOVE    "50"                TO  WRK-ERRCD
+                   END-IF
+               WHEN    OTHER
+                   MOVE    "53"            TO  WRK-ERRCD
+           END-EVALUATE
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO              2003-PTINF-UPDATE-EXT
+           END-IF
       *
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
@@ -2649,13 +2678,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "90"            TO  WRK-ERRCD
                GO      TO              2003-PTINF-UPDATE-EXT
            END-IF
-      *    性別・生年月日が一致すること
-           IF     (PTINF-SEX           =   SPA-GMN-SEX )  AND
-                  (PTINF-BIRTHDAY      =   SPA-NAI-BIRTHDAY )
-               CONTINUE
-           ELSE
-               MOVE    "50"                TO  WRK-ERRCD
-           END-IF
+      *
       *    患者情報内容編集
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20031-UPDATE-CHK-SEC
@@ -4050,6 +4073,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  WRK-ERRMSG
            WHEN    "52"
                MOVE    "旧姓履歴登録エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "53"
+               MOVE    "更新区分エラー"
                                                TO  WRK-ERRMSG
       *削除
            WHEN    "81"

@@ -927,6 +927,10 @@
                MOVE    "14"                TO  WRK-ERRCD
            END-IF
       *
+           IF      WRK-DRCD (1:1)  NOT =   "1"
+               MOVE    "14"                TO  WRK-ERRCD
+           END-IF
+      *
            .
        20011-DRCD-CHK-EXT.
            EXIT.
