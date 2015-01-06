@@ -3928,7 +3928,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL ( IDX     >   SPA-GMN-TBL-MAX )
                    OR    ( SPA-ERRCD   NOT =   SPACE )
-               IF      SPA-GMN-SELNUM  NOT =   IDX
+               IF      SPA-GMN-SELNUM  =   IDX
       *            選択された内容の開始日が変更された場合
                    IF      SPA-NAI-STYUKYMD    =   SPA-NAI-TSTYUKYMD
                                                                (IDX)
