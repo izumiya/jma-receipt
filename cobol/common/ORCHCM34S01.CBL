@@ -205,6 +205,7 @@
                    07  WRK-SYS-5113-BRMSAGAKU  PIC 9(07).
            03  WRK-SRYCD-NUM                   PIC 9(09).
            03  WRK-SKJ-SRYCD-G.
+               05  WRK-SKJ-PTFTN               PIC 9(01).
                05  WRK-SKJ-ZAITEN              PIC 9(08).
                05  WRK-SKJ-SRYCDTOTAL          PIC 9(14).
                05  WRK-SKJ-SRYCD               PIC X(09)   OCCURS  5.
@@ -350,6 +351,8 @@
                    07  WSYOKUJI-DAY            PIC 9(03)   OCCURS  31.
       *        生活療養フラグ
                05  WSYOKUJI-LIFE               PIC 9(01).
+      *        食事（環境）負担額剤フラグ
+               05  WSYOKUJI-PTFTN              PIC 9(01).
       *
       *    食事
        01  WSKJH1804-AREA.
@@ -440,6 +443,7 @@
                05  SRT-ZAITEN                  PIC 9(08).
                05  SRT-ZAIKAISU                PIC 9(07).
                05  SRT-SAGAKUCD                PIC X(02).
+               05  SRT-PTFTN                   PIC 9(01).
                05  SRT-SRYCD-OCC               OCCURS  5.
                    07  SRT-SURYO               PIC 9(05).
                    07  SRT-SRYCD               PIC X(09).
@@ -2486,8 +2490,9 @@
            END-PERFORM
       *
            IF    ( IDX-KHN             =   ZERO )
-               MOVE    9               TO  HCM34S01-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
+               MOVE    1               TO  IDX-KHN
+      *        MOVE    9               TO  HCM34S01-RC
+      *        PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
       *    加算分の点数を求める
@@ -2495,10 +2500,10 @@
       *
       *    上で求めた入院基本料のコードを選定入院料のコードに置き換える
            PERFORM 900-SENTEICDCHG-KEY2-SEL-SEC
-           IF    ( FLG-SENTEICDCHG NOT =   ZERO )
-               MOVE    10              TO  HCM34S01-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
-           END-IF
+      *    IF    ( FLG-SENTEICDCHG NOT =   ZERO )
+      *        MOVE    10              TO  HCM34S01-RC
+      *        PERFORM 990-EXIT-PROGRAM-SEC
+      *    END-IF
       *
            MOVE    SENCHG-IPNSRYCD     TO  WRK-SENTEIIPNCD
            MOVE    SENCHG-SENTEISRYCD  TO  WRK-SENTEISRYCD
@@ -2506,10 +2511,10 @@
       *    点数も改めて求めなおす
            MOVE    SENCHG-SENTEISRYCD  TO  WRK-TNS-SRYCD
            PERFORM 900-TENSU-KEY-SEL-SEC
-           IF    ( FLG-TENSU       NOT =   ZERO )
-               MOVE    11              TO  HCM34S01-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
-           END-IF
+      *    IF    ( FLG-TENSU       NOT =   ZERO )
+      *        MOVE    11              TO  HCM34S01-RC
+      *        PERFORM 990-EXIT-PROGRAM-SEC
+      *    END-IF
       *
            IF    ( SENCHG-IPNSRYCD     =   SENCHG-SENTEISRYCD )
                COMPUTE WRK-SENTEI-KHNTEN
@@ -3522,6 +3527,7 @@
            IF    ( TSKJFTN-SRYCD (IDXD) =   SPACE )
                CONTINUE
            ELSE
+               MOVE    1               TO  WRK-SKJ-PTFTN
                IF    ( IDX5                <   5 )
                    COMPUTE IDX5    =   IDX5    +   1
                    MOVE    TSKJFTN-SRYCD (IDXD)
@@ -3717,6 +3723,7 @@
              OR  ( LNK-NYULIFE-SKJFTN-SRYCD (IDXD) =   SPACE )
                CONTINUE
            ELSE
+               MOVE    1               TO  WRK-SKJ-PTFTN
                IF    ( IDX5                <   5 )
                    COMPUTE IDX5    =   IDX5    +   1
                    MOVE    LNK-NYULIFE-SKJFTN-SRYCD (IDXD)
@@ -3764,6 +3771,8 @@
                                        TO  WSYOKUJI-SRYCDTOTAL (IDXB)
                    MOVE    NACCT-SRYKBN
                                        TO  WSYOKUJI-SRYKBN (IDXB)
+                   MOVE    WRK-SKJ-PTFTN
+                                       TO  WSYOKUJI-PTFTN (IDXB)
                    MOVE    WRK-SKJ-ZAITEN
                                        TO  WSYOKUJI-ZAITEN (IDXB)
                    PERFORM VARYING IDXC    FROM    1   BY  1
@@ -4337,6 +4346,7 @@
                                    TO  WSYOKUJI-SURYO(IDXB IDXC)
                MOVE    TSKJFTN-SRYCD (IDXD)
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
+               MOVE    1           TO  WSYOKUJI-PTFTN(IDXB)
            END-IF
       *
            .
@@ -4405,6 +4415,7 @@
                                    TO  WSYOKUJI-SURYO(IDXB IDXC)
                MOVE    LNK-NYULIFE-SKJFTN-SRYCD (IDXD)
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
+               MOVE    1           TO  WSYOKUJI-PTFTN (IDXB)
            END-IF
            IF    ( WSKJH1804-CNT-KANFTN        >   ZERO )
                COMPUTE IDXC    =   IDXC  +     1
@@ -4412,6 +4423,7 @@
                                    TO  WSYOKUJI-SURYO(IDXB IDXC)
                MOVE    LNK-NYULIFE-KANFTN-SRYCD (IDXD)
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
+               MOVE    1           TO  WSYOKUJI-PTFTN (IDXB)
            END-IF
       *
            MOVE    1               TO  WSYOKUJI-LIFE (IDXB)
@@ -5048,6 +5060,8 @@
       *
                MOVE    WSYOKUJI-ZAIKAISU(IDXB)
                                            TO  SRT-ZAIKAISU (SRT-MAX)
+               MOVE    WSYOKUJI-PTFTN   (IDXB)
+                                           TO  SRT-PTFTN    (SRT-MAX)
       *
                MOVE    "4"                 TO  SRT-ZAISKBKBN(SRT-MAX)
                PERFORM VARYING IDXC    FROM    1   BY  1
@@ -5196,6 +5210,11 @@
                                                               (IDXE)
                    IF    ( SRT-ZAISKBKBN(IDXB) =   "7" )
                        MOVE    "850"           TO  HCM34S01-SRYSYUKBN
+                                                              (IDXE)
+                   END-IF
+                   IF    ( SRT-SRYKBN  (IDXB) =   "97" )
+                    AND  ( SRT-PTFTN   (IDXB) =   1  )
+                       MOVE    "971"           TO  HCM34S01-SRYSYUKBN
                                                               (IDXE)
                    END-IF
                    MOVE    SRT-ZAITEN   (IDXB) TO  HCM34S01-ZAITEN

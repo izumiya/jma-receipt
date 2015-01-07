@@ -485,6 +485,7 @@
                05  WRK-SRYACT-OCC                  OCCURS  500.
                    07  WRK-SRYACT                  PIC X(52).
            03  WRK-SRYACT-SRYKBN                   PIC X(02).
+           03  WRK-SRYACT-SRYSYUKBN                PIC X(03).
            03  WRK-SRYACT-MARK                     PIC X(04).
            03  WRK-SRYACT-HKNCOMBI                 PIC X(04).
            03  WRK-SRYACT-JIHOKBN                  PIC X(01).
@@ -3942,6 +3943,8 @@
                MOVE    SRY-SRYKBN      TO  WRK-SRYACT-SRYKBN
            END-IF
       *
+           MOVE    SRY-SRYSYUKBN       TO  WRK-SRYACT-SRYSYUKBN
+      *
            MOVE    ACCT-JIHOKBN        TO  WRK-SRYACT-JIHOKBN
       *
       *    ø«Œ≈∂Ë ¨
@@ -6714,8 +6717,9 @@
            END-EVALUATE
       *
            IF    ( WRK-SRYACT-JIHOKBN  =   "1" )
+            OR   ( WRK-SRYACT-SRYSYUKBN =  "971" )
                MOVE    ")"         TO  WRK-TOTAL-KAKKO
-               MOVE    " ("        TO  WRK-TOTAL-G(1:2)
+               MOVE    "("         TO  WRK-TOTAL-G(1:1)
            END-IF
       *
            .
@@ -6787,17 +6791,21 @@
                    =   WRK-SRYACT-TOTAL (2)
                    + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
-               COMPUTE WRK-TTL-KINGAKU
-                   =   WRK-TTL-KINGAKU
-                   + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
+               IF    ( WRK-SRYACT-SRYSYUKBN    NOT =   "971" )
+                   COMPUTE WRK-TTL-KINGAKU
+                       =   WRK-TTL-KINGAKU
+                       + ( WRK-ZAITEN  *   WRK-ZAIKAISU )
+               END-IF
            ELSE
                COMPUTE WRK-SRYACT-TOTAL (2)
                    =   WRK-SRYACT-TOTAL (2)
                    - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
       *
-               COMPUTE WRK-TTL-KINGAKU
-                   =   WRK-TTL-KINGAKU
-                   - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
+               IF    ( WRK-SRYACT-SRYSYUKBN    NOT =   "971" )
+                   COMPUTE WRK-TTL-KINGAKU
+                       =   WRK-TTL-KINGAKU
+                       - ( WRK-ZAITEN  *   WRK-ZAIKAISU )
+               END-IF
            END-IF
       *
            .
