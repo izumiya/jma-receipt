@@ -679,6 +679,8 @@
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÂÐ±þ¡Ë
       *                                     ¡ÊÌô»öË¡ÂÐ±þ¡Ë
       *                                     ¡Ê½éºÆ¿ÇÎÁ¡¦ÄãÂÅ·ëÎ¨ÂÐ±þ¡Ë
+      *  04.07.36    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -5471,11 +5473,33 @@ grpsys          PERFORM 900-DBSELECT-SEC
       *
            EVALUATE   FLG-GENBUTU70
              WHEN     1
+               IF  RECE02-SRYYM   >=  "201501"
+                 EVALUATE  FLG-GENBUTU70-KBN
+                   WHEN      11
+                     MOVE     "26"   TO    RECE02-DISCOUNTTENTNK
+                   WHEN      12
+                     MOVE     "27"   TO    RECE02-DISCOUNTTENTNK
+                 END-EVALUATE
+               ELSE
                  MOVE   "17"   TO    RECE02-DISCOUNTTENTNK
+               END-IF
              WHEN     2
+               IF  RECE02-SRYYM   >=  "201501"
+                 EVALUATE  FLG-GENBUTU70-KBN
+                   WHEN      21
+                     MOVE     "28"   TO    RECE02-DISCOUNTTENTNK
+                   WHEN      22
+                     MOVE     "29"   TO    RECE02-DISCOUNTTENTNK
+                 END-EVALUATE
+               ELSE
                  MOVE   "18"   TO    RECE02-DISCOUNTTENTNK
+               END-IF
              WHEN     3
+               IF  RECE02-SRYYM   >=  "201501"
+                 MOVE   "30"   TO    RECE02-DISCOUNTTENTNK
+               ELSE
                  MOVE   "19"   TO    RECE02-DISCOUNTTENTNK
+               END-IF
            END-EVALUATE
       *
            .
@@ -7417,14 +7441,20 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                END-IF
              END-IF
              PERFORM   21045-TOKKI-HENSYU-SEC
-             EVALUATE  FLG-TOKUSITU
-               WHEN       1
-                 MOVE   1    TO   RECE02-RJNNYUKOHFTN(2)
-               WHEN       2
-                 MOVE   2    TO   RECE02-RJNNYUKOHFTN(2)
-               WHEN       3
-                 MOVE   3    TO   RECE02-RJNNYUKOHFTN(2)
-             END-EVALUATE
+             IF  RECE02-SRYYM   >=  "201501"
+               IF   FLG-TOKUSITU   NOT =  ZERO
+                   MOVE   1    TO   RECE02-RJNNYUKOHFTN(2)
+               END-IF
+             ELSE
+               EVALUATE  FLG-TOKUSITU
+                 WHEN       1
+                   MOVE   1    TO   RECE02-RJNNYUKOHFTN(2)
+                 WHEN       2
+                   MOVE   2    TO   RECE02-RJNNYUKOHFTN(2)
+                 WHEN       3
+                   MOVE   3    TO   RECE02-RJNNYUKOHFTN(2)
+               END-EVALUATE
+             END-IF
            END-IF
       *
            .

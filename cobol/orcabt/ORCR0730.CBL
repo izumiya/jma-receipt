@@ -202,6 +202,8 @@
       *                                     ¤ÎÅÀ¿ôÍóµ­ºÜ½¤Àµ
       *  04.07.17    NACL-Æ£¸¶    14/12/03  Ê¿À®£²£¶Ç¯£±£±·î²þÀµÂÐ±þ
       *  04.07.18    NACL-ÌçÏÆ    14/12/05  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *  04.07.19    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *
       *  04.08.01    NACL-Æ£¸¶    12/01/08  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­
       *                                     ºÜÂÐ±þ
@@ -2951,14 +2953,29 @@
            END-IF
            MOVE    RECE62X-SHOSHINTIME TO  KOHSKY-SHOSHINTIME
            IF      RECE62X-KOUREI   =  "2" OR "3"
-             EVALUATE  RECE62X-DISCOUNTTENTNK
-               WHEN       "17"
-                 MOVE   "2"     TO   KOHSKY-ZAITAKU
-               WHEN       "18"
-                 MOVE   "3"     TO   KOHSKY-ZAITAKU
-               WHEN       "19"
-                 MOVE   "4"     TO   KOHSKY-ZAITAKU
-             END-EVALUATE
+             IF  RECE62X-SRYYM   >=  "201501"
+               EVALUATE  RECE62X-DISCOUNTTENTNK
+                 WHEN       "26"
+                   MOVE   "2"     TO   KOHSKY-ZAITAKU
+                 WHEN       "27"
+                   MOVE   "3"     TO   KOHSKY-ZAITAKU
+                 WHEN       "28"
+                   MOVE   "4"     TO   KOHSKY-ZAITAKU
+                 WHEN       "29"
+                   MOVE   "5"     TO   KOHSKY-ZAITAKU
+                 WHEN       "30"
+                   MOVE   "6"     TO   KOHSKY-ZAITAKU
+               END-EVALUATE
+             ELSE
+               EVALUATE  RECE62X-DISCOUNTTENTNK
+                 WHEN       "17"
+                   MOVE   "2"     TO   KOHSKY-ZAITAKU
+                 WHEN       "18"
+                   MOVE   "3"     TO   KOHSKY-ZAITAKU
+                 WHEN       "19"
+                   MOVE   "4"     TO   KOHSKY-ZAITAKU
+               END-EVALUATE
+             END-IF
            END-IF
            IF      RECE62X-KOUREI-SAIKEI  NOT =  999999999
              MOVE  RECE62X-KOUREI-SAIKEI  TO  KOHSKY-ZAITAKU-SAIKEI
