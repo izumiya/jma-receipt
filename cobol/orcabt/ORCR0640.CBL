@@ -668,6 +668,8 @@
       *                                     ¡Ê£°£µ£´¡¢£°£µ£²ÂÐ±þ¡Ë
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÂÐ±þ¡Ë
       *                                     ¡ÊÌô»öË¡ÂÐ±þ¡Ë
+      *  04.07.39    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -27154,11 +27156,33 @@
       *
            EVALUATE   FLG-GENBUTU70
              WHEN     1
+               IF  RECE62-SRYYM   >=  "201501"
+                 EVALUATE  FLG-GENBUTU70-KBN
+                   WHEN      11
+                     MOVE     "26"   TO    RECE62-DISCOUNTTENTNK
+                   WHEN      12
+                     MOVE     "27"   TO    RECE62-DISCOUNTTENTNK
+                 END-EVALUATE
+               ELSE
                  MOVE   "17"   TO    RECE62-DISCOUNTTENTNK
+               END-IF
              WHEN     2
+               IF  RECE62-SRYYM   >=  "201501"
+                 EVALUATE  FLG-GENBUTU70-KBN
+                   WHEN      21
+                     MOVE     "28"   TO    RECE62-DISCOUNTTENTNK
+                   WHEN      22
+                     MOVE     "29"   TO    RECE62-DISCOUNTTENTNK
+                 END-EVALUATE
+               ELSE
                  MOVE   "18"   TO    RECE62-DISCOUNTTENTNK
+               END-IF
              WHEN     3
+               IF  RECE62-SRYYM   >=  "201501"
+                 MOVE   "30"   TO    RECE62-DISCOUNTTENTNK
+               ELSE
                  MOVE   "19"   TO    RECE62-DISCOUNTTENTNK
+               END-IF
            END-EVALUATE
       *
            .
@@ -28639,24 +28663,30 @@
                END-IF
              END-IF
              PERFORM   21013-TOKKI-HENSYU-SEC
-             IF   FLG-TOKUSITU-TASU  =  1
-               EVALUATE  FLG-TOKUSITU
-                 WHEN       1
-                   MOVE   4    TO   RECE62-RJNNYUKOHFTN(2)
-                 WHEN       2
-                   MOVE   5    TO   RECE62-RJNNYUKOHFTN(2)
-                 WHEN       3
-                   MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
-               END-EVALUATE
+             IF  RECE62-SRYYM   >=  "201501"
+               IF   FLG-TOKUSITU   NOT =  ZERO
+                     MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
+               END-IF
              ELSE
-               EVALUATE  FLG-TOKUSITU
-                 WHEN       1
-                   MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
-                 WHEN       2
-                   MOVE   2    TO   RECE62-RJNNYUKOHFTN(2)
-                 WHEN       3
-                   MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
-               END-EVALUATE
+               IF   FLG-TOKUSITU-TASU  =  1
+                 EVALUATE  FLG-TOKUSITU
+                   WHEN       1
+                     MOVE   4    TO   RECE62-RJNNYUKOHFTN(2)
+                   WHEN       2
+                     MOVE   5    TO   RECE62-RJNNYUKOHFTN(2)
+                   WHEN       3
+                     MOVE   6    TO   RECE62-RJNNYUKOHFTN(2)
+                 END-EVALUATE
+               ELSE
+                 EVALUATE  FLG-TOKUSITU
+                   WHEN       1
+                     MOVE   1    TO   RECE62-RJNNYUKOHFTN(2)
+                   WHEN       2
+                     MOVE   2    TO   RECE62-RJNNYUKOHFTN(2)
+                   WHEN       3
+                     MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
+                 END-EVALUATE
+               END-IF
              END-IF
            END-IF
       *

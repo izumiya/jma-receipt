@@ -200,6 +200,8 @@
       *                                     ¤ÎÅÀ¿ôÍóµ­ºÜ½¤Àµ
       *  04.07.19    NACL-Æ£¸¶    14/12/03  Ê¿À®£²£¶Ç¯£±£±·î²þÀµÂÐ±þ
       *  04.07.20    NACL-ÌçÏÆ    14/12/05  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *  04.07.21    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2876,14 +2878,29 @@
              MOVE       "1"     TO   KOHSKY-ZAITAKU
            END-IF
            IF      RECE02X-ZAITAKU  =  "2" OR "3"
-             EVALUATE  RECE02X-DISCOUNTTENTNK
-               WHEN       "17"
-                 MOVE   "2"     TO   KOHSKY-ZAITAKU
-               WHEN       "18"
-                 MOVE   "3"     TO   KOHSKY-ZAITAKU
-               WHEN       "19"
-                 MOVE   "4"     TO   KOHSKY-ZAITAKU
-             END-EVALUATE
+             IF  RECE02X-SRYYM   >=  "201501"
+               EVALUATE  RECE02X-DISCOUNTTENTNK
+                 WHEN       "26"
+                   MOVE   "2"     TO   KOHSKY-ZAITAKU
+                 WHEN       "27"
+                   MOVE   "3"     TO   KOHSKY-ZAITAKU
+                 WHEN       "28"
+                   MOVE   "4"     TO   KOHSKY-ZAITAKU
+                 WHEN       "29"
+                   MOVE   "5"     TO   KOHSKY-ZAITAKU
+                 WHEN       "30"
+                   MOVE   "6"     TO   KOHSKY-ZAITAKU
+               END-EVALUATE
+             ELSE
+               EVALUATE  RECE02X-DISCOUNTTENTNK
+                 WHEN       "17"
+                   MOVE   "2"     TO   KOHSKY-ZAITAKU
+                 WHEN       "18"
+                   MOVE   "3"     TO   KOHSKY-ZAITAKU
+                 WHEN       "19"
+                   MOVE   "4"     TO   KOHSKY-ZAITAKU
+               END-EVALUATE
+             END-IF
            END-IF
            IF      RECE02X-ZAITAKU-SAIKEI  NOT =  999999999
              MOVE  RECE02X-ZAITAKU-SAIKEI  TO  KOHSKY-ZAITAKU-SAIKEI
