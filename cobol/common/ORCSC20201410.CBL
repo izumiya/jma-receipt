@@ -1919,7 +1919,7 @@
                        MOVE    "297"          TO  WRK-CHK-SRYSYUKBN
                END-EVALUATE
            END-IF
-          .
+           .
        30001-SRYSYUKBN-SET-EXT.
            EXIT.
       *
@@ -4532,6 +4532,13 @@
                    PERFORM 30011-GENTUIKA-SEC
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    "1"             TO  WRK-COM-CUR (IDX)
+      *H27.1
+                   ELSE
+      *                ¡Ê¸º¡Ë¤ÎÁÞÆþ¹Ô¤Ï·×»»ºÑ¤ß
+                       IF      WRK-GMN-INPUTCD(IDX)(1:1)
+                                               NOT =   "."
+                           ADD     1               TO  IDX
+                       END-IF
                    END-IF
                    MOVE    1               TO  FLG-ZAI
                END-IF
