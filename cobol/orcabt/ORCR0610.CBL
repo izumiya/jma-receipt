@@ -188,6 +188,10 @@
       *  04.07.07    NACL-藤原    14/03/30  平成２６年４月改正対応
       *  04.07.08    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.09    NACL-藤原    14/12/05  平成２７年１月改正対応
+      *  04.07.10    NACL-藤原    14/12/08  月途中に公費の負担者番号等の
+      *                                     変更があった場合の記載対応
+      *                                     法別番号、適用開始日の順とする
+      *                                     （地方公費） 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -300,6 +304,10 @@
            03  IDZZ                                    PIC 9(03).
            03  IDY1                                    PIC 9(03).
            03  IDY2                                    PIC 9(03).
+           03  IDY3                                    PIC 9(03).
+           03  IDZ1                                    PIC 9(03).
+           03  IDZ2                                    PIC 9(03).
+           03  IDZ3                                    PIC 9(03).
            03  TBL-MAX                                 PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  WRK-SYS2013-IDX                         PIC 9(03).
@@ -424,12 +432,20 @@
                                        PIC  X(01).
                    07  WRK-KOHTEKSTYMD-O
                                        PIC  X(08).
+                   07  WRK-KOHHBTNUM-O PIC  X(02).
+                   07  WRK-KOHFTNJANUM-O
+                                       PIC  X(08).
+                   07  WRK-KOHJKYSNUM-O
+                                       PIC  X(20).
            03  WRK-KOHI.
                05  WRK-KOHID           PIC  9(10).
                05  WRK-KOHHKNNUM       PIC  X(03).
                05  WRK-KOHPAYKBN       PIC  X(02).
                05  WRK-RECESKYKBN      PIC  X(01).
                05  WRK-KOHTEKSTYMD     PIC  X(08).
+               05  WRK-KOHHBTNUM       PIC  X(02).
+               05  WRK-KOHFTNJANUM     PIC  X(08).
+               05  WRK-KOHJKYSNUM      PIC  X(20).
       *
       *    請求区分別公費情報（１：レセプト　２：請求書）
            03  WRK-SEIKYUKBN-KOHI-AREA.
@@ -440,6 +456,10 @@
                        09  WRK-SEIKYU-KOHPAYKBN  PIC  X(02).
                        09  WRK-SEIKYU-RECESKYKBN PIC  X(01).
                        09  WRK-SEIKYU-TEKSTYMD   PIC  X(08).
+                       09  WRK-SEIKYU-KOHHBTNUM  PIC  X(02).
+                       09  WRK-SEIKYU-KOHFTNJANUM
+                                                 PIC  X(08).
+                       09  WRK-SEIKYU-KOHJKYSNUM PIC  X(20).
       *
        01  WRK-ERRMSG-AREA.
            03  WRK-RECEERR         PIC X(200).
@@ -1610,6 +1630,8 @@
                                           WRK-SEIKYU-KOHID    (IDX1 IDY)
                        MOVE    COMB-TEKSTYMD          TO
                                           WRK-SEIKYU-TEKSTYMD (IDX1 IDY)
+                       MOVE    HKN-HBTNUM             TO
+                                          WRK-SEIKYU-KOHHBTNUM(IDX1 IDY)
       *                レセプト記載と併せて公費請求テーブルの作成も行う
                        IF     FLG-KOHSKY-HENSYU   =   1
                            ADD     1                      TO  IDZ    
@@ -2106,6 +2128,8 @@
                                           WRK-SEIKYU-KOHID    (IDX1 IDY)
                        MOVE    COMB-TEKSTYMD          TO
                                           WRK-SEIKYU-TEKSTYMD (IDX1 IDY)
+                       MOVE    HKN-HBTNUM             TO
+                                          WRK-SEIKYU-KOHHBTNUM(IDX1 IDY)
       *                レセプト記載と併せて公費請求テーブルの作成も行う
                        IF     FLG-KOHSKY-HENSYU   =   1
                            ADD     1                      TO  IDZ    
@@ -3244,20 +3268,58 @@
                                                            =   "143" )
                                    CONTINUE
                                ELSE
-                                   IF      WRK-KOHHKNNUM-O (IDX)
-                                               >   WRK-KOHHKNNUM-O (IDY)
-                                       MOVE    WRK-KOHI-TBL(IDX)
+      *                            同じ公費のとき適用開始日の古い順にする
+                                   IF    ( WRK-KOHHKNNUM-O (IDX) 
+                                           =   WRK-KOHHKNNUM-O (IDY) )
+                                   OR    ( WRK-KOHHBTNUM-O (IDX) 
+                                           =   WRK-KOHHBTNUM-O (IDY) )
+      ****                             IF      WRK-KOHTEKSTYMD-O (IDX)
+      ****                                        >   WRK-KOHTEKSTYMD-O
+      ****                                                      (IDY)
+                                           MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
-                                       MOVE    WRK-KOHI-TBL(IDY)
+                                           MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
-                                       MOVE    WRK-KOHI
+                                           MOVE    WRK-KOHI
                                                    TO  WRK-KOHI-TBL(IDY)
+      ****                             END-IF
+                                   ELSE
+                                       IF      WRK-KOHHKNNUM-O (IDX)
+                                               >   WRK-KOHHKNNUM-O (IDY)
+                                           MOVE    WRK-KOHI-TBL(IDX)
+                                                   TO  WRK-KOHI
+                                           MOVE    WRK-KOHI-TBL(IDY)
+                                                   TO  WRK-KOHI-TBL(IDX)
+                                           MOVE    WRK-KOHI
+                                                   TO  WRK-KOHI-TBL(IDY)
+                                       END-IF
                                    END-IF
                                END-IF
                            END-IF
                        END-IF    
                    END-IF    
                  END-IF    
+               END-PERFORM
+           END-PERFORM
+      *
+      *    法別、適用開始日による並び替え
+           PERFORM VARYING IDX FROM    1    BY  1
+                   UNTIL   IDX >       9
+                   OR      WRK-KOHHKNNUM-O (IDX) =   SPACE
+               COMPUTE IDX1    =   IDX     +   1
+               PERFORM VARYING IDY FROM    IDX1    BY  1
+                       UNTIL   IDY >       10
+                       OR      WRK-KOHHKNNUM-O (IDY) =   SPACE
+                   IF  (   ( WRK-KOHHKNNUM-O (IDX) 
+                                       =   WRK-KOHHKNNUM-O (IDY) )
+                        OR ( WRK-KOHHBTNUM-O (IDX) 
+                                       =   WRK-KOHHBTNUM-O (IDY) ) )
+                   AND ( WRK-KOHTEKSTYMD-O (IDX)
+                                       >   WRK-KOHTEKSTYMD-O (IDY) )
+                       MOVE    WRK-KOHI-TBL (IDX)  TO  WRK-KOHI
+                       MOVE    WRK-KOHI-TBL (IDY)  TO  WRK-KOHI-TBL(IDX)
+                       MOVE    WRK-KOHI            TO  WRK-KOHI-TBL(IDY)
+                   END-IF    
                END-PERFORM
            END-PERFORM
       *
@@ -3471,6 +3533,12 @@
                    MOVE    WRK-RECESKYKBN  TO  WRK-RECESKYKBN-O(IDY)
                    MOVE    WRK-SEIKYU-TEKSTYMD (IDX1 IDX)
                                            TO  WRK-KOHTEKSTYMD-O (IDY)
+                   MOVE    WRK-SEIKYU-KOHHBTNUM    (IDX1 IDX)
+                                           TO  WRK-KOHHBTNUM-O   (IDY)
+                   MOVE    WRK-SEIKYU-KOHFTNJANUM  (IDX1 IDX)
+                                           TO  WRK-KOHFTNJANUM-O (IDY)
+                   MOVE    WRK-SEIKYU-KOHJKYSNUM   (IDX1 IDX)
+                                           TO  WRK-KOHJKYSNUM-O  (IDY)
                    MOVE    1               TO  FLG-ADDKBN
                    MOVE    10              TO  IDY
                ELSE 
@@ -3539,8 +3607,10 @@
                                END-IF
                            ELSE
       *                        同じ公費のとき適用開始日の古い順にする
-                               IF      WRK-KOHHKNNUM-O (IDX) 
-                                               =   WRK-KOHHKNNUM-O (IDY)
+                               IF    ( WRK-KOHHKNNUM-O (IDX) 
+                                           =   WRK-KOHHKNNUM-O (IDY) )
+                               OR    ( WRK-KOHHBTNUM-O (IDX) 
+                                           =   WRK-KOHHBTNUM-O (IDY) )
                                    IF      WRK-KOHTEKSTYMD-O (IDX)
                                                   >   WRK-KOHTEKSTYMD-O
                                                                 (IDY)
@@ -3598,30 +3668,106 @@
                                            =       SPACE
                        MOVE    ZERO            TO  IDY1
                                                    IDY2
+                                                   IDY3
+                       MOVE    ZERO            TO  IDZ1
+                                                   IDZ2
+                                                   IDZ3
                        PERFORM VARYING IDZZ    FROM    1   BY  1
                                UNTIL   IDZZ    >       10
                                OR      WRK-RECE61-KOHHKNNUM-O (IDZZ)
                                                =       SPACE
                            IF      WRK-RECE61-KOHHKNNUM-O (IDZZ)
                                                =   SYS-2013-KOHNUM(IDXX)
-                               MOVE    IDZZ            TO  IDY1
+                               IF      IDY1            =   ZERO
+                                   MOVE    IDZZ            TO  IDY1
+                                                               IDY2
+                                                               IDY3
+                               ELSE
+                                   IF      IDY2            =   IDY1
+                                       MOVE    IDZZ            TO  IDY2
+                                                                   IDY3
+                                   ELSE
+                                       MOVE    IDZZ            TO  IDY3
+                                   END-IF
+                               END-IF
                            END-IF
                            IF      WRK-RECE61-KOHHKNNUM-O (IDZZ)
                                                =   SYS-2013-KOHNUM(IDYY)
-                               MOVE    IDZZ            TO  IDY2
+                               IF      IDZ1            =   ZERO
+                                   MOVE    IDZZ            TO  IDZ1
+                                                               IDZ2
+                                                               IDZ3
+                               ELSE
+                                   IF      IDZ2            =   IDZ1
+                                       MOVE    IDZZ            TO  IDZ2
+                                                                   IDZ3
+                                   ELSE
+                                       MOVE    IDZZ            TO  IDZ3
+                                   END-IF
+                               END-IF
                            END-IF
                        END-PERFORM
       *
                        IF    ( IDY1            >   0    )
-                       AND   ( IDY2            >   0    )
-                       AND   ( IDY1            >   IDY2 )
-                           MOVE    WRK-RECE61-KOHI-TBL(IDY1)
-                                               TO  WRK-KOHI
-                           MOVE    WRK-RECE61-KOHI-TBL (IDY2)
-                                               TO  WRK-RECE61-KOHI-TBL
-                                                               (IDY1)
-                           MOVE    WRK-KOHI    TO  WRK-RECE61-KOHI-TBL
-                                                               (IDY2)
+                       AND   ( IDZ1            >   0    )
+                       AND   ( IDY1            >   IDZ1 )
+                           MOVE    WRK-RECE61-KOHI-AREA
+                                               TO  WRK-KOHI-AREA
+                           INITIALIZE              WRK-RECE61-KOHI-AREA
+                           MOVE ZERO           TO  TBL-MAX
+      *
+                           PERFORM VARYING IDZZ    FROM    1   BY  1
+                                   UNTIL   IDZZ    >       10
+                               IF      WRK-KOHHKNNUM-O (IDZZ)
+                                               NOT =    SPACE
+                                   EVALUATE    TRUE
+                                       WHEN    IDZZ    =   IDZ1
+                                         ADD     1         TO  TBL-MAX
+                                         MOVE    WRK-KOHI-TBL(IDY1)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         IF      IDY2      >   IDY1
+                                             ADD     1     TO  TBL-MAX
+                                             MOVE    WRK-KOHI-TBL(IDY2)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         END-IF
+                                         IF      IDY3    >   IDY2
+                                           ADD     1       TO  TBL-MAX
+                                           MOVE    WRK-KOHI-TBL(IDY3)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         END-IF
+                                       WHEN    IDZZ    =   IDY1
+                                         ADD     1         TO  TBL-MAX
+                                         MOVE    WRK-KOHI-TBL(IDZ1)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         IF      IDZ2      >   IDZ1
+                                             ADD     1     TO  TBL-MAX
+                                             MOVE    WRK-KOHI-TBL(IDZ2)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         END-IF
+                                         IF      IDZ3    >   IDZ2
+                                           ADD     1       TO  TBL-MAX
+                                           MOVE    WRK-KOHI-TBL(IDZ3)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                         END-IF
+                                     WHEN    IDZZ    =   IDZ2
+                                     WHEN    IDZZ    =   IDZ3
+                                     WHEN    IDZZ    =   IDY2
+                                     WHEN    IDZZ    =   IDY3
+                                         CONTINUE
+                                     WHEN    OTHER
+                                         ADD     1         TO  TBL-MAX
+                                         MOVE    WRK-KOHI-TBL(IDZZ)
+                                                 TO  WRK-RECE61-KOHI-TBL
+                                                           (TBL-MAX)
+                                   END-EVALUATE
+                               END-IF
+                           END-PERFORM
                        END-IF
                    END-PERFORM
                END-PERFORM
