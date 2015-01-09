@@ -4488,20 +4488,20 @@
                ELSE
                    MOVE    ZERO            TO  FLG-NAIFUKU
                END-IF
-               IF     (FLG-NAIFUKU             =   1   )
-                 AND  (WRK-COM-ZAIEND (IDX)    =   "1" )
+      ****     IF     (FLG-NAIFUKU             =   1   )
+      *          AND  (WRK-COM-ZAIEND (IDX)    =   "1" )
       *            頓服・外用毎の点数集計
-                   EVALUATE    WRK-CHK-SRYSYUKBN
+      *            EVALUATE    WRK-CHK-SRYSYUKBN
       *            頓服
-                   WHEN    "221"
-                   WHEN    "297"
-                       PERFORM 30022-TAZAI22-GENCHK-SEC
+      *            WHEN    "221"
+      *            WHEN    "297"
+      *                PERFORM 30022-TAZAI22-GENCHK-SEC
       *            外用
-                   WHEN    "231"
-                   WHEN    "294"
-                       PERFORM 30023-TAZAI23-GENCHK-SEC
-                   END-EVALUATE
-               END-IF
+      *            WHEN    "231"
+      *            WHEN    "294"
+      *                PERFORM 30023-TAZAI23-GENCHK-SEC
+      *            END-EVALUATE
+      ******   END-IF
       *
                IF     (FLG-NAIFUKU             =   1     )  AND
                       (FLG-ZAI                 =   ZERO  )
@@ -4520,17 +4520,25 @@
                    PERFORM 30011-GENTUIKA-SEC
                    IF      SPA-ERRCD       NOT =   SPACE
                        MOVE    "1"             TO  WRK-COM-CUR (IDX)
-      *H27.1
-                   ELSE
-      *                （減）の挿入行は計算済み
-                       IF      WRK-GMN-INPUTCD(IDX)(1:1)
-                                               NOT =   "."
-                           ADD     1               TO  IDX
-                       END-IF
                    END-IF
                    MOVE    1               TO  FLG-ZAI
                END-IF
                MOVE    1               TO  FLG-ZAI
+      *H27.1
+               IF     (FLG-NAIFUKU             =   1   )
+                 AND  (WRK-COM-ZAIEND (IDX)    =   "1" )
+      *            頓服・外用毎の点数集計
+                   EVALUATE    WRK-CHK-SRYSYUKBN
+      *            頓服
+                   WHEN    "221"
+                   WHEN    "297"
+                       PERFORM 30022-TAZAI22-GENCHK-SEC
+      *            外用
+                   WHEN    "231"
+                   WHEN    "294"
+                       PERFORM 30023-TAZAI23-GENCHK-SEC
+                   END-EVALUATE
+               END-IF
              END-IF
       *
                IF      WRK-COM-ZAIEND (IDX)    =   "1"
