@@ -3611,16 +3611,16 @@
                                            =   WRK-KOHHKNNUM-O (IDY) )
                                OR    ( WRK-KOHHBTNUM-O (IDX) 
                                            =   WRK-KOHHBTNUM-O (IDY) )
-                                   IF      WRK-KOHTEKSTYMD-O (IDX)
-                                                  >   WRK-KOHTEKSTYMD-O
-                                                                (IDY)
+      ***                          IF      WRK-KOHTEKSTYMD-O (IDX)
+      ***                                         >   WRK-KOHTEKSTYMD-O
+      ***                                                       (IDY)
                                        MOVE    WRK-KOHI-TBL(IDX)
                                                    TO  WRK-KOHI
                                        MOVE    WRK-KOHI-TBL(IDY)
                                                    TO  WRK-KOHI-TBL(IDX)
                                        MOVE    WRK-KOHI
                                                    TO  WRK-KOHI-TBL(IDY)
-                                   END-IF    
+      ***                          END-IF
                                ELSE
                                    IF      WRK-KOHHKNNUM-O (IDX)
                                                >   WRK-KOHHKNNUM-O (IDY)
@@ -3634,6 +3634,27 @@
                                END-IF
                            END-IF
                        END-IF    
+                   END-IF    
+               END-PERFORM
+           END-PERFORM
+      *
+      *    法別、適用開始日による並び替え
+           PERFORM VARYING IDX FROM    1    BY  1
+                   UNTIL   IDX >       9
+                   OR      WRK-KOHHKNNUM-O (IDX) =   SPACE
+               COMPUTE IDX1    =   IDX     +   1
+               PERFORM VARYING IDY FROM    IDX1    BY  1
+                       UNTIL   IDY >       10
+                       OR      WRK-KOHHKNNUM-O (IDY) =   SPACE
+                   IF  (   ( WRK-KOHHKNNUM-O (IDX) 
+                                       =   WRK-KOHHKNNUM-O (IDY) )
+                        OR ( WRK-KOHHBTNUM-O (IDX) 
+                                       =   WRK-KOHHBTNUM-O (IDY) ) )
+                   AND ( WRK-KOHTEKSTYMD-O (IDX)
+                                       >   WRK-KOHTEKSTYMD-O (IDY) )
+                       MOVE    WRK-KOHI-TBL (IDX)  TO  WRK-KOHI
+                       MOVE    WRK-KOHI-TBL (IDY)  TO  WRK-KOHI-TBL(IDX)
+                       MOVE    WRK-KOHI            TO  WRK-KOHI-TBL(IDY)
                    END-IF    
                END-PERFORM
            END-PERFORM
