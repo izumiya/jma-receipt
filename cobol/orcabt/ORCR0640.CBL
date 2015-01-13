@@ -669,6 +669,7 @@
       *                                     ¡ÊÌô»öË¡ÂÐ±þ¡Ë
       *  04.07.39    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
+      *  04.07.40    NACL-ÌçÏÆ    15/01/13  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -21797,8 +21798,7 @@
                     (RECE62-KOHNUM(KH-IDX - 1) =
                                    "183" OR "483"           ) AND
                     (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
-                                "8304017" OR "8304028" OR
-                                "8304079"                   ) AND
+                                "8304017" OR "8304028"      ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
                     (RECE62-SRYYM         >=  "200610"      ))
@@ -21806,8 +21806,7 @@
                     (RECE62-KOHNUM(KH-IDX - 1) =
                                    "583" OR "783"           ) AND
                     (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
-                                "8304017" OR "8304028" OR
-                                "8304079"                   ) AND
+                                "8304017" OR "8304028"      ) AND
                     (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "201010"      ))
@@ -21815,11 +21814,37 @@
                     (RECE62-KOHNUM(KH-IDX - 1) =
                           "263" OR "363" OR "463" OR "563"  ) AND
                     (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
-                                "8304017" OR "8304028" OR
-                                "8304079"                   ) AND
+                                "8304017" OR "8304028"      ) AND
                     (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "201310"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "183" OR "483"           ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304079"                   ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
+                    (RECE62-SRYYM         >=  "200610"      ) AND
+                    (RECE62-SRYYM         <=  "201409"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "583" OR "783"           ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304079"                   ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "201010"      ) AND
+                    (RECE62-SRYYM         <=  "201409"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                          "263" OR "363" OR "463" OR "563"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304079"                   ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "201310"      ) AND
+                    (RECE62-SRYYM         <=  "201409"      ))
                    MOVE       1      TO    FLG-MIYAGI
                 END-IF
       ****

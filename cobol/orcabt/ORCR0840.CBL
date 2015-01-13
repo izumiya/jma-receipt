@@ -260,6 +260,7 @@
       *  04.07.21    NACL-ÌçÏÆ    14/09/01  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
       *  04.07.22    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.07.23    NACL-ÌçÏÆ    14/10/17  ÅÀÅ©¤Î¿ÇÎÅ²ÊÊÔ½¸ÂÐ±þ
+      *  04.07.24    NACL-ÌçÏÆ    15/01/13  Ï«ºÒ¥ì¥»ÅÅÍÑ¤Î¹àÌÜÊÔ½¸½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
@@ -7943,6 +7944,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        230-RECE84-HENSYU2-SEC                SECTION.
       *
+           MOVE      ZERO      TO    WRK-TEN
+                                     WRK-MEISAI-CNT
+                                     WRK-SRYCDTOTAL
+                                     WRK-SURYOUTOTAL
+                                     WRK-ZAI-KINGAKU
+      *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE82-HOSPNUM        TO      NACCT-HOSPNUM
            MOVE    RECE82-NYUGAIKBN      TO      NACCT-NYUGAIKBN
@@ -8073,11 +8080,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 CNT-DAY24
                       MOVE     ZERO       TO    FLG-DAY21
                                                 FLG-DAY24
-      *
-                      MOVE     ZERO       TO    WRK-TEN
-                                                WRK-MEISAI-CNT
-                                                WRK-SRYCDTOTAL
-                                                WRK-SURYOUTOTAL
       *
                       PERFORM  VARYING  IDY    FROM    1   BY  1
                                   UNTIL   IDY     >       31

@@ -397,6 +397,7 @@
       *                                     （高額療養費対応）
       *  04.07.22    NACL-門脇    14/12/09  東京都地方公費神奈川県対応
       *  04.07.23    NACL-門脇    15/01/05  東京都地方公費対応
+      *  04.07.24    NACL-門脇    15/01/13  宮城県地方公費対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -23766,8 +23767,11 @@
                            EVALUATE  PTKOH-FTNJANUM(1:7)
                              WHEN    "8304017"
                              WHEN    "8304028"
-                             WHEN    "8304079"
                                MOVE    1    TO  FLG-MIYAGI
+                             WHEN    "8304079"
+                               IF  LNK-SYU-SRYYMD(1:6) <= "201409"
+                                 MOVE  1    TO  FLG-MIYAGI
+                               END-IF
                            END-EVALUATE
                            MOVE    1        TO  FLG-PTKOHINF
                         ELSE
