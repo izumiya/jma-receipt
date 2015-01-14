@@ -574,6 +574,15 @@
                05  WRK-CHK2-SRYMR          PIC 9(02).
            03  WRK-CHK2-FLG                PIC 9(01).
       *
+      *    翌月入院会計作成用
+           03  WRK-SAI-SRYYM               PIC X(06).
+           03  WRK-SAI-SRYYMR      REDEFINES  WRK-SAI-SRYYM.
+               05  WRK-SAI-SRYYR           PIC 9(04).
+               05  WRK-SAI-SRYMR           PIC 9(02).
+           03  FLG-SAI-SAKUSEI             PIC 9(01).
+           03  FLG-SAI-SAKUSEI2            PIC 9(01).
+           03  WRK-SAI-I01-TOKNYUIN-CD     PIC X(02).
+      *
       *    出生児体重
            03  WRK-WEIGHT                  PIC 9(04).
       *
@@ -12834,13 +12843,59 @@
            END-IF
       *-------入院当日の食堂加算対応ここまで-----------------------------------
       *
+           MOVE   ZERO                   TO   FLG-SAI-SAKUSEI
+           MOVE   ZERO                   TO   FLG-SAI-SAKUSEI2
+           MOVE   SPACE                  TO   WRK-SAI-I01-TOKNYUIN-CD
+      *
            IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
-               MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
+               MOVE    SPA-GMN-I01-TOKNYUIN-CD
+                                         TO   WRK-SAI-I01-TOKNYUIN-CD
+               MOVE    SPACE             TO   SPA-GMN-I01-TOKNYUIN-CD
                MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
                MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
                MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
+               MOVE    WRK-SANTEISTYMD   TO   SPA-NAI-I01-NYUINYMD
+               MOVE    1                 TO   FLG-SAI-SAKUSEI
                PERFORM   4801-TENROOM-EDIT-SEC
            END-IF
+      *----入院年月日翌月分の入院会計再作成処理--------------------
+            DISPLAY  "####  NYUIN-KAIKEI  SAI-SAKUSEI-SHORI ####"
+            DISPLAY  "LNK-SCNYUACCT-STSRYYMD = "
+                      LNK-SCNYUACCT-STSRYYMD
+            DISPLAY  "PTNYUINRRK-NYUINYMD = "
+                      PTNYUINRRK-NYUINYMD
+      *     会計作成用の年月算出（入院年月＋１月）
+            IF      FLG-SAI-SAKUSEI     =   1
+                MOVE    PTNYUINRRK-NYUINYMD(1:6)  TO  WRK-SAI-SRYYM
+                MOVE    WRK-SAI-I01-TOKNYUIN-CD   TO
+                                         SPA-GMN-I01-TOKNYUIN-CD
+            ELSE
+                MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)  TO  WRK-SAI-SRYYM
+            END-IF
+            IF      WRK-SAI-SRYMR        =  12
+                COMPUTE   WRK-SAI-SRYYR =   WRK-SAI-SRYYR + 1
+                MOVE      1             TO  WRK-SAI-SRYMR
+            ELSE
+                COMPUTE   WRK-SAI-SRYMR =   WRK-SAI-SRYMR + 1
+            END-IF
+            DISPLAY "WRK-SAI-SRYYM = " WRK-SAI-SRYYM
+            MOVE    WRK-SAI-SRYYM    TO  WRK-SANTEISTYMD(1:6)
+            MOVE    "01"             TO  WRK-SANTEISTYMD(7:2)
+            MOVE    WRK-SANTEISTYMD  TO  SPA-NAI-I01-IDOYMD
+            MOVE    WRK-SANTEISTYMD  TO  PTNYUINRRK-TENNYUYMD
+            MOVE    WRK-SANTEISTYMD  TO  SPA-NAI-I01-NYUINYMD
+            MOVE    1                TO  FLG-SAI-SAKUSEI2
+            PERFORM 4801-TENROOM-EDIT-SEC
+            IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
+                MOVE    SPA-GMN-I01-TOKNYUIN-CD
+                                          TO   WRK-SAI-I01-TOKNYUIN-CD
+                MOVE    SPACE             TO   SPA-GMN-I01-TOKNYUIN-CD
+                MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
+                MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
+                MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
+                MOVE    WRK-SANTEISTYMD   TO   SPA-NAI-I01-NYUINYMD
+                PERFORM   4801-TENROOM-EDIT-SEC
+            END-IF
       *
            .
        4801-NYUKAIKEI-EDIT-EXT.
@@ -15450,7 +15505,12 @@
       *
       *    入院会計作成サブの呼出し
            INITIALIZE                     ORCSNYUACCT-AREA
-           MOVE    "8"                TO  LNK-SCNYUACCT-SYORI-KBN
+           IF      FLG-SAI-SAKUSEI2   =   ZERO
+               MOVE    "8"            TO  LNK-SCNYUACCT-SYORI-KBN
+           ELSE
+               MOVE    "9"            TO  LNK-SCNYUACCT-SYORI-KBN
+               MOVE    ZERO           TO  FLG-SAI-SAKUSEI2
+           END-IF
            MOVE    "1"                TO  SPA-NYUGAIKBN
            MOVE    PTNYUINRRK-PTID    TO  SPA-PTID
            MOVE    PTNYUINRRK-NYUINKA TO  SPA-SRYKA
