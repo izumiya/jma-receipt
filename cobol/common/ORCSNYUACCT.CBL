@@ -220,6 +220,8 @@
                    07  WRK-ZEN-DD               PIC 9(02).
       *    ÎÅÍÜÉÂÅï¥³¡¼¥ÉÂàÈò
            03  WRK-RYOYO-SRYCD                  PIC X(09).
+      *    Ã»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ¤Î»»ÄêºÑÆü¿ô
+           03  WRK-TANKI-NISSU                  PIC 9(05).
       *    Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»¤Î»»ÄêºÑÆü¿ô
            03  WRK-YUUSHO-NISSU                 PIC 9(05).
       *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¤Î»»ÄêºÑÆü¿ô
@@ -233,6 +235,11 @@
                05  WRK-KSN-YY          PIC 9(04).
                05  WRK-KSN-MM          PIC 9(02).
                05  WRK-KSN-DD          PIC 9(02).
+      *    Ã»´üÂÚºß¤Î»»ÄêºÑ²ó¿ô¥«¥¦¥ó¥ÈÍÑ
+           03  WRK-KAGEN-SRYCD-9       PIC 9(14).
+           03  WRK-KAGEN-SRYCD-X   REDEFINES   WRK-KAGEN-SRYCD-9.
+               05  WRK-KAGEN-SRYCD-X1  PIC X(05).
+               05  WRK-KAGEN-SRYCD-X2  PIC X(09).
       *
       *    É¸·ç¡¦Ä¶²á¥Æ¡¼¥Ö¥ë
        01  WRK-HYOU-TEISU-TBL.
@@ -1982,6 +1989,86 @@
            EXIT.
       *
       *****************************************************************
+      *    Ã»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ¤Î»»ÄêºÑÆü¿ô¼èÆÀ
+      *****************************************************************
+       210-TANKI-NISSU-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TANKI-NISSU
+           MOVE     ZERO               TO  WRK-KAGEN-SRYCD-9
+      *    Æþ±¡ÍúÎò¤ÈÆþ±¡²ñ·×¤ò¸¡º÷¤·¡¢»»ÄêºÑ¤ßÆü¿ô¤òµá¤á¤ë
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key42"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-FETCH-SEC
+               IF      FLG-PTNYUINRRK  =   ZERO
+                   INITIALIZE                      KSN-NYUINACCT-REC
+                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
+                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
+                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
+                                               TO  KSN-NACCT-SRYYM
+                   MOVE    "00000"             TO  WRK-KAGEN-SRYCD-X1
+                   MOVE    LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                               TO  WRK-KAGEN-SRYCD-X2
+                   MOVE    WRK-KAGEN-SRYCD-9   TO  KSN-NACCT-SRYCDTOTAL
+                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key56"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key56"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-FETCH-SEC
+                       PERFORM    UNTIL
+                                  FLG-NYUINACCT    =    1
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-TANKI-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
+                                               TO  WRK-TANKI-NISSU
+                           END-IF
+                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                           MOVE    "key56"         TO  MCP-PATHNAME
+                           PERFORM 910-NYUINACCT-FETCH-SEC
+                       END-PERFORM
+                   END-IF
+      *
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key56"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-IF
+           END-IF
+      *
+           DISPLAY  "###########ORCSNYUACCT###########"
+           DISPLAY   "WRK-TANKI-NISSU = " WRK-TANKI-NISSU
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
+      **                 WRK-KYUKYU-NISSU
+           .
+       210-TANKI-NISSU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»¤Î»»ÄêºÑÆü¿ô¼èÆÀ
       *****************************************************************
        210-YUUSHO-KSN-SEC            SECTION.
@@ -3565,8 +3652,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        40024-NYUINACCT-HEN-SEC          SECTION.
       *
+      *    Ã»´üÂÚºß¤Î»»ÄêºÑ¥«¥¦¥ó¥È
+           IF     (NACCT-ZAISKBKBN     =   "1")   AND
+                  (FLG-TANKI           =   1)
+               PERFORM   210-TANKI-NISSU-SEC
+           END-IF
+      *
       *    ²ó¿ô¥»¥Ã¥È
-           DISPLAY "FLG-TANKI-NASI ========== " FLG-TANKI-NASI
            MOVE    WRK-ACT-STYMD(7:2)  TO  IDX1
            MOVE    WRK-ACT-EDYMD(7:2)  TO  IDX2
            PERFORM VARYING     IDX-D   FROM    IDX1   BY  1
@@ -3579,6 +3671,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE     ZERO        TO  NACCT-DAY (IDX-D)
                ELSE
                    MOVE    WRK-ACT-DAY  TO  NACCT-DAY (IDX-D)
+      *            Ã»´üÂÚºß¤Ç´û¤ËÆþ±¡²ñ·×¥«¥ì¥ó¥À¡¼¤Î»»Äê¤¬¤¢¤ë¾ì¹ç¤Ï
+      *            ¥¼¥í¤ò¥»¥Ã¥È
+                   IF   (FLG-TANKI     =    1)   AND
+                        (WRK-TANKI-NISSU  NOT =  ZERO) AND
+                        (NACCT-ZAISKBKBN     =     "1")
+                      MOVE     ZERO        TO  NACCT-DAY (IDX-D)
+                   END-IF
                END-IF
            END-PERFORM
       *
