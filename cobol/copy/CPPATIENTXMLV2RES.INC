@@ -24,6 +24,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  14/05/12  介護保険情報等追加
       * 04.07.00     NACL-多々納  14/11/XX  初回・最終来院日他追加
+      * 04.07.00     NACL-多々納  15/01/XX  労災自賠責編集追加
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -162,6 +163,50 @@
                         07  PTRES-INSURANCE-START-DATE    PIC X(10).
       *                 有効終了日
                         07  PTRES-INSURANCE-END-DATE      PIC X(10).
+      *H27.1
+      *労災情報
+                     06  PTRES-ACCIDENT-INF-G.
+      *                  労災保険名称（記号と同じ内容）
+                         07  PTRES-ACCIDENT-NAME           PIC X(50).
+      *                  傷病の部位（番号と同じ内容）
+                         07  PTRES-DISEASE-LOCATION        PIC X(100).
+      *                  傷病年月日
+                         07  PTRES-DISEASE-DATE            PIC X(10).
+      *労災
+      *                  労働保険番号
+                         07  PTRES-ACCIDENT-NUMBER         PIC X(14).
+      *                  年金証書番号
+                         07  PTRES-PENSIONCERTIFICATE      PIC X(08).
+      *                  災害区分（名称）
+                         07  PTRES-ACCIDENT-CLASS          PIC X(20).
+      *                  労働基準監督署コード
+                         07  PTRES-LABOR-ST-CODE           PIC X(05).
+      *                  労働基準監督署コード
+                         07  PTRES-LABOR-ST-NAME           PIC X(50).
+      *                  事業所名称
+                         07  PTRES-RSI-JIGYOUNAME          PIC X(80).
+      *                  所在地都道府県名
+                         07  PTRES-RSI-PREFNAME            PIC X(20).
+      *                  所在地都道府県区分
+                         07  PTRES-RSI-PREFKBN             PIC X(01).
+      *                  所在地都道府県区分名称
+                         07  PTRES-RSI-PREFKBNNAME         PIC X(02).
+      *                  所在地郡市区名
+                         07  PTRES-RSI-CITYNAME            PIC X(80).
+      *                  所在地郡市区区分
+                         07  PTRES-RSI-CITYKBN             PIC X(01).
+      *                  所在地郡市区名称
+                         07  PTRES-RSI-CITYKBNNAME         PIC X(02).
+      *自賠責
+      *                  自賠責保険会社名
+                         07  PTRES-RSI-HOKENNAME           PIC X(80).
+      *アフターケア
+      *                  健康管理手帳番号
+                         07  PTRES-RSI-KANRITCHO-NUMBER    PIC X(13).
+      *                  損傷区分
+                         07  PTRES-DAMAGE-CLASS            PIC X(03).
+      *                  損傷区分名称
+                         07  PTRES-DAMAGE-CLASS-NAME       PIC X(100).
       *
       *H26.5
       *           介護情報
