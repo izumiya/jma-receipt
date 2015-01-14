@@ -90,6 +90,7 @@
       *  04.07.05    NACL-門脇    14/03/01  労災マスタ追加対応
       *  04.07.06    NACL-門脇    14/03/04  平成２６年４月改正対応
       *  04.07.07    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.08    NACL-門脇    15/01/14  同日入院時のフラグ編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -895,7 +896,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF   RECE82-HKNCOMBI         =
                                    RECE82-DOUJITSU-HKNCOMBI(IDY)
-                      MOVE    SPACE           TO    RECE82-NYUINRYOFLG
+      ***             MOVE    SPACE           TO    RECE82-NYUINRYOFLG
+                      IF   RECE82-HKNCOMBI = WRK-DAY5(IDY)
+                        CONTINUE
+                      ELSE
+                        MOVE  SPACE           TO    RECE82-NYUINRYOFLG
+                      END-IF
                       MOVE    ZERO            TO    FLG-SHOSAISIN
                       IF   WRK-DAY1(IDY)   NOT =    ZERO
                                MOVE    1      TO    FLG-SHOSAISIN
