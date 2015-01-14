@@ -8081,6 +8081,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE     ZERO       TO    FLG-DAY21
                                                 FLG-DAY24
       *
+                      MOVE     ZERO       TO    WRK-TEN
+                                                WRK-MEISAI-CNT
+                                                WRK-SRYCDTOTAL
+                                                WRK-SURYOUTOTAL
+                                                WRK-ZAI-KINGAKU
+      *
                       PERFORM  VARYING  IDY    FROM    1   BY  1
                                   UNTIL   IDY     >       31
       *
