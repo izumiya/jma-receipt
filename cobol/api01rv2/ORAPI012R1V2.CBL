@@ -31,6 +31,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  13/12/11  ÃÏ°èÏ¢·È£É£ÄÅùÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/05/13  ²ð¸î¾ðÊóÂ¾ÄÉ²ÃÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/11/XX  ½é²óºÇ½ªÍè±¡ÆüÂ¾ÄÉ²ÃÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  15/01/XX  Ï«ºÒÊÝ¸±ÊÔ½¸ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -54,6 +55,8 @@
            03  FLG-PTCARE-NINTEI       PIC 9(01).
            03  FLG-PTCONF              PIC 9(01).
            03  FLG-JYURRK              PIC 9(01).
+           03  FLG-PTRSIINF            PIC 9(01).
+           03  FLG-LABOR-SIO           PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
@@ -141,6 +144,8 @@
       *    ¿¦°÷¾ðÊó
            COPY  "CPSK1010.INC".
       *
+           COPY  "CPSK4002.INC".
+      *
       *    ´µ¼Ô¥Þ¥¹¥¿¡Ý
        01  PTNUM-REC.
            COPY    "CPPTNUM.INC".
@@ -165,6 +170,14 @@
       *    ¼õ¿ÇÍúÎò
        01  JYURRK-REC.
            COPY    "CPJYURRK.INC".
+      *
+      *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊó
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
+      *
+      *    Ï«Æ¯´ð½à´ÆÆÄ½ð¥Þ¥¹¥¿
+       01  LABOR-SIO-REC.
+           COPY    "CPLABOR-SIO.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -886,6 +899,12 @@
                                                         (IDX IDY2)
            END-PERFORM
       *
+      *H27.1
+      *    Ï«ºÒ¡¦¼«ÇåÀÕ¡¦Âè»°¼Ô¹Ô°ÙÊÔ½¸
+           IF     (ORCSAPIHKN-HKNNUM(IDX)      =   "971"  OR  "973" )
+               OR (ORCSAPIHKN-KOHNUM(IDX 1)    =   "970"    )
+               PERFORM 20021011-RSIINF-HEN-SEC
+           END-IF
            .
        2002101-HKNHENSYU-EXT.
            EXIT.
@@ -934,6 +953,204 @@
       *
            .
        20021011-HKNCOMBI-FTNHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒ¡¦¼«ÇåÀÕ¡¦Âè»°¼Ô¹Ô°ÙÊÔ½¸½èÍý
+      *****************************************************************
+       20021011-RSIINF-HEN-SEC                SECTION.
+      *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+           MOVE    SPA-PTID            TO  PTRSI-PTID
+           IF      ORCSAPIHKN-HKNNUM(IDX)  =   "971"  OR  "973"
+               MOVE    ORCSAPIHKN-NAI-HKNID (IDX)
+                                           TO  PTRSI-HKNID
+           ELSE
+               MOVE    ORCSAPIHKN-NAI-KOHID (IDX 1)
+                                           TO  PTRSI-KOHID
+           END-IF
+      *
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptrsiinf"     TO  MCP-TABLE
+               MOVE    "key"              TO  MCP-PATHNAME
+               PERFORM 993-PTRSIINF-NEXT-SEC
+           ELSE
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    1                   TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-PTRSIINF        =   1
+               GO      TO    20021011-RSIINF-HEN-EXT
+           END-IF
+      *    Ï«ºÒÊÝ¸±Ì¾¾Î
+           EVALUATE    PTRSI-HKNKBN
+               WHEN    "1"
+                   MOVE    "Ã»´üµëÉÕ"          TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+               WHEN    "2"
+                   MOVE    "½ýÉÂÇ¯¶â"          TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+               WHEN    "3"
+                   MOVE    "¥¢¥Õ¥¿¡¼¥±¥¢"      TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+               WHEN    "4"
+                   MOVE    "¼«ÇåÀÕÊÝ¸±"        TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+               WHEN    "5"
+                   MOVE    "¸øÌ³ºÒ³²"          TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+               WHEN    "6"
+                   MOVE    "Âè»°¼Ô¹Ô°Ù"        TO  PTRES-ACCIDENT-NAME
+                                                                  (IDX)
+           END-EVALUATE
+      *    ½ýÉÂ¤ÎÉô°Ì
+           MOVE    PTRSI-COMMENT       TO  PTRES-DISEASE-LOCATION(IDX)
+      *    ½ýÉÂÇ¯·îÆü
+           IF      PTRSI-SHOBYOYMD NOT =   SPACE
+               MOVE    PTRSI-SHOBYOYMD     TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-DISEASE-DATE (IDX)
+           END-IF
+      *
+           EVALUATE    PTRSI-HKNKBN
+               WHEN    "1"
+      *    Ï«Æ¯ÊÝ¸±ÈÖ¹æ
+                   MOVE    PTRSI-KOFUNUM   TO  PTRES-ACCIDENT-NUMBER
+                                                                (IDX)
+               WHEN    "2"
+      *    Ç¯¶â¾Ú½ñÈÖ¹æ
+                   MOVE    PTRSI-KOFUNUM   TO  PTRES-PENSIONCERTIFICATE
+                                                                (IDX)
+               WHEN    "3"
+      *    ·ò¹¯´ÉÍý¼êÄ¢ÈÖ¹æ
+                   MOVE    PTRSI-KOFUNUM   TO
+                                           PTRES-RSI-KANRITCHO-NUMBER
+                                                                (IDX)
+           END-EVALUATE
+      *    ºÒ³²¶èÊ¬¡ÊÌ¾¾Î¡Ë
+           EVALUATE    PTRSI-SAIGAIKBN
+               WHEN    "1"
+                   MOVE    "¶ÈÌ³Ãæ¤ÎºÒ³²"      TO  PTRES-ACCIDENT-CLASS
+                                                                (IDX)
+               WHEN    "2"
+                   MOVE    "ÄÌ¶ÐÅÓ¾å¤ÎºÒ³²"    TO  PTRES-ACCIDENT-CLASS
+                                                                (IDX)
+           END-EVALUATE
+      *    Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥É
+           MOVE    PTRSI-SYOCD         TO  PTRES-LABOR-ST-CODE  (IDX)
+           IF      PTRSI-SYOCD     NOT =   SPACE
+               PERFORM 20021012-SYOCD-HEN-SEC
+           END-IF
+      *
+      *    »ö¶È½êÌ¾¾Î
+           MOVE    PTRSI-JIGYOUNAME    TO  PTRES-RSI-JIGYOUNAME (IDX)
+      *    ½êºßÃÏÅÔÆ»ÉÜ¸©Ì¾
+           MOVE    PTRSI-PREFNAME      TO  PTRES-RSI-PREFNAME (IDX)
+      *    ½êºßÃÏÅÔÆ»ÉÜ¸©¶èÊ¬
+           MOVE    PTRSI-PREFKBN       TO  PTRES-RSI-PREFKBN (IDX)
+           EVALUATE    PTRSI-PREFKBN
+               WHEN    "1"
+                   MOVE    "ÅÔ"        TO  PTRES-RSI-PREFKBNNAME (IDX)
+               WHEN    "2"
+                   MOVE    "Æ»"        TO  PTRES-RSI-PREFKBNNAME (IDX)
+               WHEN    "3"
+                   MOVE    "ÉÜ"        TO  PTRES-RSI-PREFKBNNAME (IDX)
+               WHEN    "4"
+                   MOVE    "¸©"        TO  PTRES-RSI-PREFKBNNAME (IDX)
+           END-EVALUATE
+      *    ½êºßÃÏ·´»Ô¶èÌ¾
+           MOVE    PTRSI-CITYNAME      TO  PTRES-RSI-CITYNAME (IDX)
+      *    ½êºßÃÏ·´»Ô¶è¶èÊ¬
+           MOVE    PTRSI-CITYKBN       TO  PTRES-RSI-CITYKBN (IDX)
+           EVALUATE    PTRSI-CITYKBN
+               WHEN    "1"
+                   MOVE    "·´"        TO  PTRES-RSI-CITYKBNNAME (IDX)
+               WHEN    "2"
+                   MOVE    "»Ô"        TO  PTRES-RSI-CITYKBNNAME (IDX)
+               WHEN    "3"
+                   MOVE    "¶è"        TO  PTRES-RSI-CITYKBNNAME (IDX)
+           END-EVALUATE
+      *    ¼«ÇåÀÕÊÝ¸±²ñ¼ÒÌ¾
+           MOVE    PTRSI-HOKENNAME     TO  PTRES-RSI-HOKENNAME (IDX)
+      *
+      *    ¥¢¥Õ¥¿¡¼¥±¥¢
+           EVALUATE    PTRSI-HKNKBN
+           WHEN    "3"
+      *        Â»½ý¶èÊ¬
+               STRING  PTRSI-SONSHOUKBN
+                       PTRSI-SONSHOUKBN-EDANUM
+                                           DELIMITED  BY  SIZE
+                                           INTO   PTRES-DAMAGE-CLASS
+                                                                (IDX)
+               END-STRING
+      *        Â»½ý¶èÊ¬Ì¾¾Î¼èÆÀ
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "4002"              TO  SYS-KANRICD
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    PTRES-DAMAGE-CLASS (IDX)
+                                           TO  SYS-KBNCD
+               PERFORM 900-SYSKANRI-KEYREAD-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-4002-REC
+                   MOVE    SYS-4002-SONSHOUNAME
+                                           TO  PTRES-DAMAGE-CLASS-NAME
+                                                                (IDX)
+               END-IF
+           END-EVALUATE
+           .
+       20021011-RSIINF-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«Æ¯´ð½à´ÆÆÄ½ðÌ¾¾ÎÊÔ½¸½èÍý
+      *****************************************************************
+       20021012-SYOCD-HEN-SEC                SECTION.
+      *
+           INITIALIZE                      LABOR-SIO-REC
+           MOVE    PTRSI-SYOCD         TO  LABOR-SIO-SYOCD
+           MOVE    PTRSI-RYOSTYMD      TO  LABOR-SIO-YUKOSTYMD
+           MOVE    PTRSI-RYOSTYMD      TO  LABOR-SIO-YUKOEDYMD
+      *
+           MOVE    LABOR-SIO-REC       TO  MCPDATA-REC
+           MOVE    "tbl_labor_sio"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_labor_sio"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  LABOR-SIO-REC
+                   MOVE    ZERO                TO  FLG-LABOR-SIO
+               ELSE
+                   MOVE    1                   TO  FLG-LABOR-SIO
+                   INITIALIZE                  LABOR-SIO-REC
+               END-IF
+           ELSE
+               INITIALIZE                  LABOR-SIO-REC
+               MOVE    1               TO  FLG-LABOR-SIO
+           END-IF
+           MOVE    "tbl_labor_sio"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-LABOR-SIO       =   ZERO
+               MOVE    LABOR-SIO-NAME      TO  PTRES-LABOR-ST-NAME (IDX)
+           END-IF
+           .
+       20021012-SYOCD-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1177,6 +1394,54 @@
       *
            .
        970-JYURRK-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊóÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       993-PTRSIINF-NEXT-SEC        SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+               MOVE    ZERO            TO  FLG-PTRSIINF
+           ELSE
+               INITIALIZE                  PTRSIINF-REC
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+      *
+           .
+       993-PTRSIINF-NEXT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥·¥¹¥Æ¥à´ÉÍý¥Þ¥¹¥¿¼ç¥­¡¼ÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       900-SYSKANRI-KEYREAD-SEC        SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+                   MOVE    ZERO            TO  FLG-SYSKANRI
+               ELSE
+                   INITIALIZE                  SYSKANRI-REC
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-EXT.
            EXIT.
       *
       *****************************************************************
