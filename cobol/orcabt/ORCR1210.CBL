@@ -46,6 +46,7 @@
       *  04.07.01    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.02    NACL-門脇    14/04/08  平成２６年４月改正対応
       *  04.07.03    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
+      *  04.07.04    NACL-門脇    15/01/14  同日入院時のフラグ編集修正
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -537,7 +538,12 @@
       *
                  IF   RECE200-HKNCOMBI        =
                                    RECE200-DOUJITSU-HKNCOMBI(IDY)
-                      MOVE    SPACE     TO   RECE200-NYUINRYOFLG
+      ***             MOVE    SPACE     TO   RECE200-NYUINRYOFLG
+                      IF   RECE200-HKNCOMBI = WRK-DAY5(IDY)
+                        CONTINUE
+                      ELSE
+                        MOVE  SPACE     TO   RECE200-NYUINRYOFLG
+                      END-IF
                       IF   WRK-DAY1(IDY)   NOT =    ZERO
                           MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
                       END-IF
