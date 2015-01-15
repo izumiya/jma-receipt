@@ -633,6 +633,16 @@
                        MOVE    "0039"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
                    END-IF
+      *!!!!
+      *H27.1       Æþ±¡»þ¤ÎÃæ¿´ÀÅÌ®Ãí¼Í¤È´ïºà¤ÏÊ¬¤±¤ë
+                   IF    (SPA-NYUGAIKBN        =   "1" )   AND
+                         (FLG-SYUGI-CHU        =   1   )   AND
+                         (WRK-COM-HKNCOMBI (IDX-Z)
+                                           NOT =   "9999")
+                       MOVE    "9042"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+                   END-IF
+      *!!!!
            END-EVALUATE
       *
            .
