@@ -1109,6 +1109,13 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H27.1
+               WHEN    "9042"
+                   STRING  "入院の中心静脈注射の器材は別剤で"
+                           "入力してください。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *!!!
                WHEN    "9100"
                    STRING  "診療内容が４００行を超えます。"

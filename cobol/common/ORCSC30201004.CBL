@@ -633,6 +633,16 @@
                        MOVE    "0039"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
                    END-IF
+      *!!!!
+      *H27.1       入院時の中心静脈注射と器材は分ける
+                   IF    (SPA-NYUGAIKBN        =   "1" )   AND
+                         (FLG-SYUGI-CHU        =   1   )   AND
+                         (WRK-COM-HKNCOMBI (IDX-Z)
+                                           NOT =   "9999")
+                       MOVE    "9042"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+                   END-IF
+      *!!!!
            END-EVALUATE
       *
            .
@@ -1370,8 +1380,8 @@
              IF   (WRK-COM-HKNCOMBI (IDX) NOT =   "9999")
       *        点滴は１回のみとする（外来のみ）
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-      *               (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
-      *                                                "960") AND
+      **              (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
+      **                                               "960") AND
                       (WRK-COM-SRYKBN   (IDX)  NOT =   "95"   AND
                                                        "96" ) AND
                       (WRK-COM-INPUTCD  (IDX)      =   "130009310" OR
@@ -1385,8 +1395,8 @@
                END-IF
       *        動脈注射は１回のみとする
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
-      **              (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
-      **                                               "960") AND
+      ***             (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
+      ***                                              "960") AND
                       (WRK-COM-SRYKBN   (IDX)  NOT =   "95"   AND
                                                        "96" ) AND
                       (WRK-COM-INPUTCD  (IDX)      =   "130006110" OR
