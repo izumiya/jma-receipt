@@ -372,18 +372,11 @@
            MOVE    WRK-PARA-SRYYM      TO  SYS-2001-SRYYM
            MOVE    WRK-PARA-SYOKBN     TO  SYS-2001-SYOKBN
       *
-      *??
-           IF      WRK-PARA-RECEKBN    =   "6"
-      *??
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAME
            CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
            MOVE    SPACE               TO  RECEERR
            MOVE    SGETTEMP-FULLNAME   TO  RECEERR
-      *??
-           END-IF
-           DISPLAY "RECEERR=" RECEERR
-      *??
       *
            IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
       *        ＤＢオープン処理
