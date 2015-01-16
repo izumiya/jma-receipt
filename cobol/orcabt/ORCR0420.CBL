@@ -276,6 +276,8 @@
       *                                     マスタの診療区分と異なる場合の対応
       *  04.07.21    NACL-門脇    14/12/15  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.22    NACL-門脇    15/01/15  外来管理加算（読み替え加算）チェッ
+      *                                     ク
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -2473,6 +2475,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        UNTIL    (IDX2      >    5)    OR
                                 (SRY-SRYCD(IDX2)  =   SPACE)
       *
+      *      外来管理加算（読み替え加算）の未訂正分がある場合の特例措置
+      *      （外来管理加算があれば、外来管理加算（読み替え加算）へ）
+             IF      RECE41-YOBIETC(1)  =  1
+               IF    SRY-SRYCD(IDX2)  =  "112011010"
+                  MOVE   "101120020"    TO  SRY-SRYCD(IDX2)
+                  COMPUTE   RECE44-SRYCDTOTAL  =  RECE44-SRYCDTOTAL
+                                               -  112011010
+                                               +  101120020
+               END-IF
+             END-IF
       *
              PERFORM    800-TENSU-TBL-SEC
       **     点数マスタ情報退避
