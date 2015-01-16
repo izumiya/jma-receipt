@@ -12886,7 +12886,8 @@
             MOVE    WRK-SANTEISTYMD  TO  SPA-NAI-I01-NYUINYMD
             MOVE    1                TO  FLG-SAI-SAKUSEI2
             PERFORM 4801-TENROOM-EDIT-SEC
-            IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
+            IF    (IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1")  AND
+                  (WRK-SAI-SRYYM(1:6)   =    IPN-SANTEISTYMD(1:6))
                 MOVE    SPA-GMN-I01-TOKNYUIN-CD
                                           TO   WRK-SAI-I01-TOKNYUIN-CD
                 MOVE    SPACE             TO   SPA-GMN-I01-TOKNYUIN-CD
@@ -12894,6 +12895,7 @@
                 MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
                 MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
                 MOVE    WRK-SANTEISTYMD   TO   SPA-NAI-I01-NYUINYMD
+                MOVE    1                 TO   FLG-SAI-SAKUSEI2
                 PERFORM   4801-TENROOM-EDIT-SEC
             END-IF
       *
