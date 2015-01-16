@@ -596,6 +596,8 @@
       *
            03  WRK-ERRFLG              PIC X(01).
            03  WRK-ERRFLG2             PIC X(01).
+      *H27.1
+           03  WRK-CCNT                PIC 9(03).
       *
       *
        01  TBL-GRP-AREA.
@@ -5122,6 +5124,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¬–æ›§Œø«Œ≈π‘∞Ÿ
            MOVE    ZERO                TO  FLG-DEKIDAKA
            MOVE    ZERO                TO  IDX-T
+           MOVE    ZERO                TO  WRK-CCNT
            PERFORM VARYING     IDX-H   FROM    IDX   BY  1
                    UNTIL      (IDX-H   >   SPA-GMN-MAX )
                            OR (IDX-T   >=  10          )
@@ -5134,6 +5137,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  ORCSCHKTALL-HKTSRYCD
                                                     (IDX-T)
                END-IF
+      *H27.1
+      *        ø«Œ≈°¶¥Ô∫‡°¶ÃÙ∫ﬁ•≥°º•…§Œ•¡•ß•√•Ø
+               IF     (SPA-GMN-TSRYCD (IDX-H)(1:1) =   "1"
+                                                   OR  "6"
+                                                   OR  "7")
+                 OR   (SPA-GMN-TSRYCD (IDX-H)(1:3) =  "059")
+                   ADD     1           TO  WRK-CCNT
+               END-IF
+      *
                IF     (SPA-GMN-TMEISYO (IDX-H) =   ALL "-" )
                   OR ((IDX             NOT =   IDX-H   )  AND
                       (SPA-GMN-TBANGO  (IDX-H) >   ZERO   ))
@@ -5151,6 +5163,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  SPA-NAI-HKTGAIFLG
            END-IF
+      *H27.1
+      *    ø«Œ≈°¶¥Ô∫‡°¶ÃÙ∫ﬁ§ §∑°¢±°≥∞≈ÍÃÙ¬–æ›≥∞
+           IF     (WRK-CCNT            =   ZERO )
+           OR     ((SPA-NAI-SRYKBN(SPA-NAI-BANGO)
+                                       =   "21"
+                                       OR  "22"
+                                       OR  "23" )  AND
+                   (SPA-NAI-ZAITEN(SPA-NAI-BANGO)
+                                       =   ZERO ) )
+           OR     ( SPA-NAI-SRYSYU (SPA-NAI-BANGO)
+                                       =   "148"
+                                       OR  "149" )
+               MOVE    ZERO                TO  SPA-NAI-HKTGAIFLG
+           END-IF
+      *
            IF     (SPA-NAI-HKTGAIFLG   =   1    )  AND
                   (SPA-NAI-NYUHKTKBN   =   1    )
                CALL    "ORCSCHKTALL"       USING
