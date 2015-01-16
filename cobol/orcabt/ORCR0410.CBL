@@ -119,6 +119,8 @@
       *  04.07.17    NACL-門脇    14/10/15  療養期間の記載修正
       *  04.07.18    NACL-門脇    14/12/15  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.19    NACL-門脇    15/01/15  外来管理加算（読み替え加算）
+      *                                     チェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2585,6 +2587,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF    RECE41-GAITOKU-KAISU2  NOT  =  ZERO 
                   MOVE   "1"   TO     RECE41-GAITOKU-PRTKBN2
                   MOVE    26   TO     RECE41-GAITOKU-TEN2
+           END-IF
+      *
+      *    外来管理加算（読み替え加算）の算定チェック
+      *    （パッチ適用前の診療行為入力分で、未訂正分があるか）
+           IF   RECE41-SRYYM  >=  "201502"
+             PERFORM    VARYING   IDZ2   FROM   1    BY   1
+                         UNTIL    IDZ2     >    3
+                PERFORM    VARYING    IDZ    FROM    1   BY   1
+                            UNTIL     IDZ     >     31
+                  IF   ( TBL-GXXNISSU-DAY(IDZ2 IDZ)
+                                            =  SPACE )
+                  AND  ( TBL-G52NISSU-DAY(IDZ2 IDZ)
+                                        NOT =  SPACE )
+                       MOVE    1     TO    RECE41-YOBIETC(1)
+                       DISPLAY "<GAIKAN-CHECK> DAY=" IDZ
+                  END-IF
+                END-PERFORM
+             END-PERFORM
            END-IF
       *
       *    実日数から減する
