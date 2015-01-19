@@ -968,6 +968,7 @@
                PERFORM 2003-MAYAKU-HEN-SEC
            END-IF
       *ＱＲ対応
+           INITIALIZE                  OUT-ORCSQRCSVAREA
       *    ＱＲデータ出力処理（日数ゼロは対象外）
            IF      (ORCHC19-KBN        =   SPACE
                                        OR  "3"
@@ -993,21 +994,6 @@
       *        ELSE
       *            PERFORM 600-QRDATA-SYORI-SEC
       ******** END-IF
-      *H27.1
-      *    CSV出力
-      *        院外の請求確認・中途・退院時処方せんのみ
-               IF      (ORCHC19-KBN        =   SPACE
-                                           OR  "4"
-                                           OR  "N"   )
-      *            交付日未設定は作成なし
-                   IF      (WRK-KOFYMD         =   SPACE )
-      *                点数マスタなし
-                       OR  (FLG-QRCHK          =   1     )
-                       CONTINUE
-                   ELSE
-                       PERFORM 610-CSVDATA-SYORI-SEC
-                   END-IF
-               END-IF
       *
            END-IF
            MOVE    ZERO                TO  WRK-FILE-CNT
@@ -1048,6 +1034,22 @@
       *        帳票印刷処理
                PERFORM 400-PRINT-SEC
            END-PERFORM
+      *
+      *H27.1
+      *    CSV出力
+      *    院外の請求確認・中途・退院時処方せんのみ
+           IF      (ORCHC19-KBN        =   SPACE
+                                       OR  "4"
+                                       OR  "N"   )
+      *        交付日未設定は作成なし
+               IF      (WRK-KOFYMD         =   SPACE )
+      *            点数マスタなし
+                   OR  (FLG-QRCHK          =   1     )
+                   CONTINUE
+               ELSE
+                   PERFORM 610-CSVDATA-SYORI-SEC
+               END-IF
+           END-IF
       *
            .
        400-PRINT-SYORI-EXT.
