@@ -105,6 +105,10 @@
                        09  ORCSQRCSV-SURYOU-SG        PIC 9(05)V9(05).
       *                内服服用回数
                        09  ORCSQRCSV-KAISU-SG         PIC 9(03).
+      *H26.12
+      *                CSV用　薬剤名称
+                       09  ORCSQRCSV-CSV-NAME         PIC X(100).
+      *
       *    ファイル名組み立て項目
            03  ORCSQRCSV-SYSTIME       PIC 9(08).
       *    エラーコード

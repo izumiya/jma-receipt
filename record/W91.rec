@@ -15,8 +15,15 @@ W91 {
       count int;
         item varchar(20)[10];
     };
+    LABEL1 {
+      textdata varchar(50);
+    };
+    LABEL2 {
+      textdata varchar(50);
+    };
     CHKSYREC {
       isactive bool;
+      state int;
     };
   };
 };
