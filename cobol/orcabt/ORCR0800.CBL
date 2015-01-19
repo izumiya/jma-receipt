@@ -294,7 +294,7 @@
       ****************************************************************
        LINKAGE                 SECTION.
        01  COMMAND-PARAM.
-           02  FILLER      PIC X(2000).
+           02  FILLER      PIC X(400).
       ****************************************************************
        PROCEDURE           DIVISION
                USING
@@ -360,6 +360,7 @@
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAMES  (1)
            CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
+           MOVE    SPACE               TO  RECEERR
            MOVE    SGETTEMP-FULLNAMES (1)
                                        TO  RECEERR
       *
