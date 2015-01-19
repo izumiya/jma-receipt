@@ -165,6 +165,8 @@
       *                                     データを作成する
       *  04.07.13    NACL-門脇    14/12/09  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.14    NACL-門脇    15/01/16  入院点滴：診療種別「．３４０」の
+      *                                     入力チェック対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -199,6 +201,7 @@
            03  WRK-TAIJYUSIN-ERR           PIC 9(01).
            03  WRK-GENSAN-ERR              PIC 9(01).
            03  WRK-GENSAN-ERR2             PIC 9(01).
+           03  WRK-TENTEKI-ERR             PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
@@ -703,6 +706,9 @@
       *    入院点滴一括更新サブ
            COPY    "CPORCSTENTEK.INC".
       *
+      *    入院点滴手技加算まとめサブ
+           COPY    "CPORCSTENTEK2.INC".
+      *
       *    病棟選定入院自己負担取得サブ
            COPY    "CPORCSBTUSENTEI.INC".
       *
@@ -987,6 +993,11 @@
            IF    LNK-S02-RC   =   ZERO
              IF   WRK-GENTEN-ERR2 =  1
                 MOVE     25     TO    LNK-S02-RC
+             END-IF
+           END-IF.
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-TENTEKI-ERR =  1
+                MOVE     28     TO    LNK-S02-RC
              END-IF
            END-IF.
       *
@@ -7819,9 +7830,97 @@ grpsys                            SPA-AREA
       *
            END-PERFORM
       *
+      ***  診療種別「．３４０」の診療行為入力チェック（レセプト処理時）
+      *
+           IF   LNK-S02-TEIKI-KBN   =   "X"
+      *
+             INITIALIZE                   ORCSTENTEK2AREA
+             MOVE    SYU-HOSPNUM      TO  LNK-ORCSTEN2-HOSPNUM
+             MOVE    SYU-PTID         TO  LNK-ORCSTEN2-PTID
+             MOVE    SYU-SRYYMD(1:6)  TO  LNK-ORCSTEN2-SRYYM
+             MOVE    SYU-HKNCOMBINUM  TO  LNK-ORCSTEN2-HKNCOMBI
+             CALL    "ORCSTENTEK2"  USING
+                                    ORCSTENTEK2AREA
+                                    SPA-AREA
+             IF      LNK-ORCSTEN2-RC  =   ZERO
+               IF   (LNK-ORCSTEN2-TENTEK-ERRCD  = ZERO)
+               OR   (LNK-ORCSTEN2-CHUJOU-ERRCD  = ZERO)
+                 PERFORM  VARYING  IDX1  FROM  1  BY  1
+                           UNTIL   IDX1    >  20
+                   IF  LNK-ORCSTEN2-ZAINUM(IDX1) NOT = ZERO
+                     PERFORM  TENTEK-MATOME-CHECK-SEC
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
            .
       *
        TENTEK-MATOME-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    診療種別「．３４０」の診療行為入力チェック（レセプト処理時）*
+      ******************************************************************
+       TENTEK-MATOME-CHECK-SEC                 SECTION.
+      *
+           INITIALIZE                      SRYACCT-REC
+           MOVE    SYU-HOSPNUM         TO  ACCT-HOSPNUM
+           MOVE    SYU-PTID            TO  ACCT-PTID
+           MOVE    LNK-ORCSTEN2-ZAINUM(IDX1)
+                                       TO  ACCT-ZAINUM
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key57"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+           IF      MCP-RC  =   ZERO
+             MOVE  "tbl_sryacct"       TO  MCP-TABLE
+             MOVE  "key57"             TO  MCP-PATHNAME
+             PERFORM  SRYACCT-READ-SEC
+             IF  FLG-SRYACCT = ZERO
+               IF   ACCT-YKZTEN     NOT = ZERO
+               OR   ACCT-KIZAITEN   NOT = ZERO
+                 INITIALIZE                   SRYACT-REC
+                 MOVE    ACCT-HOSPNUM     TO  SRY-HOSPNUM
+                 MOVE    ACCT-NYUGAIKBN   TO  SRY-NYUGAIKBN
+                 MOVE    ACCT-PTID        TO  SRY-PTID
+                 MOVE    ACCT-SRYYM       TO  SRY-SRYYM
+                 MOVE    ACCT-ZAINUM      TO  SRY-ZAINUM
+                 MOVE    SRYACT-REC       TO  MCPDATA-REC
+                 MOVE    "DBSELECT"       TO  MCP-FUNC
+                 MOVE    "tbl_sryact"     TO  MCP-TABLE
+                 MOVE    "key9"           TO  MCP-PATHNAME
+                 CALL    "ORCDBMAIN"      USING MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+                 IF      MCP-RC  =   ZERO
+                   MOVE  "tbl_sryact"     TO  MCP-TABLE
+                   MOVE  "key9"           TO  MCP-PATHNAME
+                   PERFORM  SRYACT-READ-SEC
+                   IF  FLG-SRYACT = ZERO
+                     IF  SRY-SRYSYUKBN = "340"
+                       MOVE     1         TO  WRK-TENTEKI-ERR
+                     END-IF
+                   END-IF
+                 END-IF
+                 MOVE    "tbl_sryact"     TO  MCP-TABLE
+                 MOVE    "key9"           TO  MCP-PATHNAME
+                 PERFORM    CSR-CLOSE-SEC
+               END-IF
+             END-IF
+           END-IF
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key57"             TO  MCP-PATHNAME
+           PERFORM    CSR-CLOSE-SEC
+      *
+           .
+      *
+       TENTEK-MATOME-CHECK-EXT.
            EXIT.
       *
       ******************************************************************
