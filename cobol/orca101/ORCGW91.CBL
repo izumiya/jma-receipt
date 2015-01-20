@@ -703,7 +703,7 @@
       *****************************************************************
        4801-KANRENCHK-SEC              SECTION.
       *
-           IF      SPA-GMN-COOPBASE    =   "1"
+           IF      SPA-GMN-COOPBASE    NOT =   "0"
                IF      SPA-GMN-FILE-DIR    =   SPACE
                    MOVE    "0010"          TO  SPA-ERRCD
                    IF      SPA-W01-KANRICD         =   "9103"
