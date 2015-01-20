@@ -2083,6 +2083,9 @@
       *H25.7
       *                第三者行為
                           OR  (SPA-GMN-KOHNUM(IDX-K)   =   "970" )
+      *H27.1
+      *                難病
+                          OR ( SPA-GMN-KOHNUM(IDX-K)   =   "054" )
       *H26.11
       *                小児特定　Ｈ２６．１２まで
                           OR ((SPA-GMN-KOHNUM(IDX-K)   =   "052" ) AND
@@ -2243,6 +2246,9 @@
                               (SPA-PREFNUM             =   01    ))
       *H25.7              第三者行為
                          OR   (SPA-GMN-KOHNUM(IDX-K)   =   "970" )
+      *H27.1             難病
+                          OR ( SPA-GMN-KOHNUM(IDX-K)   =   "054" )
+      *
                              MOVE    ZERO              TO  FLG-CHK
                        END-IF
                    END-IF

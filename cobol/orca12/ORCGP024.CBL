@@ -629,6 +629,9 @@
                                            =   "052" ) AND
                        (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
                                            <=  "20141231" ))
+      *H27.1         難病
+                 OR   ( SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "054"     )
       *
                    MOVE    "受給者番号："      TO  SPA-GMN24-JKYSNUM
                    MOVE    SPA-NAI24-TJKYSNUM (SPA-NAI24-FTNSELNUM)

@@ -610,6 +610,9 @@
                    OR     ((LNK-COMB-KOHHKNNUM (IDX IDKH)
                                                    =   "052" ) AND
                            (LNK-COMB-TEKSTYMD(IDX) <=  "20141231"))
+      *H27.1        ÆñÉÂ
+                   OR      (LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =   "054"   )
       *
                        MOVE    LNK-COMB-KOHHKNNUM (IDX IDKH)
                                                    TO  WRK-KOHNUM
