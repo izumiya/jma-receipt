@@ -135,6 +135,7 @@
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-YMD                 PIC 9(01).
            03  FLG-TENKI               PIC 9(01).
+           03  FLG-CHK                 PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -429,6 +430,7 @@
            OPEN    INPUT           ISAM-FILE
            IF  STS-ISAM        NOT =   ZERO
                MOVE    1           TO  FLG-ISAM
+               MOVE    1           TO  FLG-CHK
                DISPLAY "*(ORCVTPTBYOMEI)* ISAM-FILE OPN STS["
                                        STS-ISAM "]"
       *         労災ファイルがなくても処理続ける
@@ -1450,7 +1452,7 @@
       *    労災・自賠責保険レコード番号指定されていれば
            IF      WRK-RENNUM  NOT =   ZERO
       *        労災ファイルがあれば
-               IF      STS-ISAM        =   ZERO
+               IF      FLG-CHK        =   ZERO
                    INITIALIZE                  ISAM-REC
                    MOVE    PTNUM-PTID      TO  ISAM-PTID
                    MOVE    WRK-RENNUM      TO  ISAM-RENNUM
