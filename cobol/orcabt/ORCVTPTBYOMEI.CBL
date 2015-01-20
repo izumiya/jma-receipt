@@ -274,6 +274,10 @@
                05  ERR2-BYOMEIMES      PIC X(09).
                05  ERR2-BYOMEI         PIC X(30).
       *
+       01  CONST-AREA.
+           03  CONST-ISAM              PIC X(256)
+               VALUE               "/var/tmp/ORCVTPTRSIINF-HKNID_ISAM".
+      *
       *****************************************************************
       *    ファイル定義
       *****************************************************************
@@ -362,6 +366,7 @@
            MOVE    ZERO            TO  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
+           INITIALIZE                  ASS-AREA
       *
       *    パラメタセット
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
@@ -426,7 +431,8 @@
                MOVE    1           TO  FLG-ISAM
                DISPLAY "*(ORCVTPTBYOMEI)* ISAM-FILE OPN STS["
                                        STS-ISAM "]"
-               GO  TO  100-INIT-EXT
+      *         労災ファイルがなくても処理続ける
+      *         GO  TO  100-INIT-EXT
            END-IF
       *
       *    帳票出力　初期処理
@@ -485,6 +491,11 @@
            ELSE
                MOVE    1               TO  FLG-CSV
                GO  TO  101-PARA-GET-EXT
+           END-IF
+      *
+      *    労災のISAMファイルがない場合デフォルトをセットする
+           IF      ASS-ISAM        =   SPACE
+               MOVE    CONST-ISAM      TO  ASS-ISAM
            END-IF
       *
            .
@@ -1438,13 +1449,16 @@
       *
       *    労災・自賠責保険レコード番号指定されていれば
            IF      WRK-RENNUM  NOT =   ZERO
-               INITIALIZE                  ISAM-REC
-               MOVE    PTNUM-PTID      TO  ISAM-PTID
-               MOVE    WRK-RENNUM      TO  ISAM-RENNUM
-               PERFORM 900-ISAM-READ-SEC
-               INITIALIZE                  WRK-HEN-AREA
-               MOVE    ISAM-HKNID      TO  WRK-HEN-HKNCOMBI(1) 
-               MOVE    1               TO  CNT-HKNCOMB
+      *        労災ファイルがあれば
+               IF      STS-ISAM        =   ZERO
+                   INITIALIZE                  ISAM-REC
+                   MOVE    PTNUM-PTID      TO  ISAM-PTID
+                   MOVE    WRK-RENNUM      TO  ISAM-RENNUM
+                   PERFORM 900-ISAM-READ-SEC
+                   INITIALIZE                  WRK-HEN-AREA
+                   MOVE    ISAM-HKNID      TO  WRK-HEN-HKNCOMBI(1) 
+                   MOVE    1               TO  CNT-HKNCOMB
+               END-IF
            END-IF
       *
            MOVE    PTNUM-PTID      TO  WKPTBYO-PTID
@@ -2019,7 +2033,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    帳票出力　終了処理
            CLOSE   CSV-FILE
-           CLOSE   ISAM-FILE
+      *    労災ファイルがあれば
+           IF      STS-ISAM        =   ZERO
+               CLOSE   ISAM-FILE
+           END-IF
            CLOSE   ERR-FILE
       *
       *    DB DISCONNECT

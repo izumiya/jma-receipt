@@ -276,6 +276,10 @@
                05  ERR2-TEKBAR         PIC X(01).
                05  ERR2-TEKEDYMD       PIC X(08).
       *
+       01  CONST-AREA.
+           03  CONST-ISAM              PIC X(256)
+               VALUE               "/var/tmp/ORCVTPTRSIINF-HKNID_ISAM".
+      *
       *****************************************************************
       *    ファイル定義
       *****************************************************************
@@ -357,6 +361,7 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
+           INITIALIZE                  ASS-AREA
       *
       *    パラメタセット
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
@@ -473,6 +478,11 @@
                CONTINUE
            ELSE
                MOVE    1               TO  FLG-CSV
+           END-IF
+      *
+      *    労災のISAMファイルがない場合デフォルトをセットする
+           IF      ASS-ISAM        =   SPACE
+               MOVE    CONST-ISAM      TO  ASS-ISAM
            END-IF
       *
            .
