@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  15/01/07  9103 処方せん連携基盤情報
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -77,6 +78,9 @@
       *
                05  SPA-GMN-FILE-DIR            PIC X(200).
                05  SPA-GMN-CHKSYREC            PIC X(01).
+      *    見出し
+           03  SPA-GMN-LABEL1                  PIC X(50).
+           03  SPA-GMN-LABEL2                  PIC X(50).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -253,11 +257,24 @@
            MOVE    "2 作成する（全件）"
                                        TO  SPA-GMN-COOPBASE-LST(3)
            MOVE    3                   TO  SPA-GMN-COOPBASE-MAX
+      *    見出し
+           IF      SPA-W01-KANRICD         =   "9101"
+               MOVE    "連携基盤用データ作成"  TO  SPA-GMN-LABEL1
+               MOVE    "連携基盤用ディレクトリ"
+                                               TO  SPA-GMN-LABEL2
+           ELSE
+               MOVE    "処方せん連携用データ作成"
+                                               TO  SPA-GMN-LABEL1
+               MOVE    "処方せん連携用ディレクトリ"
+                                               TO  SPA-GMN-LABEL2
+           END-IF
       *
       *    システム管理検索
            MOVE    SPACE               TO  SYSKANRI-REC
            INITIALIZE                      SYSKANRI-REC
-           MOVE    "9101"              TO  SYS-KANRICD
+      ***  MOVE    "9101"              TO  SYS-KANRICD
+           MOVE    SPA-W01-KANRICD     TO  SYS-KANRICD
+      *
            MOVE    "*"                 TO  SYS-KBNCD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
@@ -339,11 +356,14 @@
                PERFORM 480-TOUROKU-SEC
       *    傷病名レコード記録
            WHEN    "CLICKED"       ALSO    "CHKSYREC"
+      *    処方せんはなし
+             IF      SPA-W01-KANRICD     NOT =   "9103"
                IF      SPA-GMN-CHKSYREC    =   "T"
                    MOVE    "F"                 TO  SPA-GMN-CHKSYREC
                ELSE
                    MOVE    "T"                 TO  SPA-GMN-CHKSYREC
                END-IF
+             END-IF
            END-EVALUATE
            .
       *
@@ -440,6 +460,9 @@
       *
            IF      FLG-OK              =   ZERO
                MOVE    "0001"              TO  SPA-ERRCD
+               IF      SPA-W01-KANRICD         =   "9103"
+                   MOVE    "0301"              TO  SPA-ERRCD
+               END-IF
                MOVE    1                   TO  SPA-GMN-CUR
            END-IF
       *
@@ -465,15 +488,24 @@
       *            １桁目と最終桁のチェック
                    IF     (SPA-GMN-FILE-DIR(1:1)   NOT =   "/" )
                        MOVE    "0002"          TO  SPA-ERRCD
+                       IF      SPA-W01-KANRICD         =   "9103"
+                           MOVE    "0302"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                    IF     (SPA-GMN-FILE-DIR(KANACHK-MAX:1)
                                                    =   "/" )
                     AND   (SPA-ERRCD               =   SPACE)
                        MOVE    "0003"          TO  SPA-ERRCD
+                       IF      SPA-W01-KANRICD         =   "9103"
+                           MOVE    "0303"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                ELSE
       *            半角以外はエラー
                    MOVE    "0004"          TO  SPA-ERRCD
+                   IF      SPA-W01-KANRICD         =   "9103"
+                       MOVE    "0304"              TO  SPA-ERRCD
+                   END-IF
                END-IF
       *
                IF      SPA-ERRCD           =   SPACE
@@ -507,6 +539,9 @@
                CALL    "orcfiledel"    USING   ORCSFDELAREA
            ELSE
                MOVE    "0005"          TO  SPA-ERRCD
+               IF      SPA-W01-KANRICD         =   "9103"
+                   MOVE    "0305"              TO  SPA-ERRCD
+               END-IF
            END-IF
            .
        41021-FILE-CHK-EXT.
@@ -560,7 +595,8 @@
       *    システム管理検索
            MOVE    SPACE               TO  SYSKANRI-REC
            INITIALIZE                      SYSKANRI-REC
-           MOVE    "9101"              TO  SYS-KANRICD
+      ***  MOVE    "9101"              TO  SYS-KANRICD
+           MOVE    SPA-W01-KANRICD     TO  SYS-KANRICD
            MOVE    "*"                 TO  SYS-KBNCD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
@@ -619,7 +655,8 @@
       *    システム管理検索
            MOVE    SPACE               TO  SYSKANRI-REC
            INITIALIZE                      SYSKANRI-REC
-           MOVE    "9101"              TO  SYS-KANRICD
+      *    MOVE    "9101"              TO  SYS-KANRICD
+           MOVE    SPA-W01-KANRICD     TO  SYS-KANRICD
            MOVE    "*"                 TO  SYS-KBNCD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
@@ -631,7 +668,8 @@
            ELSE
                MOVE    SPACE               TO  SYS-9101-REC
                INITIALIZE                      SYS-9101-REC
-               MOVE    "9101"              TO  SYS-9101-KANRICD
+      *        MOVE    "9101"              TO  SYS-9101-KANRICD
+               MOVE    SPA-W01-KANRICD     TO  SYS-9101-KANRICD
                MOVE    "*"                 TO  SYS-9101-KBNCD
            END-IF
       *
@@ -642,7 +680,11 @@
       *    連携基盤用データファイルデイレクトリ
            MOVE    SPA-GMN-FILE-DIR        TO  SYS-9101-FILE-DIR
       *    傷病名レコード記録
+           IF      SPA-W01-KANRICD         =   "9101"
+      *
            MOVE    SPA-GMN-CHKSYREC        TO  SYS-9101-SYREC
+      *
+           END-IF
       *
            MOVE    SYS-9101-REC            TO  SYSKANRI-REC
       *    ＤＢ更新処理
@@ -661,9 +703,13 @@
       *****************************************************************
        4801-KANRENCHK-SEC              SECTION.
       *
-           IF      SPA-GMN-COOPBASE    =   "1"
+      *****IF      SPA-GMN-COOPBASE    =   "1"
+           IF      SPA-GMN-COOPBASE    NOT =   "0"
                IF      SPA-GMN-FILE-DIR    =   SPACE
                    MOVE    "0010"          TO  SPA-ERRCD
+                   IF      SPA-W01-KANRICD         =   "9103"
+                       MOVE    "0310"              TO  SPA-ERRCD
+                   END-IF
                    MOVE    2               TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -772,6 +818,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-FILE-DIR    TO  W91-FILEDIR
            MOVE    SPA-GMN-CHKSYREC    TO  W91-CHKSYREC
+           IF      SPA-W01-KANRICD         =   "9101"
+               MOVE    WIDGET-NORMAL       TO  W91-CHKSYREC-STATE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE  TO  W91-CHKSYREC-STATE
+           END-IF
+      *
+           MOVE    SPA-GMN-LABEL1      TO  W91-LABEL1
+           MOVE    SPA-GMN-LABEL2      TO  W91-LABEL2
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -814,6 +868,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    2               TO  SPA-GMN-CUR
                WHEN    "FILEDIR"
                    MOVE    3               TO  SPA-GMN-CUR
+      *            処方せんは登録へ
+                   IF      SPA-W01-KANRICD     =   "9103"
+                       MOVE    90              TO  SPA-GMN-CUR
+                   END-IF
                WHEN    "CHKSYREC"
                    MOVE    90              TO  SPA-GMN-CUR
            END-EVALUATE
@@ -833,7 +891,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0001"
                    MOVE    "連携基盤用データ作成区分がありません"
                                        TO  SPA-ERRMSG
-               WHEN    "0002"
+              WHEN    "0002"
                    STRING  "連携基盤用ディレクトリの先頭は/から"
                            "指定して下さい。"
                                        DELIMITED  BY  SIZE
@@ -860,6 +918,38 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0010"
                    MOVE    "連携基盤用ディレクトリを入力して下さい"
                                        TO  SPA-ERRMSG
+      *
+               WHEN    "0301"
+                   MOVE    "処方せん連携用データ作成区分がありません"
+                                       TO  SPA-ERRMSG
+               WHEN    "0302"
+                   STRING  "処方せん連携用ディレクトリの先頭は/から"
+                           "指定して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0303"
+                   STRING  "処方せん連携用ディレクトリの末尾は/を"
+                           "省略して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0304"
+                   STRING  "処方せん連携用ディレクトリはすべて半角で"
+                           "入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0305"
+                   STRING  "処方せん連携用ディレクトリが存在しないか"
+                           "又は権限がありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0310"
+                   MOVE    "処方せん連携用ディレクトリを入力して下さい"
+                                       TO  SPA-ERRMSG
+      *
                WHEN    "9001"
                    MOVE    "登録処理に失敗しました"
                                        TO  SPA-ERRMSG

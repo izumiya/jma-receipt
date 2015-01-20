@@ -20,9 +20,9 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 診療行為
-      *  コンポーネント名  : 処方箋　印刷（Ａ５）（用紙Ａ４）
+      *  コンポーネント名  : 処方箋　印刷（Ａ５）
       *                      平成２４年４月から使用
-      *                      （ORCHC02V02のCOPY)
+      *                      （ORCHC02QV02 の QR印刷を削除）
       *  管理者            : 
       *  作成日付    作業者        記述
       *  12/03/01    NACL−多々納  新規作成
@@ -77,11 +77,13 @@
       * 04.06.00     NACL-多々納  12/03/01  Ｈ２４年４月改正対応
       * 04.06.00     NACL-多々納  12/04/10  一般名１００文字対応
       *                                     含量規格変更不可等の対応
-      * 04.07.00     NACL-多々納  13/10/08  第三者行為対応
+      * 04.06.00     NACL-多々納  12/09/27  医師コード等編集対応
+      * 04.07.00     NACL-多々納  14/01/08  第三者行為対応
       * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       * 04.07.00     NACL-多々納  14/09/XX  外用薬（臨時投薬）対応
       * 04.07.00     NACL-多々納  14/10/07  頓服薬（臨時投薬）対応
       * 04.07.00     NACL-多々納  14/10/20  公費備考編集個別対応
+      * 04.07.00     NACL-多々納  15/01/19  ＣＳＶデータ出力対応
       *****************************************************************
       *
       *
@@ -181,6 +183,8 @@
       *H24.4
            03  FLG-FUKACHK             PIC 9(01).
            03  FLG-FUKACHK2            PIC 9(01).
+      *    点数マスタなし
+           03  FLG-QRCHK               PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -376,6 +380,11 @@
            03  WRK-SYS-TIME            PIC 9(08).
       *
            03  WRK-BIKOU-FTN           PIC X(01).
+      *H24.6
+      *ＱＲのみページ対応
+           03  WRK-QRPAGE              PIC 9(03).
+           03  WRK-QRYOBI              PIC 9(03).
+           03  WRK-IDXMAX              PIC 9(03).
       *
       *    剤毎の内容
        01  WRK-NAIYOU-AREA.
@@ -523,6 +532,11 @@
            03  PARA-ALLERGY            PIC X(01).
            03  PARA-KANSENSYO          PIC X(01).
            03  PARA-COMMENT            PIC X(01).
+      *H24.9
+      *    ＱＲ医師コード
+      *    03  PARA-QR-DRCD             PIC X(01).
+      *    ＱＲ患者番号
+      *    03  PARA-QR-PTNUM            PIC X(01).
       *H26.10
       *    公費備考編集
            03  PARA-KOHNUM-G.
@@ -665,6 +679,11 @@
       *    プログラムオプション編集パラメタ
            COPY    "CPORCSPRGOPTION.INC".
       *
+      *H26.12
+      *    ＱＲデータ作成サブパラメタ
+           COPY    "CPORCSQRCSV.INC"   REPLACING
+                                  //ORCSQRCSV// BY //OUT-ORCSQRCSV//.
+      *
            COPY    "MCPDATA.INC".
       *
            COPY    "MCPAREA".
@@ -763,7 +782,15 @@
            MOVE    "COMMENT"           TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-COMMENT
-      *
+      *H24.9
+      *    ＱＲ医師コード
+      *    MOVE    "QRDRCD"            TO  WRK-PARA-NAME
+      *    PERFORM 1001-OPTION-CALL-SEC
+      *    MOVE    WRK-PARA(1:1)       TO  PARA-QR-DRCD
+      *    ＱＲ患者番号
+      *    MOVE    "QRPTNUM"           TO  WRK-PARA-NAME
+      *    PERFORM 1001-OPTION-CALL-SEC
+      *    MOVE    WRK-PARA(1:1)       TO  PARA-QR-PTNUM
       *H24.10
       *    公費備考編集
            PERFORM VARYING     IDP     FROM    1   BY  1
@@ -903,26 +930,59 @@
                PERFORM 2003-MAYAKU-HEN-SEC
            END-IF
       *ＱＲ対応
+           INITIALIZE                  OUT-ORCSQRCSVAREA
       *    ＱＲデータ出力処理（日数ゼロは対象外）
-      *    IF      (ORCHC19-KBN        =   SPACE
-      *                                OR  "3"
-      *                                OR  "4"
-      *                                OR  "5"
-      *                                OR  "A"
+           IF      (ORCHC19-KBN        =   SPACE
+                                       OR  "3"
+                                       OR  "4"
+                                       OR  "5"
+                                       OR  "A"
       *---(04.03.00) LINE ADD START ------------------------------------
-      *                                OR  "N"   )
+                                       OR  "N"   )
       *---(04.03.00) LINE ADD END   ------------------------------------
-      *        AND (IDX-QR1            >   ZERO  )
+               AND (IDX-QR1            >   ZERO  )
+      *H27.1
+      *CSV用
+               MOVE    ORCSQRCSVAREA       TO  OUT-ORCSQRCSVAREA
+      *
       *        医師・交付日未設定は作成なし
       *        IF      (WRK-DRCD           =   SPACE )
       *            OR  (WRK-DRNAME         =   SPACE )
       *            OR  (WRK-KOFYMD         =   SPACE )
+      *H25.4
+      *            点数マスタなし
+      *            OR  (FLG-QRCHK          =   1     )
       *            INITIALIZE                  ORCSQRCSVAREA
       *        ELSE
       *            PERFORM 600-QRDATA-SYORI-SEC
+      ******** END-IF
+      *
+           END-IF
+           MOVE    ZERO                TO  WRK-FILE-CNT
+      *
+      *H24.6
+      *    ＱＲ件数と印刷枚数の判定
+      *    IF      ORCSQRCSV-RET-COUNT     >   ZERO
+      *        DIVIDE  3   INTO    ORCSQRCSV-RET-COUNT
+      *                    GIVING  WRK-QRPAGE
+      *                    REMAINDER  WRK-QRYOBI
+      *        IF      WRK-QRYOBI          >   ZERO
+      *            COMPUTE WRK-QRPAGE      =   WRK-QRPAGE  +  1
       *        END-IF
-      *    END-IF
-      **** MOVE    ZERO                TO  WRK-FILE-CNT
+      *        ＱＲのみのページ作成
+      *        IF      WRK-QRPAGE          >   WRK-PAGE-MAX
+      *            MOVE    WRK-IDXMAX          TO  IDX
+      *            MOVE    SPACE               TO  WRK-NAIYOU
+      *                                            (WRK-PAGE-MAX IDX)
+      *            MOVE    "次ページへ続く"    TO  WRK-NAIYOU
+      *                                            (WRK-PAGE-MAX IDX)
+      *                                                         (50:)
+      *            COMPUTE WRK-PAGE-MAX    =   WRK-PAGE-MAX   +   1
+      *            MOVE    "　　　　　　以下余白"
+      *                                TO  WRK-NAIYOU (WRK-PAGE-MAX 2)
+      *        END-IF
+      *****END-IF
+      *H24.6
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-PAGE-MAX
@@ -937,6 +997,21 @@
                PERFORM 400-PRINT-SEC
            END-PERFORM
       *
+      *H27.1
+      *    CSV出力
+      *    院外の請求確認・中途・退院時処方せんのみ
+           IF      (ORCHC19-KBN        =   SPACE
+                                       OR  "4"
+                                       OR  "N"   )
+      *        交付日未設定は作成なし
+               IF      (WRK-KOFYMD         =   SPACE )
+      *            点数マスタなし
+                   OR  (FLG-QRCHK          =   1     )
+                   CONTINUE
+               ELSE
+                   PERFORM 610-CSVDATA-SYORI-SEC
+               END-IF
+           END-IF
            .
        400-PRINT-SYORI-EXT.
            EXIT.
@@ -1313,7 +1388,6 @@
                                             TO  WRK-JKYSNO
                MOVE    KANACHK-MAX          TO  WRK-JKYSNO-MAX
            END-IF
-      *
       *ver.4.7
            IF      COMB-KOH1HKNNUM     =   "970"
       *        第三者行為は備考へ
@@ -1926,6 +2000,34 @@
        30011-USER-HENSYU-EXT.
            EXIT.
       *
+      *****************************************************************
+      *        ＱＲイメージ編集処理
+      *****************************************************************
+      *2003-QRIMAGE-HEN-SEC      SECTION.
+      *
+      *    PERFORM VARYING     IDQ     FROM    1  BY  1
+      *            UNTIL       IDQ     >   3
+      *        MOVE    KUHAKU-FILE-NAME    TO  HCM19-QR (IDQ)
+      *        ADD     1                   TO  WRK-FILE-CNT
+      *        IF      WRK-FILE-CNT        <=  ORCSQRCSV-RET-COUNT 
+      *            MOVE    SPA-HOSPNUM         TO  QR-FILE-HOSPNUM
+      *            MOVE    "HC2Q"              TO  QR-FILE-FORM-ID
+      *            MOVE    SPA-TERMID          TO  QR-FILE-TERMID
+      *            MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
+      *            MOVE    WRK-FILE-CNT        TO  QR-FILE-ID
+      *            ファイル存在チェック
+      *            INITIALIZE                      ORCSFILECHKAREA
+      *            MOVE    QR-FILE-NAME        TO  FILECHK-NAME
+      *            CALL    "ORCSFILECHK"       USING
+      *                                        ORCSFILECHKAREA
+      *            IF      FILECHK-RC          =   ZERO OR 2
+      *                MOVE   QR-FILE-NAME     TO  HCM19-QR (IDQ)
+      *            END-IF
+      *        END-IF
+      *    END-PERFORM
+      *    .
+      *2003-QRIMAGE-HEN-EXT.
+      *    EXIT.
       *
       *****************************************************************
       *    初期編集処理
@@ -2270,11 +2372,11 @@
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  IDX-Z
            MOVE    ZERO                TO  FLG-MAYAKU
+           MOVE    ZERO                TO  FLG-KOUHATUFUKA-IN
       *    MOVE    ZERO                TO  FLG-KOUHATU-HEN
       *    MOVE    ZERO                TO  FLG-KOUHATU-CHK
       *    MOVE    ZERO                TO  FLG-KOUHATU-1-CHK
       *---(04.02.00) LINE ADD START ------------------------------------
-           MOVE    ZERO                TO  FLG-KOUHATUFUKA-IN
       *    MOVE    ZERO                TO  FLG-KOUHATUFUKA-ARI
       *    MOVE    ZERO                TO  FLG-KOUHATU-ARI
       *---(04.02.00) LINE ADD END   ------------------------------------
@@ -2284,6 +2386,7 @@
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
            MOVE    ZERO                TO  IDX-QRB
+           MOVE    ZERO                TO  FLG-QRCHK
       *    時間
            ADD     1                   TO  WRK-FILE-CNT2
            COMPUTE WRK-SYS-TIME        =   SYS-TIME
@@ -2379,11 +2482,15 @@
                       (IDX             =   LINE-MAX  )
                    MOVE    "　　　　　　以下余白"
                                        TO  WRK-NAIYOU (WRK-PAGE-MAX IDX)
+      *H24.6
+                   MOVE    IDX         TO  WRK-IDXMAX
                END-IF
                ADD     1               TO  IDX
                IF      IDX             <=  LINE-MAX
                    MOVE    "　　　　　　以下余白"
                                        TO  WRK-NAIYOU (WRK-PAGE-MAX IDX)
+      *H24.6
+                   MOVE    IDX         TO  WRK-IDXMAX
                END-IF
                MOVE    1               TO  FLG-PRINT
            END-IF
@@ -2687,7 +2794,7 @@
       *           外用臨時投薬
                   OR  (WRK-SRYSYUKBN       =   "293"  )
                   OR  (WRK-SRYSYUKBN       =   "296"  ))
-                  IF     (FLG-SYOHO-IN        =   2    )
+                   IF     (FLG-SYOHO-IN        =   2    )
       *                剤点数ゼロで院内処方印刷
                        IF     (ACCT-ZAITEN         =   ZERO )
                            MOVE    1               TO  FLG-TAIGAI
@@ -2866,6 +2973,11 @@
                END-IF
       *        コード毎の編集
                PERFORM 31032-TENSU-HENSYU-SEC
+      *H24.4
+               IF      FLG-FUKACHK         =   2
+      *            後発品変更不可自動ＱＲ追加対応
+                   PERFORM 31039-QR-KOUHATU-SEC
+               END-IF
            END-IF
            .
        3103-SRYACT-HEN-EXT.
@@ -3079,6 +3191,7 @@
            .
        310391-FUKACHK-EXT.
            EXIT.
+      *
       *****************************************************************
       *    後発医薬品へ変更不可編集処理
       *****************************************************************
@@ -3173,8 +3286,8 @@
       *
       *        システム管理の後発品変更不可の判定
                IF      FLG-FUKACHK         =   2
-      ***          先発品のみは、変更不可記載なし
-      ***          IF     (TNS-KOUHATUKBN      =   ZERO )
+      *****        先発品のみは、変更不可記載なし
+      *****        IF     (TNS-KOUHATUKBN      =   ZERO )
       *            先発品も変更不可とする
                    IF     (TNSP-IPN-KISAIKBN   =   1    )
                      OR   (TNSP-IPN-KISAIKBN   =   3    )
@@ -3191,7 +3304,7 @@
       *
       *        一般名・処方名称記載
                MOVE    TNS-NAME            TO  WRK-TNS-NAME-G
-               IF      TNSP-IPN-KISAIKBN   =   ZERO
+               IF      TNSP-IPN-KISAIKBN   =   ZERO 
                    MOVE    1                   TO  WRK-KANZANCHI
                    MOVE    WRK-TNS-NAME-G      TO  WRK-QR-NAME
                ELSE
@@ -3199,7 +3312,7 @@
                    MOVE    WRK-TNS-NAME-G      TO  WRK-QR-NAME
                END-IF
       *        ＧＥ付き表示の時、表示
-               MOVE    WRK-TNS-NAME-G      TO  WRK-TNS-NAME
+               MOVE    WRK-TNS-NAME-G          TO  WRK-TNS-NAME
                IF      SYS-1030-SYOHOGEPRTFLG  =   1
                    IF     (TNS-SYUSAISKB       =   8   )  AND
                           (TNS-SYOMEIKANREN    NOT =   SPACE AND
@@ -3213,7 +3326,7 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
                    IF     (TNS-KOUHATUKBN          =   1
-                                                   OR  7   )
+                                                   OR  7    )
       *H24.4         一般名記載以外
                      AND  (TNSP-IPN-KISAIKBN       =   ZERO
                                                    OR  2     )
@@ -3424,6 +3537,10 @@
            ELSE
                IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"   )
                  AND  (TNSP-IPN-KISAIKBN           =   ZERO  )
+      *H26.12
+      *            CSV用　薬剤名称
+                   MOVE    WRK-QR-NAME     TO  ORCSQRCSV-CSV-NAME
+                                                  (IDX-QR1 IDX-QR2)
                    CONTINUE
                ELSE
                    MOVE    WRK-QR-NAME     TO  ORCSQRCSV-TNS-NAME
@@ -3432,6 +3549,7 @@
            END-IF
            MOVE    WRK-SURYO2          TO  ORCSQRCSV-SURYOU
                                                   (IDX-QR1 IDX-QR2)
+      *
            MOVE    TNS-TANINAME        TO  ORCSQRCSV-TANINAME
                                                   (IDX-QR1 IDX-QR2)
            MOVE    TNS-YKZKBN          TO  ORCSQRCSV-YKZKBN
@@ -3446,11 +3564,15 @@
            END-IF
       *H24.4
       *    一般名コード
-           STRING  TNS-YAKKAKJNCD(1:9)
-                   "ZZZ"               DELIMITED  BY  SIZE
-                                       INTO    ORCSQRCSV-YAKKAKJNCD
+      *    STRING  TNS-YAKKAKJNCD(1:9)
+      *            "ZZZ"               DELIMITED  BY  SIZE
+      *                                INTO    ORCSQRCSV-YAKKAKJNCD
+      *                                           (IDX-QR1 IDX-QR2)
+      *    END-STRING
+      *H24.8
+      *    薬価基準コード
+           MOVE    TNS-YAKKAKJNCD      TO  ORCSQRCSV-YAKKAKJNCD
                                                   (IDX-QR1 IDX-QR2)
-           END-STRING
       *    単位換算値
            IF      TNSP-IPN-KISAIKBN   =   ZERO
                CONTINUE
@@ -3548,7 +3670,7 @@
            MOVE    KANACHK-MAX         TO  WRK-M-KETA
       *
            IF     (WRK-SRYCD(1:1)      =   "6"  OR  "7" )  OR
-                  (WRK-SRYCD(1:3)      =   "059"  )
+                  (WRK-SRYCD(1:3)      =   "059"        )
       *        薬剤・器材編集
                PERFORM 310311-MEISYOU-HEN2-SEC
            ELSE
@@ -3643,7 +3765,7 @@
                IF      WRK-SRY-SRYCD (IDXA)    =   "099209902"
                                                OR  "099209904"
                    CONTINUE
-      ***          IF      WRK-SRY-SRYCD (IDXA)    =   "099209902"
+      ****         IF      WRK-SRY-SRYCD (IDXA)    =   "099209902"
       *                後発医薬品への変更
       *                MOVE    1               TO  FLG-KOUHATU-HEN
       *            ELSE
@@ -3715,6 +3837,7 @@
            END-IF
            COMPUTE WRK-SURYO2          =   WRK-KANZANCHI
                                        *   WRK-SURYO
+      *
            MOVE    SPACE               TO  WRK-SURYO-X
            IF      WRK-SURYO2-S2(4:2)  =   ZERO
       *        小数点３桁まで
@@ -3799,6 +3922,7 @@
            .
        100112-SURYO-HEN05-EXT.
            EXIT.
+      *
       *---(03.04.00) LINE ADD END   ------------------------------------
       *****************************************************************
       *    患者コメントから編集する
@@ -4327,6 +4451,34 @@
       *    医師情報
            MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV-DR-KANANAME
            MOVE    SYS-1010-NAME       TO  ORCSQRCSV-DR-NAME
+      *H24.9
+      *    ＱＲ医師コード
+      *    IF      PARA-QR-DRCD        =   "1"
+      *        医籍登録番号
+      *        MOVE    WRK-DRCD(2:4)       TO  ORCSQRCSV-DR-CD
+      *    END-IF
+      *    ＱＲ患者番号
+      *    IF      PARA-QR-PTNUM       =   "1"
+      *        患者番号（１５桁）
+      *        MOVE    SPA-PTNUM(1:15)     TO  ORCSQRCSV-PTNUM
+      *    END-IF
+      *    ＱＲ麻薬施用コード
+           IF      FLG-MAYAKU          =   1
+      *        麻薬ライセンス
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+               IF     (KANACHK-RC          =   ZERO )
+                 AND  (KANACHK-SYUBETU     =   1    )
+      *                半角のみ対象
+                   MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  ORCSQRCSV-MAYAKULICENSE
+               END-IF
+           END-IF
+      *
       *    患者情報
            MOVE    PTINF-NAME          TO  ORCSQRCSV-NAME
            MOVE    PTINF-KANANAME      TO  ORCSQRCSV-KANANAME
@@ -4375,6 +4527,26 @@
                                    AND <=  "899"
                    MOVE    1               TO  FLG-KOHERR
                END-IF
+           END-IF
+      *ver.4.7
+           IF      COMB-KOHHKNNUM (IDX-K)  =   "970"
+      *        第三者行為は対象外
+               MOVE    1               TO  FLG-KOHERR
+           END-IF
+      *
+      *H26.10
+      *    公費個別判定
+           IF     (FLG-KOHERR          =   ZERO )
+             AND  (PARA-KOHNUM-G   NOT =   SPACE)
+               PERFORM VARYING     IDP     FROM    1   BY  1
+                       UNTIL       IDP     >   5
+                   IF     (PARA-KOHNUM (IDP)   NOT =   SPACE  )
+                     AND  (PARA-KOHNUM (IDP)       =   COMB-KOHHKNNUM
+                                                           (IDX-K))
+                       MOVE    1                   TO  FLG-KOHERR
+                       MOVE    5                   TO  IDP
+                   END-IF
+               END-PERFORM
            END-IF
       *
            IF      FLG-KOHERR          =   ZERO
@@ -4482,6 +4654,101 @@
            END-IF
            .
        6002-QRBIKOU-HENSYU-EXT.
+           EXIT.
+      *H27.1
+      *****************************************************************
+      *    ＣＳＶデータ出力処理
+      *****************************************************************
+        610-CSVDATA-SYORI-SEC           SECTION.
+      *
+           MOVE    OUT-ORCSQRCSVAREA   TO  ORCSQRCSVAREA
+      *
+      *    県番号
+           MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV-PREFNUM
+      *    医療機関コード
+           MOVE    SYS-1001-HOSPCD     TO  ORCSQRCSV-HOSPCD
+      *    医療機関種別
+           MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV-HOSPSBT
+      *    医療機関名称
+           STRING  WRK-HOSPNAME1
+                   WRK-HOSPNAME2       DELIMITED  BY  SPACE
+                                       INTO    ORCSQRCSV-HOSPNAME
+           END-STRING
+      *    医療機関住所名称
+           STRING  WRK-HOSPADRS1
+                   WRK-HOSPADRS2       DELIMITED  BY SPACE
+                                       INTO    ORCSQRCSV-HOSPADRS
+           END-STRING
+      *    医療機関郵便番号
+           IF      SYS-1002-POST       NUMERIC
+               MOVE    SYS-1002-POST(1:3)  TO  ORCSQRCSV-HOSPPOST(1:3)
+               MOVE    "-"                 TO  ORCSQRCSV-HOSPPOST(4:1)
+               MOVE    SYS-1002-POST(4:4)  TO  ORCSQRCSV-HOSPPOST(5:4)
+           END-IF
+      *    医療機関電話
+           MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
+      *    診療科
+           MOVE    SYS-1005-RECESRYKA  TO  ORCSQRCSV-RECESRYKA
+           MOVE    SYS-1005-SRYKANAME  TO  ORCSQRCSV-SRYKANAME
+      *    医師情報
+           MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV-DR-KANANAME
+           MOVE    SYS-1010-NAME       TO  ORCSQRCSV-DR-NAME
+      *
+      *    ドクターコード
+           MOVE    WRK-DRCD(2:4)       TO  ORCSQRCSV-DR-CD
+      *    患者番号（１５桁）
+           MOVE    SPA-PTNUM(1:15)     TO  ORCSQRCSV-PTNUM
+      *    ＱＲ麻薬施用コード
+           IF      FLG-MAYAKU          =   1
+      *        麻薬ライセンス
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+               IF     (KANACHK-RC          =   ZERO )
+                 AND  (KANACHK-SYUBETU     =   1    )
+      *                半角のみ対象
+                   MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  ORCSQRCSV-MAYAKULICENSE
+               END-IF
+           END-IF
+      *
+      *    患者情報
+           MOVE    PTINF-NAME          TO  ORCSQRCSV-NAME
+           MOVE    PTINF-KANANAME      TO  ORCSQRCSV-KANANAME
+           MOVE    PTINF-SEX           TO  ORCSQRCSV-SEX
+           MOVE    PTINF-BIRTHDAY      TO  ORCSQRCSV-BIRTHDAY
+           STRING  PTINF-HOME-ADRS     DELIMITED   BY  SPACE
+                   PTINF-HOME-BANTI    DELIMITED   BY  SPACE
+                                       INTO    ORCSQRCSV-ADRS
+           END-STRING
+           MOVE    PTINF-HOME-TEL1     TO  ORCSQRCSV-TEL
+      *    患者保険情報
+           MOVE    WRK-HKNCOMBINUM     TO  ORCSQRCSV-HKNCOMBINUM 
+      *    対象公費編集
+           MOVE    ZERO                TO  IDX-K2
+           PERFORM VARYING    IDX-K    FROM    1   BY  1
+                   UNTIL     (IDX-K    >   4   )
+                         OR  (COMB-KOHID (IDX-K)   =   ZERO )
+               PERFORM 6001-QRKOH-HENSYU-SEC
+           END-PERFORM
+      *    備考編集
+           PERFORM 6002-QRBIKOU-HENSYU-SEC
+      *    麻毒フラグ
+           MOVE    FLG-MAYAKU          TO  ORCSQRCSV-MAYAKU
+      *    一部負担割合備考
+           MOVE    WRK-BIKOU-FTN       TO  ORCSQRCSV-BIKO-FTN
+      *    ファイル名組み立て項目
+           MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
+      *
+           CALL    "ORCSQRCSVOUT"      USING
+                                       SPA-AREA
+                                       ORCSQRCSVAREA
+      *
+           .
+       610-CSVDATA-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    医療機関編集情報処理
@@ -4790,6 +5057,11 @@
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *H25.4
+           IF      FLG-TENSU           =   1
+      *        QR出力なし
+               MOVE    1                   TO  FLG-QRCHK
+           END-IF
       *
       *---(03.04.00) LINE ADD START ------------------------------------
       *    点数附加情報検索

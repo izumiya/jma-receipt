@@ -17,6 +17,13 @@ W91	{
 		};
 		CHKSYREC	{
 			value	bool;
+			state int;
+		};
+		LABEL1	{
+			value	varchar(50);
+		};
+		LABEL2	{
+			value	varchar(50);
 		};
 	};
 };
