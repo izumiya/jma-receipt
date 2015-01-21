@@ -86,7 +86,6 @@
       * 04.07.00     NACL-多々納  14/09/XX  外用薬（臨時投薬）対応
       * 04.07.00     NACL-多々納  14/10/07  頓服薬（臨時投薬）対応
       * 04.07.00     NACL-多々納  14/10/20  公費備考編集個別対応
-      * 04.07.00     NACL-多々納  15/01/19  ＣＳＶデータ出力対応
       *****************************************************************
       *
       *
@@ -967,23 +966,20 @@
            IF      FLG-MAYAKU          =   1
                PERFORM 2003-MAYAKU-HEN-SEC
            END-IF
-      *ＱＲ対応
-           INITIALIZE                  OUT-ORCSQRCSVAREA
-      *    ＱＲデータ出力処理（日数ゼロは対象外）
-           IF      (ORCHC19-KBN        =   SPACE
-                                       OR  "3"
-                                       OR  "4"
-                                       OR  "5"
-                                       OR  "A"
-      *---(04.03.00) LINE ADD START ------------------------------------
-                                       OR  "N"   )
-      *---(04.03.00) LINE ADD END   ------------------------------------
-               AND (IDX-QR1            >   ZERO  )
-      *H27.1
-      *CSV用
-               MOVE    ORCSQRCSVAREA       TO  OUT-ORCSQRCSVAREA
       *
-      *******  医師・交付日未設定は作成なし
+      *ＱＲ対応
+      *    ＱＲデータ出力処理（日数ゼロは対象外）
+      *    IF      (ORCHC19-KBN        =   SPACE
+      *                                OR  "3"
+      *                                OR  "4"
+      *                                OR  "5"
+      *                                OR  "A"
+      *---(04.03.00) LINE ADD START ------------------------------------
+      *                                OR  "N"   )
+      *---(04.03.00) LINE ADD END   ------------------------------------
+      *        AND (IDX-QR1            >   ZERO  )
+      *
+      *        医師・交付日未設定は作成なし
       *        IF      (WRK-DRCD           =   SPACE )
       *            OR  (WRK-DRNAME         =   SPACE )
       *            OR  (WRK-KOFYMD         =   SPACE )
@@ -993,8 +989,9 @@
       *            INITIALIZE                  ORCSQRCSVAREA
       *        ELSE
       *            PERFORM 600-QRDATA-SYORI-SEC
-      ******** END-IF
-           END-IF
+      *        END-IF
+      *
+      *****END-IF
            MOVE    ZERO                TO  WRK-FILE-CNT
       *
       *H24.6
@@ -1033,21 +1030,6 @@
       *        帳票印刷処理
                PERFORM 400-PRINT-SEC
            END-PERFORM
-      *H27.1
-      *    CSV出力
-      *    院外の請求確認・中途・退院時処方せんのみ
-           IF      (ORCHC19-KBN        =   SPACE
-                                       OR  "4"
-                                       OR  "N"   )
-      *        交付日未設定は作成なし
-               IF      (WRK-KOFYMD         =   SPACE )
-      *            点数マスタなし
-                   OR  (FLG-QRCHK          =   1     )
-                   CONTINUE
-               ELSE
-                   PERFORM 610-CSVDATA-SYORI-SEC
-               END-IF
-           END-IF
       *
            .
        400-PRINT-SYORI-EXT.
@@ -4781,101 +4763,6 @@
            END-IF
            .
        6002-QRBIKOU-HENSYU-EXT.
-           EXIT.
-      *H27.1
-      *****************************************************************
-      *    ＣＳＶデータ出力処理
-      *****************************************************************
-        610-CSVDATA-SYORI-SEC           SECTION.
-      *
-           MOVE    OUT-ORCSQRCSVAREA   TO  ORCSQRCSVAREA
-      *
-      *    県番号
-           MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV-PREFNUM
-      *    医療機関コード
-           MOVE    SYS-1001-HOSPCD     TO  ORCSQRCSV-HOSPCD
-      *    医療機関種別
-           MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV-HOSPSBT
-      *    医療機関名称
-           STRING  WRK-HOSPNAME1
-                   WRK-HOSPNAME2       DELIMITED  BY  SPACE
-                                       INTO    ORCSQRCSV-HOSPNAME
-           END-STRING
-      *    医療機関住所名称
-           STRING  WRK-HOSPADRS1
-                   WRK-HOSPADRS2       DELIMITED  BY SPACE
-                                       INTO    ORCSQRCSV-HOSPADRS
-           END-STRING
-      *    医療機関郵便番号
-           IF      SYS-1002-POST       NUMERIC
-               MOVE    SYS-1002-POST(1:3)  TO  ORCSQRCSV-HOSPPOST(1:3)
-               MOVE    "-"                 TO  ORCSQRCSV-HOSPPOST(4:1)
-               MOVE    SYS-1002-POST(4:4)  TO  ORCSQRCSV-HOSPPOST(5:4)
-           END-IF
-      *    医療機関電話
-           MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
-      *    診療科
-           MOVE    SYS-1005-RECESRYKA  TO  ORCSQRCSV-RECESRYKA
-           MOVE    SYS-1005-SRYKANAME  TO  ORCSQRCSV-SRYKANAME
-      *    医師情報
-           MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV-DR-KANANAME
-           MOVE    SYS-1010-NAME       TO  ORCSQRCSV-DR-NAME
-      *
-      *    ドクターコード
-           MOVE    WRK-DRCD(2:4)       TO  ORCSQRCSV-DR-CD
-      *    患者番号（１５桁）
-           MOVE    SPA-PTNUM(1:15)     TO  ORCSQRCSV-PTNUM
-      *    ＱＲ麻薬施用コード
-           IF      FLG-MAYAKU          =   1
-      *        麻薬ライセンス
-               INITIALIZE                  ORCSKANACHKAREA
-               MOVE    "1"                 TO  KANACHK-SYORI
-               MOVE    SYS-1010-MAYAKULICENSE(1:15)
-                                           TO  KANACHK-MAE-INPUT
-               CALL    "ORCSKANACHK"       USING
-                                           ORCSKANACHKAREA
-               IF     (KANACHK-RC          =   ZERO )
-                 AND  (KANACHK-SYUBETU     =   1    )
-      *                半角のみ対象
-                   MOVE    SYS-1010-MAYAKULICENSE(1:15)
-                                           TO  ORCSQRCSV-MAYAKULICENSE
-               END-IF
-           END-IF
-      *
-      *    患者情報
-           MOVE    PTINF-NAME          TO  ORCSQRCSV-NAME
-           MOVE    PTINF-KANANAME      TO  ORCSQRCSV-KANANAME
-           MOVE    PTINF-SEX           TO  ORCSQRCSV-SEX
-           MOVE    PTINF-BIRTHDAY      TO  ORCSQRCSV-BIRTHDAY
-           STRING  PTINF-HOME-ADRS     DELIMITED   BY  SPACE
-                   PTINF-HOME-BANTI    DELIMITED   BY  SPACE
-                                       INTO    ORCSQRCSV-ADRS
-           END-STRING
-           MOVE    PTINF-HOME-TEL1     TO  ORCSQRCSV-TEL
-      *    患者保険情報
-           MOVE    WRK-HKNCOMBINUM     TO  ORCSQRCSV-HKNCOMBINUM 
-      *    対象公費編集
-           MOVE    ZERO                TO  IDX-K2
-           PERFORM VARYING    IDX-K    FROM    1   BY  1
-                   UNTIL     (IDX-K    >   4   )
-                         OR  (COMB-KOHID (IDX-K)   =   ZERO )
-               PERFORM 6001-QRKOH-HENSYU-SEC
-           END-PERFORM
-      *    備考編集
-           PERFORM 6002-QRBIKOU-HENSYU-SEC
-      *    麻毒フラグ
-           MOVE    FLG-MAYAKU          TO  ORCSQRCSV-MAYAKU
-      *    一部負担割合備考
-           MOVE    WRK-BIKOU-FTN       TO  ORCSQRCSV-BIKO-FTN
-      *    ファイル名組み立て項目
-           MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
-      *
-           CALL    "ORCSQRCSVOUT"      USING
-                                       SPA-AREA
-                                       ORCSQRCSVAREA
-      *
-           .
-       610-CSVDATA-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    医療機関編集情報処理
