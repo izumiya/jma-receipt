@@ -670,6 +670,7 @@
       *  04.07.39    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *  04.07.40    NACL-ÌçÏÆ    15/01/13  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.41    NACL-ÌçÏÆ    15/01/21  ÆñÉÂÊ£¿ôÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -942,6 +943,7 @@
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  IDY3                                    PIC 9(03).
+           03  IDY4                                    PIC 9(03).
            03  IDZ                                     PIC 9(03).
            03  IDW                                     PIC 9(03).
            03  IDW2                                    PIC 9(03).
@@ -1426,6 +1428,11 @@
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
                05  TBL-HKNFTNDATA-JGNXXX               PIC  9(07).
+      *
+       01  TBL-CYOFUKU-KOH.
+           03  TBL-CYOFUKU-KOH-OCC                     OCCURS   4.
+               05  TBL-CYOFUKU-KOHNUM                  PIC  X(03).
+               05  TBL-CYOFUKU-KOHID                   PIC  9(10).
       *
        01  TBL-PTTOKKI.
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
@@ -16739,7 +16746,7 @@
                      IF  TBL-HKNFTNDATA-ZAN(IDY2) NOT =  ZERO
                        PERFORM  2104G-JGNCHK-HENSYU2-SEC
                        IF  TBL-HKNFTNDATA-ZAN(IDY2)  >
-                               TBL-HKNFTNDATA-NYUIN(IDY2)
+                               TBL-HKNFTNDATA-NYUSKJ(IDY2)
                          COMPUTE  WRK-HKNFTNDATA-RUI          =
                                   TBL-HKNFTNDATA-TAF(IDY2)    +
                                   TBL-HKNFTNDATA-GAIRAI(IDY2) +
@@ -16747,9 +16754,15 @@
                          IF   TBL-HKNFTNDATA-JGN(IDY2) =
                                               WRK-HKNFTNDATA-RUI
                            MOVE 1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                           MOVE ZERO TO  TBL-HKNFTNDATA-ZAN(IDY2)
+                         ELSE
+                           COMPUTE  TBL-HKNFTNDATA-ZAN(IDY2) =
+                                    TBL-HKNFTNDATA-ZAN(IDY2) -
+                                    TBL-HKNFTNDATA-NYUSKJ(IDY2)
                          END-IF
                        ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                         MOVE   ZERO TO  TBL-HKNFTNDATA-ZAN(IDY2)
                        END-IF
                      ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
@@ -16776,6 +16789,45 @@
                    DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
                    DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
+             END-PERFORM
+      *
+      *      Ê£¿ô¤Î¸øÈñÅÐÏ¿¤¬Í­¤ë¾ì¹ç
+             PERFORM   VARYING  IDY2    FROM    1   BY   1
+                        UNTIL   IDY2      >     4
+               IF  ( RECE62-KOHNUM(IDY2) = "051" OR "038" )
+               OR  ((RECE62-KOHNUM(IDY2) = "052"         ) AND
+                    (RECE62-SRYYM       <= "201412"      ))
+               OR  ((RECE62-KOHNUM(IDY2) = "054"         ) AND
+                    (RECE62-SRYYM       >= "201501"      ))
+                 IF   (TBL-HKNFTNDATA-JGN(IDY2)  NOT =  ZERO)
+                 AND  (TBL-HKNFTNDATA-ZAN(IDY2)  NOT =  ZERO)
+                 AND  (TBL-HKNFTNDATA-FLG(IDY2)      =  ZERO)
+                   MOVE   ZERO   TO  WRK-HKNFTNDATA-RUI
+                   PERFORM   VARYING  IDY3    FROM    1   BY   1
+                              UNTIL   IDY3      >     4
+                     IF  (IDY2  NOT = IDY3                         )
+                     AND (RECE62-KOHNUM(IDY2) = RECE62-KOHNUM(IDY3))
+                       ADD   TBL-HKNFTNDATA-GAIRAI(IDY3)  TO
+                                               WRK-HKNFTNDATA-RUI
+                       ADD   TBL-HKNFTNDATA-NYUSKJ(IDY3)  TO
+                                               WRK-HKNFTNDATA-RUI
+                     END-IF
+                   END-PERFORM
+      *
+                   IF    TBL-HKNFTNDATA-ZAN(IDY2) <= WRK-HKNFTNDATA-RUI
+                        MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                   ELSE
+                    IF  ( RECE62-KOHNUM(IDY2) = "038"          )
+                    OR  ((RECE62-KOHNUM(IDY2) = "052" OR "054") AND
+                         (RECE62-SRYYM       >= "201501"      ))
+                      PERFORM  2104I-CYOFUKU-KOH-HENSYU-SEC
+                      IF TBL-HKNFTNDATA-ZAN(IDY2) <= WRK-HKNFTNDATA-RUI
+                        MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                      END-IF
+                    END-IF
+                   END-IF
+                 END-IF
+               END-IF
              END-PERFORM
       *
            END-IF
@@ -16975,6 +17027,82 @@
       *
            .
        2104F-JGNCHK-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ½ÅÊ£¸øÈñÊÔ½¸¡Ê³°Íè¥ì¥»¥×¥È¤Î¤ß¤Ë°ìÉôÉéÃ´¤¬¤¢¤ë¾ì¹ç¡Ë
+      *****************************************************************
+       2104I-CYOFUKU-KOH-HENSYU-SEC      SECTION.
+      *
+           MOVE    ZERO                 TO  IDY4
+           INITIALIZE                       TBL-CYOFUKU-KOH
+      *
+           INITIALIZE                       PTKOHINF-REC
+           MOVE    RECE62-HOSPNUM       TO  PTKOH-HOSPNUM
+           MOVE    RECE62-PTID          TO  PTKOH-PTID
+           MOVE    RECE62-KOHNUM(IDY2)  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+             MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+             MOVE    "key4"             TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+               IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE62-SRYYM       )
+               AND (RECE62-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
+               AND (PTKOH-SAKJOKBN        =   SPACE              )
+                 IF  ((PTKOH-KOHNUM = RECE62-KOHNUM(1)) AND
+                      (PTKOH-KOHID  = RECE62-KOHID (1)))
+                 OR  ((PTKOH-KOHNUM = RECE62-KOHNUM(2)) AND
+                      (PTKOH-KOHID  = RECE62-KOHID (2)))
+                 OR  ((PTKOH-KOHNUM = RECE62-KOHNUM(3)) AND
+                      (PTKOH-KOHID  = RECE62-KOHID (3)))
+                 OR  ((PTKOH-KOHNUM = RECE62-KOHNUM(4)) AND
+                      (PTKOH-KOHID  = RECE62-KOHID (4)))
+                   CONTINUE
+                 ELSE
+                   IF  IDY4  <  4
+                     ADD      1           TO  IDY4
+                     MOVE  PTKOH-KOHNUM   TO  TBL-CYOFUKU-KOHNUM(IDY4)
+                     MOVE  PTKOH-KOHID    TO  TBL-CYOFUKU-KOHID (IDY4)
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE        "key4"             TO  MCP-PATHNAME
+           PERFORM      900-CLOSE-SEC
+      *
+           PERFORM   VARYING  IDY4    FROM    1   BY   1
+                      UNTIL  (IDY4                     >  4   )
+                       OR    (TBL-CYOFUKU-KOHNUM(IDY4) = SPACE)
+             INITIALIZE                 ORCSFTNJGNCHKAREA
+             MOVE  RECE62-HOSPNUM   TO  LNK-FTNJGNCHK-HOSPNUM
+             MOVE  RECE62-PTID      TO  LNK-FTNJGNCHK-PTID
+             MOVE  "2"              TO  LNK-FTNJGNCHK-NYUGAIKBN
+             MOVE  RECE62-SRYYM     TO  LNK-FTNJGNCHK-SRYYM
+             MOVE  TBL-CYOFUKU-KOHNUM(IDY4)
+                                    TO  LNK-FTNJGNCHK-KOHNUM
+             MOVE  TBL-CYOFUKU-KOHID (IDY4)
+                                    TO  LNK-FTNJGNCHK-KOHID
+             MOVE  WRK-PREFNUM      TO  LNK-FTNJGNCHK-PREFNUM
+             MOVE  ZERO             TO  LNK-FTNJGNCHK-HKNCOMBINUM
+             MOVE  ZERO             TO  LNK-FTNJGNCHK-HKNID
+             CALL  "ORCSFTNJGNCHK"  USING
+                                    ORCSFTNJGNCHKAREA
+                                    SPA-AREA
+             ADD   LNK-FTNJGNCHK-KOHFTN
+                                    TO  WRK-HKNFTNDATA-RUI
+           END-PERFORM
+      *
+           .
+       2104I-CYOFUKU-KOH-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

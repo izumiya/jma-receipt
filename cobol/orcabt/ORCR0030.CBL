@@ -681,6 +681,7 @@
       *                                     ¡Ê½éºÆ¿ÇÎÁ¡¦ÄãÂÅ·ëÎ¨ÂÐ±þ¡Ë
       *  04.07.36    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
+      *  04.07.37    NACL-ÌçÏÆ    15/01/21  ÆñÉÂÊ£¿ôÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -901,6 +902,7 @@
            03  FLG-CYOKI-HENSYU2                       PIC 9(01).
            03  FLG-DAISAN-GENBUTU                      PIC 9(01).
            03  FLG-ARI                                 PIC 9(01).
+           03  FLG-NYUIN-CHECK                         PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -965,6 +967,8 @@
            03  IDZX                                    PIC 9(02).
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
+           03  IDY3                                    PIC 9(03).
+           03  IDY4                                    PIC 9(03).
            03  IDZ                                     PIC 9(03).
            03  IDW                                     PIC 9(03).
            03  IDW2                                    PIC 9(03).
@@ -1328,6 +1332,11 @@
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
       *
                05  TBL-HKNFTNDATA-JGNXXX               PIC  9(07).
+      *
+       01  TBL-CYOFUKU-KOH.
+           03  TBL-CYOFUKU-KOH-OCC                     OCCURS   4.
+               05  TBL-CYOFUKU-KOHNUM                  PIC  X(03).
+               05  TBL-CYOFUKU-KOHID                   PIC  9(10).
       *
        01  TBL-PTTOKKI.
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
@@ -3328,6 +3337,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
              OR ((RECE02-KOHNUM(4)  =        "052" OR "054") AND
                  (TBL-HKNFTNDATA-JGN(4)  NOT =  ZERO       ) AND
                  (RECE02-SRYYM     >=        "201501"      ))
+                     MOVE     1    TO  FLG-NYUIN-CHECK
                      PERFORM  211D-NYUIN-SYUNOU-HENSYU-SEC
              END-IF
       *
@@ -3362,9 +3372,15 @@ grpsys           PERFORM 900-DBSELECT-SEC
                          IF   TBL-HKNFTNDATA-JGN(IDY2) =
                                               WRK-HKNFTNDATA-RUI
                            MOVE 1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                           MOVE ZERO TO  TBL-HKNFTNDATA-ZAN(IDY2)
+                         ELSE
+                           COMPUTE  TBL-HKNFTNDATA-ZAN(IDY2) =
+                                    TBL-HKNFTNDATA-ZAN(IDY2) -
+                                    TBL-HKNFTNDATA-GAIRAI(IDY2)
                          END-IF
                        ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                         MOVE   ZERO TO  TBL-HKNFTNDATA-ZAN(IDY2)
                        END-IF
                      ELSE
                          MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
@@ -3390,6 +3406,45 @@ grpsys           PERFORM 900-DBSELECT-SEC
                    DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
                    DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
+             END-PERFORM
+      *
+      *      Ê£¿ô¤Î¸øÈñÅÐÏ¿¤¬Í­¤ë¾ì¹ç
+             PERFORM   VARYING  IDY2    FROM    1   BY   1
+                        UNTIL   IDY2      >     4
+               IF  ( RECE02-KOHNUM(IDY2) = "051" OR "038" )
+               OR  ((RECE02-KOHNUM(IDY2) = "052"         ) AND
+                    (RECE02-SRYYM       <= "201412"      ))
+               OR  ((RECE02-KOHNUM(IDY2) = "054"         ) AND
+                    (RECE02-SRYYM       >= "201501"      ))
+                 IF   (TBL-HKNFTNDATA-JGN(IDY2)  NOT =  ZERO)
+                 AND  (TBL-HKNFTNDATA-ZAN(IDY2)  NOT =  ZERO)
+                 AND  (TBL-HKNFTNDATA-FLG(IDY2)      =  ZERO)
+                   MOVE   ZERO   TO  WRK-HKNFTNDATA-RUI
+                   PERFORM   VARYING  IDY3    FROM    1   BY   1
+                              UNTIL   IDY3      >     4
+                     IF  (IDY2  NOT = IDY3                         )
+                     AND (RECE02-KOHNUM(IDY2) = RECE02-KOHNUM(IDY3))
+                       ADD   TBL-HKNFTNDATA-GAIRAI(IDY3)  TO
+                                               WRK-HKNFTNDATA-RUI
+                       ADD   TBL-HKNFTNDATA-NYUIN (IDY3)  TO
+                                               WRK-HKNFTNDATA-RUI
+                     END-IF
+                   END-PERFORM
+      *
+                   IF    TBL-HKNFTNDATA-ZAN(IDY2) <= WRK-HKNFTNDATA-RUI
+                        MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                   ELSE
+                    IF  ( RECE02-KOHNUM(IDY2) = "038"          )
+                    OR  ((RECE02-KOHNUM(IDY2) = "052" OR "054") AND
+                         (RECE02-SRYYM       >= "201501"      ))
+                      PERFORM  211Z-CYOFUKU-KOH-HENSYU-SEC
+                      IF TBL-HKNFTNDATA-ZAN(IDY2) <= WRK-HKNFTNDATA-RUI
+                        MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
+                      END-IF
+                    END-IF
+                   END-IF
+                 END-IF
+               END-IF
              END-PERFORM
       *
            END-IF
@@ -4680,6 +4735,67 @@ grpsys           PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    ½ÅÊ£¸øÈñÊÔ½¸¡ÊÆþ±¡¥ì¥»¥×¥È¤Î¤ß¤Ë°ìÉôÉéÃ´¤¬¤¢¤ë¾ì¹ç¡Ë
+      *****************************************************************
+       211Z-CYOFUKU-KOH-HENSYU-SEC      SECTION.
+      *
+           MOVE    ZERO                 TO  IDY4
+           INITIALIZE                       TBL-CYOFUKU-KOH
+      *
+           INITIALIZE                       PTKOHINF-REC
+           MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
+           MOVE    RECE02-PTID          TO  PTKOH-PTID
+           MOVE    RECE02-KOHNUM(IDY2)  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+             MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+             MOVE    "key4"             TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+               IF  (PTKOH-TEKSTYMD(1:6)  <=   RECE02-SRYYM       )
+               AND (RECE02-SRYYM         <=   PTKOH-TEKEDYMD(1:6))
+               AND (PTKOH-SAKJOKBN        =   SPACE              )
+                 IF  ((PTKOH-KOHNUM = RECE02-KOHNUM(1)) AND
+                      (PTKOH-KOHID  = RECE02-KOHID (1)))
+                 OR  ((PTKOH-KOHNUM = RECE02-KOHNUM(2)) AND
+                      (PTKOH-KOHID  = RECE02-KOHID (2)))
+                 OR  ((PTKOH-KOHNUM = RECE02-KOHNUM(3)) AND
+                      (PTKOH-KOHID  = RECE02-KOHID (3)))
+                 OR  ((PTKOH-KOHNUM = RECE02-KOHNUM(4)) AND
+                      (PTKOH-KOHID  = RECE02-KOHID (4)))
+                   CONTINUE
+                 ELSE
+                   IF  IDY4  <  4
+                     ADD      1           TO  IDY4
+                     MOVE  PTKOH-KOHNUM   TO  TBL-CYOFUKU-KOHNUM(IDY4)
+                     MOVE  PTKOH-KOHID    TO  TBL-CYOFUKU-KOHID (IDY4)
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE        "key4"             TO  MCP-PATHNAME
+           PERFORM      900-CLOSE-SEC
+      *
+           PERFORM   VARYING  IDY4    FROM    1   BY   1
+                      UNTIL  (IDY4                     >  4   )
+                       OR    (TBL-CYOFUKU-KOHNUM(IDY4) = SPACE)
+             MOVE     2    TO  FLG-NYUIN-CHECK
+             PERFORM  211D-NYUIN-SYUNOU-HENSYU-SEC
+           END-PERFORM
+      *
+           .
+       211Z-CYOFUKU-KOH-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¸øÈñ¾å¸Â³ÛÊÔ½¸¡ÊÆþ±¡¼ýÇ¼ÊÔ½¸¡Ë
       *****************************************************************
        211D-NYUIN-SYUNOU-HENSYU-SEC      SECTION.
@@ -4777,7 +4893,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                   PERFORM VARYING SYU-IDX   FROM    1   BY  1
                           UNTIL ( SYU-IDX                   >     10  )
                             OR  ( LNK-SYU-SKYSTYMD(SYU-IDX) =   SPACE )
-                      PERFORM 211D1-NYUIN-SYUNOU-CHECK-SEC
+                    EVALUATE  FLG-NYUIN-CHECK
+                      WHEN     1
+                        PERFORM 211D1-NYUIN-SYUNOU-CHECK-SEC
+                      WHEN     2
+                        PERFORM 211D2-NYUIN-SYUNOU-CHECK2-SEC
+                    END-EVALUATE
                   END-PERFORM
               ELSE
                   DISPLAY "SKYSTYMD="   WRK-SEIKYUSTYMD
@@ -4842,6 +4963,45 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *
            .
        211D1-NYUIN-SYUNOU-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸øÈñ¾å¸Â³ÛÊÔ½¸£²¡ÊÆþ±¡¼ýÇ¼¥Á¥§¥Ã¥¯¡Ë
+      *****************************************************************
+       211D2-NYUIN-SYUNOU-CHECK2-SEC      SECTION.
+      *
+           INITIALIZE                         HKNCOMBI-REC
+           MOVE    RECE02-HOSPNUM       TO    COMB-HOSPNUM
+           MOVE    RECE02-PTID          TO    COMB-PTID
+           MOVE    LNK-SYU-HKNCOMBINUM(SYU-IDX)
+                                        TO    COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC         TO    MCPDATA-REC
+           PERFORM 900-HKNCOMBI-INV-SEC
+           IF      FLG-HKNCOMBI    =   ZERO
+             IF   (TBL-CYOFUKU-KOHNUM(IDY4) = COMB-KOH1HKNNUM)
+             AND  (TBL-CYOFUKU-KOHID (IDY4) = COMB-KOH1ID    )
+               ADD  LNK-SYU-KOH1HKNFTNMONEY(SYU-IDX)
+                                        TO  WRK-HKNFTNDATA-RUI
+             END-IF
+             IF   (TBL-CYOFUKU-KOHNUM(IDY4) = COMB-KOH2HKNNUM)
+             AND  (TBL-CYOFUKU-KOHID (IDY4) = COMB-KOH2ID    )
+               ADD  LNK-SYU-KOH2HKNFTNMONEY(SYU-IDX)
+                                        TO  WRK-HKNFTNDATA-RUI
+             END-IF
+             IF   (TBL-CYOFUKU-KOHNUM(IDY4) = COMB-KOH3HKNNUM)
+             AND  (TBL-CYOFUKU-KOHID (IDY4) = COMB-KOH3ID    )
+               ADD  LNK-SYU-KOH3HKNFTNMONEY(SYU-IDX)
+                                        TO  WRK-HKNFTNDATA-RUI
+             END-IF
+             IF   (TBL-CYOFUKU-KOHNUM(IDY4) = COMB-KOH4HKNNUM)
+             AND  (TBL-CYOFUKU-KOHID (IDY4) = COMB-KOH4ID    )
+               ADD  LNK-SYU-KOH4HKNFTNMONEY(SYU-IDX)
+                                        TO  WRK-HKNFTNDATA-RUI
+             END-IF
+           END-IF
+      *
+           .
+       211D2-NYUIN-SYUNOU-CHECK2-EXT.
            EXIT.
       *
       *****************************************************************

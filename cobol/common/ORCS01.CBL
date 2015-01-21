@@ -433,6 +433,7 @@
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÂÐ±þ¡Ë
       *  04.07.20    NACL-ÌçÏÆ    14/12/09  ÅìµþÅÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       *  04.07.21    NACL-ÌçÏÆ    15/01/05  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.22    NACL-ÌçÏÆ    15/01/21  ÆñÉÂÊ£¿ôÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -17391,6 +17392,8 @@
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "052"   ))
              OR ((LNK-SYU-SRYYMD(1:6)         >=  "200804") AND
                  (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "038"   ))
+             OR ((LNK-SYU-SRYYMD(1:6)         >=  "201501") AND
+                 (SYU-KOH-HKNNUM(KOHFUKA-IDX)  =  "054"   ))
                 MOVE   1   TO   FLG-KOHFUKA-HENSYU
                 PERFORM   220272-KOHFUKA-HENSYU1-SEC
              END-IF
