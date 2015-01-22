@@ -2880,6 +2880,17 @@
            PERFORM 200799-ZAI-HENSYU-1-SEC
       *病院点数マスタコードから診療行為名称まで
            PERFORM 200799-ZAI-HENSYU-2-SEC
+      *療養担当手当の診療科取得
+           IF    WRK-FEDT-SRYCD    =   "199000510"
+              IF    LNK-DPCNYUIN-SRYKA(1 WRK-FEDT-DD)  NOT =  SPACE
+                  MOVE    LNK-DPCNYUIN-SRYKA(1 WRK-FEDT-DD)
+                                          TO   RECE641-SRYKA
+              END-IF
+              IF    LNK-DPCNYUIN-SRYKA(2 WRK-FEDT-DD)  NOT =  SPACE
+                  MOVE    LNK-DPCNYUIN-SRYKA(2 WRK-FEDT-DD)
+                                          TO   RECE641-SRYKA
+              END-IF
+           END-IF
       *行為点数
            MOVE    RECE641-ZAITEN      TO  WRK-FEDT-ZAITEN
       *行為薬剤料
