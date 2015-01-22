@@ -539,6 +539,18 @@
                PERFORM 400-DATAOUT-SEC
            END-PERFORM
       *
+      *H27.1
+      *    連携用コード
+           IF      ORCSQRCSV-CSVFILE   NOT =   SPACE
+               MOVE    SPACE               TO  TBL-QRCSV-AREA
+               MOVE    "81"                TO  TBL-QRCSV-DATA (1)
+               MOVE    "999"               TO  TBL-QRCSV-DATA (2)
+               MOVE    "51"                TO  TBL-QRCSV-DATA (3)
+               MOVE    ORCSQRCSV-CSVFILE   TO  TBL-QRCSV-DATA (4)
+               MOVE    4                   TO  TBL-MAX
+               PERFORM 400-DATAOUT-SEC
+           END-IF
+      *
            .
        100-HEAD-SYORI-EXT.
            EXIT.

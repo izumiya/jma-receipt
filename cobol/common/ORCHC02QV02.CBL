@@ -542,6 +542,8 @@
            03  PARA-KOHNUM-G.
                05  PARA-KOHNUM         PIC X(03)
                                        OCCURS   5.
+      *    連携用ＣＶＳファイル名編集
+           03  PARA-QR-CSVFILE         PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -803,6 +805,11 @@
                PERFORM 1001-OPTION-CALL-SEC
                MOVE    WRK-PARA            TO  PARA-KOHNUM (IDP)
            END-PERFORM
+      *H27.1
+      *    連携用ＣＶＳファイル名編集
+           MOVE    "QRCSVFILE"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-QR-CSVFILE
       *
            .
        100-OPTION-SELECT-EXT.
@@ -927,8 +934,23 @@
            IF      FLG-MAYAKU          =   1
                PERFORM 2003-MAYAKU-HEN-SEC
            END-IF
+      *H27.1
+      *    CSV出力
+      *    院外の請求確認・中途・退院時処方せんのみ
+           IF      (ORCHC19-KBN        =   SPACE
+                                       OR  "4"
+                                       OR  "N"   )
+      *        交付日未設定は作成なし
+               IF      (WRK-KOFYMD         =   SPACE )
+      *            点数マスタなし
+                   OR  (FLG-QRCHK          =   1     )
+                   CONTINUE
+               ELSE
+                   PERFORM 610-CSVDATA-SYORI-SEC
+               END-IF
+           END-IF
+      *
       *ＱＲ対応
-           INITIALIZE                  OUT-ORCSQRCSVAREA
       *    ＱＲデータ出力処理（日数ゼロは対象外）
            IF      (ORCHC19-KBN        =   SPACE
                                        OR  "3"
@@ -939,9 +961,6 @@
                                        OR  "N"   )
       *---(04.03.00) LINE ADD END   ------------------------------------
                AND (IDX-QR1            >   ZERO  )
-      *H27.1
-      *CSV用
-               MOVE    ORCSQRCSVAREA       TO  OUT-ORCSQRCSVAREA
       *
       *        医師・交付日未設定は作成なし
                IF      (WRK-DRCD           =   SPACE )
@@ -995,21 +1014,6 @@
                PERFORM 400-PRINT-SEC
            END-PERFORM
       *
-      *H27.1
-      *    CSV出力
-      *    院外の請求確認・中途・退院時処方せんのみ
-           IF      (ORCHC19-KBN        =   SPACE
-                                       OR  "4"
-                                       OR  "N"   )
-      *        交付日未設定は作成なし
-               IF      (WRK-KOFYMD         =   SPACE )
-      *            点数マスタなし
-                   OR  (FLG-QRCHK          =   1     )
-                   CONTINUE
-               ELSE
-                   PERFORM 610-CSVDATA-SYORI-SEC
-               END-IF
-           END-IF
            .
        400-PRINT-SYORI-EXT.
            EXIT.
@@ -4659,7 +4663,7 @@
       *****************************************************************
         610-CSVDATA-SYORI-SEC           SECTION.
       *
-           MOVE    OUT-ORCSQRCSVAREA   TO  ORCSQRCSVAREA
+           MOVE    ORCSQRCSVAREA       TO  OUT-ORCSQRCSVAREA
       *
       *    県番号
            MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV-PREFNUM
@@ -4744,6 +4748,13 @@
            CALL    "ORCSQRCSVOUT"      USING
                                        SPA-AREA
                                        ORCSQRCSVAREA
+      *
+      *    連携用ＣＶＳファイル名編集
+           IF      PARA-QR-CSVFILE     =   "1"
+               MOVE    ORCSQRCSV-CSVFILE   TO  OUT-ORCSQRCSV-CSVFILE
+           END-IF
+      *
+           MOVE    OUT-ORCSQRCSVAREA   TO  ORCSQRCSVAREA
       *
            .
        610-CSVDATA-SYORI-EXT.

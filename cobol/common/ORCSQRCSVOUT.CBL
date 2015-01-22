@@ -251,6 +251,7 @@
            INITIALIZE                  WRK-AREA
       *
            MOVE    ZERO                TO  ORCSQRCSV-ERRCD
+           MOVE    SPACE               TO  ORCSQRCSV-CSVFILE
       *    CSVデータファイル名取得
            PERFORM 100-CVSFILE-HEN-SEC
            IF      ORCSQRCSV-ERRCD NOT =   ZERO
@@ -286,6 +287,11 @@
            IF      ORCSQRCSV-ERRCD     =   ZERO
       *        CSVデータ（JIS）の作成
                PERFORM 290-CSVOUT-SYORI-SEC
+           END-IF
+      *
+           IF      ORCSQRCSV-ERRCD     =   ZERO
+      *        CSVファイル名編集
+               MOVE    WRK-BIKO-FILE       TO  ORCSQRCSV-CSVFILE
            END-IF
       *
       *    データ削除
@@ -350,7 +356,8 @@
            PERFORM 990-DBCLOSE-SEC
       *
       *    情報提供同意有無
-           IF      PTPUBLIC-AGREEMENT  =   "0"
+           IF     (PTPUBLIC-AGREEMENT  =   "0"  )
+             AND  (SYS-9101-COOPBASE   =   "1"  )
       *        同意しない　終了
                MOVE    9                   TO  ORCSQRCSV-ERRCD
                GO      TO      100-CVSFILE-HEN-EXT
