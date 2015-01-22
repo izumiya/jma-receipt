@@ -901,6 +901,7 @@
            03  FLG-CYOKI-HENSYU                        PIC 9(01).
            03  FLG-CYOKI-HENSYU2                       PIC 9(01).
            03  FLG-DAISAN-GENBUTU                      PIC 9(01).
+           03  FLG-CYOFUKU-KOH                         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1415,16 +1416,13 @@
            03  TBL-HKNFTNDATA-OCC                      OCCURS   4.
                05  TBL-HKNFTNDATA-JGN                  PIC  9(07).
                05  TBL-HKNFTNDATA-TAF                  PIC  9(07).
-      *
                05  TBL-HKNFTNDATA-GAIRAI               PIC  9(07).
                05  TBL-HKNFTNDATA-NYUIN                PIC  9(07).
-      *
                05  TBL-HKNFTNDATA-NYUSKJ               PIC  9(07).
-      *
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
-      *
                05  TBL-HKNFTNDATA-JGNXXX               PIC  9(07).
+               05  TBL-HKNFTNDATA-TEKFLG               PIC  9(01).
       *
        01  TBL-CYOFUKU-KOH.
            03  TBL-CYOFUKU-KOH-OCC                     OCCURS   4.
@@ -1851,6 +1849,10 @@
                05  WRK-HKNNUM-CHECK-OCC        OCCURS 100.
                  07  WRK-HKNNUM                PIC X(03).
                  07  WRK-HKNNUM-KOHHBTNUM      PIC X(02).
+      *
+           03  WRK-CYOFUKU-KOH-YMD.
+               05  WRK-CYOFUKU-KOH-YM          PIC 9(06).
+               05  WRK-CYOFUKU-KOH-DD          PIC 9(02).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -16753,22 +16755,14 @@
                          MOVE   2    TO  TBL-HKNFTNDATA-FLG(IDY2)
                      END-IF
                    END-IF
-                   DISPLAY "IDX KOHNUM=" IDY2
-                           " "    RECE62-KOHNUM(IDY2)
-                   DISPLAY "JGN=" TBL-HKNFTNDATA-JGN(IDY2)
-                   DISPLAY "TAF=" TBL-HKNFTNDATA-TAF(IDY2)
-                   DISPLAY "GAI=" TBL-HKNFTNDATA-GAIRAI(IDY2)
-                   DISPLAY "NYU=" TBL-HKNFTNDATA-NYUIN(IDY2)
-                   DISPLAY "SKJ=" TBL-HKNFTNDATA-NYUSKJ(IDY2)
-                   DISPLAY "ZAN=" TBL-HKNFTNDATA-ZAN(IDY2)
-                   DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
                 END-IF
              END-PERFORM
       *
       *      Ê£¿ô¤Î¸øÈñÅÐÏ¿¤¬Í­¤ë¾ì¹ç
              PERFORM   VARYING  IDY2    FROM    1   BY   1
                         UNTIL   IDY2      >     4
-               IF  ( RECE62-KOHNUM(IDY2) = "051" OR "038" )
+               IF  ( RECE62-KOHNUM(IDY2) =
+                     "051" OR "038" OR "015" OR "016"     )
                OR  ((RECE62-KOHNUM(IDY2) = "052"         ) AND
                     (RECE62-SRYYM       <= "201412"      ))
                OR  ((RECE62-KOHNUM(IDY2) = "054"         ) AND
@@ -16776,11 +16770,13 @@
                  IF   (TBL-HKNFTNDATA-JGN(IDY2)  NOT =  ZERO)
                  AND  (TBL-HKNFTNDATA-ZAN(IDY2)  NOT =  ZERO)
                  AND  (TBL-HKNFTNDATA-FLG(IDY2)      =  ZERO)
+                 AND  (TBL-HKNFTNDATA-TEKFLG(IDY2)   =  ZERO)
                    MOVE   ZERO   TO  WRK-HKNFTNDATA-RUI
                    PERFORM   VARYING  IDY3    FROM    1   BY   1
                               UNTIL   IDY3      >     4
                      IF  (IDY2  NOT = IDY3                         )
                      AND (RECE62-KOHNUM(IDY2) = RECE62-KOHNUM(IDY3))
+                     AND (TBL-HKNFTNDATA-TEKFLG(IDY3)  =  ZERO     )
                        ADD   TBL-HKNFTNDATA-GAIRAI(IDY3)  TO
                                                WRK-HKNFTNDATA-RUI
                        ADD   TBL-HKNFTNDATA-NYUSKJ(IDY3)  TO
@@ -16791,7 +16787,8 @@
                    IF    TBL-HKNFTNDATA-ZAN(IDY2) <= WRK-HKNFTNDATA-RUI
                         MOVE   1    TO  TBL-HKNFTNDATA-FLG(IDY2)
                    ELSE
-                    IF  ( RECE62-KOHNUM(IDY2) = "038"          )
+                    IF  ( RECE62-KOHNUM(IDY2) =
+                                       "038" OR "015" OR "016" )
                     OR  ((RECE62-KOHNUM(IDY2) = "052" OR "054") AND
                          (RECE62-SRYYM       >= "201501"      ))
                       PERFORM  2104I-CYOFUKU-KOH-HENSYU-SEC
@@ -16802,6 +16799,16 @@
                    END-IF
                  END-IF
                END-IF
+             END-PERFORM
+      *
+             PERFORM   VARYING  IDY2    FROM    1   BY   1
+                        UNTIL   IDY2      >     4
+                IF  TBL-HKNFTNDATA-JGN(IDY2)  NOT =  ZERO
+                   DISPLAY "IDX KOHNUM=" IDY2
+                           " "    RECE62-KOHNUM(IDY2)
+                   DISPLAY "JGN=" TBL-HKNFTNDATA-JGN(IDY2)
+                   DISPLAY "FLG=" TBL-HKNFTNDATA-FLG(IDY2)
+                END-IF
              END-PERFORM
       *
            END-IF
@@ -16997,6 +17004,16 @@
                 MOVE    LNK-FTNJGNCHK-KOHFTN
                                    TO  TBL-HKNFTNDATA-GAIRAI(IDY2)
               END-IF
+      *
+              IF   RECE62-KOHNUM(IDY2) = "015" OR "016"
+                MOVE  RECE62-SRYYM    TO  WRK-CYOFUKU-KOH-YM
+                MOVE  01              TO  WRK-CYOFUKU-KOH-DD
+                IF   RECE62-KOHTEKSTYMD(IDY2) <=  WRK-CYOFUKU-KOH-YMD
+                  CONTINUE
+                ELSE
+                  MOVE    1           TO  TBL-HKNFTNDATA-TEKFLG(IDY2)
+                END-IF
+              END-IF
            END-IF
       *
            .
@@ -17037,7 +17054,18 @@
                       (PTKOH-KOHID  = RECE62-KOHID (4)))
                    CONTINUE
                  ELSE
-                   IF  IDY4  <  4
+                   MOVE    ZERO           TO  FLG-CYOFUKU-KOH
+                   IF   PTKOH-KOHNUM = "015" OR "016"
+                     MOVE  RECE62-SRYYM   TO  WRK-CYOFUKU-KOH-YM
+                     MOVE  01             TO  WRK-CYOFUKU-KOH-DD
+                     IF   PTKOH-TEKSTYMD <=  WRK-CYOFUKU-KOH-YMD
+                       CONTINUE
+                     ELSE
+                       MOVE    1          TO  FLG-CYOFUKU-KOH
+                     END-IF
+                   END-IF
+                   IF  (FLG-CYOFUKU-KOH  =  ZERO)
+                   AND (IDY4             <   4  )
                      ADD      1           TO  IDY4
                      MOVE  PTKOH-KOHNUM   TO  TBL-CYOFUKU-KOHNUM(IDY4)
                      MOVE  PTKOH-KOHID    TO  TBL-CYOFUKU-KOHID (IDY4)
@@ -25841,7 +25869,14 @@
            OR  ((WK-GENGAKUKBN                     =   2    ) AND
                 (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)    =  ZERO  ))
            OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)    =  1 OR 2 )
-            CONTINUE
+            IF   RECE62-KOUREI   =  "1"
+              CONTINUE
+            ELSE
+              IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+                PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
+                PERFORM  21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
+              END-IF
+            END-IF
            ELSE
             IF   WRK-JYOGEN-KOH   =    ZERO
                MOVE    ZERO    TO   WRK-FTNKEI-KOH
