@@ -6978,7 +6978,7 @@
                    END-IF
                WHEN    "BK3"
                    IF      (SPA-GMN-KOHNUM (3) NOT =   SPACE )
-                     AND   (SPA-GMN-KOHNUM (1) NOT =   "970" )
+                     AND   (SPA-GMN-KOHNUM (3) NOT =   "970" )
                        IF     (SPA-SYSYMD      =   SPA-NAI-KKAKUNINYMD
                                                              (3) ) AND
                               (SPA-MAE-KKAKUNINYMD (3)
