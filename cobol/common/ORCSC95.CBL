@@ -1905,7 +1905,7 @@
       *
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )
-                           OR (IDX     >   15   )
+                           OR (IDX     >   30   )
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDX)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
@@ -2172,6 +2172,7 @@
                END-IF
            END-PERFORM
       *
+      *
            IF      FLG-HKNCOMBICHK     =   ZERO
       *        選択した保険がない場合、エラー
       *****    MOVE   "1034"               TO  SPA-ERRCD
@@ -2179,6 +2180,8 @@
            ELSE
       *        保険情報編集・年齢
                IF      LNK-SC95-KBN        =   "H"
+      *API対応
+                                           OR  "@"
                    PERFORM 4001-HKNCOMBI-HEN-SEC
                ELSE
                    MOVE    SPA-GMN-HKN-LIST (IDX)
@@ -3806,60 +3809,6 @@
                                        SPA-AREA
                                        SPA-K01KYOUTU
       *!
-      *    システム管理検索（医療機関情報）
-      *    MOVE    SPACE               TO  SYS-1001-REC
-      *    INITIALIZE                  SYS-1001-REC
-      *    MOVE    "1001"              TO  SYS-1001-KANRICD
-      *    MOVE    "*"                 TO  SYS-1001-KBNCD
-      *    MOVE    SPA-SRYYMD          TO  SYS-1001-STYUKYMD
-      *    MOVE    SPA-SRYYMD          TO  SYS-1001-EDYUKYMD
-      *    MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
-      *    MOVE    SYS-1001-REC        TO  MCPDATA-REC
-      *
-      *    MOVE    "tbl_syskanri"      TO  MCP-TABLE
-      *    MOVE    "key10"             TO  MCP-PATHNAME
-      *    PERFORM 910-DBSELECT-SEC
-      *    IF      MCP-RC              =   ZERO
-      *        MOVE    "key10"             TO  MCP-PATHNAME
-      *        PERFORM 900-SYSKANRI-READ-SEC
-      *    ELSE
-      *        MOVE    SPACE               TO  SYS-1001-REC
-      *        INITIALIZE                  SYS-1001-REC
-      *        MOVE    1               TO  FLG-SYSKANRI
-      *    END-IF
-      *    IF      FLG-SYSKANRI        =   ZERO
-      *        MOVE    MCPDATA-REC         TO  SYS-1001-REC
-      *        病院種別
-      *        MOVE    SYS-1001-HOSPSBT    TO  SPA-HOSPSBT
-      *        IF      SPA-BEDKBN          =   ZERO
-      *            CONTINUE
-      *        ELSE
-      *        病床数
-      *            MOVE    SYS-1001-BEDSU          TO  SPA-BEDSU
-      *        病床数（一般）
-      *            IF     (SYS-1001-BEDSUIPN(1:4)  =   SPACE )  OR
-      *                   (SYS-1001-BEDSUIPN(1:4)  NOT NUMERIC)
-      *                MOVE    ZERO                TO  SPA-BEDSUIPN
-      *            ELSE
-      *                MOVE    SYS-1001-BEDSUIPN   TO  SPA-BEDSUIPN
-      *            END-IF
-      *        END-IF
-      *        消費税端数設定
-      *        MOVE    SYS-1001-TAX-HASU-KBN   TO  SPA-TAX-HASU-KBN
-      *    ELSE
-      *        MOVE    SPACE                   TO  SPA-TAX-HASU-KBN
-      *    END-IF
-      *    MOVE    "tbl_syskanri"      TO  MCP-TABLE
-      *    MOVE    "key10"             TO  MCP-PATHNAME
-      *    PERFORM 990-DBCLOSE-SEC
-      *
-      *    施設基準検索
-      *    PERFORM 1009-SISETU-KIJUN-SEC
-      *    その他システム管理
-      *    PERFORM 3009-SYSKANRI-SAISET-SEC
-      *    包括診療行為算定
-      *    PERFORM 10010-HKTSANTEI-SEC
-      *
       *    患者情報の再セット
            PERFORM 1001-SPA-JYUSIN-SEC
       *
@@ -3875,6 +3824,7 @@
            MOVE    WRK-SYOSINYMD1      TO  SPA-SYOYMD-OLD
       *    最初の初診算定日
            MOVE    WRK-SYOSINYMDS      TO  SPA-SYOYMD1
+      *
       *Ｈ２０．４の労災初診改正対応
       *    初診診算定日＞Ｈ２０．４．１
            MOVE    SPACE               TO  SPA-SYOYMD-RSI
@@ -4201,6 +4151,7 @@
            END-IF
       *H25.4   紹介なし
       *    同日初診（紹介状なし）（Ｈ２５．４から）
+      *    （H27.1　初診（同一日２科目 減点規定該当）
            MOVE    "111012610"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
            IF     (WRK-SYOSINYMD1      =   SPACE  )  OR
@@ -5697,6 +5648,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 10011-JYURRK-SEC
       *    保険組合せ名称編集
            PERFORM 10013-HKNCOMBI-SEC
+      *
+      *    患者特記事項編集
+           PERFORM 1102-PTTOKKI-SET-SEC
       *
       *    初診日、最終診察日
            MOVE    SPACE               TO  SPA-SYOYMD 

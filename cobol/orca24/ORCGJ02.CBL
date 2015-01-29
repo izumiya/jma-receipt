@@ -1777,7 +1777,7 @@
            END-IF
            MOVE    ZERO                TO  SPA-SRYKA-MAX
            PERFORM VARYING     IDX     FROM    2   BY  1
-                   UNTIL       (IDX            >   40   )  OR
+                   UNTIL       (IDX            >   100  )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC         TO  SYS-1005-REC
       *
@@ -2218,7 +2218,7 @@
            MOVE    1                   TO  IDH
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )  OR
-                              (IDH     >=  20              )
+                              (IDH     >=  40              )
                ADD     1                   TO  IDH
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDH)
@@ -14906,6 +14906,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-JID1-FLG
       *
            MOVE    SPACE               TO  JID1
+           INITIALIZE                      JID1
            MOVE    SPA-JIDCD           TO  JID1-ID1CODE
            MOVE    WRK-JIDMSG          TO  JID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
@@ -14935,6 +14936,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        520-JID2SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  JID2
+           INITIALIZE                      JID2
            EVALUATE    SPA-JIDCD2
                WHEN    "0115"
                    MOVE    "診療日の変更、または追加を選択して下さい。"

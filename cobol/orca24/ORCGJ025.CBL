@@ -239,6 +239,7 @@
       *
            MOVE    SPACE               TO  J025
       *
+           INITIALIZE                      J025
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-J025-MAX
                MOVE    SPA-J025-DENPNUM (IDX)  TO  J025-DENPNUM (IDX)

@@ -52,14 +52,14 @@ J03 {
         textdata varchar(20);
       };
       count int;
-        item varchar(20)[41];
+        item varchar(20)[100];
     };
     HHKNCOMBI_COMB {
       HHKNCOMBI {
         textdata varchar(65);
       };
       count int;
-        item varchar(65)[20];
+        item varchar(65)[40];
     };
     MIDASI {
       style varchar(20);

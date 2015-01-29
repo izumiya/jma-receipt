@@ -771,6 +771,7 @@
            MOVE    SPACE               TO  J021
       *
       *    ≤ËÃÃ ‘Ω∏
+           INITIALIZE                      J021
            IF      SPA-J021-MAE-HKNCOMBI   =   ZERO
                CONTINUE
            ELSE
@@ -3633,6 +3634,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-JID1-FLG
       *
            MOVE    SPACE               TO  JID1
+           INITIALIZE                      JID1
            MOVE    SPA-JIDCD           TO  JID1-ID1CODE
            MOVE    WRK-JIDMSG          TO  JID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET

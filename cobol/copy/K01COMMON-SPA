@@ -177,8 +177,11 @@
                05  SPA-HKTSANTEI-206       PIC 9(01).
       *
       *H26.4
-      *        妥結率５割以下区分  (H27.4から使用）
+      *        妥結率５割以下区分  (H26.4から使用）
                05  SPA-DAKT50-KBN          PIC 9(01).
+      *H27.4??
+      *        低紹介率病院区分  (H27.4から使用）
+               05  SPA-TEIRITU-KBN         PIC 9(01).
       *@
       *腫瘍マーカー一覧展開選択
                05  SPA-AKUSEIHYOFLG        PIC  X(01).
@@ -639,7 +642,7 @@
       *診療科一覧
            03  SPA-K01SONOTA.
                05  SPA-GMN-SRYKA-AREA.
-                   07  SPA-GMN-SRYKALST                OCCURS  40.
+                   07  SPA-GMN-SRYKALST                OCCURS  99.
                        09  SPA-GMN-SRYKAL      PIC X(02).
                        09  SPA-GMN-F1L         PIC X(01).
                        09  SPA-GMN-SRYKAMEIL   PIC X(12).
@@ -659,8 +662,12 @@
            03  SPA-PSYCHO-CHK          PIC  9(01).
            03  SPA-PSYCHO-OK           PIC  9(01).
       *ver.4.8
-      *    一般・銘柄名記載（処方毎）
-           03  SPA-INGIKSN-KBN         PIC  9(01).
+      *    後発変更不可（処方毎）
+           03  SPA-GENECHG-KBN         PIC  9(01).
+      *H27.4
+      *    投薬３割逓減確認
+           03  SPA-TEIGEN30-CHK        PIC  9(01).
+           03  SPA-TEIGEN30-OK         PIC  9(01).
       *
       *(4.7　は予備使用）
       *    予備

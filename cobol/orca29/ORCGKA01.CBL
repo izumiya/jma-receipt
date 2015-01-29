@@ -121,14 +121,14 @@
       *
       *            保険組合せ一覧
                    07  SPA-GMN-HKNCOMI-COMB-G.
-                       09  SPA-GMN-HKNCOMBI-COMB       OCCURS  15.
+                       09  SPA-GMN-HKNCOMBI-COMB       OCCURS  30.
                            11  SPA-GMN-THKNCOMBINUM    PIC X(04).
                            11  SPA-GMN-THKNCOMBY1      PIC X(01).
                            11  SPA-GMN-THKNCOMBIMEI    PIC X(65).
                        09  SPA-HKNCOMBI-MAX            PIC  9(04).
       *            診療科
                    07  SPA-GMN-SRYKA-COMB-G.
-                       09  SPA-GMN-SRYKA-COMB       OCCURS  40.
+                       09  SPA-GMN-SRYKA-COMB       OCCURS  99.
                            11  SPA-GMN-TSRYKA       PIC X(02).
                            11  SPA-GMN-TSRYKA1      PIC X(01).
                            11  SPA-GMN-TSRYKAMEI    PIC X(12).
@@ -925,8 +925,10 @@
            MOVE    SPACE               TO  SYS-1005-REC
            INITIALIZE                  SYS-1005-REC
            MOVE    "1005"              TO  SYS-1005-KANRICD
-           MOVE    "00000000"          TO  SYS-1005-STYUKYMD
-           MOVE    "99999999"          TO  SYS-1005-EDYUKYMD
+      **   MOVE    "00000000"          TO  SYS-1005-STYUKYMD
+      **   MOVE    "99999999"          TO  SYS-1005-EDYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1005-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1005-EDYUKYMD
       *
            MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
            MOVE    SYS-1005-REC        TO  MCPDATA-REC
@@ -942,7 +944,7 @@
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       (IDX            >   40   )  OR
+                   UNTIL       (IDX            >   99   )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC           TO  SYS-1005-REC
                MOVE    SYS-1005-KBNCD (1:2)  TO  SPA-GMN-TSRYKA   (IDX)
@@ -983,7 +985,7 @@
       *
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )
-                           OR (IDX     >   15   )
+                           OR (IDX     >   30   )
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDX)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
@@ -1293,6 +1295,7 @@
                                                               (IDX-J)
            END-IF
       *    科名
+           MOVE    HZN-JYURRK-SRYKA        TO  SPA-GMN-RRKSRYKA(IDX-J)
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY         >   SPA-SRYKA-MAX
                IF      HZN-JYURRK-SRYKA    =   SPA-GMN-TSRYKA (IDY)
@@ -4441,6 +4444,7 @@
       *
            MOVE    SPACE               TO  KA01
       *    コラムリストの位置指定
+           INITIALIZE                      KA01
            MOVE    ZERO                TO  KA01-RRKLIST-ROW
            MOVE    ZERO                TO  KA01-RRKLIST-ROWATTR
            MOVE    ZERO                TO  KA01-MEILIST-ROW
@@ -4789,6 +4793,7 @@
        520-KA01IDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KAID1
+           INITIALIZE                      KAID1
            EVALUATE    SPA-KAID1CD
                WHEN    "0201"
                    STRING  "前回処方せんを日数空白で印刷します。"
@@ -4890,6 +4895,7 @@
        530-KA02IDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KAID2
+           INITIALIZE                      KAID2
            EVALUATE    SPA-KAID2CD
                WHEN    "0101"
                    STRING  "診療日を交付日として再印刷します。"

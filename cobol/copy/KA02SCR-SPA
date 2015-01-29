@@ -74,14 +74,14 @@
       *
       *            ÊÝ¸±ÁÈ¹ç¤»°ìÍ÷
                    07  SPA-GMN-HKNCOMI-COMB-G.
-                       09  SPA-GMN-HKNCOMBI-COMB       OCCURS  15.
+                       09  SPA-GMN-HKNCOMBI-COMB       OCCURS  30.
                            11  SPA-GMN-THKNCOMBINUM    PIC X(04).
                            11  SPA-GMN-THKNCOMBY1      PIC X(01).
                            11  SPA-GMN-THKNCOMBIMEI    PIC X(65).
                        09  SPA-HKNCOMBI-MAX            PIC  9(04).
       *            ¿ÇÎÅ²Ê
                    07  SPA-GMN-SRYKA-COMB-G.
-                       09  SPA-GMN-SRYKA-COMB       OCCURS  40.
+                       09  SPA-GMN-SRYKA-COMB       OCCURS  99.
                            11  SPA-GMN-TSRYKA       PIC X(02).
                            11  SPA-GMN-TSRYKA1      PIC X(01).
                            11  SPA-GMN-TSRYKAMEI    PIC X(12).

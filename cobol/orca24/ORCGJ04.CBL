@@ -1582,7 +1582,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  IDH
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )  OR
-                              (IDH     >=  20              )
+                              (IDH     >=  40              )
                ADD     1                   TO  IDH
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDH)
@@ -7951,6 +7951,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        510229-POP-ERR-SEC              SECTION.
       *
            MOVE    SPACE               TO  J042
+           INITIALIZE                      J042
            MOVE    WRK-KNK-TOUMEI (1)  TO  J042-POP-TOUMEI
       *
            MOVE    ZERO                TO  IDX-X
@@ -7995,6 +7996,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  J041
       *
+           INITIALIZE                      J041
            MOVE    1                   TO  IDX-K
            PERFORM VARYING     IDX1    FROM    1   BY  1
                    UNTIL      (IDX1        >   30  )   OR
@@ -8452,6 +8454,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-JERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  JERR2
+           INITIALIZE                      JERR2
            MOVE    SPA-ERRCD           TO  JERR2-ERRCODE
            MOVE    SPA-ERRMSG2         TO  JERR2-ERRMSG(1:80)
            MOVE    SPA-ERRMSG          TO  JERR2-ERRMSG2
@@ -8502,6 +8505,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-JID1-FLG
       *
            MOVE    SPACE               TO  JID1
+           INITIALIZE                      JID1
            MOVE    SPA-JIDCD           TO  JID1-ID1CODE
            MOVE    WRK-JIDMSG          TO  JID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET

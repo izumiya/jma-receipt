@@ -317,6 +317,7 @@
            MOVE    SPACE               TO  J026
       *
       *    ≤ËÃÃ ‘Ω∏
+           INITIALIZE                      J026
            MOVE    SPA-J026-GMN-MIDASI     TO  J026-MIDASI
       *
            MOVE    SPA-J026-GMN-STRDD      TO  J026-STRDD
@@ -906,6 +907,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-JID1-FLG
       *
            MOVE    SPACE               TO  JID1
+           INITIALIZE                      JID1
            MOVE    SPA-JIDCD           TO  JID1-ID1CODE
            MOVE    WRK-JIDMSG          TO  JID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET

@@ -1354,6 +1354,7 @@
       *
            MOVE    SPACE               TO  KA021
       *    コラムリストの位置指定
+           INITIALIZE                      KA021
            MOVE    ZERO                TO  KA021-MEILIST-ROW
            IF      WRK-KA02-MEILIST-ROW NOT =   ZERO
                MOVE    WRK-KA02-MEILIST-ROW TO  KA021-MEILIST-ROW
@@ -1501,6 +1502,7 @@
        520-KA02IDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KAID1
+           INITIALIZE                      KAID1
            EVALUATE    SPA-KAID1CD
                WHEN    "0101"
                    STRING  "選択した剤を削除します。"

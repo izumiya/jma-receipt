@@ -402,7 +402,7 @@ J04 {
         textdata varchar(55);
       };
       count int;
-        item varchar(55)[20];
+        item varchar(55)[40];
     };
     SRYKA {
       textdata varchar(20);
