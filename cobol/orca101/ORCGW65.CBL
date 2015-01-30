@@ -2919,7 +2919,13 @@
            MOVE    "入外上限額・他一部負担累計を入力する"
                                    TO  SPA-GMN-PTJGNKBNMEIL (3)
       *
-           MOVE    3               TO  SPA-GMN-PTJGNKBN-MAX
+           MOVE    "3"             TO  SPA-GMN-PTJGNKBNL    (4)
+           STRING  "入外上限額・他一部負担累計を入力する"
+                   "（難病・小児慢性適用区分対応）"
+           INTO    SPA-GMN-PTJGNKBNMEIL (4)
+           END-STRING
+      *
+           MOVE    4               TO  SPA-GMN-PTJGNKBN-MAX
       *
            .
        3110-PTJGNKBNLST-EXT.
