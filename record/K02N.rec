@@ -24,7 +24,7 @@ K02N	{
 				value	varchar(65);
 			};
 			count	int;
-			item	varchar(65)[15];
+			item	varchar(65)[30];
 		};
 		RATE	{
 			value	varchar(6);
@@ -57,7 +57,7 @@ K02N	{
 				value	varchar(16);
 			};
 			count	int;
-			item	varchar(16)[40];
+			item	varchar(16)[99];
 		};
 		TABOOCOB	{
 			TABOO	{

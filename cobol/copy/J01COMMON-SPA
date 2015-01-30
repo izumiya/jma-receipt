@@ -167,7 +167,7 @@
                05  SPA-J01-SRYKA               PIC X(02).
                05  SPA-J01-SRYKAMEI            PIC X(12).
                05  SPA-GMN-SRYKA-AREA.
-                   07  SPA-GMN-SRYKA-LIST      OCCURS  41.
+                   07  SPA-GMN-SRYKA-LIST      OCCURS  100.
                        09  SPA-GMN-SRYKAL      PIC X(02).
                        09  SPA-GMN-F1L         PIC X(01).
                        09  SPA-GMN-SRYKAMEIL   PIC X(16).

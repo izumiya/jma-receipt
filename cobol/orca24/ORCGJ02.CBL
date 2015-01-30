@@ -1685,7 +1685,7 @@
            END-IF
            MOVE    ZERO                TO  SPA-SRYKA-MAX
            PERFORM VARYING     IDX     FROM    2   BY  1
-                   UNTIL       (IDX            >   40   )  OR
+                   UNTIL       (IDX            >   100  )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC         TO  SYS-1005-REC
       *
@@ -2152,7 +2152,7 @@
            MOVE    1                   TO  IDH
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )  OR
-                              (IDH     >=  20              )
+                              (IDH     >=  40              )
                ADD     1                   TO  IDH
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDH)
@@ -2916,6 +2916,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *!
       *    Êñ³ç¸¡ºº¿ô
            IF      WRK-HOUKNS-CNT      >   1
+             AND (IDG                  <=  400 )
                PERFORM 3009-INPUT-MEISYO-SEC
            END-IF
       *!
@@ -2925,7 +2926,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                TO  SPA-NAI-SYUTEN2 (IDX)
            END-IF
       *!!
-      *
            IF      IDG                 >   400
                GO      TO      3101-SRYACCT-SPA-EXT
            END-IF
@@ -2987,8 +2987,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                            (IDG3 + 1)
                    END-PERFORM
                    COMPUTE WRK-HOUKNS-IDX  =   WRK-HOUKNS-IDX  +  1
-                   INITIALIZE                  SPA-GMN-TBLREC
+                   IF      WRK-HOUKNS-IDX      <=   400
+                       INITIALIZE                  SPA-GMN-TBLREC
                                                         (WRK-HOUKNS-IDX)
+                   END-IF
                    ADD     1               TO  IDG
                END-IF
                IF      WRK-HOUKNS-IDX      <=   400

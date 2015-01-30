@@ -123,7 +123,7 @@
       *        保険組合せ一覧
                05  SPA-HKNCOMBI-AREA.
                    07  SPA-GMN-HKNCOMBI-LISTG.
-                       09  SPA-GMN-HKN-LIST    OCCURS  20.
+                       09  SPA-GMN-HKN-LIST    OCCURS  40.
                            11  SPA-GMN-THKNCOMBINUM-G.
                                13  SPA-GMN-THKNCOMBINUM    PIC X(04).
                                13  SPA-GMN-THKNCOMBY1      PIC X(01).

@@ -272,12 +272,12 @@
       *    保険組合せ一覧（患者番号変更毎にクリア）
            03  SPA-HKNCOMI-AREA.
                05  SPA-GMN-HKNCOMBI-LISTG.
-                   07  SPA-GMN-HKN-LIST    OCCURS  15.
+                   07  SPA-GMN-HKN-LIST    OCCURS  30.
                        11  SPA-GMN-THKNCOMBINUM    PIC X(04).
                        11  SPA-GMN-THKNCOMBY1      PIC X(01).
                        11  SPA-GMN-THKNCOMBIMEI    PIC X(60).
       *
-                   07  SPA-NAI-HKNCOMBI    OCCURS  15.
+                   07  SPA-NAI-HKNCOMBI    OCCURS  30.
                        11  SPA-GMN-TFTNRATEMEI     PIC  X(05).
                        11  SPA-NAI-TFTNRATE        PIC  9(03).
                        11  SPA-NAI-THKNCOMBIMEI    PIC  X(50).

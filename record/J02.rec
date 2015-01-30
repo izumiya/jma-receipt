@@ -207,7 +207,7 @@ J02	{
 				value	varchar(16);
 			};
 			count	int;
-			item	varchar(16)[41];
+			item	varchar(16)[100];
 		};
 		SRYKBNCOMB	{
 			SRYKBN	{
@@ -224,7 +224,7 @@ J02	{
 				value	varchar(65);
 			};
 			count	int;
-			item	varchar(65)[20];
+			item	varchar(65)[40];
 		};
 		IKKATU	{
 			value	varchar(20);

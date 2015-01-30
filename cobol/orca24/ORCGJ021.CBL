@@ -766,6 +766,7 @@
        500-GMNHEN-SEC                  SECTION.
       *
            MOVE    SPACE               TO  J021
+           INITIALIZE                      J021
       *
       *    ≤ËÃÃ ‘Ω∏
            IF      SPA-J021-MAE-HKNCOMBI   =   ZERO

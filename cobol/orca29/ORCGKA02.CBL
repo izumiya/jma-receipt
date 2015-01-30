@@ -755,8 +755,10 @@
            MOVE    SPACE               TO  SYS-1005-REC
            INITIALIZE                  SYS-1005-REC
            MOVE    "1005"              TO  SYS-1005-KANRICD
-           MOVE    "00000000"          TO  SYS-1005-STYUKYMD
-           MOVE    "99999999"          TO  SYS-1005-EDYUKYMD
+      **** MOVE    "00000000"          TO  SYS-1005-STYUKYMD
+      **** MOVE    "99999999"          TO  SYS-1005-EDYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1005-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1005-EDYUKYMD
       *
            MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
            MOVE    SYS-1005-REC        TO  MCPDATA-REC
@@ -772,7 +774,7 @@
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       (IDX            >   40   )  OR
+                   UNTIL       (IDX            >   99   )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC           TO  SYS-1005-REC
                MOVE    SYS-1005-KBNCD (1:2)  TO  SPA-GMN-TSRYKA   (IDX)
@@ -797,7 +799,7 @@
       *
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )
-                           OR (IDX     >   15   )
+                           OR (IDX     >   30   )
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDX)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
@@ -1180,6 +1182,7 @@
                                                               (IDX-J)
            END-IF
       *    ²ÊÌ¾
+           MOVE    HZN-JYURRK-SRYKA    TO  SPA-GMN-RRKSRYKA(IDX-J)
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY         >   SPA-SRYKA-MAX
                IF      HZN-JYURRK-SRYKA    =   SPA-GMN-TSRYKA (IDY)
@@ -1335,7 +1338,7 @@
       *
            PERFORM VARYING     IDX-T     FROM   1   BY  1
                    UNTIL      (IDX-T     >   ORCSHKN-HKN-MAX )
-                           OR (IDX-T     >   15   )
+                           OR (IDX-T     >   30   )
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX-T)
                                        TO  SPA-GMN-THKNCOMBINUM (IDX-T)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX-T)

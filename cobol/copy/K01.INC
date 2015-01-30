@@ -29,7 +29,7 @@
                 04  K01-SRYKA.
                   05  K01-VALUE   PIC X(21).
                 04  K01-SRYKA-COUNT   PIC S9(9)   BINARY.
-                04  K01-SRYKA-ITEM    PIC X(21)   OCCURS  40 TIMES.
+                04  K01-SRYKA-ITEM    PIC X(21)   OCCURS  99 TIMES.
               03  K01-SRYYMD.
                 04  K01-VALUE   PIC X(10).
               03  K01-ZENKAICOMB.

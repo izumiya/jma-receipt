@@ -29,8 +29,8 @@ K97	{
 				item	{
 					value0	varchar(2);
 					value1	varchar(12);
-				}	[40];
-				select	bool[40];
+				}	[99];
+				select	bool[99];
 			};
 		};
 		scrolledwindow26	{
@@ -41,8 +41,8 @@ K97	{
 				item	{
 					value0	varchar(04);
 					value1	varchar(60);
-				}	[15];
-				select	bool[15];
+				}	[30];
+				select	bool[30];
 			};
 		};
 	};

@@ -37,7 +37,7 @@
                   05  KA02-VALUE  PIC X(65).
                 04  KA02-HKNCOMBI-COUNT  PIC S9(9)   BINARY.
                 04  KA02-HKNCOMBI-ITEM
-                        PIC X(65)   OCCURS  15 TIMES.
+                        PIC X(65)   OCCURS  30 TIMES.
               03  KA02-DRCD-COMB.
                 04  KA02-DRCD.
                   05  KA02-VALUE  PIC X(29).

@@ -1519,7 +1519,7 @@
            MOVE    ZERO                TO  IDY
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )
-                           OR (IDX     >   15   )
+                           OR (IDX     >   30   )
       *        Ï«ºÒ¡¦¼«ÇåÀÕ¤ÏÂÐ¾Ý³°
                IF      ORCSHKN-NAI-HKNNUM (IDX)    =   "971"
                                                    OR  "973"

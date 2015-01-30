@@ -139,7 +139,7 @@
       *  保険組合せ一覧
                05  SPA-HKNCOMI-AREA.
                    07  SPA-GMN-HKNCOMBI-LISTG.
-                       09  SPA-GMN-HKN-LIST    OCCURS  20.
+                       09  SPA-GMN-HKN-LIST    OCCURS  40.
                            11  SPA-GMN-THKNCOMBINUM-G.
                                13  SPA-GMN-THKNCOMBINUM    PIC X(04).
                                13  SPA-GMN-THKNCOMBY1      PIC X(01).
@@ -687,6 +687,7 @@
            MOVE    1                   TO  IDH
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL       IDX     >   ORCSHKN-HKN-MAX
+                           OR (IDH     >=  40      )
                ADD     1                   TO  IDH
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        TO  SPA-GMN-THKNCOMBINUM (IDH)

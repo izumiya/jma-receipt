@@ -35,6 +35,7 @@
       *  04.04.00    NACL-多々納  08/12/XX  入院料包括対応
       *  04.07.00    NACL-多々納  12/01/25  入力スクロール背景色
       *  04.07.00    NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
+      *  04.07.00    NACL-多々納  15/02/XX  診療科件数変更他対応
       ************************************************************
       *
        01  SPA-K01KYOUTU.
@@ -628,7 +629,7 @@
       *診療科一覧
            03  SPA-K01SONOTA.
                05  SPA-GMN-SRYKA-AREA.
-                   07  SPA-GMN-SRYKALST                OCCURS  40.
+                   07  SPA-GMN-SRYKALST                OCCURS  99.
                        09  SPA-GMN-SRYKAL      PIC X(02).
                        09  SPA-GMN-F1L         PIC X(01).
                        09  SPA-GMN-SRYKAMEIL   PIC X(12).
@@ -642,6 +643,14 @@
       *H26.4
       *    画面最大行数
            03  SPA-GMLINCNT            PIC 9(02).
+      *
+      *H27.2
+      *    後発変更不可（処方毎）
+           03  SPA-GENECHG-KBN         PIC  9(01).
+      *    投薬３割逓減確認
+           03  SPA-TEIGEN30-CHK        PIC  9(01).
+           03  SPA-TEIGEN30-OK         PIC  9(01).
+      *
       *    予備
            03  SPA-K01-YOBI            PIC X(10).
       *
