@@ -32,6 +32,8 @@
       *  04.05.02    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.07.01    NACL-ÌçÏÆ    14/11/04  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê£°£µ£´¡¢£°£µ£²ÂÐ±þ¡Ë
+      *  04.07.02    NACL-ÌçÏÆ    15/01/26  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡ÊÅÔÆ»ÉÜ¸©ÆÈ¼«ÆñÉÂÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -55,13 +57,7 @@
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-END                 PIC 9(01).
            03  FLG-HKNHIT              PIC 9(01).
-           03  FLG-KOHNUM-G.
-               05  FLG-KOH051          PIC 9(01).
-               05  FLG-KOH052          PIC 9(01).
-               05  FLG-KOH054          PIC 9(01).
-               05  FLG-KOH091          PIC 9(01).
-               05  FLG-KOH151          PIC 9(01).
-               05  FLG-KOH152          PIC 9(01).
+           03  FLG-KOH                 PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -70,6 +66,10 @@
       *
        01  WRK-AREA.
            03  WRK-HKNCOMBI            PIC X(04).
+           03  WRK-JGNGET-AREA.
+               04  WRK-JGNGET-OCC      OCCURS 4.
+                 05  WRK-JGNGET-TEKIYOFLG
+                                       PIC 9(01).
       *
        01  KEY-AREA.
            03  KEY-HKNNUM              PIC X(03).
@@ -131,6 +131,9 @@
            COPY    "CPORCSAGECHK.INC".
       *
            COPY    "CPORCSS009.INC".
+      *
+      *    ¸øÈñ·î¾å¸Â³Û¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSJGNGET.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -302,12 +305,7 @@
       *
            PERFORM 800-HKNCOMBI-CHK-SEC
            IF    ( KEY-HKNNUM      =   COMB-HKNNUM )
-            AND  (     FLG-KOH051  =   1
-                    OR FLG-KOH052  =   1
-                    OR FLG-KOH054  =   1
-                    OR FLG-KOH091  =   1
-                    OR FLG-KOH151  =   1
-                    OR FLG-KOH152  =   1           )
+           AND   ( FLG-KOH         =   1           )
       *
                PERFORM 800-HOKEN-CHK-SEC
                PERFORM VARYING IDX-KOH FROM    1   BY  1
@@ -365,6 +363,8 @@
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
                                            =   "52"           )
                         AND  ( SSRHKOH-SRYYM    >=   "201501" )
+                       WHEN  ( WRK-JGNGET-TEKIYOFLG(IDX-KOH)
+                                           =    1             )
                            IF    ( KEY-HKNNUM  =   "060" OR "039" )
                             OR   ( AGECHK-NENREI   >=    70 )
                                MOVE    1       TO  SSRHKOH-RC
@@ -376,7 +376,6 @@
                            END-IF
                        END-EVALUATE
                    END-IF
-
                END-PERFORM
            END-IF
       *
@@ -400,7 +399,9 @@
            INITIALIZE                  HKNCOMBI-REC
       *
            MOVE    ZERO            TO  FLG-HKNHIT
-                                       FLG-KOHNUM-G
+                                       FLG-KOH
+      *
+           INITIALIZE                  WRK-JGNGET-AREA
       *
            PERFORM 900-HKNCOMBI-KEY-SEL-SEC
            IF    ( COMB-HKNNUM     =   SPACE OR "971" OR "973" OR "975"
@@ -415,27 +416,53 @@
                    UNTIL ( IDX-KOH >   CONST-KOH-MAX )
                     OR   ( COMB-KOHHKNNUM (IDX-KOH)    =   SPACE )
       *
-               IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "051" )
-                   MOVE    1       TO  FLG-KOH051
+               IF  IDX-KOH  =  1
+                 IF  ( COMB-KOHHKNNUM (IDX-KOH)    =   "051"
+                                                   OR  "052"
+                                                   OR  "091"    )
+                 OR  ((COMB-KOHHKNNUM (IDX-KOH)    =   "054"   ) AND
+                      (SSRHKOH-SRYYM              >=   "201501"))
+                 OR  ((SYS-1001-PREFNUM            =    13     ) AND
+                      (COMB-KOHHKNNUM (IDX-KOH)    =   "151"   ) AND
+                      (SSRHKOH-SRYYM              >=   "200905"))
+                 OR  ((SYS-1001-PREFNUM            =    23     ) AND
+                      (COMB-KOHHKNNUM (IDX-KOH)    =   "191"   ) AND
+                      (SSRHKOH-SRYYM              >=   "200910"))
+                 OR  ((SYS-1001-PREFNUM            =   23 OR 24) AND
+                      (COMB-KOHHKNNUM (IDX-KOH)    =   "152"   ) AND
+                      (SSRHKOH-SRYYM              >=   "201104"))
+                   MOVE    1       TO  FLG-KOH
+                 END-IF
+                 IF   (FLG-KOH                       =  ZERO         )
+                 AND  (COMB-KOHHKNNUM(IDX-KOH)(1:1) >= "1" AND <= "8")
+                   PERFORM  900-PTKOHINF-KEY-SEL-SEC
+                   INITIALIZE                  LNK-ORCSJGNGET-REC
+                   MOVE  SPA-HOSPNUM       TO  LNK-ORCSJGNGET-HOSPNUM
+                   MOVE  COMB-KOHHKNNUM(IDX-KOH)
+                                           TO  LNK-ORCSJGNGET-KOHHKNNUM
+                   MOVE  PTKOH-TEKSTYMD    TO  LNK-ORCSJGNGET-TEKSTYMD
+                   MOVE  SYS-1001-PREFNUM  TO  LNK-ORCSJGNGET-PREFNUM
+                   MOVE   "1"              TO  LNK-ORCSJGNGET-HENFLG
+                   CALL  "ORCSJGNGET"      USING
+                                           LNK-ORCSJGNGET-REC
+                                           SPA-AREA
+                   IF    LNK-ORCSJGNGET-RC   =   ZERO
+                     IF   (SSRHKOH-SRYYM            >=  "201501")
+                     AND  (LNK-ORCSJGNGET-TEKIYOFLG  =   1      )
+                       MOVE    1   TO  FLG-KOH
+                       MOVE    1   TO  WRK-JGNGET-TEKIYOFLG(IDX-KOH)
+                     END-IF
+                   END-IF
+                 END-IF
                END-IF
-               IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "052" )
-                   MOVE    1       TO  FLG-KOH052
-               END-IF
-               IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "054"    )
-                AND  ( SSRHKOH-SRYYM              >=   "201501" )
-                   MOVE    1       TO  FLG-KOH054
-               END-IF
-               IF    ( COMB-KOHHKNNUM (IDX-KOH)    =   "091" )
-                   MOVE    1       TO  FLG-KOH091
-               END-IF
-               IF    ( SYS-1001-PREFNUM            =   13 )
-                AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "151" )
-                   MOVE    1       TO  FLG-KOH151
-               END-IF
-               IF    ( SYS-1001-PREFNUM            =   23 OR 24 )
-                AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "152"    )
-                AND  ( SSRHKOH-SRYYM              >=   "201104" )
-                   MOVE    1       TO  FLG-KOH152
+      *
+               IF  IDX-KOH  =  2
+                 IF  ( COMB-KOHHKNNUM (IDX-KOH)    =   "051"
+                                                   OR  "091"    )
+                 OR  ((COMB-KOHHKNNUM (IDX-KOH)    =   "054"   ) AND
+                      (SSRHKOH-SRYYM              >=   "201501"))
+                   MOVE    1       TO  FLG-KOH
+                 END-IF
                END-IF
       *
            END-PERFORM
