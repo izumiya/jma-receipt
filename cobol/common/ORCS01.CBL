@@ -434,6 +434,8 @@
       *  04.07.20    NACL-ÌçÏÆ    14/12/09  ÅìµþÅÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       *  04.07.21    NACL-ÌçÏÆ    15/01/05  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.07.22    NACL-ÌçÏÆ    15/01/21  ÆñÉÂÊ£¿ôÂÐ±þ
+      *  04.07.23    NACL-ÌçÏÆ    15/01/26  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *                                     ¡ÊÅÔÆ»ÉÜ¸©ÆÈ¼«ÆñÉÂÂÐ±þ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -663,6 +665,7 @@
                05  WK-KOHJGNGET-OCC              OCCURS   4.
                  06  WK-KOHJGNGET-TAISYOKBN      PIC 9(01).
                  06  WK-KOHJGNGET-TEKSTYMD       PIC X(08).
+                 06  WK-KOHJGNGET-TEKIYOFLG      PIC 9(01).
       *
            03  WK-SYS2010-TBL.
                05  WK-SYS2010-OCC                OCCURS   4.
@@ -3949,6 +3952,8 @@
       *
            PERFORM       2113-SYSKAN2010-HENSYU-SEC
       *
+           PERFORM       2112-TAISYOKBN-HENSYU-SEC
+      *
       *    ¸øÈñÃ±ÆÈ¤ÇÏ·¿ÍÊÝ¸±ÆþÎÏ¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
            IF      COMB-HKNNUM          =   SPACE
            AND     COMB-KOH1HKNNUM  NOT =   SPACE
@@ -4149,19 +4154,6 @@
                   MOVE    1     TO    FLG-ZENKI-TOKUREI
                END-IF
              END-IF
-           END-IF
-      *
-           INITIALIZE        WK-TOKATUKAI-TBL
-           IF ((WK-1001-PREFNUM      =  13     ) AND
-               (COMB-KOH1HKNNUM      = "151"   ) AND
-               (LNK-SYU-SRYYMD(1:6) >= "200905"))
-           OR ((WK-1001-PREFNUM      =  23     ) AND
-               (COMB-KOH1HKNNUM      = "191"   ) AND
-               (LNK-SYU-SRYYMD(1:6) >= "200910"))
-           OR ((WK-1001-PREFNUM   =  23 OR 24  ) AND
-               (COMB-KOH1HKNNUM      = "152"   ) AND
-               (LNK-SYU-SRYYMD(1:6) >= "201104"))
-               MOVE    1     TO    WK-TOKATUKAI(1)
            END-IF
       *
       *    ÆÃÄê¼À´µÅù¤ÎÈ½Äê
@@ -5763,6 +5755,7 @@
                    ( WK-KOH-FTNJANUM(5:3) = "601" OR "501"  ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "54"            ) AND
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
+               OR (  WK-KOHJGNGET-TEKIYOFLG(1) =  1          )
                  IF     FLG-KOUREI-KBN   =   "1"
                    IF    COMB-HOJOKBN    =   "3" OR "6" OR "7"
                          MOVE    1    TO   FLG-TOKUSITU
@@ -5938,7 +5931,6 @@
            INITIALIZE       WK-CHIHOU-FLG-TAIHI-AREA.
       *
            PERFORM    2111-TOKU75-SETTEI-SEC.
-           PERFORM    2112-TAISYOKBN-HENSYU-SEC.
       *
            MOVE      ZERO      TO      WK-KANAGAWA41-FTNRATE.
       *
@@ -9240,6 +9232,8 @@
                 IF  COMB-KOHHKNNUM(KOH-IDX)(1:1)  >=  "1" AND <=  "8"
                    MOVE  WK-KOHJGNGET-TAISYOKBN(KOH-IDX)
                                           TO  LNK-ORCSJGNGET-SETKBN
+                   MOVE  WK-KOHJGNGET-TEKIYOFLG(KOH-IDX)
+                                          TO  LNK-ORCSJGNGET-SETKBN2
                 END-IF
       *
                 CALL    "ORCSJGNGET"      USING
@@ -10862,6 +10856,19 @@
       ******************************************************************
        2112-TAISYOKBN-HENSYU-SEC           SECTION.
       *
+           INITIALIZE        WK-TOKATUKAI-TBL
+           IF ((WK-1001-PREFNUM      =  13     ) AND
+               (COMB-KOH1HKNNUM      = "151"   ) AND
+               (LNK-SYU-SRYYMD(1:6) >= "200905"))
+           OR ((WK-1001-PREFNUM      =  23     ) AND
+               (COMB-KOH1HKNNUM      = "191"   ) AND
+               (LNK-SYU-SRYYMD(1:6) >= "200910"))
+           OR ((WK-1001-PREFNUM   =  23 OR 24  ) AND
+               (COMB-KOH1HKNNUM      = "152"   ) AND
+               (LNK-SYU-SRYYMD(1:6) >= "201104"))
+               MOVE    1     TO    WK-TOKATUKAI(1)
+           END-IF
+      *
            INITIALIZE        WK-KOHJGNGET-TBL
            PERFORM   VARYING   IDX-CYO   FROM    1   BY  1
                       UNTIL    IDX-CYO     >     4
@@ -10904,6 +10911,13 @@
                 IF    LNK-ORCSJGNGET-RC   =   ZERO
                    MOVE   LNK-ORCSJGNGET-TAISYOKBN
                                 TO  WK-KOHJGNGET-TAISYOKBN(IDX-CYO)
+                   IF  (LNK-SYU-SRYYMD(1:6)     >=  "201501")
+                   AND (IDX-CYO                  =   1      )
+                   AND (LNK-ORCSJGNGET-TEKIYOFLG =   1      )
+                   AND (WK-TOKATUKAI(IDX-CYO)    =   ZERO   )
+                     MOVE   1   TO  WK-KOHJGNGET-TEKIYOFLG(IDX-CYO)
+      ***************MOVE   1   TO  WK-TOKATUKAI(IDX-CYO)
+                   END-IF
                 END-IF
              END-IF
            END-PERFORM
@@ -19842,6 +19856,7 @@
                         (FLG-KOUREI-KBN               =   "1" ))
                    AND ( MAX-KIN-KOHI1-M  >  WK-KOH-GENDOGAKU  )
                      IF   (WK-TOKATUKAI(1)            =  ZERO)
+                     AND  (WK-KOHJGNGET-TEKIYOFLG(1)  =  ZERO)
                      AND  (WK-KOHJGNGET-TAISYOKBN(1)  =   2  )
                       CONTINUE
                      ELSE
@@ -19877,6 +19892,7 @@
                    IF  ( FLG-GENBUTU70   NOT =   ZERO          )
                    AND ( MAX-KIN-KOHI1-M  >  WK-GEN70-GENDOGAKU)
                      IF   (WK-TOKATUKAI(1)            =  ZERO)
+                     AND  (WK-KOHJGNGET-TEKIYOFLG(1)  =  ZERO)
                      AND  (WK-KOHJGNGET-TAISYOKBN(1)  =   2  )
                       CONTINUE
                      ELSE
