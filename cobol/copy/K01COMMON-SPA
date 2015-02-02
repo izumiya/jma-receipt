@@ -178,8 +178,11 @@
                05  SPA-HKTSANTEI-206       PIC 9(01).
       *
       *H26.4
-      *        妥結率５割以下区分  (H27.4から使用）
+      *        妥結率５割以下区分  (H26.4から使用）
                05  SPA-DAKT50-KBN          PIC 9(01).
+      *H27.4
+      *        低紹介率病院区分  (H27.4から使用）
+               05  SPA-TEIRITU-KBN         PIC 9(01).
       *@
       *腫瘍マーカー一覧展開選択
                05  SPA-AKUSEIHYOFLG        PIC  X(01).
