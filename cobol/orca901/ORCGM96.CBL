@@ -814,48 +814,76 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *****************************************************************
        2011-RUNNING-JOB-CHK-SEC        SECTION.
       *
-           MOVE    ZERO            TO  FLG-RUNNING
+           MOVE    ZERO                TO  FLG-RUNNING
       *
-           MOVE    "CH2"           TO  SJOBKANRI-MODE
+           PERFORM 900-MONBATCH-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-MONBATCH    NOT =   ZERO )
+                    OR   ( FLG-RUNNING     NOT =   ZERO )
+      *
+               IF    ( SHELLTBL-SHELLID    =   CONST-MNTSHELLID
+                                            OR CONST-MLISHELLID )
+      *
+                   MOVE    1           TO  FLG-RUNNING
+      *
+               END-IF
+      *
+               PERFORM 900-MONBATCH-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           PERFORM 900-JOBKANRI-KEY4-SEL-SEC
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
            MOVE    CONST-MNTJOBID  TO  JOB-JOBID
            MOVE    CONST-MNTSHELLID
                                    TO  JOB-SHELLID
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
+                                   ORCSJOBKANRIAREA
+                                   JOBKANRI-REC
+                                   SPA-AREA
            IF    ( SJOBKANRI-RETURN    =   ZERO  )
       *
-               MOVE    2           TO  FLG-RUNNING
-      *
-               IF    ( JOB-PGID            =   "ORCXRMST2" )
-                AND  ( JOB-STEPENDTIME     =   SPACE OR ZERO )
+               IF    ( FLG-RUNNING     =   1 )
+                AND  ( JOB-PGID        =   "ORCXRMST2" )
+                AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
                    MOVE    "1104"  TO  SPA-ERRCD
                END-IF
+      *
+               IF    ( FLG-RUNNING     =   ZERO )
+                   MOVE    2       TO  FLG-RUNNING
+               END-IF
+      *
            END-IF
       *
-           IF    ( SPA-ERRCD       =   SPACE )
-               MOVE    "CH2"           TO  SJOBKANRI-MODE
-               INITIALIZE                  JOBKANRI-REC
-               MOVE    CONST-MLIJOBID  TO  JOB-JOBID
-               MOVE    CONST-MLISHELLID
-                                       TO  JOB-SHELLID
-               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
-               CALL    "ORCSJOB"       USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
-               IF    ( SJOBKANRI-RETURN    =   ZERO  )
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    CONST-MLIJOBID  TO  JOB-JOBID
+           MOVE    CONST-MLISHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA
+                                   JOBKANRI-REC
+                                   SPA-AREA
+           IF    ( SJOBKANRI-RETURN    =   ZERO  )
       *
-                   MOVE    2           TO  FLG-RUNNING
-      *
-                   IF    ( JOB-PGID        =   "ORCXRMST4" )
-                    AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
-                       MOVE    "1104"  TO  SPA-ERRCD
-                   END-IF
+               IF    ( FLG-RUNNING     =   1 )
+                AND  ( JOB-PGID        =   "ORCXRMST4" )
+                AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
+                   MOVE    "1104"  TO  SPA-ERRCD
                END-IF
+      *
+               IF    ( FLG-RUNNING     =   ZERO )
+                   MOVE    2       TO  FLG-RUNNING
+               END-IF
+      *
            END-IF
       *
            .
@@ -1669,6 +1697,50 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-MONBATCH-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥¸¥ç¥Ö´ÉÍý¸¡º÷½èÍý
+      *****************************************************************
+       900-JOBKANRI-KEY4-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-JOBKANRI
+      *
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    JOBKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_jobkanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 911-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               PERFORM 900-JOBKANRI-KEY4-FET-SEC
+           ELSE
+               MOVE    1               TO  FLG-JOBKANRI
+               INITIALIZE                  JOBKANRI-REC
+           END-IF
+      *
+           .
+       900-JOBKANRI-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥¸¥ç¥Ö´ÉÍýFETCH½èÍý
+      *****************************************************************
+       900-JOBKANRI-KEY4-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-JOBKANRI
+      *
+           MOVE    "tbl_jobkanri"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+      *
+               MOVE    MCPDATA-REC     TO  JOBKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-JOBKANRI
+               INITIALIZE                  JOBKANRI-REC
+           END-IF
+      *
+           .
+       900-JOBKANRI-KEY4-FET-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â£Ó£Å£Ì£Å£Ã£Ô½èÍý
