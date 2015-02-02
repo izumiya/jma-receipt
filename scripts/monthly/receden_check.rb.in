@@ -409,18 +409,34 @@ class Receden_check < Receden_common
           end
         end
 
-        if ((rece.tokki.include?("17") || rece.tokki.include?("18") || rece.tokki.include?("19")) && [KOREI7,KOUKI7,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)) ||
-           ( rece.tokki.include?("22") && [KOREI7,KOUKI7].include?(rece.sbt.honkzk)) ||
-           ((rece.tokki.include?("22") || rece.tokki.include?("23") || rece.tokki.include?("24")) && [HONNIN,ROKUSAI,KAZOKU].include?(rece.sbt.honkzk))
-          myflg=false
-          rece.ko.each{|ko|
-            if ko["FTNNUM"].value =~ /^(51..601|51..602|52)/
-              myflg=true
-              break
+        if re["SRYYM"].wtos >= H270101
+          if ((rece.tokki.include?("17") || rece.tokki.include?("18") || rece.tokki.include?("19")) && [KOREI7,KOUKI7,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)) ||
+             ( rece.tokki.include?("22") && [KOREI7,KOUKI7].include?(rece.sbt.honkzk))
+            myflg=false
+            rece.ko.each{|ko|
+              if ko["FTNNUM"].value =~ /^(51..601|51..602|52|54..501|54..601)/
+                myflg=true
+                break
+              end
+            }
+            if myflg == false
+              @errors.push("30160",rece,re,"TOKKI")
             end
-          }
-          if myflg == false
-            @errors.push("30160",rece,re,"TOKKI")
+          end
+        else
+          if ((rece.tokki.include?("17") || rece.tokki.include?("18") || rece.tokki.include?("19")) && [KOREI7,KOUKI7,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)) ||
+             ( rece.tokki.include?("22") && [KOREI7,KOUKI7].include?(rece.sbt.honkzk)) ||
+             ((rece.tokki.include?("22") || rece.tokki.include?("23") || rece.tokki.include?("24")) && [HONNIN,ROKUSAI,KAZOKU].include?(rece.sbt.honkzk))
+            myflg=false
+            rece.ko.each{|ko|
+              if ko["FTNNUM"].value =~ /^(51..601|51..602|52)/
+                myflg=true
+                break
+              end
+            }
+            if myflg == false
+              @errors.push("30160",rece,re,"TOKKI")
+            end
           end
         end
 
