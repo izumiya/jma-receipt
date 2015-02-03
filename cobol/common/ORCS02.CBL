@@ -9051,19 +9051,18 @@
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-KANEN-TAFTNRUIKEI(KOH-IDX)
                         END-IF
-                        IF  (COMB-KOH1HKNNUM      = "052" OR "054")
+                        IF  (COMB-KOH1HKNNUM      = "054"         )
                         AND (LNK-SYU-SRYYMD(1:6) >= "201501"      )
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-TOKUSITU-TAFTNRUIKEI(KOH-IDX)
                           IF  MAX-KIN-KOHI1-M = ZERO
-                            MOVE  1  TO  WK-TOKUSITU-SKJGENMEN(KOH-IDX)
-                          END-IF
-                        END-IF
-                        IF  (WK-1001-PREFNUM      =  23 OR 24     )
-                        AND (COMB-KOH1HKNNUM      = "152"         )
-                        AND (LNK-SYU-SRYYMD(1:6) >= "201501"      )
-                          IF  MAX-KIN-KOHI1-M = ZERO
-                            MOVE  1  TO  WK-TOKUSITU-SKJGENMEN(KOH-IDX)
+                            IF  WK-TOKUSITU-TAFTNRUIKEI(KOH-IDX)
+                                              = 9999999 OR 999999
+                              CONTINUE
+                            ELSE
+                              MOVE  1
+                                   TO WK-TOKUSITU-SKJGENMEN(KOH-IDX)
+                            END-IF
                           END-IF
                         END-IF
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1"
@@ -9543,7 +9542,13 @@
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-TOKUSITU-TAFTNRUIKEI(KOH-IDX)
                           IF  MAX-KIN-KOHI2-M = ZERO
-                            MOVE  1  TO  WK-TOKUSITU-SKJGENMEN(KOH-IDX)
+                            IF  WK-TOKUSITU-TAFTNRUIKEI(KOH-IDX)
+                                              = 9999999 OR 999999
+                              CONTINUE
+                            ELSE
+                              MOVE  1
+                                   TO WK-TOKUSITU-SKJGENMEN(KOH-IDX)
+                            END-IF
                           END-IF
                         END-IF
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1"
@@ -23854,6 +23859,11 @@
                IF   WK-TOKUSITU-SKJ(KOH-IDX)  =   1
                   MOVE   1     TO   FLG-NYUSKJJYOGAK
                END-IF
+               IF  (WK-TOKUSITU-SKJ(KOH-IDX)        =   9)
+               AND (WK-TOKUSITU-SKJGENMEN(KOH-IDX)  =   1)
+                    MOVE  "3"    TO   WK-NYUSKJRYYKBN
+                    MOVE  ZERO   TO   FLG-NYUSKJJYOGAK
+               END-IF
              END-IF
              IF   ( COMB-KOHHKNNUM(KOH-IDX)   =  "052" )
              OR   ((WK-1001-PREFNUM   =   23 OR 24    ) AND
@@ -23864,10 +23874,6 @@
                   MOVE  "3"    TO   WK-NYUSKJRYYKBN
                   MOVE  ZERO   TO   FLG-NYUSKJJYOGAK
                END-IF
-             END-IF
-             IF  WK-TOKUSITU-SKJGENMEN(KOH-IDX)  =   1
-               MOVE     "3"    TO   WK-NYUSKJRYYKBN
-               MOVE     ZERO   TO   FLG-NYUSKJJYOGAK
              END-IF
            END-IF.
       *
