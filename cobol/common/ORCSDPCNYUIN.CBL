@@ -52,6 +52,18 @@
       *                                     ・褥瘡評価実施加算（有床診療所）
       *
       *              NACL-小豆沢  14/04/15  平成２６年度改定対応
+      *              NACL-小豆沢  15/02/03  短期滞在手術等基本料で入院料が
+      *                                     未算定日に入力された診療行為について
+      *                                     ・医師コード
+      *                                     ・病棟コード
+      *                                     ・病棟区分
+      *                                     が記録できなかった不具合を修正
+      *              NACL-小豆沢  15/02/03  労災保険で入院した患者が医保で
+      *                                     入力した診療行為について
+      *                                     ・医師コード
+      *                                     ・病棟コード
+      *                                     ・病棟区分
+      *                                     が記録できなかった不具合を修正
       *****************************************************************
       *
       *
@@ -690,6 +702,8 @@
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                    MOVE    "key17"                 TO  MCP-PATHNAME
                    PERFORM   900-CLOSE-SEC
+      *            病棟番号（病棟区分）の編集
+                   PERFORM   2105-BTUNUM-HENSHU-SEC
                    GO   TO    200-MAIN-EXT
                END-IF
            ELSE
@@ -698,6 +712,8 @@
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key17"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
+      *        病棟番号（病棟区分）の編集
+               PERFORM   2105-BTUNUM-HENSHU-SEC
                GO   TO    200-MAIN-EXT
            END-IF
       *    入院会計クローズ
@@ -3614,7 +3630,7 @@
            PERFORM    VARYING   IDX1   FROM  1  BY  1
                       UNTIL     (IDX1   >     31)
       *         病棟番号セット（入院料）
-                IF    LNK-DPCNYUIN-SRYCD(1 IDX1 1)   NOT =  SPACE
+      **          IF    LNK-DPCNYUIN-SRYCD(1 IDX1 1)   NOT =  SPACE
                     MOVE   TBL-BTUNUM(IDX1)   TO
                                           LNK-DPCNYUIN-BTUNUM(1 IDX1)
                     MOVE   TBL-BTUKBN(IDX1)   TO
@@ -3623,9 +3639,9 @@
                                           LNK-DPCNYUIN-SRYKA(1 IDX1)
                     MOVE   TBL-DRCD(IDX1)     TO
                                           LNK-DPCNYUIN-DRCD(1 IDX1)
-                END-IF
+      **          END-IF
       *         病棟番号セット（特定入院料）
-                IF    LNK-DPCNYUIN-SRYCD(2 IDX1 1)   NOT =  SPACE
+      **          IF    LNK-DPCNYUIN-SRYCD(2 IDX1 1)   NOT =  SPACE
                     MOVE   TBL-BTUNUM(IDX1)   TO
                                           LNK-DPCNYUIN-BTUNUM(2 IDX1)
                     MOVE   TBL-BTUKBN(IDX1)   TO
@@ -3634,9 +3650,9 @@
                                           LNK-DPCNYUIN-SRYKA(2 IDX1)
                     MOVE   TBL-DRCD(IDX1)     TO
                                           LNK-DPCNYUIN-DRCD(2 IDX1)
-                END-IF
+      **          END-IF
       *         病棟番号セット（食事）
-                IF    LNK-DPCNYUIN-SRYCD(3 IDX1 1)   NOT =  SPACE
+      **          IF    LNK-DPCNYUIN-SRYCD(3 IDX1 1)   NOT =  SPACE
                     MOVE   TBL-BTUNUM(IDX1)   TO
                                           LNK-DPCNYUIN-BTUNUM(3 IDX1)
                     MOVE   TBL-BTUKBN(IDX1)   TO
@@ -3645,9 +3661,9 @@
                                           LNK-DPCNYUIN-SRYKA(3 IDX1)
                     MOVE   TBL-DRCD(IDX1)     TO
                                           LNK-DPCNYUIN-DRCD(3 IDX1)
-                END-IF
+      **          END-IF
       *         病棟番号セット（生活療養）
-                IF    LNK-DPCNYUIN-SRYCD(4 IDX1 1)   NOT =  SPACE
+      **          IF    LNK-DPCNYUIN-SRYCD(4 IDX1 1)   NOT =  SPACE
                     MOVE   TBL-BTUNUM(IDX1)   TO
                                           LNK-DPCNYUIN-BTUNUM(4 IDX1)
                     MOVE   TBL-BTUKBN(IDX1)   TO
@@ -3656,9 +3672,9 @@
                                           LNK-DPCNYUIN-SRYKA(4 IDX1)
                     MOVE   TBL-DRCD(IDX1)     TO
                                           LNK-DPCNYUIN-DRCD(4 IDX1)
-                END-IF
+      **          END-IF
       *         病棟番号セット（環境療養）
-                IF    LNK-DPCNYUIN-SRYCD(5 IDX1 1)   NOT =  SPACE
+      **          IF    LNK-DPCNYUIN-SRYCD(5 IDX1 1)   NOT =  SPACE
                     MOVE   TBL-BTUNUM(IDX1)   TO
                                           LNK-DPCNYUIN-BTUNUM(5 IDX1)
                     MOVE   TBL-BTUKBN(IDX1)   TO
@@ -3667,7 +3683,7 @@
                                           LNK-DPCNYUIN-SRYKA(5 IDX1)
                     MOVE   TBL-DRCD(IDX1)     TO
                                           LNK-DPCNYUIN-DRCD(5 IDX1)
-                END-IF
+      **          END-IF
            END-PERFORM
       *
            .
