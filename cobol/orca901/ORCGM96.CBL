@@ -850,11 +850,11 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                                    SPA-AREA
            IF    ( SJOBKANRI-RETURN    =   ZERO  )
       *
-               IF    ( FLG-RUNNING     =   1 )
-                AND  ( JOB-PGID        =   "ORCXRMST2" )
-                AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
-                   MOVE    "1104"  TO  SPA-ERRCD
-               END-IF
+      *        IF    ( FLG-RUNNING     =   1 )
+      *         AND  ( JOB-PGID        =   "ORCXRMST2" )
+      *         AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
+      *            MOVE    "1104"  TO  SPA-ERRCD
+      *        END-IF
       *
                IF    ( FLG-RUNNING     =   ZERO )
                    MOVE    2       TO  FLG-RUNNING
@@ -874,11 +874,11 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                                    SPA-AREA
            IF    ( SJOBKANRI-RETURN    =   ZERO  )
       *
-               IF    ( FLG-RUNNING     =   1 )
-                AND  ( JOB-PGID        =   "ORCXRMST4" )
-                AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
-                   MOVE    "1104"  TO  SPA-ERRCD
-               END-IF
+      *        IF    ( FLG-RUNNING     =   1 )
+      *         AND  ( JOB-PGID        =   "ORCXRMST4" )
+      *         AND  ( JOB-STEPENDTIME =   SPACE OR ZERO )
+      *            MOVE    "1104"  TO  SPA-ERRCD
+      *        END-IF
       *
                IF    ( FLG-RUNNING     =   ZERO )
                    MOVE    2       TO  FLG-RUNNING
@@ -1197,9 +1197,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "shell"         TO  MCP-TABLE
                    MOVE    LOW-VALUE       TO  MCP-PATHNAME
                    PERFORM 910-DBDELETE-SEC
-                   IF    ( MCP-RC          NOT =   ZERO )
-                       MOVE    "1103"      TO  SPA-ERRCD
-                   END-IF
+      *            IF    ( MCP-RC          NOT =   ZERO )
+      *                MOVE    "1103"      TO  SPA-ERRCD
+      *            END-IF
                END-IF
       *
                PERFORM 900-MONBATCH-FET-SEC

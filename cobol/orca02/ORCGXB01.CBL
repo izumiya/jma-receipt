@@ -729,9 +729,9 @@
       *    入力チェック
            PERFORM 410-INPUT-CHK-SEC
       *
-           IF    ( SPA-ERRCD   =   SPACE )
-               PERFORM 4201-RUNNING-JOB-CHK-SEC
-           END-IF
+      *    IF    ( SPA-ERRCD   =   SPACE )
+      *        PERFORM 4201-RUNNING-JOB-CHK-SEC
+      *    END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
                IF    ( SPA-GMN-JOBLIST-SEL  =   ZERO )
@@ -754,9 +754,9 @@
       *****************************************************************
        4201-DELETE-SEC                 SECTION.
       *
-           IF    ( SPA-ERRCD   =   SPACE )
-               PERFORM 4201-RUNNING-JOB-CHK-SEC
-           END-IF
+      *    IF    ( SPA-ERRCD   =   SPACE )
+      *        PERFORM 4201-RUNNING-JOB-CHK-SEC
+      *    END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 42011-DELETE-SEC
@@ -812,9 +812,9 @@
                    MOVE    "shell"         TO  MCP-TABLE
                    MOVE    LOW-VALUE       TO  MCP-PATHNAME
                    PERFORM 910-DBDELETE-SEC
-                   IF    ( MCP-RC          NOT =   ZERO )
-                       MOVE    "1103"      TO  SPA-ERRCD
-                   END-IF
+      *            IF    ( MCP-RC          NOT =   ZERO )
+      *                MOVE    "1103"      TO  SPA-ERRCD
+      *            END-IF
                END-IF
       *
                PERFORM 900-MONBATCH-FET-SEC
