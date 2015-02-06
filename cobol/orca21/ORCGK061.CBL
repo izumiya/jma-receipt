@@ -464,7 +464,8 @@
            END-IF
       *
            IF      FLG-END         =   ZERO
-               MOVE    SPACE               TO  LINKAREA
+      ****     MOVE    SPACE               TO  LINKAREA
+               MOVE    SPACE               TO  LNK-KYOUTU
       *
                MOVE    SPACE               TO  MCP-PUTTYPE
                MOVE    "K061   "           TO  MCP-WINDOW
@@ -3239,7 +3240,8 @@
            MOVE    "K061"              TO  SPA-K062-MOTOPG
       *
       *    初期画面セット
-           MOVE    SPACE               TO  LINKAREA
+      *****MOVE    SPACE               TO  LINKAREA
+           MOVE    SPACE               TO  LNK-KYOUTU
       *
            MOVE    SPACE               TO  SPA-MOTOPG
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -3264,7 +3266,8 @@
       *
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
       *
-           MOVE    SPACE               TO  LINKAREA
+      **** MOVE    SPACE               TO  LINKAREA
+           MOVE    SPACE               TO  LNK-KYOUTU
       *
            MOVE    "NEW"               TO  MCP-PUTTYPE
            MOVE    "K062"              TO  MCP-WINDOW
@@ -3381,7 +3384,8 @@
                GO      TO      500-SET-SCREEN-EXT
            END-IF
       *
-           MOVE    SPACE               TO  LINKAREA
+      **** MOVE    SPACE               TO  LINKAREA
+           MOVE    SPACE               TO  LNK-KYOUTU
       *
            MOVE    "CURRENT"           TO  MCP-PUTTYPE.
            MOVE    "K061"              TO  MCP-WINDOW.
@@ -3808,6 +3812,7 @@
            MOVE    SPACE               TO  SPA-KID1-FLG
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *
