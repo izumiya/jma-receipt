@@ -164,6 +164,8 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.09    NACL-門脇    14/12/24  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.10    NACL-門脇    15/02/05  摘要欄の点数・回数等の記載
+      *                                     不具合対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -1878,8 +1880,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                          =   TBL-NOSRYCD (IDY)
                    IF  ( RECE41-SRYYM   <  "200804"              )
                    AND ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                            =   "112000970"  OR
-                                "112015570"  OR  "112001410"  OR
+                            =   "112015570"  OR  "112001410"  OR
                                 "112014170"  OR  "112014270"  OR
                                 "112014370"  OR  "112015070"     )
                        MOVE    ZERO          TO  FLG-NOPRT
@@ -1931,8 +1932,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            IF   RECE44-JIHOKBN  =  SPACE
             IF (( RECE41-SRYYM   >=  "200804"             ) AND
                 ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                       =   "112000970"  OR
-                           "112015570"  OR  "112001410"  OR
+                       =   "112015570"  OR  "112001410"  OR
                            "112014170"  OR  "112014270"  OR
                            "112014370"  OR  "112015070"   ))
             OR (( RECE41-SRYYM   >=  "201004"             ) AND
@@ -1944,6 +1944,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                 ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                        =   "112016610"  OR  "112016750"  OR
                            "112016850"  OR  "112016950"   ))
+            OR (( RECE41-SRYYM   >=  "200804"             ) AND
+                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                       =   "112000970"                    ) AND
+                ( RECE41-HKNKBN      =  "4"               ) AND
+                ( WRK-PARA-RECEKBN   =  "4"               ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                WHEN       "112016610"
@@ -1977,6 +1982,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                   MOVE    14     TO     IDX6
                WHEN       "112017270"
                   MOVE    15     TO     IDX6
+      *
+               WHEN       "112000970"
+                  MOVE    16     TO     IDX6
              END-EVALUATE
       *
              MOVE     1              TO  TBL-SORT12-FLG(IDX6)
@@ -3155,6 +3163,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  WHEN     13
                  WHEN     14
                  WHEN     15
+                 WHEN     16
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    TBL-SORT12-TEN(IDX6)  TO  WRK-ZAITENX
@@ -3208,6 +3217,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                      WHEN     15
                        MOVE  "地域包括診療加算"
                                              TO  WRK-ZAI-NAME(1:16)
+                     WHEN     16
+                       MOVE  "再診（乳幼児）加算"
+                                             TO  WRK-ZAI-NAME(1:18)
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
@@ -3299,6 +3311,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                COMPUTE RECE46-ZAINUM   = 99992631
              WHEN    15
                COMPUTE RECE46-ZAINUM   = 99992641
+             WHEN    16
+               COMPUTE RECE46-ZAINUM   = 99992651
            END-EVALUATE
       *
            MOVE    1                 TO  RECE46-ZAIMEISAISU
