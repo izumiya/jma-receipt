@@ -9489,7 +9489,7 @@
            PERFORM 4200-COMMONTAIKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-JNISSUTAIKBN-G
                                        SPA-GMN-TOTALTENTAIKBN-G
-                                       SPA-GMN-SYUKEITAIKBN-G
+      *                                SPA-GMN-SYUKEITAIKBN-G
                                        SPA-GMN-FTNKEITAIKBNG-G
                                        SPA-GMN-FTNKEITAIKBNN-G
                                        SPA-GMN-FTNMONEYTAIKBNG-G
@@ -13594,7 +13594,7 @@
            IF    ( WRK-CMB-ITM     =   SPACE )
                EVALUATE    SPA-PREFNUM
                WHEN    CONST-TOKYO
-               WHEN    CONST-KYOTO
+      *        WHEN    CONST-KYOTO
                WHEN    CONST-IBARAKI
                WHEN    CONST-SHIMANE
                    MOVE    SPA-GMN-SYUKEIKBNLST (3)
