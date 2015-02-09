@@ -9065,6 +9065,11 @@
                             END-IF
                           END-IF
                         END-IF
+                        IF  (COMB-KOH1HKNNUM      = "052"         )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "201501"      )
+                              MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
+                                   TO WK-TOKUSITU-TAFTNRUIKEI(KOH-IDX)
+                        END-IF
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1"
                         OR   FLG-KOREI-TANYUIN         =     1
                          IF  (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
