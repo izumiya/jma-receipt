@@ -117,6 +117,8 @@
       *  04.07.04    NACL-門脇    14/04/08  平成２６年４月改正対応
       *  04.07.05    NACL-門脇    14/06/17  栄養管理体制減算規定該当対応
       *  04.07.06    NACL-門脇    15/01/14  同日入院時のフラグ編集修正
+      *  04.07.07    NACL-門脇    15/02/09  京都府地方公費対応（システム管理
+      *                                     ２０１０のデフォルト設定修正）
       *****************************************************************
       *
       *
@@ -4718,7 +4720,6 @@
                  EVALUATE   WRK-PREFNUM
                    WHEN     "32"
                    WHEN     "13"
-                   WHEN     "26"
                    WHEN     "08"
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
@@ -4738,8 +4739,24 @@
                    WHEN     "38"
                        MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                   WHEN     "26"
+                     IF  RECE62-SRYYM  <=  "201103"
+                       MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                  END-EVALUATE
              WHEN      "0"
+                 MOVE   SYS-2010-SYUKEIKBN
+                                    TO   RECE62-SYUKEIKBN(IDX11 2)
+                 MOVE   SYS-2010-SYUKEI-TAIKBN
+                                    TO   RECE62-SYUKEI-TAIKBN(IDX11 2)
+                 EVALUATE   WRK-PREFNUM
+                   WHEN     "26"
+                     IF  RECE62-SRYYM  <=  "201103"
+                       MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                 END-EVALUATE
              WHEN      "1"
              WHEN      "2"
              WHEN      "3"
