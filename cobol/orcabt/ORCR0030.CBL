@@ -684,6 +684,8 @@
       *  04.07.37    NACL-門脇    15/01/21  難病複数対応
       *  04.07.38    NACL-門脇    15/01/26  平成２７年１月改正対応
       *                                     （都道府県独自難病対応）
+      *  04.07.39    NACL-門脇    15/02/09  京都府地方公費対応（システム管理
+      *                                     ２０１０のデフォルト設定修正）
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -4651,7 +4653,6 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  EVALUATE   SYS-1001-PREFNUM
                    WHEN     "32"
                    WHEN     "13"
-                   WHEN     "26"
                    WHEN     "08"
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
@@ -4671,8 +4672,24 @@ grpsys           PERFORM 900-DBSELECT-SEC
                    WHEN     "38"
                        MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                   WHEN     "26"
+                     IF  RECE02-SRYYM  <=  "201103"
+                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                  END-EVALUATE
              WHEN      "0"
+                 MOVE   SYS-2010-SYUKEIKBN
+                                    TO   RECE02-SYUKEIKBN(IDX11 2)
+                 MOVE   SYS-2010-SYUKEI-TAIKBN
+                                    TO   RECE02-SYUKEI-TAIKBN(IDX11 2)
+                 EVALUATE   SYS-1001-PREFNUM
+                   WHEN     "26"
+                     IF  RECE02-SRYYM  <=  "201103"
+                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                 END-EVALUATE
              WHEN      "1"
              WHEN      "2"
              WHEN      "3"
