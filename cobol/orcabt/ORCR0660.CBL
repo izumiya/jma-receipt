@@ -157,6 +157,7 @@
       *                                     コメント自動記載修正
       *  04.07.09    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *  04.07.10    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
+      *  04.07.11    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-門脇    14/07/29  ３２文字以上の文字列修正
@@ -3690,17 +3691,25 @@
            ADD     1           TO  IDX-RECE65
            MOVE    "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
            MOVE    ZERO        TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-      *
            EVALUATE      WRK-SRYCD
              WHEN       CONS-SINDAI
-               MOVE    30   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-               MOVE    "（第三者行為）"
+               IF  RECE62-DAISAN-TOKKI  =  ZERO
+                 MOVE  30   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "（第三者行為）"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-               MOVE    "心大血管疾患リハ：治療開始　　　年　　月　　日"
+                 MOVE  "心大血管疾患リハ：治療開始　　　年　　月　　日"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-               MOVE    43   TO  IDC1
-               MOVE    49   TO  IDC2
-               MOVE    55   TO  IDC3
+                 MOVE  43   TO  IDC1
+                 MOVE  49   TO  IDC2
+                 MOVE  55   TO  IDC3
+               ELSE
+                 MOVE  23   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "心大血管疾患リハ：治療開始　　　年　　月　　日"
+                            TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                 MOVE  29   TO  IDC1
+                 MOVE  35   TO  IDC2
+                 MOVE  41   TO  IDC3
+               END-IF
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
                  COMPUTE WRK-ZAINUM    =  99982000 + IDX23
@@ -3711,35 +3720,63 @@
              WHEN       CONS-NOUKE
                EVALUATE   FLG-COMOKIKAE2
                  WHEN       0
-                   MOVE    28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "脳血管疾患等リハ：発症　　　年　　月　　日"
+                     MOVE  "脳血管疾患等リハ：発症　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    39  TO  IDC1
-                   MOVE    45  TO  IDC2
-                   MOVE    51  TO  IDC3
+                     MOVE  39  TO  IDC1
+                     MOVE  45  TO  IDC2
+                     MOVE  51  TO  IDC3
+                   ELSE
+                     MOVE  21  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "脳血管疾患等リハ：発症　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  25  TO  IDC1
+                     MOVE  31  TO  IDC2
+                     MOVE  37  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       1
-                   MOVE    28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "脳血管疾患等リハ：手術　　　年　　月　　日"
+                     MOVE  "脳血管疾患等リハ：手術　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    39  TO  IDC1
-                   MOVE    45  TO  IDC2
-                   MOVE    51  TO  IDC3
+                     MOVE  39  TO  IDC1
+                     MOVE  45  TO  IDC2
+                     MOVE  51  TO  IDC3
+                   ELSE
+                     MOVE  21  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "脳血管疾患等リハ：手術　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  25  TO  IDC1
+                     MOVE  31  TO  IDC2
+                     MOVE  37  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       2
-                   MOVE    30  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  30  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE
+                     MOVE
                        "脳血管疾患等リハ：急性増悪　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    43  TO  IDC1
-                   MOVE    49  TO  IDC2
-                   MOVE    55  TO  IDC3
+                     MOVE  43  TO  IDC1
+                     MOVE  49  TO  IDC2
+                     MOVE  55  TO  IDC3
+                   ELSE
+                     MOVE  23  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE
+                       "脳血管疾患等リハ：急性増悪　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  29  TO  IDC1
+                     MOVE  35  TO  IDC2
+                     MOVE  41  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
@@ -3751,34 +3788,61 @@
              WHEN       CONS-UNDOKI
                EVALUATE   FLG-COMOKIKAE2
                  WHEN       0
-                   MOVE    25  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  25  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "運動器リハ：発症　　　年　　月　　日"
+                     MOVE  "運動器リハ：発症　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    33  TO  IDC1
-                   MOVE    39  TO  IDC2
-                   MOVE    45  TO  IDC3
+                     MOVE  33  TO  IDC1
+                     MOVE  39  TO  IDC2
+                     MOVE  45  TO  IDC3
+                   ELSE
+                     MOVE  18  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "運動器リハ：発症　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  19  TO  IDC1
+                     MOVE  25  TO  IDC2
+                     MOVE  31  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       1
-                   MOVE    25  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  25  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "運動器リハ：手術　　　年　　月　　日"
+                     MOVE  "運動器リハ：手術　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    33  TO  IDC1
-                   MOVE    39  TO  IDC2
-                   MOVE    45  TO  IDC3
+                     MOVE  33  TO  IDC1
+                     MOVE  39  TO  IDC2
+                     MOVE  45  TO  IDC3
+                   ELSE
+                     MOVE  18  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "運動器リハ：手術　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  19  TO  IDC1
+                     MOVE  25  TO  IDC2
+                     MOVE  31  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       2
-                   MOVE    27  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  27  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "運動器リハ：急性増悪　　　年　　月　　日"
+                     MOVE  "運動器リハ：急性増悪　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    37  TO  IDC1
-                   MOVE    43  TO  IDC2
-                   MOVE    49  TO  IDC3
+                     MOVE  37  TO  IDC1
+                     MOVE  43  TO  IDC2
+                     MOVE  49  TO  IDC3
+                   ELSE
+                     MOVE  20  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "運動器リハ：急性増悪　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  23  TO  IDC1
+                     MOVE  29  TO  IDC2
+                     MOVE  35  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
@@ -3788,14 +3852,23 @@
                END-IF
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-KOKYUKI
-               MOVE    27   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-               MOVE    "（第三者行為）"
+               IF  RECE62-DAISAN-TOKKI  =  ZERO
+                 MOVE  27   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "（第三者行為）"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-               MOVE    "呼吸器リハ：治療開始　　　年　　月　　日"
+                 MOVE  "呼吸器リハ：治療開始　　　年　　月　　日"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-               MOVE    37   TO  IDC1
-               MOVE    43   TO  IDC2
-               MOVE    49   TO  IDC3
+                 MOVE  37   TO  IDC1
+                 MOVE  43   TO  IDC2
+                 MOVE  49   TO  IDC3
+               ELSE
+                 MOVE  20   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "呼吸器リハ：治療開始　　　年　　月　　日"
+                            TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                 MOVE  23   TO  IDC1
+                 MOVE  29   TO  IDC2
+                 MOVE  35   TO  IDC3
+               END-IF
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
                  COMPUTE WRK-ZAINUM    =  99982000 + IDX23
@@ -3804,14 +3877,23 @@
                END-IF
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-SESSYOKU
-               MOVE    28   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-               MOVE    "（第三者行為）"
+               IF  RECE62-DAISAN-TOKKI  =  ZERO
+                 MOVE  28   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "（第三者行為）"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-               MOVE    "摂食機能療法：治療開始　　　年　　月　　日"
+                 MOVE  "摂食機能療法：治療開始　　　年　　月　　日"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-               MOVE    39   TO  IDC1
-               MOVE    45   TO  IDC2
-               MOVE    51   TO  IDC3
+                 MOVE  39   TO  IDC1
+                 MOVE  45   TO  IDC2
+                 MOVE  51   TO  IDC3
+               ELSE
+                 MOVE  21   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "摂食機能療法：治療開始　　　年　　月　　日"
+                            TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                 MOVE  25   TO  IDC1
+                 MOVE  31   TO  IDC2
+                 MOVE  37   TO  IDC3
+               END-IF
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
                  COMPUTE WRK-ZAINUM    =  99982000 + IDX23
@@ -3822,34 +3904,61 @@
              WHEN       CONS-NANBYO
                EVALUATE   FLG-COMOKIKAE2
                  WHEN       0
-                   MOVE    26  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  26  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "難病患者リハ：発症　　　年　　月　　日"
+                     MOVE  "難病患者リハ：発症　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    35  TO  IDC1
-                   MOVE    41  TO  IDC2
-                   MOVE    47  TO  IDC3
+                     MOVE  35  TO  IDC1
+                     MOVE  41  TO  IDC2
+                     MOVE  47  TO  IDC3
+                   ELSE
+                     MOVE  19  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "難病患者リハ：発症　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  21  TO  IDC1
+                     MOVE  27  TO  IDC2
+                     MOVE  33  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       1
-                   MOVE    26  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  26  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "難病患者リハ：手術　　　年　　月　　日"
+                     MOVE  "難病患者リハ：手術　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    35  TO  IDC1
-                   MOVE    41  TO  IDC2
-                   MOVE    47  TO  IDC3
+                     MOVE  35  TO  IDC1
+                     MOVE  41  TO  IDC2
+                     MOVE  47  TO  IDC3
+                   ELSE
+                     MOVE  19  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "難病患者リハ：手術　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  21  TO  IDC1
+                     MOVE  27  TO  IDC2
+                     MOVE  33  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                  WHEN       2
-                   MOVE    28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                   MOVE    "（第三者行為）"
+                   IF  RECE62-DAISAN-TOKKI  =  ZERO
+                     MOVE  28  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "（第三者行為）"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-                   MOVE    "難病患者リハ：急性増悪　　　年　　月　　日"
+                     MOVE  "難病患者リハ：急性増悪　　　年　　月　　日"
                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-                   MOVE    39  TO  IDC1
-                   MOVE    45  TO  IDC2
-                   MOVE    51  TO  IDC3
+                     MOVE  39  TO  IDC1
+                     MOVE  45  TO  IDC2
+                     MOVE  51  TO  IDC3
+                   ELSE
+                     MOVE  21  TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                     MOVE  "難病患者リハ：急性増悪　　　年　　月　　日"
+                               TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                     MOVE  25  TO  IDC1
+                     MOVE  31  TO  IDC2
+                     MOVE  37  TO  IDC3
+                   END-IF
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
@@ -3859,14 +3968,23 @@
                END-IF
                MOVE    "80" TO  WRK-SRYKBN
              WHEN       CONS-SYOGAI
-               MOVE    28   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-               MOVE    "（第三者行為）"
+               IF  RECE62-DAISAN-TOKKI  =  ZERO
+                 MOVE  28   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "（第三者行為）"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:14)
-               MOVE    "障害児（者）リハ：発症　　　年　　月　　日"
+                 MOVE  "障害児（者）リハ：発症　　　年　　月　　日"
                             TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(15:)
-               MOVE    39   TO  IDC1
-               MOVE    45   TO  IDC2
-               MOVE    51   TO  IDC3
+                 MOVE  39   TO  IDC1
+                 MOVE  45   TO  IDC2
+                 MOVE  51   TO  IDC3
+               ELSE
+                 MOVE  21   TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "障害児（者）リハ：発症　　　年　　月　　日"
+                            TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(1:)
+                 MOVE  25   TO  IDC1
+                 MOVE  31   TO  IDC2
+                 MOVE  37   TO  IDC3
+               END-IF
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
                  COMPUTE WRK-ZAINUM    =  99982000 + IDX23
