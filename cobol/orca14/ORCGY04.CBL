@@ -1051,6 +1051,7 @@
            MOVE    "1"                 TO  ORCSPRTNM-KBN
            MOVE    "00000012"          TO  ORCSPRTNM-KBNCD
            MOVE    SPA-SYSYMD          TO  ORCSPRTNM-SRYYMD
+           MOVE    "2"                 TO  ORCSPRTNM-NYUGAIKBN
            CALL    "ORCSPRTNM"         USING
                                            ORCSPRTNMAREA
                                            SPA-AREA
