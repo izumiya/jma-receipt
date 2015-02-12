@@ -3928,6 +3928,7 @@
            MOVE    "1"                 TO  ORCSPRTNM-KBN
            MOVE    "00000010"          TO  ORCSPRTNM-KBNCD
            MOVE    SPA-SYSYMD          TO  ORCSPRTNM-SRYYMD
+           MOVE    "2"                 TO  ORCSPRTNM-NYUGAIKBN
            CALL    "ORCSPRTNM"         USING
                                            ORCSPRTNMAREA
                                            SPA-AREA
@@ -4841,6 +4842,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  YID1
+           INITIALIZE                       YID1
            MOVE    SPA-YID1CD           TO  YID1-ID1CODE
            MOVE    WRK-YID1MSG          TO  YID1-ID1MSG
            MOVE    "£Î£Ï"               TO  YID1-B01
