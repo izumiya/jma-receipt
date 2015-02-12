@@ -415,6 +415,7 @@
       *  04.07.08    NACL-藤原    14/09/24  全角の負担者番号、受給者番号の
       *                                     記録対応
       *  04.07.09    NACL-藤原    14/10/17  請求情報への更新日設定
+      *  04.07.10    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4126,7 +4127,8 @@ grpsys         MOVE    RECE041-HOSPNUM TO  COMB-HOSPNUM
            MOVE    "01"                TO  WRK-SRYKBN
       *
            MOVE    SPACE               TO  WRK-DISASTER-COMMENT
-           IF   RECE02-DAISAN-GAITO   =   1  OR  2  OR  4
+           IF  (RECE02-DAISAN-GAITO   =   1  OR  2  OR  4)
+           AND (RECE02-DAISAN-TOKKI   =   ZERO           )
                MOVE    RECE02-DAISAN-TOTALTEN  TO  WRK-FUTAN3
                INITIALIZE              ORCSKANACHKAREA
                MOVE    "2"             TO  KANACHK-SYORI 
