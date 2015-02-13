@@ -203,6 +203,7 @@
       *  04.07.21    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *  04.07.22    NACL-ÌçÏÆ    15/02/09  Âè»°¼Ô¹Ô°Ù¤Î¥³¥á¥ó¥ÈÊÔ½¸¾ò·ï½¤Àµ
+      *  04.07.23    NACL-Æ£¸¶    15/02/04  ÀÁµá´ÉÍý¤Ø¤Î¸øÈñ¾ðÊó¤Î¹¹¿·
       *
       *  04.08.01    NACL-Æ£¸¶    12/01/08  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­
       *                                     ºÜÂÐ±þ
@@ -1333,7 +1334,7 @@
       ****************************************************************
        LINKAGE                 SECTION.
        01  COMMAND-PARAM.
-           02  FILLER      PIC X(1000).
+           02  FILLER      PIC X(400).
       ****************************************************************
        PROCEDURE           DIVISION
                USING
@@ -9447,13 +9448,6 @@
                MOVE    ZERO                TO  RECE10-SKYYM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
-               PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
-                   MOVE    RECE02-KOHNUM (IDX) TO
-                                       RECE10-KOHNUM (IDX)
-                   MOVE    RECE02-KOHID  (IDX) TO
-                                       RECE10-KOHID  (IDX)
-               END-PERFORM
                MOVE    RECE02-HKNNUM   TO  RECE10-HKNNUM-S
                IF      RECE02-HKNJANUM-KEY =   SPACE
                    MOVE    ZERO            TO  RECE10-HKNJANUM-S
@@ -9479,6 +9473,14 @@
                MOVE    ZERO                TO  RECE10-UPDYMD
                                                RECE10-UPDHMS
            END-IF
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       4
+               MOVE    RECE02-KOHNUM (IDX) TO
+                                       RECE10-KOHNUM (IDX)
+               MOVE    RECE02-KOHID  (IDX) TO
+                                       RECE10-KOHID  (IDX)
+           END-PERFORM
       *
            MOVE    RECE02-KIGO         TO  RECE10-KIGO
            MOVE    RECE02-NUM          TO  RECE10-NUM
