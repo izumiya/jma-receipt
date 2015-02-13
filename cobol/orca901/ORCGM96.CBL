@@ -1249,6 +1249,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            MOVE    "M96"               TO  SPA-MOTOPG
+      *
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
            MOVE    SPA-SAKIPG          TO  MCP-WINDOW
            MOVE    "JOIN"              TO  MCP-PUTTYPE
       *
