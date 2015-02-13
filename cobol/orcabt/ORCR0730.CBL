@@ -205,6 +205,7 @@
       *  04.07.19    NACL-ÌçÏÆ    15/01/07  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê¸øÈñÀÁµá¥Æ¡¼¥Ö¥ëÊÔ½¸¡Ë
       *  04.07.20    NACL-ÌçÏÆ    15/02/09  Âè»°¼Ô¹Ô°Ù¤Î¥³¥á¥ó¥ÈÊÔ½¸¾ò·ï½¤Àµ
+      *  04.07.23    NACL-Æ£¸¶    15/02/04  ÀÁµá´ÉÍý¤Ø¤Î¸øÈñ¾ðÊó¤Î¹¹¿·
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -10576,13 +10577,6 @@
                MOVE    ZERO                TO  RECE10-SKYYM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
-               PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
-                   MOVE    RECE62-KOHNUM (IDX) TO
-                                       RECE10-KOHNUM (IDX)
-                   MOVE    RECE62-KOHID  (IDX) TO
-                                       RECE10-KOHID  (IDX)
-               END-PERFORM
                MOVE    RECE62-HKNNUM   TO  RECE10-HKNNUM-S
                IF      RECE62-HKNJANUM-KEY =   SPACE
                    MOVE    ZERO            TO  RECE10-HKNJANUM-S
@@ -10608,6 +10602,14 @@
                MOVE    ZERO                TO  RECE10-UPDYMD
                                                RECE10-UPDHMS
            END-IF
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       4
+               MOVE    RECE62-KOHNUM (IDX) TO
+                                       RECE10-KOHNUM (IDX)
+               MOVE    RECE62-KOHID  (IDX) TO
+                                       RECE10-KOHID  (IDX)
+           END-PERFORM
       *
            MOVE    RECE62-KIGO         TO  RECE10-KIGO
            MOVE    RECE62-NUM          TO  RECE10-NUM
