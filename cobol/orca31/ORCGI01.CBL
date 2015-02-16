@@ -958,9 +958,9 @@
                                //SPA-// BY //WRK-SPA-//.
       *
       *    入院履歴ワーク
-       01  WKPTNYUINRRK-REC.
+       01  WKPTNYUIN-REC.
            COPY    "CPPTNYUINRRK.INC"  REPLACING
-                               //PTNYUINRRK-// BY //WKPTNYUINRRK-//.
+                               //PTNYUINRRK-// BY //WKPTNYUIN-//.
       *
       *    ユーザープログラム用入院履歴退避領域
        01  USERPGRRK-REC.
@@ -985,9 +985,9 @@
            03  WRK-DOU-PTNYUINRRK-TENNYUYMD  PIC X(08).
            03  WRK-DOU-TENNYUYMD             PIC X(08).
            03  FLG-JIINRRK                   PIC 9(01).
-       01  WRK-PTNYUINRRK-REC.
+       01  WRKRRK-REC.
            COPY  "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
-                                            BY  //WRK-PTNYUINRRK-//.
+                                            BY  //WRKRRK-//.
        01  LASTRRK-REC.
            COPY  "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                             BY  //LASTRRK-//.
@@ -6958,7 +6958,7 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       41011-KANSATU-DAT-SET-DAT-SET-EXT.
+       41011-KANSATU-DAT-SET-EXT.
            EXIT.
       *****************************************************************
       *    特定入院料コンボデータセット処理
@@ -7376,20 +7376,20 @@
            END-PERFORM
       *
            IF    ( FLG-SHONUM      =   ZERO )
-               INITIALIZE                  WKPTNYUINRRK-REC
-               MOVE    SPA-HOSPNUM      TO  WKPTNYUINRRK-HOSPNUM
+               INITIALIZE                  WKPTNYUIN-REC
+               MOVE    SPA-HOSPNUM      TO  WKPTNYUIN-HOSPNUM
                MOVE    SPA-NAI-I01-PTID
-                                       TO  WKPTNYUINRRK-PTID
+                                       TO  WKPTNYUIN-PTID
                MOVE    SPA-GMN-I01-SHONUM
-                                       TO  WKPTNYUINRRK-SHONUM
-               MOVE    WKPTNYUINRRK-REC
+                                       TO  WKPTNYUIN-SHONUM
+               MOVE    WKPTNYUIN-REC
                                        TO  MCPDATA-REC
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
                MOVE    "key30"             TO  MCP-PATHNAME
                PERFORM 910-DBSELECT-SEC
                IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC TO  WKPTNYUINRRK-REC
-                   MOVE    WKPTNYUINRRK-NYUINYMD
+                   MOVE    MCPDATA-REC TO  WKPTNYUIN-REC
+                   MOVE    WKPTNYUIN-NYUINYMD
                                        TO  WRK-YMD
                    PERFORM 5002-HIZUKE-CHK-SEC
                    MOVE    WRK-HENYMDG TO  WRK-SHOKAI-NYUINYMD-W
@@ -10257,26 +10257,26 @@
            MOVE    SPACE               TO  WRK-NYUINCHU-TAIINYMD
            MOVE    ZERO                TO  FLG-WKPTTEIKIRRK
       *
-           INITIALIZE      WKPTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM          TO  WKPTNYUINRRK-HOSPNUM
-           MOVE    SPA-NAI-I01-PTID    TO  WKPTNYUINRRK-PTID
+           INITIALIZE      WKPTNYUIN-REC
+           MOVE    SPA-HOSPNUM          TO  WKPTNYUIN-HOSPNUM
+           MOVE    SPA-NAI-I01-PTID    TO  WKPTNYUIN-PTID
       *
            MOVE    SPA-NAI-I01-NYUINYMD
                                        TO  WRK-YMD
            MOVE    "1"                 TO  WRK-ZOGENPTN
            MOVE    -1                  TO  WRK-ZOGEN
            PERFORM 5002-CALENDAR-SEC
-           MOVE    WRK-KEISANYMD       TO  WKPTNYUINRRK-NYUINYMD
+           MOVE    WRK-KEISANYMD       TO  WKPTNYUIN-NYUINYMD
                                            WRK-NYUINCHU-TAIINYMD
       *
-           MOVE    WKPTNYUINRRK-REC    TO  MCPDATA-REC
+           MOVE    WKPTNYUIN-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    "key12"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          NOT =   ZERO )
                MOVE    1               TO  FLG-WKPTTEIKIRRK
            ELSE
-               MOVE    MCPDATA-REC     TO  WKPTNYUINRRK-REC
+               MOVE    MCPDATA-REC     TO  WKPTNYUIN-REC
            END-IF
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
@@ -10288,8 +10288,8 @@
            END-IF
       *
       *    前歴の自院歴が「入院中」の場合
-           IF    ( WKPTNYUINRRK-JTIKBN         =   "6" )
-            AND  ( WKPTNYUINRRK-NYUINCHUKBN    =   "1" )
+           IF    ( WKPTNYUIN-JTIKBN            =   "6" )
+            AND  ( WKPTNYUIN-NYUINCHUKBN       =   "1" )
       *
       *        継続入院であること
                IF    ( SPA-GMN-I01-SHOKAI-CD   NOT =   "2" )
@@ -10299,14 +10299,14 @@
                END-IF
       *
       *        初回番号が等しいこと
-               IF    ( WKPTNYUINRRK-SHONUM NOT =   SPA-GMN-I01-SHONUM )
+               IF    ( WKPTNYUIN-SHONUM NOT =   SPA-GMN-I01-SHONUM )
                    MOVE    "1031"      TO  SPA-ERRCD
                    MOVE    10          TO  SPA-GMN-I01-CUR
                    GO TO   4801-ZENKAI-ZIINRRK-CHK-EXT
                END-IF
       *
       *        自院歴の退院日の翌日が入院日となっていること
-               IF    ( WKPTNYUINRRK-TAIINYMD
+               IF    ( WKPTNYUIN-TAIINYMD
                                    NOT =   WRK-NYUINCHU-TAIINYMD )
                    MOVE    "1032"      TO  SPA-ERRCD
                    MOVE    7           TO  SPA-GMN-I01-CUR
@@ -11774,7 +11774,7 @@
            MOVE   SPA-NAI-I01-NYUINYMD TO  WRK-DOU-NAI-I01-NYUINYMD
            MOVE   PTNYUINRRK-TENNYUYMD TO  WRK-DOU-PTNYUINRRK-TENNYUYMD
       *    入院履歴の退避
-           MOVE   PTNYUINRRK-REC       TO  WRK-PTNYUINRRK-REC
+           MOVE   PTNYUINRRK-REC       TO  WRKRRK-REC
       *    最終入院履歴が自院歴かを判定する
            MOVE    ZERO                TO  FLG-JIINRRK
            INITIALIZE  PTNYUINRRK-REC
@@ -11799,7 +11799,7 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *    入院履歴の復元
-           MOVE    WRK-PTNYUINRRK-REC  TO  PTNYUINRRK-REC
+           MOVE    WRKRRK-REC          TO  PTNYUINRRK-REC
       *    前歴が自院歴（同日退院分）の場合、入院会計作成日を１日ずらす
            IF     FLG-JIINRRK    =     1
                INITIALIZE                  STS-AREA-DAY
@@ -11964,7 +11964,7 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            DISPLAY  "LNK-TOKNYUIN2-RC = " LNK-TOKNYUIN2-RC
@@ -13004,7 +13004,7 @@
       *    同日再入院用に入院日（転入日）を退避
            MOVE   SPA-NAI-I01-NYUINYMD TO  WRK-DOU-NAI-I01-NYUINYMD
       *    入院履歴の退避
-           MOVE   PTNYUINRRK-REC       TO  WRK-PTNYUINRRK-REC
+           MOVE   PTNYUINRRK-REC       TO  WRKRRK-REC
       *    最終入院履歴が自院歴かを判定する
            MOVE    ZERO                TO  FLG-JIINRRK
            INITIALIZE  PTNYUINRRK-REC
@@ -13026,7 +13026,7 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *    入院履歴の復元
-           MOVE    WRK-PTNYUINRRK-REC  TO  PTNYUINRRK-REC
+           MOVE    WRKRRK-REC          TO  PTNYUINRRK-REC
       *    前歴が自院歴（同日退院分）の場合、入院会計作成日を１日ずらす
            MOVE    SPACE               TO  WRK-DOUJITSU-FLG
                                            WRK-DOUJITSU-MOTOYMD
@@ -14015,10 +14015,10 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF    (LNK-AKYUSEI-RC        =   1)           AND
                  (SPA-NAI-I01-TAIINYMD  >=   "20120401")
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
@@ -15583,10 +15583,10 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF    (LNK-AKYUSEI-RC        =   1)           AND
                  (SPA-NAI-I01-IDOYMD    >=   "20120401")
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
@@ -17184,7 +17184,7 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            IF     LNK-TOKNYUIN2-RC      =   ZERO
@@ -18708,11 +18708,11 @@
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
-               MOVE    NRRK-REC       TO   WKPTNYUINRRK-REC
+               MOVE    NRRK-REC       TO   WKPTNYUIN-REC
                CALL    "ORCGI0SUB03"  USING
-                                      WKPTNYUINRRK-REC
+                                      WKPTNYUIN-REC
                                       SPA-AREA
-               IF    ( WKPTNYUINRRK-RRKEDANUM  >   ZERO )
+               IF    ( WKPTNYUIN-RRKEDANUM  >   ZERO )
                 AND  ( SPA-GMN-I01-BUNBEN-CD   =   "0" OR "1" OR "2" )
                    MOVE    BUNBEN-REC      TO  MCPDATA-REC
                    MOVE    "tbl_bunben"    TO  MCP-TABLE
@@ -20961,6 +20961,7 @@
       *
       *
            MOVE    SPACE                TO  I0ID1
+           INITIALIZE                       I0ID1
            MOVE    SPA-I0IDCD           TO  I0ID1-ID1CODE
            MOVE    WRK-I0IDMSG          TO  I0ID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -20991,6 +20992,7 @@
       *
       *
            MOVE    SPACE               TO  I0ID2
+           INITIALIZE                      I0ID2
            MOVE    SPA-I0IDCD2         TO  I0ID2-ID2CODE
            MOVE    WRK-I0IDMSG         TO  I0ID2-ID2MSG
       *
