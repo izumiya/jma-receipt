@@ -958,7 +958,7 @@
                                //SPA-// BY //WRK-SPA-//.
       *
       *    Æþ±¡ÍúÎò¥ï¡¼¥¯
-       01  WkPTNYUIN-REC.
+       01  WKPTNYUIN-REC.
            COPY    "CPPTNYUINRRK.INC"  REPLACING
                                //PTNYUINRRK-// BY //WKPTNYUIN-//.
       *
@@ -21006,6 +21006,7 @@
       *
       *
            MOVE    SPACE                TO  I0ID1
+           INITIALIZE                       I0ID1
            MOVE    SPA-I0IDCD           TO  I0ID1-ID1CODE
            MOVE    WRK-I0IDMSG          TO  I0ID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -21036,6 +21037,7 @@
       *
       *
            MOVE    SPACE               TO  I0ID2
+           INITIALIZE                      I0ID2
            MOVE    SPA-I0IDCD2         TO  I0ID2-ID2CODE
            MOVE    WRK-I0IDMSG         TO  I0ID2-ID2MSG
       *
