@@ -57,9 +57,7 @@ master_get.sh ${HOSPNUM} ${TERMID} ${JOBID} ${SHELLID} SIORI ${SRYCD}
 if [ $? -ne 0 ] ; then
   exit $?
 fi
-create_pgpass
-FLIST=`echo "select photo1_filename || ' ' || photo2_filename || ' ' || photo3_filename from tbl_yakujyo_temp where termid='${TERMID}' and srycd='${SRYCD}' and hospnum=${HOSPNUM};" | psql ${DBCONNOPTION} -Atq ${DBNAME}`
-delete_pgpass
+FLIST=`/usr/lib/panda/bin/monsql -dir ${LDDIRECTORY} -c "select photo1_filename || ' ' || photo2_filename || ' ' || photo3_filename from tbl_yakujyo_temp where termid='${TERMID}' and srycd='${SRYCD}' and hospnum=${HOSPNUM};" -o CSV2`
 #echo $FLIST
 
 for file in $FLIST
