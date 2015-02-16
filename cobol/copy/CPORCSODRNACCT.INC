@@ -27,6 +27,10 @@
            03  SODRNACCT-ORDERID       PIC X(04).
       *    入院料区分（01:一般／02:特定入院）
            03  SODRNACCT-NYUKBN        PIC X(02).
+      *    入院料加算
+           03  SODRNACCT-KSN-G.
+               05  SODRNACCT-KSN-MAX   PIC 9(03).
+               05  SODRNACCT-KSN-SRYCD PIC X(09)   OCCURS  3.
       *    外泊・食事起算日
            03  SODRNACCT-STARTYMD      PIC X(08).
       *    外泊・食事時間
