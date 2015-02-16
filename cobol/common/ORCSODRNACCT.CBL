@@ -65,6 +65,7 @@
            03  FLG-RJN                     PIC 9(01).
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-PTCONF                  PIC 9(01).
+           03  FLG-IDOKAIKEI-CANCEL        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -88,6 +89,7 @@
            03  IDX16                       PIC 9(05).
            03  START-IDX                   PIC 9(05).
            03  IDX-SKJ-TAIHI               PIC 9(02).
+           03  IDX-KSN                     PIC 9(05).
       *
       *    システム領域
        01  SYS-AREA.
@@ -153,6 +155,11 @@
            03  WRK-SAGAKU-KBN9  REDEFINES  WRK-SAGAKU-KBN
                                            PIC 9(02).
            03  WRK-TAIHI-SRYKA             PIC X(02).
+           03  WRK-TENNYUYMD               PIC X(08).
+           03  WRK-TENNYUYMD9   REDEFINES  WRK-TENNYUYMD.
+               05  WRK-TENNYUYMD-YY9       PIC 9(04).
+               05  WRK-TENNYUYMD-MM9       PIC 9(02).
+               05  WRK-TENNYUYMD-DD9       PIC 9(02).
       *
       *    医療機関設定の入院料加算チェック用
            03  WRK-NYUKHNKSN-SRYCD         PIC X(09)  OCCURS 20.
@@ -259,9 +266,9 @@
            03  WRK-DOU-PTNYUINRRK-TENNYUYMD  PIC X(08).
            03  WRK-DOU-TENNYUYMD             PIC X(08).
            03  FLG-JIINRRK                   PIC 9(01).
-       01  WRK-PTNYUINRRK-REC.
+       01  WRK-PTNYU-REC.
            COPY  "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
-                                            BY  //WRK-PTNYUINRRK-//.
+                                            BY  //WRK-PTNYU-//.
       *
       *    食堂加算設定用の退避領域
        01   WRK-SHOKUDOU                   PIC 9(02).
@@ -605,7 +612,7 @@
            MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                        TO  WRK-DOU-PTNYUINRRK-TENNYUYMD
       *    入院履歴の退避
-           MOVE   LNK-PTNYUINRRK-REC   TO  WRK-PTNYUINRRK-REC
+           MOVE   LNK-PTNYUINRRK-REC   TO  WRK-PTNYU-REC
       *    最終入院履歴が自院歴かを判定する
            MOVE    ZERO                TO  FLG-JIINRRK
            INITIALIZE  PTNYUINRRK-REC
@@ -636,7 +643,7 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *    入院履歴の復元
-           MOVE    WRK-PTNYUINRRK-REC  TO  LNK-PTNYUINRRK-REC
+           MOVE    WRK-PTNYU-REC       TO  LNK-PTNYUINRRK-REC
       *    前歴が自院歴（同日退院分）の場合、入院会計作成日を１日ずらす
            IF     FLG-JIINRRK    =     1
                INITIALIZE                  STS-AREA-DAY
@@ -792,9 +799,9 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF     LNK-AKYUSEI-RC          =   1
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
@@ -912,7 +919,9 @@
                                 TO  LNK-SCNYUACCT-HKNCOMBINUM
            MOVE   SPA-SRYKA     TO  WRK-TAIHI-SRYKA
            MOVE   "00"          TO  SPA-SRYKA
-           PERFORM 4801-SENTEI-SET-SEC
+           IF     LNK-PTNYUINRRK-SENTEIKBN  =   "1"
+               PERFORM 4801-SENTEI-SET-SEC
+           END-IF
            MOVE  LNK-PTNYUINRRK-HOSPNUM   TO  SPA-HOSPNUM
            MOVE  LNK-PTNYUINRRK-PTID     TO  SPA-PTID
       *
@@ -1060,6 +1069,12 @@
                    END-EVALUATE
                END-IF
            END-IF
+      *    入院カレンダー未設定の判定
+           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
+                  MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
+           ELSE
+                  MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
+           END-IF
            MOVE   LNK-PTNYUINRRK-BTUNUM
                                        TO  LNK-SCNYUACCT-BTU-NUM
       *
@@ -1119,6 +1134,18 @@
            IF      LNK-TOKNYUIN-GAI-NYUKSNKBN   =    "1"
                MOVE   "190079010"       TO  LNK-NYUKSNGET-NYUIN-SRYCD
            END-IF
+      *
+      *    引数で設定される入院料加算のセット
+           MOVE    ZERO                 TO  IDX
+           PERFORM VARYING IDX-KSN FROM    1   BY  1
+                   UNTIL ( IDX-KSN      >   SODRNACCT-KSN-MAX )
+               IF    ( SODRNACCT-KSN-SRYCD (IDX-KSN)
+                                        NOT =   SPACE )
+                    ADD     1           TO     IDX
+                    MOVE    SODRNACCT-KSN-SRYCD (IDX-KSN)
+                                TO     LNK-NYUKSNGET-I01-KSN-SRYCD(IDX)
+               END-IF
+           END-PERFORM
       *
            CALL    "ORCSNYUKSNGET"      USING  ORCSNYUKSNGET-AREA
                                                SPA-AREA
@@ -2512,9 +2539,9 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF     LNK-AKYUSEI-RC          =   1
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
@@ -2640,7 +2667,9 @@
       **                          TO  LNK-SCNYUACCT-MOTO-NYUINKA
            MOVE   SPA-SRYKA     TO  WRK-TAIHI-SRYKA
            MOVE   "00"          TO  SPA-SRYKA
-           PERFORM 4801-SENTEI-SET-SEC
+           IF     LNK-PTNYUINRRK-SENTEIKBN  =   "1"
+               PERFORM 4801-SENTEI-SET-SEC
+           END-IF
            MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  SPA-HOSPNUM
            MOVE    LNK-PTNYUINRRK-PTID     TO  SPA-PTID
       *
@@ -2789,6 +2818,12 @@
                END-IF
            END-IF
       *
+      *    入院カレンダー未設定の判定
+           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
+                  MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
+           ELSE
+                  MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
+           END-IF
            MOVE   LNK-PTNYUINRRK-BTUNUM
                                        TO  LNK-SCNYUACCT-BTU-NUM
            CALL   "ORCSNYUACCT"  USING   SPA-AREA
@@ -3742,10 +3777,10 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF    (LNK-AKYUSEI-RC        =   1)           AND
                  (LNK-PTNYUINRRK-TAIINYMD  >=   "20120401")
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
@@ -3778,37 +3813,37 @@
       *    退院日に救急・在宅等支援療養病床初期加算（病院）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN1-SEC
+           PERFORM   210-KYUKYU-KSN1-SEC
       *
       *    退院日に救急・在宅等支援療養病床初期加算（診療所）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN2-SEC
+           PERFORM   210-KYUKYU-KSN2-SEC
       *
       *    退院日に救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN3-SEC
+           PERFORM   210-KYUKYU-KSN3-SEC
       *
       *    退院日に救急・在宅等支援療養病床初期加算（一般病棟入院基本料）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN4-SEC
+           PERFORM   210-KYUKYU-KSN4-SEC
       *
       *    退院日に救急・在宅等支援療養病床初期加算（特定一般病棟入院料）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN5-SEC
+           PERFORM   210-KYUKYU-KSN5-SEC
       *
       *    退院日に救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-KYUKYU-KSN6-SEC
+           PERFORM   210-KYUKYU-KSN6-SEC
       *
       *    退院日に有床診療所一般病床初期加算が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
-      *//     PERFORM   210-YUUSHOUIPPAN-KSN-SEC
+           PERFORM   210-YUUSHOUIPPAN-KSN-SEC
       *
       *    特定入院料区分のセット
            IF      LNK-PTNYUINRRK-TOKUTEI-NYUIN    =   SPACE
@@ -3910,12 +3945,6 @@
            MOVE   "00"          TO  SPA-SRYKA
            IF     LNK-PTNYUINRRK-SENTEIKBN  =   "1"
                PERFORM 4801-SENTEI-SET-SEC
-           END-IF
-      *    入院カレンダー未設定の判定
-           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
-                  MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
-           ELSE
-                  MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
            END-IF
       *
       *    有床診療所入院基本料の相互算定コード置き換え
@@ -4063,6 +4092,12 @@
                END-IF
            END-IF
       *
+      *    入院カレンダー未設定の判定
+           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
+                  MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
+           ELSE
+                  MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
+           END-IF
            MOVE   LNK-PTNYUINRRK-BTUNUM   TO  LNK-SCNYUACCT-BTU-NUM
            CALL   "ORCSNYUACCT"  USING   SPA-AREA
                                          ORCSNYUACCT-AREA
@@ -4082,6 +4117,339 @@
       *
            .
        4801-TAIINKAIKEI-CANCEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（病院）の算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN1-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key44"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key44"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190134270"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key44"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（診療所）の算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN2-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING    STS-AREA-DAY
+                                       LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key45"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190135670"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key45"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN3-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key48"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key48"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190143370"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key48"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（一般病棟入院基本料）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN4-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key49"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190142970"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（特定一般病棟入院料）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN5-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key50"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key50"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190152470"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key50"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN5-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN6-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key52"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key52"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190177170"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key52"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN6-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    有床診療所一般病床初期加算の算定有無チェック
+      *****************************************************************
+       210-YUUSHOUIPPAN-KSN-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  WRK-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING    STS-AREA-DAY
+                                       LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key46"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key46"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190135470"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key46"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-YUUSHOUIPPAN-KSN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4108,12 +4476,12 @@
            MOVE    "61"                 TO  LNK-DAY6-IRAI
            MOVE    LNK-PTNYUINRRK-TENNYUYMD
                                         TO  LNK-DAY6-KIJUN
+                                            WRK-MAEIDOYMD
            MOVE    "1"                  TO  LNK-DAY6-ZOGENPTN
            MOVE    -1                   TO  LNK-DAY6-ZOGEN
            CALL  "ORCSDAY"              USING   STS-AREA-DAY
                                                 LNK-DAY6-AREA
            MOVE    LNK-DAY6-KEISAN      TO  LNK-SCNYUACCT-EDSRYYMD
-                                            WRK-MAEIDOYMD
       *
       *    入院会計削除前に会計データの食事区分と保険組合せを退避
            INITIALIZE                       NYUINACCT-REC
@@ -4462,7 +4830,7 @@
            MOVE   SPA-SRYKA            TO  WRK-TAIHI-SRYKA
            MOVE   "00"                 TO  SPA-SRYKA
       *    入院カレンダー未設定の判定
-           IF     PTNYUINRRK-NYUCALKBN   =   "1"
+           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
                   MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
            ELSE
                   MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
@@ -4589,6 +4957,14 @@
            END-IF
       *
            INITIALIZE      ORCSSYOKIKSNAREA
+      *
+           DISPLAY "################################################"
+           DISPLAY "#            IDOKAIKEI-CANCEL                  #"
+           DISPLAY "################################################"
+           DISPLAY   "WRK-MAEIDOYMD = " WRK-MAEIDOYMD
+           DISPLAY   "PTNYUINRRK-TOKUTEI-KBN = " PTNYUINRRK-TOKUTEI-KBN
+           DISPLAY   "PTNYUINRRK-TOKUTEI-NYUIN = "
+                      PTNYUINRRK-TOKUTEI-NYUIN
       *
       *    通算日数、算定開始日を求める
            MOVE    WRK-MAEIDOYMD  TO   PTNYUINRRK-TENNYUYMD
@@ -5067,7 +5443,7 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            IF     LNK-TOKNYUIN2-RC      =   ZERO
@@ -5102,6 +5478,46 @@
       *
       *    入院料加算診療コード取り込み
            PERFORM    4801-NYUKSN-GET-SEC
+      *
+           MOVE       1           TO    FLG-IDOKAIKEI-CANCEL
+           MOVE      "1"          TO    LNK-SCNYUACCT-IDOSAKUSEI-KBN
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（病院）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN1-SEC
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（診療所）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN2-SEC
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN3-SEC
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（一般病棟入院基本料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN4-SEC
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（特定一般病棟入院料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN5-SEC
+      *
+      *    異動日に救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN6-SEC
+      *
+      *    異動日に有床診療所一般病床初期加算が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-YUUSHOUIPPAN-KSN-SEC
+      *
+           MOVE      ZERO         TO   FLG-IDOKAIKEI-CANCEL
       *
       *    特定入院料区分のセット
            IF      PTNYUINRRK-TOKUTEI-NYUIN    =   SPACE
@@ -5694,6 +6110,12 @@
            MOVE   WRK-HKNCOMBINUM9      TO  LNK-SCNYUACCT-HKNCOMBINUM
            MOVE   SPA-SRYKA     TO  WRK-TAIHI-SRYKA
            MOVE   "00"          TO  SPA-SRYKA
+      *    入院カレンダー未設定の判定
+           IF     LNK-PTNYUINRRK-NYUCALKBN   =   "1"
+                  MOVE   1      TO  LNK-SCNYUACCT-NYUCAL-KBN
+           ELSE
+                  MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
+           END-IF
            MOVE   LNK-PTNYUINRRK-BTUNUM TO  LNK-SCNYUACCT-BTU-NUM
            CALL   "ORCSNYUACCT"  USING   SPA-AREA
                                          ORCSNYUACCT-AREA
