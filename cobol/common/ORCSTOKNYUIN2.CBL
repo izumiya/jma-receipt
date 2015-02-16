@@ -142,8 +142,8 @@
        200-EDIT-SEC                    SECTION.
       *
            DISPLAY  "====  ORCSTOKNYUIN2 SET  ===="
-           DISPLAY  "LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN  = " 
-                     LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+           DISPLAY  "LNK-TOKNYUIN2-TOKUTEI-NYUIN  = " 
+                     LNK-TOKNYUIN2-TOKUTEI-NYUIN
            DISPLAY  "LNK-TOKNYUIN2-IDOKBN    = " LNK-TOKNYUIN2-IDOKBN
            DISPLAY  "LNK-TOKNYUIN2-NYUINYMD  = " LNK-TOKNYUIN2-NYUINYMD
            DISPLAY  "LNK-TOKNYUIN2-SANTEIYMD = " LNK-TOKNYUIN2-SANTEIYMD
@@ -153,13 +153,13 @@
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±¤ÎµÞÀ­Áý°­¤Ë¤è¤ëÅ¾Åï
            IF   (LNK-TOKNYUIN2-SET-SRYCD   =  "190121110")  AND
                 (LNK-TOKNYUIN2-IDOKBN      =  "1")          AND
-                (LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN   =   "24")
+                (LNK-TOKNYUIN2-TOKUTEI-NYUIN   =   "24")
                MOVE    ZERO            TO  LNK-TOKNYUIN2-NISSU08
            END-IF
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²¤ÎµÞÀ­Áý°­¤Ë¤è¤ëÅ¾Åï
            IF   (LNK-TOKNYUIN2-SET-SRYCD   =  "190121210")  AND
                 (LNK-TOKNYUIN2-IDOKBN      =  "1")          AND
-                (LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN   =   "25")
+                (LNK-TOKNYUIN2-TOKUTEI-NYUIN   =   "25")
                MOVE    ZERO            TO  LNK-TOKNYUIN2-NISSU08
            END-IF
       *
@@ -937,7 +937,7 @@
       *      (A308-2)°¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍýÎÁ£±
               WHEN      "190117410"
                   MOVE  "190117410"    TO  WRK-TOKNYUIN2-SRYCD(1)
-                  IF    LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)  =  "1"
+                  IF    LNK-TOKNYUIN2-TOKUBETSU-FLG(1)  =  "1"
                       MOVE  90         TO  WRK-JGN-NISSU(1)
                   ELSE
                       MOVE  60         TO  WRK-JGN-NISSU(1)
@@ -951,7 +951,7 @@
       *      (A308-2)°¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍýÎÁ£²
               WHEN      "190129910"
                   MOVE  "190129910"    TO  WRK-TOKNYUIN2-SRYCD(1)
-                  IF    LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)  =  "1"
+                  IF    LNK-TOKNYUIN2-TOKUBETSU-FLG(1)  =  "1"
                       MOVE  90         TO  WRK-JGN-NISSU(1)
                   ELSE
                       MOVE  60         TO  WRK-JGN-NISSU(1)
@@ -1240,7 +1240,7 @@
       *      (A308-2)°¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍýÎÁ£±
               WHEN      "190117410"
                   MOVE  "190117410"    TO  WRK-TOKNYUIN2-SRYCD(1)
-                  IF    LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)  =  "1"
+                  IF    LNK-TOKNYUIN2-TOKUBETSU-FLG(1)  =  "1"
                       MOVE  90         TO  WRK-JGN-NISSU(1)
                   ELSE
                       MOVE  60         TO  WRK-JGN-NISSU(1)
@@ -1254,7 +1254,7 @@
       *      (A308-2)°¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍýÎÁ£²
               WHEN      "190129910"
                   MOVE  "190129910"    TO  WRK-TOKNYUIN2-SRYCD(1)
-                  IF    LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)  =  "1"
+                  IF    LNK-TOKNYUIN2-TOKUBETSU-FLG(1)  =  "1"
                       MOVE  90         TO  WRK-JGN-NISSU(1)
                   ELSE
                       MOVE  60         TO  WRK-JGN-NISSU(1)
@@ -2002,7 +2002,7 @@
       *
       *    ÎÅÍÜÉÂÅï¡ÊÉÂ¾²¡Ë¤ÎÆþ±¡»þ¤ÏÆÃÄêÆþ±¡ÎÁ»»Äê¸å¤Î°ìÈÌÆþ±¡²ñ·×¤Ï
       *    ºîÀ®¤·¤Ê¤¤
-           IF     LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(2)    =    "1"
+           IF     LNK-TOKNYUIN2-TOKUBETSU-FLG(2)    =    "1"
                MOVE    SPACE      TO     LNK-TOKNYUIN2-IPN-KAIKEI-FLG
                                          LNK-TOKNYUIN2-IPN-KAIKEI-YMD
            END-IF

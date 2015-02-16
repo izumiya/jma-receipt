@@ -527,13 +527,13 @@
            COPY    "COMMON-SPA"           REPLACING
                                 //SPA-// BY //WRK-SPA-//.
       *    ∆˛±°Õ˙ŒÚ¬‡»ÚÕ—•Ô°º•Ø
-       01  WK-PTNYUINRRK-REC.
+       01  WK-PTNYU-REC.
            COPY    "CPPTNYUINRRK.INC"     REPLACING
-                                //PTNYUINRRK-// BY //WK-PTNYUINRRK-//.
+                                //PTNYUINRRK-// BY //WK-PTNYU-//.
       *    ∆˛±°Õ˙ŒÚ¬‡»ÚÕ—•Ô°º•Ø
-       01  WWK-PTNYUINRRK-REC.
+       01  WWK-PTNYU-REC.
            COPY    "CPPTNYUINRRK.INC"     REPLACING
-                                //PTNYUINRRK-// BY //WWK-PTNYUINRRK-//.
+                                //PTNYUINRRK-// BY //WWK-PTNYU-//.
       *    ∆√ƒÍ∆˛±°¥¸¥÷ªªƒÍÕ—•Ô°º•Ø
        01  WRK-SCNYUACCT-AREA.
            03  WRK-SCNYUACCT-KAGENCD-TBL         OCCURS  7.
@@ -1811,6 +1811,7 @@
                            WRK-NYUINKAMEI3  DELIMITED BY SPACE
                            "°€"
                   INTO     SPA-GMN-NYUINKA
+                  END-STRING
               ELSE
                   STRING   "°⁄"
                            WRK-NYUINKAMEI1  DELIMITED BY SPACE
@@ -1822,6 +1823,7 @@
                            "≈˘"            DELIMITED BY SIZE
                            "°€"
                   INTO     SPA-GMN-NYUINKA
+                  END-STRING
               END-IF
            END-IF
       *     DISPLAY  "SPA-GMN-NYUINKA = " SPA-GMN-NYUINKA
@@ -6364,7 +6366,7 @@
                       (SPA-NAI-SRYYM           >=  "200604")
                        MOVE      SPACE     TO  WRK-TOKUTEI-NYUIN
                END-IF
-               MOVE    PTNYUINRRK-REC      TO  WK-PTNYUINRRK-REC
+               MOVE    PTNYUINRRK-REC      TO  WK-PTNYU-REC
            ELSE
                INITIALIZE                  PTNYUINRRK-REC
                MOVE    1               TO  FLG-PTNYUINRRK
@@ -6379,7 +6381,7 @@
                GO  TO  410191-NYUACCT-SAKUSEI-EXT
            END-IF
       *
-           MOVE    WK-PTNYUINRRK-REC   TO  PTNYUINRRK-REC
+           MOVE    WK-PTNYU-REC        TO  PTNYUINRRK-REC
       *
            MOVE    WRK-TSUSAN          TO  SYOKIKSN-IN-TUSANNISSU
            MOVE    SPA-NAI-SRYYM       TO  SYOKIKSN-IN-SANTEISTYMD(1:6)
@@ -6840,9 +6842,9 @@
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
-                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF    LNK-AKYUSEI-RC          =   1
-              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
       *    Œ≈Õ‹…¬≈Ô° …¬æ≤°À∆˛±°§Œ•’•È•∞•ª•√•»
            INITIALIZE                       SYS-5001-REC
@@ -6859,7 +6861,7 @@
                  MOVE   MCPDATA-REC     TO  SYS-5001-REC
                  IF    SYS-5001-BTU-SBT    =   "04"  OR  "09"
                      MOVE    "1"        TO
-                                  LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(2)
+                                  LNK-TOKNYUIN2-TOKUBETSU-FLG(2)
                  END-IF
            END-IF
       *
@@ -7229,7 +7231,7 @@
                                        TO  WRK-SHONUM
                MOVE    PTNYUINRRK-TENNYUYMD
                                        TO  WRK-SANTEISTYMD
-               MOVE    PTNYUINRRK-REC  TO  WK-PTNYUINRRK-REC
+               MOVE    PTNYUINRRK-REC  TO  WK-PTNYU-REC
       *         DISPLAY  "PTNYUINRRK-RRKNUM = " PTNYUINRRK-RRKNUM
            ELSE
                INITIALIZE                  PTNYUINRRK-REC
@@ -7245,7 +7247,7 @@
                GO  TO  410191-IPNNYUACCT-SAKUSEI-EXT
            END-IF
       *
-           MOVE    WK-PTNYUINRRK-REC   TO  PTNYUINRRK-REC
+           MOVE    WK-PTNYU-REC        TO  PTNYUINRRK-REC
       *
            MOVE    WRK-TSUSAN          TO  SYOKIKSN-IN-TUSANNISSU
            MOVE    IPN-SANTEISTYMD     TO  SYOKIKSN-IN-SANTEISTYMD
@@ -9734,7 +9736,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        980-PTNYUINRRK-SELECT-SEC     SECTION.
       *
-           MOVE    WWK-PTNYUINRRK-REC   TO  MCPDATA-REC
+           MOVE    WWK-PTNYU-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
            MOVE    "key4"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
@@ -9742,7 +9744,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO             TO  FLG-WWK-PTNYUINRRK
            ELSE
                MOVE    1                TO  FLG-WWK-PTNYUINRRK
-               INITIALIZE                   WWK-PTNYUINRRK-REC
+               INITIALIZE                   WWK-PTNYU-REC
            END-IF
       *
            .
@@ -9757,10 +9759,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 920-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  WWK-PTNYUINRRK-REC
+               MOVE    MCPDATA-REC     TO  WWK-PTNYU-REC
                MOVE    ZERO            TO  FLG-WWK-PTNYUINRRK
            ELSE
-               INITIALIZE                  WWK-PTNYUINRRK-REC
+               INITIALIZE                  WWK-PTNYU-REC
                MOVE    1               TO  FLG-WWK-PTNYUINRRK
            END-IF.
       *

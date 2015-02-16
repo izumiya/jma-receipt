@@ -46,12 +46,14 @@
       *特定入院料通算日数（STUSAN-NISSU08をセット）
            03  LNK-TOKNYUIN2-NISSU08                 PIC  9(08).
       *特定入院料区分
-           03  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN PIC X(02).
+           03  LNK-TOKNYUIN2-TOKUTEI-NYUIN           PIC X(02).
       *特別処理フラグ領域
       *    １：平成２４年３月３１日に亜急性期入院医療管理料１算定時は
       *        上限日数を９０日とする
-      *    ２から５は未使用
-           03  LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG     PIC X(01)
+      *    ２：療養病棟、療養病床入院時は特定入院料算定上限日数を超えた
+      *        日以降の入院会計を作成しない（異動処理で作成する為）
+      *    ３から５は未使用
+           03  LNK-TOKNYUIN2-TOKUBETSU-FLG           PIC X(01)
                                                      OCCURS  5.
       *返却項目
            03  LNK-TOKNYUIN2-HENKYAKU-AREA.
