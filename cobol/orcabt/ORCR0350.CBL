@@ -154,6 +154,7 @@
       *                                     ¤Îµ­Ï¿¤ò¤ä¤á¤ë
       *  03.03.08    NACL-Æ£¸¶    06/11/14  Ï·¿Í¸ºÌÈÂÐ±þ
       *  03.03.09    NACL-Æ£¸¶    06/11/16  ¸øÈñÃ±ÆÈ¤Ç¸øÈñ¤¬Á´¤ÆÀ¸³èÎÅÍÜ
+
       *                                     ¿©»öÉéÃ´¤¢¤ê¤Î¾ì¹ç¤Ï¡Ö97¡×¤Î
       *                                     µ­ºÜ¤Ï¤·¤Ê¤¤
       *  03.03.10    NACL-Æ£¸¶    06/11/17  ¸¡ºº¤ÎÈ½ÃÇÎÁ¤ÎÉéÃ´¶èÊ¬¤Îµ­Ï¿
@@ -169,6 +170,7 @@
       *  03.04.01    NACL-Æ£¸¶    06/12/21  Æþ±¡ÎÁ²Ã»»¤Î¥³¥á¥ó¥È¤òµ­Ï¿¤¹¤ë
       *  03.04.02    NACL-ÌçÏÆ    07/03/22  ¸øÈñµëÉÕÂÐ¾Ý°ìÉôÉéÃ´¶âÊÔ½¸½¤Àµ
       *  03.04.03    NACL-Æ£¸¶    07/03/27  ÆÃÄê´ïºà¤Îµ­ºÜÊýË¡¤ÎÊÑ¹¹
+
       *  £²£°£°£·Ç¯£´·î²þÀµ
       *  03.04.04    NACL-ÌçÏÆ    07/04/01  ¸½ÊªµëÉÕÂÐ±þ
       *  03.04.05    NACL-Æ£¸¶    07/04/13  ¾É¾õ¾Üµ­¶èÊ¬¥³¡¼¥ÉÄÉ²Ã¤ËÈ¼¤¦ÂÐ±þ
@@ -378,7 +380,12 @@
       *                                     ¤Îµ­Ï¿ÊýË¡¤ÎÊÑ¹¹
       *  04.07.09    NACL-Æ£¸¶    14/09/24  Á´³Ñ¤ÎÉéÃ´¼ÔÈÖ¹æ¡¢¼õµë¼ÔÈÖ¹æ¤Î
       *                                     µ­Ï¿ÂÐ±þ
+      *  04.07.10    NACL-Æ£¸¶    15/01/24  Æ±ÆüºÆÆþ±¡»þ¤ÎÆþÂà±¡ÍúÎò¤Îµ­Ï¿
+      *                                     ¤ò½¤Àµ
+      *                                    ¡ÊÆþ±¡Æü¤ÈÂà±¡Æü¤¬Æ±¤¸¤È¤­¡Ë
       *  04.07.11    NACL-ÌçÏÆ    15/02/09  Âè»°¼Ô¹Ô°Ù¤Î¥³¥á¥ó¥ÈÊÔ½¸¾ò·ï½¤Àµ
+      *  04.07.12    NACL-Æ£¸¶    15/02/12  ¹ð¼¨Åù¼±ÊÌ¶èÊ¬¤Ë¤è¤ëµ­Ï¿½ç¤ò½¤Àµ
+      *                                    ¡ÊÄÌÂ§²Ã»»ÂÐ¾Ý³°¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/06/02  ÀÁµá¾ðÊó¤Ø¤Î¹¹¿·ÆüÀßÄê
@@ -583,6 +590,7 @@
            03  FLG-TAISYO              PIC 9(01).
            03  FLG-SKJ-HANTEI          PIC 9(01).
            03  FLG-SUUJI               PIC 9(01).
+           03  FLG-NYUINYMD            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1122,7 +1130,7 @@
       *
       *
        01  WRK-KOUI-AREA.
-           03  WRK-KOUI-TABLE                   OCCURS  4.
+           03  WRK-KOUI-TABLE                   OCCURS  5.
                05  WRK-KOUI-TBLMAX              PIC 9(03).
                05  WRK-KOUI-REC                     OCCURS  100.
                    07  WRK-KOUI-KEY.
@@ -4635,6 +4643,7 @@
       *
            MOVE    ZERO                TO  FLG-NYUTAI-RIREKI
                                            FLG-NYUIN-SRYCD
+                                           FLG-NYUINYMD
            MOVE    ZERO                TO  WRK-NYUINCHUKBN
       *          
            INITIALIZE                      RECE68-REC
@@ -4652,10 +4661,13 @@
                    OR    ( RECE62-KEY       NOT =  RECE68-KEY1         )
       *
       *        ºÆÆþ±¡Ç¯·îÆü¤«Æþ±¡Ç¯·îÆü
-               IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )
-               OR    ( WRK-NYUINCHUKBN     =   "1"             )
+               IF    ( WRK-NYUINCHUKBN =   "1"             )
                    CONTINUE
                ELSE
+                 IF    ( RECE68-NYUINYMD =   RECE62-NYUINYMD )
+                 AND   ( FLG-NYUINYMD    =   ZERO            )
+                     MOVE    1               TO  FLG-NYUINYMD
+                 ELSE
                    MOVE    SPACE               TO  WRK-REC
                    MOVE    ZERO                TO  WRK-REC-LENGTH
       *
@@ -4671,7 +4683,7 @@
       *            ÉéÃ´¶èÊ¬
                    MOVE    WRK-COM-FTNKBN      TO  WRK-DATA
                    MOVE    1                   TO  WRK-NAGASA
-                   PERFORM 5004-MOJI-HENSYU-SEC  
+                   PERFORM 5004-MOJI-HENSYU-SEC
       *            ¥³¥á¥ó¥È¥³¡¼¥É
                    IF    ( RECE68-SHONUM       =   ZERO )
                    AND   ( FLG-NYUIN-SRYCD     =   ZERO )
@@ -4701,6 +4713,7 @@
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *
                    PERFORM 5001-FILE-WRITE-SEC
+                 END-IF
                END-IF
       *
       *        Âà±¡Ç¯·îÆü                          
@@ -6167,6 +6180,7 @@
                        OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                            PERFORM 200741-KASAN-HENSYU-SEC
                        END-IF
                        ADD     1           TO  IDY   
@@ -6191,6 +6205,7 @@
                                    OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                                        PERFORM 200741-KASAN-HENSYU-SEC
                                    END-IF
                                    MOVE    1               TO  IDZ  
@@ -6231,7 +6246,7 @@
                                            =   "5" OR  "6" )
                                        MOVE    ZERO        TO  IDZ
                                    ELSE
-                                       MOVE    4           TO  IDZ
+                                       MOVE    5           TO  IDZ
                                    END-IF  
                            END-EVALUATE
                            IF      IDZ         >   ZERO
@@ -6252,6 +6267,7 @@
            OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                PERFORM 200741-KASAN-HENSYU-SEC
            END-IF
            .
@@ -6288,7 +6304,7 @@
            MOVE    ZERO            TO  WRK-KIHON-TIMEKSNKBN
       *
            PERFORM VARYING IDY1    FROM    1   BY  1
-                   UNTIL   IDY1    >       4
+                   UNTIL   IDY1    >       5
                MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
                PERFORM VARYING IDY2    FROM    1   BY  1
                        UNTIL   IDY2    >       IDYY

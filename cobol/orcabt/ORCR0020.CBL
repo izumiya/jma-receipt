@@ -267,6 +267,9 @@
       *  04.07.12    NACL-藤原    14/09/10  月途中のまとめのとき第二公費
       *                                     マル長のときの修正
       *  04.07.13    NACL-門脇    14/10/21  低所得フラグ編集修正
+      *  04.07.14    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
+      *                                     を修正
+      *                                    （入院日と退院日が同じとき）
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -4826,12 +4829,18 @@ grpsys         PERFORM 900-DBSELECT-SEC
                GO  TO  24012-RECE12-WRITE-EXT
            END-IF
       *
+           INITIALIZE                      RECE12-REC
 grpsys     MOVE    RECE02-KEY          TO  RECE12-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE12-NYUINYMD
-           MOVE    RECE12-REC          TO  WRK-RECE12-REC          
+           IF      PTNYUINRRK-TAIINYMD =   "99999999"
+               MOVE    1                   TO  RECE12-NYUINYMD-SEQNO
+           ELSE
+               MOVE    ZERO                TO  RECE12-NYUINYMD-SEQNO
+           END-IF
+           MOVE    RECE12-REC          TO  WRK-RECE12-REC
            PERFORM 900-RECE12-READ-SEC
            IF      FLG-RECE12          =   1
-               MOVE    WRK-RECE12-REC      TO  RECE12-REC 
+               MOVE    WRK-RECE12-REC      TO  RECE12-REC
                MOVE    PTNYUINRRK-TAIINYMD TO  RECE12-TAIINYMD
                MOVE    PTNYUINRRK-NYUINCHUKBN
                                            TO  RECE12-NYUINCHUKBN
