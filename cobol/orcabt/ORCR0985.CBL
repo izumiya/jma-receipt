@@ -34,6 +34,11 @@
       *                                     法の変更
       *                                     漢字モードの継続するスペース
       *                                     の記録方法の変更
+      *  04.07.03    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
+      *                                     を修正
+      *                                    （入院日と退院日が同じとき）
+      *  04.07.04    NACL-藤原    15/02/12  告示等識別区分による記録順を修正
+      *                                    （通則加算対象外）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -185,6 +190,7 @@
            03  FLG-TAISYO              PIC 9(01).
            03  FLG-RECECOM-XX          PIC 9(01).
            03  FLG-RECECOM-AA          PIC 9(01).
+           03  FLG-NYUINYMD            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -613,7 +619,7 @@
       *
       *   
        01  WRK-KOUI-AREA.
-           03  WRK-KOUI-TABLE                   OCCURS  5.
+           03  WRK-KOUI-TABLE                   OCCURS  6.
                05  WRK-KOUI-TBLMAX              PIC 9(03).
                05  WRK-KOUI-REC                     OCCURS  100.
                    07  WRK-KOUI-KEY.
@@ -2187,6 +2193,7 @@
       *
            MOVE    ZERO                TO  FLG-NYUTAI-RIREKI
                                            FLG-NYUIN-SRYCD
+                                           FLG-NYUINYMD
            MOVE    ZERO                TO  WRK-NYUINCHUKBN
       *          
            INITIALIZE                      RECE88-REC
@@ -2204,10 +2211,13 @@
                    OR    ( RECE82-KEY   NOT =  RECE88-KEY1 )
       *
       *        再入院年月日か入院年月日
-               IF    ( RECE88-NYUINYMD     =   RECE82-NYUINYMD )
-               OR    ( WRK-NYUINCHUKBN     =   "1"             )
+               IF    ( WRK-NYUINCHUKBN =   "1"             )
                    CONTINUE
                ELSE
+                 IF    ( RECE88-NYUINYMD =   RECE82-NYUINYMD )
+                 AND   ( FLG-NYUINYMD    =   ZERO            )
+                     MOVE    1               TO  FLG-NYUINYMD
+                 ELSE
                    MOVE    SPACE               TO  WRK-REC
                    MOVE    ZERO                TO  WRK-REC-LENGTH
       *
@@ -2251,6 +2261,7 @@
                    PERFORM 5004-MOJI-HENSYU-SEC  
       *
                    PERFORM 5001-FILE-WRITE-SEC
+                 END-IF
                END-IF
       *
       *        退院年月日                          
@@ -3340,6 +3351,7 @@
                        OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (6) >  ZERO )
                            PERFORM 200741-KASAN-HENSYU-SEC
                        END-IF
                        ADD     1           TO  IDY   
@@ -3365,6 +3377,7 @@
                                    OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (6) >  ZERO )
                                        PERFORM 200741-KASAN-HENSYU-SEC
                                    END-IF
                                    MOVE    1               TO  IDZ  
@@ -3405,10 +3418,10 @@
                                            =   "5" OR  "6" )
                                        MOVE    ZERO        TO  IDZ
                                    ELSE
-                                       MOVE    4           TO  IDZ
+                                       MOVE    5           TO  IDZ
                                    END-IF  
                                WHEN    "8" 
-                                   MOVE    5           TO  IDZ
+                                   MOVE    6           TO  IDZ
                            END-EVALUATE
                            IF      IDZ         >   ZERO
                                ADD     1           TO
@@ -3429,6 +3442,7 @@
            OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (6) >  ZERO )
                PERFORM 200741-KASAN-HENSYU-SEC
            END-IF
            .
@@ -3465,7 +3479,7 @@
            MOVE    ZERO            TO  WRK-KIHON-TIMEKSNKBN
       *
            PERFORM VARYING IDY1    FROM    1   BY  1
-                   UNTIL   IDY1    >       4
+                   UNTIL   IDY1    >       5
                MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
                PERFORM VARYING IDY2    FROM    1   BY  1
                        UNTIL   IDY2    >       IDYY
@@ -3506,7 +3520,7 @@
            END-PERFORM
       *
       *    労災特別加算項目の編集
-           MOVE    5                       TO  IDY1
+           MOVE    6                       TO  IDY1
            MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
            PERFORM VARYING IDY2    FROM    1   BY  1
                    UNTIL   IDY2    >       IDYY

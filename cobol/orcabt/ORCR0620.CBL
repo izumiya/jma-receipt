@@ -226,6 +226,9 @@
       *  04.07.11    NACL-藤原    14/09/10  月途中のまとめのとき第二公費
       *                                     マル長のときの修正
       *  04.07.12    NACL-門脇    14/10/21  低所得フラグ編集修正
+      *  04.07.13    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
+      *                                     を修正
+      *                                    （入院日と退院日が同じとき）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4025,10 +4028,20 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
            INITIALIZE                      RECE68-REC
            MOVE    RECE62-KEY          TO  RECE68-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE68-NYUINYMD
-           MOVE    RECE68-REC          TO  WRK-RECE68-REC          
+           IF      PTNYUINRRK-NYUINYMD =   PTNYUINRRK-TAIINYMD
+               MOVE    0                   TO  RECE68-NYUINYMD-SEQNO
+           ELSE 
+               IF      PTNYUINRRK-TAIINYMD =   "99999999"
+                   MOVE    9                   TO  RECE68-NYUINYMD-SEQNO
+               ELSE
+                   MOVE    1                   TO  RECE68-NYUINYMD-SEQNO
+               END-IF
+           END-IF
+      *
+           MOVE    RECE68-REC          TO  WRK-RECE68-REC
            PERFORM 900-RECE68-READ-SEC
            IF      FLG-RECE68          =   1
-               MOVE    WRK-RECE68-REC      TO  RECE68-REC 
+               MOVE    WRK-RECE68-REC      TO  RECE68-REC
                MOVE    PTNYUINRRK-TAIINYMD TO  RECE68-TAIINYMD
                MOVE    PTNYUINRRK-NYUINCHUKBN
                                            TO  RECE68-NYUINCHUKBN

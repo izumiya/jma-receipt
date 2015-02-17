@@ -39,6 +39,9 @@
       *  04.07.01    NACL-藤原    14/02/07  入院会計の保険組合せが全て
       *                                     公害以外のときの一括処理の修正
       *  04.07.02    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.03    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
+      *                                     を修正
+      *                                    （入院日と退院日が同じとき）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1908,8 +1911,18 @@
                GO  TO  24012-RECE250-WRITE-EXT
            END-IF
       *
+           INITIALIZE                      RECE250-REC
            MOVE    WRK-RECE200-KEY     TO  RECE250-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE250-NYUINYMD
+           IF      PTNYUINRRK-NYUINYMD =   PTNYUINRRK-TAIINYMD
+               MOVE    0                   TO  RECE250-NYUINYMD-SEQNO
+           ELSE 
+               IF      PTNYUINRRK-TAIINYMD =   "99999999"
+                   MOVE    9                   TO RECE250-NYUINYMD-SEQNO
+               ELSE
+                   MOVE    1                   TO RECE250-NYUINYMD-SEQNO
+               END-IF
+           END-IF
            MOVE    RECE250-REC         TO  WRK-RECE250-REC          
            PERFORM 900-RECE250-READ-SEC
            IF      FLG-RECE250         =   1

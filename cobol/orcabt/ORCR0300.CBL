@@ -416,6 +416,8 @@
       *                                     記録対応
       *  04.07.09    NACL-藤原    14/10/17  請求情報への更新日設定
       *  04.07.10    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
+      *  04.07.11    NACL-藤原    15/02/12  告示等識別区分による記録順を修正
+      *                                    （通則加算対象外）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1140,7 +1142,7 @@ grpsys     COPY    "COMMON-SPA".
       *
       *   
        01  WRK-KOUI-AREA.
-           03  WRK-KOUI-TABLE                   OCCURS  4.
+           03  WRK-KOUI-TABLE                   OCCURS  5.
                05  WRK-KOUI-TBLMAX              PIC 9(03).
                05  WRK-KOUI-REC                     OCCURS  100.
                    07  WRK-KOUI-KEY.
@@ -5252,6 +5254,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                        OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                        OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                       OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                            PERFORM 200741-KASAN-HENSYU-SEC
                        END-IF
                        ADD     1           TO  IDY   
@@ -5276,6 +5279,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                    OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
                                    OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+                                   OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                                        PERFORM 200741-KASAN-HENSYU-SEC
                                    END-IF
                                    MOVE    1               TO  IDZ  
@@ -5316,7 +5320,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                            =   "5" OR  "6" )
                                        MOVE    ZERO        TO  IDZ
                                    ELSE
-                                       MOVE    4           TO  IDZ
+                                       MOVE    5           TO  IDZ
                                    END-IF  
                            END-EVALUATE
                            IF      IDZ         >   ZERO
@@ -5337,6 +5341,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
            OR    ( WRK-KOUI-TBLMAX (2) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (3) >  ZERO )
            OR    ( WRK-KOUI-TBLMAX (4) >  ZERO )
+           OR    ( WRK-KOUI-TBLMAX (5) >  ZERO )
                PERFORM 200741-KASAN-HENSYU-SEC
            END-IF
            .
@@ -5373,7 +5378,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
            MOVE    ZERO            TO  WRK-KIHON-TIMEKSNKBN
       *
            PERFORM VARYING IDY1    FROM    1   BY  1
-                   UNTIL   IDY1    >       4
+                   UNTIL   IDY1    >       5
                MOVE    WRK-KOUI-TBLMAX (IDY1)  TO  IDYY
                PERFORM VARYING IDY2    FROM    1   BY  1
                        UNTIL   IDY2    >       IDYY

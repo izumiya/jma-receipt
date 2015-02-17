@@ -54,6 +54,9 @@
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.04    NACL-門脇    14/05/08  労災レセ「新継再別」記載修正
       *  04.07.05    NACL-門脇    14/08/07  労災レセ「新継再別」記載修正
+      *  04.07.06    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
+      *                                     を修正
+      *                                    （入院日と退院日が同じとき）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -689,6 +692,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                GO  TO  210111-RECE88-WRITE-EXT
            END-IF
       *
+           INITIALIZE                      RECE88-REC
            MOVE    RECE82-HOSPNUM      TO  RECE88-HOSPNUM
            MOVE    RECE82-SRYYM        TO  RECE88-SRYYM
            MOVE    RECE82-NYUGAIKBN    TO  RECE88-NYUGAIKBN
@@ -697,6 +701,15 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE82-HKNID        TO  RECE88-HKNID
            MOVE    RECE82-TEKSTYMD     TO  RECE88-TEKSTYMD
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE88-NYUINYMD
+           IF      PTNYUINRRK-NYUINYMD =   PTNYUINRRK-TAIINYMD
+               MOVE    0                   TO  RECE88-NYUINYMD-SEQNO
+           ELSE 
+               IF      PTNYUINRRK-TAIINYMD =   "99999999"
+                   MOVE    9                   TO  RECE88-NYUINYMD-SEQNO
+               ELSE
+                   MOVE    1                   TO  RECE88-NYUINYMD-SEQNO
+               END-IF
+           END-IF
            MOVE    RECE88-REC          TO  WRK-RECE88-REC          
            PERFORM 900-RECE88-READ-SEC
            IF      FLG-RECE88          =   1
@@ -704,6 +717,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    PTNYUINRRK-TAIINYMD TO  RECE88-TAIINYMD
                MOVE    PTNYUINRRK-NYUINCHUKBN
                                            TO  RECE88-NYUINCHUKBN
+      *        入院年月日と同じ初回番号のときのみセット
+               IF      PTNYUINRRK-SHONUM   =    WRK-SHONUM
+                   MOVE    WRK-SHONUM           TO  RECE88-SHONUM
+               END-IF
                WRITE   RECE88-REC
                ADD     1                   TO  CNT-RECE88
       *
