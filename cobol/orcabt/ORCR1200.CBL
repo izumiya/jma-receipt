@@ -1975,6 +1975,7 @@
                GO  TO  24012-RECE250-WRITE-EXT
            END-IF
       *
+           INITIALIZE                      RECE250-REC
            MOVE    WRK-RECE200-KEY     TO  RECE250-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE250-NYUINYMD
            IF      PTNYUINRRK-NYUINYMD =   PTNYUINRRK-TAIINYMD
