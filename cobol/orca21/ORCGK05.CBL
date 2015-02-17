@@ -348,6 +348,8 @@
       *
            03  WRK-KANSURYO        PIC 9(05)V9(05).
       *
+           03  WRK-HZN-SELNUM      PIC 9(03).
+      *
        01  WRK-GMNGYO-AREA.
            03  WRK-MAP-MAX         PIC 9(04).
            03  WRK-MAP-CUR         PIC 9(04).
@@ -1073,6 +1075,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    "0003"
                     IF      SPA-KID1-FLG        =   "OK"
                         PERFORM 30011-SYUSEI-HEN-SEC
+                    ELSE
+      *H27.2            入力コード、期間のみ編集
+                        PERFORM 30013-SYUSEI-NASI-SEC
                     END-IF
       *         期間変更
                 WHEN    "0004"
@@ -1748,6 +1753,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 420-ROUJIN-SEC
       *        選択番号
                WHEN    "ACTIVATE"      ALSO    "SELNUM"
+      *!!
+                   MOVE    SPA-K05-SELNUM      TO  WRK-HZN-SELNUM
+      *!!
                    PERFORM 430-SELNUM-SEC
       *        履歴選択
                WHEN    ANY             ALSO    "RRKLIST"
@@ -1881,6 +1889,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    3               TO  SPA-GMN5-CUR
            ELSE
                IF      FLG-CHK             =   1
+      *!!
+      *            名称編集
+                   IF      WRK-HZN-SELNUM      =   ZERO
+                       MOVE    1               TO  FLG-KOUSIN
+                       PERFORM 30011-SYUSEI-HEN-SEC
+                       MOVE    ZERO            TO  FLG-KOUSIN
+                   END-IF
+      *!!
       *            セット展開
                    INITIALIZE                  SPA-SCR-REC
                    MOVE    1                   TO  SPA-GMN-IDX
@@ -1920,6 +1936,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            IF      WRK-SELNUM          >   ZERO
+      *!!
+               MOVE    SPA-K05-SELNUM      TO  WRK-HZN-SELNUM
+      *!!
                MOVE    WRK-SELNUM          TO  SPA-K05-SELNUM
                MOVE    SPA-K05-SELNUM      TO  K05-SELNUM
                PERFORM 430-SELNUM-SEC
@@ -2202,6 +2221,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1"                 TO  SPA-K05-SYORI
                INITIALIZE                      SPA-K051-TBL
                INITIALIZE                      SPA-K05-KIKAN-AREA
+               INITIALIZE                      SPA-K051-AREA
+      *
                MOVE    2                   TO  SPA-GMN5-CUR
                MOVE    "00000000"          TO  SPA-K05-GMN-YUKOSTYMD
                MOVE    "00000000"          TO  SPA-K05-NAI-YUKOSTYMD
@@ -2269,7 +2290,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        300111-SETTENKAI-SEC               SECTION.
       *
            INITIALIZE                  SPA-K05-KIKAN-AREA
+           INITIALIZE                  SPA-K051-AREA
            INITIALIZE                  SPA-SCR-REC
+      *
            MOVE    1                   TO  SPA-GMN-IDX
            MOVE    SPA-GMN-SETCODE     TO  WRK-SETCD
            MOVE    1                   TO  FLG-SYOKI
@@ -2322,6 +2345,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                MOVE    2                   TO  SPA-GMN5-CUR
            ELSE
+      *        入力コードセット
+               PERFORM 410111-INPUTCD-SET-SEC
+      *
                MOVE    13                  TO  SPA-GMN5-CUR
            END-IF
       *
@@ -2428,6 +2454,58 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        410111-INPUTCD-SET-EXT.
            EXIT.
       *----(01.00.01) LINE ADD END   ----------------------------------
+      *H27.2
+      *****************************************************************
+      *    修正の入力コードセット処理（ＮＯ選択）
+      *****************************************************************
+       30013-SYUSEI-NASI-SEC               SECTION.
+      *
+           INITIALIZE                  SPA-K05-KIKAN-AREA
+           INITIALIZE                  SPA-K051-AREA
+      *
+           MOVE    SPA-GMN-SETCODE     TO  WRK-SETCD
+      **** MOVE    1                   TO  FLG-SYOKI
+      *    期間決定
+           INITIALIZE                      INPUTSET-REC
+           MOVE    SPA-HOSPNUM         TO  ISET-HOSPNUM
+           MOVE    WRK-SETCD           TO  ISET-SETCD
+      *
+           MOVE    INPUTSET-REC        TO  MCPDATA-REC
+           MOVE    "tbl_inputset"      TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_inputset"      TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 975-INPUTSET-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-INPUTSET
+           END-IF
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL    FLG-INPUTSET    =   1
+               ADD     1               TO  IDX
+               IF      IDX             >   10
+                   CONTINUE
+               ELSE
+                   PERFORM 301112-RRKYMD-SET-SEC
+               END-IF
+               MOVE    "tbl_inputset"      TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 975-INPUTSET-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_inputset"      TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    入力コードセット
+           PERFORM 410111-INPUTCD-SET-SEC
+      *
+           MOVE    1                   TO  SPA-GMN5-CUR
+      *
+           MOVE    "2"                 TO  SPA-K05-SYORI
+           .
+       30013-SYUSEI-NASI-EXT.
+           EXIT.
       *
       *****************************************************************
       *    セット名入力処理
@@ -3345,6 +3423,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  K99
       *
       *    画面カーソルセット処理
+           INITIALIZE                      K99
            MOVE    "PIN"               TO  MCP-WIDGET
       *
            MOVE    SPACE               TO  SPA-K99-DATA
@@ -5655,6 +5734,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            INITIALIZE              SPA-SCR-REC
            INITIALIZE              SPA-K05-AREA
+           INITIALIZE              SPA-K051-AREA
       *
            MOVE    SPA-SRYYMD          TO  SPA-K05-MAE-SRYYMD
       *    入外区分、老人区分初期表示
@@ -5718,6 +5798,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  K051
       *
       *    画面編集
+           INITIALIZE                      K051
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   5
                MOVE    SPA-K051-INPUTCD   (IDX)
@@ -6501,6 +6582,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ALL "9"             TO  SPA-K052-INPUTCD2
       *
            MOVE    SPACE               TO  K052
+           INITIALIZE                      K052
            MOVE    SPA-K052-INPUTCD1   TO  K052-INPUTCD1
            MOVE    SPA-K052-INPUTCD2   TO  K052-INPUTCD2
       *
@@ -6973,6 +7055,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-KERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KERR2
+           INITIALIZE                      KERR2
            MOVE    SPA-ERRCD           TO  KERR2-ERRCODE
            MOVE    SPA-ERRMSG2         TO  KERR2-ERRMSG(1:80)
            MOVE    SPA-ERRMSG          TO  KERR2-ERRMSG2
@@ -7027,6 +7110,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *
