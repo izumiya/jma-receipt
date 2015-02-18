@@ -386,6 +386,8 @@
       *  04.07.12    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
       *  04.07.13    NACL-藤原    15/02/12  告示等識別区分による記録順を修正
       *                                    （通則加算対象外）
+      *  04.07.14    NACL-藤原    15/02/18  医療情報連携対応
+      *                                     自費レセプトを対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9680,11 +9682,15 @@
                        OR  (   RECE62-PTNUM        =   SPACE       )
                        OR  (   RECE62-TSTPTNUMKBN  =   "1"         )
                        OR  (   RECE62-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
+      *************************************************8888   OR 
                                                        6666        )
                        OR  (   RECE62-ERR-ERRKBN   >   ZERO        )
                            MOVE    2               TO  FLG-READ
                        ELSE
+                         IF    ( RECE62-RECESYUBETU  =   8888 )
+                         AND   ( WRK-PARA-PRTKBN NOT =   "9"  )
+                             MOVE    2                   TO  FLG-READ
+                         ELSE
       *                    主科設定のとき未設定なら更新しない
                            IF    ( SYS-2009-SYUKA-KBN  =   "1"  )
                            AND   ( RECE62-SYUKA        =   "XX" )
@@ -9697,6 +9703,7 @@
                                MOVE    2               TO  FLG-READ
                              END-IF
                            END-IF
+                         END-IF
                        END-IF    
       *
                        IF      FLG-READ            =   ZERO
@@ -9756,6 +9763,7 @@
                                                    TO KEY-N-TEISYUTUSAKI
       *
                            DISPLAY "RECE62  PTNUM=" RECE62-PTNUM  
+                                " RECESYUBETU=" RECE62-RECESYUBETU
                                "  RJNGAIKOHFTN=" RECE62-RJNGAIKOHFTN(1)    
                                 " PREFKBN=" RECE62-PREFKBN
                                 " PREFNUM=" RECE62-HKNJANUM-PREFNUM

@@ -35,6 +35,9 @@
       *  04.02.01    NACL-藤原    08/03/25  平成２０年４月改正対応
       *                                     広域連合対応
       *  04.02.02    NACL-藤原    08/05/09  広域連合分記載もれ対応
+      *
+      *  04.07.01    NACL-藤原    15/02/18  医療情報連携対応
+      *                                     自費レセプトを対象とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -127,6 +130,7 @@
                05  WRK-PARA-KKHRECEKBN PIC X(01).
                05  WRK-PARA-KOUIKIRECEKBN
                                        PIC X(01).
+               05  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-RECEERR             PIC X(200). 
@@ -193,6 +197,7 @@
                                                WRK-PARA-KKHRECEKBN
                                                WRK-PARA-JOBID
                                                WRK-PARA-SHELLID
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING                                  
@@ -343,11 +348,17 @@
                              ( RECE631-TEISYUTUSAKI
                                                    =   "6"  )      )
                        OR  (   RECE631-RECESYUBETU =   ZERO   OR 
-                                                       8888   OR 
+      *************************************************8888   OR 
                                                        6666        )
                            CONTINUE
                        ELSE
-                           MOVE    1           TO  FLG-READ
+                           IF      RECE631-RECESYUBETU =   8888
+                               IF      WRK-PARA-PRTKBN     =   "9"
+                                   MOVE    1               TO  FLG-READ
+                               END-IF
+                           ELSE
+                               MOVE    1           TO  FLG-READ
+                           END-IF
                        END-IF
       *
                        IF      FLG-READ            =   1         
@@ -355,6 +366,7 @@
                            MOVE    ZERO        TO  FLG-END
       *
                            DISPLAY "RECE63  PTID=" RECE631-PTID
+                                   " RECESYUBETU=" RECE631-RECESYUBETU
                        END-IF
                END-READ
            END-PERFORM
