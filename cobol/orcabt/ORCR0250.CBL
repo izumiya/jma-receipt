@@ -65,6 +65,8 @@
       *                                     レセプト記載対応
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-藤原    15/02/18  医療情報連携対応
+      *                                     自費レセプトを対象とする
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -179,6 +181,7 @@
                05  WRK-PARA-KKHRECEKBN PIC X(01).
                05  WRK-PARA-KOUIKIRECEKBN
                                        PIC X(01).
+               05  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-KOHBUNRI            PIC 9(01).
@@ -276,6 +279,7 @@
                                                WRK-PARA-KKHRECEKBN
                                                WRK-PARA-JOBID
                                                WRK-PARA-SHELLID
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING                                  
@@ -707,19 +711,28 @@
                              ( RECE64-TEISYUTUSAKI
                                                    =   "6"  )      )
                        OR  (   RECE64-RECESYUBETU  =   ZERO   OR 
-                                                       8888   OR 
+      *************************************************8888   OR 
                                                        6666        )
                        OR  ( RECE64-SRYKBN         =  "95"    OR
                                                       "96"    OR
                                                       "98"         )
                                CONTINUE
                        ELSE
-                           MOVE    1           TO  FLG-READ
+                           IF      RECE64-RECESYUBETU  =   8888
+                               IF      WRK-PARA-PRTKBN =   "9"
+                                   MOVE    1               TO  FLG-READ
+                               END-IF
+                           ELSE
+                               MOVE    1           TO  FLG-READ
+                           END-IF
                        END-IF      
       *
                        IF      FLG-READ            =   1         
                            ADD     1                   TO  CNT-IN
                            MOVE    ZERO                TO  FLG-END
+      *
+                           DISPLAY "RECE64  PTNUM=" RECE64-PTNUM
+                                    " RECESYUBETU=" RECE64-RECESYUBETU
                        END-IF
                END-READ
            END-PERFORM

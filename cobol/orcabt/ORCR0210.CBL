@@ -36,6 +36,9 @@
       *  04.02.01    NACL-藤原    08/03/25  平成２０年４月改正対応
       *                                     広域連合対応
       *
+      *  04.07.01    NACL-藤原    15/02/18  医療情報連携対応
+      *                                     自費レセプトを対象とする
+      *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
       *
@@ -131,6 +134,7 @@ grpsys     COPY    "COMMON-SPA".
                05  WRK-PARA-KKHRECEKBN PIC X(01).
                05  WRK-PARA-KOUIKIRECEKBN
                                        PIC X(01).
+               05  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-RECEERR             PIC X(200). 
@@ -200,6 +204,7 @@ grpsys     COPY    "COMMON-SPA".
                                                WRK-PARA-KKHRECEKBN
                                                WRK-PARA-JOBID
                                                WRK-PARA-SHELLID
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -378,11 +383,17 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                              ( RECE031-TEISYUTUSAKI
                                                    =   "6"  )      )
                        OR  (   RECE031-RECESYUBETU =   ZERO   OR 
-                                                       8888   OR 
+      *************************************************8888   OR 
                                                        6666        )
                            CONTINUE
                        ELSE
-                           MOVE    1           TO  FLG-READ
+                           IF      RECE031-RECESYUBETU =   8888
+                               IF      WRK-PARA-PRTKBN     =   "9"
+                                   MOVE    1               TO  FLG-READ
+                               END-IF
+                           ELSE
+                               MOVE    1           TO  FLG-READ
+                           END-IF
                        END-IF
       *
                        IF      FLG-READ            =   1         
@@ -390,6 +401,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            MOVE    ZERO        TO  FLG-END
       *
                            DISPLAY "RECE03  PTID=" RECE031-PTID
+                                   " RECESYUBETU=" RECE031-RECESYUBETU
                        END-IF
                END-READ
            END-PERFORM
