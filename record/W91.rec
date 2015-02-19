@@ -19,6 +19,14 @@ W91	{
 			value	bool;
 			state int;
 		};
+		CHKJIHI		{
+			value	bool;
+			state int;
+		};
+		CHKPTNUM	{
+			value	bool;
+			state int;
+		};
 		LABEL1	{
 			value	varchar(50);
 		};
