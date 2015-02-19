@@ -25,5 +25,13 @@ W91 {
       isactive bool;
       state int;
     };
+    CHKJIHI {
+      isactive bool;
+      state int;
+    };
+    CHKPTNUM {
+      isactive bool;
+      state int;
+    };
   };
 };

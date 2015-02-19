@@ -78,6 +78,8 @@
       *
                05  SPA-GMN-FILE-DIR            PIC X(200).
                05  SPA-GMN-CHKSYREC            PIC X(01).
+               05  SPA-GMN-CHKJIHI             PIC X(01).
+               05  SPA-GMN-CHKPTNUM            PIC X(01).
       *    見出し
            03  SPA-GMN-LABEL1                  PIC X(50).
            03  SPA-GMN-LABEL2                  PIC X(50).
@@ -289,6 +291,10 @@
                MOVE    SYS-9101-FILE-DIR   TO  SPA-GMN-FILE-DIR
       *        傷病名レコード記録
                MOVE    SYS-9101-SYREC      TO  SPA-GMN-CHKSYREC
+      *        自費保険分作成
+               MOVE    SYS-9101-JIHI       TO  SPA-GMN-CHKJIHI
+      *        患者番号記録
+               MOVE    SYS-9101-PTNUM      TO  SPA-GMN-CHKPTNUM
            END-IF
       *    連携基盤用データ作成初期
            IF      SPA-GMN-COOPBASE    =   SPACE
@@ -298,6 +304,14 @@
       *    傷病名レコード記録初期
            IF      SPA-GMN-CHKSYREC    =   SPACE
                MOVE    "F"             TO  SPA-GMN-CHKSYREC
+           END-IF
+      *    自費保険分作成初期
+           IF      SPA-GMN-CHKJIHI     =   SPACE
+               MOVE    "F"             TO  SPA-GMN-CHKJIHI
+           END-IF
+      *    患者番号記録初期
+           IF      SPA-GMN-CHKPTNUM    =   SPACE
+               MOVE    "F"             TO  SPA-GMN-CHKPTNUM
            END-IF
       *
            MOVE    SPACE               TO  SPA-ERRCD
@@ -364,6 +378,26 @@
                    MOVE    "T"                 TO  SPA-GMN-CHKSYREC
                END-IF
              END-IF
+      *    自費保険分作成
+           WHEN    "CLICKED"       ALSO    "CHKJIHI"
+      *    処方せんはなし
+             IF      SPA-W01-KANRICD     NOT =   "9103"
+               IF      SPA-GMN-CHKJIHI     =   "T"
+                   MOVE    "F"                 TO  SPA-GMN-CHKJIHI
+               ELSE
+                   MOVE    "T"                 TO  SPA-GMN-CHKJIHI
+               END-IF
+             END-IF
+      *    患者番号記録
+           WHEN    "CLICKED"       ALSO    "CHKPTNUM"
+      *    処方せんはなし
+             IF      SPA-W01-KANRICD     NOT =   "9103"
+               IF      SPA-GMN-CHKPTNUM    =   "T"
+                   MOVE    "F"                 TO  SPA-GMN-CHKPTNUM
+               ELSE
+                   MOVE    "T"                 TO  SPA-GMN-CHKPTNUM
+               END-IF
+             END-IF
            END-EVALUATE
            .
       *
@@ -420,6 +454,8 @@
            MOVE    W91-COOPBASE        TO  SPA-GMN-COOPBASE-G
            MOVE    W91-FILEDIR         TO  SPA-GMN-FILE-DIR
            MOVE    W91-CHKSYREC        TO  SPA-GMN-CHKSYREC
+           MOVE    W91-CHKJIHI         TO  SPA-GMN-CHKJIHI
+           MOVE    W91-CHKPTNUM        TO  SPA-GMN-CHKPTNUM
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -680,9 +716,13 @@
       *    連携基盤用データファイルデイレクトリ
            MOVE    SPA-GMN-FILE-DIR        TO  SYS-9101-FILE-DIR
       *    傷病名レコード記録
+      *    自費保険分作成
+      *    患者番号記録
            IF      SPA-W01-KANRICD         =   "9101"
       *
            MOVE    SPA-GMN-CHKSYREC        TO  SYS-9101-SYREC
+           MOVE    SPA-GMN-CHKJIHI         TO  SYS-9101-JIHI
+           MOVE    SPA-GMN-CHKPTNUM        TO  SYS-9101-PTNUM
       *
            END-IF
       *
@@ -817,10 +857,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-FILE-DIR    TO  W91-FILEDIR
            MOVE    SPA-GMN-CHKSYREC    TO  W91-CHKSYREC
+           MOVE    SPA-GMN-CHKJIHI     TO  W91-CHKJIHI
+           MOVE    SPA-GMN-CHKPTNUM    TO  W91-CHKPTNUM
            IF      SPA-W01-KANRICD         =   "9101"
                MOVE    WIDGET-NORMAL       TO  W91-CHKSYREC-STATE
+               MOVE    WIDGET-NORMAL       TO  W91-CHKJIHI-STATE
+               MOVE    WIDGET-NORMAL       TO  W91-CHKPTNUM-STATE
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKSYREC-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W91-CHKJIHI-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W91-CHKPTNUM-STATE
            END-IF
       *
            MOVE    SPA-GMN-LABEL1      TO  W91-LABEL1
@@ -849,6 +895,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "FILEDIR"           TO  MCP-WIDGET
                WHEN    03
                    MOVE    "CHKSYREC"          TO  MCP-WIDGET
+               WHEN    04
+                   MOVE    "CHKJIHI"           TO  MCP-WIDGET
+               WHEN    05
+                   MOVE    "CHKPTNUM"          TO  MCP-WIDGET
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -872,6 +922,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    90              TO  SPA-GMN-CUR
                    END-IF
                WHEN    "CHKSYREC"
+                   MOVE    4               TO  SPA-GMN-CUR
+               WHEN    "CHKJIHI"
+                   MOVE    5               TO  SPA-GMN-CUR
+               WHEN    "CHKPTNUM"
                    MOVE    90              TO  SPA-GMN-CUR
            END-EVALUATE
       *
@@ -995,6 +1049,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET

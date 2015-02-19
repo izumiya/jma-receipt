@@ -20,3 +20,9 @@
               04  W91-CHKSYREC.
                 06  W91-CHKSYREC-VALUE   PIC X.
                 06  W91-CHKSYREC-STATE   PIC S9(9)   BINARY.
+              04  W91-CHKJIHI.
+                06  W91-CHKJIHI-VALUE    PIC X.
+                06  W91-CHKJIHI-STATE    PIC S9(9)   BINARY.
+              04  W91-CHKPTNUM.
+                06  W91-CHKPTNUM-VALUE   PIC X.
+                06  W91-CHKPTNUM-STATE   PIC S9(9)   BINARY.
