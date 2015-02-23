@@ -3202,6 +3202,12 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "5031"
+                   STRING  "履歴は１０件までの登録となります。"
+                           "これ以上登録できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "K050"
                    STRING  "警告！！"
                            "有効終了日が設定されています。"

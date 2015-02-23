@@ -5921,6 +5921,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 41009-KIKANCHK-SEC
                END-IF
            END-IF
+      *H27.2
+      *    ´ü´Ö¤Ï£±£°·ï¤È¤¹¤ë
+           IF     (SPA-K05-SYORI       =   "2"  )
+             AND  (SPA-K05-SELNUM      =   ZERO )
+             AND  (SPA-K05-RRK-MAX     =   10   )
+               MOVE    "5031"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN5-CUR
+           END-IF
       *
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-KIDCD           =   SPACE )
