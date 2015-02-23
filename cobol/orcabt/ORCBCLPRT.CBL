@@ -139,7 +139,7 @@
       *
            PERFORM 900-PRTKANRI-KEY14-SEL-SEC
       *
-           PERFORM UNTIL ( FLG-PRTKANRI    NOT =   ZERO )
+      *    PERFORM UNTIL ( FLG-PRTKANRI    NOT =   ZERO )
       *
              MOVE    SPACE               TO  SHELLTBL
              MOVE    "print_prv.sh"      TO  SHELLTBL-NAME
@@ -147,7 +147,8 @@
              MOVE    PRTKANRI-RENNUM     TO  SHELLTBL-ARG1
              MOVE    PRTKANRI-TBL-KEY    TO  SHELLTBL-ARG2
              MOVE    PRTKANRI-TBL-GROUP  TO  SHELLTBL-ARG3
-             MOVE    PRTKANRI-SHORI-RENNUM
+      *      MOVE    PRTKANRI-SHORI-RENNUM
+             MOVE    ZERO
                                          TO  SHELLTBL-ARG4
              MOVE    PRTKANRI-SRYYM      TO  SHELLTBL-ARG5
              MOVE    PRTKANRI-SKYYMD     TO  SHELLTBL-ARG6
@@ -179,9 +180,9 @@
                                                MCPDATA-REC
                                                SPA-AREA
       *
-             PERFORM 900-PRTKANRI-KEY14-FET-SEC
+      *      PERFORM 900-PRTKANRI-KEY14-FET-SEC
       *
-           END-PERFORM
+      *    END-PERFORM
       *
            MOVE    "tbl_prtkanri"          TO  MCP-TABLE
            MOVE    "key14"                 TO  MCP-PATHNAME
