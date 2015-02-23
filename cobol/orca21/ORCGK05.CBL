@@ -5978,6 +5978,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-K05-SELNUM      >   ZERO
                    IF      FLG-JYUFKU      =   ZERO
                        MOVE    "0004"          TO  SPA-KIDCD
+      *H27.2
+      *                ´ü´Ö¤Ï£±£°·ï¤È¤¹¤ë
+                       IF      (SPA-K05-RRK-MAX     =   10   )
+                           MOVE    "5031"              TO  SPA-ERRCD
+                           MOVE    1                   TO  SPA-GMN5-CUR
+                           MOVE    SPACE               TO  SPA-KIDCD
+                       END-IF
                    END-IF
                END-IF
            END-IF
