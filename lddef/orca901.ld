@@ -26,6 +26,7 @@ data	{
 
 db	{
 	tbl_jobkanri;
+	tbl_sysbase;
 	tbl_sysuser;
 	tbl_dbkanri;
 	tbl_mstkanri;
