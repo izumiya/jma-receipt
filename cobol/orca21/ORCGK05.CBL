@@ -205,6 +205,8 @@
       *
            03  FLG-SAIHEN          PIC 9(01).
            03  FLG-ZEROOK          PIC 9(01).
+      *    ＤＢエラー
+           03  FLG-DBERR           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -630,6 +632,7 @@
       *
       *    画面ＳＰＡ書込み
            IF      FLG-END2             =   ZERO
+            AND    FLG-DBERR            =   ZERO
                PERFORM 1003-K05SPA-OUT-SEC
            END-IF
       *
@@ -804,6 +807,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        DISPLAY "K05 PARA INSERT ERR:"  MCP-RC
                            ",KEY2:" PARA-KEY
                            ",EDANUM:" PARA-EDANUM
+                       MOVE    "5005"          TO  SPA-ERRCD
+                       MOVE    1               TO  FLG-DBERR
                    END-IF
                END-IF
            END-PERFORM
@@ -1084,6 +1089,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     IF      SPA-KID1-FLG        =   "OK"
                         MOVE    "5"             TO  SPA-K05-SYORI
                         PERFORM 41002-KOUSIN-SYORI-SEC
+                    END-IF
+                    IF      SPA-ERRCD       NOT =   SPACE
+                        PERFORM 510-ERRSET-SEC
                     END-IF
            END-EVALUATE
       *
@@ -1766,7 +1774,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     PERFORM 210-GMN-INPUT-SEC
                     MOVE    ZERO                TO  FLG-KOUSIN
       *             入力チェック処理
-                   PERFORM 220-INPUT-CHK-SEC
+                    PERFORM 220-INPUT-CHK-SEC
            END-EVALUATE
       *
            .
@@ -5997,6 +6005,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        41002-KOUSIN-SYORI-SEC          SECTION.
       *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K05SPA-OUT-SEC
+      *
            MOVE    SPACE               TO  SPA-UPDFLG
       *
       *    更新日取得
@@ -6252,7 +6263,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    ZERO                TO  WRK-DSPSEQ
                        PERFORM 410022-INPUTCD-INS-SEC
       *                入力コード追加処理
-                       PERFORM 410023-INPUTCD-TBLINS-SEC
+                       IF      SPA-ERRCD           =   SPACE
+                           PERFORM 410023-INPUTCD-TBLINS-SEC
+                       END-IF
                    END-IF
       *            削除
                WHEN    "3"
@@ -6274,7 +6287,9 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    "5007"          TO  SPA-ERRCD
                        END-IF
       *                入力コード削除処理
-                       PERFORM 410025-INPUTCD-TBLDEL-SEC
+                       IF      SPA-ERRCD           =   SPACE
+                           PERFORM 410025-INPUTCD-TBLDEL-SEC
+                       END-IF
                      END-IF
                    END-IF
            END-EVALUATE
@@ -6321,6 +6336,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "K05 INPUTCD INS ERR:"  MCP-RC
                MOVE    "5005"          TO  SPA-ERRCD
+               MOVE    1               TO  FLG-DBERR
            END-IF
            .
        410022-INPUTCD-INS-EXT.
@@ -6334,6 +6350,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   5   )  OR
                               (SPA-K051-INPUTCD (IDX)  =   SPACE )
+                          OR  (SPA-ERRCD   NOT =   SPACE )
                MOVE    SPA-K051-INPUTCD (IDX)  TO  WRK-ICD-INPUTCD
                MOVE    SPA-K051-CDSYU   (IDX)  TO  WRK-CDSYU
                MOVE    IDX                     TO  WRK-DSPSEQ
@@ -6436,6 +6453,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      MCP-RC          NOT =   ZERO
                    DISPLAY "K05 INPUTSET   INS ERR:"  MCP-RC
                    MOVE    "5005"          TO  SPA-ERRCD
+                   MOVE    1               TO  FLG-DBERR
                END-IF
              END-IF
            END-PERFORM
