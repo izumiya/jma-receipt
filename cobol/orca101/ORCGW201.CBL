@@ -247,7 +247,6 @@
            END-IF
       *
            EVALUATE    SPA-MOTOPG
-           EVALUATE    SPA-MOTOPG
            WHEN    "W25"
                    PERFORM 320-W25SPASET-SEC
                WHEN    "WID1"
