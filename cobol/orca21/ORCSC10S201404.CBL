@@ -202,6 +202,11 @@
       *H25.4
            03  FLG-SYOKAINASI      PIC 9(01).
            03  FLG-SYONIKA-NAI     PIC 9(01).
+      *H27.3
+      *    外来管理加算削除あり
+           03  FLG-GAIDEL          PIC 9(01).
+           03  FLG-ARI1            PIC 9(01).
+           03  FLG-ARIRS           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -4441,13 +4446,18 @@
       *****************************************************************
        20092-RSIGAIRA-SEC         SECTION.
       *
-           MOVE    ZERO                TO  WRK-KAISU
-           MOVE    "G"                 TO  WRK-KBN
+      *    MOVE    ZERO                TO  WRK-KAISU
+      *    MOVE    "G"                 TO  WRK-KBN
       *
       *    テーブル検索
       *****PERFORM 20091-RSI-SINSATU-SEC
+      *
       *    労災外来管理加算コード
            MOVE    TBLRG-SRYCD         TO  WRK-SRYCD
+      *H27.2 から　外来管理加算コード変更
+           IF      SPA-SRYYMD          >=  "20150201"
+               MOVE    TBLG-SRYCD          TO  WRK-SRYCD
+           END-IF
            PERFORM 3301-SYOSIN-HEN-SEC
       *    自動算定あり
            IF      FLG-ADD             =   1
@@ -6334,6 +6344,8 @@
            MOVE    ZERO                TO  FLG-ARI2
            MOVE    ZERO                TO  FLG-FUKU
            MOVE    IDX2                TO  IDX-INT-MAX
+      *
+           MOVE    ZERO                TO  FLG-ARIRS
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
                              ((HZN-COM-INPUTCD (IDX)   =   SPACE ) AND
@@ -6517,8 +6529,11 @@
       *    外来管理加算
                IF      WRK-SRYCD           =   TBLG-SRYCD
                    MOVE    1                   TO  FLG-ARI
-      *        外来管理加算を自動発生しない時、削除しない
-                   IF      SPA-GAIKANRIKBN-CHK     =   3
+      *            外来管理加算を自動発生しない時、削除しない
+                   IF     (SPA-GAIKANRIKBN-CHK     =   3    )
+                    AND   (FLG-GAIDEL              =   ZERO )
+      *                労災コードがあれば削除
+                    AND   (FLG-ARIRS               =   ZERO )
                        MOVE    ZERO                TO  FLG-ARI
                    END-IF
                END-IF
@@ -6533,6 +6548,7 @@
                    WHEN    WRK-SRYCD       =   TBLR-SRYCD (TBL-RSI)
                        MOVE    1                   TO  FLG-ARI
                        MOVE    1                   TO  FLG-ARI3
+                       MOVE    1                   TO  FLG-ARIRS
                END-SEARCH
       *        労災外来管理加算
                IF      WRK-SRYCD           =   TBLRG-SRYCD
@@ -6628,6 +6644,7 @@
            END-IF
       *
       *    その他同じコードがある時
+           MOVE    ZERO                TO  FLG-ARI1
            PERFORM VARYING     IDXS    FROM    1   BY  1
                    UNTIL      (IDXS    >   IDX-INT-MAX )  OR
                               (FLG-ARI =   1           )
@@ -6636,7 +6653,23 @@
                                                             (IDXS))
                    MOVE    1                   TO  FLG-ARI
                END-IF
+      *H27.3   外来管理加算を残す時、診察料を自動算定していること
+               IF      WRK-SRYCD           =   TBLG-SRYCD
+                   IF      (SPA-COM-INPUTCD (IDXS)(1:1)
+                                               =   "1" )
+                       MOVE    1               TO  FLG-ARI1
+                   END-IF
+                END-IF
            END-PERFORM
+      *
+      *H27.3
+      *    外来管理加算の削除
+           IF     (FLG-ARI             =   ZERO       )
+             AND  (WRK-SRYCD           =   TBLG-SRYCD )
+               IF      FLG-ARI1            =   ZERO
+                   MOVE    1                   TO  FLG-ARI
+               END-IF
+           END-IF
       *
            .
        10101-SINSATU-CHK-EXT.
@@ -6687,6 +6720,11 @@
                GO      TO      1012-TAHOKEN-HEN-EXT
            END-IF
            MOVE    SPA-GMN-IDX         TO  IDX2
+      *H27.3
+      *    外来管理加算削除
+           MOVE    1                   TO  FLG-GAIDEL
+           MOVE    ZERO                TO  FLG-ARIRS
+      *
       *    診療行為内容の編集
            MOVE    ZERO                TO  FLG-CHK
            PERFORM VARYING     IDX     FROM    1   BY  1
