@@ -11539,7 +11539,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    JYURRK-DENPNUM      TO  SYU-DENPNUM
            MOVE    SPA-RRK-HKNCOMBI(IDX)
                                        TO  SYU-HKNCOMBINUM
-           MOVE    SPA-RRK-DRCD  (IDX) TO  SYU-DRCD
+           MOVE    SPA-RRK-DRCD  (IDX) TO  SYU-DRCD-G
       *    伝票番号発行日
            MOVE    SPA-SYSYMD          TO  SYU-DENPPRTYMD
       *    院外処方区分
