@@ -31,7 +31,11 @@
       * 04.05.01     NACL-門脇    09/12/04  食事（特別食）の他保険対応
       * 04.05.02     NACL-門脇    11/11/09  同日再入院食事対応
       *
-      * 04.06.01     NACL-門脇    13/02/18  自賠責救急医療管理加算点数追加
+      * 04.06.01     NACL-門脇    13/02/18  自賠責救急医療管理加算点数
+      *                                     追加
+      *
+      * 04.07.01     NACL-門脇    15/02/02  システム管理２０１０機能追
+      *                                     加対応
       ************************************************************
       *01  LNK-ORCS02-REC.
       *医療機関ＩＤ
@@ -104,6 +108,25 @@
       *
       *高齢者他保険入院フラグ
            03  LNK-S02-KOREI-TANYUIN       PIC  X(01).
+      *
+      *日別点数
+           03  LNK-S02-DAYTEN.
+              05  LNK-S02-DAYTEN-OCC            OCCURS  10.
+                07  LNK-S02-DAYTEN-SRYYM        PIC  X(06).
+                07  LNK-S02-DAYTEN-HKNCOMBINUM  PIC  X(04).
+                07  LNK-S02-DAYTEN-OCC2.
+                  09  LNK-S02-DAYTEN-HKNTEN     PIC  9(07)  OCCURS  31.
+      *
+      *前日までのマル長の一部負担金の残
+           03  LNK-S02-CYOKI.
+              05  LNK-S02-CYOKI-OCC             OCCURS  10.
+                07  LNK-S02-CYOKI-FLG           PIC  9(01).
+                07  LNK-S02-CYOKI-ZAN1          PIC  9(07).
+                07  LNK-S02-CYOKI-ZAN2          PIC  9(07).
+                07  LNK-S02-CYOKI-ZAN3          PIC  9(07).
+      *
+      *使用インデックス
+           03  LNK-S02-IDX                      PIC  9(02).
       *
       *復帰コード
            03  LNK-S02-RC                  PIC  S9(9)   BINARY.

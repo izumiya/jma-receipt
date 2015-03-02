@@ -167,6 +167,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.14    NACL-門脇    15/01/16  入院点滴：診療種別「．３４０」の
       *                                     入力チェック対応
+      *  04.07.15    NACL-門脇    15/02/02  システム管理２０１０機能追加対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -276,6 +277,14 @@
               03 WRK-DOJITU-FLG2           PIC 9(01)  OCCURS  31.
               03 WRK-DOJITUSKJST-FLG       PIC X(01)  OCCURS  31.
               03 WRK-DOJITUSKJED-FLG       PIC X(01)  OCCURS  31.
+      *
+      *    日別点数
+       01  WRK-DAYTEN-TABLE.
+           02  WRK-DAYTEN-TBL    OCCURS  10.
+              03 WRK-DAYTEN-SRYYM          PIC X(06).
+              03 WRK-DAYTEN-HKNCOMBINUM    PIC X(04).
+              03 WRK-DAYTEN-TBL2.
+                05 WRK-DAYTEN-HKNTEN       PIC 9(07)  OCCURS  31.
       *
        01  WRK-NYUINDAY-TAIHI-TABLE.
            02  WRK-NYUINDAY-TAIHI-TBL      OCCURS    2.
@@ -509,6 +518,7 @@
            03  IDX7                        PIC 9(02).
            03  IDX8                        PIC 9(02).
            03  IDX9                        PIC 9(02).
+           03  IDX10                       PIC 9(02).
            03  SYU-IDX                     PIC 9(02).
            03  NYUINACT-IDX                PIC 9(02).
            03  RMSAGAKU-IDX                PIC 9(02).
@@ -778,6 +788,7 @@
                          WRK-NYUSANTEI-TABLE
                          WRK-SYOSIN-TABLE
                          WRK-DOJITU-TABLE
+                         WRK-DAYTEN-TABLE
                          WRK-NYUINDAY-TAIHI-TABLE
                          WRK-TAISYOGAI-HANTEI-TABLE
                          WRK-KAIKEING-TABLE
@@ -827,6 +838,21 @@
                       PERFORM       SINRYO-KAIKEI-SET-SEC
            END-PERFORM.
       *
+      *    日別点数編集
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                      UNTIL  (IDX            >    10)
+                        OR   (LNK-SYU-SRYYMD(IDX) =  SPACE)
+             MOVE  LNK-SYU-SRYYMD(IDX)(1:6)
+                                TO  WRK-DAYTEN-SRYYM(IDX)
+             MOVE  LNK-SYU-HKNCOMBINUM(IDX)
+                                TO  WRK-DAYTEN-HKNCOMBINUM(IDX)
+             PERFORM  VARYING  IDX10  FROM  1  BY  1
+                       UNTIL   IDX10   >   31
+               MOVE   LNK-SDAY-HKNTEN(IDX IDX10)
+                                TO  WRK-DAYTEN-HKNTEN(IDX IDX10)
+             END-PERFORM
+           END-PERFORM.
+      *
       *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX            >    10)
@@ -862,6 +888,9 @@
                                               TO  LNK-S02-KOREI-TANYUIN
       *
                 MOVE     WRK-DOJITU-TBL(IDX)  TO  LNK-S02-DOJITU
+      *
+                MOVE     WRK-DAYTEN-TABLE     TO  LNK-S02-DAYTEN
+                MOVE     IDX                  TO  LNK-S02-IDX
       *
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
@@ -1116,6 +1145,9 @@
                                               TO  LNK-S02-KOREI-TANYUIN
       *
                 MOVE     WRK-DOJITU-TBL(IDX)  TO  LNK-S02-DOJITU
+      *
+                MOVE     WRK-DAYTEN-TABLE     TO  LNK-S02-DAYTEN
+                MOVE     IDX                  TO  LNK-S02-IDX
       *
                 MOVE     LNK-ORCS02-REC       TO  WRK-ORCS02-REC
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
