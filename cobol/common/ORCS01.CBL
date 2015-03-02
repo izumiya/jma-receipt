@@ -436,6 +436,7 @@
       *  04.07.22    NACL-門脇    15/01/21  難病複数対応
       *  04.07.23    NACL-門脇    15/01/26  平成２７年１月改正対応
       *                                     （都道府県独自難病対応）
+      *  04.07.24    NACL-門脇    15/02/02  システム管理２０１０機能追加対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -631,6 +632,7 @@
            03  FLG-PTRSIINF            PIC 9(01).
            03  FLG-KOMURSI             PIC 9(01).
            03  FLG-DAISAN-GENBUTU      PIC 9(01).
+           03  FLG-ARI                 PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-END                  PIC 9(08).
@@ -671,6 +673,7 @@
                05  WK-SYS2010-OCC                OCCURS   4.
                  06  WK-2010-JGNFTNKBN           PIC X(01).
                  06  WK-2010-JYUHENKBN           PIC X(01).
+                 06  WK-2010-JYUHEN-TAIKBN       PIC X(01).
                  06  WK-2010-IRYOKEIKBN-G        PIC X(01).
                  06  WK-2010-IRYOKEIKBN-G-XXX    PIC X(01).
                  06  WK-2010-KINJYOKBN-G         PIC X(01).
@@ -1014,6 +1017,24 @@
            03  WK-CHECK2-TEKYMD.
                05  WK-CHECK2-TEKYM                      PIC 9(06).
                05  WK-CHECK2-TEKDD                      PIC 9(02).
+      *
+           03  WK-HBTNUM-TBL.
+               05  WK-HBTNUM-OCC                        OCCURS   4.
+                 06  WK-HBTNUM                          PIC X(02).
+      *
+           03  WK-CHECK2010-TBL.
+               05  WK-CHECK2010-OCC                     OCCURS 100.
+                 06  WK-CHECK2010-HKNCOMBINUM           PIC X(04).
+                 06  WK-CHECK2010-OCC2                  OCCURS   4.
+                   07  WK-CHECK2010-JYUHENKBN           PIC X(01).
+                   07  WK-CHECK2010-JYUHEN-TAIKBN       PIC X(01).
+                   07  WK-CHECK2010-HBTNUM              PIC X(02).
+                   07  WK-CHECK2010-HBTNUM-NG           PIC X(01).
+      *
+           03  WK-CHECK2010X-TBL.
+               05  WK-CHECK2010X-OCC                    OCCURS   4.
+                 06  WK-CHECK2010X-JYUHENKBN            PIC X(01).
+                 06  WK-CHECK2010X-HBTNUMIDX            PIC 9(01).
       *
       *    公費の患者負担上限回数と上限金額の退避用エリア
        01  HOKEN-MAX-AREA.
@@ -1363,6 +1384,9 @@
            03  IDX12                   PIC  9(02).
            03  IDX13                   PIC  9(03).
            03  IDX14                   PIC  9(03).
+           03  IDX16                   PIC  9(03).
+           03  IDX17                   PIC  9(03).
+           03  IDX18                   PIC  9(03).
            03  Y-IDX                   PIC  9(03)  VALUE  ZERO.
            03  Y-IDX2                  PIC  9(03)  VALUE  ZERO.
            03  Y-IDX3                  PIC  9(03)  VALUE  ZERO.
@@ -1703,6 +1727,9 @@
       *
            MOVE    ZERO            TO  FLG-SEISINJYO
                                        FLG-TOKUREI-HKNJYA.
+      *
+           INITIALIZE                  WK-HBTNUM-TBL.
+           INITIALIZE                  WK-CHECK2010-TBL.
       *
       *    システム管理１００１の取り込み
            PERFORM    SYS1001-READ-SEC.
@@ -3585,6 +3612,11 @@
                           AND (WK-SYOUKAN-FTNRATE    =  100)
                              MOVE    1    TO   FLG-FTNRATE100
                           END-IF
+      *
+                          IF  (COMB-KOH1HKNNUM(1:1) >=  "1")
+                          AND (COMB-KOH1HKNNUM(1:1) <=  "8")
+                             MOVE  HKN-HBTNUM  TO  WK-HBTNUM(1)
+                          END-IF
                    END-IF
                END-IF
       *
@@ -3629,6 +3661,11 @@
                           AND (COMB-KOH2HKNNUM(1:1) <=  "8")
                           AND (WK-SYOUKAN-FTNRATE    =  100)
                              MOVE    2    TO   FLG-FTNRATE100
+                          END-IF
+      *
+                          IF  (COMB-KOH2HKNNUM(1:1) >=  "1")
+                          AND (COMB-KOH2HKNNUM(1:1) <=  "8")
+                             MOVE  HKN-HBTNUM  TO  WK-HBTNUM(2)
                           END-IF
                    END-IF
                END-IF
@@ -3675,6 +3712,11 @@
                           AND (WK-SYOUKAN-FTNRATE    =  100)
                              MOVE    3    TO   FLG-FTNRATE100
                           END-IF
+      *
+                          IF  (COMB-KOH3HKNNUM(1:1) >=  "1")
+                          AND (COMB-KOH3HKNNUM(1:1) <=  "8")
+                             MOVE  HKN-HBTNUM  TO  WK-HBTNUM(3)
+                          END-IF
                    END-IF
                END-IF
       *
@@ -3719,6 +3761,11 @@
                           AND (COMB-KOH4HKNNUM(1:1) <=  "8")
                           AND (WK-SYOUKAN-FTNRATE    =  100)
                              MOVE    4    TO   FLG-FTNRATE100
+                          END-IF
+      *
+                          IF  (COMB-KOH4HKNNUM(1:1) >=  "1")
+                          AND (COMB-KOH4HKNNUM(1:1) <=  "8")
+                             MOVE  HKN-HBTNUM  TO  WK-HBTNUM(4)
                           END-IF
                    END-IF
                END-IF
@@ -10998,6 +11045,8 @@
       *
            MOVE      SYS-2010-JYUHENKBN
                                     TO  WK-2010-JYUHENKBN(IDX-CYO)
+           MOVE      SYS-2010-JYUHEN-TAIKBN
+                                    TO  WK-2010-JYUHEN-TAIKBN(IDX-CYO)
       *
            EVALUATE  SYS-2010-IRYOKEIKBN-G
              WHEN      SPACE
@@ -16881,6 +16930,7 @@
                       UNTIL   IDX11   >   31
              IF  (KOHI-TBL(IDX11 IDX3)         =  ZERO      )
              AND (SYU-DAY(IDX11) =  "1" OR "2" OR "8" OR "9")
+             AND (SYU-KOH-HKNFTNMONEY(IDX12)   NOT = ZERO   )
              AND (SDAY-SANTEIFLG(IDX11 IDX12)  =   1        )
              AND (IDX11                    NOT =  IDX2      )
                 ADD    1    TO    KOHI-TBL(IDX11 IDX3)
@@ -17413,6 +17463,15 @@
              END-IF
            END-PERFORM
       *
+           MOVE   ZERO     TO   IDX18
+           INITIALIZE           WK-CHECK2010X-TBL
+           IF     LNK-SYU-SRYYMD(1:6) >= "200804"
+                PERFORM    220277-SYU-CHECK2010-SEC
+                IF   IDX18  NOT = ZERO
+                  PERFORM  220278-SYU-CHECKHBT-SEC
+                END-IF
+           END-IF
+      *
            PERFORM   VARYING   KOHFUKA-IDX   FROM   1   BY   1
                       UNTIL    KOHFUKA-IDX    >     4
              IF    SYU-KOH-HKNNUM(KOHFUKA-IDX)(1:1) >= "1" AND <= "8"
@@ -17506,8 +17565,9 @@
       *
            EVALUATE   KOHFUKA-IDX
              WHEN        1
-               IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM )
-               AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID)
+               IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                   (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  1      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -17525,18 +17585,23 @@
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                     MOVE   LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                    WHEN        2
                      MOVE     1      TO    CHECK-IDX
                      MOVE     1      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH1ID
+                      MOVE  LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                      END-IF
                  END-EVALUATE
                 END-IF
                END-IF
-               IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM )
-               AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID)
+               IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                   (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  2      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -17551,47 +17616,62 @@
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                     MOVE   LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                    WHEN        2
                      MOVE     2      TO    CHECK-IDX
                      MOVE     1      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH1ID
+                      MOVE  LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                      END-IF
                  END-EVALUATE
                 END-IF
                END-IF
-               IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM )
-               AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH1ID)
+               IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                   (COMB-KOH3ID     NOT =  WRK-COMB-KOH1ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
+                     MOVE   LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                    WHEN        2
                      MOVE     3      TO    CHECK-IDX
                      MOVE     1      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH3ID    TO  WRK-COMB-KOH1ID
+                      MOVE  LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM )
-               AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH1ID)
+               IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM ) AND
+                   (COMB-KOH4ID     NOT =  WRK-COMB-KOH1ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
+                     MOVE   LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                    WHEN        2
                      MOVE     4      TO    CHECK-IDX
                      MOVE     1      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH4ID    TO  WRK-COMB-KOH1ID
+                      MOVE  LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH1HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
              WHEN        2
-               IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM )
-               AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID)
+               IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                   (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  1      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -17606,18 +17686,23 @@
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                     MOVE   LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                    WHEN        2
                      MOVE     1      TO    CHECK-IDX
                      MOVE     2      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH2ID
+                      MOVE  LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                      END-IF
                  END-EVALUATE
                 END-IF
                END-IF
-               IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM )
-               AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID)
+               IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                   (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  2      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -17632,155 +17717,209 @@
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                     MOVE   LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                    WHEN        2
                      MOVE     2      TO    CHECK-IDX
                      MOVE     2      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH2ID
+                      MOVE  LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                      END-IF
                  END-EVALUATE
                 END-IF
                END-IF
-               IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM )
-               AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH2ID)
+               IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                   (COMB-KOH3ID     NOT =  WRK-COMB-KOH2ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
+                     MOVE   LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                    WHEN        2
                      MOVE     3      TO    CHECK-IDX
                      MOVE     2      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH3ID    TO  WRK-COMB-KOH2ID
+                      MOVE  LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM )
-               AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH2ID)
+               IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM ) AND
+                   (COMB-KOH4ID     NOT =  WRK-COMB-KOH2ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
+                     MOVE   LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                    WHEN        2
                      MOVE     4      TO    CHECK-IDX
                      MOVE     2      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH4ID    TO  WRK-COMB-KOH2ID
+                      MOVE  LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH2HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
              WHEN        3
-               IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM )
-               AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH3ID)
+               IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM ) AND
+                   (COMB-KOH1ID     NOT =  WRK-COMB-KOH3ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  1      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
+                     MOVE   LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                    WHEN        2
                      MOVE     1      TO    CHECK-IDX
                      MOVE     3      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH3ID
+                      MOVE  LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM )
-               AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH3ID)
+               IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM ) AND
+                   (COMB-KOH2ID     NOT =  WRK-COMB-KOH3ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  2      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
+                     MOVE   LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                    WHEN        2
                      MOVE     2      TO    CHECK-IDX
                      MOVE     3      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH3ID
+                      MOVE  LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM )
-               AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH3ID)
+               IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM ) AND
+                   (COMB-KOH3ID     NOT =  WRK-COMB-KOH3ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
+                     MOVE   LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                    WHEN        2
                      MOVE     3      TO    CHECK-IDX
                      MOVE     3      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH3ID    TO  WRK-COMB-KOH3ID
+                      MOVE  LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM )
-               AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH3ID)
+               IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM ) AND
+                   (COMB-KOH4ID     NOT =  WRK-COMB-KOH3ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
+                     MOVE   LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                    WHEN        2
                      MOVE     4      TO    CHECK-IDX
                      MOVE     3      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH4ID    TO  WRK-COMB-KOH3ID
+                      MOVE  LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH3HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
              WHEN        4
-               IF  (LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM )
-               AND (COMB-KOH1ID     NOT =  WRK-COMB-KOH4ID)
+               IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM ) AND
+                   (COMB-KOH1ID     NOT =  WRK-COMB-KOH4ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  1      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
+                     MOVE   LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                    WHEN        2
                      MOVE     1      TO    CHECK-IDX
                      MOVE     4      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH1ID    TO  WRK-COMB-KOH4ID
+                      MOVE  LNK-SYU-KOH1HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM )
-               AND (COMB-KOH2ID     NOT =  WRK-COMB-KOH4ID)
+               IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM ) AND
+                   (COMB-KOH2ID     NOT =  WRK-COMB-KOH4ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  2      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
+                     MOVE   LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                    WHEN        2
                      MOVE     2      TO    CHECK-IDX
                      MOVE     4      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH2ID    TO  WRK-COMB-KOH4ID
+                      MOVE  LNK-SYU-KOH2HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM )
-               AND (COMB-KOH3ID     NOT =  WRK-COMB-KOH4ID)
+               IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM ) AND
+                   (COMB-KOH3ID     NOT =  WRK-COMB-KOH4ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
+                     MOVE   LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                    WHEN        2
                      MOVE     3      TO    CHECK-IDX
                      MOVE     4      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH3ID    TO  WRK-COMB-KOH4ID
+                      MOVE  LNK-SYU-KOH3HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
-               IF  (LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM )
-               AND (COMB-KOH4ID     NOT =  WRK-COMB-KOH4ID)
+               IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM ) AND
+                   (COMB-KOH4ID     NOT =  WRK-COMB-KOH4ID))
+               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
+                     MOVE   LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                    WHEN        2
                      MOVE     4      TO    CHECK-IDX
                      MOVE     4      TO    CHECK-IDX2
                      PERFORM  220271-KOHINF-CHECK-SEC
                      IF   FLG-CHECK-OK  =  1
                       MOVE  COMB-KOH4ID    TO  WRK-COMB-KOH4ID
+                      MOVE  LNK-SYU-KOH4HKNNUM
+                                           TO  SYU-KOH4HKNNUM
                      END-IF
                  END-EVALUATE
                END-IF
@@ -18442,13 +18581,13 @@
       ******************************************************************
        220275-JYUHENKBN-HENSYU-SEC          SECTION.
       *
-           EVALUATE  WK-2010-JYUHENKBN(KOHFUKA-IDX)
+           EVALUATE  WK-CHECK2010X-JYUHENKBN(KOHFUKA-IDX)
              WHEN      SPACE
              WHEN      "0"
                  PERFORM   220276-JYUHENKBN-HENSYU2-SEC
              WHEN      "1"
              WHEN      "2"
-                 MOVE  WK-2010-JYUHENKBN(KOHFUKA-IDX)
+                 MOVE  WK-CHECK2010X-JYUHENKBN(KOHFUKA-IDX)
                                            TO  FLG-KOHFUKA-HENSYU
                  PERFORM   220272-KOHFUKA-HENSYU1-SEC
              WHEN      "3"
@@ -18499,6 +18638,253 @@
            .
       *
        220276-JYUHENKBN-HENSYU2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データのシステム管理２０１０設定チェック
+      ******************************************************************
+       220277-SYU-CHECK2010-SEC          SECTION.
+      *
+           MOVE     ZERO     TO    FLG-ARI
+           PERFORM  VARYING  IDX16  FROM  1  BY  1
+                     UNTIL  (IDX16                            >  100 )
+                      OR    (WK-CHECK2010-HKNCOMBINUM(IDX16)  = SPACE)
+                      OR    (FLG-ARI                          =  1   )
+             IF  SYU-HKNCOMBINUM = WK-CHECK2010-HKNCOMBINUM(IDX16)
+               MOVE    1     TO    FLG-ARI
+               MOVE   IDX16  TO    IDX18
+               PERFORM  VARYING  IDX17  FROM  1  BY  1
+                         UNTIL  (IDX17                     >  4   )
+                          OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
+                 IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
+                   MOVE  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+                             TO    WK-CHECK2010X-JYUHENKBN(IDX17)
+                 END-IF
+               END-PERFORM
+             END-IF
+           END-PERFORM
+           IF    FLG-ARI  =   ZERO
+           AND   IDX16   <=   100
+             MOVE     IDX16  TO    IDX18
+             MOVE  SYU-HKNCOMBINUM  TO  WK-CHECK2010-HKNCOMBINUM(IDX16)
+             PERFORM  VARYING  IDX17  FROM  1  BY  1
+                       UNTIL  (IDX17                     >  4   )
+                        OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
+               IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
+                 PERFORM   2202771-SYU-CHECK2010-XXX-SEC
+               END-IF
+             END-PERFORM
+      *
+             PERFORM  VARYING  IDX17  FROM  1  BY  1
+                       UNTIL  (IDX17                     >  4   )
+                        OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
+               IF   WK-CHECK2010-HBTNUM(IDX16 IDX17)  NOT =  SPACE
+                 EVALUATE  IDX17
+                   WHEN       1
+                     IF  WK-CHECK2010-HBTNUM(IDX16 1) =
+                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 3) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 4)
+                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 1)
+                     END-IF
+                   WHEN       2
+                     IF  WK-CHECK2010-HBTNUM(IDX16 2) =
+                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 3) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 4)
+                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 2)
+                     END-IF
+                   WHEN       3
+                     IF  WK-CHECK2010-HBTNUM(IDX16 3) =
+                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 4)
+                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 3)
+                     END-IF
+                   WHEN       4
+                     IF  WK-CHECK2010-HBTNUM(IDX16 4) =
+                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
+                                       WK-CHECK2010-HBTNUM(IDX16 3)
+                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 4)
+                     END-IF
+                 END-EVALUATE
+               END-IF
+             END-PERFORM
+      *
+             PERFORM  VARYING  IDX17  FROM  1  BY  1
+                       UNTIL  (IDX17                     >  4   )
+                        OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
+               IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
+                 MOVE  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+                             TO    WK-CHECK2010X-JYUHENKBN(IDX17)
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+           .
+      *
+       220277-SYU-CHECK2010-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データのシステム管理２０１０設定チェック
+      ******************************************************************
+       2202771-SYU-CHECK2010-XXX-SEC          SECTION.
+      *
+           INITIALIZE                   SYS-2010-REC
+           MOVE    "2010"           TO  SYS-2010-KANRICD
+           MOVE    WRK-COMB-KOHHKNNUM(IDX17)
+                                    TO  SYS-2010-KBNCD
+           MOVE    SYU-HOSPNUM      TO  SYS-2010-HOSPNUM
+           MOVE    SYU-SRYYMD       TO  SYS-2010-STYUKYMD
+           MOVE    SYU-SRYYMD       TO  SYS-2010-EDYUKYMD
+           MOVE    SYS-2010-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"       TO  MCP-FUNC
+           MOVE    "tbl_syskanri"   TO  MCP-TABLE
+           MOVE    "key10"          TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"  USING   MCPAREA
+                                        MCPDATA-REC
+                                        SPA-AREA
+           IF      MCP-RC   =   ZERO
+             MOVE  "tbl_syskanri"   TO  MCP-TABLE
+             MOVE  "key10"          TO  MCP-PATHNAME
+             PERFORM      SYSKANRI-READ-SEC
+             MOVE  SYS-2010-JYUHENKBN
+                            TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+             MOVE  SYS-2010-JYUHEN-TAIKBN
+                            TO  WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17)
+             IF    SYS-2010-JYUHEN-TAIKBN  =  "1"
+               INITIALIZE                     HKNNUM-REC
+               MOVE   SYU-HOSPNUM         TO  HKN-HOSPNUM
+               MOVE   WRK-COMB-KOHHKNNUM(IDX17)
+                                          TO  HKN-HKNNUM
+               MOVE   "00"                TO  HKN-PAYKBN
+               MOVE   SYU-SRYYMD(1:6)     TO  HKN-TEKSTYMD(1:6)
+                                              HKN-TEKEDYMD(1:6)
+               MOVE   "01"                TO  HKN-TEKSTYMD(7:2)
+                                              HKN-TEKEDYMD(7:2)
+               MOVE   HKNNUM-REC          TO  MCPDATA-REC
+               MOVE   "DBSELECT"          TO  MCP-FUNC
+               MOVE   "tbl_hknnum"        TO  MCP-TABLE
+               MOVE   "key"               TO  MCP-PATHNAME
+               CALL   "ORCDBMAIN"         USING   MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+               IF      MCP-RC       =   ZERO
+                 MOVE "tbl_hknnum"        TO  MCP-TABLE
+                 MOVE "key"               TO  MCP-PATHNAME
+                 PERFORM  HKNNUM-READ-SEC
+                 IF    FLG-HKNNUM   =   ZERO
+                   MOVE   HKN-HBTNUM
+                            TO  WK-CHECK2010-HBTNUM(IDX16 IDX17)
+                 END-IF
+               END-IF
+               MOVE   "tbl_hknnum"        TO  MCP-TABLE
+               MOVE   "key"               TO  MCP-PATHNAME
+               PERFORM    DB-CLOSE-SEC
+             END-IF
+           END-IF
+           MOVE    "tbl_syskanri"   TO  MCP-TABLE
+           MOVE    "key10"          TO  MCP-PATHNAME
+           PERFORM        DB-CLOSE-SEC
+      *
+           .
+      *
+       2202771-SYU-CHECK2010-XXX-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データの法別番号チェック
+      ******************************************************************
+       220278-SYU-CHECKHBT-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX17   FROM   1   BY   1
+                      UNTIL    IDX17    >     4
+             IF  (WK-CHECK2010-HBTNUM(IDX18 IDX17) NOT = SPACE)
+             AND (WK-CHECK2010-HBTNUM-NG(IDX18 IDX17)  = SPACE)
+               IF  WRK-COMB-KOHHKNNUM(IDX17) =  COMB-KOHHKNNUM(1)
+                                            OR  COMB-KOHHKNNUM(2)
+                                            OR  COMB-KOHHKNNUM(3)
+                                            OR  COMB-KOHHKNNUM(4)
+                 CONTINUE
+               ELSE
+                 PERFORM  VARYING  IDX16  FROM  1  BY  1
+                           UNTIL  (IDX16                 >  4   )
+                            OR    (COMB-KOHHKNNUM(IDX16) = SPACE)
+                   IF  (WK-2010-JYUHEN-TAIKBN(IDX16)  =  "1"  )
+                   AND (WK-HBTNUM(IDX16) =
+                           WK-CHECK2010-HBTNUM(IDX18 IDX17)   )
+                   AND (WK-2010-JYUHENKBN(IDX16) =
+                           WK-CHECK2010-JYUHENKBN(IDX18 IDX17))
+                      PERFORM   2202781-SYU-CHECKHBT-XXX-SEC
+                      MOVE   4       TO   IDX16
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-IF
+           END-PERFORM
+      *
+           .
+      *
+       220278-SYU-CHECKHBT-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データの法別番号チェック
+      ******************************************************************
+       2202781-SYU-CHECKHBT-XXX-SEC          SECTION.
+      *
+           EVALUATE  IDX16
+             WHEN      1
+               IF ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
+                   (WK-HBTNUM(2) = WK-HBTNUM(1)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
+                   (WK-HBTNUM(3) = WK-HBTNUM(1)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
+                   (WK-HBTNUM(4) = WK-HBTNUM(1)     ))
+                 CONTINUE
+               ELSE
+                 MOVE    1    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+               END-IF
+             WHEN      2
+               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
+                   (WK-HBTNUM(1) = WK-HBTNUM(2)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
+                   (WK-HBTNUM(3) = WK-HBTNUM(2)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
+                   (WK-HBTNUM(4) = WK-HBTNUM(2)     ))
+                 CONTINUE
+               ELSE
+                 MOVE    2    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+               END-IF
+             WHEN      3
+               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
+                   (WK-HBTNUM(1) = WK-HBTNUM(3)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
+                   (WK-HBTNUM(2) = WK-HBTNUM(3)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
+                   (WK-HBTNUM(4) = WK-HBTNUM(3)     ))
+                 CONTINUE
+               ELSE
+                 MOVE    3    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+               END-IF
+             WHEN      4
+               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
+                   (WK-HBTNUM(1) = WK-HBTNUM(4)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
+                   (WK-HBTNUM(2) = WK-HBTNUM(4)     ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
+                   (WK-HBTNUM(3) = WK-HBTNUM(4)     ))
+                 CONTINUE
+               ELSE
+                 MOVE    4    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       2202781-SYU-CHECKHBT-XXX-EXT.
            EXIT.
       *
       ******************************************************************
