@@ -15132,6 +15132,9 @@
       *
       *    入院会計作成前に会計データの食事区分を退避
       *
+           MOVE      SPACE                 TO  WRK-TENROOM-SKJ-TABLE
+           INITIALIZE                          WRK-TENROOM-SKJ-TABLE
+      *
            IF  SPA-NAI-I01-IDOYMD(1:6)  >= "200604"
       *
       *      前月末日の食事会計取得
