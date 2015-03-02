@@ -2157,6 +2157,10 @@
            END-IF
       *
       *    入院会計作成前に会計データの食事区分を退避
+      *
+           MOVE      SPACE                 TO  WRK-TENROOM-SKJ-TABLE
+           INITIALIZE                          WRK-TENROOM-SKJ-TABLE
+      *
            IF  LNK-PTNYUINRRK-TENNYUYMD(1:6)  >= "200604"
       *      （異動月分）
              PERFORM   VARYING   IDX-SKJ-TAIHI  FROM  1 BY  1
