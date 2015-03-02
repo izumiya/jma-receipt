@@ -857,6 +857,37 @@
                     06  W65-TANKITAIKBN-COUNT   PIC S9(9) BINARY.
                     06  W65-TANKITAIKBN-ITEM    PIC X(40) OCCURS 10.
                     06  W65-TANKITAIKBN-ITEM-STATE PIC S9(9) BINARY.
+                04  W65-FXD1.
+                  05  W65-CMB-KAICNTKBNN.
+                    06  W65-KAICNTKBNN           PIC X(80).
+                    06  W65-KAICNTKBNN-COUNT     PIC S9(9) BINARY.
+                    06  W65-KAICNTKBNN-ITEM      PIC X(80) OCCURS 10.
+                  05  W65-CMB-KAICNTTAIKBNN.
+                    06  W65-KAICNTTAIKBNN        PIC X(40).
+                    06  W65-KAICNTTAIKBNN-STATE  PIC S9(9) BINARY.
+                    06  W65-KAICNTTAIKBNN-COUNT  PIC S9(9) BINARY.
+                    06  W65-KAICNTTAIKBNN-ITEM   PIC X(40) OCCURS 10.
+                    06  W65-KAICNTTAIKBNN-ITEM-STATE  PIC S9(9) BINARY.
+                  05  W65-CMB-CYOKEIKBNN.
+                    06  W65-CYOKEIKBNN           PIC X(80).
+                    06  W65-CYOKEIKBNN-COUNT     PIC S9(9) BINARY.
+                    06  W65-CYOKEIKBNN-ITEM      PIC X(80) OCCURS 10.
+                  05  W65-CMB-CYOKEITAIKBNN.
+                    06  W65-CYOKEITAIKBNN        PIC X(40).
+                    06  W65-CYOKEITAIKBNN-STATE  PIC S9(9) BINARY.
+                    06  W65-CYOKEITAIKBNN-COUNT  PIC S9(9) BINARY.
+                    06  W65-CYOKEITAIKBNN-ITEM   PIC X(40) OCCURS 10.
+                    06  W65-CYOKEITAIKBNN-ITEM-STATE  PIC S9(9) BINARY.
+                  05  W65-CMB-ZENDAYKBNN.
+                    06  W65-ZENDAYKBNN          PIC X(80).
+                    06  W65-ZENDAYKBNN-COUNT    PIC S9(9) BINARY.
+                    06  W65-ZENDAYKBNN-ITEM     PIC X(80) OCCURS 10.
+                  05  W65-CMB-ZENDAYTAIKBNN.
+                    06  W65-ZENDAYTAIKBNN       PIC X(40).
+                    06  W65-ZENDAYTAIKBNN-STATE PIC S9(9) BINARY.
+                    06  W65-ZENDAYTAIKBNN-COUNT PIC S9(9) BINARY.
+                    06  W65-ZENDAYTAIKBNN-ITEM  PIC X(40) OCCURS 10.
+                    06  W65-ZENDAYTAIKBNN-ITEM-STATE PIC S9(9) BINARY.
               03  W65-YUKOSTYMD                  PIC X(10).
               03  W65-YUKOSTYMD-STATE            PIC S9(9) BINARY.
               03  W65-YUKOEDYMD                  PIC X(10).

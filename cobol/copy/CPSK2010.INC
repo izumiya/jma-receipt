@@ -272,8 +272,18 @@
            03  SYS-2010-TANKIKBN            PIC  X(01).
            03  SYS-2010-TANKI-TAIKBN        PIC  X(01).
       *
+      *負担金未発生日の回数カウント（入院）
+           03  SYS-2010-KAICNTKBN-N         PIC  X(01).
+           03  SYS-2010-KAICNT-TAIKBN-N     PIC  X(01).
+      *長期併用時の特別計算（入院）
+           03  SYS-2010-CYOKEIKBN-N         PIC  X(01).
+           03  SYS-2010-CYOKEI-TAIKBN-N     PIC  X(01).
+      *全国公費併用時の日の負担金計算（入院）
+           03  SYS-2010-ZENDAYKBN-N         PIC  X(01).
+           03  SYS-2010-ZENDAY-TAIKBN-N     PIC  X(01).
+      *
       *予備
-           03  SYS-2010-YOBI                PIC  X(344).
+           03  SYS-2010-YOBI                PIC  X(338).
       *端末ＩＤ
            03  SYS-2010-TERMID              PIC  X(16).
       *オペレータＩＤ
