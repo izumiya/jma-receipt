@@ -100,6 +100,7 @@
        01  REG-AREA.
            03  REG-SAVEREQ             PIC X(01).
            03  REG-NYUINYMD            PIC X(08).
+           03  REG-ORDERID             PIC X(04).
            03  REG-SRYYMD              PIC X(08).
            03  REG-GAIHAKUKBN          PIC X(01).
            03  REG-SKJ-AREA.
@@ -247,6 +248,10 @@
       *    ¼ç½èÍý
            IF    ( REG-ERR-MAX         =   ZERO )
                PERFORM 200-MAIN-SEC
+           ELSE
+               IF    ( REG-SAVEREQ     =   "1" )
+                   PERFORM 290-ORDER-INSERT-SEC
+               END-IF
            END-IF
       *
       *    ÊÖµÑÎÎ°èÊÔ½¸
@@ -328,8 +333,10 @@
            EVALUATE    HSACCTMREQ-REQNUM
            WHEN    "2"
                PERFORM 1001-GAIHAKU-SEC
+               MOVE    NORDERID-GPTSTID    TO  REG-ORDERID
            WHEN    "4"
                PERFORM 1001-SHOKUJI-SEC
+               MOVE    NORDERID-FOODID     TO  REG-ORDERID
            WHEN    OTHER
                MOVE    "8003"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
@@ -547,7 +554,7 @@
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    NORDERID-GPTSTID    TO  SODR-ORDERID
+           MOVE    REG-ORDERID         TO  SODR-ORDERID
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -557,6 +564,7 @@
       *
            CALL   "ORCSODR03"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -580,7 +588,7 @@
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    NORDERID-FOODID     TO  SODR-ORDERID
+           MOVE    REG-ORDERID         TO  SODR-ORDERID
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -599,6 +607,7 @@
       *
            CALL   "ORCSODR04"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -683,7 +692,7 @@
            ELSE
                MOVE    "2"             TO  SODR-PROCKBN
            END-IF
-           MOVE    1                   TO  SODR-KEYGENERATE
+           MOVE    2                   TO  SODR-KEYGENERATE
            MOVE    99                  TO  SODR-INF-DIALOG
            MOVE    "1"                 TO  SODR-SRCKBN
       *
@@ -864,6 +873,44 @@
       *
            .
        2001-RESPONSE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥ª¡¼¥À¡¼ÄÉ²Ã½èÍý
+      *****************************************************************
+       290-ORDER-INSERT-SEC          SECTION.
+      *
+           INITIALIZE                      ORDER-REC
+           MOVE    SPA-HOSPNUM         TO  ORDER-HOSPNUM
+           MOVE    SUID-UID            TO  ORDER-KARTE-KEY
+           MOVE    1                   TO  ORDER-ORDERNUM
+           MOVE    "1"                 TO  ORDER-NYUGAIKBN
+           MOVE    SPA-PTNUM           TO  ORDER-PTNUM
+           MOVE    SPA-PTID            TO  ORDER-PTID
+           MOVE    REG-SRYYMD          TO  ORDER-SRYYMD
+           MOVE    SMCNDATE-YMD        TO  ORDER-UKEYMD
+           MOVE    SMCNDATE-HMS        TO  ORDER-UKEHMS
+           MOVE    REG-ORDERID         TO  ORDER-ORDERID
+      *
+           MOVE    REG-ERRCD (1)       TO  ORDER-ERRCD1
+      *    MOVE    REG-ERRCD (2)       TO  ORDER-ERRCD2
+      *
+           MOVE    1                   TO  ORDER-STATUS
+      *
+           MOVE    2                   TO  ORDER-KEYGENERATE
+           MOVE    SPACE               TO  ORDER-TERMID
+           MOVE    "api_"              TO  ORDER-OPID
+           MOVE    SPA-OPID            TO  ORDER-OPID(5:)
+           MOVE    SMCNDATE-YMD        TO  ORDER-CREYMD
+                                           ORDER-UPYMD
+           MOVE    SMCNDATE-YMD        TO  ORDER-UPHMS
+      *
+           MOVE    ORDER-REC           TO  MCPDATA-REC
+           MOVE    "tbl_order"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       290-ORDER-INSERT-EXT.
            EXIT.
       *****************************************************************
       *    ½ªÎ»½èÍý
@@ -1394,6 +1441,21 @@
            .
       *
        910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â£É£Î£Ó£Å£Ò£Ô½èÍý
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
            EXIT.
       *****************************************************************
       *    £Ø£Í£Ì¥ª¡¼¥×¥ó½èÍý

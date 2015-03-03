@@ -116,7 +116,7 @@
                07  NCLAIMID-TEIKIKBNJMA
                                 PIC X(05)   VALUE  "00013".
                07  NCLAIMID-TEIKIKBNMES
-                                PIC X(100)  VALUE  "定期請求の指定".
+                                PIC X(100)  VALUE  "定期請求区分".
              05  NCLAIMID-KAIGOKBN-G.
                07  NCLAIMID-KAIGOKBN
                                 PIC X(20)   VALUE  "XXXXXXX".
@@ -187,6 +187,43 @@
                                 PIC X(05)   VALUE  "00023".
                07  NCLAIMID-ADLALLMES
                        PIC X(100)  VALUE  "ＡＤＬ点数複数日設定".
+             05  NCLAIMID-TOKHIGAITOKBN-G.
+               07  NCLAIMID-TOKHIGAITOKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-TOKHIGAITOKBNJMA
+                                PIC X(05)   VALUE  "00024".
+               07  NCLAIMID-TOKHIGAITOKBNMES
+                                PIC X(100)  VALUE  "算定要件非該当区分".
+             05  NCLAIMID-SENTEIKBN-G.
+               07  NCLAIMID-SENTEIKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SENTEIKBNJMA
+                                PIC X(05)   VALUE  "00025".
+               07  NCLAIMID-SENTEIKBNMES
+                                PIC X(100)  VALUE  "選定入院".
+             05  NCLAIMID-NACCTKBN-G.
+               07  NCLAIMID-NACCTKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-NACCTKBNJMA
+                                PIC X(05)   VALUE  "00026".
+               07  NCLAIMID-NACCTKBNMES
+                                PIC X(100)  VALUE  "入院会計".
+             05  NCLAIMID-DISPKBN-G.
+               07  NCLAIMID-DISPKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-DISPKBNJMA
+                                PIC X(05)   VALUE  "00027".
+               07  NCLAIMID-DISPKBNMES
+                                PIC X(100)
+                                    VALUE  "検索時患者表示".
+             05  NCLAIMID-KSNCD-G.
+               07  NCLAIMID-KSNCD
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-KSNCDJMA
+                                PIC X(05)   VALUE  "00028".
+               07  NCLAIMID-KSNCDMES
+                                PIC X(100)
+                                    VALUE  "入院加算".
              05  NCLAIMID-UNCHKECK-G.
                07  NCLAIMID-UNCHKECK
                                 PIC X(20)   VALUE  "XXXXXXX".
@@ -195,8 +232,8 @@
                07  NCLAIMID-UNCHKECKMES
                                 PIC X(100)  VALUE  "不明".
            03  NCLAIMID-ITEM-R          REDEFINES   NCLAIMID-ITEM-VAL.
-             05  NCLAIMID-ITEM-OCC      OCCURS  24.
+             05  NCLAIMID-ITEM-OCC      OCCURS  29.
                07  NCLAIMID-ITEM        PIC X(20).
                07  NCLAIMID-ITEMJMA     PIC X(05).
                07  NCLAIMID-ITEMMES     PIC X(100).
-           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   24.
+           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   29.

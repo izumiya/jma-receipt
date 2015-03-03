@@ -80,6 +80,7 @@
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
            03  ITEM-TEIKIKBN           PIC X(01).
+           03  ITEM-DISPKBN            PIC X(01).
            03  ITEM-DRCD-G.
                05  ITEM-DRCD-MAX       PIC 9(02).
                05  ITEM-DRCD           PIC X(05)   OCCURS  3.
@@ -154,7 +155,6 @@
            COPY    "CPORCSLOCK.INC".
       *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    連絡　領域
@@ -169,6 +169,7 @@
            02  LNK-ODRITEM-OCC         OCCURS   30.
            COPY    "CPODRITEM.INC"     REPLACING  //ODRITEM-//
                                        BY         //LNK-ODRITEM-//.
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
@@ -177,6 +178,7 @@
                                        USING
                                                SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -227,7 +229,9 @@
       *
            IF    ( SODR-ORDERID        =   NORDERID-HENKOID )
                MOVE    PTNYUINRRK-NYUINKA     TO  SODR-SRYKA
+                                                  ITEM-NYUINKA
                MOVE    PTNYUINRRK-HKNCOMBINUM TO  SODR-HKNCOMBI
+                                                  ITEM-HKNCOMBI
            END-IF
       *
            .
@@ -300,6 +304,11 @@
       *****************************************************************
        2001-INPUT-CHK-SEC              SECTION.
       *
+           MOVE    TRRK-TEIKI-SEIKYUKBN
+                                   TO  ITEM-TEIKIKBN
+           MOVE    TRRK-KENSAKU-DISPKBN
+                                   TO  ITEM-DISPKBN
+      *
            PERFORM VARYING IDX-ODR    FROM    1   BY  1
                    UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
       *
@@ -312,6 +321,8 @@
                    PERFORM 20011-DR-CHK-SEC
                WHEN    NCLAIMID-TEIKIKBNJMA
                    PERFORM 20011-TEIKIKBN-CHK-SEC
+               WHEN    NCLAIMID-DISPKBNJMA
+                   PERFORM 20011-DISPKBN-CHK-SEC
                END-EVALUATE
       *
            END-PERFORM
@@ -327,6 +338,7 @@
            COMPUTE CNT-NYUINKA  =   CNT-NYUINKA  +   1
       *
            IF    ( CNT-NYUINKA  =   1 )
+            AND  ( ITEM-NYUINKA =   SPACE )
       *
                MOVE    "1005"          TO  WRK-SYS-KANRICD
                MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
@@ -343,10 +355,6 @@
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
-           ELSE
-               PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0040"      TO  ERRCD-ERRCD
-               PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
            .
@@ -360,6 +368,7 @@
            COMPUTE CNT-HKNCOMBI  =   CNT-HKNCOMBI  +   1
       *
            IF    ( CNT-HKNCOMBI  =   1 )
+            AND  ( ITEM-HKNCOMBI =   ZERO )
       *
                MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  WRK-COMBI-HKNCOMBI
@@ -380,10 +389,6 @@
                        PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
-           ELSE
-               PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0041"      TO  ERRCD-ERRCD
-               PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
            .
@@ -430,17 +435,38 @@
       *****************************************************************
        20011-TEIKIKBN-CHK-SEC          SECTION.
       *
-           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
-                                       =   SPACE OR "1" OR "2" OR "3" )
-               MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" OR "3" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-TEIKIKBN
-           ELSE
-               MOVE    "0141"          TO  ERRCD-ERRCD
-               PERFORM 2100-ITEM-ERR-SET-SEC
+               ELSE
+                   MOVE    "0141"          TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
            END-IF
       *
            .
        20011-TEIKIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院患者照会表示チェック処理
+      *****************************************************************
+       20011-DISPKBN-CHK-SEC           SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-DISPKBN
+               ELSE
+                   MOVE    "0158"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-DISPKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    項目未処理状態設定処理
@@ -591,6 +617,7 @@
            CALL    "ORCSODRS01"        USING   SODR-AREA
                                                SODRS01-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
            MOVE    SODRS01-RC      TO  FLG-END
       *
@@ -634,14 +661,8 @@
       *
            MOVE    "7"             TO  PTNYUINRRK-JTIKBN
       *
-           IF    ( SODR-ORDERID    =   NORDERID-HENKOID )
-               IF    ( ITEM-TEIKIKBN   =   SPACE )
-                   MOVE    "1"     TO  PTNYUINRRK-TEIKI-SEIKYUKBN
-               ELSE
-                   MOVE    ITEM-TEIKIKBN
-                                   TO  PTNYUINRRK-TEIKI-SEIKYUKBN
-               END-IF
-           END-IF
+           MOVE    ITEM-TEIKIKBN   TO  PTNYUINRRK-TEIKI-SEIKYUKBN
+           MOVE    ITEM-DISPKBN    TO  PTNYUINRRK-KENSAKU-DISPKBN
       *
            MOVE    SODR-OPID       TO  PTNYUINRRK-OPID
            MOVE    SODR-UPYMD      TO  PTNYUINRRK-CREYMD
@@ -687,14 +708,8 @@
            MOVE    ITEM-DRCD (2)   TO  PTNYUINRRK-DRCD2
            MOVE    ITEM-DRCD (3)   TO  PTNYUINRRK-DRCD3
       *
-           IF    ( SODR-ORDERID    =   NORDERID-HENKOID )
-               IF    ( ITEM-TEIKIKBN   =   SPACE )
-                   CONTINUE
-               ELSE
-                   MOVE    ITEM-TEIKIKBN
-                                   TO  PTNYUINRRK-TEIKI-SEIKYUKBN
-               END-IF
-           END-IF
+           MOVE    ITEM-TEIKIKBN   TO  PTNYUINRRK-TEIKI-SEIKYUKBN
+           MOVE    ITEM-DISPKBN    TO  PTNYUINRRK-KENSAKU-DISPKBN
       *
            MOVE    SODR-OPID       TO  PTNYUINRRK-OPID
            MOVE    SODR-UPYMD      TO  PTNYUINRRK-UPYMD
@@ -768,6 +783,7 @@
            MOVE   SODR-KEYGENERATE     TO  ORDER-KEYGENERATE
       *
            MOVE   ERRCD-ORDER          TO  ORDER-ERRCD1
+           MOVE   ERRCD-ITEM           TO  ORDER-ERRCD2
       *
            IF    ( ERRCD-ITEM          =   SPACE )
             AND  ( ERRCD-ORDER         =   SPACE )
@@ -826,7 +842,9 @@
                                        =   NCLAIMID-NYUINKAJMA
                                        OR  NCLAIMID-HKNCOMBIJMA
                                        OR  NCLAIMID-DRJMA
-                                       OR  NCLAIMID-TEIKIKBNJMA )
+                                       OR  NCLAIMID-TEIKIKBNJMA
+                                       OR  NCLAIMID-DISPKBNJMA
+                                        )
                CONTINUE
            ELSE
                MOVE    3               TO  ODRITEM-STATUS

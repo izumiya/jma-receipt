@@ -16,23 +16,27 @@
       * 113-8621, Japan.
       ********************************************************************
       ************************************************************
-      *    Æþ±¡ÍúÎò¾È²ñ¥Æ¡¼¥Ö¥ë       COPY (CPNRRKSRH.INC)       *
+      *    Æþ±¡ÎÁ²Ã»»»»Äê²ÄÈÝ¥Á¥§¥Ã¥¯ COPY (CPORCSI01.INC)       *
       ************************************************************
       ************************************************************
       *  ¥³¥Ô¡¼¶ç½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ     ÆâÍÆ
       ************************************************************
-      *01  NRRKSRH-REC.
-           03  NRRKSRH-HOSPNUM         PIC 9(02).
-           03  NRRKSRH-PTID            PIC 9(10).
-           03  NRRKSRH-SRYYMD          PIC X(08).
-           03  NRRKSRH-ZAINUM          PIC 9(09).
-           03  NRRKSRH-RRKNUM          PIC 9(03).
-           03  NRRKSRH-TERMID          PIC X(16).
-           03  NRRKSRH-OPID            PIC X(16).
-           03  NRRKSRH-CREYMD          PIC X(08).
-           03  NRRKSRH-UPYMD           PIC X(08).
-           03  NRRKSRH-UPHMS           PIC X(06).
-      *
-           03  NRRKSRH-SELSHONUM       PIC 9(03).
-           03  NRRKSRH-SELSRYCD        PIC X(09).
+       01  SI01-AREA.
+           03  SI01-PTID                   PIC 9(10).
+           03  SI01-SRYYMD                 PIC X(08).
+           03  SI01-NYUINYMD               PIC X(08).
+           03  SI01-BTUSBT                 PIC X(02).
+           03  SI01-SNTNYUINCD             PIC X(09).
+           03  SI01-JOKUSOUYMD             PIC X(08).
+           03  SI01-JOKUSOUKBN             PIC X(01).
+           03  SI01-KSN-G.
+               05  SI01-KSN-MAX            PIC 9(03).
+               05  SI01-KSN-OCC            OCCURS 3.
+                   07  SI01-KSN-NAME       PIC X(100).
+                   07  SI01-KSN-SRYCD      PIC X(09).
+           03  SI01-KSNLST-G.
+               05  SI01-KSNLST-MAX         PIC 9(03).
+               05  SI01-KSNLST-OCC         OCCURS 20.
+                   07  SI01-KSNLST-NAME    PIC X(100).
+                   07  SI01-KSNLST-SRYCD   PIC X(09).

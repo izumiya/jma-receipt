@@ -17,9 +17,25 @@
       ********************************************************************
         02  I06.
       *     02  I06-FIXED6.
+              03  I06-B06-STATE                PIC S9(9)   BINARY.
               03  I06-B06S-STATE               PIC S9(9)   BINARY.
+              03  I06-B07-STATE                PIC S9(9)   BINARY.
               03  I06-B07S-STATE               PIC S9(9)   BINARY.
               03  I06-B12-STATE                PIC S9(9)   BINARY.
+              03  I06-SELNUM                   PIC S9(4).
+              03  I06-SELUKEYMD                PIC X(10).
+              03  I06-SELIDOYMD                PIC X(10).
+              03  I06-SELPTNUM                 PIC X(20).
+              03  I06-SELNAME-STYLE            PIC X(20).
+              03  I06-SELNAME                  PIC X(50).
+              03  I06-CMB-SELSTS-G.
+                04  I06-SELSTS                 PIC X(22).
+                04  I06-SELSTS-COUNT           PIC S9(9)   BINARY.
+                04  I06-SELSTS-ITEM            PIC X(22)   OCCURS  5.
+              03  I06-CMB-SELSORT-G.
+                04  I06-SELSORT                PIC X(53).
+                04  I06-SELSORT-COUNT          PIC S9(9)   BINARY.
+                04  I06-SELSORT-ITEM           PIC X(53)   OCCURS  10.
               03  I06-PTNUM                    PIC X(20).
               03  I06-NAME                     PIC X(100).
               03  I06-SEX                      PIC X(4).
@@ -28,11 +44,9 @@
               03  I06-HSRYKA                   PIC X(10).
               03  I06-HHKNCOMBI                PIC X(46).
               03  I06-IDOJIYU                  PIC X(30).
-              03  I06-LBL-MAEIDOMEI            PIC X(12).
-              03  I06-MAEIDOYMD                PIC X(10).
-              03  I06-SELNUM                   PIC S9(3).
-              03  I06-UKEYMD.
-                04  I06-VALUE                  PIC X(10).
+              03  I06-HNYUINYMD                PIC X(10).
+              03  I06-LBL-LASTIDOYMD           PIC X(12).
+              03  I06-LASTIDOYMD               PIC X(10).
               03  I06-BRMNUM-G.
                 04  I06-BRMNUM                 PIC X(6).
                 04  I06-BRMNUM-STATE           PIC S9(9)   BINARY.
@@ -48,6 +62,12 @@
                 04  I06-SAGAKU-COUNT           PIC S9(9)   BINARY.
                 04  I06-SAGAKU-ITEM            PIC X(23)   OCCURS  20.
                 04  I06-SAGAKU-ITEM-STATE      PIC S9(9)   BINARY.
+              03  I06-CMB-SENTEIKBN.
+                04  I06-SENTEIKBN              PIC X(24).
+                04  I06-SENTEIKBN-STATE        PIC S9(9)   BINARY.
+                04  I06-SENTEIKBN-COUNT        PIC S9(9)   BINARY.
+                04  I06-SENTEIKBN-ITEM         PIC X(24)   OCCURS  10.
+                04  I06-SENTEIKBN-ITEM-STATE   PIC S9(9)   BINARY.
               03  I06-NYUINYMD-G.
                 04  I06-NYUINYMD                PIC X(10).
                 04  I06-NYUINYMD-STATE          PIC S9(9)  BINARY.
@@ -67,6 +87,12 @@
                 04  I06-SHONUM                 PIC S9(2).
                 04  I06-SHONUM-STATE           PIC S9(9)   BINARY.
               03  I06-LBL-SHONYUINYMD          PIC X(16).
+              03  I06-CMB-KAIGOKBN.
+                04  I06-KAIGOKBN               PIC X(18).
+                04  I06-KAIGOKBN-STATE         PIC S9(9)   BINARY.
+                04  I06-KAIGOKBN-COUNT         PIC S9(9)   BINARY.
+                04  I06-KAIGOKBN-ITEM          PIC X(18)   OCCURS  5.
+                04  I06-KAIGOKBN-ITEM-STATE    PIC S9(9)   BINARY.
               03  I06-TAIINYMD-G.
                 04  I06-TAIINYMD               PIC X(10).
                 04  I06-TAIINYMD-STATE         PIC S9(9)   BINARY.
@@ -89,12 +115,6 @@
                 04  I06-HKNCOMBI-COUNT         PIC S9(9)   BINARY.
                 04  I06-HKNCOMBI-ITEM          PIC X(51)   OCCURS  30.
                 04  I06-HKNCOMBI-ITEM-STATE    PIC S9(9)   BINARY.
-              03  I06-CMB-NYUKBN.
-                04  I06-NYUKBN                 PIC X(11).
-                04  I06-NYUKBN-STATE           PIC S9(9)   BINARY.
-                04  I06-NYUKBN-COUNT           PIC S9(9)   BINARY.
-                04  I06-NYUKBN-ITEM            PIC X(11)   OCCURS  2.
-                04  I06-NYUKBN-ITEM-STATE      PIC S9(9)   BINARY.
               03  I06-LBL-TOKNYUIN             PIC X(10).
               03  I06-CMB-TOKNYUIN.
                 04  I06-TOKNYUIN               PIC X(63).
@@ -102,9 +122,40 @@
                 04  I06-TOKNYUIN-COUNT         PIC S9(9)   BINARY.
                 04  I06-TOKNYUIN-ITEM          PIC X(63)   OCCURS  100.
                 04  I06-TOKNYUIN-ITEM-STATE    PIC S9(9)   BINARY.
+              03  I06-CMB-TOKHIGAITOKBN.
+                04  I06-TOKHIGAITOKBN            PIC X(30).
+                04  I06-TOKHIGAITOKBN-STATE      PIC S9(9)   BINARY.
+                04  I06-TOKHIGAITOKBN-COUNT      PIC S9(9)   BINARY.
+                04  I06-TOKHIGAITOKBN-ITEM       PIC X(30)   OCCURS  5.
+                04  I06-TOKHIGAITOKBN-ITEM-STATE PIC S9(9)   BINARY.
               03  I06-SNTNYUIN-G.
                 04  I06-SNTNYUIN               PIC X(60).
                 04  I06-SNTNYUIN-STATE         PIC S9(9)   BINARY.
+              03  I06-CMB-NACCTKBN.
+                04  I06-NACCTKBN               PIC X(30).
+                04  I06-NACCTKBN-STATE         PIC S9(9)   BINARY.
+                04  I06-NACCTKBN-COUNT         PIC S9(9)   BINARY.
+                04  I06-NACCTKBN-ITEM          PIC X(30)   OCCURS  5.
+                04  I06-NACCTKBN-ITEM-STATE    PIC S9(9)   BINARY.
+              03  I06-KSNCD-G.
+                04  I06-KSNCD-OCC              OCCURS  3.
+                  05  I06-KSNCD                PIC X(73).
+                  05  I06-KSNCD-STATE          PIC S9(9)   BINARY.
+                  05  I06-KSNCD-COUNT          PIC S9(9)   BINARY.
+                  05  I06-KSNCD-ITEM           PIC X(73)   OCCURS  20.
+                  05  I06-KSNCD-ITEM-STATE     PIC S9(9)   BINARY.
+              03  I06-CMB-TEIKIKBN.
+                04  I06-TEIKIKBN               PIC X(24).
+                04  I06-TEIKIKBN-STATE         PIC S9(9)   BINARY.
+                04  I06-TEIKIKBN-COUNT         PIC S9(9)   BINARY.
+                04  I06-TEIKIKBN-ITEM          PIC X(24)   OCCURS  5.
+                04  I06-TEIKIKBN-ITEM-STATE    PIC S9(9)   BINARY.
+              03  I06-CMB-DISPKBN.
+                04  I06-DISPKBN                PIC X(11).
+                04  I06-DISPKBN-STATE          PIC S9(9)   BINARY.
+                04  I06-DISPKBN-COUNT          PIC S9(9)   BINARY.
+                04  I06-DISPKBN-ITEM           PIC X(11)   OCCURS  5.
+                04  I06-DISPKBN-ITEM-STATE     PIC S9(9)   BINARY.
               03  I06-CMB-SKJTIME.
                 04  I06-SKJTIME                PIC X(10).
                 04  I06-SKJTIME-STATE          PIC S9(9)   BINARY.
@@ -114,37 +165,44 @@
               03  I06-NISSU-G.
                 04  I06-NISSU                  PIC X(50).
                 04  I06-NISSU-STATE            PIC S9(9)   BINARY.
+              03  I06-SCROLLEDWINDOW4.
+                04  I06-ERRMSGLST.
+                  05  I06-ERRMSGLST-COUNT      PIC S9(9)   BINARY.
+                  05  I06-ERRMSGLST-ROW        PIC S9(9)   BINARY.
+                  05  I06-ERRMSGLST-ROWATTR    PIC S9(9)   BINARY.
+                  05  I06-ERRMSGLST-ITEM       OCCURS  20 TIMES.
+                    06  I06-TERRCD             PIC X(4).
+                    06  I06-TERRMSG            PIC X(100).
+                  05  I06-ERRMSGLST-SELECT     PIC X       OCCURS  20.
               03  I06-SCROLLEDWINDOW1.
                 04  I06-ALLIDOLST.
                   05  I06-ALLIDOLST-COUNT      PIC S9(9)   BINARY.
                   05  I06-ALLIDOLST-ROW        PIC S9(9)   BINARY.
                   05  I06-ALLIDOLST-ROWATTR    PIC S9(9)   BINARY.
-                  05  I06-ALLIDOLST-ITEM       OCCURS  50 TIMES.
+                  05  I06-ALLIDOLST-ITEM       OCCURS  100 TIMES.
                     06  I06-TALLNUM            PIC X(4).
-                    06  I06-TALLIDOYMD         PIC X(10).
                     06  I06-TALLIDOJIYU        PIC X(20).
+                    06  I06-TALLIDOYMD         PIC X(10).
                     06  I06-TALLPTNUM          PIC X(20).
-                    06  I06-TALLNAME           PIC X(100).
-                    06  I06-TALLERR            PIC X(4).
-                  05  I06-ALLIDOLST-SELECT     PIC X       OCCURS  50.
+                    06  I06-TALLNAME           PIC X(50).
+                    06  I06-TALLERR            PIC X(10).
+                    06  I06-TALLERRCD          PIC X(04).
+                    06  I06-TALLUKEYMD-G.
+                      07   I06-TALLUKEYMD      PIC X(10).
+                      07   I06-TALLUKEHMS      PIC X(05).
+                  05  I06-ALLIDOLST-SELECT     PIC X       OCCURS  100.
               03  I06-SCROLLEDWINDOW3.
-                04  I06-KJNIDOLST.
-                  05  I06-KJNIDOLST-COUNT      PIC S9(9)   BINARY.
-                  05  I06-KJNIDOLST-ROW        PIC S9(9)   BINARY.
-                  05  I06-KJNIDOLST-ROWATTR    PIC S9(9)   BINARY.
-                  05  I06-KJNIDOLST-ITEM       OCCURS  50 TIMES.
-                    06  I06-TKJNNUM            PIC X(4).
-                    06  I06-TKJNUKEYMD         PIC X(10).
-                    06  I06-TKJNIDOYMD         PIC X(10).
-                    06  I06-TKJNIDOJIYU        PIC X(20).
-                    06  I06-TKJNERR            PIC X(4).
-                  05  I06-KJNIDOLST-SELECT     PIC X       OCCURS  50.
-              03  I06-SCROLLEDWINDOW4.
-                04  I06-ERRMESLST.
-                  05  I06-ERRMESLST-COUNT      PIC S9(9)   BINARY.
-                  05  I06-ERRMESLST-ROW        PIC S9(9)   BINARY.
-                  05  I06-ERRMESLST-ROWATTR    PIC S9(9)   BINARY.
-                  05  I06-ERRMESLST-ITEM       OCCURS  20 TIMES.
-                    06  I06-TERRCD             PIC X(4).
-                    06  I06-TERRMES            PIC X(100).
-                  05  I06-ERRMESLST-SELECT     PIC X       OCCURS  20.
+                04  I06-PTIDOLST-VISIBLE      PIC X.
+                04  I06-PTIDOLST.
+                  05  I06-PTIDOLST-COUNT      PIC S9(9)   BINARY.
+                  05  I06-PTIDOLST-ROW        PIC S9(9)   BINARY.
+                  05  I06-PTIDOLST-ROWATTR    PIC S9(9)   BINARY.
+                  05  I06-PTIDOLST-ITEM       OCCURS  50 TIMES.
+                    06  I06-TPTNUM            PIC X(4).
+                    06  I06-TPTIDOYMD         PIC X(10).
+                    06  I06-TPTIDOJIYU        PIC X(20).
+                    06  I06-TPTERR            PIC X(10).
+                    06  I06-TPTUKEYMD-G.
+                        07  I06-TPTUKEYMD     PIC X(10).
+                        07  I06-TPTUKEHMS     PIC X(5).
+                  05  I06-PTIDOLST-SELECT     PIC X       OCCURS  50.

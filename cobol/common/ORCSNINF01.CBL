@@ -618,6 +618,19 @@
                                    TO  SNINF01-TEIKIKBN-NAME(IDXA)
            END-EVALUATE
       *
+           MOVE    "検索時患者表示"
+                                   TO  SNINF01-DISPKBN-LBL (IDXA)
+           MOVE    PTNYUINRRK-KENSAKU-DISPKBN
+                                   TO  SNINF01-DISPKBN-DATA(IDXA)
+           EVALUATE    PTNYUINRRK-KENSAKU-DISPKBN
+           WHEN    "1"
+               MOVE    "表示可"
+                                   TO  SNINF01-DISPKBN-NAME(IDXA)
+           WHEN    "2"
+               MOVE    "表示不可"
+                                   TO  SNINF01-DISPKBN-NAME(IDXA)
+           END-EVALUATE
+      *
           .
        20011-NYUINRRK-EXT.
            EXIT.

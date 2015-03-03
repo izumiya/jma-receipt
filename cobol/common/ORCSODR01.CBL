@@ -77,6 +77,7 @@
            03  IDX2                    PIC 9(05).
            03  IDX3                    PIC 9(05).
            03  IDX4                    PIC 9(05).
+           03  IDXK                    PIC 9(05).
            03  IDX-ODR                 PIC 9(05).
       *
       *    一時領域
@@ -111,12 +112,16 @@
            03  ITEM-LASTNYINYMD        PIC X(08).
            03  ITEM-SYONUM             PIC 9(03).
            03  ITEM-BTUNUM             PIC X(02).
+           03  ITEM-BTUSBT             PIC X(02).
            03  ITEM-BRMNUM             PIC X(08).
+           03  ITEM-SENTEIKBN          PIC X(01).
            03  ITEM-SAGAKUCD           PIC X(02).
            03  ITEM-TOKNYUIN-G.
                05  ITEM-TOKNYUIN-KBN   PIC X(01).
                05  ITEM-TOKNYUIN-NYUIN PIC X(02).
+           03  ITEM-TOKNYUIN-SRYCD     PIC X(09).
            03  ITEM-SANTEICD           PIC X(09).
+           03  ITEM-TOKHIGAITOKBN          PIC X(01).
            03  ITEM-DRCD-G.
                05  ITEM-DRCD-MAX       PIC 9(02).
                05  ITEM-DRCD           PIC X(05)   OCCURS  3.
@@ -125,7 +130,12 @@
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
            03  ITEM-KAIGOKBN           PIC X(01).
+           03  ITEM-NACCTKBN           PIC X(01).
+           03  ITEM-KSNCD-G.
+               05  ITEM-KSNCD-MAX      PIC 9(02).
+               05  ITEM-KSNCD          PIC X(09)   OCCURS  3.
            03  ITEM-TEIKIKBN           PIC X(01).
+           03  ITEM-DISPKBN            PIC X(01).
       *
        01  ERRCD-AREA.
            03  ERRCD-ITEM-G.
@@ -213,11 +223,16 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
       *
+      *    特定入院料コード取得サブ
+           COPY  "CPORCSTOKNYUIN.INC".
+      *
       *    排他制御
            COPY    "CPORCSLOCK.INC".
       *
+      *    入院料加算算定可否チェックサブ
+           COPY    "CPORCSI01.INC".
+      *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    連絡　領域
@@ -231,6 +246,7 @@
            02  LNK-ODRITEM-OCC         OCCURS   30.
            COPY    "CPODRITEM.INC"     REPLACING  //ODRITEM-//
                                        BY         //LNK-ODRITEM-//.
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
@@ -238,6 +254,7 @@
        PROCEDURE                       DIVISION
                                        USING   SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -345,6 +362,12 @@
       *****************************************************************
        2001-INPUT-CHK-SEC              SECTION.
       *
+           MOVE    "1"             TO  ITEM-SENTEIKBN
+           MOVE    "0"             TO  ITEM-TOKHIGAITOKBN
+           MOVE    "2"             TO  ITEM-NACCTKBN
+           MOVE    "1"             TO  ITEM-TEIKIKBN
+           MOVE    "1"             TO  ITEM-DISPKBN
+      *
            PERFORM VARYING IDX-ODR    FROM    1   BY  1
                    UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
       *
@@ -357,20 +380,30 @@
                    PERFORM 20011-BTUNUM-CHK-SEC
                WHEN    NCLAIMID-BRMNUMJMA
                    PERFORM 20011-BRMNUM-CHK-SEC
+               WHEN    NCLAIMID-SENTEIKBNJMA
+                   PERFORM 20011-SENTEIKBN-CHK-SEC
                WHEN    NCLAIMID-SAGAKUJMA
                    PERFORM 20011-SAGAKU-CHK-SEC
+               WHEN    NCLAIMID-KAIGOKBNJMA
+                   PERFORM 20011-KAIGOKBN-CHK-SEC
                WHEN    NCLAIMID-DRJMA
                    PERFORM 20011-DR-CHK-SEC
                WHEN    NCLAIMID-TOKNYUINJMA
                    PERFORM 20011-TOKNYUIN-CHK-SEC
+               WHEN    NCLAIMID-TOKHIGAITOKBNJMA
+                   PERFORM 20011-TOKHIGAITOKBN-CHK-SEC
                WHEN    NCLAIMID-NYUINKAJMA
                    PERFORM 20011-NYUINKA-CHK-SEC
                WHEN    NCLAIMID-HKNCOMBIJMA
                    PERFORM 20011-HKNCOMBI-CHK-SEC
+               WHEN    NCLAIMID-NACCTKBNJMA
+                   PERFORM 20011-NACCTKBN-CHK-SEC
+               WHEN    NCLAIMID-KSNCDJMA
+                   PERFORM 20011-KSNCD-CHK-SEC
                WHEN    NCLAIMID-TEIKIKBNJMA
                    PERFORM 20011-TEIKIKBN-CHK-SEC
-               WHEN    NCLAIMID-KAIGOKBNJMA
-                   PERFORM 20011-KAIGOKBN-CHK-SEC
+               WHEN    NCLAIMID-DISPKBNJMA
+                   PERFORM 20011-DISPKBN-CHK-SEC
                END-EVALUATE
       *
            END-PERFORM
@@ -466,6 +499,8 @@
       *
                    MOVE    SYS-5001-BTU-KHNSRYCD
                                        TO  ITEM-SANTEICD
+                   MOVE    SYS-5001-BTU-SBT
+                                       TO  ITEM-BTUSBT
                    IF    ( SODR-KHNSRYCD NOT = SPACE )
                      AND ( SODR-KHNSRYCD NOT = SYS-5001-BTU-KHNSRYCD )
                        MOVE    SPACE   TO  ITEM-SANTEICD
@@ -571,6 +606,25 @@
        200111-SAGAKUCD-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    選定入院区分チェック処理
+      *****************************************************************
+       20011-SENTEIKBN-CHK-SEC          SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-SENTEIKBN
+               ELSE
+                   MOVE    "0156"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-SENTEIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    担当医チェック処理
       *****************************************************************
        20011-DR-CHK-SEC                SECTION.
@@ -623,6 +677,8 @@
                        IF    ( LNK-ODRITEM-ITEM  (IDX-ODR) =   "101" )
                            MOVE    LNK-ODRITEM-ITEM  (IDX-ODR)
                                        TO  ITEM-TOKNYUIN-G
+                           MOVE    LNK-ODRITEM-MEMO (IDX-ODR)
+                                       TO  ITEM-TOKNYUIN-SRYCD
                        END-IF
                    WHEN    "2"
                        MOVE    "5110"          TO  WRK-SYS-KANRICD
@@ -632,6 +688,8 @@
                        IF    ( FLG-SYSKANRI    =   ZERO )
                            MOVE    LNK-ODRITEM-ITEM  (IDX-ODR)
                                                TO  ITEM-TOKNYUIN-G
+                           MOVE    LNK-ODRITEM-MEMO (IDX-ODR)
+                                               TO  ITEM-TOKNYUIN-SRYCD
                        END-IF
                    WHEN    "3"
                        MOVE    "5111"          TO  WRK-SYS-KANRICD
@@ -641,6 +699,19 @@
                        IF    ( FLG-SYSKANRI    =   ZERO )
                            MOVE    LNK-ODRITEM-ITEM  (IDX-ODR)
                                                TO  ITEM-TOKNYUIN-G
+                           MOVE    LNK-ODRITEM-MEMO (IDX-ODR)
+                                               TO  ITEM-TOKNYUIN-SRYCD
+                       END-IF
+                   WHEN    "4"
+                       MOVE    "5112"          TO  WRK-SYS-KANRICD
+                       MOVE    LNK-ODRITEM-ITEM (IDX-ODR) (2:2)
+                                               TO  WRK-SYS-KBNCD
+                       PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+                       IF    ( FLG-SYSKANRI    =   ZERO )
+                           MOVE    LNK-ODRITEM-ITEM  (IDX-ODR)
+                                               TO  ITEM-TOKNYUIN-G
+                           MOVE    LNK-ODRITEM-MEMO (IDX-ODR)
+                                               TO  ITEM-TOKNYUIN-SRYCD
                        END-IF
                    END-EVALUATE
       *
@@ -658,6 +729,20 @@
       *
            .
        20011-TOKNYUIN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    算定要件非該当区分チェック処理
+      *****************************************************************
+       20011-TOKHIGAITOKBN-CHK-SEC         SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       NOT =   SPACE )
+               MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-TOKHIGAITOKBN
+           END-IF
+      *
+           .
+       20011-TOKHIGAITOKBN-CHK-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入院科チェック処理
@@ -730,21 +815,88 @@
        20011-HKNCOMBI-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    入院会計区分チェック処理
+      *****************************************************************
+       20011-NACCTKBN-CHK-SEC          SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-NACCTKBN
+               ELSE
+                   MOVE    "0157"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-NACCTKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院加算チェック処理
+      *****************************************************************
+       20011-KSNCD-CHK-SEC             SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+      *
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   3 )
+                        OR   ( ITEM-KSNCD (IDX1)
+                                       =   LNK-ODRITEM-ITEM (IDX-ODR))
+      *
+                   IF    ( ITEM-KSNCD (IDX1)   =   SPACE )
+                       MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-KSNCD (IDX1)
+                       MOVE    IDX1    TO  ITEM-KSNCD-MAX
+                       MOVE    999     TO  IDX1
+                   END-IF
+      *
+               END-PERFORM
+      *
+           END-IF
+      *
+           .
+       20011-KSNCD-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    定期請求区分チェック処理
       *****************************************************************
        20011-TEIKIKBN-CHK-SEC          SECTION.
       *
            IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
-                                       =   SPACE OR "1" OR "2" OR "3" )
-               MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       NOT =   SPACE  )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" OR "3" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  ITEM-TEIKIKBN
-           ELSE
-               MOVE    "0141"          TO  ERRCD-ERRCD
-               PERFORM 2100-ITEM-ERR-SET-SEC
+               ELSE
+                   MOVE    "0141"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
            END-IF
       *
            .
        20011-TEIKIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院患者照会表示チェック処理
+      *****************************************************************
+       20011-DISPKBN-CHK-SEC           SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "1" OR "2" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-DISPKBN
+               ELSE
+                   MOVE    "0158"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-DISPKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    介護からの異動チェック処理
@@ -821,13 +973,18 @@
            END-IF
       *
            IF    ( ERRCD-ORDER     =   SPACE )
+      *        入院履歴チェック処理
+               PERFORM 20021-NYUINRRK-CHK-SEC
+           END-IF
+      *
+           IF    ( ERRCD-ORDER     =   SPACE )
       *        入院料チェック処理
                PERFORM 20021-NYUINRYO-CHK-SEC
            END-IF
       *
            IF    ( ERRCD-ORDER     =   SPACE )
-      *        入院履歴チェック処理
-               PERFORM 20021-NYUINRRK-CHK-SEC
+      *        入院加算チェック処理
+               PERFORM 20021-KSNCD-CHK-SEC
            END-IF
       *
            IF    ( ERRCD-ORDER     =   SPACE )
@@ -996,8 +1153,79 @@
                MOVE    "0030"          TO  ERRCD-ORDER
            END-IF
       *
+           IF    ( ERRCD-ORDER         =   SPACE )
+               IF    ( ITEM-TOKNYUIN-G     NOT =   SPACE )
+      *
+                   INITIALIZE                  ORCSTOKNYUIN-AREA
+                   MOVE    ITEM-TOKNYUIN-KBN
+                                       TO  LNK-TOKNYUIN-KBN
+                   MOVE    ITEM-TOKNYUIN-NYUIN
+                                       TO  LNK-TOKNYUIN-NYUIN
+                   MOVE    ITEM-BTUNUM TO  LNK-TOKNYUIN-BTUNUM
+                   MOVE    "1"         TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+                   MOVE    SODR-SRYYMD TO  LNK-TOKNYUIN-SANTEIYM
+                   CALL    "ORCSTOKNYUIN"  USING
+                                           ORCSTOKNYUIN-AREA
+                                           SPA-AREA
+                   IF    ( LNK-TOKNYUIN-RC     =   ZERO )
+                    AND  ( LNK-TOKNYUIN-GAI-SRYCD  NOT =  SPACE )
+                       IF    ( ITEM-TOKHIGAITOKBN  =   "0" OR "1" )
+                           IF    ( ITEM-TOKHIGAITOKBN  =   "1" )
+                               MOVE    LNK-TOKNYUIN-GAI-SRYCD
+                                               TO  ITEM-TOKNYUIN-SRYCD
+                           END-IF
+                       ELSE
+                           MOVE    "0155"      TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
            .
        20021-NYUINRYO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院加算チェック処理
+      *****************************************************************
+       20021-KSNCD-CHK-SEC          SECTION.
+      *
+           INITIALIZE                      SI01-AREA
+           MOVE    SODR-PTID           TO  SI01-PTID
+           MOVE    SODR-SRYYMD         TO  SI01-SRYYMD
+           MOVE    SODR-SRYYMD         TO  SI01-NYUINYMD
+           MOVE    ITEM-BTUSBT         TO  SI01-BTUSBT
+           IF    ( ITEM-TOKNYUIN-SRYCD NOT =   SPACE )
+               MOVE    ITEM-TOKNYUIN-SRYCD
+                                       TO  SI01-SNTNYUINCD
+           ELSE
+               MOVE    ITEM-SANTEICD   TO  SI01-SNTNYUINCD
+           END-IF
+           CALL    "ORCSI01"           USING
+                                       SI01-AREA
+                                       SPA-AREA
+      *
+           PERFORM VARYING IDX1  FROM  1   BY  1
+                   UNTIL ( IDX1  >     ITEM-KSNCD-MAX )
+                    OR   ( ERRCD-ORDER NOT   =   SPACE )
+      *
+               MOVE    ZERO    TO      IDXK
+               PERFORM VARYING IDX2    FROM    1   BY  1
+                       UNTIL ( IDX2    >   SI01-KSN-MAX )
+                        OR   ( IDXK    NOT =   ZERO )
+                   IF    ( SI01-KSN-SRYCD (IDX2)
+                                 =     ITEM-KSNCD (IDX1))
+                       MOVE    IDX2    TO  IDXK
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( IDXK    =   ZERO )
+                   MOVE    "0159"      TO  ERRCD-ORDER
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       20021-KSNCD-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入院履歴チェック処理
@@ -1167,6 +1395,9 @@
       *    病室番号
            MOVE    ITEM-BRMNUM     TO  PTNYUINRRK-BRMNUM
       *
+      *    選定入院
+           MOVE    ITEM-SENTEIKBN  TO  PTNYUINRRK-SENTEIKBN
+      *
       *    入院科
            MOVE    ITEM-NYUINKA    TO  PTNYUINRRK-NYUINKA
       *
@@ -1190,8 +1421,20 @@
            MOVE    ITEM-TOKNYUIN-NYUIN
                                    TO  PTNYUINRRK-TOKUTEI-NYUIN
       *
+      *    特定入院料非該当
+           IF    ( ITEM-TOKNYUIN-G        NOT =   SPACE )
+            AND  ( ITEM-TOKHIGAITOKBN         NOT =   "0"  )
+               MOVE    ITEM-TOKHIGAITOKBN
+                                   TO  PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+           ELSE
+               MOVE    SPACE       TO  PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+           END-IF
+      *
       *    室料差額
            MOVE    ITEM-SAGAKUCD   TO  PTNYUINRRK-RM-SAGAKU
+      *
+      *    入院会計
+           MOVE    ITEM-NACCTKBN   TO  PTNYUINRRK-NYUCALKBN
       *
       *    定期請求区分
            IF    ( ITEM-TEIKIKBN   =   SPACE )
@@ -1202,7 +1445,7 @@
            END-IF
       *
       *    検索表示区分
-           MOVE    "1"             TO  PTNYUINRRK-KENSAKU-DISPKBN
+           MOVE    ITEM-DISPKBN    TO  PTNYUINRRK-KENSAKU-DISPKBN
       *
       *    初回継続区分
            IF    ( ITEM-SHOKAI     =   SPACE )
@@ -1408,6 +1651,7 @@
            CALL    "ORCSODRS01"        USING   SODR-AREA
                                                SODRS01-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
            MOVE    SODRS01-RC      TO  FLG-END
       *
@@ -1454,6 +1698,7 @@
            MOVE   SODR-KEYGENERATE     TO  ORDER-KEYGENERATE
       *
            MOVE   ERRCD-ORDER          TO  ORDER-ERRCD1
+           MOVE   ERRCD-ITEM           TO  ORDER-ERRCD2
       *
            IF    ( ERRCD-ITEM          =   SPACE )
             AND  ( ERRCD-ORDER         =   SPACE )
@@ -1520,7 +1765,12 @@
                                        OR  NCLAIMID-HKNCOMBIJMA
                                        OR  NCLAIMID-KAIGOKBNJMA
                                        OR  NCLAIMID-TEIKIKBNJMA
-                                           )
+                                       OR  NCLAIMID-SENTEIKBNJMA
+                                       OR  NCLAIMID-TOKHIGAITOKBNJMA
+                                       OR  NCLAIMID-NACCTKBNJMA
+                                       OR  NCLAIMID-KSNCDJMA
+                                       OR  NCLAIMID-DISPKBNJMA
+                                        )
                CONTINUE
            ELSE
                MOVE    3               TO  ODRITEM-STATUS
@@ -1567,6 +1817,14 @@
            MOVE    SODR-UPYMD      TO  SODRNACCT-UPYMD
            MOVE    SODR-UPHMS      TO  SODRNACCT-UPHMS
            MOVE    ITEM-NYUKBN     TO  SODRNACCT-NYUKBN
+      *
+           MOVE    ITEM-KSNCD-MAX  TO  SODRNACCT-KSN-MAX
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   ITEM-KSNCD-MAX )
+               MOVE    ITEM-KSNCD (IDX1)
+                                   TO  SODRNACCT-KSN-SRYCD (IDX1)
+           END-PERFORM
+      *
            MOVE    TRRK-REC        TO  LNK-PTNYUINRRK-REC
       *
            CALL    "ORCSODRNACCT"      USING

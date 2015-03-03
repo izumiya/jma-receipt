@@ -235,7 +235,6 @@
            COPY    "CPORCSLOCK.INC".
       *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -249,14 +248,15 @@
            02  LNK-ODRITEM-OCC         OCCURS   150.
            COPY    "CPODRITEM.INC"     REPLACING  //ODRITEM-//
                                        BY         //LNK-ODRITEM-//.
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
       *
        PROCEDURE                       DIVISION
-                                       USING
-                                               SODR-AREA
+                                       USING   SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -1113,6 +1113,7 @@
            CALL    "ORCSODRS01"        USING   SODR-AREA
                                                SODRS01-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
            MOVE    SODRS01-RC      TO  FLG-END
       *
@@ -1159,16 +1160,21 @@
            MOVE   SODR-KEYGENERATE     TO  ORDER-KEYGENERATE
       *
            MOVE   ERRCD-ORDER          TO  ORDER-ERRCD1
+           MOVE   ERRCD-ITEM           TO  ORDER-ERRCD2
       *
            IF    ( ERRCD-ITEM          =   SPACE )
             AND  ( ERRCD-ORDER         =   SPACE )
                MOVE    TRRK-RRKNUM     TO  ORDER-RRKNUM
                MOVE    TRRK-RRKEDANUM  TO  ORDER-RRKEDANUM
            ELSE
-               IF    ( WRK-DIALOG      =   ZERO )
-                   MOVE    2           TO  ORDER-STATUS
+               IF    ( SODR-KEYGENERATE    =   2 )
+                       MOVE    1       TO  ORDER-STATUS
                ELSE
-                   MOVE    5           TO  ORDER-STATUS
+                   IF    ( WRK-DIALOG      =   ZERO )
+                       MOVE    2       TO  ORDER-STATUS
+                   ELSE
+                       MOVE    5       TO  ORDER-STATUS
+                   END-IF
                END-IF
            END-IF
       *
@@ -1214,10 +1220,13 @@
                                        TO  ODRITEM-REC
       *
            IF    ( LNK-ODRITEM-ITEMID (IDX-ODR)
-                                       =   NCLAIMID-NYUINKAJMA
-                                       OR  NCLAIMID-HKNCOMBIJMA
-                                       OR  NCLAIMID-GAIHAKUKBNJMA
-                                           )
+                                       =   NCLAIMID-MEDIDJMA
+                                        OR NCLAIMID-MEDDATAJMA
+                                        OR NCLAIMID-MEDALLJMA
+                                        OR NCLAIMID-ADLIDJMA
+                                        OR NCLAIMID-ADLTENJMA
+                                        OR NCLAIMID-ADLALLJMA
+                                                                )
                CONTINUE
            ELSE
                MOVE    3               TO  ODRITEM-STATUS

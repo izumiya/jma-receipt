@@ -101,6 +101,9 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *    入院オーダーエラーメッセージ取得
+           COPY    "CPORCSODRS03.INC".
+      *
       *    入院異動チェックサブ
            COPY    "CPORCSODR.INC".
        01  SODRITEM-REC.
@@ -110,7 +113,6 @@
                                        BY         //SODRITEM-//.
       *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    連絡　領域
@@ -123,6 +125,7 @@
            COPY    "CPORDER.INC"       REPLACING  //ORDER-//
                                        BY         //LNK-ORDER-//.
       *
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
@@ -131,6 +134,7 @@
                                        USING
                                                ORCSBD009SAREA
                                                LNK-ORDER-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -237,6 +241,7 @@
            MOVE    LNK-ORDER-ORDERNUM  TO  SODR-ORDERNUM
            CALL    "ORCSODRS02"        USING   SODR-AREA
                                                SODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
            IF    ( SODR-ERRFLG NOT =   ZERO )
       *
@@ -259,11 +264,13 @@
       *
            DISPLAY "ERR-ORDER-ERRCD =" ERR-ORDER-ERRCD
       *
-           IF    ( ERR-ORDER-ERRCD   NOT =   SPACE )
-               MOVE    ERR-ORDER-ERRCD TO  BD009S-ERRCD (1)
-               MOVE    ERR-ORDER-ERRCD TO  WRK-CMB-CD
-               PERFORM 4200-ERRCD-CHK-SEC
-               MOVE    WRK-CMB-ITM     TO  BD009S-ERRMES(1)
+           IF    ( ERR-ORDER-ERRCD NOT =   SPACE )
+               INITIALIZE              SODRS03-AREA
+               MOVE    ERR-ORDER-ERRCD TO  SODRS03-ERRCD
+               CALL    "ORCSODRS03"    USING
+                                       SODRS03-AREA
+               MOVE    SODRS03-ERRCD   TO  BD009S-ERRCD (1)
+               MOVE    SODRS03-ERRMSG  TO  BD009S-ERRMES(1)
                MOVE    1               TO  IDX-MAX
                DISPLAY IDX-MAX ODRITEM-ERRCD "-" BD009S-ERRMES(IDX-MAX)
            END-IF
@@ -274,34 +281,22 @@
                MOVE    ERR-ODRITEM-OCC (IDX0)  TO  ODRITEM-REC
       *
                IF    ( ODRITEM-ERRCD    NOT =   SPACE )
+                AND  ( ODRITEM-ERRCD    NOT =   CONST-ERRCD9001 )
                    IF    ( IDX-MAX    >=   CONST-ERRCD-MAX )
                        CONTINUE
                    ELSE
                        COMPUTE IDX-MAX =   IDX-MAX +   1
       *
+                       INITIALIZE              SODRS03-AREA
                        MOVE    ODRITEM-ERRCD
+                                           TO  SODRS03-ERRCD
+                       CALL    "ORCSODRS03"    USING
+                                               SODRS03-AREA
+                       MOVE    SODRS03-ERRCD
                                            TO  BD009S-ERRCD (IDX-MAX)
-                       IF    ( ODRITEM-ERRCD
-                                           =   CONST-ERRCD9001 )
-                           MOVE    ODRITEM-ERRCD    TO  WRK-CMB-CD
-                           PERFORM 4200-ERRCD-CHK-SEC
-               DISPLAY IDX-MAX ODRITEM-ERRCD ":" BD009S-ERRMES(IDX-MAX)
-                           MOVE    WRK-CMB-ITM         TO  WRK-STR
-                           MOVE    ODRITEM-ITEMID      TO  WRK-CMB-CD
-                           PERFORM 4200-NCLAIMID-CHK-SEC
-                           STRING  WRK-STR         DELIMITED BY SPACE
-                                   "［"            DELIMITED BY SIZE
-                                   WRK-CMB-ITM     DELIMITED BY SPACE
-                                   "］"            DELIMITED BY SIZE
-                           INTO                BD009S-ERRMES(IDX-MAX)
-                           END-STRING
-                       ELSE
-                           MOVE    ODRITEM-ERRCD    TO  WRK-CMB-CD
-                           PERFORM 4200-ERRCD-CHK-SEC
-               DISPLAY IDX-MAX ODRITEM-ERRCD ":" BD009S-ERRMES(IDX-MAX)
-                           MOVE    WRK-CMB-ITM
+                       MOVE    SODRS03-ERRMSG
                                            TO  BD009S-ERRMES(IDX-MAX)
-                       END-IF
+               DISPLAY IDX-MAX ODRITEM-ERRCD "-" BD009S-ERRMES(IDX-MAX)
                    END-IF
                END-IF
       *

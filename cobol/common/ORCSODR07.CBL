@@ -199,7 +199,6 @@
            COPY  "CPORCSS002.INC".
       *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    連絡　領域
@@ -213,6 +212,7 @@
            02  LNK-ODRITEM-OCC         OCCURS   30.
            COPY    "CPODRITEM.INC"     REPLACING  //ODRITEM-//
                                        BY         //LNK-ODRITEM-//.
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
@@ -220,6 +220,7 @@
        PROCEDURE                       DIVISION
                                        USING   SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -268,10 +269,11 @@
                END-IF
            END-IF
       *
-           IF    ( SODR-ORDERID        =   NORDERID-ALLCANNYUINID
-                                        OR NORDERID-CANNYUINID )
+           IF    ( SODR-KEYGENERATE     =   2 )
                MOVE    PTNYUINRRK-NYUINKA     TO  SODR-SRYKA
+                                                  ITEM-NYUINKA
                MOVE    PTNYUINRRK-HKNCOMBINUM TO  SODR-HKNCOMBI
+                                                  ITEM-HKNCOMBI
            END-IF
       *
            .
@@ -371,6 +373,7 @@
            COMPUTE CNT-NYUINKA  =   CNT-NYUINKA  +   1
       *
            IF    ( CNT-NYUINKA  =   1 )
+            AND  ( ITEM-NYUINKA =   SPACE )
       *
                MOVE    "1005"          TO  WRK-SYS-KANRICD
                MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
@@ -387,10 +390,6 @@
                    PERFORM 2100-ITEM-ERR-SET-SEC
                END-IF
       *
-           ELSE
-               PERFORM 2100-ITEM-UNPROCSTS-SET-SEC
-               MOVE    "0040"      TO  ERRCD-ERRCD
-               PERFORM 2100-ITEM-ERR-SET-SEC
            END-IF
       *
            .
@@ -404,6 +403,7 @@
            COMPUTE CNT-HKNCOMBI  =   CNT-HKNCOMBI  +   1
       *
            IF    ( CNT-HKNCOMBI  =   1 )
+            AND  ( ITEM-HKNCOMBI =   ZERO )
       *
                MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                        TO  WRK-COMBI-HKNCOMBI
@@ -489,11 +489,8 @@
       *****************************************************************
        20021-NYUINKA-CHK-SEC           SECTION.
       *
-           IF    ( SODR-ORDERID        =   NORDERID-DELNYUINID
-                                        OR NORDERID-ALLDELNYUINID  )
-               IF    ( ITEM-NYUINKA    =   SPACE )
-                   MOVE    "0002"          TO  ERRCD-ORDER
-               END-IF
+           IF    ( ITEM-NYUINKA    =   SPACE )
+               MOVE    "0002"          TO  ERRCD-ORDER
            END-IF
       *
            .
@@ -504,11 +501,8 @@
       *****************************************************************
        20021-HKNCOMBI-CHK-SEC          SECTION.
       *
-           IF    ( SODR-ORDERID        =   NORDERID-DELNYUINID
-                                        OR NORDERID-ALLDELNYUINID  )
-               IF    ( ITEM-HKNCOMBI   =   ZERO )
-                   MOVE    "0005"          TO  ERRCD-ORDER
-               END-IF
+           IF    ( ITEM-HKNCOMBI   =   ZERO )
+               MOVE    "0005"          TO  ERRCD-ORDER
            END-IF
       *
            .
@@ -524,15 +518,19 @@
       *    入院中であること
            IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
                MOVE    "0052"      TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
            END-IF
       *
       *    入院日と異動日が等しいこと
-           IF    ( SODR-ORDERID            =   NORDERID-ALLDELNYUINID
+           IF    ( ERRCD-ORDER             =   SPACE )
+               IF    ( SODR-KEYGENERATE    =   2 )
+                   CONTINUE
+               ELSE
+                   IF    ( SODR-ORDERID    =   NORDERID-ALLDELNYUINID
                                             OR NORDERID-DELNYUINID     )
-               IF    ( PTNYUINRRK-NYUINYMD NOT =   SODR-SRYYMD )
-                   MOVE    "0133"      TO  ERRCD-ORDER
-                   GO  TO  20021-NYUINRRK-CHK-EXT
+                       IF    ( PTNYUINRRK-NYUINYMD NOT =   SODR-SRYYMD )
+                           MOVE    "0133"  TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
                END-IF
            END-IF
       *
@@ -769,6 +767,7 @@
            CALL    "ORCSODRS01"        USING   SODR-AREA
                                                SODRS01-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
            MOVE    SODRS01-RC      TO  FLG-END
       *
@@ -815,6 +814,7 @@
            MOVE   SODR-KEYGENERATE     TO  ORDER-KEYGENERATE
       *
            MOVE   ERRCD-ORDER          TO  ORDER-ERRCD1
+           MOVE   ERRCD-ITEM           TO  ORDER-ERRCD2
       *
            IF    ( ERRCD-ITEM          =   SPACE )
             AND  ( ERRCD-ORDER         =   SPACE )
@@ -915,16 +915,7 @@
       *
       *
            INITIALIZE                  SODRNACCT-AREA
-           EVALUATE    SODR-ORDERID
-           WHEN    NORDERID-ALLCANNYUINID
-               MOVE    NORDERID-ALLDELNYUINID
-                                       TO  SODRNACCT-ORDERID
-           WHEN    NORDERID-CANNYUINID
-               MOVE    NORDERID-DELNYUINID
-                                       TO  SODRNACCT-ORDERID
-           WHEN    OTHER
-               MOVE    SODR-ORDERID    TO  SODRNACCT-ORDERID
-           END-EVALUATE
+           MOVE    SODR-ORDERID    TO  SODRNACCT-ORDERID
            MOVE    SODR-OPID       TO  SODRNACCT-OPID
            MOVE    SODR-UPYMD      TO  SODRNACCT-UPYMD
            MOVE    SODR-UPHMS      TO  SODRNACCT-UPHMS

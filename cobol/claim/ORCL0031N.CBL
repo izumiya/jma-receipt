@@ -88,7 +88,7 @@
                05  WRK-MEMO            PIC X(80).
            03  WRK-STATUS-ITEM         PIC 9(05).
            03  WRK-UKEYMD              PIC X(08).
-           03  WRK-UKEHMS              PIC X(06).
+           03  WRK-UKEHMS              PIC X(08).
            03  WRK-ORDER-CLAIMID-G.
                05  WRK-ORDER-CLAIMID1  PIC X(02).
                05  WRK-ORDER-CLAIMID2  PIC X(03).
@@ -103,6 +103,9 @@
            03  WRK-SAGAKU              PIC 9(08).
            03  WRK-SNUM-INX            PIC X(26).
            03  WRK-SNUM-OUTNUM         PIC 9(12).
+           03  WRK-DATE.
+               05  WRK-DATEYY          PIC X(02).
+               05  WRK-DATEYYMMDD      PIC X(06).
       *
        01  ERRCD-AREA.
            03  ERRCD-KHNERR            PIC X(04).
@@ -174,6 +177,7 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+       01  SMCNDATE-TIME               PIC X(8).
       *
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
@@ -244,7 +248,7 @@
       *
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  WRK-UKEYMD
-           MOVE    SMCNDATE-HMS        TO  WRK-UKEHMS
+           MOVE    SMCNDATE-TIME       TO  WRK-UKEHMS
       *
            PERFORM 1001-KIHON-CHK-SEC
       *
@@ -668,6 +672,7 @@
            IF    ( WRK-PGNAME      NOT =   SPACE )
                CALL    WRK-PGNAME      USING   SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA
                IF    ( SODR-RC     NOT =   ZERO )
                    MOVE    1           TO  FLG-END
@@ -1199,7 +1204,7 @@
            END-IF
       *
            MOVE    ERRCD-ERRCD (1)     TO  ORDER-ERRCD1
-           MOVE    ERRCD-ERRCD (2)     TO  ORDER-ERRCD2
+      *    MOVE    ERRCD-ERRCD (2)     TO  ORDER-ERRCD2
       *
            MOVE    1                   TO  ORDER-STATUS
       *
@@ -1435,7 +1440,15 @@
       *****************************************************************
        800-MCNDATE-SEC         SECTION.
       *
-           CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
+           INITIALIZE              ORCSMCNDATEAREA
+                                   SMCNDATE-TIME
+      *
+           MOVE    SPACE           TO      WRK-DATE
+           MOVE    "20"            TO      WRK-DATEYY
+           ACCEPT  WRK-DATEYYMMDD  FROM    DATE
+           MOVE    WRK-DATE        TO      SMCNDATE-YMD
+      *
+           ACCEPT  SMCNDATE-TIME   FROM    TIME
       *
            .
       *

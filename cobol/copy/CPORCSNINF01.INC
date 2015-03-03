@@ -116,3 +116,7 @@
                       09   SNINF01-TEIKIKBN-LBL     PIC X(20).
                       09   SNINF01-TEIKIKBN-DATA    PIC X(01).
                       09   SNINF01-TEIKIKBN-NAME    PIC X(20).
+                  07  SNINF01-DISPKBN-G.
+                      09   SNINF01-DISPKBN-LBL      PIC X(20).
+                      09   SNINF01-DISPKBN-DATA     PIC X(01).
+                      09   SNINF01-DISPKBN-NAME     PIC X(20).

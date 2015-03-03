@@ -76,7 +76,7 @@ path	key4 	{
 		WHERE  HOSPNUM        = :HOSPNUM
 		AND    KARTE_KEY     = :KARTE_KEY
 		AND    ORDERNUM      = :ORDERNUM
-		ORDER  BY  ITEMID,ITEMNUM
+		ORDER  BY  ITEMNUM
 		;
 	};
 };

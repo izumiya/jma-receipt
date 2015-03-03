@@ -35,6 +35,7 @@
               05  HSPTINFMREQ-BTUNUM            PIC X(2).
               05  HSPTINFMREQ-BRMNUM            PIC X(6).
               05  HSPTINFMREQ-SAGAKU            PIC X(7).
+              05  HSPTINFMREQ-SENTEIKBN         PIC X(1).
               05  HSPTINFMREQ-SRYKA             PIC X(2).
               05  HSPTINFMREQ-SHOKAIYMD         PIC X(10).
               05  HSPTINFMREQ-KAIGOKBN          PIC X(1).
@@ -60,4 +61,8 @@
                       11  HSPTINFMREQ-KTEKSTYMD PIC X(10).
                       11  HSPTINFMREQ-KTEKEDYMD PIC X(10).
               05  HSPTINFMREQ-KHNCD             PIC X(9).
+              05  HSPTINFMREQ-TOKHIGAITOKBN     PIC X(1).
+              05  HSPTINFMREQ-NACCTKBN          PIC X(1).
+              05  HSPTINFMREQ-KSNCD             PIC X(9) OCCURS 3.
               05  HSPTINFMREQ-TEIKIKBN          PIC X(1).
+              05  HSPTINFMREQ-DISPKBN           PIC X(1).
