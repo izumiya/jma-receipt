@@ -36,7 +36,7 @@
                05  SODR-DRCD               PIC X(05).
                05  SODR-ORDERID            PIC X(04).
                05  SODR-UKEYMD             PIC X(08).
-               05  SODR-UKEHMS             PIC X(06).
+               05  SODR-UKEHMS             PIC X(08).
                05  SODR-PROCKBN            PIC X(01).
                05  SODR-KEYGENERATE        PIC 9(01).
                05  SODR-INF-DIALOG         PIC 9(02).

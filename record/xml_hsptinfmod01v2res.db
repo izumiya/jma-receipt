@@ -103,6 +103,11 @@ xml_hsptinfmod01v2res {
 				Data			varchar(1);
 				Name			varchar(20);
 			};
+			Search_Function{
+				Label			varchar(30);
+				Data			varchar(1);
+				Name			varchar(20);
+			};
 		};
 	};
 };

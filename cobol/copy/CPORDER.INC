@@ -35,7 +35,7 @@
            03  ORDER-HKNCOMBI          PIC X(04).
            03  ORDER-ORDERID           PIC X(04).
            03  ORDER-UKEYMD            PIC X(08).
-           03  ORDER-UKEHMS            PIC X(06).
+           03  ORDER-UKEHMS            PIC X(08).
            03  ORDER-ERRCD1            PIC X(04).
            03  ORDER-ERRCD2            PIC X(04).
            03  ORDER-STATUS            PIC 9(01).
@@ -50,3 +50,8 @@
            03  ORDER-UPHMS             PIC X(06).
            03  ORDER-SELSTUKEYMD       PIC X(08).
            03  ORDER-SELEDUKEYMD       PIC X(08).
+           03  ORDER-SELSTATUS         PIC X(01).
+           03  ORDER-SELLIMIT          PIC 9(05).
+           03  ORDER-SELOFFSET         PIC 9(05).
+           03  ORDER-SELSORT           PIC X(02).
+           03  ORDER-SELNUMBER         PIC 9(08).

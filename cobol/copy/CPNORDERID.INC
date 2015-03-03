@@ -87,7 +87,7 @@
                    07  NORDERID-ALLDELNYUINMES1 PIC X(30)
                                            VALUE "入院取消（会計含む）".
                    07  NORDERID-ALLDELNYUINMES2 PIC X(20)
-                                           VALUE "入院・会計取消".
+                                           VALUE "入院取消（会計含む）".
       *
                05  NORDERID-NYUIN2-G.
                    07  NORDERID-NYUIN2CL1       PIC X(02) VALUE "XX".
@@ -203,16 +203,16 @@
                    07  NORDERID-FNORLCL2   PIC X(03) VALUE "009".
                    07  NORDERID-FNORLID    PIC X(04) VALUE "0301".
                    07  NORDERID-FNORLMES1  PIC X(30)
-                                           VALUE "食事療養のみ".
+                                           VALUE "一般食".
                    07  NORDERID-FNORLMES2  PIC X(20)
-                                           VALUE "食事療養のみ".
+                                           VALUE "一般食".
       *
                05  NORDERID-FSPCL-G.
                    07  NORDERID-FSPCLCL1   PIC X(02) VALUE "02".
                    07  NORDERID-FSPCLCL2   PIC X(03) VALUE "010".
                    07  NORDERID-FSPCLID    PIC X(04) VALUE "0302".
                    07  NORDERID-FSPCLMES1  PIC X(30)
-                                           VALUE "食事療養＋特食".
+                                           VALUE "特別食".
                    07  NORDERID-FSPCLMES2  PIC X(20) VALUE "特別食".
       *
                05  NORDERID-FSELE-G.
@@ -220,7 +220,7 @@
                    07  NORDERID-FSELECL2   PIC X(03) VALUE "011".
                    07  NORDERID-FSELEID    PIC X(04) VALUE "0303".
                    07  NORDERID-FSELEMES1  PIC X(30)
-                                           VALUE "食事療養＋選択食".
+                                           VALUE "選択食".
                    07  NORDERID-FSELEMES2  PIC X(20) VALUE "選択食".
       *
                05  NORDERID-FSPSL-G.
@@ -228,9 +228,9 @@
                    07  NORDERID-FSPSLCL2   PIC X(03) VALUE "013".
                    07  NORDERID-FSPSLID    PIC X(04) VALUE "0304".
                    07  NORDERID-FSPSLMES1  PIC X(30)
-                                       VALUE "食事療養＋特食＋選択食".
+                                       VALUE "特別食＋選択食".
                    07  NORDERID-FSPSLMES2  PIC X(20)
-                                       VALUE "特食＋選択食".
+                                       VALUE "特別食＋選択食".
       *
                05  NORDERID-FSTOP-G.
                    07  NORDERID-FSTOPCL1   PIC X(02) VALUE "02".

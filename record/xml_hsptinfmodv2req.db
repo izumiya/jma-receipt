@@ -14,6 +14,7 @@ xml_hsptinfmodv2req {
 		Ward_Number			varchar(02);
 		Room_Number			varchar(06);
 		Room_Charge			varchar(07);
+		Over180days_Hospital_Stay varchar(01);
 		Department_Code		varchar(02);
 		Last_Admission_Date	varchar(10);
 		From_Nursing_Care	varchar(01);
@@ -40,7 +41,10 @@ xml_hsptinfmodv2req {
 			}[4];
 		};
 		Hospital_Charge						varchar(09);
+		Hospital_Charge_NotApplicable		varchar(01);
+		Editing_Hospital_Charge				varchar(01);
+		Additional_Hospital_Charge			varchar(09)[3];
 		Recurring_Billing					varchar(01);
+		Search_Function						varchar(01);
 	};
 };
-

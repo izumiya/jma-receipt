@@ -97,7 +97,6 @@
            COPY    "CPORCSGDAY.INC".
       *
            COPY    "MCPDATA.INC".
-           COPY    "MCPAREA".
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -111,6 +110,7 @@
            02  LNK-ODRITEM-OCC         OCCURS   30.
            COPY    "CPODRITEM.INC"     REPLACING  //ODRITEM-//
                                        BY         //LNK-ODRITEM-//.
+           COPY    "MCPAREA".
            COPY    "COMMON-SPA".
       *
       ******************************************************************
@@ -119,6 +119,7 @@
                                        USING
                                                SODR-AREA
                                                LNK-ODRITEM-REC
+                                               MCPAREA
                                                SPA-AREA.
       *
       *****************************************************************

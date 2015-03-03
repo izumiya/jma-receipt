@@ -59,7 +59,7 @@
                03  BD009-PTNUM     PIC X(20).
                03  BD009-PTID      PIC 9(10).
                03  BD009-SRYYMD    PIC X(08).
-               03  BD009-UKEHMS    PIC X(06).
+               03  BD009-UKEHMS    PIC X(08).
                03  BD009-KARTE-KEY PIC X(36).
                03  BD009-ORDERNUM  PIC 9(02).
            02  BD009-NAME          PIC X(100).
@@ -117,6 +117,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDP                 PIC 9(05).
            03  IDX                 PIC 9(05).
            03  IDY                 PIC 9(05).
            03  IDZ                 PIC 9(05).
@@ -583,20 +584,21 @@
       *
       *    異動内容セット
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >   15
+                   UNTIL   IDX     >   NORDERID-MAX
                IF      NORDERID-ORCAID(IDX)    =   BD009-ORDER-ORDERID
                    MOVE    NORDERID-ORCAMES2(IDX)
                                        TO  HCM45-IDONAIYO(CNT-LINE)
-                   MOVE    15          TO  IDX
+                   MOVE    NORDERID-MAX
+                                       TO  IDX
                END-IF
            END-PERFORM
       *
       *    状態セット
            EVALUATE    BD009-ORDER-STATUS
                WHEN    1
-                   MOVE    "重"        TO  HCM45-JYOTAI(CNT-LINE)
+                   MOVE    "エラー"    TO  HCM45-JYOTAI(CNT-LINE)
                WHEN    2
-                   MOVE    "有"        TO  HCM45-JYOTAI(CNT-LINE)
+                   MOVE    "エラー"    TO  HCM45-JYOTAI(CNT-LINE)
                WHEN    3
                    MOVE    "削除"      TO  HCM45-JYOTAI(CNT-LINE)
                WHEN    4
@@ -614,17 +616,21 @@
                                            SPA-AREA
       *        エラー内容作業領域にセット
                MOVE    SPACE           TO  WRK-ITEM
+               MOVE    1               TO  IDP
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL   IDX     >   BD009S-ERR-CNT
                        OR      IDX     >=  100
-                   STRING  WRK-ITEM            DELIMITED  BY  SPACE
+                   STRING  " "                 DELIMITED  BY  SIZE
+                           BD009S-ERRCD (IDX)  DELIMITED  BY  SPACE
+                           " "                 DELIMITED  BY  SIZE
                            BD009S-ERRMES(IDX)  DELIMITED  BY  SPACE
-                                       INTO    WRK-ITEM
+                   INTO    WRK-ITEM
+                   WITH    POINTER     IDP
                    END-STRING
                    IF      IDX     <   BD009S-ERR-CNT
-                       STRING  WRK-ITEM        DELIMITED  BY  SPACE
-                               "／"            DELIMITED  BY  SIZE
-                                       INTO    WRK-ITEM
+                       STRING  "／"            DELIMITED  BY  SIZE
+                       INTO    WRK-ITEM
+                       WITH    POINTER     IDP
                        END-STRING
                    END-IF
                END-PERFORM

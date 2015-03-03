@@ -102,12 +102,15 @@
            03  WRK-KJNYMD              PIC X(08).
       *
        01  REG-AREA.
+           03  REG-ORDERID             PIC X(04).
+           03  REG-SRYYMD              PIC X(08).
            03  REG-SAVEREQ             PIC X(01).
            03  REG-REQNUM              PIC X(02).
            03  REG-NYUINYMD            PIC X(08).
            03  REG-IDOYMD              PIC X(08).
            03  REG-BTUNUM              PIC X(02).
            03  REG-BRMNUM              PIC X(06).
+           03  REG-SENTEIKBN           PIC X(01).
            03  REG-SRYKA               PIC X(02).
            03  REG-SAGAKU              PIC X(07).
            03  REG-SAGAKUCD            PIC X(02).
@@ -118,7 +121,12 @@
            03  REG-HKNCOMBI            PIC X(04).
            03  REG-KHNCD               PIC X(09).
            03  REG-NYUINRYOCD          PIC X(03).
+           03  REG-TOKHIGAITOKBN       PIC X(01).
+           03  REG-NACCTKBN            PIC X(01).
+           03  REG-KSNCD               PIC X(09)
+                                       OCCURS   3.
            03  REG-TEIKIKBN            PIC X(01).
+           03  REG-DISPKBN             PIC X(01).
            03  REG-TAIINYMD            PIC X(08).
            03  REG-TENNYUYMD           PIC X(08).
            03  REG-TAIINCD             PIC X(02).
@@ -147,6 +155,10 @@
        01  TRRK-REC.
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //TRRK-//.
+      *
+       01  TODR-REC.
+           COPY  "CPORDER.INC"         REPLACING  //ORDER-//
+                                       BY         //TODR-//.
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -275,6 +287,7 @@
            INITIALIZE                  REG-AREA
            INITIALIZE                  SPA-AREA
            INITIALIZE                  TRRK-REC
+           INITIALIZE                  TODR-REC
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -282,6 +295,10 @@
       *    主処理
            IF    ( REG-ERR-MAX         =   ZERO )
                PERFORM 200-MAIN-SEC
+           ELSE
+               IF    ( REG-SAVEREQ     =   "1" )
+                   PERFORM 290-ORDER-INSERT-SEC
+               END-IF
            END-IF
       *
       *    返却領域編集
@@ -363,22 +380,59 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
+           PERFORM 1001-INIT-CHECK-SEC
+      *
            EVALUATE    HSPTINFMREQ-REQNUM
            WHEN    "01"
                PERFORM 1001-NYUIN-SEC
+               MOVE    NORDERID-NYUINID    TO  REG-ORDERID
+               MOVE    REG-NYUINYMD        TO  REG-SRYYMD
+      *
            WHEN    "02"
                PERFORM 1001-TAIIN-SEC
+               MOVE    NORDERID-TAIINID    TO  REG-ORDERID
+               MOVE    REG-TAIINYMD        TO  REG-SRYYMD
+      *
            WHEN    "03"
                PERFORM 1001-HENKO-SEC
+               MOVE    NORDERID-HENKOID    TO  REG-ORDERID
+               IF    ( TRRK-TENNYUYMD      =   SPACE )
+                   MOVE    "99999999"      TO  TRRK-TENNYUYMD
+               END-IF
+               MOVE    TRRK-TENNYUYMD      TO  REG-SRYYMD
+      *
            WHEN    "05"
            WHEN    "06"
                PERFORM 1001-NYUIN-TORIKESHI-SEC
+               IF    ( HSPTINFMREQ-REQNUM  =   "05" )
+                   MOVE    NORDERID-DELNYUINID     TO  REG-ORDERID
+               ELSE
+                   MOVE    NORDERID-ALLDELNYUINID  TO  REG-ORDERID
+               END-IF
+               MOVE    REG-NYUINYMD        TO  REG-SRYYMD
+      *
            WHEN    "07"
                PERFORM 1001-TAIIN-TORIKESHI-SEC
+               MOVE    NORDERID-CANTAIINID
+                                           TO  REG-ORDERID
+               IF    ( TRRK-TAIINYMD       =   SPACE )
+                   MOVE    "99999999"      TO  REG-SRYYMD
+               END-IF
+               MOVE    TRRK-TAIINYMD       TO  REG-SRYYMD
+      *
            WHEN    "08"
                PERFORM 1001-IDO-SEC
+               MOVE    NORDERID-IDOALLID   TO  REG-ORDERID
+               MOVE    REG-IDOYMD          TO  REG-SRYYMD
+      *
            WHEN    "09"
                PERFORM 1001-IDO-TORIKESHI-SEC
+               MOVE    NORDERID-CANIDOID   TO  REG-ORDERID
+               IF    ( TRRK-TENNYUYMD      =   SPACE )
+                   MOVE    "99999999"      TO  TRRK-TENNYUYMD
+               END-IF
+               MOVE    TRRK-TENNYUYMD      TO  REG-SRYYMD
+      *
            WHEN    OTHER
                MOVE    "8003"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
@@ -393,9 +447,9 @@
       *****************************************************************
        1001-INIT-CHECK-SEC         SECTION.
       *
-           MOVE    HSPTINFMREQ-SAVEREQ  TO  REG-SAVEREQ
+           MOVE    HSPTINFMREQ-SAVEREQ TO  REG-SAVEREQ
       *
-           MOVE   HSPTINFMREQ-REQNUM   TO  REG-REQNUM
+           MOVE    HSPTINFMREQ-REQNUM  TO  REG-REQNUM
       *
            PERFORM 10011-PTNUM-CHECK-SEC
       *
@@ -514,13 +568,14 @@
       *****************************************************************
        1001-NYUIN-SEC                  SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
-      *
            MOVE    HSPTINFMREQ-BTUNUM  TO  REG-BTUNUM
       *
            MOVE    HSPTINFMREQ-BRMNUM  TO  REG-BRMNUM
       *
            PERFORM 10011-SAGAKU-CHECK-SEC
+      *
+           MOVE    HSPTINFMREQ-SENTEIKBN
+                                       TO  REG-SENTEIKBN
       *
            PERFORM VARYING  IDX0    FROM   1   BY  1
                   UNTIL  ( IDX0    >   3 )
@@ -544,7 +599,19 @@
                PERFORM 10011-KHNCD-CHECK-SEC
            END-IF
       *
+           MOVE    HSPTINFMREQ-TOKHIGAITOKBN
+                                       TO  REG-TOKHIGAITOKBN
+           MOVE    HSPTINFMREQ-NACCTKBN
+                                       TO  REG-NACCTKBN
+      *
+           PERFORM VARYING  IDX0    FROM   1   BY  1
+                  UNTIL  ( IDX0    >   3 )
+               MOVE    HSPTINFMREQ-KSNCD (IDX0)
+                                       TO  REG-KSNCD (IDX0)
+           END-PERFORM
+      *
            MOVE    HSPTINFMREQ-TEIKIKBN TO REG-TEIKIKBN
+           MOVE    HSPTINFMREQ-DISPKBN TO  REG-DISPKBN
       *
            .
        1001-NYUIN-EXT.
@@ -554,7 +621,6 @@
       *****************************************************************
        1001-TAIIN-SEC                  SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
       *
            PERFORM 10011-TAIINYMD-CHECK-SEC
       *
@@ -568,7 +634,6 @@
       *****************************************************************
        1001-HENKO-SEC                  SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
       *
            PERFORM VARYING  IDX0    FROM   1   BY  1
                   UNTIL  ( IDX0    >   3 )
@@ -577,6 +642,7 @@
            END-PERFORM
       *
            MOVE    HSPTINFMREQ-TEIKIKBN TO REG-TEIKIKBN
+           MOVE    HSPTINFMREQ-DISPKBN TO  REG-DISPKBN
       *
            .
        1001-HENKO-EXT.
@@ -586,7 +652,6 @@
       *****************************************************************
        1001-NYUIN-TORIKESHI-SEC        SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
       *
            .
        1001-NYUIN-TORIKESHI-EXT.
@@ -596,7 +661,6 @@
       *****************************************************************
        1001-TAIIN-TORIKESHI-SEC        SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
       *
            .
        1001-TAIIN-TORIKESHI-EXT.
@@ -605,10 +669,6 @@
       *    電文項目退避処理（転科転棟転室時）
       *****************************************************************
        1001-IDO-SEC                    SECTION.
-      *
-           PERFORM 1001-INIT-CHECK-SEC
-      *
-           MOVE    HSPTINFMREQ-SAVEREQ  TO  REG-SAVEREQ
       *
            PERFORM 10011-PTNUM-CHECK-SEC
       *
@@ -619,6 +679,9 @@
            MOVE    HSPTINFMREQ-BRMNUM   TO  REG-BRMNUM
       *
            PERFORM 10011-SAGAKU-CHECK-SEC
+      *
+           MOVE    HSPTINFMREQ-SENTEIKBN
+                                       TO  REG-SENTEIKBN
       *
            PERFORM VARYING  IDX0    FROM   1   BY  1
                   UNTIL  ( IDX0    >   3 )
@@ -635,6 +698,17 @@
                PERFORM 10011-KHNCD-CHECK-SEC
            END-IF
       *
+           MOVE    HSPTINFMREQ-TOKHIGAITOKBN
+                                       TO  REG-TOKHIGAITOKBN
+           MOVE    HSPTINFMREQ-NACCTKBN
+                                       TO  REG-NACCTKBN
+      *
+           PERFORM VARYING  IDX0    FROM   1   BY  1
+                  UNTIL  ( IDX0    >   3 )
+               MOVE    HSPTINFMREQ-KSNCD (IDX0)
+                                       TO  REG-KSNCD (IDX0)
+           END-PERFORM
+      *
            .
        1001-IDO-EXT.
            EXIT.
@@ -643,7 +717,6 @@
       *****************************************************************
        1001-IDO-TORIKESHI-SEC          SECTION.
       *
-           PERFORM 1001-INIT-CHECK-SEC
       *
            .
        1001-IDO-TORIKESHI-EXT.
@@ -758,7 +831,26 @@
       *****************************************************************
        10011-KHNCD-CHECK-SEC           SECTION.
       *
-           PERFORM 900-NYUINCDCHG-KEY2-SEL-SEC
+           PERFORM 100111-KHNCD-CHECK-SEC
+      *
+           .
+       10011-KHNCD-CHECK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料チェック処理
+      *****************************************************************
+       100111-KHNCD-CHECK-SEC           SECTION.
+      *
+           IF    ( HSPTINFMREQ-KHNCD (1:1) =   "4" )
+            AND  ( HSPTINFMREQ-KHNCD (4:)  =   SPACE )
+               INITIALIZE                  NYUINCDCHG-REC
+               MOVE    HSPTINFMREQ-KHNCD
+                                       TO  NYUINCDCHG-NYUINRYOCD
+      *        ダミーのコードを設定
+               MOVE    "188000000"     TO  NYUINCDCHG-SRYCD-AF
+           ELSE
+               PERFORM 900-NYUINCDCHG-KEY2-SEL-SEC
+           END-IF
       *
            INITIALIZE                      SNYUINRYO-AREA
            MOVE    WRK-KJNYMD          TO  SNYUINRYO-SRYYMD
@@ -798,7 +890,7 @@
            END-IF
       *
            .
-       10011-KHNCD-CHECK-EXT.
+       100111-KHNCD-CHECK-EXT.
            EXIT.
       *****************************************************************
       *    退院日チェック処理
@@ -894,9 +986,6 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-NYUINYMD        TO  SODR-SRYYMD
-           MOVE    NORDERID-NYUIN2ID   TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -917,6 +1006,12 @@
                END-IF
            END-IF
       *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-SENTEIKBN     NOT =   SPACE )
+                   PERFORM 2300-SENTEIKBN-SET-SEC
+               END-IF
+           END-IF
+      *
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL ( IDX2    >   3 )
                IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -931,6 +1026,13 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-TOKHIGAITOKBN
+                                         NOT =   SPACE )
+                   PERFORM 2300-TOKHIGAITOKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                PERFORM 2300-NYUINKA-SET-SEC
            END-IF
       *
@@ -939,8 +1041,29 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-NACCTKBN        NOT =   SPACE )
+                   PERFORM 2300-NACCTKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   3 )
+               IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+                   IF    ( REG-KSNCD (IDX2)  NOT =   SPACE )
+                       PERFORM 2300-KSNCD-SET-SEC
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                IF    ( REG-TEIKIKBN      NOT =   SPACE )
                    PERFORM 2300-TEIKIKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-DISPKBN        NOT =   SPACE )
+                   PERFORM 2300-DISPKBN-SET-SEC
                END-IF
            END-IF
       *
@@ -954,6 +1077,7 @@
       *
            CALL   "ORCSODR01"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -976,9 +1100,6 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-TAIINYMD        TO  SODR-SRYYMD
-           MOVE    NORDERID-TAIIN2ID   TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -989,6 +1110,7 @@
       *
            CALL   "ORCSODR02"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1011,9 +1133,6 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    TRRK-TENNYUYMD      TO  SODR-SRYYMD
-           MOVE    NORDERID-HENKOID    TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            PERFORM VARYING IDX2    FROM    1   BY  1
@@ -1029,10 +1148,17 @@
                END-IF
            END-IF
       *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-DISPKBN        NOT =   SPACE )
+                   PERFORM 2300-DISPKBN-SET-SEC
+               END-IF
+           END-IF
+      *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
       *
            CALL   "ORCSODR05"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1055,21 +1181,13 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    SPA-SYSYMD          TO  SODR-SRYYMD
-           IF    ( REG-REQNUM          =   "05" )
-               MOVE    NORDERID-CANNYUINID
-                                       TO  SODR-ORDERID
-           ELSE
-               MOVE    NORDERID-ALLCANNYUINID
-                                       TO  SODR-ORDERID
-           END-IF
-      *
-           MOVE    ZERO                TO  IDX-ITM
+           MOVE    ZERO            TO  IDX-ITM
       *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
       *
            CALL   "ORCSODR07"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1092,16 +1210,13 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    SPA-SYSYMD          TO  SODR-SRYYMD
-           MOVE    NORDERID-CANTAIINID
-                                       TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
       *
            CALL   "ORCSODR08"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1124,9 +1239,6 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-IDOYMD          TO  SODR-SRYYMD
-           MOVE    NORDERID-IDOALLID   TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -1143,6 +1255,13 @@
                END-IF
            END-IF
       *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-SENTEIKBN     =   SPACE )
+                   MOVE    TRRK-SENTEIKBN    TO  REG-SENTEIKBN
+               END-IF
+               PERFORM 2300-SENTEIKBN-SET-SEC
+           END-IF
+      *
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL ( IDX2    >   3 )
                IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -1157,6 +1276,13 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-TOKHIGAITOKBN     =   SPACE )
+                   MOVE    "0"           TO  REG-TOKHIGAITOKBN
+               END-IF
+               PERFORM 2300-TOKHIGAITOKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                PERFORM 2300-NYUINKA-SET-SEC
            END-IF
       *
@@ -1164,10 +1290,27 @@
                PERFORM 2300-HKNCOMBI-SET-SEC
            END-IF
       *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-NACCTKBN          =   SPACE )
+                   MOVE    TRRK-NYUCALKBN TO REG-NACCTKBN
+               END-IF
+               PERFORM 2300-NACCTKBN-SET-SEC
+           END-IF
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   3 )
+               IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+                   IF    ( REG-KSNCD (IDX2)  NOT =   SPACE )
+                       PERFORM 2300-KSNCD-SET-SEC
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
       *
            CALL   "ORCSODR06"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1190,15 +1333,13 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    SPA-SYSYMD          TO  SODR-SRYYMD
-           MOVE    NORDERID-CANIDOID   TO  SODR-ORDERID
-      *
            MOVE    ZERO                TO  IDX-ITM
       *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
       *
            CALL   "ORCSODR09"      USING   SODR-AREA
                                            LNK-ODRITEM-REC
+                                           MCPAREA
                                            SPA-AREA
            EVALUATE    TRUE
            WHEN  ( SODR-RC         =   ZERO )
@@ -1274,6 +1415,20 @@
        2300-SAGAKU-SET-EXT.
            EXIT.
       *****************************************************************
+      *    選定入院設定処理
+      *****************************************************************
+       2300-SENTEIKBN-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-SENTEIKBNJMA 
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-SENTEIKBN       TO  LNK-ODRITEM-ITEM (IDX-ITM)
+      *
+           .
+       2300-SENTEIKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    担当医設定処理
       *****************************************************************
        2300-DR-SET-SEC                 SECTION.
@@ -1305,6 +1460,7 @@
       *
            MOVE    NCLAIMID-TOKNYUINJMA TO  LNK-ODRITEM-ITEMID (IDX-ITM)
            MOVE    REG-NYUINRYOCD       TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    REG-KHNCD            TO  LNK-ODRITEM-MEMO (IDX-ITM)
       *
            .
        2300-TOKNYUIN-SET-EXT.
@@ -1337,6 +1493,34 @@
        2300-HKNCOMBI-SET-EXT.
            EXIT.
       *****************************************************************
+      *    入院会計設定処理
+      *****************************************************************
+       2300-NACCTKBN-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-NACCTKBNJMA 
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-NACCTKBN       TO  LNK-ODRITEM-ITEM (IDX-ITM)
+      *
+           .
+       2300-NACCTKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院加算設定処理
+      *****************************************************************
+       2300-KSNCD-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-KSNCDJMA
+                                      TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-KSNCD (IDX2)   TO  LNK-ODRITEM-ITEM   (IDX-ITM)
+      *
+           .
+       2300-KSNCD-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    定期請求区分設定処理
       *****************************************************************
        2300-TEIKIKBN-SET-SEC           SECTION.
@@ -1349,6 +1533,20 @@
       *
            .
        2300-TEIKIKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    検索時患者表示設定処理
+      *****************************************************************
+       2300-DISPKBN-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-DISPKBNJMA 
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-DISPKBN         TO  LNK-ODRITEM-ITEM (IDX-ITM)
+      *
+           .
+       2300-DISPKBN-SET-EXT.
            EXIT.
       *****************************************************************
       *    介護区分区分設定処理
@@ -1378,6 +1576,20 @@
        2300-TAIINCD-SET-EXT.
            EXIT.
       *****************************************************************
+      *    算定要件非該当区分設定処理
+      *****************************************************************
+       2300-TOKHIGAITOKBN-SET-SEC           SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-TOKHIGAITOKBNJMA
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-TOKHIGAITOKBN   TO  LNK-ODRITEM-ITEM (IDX-ITM)
+      *
+           .
+       2300-TOKHIGAITOKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    共通項目設定処理
       *****************************************************************
        2300-SODR-COMMON-SET-SEC       SECTION.
@@ -1397,7 +1609,7 @@
            ELSE
                MOVE    "2"             TO  SODR-PROCKBN
            END-IF
-           MOVE    1                   TO  SODR-KEYGENERATE
+           MOVE    2                   TO  SODR-KEYGENERATE
            MOVE    99                  TO  SODR-INF-DIALOG
            MOVE    REG-KHNCD           TO  SODR-KHNSRYCD
            MOVE    "1"                 TO  SODR-SRCKBN
@@ -1406,6 +1618,9 @@
            MOVE    SPA-OPID            TO  SODR-OPID(5:)
            MOVE    SMCNDATE-YMD        TO  SODR-UPYMD
            MOVE    SMCNDATE-HMS        TO  SODR-UPHMS
+      *
+           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
+           MOVE    REG-ORDERID         TO  SODR-ORDERID
       *
            .
        2300-SODR-COMMON-SET-EXT.
@@ -1594,6 +1809,12 @@
                                    TO HSPTINFM01RES-TEIKIKBN-DATA
            MOVE    SNINF01-TEIKIKBN-NAME (IDXA)
                                    TO HSPTINFM01RES-TEIKIKBN-NAME
+           MOVE    SNINF01-DISPKBN-LBL (IDXA)
+                                   TO HSPTINFM01RES-DISPKBN-LBL
+           MOVE    SNINF01-DISPKBN-DATA (IDXA)
+                                   TO HSPTINFM01RES-DISPKBN-DATA
+           MOVE    SNINF01-DISPKBN-NAME (IDXA)
+                                   TO HSPTINFM01RES-DISPKBN-NAME
       *
            .
        2001-RESPONSE-EDIT-EXT.
@@ -1748,6 +1969,45 @@
       *
            .
        2003-RESPONSE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    オーダー追加処理
+      *****************************************************************
+       290-ORDER-INSERT-SEC          SECTION.
+      *
+           INITIALIZE                      ORDER-REC
+           MOVE    SPA-HOSPNUM         TO  ORDER-HOSPNUM
+           MOVE    SUID-UID            TO  ORDER-KARTE-KEY
+           MOVE    1                   TO  ORDER-ORDERNUM
+           MOVE    "1"                 TO  ORDER-NYUGAIKBN
+           MOVE    SPA-PTNUM           TO  ORDER-PTNUM
+           MOVE    SPA-PTID            TO  ORDER-PTID
+           MOVE    REG-SRYYMD          TO  ORDER-SRYYMD
+           MOVE    REG-HKNCOMBI        TO  ORDER-HKNCOMBI
+           MOVE    SMCNDATE-YMD        TO  ORDER-UKEYMD
+           MOVE    SMCNDATE-HMS        TO  ORDER-UKEHMS
+           MOVE    REG-ORDERID         TO  ORDER-ORDERID
+      *
+           MOVE    REG-ERRCD (1)       TO  ORDER-ERRCD1
+      *    MOVE    REG-ERRCD (2)       TO  ORDER-ERRCD2
+      *
+           MOVE    1                   TO  ORDER-STATUS
+      *
+           MOVE    2                   TO  ORDER-KEYGENERATE
+           MOVE    SPACE               TO  ORDER-TERMID
+           MOVE    "api_"              TO  ORDER-OPID
+           MOVE    SPA-OPID            TO  ORDER-OPID(5:)
+           MOVE    SMCNDATE-YMD        TO  ORDER-CREYMD
+                                           ORDER-UPYMD
+           MOVE    SMCNDATE-YMD        TO  ORDER-UPHMS
+      *
+           MOVE    ORDER-REC           TO  MCPDATA-REC
+           MOVE    "tbl_order"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       290-ORDER-INSERT-EXT.
            EXIT.
       *****************************************************************
       *    終了処理
@@ -2431,6 +2691,21 @@
            .
       *
        910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＩＮＳＥＲＴ処理
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
            EXIT.
       *****************************************************************
       *    ＸＭＬオープン処理

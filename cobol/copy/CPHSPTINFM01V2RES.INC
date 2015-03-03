@@ -112,3 +112,7 @@
                           11   HSPTINFM01RES-TEIKIKBN-LBL     PIC X(20).
                           11   HSPTINFM01RES-TEIKIKBN-DATA    PIC X(01).
                           11   HSPTINFM01RES-TEIKIKBN-NAME    PIC X(20).
+                      09  HSPTINFM01RES-DISPKBN-G.
+                          11   HSPTINFM01RES-DISPKBN-LBL     PIC X(30).
+                          11   HSPTINFM01RES-DISPKBN-DATA    PIC X(01).
+                          11   HSPTINFM01RES-DISPKBN-NAME    PIC X(20).

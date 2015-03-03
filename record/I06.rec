@@ -1,6 +1,12 @@
 I06 {
   fixed6 {
+    B06 {
+      state int;
+    };
     B06S {
+      state int;
+    };
+    B07 {
       state int;
     };
     B07S {
@@ -9,6 +15,38 @@ I06 {
     B12 {
       state int;
     };
+    SELNUM {
+      numdata number(4);
+    };
+    SELUKEYMD {
+      textdata varchar(10);
+    };
+    SELIDOYMD {
+      textdata varchar(10);
+    };
+    SELPTNUM {
+      textdata varchar(20);
+    };
+    SELNAME {
+      style varchar(20);
+      textdata varchar(50);
+    };
+    CMB_SELSTS {
+      SELSTS {
+        textdata varchar(22);
+      };
+      count int;
+        item varchar(22)[5];
+    };
+    CMB_SELSORT {
+      SELSORT {
+        textdata varchar(53);
+      };
+      count int;
+        item varchar(53)[10];
+    };
+  	frame1 {
+  	fixed1 {
     PTNUM {
       textdata varchar(20);
     };
@@ -33,16 +71,13 @@ I06 {
     IDOJIYU {
       textdata varchar(30);
     };
-    LBL_MAEIDOMEI {
-      textdata varchar(12);
-    };
-    MAEIDOYMD {
+    HNYUINYMD {
       textdata varchar(10);
     };
-    SELNUM {
-      numdata number(3);
+    LBL_LASTIDOYMD {
+      textdata varchar(12);
     };
-    UKEYMD {
+    LASTIDOYMD {
       textdata varchar(10);
     };
     BRMNUM {
@@ -65,6 +100,15 @@ I06 {
       };
       count int;
         item varchar(23)[20];
+      state int;
+    };
+    CMB_SENTEIKBN {
+      SENTEIKBN {
+        textdata varchar(24);
+        state int;
+      };
+      count int;
+        item varchar(24)[10];
       state int;
     };
     NYUINYMD {
@@ -95,6 +139,15 @@ I06 {
     };
     LBL_SHONYUINYMD {
       textdata varchar(16);
+    };
+    CMB_KAIGOKBN {
+      KAIGOKBN {
+        textdata varchar(18);
+        state int;
+      };
+      count int;
+        item varchar(18)[5];
+      state int;
     };
     TAIINYMD {
       textdata varchar(10);
@@ -145,15 +198,6 @@ I06 {
         item varchar(51)[30];
       state int;
     };
-    CMB_NYUKBN {
-      NYUKBN {
-        textdata varchar(11);
-        state int;
-      };
-      count int;
-        item varchar(11)[2];
-      state int;
-    };
     LBL_TOKNYUIN {
       textdata varchar(10);
     };
@@ -166,8 +210,71 @@ I06 {
         item varchar(63)[100];
       state int;
     };
+    CMB_TOKHIGAITOKBN {
+      TOKHIGAITOKBN {
+        textdata varchar(30);
+        state int;
+      };
+      count int;
+        item varchar(30)[5];
+      state int;
+    };
     SNTNYUIN {
       textdata varchar(60);
+      state int;
+    };
+    CMB_NACCTKBN {
+      NACCTKBN {
+        textdata varchar(30);
+        state int;
+      };
+      count int;
+      item varchar(30)[5];
+      state int;
+    };
+    CMB_KSNCD01{
+      KSNCD01 {
+        textdata varchar(73);
+        state int;
+      };
+      count int;
+      item varchar(73)[20];
+      state int;
+    };
+    CMB_KSNCD02{
+      KSNCD02 {
+        textdata varchar(73);
+        state int;
+      };
+      count int;
+      item varchar(73)[20];
+      state int;
+    };
+    CMB_KSNCD03{
+      KSNCD03 {
+        textdata varchar(73);
+        state int;
+      };
+      count int;
+      item varchar(73)[20];
+      state int;
+    };
+    CMB_TEIKIKBN {
+      TEIKIKBN {
+        textdata varchar(24);
+        state int;
+      };
+      count int;
+      item varchar(24)[5];
+      state int;
+    };
+    CMB_DISPKBN {
+      DISPKBN {
+        textdata varchar(11);
+        state int;
+      };
+      count int;
+      item varchar(11)[5];
       state int;
     };
     CMB_SKJTIME {
@@ -183,39 +290,8 @@ I06 {
       textdata varchar(50);
       state int;
     };
-    scrolledwindow1 {
-      ALLIDOLST {
-        count int;
-        row int;
-        rowattr int;
-          item {
-            column1 varchar(4);
-            column2 varchar(10);
-            column3 varchar(20);
-            column4 varchar(20);
-            column5 varchar(100);
-            column6 varchar(4);
-          }[50];
-          selectdata bool[50];
-      };
-    };
-    scrolledwindow3 {
-      KJNIDOLST {
-        count int;
-        row int;
-        rowattr int;
-          item {
-            column1 varchar(4);
-            column2 varchar(10);
-            column3 varchar(10);
-            column4 varchar(20);
-            column5 varchar(4);
-          }[50];
-          selectdata bool[50];
-      };
-    };
     scrolledwindow4 {
-      ERRMESLST {
+      ERRMSGLST {
         count int;
         row int;
         rowattr int;
@@ -224,6 +300,42 @@ I06 {
             column2 varchar(100);
           }[20];
           selectdata bool[20];
+      };
+    };
+    };
+    };
+    scrolledwindow1 {
+      ALLIDOLST {
+        count int;
+        row int;
+        rowattr int;
+          item {
+            column1 varchar(4);
+            column2 varchar(20);
+            column3 varchar(10);
+            column4 varchar(20);
+            column5 varchar(50);
+            column6 varchar(10);
+            column7 varchar(4);
+            column8 varchar(15);
+          }[100];
+          selectdata bool[100];
+      };
+    };
+    scrolledwindow3 {
+      visible       bool;
+      PTIDOLST {
+        count int;
+        row int;
+        rowattr int;
+          item {
+            column1 varchar(4);
+            column2 varchar(10);
+            column3 varchar(20);
+            column4 varchar(10);
+            column5 varchar(15);
+          }[50];
+          selectdata bool[50];
       };
     };
   };
