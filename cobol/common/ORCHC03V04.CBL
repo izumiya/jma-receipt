@@ -106,6 +106,7 @@
            03  IDX-TBL             PIC 9(04).
       *H26.10
            03  IDXC                PIC 9(04).
+           03  IDX-CM              PIC 9(04).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -1848,8 +1849,12 @@
       *****************************************************************
        30050-COMMNT-CHK-SEC                  SECTION.
       *
+           MOVE    ZERO                TO  IDX-CM
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   ORCHC04SUB-TBL-MAX
+      *
+               MOVE    1                   TO  FLG-OK
       *
                IF     (ORCHC04SUB-SRYCD (IDX)(1:1) =   "8" )
                   OR  (ORCHC04SUB-SRYCD (IDX)(1:3) =   "008")
@@ -1869,26 +1874,26 @@
       *                ÂÐ¾Ý³°
                        IF     (ORCHC04SUB-H-ZAIHEN(IDX)
                                                    NOT =   "¡ö")
-                         AND  (ORCHC04SUB-H-TENSU(IDX - 1)
+                         AND  (ORCHC04SUB-H-TENSU (IDX-CM)
                                                        =   SPACE )
-                         AND  (ORCHC04SUB-H-KINGAKU(IDX - 1)
+                         AND  (ORCHC04SUB-H-KINGAKU(IDX-CM)
                                                        =   SPACE )
       *                    ºÞ¤ÎºÇ¸å
                            MOVE    ORCHC04SUB-H-KAISU (IDX)
                                                TO  ORCHC04SUB-H-KAISU
-                                                             (IDX - 1)
+                                                             (IDX-CM)
                            MOVE    ORCHC04SUB-H-TENSU (IDX)
                                                TO  ORCHC04SUB-H-TENSU
-                                                             (IDX - 1)
+                                                             (IDX-CM)
                            MOVE    ORCHC04SUB-H-KINGAKU (IDX)
                                                TO  ORCHC04SUB-H-KINGAKU
-                                                             (IDX - 1)
+                                                             (IDX-CM)
                            MOVE    ORCHC04SUB-H-ENKBN (IDX)
                                                TO  ORCHC04SUB-H-ENKBN
-                                                             (IDX - 1)
+                                                             (IDX-CM)
                            MOVE    ORCHC04SUB-ZAIEND (IDX)
                                                TO  ORCHC04SUB-ZAIEND
-                                                             (IDX - 1)
+                                                             (IDX-CM)
                        END-IF
                        IF     (ORCHC04SUB-H-ZAIHEN(IDX)
                                                        =   "¡ö")
@@ -1903,6 +1908,10 @@
                        END-IF
                        MOVE    "999999999"     TO ORCHC04SUB-SRYCD (IDX)
                    END-IF
+               END-IF
+      *
+               IF      FLG-OK              =   1
+                   MOVE    IDX             TO  IDX-CM
                END-IF
            END-PERFORM
            .
