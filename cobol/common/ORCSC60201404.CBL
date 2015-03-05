@@ -379,18 +379,10 @@
            03  FILLER          PIC X(12)  VALUE    "02 160068850".
       *    バリストカルジオグラフ（１方向）
            03  FILLER          PIC X(12)  VALUE    "02 160069050".
-      *    バリストカルジオグラフ（２方向以上）（H22.4から加算）
-      *??  03  FILLER          PIC X(12)  VALUE    "02 160069130".
-      *    ＥＣＧ１２(H14.3で終了）
-      *    03  FILLER          PIC X(12)  VALUE    "02 160704210".
-      *    ＥＣＧ（６誘導以上）(H14.3で終了）
-      *    03  FILLER          PIC X(12)  VALUE    "02 160704310".
-      *    ＶＤＧ(H14.3で終了）
-      *    03  FILLER          PIC X(12)  VALUE    "02 160708710".
-      *    体表ヒス束心電図(H14.3で終了）
-      *    03  FILLER          PIC X(12)  VALUE    "02 160708810".
       *    携帯型発作時心電図記憶伝送装置使用心電図
            03  FILLER          PIC X(12)  VALUE    "02 160150650".
+      *    加算平均心電図による心室遅延電位測定
+           03  FILLER          PIC X(12)  VALUE    "02 160198510".
       * 03(D209)
       *    ＥＣＧ負荷１２
            03  FILLER          PIC X(12)  VALUE    "03 160069210".
@@ -410,39 +402,6 @@
            03  FILLER          PIC X(12)  VALUE    "15 160069750".
       *    心外膜興奮伝播図
            03  FILLER          PIC X(12)  VALUE    "15 160069850".
-      *H20.3.31　で終了
-      *    ホルター型心電図(３０分まで）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128430".
-      *    ホルター型心電図(３０分超１時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128530".
-      *    ホルター型心電図(１時間超１時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128630".
-      *    ホルター型心電図(１時間３０分超２時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128730".
-      *    ホルター型心電図(２時間超１時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128830".
-      *    ホルター型心電図(２時間３０分超３時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160128930".
-      *    ホルター型心電図(３時間超３時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129030".
-      *    ホルター型心電図(３時間３０分超４時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129130".
-      *    ホルター型心電図(４時間超４時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129230".
-      *    ホルター型心電図(４時間３０分超５時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129330".
-      *    ホルター型心電図(５時間超５時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129430".
-      *    ホルター型心電図(５時間３０分超６時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129530".
-      *    ホルター型心電図(６時間超６時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129630".
-      *    ホルター型心電図(６時間３０分超７時間）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129730".
-      *    ホルター型心電図(７時間超７時間３０分）
-      *    03  FILLER          PIC X(12)  VALUE    "04 160129830".
-      *    ホルター型心電図(７時間３０分超８時間未満）
-      **   03  FILLER          PIC X(12)  VALUE    "04 160129930".
       * 05(D213)
       *    ＰＧＣ
            03  FILLER          PIC X(12)  VALUE    "05 160071910".
@@ -518,11 +477,11 @@
        01  TBL-KENSA-HOU-AREA-R    REDEFINES   TBL-KENSA-HOU-AREA.
       **** 03  TBL-KENSA-HOU-OCC       OCCURS  56  INDEXED  KEN-IDX.
       **** 03  TBL-KENSA-HOU-OCC       OCCURS  65  INDEXED  KEN-IDX.
-           03  TBL-KENSA-HOU-OCC       OCCURS  42  INDEXED  KEN-IDX.
+           03  TBL-KENSA-HOU-OCC       OCCURS  43  INDEXED  KEN-IDX.
                05  TBL-KEN-HOU         PIC X(02).
                05  TBL-FILLER          PIC X(01).
                05  TBL-KEN-SRYCD       PIC X(09).
-       01  KEN-IDX-MAX                 PIC 9(04)   VALUE   42.
+       01  KEN-IDX-MAX                 PIC 9(04)   VALUE   43.
       *
       *****************************************************************
       *    重複算定不可テーブル
