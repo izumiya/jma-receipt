@@ -2683,9 +2683,12 @@
                IF    ( ERR-ODRITEM-MAX   >=  CONST-ODRITEM-MAX )
                    CONTINUE
                ELSE
-                   COMPUTE ERR-ODRITEM-MAX =   ERR-ODRITEM-MAX   +   1
-                   MOVE    ODRITEM-REC TO  ERR-ODRITEM-OCC
+                   IF    ( ODRITEM-ERRCD   NOT =   SPACE )
+                    AND  ( ODRITEM-ERRCD   NOT =   CONST-ERRCD9001 )
+                       COMPUTE ERR-ODRITEM-MAX =   ERR-ODRITEM-MAX + 1
+                       MOVE    ODRITEM-REC TO  ERR-ODRITEM-OCC
                                                       (ERR-ODRITEM-MAX)
+                   END-IF
                END-IF
       *
                PERFORM 900-ODRITEM-KEY4-FET-SEC
@@ -2735,6 +2738,8 @@
                                             OR NORDERID-IDOALLID )
                MOVE    "1"         TO  SPA-NAI-INPUT-COMB-SRYKA
            END-IF
+      *
+           PERFORM 410111-INPUT-AREA-HEN-SEC
       *
            PERFORM 900-ODRITEM-KEY4-SEL-SEC
       *
@@ -2786,9 +2791,12 @@
                IF    ( ERR-ODRITEM-MAX      >=   CONST-ODRITEM-MAX )
                    CONTINUE
                ELSE
-                   COMPUTE ERR-ODRITEM-MAX   =   ERR-ODRITEM-MAX   +   1
-                   MOVE    ODRITEM-REC TO  ERR-ODRITEM-OCC
-                                                (ERR-ODRITEM-MAX)
+                   IF    ( ODRITEM-ERRCD   NOT =   SPACE )
+                    AND  ( ODRITEM-ERRCD   NOT =   CONST-ERRCD9001 )
+                       COMPUTE ERR-ODRITEM-MAX =   ERR-ODRITEM-MAX + 1
+                       MOVE    ODRITEM-REC TO  ERR-ODRITEM-OCC
+                                                      (ERR-ODRITEM-MAX)
+                   END-IF
                END-IF
       *
                PERFORM 900-ODRITEM-KEY4-FET-SEC
@@ -2815,13 +2823,12 @@
        41011-INPUT-AREA-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    入院時編集処理
+      *    入力領域編集処理
       *****************************************************************
-       410111-NYUIN-HEN-SEC            SECTION.
+       410111-INPUT-AREA-HEN-SEC       SECTION.
       *
-           COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
-      *
-           IF    ( CNT-ORDER   =  1 )
+           EVALUATE    WRK-ALLORDERID
+           WHEN    NORDERID-NYUINID
       *
                MOVE    ORDER-SRYYMD    TO  WRK-YMD
                PERFORM 800-SEIWA-HEN-SEC
@@ -2835,7 +2842,33 @@
                MOVE    "1"             TO  SPA-GMN-TEIKIKBN
                MOVE    "1"             TO  SPA-GMN-DISPKBN
       *
-           END-IF
+           WHEN    NORDERID-TAIINID
+               MOVE    ORDER-SRYYMD    TO  WRK-YMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-SYMD        TO  SPA-NAI-TAIINYMD
+               MOVE    WRK-HENYMDG     TO  SPA-GMN-TAIINYMD
+           WHEN    NORDERID-DELNYUINID
+           WHEN    NORDERID-ALLDELNYUINID
+               MOVE    ORDER-SRYYMD    TO  WRK-YMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-SYMD        TO  SPA-NAI-NYUINYMD
+               MOVE    WRK-HENYMDG     TO  SPA-GMN-NYUINYMD
+           WHEN    NORDERID-CANTAIINID
+               MOVE    ORDER-SRYYMD    TO  WRK-YMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-SYMD        TO  SPA-NAI-TAIINYMD
+               MOVE    WRK-HENYMDG     TO  SPA-GMN-TAIINYMD
+           END-EVALUATE
+      *
+           .
+       410111-INPUT-AREA-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院時編集処理
+      *****************************************************************
+       410111-NYUIN-HEN-SEC            SECTION.
+      *
+           COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
       *
            PERFORM 410111-INPUT-COMMON-HEN-SEC
       *
@@ -2891,13 +2924,6 @@
        410111-TAIIN-HEN-SEC            SECTION.
       *
            COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
-      *
-           IF    ( CNT-ORDER   =  1 )
-               MOVE    ORDER-SRYYMD    TO  WRK-YMD
-               PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-SYMD        TO  SPA-NAI-TAIINYMD
-               MOVE    WRK-HENYMDG     TO  SPA-GMN-TAIINYMD
-           END-IF
       *
            PERFORM 410111-INPUT-COMMON-HEN-SEC
       *
@@ -3070,15 +3096,6 @@
        410111-DELNYUIN-HEN-SEC         SECTION.
       *
            COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
-      *
-           IF    ( CNT-ORDER   =  1 )
-               IF    ( ORDER-KEYGENERATE   NOT =   2 )
-                   MOVE    ORDER-SRYYMD    TO  WRK-YMD
-                   PERFORM 800-SEIWA-HEN-SEC
-                   MOVE    WRK-SYMD        TO  SPA-NAI-NYUINYMD
-                   MOVE    WRK-HENYMDG     TO  SPA-GMN-NYUINYMD
-               END-IF
-           END-IF
       *
            PERFORM 410111-INPUT-COMMON-HEN-SEC
       *
