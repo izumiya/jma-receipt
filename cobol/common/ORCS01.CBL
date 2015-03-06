@@ -437,6 +437,7 @@
       *  04.07.23    NACL-門脇    15/01/26  平成２７年１月改正対応
       *                                     （都道府県独自難病対応）
       *  04.07.24    NACL-門脇    15/02/02  システム管理２０１０機能追加対応
+      *  04.07.25    NACL-門脇    15/03/04  東京都地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -11132,6 +11133,9 @@
                      IF   LNK-SYU-SRYYMD(1:6)  <= "201412"
                        MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
                      END-IF
+                     IF   COMB-KOHHKNNUM(IDX-CYO)  =  "588"
+                       MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                     END-IF
                    WHEN       26
                    WHEN       33
                        MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
@@ -19424,6 +19428,9 @@
                 OR ((LNK-SYU-KOH-HKNNUM(1) = "054"      ) AND
                     (LNK-SYU-SRYYMD(1:6)  >= "201501"   ))
                 OR ( WK-TOKATUKAI(1)       =   1         )
+                OR ((WK-1001-PREFNUM       =  13        ) AND
+                    (LNK-SYU-KOH-HKNNUM(1) =
+                     "183" OR "283" OR "383" OR "483"   ))
                    MOVE    1    TO   FLG-RUIKEIYO
                 END-IF
            END-IF
