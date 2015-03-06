@@ -797,6 +797,15 @@
                   (COMB-KOH4HKNNUM     =   "079" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *H27.1
+      *    難病のみの時
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "054" )  OR
+                  (COMB-KOH2HKNNUM     =   "054" )  OR
+                  (COMB-KOH3HKNNUM     =   "054" )  OR
+                  (COMB-KOH4HKNNUM     =   "054" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
       *!!!!
       *    高齢者非該当あり
            IF      FLG-HI-ROUJIN2      =   1
@@ -1604,6 +1613,12 @@
                       (COMB-KOH2HKNNUM     =   "025" )  OR
                       (COMB-KOH3HKNNUM     =   "025" )  OR
                       (COMB-KOH4HKNNUM     =   "025" ))
+      *H27.1
+      *            難病
+                 OR  ((COMB-KOH1HKNNUM     =   "054" )  OR
+                      (COMB-KOH2HKNNUM     =   "054" )  OR
+                      (COMB-KOH3HKNNUM     =   "054" )  OR
+                      (COMB-KOH4HKNNUM     =   "054" ))
                    MOVE    AGECHK-ROUJIN2      TO  AGECHK-ROUJIN
                END-IF
            END-IF
