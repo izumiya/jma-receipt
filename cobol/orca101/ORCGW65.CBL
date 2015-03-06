@@ -10654,7 +10654,8 @@
                END-EVALUATE
       *
                EVALUATE    TRUE
-      *        WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
+               WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
+                AND  ( SPA-GMN-KOHNUM  =   "588"       )
                WHEN  ( SPA-PREFNUM     =   CONST-KYOTO )
                WHEN  ( SPA-PREFNUM     =   CONST-OKAYAMA )
                WHEN  ( SPA-PREFNUM     =   CONST-KUMAMOTO )
