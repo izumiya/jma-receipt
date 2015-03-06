@@ -1286,20 +1286,25 @@
            IF      (SRY-SRYKBN         =   "12"  )  AND
                    (SRY-SRYCD (IDXA)(1:1)   =   "1"  )  AND
                    (TNS-DATAKBN        =   "2"  )  AND
-                   (TNS-TIMEKSNKBN     >=  1    AND  <=  6  )
+                   (TNS-TIMEKSNKBN     >=  1    AND  <=  7  )
                EVALUATE    TNS-TIMEKSNKBN
       *            時間外加算処理
                    WHEN    1
+      *            時間外特例加算処理
                    WHEN    5
                        MOVE    "123"           TO  WRK-SRYKBN3
       *            休日加算処理
                    WHEN    2
+      *            休日加算処理（初診）
+                   WHEN    3
                        MOVE    "124"           TO  WRK-SRYKBN3
       *            深夜加算処理
-                   WHEN    3
+                   WHEN    4
                        MOVE    "125"           TO  WRK-SRYKBN3
       *            夜間・早朝加算
                    WHEN    6
+      *            夜間加算
+                   WHEN    7
                        MOVE    "126"           TO  WRK-SRYKBN3
                END-EVALUATE
                ADD     1               TO  IDX-LF
