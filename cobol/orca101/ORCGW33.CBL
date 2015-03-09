@@ -20,14 +20,15 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : システム管理情報設定
-      *  コンポーネント名  : 印刷データ削除設定機能情報（Ｗ３３）
+      *  コンポーネント名  : 印刷データ等削除機能情報（Ｗ３３）
       *  管理者            : 
       *  作成日付    作業者        記述
       *  07/05/25    NACL-藤原     新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  04.01.01    NACL-藤原    07/11/2   期間変更時のデータの初期化
+      *  04.01.01    NACL-藤原    07/11/02  期間変更時のデータの初期化
+      *  04.08.00    NACL-太田    15/03/06  入院オーダー追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -56,6 +57,7 @@
                    07  SPA-GMN-KOUMOKU.
                        09  SPA-GMN-MONTHLY    PIC 9(03).
                        09  SPA-GMN-DAILY      PIC 9(03).
+                       09  SPA-GMN-NORDER     PIC 9(03).
       *
                05  SPA-NAI-AREA.
                    07  SPA-NAI-STYUKYMD       PIC 9(08).
@@ -64,6 +66,8 @@
                        09  SPA-NAI-8000-MONTHLY
                                               PIC 9(03).
                        09  SPA-NAI-8000-DAILY PIC 9(03).
+                       09  SPA-NAI-8000-NORDER
+                                              PIC 9(03).
       *
            COPY    "ENUM-VALUE".
       *
@@ -106,7 +110,7 @@
       *    システム管理マスタ
            COPY  "CPSYSKANRI.INC".
       *
-      *    印刷データ削除設定機能情報
+      *    印刷データ等削除機能情報
            COPY  "CPSK8000.INC".
       *
       *****************************************************************
@@ -275,10 +279,17 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
                                                SPA-NAI-8000-DAILY 
                MOVE    SYS-8000-MONTHLY    TO  SPA-GMN-MONTHLY
                                                SPA-NAI-8000-MONTHLY
+               MOVE    SYS-8000-NORDER     TO  SPA-NAI-8000-NORDER
+               IF    ( SYS-8000-NORDER     IS  NUMERIC )
+                   MOVE    SYS-8000-NORDER TO  SPA-GMN-NORDER
+               ELSE
+                   MOVE    36              TO  SPA-GMN-NORDER
+               END-IF
            ELSE
                MOVE    1                   TO  SPA-GMN-DAILY
                MOVE    36                  TO  SPA-GMN-MONTHLY
-           END-IF     
+               MOVE    36                  TO  SPA-GMN-NORDER
+           END-IF
       *
            MOVE    1                   TO  SPA-GMN-CUR
            . 
@@ -338,6 +349,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
       *
            MOVE    W33-DAILY       TO  SPA-GMN-DAILY
            MOVE    W33-MONTHLY     TO  SPA-GMN-MONTHLY 
+           MOVE    W33-NORDER      TO  SPA-GMN-NORDER
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -352,6 +364,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 41022-MONTHLY-CHK-SEC
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41023-NORDER-CHK-SEC
            END-IF
       *
            .
@@ -382,6 +398,19 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
            END-IF
            .
        41022-MONTHLY-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院オーダーチェック処理
+      *****************************************************************
+       41023-NORDER-CHK-SEC            SECTION.
+      *
+           IF      SPA-GMN-NORDER     =   ZERO
+               MOVE    3                   TO  SPA-GMN-CUR
+               MOVE    "0003"              TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       41023-NORDER-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -450,6 +479,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
            MOVE    SPA-W01-EDYUKYMD    TO  SYS-8000-EDYUKYMD
            MOVE    SPA-GMN-DAILY       TO  SYS-8000-DAILY
            MOVE    SPA-GMN-MONTHLY     TO  SYS-8000-MONTHLY
+           MOVE    SPA-GMN-NORDER      TO  SYS-8000-NORDER
       *     
            IF      FLG-SYSKANRI        =   ZERO
                IF      SPA-GMN-DAILY   NOT =   SPA-NAI-8000-DAILY
@@ -459,6 +489,10 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
                IF      SPA-GMN-MONTHLY NOT =   SPA-NAI-8000-MONTHLY
                    MOVE    SPACE           TO  SYS-8000-MONTHLY-YM
                    MOVE    SMCNDATE-YMD    TO  SYS-8000-MONTHLY-UPYMD
+               END-IF
+               IF      SPA-GMN-NORDER  NOT =   SPA-NAI-8000-NORDER
+                   MOVE    SPACE           TO  SYS-8000-NORDER-YM
+                   MOVE    SMCNDATE-YMD    TO  SYS-8000-NORDER-UPYMD
                END-IF
                MOVE    SYS-8000-REC        TO  SYSKANRI-REC
                MOVE    SMCNDATE-YMD        TO  SYS-UPYMD
@@ -552,6 +586,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       * 
            MOVE    SPA-GMN-DAILY       TO  W33-DAILY
            MOVE    SPA-GMN-MONTHLY     TO  W33-MONTHLY
+           MOVE    SPA-GMN-NORDER      TO  W33-NORDER
       *
            PERFORM 5001-MAPCUR-SEC
            .
@@ -605,10 +640,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            EVALUATE    SPA-WIDCD
                WHEN    "1001"
-                   MOVE    "印刷データ削除設定情報を登録します"
+                   MOVE    "印刷データ等削除機能情報を登録します"
                                        TO  WRK-WIDMSG
                WHEN    "1002"
-                   MOVE    "印刷データ削除設定情報を削除します"
+                   MOVE    "印刷データ等削除機能情報を削除します"
                                        TO  WRK-WIDMSG
            END-EVALUATE
       *
@@ -645,6 +680,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "DAILY"          TO  MCP-WIDGET
                 WHEN    2
                     MOVE  "MONTHLY"        TO  MCP-WIDGET
+                WHEN    3
+                    MOVE  "NORDER"         TO  MCP-WIDGET
                 WHEN    99
                     MOVE  "B12"            TO  MCP-WIDGET
            END-EVALUATE
@@ -662,6 +699,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "DAILY"
                    MOVE    2               TO  SPA-GMN-CUR
                WHEN    "MONTHLY"
+                   MOVE    3               TO  SPA-GMN-CUR
+               WHEN    "NORDER"
                    MOVE    99              TO  SPA-GMN-CUR
            END-EVALUATE
       *

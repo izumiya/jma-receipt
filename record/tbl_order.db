@@ -249,3 +249,13 @@ path	key9 	{
 	};
 };
 
+path	del2 	{
+	DBDELETE	{
+		DELETE
+        FROM tbl_order
+        WHERE HOSPNUM       =  :HOSPNUM
+        AND   UKEYMD        <  :UKEYMD
+		;
+	};
+};
+

@@ -182,6 +182,9 @@
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.16    NACL-藤原    14/12/05  入力チェックの修正
       *  04.07.16    NACL-藤原    14/12/24  ＥＦファイル名修正
+      *  04.07.17    NACL-太田    15/03/06  システム管理 8000番
+      *                                     (印刷データ削除)の追加処理を
+      *                                     バッチに移動
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -466,9 +469,6 @@
            COPY    "CPSK9101.INC".
       *
            COPY    "CPSK9102.INC".
-      *
-      *    印刷データ削除設定情報
-           COPY    "CPSK8000.INC".
       *
        01  PRTKANRI-REC.
            COPY    "CPPRTKANRI.INC".
@@ -3715,44 +3715,6 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        ORCSMCNDATEAREA
            MOVE    SMCNDATE-YMD        TO  WRK-SYSYMD
            MOVE    SMCNDATE-HMS        TO   SYS-TIME 
-      *
-      *    印刷データ削除設定情報がないときの更新処理
-           MOVE    SPACE               TO  SYS-8000-REC
-           INITIALIZE                      SYS-8000-REC
-           MOVE    "8000"              TO  SYS-8000-KANRICD
-           MOVE    "*"                 TO  SYS-8000-KBNCD
-           MOVE    SMCNDATE-YMD        TO  SYS-8000-STYUKYMD
-                                           SYS-8000-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
-           MOVE    SYS-8000-REC        TO  MCPDATA-REC
-           PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               CONTINUE
-           ELSE
-               MOVE    SPACE               TO  SYS-8000-REC
-               INITIALIZE                      SYS-8000-REC
-               MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
-               MOVE    "8000"              TO  SYS-8000-KANRICD
-               MOVE    "*"                 TO  SYS-8000-KBNCD
-               MOVE    "00000000"          TO  SYS-8000-STYUKYMD
-               MOVE    "99999999"          TO  SYS-8000-EDYUKYMD
-               MOVE    1                   TO  SYS-8000-DAILY
-               MOVE    36                  TO  SYS-8000-MONTHLY
-               MOVE    SYS-8000-REC        TO  SYSKANRI-REC
-               MOVE    SMCNDATE-YMD        TO  SYS-CREYMD
-                                               SYS-UPYMD
-               MOVE    SMCNDATE-HMS        TO  SYS-UPHMS
-      *
-               MOVE    "DBINSERT"          TO  MCP-FUNC
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
-grpsys         PERFORM 900-ORCDBMAIN-SEC
-               IF      MCP-RC          NOT =   ZERO 
-                   MOVE    "1006"              TO  SPA-ERRCD
-                   GO  TO  450-PRINT-EXT
-               END-IF
-           END-IF    
       *
            MOVE    ZERO                TO  WRK-CONS-JOB-JOBID     
                                            WRK-PRTKANRI-RENNUM

@@ -362,7 +362,7 @@
       *外来のみ
        01  TBL-KANRICD-G-AREA.
            03  FILLER              PIC X(35)   VALUE
-               "8000 印刷データ削除機能情報".
+               "8000 印刷データ等削除機能情報".
            03  FILLER              PIC X(35)   VALUE
                "9000 ＣＬＡＩＭ接続情報".
            03  FILLER              PIC X(35)   VALUE
@@ -410,7 +410,7 @@
            03  FILLER              PIC X(35)   VALUE
                "5015 医療区分・ＡＤＬ点数情報".
            03  FILLER              PIC X(35)   VALUE
-               "8000 印刷データ削除機能情報".
+               "8000 印刷データ等削除機能情報".
            03  FILLER              PIC X(35)   VALUE
                "9000 ＣＬＡＩＭ接続情報".
            03  FILLER              PIC X(35)   VALUE
