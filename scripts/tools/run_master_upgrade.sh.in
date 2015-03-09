@@ -92,11 +92,11 @@ export MCP_TENANT=1
 
   /usr/lib/panda/bin/monbatch  -dir ${LDDIRECTORY} "master_upgrade.sh \"${HOSPNUM}\" T \"${HOSPID}\" \"${MNTERRFS}\" 0000001 MSTMNT \"${MLIERRFS}\" 0000001 MSTMLI"
   MSTMNT=$?
-  delete_tempdir 
   if [ ${MSTMNT} -ne 0 ] ; then
     exit ${MSTMNT}
   fi
 done
+delete_tempdir 
 delete_pgpass
 
 exit ${MSTMNT}
