@@ -12,5 +12,8 @@ W33 {
     DAILY {
       numdata number(3);
     };
+    NORDER {
+      numdata number(3);
+    };
   };
 };

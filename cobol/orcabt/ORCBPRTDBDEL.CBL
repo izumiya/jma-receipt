@@ -28,6 +28,9 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-太田    15/03/06  入院オーダー追加
+      *                                     印刷データ等削除機能情報
+      *                                     の追加処理を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -55,6 +58,11 @@
                05  WRK-SMCNDATE-YM PIC X(06).
                05  WRK-SMCNDATE-DD PIC X(02).
       *
+       01  CONST-AREA.
+           03  CONST-DAILY         PIC 9(03)  VALUE  1.
+           03  CONST-MONTHLY       PIC 9(03)  VALUE 36.
+           03  CONST-NORDER        PIC 9(03)  VALUE 36.
+      *
       *    ワーク印刷データ削除設定情報
            COPY    "CPSK8000.INC"  REPLACING  //SYS-8000//
                                    BY         //WRK-SYS-8000//.
@@ -80,8 +88,19 @@
       *    プレビュー印刷用管理データ
            COPY    "CPPRVKANRI.INC".
       *
+      *    システム管理
+           COPY    "CPSYSKANRI.INC".
+      *
       *    印刷データ削除設定情報
            COPY    "CPSK8000.INC".
+      *
+      *    入院オーダー
+       01  ORDER-REC.
+           COPY    "CPORDER.INC".
+      *
+      *    入院オーダー項目
+       01  ODRITEM-REC.
+           COPY    "CPODRITEM.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -188,6 +207,41 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-8000-REC
                                                WRK-SYS-8000-REC
+      *
+               IF    ( SYS-8000-NORDER     IS  NOT NUMERIC )
+                   MOVE    CONST-NORDER    TO  SYS-8000-NORDER
+               END-IF
+      *
+           ELSE
+               MOVE    SPACE               TO  SYS-8000-REC
+               INITIALIZE                      SYS-8000-REC
+               MOVE    SPA-HOSPNUM         TO  SYS-8000-HOSPNUM
+               MOVE    "8000"              TO  SYS-8000-KANRICD
+               MOVE    "*"                 TO  SYS-8000-KBNCD
+               MOVE    "00000000"          TO  SYS-8000-STYUKYMD
+               MOVE    "99999999"          TO  SYS-8000-EDYUKYMD
+               MOVE    CONST-DAILY         TO  SYS-8000-DAILY
+               MOVE    CONST-MONTHLY       TO  SYS-8000-MONTHLY
+               MOVE    CONST-NORDER        TO  SYS-8000-NORDER
+               MOVE    SMCNDATE-YMD        TO  SYS-8000-CREYMD
+                                               SYS-8000-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-8000-UPHMS
+               MOVE    SYS-8000-REC        TO  SYSKANRI-REC
+                                               WRK-SYS-8000-REC
+      *
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+grpsys         PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC          NOT =   ZERO 
+                   DISPLAY "SYS 8000 INSERT ERR RC=" MCP-RC
+                   MOVE    1               TO  FLG-END
+               END-IF
+           END-IF
+      *
+           IF      FLG-END                 =   ZERO
+      *
       *        日次情報削除
                IF    ( SYS-8000-DAILY-YM   =   WRK-SMCNDATE-YM )
                OR    ( SYS-8000-DAILY      =   999             )
@@ -204,6 +258,15 @@
                ELSE
                    MOVE    WRK-SMCNDATE-YM TO  SYS-8000-MONTHLY-YM
                    MOVE    SMCNDATE-YMD    TO  SYS-8000-MONTHLY-UPYMD
+                   MOVE    1               TO  FLG-SYS-8000-DLT
+               END-IF
+      *        入院オーダー削除
+               IF    ( SYS-8000-NORDER-YM  =   WRK-SMCNDATE-YM )
+               OR    ( SYS-8000-NORDER     =   999             )
+                   CONTINUE
+               ELSE
+                   MOVE    WRK-SMCNDATE-YM TO  SYS-8000-NORDER-YM
+                   MOVE    SMCNDATE-YMD    TO  SYS-8000-NORDER-UPYMD
                    MOVE    1               TO  FLG-SYS-8000-DLT
                END-IF
       *
@@ -230,10 +293,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                    DISPLAY "SYS 8000 EXIST DELETE SKIP"
                    MOVE    1                   TO  FLG-END
                END-IF
-           ELSE
-               DISPLAY "SYS 8000 NOT FOUND DELETE SKIP"
-               MOVE    1                   TO  FLG-END
-           END-IF    
+           END-IF
            .
        100-INIT-EXT.
            EXIT.
@@ -298,6 +358,9 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
 grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-IF    
       *    
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *    
       *    月次情報削除
       *
            DISPLAY "MONTHLY     YM=" WRK-SYS-8000-MONTHLY-YM
@@ -353,12 +416,74 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    "del15"         TO  MCP-PATHNAME
 grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-IF    
+      *    
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *    
+           PERFORM 2001-NORDER-DEL-SEC
+      *
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
       *
            MOVE    1                   TO  FLG-END     
            .
        200-MAIN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    入院オーダー削除処理
+      *****************************************************************
+       2001-NORDER-DEL-SEC         SECTION.
+      *
+      *    入院オーダー削除
+           DISPLAY "NORDER      YM=" WRK-SYS-8000-NORDER-YM
+                                " NORDER="WRK-SYS-8000-NORDER
+      *
+           IF    ( WRK-SYS-8000-NORDER-YM
+                                       =   WRK-SMCNDATE-YM )
+           OR    ( WRK-SYS-8000-NORDER
+                                       =   999             )
+               CONTINUE
+           ELSE  
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    WRK-SMCNDATE-YMD    TO  LNK-DAY6-KIJUN
+               MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
+               COMPUTE LNK-DAY6-ZOGEN  =   WRK-SYS-8000-NORDER *  (-1)
+               CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+      *
+               DISPLAY "NORDER KEISAN="  LNK-DAY6-KEISAN (1:6)
+      *
+               INITIALIZE                  ODRITEM-REC
+               MOVE    LNK-DAY6-KEISAN (1:6)
+                                       TO  ODRITEM-CREYMD
+               MOVE    "01"            TO  ODRITEM-CREYMD(7:2)
+               MOVE    WRK-PARA-HOSPNUM
+                                       TO  ODRITEM-HOSPNUM
+               MOVE    ODRITEM-REC     TO  MCPDATA-REC
+               MOVE    "DBDELETE"      TO  MCP-FUNC
+               MOVE    "tbl_odritem"   TO  MCP-TABLE
+               MOVE    "del2"          TO  MCP-PATHNAME
+grpsys         PERFORM 900-ORCDBMAIN-SEC
+      *
+               INITIALIZE                  ORDER-REC
+               MOVE    LNK-DAY6-KEISAN (1:6)
+                                       TO  ORDER-UKEYMD
+               MOVE    "01"            TO  ORDER-UKEYMD(7:2)
+               MOVE    WRK-PARA-HOSPNUM
+                                       TO  ORDER-HOSPNUM
+               MOVE    ORDER-REC       TO  MCPDATA-REC
+               MOVE    "DBDELETE"      TO  MCP-FUNC
+               MOVE    "tbl_order"     TO  MCP-TABLE
+               MOVE    "del2"          TO  MCP-PATHNAME
+grpsys         PERFORM 900-ORCDBMAIN-SEC
+           END-IF    
+           .
+      *
+       2001-NORDER-DEL-EXT.
+           EXIT.
       *****************************************************************
       *    終了処理
       *****************************************************************

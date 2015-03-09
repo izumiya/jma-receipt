@@ -90,3 +90,18 @@ path	 all	{
 		;
 	};
 };
+
+path	del2 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_odritem
+			WHERE   (HOSPNUM,KARTE_KEY,ORDERNUM) in (
+         SELECT HOSPNUM,KARTE_KEY,ORDERNUM
+         FROM tbl_order
+         WHERE HOSPNUM       =  :HOSPNUM
+         AND   UKEYMD        <  :CREYMD
+		)
+        ;
+	};
+};
+

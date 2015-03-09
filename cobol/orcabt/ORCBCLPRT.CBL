@@ -147,8 +147,8 @@
              MOVE    PRTKANRI-RENNUM     TO  SHELLTBL-ARG1
              MOVE    PRTKANRI-TBL-KEY    TO  SHELLTBL-ARG2
              MOVE    PRTKANRI-TBL-GROUP  TO  SHELLTBL-ARG3
-      *      MOVE    PRTKANRI-SHORI-RENNUM
-             MOVE    ZERO
+             MOVE    ZERO                TO  PRTKANRI-SHORI-RENNUM
+             MOVE    PRTKANRI-SHORI-RENNUM
                                          TO  SHELLTBL-ARG4
              MOVE    PRTKANRI-SRYYM      TO  SHELLTBL-ARG5
              MOVE    PRTKANRI-SKYYMD     TO  SHELLTBL-ARG6
