@@ -173,6 +173,8 @@
            03  IDX-SN              PIC 9(04).
            03  IDD                 PIC 9(02).
       *
+           03  IDX-TH              PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
       *    単位名称
@@ -208,7 +210,7 @@
       *
            03  WRK-SRYCD               PIC X(09).
            03  WRK-SRYCD2              PIC X(09).
-           03  WRK-SRYCD-3             PIC X(09).
+           03  WRK-SRYCD3              PIC X(09).
       *H25.7
            03  WRK-CHK-SRYCD           PIC X(09).
       *
@@ -3227,22 +3229,6 @@
            EXIT.
       *
       *****************************************************************
-      *     リハビリ料チェック処理
-      *****************************************************************
-      *200542-RIHA-HENKAN-SEC        SECTION.
-      *
-      *    SET     TBL-RIH             TO  1
-      *    SEARCH  TBL-RIHABIRI-OCC    VARYING   TBL-RIH
-      *            AT  END
-      *                MOVE    ZERO            TO  FLG-RIHA-OK
-      *            WHEN    WRK-SRYCD-3     =   TBL-RIHA-SRYCD(TBL-RIH)
-      *                MOVE    1               TO  FLG-RIHA-OK
-      *    END-SEARCH
-      *    .
-      *200542-RIHA-HENKAN-EXT.
-      *    EXIT.
-      *
-      *****************************************************************
       *    入院中の場合、算定なしとする
       *****************************************************************
        200541-NYUIN-CHK-SEC                SECTION.
@@ -3449,11 +3435,15 @@
            MOVE    "111000110"         TO  WRK-SRYCD
       *    初診料（紹介状なし）
            MOVE    "111012510"         TO  WRK-SRYCD2
+      *H27.1
+      *    初診料（妥結率５割以下）
+           MOVE    "111012710"         TO  WRK-SRYCD3
       *
            MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
            MOVE    ZERO                TO  FLG-SYO-ERR
            IF      CHK-CD              =   WRK-SRYCD
                                        OR  WRK-SRYCD2
+                                       OR  WRK-SRYCD3
       *        初診以外入力時、前に初診算定があればエラー
                PERFORM VARYING     IDX-Y3  FROM    1   BY   1
                        UNTIL       IDX-Y3  >   31
@@ -5484,6 +5474,38 @@
                    MOVE    TNS-IDOKANREN   TO  SPA-COM-INPUTCD(IDX-T)
                    MOVE    TNS-IDOKANREN   TO  SPA-GMN-INPUTCD(IDX-T)
                    MOVE    "1"             TO  SPA-COM-AUTOKBN2 (IDX-T)
+      *H27.4
+      *            商品名コードに数量・回数入力あり
+                   MOVE    ZERO            TO  IDX-TH
+                   IF     (SPA-COM-SURFLG (IDX-T - 1)  =   "1" )
+                     AND  (SPA-COM-SURYO  (IDX-T - 1)  >   1   )
+                       IF      SPA-COM-SURYO  (IDX-T)      =   ZERO
+                           MOVE    SPA-COM-SURFLG(IDX-T - 1)
+                                               TO  SPA-COM-SURFLG(IDX-T)
+                           MOVE    SPA-COM-SURYO(IDX-T - 1) 
+                                               TO  SPA-COM-SURYO (IDX-T)
+                       END-IF
+                       COMPUTE IDX-TH          =   IDX-T   -   1
+                       MOVE    SPACE           TO  SPA-COM-SURFLG
+                                                            (IDX-TH)
+                       MOVE    1               TO  SPA-COM-SURYO
+                                                            (IDX-TH)
+                   END-IF
+                   IF      SPA-COM-KAIFLG (IDX-T - 1)  =   "1"
+                       MOVE    SPA-COM-KAIFLG(IDX-T - 1) 
+                                               TO  SPA-COM-KAIFLG(IDX-T)
+                       MOVE    SPA-COM-KAISU(IDX-T - 1) 
+                                               TO  SPA-COM-KAISU (IDX-T)
+                       COMPUTE IDX-TH          =   IDX-T   -   1
+                       MOVE    SPACE           TO  SPA-COM-KAIFLG
+                                                               (IDX-TH)
+                       MOVE    ZERO            TO  SPA-COM-KAISU
+                                                               (IDX-TH)
+                   END-IF
+                   IF      IDX-TH              >   ZERO
+                       PERFORM 500-GMN-HEN02-SEC
+                   END-IF
+      *
       *            基本編集・併用チェック
                    PERFORM 200-KIHON-CHK-SEC
                    IF      SPA-ERRCD           =   SPACE
@@ -5493,11 +5515,37 @@
                                            TO  SPA-COM-IN       (IDX-T)
                    MOVE    SPA-COM-IN2(IDX-T - 1)
                                            TO  SPA-COM-IN2      (IDX-T)
+      *H27.4
+      *            器材コードの画面再編集
+                   IF      IDX-TH              >   ZERO
+                       MOVE    IDX-T           TO  IDX-TH
+                       PERFORM 500-GMN-HEN02-SEC
+                   END-IF
+      *
                    MOVE    IDX-T           TO  LNK-SC92-GMN-IDX
                END-IF
            END-IF
            .
        400-SYOHINMEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面再編処理
+      *****************************************************************
+       500-GMN-HEN02-SEC                SECTION.
+      *
+      *    画面再編集・基本チェック
+           INITIALIZE                  ORCSC94AREA
+           MOVE    "1"                 TO  LNK-SC94-KBN
+           MOVE    LNK-SC92-PG         TO  LNK-SC94-PG
+           MOVE    IDX-TH              TO  LNK-SC94-IDX
+           CALL    "ORCSC94"           USING
+                                       ORCSC94AREA
+                                       SPA-SCR-REC
+                                       SPA-AREA
+      *
+           .
+       500-GMN-HEN02-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ読み込み処理
@@ -5595,7 +5643,7 @@
                MOVE    SPACE               TO  TENSUPLUS-REC
                INITIALIZE                      TENSUPLUS-REC
            END-IF
-          .
+           .
        910-TENSU-READ-EXT.
            EXIT.
       *
