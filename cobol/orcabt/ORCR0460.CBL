@@ -166,6 +166,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.10    NACL-門脇    15/02/05  摘要欄の点数・回数等の記載
       *                                     不具合対応
+      *  04.07.11    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -3830,6 +3831,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
              OR ( RECE44-SAFLG   NOT =   SPACE                )
              OR ( RECE44-TOYAKUFLG   =   "2" OR "4"           )
              OR ( RECE44-ZAIKBN      =    1                   )
+             OR ( RECE44-HOMONCOMFLG NOT = SPACE              )
                   GO  TO  440-TNSKAI-SET-EXT
              END-IF
            END-IF

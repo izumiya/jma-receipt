@@ -30,6 +30,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-門脇    14/10/15  療養期間の記載修正
+      *  04.07.02    NACL-門脇    15/03/09  症状詳記９０の対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -403,8 +404,10 @@
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(56)   VALUE
                "【廃用症候群に係る評価表】".
+           03  FILLER              PIC X(56)   VALUE
+               "【上記以外の診療報酬明細書】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(56)   OCCURS   2.
+           03  TBL-RECECOM-NAME    PIC X(56)   OCCURS   3.
       *
            COPY    "COMMON-SPA".
       *
@@ -2044,9 +2047,9 @@
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 200261-RECECOM-HENSYU-SEC
       *     
-      *    症状詳記コメント（５０、５１）     
+      *    症状詳記コメント（５０、５１、５２、９０）
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key12"             TO  WRK-MCP-PATHNAME
+           MOVE    "key23"             TO  WRK-MCP-PATHNAME
            PERFORM 200261-RECECOM-HENSYU-SEC
            .
        20026-COMMENT-HEN-EXT.
@@ -2121,6 +2124,10 @@
                    WHEN    "52"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (2)
+                                               TO  WRK-RECECOM-NAME
+                   WHEN    "90"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    TBL-RECECOM-NAME (3)
                                                TO  WRK-RECECOM-NAME
                    WHEN    OTHER
                        MOVE    9               TO  FLG-RECECOM-SJKBN

@@ -76,6 +76,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.06    NACL-門脇    14/12/24  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.07    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -3618,6 +3619,7 @@
              OR ( RECE120-SAFLG  NOT =   SPACE                )
              OR ( RECE120-TOYAKUFLG  =   "2" OR "4"           )
              OR ( RECE120-ZAIKBN     =    1                   )
+             OR ( RECE120-HOMONCOMFLG NOT = SPACE             )
                   GO  TO  440-TNSKAI-SET-EXT
              END-IF
            END-IF

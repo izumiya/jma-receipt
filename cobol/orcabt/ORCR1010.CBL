@@ -120,6 +120,7 @@
       *                                     マスタの診療区分と異なる場合の対応
       *  04.07.11    NACL-門脇    14/12/15  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.12    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -1781,9 +1782,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       OR "099400001"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
-             IF       SRY-SRYCD(IDX2)  =  "099140011" OR "099140012"
-                  MOVE    1     TO    FLG-HENSYU-NG
-             END-IF
       *
              IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
@@ -1953,6 +1951,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ELSE
                         MOVE    "1"       TO    RECE120-TOYAKUFLG
                     END-IF
+                  END-IF
+               END-IF
+      *
+               IF      SRY-SRYKBN   =   "99"
+                  IF      SRY-SRYCD(IDX2)     =   "099140011"
+                      MOVE     "1"        TO    RECE120-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE130-SRYCD(IDX4)
+                  END-IF
+                  IF      SRY-SRYCD(IDX2)     =   "099140012"
+                      MOVE     "2"        TO    RECE120-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE130-SRYCD(IDX4)
+                  END-IF
+                  IF      RECE120-HOMONCOMFLG =   "2"
+                      MOVE     "1"        TO    RECE100-COMCNTFLG
+                      MOVE     "1"        TO    RECE130-RECEPTFLG(IDX4)
                   END-IF
                END-IF
       *
