@@ -69,6 +69,7 @@
       *  04.07.03    NACL-門脇    14/04/07  平成２６年４月改正対応
       *  04.07.04    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *  04.07.05    NACL-門脇    14/09/01  平成２６年１０月改正対応
+      *  04.07.06    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -285,6 +286,8 @@
            03  IDX15               PIC 9(01).
            03  IDX16               PIC 9(02).
            03  IDX17               PIC 9(04).
+           03  IDX18               PIC 9(04).
+           03  IDX19               PIC 9(01).
            03  IDX26               PIC 9(02).
            03  IDX27               PIC 9(02).
            03  IDX28               PIC 9(02).
@@ -415,6 +418,13 @@
            03  WRK-BOKOHO-YMD                PIC X(08).
            03  WRK-TUINZAI-YMD               PIC X(08).
            03  WRK-NINRYO-FSANTEIYMD         PIC X(08).
+      *
+           03  WRK-SRYKAISU-X                PIC ZZ9.
+           03  WRK-CHAR-HENKAN-AREA.
+               05  WRK-CHAR-X                PIC X(03).
+               05  WRK-CHAR-N                PIC X(06).
+               05  WRK-CHAR-N-CNT            PIC 9(01).
+               05  WRK-CHAR-IDX              PIC 9(01).
       *
            03  WRK-GANSIDO-YMD-AREA.
                05  WRK-GANSIDO-YMD           PIC X(08)
@@ -662,6 +672,10 @@
       *
        01  TBL-ZAISIEN-INF.
            03  TBL-ZAISIEN-COMMENT          PIC 9(01).
+      *
+       01  TBL-HOMONCOM-NINZU-INF.
+           03  TBL-HOMONCOM-SETFLG          PIC 9(01).
+           03  TBL-HOMONCOM-NINZU           PIC 9(03)  OCCURS  31.
       *
       *    酸素（金額・数量）情報
        01  TBL-SANSO-INF.
@@ -968,6 +982,7 @@
       *
            INITIALIZE                      TBL-HASSYO-INF
            INITIALIZE                      TBL-ZAISIEN-INF
+           INITIALIZE                      TBL-HOMONCOM-NINZU-INF
       *
            INITIALIZE                      TBL-YAKUTEI-INF
       *
@@ -1102,6 +1117,18 @@
                                   UNTIL   IDX1   >   31
                          IF   RECE120-KAISU(1 IDX1)  NOT = ZERO
                           MOVE 1 TO TBL-HASSYO-SESSYOKU-SANTEI(IDX1)
+                         END-IF
+                        END-PERFORM
+                      END-IF
+                   WHEN      "99"
+      *               （訪問診療にかかる記録書コメントに関する編集）
+                      IF  RECE120-HOMONCOMFLG        =  "2"
+                        PERFORM  VARYING  IDX1  FROM  1  BY  1
+                                  UNTIL   IDX1   >   31
+                         IF   RECE120-KAISU(1 IDX1)  NOT = ZERO
+                          MOVE  1  TO  TBL-HOMONCOM-SETFLG
+                          ADD  RECE120-KAISU(1 IDX1)  TO
+                                       TBL-HOMONCOM-NINZU(IDX1)
                          END-IF
                         END-PERFORM
                       END-IF
@@ -1405,6 +1432,15 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       END-IF
                       IF   FLG-COMMENT  =  ZERO
                             PERFORM   2099-RECE120-TENSOU-SEC
+                      END-IF
+                   WHEN      "99"
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *             (訪問診療にかかる記録書コメント（日・人数）のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-HOMONCOM-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2099-RECE120-TENSOU-SEC
                       END-IF
                    WHEN   OTHER
                       PERFORM    2099-RECE120-TENSOU-SEC
@@ -4974,6 +5010,78 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    訪問診療にかかる記録書コメント（日・人数）があるか判定
+      *****************************************************************
+       2001-HOMONCOM-HANTEI-SEC          SECTION.
+      *
+           IF     RECE120-HOMONCOMFLG   =  "1"
+           AND    TBL-HOMONCOM-SETFLG   =   1
+      *
+             MOVE       99         TO   FLG-COMMENT
+      *
+             MOVE       ZERO       TO   IDZ
+             INITIALIZE            WRK-FREE-AREA2
+      *
+             PERFORM   VARYING   IDX    FROM   1   BY   1
+                        UNTIL    IDX      >   31
+      *
+               IF    TBL-HOMONCOM-NINZU(IDX)  NOT = ZERO
+                 ADD      1                TO  IDZ
+                 MOVE     "　　　　　　　日（　　　人）"
+                                           TO  WK-FREE-NAME2(IDZ)
+                 IF    IDZ  =  1
+                   MOVE   "診療人数："     TO  WK-FREE-NAME2(IDZ)(1:10)
+                 END-IF
+                 MOVE     TBL-DAY(IDX)     TO  WK-FREE-NAME2(IDZ)(11:4)
+                 INITIALIZE                    WRK-CHAR-HENKAN-AREA
+                 MOVE     TBL-HOMONCOM-NINZU(IDX)
+                                           TO  WRK-SRYKAISU-X
+                 MOVE     WRK-SRYKAISU-X   TO  WRK-CHAR-X
+                 PERFORM  2502111-NUM-ZENKAKU-HENKAN-SEC
+                 EVALUATE WRK-CHAR-N-CNT
+                   WHEN       2
+                     MOVE WRK-CHAR-N(1:2)  TO  WK-FREE-NAME2(IDZ)(23:2)
+                   WHEN       4
+                     MOVE WRK-CHAR-N(1:4)  TO  WK-FREE-NAME2(IDZ)(21:4)
+                   WHEN       6
+                     MOVE WRK-CHAR-N(1:6)  TO  WK-FREE-NAME2(IDZ)(19:6)
+                 END-EVALUATE
+                 MOVE     14               TO  WK-FREE-YUKOKETA2(IDZ)
+               END-IF
+      *
+             END-PERFORM
+      *
+             PERFORM  200111-RECE130-TAIHI-SEC
+      *
+      *      ＲＥＣＥ０５ファイルの内容をテーブルに退避
+             MOVE    ZERO                 TO  IDX-RECE130
+             MOVE    SPACE                TO  WRK-RECE130XX-REC
+             INITIALIZE                       WRK-RECE130XX-REC
+      *
+             MOVE    RECE120-MEISAISU     TO  MAX-MEISAISU
+      *
+             PERFORM   VARYING   IDX   FROM    1   BY  1
+                        UNTIL  ( IDX                >   50    )
+                         OR    ( WK-FREE-NAME2(IDX) =   SPACE )
+               COMPUTE   MAX-MEISAISU  =  MAX-MEISAISU  +  1
+               MOVE  "810000001"
+                           TO  WRK-RECE130XX-SRYCD(MAX-MEISAISU 1)
+               MOVE  ZERO  TO  WRK-RECE130XX-SRYSURYO(MAX-MEISAISU 1)
+               MOVE  WK-FREE-YUKOKETA2(IDX)
+                           TO  WRK-RECE130XX-YUKOKETA(MAX-MEISAISU 1)
+               MOVE  WK-FREE-NAME2(IDX)
+                           TO  WRK-RECE130XX-NAME(MAX-MEISAISU 1)
+             END-PERFORM
+      *
+             PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           END-IF
+      *
+           .
+       2001-HOMONCOM-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    磁気による膀胱等刺激法があるか判定
       *****************************************************************
        2001-BOKOHO-HANTEI-SEC          SECTION.
@@ -7274,6 +7382,34 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
       *
            .
        250111-SRYACTINF2-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    数値半角→全角変換処理
+      *****************************************************************
+       2502111-NUM-ZENKAKU-HENKAN-SEC    SECTION.
+      *
+           MOVE     1       TO   WRK-CHAR-IDX
+           MOVE    ZERO     TO   WRK-CHAR-N-CNT
+      *
+           PERFORM   VARYING   IDX18   FROM    1   BY  1
+                      UNTIL    IDX18     >     3
+              IF  WRK-CHAR-X(IDX18:1)  IS   NUMERIC
+                 IF   WRK-CHAR-X(IDX18:1) = "0"
+                   MOVE   "０"      TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 ELSE
+                   MOVE   WRK-CHAR-X(IDX18:1)
+                                    TO  IDX19
+                   MOVE   TBL-DAY(IDX19)(3:2)
+                                    TO  WRK-CHAR-N(WRK-CHAR-IDX:)
+                 END-IF
+                 ADD    2           TO  WRK-CHAR-IDX
+                                        WRK-CHAR-N-CNT
+              END-IF
+           END-PERFORM
+      *
+           .
+       2502111-NUM-ZENKAKU-HENKAN-EXT.
            EXIT.
       *
       *****************************************************************

@@ -278,6 +278,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.22    NACL-門脇    15/01/15  外来管理加算（読み替え加算）チェッ
       *                                     ク
+      *  04.07.23    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2478,9 +2479,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       OR "099400001"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
-             IF       SRY-SRYCD(IDX2)  =  "099140011" OR "099140012"
-                  MOVE    1     TO    FLG-HENSYU-NG
-             END-IF
       *
              IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
@@ -2695,6 +2693,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ELSE
                         MOVE    "1"       TO    RECE44-TOYAKUFLG
                     END-IF
+                  END-IF
+               END-IF
+      *
+               IF      SRY-SRYKBN   =   "99"
+                  IF      SRY-SRYCD(IDX2)     =   "099140011"
+                      MOVE     "1"        TO    RECE44-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE45-SRYCD(IDX4)
+                  END-IF
+                  IF      SRY-SRYCD(IDX2)     =   "099140012"
+                      MOVE     "2"        TO    RECE44-HOMONCOMFLG
+                      MOVE  "810000001"   TO    RECE45-SRYCD(IDX4)
+                  END-IF
+                  IF      RECE44-HOMONCOMFLG  =   "2"
+                      MOVE     "1"        TO    RECE41-COMCNTFLG
+                      MOVE     "1"        TO    RECE45-RECEDENFLG(IDX4)
+                      MOVE     "1"        TO    RECE45-RECEPTFLG(IDX4)
                   END-IF
                END-IF
       *

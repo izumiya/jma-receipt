@@ -30,6 +30,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.07.01    NACL-ÌçÏÆ    14/10/15  ÎÅÍÜ´ü´Ö¤Îµ­ºÜ½¤Àµ
+      *  04.07.02    NACL-ÌçÏÆ    15/03/09  ¾É¾õ¾Üµ­£¹£°¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -399,8 +400,10 @@
                "¡Ú¼À´µÊÌ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤Ë·¸¤ë¼£ÎÅ·ÑÂ³¤ÎÍýÍ³Åù¡Û".
            03  FILLER              PIC X(56)   VALUE
                "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+           03  FILLER              PIC X(56)   VALUE
+               "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(56)   OCCURS   2.
+           03  TBL-RECECOM-NAME    PIC X(56)   OCCURS   3.
       *
            COPY    "COMMON-SPA".
       *
@@ -2015,9 +2018,9 @@
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 200261-RECECOM-HENSYU-SEC
       *     
-      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡Ë     
+      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡¢£¹£°¡Ë
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key12"             TO  WRK-MCP-PATHNAME
+           MOVE    "key23"             TO  WRK-MCP-PATHNAME
            PERFORM 200261-RECECOM-HENSYU-SEC
            .
        20026-COMMENT-HEN-EXT.
@@ -2092,6 +2095,10 @@
                    WHEN    "52"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (2)
+                                               TO  WRK-RECECOM-NAME
+                   WHEN    "90"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    TBL-RECECOM-NAME (3)
                                                TO  WRK-RECECOM-NAME
                    WHEN    OTHER
                        MOVE    9               TO  FLG-RECECOM-SJKBN

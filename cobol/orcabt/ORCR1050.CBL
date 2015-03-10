@@ -76,6 +76,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.06    NACL-門脇    14/12/24  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.07    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3510,6 +3511,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
              OR ( RECE120-SAFLG  NOT =   SPACE                )
              OR ( RECE120-TOYAKUFLG  =   "2"                  )
              OR ( RECE120-ZAIKBN     =    1                   )
+             OR ( RECE120-HOMONCOMFLG NOT = SPACE             )
                   GO  TO  440-TNSKAI-SET-EXT
              END-IF
            END-IF

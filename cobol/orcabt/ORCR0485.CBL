@@ -97,6 +97,7 @@
       *  04.07.04    NACL-ÌçÏÆ    14/10/02  Å¦Í×Íó¤ÎºÇ½ª¹Ô¤Þ¤Çµ­ºÜ¤·¤Æ¤«¤é
       *                                     ²þ¥Ú¡¼¥¸¤¹¤ë¤è¤¦½¤Àµ
       *  04.07.05    NACL-ÌçÏÆ    14/10/15  ÎÅÍÜ´ü´Ö¤Îµ­ºÜ½¤Àµ
+      *  04.07.06    NACL-ÌçÏÆ    15/03/09  ¾É¾õ¾Üµ­£¹£°¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -501,8 +502,10 @@
                "¡Ú¼À´µÊÌ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤Ë·¸¤ë¼£ÎÅ·ÑÂ³¤ÎÍýÍ³Åù¡Û".
            03  FILLER              PIC X(52)   VALUE
                "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+           03  FILLER              PIC X(52)   VALUE
+               "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   2.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   3.
       *     
            COPY    "ORCA-DBMETA".
       *
@@ -2106,9 +2109,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 3601-RECECOM-HENSYU-SEC
       *     
-      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡Ë     
+      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡¢£¹£°¡Ë
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key12"             TO  WRK-MCP-PATHNAME
+           MOVE    "key23"             TO  WRK-MCP-PATHNAME
            PERFORM 3601-RECECOM-HENSYU-SEC
            .
        360-HC101-COMMENT-HEN-EXT.
@@ -2166,7 +2169,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    ZERO            TO  FLG-RECECOM-SJKBN
       *
       *    ¾É¾õ¾Üµ­¶èÊ¬¤Î¸«½Ð¤·¤òµ­ºÜ
-           IF      RECECOM-SJKBN   =   "51"   OR  "52"
+           IF      RECECOM-SJKBN   =   "51"  OR  "52"  OR  "90"
                MOVE    RECECOM-SJKBN   TO  RECECOM-SJKBN
            ELSE
                MOVE    SPACE           TO  RECECOM-SJKBN
@@ -2183,6 +2186,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "52"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (2)
+                                               TO  WRK-RECECOM-NAME
+                   WHEN    "90"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    TBL-RECECOM-NAME (3)
                                                TO  WRK-RECECOM-NAME
                END-EVALUATE
            END-IF
