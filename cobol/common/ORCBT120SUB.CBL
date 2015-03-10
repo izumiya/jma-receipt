@@ -790,10 +790,14 @@
            COMPUTE  LNK-ORCBT120SUB-SKJ (SYU-IDX)
                                        =   SYU-SKYMONEY-SKJ
                                        +   SYU-SKYMONEY-SKJ-JIHI
+                                       +   SYU-SKYMONEY-LIFE
+                                       +   SYU-SKYMONEY-LIFE-JIHI
       *    ø©ªˆæ√»Ò¿«≥€
            COMPUTE  LNK-ORCBT120SUB-SKJ-TAX (SYU-IDX)
                                        =   SYU-SKYMONEY-SKJ-TAX
                                        +   SYU-SKYMONEY-SKJ-JIHI-TAX
+                                       +   SYU-SKYMONEY-LIFE-TAX
+                                       +   SYU-SKYMONEY-LIFE-JIHI-TAX
       *    ººŒ¡∫π≥€
            COMPUTE  LNK-ORCBT120SUB-RMSAGAKU (SYU-IDX)
                                        =   SYU-RMSAGAKU
