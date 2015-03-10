@@ -765,6 +765,7 @@
                                        +   SYU-JIHI-TOTAL-TAX
                                        +   SYU-RMSAGAKU
                                        +   SYU-SKYMONEY-SKJ-JIHI-KEI
+                                       +   SYU-SKYMONEY-LIFE-JIHI-KEI
                    IF      SYU-SRYYMD  <   CONST-H190401
                        COMPUTE WRK-JIHI    =   WRK-JIHI 
                                            +   SYU-JIHI-TAX
@@ -788,6 +789,7 @@
                                                +   SYU-KOH-FTN
                                                +   SYU-YKZ-FTN
                                                +   SYU-SKYMONEY-SKJ-KEI
+                                               +   SYU-SKYMONEY-LIFE-KEI
                            COMPUTE WRK-JIHI    =   SYU-SKYMONEY
                                                -   WRK-MONEY
                        END-IF
@@ -898,6 +900,7 @@
                                        +   SYU-JIHI-TOTAL-TAX
                                        +   SYU-RMSAGAKU
                                        +   SYU-SKYMONEY-SKJ-JIHI-KEI
+                                       +   SYU-SKYMONEY-LIFE-JIHI-KEI
                    IF      SYU-SRYYMD  <   CONST-H190401
                        COMPUTE WRK-JIHI    =   WRK-JIHI 
                                            +   SYU-JIHI-TAX
@@ -921,6 +924,7 @@
                                                +   SYU-KOH-FTN
                                                +   SYU-YKZ-FTN
                                                +   SYU-SKYMONEY-SKJ-KEI
+                                               +   SYU-SKYMONEY-LIFE-KEI
                            COMPUTE WRK-JIHI    =   SYU-SKYMONEY
                                                -   WRK-MONEY
                        END-IF
