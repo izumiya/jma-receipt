@@ -941,6 +941,8 @@
                    PERFORM 3001-INIT-HENSYU-SEC
                    IF      SPA-PTID            =   ZERO
                        MOVE    ZERO                TO  SPA-GMN-CUR-41
+      *                患者番号なし
+                       MOVE    "1"                 TO  SPA-I40-MOTOFLG
                    ELSE
                        MOVE    SPA-PTNUM           TO  I41-PTNUM
                        MOVE    SPA-PTID            TO  SPA-GMN-PTID
@@ -3850,6 +3852,8 @@
                MOVE    ZERO    TO  SPA-NAI-LOCK
            END-IF
       *
+           MOVE    SPA-GMN-PTID        TO  SPA-PTID
+           MOVE    SPA-GMN-PTNUM       TO  SPA-PTNUM
       *    前回患者へ待避
            MOVE    SPA-GMN-PTNUM       TO  SPA-LAST-PTNUM
            MOVE    SPA-GMN-PTID        TO  SPA-LAST-PTID
@@ -5771,6 +5775,7 @@
       *        元画面へ
                MOVE    SPACE               TO  LINKAREA
                IF      SPA-I40-MOTOFLG     =   "0"
+                                           OR  "1"
                    INITIALIZE                  SPA-KYOTUKEY
                END-IF
                MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
@@ -5799,6 +5804,7 @@
            MOVE    "I41"               TO  SPA-MOTOPG.
            MOVE    SPA-I40-MOTOPG      TO  SPA-SAKIPG.
            IF      SPA-I40-MOTOFLG     =   "0"
+                                       OR  "1"
                INITIALIZE                  SPA-KYOTUKEY
            END-IF.
            IF      SPA-I40-MOTOPG      =   "M01"
