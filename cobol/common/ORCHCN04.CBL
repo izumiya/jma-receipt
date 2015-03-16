@@ -154,7 +154,7 @@
            03  WRK-SRYYMD              PIC X(08).
       *
            03  WRK-ROOM                PIC X(50).
-           03  WRK-ROOMNUM-NAME        PIC X(10).
+           03  WRK-ROOMNUM-NAME        PIC X(12).
            03  WRK-BTUNUM              PIC X(02).
            03  WRK-BRMNUM              PIC X(06).
       *
