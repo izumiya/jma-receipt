@@ -109,6 +109,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/10/09  ´µ¼ÔÅÐÏ¿Ìá¤ê½èÍýÊÑ¹¹
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/12/11  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1696,6 +1697,9 @@
       *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-CHK
                    MOVE    ZERO            TO  SPA-K01-YOBI(1:1)
                    MOVE    ZERO            TO  SPA-K01-YOBI(2:1)
+      *H27.4
+                   MOVE    ZERO            TO  SPA-TEIGEN30-CHK
+                   MOVE    ZERO            TO  SPA-TEIGEN30-OK
       *
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
@@ -3149,6 +3153,20 @@
                    ELSE
       *v4.7           MOVE    ZERO             TO  SPA-PSYCHO-OK
                       MOVE    ZERO             TO  SPA-K01-YOBI(1:1)
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            ²èÌÌÀ©¸æ
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *H27.4
+      *        Äã¾Ò²ðÎ¨£³£°Æü°Ê¾åÅêÍ¿
+               WHEN    "2007"
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   IF      SPA-KID1-FLG        =   "OK"
+                      MOVE    1                TO  SPA-TEIGEN30-OK
+                   ELSE
+                      MOVE    ZERO             TO  SPA-TEIGEN30-OK
                    END-IF
                    MOVE    SPACE               TO  SPA-KIDCD
                    MOVE    SPACE               TO  SPA-KID1-FLG
@@ -13833,6 +13851,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H27.4¡¡²þÀµ
+               WHEN    "2007"
+                   STRING  "£³£°Æü°Ê¾å¤ÎÅêÌô¤¬¤¢¤ê¤Þ¤¹¡£"
+                           "Äþ¸º¤·¤Þ¤¹¤«¡©"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
       ***
       *ver.4.7
       *
@@ -13939,6 +13964,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "2004"
                WHEN    "2005"
                WHEN    "2006"
+               WHEN    "2007"
                    MOVE    "£Î£Ï"            TO  KID1-B01
            END-EVALUATE
       *

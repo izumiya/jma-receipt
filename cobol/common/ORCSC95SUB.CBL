@@ -30,6 +30,7 @@
       * 04.07.00     NACL=Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/03/XX  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/12/11  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  15/03/XX  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -1298,6 +1299,7 @@
        1003-SYSKANRI-DAKETU-SEC         SECTION.
       *
            MOVE    ZERO                TO  SPA-DAKT50-KBN
+           MOVE    ZERO                TO  SPA-TEIRITU-KBN
       *
       *    ÉÂ±¡¡¦µö²ÄÉÂ¾²¿ô£²£°£°°Ê¾å
            IF     (SPA-HOSPSBT         =   1  )
@@ -1318,6 +1320,28 @@
       *            ÂÅ·ëÎ¨°Ê²¼
                    IF      SYS-1201-DAKETUKBN  =   "1"
                        MOVE    1                   TO  SPA-DAKT50-KBN
+                   END-IF
+               END-IF
+           END-IF
+      *H27.4
+      *    ÉÂ±¡¡¦µö²ÄÉÂ¾²¿ô£µ£°£°°Ê¾å
+           IF     (SPA-HOSPSBT         =   1  )
+              AND (SPA-BEDSU           >=  500)
+              AND (SPA-SRYYMD          >=  "20150401")
+      *        Äã¾Ò²ðÎ¨
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "1202"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
+               MOVE    SPA-SRYYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SRYYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+      *
+               PERFORM 900-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+      *            Äã¾Ò²ðÎ¨¤Ç¤¢¤ë
+                   IF      SYS-KANRITBL(1:1)   =   "1"
+                       MOVE    1               TO  SPA-TEIRITU-KBN
                    END-IF
                END-IF
            END-IF

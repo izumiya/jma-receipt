@@ -1305,6 +1305,10 @@
       *v4.8        MOVE    ZERO            TO  SPA-PSYCHO-CHK
                    MOVE    ZERO            TO  SPA-K01-YOBI(1:1)
                    MOVE    ZERO            TO  SPA-K01-YOBI(2:1)
+      *H27.4
+                   MOVE    ZERO             TO  SPA-TEIGEN30-CHK
+                   MOVE    ZERO             TO  SPA-TEIGEN30-OK
+      *
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
                    MOVE    ZERO            TO  SPA-SYOHOU-CHK
@@ -1792,6 +1796,20 @@
                    ELSE
       *v4.7           MOVE    ZERO             TO  SPA-PSYCHO-OK
                       MOVE    ZERO             TO  SPA-K01-YOBI(1:1)
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            ²èÌÌÀ©¸æ
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *H27.4
+      *        Äã¾Ò²ðÎ¨£³£°Æü°Ê¾åÅêÍ¿
+               WHEN    "2007"
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   IF      SPA-KID1-FLG        =   "OK"
+                      MOVE    1                TO  SPA-TEIGEN30-OK
+                   ELSE
+                      MOVE    ZERO             TO  SPA-TEIGEN30-OK
                    END-IF
                    MOVE    SPACE               TO  SPA-KIDCD
                    MOVE    SPACE               TO  SPA-KID1-FLG
@@ -9394,6 +9412,13 @@
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H27.4¡¡²þÀµ
+               WHEN    "2007"
+                   STRING  "£³£°Æü°Ê¾å¤ÎÅêÌô¤¬¤¢¤ê¤Þ¤¹¡£"
+                           "Äþ¸º¤·¤Þ¤¹¤«¡©"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
       *ver.4.7
       *!!
                WHEN    OTHER
@@ -9422,6 +9447,7 @@
                WHEN    "2004"
                WHEN    "2005"
                WHEN    "2006"
+               WHEN    "2007"
                    MOVE    "£Î£Ï"            TO  KTID1-B01
            END-EVALUATE
       *

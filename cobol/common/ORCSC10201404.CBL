@@ -76,6 +76,7 @@
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/01/16  Ï«ºÒÆÉ¤ßÂØ¤¨²Ã»»ÊÑ´¹ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -372,6 +373,8 @@
            03  WRK-SPA-MEISAKBN        PIC 9(01).
            03  WRK-SPA-INITAUTO-FLG    PIC X(01).
            03  WRK-SPA-DAKT50-KBN      PIC 9(01).
+      *H27.4
+           03  WRK-SPA-TEIRITU-KBN     PIC 9(01).
       *H25.3
            03  WRK-SYOUKAI             PIC 9(01).
            03  FLG-SYOKAINASI          PIC 9(01).
@@ -813,6 +816,7 @@
                    MOVE    SPA-MEISAKBN        TO  WRK-SPA-MEISAKBN
                    MOVE    SPA-INITAUTO-FLG    TO  WRK-SPA-INITAUTO-FLG
                    MOVE    SPA-DAKT50-KBN      TO  WRK-SPA-DAKT50-KBN
+                   MOVE    SPA-TEIRITU-KBN     TO  WRK-SPA-TEIRITU-KBN
                END-IF
       *        ²ñ·×¾È²ñ¤ÏSPA-WORK¤ËÊÔ½¸
                IF     (LNK-ORCSC-PG        =   "J04" )
@@ -826,6 +830,7 @@
                MOVE    WRK-SPA-MEISAKBN    TO  SPA-MEISAKBN
                MOVE    WRK-SPA-INITAUTO-FLG    TO  SPA-INITAUTO-FLG
                MOVE    WRK-SPA-DAKT50-KBN      TO  SPA-DAKT50-KBN
+               MOVE    WRK-SPA-TEIRITU-KBN     TO  SPA-TEIRITU-KBN
            END-IF
       *
            EVALUATE    LNK-ORCSC-KBN
@@ -1225,7 +1230,7 @@
            EXIT.
       *
       *****************************************************************
-      *    ºßÂð¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯½èÍý
+      *    ¿Ç»¡ÎÁ¤ÎÈ½Äê½èÍý
       *****************************************************************
        100110-SINSATU-CHK-SEC           SECTION.
       *    ¿Ç»¡ÎÁ¥»¥Ã¥È
@@ -1936,6 +1941,17 @@
                    END-IF
                END-IF
            END-IF
+      *H27.4
+      *    Äã¾Ò²ðÎ¨¤Î¥Á¥§¥Ã¥¯
+           IF     (WRK-ERRCD           =   SPACE )
+             AND  (SPA-SRYYMD          >=  "20150401" )
+             AND  (WRK-ETCKBN          =   "1"   )
+      *        ÀßÄê¤Ê¤·
+               IF      SPA-TEIRITU-KBN     =   ZERO
+                   MOVE    "K116"          TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
            IF     (WRK-ERRCD       NOT =   SPACE )
                IF     (WRK-COM-KZMFLG2(IDX-Z)
                                            =   SPACE ) AND
@@ -4607,7 +4623,6 @@
       *****************************************************************
        10012-DUMMYSYORI-SEC          SECTION.
       *
-      *TEST
       *H24.4
       *    ºßÂðÈ½Äê
            IF      WRK-COM-SRYKBN (IDX-Z)  =   "14"

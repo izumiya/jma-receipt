@@ -48,6 +48,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/07/XX  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *                                     ³°ÍÑÌôºÞ²ó¿ô¥Á¥§¥Ã¥¯ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£°£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -300,25 +301,17 @@
                    07  WRK-ACTP-ZAINUM     PIC 9(08)   OCCURS   50.
                05  IDX-GEN                 PIC 9(04).
                05  IDX-GEN2                PIC 9(04).
-      *
-      *    ¿ÇÎÅ¹Ô°ÙÆâÍÆÈæ³ÓÍÑ¥Æ¡¼¥Ö¥ë
-      *01  TBL-AREA.
-      *    03  TBL-MAE-AREA.
-      *        05  TBL-MAE-REC     OCCURS   50.
-      *            07  TBL-MAE-SRYCD       PIC  X(09).
-      *            07  TBL-MAE-SRYSURYO    PIC  9(05)V9(03).
-      *            07  TBL-MAE-SRYKAISU    PIC  9(03).
-      *            07  TBL-MAE-INPUTCOMENT PIC  X(40).
-      *            07  TBL-MAE-ATAI-G.
-      *                09  TBL-MAE-ATAI    PIC  X(08)  OCCURS  3.
-      *    03  TBL-ATO-AREA.
-      *        05  TBL-ATO-REC     OCCURS   50.
-      *            07  TBL-ATO-SRYCD       PIC  X(09).
-      *            07  TBL-ATO-SRYSURYO    PIC  9(05)V9(03).
-      *            07  TBL-ATO-SRYKAISU    PIC  9(03).
-      *            07  TBL-ATO-INPUTCOMENT PIC  X(40).
-      *            07  TBL-ATO-ATAI-G.
-      ***              09  TBL-ATO-ATAI    PIC  X(08)  OCCURS  3.
+      *H27.4
+      *    ¿ÇÎÅ¹Ô°ÙÉí²Ã¾ðÊóÀßÄê¡Ê²ÊËè¡Ë£³£°ÆüÄþ¸º
+           03  WRK-ACTP30-AREA.
+               05  WRK-ACTP30-ZAINUM-G       OCCURS   30.
+                   07  WRK-ACTP30-SRYKA      PIC X(02).
+                   07  WRK-ACTP30-HKNCOMBI   PIC X(04).
+                   07  WRK-ACTP30-SRYKBN     PIC X(02).
+                   07  WRK-ACTP30-MAX        PIC 9(04).
+                   07  WRK-ACTP30-ZAINUM     PIC 9(08)   OCCURS   50.
+               05  IDX-GEN3                 PIC 9(04).
+               05  IDX-GEN32                PIC 9(04).
       *
       *    ºÞ¥Æ¡¼¥Ö¥ëÎÎ°è
        01  WRK-TBL-ZAINUM-AREA.
@@ -334,6 +327,15 @@
                                      //ACCTP-// BY //TBL-ACCTP-//.
            03  TBL-ACCTP-HKNCOMBI      PIC X(04).
            03  TBL-ACCTP-SRYKBN        PIC X(02).
+      *H27.4
+      *    ¿ÇÎÅ²ñ·×Éí²Ã¾ðÊó¥Þ¥¹¥¿¡Ý¡Ê£³£°ÆüÄþ¸º¡Ë
+       01  TBL-SRYACCTPLUS30-AREA.
+           02  TBL-SRYACCTPLUS30-REC   OCCURS   30.
+           COPY    "CPSRYACCTPLUS.INC"  REPLACING
+                                     //ACCTP-// BY //TBL-ACCTP30-//.
+           03  TBL-ACCTP30-HKNCOMBI      PIC X(04).
+           03  TBL-ACCTP30-SRYKBN        PIC X(02).
+      *
       *
       *!!!!
       *    ¥ê¥Ï¥Ó¥ê³«»ÏÆüÄûÀµÁ°¾ðÊó
@@ -635,6 +637,8 @@
            END-IF
            INITIALIZE                  WRK-ACTP-AREA
            INITIALIZE                  TBL-SRYACCTPLUS-AREA
+           INITIALIZE                  WRK-ACTP30-AREA
+           INITIALIZE                  TBL-SRYACCTPLUS30-AREA
       *
            PERFORM VARYING     IDH     FROM    1   BY  1
                    UNTIL      (IDH     >   15  )  OR
@@ -3262,6 +3266,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                       AND (LNK-WKSRY-SRYKBN (IDX)      =   "21"  )
                        MOVE    1               TO  FLG-GEN-ARI
                    END-IF
+      *H27.4
+                   IF     (LNK-WKSRY-SRYCD (IDX IDY)   =   "820000047")
+                      AND (LNK-WKSRY-SRYKBN (IDX)      =   "22"  )
+                       MOVE    1               TO  FLG-GEN-ARI
+                   END-IF
       *H26.10
       *            ¸þÀº¿ÀÌôÂ¿ºÞÄþ¸º¤Î¸º¤ÎÍ­ÌµÈ½Äê
                    IF     (LNK-WKSRY-SRYCD (IDX IDY)
@@ -3355,6 +3364,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                   (LNK-WKSRYP-TEI-NKBN (1) =   2    )
                PERFORM 45015-TEIGEN-CHK-SEC
            END-IF
+      *H27.4
+      *    £³£°Æü°Ê¾åÄþ¸º¤ÎºÞ¥Á¥§¥Ã¥¯
+           IF     (WRK-ZAINUM      NOT =   ZERO )  AND
+                  (LNK-WKSRY-SRYKBN    (1) =   "21"
+                                           OR  "22" )  AND
+                  (LNK-WKSRYP-TEI-NKBN30(1) =   2    )
+               PERFORM 45015-TEIGEN30-CHK-SEC
+           END-IF
       *
            IF      WRK-ZAINUM          =   ZERO
       *        ºÞÈÖ¹æ¼èÆÀ½èÍý
@@ -3365,7 +3382,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *!!
       *    ÆâÉþÄþ¸º½èÍý
-           IF      FLG-GEN-ARI         =   1
+      *****IF      FLG-GEN-ARI         =   1
+      *H27.4
+      *    ÆâÉþÄþ¸ºÂÐ¾ÝºÞ
+           IF      LNK-WKSRYP-TEI-NKBN (1) =   1
                PERFORM VARYING IDX-GEN2    FROM    1   BY  1
                        UNTIL   IDX-GEN2    >   30
                    IF      WRK-ACTP-SRYKA(IDX-GEN2)    =   SPACE
@@ -3394,6 +3414,40 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                        MOVE    WRK-ZAINUM      TO  WRK-ACTP-ZAINUM
                                                      (IDX-GEN2 IDX-GEN)
+                       MOVE    30              TO  IDX-GEN2
+                   END-IF
+               END-PERFORM
+           END-IF
+      *H27.4
+      *    £³£°Æü°Ê¾åÄþ¸ºÂÐ¾ÝºÞ
+           IF      LNK-WKSRYP-TEI-NKBN30 (1) =   1
+               PERFORM VARYING IDX-GEN2    FROM    1   BY  1
+                       UNTIL   IDX-GEN2    >   30
+                   IF      WRK-ACTP30-SRYKA(IDX-GEN2)    =   SPACE
+                       MOVE    LNK-WKSRY-SRYKA(01)
+                                           TO  WRK-ACTP30-SRYKA
+                                                            (IDX-GEN2)
+                       MOVE    LNK-WKSRY-HKNCOMBI(01)
+                                           TO  WRK-ACTP30-HKNCOMBI
+                                                            (IDX-GEN2)
+                       MOVE    LNK-WKSRY-SRYKBN(01)
+                                           TO  WRK-ACTP30-SRYKBN
+                                                            (IDX-GEN2)
+                   END-IF
+                   IF     (WRK-ACTP30-SRYKA(IDX-GEN2)
+                                           =   LNK-WKSRY-SRYKA(01) )
+                     AND  (WRK-ACTP30-HKNCOMBI(IDX-GEN2)
+                                           =   LNK-WKSRY-HKNCOMBI(01))
+                     AND  (WRK-ACTP30-SRYKBN  (IDX-GEN2)
+                                           =   LNK-WKSRY-SRYKBN  (01))
+                       ADD     1           TO  WRK-ACTP30-MAX (IDX-GEN2)
+                       MOVE    WRK-ACTP30-MAX (IDX-GEN2) 
+                                           TO  IDX-GEN
+                       IF      IDX-GEN     >   50
+                           MOVE    50                  TO  IDX-GEN
+                       END-IF
+                       MOVE    WRK-ZAINUM      TO  WRK-ACTP30-ZAINUM
+                                                    (IDX-GEN2 IDX-GEN)
                        MOVE    30              TO  IDX-GEN2
                    END-IF
                END-PERFORM
@@ -3568,6 +3622,90 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        45015-TEIGEN-CHK-EXT.
            EXIT.
       *
+      *H27.4
+      *****************************************************************
+      *   £³£°Æü°Ê¾åÄþ¸ººÞÆâÍÆÈ½Äê½èÍý
+      *****************************************************************
+       45015-TEIGEN30-CHK-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  SRYACCTPLUS-REC
+           INITIALIZE                  SRYACCTPLUS-REC
+           MOVE    LNK-WKSRY-HOSPNUM (01)  TO  ACCTP-HOSPNUM
+           MOVE    LNK-WKSRY-NYUGAIKBN(01) TO  ACCTP-NYUGAIKBN
+           MOVE    LNK-WKSRY-PTID   (01)   TO  ACCTP-PTID
+           MOVE    LNK-WKSRY-SRYKA  (01)   TO  ACCTP-SRYKA
+           MOVE    LNK-WKSRY-SRYYMD (01)(1:6)
+                                           TO  ACCTP-SRYYM
+           MOVE    WRK-ZAINUM              TO  ACCTP-ZAINUM
+      *
+           MOVE    SRYACCTPLUS-REC     TO  MCPDATA-REC
+           MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 910-SRYACCTPLUS-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACCTPLUS
+           END-IF
+           MOVE    ZERO                TO  FLG-ERR
+           PERFORM UNTIL  (FLG-SRYACCTPLUS =   1 )  OR
+                          (FLG-ERR         =   1 )
+               PERFORM VARYING IDX-GEN4    FROM    1   BY  1
+                       UNTIL  (IDX-GEN4    >   5   )  OR
+                              (ACCTP-GRP-ZAINUM(IDX-GEN4)  =   ZERO) OR
+                              (FLG-ERR         =   1 )
+                   MOVE    ZERO                TO  FLG-ERR2
+                   PERFORM VARYING IDX-GEN5    FROM    1   BY  1
+                           UNTIL  (IDX-GEN5    >   30   )  OR
+                                  (WRK-ACTP30-SRYKA(IDX-GEN5)
+                                               =   SPACE  )  OR
+                                  (FLG-ERR2    =   1      )
+                       IF     (LNK-WKSRY-SRYKA(01)
+                                           =   WRK-ACTP30-SRYKA
+                                                            (IDX-GEN5))
+                         AND  (LNK-WKSRY-HKNCOMBI (01)
+                                           =   WRK-ACTP30-HKNCOMBI
+                                                            (IDX-GEN5))
+                         AND  (LNK-WKSRY-SRYKBN   (01)
+                                           =   WRK-ACTP30-SRYKBN
+                                                            (IDX-GEN5))
+                           PERFORM VARYING IDX-GEN6    FROM    1   BY  1
+                                   UNTIL  (IDX-GEN6    >   50  )  OR
+                                          (WRK-ACTP30-ZAINUM
+                                                    (IDX-GEN5 IDX-GEN6)
+                                                       =   ZERO   ) OR
+                                          (FLG-ERR2    =   1      )
+                               IF      WRK-ACTP30-ZAINUM
+                                                     (IDX-GEN5 IDX-GEN6)
+                                           =   ACCTP-GRP-ZAINUM
+                                                         (IDX-GEN4)
+                                   MOVE    1           TO  FLG-ERR2
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                   END-PERFORM
+                   IF      FLG-ERR2            =   ZERO
+                       MOVE    1               TO  FLG-ERR
+                   END-IF
+               END-PERFORM
+               MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 910-SRYACCTPLUS-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    ¿ÇÎÅ²ñ·×Éí²Ã¾ðÊó¤ÎÄþ¸ººÞÆâÍÆ¤¬°ã¤¦»þ¡¢¿·µ¬
+           IF      FLG-ERR             =   1
+               MOVE    ZERO            TO  WRK-ZAINUM
+           END-IF
+      *
+           .
+       45015-TEIGEN30-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *   ºÞÈÖ¹æ¼èÆÀ½èÍý
       *****************************************************************
@@ -3662,6 +3800,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *    ÆâÉþÄþ¸ºÂÐ¾ÝºÞ
            IF      LNK-WKSRYP-TEI-NKBN (1) =   1
+               MOVE    "2"                 TO  ACCT-ZAIREQFLG
+           END-IF
+      *H27.4
+      *    £³£°ÆüÄþ¸ºÂÐ¾ÝºÞ
+           IF      LNK-WKSRYP-TEI-NKBN30 (1) =   1
                MOVE    "2"                 TO  ACCT-ZAIREQFLG
            END-IF
       *!!
@@ -4111,6 +4254,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    30          TO  IDW
                    END-IF
                END-PERFORM
+      *****ELSE
+      *********PERFORM 4503-SRYACCTPLUS-INS-SEC
+           END-IF
+      *H27.4
+      *    £³£°ÆüÄþ¸ºÂÐ¾ÝºÞ
+           IF      LNK-WKSRYP-TEI-NKBN30 (1)   =   2
+               PERFORM VARYING     IDW     FROM    1   BY  1
+                       UNTIL       IDW     >   30
+                   IF      TBL-ACCTP30-HOSPNUM (IDW)  =   ZERO
+                       MOVE    SRYACCTPLUS-REC
+                                           TO  TBL-SRYACCTPLUS30-REC
+                                                                (IDW)
+                       MOVE    ACCT-HKNCOMBI
+                                           TO  TBL-ACCTP30-HKNCOMBI
+                                                                 (IDW)
+                       MOVE    ACCT-SRYKBN
+                                           TO  TBL-ACCTP30-SRYKBN(IDW)
+                       MOVE    30          TO  IDW
+                   END-IF
+               END-PERFORM
+           END-IF
+           IF      (LNK-WKSRYP-TEI-NKBN (1)    =   2 )
+               OR  (LNK-WKSRYP-TEI-NKBN30 (1)  =   2 )
+               CONTINUE
            ELSE
                PERFORM 4503-SRYACCTPLUS-INS-SEC
            END-IF
@@ -4154,6 +4321,49 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                ADD     1           TO  ACCTP-RENNUM
                            END-IF
                            MOVE    WRK-ACTP-ZAINUM (IDX-GEN2 IDX-GEN)
+                                          TO  ACCTP-GRP-ZAINUM (IDW2)
+                       END-PERFORM
+                       IF      IDW2                >   ZERO
+                           PERFORM 4503-SRYACCTPLUS-INS-SEC
+                       END-IF
+                       MOVE    30             TO  IDX-GEN2
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+      *H27.4
+      *    30ÆüÄþ¸º
+           PERFORM VARYING     IDW     FROM    1   BY  1
+                   UNTIL      (IDW     >   30   )   OR
+                              (TBL-ACCTP30-HOSPNUM (IDW)  =   ZERO )
+               MOVE    TBL-SRYACCTPLUS30-REC(IDW)    TO  SRYACCTPLUS-REC
+               INITIALIZE                  ACCTP-GRP-ZAINUM-G
+               MOVE    ZERO                TO  IDW2
+               PERFORM VARYING     IDX-GEN2    FROM    1   BY  1
+                       UNTIL      (IDX-GEN2    >   30   )   OR
+                                  (WRK-ACTP30-SRYKA (IDX-GEN2)
+                                              =   SPACE)
+                   IF     (ACCTP-SRYKA        =    WRK-ACTP30-SRYKA
+                                                          (IDX-GEN2))
+                     AND  (TBL-ACCTP30-HKNCOMBI(IDW)
+                                              =    WRK-ACTP30-HKNCOMBI
+                                                          (IDX-GEN2))
+                     AND  (TBL-ACCTP30-SRYKBN  (IDW)
+                                              =    WRK-ACTP30-SRYKBN
+                                                          (IDX-GEN2))
+                       PERFORM VARYING IDX-GEN FROM    1   BY  1
+                               UNTIL   (IDX-GEN    >   50  )   OR
+                                       (WRK-ACTP30-ZAINUM
+                                                  (IDX-GEN2 IDX-GEN)
+                                                       =  ZERO)
+                           ADD     1                   TO  IDW2
+                           IF      IDW2                >   15
+                               PERFORM 4503-SRYACCTPLUS-INS-SEC
+                               MOVE    1           TO  IDW2
+                               INITIALIZE          ACCTP-GRP-ZAINUM-G
+                               ADD     1           TO  ACCTP-RENNUM
+                           END-IF
+                           MOVE    WRK-ACTP30-ZAINUM (IDX-GEN2 IDX-GEN)
                                           TO  ACCTP-GRP-ZAINUM (IDW2)
                        END-PERFORM
                        IF      IDW2                >   ZERO

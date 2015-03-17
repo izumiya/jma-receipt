@@ -34,6 +34,7 @@
       * 01.00.03     NACL−多々納 02/11/11  ＤＵＭＭＹ診察料追加
       * 01.00.04     NACL−多々納 02/12/09  動脈注射エラー追加
       * 04.07.00     NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
+      * 04.07.00     NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
       *****************************************************************
       *
       *
@@ -484,6 +485,15 @@
                                        TO  SPA-ERRMSG
                    MOVE    "逓減・加算コードは入力できません"
                                        TO  SPA-ERRMSG(37:)
+      *H27.4
+                   IF      SPA-SRYYMD      >=  "20150401"
+                       MOVE    SPACE           TO  SPA-ERRMSG
+                       STRING  "施設基準不適合の手術ではありません。"
+                               "逓減コードは入力できません"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                       END-STRING
+                   END-IF
                WHEN    "0074"
                    MOVE
                "この種別は投薬料が算定できない時のみ入力できます。"
@@ -2165,6 +2175,23 @@
                                            DELIMITED   BY  SIZE
                                            INTO    SPA-ERRMSG
                    END-STRING
+      *!!!
+      *H27.1
+               WHEN    "2072"
+                   STRING  "後発品変更不可（処方単位）・"
+                           "後発品変更可（処方単位）"
+                           "が重複します。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H27.4
+               WHEN    "K116"
+                   STRING  "警告！"
+                           "低紹介率の設定ではありません。"
+                           "投薬の逓減は行いません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -3078,6 +3105,31 @@
                    STRING  "警告！"
                            "向精神薬多剤投与となります。"
                            "精神科継続外来支援・指導料は算定できません"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H27.4
+               WHEN    "K253"
+                   STRING  "警告！"
+                           "３０日以上の投薬があります。"
+                           "処方せんの３０日以上投薬逓減の算定"
+                           "がありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K254"
+                   STRING  "警告！"
+                           "３０日以上の投薬がありません。"
+                           "処方せんの３０日以上投薬逓減の算定"
+                           "があります。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K256"
+                   STRING  "警告！"
+                           "低紹介率の設定ではありません。"
+                           "処方せんの３０日以上投薬逓減の算定"
+                           "があります。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

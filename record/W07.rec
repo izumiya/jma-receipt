@@ -1111,6 +1111,13 @@ W07	{
 					count	int;
 					item	varchar(50)[5];
 				};
+				TEIRITUKBN_COMB	{
+					TEIRITUKBN	{
+						value	varchar(50);
+					};
+					count	int;
+					item	varchar(50)[5];
+				};
 			};
 			TAGNAME8    {
 			  	state   int;

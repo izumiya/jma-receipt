@@ -30,6 +30,7 @@
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  09/07/30  リハビリ発症日編集対応
       *  04.06.00    NACL-多々納  10/07/01  残量廃棄自動算定対応
+      *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -150,6 +151,17 @@
                    07  WRK-KYUSEI-ST       PIC X(01).
                    07  WRK-KYUSEI-ED       PIC X(01).
                05  WRK-TEIGEN-IN           PIC X(01).
+      *!!!!!!!!!!!!!!!!!
+      *H27.4
+      *    一般・銘柄名記載区分（処方毎）
+           03  WRK-INGIKSN-KBN-G.
+               05  WRK-INGIKSN-KBN-TBL      OCCURS   20.
+                   07  WRK-INGKSN-SRYKA        PIC X(02).
+                   07  WRK-INGKSN-HKNCOMBI     PIC X(04).
+                   07  WRK-INGKSN-KBN          PIC X(01).
+           03  IDX-M                      PIC 9(04).
+      *!!!!!!!!!!!!!!!!!
+      *
       *    自動加算テーブル
        01  WRK-KASAN-AREA.
            03  WRK-KASAN-TBL                       OCCURS   60.
@@ -188,8 +200,8 @@
            COPY    "COMMON-SPA"      REPLACING
                                      //SPA-// BY //WRK-SPA-//.
       *    画面スパ領域
-           COPY    "K02SCR-SPA"      REPLACING
-                                     //SPA-// BY //WKSPA-//.
+      *    COPY    "K02SCR-SPA"      REPLACING
+      *                              //SPA-// BY //WKSPA-//.
       *
       *処理最大行
        01  MAX-LINE-VALUE          PIC 9(04)   VALUE   400.
@@ -478,6 +490,16 @@
                PERFORM 51017-SANTEI-CHEK-SEC
                IF     (SPA-ERRCD       NOT =   SPACE)
                   AND (ORCSC100-INIT       =   ZERO )
+                   GO      TO      5101-TBLSAIHEN-EXT
+               END-IF
+           END-IF
+      *
+      *H27.1
+      *    後発品変更可・不可処方毎処理
+           IF     (ORCSC100-KBN        =   "3"  )
+            OR    (FLG-IKKATU          =   ZERO )
+               PERFORM 51019-INGIKSN-HEN-SEC
+               IF     (SPA-ERRCD       NOT =   SPACE)
                    GO      TO      5101-TBLSAIHEN-EXT
                END-IF
            END-IF
@@ -1222,6 +1244,64 @@
            .
        51021-ORCSCKAISU-HEN-EXT.
            EXIT.
+      *!!!
+      *H27.1
+      *****************************************************************
+      *    後発品変更可・不可処方毎の処理
+      *****************************************************************
+       51019-INGIKSN-HEN-SEC             SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-MAX-LINE    )   OR
+                             ((SPA-GMN-INPUTCD (IDX)   =   SPACE ) AND
+                              (SPA-COM-INPUTCD (IDX)   =   SPACE ))
+                          OR ( SPA-ERRCD           NOT =   SPACE )
+               IF      SPA-COM-INPUTCD (IDX)   =   "099209910"
+                                               OR  "099209911"
+                   PERFORM 510191-INGIKSN-HENSYORI-SEC
+               END-IF
+           END-PERFORM
+           .
+       51019-INGIKSN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一般・銘柄処方毎処理
+      *****************************************************************
+       510191-INGIKSN-HENSYORI-SEC     SECTION.
+      *
+           PERFORM VARYING IDX-M       FROM    1   BY  1
+                   UNTIL        (IDX-M         >   20    )
+                           OR   (SPA-ERRCD NOT =   SPACE )
+               IF      (WRK-INGKSN-SRYKA (IDX-M)   =   SPACE)
+                   MOVE    SPA-COM-SRYKA(IDX)
+                                          TO  WRK-INGKSN-SRYKA   (IDX-M)
+                   MOVE    SPA-COM-HKNCOMBI(IDX)
+                                          TO  WRK-INGKSN-HKNCOMBI(IDX-M)
+               END-IF
+               IF     (SPA-COM-SRYKA(IDX)      =   WRK-INGKSN-SRYKA
+                                                               (IDX-M))
+                 AND  (SPA-COM-HKNCOMBI(IDX)   =   WRK-INGKSN-HKNCOMBI
+                                                               (IDX-M))
+                   IF      WRK-INGKSN-KBN(IDX-M)   =   SPACE
+                       IF      SPA-COM-INPUTCD (IDX)   =   "099209910"
+                           MOVE    "1"             TO  WRK-INGKSN-KBN
+                                                               (IDX-M)
+                       ELSE
+                           MOVE    "2"             TO  WRK-INGKSN-KBN
+                                                               (IDX-M)
+                       END-IF
+                   ELSE
+                       MOVE    "2072"              TO  SPA-ERRCD
+                       MOVE    "1"                 TO  SPA-COM-CUR (IDX)
+                   END-IF
+                   MOVE    20                  TO  IDX-M
+               END-IF
+           END-PERFORM
+           .
+       510191-INGIKSN-HENSYORI-EXT.
+           EXIT.
+      *!!!
       *
       *****************************************************************
       *    剤ごとの処理
@@ -1395,6 +1475,24 @@
                    END-IF
                END-PERFORM
            END-IF
+      *
+      *H27.1
+      *    後発変更不可処方毎編集
+           MOVE    ZERO                TO  SPA-GENECHG-KBN
+           PERFORM VARYING IDX-M       FROM    1   BY  1
+                   UNTIL         ( IDX-M   >   20  )
+                            OR   ( WRK-INGKSN-SRYKA (IDX-M)
+                                               =   SPACE )
+               IF     (SPA-COM-SRYKA(IDX)      =   WRK-INGKSN-SRYKA
+                                                               (IDX-M))
+                 AND  (SPA-COM-HKNCOMBI(IDX)   =   WRK-INGKSN-HKNCOMBI
+                                                               (IDX-M))
+                   MOVE    WRK-INGKSN-KBN(IDX-M)   TO  SPA-GENECHG-KBN
+                   MOVE    20                 TO  IDX-M
+               END-IF
+           END-PERFORM
+           MOVE    SPA-K01KYOUTU       TO  SPA-WORK
+      *
            PERFORM 51021-ZAIBETU-CHK-SEC
            MOVE    WRK-SPA-SRYYMD      TO  SPA-SRYYMD
            .
@@ -2638,6 +2736,12 @@
                            PERFORM 3004-SANTEI-SET-SEC
                        END-IF
                    END-IF
+      *H27.4
+      *            複数加算対応（入院はないとする）
+                   IF      LNK-ORCSC-SRYSYUKBN (IDX IDY) =  "NET"
+                       PERFORM 3002-AUTOKSN-HEN-SEC
+                   END-IF
+      *
                END-PERFORM
            END-PERFORM
       *
@@ -2842,6 +2946,50 @@
            END-PERFORM
            .
        3001-AUTOZAI-HEN-EXT.
+           EXIT.
+      *H27.4
+      *****************************************************************
+      *    複数加算対応処理
+      *****************************************************************
+       3002-AUTOKSN-HEN-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-KSN-ZAIEND (IDX-S)
+      *    追加の加算
+           ADD     1                   TO  IDX-S
+           IF      IDX-S               <=  60
+               MOVE    WRK-ZAINUM          TO  WRK-KSN-ZAINUM
+                                                              (IDX-S)
+               MOVE    LNK-ORCSC-SRYCD-KS(IDX IDY)
+                                               TO  WRK-KSN-SRYCD
+                                                              (IDX-S)
+      *        コメントの入力値（算定日）
+               MOVE    LNK-ORCSC-ATAI-G  (IDX IDY)
+                                           TO  WRK-KSN-ATAI-G (IDX-S)
+      *        前行を複写
+               MOVE    WRK-KSN-HKNCOMBI  (IDX-S - 1)
+                                           TO  WRK-KSN-HKNCOMBI
+                                                              (IDX-S)
+      *        MOVE    WRK-KSN-CHIKENKBN (IDX-S - 1)
+      *                                    TO  WRK-KSN-CHIKENKBN
+      *                                                       (IDX-S)
+               MOVE    WRK-KSN-SRYKA     (IDX-S - 1)
+                                           TO  WRK-KSN-SRYKA (IDX-S)
+               MOVE    WRK-KSN-SRYSYUKBN (IDX-S - 1)
+                                           TO  WRK-KSN-SRYSYUKBN
+                                                             (IDX-S)
+               MOVE    WRK-KSN-SRYKBN    (IDX-S - 1)
+                                           TO  WRK-KSN-SRYKBN (IDX-S)
+               MOVE    WRK-KSN-AUTOKBN  (IDX-S - 1)
+                                           TO  WRK-KSN-AUTOKBN(IDX-S)
+               MOVE    WRK-KSN-HKTKBN  (IDX-S - 1)
+                                           TO  WRK-KSN-HKTKBN (IDX-S)
+      *
+               MOVE    LNK-ORCSC-TENSU-KS (IDX IDY)
+                                           TO  WRK-KSN-TENSU  (IDX-S)
+               MOVE    "1"                 TO  WRK-KSN-ZAIEND (IDX-S)
+           END-IF
+           .
+       3002-AUTOKSN-HEN-EXT.
            EXIT.
       *****************************************************************
       *    算定回数処理
