@@ -9809,6 +9809,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                GO  TO  4033-DEL-1201-EXT
            END-IF
       *
+      *
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1202"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "9001"              TO  SPA-ERRCD
+               DISPLAY "SYSKANRI-KEY =>" SYS-KEY 
+                       ",MCP-RC:" MCP-RC 
+               GO  TO  4033-DEL-1201-EXT
+           END-IF
+      *
            MOVE   "JOIN"               TO  MCP-PUTTYPE
            PERFORM 210-BACK
            .
