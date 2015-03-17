@@ -1668,9 +1668,11 @@
       *        ¸þÀº¿ÀÌôºÞÂ¿ºÞÅêÍ¿
                WHEN    "2006"
                    IF      SPA-KID1-FLG        =   "OK"
-                      MOVE    1                TO  SPA-PSYCHO-OK
+      *v4.7           MOVE    1                TO  SPA-PSYCHO-OK
+                      MOVE    "1"              TO  SPA-K01-YOBI(1:1)
                    ELSE
-                      MOVE    ZERO             TO  SPA-PSYCHO-OK
+      *v4.7           MOVE    ZERO             TO  SPA-PSYCHO-OK
+                      MOVE    ZERO             TO  SPA-K01-YOBI(1:1)
                    END-IF
       *H27.4
       *        Äã¾Ò²ðÎ¨£³£°Æü°Ê¾åÅêÍ¿
