@@ -58,6 +58,7 @@
       *  04.07.01    NACL-ÌçÏÆ    13/09/04  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    14/01/08  ÀÁµáÅÀ¿ô¤¬¤Ê¤¤ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤¬Í­¤ë
       *                                     ¾ì¹ç¤Î¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸ÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    15/03/17  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -328,55 +329,46 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            INITIALIZE                  WRK-HIKAKU-TABLE
            MOVE       SPACE     TO     WRK-3SYU-KBN
       *
-           IF (RECE02-HENTOTALTEN(2)       =      ZERO)    AND
-              (RECE02-HENTOTALTEN(3)       =      ZERO)    AND
-              (RECE02-HENTOTALTEN(4)       =      ZERO)    AND
-              (RECE02-HENTOTALTEN(5)       =      ZERO)    AND
-              (RECE02-TENKEN-FLG           =     SPACE)
+           IF   (RECE02-KOHNUM(1)    =     SPACE)
+           AND  (RECE02-KOHNUM(2)    =     SPACE)
+           AND  (RECE02-KOHNUM(3)    =     SPACE)
+           AND  (RECE02-KOHNUM(4)    =     SPACE)
                CONTINUE
            ELSE
-             IF     RECE02-HENTOTALTEN(1) NOT = ZERO
-               IF ((RECE02-HENTOTALTEN(2) NOT = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(2)))
-               OR ((RECE02-TENKEN-FLG         = "1" )    AND
-                   (RECE02-HENTOTALTEN(2)     = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(2)))
-               OR ((RECE02-HENTOTALTEN(2) NOT = ZERO)              AND
+             IF     RECE02-HKNNUM         NOT = SPACE
+               IF ((RECE02-KOHNUM(1)  NOT = SPACE                ) AND
+                   (RECE02-HENTOTALTEN(1)
+                                      NOT = RECE02-HENTOTALTEN(2)))
+               OR ((RECE02-KOHNUM(1)  NOT = SPACE                ) AND
                    (RECE02-HENTOTALTEN(1) = RECE02-HENTOTALTEN(2)) AND
-                   (RECE02-SKYTENFLG          =  1  )                 )
+                   (RECE02-SKYTENFLG      =  1                   ))
                    MOVE      1          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF ((RECE02-HENTOTALTEN(3) NOT = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(3)))
-               OR ((RECE02-TENKEN-FLG         = "1" )    AND
-                   (RECE02-HENTOTALTEN(3)     = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(3)))
-               OR ((RECE02-HENTOTALTEN(3) NOT = ZERO)              AND
+               IF ((RECE02-KOHNUM(2)  NOT = SPACE                ) AND
+                   (RECE02-HENTOTALTEN(1)
+                                      NOT = RECE02-HENTOTALTEN(3)))
+               OR ((RECE02-KOHNUM(2)  NOT = SPACE                ) AND
                    (RECE02-HENTOTALTEN(1) = RECE02-HENTOTALTEN(3)) AND
-                   (RECE02-SKYTENFLG          =  1  )                 )
+                   (RECE02-SKYTENFLG      =  1                   ))
                    MOVE      2          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF ((RECE02-HENTOTALTEN(4) NOT = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(4)))
-               OR ((RECE02-TENKEN-FLG         = "1" )    AND
-                   (RECE02-HENTOTALTEN(4)     = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(4)))
-               OR ((RECE02-HENTOTALTEN(4) NOT = ZERO)              AND
+               IF ((RECE02-KOHNUM(3)  NOT = SPACE                ) AND
+                   (RECE02-HENTOTALTEN(1)
+                                      NOT = RECE02-HENTOTALTEN(4)))
+               OR ((RECE02-KOHNUM(3)  NOT = SPACE                ) AND
                    (RECE02-HENTOTALTEN(1) = RECE02-HENTOTALTEN(4)) AND
-                   (RECE02-SKYTENFLG          =  1  )                 )
+                   (RECE02-SKYTENFLG      =  1                   ))
                    MOVE      3          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF ((RECE02-HENTOTALTEN(5) NOT = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(5)))
-               OR ((RECE02-TENKEN-FLG         = "1" )    AND
-                   (RECE02-HENTOTALTEN(5)     = ZERO)    AND
-                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(5)))
-               OR ((RECE02-HENTOTALTEN(5) NOT = ZERO)              AND
+               IF ((RECE02-KOHNUM(4)  NOT = SPACE                ) AND
+                   (RECE02-HENTOTALTEN(1)
+                                      NOT = RECE02-HENTOTALTEN(5)))
+               OR ((RECE02-KOHNUM(4)  NOT = SPACE                ) AND
                    (RECE02-HENTOTALTEN(1) = RECE02-HENTOTALTEN(5)) AND
-                   (RECE02-SKYTENFLG          =  1  )                 )
+                   (RECE02-SKYTENFLG      =  1                   ))
                    MOVE      4          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
@@ -387,7 +379,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF     (FLG-KOHBUNRI-OKIKAE   =     1    )
            AND    (RECE02-SRYYM         >=  "200804")
-             IF    RECE02-HENTOTALTEN(1)   NOT =  ZERO
+             IF    RECE02-HKNNUM     NOT =   SPACE
                 DISPLAY   "< KOHBUNRI OKIKAE >"
                 PERFORM   20013-KOHBUNRI-OKIKAE-SEC
              END-IF

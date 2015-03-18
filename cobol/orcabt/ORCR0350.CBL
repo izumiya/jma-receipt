@@ -388,6 +388,7 @@
       *                                    ¡ÊÄÌÂ§²Ã»»ÂÐ¾Ý³°¡Ë
       *  04.07.14    NACL-Æ£¸¶    15/02/18  °åÎÅ¾ðÊóÏ¢·ÈÂÐ±þ
       *                                     ¼«Èñ¥ì¥»¥×¥È¤òÂÐ¾Ý¤È¤¹¤ë
+      *  04.07.15    NACL-ÌçÏÆ    15/03/17  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3550,36 +3551,11 @@
              OR  ( RECE62-EKF-FTNKEIFLG(IDX)  =  "2" )
                CONTINUE
              ELSE
-               IF      RECE62-FTNMONEY(IDX)   >   ZERO     
+               IF    ( RECE62-FTNMONEY(IDX)      >   ZERO  )
+               OR    ((RECE62-FTNMONEY(IDX)      =   ZERO ) AND
+                      (RECE62-ZEROKISAIFLG(IDX)  =   "1"  ))
                    MOVE    RECE62-FTNMONEY(IDX)   TO  WRK-NUM
                    MOVE    8                      TO  WRK-NAGASA
-               ELSE
-                   IF   (( RECE62-TOTALTEN (IDX)      >   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE62-KOHNUM   (IDY)      =   "012") AND
-                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE62-FUKUSHIFLG(IDX)     =   "1"  ) AND
-                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE62-FUKUSHIFLG(IDX)     =   "1"  ) AND
-                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      >   ZERO ))
-                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE62-FTNMONEY (IDX)      >   ZERO ))
-                       MOVE    RECE62-FTNMONEY(IDX)   TO  WRK-NUM
-                       MOVE    8                      TO  WRK-NAGASA
-                   END-IF
                END-IF
              END-IF
            END-IF    
