@@ -205,11 +205,12 @@
       *  04.07.19    NACL-門脇    15/01/07  平成２７年１月改正対応
       *                                     （公費請求テーブル編集）
       *  04.07.20    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
-      *  04.07.21    NACL-藤原    15/02/04  請求管理への公費情報の更新
+      *  04.07.21    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    15/02/04  請求管理への公費情報の更新
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -403,6 +404,8 @@
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-STS             PIC 9(04).
            03  FLG-MEISYO-HENSYU   PIC 9(01).
+           03  FLG-JNISSU          PIC 9(01).
+           03  FLG-TOTALTEN        PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4461,37 +4464,34 @@
       *
       *    <診療実日数>
            IF      CNT-PAGE        =   1
-               IF      RECE62-TOTALTEN (IDX1)        >   ZERO
-               OR      RECE62-SHOKUJIRYOYOHI(IDX1)   >   ZERO
+               MOVE      ZERO             TO  FLG-JNISSU
+               IF    ((IDX1                         =   1   ) AND
+                      (RECE62-HKNNUM            NOT =  SPACE))
+               OR    ((IDX1                     NOT =   1   ) AND
+                      (RECE62-KOHNUM(IDX1 - 1)  NOT =  SPACE))
                   MOVE    RECE62-JNISSU (IDX1)
                                           TO  WRK-JINISSU2Z
                   MOVE    WRK-JINISSU2    TO  HC06-JINISSU
+                  MOVE    1               TO  FLG-JNISSU
                END-IF
-               IF (((RECE62-TOTALTEN(IDX2)         > ZERO         ) OR
-                    (RECE62-SHOKUJIRYOYOHI(IDX2)   > ZERO         )) AND
-                   ((RECE62-JNISSU(IDX1) NOT = RECE62-JNISSU(IDX2)) OR
-                    (RECE62-JSKISAIFLG          =   "1"           ) OR
-                    (RECE62-EKF-JNISSUFLG(IDX2) =   "1"           )))
-               OR ( (RECE62-TOTALTEN(IDX2)         > ZERO         )  AND
-                    (RECE62-TOTALTEN(IDX1)         = ZERO         ) )
-               OR ( (RECE62-SHOKUJIRYOYOHI(IDX2)   > ZERO         )  AND
-                    (RECE62-SHOKUJIRYOYOHI(IDX1)   = ZERO         ) )
+               IF      RECE62-KOHNUM(IDX2 - 1)  NOT =  SPACE
+                  IF (FLG-JNISSU                 = ZERO               )
+                  OR (RECE62-JNISSU(IDX1)    NOT = RECE62-JNISSU(IDX2))
+                  OR (RECE62-JSKISAIFLG          = "1"                )
+                  OR (RECE62-EKF-JNISSUFLG(IDX2) = "1"                )
                       MOVE    RECE62-JNISSU (IDX2)
                                               TO  WRK-JINISSU2Z
                       MOVE    WRK-JINISSU2    TO  HC06-JINISSU1
+                  END-IF
                END-IF
-               IF (((RECE62-TOTALTEN(IDX3)         > ZERO         ) OR
-                    (RECE62-SHOKUJIRYOYOHI(IDX3)   > ZERO         )) AND
-                   ((RECE62-JNISSU(IDX2) NOT = RECE62-JNISSU(IDX3)) OR
-                    (RECE62-JSKISAIFLG          =   "1"           ) OR
-                    (RECE62-EKF-JNISSUFLG(IDX3) =   "1"           )))
-               OR (( RECE62-FUKUSHIFLG(IDX3)    =   "1"            ) AND
-                   ((RECE62-JNISSU(IDX2) NOT = RECE62-JNISSU(IDX3)) OR
-                    (RECE62-JSKISAIFLG          =   "1"           ) OR
-                    (RECE62-EKF-JNISSUFLG(IDX3) =   "1"           )))
+               IF      RECE62-KOHNUM(IDX3 - 1)  NOT =  SPACE
+                  IF (RECE62-JNISSU(IDX2)    NOT = RECE62-JNISSU(IDX3))
+                  OR (RECE62-JSKISAIFLG          = "1"                )
+                  OR (RECE62-EKF-JNISSUFLG(IDX3) = "1"                )
                       MOVE    RECE62-JNISSU (IDX3)
                                               TO  WRK-JINISSU2Z
                       MOVE    WRK-JINISSU2    TO  HC06-JINISSU2
+                  END-IF
                END-IF
       *        県単用項目
                IF      FLG-RECE67           =   ZERO
@@ -6432,9 +6432,14 @@
                    MOVE    "支払猶予"         TO  HC06-GENMEN
            END-EVALUATE 
       *    保険
-           IF      RECE62-TOTALTEN (IDX1)     >   ZERO
+           MOVE      ZERO                     TO  FLG-TOTALTEN
+           IF    ((IDX1                         =   1   ) AND
+                  (RECE62-HKNNUM            NOT =  SPACE))
+           OR    ((IDX1                     NOT =   1   ) AND
+                  (RECE62-KOHNUM(IDX1 - 1)  NOT =  SPACE))
                MOVE    RECE62-TOTALTEN (IDX1) TO  WRK-KGK10
                MOVE    WRK-KGK10              TO  HC06-TOTALTEN(1)
+               MOVE    1                      TO  FLG-TOTALTEN
                IF    ( RECE62-FTNMONEY (IDX1) >    ZERO   )
                OR    ( RECE62-KOUREI          = "1" OR "2")
                    MOVE    RECE62-FTNMONEY (IDX1) TO  WRK-KGK7
@@ -6481,7 +6486,7 @@
       *
            INITIALIZE                     WRK-FTNMONEY-HENSYU-AREA
       *    公費１
-           IF    ( RECE62-TOTALTEN (IDX2) >   ZERO                     )
+           IF    ( RECE62-KOHNUM(IDX2 - 1)    NOT =   SPACE            )
            AND   ((RECE62-TOTALTEN (IDX2)
                                       NOT =   RECE62-TOTALTEN (IDX1)) OR
                   (RECE62-FTNMONEY (IDX2)
@@ -6496,7 +6501,7 @@
                END-IF
              END-IF
            END-IF
-           IF    ( RECE62-TOTALTEN (IDX2) >   ZERO                  )
+           IF    ( RECE62-KOHNUM(IDX2 - 1)    NOT =   SPACE         )
            AND   ( RECE62-FTNMONEY (IDX2) =   RECE62-FTNMONEY (IDX1))
            AND   ( RECE62-KISAIFLG (IDX2) =   "1"                   )
                IF    RECE62-FTNMONEY (IDX2)   >   ZERO
@@ -6505,38 +6510,21 @@
                                                   WRK-KOH-FTNMONEY(1)
                END-IF
            END-IF
-           IF   (( RECE62-TOTALTEN (IDX2)     >   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX2)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX2) =   "1"  ))
-           OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                 ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                 ( RECE62-TOTALTEN (IDX2)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX2)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX2) =   "1"  ))
-           OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                 ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                 ( RECE62-TOTALTEN (IDX2)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX2)     >   ZERO ))
+           IF    ( RECE62-KOHNUM(IDX2 - 1)    NOT =   SPACE )
+           AND   ( RECE62-FTNMONEY (IDX2)         =   ZERO  )
+           AND   ( RECE62-ZEROKISAIFLG (IDX2)     =   "1"   )
                    MOVE    RECE62-FTNMONEY (IDX2) TO  WRK-KGK7
                    MOVE    WRK-KGK7               TO
                                                   WRK-KOH-FTNMONEY(1)
            END-IF
-           IF    ( RECE62-TOTALTEN (IDX2) >   ZERO            )
-           AND   ((RECE62-TOTALTEN (IDX2)
-                               NOT =   RECE62-TOTALTEN (IDX1)) OR
-                  (RECE62-JSKISAIFLG             =  "1"      ) OR
-                  (RECE62-EKF-TOTALTENFLG(IDX2)  =  "1"      ))
+           IF      RECE62-KOHNUM(IDX2 - 1)    NOT =   SPACE
+             IF  (FLG-TOTALTEN                 = ZERO                 )
+             OR  (RECE62-TOTALTEN(IDX1)    NOT = RECE62-TOTALTEN(IDX2))
+             OR  (RECE62-JSKISAIFLG            = "1"                  )
+             OR  (RECE62-EKF-TOTALTENFLG(IDX2) = "1"                  )
                MOVE    RECE62-TOTALTEN (IDX2) TO  WRK-KGK10
                MOVE    WRK-KGK10              TO  WRK-KOH-TOTALTEN(1)
-           ELSE
-               IF     (RECE62-HKNNUM     NOT =   SPACE  ) AND
-                      (RECE62-KOHNUM(1)  NOT =   SPACE  ) AND
-                      (RECE62-GENMENKBN      =   2 OR 3 ) AND
-                      (RECE62-TOTALTEN (IDX2)  =   ZERO )
-                   MOVE    RECE62-TOTALTEN (IDX2) TO  WRK-KGK10
-                   MOVE    WRK-KGK10              TO
-                                                  WRK-KOH-TOTALTEN(1)
-               END-IF
+             END-IF
            END-IF
       *
            IF    ( RECE62-SHOKUJIRYOYOHI(IDX2) >   ZERO                )
@@ -6588,9 +6576,8 @@
                  END-IF
                END-IF
            END-IF
-      *     
       *    公費２
-           IF  ( RECE62-TOTALTEN (IDX3) >   ZERO                     )
+           IF  ( RECE62-KOHNUM(IDX3 - 1)    NOT =   SPACE            )
            AND ((RECE62-TOTALTEN (IDX3)
                                     NOT =   RECE62-TOTALTEN (IDX1)) OR
                 (RECE62-TOTALTEN (IDX3)
@@ -6609,7 +6596,7 @@
                    END-IF
                  END-IF
            END-IF
-           IF    ( RECE62-TOTALTEN (IDX3) >   ZERO                  )
+           IF    ( RECE62-KOHNUM(IDX3 - 1)    NOT =   SPACE         )
            AND   ( RECE62-FTNMONEY (IDX3) =   RECE62-FTNMONEY (IDX2))
            AND   ( RECE62-KISAIFLG (IDX3) =   "1"                   )
                  IF    RECE62-FTNMONEY (IDX3)   >   ZERO
@@ -6618,53 +6605,20 @@
                                                   WRK-KOH-FTNMONEY(2)
                  END-IF
            END-IF
-           IF   (( RECE62-TOTALTEN (IDX3)     >   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX3) =   "1"  ))
-           OR   (( RECE62-KOHNUM(2)           =   "012") AND
-                 ( RECE62-TOTALTEN (IDX3)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX3) =   "1"  ))
-           OR   (( RECE62-FUKUSHIFLG(IDX3)    =   "1"  ) AND
-                 ( RECE62-TOTALTEN (IDX3)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX3) =   "1"  ))
-           OR   (( RECE62-FUKUSHIFLG(IDX3)    =   "1"  ) AND
-                 ( RECE62-TOTALTEN (IDX3)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     >   ZERO ))
-           OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                 ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                 ( RECE62-TOTALTEN (IDX3)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     =   ZERO ) AND
-                 ( RECE62-ZEROKISAIFLG (IDX3) =   "1"  ))
-           OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
-                 ( RECE62-GENMENKBN         =   2 OR 3 ) AND
-                 ( RECE62-TOTALTEN (IDX3)     =   ZERO ) AND
-                 ( RECE62-FTNMONEY (IDX3)     >   ZERO ))
+           IF    ( RECE62-KOHNUM(IDX3 - 1)    NOT =   SPACE )
+           AND   ( RECE62-FTNMONEY (IDX3)         =   ZERO  )
+           AND   ( RECE62-ZEROKISAIFLG (IDX3)     =   "1"   )
                    MOVE    RECE62-FTNMONEY (IDX3) TO  WRK-KGK7
                    MOVE    WRK-KGK7               TO
                                                   WRK-KOH-FTNMONEY(2)
            END-IF
-           IF    ( RECE62-TOTALTEN (IDX3) >   ZERO            )
-           AND   ((RECE62-TOTALTEN (IDX3)
-                               NOT =   RECE62-TOTALTEN (IDX2)) OR
-                  (RECE62-JSKISAIFLG             =  "1"      ) OR
-                  (RECE62-EKF-TOTALTENFLG(IDX3)  =  "1"      ))
+           IF      RECE62-KOHNUM(IDX3 - 1)    NOT =   SPACE
+             IF  (RECE62-TOTALTEN(IDX2)    NOT = RECE62-TOTALTEN(IDX3))
+             OR  (RECE62-JSKISAIFLG            = "1"                  )
+             OR  (RECE62-EKF-TOTALTENFLG(IDX3) = "1"                  )
                MOVE    RECE62-TOTALTEN (IDX3) TO  WRK-KGK10
                MOVE    WRK-KGK10              TO  WRK-KOH-TOTALTEN(2)
-           ELSE
-               IF    ((RECE62-FUKUSHIFLG(IDX3) =   "1"  ) AND
-                      (RECE62-TOTALTEN (IDX3)  =   ZERO ))
-               OR    ((RECE62-KOHNUM(2)        =   "012") AND
-                      (RECE62-TOTALTEN (IDX3)  =   ZERO ))
-               OR    ((RECE62-HKNNUM     NOT =   SPACE  ) AND
-                      (RECE62-KOHNUM(2)  NOT =   SPACE  ) AND
-                      (RECE62-GENMENKBN      =   2 OR 3 ) AND
-                      (RECE62-TOTALTEN (IDX3)  =   ZERO ))
-                   MOVE    RECE62-TOTALTEN (IDX3) TO  WRK-KGK10
-                   MOVE    WRK-KGK10              TO
-                                                  WRK-KOH-TOTALTEN(2)
-               END-IF
+             END-IF
            END-IF
       *
            IF    ( RECE62-SHOKUJIRYOYOHI(IDX3) >   ZERO                )
@@ -6719,7 +6673,7 @@
       *
       *    公費３
            IF      IDX4                    >   ZERO
-               IF   (  RECE62-TOTALTEN (IDX4)  >   ZERO               )
+               IF   (  RECE62-KOHNUM(IDX4 - 1)    NOT =   SPACE       )
                AND  (( RECE62-TOTALTEN (IDX4)
                                    NOT =   RECE62-TOTALTEN (IDX1)) OR
                      ( RECE62-TOTALTEN (IDX4)
@@ -6742,7 +6696,7 @@
                        END-IF
                      END-IF
                END-IF
-               IF    ( RECE62-TOTALTEN (IDX4)  > ZERO                  )
+               IF    ( RECE62-KOHNUM(IDX4 - 1)    NOT =   SPACE        )
                AND   ( RECE62-FTNMONEY (IDX4)  = RECE62-FTNMONEY (IDX3))
                AND   ( RECE62-KISAIFLG (IDX4)  = "1"                   )
                    IF      RECE62-FTNMONEY (IDX4)   >   ZERO
@@ -6751,54 +6705,22 @@
                        MOVE    WRK-KGK7        TO  WRK-KOH-FTNMONEY(3)
                    END-IF
                END-IF
-               IF   (( RECE62-TOTALTEN (IDX4)      >   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX4)  =   "1"  )     )
-               OR   (( RECE62-KOHNUM(3)            =   "012") AND
-                     ( RECE62-TOTALTEN (IDX4)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX4)  =   "1"  )     )
-               OR   (( RECE62-FUKUSHIFLG(IDX4)     =   "1"  ) AND
-                     ( RECE62-TOTALTEN (IDX4)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX4)  =   "1"  )     )
-               OR   (( RECE62-FUKUSHIFLG(IDX4)     =   "1"  ) AND
-                     ( RECE62-TOTALTEN (IDX4)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      >   ZERO )     )
-               OR   (( RECE62-HKNNUM         NOT =   SPACE  ) AND
-                     ( RECE62-GENMENKBN          =   2 OR 3 ) AND
-                     ( RECE62-TOTALTEN (IDX4)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX4)  =   "1"  )     )
-               OR   (( RECE62-HKNNUM         NOT =   SPACE  ) AND
-                     ( RECE62-GENMENKBN          =   2 OR 3 ) AND
-                     ( RECE62-TOTALTEN (IDX4)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX4)      >   ZERO )     )
+               IF    ( RECE62-KOHNUM(IDX4 - 1)    NOT =   SPACE )
+               AND   ( RECE62-FTNMONEY (IDX4)         =   ZERO  )
+               AND   ( RECE62-ZEROKISAIFLG (IDX4)     =   "1"   )
                    MOVE    RECE62-FTNMONEY (IDX4)  TO  WRK-KGK7
                    MOVE    WRK-KGK7                TO
                                                    WRK-KOH-FTNMONEY(3)
                END-IF
-               IF    ( RECE62-TOTALTEN (IDX4) >   ZERO            )
-               AND   ((RECE62-TOTALTEN (IDX4)
-                                   NOT =   RECE62-TOTALTEN (IDX3)) OR
-                      (RECE62-JSKISAIFLG             =  "1"      ) OR
-                      (RECE62-EKF-TOTALTENFLG(IDX4)  =  "1"      ))
+               IF      RECE62-KOHNUM(IDX4 - 1)    NOT =   SPACE
+                 IF  (RECE62-TOTALTEN(IDX3)
+                                        NOT = RECE62-TOTALTEN(IDX4))
+                 OR  (RECE62-JSKISAIFLG            = "1"           )
+                 OR  (RECE62-EKF-TOTALTENFLG(IDX4) = "1"           )
                    MOVE    RECE62-TOTALTEN (IDX4)  TO  WRK-KGK10
                    MOVE    WRK-KGK10               TO
                                                    WRK-KOH-TOTALTEN(3)
-               ELSE
-                   IF    ((RECE62-FUKUSHIFLG(IDX4) =   "1"  ) AND
-                          (RECE62-TOTALTEN (IDX4)  =   ZERO ))
-                   OR    ((RECE62-KOHNUM(3)        =   "012") AND
-                          (RECE62-TOTALTEN (IDX4)  =   ZERO ))
-                   OR    ((RECE62-HKNNUM     NOT =   SPACE  ) AND
-                          (RECE62-KOHNUM(3)  NOT =   SPACE  ) AND
-                          (RECE62-GENMENKBN      =   2 OR 3 ) AND
-                          (RECE62-TOTALTEN (IDX4)  =   ZERO ))
-                       MOVE    RECE62-TOTALTEN (IDX4)  TO  WRK-KGK10
-                       MOVE    WRK-KGK10               TO
-                                                   WRK-KOH-TOTALTEN(3)
-                   END-IF
+                 END-IF
                END-IF
       *
                IF    ( RECE62-SHOKUJIRYOYOHI(IDX4) >   ZERO            )
@@ -6856,7 +6778,7 @@
            END-IF    
       *    公費４
            IF      IDX5                   >   ZERO
-               IF   (  RECE62-TOTALTEN (IDX5)  >   ZERO               )
+               IF   (  RECE62-KOHNUM(IDX5 - 1)    NOT =   SPACE       )
                AND  (( RECE62-TOTALTEN (IDX5)
                                    NOT =   RECE62-TOTALTEN (IDX1)) OR
                      ( RECE62-TOTALTEN (IDX5)
@@ -6883,7 +6805,7 @@
                        END-IF
                      END-IF
                END-IF
-               IF    ( RECE62-TOTALTEN (IDX5)  > ZERO                  )
+               IF    ( RECE62-KOHNUM(IDX5 - 1)    NOT =   SPACE        )
                AND   ( RECE62-FTNMONEY (IDX5)  = RECE62-FTNMONEY (IDX4))
                AND   ( RECE62-KISAIFLG (IDX5)  = "1"                   )
                    IF      RECE62-FTNMONEY (IDX5)   >   ZERO
@@ -6892,54 +6814,22 @@
                        MOVE    WRK-KGK7        TO  WRK-KOH-FTNMONEY(4)
                    END-IF
                END-IF
-               IF   (( RECE62-TOTALTEN (IDX5)      >   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX5)  =   "1"  )     )
-               OR   (( RECE62-KOHNUM(4)            =   "012") AND
-                     ( RECE62-TOTALTEN (IDX5)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX5)  =   "1"  )     )
-               OR   (( RECE62-FUKUSHIFLG(IDX5)     =   "1"  ) AND
-                     ( RECE62-TOTALTEN (IDX5)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX5)  =   "1"  )     )
-               OR   (( RECE62-FUKUSHIFLG(IDX5)     =   "1"  ) AND
-                     ( RECE62-TOTALTEN (IDX5)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      >   ZERO )     )
-               OR   (( RECE62-HKNNUM         NOT =   SPACE  ) AND
-                     ( RECE62-GENMENKBN          =   2 OR 3 ) AND
-                     ( RECE62-TOTALTEN (IDX5)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      =   ZERO ) AND
-                     ( RECE62-ZEROKISAIFLG (IDX5)  =   "1"  )     )
-               OR   (( RECE62-HKNNUM         NOT =   SPACE  ) AND
-                     ( RECE62-GENMENKBN          =   2 OR 3 ) AND
-                     ( RECE62-TOTALTEN (IDX5)      =   ZERO ) AND
-                     ( RECE62-FTNMONEY (IDX5)      >   ZERO )     )
+               IF    ( RECE62-KOHNUM(IDX5 - 1)    NOT =   SPACE )
+               AND   ( RECE62-FTNMONEY (IDX5)         =   ZERO  )
+               AND   ( RECE62-ZEROKISAIFLG (IDX5)     =   "1"   )
                    MOVE    RECE62-FTNMONEY (IDX5)  TO  WRK-KGK7
                    MOVE    WRK-KGK7                TO
                                                    WRK-KOH-FTNMONEY(4)
                END-IF
-               IF    ( RECE62-TOTALTEN (IDX5) >   ZERO            )
-               AND   ((RECE62-TOTALTEN (IDX5)
-                                   NOT =   RECE62-TOTALTEN (IDX4)) OR
-                      (RECE62-JSKISAIFLG             =  "1"      ) OR
-                      (RECE62-EKF-TOTALTENFLG(IDX5)  =  "1"      ))
+               IF      RECE62-KOHNUM(IDX5 - 1)    NOT =   SPACE
+                 IF  (RECE62-TOTALTEN(IDX4)
+                                        NOT = RECE62-TOTALTEN(IDX5))
+                 OR  (RECE62-JSKISAIFLG            = "1"           )
+                 OR  (RECE62-EKF-TOTALTENFLG(IDX5) = "1"           )
                    MOVE    RECE62-TOTALTEN (IDX5)  TO  WRK-KGK10
                    MOVE    WRK-KGK10               TO
                                                    WRK-KOH-TOTALTEN(4)
-               ELSE
-                   IF    ((RECE62-FUKUSHIFLG(IDX5) =   "1"  ) AND
-                          (RECE62-TOTALTEN (IDX5)  =   ZERO ))
-                   OR    ((RECE62-KOHNUM(4)        =   "012") AND
-                          (RECE62-TOTALTEN (IDX5)  =   ZERO ))
-                   OR    ((RECE62-HKNNUM     NOT =   SPACE  ) AND
-                          (RECE62-KOHNUM(4)  NOT =   SPACE  ) AND
-                          (RECE62-GENMENKBN      =   2 OR 3 ) AND
-                          (RECE62-TOTALTEN (IDX5)  =   ZERO ))
-                       MOVE    RECE62-TOTALTEN (IDX5)  TO  WRK-KGK10
-                       MOVE    WRK-KGK10               TO
-                                                   WRK-KOH-TOTALTEN(4)
-                   END-IF
+                 END-IF
                END-IF
       *
                IF    ( RECE62-SHOKUJIRYOYOHI(IDX5) >   ZERO            )

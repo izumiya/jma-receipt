@@ -101,6 +101,7 @@
       *  04.07.05    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/08/29  Åçº¬¡¦ÆàÎÉ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.08    NACL-ÌçÏÆ    15/03/17  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -142,11 +143,13 @@
            03  FLG-INNAI           PIC 9(01).
            03  FLG-HKNCOMBI-CHECK  PIC 9(01).
            03  FLG-SKJ-CHECK       PIC 9(01).
+           03  FLG-SRYACCT-CHECK   PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
            03  IDX1                PIC 9(04).
+           03  IDX2                PIC 9(04).
            03  SYOTOKU-IDX         PIC 9(02).
       *
       *    °ì»þÎÎ°è
@@ -184,6 +187,8 @@
                  07  WRK-HKNCOMBINUM-HKNID  PIC 9(10).
                  07  WRK-HKNCOMBINUM-FLG    PIC 9(01).
                  07  WRK-HKNCOMBINUM-KYUFUGAI
+                                            PIC 9(01).
+                 07  WRK-HKNCOMBINUM-ZEROFLG
                                             PIC 9(01).
       *
            03  WRK-HKNNUM                   PIC X(03).
@@ -254,6 +259,10 @@
       *    ´µ¼ÔÊÝ¸±¾ðÊó
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
+      *
+      *    ¿ÇÎÅ²ñ·×
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK1001.INC".
@@ -1951,6 +1960,9 @@
                         MOVE    1    TO    FLG-SKJRYOYOHI-ARI
                      END-IF
                      PERFORM     2004113-SAIGAI-HENSYU2-SEC
+                     IF  SYU-TOTAL-HKNTEN = ZERO
+                        MOVE    1    TO    WRK-HKNCOMBINUM-ZEROFLG(IDX1)
+                     END-IF
                   ELSE
                      PERFORM     2004112-SAIGAI-HENSYU-SEC
                      IF  FLG-SAIGAI-TAISYO  =  1
@@ -2069,8 +2081,24 @@
            AND   FLG-ARI2          =    1
              IF  WRK-SEIKYU         =  ZERO
              AND FLG-SKJRYOYOHI-ARI =  ZERO
+                MOVE     ZERO    TO   FLG-SRYACCT-CHECK
+                PERFORM  VARYING  IDX2  FROM  1  BY  1
+                          UNTIL  (IDX2               >  50)
+                           OR    (FLG-SRYACCT-CHECK  =  1 )
+                  IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                    PERFORM  2004115-SRYACCT-CHECK-SEC
+                  END-IF
+                END-PERFORM
+                IF    FLG-SRYACCT-CHECK  =  1
+                  IF  LNK-FTNJGNCHK-KOHNUM(1:1) = "0"
+                       CONTINUE
+                  ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
+                  END-IF
+                ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                END-IF
              END-IF
            END-IF
       *
@@ -2416,7 +2444,20 @@
                      AND   FLG-SKJ-CHECK          =    1
                              MOVE   ZERO       TO  LNK-FTNJGNCHK-RC
                      END-IF
+                   END-IF
       *
+                   IF   LNK-FTNJGNCHK-RC      = ZERO
+                   AND  WRK-HKNMST-JGNGAK     = ZERO
+                   AND  WRK-KOHFTN        NOT = 9999999999
+                   AND  LNK-FTNJGNCHK-SRYYM  >= "200804"
+                     IF   WRK-KOHFTN9-H  =  WRK-KOHFTN-H
+                             MOVE   01         TO  LNK-FTNJGNCHK-RC
+                     END-IF
+      *
+                     IF    LNK-FTNJGNCHK-RC   NOT =   ZERO
+                     AND   FLG-SKJ-CHECK          =    1
+                             MOVE   ZERO       TO  LNK-FTNJGNCHK-RC
+                     END-IF
                    END-IF
                END-EVALUATE
            END-IF
@@ -2430,6 +2471,44 @@
       *
            .
        2004114-FTNJGNCHK-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2004115-SRYACCT-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                          SRYACCT-REC
+           MOVE   LNK-FTNJGNCHK-HOSPNUM    TO  ACCT-HOSPNUM
+           MOVE   LNK-FTNJGNCHK-NYUGAIKBN  TO  ACCT-NYUGAIKBN
+           MOVE   LNK-FTNJGNCHK-PTID       TO  ACCT-PTID
+           MOVE   LNK-FTNJGNCHK-SRYYM      TO  ACCT-SRYYM
+           MOVE   WRK-HKNCOMBINUM(IDX2)    TO  ACCT-HKNCOMBI
+           MOVE   SRYACCT-REC              TO  MCPDATA-REC
+           MOVE   "DBSELECT"               TO  MCP-FUNC
+           MOVE   "tbl_sryacct"            TO  MCP-TABLE
+           MOVE   "key64"                  TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"              USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+           IF      MCP-RC   =   ZERO
+             MOVE   "DBFETCH"              TO  MCP-FUNC
+             MOVE   "tbl_sryacct"          TO  MCP-TABLE
+             MOVE   "key64"                TO  MCP-PATHNAME
+             CALL   "ORCDBMAIN"            USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+             IF    MCP-RC   =   ZERO
+                MOVE    MCPDATA-REC        TO  SRYACCT-REC
+                MOVE    1                  TO  FLG-SRYACCT-CHECK
+             END-IF
+           END-IF
+           MOVE     "tbl_sryacct"          TO  MCP-TABLE
+           MOVE     "key64"                TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+       2004115-SRYACCT-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2495,6 +2574,9 @@
                         MOVE    1    TO    FLG-SKJRYOYOHI-ARI
                      END-IF
                      PERFORM     2004113-SAIGAI-HENSYU2-SEC
+                     IF  SYU-TOTAL-HKNTEN = ZERO
+                        MOVE    1    TO    WRK-HKNCOMBINUM-ZEROFLG(IDX1)
+                     END-IF
                   ELSE
                      PERFORM     2004112-SAIGAI-HENSYU-SEC
                      IF  FLG-SAIGAI-TAISYO  =  1
@@ -2537,8 +2619,24 @@
            AND   FLG-ARI2          =    1
              IF  WRK-SEIKYU         =  ZERO
              AND FLG-SKJRYOYOHI-ARI =  ZERO
+                MOVE     ZERO    TO   FLG-SRYACCT-CHECK
+                PERFORM  VARYING  IDX2  FROM  1  BY  1
+                          UNTIL  (IDX2               >  50)
+                           OR    (FLG-SRYACCT-CHECK  =  1 )
+                  IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                    PERFORM  2004115-SRYACCT-CHECK-SEC
+                  END-IF
+                END-PERFORM
+                IF    FLG-SRYACCT-CHECK  =  1
+                  IF  LNK-FTNJGNCHK-KOHNUM(1:1) = "0"
+                       CONTINUE
+                  ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
+                  END-IF
+                ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                END-IF
              END-IF
            END-IF
       *

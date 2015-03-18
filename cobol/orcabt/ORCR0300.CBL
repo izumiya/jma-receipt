@@ -419,6 +419,7 @@
       *                                    （通則加算対象外）
       *  04.07.11    NACL-藤原    15/02/18  医療情報連携対応
       *                                     自費レセプトを対象とする
+      *  04.07.12    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
       *
       *  04.08.01    NACL-藤原    14/06/02  請求情報への更新日設定
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
@@ -3287,23 +3288,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
              OR  ( RECE02-EKF-FTNKEIFLG(IDX)  =  "2" )
                CONTINUE
              ELSE
-               IF      RECE02-FTNMONEY(IDX)   >   ZERO     
+               IF    ( RECE02-FTNMONEY(IDX)      >   ZERO  )
+               OR    ((RECE02-FTNMONEY(IDX)      =   ZERO ) AND
+                      (RECE02-ZEROKISAIFLG(IDX)  =   "1"  ))
                    MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
                    MOVE    8                      TO  WRK-NAGASA
-               ELSE
-                   IF   (( RECE02-TOTALTEN (IDX)      >   ZERO ) AND
-                         ( RECE02-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE02-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE02-FUKUSHIFLG(IDX)     =   "1"  ) AND
-                         ( RECE02-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE02-FTNMONEY (IDX)      =   ZERO ) AND
-                         ( RECE02-ZEROKISAIFLG (IDX)  =   "1"  ))
-                   OR   (( RECE02-FUKUSHIFLG(IDX)     =   "1"  ) AND
-                         ( RECE02-TOTALTEN (IDX)      =   ZERO ) AND
-                         ( RECE02-FTNMONEY (IDX)      >   ZERO ))
-                       MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
-                       MOVE    8                      TO  WRK-NAGASA
-                   END-IF
                END-IF
              END-IF
            END-IF
