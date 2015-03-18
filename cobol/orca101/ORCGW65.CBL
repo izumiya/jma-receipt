@@ -10385,8 +10385,7 @@
                                         OR "783" OR "263" OR "363"
                                         OR "463" OR "563")
                WHEN  ( SPA-PREFNUM     =   CONST-SAITAMA )
-                AND  ( SPA-GMN-KOHNUM  =   "352" OR "353" OR "354"
-                                        OR "683" )
+                AND  ( SPA-GMN-KOHNUM  =   "683" )
                    MOVE    "2"         TO  SPA-GMN-SKJRYOKBNHON
                    MOVE    "0"         TO  SPA-GMN-SKJRYOTAIKBNHON
                END-EVALUATE

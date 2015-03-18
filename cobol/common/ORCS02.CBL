@@ -402,6 +402,7 @@
       *  04.07.26    NACL-ÌçÏÆ    15/01/26  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡ÊÅÔÆ»ÉÜ¸©ÆÈ¼«ÆñÉÂÂÐ±þ¡Ë
       *  04.07.27    NACL-ÌçÏÆ    15/02/02  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
+      *  04.07.28    NACL-ÌçÏÆ    15/03/18  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -10975,6 +10976,11 @@
                  PERFORM    21134-SYSKAN2010-SET4-SEC
                WHEN       "0"
                  MOVE         "0"     TO  WK-2010-SKJRYOKBN-HON(IDX-CYO)
+                 IF ((COMB-KOHHKNNUM(IDX-CYO) =
+                               "352" OR "353" OR "354"   ) AND
+                     (LNK-SYU-SRYYMD(1:6)    <= "201412" ))
+                     MOVE     "2"     TO  WK-2010-SKJRYOKBN-HON(IDX-CYO)
+                 END-IF
                  IF ((WK-1001-PREFNUM         =   11     ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) =  "382"   ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200910" ) AND
@@ -11533,8 +11539,9 @@
                                       WK-2010-SEIKANKBN-HON(IDX-CYO)
                  END-IF
                WHEN       11
-                 IF   COMB-KOHHKNNUM(IDX-CYO) =
-                               "352" OR "353" OR "354"
+                 IF ((COMB-KOHHKNNUM(IDX-CYO) =
+                               "352" OR "353" OR "354"   ) AND
+                     (LNK-SYU-SRYYMD(1:6)    <= "201412" ))
                    MOVE    "2"    TO  WK-2010-SKJRYOKBN-HON(IDX-CYO)
                  END-IF
                  IF ((COMB-KOHHKNNUM(IDX-CYO) =  "683"   ) AND
