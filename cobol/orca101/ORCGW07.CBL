@@ -124,6 +124,7 @@
       *  04.07.00    NACL-ÂÀÅÄ    12/07/04  ºÆ·×»»³ºÅö¼Ô¥Á¥§¥Ã¥¯ÀßÄêÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/08/01  »þ´Ö³°¶ÛµÞ±¡Æâ¥Á¥§¥Ã¥¯¶èÊ¬ÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/12/08  ÅÀ¿ô»»Äê´ð½àÄÉ²Ã
+      *  04.07.00    NACL-Â¿¡¹Ç¼  15/03/XX  Äã¾Ò²ðÎ¨ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1289,6 +1290,16 @@
                            11  SPA-GMN-DAKETUKBN-LIST     PIC X(50)
                                                           OCCURS  5.
                        09  SPA-GMN-DAKETUKBN-MAX          PIC 9(04).
+      *H27.4
+      *                Äã¾Ò²ðÎ¨¶èÊ¬
+                       09  SPA-GMN-TEIRITUKBN-G.
+                           11  SPA-GMN-TEIRITUKBN         PIC X(01).
+                           11  SPA-GMN-TEIRIT-F1          PIC X(01).
+                           11  SPA-GMN-TEIRITUKBN-MEI     PIC X(48).
+                       09  SPA-GMN-TEIRITUKBN-COMB.
+                           11  SPA-GMN-TEIRITUKBN-LIST    PIC X(50)
+                                                          OCCURS  5.
+                       09  SPA-GMN-TEIRITUKBN-MAX         PIC 9(04).
       *
       *
                    07  SPA-GMN-DATALST        OCCURS  2.
@@ -2259,6 +2270,13 @@
            MOVE    "1 ÄãÂÅ·ëÎ¨¤Ç¤¢¤ë"
                                        TO  SPA-GMN-DAKETUKBN-LIST(2)
            MOVE    2                   TO  SPA-GMN-DAKETUKBN-MAX
+      *H27.4
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    "0 Äã¾Ò²ðÎ¨¤Ç¤Ê¤¤"
+                                       TO  SPA-GMN-TEIRITUKBN-LIST(1)
+           MOVE    "1 Äã¾Ò²ðÎ¨¤Ç¤¢¤ë"
+                                       TO  SPA-GMN-TEIRITUKBN-LIST(2)
+           MOVE    2                   TO  SPA-GMN-TEIRITUKBN-MAX
       *
       *
       *ver.4.7
@@ -5015,6 +5033,40 @@
                                        TO  SPA-GMN-DAKETUKBN-G
            END-IF
       *
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1202"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    NOT =   ZERO
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                      SYSKANRI-REC
+           END-IF
+           MOVE    SYS-KANRITBL(1:1)   TO  SPA-GMN-TEIRITUKBN
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-TEIRITUKBN-MAX
+               IF      SPA-GMN-TEIRITUKBN
+                                       =   SPA-GMN-TEIRITUKBN-LIST(IDY)
+                                                             (1:1)
+                   MOVE    SPA-GMN-TEIRITUKBN-LIST(IDY)
+                                           TO  SPA-GMN-TEIRITUKBN-G
+                   MOVE    1               TO  FLG-OK
+                   MOVE    SPA-GMN-TEIRITUKBN-MAX
+                                           TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-TEIRITUKBN-LIST (1)
+                                       TO  SPA-GMN-TEIRITUKBN-G
+           END-IF
+      *
            MOVE    800                 TO  SPA-GMN-CUR
       *
            . 
@@ -5297,6 +5349,7 @@
       *
       *    ÅÀ¿ô»»Äê´ð½à¾ðÊó
            MOVE    W07-DAKETUKBN       TO  SPA-GMN-DAKETUKBN-G
+           MOVE    W07-TEIRITUKBN      TO  SPA-GMN-TEIRITUKBN-G
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -5822,6 +5875,10 @@
       *            ÂÅ·ëÎ¨¶èÊ¬
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4611-DAKETUKBN-CHK-SEC
+                   END-IF
+      *            Äã¾Ò²ðÎ¨¶èÊ¬
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4611-TEIRITUKBN-CHK-SEC
                    END-IF
            END-EVALUATE
       *
@@ -9387,6 +9444,32 @@
            EXIT.
       *
       *****************************************************************
+      *    Äã¾Ò²ðÎ¨¶èÊ¬¥Á¥§¥Ã¥¯½èÍý¡ÊÅÀ¿ô»»Äê´ð½à¾ðÊó¡Ë
+      *****************************************************************
+       4611-TEIRITUKBN-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-TEIRITUKBN-MAX )
+                          OR  (FLG-OK  =   1    )
+               IF      SPA-GMN-TEIRITUKBN
+                                       =   SPA-GMN-TEIRITUKBN-LIST(IDX)
+                                                             (1:1)
+                   MOVE    SPA-GMN-TEIRITUKBN-LIST(IDX)
+                                           TO  SPA-GMN-TEIRITUKBN-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    801             TO  SPA-GMN-CUR
+               MOVE    "8002"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       44611-TEIRITUKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    Ìá¤ë¡¡½èÍý
       *****************************************************************
        210-BACK                    SECTION.
@@ -9705,6 +9788,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SYSKANRI-REC
            INITIALIZE                      SYSKANRI-REC
            MOVE    "1201"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "9001"              TO  SPA-ERRCD
+               DISPLAY "SYSKANRI-KEY =>" SYS-KEY 
+                       ",MCP-RC:" MCP-RC 
+               GO  TO  4033-DEL-1201-EXT
+           END-IF
+      *
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1202"              TO  SYS-KANRICD
            MOVE    "A0000001"          TO  SYS-KBNCD
            MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
            MOVE    SPA-W01-EDYUKYMD    TO  SYS-EDYUKYMD
@@ -10414,6 +10521,34 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-W01-EDYUKYMD        TO  SYS-EDYUKYMD
       *    ÂÅ·ëÎ¨¶èÊ¬
            MOVE    SPA-GMN-DAKETUKBN       TO  SYS-KANRITBL(1:1)
+      *
+      *    £Ä£Â¹¹¿·½èÍý
+           PERFORM 4910-DBKOUSIN-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      493-KOUSHIN-1201-EXT
+           END-IF
+      *
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1202"              TO  SYS-KANRICD
+           MOVE    "A0000001"          TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        NOT =   ZERO
+               MOVE    SPACE               TO  SYSKANRI-REC
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    "1202"              TO  SYS-KANRICD
+               MOVE    "A0000001"          TO  SYS-KBNCD
+           END-IF
+      *
+           MOVE    SPA-W01-STYUKYMD        TO  SYS-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD        TO  SYS-EDYUKYMD
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    SPA-GMN-TEIRITUKBN      TO  SYS-KANRITBL(1:1)
       *
       *    £Ä£Â¹¹¿·½èÍý
            PERFORM 4910-DBKOUSIN-SEC
@@ -11736,7 +11871,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-DAKETUKBN-LIST (IDX)
                                       TO  W07-DAKETUKBN-ITEM(IDX)
            END-PERFORM
-           MOVE    SPA-GMN-DAKETUKBN-MAX    TO  W07-DAKETUKBN-COUNT
+           MOVE    SPA-GMN-DAKETUKBN-MAX   TO  W07-DAKETUKBN-COUNT
+      *    Äã¾Ò²ðÎ¨¶èÊ¬
+           MOVE    SPA-GMN-TEIRITUKBN-G    TO  W07-TEIRITUKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-TEIRITUKBN-MAX
+               MOVE    SPA-GMN-TEIRITUKBN-LIST (IDX)
+                                      TO  W07-TEIRITUKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-TEIRITUKBN-MAX TO  W07-TEIRITUKBN-COUNT
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -12229,6 +12372,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "8001"
                    MOVE    "ÂÅ·ëÎ¨¶èÊ¬¤¬¤¢¤ê¤Þ¤»¤ó¡£"
                                                        TO  SPA-ERRMSG
+               WHEN    "8002"
+                   MOVE    "Äã¾Ò²ðÎ¨¶èÊ¬¤¬¤¢¤ê¤Þ¤»¤ó¡£"
+                                                       TO  SPA-ERRMSG
       *
                WHEN    "0099"
                    MOVE    "Ì¤ÆþÎÏ¤Î¹àÌÜ¤¬¤¢¤ê¤Þ¤¹"    TO  SPA-ERRMSG
@@ -12320,6 +12466,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  WID1
+           INITIALIZE                      WID1
            MOVE    SPA-WIDCD           TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG          TO  WID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
@@ -12708,6 +12855,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *ÅÀ¿ô»»Äê´ð½à
                WHEN    800
                    MOVE  "DAKETUKBN"       TO   MCP-WIDGET
+               WHEN    801
+                   MOVE  "TEIRITUKBN"      TO   MCP-WIDGET
       *
                WHEN    999
                    MOVE  "B12"             TO   MCP-WIDGET
@@ -13145,6 +13294,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    999             TO  SPA-GMN-CUR
       *ÅÀ¿ô»»Äê´ð½à
                WHEN    "DAKETUKBN"
+                   MOVE    801             TO  SPA-GMN-CUR
+               WHEN    "TEIRITUKBN"
                    MOVE    999             TO  SPA-GMN-CUR
            END-EVALUATE
       *

@@ -65,6 +65,7 @@
       *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *  04.08.00    NACL-多々納  14/05/XX  一時保存データ対応
       *  04.08.00    NACL-多々納  14/08/11  クライアント印刷変更
+      *  04.08.00    NACL-多々納  15/02/XX  後発品変更不可処方対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -321,6 +322,8 @@
            03  FLG-TENSUPLUS           PIC 9(01).
       *
            03  FLG-RSIKSN              PIC 9(01).
+      *H27.1
+           03  FLG-INGIKSN-KBN         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1584,7 +1587,10 @@
            MOVE    SPACE               TO  LNK-WKSRYACT-AREA
            INITIALIZE                  LNK-WKSRYACT-AREA
            MOVE    ZERO                TO  IDX-MAX
-           MOVE    ZERO           TO  FLG-FUKU
+           MOVE    ZERO                TO  FLG-FUKU
+      *H27.1
+           MOVE    ZERO                TO  FLG-INGIKSN-KBN
+      *
            PERFORM VARYING   IDX1      FROM   1   BY  1
                    UNTIL    (IDX1      >   WRK-MAX    )
                IF     (HZN-WKSRY-HKNCOMBI(IDX1)   =   WRK-HKNCOMBI) AND
@@ -1593,6 +1599,17 @@
                    MOVE    HZN-WKSRYACT-REC(IDX1)
                                               TO  LNK-WKSRYACT-REC
                                                                (IDX-MAX)
+      *H27.1
+      *            一般・銘柄名処方毎
+                   IF      HZN-WKSRY-SRYCD(IDX1 1)    =    "099209910"
+      *                後発品変更不可
+                       MOVE    1                   TO  FLG-INGIKSN-KBN
+                   END-IF
+                   IF      HZN-WKSRY-SRYCD(IDX1 1)    =    "099209911"
+      *                後発品変更可
+                       MOVE    2                   TO  FLG-INGIKSN-KBN
+                   END-IF
+      *!!
                    IF      HZN-WKSRY-INPUTCD(IDX1 1)(1:1)  =   "#"
                        MOVE    1              TO  FLG-FUKU
                    END-IF
@@ -3112,14 +3129,25 @@
                MOVE    1               TO  WRK-IPNMEI
            END-IF
       *
+      *H27.1
+      *    後発品変更不可（処方）
+           IF     (FLG-INGIKSN-KBN     =   1    )
+              AND (WRK-IPNMEI          =   ZERO )
+               GO      TO      310020-GENERICNAME-CHK-EXT
+           END-IF
+      *
            PERFORM 9101-TENSUPLUS-READ-SEC
       *
       *    システム管理の変更可によってすべて一般名記載とする
            IF     (TNSP-IPN-KISAIKBN       =   0       )
-             AND  (SPA-KOUHATUKA           =   "1"     )
+      *?     AND  (SPA-KOUHATUKA           =   "1"     )
              AND  (TNS-KOUHATUKBN          =   1  OR  2
                                            OR  7       )
-               MOVE    1               TO  TNSP-IPN-KISAIKBN
+      *H27.1
+               IF       (SPA-KOUHATUKA           =   "1" )
+                   OR   (FLG-INGIKSN-KBN         =   2    )
+                   MOVE    1               TO  TNSP-IPN-KISAIKBN
+               END-IF
            END-IF
       *
       *    後発品区分名称
@@ -7043,6 +7071,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            MOVE    SPACE               TO  K08
+           INITIALIZE                      K08
       *
       *    コラムリストの位置指定
            MOVE    ZERO                TO  K08-ROW
@@ -7452,6 +7481,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-KERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KERR2
+           INITIALIZE                      KERR2
            MOVE    SPA-ERRCD           TO  KERR2-ERRCODE
            MOVE    SPA-ERRMSG          TO  KERR2-ERRMSG
            MOVE    SPA-ERRMSG2         TO  KERR2-ERRMSG2(1:80)
@@ -7504,6 +7534,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *

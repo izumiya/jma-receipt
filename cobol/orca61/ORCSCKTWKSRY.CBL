@@ -30,6 +30,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/09/XX  '0086'¥³¥á¥ó¥È¥³¡¼¥ÉÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/05/29  °ì»þ¥Õ¥¡¥¤¥ëÊÑ¹¹
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -188,6 +189,7 @@
            03  FLG-DAY             PIC 9(01).
       *
            03  FLG-RSITEN          PIC 9(01).
+           03  FLG-TEIGEN30-ZAI    PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -339,6 +341,12 @@
        01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
       * ¡ÊÀº¸º¡Ë
        01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *
+      *H27.4
+      * Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»¥³¡¼¥É
+       01  CONS-TEIHP-SRYCD        PIC X(09)   VALUE    "630010006".
+      * ¡Ê¸º¡Ë¡ÊÆâÉþÄþ¸º¤ÈÆ±¤¸¡Ë
+       01  CONS-TGEN-SRYCD         PIC X(09)   VALUE    "820000047".
       *
       *
       *****************************************************************
@@ -3038,8 +3046,19 @@
            MOVE    SPACE               TO  WKSRYACTPLUS-REC
            INITIALIZE                  WKSRYACTPLUS-REC
       *
+           MOVE    ZERO                TO  FLG-TEIGEN30-ZAI
+      *
            PERFORM VARYING     IDW2    FROM    IDW-STR   BY  1
                    UNTIL       IDW2    >   SPA-GMN-MAX
+      *H27.4
+      *        £³£°Æü¸ºÂÐ¾ÝÈ½Äê
+               IF     (SPA-COM-SRYKBN(IDW2)    =   "21"
+                                               OR  "22" )
+                 AND  (SPA-COM-INPUTCD(IDW2)(1:1)  =   "6" )
+                 AND  (SPA-COM-YOBI2 (IDW2)(1:1)   =   SPACE)
+                   MOVE    1                   TO  FLG-TEIGEN30-ZAI
+               END-IF
+      *
                IF      SPA-COM-ZAIEND(IDW2)    =   "1"
                    MOVE    IDW2                TO  IDW-END
                    MOVE    SPA-GMN-MAX         TO  IDW2
@@ -3140,6 +3159,8 @@
       *    ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
            IF     (SPA-COM-SRYKBN(IDW2)    =   "21" )  AND
                   (SPA-COM-INPUTCD(IDW2)   =   "820000047")
+      *H27.4
+            AND   (SPA-NAIFUKU-OK          =   1     )
                MOVE    1                   TO  WKSRYP-TEI-NKBN
            END-IF
       *H26.10
@@ -3149,6 +3170,17 @@
                                            OR  "23" )  AND
                   (SPA-COM-INPUTCD(IDW2)   =   CONS-SGEN-SRYCD )
                MOVE    1                   TO  WKSRYP-TEI-NKBN
+           END-IF
+      *H27.4
+      *    £³£°ÆüÅêÌôÄþ¸ºÂÐ¾Ý
+           IF     (SPA-COM-SRYKBN(IDW2)    =   "21"
+                                           OR  "22" )
+             AND  (SPA-COM-INPUTCD(IDW2)   =   CONS-TGEN-SRYCD )
+             AND  (SPA-TEIGEN30-OK         =   1    )
+             AND  (WRK-KAISUKEI            >=  30   )
+      *        ÂÐ¾Ý¤ÎºÞÈ½Äê
+             AND  (FLG-TEIGEN30-ZAI        =   1    )
+               MOVE    1                   TO  WKSRYP-TEI-NKBN30
            END-IF
       *
       *
@@ -4007,6 +4039,8 @@
                                                =   "630010002"
       *H26.10
                                                OR  CONS-TAZAI-SRYCD
+      *H27.4                   Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»¥³¡¼¥É
+                                                 OR  CONS-TEIHP-SRYCD
                            COMPUTE SUM-SYU-HKNTEN (04)
                                                =   SUM-SYU-HKNTEN(04)
                                                -   ORCSCWKSRY-KSN-TENSU
@@ -4217,6 +4251,16 @@
                MOVE    1                   TO  WKSRYP-PLUSKBN
       *        ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
                MOVE    2                   TO  WKSRYP-TEI-NKBN
+               MOVE    "1"                 TO  WKSRYP-ADDKBN
+           END-IF
+      *
+      *H27.4
+      *    Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»
+      *    ÌôºÞÎÁÄþ¸º¡¡¤ò¸º»»
+           IF      ORCSCWKSRY-KSN-SRYCD (IDX)  =   CONS-TEIHP-SRYCD
+               MOVE    1                   TO  WKSRYP-PLUSKBN
+      *        ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
+               MOVE    2                   TO  WKSRYP-TEI-NKBN30
                MOVE    "1"                 TO  WKSRYP-ADDKBN
            END-IF
       *

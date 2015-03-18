@@ -1111,6 +1111,13 @@ W07 {
             textdata varchar(50);
           };
         };
+        TEIRITUKBN_COMB { #GtkPandaCombo
+          count int;
+          item varchar(50)[5];
+          TEIRITUKBN { #GtkPandaEntry
+            textdata varchar(50);
+          };
+        };
       };
       TAGNAME8 {
         state int;

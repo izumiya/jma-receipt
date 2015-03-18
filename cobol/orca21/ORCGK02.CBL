@@ -111,6 +111,7 @@
       *  04.08.00    NACL-多々納  14/08/11  クライアント印刷変更
       *  04.07.00    NACL-多々納  14/10/09  患者登録戻り処理変更
       *  04.08.00    NACL-多々納  14/10/23  連続挿入対応
+      *  04.08.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1727,6 +1728,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *H26.10      向精神薬多剤
                    MOVE    ZERO            TO  SPA-PSYCHO-OK
                    MOVE    ZERO            TO  SPA-PSYCHO-CHK
+      *H27.4
+                   MOVE    ZERO            TO  SPA-TEIGEN30-CHK
+                   MOVE    ZERO            TO  SPA-TEIGEN30-OK
       *
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
@@ -3222,6 +3226,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                       MOVE    1                TO  SPA-PSYCHO-OK
                    ELSE
                       MOVE    ZERO             TO  SPA-PSYCHO-OK
+                   END-IF
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   MOVE    SPACE               TO  SPA-KID1-FLG
+      *            画面制御
+                   MOVE    "JOIN"              TO  WRK-PUTTYPE
+                   PERFORM 41002-KOUSIN-SYORI-SEC
+      *H27.4
+      *        低紹介率３０日以上投与
+               WHEN    "2007"
+                   MOVE    SPACE               TO  SPA-KIDCD
+                   IF      SPA-KID1-FLG        =   "OK"
+                      MOVE    1                TO  SPA-TEIGEN30-OK
+                   ELSE
+                      MOVE    ZERO             TO  SPA-TEIGEN30-OK
                    END-IF
                    MOVE    SPACE               TO  SPA-KIDCD
                    MOVE    SPACE               TO  SPA-KID1-FLG
@@ -7611,6 +7629,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    画面編集
            INITIALIZE                  SPA-K99GMN-AREA
            MOVE    SPACE               TO  K99
+           INITIALIZE                      K99
       *
       *    画面カーソルセット処理
            MOVE    "PIN"               TO  MCP-WIDGET
@@ -8989,7 +9008,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    MSYU-SRYMEI (MSYU-IDX)
                                                 TO  WRK-SRYSYUKBNMEI
            END-SEARCH 
-      *
            .
        510-SRYKBN-MEI-EXT.
            EXIT.
@@ -13757,6 +13775,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-KERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KERR2
+           INITIALIZE                      KERR2
            MOVE    SPA-ERRCD           TO  KERR2-ERRCODE
            MOVE    SPA-ERRMSG2         TO  KERR2-ERRMSG(1:80)
            MOVE    SPA-ERRMSG          TO  KERR2-ERRMSG2
@@ -14058,6 +14077,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H27.4　改正
+               WHEN    "2007"
+                   STRING  "３０日以上の投薬があります。"
+                           "逓減しますか？"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
       ***
       *ver.4.7
       *
@@ -14132,6 +14158,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *
@@ -14166,6 +14193,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "2004"
                WHEN    "2005"
                WHEN    "2006"
+               WHEN    "2007"
                    MOVE    "ＮＯ"            TO  KID1-B01
            END-EVALUATE
       *
@@ -14210,6 +14238,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID2
+           INITIALIZE                      KID2
            MOVE    SPA-KIDCD2          TO  KID2-ID2CODE
            MOVE    WRK-KIDMSG          TO  KID2-ID2MSG
       *    ユーザプログラム起動初期表示

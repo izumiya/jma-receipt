@@ -780,5 +780,11 @@
                             PIC X(50)   OCCURS  5 TIMES.
                     06  W07-DAKETUKBN.
                       07  W07-TEXTDATA    PIC X(50).
+                  05  W07-TEIRITUKBN-COMB.
+                    06  W07-TEIRITUKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W07-TEIRITUKBN-ITEM
+                            PIC X(50)   OCCURS  5 TIMES.
+                    06  W07-TEIRITUKBN.
+                      07  W07-TEXTDATA    PIC X(50).
                 04  W07-TAGNAME8.
                   05  W07-TAGNAME8-STATE   PIC S9(9)   BINARY.
