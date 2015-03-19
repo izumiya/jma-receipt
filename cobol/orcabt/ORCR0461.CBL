@@ -41,6 +41,7 @@
       *  04.07.07    NACL-門脇    15/02/05  摘要欄の点数・回数等の記載
       *                                     不具合対応
       *  04.07.08    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
+      *  04.07.09    NACL-門脇    15/03/16  平成２７年４月改正対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -656,6 +657,8 @@
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *    処方料（向精神薬多剤投与）
            03  FILLER          PIC X(09)   VALUE   "120003610".
+      *    処方料（紹介率が低い大病院３０日以上投薬減算）
+           03  FILLER          PIC X(09)   VALUE   "120003870".
       *
       *    再診（妥結率５割以下）
            03  FILLER          PIC X(09)   VALUE   "112016610".
@@ -697,9 +700,9 @@
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   78.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   79.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   78.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   79.
       *
       *    固定値
        01  CONST-AREA.
@@ -715,6 +718,8 @@
            03  CONS-TEIGEN     PIC X(09)   VALUE   "630010002".
       *    薬剤料逓減（８０／１００）（向精神薬多剤投与）
            03  CONS-TEIGEN2    PIC X(09)   VALUE   "630010005".
+      *    薬剤料逓減（６０／１００）（紹介率が低い大病院３０日以上投薬）
+           03  CONS-TEIGEN3    PIC X(09)   VALUE   "630010006".
       *    包括点数の治験減点分
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *---- (01.00.05) LINE ADD START --------------------------------
@@ -1508,6 +1513,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
                        IF      RECE45-SRYCD(IDX) =   CONS-TEIGEN
                                                  OR  CONS-TEIGEN2
+                                                 OR  CONS-TEIGEN3
                                                  OR  CONS-GENTEN
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF 
@@ -3903,7 +3909,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
-                                       "120003570" OR "120003710"
+                                       "120003570" OR "120003710" OR
+                                       "120003970"
                        MOVE   ZERO   TO   RECE46-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE46-SYOHOUFLG

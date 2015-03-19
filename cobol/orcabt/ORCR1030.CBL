@@ -70,6 +70,7 @@
       *  04.07.04    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *  04.07.05    NACL-門脇    14/09/01  平成２６年１０月改正対応
       *  04.07.06    NACL-門脇    15/03/09  訪問診療にかかる記録書コメント対応
+      *  04.07.07    NACL-門脇    15/03/16  平成２７年４月改正対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -6399,6 +6400,7 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
              END-PERFORM
       *
              IF      RECE120-SRYCDTOTAL  =   630010002  OR  630010005
+                                                        OR  630010006
                   MOVE      2      TO     TBL-YT1-FLG(IDX6)
              ELSE
                   MOVE      1      TO     TBL-YT1-FLG(IDX6)

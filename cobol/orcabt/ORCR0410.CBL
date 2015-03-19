@@ -121,6 +121,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.19    NACL-門脇    15/01/15  外来管理加算（読み替え加算）
       *                                     チェック
+      *  04.07.20    NACL-門脇    15/03/16  平成２７年４月改正対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
@@ -2291,6 +2292,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF        ACCT-SRYCDTOTAL    =    630010002
                                                   OR   630010005
+                                                  OR   630010006
                          COMPUTE  TBL-YKZTEN-JI(ID1)  =
                                   TBL-YKZTEN-JI(ID1)  -
                                  ( WRK-ZAIKAISU-JI * ACCT-ZAITEN   )
@@ -2551,6 +2553,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ELSE
                    IF        ACCT-SRYCDTOTAL    =    630010002
                                                 OR   630010005
+                                                OR   630010006
                      COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                  (ACCT-ZAITEN    *  
                                                   ACCT-ZAIKAISU)
@@ -2841,6 +2844,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ELSE
                  IF        ACCT-SRYCDTOTAL    =    630010002
                                               OR   630010005
+                                              OR   630010006
                    COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                (ACCT-ZAITEN    *  
                                                 WRK-ZAIKAISU)

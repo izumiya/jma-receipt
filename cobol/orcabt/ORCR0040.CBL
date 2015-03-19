@@ -160,6 +160,7 @@
       *  04.07.11    NACL-門脇    14/12/15  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
       *  04.07.12    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
+      *  04.07.13    NACL-門脇    15/03/16  平成２７年４月改正対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -8548,6 +8549,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
              END-PERFORM
       *
              IF      RECE04-SRYCDTOTAL  =   630010002  OR  630010005
+                                                       OR  630010006
                   MOVE      2      TO     TBL-YT1-FLG(IDX6)
              ELSE
                   MOVE      1      TO     TBL-YT1-FLG(IDX6)

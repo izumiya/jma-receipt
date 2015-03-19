@@ -688,6 +688,7 @@
       *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
       *  04.07.40    NACL-ÌçÏÆ    15/03/05  ¼çÊÝ¸±¡ÜÁ´¹ñ¸øÈñ¤È¼çÊÝ¸±¡ÜÃÏÊý¸øÈñ¡Ü
       *                                     Ä¹´ü¤ÎÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.07.41    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -1734,6 +1735,10 @@
            03  WRK-AKUSEI-SKAN2                        PIC 9(03).
       *    °ìÈÌÌ¾½èÊý²Ã»»¡Ê½èÊý¤»¤óÎÁ¡Ë
            03  WRK-IPPAN-SKAN2                         PIC 9(03).
+      *    ½èÊýÎÁ¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¡Ë
+           03  WRK-DAIBYOIN-SGEN                       PIC 9(03).
+      *    ½èÊý¤»¤óÎÁ¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¡Ë
+           03  WRK-DAIBYOIN-SGEN2                      PIC 9(03).
       *---------------------------------------------------------------
       *
        01  WRK-ERR-AREA.
@@ -1772,10 +1777,14 @@
            03  CONS-SHOHOKSN4  PIC X(09)   VALUE   "120003470".
       *    °ìÈÌÌ¾½èÊý²Ã»»¡Ê½èÊý¤»¤óÎÁ¡Ë
            03  CONS-SHOHOKSN5  PIC X(09)   VALUE   "120003570".
+      *    ½èÊý¤»¤óÎÁ¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¡Ë
+           03  CONS-SHOHOKSN6  PIC X(09)   VALUE   "120003970".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¹£°¡¿£±£°£°¡Ë¡ÊÆâÉþÌô¡Ë
            03  CONS-YAKTEIGEN  PIC X(09)   VALUE   "630010002".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
            03  CONS-YAKTEIGEN2 PIC X(09)   VALUE   "630010005".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¶£°¡¿£±£°£°¡Ë¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¡Ë
+           03  CONS-YAKTEIGEN3 PIC X(09)   VALUE   "630010006".
       *    ¡Ê¸º¡Ë
            03  CONS-GEN        PIC X(09)   VALUE   "820000047".
       *    ¡ÊÀº¸º¡Ë
@@ -4115,6 +4124,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        ELSE
                          IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
                                                   OR CONS-YAKTEIGEN2
+                                                  OR CONS-YAKTEIGEN3
                            COMPUTE    RECE02-DAISAN-TOTALTEN  =
                                       RECE02-DAISAN-TOTALTEN  -
                                      (ACCT-ZAITEN  *  ACCT-ZAIKAISU)
@@ -9792,6 +9802,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 ELSE
                  IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
                                           OR CONS-YAKTEIGEN2
+                                          OR CONS-YAKTEIGEN3
                    COMPUTE  RECE02-TOTALTEN(1) =  RECE02-TOTALTEN(1) -
                                                  (ACCT-ZAITEN  *  
                                                   ACCT-ZAIKAISU)
@@ -9854,6 +9865,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
                                               OR CONS-YAKTEIGEN2
+                                              OR CONS-YAKTEIGEN3
                          COMPUTE  RECE02-HENTOTALTEN(KH-IDX) =
                                         RECE02-HENTOTALTEN(KH-IDX) -
                                              (ACCT-ZAITEN * 
@@ -9869,6 +9881,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      ELSE
                        IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
                                                 OR CONS-YAKTEIGEN2
+                                                OR CONS-YAKTEIGEN3
                          COMPUTE  RECE02-TOTALTEN(KH-IDX) =
                                               RECE02-TOTALTEN(KH-IDX) -
                                              (ACCT-ZAITEN * 
@@ -10151,7 +10164,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       "099999903" OR "099999904" OR
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
-                      "099830101"                           )
+                      "099830101" OR "099200101"            )
                   COMPUTE   RECE04-MEISAISU    =  RECE04-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -10238,7 +10251,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099830101"                           )
+                       "099830101" OR "099200101"            )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
                  IF  WRK-TAIHI-ZAINUM  =  ZERO
@@ -10373,6 +10386,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND   ( ACCT-JIHOKBN      =     SPACE        )
                 IF   ACCT-SRYCDTOTAL(6:9) = CONS-YAKTEIGEN
                                          OR CONS-YAKTEIGEN2
+                                         OR CONS-YAKTEIGEN3
                   CONTINUE
                 ELSE
                   IF     RECE04-SAFLG   NOT =  SPACE
@@ -10903,6 +10917,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                IF          SRY-SRYKBN       =  "21" OR "22" OR "23"
                     IF    SRY-SRYCD(IDX2)  =  CONS-YAKTEIGEN
                                            OR CONS-YAKTEIGEN2
+                                           OR CONS-YAKTEIGEN3
                                            OR CONS-GEN
                                            OR CONS-GEN2
                         MOVE     "2"       TO    RECE04-COMCDFLG
@@ -10918,6 +10933,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       ***      IF    RECE04-COMCDFLG       =   "2"
       ***        IF    SRY-SRYCD(IDX2)  =  CONS-YAKTEIGEN
       ***                               OR CONS-YAKTEIGEN2
+      ***                               OR CONS-YAKTEIGEN3
       ***                               OR CONS-GEN
       ***                               OR CONS-GEN2
       ***          CONTINUE
@@ -12828,6 +12844,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                          WRK-AKUSEI-SKAN2
       *    °ìÈÌÌ¾½èÊý²Ã»»¤Î»»Äê²ó¿ô¸º»»ÍÑÎÎ°è¤Î½é´ü²½
            MOVE   ZERO              TO   WRK-IPPAN-SKAN2
+      *    ¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¤Î
+      *    »»Äê²ó¿ô¸º»»ÍÑÎÎ°è¤Î½é´ü²½
+           MOVE   ZERO              TO   WRK-DAIBYOIN-SGEN
+           MOVE   ZERO              TO   WRK-DAIBYOIN-SGEN2
       *
       *
       *    ¸øÈñ¤ÎÊ¬Î¥É½¼¨ÍÑ¥¤¥ó¥Ç¥Ã¥¯¥¹¤Î³ÎÄê
@@ -13062,7 +13082,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             "31"  OR  "32"  OR  "33" OR
                                             "40"  OR  "50"  OR  "54" OR
                                             "60"  OR  "70"  OR  "80" OR
-                                            "13"  OR  "14"  OR  "64" )
+                                            "13"  OR  "14"  OR  "64" OR
+                                            "25"                     )
                        OR ((ACCT-ZAIKBN  =   2  ) AND
                            (SRY-SRYKBN   =  "12"))
                            MOVE  ZERO          TO   WK-ZAIKAISU
@@ -13112,6 +13133,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            COMPUTE    RECE02-KAISU(19)   =    RECE02-KAISU(19)  -
                                               WRK-AKUSEI-SKAN
       *
+      *    ½èÊý¤Î»»Äê²ó¿ô¤«¤é
+      *    ¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¤Î¸º»»
+           COMPUTE    RECE02-KAISU(19)   =    RECE02-KAISU(19)  -
+                                              WRK-DAIBYOIN-SGEN
+      *
       *    ½èÊý¤Î»»Äê²ó¿ô¤«¤éÆÃÄê¼À´µ½èÊý´ÉÍý²Ã»»(½èÊýÎÁ)¤Î¸º»»
            COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
                                               WRK-TOKUTEI-SKAN2           
@@ -13131,6 +13157,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *    ½èÊý¤»¤ó¤Î»»Äê²ó¿ô¤«¤é°ìÈÌÌ¾½èÊý²Ã»»(½èÊý¤»¤óÎÁ)¤Î¸º»»
            COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
                                               WRK-IPPAN-SKAN2
+      *
+      *    ½èÊý¤»¤ó¤Î»»Äê²ó¿ô¤«¤é
+      *    ¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¤Î¸º»»
+           COMPUTE    RECE02-KAISU(33)   =    RECE02-KAISU(33)  -
+                                              WRK-DAIBYOIN-SGEN2
       *
       *    ËãÆÇ¤Î»»Äê²ó¿ô¤«¤é½èÊýÎÁ¡ÊËã¡¦¸þ¡¦ÆÇ¡¦³Ð¡Ë¤Î¸º»»
            COMPUTE    RECE02-KAISU(20)   =    RECE02-KAISU(20)  -
@@ -14005,6 +14036,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF    SRY-SRYCD(IDX3)  =  CONS-YAKTEIGEN
                                             OR CONS-YAKTEIGEN2
+                                            OR CONS-YAKTEIGEN3
                        IF    BUN-IDX        =   1
                            COMPUTE   RECE02-TENSU(14 BUN-IDX)  =
                                      RECE02-TENSU(14 BUN-IDX)  -
@@ -14105,6 +14137,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    END-IF
                WHEN    "22"
                  IF    SRY-SRYCD(IDX3)      =  CONS-YAKTEIGEN2
+                                            OR CONS-YAKTEIGEN3
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE02-TENSU(16 BUN-IDX)  =
                                  RECE02-TENSU(16 BUN-IDX)  -
@@ -14156,6 +14189,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    OR    (SRY-SRYCD(IDX3) (1:7)  = "0992000"        )
                    OR    (SRY-SRYCD(IDX3)        = "099999903"      )
                      IF    SRY-SRYCD(IDX3)  =  CONS-YAKTEIGEN2
+                                            OR CONS-YAKTEIGEN3
                        IF    BUN-IDX        =   1
                            COMPUTE   RECE02-TENSU(17 BUN-IDX)  =
                                      RECE02-TENSU(17 BUN-IDX)  -
@@ -14234,29 +14268,24 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                WHEN    "25"
                    IF SRY-SRYCD(IDX3)      =    "120002270"
                       COMPUTE  WRK-TOKUTEI-SKAN  =  WRK-TOKUTEI-SKAN +
-                                                    WK-ZAIKAISU 
+                                                    ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    "120002170"
                       COMPUTE  WRK-NYUYOUJI-SKAN  =  WRK-NYUYOUJI-SKAN +
-                                                    WK-ZAIKAISU 
+                                                     ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    "120003170"             
                       COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
-                                                  WK-ZAIKAISU           
+                                                  ACCT-ZAIKAISU
                    END-IF                                               
                    IF SRY-SRYCD(IDX3)      =    "120003370"
                       COMPUTE  WRK-AKUSEI-SKAN =  WRK-AKUSEI-SKAN +
-                                                  WK-ZAIKAISU
+                                                  ACCT-ZAIKAISU
                    END-IF
-      ***          IF    RECE02-KHNTEN(19)   =   ZERO
-      ***             MOVE  WRK-TNS-TEN(IDX3) TO  RECE02-KHNTEN(19)
-      ***          ELSE
-      ***             IF   RECE02-KHNTEN(19) NOT = WRK-TNS-TEN(IDX3)
-      ***             AND  WRK-TNS-TEN(IDX3) NOT = ZERO
-      ***                  MOVE   ZERO    TO    RECE02-KHNTEN(19)
-      ***                  MOVE   1       TO    FLG-KHNTEN19
-      ***             END-IF
-      ***          END-IF
+                   IF SRY-SRYCD(IDX3)      =    "120003870"
+                      COMPUTE  WRK-DAIBYOIN-SGEN  =  WRK-DAIBYOIN-SGEN +
+                                                     ACCT-ZAIKAISU
+                   END-IF
                    IF    WK-ZAITEN   NOT =  ZERO
                      IF    RECE02-KHNTEN(19)     = ZERO
                       MOVE  WK-ZAITEN     TO   RECE02-KHNTEN(19)
@@ -14272,27 +14301,27 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
-                      ADD    WK-ZAIKAISU     TO    RECE02-KAISU(19)
+                      ADD    ACCT-ZAIKAISU   TO    RECE02-KAISU(19)
                    END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE02-TENSU(19 BUN-IDX)  =
                                  RECE02-TENSU(19 BUN-IDX)  +
-                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                (WK-ZAITEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX2       =   2
                        COMPUTE   RECE02-TENSU(19 BUN-IDX2)  =
                                  RECE02-TENSU(19 BUN-IDX2)  +
-                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                (WK-ZAITEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX3       =   3
                        COMPUTE   RECE02-TENSU(19 BUN-IDX3)  =
                                  RECE02-TENSU(19 BUN-IDX3)  +
-                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                (WK-ZAITEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(19 BUN-IDX4)  =
                                  RECE02-TENSU(19 BUN-IDX4)  +
-                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                (WK-ZAITEN   *   ACCT-ZAIKAISU)
                    END-IF
       *    ËãÆÇ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "26"
@@ -14636,6 +14665,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       COMPUTE  WRK-IPPAN-SKAN2  =   WRK-IPPAN-SKAN2   +
                                                     ACCT-ZAIKAISU
                    END-IF
+                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN6
+                      COMPUTE  WRK-DAIBYOIN-SGEN2 = WRK-DAIBYOIN-SGEN2 +
+                                                    ACCT-ZAIKAISU
+                   END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOSEN1 OR
                                                 CONS-SHOHOSEN2 OR
                                                 CONS-SHOHOSEN3 OR
@@ -14645,13 +14678,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                 CONS-SHOHOKSN2 OR
                                                 CONS-SHOHOKSN3 OR
                                                 CONS-SHOHOKSN4 OR
-                                                CONS-SHOHOKSN5
+                                                CONS-SHOHOKSN5 OR
+                                                CONS-SHOHOKSN6
                            ADD  ACCT-ZAIKAISU  TO  RECE02-KAISU(33)
                    END-IF
                    IF    BUN-IDX        =   1
-                       COMPUTE   RECE02-TENSU(34 BUN-IDX)  =
-                                 RECE02-TENSU(34 BUN-IDX)  +
-                                (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
                                                  CONS-SHOHOSEN2 OR
                                                  CONS-SHOHOSEN3 OR
@@ -14661,14 +14692,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOKSN2 OR
                                                  CONS-SHOHOKSN3 OR
                                                  CONS-SHOHOKSN4 OR
-                                                 CONS-SHOHOKSN5
+                                                 CONS-SHOHOKSN5 OR
+                                                 CONS-SHOHOKSN6
                            COMPUTE   RECE02-TENSU(33 BUN-IDX)  =
                                      RECE02-TENSU(33 BUN-IDX)  +
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
-                           COMPUTE   RECE02-TENSU(34 BUN-IDX)  =
-                                     RECE02-TENSU(34 BUN-IDX)  -
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                    (WK-ZAITEN  *   ACCT-ZAIKAISU)
                        ELSE
+                         COMPUTE     RECE02-TENSU(34 BUN-IDX)  =
+                                     RECE02-TENSU(34 BUN-IDX)  +
+                                    (WK-SYUTEN  *   ACCT-ZAIKAISU)
                          IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
                            COMPUTE   RECE02-TENSU(7 BUN-IDX)  =
                                      RECE02-TENSU(7 BUN-IDX)  +
@@ -14680,9 +14712,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        END-IF
                    END-IF
                    IF    BUN-IDX2       =   2
-                       COMPUTE   RECE02-TENSU(34 BUN-IDX2)  =
-                                 RECE02-TENSU(34 BUN-IDX2)  +
-                                (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
                                                  CONS-SHOHOSEN2 OR
                                                  CONS-SHOHOSEN3 OR
@@ -14692,14 +14721,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOKSN2 OR
                                                  CONS-SHOHOKSN3 OR
                                                  CONS-SHOHOKSN4 OR
-                                                 CONS-SHOHOKSN5
+                                                 CONS-SHOHOKSN5 OR
+                                                 CONS-SHOHOKSN6
                            COMPUTE   RECE02-TENSU(33 BUN-IDX2)  =
                                      RECE02-TENSU(33 BUN-IDX2)  +
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
-                           COMPUTE   RECE02-TENSU(34 BUN-IDX2)  =
-                                     RECE02-TENSU(34 BUN-IDX2)  -
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                    (WK-ZAITEN  *   ACCT-ZAIKAISU)
                        ELSE
+                         COMPUTE     RECE02-TENSU(34 BUN-IDX2)  =
+                                     RECE02-TENSU(34 BUN-IDX2)  +
+                                    (WK-SYUTEN  *   ACCT-ZAIKAISU)
                          IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
                            COMPUTE   RECE02-TENSU(7 BUN-IDX2)  =
                                      RECE02-TENSU(7 BUN-IDX2)  +
@@ -14711,9 +14741,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        END-IF
                    END-IF
                    IF    BUN-IDX3       =   3
-                       COMPUTE   RECE02-TENSU(34 BUN-IDX3)  =
-                                 RECE02-TENSU(34 BUN-IDX3)  +
-                                (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
                                                  CONS-SHOHOSEN2 OR
                                                  CONS-SHOHOSEN3 OR
@@ -14723,14 +14750,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOKSN2 OR
                                                  CONS-SHOHOKSN3 OR
                                                  CONS-SHOHOKSN4 OR
-                                                 CONS-SHOHOKSN5
+                                                 CONS-SHOHOKSN5 OR
+                                                 CONS-SHOHOKSN6
                            COMPUTE   RECE02-TENSU(33 BUN-IDX3)  =
                                      RECE02-TENSU(33 BUN-IDX3)  +
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
-                           COMPUTE   RECE02-TENSU(34 BUN-IDX3)  =
-                                     RECE02-TENSU(34 BUN-IDX3)  -
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                    (WK-ZAITEN  *   ACCT-ZAIKAISU)
                        ELSE
+                         COMPUTE     RECE02-TENSU(34 BUN-IDX3)  =
+                                     RECE02-TENSU(34 BUN-IDX3)  +
+                                    (WK-SYUTEN  *   ACCT-ZAIKAISU)
                          IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
                            COMPUTE   RECE02-TENSU(7 BUN-IDX3)  =
                                      RECE02-TENSU(7 BUN-IDX3)  +
@@ -14742,9 +14770,6 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        END-IF
                    END-IF
                    IF    BUN-IDX4       =   4
-                       COMPUTE   RECE02-TENSU(34 BUN-IDX4)  =
-                                 RECE02-TENSU(34 BUN-IDX4)  +
-                                (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
                                                  CONS-SHOHOSEN2 OR
                                                  CONS-SHOHOSEN3 OR
@@ -14754,14 +14779,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  CONS-SHOHOKSN2 OR
                                                  CONS-SHOHOKSN3 OR
                                                  CONS-SHOHOKSN4 OR
-                                                 CONS-SHOHOKSN5
+                                                 CONS-SHOHOKSN5 OR
+                                                 CONS-SHOHOKSN6
                            COMPUTE   RECE02-TENSU(33 BUN-IDX4)  =
                                      RECE02-TENSU(33 BUN-IDX4)  +
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
-                           COMPUTE   RECE02-TENSU(34 BUN-IDX4)  =
-                                     RECE02-TENSU(34 BUN-IDX4)  -
-                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                                    (WK-ZAITEN  *   ACCT-ZAIKAISU)
                        ELSE
+                         COMPUTE     RECE02-TENSU(34 BUN-IDX4)  =
+                                     RECE02-TENSU(34 BUN-IDX4)  +
+                                    (WK-SYUTEN  *   ACCT-ZAIKAISU)
                          IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
                            COMPUTE   RECE02-TENSU(7 BUN-IDX4)  =
                                      RECE02-TENSU(7 BUN-IDX4)  +
@@ -14775,22 +14801,22 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE02-TENSU(35 BUN-IDX)  =
                                  RECE02-TENSU(35 BUN-IDX)  +
-                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                                (WK-YKZTEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX2       =   2
                        COMPUTE   RECE02-TENSU(35 BUN-IDX2)  =
                                  RECE02-TENSU(35 BUN-IDX2)  +
-                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                                (WK-YKZTEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX3       =   3
                        COMPUTE   RECE02-TENSU(35 BUN-IDX3)  =
                                  RECE02-TENSU(35 BUN-IDX3)  +
-                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                                (WK-YKZTEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(35 BUN-IDX4)  =
                                  RECE02-TENSU(35 BUN-IDX4)  +
-                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                                (WK-YKZTEN   *   ACCT-ZAIKAISU)
                    END-IF
            END-EVALUATE
            .
