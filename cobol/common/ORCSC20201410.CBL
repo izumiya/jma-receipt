@@ -3178,16 +3178,19 @@
                PERFORM 300091-GEN30-HENSYU-SEC
       *
                IF      IDXG4               >   ZERO
-                   MOVE    1                   TO  FLG-GEN30
                    IF      WRK-CHK-SRYSYUKBN   =   "211"
                                                OR  "291"
       *!ÆÜÉþÈ½Äê                               OR  "221"
       *!                                       OR  "297"
+                       MOVE    1                   TO  FLG-GEN30
       *                ±¡Æâ
                        MOVE    1                   TO  FLG-GEN30-N
       *                ±¡ÆâÅêÌô£³£°Æü°Ê¾åÅÀ¿ô½¸·×
                        PERFORM 300091-GEN30-ADD-SEC
-                   ELSE
+                   END-IF
+                   IF      WRK-CHK-SRYSYUKBN   =   "212"
+                                               OR  "292"
+                       MOVE    1                   TO  FLG-GEN30
       *                ±¡³°
                        MOVE    1                   TO  FLG-GEN30-G
                    END-IF
@@ -5254,10 +5257,9 @@
                PERFORM 30001-SRYSYUKBN-SET-SEC
       *        ±¡ÆâÅêÌô¤Ç£³£°Æü°Ê¾å¤òÂÐ¾Ý¤È¤¹¤ë
                IF     (WRK-CHK-SRYSYUKBN   =   "211"
-                                           OR  "291"
-                                           OR  "221"
-                                           OR  "297" )
-               AND    (WRK-COM-KAISU (IDX) >=  30    )
+                                           OR  "291")
+      **                                   OR  "221"
+      **                                   OR  "297" )
                    MOVE    1               TO  FLG-NAIFUKU
       *            ÌôºÞÎÁÄþ¸º¥Á¥§¥Ã¥¯½èÍý
                    PERFORM 300110-GENTUIKA-CHK30-SEC
@@ -5351,7 +5353,8 @@
                IF      WRK-COM-ZAIEND (IDX-G)  =   "1"
                    MOVE    1               TO  FLG-ZAIEND2
                    IF     (WRK-COM-KEI (IDX-G) =   ZERO   )
-      *                ºÞÅÀ¿ô¤¬¥¼¥í¤Î»þ¡¢ÂÐ¾Ý³°
+                   OR     (WRK-COM-KAISU(IDX-G) <   30    )
+      *                ºÞÅÀ¿ô¤¬¥¼¥í¡¢£³£°ÆüÌ¤ËþÂÐ¾Ý³°
                        MOVE    ZERO            TO  FLG-NAIFUKU
                    END-IF
                END-IF
