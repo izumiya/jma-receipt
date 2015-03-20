@@ -167,6 +167,7 @@
       *  04.07.10    NACL-ÌçÏÆ    15/02/05  Å¦Í×Íó¤ÎÅÀ¿ô¡¦²ó¿ôÅù¤Îµ­ºÜ
       *                                     ÉÔ¶ñ¹çÂÐ±þ
       *  04.07.11    NACL-ÌçÏÆ    15/03/09  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.07.12    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -792,6 +793,8 @@
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *    ½èÊýÎÁ¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
            03  FILLER          PIC X(09)   VALUE   "120003610".
+      *    ½èÊýÎÁ¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¸º»»¡Ë
+           03  FILLER          PIC X(09)   VALUE   "120003870".
       *
       *    ºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
            03  FILLER          PIC X(09)   VALUE   "112016610".
@@ -833,9 +836,9 @@
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   78.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   79.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   78.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   79.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -851,6 +854,8 @@
            03  CONS-TEIGEN     PIC X(09)   VALUE   "630010002".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¸£°¡¿£±£°£°¡Ë¡Ê¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¡Ë
            03  CONS-TEIGEN2    PIC X(09)   VALUE   "630010005".
+      *    ÌôºÞÎÁÄþ¸º¡Ê£¶£°¡¿£±£°£°¡Ë¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¡Ë
+           03  CONS-TEIGEN3    PIC X(09)   VALUE   "630010006".
       *    Êñ³çÅÀ¿ô¤Î¼£¸³¸ºÅÀÊ¬
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *---- (01.00.05) LINE ADD START --------------------------------
@@ -1621,6 +1626,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
                        IF      RECE45-SRYCD(IDX) =   CONS-TEIGEN
                                                  OR  CONS-TEIGEN2
+                                                 OR  CONS-TEIGEN3
                                                  OR  CONS-GENTEN
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF 
@@ -3947,7 +3953,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
-                                       "120003570" OR "120003710"
+                                       "120003570" OR "120003710" OR
+                                       "120003970"
                        MOVE   ZERO   TO   RECE46-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE46-SYOHOUFLG

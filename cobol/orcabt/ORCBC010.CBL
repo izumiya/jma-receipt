@@ -78,6 +78,7 @@
       *  04.07.04    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    14/12/15  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê½éºÆ¿ÇÎÁ¡¦ÄãÂÅ·ëÎ¨ÂÐ±þ¡Ë
+      *  04.07.06    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4182,7 +4183,9 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                 OR     ( COLDAT02-SRYCD      =   "099999912" )
                    CONTINUE
                ELSE
-                 IF  (ACCT-SRYCDTOTAL  =  630010002  OR  630010005)
+                 IF  (ACCT-SRYCDTOTAL  =  630010002
+                                      OR  630010005
+                                      OR  630010006               )
                  OR  (ACCT-ZAIKBN      =  2                       )
                    IF    ACCT-ZAIKBN        =    2
                          COMPUTE    WRK-TOTALTENSU(1)   =
@@ -4253,7 +4256,9 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                    OR     ( COLDAT02-SRYCD      =   "099999912" )
                      CONTINUE
                   ELSE
-                     IF  (ACCT-SRYCDTOTAL  =  630010002  OR  630010005)
+                     IF  (ACCT-SRYCDTOTAL  =  630010002
+                                          OR  630010005
+                                          OR  630010006               )
                      OR  (ACCT-ZAIKBN      =  2                       )
                          IF    ACCT-ZAIKBN        =    2
                              COMPUTE    WRK-TOTALTENSU(KH-IDX)   =
