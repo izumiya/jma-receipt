@@ -389,6 +389,9 @@
       *  04.07.14    NACL-∆£∏∂    15/02/18  ∞ÂŒ≈æ Ûœ¢∑»¬–±˛
       *                                     º´»Ò•Ï•ª•◊•»§Ú¬–æ›§»§π§Î
       *  04.07.15    NACL-ÃÁœ∆    15/03/17  ¿¡µ·≈¿øÙ£∞≈¿∏¯»Ò•Ï•ªµ≠∫‹¬–±˛
+      *  04.07.16    NACL-∆£∏∂    15/03/23  ª‹¿ﬂ¥Ω‡…‘≈¨πÁ∏∫ªª§Œ¬–±˛
+      *                                     ƒÃ¬ß≤√ªªπ‡Ã‹° ≤√∏∫ªª•≥°º•…°À
+      *                                     §Œ§»§≠§Œµ≠œø ˝À°
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -596,6 +599,7 @@
            03  FLG-SKJ-HANTEI          PIC 9(01).
            03  FLG-SUUJI               PIC 9(01).
            03  FLG-NYUINYMD            PIC 9(01).
+           03  FLG-SISETUKIJYUN-GENZAN PIC 9(01).
       *
       *    •´•¶•Û•»ŒŒ∞Ë
        01  CNT-AREA.
@@ -1512,6 +1516,10 @@
       *    ª‹¿ﬂ¥Ω‡…‘≈¨πÁ°  ¸ºÕ¿˛°À° £±£∞£∞ ¨§Œ£∑£∞°À
            03  WRK-CONS-SISETUKIJYUN-HOUSYASEN
                                       PIC X(09)   VALUE   "180025270".
+      *
+      *    ª‹¿ﬂ¥Ω‡…‘≈¨πÁ∏∫ªª° ºÍΩ—°À° £±£∞£∞ ¨§Œ£∏£∞°À
+           03  WRK-CONS-SISETUKIJYUN-GENZAN
+                                      PIC X(09)   VALUE   "150382490".
       *
       *    ª¿¡« ‰¿µŒ®£±°•£≥° £±µ§∞µ°À
            03  WRK-CONS-SANSO-HOSEI   PIC X(09)   VALUE   "770020070".
@@ -5949,6 +5957,7 @@
       *
            MOVE    ZERO                TO  IDY
                                            IDWW
+                                           FLG-SISETUKIJYUN-GENZAN
       *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >       WRK-TBLMAX1
@@ -5958,13 +5967,29 @@
                                            =   "9"         )
                AND   ( TBL-KOUI-TENSIKIBETU   (IDX)
                                            =   "5" OR  "6" )
-                   ADD     1                   TO  IDWW
-                   MOVE    TBL-KOUI-REC  (IDX) TO
-                                   WRK-KOUI-KASAN-TAIHI-REC (IDWW)
-                   MOVE    TBL-KOUI-TIMEKSNKBN    (IDX)
-                                               TO
-                                   WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
-                                                            (IDWW)
+      *            ª‹¿ﬂ¥Ω‡…‘≈¨πÁ∏∫ªª° ºÍΩ—°À° £±£∞£∞ ¨§Œ£∏£∞°À§Œ§»§≠
+                   IF      TBL-KOUI-SRYCD (IDX)    =
+                                           WRK-CONS-SISETUKIJYUN-GENZAN
+                       IF      FLG-SISETUKIJYUN-GENZAN =   ZERO
+                           ADD     1                   TO  IDWW
+                           MOVE    TBL-KOUI-REC  (IDX) TO
+                                       WRK-KOUI-KASAN-TAIHI-REC (IDWW)
+                           MOVE    TBL-KOUI-TIMEKSNKBN    (IDX)
+                                                   TO
+                                       WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
+                                                                (IDWW)
+                           MOVE    1               TO
+                                               FLG-SISETUKIJYUN-GENZAN
+                       END-IF
+                   ELSE
+                       ADD     1                   TO  IDWW
+                       MOVE    TBL-KOUI-REC  (IDX) TO
+                                       WRK-KOUI-KASAN-TAIHI-REC (IDWW)
+                       MOVE    TBL-KOUI-TIMEKSNKBN    (IDX)
+                                                   TO
+                                       WRK-KOUI-KASAN-TAIHI-TIMEKSNKBN
+                                                                (IDWW)
+                   END-IF
                END-IF
       *
       *        ΩË√÷§Œ≤√ªªπ‡Ã‹§ŒÕ≠Ãµ                
