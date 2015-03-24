@@ -1408,6 +1408,7 @@
                                                              (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100.00
+                                               +   0.5
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-GEN
                END-IF
@@ -6496,6 +6497,7 @@
                                                       (02 IDXS-2)
                                            *  (TNS-TEN
                                            /   100.00  )
+                                           +   0.5
                MOVE    WRK-SANTEN-9        TO  WRK-SANTEN
                COMPUTE WRK-SANTEN-KEI      =   LNK-ORCSC-TENSU
                                                       (02 IDXS-2)
