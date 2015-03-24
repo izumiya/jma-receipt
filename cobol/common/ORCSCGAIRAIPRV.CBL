@@ -649,6 +649,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            INITIALIZE                  WRK-ACTP-AREA
            INITIALIZE                  TBL-SRYACCTPLUS-AREA
+           INITIALIZE                  WRK-ACTP30-AREA
+           INITIALIZE                  TBL-SRYACCTPLUS30-AREA
       *
            PERFORM VARYING     IDH     FROM    1   BY  1
                    UNTIL      (IDH     >   15  )  OR
