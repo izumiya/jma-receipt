@@ -101,6 +101,9 @@
       *              NACL-小豆沢  15/01/22  Ｅファイル編集処理
       *                                     療養担当手当の診療科が記録
       *                                     されない不具合を修正
+      *              NACL-小豆沢  15/03/25  Ｆファイル編集処理
+      *                                     行為明細点数をきざみ点数を
+      *                                     加算した点数に修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3169,6 +3172,14 @@
                END-IF
               END-IF
              END-IF
+           END-IF
+      *    行為明細点数を再セット（きざみ）
+           IF     (TBL-KOUI-TENSIKIBETU (IDX)      =   3)  AND
+                  (TBL-KOUI-KZMCOMPSIKIBETU (IDX)  =   1)  AND
+                  (WRK-FEDT-MEISAI-TEN         NOT =
+                                               WRK-FEDT-DEKIDAKA-TEN)
+               MOVE    WRK-FEDT-DEKIDAKA-TEN
+                                       TO  WRK-FEDT-MEISAI-TEN
            END-IF
       *出来高・包括フラグ
            IF      WRK-FEDT-HOUKATU-FLG    NOT =   "6"
