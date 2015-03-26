@@ -1018,6 +1018,7 @@
       *        加算追加
                MOVE    WRK-COM-AGEKSNSRYCD (IDX-Z IDX2)  TO  WRK-SRYCD
       *        加算料チェック処理
+               MOVE    IDX-Z               TO  IDX-S
                PERFORM 100111-KASAN-CHK-SEC
       *        加算料追加処理
       *********MOVE    IDX-Z               TO  IDX-S
