@@ -872,7 +872,8 @@
       *                訂正時、受診履歴等の削除
                        MOVE    ZERO                TO  FLG-CLAIM-OK
                        PERFORM 4500-TOROKU-SYORI-SEC
-                       IF      SPA-ERRCD (1:1)     =   "K"
+      ********         IF      SPA-ERRCD (1:1)     =   "K"
+                       IF      SPA-ERRCD       NOT =   SPACE
                            PERFORM 510-ERRSET-SEC
                        END-IF
                    END-IF
@@ -2874,7 +2875,8 @@
       *    更新処理
            MOVE    1                   TO  FLG-CLAIM-OK
            PERFORM 4500-TOROKU-SYORI-SEC
-           IF      SPA-ERRCD (1:1)     =   "K"
+      **** IF      SPA-ERRCD (1:1)     =   "K"
+           IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
            END-IF
       *
