@@ -833,7 +833,8 @@
       *                訂正時、受診履歴等の削除
                        MOVE    ZERO                TO  FLG-CLAIM-OK
                        PERFORM 4500-TOROKU-SYORI-SEC
-                       IF      SPA-ERRCD (1:1)     =   "K"
+      ******           IF      SPA-ERRCD (1:1)     =   "K"
+                       IF      SPA-ERRCD       NOT =   SPACE
                            PERFORM 510-ERRSET-SEC
                        END-IF
                    END-IF
@@ -2854,7 +2855,8 @@
       *    更新処理
            MOVE    1                   TO  FLG-CLAIM-OK
            PERFORM 4500-TOROKU-SYORI-SEC
-           IF      SPA-ERRCD (1:1)     =   "K"
+      **** IF      SPA-ERRCD (1:1)     =   "K"
+           IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
            END-IF
       *
@@ -2869,6 +2871,7 @@
       *
            MOVE    SPACE               TO  K03
       *
+           INITIALIZE                      K03
            MOVE    SPA-PTNUM           TO  K03-PTNUM
            MOVE    SPA-KANANAME        TO  K03-KANANAME
            MOVE    SPA-NAME            TO  K03-NAME
@@ -7347,6 +7350,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-KERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KERR2
+           INITIALIZE                      KERR2
            MOVE    SPA-ERRCD           TO  KERR2-ERRCODE
            MOVE    SPA-ERRMSG          TO  KERR2-ERRMSG
            MOVE    SPA-ERRMSG2         TO  KERR2-ERRMSG2(1:80)
@@ -7382,6 +7386,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *
