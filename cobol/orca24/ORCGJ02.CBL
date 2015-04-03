@@ -10415,25 +10415,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                            =   SPA-NAIGMN-SRYKA) AND
                               (SPA-RRK-HKNCOMBI(IDR5)
                                            =   SPA-GMN-HKNCOMBI )
-      *v4.8                IF      SPA-RRK-RENNUM (IDR5)   >   3
-      *                        MOVE    4               TO  WRK-REN
-      ****                 ELSE
-                               MOVE    SPA-RRK-RENNUM (IDR5)
+                           MOVE    SPA-RRK-RENNUM (IDR5)
                                                        TO  WRK-REN
-                               ADD     1               TO  WRK-REN
-      ****                 END-IF
+                           ADD     1               TO  WRK-REN
       *                    剤番号存在判定
                            IF      WRK-REN             =   IDR4
                                MOVE    IDR5            TO  IDX-RRK2
                                PERFORM 41012202-JYURRK-ZAINUM-SEC
-      *v4.8                    IF     (WRK-IDR         =   ZERO )
-      *                          AND  (IDR4            =   4    )
-      *                            連番が４で剤番号がない時、再度
-      *                            IF      IDX-RRK3        =   ZERO
-      *                                MOVE    IDR5        TO  IDX-RRK3
-      *                            END-IF
-      *                            MOVE    ZERO            TO  IDX-RRK2
-      ****                     END-IF
                            ELSE
                                IF      IDR6            =   ZERO
                                    MOVE    IDR5            TO  IDR6
@@ -10449,25 +10437,17 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *            入院対象の受診履歴がない時
                    IF     (IDX-RRK2            =   ZERO )
-      *?????          AND (WRK-D-RENNUM    NOT =   ZERO )
+                      AND (WRK-D-RENNUM    NOT =   ZERO )
                        CONTINUE
                    ELSE
-      *ver.4.7
       *
-      *            IF      IDX-RRK2            =   ZERO
-      *                IF      IDX-RRK3        =   ZERO
-      *                    MOVE    IDR6            TO  IDX-RRK2
-      *                ELSE
-      *                    MOVE    IDX-RRK3        TO  IDX-RRK2
-      *                END-IF
-      *            END-IF
-      *v4.8        IF      SPA-RRK-RENNUM (IDX-RRK2)   >   3
-      *                MOVE    4               TO  WRK-REN
-      ****         ELSE
-                       MOVE    SPA-RRK-RENNUM (IDX-RRK2)
+                   IF      IDX-RRK2            =   ZERO
+                       MOVE    IDR6            TO  IDX-RRK2
+                   END-IF
+                   MOVE    SPA-RRK-RENNUM (IDX-RRK2)
                                                TO  WRK-REN
-                       ADD     1               TO  WRK-REN
-      *****        END-IF
+                   ADD     1                   TO  WRK-REN
+      *
                    MOVE    SPA-GNAI-DAY (IDR4 SPA-DAY-IDX)
                                                TO  WRK-DAY-S
                    IF      IDR4            NOT =   WRK-REN
