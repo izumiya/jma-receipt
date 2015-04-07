@@ -229,6 +229,11 @@
       *
            MOVE    SCL31N-HOSPNUM  TO  SPA-HOSPNUM
       *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
+           MOVE    SMCNDATE-YMD        TO  WRK-UKEYMD
+           MOVE    SMCNDATE-TIME       TO  WRK-UKEHMS
+      *
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
            MOVE    "M00"               TO  ORCSCOMMON-PG
@@ -238,6 +243,8 @@
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
       *
+           MOVE    MCP-USER        TO  SPA-OPID
+      *
            MOVE    ZERO            TO  FLG-END
            MOVE    ZERO            TO  WRK-ORDERNUM
       *
@@ -245,10 +252,6 @@
            IF    ( FLG-KARTE-KEY   =   9 )
                GO  TO  100-INIT-EXT
            END-IF
-      *
-           PERFORM 800-MCNDATE-SEC
-           MOVE    SMCNDATE-YMD        TO  WRK-UKEYMD
-           MOVE    SMCNDATE-TIME       TO  WRK-UKEHMS
       *
            PERFORM 1001-KIHON-CHK-SEC
       *
