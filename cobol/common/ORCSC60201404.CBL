@@ -4758,7 +4758,10 @@
                END-IF
       *
                MOVE    1               TO  FLG-KENTAI2
-               ADD     1               TO  WRK-KENTAI2-CNT
+      ******   ADD     1               TO  WRK-KENTAI2-CNT
+      *H27.4   回数を集計
+               COMPUTE WRK-KENTAI2-CNT =   WRK-KENTAI2-CNT
+                                       +   WRK-COM-KAISU (IDX)
            END-IF
       *
            .
