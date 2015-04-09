@@ -158,6 +158,7 @@
       *  04.07.09    NACL-門脇    14/07/08  明細が５０を超える場合の対応
       *  04.07.10    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
       *  04.07.11    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
+      *  04.07.12    NACL-門脇    15/04/08  リハビリ開始日編集修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -918,24 +919,31 @@
                05  TBL-HASSYO-HKNCOMBI2         PIC 9(04).
       *
            03  TBL-HASSYO-SINDAI-DAY-T.
+             04  TBL-HASSYO-SINDAI-DAY-T2         OCCURS   5.
                05  TBL-HASSYO-SINDAI-DAY-OCC      OCCURS  31.
                    07  TBL-HASSYO-SINDAI-SANTEI   PIC 9(01).
            03  TBL-HASSYO-KOKYUKI-DAY-T.
+             04  TBL-HASSYO-KOKYUKI-DAY-T2        OCCURS   5.
                05  TBL-HASSYO-KOKYUKI-DAY-OCC     OCCURS  31.
                    07  TBL-HASSYO-KOKYUKI-SANTEI  PIC 9(01).
            03  TBL-HASSYO-NOUKE-DAY-T.
+             04  TBL-HASSYO-NOUKE-DAY-T2          OCCURS   5.
                05  TBL-HASSYO-NOUKE-DAY-OCC       OCCURS  31.
                    07  TBL-HASSYO-NOUKE-SANTEI    PIC 9(01).
            03  TBL-HASSYO-UNDOKI-DAY-T.
+             04  TBL-HASSYO-UNDOKI-DAY-T2         OCCURS   5.
                05  TBL-HASSYO-UNDOKI-DAY-OCC      OCCURS  31.
                    07  TBL-HASSYO-UNDOKI-SANTEI   PIC 9(01).
            03  TBL-HASSYO-NANBYO-DAY-T.
+             04  TBL-HASSYO-NANBYO-DAY-T2         OCCURS   5.
                05  TBL-HASSYO-NANBYO-DAY-OCC      OCCURS  31.
                    07  TBL-HASSYO-NANBYO-SANTEI   PIC 9(01).
            03  TBL-HASSYO-SYOGAI-DAY-T.
+             04  TBL-HASSYO-SYOGAI-DAY-T2         OCCURS   5.
                05  TBL-HASSYO-SYOGAI-DAY-OCC      OCCURS  31.
                    07  TBL-HASSYO-SYOGAI-SANTEI   PIC 9(01).
            03  TBL-HASSYO-SESSYOKU-DAY-T.
+             04  TBL-HASSYO-SESSYOKU-DAY-T2       OCCURS   5.
                05  TBL-HASSYO-SESSYOKU-DAY-OCC    OCCURS  31.
                    07  TBL-HASSYO-SESSYOKU-SANTEI PIC 9(01).
            03  TBL-HASSYO-TAIHI-DAY-T.
@@ -2104,129 +2112,129 @@
            END-IF
       ***
            IF   TBL-HASSYO-SINDAI-FLG   =   1 OR 3
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-SINDAI     TO   WRK-SRYCD
-             MOVE      CONS-SINDAI-E   TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-SINDAI-DAY-T
-                                       TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-SINDAI-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-SINDAI-COMMENT(IDX14)   =  1
+                 MOVE      ZERO            TO   FLG-COMOKIKAE
+                 MOVE      CONS-SINDAI     TO   WRK-SRYCD
+                 MOVE      CONS-SINDAI-E   TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-SINDAI-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-KOKYUKI-FLG   =   1 OR 3
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
-             MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-KOKYUKI-DAY-T
-                                       TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-KOKYUKI-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-KOKYUKI-COMMENT(IDX14)   =  1
+                 MOVE      ZERO            TO   FLG-COMOKIKAE
+                 MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
+                 MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-KOKYUKI-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-NOUKE-FLG   =   1 OR 3
-             MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-NOUKE      TO   WRK-SRYCD
-             MOVE      CONS-NOUKE-E    TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-NOUKE-DAY-T
-                                       TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-NOUKE-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-NOUKE-COMMENT(IDX14)   =  1
+                 MOVE      1               TO   FLG-COMOKIKAE
+                 MOVE      CONS-NOUKE      TO   WRK-SRYCD
+                 MOVE      CONS-NOUKE-E    TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-NOUKE-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-UNDOKI-FLG   =   1 OR 3
-             MOVE      1                TO   FLG-COMOKIKAE
-             MOVE      CONS-UNDOKI      TO   WRK-SRYCD
-             MOVE      CONS-UNDOKI-E    TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-UNDOKI-DAY-T
-                                        TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-UNDOKI-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-UNDOKI-COMMENT(IDX14)   =  1
+                 MOVE      1               TO   FLG-COMOKIKAE
+                 MOVE      CONS-UNDOKI     TO   WRK-SRYCD
+                 MOVE      CONS-UNDOKI-E   TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-UNDOKI-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-NANBYO-FLG   =   1 OR 3
-             MOVE      1                TO   FLG-COMOKIKAE
-             MOVE      CONS-NANBYO      TO   WRK-SRYCD
-             MOVE      CONS-NANBYO-E    TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-NANBYO-DAY-T
-                                        TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-NANBYO-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-NANBYO-COMMENT(IDX14)   =  1
+                 MOVE      1               TO   FLG-COMOKIKAE
+                 MOVE      CONS-NANBYO     TO   WRK-SRYCD
+                 MOVE      CONS-NANBYO-E   TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-NANBYO-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-SYOGAI-FLG   =   1 OR 3
-             MOVE      ZERO             TO   FLG-COMOKIKAE
-             MOVE      CONS-SYOGAI      TO   WRK-SRYCD
-             MOVE      CONS-SYOGAI-E    TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-SYOGAI-DAY-T
-                                        TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-SYOGAI-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-SYOGAI-COMMENT(IDX14)   =  1
+                 MOVE      ZERO            TO   FLG-COMOKIKAE
+                 MOVE      CONS-SYOGAI     TO   WRK-SRYCD
+                 MOVE      CONS-SYOGAI-E   TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-SYOGAI-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       ***
            IF   TBL-HASSYO-SESSYOKU-FLG   =   1 OR 3
-             MOVE      ZERO               TO   FLG-COMOKIKAE
-             MOVE      CONS-SESSYOKU      TO   WRK-SRYCD
-             MOVE      CONS-SESSYOKU-E    TO   WRK-SRYCD2
-             MOVE      TBL-HASSYO-SESSYOKU-DAY-T
-                                          TO   TBL-HASSYO-TAIHI-DAY-T
-             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
-             PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
-             IF        FLG-KYUSEI-COMMENT    =      1
-                 PERFORM   VARYING   IDX14    FROM   1   BY   1
-                            UNTIL    IDX14      >    5
-                    IF   TBL-HASSYO-SESSYOKU-COMMENT(IDX14)   =  1
-                      PERFORM   2001X-HASSYO-HENSYU-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
+             PERFORM   VARYING   IDX14    FROM   1   BY   1
+                        UNTIL    IDX14      >    5
+               IF   TBL-HASSYO-SESSYOKU-COMMENT(IDX14)   =  1
+                 MOVE      ZERO            TO   FLG-COMOKIKAE
+                 MOVE      CONS-SESSYOKU   TO   WRK-SRYCD
+                 MOVE      CONS-SESSYOKU-E TO   WRK-SRYCD2
+                 MOVE      TBL-HASSYO-SESSYOKU-DAY-T2(IDX14)
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                 MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+                 IF        FLG-KYUSEI-COMMENT    =      1
+                   PERFORM   2001X-HASSYO-HENSYU-SEC
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       *
            PERFORM  2002-DAISAN-HASSYO-HANTEI-SEC
@@ -2264,17 +2272,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-SINDAI(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-SINDAI-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-SINDAI-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-SINDAI-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2317,17 +2326,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-KOKYUKI(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-KOKYUKI-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-KOKYUKI-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-KOKYUKI-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2370,17 +2380,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-NOUKE(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-NOUKE-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-NOUKE-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-NOUKE-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2423,17 +2434,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-UNDOKI(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-UNDOKI-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-UNDOKI-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-UNDOKI-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2476,17 +2488,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-NANBYO(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-NANBYO-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-NANBYO-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-NANBYO-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2529,17 +2542,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-SYOGAI(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-SYOGAI-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-SYOGAI-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-SYOGAI-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
@@ -2582,17 +2596,18 @@
                    MOVE    1  TO  FLG-DAISAN1
                  END-IF
                ELSE
+                 COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
+                                      + 1
                  MOVE     ZERO   TO   FLG-ARI
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
                            UNTIL   IDX1   >   31
                   IF   RECE62-RIHA-SESSYOKU(IDX22 IDX1)  NOT = ZERO
-                    MOVE   1  TO  TBL-HASSYO-SESSYOKU-SANTEI(IDX1)
+                    MOVE   1  TO  TBL-HASSYO-SESSYOKU-SANTEI
+                                                (WRK-KOHBUNRI IDX1)
                     MOVE   1  TO  FLG-ARI
                   END-IF
                  END-PERFORM
                  IF  FLG-ARI = 1
-                   COMPUTE WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX22)
-                                        + 1
                    MOVE    1  TO  TBL-HASSYO-SESSYOKU-COMMENT
                                                      (WRK-KOHBUNRI)
                    MOVE  RECE62-HKNCOMBI(IDX22)
