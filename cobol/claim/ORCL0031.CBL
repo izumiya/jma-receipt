@@ -302,6 +302,16 @@
        01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
       * ¡ÊÀº¸º¡Ë
        01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *H27.4
+      * Äã¾Ò²ðÎ¨ÉÂ±¡¡¡½èÊý¤»¤óÎÁ²Ã»»
+       01  CONS-TEIHP-SYOSEN       PIC X(09)   VALUE    "120003970".
+      * Äã¾Ò²ðÎ¨ÉÂ±¡¡¡½èÊýÎÁ²Ã»»
+       01  CONS-TEIHP-SYOHOU       PIC X(09)   VALUE    "120003870".
+      * Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»¥³¡¼¥É
+       01  CONS-TEIHP-SRYCD        PIC X(09)   VALUE    "630010006".
+      *
+      * ½èÊýÎÁ¡ÊÆýÍÄ»ù¡Ë²Ã»»
+       01  CONS-KSN-SRYCD1         PIC X(09)   VALUE    "120002170".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1822,6 +1832,14 @@
                                        OR  CONS-TAZAI-SYOHOU
                                        OR  CONS-TAZAI-SRYCD
                                        OR  CONS-SGEN-SRYCD
+               MOVE    1               TO  FLG-CHK
+           END-IF
+      *H27.4
+      *    Äã¾Ò²ðÎ¨ÉÂ±¡¤Ê¤É ÂÐ±þ
+           IF      WRK-SRYCD           =   CONS-TEIHP-SYOSEN
+                                       OR  CONS-TEIHP-SYOHOU
+                                       OR  CONS-TEIHP-SRYCD
+                                       OR  CONS-KSN-SRYCD1
                MOVE    1               TO  FLG-CHK
            END-IF
       *
