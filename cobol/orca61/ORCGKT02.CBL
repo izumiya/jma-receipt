@@ -326,6 +326,8 @@
       *H24.4
            03  FLG-GENERICNAME         PIC 9(01).
            03  FLG-TENSUPLUS           PIC 9(01).
+      *H27.4
+           03  FLG-INGIKSN-KBN         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1399,6 +1401,9 @@
            INITIALIZE                  SRT-WKSRYACT-AREA
            MOVE    ZERO                TO  LNK-WKSRYACT-MAX
       *
+      *H27.4
+           MOVE    ZERO                TO  FLG-INGIKSN-KBN
+      *
            PERFORM VARYING   IDX       FROM   1   BY  1
                    UNTIL     IDX       >   IDX-MAX
                MOVE    ALL "9"             TO  WRK-ZAINUM-X
@@ -1407,6 +1412,17 @@
                MOVE    ZERO                TO  IDX2
                PERFORM VARYING   IDX1      FROM   1   BY  1
                        UNTIL     IDX1      >   IDX-MAX
+      *H27.4
+      *            変更不可処方毎
+                   IF      LNK-WKSRY-SRYCD (IDX1 1)   =    "099209910"
+      *                後発品変更不可
+                       MOVE    1                   TO  FLG-INGIKSN-KBN
+                   END-IF
+                   IF      LNK-WKSRY-SRYCD (IDX1 1)   =    "099209911"
+      *                後発品変更可
+                       MOVE    2                   TO  FLG-INGIKSN-KBN
+                   END-IF
+      *!!
                    IF   LNK-WKSRY-INPUTCD(IDX1 1)(1:1)  =   "#"
                                                         OR  "$"
                        MOVE    IDX1                TO  IDX2
@@ -2757,14 +2773,25 @@
                MOVE    1               TO  WRK-IPNMEI
            END-IF
       *
+      *H27.4
+      *    後発品変更不可（処方）
+           IF     (FLG-INGIKSN-KBN     =   1    )
+              AND (WRK-IPNMEI          =   ZERO )
+               GO      TO      310020-GENERICNAME-CHK-EXT
+           END-IF
+      *
            PERFORM 9101-TENSUPLUS-READ-SEC
       *
       *    システム管理の変更可によってすべて一般名記載とする
            IF     (TNSP-IPN-KISAIKBN       =   0       )
-             AND  (SPA-KOUHATUKA           =   "1"     )
+      *H27   AND  (SPA-KOUHATUKA           =   "1"     )
              AND  (TNS-KOUHATUKBN          =   1  OR  2
                                            OR  7       )
-               MOVE    1               TO  TNSP-IPN-KISAIKBN
+      *H27.4
+               IF       (SPA-KOUHATUKA           =   "1" )
+                   OR   (FLG-INGIKSN-KBN         =   2    )
+                   MOVE    1               TO  TNSP-IPN-KISAIKBN
+               END-IF
            END-IF
       *
       *    後発品区分名称

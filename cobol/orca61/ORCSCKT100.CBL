@@ -1627,6 +1627,15 @@
                    ADD     1               TO  SPA-SRYKBN-CNT (08)
       *            その他
                WHEN    "80"
+      *          処方せん料は投薬とする
+                 IF      WRK-COM-SRYSYUKBN (01)  =   "820"
+                   CALL    "ORCSC20"       USING
+                                           MCPAREA
+                                           ORCSC00AREA
+                                           WRK-SCR-REC
+                                           SPA-AREA
+                   ADD     1               TO  SPA-SRYKBN-CNT (02)
+                 ELSE
                    CALL    "ORCSC80"       USING
                                            MCPAREA
                                            ORCSC00AREA
@@ -1636,6 +1645,7 @@
                    MOVE    LNK-RIGAKU-NCNT-AREA
                                            TO  SPA-RIGAKU-NCNT-AREA
                    ADD     1               TO  SPA-SRYKBN-CNT (09)
+                 END-IF
       *            コメント等
                WHEN    "93"
                WHEN    "99"

@@ -250,8 +250,10 @@
                05  WRK-TENSU-GAI       PIC 9(08)V9(2).
                05  WRK-TENSU-KEI       PIC 9(08)V9(2).
            03  WRK-TENSUKEI-9      PIC 9(08).
-           03  WRK-TENSUKEI-G      PIC 9(08).
-           03  WRK-TENSUKEI-GEN    PIC 9(08).
+      ***  03  WRK-TENSUKEI-G      PIC 9(08).
+      ***  03  WRK-TENSUKEI-GEN    PIC 9(08).
+           03  WRK-TENSUKEI-G      PIC 9(08)V99.
+           03  WRK-TENSUKEI-GEN    PIC 9(08)V99.
       *
            03  WRK-TEI-CNT         PIC 9(04).
       *
@@ -375,6 +377,7 @@
            03  WRK-SRYKA               PIC X(02).
            03  WRK-HKNCOMBI            PIC X(04).
            03  WRK-CHIKENKBN           PIC X(01).
+           03  WRK-GENECHG-KBN         PIC X(01).
       *    薬剤毎の保険
            03  WRK-HKNCOMBI-AREA.
                05  WRK-NAI-HKNCOMBI        PIC X(04).
@@ -425,6 +428,7 @@
                05  TBL-SRYKA           PIC X(02).
                05  TBL-HKNCOMBI        PIC X(04).
                05  TBL-CHIKENKBN       PIC X(01).
+               05  TBL-GENECHG         PIC X(01).
       *
       *    保存用
        01  HOZ-SCR-REC.
@@ -1060,7 +1064,7 @@
                            (WRK-COM-DATAKBN (IDX1)      =   "2" )
       *           通則外加算の前
                      AND  ((WRK-COM-TUSOKUGAIKBN(IDX1)  NOT =  "1" )  OR
-      *           施設基準逓減の後
+      *           減算の後
                            (WRK-COM-TENSIKIBETU(IDX1)   =   6   ))
                        MOVE    IDX1           TO  IDX-T
                    END-IF
@@ -1406,9 +1410,10 @@
                    COMPUTE WRK-TENSUKEI        =   WRK-TENSU-KEI
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+      **                                       +   0.5
+      **           MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      **           ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
                END-IF
       *        %減算　（手技料の点数を所定点数とする)
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
@@ -1418,16 +1423,22 @@
                                                              (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100.00
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-GEN
+      **                                       +   0.5
+      **           MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      **           ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-GEN
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-GEN
                END-IF
            END-PERFORM
       *
-           COMPUTE LNK-SC90-TENSU      =   WRK-TENSU-KEI
+      *    COMPUTE LNK-SC90-TENSU      =   WRK-TENSU-KEI
+      *                                +   WRK-TENSU-GAI
+      *                                +   WRK-TENSUKEI-G
+      ***                              -   WRK-TENSUKEI-GEN
+           COMPUTE LNK-SC90-TENSU      =  (WRK-TENSU-KEI
                                        +   WRK-TENSU-GAI
                                        +   WRK-TENSUKEI-G
-                                       -   WRK-TENSUKEI-GEN
+                                       -   WRK-TENSUKEI-GEN )
+                                       +   0.5
       *
            .
        1006-KASAN-SET-EXT.
@@ -1521,6 +1532,7 @@
                    END-IF
       *@
                END-IF
+      *
                END-PERFORM
       *        調基が算定時の処方せん料とのチェック
                IF      IDX-CHOKI           >   ZERO
@@ -1626,6 +1638,16 @@
                        END-IF
                        IF      TBL-SRYKA (IDX-KA)  =   WRK-COM-SRYKA
                                                                (IDX)
+      *H27.4           診療科毎に後発変更不可処方毎の設定
+                           EVALUATE    WRK-COM-INPUTCD (IDX)
+                           WHEN   "099209910"
+                               MOVE    "1"         TO  TBL-GENECHG
+                                                              (IDX-KA)
+                           WHEN   "099209911"
+                               MOVE    "2"         TO  TBL-GENECHG
+                                                              (IDX-KA)
+                           END-EVALUATE
+      *H27.4
                            MOVE    10              TO  IDX-KA
                        END-IF
                    END-PERFORM
@@ -1656,6 +1678,7 @@
                MOVE    TBL-SRYKA (IDX-KA)      TO  WRK-SRYKA
                MOVE    TBL-HKNCOMBI(IDX-KA)    TO  WRK-HKNCOMBI
                MOVE    TBL-CHIKENKBN(IDX-KA)   TO  WRK-CHIKENKBN
+               MOVE    TBL-GENECHG  (IDX-KA)   TO  WRK-GENECHG-KBN
       *
                MOVE    ZERO            TO  FLG-TOKUTEI
                PERFORM VARYING     IDX-KA2 FROM    1   BY  1
@@ -2000,6 +2023,7 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 3003-CHEK-SYORI-SEC
            END-IF
+      *
            IF     (LNK-ORCSC-KIDCD     NOT =   SPACE )  OR
                   (SPA-ERRCD           NOT =   SPACE )
       *??      CONTINUE
@@ -2949,11 +2973,11 @@
       ***************  IF     (WRK-COM-KOKUJISKBKBN2(IDX)  =   9  )
                        IF     (WRK-COM-IPN-KISAIKBN (IDX)  =   1  )
       *H27.4               後発品変更可
-                         OR   (SPA-GENECHG-KBN             =   2   )
+                         OR   (WRK-GENECHG-KBN             =   "2" )
       *
                            MOVE    1                   TO  FLG-CHK-P
       *H27.4               後発品変更不可
-                           IF      SPA-GENECHG-KBN     =   1
+                           IF      WRK-GENECHG-KBN     =   "1"
                               MOVE    ZERO                TO  FLG-CHK-P
                            END-IF
       *
@@ -3608,7 +3632,7 @@
                   (FLG-SYOHOSENN       =   ZERO)
                GO      TO      3001-INGAI-SYORI-EXT
            END-IF
-      *TEST
+      *
       *    訂正で自動発生なしの場合
            IF    ((LNK-ORCSC-SYORIFLG  =   1  )  AND
                   (SPA-TEISEITOKU-FLG  =   "0") )
@@ -3743,6 +3767,7 @@
       *        ３０日以上逓減
                IF     (SPA-TEIGEN30-OK     =   1 )
                  AND  (FLG-GEN30-G         =   1 )
+                 AND  (FLG-SYOHOSENN       =   1 )
                    MOVE    CONS-TEIHP-SYOSEN   TO  WRK-SRYCD
                    MOVE    SPACE               TO  WRK-SRYCD2
                    PERFORM 30019-GEN30KSN-HENSYU-SEC
@@ -4111,6 +4136,7 @@
       *        ３０日以上逓減
                IF     (SPA-TEIGEN30-OK     =   1 )
                  AND  (FLG-GEN30-N         =   1 )
+                 AND  (FLG-SYOHORYO        =   1 )
                    MOVE    CONS-TEIHP-SYOHOU   TO  WRK-SRYCD
                    MOVE    SPACE               TO  WRK-SRYCD2
                    PERFORM 30019-GEN30KSN-HENSYU-SEC
@@ -4977,7 +5003,6 @@
                        PERFORM 30023-TAZAI23-GENCHK-SEC
                    END-EVALUATE
                END-IF
-      *
              END-IF
       *
                IF      WRK-COM-ZAIEND (IDX)    =   "1"
@@ -6526,11 +6551,10 @@
                                                       (02 IDXS-2)
                                            *  (TNS-TEN
                                            /   100.00  )
-                                           +   0.5
-               MOVE    WRK-SANTEN-9        TO  WRK-SANTEN
-               COMPUTE WRK-SANTEN-KEI      =   LNK-ORCSC-TENSU
+               COMPUTE WRK-SANTEN-KEI      =  (LNK-ORCSC-TENSU
                                                       (02 IDXS-2)
-                                           -   WRK-SANTEN
+                                           -   WRK-SANTEN-9 )
+                                           +   0.5
       *        逓減後の手技料点数
                MOVE    WRK-SANTEN-KEI      TO  LNK-ORCSC-TENSU
                                                       (02 IDXS-2)
