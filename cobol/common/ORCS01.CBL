@@ -439,6 +439,7 @@
       *  04.07.24    NACL-ÌçÏÆ    15/02/02  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.25    NACL-ÌçÏÆ    15/03/04  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.07.26    NACL-ÌçÏÆ    15/04/03  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.27    NACL-ÌçÏÆ    15/04/09  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÆÃÊÌ·×»»½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -923,6 +924,7 @@
                05  WK-RUI-FTNRATE          PIC  9(03).
                05  WK-RUI-FTNRATE-KOH1     PIC  9(03).
                05  WK-RUI-COMPFTN          PIC  9(07).
+               05  WK-RUI-COMPFTN-XXX      PIC  9(07).
                05  WK-RUI-HKNFTNMONEY      PIC  9(07).
                05  WK-RUI-COMPFTN-ENTANI   PIC  9(07)V9(01).
                05  WK-RUI-COMPFTN-ENTANI2  PIC  9(07).
@@ -23714,10 +23716,17 @@
        23042-FTNGAK-HENSYU-SEC           SECTION.
       *
            IF    LNK-SYU-KOH1COMPFTN  >  LNK-SYU-SYUCOMPFTN
-              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN
+              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN-XXX
            ELSE
-              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN
+              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN-XXX
            END-IF
+      *
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-COMPFTN-XXX  +   5
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-HKNFTNMONEY  /  10
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-HKNFTNMONEY  *  10
       *
            IF    LNK-SYU-KOH1COMPFTN-ENTANI
                                       >  LNK-SYU-SYUCOMPFTN-ENTANI
@@ -23730,12 +23739,17 @@
            COMPUTE  WK-RUI-COMPFTN-ENTANI2 =
                     WK-RUI-COMPFTN-ENTANI  + 0.9
       *
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-COMPFTN      +   5
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-HKNFTNMONEY  /  10
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-HKNFTNMONEY  *  10
+           IF    WK-KOH-COMPFTN(1)  =  ALL"9"
+              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN-XXX
+           ELSE
+              MOVE   WK-KOH-COMPFTN(1)     TO   WK-RUI-COMPFTN-XXX
+           END-IF
+      *
+           IF    WK-RUI-COMPFTN-XXX   >  LNK-SYU-SYUCOMPFTN
+              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN
+           ELSE
+              MOVE   WK-RUI-COMPFTN-XXX    TO   WK-RUI-COMPFTN
+           END-IF
       *
            IF ((LNK-SYU-KOH1HKNNUM  =  "015" OR "016" OR "021") AND
                (WK-JIRITU-CYUKANSOU(1)   =  2                 ))
