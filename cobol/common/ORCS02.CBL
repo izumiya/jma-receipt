@@ -931,6 +931,7 @@
       *
                05  WK-RUI-FTNRATE          PIC  9(03).
                05  WK-RUI-COMPFTN          PIC  9(07).
+               05  WK-RUI-COMPFTN-XXX      PIC  9(07).
                05  WK-RUI-HKNFTNMONEY      PIC  9(07).
                05  WK-RUI-COMPFTN-ENTANI   PIC  9(07)V9(01).
                05  WK-RUI-COMPFTN-ENTANI2  PIC  9(07).
@@ -24949,10 +24950,17 @@
        23062-FTNGAK-HENSYU-SEC           SECTION.
       *
            IF    LNK-SYU-KOH1COMPFTN  >  LNK-SYU-SYUCOMPFTN
-              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN
+              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN-XXX
            ELSE
-              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN
+              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN-XXX
            END-IF
+      *
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-COMPFTN-XXX  +   5
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-HKNFTNMONEY  /  10
+           COMPUTE  WK-RUI-HKNFTNMONEY  =
+                    WK-RUI-HKNFTNMONEY  *  10
       *
            IF    LNK-SYU-KOH1COMPFTN-ENTANI
                                       >  LNK-SYU-SYUCOMPFTN-ENTANI
@@ -24965,12 +24973,17 @@
            COMPUTE  WK-RUI-COMPFTN-ENTANI2 =
                     WK-RUI-COMPFTN-ENTANI  + 0.9
       *
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-COMPFTN      +   5
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-HKNFTNMONEY  /  10
-           COMPUTE  WK-RUI-HKNFTNMONEY  =
-                    WK-RUI-HKNFTNMONEY  *  10
+           IF    WK-KOH-COMPFTN(1)  =  ALL"9"
+              MOVE   LNK-SYU-KOH1COMPFTN   TO   WK-RUI-COMPFTN-XXX
+           ELSE
+              MOVE   WK-KOH-COMPFTN(1)     TO   WK-RUI-COMPFTN-XXX
+           END-IF
+      *
+           IF    WK-RUI-COMPFTN-XXX   >  LNK-SYU-SYUCOMPFTN
+              MOVE   LNK-SYU-SYUCOMPFTN    TO   WK-RUI-COMPFTN
+           ELSE
+              MOVE   WK-RUI-COMPFTN-XXX    TO   WK-RUI-COMPFTN
+           END-IF
       *
            IF    LNK-SYU-KOH1SKJ-FTNKBN   =  "2"
                  ADD  LNK-SYU-KOH1SKJ-FTN    TO  WK-RUI-HKNFTNMONEY
