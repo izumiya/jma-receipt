@@ -166,6 +166,8 @@
       *                                     医療情報連携基盤対応
       *  04.07.10    NACL-藤原    14/06/02  医保分で受診日指定時、医保＋
       *                                     第三者行為も対象とする
+      *  04.07.11    NACL-藤原    15/04/10  自賠責の請求管理削除処理に条件
+      *                                     を追加
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -3546,6 +3548,11 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                WHEN    "8"
                    MOVE    4               TO  RECE10-TEISYUTUSAKI
                    MOVE    4               TO  RECE10-XXTEISYUTUSAKI 
+                   IF      SPA-R01-RECEKBN =   "8"
+                       MOVE    "970"           TO  RECE10-HKNNUM
+                   ELSE
+                       MOVE    "973"           TO  RECE10-HKNNUM
+                   END-IF
                WHEN    "6"
                    MOVE    5               TO  RECE10-TEISYUTUSAKI
                    MOVE    5               TO  RECE10-XXTEISYUTUSAKI 
