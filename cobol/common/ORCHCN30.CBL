@@ -1194,6 +1194,7 @@
       *
       *    在宅なら抜ける
            IF    ( ORCHCN30-ZAIKBN(CNT-PARA)   =   4 ) OR
+                 ( ORCHCN30-ZAIKBN(CNT-PARA)   =   3 ) OR
                  ( TNSP-SOURYOHENKBN           =   "1" )
                GO  TO  240-KBN-SET-EXT
            END-IF
