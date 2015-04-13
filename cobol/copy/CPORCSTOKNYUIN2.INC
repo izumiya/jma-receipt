@@ -55,6 +55,9 @@
       *    ３から５は未使用
            03  LNK-TOKNYUIN2-TOKUBETSU-FLG           PIC X(01)
                                                      OCCURS  5.
+      *初回番号（歴作成で登録された入院履歴登録分について特定入院−通算
+      *          対象日数を取得する為にセット）
+           03  LNK-TOKNYUIN2-SHONUM                  PIC 9(03).
       *返却項目
            03  LNK-TOKNYUIN2-HENKYAKU-AREA.
       *特定入院料コード算定期間返却領域
@@ -70,6 +73,7 @@
              05  LNK-TOKNYUIN2-IPN-KAIKEI-FLG        PIC  X(01).
       *一般入院会計作成開始日
              05  LNK-TOKNYUIN2-IPN-KAIKEI-YMD        PIC  X(08).
-      *復帰コード（０：特定入院料返却あり　１：特定入院料返却なし）
+      *復帰コード（０：特定入院料返却あり　１：特定入院料上限超え返却なし
+      *            ２：特定入院料対象なし）
            03  LNK-TOKNYUIN2-RC                      PIC S9(9) BINARY.
       *
