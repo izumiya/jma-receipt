@@ -798,6 +798,7 @@
                                         TO  LNK-TOKNYUIN2-SANTEIYMD
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
+           MOVE   LNK-PTNYUINRRK-SHONUM TO  LNK-TOKNYUIN2-SHONUM
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
                              TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF     LNK-AKYUSEI-RC          =   1
@@ -1773,89 +1774,6 @@
            MOVE    WRK-SANTEISTYMD
                                    TO  SYOKIKSN-IN-SANTEISTYMD
       *
-      *    特定集中治療室管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    救命救急入院料１
-      *    救命救急入院料２
-      *    一類感染症患者入院医療管理料
-      *    救命救急入院料３（救命救急入院料）
-      *    救命救急入院料４（救命救急入院料）
-      *    特定集中治療室管理料２（特定集中治療室管理料）
-      *    小児特定集中治療室管理料
-      *    特定集中治療室管理料１（平成２６年改正）
-      *    特定集中治療室管理料２（特定集中治療室管理料）（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF LNK-PTNYUINRRK-TOKUTEI-NYUIN = "03" OR "04" OR "05" OR
-                                                 "06" OR "07" OR "08" OR
-                                                 "09" OR "14" OR "16" OR
-                                                 "55" OR "57" OR "59" OR
-                                                 "91" OR "AH" OR "AI"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    地域包括ケア病棟入院料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "2"
-              IF  LNK-PTNYUINRRK-TOKUTEI-NYUIN  =  "41" OR "42" OR "43"
-                                                OR "44" OR "45" OR "46"
-                                                OR "47" OR "48"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-              END-IF
-           END-IF
-      *
-      *    地域包括ケア入院医療管理料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-              IF  LNK-PTNYUINRRK-TOKUTEI-NYUIN = "AL" OR "AM" OR "AN" OR
-                                                 "AO" OR "AP" OR "AQ" OR
-                                                 "AR" OR "AS"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（地域包括ケア入院医療管理１）（平成２６年改正）
-      *    特定一般病棟入院料（地域包括ケア入院医療管理２）（平成２６年改正）
-      *    の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN  = "AU" OR "AV"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    広範囲熱傷特定集中治療室管理料算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "13"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    ハイケアユニット入院医療管理料算定時に特定入院での算定日が２１日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    ハイケアユニット入院医療管理料１（平成２６年改正）
-      *    ハイケアユニット入院医療管理料２（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN  = "17" OR "AJ" OR "AK"
-                   IF   STUSAN-NISSU08   >=   21
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
       *     DISPLAY "====AZU  TENROOM-EDIT =================="
       *     DISPLAY "RRKNUM     = " PTNYUINRRK-RRKNUM
       *     DISPLAY "RRKEDANUM  = " PTNYUINRRK-RRKEDANUM
@@ -1863,6 +1781,7 @@
       *     DISPLAY "TAIINYMD   = " PTNYUINRRK-TAIINYMD
       *     DISPLAY "TENNYUYMD  = " PTNYUINRRK-TENNYUYMD
       *     DISPLAY "TENSTUYMD  = " PTNYUINRRK-TENSTUYMD
+      *
       *    平成２４年３月３１日時点で亜急性期入院医療管理料１を算定
       *    している状態か判定するサブを呼び出し
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
@@ -1874,237 +1793,6 @@
                    CALL    "ORCSAKYUSEI"    USING  ORCSAKYUSEI-AREA
                                                    SPA-AREA
                    DISPLAY  "LNK-AKYUSEI-RC = " LNK-AKYUSEI-RC
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （平成２４年３月３１日までの入院分は９０日限度）
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "18"
-                  IF   PTNYUINRRK-NYUINYMD   >=   "20120401"
-                      IF  STUSAN-NISSU08   >=   60
-                          MOVE  SPACE  TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  ELSE
-                      IF  STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （経過措置により平成２４年３月３１日時点で亜急性期入院医療
-      *      管理料１を算定している場合は９０日限度とする対応追加）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-             IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "54"
-               IF  LNK-PTNYUINRRK-NYUINYMD   >=   "20120401"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               ELSE
-                   IF    LNK-AKYUSEI-RC   =   1
-                      IF   STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   ELSE
-                      IF   STUSAN-NISSU06   >=   60
-                          MOVE  SPACE  TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   END-IF
-               END-IF
-             END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "92"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "93"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理）算定時に特定入院での
-      *    算定日が６０日を経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "95"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
-      *    算定時に特定入院での算定日が６０日を経過していた場合は一般の
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "96"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料３（広範囲熱傷特定集中治療）の場合は最長６０日間の算定の為、
-      *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN = "56"
-                   IF       STUSAN-NISSU08  >=  60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料４（広範囲熱傷特定集中治療）の場合は最長６０日間の算定の為、
-      *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN = "58"
-                   IF       STUSAN-NISSU08  >=  60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定集中治療室管理料２（広範囲熱傷特定集中治療）の場合は最長６０日間の算定の為、
-      *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    特定集中治療室管理料２（広範囲熱傷特定集中治療）（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN = "60" OR "AT"
-                   IF       STUSAN-NISSU08  >=  60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    脳卒中ケアユニット入院医療管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "19"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    総合周産期特定集中治療室管理料（母体・胎児）算定時に特定入院での
-      *    算定日が１４日を経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "11"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    以下の特定入院料は出生児体重より算定上限日数を判定し、
-      *    経過していた場合は一般の入院料算定とする
-      *    ・新生児特定集中治療室管理料１
-      *    ・新生児特定集中治療室管理料２
-      *    ・総合周産期特定集中治療室管理料（新生児）
-      *    ・新生児治療回復室入院医療管理料
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR
-                                                     "61"  OR
-                                                     "12"  OR
-                                                     "62"
-      *          出生児体重の取得
-                 MOVE   SPACE                TO  PTCONF-REC
-                 INITIALIZE                      PTCONF-REC
-                 MOVE   LNK-PTNYUINRRK-HOSPNUM
-                                             TO  PTCONF-HOSPNUM
-                 MOVE   LNK-PTNYUINRRK-PTID  TO  PTCONF-PTID
-                 MOVE   "BIRTHWEIGHT"        TO  PTCONF-CKEY
-                 PERFORM 900-PTCONF-READ-SEC
-                 IF     FLG-PTCONF           =   ZERO
-                     MOVE   PTCONF-CDATA(1:4)  TO  WRK-WEIGHT
-                 ELSE
-                     MOVE   9999               TO  WRK-WEIGHT
-                 END-IF
-      *
-      *          新生児特定集中治療室管理料１
-      *          新生児特定集中治療室管理料２
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR  "61"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          総合周産期特定集中治療室管理料（新生児）
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "12"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          新生児治療回復室入院医療管理料
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "62"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   120
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   30
-                          MOVE    SPACE   TO
-                                          LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
                END-IF
            END-IF
       *
@@ -2476,8 +2164,8 @@
            INITIALIZE                     ORCSNYUACCT-AREA
            MOVE    "8"                TO  LNK-SCNYUACCT-SYORI-KBN
            MOVE    "1"                TO  SPA-NYUGAIKBN
-           MOVE    PTNYUINRRK-PTID    TO  SPA-PTID
-           MOVE    PTNYUINRRK-NYUINKA TO  SPA-SRYKA
+           MOVE    LNK-PTNYUINRRK-PTID    TO  SPA-PTID
+           MOVE    LNK-PTNYUINRRK-NYUINKA TO  SPA-SRYKA
            MOVE    SYOKIKSN-IN-KHNSRYCD
                            TO  LNK-SCNYUACCT-NYUKHN-SRYCD(1)
            MOVE    SYOKIKSN-IN-SANTEISTYMD
@@ -2542,11 +2230,39 @@
                                         TO  LNK-TOKNYUIN2-SANTEIYMD
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
+           MOVE   LNK-PTNYUINRRK-SHONUM TO  LNK-TOKNYUIN2-SHONUM
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
                              TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF     LNK-AKYUSEI-RC          =   1
               MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
+      *    療養病棟（病床）入院のフラグセット
+           INITIALIZE                      SYS-5001-REC
+           MOVE    "5001"              TO  SYS-5001-KANRICD
+           MOVE    LNK-PTNYUINRRK-BTUNUM
+                                       TO  SYS-5001-KBNCD
+           MOVE    LNK-PTNYUINRRK-TENNYUYMD(1:6)
+                                       TO  SYS-5001-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-5001-STYUKYMD (7:2)
+           MOVE    SYS-5001-STYUKYMD   TO  SYS-5001-EDYUKYMD
+           MOVE    LNK-PTNYUINRRK-HOSPNUM
+                                       TO  SYS-5001-HOSPNUM
+           MOVE    SYS-5001-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-5001-REC
+               IF    SYS-5001-BTU-SBT    =   "04"  OR  "09"
+                       MOVE    "1"     TO
+                                         LNK-TOKNYUIN2-TOKUBETSU-FLG(2)
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            IF     LNK-TOKNYUIN2-RC      =   ZERO
@@ -2567,6 +2283,18 @@
                                           TO  IPN-NYUKAIKEI-SAKUSEI-FLG
               MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-YMD
                                           TO  IPN-SANTEISTYMD
+           ELSE
+              IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN  NOT =   SPACE
+                IF    LNK-TOKNYUIN2-RC  =   1
+                    MOVE    SPACE      TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
+                                           SYOKIKSN-IN-KHNSRYCD
+                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                END-IF
+                  MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-FLG
+                                        TO  IPN-NYUKAIKEI-SAKUSEI-FLG
+                  MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+                                        TO  IPN-SANTEISTYMD
+              END-IF
            END-IF
       *
       *-------特定入院対応ここまで-----------------------------------
@@ -3352,121 +3080,6 @@
            MOVE    WRK-SANTEISTYMD
                                    TO  SYOKIKSN-IN-SANTEISTYMD
       *
-      *    特定集中治療室管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    救命救急入院料１
-      *    救命救急入院料２
-      *    一類感染症患者入院医療管理料
-      *    救命救急入院料３（救命救急入院料）
-      *    救命救急入院料４（救命救急入院料）
-      *    特定集中治療室管理料２（特定集中治療室管理料）
-      *    小児特定集中治療室管理料
-      *    特定集中治療室管理料１（平成２６年改正）
-      *    特定集中治療室管理料２（特定集中治療室管理料）（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-             IF  LNK-PTNYUINRRK-TOKUTEI-NYUIN  = "03" OR "04" OR "05" OR
-                                                 "06" OR "07" OR "08" OR
-                                                 "09" OR "14" OR "16" OR
-                                                 "55" OR "57" OR "59" OR
-                                                 "91" OR "AH" OR "AI"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-             END-IF
-           END-IF
-      *
-      *    地域包括ケア病棟入院料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "2"
-               IF LNK-PTNYUINRRK-TOKUTEI-NYUIN = "41" OR "42" OR "43"
-                                              OR "44" OR "45" OR "46"
-                                              OR "47" OR "48"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    地域包括ケア入院医療管理料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF LNK-PTNYUINRRK-TOKUTEI-NYUIN = "AL" OR "AM" OR "AN" OR
-                                                "AO" OR "AP" OR "AQ" OR
-                                                "AR" OR "AS"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（地域包括ケア入院医療管理１）（平成２６年改正）
-      *    特定一般病棟入院料（地域包括ケア入院医療管理２）（平成２６年改正）
-      *    の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN  = "AU" OR "AV"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料３（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "56"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料４（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "58"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定集中治療室管理料（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    特定集中治療室管理料２（広範囲熱傷特定集中治療）（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "60" OR "AT"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    広範囲熱傷特定集中治療室管理料算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "13"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    ハイケアユニット入院医療管理料算定時に特定入院での算定日が２１日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    ハイケアユニット入院医療管理料１（平成２６年改正）
-      *    ハイケアユニット入院医療管理料２（平成２６年改正）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "17" OR "AJ" OR "AK"
-                   IF   STUSAN-NISSU08   >=   21
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
       *     DISPLAY "====AZU  TAIIN-CANCEL=================="
       *     DISPLAY "RRKNUM     = " PTNYUINRRK-RRKNUM
       *     DISPLAY "RRKEDANUM  = " PTNYUINRRK-RRKEDANUM
@@ -3474,6 +3087,7 @@
       *     DISPLAY "TAIINYMD   = " PTNYUINRRK-TAIINYMD
       *     DISPLAY "TENNYUYMD  = " PTNYUINRRK-TENNYUYMD
       *     DISPLAY "TENSTUYMD  = " PTNYUINRRK-TENSTUYMD
+      *
       *    平成２４年３月３１日時点で亜急性期入院医療管理料１を算定
       *    している状態か判定するサブを呼び出し
            IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
@@ -3485,196 +3099,6 @@
                    CALL    "ORCSAKYUSEI"    USING  ORCSAKYUSEI-AREA
                                                    SPA-AREA
                    DISPLAY  "LNK-AKYUSEI-RC = " LNK-AKYUSEI-RC
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （平成２４年３月３１日までの入院分は９０日限度）
-           IF  LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "18"
-                  IF   LNK-PTNYUINRRK-NYUINYMD   >=   "20120401"
-                      IF  STUSAN-NISSU08   >=   60
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  ELSE
-                      IF  STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （経過措置により平成２４年３月３１日時点で亜急性期入院医療
-      *      管理料１を算定している場合は９０日限度とする対応追加）
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-             IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "54"
-               IF  LNK-PTNYUINRRK-NYUINYMD   >=   "20120401"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               ELSE
-                   IF    LNK-AKYUSEI-RC   =   1
-                      IF   STUSAN-NISSU08   >=   90
-                          MOVE  SPACE   TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   ELSE
-                      IF   STUSAN-NISSU08   >=   60
-                          MOVE  SPACE   TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   END-IF
-               END-IF
-             END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "92"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "93"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    脳卒中ケアユニット入院医療管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "19"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理）算定時に特定入院での
-      *    算定日が６０日を経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "95"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
-      *    算定時に特定入院での算定日が６０日を経過していた場合は一般の
-      *    入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "96"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    総合周産期特定集中治療室管理料（母体・胎児）算定時に特定入院での
-      *    算定日が１４日を経過していた場合は一般の入院料算定とする
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "11"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    以下の特定入院料は出生児体重より算定上限日数を判定し、
-      *    経過していた場合は一般の入院料算定とする
-      *    ・新生児特定集中治療室管理料１
-      *    ・新生児特定集中治療室管理料２
-      *    ・総合周産期特定集中治療室管理料（新生児）
-      *    ・新生児治療回復室入院医療管理料
-           IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR
-                                                 "61"  OR
-                                                 "12"  OR
-                                                 "62"
-      *          出生児体重の取得
-                 MOVE   SPACE                TO  PTCONF-REC
-                 INITIALIZE                      PTCONF-REC
-                 MOVE   PTNYUINRRK-HOSPNUM   TO  PTCONF-HOSPNUM
-                 MOVE   PTNYUINRRK-PTID      TO  PTCONF-PTID
-                 MOVE   "BIRTHWEIGHT"        TO  PTCONF-CKEY
-                 PERFORM 900-PTCONF-READ-SEC
-                 IF     FLG-PTCONF           =   ZERO
-                     MOVE   PTCONF-CDATA(1:4)  TO  WRK-WEIGHT
-                 ELSE
-                     MOVE   9999               TO  WRK-WEIGHT
-                 END-IF
-      *
-      *          新生児特定集中治療室管理料１
-      *          新生児特定集中治療室管理料２
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR  "61"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          総合周産期特定集中治療室管理料（新生児）
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "12"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          新生児治療回復室入院医療管理料
-                 IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN   = "62"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   120
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   30
-                          MOVE  SPACE  TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
                END-IF
            END-IF
       *
@@ -3780,12 +3204,40 @@
                                         TO  LNK-TOKNYUIN2-SANTEIYMD
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
+           MOVE   LNK-PTNYUINRRK-SHONUM TO  LNK-TOKNYUIN2-SHONUM
            MOVE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
                              TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            IF    (LNK-AKYUSEI-RC        =   1)           AND
                  (LNK-PTNYUINRRK-TAIINYMD  >=   "20120401")
               MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-FLG(1)
            END-IF
+      *    療養病棟（病床）入院のフラグセット
+           INITIALIZE                      SYS-5001-REC
+           MOVE    "5001"              TO  SYS-5001-KANRICD
+           MOVE    LNK-PTNYUINRRK-BTUNUM
+                                       TO  SYS-5001-KBNCD
+           MOVE    LNK-PTNYUINRRK-TAIINYMD(1:6)
+                                       TO  SYS-5001-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-5001-STYUKYMD (7:2)
+           MOVE    SYS-5001-STYUKYMD   TO  SYS-5001-EDYUKYMD
+           MOVE    LNK-PTNYUINRRK-HOSPNUM
+                                       TO  SYS-5001-HOSPNUM
+           MOVE    SYS-5001-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-5001-REC
+               IF    SYS-5001-BTU-SBT    =   "04"  OR  "09"
+                       MOVE    "1"     TO
+                                         LNK-TOKNYUIN2-TOKUBETSU-FLG(2)
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
            IF     LNK-TOKNYUIN2-RC      =   ZERO
@@ -3806,6 +3258,18 @@
                                           TO  IPN-NYUKAIKEI-SAKUSEI-FLG
               MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-YMD
                                           TO  IPN-SANTEISTYMD
+           ELSE
+              IF   LNK-PTNYUINRRK-TOKUTEI-NYUIN  NOT =   SPACE
+                IF    LNK-TOKNYUIN2-RC  =   1
+                    MOVE    SPACE      TO  LNK-PTNYUINRRK-TOKUTEI-NYUIN
+                                           SYOKIKSN-IN-KHNSRYCD
+                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                END-IF
+                  MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-FLG
+                                        TO  IPN-NYUKAIKEI-SAKUSEI-FLG
+                  MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+                                        TO  IPN-SANTEISTYMD
+              END-IF
            END-IF
       *
       *
@@ -4993,121 +4457,6 @@
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-5001-REC
       *
-      *    特定集中治療室管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    救命救急入院料１
-      *    救命救急入院料２
-      *    一類感染症患者入院医療管理料
-      *    救命救急入院料３（救命救急入院料）
-      *    救命救急入院料４（救命救急入院料）
-      *    特定集中治療室管理料２（特定集中治療室管理料）
-      *    小児特定集中治療室管理料
-      *    特定集中治療室管理料１（平成２６年改正）
-      *    特定集中治療室管理料２（特定集中治療室管理料）（平成２６年改正）
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "03" OR "04" OR "05" OR
-                                                 "06" OR "07" OR "08" OR
-                                                 "09" OR "14" OR "16" OR
-                                                 "55" OR "57" OR "59" OR
-                                                 "91" OR "AH" OR "AI"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    地域包括ケア病棟入院料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "2"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN  =  "41" OR "42" OR "43"
-                                              OR "44" OR "45" OR "46"
-                                              OR "47" OR "48"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    地域包括ケア入院医療管理料（平成２６年改正）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN  = "AL" OR "AM" OR "AN" OR
-                                                "AO" OR "AP" OR "AQ" OR
-                                                "AR" OR "AS"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（地域包括ケア入院医療管理１）（平成２６年改正）
-      *    特定一般病棟入院料（地域包括ケア入院医療管理２）（平成２６年改正）
-      *    の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN  = "AU" OR "AV"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料３（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "56"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料４（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "58"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定集中治療室管理料（広範囲熱傷特定集中治療）の算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    特定集中治療室管理料２（広範囲熱傷特定集中治療）（平成２６年改正）
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "60" OR "AT"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    広範囲熱傷特定集中治療室管理料算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "13"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    ハイケアユニット入院医療管理料算定時に特定入院での算定日が２１日を
-      *    経過していた場合は一般の入院料算定とする
-      *    以下の特定入院料も同様
-      *    ハイケアユニット入院医療管理料１（平成２６年改正）
-      *    ハイケアユニット入院医療管理料２（平成２６年改正）
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "17" OR "AJ" OR "AK"
-                   IF   STUSAN-NISSU08   >=   21
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
       *     DISPLAY "====AZU  TAIIN-CANCEL=================="
       *     DISPLAY "RRKNUM     = " PTNYUINRRK-RRKNUM
       *     DISPLAY "RRKEDANUM  = " PTNYUINRRK-RRKEDANUM
@@ -5115,6 +4464,7 @@
       *     DISPLAY "TAIINYMD   = " PTNYUINRRK-TAIINYMD
       *     DISPLAY "TENNYUYMD  = " PTNYUINRRK-TENNYUYMD
       *     DISPLAY "TENSTUYMD  = " PTNYUINRRK-TENSTUYMD
+      *
       *    平成２４年３月３１日時点で亜急性期入院医療管理料１を算定
       *    している状態か判定するサブを呼び出し
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
@@ -5126,196 +4476,6 @@
                    CALL    "ORCSAKYUSEI"    USING  ORCSAKYUSEI-AREA
                                                    SPA-AREA
                    DISPLAY  "LNK-AKYUSEI-RC = " LNK-AKYUSEI-RC
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （平成２４年３月３１日までの入院分は９０日限度）
-           IF PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "18"
-                  IF   PTNYUINRRK-NYUINYMD   >=   "20120401"
-                      IF  STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  ELSE
-                      IF  STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                  END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-      *    （経過措置により平成２４年３月３１日時点で亜急性期入院医療
-      *      管理料１を算定している場合は９０日限度とする対応追加）
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-             IF   PTNYUINRRK-TOKUTEI-NYUIN   = "54"
-               IF  PTNYUINRRK-NYUINYMD   >=   "20120401"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               ELSE
-                   IF    LNK-AKYUSEI-RC   =   1
-                      IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   ELSE
-                      IF   STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                      END-IF
-                   END-IF
-               END-IF
-             END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "92"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２（指定地域）算定時に特定入院での算定日が６０日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "93"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    脳卒中ケアユニット入院医療管理料算定時に特定入院での算定日が１４日を
-      *    経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "19"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理）算定時に特定入院での
-      *    算定日が６０日を経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "95"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
-      *    算定時に特定入院での算定日が６０日を経過していた場合は一般の
-      *    入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "96"
-                   IF   STUSAN-NISSU08   >=   60
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    総合周産期特定集中治療室管理料（母体・胎児）算定時に特定入院での
-      *    算定日が１４日を経過していた場合は一般の入院料算定とする
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "11"
-                   IF   STUSAN-NISSU08   >=   14
-                       MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    以下の特定入院料は出生児体重より算定上限日数を判定し、
-      *    経過していた場合は一般の入院料算定とする
-      *    ・新生児特定集中治療室管理料１
-      *    ・新生児特定集中治療室管理料２
-      *    ・総合周産期特定集中治療室管理料（新生児）
-      *    ・新生児治療回復室入院医療管理料
-           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR
-                                                 "61"  OR
-                                                 "12"  OR
-                                                 "62"
-      *          出生児体重の取得
-                 MOVE   SPACE                TO  PTCONF-REC
-                 INITIALIZE                      PTCONF-REC
-                 MOVE   PTNYUINRRK-HOSPNUM   TO  PTCONF-HOSPNUM
-                 MOVE   PTNYUINRRK-PTID      TO  PTCONF-PTID
-                 MOVE   "BIRTHWEIGHT"        TO  PTCONF-CKEY
-                 PERFORM 900-PTCONF-READ-SEC
-                 IF     FLG-PTCONF           =   ZERO
-                     MOVE   PTCONF-CDATA(1:4)  TO  WRK-WEIGHT
-                 ELSE
-                     MOVE   9999               TO  WRK-WEIGHT
-                 END-IF
-      *
-      *          新生児特定集中治療室管理料１
-      *          新生児特定集中治療室管理料２
-                 IF   PTNYUINRRK-TOKUTEI-NYUIN   = "10"  OR  "61"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          総合周産期特定集中治療室管理料（新生児）
-                 IF   PTNYUINRRK-TOKUTEI-NYUIN   = "12"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   60
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   21
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
-      *          新生児治療回復室入院医療管理料
-                 IF   PTNYUINRRK-TOKUTEI-NYUIN   = "62"
-                    IF    WRK-WEIGHT     <   1000
-                       IF   STUSAN-NISSU08   >=   120
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF   (WRK-WEIGHT     >=  1000)   AND
-                         (WRK-WEIGHT     <   1500)
-                       IF   STUSAN-NISSU08   >=   90
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                    IF    WRK-WEIGHT     >=  1500
-                       IF   STUSAN-NISSU08   >=   30
-                          MOVE    SPACE   TO   PTNYUINRRK-TOKUTEI-NYUIN
-                       END-IF
-                    END-IF
-                 END-IF
-      *
                END-IF
            END-IF
       *
@@ -5446,6 +4606,7 @@
            MOVE   WRK-MAEIDOYMD         TO  LNK-TOKNYUIN2-SANTEIYMD
            MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
            MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
+           MOVE   PTNYUINRRK-SHONUM     TO  LNK-TOKNYUIN2-SHONUM
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
                              TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA

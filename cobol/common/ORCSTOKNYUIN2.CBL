@@ -46,6 +46,9 @@
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
            03  FLG-PTCONF                  PIC 9(01).
+           03  FLG-PTNYUINRRK              PIC 9(01).
+      *  ° £∞°ßº£Œ≈ºº√±∞Ã∞ ≥∞§Œ∆√ƒÍ∆˛±°Œ¡°¢£±°ßº£Œ≈ºº√±∞Ã§Œ∆√ƒÍ∆˛±°Œ¡°À
+           03  FLG-ROOM                    PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -76,6 +79,7 @@
            03  WRK-IPN-HANTEI-YMD2         PIC X(08).
       *
            03  WRK-WEIGHT                  PIC 9(04).
+           03  WRK-TOKUTEI-ROOM-NISSU      PIC 9(04).
       *
       *****************************************************************
       *    •’•°•§•Î•Ï•§•¢•¶•»
@@ -87,6 +91,10 @@
       *    ¥µº‘∏ƒ Ã¿ﬂƒÍ
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
+      *
+      *    ¥µº‘∆˛±°Õ˙ŒÚ
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *    £ƒ£¬∏°∫˜
            COPY    "MCPDATA.INC".
@@ -101,6 +109,9 @@
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
            COPY    "CPORCSGDAY.INC".
+      *
+      *    ƒÃªª∆¸øÙºË∆¿•µ•÷
+           COPY "CPORCSTUSAN.INC".
       *
       *****************************************************************
       *    œ¢ÕÌ°°ŒŒ∞Ë
@@ -1049,6 +1060,7 @@
                   MOVE  "190074510"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  14             TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≤
               WHEN      "190024310"
                   MOVE  "190024310"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1058,6 +1070,7 @@
                   MOVE  "190024410"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  14             TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≥° µﬂÃøµﬂµﬁ∆˛±°Œ¡°À
               WHEN      "190138110"
                   MOVE  "190138110"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1067,6 +1080,7 @@
                   MOVE  "190138310"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  14             TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
               WHEN      "190138410"
                   MOVE  "190138410"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1076,6 +1090,7 @@
                   MOVE  "190138610"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  60             TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£¥° µﬂÃøµﬂµﬁ∆˛±°Œ¡°À
               WHEN      "190138710"
                   MOVE  "190138710"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1085,6 +1100,7 @@
                   MOVE  "190138910"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  14             TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£¥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
               WHEN      "190139010"
                   MOVE  "190139010"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1096,6 +1112,7 @@
                   MOVE  "190139310"    TO  WRK-TOKNYUIN2-SRYCD(4)
                   MOVE  60             TO  WRK-JGN-NISSU(4)
                   MOVE  4              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£±
               WHEN      "190174410"
                   MOVE  "190174410"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1103,6 +1120,7 @@
                   MOVE  "190174510"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤° ∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°À
               WHEN      "190174610"
                   MOVE  "190174610"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1110,6 +1128,7 @@
                   MOVE  "190174710"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
               WHEN      "190174810"
                   MOVE  "190174810"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1117,6 +1136,7 @@
                   MOVE  "190174910"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  60             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≥
               WHEN      "190116310"
                   MOVE  "190116310"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1124,6 +1144,7 @@
                   MOVE  "190116410"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£¥° ∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°À
               WHEN      "190139810"
                   MOVE  "190139810"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1131,6 +1152,7 @@
                   MOVE  "190139910"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£¥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
               WHEN      "190140010"
                   MOVE  "190140010"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1138,26 +1160,31 @@
                   MOVE  "190140110"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  60             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±
               WHEN      "190175010"
                   MOVE  "190175010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  21             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤
               WHEN      "190175110"
                   MOVE  "190175110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  21             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
               WHEN      "190117310"
                   MOVE  "190117310"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  21             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301-3)«æ¬¥√Ê•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
               WHEN      "190120810"
                   MOVE  "190120810"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A301-4)æÆª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡
               WHEN      "190149910"
                   MOVE  "190149910"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1165,6 +1192,7 @@
                   MOVE  "190150010"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A302)ø∑¿∏ª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£±
       **          ¬ŒΩ≈£±°§£µ£∞£∞•∞•È•‡∞ æÂ§«°§∏¸¿∏œ´∆Ø¬Áø√§¨ƒÍ§·§Îº¿¥µ
       **          §ÚºÁ…¬§»§π§Î¥µº‘§œ£≥£µ∆¸∏¬≈Ÿ§¿§¨°¢∏Ωæı§«§œ»ΩƒÍ§«§≠§ §§
@@ -1180,6 +1208,7 @@
                       MOVE  60         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A302)ø∑¿∏ª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤
       **          ¬ŒΩ≈£±°§£µ£∞£∞•∞•È•‡∞ æÂ§«°§∏¸¿∏œ´∆Ø¬Áø√§¨ƒÍ§·§Îº¿¥µ
       **          §ÚºÁ…¬§»§π§Î¥µº‘§œ£≥£µ∆¸∏¬≈Ÿ§¿§¨°¢∏Ωæı§«§œ»ΩƒÍ§«§≠§ §§
@@ -1195,11 +1224,13 @@
                       MOVE  60         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A303)¡ÌπÁº˛ª∫¥¸∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°  Ï¬Œ°¶¬€ª˘°À
               WHEN      "190066710"
                   MOVE  "190066710"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A303)¡ÌπÁº˛ª∫¥¸∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡° ø∑¿∏ª˘°À
       **          ¬ŒΩ≈£±°§£µ£∞£∞•∞•È•‡∞ æÂ§«°§∏¸¿∏œ´∆Ø¬Áø√§¨ƒÍ§·§Îº¿¥µ
       **          §ÚºÁ…¬§»§π§Î¥µº‘§œ£≥£µ∆¸∏¬≈Ÿ§¿§¨°¢∏Ωæı§«§œ»ΩƒÍ§«§≠§ §§
@@ -1215,6 +1246,7 @@
                       MOVE  60         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A303-2)ø∑¿∏ª˘º£Œ≈≤Û…¸ºº∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
       **          ¬ŒΩ≈£±°§£µ£∞£∞•∞•È•‡∞ æÂ§«°§∏¸¿∏œ´∆Ø¬Áø√§¨ƒÍ§·§Îº¿¥µ
       **          §ÚºÁ…¬§»§π§Î¥µº‘§œ£µ£∞∆¸∏¬≈Ÿ§¿§¨°¢∏Ωæı§«§œ»ΩƒÍ§«§≠§ §§
@@ -1230,6 +1262,7 @@
                       MOVE  90         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A305)∞ÏŒ‡¥∂¿˜æ…¥µº‘∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
               WHEN      "190075510"
                   MOVE  "190075510"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1237,6 +1270,7 @@
                   MOVE  "190075610"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
       *      (A308-2)∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±
               WHEN      "190117410"
                   MOVE  "190117410"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1246,11 +1280,13 @@
                       MOVE  60         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-2)∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ªÿƒÍ√œ∞Ë°À
               WHEN      "190150310"
                   MOVE  "190150310"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-2)∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤
               WHEN      "190129910"
                   MOVE  "190129910"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1260,91 +1296,109 @@
                       MOVE  60         TO  WRK-JGN-NISSU(1)
                   END-IF
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-2)∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ªÿƒÍ√œ∞Ë°À
               WHEN      "190150410"
                   MOVE  "190150410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£±
               WHEN      "190175310"
                   MOVE  "190175310"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£±° ¿∏≥ËŒ≈Õ‹°À
               WHEN      "190175410"
                   MOVE  "190175410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±
               WHEN      "190175510"
                   MOVE  "190175510"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ¿∏≥ËŒ≈Õ‹°À
               WHEN      "190175610"
                   MOVE  "190175610"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£≤
               WHEN      "190175710"
                   MOVE  "190175710"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£≤° ¿∏≥ËŒ≈Õ‹°À
               WHEN      "190175810"
                   MOVE  "190175810"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤
               WHEN      "190175910"
                   MOVE  "190175910"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À
               WHEN      "190176010"
                   MOVE  "190176010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£±° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176110"
                   MOVE  "190176110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£±° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176210"
                   MOVE  "190176210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176310"
                   MOVE  "190176310"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176410"
                   MOVE  "190176410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£≤° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176510"
                   MOVE  "190176510"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°£≤° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176610"
                   MOVE  "190176610"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176710"
                   MOVE  "190176710"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A308-3)√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
               WHEN      "190176810"
                   MOVE  "190176810"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A310)¥Àœ¬•±•¢…¬≈Ô∆˛±°Œ¡
               WHEN      "190028910"
                   MOVE  "190028910"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1354,6 +1408,7 @@
                   MOVE  "190150610"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A311)¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡£±
               WHEN      "190121010"
                   MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1361,6 +1416,7 @@
                   MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A311)¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡£≤
               WHEN      "190130010"
                   MOVE  "190130010"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1368,6 +1424,7 @@
                   MOVE  "190130110"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A311-2)¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡£±
               WHEN      "190121110"
                   MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1375,6 +1432,7 @@
                   MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A311-2)¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡£≤
               WHEN      "190121210"
                   MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1382,6 +1440,7 @@
                   MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A311-3)¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡
               WHEN      "190130210"
                   MOVE  "190130210"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1389,6 +1448,7 @@
                   MOVE  "190130310"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A314)«ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡£±
               WHEN      "190151610"
                   MOVE  "190151610"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1398,6 +1458,7 @@
                   MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A314)«ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡£≤
               WHEN      "190151710"
                   MOVE  "190151710"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1407,26 +1468,31 @@
                   MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(3)
                   MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A317)∆√ƒÍ∞Ï»Ã…¬≈Ô∆˛±°Œ¡° ∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝°À
               WHEN      "190152610"
                   MOVE  "190152610"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A317)∆√ƒÍ∞Ï»Ã…¬≈Ô∆˛±°Œ¡° ∞°µﬁ¿≠¥¸∆˛±°∞ÂŒ≈¥…Õ˝°¶•Í•œ•”•ÍªªƒÍ¥µº‘°À
               WHEN      "190152710"
                   MOVE  "190152710"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A317)∆√ƒÍ∞Ï»Ã…¬≈Ô∆˛±°Œ¡° √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝£±°À
               WHEN      "190182310"
                   MOVE  "190182310"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
       *      (A317)∆√ƒÍ∞Ï»Ã…¬≈Ô∆˛±°Œ¡° √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝£≤°À
               WHEN      "190182410"
                   MOVE  "190182410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
              END-EVALUATE
            END-IF
       *
@@ -1456,6 +1522,43 @@
                  (WRK-JGN-NISSU(5)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(5)  =   WRK-JGN-NISSU(5)   -  1
            END-IF
+      *
+      *    ªªƒÍ∆√ƒÍ∆˛±°Œ¡§¨º£Œ≈ºº√±∞Ã∞ ≥∞§«§¢§ÎæÏπÁ°¢¥˚§ÀªªƒÍ∫—§ﬂ§Œ∆±∞Ï
+      *    ∆√ƒÍ∆˛±°Œ¡§À§ƒ§§§∆ƒÃªª∆¸øÙ§ÚªªΩ–§π§Î
+           IF   FLG-ROOM      =    0
+             INITIALIZE                      ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM   TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID      TO  STUSAN-PTID
+             IF      WRK-TOKNYUIN2-SRYCD(1)  NOT =   SPACE
+                MOVE WRK-TOKNYUIN2-SRYCD(1)  TO  STUSAN-TOKUTEI-SRYCD(1)
+             END-IF
+             IF      WRK-TOKNYUIN2-SRYCD(2)  NOT =   SPACE
+                MOVE WRK-TOKNYUIN2-SRYCD(2)  TO  STUSAN-TOKUTEI-SRYCD(2)
+             END-IF
+             IF      WRK-TOKNYUIN2-SRYCD(3)  NOT =   SPACE
+                MOVE WRK-TOKNYUIN2-SRYCD(3)  TO  STUSAN-TOKUTEI-SRYCD(3)
+             END-IF
+             IF      WRK-TOKNYUIN2-SRYCD(4)  NOT =   SPACE
+                MOVE WRK-TOKNYUIN2-SRYCD(4)  TO  STUSAN-TOKUTEI-SRYCD(4)
+             END-IF
+             IF      WRK-TOKNYUIN2-SRYCD(5)  NOT =   SPACE
+                MOVE WRK-TOKNYUIN2-SRYCD(5)  TO  STUSAN-TOKUTEI-SRYCD(5)
+             END-IF
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO  STUSAN-KJNYMD
+             CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
+                                             SPA-AREA
+             MOVE    STUSAN-NISSU07          TO  LNK-TOKNYUIN2-NISSU08
+           END-IF
+      *
+      *    ªªƒÍ∆√ƒÍ∆˛±°Œ¡§¨º£Œ≈ºº√±∞Ã§«§¢§ÎæÏπÁ°¢¥˚§ÀªªƒÍ∫—§ﬂ§Œº£Œ≈ºº
+      *    √±∞Ã§Œ∆√ƒÍ∆˛±°Œ¡§À§ƒ§§§∆ƒÃªª∆¸øÙ§ÚªªΩ–§π§Î
+           IF   FLG-ROOM      =    1
+             PERFORM    201-TOKUTEI-ROOM-NISSU-SEC
+           END-IF
+      *
+      *    ŒÚ∫Ó¿Æ§«≈–œø§∑§ø∆˛±°Õ˙ŒÚ§À§ƒ§§§∆°÷∆√ƒÍ∆˛±°°›ƒÃªª¬–æ›∆¸øÙ°◊§Œ
+      *    ∆˛Œœ ¨∆¸øÙ§Ú≤√ªª§π§Î
+           PERFORM    202-RRK-TOKUTEI-NISSU-SEC
       *
       *    ∆√ƒÍ∆˛±°Œ¡•≥°º•…§¨£±ºÔŒ‡§ŒæÏπÁ
            IF    WRK-SRYCD-COUNT       =   1
@@ -2026,10 +2129,295 @@
            IF   LNK-TOKNYUIN2-SRYCD(1)  =      SPACE
                MOVE    1                TO     LNK-TOKNYUIN2-RC
            END-IF
+           IF     FLG-HIT     =    ZERO
+                  MOVE    2             TO     LNK-TOKNYUIN2-RC
+           END-IF
       *
       *
            .
        200-EDIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    º£Œ≈ºº√±∞Ã§Œ∆√ƒÍ∆˛±°Œ¡ƒÃªª∆¸øÙ°  ø¿Æ£≤£∂«Ø£¥∑Ó£±∆¸∞ πﬂ°À
+      *****************************************************************
+       201-TOKUTEI-ROOM-NISSU-SEC                    SECTION.
+      *
+           MOVE   ZERO                  TO  WRK-TOKUTEI-ROOM-NISSU
+      *
+           IF    LNK-TOKNYUIN2-NISSU08   NOT =    ZERO
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£±
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190024510"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190128610"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190074510"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≤
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190024310"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190128710"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190024410"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≥° µﬂÃøµﬂµﬁ∆˛±°Œ¡°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190138110"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190138210"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190138310"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£≥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190138410"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190138510"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190138610"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£¥° µﬂÃøµﬂµﬁ∆˛±°Œ¡°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190138710"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190138810"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190138910"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A300)µﬂÃøµﬂµﬁ∆˛±°Œ¡£¥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190139010"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190139110"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE   "190139210"             TO  STUSAN-TOKUTEI-SRYCD(3)
+             MOVE   "190139310"             TO  STUSAN-TOKUTEI-SRYCD(4)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£±
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190174410"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190174510"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤° ∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190174610"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190174710"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190174810"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190174910"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≥
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190116310"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190116410"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£¥° ∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190139810"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190139910"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301)∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£¥° π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190140010"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190140110"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190175010"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190175110"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301-2)•œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190117310"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301-3)«æ¬¥√Ê•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190120810"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A301-4)æÆª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190149910"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190150010"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A302)ø∑¿∏ª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£±
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190024710"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A302)ø∑¿∏ª˘∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡£≤
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190140410"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A303)¡ÌπÁº˛ª∫¥¸∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡°  Ï¬Œ°¶¬€ª˘°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190066710"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A303)¡ÌπÁº˛ª∫¥¸∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡° ø∑¿∏ª˘°À
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190066810"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A303-2)ø∑¿∏ª˘º£Œ≈≤Û…¸ºº∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190140510"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *     (A305)∞ÏŒ‡¥∂¿˜æ…¥µº‘∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+             INITIALIZE                         ORCSTUSANAREA
+             MOVE    LNK-TOKNYUIN2-HOSPNUM  TO  STUSAN-HOSPNUM
+             MOVE    LNK-TOKNYUIN2-PTID     TO  STUSAN-PTID
+             MOVE   "190075510"             TO  STUSAN-TOKUTEI-SRYCD(1)
+             MOVE   "190075610"             TO  STUSAN-TOKUTEI-SRYCD(2)
+             MOVE    LNK-TOKNYUIN2-SANTEIYMD TO STUSAN-KJNYMD
+             CALL   "ORCSTUSAN"          USING  ORCSTUSANAREA
+                                                SPA-AREA
+             ADD     STUSAN-NISSU07         TO  WRK-TOKUTEI-ROOM-NISSU
+      *
+             MOVE    WRK-TOKUTEI-ROOM-NISSU TO  LNK-TOKNYUIN2-NISSU08
+           END-IF
+           .
+       201-TOKUTEI-ROOM-NISSU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ŒÚ∫Ó¿Æ§«≈–œø§∑§ø∆˛±°Õ˙ŒÚ§À§ƒ§§§∆°÷∆√ƒÍ∆˛±°°›ƒÃªª¬–æ›∆¸øÙ°◊§Œ
+      *    ∆˛Œœ ¨∆¸øÙ§Ú≤√ªª§π§Î
+      *****************************************************************
+       202-RRK-TOKUTEI-NISSU-SEC                    SECTION.
+      *
+           INITIALIZE                       PTNYUINRRK-REC
+           MOVE    LNK-TOKNYUIN2-HOSPNUM
+                                        TO  PTNYUINRRK-HOSPNUM
+           MOVE    LNK-TOKNYUIN2-PTID   TO  PTNYUINRRK-PTID
+           MOVE    LNK-TOKNYUIN2-SHONUM TO  PTNYUINRRK-SHONUM
+           MOVE    PTNYUINRRK-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key65"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+               MOVE    "key65"          TO  MCP-PATHNAME
+               PERFORM 920-PTNYUINRRK-FETCH-SEC
+               PERFORM    UNTIL   FLG-PTNYUINRRK  =   1
+      *
+                  IF      PTNYUINRRK-TOKU-TAISYONISSU  NOT =  ZERO
+                      ADD PTNYUINRRK-TOKU-TAISYONISSU  TO
+                          LNK-TOKNYUIN2-NISSU08
+                  END-IF
+      *
+                  MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+                  MOVE    "key65"          TO  MCP-PATHNAME
+                  PERFORM 920-PTNYUINRRK-FETCH-SEC
+               END-PERFORM
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"       TO   MCP-TABLE
+           MOVE    "key65"                TO   MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       202-RRK-TOKUTEI-NISSU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2087,6 +2475,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥µº‘∆˛±°Õ˙ŒÚ•ﬁ•π•ø°º∆…π˛
+      *****************************************************************
+       920-PTNYUINRRK-FETCH-SEC     SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+               MOVE    ZERO            TO  FLG-PTNYUINRRK
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF.
+      *
+       920-PTNYUINRRK-FETCH-EXT.
            EXIT.
       *
       *****************************************************************
