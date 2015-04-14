@@ -6629,6 +6629,19 @@
                        END-IF
                    END-IF
       *!!!
+      *       退院日からの１カ月以内のエラーは、警告とする
+                   IF     (SPA-ERRCD          =   "0120" )
+                       MOVE    SPACE               TO  SPA-ERRCD
+                       IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                         AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                           MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                                (IDX-Z)
+                           MOVE    "K022"         TO  SPA-ERRCD
+                       END-IF
+                   END-IF
+      *
+      *!!!
       *       初診算定日からの１ヵ月以内のエラーで、同日初診・退院以外
       *       労災・労災外の初診算定がある時
                    IF     (SPA-ERRCD           =   "0034")  AND
