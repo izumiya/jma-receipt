@@ -310,6 +310,8 @@
       *                                     の表示時のチェック追加
       *                                     病名コード削除時の修正 
       *  04.07.14    NACL-藤原    14/07/14  第三者行為の重複チェック修正
+      *  04.07.15    NACL-藤原    15/04/15  自院病名で登録した疾患区分と
+      *                                     同じときは難病の設定を行う
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
       *****************************************************************
@@ -5404,16 +5406,25 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                                                SPA-NAI-C02-HAISIYMD(IDZ)
                                        END-IF
                                    END-IF
-      *****************************IF      SPA-NAI-C02-TOKSKNCD(IDZ)
-      *****************************            =   ZERO
-      *****************************    MOVE    BYO-TOKSKNCD    TO
-      *****************************        SPA-NAI-C02-TOKSKNCD(IDZ)
-      *****************************END-IF
-      *****************************IF      SPA-NAI-C02-NANBYOCD-O(IDZ)
-      *****************************            =   ZERO
-      *****************************    MOVE    BYO-NANBYOCD        TO
-      *****************************        SPA-NAI-C02-NANBYOCD-O(IDZ)
-      *****************************END-IF
+      *                            自院病名で設定した疾患区分と同じとき
+      *                            疾患区分の設定を行う
+                                   IF      SPA-NAI-C02-US-TOKSKNCD
+                                                                  (IDZ)
+                                               =   BYO-TOKSKNCD    OR
+                                                   BYO-NANBYOCD
+                                       IF      SPA-NAI-C02-TOKSKNCD(IDZ)
+                                                   =   ZERO
+                                           MOVE    BYO-TOKSKNCD    TO
+                                               SPA-NAI-C02-TOKSKNCD(IDZ)
+                                       END-IF
+                                       IF      SPA-NAI-C02-NANBYOCD-O
+                                                               (IDZ)
+                                               =   ZERO
+                                           MOVE    BYO-NANBYOCD    TO
+                                               SPA-NAI-C02-NANBYOCD-O
+                                                                   (IDZ)
+                                       END-IF
+                                   END-IF
                                ELSE
                                    MOVE    "■■■"        TO
                                        SPA-NAI-C02-BYOMEI-O  (IDZ IDXX)
