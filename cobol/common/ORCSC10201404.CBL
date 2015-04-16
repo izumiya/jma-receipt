@@ -77,6 +77,7 @@
       * 04.08.00     NACL-多々納  14/12/12  Ｈ２７年１月改正対応
       * 04.08.00     NACL-多々納  15/01/16  労災読み替え加算変換対応
       * 04.08.00     NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
+      * 04.08.00     NACL-多々納  15/04/15  退院日の保険組合せ判定追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -97,6 +98,9 @@
            03  FLG-TENSU           PIC 9(01).
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
+      *H27.4
+           03  FLG-NYUINACCT       PIC 9(01).
+           03  FLG-HKNCOMBI        PIC 9(01).
       *
            03  FLG-ARI             PIC 9(01).
            03  FLG-ARIOK           PIC 9(01).
@@ -385,6 +389,11 @@
            03  WRK-ZS-KBN                  PIC X(01).
            03  WRK-ZS-KBN2                 PIC X(01).
            03  WRK-KEY-KBN                 PIC X(01).
+      *
+      *H27.4
+      *    退院日の保険組合せ
+           03  WRK-NYU-DD              PIC 9(02).
+           03  WRK-NYU-HKNCOMBI        PIC 9(04).
       *
       *    保存用ＳＰＡ
        01  HZN-SCR-REC.
@@ -742,6 +751,14 @@
       *    受診履歴
        01  JYURRK-REC.
            COPY    "CPJYURRK.INC".
+      *
+      *H27.4
+      *    入院会計マスタ−
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
+      *    保険組合せ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -6628,19 +6645,11 @@
                            END-EVALUATE
                        END-IF
                    END-IF
-      *!!!
-      *       退院日からの１カ月以内のエラーは、警告とする
+      *H27.4
+      *            退院日からの１カ月以内のエラーの保険判定
                    IF     (SPA-ERRCD          =   "0120" )
-                       MOVE    SPACE               TO  SPA-ERRCD
-                       IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
-                         AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
-                           MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
-                           MOVE    "1"             TO  WRK-COM-KZMFLG
-                                                                (IDX-Z)
-                           MOVE    "K022"         TO  SPA-ERRCD
-                       END-IF
+                       PERFORM 2303-TAIYMD-CHK-SEC
                    END-IF
-      *
       *!!!
       *       初診算定日からの１ヵ月以内のエラーで、同日初診・退院以外
       *       労災・労災外の初診算定がある時
@@ -6727,6 +6736,68 @@
            .
        2302-ERRCHK-EXT.
            EXIT.
+      *H27.4
+      *****************************************************************
+      *    退院日の保険チェック処理
+      *****************************************************************
+       2303-TAIYMD-CHK-SEC                SECTION.
+      *
+      *    退院日の保険組合せ
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    "1"                 TO  NACCT-NYUGAIKBN
+           MOVE    SPA-PTID            TO  NACCT-PTID
+           MOVE    LNK-ORCSC-TAIINYMD(1:6)
+                                       TO  NACCT-SRYYM
+           MOVE    "5"                 TO  NACCT-ZAISKBKBN
+      *
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM 900-NYUINACCT-READ-SEC
+           ELSE
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    1               TO  FLG-NYUINACCT
+           END-IF
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO                    TO  WRK-NYU-HKNCOMBI
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    ZERO                    TO  WRK-NYU-HKNCOMBI
+               MOVE    LNK-ORCSC-TAIINYMD(7:2) TO  WRK-NYU-DD
+               MOVE    NACCT-DAY(WRK-NYU-DD)   TO  WRK-NYU-HKNCOMBI
+           END-IF
+      *
+           INITIALIZE                  HKNCOMBI-REC
+           IF      WRK-NYU-HKNCOMBI    NOT =   ZERO
+      *        保険組合せマスター検索
+               INITIALIZE                      HKNCOMBI-REC
+               MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
+               MOVE    SPA-PTID            TO  COMB-PTID
+               MOVE    WRK-NYU-HKNCOMBI    TO  COMB-HKNCOMBINUM
+               PERFORM 910-HKNCOMBI-READ-SEC
+           END-IF
+      *    保険組合せが自費は警告へ
+           IF      COMB-HKNNUM(1:2)    =   "98"
+               MOVE    SPACE               TO  SPA-ERRCD
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG  (IDX-Z)
+                   MOVE    "K022"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       2303-TAIYMD-CHK-EXT.
+           EXIT.
+      *!!
       *****************************************************************
       *    入院中の回数チェック処理
       *****************************************************************
@@ -7612,6 +7683,55 @@
       *
            .
        970-JYURRK-READ-EXT.
+           EXIT.
+      *
+      *H27.4
+      *****************************************************************
+      *    入院会計マスター次読込
+      *****************************************************************
+       900-NYUINACCT-READ-SEC       SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  NYUINACCT-REC
+               MOVE    ZERO                TO  FLG-NYUINACCT
+           ELSE
+               INITIALIZE                      NYUINACCT-REC
+               MOVE    1                   TO  FLG-NYUINACCT
+           END-IF.
+      *
+       900-NYUINACCT-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せマスター読み込み
+      *****************************************************************
+       910-HKNCOMBI-READ-SEC         SECTION.
+      *
+           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+                   MOVE    ZERO            TO  FLG-HKNCOMBI
+               ELSE
+                   MOVE    1               TO  FLG-HKNCOMBI
+                   INITIALIZE                  HKNCOMBI-REC
+               END-IF
+           ELSE
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       910-HKNCOMBI-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
