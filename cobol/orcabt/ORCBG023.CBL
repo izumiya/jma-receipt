@@ -122,7 +122,9 @@
            03  WRK-SRYYM           PIC X(16).
       *
        01  WRK-CONS-AREA.
-           03  WRK-CONS-TOKKI      PIC X(06)   VALUE   "【配】".
+           03  WRK-CONS-TOKKI1     PIC X(06)   VALUE   "【配】".
+           03  WRK-CONS-TOKKI2     PIC X(06)   VALUE   "（配）".
+           03  WRK-CONS-TOKKI3     PIC X(06)   VALUE   "「配」".
            03  WRK-CONS-COMMENT.
                05  WRK-CONS-FL1    PIC X(06)   VALUE   "【配】".
                05  WRK-CONS-KAISU  PIC X(04).
@@ -377,7 +379,7 @@
            END-IF
       *
       *    編集レセコメント作成
-           IF      WRK-PARA-KAISU  >   1
+           IF      WRK-PARA-KAISU  >   0
                MOVE    WRK-PARA-KAISU  TO  WRK-Z9
                INITIALIZE                  ORCSKANACHKAREA
                MOVE    "2"             TO  KANACHK-SYORI
@@ -513,7 +515,9 @@
       *        【配】の有無チェック
                MOVE    ZERO            TO  WRK-COL
                INSPECT RECECOM-COMMENT TALLYING    WRK-COL
-                                       FOR ALL     WRK-CONS-TOKKI
+                                       FOR ALL     WRK-CONS-TOKKI1,
+                                           ALL     WRK-CONS-TOKKI2,
+                                           ALL     WRK-CONS-TOKKI3
                IF      WRK-COL         >   ZERO
                    MOVE    1               TO  FLG-TOKKI
                    DISPLAY "RECECOM found sryka="  RECECOM-SRYKA " " 
