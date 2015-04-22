@@ -404,6 +404,7 @@
       *  04.07.27    NACL-ÌçÏÆ    15/02/02  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.28    NACL-ÌçÏÆ    15/03/18  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.07.29    NACL-ÌçÏÆ    15/04/03  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.30    NACL-ÌçÏÆ    15/04/22  ÆñÉÂ¡¦¾®»ùËýÀ­Ã±ÆÈ¤Î¿©»ö·×»»½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5585,7 +5586,7 @@
            MOVE     ZERO      TO    FLG-TOKUSITU-KBN
            INITIALIZE               WK-TOKUSITU-SKJ-TBL
            IF   (LNK-SYU-SRYYMD(1:6)       >=  "200905" )
-           AND  (COMB-HKNNUM            NOT =   SPACE   )
+      *****AND  (COMB-HKNNUM            NOT =   SPACE   )
              IF (COMB-SYU-HKNKOHSBTKBN   =  "8" OR "9"  )
              OR (COMB-HKNNUM  =  "971" OR "973" OR "975"
                               OR "068" OR "069" OR "040")
@@ -5652,56 +5653,60 @@
                    ( WK-KOH-FTNJANUM(1:2) = "54"            ) AND
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
                OR (  WK-KOHJGNGET-TEKIYOFLG(1) =  1          )
-                 IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
-                 OR     FLG-KOREI-TANYUIN         =   1
-                   IF    COMB-HOJOKBN    =   "3" OR "7"
-                         MOVE    1    TO   FLG-TOKUSITU
-                   ELSE
-                     IF  FLG-SANSHOU3    =   SPACE
-                        MOVE     2    TO   FLG-TOKUSITU
-                     ELSE
-                        MOVE     3    TO   FLG-TOKUSITU
-                     END-IF
-                   END-IF
-                 ELSE
-                   PERFORM  20021-TOKUSITU-HENSYU-SEC
+                 IF   COMB-HKNNUM  NOT =  SPACE
+                    IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
+                    OR     FLG-KOREI-TANYUIN         =   1
+                      IF    COMB-HOJOKBN    =   "3" OR "7"
+                            MOVE    1    TO   FLG-TOKUSITU
+                      ELSE
+                        IF  FLG-SANSHOU3    =   SPACE
+                           MOVE     2    TO   FLG-TOKUSITU
+                        ELSE
+                           MOVE     3    TO   FLG-TOKUSITU
+                        END-IF
+                      END-IF
+                    ELSE
+                      PERFORM  20021-TOKUSITU-HENSYU-SEC
+                    END-IF
+                    IF   FLG-TOKUSITU  NOT = ZERO
+                      MOVE       1       TO   FLG-TOKUSITU-XXX
+                      IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
+                      OR     FLG-KOREI-TANYUIN         =   1
+                        IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
+                          MOVE   1       TO   LNK-SYU-SKJ-FTNDAY(3)
+                        END-IF
+                      ELSE
+                        IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
+                          MOVE  "1"      TO   LNK-S02-TOKUSYU-SAI-KBN
+                          MOVE   1       TO   LNK-SYU-SKJ-FTNDAY(3)
+                        END-IF
+                      END-IF
+                      PERFORM    20022-TOKUSITU-TASU-HANTEI-SEC
+                    END-IF
                  END-IF
-                 IF   FLG-TOKUSITU  NOT = ZERO
-                   MOVE       1         TO   FLG-TOKUSITU-XXX
-                   IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
-                   OR     FLG-KOREI-TANYUIN         =   1
-                     IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
-                       MOVE   1         TO   LNK-SYU-SKJ-FTNDAY(3)
-                     END-IF
-                   ELSE
-                     IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
-                       MOVE  "1"        TO   LNK-S02-TOKUSYU-SAI-KBN
-                       MOVE   1         TO   LNK-SYU-SKJ-FTNDAY(3)
-                     END-IF
-                   END-IF
-                   PERFORM    20022-TOKUSITU-TASU-HANTEI-SEC
-                 END-IF
-                 PERFORM      20023-TOKUSITU-SKJ-HENSYU-SEC
+                 PERFORM         20023-TOKUSITU-SKJ-HENSYU-SEC
                ELSE
-                 IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
-                 OR     FLG-KOREI-TANYUIN         =   1
-                   CONTINUE
-                 ELSE
-                  IF    LNK-S02-TOKUSYU-SAI-KBN   =  "1"
-                      PERFORM  20021-TOKUSITU-HENSYU-SEC
-                  ELSE
-                   INITIALIZE                      SSRHKOH-AREA
-                   MOVE    LNK-SYU-PTID        TO  SSRHKOH-PTID
-                   MOVE    LNK-SYU-NYUGAIKBN   TO  SSRHKOH-NYUGAIKBN
-                   MOVE    LNK-SYU-SRYYMD(1:6) TO  SSRHKOH-SRYYM
-                   MOVE    LNK-SYU-HKNCOMBINUM TO  SSRHKOH-HKNCOMBI
-                   CALL    "ORCSSRHKOH"        USING
-                                               SSRHKOH-AREA
-                                               SPA-AREA
-                   IF   SSRHKOH-RC  =  1
-                      PERFORM  20021-TOKUSITU-HENSYU-SEC
-                   END-IF
-                  END-IF
+                 IF   COMB-HKNNUM  NOT =  SPACE
+                    IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
+                    OR     FLG-KOREI-TANYUIN         =   1
+                      CONTINUE
+                    ELSE
+                      IF    LNK-S02-TOKUSYU-SAI-KBN   =  "1"
+                        PERFORM  20021-TOKUSITU-HENSYU-SEC
+                      ELSE
+                        INITIALIZE                    SSRHKOH-AREA
+                        MOVE  LNK-SYU-PTID        TO  SSRHKOH-PTID
+                        MOVE  LNK-SYU-NYUGAIKBN   TO  SSRHKOH-NYUGAIKBN
+                        MOVE  LNK-SYU-SRYYMD(1:6) TO  SSRHKOH-SRYYM
+                        MOVE  LNK-SYU-HKNCOMBINUM TO  SSRHKOH-HKNCOMBI
+                        CALL  "ORCSSRHKOH"        USING
+                                                  SSRHKOH-AREA
+                                                  SPA-AREA
+                        IF   SSRHKOH-RC  =  1
+                          PERFORM  20021-TOKUSITU-HENSYU-SEC
+                        END-IF
+                      END-IF
+                    END-IF
                  END-IF
                END-IF
              END-IF
