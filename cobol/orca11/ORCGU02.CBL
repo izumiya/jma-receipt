@@ -154,6 +154,8 @@
       *
            03  FLG-K02NYUIN            PIC 9(01).
       *
+           03  FLG-OK                  PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
@@ -1436,16 +1438,33 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    END-IF
                END-PERFORM
       *        ¿¦°÷¾ðÊó¤ò£Ó£Ð£Á¤Ë¥»¥Ã¥È
+               MOVE    ZERO                TO  FLG-OK
                PERFORM VARYING     IDY     FROM    1   BY  1
                        UNTIL       IDY     >       SPA-ALL-DRCDMAX
                    IF      SPA-GMN-TDRCD (IDX)
                                            =  SPA-ALL-DRCD(IDY)
                        MOVE    SPA-ALL-DRCD-G (IDY)
                                                TO  SPA-GMN-TDRCD-G(IDX)
+                       MOVE    1               TO  FLG-OK
                        MOVE    SPA-ALL-DRCDMAX     TO  IDY
                    END-IF
                END-PERFORM
       *
+               IF      FLG-OK              =   ZERO
+                   INITIALIZE                  ORCSDRSETAREA
+                   MOVE    SPA-SYSYMD          TO  ORCSDR-SYSYMD
+                   MOVE    "2"                 TO  ORCSDR-KBN
+                   MOVE    SPA-GMN-TSRYKA (IDX)
+                                               TO  ORCSDR-SRYKA
+                   MOVE    SPA-GMN-DRCDLST-G   TO  ORCSDR-DRCD-TBL-G
+                   MOVE    SPA-DRCD-MAX        TO  ORCSDR-DRCD-MAX
+                   MOVE    SPA-GMN-TDRCD (IDX)
+                                               TO  ORCSDR-IN-DRCD
+                   CALL    "ORCSDRSET"         USING
+                                               SPA-AREA
+                                               ORCSDRSETAREA
+                   MOVE    ORCSDR-IN-DRCD-G    TO  SPA-GMN-TDRCD-G(IDX)
+               END-IF
       *        INITIALIZE                  ORCSDRSETAREA
       *        MOVE    SPA-SYSYMD          TO  ORCSDR-SYSYMD
       *        MOVE    "2"                 TO  ORCSDR-KBN

@@ -127,6 +127,8 @@
                        09  SPA-NAI-KAIKEITIME      PIC 9(04).
                        09  SPA-NAI-YYKTIME         PIC 9(04).
                        09  SPA-NAI-HYOJIJUN        PIC X(04).
+      *                ドクター追加
+                       09  SPA-NAI-DRCDADD         PIC X(01).
       *                送受信フラグ
                        09  SPA-NAI-SRFLG           PIC X(01).
                    07  SPA-GMN-MAX             PIC 9(03).
@@ -143,6 +145,8 @@
            03  FLG-NO                  PIC 9(01).
            03  FLG-OK                  PIC 9(01).
            03  FLG-CHK-END             PIC 9(01).
+      *    ドクター追加あり
+           03  FLG-DRCD-ADD            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -184,6 +188,18 @@
                05  WRK-HYOJIJUN         PIC X(04).
                05  WRK-UKETIME         PIC X(06).
            03  WRK-IDX                 PIC 9(04).
+      *    ドクター一覧ワーク
+           03  WRK-DRCD-HENSYU-AREA.
+               05  WRK-GMN-DRCD-LIST-G.
+                   07  WRK-GMN-DRCD-LIST          OCCURS  100.
+                       09  WRK-GMN-DRCDL              PIC X(04).
+                       09  WRK-GMN-DRCDF1L            PIC X(01).
+                       09  WRK-GMN-DRNAMEL            PIC X(24).
+                   07  WRK-DRCD-MAX               PIC 9(04).
+                   07  WRK-NAI-DRCD-LIST-G.
+                       09  WRK-NAI-DRCHK              PIC X(01)
+                                                      OCCURS  100.
+      *
       *    ＳＯＲＴ用
        01  WRK-SORT-AREA.
                03  WRK-GMN-TBL.
@@ -213,6 +229,8 @@
                        09  WRK-NAI-KAIKEITIME      PIC 9(04).
                        09  WRK-NAI-YYKTIME         PIC 9(04).
                        09  WRK-NAI-HYOJIJUN        PIC X(04).
+      *                ドクター追加
+                       09  WRK-NAI-DRCDADD         PIC X(01).
       *                送受信フラグ
                        09  WRK-NAI-SRFLG           PIC X(01).
       *    一覧表最大行数
@@ -601,6 +619,7 @@
            MOVE    ZERO                TO  IDX
       *
            INITIALIZE                  SPA-GMN-TBL
+           MOVE    ZERO                TO  FLG-DRCD-ADD
       *
            INITIALIZE                  UKETUKE-REC
            MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
@@ -666,12 +685,72 @@
            MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *    ドクター追加あり
+           IF      FLG-DRCD-ADD        =   1
+               PERFORM 50013-DRCD-HENSYU-SEC
+           END-IF
+      *
            IF      SPA-NAI-SYORI       =   1
       *        受付中は表示順によりＳＯＲＴする
                PERFORM 50021-UKETUKE-SROT-SEC
            END-IF
            .
        5001-UKETUKE-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ドクター追加処理
+      *****************************************************************
+       50013-DRCD-HENSYU-SEC               SECTION.
+      *
+      *    一覧表のドクターのみ表示とする
+           MOVE    SPACE               TO  WRK-GMN-DRCD-LIST-G
+           INITIALIZE                      WRK-GMN-DRCD-LIST-G
+           MOVE    ZERO                TO  IDX3
+           PERFORM VARYING   IDX2      FROM    1   BY  1
+                   UNTIL    (IDX2      >   SPA-DRCD-MAX)
+               IF     (SPA-NAI-DRCHK (IDX2)    =   "1" )
+                  OR  (IDX2                    =   1   )
+                   ADD     1               TO  IDX3
+                   MOVE    SPA-GMN-DRCD-LIST(IDX2)
+                                           TO  WRK-GMN-DRCD-LIST(IDX3)
+                   MOVE    SPA-NAI-DRCHK (IDX2)
+                                           TO  WRK-NAI-DRCHK    (IDX3)
+                   MOVE    IDX3            TO  WRK-DRCD-MAX
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX             >   SPA-GMN-MAX
+               IF      SPA-NAI-DRCDADD (IDX)   =   "1"
+                   MOVE    ZERO                TO  FLG-OK
+                   PERFORM VARYING   IDX3      FROM    1   BY  1
+                           UNTIL    (IDX3      >   WRK-DRCD-MAX)
+                                 OR (FLG-OK    =   1    )
+                       IF      WRK-GMN-DRCDL (IDX3)
+                                               =   SPA-NAI-DRCD (IDX)
+                                                                (2:4)
+                           MOVE    1               TO  FLG-OK
+                       END-IF
+                   END-PERFORM
+                   IF      FLG-OK          =   ZERO
+                       ADD     1               TO  WRK-DRCD-MAX
+                       IF      WRK-DRCD-MAX    >   100
+                           MOVE    100             TO  WRK-DRCD-MAX
+                       ELSE
+                           MOVE    WRK-DRCD-MAX    TO  IDX3
+                           MOVE    SPA-NAI-DRCD(IDX)(2:4)
+                                           TO  WRK-GMN-DRCDL (IDX3)
+                           MOVE    SPA-GMN-DRCDMEI(IDX)
+                                           TO  WRK-GMN-DRNAMEL(IDX3)
+                           MOVE    "1"     TO  WRK-NAI-DRCHK  (IDX3)
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           MOVE    WRK-GMN-DRCD-LIST-G TO  SPA-GMN-DRCD-LIST-G
+           .
+       50013-DRCD-HENSYU-EXT.
            EXIT.
       *****************************************************************
       *    確認画面より
@@ -877,16 +956,17 @@
                                            TO  SPA-GMN-DRCD-G
                        MOVE    1           TO  FLG-CHK-END
                    END-IF
-                   IF      IDX2            =   SPA-DRCD-MAX
-                       MOVE    SPA-GMN-DRCD-LIST(01)
-                                           TO  SPA-GMN-DRCD-G
-                       MOVE    1           TO  FLG-CHK-END
-                   END-IF
                END-IF
                IF      SPA-GMN-DRCDL (IDX2)
                                            =   SPA-GMN-DRCD
                    MOVE    1               TO  FLG-OK
                END-IF
+               IF      IDX2            =   SPA-DRCD-MAX
+                 AND  (FLG-CHK-END     =   ZERO   )
+                   MOVE    SPA-GMN-DRCD-LIST(01)
+                                           TO  SPA-GMN-DRCD-G
+                   MOVE    1           TO  FLG-CHK-END
+                END-IF
            END-PERFORM
            MOVE    1                   TO  SPA-GMN-PAGE
       *    一覧表示
@@ -1186,6 +1266,7 @@
            END-PERFORM
       *
       *    ドクター名
+           MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING   IDX2      FROM    1   BY  1
                    UNTIL     IDX2      >   SPA-DRCD-MAX
                IF      SPA-GMN-DRCDL (IDX2)
@@ -1195,9 +1276,23 @@
                                            TO  SPA-GMN-DRCDMEI(IDX)
       *            受付有り
                    MOVE    "1"             TO  SPA-NAI-DRCHK (IDX2)
+                   MOVE    1               TO  FLG-OK
                    MOVE    SPA-DRCD-MAX    TO  IDX2
                END-IF
            END-PERFORM
+           IF      FLG-OK              =   ZERO
+               INITIALIZE                  ORCSDRSETAREA
+               MOVE    SPA-SYSYMD          TO  ORCSDR-SYSYMD
+               MOVE    "2"                 TO  ORCSDR-KBN
+               MOVE    SPA-NAI-DRCD (IDX)(2:4)
+                                           TO  ORCSDR-IN-DRCD
+               CALL    "ORCSDRSET"         USING
+                                           SPA-AREA
+                                           ORCSDRSETAREA
+               MOVE    ORCSDR-OUT-DRCDMEI  TO  SPA-GMN-DRCDMEI(IDX)
+               MOVE    "1"                 TO  SPA-NAI-DRCDADD (IDX)
+               MOVE    1                   TO  FLG-DRCD-ADD
+           END-IF
       *
       *    診療内容
            PERFORM VARYING   IDX2      FROM    1   BY  1
