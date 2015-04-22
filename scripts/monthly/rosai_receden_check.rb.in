@@ -781,6 +781,11 @@ class Receden_check < Receden_common
     chozai_kaisu=0
 
     rece.tekiyo.each{|tekiyo|
+
+      if tekiyo.hokatsu == true
+        next
+      end
+
       myzaikaisu=nil
       myreceline=0
       flg_plus  = false
@@ -925,7 +930,7 @@ class Receden_check < Receden_common
                     @errors.push("40070",rece,rr,"SHINKEIKBN")
                   end
                 end
-                if tbl_tensu["NYUTENTTLKBN"].to_i == 240  && tbl_tensu["KOKUJISKBKBN2"].to_i = 1
+                if tbl_tensu["NYUTENTTLKBN"].to_i == 240  && tbl_tensu["KOKUJISKBKBN2"].to_i == 1
                   chozai_kaisu += zai["KAISU"].value.to_i
                 end
                 case rs["HOSPKBN"].value
@@ -1426,7 +1431,7 @@ class Receden_check < Receden_common
     @info=Recinfo.new
     @errors=Receden_error.new(@recefile)
 
-    r=Receden.new(@infile)
+    r=Receden.new(@infile,@check_level)
     check_lv1(r)
     if @errors.empty?
       check_receipt(r)

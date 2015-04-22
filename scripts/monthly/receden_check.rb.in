@@ -942,6 +942,11 @@ class Receden_check < Receden_common
     srtSrykbn="00"
 
     rece.tekiyo.each{|tekiyo|
+
+      if tekiyo.hokatsu == true
+        next
+      end
+
       myzaikaisu=nil
       myreceline=0
       myzaiday=Hash.new
@@ -1570,7 +1575,7 @@ class Receden_check < Receden_common
     @info=Recinfo.new
     @errors=Receden_error.new
 
-    r=Receden.new(@infile)
+    r=Receden.new(@infile,@check_level)
     check_lv1(r)
     if @errors.empty?
       check_receipt(r)
