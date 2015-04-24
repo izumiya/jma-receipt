@@ -433,6 +433,7 @@
                INITIALIZE                  QSUB01-LNK
                MOVE    "I"             TO  QSUB01-KBN
                CALL    "ORCGQSUB01"    USING   QSUB01-LNK
+                                               SPA-AREA
       *
                MOVE    QSUB01-SPA-AREA TO  SPA-Q01FREE
       *

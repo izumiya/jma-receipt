@@ -460,7 +460,20 @@
       *
       *    他のＬＤより
            IF  ( LINKAREA      NOT =   SPACE )
+      *
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+      *
+               IF    ( SPA-MOTOPG  =           "P02"
+                                           OR  "C02"
+                                           OR  "K02"
+                                           OR  "K02N" )
+      *
+                   MOVE    "I"             TO  QSUB01-KBN
+                   PERFORM 800-ORCGQSUB01-SEC
+                   MOVE    "O"             TO  QSUB01-KBN
+                   PERFORM 800-ORCGQSUB01-SEC
+      *
+               END-IF
            END-IF
       *
            IF  ( SPA-Q01-SAKIPG    NOT =   "Q02" )
@@ -2616,6 +2629,31 @@
            INSPECT WRK-HENYMDG3   REPLACING  ALL "  "  BY  "　"
            .
        800-SEIWA-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    SPA入出力処理
+      *****************************************************************
+       800-ORCGQSUB01-SEC              SECTION.
+      *
+           IF    ( QSUB01-KBN      =   "I" )
+               INITIALIZE                  QSUB01-LNK
+               MOVE    "I"         TO      QSUB01-KBN
+               CALL    "ORCGQSUB01"        USING
+                                           QSUB01-LNK
+                                           SPA-AREA
+               MOVE    QSUB01-SPA-AREA TO  SPA-Q01FREE
+           ELSE
+               INITIALIZE                  QSUB01-LNK
+               MOVE    "O"         TO      QSUB01-KBN
+               MOVE    SPA-Q01FREE TO      QSUB01-SPA-AREA
+               CALL    "ORCGQSUB01"        USING
+                                           QSUB01-LNK
+                                           SPA-AREA
+           END-IF
+      *
+           .
+      *
+       800-ORCGQSUB01-EXT.
            EXIT.
       *****************************************************************
       *    文字列長取得処理
