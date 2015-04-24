@@ -762,6 +762,8 @@
            INITIALIZE                  WRK-NAIYOU-AREA
            INITIALIZE                  WRK-SYOHOU-AREA
            INITIALIZE                  WRK-BIKOU-AREA
+      *H27.4
+           INITIALIZE                  WRK-SRYACT-ALL-AREA
       *
       *---(04.03.00) LINE UPD START ------------------------------------
       **** ACCEPT  SYS-TIME            FROM    TIME
@@ -2439,6 +2441,8 @@
       *    MOVE    ZERO                TO  FLG-KOUHATU-ARI
       *---(04.02.00) LINE ADD END   ------------------------------------
            INITIALIZE                  WRK-BIKOU-AREA
+      *H27.4
+           INITIALIZE                  WRK-SRYACT-ALL-AREA
       *
       *£—£“¬–±˛
            INITIALIZE                  ORCSQRCSVAREA
@@ -2610,8 +2614,10 @@
       *                ≈¡…º»÷πÊÀË§Œ∞ı∫˛ ‘Ω∏ΩËÕ˝
                        PERFORM 2100-SYOHOU-SYORI-SEC
       *!!!!
-      *                ≈¡…º»÷πÊÀË§À∞ı∫˛
-                       PERFORM 200212-PRINT-CHK-SEC
+                       IF      IDX             >   ZERO
+      *                    ≈¡…º»÷πÊÀË§À∞ı∫˛
+                           PERFORM 200212-PRINT-CHK-SEC
+                       END-IF
                    END-IF
                    PERFORM 200211-SYOHOU-INIT-SEC
                    MOVE    JYURRK-RENNUM       TO  WRK-RENNUM
