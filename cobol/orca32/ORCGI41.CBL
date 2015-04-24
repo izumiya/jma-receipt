@@ -842,7 +842,7 @@
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *        元画面表示
-               IF      WRK-MOTOPG(1:3)     =   "Y01"  OR  "U01"
+               IF      WRK-MOTOPG          =   "Y01"  OR  "U01"
                                                       OR  "P97"
                                                       OR  "C50"
                                                       OR  "XC01"
