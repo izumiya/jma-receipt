@@ -3315,6 +3315,8 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            MOVE    ZERO                TO  SPA-MIKAKU-MAX
            MOVE    ZERO                TO  IDX
       *
+           MOVE    1                   TO  SPA-GMN-PAGE
+      *
       *   保険読み出し
            INITIALIZE                  PTHKNINF-REC
            MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
