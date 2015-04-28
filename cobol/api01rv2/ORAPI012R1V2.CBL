@@ -222,8 +222,13 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *     ÷µ—ŒŒ∞Ë ‘Ω∏
-           PERFORM 300-PTXMLMAKE-SEC
+           IF      WRK-ERRCD           =   "99"
+      *        •Ê°º•∂£…£ƒ•®•È°º
+               MOVE   404                  TO  APIPTA-HTTPSTATUS
+           ELSE
+      *         ÷µ—ŒŒ∞Ë ‘Ω∏
+               PERFORM 300-PTXMLMAKE-SEC
+           END-IF
       *
            DISPLAY   "*******************"
            DISPLAY   "* patient res end *"
@@ -257,6 +262,7 @@
            MOVE    WRK-HEN-TIME        TO  PTRES-INFORMATION-TIME
       *
       *    ∞ÂŒ≈µ°¥ÿº± Ã»÷πÊ•ª•√•» 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA

@@ -373,9 +373,28 @@
                        MOVE    MSYU-SRYSYUKBN (MSYU-IDX)
                                                 TO  WRK-SRYSYUKBN
            END-SEARCH
+      *
            IF      WRK-SRYSYUKBN       =   SPACE
                MOVE    ORAPIWKSRY-MDC-CLASS (IDY)(1:2) TO  WRK-SRYKBN
+           ELSE
+      *        入力できない診療種別は削除
+               EVALUATE    WRK-SRYSYUKBN
+      *            ギブス
+                   WHEN    "520"
+      *            Ｘ線
+                   WHEN    "710"
+                   WHEN    "711"
+                   WHEN    "712"
+                   WHEN    "713"
+                   WHEN    "720"
+                   WHEN    "721"
+                   WHEN    "723"
+                   WHEN    "724"
+      *                診療種別エラー
+                       MOVE    SPACE           TO  WRK-SRYSYUKBN
+               END-EVALUATE
            END-IF
+      *
       *    剤回数
            MOVE    ZERO                TO  WRK-KAISU
            MOVE    ZERO                TO  WRK-KAISU-23
@@ -587,7 +606,7 @@
       *    時間外加算算定可
            IF     (TNS-TIMEKSNKBN      =   "1"  )
       *       （労災再診料に加算区分の設定がないので判定）
-              OR  (TNS-SRYCD           =   "101120040")
+              OR  (TNS-SRYCD           =   "101120010")
                MOVE    SPACE               TO  TBL-WKSRY-INPUTCD
                                                    (TBL-MAX IDX-S)
                STRING  ORAPIWKSRY-TIMEFLG

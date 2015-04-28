@@ -232,13 +232,18 @@
       *
       *    初期処理
            PERFORM 100-INIT-SEC
+      *
       *    主処理
            IF      WRK-ERRCD           =   SPACE
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *    返却領域編集
-           PERFORM 300-APTLSTMAKE-SEC
+           IF      WRK-ERRCD           =   "99"
+               MOVE   404                  TO  APILST-HTTPSTATUS
+           ELSE
+      *        返却領域編集
+               PERFORM 300-APTLSTMAKE-SEC
+           END-IF
       *
            DISPLAY   "******************"
            DISPLAY   "* acceptlst end  *"
@@ -272,6 +277,7 @@
            MOVE    WRK-HEN-TIME        TO  ACPLSTRES-INFORMATION-TIME
       *
       *    医療機関識別番号セット 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA

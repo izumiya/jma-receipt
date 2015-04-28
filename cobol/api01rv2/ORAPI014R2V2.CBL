@@ -228,8 +228,13 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *     ÷µ—ŒŒ∞Ë ‘Ω∏
-           PERFORM 300-APTLSTMAKE-SEC
+           IF      WRK-ERRCD           =   "99"
+      *        •Ê°º•∂£…£ƒ•®•È°º
+               MOVE   404                  TO  APILST8-HTTPSTATUS
+           ELSE
+      *         ÷µ—ŒŒ∞Ë ‘Ω∏
+               PERFORM 300-APTLSTMAKE-SEC
+           END-IF
       *
            DISPLAY   "********************"
            DISPLAY   "* appointlst2 end  *"
@@ -263,6 +268,7 @@
            MOVE    WRK-HEN-TIME        TO  APLST2RES-INFORMATION-TIME
       *
       *    ∞ÂŒ≈µ°¥ÿº± Ã»÷πÊ•ª•√•» 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA

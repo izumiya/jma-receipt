@@ -359,8 +359,13 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *    返却領域編集
-           PERFORM 300-RGTXMLMAKE-SEC
+           IF      WRK-ERRCD           =   "99"
+      *        ユーザＩＤエラー
+               MOVE   404                  TO  APIMOD-HTTPSTATUS
+           ELSE
+      *        返却領域編集
+               PERFORM 300-RGTXMLMAKE-SEC
+           END-IF
       *
            DISPLAY   "*******************"
            DISPLAY   "* patient res end *"
@@ -404,6 +409,7 @@
            MOVE    WRK-HEN-TIME        TO  PTMODRES-INFORMATION-TIME
       *
       *    医療機関識別番号セット 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
@@ -4427,7 +4433,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        990-LOCK-IN-SEC         SECTION.
       *
       *    排他制御処理
-           DISPLAY "mcp-window = "    MCP-WINDOW 
+      *    DISPLAY "mcp-window = "    MCP-WINDOW 
+      *
            MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
            MOVE    "P02"               TO  SPA-MOTOPG
                                            MCP-WINDOW

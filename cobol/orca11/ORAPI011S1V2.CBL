@@ -322,8 +322,14 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *     ÷µ—ŒŒ∞Ë ‘Ω∏
-           PERFORM 300-RGTXMLMAKE-SEC
+      *
+           IF      WRK-ERRCD           =   "99"
+      *        •Ê°º•∂£…£ƒ•®•È°º
+               MOVE   404                  TO  APIMOD-HTTPSTATUS
+           ELSE
+      *         ÷µ—ŒŒ∞Ë ‘Ω∏
+               PERFORM 300-RGTXMLMAKE-SEC
+           END-IF
       *
            DISPLAY   "***************"
            DISPLAY   "* accept end  *"
@@ -361,6 +367,7 @@
            MOVE    WRK-HEN-TIME        TO  ACCPTRES-INFORMATION-TIME
       *
       *    ∞ÂŒ≈µ°¥ÿº± Ã»÷πÊ•ª•√•» 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
