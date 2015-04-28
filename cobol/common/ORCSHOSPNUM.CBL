@@ -26,6 +26,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  15/04/28  パスワードチェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -43,6 +44,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-SYSBASE         PIC 9(01).
            03  FLG-SYSUSER         PIC 9(01).
+           03  FLG-PASSWD          PIC 9(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -60,6 +62,9 @@
       *    システムユーザー
        01  SYSUSER-REC.
            COPY    "CPSYSUSER.INC".
+      *
+      *    パスワード
+           COPY    "CPPASSWD.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -83,20 +88,28 @@
       *    主　　処理
       *****************************************************************
        000-PROC-SEC                SECTION.
-      *           
+      *
            INITIALIZE                     FLG-AREA
       *
+      *    パスワード登録チェック（API対応）
+           IF      SPA-MOTOPG          =   "API"
+               PERFORM 100-PASSWD-CHECK-SEC
+           END-IF
+      *
       *    医療機関識別番号設定
-           PERFORM 100-HOSPNUM-SET-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 100-HOSPNUM-SET-SEC
+           END-IF
       *
       *    システム基本チェック処理
            IF      SPA-ERRCD           =   SPACE
                PERFORM 100-SYSBASE-CHECK-SEC
+               IF      FLG-OK              =   ZERO
+                   MOVE    ZERO                TO  SPA-HOSPNUM
+                   MOVE    "1002"              TO  SPA-ERRCD
+               END-IF
            END-IF
-           IF      FLG-OK              =   ZERO
-               MOVE    ZERO                TO  SPA-HOSPNUM
-               MOVE    "1002"              TO  SPA-ERRCD
-           END-IF
+      *
            .
            EXIT    PROGRAM
            .
@@ -176,6 +189,45 @@
            PERFORM 990-DBCLOSE-SEC
            .
        100-SYSBASE-CHECK-EXT.
+           EXIT.
+      *****************************************************************
+      *    パスワードチェック処理
+      *****************************************************************
+       100-PASSWD-CHECK-SEC       SECTION.
+      *
+           MOVE    "1"                 TO  SPA-NOCHK-HOSPNUM
+      *
+           INITIALIZE                      PASSWD-REC
+           MOVE    SPA-OPID            TO  PASSWD-USERID
+           MOVE    PASSWD-REC          TO  MCPDATA-REC
+           MOVE    "tbl_passwd"        TO  MCP-TABLE 
+           MOVE    "key"               TO  MCP-PATHNAME 
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_passwd"    TO  MCP-TABLE 
+               MOVE    "key"           TO  MCP-PATHNAME 
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PASSWD-REC
+                   MOVE    ZERO            TO  FLG-PASSWD
+               ELSE
+                   MOVE    1               TO  FLG-PASSWD
+               END-IF
+           ELSE
+               INITIALIZE                  PASSWD-REC
+               MOVE    1               TO  FLG-PASSWD
+           END-IF
+           MOVE    "tbl_passwd"        TO  MCP-TABLE 
+           MOVE    "key"               TO  MCP-PATHNAME 
+           PERFORM 990-DBCLOSE-SEC
+      *    パスワードなし
+           IF      FLG-PASSWD      NOT =   ZERO
+               MOVE    "1002"              TO  SPA-ERRCD
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-NOCHK-HOSPNUM
+           .
+       100-PASSWD-CHECK-EXT.
            EXIT.
       *****************************************************************
       *    システム基本読込処理
