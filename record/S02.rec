@@ -45,7 +45,7 @@ S02 {
     };
     LBLMSG3 {
       style varchar(20);
-      value varchar(40);
+      textdata varchar(40);
     };
     LBLMSG4 {
       style varchar(20);
@@ -187,7 +187,7 @@ S02 {
     };
     CMB_SKYPRT {
       SKYPRT {
-        value varchar(24);
+        textdata varchar(24);
         state int;
       };
       count int;
@@ -196,7 +196,7 @@ S02 {
     };
     CMB_SRYPRT {
       SRYPRT {
-        value varchar(24);
+        textdata varchar(24);
         state int;
       };
       count int;
