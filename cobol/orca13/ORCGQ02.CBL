@@ -462,6 +462,7 @@
            IF  ( LINKAREA      NOT =   SPACE )
       *
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-SCRSPA          TO  SPA-Q01FREE
       *
                IF    ( SPA-MOTOPG  =           "P02"
                                            OR  "C02"
