@@ -5,5 +5,5 @@ hsacctmodv2 {
     	methodtype			varchar(100);
     	content_type		varchar(100);
     	body				object;
-	httpstatus			int;
+	http_status			int;
 };

@@ -200,8 +200,13 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *     ÷µ—ŒŒ∞Ë ‘Ω∏
-           PERFORM 300-END-SEC
+           IF    ( WRK-ERRCD          =   "99" )
+      *        •Ê°º•∂£…£ƒ•®•È°º
+               MOVE   404             TO  APILST12-HTTPSTATUS
+           ELSE
+      *         ÷µ—ŒŒ∞Ë ‘Ω∏
+               PERFORM 300-END-SEC
+           END-IF
       *
            .
        000-MAIN-EXIT.
@@ -224,6 +229,7 @@
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
       *
       *    ∞ÂŒ≈µ°¥ÿº± Ã»÷πÊ•ª•√•» 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
@@ -246,7 +252,9 @@
                END-IF
            END-IF
       *
-           PERFORM 1001-INIT-CHECK-SEC
+           IF    ( WRK-ERRCD          =   SPACE )
+               PERFORM 1001-INIT-CHECK-SEC
+           END-IF
       *
            .
        100-INIT-EXT.

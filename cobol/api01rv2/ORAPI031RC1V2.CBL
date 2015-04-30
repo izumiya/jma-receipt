@@ -169,8 +169,13 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *    返却領域編集
-           PERFORM 300-END-SEC
+           IF    ( WRK-ERRCD          =   "99" )
+      *        ユーザＩＤエラー
+               MOVE   404             TO  APILST11-HTTPSTATUS
+           ELSE
+      *        返却領域編集
+               PERFORM 300-END-SEC
+           END-IF
       *
            DISPLAY   "***************"
            DISPLAY   "* accept end  *"
@@ -196,6 +201,7 @@
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
       *
       *    医療機関識別番号セット 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
@@ -218,10 +224,14 @@
                END-IF
            END-IF
       *
-      *    XML情報取り出し
-           PERFORM 900-XML-READ-SEC
+           IF    ( WRK-ERRCD          =   SPACE )
+      *        XML情報取り出し
+               PERFORM 900-XML-READ-SEC
+           END-IF
       *
-           PERFORM 1001-INIT-CHECK-SEC
+           IF    ( WRK-ERRCD          =   SPACE )
+               PERFORM 1001-INIT-CHECK-SEC
+           END-IF
       *
            .
        100-INIT-EXT.

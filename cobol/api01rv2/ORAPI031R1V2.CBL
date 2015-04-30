@@ -241,6 +241,7 @@
            MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
       *
       *    医療機関識別番号セット 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
@@ -1002,6 +1003,22 @@
       *****************************************************************
        990-EXIT-PROGRAM-SEC            SECTION.
       *
+           IF    ( WRK-ERRCD           =   "99" )
+               MOVE    404             TO  APILST17-HTTPSTATUS
+           ELSE
+               PERFORM 9901-EXIT-PROGRAM-SEC
+           END-IF
+      *
+           EXIT PROGRAM
+      *
+           .
+       990-EXIT-PROGRAM-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラム終了処理（エラー時）
+      *****************************************************************
+       9901-EXIT-PROGRAM-SEC            SECTION.
+      *
            MOVE    SMCNDATE-YMD        TO  WRK-SYMD
            PERFORM 800-DATE-SEC
            MOVE    WRK-DATE            TO  HSPTINFRES-INFORMATION-DATE
@@ -1016,8 +1033,6 @@
       *
            PERFORM 900-XML-WRITE-SEC
       *
-           EXIT PROGRAM
-      *
            .
-       990-EXIT-PROGRAM-EXT.
+       9901-EXIT-PROGRAM-EXT.
            EXIT.
