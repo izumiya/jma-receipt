@@ -513,6 +513,7 @@
                IF    (  SPA-MOTOPG     =   "XB01" )
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-C02FREE
+                   INITIALIZE                  SPA-C01KYOUTU
                    GO  TO  300-SCREEN-EXT
                END-IF
            END-IF
