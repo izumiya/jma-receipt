@@ -281,6 +281,7 @@
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-SCRSPA          TO  SPA-WORK
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
       *        元の画面へ戻す
@@ -905,6 +906,7 @@
                                        TO  SPA-JOB-SHELLID
       *
            MOVE    SPA-XG01KYOUTU      TO  SPA-WORK
+           MOVE    SPA-WORK            TO  LNK-SCRSPA
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
            MOVE   "CHANGE"             TO  MCP-PUTTYPE
