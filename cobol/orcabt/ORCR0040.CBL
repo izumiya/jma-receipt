@@ -162,6 +162,8 @@
       *  04.07.12    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
       *  04.07.13    NACL-門脇    15/03/16  平成２７年４月改正対応
       *  04.07.14    NACL-門脇    15/04/08  リハビリ開始日編集修正
+      *  04.07.15    NACL-門脇    15/04/27  特記事項０９施がある場合の
+      *                                     【配】回数記載対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -463,7 +465,9 @@
            03  WRK-KETA2           PIC 9(04).
            03  WRK-KOHBUNRI        PIC 9(01).
            03  WRK-KOHBUNRI-JIDO   PIC 9(01).
+           03  WRK-KOHBUNRI-JIDO2  PIC 9(01).
            03  WRK-HKNCOMBI-JIDO   PIC 9(04).
+           03  WRK-HKNCOMBI-JIDO2  PIC 9(04).
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-RECEERR         PIC X(200).
       *
@@ -1270,7 +1274,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
            MOVE       ZERO             TO  IDX6
       *
            MOVE  RECE02-KOHBUNRI-MIN   TO  WRK-KOHBUNRI-JIDO
+           MOVE  RECE02-KOHBUNRI-MAX   TO  WRK-KOHBUNRI-JIDO2
            MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO
+           MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO2
       *
            IF   RECE02-COMCNTFLG   =   "1"
       *
@@ -1455,6 +1461,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
       ***           AND (RECE04-ZAITEN    NOT =   ZERO)
       ***           AND (RECE04-ZAIKAISU  NOT =   ZERO)
                        MOVE   RECE04-HKNCOMBI   TO   WRK-HKNCOMBI-JIDO
+                    END-IF
+                 END-IF
+               END-IF
+      *
+               IF   WRK-HKNCOMBI-JIDO2  =   ZERO
+                 IF    WRK-KOHBUNRI-JIDO2  =   RECE04-KOHBUNRI
+                    IF  (RECE04-SRYKBN    NOT =  "95"  AND  "96")
+      ***           AND (RECE04-ZAITEN    NOT =   ZERO)
+      ***           AND (RECE04-ZAIKAISU  NOT =   ZERO)
+                       MOVE   RECE04-HKNCOMBI   TO   WRK-HKNCOMBI-JIDO2
                     END-IF
                  END-IF
                END-IF
@@ -1800,6 +1816,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            IF   RECE02-RJNGAIKOHFTN(3)  =   1
               PERFORM   2001-KOUREI-TOKUREI-COMMENT-SEC
+           END-IF
+      *
+      *    特記事項０９施がある場合の【配】回数コメント
+      *
+           IF   RECE02-TOKKI09FLG      =   1
+           AND  RECE02-HAICOMFLG       =  ZERO
+           AND  RECE02-DUMMYKAISU  NOT =  ZERO
+              PERFORM   2001-HAIKAISU-COMMENT-SEC
            END-IF
       *
       *****内服薬剤料逓減に関する編集２****
@@ -2504,6 +2528,66 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2001-KOUREI-TOKUREI-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    特記事項０９施がある場合の【配】回数コメント
+      *****************************************************************
+       2001-HAIKAISU-COMMENT-SEC          SECTION.
+      *
+           PERFORM 800-RECE02-SET049-SEC
+           MOVE    99999988            TO  RECE049-ZAINUM
+      *****MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
+           MOVE    WRK-KOHBUNRI-JIDO2  TO  RECE049-KOHBUNRI
+           MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    "991"               TO  RECE049-SRYSYUKBN
+      *****MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
+           MOVE    WRK-HKNCOMBI-JIDO2  TO  RECE049-HKNCOMBI
+      *
+           MOVE    1                   TO  RECE049-MEISAISU
+      *
+           WRITE   RECE049-REC
+           ADD     1                   TO  CNT-RECE049
+      *
+           PERFORM 800-RECE02-SET059-SEC
+           MOVE    99999988            TO  RECE059-ZAINUM
+      *****MOVE    WRK-KOHBUNRI-JIDO   TO  RECE059-KOHBUNRI
+           MOVE    WRK-KOHBUNRI-JIDO2  TO  RECE059-KOHBUNRI
+           MOVE    "99"                TO  RECE059-SRYKBN
+           MOVE    "991"               TO  RECE059-SRYSYUKBN
+      *    コメントの挿入
+           MOVE    SPACE               TO  WRK-RECE05XX-REC
+           INITIALIZE                      WRK-RECE05XX-REC
+      *
+           MOVE    "810000001"         TO  WRK-RECE05XX-SRYCD(1 1)
+           MOVE     ZERO               TO  WRK-RECE05XX-SRYSURYO(1 1)
+      *    全角変換
+           INITIALIZE                      WRK-CHAR-HENKAN-AREA
+           MOVE     RECE02-DUMMYKAISU  TO  WRK-SRYKAISU-X
+           MOVE     WRK-SRYKAISU-X     TO  WRK-CHAR-X
+           PERFORM  2502111-NUM-ZENKAKU-HENKAN-SEC
+           EVALUATE WRK-CHAR-N-CNT
+             WHEN       2
+               MOVE "【配】　回"       TO  WRK-RECE05XX-NAME(1 1)
+               MOVE WRK-CHAR-N(1:2)    TO  WRK-RECE05XX-NAME(1 1)(7:2)
+               MOVE 5                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+             WHEN       4
+               MOVE "【配】　　回"     TO  WRK-RECE05XX-NAME(1 1)
+               MOVE WRK-CHAR-N(1:4)    TO  WRK-RECE05XX-NAME(1 1)(7:4)
+               MOVE 6                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+             WHEN       6
+               MOVE "【配】　　　回"   TO  WRK-RECE05XX-NAME(1 1)
+               MOVE WRK-CHAR-N(1:6)    TO  WRK-RECE05XX-NAME(1 1)(7:6)
+               MOVE 7                  TO  WRK-RECE05XX-YUKOKETA(1 1)
+           END-EVALUATE
+      *
+           MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
+                                       TO  RECE059-SRYACT-TBL(1)
+           WRITE   RECE059-REC
+           ADD     1                   TO  CNT-RECE059
+      *
+           .
+       2001-HAIKAISU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

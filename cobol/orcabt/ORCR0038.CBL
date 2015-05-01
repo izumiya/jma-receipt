@@ -55,6 +55,8 @@
       *                                     キーにkohid 追加
       *
       *  04.07.01    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
+      *  04.07.02    NACL-門脇    15/04/27  特記事項０９施がある場合の
+      *                                     【配】回数記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -195,6 +197,7 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-COMRENNUM           PIC 9(05).
       *
            03  WRK-KOHBUNRI-MIN        PIC 9(01).
+           03  WRK-KOHBUNRI-MAX        PIC 9(01).
       *    剤番号の退避
            03  WRK-ZAINUM              PIC 9(08).
       *    剤番号の退避
@@ -367,6 +370,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
        210-RECE042-WRITE-SEC                SECTION.
       *
            MOVE       9                TO  WRK-KOHBUNRI-MIN
+           MOVE       0                TO  WRK-KOHBUNRI-MAX
       *
            MOVE    ZERO                TO  WRK-COMRENNUM
       *
@@ -570,6 +574,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MIN
                END-IF
       *
+               IF   WRK-KOHBUNRI-MAX  <  RECE04-KOHBUNRI
+                   MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MAX
+               END-IF
+      *
                PERFORM     900-RECE04-READ-SEC
       *
       *        処理中止設定処理
@@ -581,6 +589,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF      FLG-END             =   ZERO
                MOVE      WRK-KOHBUNRI-MIN   TO   RECE02-KOHBUNRI-MIN
+               MOVE      WRK-KOHBUNRI-MAX   TO   RECE02-KOHBUNRI-MAX
                REWRITE   RECE02-REC
       *
       *
