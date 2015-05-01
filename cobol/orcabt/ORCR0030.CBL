@@ -689,6 +689,8 @@
       *  04.07.40    NACL-門脇    15/03/05  主保険＋全国公費と主保険＋地方公費＋
       *                                     長期の保険欄一部負担金記載修正
       *  04.07.41    NACL-門脇    15/03/16  平成２７年４月改正対応
+      *  04.07.42    NACL-門脇    15/04/27  特記事項０９施がある場合の
+      *                                     【配】回数記載対応
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -911,6 +913,7 @@
            03  FLG-ARI                                 PIC 9(01).
            03  FLG-NYUIN-CHECK                         PIC 9(01).
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
+           03  FLG-RECECOM                             PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1022,6 +1025,7 @@
            03  IDX22                                   PIC 9(02).
            03  IDX23                                   PIC 9(03).
            03  IDX24                                   PIC 9(03).
+           03  IDX25                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
       *
@@ -2377,6 +2381,10 @@
            03  CONS-DOUJITU-COMMENT
                                    PIC X(09) VALUE "830000051".
       *
+           03  CONS-HAICOM1        PIC X(06) VALUE "【配】".
+           03  CONS-HAICOM2        PIC X(06) VALUE "（配）".
+           03  CONS-HAICOM3        PIC X(06) VALUE "「配」".
+      *
       *    剤の診療内容チェックテーブル
        01  TBL-ZAICHECK-AREA.
       *    （サ）
@@ -2564,6 +2572,10 @@
       *    保険番号
        01  HKNNUM-REC.
            COPY    "CPHKNNUM.INC".
+      *
+      *    レセプトコメントマスタ
+       01  RECECOM-REC.
+           COPY    "CPRECECOM.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -3994,9 +4006,94 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *    在宅回数の再編集
            PERFORM     211Y-ZAITAKU-KAISU-HENSYU-SEC
       *
+      *    特記事項０９施有りフラグ編集
+           PERFORM     210A-TOKKI09FLG-HENSYU-SEC
+      *
            PERFORM     RECE02-REWRITE-SEC
            .
        210-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    特記事項０９施有りフラグ編集
+      *****************************************************************
+       210A-TOKKI09FLG-HENSYU-SEC               SECTION.
+      *
+           IF   RECE02-TOKKI09FLG  =  ZERO
+             PERFORM  VARYING  IDX25  FROM  1  BY  1
+                       UNTIL  (IDX25               >  5   )
+                        OR    (RECE02-TOKKI(IDX25) = SPACE)
+               IF   RECE02-TOKKI(IDX25) = "09"
+                 MOVE   1   TO  RECE02-TOKKI09FLG
+                 MOVE   5   TO  IDX25
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+           IF   RECE02-TOKKI09FLG  =  ZERO
+             PERFORM  VARYING  IDX25  FROM  1  BY  1
+                       UNTIL  (IDX25                    >  5   )
+                        OR    (RECE02-PTTOKKI-CD(IDX25) = SPACE)
+               IF   RECE02-PTTOKKI-CD(IDX25) = "09"
+                 MOVE   1   TO  RECE02-TOKKI09FLG
+                 MOVE   5   TO  IDX25
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+           IF   RECE02-TOKKI09FLG  =   1
+           AND  RECE02-HAICOMFLG   =  ZERO
+      *      レセプトコメント（９９）のチェック
+             INITIALIZE                      RECECOM-REC
+             MOVE    RECE02-HOSPNUM      TO  RECECOM-HOSPNUM
+             MOVE    RECE02-PTID         TO  RECECOM-PTID
+             MOVE    RECE02-SRYYM        TO  RECECOM-SRYYM
+             MOVE    RECE02-NYUGAIKBN    TO  RECECOM-NYUGAIKBN
+             MOVE    RECECOM-REC         TO  MCPDATA-REC
+             MOVE    "tbl_rececom"       TO  MCP-TABLE
+             MOVE    "key7"              TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC              =   ZERO
+               MOVE    "tbl_rececom"     TO  MCP-TABLE
+               MOVE    "key7"            TO  MCP-PATHNAME
+               PERFORM 900-RECECOM-READ-SEC
+             ELSE
+               INITIALIZE                    RECECOM-REC
+               MOVE    1                 TO  FLG-RECECOM
+             END-IF
+             PERFORM  UNTIL  FLG-RECECOM       =   1
+                       OR    RECE02-HAICOMFLG  =   1
+               MOVE     ZERO    TO   FLG-ARI
+               PERFORM  VARYING  IDX25  FROM  1  BY  1
+                         UNTIL  (IDX25                  >   10 )
+                          OR    (RECE02-HKNCOMBI(IDX25) =  ZERO)
+                 IF  RECE02-HKNCOMBI(IDX25) =  RECECOM-HKNCOMBI
+                   MOVE     1   TO   FLG-ARI
+                   MOVE    10   TO   IDX25
+                 END-IF
+               END-PERFORM
+               IF    FLG-ARI  =  1
+      *          【配】の有無チェック
+                 MOVE       ZERO         TO  WRK-COL
+                 INSPECT  RECECOM-COMMENT  TALLYING  WRK-COL
+                                           FOR ALL   CONS-HAICOM1,
+                                               ALL   CONS-HAICOM2,
+                                               ALL   CONS-HAICOM3
+                 IF      WRK-COL         >   ZERO
+                     MOVE    1           TO  RECE02-HAICOMFLG
+                 END-IF
+               END-IF
+               MOVE      "tbl_rececom"   TO  MCP-TABLE
+               MOVE      "key7"          TO  MCP-PATHNAME
+               PERFORM   900-RECECOM-READ-SEC
+             END-PERFORM
+             MOVE        "tbl_rececom"   TO  MCP-TABLE
+             MOVE        "key7"          TO  MCP-PATHNAME
+             PERFORM     900-CLOSE-SEC
+           END-IF
+      *
+           .
+       210A-TOKKI09FLG-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10220,6 +10317,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
              END-IF
       *
+      *      初診ダミー・再診ダミーの剤回数
+             IF   (ACCT-SRYKBN     = "11" OR "12"              )
+             AND  (SRY-SRYCD(IDX2) = "099110001" OR "099120001")
+                ADD   ACCT-ZAIKAISU   TO   RECE02-DUMMYKAISU
+             END-IF
+      *
              IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
                                                   "6" OR  "7" OR
                                                   "8"
@@ -10885,6 +10988,19 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                          COMPUTE  RECE05-YUKOKETA(IDX4) =
                                   RECE05-YUKOKETA(IDX4) + 2
                    END-IF
+               END-IF
+      *
+               IF   ( ACCT-SRYKBN           =   "99"  )
+               AND  ((SRY-SRYCD(IDX2)(1:1)  =   "8"  ) OR
+                     (SRY-SRYCD(IDX2)(1:3)  =   "008"))
+                 MOVE       ZERO         TO  WRK-COL
+                 INSPECT  RECE05-NAME(IDX4)  TALLYING  WRK-COL
+                                             FOR ALL   CONS-HAICOM1,
+                                                 ALL   CONS-HAICOM2,
+                                                 ALL   CONS-HAICOM3
+                 IF      WRK-COL         >   ZERO
+                     MOVE    1           TO  RECE02-HAICOMFLG
+                 END-IF
                END-IF
       *
                IF  SRY-SRYCD(IDX2)        =     CONS-ZANHAIKI
@@ -26422,6 +26538,24 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        900-HKNCOMBI-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプトコメントマスタ読込
+      *****************************************************************
+       900-RECECOM-READ-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  RECECOM-REC
+               MOVE    ZERO            TO  FLG-RECECOM
+           ELSE
+               INITIALIZE                  RECECOM-REC
+               MOVE    1               TO  FLG-RECECOM
+           END-IF
+      *
+           .
+       900-RECECOM-READ-EXT.
            EXIT.
       *
       *****************************************************************
