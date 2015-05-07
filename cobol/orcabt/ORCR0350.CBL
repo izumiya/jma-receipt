@@ -392,6 +392,8 @@
       *  04.07.16    NACL-藤原    15/03/23  施設基準不適合減算の対応
       *                                     通則加算項目（加減算コード）
       *                                     のときの記録方法
+      *  04.07.17    NACL-藤原    15/04/16  注加算コードが１４１９の加算
+      *                                     項目の記録方法の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -618,6 +620,7 @@
            03  IDY1                    PIC 9(04).
            03  IDY2                    PIC 9(04).
            03  IDY3                    PIC 9(03).
+           03  IDY4                    PIC 9(03).
            03  IDXX                    PIC 9(03).
            03  IDXY                    PIC 9(03).
            03  IDXZ                    PIC 9(03).
@@ -1263,8 +1266,57 @@
                    07  TBL-KOUI-SRYKBN13-KAISU PIC 9(04).
       *            点数
                    07  TBL-KOUI-SRYKBN13-TEN   PIC 9(09)V9(02).
+      *            注加算コード
+                   07  TBL-KOUI-SRYKBN13-CHUKSNINF.
+      *            コード
+                       09  TBL-KOUI-SRYKBN13-CHUKSNCD
+                                               PIC X(04).
+      *            通番
+                       09  TBL-KOUI-SRYKBN13-CHUKSNTUBAN
+                                               PIC X(01).
       *    点数合計
            03  TBL-KOUI-SRYKBN13-TEN-G         PIC 9(09)V9(02).
+      *
+      *    診療行為データ用テーブル（加算項目扱いの基本項目と同じ注換算）
+       01  TBL-KOUI-SRYKBN13-CHU-AREA.
+           03  TBL-KOUI-SRYKBN13-CHU-MAX                 PIC 9(02).
+      *
+           03  TBL-KOUI-SRYKBN13-CHU-REC                 OCCURS  5.
+               05  TBL-KOUI-SRYKBN13-CHU-KEY.
+                   07  TBL-KOUI-SRYKBN13-CHU-HOSPNUM     PIC 9(2).
+                   07  TBL-KOUI-SRYKBN13-CHU-SRYYM       PIC 9(06).
+                   07  TBL-KOUI-SRYKBN13-CHU-NYUGAIKBN   PIC X(01).
+                   07  TBL-KOUI-SRYKBN13-CHU-PTID        PIC 9(10).
+                   07  TBL-KOUI-SRYKBN13-CHU-RECEKA      PIC X(02).
+                   07  TBL-KOUI-SRYKBN13-CHU-TEISYUTUSAKI
+                                                     PIC 9(01).
+                   07  TBL-KOUI-SRYKBN13-CHU-RECESYUBETU PIC 9(04).
+                   07  TBL-KOUI-SRYKBN13-CHU-HKNJANUM    PIC X(08).
+                   07  TBL-KOUI-SRYKBN13-CHU-HOJOKBN     PIC X(01).
+                   07  TBL-KOUI-SRYKBN13-CHU-KOHID       PIC 9(10).
+                   07  TBL-KOUI-SRYKBN13-CHU-TEKSTYMD    PIC X(08).
+                   07  TBL-KOUI-SRYKBN13-CHU-RECEIPT-KBN PIC X(10).
+                   07  TBL-KOUI-SRYKBN13-CHU-ZAINUM      PIC 9(08).
+                   07  TBL-KOUI-SRYKBN13-CHU-RENNUM      PIC 9(02).
+               05  TBL-KOUI-SRYKBN13-CHU-SHORI-RENNUM    PIC 9(01).
+               05  TBL-KOUI-SRYKBN13-CHU-SRYACTINF.
+      *            診療コード
+                   07  TBL-KOUI-SRYKBN13-CHU-SRYCD PIC X(09).
+      *            回数
+                   07  TBL-KOUI-SRYKBN13-CHU-KAISU PIC 9(04).
+      *            点数
+                   07  TBL-KOUI-SRYKBN13-CHU-TEN   PIC 9(09)V9(02).
+      *            注加算コード
+                   07  TBL-KOUI-SRYKBN13-CHU-CHUKSNINF.
+      *            コード
+                       09  TBL-KOUI-SRYKBN13-CHU-CHUKSNCD
+                                               PIC X(04).
+      *            通番
+                       09  TBL-KOUI-SRYKBN13-CHU-CHUKSNTUBAN
+                                               PIC X(01).
+      *    点数合計
+           03  TBL-KOUI-SRYKBN13-CHU-TEN-G     PIC 9(09)V9(02).
+      *
       *
       *    負担区分編集用エリア
        01  WRK-RECE641-REC.
@@ -4744,6 +4796,7 @@
                                            TBL-KOUI-AREA
                                            TBL-COMMENT-AREA
                                            TBL-KOUI-SRYKBN13-AREA
+                                           TBL-KOUI-SRYKBN13-CHU-AREA
            INITIALIZE                      WRK-RECE65-REC
                                            WRK-KASAN-RECE65-REC
                                            WRK-TEIGEN-RECE65-REC
@@ -5155,11 +5208,46 @@
                    MOVE    RECE65-TEN (IDX)
                                            TO  TBL-KOUI-SRYKBN13-TEN
                                                (TBL-KOUI-SRYKBN13-MAX)
+                   MOVE    RECE65-CHUKSNCD (IDX)
+                                           TO
+                                           TBL-KOUI-SRYKBN13-CHUKSNCD
+                                               (TBL-KOUI-SRYKBN13-MAX)
                    ADD     RECE65-TEN (IDX)
                                            TO  TBL-KOUI-SRYKBN13-TEN-G
                    GO  TO  200711-KOUI-TAIHI-EXT
                END-IF
            END-IF
+      *
+           IF    ( RECE641-SRYKBN      =   "13"    OR  "14" )
+           AND   ( RECE65-KOKUJISKBKBN1 (IDX)
+                                       =   "7" OR  "9"      )
+           AND   ( RECE65-CHUKSNCD      (IDX)
+                                       =   "1419"           )
+      *        注加算コードが１４１９の加算項目のとき剤を別にする
+               ADD     1               TO  TBL-KOUI-SRYKBN13-CHU-MAX
+               MOVE    RECE65-KEY      TO  TBL-KOUI-SRYKBN13-CHU-KEY
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               MOVE    IDX             TO
+                                   TBL-KOUI-SRYKBN13-CHU-SHORI-RENNUM
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               MOVE    RECE641-ZAIKAISU
+                                       TO  TBL-KOUI-SRYKBN13-CHU-KAISU
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               MOVE    RECE65-SRYCD (IDX)
+                                       TO  TBL-KOUI-SRYKBN13-CHU-SRYCD
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               MOVE    RECE65-TEN (IDX)
+                                       TO  TBL-KOUI-SRYKBN13-CHU-TEN
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               MOVE    RECE65-CHUKSNCD (IDX)
+                                       TO
+                                       TBL-KOUI-SRYKBN13-CHU-CHUKSNCD
+                                           (TBL-KOUI-SRYKBN13-CHU-MAX)
+               ADD     RECE65-TEN (IDX)
+                                       TO  TBL-KOUI-SRYKBN13-CHU-TEN-G
+               GO  TO  200711-KOUI-TAIHI-EXT
+           END-IF
+      *
       *
       *    画像診断の撮影料のとき順番を変える（同時撮影以外）
            IF     RECE65-SRYSYUKBN-X (IDX)
@@ -6485,8 +6573,10 @@
                                WHEN    "13"
                                WHEN    "14"
                                    COMPUTE WRK-TENSU   =
-                                               RECE641-SYUTEN1 -
-                                               TBL-KOUI-SRYKBN13-TEN-G
+                                           RECE641-SYUTEN1 -
+                                           TBL-KOUI-SRYKBN13-TEN-G
+                                                           -
+                                           TBL-KOUI-SRYKBN13-CHU-TEN-G
                                WHEN    OTHER  
                                    MOVE    RECE641-SYUTEN1
                                                        TO  WRK-TENSU
@@ -8858,10 +8948,146 @@
       *
       *            関連コメント編集処理
                    PERFORM 200799-KANREN-COMMENT-HENSYU-SEC
+      *
+      *            注加算コードが１４１９の加算項目を編集
+                   IF    ( TBL-KOUI-SRYKBN13-CHUKSNCD (IDX)
+                                                   =   "1419" )
+                   AND   ( TBL-KOUI-SRYKBN13-CHU-MAX
+                                                   >   ZERO   )
+                       PERFORM 200791-SRYKBN13-CHUKSN-HENSYU-SEC
+                       MOVE    ZERO        TO  TBL-KOUI-SRYKBN13-CHU-MAX
+                   END-IF
                END-IF
            END-PERFORM
            .
        20079-SRYKBN13-KASAN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    注加算コードが１４１９の加算項目を編集処理
+      *****************************************************************
+       200791-SRYKBN13-CHUKSN-HENSYU-SEC   SECTION.
+      *
+      *    診療行為データの編集
+           PERFORM VARYING IDY4    FROM    1   BY  1
+                   UNTIL   IDY4    >       TBL-KOUI-SRYKBN13-CHU-MAX
+               IF      TBL-KOUI-SRYKBN13-CHU-KAISU (IDY4)
+                                       >   ZERO
+      *            関連コメント退避処理
+                   INITIALIZE              TBL-RECE655-COMMENT-AREA
+                   IF      RECE641-SETCOMFLG   =   "1"
+                       INITIALIZE               WRK-RECE655-REC
+                       MOVE    TBL-KOUI-SRYKBN13-CHU-KEY (IDY4)
+                                            TO  WRK-RECE655-KEY1
+                       MOVE    TBL-KOUI-SRYKBN13-CHU-SHORI-RENNUM (IDY4)
+                                            TO  WRK-RECE655-SHORI-RENNUM
+                       MOVE    ZERO         TO  WRK-RECE655-SEQNO
+                       PERFORM 200799-KANREN-COMMENT-TAIHI-SEC
+                   END-IF
+      *
+                   MOVE    SPACE               TO  WRK-REC
+                   MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+                   MOVE    "SI,"               TO  WRK-REC
+                   MOVE    3                   TO  WRK-REC-LENGTH
+      *            診療識別
+                   IF    ( IDY4                 =   1    )
+                   AND   ( WRK-SRYKBN      NOT =   SPACE )
+                       MOVE    WRK-SRYKBN          TO  WRK-DATA
+                       MOVE    2                   TO  WRK-NAGASA
+                       MOVE    SPACE               TO  WRK-SRYKBN
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            負担区分
+                   MOVE    WRK-FTNKBN          TO  WRK-DATA
+                   MOVE    1                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            診療行為コード
+                   MOVE    TBL-KOUI-SRYKBN13-CHU-SRYCD (IDY4)
+                                               TO  WRK-DATA
+                   MOVE    9                   TO  WRK-NAGASA
+                   PERFORM 5004-MOJI-HENSYU-SEC
+      *            数量
+                   PERFORM 5005-NUM-HENSYU-SEC
+      *            点数
+                   MOVE    TBL-KOUI-SRYKBN13-CHU-TEN (IDY4)
+                                               TO  WRK-TENSU
+                   MOVE    WRK-TENSU           TO  WRK-NUM
+                   MOVE    7                   TO  WRK-NAGASA
+                   PERFORM 5005-NUM-HENSYU-SEC  
+      *            回数
+                   MOVE    TBL-KOUI-SRYKBN13-CHU-KAISU (IDY4)
+                                               TO  WRK-KAISU
+                   MOVE    WRK-KAISU           TO  WRK-NUM
+                   MOVE    3                   TO  WRK-NAGASA
+                   PERFORM 5005-NUM-HENSYU-SEC
+      *            コメントコード１
+                   IF      TBL-RECE655-MAX >   ZERO
+                       MOVE    TBL-RECE655-SRYCD (1)
+                                               TO  WRK-DATA
+                       MOVE    9               TO  WRK-NAGASA
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            文字データ１
+                   IF      TBL-RECE655-MAX >   ZERO
+                       MOVE    TBL-RECE655-NAME  (1)
+                                               TO  WRK-DATA
+                       MOVE    100             TO  WRK-NAGASA
+                       MOVE    1               TO  WRK-MOJI-CHK
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            コメントコード２
+                   IF      TBL-RECE655-MAX >   1
+                       MOVE    TBL-RECE655-SRYCD (2)
+                                               TO  WRK-DATA
+                       MOVE    9               TO  WRK-NAGASA
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            文字データ２
+                   IF      TBL-RECE655-MAX >   1
+                       MOVE    TBL-RECE655-NAME  (2)
+                                               TO  WRK-DATA
+                       MOVE    100             TO  WRK-NAGASA
+                       MOVE    1               TO  WRK-MOJI-CHK
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            コメントコード３
+                   IF      TBL-RECE655-MAX >   2
+                       MOVE    TBL-RECE655-SRYCD (3)
+                                               TO  WRK-DATA
+                       MOVE    9               TO  WRK-NAGASA
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            文字データ３
+                   IF      TBL-RECE655-MAX >   2
+                       MOVE    TBL-RECE655-NAME  (3)
+                                               TO  WRK-DATA
+                       MOVE    100             TO  WRK-NAGASA
+                       MOVE    1               TO  WRK-MOJI-CHK
+                   END-IF
+                   PERFORM 5004-MOJI-HENSYU-SEC  
+      *            日付情報
+                   PERFORM VARYING IDV     FROM    1   BY  1
+                           UNTIL   IDV     >       31
+                       IF      RECE641-KAISU (1 IDV)   >   ZERO
+                           MOVE    RECE641-KAISU (1 IDV)
+                                                       TO  WRK-NUM
+                           MOVE    3                   TO  WRK-NAGASA
+                       END-IF
+                       IF      IDV                 =   31
+                           MOVE    1                   TO  WRK-END 
+                       END-IF     
+                       PERFORM 5005-NUM-HENSYU-SEC
+                   END-PERFORM  
+      *
+                   PERFORM 5001-FILE-WRITE-SEC
+      *
+      *            関連コメント編集処理
+                   PERFORM 200799-KANREN-COMMENT-HENSYU-SEC
+               END-IF
+           END-PERFORM
+           .
+       200791-SRYKBN13-CHUKSN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
