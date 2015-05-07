@@ -440,6 +440,12 @@
       *  04.07.25    NACL-門脇    15/03/04  東京都地方公費対応
       *  04.07.26    NACL-門脇    15/04/03  愛知県地方公費対応
       *  04.07.27    NACL-門脇    15/04/09  全国公費併用時の特別計算修正
+      *  04.07.28    NACL-門脇    15/05/07  システム管理２０１０の
+      *                                     「現物給付対象者の特別計算」
+      *                                     「長期併用時の特別計算」
+      *                                     「負担金未発生分の回数カウント」
+      *                                     の機能について、診療済みデータ
+      *                                     のセレクト条件修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -662,6 +668,8 @@
            03  WK-1001-CHIHOUNUMKBN    PIC X(01).
            03  WK-1001-GENTAIKBN       PIC X(01).
            03  WK-1001-DAISANKBN       PIC X(01).
+      *
+           03  WK-1039-IKTSORTKBN      PIC X(01).
       *
            03  WK-GAIJGNKBN            PIC X(01).
            03  WK-GAIJGNGAK            PIC 9(07).
@@ -1589,6 +1597,7 @@
            COPY    "CPSK1026.INC".
            COPY    "CPSK1027.INC".
            COPY    "CPSK1037.INC".
+           COPY    "CPSK1039.INC".
            COPY    "CPSK2010.INC".
            COPY    "CPSK2012.INC".
            COPY    "CPSK4001.INC".
@@ -1797,6 +1806,9 @@
            IF   WK-1001-DAISANKBN = SPACE
               MOVE   "2"                      TO   WK-1001-DAISANKBN
            END-IF.
+      *
+      *    システム管理１０３９の取り込み
+           PERFORM    SYS1039-READ-SEC.
       *
       *    消費税計算の係数設定
            IF  LNK-SYU-SRYYMD(1:6) >= "201404"
@@ -13547,9 +13559,22 @@
                    AND (SYU-KOH4HKNNUM            =  SPACE         )
                    AND (LNK-SYU-KOH1HKNNUM        =  SYU-KOH1HKNNUM)
                    AND (FLG-KEISAN-TAI2           =  1             )
-                     IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
-                     AND (LNK-SYU-DENPNUM     NOT =  ZERO )
-                     AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
+      ***            IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
+      ***            AND (LNK-SYU-DENPNUM     NOT =  ZERO )
+      ***            AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
+                     IF ((WK-1039-IKTSORTKBN     =  "0" OR SPACE) AND
+                         (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                         (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                         (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
+                     OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                         (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                         (LNK-SYU-SRYYMD     <  SYU-SRYYMD      ))
+                     OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                         (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                         (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                         (LNK-SYU-SRYYMD     =  SYU-SRYYMD      ) AND
+                         (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                         (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
                          CONTINUE
                      ELSE
                          MOVE     ZERO       TO    WK-KEISAN-FTNRATE
@@ -14498,12 +14523,34 @@
                       END-IF
                    END-IF
       *
-                   IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
-                   AND (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  )
-                   AND (MAX-KIN-KOHI1-D     NOT =  ZERO     )
-                   AND (LNK-S01-SAIKEISAN-KBN   =   "1"     )
-                   AND (LNK-SYU-DENPNUM     NOT =  ZERO     )
-                   AND (LNK-SYU-DENPNUM      <  SYU-DENPNUM )
+      ***          IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
+      ***          AND (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  )
+      ***          AND (MAX-KIN-KOHI1-D     NOT =  ZERO     )
+      ***          AND (LNK-S01-SAIKEISAN-KBN   =   "1"     )
+      ***          AND (LNK-SYU-DENPNUM     NOT =  ZERO     )
+      ***          AND (LNK-SYU-DENPNUM      <  SYU-DENPNUM )
+                   IF ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-D     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"      ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO     ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM  ))
+                   OR ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-D     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "1"          ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE    ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD   ))
+                   OR ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-D     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "1"          ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"      ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE    ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD   ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO     ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM  ))
                       IF    LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
                          MOVE     ZERO   TO   SYU-KOH1HKNFTNMONEY
                                               SYU-KOH1COMPFTN
@@ -15272,14 +15319,42 @@
                       END-IF
                    END-IF
       *
-                   IF  (  LNK-SYU-KOH3HKNNUM  = "972" OR "974"  )
-                   AND (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
-                         (MAX-KIN-KOHI1-D     NOT =  ZERO     )) OR
-                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE  ) AND
-                         (MAX-KIN-KOHI2-D     NOT =  ZERO     )))
-                   AND (  LNK-S01-SAIKEISAN-KBN   =   "1"       )
-                   AND (  LNK-SYU-DENPNUM     NOT =  ZERO       )
-                   AND (  LNK-SYU-DENPNUM      <  SYU-DENPNUM   )
+      ***          IF  (  LNK-SYU-KOH3HKNNUM  = "972" OR "974"  )
+      ***          AND (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+      ***                (MAX-KIN-KOHI1-D     NOT =  ZERO     )) OR
+      ***               ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE  ) AND
+      ***                (MAX-KIN-KOHI2-D     NOT =  ZERO     )))
+      ***          AND (  LNK-S01-SAIKEISAN-KBN   =   "1"       )
+      ***          AND (  LNK-SYU-DENPNUM     NOT =  ZERO       )
+      ***          AND (  LNK-SYU-DENPNUM      <  SYU-DENPNUM   )
+                   IF ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE  ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD     ))
+                   OR ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD     ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
                       IF    LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
                          MOVE     ZERO   TO   SYU-KOH1HKNFTNMONEY
                                               SYU-KOH1COMPFTN
@@ -15959,16 +16034,50 @@
                       END-IF
                    END-IF
       *
-                   IF  (  LNK-SYU-KOH4HKNNUM  = "972" OR "974"  )
-                   AND (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
-                         (MAX-KIN-KOHI1-D     NOT =  ZERO     )) OR
-                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE  ) AND
-                         (MAX-KIN-KOHI2-D     NOT =  ZERO     )) OR
-                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE  ) AND
-                         (MAX-KIN-KOHI3-D     NOT =  ZERO     )))
-                   AND (  LNK-S01-SAIKEISAN-KBN   =   "1"       )
-                   AND (  LNK-SYU-DENPNUM     NOT =  ZERO       )
-                   AND (  LNK-SYU-DENPNUM      <  SYU-DENPNUM   )
+      ***          IF  (  LNK-SYU-KOH4HKNNUM  = "972" OR "974"  )
+      ***          AND (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+      ***                (MAX-KIN-KOHI1-D     NOT =  ZERO     )) OR
+      ***               ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE  ) AND
+      ***                (MAX-KIN-KOHI2-D     NOT =  ZERO     )) OR
+      ***               ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE  ) AND
+      ***                (MAX-KIN-KOHI3-D     NOT =  ZERO     )))
+      ***          AND (  LNK-S01-SAIKEISAN-KBN   =   "1"       )
+      ***          AND (  LNK-SYU-DENPNUM     NOT =  ZERO       )
+      ***          AND (  LNK-SYU-DENPNUM      <  SYU-DENPNUM   )
+                   IF ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE  ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD     ))
+                   OR ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-D     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD     ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
                       IF    LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
                          MOVE     ZERO   TO   SYU-KOH1HKNFTNMONEY
                                               SYU-KOH1COMPFTN
@@ -16684,9 +16793,22 @@
       *
            IF    WK-2010-KAICNTKBN-G(IDX3)  =  "1"
              MOVE     ZERO     TO     FLG-NOCOUNT
-             IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
-             AND (LNK-SYU-DENPNUM     NOT =  ZERO)
-             AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+      ***    IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
+      ***    AND (LNK-SYU-DENPNUM     NOT =  ZERO)
+      ***    AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+             IF ((WK-1039-IKTSORTKBN     =  "0" OR SPACE) AND
+                 (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                 (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                 (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
+             OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                 (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                 (LNK-SYU-SRYYMD     <  SYU-SRYYMD      ))
+             OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                 (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                 (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                 (LNK-SYU-SRYYMD     =  SYU-SRYYMD      ) AND
+                 (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                 (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
                 MOVE    1      TO     FLG-NOCOUNT
              END-IF
            END-IF.
@@ -16844,9 +16966,22 @@
       *
            IF    WK-2010-KAICNTKBN-G(IDX3)  =  "1"
              MOVE     ZERO     TO     FLG-NOCOUNT
-             IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
-             AND (LNK-SYU-DENPNUM     NOT =  ZERO)
-             AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+      ***    IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
+      ***    AND (LNK-SYU-DENPNUM     NOT =  ZERO)
+      ***    AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+             IF ((WK-1039-IKTSORTKBN     =  "0" OR SPACE) AND
+                 (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                 (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                 (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
+             OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                 (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                 (LNK-SYU-SRYYMD     <  SYU-SRYYMD      ))
+             OR ((WK-1039-IKTSORTKBN     =  "1"         ) AND
+                 (LNK-S01-SAIKEISAN-KBN  =  "1"         ) AND
+                 (LNK-SYU-SRYYMD     NOT =  SPACE       ) AND
+                 (LNK-SYU-SRYYMD     =  SYU-SRYYMD      ) AND
+                 (LNK-SYU-DENPNUM    NOT =  ZERO        ) AND
+                 (LNK-SYU-DENPNUM    <  SYU-DENPNUM     ))
                 MOVE    1      TO     FLG-NOCOUNT
              END-IF
            END-IF.
@@ -30425,7 +30560,7 @@
            EXIT.
       *
       ******************************************************************
-      *        システム管理テーブルより老人保険の支払方法を取得        *
+      *    システム管理１００１読込
       ******************************************************************
        SYS1001-READ-SEC           SECTION.
       *
@@ -30455,6 +30590,40 @@
        SYS1001-READ-EXT.
            EXIT.
       *
+      ******************************************************************
+      *    システム管理１０３９読込
+      ******************************************************************
+       SYS1039-READ-SEC           SECTION.
+      *
+           INITIALIZE                       SYS-1039-REC
+           MOVE    "1039"               TO  SYS-1039-KANRICD
+           MOVE    "*"                  TO  SYS-1039-KBNCD
+           MOVE    LNK-SYU-HOSPNUM      TO  SYS-1039-HOSPNUM
+           MOVE    LNK-SYU-SRYYMD       TO  SYS-1039-STYUKYMD
+           MOVE    LNK-SYU-SRYYMD       TO  SYS-1039-EDYUKYMD
+           MOVE    SYS-1039-REC         TO  MCPDATA-REC
+           MOVE    "DBSELECT"           TO  MCP-FUNC
+           MOVE    "tbl_syskanri"       TO  MCP-TABLE
+           MOVE    "key10"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"          USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+           IF      MCP-RC               =   ZERO
+             MOVE     "tbl_syskanri"    TO  MCP-TABLE
+             MOVE     "key10"           TO  MCP-PATHNAME
+             PERFORM   SYSKANRI-READ-SEC
+             IF    MCP-RC               =   ZERO
+               MOVE SYS-1039-IKTSORTKBN TO  WK-1039-IKTSORTKBN
+             END-IF
+           END-IF
+           MOVE    "tbl_syskanri"       TO  MCP-TABLE
+           MOVE    "key10"              TO  MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           .
+       SYS1039-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    システム管理マスター読込
       *****************************************************************
@@ -30469,6 +30638,7 @@
                                            SYS-1026-REC
                                            SYS-1027-REC
                                            SYS-1037-REC
+                                           SYS-1039-REC
                                            SYS-2010-REC
                                            SYS-2012-REC
                                            SYS-4001-REC
@@ -30479,6 +30649,7 @@
                                            SYS-1026-REC
                                            SYS-1027-REC
                                            SYS-1037-REC
+                                           SYS-1039-REC
                                            SYS-2010-REC
                                            SYS-2012-REC
                                            SYS-4001-REC
