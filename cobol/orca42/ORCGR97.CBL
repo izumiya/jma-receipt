@@ -505,6 +505,18 @@
       *****************************************************************
        300-SCREEN-SEC              SECTION.
       *
+      *    他のＬＤより
+           IF      LINKAREA        NOT =   SPACE
+               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+      *        元の画面へ戻す
+               IF      SPA-MOTOPG      =   "XB01"
+                   MOVE    LNK-COMMON      TO  SPA-KYOUTU
+                   MOVE    LNK-SCRSPA      TO  SPA-R97
+                   MOVE    SPA-WORK        TO  SPA-R01KYOUTU
+                   GO  TO  300-SCREEN-EXT
+               END-IF
+           END-IF
+      *
            EVALUATE    SPA-MOTOPG
                WHEN    "RID1"
                    PERFORM 330-RID1-SET-SEC
