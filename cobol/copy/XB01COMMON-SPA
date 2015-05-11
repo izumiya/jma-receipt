@@ -31,3 +31,4 @@
            03  SPA-XBID-AREA. 
                05  SPA-XBID-FLG        PIC X(02).
       *
+           03  SPA-XB01-LN-MOTOPG      PIC X(08).

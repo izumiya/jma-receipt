@@ -281,14 +281,12 @@
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
-               MOVE    LNK-SCRSPA          TO  SPA-WORK
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
       *        元の画面へ戻す
                EVALUATE    WRK-MOTOPG
                WHEN    "XB01"
-                   MOVE    SPA-WORK        TO   SPA-XG01KYOUTU
-                   MOVE    SPA-XG01-MOTOPG TO   WRK-MOTOPG
+                   MOVE    SPA-WORK        TO   WRK-MOTOPG
                    INITIALIZE                   SPA-XG01FREE
                                                 SPA-XG01KYOUTU
                    MOVE    WRK-MOTOPG      TO   SPA-XG01-MOTOPG
@@ -905,8 +903,7 @@
            MOVE    WRK-CONS-JOB-SHELLID
                                        TO  SPA-JOB-SHELLID
       *
-           MOVE    SPA-XG01KYOUTU      TO  SPA-WORK
-           MOVE    SPA-WORK            TO  LNK-SCRSPA
+           MOVE    SPA-XG01-MOTOPG     TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
            MOVE   "CHANGE"             TO  MCP-PUTTYPE
