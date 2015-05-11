@@ -588,7 +588,7 @@
       *
       *    Â¾¤Î£Ì£Ä¤è¤ê
            IF  ( LINKAREA      NOT =   SPACE )
-               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-KYOUTU  TO  SPA-KYOUTU
            END-IF
       *
            EVALUATE    SPA-MOTOPG

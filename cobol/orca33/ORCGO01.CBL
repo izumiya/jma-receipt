@@ -199,6 +199,7 @@
                05  WRK-CMB-ITM         PIC X(200).
            03  WRK-PNT                 PIC 9(03).
            03  WRK-LSTKBT              PIC X(06).
+           03  WRK-MOTOPG              PIC X(08).
       *
        01  WRK-SHELL-NAME.
            05  FILLER                  PIC X(16) VALUE
@@ -402,6 +403,7 @@
       *    他のＬＤより
            IF    ( LINKAREA        NOT =   SPACE )
                MOVE    LNK-KYOUTU      TO  SPA-KYOUTU
+               MOVE    SPA-MOTOPG      TO  WRK-MOTOPG
       *
       *        元の画面へ戻す
                IF      SPA-MOTOPG      =   "XB01" OR "XA01"
@@ -412,6 +414,7 @@
                END-IF
       *         
                MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
+               MOVE    WRK-MOTOPG          TO  SPA-MOTOPG
       *
                INITIALIZE              SPA-O01KYOUTU
            END-IF

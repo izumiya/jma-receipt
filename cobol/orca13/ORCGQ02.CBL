@@ -182,6 +182,7 @@
                07  WRK-FILENM      PIC X(100).
                07  WRK-FILENM-FOLDER 
                                    PIC X(100).
+           03  WRK-MOTOPG                          PIC X(08).
       *
        01  WRK-ROW-AREA.
            03  WRK-KEKKALST-ROW                    PIC S9(9)   BINARY.
@@ -462,7 +463,7 @@
            IF  ( LINKAREA      NOT =   SPACE )
       *
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
-               MOVE    LNK-SCRSPA          TO  SPA-Q01FREE
+               MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
                IF    ( SPA-MOTOPG  =           "P02"
                                            OR  "C02"
@@ -474,7 +475,13 @@
                    MOVE    "O"             TO  QSUB01-KBN
                    PERFORM 800-ORCGQSUB01-SEC
       *
+               ELSE
+                   MOVE    LNK-COMMON          TO  SPA-KYOUTU
+                   MOVE    LNK-SCRSPA          TO  SPA-Q01FREE
                END-IF
+      *
+               MOVE    WRK-MOTOPG          TO  SPA-MOTOPG
+      *
            END-IF
       *
            IF  ( SPA-Q01-SAKIPG    NOT =   "Q02" )
@@ -501,15 +508,16 @@
                GO  TO      300-SCREEN-EXT
       *    ¾ðÊóºï½ü²èÌÌ
            WHEN    "XB01"
-               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-COMMON          TO  SPA-KYOUTU
                MOVE    LNK-SCRSPA          TO  SPA-Q01FREE
                GO  TO      300-SCREEN-EXT
       *    Í½ÌóÅÐÏ¿
            WHEN    "Y01"
       *    ¼õÉÕ°ìÍ÷
            WHEN    "U01"
-               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-COMMON          TO  SPA-KYOUTU
                MOVE    LNK-SCRSPA          TO  SPA-Q01FREE
+               GO  TO      300-SCREEN-EXT
       *    ´µ¼ÔÅÐÏ¿
            WHEN    "P02"
            WHEN    "C02"

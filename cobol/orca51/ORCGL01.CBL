@@ -163,6 +163,7 @@
                    07  WRK-FMTNUM-Z10          PIC Z(9)9.
                05  WRK-FMTNUM-R2   REDEFINES   WRK-FMTNUM-X10.
                    07  WRK-FMTNUM-910          PIC 9(10).
+           03  WRK-MOTOPG                      PIC X(08).
       *
       *    システム領域
        01  SYS-AREA.
@@ -416,14 +417,15 @@
       *    他のＬＤより
            IF    ( LINKAREA        NOT =   SPACE )
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
       *        元の画面へ戻す
                IF    ( SPA-MOTOPG      =   "XA01" OR "XB01" OR "XC01"
                                                   OR "XG01"           )
+                   MOVE    LNK-COMMON      TO  SPA-KYOUTU
+                   MOVE    LNK-SCRSPA      TO  SPA-L01FREE
                    PERFORM 3001-UPDATE-CHK-SEC
                    IF    ( FLG-UPDATE      =   ZERO )
-                       MOVE    LNK-COMMON      TO  SPA-KYOUTU
-                       MOVE    LNK-SCRSPA      TO  SPA-L01FREE
                        INITIALIZE              SPA-L01KYOUTU
                    ELSE
                        PERFORM 310-SPASET-SEC
@@ -432,6 +434,7 @@
                END-IF
       *
                MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
+               MOVE    WRK-MOTOPG          TO  SPA-MOTOPG
            END-IF
       *
            EVALUATE    SPA-MOTOPG

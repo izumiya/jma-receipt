@@ -227,6 +227,7 @@
            03  WRK-KBNCD-G.
                05  WRK-KBNCD-NUM           PIC 9(02).
                05  WRK-KBNCD-FL            PIC X(06).
+           03  WRK-MOTOPG                  PIC X(08).
       *
        01  CONST-AREA.
            03  CONST-H2004                 PIC X(06)   VALUE   "200804".
@@ -426,6 +427,7 @@
       *    他のＬＤより
            IF    ( LINKAREA        NOT =   SPACE )
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
       *        元の画面へ戻す
                IF    ( SPA-MOTOPG      =   "XA01" OR "XB01" OR "XC01" )
@@ -436,6 +438,7 @@
                END-IF
       *
                MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
+               MOVE    WRK-MOTOPG          TO  SPA-MOTOPG
            END-IF
       *
            EVALUATE    SPA-MOTOPG
