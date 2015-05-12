@@ -55,6 +55,7 @@
       *  04.04.00    NACL-森脇    09/01/27  排他ＳＰＡ共通対応
       *  04.07.00    NACL-森脇    12/07/04  ユーザーＩＤ表示
       *  04.07.00    NACL-太田    13/07/16  電子お薬手帳対応
+      *  04.08.00    NACL-多々納  15/05/12  背景色設定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -108,6 +109,7 @@
       *    一時領域
        01  WRK-AREA.
            03  IDX                   PIC 9(03).
+           03  IDJ                   PIC 9(03).
            03  WRK-SYSYMD.
                05  WRK-SYSYY         PIC 9(04).
                05  WRK-SYSMM         PIC 9(02).
@@ -173,6 +175,9 @@
       *
       *    COMMON-SPA 初期編集
            COPY    "CPORCSCOMMON.INC".
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -498,6 +503,10 @@
                                        SPA-AREA
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
+      *H27.5
+      *    背景色設定
+           PERFORM 3102-BGCOLORS-INIT-SEC
+      *
       *!!
       *    職員情報
       *    MOVE    SPACE               TO  SYS-1010-REC
@@ -600,43 +609,76 @@
            .
        320-SYS-1010-SPASET-EXT.
            EXIT.
-      *****************************************************************
-      *    検査正式名称表示処理
-      *****************************************************************
-      *3201-SYS-1038-SET-SEC          SECTION.
       *
-      *    MOVE    SPACE               TO  SYS-1038-REC
-      *    INITIALIZE                  SYS-1038-REC
-      *    MOVE    "1038"              TO  SYS-1038-KANRICD
-      *    MOVE    "*"                 TO  SYS-1038-KBNCD
-      *    MOVE    SPA-SYSYMD          TO  SYS-1038-STYUKYMD
-      *    MOVE    SPA-SYSYMD          TO  SYS-1038-EDYUKYMD
-      *    MOVE    SPA-HOSPNUM         TO  SYS-1038-HOSPNUM
-      *    MOVE    SYS-1038-REC        TO  MCPDATA-REC
+      *****************************************************************
+      *    背景色設定処理
+      *****************************************************************
+       3102-BGCOLORS-INIT-SEC       SECTION.
       *
-      *    MOVE    "tbl_syskanri"      TO  MCP-TABLE
-      *    MOVE    "key10"             TO  MCP-PATHNAME
-      *    PERFORM 910-DBSELECT-SEC
-      *    IF      MCP-RC              =   ZERO
-      *        MOVE    "tbl_syskanri"      TO  MCP-TABLE
-      *        MOVE    "key10"             TO  MCP-PATHNAME
-      *        PERFORM 900-SYSKANRI-READ-SEC
-      *    ELSE
-      *        MOVE    SPACE               TO  SYS-1038-REC
-      *        INITIALIZE                  SYS-1038-REC
-      *        MOVE    1               TO  FLG-SYSKANRI
-      *    END-IF
-      *    MOVE    "tbl_syskanri"      TO  MCP-TABLE
-      *    MOVE    "key10"             TO  MCP-PATHNAME
-      *    PERFORM 990-DBCLOSE-SEC
-      *    IF      FLG-SYSKANRI        =   ZERO
-      *        MOVE    MCPDATA-REC         TO  SYS-1038-REC
-      *        検査正式名称表示
-      *        MOVE    SYS-1038-FORMALFLG  TO  SPA-FORMALFLG
-      *    END-IF
-      *    .
-      *3201-SYS-1038-SET-EXT.
-      **   EXIT.
+      *    システム日付決定
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+           MOVE    SMCNDATE-YMD        TO  WRK-SYSYMD
+      *
+           MOVE    SPACE               TO  SYS-1038-REC
+           INITIALIZE                      SYS-1038-REC
+           MOVE    "1038"              TO  SYS-1038-KANRICD
+           MOVE    "*"                 TO  SYS-1038-KBNCD
+           MOVE    WRK-SYSYMD          TO  SYS-1038-STYUKYMD
+           MOVE    WRK-SYSYMD          TO  SYS-1038-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1038-HOSPNUM
+      *    システム管理検索
+           MOVE    SYS-1038-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-1038-REC
+               END-IF
+           ELSE
+               INITIALIZE                  SYS-1038-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-SYSKANRI        =   ZERO
+      *        背景色設定
+               PERFORM 31021-BGCOLORS-HEN-SEC
+           END-IF
+           .
+       3102-BGCOLORS-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    背景色設定処理
+      *****************************************************************
+       31021-BGCOLORS-HEN-SEC       SECTION.
+      *
+      *    時間内（標準
+           MOVE    SYS-1038-BGCOLORSJ0 TO  SPA-M00-BGCOLORS
+      *
+           IF      WRK-SYSYMD          =   SPA-SYSYMD
+      *    時間外
+               IF      SPA-GAI-JIKANKBN    NOT =   "0"
+                   MOVE    SPA-GAI-JIKANKBN        TO  IDJ
+                   IF     (IDJ                 >=  1   AND   <=  8 )
+                       MOVE    SYS-1038-BGCOLORSJ (IDJ)
+                                               TO  SPA-M00-BGCOLORS
+                   END-IF
+               END-IF
+           ELSE
+      *    日付変更
+               MOVE    SYS-1038-BGCOLORSDAY    TO  SPA-M00-BGCOLORS
+           END-IF
+           .
+       31021-BGCOLORS-HEN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    画面遷移処理
@@ -1551,6 +1593,7 @@
            END-EVALUATE
       *
            MOVE    SPACE               TO  MID1
+           INITIALIZE                      MID1
            MOVE    SPA-MIDCD           TO  MID1-ID1CODE
            MOVE    WRK-MIDMSG          TO  MID1-ID1MSG
       *
