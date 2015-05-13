@@ -2252,7 +2252,7 @@
                                    TO  IDX-GKSN
                IF    ( IDX-GKSN     >   ZERO )
                    MOVE    W21-KSN (IDX-GKSN)
-                                   TO  SPA-GMN-W21-KSNCD
+                                   TO  SPA-GMN-W21-KSNCD-G
                                                       (IDX-KSN)
                END-IF
            END-PERFORM
@@ -4328,7 +4328,7 @@
                IF    ( SPA-NAI-W21-KSNINF-IDX (IDX-KSN)
                                       >    ZERO )
                    MOVE   SPA-GMN-W21-KSNLST (IDX-KSN 1)
-                                       TO  SPA-GMN-W21-KSNCD(IDX-KSN)
+                                       TO  SPA-GMN-W21-KSNCD-G(IDX-KSN)
                END-IF
       *
            END-PERFORM
@@ -4916,7 +4916,7 @@
                IF    ( IDX-GKSN    >   ZERO )
                    MOVE    SPA-GMN-W21-KSN-LBL    (IDX-KSN)
                                    TO  W21-LBLKSN (IDX-GKSN)
-                   MOVE    SPA-GMN-W21-KSNCD      (IDX-KSN)
+                   MOVE    SPA-GMN-W21-KSNCD-G    (IDX-KSN)
                                    TO  W21-KSN (IDX-GKSN)
                    MOVE    SPA-GMN-W21-KSNLST-MAX (IDX-KSN)
                                    TO  W21-KSN-CNT(IDX-GKSN)
