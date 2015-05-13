@@ -114,6 +114,8 @@
       *
        WORKING-STORAGE             SECTION.
       *
+           COPY    "ENUM-VALUE".
+      *
       *    ¥¹¥ÑÎÎ°è
            COPY    "COMMON-SPA".
       *
@@ -658,16 +660,24 @@
                        UNTIL      (IDX         >   TBL-KANRICDG-MAX) OR
                                   (IDX-MAX     >=  100  )
       *
-                   MOVE    ZERO        TO  FLG-HIT
+                   MOVE    1       TO  FLG-HIT
       *
-                   IF    ( TBL-KANRICD-G (IDX)  =   "9600" )
+                   EVALUATE    TBL-KANRICD-G (IDX)
+                   WHEN    "9600"
                        IF    ( SPA-HOSPNUM      =   1 )
                         AND  ( SPA-SUPERVISOR   =   "T" )
-                           MOVE    1       TO  FLG-HIT
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO    TO  FLG-HIT
                        END-IF
-                   ELSE
-                           MOVE    1       TO  FLG-HIT
-                   END-IF
+                       IF    ( SPA-MW      =   SPA-GINBEE )
+                           MOVE    ZERO    TO  FLG-HIT
+                       END-IF
+                   WHEN    "9700"
+                       IF    ( SPA-MW      =   SPA-GINBEE )
+                           MOVE    ZERO    TO  FLG-HIT
+                       END-IF
+                   END-EVALUATE
       *
                    IF    ( FLG-HIT         =   1 )
                        ADD     1               TO  IDX-MAX
@@ -688,16 +698,25 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   TBL-KANRICDN-MAX )  OR
                               (IDX-MAX     >=  100  )
-               MOVE    ZERO        TO  FLG-HIT
       *
-               IF    ( TBL-KANRICD-N (IDX)  =   "9600" )
+               MOVE    1          TO  FLG-HIT
+      *
+               EVALUATE    TBL-KANRICD-N (IDX)
+               WHEN    "9600"
                    IF    ( SPA-HOSPNUM      =   1 )
                     AND  ( SPA-SUPERVISOR   =   "T" )
-                       MOVE    1       TO  FLG-HIT
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO        TO  FLG-HIT
                    END-IF
-               ELSE
-                       MOVE    1       TO  FLG-HIT
-               END-IF
+                   IF    ( SPA-MW      =   SPA-GINBEE )
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               WHEN    "9700"
+                   IF    ( SPA-MW      =   SPA-GINBEE )
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               END-EVALUATE
       *
                IF    ( FLG-HIT         =   1 )
                    ADD     1                   TO  IDX-MAX
