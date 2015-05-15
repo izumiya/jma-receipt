@@ -61,8 +61,11 @@
       *            日数８：初回入院から基準日前日までの特定入院料通算日数
       *            （自院歴分含む・他院歴分含めず）
                    07  STUSAN-NISSU08      PIC 9(08).
+      *            日数９：初回入院から基準日前日までの引数で指定した
+      *            特定入院料での通算日数
+                   07  STUSAN-NISSU09      PIC 9(08).
                05  STUSAN-TUSAN-R  REDEFINES   STUSAN-NISSU-VAL.
-                   07  STUSAN-TUSAN-OCC    OCCURS  8.
+                   07  STUSAN-TUSAN-OCC    OCCURS  9.
                        09  STUSAN-NISSU    PIC 9(08).
       *            基準日チェックフラグ　（0:対象外／1:対象）
       *            （基準日の入院料が通算日数の対象となるかチェック）

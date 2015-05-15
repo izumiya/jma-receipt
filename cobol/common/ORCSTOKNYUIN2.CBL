@@ -1547,7 +1547,7 @@
              MOVE    LNK-TOKNYUIN2-SANTEIYMD TO  STUSAN-KJNYMD
              CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
                                              SPA-AREA
-             MOVE    STUSAN-NISSU07          TO  LNK-TOKNYUIN2-NISSU08
+             MOVE    STUSAN-NISSU09          TO  LNK-TOKNYUIN2-NISSU08
            END-IF
       *
       *    换年泼年掐薄瘟が迹闻技帽疤である眷圭、贷に换年貉みの迹闻技

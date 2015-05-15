@@ -303,6 +303,8 @@
                    =   STUSAN-NISSU07 +    WRK-ACCT-TOK-NISSU2
                COMPUTE STUSAN-NISSU08
                    =   STUSAN-NISSU08 +    WRK-ACCT-TOK-NISSU1
+               COMPUTE STUSAN-NISSU09
+                   =   STUSAN-NISSU09 +    WRK-ACCT-TOK-NISSU2
            ELSE
                PERFORM 2110-TUSAN-SYUKEI-SEC
                IF    ( STUSAN-RC       NOT  =   ZERO )
@@ -500,6 +502,8 @@
                    =   STUSAN-NISSU05 +    WRK-ACCT-NISSU
                COMPUTE STUSAN-NISSU08
                    =   STUSAN-NISSU08 +    WRK-ACCT-TOK-NISSU1
+               COMPUTE STUSAN-NISSU09
+                   =   STUSAN-NISSU09 +    WRK-ACCT-TOK-NISSU2
            END-EVALUATE
            .
       *
@@ -978,6 +982,7 @@
            DISPLAY "STUSAN-NISSU06 = " STUSAN-NISSU06
            DISPLAY "STUSAN-NISSU07 = " STUSAN-NISSU07
            DISPLAY "STUSAN-NISSU08 = " STUSAN-NISSU08
+           DISPLAY "STUSAN-NISSU09 = " STUSAN-NISSU09
            DISPLAY "STUSAN-TAINREL-NISSU = " STUSAN-TAINREL-NISSU
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
