@@ -1825,7 +1825,12 @@
       *        システム予約の入力不可分
                IF      SPA-K98-GMN-SYORI3      =   "U6"
                    IF      TNS-SRYCD           >=  "099999911"
-                       MOVE    1               TO  FLG-CHK
+                       IF     (TNS-SRYCD           >=  "099999921"
+                                               AND <=  "099999929" )
+                           CONTINUE
+                       ELSE
+                           MOVE    1               TO  FLG-CHK
+                       END-IF
                    END-IF
       *            リハビリ算定
                    IF      TNS-SRYCD           =   "099800201"
@@ -2873,10 +2878,12 @@
                STRING      WRK-GRP-MEI     DELIMITED  BY  SPACE
                            "（自院）"      DELIMITED  BY  SIZE
                            INTO            WRK-GRP-MEI-X
+               END-STRING
            ELSE
                STRING      WRK-GRP-MEI     DELIMITED  BY  SPACE
                            "（全体）"      DELIMITED  BY  SIZE
                            INTO            WRK-GRP-MEI-X
+               END-STRING
            END-IF
       *
            .
