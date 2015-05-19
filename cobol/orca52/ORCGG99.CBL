@@ -169,6 +169,10 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
+           INITIALIZE                  FLG-AREA
+                                       IDX-AREA
+                                       WRK-AREA
+      *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-G01FREE
            MOVE    SPA-WORK        TO  SPA-G01KYOUTU
@@ -220,17 +224,6 @@
                WHEN    "CLICKED"       ALSO    "pandatimer1"
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM 490-KAKUNIN-SEC
-               IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
-                   ADD     1                   TO  SPA-SFILESV-IDX 
-                   PERFORM 3001-FILEENTRY-SEC
-                 IF      SPA-SFILESV-MAX   =   SPA-SFILESV-IDX
-                   ADD     1                   TO  SPA-SFILESV-IDX 
-                 END-IF
-               ELSE
-                 IF      SPA-SFILESV-MAX   NOT =   ZERO
-                   MOVE    ZERO                TO  G99-DURATION
-                 END-IF
-               END-IF
       *    プレビュー画面へ
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 4501-NEXT-GMN-SEC
@@ -386,18 +379,31 @@
       *                    ファイルエントリ処理(クライアント保存)
                            ADD     1               TO  SPA-SFILESV-IDX 
                            PERFORM 3001-FILEENTRY-SEC
-                           IF      FLG-END         =   1
-                               GO  TO  490-KAKUNIN-EXT
-                           END-IF
                        END-IF
                    END-IF
                END-IF    
            END-IF
       *
-           MOVE    "CURRENT"           TO  MCP-PUTTYPE
-           MOVE    "G99    "           TO  MCP-WINDOW
+           IF    ( FLG-END             =   ZERO )
       *
-           PERFORM 900-PUT-WINDOW
+               IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
+                   ADD     1                   TO  SPA-SFILESV-IDX 
+                   PERFORM 3001-FILEENTRY-SEC
+                   IF      SPA-SFILESV-MAX =   SPA-SFILESV-IDX
+                       ADD     1               TO  SPA-SFILESV-IDX 
+                   END-IF
+               ELSE
+                   IF      SPA-SFILESV-MAX NOT =   ZERO
+                       MOVE    ZERO            TO  G99-DURATION
+                   END-IF
+               END-IF
+      *
+               MOVE    "CURRENT"           TO  MCP-PUTTYPE
+               MOVE    "G99    "           TO  MCP-WINDOW
+      *
+               PERFORM 900-PUT-WINDOW
+           END-IF
+      *
            .
        490-KAKUNIN-EXT.
            EXIT.
