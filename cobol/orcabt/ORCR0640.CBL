@@ -678,6 +678,7 @@
       *                                     ƒπ¥¸§Œ ›∏±ÕÛ∞Ï…Ù…È√¥∂‚µ≠∫‹Ω§¿µ
       *  04.07.44    NACL-ÃÁœ∆    15/03/16   ø¿Æ£≤£∑«Ø£¥∑Ó≤˛¿µ¬–±˛
       *  04.07.45    NACL-ÃÁœ∆    15/05/01   ›∏±ÕÛ∞Ï…Ù…È√¥∂‚µ≠∫‹Ω§¿µ
+      *  04.07.46    NACL-ÃÁœ∆    15/05/18  £∑£∞∫–¬Â¡∞»æ∆√Œ„∞Ï…Ù…È√¥∂‚µ≠∫‹Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -26511,10 +26512,11 @@
            OR  ((WK-GENGAKUKBN                     =   2    ) AND
                 (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)    =  ZERO  ))
            OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)    =  1 OR 2 )
-            IF   RECE62-KOUREI   =  "1"
-              CONTINUE
-            ELSE
-              IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+            IF   RECE62-KOUREI               NOT =  "1"
+            AND  TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =   1
+              IF  WRK-JYOGEN-KOH = RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                CONTINUE
+              ELSE
                 PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
                 PERFORM  21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
               END-IF

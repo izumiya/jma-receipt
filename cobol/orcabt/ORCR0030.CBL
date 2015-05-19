@@ -693,6 +693,7 @@
       *  04.07.42    NACL-ÌçÏÆ    15/04/27  ÆÃµ­»ö¹à£°£¹»Ü¤¬¤¢¤ë¾ì¹ç¤Î
       *                                     ¡ÚÇÛ¡Û²ó¿ôµ­ºÜÂÐ±þ
       *  04.07.43    NACL-ÌçÏÆ    15/05/01  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.07.44    NACL-ÌçÏÆ    15/05/18  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -23057,10 +23058,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR  ((WK-GENGAKUKBN                    =   2    ) AND
                    (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)   =  ZERO  ))
               OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)   =  1 OR 2 )
-                IF   RECE02-ZAITAKU  =  "1"
-                  CONTINUE
-                ELSE
-                  IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+                IF   RECE02-ZAITAKU              NOT =  "1"
+                AND  TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =   1
+                  IF  WRK-JYOGEN-KOH = RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                    CONTINUE
+                  ELSE
                     PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
                     PERFORM  2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
                   END-IF
