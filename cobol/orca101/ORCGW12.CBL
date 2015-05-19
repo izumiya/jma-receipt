@@ -167,6 +167,8 @@
       *                                     様式追加対応
       *  04.07.14    NACL-藤原    14/03/20  上限０円時の食事欄記載対応
       *                                    （法別２４・７９）
+      *  04.07.15    NACL-藤原    15/05/14  ０点全国公費レセプト記載区分
+      *                                    （提出用レセプト）対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -413,6 +415,12 @@
                                               PIC X(01).
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-RECEIPT-MAKEKBNMEI
+                                              PIC X(18).
+                       09  SPA-GMN-ZERO-KOH-PRTKBN-G.
+                           11  SPA-GMN-ZERO-KOH-PRTKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-ZERO-KOH-PRTKBNMEI
                                               PIC X(18).
                        09  SPA-GMN-RECECOMKBN-G.
                            11  SPA-GMN-RECECOMKBN
@@ -1104,6 +1112,15 @@
                                               PIC X(18).
                    07  SPA-GMN-RECEIPT-MAKEKBN-MAX
                                               PIC 9(02).    
+      *
+                   07  SPA-GMN-ZERO-KOH-PRTKBNLST   OCCURS  2.
+                       09  SPA-GMN-ZERO-KOH-PRTKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-ZERO-KOH-PRTKBNMEIL
+                                              PIC X(18).
+                   07  SPA-GMN-ZERO-KOH-PRTKBN-MAX
+                                              PIC 9(02).
       *                                        
                    07  SPA-GMN-RECECOMKBNLST  OCCURS  2.
                        09  SPA-GMN-RECECOMKBNL
@@ -2501,6 +2518,19 @@
            MOVE    "点検用レセプト"    TO  SPA-GMN-RECEIPT-MAKEKBNMEIL
                                                                    (2)
            MOVE    2                   TO  SPA-GMN-RECEIPT-MAKEKBN-MAX 
+      *     
+           MOVE    "0"                 TO  SPA-GMN-ZERO-KOH-PRTKBNL
+                                                                   (1)
+           MOVE    "記載しない"        TO
+                                       SPA-GMN-ZERO-KOH-PRTKBNMEIL
+                                                                   (1)
+           MOVE    "1"                 TO  SPA-GMN-ZERO-KOH-PRTKBNL
+                                                                   (2)
+           MOVE    "記載する"          TO
+                                       SPA-GMN-ZERO-KOH-PRTKBNMEIL
+                                                                   (2)
+           MOVE    2                   TO
+                                       SPA-GMN-ZERO-KOH-PRTKBN-MAX 
       *
            MOVE    "01"                TO  SPA-GMN-PRTJYUN1L    (1)
            MOVE    "種別・保険者番号・カナ氏名順"
@@ -3933,6 +3963,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-ZERO-KOH-PRTKBN
+                                       TO  SPA-GMN-ZERO-KOH-PRTKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-ZERO-KOH-PRTKBN-MAX
+               IF      SPA-GMN-ZERO-KOH-PRTKBN 
+                               =   SPA-GMN-ZERO-KOH-PRTKBNL (IDY)
+                   MOVE    SPA-GMN-ZERO-KOH-PRTKBNLST (IDY)
+                                       TO  SPA-GMN-ZERO-KOH-PRTKBN-G
+                   MOVE    SPA-GMN-ZERO-KOH-PRTKBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
            MOVE    SYS-200501-FRAME-ROUPRTKBN
                                        TO  SPA-GMN-FRAME-ROUPRTKBN
            PERFORM VARYING IDY FROM    1   BY  1
@@ -4753,6 +4796,12 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO
                                            SPA-GMN-RECEIPT-MAKEKBN-G
            END-IF                                              
+           IF     SPA-GMN-ZERO-KOH-PRTKBN-G
+                                           =   SPACE
+               MOVE    SPA-GMN-ZERO-KOH-PRTKBNLST  (2)
+                                           TO
+                                           SPA-GMN-ZERO-KOH-PRTKBN-G
+           END-IF                                              
       *
       *    労災医療機関情報
            INITIALIZE                      SYS-4001-REC
@@ -4933,6 +4982,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        TO  SPA-GMN-INSPECT-INCLUDE-KBN-G 
            MOVE    W12-SEIHO-DSPKBN    TO  SPA-GMN-SEIHO-DSPKBN-G 
            MOVE    W12-RECEIPT-MAKE    TO  SPA-GMN-RECEIPT-MAKEKBN-G 
+           MOVE    W12-ZERO-KOH-PRTKBN TO  SPA-GMN-ZERO-KOH-PRTKBN-G
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
            MOVE    W12-SRYKAHENKBN     TO  SPA-GMN-SRYKAHENKBN-G
@@ -5194,6 +5244,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4189-RECEIPT-MAKEKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4198-ZERO-KOH-PRTKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -6487,6 +6542,35 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            .
        4189-RECEIPT-MAKEKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ０点全国公費レセプト記載区分（提出用レセプト）チェック
+      *****************************************************************
+       4198-ZERO-KOH-PRTKBN-CHK-SEC        SECTION.
+      *
+           IF      SPA-GMN-ZERO-KOH-PRTKBN =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-ZERO-KOH-PRTKBN-MAX
+                        OR     SPA-GMN-ZERO-KOH-PRTKBN
+                                   =   SPA-GMN-ZERO-KOH-PRTKBNL (IDY)
+                   CONTINUE
+               END-PERFORM
+      * 
+               IF      IDY <=      SPA-GMN-ZERO-KOH-PRTKBN-MAX
+                   MOVE    SPA-GMN-ZERO-KOH-PRTKBNLST (IDY)
+                                           TO
+                                           SPA-GMN-ZERO-KOH-PRTKBN-G
+               ELSE
+                   MOVE    309             TO  SPA-GMN-CUR
+                   MOVE    "0124"          TO  SPA-ERRCD
+               END-IF
+           END-IF    
+      *
+           .
+       4198-ZERO-KOH-PRTKBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -9226,6 +9310,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SEIHO-DSPKBN    TO  SYS-200501-SEIHO-DSPKBN
            MOVE    SPA-GMN-RECEIPT-MAKEKBN TO
                                            SYS-200501-RECEIPT-MAKE-KBN
+           MOVE    SPA-GMN-ZERO-KOH-PRTKBN TO
+                                           SYS-200501-ZERO-KOH-PRTKBN
            MOVE    SPA-GMN-FRAME-ROUPRTKBN
                                            TO
                                            SYS-200501-FRAME-ROUPRTKBN
@@ -9845,6 +9931,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SEIHO-DSPKBN-G   TO  W12-SEIHO-DSPKBN
            MOVE    SPA-GMN-RECEIPT-MAKEKBN-G
                                             TO  W12-RECEIPT-MAKE
+           MOVE    SPA-GMN-ZERO-KOH-PRTKBN-G
+                                            TO  W12-ZERO-KOH-PRTKBN
            MOVE    SPA-GMN-RECECOMKBN-G     TO  W12-RECECOMKBN
            MOVE    SPA-GMN-SRYKAHENKBN-G    TO  W12-SRYKAHENKBN
            MOVE    SPA-GMN-BTUNUM-KSIKBN-G  TO  W12-BTUNUM-KSIKBN
@@ -10196,6 +10284,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-RECEIPT-MAKEKBN-MAX
                                        TO  W12-RECEIPT-MAKE-COUNT 
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-ZERO-KOH-PRTKBN-MAX
+               MOVE    SPA-GMN-ZERO-KOH-PRTKBNLST (IDY)
+                                       TO  W12-ZERO-KOH-PRTKBNLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-ZERO-KOH-PRTKBN-MAX
+                                       TO  W12-ZERO-KOH-PRTKBN-COUNT 
       *     
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECECOMKBN-MAX
@@ -11148,6 +11244,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0123"
                    MOVE    "ファイル出力先設定を行って下さい"
                                                TO  SPA-ERRMSG
+               WHEN    "0124"
+                   MOVE    "０点全国公費レセプト記載区分入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -11339,6 +11438,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "HKNJANUM_UPD"     TO   MCP-WIDGET
                 WHEN    303
                     MOVE  "DRNAME_KSIKBN"    TO   MCP-WIDGET
+                WHEN    309
+                    MOVE  "ZERO_KOH_PRTKBN"  TO   MCP-WIDGET
       *
                 WHEN    9
                     MOVE  "SYAPRTNM"         TO   MCP-WIDGET
@@ -11561,7 +11662,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    68  THRU    69
                 WHEN    300 THRU    302
                 WHEN    304
-                WHEN    307 THRU    308
+                WHEN    307 THRU    309
                     MOVE    0                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -11674,6 +11775,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "SEIHO_DSPKBN"
                    MOVE    302         TO  SPA-GMN-CUR
                WHEN    "RECEIPT_MAKE"
+                   MOVE    309          TO  SPA-GMN-CUR
+               WHEN    "ZERO_KOH_PRTKBN"
                    MOVE    99          TO  SPA-GMN-CUR
                WHEN    "SELNUM"
                    MOVE    69          TO  SPA-GMN-CUR

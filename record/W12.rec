@@ -177,6 +177,13 @@ W12 {
           count int;
             item varchar(20)[2];
         };
+        ZERO_KOH_PRTKBN_COMBO {
+          ZERO_KOH_PRTKBN {
+            textdata varchar(20);
+          };
+          count int;
+            item varchar(20)[2];
+        };
         scr4 {
           HKNJANUMLIST {
             count int;
