@@ -148,6 +148,12 @@
                     06  W12-RECEIPT-MAKE-COUNT   PIC S9(9)   BINARY.
                     06  W12-RECEIPT-MAKELST
                             PIC X(20)   OCCURS  2 TIMES.
+                  05  W12-ZERO-KOH-PRTKBN-COMBO.
+                    06  W12-ZERO-KOH-PRTKBN.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-ZERO-KOH-PRTKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-ZERO-KOH-PRTKBNLST
+                            PIC X(20)   OCCURS  2 TIMES.
                   05  W12-SCR.
                     06  W12-HKNJANUMLIST.
                       07  W12-HKNJANUMLIST-COUNT  PIC S9(9)   BINARY.
