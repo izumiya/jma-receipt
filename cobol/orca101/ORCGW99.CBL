@@ -1314,6 +1314,10 @@
       *****************************************************************
        490-KOUSHIN-SEC           SECTION.
       *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    SMCNDATE-YMD        TO  SYS-UPYMD
+           MOVE    SMCNDATE-HMS        TO  SYS-UPHMS
+      *
       *    Ï«ºÒ°åÎÅµ¡´Ø¾ðÊó
            MOVE    SPACE               TO  SYS-9000-REC
            INITIALIZE                      SYS-9000-REC
@@ -1336,8 +1340,8 @@
                MOVE    "*"                     TO  SYS-9000-KBNCD
            END-IF
       *
-           MOVE    SPA-W01-STYUKYMD        TO  SYS-9000-STYUKYMD
-           MOVE    SPA-W01-EDYUKYMD        TO  SYS-9000-EDYUKYMD
+           MOVE    "00000000"              TO  SYS-9000-STYUKYMD
+           MOVE    "99999999"              TO  SYS-9000-EDYUKYMD
            MOVE    SPA-GMN-SETUZOKU        TO  SYS-9000-SETUZOKU
            MOVE    SPA-GMN-SCODE           TO  SYS-9000-CODE
            MOVE    SPA-GMN-UKEBUTTON-G     TO  SYS-9000-UKEBUTTON-G
@@ -1388,72 +1392,64 @@
                MOVE    SPACE               TO  SYS-9000-RESEND-FLG
            END-IF
       *     
-           MOVE    SYS-9000-REC            TO  SYSKANRI-REC
-      *     
            IF      FLG-SYSKANRI            =   ZERO
-      *     
-               PERFORM 800-MCNDATE-SEC
-               MOVE    SMCNDATE-YMD        TO  SYS-UPYMD
-               MOVE    SMCNDATE-HMS        TO  SYS-UPHMS
-      *     
-               MOVE    SYS-KANRICD             TO  SYSUP-KANRICD
-               MOVE    SYS-KBNCD               TO  SYSUP-KBNCD
-               MOVE    SPA-W01-SEL-STYUKYMD    TO  SYSUP-STYUKYMD
-               MOVE    SPA-W01-SEL-EDYUKYMD    TO  SYSUP-EDYUKYMD
-               MOVE    "tbl_syskanri"          TO  MCP-TABLE
-               MOVE    "upd1"                  TO  MCP-PATHNAME
-               MOVE    "DBUPDATE"              TO  MCP-FUNC
+               MOVE    SMCNDATE-YMD        TO  SYS-9000-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-9000-UPHMS
            ELSE
-      *     
-               PERFORM 800-MCNDATE-SEC
-               MOVE    SMCNDATE-YMD        TO  SYS-CREYMD
-                                               SYS-UPYMD
-               MOVE    SMCNDATE-HMS        TO  SYS-UPHMS
-      *     
-               MOVE    "tbl_syskanri"          TO  MCP-TABLE
-               MOVE    "key"                   TO  MCP-PATHNAME
-               MOVE    "DBINSERT"              TO  MCP-FUNC
+               MOVE    SMCNDATE-YMD        TO  SYS-9000-CREYMD
+                                               SYS-9000-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-9000-UPHMS
            END-IF
-           MOVE    SPA-HOSPNUM             TO  SYS-HOSPNUM
-                                               SYSUP-HOSPNUM
-           MOVE    SYSKANRI-REC            TO  MCPDATA-REC
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-9000-HOSPNUM
+           MOVE    SYS-9000-REC        TO  SYSKANRI-REC
+      *
+      *    £Ã£Ì£Á£É£ÍÀÜÂ³¾ðÊó
+           MOVE    "99999999"          TO  SYS-STYUKYMD
+           MOVE    "00000000"          TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "del11"             TO  MCP-PATHNAME
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC              NOT =   ZERO )
+               MOVE    "1003"                  TO  SPA-ERRCD
+               GO  TO  490-KOUSHIN-EXT
+           END-IF
+      *
+           MOVE    SYS-9000-REC        TO  SYSKANRI-REC
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC              NOT =   ZERO )
+               MOVE    "1003"                  TO  SPA-ERRCD
+               GO  TO  490-KOUSHIN-EXT
+           END-IF
+      *
+      *    £Ã£Ì£Á£É£ÍÀÜÂ³ÀßÄêÌ¾¾Îºï½ü½èÍý
+           INITIALIZE                      SYS-9001-REC
+           MOVE    "9001"                  TO  SYS-9001-KANRICD
+           MOVE    "99999999"              TO  SYS-9001-STYUKYMD
+           MOVE    "00000000"              TO  SYS-9001-EDYUKYMD
+           MOVE    SPA-HOSPNUM             TO  SYS-9001-HOSPNUM
+           MOVE    SYS-9001-REC            TO  MCPDATA-REC
+           MOVE    "DBDELETE"              TO  MCP-FUNC
+           MOVE    "tbl_syskanri"          TO  MCP-TABLE
+           MOVE    "del11"                 TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
+      *
            IF      MCP-RC              NOT =   ZERO 
-               MOVE    "1003"                  TO  SPA-ERRCD
+               MOVE    "1001"                  TO  SPA-ERRCD
+               DISPLAY "SYSKANRI-KEY =>" SYS-9001-KEY 
                GO  TO  490-KOUSHIN-EXT
-           END-IF      
-      *
-      *    £Ã£Ì£Á£É£ÍÀÜÂ³ÀßÄêÌ¾¾Îºï½ü½èÍý
-           INITIALIZE                  SYS-9001-REC
-           MOVE    "9001"              TO  SYS-9001-KANRICD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-9001-STYUKYMD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-9001-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-9001-HOSPNUM
-           MOVE    SYS-9001-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI        =   ZERO
-               INITIALIZE                      SYS-9001-REC
-               MOVE    "9001"                  TO  SYS-9001-KANRICD
-               MOVE    SPA-W01-STYUKYMD        TO  SYS-9001-STYUKYMD
-               MOVE    SPA-W01-STYUKYMD        TO  SYS-9001-EDYUKYMD
-               MOVE    SPA-HOSPNUM             TO  SYS-9001-HOSPNUM
-               MOVE    SYS-9001-REC            TO  MCPDATA-REC
-               MOVE    "DBDELETE"              TO  MCP-FUNC
-               MOVE    "tbl_syskanri"          TO  MCP-TABLE
-               MOVE    "del11"                 TO  MCP-PATHNAME
-grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
-                                                   MCPDATA-REC
-                                                   SPA-AREA
-      *
-               IF      MCP-RC              NOT =   ZERO 
-                   MOVE    "1001"                  TO  SPA-ERRCD
-                   DISPLAY "SYSKANRI-KEY =>" SYS-9001-KEY 
-                   GO  TO  490-KOUSHIN-EXT
-               END-IF
            END-IF
       *
       *    £Ã£Ì£Á£É£ÍÀÜÂ³ÀßÄêÅÐÏ¿½èÍý
@@ -1474,8 +1470,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                             TO  SYS-9001-PORT2 
                    MOVE    SPA-GMN-SMEMO (IDX)
                                             TO  SYS-9001-MEMO 
-                   MOVE    SPA-W01-STYUKYMD    TO  SYS-9001-STYUKYMD
-                   MOVE    SPA-W01-EDYUKYMD    TO  SYS-9001-EDYUKYMD
+                   MOVE    "00000000"       TO  SYS-9001-STYUKYMD
+                   MOVE    "99999999"       TO  SYS-9001-EDYUKYMD
       *     
                    PERFORM 800-MCNDATE-SEC
                    MOVE    SMCNDATE-YMD        TO  SYS-9001-CREYMD

@@ -2287,9 +2287,19 @@
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE
                    ELSE
-                       IF    ( SPA-GMN-KANRICD =   "9800" )
-                        AND  ( SPA-GMN-MAX    >=   2    )
-                           CONTINUE
+                       IF    ( SPA-GMN-KANRICD =   "9000" OR "9800" )
+                           IF    ( SPA-GMN-SELNUM      =   ZERO )
+                            OR  (( SPA-GMN-SELNUM NOT  =   ZERO )
+                             AND ( SPA-NAI-STYUKYMD
+                                           NOT =   SPA-NAI-TSTYUKYMD
+                                                     (SPA-GMN-SELNUM)
+                              OR   SPA-NAI-EDYUKYMD
+                                           NOT =   SPA-NAI-TEDYUKYMD
+                                                     (SPA-GMN-SELNUM)))
+                               MOVE    3       TO  SPA-GMN-CUR
+                               MOVE    "0021"  TO  SPA-ERRCD
+                               GO  TO  4101-KAKUTEI-CHK-EXT
+                           END-IF
                        ELSE
                            MOVE    3           TO  SPA-GMN-CUR
                            MOVE    "0021"      TO  SPA-ERRCD
@@ -2365,7 +2375,11 @@
                                            >   SPA-NAI-EDYUKYMD )
                        CONTINUE
                    ELSE
-                       MOVE    "0004"              TO  SPA-ERRCD 
+                       IF    ( SPA-GMN-KANRICD     =   "9000" OR "9800")
+                           CONTINUE
+                       ELSE
+                           MOVE    "0004"          TO  SPA-ERRCD 
+                       END-IF
                    END-IF
       *************IF     (SPA-NAI-STYUKYMD
       *                                    >=  SPA-NAI-TSTYUKYMD (IDX))
