@@ -40,6 +40,7 @@
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
+      *  04.07.03    NACL-藤原    15/05/11  ファイルの文字コードチェック
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -869,6 +870,9 @@
                                                DELIMITED  BY  SPACE
                                                INTO  SPA-GMN-T05-ERRMSG1
                        END-STRING
+                   WHEN    5
+                       MOVE    "取込みデータに不正な文字が存在します"
+                                               TO  SPA-GMN-T05-ERRMSG1
                    WHEN    9
                        MOVE    "ファイルがオープンできません"
                                                TO  SPA-GMN-T05-ERRMSG1
@@ -1248,11 +1252,12 @@
       *
                MOVE    PARA-REC        TO   SJISTOEUC-INDATA
                PERFORM 7002-FILE-CONVERT-SEC
-               MOVE    SJISTOEUC-OUTDATA
+               IF      SJISTOEUC-RETURN    =   0
+                 MOVE    SJISTOEUC-OUTDATA
                                        TO  PARA-DATA
-               IF       PARA-DATA(1:1) =   X"0D"
+                 IF       PARA-DATA(1:1) =   X"0D"
                    MOVE    1               TO  WRK-ERRMSG1
-               ELSE
+                 ELSE
                    IF      CNT-PARA            =   1
                        EVALUATE    WRK-FILENM(1:6)
                            WHEN    "RIhasp"
@@ -1303,6 +1308,9 @@
                    END-IF
       *
                    PERFORM 900-PARA-READ-SEC
+                 END-IF
+               ELSE
+                 MOVE    5               TO  WRK-ERRMSG1
                END-IF
            END-PERFORM
       *

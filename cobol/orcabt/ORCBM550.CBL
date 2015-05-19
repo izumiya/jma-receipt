@@ -41,6 +41,8 @@
       *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
       *  04.07.03    NACL-藤原    14/02/12  データ識別が数字であれば全て
       *                                     取り込むようにする
+      *  04.07.04    NACL-藤原    15/05/12  患者番号からＩＤが取得できない
+      *                                     ときのエラー処理
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -101,6 +103,7 @@
                05  FLG-DELI1           PIC 9(01).
                05  FLG-DELI2           PIC 9(01).
                05  FLG-NODATA          PIC 9(01).
+           03  FLG-PTID-ERR            PIC 9(01).
       *
       *    カウンタ
        01  CNT-AREA.
@@ -437,6 +440,7 @@
                DISPLAY "file shori st = " IDXX " " WRK-FILE-TMP
       *
                MOVE    ZERO                TO  FLG-PARA
+                                               FLG-PTID-ERR
                MOVE    ZERO                TO  READ-CNT
                                                INS-K-CNT
                                                INS-B-CNT
@@ -697,6 +701,10 @@
       *
            CLOSE   PARA-FILE
       *
+           IF      FLG-PTID-ERR        =   9
+               PERFORM 2009-DB-DELETE-SEC
+           END-IF
+      *
            IF      IDZZ            >   ZERO
       *        ＤＢ更新処理（返戻ファイル）
                PERFORM 20021-DB-UPDATE-SEC
@@ -790,6 +798,10 @@
            END-PERFORM
       *
            CLOSE   PARA-FILE
+      *
+           IF      FLG-PTID-ERR        =   9
+               PERFORM 2009-DB-DELETE-SEC
+           END-IF
       *
            IF      IDZZ            >   ZERO
       *        ＤＢ更新処理（労災・返戻ファイル）
@@ -3072,6 +3084,34 @@
            EXIT.
       *
       *****************************************************************
+      *    データ削除処理
+      *****************************************************************
+       2009-DB-DELETE-SEC                  SECTION.
+      *
+           INITIALIZE                          HENREI-B-REC
+           MOVE    WRK-PARA-HOSPNUM        TO  HENREI-B-HOSPNUM
+           MOVE    WRK-HENREI-K-TEISYUTUSAKI
+                                           TO  HENREI-B-TEISYUTUSAKI
+           MOVE    WRK-HENREI-K-TEISYUTUSAKI2
+                                           TO  HENREI-B-TEISYUTUSAKI2
+           MOVE    WRK-HENREI-K-SYORIYM    TO  HENREI-B-SYORIYM
+           MOVE    HENREI-B-REC            TO  MCPDATA-REC
+      *
+           MOVE   "tbl_henrei_body"        TO  MCP-TABLE
+           MOVE   "del1"                   TO  MCP-PATHNAME
+           MOVE    "DBDELETE"              TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           MOVE    SPACE                   TO  WRK-CSVERR
+           MOVE    "全ての患者情報の取得に失敗しました"
+                                           TO    WRK-CSVERR
+           PERFORM 500-ERR-HENSYU-SEC
+           PERFORM 500-COBABORT-SEC
+           .
+       2009-DB-DELETE-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    エラー出力処理
       *****************************************************************
        500-ERR-HENSYU-SEC                SECTION.
@@ -3155,6 +3195,15 @@
            MOVE    WRK-PTNUM           TO  SPTNUM-PTNUM
            CALL    "ORCSPTNUM"         USING   ORCSPTNUMAREA
                                                SPA-AREA
+           IF      SPTNUM-RC           =   00
+               MOVE    1                   TO  FLG-PTID-ERR
+               DISPLAY "PTNUM=" WRK-PTNUM
+           ELSE
+               IF      FLG-PTID-ERR        =   ZERO
+                   MOVE    9                   TO  FLG-PTID-ERR
+               END-IF
+               DISPLAY "PTNUM=" WRK-PTNUM " PTID NOT FOUND!!"
+           END-IF
            .
        500-PTID-HENSYU-EXT.
            EXIT.

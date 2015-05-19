@@ -403,4 +403,14 @@ path    upd1    {
                 ;
         };
 };
+path    del1    {
+    DBDELETE        {
+        DELETE  FROM tbl_henrei_body
+                WHERE     HOSPNUM         = :HOSPNUM
+                    AND   TEISYUTUSAKI    = :TEISYUTUSAKI
+                    AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
+                    AND   SYORIYM         = :SYORIYM
+                ;
+        };
+};
 
