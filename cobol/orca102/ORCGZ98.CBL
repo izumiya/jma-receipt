@@ -1759,7 +1759,12 @@
       *        システム予約の入力不可分
                IF      SPA-Z98-GMN-SYORI3      =   "U6"
                    IF      TNS-SRYCD           >=  "099999911"
-                       MOVE    1               TO  FLG-CHK
+                       IF     (TNS-SRYCD           >=  "099999921"
+                                               AND <=  "099999929" )
+                           CONTINUE
+                       ELSE
+                           MOVE    1               TO  FLG-CHK
+                       END-IF
                    END-IF
       *            リハビリ算定
                    IF      TNS-SRYCD           =   "099800201"
