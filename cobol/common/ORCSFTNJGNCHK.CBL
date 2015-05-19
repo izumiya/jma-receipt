@@ -102,6 +102,7 @@
       *  04.07.06    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/08/29  Åçº¬¡¦ÆàÎÉ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    15/03/17  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
+      *  04.07.09    NACL-ÌçÏÆ    15/05/18  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -233,6 +234,8 @@
       *
            03  WRK-BIRTHDAY                 PIC X(08).
       *
+           03  WRK-ZERO-KOH-PRTKBN          PIC X(01).
+      *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
       *
@@ -268,6 +271,8 @@
            COPY    "CPSK1001.INC".
       *
            COPY    "CPSK2010.INC".
+      *
+           COPY    "CPSK200501.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -2091,7 +2096,14 @@
                 END-PERFORM
                 IF    FLG-SRYACCT-CHECK  =  1
                   IF  LNK-FTNJGNCHK-KOHNUM(1:1) = "0"
+      *              ¥·¥¹¥Æ¥à´ÉÍý£²£°£°£µÊÔ½¸
+                     PERFORM  2004116-SYS2005-CHECK-SEC
+                     IF  WRK-ZERO-KOH-PRTKBN = "1"
                        CONTINUE
+                     ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
+                     END-IF
                   ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
@@ -2512,6 +2524,47 @@
            EXIT.
       *
       *****************************************************************
+      *    ¥·¥¹¥Æ¥à´ÉÍý£²£°£°£µ¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2004116-SYS2005-CHECK-SEC            SECTION.
+      *
+           MOVE      SPACE              TO  WRK-ZERO-KOH-PRTKBN
+      *
+           INITIALIZE                       SYS-200501-REC
+           MOVE  "2005"                 TO  SYS-200501-KANRICD
+           MOVE  "01"                   TO  SYS-200501-KBNCD
+           MOVE  LNK-FTNJGNCHK-HOSPNUM  TO  SYS-200501-HOSPNUM
+           MOVE  LNK-FTNJGNCHK-SRYYM    TO  SYS-200501-STYUKYMD(1:6)
+           MOVE  "01"                   TO  SYS-200501-STYUKYMD(7:2)
+           MOVE  LNK-FTNJGNCHK-SRYYM    TO  SYS-200501-EDYUKYMD(1:6)
+           MOVE  "01"                   TO  SYS-200501-EDYUKYMD(7:2)
+           MOVE  SYS-200501-REC         TO  MCPDATA-REC
+           MOVE  "DBSELECT"             TO  MCP-FUNC
+           MOVE  "tbl_syskanri"         TO  MCP-TABLE
+           MOVE  "key10"                TO  MCP-PATHNAME
+           CALL  "ORCDBMAIN"            USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+           IF     MCP-RC   =   ZERO
+              MOVE     "tbl_syskanri"   TO  MCP-TABLE
+              MOVE     "key10"          TO  MCP-PATHNAME
+              PERFORM   SYSKANRI-READ-SEC
+              MOVE      SYS-200501-ZERO-KOH-PRTKBN
+                                        TO  WRK-ZERO-KOH-PRTKBN
+           END-IF
+           MOVE        "tbl_syskanri"   TO  MCP-TABLE
+           MOVE        "key10"          TO  MCP-PATHNAME
+           PERFORM      910-DB-CLOSE-SEC
+      *
+           IF      WRK-ZERO-KOH-PRTKBN  =   SPACE
+               MOVE    "1"              TO  WRK-ZERO-KOH-PRTKBN
+           END-IF
+      *
+           .
+       2004116-SYS2005-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÊÔ½¸½èÍý£²
       *****************************************************************
        200412-SYUKEI-HENSYU2-SEC            SECTION.
@@ -2629,7 +2682,14 @@
                 END-PERFORM
                 IF    FLG-SRYACCT-CHECK  =  1
                   IF  LNK-FTNJGNCHK-KOHNUM(1:1) = "0"
+      *              ¥·¥¹¥Æ¥à´ÉÍý£²£°£°£µÊÔ½¸
+                     PERFORM  2004116-SYS2005-CHECK-SEC
+                     IF  WRK-ZERO-KOH-PRTKBN = "1"
                        CONTINUE
+                     ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
+                     END-IF
                   ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
@@ -2968,10 +3028,12 @@
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  SYS-1001-REC
                                            SYS-2010-REC
+                                           SYS-200501-REC
                MOVE    ZERO            TO  FLG-SYSKANRI
            ELSE
                INITIALIZE                  SYS-1001-REC
                                            SYS-2010-REC
+                                           SYS-200501-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
       *
