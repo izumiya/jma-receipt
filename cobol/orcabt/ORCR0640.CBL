@@ -677,6 +677,7 @@
       *                                     長期の保険欄一部負担金記載修正
       *  04.07.44    NACL-門脇    15/03/16  平成２７年４月改正対応
       *  04.07.45    NACL-門脇    15/05/01  保険欄一部負担金記載修正
+      *  04.07.46    NACL-門脇    15/05/18  ７０歳代前半特例一部負担金記載修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-門脇    14/07/29  ３２文字以上の文字列修正
@@ -26537,10 +26538,11 @@
            OR  ((WK-GENGAKUKBN                     =   2    ) AND
                 (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)    =  ZERO  ))
            OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)    =  1 OR 2 )
-            IF   RECE62-KOUREI   =  "1"
-              CONTINUE
-            ELSE
-              IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+            IF   RECE62-KOUREI               NOT =  "1"
+            AND  TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =   1
+              IF  WRK-JYOGEN-KOH = RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                CONTINUE
+              ELSE
                 PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
                 PERFORM  21046A-CHIHO-ICHIBUFTN-HEN-SEC
               END-IF

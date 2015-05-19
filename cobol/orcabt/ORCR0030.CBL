@@ -692,6 +692,7 @@
       *  04.07.42    NACL-門脇    15/04/27  特記事項０９施がある場合の
       *                                     【配】回数記載対応
       *  04.07.43    NACL-門脇    15/05/01  保険欄一部負担金記載修正
+      *  04.07.44    NACL-門脇    15/05/18  ７０歳代前半特例一部負担金記載修正
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -23089,10 +23090,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR  ((WK-GENGAKUKBN                    =   2    ) AND
                    (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)   =  ZERO  ))
               OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)   =  1 OR 2 )
-                IF   RECE02-ZAITAKU  =  "1"
-                  CONTINUE
-                ELSE
-                  IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
+                IF   RECE02-ZAITAKU              NOT =  "1"
+                AND  TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =   1
+                  IF  WRK-JYOGEN-KOH = RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                    CONTINUE
+                  ELSE
                     PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
                     PERFORM  2109A-CHIHO-ICHIBUFTN-HEN-SEC
                   END-IF
