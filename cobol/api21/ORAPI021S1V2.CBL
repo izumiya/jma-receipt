@@ -1896,11 +1896,11 @@
            MOVE    SPA-SYSYMD          TO  PTNYUINRRK-TAIINYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key11"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    "key11"             TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
@@ -1915,7 +1915,7 @@
            END-IF
       *
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key11"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-PTNYUINRRK      =   ZERO
       *        Æþ±¡Ãæ
