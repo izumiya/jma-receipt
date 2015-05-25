@@ -1065,6 +1065,7 @@
       *
                MOVE    ZERO            TO  WRK-SKYMONEY-TTL
                                            WRK-MISYU-TTL
+                                           WRK-NYUKIN-TTL
       *
                MOVE    ZERO            TO  FLG-SKIP
       *
