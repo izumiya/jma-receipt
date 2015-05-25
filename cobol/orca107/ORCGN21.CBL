@@ -1206,11 +1206,11 @@
       *
            IF    ( SPA-N21FIL-PHOTO    NOT =   SPACE )
       *        画像ファイルがない場合はファイル作成する
-               INITIALIZE                  ORCSFILECHKAREA
-               MOVE     ORCA-BLOB-FILE TO  FILECHK-NAME
-               CALL    "ORCSFILECHK"       USING
-                                           ORCSFILECHKAREA
-               IF      FILECHK-RC      NOT =   0
+      *         INITIALIZE                  ORCSFILECHKAREA
+      *         MOVE     ORCA-BLOB-FILE TO  FILECHK-NAME
+      *         CALL    "ORCSFILECHK"       USING
+      *                                     ORCSFILECHKAREA
+      *         IF      FILECHK-RC      NOT =   0
                    MOVE    SPA-N21FIL-OBJECT
                                        TO  ORCA-BLOB-OBJECT
       *            画像イメージを表示
@@ -1236,7 +1236,7 @@
                        MOVE    "0022"              TO  SPA-ERRCD
                        GO  TO  430-GAZOCHK-HENSYU-EXT
                    END-IF
-               END-IF
+      *         END-IF
            ELSE
                MOVE    SPACE           TO  SPA-N21FIL-PHOTO
                MOVE    LOW-VALUE       TO  SPA-N21FIL-OBJECT
