@@ -377,26 +377,21 @@
                            PERFORM 4902-FILE-INFO-CHK-SEC
                        ELSE
       *                    ファイルエントリ処理(クライアント保存)
-                           ADD     1               TO  SPA-SFILESV-IDX 
-                           PERFORM 3001-FILEENTRY-SEC
+                           IF      SPA-SFILESV-MAX   >   SPA-SFILESV-IDX
+                               ADD     1   TO  SPA-SFILESV-IDX 
+                               PERFORM 3001-FILEENTRY-SEC
+                           ELSE
+                               IF      SPA-SFILESV-MAX NOT =   ZERO
+                                   MOVE    ZERO    TO  G99-DURATION
+                                   MOVE    ZERO    TO  SPA-SFILESV-IDX
+                               END-IF
+                           END-IF
                        END-IF
                    END-IF
                END-IF    
            END-IF
       *
            IF    ( FLG-END             =   ZERO )
-      *
-               IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
-                   ADD     1                   TO  SPA-SFILESV-IDX 
-                   PERFORM 3001-FILEENTRY-SEC
-                   IF      SPA-SFILESV-MAX =   SPA-SFILESV-IDX
-                       ADD     1               TO  SPA-SFILESV-IDX 
-                   END-IF
-               ELSE
-                   IF      SPA-SFILESV-MAX NOT =   ZERO
-                       MOVE    ZERO            TO  G99-DURATION
-                   END-IF
-               END-IF
       *
                MOVE    "CURRENT"           TO  MCP-PUTTYPE
                MOVE    "G99    "           TO  MCP-WINDOW
