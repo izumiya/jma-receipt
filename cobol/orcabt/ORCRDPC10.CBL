@@ -104,6 +104,9 @@
       *              NACL-小豆沢  15/03/25  Ｆファイル編集処理
       *                                     行為明細点数をきざみ点数を
       *                                     加算した点数に修正
+      *              NACL-小豆沢  15/05/26  入院料Ｆファイル編集処理
+      *                                     ％減算は行為明細点数にゼロを
+      *                                     セットするよう修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4246,7 +4249,9 @@
                                        +   0.5
            ELSE
             IF     TNS-TENSIKIBETU     =   6
-              MOVE WRK-FEDT-ZAITEN     TO  WRK-FEDT-MEISAI-TEN
+      **        MOVE WRK-FEDT-ZAITEN     TO  WRK-FEDT-MEISAI-TEN
+      *       ％減算は行為明細点数にゼロをセットするよう修正
+              MOVE ZERO                TO  WRK-FEDT-MEISAI-TEN
             ELSE
              IF    TNS-SRYKBN          =   "97"
                IF  WRK-FEDT-SRYSURYO   =   ZERO
