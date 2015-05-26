@@ -469,8 +469,12 @@
                                            ORCHC33AREA
                IF      ORCHC33-RC          =   ZERO
                    ADD     ORCHC33-PAGE        TO  CNT-PAGE
-               ELSE
-                   PERFORM 500-ERR-HENSYU-SEC
+      ******   ELSE
+      ******       PERFORM 500-ERR-HENSYU-SEC
+               END-IF
+               IF      ORCHC33-RC          =   9
+      *            °õºþ°Û¾ï½ªÎ»
+                   MOVE    1               TO  FLG-END
                END-IF
       *
                MOVE    "tbl_ptinf"         TO  MCP-TABLE
@@ -480,6 +484,10 @@
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-END             =   1
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
       *
              .
        2002-GAIRAI-SYORI-EXT.
@@ -541,8 +549,12 @@
                IF      ORCHC33-RC          =   ZERO
                    ADD     ORCHC33-PAGE        TO  CNT-PAGE
                    DISPLAY "ORCHC33-PAGE =" ORCHC33-PAGE
-               ELSE
-                   PERFORM 500-ERR-HENSYU-SEC
+      *******  ELSE
+      *******      PERFORM 500-ERR-HENSYU-SEC
+               END-IF
+               IF      ORCHC33-RC          =   9
+      *            °õºþ°Û¾ï½ªÎ»
+                   MOVE    1               TO  FLG-END
                END-IF
       *
                MOVE    "tbl_ptinf"         TO  MCP-TABLE
@@ -552,6 +564,10 @@
            MOVE    "tbl_ptinf"         TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-END             =   1
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
       *
              .
        2001-NYUIN-SYORI-EXT.
