@@ -4416,7 +4416,17 @@
             IF     TNS-TENSIKIBETU     =   6
       **        MOVE WRK-FEDT-ZAITEN     TO  WRK-FEDT-MEISAI-TEN
       *       ％減算は行為明細点数にゼロをセットするよう修正
-              MOVE ZERO                TO  WRK-FEDT-MEISAI-TEN
+      *       （但し、平成２７年３月迄の外泊コードは１明細での記録の為、
+      *         剤点セットのままとする）
+              IF   (LNK-DPCNYUIN-SANTEIYM   <=  "201503")   AND
+                   (TNS-SRYCD                =  "190107290" OR
+                                                "190107390" OR
+                                                "190107490" OR
+                                                "190107590")
+                 MOVE WRK-FEDT-ZAITEN  TO  WRK-FEDT-MEISAI-TEN
+              ELSE
+                  MOVE ZERO            TO  WRK-FEDT-MEISAI-TEN
+              END-IF
             ELSE
              IF    TNS-SRYKBN          =   "97"
                IF  WRK-FEDT-SRYSURYO   =   ZERO
