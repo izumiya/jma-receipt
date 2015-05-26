@@ -107,6 +107,10 @@
       *              NACL-小豆沢  15/05/26  入院料Ｆファイル編集処理
       *                                     ％減算は行為明細点数にゼロを
       *                                     セットするよう修正
+      *              NACL-小豆沢  15/05/26  入院料Ｆファイル編集処理
+      *                                     平成２７年３月迄の外泊は１明細
+      *                                     平成２７年４月以降の外泊は２明細
+      *                                     記録に対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3958,14 +3962,20 @@
                                     OR    LNK-DPCNYUIN-SRYSKB
                                                        (IDZ1 IDZ2 IDXZ)
                                                      = "97"
-      *                              外泊の場合(2行目のレコード)
-                                       IF  LNK-DPCNYUIN-SRYCD
+      *                                外泊の場合
+      *                                平成２７年３月迄は１明細の記録
+      *                                平成２７年４月以降は２明細での記録
+                                       IF (LNK-DPCNYUIN-SANTEIYM  <=
+                                                              "201503")
+                                         IF  LNK-DPCNYUIN-SRYCD
                                                        (IDZ1 IDZ2 2)
                                                      = "190107290" OR
                                                        "190107390" OR
                                                        "190107490" OR
                                                        "190107590"
+      *                                    ２行目のレコード
                                            MOVE    2   TO  IDXZ
+                                         END-IF
                                        END-IF
                                        MOVE  IDZ2  TO  WRK-FEDT-DD
                                        PERFORM
@@ -4295,11 +4305,12 @@
            MOVE    ZERO                TO  WRK-FEDT-DEKIDAKA-SUB
            MOVE    WRK-FEDT-MEISAI-TEN TO  WRK-FEDT-DEKIDAKA-TEN
            IF      TNS-TENSIKIBETU     =  6
-      *                              外泊の場合は対象外
-               IF  TNS-SRYCD           = "190107290" OR
-                                         "190107390" OR
-                                         "190107490" OR
-                                         "190107590"
+      *        平成２７年３月迄の外泊は対象外
+               IF  (LNK-DPCNYUIN-SANTEIYM   <=  "201503")  AND
+                   (TNS-SRYCD           = "190107290" OR
+                                          "190107390" OR
+                                          "190107490" OR
+                                          "190107590")
                    CONTINUE
                ELSE
                    MOVE    1           TO  WRK-FEDT-DEKIDAKA-SUB
