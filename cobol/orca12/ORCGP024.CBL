@@ -1469,7 +1469,9 @@
                MOVE    SPACE               TO  WRK-FTNEDYMD
                PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL       IDX     >   SPA-FTN2-MAX
+      *
                    IF      SPA-NAI24-TFTNEDYMD (IDX)   >   WRK-FTNEDYMD
+                    AND   (SPA-NAI24-FTNDELKBN2(IDX)  =   SPACE )
                        MOVE    IDX                 TO  IDX-F
                        MOVE    SPA-NAI24-TFTNEDYMD (IDX)
                                                    TO  WRK-FTNEDYMD
