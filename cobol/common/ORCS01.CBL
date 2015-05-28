@@ -446,6 +446,7 @@
       *                                     「負担金未発生分の回数カウント」
       *                                     の機能について、診療済みデータ
       *                                     のセレクト条件修正
+      *  04.07.29    NACL-門脇    15/05/28  神戸市地方公費神奈川県対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9641,7 +9642,7 @@
                             END-IF
                         END-IF
                         IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
-                                             OR 39                    )
+                                             OR 39 OR 14              )
                         AND (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH2HKNNUM =  "100" OR "200"
@@ -9972,7 +9973,7 @@
                             END-IF
                         END-IF
                         IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
-                                             OR 39                    )
+                                             OR 39 OR 14              )
                         AND (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH3HKNNUM =  "100" OR "200"
