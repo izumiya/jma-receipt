@@ -575,6 +575,7 @@
            03  FLG-RECE67              PIC 9(01).
            03  FLG-RECE68              PIC 9(01).
            03  FLG-OPECOM              PIC 9(01).
+           03  FLG-NYUINACCT           PIC 9(01).
       *
            03  FLG-READ                PIC 9(01).
       *
@@ -1727,6 +1728,10 @@
       *    手術歴レセプトコメントマスター
        01  OPECOM-REC.
            COPY    "CPOPECOM.INC".
+      *
+      *    入院診療会計マスタ−
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -4884,17 +4889,51 @@
                         ELSE
       *                     難病患者等入院診療加算対応
       *                     入院料と同じ保険組合せは対象としない
-                            MOVE    1                  TO  FLG-TAISYO
+                            MOVE    0                  TO  FLG-TAISYO
+      *                     入院会計マスターの保険組合せ検索
+                            INITIALIZE                     NYUINACCT-REC
+                            MOVE  LNK-NYURECEDEN-HOSPNUM
+                                                       TO  NACCT-HOSPNUM
+                            MOVE  LNK-NYURECEDEN-PTID
+                                                       TO  NACCT-PTID
+                            MOVE  LNK-NYURECEDEN-SANTEIYM
+                                                       TO  NACCT-SRYYM
+                            MOVE  "5"                TO  NACCT-ZAISKBKBN
+                            MOVE  "tbl_nyuinacct"    TO  MCP-TABLE
+                            MOVE  "key17"            TO  MCP-PATHNAME
+                            PERFORM 910-NYUINACCT-SELECT-SEC
+                            IF      FLG-NYUINACCT      =   ZERO
+                               MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                               MOVE    "key17"         TO  MCP-PATHNAME
+                               PERFORM 910-NYUINACCT-READ-SEC
+                            END-IF
+      *
+                            MOVE    "tbl_nyuinacct"    TO  MCP-TABLE
+                            MOVE    "key17"            TO  MCP-PATHNAME
+                            PERFORM   900-CLOSE-SEC
+      *
                             PERFORM VARYING IDY FROM    1   BY  1
-                                    UNTIL   IDY >       31
-                                IF      RECE641-HKNCOMBI
-                                                  =
-                                    LNK-NYURECEDEN-HKNCOMBI (1 IDY)  OR
-                                    LNK-NYURECEDEN-HKNCOMBI (2 IDY)
-                                    MOVE    0           TO  FLG-TAISYO
-                                    MOVE    31          TO  IDY
-                                END-IF 
+                                    UNTIL  IDY >       31
+                                IF   RECE641-KAISU(1 IDY)   NOT =  ZERO
+                                  IF      RECE641-HKNCOMBI
+                                                  =   NACCT-DAY(IDY)
+                                      MOVE  ZERO  TO
+                                                   RECE641-KAISU(1 IDY)
+                                  ELSE
+                                    MOVE    1           TO  FLG-TAISYO
+                                  END-IF 
+                                END-IF
                             END-PERFORM
+                            IF     FLG-TAISYO  =   1
+                               MOVE    ZERO   TO  RECE641-ZAIKAISU
+                               PERFORM VARYING IDY FROM    1   BY  1
+                                 UNTIL  IDY >       31
+                                     IF   RECE641-KAISU(1 IDY)
+                                                  NOT =   ZERO
+                                        ADD  1  TO  RECE641-ZAIKAISU
+                                     END-IF
+                               END-PERFORM
+                            END-IF
                             IF  RECE641-SRYKBN  = "97"
                                     MOVE    0           TO  FLG-TAISYO
                             END-IF
@@ -10329,6 +10368,58 @@
            END-IF
            .
        900-DBINSERT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院会計マスター検索
+      *****************************************************************
+       910-NYUINACCT-SELECT-SEC        SECTION.
+      *
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           PERFORM   910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-NYUINACCT
+           ELSE
+               MOVE    1                  TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       910-NYUINACCT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院会計マスター読込
+      *****************************************************************
+       910-NYUINACCT-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  NYUINACCT-REC
+               MOVE    ZERO               TO  FLG-NYUINACCT
+           ELSE
+               INITIALIZE                     NYUINACCT-REC
+               MOVE    1                  TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       910-NYUINACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢＳＥＬＥＣＴ処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               CONTINUE
+           ELSE
+               DISPLAY "SELECT ERR table=" MCP-TABLE
+                       " pathname="        MCP-PATHNAME
+           END-IF
+           .
+       910-DBSELECT-EXT.
            EXIT.
       *
       *****************************************************************
