@@ -43,6 +43,11 @@
       *                                     ¤ËÊÑ¹¹
       *  04.02.00    NACL-¾®Æ¦Âô  08/05/02  ÆÃÊÌÆþ±¡´ðËÜÎÁ»»Äê»þ¤Ë£Á£Ä£ÌÆþÎÏ¤«¤é
       *                                     °åÎÅÅÙ¤Î¹â¤¤´µ¼Ô¤òÈ½Äê
+      *Ê¿À®£²£·Ç¯£±·îÆñÉÂÂÐ±þ
+      *  04.07.00    NACL-¾®Æ¦Âô  15/06/02  ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁµÚ¤Ó
+      *                                     ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ¤Î
+      *                                     »»Äê¤ÇÆñÉÂ¸øÈñ¤Î»»Äê»þ¤Ë
+      *                                     °åÎÅÅÙ¤Î¹â¤¤´µ¼Ô¤È¤¹¤ëÈ½ÄêÄÉ²Ã
       *****************************************************************
       *
       *
@@ -71,6 +76,8 @@
            03  FLG-RJN                     PIC 9(01).
            03  FLG-SEI                     PIC 9(01).
            03  FLG-PTNYUINRRK              PIC 9(01).
+           03  FLG-HKNCOMBI                PIC 9(01).
+           03  FLG-NANBYO                  PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -487,7 +494,11 @@
            03  WRK-KYUKYU-DAY              PIC 9(02).
            03  WRK-KYUKYU-YMD              PIC X(08).
            03  WRK-KYUKYU-NYUINCD          PIC X(09).
-      *    
+      *
+      *    ÊÝ¸±ÁÈ¹ç¤»ÂàÈò
+           03  WRK-NYUIN-TABLE.
+               05  WRK-NYUIN-TBL           OCCURS  31.
+                   07  WRK-HKNCOMBI-DAY    PIC 9(03).
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -517,6 +528,10 @@
       *    ´µ¼ÔÊÝ¸±¾ðÊó¥Þ¥¹¥¿¡Ý
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
+      *
+      *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *    Äã½êÆÀ
        01  TSYRRK-REC.
@@ -644,7 +659,14 @@
                MOVE    "tbl_nyuinacct"  TO  MCP-TABLE
                MOVE    "key17"          TO  MCP-PATHNAME
                PERFORM 910-NYUINACCT-READ-SEC
-               IF   FLG-NYUINACCT       NOT =   ZERO
+               IF   FLG-NYUINACCT       =   ZERO
+      *             ÆñÉÂ¸øÈñÈ½ÄêÍÑ¤ËÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æ¤òÂàÈò
+                    PERFORM    VARYING   IDX1   FROM   1   BY   1
+                               UNTIL     IDX1   >      31
+                        MOVE   NACCT-DAY (IDX1) TO 
+                                            WRK-HKNCOMBI-DAY(IDX1)
+                    END-PERFORM
+               ELSE
                     MOVE    3           TO  LNK-NYULIFE-RC
                END-IF
            END-IF
@@ -989,6 +1011,51 @@
                                    (IDX-SEI2   <=   28)
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+      *                        ÆñÉÂ¸øÈñ¤ÎÈ½ÄêÄÉ²Ã¡Ê°Ê²¼Æþ±¡ÎÁ¤Î¾ì¹ç¤Î¤ß¡Ë
+      *                        ¡¦ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ
+      *                        ¡¦ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ
+                               IF  (IDX-SEI2   >=   66)   AND
+                                   (IDX-SEI2   <=   73)
+      *                          ÆñÉÂ¸øÈñ¤ò»ÈÍÑ¤µ¤ì¤Æ¤¤¤ë¤«È½Äê
+                                 MOVE   ZERO       TO   FLG-NANBYO
+                                 IF  WRK-HKNCOMBI-DAY(IDX1) NOT =  ZERO
+                                     INITIALIZE            HKNCOMBI-REC
+                                     MOVE   LNK-NYULIFE-HOSPNUM
+                                                   TO  COMB-HOSPNUM
+                                     MOVE   LNK-NYULIFE-PTID 
+                                                   TO  COMB-PTID
+                                     MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                                   TO  COMB-HKNCOMBINUM
+                                     MOVE   "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                     MOVE    "key" TO  MCP-PATHNAME
+                                     PERFORM 910-HKNCOMBI-SELECT-SEC
+                                     IF   FLG-HKNCOMBI      =   ZERO
+                                       MOVE  "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                       MOVE  "key"  TO  MCP-PATHNAME
+                                       PERFORM   910-HKNCOMBI-READ-SEC
+                                       IF  FLG-HKNCOMBI         =  ZERO
+                                         IF  (COMB-KOHHKNNUM(1) = "054")
+                                          OR (COMB-KOHHKNNUM(2) = "054")
+                                          OR (COMB-KOHHKNNUM(3) = "054")
+                                          OR (COMB-KOHHKNNUM(4) = "054")
+                                             MOVE  1    TO   FLG-NANBYO
+                                         END-IF
+                                       END-IF
+                                     END-IF
+      *                              ÊÝ¸±ÁÈ¹ç¤»¥¯¥í¡¼¥º
+                                     MOVE    "tbl_hkncombi"
+                                                        TO  MCP-TABLE
+                                     MOVE    "key"      TO  MCP-PATHNAME
+                                     PERFORM   900-CLOSE-SEC
+                                 END-IF
+      *
+                                 IF   FLG-NANBYO  =   1
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                                 END-IF
                                END-IF
       *                        ÉÂ¾õ¤ÎÄøÅÙ¡¢¼£ÎÅ¤ÎÆâÍÆ¤ò¤·¤ó¼à¤·¤ÆÉ¸½à
       *                        ÉéÃ´³Û¤ò·Ú¸º¤¹¤ë´µ¼Ô¤ÎÈ½Äê¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ»»Äê»þ¤Î
@@ -1411,6 +1478,41 @@
       *
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¡¼¸¡º÷
+      *****************************************************************
+       910-HKNCOMBI-SELECT-SEC        SECTION.
+      *
+           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-HKNCOMBI
+           ELSE
+               MOVE    1                  TO  FLG-HKNCOMBI
+           END-IF
+      *
+           .
+       910-HKNCOMBI-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       910-HKNCOMBI-READ-SEC         SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  HKNCOMBI-REC
+               MOVE    ZERO                TO  FLG-HKNCOMBI
+           ELSE
+               INITIALIZE                      HKNCOMBI-REC
+               MOVE    1                   TO  FLG-HKNCOMBI
+           END-IF
+      *
+           .
+       910-HKNCOMBI-READ-EXT.
            EXIT.
       *
       *****************************************************************
