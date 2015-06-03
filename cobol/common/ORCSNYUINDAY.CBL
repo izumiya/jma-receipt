@@ -512,6 +512,7 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
                          END-IF
                       END-PERFORM
@@ -576,6 +577,7 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
                          END-IF
                       END-PERFORM
@@ -640,6 +642,7 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
                          END-IF
                       END-PERFORM
@@ -704,6 +707,7 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
                          END-IF
                       END-PERFORM
@@ -773,7 +777,9 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI3-KBN(IDX)
                          END-IF
                       END-PERFORM
                  END-IF
@@ -841,7 +847,9 @@
                                UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI-KBN(IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
+                            MOVE  "2"  TO  LNK-NYUINDAY-TANKI3-KBN(IDX)
                          END-IF
                       END-PERFORM
                  END-IF
@@ -962,7 +970,9 @@
                  UNTIL     IDX   >   31
                IF   WRK-TANKI-IGAI(IDX)  NOT =   SPACE
                    MOVE   SPACE     TO   LNK-NYUINDAY-KBN(IDX)
+                   MOVE   SPACE     TO   LNK-NYUINDAY-TANKI-KBN(IDX)
                    MOVE   SPACE     TO   LNK-NYUINDAY-TANKI2-KBN(IDX)
+                   MOVE   SPACE     TO   LNK-NYUINDAY-TANKI3-KBN(IDX)
                END-IF
            END-PERFORM
       *

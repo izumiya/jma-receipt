@@ -565,7 +565,7 @@
            COPY    "CPORCSSYOTOKU.INC".
       *
       *    入院料未算定日取得サブ
-           COPY    "CPORCSNYUINDAY2.INC".
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    医療区分取得サブ
            COPY    "CPORCSS008.INC".
@@ -696,11 +696,11 @@
       *    該当日の食事が生活療養に該当するか判定（サブプロより取得）
            MOVE    ZERO                    TO  WRK-KYUKYU-DAY
            MOVE    SPACE                   TO  WRK-KYUKYU-YMD
-           INITIALIZE                          ORCSNYUINDAY2-AREA
+           INITIALIZE                          ORCSNYUINDAY-AREA
            MOVE    LNK-NYULIFE-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
            MOVE    LNK-NYULIFE-PTID        TO  LNK-NYUINDAY-PTID
            MOVE    LNK-NYULIFE-SANTEIYM    TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY2"     USING   ORCSNYUINDAY2-AREA
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
                                                SPA-AREA
            IF      LNK-NYUINDAY-RC         =   ZERO
                    PERFORM    VARYING   IDX1   FROM   1   BY   1
@@ -1086,11 +1086,11 @@
       *
       *    短期滞在手術基本料２（短期滞在手術基本料３）の入院料未算定日
       *    について生活療養の該当日と軽減区分２の情報を取得（サブプロより取得）
-           INITIALIZE                          ORCSNYUINDAY2-AREA
+           INITIALIZE                          ORCSNYUINDAY-AREA
            MOVE    LNK-NYULIFE-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
            MOVE    LNK-NYULIFE-PTID        TO  LNK-NYUINDAY-PTID
            MOVE    LNK-NYULIFE-SANTEIYM    TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY2"     USING   ORCSNYUINDAY2-AREA
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
                                                SPA-AREA
            IF      LNK-NYUINDAY-RC         =   ZERO
                IF    LNK-NYUINDAY-TANKI2-TBL   NOT =    SPACE
