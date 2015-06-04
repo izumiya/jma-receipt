@@ -168,6 +168,8 @@
       *  04.07.14    NACL-ÌçÏÆ    15/01/16  Æþ±¡ÅÀÅ©¡§¿ÇÎÅ¼ïÊÌ¡Ö¡¥£³£´£°¡×¤Î
       *                                     ÆþÎÏ¥Á¥§¥Ã¥¯ÂÐ±þ
       *  04.07.15    NACL-ÌçÏÆ    15/02/02  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
+      *  04.07.16    NACL-ÌçÏÆ    15/06/02  Ã»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ»»Äê»þ¤Î
+      *                                     Æþ±¡ÉéÃ´¶â·×»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -266,6 +268,11 @@
                                  OCCURS   10.
               03 WRK-NYUINDAY-KYUKYU-KBN   PIC X(01)  OCCURS  31.
       *
+       01  WRK-NYUINDAY-TANKI-TABLE.
+           02  WRK-NYUINDAY-TANKI-TBL
+                                 OCCURS   10.
+              03 WRK-NYUINDAY-TANKI-KBN    PIC X(01)  OCCURS  31.
+      *
        01  WRK-NYUSANTEI-TABLE.
            02  WRK-NYUSANTEI-TBL OCCURS   10.
               03 WRK-NYUSANTEI-KBN         PIC X(01)  OCCURS  31.
@@ -290,6 +297,8 @@
            02  WRK-NYUINDAY-TAIHI-TBL      OCCURS    2.
               03  WRK-NYUINDAY-TAIHI-KBN   PIC X(01)  OCCURS  31.
               03  WRK-NYUINDAY-TAIHI-KYUKYU-KBN
+                                           PIC X(01)  OCCURS  31.
+              03  WRK-NYUINDAY-TAIHI-TANKI-KBN
                                            PIC X(01)  OCCURS  31.
               03  WRK-NYUINDAY-TAIHI-DOU-HKNCOMBI
                                            PIC 9(04)  OCCURS  31.
@@ -785,6 +794,7 @@
                          WRK-NYUINDAY-TABLE
                          WRK-NYUINDAY2-TABLE
                          WRK-NYUINDAY-KYUKYU-TABLE
+                         WRK-NYUINDAY-TANKI-TABLE
                          WRK-NYUSANTEI-TABLE
                          WRK-SYOSIN-TABLE
                          WRK-DOJITU-TABLE
@@ -881,6 +891,8 @@
       *
                 MOVE     WRK-NYUINDAY-TBL(IDX)
                                               TO  LNK-S02-NYUINDAY-TBL
+                MOVE     WRK-NYUINDAY-TANKI-TBL(IDX)
+                                        TO  LNK-S02-NYUINDAY-TANKI-TBL
                 MOVE     WRK-NYUSANTEI-TBL(IDX)
                                               TO  LNK-S02-NYUSANTEI-TBL
       *
@@ -1138,6 +1150,8 @@
       *
                 MOVE     WRK-NYUINDAY-TBL(IDX)
                                               TO  LNK-S02-NYUINDAY-TBL
+                MOVE     WRK-NYUINDAY-TANKI-TBL(IDX)
+                                        TO  LNK-S02-NYUINDAY-TANKI-TBL
                 MOVE     WRK-NYUSANTEI-TBL(IDX)
                                               TO  LNK-S02-NYUSANTEI-TBL
       *
@@ -1330,6 +1344,8 @@
                            WRK-NYUINDAY-TAIHI-KBN(IDX IDY)
                    MOVE  LNK-NYUINDAY-KYUKYU-KBN(IDY) TO
                            WRK-NYUINDAY-TAIHI-KYUKYU-KBN(IDX IDY)
+                   MOVE  LNK-NYUINDAY-TANKI-KBN(IDY) TO
+                           WRK-NYUINDAY-TAIHI-TANKI-KBN(IDX IDY)
                    MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDY) TO
                            WRK-NYUINDAY-TAIHI-DOU-HKNCOMBI(IDX IDY)
                    MOVE  LNK-NYUINDAY-DOUJITSU-SKJKBN(IDY) TO
@@ -2339,6 +2355,10 @@
       *
                 MOVE  WRK-NYUINDAY-TAIHI-KYUKYU-KBN(IDX7 IDY)
                              TO  WRK-NYUINDAY-KYUKYU-KBN(IDX IDY)
+      *
+                MOVE  WRK-NYUINDAY-TAIHI-TANKI-KBN(IDX7 IDY)
+                             TO  WRK-NYUINDAY-TANKI-KBN(IDX IDY)
+      *
                 IF    WRK-NYUINDAY-TAIHI-KYUKYU-KBN(IDX7 IDY) =  "1"
                   IF   IDX7  =   1
                     IF   (WRK-DAY1(1 IDY)  NOT =  ZERO)
