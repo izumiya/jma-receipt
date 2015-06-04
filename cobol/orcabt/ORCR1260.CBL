@@ -64,6 +64,7 @@
       *                                     （初再診料・低妥結率対応）
       *  04.07.05    NACL-門脇    14/12/24  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
+      *  04.07.06    NACL-門脇    15/06/02  記載不要なシステム予約コードの対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
@@ -604,11 +605,15 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    寝たきり老人在宅総合診療科算定終了
            03  FILLER          PIC X(09)   VALUE   "099140001".
+      *    短期滞在一部負担金まとめ徴収
+           03  FILLER          PIC X(09)   VALUE   "099409908".
+      *    短期滞在一部負担金徴収なし
+           03  FILLER          PIC X(09)   VALUE   "099409909".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   17.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   17.
       *
       *    固定値
        01  CONST-AREA.

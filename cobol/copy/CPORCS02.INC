@@ -36,6 +36,8 @@
       *
       * 04.07.01     NACL-門脇    15/02/02  システム管理２０１０機能追
       *                                     加対応
+      * 04.07.02     NACL-門脇    15/06/02  短期滞在手術等基本料算定時の
+      *                                     入院負担金計算対応
       ************************************************************
       *01  LNK-ORCS02-REC.
       *医療機関ＩＤ
@@ -94,6 +96,11 @@
       *入院料未算定区分
            03  LNK-S02-NYUINDAY-TBL.
               05  LNK-S02-NYUINDAY-KBN     PIC  X(01)   OCCURS  31.
+      *
+      *短期滞在手術等基本料算定区分
+           03  LNK-S02-NYUINDAY-TANKI-TBL.
+              05  LNK-S02-NYUINDAY-TANKI-KBN
+                                           PIC  X(01)   OCCURS  31.
       *
       *入院料算定識別区分
            03  LNK-S02-NYUSANTEI-TBL.
