@@ -2021,10 +2021,10 @@
            MOVE    "合計"              TO  HCM33-BIKOU (CNT-MEI)
            MOVE    WRK-TUK-ZAITEN      TO  WRK-Z89
            MOVE    WRK-Z89             TO  HCM33-NAIYO (CNT-MEI 8)
-           MOVE    WRK-TUK-SKYMONEY    TO  WRK-Z89
-           MOVE    WRK-Z89             TO  HCM33-NAIYO (CNT-MEI 9)
-           MOVE    WRK-TUK-JIHIKEI     TO  WRK-Z89
-           MOVE    WRK-Z89             TO  HCM33-NAIYO (CNT-MEI 10)
+           MOVE    WRK-TUK-SKYMONEY    TO  WRK-Z79S
+           MOVE    WRK-Z79S            TO  HCM33-NAIYO (CNT-MEI 9)
+           MOVE    WRK-TUK-JIHIKEI     TO  WRK-Z79S
+           MOVE    WRK-Z79S            TO  HCM33-NAIYO (CNT-MEI 10)
       *
            IF      WRK-TUK-RSI-MONEY   =   ZERO
                CONTINUE
@@ -2257,10 +2257,10 @@
            MOVE    "合計"              TO  HCM331-BIKOU (CNT-MEI)
            MOVE    WRK-TUK-ZAITEN      TO  WRK-Z89
            MOVE    WRK-Z89             TO  HCM331-NAIYO (CNT-MEI 8)
-           MOVE    WRK-TUK-SKYMONEY    TO  WRK-Z89
-           MOVE    WRK-Z89             TO  HCM331-NAIYO (CNT-MEI 9)
-           MOVE    WRK-TUK-JIHIKEI    TO  WRK-Z89
-           MOVE    WRK-Z89             TO  HCM331-NAIYO (CNT-MEI 10)
+           MOVE    WRK-TUK-SKYMONEY    TO  WRK-Z79S
+           MOVE    WRK-Z79S            TO  HCM331-NAIYO (CNT-MEI 9)
+           MOVE    WRK-TUK-JIHIKEI     TO  WRK-Z79S
+           MOVE    WRK-Z79S            TO  HCM331-NAIYO (CNT-MEI 10)
       *
            IF      WRK-TUK-RSI-MONEY   =   ZERO
       *        印刷処理
