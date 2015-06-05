@@ -27897,9 +27897,9 @@
                      IF   COMB-HKNCOMBINUM  =  ACCT-HKNCOMBI
                        PERFORM  VARYING  IDX22  FROM  1  BY  1
                                  UNTIL   IDX22   >   31
-                         IF  (LNK-S02-NYUINDAY-TANKI-KBN(IDX22) = "1" )
-                         AND (ACCT-DAY(1 IDX22)             NOT = ZERO)
-                         AND (LNK-SYU-DAY(IDX22)                = "1" )
+                         IF  (ACCT-DAY(1 IDX22)             NOT = ZERO)
+      ***                AND (LNK-S02-NYUINDAY-TANKI-KBN(IDX22) = "1" )
+      ***                AND (LNK-SYU-DAY(IDX22)                = "1" )
                            ADD   ACCT-DAY(1 IDX22)
                                            TO  WK-TANKI-CYOSYU(IDX22)
                          END-IF
@@ -27965,8 +27965,8 @@
                      IF   COMB-HKNCOMBINUM  =  ACCT-HKNCOMBI
                        PERFORM  VARYING  IDX22  FROM  1  BY  1
                                  UNTIL   IDX22   >   31
-                         IF  (LNK-S02-NYUINDAY-TANKI-KBN(IDX22) = "1" )
-                         AND (ACCT-DAY(1 IDX22)             NOT = ZERO)
+                         IF  (ACCT-DAY(1 IDX22)             NOT = ZERO)
+      ***                AND (LNK-S02-NYUINDAY-TANKI-KBN(IDX22) = "1" )
                            MOVE     1      TO  WK-TANKI-MICYOSYU(IDX22)
                          END-IF
                        END-PERFORM
