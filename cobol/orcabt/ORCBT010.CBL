@@ -127,6 +127,7 @@
       *  04.07.05    NACL-藤原    14/08/18  ７５歳以上の海外居住者２割対応
       *  04.07.06    NACL-門脇    14/09/01  平成２６年１０月改正対応
       *  04.07.07    NACL-門脇    15/03/16  平成２７年４月改正対応
+      *  04.07.08    NACL-藤原    15/05/12  存在しない保険組合せの情報設定
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -1013,6 +1014,11 @@ grpsys             PERFORM 900-DBSELECT-SEC
                        MOVE    HKNCOMBI-REC    TO
                                            WRK-HKNCOMBI-REC  (IDX1)
                    ELSE
+                       MOVE    WRK-PARA-HOSPNUM 
+                                               TO
+                                           WRK-COMB-HOSPNUM     (IDX1)
+                       MOVE    PTINF-PTID      TO
+                                           WRK-COMB-PTID        (IDX1)
                        MOVE    WRK-DAY (2 IDX) TO
                                            WRK-COMB-HKNCOMBINUM (IDX1)
                        MOVE    "1"     TO  WRK-HKNCOMBI-SYOKBN  (IDX1)
@@ -1100,7 +1106,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            MOVE    "1"             TO  WRK-UPDKBN
                        END-IF
                    ELSE
-                      MOVE    "1"             TO  WRK-TEISEIKBN
+                       MOVE    WRK-PARA-HOSPNUM
+                                              TO  COMB-HOSPNUM
+                       MOVE    PTINF-PTID     TO  COMB-PTID
+                       MOVE    KEY-N-HKNCOMBI TO  COMB-HKNCOMBINUM 
+                       MOVE    "1"            TO  WRK-TEISEIKBN
                    END-IF
                END-IF
       *             
@@ -1329,6 +1339,10 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                                MOVE    "1"             TO  WRK-UPDKBN
                            END-IF
                        ELSE
+                           MOVE    WRK-PARA-HOSPNUM
+                                                   TO  COMB-HOSPNUM
+                           MOVE    KEY-N-PTID      TO  COMB-PTID
+                           MOVE    KEY-N-HKNCOMBI  TO  COMB-HKNCOMBINUM 
                            MOVE    "1"             TO  WRK-TEISEIKBN
                        END-IF
                    END-IF    
@@ -1416,8 +1430,8 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
       *
       *    年齢
            INITIALIZE                  ORCSAGECHKAREA
-           MOVE    COMB-HOSPNUM    TO  AGECHK-HOSPNUM
-           MOVE    TOUKEI01-PTID   TO  AGECHK-PTID
+           MOVE    PTINF-HOSPNUM   TO  AGECHK-HOSPNUM
+           MOVE    PTINF-PTID      TO  AGECHK-PTID
            MOVE    WRK-PARA-SRYYM  TO  AGECHK-SRYYMD(1:6)
            MOVE    "01"            TO  AGECHK-SRYYMD(7:2)
            MOVE    PTINF-BIRTHDAY  TO  AGECHK-BIRTHDAY
@@ -1478,7 +1492,7 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI01-HOSPNUM
            MOVE    WRK-PARA-SRYYM      TO  TOUKEI01-SRYYM
            MOVE    WRK-PARA-NYUGAIKBN  TO  TOUKEI01-NYUGAIKBN
-           MOVE    COMB-PTID           TO  TOUKEI01-PTID
+           MOVE    PTINF-PTID          TO  TOUKEI01-PTID
            MOVE    COMB-HKNNUM         TO  TOUKEI01-HKNNUM
            MOVE    PTHKN-HONKZKKBN     TO  TOUKEI01-HONKZKKBN
            IF      COMB-HKNNUM         =   SPACE
@@ -3701,8 +3715,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                MOVE    HKNCOMBI-REC    TO
                                                WRK-HKNCOMBI-REC(IDX1)
                            ELSE
+                               MOVE    WRK-PARA-HOSPNUM
+                                                       TO
+                                           WRK-COMB-HOSPNUM     (IDX1)
+                               MOVE    PTINF-PTID      TO
+                                           WRK-COMB-PTID        (IDX1)
                                MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI
-                                                               (IDXX)
+                                                                (IDXX)
                                                        TO
                                            WRK-COMB-HKNCOMBINUM (IDX1)
                                MOVE    "1"             TO
