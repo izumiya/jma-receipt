@@ -222,7 +222,7 @@
            03  KEY-SRYCD               PIC X(09).
       *
        01  CSV-EDIT-AREA.
-           03  CSV-NO                  PIC Z(9)9.
+           03  CSV-NO                  PIC Z(10).
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CSV-PTNUM               PIC X(20).
            03  FILLER                  PIC X(01)   VALUE ",".
@@ -581,6 +581,7 @@
       *
            MOVE    ZERO            TO  KEY-PTID
            MOVE    LOW-VALUE       TO  KEY-SRYCD
+           MOVE    ZERO            TO  FLG-EDIT
       *
       *    患者対象データ検索処理
            PERFORM 910-PTSRH-ODR-SEL-SEC
@@ -764,27 +765,15 @@
        800-CSV-EDIT-SEC                SECTION.
       *
            INITIALIZE                  CSV-EDIT-AREA
-                                       CSV-NO
-                                       CSV-PTNUM
-                                       CSV-NAME
-                                       CSV-KANANAME
-                                       CSV-SEX
-                                       CSV-BIRTHDAY
-                                       CSV-AGENUM
-                                       CSV-AGETANI
-                                       CSV-SRYCD
-                                       CSV-SRYNAME
-                                       CSV-SRYKANANAME
-                                       CSV-SRYSURYO
-                                       CSV-ZAIKAISU
-                                       CSV-SURYOTOTAL
-                                       CSV-SRYYM
       *
            COMPUTE CNT-CSV =   CNT-CSV +   1
            IF    ( CNT-CSV =   1 )
                MOVE    CONST-CSV-HEADER
                                    TO  CSV-REC
                WRITE   CSV-REC
+      *
+               INITIALIZE              CSV-EDIT-AREA
+      *
            END-IF
       *
            PERFORM VARYING IDXD    FROM    1   BY  1
@@ -797,51 +786,56 @@
                COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
                MOVE    PTSRH-PTID  TO  KEY-PTID
                MOVE    PTSRH-SRYCD TO  KEY-SRYCD
+               MOVE    1           TO  FLG-EDIT
            END-IF
       *
-           MOVE    CNT-RENNUM      TO  CSV-NO
-           MOVE    PTSRH-PTNUM
-                                   TO  CSV-PTNUM
-           MOVE    PTINF-NAME
-                                   TO  CSV-NAME
-           MOVE    PTINF-KANANAME
-                                   TO  CSV-KANANAME
-           EVALUATE    PTINF-SEX
-           WHEN    1
-               MOVE    "男"        TO  CSV-SEX
-           WHEN    2
-               MOVE    "女"        TO  CSV-SEX
-           WHEN    OTHER
-               MOVE    SPACE       TO  CSV-SEX
-           END-EVALUATE
+           IF    ( FLG-EDIT        NOT =   ZERO )
       *
-           MOVE    PTINF-BIRTHDAY (1:4)
+               MOVE    ZERO        TO  FLG-EDIT
+      *
+               MOVE    CNT-RENNUM  TO  CSV-NO
+               MOVE    PTSRH-PTNUM TO  CSV-PTNUM
+               MOVE    PTINF-NAME
+                                   TO  CSV-NAME
+               MOVE    PTINF-KANANAME
+                                   TO  CSV-KANANAME
+               EVALUATE    PTINF-SEX
+               WHEN    1
+                   MOVE    "男"    TO  CSV-SEX
+               WHEN    2
+                   MOVE    "女"    TO  CSV-SEX
+               WHEN    OTHER
+                   MOVE    SPACE   TO  CSV-SEX
+               END-EVALUATE
+      *
+               MOVE    PTINF-BIRTHDAY (1:4)
                                    TO  CSV-BIRTHDAY (1:4)
-           MOVE    "/"             TO  CSV-BIRTHDAY (5:1)
-           MOVE    PTINF-BIRTHDAY (5:2)
+               MOVE    "/"         TO  CSV-BIRTHDAY (5:1)
+               MOVE    PTINF-BIRTHDAY (5:2)
                                    TO  CSV-BIRTHDAY (6:2)
-           MOVE    "/"             TO  CSV-BIRTHDAY (8:1)
-           MOVE    PTINF-BIRTHDAY (7:2)
+               MOVE    "/"         TO  CSV-BIRTHDAY (8:1)
+               MOVE    PTINF-BIRTHDAY (7:2)
                                    TO  CSV-BIRTHDAY (9:2)
       *
-           PERFORM 900-AGE-EDIT-SEC
-           MOVE    WRK-AGE-Z       TO  CSV-AGENUM
-           MOVE    WRK-AGE-MEI     TO  CSV-AGETANI
+               PERFORM 900-AGE-EDIT-SEC
+               MOVE    WRK-AGE-Z   TO  CSV-AGENUM
+               MOVE    WRK-AGE-MEI TO  CSV-AGETANI
       *
-           MOVE    PTSRH-SRYCD     TO  CSV-SRYCD
-           MOVE    PTSRH-SRYNAME   TO  CSV-SRYNAME
-           MOVE    PTSRH-SRYKANANAME   TO  CSV-SRYKANANAME
-           IF    ( PTSRH-SURYO-EDIT    =   1 )
-               PERFORM 8001-SRYSURYO-EDIT-SEC
-               MOVE    WRK-SRYSURYOX
+               MOVE    PTSRH-SRYCD     TO  CSV-SRYCD
+               MOVE    PTSRH-SRYNAME   TO  CSV-SRYNAME
+               MOVE    PTSRH-SRYKANANAME   TO  CSV-SRYKANANAME
+               IF    ( PTSRH-SURYO-EDIT    =   1 )
+                   PERFORM 8001-SRYSURYO-EDIT-SEC
+                   MOVE    WRK-SRYSURYOX
                                    TO  CSV-SRYSURYO
+               END-IF
+      *
+               MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
+               MOVE    WRK-ZAIKAISUZ   TO  CSV-ZAIKAISU
+      *
+               PERFORM 8001-SURYOTOTAL-EDIT-SEC
+               MOVE    WRK-SURYOTOTALX TO  CSV-SURYOTOTAL
            END-IF
-      *
-           MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
-           MOVE    WRK-ZAIKAISUZ   TO  CSV-ZAIKAISU
-      *
-           PERFORM 8001-SURYOTOTAL-EDIT-SEC
-           MOVE    WRK-SURYOTOTALX TO  CSV-SURYOTOTAL
       *
            MOVE    PTSRH-SRYYM(1:4)
                                    TO  CSV-SRYYM (1:4)
@@ -1401,7 +1395,9 @@
                    COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
                    MOVE    PTSRH-PTID  TO  KEY-PTID
                    MOVE    PTSRH-SRYCD TO  KEY-SRYCD
-      *
+                   MOVE    1           TO  FLG-EDIT
+               ELSE
+                   MOVE    ZERO        TO  FLG-EDIT
                END-IF
       *
            END-PERFORM
