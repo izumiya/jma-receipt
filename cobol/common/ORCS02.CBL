@@ -408,6 +408,7 @@
       *  04.07.31    NACL-ÌçÏÆ    15/05/28  ¿À¸Í»ÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       *  04.07.32    NACL-ÌçÏÆ    15/06/02  Ã»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ»»Äê»þ¤Î
       *                                     Æþ±¡ÉéÃ´¶â·×»»ÂÐ±þ
+      *  04.07.33    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5658,7 +5659,8 @@
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
                OR (((COMB-KOH1HKNNUM = "054"               ) OR
                     (COMB-KOH2HKNNUM = "054"               )) AND
-                   ( WK-KOH-FTNJANUM(5:3) = "601" OR "501"  ) AND
+                   ( WK-KOH-FTNJANUM(5:3) = "601" OR "501"
+                                                  OR "602"  ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "54"            ) AND
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
                OR (  WK-KOHJGNGET-TEKIYOFLG(1) =  1          )
@@ -5915,7 +5917,8 @@
            END-IF
       *
            IF  (COMB-KOH1HKNNUM      = "054"         )
-           AND (WK-KOH-FTNJANUM(5:3) = "601" OR "501")
+           AND (WK-KOH-FTNJANUM(5:3) = "601" OR "501"
+                                             OR "602")
            AND (WK-KOH-FTNJANUM(1:2) = "54"          )
            AND (LNK-SYU-SRYYMD(1:6) >= "201501"      )
              IF   WK-KOH-FTNJANUM(5:3) = "601"
@@ -5924,10 +5927,14 @@
              IF   WK-KOH-FTNJANUM(5:3) = "501"
                MOVE     1     TO    WK-TOKUSITU-SKJ(1)
              END-IF
+             IF   WK-KOH-FTNJANUM(5:3) = "602"
+               MOVE     3     TO    WK-TOKUSITU-SKJ(1)
+             END-IF
            END-IF
       *
            IF  (COMB-KOH2HKNNUM      = "054"         )
-           AND (WK-KOH-FTNJANUM(5:3) = "601" OR "501")
+           AND (WK-KOH-FTNJANUM(5:3) = "601" OR "501"
+                                             OR "602")
            AND (WK-KOH-FTNJANUM(1:2) = "54"          )
            AND (LNK-SYU-SRYYMD(1:6) >= "201501"      )
              IF   WK-KOH-FTNJANUM(5:3) = "601"
@@ -5935,6 +5942,9 @@
              END-IF
              IF   WK-KOH-FTNJANUM(5:3) = "501"
                MOVE     1     TO    WK-TOKUSITU-SKJ(2)
+             END-IF
+             IF   WK-KOH-FTNJANUM(5:3) = "602"
+               MOVE     3     TO    WK-TOKUSITU-SKJ(2)
              END-IF
            END-IF
       *
@@ -24631,6 +24641,11 @@
                   MOVE   1     TO   FLG-NYUSKJJYOGAK
                END-IF
                IF  (WK-TOKUSITU-SKJ(KOH-IDX)        =   9)
+               AND (WK-TOKUSITU-SKJGENMEN(KOH-IDX)  =   1)
+                    MOVE  "3"    TO   WK-NYUSKJRYYKBN
+                    MOVE  ZERO   TO   FLG-NYUSKJJYOGAK
+               END-IF
+               IF  (WK-TOKUSITU-SKJ(KOH-IDX)        =   3)
                AND (WK-TOKUSITU-SKJGENMEN(KOH-IDX)  =   1)
                     MOVE  "3"    TO   WK-NYUSKJRYYKBN
                     MOVE  ZERO   TO   FLG-NYUSKJJYOGAK
