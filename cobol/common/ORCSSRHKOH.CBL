@@ -34,6 +34,7 @@
       *                                     （０５４、０５２対応）
       *  04.07.02    NACL-門脇    15/01/26  平成２７年１月改正対応
       *                                     （都道府県独自難病対応）
+      *  04.07.03    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -330,7 +331,8 @@
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
                                            =   "054"          )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
-                                           =   "601" OR "501" )
+                                           =   "601" OR "501"
+                                                     OR "602" )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
                                            =   "54"           )
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)

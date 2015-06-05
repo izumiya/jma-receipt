@@ -693,6 +693,7 @@
       *                                     ¡ÚÇÛ¡Û²ó¿ôµ­ºÜÂÐ±þ
       *  04.07.43    NACL-ÌçÏÆ    15/05/01  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.07.44    NACL-ÌçÏÆ    15/05/18  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.07.46    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -7376,7 +7377,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (( RECE02-KOHNUM(1)    = "054"                 ) AND
-                   ( RECE02-KOHFTNJANUM(1)(5:3) = "601" OR "501" ) AND
+                   ( RECE02-KOHFTNJANUM(1)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE02-KOHFTNJANUM(1)(1:2) = "54"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (((RECE02-KOHNUM(2)    = "051" OR "091"       ) OR
@@ -7394,7 +7396,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (( RECE02-KOHNUM(2)    = "054"                 ) AND
-                   ( RECE02-KOHFTNJANUM(2)(5:3) = "601" OR "501" ) AND
+                   ( RECE02-KOHFTNJANUM(2)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE02-KOHFTNJANUM(2)(1:2) = "54"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (((RECE02-KOHNUM(3)    = "051" OR "091"       ) OR
@@ -7412,7 +7415,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (( RECE02-KOHNUM(3)    = "054"                 ) AND
-                   ( RECE02-KOHFTNJANUM(3)(5:3) = "601" OR "501" ) AND
+                   ( RECE02-KOHFTNJANUM(3)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE02-KOHFTNJANUM(3)(1:2) = "54"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (((RECE02-KOHNUM(4)    = "051" OR "091"       ) OR
@@ -7430,7 +7434,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (( RECE02-KOHNUM(4)    = "054"                 ) AND
-                   ( RECE02-KOHFTNJANUM(4)(5:3) = "601" OR "501" ) AND
+                   ( RECE02-KOHFTNJANUM(4)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE02-KOHFTNJANUM(4)(1:2) = "54"           ) AND
                    ( RECE02-SRYYM              >= "201501"       ))
                OR (  WRK-KOHJGNGET-TEKIYOFLG(1) =  1              )
@@ -7453,7 +7458,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (( RECE02-KOHNUM(1)    = "054"                 ) AND
-                     ( RECE02-KOHFTNJANUM(1)(5:3) = "601" OR "501" ) AND
+                     ( RECE02-KOHFTNJANUM(1)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE02-KOHFTNJANUM(1)(1:2) = "54"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(1) =  1              )
@@ -7474,7 +7480,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (( RECE02-KOHNUM(2)    = "054"                 ) AND
-                     ( RECE02-KOHFTNJANUM(2)(5:3) = "601" OR "501" ) AND
+                     ( RECE02-KOHFTNJANUM(2)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE02-KOHFTNJANUM(2)(1:2) = "54"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(2) =  1              )
@@ -7495,7 +7502,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (( RECE02-KOHNUM(3)    = "054"                 ) AND
-                     ( RECE02-KOHFTNJANUM(3)(5:3) = "601" OR "501" ) AND
+                     ( RECE02-KOHFTNJANUM(3)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE02-KOHFTNJANUM(3)(1:2) = "54"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(3) =  1              )
@@ -7516,7 +7524,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (( RECE02-KOHNUM(4)    = "054"                 ) AND
-                     ( RECE02-KOHFTNJANUM(4)(5:3) = "601" OR "501" ) AND
+                     ( RECE02-KOHFTNJANUM(4)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE02-KOHFTNJANUM(4)(1:2) = "54"           ) AND
                      ( RECE02-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(4) =  1              )
@@ -22202,6 +22211,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *      °¦É²¸©ÃÏÊý¸øÈñ
              WHEN    "38"
                IF  (RECE02-SRYYM        >=  "200804"  )
+               AND (RECE02-TEISYUTUSAKI  =   2  OR  6 )
                AND (RECE02-ZAITAKU       =  "1" OR "2")
                  IF  (RECE02-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
                  AND (RECE02-KOHNUM(2)       =  SPACE            )
@@ -22295,6 +22305,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF  (RECE02-SRYYM        >=  "200804" )
                AND (RECE02-TEISYUTUSAKI  =   2  OR  6)
                AND (RECE02-ZAITAKU       =  "1"      )
+      ***********IF  (RECE02-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+      ***********AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
                  IF  (RECE02-KOHNUM(1)   =  "282"                )
                  AND (RECE02-KOHNUM(2)   =  SPACE                )
                  AND (RECE02-KOHNUM(3)   =  SPACE                )

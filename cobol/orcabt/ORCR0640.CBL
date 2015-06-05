@@ -678,6 +678,7 @@
       *  04.07.44    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.45    NACL-ÌçÏÆ    15/05/01  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.07.46    NACL-ÌçÏÆ    15/05/18  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.07.47    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -25649,6 +25650,7 @@
       *      °¦É²¸©ÃÏÊý¸øÈñ
              WHEN    "38"
                IF  (RECE62-SRYYM        >=  "200804"  )
+               AND (RECE62-TEISYUTUSAKI  =   2  OR  6 )
                AND (RECE62-KOUREI        =  "1" OR "2")
                  IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
                  AND (RECE62-KOHNUM(2)       =  SPACE            )
@@ -25733,6 +25735,8 @@
                IF  (RECE62-SRYYM        >=  "200804" )
                AND (RECE62-TEISYUTUSAKI  =   2  OR  6)
                AND (RECE62-KOUREI        =  "1"      )
+      ***********IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+      ***********AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
                  IF  (RECE62-KOHNUM(1)   =  "282"                )
                  AND (RECE62-KOHNUM(2)   =  SPACE                )
                  AND (RECE62-KOHNUM(3)   =  SPACE                )
@@ -29066,7 +29070,8 @@
                    ( RECE62-KOHFTNJANUM(1)(1:2) = "52"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (( RECE62-KOHNUM(1)    = "054"                 ) AND
-                   ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "501" ) AND
+                   ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(1)(1:2) = "54"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (((RECE62-KOHNUM(2)    = "051" OR "091"       ) OR
@@ -29084,7 +29089,8 @@
                    ( RECE62-KOHFTNJANUM(2)(1:2) = "52"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (( RECE62-KOHNUM(2)    = "054"                 ) AND
-                   ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "501" ) AND
+                   ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(2)(1:2) = "54"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (((RECE62-KOHNUM(3)    = "051" OR "091"       ) OR
@@ -29102,7 +29108,8 @@
                    ( RECE62-KOHFTNJANUM(3)(1:2) = "52"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (( RECE62-KOHNUM(3)    = "054"                 ) AND
-                   ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "501" ) AND
+                   ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(3)(1:2) = "54"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (((RECE62-KOHNUM(4)    = "051" OR "091"       ) OR
@@ -29120,7 +29127,8 @@
                    ( RECE62-KOHFTNJANUM(4)(1:2) = "52"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (( RECE62-KOHNUM(4)    = "054"                 ) AND
-                   ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "501" ) AND
+                   ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "501"
+                                                        OR "602" ) AND
                    ( RECE62-KOHFTNJANUM(4)(1:2) = "54"           ) AND
                    ( RECE62-SRYYM              >= "201501"       ))
                OR (  WRK-KOHJGNGET-TEKIYOFLG(1) =  1              )
@@ -29143,7 +29151,8 @@
                      ( RECE62-KOHFTNJANUM(1)(1:2) = "52"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (( RECE62-KOHNUM(1)    = "054"                 ) AND
-                     ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "501" ) AND
+                     ( RECE62-KOHFTNJANUM(1)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE62-KOHFTNJANUM(1)(1:2) = "54"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(1) =  1              )
@@ -29164,7 +29173,8 @@
                      ( RECE62-KOHFTNJANUM(2)(1:2) = "52"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (( RECE62-KOHNUM(2)    = "054"                 ) AND
-                     ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "501" ) AND
+                     ( RECE62-KOHFTNJANUM(2)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE62-KOHFTNJANUM(2)(1:2) = "54"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(2) =  1              )
@@ -29185,7 +29195,8 @@
                      ( RECE62-KOHFTNJANUM(3)(1:2) = "52"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (( RECE62-KOHNUM(3)    = "054"                 ) AND
-                     ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "501" ) AND
+                     ( RECE62-KOHFTNJANUM(3)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE62-KOHFTNJANUM(3)(1:2) = "54"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(3) =  1              )
@@ -29206,7 +29217,8 @@
                      ( RECE62-KOHFTNJANUM(4)(1:2) = "52"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (( RECE62-KOHNUM(4)    = "054"                 ) AND
-                     ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "501" ) AND
+                     ( RECE62-KOHFTNJANUM(4)(5:3) = "601" OR "501"
+                                                          OR "602" ) AND
                      ( RECE62-KOHFTNJANUM(4)(1:2) = "54"           ) AND
                      ( RECE62-SRYYM              >= "201501"       ))
                  OR (  WRK-KOHJGNGET-TEKIYOFLG(4) =  1              )

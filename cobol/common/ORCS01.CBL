@@ -447,6 +447,7 @@
       *                                     ¤Îµ¡Ç½¤Ë¤Ä¤¤¤Æ¡¢¿ÇÎÅºÑ¤ß¥Ç¡¼¥¿
       *                                     ¤Î¥»¥ì¥¯¥È¾ò·ï½¤Àµ
       *  04.07.29    NACL-ÌçÏÆ    15/05/28  ¿À¸Í»ÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
+      *  04.07.30    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5816,7 +5817,8 @@
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
                OR (((COMB-KOH1HKNNUM = "054"               ) OR
                     (COMB-KOH2HKNNUM = "054"               )) AND
-                   ( WK-KOH-FTNJANUM(5:3) = "601" OR "501"  ) AND
+                   ( WK-KOH-FTNJANUM(5:3) = "601" OR "501"
+                                                  OR "602"  ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "54"            ) AND
                    ( LNK-SYU-SRYYMD(1:6) >= "201501"        ))
                OR (  WK-KOHJGNGET-TEKIYOFLG(1) =  1          )
