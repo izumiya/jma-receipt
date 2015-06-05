@@ -205,8 +205,10 @@
       *  04.07.19    NACL-門脇    15/01/07  平成２７年１月改正対応
       *                                     （公費請求テーブル編集）
       *  04.07.20    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
-      *  04.07.23    NACL-藤原    15/02/04  請求管理への公費情報の更新
-      *  04.07.24    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
+      *  04.07.21    NACL-藤原    15/02/04  請求管理への公費情報の更新
+      *  04.07.22    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
+      *  04.07.23    NACL-藤原    15/06/04  ＥＦファイルに種別不明分があ
+      *                                     れば処理終了
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1489,6 +1491,9 @@
       *
       *    ＥＦファイル作成・連携基盤用のとき処理終了
            IF      WRK-PARA-PRTKBN      =   "9" OR  "8"
+               IF      WRK-PARA-PRTKBN      =   "8"
+                   PERFORM 1001-EFOUT-CHECK-SEC
+               END-IF
                MOVE    2                    TO  FLG-STS
            ELSE
                IF      FLG-STS             =   ZERO
@@ -2353,6 +2358,37 @@
       *
            .
        1201-HENTETU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＥＦファイル種別不明分チェック処理
+      *****************************************************************
+       1001-EFOUT-CHECK-SEC        SECTION.
+      *
+           PERFORM 990-RECE62-READ-SEC
+      *
+           PERFORM         UNTIL   FLG-RECE62     =   1
+      *        不明分があれば処理終了
+               IF      RECE62-RECESYUBETU  =   ZERO
+                   STRING   "レセプトが種別不明です　患者番号＝"
+                                               DELIMITED  BY  SIZE
+                            RECE62-PTNUM       DELIMITED  BY  SIZE
+                                               INTO  WRK-RECEERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   STRING  "ORCR0730 "         DELIMITED   BY  SIZE
+                           WRK-RECEERR         DELIMITED   BY  SPACE
+                           LOW-VALUE           DELIMITED   BY  SIZE
+                                              INTO    WRK-ERRMSG
+                   END-STRING
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+      *
+               PERFORM 990-RECE62-READ-SEC
+           END-PERFORM
+      *
+           .
+       1001-EFOUT-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
