@@ -4077,6 +4077,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                END-PERFORM
                IF    FLG-ARI  =  1
       *          【配】の有無チェック
+                IF  RECE02-HAICOMFLG  =  ZERO
                  MOVE       ZERO         TO  WRK-COL
                  INSPECT  RECECOM-COMMENT  TALLYING  WRK-COL
                                            FOR ALL   CONS-HAICOM1,
@@ -4085,6 +4086,15 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  IF      WRK-COL         >   ZERO
                      MOVE    1           TO  RECE02-HAICOMFLG
                  END-IF
+                END-IF
+                IF  RECE02-HAICOMFLG  =  ZERO
+                 IF  ( RECECOM-COMMENT(1:2) = "配" )
+                 AND ((RECECOM-COMMENT(5:2) = "回") OR
+                      (RECECOM-COMMENT(7:2) = "回") OR
+                      (RECECOM-COMMENT(9:2) = "回"))
+                     MOVE    1           TO  RECE02-HAICOMFLG
+                 END-IF
+                END-IF
                END-IF
                MOVE      "tbl_rececom"   TO  MCP-TABLE
                MOVE      "key7"          TO  MCP-PATHNAME
@@ -11011,6 +11021,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                IF   ( ACCT-SRYKBN           =   "99"  )
                AND  ((SRY-SRYCD(IDX2)(1:1)  =   "8"  ) OR
                      (SRY-SRYCD(IDX2)(1:3)  =   "008"))
+                IF  RECE02-HAICOMFLG  =  ZERO
                  MOVE       ZERO         TO  WRK-COL
                  INSPECT  RECE05-NAME(IDX4)  TALLYING  WRK-COL
                                              FOR ALL   CONS-HAICOM1,
@@ -11019,6 +11030,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                  IF      WRK-COL         >   ZERO
                      MOVE    1           TO  RECE02-HAICOMFLG
                  END-IF
+                END-IF
+                IF  RECE02-HAICOMFLG  =  ZERO
+                 IF  ( RECE05-NAME(IDX4)(1:2) = "配" )
+                 AND ((RECE05-NAME(IDX4)(5:2) = "回") OR
+                      (RECE05-NAME(IDX4)(7:2) = "回") OR
+                      (RECE05-NAME(IDX4)(9:2) = "回"))
+                     MOVE    1           TO  RECE02-HAICOMFLG
+                 END-IF
+                END-IF
                END-IF
       *
                IF  SRY-SRYCD(IDX2)        =     CONS-ZANHAIKI
