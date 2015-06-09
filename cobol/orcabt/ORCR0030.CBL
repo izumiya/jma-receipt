@@ -693,6 +693,8 @@
       *                                     【配】回数記載対応
       *  04.07.43    NACL-門脇    15/05/01  保険欄一部負担金記載修正
       *  04.07.44    NACL-門脇    15/05/18  ７０歳代前半特例一部負担金記載修正
+      *  04.07.45    NACL-門脇    15/06/02  連携基盤・ＥＦファイル用データ
+      *                                     編集修正
       *  04.07.46    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
@@ -9663,6 +9665,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                     "24" AND "90" AND "92" AND "93" AND
                                     "97" AND "98"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
+                               OR ((ACCT-SRYKBN     = "98"       )  AND
+                                   (WRK-PARA-PRTKBN = "9" OR "8" )  AND
+                                   (ACCT-SRYCDTOTAL =
+                                      00000099209910  OR
+                                      00000099209911             ))
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
                                  AND (ACCT-MEISAISU      =   1    )
@@ -10282,14 +10289,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
              OR     ( FLG-HENSYU-NG2    NOT =  ZERO         )
              OR     ( SRY-SRYCD(IDX2)       =
-                      "099209902" OR "099209903" OR
-                      "099209904" OR "099209905" OR
-                      "099209906" OR "099209907" OR
-                      "099209908" OR
+                      "099209902" OR "099209904" OR
                       "099999903" OR "099999904" OR
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
                       "099830101" OR "099200101"            )
+             OR     ((SRY-SRYCD(IDX2)       =
+                      "099209903" OR "099209905" OR
+                      "099209906" OR "099209907" OR
+                      "099209908"                          ) AND
+                     (WRK-PARA-PRTKBN  NOT = "9" AND "8"   ))
                   COMPUTE   RECE04-MEISAISU    =  RECE04-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -10375,14 +10384,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
               OR     ( FLG-HENSYU-NG2    NOT =  ZERO         )
               OR     ( SRY-SRYCD(IDX2)       =
-                       "099209902" OR "099209903" OR
-                       "099209904" OR "099209905" OR
-                       "099209906" OR "099209907" OR
-                       "099209908" OR
+                       "099209902" OR "099209904" OR
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
                        "099830101" OR "099200101"            )
+              OR     ((SRY-SRYCD(IDX2)       =
+                       "099209903" OR "099209905" OR
+                       "099209906" OR "099209907" OR
+                       "099209908"                          ) AND
+                      (WRK-PARA-PRTKBN  NOT = "9" AND "8"   ))
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
                  IF  WRK-TAIHI-ZAINUM  =  ZERO
