@@ -2176,11 +2176,24 @@
                                            INTO    SPA-ERRMSG
                    END-STRING
       *!!!
-      *H27.1
+      *H27.6
                WHEN    "2072"
                    STRING  "後発品変更不可（処方単位）・"
                            "後発品変更可（処方単位）"
                            "が重複します。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2073"
+                   STRING  "後発品変更不可（処方単位）は"
+                           "入力できません。"
+                           "システム管理が変更不可です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2074"
+                   STRING  "後発品変更可（処方単位）は入力できません。"
+                           "システム管理が変更可です。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
