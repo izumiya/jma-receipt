@@ -2112,6 +2112,9 @@
       *                    １剤１明細とする
                            MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                   (IDX)
+      *                    コメントも不可
+                           MOVE   "1"              TO  SPA-COM-KAIFLG
+                                                                  (IDX)
                            MOVE    1               TO  FLG-ZAI
       *
       *                包括出来高算定（剤）

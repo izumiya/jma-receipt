@@ -1328,6 +1328,21 @@
       *****************************************************************
        510191-INGIKSN-HENSYORI-SEC     SECTION.
       *
+      *    システム管理とのチェック
+           IF      SPA-COM-INPUTCD (IDX)   =   "099209910"
+      *        後発品変更不可
+               IF      SPA-KOUHATUKA       =   "0"
+                   MOVE    "2073"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  SPA-COM-CUR (IDX)
+               END-IF
+           ELSE
+      *        後発品変更可
+               IF      SPA-KOUHATUKA       =   "1"
+                   MOVE    "2074"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  SPA-COM-CUR (IDX)
+               END-IF
+           END-IF
+      *
            PERFORM VARYING IDX-M       FROM    1   BY  1
                    UNTIL        (IDX-M         >   20    )
                            OR   (SPA-ERRCD NOT =   SPACE )
