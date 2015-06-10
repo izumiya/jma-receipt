@@ -49,7 +49,7 @@
       *  04.07.02    NACL-森脇     13/06/14  在総診区分分類なし追加   
       *  04.08.00    NACL-森脇     14/05/01  平成２６年４月改正
       *  04.08.01    NACL-森脇     14/07/22  一時ファイルディレクトリ設定
-      *  04.08.02    NACL-森脇     14/11/07  公費と医保の併用（単独入力分）追加
+      *  04.08.02    NACL-森脇     14/11/07  公費と医保の併用（単独入力分）追加←中止
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1625,12 +1625,12 @@
       *    レセプト種別区分分類
            IF          RECE10-HKNNUM       NOT =   SPACE
       *----(04.08.02)--UPD-START---
-               IF          RECE10-TOTALTEN(1)  =   RECE10-TOTALTEN(2)
+      *         IF          RECE10-TOTALTEN(1)  =   RECE10-TOTALTEN(2)
                    GO  TO  220-KOH-SYAHO-SYUKEI-ATO-EXT
-               ELSE
+      *         ELSE
       *            公費と医保の併用
-                   MOVE    "3"             TO  WRK-SYUBETUKBN
-               END-IF
+      *             MOVE    "3"             TO  WRK-SYUBETUKBN
+      *         END-IF
       *----(04.08.02)--UPD-END-----
            ELSE
                IF      RECE10-KOHNUM(2)    NOT =   SPACE
@@ -3528,9 +3528,9 @@
                WHEN    "1" ALSO    "3" ALSO    "2" ALSO    ANY
                    MOVE    "＊公費単独"            TO  WRK-PRT-LINE
       *----(04.08.02)--ADD-START---
-               WHEN    "1" ALSO    "3" ALSO    "3" ALSO    ANY
-                   MOVE    "＊公費と医保の併用（単独入力分）"
-                                                   TO  WRK-PRT-LINE
+      *         WHEN    "1" ALSO    "3" ALSO    "3" ALSO    ANY
+      *             MOVE    "＊公費と医保の併用（単独入力分）"
+      *                                             TO  WRK-PRT-LINE
       *----(04.08.02)--ADD-END-----
                WHEN    "2" ALSO    "1" ALSO    "1" ALSO    ANY
                WHEN    "3" ALSO    "1" ALSO    "1" ALSO    ANY
