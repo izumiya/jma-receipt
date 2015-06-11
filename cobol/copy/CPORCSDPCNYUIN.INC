@@ -47,6 +47,9 @@
                        09  LNK-DPCNYUIN-SRYSKB     PIC  X(02).
       *診療行為コード
                        09  LNK-DPCNYUIN-SRYCD      PIC  X(09).
+      *選定入院外泊区分
+                       09  LNK-DPCNYUIN-SENTEI-GAIHAKU
+                                                   PIC 9(01).
       *数量
                        09  LNK-DPCNYUIN-SURYO      PIC  9(01).
       *点数

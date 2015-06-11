@@ -64,6 +64,8 @@
       *                                     ・病棟コード
       *                                     ・病棟区分
       *                                     が記録できなかった不具合を修正
+      *              NACL-小豆沢  15/06/10  選定入院時の外泊もレコード記録
+      *                                     する対応
       *****************************************************************
       *
       *
@@ -317,6 +319,8 @@
            03  WRK-DAY-X                       PIC X(02).
            03  WRK-DAY-9        REDEFINES      WRK-DAY-X
                                                PIC 9(02).
+      *    選定入院時の外泊判定用
+           03  WRK-SENTEI-GAIGAKU              PIC 9(01)   OCCURS  31..
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1397,7 +1401,14 @@
                    EVALUATE   WRK-GAIHAKU-KBN(IDX1)
       *                外泊
                        WHEN   3
-                           INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
+      *            AZU-MOD START 2015.6.10
+      *            選定入院時の外泊もレコード記録するように対処
+                           IF    LNK-DPCNYUIN-SANTEIYM  <=  "201503"
+                              INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
+                           ELSE
+                              MOVE  1   TO  WRK-SENTEI-GAIGAKU(IDX1)
+                           END-IF
+      *            AZU-MOD END 2015.6.10
       *                他医療機関受診
                        WHEN   4
       ******                 WHEN   5
@@ -1440,7 +1451,9 @@
            PERFORM    VARYING   IDX1   FROM  1  BY  1
                       UNTIL     (IDX1   >     31)
                IF   (WRK-SO-MEISAISU(IDX1)  NOT =   ZERO)   AND
-                    (WRK-SO-TEN(IDX1)       NOT =   ZERO)   AND
+      *AZU-DEL START 2015.6.10
+      **            (WRK-SO-TEN(IDX1)       NOT =   ZERO)   AND
+      *AZU-DEL END 2015.6.10
                     (WRK-SO-SRYKBN(IDX1)    =       "90")
                      MOVE  IDX1   TO    IDX2
                      MOVE  WRK-SO-HKNCOMBI-DAY(IDX1) TO
@@ -1458,6 +1471,13 @@
       **                   END-IF
                          MOVE  WRK-SO-SRYCD(IDX1 IDX3) TO
                                     LNK-DPCNYUIN-SRYCD(1 IDX2 IDX3)
+      *AZU-ADD START 2015.6.10
+                         IF  (WRK-SO-SRYCD(IDX1 IDX3) = "190107290") AND
+                             (WRK-SENTEI-GAIGAKU(IDX1) = 1)
+                            MOVE  1  TO
+                               LNK-DPCNYUIN-SENTEI-GAIHAKU(1 IDX2 IDX3)
+                         END-IF
+      *AZU-ADD END 2015.6.10
                          MOVE  ZERO     TO    IDX4
                          COMPUTE   IDX4 =    IDX3   +   1
                          IF    WRK-SO-SRYCD(IDX1 IDX4)    =   SPACE
@@ -1577,12 +1597,17 @@
       *****************************************************************
        210-GAIHAKU-SET-SEC            SECTION.
       *
+           DISPLAY "210-GAIHAKU-SET-SEC"
            MOVE   NACCT-DAY(IDX1)     TO    WRK-GAIHAKU-KBN(IDX1)
+           DISPLAY "WRK-SRYKBN(IDX1) = " WRK-SRYKBN(IDX1)
       *
            EVALUATE   WRK-SRYKBN(IDX1)
               WHEN     "90"
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     1
+      *            AZU-ADD START 2015.6.10
+                    WHEN     3
+      *            AZU-ADD END   2015.6.10
                       MOVE   "190107290"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     2
                       MOVE   "190107390"   TO  WRK-GAIHAKU(IDX1)
@@ -1619,6 +1644,8 @@
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
            END-EVALUATE
+           DISPLAY "IDX1 = " IDX1
+           DISPLAY "WRK-GAIHAKU(IDX1) = " WRK-GAIHAKU(IDX1)
       *
            .
        210-GAIHAKU-SET-EXT.
@@ -1988,6 +2015,11 @@
                               (TNS-TEN   /  100))  + 0.5)
       *        ％減算
                WHEN    6
+      *            AZU-MOD START 2015.6.10
+                   IF (WRK-SENTEI-GAIGAKU(IDX1)  =   1)  AND
+                      (TNS-SRYCD                 =  "190107290")
+                      MOVE    100     TO    TNS-TEN
+                   END-IF
                    COMPUTE    WRK-SO-TEN(IDX1)  =
                             ( WRK-SO-TEN(IDX1)  -
                              (WRK-SO-TEN(IDX1)  *

@@ -115,6 +115,9 @@
       *                                     平成２７年４月以降は特定入院料
       *                                     算定日の入院基本料等（診療行為
       *                                     入力分)記録に対応
+      *              NACL-小豆沢  15/06/10  入院料ＥＦファイル編集処理
+      *                                     平成２７年４月以降は選定入院時
+      *                                     の外泊もレコード記録する対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4424,6 +4427,11 @@
                                           "190107590")
                    CONTINUE
                ELSE
+      *AZU-ADD START 2015.6.10
+                   IF   LNK-DPCNYUIN-SENTEI-GAIHAKU(IDZ1 IDZ2 IDXZ) = 1
+                       MOVE    100     TO  TNS-TEN
+                   END-IF
+      *AZU-ADD END 2015.6.10
                    MOVE    1           TO  WRK-FEDT-DEKIDAKA-SUB
                    COMPUTE WRK-FEDT-DEKIDAKA-TEN
                                        =  (WRK-FEDT-PREV-TEN
