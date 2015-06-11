@@ -37,6 +37,7 @@
       * 04.06.00     NACL-多々納  10/09/06  自費保険入院中入力対応
       * 04.08.00     NACL-多々納  13/01/15  診療回数テーブル１０対応
       * 04.08.00     NACL-多々納  14/01/08  第三者行為対応
+      * 04.08.00     NACL-多々納  15/06/04  削除分対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -516,6 +517,12 @@
                   OR  (COMB-KOH1HKNNUM     =   "970"  )
                   MOVE    ZERO                 TO  FLG-HKNCOMBICHK
                END-IF
+      *H27.6
+      *        削除分判定
+               IF     (FLG-HKNCOMBICHK     =    1 )
+                 AND  (COMB-DELKBN         =   "1")
+                   PERFORM 31012-DELKBN-CHK-SEC
+               END-IF
       *
                IF      FLG-HKNCOMBICHK    =    1
                    ADD     1                   TO  SPA-J021-MAX
@@ -635,6 +642,84 @@
       *
            .
        3101-HKNCOMBI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    削除分判定処理
+      *****************************************************************
+       31012-DELKBN-CHK-SEC             SECTION.
+      *
+      *    受診履歴が存在すること
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           MOVE    SPA-J01-SRYKA       TO  JYURRK-SRYKA
+           MOVE    COMB-HKNCOMBINUM    TO  JYURRK-HKNCOMBINUM
+           MOVE    SPA-NAI-SRYYM       TO  JYURRK-SRYYMD(1:6)
+           MOVE    "01"                TO  JYURRK-SRYYMD(7:2)
+           MOVE    SPA-NAI-SRYYM       TO  JYURRK-UPSRYYMD(1:6)
+           MOVE    "31"                TO  JYURRK-UPSRYYMD(7:2)
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key18"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key18"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key18"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-JYURRK          =   ZERO
+      *        受診有
+               MOVE    1                   TO  FLG-OK
+           ELSE
+               MOVE    ZERO                TO  FLG-OK
+           END-IF
+      *
+      *   入院の時、診療会計から判定
+          IF     (SPA-NYUGAIKBN       =   "1" )
+             AND (FLG-OK              =   ZERO )
+      *        診療会計
+               INITIALIZE                  SRYACCT-REC
+               MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+               MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+               MOVE    SPA-GMN-PTID        TO  ACCT-PTID
+               MOVE    SPA-J01-SRYKA       TO  ACCT-SRYKA
+               MOVE    SPA-NAI-SRYYM       TO  ACCT-SRYYM
+               MOVE    COMB-HKNCOMBINUM    TO  ACCT-HKNCOMBI
+      *
+               MOVE    SRYACCT-REC         TO  MCPDATA-REC
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key24"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key24"             TO  MCP-PATHNAME
+                   PERFORM 980-SRYACCT-READ-SEC
+                   IF      FLG-SRYACCT         =   ZERO
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               ELSE
+                   INITIALIZE                  SRYACCT-REC
+                   MOVE    1               TO  FLG-SRYACCT
+               END-IF
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key24"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+           END-IF
+      *    今月算定なし
+           IF      FLG-OK              =   ZERO
+               MOVE    ZERO            TO  FLG-HKNCOMBICHK
+           END-IF
+           .
+       31012-DELKBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
