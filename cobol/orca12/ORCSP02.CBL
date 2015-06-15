@@ -913,6 +913,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *        公費法別一覧表示区分
                MOVE    SYS-1017-KOHHBTKBN-FLG
                                            TO  SPA-NAI-KOHHBTKBN-FLG
+      *        保険初期表示区分
+               MOVE    SYS-1017-HKNINITKBN-FLG
+                                           TO  SPA-NAI-HKNINITKBN-FLG
            ELSE
       *        未登録の時、ゼロとする
                MOVE    ZERO                    TO  SPA-NAI-JINMEI-USE
@@ -983,6 +986,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    公費法別一覧表示区分
            IF      SPA-NAI-KOHHBTKBN-FLG   =   SPACE
                MOVE    "0"                 TO  SPA-NAI-KOHHBTKBN-FLG
+           END-IF
+      *    保険初期表示区分
+           IF      SPA-NAI-HKNINITKBN-FLG  =   SPACE
+               MOVE    "0"                 TO  SPA-NAI-HKNINITKBN-FLG
            END-IF
       *
            .

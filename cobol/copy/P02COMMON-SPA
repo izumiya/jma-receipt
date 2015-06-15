@@ -93,6 +93,8 @@
            03  SPA-NAI-TOWNNAME2KBN-FLG   PIC X(01).
       *    公費法別一覧編集区分
            03  SPA-NAI-KOHHBTKBN-FLG      PIC X(01).
+      *    保険初期表示区分
+           03  SPA-NAI-HKNINITKBN-FLG     PIC X(01).
       *
       *    更新時警告あり
            03  SPA-KEI2-FLG               PIC 9(01).

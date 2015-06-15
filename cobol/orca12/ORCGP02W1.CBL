@@ -1162,8 +1162,19 @@
       *
       *    テーブル内の保険情報に名称を編集する
            PERFORM 3100-HKNTBL-KBNHEN-SEC
+      *
+      *TEST
+      *    保険初期表示変更
+           IF      SPA-NAI-HKNINITKBN-FLG  NOT =   "0"
+      *        自費以外を初期表示
+               PERFORM 3109-HKNINIT-SYORI-SEC
+           ELSE
+      *        １件目
+               MOVE    1               TO  SPA-NAI-HKNSTR
+           END-IF
+      *TEST
       *    保険表示連番
-           MOVE    1                   TO  SPA-NAI-HKNSTR
+      *****MOVE    1                   TO  SPA-NAI-HKNSTR
       *    保険情報ＴＢＬから編集
            PERFORM 3101-HKN-TBL-SPA-SEC
       *
@@ -1178,6 +1189,40 @@
       *
            .
        310-SPASET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険初期表示変更処理
+      *****************************************************************
+       3109-HKNINIT-SYORI-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  IDY
+           MOVE    ZERO                TO  FLG-CHK
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   SPA-PTHKN-MAX )
+                         OR   (FLG-CHK NOT =   ZERO )
+               IF     (SPA-PTHKN-SAKJOKBN (IDX)    =   SPACE      )
+                  AND (SPA-PTHKN-TEKSTYMD (IDX)    <=  SPA-SYSYMD )
+                  AND (SPA-PTHKN-TEKEDYMD (IDX)    >=  SPA-SYSYMD )
+                   IF     (SPA-PTHKN-HKNNUM (IDX)(1:2) NOT =   "98" )
+                    AND   (SPA-NAI-HKNINITKBN-FLG  =   "1"   )
+                       MOVE    IDX             TO  IDY
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+                   IF     (SPA-PTHKN-HKNNUM (IDX)(1:1) NOT =   "9" )
+                    AND   (SPA-NAI-HKNINITKBN-FLG  =   "2"   )
+                       MOVE    IDX             TO  IDY
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           MOVE    1                   TO  SPA-NAI-HKNSTR
+           IF      IDY             NOT =   ZERO
+               MOVE    IDY             TO  SPA-NAI-HKNSTR
+           END-IF
+           .
+       3109-HKNINIT-SYORI-EXT.
            EXIT.
       *
       *****************************************************************

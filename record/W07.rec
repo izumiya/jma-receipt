@@ -433,6 +433,13 @@ W07 {
           count int;
             item varchar(28)[5];
         };
+        HKNINITKBN_COMB {
+          HKNINITKBN {
+            textdata varchar(32);
+          };
+          count int;
+            item varchar(32)[5];
+        };
       };
       TAGNAME2 {
         state int;
