@@ -125,6 +125,7 @@
       *  04.07.00    NACL-多々納  13/08/01  時間外緊急院内チェック区分追加
       *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *  04.07.00    NACL-多々納  15/03/XX  低紹介率追加
+      *  04.07.00    NACL-多々納  15/06/15  保険初期表示区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -522,6 +523,16 @@
                            11  SPA-GMN-KOHHBTKBN-LIST     PIC X(28)
                                                              OCCURS  5.
                        09  SPA-GMN-KOHHBTKBN-MAX          PIC 9(02).
+      *H27.6
+      *                保険初期表示区分
+                       09  SPA-GMN-HKNINITKBN-G.
+                           11  SPA-GMN-HKNINITKBN         PIC X(01).
+                           11  SPA-GMN-HKNINITKBN-F1      PIC X(01).
+                           11  SPA-GMN-HKNINITKBN-MEI     PIC X(30).
+                       09  SPA-GMN-HKNINITKBN-COMB.
+                           11  SPA-GMN-HKNINITKBN-LIST    PIC X(32)
+                                                             OCCURS  5.
+                       09  SPA-GMN-HKNINITKBN-MAX         PIC 9(02).
       *
                    07  SPA-GMN-PAGE3-AREA.
       *                入金管理情報（診療行為機能情報）
@@ -1880,6 +1891,14 @@
            MOVE    "1 自動表示する"
                                    TO  SPA-GMN-KOHHBTKBN-LIST (2)
            MOVE    2               TO  SPA-GMN-KOHHBTKBN-MAX 
+      *    保険初期表示区分
+           MOVE    "0 標準"
+                                   TO  SPA-GMN-HKNINITKBN-LIST (1)
+           MOVE    "1 自費以外"
+                                   TO  SPA-GMN-HKNINITKBN-LIST (2)
+           MOVE    "2 自費・労災・自賠責・治験以外"
+                                   TO  SPA-GMN-HKNINITKBN-LIST (3)
+           MOVE    3               TO  SPA-GMN-HKNINITKBN-MAX 
       *
            MOVE    "1 今回請求分のみ入金"
                                        TO  SPA-GMN-SRYNYKNKNRKBNLST(1)
@@ -3024,6 +3043,9 @@
       *        公費法別一覧表示区分
                MOVE    SYS-1017-KOHHBTKBN-FLG
                                        TO  SPA-GMN-KOHHBTKBN
+      *        保険初期表示区分
+               MOVE    SYS-1017-HKNINITKBN-FLG
+                                       TO  SPA-GMN-HKNINITKBN
            END-IF
       *
       *    初期設定
@@ -3274,6 +3296,23 @@
            IF      FLG-OK              =   ZERO
                MOVE    SPA-GMN-KOHHBTKBN-LIST(1)
                                            TO  SPA-GMN-KOHHBTKBN-G
+           END-IF
+      *    保険初期表示区分
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-HKNINITKBN-MAX
+               IF      SPA-GMN-HKNINITKBN
+                                       =   SPA-GMN-HKNINITKBN-LIST
+                                                         (IDX)(1:1)
+                   MOVE    SPA-GMN-HKNINITKBN-LIST(IDX)
+                                           TO  SPA-GMN-HKNINITKBN-G
+                   MOVE    1               TO  FLG-OK
+                   MOVE    SPA-GMN-HKNINITKBN-MAX    TO  IDX
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-HKNINITKBN-LIST(1)
+                                           TO  SPA-GMN-HKNINITKBN-G
            END-IF
       *
            MOVE    201                 TO  SPA-GMN-CUR
@@ -5233,6 +5272,7 @@
            MOVE    W07-KENMEIKBN       TO  SPA-GMN-KENMEIKBN-FLG-G
            MOVE    W07-TOWNNAME2KBN    TO  SPA-GMN-TOWNNAME2KBN-G
            MOVE    W07-KOHHBTKBN       TO  SPA-GMN-KOHHBTKBN-G
+           MOVE    W07-HKNINITKBN      TO  SPA-GMN-HKNINITKBN-G
       *
       *    診療行為機能情報
            MOVE    W07-SRYNYKNKNRKBN   TO  SPA-GMN-SRYNYKNKNRKBN-G
@@ -5560,6 +5600,10 @@
       *            公費法別一覧表示区分
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4107-KOHHBTKBN-FLG-SEC
+                   END-IF
+      *            保険初期表示区分
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4107-HKNINITKBN-FLG-SEC
                    END-IF
                WHEN    "1038"
       *            ＤＯ初期表示
@@ -7440,6 +7484,31 @@
       *
           .
        4107-KOHHBTKBN-FLG-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険初期表示区分チェック処理
+      *****************************************************************
+       4107-HKNINITKBN-FLG-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-HKNINITKBN-MAX) OR
+                              (FLG-OK  =   1    )
+               IF      SPA-GMN-HKNINITKBN
+                                       =   SPA-GMN-HKNINITKBN-LIST
+                                                          (IDX)(1:1)
+                   MOVE    SPA-GMN-HKNINITKBN-LIST(IDX)
+                                          TO  SPA-GMN-HKNINITKBN-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    219             TO  SPA-GMN-CUR
+               MOVE    "1019"          TO  SPA-ERRCD
+           END-IF
+      *
+          .
+       4107-HKNINITKBN-FLG-EXT.
            EXIT.
       *****************************************************************
       *    入金管理区分チェック処理（診療行為機能情報）
@@ -10144,6 +10213,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KENMEIKBN-FLG   TO  SYS-1017-KENMEIKBN-FLG
            MOVE    SPA-GMN-TOWNNAME2KBN    TO  SYS-1017-TOWNNAME2KBN-FLG
            MOVE    SPA-GMN-KOHHBTKBN       TO  SYS-1017-KOHHBTKBN-FLG
+           MOVE    SPA-GMN-HKNINITKBN      TO  SYS-1017-HKNINITKBN-FLG
       *
            MOVE    SYS-1017-REC            TO  SYSKANRI-REC
       *
@@ -11143,6 +11213,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-KOHHBTKBN-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-GMN-KOHHBTKBN-MAX   TO  W07-KOHHBTKBN-COUNT
+      *
+      *    保険初期表示区分
+           MOVE    SPA-GMN-HKNINITKBN-G    TO  W07-HKNINITKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-HKNINITKBN-MAX
+               MOVE    SPA-GMN-HKNINITKBN-LIST (IDX)
+                                       TO  W07-HKNINITKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-HKNINITKBN-MAX  TO  W07-HKNINITKBN-COUNT
       *
       *    入金管理区分（診療行為機能情報）
            MOVE    SPA-GMN-SRYNYKNKNRKBN-G TO  W07-SRYNYKNKNRKBN
@@ -12195,6 +12274,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    DELIMITED BY  SIZE
                                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "1019"
+                   STRING  "保険初期表示区分がありません"
+                                                   DELIMITED BY  SIZE
+                                                       INTO  SPA-ERRMSG
+                   END-STRING
       *    診療行為機能情報
                WHEN    "2001"
                    MOVE    "入金管理区分がありません。"
@@ -12640,6 +12724,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "TOWNNAME2KBN"    TO   MCP-WIDGET
                WHEN    218
                    MOVE  "KOHHBTKBN"       TO   MCP-WIDGET
+               WHEN    219
+                   MOVE  "HKNINITKBN"      TO   MCP-WIDGET
       *診療行為情報
                WHEN    301
                    MOVE  "DOSRYKBN_FLG"    TO   MCP-WIDGET
@@ -13060,6 +13146,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "TOWNNAME2KBN"
                    MOVE    218              TO  SPA-GMN-CUR
                WHEN    "KOHHBTKBN"
+                   MOVE    219              TO  SPA-GMN-CUR
+               WHEN    "HKNINITKBN"
                    MOVE    999              TO  SPA-GMN-CUR
       *    診療行為情報
                WHEN    "DOSRYKBN_FLG"
