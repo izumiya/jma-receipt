@@ -330,6 +330,8 @@
                    AND    (WRK-ERRCD           =   SPACE )
                    AND    (WRK-COM-SRYKBN (IDX-Z)  =   "90"
                                                    OR  "92" )
+      *            Êñ³ç°Ê³°
+                   AND    (SPA-HKNCOMBINUM NOT =   "9999"   )
       *            Æþ±¡ÎÁ¤È¤ÎÊ»ÍÑ»»Äê¥Á¥§¥Ã¥¯
                        PERFORM 1004-NYUACCT-CHK-SEC
                    END-IF
