@@ -679,6 +679,7 @@
       *  04.07.45    NACL-ÌçÏÆ    15/05/01  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.07.46    NACL-ÌçÏÆ    15/05/18  £·£°ºÐÂåÁ°È¾ÆÃÎã°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.07.47    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
+      *  04.07.48    NACL-ÌçÏÆ    15/06/16  ¹â³ÛÎÅÍÜÈñ¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -24614,6 +24615,39 @@
                     MOVE    "3"      TO   RECE62-KOUREI
                  END-IF
                 END-IF
+               END-IF
+      *
+               IF  (FLG-ZENKOKUKOHI-NISYU4  =   1      )
+               AND (RECE62-KOUREI           =  "3"     )
+               AND (WRK-CHK-KINGAKU     NOT =   9999999)
+               AND (WRK-CHK-KINGAKU2    NOT =   9999999)
+                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
+                                           + RECE62-HENTOTALTEN(3)
+                 IF  (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                       (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                      ( TBL-TOKATUKAIFLG(1)   =  1              ) )
+                 AND (RECE62-KOHNUM(2)(1:1)  >= "1" AND <= "8"    )
+                 AND (TBL-TOKATUKAIFLG(2)     = ZERO              )
+                 AND (RECE62-KOHNUM(3)        = SPACE             )
+                 AND (RECE62-KOHNUM(4)        = SPACE             )
+                 AND (RECE62-HKNCOMBI(2)  NOT = ZERO              )
+                 AND (WRK-TAIHI-TOTALTEN  NOT = RECE62-TOTALTEN(2))
+                 AND ((WRK-TAIHI-TOTALTEN   =  WRK-CHK-KOKIGAK4 ) OR
+                      (WRK-TAIHI-TOTALTEN   =
+                                           RECE62-HENTOTALTEN(3)) )
+      *
+                     IF   WRK-CHK-KINGAKU  >  RECE62-FTNMONEY(2)
+                       COMPUTE  WRK-CHK-KOKIGAK = WRK-CHK-KINGAKU
+                                                - RECE62-FTNMONEY(2)
+                     ELSE
+                       MOVE     ZERO     TO   WRK-CHK-KOKIGAK
+                     END-IF
+                     IF  (WRK-KOH-GAI-GEN70-KIN2 >  WRK-CHK-KOKIGAK)
+                     OR  (WRK-KOH-GAI-GEN70-KIN4 >  WRK-CHK-KOKIGAK)
+                        MOVE    "2"      TO   RECE62-KOUREI
+                     END-IF
+      *
+                 END-IF
                END-IF
       *
                IF  (WRK-KEISAN-YYY    NOT =  ZERO)
