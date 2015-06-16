@@ -19,7 +19,7 @@ U02	{
 				value	varchar(21);
 			};
 			count	int;
-			item	varchar(21)[40];
+			item	varchar(21)[99];
 		};
 		DRNAME_COMBO	{
 			DRNAME	{
@@ -67,8 +67,8 @@ U02	{
 					value3	varchar(10);
 					value4	varchar(10);
 					value5	varchar(10);
-				}	[15];
-				select	bool[15];
+				}	[30];
+				select	bool[30];
 			};
 		};
 		BHK1	{

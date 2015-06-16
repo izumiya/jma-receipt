@@ -105,6 +105,7 @@
       * 04.07.00     NACL-多々納  14/08/08  高齢非該当２割対応
       * 04.07.00     NACL-多々納  14/12/XX  難病等対応
       * 04.07.00     NACL-多々納  15/06/15  保険初期表示対応
+      * 04.07.00     NACL-多々納  15/06/16  診療科・保険組合せ件数対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -461,7 +462,7 @@
       *    保険組合せ（ＳＰＡと同じ）
        01  WRK-HKNCOBMI-SORT-AREA.
            03  WRK-HKNCOMBI-AREA.
-               05  WRK-GMN-HKNCOMBI-LIST       OCCURS   15.
+               05  WRK-GMN-HKNCOMBI-LIST       OCCURS   30.
                        09  WRK-GMN-THKNCOMBINUM    PIC 9(04).
                        09  WRK-GMN-THKNCOMBIMEI    PIC X(60).
                        09  WRK-GMN-TTEKSTYMD       PIC X(09).
@@ -485,7 +486,7 @@
                05  WRK-SRT-IDX            PIC 9(04).
       *
            03  WRK-HKNCOMBI02-AREA.
-               05  WRK-GMN-HKNCOMBI02-LIST       OCCURS   15.
+               05  WRK-GMN-HKNCOMBI02-LIST       OCCURS   30.
                        09  WRK-GMN02-THKNCOMBINUM    PIC 9(04).
                        09  WRK-GMN02-THKNCOMBIMEI    PIC X(60).
                        09  WRK-GMN02-TTEKSTYMD       PIC X(09).
@@ -2409,7 +2410,7 @@
       *
            PERFORM
                UNTIL   (FLG-PARA       NOT =   ZERO      )  OR
-                       (IDX                >=  15        )
+                       (IDX                >=  30        )
                MOVE    PARA-DATA-REC       TO  HKNCOMBI-REC
       *
                IF     (COMB-DELKBN     NOT =   "1"       )  AND
@@ -2525,7 +2526,7 @@
       *    表示分のみ行う
            INITIALIZE                  WRK-HKNCOBMI-SORT-AREA
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   15
+                   UNTIL       IDX     >   30
                MOVE    ALL "9"         TO  WRK-SRT-TEKISTYMD
                MOVE    ALL "9"         TO  WRK-SRT-HKNCOMBINUM
                MOVE    ZERO            TO  WRK-SRT-IDX
@@ -2550,7 +2551,7 @@
       *
       *    非表示分のみ行う
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   15
+                   UNTIL       IDX     >   30
                MOVE    ALL "9"         TO  WRK-SRT-TEKISTYMD
                MOVE    ALL "9"         TO  WRK-SRT-HKNCOMBINUM
                MOVE    ZERO            TO  WRK-SRT-IDX
@@ -2578,7 +2579,7 @@
            MOVE    ZERO                TO   SPA-HKNCOMBI-MAX
            INITIALIZE                  SPA-HKNCOMBI-AREA
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   15
+                   UNTIL       IDX     >   30
                IF      WRK-GMN-THKNCOMBINUM (IDX) NOT =   ZERO
                    ADD     1           TO   SPA-HKNCOMBI-MAX
                    MOVE    WRK-GMN-HKNCOMBI-LIST (IDX)
@@ -2594,7 +2595,7 @@
            END-PERFORM
       *    ＳＰＡ編集（非表示分）
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   15
+                   UNTIL       IDX     >   30
                IF      WRK-GMN02-THKNCOMBINUM (IDX) NOT =   ZERO
                    ADD     1           TO   SPA-HKNCOMBI-MAX
                    MOVE    WRK-GMN-HKNCOMBI02-LIST (IDX)
@@ -3070,7 +3071,7 @@
            MOVE    ZERO                TO  WRK-SELNUM
            MOVE    ZERO                TO  WRK-GMN-SELNUM
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   30
+                   UNTIL       IDX     >   60
                IF      P02-HKNLIST-SELECT (IDX)    =   "T"
                    IF     (P02-HKNCOBNUM (IDX)     =   SPACE ) AND
                           (IDX                     >   1     )

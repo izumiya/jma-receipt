@@ -111,7 +111,7 @@ P02D	{
 				value	varchar(15);
 			};
 			count	int;
-			item	varchar(15)[40];
+			item	varchar(15)[99];
 		};
 		DRCD_COMB	{
 			DRCD	{

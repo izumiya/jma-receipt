@@ -87,7 +87,7 @@
                     06  P02-P020-SRYKA.
                       07  P02-VALUE   PIC X(21).
                     06  P02-P020-SRYKA-COUNT   PIC S9(9)   BINARY.
-                    06  P02-P020-SRYKA-ITEM    PIC X(21)   OCCURS  40.
+                    06  P02-P020-SRYKA-ITEM    PIC X(21)   OCCURS  99.
                   05  P02-P020-DRNAME-COMBO.
                     06  P02-P020-DRNAME.
                       07  P02-VALUE   PIC X(29).
@@ -115,12 +115,12 @@
                       07  P02-P020-HKNCOMBI-COUNT   PIC S9(9)   BINARY.
                       07  P02-P020-HKNCOMBI-ROW     PIC S9(9)   BINARY.
                       07  P02-P020-HKNCOMBI-ROWATTR PIC S9(9)   BINARY.
-                      07  P02-ITEM        OCCURS  15 TIMES.
+                      07  P02-ITEM        OCCURS  30 TIMES.
                         08  P02-P020-HKNCOBNUM    PIC X(4).
                         08  P02-P020-HKNCOBMEI    PIC X(60).
                         08  P02-P020-TEKSTYMD     PIC X(10).
                         08  P02-P020-TEKEDYMD     PIC X(10).
-                      07  P02-P020-HKNCOMBI-SELECT  PIC X  OCCURS  15.
+                      07  P02-P020-HKNCOMBI-SELECT  PIC X  OCCURS  30.
                 04  P02-FIXPAGE2.
                   05  P02-P02-KANANAME.
                     06  P02-VALUE   PIC X(50).
@@ -258,7 +258,7 @@
                     06  P02-P02-SRYKA.
                       07  P02-VALUE   PIC X(21).
                     06  P02-SRYKA-COUNT   PIC S9(9)   BINARY.
-                    06  P02-SRYKA-ITEM    PIC X(21)   OCCURS  40.
+                    06  P02-SRYKA-ITEM    PIC X(21)   OCCURS  99.
                   05  P02-P02-POST.
                     06  P02-VALUE   PIC X(7).
                   05  P02-P02-ADRS.
@@ -320,10 +320,10 @@
                       07  P02-HKNLIST-COUNT   PIC S9(9)   BINARY.
                       07  P02-HKNLIST-ROW     PIC S9(9)   BINARY.
                       07  P02-HKNLIST-ROWATTR PIC S9(9)   BINARY.
-                      07  P02-ITEM        OCCURS  30 TIMES.
+                      07  P02-ITEM        OCCURS  60 TIMES.
                         08  P02-HKNCOBNUM     PIC X(4).
                         08  P02-HKNCOBNAME    PIC X(60).
-                      07  P02-HKNLIST-SELECT  PIC X   OCCURS  30 TIMES.
+                      07  P02-HKNLIST-SELECT  PIC X   OCCURS  60 TIMES.
                   05  P02-P02-HKNNAME.
                     06  P02-VALUE   PIC X(30).
                   05  P02-P02-HKNNAME2.

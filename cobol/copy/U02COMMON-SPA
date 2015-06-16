@@ -73,7 +73,7 @@
                    07  SPA-GMN-KOHMSG                 PIC X(50).
       *
                    07  SPA-GMN-COMBI.
-                       09  SPA-GMN-COMBI-TBL          OCCURS  15.
+                       09  SPA-GMN-COMBI-TBL          OCCURS  30.
                            11  SPA-GMN-HKNCOMBINUM        PIC 9(04).
                            11  SPA-GMN-SYU-TANSEIDONAME   PIC X(12).
                            11  SPA-GMN-KOH1-TANSEIDONAME  PIC X(12).
@@ -107,7 +107,7 @@
                05  SPA-GMN-COMB-AREA.
       *            ø«Œ≈≤ 
                    07  SPA-GMN-SRYKALST               PIC X(20)
-                                                      OCCURS  40.
+                                                      OCCURS  99.
                    07  SPA-SRYKA-MAX                  PIC 9(04).
       *            •…•Ø•ø°º
                    07  SPA-GMN-DRCDLST-G.

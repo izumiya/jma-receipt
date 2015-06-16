@@ -62,14 +62,14 @@
            03  SPA-GMN-HEN-AREA.
       *        ¿ÇÎÅ²Ê
                05  SPA-GMN-SRYKA-LIST-G.
-                   07  SPA-GMN-SRYKA-LIST      OCCURS  40.
+                   07  SPA-GMN-SRYKA-LIST      OCCURS  100.
                        09  SPA-GMN-SRYKAL          PIC X(02).
                        09  SPA-GMN-SRYKAF1L        PIC X(01).
                        09  SPA-GMN-SRYKANAMEL      PIC X(16).
                    07  SPA-SRYKA-MAX           PIC 9(04).
                    07  SPA-NAI-SRYKA-LIST-G.
                        09  SPA-NAI-SRYKACHK        PIC X(01)
-                                                   OCCURS  40.
+                                                   OCCURS  100.
                05  SPA-GMN-SRYKA-G.
                    07  SPA-GMN-SRYKA              PIC X(02).
                    07  SPA-GMN-SRYKA1             PIC X(01).
@@ -501,7 +501,7 @@
            MOVE    1                   TO  IDX
            MOVE    "00 Á´²Ê"           TO  SPA-GMN-SRYKA-LIST (IDX)
            PERFORM 
-                   UNTIL       (IDX            >=  40   )  OR
+                   UNTIL       (IDX            >=  100  )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC           TO  SYS-1005-REC
                ADD     1                     TO  IDX

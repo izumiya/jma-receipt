@@ -108,7 +108,7 @@
                        09  SPA-GMN-SRYKAMEI        PIC X(16).
       *            診療科一覧（共通）
                    07  SPA-GMN-SRYKA-COB.
-                       09  SPA-GMN-SRYKA-LST       PIC X(20)  OCCURS 40.
+                       09  SPA-GMN-SRYKA-LST       PIC X(20)  OCCURS 99.
                    07  SPA-SRYKA-MAX               PIC 9(03).
       *
                    07  SPA-GMN-POST            PIC X(07).
@@ -351,7 +351,7 @@
       *
       *        保険組合せ（受付と共通）
                05  SPA-HKNCOMBI-AREA.
-                   07  SPA-GMN-HKNCOMBI-LIST       OCCURS   15.
+                   07  SPA-GMN-HKNCOMBI-LIST       OCCURS   30.
                        09  SPA-GMN-THKNCOMBINUM    PIC 9(04).
                        09  SPA-GMN-THKNCOMBIMEI    PIC X(60).
                        09  SPA-GMN-TTEKSTYMD       PIC X(09).
@@ -1692,7 +1692,7 @@
                    07  SPA-P02S-SYUKA-MEI      PIC X(18).
       *        診療科一覧
                05  SPA-P02S-SYUKA-COB.
-                   07  SPA-P02S-SYUKA-LST      PIC X(20)  OCCURS 40.
+                   07  SPA-P02S-SYUKA-LST      PIC X(20)  OCCURS 99.
                05  SPA-P02S-SYUKA-MAX          PIC 9(04).
       *
                05  SPA-P02S-NAI-SRYYM      PIC X(06).

@@ -344,7 +344,7 @@
            END-IF
            PERFORM VARYING IDX
                    FROM    1       BY  1
-                   UNTIL      (IDX             >   40    )   OR
+                   UNTIL      (IDX             >   99    )   OR
                               (FLG-SYSKANRI    =   1     )
                MOVE    MCPDATA-REC             TO  SYS-1005-REC
                MOVE    SYS-1005-KBNCD (1:2)    TO  SPA-P02S-SYUKA-LST
