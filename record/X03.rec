@@ -12,6 +12,9 @@ X03 {
     B10_2 {
       state int;
     };
+    BTN_INS {
+      state int;
+    };
     LCHKKBNMEI {
       textdata varchar(70);
     };

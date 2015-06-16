@@ -106,11 +106,11 @@
            03  FLG-INPUTCD                         PIC 9(01).
            03  FLG-SRYACT                          PIC 9(01).
            03  FLG-CHKSND                          PIC 9(01).
-           03  FLG-TEKBYO                          PIC 9(01).
+           03  FLG-TEKMED                          PIC 9(01).
+           03  FLG-TEKDIS                          PIC 9(01).
            03  FLG-SRYCD                           PIC 9(01).
            03  FLG-SORT                            PIC 9(01).
            03  FLG-TENSU                           PIC 9(01).
-           03  FLG-HAISHI                          PIC 9(01).
            03  FLG-END                             PIC 9(01).
            03  FLG-LIST1                           PIC 9(01).
            03  FLG-LIST2                           PIC 9(01).
@@ -228,8 +228,11 @@
            COPY    "CPCHKSND.INC".
       *
       *    適応病名マスタ
-       01  TEKIOUBYOMEI-REC.
-           COPY    "CPTEKIOUBYOMEI.INC".
+       01  TEKIOU-MEDICINE-REC.
+           COPY    "CPTEKIOU-MEDICINE.INC".
+       01  TEKIOU-DISEASE-REC.
+           COPY    "CPTEKIOU-DISEASE.INC".
+      *
       *
       *    点数マスタ−
       *01  TENSU-REC.
@@ -239,8 +242,8 @@
       *    サブプロ用　領域
       *****************************************************************
       *
-      *    病名編集サブ
-           COPY    "CPORCSBYOMEI.INC".
+      *    チェックマスタ病名編集サブ
+           COPY    "CPORCSS012.INC".
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
@@ -470,9 +473,9 @@
                                            TO  SRYCD-YUKOEDYMD
                        MOVE  WRK-SRYCD     TO  SRYCD-KEY
       *
-                       PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
-                       IF  ( FLG-TEKBYO        =   ZERO )
-                           PERFORM 900-CHKSND-KEY26-SEL-SEC
+                       PERFORM 900-TEKIOU-MEDICINE-KEY-SEL-SEC
+                       IF  ( FLG-TEKMED        =   ZERO )
+                           PERFORM 900-CHKSND-KEY30-SEL-SEC
                            IF  ( FLG-CHKSND    =  ZERO  )
                                MOVE  "2"   TO  SRYCD-FLG
                                WRITE SRYCD-REC
@@ -486,11 +489,8 @@
                            MOVE  "0"       TO  SRYCD-FLG
                            WRITE SRYCD-REC
                        END-IF
-      *
-                       MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-                       MOVE    "key2"              TO   MCP-PATHNAME
-                       PERFORM 910-DBCLOSECURSOR-SEC
                    END-IF
+      *
                END-IF
       *
                PERFORM 900-ICD-ALL-FET-SEC
@@ -559,9 +559,9 @@
            PERFORM UNTIL ( FLG-SRYCD   NOT =   ZERO )
       *
                MOVE    SRYCD-KEY       TO   WRK-SRYCD
-               PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
-               IF    ( FLG-TEKBYO      =   ZERO )
-                   PERFORM 900-CHKSND-KEY26-SEL-SEC
+               PERFORM 900-TEKIOU-MEDICINE-KEY-SEL-SEC
+               IF    ( FLG-TEKMED      =   ZERO )
+                   PERFORM 900-CHKSND-KEY30-SEL-SEC
                    IF    ( FLG-CHKSND  =   ZERO )
                        MOVE  CHKSND-YUKOSTYMD
                                            TO  SRYCD-YUKOSTYMD
@@ -580,10 +580,6 @@
                        MOVE    1           TO  FLG-LIST1
                    END-IF
                END-IF
-      *
-               MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-               MOVE    "key2"              TO   MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
       *
                PERFORM 900-SRYCD-READ-SEC
       *
@@ -684,7 +680,7 @@
       *
            MOVE    SPACE               TO  WRK-MEMO
            IF    ( SORT-LISTKBN    =   "1" )
-               MOVE    "（チェックマスタに登録した薬剤）"
+               MOVE    "（チェックマスタを登録した薬剤）"
                                        TO  WRK-MEMO
            ELSE
                MOVE    "（登録済みのため更新を行わなかった薬剤）"
@@ -747,49 +743,24 @@
            MOVE    ZERO                TO  CNT-RENNUM
       *
            MOVE    SORT-SRYCD      TO  WRK-SRYCD
-           PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
+           PERFORM 900-TEKIOU-DISEASE-KEY3-SEL-SEC
       *
-           PERFORM UNTIL ( FLG-TEKBYO  NOT =   ZERO )
+           PERFORM UNTIL ( FLG-TEKDIS  NOT =   ZERO )
+                    OR   ( CNT-RENNUM      >   ZERO )
       *
-               MOVE    ZERO        TO  FLG-HAISHI
+               INITIALIZE              SS012-AREA
+               MOVE    LNK-PRTKANRI-SKYYMD (1:6)
+                               TO  SS012-SRYYM
       *
-               INITIALIZE                      ORCSBYOMEIAREA
-               MOVE    "1"                 TO  LNK-BYO-SYORI
-               MOVE    TEKBYO-BYOMEI       TO  LNK-BYO-BYOMEI
-               CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                               SPA-AREA
-               IF    ( LNK-BYO-BYOMEIHENFLG    =   SPACE ) 
-                   IF    ( LNK-BYO-IKOSAKICD   NOT =   SPACE )
-                       MOVE    SPACE       TO  WRK-TBYOMEICD-G
-                       PERFORM VARYING IDX0 FROM 1 BY 1
-                               UNTIL ( IDX0 >   CONST-MKCD-MAX )
-                                OR   ( LNK-BYO-TBYOMEICD (IDX0)
-                                            = SPACE )
-                           MOVE    LNK-BYO-TBYOMEICD (IDX0)
-                                           TO  WRK-TBYOMEICD (IDX0)
-                       END-PERFORM
-                       MOVE    LNK-BYO-IKOSAKICD   TO  WRK-IKOCD
-                       MOVE    LNK-BYO-IKOSAKICD-INDEX
-                                                   TO  IDXI
-                       INITIALIZE              ORCSBYOMEIAREA
-                       MOVE    "2"         TO  LNK-BYO-SYORI
-                       PERFORM VARYING IDX0 FROM 1 BY 1
-                               UNTIL ( IDX0 >   CONST-MKCD-MAX )
-                                OR   ( WRK-TBYOMEICD (IDX0)    = SPACE )
-                           MOVE WRK-TBYOMEICD (IDX0)
-                                           TO  LNK-BYO-TBYOMEICD (IDX0)
-                       END-PERFORM
-                       MOVE    WRK-IKOCD   TO  LNK-BYO-TBYOMEICD (IDXI)
-                       CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                                       SPA-AREA
-                   ELSE
-                       IF    ( LNK-BYO-HAISIYMD-ERR  NOT   =   ZERO )
-                           MOVE    1       TO  FLG-HAISHI
-                       END-IF
-                   END-IF
-               END-IF
+               MOVE    TEKDIS-SELBYOMEI
+                               TO  SS012-I-BYOMEI
+               CALL    "ORCSS012"      USING
+                                       SS012-AREA
+                                       SPA-AREA
       *
-               IF    ( FLG-HAISHI      =   ZERO )
+               IF    ( SS012-HAISHI    =   ZERO )
+      *
+                   COMPUTE CNT-RENNUM      =   CNT-RENNUM  +   1
       *
                    INITIALIZE              CHKSND-REC
       *
@@ -798,18 +769,8 @@
                    MOVE    WRK-SRYCD       TO  CHKSND-SRYCD
                    MOVE    "00000000"      TO  CHKSND-YUKOSTYMD
                    MOVE    "99999999"      TO  CHKSND-YUKOEDYMD
-                   MOVE    "1"             TO  CHKSND-CDKBN
-                   COMPUTE CNT-RENNUM      =   CNT-RENNUM  +   1
-                   MOVE    CNT-RENNUM      TO  CHKSND-RENNUM
-      *
-                   PERFORM 400-CD-KEY-SEC
-                   MOVE    WRK-KEY-CD-G    TO  CHKSND-CD
-      *
-                   MOVE    LNK-BYO-BYOMEI  TO  CHKSND-BYOMEI
-                   MOVE    "1"             TO  CHKSND-COMPKBN
-                   MOVE    "0"             TO  CHKSND-UTAGAIKBN
-                   MOVE    LNK-BYO-BYOMEIHENFLG
-                                           TO  CHKSND-BYOMEIHENFLG
+                   MOVE    "0"             TO  CHKSND-CDKBN
+                   MOVE    "1"             TO  CHKSND-TEKBYOKBN
       *
                    MOVE    SMCNDATE-YMD    TO  CHKSND-CREYMD
                                                CHKSND-UPYMD
@@ -820,20 +781,16 @@
                    MOVE    "key"           TO   MCP-PATHNAME
                    PERFORM 910-DBINSERT-SEC
       *
-                   IF    ( CNT-RENNUM  =   1 )
-                       PERFORM 2104-CHKSND-HEN-SEC
-                   END-IF
-      *
-      *            PERFORM 2105-CHKSND-HEN-SEC
+                   PERFORM 2104-CHKSND-HEN-SEC
       *
                END-IF
       *
-               PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
+               PERFORM 900-TEKIOU-DISEASE-KEY3-FET-SEC
       *
            END-PERFORM
       *
-           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-           MOVE    "key2"              TO   MCP-PATHNAME
+           MOVE    "tbl_tekiou_disease"    TO  MCP-TABLE
+           MOVE    "key3"                  TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            IF    ( CNT-RENNUM          >   ZERO )
@@ -905,21 +862,6 @@
       *
            .
        2104-CHKSND-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    チェックマスタ内容編集処理
-      *****************************************************************
-       2105-CHKSND-HEN-SEC         SECTION.
-      *
-           STRING  "　　　　　　"  DELIMITED BY SIZE
-                   LNK-BYO-BYOMEI  DELIMITED BY SPACE
-           INTO    HCMSL80-MOJI (CNT-LINE)
-           END-STRING
-      *
-           PERFORM 2104-LINE-CNT-SEC
-      *
-           .
-       2105-CHKSND-HEN-EXT.
            EXIT.
       *****************************************************************
       *    行カウント処理
@@ -1068,27 +1010,6 @@
       *
            .
        300-END-EXT.
-           EXIT.
-      *****************************************************************
-      *    適用コード編集処理
-      *****************************************************************
-       400-CD-KEY-SEC                  SECTION.
-      *
-           INITIALIZE                  WRK-KEY-CD-G
-      *
-           PERFORM VARYING IDX0        FROM    1   BY  1
-                   UNTIL ( IDX0        >  CONST-MKCD-MAX )
-                    OR   ( LNK-BYO-TBYOMEICD (IDX0)    =   SPACE )
-      *
-               MOVE    LNK-BYO-TBYOMEICD (IDX0)
-                                      TO  WRK-KEY-CD    (IDX0)
-               IF    ( IDX0           >   1 )
-                   MOVE    "-"        TO  WRK-KEY-CDSEP (IDX0 - 1)
-               END-IF
-      *
-           END-PERFORM
-           .
-       400-CD-KEY-EXT.
            EXIT.
       *****************************************************************
       *    エラー出力処理
@@ -1403,7 +1324,7 @@
       *****************************************************************
       *    チェックマスタ２情報検索
       *****************************************************************
-       900-CHKSND-KEY26-SEL-SEC        SECTION.
+       900-CHKSND-KEY30-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
@@ -1411,9 +1332,10 @@
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
            MOVE    "1"                 TO  CHKSND-CHKKBN
            MOVE    WRK-SRYCD           TO  CHKSND-SRYCD
+           MOVE    ZERO                TO  CHKSND-CDKBN
            MOVE    CHKSND-REC          TO  MCPDATA-REC
            MOVE    "tbl_chksnd"        TO   MCP-TABLE
-           MOVE    "key26"             TO   MCP-PATHNAME
+           MOVE    "key30"             TO   MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -1423,52 +1345,81 @@
            END-IF
       *
            MOVE    "tbl_chksnd"        TO   MCP-TABLE
-           MOVE    "key26"             TO   MCP-PATHNAME
+           MOVE    "key30"             TO   MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-CHKSND-KEY26-SEL-EXT.
+       900-CHKSND-KEY30-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    適応病名マスタ情報検索(KEY2)
+      *    適応病名マスタ情報検索
       *****************************************************************
-       900-TEKIOUBYOMEI-KEY2-SEL-SEC       SECTION.
+       900-TEKIOU-MEDICINE-KEY-SEL-SEC       SECTION.
       *
-           MOVE    ZERO                TO  FLG-TEKBYO
+           MOVE    ZERO                TO  FLG-TEKMED
       *
-           INITIALIZE                  TEKIOUBYOMEI-REC
-           MOVE    "1"                 TO  TEKBYO-CHKKBN
-           MOVE    WRK-SRYCD           TO  TEKBYO-SRYCD
-           MOVE    TEKIOUBYOMEI-REC    TO  MCPDATA-REC
-           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-           MOVE    "key2"              TO   MCP-PATHNAME
+           INITIALIZE                  TEKIOU-MEDICINE-REC
+           MOVE    WRK-SRYCD           TO  TEKMED-SRYCD
+           MOVE    TEKIOU-MEDICINE-REC TO  MCPDATA-REC
+           MOVE    "tbl_tekiou_medicine" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  TEKIOUBYOMEI-REC
+               MOVE    MCPDATA-REC     TO  TEKIOU-MEDICINE-REC
            ELSE
-               INITIALIZE              TEKIOUBYOMEI-REC
-               MOVE    1               TO  FLG-TEKBYO
+               INITIALIZE                  TEKIOU-MEDICINE-REC
+               MOVE    1               TO  FLG-TEKMED
            END-IF
+      *
+           MOVE    "tbl_tekiou_medicine" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
            .
-       900-TEKIOUBYOMEI-KEY2-SEL-EXT.
+       900-TEKIOU-MEDICINE-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    適応病名マスタ情報FETCH(KEY2)
+      *    適応病名マスタ情報検索
       *****************************************************************
-       900-TEKIOUBYOMEI-KEY2-FET-SEC       SECTION.
+       900-TEKIOU-DISEASE-KEY3-SEL-SEC     SECTION.
       *
-           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-           MOVE    "key2"              TO   MCP-PATHNAME
+           MOVE    ZERO                TO  FLG-TEKDIS
+      *
+           INITIALIZE                      TEKIOU-DISEASE-REC
+           MOVE    WRK-SRYCD           TO  TEKDIS-SELSRYCD
+           MOVE    TEKIOU-DISEASE-REC  TO  MCPDATA-REC
+           MOVE    "tbl_tekiou_disease" TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TEKIOU-DISEASE-REC
+           ELSE
+               INITIALIZE                  TEKIOU-DISEASE-REC
+               MOVE    1               TO  FLG-TEKDIS
+           END-IF
+      *
+           .
+       900-TEKIOU-DISEASE-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ情報検索
+      *****************************************************************
+       900-TEKIOU-DISEASE-KEY3-FET-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TEKDIS
+      *
+           MOVE    "tbl_tekiou_disease" TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  TEKIOUBYOMEI-REC
+               MOVE    MCPDATA-REC     TO  TEKIOU-DISEASE-REC
            ELSE
-               INITIALIZE              TEKIOUBYOMEI-REC
-               MOVE    1               TO  FLG-TEKBYO
+               INITIALIZE                  TEKIOU-DISEASE-REC
+               MOVE    1               TO  FLG-TEKDIS
            END-IF
-           .
       *
-       900-TEKIOUBYOMEI-KEY2-FET-EXT.
+           .
+       900-TEKIOU-DISEASE-KEY3-FET-EXT.
            EXIT.
       *****************************************************************
       *    点数マスタ検索処理(KEY)

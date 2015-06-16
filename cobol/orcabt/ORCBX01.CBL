@@ -36,12 +36,21 @@
        INPUT-OUTPUT            SECTION.
        FILE-CONTROL.
       *
+           SELECT  TENSU-FILE      ASSIGN  SS004-FILENAME
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  TNS-KEY
+                                   FILE    STATUS  IS  STS-BX0101.
+      *
 006900*    エラーファイル
            SELECT  CHKMERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-CHKMERR.
       *
        DATA                    DIVISION.
        FILE                        SECTION.
+      *
+       FD  TENSU-FILE.
+           COPY    "CPTENSU.INC".
       *
       *    エラーファイル
        FD  CHKMERR-FILE.
@@ -54,14 +63,20 @@
       *    ステータス領域
        01  STS-AREA.
            03  STS-CHKMERR                         PIC X(02).
+           03  STS-BX0101                          PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END                             PIC 9(01).
+           03  FLG-CHKSND                          PIC 9(01).
+           03  FLG-BX0101                          PIC 9(01).
+           03  FLG-TENSU                           PIC 9(01).
+           03  FLG-LOOPEND                         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-JOB-UPDCNT                      PIC 9(08).
+           03  CNT-CHKSND                          PIC 9(05).
       *
       *    システム領域
        01  SYS-AREA.
@@ -91,12 +106,24 @@
        01  WRK-AREA.
            03  WRK-TITLE                           PIC X(100).
            03  WRK-CHKMERR                         PIC X(200).
+           03  WRK-TEKBYO-CHKKBN                   PIC X(1).
+           03  WRK-SHO                             PIC 9(05).
+           03  WRK-AMARI                           PIC 9(05).
+           03  WRK-TEXT                            PIC X(300).
+           03  WRK-TEXT-LEN                        PIC 9(05).
+           03  WRK-KENSU-Z                         PIC ZZZZZZ.
       *
            COPY    "CPSHELLTBL.INC".
+      *
+           COPY    "COMMON-SPA"        REPLACING 
+                                       //SPA-//    BY //WSPA-//.
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+       01  CHKSND-REC.
+           COPY    "CPCHKSND.INC".
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
@@ -117,6 +144,16 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *    全角変換
+           COPY    "CPORCXKANACONV.INC".
+      *
+           COPY    "CPORCSS004.INC".
+      *
+      *    一時チェックマスタ編集サブ
+           COPY    "CPORCSS013.INC".
+      *
+           COPY    "CPORCSS013.INC"    REPLACING
+                                       //SS013-// BY //TSS013-//.
       *
       *    一覧印刷変換領域
            COPY    "CPORCHXLST.INC".
@@ -246,20 +283,18 @@
            WHEN    "B"
                MOVE    "診療行為の併用算定一覧表（同会計内）"
                                        TO  WRK-TITLE
+           WHEN    "Y"
+               MOVE    "適応病名マスタ一覧表（薬剤）"
+                                       TO  WRK-TITLE
+           WHEN    "Z"
+               MOVE    "適応病名マスタ一覧表（診療行為）"
+                                       TO  WRK-TITLE
            END-EVALUATE
       *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
-           MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
-           MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
-           MOVE    "ORCBX01"           TO  JOB-PGID
-           MOVE    WRK-TITLE           TO  JOB-SHELLMSG
-           MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
-           CALL    "ORCSJOB"               USING
-                                           ORCSJOBKANRIAREA
-                                           JOBKANRI-REC
-                                           SPA-AREA
+           PERFORM 800-ORCSJOB-SEC
       *
            INITIALIZE                  SGETTEMP-AREA
            MOVE    RECEERR TO SGETTEMP-BASENAMES (1)
@@ -286,6 +321,13 @@
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
+      *
+           EVALUATE    WRK-PARA-CHKKBN
+           WHEN    "Y"
+               MOVE    "1"             TO  WRK-TEKBYO-CHKKBN
+           WHEN    "Z"
+               MOVE    "2"             TO  WRK-TEKBYO-CHKKBN
+           END-EVALUATE
       *
            .
        110-SPA-SET-EXT.
@@ -325,6 +367,10 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
+           IF    ( WRK-PARA-CHKKBN     =   "Y" OR "Z" )
+               PERFORM 2001-TEKBYO-START-SEC
+           END-IF
+      *
            INITIALIZE                      ORCHXLSTAREA
            MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
            MOVE    WRK-PARA-STSRYCD    TO  HXLST-SRYCD
@@ -342,10 +388,170 @@
       *
            MOVE    1                   TO  FLG-END
       *
+           IF    ( WRK-PARA-CHKKBN     =   "Y" OR "Z" )
+               PERFORM 2001-TEKBYO-END-SEC
+           END-IF
+      *
            .
        200-MAIN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    適応病名マスタ一覧表開始処理
+      *****************************************************************
+       2001-TEKBYO-START-SEC           SECTION.
+      *
+           MOVE    "STM"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           STRING  "対象データを取得しています"
+                                       DELIMITED BY SIZE
+           INTO    JOB-YOBI
+           END-STRING
+      *
+           PERFORM 800-ORCSJOB-SEC
+      *
+           PERFORM 20011-TEKBYO-START-SEC
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBCREATE"         TO  SS013-FUNC
+           MOVE     WRK-TEKBYO-CHKKBN  TO  SS013-CHKKBN
+           MOVE     "9"                TO  SS013-CREATEKBN
+           MOVE     WRK-PARA-KJNYMD    TO  SS013-KJNYMD
+           CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+           MOVE     SS013-AREA         TO  TSS013-AREA
+      *
+           OPEN    INPUT   TENSU-FILE
+      *
+           PERFORM 901-TENSU-READ-SEC
+      *
+           PERFORM UNTIL ( FLG-TENSU   NOT =   ZERO )
+      *
+               INITIALIZE                      SS013-AREA
+               MOVE     "DBINSERT"         TO  SS013-FUNC
+               MOVE     WRK-TEKBYO-CHKKBN  TO  SS013-CHKKBN
+               MOVE     "1"                TO  SS013-TEKBYOKBN
+               MOVE     TNS-SRYCD          TO  SS013-SRYCD
+               MOVE     WRK-PARA-KJNYMD    TO  SS013-KJNYMD
+               MOVE     TSS013-TEMP-NAME   TO  SS013-TEMP-NAME
+               MOVE     TSS013-TEMP-KEY    TO  SS013-TEMP-KEY
+               CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+      *
+               PERFORM 901-CHKSND-KEY23-SEL-SEC
+               IF    ( FLG-CHKSND          =   ZERO )
+      *
+                   COMPUTE CNT-CHKSND = CNT-CHKSND + 1
+      *
+                   DIVIDE  50  INTO    CNT-CHKSND  GIVING  WRK-SHO
+                   REMAINDER WRK-AMARI
+                   END-DIVIDE
+      *
+                   IF    ( WRK-AMARI       =   ZERO )
+                       MOVE    CNT-CHKSND  TO  WRK-KENSU-Z
+                       MOVE    WRK-KENSU-Z TO  WRK-TEXT
+                       PERFORM 800-ZENKAKU-SEC
+      *
+                       MOVE    "STM"       TO  SJOBKANRI-MODE
+                       INITIALIZE              JOBKANRI-REC
+                       STRING  "適応病名マスタを参照しています"
+                                               DELIMITED BY SIZE
+                               WRK-TEXT        DELIMITED BY SPACE
+                               "件"            DELIMITED BY SIZE
+                       INTO    JOB-YOBI
+                       END-STRING
+      *
+                       PERFORM 800-ORCSJOB-SEC
+      *
+                   END-IF
+      *
+                   MOVE    "0"             TO  CHKSND-CDKBN
+                   MOVE    CHKSND-REC      TO  MCPDATA-REC
+      *
+                   MOVE    "tbl_chksnd"    TO  MCP-TABLE
+                   MOVE    "tmpins2"       TO  MCP-PATHNAME
+                   PERFORM 910-DBINSERT-SEC
+               END-IF
+      *
+               PERFORM 901-TENSU-READ-SEC
+      *
+           END-PERFORM
+      *
+           CLOSE   TENSU-FILE
+      *
+           MOVE    "STM"       TO  SJOBKANRI-MODE
+           INITIALIZE              JOBKANRI-REC
+           STRING  "印刷データを作成しています"
+                                   DELIMITED BY SIZE
+           INTO    JOB-YOBI
+           END-STRING
+      *
+           PERFORM 800-ORCSJOB-SEC
+      *
+           .
+       2001-TEKBYO-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ一覧表開始処理
+      *****************************************************************
+       20011-TEKBYO-START-SEC          SECTION.
+      *
+           INITIALIZE                  SS004-AREA
+           MOVE    WRK-TEKBYO-CHKKBN   TO  SS004-SRYCDKBN
+           MOVE    6                   TO  SS004-KIKAN
+           MOVE    SPA-AREA            TO  WSPA-AREA
+           MOVE    WRK-PARA-KJNYMD     TO  WSPA-SYSYMD
+           CALL    "ORCSS004"          USING
+                                       SS004-AREA
+                                       WSPA-AREA
+      *
+           OPEN    I-O                 TENSU-FILE
+      *
+           PERFORM 900-CHKSND-KEY23-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+      *
+               PERFORM 900-TENSU-START-SEC
+               IF    ( FLG-TENSU       NOT =   ZERO )
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       WRITE    TNS-TENSU-REC
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-CHKSND-KEY23-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key23"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           CLOSE   TENSU-FILE
+      *
+           .
+       20011-TEKBYO-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ一覧表終了処理
+      *****************************************************************
+       2001-TEKBYO-END-SEC             SECTION.
+      *
+           MOVE    "STM"       TO  SJOBKANRI-MODE
+           INITIALIZE              JOBKANRI-REC
+           PERFORM 800-ORCSJOB-SEC
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBDROP"           TO  SS013-FUNC
+           CALL     "ORCSS013"         USING
+                                       SS013-AREA
+                                       SPA-AREA
+      *
+           .
+       2001-TEKBYO-END-EXT.
+           EXIT.
       *****************************************************************
       *    エラー出力処理
       *****************************************************************
@@ -364,16 +570,9 @@
       *        ジョブ管理開始処理
                MOVE    "JBE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
-               MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
-               MOVE    WRK-PARA-SHELLID
-                                       TO  JOB-SHELLID
                MOVE    WRK-CHKMERR     TO  JOB-YOBI
                MOVE    "9999"          TO  JOB-ERRCD
-               MOVE    WRK-PARA-HOSPNUM TO JOB-HOSPNUM
-               CALL    "ORCSJOB"           USING
-                                           ORCSJOBKANRIAREA
-                                           JOBKANRI-REC
-                                           SPA-AREA
+               PERFORM 800-ORCSJOB-SEC
            END-IF
       *
            MOVE    1                   TO  FLG-END
@@ -396,15 +595,8 @@
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
-           MOVE    WRK-PARA-SHELLID
-                                   TO  JOB-SHELLID
            MOVE    CNT-JOB-UPDCNT  TO  JOB-UPDCNT
-           MOVE    WRK-PARA-HOSPNUM TO JOB-HOSPNUM
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
+           PERFORM 800-ORCSJOB-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
       *
@@ -412,6 +604,228 @@
        300-END-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    全角変換処理
+      *****************************************************************
+       800-ZENKAKU-SEC             SECTION.
+      *
+           MOVE    ZERO            TO  WRK-TEXT-LEN
+      *
+           INITIALIZE                  ORCXKANACONVAREA
+           MOVE 300                TO  KANACONV-LEN
+           MOVE 1000               TO  KANACONV-STLEN
+           MOVE 1                  TO  KANACONV-CONV-FLAG
+           MOVE 15                 TO  KANACONV-CHAR-TYPE
+           MOVE WRK-TEXT           TO  KANACONV-INDATA
+           CALL "kanaconv"             USING ORCXKANACONVAREA
+           IF    ( KANACONV-RETURN =   ZERO )
+               MOVE    KANACONV-OUTDATA
+                                       TO  WRK-TEXT
+               MOVE    KANACONV-MAXLEN TO  WRK-TEXT-LEN
+           END-IF
+      *
+           .
+       800-ZENKAKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ジョブ管理編集処理
+      *****************************************************************
+       800-ORCSJOB-SEC                 SECTION.
+      *
+           MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
+           MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
+           MOVE    "ORCBX01"           TO  JOB-PGID
+           MOVE    WRK-TITLE           TO  JOB-SHELLMSG
+           MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"               USING
+                                           ORCSJOBKANRIAREA
+                                           JOBKANRI-REC
+                                           SPA-AREA
+      *
+           .
+       800-ORCSJOB-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ検索処理
+      *****************************************************************
+       900-TENSU-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
+           INITIALIZE                      TNS-TENSU-REC
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    CHKSND-SRYCD        TO  TNS-SRYCD
+           MOVE    WRK-PARA-KJNYMD     TO  TNS-YUKOSTYMD
+                                           TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+           ELSE
+               MOVE    1               TO  FLG-TENSU
+               INITIALIZE                  TNS-TENSU-REC
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-TENSU-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY23-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    WRK-TEKBYO-CHKKBN   TO  CHKSND-CHKKBN
+           MOVE    "%"                 TO  CHKSND-SRYCD
+           MOVE    "0"                 TO  CHKSND-CDKBN
+           MOVE    WRK-PARA-KJNYMD     TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY23-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY23-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY23-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       901-CHKSND-KEY23-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    WRK-TEKBYO-CHKKBN   TO  CHKSND-CHKKBN
+           MOVE    TNS-SRYCD           TO  CHKSND-SRYCD
+           MOVE    WRK-PARA-KJNYMD     TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       901-CHKSND-KEY23-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数ファイルSTART処理
+      *****************************************************************
+       900-TENSU-START-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    CHKSND-SRYCD        TO  TNS-SRYCD
+           MOVE    LOW-VALUE           TO  TNS-YUKOSTYMD
+                                           TNS-YUKOEDYMD
+      *
+           START   TENSU-FILE
+               KEY IS  >=   TNS-KEY
+           INVALID
+               MOVE    1               TO  FLG-TENSU
+           NOT INVALID
+               PERFORM 900-TENSU-READ-SEC
+           END-START
+           
+      *
+           .
+       900-TENSU-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数ファイル読込処理
+      *****************************************************************
+       900-TENSU-READ-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-TENSU   NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               READ    TENSU-FILE          NEXT
+               AT  END
+                   MOVE    1           TO  FLG-TENSU
+               NOT AT  END
+      *
+                   IF    ( TNS-HOSPNUM     =   CHKSND-HOSPNUM )
+                    AND  ( TNS-SRYCD       =   CHKSND-SRYCD )
+                       IF    ( TNS-YUKOSTYMD  <=   WRK-PARA-KJNYMD )
+                         AND ( TNS-YUKOEDYMD  >=   WRK-PARA-KJNYMD )
+                           MOVE    1   TO  FLG-LOOPEND
+                       END-IF
+                   ELSE
+                           MOVE    1   TO  FLG-TENSU
+                   END-IF
+               END-READ
+      *
+           END-PERFORM
+      *
+           .
+       900-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数ファイル読込処理
+      *****************************************************************
+       901-TENSU-READ-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
+           READ    TENSU-FILE          NEXT
+           AT  END
+               MOVE    1               TO  FLG-TENSU
+           END-READ
+      *
+           .
+       901-TENSU-READ-EXT.
+           EXIT.
       *****************************************************************
       *    ＤＢ　オープン処理
       *****************************************************************
@@ -490,4 +904,91 @@
                                        SPA-AREA
            .
        900-DBSTART-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理（FHETCHも行う)
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理（FHETCHは行わない)
+      *****************************************************************
+       911-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       911-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢクローズ処理
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC                 SECTION.
+      *
+           MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＤＥＬＥＴＥ処理
+      *****************************************************************
+       910-DBDELETE-SEC                 SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＩＮＳＥＲＴ処理
+      *****************************************************************
+       910-DBINSERT-SEC                SECTION.
+      *
+           MOVE    "DBINSERT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
            EXIT.

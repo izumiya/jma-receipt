@@ -98,6 +98,7 @@
       *
       *
        01  CONST-AREA.
+           03  CONST-ALL                       PIC X(01)   VALUE "0".
            03  CONST-YAKUZAI                   PIC X(01)   VALUE "1".
            03  CONST-KENSA                     PIC X(01)   VALUE "2".
            03  CONST-SRYCD-MAX                 PIC 9(05)   VALUE 5.
@@ -305,16 +306,19 @@
       *
            MOVE  ZERO              TO  FLG-TARGET
       *
-           IF  ( SS004-SRYCDKBN        =   CONST-KENSA )
+           EVALUATE    SS004-SRYCDKBN
+           WHEN    CONST-ALL
+               MOVE    1           TO  FLG-TARGET
+           WHEN    CONST-KENSA
                IF  ( WRK-SRYCD(1:2)    =  "16" )
                 OR ( WRK-SRYCD(1:3)    =  "002" )
                    MOVE    1       TO  FLG-TARGET
                END-IF
-           ELSE
+           WHEN    CONST-YAKUZAI
                IF  ( WRK-SRYCD(1:1)    =  "6" )
                    MOVE    1       TO  FLG-TARGET
                END-IF
-           END-IF
+           END-EVALUATE
       *
            IF    ( FLG-TARGET          =   1 )
                PERFORM 900-SS00401-READ-DYN-SEC
@@ -469,13 +473,20 @@
            MOVE    "%"                 TO  SRY-NYUGAIKBN
            MOVE    WRK-STSRYYM         TO  SRY-SRYYM
            MOVE    WRK-EDSRYYM         TO  SRY-CREYMD
-           IF   (  SS004-SRYCDKBN      =   CONST-KENSA )
+           EVALUATE    SS004-SRYCDKBN
+           WHEN    CONST-ALL
+               MOVE    "002000000"     TO  SRY-SRYCD (1)
+               MOVE    "699999999"     TO  SRY-SRYCD (2)
+           WHEN    CONST-KENSA
                MOVE    "002000000"     TO  SRY-SRYCD (1)
                MOVE    "169999999"     TO  SRY-SRYCD (2)
-           ELSE
+           WHEN    CONST-YAKUZAI
                MOVE    "600000000"     TO  SRY-SRYCD (1)
                MOVE    "699999999"     TO  SRY-SRYCD (2)
-           END-IF
+           WHEN    OTHER
+               MOVE    "XXXXXXXXX"     TO  SRY-SRYCD (1)
+               MOVE    "XXXXXXXXX"     TO  SRY-SRYCD (2)
+           END-EVALUATE
       *
            MOVE    SRYACT-REC          TO  MCPDATA-REC
            MOVE    "tbl_sryact"        TO  MCP-TABLE

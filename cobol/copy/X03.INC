@@ -25,6 +25,7 @@
               03  X03-B09-2-STATE PIC S9(9)   BINARY.
               03  X03-B10-STATE PIC S9(9)   BINARY.
               03  X03-B10-2-STATE PIC S9(9)   BINARY.
+              03  X03-BTN-INS-STATE PIC S9(9)   BINARY.
               03  X03-LCHKKBNMEI.
                 04  X03-VALUE   PIC X(70).
               03  X03-LYUKOSTYMD.

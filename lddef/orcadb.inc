@@ -192,4 +192,6 @@ db	{
 	tbl_med_image;
 	tbl_das_conf;
 	monbatch_log;
+	tbl_tekiou_medicine;
+	tbl_tekiou_disease;
 };

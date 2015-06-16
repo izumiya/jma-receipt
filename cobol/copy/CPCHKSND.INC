@@ -36,7 +36,7 @@
       *コード区分
                05  CHKSND-CDKBN          PIC  X(01).
       *連番号
-               05  CHKSND-RENNUM         PIC  9(03).
+               05  CHKSND-RENNUM         PIC  9(05).
       *適用コード
            03  CHKSND-CD                 PIC  X(170).
       *病名
@@ -57,6 +57,8 @@
            03  CHKSND-HOSOKU             PIC  X(40).
       *補足コメント条件区分
            03  CHKSND-HOSOKU-COMPKBN     PIC  X(1).
+      *適応病名チェック区分
+           03  CHKSND-TEKBYOKBN          PIC  X(1).
       *端末ＩＤ
            03  CHKSND-TERMID             PIC  X(16).
       *オペーレータＩＤ

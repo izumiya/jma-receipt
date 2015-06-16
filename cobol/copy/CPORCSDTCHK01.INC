@@ -46,5 +46,6 @@
                    07  SDTCHK01-O-TEKBYOMEI    PIC X(160).
                    07  SDTCHK01-O-TEKCOMPKBN   PIC X(1).
                    07  SDTCHK01-O-HOSOKU       PIC X(40).
+                   07  SDTCHK01-O-TEKHOSOKU    PIC X(40).
                    07  SDTCHK01-O-ERRDAY-G.
                        09  SDTCHK01-O-ERRDAY   PIC 9(01)   OCCURS  31.

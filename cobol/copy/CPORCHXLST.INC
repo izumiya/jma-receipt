@@ -31,12 +31,29 @@
            03  HXLST-SRYCD              PIC X(09).
       *    対象コード（終了）
            03  HXLST-SRYCD-END          PIC X(09).
+      *
+      *    対象ＩＤ
+           03  HXLST-ID                 PIC 9(09).
       *    処理区分
            03  HXLST-PROCKBN            PIC X(01).
       *    ソート区分
            03  HXLST-SRTKBN             PIC X(01).
       *    基準日
            03  HXLST-KJNYMD             PIC X(08).
+      *    適応病名マスタ分判別キー
+           03  HXLST-TEMP-NAME          PIC X(10).
+           03  HXLST-TEMP-KEY           PIC X(16).
+      *    適応病名マスタ対象区分（マスタ）
+      *    0:薬剤及び診療行為
+      *    1:薬剤
+      *    2:診療行為
+           03  HXLST-TEKBYOMST          PIC X(01).
+      *    適応病名マスタ対象区分（範囲）
+      *    1:チェックマスタ登録分のみ印刷する
+      *    2:自院コードと過去６ヶ月の診療内容より印刷する
+      *    3:１または２に該当するものを印刷する
+      *    4:全て印刷する
+           03  HXLST-TEKBYOPRT          PIC X(01).
       *    一括パラメタ
            03  HXLST-PRTAREA            PIC X(25000).
       *    出力件数

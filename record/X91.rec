@@ -27,6 +27,12 @@ X91 {
     CHKSRYHEIB {
       isactive bool;
     };
+    CHKTEKBYOYKZ {
+      isactive bool;
+    };
+    CHKTEKBYOSRY {
+      isactive bool;
+    };
     CHKSRYRANGE {
       isactive bool;
     };

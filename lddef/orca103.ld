@@ -62,6 +62,7 @@ db	{
 	tbl_dbcatalog;
 	tbl_prtdata;
 	tbl_prtkanri;
+	tbl_tekiou_disease;
 };
 
 #include "orcadbh.inc"

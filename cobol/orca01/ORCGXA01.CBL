@@ -126,6 +126,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-LIST-ROW        PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
+           03  FLG-LOOPEND         PIC 9(01).
       *
       *    •∑•π•∆•‡ŒŒ∞Ë
        01  SYS-AREA.
@@ -414,9 +415,10 @@
       *
            INITIALIZE              SPA-XA01-AREA
                                    SPA-XA01KYOUTU
-           PERFORM 310-SPASET-SEC
       *
-           MOVE    WRK-MOTOPG              TO  SPA-XA01-MOTOPG
+           MOVE    WRK-MOTOPG      TO  SPA-XA01-MOTOPG
+      *
+           PERFORM 310-SPASET-SEC
       *
            .
        300-SCREEN-EXT.
@@ -496,6 +498,17 @@
                                                 TO  SPA-GMN-TSHORI-TITLE
                                                            (IDX)
                    END-SEARCH
+      *
+      *                                                                                          
+                   IF    ( SPA-XA01-MOTOPG     =   "X91" )
+                    AND  ( SPA-PRT-GROUP   NOT =   SPACE )
+                       IF    ( PRTKANRI-TBL-GROUP
+                                               =   SPA-PRT-GROUP )
+                           MOVE    PRTKANRI-TBL-GROUP
+                                               TO  SPA-GMN-TBL-GROUP
+                       END-IF
+                   END-IF
+      *
                END-IF                                 
                MOVE    PRTKANRI-RENNUM     TO  SPA-GMN-TRENNUM    (IDX)
                MOVE    PRTKANRI-SHORI-RENNUM
@@ -518,8 +531,12 @@
            MOVE    IDX                 TO  SPA-GMN-MAX
       *                                 
            MOVE    1                   TO  FLG-LIST-ROW
-      *                                 
-           MOVE    1                   TO  SPA-GMN-CUR                                                 
+      *
+           IF    ( SPA-GMN-TBL-GROUP   =   SPACE )
+               MOVE    1               TO  SPA-GMN-CUR
+           ELSE
+               MOVE    99              TO  SPA-GMN-CUR
+           END-IF
            .
        310-SPASET-EXT.
            EXIT.
@@ -2045,16 +2062,36 @@
       *****************************************************************
        900-PRTKANRI-FET-SEC            SECTION.
       *
-           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-           MOVE    "key13"             TO  MCP-PATHNAME
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-PRTKANRI    NOT =   ZERO )
+                    OR   ( FLG-LOOPEND     NOT =   ZERO )
+      *
+               MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+               MOVE    "key13"             TO  MCP-PATHNAME
                PERFORM 900-DBFETCH-SEC
-      *                                  
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC         TO  PRTKANRI-REC
-               MOVE    ZERO                TO  FLG-PRTKANRI
-           ELSE
-               MOVE    1                   TO  FLG-PRTKANRI
-           END-IF
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PRTKANRI-REC
+                   MOVE    ZERO            TO  FLG-PRTKANRI
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+      *
+                   IF    ( SPA-XA01-MOTOPG     =   "X91" )
+                    AND  ( SPA-PRT-GROUP   NOT =   SPACE )
+                       IF    ( PRTKANRI-TBL-GROUP
+                                               =   SPA-PRT-GROUP )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO    TO  FLG-LOOPEND
+                       END-IF
+                   END-IF
+      *
+               ELSE
+                   MOVE    1               TO  FLG-PRTKANRI
+               END-IF
+      *
+           END-PERFORM
+      *
            .
        900-PRTKANRI-FET-EXT.
            EXIT.

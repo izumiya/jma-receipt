@@ -382,7 +382,7 @@
       *
            PERFORM UNTIL ( FLG-TENSU   NOT =   ZERO )
       *
-               PERFORM 900-CHKSND-KEY-SEL-SEC
+               PERFORM 900-CHKSND-KEY3-SEL-SEC
                IF    ( FLG-CHKSND      =   ZERO )
                    CONTINUE
                ELSE
@@ -839,7 +839,7 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY-SEL-SEC      SECTION.
+       900-CHKSND-KEY3-SEL-SEC      SECTION.
       *
            MOVE    ZERO            TO  FLG-CHKSND
       *
@@ -849,11 +849,10 @@
            MOVE    TNS-SRYCD       TO  CHKSND-SRYCD
            MOVE    WRK-PARA-KJNYMD TO  CHKSND-YUKOSTYMD
                                        CHKSND-YUKOEDYMD
-           MOVE    "1"             TO  CHKSND-CDKBN
-           MOVE    1               TO  CHKSND-RENNUM
+           MOVE    "0"             TO  CHKSND-CDKBN
            MOVE    CHKSND-REC      TO  MCPDATA-REC
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key3"          TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  CHKSND-REC
@@ -863,11 +862,11 @@
            END-IF
       *
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key3"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-CHKSND-KEY-SEL-EXT.
+       900-CHKSND-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

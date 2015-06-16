@@ -128,6 +128,7 @@
            03  CNT-TEKLINE             PIC 9(05).
            03  CNT-SETCD               PIC 9(05).
            03  CNT-MSTSEQ              PIC 9(10).
+           03  CNT-OTHER               PIC 9(10).
       *
       *
       *    フラグ領域
@@ -143,6 +144,7 @@
            03  FLG-TENSU               PIC 9(01).
            03  FLG-CHKMST              PIC 9(01).
            03  FLG-CHKSND              PIC 9(01).
+           03  FLG-CHK002              PIC 9(01).
            03  FLG-CHKTRD              PIC 9(01).
            03  FLG-CHK005              PIC 9(01).
            03  FLG-BYOMEI              PIC 9(01).
@@ -176,6 +178,7 @@
            03  FLG-B01R                PIC 9(01).
            03  FLG-B01T                PIC 9(01).
            03  FLG-SET                 PIC 9(01).
+           03  FLG-EDIT                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -231,6 +234,8 @@
                                        OCCURS  100.
            03  WRK-STSRYCD             PIC X(09).
            03  WRK-EDSRYCD             PIC X(09).
+           03  WRK-TEKBYOKBN           PIC X(01).
+           03  WRK-DELIMITER           PIC X(02).
       *
        01  KEY-AREA.
            03  KEY-TEKCD               PIC X(200).
@@ -341,6 +346,10 @@
                                        BY          //WKISET-//.
       *
            COPY    "CPTTNS.INC".
+      *
+       01  TCHKSND-REC.
+           COPY    "CPCHKSND.INC"      REPLACING   //CHKSND-//
+                                       BY          //TCHKSND-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -500,6 +509,8 @@
            WHEN    "1"
            WHEN    "2"
            WHEN    "6"
+           WHEN    "Y"
+           WHEN    "Z"
       *
                PERFORM 200-MEISAI-CHKSND-SYORI-SEC
            WHEN    "7"
@@ -573,6 +584,12 @@
            IF    ( SYS-1101-YBUTAGAIKBN    =   SPACE )
                MOVE    "1"         TO  SYS-1101-YBUTAGAIKBN
            END-IF
+           IF    ( SYS-1101-TEKBYOYKZKBN   =   SPACE )
+               MOVE    ZERO        TO  SYS-1101-TEKBYOYKZKBN
+           END-IF
+           IF    ( SYS-1101-TEKBYOSRYKBN   =   SPACE )
+               MOVE    ZERO        TO  SYS-1101-TEKBYOSRYKBN
+           END-IF
       *
            IF    ( HXLST-KJNYMD    =   SPACE )
                MOVE    SPA-SYSYMD  TO  HXLST-KJNYMD
@@ -590,6 +607,8 @@
            WHEN    "1"
            WHEN    "2"
            WHEN    "6"
+           WHEN    "Y"
+           WHEN    "Z"
                PERFORM 1001-CHKSND-SYOKI-SEC
            WHEN    "4"
            WHEN    "5"
@@ -604,6 +623,8 @@
            WHEN    OTHER
                MOVE    -1          TO  HXLST-RCD
            END-EVALUATE
+      *
+           MOVE    "，"               TO  WRK-DELIMITER
       *
            .
        100-SYORI-EXT.
@@ -682,7 +703,7 @@
                                        TO  H01-MIDASI
                    MOVE    "薬剤コード@"
                                        TO  WRK-MIDASI1
-                   MOVE    "  適用薬剤コード@"
+                   MOVE    "  併用禁忌薬剤コード@"
                                        TO  WRK-MIDASI2
            WHEN    "5"
                MOVE
@@ -742,6 +763,22 @@
                    MOVE    "  薬剤コード@"
                                        TO  WRK-MIDASI1
                    MOVE    "    病名コード@"
+                                       TO  WRK-MIDASI2
+           WHEN    "Y"
+               MOVE
+               "＜　適応病名一覧表（薬剤）　＞"
+                                       TO  H01-MIDASI
+                   MOVE    "  薬剤コード@"
+                                       TO  WRK-MIDASI1
+                   MOVE    "    病名@"
+                                       TO  WRK-MIDASI2
+           WHEN    "Z"
+               MOVE
+               "＜　適応病名一覧表（診療行為）　＞"
+                                       TO  H01-MIDASI
+                   MOVE    "  診療行為コード@"
+                                       TO  WRK-MIDASI1
+                   MOVE    "    病名@"
                                        TO  WRK-MIDASI2
            END-EVALUATE
       *
@@ -820,6 +857,7 @@
            MOVE    "2"                 TO  CHK005-CDKBN
       *
            MOVE    HXLST-CHKKBN        TO  CHK005-CHKKBN
+           MOVE    HXLST-ID            TO  CHK005-ID
       *
            MOVE    HXLST-KJNYMD        TO  CHK005-YUKOSTYMD
                                            CHK005-YUKOEDYMD
@@ -939,9 +977,16 @@
       *
            INITIALIZE                  CHKSND-REC
       *
-           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
       *
-           MOVE    HXLST-CHKKBN        TO  CHKSND-CHKKBN
+           EVALUATE    HXLST-CHKKBN
+           WHEN    "Y"
+               MOVE    "1"             TO  CHKSND-CHKKBN
+           WHEN    "Z"
+               MOVE    "2"             TO  CHKSND-CHKKBN
+           WHEN    OTHER
+               MOVE    HXLST-CHKKBN    TO  CHKSND-CHKKBN
+           END-EVALUATE
       *
            MOVE    WRK-STSRYCD         TO  CHKSND-SRYCD
            MOVE    WRK-EDSRYCD         TO  CHKSND-UPSRYCD
@@ -1076,37 +1121,11 @@
       *****************************************************************
        2101-MEISAI-CHKSND-SYORI-SEC    SECTION.
       *
-           PERFORM UNTIL ( FLG-CHKSND  =   1 )
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
       *
-               COMPUTE CNT-MSTSEQ  =   CNT-MSTSEQ  +   1
+               PERFORM 21011-MEISAI-CHKSND-SYORI-SEC
       *
-               MOVE    CHKSND-SRYCD    TO  KEY-TEKCD
-      *
-               MOVE    ZERO            TO  CNT-TEKCD
-               MOVE    ZERO            TO  FLG-TARGET
-               INITIALIZE                  WRK-YKSK-G
-      *
-               PERFORM 210-MEISAI-B01L-SEC
-      *
-               PERFORM UNTIL ( FLG-CHKSND      =   1 )
-                        OR   ( KEY-TEKCD   NOT =   CHKSND-SRYCD )
-      *
-                   PERFORM 210-MEISAI-B01R-SEC
-      *
-                   PERFORM 900-CHKSND-FET-SEC
-      *
-               END-PERFORM
-      *
-               PERFORM VARYING IDXY    FROM    1   BY  1
-                       UNTIL ( IDXY    >   WRK-YKSK-MAX )
-                   PERFORM 210-YAKUSOKU-CHK-SEC
-               END-PERFORM
-      *
-               IF    ( FLG-TARGET  =   1 )
-                   INITIALIZE              B01T-REC
-                   MOVE    CNT-MSTSEQ  TO  B01T-MSTSEQ
-                   WRITE   B01T-REC
-               END-IF
+               PERFORM 900-CHKSND-FET-SEC
       *
            END-PERFORM
       *
@@ -1116,6 +1135,65 @@
       *
            .
        2101-MEISAI-CHKSND-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細編集処理（チェックマスタ２より）
+      *****************************************************************
+       21011-MEISAI-CHKSND-SYORI-SEC    SECTION.
+      *
+           MOVE    CHKSND-REC      TO  TCHKSND-REC
+      *
+           COMPUTE CNT-MSTSEQ  =   CNT-MSTSEQ  +   1
+      *
+           MOVE    ZERO            TO  CNT-OTHER
+      *
+           MOVE    ZERO            TO  CNT-TEKCD
+           MOVE    ZERO            TO  FLG-TARGET
+           INITIALIZE                  WRK-YKSK-G
+      *
+           PERFORM 210-MEISAI-B01L-SEC
+      *
+           PERFORM 900-CHKSND-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHK002  NOT =   ZERO )
+      *
+               EVALUATE    TRUE
+               WHEN  ( HXLST-CHKKBN    =   "Y" OR "Z" )
+               WHEN  ( HXLST-TEMP-NAME NOT =   SPACE )
+                AND  ( CHKSND-TERMID   =   HXLST-TEMP-NAME )
+                AND  ( CHKSND-OPID     =   HXLST-TEMP-KEY )
+                   PERFORM 211-MEISAI-B01R-SEC
+               WHEN    OTHER
+                   PERFORM 210-MEISAI-B01R-SEC
+               END-EVALUATE
+      *
+               PERFORM 900-CHKSND-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           IF    ( CNT-OTHER       >   ZERO )
+            AND  ( WRK-PNT         >=  3 )
+               MOVE    SPACE    TO  B01R-TEKIYO (WRK-PNT - 2 : )
+               WRITE   B01R-REC
+           END-IF
+      *
+           PERFORM VARYING IDXY    FROM    1   BY  1
+                   UNTIL ( IDXY    >   WRK-YKSK-MAX )
+               PERFORM 210-YAKUSOKU-CHK-SEC
+           END-PERFORM
+      *
+           IF    ( FLG-TARGET  =   1 )
+               INITIALIZE              B01T-REC
+               MOVE    CNT-MSTSEQ  TO  B01T-MSTSEQ
+               WRITE   B01T-REC
+           END-IF
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       21011-MEISAI-CHKSND-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    明細編集処理（チェックマスタ２より）
@@ -1166,6 +1244,48 @@
            MOVE    WRK-SRYNAME     TO  B01L-NAME
       *
            WRITE   B01L-REC
+      *
+           IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
+      *
+              MOVE    1            TO  FLG-EDIT
+      *
+              IF    ( CHKSND-GRPCHKKBN
+                                   NOT =   SPACE )
+                  MOVE    ZERO     TO  FLG-EDIT
+              END-IF
+      *
+              EVALUATE    CHKSND-TEKBYOKBN
+              WHEN    "0"
+                  MOVE    ZERO     TO  FLG-EDIT
+              WHEN    "1"
+                  CONTINUE
+              WHEN    OTHER
+                  MOVE    SPACE       TO  WRK-TEKBYOKBN
+                  IF    ( CHKSND-CHKKBN   =   "1" )
+                      MOVE    SYS-1101-TEKBYOYKZKBN
+                                      TO  WRK-TEKBYOKBN
+                  ELSE
+                      MOVE    SYS-1101-TEKBYOSRYKBN
+                                      TO  WRK-TEKBYOKBN
+                  END-IF
+                  IF    ( WRK-TEKBYOKBN   =   "1" )
+                   OR  (( WRK-TEKBYOKBN   =   "2" )
+                     AND( CHKSND-RENNUM   =   ZERO ))
+                      CONTINUE
+                  ELSE
+                      MOVE    ZERO    TO  FLG-EDIT
+                  END-IF
+               END-EVALUATE
+      *
+               IF    ( FLG-EDIT       =   1 )
+                   INITIALIZE                 B01R-REC
+                   MOVE    CNT-MSTSEQ     TO  B01R-MSTSEQ
+                   MOVE    "適応病名マスタを参照する"
+                                          TO  B01R-TEKIYO
+                   WRITE   B01R-REC
+               END-IF
+      *
+           END-IF
       *
            IF    ( CHKSND-SRYCD(1:1)       =   "S" OR "P" )
       *
@@ -1470,6 +1590,80 @@
       *
            .
        2001-MEISAI-CHKSND-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細編集処理（チェックマスタ２より）
+      *****************************************************************
+       211-MEISAI-B01R-SEC             SECTION.
+      *
+           MOVE    ZERO        TO  FLG-MEISAI
+           MOVE    ZERO        TO  FLG-TEKCD
+      *
+           COMPUTE CNT-OTHER = CNT-OTHER   +   1
+      *
+           IF    ( CNT-OTHER           =   1 )
+      *
+               IF    ( HXLST-CHKKBN        =   "Y" OR "Z" )
+                   CONTINUE
+               ELSE
+      *
+                   INITIALIZE                     B01R-REC
+                   MOVE    CNT-MSTSEQ         TO  B01R-MSTSEQ
+                   MOVE    "■■■　以下適応病名マスタより　■■■"
+                                          TO  B01R-TEKIYO
+                   WRITE   B01R-REC
+               END-IF
+      *
+               MOVE    1                  TO  WRK-PNT
+      *
+               INITIALIZE                     B01R-REC
+               MOVE    CNT-MSTSEQ         TO  B01R-MSTSEQ
+      *
+           END-IF
+      *
+           IF    ( HXLST-CHKKBN        =   "Y" OR "Z" )
+               CONTINUE
+           ELSE
+               EVALUATE    CHKSND-UTAGAIKBN
+               WHEN    "0"
+                   IF    ( SYS-1101-YBUTAGAIKBN    =   "2" )
+                       MOVE    "1"        TO  B01R-UTAGAIKBN
+                       MOVE    "#"        TO  B01R-UTAGAIKBNMEI
+                   END-IF
+               WHEN    "1"
+                   CONTINUE
+               WHEN    "2"
+                       MOVE    "1"        TO  B01R-UTAGAIKBN
+                       MOVE    "#"        TO  B01R-UTAGAIKBNMEI
+               END-EVALUATE
+           END-IF
+      *
+           MOVE    SPACE              TO  WRK-MEISAISTR
+      *
+           STRING  CHKSND-BYOMEI      DELIMITED BY SPACE
+                   WRK-DELIMITER      DELIMITED BY SPACE
+           INTO    WRK-MEISAISTR
+           END-STRING
+      *
+           PERFORM 20011-LINE-FEED-CHK-SEC
+      *
+           IF  ( FLG-LINE-FEED         =   1 )
+      *
+               WRITE   B01R-REC
+      *
+               INITIALIZE              B01R-REC
+               MOVE    CNT-MSTSEQ  TO  B01R-MSTSEQ
+      *
+               MOVE    1           TO  WRK-PNT
+           END-IF
+      *
+           STRING  WRK-STR (1:WRK-STRLEN)  DELIMITED   BY  SIZE
+           INTO    B01R-TEKIYO
+           WITH    POINTER     WRK-PNT
+           END-STRING
+      *
+           .
+       211-MEISAI-B01R-EXT.
            EXIT.
       *****************************************************************
       *    入力セット内約束コード対象チェック処理
@@ -2097,7 +2291,8 @@
            WITH    POINTER WRK-TGPNT
            END-STRING
       *
-           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6" )
+           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6"
+                                        OR "Y" OR "Z" )
       *
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL ( IDX2    >   CONST-TOTUGO-MES-MAX )
@@ -2115,7 +2310,8 @@
       *
            END-IF
       *
-           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6" )
+           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6"
+                                        OR "Y" OR "Z" )
                IF    ( FLG-UTAGAIKBN       =   1 )
                        STRING "#:疑い病名を認めない"
                               DELIMITED   BY  SPACE
@@ -2466,17 +2662,66 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
+       900-CHKSND-KEY2-SEL-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK002
+      *
+           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               INITIALIZE                  CHKSND-REC
+               MOVE    1               TO  FLG-CHK002
+           END-IF
+      *
+           .
+       900-CHKSND-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY2-FET-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK002
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               INITIALIZE                  CHKSND-REC
+               MOVE    1               TO  FLG-CHK002
+           END-IF
+      *
+           .
+       900-CHKSND-KEY2-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
        900-CHKSND-KEY23-SEL-SEC              SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
            INITIALIZE                      CHKSND-REC
            MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
-           MOVE    HXLST-CHKKBN        TO  CHKSND-CHKKBN
+           EVALUATE    HXLST-CHKKBN
+           WHEN    "X"
+               MOVE    "1"             TO  CHKSND-CHKKBN
+           WHEN    "Y"
+               MOVE    "2"             TO  CHKSND-CHKKBN
+           WHEN    OTHER
+               MOVE    HXLST-CHKKBN    TO  CHKSND-CHKKBN
+           END-EVALUATE
            MOVE    WRK-TNS-SRYCD       TO  CHKSND-SRYCD
            MOVE    HXLST-KJNYMD        TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
-           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
            MOVE    CHKSND-REC          TO  MCPDATA-REC
       *
            MOVE    "tbl_chksnd"        TO  MCP-TABLE

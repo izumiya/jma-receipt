@@ -13,6 +13,9 @@ X04 {
     B06 {
       label varchar(10);
     };
+    B07 {
+      state int;
+    };
     B09 {
       state int;
     };
@@ -23,7 +26,13 @@ X04 {
       style varchar(20);
       textdata varchar(30);
     };
+    BTN_INS {
+      state int;
+    };
     BTN_ALLINS {
+      state int;
+    };
+    BTN_ALLDEL {
       state int;
     };
     CHKKBN {
@@ -47,6 +56,21 @@ X04 {
       };
       count int;
         item varchar(22)[5];
+    };
+    LBLTEKBYOKBN {
+        textdata varchar(40);
+    };
+    CMB_TEKBYOKBN {
+      TEKBYOKBN {
+        textdata varchar(100);
+      };
+      count int;
+      item varchar(100)[5];
+	  visible    bool;
+    };
+    LBLMSG01 {
+        style varchar(20);
+        textdata varchar(20);
     };
     SELNUM {
       textdata varchar(50);
@@ -101,6 +125,7 @@ X04 {
     HOSOKU {
       textdata varchar(40);
       state int;
+	  visible  bool;
     };
     LBLHOSOKU_JYKNKBN {
       textdata varchar(8);
@@ -113,22 +138,20 @@ X04 {
       count int;
         item varchar(12)[5];
       state int;
+	  visible  bool;
     };
     LBLUTAGAIKBN {
       textdata varchar(10);
     };
     CMB_UTAGAIKBN {
       UTAGAIKBN {
-        textdata varchar(32);
+        textdata varchar(80);
         state int;
       };
       count int;
-        item varchar(32)[5];
+        item varchar(80)[5];
       state int;
-    };
-    LBLSYSKANRI {
-      style varchar(20);
-      textdata varchar(30);
+	  visible  bool;
     };
     SEL_BYOMEI {
       textdata varchar(100);
@@ -172,6 +195,7 @@ X04 {
       count int;
         item varchar(10)[26];
       state int;
+	  visible  bool;
     };
     scrolledwindow1 {
       BYOLST {
@@ -200,8 +224,8 @@ X04 {
             column1 varchar(3);
             column2 varchar(100);
             column3 varchar(12);
-          }[50];
-          selectdata bool[50];
+          }[100];
+          selectdata bool[100];
       };
     };
     scrolledwindow2 {

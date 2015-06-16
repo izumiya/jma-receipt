@@ -5,7 +5,7 @@ tbl_chksnd	{
 	YUKOSTYMD  		char(8);
 	YUKOEDYMD  		char(8);
 	CDKBN   		char(1);
-	RENNUM			number(3);
+	RENNUM			number(5);
 	CD				varchar(170);
 	BYOMEI			varchar(160);
 	COMPKBN			char(1);
@@ -16,6 +16,7 @@ tbl_chksnd	{
 	GRPID			char(1);
 	HOSOKU			varchar(40);
 	HOSOKU_COMPKBN  char(1);
+	TEKBYOKBN       varchar(1);
 	TERMID  		varchar(16);
 	OPID    		varchar(16);
 	CREYMD  		char(8);
@@ -82,7 +83,7 @@ path	key3	{
 			AND   YUKOSTYMD  <=   :YUKOSTYMD
 			AND   YUKOEDYMD  >=   :YUKOEDYMD
 			AND   CDKBN       =   :CDKBN
-			ORDER   BY        SRYCD,
+			ORDER   BY        YUKOSTYMD,
                                           RENNUM
 		;
 	};
@@ -143,6 +144,7 @@ path	upd1	{
 		GRPID		=	:GRPID,
 		HOSOKU		=	:HOSOKU,
 		HOSOKU_COMPKBN		=	:HOSOKU_COMPKBN,
+		TEKBYOKBN		=	:TEKBYOKBN,
 		TERMID  	 =	:TERMID,
 		OPID    	 =	:OPID,
 		CREYMD  	 =	:CREYMD,
@@ -166,8 +168,8 @@ path	del11	{
 		WHERE 	HOSPNUM	= :HOSPNUM
 			AND   CHKKBN    =   :CHKKBN
 			AND   SRYCD       =   :SRYCD
-			AND   YUKOSTYMD   =   :YUKOSTYMD
-			AND   YUKOEDYMD   =   :YUKOEDYMD
+			AND   YUKOSTYMD   <=   :YUKOSTYMD
+			AND   YUKOEDYMD   >=   :YUKOEDYMD
 		;
 	};
 };
@@ -285,8 +287,7 @@ path	key11	{
 		AND  A.CHKKBN     = :CHKKBN
 		AND A.YUKOSTYMD    <= :YUKOSTYMD
 		AND A.YUKOEDYMD    >= :YUKOEDYMD
-		AND A.RENNUM        = 1 
-		AND A.CDKBN       =   '1'
+		AND A.CDKBN       =   :CDKBN
 		AND B.HOSPNUM	= A.HOSPNUM
 		AND B.SRYCD         = A.SRYCD
 		AND B.YUKOSTYMD    <= :YUKOSTYMD
@@ -383,13 +384,14 @@ path	ins1	{
 		GRPID,
 		HOSOKU,
 		HOSOKU_COMPKBN,
+		TEKBYOKBN,
 		TERMID,
 		OPID,
 		CREYMD,
 		UPYMD,
 		UPHMS
 		) SELECT HOSPNUM,CHKKBN,:SRYCD,:YUKOSTYMD,:YUKOEDYMD,CDKBN,RENNUM,CD,BYOMEI,
-						COMPKBN,UTAGAIKBN,BYOMEIHENFLG,NYUGAIKBN,GRPCHKKBN,GRPID,HOSOKU,HOSOKU_COMPKBN,:TERMID,:OPID,:CREYMD,:UPYMD,:UPHMS
+						COMPKBN,UTAGAIKBN,BYOMEIHENFLG,NYUGAIKBN,GRPCHKKBN,GRPID,HOSOKU,HOSOKU_COMPKBN,TEKBYOKBN,:TERMID,:OPID,:CREYMD,:UPYMD,:UPHMS
 			FROM tbl_chksnd
 			WHERE HOSPNUM = :HOSPNUM
 			AND  CHKKBN  = :UPCHKKBN
@@ -407,6 +409,7 @@ path	key16	{
                 AND  A.CHKKBN     =  :CHKKBN
                 AND A.YUKOSTYMD    <= :YUKOSTYMD
                 AND A.YUKOEDYMD    >= :YUKOEDYMD
+                AND A.CDKBN         = :CDKBN
                 AND B.HOSPNUM       = A.HOSPNUM
                 AND B.SRYCD         = A.SRYCD
                 AND B.YUKOSTYMD    <= :YUKOSTYMD
@@ -429,6 +432,7 @@ path	key17	{
                 AND  A.CHKKBN     =  :CHKKBN
                 AND A.YUKOSTYMD    <= :YUKOSTYMD
                 AND A.YUKOEDYMD    >= :YUKOEDYMD
+                AND A.CDKBN         = :CDKBN
                 AND B.HOSPNUM       = A.HOSPNUM
                 AND B.SRYCD         = A.SRYCD
                 AND B.YUKOSTYMD    <= :YUKOSTYMD
@@ -451,6 +455,7 @@ path	key18	{
 		AND  A.CHKKBN     = :CHKKBN
 		AND A.YUKOSTYMD    <= :YUKOSTYMD
 		AND A.YUKOEDYMD    >= :YUKOEDYMD
+        AND A.CDKBN         = :CDKBN
 		AND B.HOSPNUM       = A.HOSPNUM
 		AND B.SRYCD         = A.SRYCD
 		AND B.SRYCD         = :SRYCD
@@ -485,7 +490,8 @@ path	key20	{
 		WHERE  HOSPNUM = :HOSPNUM
 		AND   YUKOSTYMD  <=   :YUKOSTYMD
 		AND   YUKOEDYMD  >=   :YUKOEDYMD
-		AND    CD      = :CD
+		AND   CDKBN    in ('2','3')
+		AND   CD         = :CD
 		ORDER BY HOSPNUM,CHKKBN,SRYCD,YUKOSTYMD,YUKOEDYMD,CDKBN,RENNUM
 		;
 	};
@@ -530,7 +536,7 @@ path	key23		{
 		FROM tbl_chksnd
 		WHERE 	HOSPNUM	= :HOSPNUM
 			AND CHKKBN        =   :CHKKBN
-			AND   SRYCD       LIKE :SRYCD
+			AND  SRYCD       LIKE :SRYCD
 			AND   YUKOSTYMD  <=   :YUKOSTYMD
 			AND   YUKOEDYMD  >=   :YUKOEDYMD
 			AND   CDKBN       =   :CDKBN
@@ -546,7 +552,7 @@ path	key24		{
 		FROM tbl_chksnd
 		WHERE 	HOSPNUM	= :HOSPNUM
 			AND CHKKBN        =   :CHKKBN
-			AND   SRYCD       LIKE :SRYCD
+			AND  SRYCD       LIKE :SRYCD
 			AND   YUKOSTYMD  <=   :YUKOSTYMD
 			AND   YUKOEDYMD  >=   :YUKOEDYMD
 			AND   CDKBN       =   :CDKBN
@@ -624,6 +630,17 @@ path	tmpkey	{
 		WHERE  HOSPNUM	  = :HOSPNUM
 		;
 	};
+	
+	DBCREATE2	{
+		CREATE TEMP TABLE tbl_chksnd ON COMMIT PRESERVE ROWS AS
+		SELECT *
+		FROM   tbl_chksnd
+		WHERE  HOSPNUM	  = :HOSPNUM
+		 AND   CHKKBN	  = :CHKKBN
+			AND  (case when TRIM(:SRYCD ) <> '' then  SRYCD  = :SRYCD  else TRUE end)
+		;
+	};
+		
 		
 	DBCREATEINDEX	{
 		CREATE INDEX idx_chksnd_tmp ON pg_temp.tbl_chksnd (SRYCD)
@@ -671,6 +688,7 @@ path	tmpins2	{
 		GRPID,
 		HOSOKU,
 		HOSOKU_COMPKBN,
+		TEKBYOKBN,
 		TERMID,
 		OPID,
 		CREYMD,
@@ -694,6 +712,7 @@ path	tmpins2	{
 		:GRPID,
 		:HOSOKU,
 		:HOSOKU_COMPKBN,
+		:TEKBYOKBN,
 		:TERMID,
 		:OPID,
 		:CREYMD,
@@ -724,7 +743,7 @@ path	tmpdel1	{
 		DELETE FROM   pg_temp.tbl_chksnd
 		WHERE HOSPNUM	  =   :HOSPNUM
 		AND   CHKKBN      =   :CHKKBN
-		AND   SRYCD       =   :SRYCD
+			AND  (case when TRIM(:SRYCD ) <> '' then  SRYCD  = :SRYCD  else TRUE end)
         AND   TERMID      =   :TERMID
         AND   OPID		  =   :OPID
 		AND   YUKOSTYMD  <=   :YUKOSTYMD
@@ -734,11 +753,74 @@ path	tmpdel1	{
 		WHERE HOSPNUM	  =   :HOSPNUM
 		AND   CHKKBN      =   :CHKKBN
 		AND   SRYCD       =   :SRYCD
-		AND   TERMID     <>   :TERMID   
+		AND   TERMID     <>   :TERMID
         AND   OPID		 <>   :OPID
 		AND   YUKOSTYMD  <=   :YUKOSTYMD
 		AND   YUKOEDYMD  >=   :YUKOEDYMD
 		);
+	};
+};
+
+path	key29		{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key29_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+			WHERE HOSPNUM	  =   :HOSPNUM
+			AND   CHKKBN      =   :CHKKBN
+			AND   SRYCD       =   :SRYCD
+			AND   BYOMEI      LIKE :BYOMEI
+			AND   CDKBN       =   '1'   
+			ORDER   BY    BYOMEI,RENNUM
+		;
+	};
+};
+
+path	key30	{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key30_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   CHKKBN    =   :CHKKBN
+			AND   SRYCD       =   :SRYCD
+			AND   CDKBN       =   :CDKBN
+			ORDER  BY  YUKOSTYMD DESC,
+                                   RENNUM
+		;
+	};
+};
+
+path	key31		{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key31_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND CHKKBN        =   :CHKKBN
+			AND  SRYCD       LIKE :SRYCD
+			AND   YUKOSTYMD  <=   :YUKOSTYMD
+			AND   YUKOEDYMD  >=   :YUKOEDYMD
+			AND   CDKBN       =   :CDKBN
+		ORDER   BY    SRYCD,RENNUM
+		;
+	};
+};
+
+path	key32	{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key32_csr CURSOR FOR
+		SELECT *
+		FROM TBL_CHKSND
+		WHERE  HOSPNUM = :HOSPNUM
+		AND  (case when TRIM(:CHKKBN) <> '' then  CHKKBN = :CHKKBN else TRUE end)
+		AND  (case when TRIM(:SRYCD ) <> '' then  SRYCD  = :SRYCD  else TRUE end)
+		AND   YUKOSTYMD  <=   :YUKOEDYMD
+		AND   YUKOEDYMD  >=   :YUKOEDYMD
+		AND   CDKBN      = :CDKBN
+		AND   CD         = :CD
+		ORDER BY HOSPNUM,CHKKBN,SRYCD,YUKOSTYMD,YUKOEDYMD,CDKBN,RENNUM
+		;
 	};
 };
 

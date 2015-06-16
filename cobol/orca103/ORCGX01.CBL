@@ -1282,7 +1282,7 @@
       *****************************************************************
        41041-SRYCD-CHKSND-SEC              SECTION.
       *
-           PERFORM 900-CHKSND-KEY12-SEL-SEC
+           PERFORM 900-CHKSND-KEY3-SEL-SEC
       *
            MOVE    ZERO            TO  IDX
            PERFORM UNTIL      (IDX     =  100  )  OR
@@ -1314,13 +1314,13 @@
       *
                MOVE    IDX                 TO  SPA-GMN-MAX
       *
-               PERFORM 900-CHKSND-KEY12-FET-SEC
+               PERFORM 900-CHKSND-KEY3-FET-SEC
       *
            END-PERFORM
       *
       *    カーソルクロース
            MOVE    "tbl_chksnd"         TO  MCP-TABLE
-           MOVE    "key12"              TO  MCP-PATHNAME
+           MOVE    "key3"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -3054,7 +3054,7 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY12-SEL-SEC           SECTION.
+       900-CHKSND-KEY3-SEL-SEC         SECTION.
       *
            MOVE    ZERO            TO  FLG-CHKSND
       *
@@ -3062,10 +3062,13 @@
            MOVE    SPA-GMN-CHKKBN      TO  CHKSND-CHKKBN
            MOVE    SPA-GMN-SRYCD       TO  CHKSND-SRYCD
            MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    "99999999"          TO  CHKSND-YUKOSTYMD
+           MOVE    "00000000"          TO  CHKSND-YUKOEDYMD
+           MOVE    ZERO                TO  CHKSND-CDKBN
            MOVE    CHKSND-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key12"             TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -3076,15 +3079,15 @@
            END-IF
       *
            .
-       900-CHKSND-KEY12-SEL-EXT.
+       900-CHKSND-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ２FETCH処理(KEY12)
       *****************************************************************
-       900-CHKSND-KEY12-FET-SEC           SECTION.
+       900-CHKSND-KEY3-FET-SEC             SECTION.
       *
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key12"             TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -3095,7 +3098,7 @@
            END-IF
       *
            .
-       900-CHKSND-KEY12-FET-EXT.
+       900-CHKSND-KEY3-FET-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ３検索処理

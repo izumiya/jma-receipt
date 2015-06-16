@@ -496,9 +496,6 @@
                    MOVE    QDTCHK-HOSOKU-COMPKBN
                                            TO  WRK-COMPKBN
                    PERFORM 20011-TOTUGO-SEC
-                   DISPLAY "WRK-CHKMST-KEY[" WRK-CHKMST-KEY "]"
-                   DISPLAY "WRK-PTBYOMEI-KEY[" WRK-PTBYOMEI-KEY "]"
-                   DISPLAY "FLG-MATCH[" FLG-MATCH "]"
                END-IF
            END-IF
       *
@@ -638,14 +635,14 @@
                     OR   ( TBYOMEI-IDX1    >   ZERO    )
       *
                IF    ( SYS-1101-BYOSRYKAKBN    =   "1" OR SPACE)
-                   IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-BYOMEI )
-                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-HOSOKU )
+                   IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-PTBYOMEI )
+                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-PTHOSOKU )
                     AND  ( TBYOMEI-SRYKA  (IDX1)   =   QDTCHK-SRYKA )
                        MOVE    IDX1    TO  TBYOMEI-IDX1
                    END-IF
                ELSE
-                   IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-BYOMEI )
-                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-HOSOKU )
+                   IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-PTBYOMEI )
+                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-PTHOSOKU )
                        MOVE    IDX1    TO  TBYOMEI-IDX1
                    END-IF
                END-IF
@@ -660,8 +657,8 @@
                COMPUTE TBYOMEI-MAX
                    =   TBYOMEI-MAX     +   1
       *
-               MOVE    QDTCHK-BYOMEI   TO  TBYOMEI-BYOMEI (TBYOMEI-MAX)
-               MOVE    QDTCHK-HOSOKU   TO  TBYOMEI-HOSOKU (TBYOMEI-MAX)
+               MOVE    QDTCHK-PTBYOMEI TO  TBYOMEI-BYOMEI (TBYOMEI-MAX)
+               MOVE    QDTCHK-PTHOSOKU TO  TBYOMEI-HOSOKU (TBYOMEI-MAX)
                MOVE    QDTCHK-SRYKA    TO  TBYOMEI-SRYKA  (TBYOMEI-MAX)
                MOVE    "00000000"      TO  TBYOMEI-SRYYMD (TBYOMEI-MAX)
       *
@@ -994,11 +991,6 @@
                                           <=   SDTCHK01-KJNYMD (1:6))
                        MOVE    ZERO        TO  FLG-LOOP-END
                    END-IF
-      *
-              DISPLAY SDTCHK01-SRYCD " "
-              "QDTCHK-TENKIYMD (1:6)[" QDTCHK-TENKIYMD (1:6) "]"
-              "SDTCHK01-KJNYMD (1:6) (1:6)[" SDTCHK01-KJNYMD (1:6) "]"
-                      FLG-LOOP-END
       *
                    IF    ( QDTCHK-HKNCOMBI  NOT =   ZERO )
                     OR   ( QDTCHK-KOHID     NOT =   ZERO )

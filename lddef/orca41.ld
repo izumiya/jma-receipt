@@ -81,6 +81,7 @@ db	{
 	tbl_tnkrrk;
 	tbl_tsyrrk;
 	tbl_spa_tmp;
+	tbl_tekiou_disease;
 };
 
 /* #include "orcadb.inc" */
