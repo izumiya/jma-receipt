@@ -320,13 +320,20 @@
            MOVE    SPACE               TO  LINKAREA
       *
       *----(01.00.02)--ADD-START---
-           IF    ( SPA-XID1-FLG    =   "PV" )
+           EVALUATE    SPA-XID1-FLG
+           WHEN    "PV"
                MOVE    "F12:プレビュー"    TO  X97-B12-LABEL
                IF    ( WRK-PRT-PAGE    >   ZERO )
                        MOVE    WIDGET-NORMAL    TO  X97-B12-STATE
                        MOVE    "B12"            TO  MCP-WIDGET
                END-IF
-           END-IF
+           WHEN    "OK"
+               MOVE    "F12:印刷"               TO  X97-B12-LABEL
+               IF    ( WRK-PRT-PAGE    >   ZERO )
+                       MOVE    WIDGET-NORMAL    TO  X97-B12-STATE
+                       MOVE    "B12"            TO  MCP-WIDGET
+               END-IF
+           END-EVALUATE
       *----(01.00.02)--UPD-END-----
       *
            MOVE    "CURRENT"           TO  MCP-PUTTYPE

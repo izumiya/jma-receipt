@@ -80,6 +80,7 @@ db	{
 	tbl_nrrksrh ;
 	tbl_tnkrrk;
 	tbl_tsyrrk;
+	tbl_tekiou_disease;
 };
 
 /* #include "orcadb.inc" */

@@ -1,86 +1,92 @@
-X91	{
-	fixed2	{
-		KJNYMD	{
-			value	varchar(10);
-		};
-		CHKYKZBYO	{
-			value	bool;
-		};
-		CHKSRYBYO	{
-			value	bool;
-		};
-		CHKYKZHEI	{
-			value	bool;
-		};
-		CHKSRYHEI	{
-			value	bool;
-		};
-		CHKYKZKNKBYO	{
-			value	bool;
-		};
-		CHKSRYSNT	{
-			value	bool;
-		};
-		CHKSRYHEIA	{
-			value	bool;
-		};
-		CHKSRYHEIB	{
-			value	bool;
-		};
-		CHKSRYRANGE	{
-			value	bool;
-		};
-		STSRYCD	{
-			value	varchar(9);
-			state	int;
-		};
-		STSRYNAME	{
-			value	varchar(100);
-			style   varchar(20);
-			state	int;
-		};
-		EDSRYCD	{
-			value	varchar(9);
-			state	int;
-		};
-		CMB_SORT	{
-			SORT	{
-				value	varchar(30);
-			};
-			count	int;
-			item	varchar(30)[05];
-		};
-		CHKBYOYKZ	{
-			value	bool;
-		};
-		CHKBYOSRY	{
-			value	bool;
-		};
-		CHKKAISU	{
-			value	bool;
-		};
-		CMB_MOREKIKAN	{
-			MOREKIKAN	{
-				value	varchar(40);
-			};
-			count	int;
-			item	varchar(40)[5];
-		};
-		CHKMOREYKZBYO	{
-			value	bool;
-		};
-		CHKMOREKENSA	{
-			value	bool;
-		};
-		CHKMOREBUI	{
-			value	bool;
-		};
-		CMB_MORESORT	{
-			MORESORT	{
-				value	varchar(30);
-			};
-			count	int;
-			item	varchar(30)[5];
-		};
-	};
+X91 {
+  fixed2 {
+    KJNYMD {
+      textdata varchar(10);
+    };
+    CHKYKZBYO {
+      isactive bool;
+    };
+    CHKSRYBYO {
+      isactive bool;
+    };
+    CHKYKZHEI {
+      isactive bool;
+    };
+    CHKSRYHEI {
+      isactive bool;
+    };
+    CHKYKZKNKBYO {
+      isactive bool;
+    };
+    CHKSRYSNT {
+      isactive bool;
+    };
+    CHKSRYHEIA {
+      isactive bool;
+    };
+    CHKSRYHEIB {
+      isactive bool;
+    };
+    CHKTEKBYOYKZ {
+      isactive bool;
+    };
+    CHKTEKBYOSRY {
+      isactive bool;
+    };
+    CHKSRYRANGE {
+      isactive bool;
+    };
+    STSRYCD {
+      textdata varchar(9);
+      state int;
+    };
+    STSRYNAME {
+      textdata varchar(100);
+      style varchar(20);
+      state int;
+    };
+    EDSRYCD {
+      textdata varchar(9);
+      state int;
+    };
+    CMB_SORT {
+      SORT {
+        textdata varchar(30);
+      };
+      count int;
+        item varchar(30)[5];
+    };
+    CHKBYOYKZ {
+      isactive bool;
+    };
+    CHKBYOSRY {
+      isactive bool;
+    };
+    CHKKAISU {
+      isactive bool;
+    };
+    CMB_MOREKIKAN {
+      MOREKIKAN {
+        textdata varchar(40);
+      };
+      count int;
+        item varchar(40)[5];
+    };
+    CHKMOREYKZBYO {
+      isactive bool;
+    };
+    CHKMOREKENSA {
+      isactive bool;
+    };
+    CHKMOREBUI {
+      isactive bool;
+    };
+    CMB_MORESORT {
+      MORESORT {
+        textdata varchar(30);
+      };
+      count int;
+        item varchar(30)[5];
+    };
+  };
 };

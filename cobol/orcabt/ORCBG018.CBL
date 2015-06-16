@@ -647,8 +647,9 @@
                MOVE    TNS-SRYCD       TO  WRK-SRYCD
                PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
                IF    ( FLG-SRYCDCHG        =   ZERO )
-                   PERFORM 900-CHKSND-KEY6-SEL-SEC
+                   PERFORM 900-CHKSND-KEY30-SEL-SEC
                    IF    ( FLG-TCHKSND             =   ZERO )
+                       PERFORM 900-CHKSND-KEY6-SEL-SEC
       *電話でのお問い合わせ４月１日−チェックマスタ経過措置薬剤更新
       *での不具合データ修復対応
                        IF    ( TCHKSND-UTAGAIKBN   =   SPACE )
@@ -1956,12 +1957,38 @@ grpsys                                 SPA-AREA
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY6-SEL-SEC         SECTION.
+       900-CHKSND-KEY30-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-TCHKSND
       *
            MOVE    CHKSND-REC          TO  TCHKSND-REC
            MOVE    CHG-RJNSRYCD        TO  TCHKSND-SRYCD
+           MOVE    "0"                 TO  TCHKSND-CDKBN
+      *
+           MOVE    TCHKSND-REC         TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key30"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC TO  TCHKSND-REC
+           ELSE
+               MOVE    1           TO  FLG-TCHKSND
+               INITIALIZE              TCHKSND-REC
+           END-IF
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key30"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-CHKSND-KEY30-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY6-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TCHKSND
       *
            MOVE    TCHKSND-REC         TO  MCPDATA-REC
            MOVE    "tbl_chksnd"        TO  MCP-TABLE

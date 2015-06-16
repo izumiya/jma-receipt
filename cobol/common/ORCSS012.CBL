@@ -43,6 +43,7 @@
        01  FLG-AREA.
            03  FLG-END                     PIC 9(01).
            03  FLG-HAISHI                  PIC 9(01).
+           03  FLG-BYOMEI                  PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
@@ -64,6 +65,9 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    病名
+       01  BYOMEI-REC.
+           COPY    "CPBYOMEI.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -122,6 +126,25 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
+           PERFORM 900-BYOMEI-KEY4-SEL-SEC
+           IF    ( FLG-BYOMEI          =   ZERO )
+            AND  ( BYO-HAISIYMD        =   "99999999" )
+               MOVE    BYO-BYOMEI      TO  SS012-O-BYOMEI
+               MOVE    BYO-BYOMEICD    TO  SS012-BYOMEICD (1)
+               MOVE    SPACE           TO  SS012-BYOMEIHENFLG
+               MOVE    ZERO            TO  SS012-HAISHI
+           ELSE
+               PERFORM 2001-EDIT-SEC
+           END-IF
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    編集処理
+      *****************************************************************
+       2001-EDIT-SEC                    SECTION.
+      *
            MOVE    ZERO        TO  FLG-HAISHI
       *
            INITIALIZE                      ORCSBYOMEIAREA
@@ -156,7 +179,14 @@
                                                SPA-AREA
                ELSE
                    IF    ( LNK-BYO-HAISIYMD-ERR  NOT = ZERO )
-                       MOVE    1       TO  FLG-HAISHI
+                       IF    ( SS012-SRYYM           = SPACE )
+                           MOVE    1   TO  FLG-HAISHI
+                       ELSE
+                           IF    ( LNK-BYO-HAISIYMD-ERR (1:6)
+                                       < SS012-SRYYM )
+                               MOVE    1   TO  FLG-HAISHI
+                           END-IF
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -183,7 +213,7 @@
            MOVE    FLG-HAISHI          TO  SS012-HAISHI
       *
            .
-       200-MAIN-EXT.
+       2001-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    終了処理
@@ -193,6 +223,33 @@
       *
            .
        300-END-EXT.
+           EXIT.
+      *****************************************************************
+      *    病名検索処理
+      *****************************************************************
+       900-BYOMEI-KEY4-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BYOMEI
+      *
+           INITIALIZE                  BYOMEI-REC
+           MOVE    SS012-I-BYOMEI  TO  BYO-BYOMEI
+           MOVE    BYOMEI-REC      TO  MCPDATA-REC
+           MOVE    "tbl_byomei"    TO  MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BYOMEI-REC
+           ELSE
+               INITIALIZE              BYOMEI-REC
+               MOVE    1           TO  FLG-BYOMEI
+           END-IF
+      *
+           MOVE    "tbl_byomei"    TO  MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-BYOMEI-KEY4-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

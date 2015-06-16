@@ -128,8 +128,8 @@ D04 {
             column1 varchar(5);
             column2 varchar(101);
             column3 varchar(12);
-          }[500];
-          selectdata bool[500];
+          }[501];
+          selectdata bool[501];
       };
     };
   };

@@ -503,3 +503,19 @@ path	key21		{
 	};
 };
 
+path	key22	{ 	
+	DBSELECT	{
+		DECLARE tbl_chk_key22_csr CURSOR FOR
+		SELECT *
+		FROM TBL_CHK
+		WHERE  HOSPNUM = :HOSPNUM
+		AND  (case when TRIM(:CHKKBN) <> '' then  CHKKBN = :CHKKBN else TRUE end)
+		AND  (case when TRIM(:SRYCD ) <> '' then  SRYCD  = :SRYCD  else TRUE end)
+		AND   YUKOSTYMD  <=   :YUKOSTYMD
+		AND   YUKOEDYMD  >=   :YUKOEDYMD
+		AND    CD      = :CD
+		ORDER BY HOSPNUM,CHKKBN,SRYCD,GRPNUM,YUKOSTYMD,YUKOEDYMD,CDKBN
+		;
+	};
+};
+

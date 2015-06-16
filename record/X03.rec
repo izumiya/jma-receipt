@@ -1,99 +1,102 @@
-X03	{
-	fixed6	{
-		B09	{
-			state	int;
-		};
-		B09_2	{
-			state	int;
-		};
-		B10	{
-			state	int;
-		};
-		B10_2	{
-			state	int;
-		};
-		LCHKKBNMEI	{
-			value	varchar(70);
-		};
-		LYUKOSTYMD	{
-			value	varchar(9);
-		};
-		LYUKOEDYMD	{
-			value	varchar(9);
-		};
-		LNAME	{
-			value	varchar(70);
-		};
-		scrolledwindow1	{
-			LCHKLST	{
-				LBLLJYKN	{
-					value	varchar(06);
-				};
-				count	int;
-				row	int;
-				rowattr	int;
-				item	{
-					value0	varchar(6);
-					value1	varchar(150);
-					value2	varchar(12);
-				}	[400];
-				select	bool[400];
-			};
-		};
-		RCHKKBNMEI	{
-			value	varchar(70);
-		};
-		RYUKOSTYMD	{
-			value	varchar(9);
-		};
-		RYUKOEDYMD	{
-			value	varchar(9);
-		};
-		RNAME	{
-			value	varchar(70);
-		};
-		scrolledwindow3	{
-			RCHKLST	{
-				LBLRJYKN	{
-					value	varchar(06);
-				};
-				count	int;
-				row	int;
-				rowattr	int;
-				item	{
-					value0	varchar(6);
-					value1	varchar(150);
-					value2	varchar(12);
-				}	[400];
-				select	bool[400];
-			};
-		};
-		CMB_CHKKBN	{
-			CHKKBN	{
-				value	varchar(72);
-			};
-			count	int;
-			item	varchar(72)[5];
-		};
-		SELNAME	{
-				value	varchar(70);
-		};
-		scrolledwindow2	{
-			SELCHKLST	{
-				count	int;
-				row	int;
-				rowattr	int;
-				item	{
-					value0	varchar(4);
-					value1	varchar(70);
-					value2	varchar(9);
-					value3	varchar(9);
-				}	[100];
-				select	bool[100];
-			};
-		};
-		KJNYMD	{
-			value	varchar(10);
-		};
-	};
+X03 {
+  fixed6 {
+    B09 {
+      state int;
+    };
+    B09_2 {
+      state int;
+    };
+    B10 {
+      state int;
+    };
+    B10_2 {
+      state int;
+    };
+    BTN_INS {
+      state int;
+    };
+    LCHKKBNMEI {
+      textdata varchar(70);
+    };
+    LYUKOSTYMD {
+      textdata varchar(9);
+    };
+    LYUKOEDYMD {
+      textdata varchar(9);
+    };
+    LNAME {
+      textdata varchar(70);
+    };
+    scrolledwindow1 {
+      LCHKLST {
+        LBLLJYKN {
+          textdata varchar(6);
+        };
+        count int;
+        row int;
+        rowattr int;
+          item {
+            column1 varchar(6);
+            column2 varchar(150);
+            column3 varchar(12);
+          }[400];
+          selectdata bool[400];
+      };
+    };
+    RCHKKBNMEI {
+      textdata varchar(70);
+    };
+    RYUKOSTYMD {
+      textdata varchar(9);
+    };
+    RYUKOEDYMD {
+      textdata varchar(9);
+    };
+    RNAME {
+      textdata varchar(70);
+    };
+    scrolledwindow3 {
+      RCHKLST {
+        LBLRJYKN {
+          textdata varchar(6);
+        };
+        count int;
+        row int;
+        rowattr int;
+          item {
+            column1 varchar(6);
+            column2 varchar(150);
+            column3 varchar(12);
+          }[400];
+          selectdata bool[400];
+      };
+    };
+    CMB_CHKKBN {
+      CHKKBN {
+        textdata varchar(72);
+      };
+      count int;
+        item varchar(72)[5];
+    };
+    SELNAME {
+      textdata varchar(70);
+    };
+    scrolledwindow2 {
+      SELCHKLST {
+        count int;
+        row int;
+        rowattr int;
+          item {
+            column1 varchar(4);
+            column2 varchar(70);
+            column3 varchar(9);
+            column4 varchar(9);
+          }[100];
+          selectdata bool[100];
+      };
+    };
+    KJNYMD {
+      textdata varchar(10);
+    };
+  };
 };

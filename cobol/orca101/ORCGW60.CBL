@@ -1154,7 +1154,7 @@
                                    TO  SPA-GMN-TEKBYOYKZKBNMEIL (2)
       *
            MOVE    "2"             TO  SPA-GMN-TEKBYOYKZKBNL    (3)
-           MOVE    "チェックマスタに未登録の薬剤のみ行う"
+           MOVE    "チェックマスタにない薬剤のみ行う"
                                    TO  SPA-GMN-TEKBYOYKZKBNMEIL (3)
       *
            MOVE    SPA-GMN-TEKBYOYKZKBNLST  (1)
@@ -1181,7 +1181,7 @@
                                    TO  SPA-GMN-TEKBYOSRYKBNMEIL (2)
       *
            MOVE    "2"             TO  SPA-GMN-TEKBYOSRYKBNL    (3)
-           MOVE    "チェックマスタに未登録の診療行為のみ行う"
+           MOVE    "チェックマスタにない診療行為のみ行う"
                                    TO  SPA-GMN-TEKBYOSRYKBNMEIL (3)
       *
            MOVE    SPA-GMN-TEKBYOSRYKBNLST  (1)

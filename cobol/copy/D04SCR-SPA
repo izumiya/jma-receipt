@@ -100,7 +100,7 @@
                        09  SPA-GMN-TDAYMONTHKBN PIC X(4).
                        09  SPA-GMN-TCHKSRYNAME PIC X(100).
                        09  SPA-GMN-TCHKTEKCD   PIC X(9).
-                       09  SPA-GMN-TANOTHERMST  PIC X(1).
+                       09  SPA-GMN-TOTHERMST   PIC X(1).
                        09  SPA-GMN-TCHKHOSOKU  PIC X(40).
                        09  SPA-GMN-TSNTYMD     PIC X(10).
                        09  SPA-GMN-TKAISU      PIC 9(05).

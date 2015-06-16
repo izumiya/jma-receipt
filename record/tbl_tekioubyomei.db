@@ -61,8 +61,8 @@ path	key2 	{
 		SELECT *
 		FROM tbl_tekioubyomei
 			WHERE   CHKKBN	=	:CHKKBN
-			AND		SRYCD	=	:SRYCD
-		;
+			AND		SRYCD	LIKE :SRYCD
+            ORDER BY CHKKBN,SRYCD,BYOMEI ;
 	};
 };
 

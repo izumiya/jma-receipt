@@ -186,4 +186,6 @@ db	{
 	tbl_hknjainf_care;
 	tbl_efout;
 	tbl_nyuincdchg;
+	tbl_tekiou_medicine;
+	tbl_tekiou_disease;
 };

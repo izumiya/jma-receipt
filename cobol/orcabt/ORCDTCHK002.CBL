@@ -423,6 +423,7 @@
            03  FLG-KAISU-CHK                           PIC 9(01).
            03  FLG-KAIGO-CHK                           PIC 9(01).
            03  FLG-HKNKBN                              PIC 9(01).
+           03  FLG-TEKDIS                              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -557,6 +558,7 @@
            03  WRK-ERRMES-PLUS                         PIC X(200).
            03  WRK-PTBYOMES-PLUS                       PIC X(200).
            03  WRK-BYOMEICD                            PIC X(07).
+           03  WRK-BYOMEI                              PIC X(200).
            03  WRK-HKNNUM                              PIC X(03).
            03  WRK-PTHKN-KIGO                          PIC X(80).
            03  WRK-PTHKN-NUM                           PIC X(80).
@@ -1210,6 +1212,10 @@
        01  TEKIOUBYOMEI-REC.
            COPY    "CPTEKIOUBYOMEI.INC".
       *
+      *    医薬品傷病名マスタ
+       01  TEKIOU-DISEASE-REC.
+           COPY    "CPTEKIOU-DISEASE.INC".
+      *
       *    患者介護認定者情報
        01  PTCRNIN-REC.
            COPY    "CPPTCARE-NINTEI.INC".
@@ -1226,6 +1232,9 @@
       *
       *    チェックマスタ病名編集サブ
            COPY    "CPORCSS012.INC".
+      *
+      *    一時チェックマスタ編集サブ
+           COPY    "CPORCSS013.INC".
       *
       *    入院負担金計算サブ
        01  LNK-ORCS02-REC.
@@ -1626,8 +1635,8 @@
       *
       *    薬剤と投与禁忌病名
            MOVE    "6"                 TO  WRK-CHK-CHKKBN
-           MOVE    "1"                 TO  WRK-CHK-CDKBN
-           PERFORM 900-CHKSND-KEY5-SEL-SEC
+           MOVE    "0"                 TO  WRK-CHK-CDKBN
+           PERFORM 901-CHKSND-KEY31-SEL-SEC
            IF    ( FLG-CHKMST          =   ZERO )
                MOVE    1               TO  FLG-YKZKNKBYO
            END-IF
@@ -1692,18 +1701,19 @@
       *
            INITIALIZE                      CHKSND-REC
            MOVE    "2"                 TO  CHKSND-CHKKBN
-           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
            MOVE    "P%"                TO  CHKSND-SRYCD
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
       *
-           PERFORM 900-CHKSND-KEY24-SEL-SEC
+           PERFORM 900-CHKSND-KEY31-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
       *
                INITIALIZE                  DTCHK010-REC
                MOVE    CHKSND-REC      TO  DTCHK010-DAT
+               MOVE    "1"             TO  DTCHK010-CDKBN
       *
                MOVE    CHKSND-SRYCD    TO  WRK-SRYCD
       *
@@ -1712,37 +1722,42 @@
                MOVE    ORCBSD01-SRYYM  TO  WRK-YMD
                PERFORM UNTIL ( FLG-INPUTSET    NOT =   ZERO )
       *
-                   PERFORM VARYING IDX-DAY FROM    1   BY  1
-                           UNTIL ( IDX-DAY >   31 )
+      *            適応症の登録があるもののみ対象とする。
+                   IF    ( CHKSND-RENNUM   >   ZERO )
       *
-                       MOVE    IDX-DAY TO  WRK-DD
-                       IF    ( WRK-YMD    >= ISET-YUKOSTYMD )
-                        AND  ( WRK-YMD    <= ISET-YUKOEDYMD )
-                           IF    ( DTCHK010-SETCD-MAX (IDX-DAY)
+                       PERFORM VARYING IDX-DAY FROM    1   BY  1
+                               UNTIL ( IDX-DAY >   31 )
+      *
+                           MOVE    IDX-DAY TO  WRK-DD
+                           IF    ( WRK-YMD    >= ISET-YUKOSTYMD )
+                            AND  ( WRK-YMD    <= ISET-YUKOEDYMD )
+                               IF    ( DTCHK010-SETCD-MAX (IDX-DAY)
                                                  >=    CONST-SETCD-MAX )
-                            OR   ( ISET-INPUTCD (1:1)  =   "." )
-                               CONTINUE
-                           ELSE
-                               MOVE    1   TO    DTCHK010-SETCD-GET
-                               COMPUTE DTCHK010-SETCD-MAX (IDX-DAY)
-                                   =   DTCHK010-SETCD-MAX (IDX-DAY)
-                                   +   1
-                               MOVE    DTCHK010-SETCD-MAX (IDX-DAY)
+                                OR   ( ISET-INPUTCD (1:1)  =   "." )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1   TO    DTCHK010-SETCD-GET
+                                   COMPUTE DTCHK010-SETCD-MAX (IDX-DAY)
+                                       =   DTCHK010-SETCD-MAX (IDX-DAY)
+                                       +   1
+                                   MOVE    DTCHK010-SETCD-MAX (IDX-DAY)
                                                TO  IDX-MAX
-                               MOVE    ISET-INPUTCD
+                                   MOVE    ISET-INPUTCD
                                                TO  DTCHK010-SETCD1
                                                   (IDX-DAY IDX-MAX)
       *
-                               MOVE    ISET-INPUTCD
+                                   MOVE    ISET-INPUTCD
                                                TO  WRK-SRYCD
-                               PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
-                               MOVE    CHG-RJNSRYCD
+                                   PERFORM 900-SRYCDCHG-KEY2-SEL-SEC
+                                   MOVE    CHG-RJNSRYCD
                                                TO  DTCHK010-SETCD2
                                                   (IDX-DAY IDX-MAX)
+                               END-IF
                            END-IF
-                       END-IF
       *
-                   END-PERFORM
+                       END-PERFORM
+      *
+                   END-IF
       *
                    PERFORM 900-INPUTSET-KEY7-FET-SEC
       *
@@ -1756,12 +1771,12 @@
                    WRITE   DTCHK010-REC
                END-IF
       *
-               PERFORM 900-CHKSND-KEY24-FET-SEC
+               PERFORM 900-CHKSND-KEY31-FET-SEC
       *
            END-PERFORM
       *
            MOVE    "tbl_chksnd"    TO  MCP-TABLE
-           MOVE    "key24"          TO  MCP-PATHNAME
+           MOVE    "key31"         TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -7421,6 +7436,7 @@
                PERFORM 800-TMPSND-EDIT-SEC
            END-IF
       *
+      *    CDKBN="1"のデータが存在する場合はチェックを行う
            INITIALIZE                      CHKSND-REC
            MOVE    "1"                 TO  CHKSND-CHKKBN
            MOVE    "1"                 TO  CHKSND-CDKBN
@@ -7429,7 +7445,7 @@
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
-           PERFORM 900-CHKSND-KEY13-SEL-SEC
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
            IF    ( FLG-CHKSND          =   ZERO )
       *
                MOVE    CHKSND-REC      TO  TCHKSND-REC
@@ -7490,7 +7506,7 @@
                    MOVE    TSRYKA-SRYCD (IDX6 IDX7)
                                            TO  SDTCHK01-SRYCD
                    MOVE    WRK-KJNYMD      TO  SDTCHK01-KJNYMD
-                   MOVE    CHKSND-CDKBN    TO  SDTCHK01-CDKBN
+                   MOVE    "1"             TO  SDTCHK01-CDKBN
                    MOVE    ORCBSD01-NYUGAIKBN
                                            TO  SDTCHK01-NYUGAIKBN
                    MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
@@ -7865,7 +7881,7 @@
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
-           PERFORM 900-CHKSND-KEY13-SEL-SEC
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
            IF    ( FLG-CHKSND           =   ZERO )
                IF    ( CHKSND-NYUGAIKBN    =   SPACE )
                 OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
@@ -7894,7 +7910,7 @@
                MOVE    TSRYKA-SRYCD (IDX6 IDX7)
                                        TO  SDTCHK01-SRYCD
                MOVE    WRK-KJNYMD      TO  SDTCHK01-KJNYMD
-               MOVE    CHKSND-CDKBN    TO  SDTCHK01-CDKBN
+               MOVE    "1"             TO  SDTCHK01-CDKBN
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SDTCHK01-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
@@ -8029,7 +8045,7 @@
                    MOVE    CHKSND-CHKKBN   TO  SDTCHK01-CHKKBN
                    MOVE    CHKSND-SRYCD    TO  SDTCHK01-SRYCD
                    MOVE    WRK-KJNYMD      TO  SDTCHK01-KJNYMD
-                   MOVE    CHKSND-CDKBN    TO  SDTCHK01-CDKBN
+                   MOVE    "1"             TO  SDTCHK01-CDKBN
                    MOVE    ORCBSD01-NYUGAIKBN
                                            TO  SDTCHK01-NYUGAIKBN
                    MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
@@ -9039,7 +9055,7 @@
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
-           PERFORM 900-CHKSND-KEY13-SEL-SEC
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
            IF    ( FLG-CHKSND           =   ZERO )
                IF    ( CHKSND-NYUGAIKBN    =   SPACE )
                 OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
@@ -9068,7 +9084,7 @@
                MOVE    TSRYKA-SRYCD (IDX6 IDX7)
                                        TO  SDTCHK01-SRYCD
                MOVE    WRK-KJNYMD      TO  SDTCHK01-KJNYMD
-               MOVE    CHKSND-CDKBN    TO  SDTCHK01-CDKBN
+               MOVE    "1"             TO  SDTCHK01-CDKBN
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SDTCHK01-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
@@ -14079,152 +14095,21 @@
       *****************************************************************
        800-TMPSND-EDIT-SEC             SECTION.
       *
-      *    INITIALIZE                  CHKSND-REC
-      *    MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
-      *    MOVE    WRK-CHK-CHKKBN  TO  CHKSND-CHKKBN
-      *    MOVE    WRK-CHK-SRYCD   TO  CHKSND-SRYCD
-      *    MOVE    WRK-KJNYMD      TO  CHKSND-YUKOSTYMD
-      *                                CHKSND-YUKOEDYMD
-      *    MOVE    CHKSND-REC      TO  MCPDATA-REC
-      *    MOVE    "tbl_chksnd"    TO  MCP-TABLE
-      *    MOVE    "tmpins1"       TO  MCP-PATHNAME
-      *    PERFORM 910-DBINSERT-SEC
-      *
-           IF    ( WRK-CHK-CHKKBN  =   "1" )
-               IF    ( SYS-1101-TEKBYOYKZKBN   =   "1" OR "2" )
-                   MOVE    SYS-1101-TEKBYOYKZKBN
-                                   TO  WRK-TEKBYOCHKKBN
-                   PERFORM 8001-TMPSND-EDIT-SEC
-               END-IF
-           END-IF
-      *
-           IF    ( WRK-CHK-CHKKBN  =   "2" )
-               IF    ( SYS-1101-TEKBYOSRYKBN   =   "1" OR "2" )
-                   MOVE    SYS-1101-TEKBYOSRYKBN
-                                   TO  WRK-TEKBYOCHKKBN
-                   PERFORM 8001-TMPSND-EDIT-SEC
-               END-IF
-           END-IF
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBINSERT"         TO  SS013-FUNC
+           MOVE     WRK-CHK-CHKKBN     TO  SS013-CHKKBN
+           MOVE     WRK-CHK-SRYCD      TO  SS013-SRYCD
+           MOVE     WRK-KJNYMD         TO  SS013-KJNYMD
+           MOVE     CONST-TEMP         TO  SS013-TEMP-NAME
+           MOVE     SMCNDATE-YMD       TO  SS013-TEMP-KEY
+           MOVE     SMCNDATE-HMS       TO  SS013-TEMP-KEY(9:)
+           CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+           
       *
            .
        800-TMPSND-EDIT-EXT.
-            EXIT.
-      *****************************************************************
-      *    一時チェックマスタ２編集処理
-      *****************************************************************
-       8001-TMPSND-EDIT-SEC            SECTION.
-      *
-           PERFORM 900-CHKSND-KEY27-SEL-SEC
-           IF    ( FLG-CHKSND      =   ZERO )
-               IF    ( CHKSND-GRPCHKKBN    =   SPACE )
-                AND  ( WRK-TEKBYOCHKKBN    =   "1" )
-                   PERFORM 80011-TMPSND-EDIT-SEC
-               END-IF
-           ELSE
-               INITIALIZE          CHKSND-REC
-               PERFORM 80011-TMPSND-EDIT-SEC
-           END-IF
-      *
-           .
-       8001-TMPSND-EDIT-EXT.
-            EXIT.
-      *****************************************************************
-      *    一時チェックマスタ２編集処理
-      *****************************************************************
-       80011-TMPSND-EDIT-SEC            SECTION.
-      *
-           MOVE    SMCNDATE-YMD        TO  WRK-TEMP-KEY
-           MOVE    SMCNDATE-HMS        TO  WRK-TEMP-KEY(9:)
-      *
-           PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-TEKBYO  NOT =   ZERO )
-      *
-               INITIALIZE              SS012-AREA
-      *
-               MOVE    TEKBYO-BYOMEI   TO  DTCHK012-I-BYOMEI
-               PERFORM 900-DTCHK012-READ-SEC
-               IF    ( FLG-DTCHK012    =   ZERO )
-                   MOVE    DTCHK012-AREA
-                                       TO  SS012-AREA
-               ELSE
-                   MOVE    TEKBYO-BYOMEI
-                                       TO  SS012-I-BYOMEI
-                   CALL    "ORCSS012"      USING
-                                           SS012-AREA
-                                           SPA-AREA
-      *
-                   MOVE    SS012-AREA  TO  DTCHK012-AREA
-      *
-                   WRITE   DTCHK012-AREA
-               END-IF
-      *
-               IF    ( SS012-HAISHI    =   ZERO )
-      *
-                   INITIALIZE                  TMPSND-REC
-                   MOVE    SPA-HOSPNUM     TO  TMPSND-HOSPNUM
-                   MOVE    WRK-CHK-CHKKBN  TO  TMPSND-CHKKBN
-                   MOVE    WRK-CHK-SRYCD   TO  TMPSND-SRYCD
-                   MOVE    "00000000"      TO  TMPSND-YUKOSTYMD
-                   MOVE    "99999999"      TO  TMPSND-YUKOEDYMD
-                   MOVE    WRK-CHK-CDKBN   TO  TMPSND-CDKBN
-                   MOVE    SPACE           TO  TMPSND-GRPCHKKBN
-                   MOVE    SPACE           TO  TMPSND-GRPID
-                   MOVE    SPACE           TO  TMPSND-NYUGAIKBN
-      *
-                   COMPUTE CHKSND-RENNUM   =   CHKSND-RENNUM  +   1
-                   MOVE    CHKSND-RENNUM   TO  TMPSND-RENNUM
-      *
-                   MOVE    SS012-BYOMEICD-G
-                                           TO  TMPSND-CD
-      *
-                   MOVE    SS012-O-BYOMEI  TO  TMPSND-BYOMEI
-                   MOVE    "1"             TO  TMPSND-COMPKBN
-      *
-                   MOVE    SPACE           TO  TMPSND-HOSOKU
-                   MOVE    "1"             TO  TMPSND-HOSOKU-COMPKBN
-      *
-                   IF    ( WRK-CHK-CHKKBN  =   "1" )
-                       MOVE    "0"         TO  TMPSND-UTAGAIKBN
-                   ELSE
-                       MOVE    "1"         TO  TMPSND-UTAGAIKBN
-                   END-IF
-                   MOVE    SS012-BYOMEIHENFLG
-                                           TO  TMPSND-BYOMEIHENFLG
-      *
-                   MOVE    CONST-TEMP      TO  TMPSND-TERMID
-                   MOVE    WRK-TEMP-KEY    TO  TMPSND-OPID
-      *
-                   MOVE    TMPSND-REC      TO  MCPDATA-REC
-                   MOVE    "tbl_chksnd"    TO  MCP-TABLE
-                   MOVE    "tmpins2"       TO  MCP-PATHNAME
-                   PERFORM 910-DBINSERT-SEC
-      *
-               END-IF
-      *
-               PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-           MOVE    "key2"              TO   MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           INITIALIZE                  CHKSND-REC
-           MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
-           MOVE    WRK-CHK-CHKKBN  TO  CHKSND-CHKKBN
-           MOVE    WRK-CHK-SRYCD   TO  CHKSND-SRYCD
-           MOVE    WRK-KJNYMD      TO  CHKSND-YUKOSTYMD
-                                       CHKSND-YUKOEDYMD
-           MOVE    CONST-TEMP      TO  CHKSND-TERMID
-           MOVE    WRK-TEMP-KEY    TO  CHKSND-OPID
-           MOVE    CHKSND-REC      TO  MCPDATA-REC
-           MOVE    "tbl_chksnd"    TO   MCP-TABLE
-           MOVE    "tmpdel1"       TO   MCP-PATHNAME
-           PERFORM 910-DBDELETE-SEC
-      *
-           .
-       80011-TMPSND-EDIT-EXT.
             EXIT.
       *****************************************************************
       *    対象患者ファイル読込処理
@@ -14279,21 +14164,22 @@
        900-CHK-KEY5-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    チェックマスタ２検索処理(CHKSND-KEY5)
+      *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY5-SEL-SEC             SECTION.
+       901-CHKSND-KEY31-SEL-SEC             SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKMST
       *
            INITIALIZE                      CHKSND-REC
            MOVE    WRK-CHK-CHKKBN      TO  CHKSND-CHKKBN
+           MOVE    "%"                 TO  CHKSND-SRYCD
            MOVE    WRK-CHK-CDKBN       TO  CHKSND-CDKBN
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
            MOVE    CHKSND-REC          TO  MCPDATA-REC
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key31"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -14303,12 +14189,12 @@
            END-IF
       *
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key31"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
       *
-       900-CHKSND-KEY5-SEL-EXT.
+       901-CHKSND-KEY31-SEL-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ３検索処理(CHKTRD-KEY5)
@@ -14377,40 +14263,6 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY13-SEL-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-CHKSND
-      *
-           MOVE    CHKSND-REC      TO  MCPDATA-REC
-      *
-           PERFORM 900-DTCHK010-START-SEC
-           IF    ( FLG-DTCHK010    =   ZERO )
-               MOVE    DTCHK010-DAT    TO  CHKSND-REC
-           ELSE
-               MOVE    "tbl_chksnd"    TO  MCP-TABLE
-               MOVE    "key13"         TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
-               IF    ( MCP-RC              =   ZERO )
-                   MOVE    MCPDATA-REC TO  CHKSND-REC
-                   MOVE    CHKSND-REC  TO  DTCHK010-DAT
-                   WRITE   DTCHK010-REC
-               ELSE
-                   MOVE    1           TO  FLG-CHKSND
-                   INITIALIZE              CHKSND-REC
-               END-IF
-      *
-               MOVE    "tbl_chksnd"    TO  MCP-TABLE
-               MOVE    "key13"         TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
-           END-IF
-      *
-           .
-      *
-       900-CHKSND-KEY13-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    チェックマスタ２検索処理
-      *****************************************************************
        900-CHKSND-KEY3-SEL-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
@@ -14452,13 +14304,47 @@
       *****************************************************************
       *    チェックマスタ２検索処理
       *****************************************************************
-       900-CHKSND-KEY24-SEL-SEC        SECTION.
+       901-CHKSND-KEY3-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHKSND
+      *
+           MOVE    CHKSND-REC      TO  MCPDATA-REC
+      *
+           PERFORM 900-DTCHK010-START-SEC
+           IF    ( FLG-DTCHK010    =   ZERO )
+               MOVE    DTCHK010-DAT    TO  CHKSND-REC
+           ELSE
+               MOVE    "tbl_chksnd"    TO  MCP-TABLE
+               MOVE    "key3"          TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC TO  CHKSND-REC
+                   MOVE    CHKSND-REC  TO  DTCHK010-DAT
+                   WRITE   DTCHK010-REC
+               ELSE
+                   MOVE    1           TO  FLG-CHKSND
+                   INITIALIZE              CHKSND-REC
+               END-IF
+      *
+               MOVE    "tbl_chksnd"    TO  MCP-TABLE
+               MOVE    "key3"          TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           .
+      *
+       901-CHKSND-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY31-SEL-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
            MOVE    CHKSND-REC          TO  MCPDATA-REC
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key24"             TO  MCP-PATHNAME
+           MOVE    "key31"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -14469,17 +14355,17 @@
       *
            .
       *
-       900-CHKSND-KEY24-SEL-EXT.
+       900-CHKSND-KEY31-SEL-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ２FETCH処理
       *****************************************************************
-       900-CHKSND-KEY24-FET-SEC        SECTION.
+       900-CHKSND-KEY31-FET-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-CHKSND
       *
            MOVE    "tbl_chksnd"        TO  MCP-TABLE
-           MOVE    "key24"             TO  MCP-PATHNAME
+           MOVE    "key31"             TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC    =     ZERO )
                MOVE    MCPDATA-REC     TO  CHKSND-REC
@@ -14490,7 +14376,7 @@
       *
            .
       *
-       900-CHKSND-KEY24-FET-EXT.
+       900-CHKSND-KEY31-FET-EXT.
            EXIT.
       *****************************************************************
       *    データチェック中間ファイル読込処理
@@ -16110,6 +15996,46 @@
            .
       *
        900-TEKIOUBYOMEI-KEY2-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    医薬品傷病名マスタ検索
+      *****************************************************************
+       900-TEKIOU-DISEASE-KEY3-SEL-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TEKDIS
+      *
+           INITIALIZE                      TEKIOU-DISEASE-REC
+           MOVE    WRK-CHK-SRYCD       TO  TEKDIS-SELSRYCD
+           MOVE    TEKIOU-DISEASE-REC  TO  MCPDATA-REC
+           MOVE    "tbl_tekiou_disease" TO  MCP-TABLE
+           MOVE    "key3"              TO   MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TEKIOU-DISEASE-REC
+           ELSE
+               INITIALIZE                  TEKIOU-DISEASE-REC
+               MOVE    1               TO  FLG-TEKDIS
+           END-IF
+           .
+       900-TEKIOU-DISEASE-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    医薬品傷病名マスタFETCH
+      *****************************************************************
+       900-TEKIOU-DISEASE-KEY3-FET-SEC       SECTION.
+      *
+           MOVE    "tbl_tekiou_disease" TO  MCP-TABLE
+           MOVE    "key3"              TO   MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TEKIOU-DISEASE-REC
+           ELSE
+               INITIALIZE                  TEKIOU-DISEASE-REC
+               MOVE    1               TO  FLG-TEKDIS
+           END-IF
+           .
+      *
+       900-TEKIOU-DISEASE-KEY3-FET-EXT.
            EXIT.
       *****************************************************************
       *    患者介護認定者情報検索処理

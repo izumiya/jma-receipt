@@ -15,21 +15,22 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-      ************************************************************
-      *    チェックマスタ病名編集サブ　COPY (CPORCSS012.INC)
-      ************************************************************
+      **************************************************************
+      *         適応病名医薬品マスタ  COPY (CPTEKIOU-MEDICINE.INC) *
+      **************************************************************
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       ************************************************************
-       01  SS012-AREA.
-           03  SS012-KEY.
-               05  SS012-I-BYOMEI           PIC X(200).
-           03  SS012-SRYYM                  PIC X(06).
-           03  SS012-O-BYOMEI               PIC X(200).
-           03  SS012-BYOMEICD-G.
-               05  SS012-BYOMEICD-OCC       OCCURS  21.
-                   07  SS012-BYOMEICD       PIC X(07).
-                   07  SS012-BYOMEICD-SEP   PIC X(01).
-           03  SS012-BYOMEIHENFLG           PIC X(01).
-           03  SS012-HAISHI                 PIC 9(01).
+      *01  TEKIOU-MEDICINE-REC.
+           03  TEKMED-KEY.
+      *診療行為コード
+               05  TEKMED-SRYCD        PIC X(09).
+      *効能コード
+           03  TEKMED-KONOCD           PIC X(05).
+      *改訂年月
+           03  TEKMED-KAITEIYM         PIC X(06).
+      *
+           03  TEKMED-CREYMD           PIC X(08).
+           03  TEKMED-UPYMD            PIC X(08).
+           03  TEKMED-UPHMS            PIC X(06).
