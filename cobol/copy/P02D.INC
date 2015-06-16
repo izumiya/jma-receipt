@@ -96,7 +96,7 @@
                   05  P02D-VALUE  PIC X(15).
                 04  P02D-SRYKA-COUNT  PIC S9(9)   BINARY.
                 04  P02D-SRYKA-ITEM
-                        PIC X(15)   OCCURS  40 TIMES.
+                        PIC X(15)   OCCURS  99 TIMES.
               03  P02D-DRCD-COMB.
                 04  P02D-DRCD.
                   05  P02D-VALUE  PIC X(29).

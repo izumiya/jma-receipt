@@ -83,6 +83,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/08/XX  ´µ¼ÔÊÝ¸±³ÎÇ§ÍúÎòÄÉ²Ã
       *  04.07.01    NACL-Â¿¡¹Ç¼  12/01/05  ¥¯¥é¥¤¥¢¥ó¥È°õºþÂÐ±þ
       *  04.08.01    NACL-Â¿¡¹Ç¼  14/05/XX  ¿ÇÎÅ¹Ô°Ù°ì»þ¥Ç¡¼¥¿ÂÐ±þ
+      *  04.08.01    NACL-Â¿¡¹Ç¼  15/06/16  ¿ÇÎÅ²Ê¡¦ÊÝ¸±ÁÈ¹ç¤»·ï¿ôÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1006,7 +1007,8 @@
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       (IDX            >   40   )  OR
+      *****        UNTIL       (IDX            >   40   )  OR
+                   UNTIL       (IDX            >   99   )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC           TO  SYS-1005-REC
                MOVE    SYS-1005-KBNCD (1:2)  TO  SPA-GMN-SRYKA
@@ -3214,7 +3216,8 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            END-IF
       *
            MOVE    ZERO                TO  IDX
-           PERFORM UNTIL       (IDX            =   15  )  OR
+      **** PERFORM UNTIL       (IDX            =   15  )  OR
+           PERFORM UNTIL       (IDX            =   30  )  OR
                                (FLG-HKNCOMBI   =   1    )
                MOVE    ZERO                TO  FLG-HKNOK
                IF     (SPA-SYSYMD          >=  COMB-TEKSTYMD) AND

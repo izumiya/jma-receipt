@@ -7,4 +7,4 @@
                   05  P02S-VALUE  PIC X(20).
                 04  P02S-SYUKA-COUNT  PIC S9(9)   BINARY.
                 04  P02S-SYUKA-ITEM
-                        PIC X(20)   OCCURS  40 TIMES.
+                        PIC X(20)   OCCURS  99 TIMES.

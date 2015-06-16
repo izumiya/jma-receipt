@@ -13,7 +13,7 @@
                   05  U012-VALUE  PIC X(21).
                 04  U012-SRYKA-COUNT  PIC S9(9)   BINARY.
                 04  U012-SRYKA-ITEM
-                        PIC X(21)   OCCURS  40 TIMES.
+                        PIC X(21)   OCCURS  100 TIMES.
               03  U012-DRCD-COMB.
                 04  U012-DRCD.
                   05  U012-VALUE  PIC X(29).

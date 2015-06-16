@@ -1302,7 +1302,7 @@
                    (SPA-NAI20-HKNKUMI  NOT =   ZERO)
                 MOVE    ZERO               TO  FLG-OK
                 PERFORM VARYING     IDX    FROM    1   BY  1
-                    UNTIL      (IDX    >   15         )
+                    UNTIL      (IDX    >   30         )
                     OR         (IDX    >   SPA-HKNCOMBI-MAX)
                    IF      SPA-NAI20-HKNKUMI
                                        =   SPA-GMN-THKNCOMBINUM(IDX)
@@ -1360,7 +1360,8 @@
            MOVE    ZERO                TO  WRK-SELNUM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   10
+      ************ UNTIL       IDX     >   10
+                   UNTIL       IDX     >   30
                IF      P02-P020-HKNCOMBI-SELECT(IDX)  =   "T"
                    IF      SPA-GMN-THKNCOMBINUM (IDX)
                                                 =   SPA-NAI20-HKNKUMI

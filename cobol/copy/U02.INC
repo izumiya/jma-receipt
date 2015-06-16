@@ -31,7 +31,7 @@
                 04  U02-SRYKA.
                   05  U02-VALUE   PIC X(21).
                 04  U02-SRYKA-COUNT   PIC S9(9)   BINARY.
-                04  U02-SRYKA-ITEM    PIC X(21)   OCCURS  40 TIMES.
+                04  U02-SRYKA-ITEM    PIC X(21)   OCCURS  99 TIMES.
               03  U02-DRNAME-COMBO.
                 04  U02-DRNAME.
                   05  U02-VALUE   PIC X(29).
@@ -61,14 +61,14 @@
                   05  U02-HKNCOMBI-COUNT   PIC S9(9)   BINARY.
                   05  U02-HKNCOMBI-ROW     PIC S9(9)   BINARY.
                   05  U02-HKNCOMBI-ROWATTR  PIC S9(9)   BINARY.
-                  05  U02-ITEM        OCCURS  15 TIMES.
+                  05  U02-ITEM        OCCURS  30 TIMES.
                     07  U02-HCNUM   PIC X(4).
                     07  U02-HCHKN   PIC X(10).
                     07  U02-HCKOH1  PIC X(10).
                     07  U02-HCKOH2  PIC X(10).
                     07  U02-HCKOH3  PIC X(10).
                     07  U02-HCKOH4  PIC X(10).
-                  05  U02-HKNCOMBI-SELECT  PIC X       OCCURS  15 TIMES.
+                  05  U02-HKNCOMBI-SELECT  PIC X       OCCURS  30 TIMES.
               03  U02-BHK1.
                 04  U02-BHK1-VALUE   PIC X.
                 04  U02-BHK1-LABEL   PIC X(2).

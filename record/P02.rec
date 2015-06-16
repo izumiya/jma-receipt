@@ -81,7 +81,7 @@ P02 {
             textdata varchar(21);
           };
           count int;
-            item varchar(21)[40];
+            item varchar(21)[99];
         };
         P020_DRNAME_COMBO {
           P020_DRNAME {
@@ -124,8 +124,8 @@ P02 {
                 column2 varchar(60);
                 column3 varchar(10);
                 column4 varchar(10);
-              }[15];
-              selectdata bool[15];
+              }[30];
+              selectdata bool[30];
           };
         };
       };
@@ -324,7 +324,7 @@ P02 {
             textdata varchar(21);
           };
           count int;
-            item varchar(21)[40];
+            item varchar(21)[99];
         };
         P02_POST {
           textdata varchar(7);
@@ -414,8 +414,8 @@ P02 {
               item {
                 column1 varchar(4);
                 column2 varchar(60);
-              }[30];
-              selectdata bool[30];
+              }[60];
+              selectdata bool[60];
           };
         };
         P02_HKNNAME {
