@@ -787,70 +787,12 @@ grpsys                                 SPA-AREA
       *
            MOVE    SPACE           TO  WRK-MSTNAME
       *
-           EVALUATE    PARA-MASTER-KBN
-           WHEN    "00"
-               MOVE    "点数マスタ"            TO  WRK-MSTNAME
-           WHEN    "01"
-               MOVE    "保険番号マスタ"        TO  WRK-MSTNAME
-           WHEN    "02"
-               MOVE    "システム管理マスタ"    TO  WRK-MSTNAME
-           WHEN    "03"
-               MOVE    "病名マスタ"            TO  WRK-MSTNAME
-           WHEN    "04"
-               MOVE    "チェックマスタ"        TO  WRK-MSTNAME
-           WHEN    "05"
-               MOVE    "一般老人置換マスタ"    TO  WRK-MSTNAME
-           WHEN    "06"
-               MOVE    "検査分類マスタ"        TO  WRK-MSTNAME
-           WHEN    "07"
-               MOVE    "相互作用マスタ"        TO  WRK-MSTNAME
-           WHEN    "08"
-               MOVE    "症状措置マスタ"        TO  WRK-MSTNAME
-           WHEN    "09"
-               MOVE    "保険者マスタ"          TO  WRK-MSTNAME
-           WHEN    "10"
-               MOVE    "住所マスタ"            TO  WRK-MSTNAME
-           WHEN    "11"
-               MOVE    "適応病名マスタ"        TO  WRK-MSTNAME
-           WHEN    "12"
-               MOVE    "一般名マスタ"          TO  WRK-MSTNAME
-           WHEN    "13"
-               MOVE    "包括チェックマスタ"    TO  WRK-MSTNAME
-           WHEN    "14"
-               MOVE    "包括診療コードマスタ"  TO  WRK-MSTNAME
-           WHEN    "15"
-               MOVE    "統計メモマスタ"        TO  WRK-MSTNAME
-           WHEN    "16"
-               MOVE    "オプションマスタ"      TO  WRK-MSTNAME
-           WHEN    "17"
-               MOVE    "感染症判定マスタ"      TO  WRK-MSTNAME
-           WHEN    "18"
-               MOVE    "入院基本料マスタ"      TO  WRK-MSTNAME
-           WHEN    "19"
-               MOVE    "入院料加算チェックマスタ"
-                                               TO  WRK-MSTNAME
-           WHEN    "20"
-               MOVE    "入院レセプト記載略称マスタ"
-                                               TO  WRK-MSTNAME
-           WHEN    "21"
-               MOVE    "同義語マスタ"          TO  WRK-MSTNAME
-           WHEN    "22"
-               MOVE    "電子点数表マスタ"      TO  WRK-MSTNAME
-           WHEN    "23"
-               MOVE    "労働基準監督署マスタ"  TO  WRK-MSTNAME
-           WHEN    "24"
-               MOVE    "最低薬価マスタ"        TO  WRK-MSTNAME
-           WHEN    "25"
-               MOVE    "介護保険者マスタ"      TO  WRK-MSTNAME
-           WHEN    "26"
-               MOVE    "選定療養費一般コード振替マスタ"
-                                               TO  WRK-MSTNAME
-           WHEN    "27"
-               MOVE    "入院料置換マスタ"
-                                               TO  WRK-MSTNAME
-           WHEN    OTHER
+           PERFORM 900-MSTKANRI-KEY-SEL-SEC
+           IF    ( FLG-MSTKANRI    =   ZERO )
+               MOVE    MSTKANRI-NAME           TO  WRK-MSTNAME
+           ELSE
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
-           END-EVALUATE
+           END-IF
       *
            .
        800-MSTNAME-EXT.
