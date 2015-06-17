@@ -2098,7 +2098,7 @@
        30002-PSYCHO-HEN-SEC              SECTION.
       *
            ADD     1                    TO  IDX-PS
-           IF      IDX-PS               >   100
+           IF      IDX-PS               >   50
                GO  TO      30002-PSYCHO-HEN-EXT
            END-IF
            MOVE    WRK-COM-INPUTCD (IDX)   TO  ORCSPSYCHO-SRYCD(IDX-PS)
@@ -3927,7 +3927,6 @@
                GO      TO      3002-INNAI-SYORI-EXT
             END-IF
       *
-      *H26.10
       *    院内処方のみの時
            IF     (FLG-NAIYAK2         =   1    )
              OR   (FLG-TONPUK2         =   1    )
