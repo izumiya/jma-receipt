@@ -518,7 +518,6 @@
       *
            PERFORM UNTIL ( FLG-SRYACT  NOT =  ZERO )
       *
-               IF  SRY-SRYKBN (1:1)    =  "2"
                    PERFORM VARYING IDX0  FROM  1  BY  1
                            UNTIL ( IDX0  >  5 )
                             OR   ( SRY-SRYCD (IDX0) =  SPACE )
@@ -533,7 +532,6 @@
                            END-IF
                        END-IF
                    END-PERFORM
-               END-IF
       *
                PERFORM 900-SRYACT-KEY13-FET-SEC
       *
