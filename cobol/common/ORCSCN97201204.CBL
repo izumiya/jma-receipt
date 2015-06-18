@@ -323,7 +323,9 @@
                        MOVE    IDX-Z           TO  IDX-ZS2
                    END-IF
       *            注加算コードのチェック
-                   PERFORM 1003-CHUKSNCD-CHK-SEC
+                   IF      (SPA-HKNCOMBINUM NOT =   "9999"   )
+                       PERFORM 1003-CHUKSNCD-CHK-SEC
+                   END-IF
       *
                    IF     (LNK-ORCSC-PG        =   "K02"    )
                    AND    (WRK-COM-KZMFLGNK (IDX-Z) =   SPACE)
