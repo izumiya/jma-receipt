@@ -1890,7 +1890,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                    TO  SHELLTBL-ARG13
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
            MOVE    WRK-CHKKBN      TO  SHELLTBL-ARG15
-           MOVE    WRK-SRTKBN      TO  SHELLTBL-ARG16
+           IF    ( WRK-CHKKBN      =   "X" OR "Y" )
+               MOVE    "3"         TO  SHELLTBL-ARG16
+           ELSE
+               MOVE    WRK-SRTKBN  TO  SHELLTBL-ARG16
+           END-IF
            MOVE    SPA-GMN-STSRYCD TO  SHELLTBL-ARG17
            MOVE    SPA-GMN-EDSRYCD TO  SHELLTBL-ARG18
            MOVE    CHKMERR         TO  SHELLTBL-ARG19
