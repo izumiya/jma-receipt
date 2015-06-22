@@ -870,7 +870,7 @@
         <width>175</width>
         <height>26</height>
         <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
+        <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
         <label>自賠責（新様式）</label>
@@ -899,7 +899,7 @@
         <width>175</width>
         <height>26</height>
         <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
+        <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
         <label>自賠責（従来様式）</label>
@@ -928,7 +928,7 @@
         <width>175</width>
         <height>26</height>
         <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
+        <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
         <label>自賠責（第三者行為）</label>
@@ -957,7 +957,7 @@
         <width>170</width>
         <height>26</height>
         <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
+        <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
         <label>公　害</label>
