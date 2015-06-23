@@ -680,6 +680,7 @@
       *  04.07.46    NACL-門脇    15/05/18  ７０歳代前半特例一部負担金記載修正
       *  04.07.47    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
       *  04.07.48    NACL-門脇    15/06/16  高額療養費の現物給付判定修正
+      *  04.07.49    NACL-門脇    15/06/22  食事回数記載修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-門脇    14/07/29  ３２文字以上の文字列修正
@@ -1520,6 +1521,8 @@
            03  WRK-KEISAN1                             PIC 9(07).
            03  WRK-KEISAN2                             PIC 9(07).
            03  WRK-KEISAN3                             PIC 9(07).
+           03  WRK-KEISAN4                             PIC 9(07).
+           03  WRK-KEISAN5                             PIC 9(07).
            03  WRK-KEISAN9                             PIC 9(07).
            03  WRK-KEISAN-XXX                          PIC 9(07).
            03  WRK-KEISAN-YYY                          PIC 9(07).
@@ -23814,6 +23817,38 @@
                END-PERFORM
              END-PERFORM
       *
+           END-IF
+      *
+      *    食事回数がゼロで、食事療養費がゼロでない場合の対応
+      *
+           IF   RECE62-SRYYM   >=  "201404"
+             IF  (RECE62-HKNNUM            NOT = SPACE)
+             AND (RECE62-SHOKUJINISSU(1)       = ZERO )
+             AND (RECE62-SHOKUJIRYOYOHI(1) NOT = ZERO )
+      *          特別食加算のみかチェック
+      *          （食事療養費を７６円で割ってチェック）
+                 COMPUTE  WRK-KEISAN4 = RECE62-SHOKUJIRYOYOHI(1) / 76
+                 COMPUTE  WRK-KEISAN5 = WRK-KEISAN4 * 76
+                 IF RECE62-SHOKUJIRYOYOHI(1) = WRK-KEISAN5
+                   MOVE  WRK-KEISAN4  TO  RECE62-SHOKUJINISSU(1)
+                 END-IF
+             END-IF
+             PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                       UNTIL   KOHFTN-IDX    >   4
+               IF  (RECE62-KOHNUM(KOHFTN-IDX)              NOT = SPACE)
+               AND (RECE62-SHOKUJINISSU(KOHFTN-IDX + 1)        = ZERO )
+               AND (RECE62-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)  NOT = ZERO )
+      *          特別食加算のみかチェック
+      *          （食事療養費を７６円で割ってチェック）
+                 COMPUTE  WRK-KEISAN4 =
+                          RECE62-SHOKUJIRYOYOHI(KOHFTN-IDX + 1) / 76
+                 COMPUTE  WRK-KEISAN5 = WRK-KEISAN4 * 76
+                 IF RECE62-SHOKUJIRYOYOHI(KOHFTN-IDX + 1) = WRK-KEISAN5
+                   MOVE  WRK-KEISAN4  TO
+                                RECE62-SHOKUJINISSU(KOHFTN-IDX + 1)
+                 END-IF
+               END-IF
+             END-PERFORM
            END-IF
       *
            .
