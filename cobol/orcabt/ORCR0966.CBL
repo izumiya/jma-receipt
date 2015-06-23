@@ -59,6 +59,7 @@
       *  04.07.04    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *  04.07.05    NACL-門脇    14/10/02  摘要欄の最終行まで記載してから
       *                                     改ページするよう修正
+      *  04.07.06    NACL-門脇    15/06/23  食事回数記載修正
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -1273,8 +1274,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
                MOVE    WRK-ZZZ           TO  HC23-SYOKAISU-SEI(2)
            END-IF
       *
-           MOVE    RECE82-SHOKUJITOTALDAY  TO  WRK-ZZZ
-           MOVE    WRK-ZZZ                 TO  HC23-SYONISSU
+           IF   RECE82-SHOKUJITOTALKIN  >  0
+             MOVE  RECE82-SHOKUJITOTALDAY  TO  WRK-ZZ9
+             MOVE  WRK-ZZ9                 TO  HC23-SYONISSU
+           END-IF
            MOVE    RECE82-SHOKUJITOTALKIN  TO  WRK-KINGAKUZ
            MOVE    WRK-KINGAKUZ            TO  HC23-SYOKINGAKU
       *
@@ -1290,8 +1293,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
                  MOVE    RECE82-FTNMONEY        TO  WRK-SEIKYUZ
                  MOVE    WRK-SEIKYUZ            TO  HC23-SEIKYU(2)
       *
-                 MOVE    RECE82-SHOKUJITOTALDAY TO  WRK-ZZZ
-                 MOVE    WRK-ZZZ                TO  HC23-FTNNISSU
+                 IF   RECE82-SKJFTNMONEY  >  0
+                   MOVE  RECE82-SHOKUJITOTALDAY TO  WRK-ZZ9
+                   MOVE  WRK-ZZ9                TO  HC23-FTNNISSU
+                 END-IF
                  MOVE    RECE82-SKJFTNMONEY     TO  WRK-KINGAKUZ
                  MOVE    WRK-KINGAKUZ           TO  HC23-SEIKYU(3)
       *
