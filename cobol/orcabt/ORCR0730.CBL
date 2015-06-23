@@ -209,6 +209,7 @@
       *  04.07.22    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
       *  04.07.23    NACL-藤原    15/06/04  ＥＦファイルに種別不明分があ
       *                                     れば処理終了
+      *  04.07.24    NACL-門脇    15/06/23  食事回数記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6481,11 +6482,11 @@
            END-IF
       *    IF      RECE62-SHOKUJINISSU (IDX1)   >   ZERO
            IF      RECE62-SHOKUJIRYOYOHI(IDX1)  >   ZERO
-               IF      RECE62-SHOKUJINISSU (IDX1)  >  ZERO
+      ***      IF      RECE62-SHOKUJINISSU (IDX1)  >  ZERO
                    MOVE    RECE62-SHOKUJINISSU (IDX1)
                                                TO  WRK-KGK2
                    MOVE    WRK-KGK2            TO  HC06-SYONISSU(1)
-               END-IF
+      ***      END-IF
                MOVE    RECE62-SHOKUJIRYOYOHI (IDX1) TO  WRK-KGK6
                MOVE    WRK-KGK6                TO  HC06-SYOTOTALTEN(1)
                IF      RECE62-SHOKUJIFTN (IDX1) >   ZERO
@@ -6547,11 +6548,11 @@
                                       RECE62-SHOKUJIFTN     (IDX1)) OR
                   (RECE62-JSKISAIFLG        =  "1"                ) OR
                   (RECE62-EKF-SKJFLG(IDX2)  =  "1"                )    )
-               IF      RECE62-SHOKUJINISSU (IDX2)  >  ZERO
+      ***      IF      RECE62-SHOKUJINISSU (IDX2)  >  ZERO
                    MOVE    RECE62-SHOKUJINISSU (IDX2)
                                            TO  WRK-KGK2 
                    MOVE    WRK-KGK2        TO  WRK-KOH-SYONISSU (1)
-               END-IF
+      ***      END-IF
                MOVE    RECE62-SHOKUJIRYOYOHI (IDX2)
                                            TO  WRK-KGK6
                MOVE    WRK-KGK6            TO  WRK-KOH-SYOTOTALTEN(1)
@@ -6641,11 +6642,11 @@
                                       RECE62-SHOKUJIFTN     (IDX2)) OR
                   (RECE62-JSKISAIFLG        =  "1"                ) OR
                   (RECE62-EKF-SKJFLG(IDX3)  =  "1"                )    )
-               IF      RECE62-SHOKUJINISSU (IDX3)  >  ZERO
+      ***      IF      RECE62-SHOKUJINISSU (IDX3)  >  ZERO
                    MOVE    RECE62-SHOKUJINISSU (IDX3)
                                            TO  WRK-KGK2
                    MOVE    WRK-KGK2        TO  WRK-KOH-SYONISSU (2)
-               END-IF
+      ***      END-IF
                MOVE    RECE62-SHOKUJIRYOYOHI (IDX3)
                                            TO  WRK-KGK6
                MOVE    WRK-KGK6            TO  WRK-KOH-SYOTOTALTEN(2)
@@ -6743,11 +6744,11 @@
                                       RECE62-SHOKUJIFTN     (IDX3)) OR
                       (RECE62-JSKISAIFLG        =  "1"            ) OR
                       (RECE62-EKF-SKJFLG(IDX4)  =  "1"            )    )
-                   IF      RECE62-SHOKUJINISSU (IDX4)  >  ZERO
+      ***          IF      RECE62-SHOKUJINISSU (IDX4)  >  ZERO
                        MOVE    RECE62-SHOKUJINISSU (IDX4)
                                                TO  WRK-KGK2
                        MOVE    WRK-KGK2        TO  WRK-KOH-SYONISSU (3)
-                   END-IF
+      ***          END-IF
                    MOVE    RECE62-SHOKUJIRYOYOHI (IDX4)
                                                TO  WRK-KGK6
                    MOVE    WRK-KGK6            TO
@@ -6852,11 +6853,11 @@
                                       RECE62-SHOKUJIFTN     (IDX4)) OR
                       (RECE62-JSKISAIFLG        =  "1"            ) OR
                       (RECE62-EKF-SKJFLG(IDX5)  =  "1"            )    )
-                   IF      RECE62-SHOKUJINISSU (IDX5)  >  ZERO
+      ***          IF      RECE62-SHOKUJINISSU (IDX5)  >  ZERO
                        MOVE    RECE62-SHOKUJINISSU (IDX5)
                                                TO  WRK-KGK2
                        MOVE    WRK-KGK2        TO  WRK-KOH-SYONISSU (4)
-                   END-IF
+      ***          END-IF
                    MOVE    RECE62-SHOKUJIRYOYOHI (IDX5)
                                                TO  WRK-KGK6
                    MOVE    WRK-KGK6            TO

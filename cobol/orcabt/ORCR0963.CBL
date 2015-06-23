@@ -43,6 +43,7 @@
       *  04.07.03    NACL-門脇    14/10/02  摘要欄の最終行まで記載してから
       *                                     改ページするよう修正
       *  04.07.04    NACL-藤原    14/12/03  平成２６年１１月改正対応
+      *  04.07.05    NACL-門脇    15/06/23  食事回数記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -474,6 +475,7 @@
            03  WRK-KGK9            PIC ZZ,ZZZ,ZZ9.
            03  WRK-KGK4            PIC ZZ,ZZZ,ZZZ.
            03  WRK-KGK2            PIC ZZ.
+           03  WRK-KGK22           PIC Z9.
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-RECEKAISU       PIC ZZZ.
            03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
@@ -2048,9 +2050,11 @@
            END-PERFORM
       *
       *    食事療養（日）          
-           MOVE    RECE82-SHOKUJITOTALDAY
-                                     TO  WRK-KGK2
-           MOVE    WRK-KGK2          TO  HCN66-SYONISSU
+           IF   RECE82-SHOKUJITOTALKIN  >  0
+             MOVE  RECE82-SHOKUJITOTALDAY
+                                     TO  WRK-KGK22
+             MOVE  WRK-KGK22         TO  HCN66-SYONISSU
+           END-IF
       *
       *    食事療養（ハ）          
            MOVE    RECE82-SHOKUJITOTALKIN
