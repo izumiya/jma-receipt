@@ -97,6 +97,8 @@
       *              NACL-小豆沢  15/03/25  Ｆファイル編集処理
       *                                     行為明細点数をきざみ点数を
       *                                     加算した点数に修正
+      *
+      *              NACL-伊藤    15/06/23  後発品変更不可（処方単位）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -787,6 +789,10 @@
        01  WRK-TEIGEN-RECE05-REC.
            COPY    "CPRCF005.INC"  REPLACING  //RECE05//
                                    BY         //WRK-TEIGEN-RECE05//.
+      *    後発変更可不可（処方単位）退避用エリア
+       01  WRK-GEN10-RECE04-REC.
+           COPY    "CPRCF004.INC" REPLACING  //RECE04//
+                                   BY        //WRK-GEN10//.
       *
       *    検体検査用退避エリア
        01  TBL-KENTAI-RECE04-AREA.
@@ -1893,6 +1899,31 @@
              PERFORM 990-RECE04-NEXT-SEC
            END-PERFORM
       *
+      *    後発品変更負荷処方単位情報
+           INITIALIZE                      WRK-GEN10-RECE04-REC
+           INITIALIZE                      RECE04-REC
+           MOVE    RECE02-KEY          TO  RECE04-KEY1
+      *
+           START   RECE04-FILE
+               KEY IS    >=   RECE04-KEY
+               INVALID
+                   DISPLAY "RECE04 START INVALID"
+                   MOVE    1           TO  FLG-RECE04
+               NOT INVALID
+                   DISPLAY "RECE04 START NOT INVALID"
+                   PERFORM 990-RECE04-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-END              =   1           )
+               OR     ( FLG-RECE04           =   1           )
+               OR     ( RECE02-KEY       NOT =   RECE04-KEY1 )
+             IF     ( RECE04-SRYKBN       =  "98" )
+      *        明細テーブル退避処理
+               PERFORM 20071-ZAI-TAIHI-SEC
+             END-IF
+             PERFORM 990-RECE04-NEXT-SEC
+           END-PERFORM
+      *
       *    摘要情報（診察料、外来管理加算以外）
            INITIALIZE                      RECE04-REC
            MOVE    RECE02-KEY          TO  RECE04-KEY1
@@ -2026,7 +2057,8 @@
                         RECE05-SRYCD (IDX) (1:3) NOT =   "008" AND
                         RECE05-SRYCD (IDX)       NOT =  "190128310" AND
                         RECE05-SRYCD (IDX)       NOT =  "190128410" AND
-                        RECE05-SRYCD (IDX)       NOT =  "190128570")
+                        RECE05-SRYCD (IDX)       NOT =  "190128570" AND
+                        RECE05-SRYCD (IDX)       NOT =  "099209910")
                  CONTINUE
                 ELSE
       *
@@ -2071,6 +2103,9 @@
       *                                MOVE "1" TO WRK-FEDT-HOUKATU-FLG
       *                            END-IF
       *                        END-PERFORM
+                           END-IF
+                           IF    RECE05-SRYCD(IDX)  =  "099209910"
+                               MOVE RECE04-REC TO WRK-GEN10-RECE04-REC
                            END-IF
                        WHEN    "1"
                            PERFORM 200711-KOUI-TAIHI-SEC
@@ -3612,6 +3647,10 @@
                END-IF
            END-IF
       *
+           IF      WRK-GEN10-KAISU (1 IDXX)
+                                       >   ZERO
+               MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
+           END-IF
       *    システム予約により銘柄名へ変更か調べる
            PERFORM 200722-SRYACCT-CHECK-SEC
       *

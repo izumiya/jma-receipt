@@ -427,6 +427,8 @@
       *                                     のときの記録方法
       *  04.07.16    NACL-藤原    15/04/16  注加算コードが１４１９の加算
       *                                     項目の記録方法の修正
+      *  04.07.17    NACL-伊藤    15/06/23  医療情報連携
+      *                                     後発品変更不可（処方単位）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -626,6 +628,7 @@ grpsys     COPY    "COMMON-SPA".
            03  FLG-TOYAKUFLG           PIC 9(01).
            03  FLG-SUUJI               PIC 9(01).
            03  FLG-SISETUKIJYUN-GENZAN PIC 9(01).
+           03  FLG-HENKOFUKA           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -1338,6 +1341,9 @@ grpsys     COPY    "COMMON-SPA".
        01  WRK-TAIHI-RECE041-REC.
            COPY    "CPRCF0041.INC"  REPLACING //RECE041//
                                    BY         //WRK-TAIHI-RECE041//.
+       01  WRK-TAIHI-R41G10-REC.
+           COPY    "CPRCF0041.INC" REPLACING  //RECE041//
+                                   BY         //WRK-R41G10//.
       *
       *    画像診断用退避エリア
       *    撮影料退避
@@ -3571,6 +3577,9 @@ grpsys             OR     ( RECE02-KEY
       *****************************************************************
        2007-HENSYU-SEC              SECTION.
       *                                        
+           IF      WRK-PARA-PRTKBN     =   "9"
+               PERFORM 8900-SYSTEM-RESERVE-98-SEC
+           END-IF
       *    摘要情報
            INITIALIZE                      RECE041-REC
 grpsys     MOVE    RECE02-KEY          TO  RECE041-KEY1
@@ -3637,7 +3646,14 @@ grpsys         OR     ( RECE02-KEY       NOT =   RECE041-KEY1        )
       *       摘要データ編集処理
                IF      FLG-END           =   ZERO
                    PERFORM 20074-ZAI-KOUI-SORT-SEC
-                   PERFORM 20072-ZAI-HENSYU-SEC
+                   IF     (WRK-PARA-PRTKBN     =   "9")  AND
+                          (RECE041-SRYKBN      =   "21"
+                                               OR  "22"
+                                               OR  "23")
+                       PERFORM 8901-YKZ-HENSYU-SEC
+                   ELSE
+                       PERFORM 20072-ZAI-HENSYU-SEC
+                   END-IF
       * 
                    PERFORM 990-RECE041-NEXT-SEC
                END-IF     
@@ -4303,9 +4319,9 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                                 TO  WRK-KIZAI-SRYCD
                        MOVE    "777770000"      TO  RECE05-SRYCD (IDX)
                    END-IF
-                   IF      RECE05-INGAIFLG(IDX) =   "1"
-                       MOVE    "699990001"      TO  RECE05-SRYCD (IDX)
-                   END-IF
+      *             IF      RECE05-INGAIFLG(IDX) =   "1"
+      *                 MOVE    "699990001"      TO  RECE05-SRYCD (IDX)
+      *             END-IF
       *
                    EVALUATE    RECE05-SRYCD (IDX) (1:1)
                        WHEN    "0"
@@ -4974,6 +4990,14 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                    TBL-ZAIW-NAME       (1 WRK-TBLMAX6)
                MOVE    RECE05-YUKOKETA   (IDX)  TO
                                    TBL-ZAIW-YUKOKETA   (1 WRK-TBLMAX6)
+               IF     (WRK-PARA-PRTKBN         =   "9")  AND
+                      (RECE05-SRYKBN           =   "21"
+                                               OR  "22"
+                                               OR  "23") AND
+                      (RECE05-INGAIFLG (IDX)   =   "1")
+                   MOVE    1                   TO
+                               TBL-ZAIW-KOKUJISKBKBN2 (1 WRK-TBLMAX6)
+               END-IF
            END-IF
            .
        200711-YKZ-TAIHI-EXT.
@@ -7001,7 +7025,19 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            MOVE    RECE055-SRYCD    TO  TBL-RECE055-SRYCD
                                                (TBL-RECE055-MAX)         
            MOVE    RECE055-NAME     TO  TBL-RECE055-NAME
-                                               (TBL-RECE055-MAX)         
+                                               (TBL-RECE055-MAX) 
+           IF     (WRK-PARA-PRTKBN     =   "9")    AND
+                  (RECE041-SRYKBN      =   "21"
+                                       OR  "22"
+                                       OR  "23")
+               IF     (TBL-ZAIW-KOKUJISKBKBN2 (1 IDX)  =   1)
+               AND    (TBL-ZAIW-SRYCD (1 IDX)      NOT = "699990001")
+                   MOVE    SPACE            TO  TBL-RECE055-SRYCD
+                                                       (TBL-RECE055-MAX)
+                   MOVE    SPACE            TO  TBL-RECE055-NAME
+                                                       (TBL-RECE055-MAX)
+               END-IF
+           END-IF
       *
            IF      RECE055-SRYCD    =   "810000001"
                CONTINUE
@@ -8503,6 +8539,185 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                                            WRK-CO-COMMENT
            .
        5010-CO-RECORD-NEXT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後発変更不可対応（該当レコードを退避）処理
+      *****************************************************************
+       8900-SYSTEM-RESERVE-98-SEC  SECTION.
+      *                                        
+           INITIALIZE                      WRK-TAIHI-R41G10-REC
+           INITIALIZE                      RECE041-REC
+           MOVE    RECE02-KEY          TO  RECE041-KEY1
+           MOVE    "98"                TO  RECE041-SRYKBN
+      *
+           START   RECE041-FILE
+               KEY IS    >=   RECE041-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE04
+               NOT INVALID
+                   PERFORM 990-RECE041-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-END              =   1            )
+               OR     ( FLG-RECE04           =   1            )
+               OR     ( RECE02-KEY       NOT =   RECE041-KEY1 )
+      *
+      *        98コメントに診療コード計に該当するものを退避
+               IF    ( RECE041-SRYKBN      =   "98"     )  AND
+                     ( RECE041-SRYCDTOTAL  =   99209910 )
+                   MOVE    RECE041-REC TO  WRK-TAIHI-R41G10-REC
+               END-IF
+      *
+               PERFORM 990-RECE041-NEXT-SEC
+           END-PERFORM
+           .
+       8900-SYSTEM-RESERVE-98-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    後発変更不可対応（編集）処理
+      *****************************************************************
+       8901-YKZ-HENSYU-SEC         SECTION.
+      *
+      *    099209910の入力なし（通常処理）
+           IF      WRK-R41G10-SRYCDTOTAL   =   ZERO
+               PERFORM 89012-YKZ-HENSYU-SEC
+               PERFORM 20072-ZAI-HENSYU-SEC
+               GO  TO  8901-YKZ-HENSYU-EXT
+           END-IF
+      *
+      *    日別に調べる
+           MOVE    ZERO                TO  FLG-HENKOFUKA
+           PERFORM 89011-YKZ-HENSYU-SEC
+      *            1:全て該当
+      *            2:部分的に該当
+      *            3:該当なし
+      *
+      *    全て該当の場合
+           IF      FLG-HENKOFUKA       =   1
+               PERFORM 20072-ZAI-HENSYU-SEC
+               GO  TO  8901-YKZ-HENSYU-EXT
+           END-IF
+      *
+      *    該当なしの場合
+           IF      FLG-HENKOFUKA       =   3
+               PERFORM 89012-YKZ-HENSYU-SEC
+               PERFORM 20072-ZAI-HENSYU-SEC
+               GO  TO  8901-YKZ-HENSYU-EXT
+           END-IF
+      *
+      *    部分的に該当の場合
+      *    該当する日
+           MOVE    RECE041-REC         TO  WRK-TAIHI-RECE041-REC
+           PERFORM 89014-YKZ-HENSYU-SEC
+           IF      RECE041-ZAIKAISU    >   ZERO
+               PERFORM 20072-ZAI-HENSYU-SEC
+           END-IF
+           MOVE    WRK-TAIHI-RECE041-REC   TO  RECE041-REC
+      *    該当しない日
+           MOVE    RECE041-SRYKBN      TO  WRK-SRYKBN
+           PERFORM 89013-YKZ-HENSYU-SEC
+           IF      RECE041-ZAIKAISU    >   ZERO
+               PERFORM 89012-YKZ-HENSYU-SEC
+               PERFORM 20072-ZAI-HENSYU-SEC
+           END-IF
+           MOVE    WRK-TAIHI-RECE041-REC   TO  RECE041-REC
+           .
+       8901-YKZ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後発変更不可対応（日別該当チェック）処理
+      *****************************************************************
+       89011-YKZ-HENSYU-SEC        SECTION.
+      *
+      *    全部該当？
+           PERFORM VARYING IDV     FROM    1   BY  1
+                   UNTIL   IDV     >       31
+               IF      RECE041-KAISU (1 IDV)   >   ZERO
+                   IF      WRK-R41G10-KAISU (1 IDV)    >   ZERO
+                       CONTINUE
+                   ELSE
+                       MOVE    9                   TO  FLG-HENKOFUKA
+                       MOVE    31                  TO  IDV
+                   END-IF
+               END-IF
+           END-PERFORM
+           IF      FLG-HENKOFUKA       =   ZERO
+               MOVE    1                   TO  FLG-HENKOFUKA
+               GO  TO  89011-YKZ-HENSYU-EXT
+           END-IF
+      *    該当なし？
+           PERFORM VARYING IDV     FROM    1   BY  1
+                   UNTIL   IDV     >       31
+               IF      RECE041-KAISU (1 IDV)   >   ZERO
+                   IF      WRK-R41G10-KAISU (1 IDV)    =   ZERO
+                       CONTINUE
+                   ELSE
+                       MOVE    9                   TO  FLG-HENKOFUKA
+                       MOVE    31                  TO  IDV
+                   END-IF
+               END-IF
+           END-PERFORM
+           IF      FLG-HENKOFUKA       =   ZERO
+               MOVE    3                   TO  FLG-HENKOFUKA
+           ELSE
+               MOVE    2                   TO  FLG-HENKOFUKA
+           END-IF
+           .  
+       89011-YKZ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後発変更不可対応（一般名の場合診療コードを戻す）処理
+      *****************************************************************
+       89012-YKZ-HENSYU-SEC        SECTION.
+      *
+           PERFORM VARYING IDV FROM    1   BY  1
+                   UNTIL   IDV >   WRK-TBLMAX6
+               IF      TBL-ZAIW-KOKUJISKBKBN2 (1 IDV)  =   1
+                   MOVE    "699990001"     TO  TBL-ZAIW-SRYCD (1 IDV)
+               END-IF
+           END-PERFORM
+           .
+       89012-YKZ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後発変更不可対応（該当しない日のため回数を０にする）処理
+      *****************************************************************
+       89013-YKZ-HENSYU-SEC        SECTION.
+      *
+           PERFORM VARYING IDV     FROM    1   BY  1
+                   UNTIL   IDV     >       31
+               IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
+                      (WRK-R41G10-KAISU (1 IDV)  >   ZERO)
+                   COMPUTE RECE041-ZAIKAISU    =
+                           RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
+                   MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
+               END-IF
+           END-PERFORM
+           .  
+       89013-YKZ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    後発変更不可対応（該当する日のため回数を０にする）処理
+      *****************************************************************
+       89014-YKZ-HENSYU-SEC        SECTION.
+      *
+           PERFORM VARYING IDV     FROM    1   BY  1
+                   UNTIL   IDV     >       31
+               IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
+                      (WRK-R41G10-KAISU (1 IDV)  =   ZERO)
+                   COMPUTE RECE041-ZAIKAISU    =
+                           RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
+                   MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
+               END-IF
+           END-PERFORM
+           .  
+       89014-YKZ-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
