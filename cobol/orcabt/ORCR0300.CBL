@@ -8614,9 +8614,6 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *****************************************************************
        8901-YKZ-HENSYU-SEC         SECTION.
       *
-      *TODO
-      *    9910該当日にしか算定がない場合はそのまま１回編集でよい
-      *
       *    099209910の入力なし（通常処理）
            IF      WRK-R41G10-SRYCDTOTAL   =   ZERO
                PERFORM 89012-YKZ-HENSYU-SEC
