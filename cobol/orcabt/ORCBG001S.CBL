@@ -134,7 +134,7 @@
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
-           03  IDZ                     PIC 9(02).
+           03  IDZ                     PIC 9(03).
            03  IDX-D                   PIC 9(04).
       *
            03  IDW1                    PIC 9(04).

@@ -130,7 +130,7 @@
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
-           03  IDZ                     PIC 9(02).
+           03  IDZ                     PIC 9(03).
            03  IDX-D                   PIC 9(04).
       *
            03  IDW1                    PIC 9(04).
@@ -624,6 +624,7 @@
       *
            CLOSE                       TOKEI-FILE
       *
+           DISPLAY "CCCCCCCCCCCCCCCCCCCCCCCCCC"
            OPEN    INPUT               TOKEI-FILE
       *    集計統計データ順読込み
            PERFORM 900-TOKEI-NEXT-SEC
@@ -635,6 +636,7 @@
                        UNTIL   FLG-TOKEI   =   1
            END-IF
            CLOSE                       TOKEI-FILE
+           DISPLAY "DDDDDDDDDDDDDDDDDD"
       *
       *    データをクリアする
            OPEN    OUTPUT              TOKEI-FILE
