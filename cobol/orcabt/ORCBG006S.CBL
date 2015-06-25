@@ -109,7 +109,7 @@
            03  CNT-TOKEI               PIC 9(05).
            03  CNT-KOUHATU             PIC 9(05).
            03  CNT-SRYKA               PIC 9(05).
-           03  CNT-MAX                 PIC 9(02).
+           03  CNT-MAX                 PIC 9(03).
            03  CNT-KETA                PIC 9(02).
            03  CNT-KETA2               PIC 9(02).
       *
@@ -206,7 +206,7 @@
                05  WRK-PAGE2           PIC X(03).
       *
            03  WRK-TAI-AREA.
-               05  WRK-TAI-TBL         OCCURS  49  TIMES.
+               05  WRK-TAI-TBL         OCCURS  100  TIMES.
                  07  WRK-TAI-SRYKA     PIC X(02).
                  07  WRK-TAI-NAIYO     PIC X(14).
            03  WRK-NAI-AREA.
@@ -216,9 +216,9 @@
                  07  WRK-NAI-TEN       PIC X(10).
                  07  WRK-NAI-TANI      PIC X(10).
                  07  WRK-NAI-SURYO     PIC X(16)
-                                       OCCURS  49  TIMES.
+                                       OCCURS  100  TIMES.
                  07  WRK-NAI-GAKU      PIC X(16)
-                                       OCCURS  49  TIMES.
+                                       OCCURS  100  TIMES.
       *
       *    £Ã£Ó£Ö¥Ç¡¼¥¿ÊÔ½¸ÍÑ
            03  WRK-REC             PIC X(20000).
@@ -636,7 +636,7 @@
       *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL ( FLG-SYSKANRI    =   1 )
-                   OR    ( IDX             >   49  )
+                   OR    ( IDX             >   99  )
                MOVE    SYS-1005-KBNCD      TO  WRK-TAI-SRYKA(IDX)
                MOVE    SYS-1005-SRYKANAME1 TO  WRK-TAI-NAIYO(IDX)
                COMPUTE CNT-SRYKA   =   CNT-SRYKA   +   1
@@ -669,6 +669,26 @@
                    MOVE    45          TO  CNT-MAX
                WHEN    45  THRU    49
                    MOVE    50          TO  CNT-MAX
+               WHEN    50  THRU    54
+                   MOVE    55          TO  CNT-MAX
+               WHEN    55  THRU    59
+                   MOVE    60          TO  CNT-MAX
+               WHEN    60  THRU    64
+                   MOVE    65          TO  CNT-MAX
+               WHEN    65  THRU    69
+                   MOVE    70          TO  CNT-MAX
+               WHEN    70  THRU    74
+                   MOVE    75          TO  CNT-MAX
+               WHEN    75  THRU    79
+                   MOVE    80          TO  CNT-MAX
+               WHEN    80  THRU    84
+                   MOVE    85          TO  CNT-MAX
+               WHEN    85  THRU    89
+                   MOVE    90          TO  CNT-MAX
+               WHEN    90  THRU    94
+                   MOVE    95          TO  CNT-MAX
+               WHEN    95  THRU    99
+                   MOVE    100         TO  CNT-MAX
            END-EVALUATE
       *
            .
@@ -688,7 +708,7 @@
       *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL ( FLG-SYSKANRI    =   1 )
-                   OR    ( IDX             >   49  )
+                   OR    ( IDX             >   99  )
                MOVE    SYS-5001-KBNCD          TO  WRK-TAI-SRYKA(IDX)
                MOVE    SYS-5001-BTU-TANNAME    TO  WRK-TAI-NAIYO(IDX)
                COMPUTE CNT-SRYKA   =   CNT-SRYKA   +   1
@@ -721,6 +741,26 @@
                    MOVE    45          TO  CNT-MAX
                WHEN    45  THRU    49
                    MOVE    50          TO  CNT-MAX
+               WHEN    50  THRU    54
+                   MOVE    55          TO  CNT-MAX
+               WHEN    55  THRU    59
+                   MOVE    60          TO  CNT-MAX
+               WHEN    60  THRU    64
+                   MOVE    65          TO  CNT-MAX
+               WHEN    65  THRU    69
+                   MOVE    70          TO  CNT-MAX
+               WHEN    70  THRU    74
+                   MOVE    75          TO  CNT-MAX
+               WHEN    75  THRU    79
+                   MOVE    80          TO  CNT-MAX
+               WHEN    80  THRU    84
+                   MOVE    85          TO  CNT-MAX
+               WHEN    85  THRU    89
+                   MOVE    90          TO  CNT-MAX
+               WHEN    90  THRU    94
+                   MOVE    95          TO  CNT-MAX
+               WHEN    95  THRU    99
+                   MOVE    100         TO  CNT-MAX
            END-EVALUATE
       *
            .
@@ -786,7 +826,7 @@
            MOVE   SPACE            TO  WRK-SRYKBN
       *
            EVALUATE    WRK-PARA-SRYKBN
-               WHEN    ""
+      *         WHEN    ""
                WHEN    SPACE
                    MOVE    1               TO  FLG-SRYKBN
                WHEN    "14"
