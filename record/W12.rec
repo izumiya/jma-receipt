@@ -498,6 +498,13 @@ W12 {
           count int;
             item varchar(20)[2];
         };
+        RECEDEN_LST2KBN_MEDIA_COMBO {
+          RECEDEN_LST2KBN_MEDIA {
+            textdata varchar(20);
+          };
+          count int;
+            item varchar(20)[5];
+        };
         RECEDEN_RIREKI_COMBO {
           state int;
           RECEDEN_RIREKIKBN {

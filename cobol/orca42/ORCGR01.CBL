@@ -168,6 +168,8 @@
       *                                     第三者行為も対象とする
       *  04.07.11    NACL-藤原    15/04/10  自賠責の請求管理削除処理に条件
       *                                     を追加
+      *  04.07.12    NACL-藤原    15/05/14  「自賠責・様式選択」の初期表
+      *                                     示変更対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -4459,21 +4461,19 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
            END-IF
            IF      SYS-200501-JIBAIPRTKBN
                                        =   SPACE
-               MOVE    ZERO            TO  SYS-200501-JIBAIPRTKBN
+               MOVE    "1"             TO  SYS-200501-JIBAIPRTKBN
            END-IF
            IF      SYS-200501-JIBAIPRTKBN-N
                                        =   SPACE
-               MOVE    ZERO            TO  SYS-200501-JIBAIPRTKBN-N
+               MOVE    "1"             TO  SYS-200501-JIBAIPRTKBN-N
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN
-                                       TO  SYS-200501-JIBAIPRTKBN1
+               MOVE    "2"             TO  SYS-200501-JIBAIPRTKBN1
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1-N
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN-N
-                                       TO  SYS-200501-JIBAIPRTKBN1-N
+               MOVE    "2"             TO  SYS-200501-JIBAIPRTKBN1-N
            END-IF
            IF      SYS-200501-KOUIKIRECEKBN
                                        =   SPACE
@@ -4790,6 +4790,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
        490-KAKUNIN-SEC            SECTION.
       *
            MOVE    SPACE               TO  R99
+           INITIALIZE                      R99
            MOVE    ZERO                TO  R99-COUNT
                                            R99-PROGRESSBAR-VALUE
            MOVE    "F12:印    刷"      TO  R99-B12-LABEL
@@ -5121,6 +5122,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       * 
            MOVE    SPACE               TO  R01
       *
+           INITIALIZE                      R01
            MOVE    SPA-GMN-R01-SYOKBN  TO  R01-SYOKBN
            MOVE    "red"               TO  R01-SYOKBN-STYLE
       *     
@@ -5619,6 +5621,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-EVALUATE
       *
            MOVE    SPACE               TO  RID1
+           INITIALIZE                      RID1
            MOVE    SPA-RIDCD           TO  RID1-ID1CODE
            MOVE    WRK-RIDMSG          TO  RID1-ID1MSG
            EVALUATE    SPA-RIDCD
@@ -5681,6 +5684,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-EVALUATE
       *
            MOVE    SPACE                TO  RID2
+           INITIALIZE                       RID2
            MOVE    SPA-RIDCD2           TO  RID2-ID1CODE
            MOVE    WRK-RIDMSG           TO  RID2-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -5705,6 +5709,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
        540-RIDSET4-SEC              SECTION.
       *
            MOVE    SPACE               TO  RID4
+           INITIALIZE                      RID4
            MOVE    SPA-RIDCD4          TO  RID4-ID1CODE
       *
            MOVE    SPACE               TO  WRK-RIDMSG

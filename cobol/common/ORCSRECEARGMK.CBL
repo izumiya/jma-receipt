@@ -51,6 +51,8 @@
       *  04.07.04    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
       *  04.07.05    NACL-藤原    14/03/12  第三者行為のプリンタ設定
+      *  04.07.06    NACL-藤原    15/06/15  「自賠責・様式選択」の初期表
+      *                                     示変更対応
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -322,20 +324,18 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                                            SYS-2005-FRAME-JIBAIPRTKBN-N
            END-IF
            IF      SYS-200501-JIBAIPRTKBN    =   SPACE
-               MOVE    ZERO                TO  SYS-200501-JIBAIPRTKBN
+               MOVE    "1"                 TO  SYS-200501-JIBAIPRTKBN
            END-IF
            IF      SYS-200501-JIBAIPRTKBN-N  =   SPACE
-               MOVE    ZERO                TO  SYS-200501-JIBAIPRTKBN-N
+               MOVE    "1"                 TO  SYS-200501-JIBAIPRTKBN-N
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN
-                                       TO  SYS-200501-JIBAIPRTKBN1
+               MOVE    "2"                 TO  SYS-200501-JIBAIPRTKBN1
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1-N
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN-N
-                                       TO  SYS-200501-JIBAIPRTKBN1-N
+               MOVE    "2"                 TO  SYS-200501-JIBAIPRTKBN1-N
            END-IF
            IF      SYS-200501-FRAME-ROUPRTKBN
                                            =   SPACE

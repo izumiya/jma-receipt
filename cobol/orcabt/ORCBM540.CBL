@@ -33,6 +33,8 @@
       *                                      う修正
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
+      *  04.07.02    NACL-藤原    15/06/18  光ディスク等送付書の媒体種類
+      *                                     設定対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -136,6 +138,8 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+      *
+           COPY  "CPSK200501.INC".
       *
       *    パラメタ
        01  BTPARA-REC.
@@ -331,6 +335,31 @@
       *    医療機関編集情報取得
            PERFORM 900-1900-READ-SEC
       *
+      *    レセプト・総括編集情報
+           INITIALIZE                      SYS-200501-REC
+           MOVE    "2005"              TO  SYS-200501-KANRICD
+           MOVE    "01"                TO  SYS-200501-KBNCD
+           MOVE    LNK-PRTKANRI-SRYYM  TO  SYS-200501-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  SYS-200501-HOSPNUM
+           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           PERFORM 910-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-200501-REC
+           ELSE
+               INITIALIZE                      SYS-200501-REC
+           END-IF
+      *    光ディスク等送付書（媒体種類）
+           IF      SYS-200501-RECEDEN-LST2-MEDIA
+                                       =   SPACE
+               MOVE    "0"             TO  SYS-200501-RECEDEN-LST2-MEDIA
+           END-IF
+           DISPLAY "SYS-200501-RECEDEN-LST2-MEDIA="
+                                       SYS-200501-RECEDEN-LST2-MEDIA
+           DISPLAY "WRK-PARA-DATAKBN             ="
+                                       WRK-PARA-DATAKBN
+      *
       *    パラメタＤＢ取得
            INITIALIZE                      BTPARA-REC
            MOVE    WRK-PARA-SHELLID    TO  BTPARA-SHELLID
@@ -424,14 +453,18 @@
            MOVE    WRK-HENYMD-D        TO  HCM64-SKYYMD
       *
       *    媒体種類
-           EVALUATE    WRK-PARA-DATAKBN
-               WHEN    "1"
-               WHEN    "3"
+           EVALUATE    SYS-200501-RECEDEN-LST2-MEDIA
+                                       ALSO    WRK-PARA-DATAKBN
+               WHEN    "0"             ALSO    "1"
+               WHEN    "0"             ALSO    "3"
+               WHEN    "1"             ALSO    ANY
                    MOVE    "○"                TO  HCM64-BAITAI (1)
-               WHEN    "2"
-               WHEN    "4"
+               WHEN    "0"             ALSO    "2"
+               WHEN    "0"             ALSO    "4"
+               WHEN    "2"             ALSO    ANY
                    MOVE    "○"                TO  HCM64-BAITAI (2)
-               WHEN    "6"
+               WHEN    "0"             ALSO    "6"
+               WHEN    "3"             ALSO    ANY
                    MOVE    "○"                TO  HCM64-BAITAI (3)
            END-EVALUATE
       *
