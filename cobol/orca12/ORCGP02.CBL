@@ -854,6 +854,9 @@
                    MOVE    1                   TO  SPA-GMN-CUR
                    MOVE    SPACE               TO  SPA-P02-WIDGET
                    MOVE    1                   TO  P02-PAGENO
+      *        ¶Ø´÷ÌôºÞ
+               WHEN    "P02Y"
+                   CONTINUE
       *        £Ã£Ì£Á£É£Í²èÌÌ¤è¤ê
                WHEN    "P02X"
                    MOVE    "P02"               TO  SPA-P02-GAMEN
@@ -2446,6 +2449,20 @@
                    MOVE    "1021"              TO  SPA-ERRCD
                END-IF
            END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+      *        É½¼¨²èÌÌ¤ÎÅÐÏ¿½èÍý
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               MOVE    1                   TO  SPA-TAGU-FLG
+               PERFORM 3002-GMNSET-SEC
+               IF     (SPA-ERRCD       NOT =   SPACE )
+                  OR  (SPA-PIDCD       NOT =   SPACE )
+                  GO  TO                  4902-P02YSYORI-EXT
+               END-IF
+           END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 49021-P02Y-SYORI-SEC
            END-IF

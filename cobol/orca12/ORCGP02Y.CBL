@@ -1871,7 +1871,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    1                   TO  FLG-END
            MOVE    ZERO                TO  SPA-FLG-END
-           MOVE    "P02"               TO  SPA-P02-GAMEN
+      *****MOVE    "P02"               TO  SPA-P02-GAMEN
       *
            .
        210-BACK-EXT.
