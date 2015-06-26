@@ -128,6 +128,8 @@
       *  04.07.07    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
       *  04.07.08    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.09    NACL-藤原    15/05/14  「自賠責・様式選択」の初期表
+      *                                     示変更対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2665,23 +2667,21 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                    END-IF
                    IF      SYS-200501-JIBAIPRTKBN
                                                =   SPACE
-                       MOVE    ZERO        TO  SYS-200501-JIBAIPRTKBN
+                       MOVE    "1"         TO  SYS-200501-JIBAIPRTKBN
                    END-IF
                    IF      SYS-200501-JIBAIPRTKBN-N
                                                =   SPACE
-                       MOVE    ZERO            TO
+                       MOVE    "1"             TO
                                                SYS-200501-JIBAIPRTKBN-N
                    END-IF
                    IF      SYS-200501-JIBAIPRTKBN1
                                                =   SPACE
-                       MOVE    SYS-200501-JIBAIPRTKBN
-                                               TO
+                       MOVE    "2"             TO
                                                SYS-200501-JIBAIPRTKBN1
                    END-IF
                    IF      SYS-200501-JIBAIPRTKBN1-N
                                                =   SPACE
-                       MOVE    SYS-200501-JIBAIPRTKBN-N
-                                               TO
+                       MOVE    "2"             TO
                                                SYS-200501-JIBAIPRTKBN1-N
                    END-IF
                    IF      SYS-200501-KOUIKIRECEKBN

@@ -168,6 +168,8 @@
       *                                     第三者行為も対象とする
       *  04.07.11    NACL-藤原    15/04/10  自賠責の請求管理削除処理に条件
       *                                     を追加
+      *  04.07.12    NACL-藤原    15/05/14  「自賠責・様式選択」の初期表
+      *                                     示変更対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4440,21 +4442,19 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
            END-IF
            IF      SYS-200501-JIBAIPRTKBN
                                        =   SPACE
-               MOVE    ZERO            TO  SYS-200501-JIBAIPRTKBN
+               MOVE    "1"             TO  SYS-200501-JIBAIPRTKBN
            END-IF
            IF      SYS-200501-JIBAIPRTKBN-N
                                        =   SPACE
-               MOVE    ZERO            TO  SYS-200501-JIBAIPRTKBN-N
+               MOVE    "1"             TO  SYS-200501-JIBAIPRTKBN-N
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN
-                                       TO  SYS-200501-JIBAIPRTKBN1
+               MOVE    "2"             TO  SYS-200501-JIBAIPRTKBN1
            END-IF
            IF      SYS-200501-JIBAIPRTKBN1-N
                                        =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN-N
-                                       TO  SYS-200501-JIBAIPRTKBN1-N
+               MOVE    "2"             TO  SYS-200501-JIBAIPRTKBN1-N
            END-IF
            IF      SYS-200501-KOUIKIRECEKBN
                                        =   SPACE

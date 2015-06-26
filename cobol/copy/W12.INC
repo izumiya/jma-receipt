@@ -403,6 +403,13 @@
                     06  W12-RECEDEN-LST2KBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-RECEDEN-LST2KBNLST
                             PIC X(20)   OCCURS  2 TIMES.
+                  05  W12-RECEDEN-LST2KBN-MEDIA-COMBO.
+                    06  W12-RECEDEN-LST2KBN-MEDIA.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-RECEDEN-LST2KBN-MEDIA-COUNT
+                                                 PIC S9(9) BINARY.
+                    06  W12-RECEDEN-LST2KBN-MEDIALST
+                            PIC X(20)   OCCURS  5 TIMES.
                   05  W12-RECEDEN-RIREKIKBN-COMBO.
                     06  W12-RECEDEN-RIREKIKBN.
                       07  W12-VALUE   PIC X(24).
