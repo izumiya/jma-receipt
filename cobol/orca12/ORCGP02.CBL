@@ -342,36 +342,6 @@
       *
        01  SCRAREA.
            COPY    "ORCA12SCRAREA.INC".
-      *    COPY    "P02.INC".
-      *    COPY    "P02A.INC".
-      *****COPY    "P02B.INC".
-      *****COPY    "P02C.INC".
-      *    COPY    "P02D.INC".
-      *    COPY    "P02E.INC".
-      *    COPY    "P02F.INC".
-      *    COPY    "P014.INC".
-      *    COPY    "P015.INC".
-      *    COPY    "P98.INC".
-      *    COPY    "P981.INC".
-      *****COPY    "P99.INC".
-      *    COPY    "P0201.INC".
-      *    COPY    "P982.INC".
-      *    COPY    "P100.INC".
-      *    COPY    "P02X.INC".
-      *    COPY    "P02S.INC".
-      *    COPY    "P02Q.INC".
-      *    COPY    "P02Q1.INC".
-      *    COPY    "P02Y.INC".
-      *    COPY    "P02Y1.INC".
-      *    COPY    "P02G.INC".
-      *    COPY    "P02G2.INC".
-      *    COPY    "P02K.INC".
-      *    COPY    "P02H.INC".
-      *    COPY    "P02T.INC".
-      *    COPY    "PERR.INC".
-      *    COPY    "PID1.INC".
-      *    COPY    "PDMY01.INC".
-      **   COPY    "CPAPIMOD.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -657,6 +627,9 @@
                    MOVE    1                   TO  SPA-GMN-CUR
                    MOVE    SPACE               TO  SPA-P02-WIDGET
                    MOVE    1                   TO  P02-PAGENO
+      *        ¶Ø´÷ÌôºÞ
+               WHEN    "P02Y"
+                   CONTINUE
       *        £Ã£Ì£Á£É£Í²èÌÌ¤è¤ê
                WHEN    "P02X"
                    MOVE    "P02"               TO  SPA-P02-GAMEN
@@ -2251,6 +2224,20 @@
                    MOVE    "1021"              TO  SPA-ERRCD
                END-IF
            END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+      *        É½¼¨²èÌÌ¤ÎÅÐÏ¿½èÍý
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               MOVE    1                   TO  SPA-TAGU-FLG
+               PERFORM 3002-GMNSET-SEC
+               IF     (SPA-ERRCD       NOT =   SPACE )
+                  OR  (SPA-PIDCD       NOT =   SPACE )
+                  GO  TO                  4902-P02YSYORI-EXT
+               END-IF
+           END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 49021-P02Y-SYORI-SEC
            END-IF
@@ -2262,7 +2249,7 @@
       *****************************************************************
        49021-P02Y-SYORI-SEC            SECTION.
       *
-           INITIALIZE                  SPA-P02Q-AREA
+           INITIALIZE                  SPA-P02Y-AREA
       *
            MOVE    SPA-P02KYOUTU       TO  SPA-WORK
            MOVE    SPA-AREA            TO  SPA-COMMON
@@ -2280,6 +2267,7 @@
            MOVE    SPA-COMMON          TO  SPA-AREA
            MOVE    SPA-FREE            TO  SPA-P02SCRAREA
            MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *
       *
            IF      SPA-P02Y-MAX        =   ZERO
                MOVE    "SRYCD"             TO  MCP-WIDGET
@@ -4137,6 +4125,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-PID1-FLG
       *
            MOVE    SPACE               TO  PID1
+           INITIALIZE                      PID1
            MOVE    SPA-PIDCD           TO  PID1-ID1CODE
            MOVE    WRK-PIDMSG          TO  PID1-ID1MSG
            MOVE    "Ìá¤ë"              TO  PID1-B01
