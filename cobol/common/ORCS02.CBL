@@ -409,6 +409,7 @@
       *  04.07.32    NACL-門脇    15/06/02  短期滞在手術等基本料算定時の
       *                                     入院負担金計算対応
       *  04.07.33    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
+      *  04.07.34    NACL-門脇    15/06/26  特別食加算の入力チェック対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12255,8 +12256,6 @@
                        MOVE    "key14"          TO    MCP-PATHNAME
                        PERFORM  SYUNOU-READ-SEC
                      END-PERFORM
-                   ELSE
-                     MOVE    12                 TO    LNK-S02-RC
                    END-IF
       *
                    MOVE     "tbl_syunou"        TO    MCP-TABLE
@@ -12325,8 +12324,6 @@
                        MOVE    "key29"          TO    MCP-PATHNAME
                        PERFORM  SYUNOU-READ-SEC
                      END-PERFORM
-                   ELSE
-                     MOVE    12                 TO    LNK-S02-RC
                    END-IF
       *
                    MOVE     "tbl_syunou"        TO    MCP-TABLE
@@ -12388,8 +12385,6 @@
                        MOVE    "key14"          TO    MCP-PATHNAME
                        PERFORM  SYUNOU-READ-SEC
                      END-PERFORM
-                   ELSE
-                     MOVE    12                 TO    LNK-S02-RC
                    END-IF
       *
                    MOVE     "tbl_syunou"        TO    MCP-TABLE
@@ -21424,6 +21419,9 @@
                   IF   WK-ROSAITOKU97(IDY)  >  3
                      MOVE    3    TO   WK-ROSAITOKU97(IDY)
                   END-IF
+                  IF   WK-SHOKUJIRYOYO(IDY) =  2
+                     MOVE   29    TO   LNK-S02-RC
+                  END-IF
                END-IF
            END-PERFORM
       *
@@ -23087,10 +23085,10 @@
                    PERFORM   HKNNUM-READ-SEC
                END-PERFORM
                IF   FLG-HKNNUM   =    1
-                 MOVE     18         TO    LNK-S02-RC
+                 MOVE     11         TO    LNK-S02-RC
                END-IF
            ELSE
-               MOVE       18         TO    LNK-S02-RC
+               MOVE       11         TO    LNK-S02-RC
            END-IF.
       *
            MOVE     "tbl_hknnum"     TO    MCP-TABLE.
@@ -24222,10 +24220,10 @@
                    PERFORM   HKNNUM-READ-SEC
                END-PERFORM
                IF   FLG-HKNNUM   =    1
-                 MOVE     18         TO    LNK-S02-RC
+                 MOVE     11         TO    LNK-S02-RC
                END-IF
            ELSE
-               MOVE       18         TO    LNK-S02-RC
+               MOVE       11         TO    LNK-S02-RC
            END-IF.
       *
            MOVE     "tbl_hknnum"  TO    MCP-TABLE.
