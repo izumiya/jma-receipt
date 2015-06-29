@@ -11903,8 +11903,6 @@
                MOVE    "key26"          TO    MCP-PATHNAME
                PERFORM  SYUNOU-READ2-SEC
              END-PERFORM
-           ELSE
-             MOVE       12              TO    LNK-S01-RC
            END-IF
            MOVE        "tbl_syunou"     TO    MCP-TABLE
            MOVE        "key26"          TO    MCP-PATHNAME
@@ -12431,8 +12429,6 @@
                      MOVE        KOHI2-TBL(32)   TO    KAISU-KOHI2-M
                      MOVE        KOHI3-TBL(32)   TO    KAISU-KOHI3-M
                      MOVE        KOHI4-TBL(32)   TO    KAISU-KOHI4-M
-                 ELSE
-                     MOVE    12              TO        LNK-S01-RC
                  END-IF
       *
                  MOVE     "tbl_syunou"  TO   MCP-TABLE
@@ -12474,8 +12470,6 @@
                      MOVE        KOHI2-TBL(32)   TO    KAISU-KOHI2-M
                      MOVE        KOHI3-TBL(32)   TO    KAISU-KOHI3-M
                      MOVE        KOHI4-TBL(32)   TO    KAISU-KOHI4-M
-                 ELSE
-                     MOVE    12              TO        LNK-S01-RC
                  END-IF
       *
                  MOVE     "tbl_syunou"  TO   MCP-TABLE
@@ -22158,6 +22152,11 @@
                    MOVE     "key2"        TO    MCP-PATHNAME
                    PERFORM   HKNNUM-READ-SEC
                END-PERFORM
+               IF   FLG-HKNNUM   =    1
+                 MOVE     11         TO    LNK-S01-RC
+               END-IF
+           ELSE
+               MOVE       11         TO    LNK-S01-RC
            END-IF.
       *
            MOVE     "tbl_hknnum"  TO    MCP-TABLE.
@@ -23279,6 +23278,11 @@
                    MOVE     "key2"        TO    MCP-PATHNAME
                    PERFORM   HKNNUM-READ-SEC
                END-PERFORM
+               IF   FLG-HKNNUM   =    1
+                 MOVE     11         TO    LNK-S01-RC
+               END-IF
+           ELSE
+               MOVE       11         TO    LNK-S01-RC
            END-IF.
       *
            MOVE     "tbl_hknnum"  TO    MCP-TABLE.

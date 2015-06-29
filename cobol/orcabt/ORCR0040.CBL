@@ -813,7 +813,7 @@
       *
       *    Ê£¿ô¿ÇÎÅ²Ê¼õ¿Ç¤ÎÂàÈò¥Æ¡¼¥Ö¥ë
        01  TBL-JUSHIN-INF.
-           03  TBL-JUSHIN-INF2      OCCURS    50.
+           03  TBL-JUSHIN-INF2      OCCURS   100.
                05  TBL-JUSHIN-SRYKA       PIC X(02).
                05  TBL-JUSHIN-SRYKANAME   PIC X(80).
                05  TBL-JUSHIN-ARI         PIC X(01).
@@ -1750,7 +1750,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM   900-SYSKANRI-READ-SEC
                PERFORM   VARYING   IDX    FROM   1   BY   1
-                          UNTIL   (IDX             >      50)
+                          UNTIL   (IDX             >     100)
                             OR    (FLG-SYSKANRI    =       1)
                    MOVE    SYS-1005-KBNCD  TO TBL-JUSHIN-SRYKA(IDX)
                    MOVE    SYS-1005-SRYKANAME   
@@ -1773,7 +1773,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
              INITIALIZE            WRK-FREE-AREA
       *
              PERFORM   VARYING   IDX    FROM   1   BY   1
-                            UNTIL   (IDX             >      50)
+                        UNTIL    IDX      >  100
                IF   TBL-JUSHIN-ARI (IDX)  =  "1"
                    ADD       1     TO   CNT-JUSHIN
                    PERFORM  2001-FREE-COMMENT-SEC
