@@ -448,6 +448,8 @@
       *                                     ¤Î¥»¥ì¥¯¥È¾ò·ï½¤Àµ
       *  04.07.29    NACL-ÌçÏÆ    15/05/28  ¿À¸Í»ÔÃÏÊý¸øÈñ¿ÀÆàÀî¸©ÂÐ±þ
       *  04.07.30    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
+      *  04.07.31    NACL-ÌçÏÆ    15/06/29  ¹â³Û°ÑÇ¤Ê§¤Î¡Ü¥¢¥ë¥Õ¥¡¡¼¤Î
+      *                                     ÉéÃ´¶â·×»»ÂÐ±þ¡ÊÊÝ¸±ÈÖ¹æ£¹£¶£´¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -829,6 +831,7 @@
                  06  WK-GENGAKU-TEN        PIC  9(07).
       *
            03  WK-KOHININBARAI-KOHID       PIC  9(10).
+           03  WK-KOHININBARAI-JKYSNUM     PIC  X(20).
       *
            03  WK-HKNJANUM-TBL.
                05  WK-HKNJANUM             PIC  X(08).
@@ -4620,6 +4623,7 @@
       *    ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙÂÐ¾Ý¼Ô
            MOVE      ZERO     TO    FLG-KOHININBARAI
            MOVE      ZERO     TO    WK-KOHININBARAI-KOHID
+           MOVE      SPACE    TO    WK-KOHININBARAI-JKYSNUM
            IF   LNK-S01-KOUREI-ZAITAKU-KBN    =   "1"
                 CONTINUE
            ELSE
@@ -4657,6 +4661,8 @@
                            MOVE    1         TO  FLG-KOHININBARAI
                            MOVE   PTKOH-KOHID
                                              TO  WK-KOHININBARAI-KOHID
+                           MOVE   PTKOH-JKYSNUM
+                                         TO  WK-KOHININBARAI-JKYSNUM
                            MOVE    1         TO  FLG-PTKOHINF
                         ELSE
                            MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
@@ -4674,7 +4680,9 @@
       *
       *    ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
            MOVE      ZERO     TO    FLG-KOHYONKAIME
-           IF   FLG-GENBUTU70    NOT =  ZERO
+           IF  ( FLG-GENBUTU70     NOT =   ZERO    )
+           OR  ((FLG-KOHININBARAI      =   1      ) AND
+                (LNK-SYU-SRYYMD(1:6)  >=  "201501"))
                 INITIALIZE                       PTKOHINF-REC
                 MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
                 MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
@@ -10889,6 +10897,52 @@
                  MOVE    ZERO        TO  FLG-KOHININBARAI
            END-IF
       *
+           IF   (FLG-KOHININBARAI      =    1      )
+           AND  (LNK-SYU-SRYYMD(1:6)  >=   "201501")
+             IF    MAX-KIN-SYU-M = 9999999 OR 999999
+               CONTINUE
+             ELSE
+               EVALUATE   WK-KOHININBARAI-JKYSNUM(1:2)
+                 WHEN      "¥¢"
+                   IF  FLG-KOHYONKAIME = 1
+                      MOVE   140100     TO  MAX-KIN-SYU-M
+                   ELSE
+                      MOVE   252600     TO  MAX-KIN-SYU-M
+                      MOVE   WK-ZENGAKU TO  WK-KOUREI-IRYOHI70
+                      MOVE   7          TO  FLG-IRYOHI70
+                   END-IF
+                 WHEN      "¥¤"
+                   IF  FLG-KOHYONKAIME = 1
+                      MOVE   93000      TO  MAX-KIN-SYU-M
+                   ELSE
+                      MOVE   167400     TO  MAX-KIN-SYU-M
+                      MOVE   WK-ZENGAKU TO  WK-KOUREI-IRYOHI70
+                      MOVE   8          TO  FLG-IRYOHI70
+                   END-IF
+                 WHEN      "¥¦"
+                   IF  FLG-KOHYONKAIME = 1
+                      MOVE   44400      TO  MAX-KIN-SYU-M
+                   ELSE
+                      MOVE   80100      TO  MAX-KIN-SYU-M
+                      MOVE   WK-ZENGAKU TO  WK-KOUREI-IRYOHI70
+                      MOVE   2          TO  FLG-IRYOHI70
+                   END-IF
+                 WHEN      "¥¨"
+                   IF  FLG-KOHYONKAIME = 1
+                      MOVE   44400      TO  MAX-KIN-SYU-M
+                   ELSE
+                      MOVE   57600      TO  MAX-KIN-SYU-M
+                   END-IF
+                 WHEN      "¥ª"
+                   IF  FLG-KOHYONKAIME = 1
+                      MOVE   24600      TO  MAX-KIN-SYU-M
+                   ELSE
+                      MOVE   35400      TO  MAX-KIN-SYU-M
+                   END-IF
+               END-EVALUATE
+             END-IF
+           END-IF
+      *
            .
       *
        2110-KOHININBARAI-KINGAKU-EXT.
@@ -12736,6 +12790,40 @@
               END-IF
            END-IF.
       *
+           IF   (FLG-KOHININBARAI      =    1      )
+           AND  (LNK-SYU-SRYYMD(1:6)  >=   "201501")
+              IF     FLG-IRYOHI70 =  7
+                 IF  WK-KOUREI-IRYOHI70  >  842000
+                    COMPUTE WK-KOUREI-IRYOHI70X =
+                         (( WK-KOUREI-IRYOHI70 - 842000 ) * 0.01 )
+                                                          + 0.5
+                    COMPUTE  MAX-KIN-SYU-M = MAX-KIN-SYU-M 
+                                           + WK-KOUREI-IRYOHI70X
+                    MOVE   1   TO   FLG-KOUGAKUCYO-GEN70
+                 END-IF
+              END-IF
+              IF     FLG-IRYOHI70 =  8
+                 IF  WK-KOUREI-IRYOHI70  >  558000
+                    COMPUTE WK-KOUREI-IRYOHI70X =
+                         (( WK-KOUREI-IRYOHI70 - 558000 ) * 0.01 )
+                                                          + 0.5
+                    COMPUTE  MAX-KIN-SYU-M = MAX-KIN-SYU-M 
+                                           + WK-KOUREI-IRYOHI70X
+                    MOVE   1   TO   FLG-KOUGAKUCYO-GEN70
+                 END-IF
+              END-IF
+              IF     FLG-IRYOHI70 =  2
+                 IF  WK-KOUREI-IRYOHI70  >  267000
+                    COMPUTE WK-KOUREI-IRYOHI70X =
+                         (( WK-KOUREI-IRYOHI70 - 267000 ) * 0.01 )
+                                                          + 0.5
+                    COMPUTE  MAX-KIN-SYU-M = MAX-KIN-SYU-M 
+                                           + WK-KOUREI-IRYOHI70X
+                    MOVE   1   TO   FLG-KOUGAKUCYO-GEN70
+                 END-IF
+              END-IF
+           END-IF.
+      *
        220-SYUNOU-EXT.
            EXIT.
       *
@@ -12991,6 +13079,12 @@
                           COMPUTE WK-ENTANI =
                                   SYU-SYUCOMPFTN-ENTANI + 0.9
                           ADD   WK-ENTANI         TO  FTN-SYU-M-ENTANI
+                          IF   (FLG-IRYOHI70  =  2 OR 7 OR 8      )
+                          AND  (LNK-SYU-SRYYMD(1:6)  >=   "201501")
+                            COMPUTE   WK-KOUREI-IRYOHI70  =
+                                      WK-KOUREI-IRYOHI70  +
+                                     (SYU-HKNTEN (17) * 10)
+                          END-IF
                          END-IF
                         END-IF
                        END-IF
