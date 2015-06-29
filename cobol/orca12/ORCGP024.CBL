@@ -81,6 +81,7 @@
       *
            03  FLG-PTKOHFTNETC     PIC 9(01).
            03  FLG-ENDYMD          PIC 9(01).
+           03  FLG-CHKNO           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2238,13 +2239,28 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2    >   SPA-FTN1-MAX  )
                          OR   (SPA-ERRCD   NOT =   SPACE )
+             MOVE    ZERO              TO  FLG-CHKNO
       *      上限額が必須でないもの(結３５、生保、精神入院、残留邦人）
-             IF      SPA-NAI24-KOHNUM (IDX2)   =   "011"
+             IF     (SPA-NAI24-KOHNUM (IDX2)   =   "011"
                                                OR  "012"
                                                OR  "020"
-                                               OR  "025"
-               CONTINUE
-             ELSE
+                                               OR  "025" )
+               MOVE    1                   TO  FLG-CHKNO
+             END-IF
+      *H27.7
+             IF     (SPA-NAI24-KOHNUM    (IDX2)   =   "964"     )
+               AND  (SPA-NAI24-TKOHSTYMD (IDX2)   >=  "20150101")
+               EVALUATE    SPA-NAI24-TJKYSNUM (IDX2)(1:2)
+                   WHEN    "ア"
+                   WHEN    "イ"
+                   WHEN    "ウ"
+                   WHEN    "エ"
+                   WHEN    "オ"
+                       MOVE    1                   TO  FLG-CHKNO
+               END-EVALUATE
+             END-IF
+      *
+             IF      FLG-CHKNO         =   ZERO
       *        当日有効な公費のみ判定
                IF     (SPA-NAI24-TKOHSTYMD (IDX2)  <=  SPA-SYSYMD )
                  AND  (SPA-NAI24-TKOHEDYMD (IDX2)  >=  SPA-SYSYMD )
