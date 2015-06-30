@@ -75,14 +75,14 @@ C50	{
 				value	varchar(20);
 			};
 			count	int;
-			item	varchar(20)[41];
+			item	varchar(20)[100];
 		};
 		HKNCOMBI_COMB	{
 			HKNCOMBI	{
 				value	varchar(55);
 			};
 			count	int;
-			item	varchar(55)[30];
+			item	varchar(55)[50];
 		};
 		scrolledwindow2	{
 			hpos	int;
@@ -105,7 +105,7 @@ C50	{
 				value	varchar(53);
 			};
 			count	int;
-			item	varchar(53)[20];
+			item	varchar(53)[50];
 		};
 		scrolledwindow3	{
 			hpos	int;

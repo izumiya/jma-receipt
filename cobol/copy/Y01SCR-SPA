@@ -97,7 +97,7 @@
       *
       *        表示リスト等
                05  SPA-GMN-HYOU-AERA.
-                   07  SPA-GMN-SRYKALST-G      OCCURS  40.
+                   07  SPA-GMN-SRYKALST-G      OCCURS  99.
                        09  SPA-GMN-SRYKALST.
                            11  SPA-GMN-SRYKACDL    PIC X(02).
                            11  SPA-GMN-SRYKALH     PIC X(01).
@@ -109,7 +109,7 @@
                    07  SPA-YYKKBN-MAX       PIC 9(04).
                    07  SPA-YYKKBN-HYOJI     PIC 9(04).
       *
-                   07  SPA-GMN-KAKRENLST    PIC X(23)   OCCURS  10.
+                   07  SPA-GMN-KAKRENLST    PIC X(23)   OCCURS  99.
                    07  SPA-KAKREN-MAX       PIC 9(04).
       *
                    07  SPA-GMN-HYOJHI      PIC X(02).

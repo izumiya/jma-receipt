@@ -386,12 +386,12 @@
                 04  Y01-SRYKA.
                   05  Y01-VALUE   PIC X(23).
                 04  Y01-SRYKA-COUNT   PIC S9(9)   BINARY.
-                04  Y01-SRYKA-LST    PIC X(23)   OCCURS  40 TIMES.
+                04  Y01-SRYKA-LST    PIC X(23)   OCCURS  99 TIMES.
               03  Y01-KAKREN-COMB.
                 04  Y01-KAKREN.
                   05  Y01-VALUE   PIC X(23).
                 04  Y01-KAKREN-COUNT   PIC S9(9)   BINARY.
-                04  Y01-KAKREN-LST    PIC X(23)   OCCURS  10 TIMES.
+                04  Y01-KAKREN-LST    PIC X(23)   OCCURS  99 TIMES.
               03  Y01-YYKKBN-COMB.
                 04  Y01-YYKKBN.
                   05  Y01-VALUE   PIC X(33).

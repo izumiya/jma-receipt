@@ -48,13 +48,13 @@
                    07  SPA-GMN-HKNCOMBY1       PIC X(01).
                    07  SPA-GMN-HKNCOMBIMEI     PIC X(50).
                05  SPA-GMN-HKNCOMB-COMB.
-                   07  SPA-GMN-HKN-LIST    OCCURS  30.
+                   07  SPA-GMN-HKN-LIST    OCCURS  50.
                        09  SPA-GMN-THKNCOMBINUM    PIC X(04).
                        09  SPA-GMN-THKNCOMBY1      PIC X(01).
                        09  SPA-GMN-THKNCOMBIMEI    PIC X(50).
                    07  SPA-GMN-HKNMAX              PIC 9(04).
       *            œ´∫“ ›∏±∂Ë ¨
-                   07  SPA-GMN-RSI-THKNKBN-OCC  OCCURS  30.
+                   07  SPA-GMN-RSI-THKNKBN-OCC  OCCURS  50.
                        09  SPA-GMN-RSI-THKNKBN     PIC X(01).
                05  SPA-GMN-RSI-HKNKBN         PIC X(01).
       *
@@ -72,7 +72,7 @@
                    07  SPA-GMN-SRYKAH        PIC X(01).
                    07  SPA-GMN-SRYKAMEI      PIC X(12).
                05  SPA-GMN-SRYKA-AREA.
-                   07  SPA-GMN-SRYKA-LIST      OCCURS  41.
+                   07  SPA-GMN-SRYKA-LIST      OCCURS  100.
                        09  SPA-GMN-SRYKAL      PIC X(02).
                        09  SPA-GMN-F1L         PIC X(01).
                        09  SPA-GMN-SRYKAMEIL   PIC X(12).
@@ -119,7 +119,7 @@
                    07  SPA-GMN-SJKBN-H         PIC X(01).
                    07  SPA-GMN-SJKBN-MEI       PIC X(50).
                05  SPA-GMN-SJKBN-AREA.
-                   07  SPA-GMN-SJKBN-LIST      OCCURS  20.
+                   07  SPA-GMN-SJKBN-LIST      OCCURS  50.
                        09  SPA-GMN-SJKBNLST    PIC X(53).
                    07  SPA-SJKBN-MAX           PIC 9(03).
       *        œ¢»÷

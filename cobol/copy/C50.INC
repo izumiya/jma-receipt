@@ -59,13 +59,13 @@
                   05  C50-VALUE   PIC X(20).
                 04  C50-SRYKA-COUNT   PIC S9(9)   BINARY.
                 04  C50-SRYKA-ITEM
-                        PIC X(20)   OCCURS  41 TIMES.
+                        PIC X(20)   OCCURS  100 TIMES.
               03  C50-HKNCOMBI-COMB.
                 04  C50-HKNCOMBI.
                   05  C50-VALUE   PIC X(55).
                 04  C50-HKNCOMBI-COUNT   PIC S9(9)   BINARY.
                 04  C50-HKNCOMBI-ITEM
-                        PIC X(55)   OCCURS  30 TIMES.
+                        PIC X(55)   OCCURS  50 TIMES.
               03  C50-SCROLLEDWINDOW2.
                 04  C50-HPOS    PIC S9(9)   BINARY.
                 04  C50-VPOS    PIC S9(9)   BINARY.
@@ -85,7 +85,7 @@
                   05  C50-VALUE   PIC X(53).
                 04  C50-SJKBN-COUNT   PIC S9(9)   BINARY.
                 04  C50-SJKBN-ITEM
-                        PIC X(53)   OCCURS  20 TIMES.
+                        PIC X(53)   OCCURS  50 TIMES.
               03  C50-SCROLLEDWINDOW3.
                 04  C50-HPOS    PIC S9(9)   BINARY.
                 04  C50-VPOS    PIC S9(9)   BINARY.

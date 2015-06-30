@@ -495,14 +495,14 @@ Y01	{
 				value	varchar(23);
 			};
 			count	int;
-			item	varchar(23)[40];
+			item	varchar(23)[99];
 		};
 		KAKREN_COMB	{
 			KAKREN	{
 				value	varchar(23);
 			};
 			count	int;
-			item	varchar(23)[10];
+			item	varchar(23)[99];
 		};
 		YYKKBN_COMB	{
 			YYKKBN	{
