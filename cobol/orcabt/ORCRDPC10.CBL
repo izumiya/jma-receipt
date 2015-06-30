@@ -388,7 +388,8 @@
            03  WRK-REC                 PIC X(2500).
            03  WRK-REC-LENGTH          PIC 9(04).
       *    特定入院料算定時に包括される入院料（診療行為入力分）の退避用
-           03  WRK-REC-TAIHI-TABLE               OCCURS 31.
+           03  WRK-REC-TAIHI-TABLE.
+            04  WRK-REC-TAIHI-TBL                 OCCURS 31.
              05  WRK-TAIHI-RENNUM      PIC 9(04).
              05  WRK-TAIHI-RENNUM-X    REDEFINES  WRK-TAIHI-RENNUM
                                        PIC X(04).
@@ -1661,6 +1662,9 @@
       *    主処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
+      *
+           MOVE    SPACE        TO    WRK-REC-TAIHI-TABLE
+           INITIALIZE                 WRK-REC-TAIHI-TABLE
       *
       *    診療年月の末日の取得
            INITIALIZE                      STS-AREA-DAY
@@ -4594,7 +4598,10 @@
            IF      WRK-FEDT-REC-FLG    =   "F"
              ADD   1                   TO  WRK-MEISAI-RENNUM
       *AZU-ADD START 2015.6.10
-             MOVE  WRK-MEISAI-RENNUM   TO  WRK-TAIHI-MEISAI-RENNUM(IDZ1)
+             IF    IDZ1      =   2
+                 MOVE  WRK-MEISAI-RENNUM
+                                       TO  WRK-TAIHI-MEISAI-RENNUM(IDZ1)
+             END-IF
       *AZU-ADD END 2015.6.10
              MOVE  WRK-MEISAI-RENNUM   TO  WRK-DATA
              MOVE  3                   TO  WRK-NAGASA
