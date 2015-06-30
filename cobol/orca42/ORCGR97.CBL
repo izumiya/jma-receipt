@@ -49,6 +49,8 @@
       *
       *  04.06.01    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *
+      *  04.07.01    NACL-Æ£¸¶    15/06/19  ¿ÇÎÅ²ÊÉ½¼¨·ï¿ô¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -115,11 +117,11 @@
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-HYOUJIKBNMEI    PIC X(08).
       *
-                   07  SPA-GMN-SYUKALST            OCCURS  42.
+                   07  SPA-GMN-SYUKALST            OCCURS  100.
                        09  SPA-GMN-SYUKAL          PIC X(02).
                        09  SPA-GMN-C02-F1L         PIC X(01).
                        09  SPA-GMN-SYUKAMEIL       PIC X(20).
-                   07  SPA-GMN-SYUKA-MAX           PIC 9(02).
+                   07  SPA-GMN-SYUKA-MAX           PIC 9(03).
       *
                    07  SPA-GMN-SYUKA-TABLE.
                        09  SPA-GMN-SYUKA-TBL       OCCURS  500.
@@ -183,7 +185,7 @@
                                                    PIC X(12).
       *
                05  SPA-NAI-AREA.
-                   07  SPA-NAI-SYUKALST            OCCURS  42.
+                   07  SPA-NAI-SYUKALST            OCCURS  100.
                        09  SPA-NAI-SYUKAMEIL       PIC X(12).
       *
                    07  SPA-NAI-SRYYM               PIC 9(06).
@@ -605,7 +607,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
            END-IF 
       *
            MOVE    ZERO                TO  IDX
-           PERFORM         UNTIL     ( IDX            >=  40 )
+           PERFORM         UNTIL     ( IDX            >=  99 )
                            OR        ( FLG-SYSKANRI   =   1  )
                ADD     1                     TO  IDX
                MOVE    MCPDATA-REC           TO  SYS-1005-REC

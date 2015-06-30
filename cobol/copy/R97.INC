@@ -42,7 +42,7 @@
                   05  R97-VALUE   PIC X(21).
                 04  R97-SYUKA-COUNT   PIC S9(9)   BINARY.
                 04  R97-SYUKA-ITEM
-                        PIC X(21)   OCCURS  40 TIMES.
+                        PIC X(21)   OCCURS  100 TIMES.
               03  R97-SCROLLEDWINDOW1.
                 04  R97-HPOS    PIC S9(9)   BINARY.
                 04  R97-VPOS    PIC S9(9)   BINARY.

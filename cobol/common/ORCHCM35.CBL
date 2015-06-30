@@ -31,6 +31,7 @@
       *  03.04.01    NACL-¿¹ÏÆ    06/11/29  ¥Ñ¥é¥á¥¿ÊÑ¹¹
       *  03.05.00    NACL-¿¹ÏÆ    07/11/05  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.02.01    NACL-¿¹ÏÆ    08/04/16  Ê¿À®£²£°Ç¯£´·î²þÀµ
+      *  04.07.01    NACL-Æ£¸¶    15/06/19  ¿ÇÎÅ²ÊÉ½¼¨·ï¿ô¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -130,6 +131,8 @@
        01  PARA-SYAPRTNM               PIC X(16).
       *----(03.04.01)--UPD-START---
        COPY    "R02SCR-SPA".
+       01  SPA-SCR-REC.
+           COPY    "CPR02SPASCR.INC".
       * 01  PARA-FILEKBN                PIC X(40).
       * 01  PARA-TBL1.
       *----(00.00.01)--UPD-START---
@@ -149,7 +152,8 @@
                                        SPA-AREA
                                        PARA-SYAPRTNM
       *----(03.04.01)--UPD-START---
-                                       SPA-R02.
+                                       SPA-R02
+                                       SPA-SCR-REC.
       *                                 PARA-FILEKBN
       *                                 PARA-TBL1.
       *----(03.04.01)--UPD-END-----

@@ -44,7 +44,7 @@ C02	{
 				value	varchar(21);
 			};
 			count	int;
-			item	varchar(21)[40];
+			item	varchar(21)[100];
 		};
 		SYOKBN_COMBO	{
 			SYOKBN	{
@@ -248,7 +248,7 @@ C02	{
 				value	varchar(21);
 			};
 			count	int;
-			item	varchar(21)[40];
+			item	varchar(21)[100];
 		};
 		HYOUJI	{
 			style	varchar(20);

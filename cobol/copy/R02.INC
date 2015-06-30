@@ -92,7 +92,7 @@
                 05  R02-SYUKA.
                   06  R02-VALUE   PIC X(21).
                 05  R02-SYUKA-COUNT   PIC S9(9)   BINARY.
-                05  R02-SYUKALST  PIC X(21)   OCCURS  50 TIMES.
+                05  R02-SYUKALST  PIC X(21)   OCCURS  100 TIMES.
               04  R02-LABEL1       PIC X(06).
               04  R02-LABEL2       PIC X(06).
               04  R02-LABEL3       PIC X(06).

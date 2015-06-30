@@ -30,7 +30,7 @@
               03  C11-SRYKA-COMBO.
                 04  C11-SRYKA         PIC X(23).
                 04  C11-SRYKA-COUNT   PIC S9(9)   BINARY.
-                04  C11-SRYKA-ITEM    PIC X(23)   OCCURS  40 TIMES.
+                04  C11-SRYKA-ITEM    PIC X(23)   OCCURS  100 TIMES.
               03  C11-DSPYM-COMBO.
                 04  C11-DSPYM         PIC X(12).
                 04  C11-DSPYM-COUNT   PIC S9(9)   BINARY.
@@ -48,7 +48,7 @@
                 04  C11-BSRYKA   PIC X(23).
                 04  C11-BSRYKA-COUNT   PIC S9(9)   BINARY.
                 04  C11-BSRYKA-ITEM
-                        PIC X(23)   OCCURS  40 TIMES.
+                        PIC X(23)   OCCURS  100 TIMES.
               03  C11-SCROLLEDWINDOW1.
                 04  C11-OPELIST.
                   05  C11-OPE-COUNT   PIC S9(9)   BINARY.

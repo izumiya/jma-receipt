@@ -146,12 +146,18 @@
       *  04.07.05    NACL-藤原    13/03/01  保険者番号の条件設定変更
       *  04.07.06    NACL-藤原    13/07/24  入力順指定時の画面表示の修正
       *  04.07.07    NACL-藤原    14/11/19  診療科の初期表示
+      *  04.07.08    NACL-藤原    15/06/19  診療科表示件数の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
        CONFIGURATION               SECTION.
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
+      *
+      *    ＳＰＡデータ
+           SELECT  SPASCR-FILE     ASSIGN  FILE-NAME1
+                                   ORGANIZATION    IS  SEQUENTIAL
+                                   FILE    STATUS  IS  STS-SPASCR.
       *
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -160,11 +166,23 @@
        DATA                    DIVISION.
        FILE                        SECTION.
       *
+      *    ＳＰＡパラメタデータ
+       FD  SPASCR-FILE.
+       01  SPA-DATA-REC            PIC X(30000).
+      *
       *    エラーファイル
        FD  RECEERR-FILE.
        01  RECEERR-REC             PIC X(200). 
       *
        WORKING-STORAGE             SECTION.
+      *
+      * ＳＰＡパラメタデータ
+       01  FILE-NAME1.
+           03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
+           03  FILLER              PIC X(09)   VALUE   "R02SPASCR".
+           03  FILE-HOSPNUM        PIC 9(02)   VALUE   ZERO.
+           03  FILE-TERMID         PIC X(64)   VALUE   SPACE.
+           03  FILLER              PIC X(06)   VALUE   ".TXT".
       *
       *    エラーファイル 名称領域 
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
@@ -212,6 +230,13 @@
       *    レセプト作成−印刷指示画面ＳＰＡ
            COPY    "R02SCR-SPA".
       *
+       01  SPA-SCR-REC.
+           COPY    "CPR02SPASCR.INC".
+      *
+       01  WRK-DATA-REC.
+           03  WRK-DATA            PIC X(30000)
+                                   OCCURS  20.
+      *
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
@@ -222,8 +247,12 @@
       *
            03  FLG-PRTNM-SET       PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
+           03  FLG-END2            PIC 9(01).
+           03  FLG-SPASCR          PIC 9(01).
       *
+       01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
+           03  STS-SPASCR          PIC X(02).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -243,6 +272,7 @@
            03  IDXY                PIC 9(04).
            03  IDYY                PIC 9(04).
            03  IDWW                PIC 9(04).
+           03  IDZZ                PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -458,6 +488,9 @@
       *    プリンタ名取得サブ
            COPY  "CPORCSPRTNMGET.INC".
       *
+      *    ファイル削除パラメタ
+           COPY    "CPORCSFDEL.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -496,9 +529,17 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  CNT-AREA
+           INITIALIZE                  WRK-AREA
+           INITIALIZE                  STS-AREA
+      *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-R02
            MOVE    SPA-WORK        TO  SPA-R01KYOUTU
+      *
+      *    画面ＳＰＡ読込み
+           PERFORM 000-R02SPA-SET-SEC
       *
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
@@ -519,6 +560,11 @@
                PERFORM 500-SET-SCREEN
            END-IF
       *
+      *    画面ＳＰＡ書込み
+           IF      FLG-END2            =   ZERO
+               PERFORM 000-R02SPA-OUT-SEC
+           END-IF
+      *
            MOVE    SPA-R01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
            MOVE    SPA-R02         TO  SPA-FREE
@@ -526,13 +572,80 @@
            .
            EXIT    PROGRAM
            .
+      *
+      *****************************************************************
+      *    画面ＳＰＡ読込
+      *****************************************************************
+       000-R02SPA-SET-SEC             SECTION.
+      *
+           MOVE    SPA-TERMID          TO  FILE-TERMID
+           MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM
+      *
+           OPEN    INPUT               SPASCR-FILE
+           IF      STS-SPASCR      NOT =   ZERO
+               GO  TO  000-R02SPA-SET-EXT
+           END-IF
+      *
+           INITIALIZE                  SPA-SCR-REC
+           INITIALIZE                  WRK-DATA-REC
+           MOVE    ZERO                TO  FLG-SPASCR
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL           FLG-SPASCR  =   1
+               READ    SPASCR-FILE
+                   AT  END
+                       MOVE   1            TO  FLG-SPASCR
+                   NOT AT  END
+                       ADD    1            TO  IDX
+                       MOVE   SPA-DATA-REC TO  WRK-DATA (IDX)
+               END-READ
+           END-PERFORM
+      *
+           MOVE    WRK-DATA-REC        TO  SPA-SCR-REC
+      *
+           CLOSE   SPASCR-FILE
+           .
+       000-R02SPA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面ＳＰＡ書込
+      *****************************************************************
+       000-R02SPA-OUT-SEC             SECTION.
+      *
+           MOVE    SPA-TERMID          TO  FILE-TERMID
+           MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM
+      *
+           OPEN    OUTPUT              SPASCR-FILE
+           IF      STS-SPASCR     NOT =   ZERO
+               CALL    "coblog" USING   "R02SPASCR OPEN ERR"
+               DISPLAY "R02SPASCR OPEN ERR:"   STS-SPASCR "."
+           END-IF
+           MOVE    SPA-SCR-REC         TO  WRK-DATA-REC
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       20
+                   OR      WRK-DATA (IDX)  =   SPACE
+               MOVE    WRK-DATA (IDX)      TO  SPA-DATA-REC
+               WRITE                       SPA-DATA-REC
+               IF      STS-SPASCR     NOT =   ZERO
+                   CALL    "coblog" USING   "R02SPASCR WRITE ERR"
+                   DISPLAY "R02SPASCR OUT WRITE ERR:"   STS-SPASCR "."
+                END-IF
+           END-PERFORM
+      *
+           CLOSE                       SPASCR-FILE
+           .
+       000-R02SPA-OUT-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    初期　処理
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
            INITIALIZE                  FLG-AREA
+           INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  STS-AREA
       *
       *    エラー画面より
            IF      SPA-MOTOPG          =   "RERR"
@@ -569,6 +682,9 @@
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+      *
+      *        画面ＳＰＡ読込
+               PERFORM 000-R02SPA-SET-SEC
       *
       *        元の画面へ戻す
                IF      SPA-MOTOPG      =   "XB01"  OR  "XC01"
@@ -613,6 +729,7 @@
        310-SPASET-SEC              SECTION.
       *
            INITIALIZE              SPA-R02-AREA
+                                   SPA-R02-AREA-1
                                    SPA-GMN-PRTNM-AREA
       *
       *    処理区分
@@ -1104,7 +1221,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    1               TO  FLG-SYSKANRI
                END-IF 
       *
-               PERFORM         UNTIL       (IDX            >=  41   )
+               PERFORM         UNTIL       (IDX            >=  99   )
                                OR          (FLG-SYSKANRI   =   1    )
                    ADD     1                     TO  IDX
                    MOVE    MCPDATA-REC           TO  SYS-1005-REC
@@ -1159,7 +1276,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    1               TO  FLG-SYSKANRI
                END-IF 
       *
-               PERFORM         UNTIL       (IDX            >=  41   )
+               PERFORM         UNTIL       (IDX            >=  99   )
                                OR          (FLG-SYSKANRI   =   1    )
                    ADD     1                     TO  IDX
                    MOVE    MCPDATA-REC           TO  SYS-1005-REC
@@ -2607,7 +2724,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        3101-PAGE-HENSYU-05-SEC            SECTION.
       *
            IF      SPA-GMN-SYUKA       =   SPACE   OR  "00"
-               MOVE    50                  TO  IDXX
+               MOVE    101                 TO  IDXX
            ELSE
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-SYUKA-MAX
@@ -2751,7 +2868,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        3101-PAGE-HENSYU-06-SEC            SECTION.
       *
            IF      SPA-GMN-SYUKA       =   SPACE   OR  "00"
-               MOVE    50                  TO  IDXX
+               MOVE    101                 TO  IDXX
            ELSE
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       SPA-GMN-SYUKA-MAX
@@ -2851,9 +2968,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            ADD     SPA-NAI-BTUNUM-TPAGE  (IDXY IDXX)
                                                TO  SPA-GMN-TPAGE
                                                           (IDW IDX)
-                                                   SPA-NAI-TPAGE-SYUKA
-                                                          (IDW IDX IDXX)
                                                    SPA-GMN-PAGEH
+                           IF      IDXX        =   101
+                               PERFORM VARYING IDZZ    FROM    1   BY  1
+                                       UNTIL   IDZZ    >
+                                                       SPA-GMN-SYUKA-MAX
+                                   ADD     SPA-NAI-BTUNUM-TPAGE
+                                                           (IDXY IDZZ)
+                                               TO  SPA-NAI-TPAGE-SYUKA
+                                                          (IDW IDX IDZZ)
+                               END-PERFORM
+                           ELSE
+                               ADD     SPA-NAI-BTUNUM-TPAGE (IDXY IDXX)
+                                               TO  SPA-NAI-TPAGE-SYUKA
+                                                          (IDW IDX IDXX)
+                           END-IF
                            ADD     SPA-NAI-BTUNUM-TKENSU (IDXY IDXX)
                                                TO  SPA-GMN-TKENSU
                                                           (IDW IDX)
@@ -3561,7 +3690,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                ADD     QUERY-RECE08-PAGE
                                                        TO
                                            SPA-NAI-DRCD-TPAGE(IDXY IDXX)
-                                           SPA-NAI-DRCD-TPAGE(IDXY 50)
+                                           SPA-NAI-DRCD-TPAGE(IDXY 101)
                                MOVE    100             TO  IDXY
                                MOVE    SPA-GMN-SYUKA-MAX
                                                        TO  IDXX
@@ -3627,7 +3756,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                ADD     QUERY-RECE08-KENSU
                                                        TO
                                        SPA-NAI-DRCD-TKENSU(IDXY IDXX)
-                                       SPA-NAI-DRCD-TKENSU(IDXY 50)
+                                       SPA-NAI-DRCD-TKENSU(IDXY 101)
                                MOVE    100             TO  IDXY
                                MOVE    SPA-GMN-SYUKA-MAX
                                                        TO  IDXX
@@ -3694,7 +3823,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF      QUERY-RECE08-SORT-1 (1:2)   =
                                            SPA-NAI-BTUNUM-TBTUNUM (IDXY)
                        ADD     QUERY-RECE08-PAGE   TO
-                                         SPA-NAI-BTUNUM-TPAGE(IDXY 50)
+                                         SPA-NAI-BTUNUM-TPAGE(IDXY 101)
                        PERFORM VARYING IDXX    FROM    1   BY  1
                                UNTIL   IDXX    >       SPA-GMN-SYUKA-MAX
                            IF      QUERY-RECE08-SRYKA
@@ -3761,7 +3890,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF      QUERY-RECE08-SORT-1 (1:2)   =
                                            SPA-NAI-BTUNUM-TBTUNUM (IDXY)
                        ADD     QUERY-RECE08-KENSU      TO
-                                       SPA-NAI-BTUNUM-TKENSU(IDXY 50)
+                                       SPA-NAI-BTUNUM-TKENSU(IDXY 101)
                        PERFORM VARYING IDXX    FROM    1   BY  1
                                UNTIL   IDXX    >       SPA-GMN-SYUKA-MAX
                            IF      QUERY-RECE08-SRYKA
@@ -5135,6 +5264,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
       *
+      *    ファイル削除処理
+           PERFORM 900-FILE-DEL-SEC
+      *
+      *
            MOVE    SPACE           TO  SPA-R99-FLG
            MOVE    SPACE           TO  SPA-RIDCD
            MOVE    SPACE           TO  SPA-RIDCD2      
@@ -5341,12 +5474,14 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    CALL    "ORCHCM35"  USING   SPA-AREA
                                                SPA-NAI-2005-SYAPRTNM-N
                                                SPA-R02
+                                               SPA-SCR-REC
       *                                         SPA-GMN-FILEKBN
       *                                         SPA-GMN-TBL1
                WHEN   "2"
                    CALL    "ORCHCM35"  USING   SPA-AREA
                                                SPA-NAI-2005-SYAPRTNM
                                                SPA-R02
+                                               SPA-SCR-REC
       *                                         SPA-GMN-FILEKBN
       *                                         SPA-GMN-TBL1
            END-EVALUATE
@@ -6642,16 +6777,26 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    PERFORM VARYING IDXX    FROM    2   BY  1
                            UNTIL   IDXX    >   SPA-GMN-SYUKA-MAX
                            OR      SPA-ERRCD   NOT =   SPACE
-                       MOVE    SPA-GMN-SYUKAL (IDXX)   TO  WRK-SYUKA
-                       PERFORM 45011-RECEPRT-HENSYU-SEC
+                       IF      SPA-NAI-TPAGE-SYUKA (IDW IDX IDXX)
+                                                   =   0
+                           CONTINUE
+                       ELSE
+                           MOVE    SPA-GMN-SYUKAL (IDXX)   TO  WRK-SYUKA
+                           PERFORM 45011-RECEPRT-HENSYU-SEC
+                       END-IF     
                    END-PERFORM
                WHEN    OTHER
                    MOVE    SPA-GMN-SYUKA   TO  WRK-SYUKA
                    PERFORM VARYING IDXX    FROM    2   BY  1
                            UNTIL   IDXX    >       SPA-GMN-SYUKA-MAX
                        IF      WRK-SYUKA   =   SPA-GMN-SYUKAL (IDXX)
-                           PERFORM 45011-RECEPRT-HENSYU-SEC
-                           MOVE    SPA-GMN-SYUKA-MAX    TO  IDXX
+                           IF      SPA-NAI-TPAGE-SYUKA (IDW IDX IDXX)
+                                                       =   0
+                               CONTINUE
+                           ELSE
+                               PERFORM 45011-RECEPRT-HENSYU-SEC
+                               MOVE    SPA-GMN-SYUKA-MAX    TO  IDXX
+                           END-IF
                        END-IF
                    END-PERFORM        
            END-EVALUATE
@@ -8450,6 +8595,23 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-QUERY-RECE08-NEXT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイル削除処理
+      *****************************************************************
+       900-FILE-DEL-SEC         SECTION.
+      *
+           MOVE    SPA-TERMID          TO  FILE-TERMID
+           MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM
+           MOVE    ZERO                TO  IF-RESULT
+           MOVE    FILE-NAME1          TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
+           MOVE    1                   TO  FLG-END2
+      *
+           .
+       900-FILE-DEL-EXT.
            EXIT.
       *
       *****************************************************************

@@ -1597,7 +1597,7 @@ R02	{
 				value	varchar(21);
 			};
 			count	int;
-			item	varchar(21)[50];
+			item	varchar(21)[100];
 		};
 		LABEL1	{
 			label	varchar(6);

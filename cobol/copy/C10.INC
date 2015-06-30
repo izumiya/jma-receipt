@@ -46,4 +46,4 @@
                 04  C10-SRYKA-COUNT
                                 PIC S9(9)   BINARY.
                 04  C10-SRYKA-ITEM
-                                PIC X(21)   OCCURS  40 TIMES.
+                                PIC X(21)   OCCURS  100 TIMES.
