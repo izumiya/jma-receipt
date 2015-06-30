@@ -697,6 +697,7 @@
       *                                     ÊÔ½¸½¤Àµ
       *  04.07.46    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       *  04.07.47    NACL-ÌçÏÆ    15/06/16  ¹â³ÛÎÅÍÜÈñ¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
+      *  04.07.48    NACL-ÌçÏÆ    15/06/30  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -22403,9 +22404,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF  (RECE02-SRYYM        >=  "200804" )
                AND (RECE02-TEISYUTUSAKI  =   2  OR  6)
                AND (RECE02-ZAITAKU       =  "1"      )
-      ***********IF  (RECE02-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
-      ***********AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
-                 IF  (RECE02-KOHNUM(1)   =  "282"                )
+                 IF  (RECE02-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+                 AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
+      ***********IF  (RECE02-KOHNUM(1)   =  "282"                )
                  AND (RECE02-KOHNUM(2)   =  SPACE                )
                  AND (RECE02-KOHNUM(3)   =  SPACE                )
                  AND (RECE02-KOHNUM(4)   =  SPACE                )
@@ -22418,11 +22419,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      DISPLAY  "3:WRK-SKY-FTNMONEY-XXX="
                                  WRK-SKY-FTNMONEY-XXX
                      MOVE   WRK-KINGAKU3   TO  RECE02-FTNMONEY(1)
-                     IF RECE02-FTNMONEY(1)  >  RECE02-ZAITAKU-SAIKEI
-                        CONTINUE
-                     ELSE
-                        MOVE   999999999   TO  RECE02-ZAITAKU-SAIKEI
-                     END-IF
+      ***************IF RECE02-FTNMONEY(1)  >  RECE02-ZAITAKU-SAIKEI
+      ***************   CONTINUE
+      ***************ELSE
+      ***************   MOVE   999999999   TO  RECE02-ZAITAKU-SAIKEI
+      ***************END-IF
                      IF   RECE02-RJNGENMENKBN   =   "1"
                        MOVE    4    TO      FLG-TOKKI
                        PERFORM   21045-TOKKI-HENSYU-SEC
