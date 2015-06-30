@@ -682,6 +682,7 @@
       *  04.07.47    NACL-ÌçÏÆ    15/06/08  ÆñÉÂ¤Î¼Â»Üµ¡´ØÈÖ¹æÄÉ²ÃÂÐ±þ¡Ê£¶£°£²¡Ë
       *  04.07.48    NACL-ÌçÏÆ    15/06/16  ¹â³ÛÎÅÍÜÈñ¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *  04.07.49    NACL-ÌçÏÆ    15/06/22  ¿©»ö²ó¿ôµ­ºÜ½¤Àµ
+      *  04.07.50    NACL-ÌçÏÆ    15/06/30  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -25778,9 +25779,9 @@
                IF  (RECE62-SRYYM        >=  "200804" )
                AND (RECE62-TEISYUTUSAKI  =   2  OR  6)
                AND (RECE62-KOUREI        =  "1"      )
-      ***********IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
-      ***********AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
-                 IF  (RECE62-KOHNUM(1)   =  "282"                )
+                 IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
+                 AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
+      ***********IF  (RECE62-KOHNUM(1)   =  "282"                )
                  AND (RECE62-KOHNUM(2)   =  SPACE                )
                  AND (RECE62-KOHNUM(3)   =  SPACE                )
                  AND (RECE62-KOHNUM(4)   =  SPACE                )
@@ -25793,11 +25794,11 @@
                      DISPLAY  "3:WRK-SKY-FTNMONEY-XXX="
                                  WRK-SKY-FTNMONEY-XXX
                      MOVE   WRK-KINGAKU3   TO  RECE62-FTNMONEY(1)
-                     IF RECE62-FTNMONEY(1)  >  RECE62-KOUREI-SAIKEI
-                        CONTINUE
-                     ELSE
-                        MOVE   999999999   TO  RECE62-KOUREI-SAIKEI
-                     END-IF
+      ***************IF RECE62-FTNMONEY(1)  >  RECE62-KOUREI-SAIKEI
+      ***************   CONTINUE
+      ***************ELSE
+      ***************   MOVE   999999999   TO  RECE62-KOUREI-SAIKEI
+      ***************END-IF
                      IF   RECE62-RJNGENMENKBN   =   "1"
                        MOVE    4    TO      FLG-TOKKI
                        PERFORM   21013-TOKKI-HENSYU-SEC
