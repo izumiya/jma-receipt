@@ -47,4 +47,4 @@
              07  I0SUB02-UPD-SKYMONEY              PIC S9(08).
              07  I0SUB02-UPD-TAX-SAI               PIC S9(08).
          03  I0SUB02-RC                            PIC S9(02).
-         03  I0SUB02-S02-RC                        PIC S9(02).
+         03  I0SUB02-S02-RC                        PIC S9(05).

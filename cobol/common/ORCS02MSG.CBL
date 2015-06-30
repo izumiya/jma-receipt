@@ -146,6 +146,20 @@
                                            DELIMITED   BY  SIZE
                INTO    WRK-MSG
                END-STRING
+           WHEN    28
+               STRING  "入院時食事療養（２）算定時に特別食"
+                                           DELIMITED   BY  SIZE
+                       "加算の算定があります"
+                                           DELIMITED   BY  SIZE
+               INTO    WRK-MSG
+               END-STRING
+           WHEN    101
+               STRING  "包括入院期間に算定できない入院料加算"
+                                           DELIMITED   BY  SIZE
+                       "の算定があります"
+                                           DELIMITED   BY  SIZE
+               INTO    WRK-MSG
+               END-STRING
            END-EVALUATE
       *
            MOVE    WRK-MSG             TO  S02MSG-MSG (1)
