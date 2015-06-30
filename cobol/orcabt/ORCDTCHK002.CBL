@@ -7471,6 +7471,31 @@
                PERFORM 800-TMPSND-EDIT-SEC
            END-IF
       *
+           INITIALIZE                      CHKSND-REC
+           MOVE    "1"                 TO  CHKSND-CHKKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
+           MOVE    TSRYKA-SRYCD (IDX6 IDX7)
+                                       TO  CHKSND-SRYCD
+           MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
+           IF    ( FLG-CHKSND          =   ZERO )
+               MOVE    CHKSND-REC      TO  TCHKSND-REC
+               IF    ( CHKSND-NYUGAIKBN    =   SPACE )
+                OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
+                   CONTINUE
+               ELSE
+                   MOVE    1           TO  FLG-CHKMST
+               END-IF
+           ELSE
+               MOVE    "1"             TO  WRK-CHK-CHKKBN
+               MOVE    "1"             TO  WRK-CHK-CDKBN
+               MOVE    TSRYKA-SRYCD (IDX6 IDX7)
+                                       TO  WRK-CHK-SRYCD
+               PERFORM 901-DTCHK008-WRITE-SEC
+           END-IF
+      *
       *    CDKBN="1"のデータが存在する場合はチェックを行う
            INITIALIZE                      CHKSND-REC
            MOVE    "1"                 TO  CHKSND-CHKKBN
@@ -7482,29 +7507,8 @@
            MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
            PERFORM 901-CHKSND-KEY3-SEL-SEC
            IF    ( FLG-CHKSND          =   ZERO )
-      *
-               MOVE    CHKSND-REC      TO  TCHKSND-REC
-               IF    ( CHKSND-NYUGAIKBN    =   SPACE )
-                OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
-                   CONTINUE
-               ELSE
-                   MOVE    1           TO  FLG-CHKMST
-               END-IF
-      *        IF    ( CHKSND-TERMID   =   CONST-TEMP )
-      *            MOVE    "1"         TO  WRK-CHK-CHKKBN
-      *            MOVE    "1"         TO  WRK-CHK-CDKBN
-      *            MOVE    TSRYKA-SRYCD (IDX6 IDX7)
-      *                                TO  WRK-CHK-SRYCD
-      *            PERFORM 901-DTCHK008-WRITE-SEC
-      *        END-IF
+               CONTINUE
            ELSE
-      *
-               MOVE    "1"             TO  WRK-CHK-CHKKBN
-               MOVE    "1"             TO  WRK-CHK-CDKBN
-               MOVE    TSRYKA-SRYCD (IDX6 IDX7)
-                                       TO  WRK-CHK-SRYCD
-               PERFORM 901-DTCHK008-WRITE-SEC
-      *
                MOVE    1               TO  FLG-CHKMST
            END-IF
       *
@@ -7910,7 +7914,7 @@
       *
            INITIALIZE                      CHKSND-REC
            MOVE    "2"                 TO  CHKSND-CHKKBN
-           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
            MOVE    TSRYKA-SRYCD (IDX6 IDX7)
                                        TO  CHKSND-SRYCD
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
@@ -7924,6 +7928,19 @@
                ELSE
                    MOVE    1           TO  FLG-CHKMST
                END-IF
+           END-IF
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    "2"                 TO  CHKSND-CHKKBN
+           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    TSRYKA-SRYCD (IDX6 IDX7)
+                                       TO  CHKSND-SRYCD
+           MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
+           IF    ( FLG-CHKSND           =   ZERO )
+               CONTINUE
            ELSE
                    MOVE    1           TO  FLG-CHKMST
            END-IF
@@ -9084,7 +9101,7 @@
       *
            INITIALIZE                      CHKSND-REC
            MOVE    "6"                 TO  CHKSND-CHKKBN
-           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    "0"                 TO  CHKSND-CDKBN
            MOVE    TSRYKA-SRYCD (IDX6 IDX7)
                                        TO  CHKSND-SRYCD
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
@@ -9098,8 +9115,21 @@
                ELSE
                    MOVE    1           TO  FLG-CHKMST
                END-IF
+           END-IF
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    "6"                 TO  CHKSND-CHKKBN
+           MOVE    "1"                 TO  CHKSND-CDKBN
+           MOVE    TSRYKA-SRYCD (IDX6 IDX7)
+                                       TO  CHKSND-SRYCD
+           MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  CHKSND-HOSPNUM
+           PERFORM 901-CHKSND-KEY3-SEL-SEC
+           IF    ( FLG-CHKSND          =   ZERO )
+               CONTINUE
            ELSE
-                   MOVE    1           TO  FLG-CHKMST
+               MOVE    1               TO  FLG-CHKMST
            END-IF
       *
            IF    ( FLG-CHKMST          =   ZERO )
