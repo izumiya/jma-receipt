@@ -34,6 +34,7 @@
       *  04.06.00    NACL-多々納  10/10/01  コメント文字　３０００、
       *                                     連番対応他
       *  04.07.00    NACL-多々納  13/09/XX  第三者行為対応
+      *  04.07.00    NACL-多々納  15/07/XX  診療科・保険組合せ件数追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -162,7 +163,7 @@
       *
       *    保険組合せワーク
            03  WRK-GMN-HKNCOMB-COMB.
-               05  WRK-GMN-HKN-LIST    OCCURS  30.
+               05  WRK-GMN-HKN-LIST    OCCURS  50.
                    07  WRK-GMN-THKNCOMBINUM    PIC X(04).
                    07  WRK-GMN-THKNCOMBY1      PIC X(01).
                    07  WRK-GMN-THKNCOMBIMEI    PIC X(100).
@@ -678,7 +679,7 @@
            MOVE    ZERO                TO  IDH
            PERFORM VARYING     IDX     FROM   1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )  OR
-                              (IDH     >=  30              )
+                              (IDH     >=  50              )
                ADD     1                   TO  IDH
                MOVE    ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                            TO  SPA-GMN-THKNCOMBINUM
@@ -827,7 +828,7 @@
            END-IF
            PERFORM
                    UNTIL      (FLG-SYSKANRI   =   1    )
-                       OR     (SPA-GMN-SRYKAMAX   >=  41 )
+                       OR     (SPA-GMN-SRYKAMAX   >=  100 )
                ADD     1                   TO  SPA-GMN-SRYKAMAX
       *
                MOVE    MCPDATA-REC         TO  SYS-1005-REC
@@ -1674,6 +1675,7 @@
            MOVE    SPACE               TO  C50
       *
       *    コラムリストの位置指定
+           INITIALIZE                      C50
            MOVE    ZERO                TO  C50-RECE-ROW
            MOVE    ZERO                TO  C50-RECE-ROWATTR
            IF      WRK-C50-RECE-ROW    NOT =   ZERO
@@ -5064,6 +5066,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-C50ID1-FLG
       *
            MOVE    SPACE               TO  C50ID1
+           INITIALIZE                      C50ID1
            MOVE    SPA-C50IDCD         TO  C50ID1-ID1CODE
            MOVE    WRK-C50IDMSG        TO  C50ID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
