@@ -4334,7 +4334,7 @@
            MOVE    SPA-GMN-SRYCD       TO  CHKSND-SRYCD
            MOVE    WRK-KJNYMD          TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
-           MOVE    "0"                 TO  CHKSND-CDKBN
+           MOVE    "1"                 TO  CHKSND-CDKBN
       *
            MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
            MOVE    CHKSND-REC          TO  MCPDATA-REC
