@@ -46,7 +46,7 @@
                 04  C02-SRYKA-COUNT
                                 PIC S9(9)   BINARY.
                 04  C02-SRYKALST
-                                PIC X(21)   OCCURS  40 TIMES.
+                                PIC X(21)   OCCURS  100 TIMES.
               03  C02-SYOKBN-COMBO.
                 04  C02-SYOKBN   PIC X(6).
                 04  C02-SYOKBN-COUNT
@@ -185,6 +185,6 @@
                 04  C02-BSRYKA-COUNT
                                 PIC S9(9)   BINARY.
                 04  C02-BSRYKALST
-                                PIC X(21)   OCCURS  40 TIMES.
+                                PIC X(21)   OCCURS  100 TIMES.
               03  C02-HYOUJI-STYLE   PIC X(20).
               03  C02-HYOUJI         PIC X(22).

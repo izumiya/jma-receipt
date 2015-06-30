@@ -31,6 +31,7 @@
       *  03.04.01    NACL-森脇    06/11/29  パラメタ変更
       *  03.05.00    NACL-森脇    07/11/05  グループ診療対応
       *  04.02.01    NACL-森脇    08/04/16  平成２０年４月改正
+      *  04.07.01    NACL-藤原    15/06/19  診療科表示件数の変更
       *  04.08.01    NACL-森脇    14/08/20  一時ファイルディレクトリ設定
       *****************************************************************
       *
@@ -140,6 +141,8 @@
        01  PARA-SYAPRTNM               PIC X(16).
       *----(03.04.01)--UPD-START---
        COPY    "R02SCR-SPA".
+       01  SPA-SCR-REC.
+           COPY    "CPR02SPASCR.INC".
       * 01  PARA-FILEKBN                PIC X(40).
       * 01  PARA-TBL1.
       *----(00.00.01)--UPD-START---
@@ -159,7 +162,8 @@
                                        SPA-AREA
                                        PARA-SYAPRTNM
       *----(03.04.01)--UPD-START---
-                                       SPA-R02.
+                                       SPA-R02
+                                       SPA-SCR-REC.
       *                                 PARA-FILEKBN
       *                                 PARA-TBL1.
       *----(03.04.01)--UPD-END-----

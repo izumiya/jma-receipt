@@ -314,6 +314,7 @@
       *                                     同じときは難病の設定を行う
       *  04.07.16    NACL-藤原    15/04/24  疾患区分を外した自院病名入力
       *                                     時の疾患区分の表示の修正
+      *  04.07.17    NACL-藤原    15/06/19  診療科表示件数の変更
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
       *****************************************************************
@@ -2294,7 +2295,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    SPA-GMN-C02-SRYKA-MAX   TO  IDX
            MOVE    ZERO                    TO  IDY
-           PERFORM         UNTIL       (IDX            >=  40   )
+           PERFORM         UNTIL       (IDX            >=  100  )
                            OR          (FLG-SYSKANRI   =   1    )
                ADD     1                     TO  IDX
                                                  IDY
@@ -11337,6 +11338,7 @@ grpsys                                          SPA-AREA
       *  
            MOVE    SPACE               TO  C09
       *
+           INITIALIZE                      C09
            MOVE    ZERO                TO  IDZ
                                            IDXX
            PERFORM VARYING IDX FROM    1   BY  1
@@ -13145,6 +13147,7 @@ grpsys                                          SPA-AREA
            MOVE    SPACE               TO  SPA-CID1-FLG
       *
            MOVE    SPACE               TO  CID1
+           INITIALIZE                      CID1
            MOVE    SPA-CIDCD           TO  CID1-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID1-ID1MSG
            EVALUATE    SPA-CIDCD
@@ -13211,6 +13214,7 @@ grpsys                                          SPA-AREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID2
+           INITIALIZE                      CID2
            MOVE    WRK-CIDMSG          TO  CID2-MSG
            MOVE    SPA-C02-IKOMOTO-BYOMEICD
                                        TO  CID2-BYOMEICD1
@@ -13250,6 +13254,7 @@ grpsys                                          SPA-AREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID4
+           INITIALIZE                      CID4
            MOVE    SPA-CIDCD4          TO  CID4-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID4-ID1MSG
            MOVE    "B01"               TO  MCP-WIDGET

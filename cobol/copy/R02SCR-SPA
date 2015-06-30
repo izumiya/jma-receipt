@@ -47,6 +47,8 @@
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.03    NACL-藤原    15/06/19  診療科表示件数の変更
+      *                                     SPA-NAI-TBLを移動
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -79,11 +81,11 @@
                        09  SPA-GMN-SYUKA           PIC X(02).
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-SYUKAMEI        PIC X(18).
-                   07  SPA-GMN-SYUKALST            OCCURS  50.
+                   07  SPA-GMN-SYUKALST            OCCURS  101.
                        09  SPA-GMN-SYUKAL          PIC X(02).
                        09  SPA-GMN-F1L             PIC X(01).
                        09  SPA-GMN-SYUKAMEIL       PIC X(18).
-                   07  SPA-GMN-SYUKA-MAX           PIC 9(02).
+                   07  SPA-GMN-SYUKA-MAX           PIC 9(03).
                    07  SPA-GMN-PRTJYUN-OLD         PIC X(02).
                    07  SPA-GMN-PRTJYUN-G.
                        09  SPA-GMN-PRTJYUN         PIC X(02).
@@ -219,61 +221,16 @@
                    07  SPA-NAI-DRCD-TABLE.
                        09  SPA-NAI-DRCD-TBL        OCCURS  100.
                            11  SPA-NAI-DRCD-TDRCD  PIC X(05).
-                           11  SPA-NAI-DRCD-OCC        OCCURS  50.
+                           11  SPA-NAI-DRCD-OCC        OCCURS  101.
                                13  SPA-NAI-DRCD-TPAGE  PIC 9(04).
                                13  SPA-NAI-DRCD-TKENSU PIC 9(04).
       *
                    07  SPA-NAI-BTUNUM-TABLE.
                        09  SPA-NAI-BTUNUM-TBL        OCCURS  100.
                            11  SPA-NAI-BTUNUM-TBTUNUM    PIC X(02).
-                           11  SPA-NAI-BTUNUM-OCC        OCCURS  50.
+                           11  SPA-NAI-BTUNUM-OCC        OCCURS  101.
                                13  SPA-NAI-BTUNUM-TPAGE  PIC 9(04).
                                13  SPA-NAI-BTUNUM-TKENSU PIC 9(04).
-      *
-                   07  SPA-NAI-TBL.
-                       09  SPA-NAI-TBL-OCC         OCCURS   19.
-                           11  SPA-NAI-THKNJANUM-SYAHO
-                                                   PIC X(08).
-                           11  SPA-NAI-TBL-G       OCCURS   36.
-                               13  SPA-NAI-PRTJYUNI
-                                                   PIC X(02).
-                               13  SPA-NAI-TEISYUTUSAKI
-                                                   PIC X(01).
-                               13  SPA-NAI-TDRCD   PIC X(05).
-                               13  SPA-NAI-TBTUNUM PIC X(02).
-                               13  SPA-NAI-THKNJANUM
-                                                   PIC X(08).
-                               13  SPA-NAI-THKNJANUM-ERR
-                                                   PIC X(01).
-                               13  SPA-NAI-TPREFKBN-SRT
-                                                   PIC X(01).
-                               13  SPA-NAI-TPAGE-G.
-                                   15  SPA-NAI-TPAGE-CHOUKI
-                                                   PIC 9(04).
-                                   15  SPA-NAI-TPAGE-ZAITAKU
-                                                   PIC 9(04).
-                                   15  SPA-NAI-TPAGE-KOUGAKU
-                                                   PIC 9(04).
-                                   15  SPA-NAI-TPAGE-SYUKA
-                                                   PIC 9(04)
-                                                   OCCURS 50.
-                                   15  SPA-NAI-TPAGE-CHOUKI-SYUKA
-                                                   PIC 9(01)
-                                                   OCCURS 50.
-                                   15  SPA-NAI-TPAGE-ZAITAKU-SYUKA
-                                                   PIC 9(01)
-                                                   OCCURS 50.
-                                   15  SPA-NAI-TPAGE-KOUGAKU-SYUKA
-                                                   PIC 9(01)
-                                                   OCCURS 50.
-                               13  SPA-NAI-SYUBETU-G.
-                                   15  SPA-NAI-SYUBETU
-                                                   PIC X(04)
-                                                   OCCURS 5.
-                               13  SPA-NAI-TSYUBETU-SRT1
-                                                   PIC X(04).
-                               13  SPA-NAI-TPREFKBN
-                                                   PIC X(01).
       *    プレビュー用情報
            03  SPA-LNK-XC01-KEY.
                05  SPA-LNK-XC01-TBL-KEY    PIC X(8).

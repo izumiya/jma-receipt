@@ -47,7 +47,7 @@ C11 {
         textdata varchar(23);
       };
       count int;
-        item varchar(23)[40];
+        item varchar(23)[100];
     };
     DSPYM_COMBO {
       DSPYM {
@@ -75,7 +75,7 @@ C11 {
         textdata varchar(23);
       };
       count int;
-        item varchar(23)[40];
+        item varchar(23)[100];
     };
     scrolledwindow1 {
       OPELIST {

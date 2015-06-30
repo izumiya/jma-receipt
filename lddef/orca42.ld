@@ -70,6 +70,7 @@ db	{
 	tbl_seikyu_etc;
 	tbl_seikyu_rsi;
 	tbl_senteicdchg;
+	tbl_spa_tmp;
 	tbl_sryact;
 	tbl_syskanri;
 	tbl_syuka;

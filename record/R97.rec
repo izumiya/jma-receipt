@@ -68,7 +68,7 @@ R97 {
         textdata varchar(21);
       };
       count int;
-        item varchar(21)[40];
+        item varchar(21)[100];
     };
     scrolledwindow1 {
       hpos int;
