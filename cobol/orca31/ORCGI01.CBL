@@ -17796,6 +17796,7 @@
            CALL    "ORCGI0SUB02"       USING
                                        SPA-AREA
                                        I0SUB02-LNK
+           DISPLAY "I0SUB02-S02-RC=" I0SUB02-S02-RC
            EVALUATE    TRUE
            WHEN  ( I0SUB02-S02-RC  NOT =   ZERO )
                EVALUATE    I0SUB02-S02-RC
@@ -17829,6 +17830,10 @@
                    MOVE    "2026"  TO  SPA-ERRCD
                WHEN    27
                    MOVE    "2027"  TO  SPA-ERRCD
+               WHEN    28
+                   MOVE    "2028"  TO  SPA-ERRCD
+               WHEN    101
+                   MOVE    "2101"  TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
                END-EVALUATE
@@ -19581,6 +19586,22 @@
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
                      "特定曜日入退院減算（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2028"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                "入院時食事療養（２）算定時に特別食加算の算定があります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2101"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                  "包括入院期間に算定できない入院料加算の算定があります"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

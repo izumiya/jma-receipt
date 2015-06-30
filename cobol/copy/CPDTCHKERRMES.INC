@@ -796,6 +796,18 @@
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
       *
+           05 PIC  X(06)   VALUE   "990033".
+           05 PIC  X(30)   VALUE   "患者負担額が計算できません。入".
+           05 PIC  X(30)   VALUE   "院時食事療養（２）算定時に特別".
+           05 PIC  X(30)   VALUE   "食加算の算定があります        ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
+           05 PIC  X(06)   VALUE   "990034".
+           05 PIC  X(30)   VALUE   "患者負担額が計算できません。包".
+           05 PIC  X(30)   VALUE   "括入院期間に算定できない入院料".
+           05 PIC  X(30)   VALUE   "加算の算定があります          ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
@@ -803,10 +815,10 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  123.
+           05 ERRMES-OCC   OCCURS  125.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   123.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   125.
 
 
 

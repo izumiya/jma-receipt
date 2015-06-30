@@ -11055,6 +11055,10 @@
                    MOVE    "990026"    TO  WRK-ERRCD
                WHEN    27
                    MOVE    "990027"    TO  WRK-ERRCD
+               WHEN    28
+                   MOVE    "990033"    TO  WRK-ERRCD
+               WHEN    101
+                   MOVE    "990034"    TO  WRK-ERRCD
                WHEN    OTHER
                    MOVE    "990018"    TO  WRK-ERRCD
                END-EVALUATE
@@ -12389,12 +12393,16 @@
       *    チェック結果ファイル共通編集項目編集処理
            PERFORM 2111-DTCHK004-KYOTU-HEN-SEC
       *
-           STRING  WRK-ERRMES          DELIMITED   BY  SPACE
-                   "【"                DELIMITED   BY  SIZE
-                   WRK-ERRMES-PLUS     DELIMITED   BY  SPACE
-                   "】"
-           INTO    DTCHK004-ERRMSG
-           END-STRING
+           IF    ( WRK-ERRMES-PLUS     =   SPACE )
+               MOVE    WRK-ERRMES      TO  DTCHK004-ERRMSG
+           ELSE
+               STRING  WRK-ERRMES          DELIMITED   BY  SPACE
+                       "【"                DELIMITED   BY  SIZE
+                       WRK-ERRMES-PLUS     DELIMITED   BY  SPACE
+                       "】"
+               INTO    DTCHK004-ERRMSG
+               END-STRING
+           END-IF
       *
            WRITE   DTCHK004-REC
            COMPUTE CNT-DTCHK004    =   CNT-DTCHK004    +   1
