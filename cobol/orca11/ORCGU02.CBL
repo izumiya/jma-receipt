@@ -686,6 +686,9 @@
                WHEN    "P02"
       *            患者登録画面より
                    PERFORM 310-SPASET-SEC
+      *H27.7       排他制御解除処理
+                   PERFORM 990-LOCK-OUT-SEC
+      *
                    IF     (SPA-ERRMSG(1:2)    =   "NO"  )  AND
                           (SPA-PTNUM(1:1)     =   "*"   )
                        MOVE    SPACE              TO  SPA-PTNUM
