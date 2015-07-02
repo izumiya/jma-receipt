@@ -7486,14 +7486,8 @@
                 OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
                    CONTINUE
                ELSE
-                   MOVE    1           TO  FLG-CHKMST
+                   MOVE    2           TO  FLG-CHKMST
                END-IF
-           ELSE
-               MOVE    "1"             TO  WRK-CHK-CHKKBN
-               MOVE    "1"             TO  WRK-CHK-CDKBN
-               MOVE    TSRYKA-SRYCD (IDX6 IDX7)
-                                       TO  WRK-CHK-SRYCD
-               PERFORM 901-DTCHK008-WRITE-SEC
            END-IF
       *
       *    CDKBN="1"のデータが存在する場合はチェックを行う
@@ -7509,7 +7503,14 @@
            IF    ( FLG-CHKSND          =   ZERO )
                CONTINUE
            ELSE
-               MOVE    1               TO  FLG-CHKMST
+               IF    ( FLG-CHKMST      =   ZERO )
+                   MOVE    "1"             TO  WRK-CHK-CHKKBN
+                   MOVE    "1"             TO  WRK-CHK-CDKBN
+                   MOVE    TSRYKA-SRYCD (IDX6 IDX7)
+                                           TO  WRK-CHK-SRYCD
+                   PERFORM 901-DTCHK008-WRITE-SEC
+                   MOVE    1               TO  FLG-CHKMST
+               END-IF
            END-IF
       *
            IF    ( FLG-CHKMST          =   ZERO )
