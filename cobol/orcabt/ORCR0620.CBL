@@ -229,6 +229,8 @@
       *  04.07.13    NACL-Æ£¸¶    15/01/24  Æ±ÆüºÆÆþ±¡»þ¤ÎÆþÂà±¡ÍúÎò¤Îµ­Ï¿
       *                                     ¤ò½¤Àµ
       *                                    ¡ÊÆþ±¡Æü¤ÈÂà±¡Æü¤¬Æ±¤¸¤È¤­¡Ë
+      *  04.07.14    NACL-Æ£¸¶    15/07/07  ÆþÂà±¡ÍúÎò¤Î¤«¤é¤Î¿ÇÎÅ²ÊÀßÄê
+      *                                     ¤ËÂà±¡Æü¡¢Å¾½ÐÆü¤ò¾ò·ï¤ËÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3839,25 +3841,63 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
            PERFORM    24011-BYOTOKBN-SET-SEC
       *
       *    ¿ÇÎÅ²Ê¾ðÊó¤Î¥»¥Ã¥È
-           PERFORM VARYING IDW FROM    1   BY  1
-                   UNTIL   IDW >       20
-                   OR      PTNYUINRRK-NYUINKA
+      *    Âà±¡Æü¡ã¿ÇÎÅÇ¯·î¡¢Å¾½ÐÆü¤ÎÁ°Æü¡ã¿ÇÎÅÇ¯·î¤Î¤È¤­¤Ï¥»¥Ã¥È¤·¤Ê¤¤
+           IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
+               IF      PTNYUINRRK-TAIINYMD (1:6)
+                                           >=  RECE62-SRYYM
+                   PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
                                            =   RECE62-SRYKA (IDW)
-               IF      RECE62-SRYKA (IDW)  =   SPACE  
-                   PERFORM VARYING IDXX    FROM    1   BY  1
-                           UNTIL   IDXX    >       10
-                           OR      RECE62-HKNCOMBI (IDXX)
+                       IF      RECE62-SRYKA (IDW)  =   SPACE  
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       10
+                                   OR      RECE62-HKNCOMBI (IDXX)
                                                    =   ZERO
-                       IF      RECE62-HKNCOMBI (IDXX)   =
+                               IF      RECE62-HKNCOMBI (IDXX)  =
                                                PTNYUINRRK-HKNCOMBINUM
-                           MOVE    PTNYUINRRK-NYUINKA  
+                                   MOVE    PTNYUINRRK-NYUINKA  
                                                TO  RECE62-SRYKA (IDW)
-                           MOVE    10  TO  IDXX
+                                   MOVE    10      TO  IDXX
+                               END-IF
+                           END-PERFORM
+                           MOVE    20          TO  IDW
                        END-IF
                    END-PERFORM
-                   MOVE    20          TO  IDW
+               END-IF    
+           ELSE    
+               INITIALIZE              STS-AREA-DAY
+               INITIALIZE              LNK-DAY6-AREA
+               MOVE    "61"            TO  LNK-DAY6-IRAI
+               MOVE   PTNYUINRRK-TENSTUYMD
+                                       TO  LNK-DAY6-KIJUN
+               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+               MOVE    -1              TO  LNK-DAY6-ZOGEN
+               CALL  "ORCSDAY"         USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+               IF      LNK-DAY6-KEISAN (1:6)
+                                       >=  RECE62-SRYYM
+                   PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                           =   RECE62-SRYKA (IDW)
+                       IF      RECE62-SRYKA (IDW)  =   SPACE  
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       10
+                                   OR      RECE62-HKNCOMBI (IDXX)
+                                                   =   ZERO
+                               IF      RECE62-HKNCOMBI (IDXX)  =
+                                               PTNYUINRRK-HKNCOMBINUM
+                                   MOVE    PTNYUINRRK-NYUINKA  
+                                               TO  RECE62-SRYKA (IDW)
+                                   MOVE    10      TO  IDXX
+                               END-IF
+                           END-PERFORM
+                           MOVE    20          TO  IDW
+                       END-IF
+                   END-PERFORM
                END-IF
-           END-PERFORM
+           END-IF
       *
       *    Æþ±¡Ç¯·îÆü¡¦ºÇ½ª²Ê
            IF      RECE62-LASTSRYKA    =   SPACE
