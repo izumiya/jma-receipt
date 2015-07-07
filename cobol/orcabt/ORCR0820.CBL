@@ -57,6 +57,8 @@
       *  04.07.06    NACL-藤原    15/01/24  同日再入院時の入退院履歴の記録
       *                                     を修正
       *                                    （入院日と退院日が同じとき）
+      *  04.07.07    NACL-藤原    15/07/07  入退院履歴のからの診療科設定
+      *                                     に退院日、転出日を条件に追加
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    14/07/23  ３２文字以上の文字列修正
@@ -640,15 +642,45 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            PERFORM    210112-BYOTOKBN-SET-SEC
       *
       *    診療科情報のセット
-           PERFORM VARYING IDW FROM    1   BY  1
-                   UNTIL   IDW >       20
-                   OR      PTNYUINRRK-NYUINKA
-                                           =   RECE82-SRYKA (IDW)
-               IF      RECE82-SRYKA (IDW)  =   SPACE  
-                   MOVE    PTNYUINRRK-NYUINKA  TO  RECE82-SRYKA (IDW)
-                   MOVE    20          TO  IDW
+      *    退院日＜診療年月、転出日の前日＜診療年月のときはセットしない
+           IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
+               IF      PTNYUINRRK-TAIINYMD (1:6)
+                                           >=  RECE82-SRYYM
+                   PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                               =   RECE82-SRYKA (IDW)
+                       IF      RECE82-SRYKA (IDW)  =   SPACE  
+                           MOVE    PTNYUINRRK-NYUINKA
+                                               TO  RECE82-SRYKA (IDW)
+                           MOVE    20          TO  IDW
+                       END-IF
+                   END-PERFORM
+               END-IF    
+           ELSE    
+               INITIALIZE              STS-AREA-DAY
+               INITIALIZE              LNK-DAY6-AREA
+               MOVE    "61"            TO  LNK-DAY6-IRAI
+               MOVE   PTNYUINRRK-TENSTUYMD
+                                       TO  LNK-DAY6-KIJUN
+               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+               MOVE    -1              TO  LNK-DAY6-ZOGEN
+               CALL  "ORCSDAY"         USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+               IF      LNK-DAY6-KEISAN (1:6)
+                                       >=  RECE82-SRYYM
+                   PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                               =   RECE82-SRYKA (IDW)
+                       IF      RECE82-SRYKA (IDW)  =   SPACE  
+                           MOVE    PTNYUINRRK-NYUINKA
+                                               TO  RECE82-SRYKA (IDW)
+                           MOVE    20          TO  IDW
+                       END-IF
+                   END-PERFORM
                END-IF
-           END-PERFORM
+           END-IF
       *
       *    入院年月日
            IF      RECE82-NYUINYMD    =   SPACE
