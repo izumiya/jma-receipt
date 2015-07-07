@@ -420,6 +420,7 @@
       *****03  WRK-RECENUM             PIC 9(06).
       *
            03  WRK-RENNUM-E            PIC 9(04).
+           03  WRK-RENNUM-E-TAIHI      PIC 9(04).
            03  WRK-RENNUM-F            PIC 9(04).
       *  WRK-RENNUM と WRK-MEISAI-RENNUM は桁数変更不可
            03  WRK-RENNUM              PIC 9(04).
@@ -1217,6 +1218,9 @@
       *    入院会計作成用パラメタ
            COPY    "CPORCSDPCNYUIN.INC".
       *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
+      *
       *    半角チェックサブ
            COPY    "CPORCSKANACHK.INC".
       *
@@ -1971,6 +1975,13 @@
            IF      LNK-DPCNYUIN-RC     NOT =   ZERO
                DISPLAY "ORCSDPCNYUIN ERROR PTID= " RECE62-PTID
                        " LNK-DPCNYUIN-RC=" LNK-DPCNYUIN-RC
+           ELSE
+               INITIALIZE                     ORCSNYUINDAY-AREA
+               MOVE    RECE62-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
+               MOVE    RECE62-PTID        TO  LNK-NYUINDAY-PTID
+               MOVE    RECE62-SRYYM       TO  LNK-NYUINDAY-SANTEIYM
+               CALL    "ORCSNYUINDAY"     USING   ORCSNYUINDAY-AREA
+                                                  SPA-AREA
            END-IF
            .
        2001-NYUINRYO-GET-EXT.
@@ -2917,6 +2928,9 @@
       *****************************************************************
        20073-ZAI-HENSYU-SEC          SECTION.
       *
+           DISPLAY  "RECE641-SRYCDTOTAL = " RECE641-SRYCDTOTAL
+           DISPLAY  "RECE641-SRYKBN = " RECE641-SRYKBN
+           DISPLAY  "RECE641-JIHOKBN = " RECE641-JIHOKBN
            IF     (RECE641-SRYKBN    =   "90" )    AND
                   (RECE641-JIHOKBN   =   "1")
               CONTINUE
@@ -2924,10 +2938,13 @@
               GO  TO   20073-ZAI-HENSYU-EXT
            END-IF
       *
-      *
+           DISPLAY  "WRK-RENNUM = " WRK-RENNUM
       *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
+           DISPLAY  "IDXX = " IDXX
+           DISPLAY  "LNK-NYUINDAY-TANKI2-KBN(IDXX) = "
+                     LNK-NYUINDAY-TANKI2-KBN(IDXX)
       *    順序番号
                    ADD     1           TO  WRK-RENNUM
       *    行為明細番号リセット
@@ -2942,23 +2959,48 @@
                            WHEN    "8"
                                CONTINUE
                            WHEN    OTHER
-                               IF    (IDX               =  1)
-      *                            Ｅファイルは出力しない
-                                   PERFORM 200721-ZAI-E-HENSYU-SEC
-      **                             PERFORM 5001-FILE-WRITE-SEC
-                               END-IF
-      *                        Ｆファイルも出力ぜず、ワーク退避のみ
-                               MOVE   "92"   TO   WRK-FEDT-SRYKBN
-                               PERFORM 200721-ZAI-F-HENSYU-SEC
-                               MOVE   WRK-REC-LENGTH
+                               IF   LNK-NYUINDAY-TANKI2-KBN(IDXX) =
+                                                            "1" OR "2"
+                                  DISPLAY "------EF-OUT"
+                                  IF    ((IDX               =  1)
+                                   AND   (WRK-FEDT-1ST-FLG  =  ZERO))
+                                  OR    ((RECE641-SRYKBN    =  "70")
+                                   AND   (IDX               =  2)
+                                   AND   (WRK-FEDT-1ST-FLG  =  ZERO))
+                                      MOVE    1    TO   WRK-FEDT-1ST-FLG
+                                      MOVE    "92"  TO  RECE641-SRYKBN
+                                      DISPLAY "WRK-RENNUM-E-TAIHI = "
+                                               WRK-RENNUM-E-TAIHI
+                                      MOVE    WRK-RENNUM-E-TAIHI
+                                                     TO   WRK-RENNUM-E
+                                      PERFORM 200721-ZAI-E-HENSYU-SEC
+                                      PERFORM 5001-FILE-WRITE-SEC
+                                  END-IF
+                                  MOVE   "92"   TO   WRK-FEDT-SRYKBN
+                                  PERFORM 200721-ZAI-F-HENSYU-SEC
+                                  PERFORM 5001-FILE-F-WRITE-SEC
+                               ELSE
+                                  DISPLAY "------EF-OUT2"
+                                  IF    (IDX               =  1)
+      *                               Ｅファイルは出力しない
+                                      PERFORM 200721-ZAI-E-HENSYU-SEC
+      **                                PERFORM 5001-FILE-WRITE-SEC
+                                  END-IF
+      *                           Ｆファイルも出力ぜず、ワーク退避のみ
+                                  MOVE   "92"   TO   WRK-FEDT-SRYKBN
+                                  PERFORM 200721-ZAI-F-HENSYU-SEC
+                                  MOVE   WRK-REC-LENGTH
                                                   TO  WRK-REC-LENGTH-XX
+                                                             (IDXX IDX)
+                                  MOVE   WRK-REC     TO  WRK-REC-XX
                                                           (IDXX IDX)
-                               MOVE   WRK-REC     TO  WRK-REC-XX
-                                                          (IDXX IDX)
-                               MOVE   WRK-FEDT-AREA
+                                  MOVE   WRK-FEDT-AREA
                                                   TO    WRK-FEDT-XX
-                                                          (IDXX IDX)
-      **                         PERFORM 5001-FILE-F-WRITE-SEC
+                                                             (IDXX IDX)
+      **                          PERFORM 5001-FILE-F-WRITE-SEC
+                                  MOVE   WRK-RENNUM-E   TO
+                                                WRK-RENNUM-E-TAIHI
+                               END-IF
                        END-EVALUATE
                      END-IF
                    END-PERFORM
@@ -5781,6 +5823,11 @@
                    MOVE    1               TO  FLG-RECE64
                END-IF
            END-PERFORM
+      *
+      *    AZU-ADD START 2015.7.6
+               MOVE    1              TO  FLG-TOKUTEINYUIN
+      *    AZU-ADD END   2015.7.6
+      *
       *
            IF      FLG-TOKUTEINYUIN    =   1
                    PERFORM 9999-HOUKATU-SAKUSEI-SEC
