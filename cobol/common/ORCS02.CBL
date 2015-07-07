@@ -412,6 +412,7 @@
       *  04.07.34    NACL-門脇    15/06/26  特別食加算の入力チェック対応
       *  04.07.35    NACL-門脇    15/06/29  高額委任払の＋アルファーの
       *                                     負担金計算対応（保険番号９６４）
+      *  04.07.36    NACL-門脇    15/07/06  長期併用時の特別計算（入院）修正
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -27299,11 +27300,16 @@
            PERFORM    VARYING   IDX2   FROM   1   BY   1
                          UNTIL    IDX2     >    31
       *
-               IF    KOHI-TBL(IDX2 KOH-IDX)  =   9
+               IF     FLG-CYOKEIKBN-N  NOT = ZERO
+                  MOVE  LNK-SYU-SKYSTYMD(7:2)  TO  IDX-ST
+                  MOVE  LNK-SYU-SKYEDYMD(7:2)  TO  IDX-ED
+                  IF   (IDX-ST <= IDX2  )
+                  AND  (IDX2   <= IDX-ED)
+                     PERFORM    230712-ZANOKIKAE-HENSYU2-SEC
+                  END-IF
+               END-IF
       *
-                 IF     FLG-CYOKEIKBN-N  NOT = ZERO
-                    PERFORM    230712-ZANOKIKAE-HENSYU2-SEC
-                 END-IF
+               IF    KOHI-TBL(IDX2 KOH-IDX)  =   9
       *
                  MOVE   99999    TO   WK-DAY-COMPFTN
       *
@@ -27812,78 +27818,80 @@
       ******************************************************************
        230712-ZANOKIKAE-HENSYU2-SEC           SECTION.
       *
-      *    同日に、同一地方公費含む違う保険組合せで入力が有る場合、
-      *    先に計算した保険組合せの同一地方公費の日の一部負担金を
-      *    前日までのマル長の一部負担金の残から差し引く
-           EVALUATE   KOH-IDX
-             WHEN        1
-               IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI1-D(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
-                                            -  FTN-KOHI1-D(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
-               END-IF
-               IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI1-D2(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
-                                            -  FTN-KOHI1-D2(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
-               END-IF
-               IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI1-D3(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
-                                            -  FTN-KOHI1-D3(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
-               END-IF
-             WHEN        2
-               IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI2-D(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
-                                            -  FTN-KOHI2-D(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
-               END-IF
-               IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI2-D2(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
-                                            -  FTN-KOHI2-D2(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
-               END-IF
-               IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI2-D3(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
-                                            -  FTN-KOHI2-D3(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
-               END-IF
-             WHEN        3
-               IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI3-D(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
-                                            -  FTN-KOHI3-D(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
-               END-IF
-               IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI3-D2(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
-                                            -  FTN-KOHI3-D2(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
-               END-IF
-               IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI3-D3(IDX2)
-                 COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
-                                            -  FTN-KOHI3-D3(IDX2)
-               ELSE
-                 MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
-               END-IF
-           END-EVALUATE
+           IF    KOHI-TBL(IDX2 KOH-IDX)  =   9
+      *      同日に、同一地方公費含む違う保険組合せで入力が有る場合、
+      *      先に計算した保険組合せの同一地方公費の日の一部負担金を
+      *      前日までのマル長の一部負担金の残から差し引く
+             EVALUATE   KOH-IDX
+               WHEN        1
+                 IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI1-D(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
+                                              -  FTN-KOHI1-D(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI1-D2(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
+                                              -  FTN-KOHI1-D2(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI1-D3(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
+                                              -  FTN-KOHI1-D3(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
+                 END-IF
+               WHEN        2
+                 IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI2-D(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
+                                              -  FTN-KOHI2-D(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI2-D2(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
+                                              -  FTN-KOHI2-D2(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI2-D3(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
+                                              -  FTN-KOHI2-D3(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
+                 END-IF
+               WHEN        3
+                 IF  WK-CYOKI-HIKAKU1  >  FTN-KOHI3-D(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU1  =  WK-CYOKI-HIKAKU1
+                                              -  FTN-KOHI3-D(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU2  >  FTN-KOHI3-D2(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU2  =  WK-CYOKI-HIKAKU2
+                                              -  FTN-KOHI3-D2(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF  WK-CYOKI-HIKAKU3  >  FTN-KOHI3-D3(IDX2)
+                   COMPUTE  WK-CYOKI-HIKAKU3  =  WK-CYOKI-HIKAKU3
+                                              -  FTN-KOHI3-D3(IDX2)
+                 ELSE
+                   MOVE   ZERO   TO   WK-CYOKI-HIKAKU3
+                 END-IF
+             END-EVALUATE
       *
-      *    前日までのマル長の一部負担金の残と地方公費の日の残を比較
-           IF   WK-CYOKI-HIKAKU1  <  ZAN-KOHI-D(IDX2 KOH-IDX)
-             MOVE  WK-CYOKI-HIKAKU1  TO  ZAN-KOHI-D(IDX2 KOH-IDX)
-           END-IF
-           IF   WK-CYOKI-HIKAKU2  <  ZAN-KOHI-D2(IDX2 KOH-IDX)
-             MOVE  WK-CYOKI-HIKAKU2  TO  ZAN-KOHI-D2(IDX2 KOH-IDX)
-           END-IF
-           IF   WK-CYOKI-HIKAKU3  <  ZAN-KOHI-D3(IDX2 KOH-IDX)
-             MOVE  WK-CYOKI-HIKAKU3  TO  ZAN-KOHI-D3(IDX2 KOH-IDX)
+      *      前日までのマル長の一部負担金の残と地方公費の日の残を比較
+             IF   WK-CYOKI-HIKAKU1  <  ZAN-KOHI-D(IDX2 KOH-IDX)
+               MOVE  WK-CYOKI-HIKAKU1  TO  ZAN-KOHI-D(IDX2 KOH-IDX)
+             END-IF
+             IF   WK-CYOKI-HIKAKU2  <  ZAN-KOHI-D2(IDX2 KOH-IDX)
+               MOVE  WK-CYOKI-HIKAKU2  TO  ZAN-KOHI-D2(IDX2 KOH-IDX)
+             END-IF
+             IF   WK-CYOKI-HIKAKU3  <  ZAN-KOHI-D3(IDX2 KOH-IDX)
+               MOVE  WK-CYOKI-HIKAKU3  TO  ZAN-KOHI-D3(IDX2 KOH-IDX)
+             END-IF
            END-IF
       *
       *    該当日のマル長の一部負担金を計算
