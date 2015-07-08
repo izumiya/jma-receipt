@@ -394,6 +394,7 @@
       *                                     のときの記録方法
       *  04.07.17    NACL-藤原    15/04/16  注加算コードが１４１９の加算
       *                                     項目の記録方法の修正
+      *  04.08.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/06/02  請求情報への更新日設定
@@ -3760,12 +3761,17 @@
                            MOVE    RECE631-BYOMEICD(IDX)
                                                    TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
-                           IF      BYO-HAISIYMD    NOT =   SPACE
-                               IF      BYO-HAISIYMD    <
+                           IF      BYO-HKNSKYKBN   =   1
+                               MOVE    "1"     TO  RECE631-BYOMEIHENFLG
+                               MOVE    21      TO  IDX
+                           ELSE
+                               IF      BYO-HAISIYMD    NOT =   SPACE
+                                   IF      BYO-HAISIYMD    <
                                                        RECE631-SRYYMD
-                                   MOVE    "1"     TO
+                                       MOVE    "1"     TO
                                                    RECE631-BYOMEIHENFLG
-                                   MOVE    21      TO  IDX
+                                       MOVE    21      TO  IDX
+                                   END-IF
                                END-IF
                            END-IF    
                        END-IF    
