@@ -26,6 +26,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1188,6 +1189,18 @@
                        END-IF 
                    END-IF    
                END-PERFORM
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       21
+                       OR      USBYO-BYOMEICD (IDXX)   =   SPACE
+                       OR      USBYO-BYOMEICD (IDXX)   =   ALL "9"
+                       OR      SPA-NAI-C06-BYOMEI-O  (IDZ IDXX)
+                                                       =   SPACE
+                       OR      SPA-ERRCD           NOT =   SPACE
+                   IF      SPA-NAI-C06-BYOMEI-O  (IDZ IDXX)
+                                           =   "■■■"
+                       MOVE    "0076"               TO  SPA-ERRCD
+                   END-IF
+               END-PERFORM
            ELSE
                MOVE    "■■■"            TO  SPA-GMN-C06-BYOMEI  (IDZ)
                MOVE    "0004"              TO  SPA-ERRCD
@@ -1818,6 +1831,9 @@
                WHEN    "0072"
                    MOVE    "全角または半角のみで入力して下さい" 
                                                        TO  CERR-ERRMSG
+               WHEN    "0076"
+                   MOVE    "存在しない病名コードが登録されています"
+                                                       TO  CERR-ERRMSG
            END-EVALUATE
       *
            MOVE    SPACE                TO  WRK-ERR-BYOMEI
@@ -1846,6 +1862,7 @@
            MOVE    SPACE               TO  SPA-CID4-FLG
       *
            MOVE    SPACE               TO  CID4
+           INITIALIZE                      CID4
            MOVE    SPA-CIDCD4          TO  CID4-ID1CODE
            EVALUATE    SPA-CIDCD4
                WHEN    "0101"
@@ -1979,6 +1996,10 @@
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  BYOMEI-REC
                    MOVE    ZERO                TO  FLG-BYOMEI
+                   IF      BYO-HKNSKYKBN   =   1
+                       MOVE    1               TO  FLG-BYOMEI
+                       INITIALIZE                  BYOMEI-REC
+                   END-IF  
                ELSE
                    MOVE    1                   TO  FLG-BYOMEI
                    INITIALIZE                      BYOMEI-REC

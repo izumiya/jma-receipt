@@ -394,6 +394,7 @@
       *                                     のときの記録方法
       *  04.07.17    NACL-藤原    15/04/16  注加算コードが１４１９の加算
       *                                     項目の記録方法の修正
+      *  04.07.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3739,16 +3740,21 @@
                            MOVE    RECE631-BYOMEICD(IDX)
                                                    TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
-                           IF      BYO-HAISIYMD    NOT =   SPACE
-                               IF      BYO-HAISIYMD    <
+                           IF      BYO-HKNSKYKBN   =   1
+                               MOVE    "1"     TO  RECE631-BYOMEIHENFLG
+                               MOVE    21      TO  IDX
+                           ELSE
+                               IF      BYO-HAISIYMD    NOT =   SPACE
+                                   IF      BYO-HAISIYMD    <
                                                        RECE631-SRYYMD
-                                   MOVE    "1"     TO
+                                       MOVE    "1"     TO
                                                    RECE631-BYOMEIHENFLG
-                                   MOVE    21      TO  IDX
+                                       MOVE    21      TO  IDX
+                                   END-IF
                                END-IF
-                           END-IF    
-                       END-IF    
-                   END-IF       
+                           END-IF
+                       END-IF
+                   END-IF
                END-PERFORM
            END-IF    
       *

@@ -131,6 +131,7 @@
       *                                     の表示時のチェック追加
       *  04.07.09    NACL-藤原    14/03/14  複数自院病名登録時のコード
       *                                     存在チェックの修正
+      *  04.07.10    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -257,6 +258,8 @@
                                    PIC 9(03).
            03  WRK-GMN-C03-BUNRUIMEI-OLD
                                    PIC X(30).
+      *
+           03  WRK-GMN-C03-CUR     PIC 9(02).
       *
       *    ファイルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
@@ -1846,9 +1849,21 @@
                        END-IF
                    ELSE
                        MOVE    "0076"              TO  SPA-ERRCD
+                       IF      SPA-GMN-C03-BYOMEICD (1)
+                                            NOT =   SPACE
+                           COMPUTE SPA-GMN-C03-CUR  =   IDZ +   4
+                       ELSE
+                           MOVE    11               TO  SPA-GMN-C03-CUR
+                       END-IF
                    END-IF
                  END-IF                 
                END-PERFORM
+               IF      SPA-ERRCD           =   "0076"
+                   IF      SPA-GMN-C03-BYOMEICD-G
+                                               =   SPACE
+                       MOVE    11               TO  SPA-GMN-C03-CUR
+                   END-IF
+               END-IF    
       *
                MOVE    ZERO                TO  SPA-NAI-C03-NANBYOCD
                                                SPA-NAI-C03-MANSEIKBN
@@ -1925,7 +1940,10 @@
       *
                IF    ( SPA-CIDCD2          =   SPACE )
                AND   ( SPA-CIDCD6          =   SPACE ) 
-               AND   ( SPA-ERRCD           =   SPACE ) 
+               AND   ( SPA-ERRCD           =   SPACE   OR  "0076" )
+                   IF      SPA-ERRCD           =   "0076"
+                       MOVE    SPA-GMN-C03-CUR     TO  WRK-GMN-C03-CUR
+                   END-IF
                    PERFORM 4101111-BYOMEI-SELECT-HENSYU-SEC              
                    IF    ( WRK-HAISIYMDH       =   SPACE )
                    OR    ( SPA-C02-1042-MSG3-DSPKBN
@@ -1933,6 +1951,9 @@
                        CONTINUE
                    ELSE
                        MOVE    "0075"              TO  SPA-ERRCD
+                   END-IF
+                   IF      SPA-ERRCD           =   "0076"
+                       MOVE    WRK-GMN-C03-CUR     TO  SPA-GMN-C03-CUR
                    END-IF
                END-IF
            END-IF       
@@ -6463,6 +6484,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-BYOMEI
                MOVE    MCPDATA-REC     TO  BYOMEI-REC
+               IF      BYO-HKNSKYKBN   =   1
+                   MOVE    1               TO  FLG-BYOMEI
+                   INITIALIZE                  BYOMEI-REC
+               END-IF  
            ELSE
                MOVE    1               TO  FLG-BYOMEI
                INITIALIZE                  BYOMEI-REC

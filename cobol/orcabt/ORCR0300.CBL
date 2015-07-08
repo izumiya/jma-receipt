@@ -429,6 +429,7 @@
       *                                     項目の記録方法の修正
       *  04.07.17    NACL-伊藤    15/06/23  医療情報連携
       *                                     後発品変更不可（処方単位）
+      *  04.07.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3451,12 +3452,17 @@ grpsys             OR     ( RECE02-KEY
                            MOVE    RECE031-BYOMEICD(IDX)
                                                    TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
-                           IF      BYO-HAISIYMD    NOT =   SPACE
-                               IF      BYO-HAISIYMD    <
+                           IF      BYO-HKNSKYKBN   =   1
+                               MOVE    "1"     TO  RECE031-BYOMEIHENFLG
+                               MOVE    21      TO  IDX
+                           ELSE
+                               IF      BYO-HAISIYMD    NOT =   SPACE
+                                   IF      BYO-HAISIYMD    <
                                                        RECE031-SRYYMD
-                                   MOVE    "1"     TO
+                                       MOVE    "1"     TO
                                                    RECE031-BYOMEIHENFLG
-                                   MOVE    21      TO  IDX
+                                       MOVE    21      TO  IDX
+                                   END-IF 
                                END-IF
                            END-IF    
                        END-IF    

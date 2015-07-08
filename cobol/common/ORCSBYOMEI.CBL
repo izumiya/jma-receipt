@@ -50,6 +50,7 @@
       *
       *  04.07.01    NACL-藤原    11/06/10  病名からコード検索時、複数の
       *                                     組み立てを返却可能にする
+      *  04.07.02    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1729,6 +1730,10 @@ grpsys                            SPA-AREA
                            END-IF
                       END-IF
                END-EVALUATE
+               IF      BYO-HKNSKYKBN   =   1
+                   MOVE    1               TO  FLG-BYOMEI
+                   INITIALIZE                  BYOMEI-REC
+               END-IF  
            ELSE
               MOVE    1               TO  FLG-BYOMEI
               INITIALIZE                  BYOMEI-REC
