@@ -4940,7 +4940,8 @@
                                      END-IF
                                END-PERFORM
                             END-IF
-                            IF  RECE641-SRYKBN  = "97"
+                            IF (RECE641-SRYKBN  = "97")   OR
+                               (RECE641-ZAINUM  >=   99993000)
                                     MOVE    0           TO  FLG-TAISYO
                             END-IF
                         END-IF
