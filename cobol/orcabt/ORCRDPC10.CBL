@@ -116,6 +116,7 @@
       *              NACL-小豆沢  15/06/10  入院料ＥＦファイル編集処理
       *                                     平成２７年４月以降は選定入院時
       *                                     の外泊もレコード記録する対応
+      *              NACL-藤原    15/07/10  主科未設定のときエラーとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6033,7 +6034,23 @@
                                    AND ( SYS-2009-SYUKA-SYAHO  = "1" ) )
                              OR  (     ( RECE62-TEISYUTUSAKI   = "2" )
                                    AND ( SYS-2009-SYUKA-KOKUHO = "1" ) )
-                               MOVE    2               TO  FLG-READ
+                             OR  (     ( RECE62-TEISYUTUSAKI   = "6" )
+                                   AND ( SYS-2009-SYUKA-KOUIKI = "1" ) )
+                                 STRING   "主科未設定　患者番号＝"
+                                                   DELIMITED  BY  SIZE
+                                           RECE62-PTNUM
+                                                   DELIMITED  BY  SIZE
+                                                   INTO  WRK-RECEERR
+                                 END-STRING
+                                 PERFORM 500-ERR-HENSYU-SEC
+                                 STRING  "ORCRDPC10 "
+                                                   DELIMITED   BY  SIZE
+                                         WRK-RECEERR
+                                                   DELIMITED   BY  SPACE
+                                         LOW-VALUE DELIMITED   BY  SIZE
+                                                   INTO    WRK-ERRMSG
+                                 END-STRING
+                                 PERFORM 500-COBABORT-SEC
                              END-IF
                            END-IF
                        END-IF
