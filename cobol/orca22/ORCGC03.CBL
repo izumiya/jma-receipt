@@ -5820,7 +5820,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                    MOVE    "編集病名とします"
                                        TO  SPA-ERRMSG (43:)
                WHEN    "1000"
-                   MOVE    "病名コードが有りません"    TO  SPA-ERRMSG
+                   MOVE    "病名コードがありません"    TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "更新処理でエラーになりました"
                                                        TO  SPA-ERRMSG
