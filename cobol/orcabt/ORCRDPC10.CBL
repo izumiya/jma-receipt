@@ -4605,9 +4605,11 @@
                                        TO  IDW
              MOVE  LNK-DPCNYUIN-TEN (IDZ1 IDZ2 IDW)
                                        TO  WRK-FEDT-ZAITEN
+             MOVE    SPACE           TO   RECE641-JIHOKBN
            ELSE
              MOVE  LNK-DPCNYUIN-TEN (IDZ1 IDZ2 IDXZ)
                                        TO  WRK-FEDT-ZAITEN
+             MOVE    SPACE           TO   RECE641-JIHOKBN
            END-IF
       *π‘∞ŸÃÙ∫ﬁŒ¡
            MOVE    ZERO                TO  WRK-FEDT-YKZTEN
