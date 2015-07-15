@@ -149,6 +149,8 @@
       *                                     特別療養費等の処理はしない
       *  04.07.08    NACL-藤原    14/11/19  診療科の初期表示
       *  04.07.09    NACL-藤原    15/06/19  診療科表示件数の変更
+      *  04.07.10    NACL-藤原    15/07/15  社保レセプト遍綴順のときの
+      *                                     平成２４年４月以降の表示の修正
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
@@ -2248,10 +2250,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF      SPA-R01-RECE07-HKNJANUM-SRT
                                                =   "9"
                        MOVE    1                   TO  IDW
-                       IF      SPA-R01-NYUGAIKBN   =   "1"
+                       IF      SPA-R01-SRYYM   <   WRK-CONS-SRYYM-201204
+                           IF      SPA-R01-NYUGAIKBN   =   "1"
+                               MOVE    2                   TO  IDX
+                           ELSE 
+                               MOVE    3                   TO  IDX
+                           END-IF
+                       ELSE
                            MOVE    2                   TO  IDX
-                       ELSE 
-                           MOVE    3                   TO  IDX
                        END-IF
                    ELSE
                        COMPUTE IDW =   SPA-GMN-PAGE-MAX    +   1
@@ -2274,12 +2280,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            MOVE    SPA-GMN-PAGE-MAX    TO  IDW
                            EVALUATE    SPA-GMN-PAGE-MAX
                                WHEN    1
-                                   IF      SPA-GMN-PRTJYUN =   "06"
+                                   IF    ( SPA-GMN-PRTJYUN =   "06"  )
+                                   AND   ( SPA-R01-SRYYM   <
+                                               WRK-CONS-SRYYM-201204 )
                                        IF      SPA-R01-NYUGAIKBN
                                                                =   "1"
-                                           MOVE    3           TO  IDX
+                                           MOVE    3       TO  IDX
                                        ELSE
-                                           MOVE    4           TO  IDX
+                                           MOVE    4       TO  IDX
                                        END-IF
                                    ELSE
                                        MOVE    3           TO  IDX
