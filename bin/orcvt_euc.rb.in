@@ -1,6 +1,7 @@
 #!%RUBY%
 # coding : euc-jp
-require "jcode"
+Encoding.default_external = "euc-jp"
+#require "jcode"
 
 # 半角英数字記号 -> 全角変換(EUC) script for ORCA
 # 
@@ -13,7 +14,7 @@ require "jcode"
 # 01/08/22 by 山本
 # 01/11/05 by 山本 bug fix
 
-$KCODE = "euc"
+#$KCODE = "euc"
 
 $file_path_name = ARGV[0]
 $tgt_csv_no = [16,17,18,19,20]
