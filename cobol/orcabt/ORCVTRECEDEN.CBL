@@ -165,8 +165,8 @@
       *    パラメータ保存
        01  PARA-SAVE.
            03  PARA-05-1               PIC X(02).
-           03  PARA-09-A               PIC X(06).
-           03  PARA-11-A               PIC X(06).
+           03  PARA-09-C               PIC X(06).
+           03  PARA-11-C               PIC X(06).
            03  PARA-HOSPNUM            PIC X(02).
            03  PARA-12-G.
                05  PARA-12-1           PIC X(09)
@@ -592,8 +592,8 @@
            END-IF
       *
            MOVE    PARA-05-1       TO  WRK-RENKETA
-           MOVE    PARA-09-A       TO  WRK-COMMIT
-           MOVE    PARA-11-A       TO  WRK-ERR
+           MOVE    PARA-09-C       TO  WRK-COMMIT
+           MOVE    PARA-11-C       TO  WRK-ERR
       *
       *    ＣＳＶファイル　検索処理
            PERFORM 900-CSV-KENSAKU-SEC
@@ -629,8 +629,8 @@
       *
       *    パラメータチェック処理
            IF    ( PARA-05-1           IS  NUMERIC )   AND
-                 ( PARA-09-A           IS  NUMERIC )   AND
-                 ( PARA-11-A           IS  NUMERIC )
+                 ( PARA-09-C           IS  NUMERIC )   AND
+                 ( PARA-11-C           IS  NUMERIC )
                CONTINUE
            ELSE
                MOVE    1               TO  FLG-CSV
@@ -647,16 +647,16 @@
        101-PARA-GET1-SEC           SECTION.
       *
            EVALUATE                PARA-DATKBN
-               WHEN  "01-A"
+               WHEN  "01-C"
                    MOVE  PARA-DATA     TO  ASS-CSV
-               WHEN  "02-A"
+               WHEN  "02-C"
                    MOVE  PARA-DATA     TO  ASS-ERR
                WHEN  "05-1"
                    MOVE  PARA-DATA     TO  PARA-05-1
-               WHEN  "09-A"
-                   MOVE  PARA-DATA     TO  PARA-09-A
-               WHEN  "11-A"
-                   MOVE  PARA-DATA     TO  PARA-11-A
+               WHEN  "09-C"
+                   MOVE  PARA-DATA     TO  PARA-09-C
+               WHEN  "11-C"
+                   MOVE  PARA-DATA     TO  PARA-11-C
                WHEN    "HN"
                    MOVE    PARA-DATA   TO  PARA-HOSPNUM
                WHEN    OTHER
