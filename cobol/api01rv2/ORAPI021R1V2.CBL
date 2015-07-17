@@ -1866,9 +1866,9 @@
       *    ÍÑË¡¥³¡¼¥É
            IF      SRY-SRYCD (IDXA)(1:3)   =   "001"
                MOVE    SPACE               TO  WRK-HZN-NAME
-               STRING     "¡Ì"             DELIMITED   BY  SIZE
+               STRING     "¡Ú"             DELIMITED   BY  SIZE
                           WRK-TNS-NAME     DELIMITED   BY  "    "
-                          "¡Í"             DELIMITED   BY  SIZE
+                          "¡Û"             DELIMITED   BY  SIZE
                           INTO             WRK-HZN-NAME
                END-STRING
                MOVE    WRK-HZN-NAME        TO  WRK-TNS-NAME
