@@ -1141,12 +1141,28 @@
            END-IF
       *    ¥µº‘»÷πÊ
            MOVE    SPA-PTNUM           TO  HC03-KNJNO
-      *    ¥µº‘•´• ÃææŒ
-           IF    ( TPARA-KANANAME      =   "1" )
-               MOVE    PTINF-KANANAME  TO  HC03-KANANAME
+      *
+      *    •´• ÃææŒ
+      *    ÃææŒ
+           IF    ( SYU-SRYYMD             >=   CONST-H200401 )
+            AND  ( SPA-NAME (31:)      NOT =   SPACE )
+      *
+               MOVE    PTINF-KANANAME
+                                       TO  HC03-KANANAME2
+               MOVE    SPA-NAME        TO  HC03-KNJNAMW2
+           ELSE
+               MOVE    PTINF-KANANAME
+                                       TO  HC03-KANANAME
+               MOVE    SPA-NAME        TO  HC03-KNJNAMW
            END-IF
-      *    ¥µº‘ÃææŒ
-           MOVE    SPA-NAME            TO  HC03-KNJNAMW
+      *
+           IF    ( TPARA-KANANAME      =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  HC03-KANANAME
+                                           HC03-KANANAME2
+           END-IF
+      *
       *     ›∏±ºÔ Ã
            MOVE    WRK-HKNCOMBIMEI TO  HC03-HOKEN
       *    …È√¥≥‰πÁ
@@ -1610,6 +1626,8 @@
            MOVE  HC03-SRYYMD       TO  HC03V01-SRYYMD
            MOVE  HC03-KANANAME     TO  HC03V01-KANANAME
            MOVE  HC03-KNJNAMW      TO  HC03V01-KNJNAMW
+           MOVE  HC03-KANANAME2    TO  HC03V01-KANANAME2
+           MOVE  HC03-KNJNAMW2     TO  HC03V01-KNJNAMW2
            MOVE  HC03-KNJNO        TO  HC03V01-KNJNO
            MOVE  HC03-MIDASI       TO  HC03V01-MIDASI
            MOVE  HC03-HAKYMD       TO  HC03V01-HAKYMD
@@ -1693,6 +1711,8 @@
            MOVE  HC03-SRYYMD       TO  HC03V02-SRYYMD
            MOVE  HC03-KANANAME     TO  HC03V02-KANANAME
            MOVE  HC03-KNJNAMW      TO  HC03V02-KNJNAMW
+           MOVE  HC03-KANANAME2    TO  HC03V02-KANANAME2
+           MOVE  HC03-KNJNAMW2     TO  HC03V02-KNJNAMW2
            MOVE  HC03-KNJNO        TO  HC03V02-KNJNO
            MOVE  HC03-MIDASI       TO  HC03V02-MIDASI
            MOVE  HC03-HAKYMD       TO  HC03V02-HAKYMD

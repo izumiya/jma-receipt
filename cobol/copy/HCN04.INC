@@ -61,3 +61,7 @@
                         PIC X(30).
             02  HCN04-CHUI
                         PIC X(100).
+            02  HCN04-KANANAME2
+                        PIC X(50).
+            02  HCN04-NAME2
+                        PIC X(50).
