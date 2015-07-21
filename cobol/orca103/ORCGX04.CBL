@@ -4629,6 +4629,7 @@
                IF    ( SPA-GMN-BYOLST-MAX  >   ZERO )
                  OR  ( SPA-GMN-NYUGAIKBN   =   "0" )
                  OR  ( SPA-GMN-TEKBYOKBN   =   "1" OR "2" )
+                 OR  ( SPA-X06-MAX         >   ZERO )
                        CONTINUE
                ELSE
                    MOVE    "0108"      TO  SPA-ERRCD
@@ -4880,6 +4881,7 @@
                IF    ( SPA-MST-MAX         >   ZERO )
                 OR   ( SPA-GMN-NYUGAIKBN   =   "0" )
                 OR   ( SPA-GMN-TEKBYOKBN   =   "1" )
+                OR   ( SPA-X06-MAX         >   ZERO )
       *
                    INITIALIZE                  CHKSND-REC
                    MOVE    SPA-X01-CHKKBN      TO  CHKSND-CHKKBN
