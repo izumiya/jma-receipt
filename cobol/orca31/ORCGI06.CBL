@@ -7989,6 +7989,8 @@
            MOVE    ZERO            TO  FLG-ROUJIN
                                        FLG-LIFE-RJN
       *
+           PERFORM 31011-ROUJIN-CHK-SEC
+      *
            INITIALIZE                  ORCSAGECHKAREA
            MOVE    SPA-HOSPNUM          TO  AGECHK-HOSPNUM
            MOVE    SPA-NAI-PTID        TO  AGECHK-PTID
@@ -8009,11 +8011,13 @@
                EVALUATE    TRUE
                WHEN  ( SPA-NAI-KJNYMD         >=  CONST-H200401 )
                    IF    ( AGECHK-NENREI2-YY  >=  65 )
+                    OR   ( FLG-RJN             =  1 )
                        MOVE    1           TO  FLG-LIFE-RJN
                    END-IF
                WHEN  ( SPA-NAI-KJNYMD         >=  CONST-H181001 )
                    MOVE    FLG-ROUJIN      TO  FLG-LIFE-RJN
-                   IF    ( AGECHK-NENREI2-YY   >=  70 )
+                   IF    ( AGECHK-NENREI2-YY  >=  70 )
+                    OR   ( FLG-RJN             =  1 )
                        MOVE    1           TO  FLG-LIFE-RJN
                    END-IF
                END-EVALUATE

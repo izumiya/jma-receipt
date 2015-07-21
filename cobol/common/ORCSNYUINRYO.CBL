@@ -516,7 +516,8 @@
       *
                EVALUATE    TRUE
                WHEN  ( SNYUINRYO-SRYYMD   >=  CONST-H200401 )
-                   IF    ( AGECHK-NENREI  >=  65 )
+                   IF    ( FLG-KOKI        =   1  ) 
+                    OR   ( AGECHK-NENREI  >=  65 )
                        MOVE    1           TO FLG-LIFE-RJN
                    END-IF
                WHEN  ( SNYUINRYO-SRYYMD  >=  CONST-H181001 )
