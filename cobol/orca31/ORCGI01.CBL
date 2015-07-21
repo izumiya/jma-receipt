@@ -17380,8 +17380,10 @@
                WHEN  ( WRK-AGECHK-SRYYMD   >=  CONST-H200401 )
       *
                    IF    ( AGECHK-NENREI   >=   65 )
+                    OR   ( FLG-ROUJIN       =   1 )
                        MOVE    1        TO  FLG-LIFE-RJN
                    END-IF
+      *
                WHEN  ( WRK-AGECHK-SRYYMD   >=  CONST-H181001 )
       *
                    MOVE    FLG-RJN      TO  FLG-LIFE-RJN
