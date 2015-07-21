@@ -57,3 +57,5 @@
                         PIC X(100).
             02  HCM04-FUTAN
                         PIC X(10).
+            02  HCM04-NAME2
+                        PIC X(50).

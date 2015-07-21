@@ -1104,7 +1104,11 @@
                MOVE    SPA-KANANAME    TO  HCM04-KANANAME
            END-IF
       *    ¥µº‘ÃææŒ
-           MOVE    SPA-NAME            TO  HCM04-NAME
+           IF    ( SPA-NAME (31:)  NOT =   SPACE )
+               MOVE    SPA-NAME        TO  HCM04-NAME2
+           ELSE
+               MOVE    SPA-NAME        TO  HCM04-NAME
+           END-IF
       *     ›∏±ºÔ Ã
            MOVE    WRK-HKNCOMBIMEI     TO  HCM04-HOKEN
       *    …È√¥≥‰πÁ
@@ -2301,7 +2305,11 @@
                MOVE    SPA-KANANAME    TO  HCM04A5-KANANAME
            END-IF
       *    ¥µº‘ÃææŒ
-           MOVE    SPA-NAME            TO  HCM04A5-NAME
+           IF    ( SPA-NAME (31:)  NOT =   SPACE )
+               MOVE    SPA-NAME        TO  HCM04A5-NAME2
+           ELSE
+               MOVE    SPA-NAME        TO  HCM04A5-NAME
+           END-IF
       *     ›∏±ºÔ Ã
            MOVE    WRK-HKNCOMBIMEI     TO  HCM04A5-HOKEN
       *    …È√¥≥‰πÁ

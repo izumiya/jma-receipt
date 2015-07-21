@@ -807,18 +807,26 @@
                                        TO  HCN03-KNJNO
       *
       *    ¥«¥Ê»áÌ¾
-           IF    ( TPARA-KANANAME      =   "1" )
-               MOVE    PTINF-KANANAME
-                                       TO  HCN03-KANANAME
-           END-IF
-      *
       *    ´µ¼ÔÌ¾¾Î
            IF    ( SYU-SRYYMD         >=   CONST-H200401 )
-               MOVE    PTINF-NAME
-                                       TO  HCN03-KNJNAMW
+               IF    ( PTINF-NAME (31:)
+                                   NOT =   SPACE )
+                   MOVE    PTINF-NAME      TO  HCN03-KNJNAMW2
+                   MOVE    PTINF-KANANAME  TO  HCN03-KANANAME2
+                ELSE
+                   MOVE    PTINF-NAME      TO  HCN03-KNJNAMW
+                   MOVE    PTINF-KANANAME  TO  HCN03-KANANAME
+                END-IF
            ELSE
-               MOVE    PTINF-NAME
-                                       TO  HCN03-DKNJNAMW
+               MOVE    PTINF-NAME      TO  HCN03-DKNJNAMW
+               MOVE    PTINF-KANANAME  TO  HCN03-KANANAME
+           END-IF
+      *
+           IF    ( TPARA-KANANAME      =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  HCN03-KANANAME
+                                           HCN03-KANANAME2
            END-IF
       *
            IF    ( TPARA-ROOMKBN       =   "1" )
@@ -1393,6 +1401,8 @@
            MOVE    HCN03-KANANAME          TO  HCN03V01-KANANAME
            MOVE    HCN03-KNJNAMW           TO  HCN03V01-KNJNAMW
            MOVE    HCN03-DKNJNAMW          TO  HCN03V01-DKNJNAMW
+           MOVE    HCN03-KNJNAMW2          TO  HCN03V01-KNJNAMW2
+           MOVE    HCN03-KANANAME2         TO  HCN03V01-KANANAME2
            MOVE    HCN03-KNJNO             TO  HCN03V01-KNJNO
            MOVE    HCN03-ROOM              TO  HCN03V01-ROOM
            MOVE    HCN03-HOKEN             TO  HCN03V01-HOKEN
@@ -1473,6 +1483,8 @@
            MOVE    HCN03-KANANAME          TO  HCN03V02-KANANAME
            MOVE    HCN03-KNJNAMW           TO  HCN03V02-KNJNAMW
            MOVE    HCN03-DKNJNAMW          TO  HCN03V02-DKNJNAMW
+           MOVE    HCN03-KNJNAMW2          TO  HCN03V02-KNJNAMW2
+           MOVE    HCN03-KANANAME2         TO  HCN03V02-KANANAME2
            MOVE    HCN03-KNJNO             TO  HCN03V02-KNJNO
            MOVE    HCN03-ROOM              TO  HCN03V02-ROOM
            MOVE    HCN03-HOKEN             TO  HCN03V02-HOKEN

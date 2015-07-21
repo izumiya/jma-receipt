@@ -929,7 +929,11 @@
                MOVE    SPA-KANANAME    TO  HCM03V04-KANANAME
            END-IF
       *    ¥µº‘ÃææŒ
-           MOVE    SPA-NAME            TO  HCM03V04-NAME
+           IF    ( SPA-NAME (31:)  NOT =   SPACE )
+               MOVE    SPA-NAME        TO  HCM03V04-NAME2
+           ELSE
+               MOVE    SPA-NAME        TO  HCM03V04-NAME
+           END-IF
       *     ›∏±ºÔ Ã
            MOVE    WRK-HEAD-HKNCOMBIMEI     TO  HCM03V04-HOKEN
       *    …È√¥≥‰πÁ

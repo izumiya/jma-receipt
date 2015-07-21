@@ -2245,12 +2245,24 @@
            MOVE    WRK-HEAD-SRYKA-MEI  TO  HCN04-SRYKANAME
       *    ¥µº‘»÷πÊ
            MOVE    ORCHCN04-PTNUM      TO  HCN04-PTNUM
+      *
       *    •´• ª·Ãæ
-           IF    ( PARA-KANANAME       =   "1" )
-               MOVE    SPA-KANANAME    TO  HCN04-KANANAME
-           END-IF
       *    ¥µº‘ÃææŒ
-           MOVE    ORCHCN04-NAME       TO  HCN04-NAME
+           IF    ( ORCHCN04-NAME (31:) NOT =    SPACE )
+               MOVE    SPA-KANANAME    TO  HCN04-KANANAME2
+               MOVE    ORCHCN04-NAME   TO  HCN04-NAME2
+           ELSE
+               MOVE    SPA-KANANAME    TO  HCN04-KANANAME
+               MOVE    ORCHCN04-NAME   TO  HCN04-NAME
+           END-IF
+      *
+           IF    ( PARA-KANANAME       =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  HCN04-KANANAME
+                                           HCN04-KANANAME2
+           END-IF
+      *
       *     ›∏±ºÔ Ã
            MOVE    WRK-HEAD-HKNCOMBIMEI    TO  HCN04-HOKEN
       *    …È√¥≥‰πÁ
