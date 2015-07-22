@@ -2691,7 +2691,7 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "K007"
-                   STRING  "煞屢〞た爛泔管慫恓棟咥恔反ㄣ畸ゥ動嫦及"
+                   STRING  "煞屢〞た爛泔管慫恓棟咥恔反ㄣ畸杴動嫦及"
                            "遙爛卞庍凳仄化票今中﹝"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
