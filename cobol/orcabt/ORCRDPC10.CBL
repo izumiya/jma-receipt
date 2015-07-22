@@ -500,6 +500,7 @@
            03  WRK-KZM-SURYO-R         REDEFINES  WRK-KZM-SURYO.
                05  WRK-KZM-SURYO-S1    PIC 9(05).
                05  WRK-KZM-SURYO-S2    PIC 9(05).
+           03  WRK-30M-SURYO           PIC 9(05)V9(5).
       *
       *    保険履歴編集（適用欄）
            03  WRK-HKN-RIREKI-AREA.
@@ -727,6 +728,7 @@
                05  TBL-HEIMA-SURYO              PIC 9(08)V9(5).
                05  TBL-HEIMA-ZAN-SURYO          PIC 9(08)V9(5).
                05  TBL-HEIMA-COM-SURYO          PIC 9(08)V9(5).
+               05  TBL-HEIMA-30M-SURYO          PIC 9(08)V9(5).
       *
       *    診療行為データ用テーブル（告示等識別区分による記録順）
        01  WRK-KOUI-TAIHI-AREA.
@@ -3647,23 +3649,31 @@
                COMPUTE TBL-HEIMA-TOT-SURYO  =  TBL-HEIMA-TOT-SURYO
                                             -  WRK-KZM-SURYO
              END-IF
+             MOVE    TBL-HEIMA-ZAN-SURYO (IDXW)
+                                       TO  TBL-HEIMA-30M-SURYO (IDXW)
            END-PERFORM
       *    30分以下を寄せ集め
            PERFORM UNTIL   ( TBL-HEIMA-TOT-SURYO = ZERO )
              MOVE    ZERO              TO  WRK-HEIMA-IDX
              MOVE    ZERO              TO  WRK-KZM-SURYO
+             MOVE    ZERO              TO  WRK-30M-SURYO
+      *      数量の多い順になるのでここで一番多いのを決める
              PERFORM VARYING IDXW FROM 1  BY  1
                      UNTIL   ( IDXW > TBL-HEIMA-MAX )
-               IF    TBL-HEIMA-ZAN-SURYO (IDXW) >  WRK-KZM-SURYO
+               IF   (TBL-HEIMA-30M-SURYO (IDXW) >  WRK-30M-SURYO)  AND
+                    (TBL-HEIMA-ZAN-SURYO (IDXW) >  ZERO         )
                  MOVE    IDXW              TO  WRK-HEIMA-IDX
                  MOVE    TBL-HEIMA-ZAN-SURYO (IDXW)
                                            TO  WRK-KZM-SURYO
+                 MOVE    TBL-HEIMA-30M-SURYO (IDXW)
+                                           TO  WRK-30M-SURYO
                END-IF
              END-PERFORM
              IF      WRK-HEIMA-IDX   NOT =   ZERO
                    MOVE    TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
                                           TO  WRK-KZM-SURYO
                    MOVE    ZERO  TO  TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
+                   MOVE    ZERO  TO  TBL-HEIMA-30M-SURYO (WRK-HEIMA-IDX)
              END-IF
       **     DISPLAY " "
       **     DISPLAY "WRK-HEIMA-IDX = " WRK-HEIMA-IDX
