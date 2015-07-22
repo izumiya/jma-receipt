@@ -425,6 +425,7 @@
            03  WRK-KZM-SURYO-R         REDEFINES  WRK-KZM-SURYO.
                05  WRK-KZM-SURYO-S1    PIC 9(05).
                05  WRK-KZM-SURYO-S2    PIC 9(05).
+           03  WRK-30M-SURYO           PIC 9(05)V9(5).
       *
       *    保険履歴編集（適用欄）
            03  WRK-HKN-RIREKI-AREA.
@@ -652,6 +653,7 @@
                05  TBL-HEIMA-SURYO              PIC 9(08)V9(5).
                05  TBL-HEIMA-ZAN-SURYO          PIC 9(08)V9(5).
                05  TBL-HEIMA-COM-SURYO          PIC 9(08)V9(5).
+               05  TBL-HEIMA-30M-SURYO          PIC 9(08)V9(5).
       *
       *    診療行為データ用テーブル（告示等識別区分による記録順）
        01  WRK-KOUI-TAIHI-AREA.
@@ -3174,26 +3176,46 @@
                COMPUTE TBL-HEIMA-TOT-SURYO  =  TBL-HEIMA-TOT-SURYO
                                             -  WRK-KZM-SURYO
              END-IF
+             MOVE    TBL-HEIMA-ZAN-SURYO (IDXW)
+                                       TO  TBL-HEIMA-30M-SURYO (IDXW)
            END-PERFORM
+      **     DISPLAY "30m before " TBL-KOUI-SRYCD (1) " ZAN:COM:30M(1) "
+      **             TBL-HEIMA-ZAN-SURYO(1) " : "
+      **             TBL-HEIMA-COM-SURYO(1) " : "
+      **             TBL-HEIMA-30M-SURYO(1)
+      **     DISPLAY "30m before " TBL-KOUI-SRYCD (2) " ZAN:COM:30M(2) "
+      **             TBL-HEIMA-ZAN-SURYO(2) " : "
+      **             TBL-HEIMA-COM-SURYO(2) " : "
+      **             TBL-HEIMA-30M-SURYO(2)
+      **     DISPLAY "30m before " TBL-KOUI-SRYCD (3) " ZAN:COM:30M(3) "
+      **             TBL-HEIMA-ZAN-SURYO(3) " : "
+      **             TBL-HEIMA-COM-SURYO(3) " : "
+      **             TBL-HEIMA-30M-SURYO(3)
       *    30分以下を寄せ集め
            PERFORM UNTIL   ( TBL-HEIMA-TOT-SURYO = ZERO )
              MOVE    ZERO              TO  WRK-HEIMA-IDX
              MOVE    ZERO              TO  WRK-KZM-SURYO
+             MOVE    ZERO              TO  WRK-30M-SURYO
+      *      数量の多い順になるのでここで一番多いのを決める
              PERFORM VARYING IDXW FROM 1  BY  1
                      UNTIL   ( IDXW > TBL-HEIMA-MAX )
-               IF    TBL-HEIMA-ZAN-SURYO (IDXW) >  WRK-KZM-SURYO
+               IF   (TBL-HEIMA-30M-SURYO (IDXW) >  WRK-30M-SURYO)  AND
+                    (TBL-HEIMA-ZAN-SURYO (IDXW) >  ZERO         )
                  MOVE    IDXW              TO  WRK-HEIMA-IDX
                  MOVE    TBL-HEIMA-ZAN-SURYO (IDXW)
                                            TO  WRK-KZM-SURYO
+                 MOVE    TBL-HEIMA-30M-SURYO (IDXW)
+                                           TO  WRK-30M-SURYO
                END-IF
              END-PERFORM
              IF      WRK-HEIMA-IDX   NOT =   ZERO
                    MOVE    TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
                                           TO  WRK-KZM-SURYO
                    MOVE    ZERO  TO  TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
+                   MOVE    ZERO  TO  TBL-HEIMA-30M-SURYO (WRK-HEIMA-IDX)
              END-IF
-      **     DISPLAY " "
-      **     DISPLAY "WRK-HEIMA-IDX = " WRK-HEIMA-IDX
+      **       DISPLAY " "
+      **       DISPLAY "WRK-HEIMA-IDX = " WRK-HEIMA-IDX
              PERFORM VARYING IDXW FROM 1  BY  1
                      UNTIL   ( IDXW > TBL-HEIMA-MAX )
                         OR   ( WRK-HEIMA-IDX = ZERO )
@@ -3210,7 +3232,7 @@
                        END-IF
                      END-IF
                    END-PERFORM
-      **     DISPLAY "IDW = " IDW
+      **       DISPLAY "IDW = " IDW
                    COMPUTE WRK-HEIMA-SURYO =  30  -  WRK-KZM-SURYO
                    IF      TBL-HEIMA-ZAN-SURYO (IDW) < WRK-HEIMA-SURYO
                        COMPUTE WRK-KZM-SURYO =  WRK-KZM-SURYO
@@ -3230,12 +3252,18 @@
                                  +  WRK-KZM-SURYO
              COMPUTE TBL-HEIMA-TOT-SURYO  =  TBL-HEIMA-TOT-SURYO
                                           -   WRK-KZM-SURYO
-      **     DISPLAY "ZAN:COM(1) " TBL-HEIMA-ZAN-SURYO(1)
-      **                           TBL-HEIMA-COM-SURYO(1)
-      **     DISPLAY "ZAN:COM(2) " TBL-HEIMA-ZAN-SURYO(2)
-      **                           TBL-HEIMA-COM-SURYO(2)
-      **     DISPLAY "ZAN:COM(3) " TBL-HEIMA-ZAN-SURYO(3)
-      **                           TBL-HEIMA-COM-SURYO(3)
+      **       DISPLAY TBL-KOUI-SRYCD (1) " ZAN:COM:30M(1) "
+      **               TBL-HEIMA-ZAN-SURYO(1) " : "
+      **               TBL-HEIMA-COM-SURYO(1) " : "
+      **               TBL-HEIMA-30M-SURYO(1)
+      **       DISPLAY TBL-KOUI-SRYCD (2) " ZAN:COM:30M(2) "
+      **               TBL-HEIMA-ZAN-SURYO(2) " : "
+      **               TBL-HEIMA-COM-SURYO(2) " : "
+      **               TBL-HEIMA-30M-SURYO(2)
+      **       DISPLAY TBL-KOUI-SRYCD (3) " ZAN:COM:30M(3) "
+      **               TBL-HEIMA-ZAN-SURYO(3) " : "
+      **               TBL-HEIMA-COM-SURYO(3) " : "
+      **               TBL-HEIMA-30M-SURYO(3)
            END-PERFORM
            MOVE    ZERO                TO  WRK-HEIMA-IDX
            .
