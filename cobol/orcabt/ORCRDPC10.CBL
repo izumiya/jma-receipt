@@ -4874,11 +4874,11 @@
            PERFORM 900-TENSU-READ-SEC
            MOVE    TNS-NAME            TO  WRK-FEDT-NAME
            MOVE    2                   TO  WRK-FEDT-KBNNUM-FLG
-      **** IF      LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
-      ****                             =   "97"
-      ****     MOVE    SPACE           TO  WRK-KBNNUM-EDIT
+           IF      LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
+                                       =   "97"
+               MOVE    SPACE           TO  WRK-KBNNUM-EDIT
                MOVE    3               TO  WRK-FEDT-KBNNUM-FLG
-      **** END-IF
+           END-IF
       *退院年月日から順序番号まで
            PERFORM 200799-ZAI-HENSYU-1-SEC
       *行為明細番号から診療行為名称まで
