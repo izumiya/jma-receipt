@@ -77,7 +77,6 @@
       *  04.07.03    NACL-藤原    13/09/05  病名の補足コメント対応
       *  04.07.04    NACL-藤原    13/10/08  病名更新時のuserid 設定
       *  04.07.05    NACL-藤原    14/09/26  返却情報の強化対応
-      *  04.07.06    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2792,10 +2791,6 @@
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  BYOMEI-REC
                    MOVE    ZERO                TO  FLG-BYOMEI
-                   IF      BYO-HKNSKYKBN   =   1
-                       MOVE    1               TO  FLG-BYOMEI
-                       INITIALIZE                  BYOMEI-REC
-                   END-IF  
                ELSE
                    MOVE    1                   TO  FLG-BYOMEI
                    INITIALIZE                  BYOMEI-REC

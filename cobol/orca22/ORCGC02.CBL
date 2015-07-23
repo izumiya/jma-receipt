@@ -315,7 +315,6 @@
       *  04.07.16    NACL-藤原    15/04/24  疾患区分を外した自院病名入力
       *                                     時の疾患区分の表示の修正
       *  04.07.17    NACL-藤原    15/06/19  診療科表示件数の変更
-      *  04.07.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -925,7 +924,7 @@
                                            SPA-C02-CHANGE-AREA
                                            SPA-C02-HAISI-AREA
                                            SPA-ERRCD
-                                           WRK-HAISIYMDH
+                                           WRK-HAISIYMDH                                           
       *
                IF      SPA-C02-BYOSET-INDEX-MAX
                                        >   ZERO
@@ -936,17 +935,9 @@
                    OR    ( SPA-ERRCD       NOT =   SPACE )
                        CONTINUE
                    ELSE
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                               =   99
-                           MOVE    ZERO        TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                           PERFORM 41021-BYOMEICD-HENSYU-SEC
-                           MOVE    SPACE       TO  SPA-ERRCD
-                       ELSE
-                           ADD     1           TO  SPA-GMN-C02-CUR
-                           IF      SPA-GMN-C02-CUR >   7
-                               MOVE    9           TO  SPA-GMN-C02-CUR
-                           END-IF
+                       ADD     1               TO  SPA-GMN-C02-CUR
+                       IF      SPA-GMN-C02-CUR >   7
+                           MOVE    9               TO  SPA-GMN-C02-CUR
                        END-IF
                    END-IF
       *            画面編集
@@ -1266,16 +1257,9 @@
                        OR    ( SPA-ERRCD       NOT =   SPACE )
                            GO  TO  300-SCREEN-EXT
                        END-IF
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                               =   99
-                           MOVE    ZERO        TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                           PERFORM 41021-BYOMEICD-HENSYU-SEC
-                           MOVE    SPACE       TO  SPA-ERRCD
-                       END-IF
-                   ELSE
-                       PERFORM 41021-BYOMEICD-HENSYU-SEC
                    END-IF
+      *
+                   PERFORM 41021-BYOMEICD-HENSYU-SEC
       *     
                    INITIALIZE                  SPA-CIDCD-AREA
                                                SPA-CID1-AREA
@@ -1774,7 +1758,6 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
                            "）"                DELIMITED   BY  SIZE
                                                INTO
                                                SPA-GMN-C02-KOHIDL (IDX)
-                   END-STRING
                END-IF
       *
                MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
@@ -3402,21 +3385,13 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                        OR    ( SPA-ERRCD       NOT =   SPACE )
                            GO  TO  370-CID6-SET-EXT
                        END-IF
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                               =   99
-                           MOVE    ZERO        TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                           INITIALIZE              SPA-C02-HAISI-AREA
-                           PERFORM 41021-BYOMEICD-HENSYU-SEC
-                           MOVE    SPACE       TO  SPA-ERRCD
-                       END-IF
                    ELSE
                        COMPUTE SPA-GMN-C02-CUR =   SPA-C02-IKOSAKI-INDEX
                                                +   1
-      * 
-                       INITIALIZE                  SPA-C02-HAISI-AREA
-                       PERFORM 41021-BYOMEICD-HENSYU-SEC
                    END-IF
+      * 
+                   INITIALIZE                  SPA-C02-HAISI-AREA
+                   PERFORM 41021-BYOMEICD-HENSYU-SEC
            END-EVALUATE
       *     
            INITIALIZE                  SPA-CIDCD-AREA
@@ -4883,14 +4858,8 @@ grpsys                 MOVE    SPA-HOSPNUM TO  USBYO-HOSPNUM
                        OR      SPA-ERRCD
                                    NOT =   SPACE
                    IF      SPA-NAI-C02-BYOMEI-O (IDZ IDXX)
-                                                =   "■■■"
-                       MOVE    "0091"          TO  SPA-ERRCD
-                       IF      SPA-GMN-C02-BYOMEICD (1)
-                                            NOT =   SPACE
-                           COMPUTE SPA-GMN-C02-CUR  =   IDZ +   1
-                       ELSE
-                           MOVE    8                TO  SPA-GMN-C02-CUR
-                       END-IF
+                                               =   "■■■"
+                       MOVE    "0091"        TO  SPA-ERRCD
                    END-IF
                END-PERFORM       
            END-PERFORM       
@@ -5895,7 +5864,7 @@ grpsys                         MOVE    SPA-HOSPNUM
                        MOVE    SPA-GMN-C02-BYOMEICD   (IDW)
                                        TO  SPA-GMN-C02-BYOMEICD   (IDX)
                    END-IF                     
-               END-PERFORM
+               END-PERFORM                           
            ELSE
       *        ７桁入力のときは病名マスタ、以外は自院病名マスタを先に読み込む
                IF         WRK-LENGTH       =   7
@@ -5986,9 +5955,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                    IF      FLG-USERBYOMEI      =   ZERO
                        PERFORM 41025-USERBYOMEICD-CHK-SEC
                        IF      FLG-USERBYOMEI-CHK  =   ZERO
-                           IF      SPA-ERRCD           =   "0091"
-                               PERFORM 41021-BYOMEICD-HENSYU-SEC
-                           END-IF
                            GO  TO  4102-BYOMEICD-CHK-EXT
                        END-IF
                    ELSE
@@ -6010,7 +5976,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                                                    TO  MCPDATA-REC
                                PERFORM 900-BYOMEIINPUTSET-READ-SEC
                                IF      FLG-BYOMEIINPUTSET  =   ZERO
-                                   MOVE    SPACE       TO  SPA-ERRCD
                                    IF      SPA-GMN-C02-BANGO   =   ZERO
                                        PERFORM
                                           41026-BYOMEIINPUTSET-CHECK-SEC
@@ -6786,8 +6751,7 @@ grpsys                         MOVE    SPA-HOSPNUM
       *****************************************************************
        41026-BYOMEIINPUTSET-CHECK-SEC SECTION.
       *
-           INITIALIZE                  SPA-CIDCD-AREA
-                                       SPA-CID1-AREA
+           MOVE    SPACE               TO  SPA-ERRCD
       *
            INITIALIZE                  SPA-C02-BYOSET-INDEX-AREA
       *
@@ -6898,11 +6862,6 @@ grpsys                         MOVE    SPA-HOSPNUM
       *****************************************************************
        410261-BYOMEIINPUTSET-HENSYU-SEC  SECTION.
       *
-           IF      SPA-C02-BYOSET-INDEX-MAX
-                                           =   99
-               GO  TO  410261-BYOMEIINPUTSET-HENSYU-EXT
-           END-IF
-      *
            PERFORM VARYING IDWW    FROM    1   BY  1
                    UNTIL   IDWW    >       6
                IF      SPA-C02-BYOSET-BYOMEIINPUTCD (IDWW)
@@ -6920,9 +6879,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                                        TO  SPA-GMN-C02-BYOMEICD (IDZ)
                                            SPA-NAI-C02-BYOMEICD (IDZ)
       *
-                   MOVE    SPACE       TO  SPA-C02-BYOSET-BYOMEIINPUTCD
-                                                             (IDWW)
-      *
                    MOVE    IDZ         TO  SPA-C02-BYOSET-INDEX-ED
       *
       *            自院病名検索
@@ -6933,15 +6889,11 @@ grpsys                         MOVE    SPA-HOSPNUM
                    PERFORM 410112-USERBYOMEI-HENSYU-SEC
                    IF      FLG-USERBYOMEI  =   ZERO
                        PERFORM 41025-USERBYOMEICD-CHK-SEC
-                   ELSE
-                       MOVE    "0053"          TO  SPA-ERRCD
                    END-IF
+      *
+                   MOVE    SPACE       TO  SPA-C02-BYOSET-BYOMEIINPUTCD
+                                                             (IDWW)
                    IF      FLG-USERBYOMEI-CHK  =   ZERO
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                                   =   IDWW
-                           MOVE    99          TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                       END-IF
                        GO  TO  410261-BYOMEIINPUTSET-HENSYU-EXT
                    END-IF
       *
@@ -6953,11 +6905,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                        PERFORM 500-BYOMEI-KENSAKU-SEC
                    END-IF
                    IF      SPA-CIDCD6      NOT =   SPACE
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                                   =   IDWW
-                           MOVE    99          TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                       END-IF
                        GO  TO  410261-BYOMEIINPUTSET-HENSYU-EXT
                    END-IF
       *
@@ -6966,11 +6913,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                    COMPUTE SPA-GMN-C02-CUR     =   IDZ +   1
       *
                    IF      SPA-ERRCD           =   "0075"
-                       IF      SPA-C02-BYOSET-INDEX-MAX
-                                                   =   IDWW
-                           MOVE    99          TO
-                                               SPA-C02-BYOSET-INDEX-MAX
-                       END-IF
                        GO  TO  410261-BYOMEIINPUTSET-HENSYU-EXT
                    END-IF
                END-IF
@@ -10337,7 +10279,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
       *    医保と第三者行為のため登録不可とする
            MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
       *
-           .                   
+           .
        45021-HKNCOMBI-DABURI-CHK-EXT.
            EXIT.
       *
@@ -12971,8 +12913,7 @@ grpsys                                          SPA-AREA
                    STRING   WRK-TANDOKUKBN-BYOMEI  DELIMITED  BY  SPACE
                            "は単独使用禁止の病名です"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG
-                   END-STRING
+                                                   INTO    SPA-ERRMSG 
                WHEN    "0077"
                    MOVE
               "病名コードが２２個以上になりますので、編集病名とします。"
@@ -13789,11 +13730,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-BYOMEI
                MOVE    MCPDATA-REC     TO  BYOMEI-REC
-               IF      BYO-HKNSKYKBN   =   1
-                   MOVE    1               TO  FLG-BYOMEI
-                   INITIALIZE                  BYOMEI-REC
-               END-IF  
-          ELSE
+           ELSE
               MOVE    1               TO  FLG-BYOMEI
               INITIALIZE                  BYOMEI-REC
            END-IF

@@ -40,7 +40,6 @@
       *                                     条件修正
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
-      *  04.07.02    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -82,7 +81,7 @@
            03  FLG-SYNONYM         PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
-           03  FLG-ERR             PIC 9(02).
+           03  FLG-ERR             PIC 9(01).
            03  FLG-PRTKBN          PIC 9(01).
       *
       *    カウント領域
@@ -903,28 +902,22 @@
       *        なら未傷病名コードにする
                MOVE    PTBYO-KHNBYOMEICD   TO  BYO-BYOMEICD
                PERFORM 900-BYOMEI-READ-SEC
-               IF      BYO-HKNSKYKBN   =   1
-                   MOVE    10                  TO  FLG-ERR
-               ELSE
-                   MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
-                   IF      WRK-BYO-HAISIYMD    NOT =   SPACE
-                       IF      WRK-BYO-HAISIYMD    <   PTBYO-SRYYMD
-                           IF      WRK-BYO-IKOSAKICD   =   SPACE
-                               MOVE    3                   TO  FLG-ERR
-      *                        推奨病名チェック
-                               INITIALIZE                  SYNONYM-REC
-                               MOVE    WRK-BYO-BYOMEI      TO
-                                                       SYNONYM-BYOMEI
-                               PERFORM 5001-SYNONYM-CHK-SEC
-                               IF      FLG-SYNONYM         =   ZERO
-                                   MOVE    5               TO  FLG-ERR
-                               END-IF
-                           ELSE
-                               MOVE    4                   TO  FLG-ERR
-                               MOVE    WRK-BYO-IKOSAKICD   TO
-                                                           BYO-BYOMEICD
-                               PERFORM 900-BYOMEI-READ-SEC
+               MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
+               IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+                   IF      WRK-BYO-HAISIYMD    <   PTBYO-SRYYMD
+                       IF      WRK-BYO-IKOSAKICD   =   SPACE
+                           MOVE    3                   TO  FLG-ERR
+      *                    推奨病名チェック
+                           INITIALIZE                  SYNONYM-REC
+                           MOVE    WRK-BYO-BYOMEI      TO SYNONYM-BYOMEI
+                           PERFORM 5001-SYNONYM-CHK-SEC
+                           IF      FLG-SYNONYM         =   ZERO
+                               MOVE    5                   TO  FLG-ERR
                            END-IF
+                       ELSE
+                           MOVE    4                   TO  FLG-ERR
+                           MOVE    WRK-BYO-IKOSAKICD   TO  BYO-BYOMEICD
+                           PERFORM 900-BYOMEI-READ-SEC
                        END-IF
                    END-IF
                END-IF
@@ -1065,9 +1058,6 @@
                    MOVE    BYO-BYOMEI          TO  B03-BYOMEI
                WHEN    9
                    MOVE    "●未コード化傷病名コードで登録"
-                                           TO  B02-RIYUU
-               WHEN    10
-                   MOVE    "■保険請求対象外傷病名コードで登録"
                                            TO  B02-RIYUU
            END-EVALUATE
       *
@@ -1290,29 +1280,24 @@
                END-PERFORM         
                MOVE    USBYO-KHNBYOMEICD   TO  BYO-BYOMEICD
                PERFORM 900-BYOMEI-READ-SEC
-               IF      BYO-HKNSKYKBN   =   1
-                   MOVE    10                  TO  FLG-ERR
+               MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
+      *********IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+               IF      WRK-BYO-HAISIYMD        =   SPACE   OR  ALL "9"
+                   CONTINUE
                ELSE
-                   MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
-      *********    IF      WRK-BYO-HAISIYMD    NOT =   SPACE
-                   IF      WRK-BYO-HAISIYMD        =   SPACE   OR
-                                                       ALL "9"
-                       CONTINUE
-                   ELSE
-                       IF      WRK-BYO-IKOSAKICD   =   SPACE
-                           MOVE    3                   TO  FLG-ERR
-      *                    推奨病名チェック
-                           INITIALIZE                  SYNONYM-REC
-                           MOVE    WRK-BYO-BYOMEI  TO  SYNONYM-BYOMEI
-                           PERFORM 5001-SYNONYM-CHK-SEC
-                           IF      FLG-SYNONYM         =   ZERO
-                               MOVE    5                   TO  FLG-ERR
-                           END-IF
-                       ELSE
-                           MOVE    4                   TO  FLG-ERR
-                           MOVE    WRK-BYO-IKOSAKICD   TO  BYO-BYOMEICD
-                           PERFORM 900-BYOMEI-READ-SEC
+                   IF      WRK-BYO-IKOSAKICD   =   SPACE
+                       MOVE    3                   TO  FLG-ERR
+      *                推奨病名チェック
+                       INITIALIZE                  SYNONYM-REC
+                       MOVE    WRK-BYO-BYOMEI      TO  SYNONYM-BYOMEI
+                       PERFORM 5001-SYNONYM-CHK-SEC
+                       IF      FLG-SYNONYM         =   ZERO
+                           MOVE    5                   TO  FLG-ERR
                        END-IF
+                   ELSE
+                       MOVE    4                   TO  FLG-ERR
+                       MOVE    WRK-BYO-IKOSAKICD   TO  BYO-BYOMEICD
+                       PERFORM 900-BYOMEI-READ-SEC
                    END-IF
                END-IF
              END-IF
@@ -1402,9 +1387,6 @@
                    MOVE    BYO-BYOMEI          TO  B014-BYOMEI
                WHEN    9
                    MOVE    "●未コード化傷病名コードで登録"
-                                               TO  B013-RIYUU
-               WHEN    10
-                   MOVE    "■保険請求対象外傷病名コードで登録"
                                                TO  B013-RIYUU
            END-EVALUATE
       *
