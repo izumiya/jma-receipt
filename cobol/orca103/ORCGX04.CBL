@@ -1214,6 +1214,7 @@
       *
            INITIALIZE                    SPA-MST-AREA
       *
+           MOVE    ZERO           TO   FLG-TEMPTBL
            PERFORM 900-CHKSND-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
@@ -1291,6 +1292,7 @@
       *
            PERFORM 31011-BYOLST-SEC
       *
+           MOVE    1                   TO  FLG-TEMPTBL
            PERFORM 900-CHKSND-KEY2-SEL-SEC
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =  ZERO )
@@ -5938,6 +5940,7 @@
            MOVE    SPA-X01-CHKKBN      TO  CHKSND-CHKKBN
            MOVE    SPA-X01-SRYCD       TO  CHKSND-SRYCD
            IF    ( SPA-X01-SEL-STYUKYMD    =    SPACE )
+            OR   ( FLG-TEMPTBL             =    1 )
                MOVE    SPA-X01-STYUKYMD
                                        TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
