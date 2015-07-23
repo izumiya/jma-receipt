@@ -61,7 +61,6 @@
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
-      *  04.07.02    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1466,7 +1465,6 @@ grpsys                                       SPA-AREA
       *
            MOVE    SPACE               TO  C05
       *
-           INITIALIZE                      C05
            MOVE    SPA-GMN-C05-HENBYO      TO  C05-EDITBYOMEI
            MOVE    SPA-GMN-C05-BYOKEN      TO  C05-BYOMEIKEN
            MOVE    SPA-GMN-C05-SELNUM1     TO  C05-SELNUM1
@@ -1629,7 +1627,6 @@ grpsys                                       SPA-AREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID2
-           INITIALIZE                      CID2
            MOVE    WRK-CIDMSG          TO  CID2-MSG
            MOVE    SPA-C05-IKOMOTO-BYOMEICD
                                        TO  CID2-BYOMEICD1
@@ -1904,10 +1901,6 @@ grpsys                                       SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-BYOMEI
                MOVE    MCPDATA-REC     TO  BYOMEI-REC
-               IF      BYO-HKNSKYKBN   =   1
-                   MOVE    1               TO  FLG-BYOMEI
-                   INITIALIZE                  BYOMEI-REC
-               END-IF  
            ELSE
               MOVE    1               TO  FLG-BYOMEI
            END-IF
