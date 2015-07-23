@@ -2091,6 +2091,9 @@
       *     
       *    廃止年月日が設定されているとき廃止年月日＜診療開始日なら
       *    未傷病名コードにする
+      *    保険請求対象外のときは未傷病名コードにする
+      *    保険請求対象外の傷病名コードのみのときはそのまま記録する
+      *
            IF      RECE43-BYOMEIHENFLG =   "1"
                CONTINUE
            ELSE    
@@ -2106,7 +2109,10 @@
                                                    TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
                            IF      BYO-HKNSKYKBN   =   1
-                               MOVE    "1"     TO  RECE43-BYOMEIHENFLG
+                               IF      RECE43-BYOMEICD (2)
+                                                   NOT =   SPACE
+                                   MOVE    "1" TO  RECE43-BYOMEIHENFLG
+                               END-IF
                                MOVE    21      TO  IDX
                            ELSE
                                IF      BYO-HAISIYMD    NOT =   SPACE

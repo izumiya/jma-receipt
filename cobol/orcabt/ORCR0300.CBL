@@ -3459,6 +3459,8 @@ grpsys             OR     ( RECE02-KEY
       *     
       *    廃止年月日が設定されているとき廃止年月日＜診療開始日なら
       *    未傷病名コードにする
+      *    保険請求対象外のときは未傷病名コードにする
+      *    保険請求対象外の傷病名コードのみのときはそのまま記録する
       *
            IF      RECE031-BYOMEIHENFLG =   "1"
                 CONTINUE
@@ -3475,7 +3477,10 @@ grpsys             OR     ( RECE02-KEY
                                                    TO  BYO-BYOMEICD
                            PERFORM 900-BYOMEI-READ-SEC
                            IF      BYO-HKNSKYKBN   =   1
-                               MOVE    "1"     TO  RECE031-BYOMEIHENFLG
+                               IF      RECE031-BYOMEICD (2)
+                                                   NOT =   SPACE
+                                   MOVE    "1" TO  RECE031-BYOMEIHENFLG
+                               END-IF
                                MOVE    21      TO  IDX
                            ELSE
                                IF      BYO-HAISIYMD    NOT =   SPACE
