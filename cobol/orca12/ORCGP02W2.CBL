@@ -128,6 +128,8 @@
       *                                     保険組合せ作成
       *  04.07.08    NACL-門脇    14/11/04  平成２７年１月改正対応
       *                                     （０５４対応）
+      *  04.07.09    NACL-門脇    15/07/23  062Ｂ型肝炎と地方公費の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1464,7 +1466,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF  (WRK-KCOMB-KOH1-HKNKOHSBTKBN(IDX2)  =   "5") OR
                        (WRK-KCOMB-KOH2-HKNKOHSBTKBN(IDX2)  =   "5") OR
                        (WRK-KCOMB-KOH3-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                       (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5")
+                       (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5") OR
+                       (WRK-KCOMB-HKNNUM(IDX2)             = SPACE)
                        CONTINUE
                    ELSE
       *                公費表中より長期高額を検索し、
@@ -4217,7 +4220,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF  (WRK-KCOMB-KOH1-HKNKOHSBTKBN(IDX2)  =   "5") OR
                    (WRK-KCOMB-KOH2-HKNKOHSBTKBN(IDX2)  =   "5") OR
                    (WRK-KCOMB-KOH3-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                   (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5")
+                   (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5") OR
+                   (WRK-KCOMB-HKNNUM(IDX2)             = SPACE)
                    CONTINUE
                ELSE
       *          更生医療・小児特定・マル福がある場合、長期をつける
@@ -4708,10 +4712,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                   (WRK-KCOMB-KOH2HKNNUM (IDX2)
                         = "021" OR "020" OR "091" OR "019" OR
-                          "053" OR "011"                      ))
+                          "053" OR "011" OR "062"             ))
              OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)
                         = "021" OR "020" OR "091" OR "019" OR
-                          "053" OR "011"                       )
+                          "053" OR "011" OR "062"              )
                    MOVE    "3"            TO  WRK-FTN-FLG
              END-IF
            END-IF
