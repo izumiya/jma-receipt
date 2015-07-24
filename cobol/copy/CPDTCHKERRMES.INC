@@ -313,6 +313,12 @@
            05 PIC  X(30)   VALUE   "前の日付で登録されています    ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "050015".
+           05 PIC  X(30)   VALUE   "診療年月に保険請求対象外の病名".
+           05 PIC  X(30)   VALUE   "のみ登録されています          ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
       *
       *    ** 06xxxx 診療開始日
       *                            +---------+---------+---------+.
@@ -815,10 +821,10 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  125.
+           05 ERRMES-OCC   OCCURS  126.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   125.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   126.
 
 
 
