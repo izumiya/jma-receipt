@@ -2970,8 +2970,8 @@
                    MOVE    "2026"      TO  SPA-ERRCD
                WHEN    27
                    MOVE    "2027"      TO  SPA-ERRCD
-               WHEN    28
-                   MOVE    "2028"      TO  SPA-ERRCD
+               WHEN    29
+                   MOVE    "2029"      TO  SPA-ERRCD
                WHEN    101
                    MOVE    "2101"      TO  SPA-ERRCD
                WHEN    OTHER
@@ -4054,7 +4054,7 @@
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
-           WHEN    "2028"
+           WHEN    "2029"
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
