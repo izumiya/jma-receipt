@@ -94,6 +94,7 @@
            03  TSRYKA-OCC                              OCCURS 30.
                05  TSRYKA-PTBYO-CNT1                   PIC 9(05).
                05  TSRYKA-PTBYO-CNT2                   PIC 9(05).
+               05  TSRYKA-HKNTG-CNT                    PIC 9(05).
                05  TSRYKA-PTSYUBYO-CNT                 PIC 9(05).
                05  TSRYKA-SRYKA                        PIC X(02).
                05  TSRYKA-SYOSIN-DAY                   PIC 9(01)

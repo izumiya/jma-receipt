@@ -365,7 +365,6 @@
            03  FLG-PTBYO-ERR                           PIC 9(01).
            03  FLG-PTBYO-MOJI                          PIC 9(01).
            03  FLG-CHK-END                             PIC 9(01).
-           03  FLG-MICODSYOBYO                         PIC 9(01).
            03  FLG-PTBYO-LEN-ERR                       PIC 9(01).
            03  FLG-UTAGAI                              PIC 9(01).
            03  FLG-KYUSEI                              PIC 9(01).
@@ -437,6 +436,7 @@
            03  CNT-PTBYOMEI1                           PIC 9(06).
       *    CNT-PTBYOMEI1から、さらに入外区分、適用期間で絞った件数
            03  CNT-PTBYOMEI2                           PIC 9(06).
+           03  CNT-HKNTG                               PIC 9(06).
            03  CNT-PTSYUBYO                            PIC 9(06).
            03  CNT-BYOMEIMOJI                          PIC 9(06).
            03  CNT-TAISYO                              PIC 9(06).
@@ -1067,6 +1067,11 @@
            COPY    "CPDTCHK013.INC"
                                    REPLACING  //DTCHK013//
                                    BY         //WKDTCHK013//.
+      *
+       01  TPTBYOEX-AREA.
+           03 TPTBYOEX-HAISHIKBN       PIC X(01).
+           03 TPTBYOEX-HKNTGKBN        PIC X(01).
+           03 TPTBYOEX-SHUSHOKUGO-CNT  PIC 9(05).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -6129,6 +6134,8 @@
                                        TO  CNT-PTSYUBYO
                        MOVE    TSRYKA-SRYKA (IDX4)
                                        TO  WRK-SRYKA
+                       MOVE    TSRYKA-HKNTG-CNT (IDX4)
+                                       TO  CNT-HKNTG
                        PERFORM 2001121-PTBYO-TOUROKU-CHK-SEC
                    END-PERFORM
       *
@@ -6219,6 +6226,7 @@
       *
            MOVE    ZERO                TO  CNT-PTBYOMEI1
                                            CNT-PTBYOMEI2
+                                           CNT-HKNTG
                                            CNT-PTSYUBYO
       *
            MOVE    ZERO                TO  FLG-CHK-END
@@ -6227,6 +6235,8 @@
       *
            PERFORM UNTIL ( FLG-PTBYOMEI    NOT =   ZERO )
                     OR   ( FLG-CHK-END     NOT =   ZERO )
+      *
+               PERFORM 2001121-TPTBYOEX-EDIT-SEC
       *
       *        患者病名エラーメッセージ付加情報編集
                MOVE    PTBYO-BYOMEI    TO  WRK-PTBYOMEI
@@ -6448,12 +6458,20 @@
                        COMPUTE TSRYKA-PTSYUBYO-CNT (IDX4)
                            =   TSRYKA-PTSYUBYO-CNT (IDX4)    +   1
                    END-IF
+                   IF    ( TPTBYOEX-HKNTGKBN   =   "1" )
+                       COMPUTE TSRYKA-HKNTG-CNT (IDX4)
+                           =   TSRYKA-HKNTG-CNT (IDX4)    +   1
+                   END-IF
                ELSE
                    COMPUTE CNT-PTBYOMEI2
                        =   CNT-PTBYOMEI2   +   1
                    IF    ( PTBYO-SYUBYOFLG     =   "1" )
                        COMPUTE CNT-PTSYUBYO
                            =   CNT-PTSYUBYO    +   1
+                   END-IF
+                   IF    ( TPTBYOEX-HKNTGKBN   =   "1" )
+                       COMPUTE CNT-HKNTG
+                           =   CNT-HKNTG       +   1
                    END-IF
                END-IF
       *
@@ -6476,6 +6494,51 @@
       *
            .
        2001121-PTBYOMEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者病名チェック付加情報編集処理
+      *****************************************************************
+       2001121-TPTBYOEX-EDIT-SEC       SECTION.
+      *
+           INITIALIZE                  TPTBYOEX-AREA
+      *
+           IF    ( PTBYO-BYOMEICD (1)  =   "0000999" )
+            OR   ( PTBYO-BYOMEIHENFLG  =   "1" )
+               CONTINUE
+           ELSE
+      *
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >       CONST-MKCD-MAX )
+      *
+      *            病名のの廃止年月日が診療開始日よりも前かチェック
+                   IF    ( PTBYO-BYOMEICD(IDX0)    NOT =   SPACE )
+      *
+                       IF    ( PTBYO-BYOMEICD(IDX0) (1:3)  NOT = "ZZZ" )
+                           MOVE    PTBYO-BYOMEICD(IDX0)
+                                           TO  WRK-BYOMEICD
+                           PERFORM 900-BYOMEI-KEY-SEL-SEC
+                           IF    ( BYO-HAISIYMD    <   PTBYO-SRYYMD )
+                               MOVE    "1"     TO  TPTBYOEX-HAISHIKBN
+                           END-IF
+      *
+                           MOVE    BYO-HKNSKYKBN
+                                               TO  TPTBYOEX-HKNTGKBN
+      *
+                       ELSE
+                           COMPUTE TPTBYOEX-SHUSHOKUGO-CNT
+                               =   TPTBYOEX-SHUSHOKUGO-CNT +   1
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( TPTBYOEX-SHUSHOKUGO-CNT >   ZERO )
+                   MOVE    ZERO                TO  TPTBYOEX-HKNTGKBN
+               END-IF
+      *
+           END-IF
+      *
+           .
+       2001121-TPTBYOEX-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    患者病名エラーメッセージ付加情報編集
@@ -6614,8 +6677,7 @@
       *
                    PERFORM 2001121-PTBYO-STRLEN-CHK-SEC
                ELSE
-                   PERFORM 2001121-MICODKA-CHK-SEC
-                   IF    ( FLG-MICODSYOBYO =   1 )
+                   IF    ( TPTBYOEX-HAISHIKBN  =   "1" )
                        PERFORM 2001121-PTBYO-STRLEN-CHK-SEC
                    END-IF
                END-IF
@@ -6741,30 +6803,6 @@
       *
        2001-PTBYO-STRLEN-CHK-EXT.
            EXIT.
-      *****************************************************************
-      *    未コード化傷病名コードチェック処理
-      *****************************************************************
-       2001121-MICODKA-CHK-SEC         SECTION.
-      *
-           MOVE    ZERO                TO  FLG-MICODSYOBYO
-      *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >       21 )
-      *
-      *        病名のの廃止年月日が診療開始日よりも前かチェック
-               IF    ( PTBYO-BYOMEICD(IDX0)    NOT =   SPACE )
-                   IF    ( PTBYO-BYOMEICD(IDX0) (1:3)  NOT =   "ZZZ" )
-                       MOVE    PTBYO-BYOMEICD(IDX0)
-                                           TO  WRK-BYOMEICD
-                       PERFORM 900-BYOMEI-KEY-SEL-SEC
-                       IF    ( BYO-HAISIYMD    <   PTBYO-SRYYMD )
-                           MOVE    1       TO  FLG-MICODSYOBYO
-                       END-IF
-      *
-                       MOVE    21          TO  IDX0
-                   END-IF
-               END-IF
-           END-PERFORM
            .
       *
        2001121-MICODKA-CHK-EXT.
@@ -7028,10 +7066,6 @@
                INITIALIZE              TERRINF-AREA
                PERFORM 214-ERRMES-HEN-SEC
       *
-               IF    ( ORCBSD01-CHKKBN (5) =   "1" )
-                   MOVE    1       TO  FLG-CHKEND (5)
-                   GO  TO  2001121-PTBYO-TOUROKU-CHK-EXT
-               END-IF
            ELSE
                IF    ( CNT-PTBYOMEI2   =   ZERO )
                    MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
@@ -7043,9 +7077,12 @@
                    INITIALIZE              TERRINF-AREA
                    PERFORM 214-ERRMES-HEN-SEC
       *
-                   IF    ( ORCBSD01-CHKKBN (5) =   "1" )
-                       MOVE    1       TO  FLG-CHKEND (5)
-                       GO  TO  2001121-PTBYO-TOUROKU-CHK-EXT
+               ELSE
+                   IF    ( CNT-PTBYOMEI2   =   CNT-HKNTG )
+                       MOVE    WRK-SRYKA   TO  SRH-1005-SRYKA
+                       MOVE    "050015"    TO  WRK-ERRCD
+                       INITIALIZE              TERRINF-AREA
+                       PERFORM 214-ERRMES-HEN-SEC
                    END-IF
                END-IF
            END-IF
@@ -11051,7 +11088,7 @@
                    MOVE    "990026"    TO  WRK-ERRCD
                WHEN    27
                    MOVE    "990027"    TO  WRK-ERRCD
-               WHEN    28
+               WHEN    29
                    MOVE    "990033"    TO  WRK-ERRCD
                WHEN    101
                    MOVE    "990034"    TO  WRK-ERRCD
