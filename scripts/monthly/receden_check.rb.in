@@ -867,6 +867,8 @@ class Receden_check < Receden_common
       @errors.push("25540",rece)
     end
 
+    byomei_tg_count = 0
+
     rece.sy.each{|sy|
       if sy["SRYYMD"].wtos != ""
         if re["SRYYM"].wtos[0,6].strip != ""
@@ -908,6 +910,10 @@ class Receden_check < Receden_common
         tbl_byomei=select_byomei(sy["BYOMEICD"].value)
         if tbl_byomei.empty?
           @errors.push("32040",rece,sy,"BYOMEICD")
+        else
+           if tbl_byomei["HKNSKYKBN"].to_i  == 1
+             byomei_tg_count += 1
+           end
         end
       end
       if sy["SYUBYO"].value =~ /^(|01)$/
@@ -934,6 +940,10 @@ class Receden_check < Receden_common
       check_format(rece,sy)
       #---------------------------------------------------------------------------------------------------
     }
+
+    if rece.sy.size == byomei_tg_count
+      @errors.push("42220",rece,nil)
+    end
 
     if rece.tekiyo.empty?
       @errors.push("25550",rece,nil)
@@ -1295,10 +1305,6 @@ class Receden_check < Receden_common
                 if flg_minus == true
                   if flg_plus == true
                     @errors.push("33190",rece,zai)
-                  else
-                    if zai["TEN"].value.to_i == 0
-                      @errors.push("33060",rece,zai,"TEN",nil,tbl_tensu["NAME"])
-                    end
                   end
                 end
               end
@@ -1327,6 +1333,10 @@ class Receden_check < Receden_common
                     end
                   end
                 }
+              end
+            else
+              if zai["RECID"].value == "IY" && tbl_tensu["TENSIKIBETU"].to_i == 7
+                @errors.push("33060",rece,zai,"TEN",nil,tbl_tensu["NAME"])
               end
             end
 
@@ -1378,8 +1388,11 @@ class Receden_check < Receden_common
 
             if flg_tensu_required == true
               if ( @check_level == "1" )
-                if zai["TEN"].value.to_i == 0
-                  @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
+                if zai["RECID"].value == "IY" && tbl_tensu["TENSIKIBETU"].to_i == 7
+                else
+                  if zai["TEN"].value.to_i == 0
+                    @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
+                  end
                 end
               end
             end

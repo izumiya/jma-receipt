@@ -419,6 +419,8 @@ class Receden_error < Receden_common
       err.msg="事業場の所在地が記録されていません。"
     when "41190"
       err.msg="同一病棟区分が２つ以上記録されています。"
+    when "42220"
+      err.msg="保険請求可能な傷病名が記録されていません。"
     when "43230"
       err.msg="単位コードの記録が必要な特定器材ですが、単位コードが記録されていません。"
     when "44240"
