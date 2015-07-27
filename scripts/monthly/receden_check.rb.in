@@ -863,10 +863,6 @@ class Receden_check < Receden_common
       @errors.push("22020",rece)
     end
 
-    if rece.sy.empty?
-      @errors.push("25540",rece)
-    end
-
     byomei_tg_count = 0
 
     rece.sy.each{|sy|
@@ -941,8 +937,12 @@ class Receden_check < Receden_common
       #---------------------------------------------------------------------------------------------------
     }
 
-    if rece.sy.size == byomei_tg_count
-      @errors.push("42220",rece,nil)
+    if rece.sy.empty?
+      @errors.push("25540",rece)
+    else
+      if rece.sy.size == byomei_tg_count
+        @errors.push("42220",rece,nil)
+      end
     end
 
     if rece.tekiyo.empty?
