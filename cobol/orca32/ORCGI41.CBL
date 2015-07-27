@@ -1572,7 +1572,11 @@
                GO  TO  3103-91DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
+           IF      STUSAN-NISSU03   =   1
+               MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
+           ELSE
+               COMPUTE  WRK-TUSAN   =  STUSAN-NISSU03   -  1
+           END-IF
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
@@ -1582,6 +1586,9 @@
                       (STUSAN-RRK-NISSU (IDX10)    =   ZERO)   AND
                       (STUSAN-RRK-DJKBN (IDX10)    =   SPACE)
                            ADD   1    TO   STUSAN-RRK-NISSU (IDX10)
+                   END-IF
+                   IF   STUSAN-RRK-NISSU (IDX10)  =   ZERO
+                        ADD   1    TO   STUSAN-RRK-NISSU (IDX10)
                    END-IF
       *
                    IF   (STUSAN-RRK-TAIINYMD(IDX10)  NOT = "99999999")
