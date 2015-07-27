@@ -3453,17 +3453,6 @@
                MOVE    SYS-2005-PRTJYUNKBN1 TO  SYS-200501-PRTJYUNKBN5
            END-IF
       *
-           IF      SYS-200501-JIBAIPRTKBN1
-                                       =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN
-                                           TO  SYS-200501-JIBAIPRTKBN1
-           END-IF
-           IF      SYS-200501-JIBAIPRTKBN1-N
-                                       =   SPACE
-               MOVE    SYS-200501-JIBAIPRTKBN-N
-                                           TO  SYS-200501-JIBAIPRTKBN1-N
-           END-IF
-      *
            MOVE    SYS-200501-JIBAIPRTKBN
                                        TO  SPA-GMN-JIBAIPRTKBN
            PERFORM VARYING IDY FROM    1   BY  1
@@ -8494,7 +8483,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            IF      SPA-GMN-JIBAIPRTKBN1-G
                                    =   SPACE
-               MOVE    SPA-GMN-JIBAIPRTKBN-G
+               MOVE    SPA-GMN-JIBAIPRTKBN1LST (3)
                                        TO  SPA-GMN-JIBAIPRTKBN1-G
            ELSE
                PERFORM VARYING IDY FROM    1   BY  1
@@ -8528,7 +8517,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            IF      SPA-GMN-JIBAIPRTKBN1-N-G
                                    =   SPACE
-               MOVE    SPA-GMN-JIBAIPRTKBN-N-G
+               MOVE    SPA-GMN-JIBAIPRTKBN1-NLST (3)
                                        TO  SPA-GMN-JIBAIPRTKBN1-N-G
            ELSE
                PERFORM VARYING IDY FROM    1   BY  1
