@@ -643,7 +643,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
       *    診療科情報のセット
       *    退院日＜診療年月、転出日の前日＜診療年月のときはセットしない
-           IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
+           IF    ( PTNYUINRRK-TENSTUYMD    =  PTNYUINRRK-TAIINYMD )
+           AND   ( PTNYUINRRK-TENNYUYMD    =  PTNYUINRRK-NYUINYMD )
                IF      PTNYUINRRK-TAIINYMD (1:6)
                                            >=  RECE82-SRYYM
                    PERFORM VARYING IDW FROM    1   BY  1
@@ -658,27 +659,46 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    END-PERFORM
                END-IF    
            ELSE    
-               INITIALIZE              STS-AREA-DAY
-               INITIALIZE              LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENSTUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    -1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               IF      LNK-DAY6-KEISAN (1:6)
-                                       >=  RECE82-SRYYM
-                   PERFORM VARYING IDW FROM    1   BY  1
-                           UNTIL   IDW >       20
-                           OR      PTNYUINRRK-NYUINKA
+               IF      PTNYUINRRK-TENSTUYMD
+                                   NOT =   PTNYUINRRK-TAIINYMD
+                   INITIALIZE              STS-AREA-DAY
+                   INITIALIZE              LNK-DAY6-AREA
+                   MOVE    "61"            TO  LNK-DAY6-IRAI
+                   MOVE   PTNYUINRRK-TENSTUYMD
+                                           TO  LNK-DAY6-KIJUN
+                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                   MOVE    -1              TO  LNK-DAY6-ZOGEN
+                   CALL  "ORCSDAY"         USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                   IF      LNK-DAY6-KEISAN (1:6)
+                                           >=  RECE82-SRYYM
+                       PERFORM VARYING IDW FROM    1   BY  1
+                               UNTIL   IDW >       20
+                               OR      PTNYUINRRK-NYUINKA
                                                =   RECE82-SRYKA (IDW)
-                       IF      RECE82-SRYKA (IDW)  =   SPACE  
-                           MOVE    PTNYUINRRK-NYUINKA
-                                               TO  RECE82-SRYKA (IDW)
-                           MOVE    20          TO  IDW
-                       END-IF
-                   END-PERFORM
+                           IF      RECE82-SRYKA (IDW)  =   SPACE  
+                               MOVE    PTNYUINRRK-NYUINKA
+                                                   TO  RECE82-SRYKA(IDW)
+                               MOVE    20          TO  IDW
+                           END-IF
+                       END-PERFORM
+                   END-IF
+               END-IF
+               IF      PTNYUINRRK-TENNYUYMD
+                                   NOT =   PTNYUINRRK-NYUINYMD
+                   IF      PTNYUINRRK-TENNYUYMD (1:6)
+                                       <=  RECE82-SRYYM
+                       PERFORM VARYING IDW FROM    1   BY  1
+                               UNTIL   IDW >       20
+                               OR      PTNYUINRRK-NYUINKA
+                                               =   RECE82-SRYKA (IDW)
+                           IF      RECE82-SRYKA (IDW)  =   SPACE  
+                               MOVE    PTNYUINRRK-NYUINKA
+                                                   TO  RECE82-SRYKA(IDW)
+                               MOVE    20          TO  IDW
+                           END-IF
+                       END-PERFORM
+                   END-IF
                END-IF
            END-IF
       *
