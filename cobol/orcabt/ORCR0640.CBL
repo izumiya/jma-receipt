@@ -683,6 +683,8 @@
       *  04.07.48    NACL-ÌçÏÆ    15/06/16  ¹â³ÛÎÅÍÜÈñ¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *  04.07.49    NACL-ÌçÏÆ    15/06/22  ¿©»ö²ó¿ôµ­ºÜ½¤Àµ
       *  04.07.50    NACL-ÌçÏÆ    15/06/30  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
+      *  04.07.51    NACL-ÌçÏÆ    15/07/30  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *                                     ¡Ê£·£°ºÐÌ¤Ëþ¡¢À¸ÊÝ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -18740,19 +18742,19 @@
              AND ( FLG-ZENKOKUKOHI-NISYU    NOT =   5 )
                IF   SYU-SYUHKNNUM  NOT = SPACE
                  MOVE    1         TO   FLG-JYOGENKBN2
-                 IF  FLG-KOHYONKAIME = 1
-                  IF  FLG-TOKU75 = 3
-                    MOVE   12300      TO   WRK-KINGAKU
-                  ELSE
-                    MOVE   24600      TO   WRK-KINGAKU
-                  END-IF
-                 ELSE
+      ****       IF  FLG-KOHYONKAIME = 1
+      ****        IF  FLG-TOKU75 = 3
+      ****          MOVE   12300      TO   WRK-KINGAKU
+      ****        ELSE
+      ****          MOVE   24600      TO   WRK-KINGAKU
+      ****        END-IF
+      ****       ELSE
                   IF  FLG-TOKU75 = 3
                     MOVE   17700      TO   WRK-KINGAKU
                   ELSE
                     MOVE   35400      TO   WRK-KINGAKU
                   END-IF
-                 END-IF
+      ****       END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                  PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                END-IF
@@ -20081,19 +20083,19 @@
                OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
                OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
                  IF   SYU-SYUHKNNUM  NOT = SPACE
-                   IF  FLG-KOHYONKAIME = 1
-                     IF  FLG-TOKU75 = 3
-                       MOVE  12300      TO   WRK-KINGAKU
-                     ELSE
-                       MOVE  24600      TO   WRK-KINGAKU
-                     END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****           IF  FLG-TOKU75 = 3
+      ****             MOVE  12300      TO   WRK-KINGAKU
+      ****           ELSE
+      ****             MOVE  24600      TO   WRK-KINGAKU
+      ****           END-IF
+      ****         ELSE
                      IF  FLG-TOKU75 = 3
                        MOVE  17700      TO   WRK-KINGAKU
                      ELSE
                        MOVE  35400      TO   WRK-KINGAKU
                      END-IF
-                   END-IF
+      ****         END-IF
                  END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
@@ -20129,19 +20131,19 @@
                OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
                OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
                  IF   SYU-SYUHKNNUM  NOT = SPACE
-                   IF  FLG-KOHYONKAIME = 1
-                     IF  FLG-TOKU75 = 3
-                       MOVE  12300      TO   WRK-KINGAKU
-                     ELSE
-                       MOVE  24600      TO   WRK-KINGAKU
-                     END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****           IF  FLG-TOKU75 = 3
+      ****             MOVE  12300      TO   WRK-KINGAKU
+      ****           ELSE
+      ****             MOVE  24600      TO   WRK-KINGAKU
+      ****           END-IF
+      ****         ELSE
                      IF  FLG-TOKU75 = 3
                        MOVE  17700      TO   WRK-KINGAKU
                      ELSE
                        MOVE  35400      TO   WRK-KINGAKU
                      END-IF
-                   END-IF
+      ****         END-IF
                  END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
@@ -24383,19 +24385,19 @@
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                  WHEN       ANY         ALSO     1
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
-                   IF  FLG-KOHYONKAIME = 1
-                    IF  FLG-TOKU75 = 3
-                     MOVE  12300                TO  WRK-CHK-KINGAKU2
-                    ELSE
-                     MOVE  24600                TO  WRK-CHK-KINGAKU2
-                    END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****          IF  FLG-TOKU75 = 3
+      ****           MOVE  12300                TO  WRK-CHK-KINGAKU2
+      ****          ELSE
+      ****           MOVE  24600                TO  WRK-CHK-KINGAKU2
+      ****          END-IF
+      ****         ELSE
                     IF  FLG-TOKU75 = 3
                      MOVE  17700                TO  WRK-CHK-KINGAKU2
                     ELSE
                      MOVE  35400                TO  WRK-CHK-KINGAKU2
                     END-IF
-                   END-IF
+      ****         END-IF
                  WHEN       ZERO        ALSO     2
                    IF  FLG-TOKU75 = 3
                      MOVE    5000               TO  WRK-CHK-KINGAKU2

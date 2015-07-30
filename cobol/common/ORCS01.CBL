@@ -7384,11 +7384,11 @@
                 OR   ( COMB-KOH2HKNNUM   =   "012" OR "025" )
                 OR   ( COMB-KOH3HKNNUM   =   "012" OR "025" )
                 OR   ( COMB-KOH4HKNNUM   =   "012" OR "025" )
-                   IF  FLG-KOHYONKAIME = 1
-                      MOVE  24600   TO   WK-GEN70-GENDOGAKU2
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****            MOVE  24600   TO   WK-GEN70-GENDOGAKU2
+      ****         ELSE
                       MOVE  35400   TO   WK-GEN70-GENDOGAKU2
-                   END-IF
+      ****         END-IF
                    IF    FLG-TOKU75  =  3
                       COMPUTE  WK-GEN70-GENDOGAKU2  =
                                WK-GEN70-GENDOGAKU2  /  2
