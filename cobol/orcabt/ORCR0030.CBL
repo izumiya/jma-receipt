@@ -700,6 +700,8 @@
       *  04.07.48    NACL-門脇    15/06/30  東京都地方公費対応
       *  04.07.49    NACL-門脇    15/07/28  マル長患者で、月途中に公費が追加と
       *                                     なった場合の対応修正（低所得者）
+      *  04.07.50    NACL-門脇    15/07/30  保険欄一部負担金記載修正
+      *                                     （７０歳未満、生保）
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -16844,19 +16846,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND ( FLG-ZENKOKUKOHI-NISYU    NOT =   5 )
               IF   SYU-SYUHKNNUM  NOT = SPACE
                MOVE       1          TO   FLG-JYOGENKBN2
-               IF  FLG-KOHYONKAIME = 1
-                  IF  FLG-TOKU75 = 3
-                    MOVE  12300      TO   WRK-KINGAKU
-                  ELSE
-                    MOVE  24600      TO   WRK-KINGAKU
-                  END-IF
-               ELSE
+      ****     IF  FLG-KOHYONKAIME = 1
+      ****        IF  FLG-TOKU75 = 3
+      ****          MOVE  12300      TO   WRK-KINGAKU
+      ****        ELSE
+      ****          MOVE  24600      TO   WRK-KINGAKU
+      ****        END-IF
+      ****     ELSE
                   IF  FLG-TOKU75 = 3
                     MOVE  17700      TO   WRK-KINGAKU
                   ELSE
                     MOVE  35400      TO   WRK-KINGAKU
                   END-IF
-               END-IF
+      ****     END-IF
                PERFORM    2105211-ICHIBUFTN-KOH-SET-SEC
                PERFORM    2105219-ICHIBUFTN-NISYU-HEN-SEC
               END-IF
@@ -18044,19 +18046,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
                OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
                  IF   SYU-SYUHKNNUM  NOT = SPACE
-                   IF  FLG-KOHYONKAIME = 1
-                     IF  FLG-TOKU75 = 3
-                       MOVE  12300      TO   WRK-KINGAKU
-                     ELSE
-                       MOVE  24600      TO   WRK-KINGAKU
-                     END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****           IF  FLG-TOKU75 = 3
+      ****             MOVE  12300      TO   WRK-KINGAKU
+      ****           ELSE
+      ****             MOVE  24600      TO   WRK-KINGAKU
+      ****           END-IF
+      ****         ELSE
                      IF  FLG-TOKU75 = 3
                        MOVE  17700      TO   WRK-KINGAKU
                      ELSE
                        MOVE  35400      TO   WRK-KINGAKU
                      END-IF
-                   END-IF
+      ****         END-IF
                  END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
@@ -18092,19 +18094,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
                OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
                  IF   SYU-SYUHKNNUM  NOT = SPACE
-                   IF  FLG-KOHYONKAIME = 1
-                     IF  FLG-TOKU75 = 3
-                       MOVE  12300      TO   WRK-KINGAKU
-                     ELSE
-                       MOVE  24600      TO   WRK-KINGAKU
-                     END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****           IF  FLG-TOKU75 = 3
+      ****             MOVE  12300      TO   WRK-KINGAKU
+      ****           ELSE
+      ****             MOVE  24600      TO   WRK-KINGAKU
+      ****           END-IF
+      ****         ELSE
                      IF  FLG-TOKU75 = 3
                        MOVE  17700      TO   WRK-KINGAKU
                      ELSE
                        MOVE  35400      TO   WRK-KINGAKU
                      END-IF
-                   END-IF
+      ****         END-IF
                  END-IF
                END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
@@ -20639,19 +20641,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
                  WHEN       ANY         ALSO     1
                    MOVE    WRK-KINGAKU-GENBUTU3 TO  WRK-CHK-KINGAKU
-                   IF  FLG-KOHYONKAIME = 1
-                    IF  FLG-TOKU75 = 3
-                     MOVE  12300                TO  WRK-CHK-KINGAKU2
-                    ELSE
-                     MOVE  24600                TO  WRK-CHK-KINGAKU2
-                    END-IF
-                   ELSE
+      ****         IF  FLG-KOHYONKAIME = 1
+      ****          IF  FLG-TOKU75 = 3
+      ****           MOVE  12300                TO  WRK-CHK-KINGAKU2
+      ****          ELSE
+      ****           MOVE  24600                TO  WRK-CHK-KINGAKU2
+      ****          END-IF
+      ****         ELSE
                     IF  FLG-TOKU75 = 3
                      MOVE  17700                TO  WRK-CHK-KINGAKU2
                     ELSE
                      MOVE  35400                TO  WRK-CHK-KINGAKU2
                     END-IF
-                   END-IF
+      ****         END-IF
                  WHEN       ZERO        ALSO     2
                    IF  FLG-TOKU75 = 3
                      MOVE    5000               TO  WRK-CHK-KINGAKU2
