@@ -4818,7 +4818,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
-                     IF  RECE02-SRYYM  <=  "201303"
+                     IF  RECE02-SRYYM  <=  "201003"
                        MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
@@ -4835,7 +4835,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
-                     IF  RECE02-SRYYM  <=  "201303"
+                     IF  RECE02-SRYYM  <=  "201003"
                        MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF

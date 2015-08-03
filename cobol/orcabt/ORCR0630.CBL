@@ -4759,7 +4759,7 @@
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
-                     IF  RECE62-SRYYM  <=  "201303"
+                     IF  RECE62-SRYYM  <=  "201003"
                        MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
@@ -4776,7 +4776,7 @@
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
-                     IF  RECE62-SRYYM  <=  "201303"
+                     IF  RECE62-SRYYM  <=  "201003"
                        MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
