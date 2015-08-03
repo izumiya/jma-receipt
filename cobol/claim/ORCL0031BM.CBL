@@ -77,6 +77,9 @@
       *  04.07.03    NACL-藤原    13/09/05  病名の補足コメント対応
       *  04.07.04    NACL-藤原    13/10/08  病名更新時のuserid 設定
       *  04.07.05    NACL-藤原    14/09/26  返却情報の強化対応
+      *  04.07.06    NACL-藤原    15/07/29  患者病名登録時の登録時間記録
+      *                                     と画面表示対応
+      *                                     登録時間を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1350,6 +1353,7 @@
       *
            MOVE    9999                TO  PTBYO-SEQNUM
            MOVE    SMCNDATE-YMD        TO  PTBYO-CREYMD
+           MOVE    SMCNDATE-HMS        TO  PTBYO-CREHMS
            MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
       *

@@ -177,6 +177,10 @@
                     06  C02-TREZEFLG      PIC X(10).
                     06  C02-TREZEMM       PIC X(4).
                     06  C02-THKNBYOMEIFLG PIC X(10).
+                    06  C02-TCREYMD       PIC X(09).
+                    06  C02-TCREHMS       PIC X(08).
+                    06  C02-TUPYMD        PIC X(09).
+                    06  C02-TUPHMS        PIC X(08).
                   05  C02-BYO-SELECT      PIC X   OCCURS  200 TIMES.
                   05  C02-BYO-FGCOLOR     PIC X(16)   OCCURS  200 TIMES.
                   05  C02-BYO-BGCOLOR     PIC X(16)   OCCURS  200 TIMES.
