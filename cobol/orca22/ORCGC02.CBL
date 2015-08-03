@@ -315,6 +315,9 @@
       *  04.07.16    NACL-藤原    15/04/24  疾患区分を外した自院病名入力
       *                                     時の疾患区分の表示の修正
       *  04.07.17    NACL-藤原    15/06/19  診療科表示件数の変更
+      *  04.07.02    NACL-藤原    15/07/29  患者病名登録時の登録時間記録
+      *                                     と画面表示対応
+      *                                     登録時間を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1758,6 +1761,7 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
                            "）"                DELIMITED   BY  SIZE
                                                INTO
                                                SPA-GMN-C02-KOHIDL (IDX)
+                   END-STRING
                END-IF
       *
                MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
@@ -2122,6 +2126,58 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        TO  WRK-KBN 
                    PERFORM 5001-REZEFLG-HENSYU-SEC
                    MOVE    WRK-KBNMEI  TO  SPA-GMN-C02-TREZEFLG   (IDX)
+      *
+                   IF      WRK-PTBYO-SRYYMD-CREYMD  (IDZZ)
+                                   NOT =   SPACE
+                       MOVE    WRK-PTBYO-SRYYMD-CREYMD  (IDZZ)
+                                       TO  WRK-SYMD
+                       PERFORM 5002-HIZUKE-HEN-SEC
+                       MOVE    WRK-HENYMDG
+                                       TO
+                                       SPA-GMN-C02-TCREYMD (IDX)
+                   END-IF
+      *
+                   IF      WRK-PTBYO-SRYYMD-CREHMS  (IDZZ)
+                                   NOT =   SPACE
+                       MOVE    WRK-PTBYO-SRYYMD-CREHMS  (IDZZ) (1:2)
+                                       TO
+                                       SPA-GMN-C02-TCREHMS (IDX) (1:2)
+                       MOVE    WRK-PTBYO-SRYYMD-CREHMS  (IDZZ) (3:2)
+                                       TO
+                                       SPA-GMN-C02-TCREHMS (IDX) (4:2)
+                       MOVE    WRK-PTBYO-SRYYMD-CREHMS  (IDZZ) (5:2)
+                                       TO
+                                       SPA-GMN-C02-TCREHMS (IDX) (7:2)
+                       MOVE    ":"     TO
+                                       SPA-GMN-C02-TCREHMS (IDX) (3:1)
+                                       SPA-GMN-C02-TCREHMS (IDX) (6:1)
+                   END-IF
+      *
+                   IF      WRK-PTBYO-SRYYMD-UPYMD  (IDZZ)
+                                   NOT =   SPACE
+                       MOVE    WRK-PTBYO-SRYYMD-UPYMD  (IDZZ)
+                                       TO  WRK-SYMD
+                       PERFORM 5002-HIZUKE-HEN-SEC
+                       MOVE    WRK-HENYMDG
+                                       TO
+                                       SPA-GMN-C02-TUPYMD (IDX)
+                   END-IF
+      *
+                   IF      WRK-PTBYO-SRYYMD-UPHMS  (IDZZ)
+                                   NOT =   SPACE
+                       MOVE    WRK-PTBYO-SRYYMD-UPHMS  (IDZZ) (1:2)
+                                       TO
+                                       SPA-GMN-C02-TUPHMS (IDX) (1:2)
+                       MOVE    WRK-PTBYO-SRYYMD-UPHMS  (IDZZ) (3:2)
+                                       TO
+                                       SPA-GMN-C02-TUPHMS (IDX) (4:2)
+                       MOVE    WRK-PTBYO-SRYYMD-UPHMS  (IDZZ) (5:2)
+                                       TO
+                                       SPA-GMN-C02-TUPHMS (IDX) (7:2)
+                       MOVE    ":"     TO
+                                       SPA-GMN-C02-TUPHMS (IDX) (3:1)
+                                       SPA-GMN-C02-TUPHMS (IDX) (6:1)
+                   END-IF
                END-PERFORM
            END-IF
       *
@@ -2842,6 +2898,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
       *
            MOVE    9999                TO  WRK-PTBYO-COPY-SEQNUM
            MOVE    SMCNDATE-YMD        TO  WRK-PTBYO-COPY-CREYMD
+           MOVE    SMCNDATE-HMS        TO  WRK-PTBYO-COPY-CREHMS
            MOVE    SMCNDATE-YMD        TO  WRK-PTBYO-COPY-UPYMD
            MOVE    SMCNDATE-HMS        TO  WRK-PTBYO-COPY-UPHMS
       *
@@ -2978,6 +3035,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
       *
            MOVE    9999                TO  WRK-PTBYO-COPY-SEQNUM
            MOVE    SMCNDATE-YMD        TO  WRK-PTBYO-COPY-CREYMD
+           MOVE    SMCNDATE-HMS        TO  WRK-PTBYO-COPY-CREHMS
            MOVE    SMCNDATE-YMD        TO  WRK-PTBYO-COPY-UPYMD
            MOVE    SMCNDATE-HMS        TO  WRK-PTBYO-COPY-UPHMS
       *
@@ -5864,7 +5922,7 @@ grpsys                         MOVE    SPA-HOSPNUM
                        MOVE    SPA-GMN-C02-BYOMEICD   (IDW)
                                        TO  SPA-GMN-C02-BYOMEICD   (IDX)
                    END-IF                     
-               END-PERFORM                           
+               END-PERFORM
            ELSE
       *        ７桁入力のときは病名マスタ、以外は自院病名マスタを先に読み込む
                IF         WRK-LENGTH       =   7
@@ -10279,7 +10337,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
       *    医保と第三者行為のため登録不可とする
            MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
       *
-           .
+           .                   
        45021-HKNCOMBI-DABURI-CHK-EXT.
            EXIT.
       *
@@ -10434,6 +10492,9 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                            MOVE    PTBYO-CREYMD    TO
                                                    WRK-PTBYO-CREYMD
                                                                  (IDXX)
+                           MOVE    PTBYO-CREHMS    TO
+                                                   WRK-PTBYO-CREHMS
+                                                                 (IDXX)
                            MOVE    PTBYO-SEQNUM    TO
                                                    WRK-PTBYO-SEQNUM
                                                                  (IDXX)
@@ -10568,6 +10629,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            MOVE    9999                TO  PTBYO-SEQNUM
            MOVE    SPA-OPID            TO  PTBYO-OPID
            MOVE    SMCNDATE-YMD        TO  PTBYO-CREYMD
+           MOVE    SMCNDATE-HMS        TO  PTBYO-CREHMS
            MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
            MOVE    PTBYOMEI-REC        TO  WRK-PTBYOMEI-INSERT-REC
@@ -11308,6 +11370,7 @@ grpsys                                          SPA-AREA
       *  
            MOVE    SPACE               TO  C09
       *
+           INITIALIZE                      C09
            MOVE    ZERO                TO  IDZ
                                            IDXX
            PERFORM VARYING IDX FROM    1   BY  1
@@ -12336,6 +12399,14 @@ grpsys                                          SPA-AREA
                                            TO  C02-TTENKIYMD (IDX)
                MOVE    SPA-GMN-C02-THKNBYOMEIFLG (IDX)
                                            TO  C02-THKNBYOMEIFLG (IDX)
+               MOVE    SPA-GMN-C02-TCREYMD    (IDX)
+                                           TO  C02-TCREYMD  (IDX)
+               MOVE    SPA-GMN-C02-TCREHMS    (IDX)
+                                           TO  C02-TCREHMS  (IDX)
+               MOVE    SPA-GMN-C02-TUPYMD     (IDX)
+                                           TO  C02-TUPYMD   (IDX)
+               MOVE    SPA-GMN-C02-TUPHMS     (IDX)
+                                           TO  C02-TUPHMS   (IDX)
       *
       ***      MOVE    IDX                 TO  C02-BYO-COUNT
       *         
@@ -12913,7 +12984,8 @@ grpsys                                          SPA-AREA
                    STRING   WRK-TANDOKUKBN-BYOMEI  DELIMITED  BY  SPACE
                            "は単独使用禁止の病名です"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG 
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0077"
                    MOVE
               "病名コードが２２個以上になりますので、編集病名とします。"
@@ -13110,6 +13182,7 @@ grpsys                                          SPA-AREA
            MOVE    SPACE               TO  SPA-CID1-FLG
       *
            MOVE    SPACE               TO  CID1
+           INITIALIZE                      CID1
            MOVE    SPA-CIDCD           TO  CID1-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID1-ID1MSG
            EVALUATE    SPA-CIDCD
@@ -13176,6 +13249,7 @@ grpsys                                          SPA-AREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID2
+           INITIALIZE                      CID2
            MOVE    WRK-CIDMSG          TO  CID2-MSG
            MOVE    SPA-C02-IKOMOTO-BYOMEICD
                                        TO  CID2-BYOMEICD1
@@ -13215,6 +13289,7 @@ grpsys                                          SPA-AREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID4
+           INITIALIZE                      CID4
            MOVE    SPA-CIDCD4          TO  CID4-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID4-ID1MSG
            MOVE    "B01"               TO  MCP-WIDGET

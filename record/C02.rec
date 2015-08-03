@@ -239,6 +239,10 @@ C02	{
 					value12	varchar(10);
 					value13	varchar(4);
 					value14	varchar(10);
+					column16 varchar(09);
+					column17 varchar(08);
+					column18 varchar(09);
+					column19 varchar(08);
 				}	[200];
 				select	bool[200];
 			};

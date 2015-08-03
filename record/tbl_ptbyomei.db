@@ -64,6 +64,7 @@ tbl_ptbyomei {
 	TERMID  			varchar(16);
 	OPID    			varchar(16);
 	CREYMD  			char(8);
+	CREHMS				char(6);
 	UPYMD    			char(8);
 	UPHMS				char(6);
 #-----> 検索用項目
