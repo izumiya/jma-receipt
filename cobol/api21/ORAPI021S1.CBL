@@ -336,6 +336,50 @@
                GO  TO         100-INIT-EXT
            END-IF
       *    ＳＰＡ共通設定
+      *    INITIALIZE                  SYS-1010-REC
+      *    INITIALIZE                  ORCSCOMMONAREA
+      *    MOVE    "M00"               TO  ORCSCOMMON-PG
+      *    CALL    "ORCSCOMMON"        USING
+      *                                MCPAREA
+      *                                SPA-AREA
+      *                                ORCSCOMMONAREA
+      *                                SYS-1010-REC
+      *    IF      SPA-ERRCD       NOT =   SPACE
+      *        MOVE   "89"             TO  WRK-ERRCD
+      *    END-IF
+      *
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *H27.8
+      *****************************************************************
+      *    ＳＰＡ共通設定処理
+      *****************************************************************
+       1001-ORCSCOMMON-SEC           SECTION.
+      *
+      *    診療日チェック
+           MOVE    MDCREQ-PERFORM-DATE     TO  WRK-HEN-DATE
+           MOVE    MDCREQ-PERFORM-TIME     TO  WRK-HEN-TIME
+           PERFORM 802-DAYHEN02-SEC
+           MOVE    WRK-SYMD                TO  WRK-PERFORM-YMD
+           MOVE    WRK-THMS                TO  WRK-PERFORM-TIME
+      *    未設定時はシステム情報設定
+           IF      WRK-PERFORM-YMD         =   SPACE
+               MOVE    SMCNDATE-YMD        TO  WRK-PERFORM-YMD
+           END-IF
+      *    診療日チェック
+           PERFORM 20011-PERFORM-CHK-SEC
+      *    診療日をシステム日付へ
+           IF      WRK-ERRCD           =   SPACE
+               MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
+           ELSE
+      *        エラーは他項目と同時
+               MOVE    SPACE               TO  WRK-ERRCD
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-MOTOPG
+      *    ＳＰＡ共通設定
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
            MOVE    "M00"               TO  ORCSCOMMON-PG
@@ -347,10 +391,10 @@
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE   "89"             TO  WRK-ERRCD
            END-IF
-      *
            .
-       100-INIT-EXT.
+       1001-ORCSCOMMON-EXT.
            EXIT.
+      *H27.8
       *
       *****************************************************************
       *    主　処理
@@ -359,6 +403,12 @@
       *
       *    XML情報取り出し
            PERFORM 1000-APTXMLREAD-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      200-MAIN-EXT
+           END-IF
+      *H27.8
+      *    ＳＰＡ共通設定
+           PERFORM 1001-ORCSCOMMON-SEC
            IF      WRK-ERRCD       NOT =   SPACE
                GO      TO      200-MAIN-EXT
            END-IF
