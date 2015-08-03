@@ -5822,9 +5822,7 @@
                                                      (KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "27"
-                  IF  (RECE62-KOHNUM(KOHFTN-IDX)
-                                    NOT = "100" AND "200"   )
-                  AND (RECE62-SRYYM             >=  "200804")
+                  IF   RECE62-SRYYM             >=  "200804"
                     MOVE  "2"  TO RECE62-EKF-ENCHGKBN-K
                                                      (KOHFTN-IDX + 1)
                   END-IF
@@ -5939,9 +5937,7 @@
                                                      (KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "27"
-                  IF  (RECE62-KOHNUM(KOHFTN-IDX)
-                                    NOT = "100" AND "200"   )
-                  AND (RECE62-SRYYM             >=  "200804")
+                  IF   RECE62-SRYYM             >=  "200804"
                     MOVE  "2"  TO RECE62-EKF-ENCHGKBN-Y
                                                      (KOHFTN-IDX + 1)
                   END-IF

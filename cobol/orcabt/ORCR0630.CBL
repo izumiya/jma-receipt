@@ -119,6 +119,8 @@
       *  04.07.06    NACL-門脇    15/01/14  同日入院時のフラグ編集修正
       *  04.07.07    NACL-門脇    15/02/09  京都府地方公費対応（システム管理
       *                                     ２０１０のデフォルト設定修正）
+      *  04.07.08    NACL-門脇    15/08/03  和歌山県地方公費対応（システム管理
+      *                                     ２０１０のデフォルト設定修正）
       *
       *  04.08.01    NACL-門脇    14/07/29  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
@@ -4684,23 +4686,22 @@
                     PERFORM   900-CLOSE-SEC
                   ELSE
                     EVALUATE   WRK-PREFNUM
+                      WHEN     "08"
                       WHEN     "32"
-                        IF  RECE62-SRYYM  >=  "200510"
-                          MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-                          MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                        END-IF
                       WHEN     "13"
                       WHEN     "26"
                           MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                      WHEN     "08"
-                        IF  RECE62-SRYYM  >=  "200607"
-                          MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-                          MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                        END-IF
+                      WHEN     "30"
                       WHEN     "38"
                           MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                      WHEN     "36"
+                          MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                          MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                      WHEN     "10"
+                          MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                          MOVE "4" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                     END-EVALUATE
                   END-IF
       *
@@ -4744,24 +4745,22 @@
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
-                     IF  RECE62-SRYYM  >=  "200805"
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
                    WHEN     "10"
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                   WHEN     "30"
-                     IF  RECE62-SRYYM  >=  "200904"
-                       MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
                    WHEN     "38"
                        MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                   WHEN     "30"
+                     IF  RECE62-SRYYM  <=  "201303"
+                       MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
@@ -4774,6 +4773,11 @@
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
                        MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                   WHEN     "30"
+                     IF  RECE62-SRYYM  <=  "201303"
+                       MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
