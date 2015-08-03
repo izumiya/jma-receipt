@@ -10554,7 +10554,6 @@
                WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
                 AND  ( SPA-GMN-KOHNUM  =   "183" )
                WHEN  ( SPA-PREFNUM     =   CONST-OSAKA )
-                AND  ( SPA-GMN-KOHNUM  NOT =   "100" AND "200" )
                WHEN  ( SPA-PREFNUM     =   CONST-OKAYAMA )
                    MOVE    "2"         TO  SPA-GMN-ENCHGKBNKG
                    MOVE    "0"         TO  SPA-GMN-ENCHGTAIKBNKG
@@ -10573,7 +10572,6 @@
                WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
                 AND  ( SPA-GMN-KOHNUM  =   "183" )
                WHEN  ( SPA-PREFNUM     =   CONST-OSAKA )
-                AND  ( SPA-GMN-KOHNUM  NOT =   "100" AND "200" )
                WHEN  ( SPA-PREFNUM     =   CONST-OKAYAMA )
                    MOVE    "2"         TO  SPA-GMN-ENCHGKBNKN
                    MOVE    "0"         TO  SPA-GMN-ENCHGTAIKBNKN
@@ -10588,7 +10586,6 @@
                WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
                 AND  ( SPA-GMN-KOHNUM  =   "183" )
                WHEN  ( SPA-PREFNUM     =   CONST-OSAKA )
-                AND  ( SPA-GMN-KOHNUM  NOT =   "100" AND "200" )
                    MOVE    "2"         TO  SPA-GMN-ENCHGKBNYG
                    MOVE    "0"         TO  SPA-GMN-ENCHGTAIKBNYG
                WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
@@ -10606,7 +10603,6 @@
                WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
                 AND  ( SPA-GMN-KOHNUM  =   "183" )
                WHEN  ( SPA-PREFNUM     =   CONST-OSAKA )
-                AND  ( SPA-GMN-KOHNUM  NOT =   "100" AND "200" )
                    MOVE    "2"         TO  SPA-GMN-ENCHGKBNYN
                    MOVE    "0"         TO  SPA-GMN-ENCHGTAIKBNYN
                WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
@@ -14123,7 +14119,7 @@
                                    TO  WRK-CMB-ITM
                    MOVE    "1"     TO  WRK-CMB-ITM2
                WHEN    CONST-EHIME
-               WHEN    CONST-WAKAYAMA
+      *        WHEN    CONST-WAKAYAMA
                    MOVE    SPA-GMN-SYUKEIKBNLST (2)
                                    TO  WRK-CMB-ITM
                    MOVE    "1"     TO  WRK-CMB-ITM2

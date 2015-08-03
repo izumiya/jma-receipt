@@ -703,6 +703,8 @@
       *                                     ¤Ê¤Ã¤¿¾ì¹ç¤ÎÂÐ±þ½¤Àµ¡ÊÄã½êÆÀ¼Ô¡Ë
       *  04.07.50    NACL-ÌçÏÆ    15/07/30  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡Ê£·£°ºÐÌ¤Ëþ¡¢À¸ÊÝ¡Ë
+      *  04.07.51    NACL-ÌçÏÆ    15/08/03  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¥·¥¹¥Æ¥à´ÉÍý
+      *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4706,23 +4708,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                     PERFORM    211J1-SYUKEIKBN-HENSYU-SEC
                   ELSE
                     EVALUATE   SYS-1001-PREFNUM
+                      WHEN     "08"
                       WHEN     "32"
-                        IF  RECE02-SRYYM  >=  "200510"
-                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
-                          MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                        END-IF
                       WHEN     "13"
                       WHEN     "26"
                           MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                      WHEN     "08"
-                        IF  RECE02-SRYYM  >=  "200607"
-                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
-                          MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                        END-IF
+                      WHEN     "30"
                       WHEN     "38"
                           MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                      WHEN     "36"
+                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                      WHEN     "10"
+                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "4" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                     END-EVALUATE
                   END-IF
       *
@@ -4766,24 +4767,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
-                     IF  RECE02-SRYYM  >=  "200805"
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
                    WHEN     "10"
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                   WHEN     "30"
-                     IF  RECE02-SRYYM  >=  "200904"
-                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
                    WHEN     "38"
                        MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                   WHEN     "30"
+                     IF  RECE02-SRYYM  <=  "201303"
+                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
@@ -4796,6 +4795,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
                        MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
+                   WHEN     "30"
+                     IF  RECE02-SRYYM  <=  "201303"
+                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
@@ -9043,9 +9047,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                                                      (KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "27"
-                  IF  (RECE02-KOHNUM(KOHFTN-IDX)
-                                    NOT = "100" AND "200"   )
-                  AND (RECE02-SRYYM             >=  "200804")
+                  IF   RECE02-SRYYM             >=  "200804"
                     MOVE  "2"  TO RECE02-EKF-ENCHGKBN-K
                                                      (KOHFTN-IDX + 1)
                   END-IF
@@ -9154,9 +9156,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                                                      (KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "27"
-                  IF  (RECE02-KOHNUM(KOHFTN-IDX)
-                                    NOT = "100" AND "200"   )
-                  AND (RECE02-SRYYM             >=  "200804")
+                  IF   RECE02-SRYYM             >=  "200804"
                     MOVE  "2"  TO RECE02-EKF-ENCHGKBN-Y
                                                      (KOHFTN-IDX + 1)
                   END-IF
