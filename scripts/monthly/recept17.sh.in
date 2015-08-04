@@ -18,6 +18,10 @@ RENNUM=0
 #        ${13} シェルＩＤ
 #        ${14} HOSPNUM
 #        ${15} エラーファイル名 
+#        ${16} 様式区分
+#           0:ＯＣＲ様式  1:確認様式
+#        ${17} 枠記載区分（ＯＣＲ様式のみ）
+#           0:枠なし  2:枠あり
 #-------------------------------------------#
 #
 ##      エラーファイル削除
@@ -29,7 +33,16 @@ RENNUM=0
 
         LOG_FILE="/var/log/jma-receipt/${14}recept17.log"
 
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM042 -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15} > $LOG_FILE 2>&1
+        echo "arg5   = [" ${5}   "]" > $LOG_FILE
+        echo "arg15  = [" ${15}  "]" >> $LOG_FILE
+        echo "arg16  = [" ${16}  "]" >> $LOG_FILE
+        echo "arg17  = [" ${17}  "]" >> $LOG_FILE
+
+        if [ ${16} -eq  '0' ]; then
+            $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM043 -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${17},${15} >> $LOG_FILE 2>&1
+        else
+            $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM042 -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15} >> $LOG_FILE 2>&1
+        fi
         if  [ -e ${15} ]; then
             exit 
         else

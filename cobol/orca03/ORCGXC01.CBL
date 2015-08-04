@@ -43,6 +43,9 @@
       *
       *  04.07.01    NACL-太田     11/11/08  コラムリスト選択行表示制御変更
       *  04.07.02    NACL-藤原     12/03/30  タイトル表示の修正
+      *  04.07.03    NACL-藤原    15/07/17  労災診療費請求書及びアフター
+      *                                     ケア委託費請求書のＯＣＲ様式
+      *                                     （枠なし）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1272,16 +1275,21 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
       *    印刷編集処理
       *****************************************************************
        450-PRINT-SEC                   SECTION.
-      * 
-           IF      SPA-PRTKANRI-TBL-KEY(1:6) = "RECEPT"  
+      *
+           IF (    SPA-PRTKANRI-TBL-KEY (1:6)  =   "RECEPT"      )
+           OR (  ( SPA-PRTKANRI-TBL-KEY (1:6)  =   "SOKATU"    )
+               AND
+                 ( SPA-GMN-TPRTID(SPA-NAI-SELNUM)
+                                               =   "HCM79.red"
+                                               OR  "HCM81.red" ) )
                    PERFORM 4501-PRINT-SEC
                    GO      TO          450-PRINT-EXT
            END-IF
-      * 
-           MOVE    ZERO                TO  WRK-CONS-JOB-JOBID     
+      *
+           MOVE    ZERO                TO  WRK-CONS-JOB-JOBID
                                            WRK-PREVIEW-RENNUM
-           MOVE    SPACE               TO  WRK-CONS-PREVIEW-TBL-GROUP                                
-      *     
+           MOVE    SPACE               TO  WRK-CONS-PREVIEW-TBL-GROUP
+      *
       *
       *    印刷処理
       *

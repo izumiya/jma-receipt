@@ -698,6 +698,20 @@ W12	{
 					count	int;
 					item	varchar(34)[5];
 				};
+				ROUSAIPRTKBN_COMBO	{
+					ROUSAIPRTKBN	{
+						value	varchar(20);
+					};
+					count	 int;
+					item	 varchar(20)[2];
+				};
+				FRAME_ROUSAIPRTKBN_COMBO	{
+					FRAME_ROUSAIPRTKBN	{
+						value	varchar(20);
+					};
+					count	 int;
+					item	 varchar(20)[2];
+				};
 			};
 			fi27	{
 				SYUKA_KBN_COMBO	{

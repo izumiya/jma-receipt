@@ -181,10 +181,13 @@
       *                                     対応
       *  04.07.15    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *  04.07.16    NACL-藤原    14/12/05  入力チェックの修正
-      *  04.07.16    NACL-藤原    14/12/24  ＥＦファイル名修正
-      *  04.07.17    NACL-太田    15/03/06  システム管理 8000番
+      *  04.07.17    NACL-藤原    14/12/24  ＥＦファイル名修正
+      *  04.07.18    NACL-太田    15/03/06  システム管理 8000番
       *                                     (印刷データ削除)の追加処理を
       *                                     バッチに移動
+      *  04.07.19    NACL-藤原    15/07/17  労災診療費請求書及びアフター
+      *                                     ケア委託費請求書のＯＣＲ様式
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -941,6 +944,15 @@ grpsys                                         SPA-AREA
                                        =   SPACE
                MOVE    "0"             TO  SYS-200501-ROURECEKBN
            END-IF
+           IF     SYS-200501-ROUSAIPRTKBN
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-ROUSAIPRTKBN
+               MOVE    "1"             TO  SYS-200501-FRAME-ROUSAIPRTKBN
+           END-IF
+           IF     SYS-200501-FRAME-ROUSAIPRTKBN
+                                       =   SPACE
+               MOVE    "0"             TO  SYS-200501-FRAME-ROUSAIPRTKBN
+           END-IF
            MOVE    SYS-200501-KOUIKIKBN
                                        TO  SPA-NAI-200501-KOUIKIKBN
            MOVE    SYS-200501-KOUIKIRECEKBN
@@ -965,6 +977,11 @@ grpsys                                         SPA-AREA
                                        SPA-NAI-200501-RECEDEN-CHK-KBN
            MOVE    SYS-200501-ROURECEKBN
                                        TO  SPA-NAI-200501-ROURECEKBN
+           MOVE    SYS-200501-ROUSAIPRTKBN
+                                       TO  SPA-NAI-200501-ROUSAIPRTKBN
+           MOVE    SYS-200501-FRAME-ROUSAIPRTKBN
+                                       TO
+                                       SPA-NAI-200501-FRAME-ROUSAIPRTKBN
       *
            IF      SPA-NAI-200501-RECEDEN-CHK-KBN
                                        =   "0"
@@ -4787,6 +4804,10 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                    TO  SHELLTBL-ARG13
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
            MOVE    RECEERR         TO  SHELLTBL-ARG15
+           MOVE    SPA-NAI-200501-ROUSAIPRTKBN
+                                   TO  SHELLTBL-ARG16
+           MOVE    SPA-NAI-200501-FRAME-ROUSAIPRTKBN
+                                   TO  SHELLTBL-ARG17
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE

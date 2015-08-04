@@ -16,22 +16,20 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCBM042.
+       PROGRAM-ID.             ORCBM043.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 月次帳票
       *  コンポーネント名  : 労災・総括表
+      *                     労災診療費請求書、アフターケア委託費請求書
+      *                     ＯＣＲ様式
       *  管理者            : 
       *  作成日付    作業者        記述
-      * 117/09/27    NACL−藤原    新規作成
+      *  15/07/17    NACL−藤原    新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  04.07.01    NACL-藤原    13/05/07  公務災害を対象外とする
-      *  04.07.02    NACL-藤原    13/09/27  ￥マークの変更
-      *  04.07.03    NACL-藤原    15/07/27  医療機関編集情報からの郵便番
-      *                                     号の編集を追加
-      *****************************************************************
+       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -68,17 +66,14 @@
            COPY    "CPCOMMONDAT2.INC"
                                    REPLACING  //RECE01PARA//
                                    BY         //RECEUPD//.
-           03  FILLER              PIC X(04)   VALUE   ".dat".
       *
       *    エラーファイル 名称領域 
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM72V01.INC"  REPLACING  //HCM72V01//
-                                   BY         //HCM72//.
+           COPY    "HCM81.INC".
       *
-           COPY    "HCM73V01.INC"  REPLACING  //HCM73V01//
-                                   BY         //HCM73//.
+           COPY    "HCM79.INC".
       *
       *    スパ領域
        01  STS-AREA.
@@ -93,14 +88,14 @@
            03  FLG-UPD             PIC 9(01).
       *
            03  FLG-SYORI           PIC 9(01).
-      *     
+      *
            03  FLG-SYSKANRI        PIC 9(01). 
            03  FLG-UPDFILE         PIC 9(01).
            03  FLG-SEIKYU          PIC 9(01). 
            03  FLG-RECE10          PIC 9(01). 
            03  FLG-PTINF           PIC 9(01).
            03  FLG-LABOR-SIO       PIC 9(01).
-      *     
+      *
            03  FLG-PRTKBN          PIC 9(01).
       *
       *    添字領域
@@ -110,7 +105,7 @@
            03  IDZ                 PIC 9(04).
            03  IDX1                PIC 9(04).
            03  IDX2                PIC 9(04).
-      *     
+      *
            03  IDZ1                PIC 9(04).
            03  IDZ2                PIC 9(04).
       *
@@ -120,13 +115,14 @@
            03  WRK-PARA-HOSPNUM    PIC 9(02).
            03  WRK-PARA-JOBID      PIC 9(07).
            03  WRK-PARA-SHELLID    PIC X(08).
+           03  WRK-PARA-FRAMEKBN   PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SEIYMDWH        PIC X(06).
            03  WRK-SRYYMWH         PIC X(04).
            03  WRK-SRYYMD          PIC X(08).
-      *  
+      *
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
@@ -155,6 +151,8 @@
                05  WRK-HOSPADRS1   PIC X(50).
                05  WRK-HOSPADRS2   PIC X(50).
            03  WRK-TEL             PIC X(15).
+           03  WRK-TEL-X.
+               05  WRK-TEL-OCC     PIC X(05)   OCCURS 3.
            03  WRK-POST            PIC X(07).
       *
            03  WRK-RSIIRYOCD       PIC X(07).
@@ -236,7 +234,7 @@
       *    医療機関情報情報
            COPY    "CPSK1001.INC".
       *
-      *    医療機関情報−所在地、連絡先 
+      *    医療機関情報−所在地、連絡先
            COPY    "CPSK1002.INC".
       *
            COPY    "CPSK1900.INC".
@@ -319,6 +317,7 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  SUM-AREA
                                        SPA-AREA
+           INITIALIZE                  RECEERR
            MOVE    LOW-VALUE       TO  KEY-AREA    
       *
            PERFORM 100-DBOPEN-SEC
@@ -338,6 +337,7 @@
                                                WRK-PARA-JOBID
                                                WRK-PARA-SHELLID
                                                WRK-PARA-HOSPNUM
+                                               WRK-PARA-FRAMEKBN
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -345,8 +345,8 @@
       *    ステップ管理開始処理
            MOVE    "STS"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    "ORCBM042"      TO  JOB-PGID
-           MOVE    "労災・診療費請求書"
+           MOVE    "ORCBM043"      TO  JOB-PGID
+           MOVE    "労災・診療費請求書（ＯＣＲ様式）"
                                    TO  JOB-SHELLMSG
            PERFORM 900-CALL-ORCSJOB-SEC
       *
@@ -359,7 +359,7 @@
            MOVE    LNK-PRTKANRI-SRYYM
                                    TO  WRK-SRYYMD (1:6)
            MOVE    "01"            TO  WRK-SRYYMD (7:2)
-      *     
+      *
            INITIALIZE                  STS-AREA-DAY
            INITIALIZE                  LNK-DAY2-AREA
            MOVE    "21"            TO  LNK-DAY2-IRAI
@@ -489,6 +489,19 @@
       *    医療機関編集情報
            PERFORM 900-1900-HENSYU-SEC
       *
+      *    電話番号編集（−、()をはずす）
+           IF      WRK-TEL (1:1)       =   "("
+               MOVE    2                   TO  IDY
+           ELSE
+               MOVE    1                   TO  IDY
+           END-IF
+           UNSTRING   WRK-TEL          DELIMITED  BY  "-" OR  ")"
+                                       INTO    WRK-TEL-OCC (1)
+                                               WRK-TEL-OCC (2)
+                                               WRK-TEL-OCC (3)
+                                       WITH    POINTER IDY
+           END-UNSTRING
+      *
       *    都道府県名取得
            INITIALIZE                      SPREF-AREA
            CALL    "ORCSPREF"          USING   SPREF-AREA
@@ -519,7 +532,7 @@
            MOVE    2               TO  FLG-SYORI
            PERFORM 2001-SYUKEI-SEC
       *
-           MOVE    1               TO  FLG-END 
+           MOVE    1               TO  FLG-END
            .
        200-MAIN-EXT.
            EXIT.
@@ -532,16 +545,16 @@
            DISPLAY "FLG-SYORI=" FLG-SYORI
       *
       *
-           MOVE    LOW-VALUE       TO  KEY-AREA    
+           MOVE    LOW-VALUE       TO  KEY-AREA
       *
            MOVE    "key77"         TO  WRK-MCP-PATHNAME
            MOVE    "tbl_seikyu"    TO  WRK-MCP-TABLE
            PERFORM 900-SEIKYU-SELECT-SEC
       *
-           PERFORM         UNTIL   FLG-RECE10  =   1 
+           PERFORM         UNTIL   FLG-RECE10  =   1
       *
                INITIALIZE                  SUM-AREA
-               MOVE    KEY-NEW             TO  KEY-OLD      
+               MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM             UNTIL   FLG-RECE10      =   1
                                    OR      KEY-NEW1    NOT =   KEY-OLD1
       *          患者の人数
@@ -557,7 +570,7 @@
                    ADD     RECE10-FTNMONEY (1) TO  SUM-KINGAK
                    MOVE    1                   TO   FLG-UPD
       *
-      *            集計の対象にならなかったとき                
+      *            集計の対象にならなかったとき
                    IF      FLG-UPD             =   1
                        PERFORM 20011-UPD-FILE-HENSYU-SEC
       *
@@ -574,14 +587,14 @@
                                " 入外区分＝"       DELIMITED  BY  SIZE
                                RECE10-NYUGAIKBN    DELIMITED  BY  SIZE
                                                    INTO    WRK-RECEERR
-                       END-STRING                                
+                       END-STRING
                        PERFORM 500-ERR-HENSYU-SEC
                        MOVE    SPACE               TO  WRK-ERRMSG
-                       STRING  "ORCBM042 "         DELIMITED  BY  SIZE
+                       STRING  "ORCBM043 "         DELIMITED  BY  SIZE
                                WRK-RECEERR         DELIMITED  BY  SIZE
                                LOW-VALUE           DELIMITED  BY  SIZE
                                                    INTO    WRK-ERRMSG
-                       END-STRING   
+                       END-STRING
                        CALL    "cobabort"          USING   WRK-ERRMSG
                    END-IF 
                  END-PERFORM
@@ -640,53 +653,55 @@
       *
            EVALUATE    FLG-SYORI
                WHEN    1 
-                   INITIALIZE                      HCM73
+                   INITIALIZE                      HCM79
       *
-                   MOVE    WRK-RSIIRYOCD       TO  HCM73-RSIIRYOCD
+                   MOVE    WRK-RSIIRYOCD       TO  HCM79-RSIIRYOCD
       *
                    MOVE    SUM-KINGAK          TO  WRK-KINGAKZ
-                   MOVE    WRK-KINGAKZ         TO  HCM73-GOKEI
+                   MOVE    WRK-KINGAKZ         TO  HCM79-GOKEI
                    PERFORM VARYING IDX FROM    8   BY  -1
                            UNTIL   IDX <       1
                        IF      WRK-KINGAKZ (IDX:1) =   SPACE
                            MOVE    "\"             TO
-                                                   HCM73-MARK-S (IDX)
+                                                   HCM79-MARK-S (IDX)
                            MOVE    1               TO  IDX
                        END-IF
-                   END-PERFORM    
+                   END-PERFORM
       *
                    MOVE    SUM-KENSU           TO  WRK-KENSUZ
-                   MOVE    WRK-KENSUZ          TO  HCM73-MAISU
+                   MOVE    WRK-KENSUZ          TO  HCM79-MAISU
       *
-                   MOVE    WRK-SRYYMWH         TO  HCM73-SKYYM
+                   MOVE    WRK-SRYYMWH         TO  HCM79-SKYYM
       *
-                   MOVE    WRK-SEIYMDWH        TO  HCM73-PRTYMD
+                   MOVE    WRK-SEIYMDWH        TO  HCM79-PRTYMD
       *
                    COMPUTE SUM-NINZU   =   SUM-NINZU   -   1
                    MOVE    SUM-NINZU           TO  WRK-NINZUZ
-                   MOVE    WRK-NINZUZ          TO  HCM73-NINZU
+                   MOVE    WRK-NINZUZ          TO  HCM79-NINZU
       *
-                   MOVE    WRK-POST (1:3)      TO  HCM73-HOSPPOST (1:3)
-                   MOVE    "-"                 TO  HCM73-HOSPPOST (4:1)
-                   MOVE    WRK-POST (4:4)      TO  HCM73-HOSPPOST (5:4)
+                   MOVE    WRK-POST (1:3)      TO  HCM79-HOSPPOST (1:3)
+                   MOVE    "-"                 TO  HCM79-HOSPPOST (4:1)
+                   MOVE    WRK-POST (4:4)      TO  HCM79-HOSPPOST (5:4)
       *
-                   MOVE    WRK-HOSPADRS        TO  HCM73-HOSPADRS
-                   INSPECT HCM73-HOSPADRS
+                   MOVE    WRK-HOSPADRS        TO  HCM79-HOSPADRS
+                   INSPECT HCM79-HOSPADRS
                                    REPLACING   ALL "  "    BY  "　"
       *
-                   MOVE    WRK-HOSPNAME        TO  HCM73-HOSPNAME
-                   INSPECT HCM73-HOSPNAME
+                   MOVE    WRK-HOSPNAME        TO  HCM79-HOSPNAME
+                   INSPECT HCM79-HOSPNAME
                                    REPLACING   ALL "  "    BY  "　"
       *    
                    MOVE    SYS-1001-KAISETUNAME
-                                               TO  HCM73-KAISETSUNAME
+                                               TO  HCM79-KAISETSUNAME
       *    
-                   MOVE    WRK-TEL             TO  HCM73-HOSPTEL
+                   MOVE    WRK-TEL-OCC (1)     TO  HCM79-HOSPTEL1
+                   MOVE    WRK-TEL-OCC (2)     TO  HCM79-HOSPTEL2
+                   MOVE    WRK-TEL-OCC (3)     TO  HCM79-HOSPTEL3
       *
-                   MOVE    WRK-PREFNAME        TO  HCM73-ROUDOUNAME
+                   MOVE    WRK-PREFNAME        TO  HCM79-ROUDOUNAME
       *
                    IF      KEY-O-SYOKAIFLG     =   "1"
-                       MOVE    KEY-O-SYOCD         TO  HCM73-SYOCD
+                       MOVE    KEY-O-SYOCD         TO  HCM79-SYOCD
       *
                        INITIALIZE                  LABOR-SIO-REC
                        MOVE    KEY-O-SYOCD         TO  LABOR-SIO-SYOCD
@@ -699,59 +714,57 @@
                        MOVE    LABOR-SIO-REC       TO  MCPDATA-REC
                        PERFORM 900-LABOR-SIO-READ-SEC
                        IF      FLG-LABOR-SIO       =   ZERO
-                           STRING  "（"            DELIMITED   BY  SIZE
-                                   LABOR-SIO-NAME  DELIMITED   BY  SPACE
-                                   "署分）"        DELIMITED   BY  SIZE
-                                                   INTO    HCM73-SYONAME
-                           END-STRING
+                           MOVE    LABOR-SIO-NAME      TO
+                                                       HCM79-SYONAME
                        END-IF
                    END-IF
-               WHEN    2 
-                   INITIALIZE                      HCM72
+               WHEN    2
+                   INITIALIZE                      HCM81
       *
-                   MOVE    WRK-RSIIRYOCD       TO  HCM72-RSIIRYOCD
+                   MOVE    WRK-RSIIRYOCD       TO  HCM81-RSIIRYOCD
       *
                    MOVE    SUM-KINGAK          TO  WRK-KINGAKZ
-                   MOVE    WRK-KINGAKZ         TO  HCM72-GOKEI
+                   MOVE    WRK-KINGAKZ         TO  HCM81-GOKEI
                    PERFORM VARYING IDX FROM    8   BY  -1
                            UNTIL   IDX <       1
                        IF      WRK-KINGAKZ (IDX:1) =   SPACE
                            MOVE    "\"            TO
-                                                   HCM72-MARK-S (IDX)
+                                                   HCM81-MARK-S (IDX)
                            MOVE    1               TO  IDX
                        END-IF
-                   END-PERFORM    
+                   END-PERFORM
       *
                    MOVE    SUM-KENSU           TO  WRK-KENSUZ
-                   MOVE    WRK-KENSUZ          TO  HCM72-MAISU
+                   MOVE    WRK-KENSUZ          TO  HCM81-MAISU
       *
-                   MOVE    "7"                 TO  HCM72-SKYYM (1:1)
-                   MOVE    WRK-SRYYMWH         TO  HCM72-SKYYM (2:4)
+                   MOVE    "7"                 TO  HCM81-SKYYM (1:1)
+                   MOVE    WRK-SRYYMWH         TO  HCM81-SKYYM (2:4)
       *
-                   MOVE    WRK-SEIYMDWH        TO  HCM72-PRTYMD
+                   MOVE    WRK-SEIYMDWH        TO  HCM81-PRTYMD
       *
                    COMPUTE SUM-NINZU   =   SUM-NINZU   -   1
                    MOVE    SUM-NINZU           TO  WRK-NINZUZ
-                   MOVE    WRK-NINZUZ          TO  HCM72-NINZU
-      *
-                   MOVE    WRK-POST (1:3)      TO  HCM72-HOSPPOST (1:3)
-                   MOVE    "-"                 TO  HCM72-HOSPPOST (4:1)
-                   MOVE    WRK-POST (4:4)      TO  HCM72-HOSPPOST (5:4)
-      *
-                   MOVE    WRK-HOSPADRS        TO  HCM72-HOSPADRS
-                   INSPECT HCM72-HOSPADRS
-                                   REPLACING   ALL "  "    BY  "　"
-      *
-                   MOVE    WRK-HOSPNAME        TO  HCM72-HOSPNAME
-                   INSPECT HCM72-HOSPNAME
-                                   REPLACING   ALL "  "    BY  "　"
+                   MOVE    WRK-NINZUZ          TO  HCM81-NINZU
       *    
+                   MOVE    WRK-POST (1:3)      TO  HCM81-HOSPPOST1
+                   MOVE    WRK-POST (4:4)      TO  HCM81-HOSPPOST2
+      *
+                   MOVE    WRK-HOSPADRS        TO  HCM81-HOSPADRS
+                   INSPECT HCM81-HOSPADRS
+                                   REPLACING   ALL "  "    BY  "　"
+      *
+                   MOVE    WRK-HOSPNAME        TO  HCM81-HOSPNAME
+                   INSPECT HCM81-HOSPNAME
+                                   REPLACING   ALL "  "    BY  "　"
+      *
                    MOVE    SYS-1001-KAISETUNAME
-                                               TO  HCM72-KAISETSUNAME
-      *    
-                   MOVE    WRK-TEL             TO  HCM72-HOSPTEL
+                                               TO  HCM81-KAISETSUNAME
       *
-                   MOVE    WRK-PREFNAME        TO  HCM72-ROUDOUNAME
+                   MOVE    WRK-TEL-OCC (1)     TO  HCM81-HOSPTEL1
+                   MOVE    WRK-TEL-OCC (2)     TO  HCM81-HOSPTEL2
+                   MOVE    WRK-TEL-OCC (3)     TO  HCM81-HOSPTEL3
+      *
+                   MOVE    WRK-PREFNAME        TO  HCM81-ROUDOUNAME
            END-EVALUATE
            .
        20021-PRINT-HEN-EXT.
@@ -783,8 +796,12 @@
                                        TO  SPRT-PRIORITY
            EVALUATE    FLG-SYORI
                WHEN    1
-                   MOVE   "HCM73V01.red"       TO  SPRT-PRTID
-                   MOVE    HCM73               TO  SPRT-PRTDATA
+                   IF      WRK-PARA-FRAMEKBN   =   "0"
+                       MOVE    "HCM79.red"         TO  SPRT-PRTID
+                    ELSE
+                       MOVE    "HCM80.red"         TO  SPRT-PRTID
+                   END-IF
+                   MOVE    HCM79               TO  SPRT-PRTDATA
       *
                    IF    ( KEY-O-SYOKAIFLG     =   "1"  )
                    AND   ( FLG-LABOR-SIO       =   ZERO )
@@ -798,8 +815,12 @@
                                                    TO  SPRT-TITLE
                    END-IF
                WHEN    2
-                   MOVE   "HCM72V01.red"       TO  SPRT-PRTID
-                   MOVE    HCM72               TO  SPRT-PRTDATA
+                   IF      WRK-PARA-FRAMEKBN   =   "0"
+                       MOVE    "HCM81.red"         TO  SPRT-PRTID
+                   ELSE
+                       MOVE    "HCM82.red"         TO  SPRT-PRTID
+                   END-IF
+                   MOVE    HCM81               TO  SPRT-PRTDATA
                    MOVE    "アフターケア委託費請求書" 
                                                TO  SPRT-TITLE
            END-EVALUATE
@@ -816,15 +837,15 @@
            ELSE
                MOVE    "印刷ＤＢに更新できませんでした"
                                           TO  WRK-RECEERR
-               PERFORM 500-ERR-HENSYU-SEC                           
+               PERFORM 500-ERR-HENSYU-SEC
                MOVE    SPACE               TO  WRK-ERRMSG
-               STRING  "ORCBM042 "         DELIMITED  BY  SIZE
+               STRING  "ORCBM043 "         DELIMITED  BY  SIZE
                        WRK-RECEERR         DELIMITED  BY  SIZE
                        LOW-VALUE           DELIMITED  BY  SIZE
                                            INTO    WRK-ERRMSG
-               END-STRING   
+               END-STRING
                CALL    "cobabort"          USING   WRK-ERRMSG
-           END-IF                                                              
+           END-IF
            .
        20023-PRINT-OUT-EXT.
            EXIT.
@@ -852,7 +873,7 @@
                PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *
-           MOVE    1                   TO  FLG-END     
+           MOVE    1                   TO  FLG-END
                                            FLG-ERR
       *
            .
@@ -926,7 +947,6 @@
       *
            CLOSE   UPD-FILE
       *
-      *
            IF      CNT-RECE10      =   ZERO 
                CONTINUE
            ELSE
@@ -938,14 +958,14 @@
                END-IF     
            END-IF    
       *
-           DISPLAY "*** ORCBM042 IN   "  CNT-RECE10 
+           DISPLAY "*** ORCBM043 IN   "  CNT-RECE10 
            DISPLAY "***          PAGE "  CNT-PAGE
-           DISPLAY "*** ORCBM042 END ***"
+           DISPLAY "*** ORCBM043 END ***"
       *     
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    CNT-PAGE        TO  JOB-UPDCNT                        
+           MOVE    CNT-PAGE        TO  JOB-UPDCNT
            PERFORM 900-CALL-ORCSJOB-SEC
       *                              
            PERFORM 900-DBDISCONNECT-SEC
@@ -968,7 +988,7 @@
                IF      FLG-SEIKYU          =   ZERO
                    MOVE    "2"             TO  RECE10-SKYKBN
                    MOVE    LNK-PRTKANRI-SRYYM  TO  RECE10-SKYYM
-                   MOVE    LNK-PRTKANRI-SKYYMD TO  RECE10-UPDYMD  
+                   MOVE    LNK-PRTKANRI-SKYYMD TO  RECE10-UPDYMD
                    MOVE    RECE10-REC      TO  MCPDATA-REC
                    MOVE    "DBUPDATE"      TO  MCP-FUNC
                    MOVE    "tbl_seikyu"    TO  MCP-TABLE
@@ -981,7 +1001,7 @@
                                                DELIMITED  BY  SIZE
                                RECE10-KEY      DELIMITED  BY  SIZE
                                                INTO    WRK-RECEERR
-                       END-STRING                                
+                       END-STRING
                        PERFORM 500-ERR-HENSYU-SEC
                        MOVE    1           TO  FLG-UPDFILE
                    END-IF
@@ -990,11 +1010,11 @@
                                                DELIMITED  BY  SIZE
                            RECE10X-KEY         DELIMITED  BY  SIZE
                                                INTO    WRK-RECEERR
-                   END-STRING                                
+                   END-STRING
                    PERFORM 500-ERR-HENSYU-SEC
                    MOVE    1               TO  FLG-UPDFILE
                END-IF
-           END-PERFORM  
+           END-PERFORM
       *
            CLOSE   UPD-FILE
            .
@@ -1128,7 +1148,7 @@
                MOVE    RECE10-SYOKAIFLG    TO  KEY-N-SYOKAIFLG
                MOVE    RECE10-PTNUM        TO  KEY-N-PTNUM
       ***         MOVE SPACE TO KEY-N-PTNUM
-               ADD     1                   TO  CNT-RECE10   
+               ADD     1                   TO  CNT-RECE10
       *         
                DISPLAY "PTNUM="     RECE10-PTNUM
                        " SRYYM="    RECE10-SRYYM 
@@ -1407,7 +1427,7 @@
                END-STRING
                PERFORM 500-ERR-HENSYU-SEC
       *
-               STRING  "ORCBM042 select err TABLE="
+               STRING  "ORCBM043 select err TABLE="
                                            DELIMITED   BY  SIZE
                        MCP-TABLE           DELIMITED   BY  SPACE
                        " PATHNAME="        DELIMITED   BY  SIZE
