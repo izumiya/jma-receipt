@@ -602,6 +602,13 @@ end
                 when    'HCN53V04.red'
                         ls_w1 = 'HCN54V04.red'
                         red_file = std_form + ls_w1
+#   -----------> Ï«ºÒÀÁµá½ñÊ¬(2015/07/22)
+                when    'HCM79.red'
+                        ls_w1 = 'HCM80.red'
+                        red_file = std_form + ls_w1
+                when    'HCM81.red'
+                        ls_w1 = 'HCM82.red'
+                        red_file = std_form + ls_w1
 		end
 	end
 #   Ï«ºÒ¤ÎÏÈ¤Ê¤·Ä¢É¼¤ò¥¹¥¤¥Ã¥Á¤¹¤ë ed

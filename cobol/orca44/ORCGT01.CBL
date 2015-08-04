@@ -182,6 +182,9 @@
       *  04.07.15    NACL-Æ£¸¶    14/04/22  £Å£Æ¥Õ¥¡¥¤¥ëºîÀ®ÂÐ±þ
       *  04.07.16    NACL-Æ£¸¶    14/12/05  ÆþÎÏ¥Á¥§¥Ã¥¯¤Î½¤Àµ
       *  04.07.17    NACL-Æ£¸¶    14/12/24  £Å£Æ¥Õ¥¡¥¤¥ëÌ¾½¤Àµ
+      *  04.07.18    NACL-Æ£¸¶    15/07/17  Ï«ºÒ¿ÇÎÅÈñÀÁµá½ñµÚ¤Ó¥¢¥Õ¥¿¡¼
+      *                                     ¥±¥¢°ÑÂ÷ÈñÀÁµá½ñ¤Î£Ï£Ã£ÒÍÍ¼°
+      *                                     ÂÐ±þ
       *
       *  04.08.01    NACL-¿¹ÏÆ    13/04/12  ¥·¥¹¥Æ¥à£Ä£ÂÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
@@ -940,6 +943,15 @@ grpsys                                         SPA-AREA
                                        =   SPACE
                MOVE    "0"             TO  SYS-200501-ROURECEKBN
            END-IF
+           IF     SYS-200501-ROUSAIPRTKBN
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-ROUSAIPRTKBN
+               MOVE    "1"             TO  SYS-200501-FRAME-ROUSAIPRTKBN
+           END-IF
+           IF     SYS-200501-FRAME-ROUSAIPRTKBN
+                                       =   SPACE
+               MOVE    "0"             TO  SYS-200501-FRAME-ROUSAIPRTKBN
+           END-IF
            MOVE    SYS-200501-KOUIKIKBN
                                        TO  SPA-NAI-200501-KOUIKIKBN
            MOVE    SYS-200501-KOUIKIRECEKBN
@@ -964,7 +976,12 @@ grpsys                                         SPA-AREA
                                        SPA-NAI-200501-RECEDEN-CHK-KBN
            MOVE    SYS-200501-ROURECEKBN
                                        TO  SPA-NAI-200501-ROURECEKBN
-      *
+           MOVE    SYS-200501-ROUSAIPRTKBN
+                                       TO  SPA-NAI-200501-ROUSAIPRTKBN
+           MOVE    SYS-200501-FRAME-ROUSAIPRTKBN
+                                       TO
+                                       SPA-NAI-200501-FRAME-ROUSAIPRTKBN
+     *
            IF      SPA-MW              =   SPA-GINBEE
                MOVE    "0"                 TO
                                        SPA-NAI-200501-RECEDEN-CHK-KBN
@@ -4657,6 +4674,10 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
            MOVE    ERRFLPARA-BASENAME
                                    TO  SHELLTBL-ARG15
+           MOVE    SPA-NAI-200501-ROUSAIPRTKBN
+                                   TO  SHELLTBL-ARG16
+           MOVE    SPA-NAI-200501-FRAME-ROUSAIPRTKBN
+                                   TO  SHELLTBL-ARG17
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE

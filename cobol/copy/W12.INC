@@ -580,6 +580,18 @@
                     06  W12-KOUIKIPRTKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-KOUIKIPRTKBNLST
                             PIC X(34)   OCCURS  5 TIMES.
+                  05  W12-ROUSAIPRTKBN-COMBO.
+                    06  W12-ROUSAIPRTKBN.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-ROUSAIPRTKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-ROUSAIPRTKBNLST
+                            PIC X(20)   OCCURS  2 TIMES.
+                  05  W12-FRAME-ROUSAIPRTKBN-COMBO.
+                    06  W12-FRAME-ROUSAIPRTKBN.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-FRAME-ROUSAIPRTKBN-COUNT   PIC S9(9) BINARY.
+                    06  W12-FRAME-ROUSAIPRTKBNLST
+                            PIC X(20)   OCCURS  2 TIMES.
                 04  W12-FI27.
                   05  W12-SYUKA-KBN-COMBO.
                     06  W12-SYUKA-KBN.
