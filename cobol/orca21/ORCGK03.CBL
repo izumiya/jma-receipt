@@ -75,6 +75,7 @@
       *  04.07.01    NACL-多々納  12/01/05  クライアント印刷対応
       *  04.07.01    NACL-多々納  13/07/23  お薬手帳ＣＳＶ患者毎対応
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
+      * 04.08.00     NACL-多々納  15/08/05  領収・明細　請求書不要対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -879,6 +880,13 @@
            ELSE
       *        患者毎の設定あり
                MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+      *H27.8
+      *        請求書不要
+               IF      SPA-SKYPRTFLG       =   "8"
+                                           OR  "9"
+                                           OR  "A"
+                   MOVE    "0"                 TO  WRK-SKYPRTFLG
+               END-IF
            END-IF
       *    患者毎の発行区分変更
            EVALUATE    WRK-SKYPRTFLG
@@ -1236,12 +1244,15 @@
                    MOVE    "0"                 TO  SPA-MEIPRTFLG
                WHEN    "1"
                WHEN    "7"
+               WHEN    "8"
       *            発行あり
                    MOVE    "1"                 TO  SPA-MEIPRTFLG
                WHEN    "2"
+               WHEN    "9"
       *            請求あり
                    MOVE    "2"                 TO  SPA-MEIPRTFLG
                WHEN    "3"
+               WHEN    "A"
       *            発行する（訂正時なし）
                    MOVE    "3"                 TO  SPA-MEIPRTFLG
                WHEN    "4"
@@ -1458,11 +1469,11 @@
       *    MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
       *    伝票番号
       *    MOVE    SYU-DENPNUM          TO  SPA-GMN-DENPNUM
-           IF      SPA-SYORIFLG        =   1
-               IF      SYU-DENPNUM     NOT =   ZERO
-                   MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
-               END-IF
-           END-IF
+      *H27 IF      SPA-SYORIFLG        =   1
+      *        IF      SYU-DENPNUM     NOT =   ZERO
+      *            MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
+      *        END-IF
+      *    END-IF
       *
       *    保険料
            MOVE    ZERO                TO  SPA-GMN-HKNRYO (17)
@@ -2023,6 +2034,18 @@
            AND    (SPA-SYORIFLG        =   ZERO  )
                MOVE    1               TO  SPA-NAI-NYUKINFLG
            END-IF
+      *H27.8
+           IF      SPA-SYORIFLG        =   1
+               IF     (SPA-GMN-SRYKA       =   ZERO )
+                AND   (SPA-GMN-HKNCOMBI    =   "0000")
+                   MOVE    SPA-DENPNUM         TO  SPA-GMN-DENPNUM
+               ELSE
+                   IF      SYU-DENPNUM     NOT =   ZERO
+                       MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
+                   END-IF
+               END-IF
+           END-IF
+      *
       *
             .
        3100-SYUNOU-HEN-EXT.
@@ -3260,7 +3283,7 @@
            END-IF
            MOVE    SPA-GMN-FUKUZENMDS  TO  K03-FUKUZENMDS
            MOVE    SPA-GMN-FUKUZENMDS2 TO  K03-FUKUZENMDS2
-      *TEST
+      *
       *TEST
            IF      SPA-GMN-FUKUZENMDS2 =   SPACE
                EVALUATE    SPA-SKYPRTFLG
@@ -3287,6 +3310,16 @@
                                            TO  K03-FUKUZENMDS2
                WHEN    "7"
                    MOVE    "【請求書必要（請求あり）（明細書必要）】"
+                                           TO  K03-FUKUZENMDS2
+      *H27.8
+               WHEN    "8"
+                   MOVE    "【請求書不要・明細書必要】"
+                                           TO  K03-FUKUZENMDS2
+               WHEN    "9"
+                   MOVE    "【請求書不要・明細書必要（請求あり）】"
+                                           TO  K03-FUKUZENMDS2
+               WHEN    "A"
+                   MOVE    "【請求書不要・明細書必要（訂正時なし）】"
                                            TO  K03-FUKUZENMDS2
                END-EVALUATE
            END-IF
@@ -4319,6 +4352,13 @@
                    ELSE
       *                患者毎の設定あり
                        MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+      *H27.8
+      *                請求書不要
+                       IF      SPA-SKYPRTFLG       =   "8"
+                                                   OR  "9"
+                                                   OR  "A"
+                           MOVE    "0"             TO  WRK-SKYPRTFLG
+                       END-IF
                    END-IF
       *            請求額がゼロ以下の時、請求書発行区分変更
                    IF      WRK-SKYPRTFLG       =   "2"
@@ -4746,6 +4786,7 @@
                       (WRK-HKNCOMBI    NOT =   ZERO )
                    MOVE    SPA-GMN-NYUKIN  TO  SYU-NYUKIN-TOTAL
                END-IF
+      *
                MOVE    SYUNOU-REC          TO  SPA-SYUNOU-REC
                                                  (SPA-SYUNOU-IDX)
       *        今回入金額
