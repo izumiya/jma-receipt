@@ -1478,11 +1478,12 @@
       *    MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
       *    ≈¡…º»÷πÊ
       *    MOVE    SYU-DENPNUM          TO  SPA-GMN-DENPNUM
-           IF      SPA-SYORIFLG        =   1
-               IF      SYU-DENPNUM     NOT =   ZERO
-                   MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
-               END-IF
-           END-IF
+      *H27.8
+      *    IF      SPA-SYORIFLG        =   1
+      *        IF      SYU-DENPNUM     NOT =   ZERO
+      *            MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
+      *        END-IF
+      *****END-IF
       *
       *     ›∏±Œ¡
            MOVE    ZERO                TO  SPA-GMN-HKNRYO (17)
@@ -2042,6 +2043,17 @@
                   (SPA-GMN-HKNCOMBI    =   SPA-GOK-HKNCOMBI)
            AND    (SPA-SYORIFLG        =   ZERO  )
                MOVE    1               TO  SPA-NAI-NYUKINFLG
+           END-IF
+      *H27.8
+           IF      SPA-SYORIFLG        =   1
+               IF     (SPA-GMN-SRYKA       =   ZERO )
+                AND   (SPA-GMN-HKNCOMBI    =   "0000")
+                   MOVE    SPA-DENPNUM         TO  SPA-GMN-DENPNUM
+               ELSE
+                   IF      SYU-DENPNUM     NOT =   ZERO
+                       MOVE    SYU-DENPNUM         TO  SPA-GMN-DENPNUM
+                   END-IF
+               END-IF
            END-IF
       *
             .
