@@ -3291,6 +3291,16 @@
                    END-PERFORM
       *
            END-PERFORM
+      *
+      *    ======   TEST   DISPLAY ======
+      *     PERFORM VARYING IDXX    FROM    1   BY  1
+      *             UNTIL   IDXX    >       31
+      *       DISPLAY "IDXX = "IDXX
+      *       DISPLAY "WRK-REC-XX(IDXX 1) = " WRK-REC-XX(IDXX 1)
+      *       DISPLAY "WRK-FEDT-XX(IDXX 1) = " WRK-FEDT-XX(IDXX 1)
+      *       DISPLAY "WRK-REC-XX(IDXX 2) = " WRK-REC-XX(IDXX 2)
+      *       DISPLAY "WRK-FEDT-XX(IDXX 2) = " WRK-FEDT-XX(IDXX 2)
+      *     END-PERFORM
            .
        20073-ZAI-HENSYU-EXT.
            EXIT.
@@ -4510,8 +4520,9 @@
       *        AZU-ADD START 2015.6.9
       *            特定入院料の時、退避しておいた出来高入院料を追加する
                    IF  IDZ1   =   2
-                      PERFORM   VARYING   IDZ7  FROM  1  BY  1
-                        UNTIL   (IDZ7     >   10)   OR
+                     IF   LNK-DPCNYUIN-MEISAISU (IDZ1 IDZ2)  NOT = ZERO
+                        PERFORM   VARYING   IDZ7  FROM  1  BY  1
+                          UNTIL   (IDZ7     >   10)   OR
                                 (WRK-REC-LENGTH-XX(IDZ2 IDZ7)  =  ZERO)
                            MOVE    WRK-REC-XX(IDZ2 IDZ7) 
                                                TO   WRK-REC
@@ -4529,7 +4540,8 @@
                            MOVE    WRK-FEDT-XX(IDZ2 IDZ7)
                                                TO   WRK-FEDT-AREA
                            PERFORM 5001-FILE-F-WRITE-SEC
-                      END-PERFORM
+                        END-PERFORM
+                     END-IF
                    END-IF
       *        AZU-ADD END   2015.6.9
       *
