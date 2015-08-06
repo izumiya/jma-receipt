@@ -8758,7 +8758,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            IF      SPA-GMN-JIBAIPRTKBN1-G
                                    =   SPACE
-              MOVE    SPA-GMN-JIBAIPRTKBN1LST (3)
+               MOVE    SPA-GMN-JIBAIPRTKBN1LST (3)
                                        TO  SPA-GMN-JIBAIPRTKBN1-G
            ELSE
                PERFORM VARYING IDY FROM    1   BY  1
@@ -8951,6 +8951,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            IF      SPA-GMN-ROUSAIPRTKBN   =   SPACE
                MOVE    SPACE           TO  SPA-GMN-ROUSAIPRTKBN-G
+                                           SPA-GMN-FRAME-ROUSAIPRTKBN-G
            ELSE
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       SPA-GMN-ROUSAIPRTKBN-MAX
@@ -8968,6 +8969,14 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    311                 TO  SPA-GMN-CUR
                    MOVE    "0126"              TO  SPA-ERRCD
                ELSE
+                   IF      SPA-GMN-ROUSAIPRTKBN    =   "0"
+                       IF      SPA-GMN-FRAME-ROUSAIPRTKBN-G
+                                                       =   SPACE
+                           MOVE    SPA-GMN-FRAME-ROUSAIPRTKBNLST (1)
+                                                       TO
+                                           SPA-GMN-FRAME-ROUSAIPRTKBN-G
+                       END-IF
+                   END-IF 
                    IF      SPA-GMN-ROUSAIPRTKBN    =   "1"
                        MOVE    SPA-GMN-FRAME-ROUSAIPRTKBNLST (2)
                                                    TO
@@ -9014,6 +9023,10 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                                    TO
                                            SPA-GMN-FRAME-ROUSAIPRTKBN-G
                    END-IF 
+                   IF      SPA-GMN-ROUSAIPRTKBN   =   SPACE
+                       MOVE    SPACE               TO
+                                           SPA-GMN-FRAME-ROUSAIPRTKBN-G
+                   END-IF
                END-IF
            END-IF
       *
