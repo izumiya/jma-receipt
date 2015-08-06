@@ -1811,6 +1811,9 @@
                               (SPA-ERRCD        NOT =   SPACE)
              IF   (WRK-COM-HKNCOMBI (IDX) NOT =   "9999")
              AND  (WRK-COM-YAKUHYO  (IDX) NOT =   "1"   )
+      *H27.8 包括剤対象外
+             AND  (WRK-COM-HOUKATU-ZAI(IDX)   =   ZERO  )
+      *
       *        点滴は１回のみとする（外来のみ）
                IF     (SPA-NYUGAIKBN               =   "2"   )  AND
       **              (WRK-COM-SRYSYUKBN(IDX)  NOT =   "950"  AND
@@ -2365,7 +2368,7 @@
       *    診療年月の診療会計マスタ読み込み
            MOVE    SPACE               TO  SRYACCT-REC
            INITIALIZE                      SRYACCT-REC
-           MOVE    SPA-HOSPNUM          TO  ACCT-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  ACCT-NYUGAIKBN
            MOVE    SPA-PTID            TO  ACCT-PTID
            MOVE    SPA-SRYYMD(1:6)     TO  ACCT-SRYYM
