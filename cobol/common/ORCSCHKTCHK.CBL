@@ -885,6 +885,13 @@
                        CONTINUE
                    ELSE
                        MOVE    1               TO  FLG-CHK
+      *H27.8
+      *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ»»ÄêÆü¤ÎÏ«ºÒ¡¦¼«ÇåÀÕ¤ÏÂÐ¾Ý³°
+                       IF     (TBL-KANRICD (IDX)   =   "202" )
+                          AND (SPA-SYONIKA-ARI     =   ZERO  )
+                          AND (SPA-HKNKBN          =   1     )
+                           MOVE    ZERO            TO  FLG-CHK
+                       END-IF
                    END-IF
                WHEN    "3"
       *            »»Äê·î
@@ -1020,6 +1027,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    OR (SPA-COM-HOUKATU-ERR(IDX-Z)  =   1     )
                    OR (SPA-GMN-INPUTCD (IDX-Z)(1:1)
                                                    =   "#"
+                                                   OR  "." 
                                                    OR  "$"   )
       *            ¼£¸³ÂÐ¾Ý³°
                    OR (SPA-COM-CHIKENKBN(IDX-Z)    =   "1"   )
