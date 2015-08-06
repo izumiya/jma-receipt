@@ -885,6 +885,13 @@
                        CONTINUE
                    ELSE
                        MOVE    1               TO  FLG-CHK
+      *H27.8
+      *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ»»ÄêÆü¤ÎÏ«ºÒ¡¦¼«ÇåÀÕ¤ÏÂÐ¾Ý³°
+                       IF     (TBL-KANRICD (IDX)   =   "202" )
+                          AND (SPA-SYONIKA-ARI     =   ZERO  )
+                          AND (SPA-HKNKBN          =   1     )
+                           MOVE    ZERO            TO  FLG-CHK
+                       END-IF
                    END-IF
                WHEN    "3"
       *            »»Äê·î
