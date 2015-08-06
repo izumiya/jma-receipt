@@ -9544,9 +9544,13 @@
            IF      LNK-SC95-TENTEKI    =   1
                MOVE    SPACE           TO  SPA-ACCT2-SRYCD
            END-IF
-           COMPUTE SPA-ACCT2-CSYYOURYO
+           IF      SPA-ACCT2-CSYYOURYO <   LNK-SC95-CHUSYA
+               MOVE    ZERO            TO  SPA-ACCT2-CSYYOURYO
+           ELSE
+               COMPUTE SPA-ACCT2-CSYYOURYO
                                        =   SPA-ACCT2-CSYYOURYO
                                        -   LNK-SC95-CHUSYA
+           END-IF
       *
             PERFORM VARYING     IDX     FROM    1   BY  1
                     UNTIL      (IDX     >   SPA-MAX-LINE )  OR

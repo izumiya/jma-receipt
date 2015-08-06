@@ -5012,10 +5012,19 @@
                       (TNS-DATAKBN             =   "1"  )
                    MOVE    1                   TO  LNK-SC95-TENTEKI
                END-IF
+      *H27.8
+      *        包括分入力は対象外
+               IF     (ACCT-HKNCOMBI     =   "9999" )
+                  OR  (ACCT-JIHOKBN      =   "1"    )
+                   CONTINUE
+               ELSE
+      *
                IF      SRY-SRYCD (IDX)(1:1)    =   "6"
                    COMPUTE LNK-SC95-CHUSYA     =   LNK-SC95-CHUSYA
                                                +  (TNS-CSYYOURYO
                                                *   SRY-SRYSURYO(IDX))
+               END-IF
+      *
                END-IF
            END-IF
       *
