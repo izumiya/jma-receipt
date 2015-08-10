@@ -179,7 +179,7 @@
                        09  SPA-GMN-SKYPRTFLG-MEI      PIC X(48).
                    07  SPA-GMN-SKYPRTFLG-COB.
                        09  SPA-GMN-SKYPRTFLG-LST      PIC X(50)
-                                                      OCCURS 10.
+                                                      OCCURS 15.
                    07  SPA-SKYPRTFLG-MAX              PIC 9(02).
       *            出生時体重
                    07  SPA-GMN-BIRTHWEIGHT         PIC 9(04).

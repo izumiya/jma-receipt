@@ -56,6 +56,7 @@
       * 04.07.00     NACL-多々納  14/02/XX  患者介護情報追加対応
       * 04.07.00     NACL-多々納  14/03/XX  地域包括診療対象疾病対応
       * 04.07.00     NACL-多々納  15/06/16  診療科・保険組合せ件数対応
+      * 04.08.00     NACL-多々納  15/08/10  領収・明細　請求書不要対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1441,7 +1442,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-GMN-SKYPRTFLG-LST (7)
            MOVE    "7 請求書必要（請求あり）（明細書必要）"
                                        TO  SPA-GMN-SKYPRTFLG-LST (8)
-           MOVE    8                   TO  SPA-SKYPRTFLG-MAX
+           MOVE    "8 請求書不要・明細書必要"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (9)
+           MOVE    "9 請求書不要・明細書必要（請求あり）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (10)
+           MOVE    "A 請求書不要・明細書必要（訂正時なし）"
+                                       TO  SPA-GMN-SKYPRTFLG-LST (11)
+           MOVE    11                  TO  SPA-SKYPRTFLG-MAX
            MOVE    SPACE               TO  SPA-GMN-SKYPRTFLG-G
       *
       *    所得者２（高齢者福祉年金受給者証）

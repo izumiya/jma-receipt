@@ -918,6 +918,13 @@
            ELSE
       *        患者毎の設定あり
                MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+      *H27.8
+      *        請求書不要
+               IF      SPA-SKYPRTFLG       =   "8"
+                                           OR  "9"
+                                           OR  "A"
+                   MOVE    "0"                 TO  WRK-SKYPRTFLG
+               END-IF
            END-IF
       *    患者毎の発行区分変更
            EVALUATE    WRK-SKYPRTFLG
@@ -1266,12 +1273,15 @@
                    MOVE    "0"                 TO  SPA-MEIPRTFLG
                WHEN    "1"
                WHEN    "7"
+               WHEN    "8"
       *            発行あり
                    MOVE    "1"                 TO  SPA-MEIPRTFLG
                WHEN    "2"
+               WHEN    "9"
       *            請求あり
                    MOVE    "2"                 TO  SPA-MEIPRTFLG
                WHEN    "3"
+               WHEN    "A"
       *            発行する（訂正時なし）
                    MOVE    "3"                 TO  SPA-MEIPRTFLG
                WHEN    "4"
@@ -2902,6 +2912,7 @@
        500-GMNHEN-SEC                  SECTION.
       *
            MOVE    SPACE               TO  K03
+           INITIALIZE                      K03
       *
            MOVE    SPA-PTNUM           TO  K03-PTNUM
            MOVE    SPA-KANANAME        TO  K03-KANANAME
@@ -3318,6 +3329,16 @@
                                            TO  K03-FUKUZENMDS2
                WHEN    "7"
                    MOVE    "【請求書必要（請求あり）（明細書必要）】"
+                                           TO  K03-FUKUZENMDS2
+      *H27.8
+               WHEN    "8"
+                   MOVE    "【請求書不要・明細書必要】"
+                                           TO  K03-FUKUZENMDS2
+               WHEN    "9"
+                   MOVE    "【請求書不要・明細書必要（請求あり）】"
+                                           TO  K03-FUKUZENMDS2
+               WHEN    "A"
+                   MOVE    "【請求書不要・明細書必要（訂正時なし）】"
                                            TO  K03-FUKUZENMDS2
                END-EVALUATE
            END-IF
@@ -4343,6 +4364,13 @@
                    ELSE
       *                患者毎の設定あり
                        MOVE    SPA-SKYPRTFLG       TO  WRK-SKYPRTFLG
+      *H27.8
+      *                請求書不要
+                       IF      SPA-SKYPRTFLG       =   "8"
+                                                   OR  "9"
+                                                   OR  "A"
+                           MOVE    "0"             TO  WRK-SKYPRTFLG
+                       END-IF
                    END-IF
       *            請求額がゼロ以下の時、請求書発行区分変更
                    IF      WRK-SKYPRTFLG       =   "2"
