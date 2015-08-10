@@ -42,10 +42,13 @@ xml_medicalget02v2res {
 			Medical_Class_Point		varchar(08);
 			Medical_Class_Money 		varchar(08);
 			Medical_Class_code 		varchar(01);
+			Medical_Inclusion_Class		varchar(05);
 			Medication_info   {
 				Medication_Code		varchar(09);
 				Medication_Name		varchar(80);
 				Medication_Number	varchar(11);
+				Unit_Code		varchar(3);
+				Unit_Code_Name		varchar(24);
 			} [50];
       	 	} [135];
        	} [5];

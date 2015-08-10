@@ -4,6 +4,7 @@ xml_medicalgetv2req {
 	mode		int;
 	recordname	varchar(128);
 	medicalgetreq {
+		InOut			varchar(1);
 		Patient_ID		varchar(20);
     		Perform_Date		varchar(10);
 		For_Months		varchar(2);

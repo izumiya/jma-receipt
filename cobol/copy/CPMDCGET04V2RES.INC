@@ -103,6 +103,8 @@
                           09  MDC04RES-MDC-MOENY           PIC X(08).
       *               ≤ÛøÙ
                           09  MDC04RES-MDC-CLASS-NUMBER    PIC X(03).
-      *               ∫ﬁ∂Ë ¨° £±°ß Ò≥Á°À
+      *               ∫ﬁ∂Ë ¨
                           09  MDC04RES-MDC-CODE            PIC X(01).
+      *                Ò≥Á∂Ë ¨° True°ß Ò≥Á∫ﬁ°À
+                          09  MDC04RES-INCLUSION-CLASS     PIC X(05).
       *

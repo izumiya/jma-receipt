@@ -63,8 +63,14 @@
                   05  MDC03RES-PRSCRPT-CODE        PIC X(9).
       *           ¿ÇÎÅÌ¾¾Î
                   05  MDC03RES-PRSCRPT-NAME        PIC X(80).
+      *           Ã±°Ì
+                  05  MDC03RES-UNIT-CODE           PIC X(03).
+      *           Ã±°ÌÌ¾¾Î
+                  05  MDC03RES-UNIT-NAME           PIC X(24).
       *           Êñ³ç¶èÊ¬
                   05  MDC03RES-MDC-CODE            PIC X(01).
+      *           Êñ³ç¶èÊ¬¡ÊTrue¡§Êñ³çºÞ¡Ë
+                  05  MDC03RES-INCLUSION-CLASS     PIC X(05).
       *           »»ÄêÆü¹ç·×
                   05  MDC03RES-MDC-CLASS-NUMBER    PIC X(02).
       *           »»ÄêÆü
