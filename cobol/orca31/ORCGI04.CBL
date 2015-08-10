@@ -123,6 +123,7 @@
            03  IDX5                PIC 9(05).
            03  IDX6                PIC 9(05).
            03  IDX7                PIC 9(05).
+           03  IDX8                PIC 9(05).
            03  IDX-M               PIC 9(05).
            03  IDX-MAX             PIC 9(05).
            03  IDX-G               PIC 9(05).
@@ -235,7 +236,6 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-CHOSEITTL               PIC  S9(08).
            03  WRK-CHOSEI                  PIC  S9(08).
-           03  WRK-SKYPRTFLG               PIC  9(01).
       *!!
       *I041用
            03  IDX-D                    PIC 9(04).
@@ -270,23 +270,28 @@
            03  CONST-EDIT-TEIKI            PIC 9(01)   VALUE   1.
            03  CONST-BFSYU-MAX             PIC 9(05)   VALUE   400.
            03  CONST-PRTDEF-G.
-               05  CONST-PRTDEF0       PIC X(08)   VALUE   "00000000".
-               05  CONST-PRTDEF1       PIC X(08)   VALUE   "11111111".
-               05  CONST-PRTDEF2       PIC X(08)   VALUE   "22222222".
-               05  CONST-PRTDEF3       PIC X(08)   VALUE   "11110000".
-               05  CONST-PRTDEF4       PIC X(08)   VALUE   "10101010".
-               05  CONST-PRTDEF5       PIC X(08)   VALUE   "20202020".
-               05  CONST-PRTDEF6       PIC X(08)   VALUE   "10100000".
-               05  CONST-PRTDEF7       PIC X(08)   VALUE   "21212121".
+               05  CONST-PRTDEF0       PIC X(09)   VALUE   "000000000".
+               05  CONST-PRTDEF1       PIC X(09)   VALUE   "111111111".
+               05  CONST-PRTDEF2       PIC X(09)   VALUE   "222222222".
+               05  CONST-PRTDEF3       PIC X(09)   VALUE   "311110000".
+               05  CONST-PRTDEF4       PIC X(09)   VALUE   "410101010".
+               05  CONST-PRTDEF5       PIC X(09)   VALUE   "520202020".
+               05  CONST-PRTDEF6       PIC X(09)   VALUE   "610100000".
+               05  CONST-PRTDEF7       PIC X(09)   VALUE   "721212121".
+               05  CONST-PRTDEF8       PIC X(09)   VALUE   "801010101".
+               05  CONST-PRTDEF9       PIC X(09)   VALUE   "902020202".
+               05  CONST-PRTDEFA       PIC X(09)   VALUE   "A01010000".
            03  CONST-PRTDEF-R  REDEFINES   CONST-PRTDEF-G.
       *        0〜7 患者登録業務の請求書発行区分
-               05  CONST-PRTDEF-OCC            OCCURS  8.
+               05  CONST-PRTDEF-OCC            OCCURS  11.
+                   07  CONST-PRTDEF-PRTFLG     PIC  X(01).
       *            (1):新規 (2)：訂正時
                    07  CONST-PRTDEF-OCC2       OCCURS  2.
       *            (1):請求額>0 (2)：請求額=0
                        09  CONST-PRTDEF-OCC3   OCCURS  2.
                            11  CONST-SKYPRTOUT PIC X(01).
                            11  CONST-SRYPRTOUT PIC X(01).
+           03  CONST-PRTDEF-MAX                PIC 9(05)   VALUE   11.
       *
        01  WRK-ROW-AREA.
            03  WRK-HKNCOMBILST-ROW         PIC S9(9)   BINARY.
@@ -874,13 +879,19 @@
            MOVE    SYS-5000-SRYPRTKBN
                                    TO  SPA-GMN-I04-SRYPRTOUT
       *
-           IF    ( SPA-NAI-I04-PTSKYPRT   >=  "0" )
-            AND  ( SPA-NAI-I04-PTSKYPRT   <=  "7" )
+           MOVE    ZERO            TO  IDX1
+           PERFORM VARYING IDX8    FROM    1   BY  1
+                   UNTIL ( IDX8    >   CONST-PRTDEF-MAX )
+                    OR   ( IDX1    >   ZERO )
       *
-               MOVE    SPA-NAI-I04-PTSKYPRT
-                                   TO  WRK-SKYPRTFLG
-               COMPUTE IDX1
-                   =   WRK-SKYPRTFLG   +   1
+               IF    ( CONST-PRTDEF-PRTFLG (IDX8)
+                                   =   SPA-NAI-I04-PTSKYPRT )
+                   MOVE    IDX8    TO  IDX1
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( IDX1        NOT =  ZERO )
       *
                IF    ( SPA-I01-I04-PROCKBN         =   "2" )
                 AND  ( SPA-NAI-I04-SAIKEISANFLG    =   1 )
@@ -2730,6 +2741,15 @@
                                    TO  I04-LBLINFO2
                WHEN    "7"
                    MOVE    "【請求書必要（請求あり）（明細書必要）】"
+                                   TO  I04-LBLINFO2
+               WHEN    "8"
+                   MOVE    "【請求書不要・明細書必要】"
+                                   TO  I04-LBLINFO2
+               WHEN    "9"
+                   MOVE    "【請求書不要・明細書必要（請求あり）】"
+                                   TO  I04-LBLINFO2
+               WHEN    "A"
+                   MOVE    "【請求書不要・明細書必要（訂正時なし）】"
                                    TO  I04-LBLINFO2
                END-EVALUATE
       *

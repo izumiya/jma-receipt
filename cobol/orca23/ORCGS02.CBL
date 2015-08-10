@@ -9011,6 +9011,15 @@
            WHEN    "7"
                MOVE    "【請求書必要（請求あり）（明細書必要）】"
                                    TO  WRK-SKYPRTMSG
+           WHEN    "8"
+               MOVE    "【請求書不要・明細書必要】"
+                                   TO  WRK-SKYPRTMSG
+           WHEN    "9"
+               MOVE    "【請求書不要・明細書必要（請求あり）】"
+                                   TO  WRK-SKYPRTMSG
+           WHEN    "A"
+               MOVE    "【請求書不要・明細書必要（訂正時なし）】"
+                                   TO  WRK-SKYPRTMSG
            END-EVALUATE
       *
            .
