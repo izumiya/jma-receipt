@@ -30,12 +30,12 @@
             02  MDCREQ-MODE              PIC S9(9)   BINARY.
             02  MDCREQ-RECORDNAME        PIC X(128).
             02  MDCREQ-MEDICALREQ.
+      *       入外区分（Ｉ：入院）
+              03  MDCREQ-INOUT-CLASS       PIC X(1).
       *       患者番号
               03  MDCREQ-PATIENTID         PIC X(20).
       *       診療日付
               03  MDCREQ-PERFORM-DATE      PIC X(10).
-      *       入外区分（１：入院）
-      ****    03  MDCREQ-OUTPATIENT-CLASS  PIC X(1).
       *       診療月数
               03  MDCREQ-FOR-MONTHS        PIC X(02).
       *

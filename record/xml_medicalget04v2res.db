@@ -46,6 +46,7 @@ xml_medicalget04v2res {
 			Medical_Class_Money 		varchar(08);
 			Medical_Class_Number		varchar(03);
 			Medical_Class_code 		varchar(01);
+			Medical_Inclusion_Class		varchar(05);
 			} [100];
       	 	} [40];
    	}[31];

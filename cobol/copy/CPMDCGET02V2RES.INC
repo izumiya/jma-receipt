@@ -100,6 +100,8 @@
                       07  MDC02RES-MDC-MOENY           PIC X(08).
       *               ºÞ¶èÊ¬
                       07  MDC02RES-MDC-CODE            PIC X(01).
+      *               Êñ³ç¶èÊ¬¡ÊTrue¡§Êñ³çºÞ¡Ë
+                      07  MDC02RES-INCLUSION-CLASS     PIC X(05).
       *               ºÞÆâÍÆ
                       07  MDC02RES-PRESCRIPTION-INFO   OCCURS  50.
       *                   ¿ÇÎÅ¥³¡¼¥É
@@ -108,4 +110,8 @@
                           09  MDC02RES-PRSCRPT-NAME         PIC X(80).
       *                   ¿ôÎÌ
                           09  MDC02RES-PRSCRPT-NUMBER       PIC X(11).
+      *                   Ã±°Ì
+                          09  MDC02RES-UNIT-CODE            PIC X(03).
+      *                   Ã±°ÌÌ¾¾Î
+                          09  MDC02RES-UNIT-NAME            PIC X(24).
       *

@@ -22,7 +22,10 @@ xml_medicalget03v2res {
 		Medical_Class_Name		varchar(50);
 		Medication_Code			varchar(09);
 		Medication_Name			varchar(80);
+		Unit_Code			varchar(3);
+		Unit_Code_Name			varchar(24);
 		Medical_Class_code 		varchar(01);
+		Medical_Inclusion_Class		varchar(05);
 		Perform_Total_Number		varchar(02);
 		Perform_Calendar  		varchar(31);
 		Perform_Day_Information  {

@@ -30,6 +30,8 @@
       *
       * 04.08.00     NACL-多々納  13/12/XX  診療行為剤点数情報対応
       * 04.07.00     NACL-多々納  14/12/XX  診療月数対応
+      * 04.07.00     NACL-多々納  15/08/XX  入院対応、単位追加対応
+      *                                     包括対象項目追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -191,6 +193,9 @@
            03  WRK-MONEY               PIC S9(09).
            03  WRK-SUM-TEN             PIC S9(09).
            03  WRK-SRY-SRYSYUKBN       PIC X(03).
+      *    単位
+           03  WRK-TANICD              PIC X(03).
+           03  WRK-TANINAME            PIC X(24).
       *
        01  TBL-JYURRK-AREA.
            03  TBL-JYURRK-OCC          OCCURS   150.
@@ -207,6 +212,10 @@
                05  TBL-SYORI03-OCC2         OCCURS   400.
                    07  TBL-SRYCD            PIC X(09).
                    07  TBL-NAME             PIC X(80).
+      *H27.8       単位
+                   07  TBL-TANICD           PIC X(03).
+                   07  TBL-TANINAME         PIC X(24).
+      *
                    07  TBL-HKTKBN           PIC X(01).
                    07  TBL-DAY-G            OCCURS   31.
                        09  TBL-D-DAY        PIC 9(03).
@@ -929,6 +938,13 @@
            END-IF
       *    システム日付とする
            MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
+      *H27.8
+      *    入外区分（Ｉ：入院）
+           IF      MDCREQ-INOUT-CLASS  =   "I"
+               MOVE    "1"                 TO  SPA-NYUGAIKBN
+           ELSE
+               MOVE    "2"                 TO  SPA-NYUGAIKBN
+           END-IF
       *
       *    必須入力チェック
       *    患者番号
@@ -1047,7 +1063,7 @@
            END-IF
       *!
       *    外来とする
-           MOVE    "2"                 TO  SPA-NYUGAIKBN
+      **** MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
       *H26.12
       *    検索終了診療年月
@@ -1392,7 +1408,7 @@
            END-IF
       *!
       *    外来とする
-           MOVE    "2"                 TO  SPA-NYUGAIKBN
+      *****MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
       *    診療種別テーブルセット
            CALL    "ORCSSRYSYU"        USING
@@ -1896,6 +1912,13 @@
                                                        (IDX IDY IDX-S)
            MOVE    WRK-SURYO-HX        TO  MDC02RES-PRSCRPT-NUMBER
                                                        (IDX IDY IDX-S)
+      *H27.8
+      *    単位
+           PERFORM 200341-TANINAME-HEN-SEC
+           MOVE    WRK-TANICD          TO  MDC02RES-UNIT-CODE
+                                                     (IDX IDY IDX-S)
+           MOVE    WRK-TANINAME        TO  MDC02RES-UNIT-NAME
+                                                     (IDX IDY IDX-S)
       *
       *    診療コードの金額集計
            IF      SRY-SRYKBN          =   "95"
@@ -1979,6 +2002,8 @@
       *    包括区分
            IF      ACCT-JIHOKBN        =   "1"
                MOVE    "1"             TO  MDC02RES-MDC-CODE  (IDX IDY)
+               MOVE    "True"          TO  MDC02RES-INCLUSION-CLASS
+                                                              (IDX IDY)
            END-IF
            .
        200342-ZAINUM-HEN-EXT.
@@ -2017,6 +2042,35 @@
            .
        200342-KINGAKU-HEN-EXT.
            EXIT.
+      *H27.8
+      *****************************************************************
+      *     単位名称編集処理
+      *****************************************************************
+       200341-TANINAME-HEN-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  WRK-TANICD
+           MOVE    SPACE               TO  WRK-TANINAME
+      *    薬剤・器材
+           IF     (SRY-SRYCD (IDXA)(1:1)   =   "6"
+                                           OR  "7" )
+               MOVE    TNS-TANICD          TO  WRK-TANICD
+               MOVE    TNS-TANINAME        TO  WRK-TANINAME
+           END-IF
+      *    診療コード・商品コードは単位ありの時
+           IF     (TNS-TANICD          =   ZERO
+                                       OR  SPACE )
+               CONTINUE
+           ELSE
+               IF     (SRY-SRYCD (IDXA)(1:1)   =   "1"  ) 
+                  OR  (SRY-SRYCD (IDXA)(1:3)   =   "059"
+                                               OR  "058")
+                   MOVE    TNS-TANICD          TO  WRK-TANICD
+                   MOVE    TNS-TANINAME        TO  WRK-TANINAME
+               END-IF
+           END-IF
+           .
+       200341-TANINAME-HEN-EXT.
+           EXIT.
       *****************************************************************
       *     診療種別区分名称、診療行為区分セット
       *****************************************************************
@@ -2054,7 +2108,7 @@
            END-IF
       *!
       *    外来とする
-           MOVE    "2"                 TO  SPA-NYUGAIKBN
+      *****MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
       *    診療種別テーブルセット
            CALL    "ORCSSRYSYU"        USING
@@ -2312,6 +2366,12 @@
                                                                (IDX IDY)
                            MOVE    TNS-NAME            TO  TBL-NAME
                                                                (IDX IDY)
+      *H27.8               単位
+                           PERFORM 200341-TANINAME-HEN-SEC
+                           MOVE    WRK-TANICD          TO  TBL-TANICD
+                                                               (IDX IDY)
+                           MOVE    WRK-TANINAME        TO  TBL-TANINAME
+                                                               (IDX IDY)
       *                    包括区分
                            IF      ACCT-JIHOKBN        =   "1"
                                MOVE    "1"             TO  TBL-HKTKBN
@@ -2417,8 +2477,19 @@
                                                                 (IDX-T)
            MOVE    TBL-SRYCD (IDX IDY) TO  MDC03RES-PRSCRPT-CODE(IDX-T)
            MOVE    TBL-NAME  (IDX IDY) TO  MDC03RES-PRSCRPT-NAME(IDX-T)
+      *    単位
+           MOVE    TBL-TANICD (IDX IDY)
+                                       TO  MDC03RES-UNIT-CODE(IDX-T)
+           MOVE    TBL-TANINAME (IDX IDY)
+                                       TO  MDC03RES-UNIT-NAME(IDX-T)
       *    包括区分
            MOVE    TBL-HKTKBN(IDX IDY) TO  MDC03RES-MDC-CODE (IDX-T)
+      *H27.8
+           IF      TBL-HKTKBN(IDX IDY) =   "1"
+               MOVE    "True"          TO  MDC03RES-INCLUSION-CLASS
+                                                             (IDX-T)
+           END-IF
+      *
       *    算定回数
            MOVE    ZERO                TO  WRK-CNT
            MOVE    ZERO                TO  WRK-TBL-DAY-G
@@ -2480,7 +2551,7 @@
            END-IF
       *!
       *    外来とする
-           MOVE    "2"                 TO  SPA-NYUGAIKBN
+      **** MOVE    "2"                 TO  SPA-NYUGAIKBN
       *
       *    診療種別テーブルセット
            CALL    "ORCSSRYSYU"        USING
@@ -3093,6 +3164,8 @@
            IF      TBL-S4-JIHOKBN (IDX-D IDX IDY)  =   "1"
                MOVE    TBL-S4-JIHOKBN (IDX-D IDX IDY)
                                        TO  MDC04RES-MDC-CODE
+                                                     (IDX1 IDX2 IDX3)
+               MOVE    "True"          TO  MDC04RES-INCLUSION-CLASS
                                                      (IDX1 IDX2 IDX3)
            END-IF
       *
