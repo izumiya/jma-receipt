@@ -52,6 +52,7 @@
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
+           03  IDX0                PIC 9(05).
            03  IDX1                PIC 9(05).
            03  IDX2                PIC 9(05).
            03  IDX3                PIC 9(05).
@@ -76,30 +77,34 @@
                05  WRK-COMP-SKYEDYMD   PIC X(08).
                05  WRK-COMP-DENPNUM    PIC 9(07).
            03  WRK-DENPNUM             PIC 9(07).
-           03  WRK-SKYPRTFLG           PIC  9(01).
            03  WRK-STIDX               PIC  9(03).
       *
        01  CONST-AREA.
            03  CONST-SRYKBN-MAX        PIC 9(03)   VALUE 17.
            03  CONST-GRP-MAX           PIC 9(03)   VALUE 10.
            03  CONST-PRTDEF-G.
-               05  CONST-PRTDEF0       PIC X(08)   VALUE   "00000000".
-               05  CONST-PRTDEF1       PIC X(08)   VALUE   "11111111".
-               05  CONST-PRTDEF2       PIC X(08)   VALUE   "11001100".
-               05  CONST-PRTDEF3       PIC X(08)   VALUE   "11110000".
-               05  CONST-PRTDEF4       PIC X(08)   VALUE   "10101010".
-               05  CONST-PRTDEF5       PIC X(08)   VALUE   "10001000".
-               05  CONST-PRTDEF6       PIC X(08)   VALUE   "10100000".
-               05  CONST-PRTDEF7       PIC X(08)   VALUE   "11011101".
+               05  CONST-PRTDEF0       PIC X(09)   VALUE   "000000000".
+               05  CONST-PRTDEF1       PIC X(09)   VALUE   "111111111".
+               05  CONST-PRTDEF2       PIC X(09)   VALUE   "211001100".
+               05  CONST-PRTDEF3       PIC X(09)   VALUE   "311110000".
+               05  CONST-PRTDEF4       PIC X(09)   VALUE   "410101010".
+               05  CONST-PRTDEF5       PIC X(09)   VALUE   "510001000".
+               05  CONST-PRTDEF6       PIC X(09)   VALUE   "610100000".
+               05  CONST-PRTDEF7       PIC X(09)   VALUE   "711011101".
+               05  CONST-PRTDEF8       PIC X(09)   VALUE   "801010101".
+               05  CONST-PRTDEF9       PIC X(09)   VALUE   "901000100".
+               05  CONST-PRTDEFA       PIC X(09)   VALUE   "A01010000".
            03  CONST-PRTDEF-R  REDEFINES   CONST-PRTDEF-G.
       *        0¡Á7 ´µ¼ÔÅÐÏ¿¶ÈÌ³¤ÎÀÁµá½ñÈ¯¹Ô¶èÊ¬
-               05  CONST-PRTDEF-OCC            OCCURS  8.
+               05  CONST-PRTDEF-OCC                        OCCURS  11.
+                   07  CONST-PRTDEF-PRTFLG     PIC  X(01).
       *            (1):¿·µ¬ (2)¡§ÄûÀµ»þ
                    07  CONST-PRTDEF-OCC2       OCCURS  2.
       *            (1):ÀÁµá³Û>0 (2)¡§ÀÁµá³Û=0
                        09  CONST-PRTDEF-OCC3   OCCURS  2.
                            11  CONST-SKYPRTOUT PIC X(01).
                            11  CONST-SRYPRTOUT PIC X(01).
+           03  CONST-PRTDEF-MAX                PIC 9(05)   VALUE   11.
       *
        01  MYSYU-REC.
            COPY    "CPSYUNOU.INC"      REPLACING   //SYU-//
@@ -773,11 +778,20 @@
       *
                IF    ( ORCHCN03S02-CHKPRT      =   1 )
       *
-                   IF    ( PTINF-SKYPRTFLG            >=   "0" )
-                    AND  ( PTINF-SKYPRTFLG            <=   "7" )
+                   MOVE    ZERO    TO  IDX1
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   CONST-PRTDEF-MAX )
+                            OR   ( IDX1    >   ZERO )
+      *
+                       IF    ( CONST-PRTDEF-PRTFLG (IDX0)
+                                           =   PTINF-SKYPRTFLG )
+                           MOVE    IDX0    TO  IDX1
+                       END-IF
+      *
+                   END-PERFORM
+      *
+                   IF    ( IDX1                    NOT =   ZERO )
                     AND  ( ORCHCN03S02-PTINFREF        =   "1" )
-                       MOVE    PTINF-SKYPRTFLG     TO  WRK-SKYPRTFLG
-                       COMPUTE IDX1    =   WRK-SKYPRTFLG   +   1
                        IF    ( ORCHCN03-HAKKOFLG (ORCHCN03S02-IDX)
                                            NOT =   "2" )
                            MOVE    1           TO  IDX2

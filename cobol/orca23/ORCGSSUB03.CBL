@@ -241,7 +241,7 @@
        2001-SKYPRT-EDIT-SEC        SECTION.
       *
            IF    ( SSUB03-SKYPRT       =   SPACE )
-               IF    ( PTINF-SKYPRTFLG =   "0" )
+               IF    ( PTINF-SKYPRTFLG =   "0" OR "8" OR "9" OR "A" )
                    MOVE    "0"         TO  SSUB03-SKYPRT
                END-IF
            END-IF

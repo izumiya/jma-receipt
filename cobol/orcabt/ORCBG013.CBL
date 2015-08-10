@@ -179,8 +179,6 @@ grpsys*     03  RECEERR                             PIC X(100).
                05  WRK-FILEMEI-CD  PIC X(06).
            03  WRK-SRYYMD                          PIC X(08).
            03  WRK-DENPNUM                         PIC 9(07).
-           03  WRK-SKYPRTFLG.
-               05  WRK-SKYPRTFLG9                  PIC 9(01).
       *
        01  CONST-AREA.
            03  CONST-BTPARA-SHELLID        PIC X(08)
@@ -190,19 +188,24 @@ grpsys*     03  RECEERR                             PIC X(100).
            03  CONST-BTPARA-DSP-RENNUM     PIC 9(03)
                                            VALUE   2.
            03  CONST-PRTDEF-G.
-               05  CONST-PRTDEF0       PIC X(02)   VALUE   "00".
-               05  CONST-PRTDEF1       PIC X(02)   VALUE   "11".
-               05  CONST-PRTDEF2       PIC X(02)   VALUE   "11".
-               05  CONST-PRTDEF3       PIC X(02)   VALUE   "11".
-               05  CONST-PRTDEF4       PIC X(02)   VALUE   "10".
-               05  CONST-PRTDEF5       PIC X(02)   VALUE   "10".
-               05  CONST-PRTDEF6       PIC X(02)   VALUE   "10".
-               05  CONST-PRTDEF7       PIC X(02)   VALUE   "11".
+               05  CONST-PRTDEF0       PIC X(03)   VALUE   "000".
+               05  CONST-PRTDEF1       PIC X(03)   VALUE   "111".
+               05  CONST-PRTDEF2       PIC X(03)   VALUE   "211".
+               05  CONST-PRTDEF3       PIC X(03)   VALUE   "311".
+               05  CONST-PRTDEF4       PIC X(03)   VALUE   "410".
+               05  CONST-PRTDEF5       PIC X(03)   VALUE   "510".
+               05  CONST-PRTDEF6       PIC X(03)   VALUE   "610".
+               05  CONST-PRTDEF7       PIC X(03)   VALUE   "711".
+               05  CONST-PRTDEF8       PIC X(03)   VALUE   "801".
+               05  CONST-PRTDEF9       PIC X(03)   VALUE   "901".
+               05  CONST-PRTDEFA       PIC X(03)   VALUE   "A01".
            03  CONST-PRTDEF-R  REDEFINES   CONST-PRTDEF-G.
       *        0¡Á7 ´µ¼ÔÅÐÏ¿¶ÈÌ³¤ÎÀÁµá½ñÈ¯¹Ô¶èÊ¬
-               05  CONST-PRTDEF-OCC            OCCURS  8.
+               05  CONST-PRTDEF-OCC            OCCURS  11.
+                   07  CONST-PRTFLG            PIC X(01).
                    07  CONST-SKYPRTOUT         PIC X(01).
                    07  CONST-SRYPRTOUT         PIC X(01).
+           03  CONST-PRTDEF-MAX        PIC 9(05)   VALUE   11.
       *
        01  ERR-EDIT-AREA.
            03  ERR-PTID                            PIC 9(10).
@@ -1013,17 +1016,27 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
       *
            MOVE    1               TO      FLG-SKYPRT
                                            FLG-SRYPRT
+      *
+           MOVE    ZERO            TO      IDX1
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   CONST-PRTDEF-MAX )
+                    OR   ( IDX1    >   ZERO )
+      *
+               IF    ( CONST-PRTFLG (IDX0)
+                                   =   PTINF-SKYPRTFLG )
+                   MOVE    IDX0    TO  IDX1
+               END-IF
+      *
+           END-PERFORM
+      *
            IF    ( WRK-PARA-PTREFKBN       =   "1" )
-            AND  ( PTINF-SKYPRTFLG         >=  "0" )
-            AND  ( PTINF-SKYPRTFLG         <=  "7" )
-               MOVE    PTINF-SKYPRTFLG     TO  WRK-SKYPRTFLG
-               COMPUTE WRK-SKYPRTFLG9  =   WRK-SKYPRTFLG9  +   1
-               IF    ( CONST-SKYPRTOUT (WRK-SKYPRTFLG9)    =   "1" )
+            AND  ( IDX1                NOT =   ZERO )
+               IF    ( CONST-SKYPRTOUT (IDX1)  =   "1" )
                    MOVE    1       TO      FLG-SKYPRT
                ELSE
                    MOVE    ZERO    TO      FLG-SKYPRT
                END-IF
-               IF    ( CONST-SRYPRTOUT (WRK-SKYPRTFLG9)    =   "1" )
+               IF    ( CONST-SRYPRTOUT (IDX1)  =   "1" )
                    MOVE    1       TO      FLG-SRYPRT
                ELSE
                    MOVE    ZERO    TO      FLG-SRYPRT
