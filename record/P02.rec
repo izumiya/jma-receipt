@@ -457,7 +457,7 @@ P02 {
             textdata varchar(50);
           };
           count int;
-            item varchar(50)[10];
+            item varchar(50)[15];
         };
         P02_BIRTHWEIGHT {
           numdata number(4);
