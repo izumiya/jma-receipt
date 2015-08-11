@@ -2059,7 +2059,7 @@
       *
            MOVE       ZERO        TO   FLG-ZAINUM-MATCH
            PERFORM    VARYING   IDX2    FROM   1   BY  1
-             UNTIL    (IDX2     >    20)
+             UNTIL    (IDX2     >    40)
                  IF   ACCT-ZAINUM    =   LNK-ORCSTEN2-ZAINUM(IDX2)
                      MOVE    1    TO   FLG-ZAINUM-MATCH
                  END-IF
