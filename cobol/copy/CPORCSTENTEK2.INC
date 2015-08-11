@@ -36,7 +36,7 @@
       * ÷µ—π‡Ã‹
            03  LNK-ORCSTEN2-OUT-AREA.
       *        ∫ﬁ»÷πÊ
-               05  LNK-ORCSTEN2-ZAINUM         PIC 9(08)  OCCURS 20.
+               05  LNK-ORCSTEN2-ZAINUM         PIC 9(08)  OCCURS 40.
       *        ≈¿≈©√ÌºÕ
                05  LNK-ORCSTEN2-TENTEK-AREA.
                    07  LNK-ORCSTEN2-TENTEK-DAY            OCCURS   31.

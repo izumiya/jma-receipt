@@ -7898,7 +7898,7 @@ grpsys                            SPA-AREA
                IF   (LNK-ORCSTEN2-TENTEK-ERRCD  = ZERO)
                OR   (LNK-ORCSTEN2-CHUJOU-ERRCD  = ZERO)
                  PERFORM  VARYING  IDX1  FROM  1  BY  1
-                           UNTIL   IDX1    >  20
+                           UNTIL   IDX1    >  40
                    IF  LNK-ORCSTEN2-ZAINUM(IDX1) NOT = ZERO
                      PERFORM  TENTEK-MATOME-CHECK-SEC
                    END-IF

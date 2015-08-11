@@ -402,7 +402,7 @@
            03  WRK-TENTEKI2-HENKYAKU-AREA.
       *
                05  WRK-TENTEKI2-ZAINUM                 PIC 9(08)
-                                                       OCCURS   20.
+                                                       OCCURS   40.
       *
                05  WRK-TENTEKI2-T-AREA                 OCCURS   31.
                  06  WRK-TENTEKI2-T-SRYKA              PIC X(02).
