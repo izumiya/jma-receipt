@@ -67,6 +67,7 @@
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.02    NACL-藤原    15/02/18  医療情報連携対応
       *                                     自費レセプトを対象とする
+      *  04.07.03    NACL-門脇    15/08/10  日別保険組合せ番号編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -433,6 +434,8 @@
            MOVE    RECE64-ZAIKBN       TO  RECE641-ZAIKBN
            MOVE    RECE64-ACCTP-SYUGI-TBL-G
                                        TO  RECE641-ACCTP-SYUGI-TBL-G
+           MOVE    RECE64-HKNCOMBI-DAY-AREA
+                                       TO  RECE641-HKNCOMBI-DAY-AREA
       *
            WRITE   RECE641-REC
       *

@@ -193,6 +193,7 @@
       *  04.07.10    NACL-門脇    14/12/24  平成２７年１月改正対応
       *                                     （初再診料・低妥結率対応）
       *  04.07.11    NACL-門脇    15/06/02  記載不要なシステム予約コードの対応
+      *  04.07.12    NACL-門脇    15/08/10  日別保険組合せ番号編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -581,7 +582,7 @@
                05  WRK-RECE64-KOHBUNRI            PIC 9(01).
                05  WRK-RECE64-GAIJINKEN           PIC 9(02).
                05  WRK-RECE64-SRYSYUKBN           PIC X(03).
-               05  WRK-RECE64-REC                 PIC X(1000).
+               05  WRK-RECE64-REC                 PIC X(2000).
                05  WRK-RECE64-SRYCD-G.
                    07  WRK-RECE64-KENTAICOMMENT-SRYCD
                                                   PIC 9(09).
@@ -650,7 +651,7 @@
        01  WRK-RECE64GJK-MAX               PIC 9(02).
        01  WRK-RECE64GJK-TABLE.
            03  WRK-RECE64GJK-TBL           OCCURS 31.
-               05  WRK-RECE64GJK-REC       PIC X(1000).
+               05  WRK-RECE64GJK-REC       PIC X(2000).
        01  RECE64GJK-REC.
            COPY    "CPRCF064.INC"  REPLACING  //RECE64//
                                    BY         //RECE64GJK//.
