@@ -394,7 +394,10 @@
       *                                     のときの記録方法
       *  04.07.17    NACL-藤原    15/04/16  注加算コードが１４１９の加算
       *                                     項目の記録方法の修正
-      *  04.08.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
+      *  04.07.18    NACL-藤原    15/06/10  保険請求対象外傷病名コード対応
+      *  04.07.19    NACL-門脇    15/08/10  入院会計の保険組み合わせと異なる
+      *                                     保険組み合わせで入院料加算の入力
+      *                                     があるかのチェック方法を変更
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/06/02  請求情報への更新日設定
@@ -4946,7 +4949,8 @@
                             PERFORM VARYING IDY FROM    1   BY  1
                                     UNTIL  IDY >       31
                                 IF   RECE641-KAISU(1 IDY)   NOT =  ZERO
-                                  IF      RECE641-HKNCOMBI
+      *****                       IF      RECE641-HKNCOMBI
+                                  IF      RECE641-HKNCOMBI-DAY(IDY)
                                                   =   NACCT-DAY(IDY)
                                       MOVE  ZERO  TO
                                                    RECE641-KAISU(1 IDY)

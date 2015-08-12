@@ -45,6 +45,9 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *
+      *  04.07.01    NACL-門脇    15/08/10  日別保険組合せ番号編集対応
+      *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
@@ -455,6 +458,14 @@
                                          TO   RECE642-KAISU (IDX IDY)
                      END-PERFORM
                  END-PERFORM
+                 PERFORM VARYING IDY FROM    1   BY  1
+                         UNTIL   IDY >       31
+                     IF  RECE64-HKNCOMBI-DAY(IDY) NOT = ZERO
+                     AND RECE642-HKNCOMBI-DAY(IDY)    = ZERO
+                         MOVE    RECE64-HKNCOMBI-DAY(IDY)
+                                         TO   RECE642-HKNCOMBI-DAY(IDY)
+                     END-IF
+                 END-PERFORM
       *
                  IF  RECE64-SYODOU-SRYKA(1)  NOT =  SPACE
                    MOVE     ZERO     TO    FLG-ARI
@@ -496,6 +507,14 @@
                          ADD     RECE64-KAISU (IDX IDY)
                                          TO   RECE642-KAISU (IDX IDY)
                      END-PERFORM
+                 END-PERFORM
+                 PERFORM VARYING IDY FROM    1   BY  1
+                         UNTIL   IDY >       31
+                     IF  RECE64-HKNCOMBI-DAY(IDY) NOT = ZERO
+                     AND RECE642-HKNCOMBI-DAY(IDY)    = ZERO
+                         MOVE    RECE64-HKNCOMBI-DAY(IDY)
+                                         TO   RECE642-HKNCOMBI-DAY(IDY)
+                     END-IF
                  END-PERFORM
       *
                  IF  RECE64-SYODOU-SRYKA(1)  NOT =  SPACE
@@ -624,6 +643,8 @@
       *   剤回数・日数回数テーブルの加算したものを編集
            MOVE    RECE642-ZAIKAISU     TO  RECE64W-ZAIKAISU
            MOVE    RECE642-DAY-AREA     TO  RECE64W-DAY-AREA
+           MOVE    RECE642-HKNCOMBI-DAY-AREA
+                                        TO  RECE64W-HKNCOMBI-DAY-AREA
       *
            MOVE    RECE642-SYODOU-SRYKA-AREA
                                         TO  RECE64W-SYODOU-SRYKA-AREA

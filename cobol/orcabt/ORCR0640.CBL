@@ -684,6 +684,7 @@
       *  04.07.50    NACL-ÌçÏÆ    15/06/30  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.07.51    NACL-ÌçÏÆ    15/07/30  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡Ê£·£°ºÐÌ¤Ëþ¡¢À¸ÊÝ¡Ë
+      *  04.07.52    NACL-ÌçÏÆ    15/08/10  ÆüÊÌÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æÊÔ½¸ÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -6735,6 +6736,11 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF     (IDX3                         =  1  )
+                   AND    (RECE64-KAISU(IDX3 IDX2)  NOT = ZERO)
+                       MOVE     RECE64-HKNCOMBI
+                                        TO  RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
                END-PERFORM
            END-PERFORM
       *
@@ -10384,7 +10390,7 @@
        21015-TENTEKIMATOME-CHECK-SEC                 SECTION.
       *
            PERFORM  VARYING  ID4    FROM   1   BY   1
-                     UNTIL  (ID4                           >   20 )
+                     UNTIL  (ID4                           >   40 )
                        OR   (WRK-TENTEKI2-ZAINUM(IDX1 ID4) =  ZERO)
                        OR   (FLG-TENTEKIMATOME             =    1 )
       *
@@ -12852,6 +12858,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO  RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
            END-PERFORM
            .
        210205-RECE64-TENSOU2-EXT.
@@ -13292,6 +13302,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO  RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
            END-PERFORM
            .
        210207-RECE64-TENSOU2-SEN-EXT.
@@ -14211,6 +14225,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO    RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
            END-PERFORM
            .
        210210-RECE64-TENSOU2-GAI-EXT.
@@ -14531,6 +14549,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO   RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
            END-PERFORM
            .
        210213-RECE64-TENSOU2-SKJ-EXT.
@@ -14630,6 +14652,10 @@
            MOVE    ZERO                 TO  RECE64-TEIGENRATE
            MOVE    1                    TO  RECE64-KAISU(1 SYUKEI-IDX3)
            MOVE    SYUKEI-IDX3          TO  WK-TAIHI-DAY
+           IF      RECE64-KAISU(1 SYUKEI-IDX3)  NOT = ZERO
+             MOVE  RECE64-HKNCOMBI      TO
+                                       RECE64-HKNCOMBI-DAY(SYUKEI-IDX3)
+           END-IF
            .
        210213X-RECE64-TENSOU2-SKJ2-EXT.
            EXIT.
@@ -14671,6 +14697,10 @@
            MOVE    ZERO                 TO  RECE64-TEIGENRATE
            MOVE    1                    TO  RECE64-KAISU(1 SYUKEI-IDX3)
            MOVE    SYUKEI-IDX3          TO  WK-TAIHI-DAY
+           IF      RECE64-KAISU(1 SYUKEI-IDX3)  NOT = ZERO
+             MOVE  RECE64-HKNCOMBI      TO
+                                       RECE64-HKNCOMBI-DAY(SYUKEI-IDX3)
+           END-IF
            .
        210219-RECE64-TENSOU2-KAN-EXT.
            EXIT.
@@ -14728,6 +14758,10 @@
            MOVE    ZERO                 TO  RECE64-TEIGENRATE
            MOVE    1                    TO  RECE64-KAISU(1 SYUKEI-IDX3)
            MOVE    SYUKEI-IDX3          TO  WK-TAIHI-DAY
+           IF      RECE64-KAISU(1 SYUKEI-IDX3)  NOT = ZERO
+             MOVE  RECE64-HKNCOMBI      TO
+                                       RECE64-HKNCOMBI-DAY(SYUKEI-IDX3)
+           END-IF
            .
        210221-RECE64-TENSOU2-SFTN-EXT.
            EXIT.
@@ -15337,6 +15371,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO    RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
               END-PERFORM
            ELSE
               PERFORM     VARYING   IDX2   FROM    1    BY   1
@@ -15349,6 +15387,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO    RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
               END-PERFORM
            END-IF
       *
@@ -15855,6 +15897,9 @@
            IF    FLG-SIKIBETU  =  1
              MOVE    1                  TO      RECE64-KAISU (1 IDY)
              MOVE    IDY                TO      WK-TAIHI-DAY
+             IF      RECE64-KAISU(1 IDY)  NOT = ZERO
+               MOVE  RECE64-HKNCOMBI    TO      RECE64-HKNCOMBI-DAY(IDY)
+             END-IF
            ELSE
              MOVE        ZERO           TO      WK-TAIHI-DAY
              MOVE        ZERO           TO      WK-TAIHI-FLG
@@ -15867,6 +15912,10 @@
                        MOVE     IDX2    TO      WK-TAIHI-DAY
                        MOVE     1       TO      WK-TAIHI-FLG
                    END-IF    
+                   IF      RECE64-KAISU(1 IDX2)  NOT = ZERO
+                       MOVE     RECE64-HKNCOMBI
+                                        TO  RECE64-HKNCOMBI-DAY(IDX2)
+                   END-IF
              END-PERFORM
            END-IF
            .
@@ -15927,6 +15976,9 @@
       *
            MOVE    1                    TO      RECE64-KAISU (1 IDY)
            MOVE    IDY                  TO      WK-TAIHI-DAY
+           IF      RECE64-KAISU(1 IDY)  NOT = ZERO
+             MOVE  RECE64-HKNCOMBI      TO      RECE64-HKNCOMBI-DAY(IDY)
+           END-IF
            .
        21032X-RECE64-TENSOU3-EXT.
            EXIT.

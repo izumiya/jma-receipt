@@ -3671,7 +3671,7 @@
        21015-TENTEKIMATOME-CHECK-SEC                 SECTION.
       *
            PERFORM  VARYING  ID4    FROM   1   BY   1
-                     UNTIL  (ID4                      >   20 )
+                     UNTIL  (ID4                      >   40 )
                        OR   (WRK-TENTEKI2-ZAINUM(ID4) =  ZERO)
                        OR   (FLG-TENTEKIMATOME        =    1 )
       *

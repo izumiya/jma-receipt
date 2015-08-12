@@ -36,6 +36,8 @@
       *  04.06.02    NACL-藤原    11/01/05  機能追加（注加算、同時併施等）
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-門脇    15/08/10  日別保険組合せ番号追加
+      *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       ************************************************************
       *01  RECE642-REC.
@@ -94,8 +96,11 @@
                05  RECE642-DAY-TBL         OCCURS  4.
                    07  RECE642-KAISUINF    OCCURS  31.
                        09  RECE642-KAISU   PIC  9(03).
+      *日別保険組合せ番号
+           03  RECE642-HKNCOMBI-DAY-AREA.
+               05  RECE642-HKNCOMBI-DAY    PIC  9(04)     OCCURS  31.
       *データ
-           03  RECE642-REC1                PIC  X(1000).
+           03  RECE642-REC1                PIC  X(2000).
       *コメントデータ
            03  RECE642-COM-AREA.
                05  RECE642-COM             PIC  X(200)    OCCURS  10.
