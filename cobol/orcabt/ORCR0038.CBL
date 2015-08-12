@@ -57,6 +57,8 @@
       *  04.07.01    NACL-ÌçÏÆ    13/12/06  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    15/04/27  ÆÃµ­»ö¹à£°£¹»Ü¤¬¤¢¤ë¾ì¹ç¤Î
       *                                     ¡ÚÇÛ¡Û²ó¿ôµ­ºÜÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    15/08/11  ÆÃµ­»ö¹à£°£¹»Ü¤¬¤¢¤ë¾ì¹ç¤Î
+      *                                     ¡ÚÇÛ¡Û²ó¿ôµ­ºÜÂÐ±þ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -571,11 +573,15 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
       *
                IF   WRK-KOHBUNRI-MIN  >  RECE04-KOHBUNRI
+                 IF   RECE04-ZAITEN  NOT = ZERO
                    MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MIN
+                 END-IF
                END-IF
       *
                IF   WRK-KOHBUNRI-MAX  <  RECE04-KOHBUNRI
+                 IF   RECE04-ZAITEN  NOT = ZERO
                    MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MAX
+                 END-IF
                END-IF
       *
                PERFORM     900-RECE04-READ-SEC
