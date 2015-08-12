@@ -603,6 +603,10 @@
                05  WRK-GMN-C02-TTENKIYMD   PIC X(09).
                05  WRK-GMN-C02-THKNBYOMEIFLG
                                            PIC X(08).
+               05  WRK-GMN-C02-TCREYMD     PIC X(09).
+               05  WRK-GMN-C02-TCREHMS     PIC X(08).
+               05  WRK-GMN-C02-TUPYMD      PIC X(09).
+               05  WRK-GMN-C02-TUPHMS      PIC X(08).
            03  WRK-NAI-C02-TBLO.
                05  WRK-NAI-C02-TSRYYMD     PIC X(08).
                05  WRK-NAI-C02-TRENNUM     PIC 9(02).
