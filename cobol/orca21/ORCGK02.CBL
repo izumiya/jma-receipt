@@ -1187,9 +1187,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF      FLG-END2            =   ZERO
-               PERFORM 1003-K02SPA-OUT-SEC
-           END-IF
+      *    IF      FLG-END2            =   ZERO
+      *        PERFORM 1003-K02SPA-OUT-SEC
+      *    END-IF
       *
       *    クライアント印刷
       *    IF      FLG-CLIENT-OK       =   1
@@ -10179,6 +10179,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
 grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   MOVE    "1999"          TO  SPA-ERRCD
+                   DISPLAY "K02 WKSRYACT UPD MCP-RC:" MCP-RC
+                               ",KEY:" WKSRY-KEY
+               END-IF
       *
                MOVE    "key6"              TO  MCP-PATHNAME
                PERFORM 970-WKSRYACT-READ-SEC
@@ -12877,6 +12882,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
+      *H27.8
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            IF     (FLG-GMN-INIT        =   1   )  OR
                   (SPA-GMN-MAX1        =   ZERO )

@@ -178,7 +178,7 @@
            03  FLG-INPUTCD         PIC 9(01).
            03  FLG-PARA            PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
-           03  FLG-PTNYUINRRK      PIC 9(01).
+      **   03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-SPATMP          PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
@@ -811,8 +811,8 @@
       *    COPY    "CPSANTEI.INC".
       *
       *    患者入院履歴
-       01  PTNYUINRRK-REC.
-           COPY    "CPPTNYUINRRK.INC".
+      *01  PTNYUINRRK-REC.
+      *    COPY    "CPPTNYUINRRK.INC".
       *    患者入院履歴ワーク
       *01  HZN-PTNYUINRRK-REC.
       *    COPY    "CPPTNYUINRRK.INC"  REPLACING
@@ -1047,9 +1047,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF      FLG-END2            =   ZERO
-               PERFORM 1003-K02SPA-OUT-SEC
-           END-IF
+      *    IF      FLG-END2            =   ZERO
+      *        PERFORM 1003-K02SPA-OUT-SEC
+      *    END-IF
       *    クライアント印刷
       *    IF      FLG-CLIENT-OK       =   1
       *        PERFORM 600-CLIENT-DMY-SEC
@@ -5308,6 +5308,7 @@
            MOVE    SPACE               TO  K99
       *
       *    画面カーソルセット処理
+           INITIALIZE                      K99
            MOVE    "PIN"               TO  MCP-WIDGET
       *
            MOVE    SPACE               TO  SPA-K99-DATA
@@ -7593,6 +7594,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
 grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   MOVE    "1999"          TO  SPA-ERRCD
+                   DISPLAY "K02 WKSRYACT UPD MCP-RC:" MCP-RC
+                               ",KEY:" WKSRY-KEY
+               END-IF
       *
                MOVE    "tbl_wksryact"      TO  MCP-TABLE
                MOVE    "key6"              TO  MCP-PATHNAME
@@ -10489,6 +10495,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
+      *H27.8
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            IF     (FLG-GMN-INIT        =   1   )  OR
                   (SPA-GMN-MAX1        =   ZERO )
@@ -11244,6 +11253,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        5101-KERR2-SET-SEC              SECTION.
       *
            MOVE    SPACE               TO  KERR2
+           INITIALIZE                      KERR2
            MOVE    SPA-ERRCD           TO  KERR2-ERRCODE
            MOVE    SPA-ERRMSG2         TO  KERR2-ERRMSG(1:80)
            MOVE    SPA-ERRMSG          TO  KERR2-ERRMSG2
@@ -11457,6 +11467,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *
@@ -11508,6 +11519,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID2
+           INITIALIZE                      KID2
            MOVE    SPA-KIDCD2          TO  KID2-ID2CODE
            MOVE    WRK-KIDMSG          TO  KID2-ID2MSG
       *
@@ -11609,25 +11621,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-PTINF-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    入院履歴マスター読込
-      *****************************************************************
-       910-PTNYUINRRK-READ-SEC         SECTION.
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           PERFORM 920-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
-               MOVE    ZERO            TO  FLG-PTNYUINRRK
-           ELSE
-               INITIALIZE                  PTNYUINRRK-REC
-               MOVE    1               TO  FLG-PTNYUINRRK
-           END-IF
-      *
-           .
-       910-PTNYUINRRK-READ-EXT.
            EXIT.
       *
       *****************************************************************

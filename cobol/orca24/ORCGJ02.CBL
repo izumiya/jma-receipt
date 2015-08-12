@@ -948,9 +948,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF      FLG-END2            =   ZERO
-               PERFORM 1003-J02SPA-OUT-SEC
-           END-IF
+      *    IF      FLG-END2            =   ZERO
+      *        PERFORM 1003-J02SPA-OUT-SEC
+      *    END-IF
       *
            MOVE    SPA-J01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -3664,6 +3664,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    画面編集処理
       *****************************************************************
        500-GMNHEN-SEC                  SECTION.
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-J02SPA-OUT-SEC
       *
       *    コラムリスト位置保存
            IF      FLG-GMN-INIT        =   1

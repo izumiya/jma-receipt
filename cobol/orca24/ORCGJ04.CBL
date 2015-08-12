@@ -846,9 +846,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF      FLG-END2            =   ZERO
-               PERFORM 1003-J04SPA-OUT-SEC
-           END-IF
+      *    IF      FLG-END2            =   ZERO
+      *        PERFORM 1003-J04SPA-OUT-SEC
+      *    END-IF
       *
            MOVE    SPA-J01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -8132,6 +8132,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-J04SPA-OUT-SEC
       *
            MOVE    SPACE               TO  J04
            INITIALIZE                      J04

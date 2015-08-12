@@ -1003,9 +1003,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF      FLG-END2            =   ZERO
-               PERFORM 1003-KT01SPA-OUT-SEC
-           END-IF
+      *    IF      FLG-END2            =   ZERO
+      *        PERFORM 1003-KT01SPA-OUT-SEC
+      *    END-IF
       *
            MOVE    "KT01"              TO  SPA-HZN-MOTOPG
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -8702,6 +8702,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-KT01SPA-OUT-SEC
       *
            MOVE    SPACE               TO  KT01
            INITIALIZE                      KT01
