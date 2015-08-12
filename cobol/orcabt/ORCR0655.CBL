@@ -544,7 +544,9 @@
                END-IF
       *
                IF   WRK-KOHBUNRI-MIN  >  RECE64-KOHBUNRI
+                 IF   RECE64-ZAITEN  NOT = ZERO
                    MOVE   RECE64-KOHBUNRI  TO  WRK-KOHBUNRI-MIN
+                 END-IF
                END-IF
       *
                PERFORM     900-RECE64-READ-SEC

@@ -56,6 +56,8 @@
       *
       *  04.07.01    NACL-門脇    15/04/27  特記事項０９施がある場合の
       *                                     【配】回数記載対応
+      *  04.07.02    NACL-門脇    15/08/11  特記事項０９施がある場合の
+      *                                     【配】回数記載対応修正
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
@@ -597,11 +599,15 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
       *
                IF   WRK-KOHBUNRI-MIN  >  RECE04-KOHBUNRI
+                 IF   RECE04-ZAITEN  NOT = ZERO
                    MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MIN
+                 END-IF
                END-IF
       *
                IF   WRK-KOHBUNRI-MAX  <  RECE04-KOHBUNRI
+                 IF   RECE04-ZAITEN  NOT = ZERO
                    MOVE   RECE04-KOHBUNRI  TO  WRK-KOHBUNRI-MAX
+                 END-IF
                END-IF
       *
                PERFORM     900-RECE04-READ-SEC
