@@ -685,6 +685,8 @@
       *  04.07.51    NACL-ÌçÏÆ    15/07/30  ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡Ê£·£°ºÐÌ¤Ëþ¡¢À¸ÊÝ¡Ë
       *  04.07.52    NACL-ÌçÏÆ    15/08/10  ÆüÊÌÊÝ¸±ÁÈ¹ç¤»ÈÖ¹æÊÔ½¸ÂÐ±þ
+      *  04.07.53    NACL-ÌçÏÆ    15/08/12  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
@@ -820,6 +822,7 @@
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
            03  FLG-CYOJKSN-COM                         PIC 9(01).
+           03  FLG-CYOJKSN-OK                          PIC 9(01).
            03  FLG-RECESKYKBN                          PIC 9(01).
       *****03  FLG-HKNNUM                              PIC 9(01).
            03  FLG-RECE69                              PIC 9(01).
@@ -1007,17 +1010,19 @@
            03  IDX18                                   PIC 9(03).
            03  IDX23                                   PIC 9(03).
            03  IDX24                                   PIC 9(03).
+           03  IDX25                                   PIC 9(02).
+           03  IDX26                                   PIC 9(02).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
       *
-           03  IDA                 PIC 9(04).
-           03  IDB                 PIC 9(04).
-           03  SEIHIDX             PIC 9(02).
-           03  KAKKIDX             PIC 9(02).
-           03  SESNIDX             PIC 9(02).
+           03  IDA                                     PIC 9(04).
+           03  IDB                                     PIC 9(04).
+           03  SEIHIDX                                 PIC 9(02).
+           03  KAKKIDX                                 PIC 9(02).
+           03  SESNIDX                                 PIC 9(02).
       *
-           03 IDZ1                 PIC 9(02).
-           03 IDZ2                 PIC 9(02).
+           03  IDZ1                                    PIC 9(02).
+           03  IDZ2                                    PIC 9(02).
       *
       *    £Ï£Ã£ÒÊÔ½¸ÎÎ°è
        01  OCR1-AREA.
@@ -8374,8 +8379,28 @@
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
               IF   RECE62-SRYYM    >=     "201404"
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT
+                                    OR  CONS-CYOJKSN2-COMMENT
+                                    OR  CONS-CYOJKSN3-COMMENT
+                                    OR  CONS-CYOJKSN4-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
+                  MOVE     ZERO       TO    FLG-CYOJKSN-OK
+                  IF   RECE62-SRYYM  =  RECE62-NYUINYMD(1:6)
+                    MOVE  RECE62-NYUINYMD(7:2)  TO  IDX25
+                    PERFORM  VARYING  IDX26  FROM  1  BY  1
+                              UNTIL   IDX26   >   31
+                      IF  (ACCT-DAY(1 IDX26) NOT = ZERO )
+                      AND (IDX26                >= IDX25)
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                      END-IF
+                    END-PERFORM
+                  ELSE
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                  END-IF
+                END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "1"   TO    RECE64-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE62-COMCNTFLG
                    EVALUATE  RECE62-CYOJKSNFLG
@@ -8387,6 +8412,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "2"   TO    RECE64-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE62-COMCNTFLG
                    EVALUATE  RECE62-CYOJKSNFLG
@@ -8398,6 +8424,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "3"   TO    RECE64-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE62-COMCNTFLG
                    EVALUATE  RECE62-CYOJKSNFLG
@@ -8409,6 +8436,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "4"   TO    RECE64-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE62-COMCNTFLG
                    EVALUATE  RECE62-CYOJKSNFLG

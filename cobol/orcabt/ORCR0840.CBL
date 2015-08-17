@@ -262,6 +262,8 @@
       *  04.07.23    NACL-ÌçÏÆ    14/10/17  ÅÀÅ©¤Î¿ÇÎÅ²ÊÊÔ½¸ÂÐ±þ
       *  04.07.24    NACL-ÌçÏÆ    15/01/13  Ï«ºÒ¥ì¥»ÅÅÍÑ¤Î¹àÌÜÊÔ½¸½¤Àµ
       *  04.07.25    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.26    NACL-ÌçÏÆ    15/08/12  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
@@ -430,6 +432,7 @@
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
            03  FLG-CYOJKSN-COM                         PIC 9(01).
+           03  FLG-CYOJKSN-OK                          PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
            03  FLG-KHNRYO-SKJ                          PIC 9(01).
@@ -512,9 +515,11 @@
            03  FUKA-IDX                                PIC 9(03).
            03  IDYY                                    PIC 9(02).
            03  IDXX                                    PIC 9(02).
+           03  IDX25                                   PIC 9(02).
+           03  IDX26                                   PIC 9(02).
       *
-           03 IDZ1                                     PIC 9(02).
-           03 IDZ2                                     PIC 9(02).
+           03  IDZ1                                    PIC 9(02).
+           03  IDZ2                                    PIC 9(02).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°¡Ê¼«ÇåÀÕÍÑ¡Ë
        01  FLG-KHNTEN-JI-AREA.                                          
@@ -4733,8 +4738,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
               IF   RECE82-SRYYM    >=     "201404"
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT
+                                    OR  CONS-CYOJKSN2-COMMENT
+                                    OR  CONS-CYOJKSN3-COMMENT
+                                    OR  CONS-CYOJKSN4-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
+                  MOVE     ZERO       TO    FLG-CYOJKSN-OK
+                  IF   RECE82-SRYYM  =  RECE82-NYUINYMD(1:6)
+                    MOVE  RECE82-NYUINYMD(7:2)  TO  IDX25
+                    PERFORM  VARYING  IDX26  FROM  1  BY  1
+                              UNTIL   IDX26   >   31
+                      IF  (ACCT-DAY(1 IDX26) NOT = ZERO )
+                      AND (IDX26                >= IDX25)
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                      END-IF
+                    END-PERFORM
+                  ELSE
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                  END-IF
+                END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "1"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4746,6 +4771,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "2"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4757,6 +4783,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "3"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4768,6 +4795,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "4"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
