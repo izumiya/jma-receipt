@@ -2404,7 +2404,7 @@
            STRING
                  "（長期の月上限額−診療済み長期負担相当額）と"
                                        DELIMITED BY SIZE
-                 "（日上限額）を比較"
+                 "（回・日上限額）を比較"
                                        DELIMITED BY SIZE
            INTO                        SPA-GMN-CYOKEIKBNGMEIL (2)
            END-STRING
@@ -2439,7 +2439,7 @@
            INITIALIZE                  SPA-GMN-CYOKEITAIKBNGLST-G
       *
            MOVE  "0"               TO  SPA-GMN-CYOKEITAIKBNGL    (1)
-           MOVE  "日上限額設定のある公費"
+           MOVE  "回・日上限額設定のある公費"
                                    TO  SPA-GMN-CYOKEITAIKBNGMEIL (1)
       *
       *
@@ -2462,7 +2462,7 @@
            MOVE  "1"               TO  SPA-GMN-GNBKEIKBNKGL    (2)
            STRING    "（月上限額−診療済み主保険負担相当額）と"
                                        DELIMITED BY SIZE
-                     "（日上限額）を比較"
+                     "（回・日上限額）を比較"
                                        DELIMITED BY SIZE
            INTO                        SPA-GMN-GNBKEIKBNKGMEIL (2)
            END-STRING
@@ -2481,7 +2481,7 @@
            INITIALIZE                  SPA-GMN-GNBKEITAIKBNKGLST-G
       *
            MOVE  "0"               TO  SPA-GMN-GNBKEITAIKBNKGL    (1)
-           MOVE  "日上限額設定のある公費"
+           MOVE  "回・日上限額設定のある公費"
                                    TO  SPA-GMN-GNBKEITAIKBNKGMEIL (1)
       *
       *

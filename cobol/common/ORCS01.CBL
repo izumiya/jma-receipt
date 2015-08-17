@@ -450,6 +450,9 @@
       *  04.07.30    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
       *  04.07.31    NACL-門脇    15/06/29  高額委任払の＋アルファーの
       *                                     負担金計算対応（保険番号９６４）
+      *  04.07.32    NACL-門脇    15/08/07  システム管理２０１０−長期併用時の
+      *                                     特別計算（外来）について、
+      *                                     回上限額設定のある公費も対象とする
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13639,7 +13642,8 @@
                    END-IF
       *
                    IF  (WK-2010-GNBKEIKBN-K-G(1)  =  "1"           )
-                   AND (MAX-KIN-KOHI1-D       NOT =  ZERO          )
+                   AND ((MAX-KIN-KOHI1-D      NOT =  ZERO         ) OR
+                        (MAX-KIN-KOHI1-K      NOT =  ZERO         ))
                    AND (LNK-SYU-KOH1HKNNUM    NOT =  SPACE         )
                    AND (LNK-SYU-KOH2HKNNUM        =  SPACE         )
                    AND (LNK-SYU-KOH3HKNNUM        =  SPACE         )
@@ -14642,6 +14646,28 @@
                        (LNK-SYU-SRYYMD      =  SYU-SRYYMD   ) AND
                        (LNK-SYU-DENPNUM     NOT =  ZERO     ) AND
                        (LNK-SYU-DENPNUM     <  SYU-DENPNUM  ))
+                   OR ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-K     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"      ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO     ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM  ))
+                   OR ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-K     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "1"          ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE    ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD   ))
+                   OR ((LNK-SYU-KOH2HKNNUM  = "972" OR "974") AND
+                       (WK-2010-CYOKEIKBN-G(1) NOT = SPACE  ) AND
+                       (MAX-KIN-KOHI1-K     NOT =  ZERO     ) AND
+                       (WK-1039-IKTSORTKBN  =  "1"          ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"      ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE    ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD   ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO     ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM  ))
                       IF    LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
                          MOVE     ZERO   TO   SYU-KOH1HKNFTNMONEY
                                               SYU-KOH1COMPFTN
@@ -15446,6 +15472,34 @@
                        (LNK-SYU-SRYYMD      =  SYU-SRYYMD     ) AND
                        (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
                        (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE  ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD     ))
+                   OR ((LNK-SYU-KOH3HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD     ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
                       IF    LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
                          MOVE     ZERO   TO   SYU-KOH1HKNFTNMONEY
                                               SYU-KOH1COMPFTN
@@ -16163,6 +16217,40 @@
                          (MAX-KIN-KOHI2-D     NOT =  ZERO   )) OR
                         ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
                          (MAX-KIN-KOHI3-D     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      =  SYU-SRYYMD     ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-K     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "0"  OR SPACE  ) AND
+                       (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO       ) AND
+                       (LNK-SYU-DENPNUM     <  SYU-DENPNUM    ))
+                   OR ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-K     NOT =  ZERO   ))) AND
+                       (WK-1039-IKTSORTKBN  =  "1"            ) AND
+                       (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
+                       (LNK-SYU-SRYYMD      <  SYU-SRYYMD     ))
+                   OR ((LNK-SYU-KOH4HKNNUM  = "972" OR "974"  ) AND
+                       (((WK-2010-CYOKEIKBN-G(1) NOT = SPACE) AND
+                         (MAX-KIN-KOHI1-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(2) NOT = SPACE) AND
+                         (MAX-KIN-KOHI2-K     NOT =  ZERO   )) OR
+                        ((WK-2010-CYOKEIKBN-G(3) NOT = SPACE) AND
+                         (MAX-KIN-KOHI3-K     NOT =  ZERO   ))) AND
                        (WK-1039-IKTSORTKBN  =  "1"            ) AND
                        (LNK-S01-SAIKEISAN-KBN   =  "1"        ) AND
                        (LNK-SYU-SRYYMD      NOT =  SPACE      ) AND
@@ -21748,11 +21836,13 @@
        2308-ZANOKIKAE-HENSYU-SEC           SECTION.
       *
            IF  (WK-2010-CYOKEIKBN-G(1) NOT = SPACE)
-           AND (MAX-KIN-KOHI1-D     NOT =  ZERO   )
+           AND ((MAX-KIN-KOHI1-D    NOT =  ZERO  ) OR
+                (MAX-KIN-KOHI1-K    NOT =  ZERO  ))
                    PERFORM    23081-ZANOKIKAE-HENSYU1-SEC
            END-IF
            IF  (WK-2010-CYOKEIKBN-G(2) NOT = SPACE)
-           AND (MAX-KIN-KOHI2-D     NOT =  ZERO   )
+           AND ((MAX-KIN-KOHI2-D    NOT =  ZERO  ) OR
+                (MAX-KIN-KOHI2-K    NOT =  ZERO  ))
               IF   WK-2010-CYOKEIKBN-G(2)  =  "3" OR "4"
                 IF    COMB-KOH1HKNNUM    =  "015" OR "016"
                    CONTINUE
@@ -21764,7 +21854,8 @@
               END-IF
            END-IF
            IF  (WK-2010-CYOKEIKBN-G(3) NOT = SPACE)
-           AND (MAX-KIN-KOHI3-D     NOT =  ZERO   )
+           AND ((MAX-KIN-KOHI3-D    NOT =  ZERO  ) OR
+                (MAX-KIN-KOHI3-K    NOT =  ZERO  ))
               IF   WK-2010-CYOKEIKBN-G(3)  =  "3" OR "4"
                 IF   (COMB-KOH1HKNNUM    =  "015" OR "016")
                 OR   (COMB-KOH2HKNNUM    =  "015" OR "016")
