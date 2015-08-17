@@ -1534,28 +1534,6 @@
            IF      FLG-SYSKANRI            =   ZERO
                MOVE    SYSKANRI-REC            TO  SYS-1010-REC
       *
-               DISPLAY "SYS-1010-USERID        =" SYS-1010-USERID        
-               DISPLAY "SYS-1010-KANANAME      =" SYS-1010-KANANAME      
-               DISPLAY "SYS-1010-NAME          =" SYS-1010-NAME          
-               DISPLAY "SYS-1010-ISEKINUM      =" SYS-1010-ISEKINUM      
-               DISPLAY "SYS-1010-HKNDRNUMS     =" SYS-1010-HKNDRNUMS     
-               DISPLAY "SYS-1010-HKNDRNUMK     =" SYS-1010-HKNDRNUMK     
-               DISPLAY "SYS-1010-SEMONKACD (1) =" SYS-1010-SEMONKACD (1) 
-               DISPLAY "SYS-1010-GSRAUTH       =" SYS-1010-GSRAUTH       
-               DISPLAY "SYS-1010-KANRIAUTHFLG  =" SYS-1010-KANRIAUTHFLG  
-               DISPLAY "SYS-1010-MAYAKULICENSE =" SYS-1010-MAYAKULICENSE 
-               DISPLAY "SYS-1010-ORCA21FLG     =" SYS-1010-ORCA21FLG     
-               DISPLAY "SYS-1010-SKYPRTFLG     =" SYS-1010-SKYPRTFLG     
-               DISPLAY "SYS-1010-SYOHOPRTFLG   =" SYS-1010-SYOHOPRTFLG   
-               DISPLAY "SYS-1010-YAKUJYOPRTFLG =" SYS-1010-YAKUJYOPRTFLG 
-               DISPLAY "SYS-1010-MEIPRTFLG     =" SYS-1010-MEIPRTFLG     
-               DISPLAY "SYS-1010-FORMALFLG     =" SYS-1010-FORMALFLG     
-               DISPLAY "SYS-1010-CLIENT-SAVE   =" SYS-1010-CLIENT-SAVE   
-               DISPLAY "SYS-1010-GRPHOSPINF-G  =" SYS-1010-GRPHOSPINF-G  
-               DISPLAY "SYS-1010-USER-KANRI    =" SYS-1010-USER-KANRI    
-               DISPLAY "SYS-1010-CLIENT-PRT    =" SYS-1010-CLIENT-PRT    
-               DISPLAY "SYS-1010-DIALOGFLG     =" SYS-1010-DIALOGFLG     
-      *
                MOVE    SPACE               TO  SYS-1050-REC
                INITIALIZE                      SYS-1050-REC
                MOVE    "1050"              TO  SYS-1050-KANRICD
