@@ -126,6 +126,8 @@
       *  04.07.13    NACL-ÌçÏÆ    14/09/01  Ê¿À®£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.07.14    NACL-ÌçÏÆ    14/10/17  ÅÀÅ©¤Î¿ÇÎÅ²ÊÊÔ½¸ÂÐ±þ
       *  04.07.15    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.16    NACL-ÌçÏÆ    15/08/12  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -233,6 +235,7 @@
            03  FLG-ZAIKYO-COM      PIC 9(01).
            03  FLG-BOKOHO-COM      PIC 9(01).
            03  FLG-CYOJKSN-COM     PIC 9(01).
+           03  FLG-CYOJKSN-OK      PIC 9(01).
            03  FLG-RINYAK          PIC 9(01).
            03  FLG-TENTEKIMATOME   PIC 9(01).
            03  FLG-TAHOKEN         PIC 9(01).
@@ -290,9 +293,11 @@
            03  SYSKAN-IDX          PIC 9(03).
            03  SYSKAN-IDX2         PIC 9(03).
            03  FUKA-IDX            PIC 9(03).
+           03  IDX25               PIC 9(02).
+           03  IDX26               PIC 9(02).
       *
-           03 IDZ1                 PIC 9(02).
-           03 IDZ2                 PIC 9(02).
+           03  IDZ1                PIC 9(02).
+           03  IDZ2                PIC 9(02).
       *
       *    ºÞ¾ðÊóÂàÈòÎÎ°è
        01  WK-ZAIKAISU             PIC S9(07).
@@ -3034,8 +3039,28 @@
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
               IF   RECE200-SRYYM    >=     "201404"
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT
+                                    OR  CONS-CYOJKSN2-COMMENT
+                                    OR  CONS-CYOJKSN3-COMMENT
+                                    OR  CONS-CYOJKSN4-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
+                  MOVE     ZERO       TO    FLG-CYOJKSN-OK
+                  IF   RECE200-SRYYM  =  RECE200-NYUINYMD(1:6)
+                    MOVE  RECE200-NYUINYMD(7:2)  TO  IDX25
+                    PERFORM  VARYING  IDX26  FROM  1  BY  1
+                              UNTIL   IDX26   >   31
+                      IF  (ACCT-DAY(1 IDX26) NOT = ZERO )
+                      AND (IDX26                >= IDX25)
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                      END-IF
+                    END-PERFORM
+                  ELSE
+                        MOVE     1    TO    FLG-CYOJKSN-OK
+                  END-IF
+                END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "1"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3047,6 +3072,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "2"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3058,6 +3084,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "3"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3069,6 +3096,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
+                AND (FLG-CYOJKSN-OK  =   1                   )
                    MOVE   "4"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
