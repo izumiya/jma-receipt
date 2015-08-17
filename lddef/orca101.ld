@@ -62,6 +62,7 @@ bind	"W99"		"OpenCOBOL"	"ORCGW99";
 bind	"WERR"		"OpenCOBOL"	"ORCGWERR";
 bind	"WID1"		"OpenCOBOL"	"ORCGWID1";
 bind	"WID2"		"OpenCOBOL"	"ORCGWID2";
+bindapi	"manageusersv2"	"OpenCOBOL"	"ORCGWAPI01";
 
 multiplex_group	orca101;
 
@@ -128,12 +129,18 @@ data	{
 		WERR;
 		WID1;
 		WID2;
+		manageusersv2;
 	};
+};
+
+db	"xml2"	{
+	xml_manageusersv2req;
+	xml_manageusersv2res;
 };
 
 #include "orcadb.inc"
 /* #include "orcadbh.inc" */
- db	"shell"	{
+db	"shell"	{
 	shell;
 };
 db      "blob_body" {

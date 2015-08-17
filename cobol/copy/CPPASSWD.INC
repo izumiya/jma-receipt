@@ -29,3 +29,6 @@
                05  PASSWD-USERID     PIC X(16).
       *パスワード
            03  PASSWD-PASSWORD       PIC X(256).
+      *以下 virtual
+      *    ユーザＩＤ（更新後）
+           03  PASSWD-UPD-USERID     PIC X(16).

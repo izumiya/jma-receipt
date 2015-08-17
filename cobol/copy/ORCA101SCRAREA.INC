@@ -76,4 +76,6 @@
            COPY    "WERR.INC".
            COPY    "WID1.INC".
            COPY    "WID2.INC".
+           COPY    "CPAPILSTV2.INC"    REPLACING
+                                       //APILST-// BY //WAPI01-//.
       *
