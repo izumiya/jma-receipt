@@ -4645,7 +4645,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                GO  TO  49001-KOUSIN-EXT
            END-IF
       *
-           MOVE    SPA-KYOUTU          TO  WRK-SPA-KYOUTU
+      **** MOVE    SPA-KYOUTU          TO  WRK-SPA-KYOUTU
       *
            IF     (SPA-GMN-KARUTE      =   "0" )  AND
                   (SPA-GMN-SYOHO       =   "0" )
@@ -4669,10 +4669,10 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    PERFORM 4907-USERPG-SEC
                END-IF
            END-IF
-           IF      FLG-END             =   ZERO
+      ***  IF      FLG-END             =   ZERO
       *
-               MOVE    WRK-SPA-KYOUTU          TO  SPA-KYOUTU
-           END-IF
+      *        MOVE    WRK-SPA-KYOUTU          TO  SPA-KYOUTU
+      ***  END-IF
       *
            PERFORM 493-CLEAR-SEC
       *****PERFORM 3101-UKETU-HEN-SEC
