@@ -40,6 +40,8 @@
       *  00.00.00    NACL-伊藤    15. 2.18  自費保険分を作成
       *                                     地域連携IDが空白の場合は
       *                                     患者番号を記録
+      *  04.08.06    NACL-藤原    15/08/07  医療情報連携基盤のクライアン
+      *                                     ト保存対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -216,6 +218,8 @@
            COPY    "CPTEMPFL.INC"  REPLACING  //TEMPFLPARA//
                                    BY         //WRK-ERR-FILE-NM//.
       *
+       01  WRK-SGETTEMP-TEMPDIR        PIC X(1024).
+      *
       *    医療機関情報ワーク
            COPY    "CPSK1001.INC"      REPLACING  //SYS-1001//
                                        BY         //WRK-S-1001//.
@@ -314,6 +318,9 @@
       *
            COPY    "CPORCSGETTEMP.INC".
       *
+      *    クライアント保存ＤＢ制御サブ
+           COPY    "CPORCSFILESV.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -384,6 +391,8 @@
            MOVE    SPACE           TO  RECEERR
            MOVE    SGETTEMP-FULLNAME
                                    TO  RECEERR
+      *
+           MOVE   SGETTEMP-TEMPDIR TO  WRK-SGETTEMP-TEMPDIR
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -1381,6 +1390,11 @@
                MOVE    "処理対象のデータがありませんでした"
                                        TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
+           ELSE
+      *        ファイル保存情報更新
+               IF      WRK-PARA-DATAKBN    =   "5"
+                   PERFORM 3001-FILE-INFO-INSERT-SEC
+               END-IF
            END-IF
       *
       *    ステップ管理終了処理
@@ -1398,6 +1412,125 @@
            .
        300-TERM-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ファイル保存情報更新処理
+      *****************************************************************
+       3001-FILE-INFO-INSERT-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSFILESVAREA
+           MOVE    "I"             TO  SFILESV-MODE
+           MOVE    WRK-PARA-SHELLID
+                                   TO  SFILESV-TBL-KEY
+           MOVE    "recept4.sh"    TO  SFILESV-SHELLID  (1)
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  SFILESV-SHORI-RENNUM
+                                                        (1)
+           MOVE    LNK-PRTKANRI-RENNUM
+                                   TO  SFILESV-RENNUM   (1)
+           MOVE    LNK-PRTKANRI-SRYYM
+                                   TO  SFILESV-SRYYM    (1)
+           MOVE    LNK-PRTKANRI-SKYYMD
+                                   TO  SFILESV-SKYYMD   (1)
+      *****MOVE    WRK-PARA-FOLDER TO  SFILESV-FOR-FOLDER
+      *****                                             (1)
+           MOVE    WRK-SGETTEMP-TEMPDIR
+                                   TO  SFILESV-FOR-FOLDER
+                                                        (1)
+           IF      WRK-PARA-TEISYUTUSAKI   =   "1"
+               EVALUATE    WRK-PARA-NYUGAIKBN
+                 WHEN    "1"
+                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                           "RECEIPTCS2"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-FOR-DATA(1)
+                   END-STRING
+                   STRING  "RECEIPTCS2"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-TO-DATA (1)
+                   END-STRING
+               WHEN    "2"
+                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                           "RECEIPTCS1"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-FOR-DATA(1)
+                   END-STRING
+                   STRING  "RECEIPTCS1"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-TO-DATA (1)
+                   END-STRING
+               END-EVALUATE
+           ELSE
+               EVALUATE    WRK-PARA-NYUGAIKBN
+                 WHEN    "1"
+                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                           "RECEIPTCK2"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-FOR-DATA(1)
+                   END-STRING
+                   STRING  "RECEIPTCK2"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-TO-DATA (1)
+                   END-STRING
+                 WHEN    "2"
+                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                           "RECEIPTCK1"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-FOR-DATA(1)
+                   END-STRING
+                   STRING  "RECEIPTCK1"        DELIMITED  BY  SIZE
+                           LNK-PRTKANRI-TBL-GROUP
+                                               DELIMITED  BY  SIZE
+                           ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-TO-DATA (1)
+                   END-STRING
+               END-EVALUATE
+           END-IF
+      *
+           MOVE    CNT-OUT         TO  SFILESV-CNT-ALL  (1)
+           IF      WRK-PARA-TEISYUTUSAKI   =   "1"
+               EVALUATE    WRK-PARA-NYUGAIKBN
+                   WHEN    "1"
+                       MOVE    "社保　連携ファイル作成（入院）"
+                                           TO  SFILESV-TITLE    (1)
+                   WHEN    "2"
+                       MOVE    "社保　連携ファイル作成（入院外）"
+                                           TO  SFILESV-TITLE    (1)
+               END-EVALUATE
+           ELSE
+               EVALUATE    WRK-PARA-NYUGAIKBN
+                   WHEN    "1"
+                       MOVE    "国保　連携ファイル作成（入院）"
+                                           TO  SFILESV-TITLE    (1)
+                   WHEN    "2"
+                       MOVE    "国保　連携ファイル作成（入院外）"
+                                           TO  SFILESV-TITLE    (1)
+               END-EVALUATE
+           END-IF
+      *
+           MOVE    "1"             TO  SFILESV-DATA-TYPE(1)
+      *
+           CALL    "ORCSFILESV"    USING
+                                       ORCSFILESVAREA
+                                       SPA-AREA
+           .
+       3001-FILE-INFO-INSERT-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    エラー出力処理

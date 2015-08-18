@@ -41,7 +41,8 @@ fi
         LOG_FILE="/var/log/jma-receipt/${23}recept4_kobetu.log"
     fi
 
-    echo "arg5  = [" ${5} "]"  >$LOG_FILE
+    echo "arg3 =  [" ${3} "]"  >$LOG_FILE
+    echo "arg5  = [" ${5} "]"  >>$LOG_FILE
     echo "arg12 = [" ${12} "]" >>$LOG_FILE
     echo "arg13 = [" ${13} "]" >>$LOG_FILE
     echo "arg17 = [" ${17} "]" >>$LOG_FILE
@@ -112,29 +113,33 @@ fi
             exit 
         fi
 
-        if ! test -d  "${17}"; then
-             mkdir ${17}
-             RC=$?
-             echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
-             if  [ $RC -ne '0' ]; then
-                 ERRCD='0077'
-                 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD},${23} >> $LOG_FILE
-                 echo "--- mkdir  err   ---" >>$LOG_FILE
-                 exit
-             fi
-             chmod -R g+r ${17}
-             echo "--- mkdir rireki holder ---" >>$LOG_FILE
-##      else
-##           rm ${17}${RECEFILE1}*.UKE
-##           echo "--- rm holder file ---" ${17}${RECEFILE1}*.UKE "]" >>$LOG_FILE
-        fi
-        echo "--- folder name  [" ${17} "]" >>$LOG_FILE
+        echo "--- file name  [" ${MCP_TEMPDIR}/${23}${RECEFILE2}${3}.txt "=>" ${MCP_TEMPDIR}/${23}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
+        nkf -s ${MCP_TEMPDIR}/${23}${RECEFILE2}${3}.txt > ${MCP_TEMPDIR}/${23}${RECEFILE1}${3}.UKE
 
-        echo "--- file name  [" ${MCP_TEMPDIR}/${23}${RECEFILE2}${3}.txt "=>" ${17}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
-        nkf -s ${MCP_TEMPDIR}/${23}${RECEFILE2}${3}.txt > ${17}${RECEFILE1}${3}.UKE
-##      RC=$?
-##      echo "--- nkf end   ---[" $RC  "]" >>$LOG_FILE
-        chmod -R g+r ${17}${RECEFILE1}${3}.UKE
+#       システム管理場所出力のとき
+        if  [ ${21} -eq '3' ]|| [ ${21} -eq '4' ]; then
+            if ! test -d  "${17}"; then
+                 mkdir ${17}
+                 RC=$?
+                 echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
+                 if  [ $RC -ne '0' ]; then
+                     ERRCD='0077'
+                     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD},${23} >> $LOG_FILE
+                     echo "--- mkdir  err   ---" >>$LOG_FILE
+                     exit
+                 fi
+                 chmod -R g+r ${17}
+                 echo "--- mkdir rireki holder ---" >>$LOG_FILE
+##          else
+##               rm ${17}${RECEFILE1}*.UKE
+##               echo "--- rm holder file ---" ${17}${RECEFILE1}*.UKE "]" >>$LOG_FILE
+            fi
+            echo "--- folder name  [" ${17} "]" >>$LOG_FILE
+
+            echo "--- file name  [" ${MCP_TEMPDIR}/${23}${RECEFILE1}${3}.UKE "=>" ${17}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
+            cp  ${MCP_TEMPDIR}/${23}${RECEFILE1}${3}.UKE ${17}${RECEFILE1}${3}.UKE
+            chmod -R g+r ${17}${RECEFILE1}${3}.UKE
+        fi
 
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19},${23} >> $LOG_FILE
         exit 
