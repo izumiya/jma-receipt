@@ -3219,17 +3219,17 @@
                MOVE    WRK-Z9          TO  SPA-GMN-I04-CHOSEI-X (IDXC)
       *
       *        合計額がゼロ以下の時、発行なしとする
-               EVALUATE    WRK-MCP-WIDGET
+      *        EVALUATE    WRK-MCP-WIDGET
       *        調整金
-               WHEN    "CHOSEI1"
-               WHEN    "CHOSEI2"
-                   IF    ( SPA-GMN-I04-SEIGOK  <=  ZERO )
-                       MOVE    SPA-GMN-I04-SKYPRTOUT-ITM (1)
-                                               TO  SPA-GMN-I04-SKYPRTOUT
-                       MOVE    SPA-GMN-I04-SRYPRTOUT-ITM (1)
-                                               TO  SPA-GMN-I04-SRYPRTOUT
-                   END-IF
-               END-EVALUATE
+      *        WHEN    "CHOSEI1"
+      *        WHEN    "CHOSEI2"
+      *            IF    ( SPA-GMN-I04-SEIGOK  <=  ZERO )
+      *                MOVE    SPA-GMN-I04-SKYPRTOUT-ITM (1)
+      *                                        TO  SPA-GMN-I04-SKYPRTOUT
+      *                MOVE    SPA-GMN-I04-SRYPRTOUT-ITM (1)
+      *                                        TO  SPA-GMN-I04-SRYPRTOUT
+      *            END-IF
+      *        END-EVALUATE
            END-IF
       *
       *    今回請求額がゼロ以上であること
