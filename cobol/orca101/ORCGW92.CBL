@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-伊藤    15/08/19  GINBEE対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -432,8 +433,9 @@
       *    ＥＦファイル用データ作成区分
            PERFORM 4102-EFOUT-CHK-SEC
       *
-      *    連携基盤デイレクトリ
-           IF      SPA-ERRCD           =   SPACE
+      *    連携基盤ディレクトリ（PANDA環境のみ）
+           IF     (SPA-MW              =   SPA-PANDA)  AND
+                  (SPA-ERRCD           =   SPACE)
                PERFORM 4103-FILEDIR-CHK-SEC
            END-IF
       *
@@ -715,7 +717,8 @@
        4801-KANRENCHK-SEC              SECTION.
       *
            IF      SPA-GMN-EFOUT    =   "1"
-               IF      SPA-GMN-FILE-DIR    =   SPACE
+               IF     (SPA-MW              =   SPA-PANDA)  AND
+                      (SPA-GMN-FILE-DIR    =   SPACE)
                    MOVE    "0010"          TO  SPA-ERRCD
                    MOVE    2               TO  SPA-GMN-CUR
                END-IF

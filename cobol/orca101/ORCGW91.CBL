@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  15/01/07  9103 処方せん連携基盤情報
+      *  04.08.00    NACL-伊藤    15/08/19  GINBEE対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -469,8 +470,9 @@
       *    連携基盤用データ作成区分
            PERFORM 4102-COOPBASE-CHK-SEC
       *
-      *    連携基盤デイレクトリ
-           IF      SPA-ERRCD           =   SPACE
+      *    連携基盤ディレクトリ（PANDA環境のみ）
+           IF     (SPA-MW              =   SPA-PANDA)  AND
+                  (SPA-ERRCD           =   SPACE)
                PERFORM 4102-FILEDIR-CHK-SEC
            END-IF
            .
@@ -744,7 +746,8 @@
        4801-KANRENCHK-SEC              SECTION.
       *
            IF      SPA-GMN-COOPBASE    NOT =   "0"
-               IF      SPA-GMN-FILE-DIR    =   SPACE
+               IF     (SPA-MW              =   SPA-PANDA)  AND
+                      (SPA-GMN-FILE-DIR    =   SPACE)
                    MOVE    "0010"          TO  SPA-ERRCD
                    IF      SPA-W01-KANRICD         =   "9103"
                        MOVE    "0310"              TO  SPA-ERRCD
