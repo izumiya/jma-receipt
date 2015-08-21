@@ -3125,7 +3125,7 @@
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "1"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3134,10 +3134,13 @@
                      WHEN     "Y"
                         MOVE   "Z"    TO   RECE200-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "5"   TO    RECE220-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "2"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3146,10 +3149,13 @@
                      WHEN     "X"
                         MOVE   "Z"    TO   RECE200-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "6"   TO    RECE220-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "3"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3158,10 +3164,13 @@
                      WHEN     "Y"
                         MOVE   "Z"    TO   RECE200-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "7"   TO    RECE220-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "4"   TO    RECE220-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE200-COMCNTFLG
                    EVALUATE  RECE200-CYOJKSNFLG
@@ -3170,10 +3179,14 @@
                      WHEN     "X"
                         MOVE   "Z"    TO   RECE200-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "8"   TO    RECE220-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN5-COMMENT
                    MOVE    1    TO    FLG-CYOJKSN-COM
-                   IF  RECE220-FLG-CYOJKSN-COMMENT  NOT = SPACE
+                   IF  RECE220-FLG-CYOJKSN-COMMENT =
+                                           "1" OR "2" OR "3" OR "4"
                         MOVE   "1"    TO   RECE230-RECEPTFLG(IDX4)
                    END-IF
                 END-IF
