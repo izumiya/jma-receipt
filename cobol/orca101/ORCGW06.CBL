@@ -5089,13 +5089,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-USER-KANRI-LST(1)
                                            TO  W06-USER-KANRI
       *        クライアント印刷可否「する」に設定
-               MOVE    SPA-GMN-CLIENT-PRT-LST(2)
-                                           TO  W06-CLIENT-PRT
+      *        MOVE    SPA-GMN-CLIENT-PRT-LST(2)
+      *                                    TO  W06-CLIENT-PRT
       *        プリンタへのデータ送信単位「帳票毎に送信」に設定
                MOVE    SPA-GMN-PRTCONF-LST(2)
                                            TO  W06-PRTCONF
                MOVE    WIDGET-INSENSITIVE  TO  W06-USER-KANRI-STATE
-               MOVE    WIDGET-INSENSITIVE  TO  W06-CLIENT-PRT-STATE
+      *        MOVE    WIDGET-INSENSITIVE  TO  W06-CLIENT-PRT-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W06-PRTCONF-STATE
            ELSE
                MOVE    "プログラム更新"    TO  W06-CHK33-LABEL
