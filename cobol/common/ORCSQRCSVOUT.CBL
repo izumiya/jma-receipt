@@ -227,6 +227,8 @@
       *
            COPY    "MCPAREA".
       *
+           COPY    "ENUM-VALUE".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -255,6 +257,13 @@
       *
            MOVE    ZERO                TO  ORCSQRCSV-ERRCD
            MOVE    SPACE               TO  ORCSQRCSV-CSVFILE
+      *v4.8
+      *    ginbee対応
+           IF      SPA-MW              =   SPA-GINBEE
+               MOVE    9               TO  ORCSQRCSV-ERRCD
+               GO      TO      000-PROC-EXT
+           END-IF
+      *
       *    CSVデータファイル名取得
            PERFORM 100-CVSFILE-HEN-SEC
            IF      ORCSQRCSV-ERRCD NOT =   ZERO
