@@ -159,6 +159,8 @@
       *  04.07.10    NACL-門脇    14/11/12  画像診断フイルム分画数対応修正
       *  04.07.11    NACL-門脇    15/02/09  第三者行為のコメント編集条件修正
       *  04.07.12    NACL-門脇    15/04/08  リハビリ開始日編集修正
+      *  04.07.13    NACL-門脇    15/08/12  超重症児（者）入院診療加算等の
+      *                                     コメント自動記載修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -470,6 +472,8 @@
            03  IDX28               PIC 9(02).
            03  IDX29               PIC 9(02).
            03  IDX30               PIC 9(02).
+           03  IDX31               PIC 9(02).
+           03  IDX32               PIC 9(02).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -672,6 +676,11 @@
                05  WRK-CYOJKSN-INPUTCOMENT-YYY  PIC X(80).
       *
            03  WRK-SRYACCT-PATHNAME             PIC X(64).
+      *
+           03  WRK-CYOJKSN2-TAIHIYMD.
+               05  WRK-CYOJKSN2-TAIHIYY         PIC X(04).
+               05  WRK-CYOJKSN2-TAIHIMM         PIC X(04).
+               05  WRK-CYOJKSN2-TAIHIDD         PIC X(04).
       *
        01  WRK-RECE64-REC. 
            COPY    "CPRCF064.INC"  REPLACING   //RECE64//
@@ -1031,6 +1040,11 @@
            03  TBL-CYOJKSN-INF2                OCCURS  5.
                05  TBL-CYOJKSN-X               PIC  9(01).
                05  TBL-CYOJKSN-Y               PIC  9(01).
+       01  TBL-CYOJKSN2-INF.
+           03  TBL-CYOJKSN2-INF2               OCCURS  5.
+             04  TBL-CYOJKSN2-INF3             OCCURS 10.
+               05  TBL-CYOJKSN2-X-TAIHIYMD     PIC  X(12).
+               05  TBL-CYOJKSN2-Y-TAIHIYMD     PIC  X(12).
       *
       *    パス名領域
        01  WRK-PATH                        PIC X(64).
@@ -1256,6 +1270,7 @@
            INITIALIZE                      TBL-ZAISIEN-INF
            INITIALIZE                      TBL-RYOCOM-INF
            INITIALIZE                      TBL-CYOJKSN-INF
+           INITIALIZE                      TBL-CYOJKSN2-INF
            INITIALIZE                      WRK-JIDO-SETCOM-AREA
       *
       *    療養レセコメント取得
@@ -8549,18 +8564,18 @@
                EVALUATE  RECE64-SRYKBN
                  WHEN      "90"
                    IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
-                     COMPUTE RECE659-ZAINUM =  99994100  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994200  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
-                     COMPUTE RECE659-ZAINUM =  99994105  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994205  +  IDX19
                    END-IF
                    MOVE    "900"            TO   RECE659-SRYSYUKBN
                  WHEN      "92"
                    IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
-                     COMPUTE RECE659-ZAINUM =  99994600  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994700  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
-                     COMPUTE RECE659-ZAINUM =  99994605  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994705  +  IDX19
                    END-IF
                    MOVE    "920"            TO   RECE659-SRYSYUKBN
                END-EVALUATE
@@ -8596,17 +8611,17 @@
            EVALUATE  RECE64-SRYKBN
              WHEN      "90"
                IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
-                 COMPUTE RECE649-ZAINUM =  99994100  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994200  +  IDX19
                END-IF
                IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
-                 COMPUTE RECE649-ZAINUM =  99994105  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994205  +  IDX19
                END-IF
              WHEN      "92"
                IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
-                 COMPUTE RECE649-ZAINUM =  99994600  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994700  +  IDX19
                END-IF
                IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
-                 COMPUTE RECE649-ZAINUM =  99994605  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994705  +  IDX19
                END-IF
            END-EVALUATE
            MOVE    ZERO                TO  RECE649-ZAIREN
@@ -8624,6 +8639,226 @@
       *
            .
        20012-NYUKASAN-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    超重症児（者）入院診療加算・準超重症児（者）入院診療加算
+      *    の算定開始日コメント編集
+      *****************************************************************
+       2001-NYU-COMMENT3-SEC          SECTION.
+      *
+           MOVE        SPACE    TO    WRK-CYOJKSN2-TAIHIYMD
+      *
+           PERFORM     200111-RECE65-TAIHI-SEC
+      *
+           PERFORM
+               UNTIL  ( FLG-RECE65           =   1                   )
+               OR     ( RECE64-KEY1      NOT =   RECE65-KEY1         )
+               OR     ( RECE64-ZAINUM    NOT =   RECE65-ZAINUM       )
+               OR     ( RECE64-ZAIREN    NOT =   RECE65-ZAIREN       )
+      *
+               PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX               >   5     )
+                         OR      ( RECE65-SRYCD(IDX) =   SPACE )
+                  IF   (RECE65-SRYCD(IDX)     = "840000056")
+                  AND  (WRK-CYOJKSN2-TAIHIYMD =  SPACE     )
+                     MOVE  RECE65-NAME(IDX)(11:4)
+                                     TO  WRK-CYOJKSN2-TAIHIYY
+                     MOVE  RECE65-NAME(IDX)(17:4)
+                                     TO  WRK-CYOJKSN2-TAIHIMM
+                     MOVE  RECE65-NAME(IDX)(23:4)
+                                     TO  WRK-CYOJKSN2-TAIHIDD
+                  END-IF
+               END-PERFORM
+      *
+               PERFORM 990-RECE65-NEXT-SEC
+      *
+           END-PERFORM
+      *
+           IF  WRK-CYOJKSN2-TAIHIYMD  NOT = SPACE
+               COMPUTE   IDX31   =  RECE64-KOHBUNRI + 1
+               EVALUATE  RECE64-FLG-CYOJKSN-COMMENT
+                 WHEN      "5"
+                 WHEN      "7"
+                   MOVE     ZERO     TO    FLG-ARI
+                   PERFORM  VARYING  IDX32    FROM    1   BY  1
+                             UNTIL  (IDX32                  >  10  )
+                              OR    (TBL-CYOJKSN2-X-TAIHIYMD
+                                              (IDX31 IDX32) = SPACE)
+                              OR    (FLG-ARI                =   1  )
+                     IF  TBL-CYOJKSN2-X-TAIHIYMD(IDX31 IDX32)
+                                           =  WRK-CYOJKSN2-TAIHIYMD
+                        MOVE   1     TO    FLG-ARI
+                     END-IF
+                   END-PERFORM
+                   IF    FLG-ARI  =  ZERO
+                   AND   IDX32   <=   10
+                     PERFORM    20012-NYUKASAN-HENSYU3-SEC
+                     MOVE   WRK-CYOJKSN2-TAIHIYMD   TO
+                                TBL-CYOJKSN2-X-TAIHIYMD(IDX31 IDX32)
+                   END-IF
+                 WHEN      "6"
+                 WHEN      "8"
+                   MOVE     ZERO     TO    FLG-ARI
+                   PERFORM  VARYING  IDX32    FROM    1   BY  1
+                             UNTIL  (IDX32                  >  10  )
+                              OR    (TBL-CYOJKSN2-Y-TAIHIYMD
+                                              (IDX31 IDX32) = SPACE)
+                              OR    (FLG-ARI                =   1  )
+                     IF  TBL-CYOJKSN2-Y-TAIHIYMD(IDX31 IDX32)
+                                           =  WRK-CYOJKSN2-TAIHIYMD
+                        MOVE   1     TO    FLG-ARI
+                     END-IF
+                   END-PERFORM
+                   IF    FLG-ARI  =  ZERO
+                   AND   IDX32   <=   10
+                     PERFORM    20012-NYUKASAN-HENSYU3-SEC
+                     MOVE   WRK-CYOJKSN2-TAIHIYMD   TO
+                                TBL-CYOJKSN2-Y-TAIHIYMD(IDX31 IDX32)
+                   END-IF
+               END-EVALUATE
+           END-IF
+      *
+           .
+       2001-NYU-COMMENT3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （レセ電用）
+      *****************************************************************
+       20012-NYUKASAN-HENSYU3-SEC          SECTION.
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           MOVE    1                    TO  MAX-MEISAISU
+      *
+           MOVE  "810000001"  TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE   ZERO        TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "5" OR "7")
+             MOVE   30        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "超重症児（者）入院診療加算算定開始"
+                          TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:34)
+             MOVE  "（入院年月日以前の算定分）"
+                          TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(35:26)
+           END-IF
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "6" OR "8")
+             MOVE   31        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "準超重症児（者）入院診療加算算定開始"
+                          TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:36)
+             MOVE  "（入院年月日以前の算定分）"
+                          TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(37:26)
+           END-IF
+           MOVE  "1"          TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+      *
+      *    算定日コメントの挿入
+           COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+           MOVE   "810000001"
+                         TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE    ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           MOVE    9     TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+           MOVE   "　　年　　月　　日"
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+      *
+           MOVE    WRK-CYOJKSN2-TAIHIYY
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:4)
+           MOVE    WRK-CYOJKSN2-TAIHIMM
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(7:4)
+           MOVE    WRK-CYOJKSN2-TAIHIDD
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(13:4)
+      *
+           MOVE   "1"    TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+      *
+      *    コメントを含んだ内容で中間ファイルの再作成
+           MOVE       ZERO             TO      FLG-WRKRECE65
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE65
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE65  =    1
+               INITIALIZE                        RECE659-REC
+               MOVE    RECE64-KEY           TO   RECE659-KEY
+               COMPUTE IDX19              =  RECE64-KOHBUNRI + 1
+               EVALUATE  RECE64-SRYKBN
+                 WHEN      "90"
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "5" OR "7")
+                     COMPUTE RECE659-ZAINUM = 99994100 + (IDX19 * IDX32)
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "6" OR "8")
+                     COMPUTE RECE659-ZAINUM = 99994150 + (IDX19 * IDX32)
+                   END-IF
+                   MOVE    "900"            TO   RECE659-SRYSYUKBN
+                 WHEN      "92"
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "5" OR "7")
+                     COMPUTE RECE659-ZAINUM = 99994600 + (IDX19 * IDX32)
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "6" OR "8")
+                     COMPUTE RECE659-ZAINUM = 99994650 + (IDX19 * IDX32)
+                   END-IF
+                   MOVE    "920"            TO   RECE659-SRYSYUKBN
+               END-EVALUATE
+               MOVE    ZERO                 TO   RECE659-ZAIREN
+               ADD     1                    TO   WRK-RENNUM
+               MOVE    WRK-RENNUM           TO   RECE659-RENNUM
+               MOVE    RECE64-KOHBUNRI      TO   RECE659-KOHBUNRI
+               MOVE    RECE64-PTNUM         TO   RECE659-PTNUM
+               MOVE    RECE64-SRYKA         TO   RECE659-SRYKA
+               MOVE    RECE64-SRYKBN        TO   RECE659-SRYKBN
+               MOVE    ZERO                 TO   RECE659-JIHIMONEY
+               PERFORM  VARYING   IDX   FROM   1   BY   1
+                         UNTIL   (IDX       >    5)   OR
+                                 (FLG-WRKRECE65   =   1)
+                   ADD        1             TO    IDX-RECE65
+                   IF (WRK-RECE65XX-SRYCD(IDX-RECE65 1) = SPACE)
+                   OR (IDX-RECE65                       >  100 )
+                       MOVE   1             TO    FLG-WRKRECE65
+                   ELSE
+                       MOVE  WRK-RECE65XX-SRYACT-TBL(IDX-RECE65 1)
+                                        TO   RECE659-SRYACT-TBL(IDX)
+                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF
+               END-PERFORM
+               IF   RECE659-SRYCD(1)  NOT =  SPACE
+                   WRITE   RECE659-REC
+                   ADD     1            TO   CNT-RECE659
+               END-IF
+           END-PERFORM
+      *
+           PERFORM 500-RECE64-KEY-HENSYU-SEC
+           COMPUTE IDX19                =  RECE64-KOHBUNRI + 1
+           EVALUATE  RECE64-SRYKBN
+             WHEN      "90"
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "5" OR "7")
+                 COMPUTE RECE649-ZAINUM = 99994100 + (IDX19 * IDX32)
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "6" OR "8")
+                 COMPUTE RECE649-ZAINUM = 99994150 + (IDX19 * IDX32)
+               END-IF
+             WHEN      "92"
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "5" OR "7")
+                 COMPUTE RECE649-ZAINUM = 99994600 + (IDX19 * IDX32)
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "6" OR "8")
+                 COMPUTE RECE649-ZAINUM = 99994650 + (IDX19 * IDX32)
+               END-IF
+           END-EVALUATE
+           MOVE    ZERO                TO  RECE649-ZAIREN
+           MOVE    RECE64-KOHBUNRI     TO  RECE649-KOHBUNRI
+           MOVE    RECE64-SRYKBN       TO  RECE649-SRYKBN
+           MOVE    "6"                 TO  RECE649-ZAISKBKBN
+           MOVE    RECE64-PTNUM        TO  RECE649-PTNUM
+           MOVE    RECE64-SRYKA        TO  RECE649-SRYKA
+           MOVE    RECE64-HKNCOMBI     TO  RECE649-HKNCOMBI
+      *
+           MOVE    WRK-CNT-MEISAI      TO  RECE649-MEISAISU
+      *
+           WRITE   RECE649-REC
+           ADD     1                   TO  CNT-RECE649
+      *
+           .
+       20012-NYUKASAN-HENSYU3-EXT.
            EXIT.
       *
       *****************************************************************
@@ -8722,10 +8957,21 @@
       *****************************************************************
        2001-CYOJKSN-HANTEI-SEC          SECTION.
       *
-           IF      RECE64-FLG-CYOJKSN-COMMENT
-                                      =    "1" OR "2" OR "3" OR "4"
-               MOVE       99      TO     FLG-COMMENT
-               PERFORM   2001-NYU-COMMENT2-SEC
+           IF      RECE64-FLG-CYOJKSN-COMMENT   =
+                   "1" OR "2" OR "3" OR "4" OR "5" OR "6" OR "7" OR "8"
+             EVALUATE  RECE64-FLG-CYOJKSN-COMMENT
+               WHEN      "1"
+               WHEN      "2"
+               WHEN      "3"
+               WHEN      "4"
+                 MOVE       99      TO     FLG-COMMENT
+                 PERFORM   2001-NYU-COMMENT2-SEC
+               WHEN      "5"
+               WHEN      "6"
+               WHEN      "7"
+               WHEN      "8"
+                 PERFORM   2001-NYU-COMMENT3-SEC
+             END-EVALUATE
            END-IF
       *
            .

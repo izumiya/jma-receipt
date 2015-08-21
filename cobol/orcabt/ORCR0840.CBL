@@ -4645,7 +4645,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "1"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4654,10 +4654,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      WHEN     "Y"
                         MOVE   "Z"    TO   RECE82-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "5"   TO    RECE84-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "2"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4666,10 +4669,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      WHEN     "X"
                         MOVE   "Z"    TO   RECE82-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "6"   TO    RECE84-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "3"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4678,10 +4684,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      WHEN     "Y"
                         MOVE   "Z"    TO   RECE82-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "7"   TO    RECE84-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
-                AND (FLG-CYOJKSN-OK  =   1                   )
+                 IF  FLG-CYOJKSN-OK  =   1
                    MOVE   "4"   TO    RECE84-FLG-CYOJKSN-COMMENT
                    MOVE   "1"   TO    RECE82-COMCNTFLG
                    EVALUATE  RECE82-CYOJKSNFLG
@@ -4690,12 +4699,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      WHEN     "X"
                         MOVE   "Z"    TO   RECE82-CYOJKSNFLG
                    END-EVALUATE
+                 ELSE
+                   MOVE   "8"   TO    RECE84-FLG-CYOJKSN-COMMENT
+                 END-IF
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN5-COMMENT
                    MOVE    1    TO    FLG-CYOJKSN-COM
-                   IF  RECE84-FLG-CYOJKSN-COMMENT  NOT = SPACE
+                   IF  RECE84-FLG-CYOJKSN-COMMENT =
+                                           "1" OR "2" OR "3" OR "4"
                         MOVE   "1"    TO   RECE85-RECEPTFLG(IDX4)
                                            RECE85-RECEDENFLG(IDX4)
+                   END-IF
+                   IF  RECE84-FLG-CYOJKSN-COMMENT =
+                                           "5" OR "6" OR "7" OR "8"
+                        MOVE   "1"    TO   RECE85-RECEDENFLG(IDX4)
                    END-IF
                 END-IF
               END-IF
