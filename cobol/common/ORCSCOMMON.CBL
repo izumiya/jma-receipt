@@ -477,6 +477,10 @@
                MOVE    SYSKANRI-REC    TO  SYS-1050-REC
            END-IF
       *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               MOVE    "1"             TO  SYS-1050-PRTCONF
+           END-IF
+      *
       *    職員コード設定
            MOVE    SYS-1010-KBNCD(1:5) TO  SPA-STAFFCD
       *    クライアント印刷情報セット
