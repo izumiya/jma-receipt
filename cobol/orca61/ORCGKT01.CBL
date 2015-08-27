@@ -5087,6 +5087,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
       *
+      *    ²èÌÌ£Ó£Ð£Á½ñ¹þ¤ß
+           PERFORM 1003-KT01SPA-OUT-SEC
+      *
            CALL    "ORCGKT98"           USING
                                        MCPAREA
                                        SPAAREA
@@ -7390,6 +7393,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
+      *
+      *    ²èÌÌ£Ó£Ð£Á½ñ¹þ¤ß
+           PERFORM 1003-KT01SPA-OUT-SEC
       *
            CALL    "ORCGKT012"          USING
                                        MCPAREA
