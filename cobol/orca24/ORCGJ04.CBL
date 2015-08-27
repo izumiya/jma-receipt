@@ -846,9 +846,9 @@
            END-IF
       *
       *    ²èÌÌ£Ó£Ð£Á½ñ¹þ¤ß
-      *    IF      FLG-END2            =   ZERO
-      *        PERFORM 1003-J04SPA-OUT-SEC
-      *    END-IF
+           IF      FLG-END2            =   ZERO
+               PERFORM 1003-J04SPA-OUT-SEC
+           END-IF
       *
            MOVE    SPA-J01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -5403,6 +5403,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        ½ªÎ»
                MOVE    WRK-ZAINUM          TO  SPA-MAE-ZAINUM
                PERFORM 410021-END-SYORI-SEC
+           ELSE
+               MOVE    1                   TO  FLG-END2
            END-IF
       *
            .
