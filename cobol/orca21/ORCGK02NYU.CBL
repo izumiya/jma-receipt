@@ -1047,9 +1047,10 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-      *    IF      FLG-END2            =   ZERO
-      *        PERFORM 1003-K02SPA-OUT-SEC
-      *    END-IF
+           IF      FLG-END2            =   ZERO
+             AND  (SPA-ERRCD       NOT =   "1099")
+               PERFORM 1003-K02SPA-OUT-SEC
+           END-IF
       *    クライアント印刷
       *    IF      FLG-CLIENT-OK       =   1
       *        PERFORM 600-CLIENT-DMY-SEC
@@ -10045,6 +10046,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
            MOVE    SPA-AREA            TO  SPA-COMMON
            MOVE    SPA-K02             TO  SPA-FREE
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT

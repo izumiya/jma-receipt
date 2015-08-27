@@ -1187,9 +1187,10 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-      *    IF      FLG-END2            =   ZERO
-      *        PERFORM 1003-K02SPA-OUT-SEC
-      *    END-IF
+           IF     (FLG-END2            =   ZERO  )
+              AND (SPA-ERRCD       NOT =   "1999")
+               PERFORM 1003-K02SPA-OUT-SEC
+           END-IF
       *
       *    クライアント印刷
       *    IF      FLG-CLIENT-OK       =   1
@@ -12480,6 +12481,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            CALL    "ORCGK021"          USING
                                        MCPAREA
