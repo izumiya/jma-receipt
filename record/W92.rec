@@ -34,5 +34,12 @@ W92 {
       count int;
         item varchar(20)[5];
     };
+    KOH_RECEIPT_COMB {
+      KOH_RECEIPT {
+        textdata varchar(20);
+      };
+      count int;
+        item varchar(20)[5];
+    };
   };
 };

@@ -119,6 +119,8 @@
       *                                     平成２７年４月以降は選定入院時
       *                                     の外泊もレコード記録する対応
       *              NACL-藤原    15/07/10  主科未設定のときエラーとする
+      *  04.08.01    NACL-藤原    15/08/24  公費のみの診療（医療保険のな
+      *                                     い診療）のＥＦ出力可否対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1599,6 +1601,13 @@
            IF      SYS-9102-NUMBER     =   SPACE
                MOVE    "0"                 TO  SYS-9102-NUMBER
            END-IF
+           IF      SYS-9102-KOH-RECEIPT
+                                       =   SPACE
+               MOVE    "0"                 TO  SYS-9102-KOH-RECEIPT
+           END-IF
+      *
+           DISPLAY "SYS-9102-NUMBER     =" SYS-9102-NUMBER
+           DISPLAY "SYS-9102-KOH-RECEIPT=" SYS-9102-KOH-RECEIPT
            .
        110-SYSKANRI-HENSYU-EXT.
            EXIT.
@@ -5935,6 +5944,16 @@
                            END-IF
                        END-IF
       *
+      *                公費のみのレセプト出力可否のとき対象としない
+                       IF      FLG-READ            =   ZERO
+                           IF    ( SYS-9102-KOH-RECEIPT
+                                                       =   "1"  )
+                           AND   ( RECE62-RECESYUBETU (1:2)
+                                                       =   "12" )
+                               MOVE    2               TO  FLG-READ
+                           END-IF
+                       END-IF 
+      *
                        IF      FLG-READ            =   ZERO
       *                    医療機関情報取得
                            IF      WRK-PARA-SRYYM  =   ZERO
@@ -5960,6 +5979,7 @@
       *
                            DISPLAY "RECE62  PTNUM = " RECE62-PTNUM
                                    "  PTID = " RECE62-PTID
+                                   "  RECESYUBETU = " RECE62-RECESYUBETU
                                    "  KEY = " RECE62-KEY
                        ELSE
                            MOVE    ZERO        TO  FLG-READ

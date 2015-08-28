@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-伊藤    15/08/19  GINBEE対応
+      *  04.08.01    NACL-藤原    15/08/24  公費のみの診療（医療保険のな
+      *                                     い診療）のＥＦ出力可否対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -88,6 +90,14 @@
                    07  SPA-GMN-NUMBER-LST   PIC X(20)
                                                OCCURS   5.
                05  SPA-GMN-NUMBER-MAX       PIC 9(02).
+               05  SPA-GMN-KOH-RECEIPT-G.
+                   07  SPA-GMN-KOH-RECEIPT     PIC X(01).
+                   07  SPA-GMN-KOH-RECEIPT-F1  PIC X(01).
+                   07  SPA-GMN-KOH-RECEIPT-MEI PIC X(18).
+               05  SPA-GMN-KOH-RECEIPT-LST-G.
+                   07  SPA-GMN-KOH-RECEIPT-LST PIC X(20)
+                                               OCCURS   5.
+               05  SPA-GMN-KOH-RECEIPT-MAX     PIC 9(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -272,6 +282,10 @@
                                        TO  SPA-GMN-NUMBER-LST(2)
            MOVE    2                   TO  SPA-GMN-NUMBER-MAX
       *
+           MOVE    "0 ＥＦ記録する"    TO  SPA-GMN-KOH-RECEIPT-LST(1)
+           MOVE    "1 ＥＦ記録しない"  TO  SPA-GMN-KOH-RECEIPT-LST(2)
+           MOVE    2                   TO  SPA-GMN-KOH-RECEIPT-MAX
+      *
            MOVE    SPACE               TO  SYSKANRI-REC
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
@@ -295,17 +309,23 @@
                    PERFORM 900-TENSU-READ-SEC
                    MOVE    TNS-NAME            TO  SPA-GMN-NAME  (IDX)
                END-PERFORM
-               MOVE    SYS-9102-NUMBER      TO  SPA-GMN-NUMBER
+               MOVE    SYS-9102-NUMBER     TO  SPA-GMN-NUMBER
+               MOVE    SYS-9102-KOH-RECEIPT
+                                           TO  SPA-GMN-KOH-RECEIPT
            END-IF
       *
            IF      SPA-GMN-EFOUT       =   SPACE
                MOVE    "0"                 TO  SPA-GMN-EFOUT
            END-IF
            PERFORM 4102-EFOUT-CHK-SEC
-           IF      SPA-GMN-NUMBER       =   SPACE
+           IF      SPA-GMN-NUMBER      =   SPACE
                MOVE    "0"                 TO  SPA-GMN-NUMBER
            END-IF
            PERFORM 4105-NUMBER-CHK-SEC
+           IF      SPA-GMN-KOH-RECEIPT =   SPACE
+               MOVE    "0"                 TO  SPA-GMN-KOH-RECEIPT
+           END-IF
+           PERFORM 4106-KOH-RECEIPT-CHK-SEC
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    1                   TO  SPA-GMN-CUR
@@ -419,7 +439,8 @@
                    UNTIL   IDX >       2
                MOVE    W92-SRYCD (IDX)    TO  SPA-GMN-SRYCD (IDX)
            END-PERFORM
-           MOVE    W92-NUMBER           TO  SPA-GMN-NUMBER-G
+           MOVE    W92-NUMBER          TO  SPA-GMN-NUMBER-G
+           MOVE    W92-KOH-RECEIPT     TO  SPA-GMN-KOH-RECEIPT-G
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -447,6 +468,11 @@
       *    データ識別番号記録
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4105-NUMBER-CHK-SEC
+           END-IF
+      *
+      *    公費のみ診療出力可否
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4106-KOH-RECEIPT-CHK-SEC
            END-IF
            .
       *
@@ -609,6 +635,39 @@
       *
            .
        4105-NUMBER-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    公費のみのレセプトチェック処理
+      *****************************************************************
+       4106-KOH-RECEIPT-CHK-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-OK
+      *
+           IF      SPA-GMN-KOH-RECEIPT  =   SPACE
+               MOVE    SPA-GMN-KOH-RECEIPT-LST (1)
+                                       TO  SPA-GMN-KOH-RECEIPT-G
+               MOVE    1               TO  FLG-OK
+           ELSE
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       SPA-GMN-KOH-RECEIPT-MAX
+                   IF      SPA-GMN-KOH-RECEIPT
+                                       =   SPA-GMN-KOH-RECEIPT-LST
+                                                         (IDX)(1:1)
+                       MOVE    SPA-GMN-KOH-RECEIPT-LST (IDX)
+                                               TO  SPA-GMN-KOH-RECEIPT-G
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF      FLG-OK              =   ZERO
+               MOVE    "0008"              TO  SPA-ERRCD
+               MOVE    6                   TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4106-KOH-RECEIPT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -778,6 +837,7 @@
                END-IF
            END-PERFORM
            MOVE    SPA-GMN-NUMBER      TO  SYS-9102-NUMBER
+           MOVE    SPA-GMN-KOH-RECEIPT TO  SYS-9102-KOH-RECEIPT
       *
            MOVE    SYS-9102-REC        TO  SYSKANRI-REC
       *    ＤＢ更新処理
@@ -897,13 +957,24 @@
                MOVE    SPA-GMN-NAME  (IDX) TO  W92-NAME  (IDX)
            END-PERFORM
       *
-           MOVE    SPA-GMN-NUMBER-G  TO  W92-NUMBER
+           MOVE    SPA-GMN-NUMBER-G    TO  W92-NUMBER
            PERFORM VARYING IDX         FROM    1   BY  1
                    UNTIL   IDX         >   SPA-GMN-NUMBER-MAX
                MOVE    SPA-GMN-NUMBER-LST(IDX)
                                            TO  W92-NUMBER-ITEM (IDX)
            END-PERFORM
-           MOVE    SPA-GMN-NUMBER-MAX   TO  W92-NUMBER-COUNT
+           MOVE    SPA-GMN-NUMBER-MAX
+                                       TO  W92-NUMBER-COUNT
+      *
+           MOVE    SPA-GMN-KOH-RECEIPT-G
+                                       TO  W92-KOH-RECEIPT
+           PERFORM VARYING IDX         FROM    1   BY  1
+                   UNTIL   IDX         >   SPA-GMN-KOH-RECEIPT-MAX
+               MOVE    SPA-GMN-KOH-RECEIPT-LST(IDX)
+                                           TO  W92-KOH-RECEIPT-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-KOH-RECEIPT-MAX
+                                       TO  W92-KOH-RECEIPT-COUNT
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -932,6 +1003,8 @@
                    MOVE    "SRYCD2"            TO  MCP-WIDGET
                WHEN    5
                    MOVE    "NUMBER"            TO  MCP-WIDGET
+               WHEN    6
+                   MOVE    "KOH_RECEIPT"       TO  MCP-WIDGET
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -955,6 +1028,8 @@
                WHEN    "SRYCD2"
                    MOVE    5               TO  SPA-GMN-CUR
                WHEN    "NUMBER"
+                   MOVE    6              TO  SPA-GMN-CUR
+               WHEN    "KOH_RECEIPT"
                    MOVE    90              TO  SPA-GMN-CUR
            END-EVALUATE
       *
@@ -1002,6 +1077,9 @@
                                        TO  SPA-ERRMSG
                WHEN    "0007"
                    MOVE    "データ識別番号記録入力エラー"
+                                       TO  SPA-ERRMSG
+               WHEN    "0008"
+                   MOVE    "公費のみのレセプト入力エラー"
                                        TO  SPA-ERRMSG
                WHEN    "0010"
                    MOVE    "ＥＦファイル用ディレクトリを入力して下さい"
@@ -1055,6 +1133,7 @@
       *
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET

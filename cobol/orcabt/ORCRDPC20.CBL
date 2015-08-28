@@ -101,6 +101,8 @@
       *                                     加算した点数に修正
       *
       *              NACL-伊藤    15/06/23  後発品変更不可（処方単位）
+      *  04.08.01    NACL-藤原    15/08/24  公費のみの診療（医療保険のな
+      *                                     い診療）のＥＦ出力可否対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1513,6 +1515,13 @@
            IF      SYS-9102-NUMBER     =   SPACE
                MOVE    "0"                 TO  SYS-9102-NUMBER
            END-IF
+           IF      SYS-9102-KOH-RECEIPT
+                                       =   SPACE
+               MOVE    "0"                 TO  SYS-9102-KOH-RECEIPT
+           END-IF
+      *
+           DISPLAY "SYS-9102-NUMBER     =" SYS-9102-NUMBER
+           DISPLAY "SYS-9102-KOH-RECEIPT=" SYS-9102-KOH-RECEIPT
            .
        110-SYSKANRI-HENSYU-EXT.
            EXIT.
@@ -5253,6 +5262,16 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                            END-IF
                        END-IF
       *
+      *                公費のみのレセプト出力可否のとき対象としない
+                       IF      FLG-READ            =   ZERO
+                           IF    ( SYS-9102-KOH-RECEIPT
+                                                       =   "1"  )
+                           AND   ( RECE02-RECESYUBETU (1:2)
+                                                       =   "12" )
+                               MOVE    2               TO  FLG-READ
+                           END-IF
+                       END-IF 
+      *
                        IF      FLG-READ            =   ZERO
       *                    医療機関情報取得
                            IF      WRK-PARA-SRYYM  =   ZERO
@@ -5278,6 +5297,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *
                            DISPLAY "RECE02  PTNUM = " RECE02-PTNUM
                                    "  PTID = " RECE02-PTID
+                                   "  RECESYUBETU = " RECE02-RECESYUBETU
                                    "  KEY = " RECE02-KEY
                        ELSE
                            MOVE    ZERO        TO  FLG-READ

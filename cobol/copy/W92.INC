@@ -24,3 +24,9 @@
                 05  W92-NUMBER-COUNT   PIC S9(9)   BINARY.
                 05  W92-NUMBER-ITEM
                         PIC X(20)   OCCURS  5 TIMES.
+              04  W92-KOH-RECEIPT-COMB.
+                05  W92-KOH-RECEIPT.
+                  07  W92-VALUE   PIC X(20).
+                05  W92-KOH-RECEIPT-COUNT   PIC S9(9)   BINARY.
+                05  W92-KOH-RECEIPT-ITEM
+                        PIC X(20)   OCCURS  5 TIMES.
