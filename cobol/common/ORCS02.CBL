@@ -413,6 +413,9 @@
       *  04.07.35    NACL-門脇    15/06/29  高額委任払の＋アルファーの
       *                                     負担金計算対応（保険番号９６４）
       *  04.07.36    NACL-門脇    15/07/06  長期併用時の特別計算（入院）修正
+      *  04.07.37    NACL-門脇    15/08/31  長期併用時の特別計算の関係で、
+      *                                     千葉県の前期高齢（１割）の
+      *                                     長期の一部負担金は１割計算で行う
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -27896,7 +27899,9 @@
       *
       *    該当日のマル長の一部負担金を計算
            IF   FLG-ZENKI-TOKUREI  =  1
-             IF  WK-1001-PREFNUM   =  27
+             IF   ( WK-1001-PREFNUM      =  27      )
+             OR   ((LNK-SYU-SRYYMD(1:6) >= "201508") AND
+                   (WK-1001-PREFNUM      =  12     ))
                MOVE   10                   TO   WK-CYOKI-NYUKFTNRATE
              ELSE
                MOVE   20                   TO   WK-CYOKI-NYUKFTNRATE
@@ -29606,7 +29611,9 @@
        23079-TOKUSYU-SANTEI4-SEC           SECTION.
       *
            IF    FLG-ZENKI-TOKUREI  =  1
-             IF   WK-1001-PREFNUM   =  27
+             IF   ( WK-1001-PREFNUM      =  27      )
+             OR   ((LNK-SYU-SRYYMD(1:6) >= "201508") AND
+                   (WK-1001-PREFNUM      =  12     ))
                COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                                      =  WK-ZENGAKU  *  0.1
                COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)

@@ -453,6 +453,9 @@
       *  04.07.32    NACL-門脇    15/08/07  システム管理２０１０−長期併用時の
       *                                     特別計算（外来）について、
       *                                     回上限額設定のある公費も対象とする
+      *  04.07.37    NACL-門脇    15/08/31  長期併用時の特別計算の関係で、
+      *                                     千葉県の前期高齢（１割）の
+      *                                     長期の一部負担金は１割計算で行う
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -26803,7 +26806,9 @@
        23057-TOKUSYU-SANTEI4-SEC           SECTION.
       *
            IF    FLG-ZENKI-TOKUREI  =  1
-             IF   WK-1001-PREFNUM   =  27
+             IF   ( WK-1001-PREFNUM      =  27      )
+             OR   ((LNK-SYU-SRYYMD(1:6) >= "201508") AND
+                   (WK-1001-PREFNUM      =  12     ))
                COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                                      =  WK-ZENGAKU  *  0.1
                COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
