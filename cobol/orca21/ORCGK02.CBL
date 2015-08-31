@@ -2457,6 +2457,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                            SPA-K01KYOUTU
                                            SPA-K02
            END-IF
+           IF      SPA-ERRCD           =   "1999"
+               MOVE    1                   TO  FLG-END2
+           END-IF
       *
       *!   IF     SPA-HKNCOMBINUM      =   SPACE  OR  ZERO
       *        スパ共通編集処理
@@ -2535,6 +2538,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-AREA
                                        SPA-K01KYOUTU
                                        SPA-K02
+           IF      SPA-ERRCD           =   "1999"
+               MOVE    1                   TO  FLG-END2
+           END-IF
       *    パラメタファイルより表示
            MOVE    3               TO  FLG-PARASET
            PERFORM 3002-PARA-SET-SEC
@@ -3390,6 +3396,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA
                                        SPA-AREA
+           IF      SPA-ERRCD           =   "9000"
+      *        DB更新エラー
+               MOVE    1                   TO  FLG-END2
+           END-IF
       *
            IF      SPA-SYOKAI-SRYCD     =   "099110001"
                INITIALIZE                  ORCSKARRKAREA
@@ -3398,6 +3408,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                CALL    "ORCSKARRK"         USING
                                            ORCSKARRKAREA
                                            SPA-AREA
+               IF      SKARRK-RC       NOT =   ZERO
+                   MOVE    1                   TO  FLG-END2
+               END-IF
                MOVE    SPA-SYOKAI-YMD      TO  SPA-SYOYMD
                MOVE    SPACE               TO  SPA-SYOSIN-YMD
                MOVE    SPACE               TO  SPA-SYOSIN-SRYCD
@@ -5533,6 +5546,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        患者決定共編集処理
                MOVE    1               TO  FLG-CHKSET
                PERFORM 4102-PTNUM-HENSYU-SEC
+           ELSE
+               PERFORM 310-SPA-SET-SEC
            END-IF
       *
            IF     (SPA-ERRCD           =   SPACE )
@@ -9610,6 +9625,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO            TO  FLG-MOD-FLG
            PERFORM 4900-WKSRYACT-CLEAR-SEC
+           IF      SPA-ERRCD   NOT =   SPACE
+               GO      TO      410141-TEISEI-SET-EXT
+           END-IF
       *
       *    診療日付
            MOVE    SPA-GMN-RRKYMD (SPA-NAI-DOSELNUM)
@@ -10112,6 +10130,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
 grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                        MCPDATA-REC
                                                        SPA-AREA
+                   IF      MCP-RC          NOT =   ZERO
+                       MOVE    "1999"          TO  SPA-ERRCD
+                       DISPLAY "K02 WKSRYACT DEL MCP-RC:" MCP-RC
+                               ",KEY:" WKSRY-KEY
+                   END-IF
                END-IF
       *
                MOVE    "key7"              TO  MCP-PATHNAME
@@ -10859,6 +10882,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-K02
                                        SPA-SCR-REC
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    1               TO  FLG-END2
+           END-IF
       *
            .
        4410-WSINPARA-EXT.
@@ -12435,7 +12461,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-K02
                                        SPA-SCR-REC
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
-      *
+      *    DBエラー
+           IF      SPA-ERRCD           =   "1093"
+                                       OR  "9999"
+               MOVE    1               TO  FLG-END2
+           END-IF
            .
        45101-SNRYO-SYORI-EXT.
            EXIT.
@@ -12483,7 +12513,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  MCP-EVENT
       *
       *    画面ＳＰＡ書込み
-           PERFORM 1003-K02SPA-OUT-SEC
+      *    PERFORM 1003-K02SPA-OUT-SEC
       *
            CALL    "ORCGK021"          USING
                                        MCPAREA

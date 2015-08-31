@@ -24,6 +24,7 @@
                 04  KT98-LIST.
                   05  KT98-COUNT  PIC S9(9)   BINARY.
                   05  KT98-ROW    PIC S9(9)   BINARY.
+                  05  KT98-ROWATTR PIC S9(9)   BINARY.
                   05  KT98-ITEM       OCCURS  200 TIMES.
                     06  KT98-NO     PIC X(3).
                     06  KT98-NAME   PIC X(70).

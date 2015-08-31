@@ -5356,6 +5356,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為マスタ更新
            PERFORM 4501-SINKOUI-KOU-SEC
            IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    1                   TO  FLG-END2
                GO      TO      41002-KOUSIN-SYORI-EXT
            END-IF
       *
@@ -5369,6 +5370,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 4504-SRYACCT-ADD-SEC
            END-IF
            IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    1                   TO  FLG-END2
                GO      TO      41002-KOUSIN-SYORI-EXT
            END-IF
       *    主科設定

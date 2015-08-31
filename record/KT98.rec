@@ -56,6 +56,7 @@ KT98 {
       LIST {
         count int;
         row int;
+        rowattr int;
           item {
             column1 varchar(3);
             column2 varchar(70);

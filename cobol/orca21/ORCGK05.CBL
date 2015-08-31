@@ -49,6 +49,7 @@
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応
       *  04.06.00    NACL-多々納  10/07/XX  エラー内容変更他
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
+      *  04.08.00    NACL-多々納  15/09/XX  セットコード入力ＣＤ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -894,6 +895,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *                セットコード選択
                        PERFORM 30112-K98-SETCODE-SEC
                        MOVE    1                   TO  FLG-GMN
+                       IF      SPA-ERRCD       NOT =   SPACE
+                            PERFORM 510-ERRSET-SEC
+                       END-IF
                    ELSE
       *                明細選択
                        PERFORM 3011-K98-SET-SEC
@@ -2158,6 +2162,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    "5001"          TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN5-CUR
+               IF     (SPA-K05-SYORI   NOT =   "4"   )
+                  AND (SPA-GMN-SETCODE NOT =   SPACE )
+                   PERFORM 410112-K98HYOJI02-SEC
+               END-IF
                GO      TO      41011-SETCODE-HEN-EXT
            END-IF
       *
@@ -2554,6 +2562,85 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        410112-K98HYOJI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    セット名入力処理
+      *****************************************************************
+       410112-K98HYOJI02-SEC               SECTION.
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    SPA-GMN-SETCODE     TO  KANACHK-MAE-INPUT
+           MOVE    6                   TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  SPA-GMN-SETCODE
+           IF      KANACHK-RC2         =   7
+               MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-SETCODE
+           END-IF
+           IF      KANACHK-RC      NOT =   ZERO
+               GO      TO      410112-K98HYOJI02-EXT
+           END-IF
+           MOVE    KANACHK-MAX     TO  WRK-MOJI
+      *
+           INITIALIZE                      SPA-K98-AREA
+      *
+      *    全角
+           IF      KANACHK-SYUBETU     =   2
+      *        全角入力
+               MOVE    "J"                 TO  SPA-K98-CDSYUBETU
+           ELSE
+               IF     (SPA-GMN-SETCODE(1:WRK-MOJI)   NUMERIC)
+                   EVALUATE    WRK-MOJI
+                       WHEN    4
+                           MOVE    "4"         TO  SPA-K98-CDSYUBETU
+                       WHEN    5
+                           MOVE    "5"         TO  SPA-K98-CDSYUBETU
+                       WHEN    3
+                       WHEN    6
+                           MOVE    "6"         TO  SPA-K98-CDSYUBETU
+                       WHEN    OTHER
+                           MOVE    "A"         TO  SPA-K98-CDSYUBETU
+                   END-EVALUATE
+               ELSE
+                   MOVE    "A"             TO  SPA-K98-CDSYUBETU
+               END-IF
+           END-IF
+           MOVE    SPA-GMN-SETCODE     TO  SPA-K98-INPUTCD
+           MOVE    "1"                 TO  SPA-K98-TYPE
+      *
+      *    画面編集
+           INITIALIZE                  SPA-K98GMN-AREA
+      *    セットのみ検索
+           MOVE    "T"                 TO  SPA-K98-GMN-SYORI
+           PERFORM 4101-K98-SET-SEC
+      *
+           MOVE    SPA-K01KYOUTU       TO  SPA-WORK
+      *
+      *    画面カーソルセット処理
+           IF      SPA-K98-GMN-MAX     =   ZERO
+               MOVE    "5100"          TO  SPA-ERRCD
+               GO      TO      410112-K98HYOJI02-EXT
+           END-IF
+           MOVE    "SELNUM01"          TO  MCP-WIDGET
+      *
+      *    診療行為一覧へ
+           MOVE    "K98"               TO  SPA-SAKIPG
+           MOVE    "K05"               TO  SPA-MOTOPG
+           MOVE    "K05"               TO  SPA-K98-MOTOPG
+      *
+           MOVE    SPACE               TO  LINKAREA
+      *
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "K98"               TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       410112-K98HYOJI02-EXT.
            EXIT.
       *----(01.00.01) LINE ADD END   ----------------------------------
       *

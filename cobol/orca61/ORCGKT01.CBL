@@ -1003,9 +1003,9 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-      *    IF      FLG-END2            =   ZERO
-      *        PERFORM 1003-KT01SPA-OUT-SEC
-      *    END-IF
+           IF      FLG-END2            =   ZERO
+               PERFORM 1003-KT01SPA-OUT-SEC
+           END-IF
       *
            MOVE    "KT01"              TO  SPA-HZN-MOTOPG
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -1984,6 +1984,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA
                                        SPA-AREA
+           IF      SPA-ERRCD           =   "9000"
+      *        DB更新エラー
+               MOVE    1                   TO  FLG-END2
+           END-IF
       *
       *    診療科履歴更新
            INITIALIZE                  ORCSKARRKAREA
@@ -1992,6 +1996,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            CALL    "ORCSKARRK"         USING
                                        ORCSKARRKAREA
                                        SPA-AREA
+           IF      SKARRK-RC       NOT =   ZERO
+               MOVE    1                   TO  FLG-END2
+           END-IF
            MOVE    SPA-SYOKAI-YMD      TO  SPA-SYOYMD
            MOVE    SPACE               TO  SPA-SYOSIN-YMD
            MOVE    SPACE               TO  SPA-SYOSIN-SRYCD
@@ -5087,9 +5094,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
       *
-      *    画面ＳＰＡ書込み
-           PERFORM 1003-KT01SPA-OUT-SEC
-      *
            CALL    "ORCGKT98"           USING
                                        MCPAREA
                                        SPAAREA
@@ -7394,9 +7398,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
       *
-      *    画面ＳＰＡ書込み
-           PERFORM 1003-KT01SPA-OUT-SEC
-      *
            CALL    "ORCGKT012"          USING
                                        MCPAREA
                                        SPAAREA
@@ -8711,9 +8712,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
-      *
-      *    画面ＳＰＡ書込み
-           PERFORM 1003-KT01SPA-OUT-SEC
       *
            MOVE    SPACE               TO  KT01
            INITIALIZE                      KT01
