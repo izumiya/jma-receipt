@@ -545,58 +545,6 @@
            MOVE    SYS-1010-GSRAUTH(63:1)
                                    TO  SPA-NAI-GSRAUTH-103
       *
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-           MOVE    "1101"          TO  SYS-KANRICD
-           MOVE    "*"             TO  SYS-KBNCD
-           MOVE    ORCBSD01-SRYYM  TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
-           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
-                                       SYS-EDYUKYMD (7:2)
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC    TO  SYS-1101-REC
-           MOVE    SYS-1101-REIGAICHKKBN
-                                   TO  SPA-NAI-REIGAICHKKBN
-      *
-           IF    ( SYS-1101-TEKBYOYKZKBN   =   SPACE )
-               MOVE    "0"         TO  SPA-NAI-TEKBYOYKZKBN
-           ELSE
-               MOVE    SYS-1101-TEKBYOYKZKBN
-                                   TO  SPA-NAI-TEKBYOYKZKBN
-           END-IF
-      *
-           IF    ( SYS-1101-TEKBYOSRYKBN   =   SPACE )
-               MOVE    "0"         TO  SPA-NAI-TEKBYOSRYKBN
-           ELSE
-              MOVE    SYS-1101-TEKBYOSRYKBN
-                                   TO  SPA-NAI-TEKBYOSRYKBN
-           END-IF
-      *
-           IF    ( SYS-1101-SRYHEIMSTKBN   =   SPACE )
-               MOVE    "2"         TO  SPA-NAI-SRYHEIMSTKBN
-           ELSE
-               MOVE    SYS-1101-SRYHEIMSTKBN
-                                   TO  SPA-NAI-SRYHEIMSTKBN
-           END-IF
-      *
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-           MOVE    "2005"          TO  SYS-KANRICD
-           MOVE    "01"            TO  SYS-KBNCD
-           MOVE    ORCBSD01-SRYYM  TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
-           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
-                                       SYS-EDYUKYMD (7:2)
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC    TO  SYS-200501-REC
-           IF    ( SYS-200501-TENKIBYOMEI-KBN
-                                   =   SPACE )
-               MOVE    "0"         TO  SPA-NAI-TENKIBYOMEIKBN
-           ELSE
-               MOVE    SYS-200501-TENKIBYOMEI-KBN
-                                   TO  SPA-NAI-TENKIBYOMEIKBN
-           END-IF
-      *
            MOVE    1               TO  SPA-GMN-ERRLST-PAGE
       *
            INITIALIZE                  CHK004-REC
@@ -612,6 +560,59 @@
                MOVE    ORCBSD01-SRYYM  TO  SPA-NAI-SRYYM
                MOVE    ORCBSD01-NYUGAIKBN
                                        TO  SPA-NAI-NYUGAIKBN
+      *
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+               MOVE    "1101"          TO  SYS-KANRICD
+               MOVE    "*"             TO  SYS-KBNCD
+               MOVE    ORCBSD01-SRYYM  TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+                                           SYS-EDYUKYMD (7:2)
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-1101-REC
+               MOVE    SYS-1101-REIGAICHKKBN
+                                       TO  SPA-NAI-REIGAICHKKBN
+      *
+               IF    ( SYS-1101-TEKBYOYKZKBN   =   SPACE )
+                   MOVE    "0"         TO  SPA-NAI-TEKBYOYKZKBN
+               ELSE
+                   MOVE    SYS-1101-TEKBYOYKZKBN
+                                       TO  SPA-NAI-TEKBYOYKZKBN
+               END-IF
+      *
+               IF    ( SYS-1101-TEKBYOSRYKBN   =   SPACE )
+                   MOVE    "0"         TO  SPA-NAI-TEKBYOSRYKBN
+               ELSE
+                  MOVE    SYS-1101-TEKBYOSRYKBN
+                                       TO  SPA-NAI-TEKBYOSRYKBN
+               END-IF
+      *
+               IF    ( SYS-1101-SRYHEIMSTKBN   =   SPACE )
+                   MOVE    "2"         TO  SPA-NAI-SRYHEIMSTKBN
+               ELSE
+                   MOVE    SYS-1101-SRYHEIMSTKBN
+                                       TO  SPA-NAI-SRYHEIMSTKBN
+               END-IF
+      *
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+               MOVE    "2005"          TO  SYS-KANRICD
+               MOVE    "01"            TO  SYS-KBNCD
+               MOVE    ORCBSD01-SRYYM  TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+                                           SYS-EDYUKYMD (7:2)
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-200501-REC
+               IF    ( SYS-200501-TENKIBYOMEI-KBN
+                                       =   SPACE )
+                   MOVE    "0"         TO  SPA-NAI-TENKIBYOMEIKBN
+               ELSE
+                   MOVE    SYS-200501-TENKIBYOMEI-KBN
+                                       TO  SPA-NAI-TENKIBYOMEIKBN
+               END-IF
+      *
                MOVE    SPA-NAI-SRYYM       TO  WRK-YMD
                MOVE    "01"                TO  WRK-YMD(7:2)
                PERFORM 800-SEIWA-HEN-SEC
