@@ -196,6 +196,7 @@
       *
            03  WRK-K98-ROW         PIC S9(09).
            03  FLG-GMN-INIT        PIC  9(01).
+           03  WRK-SET-ROW         PIC S9(09).
       *
            03  WRK-ERRMSG          PIC  X(80).
            03  WRK-ERRMSG2         PIC  X(80).
@@ -2450,6 +2451,11 @@
            IF      WRK-K98-ROW     NOT =   ZERO
                MOVE    WRK-K98-ROW         TO  K98-ROW
            END-IF
+      *H27.9
+      *    セット展開前の位置へ
+           IF      WRK-SET-ROW     NOT =   ZERO
+               MOVE    WRK-SET-ROW         TO  K98-ROW
+           END-IF
       *
            MOVE    SPA-K98-GMN-INPUT   TO  K98-INPUT
       *
@@ -2746,31 +2752,6 @@
                END-IF
       *
       *TEST
-      *H27.9
-      *        セット展開
-               IF      SPA-K98-GMN-NO-X(IDX)   =   "S"
-      *            番号
-                   MOVE    "S* "               TO  K98-NO (IDX)
-                   MOVE    999                 TO  SPA-K98-NAI-NO(IDX)
-      *            単価など
-                   IF      SPA-K98-GMN-TANI (IDX)  =   "(数量)"
-                       MOVE    "  (数量)"      TO  K98-KISOTEN(IDX)
-                       MOVE    ALL "-"         TO  K98-TANI (IDX)
-                   ELSE
-                       IF      SPA-K98-GMN-KISOTEN(IDX)    =   ZERO
-                           MOVE    SPACE       TO  K98-KISOTEN(IDX)
-                       END-IF
-                   END-IF
-               END-IF
-               IF     (WRK-TBL-INPUCD  NOT =   SPACE )
-                 AND  (SPA-K98-GMN-SYORI   NOT =   "S")
-                   IF      SPA-K98-GMN-INPUTCD(IDX)
-                                           =   WRK-TBL-INPUCD
-                       MOVE    2               TO  K98-ROWATTR
-                       MOVE    IDX             TO  K98-ROW
-                   END-IF
-               END-IF
-      *!!!
       *
                MOVE    "F"             TO  K98-SELECT  (IDX)
       *H24.4
@@ -2790,6 +2771,23 @@
       *H24.4
                END-IF
       *H24.4
+      *H27.9
+      *        セット展開
+               IF      SPA-K98-GMN-NO-X(IDX)   =   "S"
+      *            番号
+                   MOVE    "S* "               TO  K98-NO (IDX)
+                   MOVE    999                 TO  SPA-K98-NAI-NO(IDX)
+      *            単価など
+                   IF      SPA-K98-GMN-TANI (IDX)  =   "(数量)"
+                       MOVE    "  (数量)"      TO  K98-KISOTEN(IDX)
+                       MOVE    ALL "-"         TO  K98-TANI (IDX)
+                   ELSE
+                       IF      SPA-K98-GMN-KISOTEN(IDX)    =   ZERO
+                           MOVE    SPACE       TO  K98-KISOTEN(IDX)
+                       END-IF
+                   END-IF
+               END-IF
+      *!!!
            END-PERFORM
       *
            MOVE    SPA-K98-GMN-MAX     TO  K98-COUNT
@@ -4710,6 +4708,9 @@
       *
            MOVE    SPA-K98-MOTOPG      TO  SPA-SAKIPG
            MOVE    "K98"               TO  SPA-MOTOPG
+      *    流用のクリア
+           MOVE    ZERO                TO  SPA-GMN-K07-PAGE
+           MOVE    ZERO                TO  SPA-GMN-K07-MAX
       *
            MOVE    SPACE               TO  LINKAREA
       *
@@ -4762,9 +4763,12 @@
       *        セット展開解除
                MOVE    SPA-K98-GMN-INPUTCD (1) TO  WRK-TBL-INPUCD
                MOVE    SPA-K98-OLD-SYORI   TO  SPA-K98-GMN-SYORI
-               MOVE    SPA-K99-IDX         TO  SPA-K98-PAGE
+      *        コピー句を流用
+               MOVE    SPA-GMN-K07-PAGE    TO  SPA-K98-PAGE
+               MOVE    SPA-GMN-K07-MAX     TO  WRK-SET-ROW
                PERFORM 310-SPA-SET-SEC
-               MOVE    ZERO                TO  SPA-K99-IDX
+               MOVE    ZERO                TO  SPA-GMN-K07-PAGE
+               MOVE    ZERO                TO  SPA-GMN-K07-MAX
                GO      TO      2501-SET-TENKAI-EXT
            END-IF
       *
@@ -4789,8 +4793,8 @@
            END-IF
       *
       **** 流用（選択時のページを保存）
-           MOVE    SPA-K98-PAGE        TO  SPA-K99-IDX
-      *
+           MOVE    SPA-K98-PAGE        TO  SPA-GMN-K07-PAGE
+           MOVE    K98-ROW             TO  SPA-GMN-K07-MAX
       *
            MOVE    SPA-K98-NAI-SELNUM (1)  TO  WRK-SELNO
            MOVE    SPA-K98-GMN-SRYCD (WRK-SELNO)  TO  WRK-TBL-SRYCD

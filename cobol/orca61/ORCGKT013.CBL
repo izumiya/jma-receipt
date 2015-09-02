@@ -585,6 +585,7 @@
        500-GMNHEN-SEC              SECTION.
       *
            MOVE    SPACE               TO  KT013
+           INITIALIZE                      KT013
       *»»Äê¹àÌÜ
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-KT012GMN-MAX1

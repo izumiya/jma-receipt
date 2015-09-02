@@ -174,7 +174,8 @@
            03  WRK-KENSA-HEN       PIC X(02).
       *
            03  WRK-KT98-ROW         PIC S9(09).
-           03  FLG-GMN-INIT        PIC  9(01).
+           03  FLG-GMN-INIT         PIC  9(01).
+           03  WRK-SET-ROW          PIC S9(09).
       *
            03  WRK-ERRMSG          PIC  X(80).
            03  WRK-ERRMSG2         PIC  X(80).
@@ -2408,9 +2409,14 @@
       *
       *    コラムリストの位置指定
            MOVE    ZERO                TO  KT98-ROW
-      *****MOVE    ZERO                TO  KT98-ROWATTR
+           MOVE    ZERO                TO  KT98-ROWATTR
            IF      WRK-KT98-ROW     NOT =   ZERO
                MOVE    WRK-KT98-ROW         TO  KT98-ROW
+           END-IF
+      *H27.9
+      *    セット展開前の位置へ
+           IF      WRK-SET-ROW     NOT =   ZERO
+               MOVE    WRK-SET-ROW         TO  KT98-ROW
            END-IF
       *
            MOVE    SPA-KT98-GMN-INPUT   TO  KT98-INPUT
@@ -2722,14 +2728,6 @@
                        IF      SPA-KT98-GMN-KISOTEN(IDX)    =   ZERO
                            MOVE    SPACE       TO  KT98-KISOTEN(IDX)
                        END-IF
-                   END-IF
-               END-IF
-               IF     (WRK-TBL-INPUCD  NOT =   SPACE )
-                 AND  (SPA-KT98-GMN-SYORI   NOT =   "S")
-                   IF      SPA-KT98-GMN-INPUTCD(IDX)
-                                           =   WRK-TBL-INPUCD
-                       MOVE    2               TO  KT98-ROWATTR
-                       MOVE    IDX             TO  KT98-ROW
                    END-IF
                END-IF
       *!!!
@@ -4671,6 +4669,8 @@
       *****************************************************************
        210-BACK                    SECTION.
       *
+      *    流用のクリア
+           MOVE    ZERO                TO  SPA-GMN-KT013-PAGE
            MOVE    ZERO                TO  SPA-GMN-KT013-MAX
       *
            MOVE    SPA-KT98-MOTOPG      TO  SPA-SAKIPG
@@ -4727,10 +4727,11 @@
       *        セット展開解除
                MOVE    SPA-KT98-GMN-INPUTCD (1) TO  WRK-TBL-INPUCD
                MOVE    SPA-KT98-OLD-SYORI   TO  SPA-KT98-GMN-SYORI
-      *******  MOVE    SPA-K99-IDX          TO  SPA-KT98-PAGE
-               MOVE    SPA-GMN-KT013-MAX    TO  SPA-KT98-PAGE
+      *        流用
+               MOVE    SPA-GMN-KT013-PAGE   TO  SPA-KT98-PAGE
+               MOVE    SPA-GMN-KT013-MAX    TO  WRK-SET-ROW
                PERFORM 310-SPA-SET-SEC
-      ******** MOVE    ZERO                TO  SPA-K99-IDX
+               MOVE    ZERO                TO  SPA-GMN-KT013-PAGE
                MOVE    ZERO                TO  SPA-GMN-KT013-MAX
                GO      TO      2501-SET-TENKAI-EXT
            END-IF
@@ -4756,8 +4757,8 @@
            END-IF
       *
       **** 流用（選択時のページを保存）
-      **** MOVE    SPA-KT98-PAGE        TO  SPA-K99-IDX
-           MOVE    SPA-KT98-PAGE        TO  SPA-GMN-KT013-MAX
+           MOVE    SPA-KT98-PAGE        TO  SPA-GMN-KT013-PAGE
+           MOVE    KT98-ROW             TO  SPA-GMN-KT013-MAX
       *
       *
            MOVE    SPA-KT98-NAI-SELNUM (1)  TO  WRK-SELNO
