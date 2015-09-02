@@ -464,3 +464,15 @@ path	key16 	{
 		;
 	};
 };
+
+path	del14 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND  (SRYYMD      >=   :SRYYMD)
+			AND  (SRYYMD      <=   :UPYMD )
+		;
+	};
+};
