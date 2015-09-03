@@ -456,6 +456,7 @@
       *  04.07.37    NACL-門脇    15/08/31  長期併用時の特別計算の関係で、
       *                                     千葉県の前期高齢（１割）の
       *                                     長期の一部負担金は１割計算で行う
+      *  04.07.38    NACL-門脇    15/09/02  東京都地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -11248,11 +11249,14 @@
                WHEN      SPACE
                  EVALUATE   WK-1001-PREFNUM
                    WHEN       13
-                     IF   LNK-SYU-SRYYMD(1:6)  <= "201412"
-                       MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
-                     END-IF
                      IF   COMB-KOHHKNNUM(IDX-CYO)  =  "588"
-                       MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                       IF   LNK-SYU-SRYYMD(1:6)  <= "201509"
+                         MOVE  "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                       END-IF
+                     ELSE
+                       IF   LNK-SYU-SRYYMD(1:6)  <= "201412"
+                         MOVE  "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                       END-IF
                      END-IF
                    WHEN       26
                    WHEN       33
@@ -11265,8 +11269,14 @@
                WHEN       "0"
                  EVALUATE   WK-1001-PREFNUM
                    WHEN       13
-                     IF   LNK-SYU-SRYYMD(1:6)  <= "201412"
-                       MOVE    "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                     IF   COMB-KOHHKNNUM(IDX-CYO)  =  "588"
+                       IF   LNK-SYU-SRYYMD(1:6)  <= "201509"
+                         MOVE  "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                       END-IF
+                     ELSE
+                       IF   LNK-SYU-SRYYMD(1:6)  <= "201412"
+                         MOVE  "1"    TO  WK-2010-ZENKEIKBN-G(IDX-CYO)
+                       END-IF
                      END-IF
                  END-EVALUATE
                WHEN       "1"
