@@ -38,6 +38,7 @@
       *  04.07.00    NACL-多々納  12/08/XX  サンプル薬（サ）対応
       *  04.07.00    NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
       *                                     短期滞在手術対応
+      *  04.08.00    NACL-多々納  15/09/XX  短期滞在手術３　外来対応
       *****************************************************************
       *
       *
@@ -115,6 +116,9 @@
            03  WRK-NT-SRYCD            PIC X(09).
       *
            03  WRK-IDX-N               PIC 9(04).
+      *H27.9
+           03  WRK-TANKI3-IDX          PIC 9(04).
+      *
       *    包括する診療区分
            03  WRK-HKT-SRYKBN-G.
                05  WRK-HKTKBN20        PIC 9(01).
@@ -231,6 +235,9 @@
       *
       *    電子点数表マスタチェックパラメタ
            COPY    "CPORCSCETNSCHK.INC".
+      *
+      *    短期滞在手術３チェックパラメタ
+           COPY    "CPORCSTANKI3HKT.INC".
       *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
@@ -409,6 +416,11 @@
                                            TO  TBL-N-SRYKBN-G (IDX-N)
                PERFORM 1001-HKTSRYCD-HEN-SEC
                MOVE    IDX-N               TO  TBL-N-MAX
+      *H27.9
+      *        短期滞在手術基本料３　あり
+               IF      SYS-1014-KBNCD (1:3)    =   "526"
+                   MOVE    IDX-N               TO  WRK-TANKI3-IDX
+               END-IF
            ELSE
       *        診療コード
                ADD     1                   TO  IDX
@@ -736,6 +748,14 @@
                END-IF
            END-PERFORM
       *
+      *!!!!!!!!!
+      *H27.9
+      *    短期滞在手術基本料３の外来チェック
+           IF     (WRK-TANKI3-IDX  NOT =   ZERO )
+             AND  (SPA-NYUGAIKBN       =   "2"  )
+               MOVE    1                   TO  ORCSCHKTCHK-HKTFLG
+               PERFORM 20013-TANKI3HKT-SEC
+           END-IF
            .
        2001-TAISYOU-CHK-EXT.
            EXIT.
@@ -1483,6 +1503,192 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
            .
        200281-ETENSU-SMP-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    短期滞在手術基本料３（外来）処理
+      *****************************************************************
+       20013-TANKI3HKT-SEC         SECTION.
+      *
+      *    包括処理
+           MOVE    TBL-N-SANTEI-HOU (WRK-TANKI3-IDX)
+                                       TO  WRK-SANTEI-HOU
+           MOVE    TBL-N-SANTEI-KBN (WRK-TANKI3-IDX)
+                                       TO  WRK-SANTEI-KBN
+      *
+           IF      ORCSCHKTCHK-SYORI   =   "1"
+                                       OR  "6"
+      *        入力項目
+               PERFORM 200131-TANKI3INPUT-CHK-SEC
+           ELSE
+      *        自動発生
+               PERFORM 200132-TANKI3AUTO-CHK-SEC
+           END-IF
+           .
+       20013-TANKI3HKT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    短期滞在手術基本料３（外来）入力項目処理
+      *****************************************************************
+       200131-TANKI3INPUT-CHK-SEC         SECTION.
+      *
+      *    包括診療コードチェック
+           MOVE    ZERO                TO  FLG-SANTEIOK
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
+               IF     (SPA-COM-HKNCOMBI (IDX-Z)    =   "9999")
+                   OR (SPA-COM-HOUKATU-FLG(IDX-Z)  =   1     )
+                   OR (SPA-COM-HOUKATU-ERR(IDX-Z)  =   1     )
+                   OR (SPA-GMN-INPUTCD (IDX-Z)(1:1)
+                                                   =   "#"
+                                                   OR  "$"   )
+      *            治験対象外
+                   OR (SPA-COM-CHIKENKBN(IDX-Z)    =   "1"   )
+      *            薬評対象外
+                   OR  (SPA-COM-YAKUHYO (IDX-Z)    =   "1"   )
+                   OR  (SPA-COM-GENTEN  (IDX-Z)    =   "1"   )
+      *            アフターケア
+                   OR  (SPA-RSI-HKNKBN             =   "3" )
+                   CONTINUE
+               ELSE
+      *            検査判断料のみのチェックとする
+                   IF     (SPA-COM-INPUTCD (IDX-Z)(1:1) =   "1" )
+                   AND    (FLG-SANTEIOK        =   ZERO )
+                   AND    (SPA-COM-SRYKBN (IDX-Z)  =   "60"     )
+                   AND    (SPA-COM-DATAKBN(IDX-Z)  =   "1"      )
+      *
+                       MOVE    SPA-COM-INPUTCD (IDX-Z) TO  WRK-SRYCD
+      *                チェック
+                       PERFORM 200131-TANKI3HKT-CHEK-SEC
+                       IF      LNK-TANKI3HKT-KBN   =   "1"
+                           IF      WRK-SANTEI-HOU      =   "1"
+      *                        会計データ作成
+                               MOVE    1       TO  SPA-COM-HOUKATU-KFLG
+                                                               (IDX-Z)
+                           ELSE
+      *                        エラー
+                               MOVE    1       TO  SPA-COM-HOUKATU-KERR
+                                                               (IDX-Z)
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+      *        出来高算定判定
+               IF      SPA-COM-ZAIEND (IDX-Z)  =   "1"
+                   MOVE    ZERO                TO  FLG-SANTEIOK
+               END-IF
+               IF      SPA-COM-INPUTCD (IDX-Z) =   "099999903"
+                   MOVE    1                   TO  FLG-SANTEIOK
+               END-IF
+           END-PERFORM
+      *
+      *    包括診療コード編集
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
+               IF     (SPA-COM-HOUKATU-KFLG (IDX-Z)  =   1     )
+                   OR (SPA-COM-HOUKATU-KFLG2(IDX-Z)  =   1     )
+                   OR (SPA-COM-HOUKATU-KERR (IDX-Z)  =   1     )
+                   MOVE    SPA-COM-HOUKATU-KFLG(IDX-Z)
+                                       TO  SPA-COM-HOUKATU-FLG (IDX-Z)
+                   MOVE    SPA-COM-HOUKATU-KFLG2(IDX-Z)
+                                       TO  SPA-COM-HOUKATU-FLG2 (IDX-Z)
+                   MOVE    SPA-COM-HOUKATU-KERR(IDX-Z)
+                                       TO  SPA-COM-HOUKATU-ERR (IDX-Z)
+               END-IF
+               MOVE    ZERO                TO  SPA-COM-HOUKATU-KFLG
+                                                               (IDX-Z)
+               MOVE    ZERO                TO  SPA-COM-HOUKATU-KFLG2
+                                                               (IDX-Z)
+               MOVE    ZERO                TO  SPA-COM-HOUKATU-KERR
+                                                               (IDX-Z)
+           END-PERFORM
+           .
+       200131-TANKI3INPUT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    短期滞在手術基本料３処理
+      *****************************************************************
+       200131-TANKI3HKT-CHEK-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSTANKI3HKT-AREA
+      *    医療機関番号
+           MOVE    SPA-HOSPNUM         TO  LNK-TANKI3HKT-HOSPNUM
+      *    患者ＩＤ
+           MOVE    SPA-PTID            TO  LNK-TANKI3HKT-PTID
+      *    算定年月日
+           MOVE    WRK-SRYYMD          TO  LNK-TANKI3HKT-SANTEIYMD
+      *    診療行為コード
+           MOVE    WRK-SRYCD           TO  LNK-TANKI3HKT-SRYCD
+           CALL    "ORCSTANKI3HKT"     USING
+                                       ORCSTANKI3HKT-AREA
+                                       SPA-AREA
+           .
+       200131-TANKI3HKT-CHEK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    短期滞在手術基本料３（外来）自動発生処理
+      *****************************************************************
+       200132-TANKI3AUTO-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-ORCSC-KASAN
+           PERFORM VARYING     IDX-L1  FROM    1   BY  1
+                   UNTIL      (IDX-L1      >   10  )
+               PERFORM VARYING     IDX-L2      FROM    1   BY  1
+                       UNTIL      (IDX-L2      >   30      )
+                   IF     (LNK-ORCSC-SRYCD (IDX-L1 IDX-L2)
+                                           NOT = SPACE     )
+      *                治験対象外
+                   AND    (LNK-ORCSC-CHIKENKBN (IDX-L1 IDX-L2)
+                                               =   SPACE   )
+      *            アフターケア
+                   AND    (SPA-RSI-HKNKBN      NOT =   "3" )
+                   AND    (LNK-ORCSC-HKTKBN  (IDX-L1 IDX-L2)
+                                                   =   ZERO)
+      *                診療コード包括
+                       MOVE    LNK-ORCSC-SRYCD (IDX-L1 IDX-L2)
+                                                   TO  WRK-SRYCD
+      *                手技料のみチェック
+                       IF     (WRK-SRYCD (1:1)     =   "1" )
+                         AND  (LNK-ORCSC-SRYKBN (IDX-L1 IDX-L2)
+                                                   =   "60")
+      *                    チェック
+                           PERFORM 200131-TANKI3HKT-CHEK-SEC
+                           IF      LNK-TANKI3HKT-KBN   =   "1"
+                               IF      WRK-SANTEI-HOU      =   "1"
+      *                         会計データ作成
+                                   MOVE    1       TO  WRK-ORCSC-HKTKBN
+                                                      (IDX-L1 IDX-L2)
+                               ELSE
+      *                        エラー（削除）
+                                   MOVE    SPACE   TO  LNK-ORCSC-SRYCD
+                                                      (IDX-L1 IDX-L2)
+                               END-IF
+      *
+                          END-IF
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *    包括診療コード編集
+           PERFORM VARYING     IDX-L1  FROM    1   BY  1
+                   UNTIL      (IDX-L1      >   10  )
+               PERFORM VARYING     IDX-L2      FROM    1   BY  1
+                       UNTIL      (IDX-L2      >   30      )
+                   IF     (LNK-ORCSC-SRYCD  (IDX-L1 IDX-L2)
+                                               NOT =   SPACE )  AND
+                          (WRK-ORCSC-HKTKBN (IDX-L1 IDX-L2)
+                                                   =   1     )
+                       MOVE    WRK-ORCSC-HKTKBN (IDX-L1 IDX-L2)
+                                           TO  LNK-ORCSC-HKTKBN
+                                                       (IDX-L1 IDX-L2)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+           .
+       200132-TANKI3AUTO-CHK-EXT.
            EXIT.
       *
       *****************************************************************

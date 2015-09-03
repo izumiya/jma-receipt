@@ -969,6 +969,11 @@
       *            ェ情恔及抁喟
                    IF      SYS-1014-KBNCD      >=  "501"
                        MOVE    1               TO  SPA-HKTNYUIN-FLG
+      *H27.9
+      *                羶渝ㄢ﹛陸侳及抁喟丐曰午允月
+                       IF      SYS-1014-KBNCD      =   "526"
+                           MOVE    1               TO  SPA-HKTSANTEI-FLG
+                       END-IF
                    ELSE
                        MOVE    1               TO  SPA-HKTSANTEI-FLG
       *                凝價粗陸侳褲說恔
