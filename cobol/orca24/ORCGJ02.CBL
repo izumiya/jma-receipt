@@ -226,6 +226,7 @@
            03  FLG-NYUGAICHG       PIC 9(01).
       *H24.5
            03  FLG-JYURRK-OK       PIC 9(01).
+           03  FLG-SANTEIDATA      PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -2882,6 +2883,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  WRK-HOUKNS-IDX
            MOVE    SPACE               TO  WRK-HOUKNS-NAME
       *
+           MOVE    ZERO                TO  FLG-SANTEIDATA
+      *
            PERFORM UNTIL       FLG-SRYACT      =   1
       *
       *        剤内１行目
@@ -3277,9 +3280,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *    算定履歴情報（剤内の最初に対象となるもの）
            IF     (TNS-SRYCD(1:1)      =   "1"  )  AND
-                  (TNS-DATAKBN         =   "1"  )  AND
+                  (TNS-DATAKBN         =   "1"
+                                       OR  "2"  )  AND
                   (TNS-SANTEIRRKKBN    NOT  =  ZERO )  AND
-                  (SPA-NAI-SANTEIRRKKBN(IDX)   =  ZERO )
+                  (FLG-SANTEIDATA      =   ZERO )
                MOVE    TNS-SANTEIRRKKBN    TO  SPA-NAI-SANTEIRRKKBN(IDX)
                MOVE    TNS-JGNCNT          TO  SPA-NAI-JGNCNT    (IDX)
                MOVE    TNS-JGNCNT1D        TO  SPA-NAI-JGNCNT1D  (IDX)
@@ -3290,6 +3294,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    TNS-HOUKNSKBN       TO  SPA-NAI-HOUKNSKBN (IDX)
       *        数量
                MOVE    SRY-SRYSURYO(IDZ)   TO  SPA-NAI-TSURYO (IDX)
+      *H27.9
+               IF      TNS-DATAKBN         =   "1"
+                   MOVE    1               TO  FLG-SANTEIDATA
+               END-IF
            END-IF
       *!!
       *    入院調剤料の自動発生分
