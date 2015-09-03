@@ -12,5 +12,6 @@ fi
 #       CUPS スプール削除
 #-------------------------------------------#
 #
-	cancel -a -u orca
+	cancel -u orca -a
+	cancel -u orca -a -x
 	exit 

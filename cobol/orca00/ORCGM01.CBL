@@ -474,7 +474,7 @@
       *
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "shell"             TO  MCP-PATHNAME
+           MOVE    "allways"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                            MCPAREA
                                            MCPDATA-REC
