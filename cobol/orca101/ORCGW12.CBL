@@ -3102,7 +3102,7 @@
                                    TO  SPA-GMN-JIBAI-FRACTION-KBN1MEIL
                                                                      (2)
            MOVE    "2"             TO  SPA-GMN-JIBAI-FRACTION-KBN1L  (3)
-           MOVE    "医療機関情報に準拠（患者請求時のみ）"
+           MOVE    "医療機関情報に準拠（患者請求分のみ）"
                                    TO  SPA-GMN-JIBAI-FRACTION-KBN1MEIL
                                                                      (3)
            MOVE    3               TO  SPA-GMN-JIBAI-FRACTION-KBN1-MAX 
@@ -3116,7 +3116,7 @@
                                    TO  SPA-GMN-JIBAI-FRACTION-KBN2MEIL
                                                                      (2)
            MOVE    "2"             TO  SPA-GMN-JIBAI-FRACTION-KBN2L  (3)
-           MOVE    "医療機関情報に準拠（患者請求時のみ）"
+           MOVE    "医療機関情報に準拠（患者請求分のみ）"
                                    TO  SPA-GMN-JIBAI-FRACTION-KBN2MEIL
                                                                      (3)
            MOVE    3               TO  SPA-GMN-JIBAI-FRACTION-KBN2-MAX 
