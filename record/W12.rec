@@ -394,6 +394,20 @@ W12 {
           count int;
             item varchar(24)[5];
         };
+        JIBAI_FRACTION_KBN1_COMBO {
+          JIBAI_FRACTION_KBN1 {
+            textdata varchar(38);
+          };
+          count int;
+            item varchar(38)[5];
+        };
+        JIBAI_FRACTION_KBN2_COMBO {
+          JIBAI_FRACTION_KBN2 {
+            textdata varchar(38);
+          };
+          count int;
+            item varchar(38)[5];
+        };
         ROUPRTNM {
           textdata varchar(16);
         };

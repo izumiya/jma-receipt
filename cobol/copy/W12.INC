@@ -324,6 +324,18 @@
                     06  W12-JIBAIPRTKBN1-N-COUNT  PIC S9(9)   BINARY.
                     06  W12-JIBAIPRTKBN1-NLST
                             PIC X(24)   OCCURS  5 TIMES.
+                  05  W12-JIBAI-FRACTION-KBN1-COMBO.
+                    06  W12-JIBAI-FRACTION-KBN1.
+                      07  W12-VALUE   PIC X(38).
+                    06  W12-JIBAI-FRACTION-KBN1-COUNT  PIC S9(9) BINARY.
+                    06  W12-JIBAI-FRACTION-KBN1LST
+                            PIC X(38)   OCCURS  5 TIMES.
+                  05  W12-JIBAI-FRACTION-KBN2-COMBO.
+                    06  W12-JIBAI-FRACTION-KBN2.
+                      07  W12-VALUE   PIC X(38).
+                    06  W12-JIBAI-FRACTION-KBN2-COUNT  PIC S9(9) BINARY.
+                    06  W12-JIBAI-FRACTION-KBN2LST
+                            PIC X(38)   OCCURS  5 TIMES.
                   05  W12-ROUPRTNM.
                     06  W12-VALUE   PIC X(16).
                   05  W12-ROUPRTNM-NEXT.
