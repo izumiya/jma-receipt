@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -367,7 +367,7 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>PTNUM</name>
-        <x>215</x>
+        <x>190</x>
         <y>3</y>
         <width>172</width>
         <height>20</height>
@@ -392,9 +392,9 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>SRYYM</name>
-        <x>70</x>
+        <x>65</x>
         <y>3</y>
-        <width>69</width>
+        <width>61</width>
         <height>20</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -417,7 +417,7 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>SRYKA</name>
-        <x>70</x>
+        <x>65</x>
         <y>23</y>
         <width>30</width>
         <height>20</height>
@@ -762,7 +762,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label538</name>
-        <x>10</x>
+        <x>5</x>
         <y>4</y>
         <width>60</width>
         <height>18</height>
@@ -780,7 +780,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>SRYKALBL</name>
-        <x>10</x>
+        <x>5</x>
         <y>23</y>
         <width>60</width>
         <height>18</height>
@@ -1044,7 +1044,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HKIGO</name>
-        <x>770</x>
+        <x>745</x>
         <y>23</y>
         <width>147</width>
         <height>18</height>
@@ -1062,9 +1062,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>MSG</name>
-        <x>660</x>
+        <x>680</x>
         <y>72</y>
-        <width>350</width>
+        <width>329</width>
         <height>20</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -1073,7 +1073,8 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label></label>
+        <label>公費請求書分は月遅れ請求にはなりません０１２３４５
+</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
@@ -1135,22 +1136,22 @@
         <active>True</active>
         <draw_indicator>True</draw_indicator>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
           <after>True</after>
         </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
-        </signal>
       </widget>
       <widget>
         <class>GtkLabel</class>
         <name>HCREYMD</name>
-        <x>917</x>
+        <x>892</x>
         <y>23</y>
-        <width>97</width>
+        <width>131</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -1159,7 +1160,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>H20.12.12作成</label>
+        <label>H20.12.12 10:10作成</label>
         <justify>GTK_JUSTIFY_LEFT</justify>
         <wrap>False</wrap>
       </widget>
@@ -12829,7 +12830,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label495</name>
-        <x>150</x>
+        <x>130</x>
         <y>4</y>
         <width>63</width>
         <height>18</height>
@@ -12847,7 +12848,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>LABEL1580</name>
-        <x>390</x>
+        <x>365</x>
         <y>4</y>
         <width>60</width>
         <height>18</height>
@@ -12865,7 +12866,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>LABEL1581</name>
-        <x>450</x>
+        <x>425</x>
         <y>4</y>
         <width>45</width>
         <height>18</height>
@@ -12883,7 +12884,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HTEISYUTUSAKI</name>
-        <x>450</x>
+        <x>425</x>
         <y>23</y>
         <width>77</width>
         <height>18</height>
@@ -12901,7 +12902,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HNYUGAIKBN</name>
-        <x>390</x>
+        <x>365</x>
         <y>23</y>
         <width>50</width>
         <height>18</height>
@@ -12919,7 +12920,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>NAME</name>
-        <x>215</x>
+        <x>190</x>
         <y>23</y>
         <width>173</width>
         <height>18</height>
@@ -12937,9 +12938,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>SRYKANAME</name>
-        <x>102</x>
+        <x>95</x>
         <y>23</y>
-        <width>115</width>
+        <width>93</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -12955,7 +12956,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>LABEL1582</name>
-        <x>525</x>
+        <x>500</x>
         <y>4</y>
         <width>90</width>
         <height>18</height>
@@ -12973,7 +12974,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HRECESYUBETU</name>
-        <x>525</x>
+        <x>500</x>
         <y>23</y>
         <width>90</width>
         <height>18</height>
@@ -12991,7 +12992,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>TITLE_KIGO</name>
-        <x>770</x>
+        <x>745</x>
         <y>4</y>
         <width>75</width>
         <height>18</height>
@@ -13009,7 +13010,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HHOJOKBN</name>
-        <x>726</x>
+        <x>701</x>
         <y>23</y>
         <width>46</width>
         <height>18</height>
@@ -13027,7 +13028,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HENREI_MSG</name>
-        <x>917</x>
+        <x>892</x>
         <y>4</y>
         <width>106</width>
         <height>18</height>
@@ -13045,7 +13046,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HHKNJANUM</name>
-        <x>613</x>
+        <x>588</x>
         <y>23</y>
         <width>115</width>
         <height>18</height>
@@ -13063,7 +13064,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>TITLE_HKNJANUM</name>
-        <x>613</x>
+        <x>588</x>
         <y>4</y>
         <width>115</width>
         <height>18</height>
@@ -13081,7 +13082,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>RECEIPT_KBN</name>
-        <x>846</x>
+        <x>821</x>
         <y>4</y>
         <width>65</width>
         <height>20</height>

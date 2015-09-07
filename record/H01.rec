@@ -2144,7 +2144,7 @@ H01 {
     };
     HCREYMD {
       style varchar(20);
-      textdata varchar(13);
+      textdata varchar(19);
     };
     AGE {
       numdata number(3);

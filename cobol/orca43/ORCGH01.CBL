@@ -104,7 +104,9 @@
       *  04.07.02    NACL-藤原    12/11/19  主科情報の取得方法変更
       *  04.07.03    NACL-藤原    13/02/07  労災レセ電対応
       *  04.07.04    NACL-藤原    13/09/20  第三者行為対応
-      *  04.07.02    NACL-藤原    13/10/07  労災レセ電返戻対応
+      *  04.07.05    NACL-藤原    13/10/07  労災レセ電返戻対応
+      *
+      *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1939,6 +1941,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE10-CREYMD       TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
            STRING  WRK-HENYMDG         DELIMITED   BY  SIZE
+                   " "                 DELIMITED   BY  SIZE
+                   RECE10-CREHMS (1:2) DELIMITED   BY  SIZE
+                   ":"                 DELIMITED   BY  SIZE
+                   RECE10-CREHMS (3:2) DELIMITED   BY  SIZE
                    "作成"              DELIMITED   BY  SIZE
                                        INTO    SPA-H01GMN-HCREYMD
            END-STRING
@@ -4797,6 +4803,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            END-EVALUATE
       *
            MOVE    SPACE                TO  HID1
+           INITIALIZE                       HID1
            MOVE    SPA-HIDCD            TO  HID1-ID1CODE
            MOVE    WRK-HIDMSG           TO  HID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET

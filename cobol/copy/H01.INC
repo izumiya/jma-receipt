@@ -157,7 +157,7 @@
                 04  H01-HENREI-MSG-VALUE   PIC X(14).
               03  H01-HCREYMD.
                 04  H01-HCREYMD-STYLE   PIC X(20).
-                04  H01-HCREYMD-VALUE   PIC X(13).
+                04  H01-HCREYMD-VALUE   PIC X(19).
               03  H01-AGE.
                 04  H01-VALUE   PIC 9(3).
               03  H01-KYURATE.
