@@ -207,7 +207,7 @@
              MOVE     ZERO                  TO  FLG-TANKI3
              PERFORM     VARYING    IDX   FROM   1   BY   1
                UNTIL     IDX    >   WRK-GETSUMATSU-DD
-                   IF    LNK-NYUINDAY-TANKI3-KBN(IDX)   =   "1"
+                   IF    LNK-NYUINDAY-TANKI3-KBN(IDX)   =  "1"  OR  "2"
                       MOVE    1             TO  FLG-TANKI3
                    END-IF
                    IF    FLG-TANKI3         =   1
