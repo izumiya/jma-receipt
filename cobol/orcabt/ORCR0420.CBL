@@ -286,6 +286,8 @@
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.05    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -682,6 +684,8 @@
       *
       *    消費税端数区分
            03  WRK-TAX1001-KBN                         PIC X(01).
+           03  WRK-HASU1001-JIBAI                      PIC X(01).
+           03  WRK-HASU1001-DAISAN                     PIC X(01).
       *
            03  WRK-SISETU613                           PIC 9(01).
            03  WRK-SISETU695                           PIC 9(01).
@@ -1714,6 +1718,17 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                   IF  WRK-DAISAN-DAISANKBN = SPACE
                     MOVE  "2"             TO  WRK-DAISAN-DAISANKBN
                   END-IF
+                  MOVE    SYS-1001-DISCOUNT-HASU-KBN4
+                                          TO  WRK-HASU1001-JIBAI
+                  IF  WRK-HASU1001-JIBAI = SPACE
+                    MOVE  "4"             TO  WRK-HASU1001-JIBAI
+                  END-IF
+                  MOVE    SYS-1001-DISCOUNT-HASU-KBN6
+                                          TO  WRK-HASU1001-DAISAN
+                  IF  WRK-HASU1001-DAISAN = SPACE
+                    MOVE  WRK-HASU1001-JIBAI
+                                          TO  WRK-HASU1001-DAISAN
+                  END-IF
               ELSE
                   MOVE    "医療機関情報が取得できませんでした。"
                                               TO  WRK-RECEERR
@@ -1865,6 +1880,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
            IF      SYS-200501-ROURECEKBN  =   SPACE
                MOVE    "0"             TO  SYS-200501-ROURECEKBN
            END-IF
+           IF      SYS-200501-JIBAI-FRACTION-KBN(1)  =   SPACE
+               MOVE    "0"   TO  SYS-200501-JIBAI-FRACTION-KBN(1)
+           END-IF
+           IF      SYS-200501-JIBAI-FRACTION-KBN(2)  =   SPACE
+               MOVE    "0"   TO  SYS-200501-JIBAI-FRACTION-KBN(2)
+           END-IF
       *                             
       *    レセプト処理
       *
@@ -2009,104 +2030,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *    在宅回数の再編集
            PERFORM     2108-ZAITAKU-KAISU-HENSYU-SEC
       *
+      *    自賠責・請求金額欄端数処理区分編集
+           PERFORM     2109-JIBAI-HASUKBN-HENSYU-SEC
+      *
            PERFORM     2105-RECE41-REWRITE-SEC
            .
        210-HENSYU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    在宅回数の再編集
-      *****************************************************************
-       2108-ZAITAKU-KAISU-HENSYU-SEC               SECTION.
-      *
-           IF    RECE41-SRYYM   >=  "201404"
-             EVALUATE   RECE41-HKNKBN
-               WHEN      "1"
-               WHEN      "2"
-      *          患家診療時間加算（往診）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(1 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(2 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(8) =
-                                RECE41-KAISU(8) -
-                                TBL-ZAITAKU-KAISU(2 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-      *          患家診療時間加算（特別往診）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(3 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(4 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(8) =
-                                RECE41-KAISU(8) -
-                                TBL-ZAITAKU-KAISU(4 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-      *          患家診療時間加算（在宅患者訪問診療料）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(5 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(6 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(11) =
-                                RECE41-KAISU(11) -
-                                TBL-ZAITAKU-KAISU(6 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-               WHEN      "5"
-      *          患家診療時間加算（往診）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(1 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(2 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(10) =
-                                RECE41-KAISU(10) -
-                                TBL-ZAITAKU-KAISU(2 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-      *          患家診療時間加算（特別往診）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(3 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(4 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(10) =
-                                RECE41-KAISU(10) -
-                                TBL-ZAITAKU-KAISU(4 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-      *          患家診療時間加算（在宅患者訪問診療料）に関する回数の再編集
-                 PERFORM  VARYING  IDX19  FROM  1  BY  1
-                           UNTIL   IDX19   >    9
-                   PERFORM  VARYING  IDX20  FROM  1  BY  1
-                             UNTIL   IDX20   >   31
-                     IF  TBL-ZAITAKU-KAISU(5 IDX19 IDX20) NOT = ZERO
-                     AND TBL-ZAITAKU-KAISU(6 IDX19 IDX20) NOT = ZERO
-                       COMPUTE  RECE41-KAISU(13) =
-                                RECE41-KAISU(13) -
-                                TBL-ZAITAKU-KAISU(6 IDX19 IDX20)
-                     END-IF
-                   END-PERFORM
-                 END-PERFORM
-             END-EVALUATE
-           END-IF
-      *
-           .
-       2108-ZAITAKU-KAISU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -8320,7 +8249,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *      （時間外）
                     WHEN  123
-                        PERFORM   2101225-NYUYOJI-COUNT-SEC
+                        PERFORM   21012241-NYUYOJI-COUNT-SEC
                         IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(4)   =   ZERO
                             MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(4)
@@ -8340,7 +8269,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *      （休日）
                     WHEN  124
-                        PERFORM   2101225-NYUYOJI-COUNT-SEC
+                        PERFORM   21012241-NYUYOJI-COUNT-SEC
                         IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(5)   =   ZERO
                             MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(5)
@@ -8360,7 +8289,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *      （深夜）
                     WHEN  125
-                        PERFORM   2101225-NYUYOJI-COUNT-SEC
+                        PERFORM   21012241-NYUYOJI-COUNT-SEC
                         IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(6)   =   ZERO
                             MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(6)
@@ -9057,6 +8986,35 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    乳幼児加算のカウント
+      *****************************************************************
+       21012241-NYUYOJI-COUNT-SEC               SECTION.
+      *
+           IF   RECE41-SRYYM  >= "200604"
+              IF  SRY-SRYCD(IDX3) = "112015170" OR
+                                    "112015270" OR
+                                    "112015370" OR
+                                    "112015470" OR
+                                    "112014470" OR
+                                    "112014570" OR
+                                    "112014670" OR
+                                    "112014770" OR
+                                    "112014870" OR
+                                    "112014970" OR
+                                    "112015070" OR
+                                    "112014170" OR
+                                    "112014270" OR
+                                    "112014370"
+                     COMPUTE  CNT-NYUYOJI  =  CNT-NYUYOJI
+                                           +  WK-ZAIKAISU
+              END-IF
+           END-IF
+           .
+      *
+       21012241-NYUYOJI-COUNT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    レセプト中間ファイルの項目転送
       *****************************************************************
        2101225-RECE-LEFT-SET5-SEC               SECTION.
@@ -9749,35 +9707,6 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            .
       *
        2101225-RECE-LEFT-SET5-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    乳幼児加算のカウント
-      *****************************************************************
-       2101225-NYUYOJI-COUNT-SEC               SECTION.
-      *
-           IF   RECE41-SRYYM  >= "200604"
-              IF  SRY-SRYCD(IDX3) = "112015170" OR
-                                    "112015270" OR
-                                    "112015370" OR
-                                    "112015470" OR
-                                    "112014470" OR
-                                    "112014570" OR
-                                    "112014670" OR
-                                    "112014770" OR
-                                    "112014870" OR
-                                    "112014970" OR
-                                    "112015070" OR
-                                    "112014170" OR
-                                    "112014270" OR
-                                    "112014370"
-                     COMPUTE  CNT-NYUYOJI  =  CNT-NYUYOJI
-                                           +  WK-ZAIKAISU
-              END-IF
-           END-IF
-           .
-      *
-       2101225-NYUYOJI-COUNT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10672,84 +10601,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2104-RECE44-HENSYU2-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    包括点数の治験減点分編集
-      *****************************************************************
-       2107-GENTEN-HENSYU-SEC      SECTION.
-      *
-           IF   RECE41-TENSU(2)  >=  WRK-RECE4G-TENSU(2)
-             COMPUTE  RECE41-TENSU(2)  =
-                      RECE41-TENSU(2)  -  WRK-RECE4G-TENSU(2)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(2)
-           END-IF
-           IF   RECE41-TENSU(3)  >=  WRK-RECE4G-TENSU(3)
-             COMPUTE  RECE41-TENSU(3)  =
-                      RECE41-TENSU(3)  -  WRK-RECE4G-TENSU(3)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(3)
-           END-IF
-           IF   RECE41-TENSU(5)  >=  WRK-RECE4G-TENSU(5)
-             COMPUTE  RECE41-TENSU(5)  =
-                      RECE41-TENSU(5)  -  WRK-RECE4G-TENSU(5)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(5)
-           END-IF
-           IF   RECE41-TENSU(6)  >=  WRK-RECE4G-TENSU(6)
-             COMPUTE  RECE41-TENSU(6)  =
-                      RECE41-TENSU(6)  -  WRK-RECE4G-TENSU(6)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(6)
-           END-IF
-           IF   RECE41-TENSU(7)  >=  WRK-RECE4G-TENSU(7)
-             COMPUTE  RECE41-TENSU(7)  =
-                      RECE41-TENSU(7)  -  WRK-RECE4G-TENSU(7)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(7)
-           END-IF
-           IF   RECE41-TENSU(8)  >=  WRK-RECE4G-TENSU(8)
-             COMPUTE  RECE41-TENSU(8)  =
-                      RECE41-TENSU(8)  -  WRK-RECE4G-TENSU(8)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(8)
-           END-IF
-           IF   RECE41-TENSU(9)  >=  WRK-RECE4G-TENSU(9)
-             COMPUTE  RECE41-TENSU(9)  =
-                      RECE41-TENSU(9)  -  WRK-RECE4G-TENSU(9)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(9)
-           END-IF
-           IF   RECE41-TENSU(12) >=  WRK-RECE4G-TENSU(12)
-             COMPUTE  RECE41-TENSU(12) =
-                      RECE41-TENSU(12) -  WRK-RECE4G-TENSU(12)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(12)
-           END-IF
-           IF   RECE41-TENSU(14) >=  WRK-RECE4G-TENSU(14)
-             COMPUTE  RECE41-TENSU(14) =
-                      RECE41-TENSU(14) -  WRK-RECE4G-TENSU(14)
-           ELSE
-             MOVE     ZERO    TO   RECE41-TENSU(14)
-           END-IF
-      *
-      *    合計点数の編集
-           IF   RECE41-HKNKBN     NOT  =   "4" AND "6"
-              COMPUTE  RECE41-TOTALTEN  =  RECE41-TOTALTEN
-                                        -  WRK-RECE4G-TENSU(2)
-                                        -  WRK-RECE4G-TENSU(3)
-                                        -  WRK-RECE4G-TENSU(5)
-                                        -  WRK-RECE4G-TENSU(6)
-                                        -  WRK-RECE4G-TENSU(7)
-                                        -  WRK-RECE4G-TENSU(8)
-                                        -  WRK-RECE4G-TENSU(9)
-                                        -  WRK-RECE4G-TENSU(12)
-                                        -  WRK-RECE4G-TENSU(14)
-           END-IF
-      *
-           .
-       2107-GENTEN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -11803,6 +11654,215 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    包括点数の治験減点分編集
+      *****************************************************************
+       2107-GENTEN-HENSYU-SEC      SECTION.
+      *
+           IF   RECE41-TENSU(2)  >=  WRK-RECE4G-TENSU(2)
+             COMPUTE  RECE41-TENSU(2)  =
+                      RECE41-TENSU(2)  -  WRK-RECE4G-TENSU(2)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(2)
+           END-IF
+           IF   RECE41-TENSU(3)  >=  WRK-RECE4G-TENSU(3)
+             COMPUTE  RECE41-TENSU(3)  =
+                      RECE41-TENSU(3)  -  WRK-RECE4G-TENSU(3)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(3)
+           END-IF
+           IF   RECE41-TENSU(5)  >=  WRK-RECE4G-TENSU(5)
+             COMPUTE  RECE41-TENSU(5)  =
+                      RECE41-TENSU(5)  -  WRK-RECE4G-TENSU(5)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(5)
+           END-IF
+           IF   RECE41-TENSU(6)  >=  WRK-RECE4G-TENSU(6)
+             COMPUTE  RECE41-TENSU(6)  =
+                      RECE41-TENSU(6)  -  WRK-RECE4G-TENSU(6)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(6)
+           END-IF
+           IF   RECE41-TENSU(7)  >=  WRK-RECE4G-TENSU(7)
+             COMPUTE  RECE41-TENSU(7)  =
+                      RECE41-TENSU(7)  -  WRK-RECE4G-TENSU(7)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(7)
+           END-IF
+           IF   RECE41-TENSU(8)  >=  WRK-RECE4G-TENSU(8)
+             COMPUTE  RECE41-TENSU(8)  =
+                      RECE41-TENSU(8)  -  WRK-RECE4G-TENSU(8)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(8)
+           END-IF
+           IF   RECE41-TENSU(9)  >=  WRK-RECE4G-TENSU(9)
+             COMPUTE  RECE41-TENSU(9)  =
+                      RECE41-TENSU(9)  -  WRK-RECE4G-TENSU(9)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(9)
+           END-IF
+           IF   RECE41-TENSU(12) >=  WRK-RECE4G-TENSU(12)
+             COMPUTE  RECE41-TENSU(12) =
+                      RECE41-TENSU(12) -  WRK-RECE4G-TENSU(12)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(12)
+           END-IF
+           IF   RECE41-TENSU(14) >=  WRK-RECE4G-TENSU(14)
+             COMPUTE  RECE41-TENSU(14) =
+                      RECE41-TENSU(14) -  WRK-RECE4G-TENSU(14)
+           ELSE
+             MOVE     ZERO    TO   RECE41-TENSU(14)
+           END-IF
+      *
+      *    合計点数の編集
+           IF   RECE41-HKNKBN     NOT  =   "4" AND "6"
+              COMPUTE  RECE41-TOTALTEN  =  RECE41-TOTALTEN
+                                        -  WRK-RECE4G-TENSU(2)
+                                        -  WRK-RECE4G-TENSU(3)
+                                        -  WRK-RECE4G-TENSU(5)
+                                        -  WRK-RECE4G-TENSU(6)
+                                        -  WRK-RECE4G-TENSU(7)
+                                        -  WRK-RECE4G-TENSU(8)
+                                        -  WRK-RECE4G-TENSU(9)
+                                        -  WRK-RECE4G-TENSU(12)
+                                        -  WRK-RECE4G-TENSU(14)
+           END-IF
+      *
+           .
+       2107-GENTEN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅回数の再編集
+      *****************************************************************
+       2108-ZAITAKU-KAISU-HENSYU-SEC               SECTION.
+      *
+           IF    RECE41-SRYYM   >=  "201404"
+             EVALUATE   RECE41-HKNKBN
+               WHEN      "1"
+               WHEN      "2"
+      *          患家診療時間加算（往診）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(1 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(2 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(8) =
+                                RECE41-KAISU(8) -
+                                TBL-ZAITAKU-KAISU(2 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+      *          患家診療時間加算（特別往診）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(3 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(4 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(8) =
+                                RECE41-KAISU(8) -
+                                TBL-ZAITAKU-KAISU(4 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+      *          患家診療時間加算（在宅患者訪問診療料）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(5 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(6 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(11) =
+                                RECE41-KAISU(11) -
+                                TBL-ZAITAKU-KAISU(6 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+               WHEN      "5"
+      *          患家診療時間加算（往診）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(1 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(2 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(10) =
+                                RECE41-KAISU(10) -
+                                TBL-ZAITAKU-KAISU(2 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+      *          患家診療時間加算（特別往診）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(3 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(4 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(10) =
+                                RECE41-KAISU(10) -
+                                TBL-ZAITAKU-KAISU(4 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+      *          患家診療時間加算（在宅患者訪問診療料）に関する回数の再編集
+                 PERFORM  VARYING  IDX19  FROM  1  BY  1
+                           UNTIL   IDX19   >    9
+                   PERFORM  VARYING  IDX20  FROM  1  BY  1
+                             UNTIL   IDX20   >   31
+                     IF  TBL-ZAITAKU-KAISU(5 IDX19 IDX20) NOT = ZERO
+                     AND TBL-ZAITAKU-KAISU(6 IDX19 IDX20) NOT = ZERO
+                       COMPUTE  RECE41-KAISU(13) =
+                                RECE41-KAISU(13) -
+                                TBL-ZAITAKU-KAISU(6 IDX19 IDX20)
+                     END-IF
+                   END-PERFORM
+                 END-PERFORM
+             END-EVALUATE
+           END-IF
+      *
+           .
+       2108-ZAITAKU-KAISU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自賠責・請求金額欄端数処理区分編集
+      *****************************************************************
+       2109-JIBAI-HASUKBN-HENSYU-SEC               SECTION.
+      *
+           EVALUATE   RECE41-HKNKBN
+             WHEN       "4"
+               EVALUATE   SYS-200501-JIBAI-FRACTION-KBN(1)
+                 WHEN      "1"
+                   IF   WRK-HASU1001-JIBAI   NOT = "4"
+                     MOVE  WRK-HASU1001-JIBAI   TO  RECE41-JIBAI-HASUKBN
+                   END-IF
+                 WHEN      "2"
+                   IF   RECE41-SEIKYUKBN         = "1"
+                   AND  WRK-HASU1001-JIBAI   NOT = "4"
+                     MOVE  WRK-HASU1001-JIBAI   TO  RECE41-JIBAI-HASUKBN
+                   END-IF
+               END-EVALUATE
+             WHEN       "6"
+               EVALUATE   SYS-200501-JIBAI-FRACTION-KBN(2)
+                 WHEN      "1"
+                   IF   WRK-HASU1001-DAISAN  NOT = "4"
+                     MOVE  WRK-HASU1001-DAISAN  TO  RECE41-JIBAI-HASUKBN
+                   END-IF
+                 WHEN      "2"
+                   IF   RECE41-SEIKYUKBN         = "1"
+                   AND  WRK-HASU1001-DAISAN  NOT = "4"
+                     MOVE  WRK-HASU1001-DAISAN  TO  RECE41-JIBAI-HASUKBN
+                   END-IF
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       2109-JIBAI-HASUKBN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    終了処理
       *****************************************************************
        300-TERM-SEC                SECTION.
@@ -12221,6 +12281,17 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                     TO    WRK-DAISAN-DAISANKBN
                    IF  WRK-DAISAN-DAISANKBN = SPACE
                      MOVE  "2"      TO    WRK-DAISAN-DAISANKBN
+                   END-IF
+                   MOVE    SYS-1001-DISCOUNT-HASU-KBN4
+                                    TO    WRK-HASU1001-JIBAI
+                   IF  WRK-HASU1001-JIBAI = SPACE
+                     MOVE  "4"      TO    WRK-HASU1001-JIBAI
+                   END-IF
+                   MOVE    SYS-1001-DISCOUNT-HASU-KBN6
+                                    TO    WRK-HASU1001-DAISAN
+                   IF  WRK-HASU1001-DAISAN = SPACE
+                     MOVE  WRK-HASU1001-JIBAI
+                                    TO    WRK-HASU1001-DAISAN
                    END-IF
                 END-IF
       *

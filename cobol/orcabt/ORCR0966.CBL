@@ -66,6 +66,8 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.04    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1346,8 +1348,8 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                      +    RECE82-MEISAI-KIN
                                      +    RECE82-SITURYO-JYU
                                      +    RECE82-SONOTAKIN-JYU
-                 MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
-                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+                 MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUG
                WHEN    "8"
                  COMPUTE WRK-GOKEI   =    RECE82-FTNMONEY
                                      +    RECE82-SKJFTNMONEY
@@ -1469,6 +1471,11 @@ grpsys        PERFORM 900-DBSELECT-SEC
            END-IF
            INSPECT HC23-HOKENNAME  REPLACING   ALL "  "    BY  "　"
       *
+      *    請求金額欄編集
+           IF      RECE82-JIBAI-HASUKBN  NOT = SPACE
+               PERFORM   20021-SEIKYUGAK-HENSYU-SEC
+           END-IF
+      *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN NOT =   "1"
                IF      SYS-200501-INSPECT-CHARACTER-KBN
@@ -1484,6 +1491,53 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *
            .
        20021-HEAD-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    帳票編集<ヘッダー部>処理（請求金額欄編集）
+      *****************************************************************
+       20021-SEIKYUGAK-HENSYU-SEC          SECTION.
+      *
+           MOVE       ZERO     TO   WRK-GOKEI
+           EVALUATE   WRK-PARA-RECEKBN
+             WHEN       "3"
+             WHEN       "4"
+             WHEN       "5"
+               COMPUTE  WRK-GOKEI = RECE82-TOTALKIN-JYU
+                                  + RECE82-SHOKUJITOTALKIN
+                                  + RECE82-SINDAN-KIN
+                                  + RECE82-MEISAI-KIN
+                                  + RECE82-SITURYO-JYU
+                                  + RECE82-SONOTAKIN-JYU
+             WHEN       "8"
+               COMPUTE WRK-GOKEI  = RECE82-FTNMONEY
+                                  + RECE82-SKJFTNMONEY
+                                  + RECE82-SINDAN-KIN
+                                  + RECE82-MEISAI-KIN
+                                  + RECE82-SITURYO-JYU
+                                  + RECE82-SONOTAKIN-JYU
+           END-EVALUATE
+           IF    WRK-GOKEI  >  ZERO
+             EVALUATE   RECE82-JIBAI-HASUKBN
+               WHEN       "1"
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  +   5
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
+               WHEN       "2"
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
+               WHEN       "3"
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  +   9
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
+                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
+             END-EVALUATE
+             MOVE    WRK-GOKEI     TO  WRK-SEIKYUZ
+             MOVE    WRK-SEIKYUZ   TO  HC23-SEIKYUG
+                                       HC23-SEIKYUGAKUTOTAL
+           END-IF
+      *
+           .
+       20021-SEIKYUGAK-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3183,6 +3237,24 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                  MOVE    RECE82-FTNMONEY     TO RECE10-FTNMONEY-FTN(1)
                  MOVE    RECE82-SKJFTNMONEY  TO RECE10-SHOKUJIRYOYOHI(1)
            END-EVALUATE
+      *
+           IF      RECE82-JIBAI-HASUKBN  NOT = SPACE
+           AND     RECE10-FTNMONEY(1)        > ZERO
+             EVALUATE   RECE82-JIBAI-HASUKBN
+               WHEN       "1"
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) +  5
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
+               WHEN       "2"
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
+               WHEN       "3"
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) +  9
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
+                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
+             END-EVALUATE
+           END-IF
+      *
            IF      RECE82-JNISSU       =   999
                MOVE    ZERO                TO  RECE10-JNISSU       (1)
            ELSE

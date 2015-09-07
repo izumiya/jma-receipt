@@ -31,6 +31,8 @@
       *  04.07.01    NACL-ÌçÏÆ    12/10/12  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¡ÊÉ¸½àÄ¢É¼¡Ë
       *                                     ¤Îµ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/10/15  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      *  04.08.01    NACL-ÌçÏÆ    15/08/27  ¼«ÇåÀÕ¥ì¥»¥×¥È¤ÎÀÁµá¶â³ÛÍóÃ¼¿ô
+      *                                     ½èÍýÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -646,6 +648,25 @@
                         SYU-CHOSEI
              END-IF
            ELSE
+            IF   IDX1  =  10
+             IF   SYU-PTFTNRATE   =  ZERO
+               COMPUTE  WRK-KEISAN                 =
+                        SYU-RMSAGAKU               +
+                        SYU-SKYMONEY-SKJ-JIHI-KEI  +
+                        SYU-SKYMONEY-LIFE-JIHI-KEI +
+                        SYU-TOTAL-TGMONEY          +
+                        SYU-TOTAL-TGMONEY-TAX      +
+                        SYU-JIHI-TOTAL             +
+                        SYU-JIHI-TOTAL-TAX         -
+                        SYU-DISCOUNT-MONEY         +
+                        SYU-CHOSEI
+             ELSE
+               COMPUTE  WRK-KEISAN            =
+                        SYU-RSIJIBAI-SKYMONEY -
+                        SYU-DISCOUNT-MONEY    +
+                        SYU-CHOSEI
+             END-IF
+            ELSE
              COMPUTE    WRK-KEISAN                 =
                         SYU-HKNTEKMONEY            +
                         SYU-KOH-FTN                +
@@ -660,6 +681,7 @@
                         SYU-JIHI-TOTAL-TAX         -
                         SYU-DISCOUNT-MONEY         +
                         SYU-CHOSEI
+            END-IF
            END-IF
            COMPUTE      WRK-KEISAN2  =
                         SYU-SKYMONEY -
@@ -750,12 +772,19 @@
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-ICHIBUFTN
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-HOKENJA
            IF    WRK-PTFTNRATE   =  100
+      ***    IF    RECE10-NYUGAIKBN   =  "1"
+      ***      COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
+      ***                RECE10-FTNMONEY(1)        -
+      ***                RECE10-SHOKUJIRYOYOHI(1)
+      ***    ELSE
+      ***      MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
+      ***    END-IF
              IF    RECE10-NYUGAIKBN   =  "1"
                COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
-                         RECE10-FTNMONEY(1)        -
-                         RECE10-SHOKUJIRYOYOHI(1)
+                         RECE10-FTNMONEY-FTN(1)    +
+                         RECE10-FTNMONEY-KOJ(1)
              ELSE
-               MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
+               PERFORM   20011-SYUNOU-CHECK-SEC
              END-IF
            ELSE
              IF    RECE10-NYUGAIKBN   =  "1"
@@ -781,6 +810,59 @@
       *
            .
        2001-HENSYU3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¡ãÏ«ºÒ¡¦¼«ÇåÀÕ¡ä  ³°Íè¤ÇÉéÃ´³ä¹ç£±£°£°¡ó¤Î¾ì¹ç
+      *****************************************************************
+       20011-SYUNOU-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                         SYUNOU-REC
+           MOVE    RECE10-HOSPNUM        TO   SYU-HOSPNUM
+           MOVE    RECE10-NYUGAIKBN      TO   SYU-NYUGAIKBN
+           MOVE    RECE10-PTID           TO   SYU-PTID
+           MOVE    RECE10-SRYYM          TO   SYU-SRYYMD(1:6)
+           MOVE    "__"                  TO   SYU-SRYYMD(7:2)
+           MOVE    RECE10-HKNCOMBI(1)    TO   SYU-HKNCOMBINUM
+           MOVE    SYUNOU-REC            TO   MCPDATA-REC
+           MOVE    "tbl_syunou"          TO   MCP-TABLE
+           MOVE    "key41"               TO   MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC   =   ZERO
+             MOVE    "tbl_syunou"        TO   MCP-TABLE
+             MOVE    "key41"             TO   MCP-PATHNAME
+             PERFORM 900-SYUNOU-READ-SEC
+             PERFORM    UNTIL   (FLG-SYUNOU   =   1)
+               IF  SYU-DENPJTIKBN    NOT =  "3"
+                 COMPUTE    WRK-KEISAN                 =
+                            SYU-SYUSKJ-RYOYOHI         +
+                            SYU-RMSAGAKU               +
+                            SYU-SKYMONEY-SKJ-JIHI-KEI  +
+                            SYU-SKYMONEY-LIFE-JIHI-KEI +
+                            SYU-TOTAL-TGMONEY          +
+                            SYU-TOTAL-TGMONEY-TAX      +
+                            SYU-JIHI-TOTAL             +
+                            SYU-JIHI-TOTAL-TAX
+      *
+                 COMPUTE    WRK-KEISAN2                =
+                            SYU-RSIJIBAI-SKYMONEY      -
+                            WRK-KEISAN
+      *
+                 COMPUTE    LNK-SKYGET-IRYO-ICHIBUFTN  =
+                            LNK-SKYGET-IRYO-ICHIBUFTN  +
+                            WRK-KEISAN2
+               END-IF
+               MOVE    "tbl_syunou"      TO   MCP-TABLE
+               MOVE    "key41"           TO   MCP-PATHNAME
+               PERFORM 900-SYUNOU-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_syunou"          TO   MCP-TABLE
+           MOVE    "key41"               TO   MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       20011-SYUNOU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -835,6 +917,8 @@
       *
            MOVE    RECE10-JNISSU(1)         TO LNK-SKYGET-IRYO-NISSU
            MOVE    RECE10-TOTALTEN(1)       TO LNK-SKYGET-IRYO-TOTALTEN
+           MOVE    ZERO                     TO LNK-SKYGET-IRYO-ICHIBUFTN
+           MOVE    ZERO                     TO LNK-SKYGET-IRYO-HOKENJA
            IF    WRK-PTFTNRATE   =  ZERO
              IF    RECE10-NYUGAIKBN   =  "1"
                COMPUTE   LNK-SKYGET-IRYO-HOKENJA   =
@@ -843,16 +927,21 @@
              ELSE
                MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-HOKENJA
              END-IF
-             MOVE    ZERO                   TO LNK-SKYGET-IRYO-ICHIBUFTN
            ELSE
-             IF    RECE10-NYUGAIKBN   =  "1"
+      ***    IF    RECE10-NYUGAIKBN   =  "1"
+      ***      COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
+      ***                RECE10-FTNMONEY(1)        -
+      ***                RECE10-SHOKUJIRYOYOHI(1)
+      ***    ELSE
+      ***      MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
+      ***    END-IF
+      ***    IF    RECE10-NYUGAIKBN   =  "1"
                COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
-                         RECE10-FTNMONEY(1)        -
-                         RECE10-SHOKUJIRYOYOHI(1)
-             ELSE
-               MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
-             END-IF
-             MOVE    ZERO                   TO LNK-SKYGET-IRYO-HOKENJA
+                         RECE10-FTNMONEY-FTN(1)    +
+                         RECE10-FTNMONEY-KOJ(1)
+      ***    ELSE
+      ***      PERFORM   20011-SYUNOU-CHECK-SEC
+      ***    END-IF
            END-IF
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-KOHFTN
       *
