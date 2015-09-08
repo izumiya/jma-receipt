@@ -153,9 +153,21 @@
                WHEN    "DBDISCONNECT"
                WHEN    "DBSTART"
                WHEN    "DBCOMMIT"
+      *!!!!!   WHEN    "PUTWINDOW"
+                   MOVE    LOW-VALUE       TO  MCP-TABLE
+                                               MCP-PATHNAME
+      *!!!!!!!!!!!!!!!
                WHEN    "PUTWINDOW"
                    MOVE    LOW-VALUE       TO  MCP-TABLE
                                                MCP-PATHNAME
+                   IF     (MCP-PUTTYPE     =   "CHANGE"  OR
+                                               "JOIN"    )
+                     AND  (MCP-WINDOW      =   "M01"    )
+                       IF        SPA-BEDFLG     >   ZERO
+                           MOVE    "M01N"          TO  MCP-WINDOW
+                       END-IF
+                   END-IF
+      *!!!!!!!!!!!!!!!
                WHEN    OTHER
                    IF  MCP-FUNC            =   "DBFETCH"
                        MOVE    LOW-VALUE   TO  MCPDATA-REC
@@ -174,7 +186,8 @@
       *
            IF    ( FLG-ERR         =   ZERO )
       *
-               MOVE    1           TO  MCP-VERSION
+               MOVE    2           TO  MCP-VERSION
+               MOVE    1           TO  MCP-LIMIT
                MOVE    1           TO  MCP-REDIRECT
       *
                IF    ( MCP-TABLE   =   "tbl_srysrh"
@@ -182,13 +195,13 @@
                                     OR "tbl_rrksrh"
                                     OR "tbl_ptsrh"
                                                     )
-                   MOVE    2       TO  MCP-VERSION
                    MOVE    0       TO  MCP-REDIRECT
                END-IF
       *
-               IF    ( MCP-TABLE   =   "tbl_chksnd" )
+               IF    ( MCP-TABLE   =   "tbl_chksnd"
+                                    OR "tbl_sryacct_main"
+                                    OR "tbl_sryacct_sub" )
                    IF    ( MCP-PATHNAME (1:3)  =   "tmp" )
-                       MOVE    2   TO  MCP-VERSION
                        MOVE    0   TO  MCP-REDIRECT
                    END-IF
                END-IF
@@ -196,7 +209,6 @@
                IF    ( MCP-TABLE   =   "tbl_jobkanri" )
                    MOVE    MCPDATA-REC TO  JOBKANRI-REC
                    IF    ( JOB-SHELLID =   "PRGMNT" )
-                       MOVE    2   TO  MCP-VERSION
                        MOVE    0   TO  MCP-REDIRECT
                    END-IF
                END-IF

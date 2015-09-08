@@ -319,9 +319,6 @@
       *    印刷ＤＢ制御サブ
            COPY    "CPORCSPRT.INC".
       *
-      *    会計カード編集サブ
-           COPY    "CPORCHCM34.INC".
-      *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
       *

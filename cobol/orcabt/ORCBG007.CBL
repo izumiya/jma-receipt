@@ -122,6 +122,7 @@
            03  IDX2                                PIC 9(05).
            03  IDX3                                PIC 9(05).
            03  IDX4                                PIC 9(05).
+           03  IDXA                                PIC 9(05).
            03  IDXE                                PIC 9(05).
            03  IDX-DAY                             PIC 9(05).
       *
@@ -138,13 +139,14 @@
            03  WRK-PARA-NYUGAIKBN                  PIC X(01).
            03  WRK-PARA-BTUNUM                     PIC X(02).
            03  WRK-PARA-SRTKBN                     PIC X(01).
-           03  WRK-PARA-EDITKBN                    PIC X(01).
+           03  WRK-PARA-EDITKBN                    PIC X(10).
            03  WRK-PARA-SRYKA                      PIC X(02).
            03  WRK-PARA-HOKEN                      PIC X(01).
            03  WRK-PARA-STDAY                      PIC X(05).
            03  WRK-PARA-EDDAY                      PIC X(05).
            03  WRK-PARA-SRYKAKBN                   PIC X(01).
            03  WRK-PARA-HIDEBYOKBN                 PIC X(01).
+           03  WRK-PARA-HIDEHOKATSU                PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -219,6 +221,13 @@
            03  SORTKEY5-KEY    REDEFINES           SORTKEY1-KEY.
                05  SORTKEY5-RENNUM                 PIC 9(10).
                05  SORTKEY5-DUMMY                  PIC X(120).
+      *    ターミナルデジット順
+           03  SORTKEY6-KEY    REDEFINES           SORTKEY1-KEY.
+               05  SORTKEY6-SRYKA                  PIC X(02).
+               05  SORTKEY6-HOKENBUNRUI            PIC X(01).
+               05  SORTKEY6-TDIGIT                 PIC X(02).
+               05  SORTKEY6-PTNUM                  PIC X(20).
+               05  SORTKEY6-DUMMY                  PIC X(105).
       *
        01  KEY-AREA.
            03  KEY-SRYKA                           PIC X(02).
@@ -327,6 +336,9 @@
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
       *
+      *    一時テーブル編集
+           COPY    "CPORCSTEMPTBL.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPAREA".
       *
@@ -427,15 +439,22 @@ grpsys     END-UNSTRING
       *
            MOVE    WRK-PARA-NYUGAIKBN  TO  WRK-NYUGAI
       *
-           EVALUATE    WRK-PARA-EDITKBN
-           WHEN    "1"
-               MOVE    "1"             TO  WRK-PARA-SRYKAKBN
-           WHEN    "2"
-               MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
-           WHEN    "3"
-               MOVE    "1"             TO  WRK-PARA-SRYKAKBN
-               MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
-           END-EVALUATE
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   10 )
+      *
+               EVALUATE    WRK-PARA-EDITKBN (IDX0 : 1)
+               WHEN    "1"
+                   MOVE    "1"             TO  WRK-PARA-SRYKAKBN
+               WHEN    "2"
+                   MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
+               WHEN    "3"
+                   MOVE    "1"             TO  WRK-PARA-SRYKAKBN
+                   MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
+               WHEN    "4"
+                   MOVE    "1"             TO  WRK-PARA-HIDEHOKATSU
+               END-EVALUATE
+      *
+           END-PERFORM
       *
            IF    ( WRK-PARA-SRYKA      NOT =   SPACE )
             AND  ( WRK-PARA-SRYKAKBN       =   SPACE )
@@ -634,6 +653,11 @@ grpsys     END-UNSTRING
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
+           IF    ( WRK-PARA-STDAY  NOT =   SPACE )
+            OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
+               PERFORM 800-TEMP-TABLE-CREATE-SEC
+           END-IF
+      *
            EVALUATE    WRK-PARA-NYUGAIKBN
                                    ALSO WRK-PARA-PTNUM
       *    入院全患者
@@ -655,6 +679,11 @@ grpsys     END-UNSTRING
       *
            IF    ( FLG-END     =   ZERO )
                PERFORM 2101-KAIKEI-HEN-SEC
+           END-IF
+      *
+           IF    ( WRK-PARA-STDAY  NOT =   SPACE )
+            OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
+               PERFORM 800-TEMP-TABLE-DROP-SEC
            END-IF
       *
            MOVE    1                   TO  FLG-END
@@ -930,6 +959,26 @@ grpsys     END-UNSTRING
                MOVE    WRK-HOKENBUNRUI     TO  SORTKEY4-HOKENBUNRUI
                MOVE    PTNUM-PTNUM         TO  SORTKEY4-PTNUM
                MOVE    SORTKEY4-KEY        TO  BG00701-KEY
+      *
+           WHEN    "6"
+      *
+               MOVE    SS001-SRYKA (IDX1)  TO  SORTKEY6-SRYKA
+               MOVE    WRK-HOKENBUNRUI     TO  SORTKEY6-HOKENBUNRUI
+      *
+               PERFORM VARYING IDXA    FROM    20   BY  -1
+                       UNTIL ( IDXA        <   2 )
+      *
+                   IF ( IDXA               <=  2 )
+                    OR( PTNUM-PTNUM (IDXA : )   NOT  = SPACE )
+                       MOVE    PTNUM-PTNUM (IDXA - 1 : 2)
+                                           TO  SORTKEY6-TDIGIT
+                       MOVE    2           TO  IDXA
+                   END-IF
+      *
+               END-PERFORM
+      *
+               MOVE    PTNUM-PTNUM         TO  SORTKEY6-PTNUM
+               MOVE    SORTKEY6-KEY        TO  BG00701-KEY
       *
            WHEN    OTHER
                MOVE    SS001-SRYKA (IDX1)  TO  SORTKEY4-SRYKA
@@ -1260,6 +1309,8 @@ grpsys     END-UNSTRING
            IF    ( WRK-PARA-PTNUM      NOT =   SPACE )
                MOVE    "1"             TO  ORCHCM34-PRTCTRLKBN
            END-IF
+           MOVE    WRK-PARA-HIDEHOKATSU
+                                       TO  ORCHCM34-HIDEHOKATSU
       *
            MOVE    ORCSPRTAREA         TO  ORCHCM34-PRTAREA
       *
@@ -1584,6 +1635,45 @@ grpsys     END-UNSTRING
        800-ERRMSG-EDIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    一時テーブル作成処理
+      *****************************************************************
+       800-TEMP-TABLE-CREATE-SEC           SECTION.
+      *
+           INITIALIZE                      STEMPTBL-AREA
+           MOVE    WRK-PARA-SRYYM      TO  STEMPTBL-SRYYM
+           MOVE    WRK-STDAY           TO  STEMPTBL-FROM
+           MOVE    WRK-EDDAY           TO  STEMPTBL-TO
+           MOVE    "DBCREATE"          TO  STEMPTBL-FUNC
+           MOVE    "SRYACCT"           TO  STEMPTBL-TABLE
+           CALL    "ORCSTEMPTBL"       USING
+                                       STEMPTBL-AREA
+                                       SPA-AREA
+      *
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *
+           .
+       800-TEMP-TABLE-CREATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    一時テーブル廃棄処理
+      *****************************************************************
+       800-TEMP-TABLE-DROP-SEC         SECTION.
+      *
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *
+           INITIALIZE                      STEMPTBL-AREA
+           MOVE    "DBDROP"            TO  STEMPTBL-FUNC
+           MOVE    "SRYACCT"           TO  STEMPTBL-TABLE
+           CALL    "ORCSTEMPTBL"       USING
+                                       STEMPTBL-AREA
+                                       SPA-AREA
+      *
+           .
+       800-TEMP-TABLE-DROP-EXT.
+           EXIT.
       *****************************************************************
       *    入院履歴検索処理(KEY43)
       *****************************************************************

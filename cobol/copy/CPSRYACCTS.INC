@@ -41,3 +41,7 @@
            03  ACCTS-VNYUGAIKBN            PIC  X(01).
       *壳闻钳奉
            03  ACCTS-VSRYYM                PIC  X(06).
+      *认跋回年倡幌
+           03  ACCTS-VFROM                 PIC  9(02).
+      *认跋回年姜位
+           03  ACCTS-VTO                   PIC  9(02).

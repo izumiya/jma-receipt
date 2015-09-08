@@ -51,6 +51,8 @@
                05  ORCHCM34-EDDAY          PIC 9(02).
                05  ORCHCM34-STSRYYMD       PIC X(08).
                05  ORCHCM34-EDSRYYMD       PIC X(08).
+      *        包括非表示区分
+               05  ORCHCM34-HIDEHOKATSU    PIC X(01).
       *        一括パラメタ
                05  ORCHCM34-PRTAREA        PIC X(25000).
       *
