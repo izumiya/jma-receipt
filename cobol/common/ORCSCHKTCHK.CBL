@@ -752,7 +752,6 @@
       *H27.9
       *    短期滞在手術基本料３の外来チェック
            IF     (WRK-TANKI3-IDX  NOT =   ZERO )
-             AND  (SPA-NYUGAIKBN       =   "2"  )
                MOVE    1                   TO  ORCSCHKTCHK-HKTFLG
                PERFORM 20013-TANKI3HKT-SEC
            END-IF
