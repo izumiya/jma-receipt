@@ -1047,10 +1047,10 @@
            END-IF
       *
       *    画面ＳＰＡ書込み
-           IF     (FLG-END2            =   ZERO )
-             AND  (SPA-ERRCD       NOT =   "1999")
-               PERFORM 1003-K02SPA-OUT-SEC
-           END-IF
+      *    IF     (FLG-END2            =   ZERO )
+      *      AND  (SPA-ERRCD       NOT =   "1999")
+      *        PERFORM 1003-K02SPA-OUT-SEC
+      *    END-IF
       *    クライアント印刷
       *    IF      FLG-CLIENT-OK       =   1
       *        PERFORM 600-CLIENT-DMY-SEC
@@ -1444,6 +1444,14 @@
                        PERFORM 520-KIDSET-SEC
                    END-IF
                END-IF
+      *!!
+           ELSE
+               IF     (FLG-END2        =   1      )
+                  OR  (SPA-ERRCD       =   "1999" )
+                   MOVE    "1999"          TO  SPA-ERRCD
+                   MOVE    "E"             TO  SPA-K01-YOBI(1:1)
+               END-IF
+      *!!
            END-IF
       *
            .
@@ -1550,6 +1558,14 @@
                        MOVE    2                   TO  FLG-SYOKAI
                    ELSE
                        PERFORM 30091-SAIHEN2-SEC
+                   END-IF
+      *!!!
+      *            ＤＢエラー表示
+                   IF      SPA-ERRCD       =   "1999"
+                                           OR  "9999"
+                       MOVE    01              TO  SPA-GMN-CUR
+                       PERFORM 500-GMNHEN-SEC
+                       PERFORM 510-ERRSET-SEC
                    END-IF
       *
                WHEN    OTHER
@@ -2078,8 +2094,18 @@
                        MOVE    WRK-SPA-SRYKA   TO  SPA-SRYKA
                    END-IF
                    PERFORM 41010-PTNUM-SYORI-SEC
+      *!!          ＤＢエラー
+                   IF     (FLG-END2        =   1      )
+                      OR  (SPA-ERRCD       =   "1999" )
+                       MOVE    "E"             TO  SPA-K01-YOBI(1:1)
+                   END-IF
+      *!!
                    MOVE    SPACE           TO  SPA-ERRCD
                    MOVE    ZERO            TO  SPA-NAI-ROUSTR
+      *!!
+                   IF     (FLG-END2        =   1      )
+                       MOVE    90              TO  SPA-GMN-CUR
+                   END-IF
                END-IF
            END-IF
       *
@@ -5483,6 +5509,9 @@
            MOVE    SPA-AREA            TO  SPA-COMMON
            MOVE    SPA-K02             TO  SPA-FREE
       *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
+      *
            MOVE    "LINK"              TO  MCP-STATUS
            MOVE    SPACE               TO  MCP-EVENT
       *
@@ -8436,6 +8465,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    行挿入行をなくす
            PERFORM 420-SYOKYO-SEC
       *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
+      *
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -8526,6 +8558,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                   (FLG-END             =   1     )
                GO      TO      470-SANTEI-EXT
            END-IF
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPACE               TO  SPA-MOTOPG
@@ -8887,6 +8922,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ヘルプ処理
       *****************************************************************
        4199-HELP-SYORI-SEC             SECTION.
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -9253,6 +9291,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4110S-K10-SYORI-SEC            SECTION.
       *
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPACE               TO  SPA-MOTOPG
@@ -9592,6 +9633,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NAI-GYOUMU-ARI  TO  SPA-K081NAI-GYOUMU-ARI
            MOVE    "K02N"              TO  SPA-ETC-MOTOPG
       *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
+      *
            MOVE    SPA-K081            TO  SPA-ETCKYOUTU-AREA
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
            MOVE    SPA-AREA            TO  SPA-COMMON
@@ -9646,7 +9690,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ユーザプログラム起動
            PERFORM 4907-USERPG-SEC
-           IF      FLG-END             =   1
+           IF     (FLG-END             =   1 )
+             OR   (FLG-END2            =   1 )
                CONTINUE
            ELSE
       *
@@ -10054,6 +10099,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        51020-K021-SYORI-SEC              SECTION.
       *
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPACE               TO  SPA-MOTOPG
@@ -10268,6 +10316,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD           =   "0100"
                MOVE    SPACE               TO  SPA-ERRCD
            END-IF
+      *!!
+      *    中途データＤＢ更新エラー表示
+           IF      SPA-K01-YOBI(1:1)   =   "E"
+               MOVE    "1999"          TO  SPA-ERRCD
+               MOVE    SPACE           TO  SPA-K01-YOBI(1:1)
+               MOVE    90              TO  SPA-GMN-CUR
+           END-IF
+           IF      SPA-ERRCD           =   "1999"
+               MOVE    90              TO  SPA-GMN-CUR
+           END-IF
+      *!!
       *
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
@@ -10510,6 +10569,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    行位置とカーソル位置の決定
            PERFORM 5002-GMNSPA-HEN-SEC
+      *
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
       *
            IF     (FLG-GMN-INIT        =   1   )  OR
                   (SPA-GMN-MAX1        =   ZERO )
@@ -11231,7 +11293,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                INTO  SPA-ERRMSG
                    END-STRING
            END-EVALUATE
-      *
       *
            IF      SPA-ERRMSG2     NOT =   SPACE
       *        エラー画面２

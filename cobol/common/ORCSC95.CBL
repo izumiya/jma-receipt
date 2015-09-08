@@ -5331,14 +5331,17 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                        SPA-AREA
                    IF      MCP-RC          NOT =   ZERO
                        MOVE    "1999"          TO  SPA-ERRCD
+                       MOVE    1               TO  FLG-WKSRYACT
                        DISPLAY "C95 WKSRYACT UPD ERR:" MCP-RC
                               ",KEY:" WKSRY-KEY
                    END-IF
                END-IF
       *
-               MOVE    "tbl_wksryact"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 940-WKSRYACT-READ-SEC
+               IF      FLG-WKSRYACT        =   ZERO
+                   MOVE    "tbl_wksryact"      TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM 940-WKSRYACT-READ-SEC
+               END-IF
            END-PERFORM
       *
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -5474,11 +5477,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    DISPLAY "C95 WKSRYACT UPD ERR:" MCP-RC
                               ",KEY:" WKSRY-KEY
                    MOVE    "1999"          TO  SPA-ERRCD
+                   MOVE    1               TO  FLG-WKSRYACT
                END-IF
       *
-               MOVE    "tbl_wksryact"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 940-WKSRYACT-READ-SEC
+               IF      FLG-WKSRYACT        =   ZERO
+                   MOVE    "tbl_wksryact"      TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM 940-WKSRYACT-READ-SEC
+               END-IF
            END-PERFORM
       *
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -5630,11 +5636,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    DISPLAY "C95 WKSRYACT UPD ERR:" MCP-RC
                               ",KEY:" WKSRY-KEY
                    MOVE    "1999"          TO  SPA-ERRCD
+                   MOVE    1               TO  FLG-WKSRYACT
                END-IF
       *
-               MOVE    "tbl_wksryact"      TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 940-WKSRYACT-READ-SEC
+               IF      FLG-WKSRYACT        =   ZERO
+                   MOVE    "tbl_wksryact"      TO  MCP-TABLE
+                   MOVE    "key6"              TO  MCP-PATHNAME
+                   PERFORM 940-WKSRYACT-READ-SEC
+               END-IF
            END-PERFORM
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
            MOVE    "key6"              TO  MCP-PATHNAME
