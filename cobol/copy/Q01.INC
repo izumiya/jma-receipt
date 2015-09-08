@@ -147,6 +147,12 @@
                                                PIC S9(9)   BINARY.
                     07  Q01-CMB-HONKZKKBN-ITEM
                                                PIC X(10)   OCCURS 5.
+                  06  Q01-CMB-FTNRATE.
+                    07  Q01-FTNRATE            PIC X(35).
+                    07  Q01-CMB-FTNRATE-COUNT
+                                               PIC S9(9)   BINARY.
+                    07  Q01-CMB-FTNRATE-ITEM
+                                               PIC X(35)   OCCURS 10.
                   06  Q01-HKNJANUM-TBL.
                     07  Q01-HKNJANUM           PIC X(08)   OCCURS 5.
                   06  Q01-CMB-HKNNUM-TBL.
