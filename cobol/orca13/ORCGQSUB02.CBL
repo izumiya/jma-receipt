@@ -96,6 +96,10 @@
            03  WRK-STTSYYMD-FROM                   PIC X(08).
            03  WRK-STTSYYMD-TO                     PIC X(08).
            03  WRK-EDTSYYMD                        PIC X(08).
+           03  WRK-AGE70DAY.
+               05  WRK-AGE70DAY-Y                  PIC 9(04).
+               05  WRK-AGE70DAY-M                  PIC X(02).
+               05  WRK-AGE70DAY-D                  PIC X(02).
            03  WRK-SQL                             PIC X(20000).
            03  WRK-SQL-PNT                         PIC 9(06).
            03  WRK-PNT                             PIC 9(06).
@@ -816,7 +820,7 @@
                    MOVE    1               TO  FLG-HKNSELPTN
                    STRING  ",(SELECT AA.HOSPNUM,AA.PTID,AA.DELKBN"
                                                    DELIMITED  BY  SIZE
-                           ",BB.HKNJANUM,BB.HONKZKKBN,BB.HKNNUM"
+                        ",BB.HKNJANUM,BB.HONKZKKBN,BB.HOJOKBN,BB.HKNNUM"
                                                    DELIMITED  BY  SIZE
                            ",AA.HKNID,BB.KIGO,BB.NUM,AA.HKNCOMBINUM "
                                                    DELIMITED  BY  SIZE
@@ -2326,6 +2330,17 @@
                PERFORM 900-SQL-JOKEN-EDIT3-SEC
            END-IF
       *
+           IF      ( SPA-Q01-FTNRATE       NOT =   SPACE )
+      *
+               MOVE    1                   TO  CNT-JOKEN
+      *
+               PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
+               PERFORM 100111-FTNRATE-SQL-EDIT-SEC
+      *
+               PERFORM 900-SQL-JOKEN-EDIT3-SEC
+           END-IF
+      *
            IF      ( SPA-Q01-HKNEDYM   NOT =   SPACE )
       *
                MOVE    1                   TO  CNT-JOKEN
@@ -2598,6 +2613,89 @@
       *
            .
        10011-PTHKNINF-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    …È√¥≥‰πÁ£”£—£Ã ‘Ω∏ΩËÕ˝
+      *****************************************************************
+       100111-FTNRATE-SQL-EDIT-SEC     SECTION.
+      *
+           MOVE    WRK-STSRYYMD        TO  WRK-AGE70DAY
+           COMPUTE WRK-AGE70DAY-Y  =   WRK-AGE70DAY-Y - 70
+           MOVE    "01"                TO  WRK-AGE70DAY-D
+      *
+           STRING  "("
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           IF    ( SPA-Q01-FTNRATE     =   "1" OR "2" OR "3" )
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HKNNUM BETWEEN '001'  AND '099' AND "
+                                               DELIMITED   BY  SIZE
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HKNNUM NOT IN ('039','040','068','069') AND "
+                                               DELIMITED   BY  SIZE
+                       "A.BIRTHDAY <='"        DELIMITED   BY  SIZE
+                       WRK-AGE70DAY            DELIMITED   BY  SPACE
+                       "' AND "                DELIMITED   BY  SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           ELSE
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HKNNUM IN ('039') AND "
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           END-IF
+      *
+           EVALUATE    SPA-Q01-FTNRATE
+           WHEN    "1"
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HOJOKBN IN ('1','9','A','B','C')"
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "2"
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HOJOKBN IN ('2','8','D','E','F')"
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "3"
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HOJOKBN IN ('3','7','G','H','I')"
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "4"
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HOJOKBN IN ('1')"
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "5"
+               STRING
+                       WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                       ".HOJOKBN IN ('3')"
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           END-EVALUATE
+      *
+           STRING  ")"
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       100111-FTNRATE-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ¥µº‘∏¯»Ò•ﬁ•π•ø° ∏¯»Ò§ŒºÔŒ‡°À∏°∫˜æÚ∑Ô ‘Ω∏ΩËÕ˝

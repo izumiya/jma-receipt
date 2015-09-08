@@ -329,6 +329,13 @@ Q01 {
           count int;
             item varchar(10)[5];
         };
+        CMB_FTNRATE{
+          FTNRATE	{
+            textdata varchar(35);
+          };
+          count int;
+            item varchar(35)[10];
+        };
         HKNJANUM1 {
           textdata varchar(8);
         };

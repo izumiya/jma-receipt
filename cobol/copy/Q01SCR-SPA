@@ -244,6 +244,13 @@
                                                        PIC X(1).
                                13  SPA-GMN-Q01-HONKZKKBNMEI
                                                        PIC X(8).
+                           11  SPA-GMN-Q01-FTNRATE-G.
+                               13  SPA-GMN-Q01-FTNRATE
+                                                       PIC X(1).
+                               13  SPA-GMN-Q01-FTNRATEFL
+                                                       PIC X(1).
+                               13  SPA-GMN-Q01-FTNRATEMEI
+                                                       PIC X(34).
       *                    保険　保険者番号
                            11  SPA-GMN-Q01-HKNJANUMTBL.
                                13  SPA-GMN-Q01-HKNJANUM
@@ -676,6 +683,14 @@
                                13  SPA-GMN-Q01-HONKZKKBNFLL PIC X(01).
                                13  SPA-GMN-Q01-HONKZKKBNMEIL
                                                            PIC X(08).
+                       09  SPA-GMN-Q01-FTNRATELST-G.
+                           11  SPA-GMN-Q01-FTNRATELST-MAX
+                                                           PIC 9(05).
+                           11  SPA-GMN-Q01-FTNRATELST      OCCURS  10.
+                               13  SPA-GMN-Q01-FTNRATEL    PIC X(01).
+                               13  SPA-GMN-Q01-FTNRATEFLL  PIC X(01).
+                               13  SPA-GMN-Q01-FTNRATEMEIL
+                                                           PIC X(34).
                        09  SPA-GMN-Q01-HKNNUMLST-G.
                            11  SPA-GMN-Q01-HKNNUMLST-MAX   PIC 9(05).
                            11  SPA-GMN-Q01-HKNNUMLST       OCCURS  50.
@@ -1257,6 +1272,7 @@
                    07  SPA-Q01-HOKEN-AREA.
                        09  SPA-Q01-HKNEDYM             PIC X(06).
                        09  SPA-Q01-HONKZKKBN           PIC X(01).
+                       09  SPA-Q01-FTNRATE             PIC X(01).
                        09  SPA-Q01-HKNJANUM-G.
                            11  SPA-Q01-HKNJANUM        PIC X(08)
                                                        OCCURS 5.
