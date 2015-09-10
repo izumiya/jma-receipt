@@ -212,6 +212,7 @@
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    15/02/04  請求管理への公費情報の更新
+      *  04.08.04    NACL-藤原    15/09/01  保険履歴の記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1929,6 +1930,11 @@
                                     =   SPACE
                MOVE    ZERO             TO  SYS-200501-TENKIBYOMEI-KBN
            END-IF
+           IF      SYS-200501-HKN-RIREKI-KBN
+                                        =   SPACE
+               MOVE    "0"              TO  SYS-200501-HKN-RIREKI-KBN
+           END-IF
+      *
            DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
                                     SYS-200501-INSPECT-CHARACTER-KBN
                     " " WRK-PARA-PRTKBN
@@ -1938,6 +1944,8 @@
                                     SYS-200501-TERMINAL-DIGIT-PRTKBN
            DISPLAY "SYS-200501-TENKIBYOMEI-KBN      ="
                                     SYS-200501-TENKIBYOMEI-KBN
+           DISPLAY "SYS-200501-HKN-RIREKI-KBN       ="
+                                    SYS-200501-HKN-RIREKI-KBN
       *
       *    レセプト・総括編集情報（区分コード０５のデータ読込）
            MOVE    SPACE            TO  SYSKANRI-REC
@@ -2461,9 +2469,11 @@
                        MOVE    "―"       TO  WRK-HKN-FIL
                END-EVALUATE
       *
-               IF    ( RECE09-NUM         =   SPACE )
-               AND   ( RECE09-KIGO        =   SPACE )        
-               AND   ( RECE09-HKNJANUM    =   SPACE )        
+               IF  ( ( RECE09-NUM         =   SPACE )
+               AND   ( RECE09-KIGO        =   SPACE )
+               AND   ( RECE09-HKNJANUM    =   SPACE ) )
+               OR  (   SYS-200501-HKN-RIREKI-KBN
+                                           =   "1"    )
                    STRING  WRK-HKN-TEISYUTUSAKI   DELIMITED  BY  SPACE
                            RECE09-TANSEIDONAME    DELIMITED  BY  SPACE
                               INTO    WRK-HKN-RIREKI (WRK-RIREKI-MAX)
@@ -2472,7 +2482,7 @@
                    MOVE    SPACE           TO  WRK-HKN-HKNJANUM
                    IF      RECE09-HKNJANUM     NOT =   SPACE
                        INITIALIZE              ORCSKANACHKAREA
-                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    "2"             TO  KANACHK-SYORI
                        MOVE    RECE09-HKNJANUM TO  KANACHK-MAE-INPUT
                        CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                        IF      KANACHK-RC      =   ZERO
@@ -2483,7 +2493,7 @@
                    MOVE    SPACE           TO  WRK-HKN-KIGO
                    IF      RECE09-KIGO     NOT =   SPACE
                        INITIALIZE              ORCSKANACHKAREA
-                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    "2"             TO  KANACHK-SYORI
                        MOVE    RECE09-KIGO     TO  KANACHK-MAE-INPUT
                        CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                        IF      KANACHK-RC      =   ZERO
@@ -2494,7 +2504,7 @@
                    MOVE    SPACE           TO  WRK-HKN-NUM
                    IF      RECE09-NUM      NOT =   SPACE
                        INITIALIZE              ORCSKANACHKAREA
-                       MOVE    "2"             TO  KANACHK-SYORI 
+                       MOVE    "2"             TO  KANACHK-SYORI
                        MOVE    RECE09-NUM      TO  KANACHK-MAE-INPUT
                        CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                        IF      KANACHK-RC      =   ZERO

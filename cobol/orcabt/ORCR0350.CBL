@@ -402,6 +402,7 @@
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/06/02  請求情報への更新日設定
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.04    NACL-藤原    15/09/01  保険履歴の記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2115,9 +2116,13 @@
                MOVE    WRK-CONS-JYOKEN-TENSU
                                        TO  SYS-200501-NI-JYOKEN(2)
            END-IF
+           IF      SYS-200501-HKN-RIREKI-KBN
+                                        =   SPACE
+               MOVE    "0"              TO  SYS-200501-HKN-RIREKI-KBN
+           END-IF
            IF      SYS-200501-KOUIKIRECEKBN
                                        =   SPACE
-               MOVE    ZERO        TO  SYS-200501-KOUIKIRECEKBN
+               MOVE    ZERO            TO  SYS-200501-KOUIKIRECEKBN
            END-IF
            MOVE    SYS-200501-KOUIKIRECEKBN
                                    TO  WRK-PARA-KOUIKIRECEKBN 
@@ -2125,6 +2130,8 @@
            DISPLAY "2005 NI-JYOKEN (3)=" SYS-2005-NI-JYOKEN(3)
                                  " (4)=" SYS-2005-NI-JYOKEN(4)
                    " 200501 NI-JYOKEN (2)=" SYS-200501-NI-JYOKEN(2)
+           DISPLAY "200501 HKN-RIREKI-KBN="
+                                         SYS-200501-HKN-RIREKI-KBN
            DISPLAY "KOUIKIRECEKBN=" WRK-PARA-KOUIKIRECEKBN
       *         
       *    レセプト編集区分情報
@@ -2461,9 +2468,11 @@
                        MOVE    "−"       TO  WRK-HKN-FIL
                END-EVALUATE
       *
-               IF    ( RECE69-NUM         =   SPACE )
-               AND   ( RECE69-KIGO        =   SPACE )        
-               AND   ( RECE69-HKNJANUM    =   SPACE )        
+               IF  ( ( RECE69-NUM         =   SPACE )
+               AND   ( RECE69-KIGO        =   SPACE )
+               AND   ( RECE69-HKNJANUM    =   SPACE ) )
+               OR  (   SYS-200501-HKN-RIREKI-KBN
+                                           =   "1"    )
                    STRING  WRK-HKN-TEISYUTUSAKI   DELIMITED  BY  SPACE
                            RECE69-TANSEIDONAME    DELIMITED  BY  SPACE
                               INTO    WRK-HKN-RIREKI (WRK-RIREKI-MAX)

@@ -172,6 +172,13 @@
                     06  W12-VALUE  PIC X(8).
                   05  W12-HKNJANAME1.
                     06  W12-VALUE  PIC X(50).
+                04  W12-FI32.
+                  05  W12-HKN-RIREKI-COMBO.
+                    06  W12-HKN-RIREKI.
+                      07  W12-VALUE   PIC X(22).
+                    06  W12-HKN-RIREKI-COUNT   PIC S9(9)   BINARY.
+                    06  W12-HKN-RIREKILST
+                            PIC X(22)   OCCURS  2 TIMES.
                 04  W12-FI30.
                   05  W12-SYAPRTNM.
                     06  W12-VALUE   PIC X(16).

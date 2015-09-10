@@ -432,6 +432,7 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-伊藤    15/06/23  医療情報連携
       *                                     後発品変更不可（処方単位）
+      *  04.08.04    NACL-藤原    15/09/01  保険履歴の記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2153,6 +2154,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
                MOVE    WRK-CONS-JYOKEN-TENSU
                                        TO  SYS-200501-NI-JYOKEN(1)
            END-IF
+           IF      SYS-200501-HKN-RIREKI-KBN
+                                        =   SPACE
+               MOVE    "0"              TO  SYS-200501-HKN-RIREKI-KBN
+           END-IF
            IF      SYS-200501-KOUIKIRECEKBN
                                        =   SPACE
                MOVE    ZERO        TO  SYS-200501-KOUIKIRECEKBN
@@ -2163,8 +2168,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
            DISPLAY "2005 NI-JYOKEN (1)=" SYS-2005-NI-JYOKEN(1)
                                  " (2)=" SYS-2005-NI-JYOKEN(2)
                    " 200501 NI-JYOKEN (1)=" SYS-200501-NI-JYOKEN(1)
+           DISPLAY "200501 HKN-RIREKI-KBN="
+                                         SYS-200501-HKN-RIREKI-KBN
            DISPLAY "KOUIKIRECEKBN=" WRK-PARA-KOUIKIRECEKBN
-      *         
+      *
       *    レセプト編集区分情報
            MOVE    SPACE           TO  SYS-2009-REC
            INITIALIZE                  SYS-2009-REC
@@ -7283,9 +7290,11 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                        MOVE    "−"       TO  WRK-HKN-FIL
                END-EVALUATE
       *
-               IF    ( RECE09-NUM         =   SPACE )
-               AND   ( RECE09-KIGO        =   SPACE )        
-               AND   ( RECE09-HKNJANUM    =   SPACE )        
+               IF  ( ( RECE09-NUM         =   SPACE )
+               AND   ( RECE09-KIGO        =   SPACE )
+               AND   ( RECE09-HKNJANUM    =   SPACE ) )
+               OR  (   SYS-200501-HKN-RIREKI-KBN
+                                           =   "1"    )
                    STRING  WRK-HKN-TEISYUTUSAKI   DELIMITED  BY  SPACE
                            RECE09-TANSEIDONAME    DELIMITED  BY  SPACE
                               INTO    WRK-HKN-RIREKI (WRK-RIREKI-MAX)

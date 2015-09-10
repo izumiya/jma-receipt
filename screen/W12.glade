@@ -2107,14 +2107,95 @@
           <yalign>0.5</yalign>
           <xpad>0</xpad>
           <ypad>0</ypad>
-          <label>レセプト・基本１</label>
+          <label>レセプト・基本１（１）</label>
+          <justify>GTK_JUSTIFY_CENTER</justify>
+          <wrap>False</wrap>
+        </widget>
+        <widget>
+          <class>GtkFixed</class>
+          <name>fi32</name>
+          <position>1</position>
+          <sensitive>True</sensitive>
+          <can_focus>False</can_focus>
+          <has_focus>False</has_focus>
+          <border_width>0</border_width>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>HKN_RIREKI_COMBO</name>
+            <x>190</x>
+            <y>16</y>
+            <width>208</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>HKN_RIREKI</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text>0 個人情報を記載する</text>
+              <input_mode>ASCII</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>labe3217</name>
+            <x>30</x>
+            <y>16</y>
+            <width>150</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>保険履歴記載区分</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+        </widget>
+        <widget>
+          <class>GtkLabel</class>
+          <name>N010</name>
+          <child_name>Notebook:tab</child_name>
+          <position>1</position>
+          <tab_fill>False</tab_fill>
+          <sensitive>True</sensitive>
+          <can_focus>False</can_focus>
+          <has_focus>False</has_focus>
+          <xalign>0.5</xalign>
+          <yalign>0.5</yalign>
+          <xpad>0</xpad>
+          <ypad>0</ypad>
+          <label>基本１（２）</label>
           <justify>GTK_JUSTIFY_CENTER</justify>
           <wrap>False</wrap>
         </widget>
         <widget>
           <class>GtkFixed</class>
           <name>fi30</name>
-          <position>1</position>
+          <position>2</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -3130,7 +3211,7 @@
           <class>GtkLabel</class>
           <name>N08</name>
           <child_name>Notebook:tab</child_name>
-          <position>1</position>
+          <position>2</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -3146,7 +3227,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi29</name>
-          <position>2</position>
+          <position>3</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -4356,7 +4437,7 @@
           <class>GtkLabel</class>
           <name>N07</name>
           <child_name>Notebook:tab</child_name>
-          <position>2</position>
+          <position>3</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -4372,7 +4453,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi28</name>
-          <position>3</position>
+          <position>4</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -5724,7 +5805,7 @@
           <class>GtkLabel</class>
           <name>N06</name>
           <child_name>Notebook:tab</child_name>
-          <position>3</position>
+          <position>4</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -5740,7 +5821,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi26</name>
-          <position>4</position>
+          <position>5</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -6438,7 +6519,7 @@
           <class>GtkLabel</class>
           <name>N04</name>
           <child_name>Notebook:tab</child_name>
-          <position>4</position>
+          <position>5</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -6454,7 +6535,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi25</name>
-          <position>5</position>
+          <position>6</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -6630,7 +6711,7 @@
           <class>GtkLabel</class>
           <name>N02</name>
           <child_name>Notebook:tab</child_name>
-          <position>5</position>
+          <position>6</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -6646,7 +6727,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi24</name>
-          <position>6</position>
+          <position>7</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -6953,7 +7034,7 @@
           <class>GtkLabel</class>
           <name>N03</name>
           <child_name>Notebook:tab</child_name>
-          <position>6</position>
+          <position>7</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -6969,7 +7050,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi27</name>
-          <position>7</position>
+          <position>8</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -7420,7 +7501,7 @@
           <class>GtkLabel</class>
           <name>N05</name>
           <child_name>Notebook:tab</child_name>
-          <position>7</position>
+          <position>8</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
@@ -7436,7 +7517,7 @@
         <widget>
           <class>GtkFixed</class>
           <name>fi31</name>
-          <position>8</position>
+          <position>9</position>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>
           <has_focus>False</has_focus>
@@ -7628,7 +7709,7 @@
           <class>GtkLabel</class>
           <name>N09</name>
           <child_name>Notebook:tab</child_name>
-          <position>8</position>
+          <position>9</position>
           <tab_fill>False</tab_fill>
           <sensitive>True</sensitive>
           <can_focus>False</can_focus>

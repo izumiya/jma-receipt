@@ -208,6 +208,15 @@ W12 {
           textdata varchar(50);
         };
       };
+      fi32 {
+        HKN_RIREKI_COMBO {
+          HKN_RIREKI {
+            textdata varchar(22);
+          };
+          count int;
+            item varchar(22)[2];
+        };
+      };
       fi30 {
         SYAPRTNM {
           textdata varchar(16);
