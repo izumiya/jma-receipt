@@ -34,8 +34,7 @@
       *                                     商品名コード対応
       *  04.08.00    NACL-多々納  13/07/XX  電子版お薬手帳アプリ連携対応他
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
-      *  04.08.01    NACL-森脇    15/08/05  注意事項・効能効果表示
-      *  04.08.02    NACL-森脇    15/08/12  処方せん備考欄コメント表示
+      *  04.08.01    NACL-森脇    15/08/12  処方せん備考欄コメント表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -84,9 +83,6 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TNSP            PIC 9(01).
-      *04.08.01*START
-           03  FLG-YAKUJYO         PIC 9(01).
-      *04.08.01*END
       *
            03  FLG-KBN             PIC 9(01).
       *
@@ -151,12 +147,7 @@
                05  WRK-TANI        PIC X(12).
                05  WRK-KAISUU      PIC X(03).
       *
-      *04.08.01*START
-           03  WRK-HENSYUDATA      PIC X(4000).
-      *
-           03  WRK-EFFECT          PIC X(2000).
-           03  WRK-CAUTION         PIC X(4000).
-      *04.08.01*END
+           03  WRK-HENSYUDATA      PIC X(100).
       *
            03  WRK-SSTKIJUNCD      PIC X(05).
            03  WRK-HENKBN-G.
@@ -259,12 +250,9 @@
       *H24.9
            03  PARA-QRKBN              PIC X(01).
            03  PARA-SHOHIN             PIC X(01).
-      *04.08.01*START
-           03  PARA-HYOUJI             PIC X(01).
-      *04.08.01*END
-      *04.08.02*START
+      *----(04.08.01)--ADD-START---
            03  PARA-BIKOU              PIC X(01).
-      *04.08.02*END
+      *----(04.08.01)--ADD-END-----
       ***  03  PARA-CSVKBN             PIC X(01).
       ***  03  PARA-CSVDIR             PIC X(256).
       *
@@ -301,10 +289,6 @@
       *    点数付加情報マスタ
        01  TNSP-REC.
            COPY    "CPTENSUPLUS.INC".
-      *04.08.01*START
-      *    薬情マスタ
-           COPY    "CPYAKUJYO.INC".
-      *04.08.01*END
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -422,18 +406,12 @@
            MOVE    "SHOHIN"        TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-SHOHIN
-      *04.08.01*START
-      *    効能効果・注意事項記載
-           MOVE    "HYOUJI"        TO  WRK-PARA-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-PARA(1:1)   TO  PARA-HYOUJI
-      *04.08.01*END
-      *04.08.02*START
+      *----(04.08.01)--ADD-START---
       *    処方せん備考欄コメント記載
            MOVE    "BIKOU"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-BIKOU
-      *04.08.02*END
+      *----(04.08.01)--ADD-END-----
       *****CSVファイル作成
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
@@ -581,14 +559,14 @@
       *
            MOVE    ZERO            TO  FLG-SOURYO
       *
-      *04.08.02*START
+      *----(04.08.01)--UPD-START---
       *    処方せん備考欄コメント表示しない場合
-           IF      PARA-BIKOU      NOT =   "1"
+           IF      PARA-BIKOU      =   "0"
                IF      ORCHC62-SRYKBN(IDX-ZAI) =   "98"
                    GO  TO  220-BODY-HENSYU-EXT
                END-IF
            END-IF
-      *04.08.02*END
+      *----(04.08.01)--UPD-END-----
       *
            COMPUTE CNT-ZAI     =   CNT-ZAI     +   1
       *
@@ -622,11 +600,6 @@
       *H24.9
       *    ＱＲ対応
            MOVE    ZERO                TO  IDX-QR2
-      *
-      *04.08.01*START
-           MOVE    SPACE           TO  WRK-EFFECT
-           MOVE    SPACE           TO  WRK-CAUTION
-      *04.08.01*END
       *
            PERFORM VARYING IDX-SRY     FROM    1   BY  1
                    UNTIL ( IDX-SRY     >   50  )
@@ -722,12 +695,16 @@
            MOVE    SPACE               TO  WRK-YOH-NAME-G
            MOVE    ZERO                TO  IDX-QY
       *
-      *    １件目だけ番号表示
-           IF      CNT-SRY         =   1
-               MOVE    CNT-ZAI         TO  WRK-Z9
-               MOVE    WRK-Z9          TO  WRK-HENLINE(1:2)
-               MOVE    ")"             TO  WRK-HENLINE(3:1)
+      *----(04.08.01)--UPD-START---
+           IF      ORCHC62-SRYKBN(IDX-ZAI) NOT =   "98"
+      *        １件目だけ番号表示
+               IF      CNT-SRY         =   1
+                   MOVE    CNT-ZAI         TO  WRK-Z9
+                   MOVE    WRK-Z9          TO  WRK-HENLINE(1:2)
+                   MOVE    ")"             TO  WRK-HENLINE(3:1)
+               END-IF
            END-IF
+      *----(04.08.01)--UPD-END-----
       *
            IF      TNS-SRYCD(1:3)  =   "001"
       *        用法編集
@@ -755,23 +732,6 @@
       *    用法編集処理
       *****************************************************************
        240-YOUHOU-HENSYU-SEC       SECTION.
-      *
-      *04.08.01*START
-      *    プログラムオプションの設定があれば
-           IF      PARA-HYOUJI =   "1"
-      *        用法と在用法が同じコードなら、注意事項・効能効果を差込
-               IF      ORCHC62-YSRYCD(IDX-ZAI)
-                                       =   TNS-SRYCD
-                   IF    ( WRK-EFFECT      NOT =   SPACE ) OR
-                         ( WRK-CAUTION     NOT =   SPACE )
-                       PERFORM 240-EFFECT-HENSYU-SEC
-                       PERFORM 240-CAUTION-HENSYU-SEC
-                   END-IF
-                   MOVE    SPACE           TO  WRK-EFFECT
-                   MOVE    SPACE           TO  WRK-CAUTION
-               END-IF
-           END-IF
-      *04.08.01*END
       *
       *    コメント名称判定
            IF      WRK-INPUTCOMENT(CNT-SRY)    =   SPACE
@@ -812,24 +772,6 @@
                    MOVE    1               TO  FLG-SOURYO
                END-IF
                MOVE    TNS-NAME            TO  WRK-YKZNAME
-      *04.08.01*START
-      *        プログラムオプションの設定があれば
-               IF      PARA-HYOUJI =   "1"
-                   IF    ( WRK-EFFECT      NOT =   SPACE ) OR
-                         ( WRK-CAUTION     NOT =   SPACE )
-                       PERFORM 240-EFFECT-HENSYU-SEC
-                       PERFORM 240-CAUTION-HENSYU-SEC
-                   END-IF
-                   MOVE    SPACE           TO  WRK-EFFECT
-                   MOVE    SPACE           TO  WRK-CAUTION
-      *            薬情マスタ検索
-                   PERFORM 900-YAKUJYO-READ-SEC
-                   IF      FLG-YAKUJYO     =   ZERO
-                       MOVE    YAKUJYO-EFFECT  TO  WRK-EFFECT
-                       MOVE    YAKUJYO-CAUTION TO  WRK-CAUTION
-                   END-IF
-               END-IF
-      *04.08.01*END
            ELSE
       *        コメントあればセット、なければ名称セット
                IF      WRK-INPUTCOMENT(CNT-SRY)    =   SPACE
@@ -1039,37 +981,6 @@
            .
        240-YOURYOU-HENSYU-EXT.
            EXIT.
-      *
-      *04.08.01*START
-      *****************************************************************
-      *    効能編集処理
-      *****************************************************************
-       240-EFFECT-HENSYU-SEC       SECTION.
-      *
-           MOVE    SPACE           TO  WRK-HENSYUDATA
-           MOVE    "【効能効果】"  TO  WRK-HENSYUDATA(1:12)
-           MOVE    YAKUJYO-EFFECT  TO  WRK-HENSYUDATA(13:)
-           PERFORM 250-HENSYU-SYORI-SEC
-      *
-           .
-       240-EFFECT-HENSYU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    注意事項編集処理
-      *****************************************************************
-       240-CAUTION-HENSYU-SEC      SECTION.
-      *
-           MOVE    SPACE           TO  WRK-HENSYUDATA
-           MOVE    "【注意事項】"  TO  WRK-HENSYUDATA(1:12)
-           MOVE    YAKUJYO-CAUTION TO  WRK-HENSYUDATA(13:)
-           PERFORM 250-HENSYU-SYORI-SEC
-      *
-           .
-       240-CAUTION-HENSYU-EXT.
-           EXIT.
-      *
-      *04.08.01*END
       *****************************************************************
       *    頁チェック　処理
       *****************************************************************
@@ -1178,23 +1089,16 @@
            MOVE    1              TO  IDX-STR
            MOVE    4              TO  IDX-STR1
       *
-      *04.08.01*START
       *    編集データがなくなるまで繰り返す
-           PERFORM UNTIL  (IDX-STR     >   4000 )
-                   OR     (IDX-STR1    >   54 )
+           PERFORM UNTIL  (IDX-STR     >   100 )
                    OR     (WRK-HENSYUDATA(IDX-STR:)    =   SPACE)
-      *        改行
-               IF      WRK-HENSYUDATA(IDX-STR:1)   =   X"0A"
-                   ADD     1               TO  IDX-STR
-               ELSE
-                   MOVE    WRK-HENSYUDATA(IDX-STR:2)
-                                       TO  WRK-HENLINE(IDX-STR1:2)
-                   ADD     2               TO  IDX-STR
-                   ADD     2               TO  IDX-STR1
-               END-IF
+               MOVE    WRK-HENSYUDATA(IDX-STR:2)
+                                   TO  WRK-HENLINE(IDX-STR1:2)
+               ADD     2               TO  IDX-STR
+               ADD     2               TO  IDX-STR1
       *        最大字で改行
                IF         (IDX-STR1        >=  54)
-                   OR    ((IDX-STR         <=  4000)
+                   OR    ((IDX-STR         <=  100)
                    AND    (WRK-HENSYUDATA(IDX-STR:) =   SPACE))
                    PERFORM 250-PAGE-CHK-SEC
                    MOVE    WRK-HENLINE     TO  HCM62-NAIYO1(CNT-LINE)
@@ -1202,7 +1106,6 @@
                    MOVE    4               TO  IDX-STR1
                END-IF
            END-PERFORM
-      *04.08.01*END
       *
            .
        250-HENSYU-SYORI-EXT.
@@ -2005,43 +1908,6 @@
            .
        900-1902-READ-EXT.
            EXIT.
-      *04.08.01*START
-      *****************************************************************
-      *    薬情マスタ読み込み
-      *****************************************************************
-       900-YAKUJYO-READ-SEC        SECTION.
-      *
-           INITIALIZE                  YAKUJYO-REC
-           MOVE    SPA-HOSPNUM     TO  YAKUJYO-HOSPNUM
-           MOVE    TNS-SRYCD       TO  YAKUJYO-SRYCD
-           MOVE    1               TO  YAKUJYO-TEKNUM
-           MOVE    YAKUJYO-REC     TO  MCPDATA-REC
-           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-      *
-           IF      MCP-RC          =   ZERO
-               MOVE    "tbl_yakujyo"   TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-               IF      MCP-RC          =   ZERO
-                   MOVE    ZERO            TO  FLG-YAKUJYO
-                   MOVE    MCPDATA-REC     TO  YAKUJYO-REC
-               ELSE
-                   MOVE    1               TO  FLG-YAKUJYO
-               END-IF
-           ELSE
-               MOVE    1               TO  FLG-YAKUJYO
-           END-IF
-      *
-           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 930-DBCLOSE-SEC
-      *
-           .
-       900-YAKUJYO-READ-EXT.
-           EXIT.
-      *04.08.01*END
       *****************************************************************
       *    ＤＢ読込開始処理
       *****************************************************************
