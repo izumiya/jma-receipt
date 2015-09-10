@@ -41,6 +41,8 @@
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
       *  04.07.02    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.03    NACL-藤原    15/08/18  医療機関編集情報への開設者名
+      *                                     追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -143,6 +145,7 @@
            03  WRK-HOSPADRS-R      REDEFINES   WRK-HOSPADRS.
                05  WRK-HOSPADRS1   PIC X(50).
                05  WRK-HOSPADRS2   PIC X(50).
+           03  WRK-KAISETUNAME     PIC X(80).
       *
            COPY    "CPSHELLTBL.INC".
       *
@@ -177,6 +180,7 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+           COPY    "CPSK1903.INC".
       *
        01  PRTKANRI-REC.
            COPY    "CPPRTKANRI.INC".
@@ -431,6 +435,8 @@
            END-IF 
       *
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+           MOVE    SYS-1001-KAISETUNAME
+                                       TO  WRK-KAISETUNAME
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
       *    医療機関編集情報
            PERFORM 900-1900-READ-SEC
@@ -540,8 +546,7 @@
            INSPECT HCM3C-HOSPNAME      REPLACING   ALL "  "    BY  "　"
       *
       *    開設者名
-           MOVE    SYS-1001-KAISETUNAME
-                                       TO  HCM3C-KAISETUNAME
+           MOVE    WRK-KAISETUNAME     TO  HCM3C-KAISETUNAME
       *    
            MOVE    SYS-1001-HOSPCDN    TO  HCM3C-HOSPCD
       *
@@ -1160,6 +1165,8 @@
                    PERFORM 900-1901-READ-SEC
       *            医療機関住所編集情報
                    PERFORM 900-1902-READ-SEC
+      *            医療機関名称編集情報（２）
+                   PERFORM 900-1903-READ-SEC
                END-IF
            ELSE
                INITIALIZE                  SYS-1900-REC
@@ -1229,6 +1236,33 @@
            .
       *
        900-1902-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    医療機関名称編集情報（２）読み込み
+      *****************************************************************
+       900-1903-READ-SEC           SECTION.
+      *
+           MOVE    SPACE           TO  SYS-1903-REC
+           INITIALIZE                  SYS-1903-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1903-HOSPNUM
+           MOVE    "1903"          TO  SYS-1903-KANRICD
+           MOVE    SYS-1900-PRTKBN(7)
+                                   TO  SYS-1903-KBNCD
+           MOVE    WRK-SYMD        TO  SYS-1903-STYUKYMD
+                                       SYS-1903-EDYUKYMD
+           MOVE    SYS-1903-REC    TO  MCPDATA-REC
+           PERFORM 800-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1903-REC
+               MOVE    SYS-1903-KAISETUNAME
+                                           TO  WRK-KAISETUNAME
+           ELSE
+               INITIALIZE                      SYS-1903-REC
+           END-IF
+           .
+      *
+       900-1903-READ-EXT.
            EXIT.
       *
       *****************************************************************

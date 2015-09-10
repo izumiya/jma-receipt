@@ -31,6 +31,8 @@
       *  04.07.02    NACL-藤原    13/09/27  ￥マークの変更
       *  04.07.03    NACL-藤原    15/07/27  医療機関編集情報からの郵便番
       *                                     号の編集を追加
+      *  04.07.04    NACL-藤原    15/08/18  医療機関編集情報への開設者名
+      *                                     追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *****************************************************************
@@ -156,6 +158,7 @@
                05  WRK-HOSPADRS2   PIC X(50).
            03  WRK-TEL             PIC X(15).
            03  WRK-POST            PIC X(07).
+           03  WRK-KAISETUNAME     PIC X(80).
       *
            03  WRK-RSIIRYOCD       PIC X(07).
            03  WRK-PREFNAME        PIC X(08).
@@ -243,6 +246,7 @@
            COPY    "CPSK1900.INC".
            COPY    "CPSK1901.INC".
            COPY    "CPSK1902.INC".
+           COPY    "CPSK1903.INC".
       *
       *    労災医療機関情報
            COPY    "CPSK4001.INC".
@@ -499,6 +503,8 @@
            END-IF 
       *
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+           MOVE    SYS-1001-KAISETUNAME
+                                       TO  WRK-KAISETUNAME
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
            MOVE    SYS-1002-TEL        TO  WRK-TEL
            MOVE    SYS-1002-POST       TO  WRK-POST
@@ -695,8 +701,7 @@
                    INSPECT HCM73-HOSPNAME
                                    REPLACING   ALL "  "    BY  "　"
       *    
-                   MOVE    SYS-1001-KAISETUNAME
-                                               TO  HCM73-KAISETSUNAME
+                   MOVE    WRK-KAISETUNAME     TO  HCM73-KAISETSUNAME
       *    
                    MOVE    WRK-TEL             TO  HCM73-HOSPTEL
       *
@@ -763,8 +768,7 @@
                    INSPECT HCM72-HOSPNAME
                                    REPLACING   ALL "  "    BY  "　"
       *    
-                   MOVE    SYS-1001-KAISETUNAME
-                                               TO  HCM72-KAISETSUNAME
+                   MOVE    WRK-KAISETUNAME     TO  HCM72-KAISETSUNAME
       *    
                    MOVE    WRK-TEL             TO  HCM72-HOSPTEL
       *
@@ -1224,6 +1228,8 @@
                    PERFORM 900-1901-READ-SEC
       *            医療機関住所編集情報
                    PERFORM 900-1902-READ-SEC
+      *            医療機関名称編集情報（２）
+                   PERFORM 900-1903-READ-SEC
                END-IF
            ELSE
                INITIALIZE                  SYS-1900-REC
@@ -1295,6 +1301,36 @@
            .
       *
        900-1902-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    医療機関名称編集情報（２）読み込み
+      *****************************************************************
+       900-1903-READ-SEC           SECTION.
+      *
+           MOVE    SPACE           TO  SYS-1903-REC
+           INITIALIZE                  SYS-1903-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1903-HOSPNUM
+           MOVE    "1903"          TO  SYS-1903-KANRICD
+           MOVE    SYS-1900-PRTKBN(23)
+                                   TO  SYS-1903-KBNCD
+           MOVE    LNK-PRTKANRI-SRYYM
+                                   TO  SYS-1903-STYUKYMD (1:6)
+           MOVE    "01"            TO  SYS-1903-STYUKYMD (7:2)
+           MOVE    SYS-1903-STYUKYMD
+                                   TO  SYS-1903-EDYUKYMD
+           MOVE    SYS-1903-REC    TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-KEY10-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1903-REC
+               MOVE    SYS-1903-KAISETUNAME
+                                           TO  WRK-KAISETUNAME
+           ELSE
+               INITIALIZE                      SYS-1903-REC
+           END-IF
+           .
+      *
+       900-1903-READ-EXT.
            EXIT.
       *
       *****************************************************************
