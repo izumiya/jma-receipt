@@ -129,6 +129,9 @@
            COPY    "CPORCHCN68.INC".
            COPY    "CPORCHCN68S01.INC".
       *
+      *    °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
+           COPY    "CPORCSPRT.INC".
+      *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
       *****************************************************************
@@ -500,6 +503,20 @@
       *
            COMPUTE ORCHCN68-CNT    =   ORCHCN68-CNT    +   1
       *
+           IF    ( ORCHCN68-BATCH  =   "1" )
+               PERFORM 2301-BATCH-PRINT-SEC
+           ELSE
+               PERFORM 2301-PRINT-SEC
+           END-IF
+      *
+           .
+       230-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬É¾²ÁÉ¼°õºþ½èÍý
+      *****************************************************************
+       2301-PRINT-SEC              SECTION.
+      *
       *    °õºþÍÑ¥Õ¥¡¥¤¥ëºîÀ®
            MOVE    SPA-HOSPNUM     TO  HC01PARA-HOSPNUM
            MOVE    "HC68"          TO  HC01PARA-FORM-ID
@@ -537,7 +554,24 @@
                                        SPA-AREA
       *
            .
-       230-PRINT-EXT.
+       2301-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬É¾²ÁÉ¼°õºþ½èÍý¡Ê¥Ð¥Ã¥Á½èÍý¡Ë
+      *****************************************************************
+       2301-BATCH-PRINT-SEC        SECTION.
+      *
+           MOVE    ORCHCN68-PRTAREA    TO  ORCSPRTAREA
+      *
+           MOVE    ORCHCN68-PTID       TO  SPRT-PTID
+           MOVE    "HCN68.red"         TO  SPRT-PRTID
+           MOVE    HCN68               TO  SPRT-PRTDATA
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+      *
+           .
+       2301-BATCH-PRINT-EXT.
            EXIT.
       *****************************************************************
       *    °åÎÅ¶èÊ¬É¾²ÁÉ¼ÊÔ½¸½èÍý
@@ -578,7 +612,7 @@
                END-IF
            END-PERFORM
       *
-           IF    ( SYS-1001-HOSPSBT    =   "1" )
+           IF    ( SYS-1001-HOSPSBT    =   1 )
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *            IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
@@ -657,6 +691,21 @@
       *
            COMPUTE ORCHCN68-CNT    =   ORCHCN68-CNT    +   1
       *
+           IF    ( ORCHCN68-BATCH  =   "1" )
+               PERFORM 2311-BATCH-PRINT-SEC
+           ELSE
+               PERFORM 2311-PRINT-SEC
+           END-IF
+      *
+      *
+           .
+       231-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Á£Ä£Ì¶èÊ¬É¾²ÁÉ¼°õºþ½èÍý
+      *****************************************************************
+       2311-PRINT-SEC               SECTION.
+      *
       *    °õºþÍÑ¥Õ¥¡¥¤¥ëºîÀ®
            MOVE    SPA-HOSPNUM     TO  HC01PARA-HOSPNUM
            MOVE    "HC68"          TO  HC01PARA-FORM-ID
@@ -694,13 +743,32 @@
                                        SPA-AREA
       *
            .
-       231-PRINT-EXT.
+       2311-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Á£Ä£Ì¶èÊ¬É¾²ÁÉ¼°õºþ½èÍý¡Ê¥Ð¥Ã¥Á½èÍý¡Ë
+      *****************************************************************
+       2311-BATCH-PRINT-SEC        SECTION.
+      *
+           MOVE    ORCHCN68-PRTAREA    TO  ORCSPRTAREA
+      *
+           MOVE    ORCHCN68-PTID       TO  SPRT-PTID
+           MOVE    "HCN69.red"         TO  SPRT-PRTID
+           MOVE    HCN69               TO  SPRT-PRTDATA
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+      *
+           .
+       2311-BATCH-PRINT-EXT.
            EXIT.
       *
       *****************************************************************
       *    ½ªÎ»¡¡¡¡½èÍý
       *****************************************************************
        300-END-SEC                 SECTION.
+      *
+           MOVE    ORCHCN68AREA    TO  ONPRTDATA-DATA
       *
            .
        300-END-EXT.

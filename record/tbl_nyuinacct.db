@@ -1074,3 +1074,18 @@ path	key56	{
 	};
 };
 
+path	key57 	{
+	DBSELECT	{
+		DECLARE tbl_nyuinacct_key57_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuinacct
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   ( CASE WHEN :PTID = 0 THEN TRUE ELSE (PTID = :PTID) END ) 
+			AND   ( SRYYM     =   :SRYYM )
+			AND   ( ZAISKBKBN =   '1'   OR
+			        ZAISKBKBN =   '5'       )   
+			ORDER  BY   PTID,SRYKA,ZAISKBKBN
+		;
+	};
+};
+

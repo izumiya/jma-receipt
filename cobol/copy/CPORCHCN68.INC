@@ -34,3 +34,7 @@
            03  ORCHCN68-PTNUM          PIC X(20).
       *    連番
            03  ORCHCN68-CNT            PIC 9(06).
+      *    バッチ印刷情報(BATCH="1")
+           03  ORCHCN68-BATCH          PIC X(1).
+           03  ORCHCN68-PRTAREA        PIC X(25000).
+

@@ -573,7 +573,7 @@
                    MOVE    SS011-KHN (IDX-DAY)
                                        TO  IDX-KHN
                        IF    ( SS011-SRYYM    >=   CONST-H2204 )
-                        AND  ( SPA-HOSPSBT     =   1 )
+                        AND  ( SYS-1001-HOSPSBT    =   1 )
                            MOVE    SS011-MEDKBN (IDX-DAY)
                                                TO  IDXM
                            EVALUATE    TRUE

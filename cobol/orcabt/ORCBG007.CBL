@@ -60,6 +60,7 @@
            03  BG00701-SRYKADAY-G.
                05  BG00701-SRYKADAY            PIC 9(01)
                                                OCCURS  31.
+           03  BG00701-TSTPTNUMKBN             PIC X(01).
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -802,18 +803,14 @@ grpsys     END-UNSTRING
            IF    ( FLG-END     =   1 )
                GO  TO  21011-NYU-BG00701-HEN-EXT
            END-IF
-           IF    ( PTINF-TSTPTNUMKBN   =   "1" )
-               CONTINUE
-           ELSE
       *
-               MOVE    PTNYUINRRK-PTID     TO  WRK-PTID
-               PERFORM 800-ORCSS001-SEC
+           MOVE    PTNYUINRRK-PTID     TO  WRK-PTID
+           PERFORM 800-ORCSS001-SEC
       *
-               IF    ( SS001-SRYKA-MAX     >   ZERO )
-                   PERFORM 21011-NYU-BG00701-OUT-SEC
-                   IF    ( FLG-END     =   1 )
-                       GO  TO  21011-NYU-BG00701-HEN-EXT
-                   END-IF
+           IF    ( SS001-SRYKA-MAX     >   ZERO )
+               PERFORM 21011-NYU-BG00701-OUT-SEC
+               IF    ( FLG-END     =   1 )
+                   GO  TO  21011-NYU-BG00701-HEN-EXT
                END-IF
            END-IF
       *
@@ -999,6 +996,8 @@ grpsys     END-UNSTRING
       *
            MOVE    SS001-SRYKA-NYURRK-DAY-G (IDX1)
                                            TO  BG00701-SRYKADAY-G
+      *
+           MOVE    PTINF-TSTPTNUMKBN       TO  BG00701-TSTPTNUMKBN
       *
            WRITE   BG00701-REC
       *
@@ -2053,6 +2052,12 @@ grpsys     END-UNSTRING
                                             OR "7" OR "8" OR "9" ))
                        CONTINUE
                    ELSE
+                       MOVE    ZERO    TO  FLG-LOOPEND
+                   END-IF
+               END-IF
+      *
+               IF    ( WRK-PARA-PTNUM      =   SPACE )
+                   IF    ( BG00701-TSTPTNUMKBN =   "1" )
                        MOVE    ZERO    TO  FLG-LOOPEND
                    END-IF
                END-IF
