@@ -29,6 +29,9 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.07.01    NACL-ÌçÏÆ    15/09/08  ¼«ÇåÀÕ¡Ê¿·ÍÍ¼°¡Ë¡Ê£Ï£Ã£ÒÍÍ¼°¡Ë
+      *                                     ¼õÎÎ¶â³ÛÍóµ­ºÜÂÐ±þ
+      *
       *  04.08.01    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    15/08/27  ¼«ÇåÀÕ¥ì¥»¥×¥È¤ÎÀÁµá¶â³ÛÍóÃ¼¿ô½èÍý
       *                                     ÂÐ±þ
@@ -1244,13 +1247,9 @@
            MOVE    RECE82-KSNRATE(2:2) TO  HCN70-SEIKYU(1)
                                            HCN70-SEIKYU(2)
       *    ÀÁµá³Û·×
-           MOVE    ZERO                TO  WRK-GOKEI
-           COMPUTE WRK-GOKEI   =   RECE82-TOTALKIN
-                               +   RECE82-TOTALKIN-YAK
-                               +   RECE82-TOTALKIN2
-                               +   RECE82-TOTALKIN-ETC
-           IF    WRK-GOKEI             >   ZERO
-               MOVE    WRK-GOKEI           TO  WRK-SEIKYUZ
+           IF    RECE82-JIBAI-GOKEI-BE  >  ZERO
+               MOVE    RECE82-JIBAI-GOKEI-AF
+                                           TO  WRK-SEIKYUZ
                MOVE    WRK-SEIKYUZ         TO  HCN70-SEIKYUGAKU (5)
       *
       *        ÀÁµá³Û£Á
@@ -1269,18 +1268,25 @@
            END-IF
       *
       *    ÀÁµá³Û
-           MOVE    ZERO                 TO  WRK-GOKEI
-           COMPUTE WRK-GOKEI   =    RECE82-TOTALKIN
-                               +    RECE82-TOTALKIN-YAK
-                               +    RECE82-TOTALKIN2
-                               +    RECE82-TOTALKIN-ETC
-           IF    WRK-GOKEI  >  ZERO
-             MOVE    WRK-GOKEI          TO  WRK-SEIKYUZ
-             MOVE    WRK-SEIKYUZ        TO  HCN70-SEIKYUGAKUTOTAL (1)
-           END-IF
       *    ÊÝ¸±²ñ¼ÒÌ¾
-           MOVE    RECE82-HOKENNAME    TO  HCN70-HOKENNAME (1)
-           INSPECT HCN70-HOKENNAME (1) REPLACING   ALL "  "    BY  "¡¡"
+           IF    RECE82-JIBAI-GOKEI-BE  >  ZERO
+             IF    RECE82-JIBAI-SKYKINFLG  =  1
+               MOVE  RECE82-JIBAI-SKYKIN    TO  WRK-SEIKYUZ
+               MOVE  WRK-SEIKYUZ            TO  HCN70-SEIKYUGAKUTOTAL(1)
+               MOVE    RECE82-HOKENNAME     TO  HCN70-HOKENNAME(1)
+               INSPECT HCN70-HOKENNAME(1) REPLACING  ALL "  "  BY  "¡¡"
+             END-IF
+             IF    RECE82-JIBAI-JYUKINFLG  =  1
+               MOVE  RECE82-JIBAI-JYUKIN    TO  WRK-SEIKYUZ
+               MOVE  WRK-SEIKYUZ            TO  HCN70-SEIKYUGAKUTOTAL(2)
+               IF    RECE82-JIBAI-JYUNAMEFLG  =  1
+                 MOVE  RECE82-JIBAI-JYUNAME TO  HCN70-HOKENNAME(2)
+               ELSE
+                 MOVE  RECE82-NAME          TO  HCN70-HOKENNAME(2)
+               END-IF
+               INSPECT HCN70-HOKENNAME(2) REPLACING  ALL "  "  BY  "¡¡"
+             END-IF
+           END-IF
       *    ºîÀ®Æü
            MOVE    WRK-CREYMDW (1:1)   TO  HCN70-SEIKYUG
            MOVE    WRK-CREYMDW (2:2)   TO  HCN70-SEIKYUYY
@@ -1362,11 +1368,6 @@
       *    °åÎÅµ¡´Ø¥³¡¼¥É
            MOVE    SYS-1001-HOSPCD     TO  HCN70-HOSPCD
       *
-      *    ÀÁµá¶â³ÛÍóÊÔ½¸
-           IF      RECE82-JIBAI-HASUKBN  NOT = SPACE
-               PERFORM   20021-HCN70-SEIKYUGAK-HENSYU-SEC
-           END-IF
-      *
       *    ÅÀ¸¡ÍÑ¥ì¥»¥×¥ÈºîÀ®»þ
            IF      WRK-PARA-PRTKBN NOT =   "1"
                IF      SYS-200501-INSPECT-CHARACTER-KBN
@@ -1384,39 +1385,6 @@
        20021-HCN70-HEAD-HEN-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    Ä¢É¼ÊÔ½¸¡Ê£Ê£Ë£±£±¥Ø¥Ã¥À¡¼Éô¡Ë½èÍý¡ÊÀÁµá¶â³ÛÍóÊÔ½¸¡Ë
-      *****************************************************************
-       20021-HCN70-SEIKYUGAK-HENSYU-SEC          SECTION.
-      *
-           MOVE    ZERO            TO  WRK-GOKEI
-           COMPUTE WRK-GOKEI  =  RECE82-TOTALKIN
-                              +  RECE82-TOTALKIN-YAK
-                              +  RECE82-TOTALKIN2
-                              +  RECE82-TOTALKIN-ETC
-           IF    WRK-GOKEI  >  ZERO
-             EVALUATE   RECE82-JIBAI-HASUKBN
-               WHEN       "1"
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  +   5
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
-               WHEN       "2"
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
-               WHEN       "3"
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  +   9
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  /  10
-                  COMPUTE  WRK-GOKEI = WRK-GOKEI  *  10
-             END-EVALUATE
-             MOVE    WRK-GOKEI     TO  WRK-SEIKYUZ
-             MOVE    WRK-SEIKYUZ   TO  HCN70-SEIKYUGAKU(5)
-                                       HCN70-SEIKYUGAKUTOTAL(1)
-           END-IF
-      *
-           .
-       20021-HCN70-SEIKYUGAK-HENSYU-EXT.
-           EXIT.
-      *     
       *****************************************************************
       *    Ä¢É¼ÊÔ½¸¡Ê£Ê£Ë£±£²¥Ø¥Ã¥À¡¼Éô¡Ë½èÍý
       *****************************************************************
@@ -2899,27 +2867,8 @@
                                            RECE82-MEISAI-KIN
            MOVE    RECE82-SHOKUJITOTALKIN
                                        TO  RECE10-SHOKUJIRYOYOHI   (1)
-           COMPUTE RECE10-FTNMONEY (1) =   RECE82-TOTALKIN     +
-                                           RECE82-TOTALKIN-YAK +
-                                           RECE82-TOTALKIN2    +
-                                           RECE82-TOTALKIN-ETC
       *
-           IF      RECE82-JIBAI-HASUKBN  NOT = SPACE
-           AND     RECE10-FTNMONEY(1)        > ZERO
-             EVALUATE   RECE82-JIBAI-HASUKBN
-               WHEN       "1"
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) +  5
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
-               WHEN       "2"
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
-               WHEN       "3"
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) +  9
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) / 10
-                  COMPUTE  RECE10-FTNMONEY(1) = RECE10-FTNMONEY(1) * 10
-             END-EVALUATE
-           END-IF
+           COMPUTE RECE10-FTNMONEY (1) =   RECE82-JIBAI-GOKEI-AF
       *
            IF      RECE82-JNISSU       =   999
                MOVE    ZERO                TO  RECE10-JNISSU       (1)

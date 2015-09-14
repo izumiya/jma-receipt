@@ -280,6 +280,8 @@
       *                                     ¥¯
       *  04.07.23    NACL-ÌçÏÆ    15/03/09  Ë¬Ìä¿ÇÎÅ¤Ë¤«¤«¤ëµ­Ï¿½ñ¥³¥á¥ó¥ÈÂÐ±þ
       *  04.07.24    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.25    NACL-ÌçÏÆ    15/09/08  ¼«ÇåÀÕ¡Ê¿·ÍÍ¼°¡Ë¡Ê£Ï£Ã£ÒÍÍ¼°¡Ë
+      *                                     ¼õÎÎ¶â³ÛÍóµ­ºÜÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/22  Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë£±£°²óÂÐ±þ
       *  04.08.02    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
@@ -458,6 +460,7 @@
            03  FLG-ZAITAKU-CHECK                       PIC 9(01).
            03  FLG-DAISAN-GENBUTU                      PIC 9(01).
            03  FLG-KIN-OKIKAE                          PIC 9(01).
+           03  FLG-KIN-OKIKAE2                         PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -766,13 +769,18 @@
            03  WRK-COL                         PIC 9(03).
       *
            03  WRK-TAIHI-ZAINUM                PIC 9(08).
+           03  WRK-TAIHI-ZAINUM2               PIC 9(08).
       *
            03  WRK-INPUTCOMENT                 PIC X(80).
            03  WRK-INPUTCOMENT2                PIC X(14).
+           03  WRK-INPUTCOMENT3                PIC X(30).
            03  WRK-INPUTCOMENT-KIN-T.
                05  WRK-INPUTCOMENT-KIN         PIC 9(07).
            03  WRK-INPUTCOMENT-KIN2-T.
                05  WRK-INPUTCOMENT-KIN2        PIC X(07).
+      *
+           03  WRK-JIBAI-SKYKIN-A              PIC 9(09).
+           03  WRK-JIBAI-SKYKIN-B              PIC 9(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -1987,6 +1995,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
            INITIALIZE                   TBL-ZAITAKU-KAISU-XXX
       *
            MOVE       ZERO       TO     WRK-TAIHI-ZAINUM
+           MOVE       ZERO       TO     WRK-TAIHI-ZAINUM2
       *
            IF      RECE41-HKNKBN   NOT  =   "3"
       *
@@ -2136,6 +2145,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    ZERO    TO      WRK-SETCOM-JIDO2
                                MOVE    ZERO    TO      FLG-ZAITAKU-CHECK
                                MOVE    ZERO    TO      FLG-KIN-OKIKAE
+                               MOVE    ZERO    TO      FLG-KIN-OKIKAE2
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
                                IF    FLG-WRITE45  =   1
@@ -2212,6 +2222,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO  WRK-SETCOM-JIDO2
                                       MOVE  ZERO  TO  FLG-ZAITAKU-CHECK
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE
+                                      MOVE  ZERO  TO  FLG-KIN-OKIKAE2
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21014-SINRYO-CHECK-SEC
@@ -2467,10 +2478,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              -  1
              END-IF
       *
+             IF       SRY-SRYCD(IDX2)  =  "099999909" OR "099999910" OR
+                                          "099999921"
+                  MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
+      *
              IF       SRY-SRYCD(IDX2)  =  "099999922"
                IF    (ACCT-JIHOKBN     =   SPACE)
                AND   (RECE41-HKNKBN    =   "6"  )
                   MOVE    1     TO    FLG-KIN-OKIKAE
+               ELSE
+                  MOVE    1     TO    FLG-HENSYU-NG
+               END-IF
+             END-IF
+      *
+             IF       SRY-SRYCD(IDX2)  =  "099999923"
+               IF    (ACCT-JIHOKBN          =  SPACE)
+               AND   (RECE41-HKNKBN         =  "4"  )
+               AND   (WRK-PARA-RECEKBN      =  "4"  )
+               AND   (WRK-PARA-JIBAIPRTKBN  =  "2"  )
+                  MOVE    1     TO    FLG-KIN-OKIKAE2
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
                END-IF
@@ -2500,6 +2527,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      (ACCT-YKZTEN           =  ZERO        ) AND
                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
              OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
+             OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
              OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
              OR     ( SRY-SRYCD(IDX2)       =
                       "099209902" OR "099209903" OR
@@ -2509,8 +2537,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       "099999903" OR "099999904" OR
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
-                      "099999909" OR "099999910" OR
-                      "099999921" OR
                       "099830101" OR "099200101"            )
              OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
                   COMPUTE   RECE44-MEISAISU    =  RECE44-MEISAISU
@@ -2552,6 +2578,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (ACCT-YKZTEN           =  ZERO        ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
+              OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
               OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
               OR     ( SRY-SRYCD(IDX2)       =
                        "099209902" OR "099209903" OR
@@ -2561,8 +2588,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099999909" OR "099999910" OR
-                       "099999921" OR
                        "099830101" OR "099200101"            )
               OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
       *
@@ -2575,6 +2600,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      CONTINUE
                    ELSE
                      PERFORM   2101217-ICHIBUCOM-HENSYU-SEC
+                   END-IF
+                 END-IF
+               END-IF
+      *
+               IF   FLG-KIN-OKIKAE2  NOT =  ZERO
+                 IF  WRK-TAIHI-ZAINUM2 =  ZERO
+                   MOVE   ACCT-ZAINUM     TO   WRK-TAIHI-ZAINUM2
+                 END-IF
+                 IF  ACCT-ZAINUM  =  WRK-TAIHI-ZAINUM2
+                   IF  SRY-SRYCD(IDX2) = "099999923"
+                     CONTINUE
+                   ELSE
+                     PERFORM   2101218-ICHIBUCOM-HENSYU2-SEC
                    END-IF
                  END-IF
                END-IF
@@ -5358,6 +5396,101 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
       *
            .
        2101217-ICHIBUCOM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¡Ú¥ì¥»¥×¥È¡Û¡Ê¼«ÇåÀÕ¡Ë¼õÎÎ¶â³ÛÍóÃÖ´¹¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2101218-ICHIBUCOM-HENSYU2-SEC     SECTION.
+      *
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT2
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT3
+           MOVE    ZERO                   TO  WRK-INPUTCOMENT-KIN
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT-KIN2
+      *
+           IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
+                  (SRY-SRYCD    (IDX2)(1:3)     =   "008"))
+           AND   ( SRY-INPUTNUM (IDX2)      NOT =   ZERO  )
+      *
+             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
+             MOVE    SRY-PTID             TO  PTCOM-PTID
+             MOVE    SRY-ZAINUM           TO  PTCOM-ZAINUM
+             MOVE    SRY-SRYCD    (IDX2)  TO  PTCOM-SRYCD
+             MOVE    SRY-INPUTNUM (IDX2)  TO  PTCOM-RENNUM
+             PERFORM 800-PTCOM-READ-SEC
+             MOVE    PTCOM-INPUTCOMENT    TO  WRK-INPUTCOMENT
+      *
+             IF  WRK-INPUTCOMENT(1:10)  =  "¼õÎÎ¶â³Û¡§"
+               MOVE  WRK-INPUTCOMENT(11:14)
+                                          TO  WRK-INPUTCOMENT2
+               IF  WRK-INPUTCOMENT2 = "¡¡¡¡¡¡¡¡¡¡¡¡¡¡" OR SPACE
+                 CONTINUE
+               ELSE
+                 PERFORM VARYING IDW7 FROM  1  BY  2
+                          UNTIL  IDW7   >  14
+                   COMPUTE  IDW8 = (IDW7 + 1) / 2
+                   EVALUATE  WRK-INPUTCOMENT2(IDW7:2)
+                     WHEN     "£°"
+                        MOVE   "0"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£±"
+                        MOVE   "1"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£²"
+                        MOVE   "2"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£³"
+                        MOVE   "3"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£´"
+                        MOVE   "4"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£µ"
+                        MOVE   "5"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¶"
+                        MOVE   "6"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£·"
+                        MOVE   "7"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¸"
+                        MOVE   "8"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¹"
+                        MOVE   "9"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     OTHER
+                        MOVE    14  TO  IDW7
+                   END-EVALUATE
+                 END-PERFORM
+                 IF  WRK-INPUTCOMENT-KIN2-T NOT = SPACE
+                   MOVE    8    TO   IDW8
+                   PERFORM VARYING IDW7 FROM  7  BY -1
+                            UNTIL  IDW7   <   1
+                     IF  WRK-INPUTCOMENT-KIN2-T(IDW7:1) = SPACE
+                        CONTINUE
+                     ELSE
+                        COMPUTE  IDW8 = IDW8 - 1
+                        MOVE  WRK-INPUTCOMENT-KIN2-T(IDW7:1)
+                                TO   WRK-INPUTCOMENT-KIN-T(IDW8:1)
+                     END-IF
+                   END-PERFORM
+                   MOVE    1    TO   RECE41-JIBAI-CHIKANKINFLG
+                   MOVE  WRK-INPUTCOMENT-KIN
+                                TO   RECE41-JIBAI-CHIKANKIN
+                 END-IF
+               END-IF
+             END-IF
+      *
+             IF  WRK-INPUTCOMENT(1:8)  =  "»ÙÊ§¸µ¡§"
+               MOVE  WRK-INPUTCOMENT(9:30)
+                                          TO  WRK-INPUTCOMENT3
+               IF  WRK-INPUTCOMENT3 =
+                   "¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡" OR SPACE
+                 CONTINUE
+               ELSE
+                 MOVE    1      TO   RECE41-JIBAI-CHIKANNAMEFLG
+                 MOVE  WRK-INPUTCOMENT3
+                                TO   RECE41-JIBAI-CHIKANNAME
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       2101218-ICHIBUCOM-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10496,6 +10629,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    ZERO    TO    WRK-SETCOM-JIDO2
                                MOVE    ZERO    TO    FLG-ZAITAKU-CHECK
                                MOVE    ZERO    TO    FLG-KIN-OKIKAE
+                               MOVE    ZERO    TO    FLG-KIN-OKIKAE2
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
                                IF    FLG-WRITE45  =   1
@@ -10574,6 +10708,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO  WRK-SETCOM-JIDO2
                                       MOVE  ZERO  TO  FLG-ZAITAKU-CHECK
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE
+                                      MOVE  ZERO  TO  FLG-KIN-OKIKAE2
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21014-SINRYO-CHECK-SEC
@@ -10696,6 +10831,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  COMPUTE   RECE41-TOTALKIN2-ETC =  RECE41-KINGAKU2(6)
                                                 +  RECE41-SINDAN-KIN
                                                 +  RECE41-MEISAI-KIN
+      *
+                 PERFORM   21054-JIBAI-KINGAKU-HENSYU-SEC
                ELSE
                  COMPUTE   RECE41-TENSU(8)    =  RECE41-TENSU(1)
                                               +  RECE41-TENSU(2)
@@ -11395,6 +11532,98 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        21053-DAISAN-GENBUTU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¼«ÇåÀÕ¡Ê¿·ÍÍ¼°¡Ë¡Ê£Ï£Ã£ÒÍÍ¼°¡Ë¤Î¶â³ÛÊÔ½¸
+      *****************************************************************
+       21054-JIBAI-KINGAKU-HENSYU-SEC      SECTION.
+      *
+           COMPUTE  WRK-JIBAI-SKYKIN-A   =  RECE41-TOTALKIN
+                                         +  RECE41-TOTALKIN-YAK
+                                         +  RECE41-TOTALKIN2
+                                         +  RECE41-TOTALKIN2-ETC
+      *
+           MOVE     WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-GOKEI-BE
+                                            RECE41-JIBAI-GOKEI-AF
+      *
+           IF       WRK-JIBAI-SKYKIN-A   >  ZERO
+             EVALUATE   RECE41-JIBAI-HASUKBN
+               WHEN       "1"
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  +   5
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  /  10
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  *  10
+               WHEN       "2"
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  /  10
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  *  10
+               WHEN       "3"
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  +   9
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  /  10
+                  COMPUTE  WRK-JIBAI-SKYKIN-A  =
+                           WRK-JIBAI-SKYKIN-A  *  10
+             END-EVALUATE
+             IF   RECE41-SEIKYUKBN    =  "1"
+               MOVE  1                   TO  RECE41-JIBAI-JYUKINFLG
+               MOVE  WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-JYUKIN
+             ELSE
+               MOVE  1                   TO  RECE41-JIBAI-SKYKINFLG
+               MOVE  WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-SKYKIN
+             END-IF
+             MOVE    WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-GOKEI-AF
+           END-IF
+      *
+           IF       RECE41-JIBAI-CHIKANKINFLG  =  1
+             IF  WRK-JIBAI-SKYKIN-A  >  ZERO
+               IF   WRK-JIBAI-SKYKIN-A  <  RECE41-JIBAI-CHIKANKIN
+                 MOVE    WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-CHIKANKIN
+               END-IF
+               IF   RECE41-JIBAI-CHIKANKIN  >  ZERO
+                 MOVE    1                   TO  RECE41-JIBAI-JYUKINFLG
+                 MOVE    RECE41-JIBAI-CHIKANKIN
+                                             TO  RECE41-JIBAI-JYUKIN
+                 COMPUTE WRK-JIBAI-SKYKIN-B = WRK-JIBAI-SKYKIN-A
+                                            - RECE41-JIBAI-CHIKANKIN
+                 IF    WRK-JIBAI-SKYKIN-B  >  ZERO
+                   MOVE  1                   TO  RECE41-JIBAI-SKYKINFLG
+                   MOVE  WRK-JIBAI-SKYKIN-B  TO  RECE41-JIBAI-SKYKIN
+                 ELSE
+                   MOVE  ZERO                TO  RECE41-JIBAI-SKYKINFLG
+                   MOVE  ZERO                TO  RECE41-JIBAI-SKYKIN
+                 END-IF
+               ELSE
+                 MOVE    ZERO                TO  RECE41-JIBAI-JYUKINFLG
+                 MOVE    ZERO                TO  RECE41-JIBAI-JYUKIN
+                 MOVE    1                   TO  RECE41-JIBAI-SKYKINFLG
+                 MOVE    WRK-JIBAI-SKYKIN-A  TO  RECE41-JIBAI-SKYKIN
+               END-IF
+             ELSE
+               MOVE      2        TO  RECE41-JIBAI-CHIKANKINFLG
+             END-IF
+           END-IF
+      *
+           IF       RECE41-JIBAI-CHIKANNAMEFLG  =  1
+             IF  WRK-JIBAI-SKYKIN-A  >  ZERO
+               IF     RECE41-JIBAI-JYUKINFLG      =  1
+                 MOVE    1        TO  RECE41-JIBAI-JYUNAMEFLG
+                 MOVE    RECE41-JIBAI-CHIKANNAME
+                                  TO  RECE41-JIBAI-JYUNAME
+               ELSE
+                 MOVE    2        TO  RECE41-JIBAI-CHIKANNAMEFLG
+               END-IF
+             ELSE
+                 MOVE    2        TO  RECE41-JIBAI-CHIKANNAMEFLG
+             END-IF
+           END-IF
+      *
+           .
+       21054-JIBAI-KINGAKU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

@@ -1779,7 +1779,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              -  1
              END-IF
       *
-             IF       SRY-SRYCD(IDX2)  =  "099999922"
+             IF       SRY-SRYCD(IDX2)  =  "099999909" OR "099999910" OR
+                                          "099999921" OR "099999922" OR
+                                          "099999923"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *
@@ -1815,8 +1817,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       "099999903" OR "099999904" OR
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
-                      "099999909" OR "099999910" OR
-                      "099999921" OR
                       "099830101" OR "099200101"            )
                   COMPUTE   RECE120-MEISAISU    =  RECE120-MEISAISU
                                                -  1
@@ -1865,8 +1865,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099999909" OR "099999910" OR
-                       "099999921" OR
                        "099830101" OR "099200101"            )
       *
                CONTINUE
