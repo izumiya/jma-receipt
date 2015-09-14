@@ -62,6 +62,8 @@
       *  04.07.06    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     算定フラグ追加
       *  04.07.07    NACL-門脇    14/07/31  第三者行為に関するフラグ追加
+      *  04.07.08    NACL-門脇    15/09/08  自賠責（新様式）（ＯＣＲ様式）
+      *                                     用の項目追加
       ************************************************************
       *01  RECE82-REC.
            03  RECE82-KEY.
@@ -432,6 +434,24 @@
       *
       *超重症児（者）入院診療加算等の算定フラグ
            03  RECE82-CYOJKSNFLG          PIC  X(01).
+      *
+      *自賠責（新様式）（ＯＣＲ様式）用
+      *合計額
+           03  RECE82-JIBAI-GOKEI-BE      PIC  9(09).
+           03  RECE82-JIBAI-GOKEI-AF      PIC  9(09).
+      *請求額
+           03  RECE82-JIBAI-SKYKINFLG     PIC  9(01).
+           03  RECE82-JIBAI-SKYKIN        PIC  9(09).
+      *受領額・受領先
+           03  RECE82-JIBAI-JYUKINFLG     PIC  9(01).
+           03  RECE82-JIBAI-JYUKIN        PIC  9(09).
+           03  RECE82-JIBAI-JYUNAMEFLG    PIC  9(01).
+           03  RECE82-JIBAI-JYUNAME       PIC  X(80).
+      *自賠責受領金額欄置換入力分
+           03  RECE82-JIBAI-CHIKANKINFLG  PIC  9(01).
+           03  RECE82-JIBAI-CHIKANKIN     PIC  9(09).
+           03  RECE82-JIBAI-CHIKANNAMEFLG PIC  9(01).
+           03  RECE82-JIBAI-CHIKANNAME    PIC  X(80).
       *
       *予備
            03  RECE82-YOBIETC-AREA.
