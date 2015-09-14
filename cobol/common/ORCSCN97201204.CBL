@@ -36,6 +36,7 @@
       *  04.05.00    NACL-多々納  10/03/XX  Ｈ２２年４月改正対応
       *  04.07.00    NACL-多々納  12/11/15  入院料加算チェック対応
       *  04.08.00    NACL-多々納  15/06/15  注加算コードチェック修正
+      *  04.08.00    NACL-多々納  15/09/14  ハイリスク妊娠管理加算チェック対応
       *****************************************************************
       *
       *
@@ -55,6 +56,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
+           03  FLG-TENSUPLUS       PIC 9(01).
       *
            03  FLG-ERR             PIC 9(01).
            03  FLG-SP              PIC 9(01).
@@ -67,6 +69,8 @@
            03  FLG-KIJUNN          PIC 9(01).
       *
            03  FLG-SYOKAI-OK       PIC 9(01).
+      *H27.9
+           03  FLG-NYUIN           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -127,6 +131,11 @@
            03  WRK-IDX-ERR         PIC 9(04).
       *
            03  WRK-TEI-CNT         PIC 9(04).
+      *H27.9
+           03  WRK-NYUCNT          PIC 9(04).
+           03  WRK-NYU-CNT         PIC 9(04).
+           03  WRK-IN-NCNT         PIC 9(04).
+           03  WRK-NYUIN-01        PIC 9(04).
       *
       *    保存用
        01  HOZ-SCR-REC.
@@ -140,6 +149,9 @@
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *    点数マスタ付加コード
+        01 TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC".
       *
       *    算定履歴
        01  SANTEI-REC.
@@ -768,6 +780,8 @@
       *****************************************************************
        200-ALL-SYORI-SEC                SECTION.
       *
+           MOVE    ZERO                TO  WRK-NYUIN-01
+      *
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-MAX-LINE   )   OR
                               (SPA-ERRCD           NOT =   SPACE )  OR
@@ -778,6 +792,19 @@
                                                    OR  "190120610"
       *            入院中１回のチェック
                    PERFORM 2001-NYUIN-CHK-SEC
+               END-IF
+      *H27.9
+      *        ハイリスク分娩加算チェック
+               IF      SPA-SRYYMD      >=  "20150401"
+                   IF      WRK-COM-INPUTCD (IDX-Z)     =   "190128110"
+      *            入院中のチェック（継続）
+                       MOVE    2                   TO  FLG-NYUIN
+                       COMPUTE WRK-NYUIN-01        =   WRK-NYUIN-01
+                                                   +   WRK-COM-NYU-KAI
+                                                              (IDX-Z)
+                       MOVE    WRK-NYUIN-01        TO  WRK-IN-NCNT
+                       PERFORM 2002-NYUIN-KIKAN-SEC
+                   END-IF
                END-IF
            END-PERFORM
            .
@@ -875,6 +902,85 @@
            .
        2001-NYUIN-CHK-EXT.
            EXIT.
+      *****************************************************************
+      *    入院中の回数チェック処理
+      *****************************************************************
+       2002-NYUIN-KIKAN-SEC                SECTION.
+      *
+           INITIALIZE                      TNS-TENSU-REC
+           MOVE    WRK-COM-INPUTCD (IDX-Z) TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+           IF      FLG-TENSU       NOT =   ZERO
+               GO      TO      2002-NYUIN-KIKAN-EXT
+           END-IF
+      *    月上限を入院中回数とする
+           MOVE    TNS-JGNCNT          TO  WRK-NYUCNT
+      *
+           INITIALIZE                      ORCSC91AREA
+           MOVE    LNK-ORCSC-SYORIFLG  TO  LNK-SC91-SYORIFLG
+           IF      FLG-NYUIN           =   2
+               MOVE    "8"                 TO  LNK-SC91-KBN
+           ELSE
+               MOVE    "9"                 TO  LNK-SC91-KBN
+           END-IF
+      *    上限回数
+           MOVE    WRK-NYUCNT          TO  LNK-SC91-NYUCNT
+           MOVE    WRK-COM-INPUTCD (IDX-Z)
+                                       TO  LNK-SC91-SRYCD
+           MOVE    LNK-ORCSC-TEISEI-AREA   TO  LNK-SC91-TEISEI-AREA
+           CALL    "ORCSC91"           USING
+                                       MCPAREA
+                                       ORCSC91AREA
+                                       WRK-SCR-REC
+                                       SPA-AREA
+                                       TNS-TENSU-REC
+      *
+           IF      LNK-SC91-CNT        =   LNK-SC91-NYUZCNT
+               MOVE    ZERO                TO  WRK-NYU-CNT
+           ELSE
+               COMPUTE WRK-NYU-CNT     =   LNK-SC91-CNT
+                                       -   LNK-SC91-NYUZCNT
+           END-IF
+           IF      LNK-SC91-ERRCD  NOT =   SPACE
+               IF      LNK-SC91-ERRCD(1:1) =   "K"
+                   MOVE    "K214"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    "0212"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+               END-IF
+           END-IF
+      *    回数判定
+           IF    ((WRK-IN-NCNT         +   WRK-NYU-CNT)
+                                           >   WRK-NYUCNT )
+      *        入院中回数
+               MOVE    "0212"              TO  SPA-ERRCD
+               MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+           ELSE
+               IF    ((WRK-IN-NCNT     +   LNK-SC91-CNT)
+                                               >   WRK-NYUCNT )
+                   MOVE    "K214"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+      *    警告へ
+           IF     (TNS-JGNCNTERR       =   9   )
+              AND (SPA-ERRCD           =   "0212" )
+               MOVE    "K214"              TO  SPA-ERRCD
+           END-IF
+      *
+           IF     (SPA-ERRCD(1:1)      =   "K" )
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG  (IDX-Z)
+                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+               END-IF
+           END-IF
+           .
+       2002-NYUIN-KIKAN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    自動算定処理
@@ -900,6 +1006,97 @@
       *
            .
        920-SANTEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスター読込
+      *****************************************************************
+       910-TENSU-READ-SEC         SECTION.
+      *
+      *    算定履歴に関する項目のみ
+           MOVE    SPA-SRYYMD          TO  TNS-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNS-YUKOEDYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key22"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+                   MOVE    ZERO                TO  FLG-TENSU
+               ELSE
+                   INITIALIZE                  TNS-TENSU-REC
+                   MOVE    1                   TO  FLG-TENSU
+               END-IF
+           ELSE
+               INITIALIZE                  TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key22"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    附加情報の上限回数設定
+           IF      FLG-TENSU           =   ZERO
+               PERFORM 9101-TENSUPLUS-SYORI-SEC
+           END-IF
+           .
+       910-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ付加情報より編集処理
+      *****************************************************************
+       9101-TENSUPLUS-SYORI-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  TENSUPLUS-REC
+           INITIALIZE                      TENSUPLUS-REC
+           MOVE    TNS-SRYCD           TO  TNSP-SRYCD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TENSUPLUS-REC
+                   MOVE    ZERO                TO  FLG-TENSUPLUS
+               ELSE
+                   MOVE    1                   TO  FLG-TENSUPLUS
+                   INITIALIZE                      TENSUPLUS-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-TENSUPLUS
+               INITIALIZE                      TENSUPLUS-REC
+           END-IF
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    上限回数
+           IF      TNSP-SANTEIRRKKBN   =   1
+               MOVE    TNSP-SANTEIRRKKBN   TO  TNS-SANTEIRRKKBN
+               MOVE    TNSP-JGNCNT         TO  TNS-JGNCNT
+               MOVE    TNSP-JGNCNT1D       TO  TNS-JGNCNT1D
+               MOVE    TNSP-JGNCNT1W       TO  TNS-JGNCNT1W
+               MOVE    TNSP-JGNCNTERR      TO  TNS-JGNCNTERR
+      *
+               MOVE    TNSP-JGNCNTETCM     TO  TNS-JGNCNTETCM
+               MOVE    TNSP-JGNCNTETC      TO  TNS-JGNCNTETC
+           END-IF
+      *
+           .
+       9101-TENSUPLUS-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
