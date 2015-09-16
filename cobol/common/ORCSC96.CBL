@@ -3198,6 +3198,11 @@
                WHEN    "5001"
                    MOVE    "セットコード入力エラー"
                                        TO  SPA-ERRMSG
+               WHEN    "5100"
+                   STRING  "対象のセットが存在しません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "5002"
                    MOVE    "すでに入力済コードです"
                                        TO  SPA-ERRMSG

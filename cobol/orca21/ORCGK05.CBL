@@ -2582,17 +2582,16 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      KANACHK-RC      NOT =   ZERO
                GO      TO      410112-K98HYOJI02-EXT
            END-IF
-           MOVE    KANACHK-MAX     TO  WRK-MOJI
+           MOVE    KANACHK-MAX     TO  WRK-MOJISU
       *
            INITIALIZE                      SPA-K98-AREA
-      *
       *    全角
            IF      KANACHK-SYUBETU     =   2
       *        全角入力
                MOVE    "J"                 TO  SPA-K98-CDSYUBETU
            ELSE
-               IF     (SPA-GMN-SETCODE(1:WRK-MOJI)   NUMERIC)
-                   EVALUATE    WRK-MOJI
+               IF     (SPA-GMN-SETCODE(1:WRK-MOJISU)   NUMERIC)
+                   EVALUATE    WRK-MOJISU
                        WHEN    4
                            MOVE    "4"         TO  SPA-K98-CDSYUBETU
                        WHEN    5
@@ -2610,6 +2609,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SETCODE     TO  SPA-K98-INPUTCD
            MOVE    "1"                 TO  SPA-K98-TYPE
       *
+           MOVE    SPACE               TO  SPA-ERRCD
       *    画面編集
            INITIALIZE                  SPA-K98GMN-AREA
       *    セットのみ検索
