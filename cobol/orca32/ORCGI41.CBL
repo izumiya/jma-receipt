@@ -1572,11 +1572,7 @@
                GO  TO  3103-91DAYS-EDIT-EXT
            END-IF
       *
-           IF      STUSAN-NISSU03   =   1
-               MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
-           ELSE
-               COMPUTE  WRK-TUSAN   =  STUSAN-NISSU03   -  1
-           END-IF
+           MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
@@ -1639,6 +1635,7 @@
                    END-IF
                END-IF
            END-PERFORM
+      **     DISPLAY "3103-91DAYS-EDIT-EXT"
       *
            .
        3103-91DAYS-EDIT-EXT.
