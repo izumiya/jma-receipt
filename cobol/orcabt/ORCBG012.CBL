@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.01    NACL-森脇    07/06/06  グループ診療対応
+      *  04.08.01    NACL-森脇    15/08/24  ＣＳＶ出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -171,6 +172,9 @@
            03  IDX1                                PIC 9(05).
            03  IDXC                                PIC 9(05).
            03  IDX-TTL                             PIC 9(05).
+      *----(04.08.01)--ADD-START---
+           03  IDW2                                PIC 9(04).
+      *----(04.08.01)--ADD-END-----
       *
       *    パラメタ領域
        01  WRK-PARA.
@@ -189,7 +193,13 @@ grpsys     03  WRK-PARA-HOSPNUM                    PIC 9(02).
       *    一時領域
        01  WRK-AREA.
            03  WRK-RECEERR                         PIC X(200).
-           03  WRK-SYMD                            PIC X(08).
+      *----(04.08.01)--UPD-START---
+           03  WRK-TOUKEIERR                       PIC X(200).
+           03  WRK-SYMD.
+               05  WRK-SYY                         PIC 9(04).
+               05  WRK-SMM                         PIC 9(02).
+               05  WRK-SDD                         PIC 9(02).
+      *----(04.08.01)--UPD-END-----
            03  WRK-EDTYMD1                         PIC X(10).
            03  WRK-EDTYMD3                         PIC X(22).
            03  WRK-TITLE                           PIC X(100).
@@ -222,6 +232,102 @@ grpsys     03  WRK-PARA-HOSPNUM                    PIC 9(02).
            03  WRK-SPRT-SRYYM                      PIC X(06).
            03  WRK-KKNYM                           PIC X(100).
            03  WRK-CHOSEIMEI                       PIC X(20).
+      *
+      *----(04.08.01)--ADD-START---
+      *    ＣＳＶデータ数字編集用
+           03  WRK-REC             PIC X(20000).
+           03  WRK-REC-LENGTH      PIC 9(05).
+           03  WRK-HENSYU-AREA.
+               05  WRK-DATA        PIC X(20000).
+               05  WRK-NAGASA      PIC 9(04).
+               05  WRK-RECSTR      PIC 9(02). 
+               05  WRK-SYOSUU      PIC 9(01).
+               05  WRK-RECEND      PIC 9(01).
+      *
+      *    ＣＳＶデータ日付編集用
+       01  WRK-HEN-YMD-OT.
+           03  WRK-HEN-YY-OT       PIC X(04).
+           03  FILLER              PIC X(01)   VALUE   "/". 
+           03  WRK-HEN-MM-OT       PIC X(02).
+           03  FILLER              PIC X(01)   VALUE   "/". 
+           03  WRK-HEN-DD-OT       PIC X(02).
+      *
+       01  WRK-CONS-AREA.
+      *    コンマ
+           03  WRK-KUGIRI          PIC X(01)   VALUE   ",".
+      *    改行コード
+           03  WRK-KAIGYO          PIC X(01)   VALUE   X"0D".
+      *
+      *    ＣＳＶデータファイル名
+       01  WRK-TO-DATA-G.
+           03  WRK-TO-DATA.
+               05  WRK-TO-DATA-HOSPNUM PIC 9(02).
+               05  FILLER              PIC X(10)   VALUE   "choseikin_".
+               05  WRK-TO-DATA-KIKAN   PIC X(24).
+           03  WRK-TO-DATA-NYUGAI      PIC X(06).
+           03  WRK-TO-DATA1.
+               05  FILLER              PIC X(04)   VALUE   ".csv".
+           03  WRK-TO-DATA2.
+               05  FILLER              PIC X(01)   VALUE   "_".
+               05  WRK-TO-DATA-STRYM   PIC X(06).
+               05  FILLER              PIC X(01)   VALUE   "-".
+               05  WRK-TO-DATA-ENDYM   PIC X(06).
+               05  FILLER              PIC X(04)   VALUE   ".csv".
+      *
+       01  WRK-CSV-AREA.
+           03  WRK-CSV-CHOSEIKBN   PIC X(08).
+           03  WRK-CSV-PTNUM       PIC X(20).
+           03  WRK-CSV-NAME        PIC X(100).
+           03  WRK-CSV-DENPNUM     PIC 9(07).
+           03  WRK-CSV-SRYKA       PIC X(02).
+           03  WRK-CSV-SRYKAMEI    PIC X(20).
+           03  WRK-CSV-STYMD       PIC X(10).
+           03  WRK-CSV-EDYMD       PIC X(10).
+           03  WRK-CSV-CHOSEIP     PIC S9(07).
+           03  WRK-CSV-CHOSEIM     PIC S9(07).
+           03  WRK-CSV-Z7          PIC -999999.
+           03  WRK-CSV-Z11         PIC -9999999999.
+      *
+      *    ＣＳＶデータヘッダー情報
+       01  CSV-HEAD-01.
+           03  FILLER              PIC X(06)   VALUE   "並び順".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  CSV-HEAD-SRTKBN     PIC X(12)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "対象期間".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  CSV-HEAD-KKNYMS     PIC X(08)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  CSV-HEAD-KKNYME     PIC X(08)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  CSV-HEAD-NYUGAI     PIC X(04)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(06)   VALUE   "作成日".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  CSV-HEAD-SKYYMD     PIC X(10)   VALUE   SPACE.
+      *
+       01  CSV-HEAD-02.
+           03  FILLER              PIC X(12)   VALUE   "調整金１／２".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "患者番号".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "患者氏名".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "伝票番号".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(06)   VALUE   "診療科".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "診療科名".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(10)   VALUE   "診療年月日".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(12)   VALUE   "調整金（＋）".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(12)   VALUE   "調整金（−）".
+           03  FILLER              PIC X(01)   VALUE   ",".
+           03  FILLER              PIC X(08)   VALUE   "調整金計".
+      *----(04.08.01)--ADD-END-----
       *
        01  HEAD-AREA.
            03  HEAD-NYUGAI                         PIC X(10).
@@ -315,6 +421,11 @@ grpsys     03  WRK-PARA-HOSPNUM                    PIC 9(02).
       *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *----(04.08.01)--ADD-START---
+      *    統計ＣＳＶ制御サブ
+           COPY    "CPORCSTOUKEICSV.INC".
+      *----(04.08.01)--ADD-END-----
       *
       *    ＤＢ検索
            COPY    "MCPAREA".
@@ -489,6 +600,33 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BG012SRTPARA-HOSPNUM
                END-IF
            END-IF
       *
+      *----(04.08.01)--ADD-START---
+      *    ＣＳＶ出力ファイル名設定
+           MOVE    SPA-HOSPNUM     TO  WRK-TO-DATA-HOSPNUM
+      *
+           MOVE    SPACE           TO  WRK-TO-DATA-NYUGAI
+           MOVE    SPACE           TO  WRK-TO-DATA-KIKAN
+      *
+           IF    ( WRK-PARA-NYUGAIKBN  =   "1" )
+               MOVE    "nyuin"             TO  WRK-TO-DATA-NYUGAI
+           ELSE
+               MOVE    "gairai"            TO  WRK-TO-DATA-NYUGAI
+           END-IF
+      *
+           IF    ( WRK-PARA-KKNKBN     =   "1" )
+               MOVE    WRK-PARA-KKNSTYM        TO  WRK-TO-DATA-STRYM
+               MOVE    WRK-PARA-KKNEDYM        TO  WRK-TO-DATA-ENDYM
+               STRING  WRK-TO-DATA-NYUGAI      DELIMITED BY SPACE
+                       WRK-TO-DATA2            DELIMITED BY SPACE
+                       INTO                    WRK-TO-DATA-KIKAN
+               END-STRING
+           ELSE
+               STRING  WRK-TO-DATA-NYUGAI      DELIMITED BY SPACE
+                       WRK-TO-DATA1            DELIMITED BY SPACE
+                       INTO                    WRK-TO-DATA-KIKAN
+               END-STRING
+           END-IF
+      *----(04.08.01)--ADD-END-----
            .
        1001-PARA-CHK-EXT.
            EXIT.
@@ -654,6 +792,7 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
            .
        1001-SRYKALST-HEN-EXT.
            EXIT.
+      *----(04.08.01)--UPD-START---
       *************************************************************
       *    ヘッダー編集処理
       *************************************************************
@@ -664,8 +803,10 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
       *    タイトル
            IF    ( WRK-PARA-NYUGAIKBN  =   "1" )
                MOVE    "（入院）"      TO  HEAD-NYUGAI
+               MOVE    "入院"          TO  CSV-HEAD-NYUGAI
            ELSE
                MOVE    "（外来）"      TO  HEAD-NYUGAI
+               MOVE    "外来"          TO  CSV-HEAD-NYUGAI
            END-IF
       *
       *    ソート区分
@@ -680,16 +821,24 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
                MOVE    "患者番号順"    TO  HEAD-SRTKBN
            END-EVALUATE
       *
+           MOVE    HEAD-SRTKBN         TO  CSV-HEAD-SRTKBN
+      *
       *    作成日
            MOVE    LNK-PRTKANRI-SKYYMD TO  WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-EDTYMD3         TO  HEAD-SAKYMD
+      *
+           MOVE    WRK-SYY             TO  WRK-HEN-YY-OT
+           MOVE    WRK-SMM             TO  WRK-HEN-MM-OT
+           MOVE    WRK-SDD             TO  WRK-HEN-DD-OT
+           MOVE    WRK-HEN-YMD-OT      TO  CSV-HEAD-SKYYMD
       *
            IF    ( WRK-PARA-KKNKBN     =   "1" )
       *
                IF    ( WRK-PARA-KKNSTYM    =   "000000" )
                 AND  ( WRK-PARA-KKNEDYM    =   "999999" )
                    MOVE    "指定なし"              TO  HEAD-KKNYM
+                                                       CSV-HEAD-KKNYMS
                ELSE
       *            期間
                    INITIALIZE  WRK-KKN-HEN
@@ -700,8 +849,12 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
                        PERFORM 800-SEIWA-HEN-SEC
                        MOVE    WRK-EDTYMD3 (1:16)  TO  WRK-KKNSTYMD
                        MOVE    WRK-PARA-KKNSTYM    TO  WRK-SPRT-SRYYM
-                   END-IF
       *
+                       MOVE    WRK-SYY             TO  WRK-HEN-YY-OT
+                       MOVE    WRK-SMM             TO  WRK-HEN-MM-OT
+                       MOVE    WRK-SDD             TO  WRK-HEN-DD-OT
+                       MOVE    WRK-HEN-YMD-OT(1:7) TO  CSV-HEAD-KKNYMS
+                   END-IF
       *
                    IF    ( WRK-PARA-KKNEDYM    NOT =   SPACE )
                        MOVE    "〜"                    TO  WRK-KKNMID
@@ -715,6 +868,11 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
                        MOVE    "01"                TO  WRK-SYMD(7:2)
                        PERFORM 800-SEIWA-HEN-SEC
                        MOVE    WRK-EDTYMD3 (1:16)  TO  WRK-KKNEDYMD
+      *
+                       MOVE    WRK-SYY             TO  WRK-HEN-YY-OT
+                       MOVE    WRK-SMM             TO  WRK-HEN-MM-OT
+                       MOVE    WRK-SDD             TO  WRK-HEN-DD-OT
+                       MOVE    WRK-HEN-YMD-OT(1:7) TO  CSV-HEAD-KKNYME
                    END-IF
       *
                    IF    ( WRK-KKNSTYMD        =   WRK-KKNEDYMD )
@@ -726,6 +884,7 @@ grpsys     MOVE    "key5"          TO  MCP-PATHNAME
       *
            ELSE
                MOVE    "指定なし"                  TO  HEAD-KKNYM
+                                                       CSV-HEAD-KKNYMS
            END-IF
       *
            .
@@ -888,6 +1047,13 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
       *
            PERFORM 900-BG012SRT-READ-SEC
       *
+      *----(04.08.01)--ADD-START---
+           IF      FLG-BG012SRT    =   ZERO
+      *        ＣＳＶ出力処理
+               PERFORM 270-CSV-HEAD-SET-SEC
+           END-IF
+      *----(04.08.01)--ADD-END-----
+      *
            PERFORM UNTIL ( FLG-BG012SRT    NOT =  ZERO )
                      OR  ( FLG-END         NOT =  ZERO )
       *
@@ -987,6 +1153,7 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
            .
        210-HEAD-EXT.
            EXIT.
+      *----(04.08.01)--UPD-START---
       *****************************************************************
       *    明細編集処理
       *****************************************************************
@@ -1002,6 +1169,12 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
            MOVE    SYU-DENPNUM     TO  WRK-DENPNUM
            MOVE    WRK-DENPNUM-G   TO  HCM42-DENPNUM (CNT-LINE)
       *
+           INITIALIZE                  WRK-CSV-AREA
+      *
+           MOVE    BG012SRT-PTNUM  TO  WRK-CSV-PTNUM
+           MOVE    BG012SRT-NAME   TO  WRK-CSV-NAME
+           MOVE    WRK-DENPNUM-G   TO  WRK-CSV-DENPNUM
+      *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   WRK-SRYKALST-MAX )
                     OR   ( HCM42-SRYKA (CNT-LINE)  NOT =   SPACE )
@@ -1010,7 +1183,12 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
                 AND  ( SYU-SRYYMD  >=  WRK-SRYKAL-STYUKYMD (IDX1))
                 AND  ( SYU-SRYYMD  <=  WRK-SRYKAL-EDYUKYMD (IDX1))
                    MOVE    WRK-SRYKAMEI1L(IDX1)
-                                   TO  HCM42-SRYKA (CNT-LINE)
+                                       TO  HCM42-SRYKA (CNT-LINE)
+      *
+                   MOVE    WRK-SRYKAL(IDX1)
+                                       TO  WRK-CSV-SRYKA
+                   MOVE    WRK-SRYKAMEI1L(IDX1)
+                                       TO  WRK-CSV-SRYKAMEI
                END-IF
       *
            END-PERFORM
@@ -1027,16 +1205,34 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
       *
                MOVE    WRK-SRYYMDM-G   TO  HCM42-SKYKKN  (CNT-LINE)
       *
+               MOVE    SYU-SKYSTYMD    TO  WRK-SYMD
+               MOVE    WRK-SYY         TO  WRK-HEN-YY-OT
+               MOVE    WRK-SMM         TO  WRK-HEN-MM-OT
+               MOVE    WRK-SDD         TO  WRK-HEN-DD-OT
+               MOVE    WRK-HEN-YMD-OT  TO  WRK-CSV-STYMD
+               MOVE    SYU-SKYEDYMD    TO  WRK-SYMD
+               MOVE    WRK-SYY         TO  WRK-HEN-YY-OT
+               MOVE    WRK-SMM         TO  WRK-HEN-MM-OT
+               MOVE    WRK-SDD         TO  WRK-HEN-DD-OT
+               MOVE    WRK-HEN-YMD-OT  TO  WRK-CSV-EDYMD
            ELSE
                MOVE    SYU-SRYYMD      TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-EDTYMD1     TO  HCM42-SRYMD   (CNT-LINE)
+      *
+               MOVE    SYU-SRYYMD      TO  WRK-SYMD
+               MOVE    WRK-SYY         TO  WRK-HEN-YY-OT
+               MOVE    WRK-SMM         TO  WRK-HEN-MM-OT
+               MOVE    WRK-SDD         TO  WRK-HEN-DD-OT
+               MOVE    WRK-HEN-YMD-OT  TO  WRK-CSV-STYMD
            END-IF
       *
            IF    ( KEY-CHOSEIKBN       =   "1" )
                MOVE    1               TO  IDXC
+               MOVE    "調整金１"      TO  WRK-CSV-CHOSEIKBN
            ELSE
                MOVE    2               TO  IDXC
+               MOVE    "調整金２"      TO  WRK-CSV-CHOSEIKBN
            END-IF
       *
            IF    ( SYU-RCHOSEI (IDXC)  >=  ZERO )
@@ -1049,6 +1245,9 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
                COMPUTE TTL-TTL-CHOSEIP (IDXC)
                    =   TTL-TTL-CHOSEIP (IDXC)
                    +   SYU-RCHOSEI (IDXC)
+      *
+               MOVE    SYU-RCHOSEI (IDXC)
+                                       TO  WRK-CSV-CHOSEIP
            ELSE
                MOVE    SYU-RCHOSEI (IDXC)
                                        TO  WRK-CHOSEI
@@ -1059,6 +1258,9 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
                COMPUTE TTL-TTL-CHOSEIM (IDXC)
                    =   TTL-TTL-CHOSEIM (IDXC)
                    +   SYU-RCHOSEI (IDXC)
+      *
+               MOVE    SYU-RCHOSEI (IDXC)
+                                       TO  WRK-CSV-CHOSEIM
            END-IF
       *
            COMPUTE TTL-SRYKA-KNS (IDXC)
@@ -1066,11 +1268,15 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
            COMPUTE TTL-TTL-KNS (IDXC)
                =   TTL-TTL-KNS (IDXC)      +   1
       *
+      *    ＣＳＶ出力処理
+           PERFORM 270-CSV-BODY-SET-SEC
+      *
            PERFORM 900-BG012SRT-READ-SEC
       *
            .
        220-MEISAI-EXT.
            EXIT.
+      *----(04.08.01)--UPD-END-----
       *****************************************************************
       *    合計行編集処理
       *****************************************************************
@@ -1176,22 +1382,26 @@ grpsys     MOVE    "key72"         TO  MCP-PATHNAME
       *****************************************************************
        2301-TOTAL-SEC                      SECTION.
       *
-          MOVE    TTL-TITLE            TO  HCM42-TTLTITLE  (IDX-TTL)
+           MOVE    TTL-TITLE            TO  HCM42-TTLTITLE  (IDX-TTL)
       *
-          MOVE    TTL-KNS              TO  WRK-CHOSEIKNS
-          MOVE    WRK-CHOSEIKNS        TO  HCM42-TTLKNS    (IDX-TTL)
+           MOVE    TTL-KNS              TO  WRK-CHOSEIKNS
+           MOVE    WRK-CHOSEIKNS        TO  HCM42-TTLKNS    (IDX-TTL)
       *
-          MOVE    TTL-CHOSEIP          TO  WRK-CHOSEI
-          MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEIP(IDX-TTL)
+           MOVE    TTL-CHOSEIP          TO  WRK-CHOSEI
+           MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEIP(IDX-TTL)
       *
-          MOVE    TTL-CHOSEIM          TO  WRK-CHOSEI
-          MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEIM(IDX-TTL)
+           MOVE    TTL-CHOSEIM          TO  WRK-CHOSEI
+           MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEIM(IDX-TTL)
       *
-          COMPUTE WRK-CHOSEI-SGK
-              =   TTL-CHOSEIP
-              +   TTL-CHOSEIM
-          MOVE    WRK-CHOSEI-SGK       TO  WRK-CHOSEI
-          MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEI (IDX-TTL)
+           COMPUTE WRK-CHOSEI-SGK
+               =   TTL-CHOSEIP
+               +   TTL-CHOSEIM
+           MOVE    WRK-CHOSEI-SGK       TO  WRK-CHOSEI
+           MOVE    WRK-CHOSEI           TO  HCM42-TTLCHOSEI (IDX-TTL)
+      *
+      *----(04.08.01)--ADD-START---
+           PERFORM 270-CSV-GOKEI-SET-SEC
+      *----(04.08.01)--ADD-END-----
       *
            .
        2301-TOTAL-EXT.
@@ -1237,6 +1447,268 @@ grpsys                                 SPA-AREA
            .
        240-PRINT-EXT.
            EXIT.
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    ＣＳＶ（ＨＥＡＤレコード）編集処理
+      *****************************************************************
+       270-CSV-HEAD-SET-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-REC
+                                       WRK-REC-LENGTH
+      *
+           MOVE    CSV-HEAD-01     TO  WRK-DATA
+           MOVE    100             TO  WRK-NAGASA
+           MOVE    1               TO  WRK-RECEND
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    改行コード編集
+           STRING  WRK-REC(1:WRK-REC-LENGTH)
+                                       DELIMITED  BY  SIZE
+                   WRK-KAIGYO          DELIMITED  BY  SIZE
+                   INTO                WRK-REC
+           END-STRING
+           PERFORM 500-TOUKEICSV-SEC
+      *
+           INITIALIZE                  WRK-REC
+                                       WRK-REC-LENGTH
+      *
+           MOVE    CSV-HEAD-02     TO  WRK-DATA
+           MOVE    120             TO  WRK-NAGASA
+           MOVE    1               TO  WRK-RECEND
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    改行コード編集
+           STRING  WRK-REC(1:WRK-REC-LENGTH)
+                                       DELIMITED  BY  SIZE
+                   WRK-KAIGYO          DELIMITED  BY  SIZE
+                   INTO                WRK-REC
+           END-STRING
+           PERFORM 500-TOUKEICSV-SEC
+      *
+           .
+       270-CSV-HEAD-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶ（データレコード）編集処理
+      *****************************************************************
+       270-CSV-BODY-SET-SEC        SECTION.
+      *
+           INITIALIZE                  WRK-REC
+                                       WRK-REC-LENGTH
+      *
+      *    調整金区分
+           MOVE    WRK-CSV-CHOSEIKBN   TO  WRK-DATA
+           MOVE    8               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    患者番号
+           MOVE    WRK-CSV-PTNUM   TO  WRK-DATA
+           MOVE    20              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    患者氏名
+           MOVE    WRK-CSV-NAME    TO  WRK-DATA
+           MOVE    100             TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    伝票番号
+           MOVE    WRK-CSV-DENPNUM TO  WRK-DATA
+           MOVE    7               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    診療科
+           MOVE    WRK-CSV-SRYKA   TO  WRK-DATA
+           MOVE    2               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    診療科名
+           MOVE    WRK-CSV-SRYKAMEI
+                                   TO  WRK-DATA
+           MOVE    20              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    診療年月日
+           MOVE    WRK-CSV-STYMD   TO  WRK-DATA
+           MOVE    10              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    WRK-CSV-EDYMD   TO  WRK-DATA
+           MOVE    10              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    調整金（＋）
+           MOVE    WRK-CSV-CHOSEIP TO  WRK-DATA
+           MOVE    7               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    調整金（−）
+           MOVE    WRK-CSV-CHOSEIM TO  WRK-CSV-Z7
+           MOVE    WRK-CSV-Z7      TO  WRK-DATA
+           MOVE    7               TO  WRK-NAGASA
+           MOVE    1               TO  WRK-RECEND
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    改行コード編集
+           STRING  WRK-REC(1:WRK-REC-LENGTH)
+                                       DELIMITED  BY  SIZE
+                   WRK-KAIGYO          DELIMITED  BY  SIZE
+                   INTO                WRK-REC
+           END-STRING
+           PERFORM 500-TOUKEICSV-SEC
+      *
+           .
+       270-CSV-BODY-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶ（合計レコード）編集処理
+      *****************************************************************
+       270-CSV-GOKEI-SET-SEC       SECTION.
+      *
+           INITIALIZE                  WRK-REC
+                                       WRK-REC-LENGTH
+      *
+           MOVE    ",,,,,"         TO  WRK-REC(1:5)
+           MOVE    5               TO  WRK-REC-LENGTH
+      *
+           MOVE    TTL-TITLE       TO  WRK-DATA
+           MOVE    20              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    TTL-KNS         TO  WRK-DATA
+           MOVE    6               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    "件"            TO  WRK-DATA
+           MOVE    2               TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    TTL-CHOSEIP     TO  WRK-DATA
+           MOVE    12              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    TTL-CHOSEIM     TO  WRK-CSV-Z11
+           MOVE    WRK-CSV-Z11     TO  WRK-DATA
+           MOVE    12              TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           IF      WRK-CHOSEI-SGK  <   0
+               MOVE    WRK-CHOSEI-SGK  TO  WRK-CSV-Z11
+               MOVE    WRK-CSV-Z11     TO  WRK-DATA
+           ELSE
+               MOVE    WRK-CHOSEI-SGK  TO  WRK-DATA
+           END-IF
+           MOVE    11              TO  WRK-NAGASA
+           MOVE    1               TO  WRK-RECEND
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    改行コード編集
+           STRING  WRK-REC(1:WRK-REC-LENGTH)
+                                       DELIMITED  BY  SIZE
+                   WRK-KAIGYO          DELIMITED  BY  SIZE
+                   INTO                WRK-REC
+           END-STRING
+           PERFORM 500-TOUKEICSV-SEC
+      *
+           .
+       270-CSV-GOKEI-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    統計ＣＳＶ出力処理
+      *****************************************************************
+       500-TOUKEICSV-SEC           SECTION.
+      *
+           INITIALIZE                  ORCSTOUKEICSVAREA
+           MOVE    "INS"           TO  STOUKEICSV-MODE
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                   TO  STOUKEICSV-TBL-KEY
+           MOVE    LNK-PRTKANRI-RENNUM
+                                   TO  STOUKEICSV-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                   TO  STOUKEICSV-TBL-GROUP
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  STOUKEICSV-SHORI-RENNUM
+           MOVE    LNK-PRTKANRI-SHELLID
+                                   TO  STOUKEICSV-SHELLID
+           MOVE    SPACE           TO  STOUKEICSV-SRYYM
+           MOVE    WRK-PARA-NYUGAIKBN
+                                   TO  STOUKEICSV-NYUGAIKBN
+           MOVE    ZERO            TO  STOUKEICSV-PTID
+           MOVE    "/var/tmp/"     TO  STOUKEICSV-TO-FOLDER
+           MOVE    WRK-TO-DATA     TO  STOUKEICSV-TO-DATA
+           MOVE    "2"             TO  STOUKEICSV-CODE-TYPE
+           MOVE    WRK-REC         TO  STOUKEICSV-CSVDATA
+      *
+           MOVE    "調整金一覧表ＣＳＶ作成"
+                                   TO  STOUKEICSV-TITLE
+      *
+           CALL    "ORCSTOUKEICSV"     USING
+                                       ORCSTOUKEICSVAREA
+                                       SPA-AREA
+           IF      STOUKEICSV-RETURN   =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    "統計ＣＳＶＤＢに更新できませんでした"
+                                      TO  WRK-TOUKEIERR
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+           .
+      *
+       500-TOUKEICSV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    出力レコード処理（文字）
+      *****************************************************************
+       5004-MOJI-HENSYU-SEC        SECTION.
+      *
+           IF      WRK-DATA            =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDW2    FROM    WRK-NAGASA  BY  -1
+                       UNTIL   IDW2    <       1
+                   IF      WRK-DATA (IDW2:1)   NOT =   SPACE
+                       STRING  WRK-REC(1:WRK-REC-LENGTH)
+                                                   DELIMITED   BY  SIZE
+                               WRK-DATA(1:IDW2)    DELIMITED   BY  SIZE
+                               INTO    WRK-REC
+                       END-STRING
+                       ADD     IDW2        TO  WRK-REC-LENGTH
+                       MOVE    1           TO  IDW2
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF      WRK-RECEND         =   ZERO
+               STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
+                       WRK-KUGIRI                DELIMITED  BY  SIZE
+                       INTO        WRK-REC
+               END-STRING
+               ADD     1                   TO  WRK-REC-LENGTH
+           END-IF
+      *
+           INITIALIZE                      WRK-HENSYU-AREA
+      *
+           .
+       5004-MOJI-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    異常終了処理
+      *****************************************************************
+       500-COBABORT-SEC          SECTION.
+      *
+           MOVE    SPACE           TO  WRK-RECEERR
+           STRING  "ORCBG012 "     DELIMITED  BY  SIZE
+                   WRK-TOUKEIERR   DELIMITED  BY  SIZE
+                   LOW-VALUE       DELIMITED  BY  SIZE
+                                   INTO    WRK-RECEERR
+           END-STRING
+           CALL    "cobabort"      USING   WRK-RECEERR
+           .
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    エラー出力処理
       *****************************************************************
