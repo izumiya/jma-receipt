@@ -210,6 +210,8 @@
                    EVALUATE    LNK-COM-YKZKBN(IDX)
                        WHEN    "4"
       *                    Ãí¼ÍÌô
+      *H27.9               ³°ÍÑÌô¤Î»ÄÎÌÇÑ´þÂÐ±þ
+                       WHEN    "6"
                            PERFORM 1002-CHUUSYA-SET-SEC
       *ver.4.7
                        WHEN    "3"
