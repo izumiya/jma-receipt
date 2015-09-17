@@ -376,6 +376,10 @@
       *
            MOVE    ZERO                TO  SPA-GMN-CUR
       *
+           MOVE    "CHK_TANKI3_"       TO  WRK-WIDGET-TANKI3-LBL
+           MOVE    CONST-GMN-TANKI3-MAX
+                                       TO  WRK-WIDGET-TANKI3
+      *
            EVALUATE    MCP-EVENT   ALSO    MCP-WIDGET
       *    Ìá¤ë
            WHEN    "CLICKED"       ALSO    "B01"
@@ -389,7 +393,7 @@
                PERFORM 430-DEL-SEC
       *    Ã»´ü£³ÁªÂò¥Á¥§¥Ã¥¯
            WHEN    "CLICKED"       ALSO    "CHK_TANKI3_01"
-                                   THRU    "CHK_TANKI3_23"
+                                   THRU    WRK-WIDGET-TANKI3-G
                PERFORM 4101-TANKI3-CHK-SEC
       *    ÅÐÏ¿
            WHEN    "CLICKED"       ALSO    "B12"
@@ -481,8 +485,10 @@
       *
            MOVE    WRK-WIDGET-TANKI3   TO  IDX2
       *
-           MOVE    W37-CHK-TANKI3 (IDX2)
+           IF    ( SPA-GMN-CHK-LBLTANKI3 (IDX2)  NOT = SPACE )
+               MOVE    W37-CHK-TANKI3 (IDX2)
                                        TO  SPA-GMN-CHK-TANKI3 (IDX2)
+           END-IF
       *
            .
        4101-TANKI3-CHK-EXT.

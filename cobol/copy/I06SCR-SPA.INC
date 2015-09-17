@@ -234,7 +234,7 @@
                    07  SPA-GMN-TOKNYUINLST-G.
                        09  SPA-GMN-TOKNYUIN-SRYCDTTL   PIC 9(14).
                        09  SPA-GMN-TOKNYUIN-MAX        PIC 9(05).
-                       09  SPA-GMN-TOKNYUINLST-OCC     OCCURS  30.
+                       09  SPA-GMN-TOKNYUINLST-OCC     OCCURS  100.
                            11  SPA-GMN-TOKNYUINLST.
                                13  SPA-GMN-TOKNYUINL       PIC X(02).
                                13  SPA-GMN-TOKNYUINFLL     PIC X(01).
