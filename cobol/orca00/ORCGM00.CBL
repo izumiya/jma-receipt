@@ -477,7 +477,7 @@
            MOVE    SPACE               TO  WRK-MOTOPG
            IF      SPA-MOTOPG          =   "M01"  OR  "M01N"
                                        OR  "M95"  OR  "MVER"
-                                       OR  "KT01"
+                                       OR  "KT01" OR  "M97"
                                        OR  "M98"
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
            END-IF
@@ -498,6 +498,8 @@
                                        OR  "KT01"
                                        OR  "MLOG"
                                        OR  "M98"
+      *H25.9
+                                       OR  "M97"
                                        OR  "MDAS"
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
