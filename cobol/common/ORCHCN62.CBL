@@ -654,7 +654,7 @@
       *
       *----(04.08.01)--ADD-START---
       *    処方せん備考欄コメント表示しない場合
-           IF      PARA-BIKOU      NOT =   "1"
+           IF      PARA-BIKOU      =   "0"
                IF      ORCHCN62-SRYKBN(IDX-ZAI) =   "98"
                    GO  TO  220-BODY-HENSYU-EXT
                END-IF
