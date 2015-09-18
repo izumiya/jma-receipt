@@ -43,6 +43,7 @@
            COPY    "COMMON-SPA".
       *
        01  FLG-AREA.
+           03  FLG-SYSBASE             PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PASSWD              PIC 9(01).
            03  FLG-SYSUSER             PIC 9(01).
@@ -59,6 +60,7 @@
            03  IDXK                    PIC 9(05).
       *
        01  CNT-AREA.
+           03  CNT-SYSBASE             PIC 9(05).
            03  CNT-SYSKANRI            PIC 9(05).
       *
       *    一時領域
@@ -181,6 +183,10 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    システム基本
+       01  SYSBASE-REC.
+           COPY    "CPSYSBASE.INC".
       *
       *    システム管理
            COPY    "CPSYSKANRI.INC".
@@ -306,6 +312,8 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
+           PERFORM 1001-GROUP-CONFIG-CHK-SEC
+      *
       *    XML情報取り出し
            PERFORM 900-XML-READ-SEC
            IF    ( WRK-ERRCD           NOT =   SPACE )
@@ -318,6 +326,32 @@
        100-INIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    グループ診療設定チェック処理
+      *****************************************************************
+       1001-GROUP-CONFIG-CHK-SEC   SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSBASE
+           MOVE    ZERO                TO  CNT-SYSBASE
+      *
+           PERFORM 900-SYSBASE-ALL-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-SYSBASE NOT =   ZERO )
+                    OR   ( CNT-SYSBASE     >   1 )
+      *
+               COMPUTE CNT-SYSBASE = CNT-SYSBASE + 1
+      *
+               PERFORM 900-SYSBASE-ALL-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       1001-GROUP-CONFIG-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    電文項目チェック処理
       *****************************************************************
@@ -452,7 +486,7 @@
       *
            MOVE    SYS-1010-USERID TO  MURES-USER-ID (IDX1 1)
       *
-           IF    ( SPA-GRPHOSPKBN  =   1 )
+           IF    ( CNT-SYSBASE     >   1 )
                MOVE    SYS-1010-HOSPNUM
                                    TO  WRK-HOSPNUM
                MOVE    WRK-HOSPNUMX TO MURES-HOSPNUM (IDX1 1)
@@ -1653,6 +1687,48 @@
       *
            .
        9001-XML-RESPONSE-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム基本検索処理
+      *****************************************************************
+       900-SYSBASE-ALL-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSBASE
+      *
+           INITIALIZE                      SYSBASE-REC
+           MOVE    SYSBASE-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSBASE-REC
+           ELSE
+               INITIALIZE                  SYSBASE-REC
+               MOVE    1               TO  FLG-SYSBASE
+           END-IF
+      *
+           .
+       900-SYSBASE-ALL-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム基本FETCH処理
+      *****************************************************************
+       900-SYSBASE-ALL-FET-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSBASE
+      *
+           MOVE    "tbl_sysbase"       TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSBASE-REC
+           ELSE
+               INITIALIZE                  SYSBASE-REC
+               MOVE    1               TO  FLG-SYSBASE
+           END-IF
+      *
+           .
+       900-SYSBASE-ALL-FET-EXT.
            EXIT.
       *****************************************************************
       *    パスワード情報検索処理
