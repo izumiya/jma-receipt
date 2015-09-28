@@ -135,8 +135,10 @@
                                               PIC X(08).
                        09  SPA-GMN-LBLKIZAILST
                                               PIC X(60).
-                       09  SPA-GMN-SYUTENTANKA PIC 9(02).
-                       09  SPA-GMN-YKZTENTANKA PIC 9(02).
+                       09  SPA-GMN-SYUTENTANKA-G PIC 9(02).
+                       09  SPA-GMN-SYUTENTANKA-N PIC 9(02).
+                       09  SPA-GMN-YKZTENTANKA-G PIC 9(02).
+                       09  SPA-GMN-YKZTENTANKA-N PIC 9(02).
                        09  SPA-GMN-KOMUKBN-G.
                            11  SPA-GMN-KOMUKBN
                                               PIC X(01).
@@ -810,12 +812,20 @@
                                             TO  SPA-GMN-RSIPRT-G
            END-IF
       *
-           IF    ( SPA-GMN-SYUTENTANKA =    ZERO )
-               MOVE    10                   TO  SPA-GMN-SYUTENTANKA
+           IF    ( SPA-GMN-SYUTENTANKA-G =    ZERO )
+               MOVE    10                   TO  SPA-GMN-SYUTENTANKA-G
            END-IF
       *
-           IF    ( SPA-GMN-YKZTENTANKA =    ZERO )
-               MOVE    10                   TO  SPA-GMN-YKZTENTANKA
+           IF    ( SPA-GMN-YKZTENTANKA-G =    ZERO )
+               MOVE    10                   TO  SPA-GMN-YKZTENTANKA-G
+           END-IF
+      *
+           IF    ( SPA-GMN-SYUTENTANKA-N =    ZERO )
+               MOVE    SPA-GMN-SYUTENTANKA-G  TO  SPA-GMN-SYUTENTANKA-N
+           END-IF
+      *
+           IF    ( SPA-GMN-YKZTENTANKA-N =    ZERO )
+               MOVE    SPA-GMN-YKZTENTANKA-G  TO  SPA-GMN-YKZTENTANKA-N
            END-IF
       *
            MOVE    ZERO                TO  SPA-NAI-KIZAITBL-FLG
@@ -885,16 +895,32 @@
       *
            IF      SYS-4001-SYUTENTANKA-X  IS  NUMERIC
                MOVE    SYS-4001-SYUTENTANKA
-                                       TO  SPA-GMN-SYUTENTANKA
+                                       TO  SPA-GMN-SYUTENTANKA-G
            ELSE
-               MOVE    10              TO  SPA-GMN-SYUTENTANKA
+               MOVE    10              TO  SPA-GMN-SYUTENTANKA-G
            END-IF
       *
            IF      SYS-4001-YKZTENTANKA-X  IS  NUMERIC
                MOVE    SYS-4001-YKZTENTANKA
-                                       TO  SPA-GMN-YKZTENTANKA
+                                       TO  SPA-GMN-YKZTENTANKA-G
            ELSE
-               MOVE    10              TO  SPA-GMN-YKZTENTANKA
+               MOVE    10              TO  SPA-GMN-YKZTENTANKA-G
+           END-IF
+      *
+           IF      SYS-4001-SYUTENTANKA2-X  IS  NUMERIC
+               MOVE    SYS-4001-SYUTENTANKA2
+                                       TO  SPA-GMN-SYUTENTANKA-N
+           ELSE
+               MOVE    SPA-GMN-SYUTENTANKA-G
+                                       TO  SPA-GMN-SYUTENTANKA-N
+           END-IF
+      *
+           IF      SYS-4001-YKZTENTANKA2-X  IS  NUMERIC
+               MOVE    SYS-4001-YKZTENTANKA2
+                                       TO  SPA-GMN-YKZTENTANKA-N
+           ELSE
+               MOVE    SPA-GMN-YKZTENTANKA-G
+                                       TO  SPA-GMN-YKZTENTANKA-N
            END-IF
       *
            MOVE    SYS-4001-KOMUKBN    TO  WRK-CMB-CD
@@ -1437,8 +1463,10 @@
            MOVE    W13-SKJKBN          TO  SPA-GMN-SKJKBN-G
            MOVE    W13-KIZAITAXKBN     TO  SPA-GMN-KIZAITAXKBN-G
            MOVE    W13-KOTEIKBN        TO  SPA-GMN-KOTEIKBN-G
-           MOVE    W13-SYUTENTANKA     TO  SPA-GMN-SYUTENTANKA
-           MOVE    W13-YKZTENTANKA     TO  SPA-GMN-YKZTENTANKA
+           MOVE    W13-SYUTENTANKA-G   TO  SPA-GMN-SYUTENTANKA-G
+           MOVE    W13-YKZTENTANKA-G   TO  SPA-GMN-YKZTENTANKA-G
+           MOVE    W13-SYUTENTANKA-N   TO  SPA-GMN-SYUTENTANKA-N
+           MOVE    W13-YKZTENTANKA-N   TO  SPA-GMN-YKZTENTANKA-N
            MOVE    W13-RSIPRT          TO  SPA-GMN-RSIPRT-G
            MOVE    W13-KOMUKBN         TO  SPA-GMN-KOMUKBN-G
            MOVE    W13-KOMURSITANKAKBN TO  SPA-GMN-KOMURSITANKAKBN-G
@@ -1516,12 +1544,22 @@
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
       *
-           PERFORM 4101-SYUTENTANKA-CHK-SEC
+           PERFORM 4101-SYUTENTANKA-G-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
       *
-           PERFORM 4101-YKZTENTANKA-CHK-SEC
+           PERFORM 4101-SYUTENTANKA-N-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4101-YKZTENTANKA-G-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4101-YKZTENTANKA-N-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -1819,28 +1857,54 @@
       *****************************************************************
       *    µªΩ—≈¿√±≤¡•¡•ß•√•Ø
       *****************************************************************
-       4101-SYUTENTANKA-CHK-SEC        SECTION.
+       4101-SYUTENTANKA-G-CHK-SEC        SECTION.
       *
-           IF    ( SPA-GMN-SYUTENTANKA     =   ZERO )
+           IF    ( SPA-GMN-SYUTENTANKA-G     =   ZERO )
                MOVE    "0013"      TO  SPA-ERRCD
                MOVE    17          TO  SPA-GMN-CUR
            END-IF
       *
            .
-       4101-SYUTENTANKA-CHK-EXT.
+       4101-SYUTENTANKA-G-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ÃÙ∫ﬁ≈˘≈¿√±≤¡
       *****************************************************************
-       4101-YKZTENTANKA-CHK-SEC        SECTION.
+       4101-YKZTENTANKA-G-CHK-SEC        SECTION.
       *
-           IF    ( SPA-GMN-YKZTENTANKA     =   ZERO )
+           IF    ( SPA-GMN-YKZTENTANKA-G     =   ZERO )
                MOVE    "0014"      TO  SPA-ERRCD
                MOVE    18          TO  SPA-GMN-CUR
            END-IF
       *
            .
-       4101-YKZTENTANKA-CHK-EXT.
+       4101-YKZTENTANKA-G-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    µªΩ—≈¿√±≤¡•¡•ß•√•Ø
+      *****************************************************************
+       4101-SYUTENTANKA-N-CHK-SEC        SECTION.
+      *
+           IF    ( SPA-GMN-SYUTENTANKA-N     =   ZERO )
+               MOVE    "0013"      TO  SPA-ERRCD
+               MOVE    26          TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4101-SYUTENTANKA-N-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÃÙ∫ﬁ≈˘≈¿√±≤¡
+      *****************************************************************
+       4101-YKZTENTANKA-N-CHK-SEC        SECTION.
+      *
+           IF    ( SPA-GMN-YKZTENTANKA-N     =   ZERO )
+               MOVE    "0014"      TO  SPA-ERRCD
+               MOVE    27          TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4101-YKZTENTANKA-N-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ∏¯Ã≥∫“≥≤∂Ë ¨•¡•ß•√•Ø
@@ -2816,8 +2880,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SKJKBN          TO  SYS-4001-SKJKBN
            MOVE    SPA-GMN-KIZAITAXKBN     TO  SYS-4001-TAXKBN-KZI
            MOVE    SPA-GMN-KOTEIKBN        TO  SYS-4001-KOTEIKBN
-           MOVE    SPA-GMN-SYUTENTANKA     TO  SYS-4001-SYUTENTANKA
-           MOVE    SPA-GMN-YKZTENTANKA     TO  SYS-4001-YKZTENTANKA
+           MOVE    SPA-GMN-SYUTENTANKA-G   TO  SYS-4001-SYUTENTANKA
+           MOVE    SPA-GMN-YKZTENTANKA-G   TO  SYS-4001-YKZTENTANKA
+           MOVE    SPA-GMN-SYUTENTANKA-N   TO  SYS-4001-SYUTENTANKA2
+           MOVE    SPA-GMN-YKZTENTANKA-N   TO  SYS-4001-YKZTENTANKA2
            MOVE    SPA-GMN-KOMUKBN         TO  SYS-4001-KOMUKBN
            MOVE    SPA-GMN-KOMURSITANKAKBN TO  SYS-4001-KOMURSITANKAKBN
            MOVE    SPA-GMN-KOMURSITANKA    TO  SYS-4001-KOMURSITANKA
@@ -3175,8 +3241,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SKJKBN-G         TO  W13-SKJKBN
            MOVE    SPA-GMN-KIZAITAXKBN-G    TO  W13-KIZAITAXKBN
            MOVE    SPA-GMN-KOTEIKBN-G       TO  W13-KOTEIKBN
-           MOVE    SPA-GMN-SYUTENTANKA      TO  W13-SYUTENTANKA
-           MOVE    SPA-GMN-YKZTENTANKA      TO  W13-YKZTENTANKA
+           MOVE    SPA-GMN-SYUTENTANKA-G    TO  W13-SYUTENTANKA-G
+           MOVE    SPA-GMN-YKZTENTANKA-G    TO  W13-YKZTENTANKA-G
+           MOVE    SPA-GMN-SYUTENTANKA-N    TO  W13-SYUTENTANKA-N
+           MOVE    SPA-GMN-YKZTENTANKA-N    TO  W13-YKZTENTANKA-N
            MOVE    SPA-GMN-KOMUKBN-G        TO  W13-KOMUKBN
            MOVE    SPA-GMN-KOMURSITANKAKBN-G TO W13-KOMURSITANKAKBN
            MOVE    SPA-GMN-KOMURSITANKA     TO  W13-KOMURSITANKA
@@ -3575,9 +3643,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    16
                     MOVE  "JIBAIKBN"       TO   MCP-WIDGET
                 WHEN    17
-                    MOVE  "SYUTENTANKA"    TO   MCP-WIDGET
+                    MOVE  "SYUTENTANKA_G"  TO   MCP-WIDGET
                 WHEN    18
-                    MOVE  "YKZTENTANKA"    TO   MCP-WIDGET
+                    MOVE  "YKZTENTANKA_G"  TO   MCP-WIDGET
                 WHEN    19
                     MOVE  "KOMUKBN"        TO   MCP-WIDGET
                 WHEN    20
@@ -3592,6 +3660,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "KOMURSITANKAKBN" TO  MCP-WIDGET
                 WHEN    25
                     MOVE  "KOMURSITANKA"    TO  MCP-WIDGET
+                WHEN    26
+                    MOVE  "SYUTENTANKA_N"  TO   MCP-WIDGET
+                WHEN    27
+                    MOVE  "YKZTENTANKA_N"  TO   MCP-WIDGET
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
             END-EVALUATE
@@ -3627,9 +3699,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    21              TO  SPA-GMN-CUR
                WHEN    "JBISKYKBN"
                    MOVE    8               TO  SPA-GMN-CUR
-               WHEN    "SYUTENTANKA"
+               WHEN    "SYUTENTANKA_G"
+                   MOVE    26              TO  SPA-GMN-CUR
+               WHEN    "SYUTENTANKA_N"
                    MOVE    18              TO  SPA-GMN-CUR
-               WHEN    "YKZTENTANKA"
+               WHEN    "YKZTENTANKA_G"
+                   MOVE    27              TO  SPA-GMN-CUR
+               WHEN    "YKZTENTANKA_N"
                    MOVE    19              TO  SPA-GMN-CUR
                WHEN    "KOMUKBN"
                    MOVE    22              TO  SPA-GMN-CUR

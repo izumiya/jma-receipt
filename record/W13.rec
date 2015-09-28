@@ -125,10 +125,16 @@ W13 {
       count int;
         item varchar(10)[2];
     };
-    SYUTENTANKA {
+    SYUTENTANKA_G {
       numdata number(2);
     };
-    YKZTENTANKA {
+    SYUTENTANKA_N {
+      numdata number(2);
+    };
+    YKZTENTANKA_G {
+      numdata number(2);
+    };
+    YKZTENTANKA_N {
       numdata number(2);
     };
     KOMUKBN_COMBO {

@@ -65,12 +65,12 @@
                05  SYS-4001-ROUKAISU    PIC  X(01).
       *º´«Â¿’∂Ë ¨
                05  SYS-4001-JIBAIKBN    PIC  X(01).
-      *µªΩ—≈¿√±≤¡
+      *º´«Â¿’° ∑Ú ›Ω‡µÚ°À  µªΩ—≈¿√±≤¡    °„≥∞ÕË°‰
                05  SYS-4001-SYUTENTANKA-G.
                    07   SYS-4001-SYUTENTANKA-X PIC  X(02).
                    07   SYS-4001-SYUTENTANKA   REDEFINES
                         SYS-4001-SYUTENTANKA-X PIC  9(02).
-      *ÃÙ∫ﬁ≈˘≈¿√±≤¡
+      *º´«Â¿’° ∑Ú ›Ω‡µÚ°À  ÃÙ∫ﬁ≈˘≈¿√±≤¡  °„≥∞ÕË°‰
                05  SYS-4001-YKZTENTANKA-G.
                    07   SYS-4001-YKZTENTANKA-X PIC  X(02).
                    07   SYS-4001-YKZTENTANKA   REDEFINES
@@ -93,8 +93,18 @@
       *∏¯Ã≥∫“≥≤œ´∫“Ω‡µÚ≈¿øÙ√±≤¡
                05  SYS-4001-KOMURSITANKA-G.
                    07  SYS-4001-KOMURSITANKA    PIC  99V99.
+      *º´«Â¿’° ∑Ú ›Ω‡µÚ°À  µªΩ—≈¿√±≤¡    °„∆˛±°°‰
+               05  SYS-4001-SYUTENTANKA2-G.
+                   07   SYS-4001-SYUTENTANKA2-X PIC  X(02).
+                   07   SYS-4001-SYUTENTANKA2   REDEFINES
+                        SYS-4001-SYUTENTANKA2-X PIC  9(02).
+      *º´«Â¿’° ∑Ú ›Ω‡µÚ°À  ÃÙ∫ﬁ≈˘≈¿√±≤¡  °„∆˛±°°‰
+               05  SYS-4001-YKZTENTANKA2-G.
+                   07   SYS-4001-YKZTENTANKA2-X PIC  X(02).
+                   07   SYS-4001-YKZTENTANKA2   REDEFINES
+                        SYS-4001-YKZTENTANKA2-X PIC  9(02).
       *ÕΩ»˜
-           03  SYS-4001-YOBI            PIC  X(391).
+           03  SYS-4001-YOBI            PIC  X(387).
       *√ºÀˆ£…£ƒ
            03  SYS-4001-TERMID          PIC  X(16).
       *•™•⁄°º•Ï°º•ø£…£ƒ
