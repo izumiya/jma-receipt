@@ -74,6 +74,8 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.04    NACL-門脇    15/09/16  自賠責（健保準拠）の点数単価
+      *                                     入外別対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -583,16 +585,26 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                       ELSE
                           MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
                       END-IF
-                      IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                      IF     SYS-4001-SYUTENTANKA2-X =  SPACE
+                        IF   SYS-4001-SYUTENTANKA-X  =  SPACE
                           MOVE ZERO              TO    WRK-SYUTENTANKA
-                      ELSE
+                        ELSE
                           MOVE SYS-4001-SYUTENTANKA
                                                  TO    WRK-SYUTENTANKA
-                      END-IF
-                      IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        END-IF
                       ELSE
+                          MOVE SYS-4001-SYUTENTANKA2
+                                                 TO    WRK-SYUTENTANKA
+                      END-IF
+                      IF     SYS-4001-YKZTENTANKA2-X =  SPACE
+                        IF   SYS-4001-YKZTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        ELSE
                           MOVE SYS-4001-YKZTENTANKA
+                                                 TO    WRK-YKZTENTANKA
+                        END-IF
+                      ELSE
+                          MOVE SYS-4001-YKZTENTANKA2
                                                  TO    WRK-YKZTENTANKA
                       END-IF
                   END-IF
@@ -1870,16 +1882,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ELSE
                           MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
                       END-IF
-                      IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                      IF     SYS-4001-SYUTENTANKA2-X =  SPACE
+                        IF   SYS-4001-SYUTENTANKA-X  =  SPACE
                           MOVE ZERO              TO    WRK-SYUTENTANKA
-                      ELSE
+                        ELSE
                           MOVE SYS-4001-SYUTENTANKA
                                                  TO    WRK-SYUTENTANKA
-                      END-IF
-                      IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        END-IF
                       ELSE
+                          MOVE SYS-4001-SYUTENTANKA2
+                                                 TO    WRK-SYUTENTANKA
+                      END-IF
+                      IF     SYS-4001-YKZTENTANKA2-X =  SPACE
+                        IF   SYS-4001-YKZTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        ELSE
                           MOVE SYS-4001-YKZTENTANKA
+                                                 TO    WRK-YKZTENTANKA
+                        END-IF
+                      ELSE
+                          MOVE SYS-4001-YKZTENTANKA2
                                                  TO    WRK-YKZTENTANKA
                       END-IF
                     END-IF
@@ -2083,16 +2105,26 @@ grpsys         MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
                       ELSE
                           MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
                       END-IF
-                      IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                      IF     SYS-4001-SYUTENTANKA2-X =  SPACE
+                        IF   SYS-4001-SYUTENTANKA-X  =  SPACE
                           MOVE ZERO              TO    WRK-SYUTENTANKA
-                      ELSE
+                        ELSE
                           MOVE SYS-4001-SYUTENTANKA
                                                  TO    WRK-SYUTENTANKA
-                      END-IF
-                      IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        END-IF
                       ELSE
+                          MOVE SYS-4001-SYUTENTANKA2
+                                                 TO    WRK-SYUTENTANKA
+                      END-IF
+                      IF     SYS-4001-YKZTENTANKA2-X =  SPACE
+                        IF   SYS-4001-YKZTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                        ELSE
                           MOVE SYS-4001-YKZTENTANKA
+                                                 TO    WRK-YKZTENTANKA
+                        END-IF
+                      ELSE
+                          MOVE SYS-4001-YKZTENTANKA2
                                                  TO    WRK-YKZTENTANKA
                       END-IF
                     END-IF

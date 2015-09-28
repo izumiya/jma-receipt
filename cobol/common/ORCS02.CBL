@@ -416,6 +416,9 @@
       *  04.07.37    NACL-門脇    15/08/31  長期併用時の特別計算の関係で、
       *                                     千葉県の前期高齢（１割）の
       *                                     長期の一部負担金は１割計算で行う
+      *
+      *  04.08.01    NACL-門脇    15/09/16  自賠責（健保準拠）の点数単価
+      *                                     入外別対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1906,16 +1909,26 @@
                    MOVE   SYS-4001-SKJKBN   TO    WK-4001-SKJKBN
                    MOVE   SYS-4001-TAXKBN-KZI
                                             TO    WK-4001-TAXKBN-KZI
-                   IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                   IF     SYS-4001-SYUTENTANKA2-X =  SPACE
+                     IF   SYS-4001-SYUTENTANKA-X  =  SPACE
                         MOVE  ZERO          TO    WK-4001-SYUTENTANKA
-                   ELSE
+                     ELSE
                         MOVE  SYS-4001-SYUTENTANKA
                                             TO    WK-4001-SYUTENTANKA
-                   END-IF
-                   IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                        MOVE  ZERO          TO    WK-4001-YKZTENTANKA
+                     END-IF
                    ELSE
+                        MOVE  SYS-4001-SYUTENTANKA2
+                                            TO    WK-4001-SYUTENTANKA
+                   END-IF
+                   IF     SYS-4001-YKZTENTANKA2-X =  SPACE
+                     IF   SYS-4001-YKZTENTANKA-X  =  SPACE
+                        MOVE  ZERO          TO    WK-4001-YKZTENTANKA
+                     ELSE
                         MOVE  SYS-4001-YKZTENTANKA
+                                            TO    WK-4001-YKZTENTANKA
+                     END-IF
+                   ELSE
+                        MOVE  SYS-4001-YKZTENTANKA2
                                             TO    WK-4001-YKZTENTANKA
                    END-IF
                    IF     SYS-4001-KOMUTENTANKA-X =  SPACE
