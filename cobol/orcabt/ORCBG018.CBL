@@ -652,7 +652,8 @@
                        PERFORM 900-CHKSND-KEY6-SEL-SEC
       *電話でのお問い合わせ４月１日−チェックマスタ経過措置薬剤更新
       *での不具合データ修復対応
-                       IF    ( TCHKSND-UTAGAIKBN   =   SPACE )
+                       IF    ( FLG-TCHKSND         =   ZERO )
+                        AND  ( TCHKSND-UTAGAIKBN   =   SPACE )
                            PERFORM 200111-CHKSND-SRYCD-EDIT-SEC
                            MOVE    "1"     TO  WRK-MSTKBN
                            MOVE    "0"     TO  WRK-PROCKBN
