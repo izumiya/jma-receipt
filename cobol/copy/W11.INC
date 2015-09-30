@@ -105,6 +105,7 @@
                         08  W11-ORCACSTNM      PIC X(20).
                       07  W11-ORCACSTCHK-G     OCCURS   12.
                         08  W11-ORCACSTCHK     PIC X.
+                      07  W11-JIHI-UCHIWAKE    PIC X(20).
                     06  W11-N0101-STATE        PIC S9(9)   BINARY.
                     06  W11-FIXED4.
                       07  W11-DSPNAME-N-G      OCCURS  20.

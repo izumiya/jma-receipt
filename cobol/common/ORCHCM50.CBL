@@ -101,6 +101,12 @@
            03  KEY-NYUGAIKBN       PIC X(01).
            03  KEY-SRYYMD          PIC X(08).
       *
+      *    プログラムオプション
+       01  PO-AREA.
+           03  PO-IN               PIC X(25).
+           03  PO-OT               PIC X(100).
+           03  PO-SHADE            PIC X(01).
+      *
        01  CONST-AREA.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE   69.
       *
@@ -130,6 +136,9 @@
       *
       *    ファイル削除パラメタ
            COPY    "CPORCSFDEL.INC".
+      *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -189,6 +198,7 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  ORCHCM50-OT-AREA
            INITIALIZE                  KEY-AREA
+           INITIALIZE                  PO-AREA
       *
       *    医療機関情報−基本情報読み込み
            MOVE    "1001"          TO  WRK-KANRICD
@@ -223,10 +233,48 @@
            OPEN    OUTPUT  HCM50SRY-FILE
            CLOSE   HCM50SRY-FILE
       *
+           PERFORM 1001-PROGRAM-OPTION-SEC
+      *
            .
        100-INIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプション編集処理
+      *****************************************************************
+       1001-PROGRAM-OPTION-SEC     SECTION.
+      *
+           MOVE    "1"                 TO  PO-SHADE
+      *
+           MOVE    "SHADE"             TO  PO-IN
+           PERFORM 10011-ORCSPRGOPTION-SEC
+           IF    ( PO-OT  =   "0" OR "1" )
+               MOVE    PO-OT           TO  PO-SHADE
+           END-IF
+      *
+           .
+       1001-PROGRAM-OPTION-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプション編集処理
+      *****************************************************************
+       10011-ORCSPRGOPTION-SEC     SECTION.
+      *
+           MOVE    SPACE              TO  PO-OT
+      *
+            INITIALIZE                     ORCSPRGOPTIONAREA
+            MOVE    "ORCHCM50"         TO  ORCSPRGOPTION-PRGID
+      *
+            MOVE    PO-IN              TO  ORCSPRGOPTION-IN-DATA
+            CALL    "ORCSPRGOPTION"    USING
+                                       SPA-AREA
+                                       ORCSPRGOPTIONAREA
+            MOVE    ORCSPRGOPTION-OT-PARA
+                                       TO  PO-OT
+      *
+           .
+       10011-ORCSPRGOPTION-EXT.
+           EXIT.
       *****************************************************************
       *    主処理
       *****************************************************************
@@ -256,6 +304,8 @@
                    END-PERFORM
       *
                    PERFORM 2001-LASTMES-SEC
+      *
+                   PERFORM 2001-LAYLER-OPTION-SEC
       *
                    PERFORM 2001-PRINT-SEC
                END-PERFORM
@@ -423,6 +473,22 @@
       *
            .
        2001-LASTMES-EXT.
+           EXIT.
+      *****************************************************************
+      *    レイヤーオプション編集処理
+      *****************************************************************
+       2001-LAYLER-OPTION-SEC          SECTION.
+      *
+           IF    ( PO-SHADE            =   ZERO )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L SHADE "        DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCM50-LOPTION
+               END-STRING
+           END-IF
+      *
+           .
+       2001-LAYLER-OPTION-EXT.
            EXIT.
       *****************************************************************
       *    帳票出力処理

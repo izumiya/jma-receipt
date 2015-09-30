@@ -352,6 +352,9 @@ W11 {
             ORCACSTCHK12 {
               isactive bool;
             };
+            JIHI_UCHIWAKE {
+              textdata varchar(20);
+            };
           };
           N0101 {
             state int;

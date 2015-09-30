@@ -1354,6 +1354,8 @@
       **************************************************************
        310-SPA-SET-SEC                  SECTION.
       *
+           INITIALIZE                   SPA-S01KYOUTU
+      *
            PERFORM 311-SPA-SET-SEC
       *
            .
@@ -1366,7 +1368,7 @@
        311-SPA-SET-SEC                  SECTION.
       *
            INITIALIZE                   SPA-S02
-                                        SPA-S01KYOUTU
+                                        SPA-S01KYOUTU-AREA
       *
            INITIALIZE                      SYS-1039-REC
            MOVE    "1039"              TO  SYS-1039-KANRICD
@@ -2824,7 +2826,7 @@
            MOVE    SPA-GMN-TDENPNUM(SPA-GMN-SELBAN)  TO
                                        SPA-S01-DENPNUM
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
            MOVE    "09"                TO  SPA-S01-SYORINO
       *
            MOVE    "S03"           TO  SPA-NAI-GYOUMUID
@@ -2971,7 +2973,7 @@
       *
            IF    ( SPA-ERRCD           =   SPACE )
       *
-               INITIALIZE                  SPA-S01KYOUTU
+               INITIALIZE                  SPA-S01KYOUTU-AREA
                PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
       *        印刷制御情報取得サブ
@@ -4855,7 +4857,7 @@
       *
            MOVE    SPA-S01KYOUTU       TO  TSPA-S01KYOUTU
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
            INITIALIZE                      SSUB03-AREA
@@ -5202,7 +5204,7 @@
            MOVE    SPA-GMN-KANANAME    TO  WRK-SPA-KANANAME
       *
            INITIALIZE                  SPA-TUKI-PARA-G
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
            CALL    "ORCGSSUB01"        USING
@@ -5352,7 +5354,7 @@
                                    TO  SPA-TUKI-SRYYM
                END-IF
       *
-               INITIALIZE              SPA-S01KYOUTU
+               INITIALIZE              SPA-S01KYOUTU-AREA
       *
                PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
@@ -5404,7 +5406,7 @@
                                TO  SPA-TUKI-SRYYM
            END-IF
       *
-           INITIALIZE              SPA-S01KYOUTU
+           INITIALIZE              SPA-S01KYOUTU-AREA
       *
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
            MOVE    SPA-TUKI-SRYYM
@@ -5493,7 +5495,7 @@
            MOVE    SPA-GMN-KANANAME    TO  WRK-SPA-KANANAME
            MOVE    SPA-GMN-NAME        TO  WRK-SPA-NAME
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
            CALL    "ORCGSSUB01"        USING
@@ -5763,7 +5765,7 @@
                                        TO  SPA-PTID
                        MOVE    SPA-GMN-PTNUM
                                        TO  SPA-PTNUM
-                       INITIALIZE              SPA-S01KYOUTU
+                       INITIALIZE              SPA-S01KYOUTU-AREA
                        PERFORM 4901-SPAKYOTUKEY-SET-SEC
                        MOVE    "2"     TO  SPA-S08-NYUGAIKBN
                        MOVE    SPA-GMN-TDENPNUM (SPA-GMN-SELBAN) 
@@ -6519,7 +6521,7 @@
                GO  TO  460-IKKATU-NYUKIN-EXT
            END-IF
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
       *
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
@@ -7024,7 +7026,7 @@
       *************************************************************
        4101-TOROKU-SEC                 SECTION.
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
                                        TSMEI-REC
       *
            MOVE    SPA-NAI-SYORINO TO  SPA-S01-SYORINO
@@ -8648,7 +8650,7 @@
                GO  TO  500-SHIHARAI-EXT
            END-IF
       *
-           INITIALIZE                  SPA-S01KYOUTU
+           INITIALIZE                  SPA-S01KYOUTU-AREA
       *
            PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
@@ -9056,7 +9058,7 @@
                MOVE    SPA-GMN-NAME    TO  WRK-SPA-NAME
                MOVE    SPA-GMN-KANANAME TO WRK-SPA-KANANAME
       *
-               INITIALIZE                  SPA-S01KYOUTU
+               INITIALIZE                  SPA-S01KYOUTU-AREA
                PERFORM 4901-SPAKYOTUKEY-SET-SEC
       *
                CALL    "ORCGSSUB01"    USING

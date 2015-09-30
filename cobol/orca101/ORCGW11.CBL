@@ -3478,6 +3478,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-ORGPGNM09N-MAX
                                        TO  W11-ORCAORGNM-N09-COUNT
       *
+           MOVE    "ORCHCM50"          TO  W11-JIHI-UCHIWAKE
+      *
            PERFORM VARYING     IDZ2     FROM    1   BY  1
                    UNTIL       IDZ2     >       SPA-NPGNM-MAX
                MOVE    SPA-GMN-TCSTPGNM-N  (IDZ2)

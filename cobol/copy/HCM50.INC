@@ -47,3 +47,5 @@
                         PIC X(60).
             02  HCM50-IRYOADRS
                         PIC X(100).
+            02  HCM50-LOPTION
+                        PIC X(500).

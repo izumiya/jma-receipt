@@ -114,8 +114,10 @@
                05  SYS-1039-MISYUKIKANKBN       PIC X(01).
       *再計算該当者チェック
                05  SYS-1039-SAIKEISANSKYCHK     PIC X(01).
+      *支払証明書印刷画面自費内訳明細書
+               05  SYS-1039-S04JIHIPRTKBN       PIC X(01).
       *予備
-               05  SYS-1039-YOBI                PIC  X(423).
+               05  SYS-1039-YOBI                PIC  X(422).
       *端末ＩＤ
            03  SYS-1039-TERMID          PIC  X(16).
       *オペーレータＩＤ

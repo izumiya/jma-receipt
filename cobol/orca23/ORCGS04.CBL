@@ -362,7 +362,11 @@
            WHEN    "CLICKED"   ALSO    "B01"
                INITIALIZE              SPA-S01-SHIHARAI-PARA
                MOVE    SPACE       TO  SPA-S01-SHR-ORDER
+               PERFORM 4101-GMN-SPA-SET-SEC
                PERFORM 210-BACK
+           WHEN    "CLICKED"   ALSO    "B02"
+               INITIALIZE              SPA-S04-AREA
+               PERFORM 310-SPASET-SEC
       *    プレビュー
            WHEN    "CLICKED"   ALSO    "B10"
                PERFORM 410-PRINT-MAE-CHK-SEC
@@ -496,6 +500,22 @@
       *****************************************************************
        210-BACK                    SECTION.
       *
+           INITIALIZE                      SPA-S04-AREA
+           MOVE    "1"                 TO  SPA-S04-SAVED
+      *
+           PERFORM 3101-SPASET-SEC
+           MOVE    SPACE               TO  SPA-ERRCD
+           MOVE    SPA-GMN-SIHARAIKBN  TO  SPA-S04-SIHARAIKBN
+           MOVE    SPA-GMN-NYUGAIKBN   TO  SPA-S04-NYUGAIKBN
+           MOVE    SPA-GMN-SRYKBN      TO  SPA-S04-SRYKBN
+           MOVE    SPA-NAI-STRSRYYMD   TO  SPA-S04-STRSRYYMD
+           MOVE    SPA-NAI-ENDSRYYMD   TO  SPA-S04-ENDSRYYMD
+           MOVE    SPA-GMN-KIKANKBN    TO  SPA-S04-KIKANKBN
+           MOVE    SPA-GMN-DSPKBN      TO  SPA-S04-DSPKBN
+           MOVE    SPA-GMN-SUMKBN      TO  SPA-S04-SUMKBN
+           MOVE    SPA-GMN-SYORIKBN    TO  SPA-S04-SYORIKBN
+           MOVE    SPA-GMN-JIHIKBN     TO  SPA-S04-JIHIKBN
+      *
            MOVE    "B01"           TO  MCP-WIDGET
       *
            MOVE    "S02"           TO  SPA-SAKIPG
@@ -583,18 +603,50 @@
                INITIALIZE                  SYS-1039-REC
            END-IF
       *
-           MOVE    SYS-1039-S04SHIHARAIKBN TO  SPA-GMN-SIHARAIKBN
-           MOVE    SYS-1039-S04NYUGAIKBN   TO  SPA-GMN-NYUGAIKBN
-           MOVE    SYS-1039-S04SRYKBN      TO  SPA-GMN-SRYKBN
-           MOVE    SYS-1039-S04KIKANKBN    TO  SPA-GMN-KIKANKBN
-           MOVE    SYS-1039-S04DSPKBN      TO  SPA-GMN-DSPKBN
-           MOVE    SYS-1039-S04SUMKBN      TO  SPA-GMN-SUMKBN
-           MOVE    SYS-1039-S04SYORIKBN    TO  SPA-GMN-SYORIKBN
+           IF    ( SPA-S04-SAVED       =   "1" )
+               MOVE    SPA-S04-SIHARAIKBN  TO  SPA-GMN-SIHARAIKBN
+               MOVE    SPA-S04-NYUGAIKBN   TO  SPA-GMN-NYUGAIKBN
+               MOVE    SPA-S04-SRYKBN      TO  SPA-GMN-SRYKBN
+               MOVE    SPA-S04-STRSRYYMD   TO  SPA-GMN-STRSRYYMD
+               MOVE    SPA-S04-ENDSRYYMD   TO  SPA-GMN-ENDSRYYMD
+               MOVE    SPA-S04-KIKANKBN    TO  SPA-GMN-KIKANKBN
+               MOVE    SPA-S04-DSPKBN      TO  SPA-GMN-DSPKBN
+               MOVE    SPA-S04-SUMKBN      TO  SPA-GMN-SUMKBN
+               MOVE    SPA-S04-SYORIKBN    TO  SPA-GMN-SYORIKBN
+               MOVE    SPA-S04-JIHIKBN     TO  SPA-GMN-JIHIKBN
+
+           ELSE
+               MOVE    SYS-1039-S04SHIHARAIKBN TO  SPA-GMN-SIHARAIKBN
+               MOVE    SYS-1039-S04NYUGAIKBN   TO  SPA-GMN-NYUGAIKBN
+               MOVE    SYS-1039-S04SRYKBN      TO  SPA-GMN-SRYKBN
+               MOVE    SYS-1039-S04KIKANKBN    TO  SPA-GMN-KIKANKBN
+               MOVE    SYS-1039-S04DSPKBN      TO  SPA-GMN-DSPKBN
+               MOVE    SYS-1039-S04SUMKBN      TO  SPA-GMN-SUMKBN
+               MOVE    SYS-1039-S04SYORIKBN    TO  SPA-GMN-SYORIKBN
+               MOVE    SYS-1039-S04JIHIPRTKBN  TO  SPA-GMN-JIHIKBN
+           END-IF
+      *
+           PERFORM 3101-SPASET-SEC
+      *
+           MOVE    1               TO  SPA-GMN-CUR
+      *
+           .
+       310-SPASET-EXT.
+           EXIT.
+      *
+      *************************************************************
+      *    画面編集処理
+      *************************************************************
+       3101-SPASET-SEC                     SECTION.
       *
            PERFORM 4001-SIHARAIKBN-SEC
            PERFORM 4001-NYUGAIKBN-SEC
            PERFORM 4001-SRYKBN-SEC
-           PERFORM 4002-SRYKBN-SET-SEC
+      *
+           IF    ( SPA-S04-SAVED       =   SPACE )
+               PERFORM 4002-SRYKBN-SET-SEC
+           END-IF
+      *
            PERFORM 4001-STRSRYYMD-SEC
            PERFORM 4001-ENDSRYYMD-SEC
            PERFORM 4001-KIKANKBN-SEC
@@ -603,12 +655,9 @@
            PERFORM 4001-SYORIKBN-SEC
            PERFORM 4001-JIHIKBN-SEC
       *
-           MOVE    1               TO  SPA-GMN-CUR
-      *
            .
-       310-SPASET-EXT.
+       3101-SPASET-EXT.
            EXIT.
-      *
       *************************************************************
       *    コンボ初期処理
       *************************************************************
