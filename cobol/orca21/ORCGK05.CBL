@@ -6413,6 +6413,8 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMCNDATE-YMD        TO  ICD-UPYMD
            MOVE    SMCNDATE-HMS        TO  ICD-UPHMS
       *
+           MOVE    SPA-OPID            TO  ICD-OPID
+      *
            MOVE    INPUTCD-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_inputcd"       TO  MCP-TABLE
@@ -6529,6 +6531,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-YMD        TO  ISET-CREYMD
                MOVE    SMCNDATE-YMD        TO  ISET-UPYMD
                MOVE    SMCNDATE-HMS        TO  ISET-UPHMS
+      *
+               MOVE    SPA-OPID            TO  ISET-OPID
       *
                MOVE    INPUTSET-REC        TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
