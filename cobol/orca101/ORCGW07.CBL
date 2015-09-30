@@ -852,6 +852,11 @@
                            11  SPA-GMN-S04SYORIKBN        PIC X(01).
                            11  SPA-GMN-S04SYORIKBN-F1     PIC X(01).
                            11  SPA-GMN-S04SYORIKBNMEI     PIC X(16).
+      *                自費内訳明細書
+                       09  SPA-GMN-S04JIHIPRTKBN-G.
+                           11  SPA-GMN-S04JIHIPRTKBN        PIC X(01).
+                           11  SPA-GMN-S04JIHIPRTKBN-F1     PIC X(01).
+                           11  SPA-GMN-S04JIHIPRTKBNMEI     PIC X(22).
       *                一括入金画面請求書兼領収書発行
                        09  SPA-GMN-S06SKYPRT-G.
                            11  SPA-GMN-S06SKYPRT           PIC X(01).
@@ -1093,6 +1098,12 @@
                                13  SPA-GMN-MISYUKIKANKBNL PIC X(01).
                                13  SPA-GMN-MISYUKIKANKBN-F1L PIC X(01).
                                13  SPA-GMN-MISYUKIKANKBNMEIL PIC X(48).
+                       09  SPA-GMN-S04JIHIPRTKBNLST-G.
+                           11  SPA-GMN-S04JIHIPRTKBN-MAX      PIC 9(03).
+                           11  SPA-GMN-S04JIHIPRTKBNLST       OCCURS  3.
+                               13  SPA-GMN-S04JIHIPRTKBNL     PIC X(01).
+                               13  SPA-GMN-S04JIHIPRTKBN-F1L  PIC X(01).
+                               13  SPA-GMN-S04JIHIPRTKBNMEIL  PIC X(22).
                    07  SPA-GMN-PAGE5-AREA.
       *                病名機能情報
                        09  SPA-GMN-MSG1-DSPKBN-G.
@@ -1737,6 +1748,11 @@
            MOVE    "1 支払額に含める"      TO  SPA-GMN-S04SYORILST(1)
            MOVE    "2 支払額に含めない"    TO  SPA-GMN-S04SYORILST(2)
            MOVE    2                       TO  SPA-GMN-S04SYORI-MAX
+      *
+           MOVE    "0 発行しない"        TO  SPA-GMN-S04JIHIPRTKBNLST(1)
+           MOVE    "1 日別明細書"        TO  SPA-GMN-S04JIHIPRTKBNLST(2)
+           MOVE    "2 月別明細書"        TO  SPA-GMN-S04JIHIPRTKBNLST(3)
+           MOVE    3                     TO  SPA-GMN-S04JIHIPRTKBN-MAX
       *
            MOVE    "0 標準（行削除する）"
                                        TO  SPA-GMN-SURYOZERO-LIST(1)
@@ -4077,6 +4093,9 @@
       *    支払証明書印刷画面期間終了後の支払い
            MOVE    SYS-1039-S04SYORIKBN TO SPA-GMN-S04SYORIKBN
            PERFORM 4109-S04SYORIKBN-CHK-SEC
+      *    支払証明書印刷自費内訳明細書
+           MOVE    SYS-1039-S04JIHIPRTKBN TO SPA-GMN-S04JIHIPRTKBN
+           PERFORM 4109-S04JIHIPRTKBN-CHK-SEC
       *
            MOVE    49                 TO  SPA-GMN-CUR
       *
@@ -5333,6 +5352,7 @@
            MOVE    W07-S04DSPKBN       TO  SPA-GMN-S04DSPKBN-G
            MOVE    W07-S04SUMKBN       TO  SPA-GMN-S04SUMKBN-G
            MOVE    W07-S04SYORIKBN     TO  SPA-GMN-S04SYORIKBN-G
+           MOVE    W07-S04JIHIPRTKBN   TO  SPA-GMN-S04JIHIPRTKBN-G
            MOVE    W07-S06SKYPRT       TO  SPA-GMN-S06SKYPRT-G
            MOVE    W07-S06SKYSUM       TO  SPA-GMN-S06SKYSUM-G
            MOVE    W07-S02SKYSAI       TO  SPA-GMN-S02SKYSAI-G
@@ -5770,6 +5790,10 @@
       *            支払証明書印刷画面期間終了後の支払いチェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4109-S04SYORIKBN-CHK-SEC
+                   END-IF
+      *            支払証明書印刷画面自費内訳明細書チェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4109-S04JIHIPRTKBN-CHK-SEC
                    END-IF
       *            入金管理区分チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -8845,12 +8869,16 @@
                                        TO  SPA-GMN-S04SUMKBN-G
                    MOVE    SPA-GMN-S04SYORILST (1)
                                        TO  SPA-GMN-S04SYORIKBN-G
+                   MOVE    SPA-GMN-S04JIHIPRTKBNLST(1)
+                                       TO  SPA-GMN-S04JIHIPRTKBN-G
                END-IF
            ELSE
                MOVE    SPACE           TO  SPA-GMN-S04SYORIKBN-G
                MOVE    SPACE           TO  SPA-GMN-S04SUMKBN-G
                MOVE    SPA-GMN-S04DSPLST(2)
                                        TO  SPA-GMN-S04DSPKBN-G
+               MOVE    SPA-GMN-S04JIHIPRTKBNLST(1)
+                                       TO  SPA-GMN-S04JIHIPRTKBN-G
            END-IF
       *
            .
@@ -8931,6 +8959,32 @@
       *
            .
        4109-S04SYORIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    支払証明書印刷画面自費内訳明細書チェック
+      *****************************************************************
+       4109-S04JIHIPRTKBN-CHK-SEC     SECTION.
+      *
+           IF    ( SPA-GMN-S04KIKANKBN =   "1" )
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL     ( IDX   > SPA-GMN-S04JIHIPRTKBN-MAX )
+                        OR       ( FLG-OK  =   1 )
+                   IF    ( SPA-GMN-S04JIHIPRTKBN
+                                       =   SPA-GMN-S04JIHIPRTKBNL (IDX))
+                       MOVE    SPA-GMN-S04JIHIPRTKBNLST (IDX)
+                                       TO  SPA-GMN-S04JIHIPRTKBN-G
+                       MOVE    1       TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF    ( FLG-OK              =   ZERO )
+                   MOVE    SPA-GMN-S04JIHIPRTKBNLST (1)
+                                       TO  SPA-GMN-S04JIHIPRTKBN-G
+               END-IF
+           END-IF
+      *
+           .
+       4109-S04JIHIPRTKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    登録時刻チェック
@@ -10417,6 +10471,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-S04KIKANKBN     TO  SYS-1039-S04KIKANKBN
            MOVE    SPA-GMN-S04DSPKBN       TO  SYS-1039-S04DSPKBN
            MOVE    SPA-GMN-S04SYORIKBN     TO  SYS-1039-S04SYORIKBN
+           MOVE    SPA-GMN-S04JIHIPRTKBN   TO  SYS-1039-S04JIHIPRTKBN
            MOVE    SPA-GMN-S04SUMKBN    TO  SYS-1039-S04SUMKBN
       *
            MOVE    SYS-1039-REC            TO  SYSKANRI-REC
@@ -11735,6 +11790,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-S04SYORI-MAX
                                        TO  W07-S04SYORIKBN-COUNT
       *
+      *    支払証明書印刷画面自費内訳明細書
+           MOVE    SPA-GMN-S04JIHIPRTKBN-G TO  W07-S04JIHIPRTKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-S04JIHIPRTKBN-MAX
+               MOVE    SPA-GMN-S04JIHIPRTKBNLST (IDX)
+                                       TO  W07-S04JIHIPRTKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-S04JIHIPRTKBN-MAX
+                                       TO  W07-S04JIHIPRTKBN-COUNT
+      *
       *    支払証明書印刷画面期間終了後の支払い
            MOVE    SPA-GMN-S04SUMKBN-G TO  W07-S04SUMKBN
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -12048,6 +12113,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            W07-S04SUMKBN-ITEM-STATE
                                            W07-S04DSPKBN-STATE
                                            W07-S04DSPKBN-ITEM-STATE
+                                           W07-S04JIHIPRTKBN-STATE
+                                           W07-S04JIHIPRTKBN-ITEM-STATE
            IF    ( SPA-GMN-S04KIKANKBN =   "2" )
                MOVE    WIDGET-INSENSITIVE
                                        TO  W07-S04SYORIKBN-STATE
@@ -12056,6 +12123,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            W07-S04SUMKBN-ITEM-STATE
                                            W07-S04DSPKBN-STATE
                                            W07-S04DSPKBN-ITEM-STATE
+                                           W07-S04JIHIPRTKBN-STATE
+                                           W07-S04JIHIPRTKBN-ITEM-STATE
            END-IF
       *
            .
@@ -12896,6 +12965,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "MISYUKIKANKBN"  TO   MCP-WIDGET
                WHEN    433
                    MOVE  "SAIKEISANSKYCHK" TO   MCP-WIDGET
+               WHEN    434
+                   MOVE  "SAIKEISANSKYCHK" TO   MCP-WIDGET
       *病名・コメント情報
                WHEN    500
                    MOVE  "MSG1_DSPKBN"     TO   MCP-WIDGET
@@ -13290,6 +13361,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    42          TO  SPA-GMN-CUR
                    END-IF
                WHEN    "S04SYORIKBN"
+                   IF    ( SPA-GMN-S04KIKANKBN =   "1" )
+                       MOVE    434         TO  SPA-GMN-CUR
+                   ELSE
+                       MOVE    42          TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "S04JIHIPRTKBN"
                    MOVE    42              TO  SPA-GMN-CUR
                WHEN    "SYUNYKNKNRKBN"
                    MOVE    429             TO  SPA-GMN-CUR

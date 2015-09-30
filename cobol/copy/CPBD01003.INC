@@ -27,7 +27,7 @@
                05  BD01003-SRT-NYUGAIKBN           PIC X(01).
                05  BD01003-SRT-SRYKA               PIC X(02).
            03  BD01003-SEIKYU-AREA.
-               05  BD01003-SEIKYU-TOTAL            PIC S9(9)
+               05  BD01003-SEIKYU-TOTAL            PIC S9(10)
                                                    OCCURS  11.
                05  BD01003-SEIKYU-VAL.
                    07  BD01003-SEIKYU-OCC          OCCURS  11.
@@ -41,3 +41,7 @@
                05  BD01003-NYUKIN-TOTAL            PIC S9(10).
                05  BD01003-NYUKIN                  PIC S9(10)
                                                    OCCURS  13.
+           03  BD01003-TENSU-AREA.
+               05  BD01003-TENSU-TOTAL             PIC S9(10).
+               05  BD01003-TENSU                   PIC S9(10)
+                                                   OCCURS  15.

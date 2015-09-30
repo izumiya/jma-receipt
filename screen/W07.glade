@@ -378,10 +378,10 @@
       <widget>
         <class>GtkNotebook</class>
         <name>n1</name>
-        <x>16</x>
-        <y>48</y>
-        <width>976</width>
-        <height>660</height>
+        <x>8</x>
+        <y>36</y>
+        <width>992</width>
+        <height>672</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
@@ -6571,8 +6571,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUSTIME_HH</name>
-            <x>228</x>
-            <y>488</y>
+            <x>188</x>
+            <y>512</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6594,8 +6594,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUSTIME_MM</name>
-            <x>260</x>
-            <y>488</y>
+            <x>220</x>
+            <y>512</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6617,8 +6617,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST11_HH</name>
-            <x>228</x>
-            <y>512</y>
+            <x>188</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6640,8 +6640,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST11_MM</name>
-            <x>260</x>
-            <y>512</y>
+            <x>220</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6663,8 +6663,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED11_HH</name>
-            <x>316</x>
-            <y>512</y>
+            <x>276</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6686,8 +6686,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED11_MM</name>
-            <x>348</x>
-            <y>512</y>
+            <x>308</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6709,8 +6709,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST12_HH</name>
-            <x>228</x>
-            <y>536</y>
+            <x>188</x>
+            <y>560</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6732,8 +6732,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST12_MM</name>
-            <x>260</x>
-            <y>536</y>
+            <x>220</x>
+            <y>560</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6755,8 +6755,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED12_HH</name>
-            <x>316</x>
-            <y>536</y>
+            <x>276</x>
+            <y>560</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6778,8 +6778,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED12_MM</name>
-            <x>348</x>
-            <y>536</y>
+            <x>308</x>
+            <y>560</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6801,8 +6801,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST21_HH</name>
-            <x>228</x>
-            <y>560</y>
+            <x>188</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6824,8 +6824,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST21_MM</name>
-            <x>260</x>
-            <y>560</y>
+            <x>220</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6847,8 +6847,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED21_HH</name>
-            <x>316</x>
-            <y>560</y>
+            <x>276</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6870,8 +6870,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED21_MM</name>
-            <x>348</x>
-            <y>560</y>
+            <x>308</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6893,8 +6893,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST22_HH</name>
-            <x>228</x>
-            <y>584</y>
+            <x>188</x>
+            <y>608</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6916,8 +6916,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIST22_MM</name>
-            <x>260</x>
-            <y>584</y>
+            <x>220</x>
+            <y>608</y>
             <width>25</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6939,8 +6939,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED22_HH</name>
-            <x>316</x>
-            <y>584</y>
+            <x>276</x>
+            <y>608</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6962,8 +6962,8 @@
           <widget>
             <class>GtkNumberEntry</class>
             <name>SYUKARIED22_MM</name>
-            <x>348</x>
-            <y>584</y>
+            <x>308</x>
+            <y>608</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -6985,8 +6985,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY1</name>
-            <x>376</x>
-            <y>512</y>
+            <x>336</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7013,8 +7013,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY7</name>
-            <x>520</x>
-            <y>512</y>
+            <x>480</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7041,8 +7041,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY6</name>
-            <x>496</x>
-            <y>512</y>
+            <x>456</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7069,8 +7069,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY5</name>
-            <x>472</x>
-            <y>512</y>
+            <x>432</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7097,8 +7097,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY4</name>
-            <x>448</x>
-            <y>512</y>
+            <x>408</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7125,8 +7125,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY3</name>
-            <x>424</x>
-            <y>512</y>
+            <x>384</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7153,8 +7153,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI1DAY2</name>
-            <x>400</x>
-            <y>512</y>
+            <x>360</x>
+            <y>536</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7181,8 +7181,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY1</name>
-            <x>376</x>
-            <y>560</y>
+            <x>336</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7209,8 +7209,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY2</name>
-            <x>400</x>
-            <y>560</y>
+            <x>360</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7237,8 +7237,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY3</name>
-            <x>424</x>
-            <y>560</y>
+            <x>384</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7265,8 +7265,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY4</name>
-            <x>448</x>
-            <y>560</y>
+            <x>408</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7293,8 +7293,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY5</name>
-            <x>472</x>
-            <y>560</y>
+            <x>432</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7321,8 +7321,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY6</name>
-            <x>496</x>
-            <y>560</y>
+            <x>456</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7349,8 +7349,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>SYUKARI2DAY7</name>
-            <x>520</x>
-            <y>560</y>
+            <x>480</x>
+            <y>584</y>
             <width>24</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7377,7 +7377,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label311</name>
-            <x>632</x>
+            <x>592</x>
             <y>160</y>
             <width>152</width>
             <height>24</height>
@@ -7395,8 +7395,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S06SKYPRT_COMBO</name>
-            <x>228</x>
-            <y>412</y>
+            <x>188</x>
+            <y>436</y>
             <width>168</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7432,7 +7432,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label270</name>
-            <x>52</x>
+            <x>12</x>
             <y>160</y>
             <width>160</width>
             <height>24</height>
@@ -7450,8 +7450,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label321</name>
-            <x>288</x>
-            <y>584</y>
+            <x>248</x>
+            <y>608</y>
             <width>26</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7468,8 +7468,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label320</name>
-            <x>288</x>
-            <y>560</y>
+            <x>248</x>
+            <y>584</y>
             <width>26</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7486,8 +7486,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label302</name>
-            <x>252</x>
-            <y>584</y>
+            <x>212</x>
+            <y>608</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7504,25 +7504,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label304</name>
-            <x>340</x>
-            <y>560</y>
-            <width>8</width>
-            <height>24</height>
-            <sensitive>True</sensitive>
-            <can_focus>False</can_focus>
-            <has_focus>False</has_focus>
-            <xalign>0.5</xalign>
-            <yalign>0.5</yalign>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <label>：</label>
-            <justify>GTK_JUSTIFY_LEFT</justify>
-            <wrap>False</wrap>
-          </widget>
-          <widget>
-            <class>GtkLabel</class>
-            <name>label319</name>
-            <x>340</x>
+            <x>300</x>
             <y>584</y>
             <width>8</width>
             <height>24</height>
@@ -7539,9 +7521,27 @@
           </widget>
           <widget>
             <class>GtkLabel</class>
+            <name>label319</name>
+            <x>300</x>
+            <y>608</y>
+            <width>8</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>：</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
             <name>label300</name>
-            <x>188</x>
-            <y>560</y>
+            <x>148</x>
+            <y>584</y>
             <width>40</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7558,8 +7558,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label301</name>
-            <x>252</x>
-            <y>560</y>
+            <x>212</x>
+            <y>584</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7576,8 +7576,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label297</name>
-            <x>252</x>
-            <y>536</y>
+            <x>212</x>
+            <y>560</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7594,8 +7594,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label298</name>
-            <x>288</x>
-            <y>536</y>
+            <x>248</x>
+            <y>560</y>
             <width>26</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7612,8 +7612,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label299</name>
-            <x>340</x>
-            <y>536</y>
+            <x>300</x>
+            <y>560</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7630,8 +7630,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label295</name>
-            <x>288</x>
-            <y>512</y>
+            <x>248</x>
+            <y>536</y>
             <width>26</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7648,8 +7648,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label296</name>
-            <x>340</x>
-            <y>512</y>
+            <x>300</x>
+            <y>536</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7666,8 +7666,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label293</name>
-            <x>188</x>
-            <y>512</y>
+            <x>148</x>
+            <y>536</y>
             <width>40</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7684,8 +7684,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label292</name>
-            <x>52</x>
-            <y>512</y>
+            <x>12</x>
+            <y>536</y>
             <width>160</width>
             <height>25</height>
             <sensitive>True</sensitive>
@@ -7702,7 +7702,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSRYPRTN_COMBO</name>
-            <x>572</x>
+            <x>532</x>
             <y>184</y>
             <width>168</width>
             <height>24</height>
@@ -7739,7 +7739,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label345</name>
-            <x>52</x>
+            <x>12</x>
             <y>288</y>
             <width>136</width>
             <height>24</height>
@@ -7757,7 +7757,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label344</name>
-            <x>52</x>
+            <x>12</x>
             <y>264</y>
             <width>172</width>
             <height>24</height>
@@ -7775,8 +7775,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label240</name>
-            <x>52</x>
-            <y>388</y>
+            <x>12</x>
+            <y>412</y>
             <width>150</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7793,8 +7793,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label273</name>
-            <x>52</x>
-            <y>364</y>
+            <x>12</x>
+            <y>388</y>
             <width>208</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7811,7 +7811,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSKYPRTN_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>184</y>
             <width>168</width>
             <height>24</height>
@@ -7848,7 +7848,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label310</name>
-            <x>404</x>
+            <x>364</x>
             <y>184</y>
             <width>168</width>
             <height>24</height>
@@ -7866,8 +7866,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label287</name>
-            <x>52</x>
-            <y>464</y>
+            <x>12</x>
+            <y>488</y>
             <width>160</width>
             <height>25</height>
             <sensitive>True</sensitive>
@@ -7884,7 +7884,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSKYPRTG_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>160</y>
             <width>168</width>
             <height>24</height>
@@ -7921,7 +7921,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04SHIHARAIKBN_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>288</y>
             <width>140</width>
             <height>24</height>
@@ -7958,7 +7958,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label355</name>
-            <x>52</x>
+            <x>12</x>
             <y>336</y>
             <width>216</width>
             <height>24</height>
@@ -7976,8 +7976,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label347</name>
-            <x>52</x>
-            <y>312</y>
+            <x>548</x>
+            <y>288</y>
             <width>92</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7994,9 +7994,9 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04SRYKBN_COMBO</name>
-            <x>228</x>
-            <y>312</y>
-            <width>92</width>
+            <x>644</x>
+            <y>288</y>
+            <width>100</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8031,7 +8031,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04DSPKBN_COMBO</name>
-            <x>720</x>
+            <x>440</x>
             <y>312</y>
             <width>180</width>
             <height>24</height>
@@ -8068,9 +8068,9 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04KIKANKBN_COMBO</name>
-            <x>472</x>
+            <x>188</x>
             <y>312</y>
-            <width>100</width>
+            <width>108</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8105,7 +8105,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label346</name>
-            <x>376</x>
+            <x>336</x>
             <y>288</y>
             <width>92</width>
             <height>24</height>
@@ -8123,7 +8123,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label349</name>
-            <x>376</x>
+            <x>12</x>
             <y>312</y>
             <width>92</width>
             <height>24</height>
@@ -8141,7 +8141,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04NYUGAIKBN_COMBO</name>
-            <x>472</x>
+            <x>440</x>
             <y>288</y>
             <width>100</width>
             <height>24</height>
@@ -8178,7 +8178,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label350</name>
-            <x>584</x>
+            <x>304</x>
             <y>312</y>
             <width>136</width>
             <height>24</height>
@@ -8196,7 +8196,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04SUMKBN_COMBO</name>
-            <x>272</x>
+            <x>220</x>
             <y>336</y>
             <width>180</width>
             <height>24</height>
@@ -8233,7 +8233,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S04SYORIKBN_COMBO</name>
-            <x>720</x>
+            <x>588</x>
             <y>336</y>
             <width>180</width>
             <height>24</height>
@@ -8270,7 +8270,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label348</name>
-            <x>544</x>
+            <x>408</x>
             <y>336</y>
             <width>176</width>
             <height>24</height>
@@ -8288,7 +8288,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label322</name>
-            <x>52</x>
+            <x>12</x>
             <y>16</y>
             <width>248</width>
             <height>24</height>
@@ -8306,7 +8306,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label1</name>
-            <x>52</x>
+            <x>12</x>
             <y>64</y>
             <width>176</width>
             <height>24</height>
@@ -8324,8 +8324,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label288</name>
-            <x>52</x>
-            <y>488</y>
+            <x>12</x>
+            <y>512</y>
             <width>160</width>
             <height>25</height>
             <sensitive>True</sensitive>
@@ -8342,8 +8342,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUNYKNKNRKBN_COMBO</name>
-            <x>228</x>
-            <y>388</y>
+            <x>188</x>
+            <y>412</y>
             <width>300</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8379,7 +8379,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label276</name>
-            <x>52</x>
+            <x>12</x>
             <y>184</y>
             <width>160</width>
             <height>24</height>
@@ -8397,7 +8397,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S03SKYMISYUPRT_COMBO</name>
-            <x>404</x>
+            <x>364</x>
             <y>160</y>
             <width>220</width>
             <height>24</height>
@@ -8434,7 +8434,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label360</name>
-            <x>52</x>
+            <x>12</x>
             <y>112</y>
             <width>136</width>
             <height>24</height>
@@ -8452,7 +8452,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label323</name>
-            <x>52</x>
+            <x>12</x>
             <y>40</y>
             <width>176</width>
             <height>24</height>
@@ -8470,7 +8470,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label362</name>
-            <x>52</x>
+            <x>12</x>
             <y>136</y>
             <width>176</width>
             <height>24</height>
@@ -8488,7 +8488,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label361</name>
-            <x>368</x>
+            <x>328</x>
             <y>136</y>
             <width>132</width>
             <height>24</height>
@@ -8506,7 +8506,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S02SKYMISYUPRT_COMBO</name>
-            <x>492</x>
+            <x>452</x>
             <y>40</y>
             <width>220</width>
             <height>24</height>
@@ -8543,7 +8543,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S02SORTKBN_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>112</y>
             <width>120</width>
             <height>24</height>
@@ -8580,7 +8580,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>IKTKEISANKBN_COMBO</name>
-            <x>500</x>
+            <x>460</x>
             <y>136</y>
             <width>336</width>
             <height>24</height>
@@ -8617,7 +8617,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>IKTSORTKBN_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>136</y>
             <width>120</width>
             <height>24</height>
@@ -8654,8 +8654,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label317</name>
-            <x>52</x>
-            <y>412</y>
+            <x>12</x>
+            <y>436</y>
             <width>145</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8672,8 +8672,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label318</name>
-            <x>52</x>
-            <y>436</y>
+            <x>12</x>
+            <y>460</y>
             <width>145</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8690,8 +8690,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>IKTSRYYMKBN_COMBO</name>
-            <x>532</x>
-            <y>388</y>
+            <x>492</x>
+            <y>412</y>
             <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8727,7 +8727,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SYUSRYPRTG_COMBO</name>
-            <x>786</x>
+            <x>746</x>
             <y>160</y>
             <width>168</width>
             <height>24</height>
@@ -8764,7 +8764,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S02SKYSAI_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>40</y>
             <width>256</width>
             <height>24</height>
@@ -8801,7 +8801,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>TUKIGRP_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>64</y>
             <width>256</width>
             <height>24</height>
@@ -8838,7 +8838,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>TUKISKYMISYUPRT_COMBO</name>
-            <x>492</x>
+            <x>452</x>
             <y>64</y>
             <width>220</width>
             <height>24</height>
@@ -8875,7 +8875,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>TUKISUM_COMBO</name>
-            <x>228</x>
+            <x>188</x>
             <y>88</y>
             <width>284</width>
             <height>24</height>
@@ -8912,8 +8912,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S06SKYSUM_COMBO</name>
-            <x>228</x>
-            <y>436</y>
+            <x>188</x>
+            <y>460</y>
             <width>300</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8949,8 +8949,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label289</name>
-            <x>252</x>
-            <y>488</y>
+            <x>212</x>
+            <y>512</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8967,8 +8967,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label294</name>
-            <x>252</x>
-            <y>512</y>
+            <x>212</x>
+            <y>536</y>
             <width>8</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -8985,8 +8985,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>MISYUKIKANKBN_COMBO</name>
-            <x>556</x>
-            <y>488</y>
+            <x>516</x>
+            <y>512</y>
             <width>344</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9024,8 +9024,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label375</name>
-            <x>556</x>
-            <y>464</y>
+            <x>516</x>
+            <y>488</y>
             <width>400</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9042,7 +9042,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label275</name>
-            <x>52</x>
+            <x>12</x>
             <y>212</y>
             <width>912</width>
             <height>48</height>
@@ -9061,7 +9061,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label9</name>
-            <x>368</x>
+            <x>328</x>
             <y>112</y>
             <width>200</width>
             <height>24</height>
@@ -9079,7 +9079,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SAIKEISANSKYCHK_COMBO</name>
-            <x>572</x>
+            <x>532</x>
             <y>112</y>
             <width>380</width>
             <height>24</height>
@@ -9111,6 +9111,61 @@
                 <handler>send_event</handler>
                 <data>ACTIVATE</data>
               </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label13</name>
+            <x>12</x>
+            <y>360</y>
+            <width>176</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>８：自費内訳明細書</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>S04JIHIPRTKBN_COMBO</name>
+            <x>188</x>
+            <y>360</y>
+            <width>168</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>S04JIHIPRTKBN</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text></text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+          <signal>
+            <name>changed</name>
+            <handler>entry_changed</handler>
+            <data>CHANGED</data>
+          </signal>
+          <signal>
+            <name>activate</name>
+            <handler>send_event</handler>
+            <data>ACTIVATE</data>
+          </signal>
             </widget>
           </widget>
         </widget>

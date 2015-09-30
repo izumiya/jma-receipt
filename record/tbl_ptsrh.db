@@ -25,6 +25,10 @@ tbl_ptsrh {
 	SQL				dbcode(15000),virtual;
 	dbescapestring			varchar(500),virtual;
 	KENSU			    number(8,0),virtual;
+	VTEXT				varchar(20000),virtual;
+	VSTR1				varchar(64),virtual;
+	VSTR2				varchar(64),virtual;
+	VSTR3				varchar(64),virtual;
 };
 
 path	all 	{
@@ -203,3 +207,9 @@ path	key3 	{
 	};
 };
 
+path	regexp_replace 	{
+	DBSELECT	{
+		DECLARE tbl_ptsrh_regexp_replace_csr CURSOR FOR
+		SELECT regexp_replace(:VTEXT,:VSTR1,:VSTR2,:VSTR3) as SQL;
+	};
+};

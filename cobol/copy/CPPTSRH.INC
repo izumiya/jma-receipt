@@ -91,5 +91,8 @@
            03  PTSRH-DBSTR        PIC X(500).
       *件数
            03  PTSRH-KENSU        PIC 9(08).
-
-
+      *テキスト（汎用）
+           03  PTSRH-VTEXT        PIC X(20000).
+      *文字列（汎用）
+           03  PTSRH-VSTR-G.
+               05  PTSRH-VSTR     PIC X(64) OCCURS 3.

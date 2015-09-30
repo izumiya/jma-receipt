@@ -614,6 +614,12 @@
                     06  W07-S04SYORIKBN-COUNT     PIC S9(9)   BINARY.
                     06  W07-S04SYORIKBN-ITEM      PIC X(18)   OCCURS  2.
                     06  W07-S04SYORIKBN-ITEM-STATE PIC S9(9)   BINARY.
+                  05  W07-S04-JIHIPRTKBN-COMBO.
+                    06  W07-S04JIHIPRTKBN           PIC X(24).
+                    06  W07-S04JIHIPRTKBN-STATE     PIC S9(9)   BINARY.
+                    06  W07-S04JIHIPRTKBN-COUNT     PIC S9(9)   BINARY.
+                    06  W07-S04JIHIPRTKBN-ITEM      PIC X(24) OCCURS  5.
+                    06  W07-S04JIHIPRTKBN-ITEM-STATE PIC S9(9)   BINARY.
                   05  W07-S06SKYPRT-COMBO.
                     06  W07-S06SKYPRT           PIC X(24).
                     06  W07-S06SKYPRT-COUNT   PIC S9(9)   BINARY.

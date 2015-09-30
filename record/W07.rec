@@ -810,6 +810,15 @@ W07 {
             item varchar(18)[2];
           state int;
         };
+        S04JIHIPRTKBN_COMBO {
+          S04JIHIPRTKBN {
+            textdata varchar(24);
+            state int;
+          };
+          count int;
+            item varchar(24)[5];
+          state int;
+        };
         S06SKYPRT_COMBO {
           S06SKYPRT {
             textdata varchar(24);
