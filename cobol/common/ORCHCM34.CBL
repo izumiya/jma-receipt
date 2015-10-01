@@ -854,21 +854,6 @@
            COPY    "CPHKNCOMBI.INC"    REPLACING   //COMB-//
                                        BY          //WKCOMB-//.
       *
-       01  TENTEKI-AREA.
-           03  TENTEKI-SRYCD       PIC  X(09).
-           03  TENTEKI-SURYO       PIC  9(05)V9(05).
-           03  TENTEKI-YUKOKETA    PIC  9(03).
-           03  TENTEKI-COM         PIC  X(200).
-           03  TENTEKI-ZAITEN      PIC  9(07).
-           03  TENTEKI-ZAIKAISU    PIC  9(03).
-           03  TENTEKI-OCC         OCCURS   31.
-               05  TENTEKI-DAY     PIC  9(03).
-           03  LNK-ORCSTEN3-SYU-MEISAISU      PIC  9(03).
-           03  LNK-ORCSTEN3-SYU-SRYCDTOTAL    PIC  9(14).
-           03  LNK-ORCSTEN3-SYU-SURYOUTOTAL   PIC  9(07)V9(05).
-           03  LNK-ORCSTEN3-SYU-RUIKEITOTAL   PIC  9(13)V9(05).
-           03  LNK-ORCSTEN3-SYU-COMCNT        PIC  9(03).
-      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -3631,8 +3616,6 @@
                                            WRK-TNSTEN
                                            WRK-KOKUJISKBKBN2
       *
-           OPEN    INPUT   HCM34SRY-FILE
-      *
            PERFORM 900-HCM34SRY-START-SEC
       *
            PERFORM UNTIL ( FLG-HCM34SRY    NOT =   ZERO )
@@ -3725,8 +3708,6 @@
               PERFORM 900-HCM34SRY-READ-SEC
       *
            END-PERFORM
-      *
-           CLOSE   HCM34SRY-FILE
       *
            IF    ( FLG-SRYSTATUS   =   ZERO )
                IF    ( ACCT-ZAITEN =   ZERO )
