@@ -138,6 +138,10 @@ fi
             echo "--- file name  [" ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE "=>" ${13}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
             cp  ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE ${13}${RECEFILE1}${3}.UKE
             chmod -R g+r ${13}${RECEFILE1}${3}.UKE
+
+            if ! [ -s ${13}${RECEFILE1}${3}.UKE ]; then
+              rm ${13}${RECEFILE1}${3}.UKE
+            fi
         fi
 
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20} >> $LOG_FILE

@@ -42,6 +42,9 @@
       *                                     患者番号を記録
       *  04.08.06    NACL-藤原    15/08/07  医療情報連携基盤のクライアン
       *                                     ト保存対応
+      *  04.08.07    NACL-伊藤    15.10.01  R1レコード編集
+      *                                     地域連携IDなしは対象とし、
+      *                                     同意なしは出力しない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -653,8 +656,9 @@
       *                指定日より後の退院日はスキップする
                                IF     (PTPUBLIC-AGREEMENT
                                                NOT =   "1")  OR
-                                      (PTPUBLIC-PATIENT-ID1
-                                                   =   SPACE)  OR
+      *H27.10 地域連携IDは未設定でも対象とする
+      **                              (PTPUBLIC-PATIENT-ID1
+      **                                           =   SPACE)  OR
                                      ((WRK-PARA-NYUGAIKBN
                                                    =   "1")  AND
                                       (WRK-PARA-PRTKBN
