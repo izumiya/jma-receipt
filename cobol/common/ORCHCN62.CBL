@@ -34,6 +34,7 @@
       * 04.08.00     NACL-Â¿¡¹Ç¼  13/07/XX  ¥Ñ¥½¥êÂÐ±þÂ¾
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/07/30  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
       *  04.08.01    NACL-¿¹ÏÆ    15/08/12  ½èÊý¤»¤óÈ÷¹ÍÍó¥³¥á¥ó¥ÈÉ½¼¨
+      *  04.08.02    NACL-¿¹ÏÆ    15/09/14  Ãí°Õ»ö¹à¡¦¸úÇ½¸ú²ÌÉ½¼¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -82,6 +83,9 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
+      *----(04.08.02)--ADD-START---
+           03  FLG-YAKUJYO         PIC 9(01).
+      *----(04.08.02)--ADD-END-----
       *
            03  FLG-KBN             PIC 9(01).
       *
@@ -153,7 +157,9 @@
                05  WRK-TANI        PIC X(12).
                05  WRK-KAISUU      PIC X(03).
       *
-           03  WRK-HENSYUDATA      PIC X(100).
+      *----(04.08.02)--UPD-START---
+           03  WRK-HENSYUDATA      PIC X(4000).
+      *----(04.08.02)--UPD-END-----
       *
            03  WRK-SSTKIJUNCD      PIC X(05).
            03  WRK-HENKBN-G.
@@ -229,8 +235,10 @@
                05  WRK-HOSPTEL     PIC X(15).
            03  WRK-LINE-SEN.
                05  FILLER          PIC X(54)   VALUE
-               "¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²".
-      *
+               "______________________________________________________".
+           03  WRK-LINE-SEN2.
+               05  FILLER          PIC X(54)   VALUE
+               "   ___________________________________________________".
       *
       *    ºÇÂç¹Ô¿ô
        01  MAX-LINE                PIC 9(03)   VALUE    68.
@@ -275,6 +283,9 @@
       *----(04.08.01)--ADD-START---
            03  PARA-BIKOU              PIC X(01).
       *----(04.08.01)--ADD-END-----
+      *----(04.08.02)--ADD-START---
+           03  PARA-KOUNOU             PIC X(01).
+      *----(04.08.02)--ADD-END-----
       ***  03  PARA-CSVKBN             PIC X(01).
       ***  03  PARA-CSVDIR             PIC X(256).
       *
@@ -312,6 +323,11 @@
       *    ÅÀ¿ôÉÕ²Ã¾ðÊó¥Þ¥¹¥¿
        01  TENSUPLUS-REC.
            COPY    "CPTENSUPLUS.INC".
+      *
+      *----(04.08.01)--ADD-START---
+      *    Ìô¾ð¥Þ¥¹¥¿
+           COPY    "CPYAKUJYO.INC".
+      *----(04.08.01)--ADD-END-----
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -454,6 +470,12 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-BIKOU
       *----(04.08.01)--ADD-END-----
+      *----(04.08.02)--ADD-START---
+      *    ¸úÇ½¸ú²Ì¡¦Ãí°Õ»ö¹àµ­ºÜ
+           MOVE    "KOUNOU"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-KOUNOU
+      *----(04.08.02)--ADD-END-----
       ***  CSV¥Õ¥¡¥¤¥ëºîÀ®
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
@@ -581,20 +603,31 @@
            PERFORM 210-HEAD-HENSYU-SEC
       *
       *    ¥Ç¡¼¥¿¤¬¤Ê¤¯¤Ê¤ë¤Þ¤Ç
+           MOVE    ZERO            TO  CNT-ZAI
            PERFORM VARYING IDX-ZAI     FROM    1   BY  1
                    UNTIL ( IDX-ZAI     >   ORCHCN62-ZAI-MAX  )
       *        Ä¢É¼£Â£Ï£Ä£Ù¾ðÊóÊÔ½¸½èÍý
                PERFORM 220-BODY-HENSYU-SEC
            END-PERFORM
       *
-           IF      IDX-ZAI             >   ZERO
-      *
-      *        Ä¢É¼£Æ£Ï£Ï£Ô¾ðÊóÊÔ½¸½èÍý
-               PERFORM 430-FOOT-SET-SEC
-      *
-      *        Ä¢É¼°õºþ½èÍý
-               PERFORM 400-PRT-WRITE-SEC
+      *    ¥Ç¡¼¥¿¤¬¤Ê¤±¤ì¤Ð½èÍýÈ´¤±¤ë
+           IF      CNT-ZAI         =   ZERO
+               GO  TO  200-MAIN-EXT
            END-IF
+      *
+      *    Ä¢É¼£Æ£Ï£Ï£Ô¾ðÊóÊÔ½¸½èÍý
+           PERFORM 430-FOOT-SET-SEC
+      *
+      *    Ä¢É¼°õºþ½èÍý
+           PERFORM 400-PRT-WRITE-SEC
+      *
+      *----(04.08.02)--ADD-START---
+      *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¤ÎÀßÄê¤¬¤¢¤ì¤Ð
+           IF      PARA-KOUNOU =   "1"
+      *        ¸úÇ½¸ú²Ì¡¦Ãí°Õ»ö¹à½èÍý
+               PERFORM 210-KOUNOU-MAIN-SEC
+           END-IF
+      *----(04.08.02)--ADD-END-----
       *
       *H24.9
       *    £Ñ£Ò°õºþ
@@ -608,6 +641,123 @@
        200-MAIN-EXT.
            EXIT.
       *
+      *----(04.08.02)--ADD-START---
+      *****************************************************************
+      *    ¸úÇ½¸ú²Ì¡¦Ãí°Õ»ö¹à½èÍý
+      *****************************************************************
+       210-KOUNOU-MAIN-SEC         SECTION.
+      *
+      *    Ä¢É¼£È£Å£Á£Ä¥»¥Ã¥È½èÍý
+           INITIALIZE                  HCM62
+           MOVE    ZERO            TO  CNT-LINE
+           PERFORM 410-HEAD-SET-SEC
+      *
+      *    ¥Ç¡¼¥¿¤¬¤Ê¤¯¤Ê¤ë¤Þ¤Ç
+           MOVE    ZERO            TO  CNT-ZAI
+           PERFORM VARYING IDX-ZAI     FROM    1   BY  1
+                   UNTIL ( IDX-ZAI     >   ORCHCN62-ZAI-MAX  )
+      *        Ä¢É¼¸úÇ½¸ú²Ì¡¦Ãí°Õ»ö¹à¾ðÊóÊÔ½¸½èÍý
+               PERFORM 220-KOUNOU-HENSYU-SEC
+           END-PERFORM
+      *
+      *    Ä¢É¼£Æ£Ï£Ï£Ô¾ðÊóÊÔ½¸½èÍý
+           PERFORM 430-FOOT-SET-SEC
+      *
+      *    Ä¢É¼°õºþ½èÍý
+           PERFORM 400-PRT-WRITE-SEC
+           .
+       210-KOUNOU-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼¸úÇ½¸ú²Ì¡¦Ãí°Õ»ö¹à¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       220-KOUNOU-HENSYU-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SOURYO
+      *
+           IF      ORCHCN62-SRYKBN(IDX-ZAI)    =   "98"
+               GO  TO  220-KOUNOU-HENSYU-EXT
+           END-IF
+      *
+           COMPUTE CNT-ZAI     =   CNT-ZAI     +   1
+      *
+           MOVE    ZERO            TO  CNT-SRY
+           PERFORM VARYING IDX-SRY     FROM    1   BY  1
+                   UNTIL ( IDX-SRY     >   50  )
+                   OR    ( ORCHCN62-SRYCD(IDX-ZAI IDX-SRY)  =   SPACE )
+      *        ÌÀºÙÊÔ½¸
+               PERFORM 230-KOUNOU-NAIYO-SEC
+           END-PERFORM
+      *
+      *    ºÞ¾ðÊó¤¬¤¢¤ì¤Ð½èÍý¤¹¤ë
+           IF      CNT-SRY         =   ZERO
+               GO  TO  220-KOUNOU-HENSYU-EXT
+           END-IF
+      *
+           MOVE    WRK-LINE-SEN    TO  HCM62-SEN(CNT-LINE)
+           .
+       220-KOUNOU-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÆâÍÆÊÔ½¸½èÍý
+      *****************************************************************
+       230-KOUNOU-NAIYO-SEC        SECTION.
+      *
+           MOVE    ORCHCN62-SRYCD(IDX-ZAI IDX-SRY)
+                                   TO  WRK-SRYCD
+      *    ÌôºÞ¤Î¤ßÊÔ½¸
+           IF      WRK-SRYCD(1:1)  NOT =   "6"
+               GO  TO  230-KOUNOU-NAIYO-EXT
+           END-IF
+      *    ÅÀ¿ô¸¡º÷
+           PERFORM 900-TENSU-READ-SEC
+      *    ÅÀ¿ô¤Ê¤±¤ì¤Ð½èÍýÈ´¤±¤ë
+           IF      FLG-TENSU       =   1
+               GO  TO  230-KOUNOU-NAIYO-EXT
+           END-IF
+      *
+      *    Ìô¾ð¥Þ¥¹¥¿¸¡º÷
+           PERFORM 900-YAKUJYO-READ-SEC
+      *
+           COMPUTE CNT-SRY     =   CNT-SRY     +   1
+      *
+      *    £±·ïÌÜ¤À¤±ÈÖ¹æÉ½¼¨
+           IF      CNT-SRY         =   1
+               MOVE    CNT-ZAI         TO  WRK-Z9
+               MOVE    WRK-Z9          TO  WRK-HENLINE(1:2)
+               MOVE    ")"             TO  WRK-HENLINE(3:1)
+           ELSE
+               MOVE    WRK-LINE-SEN2   TO  HCM62-SEN(CNT-LINE)
+           END-IF
+      *
+      *    ÌôºÞÌ¾ÊÔ½¸
+           MOVE    SPACE           TO  WRK-HENSYUDATA
+           MOVE    TNS-NAME        TO  WRK-HENSYUDATA
+           PERFORM 250-HENSYU-SYORI-SEC
+      *
+      *    ¸úÇ½ÊÔ½¸½èÍý
+           IF      YAKUJYO-EFFECT  NOT =   SPACE
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    "¡Ú¸úÇ½¸ú²Ì¡Û"  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    YAKUJYO-EFFECT  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+      *
+      *    Ãí°Õ»ö¹àÊÔ½¸½èÍý
+           IF      YAKUJYO-CAUTION NOT =   SPACE
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    "¡ÚÃí°Õ»ö¹à¡Û"  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    YAKUJYO-CAUTION TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+           .
+       230-KOUNOU-NAIYO-EXT.
+           EXIT.
+      *----(04.08.02)--ADD-END-----
       *****************************************************************
       *    Ä¢É¼£È£Å£Á£Ä¾ðÊóÊÔ½¸½èÍý
       *****************************************************************
@@ -660,6 +810,8 @@
                END-IF
            END-IF
       *----(04.08.01)--ADD-START---
+      *
+           COMPUTE CNT-ZAI     =   CNT-ZAI     +   1
       *
       *    ºÞ¾ðÊóÊÔ½¸ÎÎ°è¤Ë¥»¥Ã¥È
            INITIALIZE                  WRK-SRY-AREA
@@ -779,7 +931,7 @@
            IF      ORCHCN62-SRYKBN(IDX-ZAI)    NOT =   "98"
       *        £±·ïÌÜ¤À¤±ÈÖ¹æÉ½¼¨
                IF      CNT-SRY             =   1
-                   MOVE    IDX-ZAI         TO  WRK-Z9
+                   MOVE    CNT-ZAI         TO  WRK-Z9
                    MOVE    WRK-Z9          TO  WRK-HEN-CNT(1:2)
                    MOVE    ")"             TO  WRK-HEN-CNT(3:1)
       *            Ãí¼Í¤Ï¿ÇÎÅÌ¾¾ÎÊÔ½¸
@@ -1201,16 +1353,23 @@
            MOVE    1              TO  IDX-STR
            MOVE    4              TO  IDX-STR1
       *
+      *----(04.08.02)--UPD-START---
       *    ÊÔ½¸¥Ç¡¼¥¿¤¬¤Ê¤¯¤Ê¤ë¤Þ¤Ç·«¤êÊÖ¤¹
-           PERFORM UNTIL  (IDX-STR     >   100 )
+           PERFORM UNTIL  (IDX-STR     >   4000 )
+                   OR     (IDX-STR1    >   54 )
                    OR     (WRK-HENSYUDATA(IDX-STR:)    =   SPACE)
-               MOVE    WRK-HENSYUDATA(IDX-STR:2)
-                                   TO  WRK-HENLINE(IDX-STR1:2)
-               ADD     2               TO  IDX-STR
-               ADD     2               TO  IDX-STR1
+      *        ²þ¹Ô
+               IF      WRK-HENSYUDATA(IDX-STR:1)   =   X"0A"
+                   ADD     1               TO  IDX-STR
+               ELSE
+                   MOVE    WRK-HENSYUDATA(IDX-STR:2)
+                                       TO  WRK-HENLINE(IDX-STR1:2)
+                   ADD     2               TO  IDX-STR
+                   ADD     2               TO  IDX-STR1
+               END-IF
       *        ºÇÂç»ú¤Ç²þ¹Ô
                IF         (IDX-STR1        >=  54)
-                   OR    ((IDX-STR         <=  100)
+                   OR    ((IDX-STR         <=  4000)
                    AND    (WRK-HENSYUDATA(IDX-STR:) =   SPACE))
                    PERFORM 250-PAGE-CHK-SEC
                    MOVE    WRK-HENLINE     TO  HCM62-NAIYO1(CNT-LINE)
@@ -1218,6 +1377,7 @@
                    MOVE    4               TO  IDX-STR1
                END-IF
            END-PERFORM
+      *----(04.08.02)--UPD-END-----
       *
            .
        250-HENSYU-SYORI-EXT.
@@ -1941,6 +2101,43 @@
        900-1902-READ-EXT.
            EXIT.
       *
+      *----(04.08.02)--ADD-START---
+      *****************************************************************
+      *    Ìô¾ð¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       900-YAKUJYO-READ-SEC        SECTION.
+      *
+           INITIALIZE                  YAKUJYO-REC
+           MOVE    SPA-HOSPNUM     TO  YAKUJYO-HOSPNUM
+           MOVE    TNS-SRYCD       TO  YAKUJYO-SRYCD
+           MOVE    1               TO  YAKUJYO-TEKNUM
+           MOVE    YAKUJYO-REC     TO  MCPDATA-REC
+           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    ZERO            TO  FLG-YAKUJYO
+                   MOVE    MCPDATA-REC     TO  YAKUJYO-REC
+               ELSE
+                   MOVE    1               TO  FLG-YAKUJYO
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-YAKUJYO
+           END-IF
+      *
+           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 930-DBCLOSE-SEC
+      *
+           .
+       900-YAKUJYO-READ-EXT.
+           EXIT.
+      *----(04.08.02)--ADD-END-----
       *****************************************************************
       *    £Ä£ÂÆÉ¹þ³«»Ï½èÍý
       *****************************************************************

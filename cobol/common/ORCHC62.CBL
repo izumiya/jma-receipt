@@ -35,6 +35,7 @@
       *  04.08.00    NACL-多々納  13/07/XX  電子版お薬手帳アプリ連携対応他
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.01    NACL-森脇    15/08/12  処方せん備考欄コメント表示
+      *  04.08.02    NACL-森脇    15/09/14  注意事項・効能効果表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -83,6 +84,9 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TNSP            PIC 9(01).
+      *----(04.08.02)--ADD-START---
+           03  FLG-YAKUJYO         PIC 9(01).
+      *----(04.08.02)--ADD-END-----
       *
            03  FLG-KBN             PIC 9(01).
       *
@@ -147,7 +151,9 @@
                05  WRK-TANI        PIC X(12).
                05  WRK-KAISUU      PIC X(03).
       *
-           03  WRK-HENSYUDATA      PIC X(100).
+      *----(04.08.02)--UPD-START---
+           03  WRK-HENSYUDATA      PIC X(4000).
+      *----(04.08.02)--UPD-END-----
       *
            03  WRK-SSTKIJUNCD      PIC X(05).
            03  WRK-HENKBN-G.
@@ -212,9 +218,12 @@
                05  WRK-HOSPNAME    PIC X(54).
            03  WRK-LINE-4.
                05  WRK-HOSPTEL     PIC X(15).
-           03  WRK-LINE-5.
+           03  WRK-LINE-SEN.
                05  FILLER          PIC X(54)   VALUE
-               "＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿".
+               "______________________________________________________".
+           03  WRK-LINE-SEN2.
+               05  FILLER          PIC X(54)   VALUE
+               "   ___________________________________________________".
       *
       *
       *H24.9
@@ -253,6 +262,9 @@
       *----(04.08.01)--ADD-START---
            03  PARA-BIKOU              PIC X(01).
       *----(04.08.01)--ADD-END-----
+      *----(04.08.02)--ADD-START---
+           03  PARA-KOUNOU             PIC X(01).
+      *----(04.08.02)--ADD-END-----
       ***  03  PARA-CSVKBN             PIC X(01).
       ***  03  PARA-CSVDIR             PIC X(256).
       *
@@ -289,6 +301,11 @@
       *    点数付加情報マスタ
        01  TNSP-REC.
            COPY    "CPTENSUPLUS.INC".
+      *
+      *----(04.08.01)--ADD-START---
+      *    薬情マスタ
+           COPY    "CPYAKUJYO.INC".
+      *----(04.08.01)--ADD-END-----
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -412,6 +429,12 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-BIKOU
       *----(04.08.01)--ADD-END-----
+      *----(04.08.02)--ADD-START---
+      *    効能効果・注意事項記載
+           MOVE    "KOUNOU"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-KOUNOU
+      *----(04.08.02)--ADD-END-----
       *****CSVファイル作成
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
@@ -505,6 +528,14 @@
       *    帳票印刷処理
            PERFORM 400-PRT-WRITE-SEC
       *
+      *----(04.08.02)--ADD-START---
+      *    プログラムオプションの設定があれば
+           IF      PARA-KOUNOU =   "1"
+      *        効能効果・注意事項処理
+               PERFORM 210-KOUNOU-MAIN-SEC
+           END-IF
+      *----(04.08.02)--ADD-END-----
+      *
       *H24.9
       *    ＱＲ印刷
            IF     (WRK-QRKBN           =   "1"  )
@@ -515,6 +546,123 @@
        200-MAIN-EXT.
            EXIT.
       *
+      *----(04.08.02)--ADD-START---
+      *****************************************************************
+      *    効能効果・注意事項処理
+      *****************************************************************
+       210-KOUNOU-MAIN-SEC         SECTION.
+      *
+      *    帳票ＨＥＡＤセット処理
+           INITIALIZE                  HCM62
+           MOVE    ZERO            TO  CNT-LINE
+           PERFORM 410-HEAD-SET-SEC
+      *
+      *    データがなくなるまで
+           MOVE    ZERO            TO  CNT-ZAI
+           PERFORM VARYING IDX-ZAI     FROM    1   BY  1
+                   UNTIL ( IDX-ZAI     >   ORCHC62-ZAI-MAX  )
+      *        帳票効能効果・注意事項情報編集処理
+               PERFORM 220-KOUNOU-HENSYU-SEC
+           END-PERFORM
+      *
+      *    帳票ＦＯＯＴ情報編集処理
+           PERFORM 430-FOOT-SET-SEC
+      *
+      *    帳票印刷処理
+           PERFORM 400-PRT-WRITE-SEC
+           .
+       210-KOUNOU-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票効能効果・注意事項情報編集処理
+      *****************************************************************
+       220-KOUNOU-HENSYU-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SOURYO
+      *
+           IF      ORCHC62-SRYKBN(IDX-ZAI) =   "98"
+               GO  TO  220-KOUNOU-HENSYU-EXT
+           END-IF
+      *
+           COMPUTE CNT-ZAI     =   CNT-ZAI     +   1
+      *
+           MOVE    ZERO            TO  CNT-SRY
+           PERFORM VARYING IDX-SRY     FROM    1   BY  1
+                   UNTIL ( IDX-SRY     >   50  )
+                   OR    ( ORCHC62-SRYCD(IDX-ZAI IDX-SRY)  =   SPACE )
+      *        明細編集
+               PERFORM 230-KOUNOU-NAIYO-SEC
+           END-PERFORM
+      *
+      *    剤情報があれば処理する
+           IF      CNT-SRY         =   ZERO
+               GO  TO  220-KOUNOU-HENSYU-EXT
+           END-IF
+      *
+           MOVE    WRK-LINE-SEN    TO  HCM62-SEN(CNT-LINE)
+           .
+       220-KOUNOU-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    内容編集処理
+      *****************************************************************
+       230-KOUNOU-NAIYO-SEC        SECTION.
+      *
+           MOVE    ORCHC62-SRYCD(IDX-ZAI IDX-SRY)
+                                   TO  WRK-SRYCD
+      *    薬剤のみ編集
+           IF      WRK-SRYCD(1:1)  NOT =   "6"
+               GO  TO  230-KOUNOU-NAIYO-EXT
+           END-IF
+      *    点数検索
+           PERFORM 900-TENSU-READ-SEC
+      *    点数なければ処理抜ける
+           IF      FLG-TENSU       =   1
+               GO  TO  230-KOUNOU-NAIYO-EXT
+           END-IF
+      *
+      *    薬情マスタ検索
+           PERFORM 900-YAKUJYO-READ-SEC
+      *
+           COMPUTE CNT-SRY     =   CNT-SRY     +   1
+      *
+      *    １件目だけ番号表示
+           IF      CNT-SRY         =   1
+               MOVE    CNT-ZAI         TO  WRK-Z9
+               MOVE    WRK-Z9          TO  WRK-HENLINE(1:2)
+               MOVE    ")"             TO  WRK-HENLINE(3:1)
+           ELSE
+               MOVE    WRK-LINE-SEN2   TO  HCM62-SEN(CNT-LINE)
+           END-IF
+      *
+      *    薬剤名編集
+           MOVE    SPACE           TO  WRK-HENSYUDATA
+           MOVE    TNS-NAME        TO  WRK-HENSYUDATA
+           PERFORM 250-HENSYU-SYORI-SEC
+      *
+      *    効能編集処理
+           IF      YAKUJYO-EFFECT  NOT =   SPACE
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    "【効能効果】"  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    YAKUJYO-EFFECT  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+      *
+      *    注意事項編集処理
+           IF      YAKUJYO-CAUTION NOT =   SPACE
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    "【注意事項】"  TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+               MOVE    SPACE           TO  WRK-HENSYUDATA
+               MOVE    YAKUJYO-CAUTION TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+           .
+       230-KOUNOU-NAIYO-EXT.
+           EXIT.
+      *----(04.08.02)--ADD-END-----
       *****************************************************************
       *    帳票ＨＥＡＤ情報編集処理
       *****************************************************************
@@ -616,7 +764,7 @@
       *    回数編集
            PERFORM 240-KAISUU-HENSYU-SEC
       *
-           MOVE    WRK-LINE-5      TO  HCM62-SEN(CNT-LINE)
+           MOVE    WRK-LINE-SEN    TO  HCM62-SEN(CNT-LINE)
       *
            .
        220-BODY-HENSYU-EXT.
@@ -1089,16 +1237,23 @@
            MOVE    1              TO  IDX-STR
            MOVE    4              TO  IDX-STR1
       *
+      *----(04.08.02)--UPD-START---
       *    編集データがなくなるまで繰り返す
-           PERFORM UNTIL  (IDX-STR     >   100 )
+           PERFORM UNTIL  (IDX-STR     >   4000 )
+                   OR     (IDX-STR1    >   54 )
                    OR     (WRK-HENSYUDATA(IDX-STR:)    =   SPACE)
-               MOVE    WRK-HENSYUDATA(IDX-STR:2)
-                                   TO  WRK-HENLINE(IDX-STR1:2)
-               ADD     2               TO  IDX-STR
-               ADD     2               TO  IDX-STR1
+      *        改行
+               IF      WRK-HENSYUDATA(IDX-STR:1)   =   X"0A"
+                   ADD     1               TO  IDX-STR
+               ELSE
+                   MOVE    WRK-HENSYUDATA(IDX-STR:2)
+                                       TO  WRK-HENLINE(IDX-STR1:2)
+                   ADD     2               TO  IDX-STR
+                   ADD     2               TO  IDX-STR1
+               END-IF
       *        最大字で改行
                IF         (IDX-STR1        >=  54)
-                   OR    ((IDX-STR         <=  100)
+                   OR    ((IDX-STR         <=  4000)
                    AND    (WRK-HENSYUDATA(IDX-STR:) =   SPACE))
                    PERFORM 250-PAGE-CHK-SEC
                    MOVE    WRK-HENLINE     TO  HCM62-NAIYO1(CNT-LINE)
@@ -1106,6 +1261,7 @@
                    MOVE    4               TO  IDX-STR1
                END-IF
            END-PERFORM
+      *----(04.08.02)--UPD-END-----
       *
            .
        250-HENSYU-SYORI-EXT.
@@ -1186,7 +1342,7 @@
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-2      TO  HCM62-NAIYO1(CNT-LINE)
       *
-           MOVE    WRK-LINE-5      TO  HCM62-SEN(CNT-LINE)
+           MOVE    WRK-LINE-SEN    TO  HCM62-SEN(CNT-LINE)
       *
            .
        410-HEAD-SET-EXT.
@@ -1436,10 +1592,10 @@
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
            MOVE    WRK-LINE-2      TO  HCM62Q-NAIYO1(CNT-LINE)
       *
-           MOVE    WRK-LINE-5      TO  HCM62Q-SEN(CNT-LINE)
+           MOVE    WRK-LINE-SEN    TO  HCM62Q-SEN(CNT-LINE)
       *
            MOVE    4               TO   CNT-LINE
-           MOVE    WRK-LINE-5      TO  HCM62Q-SEN(CNT-LINE)
+           MOVE    WRK-LINE-SEN    TO  HCM62Q-SEN(CNT-LINE)
       *    医療機関名称セット
            MOVE    WRK-LINE-3      TO  HCM62Q-NAIYO1(CNT-LINE)
       *
@@ -1908,6 +2064,43 @@
            .
        900-1902-READ-EXT.
            EXIT.
+      *----(04.08.02)--ADD-START---
+      *****************************************************************
+      *    薬情マスタ読み込み
+      *****************************************************************
+       900-YAKUJYO-READ-SEC        SECTION.
+      *
+           INITIALIZE                  YAKUJYO-REC
+           MOVE    SPA-HOSPNUM     TO  YAKUJYO-HOSPNUM
+           MOVE    TNS-SRYCD       TO  YAKUJYO-SRYCD
+           MOVE    1               TO  YAKUJYO-TEKNUM
+           MOVE    YAKUJYO-REC     TO  MCPDATA-REC
+           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    ZERO            TO  FLG-YAKUJYO
+                   MOVE    MCPDATA-REC     TO  YAKUJYO-REC
+               ELSE
+                   MOVE    1               TO  FLG-YAKUJYO
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-YAKUJYO
+           END-IF
+      *
+           MOVE    "tbl_yakujyo"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 930-DBCLOSE-SEC
+      *
+           .
+       900-YAKUJYO-READ-EXT.
+           EXIT.
+      *----(04.08.02)--ADD-END-----
       *****************************************************************
       *    ＤＢ読込開始処理
       *****************************************************************
