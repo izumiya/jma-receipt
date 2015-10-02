@@ -6,6 +6,7 @@ textsize	400;
 bind	""		    "OpenCOBOL"	"ORCGH01";
 bind	"H01"		"OpenCOBOL"	"ORCGH01";
 bind	"H02"		"OpenCOBOL"	"ORCGH02";
+bind	"H03"		"OpenCOBOL"	"ORCGH03";
 bind	"H99"		"OpenCOBOL"	"ORCGH99";
 bind	"HERR"		"OpenCOBOL"	"ORCGHERR";
 bind	"HID1"		"OpenCOBOL"	"ORCGHID1";
@@ -18,6 +19,7 @@ data	{
 	window	{
 		H01;
 		H02;
+		H03;
 		H99;
 		HERR;
 		HID1;
@@ -38,6 +40,7 @@ db	{
 	tbl_kohsky;
 	tbl_ptinf;
 	tbl_ptkohinf;
+	tbl_henrei_kanri;
 	tbl_henrei_body;
 	tbl_receden;
 };

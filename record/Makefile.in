@@ -491,6 +491,7 @@ RECORD_files = \
 	MMID1.rec \
 	systeminfv2.rec \
 	manageusersv2.rec \
+	H03.rec \
 
 DEF_files = \
 

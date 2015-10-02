@@ -107,6 +107,7 @@
       *  04.07.05    NACL-藤原    13/10/07  労災レセ電返戻対応
       *
       *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
+      *  04.08.02    NACL-藤原    15/09/09  返戻取り込み済データ一覧対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -319,6 +320,7 @@
        01  SCRAREA.
            COPY    "H01.INC".
            COPY    "H02.INC".
+           COPY    "H03.INC".
            COPY    "H99.INC".
            COPY    "HERR.INC".
            COPY    "HID1.INC".
@@ -418,7 +420,7 @@
                IF      WRK-MOTOPG(1:3)     =   "Y01"  OR  "U01"  OR
                                                "P97"
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
-                   MOVE    LNK-SCRSPA      TO  SPA-H01-AREA
+                   MOVE    LNK-SCRSPA      TO  SPA-H01FREE
                    MOVE    SPA-WORK        TO  SPA-H01KYOUTU
                END-IF
       *        外部より選択がある時
@@ -443,6 +445,10 @@
       *    返戻情報設定
                WHEN    "H02"
                    PERFORM 340-H02-SET-SEC
+                   GO      TO      300-SCREEN-EXT
+      *    返戻一覧
+               WHEN    "H03"
+                   PERFORM 350-H03-SET-SEC
                    GO      TO      300-SCREEN-EXT
            END-EVALUATE
       *
@@ -510,7 +516,7 @@
       *****************************************************************
        310-SPASET-SEC              SECTION.
       *
-           INITIALIZE              SPA-H01-AREA
+           INITIALIZE              SPA-H01FREE
                                    SPA-H01KYOUTU 
       *
       *    医療機関情報取得
@@ -699,10 +705,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
       *
       *****IF      SYS-2005-??         =   "0"
                MOVE    WIDGET-INSENSITIVE  TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
       *****ELSE
       *****    MOVE    WIDGET-NORMAL       TO
-      *****                            SPA-H01GMN-HENREI-SIJI-FLG-STATE
+      *****                            SPA-H01GMN-HENREI-SIJI-FLG-STE
       *****END-IF
            MOVE    "F"                 TO  SPA-H01GMN-HENREI-SIJI-FLG
            MOVE    ZERO                TO  SPA-H01NAI-HENREI-MSG
@@ -1158,7 +1164,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                                        TO  SPA-H01NAI-HENREIYM
                        MOVE    WIDGET-NORMAL
                                        TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
                    WHEN    "1006"
       *****************PERFORM 420-CLEAR-SEC
                        MOVE    2       TO  SPA-H01GMN-CUR
@@ -1293,6 +1299,20 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    返戻情報設定更新処理
+      *****************************************************************
+       350-H03-SET-SEC            SECTION.
+      *
+           MOVE    SPA-H01-CUR     TO  SPA-H01GMN-CUR
+      *
+           MOVE    SPACE           TO  SPA-HID1-FLG
+                                       SPA-H02-FLG
+           MOVE    SPACE           TO  SPA-HIDCD
+           .
+       350-H03-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    画面遷移処理
       *****************************************************************
        200-GMNSENI                   SECTION.
@@ -1308,6 +1328,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
       *        前回の患者番号
                WHEN    "CLICKED"       ALSO    "B03"
                    PERFORM 430-MAEKPTNUM-SEC
+      *        返戻一覧
+               WHEN    "CLICKED"       ALSO    "B05"
+                   PERFORM 450-HENREI-LIST-SEC
       *        氏名検索
                WHEN    "CLICKED"       ALSO    "B09"
                    PERFORM 480-KENSAKU-SEC
@@ -1573,7 +1596,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                WHEN    20
                    MOVE    SPACE               TO  LINKAREA
                    MOVE    SPA-KYOUTU          TO  LNK-COMMON
-                   MOVE    SPA-H01-AREA        TO  LNK-SCRSPA
+                   MOVE    SPA-H01FREE         TO  LNK-SCRSPA
       *
                    MOVE    "H01"               TO  SPA-MOTOPG
                    MOVE    "P97"               TO  SPA-SAKIPG
@@ -2263,7 +2286,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *    返戻データ存在チェック
            MOVE    WIDGET-INSENSITIVE  TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
            MOVE    ZERO                TO  SPA-H01NAI-HENREI-MSG
       *    特別療養費、公害、自賠責はチェックしない
            IF    ( RECE10-RECESYUBETU  =   "6666"      )
@@ -2392,7 +2415,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            AND   ( SPA-H01NAI-HENREI-MSG
                                        =   1    )
                MOVE    WIDGET-NORMAL       TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
             END-IF
            .
        410211-HENREI-B-CHECK-EXT.
@@ -3256,7 +3279,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
       *    返戻年月入力時の返戻再請求ボタンの入力設定
       *****IF      SYS-2005-??         =   "0"
                MOVE    WIDGET-INSENSITIVE  TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
       *****ELSE
                IF    ( RECE10-RECESYUBETU  =   "6666" )
                OR    ( RECE10-TEISYUTUSAKI =   "5"    )
@@ -3266,7 +3289,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                    AND   ( SPA-H01NAI-HENREI-MSG
                                                =   1    )
                        MOVE    WIDGET-NORMAL       TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STE
                    END-IF
                END-IF
       *****END-IF
@@ -3822,6 +3845,44 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
+      *    返戻一覧処理
+      *****************************************************************
+       450-HENREI-LIST-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  SPA-MOTOPG
+           MOVE    SPA-H01KYOUTU       TO  SPA-WORK
+           MOVE    SPA-AREA            TO  SPA-COMMON
+           MOVE    SPA-H01FREE         TO  SPA-FREE
+      *
+           MOVE    "LINK"              TO  MCP-STATUS
+           MOVE    SPACE               TO  MCP-EVENT
+      *
+           CALL    "ORCGH03"           USING
+                                       MCPAREA
+                                       SPAAREA
+                                       LINKAREA
+                                       SCRAREA
+      *
+           MOVE    SPA-COMMON          TO  SPA-AREA
+           MOVE    SPA-FREE            TO  SPA-H01FREE
+           MOVE    SPA-WORK            TO  SPA-H01KYOUTU
+      *
+           MOVE    SPA-H01KYOUTU       TO  SPA-WORK
+      *
+           MOVE    "H01"                TO  SPA-MOTOPG
+           MOVE    "H03"                TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"                TO  MCP-PUTTYPE
+           MOVE    "H03"                TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                    TO  FLG-END
+          .
+       450-HENREI-LIST-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    氏名検索へ
       *****************************************************************
        480-KENSAKU-SEC             SECTION.
@@ -3833,7 +3894,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *         
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
-           MOVE    SPA-H01-AREA        TO  LNK-SCRSPA
+           MOVE    SPA-H01FREE         TO  LNK-SCRSPA
       *
       *    画面移行用のパラメタ変更
            MOVE    "H01"               TO  SPA-MOTOPG
@@ -4168,7 +4229,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        H01-NSHOFTN-STATE    (IDX)
                                        H01-NSHONISSU-STATE  (IDX)
            END-PERFORM
-           MOVE    SPA-H01GMN-HENREI-SIJI-FLG-STATE
+           MOVE    SPA-H01GMN-HENREI-SIJI-FLG-STE
                                       TO  H01-HENREI-SIJI-FLG-STATE
            MOVE    SPA-H01GMN-HENREI-SIJI-FLG
                                       TO  H01-HENREI-SIJI-FLG

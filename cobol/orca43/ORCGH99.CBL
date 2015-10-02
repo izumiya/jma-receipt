@@ -218,6 +218,7 @@
        01  SCRAREA.
            COPY    "H01.INC".
            COPY    "H02.INC".
+           COPY    "H03.INC".
            COPY    "H99.INC".
            COPY    "HERR.INC".
            COPY    "HID1.INC".
@@ -1140,6 +1141,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
        520-HIDSET-SEC              SECTION.
       *
            MOVE    SPACE                TO  HID1
+           INITIALIZE                       HID1
            MOVE    SPA-HIDCD            TO  HID1-ID1CODE
            EVALUATE    SPA-HIDCD
                WHEN    "1006"

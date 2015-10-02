@@ -59,6 +59,7 @@
       *  04.07.03    NACL-藤原    13/10/07  労災レセ電返戻対応
       *
       *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
+      *  04.08.02    NACL-藤原    15/09/14  返戻データ取込一覧対応
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -111,7 +112,7 @@
                        09  SPA-H01GMN-ZAITAKU         PIC X(20).
                        09  SPA-H01GMN-HONKZKKBN       PIC X(04).
                        09  SPA-H01GMN-HENREI-SIJI-FLG PIC X(01).
-                       09  SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                       09  SPA-H01GMN-HENREI-SIJI-FLG-STE
                                                       PIC S9(9) BINARY.
       *                 
                    07  SPA-H01GMN-SKYKBNLST          OCCURS  3.
@@ -296,6 +297,62 @@
                        09  SPA-H02NAI-TS-TEKSTYMD  PIC X(08).
                        09  SPA-H02NAI-TS-RECEIPT-KBN
                                                    PIC X(10).
+      *    Ｈ０３画面
+           03  SPA-H03-AREA.
+               05  SPA-GMN-H03-CUR                 PIC 9(02).
+      *
+               05  SPA-GMN-H03-AREA.
+                   07  SPA-GMN-H03-KANRI-TBL.
+                       09  SPA-GMN-H03-KANRI-G     OCCURS  100.
+                           11  SPA-GMN-H03-K-TSEQNUM   PIC 9(3).
+                           11  SPA-GMN-H03-K-TSYORIYM  PIC X(6).
+                           11  SPA-GMN-H03-K-TTEISYUTUSAKI
+                                                       PIC X(10).
+                           11  SPA-GMN-H03-K-TTEISYUTUSAKI2
+                                                       PIC X(2).
+                           11  SPA-GMN-H03-K-TCNT      PIC 9(4).
+                           11  SPA-GMN-H03-K-TCREYMD   PIC X(9).
+                       09  SPA-GMN-H03-KANRI-MAX       PIC 9(03).
+      *
+                   07  SPA-GMN-H03-B-HYODAI            PIC X(14).
+                   07  SPA-GMN-H03-BODY-TBL.
+                       09  SPA-GMN-H03-BODY-G      OCCURS  100.
+                           11  SPA-GMN-H03-B-TSEQNUM   PIC 9(3).
+                           11  SPA-GMN-H03-B-TPTNUM    PIC X(20).
+                           11  SPA-GMN-H03-B-TNAME     PIC X(40).
+                           11  SPA-GMN-H03-B-TSRYYM    PIC X(6).
+                           11  SPA-GMN-H03-B-THKNJANUM PIC X(8).
+                           11  SPA-GMN-H03-B-TKIGO     PIC X(40).
+                           11  SPA-GMN-H03-B-TERR      PIC X(100).
+                           11  SPA-GMN-H03-B-TERRCD    PIC X(03).
+                       09  SPA-GMN-H03-BODY-MAX        PIC 9(04).
+      *
+                   07  SPA-GMN-H03-KOUMOKU.
+                       09  SPA-GMN-H03-SELNUM      PIC 9(04).
+      *
+               05  SPA-NAI-H03-AREA.
+                   07  SPA-NAI-H03-KANRI-TBL.
+                       09  SPA-NAI-H03-KANRI-G     OCCURS   100.
+                           11  SPA-NAI-H03-K-TSYORIYM  PIC 9(06).
+                           11  SPA-NAI-H03-K-TTEISYUTUSAKI
+                                                       PIC X(01).
+                           11  SPA-NAI-H03-K-TTEISYUTUSAKI2
+                                                       PIC X(01).
+      *
+                   07  SPA-NAI-H03-BODY-TBL.
+                       09  SPA-NAI-H03-BODY-G      OCCURS  100.
+                           11  SPA-NAI-H03-B-TNYUGAIKBN
+                                                       PIC X(1).
+                           11  SPA-NAI-H03-B-TPTID     PIC 9(10).
+                           11  SPA-NAI-H03-B-TSRYYM    PIC X(6).
+                           11  SPA-NAI-H03-B-TRECESYUBETU
+                                                       PIC X(10).
+                           11  SPA-NAI-H03-B-TRECEIPT-KBN
+                                                       PIC X(4).
+                           11  SPA-NAI-H03-B-TERRFLG   PIC 9(1).
+      *
+                   07  SPA-NAI-H03-KOUMOKU.
+                       09  SPA-NAI-H03-SELNUM      PIC 9(04).
       *
       *Ｈ９９画面
            03  SPA-H99GMN-AREA.

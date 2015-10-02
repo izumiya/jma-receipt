@@ -76,6 +76,7 @@
        01  SCRAREA.
            COPY    "H01.INC".
            COPY    "H02.INC".
+           COPY    "H03.INC".
            COPY    "H99.INC".
            COPY    "HERR.INC".
            COPY    "HID1.INC".

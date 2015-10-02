@@ -32,3 +32,14 @@ path    key             {
                 ;
         };
 };
+
+path    key2             {
+        DBSELECT        {
+                DECLARE tbl_henrei_kanri_key2_csr CURSOR FOR
+                SELECT *
+                FROM tbl_henrei_kanri
+                WHERE   HOSPNUM         = :HOSPNUM
+                ORDER BY SYORIYM DESC,TEISYUTUSAKI,TEISYUTUSAKI2
+                ;
+        };
+};

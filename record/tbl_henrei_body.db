@@ -414,3 +414,17 @@ path    del1    {
         };
 };
 
+path    key4            {
+        DBSELECT        {
+                DECLARE tbl_henrei_body_key4_csr CURSOR FOR
+                SELECT *
+                FROM tbl_henrei_body
+                WHERE     HOSPNUM         = :HOSPNUM
+                    AND   TEISYUTUSAKI    = :TEISYUTUSAKI
+                    AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
+                    AND   SYORIYM         = :SYORIYM
+                    AND   PT_RENNUM       = 1
+                ;
+        };
+};
+
