@@ -339,6 +339,8 @@
            MOVE    "　記号・番号　"
                                    TO  SPA-GMN-H03-B-HYODAI
       *
+           MOVE   1                TO  FLG-KANRI-ROW
+      *
            MOVE    1               TO  SPA-GMN-H03-CUR
       *
            .
