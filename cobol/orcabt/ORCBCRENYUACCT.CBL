@@ -1527,6 +1527,12 @@
                    MOVE    LNK-SCNYUACCT-STSRYYMD
                                             TO  TNS-YUKOSTYMD
                                                 TNS-YUKOEDYMD
+      *            特定入院基本料（一般病棟入院基本料）はマスタが
+      *            平成２６年９月３０日までの為、参照時の日付を変更
+                   IF    LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799410"
+                       MOVE    "20140930"   TO  TNS-YUKOSTYMD
+                                                TNS-YUKOEDYMD
+                   END-IF
                    MOVE    TNS-TENSU-REC    TO  MCPDATA-REC
                    MOVE    "tbl_tensu"      TO  MCP-TABLE
                    MOVE    "key"            TO  MCP-PATHNAME
