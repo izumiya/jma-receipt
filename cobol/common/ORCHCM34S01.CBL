@@ -1523,6 +1523,11 @@
       *
       *    選定入院時のコード取得
            PERFORM 900-SENTEICDCHG-KEY2-SEL-SEC
+      *    特定入院基本料（障害者施設等入院基本料）（夜勤時間超過減算）
+      *    は選定入院の対象外
+           IF      NSRY-SRYCD (IDX-KHN)  =  "190161310"
+                MOVE   1                 TO  FLG-SENTEICDCHG
+           END-IF
            IF    ( FLG-SENTEICDCHG     =   ZERO )
                MOVE    SENCHG-IPNSRYCD     TO  WRK-SENTEI-IPNCD
                MOVE    SENCHG-SENTEISRYCD
