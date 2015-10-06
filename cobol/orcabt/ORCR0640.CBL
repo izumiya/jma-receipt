@@ -4529,9 +4529,8 @@
                  IF    RECE62-KOUREI-HANTEIFLG  =  "1"
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "17"
-                   WHEN      "22"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-                          "18" OR "19"
+                          "18" OR "19" OR "22"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
@@ -4547,45 +4546,81 @@
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
+                   WHEN      "22"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "17" OR "18" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
                   END-EVALUATE
                  ELSE
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "26"
-                   WHEN      "31"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                           "27" OR "28" OR "29" OR "30" OR
-                          "32" OR "33" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "27"
-                   WHEN      "32"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                           "26" OR "28" OR "29" OR "30" OR
-                          "31" OR "33" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "28"
-                   WHEN      "33"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                           "26" OR "27" OR "29" OR "30" OR
-                          "31" OR "32" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "29"
-                   WHEN      "34"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                           "26" OR "27" OR "28" OR "30" OR
-                          "31" OR "32" OR "33" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "30"
-                   WHEN      "35"
                      IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                           "26" OR "27" OR "28" OR "29" OR
+                          "31" OR "32" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "31"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "32" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "32"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "33"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "32" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "34"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "32" OR "33" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "35"
+                     IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
                           "31" OR "32" OR "33" OR "34"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
@@ -4612,9 +4647,8 @@
                IF    RECE62-KOUREI-HANTEIFLG  =  "1"
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "17"
-                   WHEN      "22"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
-                          "18" OR "19"
+                          "18" OR "19" OR "22"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
@@ -4630,45 +4664,81 @@
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
+                   WHEN      "22"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "17" OR "18" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
                   END-EVALUATE
                ELSE
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "26"
-                   WHEN      "31"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
                           "27" OR "28" OR "29" OR "30" OR
-                          "32" OR "33" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "27"
-                   WHEN      "32"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
                           "26" OR "28" OR "29" OR "30" OR
-                          "31" OR "33" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "28"
-                   WHEN      "33"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
                           "26" OR "27" OR "29" OR "30" OR
-                          "31" OR "32" OR "34" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "29"
-                   WHEN      "34"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
                           "26" OR "27" OR "28" OR "30" OR
-                          "31" OR "32" OR "33" OR "35"
+                          "31" OR "32" OR "33" OR "34" OR "35"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
                      END-IF
                    WHEN      "30"
-                   WHEN      "35"
                      IF   RECE62-TOKKI(TOKKI-IDX) =
                           "26" OR "27" OR "28" OR "29" OR
+                          "31" OR "32" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "31"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "32" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "32"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "33" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "33"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "32" OR "34" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "34"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
+                          "31" OR "32" OR "33" OR "35"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "35"
+                     IF   RECE62-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29" OR "30" OR
                           "31" OR "32" OR "33" OR "34"
                        MOVE   WRK-TOKUSITU-TOKKI  TO
                                           WRK-TOKUSITU-TOKKI2
