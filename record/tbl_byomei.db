@@ -119,3 +119,27 @@ path	key7	{
 	};
 };
 
+path	key8	{ 	
+	DBSELECT	{
+		DECLARE tbl_byomei_key8_csr CURSOR FOR
+		SELECT *
+		FROM tbl_byomei
+			WHERE   BYOMEICD     >=   :BYOMEICD
+			AND     BYOMEICD     <    :IKOSAKICD
+			ORDER BY             BYOMEICD
+		;
+	};
+};
+
+path	key9	{ 	
+	DBSELECT	{
+		DECLARE tbl_byomei_key9_csr CURSOR FOR
+		SELECT *
+		FROM tbl_byomei
+			WHERE   BYOMEICD     >=   :BYOMEICD
+			AND     BYOMEICD     <    :IKOSAKICD
+			ORDER BY             BYOMEIKANA
+		;
+	};
+};
+
