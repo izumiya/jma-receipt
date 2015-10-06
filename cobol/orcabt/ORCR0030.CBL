@@ -710,6 +710,7 @@
       *  04.08.03    NACL-門脇    14/07/29  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.05    NACL-門脇    15/10/05  難病特記事項対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1375,6 +1376,10 @@
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
                05  TBL-PTTOKKI-CD                      PIC  X(02).
       *
+       01  TBL-TOKKI.
+           03  TBL-TOKKI-OCC                           OCCURS   5.
+               05  TBL-TOKKI-CD                        PIC  X(02).
+      *
        01  TBL-HKNCOMBI.
            03  TBL-HKNCOMBI-OCC                        OCCURS  10.
                05  TBL-HKNCOMBI-TOTALTEN               PIC  9(07).
@@ -1732,6 +1737,9 @@
            03  WRK-CYOFUKU-KOH-YMD.
                05  WRK-CYOFUKU-KOH-YM          PIC 9(06).
                05  WRK-CYOFUKU-KOH-DD          PIC 9(02).
+      *
+           03  WRK-TOKUSITU-TOKKI              PIC X(02).
+           03  WRK-TOKUSITU-TOKKI2             PIC X(02).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -2439,26 +2447,6 @@
            03  TBL-GENBUTU70   PIC X(03)   OCCURS    2.
       *
        01  TBL-GENBUTU70-MAX   PIC 9(02)   VALUE     2.
-      *
-      *    特定疾患等判定用テーブル（上位）
-       01  TBL-TOKUJYOI-AREA.
-           03  FILLER          PIC X(03)   VALUE    "966".
-           03  FILLER          PIC X(03)   VALUE    "956".
-      *
-       01  TBL-TOKUJYOI-R      REDEFINES   TBL-TOKUJYOI-AREA.
-           03  TBL-TOKUJYOI    PIC X(03)   OCCURS    2.
-      *
-       01  TBL-TOKUJYOI-MAX    PIC 9(02)   VALUE     2.
-      *
-      *    特定疾患等判定用テーブル（一般・低）
-       01  TBL-TOKUIPAN-AREA.
-           03  FILLER          PIC X(03)   VALUE    "967".
-           03  FILLER          PIC X(03)   VALUE    "957".
-      *
-       01  TBL-TOKUIPAN-R      REDEFINES   TBL-TOKUIPAN-AREA.
-           03  TBL-TOKUIPAN    PIC X(03)   OCCURS    2.
-      *
-       01  TBL-TOKUIPAN-MAX    PIC 9(02)   VALUE     2.
       *
       *    入所判定用テーブル
        01  TBL-NYUSYO-AREA.
@@ -3202,6 +3190,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
            INITIALIZE                   TBL-ZAITAKU-KAISU-XXX
       *
            MOVE      ZERO       TO      WK-GENGAKU-KEISAN2
+      *
+           MOVE      SPACE      TO      WRK-TOKUSITU-TOKKI
+           MOVE      SPACE      TO      WRK-TOKUSITU-TOKKI2
       *
            MOVE      ZERO       TO      WRK-TAIHI-ZAINUM
            MOVE      ZERO       TO      WRK-TAIHI-OKIKAE
@@ -5392,8 +5383,66 @@ grpsys           PERFORM 900-DBSELECT-SEC
                                     TBL-PTTOKKI-CD(TOKKI-IDX2)
                  MOVE   RECE02-PTTOKKI-NAIYO(TOKKI-IDX) TO
                                     TBL-PTTOKKI-NAIYO(TOKKI-IDX2)
+      *
+                 IF    RECE02-KOUREI-HANTEIFLG  =  "1"
+                  EVALUATE  WRK-TOKUSITU-TOKKI
+                   WHEN      "17"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "18" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "18"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "17" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "19"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "17" OR "18"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                  END-EVALUATE
+                 ELSE
+                  EVALUATE  WRK-TOKUSITU-TOKKI
+                   WHEN      "26"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "27" OR "28" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "27"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "28" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "28"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "29"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "30"
+                     IF   RECE02-PTTOKKI-CD(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                  END-EVALUATE
+                 END-IF
                END-IF
            END-PERFORM
+      *
+           INITIALIZE                RECE02-PTTOKKI-AREA
       *
            PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
                    UNTIL   TOKKI-IDX   >      5
@@ -5401,6 +5450,96 @@ grpsys           PERFORM 900-DBSELECT-SEC
                                     RECE02-PTTOKKI-CD(TOKKI-IDX)
                  MOVE   TBL-PTTOKKI-NAIYO(TOKKI-IDX)    TO
                                     RECE02-PTTOKKI-NAIYO(TOKKI-IDX)
+           END-PERFORM
+      *
+      ***
+      *
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+               IF    RECE02-KOUREI-HANTEIFLG  =  "1"
+                  EVALUATE  WRK-TOKUSITU-TOKKI
+                   WHEN      "17"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "18" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "18"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "17" OR "19"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "19"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "17" OR "18"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                  END-EVALUATE
+               ELSE
+                  EVALUATE  WRK-TOKUSITU-TOKKI
+                   WHEN      "26"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "27" OR "28" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "27"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "26" OR "28" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "28"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "29" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "29"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "30"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                   WHEN      "30"
+                     IF   RECE02-TOKKI(TOKKI-IDX) =
+                          "26" OR "27" OR "28" OR "29"
+                       MOVE   WRK-TOKUSITU-TOKKI  TO
+                                          WRK-TOKUSITU-TOKKI2
+                     END-IF
+                  END-EVALUATE
+               END-IF
+           END-PERFORM
+      *
+      ***
+      *
+           INITIALIZE                TBL-TOKKI
+      *
+           MOVE      ZERO      TO    TOKKI-IDX2
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+               IF  (RECE02-TOKKI(TOKKI-IDX) = SPACE              )
+               OR  (RECE02-TOKKI(TOKKI-IDX) = WRK-TOKUSITU-TOKKI2)
+                 CONTINUE
+               ELSE
+                 ADD    1      TO    TOKKI-IDX2
+                 MOVE   RECE02-TOKKI(TOKKI-IDX)   TO
+                                     TBL-TOKKI-CD(TOKKI-IDX2)
+               END-IF
+           END-PERFORM
+      *
+           MOVE      SPACE     TO    RECE02-TOKKI(1)
+           MOVE      SPACE     TO    RECE02-TOKKI(2)
+           MOVE      SPACE     TO    RECE02-TOKKI(3)
+           MOVE      SPACE     TO    RECE02-TOKKI(4)
+           MOVE      SPACE     TO    RECE02-TOKKI(5)
+      *
+           PERFORM VARYING TOKKI-IDX  FROM    1   BY  1
+                   UNTIL   TOKKI-IDX   >      5
+                 MOVE   TBL-TOKKI-CD(TOKKI-IDX)   TO
+                                     RECE02-TOKKI(TOKKI-IDX)
            END-PERFORM
       *
            .
@@ -7667,95 +7806,176 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *****************************************************************
        211C1-TOKUSITU-HANTEI2-SEC               SECTION.
       *
-           PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
-                     UNTIL  (GEN-IDX    >    TBL-TOKUJYOI-MAX)
-                       OR   (FLG-TOKUSITU   NOT = ZERO       )
-              INITIALIZE                      PTKOHINF-REC
-              MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
-              MOVE  RECE02-PTID           TO  PTKOH-PTID
-              MOVE  TBL-TOKUJYOI(GEN-IDX) TO  PTKOH-KOHNUM
-              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
-              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-              MOVE  "key4"                TO  MCP-PATHNAME
-              PERFORM 900-DBSELECT-SEC
-              IF      MCP-RC               =       ZERO
-                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                MOVE    "key4"            TO  MCP-PATHNAME
-                PERFORM  900-PTKOHINF-READ-SEC
-                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                   IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
-                       (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
-                       (PTKOH-SAKJOKBN   =   SPACE         ))
-                   OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
-                       (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
-                       (PTKOH-SAKJOKBN   =   SPACE         ))
-                     MOVE     1      TO  FLG-TOKUSITU
-                     IF  RECE02-SRYYM  >= "201501"
-                       IF  PTKOH-JKYSNUM(1:2) = "イ"
-                         MOVE   12   TO  FLG-TOKUSITU-KBN
-                       ELSE
-                         MOVE   11   TO  FLG-TOKUSITU-KBN
-                       END-IF
-                     END-IF
-                     MOVE     1      TO  FLG-PTKOHINF
-                   ELSE
-                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                     MOVE    "key4"           TO  MCP-PATHNAME
-                     PERFORM  900-PTKOHINF-READ-SEC
-                   END-IF
-                END-PERFORM
-              END-IF
-              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-              MOVE    "key4"               TO  MCP-PATHNAME
-              PERFORM 900-CLOSE-SEC
-           END-PERFORM
-           IF    FLG-TOKUSITU  =  ZERO
-             PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
-                       UNTIL  (GEN-IDX    >    TBL-TOKUIPAN-MAX)
-                         OR   (FLG-TOKUSITU   NOT = ZERO       )
-                INITIALIZE                      PTKOHINF-REC
-                MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
-                MOVE  RECE02-PTID           TO  PTKOH-PTID
-                MOVE  TBL-TOKUIPAN(GEN-IDX) TO  PTKOH-KOHNUM
-                MOVE  PTKOHINF-REC          TO  MCPDATA-REC
-                MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-                MOVE  "key4"                TO  MCP-PATHNAME
-                PERFORM 900-DBSELECT-SEC
-                IF      MCP-RC               =       ZERO
-                  MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                  MOVE    "key4"            TO  MCP-PATHNAME
+           INITIALIZE                      PTKOHINF-REC
+           MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
+           MOVE  RECE02-PTID           TO  PTKOH-PTID
+           MOVE  "966"                 TO  PTKOH-KOHNUM
+           MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+           MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+           MOVE  "key4"                TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =       ZERO
+             MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+             MOVE    "key4"            TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                    (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                    (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                  MOVE     1      TO  FLG-TOKUSITU
+                  IF  RECE02-SRYYM  >= "201501"
+                    IF  PTKOH-JKYSNUM(1:2) = "イ"
+                      MOVE   12   TO  FLG-TOKUSITU-KBN
+                    ELSE
+                      MOVE   11   TO  FLG-TOKUSITU-KBN
+                    END-IF
+                  END-IF
+                  MOVE     1      TO  FLG-PTKOHINF
+                ELSE
+                  MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                  MOVE    "key4"           TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
-                  PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                     IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                     AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                     AND (PTKOH-SAKJOKBN   =   SPACE         )
-                       IF  RECE02-TEISYOTOKU  =  SPACE
-                           MOVE    2    TO   FLG-TOKUSITU
-                           IF  RECE02-SRYYM  >= "201501"
-                             IF  PTKOH-JKYSNUM(1:2) = "エ"
-                              MOVE  22  TO   FLG-TOKUSITU-KBN
-                             ELSE
-                              MOVE  21  TO   FLG-TOKUSITU-KBN
-                             END-IF
-                           END-IF
-                       ELSE
-                           MOVE    3    TO   FLG-TOKUSITU
-                           IF  RECE02-SRYYM  >= "201501"
-                              MOVE  31  TO   FLG-TOKUSITU-KBN
-                           END-IF
-                       END-IF
-                       MOVE        1    TO   FLG-PTKOHINF
-                     ELSE
-                       MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                       MOVE    "key4"           TO  MCP-PATHNAME
-                       PERFORM  900-PTKOHINF-READ-SEC
-                     END-IF
-                  END-PERFORM
                 END-IF
-                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                MOVE    "key4"               TO  MCP-PATHNAME
-                PERFORM 900-CLOSE-SEC
              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF    FLG-TOKUSITU  =  ZERO
+             INITIALIZE                      PTKOHINF-REC
+             MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
+             MOVE  RECE02-PTID           TO  PTKOH-PTID
+             MOVE  "967"                 TO  PTKOH-KOHNUM
+             MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+             MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+             MOVE  "key4"                TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+               MOVE    "key4"            TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                    IF  RECE02-TEISYOTOKU  =  SPACE
+                        MOVE    2    TO   FLG-TOKUSITU
+                        IF  RECE02-SRYYM  >= "201501"
+                          IF  PTKOH-JKYSNUM(1:2) = "エ"
+                           MOVE  22  TO   FLG-TOKUSITU-KBN
+                          ELSE
+                           MOVE  21  TO   FLG-TOKUSITU-KBN
+                          END-IF
+                        END-IF
+                    ELSE
+                        MOVE    3    TO   FLG-TOKUSITU
+                        IF  RECE02-SRYYM  >= "201501"
+                           MOVE  31  TO   FLG-TOKUSITU-KBN
+                        END-IF
+                    END-IF
+                    MOVE        1    TO   FLG-PTKOHINF
+                  ELSE
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-IF
+      *
+      ***
+      *
+           IF    FLG-TOKUSITU  =  ZERO
+             INITIALIZE                      PTKOHINF-REC
+             MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
+             MOVE  RECE02-PTID           TO  PTKOH-PTID
+             MOVE  "956"                 TO  PTKOH-KOHNUM
+             MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+             MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+             MOVE  "key4"                TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+               MOVE    "key4"            TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                    MOVE     1      TO  FLG-TOKUSITU
+                    IF  RECE02-SRYYM  >= "201501"
+                      IF  PTKOH-JKYSNUM(1:2) = "イ"
+                        MOVE   12   TO  FLG-TOKUSITU-KBN
+                      ELSE
+                        MOVE   11   TO  FLG-TOKUSITU-KBN
+                      END-IF
+                    END-IF
+                    MOVE     1      TO  FLG-PTKOHINF
+                  ELSE
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-IF
+      *
+           IF    FLG-TOKUSITU  =  ZERO
+             INITIALIZE                      PTKOHINF-REC
+             MOVE  RECE02-HOSPNUM        TO  PTKOH-HOSPNUM
+             MOVE  RECE02-PTID           TO  PTKOH-PTID
+             MOVE  "957"                 TO  PTKOH-KOHNUM
+             MOVE  PTKOHINF-REC          TO  MCPDATA-REC
+             MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
+             MOVE  "key4"                TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+               MOVE    "key4"            TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
+                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
+                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                    IF  RECE02-TEISYOTOKU  =  SPACE
+                        MOVE    2    TO   FLG-TOKUSITU
+                        IF  RECE02-SRYYM  >= "201501"
+                          IF  PTKOH-JKYSNUM(1:2) = "エ"
+                           MOVE  22  TO   FLG-TOKUSITU-KBN
+                          ELSE
+                           MOVE  21  TO   FLG-TOKUSITU-KBN
+                          END-IF
+                        END-IF
+                    ELSE
+                        MOVE    3    TO   FLG-TOKUSITU
+                        IF  RECE02-SRYYM  >= "201501"
+                           MOVE  31  TO   FLG-TOKUSITU-KBN
+                        END-IF
+                    END-IF
+                    MOVE        1    TO   FLG-PTKOHINF
+                  ELSE
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
            END-IF
       *
            .
@@ -15228,6 +15448,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN     3
                        MOVE    "19"      TO      WRK-TOKKI
                END-EVALUATE
+               IF    RECE02-SRYYM            >=  "201501"
+               AND   WRK-TOKKI            NOT =  SPACE
+                   MOVE   WRK-TOKKI      TO      WRK-TOKUSITU-TOKKI
+               END-IF
              WHEN        9
               IF ACCT-JIHOKBN = SPACE
                        MOVE    "11"      TO      WRK-TOKKI
@@ -15268,6 +15492,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN     31
                        MOVE    "30"      TO      WRK-TOKKI
                END-EVALUATE
+               IF    RECE02-SRYYM            >=  "201501"
+               AND   WRK-TOKKI            NOT =  SPACE
+                   MOVE   WRK-TOKKI      TO      WRK-TOKUSITU-TOKKI
+               END-IF
              WHEN       17
               IF ACCT-JIHOKBN = SPACE
                        MOVE    "36"      TO      WRK-TOKKI

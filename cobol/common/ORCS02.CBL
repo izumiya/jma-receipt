@@ -419,6 +419,7 @@
       *
       *  04.08.01    NACL-門脇    15/09/16  自賠責（健保準拠）の点数単価
       *                                     入外別対応
+      *  04.08.02    NACL-門脇    15/10/05  難病特記事項対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1506,27 +1507,6 @@
            03  TBL-GENBUTU70   PIC X(03)   OCCURS    2.
       *
        01  TBL-GENBUTU70-MAX   PIC 9(02)   VALUE     2.
-      *
-      *    特定疾患等判定用テーブル（上位）
-       01  TBL-TOKUJYOI-AREA.
-           03  FILLER          PIC X(03)   VALUE    "966".
-           03  FILLER          PIC X(03)   VALUE    "956".
-      *
-       01  TBL-TOKUJYOI-R      REDEFINES   TBL-TOKUJYOI-AREA.
-           03  TBL-TOKUJYOI    PIC X(03)   OCCURS    2.
-      *
-       01  TBL-TOKUJYOI-MAX    PIC 9(02)   VALUE     2.
-      *
-      *    特定疾患等判定用テーブル（一般・低）
-       01  TBL-TOKUIPAN-AREA.
-           03  FILLER          PIC X(03)   VALUE    "967".
-           03  FILLER          PIC X(03)   VALUE    "957".
-      *
-       01  TBL-TOKUIPAN-R      REDEFINES   TBL-TOKUIPAN-AREA.
-           03  TBL-TOKUIPAN    PIC X(03)   OCCURS    2.
-      *
-       01  TBL-TOKUIPAN-MAX    PIC 9(02)   VALUE     2.
-      *
       *
       *    特別食加算用テーブル
        01  TBL-TOKUSYOKU-AREA.
@@ -5768,56 +5748,50 @@
       *****************************************************************
        20021-TOKUSITU-HENSYU-SEC               SECTION.
       *
-           PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
-                     UNTIL  (GEN-IDX    >    TBL-TOKUJYOI-MAX)
-                       OR   (FLG-TOKUSITU   NOT = ZERO       )
-             INITIALIZE                         PTKOHINF-REC
-             MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
-             MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
-             MOVE    TBL-TOKUJYOI(GEN-IDX)  TO  PTKOH-KOHNUM
-             MOVE    PTKOHINF-REC           TO  MCPDATA-REC
-             MOVE    "DBSELECT"             TO  MCP-FUNC
-             MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
-             MOVE    "key4"                 TO  MCP-PATHNAME
-             CALL    "ORCDBMAIN"            USING  MCPAREA
-                                                   MCPDATA-REC
-                                                   SPA-AREA
-             IF      MCP-RC               =       ZERO
-                 MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
-                 MOVE    "key4"             TO  MCP-PATHNAME
-                 PERFORM  PTKOHINF-READ-SEC
-                 PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                    IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
-                    AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
-                    AND (PTKOH-SAKJOKBN   =  SPACE         )
-                       MOVE    1    TO  FLG-TOKUSITU
-                       IF  LNK-SYU-SRYYMD(1:6) >= "201501"
-                        IF  PTKOH-JKYSNUM(1:2) = "イ"
-                         MOVE  12   TO  FLG-TOKUSITU-KBN
-                        ELSE
-                         MOVE  11   TO  FLG-TOKUSITU-KBN
-                        END-IF
-                       END-IF
-                       MOVE    1    TO  FLG-PTKOHINF
-                    ELSE
-                       MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
-                       MOVE    "key4"          TO  MCP-PATHNAME
-                       PERFORM  PTKOHINF-READ-SEC
-                    END-IF
-                 END-PERFORM
-             END-IF
-             MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
-             MOVE    "key4"             TO  MCP-PATHNAME
-             PERFORM  DB-CLOSE-SEC
-           END-PERFORM
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
+           MOVE    "966"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                  IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                  AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                  AND (PTKOH-SAKJOKBN   =  SPACE         )
+                     MOVE    1    TO  FLG-TOKUSITU
+                     IF  LNK-SYU-SRYYMD(1:6) >= "201501"
+                      IF  PTKOH-JKYSNUM(1:2) = "イ"
+                       MOVE  12   TO  FLG-TOKUSITU-KBN
+                      ELSE
+                       MOVE  11   TO  FLG-TOKUSITU-KBN
+                      END-IF
+                     END-IF
+                     MOVE    1    TO  FLG-PTKOHINF
+                  ELSE
+                     MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                     MOVE    "key4"          TO  MCP-PATHNAME
+                     PERFORM  PTKOHINF-READ-SEC
+                  END-IF
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+           MOVE    "key4"             TO  MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
            IF    FLG-TOKUSITU  =  ZERO
-             PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
-                       UNTIL  (GEN-IDX    >    TBL-TOKUIPAN-MAX)
-                         OR   (FLG-TOKUSITU   NOT = ZERO       )
                INITIALIZE                         PTKOHINF-REC
                MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
                MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
-               MOVE    TBL-TOKUIPAN(GEN-IDX)  TO  PTKOH-KOHNUM
+               MOVE    "967"                  TO  PTKOH-KOHNUM
                MOVE    PTKOHINF-REC           TO  MCPDATA-REC
                MOVE    "DBSELECT"             TO  MCP-FUNC
                MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
@@ -5859,7 +5833,97 @@
                MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
                MOVE    "key4"             TO  MCP-PATHNAME
                PERFORM  DB-CLOSE-SEC
-             END-PERFORM
+           END-IF
+      *
+      ***
+      *
+           IF    FLG-TOKUSITU  =  ZERO
+               INITIALIZE                         PTKOHINF-REC
+               MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
+               MOVE    "956"                  TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+               MOVE    "DBSELECT"             TO  MCP-FUNC
+               MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+               MOVE    "key4"                 TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                     MCPDATA-REC
+                                                     SPA-AREA
+               IF      MCP-RC               =       ZERO
+                   MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                   MOVE    "key4"             TO  MCP-PATHNAME
+                   PERFORM  PTKOHINF-READ-SEC
+                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                      IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                      AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                      AND (PTKOH-SAKJOKBN   =  SPACE         )
+                         MOVE    1    TO  FLG-TOKUSITU
+                         IF  LNK-SYU-SRYYMD(1:6) >= "201501"
+                          IF  PTKOH-JKYSNUM(1:2) = "イ"
+                           MOVE  12   TO  FLG-TOKUSITU-KBN
+                          ELSE
+                           MOVE  11   TO  FLG-TOKUSITU-KBN
+                          END-IF
+                         END-IF
+                         MOVE    1    TO  FLG-PTKOHINF
+                      ELSE
+                         MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                         MOVE    "key4"          TO  MCP-PATHNAME
+                         PERFORM  PTKOHINF-READ-SEC
+                      END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  DB-CLOSE-SEC
+           END-IF
+      *
+           IF    FLG-TOKUSITU  =  ZERO
+               INITIALIZE                         PTKOHINF-REC
+               MOVE    LNK-SYU-HOSPNUM        TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYU-PTID           TO  PTKOH-PTID
+               MOVE    "957"                  TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+               MOVE    "DBSELECT"             TO  MCP-FUNC
+               MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+               MOVE    "key4"                 TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                     MCPDATA-REC
+                                                     SPA-AREA
+               IF      MCP-RC               =       ZERO
+                   MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+                   MOVE    "key4"             TO  MCP-PATHNAME
+                   PERFORM  PTKOHINF-READ-SEC
+                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                      IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                      AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                      AND (PTKOH-SAKJOKBN   =  SPACE         )
+                         IF  FLG-SANSHOU3    =   SPACE
+                            MOVE    2    TO   FLG-TOKUSITU
+                            IF  LNK-SYU-SRYYMD(1:6) >= "201501"
+                             IF  PTKOH-JKYSNUM(1:2) = "エ"
+                              MOVE  22   TO   FLG-TOKUSITU-KBN
+                             ELSE
+                              MOVE  21   TO   FLG-TOKUSITU-KBN
+                             END-IF
+                            END-IF
+                         ELSE
+                            MOVE    3    TO   FLG-TOKUSITU
+                            IF  LNK-SYU-SRYYMD(1:6) >= "201501"
+                              MOVE  31   TO   FLG-TOKUSITU-KBN
+                            END-IF
+                         END-IF
+                         MOVE       1    TO   FLG-PTKOHINF
+                      ELSE
+                         MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                         MOVE    "key4"          TO  MCP-PATHNAME
+                         PERFORM  PTKOHINF-READ-SEC
+                      END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_ptkohinf"     TO  MCP-TABLE
+               MOVE    "key4"             TO  MCP-PATHNAME
+               PERFORM  DB-CLOSE-SEC
            END-IF
       *
            .
