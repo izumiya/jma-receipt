@@ -20,7 +20,7 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 月次帳票
-      *  コンポーネント名  : 病名マスタ一覧
+      *  コンポーネント名  : 傷病名マスタ一覧
       *  管理者            : 
       *  作成日付    作業者        記述
       *  15/09/28    NACL-藤原     新規作成
@@ -106,9 +106,9 @@
       *    病名一覧
        01  HEAD-01.
            03  FILLER                  PIC X(40)   VALUE   SPACE.
-           03  FILLER                  PIC X(10)   VALUE
-               "傷病名一覧".
-           03  H01-TITLE               PIC X(32)   VALUE   SPACE.
+           03  FILLER                  PIC X(16)   VALUE
+               "傷病名マスタ一覧".
+           03  H01-TITLE               PIC X(26)   VALUE   SPACE.
            03  FILLER                  PIC X(08)   VALUE   "作成日：".
            03  H01-SYSYMD              PIC X(09).
            03  FILLER                  PIC X(05)   VALUE   "   P.".
