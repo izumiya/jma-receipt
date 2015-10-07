@@ -35,25 +35,26 @@
        FILE-CONTROL.
       *
       *    エラーファイル
-           SELECT  RECEERR-FILE    ASSIGN  RECEERR
-                                   FILE    STATUS  IS  STS-RECEERR.
+           SELECT  TOUKEIERR-FILE    ASSIGN  TOUKEIERR
+                                   FILE    STATUS  IS  STS-TOUKEIERR.
       *
        DATA                        DIVISION.
        FILE                        SECTION.
       *
       *    エラーファイル
-       FD  RECEERR-FILE.
-       01  RECEERR-REC             PIC X(200).
+       FD  TOUKEIERR-FILE.
+       01  TOUKEIERR-REC             PIC X(200).
       *
        WORKING-STORAGE             SECTION.
       *
-           COPY    "CPRECEERR.INC".
+           COPY    "CPRECEERR.INC" REPLACING  //RECEERR//
+                                   BY         //TOUKEIERR//.
       *
            COPY    "HCMSL80.INC".
       *
       *    ステータス領域
        01  STS-AREA.
-           03  STS-RECEERR         PIC X(02).
+           03  STS-TOUKEIERR         PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -69,10 +70,12 @@
            03  CNT-LINE            PIC 9(05).
            03  CNT-OUT             PIC 9(05).
            03  CNT-OUT-ALL         PIC 9(05).
+           03  CNT-CSV             PIC 9(05).
       *
        01  INDEX-AREA.
-           03  IDX                 PIC 9(02).
-           03  IDY                 PIC 9(02).
+           03  IDW                 PIC 9(04).
+           03  IDX                 PIC 9(04).
+           03  IDY                 PIC 9(04).
       *
        01  WRK-PARA.
            COPY    "CPORCSPRTLNK.INC".
@@ -83,11 +86,39 @@
            03  WRK-PARA-PRTKBN     PIC X(01).
       *
        01  WRK-AREA.
-           03  WRK-SYMD            PIC 9(08).
+           03  WRK-SYMD.
+               05  WRK-SYY         PIC 9(04).
+               05  WRK-SMM         PIC 9(02).
+               05  WRK-SDD         PIC 9(02).
       *
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
-           COPY    "COMMON-SPA".
+      *    ＣＳＶデータ編集用
+       01  WRK-CSV-AREA.
+           03  WRK-IN-DATA         PIC X(2000).
+           03  WRK-OUT-REC         PIC X(2000).
+           03  WRK-CSV-REC         PIC X(2000).
+           03  WRK-REC-LENGTH      PIC 9(05).
+           03  WRK-IN-MAX          PIC 9(04).
+           03  WRK-END             PIC 9(01).
+      *
+      *    ＣＳＶデータ日付編集用
+       01  WRK-CSVHENYMD.
+           03  WRK-CYY             PIC 9(04).
+           03  FILLER              PIC X(01)   VALUE   "/".
+           03  WRK-CMM             PIC 9(02).
+           03  FILLER              PIC X(01)   VALUE   "/".
+           03  WRK-CDD             PIC 9(02).
+      *
+      *    ＣＳＶ出力先
+       01  WRK-TO-DATA-AREA.
+           03  WRK-TO-DATA.
+               05  WRK-TO-DATA-HOSPNUM PIC 9(02).
+               05  FILLER              PIC X(16)   VALUE
+                                       "shobyomeimasuta_".
+               05  WRK-TO-DATA-SYOKBN  PIC X(01).
+               05  WRK-TO-DATA-PRTKBN  PIC X(01).
+               05  FILLER              PIC X(04)   VALUE   ".csv".
       *
       *    移行先病名
        01  WRK-BYOMEI-REC.
@@ -95,7 +126,7 @@
                                    BY         //WRK-BYO-//.
       *
        01  WRK-ERR-AREA.
-           03  WRK-RECEERR             PIC X(200).
+           03  WRK-TOUKEIERR             PIC X(200).
            03  WRK-ERRMSG              PIC X(300).
            03  WRK-MCP-RC              PIC 9(9).
            03  WRK-ERR-FILE-STS        PIC X(02).
@@ -103,7 +134,51 @@
            03  WRK-ERR-FILE-MSG1       PIC X(17).
            03  WRK-ERR-FLG             PIC 9(01).
       *
-      *    病名一覧
+       01  CSV-HEAD-01.
+           03  FILLER                  PIC X(12)   VALUE
+               "傷病名コード".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(08)   VALUE
+               "傷病名称".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(14)  VALUE
+               "傷病名カナ名称".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(16)   VALUE
+               "ＩＣＤ−１０−１".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(16)   VALUE
+               "ＩＣＤ−１０−２".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(12)   VALUE
+               "病名管理番号".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(08)   VALUE   "採択区分".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(12)   VALUE
+               "交換用コード".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(18)   VALUE
+               "特定疾患等対象区分".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(16)   VALUE
+               "難病外来対象区分".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(16)   VALUE
+               "単独使用禁止区分".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(14)   VALUE
+               "保険請求外区分".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(10)   VALUE
+               "廃止年月日".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(12)   VALUE
+               "移行先コード".
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  FILLER                  PIC X(12)   VALUE
+               "移行先傷病名".
+      *
        01  HEAD-01.
            03  FILLER                  PIC X(40)   VALUE   SPACE.
            03  FILLER                  PIC X(16)   VALUE
@@ -201,6 +276,12 @@
       *
        01  WRK-CONST-AREA.
            03  WRK-CONS-LINE-MAX       PIC 9(02)   VALUE   80.
+      *    カンマ
+           03  WRK-KUGIRI          PIC X(01)   VALUE   ",".
+      *    改行コード
+           03  WRK-KAIGYO          PIC X(01)   VALUE   X"0D".
+      *
+           COPY    "COMMON-SPA".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -241,6 +322,9 @@
       *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    統計ＣＳＶ制御サブ
+           COPY    "CPORCSTOUKEICSV.INC".
       *
       *    ＤＢ検索
            COPY    "MCPAREA".
@@ -286,7 +370,7 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  SPA-AREA
       *
-           INITIALIZE                  RECEERR
+           INITIALIZE                  TOUKEIERR
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -305,7 +389,7 @@
                                        WRK-PARA-JOBID
                                        WRK-PARA-SHELLID
                                        WRK-PARA-HOSPNUM
-                                       RECEERR
+                                       TOUKEIERR
                                        WRK-PARA-SYOKBN
                                        WRK-PARA-PRTKBN
            END-UNSTRING
@@ -343,10 +427,10 @@
            PERFORM 900-CALL-ORCSJOB-SEC
       *
            INITIALIZE                  SGETTEMP-AREA
-           MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
+           MOVE    TOUKEIERR         TO  SGETTEMP-BASENAMES (1)
            CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAMES (1)
-                                   TO  RECEERR
+                                   TO  TOUKEIERR
       *
            EVALUATE    WRK-PARA-SYOKBN
                WHEN    "0"
@@ -361,7 +445,7 @@
                    MOVE    "（修飾語）　"      TO  H01-TITLE
                WHEN    OTHER
                    MOVE    "指定したパラメタが正しくありません"
-                                               TO  WRK-RECEERR
+                                               TO  WRK-TOUKEIERR
                    PERFORM 500-ERR-HENSYU-SEC
            END-EVALUATE
       *
@@ -369,7 +453,7 @@
                CONTINUE
            ELSE
                MOVE    "指定したパラメタが正しくありません"
-                                           TO  WRK-RECEERR
+                                           TO  WRK-TOUKEIERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
@@ -381,6 +465,12 @@
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    LNK-DAY2-EDTYMD1
                                    TO  H01-SYSYMD
+      *
+      *    ＣＳＶ
+           MOVE    SPA-HOSPNUM         TO  WRK-TO-DATA-HOSPNUM
+           MOVE    WRK-PARA-SYOKBN     TO  WRK-TO-DATA-SYOKBN
+           MOVE    WRK-PARA-PRTKBN     TO  WRK-TO-DATA-PRTKBN
+           DISPLAY "CSVFILE=" WRK-TO-DATA
            .
        100-INIT-EXT.
            EXIT.
@@ -566,6 +656,8 @@
                PERFORM 31012-SEIWA-HEN-SEC
                MOVE    LNK-DAY2-EDTYMD1    TO  B04-HAISIYMD
            END-IF
+      *
+           INITIALIZE                      WRK-BYOMEI-REC
            IF      BYO-IKOSAKICD       =   SPACE
                CONTINUE
            ELSE
@@ -603,6 +695,9 @@
                ADD     1               TO  CNT-LINE
                MOVE    BODY-04         TO  HCMSL80-MOJI (CNT-LINE)
            END-IF
+      *
+      *    ＣＳＶデータ出力
+           PERFORM 500-CSV-SYORI-SEC
       *
            ADD     1               TO  CNT-LINE
       *
@@ -682,46 +777,244 @@
                CONTINUE
            ELSE
                MOVE    "印刷ＤＢに更新できませんでした"
-                                          TO  WRK-RECEERR
+                                          TO  WRK-TOUKEIERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
            .
        2002-PRINT-OUT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    ＣＳＶデータ処理
+      *****************************************************************
+       500-CSV-SYORI-SEC             SECTION.
+      *
+           IF      CNT-CSV             =   ZERO
+               PERFORM 5001-CSV-HEAD-SEC
+           END-IF
+      *
+           INITIALIZE                      WRK-CSV-AREA
+      *    傷病名コード
+           MOVE    BYO-BYOMEICD        TO  WRK-IN-DATA
+           MOVE    7                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    傷病名称
+           MOVE    BYO-BYOMEI          TO  WRK-IN-DATA
+           MOVE    200                 TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    傷病名カナ名称
+           MOVE    BYO-BYOMEIKANA      TO  WRK-IN-DATA
+           MOVE    200                 TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    ＩＤＣ−１０−１
+           MOVE    BYO-ICD10-1         TO  WRK-IN-DATA
+           MOVE    5                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    ＩＤＣ−１０−２
+           MOVE    BYO-ICD10-2         TO  WRK-IN-DATA
+           MOVE    5                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    病名管理区分
+           MOVE    BYO-HYOJUNCD        TO  WRK-IN-DATA
+           MOVE    8                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    採択区分
+           MOVE    BYO-SAITAKUKBN      TO  WRK-IN-DATA
+           MOVE    1                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    病名交換用コード
+           MOVE    BYO-BYOMEICHGCD     TO  WRK-IN-DATA
+           MOVE    4                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    特定疾患コード
+           MOVE    BYO-TOKSKNCD        TO  WRK-IN-DATA
+           MOVE    2                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    難病外来コード
+           MOVE    BYO-TOKSKNCD        TO  WRK-IN-DATA
+           MOVE    2                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    単独使用禁止区分
+           MOVE    BYO-TANDOKUKBN      TO  WRK-IN-DATA
+           MOVE    2                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    保険請求外区分
+           MOVE    BYO-HKNSKYKBN       TO  WRK-IN-DATA
+           MOVE    1                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    廃止年月日
+           MOVE    BYO-HAISIYMD        TO  WRK-SYMD
+           MOVE    WRK-SYY             TO  WRK-CYY
+           MOVE    WRK-SMM             TO  WRK-CMM
+           MOVE    WRK-SDD             TO  WRK-CDD
+           MOVE    WRK-CSVHENYMD       TO  WRK-IN-DATA
+           MOVE    10                  TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    移行先コード
+           MOVE    BYO-IKOSAKICD       TO  WRK-IN-DATA
+           MOVE    7                   TO  WRK-IN-MAX
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *    移行先傷病名
+           MOVE    WRK-BYO-BYOMEI      TO  WRK-IN-DATA
+           MOVE    200                 TO  WRK-IN-MAX
+           MOVE    1                   TO  WRK-END
+           PERFORM 5002-MOJI-HENSYU-SEC
+      *
+           MOVE    SPACE               TO  WRK-OUT-REC
+           STRING  WRK-CSV-REC(1:WRK-REC-LENGTH)
+                   WRK-KAIGYO              DELIMITED  BY  SIZE
+                   INTO        WRK-OUT-REC
+           END-STRING
+           MOVE    WRK-OUT-REC         TO  WRK-CSV-REC
+           PERFORM 600-TOUKEICSV-SEC
+      *
+           .
+       500-CSV-SYORI-EXIT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    統計ＣＳＶ出力処理
+      *****************************************************************
+       5001-CSV-HEAD-SEC           SECTION.
+      *
+           MOVE    CSV-HEAD-01         TO  WRK-OUT-REC
+           MOVE    SPACE               TO  WRK-CSV-REC
+           STRING  WRK-OUT-REC         DELIMITED  BY  SPACE
+                   WRK-KAIGYO          DELIMITED  BY  SIZE
+                                       INTO  WRK-CSV-REC
+           END-STRING
+           PERFORM 600-TOUKEICSV-SEC
+      *
+           .
+       5001-CSV-HEAD-EXIT.
+           EXIT.
+      *
+      *****************************************************************
+      *    出力レコード処理（文字）
+      *****************************************************************
+       5002-MOJI-HENSYU-SEC          SECTION.
+      *
+           IF      WRK-IN-DATA         =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDW     FROM    WRK-IN-MAX  BY  -1
+                       UNTIL   IDW     <       1
+                   IF      WRK-IN-DATA (IDW:1) NOT =   SPACE
+                       IF      WRK-REC-LENGTH      =   ZERO
+                           MOVE    WRK-IN-DATA (1:IDW)
+                                                   TO  WRK-CSV-REC
+                       ELSE
+                           MOVE    SPACE           TO  WRK-OUT-REC
+                           STRING  WRK-CSV-REC(1:WRK-REC-LENGTH)
+                                               DELIMITED   BY  SIZE
+                                   WRK-IN-DATA(1:IDW)
+                                               DELIMITED   BY  SIZE
+                                   INTO        WRK-OUT-REC
+                           END-STRING
+                           MOVE    WRK-OUT-REC         TO  WRK-CSV-REC
+                       END-IF
+                       ADD     IDW                 TO  WRK-REC-LENGTH
+                       MOVE    1                   TO  IDW
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF      WRK-END             =   ZERO
+               MOVE    SPACE               TO  WRK-OUT-REC
+               STRING  WRK-CSV-REC(1:WRK-REC-LENGTH)
+                       WRK-KUGIRI              DELIMITED  BY  SIZE
+                       INTO        WRK-OUT-REC
+               END-STRING
+               MOVE    WRK-OUT-REC         TO  WRK-CSV-REC
+               ADD     1                   TO  WRK-REC-LENGTH
+           END-IF
+      *
+           .
+       5002-MOJI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    統計ＣＳＶ出力処理
+      *****************************************************************
+       600-TOUKEICSV-SEC           SECTION.
+      *
+           INITIALIZE                      ORCSTOUKEICSVAREA
+           MOVE    "INS"               TO  STOUKEICSV-MODE
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                       TO  STOUKEICSV-TBL-KEY
+           MOVE    LNK-PRTKANRI-RENNUM
+                                       TO  STOUKEICSV-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  STOUKEICSV-TBL-GROUP
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  STOUKEICSV-SHORI-RENNUM
+           MOVE    LNK-PRTKANRI-SHELLID
+                                       TO  STOUKEICSV-SHELLID
+           MOVE    "/var/tmp/"         TO  STOUKEICSV-TO-FOLDER
+           MOVE    WRK-TO-DATA         TO  STOUKEICSV-TO-DATA
+           MOVE    "2"                 TO  STOUKEICSV-CODE-TYPE
+           MOVE    WRK-CSV-REC         TO  STOUKEICSV-CSVDATA
+           MOVE    "傷病名マスタ一覧ＣＳＶ作成"
+                                       TO  STOUKEICSV-TITLE
+      *
+           CALL    "ORCSTOUKEICSV"     USING
+                                       ORCSTOUKEICSVAREA
+                                       SPA-AREA
+           IF      STOUKEICSV-RETURN   =   ZERO
+               ADD     1               TO  CNT-CSV
+               CONTINUE
+           ELSE
+               MOVE    "統計ＣＳＶＤＢに更新できませんでした"
+                                      TO  WRK-TOUKEIERR
+               PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+           .
+      *
+       600-TOUKEICSV-EXT.
+           EXIT.
       *
       *****************************************************************
       *    エラー出力処理
       *****************************************************************
        500-ERR-HENSYU-SEC          SECTION.
       *
-           OPEN    INPUT               RECEERR-FILE
-           IF        ( STS-RECEERR     =   ZERO )
+           OPEN    INPUT               TOUKEIERR-FILE
+           IF        ( STS-TOUKEIERR   =   ZERO )
                CONTINUE
            ELSE
-               OPEN    OUTPUT              RECEERR-FILE
+               OPEN    OUTPUT              TOUKEIERR-FILE
       *
-               MOVE    WRK-RECEERR     TO  RECEERR-REC
-               WRITE   RECEERR-REC
-               CLOSE   RECEERR-FILE
+               MOVE    WRK-TOUKEIERR   TO  TOUKEIERR-REC
+               WRITE   TOUKEIERR-REC
+               CLOSE   TOUKEIERR-FILE
       *
       *        ジョブ管理開始処理
                MOVE    "JBE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
-               MOVE    WRK-RECEERR     TO  JOB-YOBI
+               MOVE    WRK-TOUKEIERR   TO  JOB-YOBI
                MOVE    "9999"          TO  JOB-ERRCD
                PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
+           PERFORM 500-COBABORT-SEC
+           .
+       500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    異常終了処理
+      *****************************************************************
+       500-COBABORT-SEC          SECTION.
       *
            MOVE    SPACE           TO  WRK-ERRMSG
            STRING  "ORCBG025 "     DELIMITED  BY  SIZE
-                   WRK-RECEERR     DELIMITED  BY  SIZE
+                   WRK-TOUKEIERR   DELIMITED  BY  SIZE
                    LOW-VALUE       DELIMITED  BY  SIZE
                                    INTO    WRK-ERRMSG
            END-STRING
            CALL    "cobabort"      USING   WRK-ERRMSG
            .
-       500-ERR-HENSYU-EXT.
+       500-COBABORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -816,6 +1109,7 @@
                END-IF
            ELSE
                MOVE    1               TO  FLG-BYOMEI
+               INITIALIZE                  WRK-BYOMEI-REC
            END-IF
       *
            MOVE    "tbl_byomei"    TO  MCP-TABLE
@@ -861,7 +1155,7 @@
                        MCP-TABLE           DELIMITED   BY  SPACE
                        " RC="              DELIMITED   BY  SIZE
                        WRK-MCP-RC          DELIMITED   BY  SIZE
-                                           INTO    WRK-RECEERR
+                                           INTO    WRK-TOUKEIERR
                END-STRING
                PERFORM 500-ERR-HENSYU-SEC
       *
