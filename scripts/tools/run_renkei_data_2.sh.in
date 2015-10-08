@@ -127,6 +127,7 @@ ARG13="$2/"
 ARG18="127.0.0.1"
 ARG20=`printf "%02d" $1`
 ARG16="/tmp/${ARG20}00OR044ERRAAAABBBBCCCCDDDD.dat"
+STIME=$(date  '+%H%M%S')
 
 export MON_BATCH_ID=$(uuidgen)
 export MON_BATCH_NAME="recept4.sh"
@@ -138,7 +139,7 @@ export MCP_TENANT=1
 # 社保
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
 
-PARAM="0001 SOKATU \"${ARG05}${ARG06}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
        recept4.sh 0000 AAAABBBBCCCCDDDD orcacron prt 1 \
        \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
        2 \"${ARG20}\" 6 0 0 0 99999999 0"
@@ -161,7 +162,7 @@ export MCP_TENANT=1
 # 国保・広域
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
 
-PARAM="0001 SOKATU \"${ARG05}${ARG06}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
        recept4.sh 0000 AAAABBBBCCCCDDDD orcacron prt 4 \
        \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
        2 \"${ARG20}\" 6 0 0 0 99999999 0"
