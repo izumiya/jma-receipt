@@ -26232,7 +26232,8 @@
                   ELSE
                    IF  WK-KOH-COMPFTN(KOH-IDX)
                                        >  LNK-SYU-SYUCOMPFTN-ENTANI
-                     MOVE   LNK-SYU-SYUCOMPFTN-ENTANI     TO
+      ***            MOVE   LNK-SYU-SYUCOMPFTN-ENTANI     TO
+                     MOVE   LNK-SYU-SYUCOMPFTN            TO
                                           WK-KOH-COMPFTN(KOH-IDX)
                    END-IF
                   END-IF
@@ -26458,7 +26459,6 @@
                  END-IF
                END-IF
       **
-      ***      IF    LNK-SYU-SYUCOMPFTN-ENTANI   NOT =    ZERO          
                IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                        IF    LNK-SYU-SYUCOMPFTN-ENTANI
@@ -26470,7 +26470,6 @@
                                  TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
                        END-IF
                ELSE
-      ***        IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)   NOT =    ZERO
                  IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                  AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                        IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)
@@ -26497,23 +26496,20 @@
                   ( HKN-RECEFTNDSPKBN           = "2"            ) OR
                   ((LNK-SYU-SRYYMD(1:6)        >= "200404"      ) AND
                    (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "015" OR "016"))
-      ***       IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
                 IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                 AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
-      *                IF   LNK-SYU-SYUCOMPFTN   >  ZAN-KOHI-T2(KOH-IDX)
                        IF   LNK-SYU-SYUCOMPFTN-ENTANI
-                                                 >  ZAN-KOHI-T2(KOH-IDX)
+                                                 >= ZAN-KOHI-T2(KOH-IDX)
                            MOVE   ZAN-KOHI-T2(KOH-IDX)
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
                            PERFORM    23073-KOHHI-HIKAKU2-SEC
                        ELSE
-      *                    MOVE  LNK-SYU-SYUCOMPFTN
-                           MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
+      ***                  MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
+                           MOVE  LNK-SYU-SYUCOMPFTN
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
                            PERFORM    23073-KOHHI-HIKAKU2-SEC
                        END-IF
                 ELSE
-      ***        IF    LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
                  IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                  AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                        IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)
@@ -26540,7 +26536,6 @@
                 END-IF
                END-IF                                                   
       **
-      ***      IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
                IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                        IF   LNK-SYU-SYUCOMPFTN   >  ZAN-KOHI-T(KOH-IDX)
@@ -26553,7 +26548,6 @@
                                                          (KOH-IDX)
                        END-IF
                ELSE
-      ***        IF    LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
                  IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                  AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                        IF    LNK-SYU-KOH-COMPFTN(1)
@@ -27044,7 +27038,8 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-                       MOVE  WK-KOH-COMPFTN(1)
+      ***              MOVE  WK-KOH-COMPFTN(1)
+                       MOVE  LNK-SYU-KOH-COMPFTN(1)
                                             TO  WK-KOH-COMPFTN(2)
                    END-IF
                  END-IF
@@ -27056,7 +27051,8 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(2)      < WK-KOH-COMPFTN(3)
-                       MOVE  WK-KOH-COMPFTN(2)
+      ***              MOVE  WK-KOH-COMPFTN(2)
+                       MOVE  LNK-SYU-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
                    END-IF
                  END-IF
@@ -27068,7 +27064,8 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(3)      < WK-KOH-COMPFTN(4)
-                       MOVE  WK-KOH-COMPFTN(3)
+      ***              MOVE  WK-KOH-COMPFTN(3)
+                       MOVE  LNK-SYU-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
                    END-IF
                  END-IF
@@ -27117,7 +27114,8 @@
                   IF  WK-DAY-KOH-COMPFTN(1)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(1)      < WK-DAY-KOH-COMPFTN(2)
                     AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-                        MOVE  WK-KOH-COMPFTN(1)
+      ***               MOVE  WK-KOH-COMPFTN(1)
+                        MOVE  LNK-SYU-KOH-COMPFTN(1)
                                              TO  WK-DAY-KOH-COMPFTN(2)
                     END-IF
                   ELSE
@@ -27147,7 +27145,8 @@
                   IF  WK-DAY-KOH-COMPFTN(2)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(2)      < WK-DAY-KOH-COMPFTN(3)
                     AND LNK-SYU-KOH2HKNNUM   NOT =  SPACE
-                        MOVE  WK-KOH-COMPFTN(2)
+      ***               MOVE  WK-KOH-COMPFTN(2)
+                        MOVE  LNK-SYU-KOH-COMPFTN(2)
                                              TO  WK-DAY-KOH-COMPFTN(3)
                     END-IF
                   ELSE
@@ -27177,7 +27176,8 @@
                   IF  WK-DAY-KOH-COMPFTN(3)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(3)      < WK-DAY-KOH-COMPFTN(4)
                     AND LNK-SYU-KOH3HKNNUM   NOT =  SPACE
-                        MOVE  WK-KOH-COMPFTN(3)
+      ***               MOVE  WK-KOH-COMPFTN(3)
+                        MOVE  LNK-SYU-KOH-COMPFTN(3)
                                              TO  WK-DAY-KOH-COMPFTN(4)
                     END-IF
                   ELSE
@@ -28196,8 +28196,6 @@
       ******************************************************************
        23076-TOKUSYU-SANTEI-SEC           SECTION.
       *
-      ***  IF    LNK-SYU-SYUCOMPFTN-ENTANI   NOT =    ZERO
-      ***  OR    FLG-GENBUTU70               NOT =    ZERO
            IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                    IF  (LNK-SYU-KOH-HKNNUM(1)  =  "972" OR "974") OR
@@ -28257,7 +28255,6 @@
                       END-IF
                    END-IF
            ELSE
-      ***      IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)   NOT =    ZERO
                IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                    IF  (LNK-SYU-KOH-HKNNUM(1)  =  "972" OR "974") OR
@@ -28374,8 +28371,6 @@
            END-IF
       **
            IF    HKN-RECEFTNDSPKBN      =  "2"
-      ***     IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
-      ***     OR    FLG-GENBUTU70        NOT =    ZERO
               IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                     IF  (LNK-SYU-KOH-HKNNUM(1)  =  "972" OR "974") OR
@@ -28431,7 +28426,6 @@
                       END-IF
                     END-IF
               ELSE
-      ***       IF  LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
                 IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                 AND (LNK-SYU-KOH1HKNNUM        =   "027")
                     IF  (LNK-SYU-KOH-HKNNUM(1)  =  "972" OR "974") OR
@@ -28540,8 +28534,6 @@
               END-IF
            END-IF
       **
-      ***  IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
-      ***  OR    FLG-GENBUTU70        NOT =    ZERO
            IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                   IF   FLG-KOUGAKUCYO-GEN70   =   1
@@ -28607,7 +28599,6 @@
                       END-IF
                   END-IF
            ELSE
-      ***     IF  LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
               IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND (LNK-SYU-KOH1HKNNUM        =   "027")
                   COMPUTE  WK-TOKUSYU =
@@ -29004,8 +28995,6 @@
       ******************************************************************
        23077-TOKUSYU-SANTEI2-SEC           SECTION.
       *
-      ***  IF    LNK-SYU-SYUCOMPFTN-ENTANI   NOT =    ZERO
-      ***  OR    FLG-GENBUTU70               NOT =    ZERO
            IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                    MOVE   LNK-SYU-SYUCOMPFTN-ENTANI  TO
@@ -29058,7 +29047,6 @@
                    MOVE   LNK-SYU-SYUCOMPFTN-ENTANI  TO
                                                  WK-TOKUSYU-ENTANI
            ELSE
-      ***      IF    LNK-SYU-KOH-COMPFTN-ENTANI(1)   NOT =    ZERO
                IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                    MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(1)  TO
@@ -29163,8 +29151,6 @@
            END-IF
       **
            IF    HKN-RECEFTNDSPKBN      =  "2"
-      ***     IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
-      ***     OR    FLG-GENBUTU70        NOT =    ZERO
               IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                    MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
@@ -29211,7 +29197,6 @@
                    MOVE   LNK-SYU-SYUCOMPFTN-ENTANI
                                               TO  WK-TOKUSYU-COMPFTN2
               ELSE
-      ***       IF  LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
                 IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                 AND (LNK-SYU-KOH1HKNNUM        =   "027")
                    MOVE  LNK-SYU-KOH-COMPFTN-ENTANI(1)
@@ -29303,8 +29288,6 @@
               END-IF
            END-IF
       **
-      ***  IF    LNK-SYU-SYUCOMPFTN   NOT =    ZERO
-      ***  OR    FLG-GENBUTU70        NOT =    ZERO
            IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND   (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                   IF  (FLG-KOUGAKUCYO3      =     1)
@@ -29359,7 +29342,6 @@
                   END-IF
                   MOVE   LNK-SYU-SYUCOMPFTN  TO  WK-TOKUSYU-COMPFTN
            ELSE
-      ***     IF  LNK-SYU-KOH-COMPFTN(1)   NOT =    ZERO
               IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND (LNK-SYU-KOH1HKNNUM        =   "027")
                   IF   FLG-KOUGAKUCYO3     =     1
@@ -29570,14 +29552,11 @@
       ******************************************************************
        23078-TOKUSYU-SANTEI3-SEC           SECTION.
       *
-      ***  IF     LNK-SYU-SYUCOMPFTN-ENTANI       NOT =    ZERO
-      ***  OR     FLG-GENBUTU70                   NOT =    ZERO
            IF     (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND    (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                   COMPUTE     WK-HANGAKU-ENTANI     =
                               LNK-SYU-SYUCOMPFTN-ENTANI      *  0.5
            ELSE
-      ***    IF   LNK-SYU-KOH-COMPFTN-ENTANI(1)   NOT =    ZERO
              IF   (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
              AND  (LNK-SYU-KOH1HKNNUM        =   "027")
                     COMPUTE   WK-HANGAKU-ENTANI     =
@@ -29601,15 +29580,12 @@
       *
            IF     HKN-RECEFTNDSPKBN          =  "2"
       *
-      ***     IF      LNK-SYU-SYUCOMPFTN       NOT =   ZERO
-      ***     OR      FLG-GENBUTU70            NOT =   ZERO
               IF      (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND     (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                       COMPUTE   WK-HANGAKU-COMPFTN   =
                                (LNK-SYU-SYUCOMPFTN-ENTANI     *  0.5)
                                                               +  0.5
               ELSE
-      ***       IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
                 IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                 AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                       COMPUTE   WK-HANGAKU-COMPFTN   =
@@ -29635,9 +29611,6 @@
            END-IF
       *
       *
-      ***  IF      LNK-SYU-SYUCOMPFTN       NOT =   ZERO
-      ***  IF      WK-TOKUTEI-COMPFTN       NOT =   ZERO
-      ***  OR      FLG-GENBUTU70            NOT =   ZERO
            IF      (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND     (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                    COMPUTE   WK-HANGAKU-COMPFTN   =
@@ -29645,8 +29618,6 @@
                             (WK-TOKUTEI-COMPFTN      *  0.5)
                                                      +  0.5
            ELSE
-      ***    IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
-      ***    IF    WK-TOKUTEI-COMPFTN3      NOT =   ZERO
              IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
              AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                    COMPUTE   WK-HANGAKU-COMPFTN   =
@@ -29769,8 +29740,6 @@
       *
       *    ÉéÃ´¶â³Û¤Î·×»»
       *
-      ***  IF     LNK-SYU-SYUCOMPFTN  NOT  =  ZERO
-      ***  OR     FLG-GENBUTU70       NOT  =  ZERO
            IF     (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND    (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                   COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
@@ -29780,8 +29749,6 @@
                   COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =  WK-FTN
                                                           *  10
            ELSE
-      ***    IF   (LNK-SYU-KOH-HKNNUM(1)       =   "027")
-      ***    AND  (LNK-SYU-KOH-COMPFTN(1)  NOT =   ZERO )
              IF   (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
              AND  (LNK-SYU-KOH1HKNNUM        =   "027")
                   COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
@@ -29893,7 +29860,6 @@
       ******************************************************************
        23082-TOKYO-KOHI-SEC           SECTION.
       *
-      ***  IF      WK-TOKUTEI-COMPFTN   NOT =    ZERO
            IF      (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
            AND     (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                 COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
