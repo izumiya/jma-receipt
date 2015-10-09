@@ -3925,7 +3925,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *----(04.08.04)--UPD-START---
       *    期間重複チェック
-           MOVE    ZERO            TO  FLG-OK
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL ( IDX     >   SPA-GMN-TBL-MAX )
                    OR    ( SPA-ERRCD   NOT =   SPACE )
@@ -3933,14 +3932,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *            選択された内容の開始日が変更された場合
                    IF      SPA-NAI-STYUKYMD    =   SPA-NAI-TSTYUKYMD
                                                                (IDX)
-                       MOVE    2           TO  FLG-OK
+                       MOVE    2           TO  SPA-GMN-SYORI
                    ELSE
-                       MOVE    1           TO  FLG-OK
+                       MOVE    1           TO  SPA-GMN-SYORI
                    END-IF
                ELSE
-                   MOVE    1           TO  FLG-OK
+                   MOVE    1           TO  SPA-GMN-SYORI
                END-IF
-               IF      FLG-OK   =   1
+               IF      SPA-GMN-SYORI   =   1
                    IF     (SPA-NAI-TEDYUKYMD (IDX)
                                        <   SPA-NAI-STYUKYMD )  OR
                           (SPA-NAI-TSTYUKYMD (IDX)
