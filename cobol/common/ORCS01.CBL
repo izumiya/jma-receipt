@@ -16850,9 +16850,11 @@
                PERFORM  DB-CLOSE-SEC
                MOVE     1             TO   FLG-SYUNOU-HKN-HANTEI
            END-IF
-           MOVE    "tbl_hkncombi"     TO   MCP-TABLE
-           MOVE    "key"              TO   MCP-PATHNAME
-           PERFORM  DB-CLOSE-SEC
+           IF  FLG-SYUNOU-HKN-HANTEI = ZERO
+               MOVE    "tbl_hkncombi" TO   MCP-TABLE
+               MOVE    "key"          TO   MCP-PATHNAME
+               PERFORM  DB-CLOSE-SEC
+           END-IF
       ***  IF     (FLG-GENBUTU70            NOT =  ZERO)
       ***  OR     (FLG-KOHININBARAI             =    1 )
       ***  OR     (LNK-S01-KOUREI-ZAITAKU-KBN   =   "1")
