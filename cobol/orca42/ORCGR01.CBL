@@ -174,6 +174,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    15/10/09  削除処理を行わない場合の表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -934,6 +935,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                    WHEN    "1008"
                    WHEN    "1009"
                    WHEN    "1010"
+                       MOVE    1               TO  SPA-NAI-R01-DELETE
+      *
                        MOVE    SPA-NAI-R01-SRYYM
                                                TO  WRK-ACCT-SRYYM
                        MOVE    SPA-GMN-R01-NYUGAIKBN
@@ -1136,7 +1139,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
       *
            INITIALIZE                  SPA-GMN-R01-KOUMOKU
                                        SPA-NAI-R01-KOUMOKU
-           MOVE    ZERO                TO  SPA-NAI-R01-SELNO                           
+           MOVE    ZERO                TO  SPA-NAI-R01-SELNO
       *
            MOVE    3                   TO  SPA-GMN-R01-CUR
       *
@@ -1991,7 +1994,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO  SS001-HOSPNUM
        4103-PTNUM-CHK-SEC            SECTION.
       *
            MOVE    SPACE               TO  SPA-GMN-R01-NAME
-           MOVE    ZERO                TO  SPA-NAI-R01-PTID 
+           MOVE    ZERO                TO  SPA-NAI-R01-PTID
+                                           SPA-NAI-R01-DELETE
       *
            INITIALIZE                  ORCSPTIDAREA
 grpsys     MOVE    SPA-HOSPNUM             TO  SPTID-HOSPNUM
@@ -2266,7 +2270,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
                                        MOVE    "1010"      TO  SPA-RIDCD
                                END-EVALUATE
                                MOVE    SPACE    TO  SPA-ERRCD
-                               MOVE    1        TO  SPA-NAI-R01-DELETE
+      *****                    MOVE    1        TO  SPA-NAI-R01-DELETE
       *
                                IF      SPA-GMN-R01-MAX
                                                 =   WRK-CONS-LINE-MAX
