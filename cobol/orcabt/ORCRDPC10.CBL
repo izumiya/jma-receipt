@@ -121,6 +121,9 @@
       *              NACL-藤原    15/07/10  主科未設定のときエラーとする
       *  04.08.01    NACL-藤原    15/08/24  公費のみの診療（医療保険のな
       *                                     い診療）のＥＦ出力可否対応
+      *              NACL-小豆沢  15/10/13  退院時投薬コメント入力分でも
+      *                                     包括分の場合は出来高・包括
+      *                                     フラグに１をセットしない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2427,7 +2430,9 @@
                                                = SYS-9102-SRYCD(1))
                            OR   (RECE65-SRYCD(IDX)
                                                = SYS-9102-SRYCD(2)))
+                            IF  WRK-FEDT-HOUKATU-FLG     NOT =   "6"
                                MOVE  "1"      TO WRK-FEDT-HOUKATU-FLG
+                            END-IF
       *            テーブルが３件なので繰り返しは保留にしIF文のみとした 
       *                        PERFORM VARYING TBL-TAITOYAKU-IDX
       *                            FROM  1  BY  1
