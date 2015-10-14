@@ -1720,7 +1720,7 @@
                    END-IF
                END-IF
       *
-      *        救急・在宅等支援療養病床初期加算（一般病棟入院基本料）
+      *        救急・在宅等支援病床初期加算（一般病棟入院基本料）
                IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190142970"
                   MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
       *            入院処理時のみ行う
@@ -1731,7 +1731,7 @@
                        MOVE    ZERO                TO  FLG-SYORI
       *
                    ELSE
-      *                救急・在宅等支援療養病床初期加算（一般病棟入院基本料）
+      *                救急・在宅等支援病床初期加算（一般病棟入院基本料）
       *                の算定済日数取得
                        PERFORM   210-KYUKYU-KSN1-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
@@ -1748,7 +1748,7 @@
                    END-IF
                END-IF
       *
-      *        救急・在宅等支援療養病床初期加算（特定一般病棟入院料）
+      *        救急・在宅等支援病床初期加算（特定一般病棟入院料）
                IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190152470"
                   MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
       *            入院処理時のみ行う
@@ -1759,7 +1759,7 @@
                        MOVE    ZERO                TO  FLG-SYORI
       *
                    ELSE
-      *                救急・在宅等支援療養病床初期加算（特定一般病棟入院料）
+      *                救急・在宅等支援病床初期加算（特定一般病棟入院料）
       *                の算定済日数取得
                        PERFORM   210-KYUKYU-KSN1-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
@@ -1776,7 +1776,7 @@
                    END-IF
                END-IF
       *
-      *        救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）
+      *        救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
                IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190177170"
                   MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
       *            入院処理時のみ行う
@@ -1787,7 +1787,7 @@
                        MOVE    ZERO                TO  FLG-SYORI
       *
                    ELSE
-      *                救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）
+      *                救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
       *                の算定済日数取得
                        PERFORM   210-KYUKYU-KSN1-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
@@ -2144,76 +2144,15 @@
       *****************************************************************
       *    以下、入院料加算の算定済日数取得
       *      救急・在宅等支援療養病床初期加算
-      *      救急・在宅等支援療養病床初期加算（一般病棟入院基本料）
+      *      救急・在宅等支援病床初期加算（一般病棟入院基本料）
       *      救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）
-      *      救急・在宅等支援療養病床初期加算（特定一般病棟入院料）
-      *      救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）
+      *      救急・在宅等支援病床初期加算（特定一般病棟入院料）
+      *      救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
       *****************************************************************
        210-KYUKYU-KSN1-SEC            SECTION.
       *
       *    入院履歴と入院会計を検索し、算定済み日数を求める
            MOVE     ZERO               TO  WRK-KYUKYU-NISSU
-      *
-      *    救急・在宅等支援療養病床初期加算（一般病棟入院基本料）
-           INITIALIZE                      PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
-                                           PTNYUINRRK-TENSTUYMD
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 910-PTNYUINRRK-SELECT-SEC
-           IF      FLG-PTNYUINRRK      =   ZERO
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key42"             TO  MCP-PATHNAME
-               PERFORM 910-PTNYUINRRK-FETCH-SEC
-               IF      FLG-PTNYUINRRK  =   ZERO
-                   INITIALIZE                      KSN-NYUINACCT-REC
-                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
-                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
-                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
-                                               TO  KSN-NACCT-SRYYM
-                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key48"             TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT       =   ZERO
-                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                       MOVE    "key48"         TO  MCP-PATHNAME
-                       PERFORM 910-NYUINACCT-FETCH-SEC
-                       PERFORM    UNTIL
-                                  FLG-NYUINACCT    =    1
-                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
-                                                   KSN-NACCT-SRYYM
-                               MOVE   PTNYUINRRK-NYUINYMD
-                                               TO  WRK-KSN-YMD
-                               PERFORM   VARYING IDX-KSN  FROM
-                                                 WRK-KSN-DD   BY   1
-                                 UNTIL   IDX-KSN  >   31
-                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
-                                         ADD  1  TO  WRK-KYUKYU-NISSU
-                                     END-IF
-                               END-PERFORM
-                           ELSE
-                               ADD   KSN-NACCT-ZAIKAISU
-                                               TO  WRK-KYUKYU-NISSU
-                           END-IF
-                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                           MOVE    "key48"         TO  MCP-PATHNAME
-                           PERFORM 910-NYUINACCT-FETCH-SEC
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key48"             TO  MCP-PATHNAME
-                   PERFORM 990-DBCLOSE-SEC
-               END-IF
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
       *
       *    救急・在宅等支援療養病床初期加算
            INITIALIZE                      PTNYUINRRK-REC
@@ -2276,7 +2215,7 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *    救急・在宅等支援療養病床初期加算（一般病棟入院基本料）
+      *    救急・在宅等支援病床初期加算（一般病棟入院基本料）
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
@@ -2337,7 +2276,68 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *    救急・在宅等支援療養病床初期加算（特定一般病棟入院料）
+      *    救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key42"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-FETCH-SEC
+               IF      FLG-PTNYUINRRK  =   ZERO
+                   INITIALIZE                      KSN-NYUINACCT-REC
+                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
+                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
+                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
+                                               TO  KSN-NACCT-SRYYM
+                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key48"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key48"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-FETCH-SEC
+                       PERFORM    UNTIL
+                                  FLG-NYUINACCT    =    1
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
+                                               TO  WRK-KYUKYU-NISSU
+                           END-IF
+                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                           MOVE    "key48"         TO  MCP-PATHNAME
+                           PERFORM 910-NYUINACCT-FETCH-SEC
+                       END-PERFORM
+                   END-IF
+      *
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key48"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    救急・在宅等支援病床初期加算（特定一般病棟入院料）
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
@@ -2398,7 +2398,7 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *    救急・在宅等支援療養病床初期加算（地域包括ケア病棟入院料）
+      *    救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
