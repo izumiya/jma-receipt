@@ -1761,7 +1761,7 @@
                    ELSE
       *                µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë
       *                ¤Î»»ÄêºÑÆü¿ô¼èÆÀ
-                       PERFORM   210-KYUKYU-KSN5-SEC
+                       PERFORM   210-KYUKYU-KSN1-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
                          IF  WRK-KYUKYU-NISSU    <   14
                            COMPUTE  WRK-ZOGEN  =  14 - WRK-KYUKYU-NISSU
@@ -1789,7 +1789,7 @@
                    ELSE
       *                µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
       *                ¤Î»»ÄêºÑÆü¿ô¼èÆÀ
-                       PERFORM   210-KYUKYU-KSN6-SEC
+                       PERFORM   210-KYUKYU-KSN1-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
                          IF  WRK-KYUKYU-NISSU    <   14
                            COMPUTE  WRK-ZOGEN  =  14 - WRK-KYUKYU-NISSU
@@ -2146,6 +2146,8 @@
       *      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
       *      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡Ê°ìÈÌÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
       *      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡Ë
+      *      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë
+      *      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
       *****************************************************************
        210-KYUKYU-KSN1-SEC            SECTION.
       *
@@ -2335,8 +2337,130 @@
            MOVE    "key42"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
-      **                 WRK-KYUKYU-NISSU
+      *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key42"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-FETCH-SEC
+               IF      FLG-PTNYUINRRK  =   ZERO
+                   INITIALIZE                      KSN-NYUINACCT-REC
+                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
+                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
+                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
+                                               TO  KSN-NACCT-SRYYM
+                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key50"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key50"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-FETCH-SEC
+                       PERFORM    UNTIL
+                                  FLG-NYUINACCT    =    1
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
+                                               TO  WRK-KYUKYU-NISSU
+                           END-IF
+                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                           MOVE    "key50"         TO  MCP-PATHNAME
+                           PERFORM 910-NYUINACCT-FETCH-SEC
+                       END-PERFORM
+                   END-IF
+      *
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key50"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key42"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-FETCH-SEC
+               IF      FLG-PTNYUINRRK  =   ZERO
+                   INITIALIZE                      KSN-NYUINACCT-REC
+                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
+                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
+                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
+                                               TO  KSN-NACCT-SRYYM
+                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key52"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key52"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-FETCH-SEC
+                       PERFORM    UNTIL
+                                  FLG-NYUINACCT    =    1
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
+                                               TO  WRK-KYUKYU-NISSU
+                           END-IF
+                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                           MOVE    "key52"         TO  MCP-PATHNAME
+                           PERFORM 910-NYUINACCT-FETCH-SEC
+                       END-PERFORM
+                   END-IF
+      *
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key52"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
+      *                 WRK-KYUKYU-NISSU
       *
            .
        210-KYUKYU-KSN1-EXT.
@@ -2415,276 +2539,6 @@
       **                 WRK-KYUKYU-NISSU
            .
        210-KYUKYU-KSN2-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë¤Î
-      *    »»ÄêºÑÆü¿ô¼èÆÀ
-      *****************************************************************
-       210-KYUKYU-KSN5-SEC            SECTION.
-      *
-           MOVE     ZERO               TO  WRK-KYUKYU-NISSU
-      *    Æþ±¡ÍúÎò¤ÈÆþ±¡²ñ·×¤ò¸¡º÷¤·¡¢»»ÄêºÑ¤ßÆü¿ô¤òµá¤á¤ë
-           INITIALIZE                      PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
-                                           PTNYUINRRK-TENSTUYMD
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 910-PTNYUINRRK-SELECT-SEC
-           IF      FLG-PTNYUINRRK      =   ZERO
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key42"             TO  MCP-PATHNAME
-               PERFORM 910-PTNYUINRRK-FETCH-SEC
-               IF      FLG-PTNYUINRRK  =   ZERO
-                   INITIALIZE                      KSN-NYUINACCT-REC
-                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
-                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
-                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
-                                               TO  KSN-NACCT-SRYYM
-                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key50"             TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT       =   ZERO
-                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                       MOVE    "key50"         TO  MCP-PATHNAME
-                       PERFORM 910-NYUINACCT-FETCH-SEC
-                       PERFORM    UNTIL
-                                  FLG-NYUINACCT    =    1
-                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
-                                                   KSN-NACCT-SRYYM
-                               MOVE   PTNYUINRRK-NYUINYMD
-                                               TO  WRK-KSN-YMD
-                               PERFORM   VARYING IDX-KSN  FROM
-                                                 WRK-KSN-DD   BY   1
-                                 UNTIL   IDX-KSN  >   31
-                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
-                                         ADD  1  TO  WRK-KYUKYU-NISSU
-                                     END-IF
-                               END-PERFORM
-                           ELSE
-                               ADD   KSN-NACCT-ZAIKAISU
-                                               TO  WRK-KYUKYU-NISSU
-                           END-IF
-                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                           MOVE    "key50"         TO  MCP-PATHNAME
-                           PERFORM 910-NYUINACCT-FETCH-SEC
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key50"             TO  MCP-PATHNAME
-                   PERFORM 990-DBCLOSE-SEC
-               END-IF
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
-      **                 WRK-KYUKYU-NISSU
-      *    ½¾Á°¤Î²Ã»»Æü¿ô¤ò¹ÍÎ¸¤¹¤ë
-           INITIALIZE                      PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
-                                           PTNYUINRRK-TENSTUYMD
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 910-PTNYUINRRK-SELECT-SEC
-           IF      FLG-PTNYUINRRK      =   ZERO
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key42"             TO  MCP-PATHNAME
-               PERFORM 910-PTNYUINRRK-FETCH-SEC
-               IF      FLG-PTNYUINRRK  =   ZERO
-                   INITIALIZE                      KSN-NYUINACCT-REC
-                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
-                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
-                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
-                                               TO  KSN-NACCT-SRYYM
-                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key44"             TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT       =   ZERO
-                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                       MOVE    "key44"         TO  MCP-PATHNAME
-                       PERFORM 910-NYUINACCT-FETCH-SEC
-                       PERFORM    UNTIL
-                                  FLG-NYUINACCT    =    1
-                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
-                                                   KSN-NACCT-SRYYM
-                               MOVE   PTNYUINRRK-NYUINYMD
-                                               TO  WRK-KSN-YMD
-                               PERFORM   VARYING IDX-KSN  FROM
-                                                 WRK-KSN-DD   BY   1
-                                 UNTIL   IDX-KSN  >   31
-                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
-                                         ADD  1  TO  WRK-KYUKYU-NISSU
-                                     END-IF
-                               END-PERFORM
-                           ELSE
-                               ADD   KSN-NACCT-ZAIKAISU
-                                               TO  WRK-KYUKYU-NISSU
-                           END-IF
-                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                           MOVE    "key44"         TO  MCP-PATHNAME
-                           PERFORM 910-NYUINACCT-FETCH-SEC
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key44"             TO  MCP-PATHNAME
-                   PERFORM 990-DBCLOSE-SEC
-               END-IF
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           .
-       210-KYUKYU-KSN5-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë¤Î
-      *    »»ÄêºÑÆü¿ô¼èÆÀ
-      *****************************************************************
-       210-KYUKYU-KSN6-SEC            SECTION.
-      *
-           MOVE     ZERO               TO  WRK-KYUKYU-NISSU
-      *    Æþ±¡ÍúÎò¤ÈÆþ±¡²ñ·×¤ò¸¡º÷¤·¡¢»»ÄêºÑ¤ßÆü¿ô¤òµá¤á¤ë
-           INITIALIZE                      PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
-                                           PTNYUINRRK-TENSTUYMD
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 910-PTNYUINRRK-SELECT-SEC
-           IF      FLG-PTNYUINRRK      =   ZERO
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key42"             TO  MCP-PATHNAME
-               PERFORM 910-PTNYUINRRK-FETCH-SEC
-               IF      FLG-PTNYUINRRK  =   ZERO
-                   INITIALIZE                      KSN-NYUINACCT-REC
-                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
-                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
-                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
-                                               TO  KSN-NACCT-SRYYM
-                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key52"             TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT       =   ZERO
-                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                       MOVE    "key52"         TO  MCP-PATHNAME
-                       PERFORM 910-NYUINACCT-FETCH-SEC
-                       PERFORM    UNTIL
-                                  FLG-NYUINACCT    =    1
-                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
-                                                   KSN-NACCT-SRYYM
-                               MOVE   PTNYUINRRK-NYUINYMD
-                                               TO  WRK-KSN-YMD
-                               PERFORM   VARYING IDX-KSN  FROM
-                                                 WRK-KSN-DD   BY   1
-                                 UNTIL   IDX-KSN  >   31
-                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
-                                         ADD  1  TO  WRK-KYUKYU-NISSU
-                                     END-IF
-                               END-PERFORM
-                           ELSE
-                               ADD   KSN-NACCT-ZAIKAISU
-                                               TO  WRK-KYUKYU-NISSU
-                           END-IF
-                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                           MOVE    "key52"         TO  MCP-PATHNAME
-                           PERFORM 910-NYUINACCT-FETCH-SEC
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key52"             TO  MCP-PATHNAME
-                   PERFORM 990-DBCLOSE-SEC
-               END-IF
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
-      **                 WRK-KYUKYU-NISSU
-      *    ½¾Á°¤Î²Ã»»Æü¿ô¤ò¹ÍÎ¸¤¹¤ë
-           INITIALIZE                      PTNYUINRRK-REC
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
-           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
-                                           PTNYUINRRK-TENSTUYMD
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 910-PTNYUINRRK-SELECT-SEC
-           IF      FLG-PTNYUINRRK      =   ZERO
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key42"             TO  MCP-PATHNAME
-               PERFORM 910-PTNYUINRRK-FETCH-SEC
-               IF      FLG-PTNYUINRRK  =   ZERO
-                   INITIALIZE                      KSN-NYUINACCT-REC
-                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
-                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
-                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
-                                               TO  KSN-NACCT-SRYYM
-                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key44"             TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT       =   ZERO
-                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                       MOVE    "key44"         TO  MCP-PATHNAME
-                       PERFORM 910-NYUINACCT-FETCH-SEC
-                       PERFORM    UNTIL
-                                  FLG-NYUINACCT    =    1
-                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
-                                                   KSN-NACCT-SRYYM
-                               MOVE   PTNYUINRRK-NYUINYMD
-                                               TO  WRK-KSN-YMD
-                               PERFORM   VARYING IDX-KSN  FROM
-                                                 WRK-KSN-DD   BY   1
-                                 UNTIL   IDX-KSN  >   31
-                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
-                                         ADD  1  TO  WRK-KYUKYU-NISSU
-                                     END-IF
-                               END-PERFORM
-                           ELSE
-                               ADD   KSN-NACCT-ZAIKAISU
-                                               TO  WRK-KYUKYU-NISSU
-                           END-IF
-                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                           MOVE    "key44"         TO  MCP-PATHNAME
-                           PERFORM 910-NYUINACCT-FETCH-SEC
-                       END-PERFORM
-                   END-IF
-      *
-                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-                   MOVE    "key44"             TO  MCP-PATHNAME
-                   PERFORM 990-DBCLOSE-SEC
-               END-IF
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key42"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           .
-       210-KYUKYU-KSN6-EXT.
            EXIT.
       *
       *****************************************************************
