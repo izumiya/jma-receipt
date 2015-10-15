@@ -180,3 +180,28 @@ path	key9 	{
 	};
 };
 
+path	del4 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   TERMID       =   :TERMID
+		;
+	};
+};
+
+path	key10 	{
+	DBSELECT	{
+		DECLARE tbl_para_key10_csr CURSOR FOR
+		SELECT *
+		FROM tbl_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   GYOUMUID     =   :GYOUMUID
+			AND   FILEMEI      =   :FILEMEI
+			ORDER   BY        TERMID,
+					  EDANUM DESC
+		;
+	};
+};
+
+

@@ -723,6 +723,17 @@
            03  WRK-WKSRYACTPLUS-REC.
            COPY    "CPWKSRYACTPLUS.INC"  REPLACING
                                      //WKSRYP-// BY //WRK-WKSRYP-//.
+      *H27.10
+      *    診療行為マスタワーク
+       01  PARA-WKSRYACT-AREA.
+           02  PARA-WKSRYACT-REC      OCCURS   600.
+           COPY    "CPWKSRYACT.INC"  REPLACING
+                                     //WKSRY-// BY //PARA-WKSRY-//.
+      *    附加情報を追加
+           03  PARA-WKSRYACTPLUS-REC.
+           COPY    "CPWKSRYACTPLUS.INC"  REPLACING
+                                     //WKSRYP-// BY //PARA-WKSRYP-//.
+      *
       *
       *H24.4
       *    点数マスタ付加コード
@@ -781,6 +792,10 @@
       *
       *    ユーザプログラム起動サブパラメタ
            COPY    "CPORCSUSERCHK.INC".
+      *
+      *H27.10
+      *    外来収納負担金計算サブ
+           COPY    "CPORCSCSYUNOUG.INC".
       *
       *    ＳＰＡパラメタ（ORCSC97.CBL 用のDAMMY)
        01  SPA-SCR-REC.
@@ -3438,6 +3453,13 @@
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (14)
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (15)
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (16)
+      *H27.10
+      *    全点数クリア
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   16
+               MOVE    ZERO            TO  SPA-GMN-HKNTEN (IDX)
+           END-PERFORM
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-KT02-MAX
              IF      SPA-GMN-NAIIDX  (IDX)   >   ZERO
@@ -3449,9 +3471,10 @@
                    MOVE    SPA-NAI-SRYSYUKBN (IDX-NAI) TO  WRK-SRYSYUKBN
                    PERFORM 410321-SYUNOU-TENSU-SEC
                    IF      IDX-TS                  =   ZERO
-                                                   OR  1
-                                                   OR  3
-      *                診察料は再計算なし
+      *H27.7
+      ****************                             OR  1
+      *                                            OR  3
+      *****************診察料は再計算なし
                        CONTINUE
                    ELSE
                        IF      SPA-NAI-HKNSFLG (IDX-NAI) =   ZERO
@@ -4210,6 +4233,15 @@
       *    初期設定処理
            PERFORM 450121-GAIFTN-SYOKI-SEC
       *
+      *!!!!!!!!!!!!!!!!!
+      *H27.10
+      *サブプロ対応
+           IF      SPA-SRYYMD          >=  "20151001"
+               PERFORM 45012-SYUNOU-SYORI02-SEC
+               GO      TO      45012-SYUNOU-SYORI-EXT
+           END-IF
+      *H27.10
+      *
            MOVE    SPACE               TO  LNK-SYUNOU2-AREA
            INITIALIZE                  LNK-SYUNOU2-AREA
            INITIALIZE                  LNK-SYUNOU2-MAX
@@ -4393,6 +4425,83 @@
            .
        450121-GAIFTN-SYOKI-EXT.
            EXIT.
+      *!!!!!!!!!!!!!!!!!11
+      *H27.7
+      *****************************************************************
+      *    収納更新処理（サブプロ）
+      *****************************************************************
+       45012-SYUNOU-SYORI02-SEC             SECTION.
+      *
+           INITIALIZE                  LNK-ORCS01-REC
+      *
+           INITIALIZE                  ORCSCSYUNOUGAREA
+           MOVE    "K08"               TO  ORCSCSYU-SYORIPG
+      *    初期設定編集
+           MOVE    "1"                 TO  ORCSCSYU-SYORIKBN
+      *    保険
+           MOVE    SPA-HKNCOMBINUM     TO  ORCSCSYU-HKNCOMBI (1)
+           MOVE    SPA-SRYKA           TO  ORCSCSYU-SRYKA  (1 1)
+      *
+           INITIALIZE                  PARA-WKSRYACT-AREA
+           MOVE    ZERO                TO  IDX2
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   LNK-WKSRYACT-MAX
+               MOVE    ZERO                TO  FLG-DEL
+      *        包括分は対象外
+               IF     (LNK-WKSRY-HKNCOMBI (IDX)    =   "9999")
+                   OR (LNK-WKSRY-CONTKBN  (IDX)    =   "H"   )
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+               IF     (LNK-WKSRY-INPUTCD(IDX 1)(1:1)     =   "#"
+                                                         OR  "$")
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+      *        削除分は対象外
+               IF     (LNK-WKSRY-ZAINUM (IDX)  =   ZERO   )
+                 AND  (LNK-WKSRY-SRYYMD (IDX)  =   SPACE  )
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+               IF      FLG-DEL             =   ZERO
+                   ADD     1                   TO  IDX2
+                   MOVE    LNK-WKSRYACT-REC (IDX)
+                                               TO  PARA-WKSRYACT-REC
+                                                               (IDX2)
+                   MOVE    IDX2                TO  ORCSCSYU-WKSRYACT-MAX
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPACE               TO  LNK-SYUNOU2-AREA
+           INITIALIZE                  LNK-SYUNOU2-AREA
+           MOVE    1                   TO  LNK-SYUNOU2-MAX
+      *
+           MOVE    SYUNOU-REC          TO  LNK-SYUNOU2-REC
+                                                   (LNK-SYUNOU2-MAX)
+      *****MOVE    LNK-SYUNOU-AREA     TO  LNK-SYUNOU2-AREA
+      *
+           CALL    "ORCSCSYUNOUG"      USING
+                                       ORCSCSYUNOUGAREA
+                                       LNK-ORCS01-REC
+                                       SPA-AREA
+                                       LNK-SYUNOU2-AREA
+                                       PARA-WKSRYACT-AREA
+           MOVE    ORCSCSYU-SYUNOU-MAX TO  LNK-SYUNOU2-MAX
+      *
+      *    現物給付メッセージフラグ
+           MOVE    LNK-S01-GENBUTU-MSG-FLG     TO  SPA-FTNHEN-KBN
+      *
+      *複数科なし
+      ***  IF      SPA-KAGRPFLG        =   "0"
+      *        複数科まとめ集計の差額計算
+      *        PERFORM 45016-SYUNOU-SAGAKU-SEC
+      *    ELSE
+      *        複数科まとめ集計をしない場合、科合計を計算
+      *        PERFORM 45015-SYUNOU-GOUKEI-SEC
+      **** END-IF
+           .
+       45012-SYUNOU-SYORI02-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!!!!!11
+      *H27.7
       *
       *****************************************************************
       *    収納更新・科合計追加処理

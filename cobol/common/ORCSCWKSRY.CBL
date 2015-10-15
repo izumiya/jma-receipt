@@ -45,6 +45,7 @@
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
       *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
+      *  04.08.00    NACL-多々納  15/07/28  労災金額・点数編集変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -167,6 +168,8 @@
            03  IDX-STR                 PIC 9(04).
       *
            03  IDT                     PIC 9(04).
+      *H27.7
+           03  IDW2-H                  PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -238,6 +241,12 @@
            03  WRK-TENSUKEI-K          PIC S9(08).
       *
            03  WRK-TIME-KBN2           PIC X(01).
+      *
+      *TEST
+      *    収納集計点数内容
+       01  TBL-K02SCR-AREA.
+           03  TBL-K02SCR-OCC          OCCURS   400.
+               05  TBL-SYU-TENSU       PIC 9(07).
       *
       *    集計収納請求内容
        01  WRK-SUM-AREA.
@@ -1631,15 +1640,6 @@
                END-IF
            END-IF
       *
-      *H27.4
-      *保留
-      *    CLAIMの商品名コードの数量反映
-      *    IF      (SPA-COM-INPUTCD(IDX2)(1:3) =   "058" )
-      *       AND  (LNK-WKSRY-KARTE-FLG (IDX)  =   ZERO  )
-      *       AND  (LNK-WKSRY-TERMID (1)       =   "WKSRYACT")
-      *       AND  (LNK-WKSRY-SRYSURYO (IDX IDY)   >   1    )
-      *        MOVE    "1"                 TO  SPA-COM-SURFLG (IDX2)
-      *****END-IF
            .
        10020-SPA-HEN-EXT.
            EXIT.
@@ -2558,6 +2558,17 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "2"             TO  WKSRY-INPUTKBN(IDY)
                    END-IF
       *!!!!
+      *APIV3
+      *        APIの時、一般名記載分編集
+                   IF     (FLG-SYORI           =   2  )
+                     AND  (SPA-TERMID(1:4)     =   "API+")
+                     AND  (SPA-COM-INPUTCD (IDX)(1:1) =   "6" )
+                     AND  (SPA-COM-YOBI1  (IDX)(10:1) =   "1"
+                                                      OR  "3" )
+                       PERFORM 2002-API-GENEHENSYU-SEC
+                   END-IF
+      *APIV3
+      *!!!!
       *
                    MOVE    SPA-COM-KAISU  (IDX)   TO  WRK-KAISUKEI
       *            画面の計を集計する（１剤で１件）
@@ -2829,6 +2840,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ＳＰＡ保存パラメタを作成
            PERFORM 3001-PARA-SYORI-SEC
+      *
+           INITIALIZE                  TBL-K02SCR-AREA
+      *
       *    負担金算定・収納マスタ処理 
            IF      SPA-NYUGAIKBN       =   "1"
                PERFORM 30021-SYUNOU-NYU-SYORI-SEC
@@ -2881,6 +2895,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        400-SENI-PARA-EXT.
            EXIT.
+      *
+      *!!!!
+      *APIV3
+      *****************************************************************
+      *    API 般名記載分編集処理
+      *****************************************************************
+       2002-API-GENEHENSYU-SEC              SECTION.
+      *
+      *    入力コメントに一般名区分編集
+           IF      SPA-COM-YOBI1  (IDX)(10:1) =   "1"
+               MOVE    "API+1"         TO  WKSRY-INPUTCOMENT (IDY)
+           END-IF
+           IF      SPA-COM-YOBI1  (IDX)(10:1) =   "3"
+               MOVE    "API+3"         TO  WKSRY-INPUTCOMENT (IDY)
+           END-IF
+      *
+           .
+       2002-API-GENEHENSYU-EXT.
+           EXIT.
+      *APIV3
+      *!!!!
       *
       *****************************************************************
       *    診療行為パラメタ出力処理
@@ -3039,6 +3074,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  IDW
            MOVE    ZERO                TO  IDW-END
+           MOVE    ZERO                TO  IDW2-H
            MOVE    SPACE               TO  WKSRYACTPLUS-REC
            INITIALIZE                  WKSRYACTPLUS-REC
       *
@@ -3067,6 +3103,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL       IDW2    >   IDW-END
                PERFORM 30022-WKSRYACTPLUS-HEN-SEC
            END-PERFORM
+      *!!
+      *    労災円・点数の混在
+           IF     (WKSRYP-RSIKINGAKU   NOT =   ZERO )
+             AND  (WKSRYP-RSI-TENSU    NOT =   ZERO )
+               IF      IDW                 =   ZERO
+      *            明細がない時、１件目に点数のみ記載
+                   MOVE    1               TO  IDW
+                   MOVE    SPA-COM-INPUTCD(IDW2-H)
+                                               TO  WKSRYP-SRYCD (IDW)
+                   MOVE    WKSRYP-RSI-TENSU    TO  WKSRYP-SYUTEN (IDW)
+               END-IF
+           END-IF
            .
        30022-WKSRYACTPLUS-EXT.
            EXIT.
@@ -3082,6 +3130,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-COM-RSIKIN(IDW2)    TO  WKSRYP-RSIKINGAKU
                    MOVE    "1"              TO  WKSRYP-ADDKBN
                END-IF
+      *!!!!!!
+      *H27.7
+      *        剤の収納集計用点数
+               IF      TBL-SYU-TENSU (IDW2)    >   ZERO
+                   ADD     TBL-SYU-TENSU (IDW2)    TO  WKSRYP-RSI-TENSU
+                   IF      IDW2-H              =   ZERO
+                       MOVE    IDW2                TO  IDW2-H
+                   END-IF
+               END-IF
+      *!!!!!!
            ELSE
                MOVE    ZERO                 TO  WKSRYP-RSIKINGAKU
            END-IF
@@ -3096,6 +3154,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (SPA-COM-SYUFLG(IDW2)    =   1  )  AND
                   (SPA-COM-SYUTEN-M(IDW2)  NOT =  SPA-COM-SYUTEN1
                                                        (IDW-END))
+               IF     (SPA-HKNKBN              =   1     )
+                 AND  (SPA-COM-RSIKIN(IDW2)    >   ZERO  )
+      *            労災の円は対象外
+                   CONTINUE
+               ELSE
+      *
                MOVE    "1"                 TO  WKSRYP-ADDKBN
                ADD     1                   TO  IDW
       *        開始手技コード
@@ -3108,6 +3172,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-COM-KIZTEN-M(IDW2)  TO  WKSRYP-KIZAITEN (IDW)
       *        フィルム点数
                MOVE    SPA-COM-FIRTEN-M(IDW2)  TO  WKSRYP-FIRTEN (IDW)
+      *
+               END-IF
            ELSE
       *        フィルム点数のみ
                IF      SPA-COM-FIRTEN-M(IDW2)  NOT =  ZERO
@@ -3664,15 +3730,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    各合計計算処理
            PERFORM 4506-TOTALKEI-SEC
       *
-      *    MOVE    SPACE               TO  PARAF-REC
-      *    MOVE    "SYUNOU"            TO  PARAF-FILEMEI
-      *    ADD     1                   TO  WRK-PARAEDABAN
-      *    MOVE    WRK-PARAEDABAN      TO  PARAF-EDANUM
-      *    MOVE    SYUNOU-REC          TO  PARAF-DATA-REC
-      ***  WRITE   PARAF-REC
-      *TEST
-      *TEST
-      *
            ADD     1                   TO  WRK-PARAEDABAN
       *    TBL_PARAに保存
            INITIALIZE                      PARA-REC
@@ -4207,6 +4264,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    GO      TO      45011-RSI-SYUNOU-EXT
                END-IF
            END-IF
+      *H27.7
+      *    収納　円・点数
+           IF     (WRK-TENSU           >   ZERO)
+              AND (FLG-RSITEN          =   1  )
+               MOVE    WRK-TENSU           TO  TBL-SYU-TENSU (IDX)
+           END-IF
+      *H27.7
       *
            EVALUATE    SPA-COM-SRYKBN  (IDX)
       *        初診
@@ -4286,25 +4350,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                IF     (SPA-COM-TENSIKIBETU (IDR-2) =   "5"  )  AND
                       (SPA-COM-INPUTCD(IDR-2)(1:3) =   "101")
-      *            ％加算　円未満切り捨て
+      *************％加算　円未満切り捨て
+      *            ％加算　円未満切り上げ（労災加算と合わせる）
                    MOVE    ZERO                TO  WRK-TENKEISAN
                    COMPUTE WRK-TENKEISAN   =   SPA-COM-TEN (IDX)
                                            *   SPA-COM-KISOTEN (IDR-2)
                                            /   100
+                                           +   0.9
                    MOVE    WRK-TENKEISAN       TO  WRK-TENSUKEI-9
                    ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
                END-IF
-      *
-               IF     (SPA-COM-TENSIKIBETU (IDR-2) =   "6"  )  AND
-                      (SPA-COM-INPUTCD(IDR-2)(1:3) =   "101")
+      *対象なし
+      *        IF     (SPA-COM-TENSIKIBETU (IDR-2) =   "6"  )  AND
+      *               (SPA-COM-INPUTCD(IDR-2)(1:3) =   "101")
       *            ％減算　円未満切り捨て
-                   MOVE    ZERO                TO  WRK-TENKEISAN
-                   COMPUTE WRK-TENKEISAN   =   SPA-COM-TEN (IDX)
-                                           *   SPA-COM-KISOTEN (IDR-2)
-                                           /   100
-                   MOVE    WRK-TENKEISAN       TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
-               END-IF
+      *            MOVE    ZERO                TO  WRK-TENKEISAN
+      *            COMPUTE WRK-TENKEISAN   =   SPA-COM-TEN (IDX)
+      *                                    *   SPA-COM-KISOTEN (IDR-2)
+      *                                    /   100
+      *            MOVE    WRK-TENKEISAN       TO  WRK-TENSUKEI-9
+      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+      ***      END-IF
                IF      (SPA-COM-ZAIEND (IDR-2)  =   "1" )
                    MOVE    SPA-GMN-MAX     TO  IDR-2
                END-IF

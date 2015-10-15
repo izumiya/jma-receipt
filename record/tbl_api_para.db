@@ -1,0 +1,92 @@
+tbl_api_para {
+	HOSPNUM				number(2,0);
+	GYOUMUID			char(8);
+	TERMID				char(64);
+	FILEMEI 			char(20);
+	EDANUM  			number(3,0);
+	KARTE_UID			char(36);
+	PTNUM				char(20);
+	DATA_REC 			char(5000);
+};
+primary	{
+	HOSPNUM,GYOUMUID,TERMID,FILEMEI,EDANUM;
+};
+
+path	key 	{
+	DBSELECT	{
+		DECLARE tbl_api_para_key_csr CURSOR FOR
+		SELECT *
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   GYOUMUID   =   :GYOUMUID
+			AND   TERMID       =   :TERMID
+			AND   FILEMEI      =  :FILEMEI
+			AND   EDANUM       =   :EDANUM
+		;
+	};
+};
+
+path	key2 	{
+	DBSELECT	{
+		DECLARE tbl_api_para_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   GYOUMUID   =   :GYOUMUID
+			AND   TERMID       =   :TERMID
+			AND   FILEMEI      =  :FILEMEI
+			ORDER   BY        EDANUM
+		;
+	};
+};
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_api_para_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   GYOUMUID     =   :GYOUMUID
+			AND   KARTE_UID    =   :KARTE_UID
+			AND   FILEMEI      =   :FILEMEI
+			ORDER   BY         TERMID,
+					   EDANUM
+		;
+	};
+};
+path	del1 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_api_para
+		WHERE	      HOSPNUM     = :HOSPNUM
+			AND   GYOUMUID     =   :GYOUMUID
+			AND   TERMID       =   :TERMID
+			AND   FILEMEI      =   :FILEMEI
+		;
+	};
+};
+path	all 	{
+	DBSELECT	{
+		DECLARE tbl_api_para_all_csr CURSOR FOR
+		SELECT *
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			ORDER   BY         TERMID,
+					   GYOUMUID,
+					   EDANUM
+ 		;
+	};
+};
+path	del2 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	     =   :HOSPNUM
+		  AND   GYOUMUID     =   :GYOUMUID
+		  AND   TERMID       =   :TERMID
+		;
+	};
+};
+
+
+

@@ -81,6 +81,7 @@
       * 04.07.00     NACL-多々納  14/09/XX  外用臨時投薬対応
       * 04.07.00     NACL-多々納  14/10/02  頓服（臨時投薬）対応
       * 04.08.00     NACL-多々納  14/12/XX  Ｈ２７年１月改正対応
+      * 04.08.00     NACL-多々納  15/07/28  APIV3対応
       *****************************************************************
       *
       *
@@ -288,6 +289,7 @@
            03  WRK-KBN2                PIC X(01).
            03  WRK-KBN3                PIC X(01).
            03  WRK-KBN4                PIC X(01).
+           03  WRK-KBN5                PIC X(01).
       *    紹介・妥結率５割
            03  WRK-ETCKBN              PIC X(01).
       *
@@ -503,7 +505,7 @@
       *        D:同日再診、T：電話再診、S:同日電話再診、F:初診
                05  TBL-KBN             PIC X(01).
       *        G:院外、N:院内（小児科外来診察料）
-      *        D:同日初診
+      *        D:同日初診（同一日２科目）
                05  TBL-KBN2            PIC X(01).
       *        診療コード
                05  TBL-SRYCD           PIC X(09).
@@ -785,6 +787,11 @@
       *        初診料を再診料へ変更
                WHEN    "E"
                    PERFORM 1010-SINSATU-HEN-SEC
+      *H27.07
+      *        APIV3 自動発生
+               WHEN    "@"
+                   PERFORM 1019-API-SYORI-SEC
+      *H27.01
            END-EVALUATE
       *
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -5979,6 +5986,7 @@
            MOVE    ZERO                TO  FLG-DUMMY
            MOVE    ZERO                TO  FLG-SINSATU-ARI
            MOVE    SPACE               TO  WRK-KBN3
+           MOVE    SPACE               TO  WRK-KBN5
       *    時間外なし
            MOVE    1                   TO  FLG-JIKANKBN
       *    画面テーブル内容チェック
@@ -6016,6 +6024,8 @@
       *H24.4
       *    再診同一日２科目の時
            IF     (WRK-KBN3            =   "K"   )
+      *        同一日２科目
+              OR  (WRK-KBN5            =   "D"   )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
       *
@@ -6120,6 +6130,8 @@
                        MOVE    TBL-ETCKBN(TBL-IDX) TO  WRK-ETCKBN
       *H26.4
                        MOVE    TBL-KAISU (TBL-IDX) TO  WRK-KAISU
+      *H27.10          同一日２科目
+                       MOVE    TBL-KBN2  (TBL-IDX) TO  WRK-KBN5
                    END-SEARCH
                END-IF
       *
@@ -6138,6 +6150,7 @@
                            MOVE    TBLR-KBN (TBL-RSI)
                                                    TO  WRK-KBN2
                            MOVE    TBLR-KBN (TBL-RSI)  TO  WRK-KBN3
+                           MOVE    TBLR-KBN2(TBL-RSI)  TO  WRK-KBN5
                    END-SEARCH
                END-IF
                IF      FLG-ARI             =   1
@@ -7556,6 +7569,76 @@
            .
        1015119-GYOINSN-EXT.
            EXIT.
+      *
+      *H27.07
+      *****************************************************************
+      *    API　再診の自動発生処理
+      *****************************************************************
+       1019-API-SYORI-SEC              SECTION.
+      *
+           PERFORM 100-SANTEI-CHK-SEC
+      *
+      *    同日再診料算定
+           MOVE    ZERO                TO  FLG-DOUJITU
+           IF     ( SPA-SYORIFLG        =   ZERO     ) AND
+                  ( SPA-RRK-LSTYMD      =   SPA-SRYYMD )
+               IF      SPA-DOUJITU     NOT =   ZERO
+                   MOVE    1                   TO  FLG-DOUJITU
+               END-IF
+           END-IF
+      *
+      *    小児科外来診察料の同日あり
+           IF      SPA-SYONIKA-ARI2    =   1
+               GO      TO      1019-TELHEN-API-EXT
+           END-IF
+      *
+      *
+           IF      SPA-TELSAI-ARI      =   1
+      *        夜間早朝加算の６歳未満対応
+               MOVE    SPA-GAI-JIKANKBN    TO  WRK-HZN-JIKANKBN
+               IF      SPA-GAI-JIKANKBN    =   8
+      *            ６歳未満は小児科特例夜間へ
+                   IF     (SPA-NENREI-YY       <   6  )
+                      AND (SPA-JIKANTOKU-NYU   =   1  )
+                       MOVE    5               TO  SPA-GAI-JIKANKBN
+                   END-IF
+               END-IF
+      *
+               IF      FLG-DOUJITU         =   1
+      *            同日電話再診を算定
+                   MOVE    "12"                TO  WRK-SRYKBN
+                   MOVE    "S"                 TO  WRK-KBN
+               ELSE
+      *            電話再診を算定
+                   MOVE    "12"                TO  WRK-SRYKBN
+                   MOVE    "T"                 TO  WRK-KBN
+               END-IF
+      *
+               IF     (SPA-HKNKBN          =   1   )
+      *           健保準拠以外
+                 AND  (SPA-RSI-JUNKYO  NOT =   "1"  )
+      *            労災の診察コードをテーブルより決定
+                   PERFORM 20091-RSI-SINSATU-SEC
+               ELSE
+      *            健保の診察コードをテーブルより決定
+                   PERFORM 2001-SRYCD-TBL-SEC
+      *!!労災もダミーにするなら、労災も追加  !!
+      *            地域包括診療料算定時
+                   IF      (SPA-CHKHKT-ARI2     =   1      )
+                       MOVE    "099120001"         TO  WRK-SRYCD
+                   END-IF
+               END-IF
+      *        診察料自動追加処理
+               PERFORM 3301-SYOSIN-HEN-SEC
+      *        外来時間外区分設定を戻す
+               MOVE    WRK-HZN-JIKANKBN    TO  SPA-GAI-JIKANKBN
+           END-IF
+      *
+           .
+       1019-TELHEN-API-EXT.
+           EXIT.
+      *H27.07
+      *
       *****************************************************************
       *    点数マスター読込
       *****************************************************************

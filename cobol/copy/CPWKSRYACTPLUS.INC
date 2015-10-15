@@ -59,9 +59,8 @@
       *H27.4
       *３０泣抨挑宁负滦据∈１¨宁负汤嘿恨、２¨宁负∷
            05  WKSRYP-TEI-NKBN30         PIC  9(01).
-      *柒绳７硷梧宁负爬眶恨
-      *    05  WKSRYP-TEI-ZAINUM         PIC  9(08).
-      *柒绳７硷梧宁负滦据恨戎规
-      *    05  WKSRYP-GRP-ZAINUM         PIC  9(08)
-      *                                  OCCURS   50.
+      *
+      *API脱
+      *汐阂爬眶
+           05  WKSRYP-RSI-TENSU          PIC  9(07).
       *

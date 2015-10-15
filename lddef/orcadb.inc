@@ -194,4 +194,5 @@ db	{
 	monbatch_log;
 	tbl_tekiou_medicine;
 	tbl_tekiou_disease;
+	tbl_api_para;
 };

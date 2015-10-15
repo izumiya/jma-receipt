@@ -66,6 +66,7 @@
       *  04.08.00    NACL-多々納  14/05/XX  一時保存データ対応
       *  04.08.00    NACL-多々納  14/08/11  クライアント印刷変更
       *  04.08.00    NACL-多々納  15/02/XX  後発品変更不可処方対応
+      *  04.08.00    NACL-多々納  15/07/28  負担金計算サブ対応他
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -560,11 +561,17 @@
       *    レセプトプレビュー業務区分
            03  WRK-GYOUMUKBN           PIC X(01).
       *
+      *H27.7
+           03  WRK-S-ZAITEN            PIC 9(08).
+           03  WRK-S-KEI-G             PIC 9(08).
+           03  FLG-RSIEN               PIC 9(01).
+      *!
+      *
       *    集計収納請求内容
        01  WRK-SUM-AREA.
            03  SUM-SYU-SKY-NAIYOU.
                05  SUM-SYU-SKY-TBL             OCCURS   17.
-      *    保険点数
+      *        保険点数
                    09  SUM-SYU-HKNTEN          PIC  S9(07).
       *
       *    継続の時、自動発生のチェック
@@ -732,6 +739,18 @@
            COPY    "CPWKSRYACTPLUS.INC"  REPLACING
                                      //WKSRYP-// BY //WRK-WKSRYP-//.
       *
+      *H27.7
+      *    診療行為マスタワーク(パラメタ）
+       01  PARA-WKSRYACT-AREA.
+           02  PARA-WKSRYACT-REC      OCCURS   600.
+           COPY    "CPWKSRYACT.INC"  REPLACING
+                                     //WKSRY-// BY //PARA-WKSRY-//.
+      *    附加情報を追加
+           03  PARA-WKSRYACTPLUS-REC.
+           COPY    "CPWKSRYACTPLUS.INC"  REPLACING
+                                     //WKSRYP-// BY //PARA-WKSRYP-//.
+      *H27.7
+      *
       *H24.4
       *    点数マスタ付加コード
         01 TENSUPLUS-REC.
@@ -828,6 +847,11 @@
       *
       *    for Infection
            COPY    "CPSHELLTBL.INC".
+      *
+      *H27.7
+      *    外来収納負担金計算サブ
+           COPY    "CPORCSCSYUNOUG.INC".
+      *
       *
       *****************************************************************
       *    連絡　領域
@@ -1195,6 +1219,14 @@
                    ADD     SYU-HKNTEN (IDX)    TO  SPA-GMN-HKNTEN (IDX)
                END-PERFORM
            END-PERFORM
+      *H27.7
+      *    合計点数集計
+           MOVE    ZERO                TO  SPA-GMN-GOKEI
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   16
+               ADD     SPA-GMN-HKNTEN (IDX)    TO  SPA-GMN-GOKEI
+           END-PERFORM
+      *!!
       *    点数再計算
       **** IF     (SPA-SYORIFLG    NOT =   1   )  AND
            IF     (SPA-NYUGAIKBN       =   "1" )
@@ -1825,6 +1857,8 @@
            MOVE    ZERO                TO  WRK-HOUKNS-IDX
            MOVE    SPACE               TO  WRK-HOUKNS-NAME
       *
+           MOVE    ZERO                TO  FLG-RSIEN
+      *
       *    入院で日付指定の有無
            PERFORM VARYING     IDZ     FROM    1   BY  1
                    UNTIL      (IDZ         >   5   )  OR
@@ -1869,6 +1903,23 @@
                                                   TO  WRK-JIHIMONEY
                ADD     LNK-WKSRY-JIHIMONEYTOTAL (IDX)
                                                   TO  WRK-JIHIMONEY-KEI
+      *H27.7
+      *        収納点数計算用
+               IF      LNK-WKSRYP-RSIKINGAKU(IDX) NOT =   ZERO
+      *            労災の円あり
+                   MOVE    1                   TO  FLG-RSIEN
+               END-IF
+               IF     (FLG-RSIEN               =   1   )
+      *            付加情報は剤１件目に記載
+                   IF      IDX                 =   1
+      *                労災の円と点数混在の点数
+                       MOVE    LNK-WKSRYP-RSI-TENSU(IDX)
+                                                       TO  WRK-S-ZAITEN
+                   END-IF
+               ELSE
+                   MOVE    LNK-WKSRY-ZAITENKEI(IDX)    TO  WRK-S-ZAITEN
+               END-IF
+      *!!!
       *
       *        剤内１行目
                IF      IDX                 =   1
@@ -1963,14 +2014,20 @@
                MOVE    ZERO            TO  WRK-KEI-G
            END-IF
       *
-           MOVE    WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
-      *    労災金額の時、ゼロ（指導料、その他のみ）
-           IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
-               IF      FLG-RSIFLG          =   1
-                   MOVE    ZERO            TO  SPA-NAI-HKNTEN
-                                                             (IDX-NAI)
-               END-IF
+           COMPUTE WRK-S-KEI-G         =   WRK-S-ZAITEN
+                                       *   WRK-SRYKAISUKEI
+           IF      WRK-HKTZAI      NOT =   SPACE
+               MOVE    ZERO            TO  WRK-S-KEI-G
            END-IF
+           MOVE    WRK-S-KEI-G         TO  SPA-NAI-HKNTEN  (IDX-NAI)
+      *??? MOVE    WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
+      *    労災金額の時、ゼロ（指導料、その他のみ）
+      *    IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
+      *        IF      FLG-RSIFLG          =   1
+      *            MOVE    ZERO            TO  SPA-NAI-HKNTEN
+      *                                                      (IDX-NAI)
+      *        END-IF
+      *??  END-IF
       *
       *    剤点数がゼロの時、自費を点数へ
       *    IF      WRK-ZAITEN          =   ZERO
@@ -2315,17 +2372,28 @@
                MOVE    ZERO            TO  WRK-KEI-G
            END-IF
       *
-           ADD     WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
-      *    労災金額の時、ゼロ（指導料、その他のみ）
-           IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
-               IF      FLG-RSIFLG          =   1
-                   MOVE    ZERO            TO  SPA-NAI-HKNTEN
-                                                             (IDX-NAI)
-               END-IF
+      *H27.7
+           COMPUTE WRK-S-KEI-G         =   WRK-S-ZAITEN
+                                       *   WRK-KAISU-9
+           IF      WRK-HKTZAI      NOT =   SPACE
+               MOVE    ZERO            TO  WRK-S-KEI-G
            END-IF
+           ADD     WRK-S-KEI-G         TO  SPA-NAI-HKNTEN  (IDX-NAI)
+      *??  ADD     WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
+      *
+      **   労災金額の時、ゼロ（指導料、その他のみ）
+      *    IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
+      *        IF      FLG-RSIFLG          =   1
+      *            MOVE    ZERO            TO  SPA-NAI-HKNTEN
+      *                                                      (IDX-NAI)
+      *        END-IF
+      *?   END-IF
+      *H27.7
+      *
       *    計集計
            MOVE    WRK-KEI-G           TO  WRK-KEI
            ADD     WRK-KEI-G           TO  SPA-GMN-GOKEI
+      *
            MOVE    SPACE               TO  WRK-ZAIKEI 
            MOVE    SPACE               TO  WRK-KAISU-H 
            MOVE    SPACE               TO  WRK-KAISU-H2
@@ -3895,6 +3963,13 @@
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (14)
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (15)
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (16)
+      *H27.7
+      *    点数クリア
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   16
+               MOVE    ZERO            TO  SPA-GMN-HKNTEN (IDX)
+           END-PERFORM
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-K08-MAX
              IF      SPA-GMN-NAIIDX  (IDX)   >   ZERO
@@ -3906,9 +3981,10 @@
                    MOVE    SPA-NAI-SRYSYUKBN (IDX-NAI) TO  WRK-SRYSYUKBN
                    PERFORM 410321-SYUNOU-TENSU-SEC
                    IF      IDX-TS                  =   ZERO
-                                                   OR  1
-                                                   OR  3
-      *                診察料は再計算なし
+      *H27.7
+      *****************                            OR  1
+      *                                            OR  3
+      *****************診察料は再計算なし
                        CONTINUE
                    ELSE
                        IF      SPA-NAI-HKNSFLG (IDX-NAI) =   ZERO
@@ -4449,6 +4525,7 @@
        450113-YAKUJO-CHK-EXT.
            EXIT.
       *
+      *
       *****************************************************************
       *    収納更新処理
       *****************************************************************
@@ -4456,6 +4533,15 @@
       *
       *    初期設定処理
            PERFORM 450121-GAIFTN-SYOKI-SEC
+      *
+      *!!!!!!!!!!!!!!
+      *H27.7
+      *サブプロ対応
+           IF      SPA-SRYYMD          >=  "20151001"
+               PERFORM 45012-SYUNOU-SYORI02-SEC
+               GO      TO      45012-SYUNOU-SYORI-EXT
+           END-IF
+      *H27.7
       *
            MOVE    SPACE               TO  LNK-SYUNOU2-AREA
            INITIALIZE                  LNK-SYUNOU2-AREA
@@ -4659,6 +4745,84 @@
            .
        450121-GAIFTN-SYOKI-EXT.
            EXIT.
+      *!!!!!!!!!!!!!!!!!11
+      *H27.7
+      *****************************************************************
+      *    収納更新処理（サブプロ）
+      *****************************************************************
+       45012-SYUNOU-SYORI02-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSCSYUNOUGAREA
+           MOVE    "K08"               TO  ORCSCSYU-SYORIPG
+      *    初期設定編集　済み
+           MOVE    SPACE               TO  ORCSCSYU-SYORIKBN
+           PERFORM VARYING   IDH1      FROM    1   BY  1
+                   UNTIL    (IDH1      >   15  )   OR
+                            (SPA-TBL-HKNCOMBI(IDH1)    =   SPACE)
+               MOVE    SPA-TBL-HKNCOMBI(IDH1)     TO  ORCSCSYU-HKNCOMBI
+                                                                (IDH1)
+               PERFORM VARYING   IDH2      FROM   1   BY  1
+                       UNTIL    (IDH2      >   10  )  OR
+                                (SPA-TBL-SRYKA (IDH1 IDH2) =   SPACE )
+                   MOVE    SPA-TBL-SRYKA (IDH1 IDH2)
+                                               TO  ORCSCSYU-SRYKA
+                                                           (IDH1 IDH2)
+               END-PERFORM
+           END-PERFORM
+      *
+           INITIALIZE                  PARA-WKSRYACT-AREA
+           MOVE    ZERO                TO  IDX2
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   LNK-WKSRYACT-MAX
+               MOVE    ZERO                TO  FLG-DEL
+      *        包括分は対象外
+               IF     (LNK-WKSRY-HKNCOMBI (IDX)    =   "9999")
+                   OR (LNK-WKSRY-CONTKBN  (IDX)    =   "H"   )
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+               IF     (LNK-WKSRY-INPUTCD(IDX 1)(1:1)     =   "#"
+                                                         OR  "$")
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+      *        削除分は対象外
+               IF     (LNK-WKSRY-ZAINUM (IDX)  =   ZERO   )
+                 AND  (LNK-WKSRY-SRYYMD (IDX)  =   SPACE  )
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+               IF      FLG-DEL             =   ZERO
+                   ADD     1                   TO  IDX2
+                   MOVE    LNK-WKSRYACT-REC (IDX)
+                                               TO  PARA-WKSRYACT-REC
+                                                               (IDX2)
+                   MOVE    IDX2                TO  ORCSCSYU-WKSRYACT-MAX
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPACE               TO  LNK-SYUNOU2-AREA
+           MOVE    LNK-SYUNOU-AREA     TO  LNK-SYUNOU2-AREA
+           CALL    "ORCSCSYUNOUG"      USING
+                                       ORCSCSYUNOUGAREA
+                                       LNK-ORCS01-REC
+                                       SPA-AREA
+                                       LNK-SYUNOU2-AREA
+                                       PARA-WKSRYACT-AREA
+           MOVE    ORCSCSYU-SYUNOU-MAX TO  LNK-SYUNOU2-MAX
+      *
+      *    現物給付メッセージフラグ
+           MOVE    LNK-S01-GENBUTU-MSG-FLG     TO  SPA-FTNHEN-KBN
+      *
+           IF      SPA-KAGRPFLG        =   "0"
+      *        複数科まとめ集計の差額計算
+               PERFORM 45016-SYUNOU-SAGAKU-SEC
+           ELSE
+      *        複数科まとめ集計をしない場合、科合計を計算
+               PERFORM 45015-SYUNOU-GOUKEI-SEC
+           END-IF
+           .
+       45012-SYUNOU-SYORI02-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!!!!!11
+      *H27.7
       *
       *****************************************************************
       *    収納更新処理
@@ -5000,6 +5164,16 @@
                PERFORM 45054-PREFNUM-40-SEC
            END-IF
       *
+      *test
+      *    DISPLAY "K08 S01-SYUTEN:" LNK-S01-SYUTEN(LNK-SYUNOU2-MAX)
+      *       ",SENINFLG:" LNK-S01-SENINFLG (LNK-SYUNOU2-MAX)
+      *       ",KYUKYU:" LNK-S01-KYUKYU (LNK-SYUNOU2-MAX)
+      *       ",RYOYO:" LNK-S01-RYOYO (LNK-SYUNOU2-MAX)
+      *    DISPLAY "K08 S01-SINDAN:" LNK-S01-SINDAN(LNK-SYUNOU2-MAX)
+      *       ",MEISAI:" LNK-S01-MEISAI (LNK-SYUNOU2-MAX)
+      *       ",SRYCD1:" LNK-S01-SONOTA-SRYCD (LNK-SYUNOU2-MAX 1)
+      *       ",SRYCD2:" LNK-S01-SONOTA-SRYCD (LNK-SYUNOU2-MAX 2)
+      *TEST
            .
        4505-YAKFTN-KEI-EXT.
            EXIT.
@@ -5437,6 +5611,8 @@
       *
                END-IF
            END-PERFORM
+      *test
+      ***  DISPLAY "K08 IDX-SYU:" IDX-SYU
       *
       *    対象があった場合
            IF      IDX-SYU             >   ZERO
@@ -5445,6 +5621,11 @@
                                        SPA-AREA
                                        ORCSSYU40AREA
                                        SYUNOU-REC
+      *test
+      *    DISPLAY "K08 FLG-SYU40:" FLG-SYU40
+      *       ",SYU-KYUFUGAI-GOKEI-TEN:" SYU-KYUFUGAI-GOKEI-TEN
+      *       ",SYU-KYUFUGAI-SHOSHIN-TEN:" SYU-KYUFUGAI-SHOSHIN-TEN
+      *test
       *        初診料と同日初診がある時、初診料のみ
                IF      FLG-SYU40           =   1
                    COMPUTE SYU-KYUFUGAI-GOKEI-TEN

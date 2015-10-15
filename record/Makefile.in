@@ -492,6 +492,9 @@ RECORD_files = \
 	systeminfv2.rec \
 	manageusersv2.rec \
 	H03.rec \
+	medicalmodv31.rec \
+	medicalmodv32.rec \
+	medicalmodv33.rec \
 
 DEF_files = \
 
@@ -796,6 +799,13 @@ DB_files = \
 	monbatch_log.db \
 	xml_manageusersv2req.db \
 	xml_manageusersv2res.db \
+	tbl_api_para.db \
+	xml_medicalv3req1.db \
+	xml_medicalv3req2.db \
+	xml_medicalv3req3.db \
+	xml_medicalv3res1.db \
+	xml_medicalv3res2.db \
+	xml_medicalv3res3.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
