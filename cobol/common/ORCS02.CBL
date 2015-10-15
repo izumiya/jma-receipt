@@ -420,6 +420,7 @@
       *  04.08.01    NACL-門脇    15/09/16  自賠責（健保準拠）の点数単価
       *                                     入外別対応
       *  04.08.02    NACL-門脇    15/10/05  難病特記事項対応
+      *  04.08.03    NACL-門脇    15/10/08  システム管理２０１０機能追加対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -644,6 +645,8 @@
                  06  WK-2010-ZENDAYKBN-N         PIC X(01).
                  06  WK-2010-KAICNTKBN-N         PIC X(01).
                  06  WK-2010-CYOKEIKBN-N         PIC X(01).
+      *
+                 06  WK-2010-JIRITUKBN           PIC X(01).
       *
            03  WK-DAYTAIHI-FTNMONEY    PIC 9(07).
            03  WK-DAYTAIHI-COMPFTN     PIC 9(07).
@@ -1478,9 +1481,11 @@
                05  WK-NYULIFE-SKJFTN-MONEY  PIC  9(07).
                05  WK-NYULIFE-KANFTN-MONEY  PIC  9(07).
       *
-      *地方公費用フラグ（公費限度額決定用）
+      *地方公費用フラグ
        01  WK-CHIHOU-FLG-TAIHI-AREA.
-           03  FLG-CHIHOU              PIC X(01)  OCCURS  4.
+           03  WK-CHIHOU-FLG-TAIHI-OCC OCCURS  4.
+               05  FLG-CHIHOU          PIC X(01).
+               05  FLG-CHIHOU2         PIC X(01).
       *
       *償還払い地方公費フラグ
        01  WK-SYOUKAN-FLG-TAIHI-AREA.
@@ -6121,6 +6126,10 @@
                PERFORM   DB-CLOSE-SEC
            ELSE
       *
+               IF     COMB-KOH1HKNNUM(1:1) >= "1" AND <= "8"
+                    MOVE   "1"           TO    FLG-CHIHOU2(1)
+               END-IF
+      *
                IF  ((LNK-S02-KOUREI-NYUIN-KBN =   "1") OR
                     (FLG-KOREI-TANYUIN        =    1 ))
                AND (COMB-KOH1HKNNUM           =  "010")
@@ -6321,6 +6330,10 @@
                PERFORM   DB-CLOSE-SEC
            ELSE
       *
+               IF     COMB-KOH2HKNNUM(1:1) >= "1" AND <= "8"
+                    MOVE   "1"           TO    FLG-CHIHOU2(2)
+               END-IF
+      *
                IF  (LNK-S02-KOUREI-NYUIN-KBN  =   "1" )
                AND (COMB-KOH2HKNNUM           =  "010")
                     MOVE   WK-KOH-GENDOGAKU
@@ -6479,6 +6492,10 @@
                PERFORM   DB-CLOSE-SEC
            ELSE
       *
+               IF     COMB-KOH3HKNNUM(1:1) >= "1" AND <= "8"
+                    MOVE   "1"           TO    FLG-CHIHOU2(3)
+               END-IF
+      *
                IF  ( LNK-S02-KOUREI-NYUIN-KBN     =       "1"  )
                AND ( COMB-KOH3HKNNUM(1:1)        >=       "1"  )
                AND ( COMB-KOH3HKNNUM(1:1)        <=       "8"  )
@@ -6629,6 +6646,10 @@
                MOVE     "key2"        TO    MCP-PATHNAME
                PERFORM   DB-CLOSE-SEC
            ELSE
+      *
+               IF     COMB-KOH4HKNNUM(1:1) >= "1" AND <= "8"
+                    MOVE   "1"           TO    FLG-CHIHOU2(4)
+               END-IF
       *
                IF  ( LNK-S02-KOUREI-NYUIN-KBN     =       "1"  )
                AND ( COMB-KOH4HKNNUM(1:1)        >=       "1"  )
@@ -9424,14 +9445,12 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
-                                             OR 39 OR 14              )
-                        AND (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
+                        IF  (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
-                          IF   COMB-KOH2HKNNUM =  "100" OR "200"
+                          IF   WK-2010-JIRITUKBN(2) =  "1"
                             MOVE  MAX-KAI-KOHI2-M  TO  MAX-KAI-KOHI1-M
                             MOVE  MAX-KIN-KOHI2-D  TO  MAX-KIN-KOHI1-D
-                            IF   COMB-KOH2HKNNUM  =  "200"
+                            IF   FLG-CHIHOU2(2) = "1"
                               MOVE   ZERO          TO  MAX-KIN-KOHI1-M
                             ELSE
                               MOVE MAX-KIN-KOHI2-M TO  MAX-KIN-KOHI1-M
@@ -9447,10 +9466,10 @@
                                MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
                             END-IF
                           END-IF
-                          IF   COMB-KOH3HKNNUM =  "100" OR "200"
+                          IF   WK-2010-JIRITUKBN(3) =  "1"
                             MOVE  MAX-KAI-KOHI3-M  TO  MAX-KAI-KOHI1-M
                             MOVE  MAX-KIN-KOHI3-D  TO  MAX-KIN-KOHI1-D
-                            IF   COMB-KOH3HKNNUM  =  "200"
+                            IF   FLG-CHIHOU2(3) = "1"
                               MOVE   ZERO          TO  MAX-KIN-KOHI1-M
                             ELSE
                               MOVE MAX-KIN-KOHI3-M TO  MAX-KIN-KOHI1-M
@@ -9466,10 +9485,10 @@
                                MOVE ZERO TO WK-KOUREI-IRYOHI70K-TOKU75
                             END-IF
                           END-IF
-                          IF   COMB-KOH4HKNNUM =  "100" OR "200"
+                          IF   WK-2010-JIRITUKBN(4) =  "1"
                             MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI1-M
                             MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI1-D
-                            IF   COMB-KOH4HKNNUM  =  "200"
+                            IF   FLG-CHIHOU2(4) = "1"
                               MOVE   ZERO          TO  MAX-KIN-KOHI1-M
                             ELSE
                               MOVE MAX-KIN-KOHI4-M TO  MAX-KIN-KOHI1-M
@@ -9855,14 +9874,12 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
-                                             OR 39 OR 14              )
-                        AND (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
+                        IF  (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
-                          IF   COMB-KOH3HKNNUM =  "100" OR "200"
+                          IF   WK-2010-JIRITUKBN(3) =  "1"
                             MOVE  MAX-KAI-KOHI3-M  TO  MAX-KAI-KOHI2-M
                             MOVE  MAX-KIN-KOHI3-D  TO  MAX-KIN-KOHI2-D
-                            IF   COMB-KOH3HKNNUM  =  "200"
+                            IF   FLG-CHIHOU2(3) = "1"
                               MOVE   ZERO          TO  MAX-KIN-KOHI2-M
                             ELSE
                               MOVE MAX-KIN-KOHI3-M TO  MAX-KIN-KOHI2-M
@@ -9871,10 +9888,10 @@
                             MOVE  ZERO  TO  WK-KOUREI-IRYOHI
                             MOVE  ZERO  TO  FLG-IRYOHI4
                           END-IF
-                          IF   COMB-KOH4HKNNUM =  "100" OR "200"
+                          IF   WK-2010-JIRITUKBN(4) =  "1"
                             MOVE  MAX-KAI-KOHI4-M  TO  MAX-KAI-KOHI2-M
                             MOVE  MAX-KIN-KOHI4-D  TO  MAX-KIN-KOHI2-D
-                            IF   COMB-KOH4HKNNUM  =  "200"
+                            IF   FLG-CHIHOU2(4) = "1"
                               MOVE   ZERO          TO  MAX-KIN-KOHI2-M
                             ELSE
                               MOVE MAX-KIN-KOHI4-M TO  MAX-KIN-KOHI2-M
@@ -11574,6 +11591,23 @@
                        MOVE    "1"    TO  WK-2010-CYOKEIKBN-N(IDX-CYO)
            END-EVALUATE
       *
+           EVALUATE  SYS-2010-JIRITUKBN
+             WHEN      SPACE
+               EVALUATE   WK-1001-PREFNUM
+                 WHEN       12
+                 WHEN       14
+                 WHEN       26
+                 WHEN       27
+                 WHEN       28
+                 WHEN       39
+                   IF   COMB-KOHHKNNUM(IDX-CYO)   =  "100" OR "200"
+                     MOVE    "1"    TO  WK-2010-JIRITUKBN(IDX-CYO)
+                   END-IF
+               END-EVALUATE
+             WHEN       "1"
+                     MOVE    "1"    TO  WK-2010-JIRITUKBN(IDX-CYO)
+           END-EVALUATE
+      *
            .
       *
        21131-SYSKAN2010-SET-EXT.
@@ -11807,6 +11841,19 @@
            EVALUATE   WK-1001-PREFNUM
              WHEN       15
                  MOVE    "1"    TO  WK-2010-DAYKEIKBN-N(IDX-CYO)
+           END-EVALUATE
+      *
+           EVALUATE   WK-1001-PREFNUM
+             WHEN       12
+             WHEN       14
+             WHEN       26
+             WHEN       27
+             WHEN       28
+             WHEN       39
+               IF  (COMB-KOHHKNNUM(IDX-CYO)   =  "100" OR "200")
+               AND (LNK-SYU-SRYYMD(1:6)      >= "200604"       )
+                 MOVE    "1"    TO  WK-2010-JIRITUKBN(IDX-CYO)
+               END-IF
            END-EVALUATE
       *
            .
@@ -12191,6 +12238,19 @@
            AND  (WK-2010-NYUKEIKBN-N(IDX-CYO)   NOT = SPACE)
                  MOVE    SPACE  TO  WK-2010-CYOKEIKBN-N(IDX-CYO)
            END-IF
+      *
+           EVALUATE   WK-1001-PREFNUM
+             WHEN       12
+             WHEN       14
+             WHEN       26
+             WHEN       27
+             WHEN       28
+             WHEN       39
+               IF  (COMB-KOHHKNNUM(IDX-CYO)   =  "100" OR "200")
+               AND (LNK-SYU-SRYYMD(1:6)       <  "200604"      )
+                 MOVE    SPACE  TO  WK-2010-JIRITUKBN(IDX-CYO)
+               END-IF
+           END-EVALUATE
       *
            .
       *
@@ -18106,6 +18166,14 @@
              WHEN      "4"
                  IF   WK-HKNJANUM2  =  WK-HKNJANUM
                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
+                   PERFORM   220142-KOHFUKA-HENSYU1-SEC
+                 ELSE
+      *            保険者変更時
+                   PERFORM   220144-KOHFUKA-HENSYU3-SEC
+                 END-IF
+             WHEN      "5"
+                 IF   WK-HKNJANUM2  =  WK-HKNJANUM
+                   MOVE   2   TO   FLG-KOHFUKA-HENSYU
                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
                  ELSE
       *            保険者変更時

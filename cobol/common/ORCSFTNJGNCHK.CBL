@@ -103,6 +103,8 @@
       *  04.07.07    NACL-門脇    14/08/29  島根・奈良県地方公費対応
       *  04.07.08    NACL-門脇    15/03/17  請求点数０点公費レセ記載対応
       *  04.07.09    NACL-門脇    15/05/18  請求点数０点公費レセ記載対応
+      *
+      *  04.08.01    NACL-門脇    15/10/13  請求ゼロフラグ編集
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2108,6 +2110,7 @@
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
                   END-IF
+                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                 END-IF
@@ -2694,6 +2697,7 @@
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
                   END-IF
+                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                 END-IF

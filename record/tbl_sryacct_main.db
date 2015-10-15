@@ -1213,6 +1213,7 @@ path	key53 	{
 			AND   HKNCOMBI   <>  '9999'
 			AND   JIHOKBN    <>   '1'
 			AND   ZAITEN * ZAIKAISU   >  0
+			AND   SRYKBN      NOT IN ('95','96')
 		GROUP BY HOSPNUM,NYUGAIKBN,PTID,HKNCOMBI
 		;
 	};

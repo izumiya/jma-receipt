@@ -32,6 +32,7 @@
       *                                     （請求点数０点公費分）
       *                                     点検用レセプト０点公費記載用
       *                                     復帰コード追加
+      *  04.08.01    NACL-門脇    15/10/13  請求ゼロフラグ追加
       ************************************************************
        01  ORCSFTNJGNCHKAREA.
       *入力値
@@ -64,3 +65,4 @@
            03  LNK-FTNJGNCHK-KOHFTN          PIC 9(07).
            03  LNK-FTNJGNCHK-KOHFTNSKJ       PIC 9(07).
            03  LNK-FTNJGNCHK-KOHSKYFLG       PIC X(01).
+           03  LNK-FTNJGNCHK-SKYZEROFLG      PIC X(01).

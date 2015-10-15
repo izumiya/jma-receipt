@@ -1013,6 +1013,9 @@
            03  IDX24                                   PIC 9(03).
            03  IDX25                                   PIC 9(02).
            03  IDX26                                   PIC 9(02).
+           03  IDX27                                   PIC 9(03).
+           03  IDX28                                   PIC 9(03).
+           03  IDX29                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
       *
@@ -28422,7 +28425,7 @@
                 MOVE    "key4"              TO  MCP-PATHNAME
                 PERFORM  900-CLOSE-SEC
       *
-                IF  FLG-TOKUSITU    =  ZERO
+                IF  FLG-KISAIOK     =  ZERO
                    IF  RECE62-SRYYM   >=  "201501"
                      MOVE   14    TO    FLG-TOKKI
                    ELSE
@@ -30072,6 +30075,85 @@
                      MOVE   3    TO   RECE62-RJNNYUKOHFTN(2)
                  END-EVALUATE
                END-IF
+             END-IF
+           END-IF
+      *
+           IF     (IDZ             =   1      )
+           AND    (RECE62-SRYYM   >=  "201501")
+             MOVE     ZERO    TO     IDX29
+             PERFORM  VARYING  IDX27  FROM  1  BY  1
+                       UNTIL  (IDX27                  >  10  )
+                         OR   (RECE62-HKNCOMBI(IDX27) =  ZERO)
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    RECE62-HOSPNUM  TO  COMB-HOSPNUM
+               MOVE    RECE62-PTID     TO  COMB-PTID
+               MOVE    RECE62-HKNCOMBI(IDX27)
+                                       TO  COMB-HKNCOMBINUM
+               MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+               PERFORM 900-HKNCOMBI-INV-SEC
+               IF      FLG-HKNCOMBI    =   ZERO
+                 PERFORM  VARYING  IDX28  FROM  1  BY  1
+                           UNTIL   IDX28    >   4
+                   IF ((COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(1)) AND
+                       (COMB-KOHID(IDX28)     = RECE62-KOHID(1) ) AND
+                       (TBL-TOKUSITUFLG(1)    =   1             ))
+                   OR ((COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(2)) AND
+                       (COMB-KOHID(IDX28)     = RECE62-KOHID(2) ) AND
+                       (TBL-TOKUSITUFLG(2)    =   1             ))
+                   OR ((COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(3)) AND
+                       (COMB-KOHID(IDX28)     = RECE62-KOHID(3) ) AND
+                       (TBL-TOKUSITUFLG(3)    =   1             ))
+                   OR ((COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(4)) AND
+                       (COMB-KOHID(IDX28)     = RECE62-KOHID(4) ) AND
+                       (TBL-TOKUSITUFLG(4)    =   1             ))
+                     INITIALIZE               ORCSFTNJGNCHKAREA
+                     MOVE RECE62-HOSPNUM   TO LNK-FTNJGNCHK-HOSPNUM
+                     MOVE RECE62-PTID      TO LNK-FTNJGNCHK-PTID
+                     MOVE "1"              TO LNK-FTNJGNCHK-NYUGAIKBN
+                     MOVE RECE62-SRYYM     TO LNK-FTNJGNCHK-SRYYM
+                     MOVE COMB-KOHHKNNUM(IDX28)
+                                           TO LNK-FTNJGNCHK-KOHNUM
+                     MOVE COMB-KOHID(IDX28)
+                                           TO LNK-FTNJGNCHK-KOHID
+                     MOVE WRK-PREFNUM      TO LNK-FTNJGNCHK-PREFNUM
+                     MOVE COMB-HKNCOMBINUM TO LNK-FTNJGNCHK-HKNCOMBINUM
+                     MOVE COMB-HKNID       TO LNK-FTNJGNCHK-HKNID
+                     CALL "ORCSFTNJGNCHK"  USING
+                                           ORCSFTNJGNCHKAREA
+                                           SPA-AREA
+                     IF   LNK-FTNJGNCHK-SKYZEROFLG  =  SPACE
+                       ADD     1    TO     IDX29
+                     ELSE
+                       IF  (COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(1))
+                       AND (COMB-KOHID(IDX28)     = RECE62-KOHID(1) )
+                       AND (TBL-TOKUSITUFLG(1)    =   1             )
+                          MOVE    ZERO     TO TBL-TOKUSITUFLG(1)
+                       END-IF
+                       IF  (COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(2))
+                       AND (COMB-KOHID(IDX28)     = RECE62-KOHID(2) )
+                       AND (TBL-TOKUSITUFLG(2)    =   1             )
+                          MOVE    ZERO     TO TBL-TOKUSITUFLG(2)
+                       END-IF
+                       IF  (COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(3))
+                       AND (COMB-KOHID(IDX28)     = RECE62-KOHID(3) )
+                       AND (TBL-TOKUSITUFLG(3)    =   1             )
+                          MOVE    ZERO     TO TBL-TOKUSITUFLG(3)
+                       END-IF
+                       IF  (COMB-KOHHKNNUM(IDX28) = RECE62-KOHNUM(4))
+                       AND (COMB-KOHID(IDX28)     = RECE62-KOHID(4) )
+                       AND (TBL-TOKUSITUFLG(4)    =   1             )
+                          MOVE    ZERO     TO TBL-TOKUSITUFLG(4)
+                       END-IF
+                     END-IF
+                   END-IF
+                 END-PERFORM
+               END-IF
+             END-PERFORM
+             IF  IDX29  =  ZERO
+               MOVE     ZERO      TO    FLG-TOKUSITU
+               MOVE     ZERO      TO    FLG-TOKUSITU-KBN
+               MOVE     ZERO      TO    FLG-TOKUSITU-TASU
+               MOVE     ZERO      TO    RECE62-RJNNYUKOHFTN(2)
              END-IF
            END-IF
       *
