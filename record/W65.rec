@@ -933,6 +933,22 @@ W65 {
             item varchar(40)[10];
           state int;
         };
+        CMB_JIRITUKBN {
+          JIRITUKBN {
+            textdata varchar(80);
+          };
+          count int;
+            item varchar(80)[10];
+        };
+        CMB_JIRITUTAIKBN {
+          JIRITUTAIKBN {
+            textdata varchar(40);
+            state int;
+          };
+          count int;
+            item varchar(40)[10];
+          state int;
+        };
       };
       fxd13 {
         LBLSKJHON {
