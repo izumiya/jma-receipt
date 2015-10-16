@@ -1267,6 +1267,8 @@
       *
            MOVE    SPACE           TO  LINKAREA
            MOVE    SPA-KYOUTU      TO  LNK-KYOUTU
+      *
+           MOVE    SPA-S01KYOUTU   TO  SPA-WORK
            MOVE    SPA-KYOUTU      TO  LNK-COMMON
            MOVE    SPA-S02         TO  LNK-SCRSPA
       *
