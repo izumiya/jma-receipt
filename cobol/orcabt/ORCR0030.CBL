@@ -1185,6 +1185,7 @@
            03  WRK-FTNKEI3                             PIC 9(09).
            03  WRK-FTNKEI5                             PIC 9(09).
            03  WRK-FTNKEI6                             PIC 9(09).
+           03  WRK-FTNKEI7                             PIC 9(09).
            03  WRK-FTNKEI-FTN                          PIC 9(09).
            03  WRK-FTNKEI-GENGAKU                      PIC 9(09).
            03  WRK-GENDO                               PIC 9(09).
@@ -21834,7 +21835,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  AND (WRK-TAIHI-TOTALTEN NOT = RECE02-TOTALTEN(2))
                    MOVE     WRK-TAIHI-TOTALTEN  TO  WRK-HANTEI-TOTALTEN
                    PERFORM  21094-JYOGENGAKU-HENSYU-SEC
-                   IF   RECE02-FTNMONEY(1)  >  WRK-KINGAKU3
+                   COMPUTE  WRK-FTNKEI7  = WRK-TAIHI-TOTALTEN
+                                         * 10
+                                         * WRK-KYURATE
+                                         / 100
+                   IF   WRK-FTNKEI7  >  WRK-KINGAKU3
                       MOVE    "1"    TO   RECE02-ZAITAKU
                    END-IF
                  END-IF
