@@ -185,6 +185,7 @@
       *
            03  FLG-SRYKBN-HEN      PIC 9(01).
            03  FLG-IN1             PIC 9(01).
+           03  FLG-HENKOU          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -232,6 +233,8 @@
            03  IDX-J98             PIC 9(04).
       *
            03  IDH                 PIC 9(04).
+      *
+           03  IDX-SR              PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -638,6 +641,11 @@
       *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡Ý
        01  SRYACT-REC.
            COPY    "CPSRYACT.INC".
+      *
+       01  TBL-SRYACT-AREA.
+           02  TBL-SRYACT-REC         OCCURS   10.
+           COPY    "CPSRYACT.INC"    REPLACING
+                                     //SRY-// BY //TBL-SRY-//.
       *
       *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡Ý
        01  SRYACCT-REC.
@@ -5501,6 +5509,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-ERRCD       NOT =   SPACE
                    GO      TO      4501-SINKOUI-KOU-EXT
                END-IF
+               INITIALIZE                      TBL-SRYACT-AREA
            END-IF
       *
            MOVE    ZERO                TO  IDX
@@ -5520,6 +5529,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  IDS
            MOVE    ZERO                TO  WRK-RENNUM
            INITIALIZE                  SRYACT-REC
+      *
+           MOVE    ZERO                TO  FLG-HENKOU
+           MOVE    ZERO                TO  IDX-SR
       *
            MOVE    ZERO                TO  FLG-GEN
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -5945,6 +5957,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        45012-DBDELETE-SEC              SECTION.
       *
+      *H27.10
+      *    ÊÝÂ¸
+           PERFORM 450121-SRYACT-HZN-SEC
+      *
       *    ´µ¼Ô¥³¥á¥ó¥È¤ò¥¯¥ê¥¢¤¹¤ë
            INITIALIZE                  PTCOM-REC
            MOVE    SPA-HOSPNUM         TO  PTCOM-HOSPNUM
@@ -5984,6 +6000,53 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        45012-DBDELETE-EXT.
+           EXIT.
+      *
+      *H27.10
+      *****************************************************************
+      *   ¿ÇÎÅ¹Ô°ÙÆâÍÆÊÝÂ¸½èÍý
+      *****************************************************************
+       450121-SRYACT-HZN-SEC          SECTION.
+      *
+           INITIALIZE                      TBL-SRYACT-AREA
+           MOVE    ZERO                TO  IDX-SR
+      *
+           INITIALIZE                      SRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  SRY-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  SRY-PTID
+           MOVE    SPA-J01-SRYKA       TO  SRY-SRYKA
+           MOVE    SPA-J02-SRYYMD(1:6) TO  SRY-SRYYM
+           MOVE    SPA-ZAINUM          TO  SRY-ZAINUM
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-SRYACT-NEXT-SEC
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+           PERFORM
+               UNTIL    (FLG-SRYACT        =   1          )
+                    OR  (IDX-SR            >=  10   )
+               ADD     1                   TO  IDX-SR
+               MOVE    SRYACT-REC          TO  TBL-SRYACT-REC(IDX-SR)
+      *
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-SRYACT-NEXT-SEC
+           END-PERFORM
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       450121-SRYACT-HZN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6358,6 +6421,35 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¿ÇÎÅ¹Ô°Ù¿·µ¬¥ì¥³¡¼¥ÉÊÔ½¸
       *****************************************************************
        45102-SINKOU-INS-SEC            SECTION.
+      *
+      *H27.10
+      *    ÅÐÏ¿»þ¼«Æ°È¯À¸²ò½ü½èÍý
+           ADD     1                   TO  IDX-SR
+           PERFORM VARYING     IDXS    FROM    1   BY  1
+                   UNTIL      (IDXS        >   5  )
+                          OR  (FLG-HENKOU  =   1  )
+                          OR  (IDX-SR      >   10 )
+               IF     (TBL-SRY-SRYCD (IDX-SR IDXS)
+                                       NOT =   SRY-SRYCD (IDXS))
+               OR     (TBL-SRY-SRYSURYO (IDX-SR IDXS)
+                                       NOT =   SRY-SRYSURYO (IDXS))
+               OR     (TBL-SRY-INPUTNUM (IDX-SR IDXS)
+                                       NOT =   SRY-INPUTNUM (IDXS))
+                   MOVE    1               TO  FLG-HENKOU
+               END-IF
+           END-PERFORM
+      *    ÊÑ¹¹¤¢¤ê¤Ï¡¢ÅÐÏ¿»þ¼«Æ°»»Äê²ò½ü
+           IF      FLG-HENKOU          =   1
+               PERFORM VARYING     IDXS    FROM    1   BY  1
+                       UNTIL       IDXS    >   5
+                   IF     (SRY-AUTOKBN (IDXS)  =   "3"
+                                               OR  "4"
+                                               OR  "5"
+                                               OR  "6")
+                       MOVE    SPACE           TO  SRY-AUTOKBN (IDXS)
+                   END-IF
+               END-PERFORM
+           END-IF
       *
            ADD     1                   TO  WRK-RENNUM
            MOVE    SPA-HOSPNUM          TO  SRY-HOSPNUM
@@ -7085,10 +7177,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     ACCT-HKNCOMBI        =   "9999"
                GO      TO      450422-SANTEI-UPD-EXT
            END-IF
-      *    Êñ³ç¿ÇÎÅÂÐ¾Ý³°
-           IF      ACCT-JIHOKBN        =   "1"
-               GO      TO      450422-SANTEI-UPD-EXT
-           END-IF
+      *H27.10 ºï½ü
+      *****Êñ³ç¿ÇÎÅÂÐ¾Ý³°
+      *    IF      ACCT-JIHOKBN        =   "1"
+      *        GO      TO      450422-SANTEI-UPD-EXT
+      **** END-IF
       *
       *    ¼«Èñ¤Î»þÂÐ¾Ý³°
            IF      ACCT-SRYKBN         =   "95"  OR  "96"
