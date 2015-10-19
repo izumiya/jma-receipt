@@ -273,6 +273,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
       *                                     対応
+      *  04.08.05    NACL-門脇    15/10/19  労災レセプト回数１回目の
+      *                                     「継続請求分」対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2852,6 +2854,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    1     TO    FLG-HENSYU-NG
                END-IF
             END-IF
+      *
+             IF       SRY-SRYCD(IDX2)  =  "099999924"
+               IF    (ACCT-JIHOKBN          =  SPACE       )
+               AND   (RECE82-HKNKBN         =  "1"  OR  "2")
+               AND   (RECE82-SYOKAIFLG      =  "1"         )
+                  MOVE   SPACE  TO    RECE82-SYOKAIFLG
+               END-IF
+               MOVE       1     TO    FLG-HENSYU-NG
+             END-IF
       *
             IF       SRY-SRYCD(IDX2)(1:5)  =
                      "09960" OR "09970" OR "09980"
