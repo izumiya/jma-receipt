@@ -33,6 +33,7 @@
       *  01.00.04    NACL-多々納  03.04.16  END-IF,END-SERACH追加
       *  01.00.05    NACL-多々納  04.09.22  海の日、敬老の日変更
       *  04.03.00    NACL-多々納  08.07.08  明治以前、和暦９９年以上エラー他
+      *  04.08.00    NACL-多々納  15.10.20  H27(2015) 振替休日追加
       *****************************************************************
 001400 ENVIRONMENT         DIVISION.
 001500 CONFIGURATION       SECTION.
@@ -1312,6 +1313,13 @@
 116600                 MOVE    1         TO  YSK-KYUJTS
                    END-SEARCH
                END-IF
+           END-IF.
+      *H27.10
+      *    H27(2015) 5/6,9/22を休日とする
+           IF     (WK-SYY              =   2015 )
+              AND (WK-SMD              =   0922
+                                       OR  0506 )
+               MOVE    1               TO  YSK-KYUJTS
            END-IF.
 116700*
 116800*    IF  WK-SYYMMDD  >  "19830731"
