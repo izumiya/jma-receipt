@@ -112,6 +112,9 @@
       *    ¸ºÅÀÊ¬
            03  FLG-GENTEN          PIC 9(01).
       *
+       01  FLG-AREA2.
+           03  FLG-KENSA-CHK       PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -312,6 +315,8 @@
        100-ZAI-SET-SEC              SECTION.
       *
            MOVE    ZERO                TO  FLG-KENSA-ARI
+      *H27.10
+           MOVE    ZERO                TO  FLG-KENSA-CHK
       *    ºÞÊ¬Î¥
            PERFORM 1002-ZAIBUNNRI-SEC
            IF     (SPA-ERRCD           =   SPACE ) 
@@ -326,12 +331,16 @@
                        IF      LNK-SC93-KENSAARIFLG    =   1
                            PERFORM 200-KENSA-SORT-SEC
                        END-IF
+      *H27.10
+                       MOVE    1               TO  FLG-KENSA-CHK
       *                ºÞÊ¬Î¥
                        PERFORM 1002-ZAIBUNNRI-SEC
                    END-IF
                ELSE
                    IF      FLG-KENSA-ARI       =   1
                        PERFORM 200-KENSA-SORT-SEC
+      *H27.10
+                       MOVE    1               TO  FLG-KENSA-CHK
       *                ºÞÊ¬Î¥
                        PERFORM 1002-ZAIBUNNRI-SEC
                    END-IF
@@ -1628,6 +1637,11 @@
                                                    OR  "099999908" )
                        MOVE    1                   TO  FLG-SYORI
                    END-IF
+      *H27.10
+                   IF      FLG-SYORI               =   2
+                       MOVE    SPACE               TO  WRK-HOUKNSKBN
+                       MOVE    ZERO                TO  WRK-KENSA-CNT
+                   END-IF
                ELSE
       *            Êñ³çÂÐ¾Ý¸¡ººÊÑ¹¹»þ
                    IF     (SPA-COM-HOUKNSKBN(IDX)
@@ -2543,6 +2557,23 @@
                                                         (IDX-KEN) )
                        ADD     1                 TO  WRK-KENSA-CNT
                    END-IF
+      *H27.10
+      *            Êñ³ç¶èÊ¬ÊÑ¹¹¤Ç½ªÎ»
+                   IF      FLG-KENSA-CHK       =   1
+      *
+                       IF     (WRK-KENSA-CNT       >   ZERO )  AND
+                             ((SPA-COM-HOUKNSKBN(IDX)
+                                           NOT =   SPA-COM-HOUKNSKBN
+                                                        (IDX-KEN) )
+                        OR    (SPA-COM-KAIFLG (IDX-KEN)   =   "1" ))
+                           IF      IDX             >   IDX-KEN
+                               MOVE    ZERO        TO  WRK-KENSA-CNT
+                           ELSE
+                               MOVE    SPA-MAX-LINE    TO  IDX-KEN
+                           END-IF
+                       END-IF
+                   END-IF
+      *
                END-IF
            END-PERFORM
            IF      WRK-KENSA-MAX       =   ZERO
