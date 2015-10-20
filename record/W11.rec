@@ -618,6 +618,9 @@ W11 {
             ORCACSTCHK10N {
               isactive bool;
             };
+            BUNBEN {
+              textdata varchar(20);
+            };
           };
           N0102 {
             state int;

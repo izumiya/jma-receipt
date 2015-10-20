@@ -4813,7 +4813,7 @@
        4501-TOUROKU-EXT.
            EXIT.
       *****************************************************************
-      *    登録処理 （退院登録）
+      *    登録処理 （退院再計算）
       *****************************************************************
        4502-TOUROKU-SEC            SECTION.
       *
@@ -5776,6 +5776,19 @@
        4801-BUNBEN-UPD-SEC          SECTION.
       *
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
+           IF    ( BUNBEN-UPDKBN    =  ZERO )
+               PERFORM 48011-BUNBEN-UPD-SEC
+           ELSE
+               PERFORM 4802-BUNBEN-UPD-SEC
+           END-IF
+      *
+           .
+       4801-BUNBEN-UPD-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理テーブル更新処理
+      *****************************************************************
+       48011-BUNBEN-UPD-SEC          SECTION.
       *
            PERFORM 800-ORCSBUNBENFTN-SEC
       *
@@ -5812,7 +5825,7 @@
            END-IF
       *
            .
-       4801-BUNBEN-UPD-EXT.
+       48011-BUNBEN-UPD-EXT.
            EXIT.
       *****************************************************************
       *    分娩管理テーブル更新処理
@@ -5851,7 +5864,9 @@
            MOVE    BUNBEN-ZAIWEEK      TO  LNKBUNBEN-ZAIWEEK
            MOVE    BUNBEN-SIZANKBN     TO  LNKBUNBEN-SIZANKBN
            MOVE    BUNBEN-BIRTHCNT     TO  LNKBUNBEN-BIRTHCNT
-           MOVE    BUNBEN-NYUIN-DAY    TO  LNKBUNBEN-NYUIN-DAY
+           IF    ( BUNBEN-NYUIN-DAY    NOT =   ZERO )
+               MOVE    BUNBEN-NYUIN-DAY TO LNKBUNBEN-NYUIN-DAY
+           END-IF
            MOVE    BUNBEN-SANKAKBN     TO  LNKBUNBEN-SANKAKBN
            MOVE    BUNBEN-BIKOU        TO  LNKBUNBEN-BIKOU
            MOVE    "1"                 TO  LNKBUNBEN-UPDKBN

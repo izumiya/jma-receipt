@@ -4209,8 +4209,9 @@
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
            IF    ( FLG-BUNBEN      =   ZERO )
                IF    ( BUNBEN-BUNBENKBN    =   "1" OR "2" )
-                AND  ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
-                AND  ( PTNYUINRRK-TAIINYMD    >=   CONST-H211001 )
+                AND((( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                AND  ( PTNYUINRRK-TAIINYMD    >=   CONST-H211001 ))
+                 OR ( PTNYUINRRK-NYUINYMD     >=   CONST-H211001 ))
                    MOVE    1           TO  SPA-NAI-I01-TBUNBEN (IDX1)
                END-IF
            END-IF
@@ -17435,18 +17436,44 @@
       *****************************************************************
        4801-BUNBEN-UPD-SEC          SECTION.
       *
-           INITIALIZE                  BUNBEN-REC
-           MOVE    NRRK-HOSPNUM    TO  BUNBEN-HOSPNUM
-           MOVE    NRRK-PTID       TO  BUNBEN-PTID
-           MOVE    "1"             TO  BUNBEN-NYUGAIKBN
-           MOVE    "000000"        TO  BUNBEN-SKYYM
-           MOVE    NRRK-RRKNUM     TO  BUNBEN-RRKNUM
+           MOVE    NRRK-RRKNUM     TO  WRK-BUNBENRRKNUM
+           PERFORM 900-BUNBEN-KEY3-SEL-SEC
+           IF    ( FLG-BUNBEN      =   ZERO )
+               MOVE    "000000"    TO  BUNBEN-SKYYM
+               INITIALIZE              BUNBEN-TEISYUTUBIKBN
+                                       BUNBEN-SKYKBN
+                                       BUNBEN-NYUIN-DAY
+                                       BUNBEN-NYU-MONEY
+                                       BUNBEN-RMSGK-MONEY
+                                       BUNBEN-KAIJO-MONEY
+                                       BUNBEN-BUNBEN-MONEY
+                                       BUNBEN-SHIN-MONEY
+                                       BUNBEN-KNS-MONEY
+                                       BUNBEN-SYC-MONEY
+                                       BUNBEN-SNK-MONEY
+                                       BUNBEN-ETC-MONEY
+                                       BUNBEN-ICBFTN-MONEY
+                                       BUNBEN-NINPUFTN-MONEY
+                                       BUNBEN-DAIRI-MONEY
+               IF    ( BUNBEN-UPDKBN   NOT =   ZERO )
+                   MOVE    "3"     TO  BUNBEN-UPDKBN
+               END-IF
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    NRRK-HOSPNUM
+                                   TO  BUNBEN-HOSPNUM
+               MOVE    NRRK-PTID   TO  BUNBEN-PTID
+               MOVE    "1"         TO  BUNBEN-NYUGAIKBN
+               MOVE    "0"         TO  BUNBEN-UPDKBN
+               MOVE    SMCNDATE-YMD TO BUNBEN-CREYMD
+               MOVE    NRRK-RRKNUM TO  BUNBEN-RRKNUM
+               MOVE    "000000"    TO  BUNBEN-SKYYM
+           END-IF
+      *
            MOVE    SPA-GMN-I01-BUNBEN-CD
                                    TO  BUNBEN-BUNBENKBN
            MOVE    SPA-GMN-I01-RIYOU-CD
                                    TO  BUNBEN-RIYOUKBN
-           MOVE    "0"             TO  BUNBEN-UPDKBN
-           MOVE    SMCNDATE-YMD    TO  BUNBEN-CREYMD
            MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD
            MOVE    SMCNDATE-HMS    TO  BUNBEN-UPHMS
       *
@@ -17467,6 +17494,7 @@
                                       SPA-AREA
                IF    ( WKPTNYUIN-RRKEDANUM  >   ZERO )
                 AND  ( SPA-GMN-I01-BUNBEN-CD   =   "0" OR "1" OR "2" )
+      *
                    MOVE    BUNBEN-REC      TO  MCPDATA-REC
                    MOVE    "tbl_bunben"    TO  MCP-TABLE
                    MOVE    "key"           TO  MCP-PATHNAME
@@ -18478,7 +18506,6 @@
                    MOVE    "T"         TO  I01-NYUREKILST-SELECT (IDX1)
       *
                    IF    ( SPA-NAI-I01-TBUNBEN (IDX1)      =   1 )
-                    AND  ( SPA-NAI-I01-TTAIINYMD(IDX1) NOT =   SPACE )
                        MOVE    "出産一時金"
                                        TO  I01-B15-LABEL
                    END-IF

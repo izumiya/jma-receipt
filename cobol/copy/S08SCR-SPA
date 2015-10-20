@@ -136,6 +136,7 @@
                05  SPA-NAI-LOCK                PIC 9(01).
                05  SPA-NAI-GHKNNUM             PIC X(03).
                05  SPA-NAI-GNEW                PIC 9(01).
+               05  SPA-NAI-NNEW                PIC 9(01).
                05  SPA-NAI-SLOCK-MSG           PIC X(32).
                05  SPA-NAI-SANKANUM            PIC 9(10).
                05  SPA-NAI-SRYYMD              PIC X(08).

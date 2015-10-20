@@ -94,7 +94,22 @@
                05  WRK-SKYYM               PIC X(06).
                05  WRK-SKYDD               PIC X(02).
            03  WRK-BUNBENKBN               PIC X(01).
-      *
+           03  WRK-STATE                   PIC S9(09).
+           03  WRK-VISIBLE                 PIC X(01).
+           03  WRK-LABEL-G.
+               05  WRK-LBLNYU-MONEY        PIC X(20).
+               05  WRK-LBLRMSGK-MONEY      PIC X(20).
+               05  WRK-LBLKAIJO-MONEY      PIC X(20).
+               05  WRK-LBLBUNBEN-MONEY     PIC X(20).
+               05  WRK-LBLSHIN-MONEY       PIC X(20).
+               05  WRK-LBLKNS-MONEY        PIC X(20).
+               05  WRK-LBLSYC-MONEY        PIC X(20).
+               05  WRK-LBLSNK-MONEY        PIC X(20).
+               05  WRK-LBLETC-MONEY        PIC X(20).
+               05  WRK-LBLICBFTN-MONEY     PIC X(20).
+               05  WRK-LBLNINPUFTN-MONEY   PIC X(20).
+               05  WRK-LBLDAIRI-MONEY      PIC X(20).
+               05  WRK-LBLMEIPRTKBN        PIC X(20).
       *
        01  CONST-AREA.
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
@@ -345,19 +360,27 @@
            MOVE    SPACE           TO  SPA-S08
            INITIALIZE                  SPA-S08
       *
-      *    •≥•Û•‹•‹•√•Ø•π ‘Ω∏ΩËÕ˝
-           PERFORM 310-COMBO-EDIT-SEC
-      *
            PERFORM 800-ORCSBUNBENFTN-SEC
       *
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
            IF    ( FLG-BUNBEN      =   ZERO )
-               CONTINUE
+               IF    ( SPA-S08-NYUGAIKBN   =   "1" )
+                   IF    ( BUNBEN-UPDKBN   =   ZERO OR "3" )
+                       IF    ( BUNBEN-UPDKBN       =   "3" )
+                           MOVE    2   TO  SPA-NAI-NNEW
+                       ELSE
+                           MOVE    1   TO  SPA-NAI-NNEW
+                       END-IF
+                   END-IF
+               END-IF
            ELSE
                IF    ( SPA-S08-NYUGAIKBN   =   "2" )
                    MOVE    1       TO  SPA-NAI-GNEW
                END-IF
            END-IF
+      *
+      *    •≥•Û•‹•‹•√•Ø•π ‘Ω∏ΩËÕ˝
+           PERFORM 310-COMBO-EDIT-SEC
       *
            PERFORM 311-SPASET-SEC
       *
@@ -392,9 +415,12 @@
                MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SYMD
                PERFORM 800-HIZUKE-CHK-SEC
                MOVE    WRK-HENYMDG         TO  SPA-GMN-NYUINYMD
-               MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SYMD
-               PERFORM 800-HIZUKE-CHK-SEC
-               MOVE    WRK-HENYMDG         TO  SPA-GMN-TAIINYMD
+               IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                   MOVE    PTNYUINRRK-TAIINYMD
+                                           TO  WRK-SYMD
+                   PERFORM 800-HIZUKE-CHK-SEC
+                   MOVE    WRK-HENYMDG     TO  SPA-GMN-TAIINYMD
+               END-IF
       *
            ELSE
                PERFORM 900-SYUNOU-KEY-SEL-SEC
@@ -474,6 +500,7 @@
       *
            IF    ( SPA-NAI-GNEW    =   1 )
             OR   ( FLG-SAIKEISAN   =   1 )
+            OR   ( SPA-NAI-NNEW    =   1 )
                MOVE    LNKBUNBEN-KANYUKBN 
                                        TO  SPA-GMN-SYAKOK
                MOVE    LNKBUNBEN-HONKZKKBN
@@ -484,7 +511,10 @@
                MOVE    LNKBUNBEN-NUM   TO  SPA-GMN-NUM
                MOVE    LNKBUNBEN-HKNJANUM-S
                                        TO  SPA-NAI-HKNJANUM-S
+           END-IF
       *
+           IF    ( SPA-NAI-GNEW    =   1 )
+            OR   ( FLG-SAIKEISAN   =   1 )
                MOVE    LNKBUNBEN-NYU-MONEY TO  SPA-GMN-NYU-MONEY
                MOVE    LNKBUNBEN-RMSGK-MONEY
                                            TO  SPA-GMN-RMSGK-MONEY
@@ -516,6 +546,7 @@
       *
            END-IF
       *
+      *
            IF    ( LNKBUNBEN-KANYUKBN  =   "2" )
                MOVE    "2"         TO  SPA-NAI-RECESAKI
            ELSE
@@ -527,6 +558,7 @@
            ELSE
       *
                IF    ( SPA-NAI-GNEW    =   1 )
+                OR   ( SPA-NAI-NNEW    =   1 )
                    CONTINUE
                ELSE
                    IF    ( BUNBEN-NAME =   LNKBUNBEN-NAME )
@@ -713,12 +745,15 @@
        3101-TEISYUTUBIKBNLST-SEC       SECTION.
       *
            INITIALIZE                  SPA-GMN-TEISYUTUBIKBNLST-G
-           MOVE    "1"             TO  SPA-GMN-TEISYUTUBIKBNL   (1)
-           MOVE    "£±£∞∆¸¿¡µ·"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(1)
-           MOVE    "2"             TO  SPA-GMN-TEISYUTUBIKBNL   (2)
-           MOVE    "£≤£µ∆¸¿¡µ·"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(2)
       *
-           MOVE    2               TO  SPA-GMN-TEISYUTUBIKBN-MAX
+           IF    ( SPA-NAI-NNEW            =   ZERO  )
+               MOVE    "1"             TO  SPA-GMN-TEISYUTUBIKBNL   (1)
+               MOVE    "£±£∞∆¸¿¡µ·"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(1)
+               MOVE    "2"             TO  SPA-GMN-TEISYUTUBIKBNL   (2)
+               MOVE    "£≤£µ∆¸¿¡µ·"    TO  SPA-GMN-TEISYUTUBIKBNMEIL(2)
+      *
+               MOVE    2               TO  SPA-GMN-TEISYUTUBIKBN-MAX
+           END-IF
       *
            .
        3101-TEISYUTUBIKBNLST-EXT.
@@ -729,14 +764,17 @@
        3101-SKYKBNLST-SEC            SECTION.
       *
            INITIALIZE                  SPA-GMN-SKYKBNLST-G
-           MOVE    "0"             TO  SPA-GMN-SKYKBNL   (1)
-           MOVE    "¿¡µ·§∑§ §§"    TO  SPA-GMN-SKYKBNMEIL(1)
-           MOVE    "1"             TO  SPA-GMN-SKYKBNL   (2)
-           MOVE    "Ã§¿¡µ·"        TO  SPA-GMN-SKYKBNMEIL(2)
-           MOVE    "2"             TO  SPA-GMN-SKYKBNL   (3)
-           MOVE    "¿¡µ·∫—"        TO  SPA-GMN-SKYKBNMEIL(3)
       *
-           MOVE    3               TO  SPA-GMN-SKYKBN-MAX
+           IF    ( SPA-NAI-NNEW            =   ZERO  )
+               MOVE    "0"             TO  SPA-GMN-SKYKBNL   (1)
+               MOVE    "¿¡µ·§∑§ §§"    TO  SPA-GMN-SKYKBNMEIL(1)
+               MOVE    "1"             TO  SPA-GMN-SKYKBNL   (2)
+               MOVE    "Ã§¿¡µ·"        TO  SPA-GMN-SKYKBNMEIL(2)
+               MOVE    "2"             TO  SPA-GMN-SKYKBNL   (3)
+               MOVE    "¿¡µ·∫—"        TO  SPA-GMN-SKYKBNMEIL(3)
+      *
+               MOVE    3               TO  SPA-GMN-SKYKBN-MAX
+           END-IF
       *
            .
        3101-SKYKBNLST-EXT.
@@ -815,12 +853,15 @@
        3101-MEIPRTKBNLST-SEC            SECTION.
       *
            INITIALIZE                      SPA-GMN-MEIPRTKBNLST-G
-           MOVE    "0"                 TO  SPA-GMN-MEIPRTKBNL   (1)
-           MOVE    "»Øπ‘§∑§ §§"        TO  SPA-GMN-MEIPRTKBNMEIL(1)
-           MOVE    "1"                 TO  SPA-GMN-MEIPRTKBNL   (2)
-           MOVE    "»Øπ‘§π§Î"          TO  SPA-GMN-MEIPRTKBNMEIL(2)
       *
-           MOVE    2                   TO  SPA-GMN-MEIPRTKBN-MAX
+           IF    ( SPA-NAI-NNEW            =   ZERO  )
+               MOVE    "0"                 TO  SPA-GMN-MEIPRTKBNL   (1)
+               MOVE    "»Øπ‘§∑§ §§"        TO  SPA-GMN-MEIPRTKBNMEIL(1)
+               MOVE    "1"                 TO  SPA-GMN-MEIPRTKBNL   (2)
+               MOVE    "»Øπ‘§π§Î"          TO  SPA-GMN-MEIPRTKBNMEIL(2)
+      *
+               MOVE    2                   TO  SPA-GMN-MEIPRTKBN-MAX
+           END-IF
       *
            .
        3101-MEIPRTKBNLST-EXT.
@@ -1844,7 +1885,8 @@
            END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
-               IF    ( SPA-GMN-NYUIN-DAY   =   ZERO )
+               IF    ( SPA-NAI-NNEW        =   ZERO )
+                AND  ( SPA-GMN-NYUIN-DAY   =   ZERO )
                    MOVE    "1004"          TO  SPA-ERRCD
                    MOVE    9               TO  SPA-GMN-CUR
                END-IF
@@ -1890,7 +1932,7 @@
                     AND  ( SPA-GMN-SYAKOK      =   "1" )
                        IF    ( SPA-GMN-TEISYUTUSAKI    =   "2" )
                            MOVE    "1014"  TO  SPA-ERRCD
-                           MOVE    7       TO  SPA-GMN-CUR
+                           MOVE    24      TO  SPA-GMN-CUR
                        END-IF
                    END-IF
                END-IF
@@ -2098,7 +2140,11 @@
            MOVE    SPA-GMN-DAIRI-MONEY     TO  BUNBEN-DAIRI-MONEY
            MOVE    SPA-GMN-BIKOU           TO  BUNBEN-BIKOU
            MOVE    SPA-NAI-HKNJANUM-S      TO  BUNBEN-HKNJANUM-S
-           MOVE    "1"                     TO  BUNBEN-UPDKBN
+           IF    ( SPA-NAI-NNEW            =   ZERO )
+               MOVE    "1"                 TO  BUNBEN-UPDKBN
+           ELSE
+               MOVE    "3"                 TO  BUNBEN-UPDKBN
+           END-IF
            PERFORM 800-MCNDATE-SEC
            MOVE    WRK-CREYMD              TO  BUNBEN-CREYMD
            MOVE    SMCNDATE-YMD            TO  BUNBEN-UPYMD
@@ -2440,6 +2486,7 @@
                CONTINUE
            ELSE
                IF    ( SPA-GMN-SANKAKBN        =   "1" OR "3" )
+                AND  ( SPA-NAI-NNEW            =   ZERO )
                    IF    ( SPA-GMN-SNK-MONEY   =   ZERO )
                        COMPUTE IDX-INFO    =   IDX-INFO    +   1
                        MOVE    "blue"  TO  S08-LBLINFO-STYLE (IDX-INFO)
@@ -2475,6 +2522,51 @@
       *
            END-IF
       *
+           MOVE    "T"                     TO  WRK-VISIBLE
+      *
+           MOVE    "∆˛±°Œ¡"                TO  WRK-LBLNYU-MONEY
+           MOVE    "ººŒ¡∫π≥€"              TO  WRK-LBLRMSGK-MONEY
+           MOVE    " ¨ ⁄≤ΩıŒ¡"            TO  WRK-LBLKAIJO-MONEY
+           MOVE    " ¨ ⁄Œ¡"                TO  WRK-LBLBUNBEN-MONEY
+           MOVE    "ø∑¿∏ª˘¥…Õ˝ ›∞ÈŒ¡"      TO  WRK-LBLSHIN-MONEY
+           MOVE    "∏°∫∫°¶ÃÙ∫ﬁŒ¡"          TO  WRK-LBLKNS-MONEY
+           MOVE    "ΩË√÷°¶ºÍ≈ˆŒ¡"          TO  WRK-LBLSYC-MONEY
+           MOVE    "ª∫≤ ∞ÂŒ≈ ‰Ω˛¿©≈Ÿ"      TO  WRK-LBLSNK-MONEY
+           MOVE    "§Ω§Œ¬æ"                TO  WRK-LBLETC-MONEY
+           MOVE    "∞Ï…Ù…È√¥∂‚≈˘"          TO  WRK-LBLICBFTN-MONEY
+           MOVE    "«•…ÿπÁ∑◊…È√¥≥€"        TO  WRK-LBLNINPUFTN-MONEY
+           MOVE    "¬ÂÕ˝ºıºË≥€"            TO  WRK-LBLDAIRI-MONEY
+           MOVE    "Ã¿∫ŸΩÒ"                TO  WRK-LBLMEIPRTKBN
+      *
+           MOVE    WRK-LBLNYU-MONEY        TO  S08-LBLNYU-MONEY
+           MOVE    WRK-LBLRMSGK-MONEY      TO  S08-LBLRMSGK-MONEY
+           MOVE    WRK-LBLKAIJO-MONEY      TO  S08-LBLKAIJO-MONEY
+           MOVE    WRK-LBLBUNBEN-MONEY     TO  S08-LBLBUNBEN-MONEY
+           MOVE    WRK-LBLSHIN-MONEY       TO  S08-LBLSHIN-MONEY
+           MOVE    WRK-LBLKNS-MONEY        TO  S08-LBLKNS-MONEY
+           MOVE    WRK-LBLSYC-MONEY        TO  S08-LBLSYC-MONEY
+           MOVE    WRK-LBLSNK-MONEY        TO  S08-LBLSNK-MONEY
+           MOVE    WRK-LBLETC-MONEY        TO  S08-LBLETC-MONEY
+           MOVE    WRK-LBLICBFTN-MONEY     TO  S08-LBLICBFTN-MONEY
+           MOVE    WRK-LBLNINPUFTN-MONEY   TO  S08-LBLNINPUFTN-MONEY
+           MOVE    WRK-LBLDAIRI-MONEY      TO  S08-LBLDAIRI-MONEY
+           MOVE    WRK-LBLMEIPRTKBN        TO  S08-LBLMEIPRTKBN
+      *
+           MOVE    WRK-VISIBLE         TO  S08-NYU-MONEY-VISIBLE
+                                           S08-RMSGK-MONEY-VISIBLE
+                                           S08-KAIJO-MONEY-VISIBLE
+                                           S08-BUNBEN-MONEY-VISIBLE
+                                           S08-SHIN-MONEY-VISIBLE
+                                           S08-KNS-MONEY-VISIBLE
+                                           S08-SYC-MONEY-VISIBLE
+                                           S08-SNK-MONEY-VISIBLE
+                                           S08-ETC-MONEY-VISIBLE
+                                           S08-ICBFTN-MONEY-VISIBLE
+                                           S08-NINPUFTN-MONEY-VISIBLE
+                                           S08-DAIRI-MONEY-VISIBLE
+                                           S08-MEIPRTKBN-VISIBLE
+                                           S08-MEIPRTKBN-ITEM-VISIBLE
+      *
       *    π‡Ã‹æı¬÷ ‘Ω∏
            PERFORM 500-GMNHEN-STATE-EDIT-SEC
       *
@@ -2501,6 +2593,8 @@
                                            S08-B05-STATE
                                            S08-B12-STATE
       *
+           MOVE    WIDGET-NORMAL       TO  WRK-STATE
+      *
            IF    ( SPA-NAI-LOCK        NOT =   ZERO )
                MOVE    WIDGET-INSENSITIVE
                                        TO  S08-B05-STATE
@@ -2509,6 +2603,7 @@
       *
            IF    ( SPA-GMN-RIYOUKBN    =   "0" )
             OR   ( SPA-GMN-HKNJANUM    =   SPACE )
+            OR   ( SPA-NAI-NNEW    NOT =   ZERO )
                MOVE    WIDGET-INSENSITIVE
                                        TO  S08-SKYYM-STATE
                                            S08-TEISYUTUBIKBN-STATE
@@ -2528,6 +2623,26 @@
                                        TO  S08-SANKAKBN-STATE
                                            S08-SANKAKBN-ITEM-STATE
            END-IF
+      *
+           IF    ( SPA-NAI-NNEW            NOT =   ZERO )
+               MOVE    WIDGET-INSENSITIVE  TO  WRK-STATE
+           END-IF
+      *
+           MOVE    WRK-STATE           TO  S08-NYUIN-DAY-STATE
+                                           S08-NYU-MONEY-STATE
+                                           S08-RMSGK-MONEY-STATE
+                                           S08-KAIJO-MONEY-STATE
+                                           S08-BUNBEN-MONEY-STATE
+                                           S08-SHIN-MONEY-STATE
+                                           S08-KNS-MONEY-STATE
+                                           S08-SYC-MONEY-STATE
+                                           S08-SNK-MONEY-STATE
+                                           S08-ETC-MONEY-STATE
+                                           S08-ICBFTN-MONEY-STATE
+                                           S08-NINPUFTN-MONEY-STATE
+                                           S08-DAIRI-MONEY-STATE
+                                           S08-MEIPRTKBN-STATE
+                                           S08-MEIPRTKBN-ITEM-STATE
       *
            .
        500-GMNHEN-STATE-EDIT-EXT.
@@ -2692,10 +2807,85 @@
                END-IF
            END-IF
       *
+           IF    ( SPA-GMN-CUR     =   9 )
+               IF    ( S08-NYUIN-DAY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    10      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
            IF    ( SPA-GMN-CUR     =   10 )
                IF    ( S08-SANKAKBN-STATE
                                         =   WIDGET-INSENSITIVE )
                    MOVE    11      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   11 )
+               IF    ( S08-NYU-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    12      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   12 )
+               IF    ( S08-RMSGK-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    13      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   13 )
+               IF    ( S08-KAIJO-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    14      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   14 )
+               IF    ( S08-BUNBEN-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    15      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   15 )
+               IF    ( S08-SHIN-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    16      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   16 )
+               IF    ( S08-KNS-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    17      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   17 )
+               IF    ( S08-SYC-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    18      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   18 )
+               IF    ( S08-SNK-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    19      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   19 )
+               IF    ( S08-ETC-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    20      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   20 )
+               IF    ( S08-ICBFTN-MONEY-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    21      TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF    ( SPA-GMN-CUR     =   23 )
+               IF    ( S08-MEIPRTKBN-STATE
+                                        =   WIDGET-INSENSITIVE )
+                   MOVE    212     TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
