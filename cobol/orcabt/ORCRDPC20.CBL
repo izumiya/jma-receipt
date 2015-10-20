@@ -104,6 +104,7 @@
       *  04.08.01    NACL-Æ£¸¶    15/08/24  ¸øÈñ¤Î¤ß¤Î¿ÇÎÅ¡Ê°åÎÅÊÝ¸±¤Î¤Ê
       *                                     ¤¤¿ÇÎÅ¡Ë¤Î£Å£Æ½ÐÎÏ²ÄÈÝÂÐ±þ
       *              NACL-°ËÆ£    15/10/20  ÊÄËã·×»»¸«Ä¾¤·
+      *              NACL-¾®Æ¦Âô  15/10/20  ½èÃÖ¤Î½ÐÍè¹â¼ÂÀÓÅÀ¿ô¥»¥Ã¥È½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2850,9 +2851,20 @@
                                        *   TBL-KOUI-TEN (IDX)
                                        /   100
                                        +   0.5
-                   IF      WRK-FEDT-SRYKBN     NOT =  "50"
+      *--- AZU-MOD START 2015.10.20
+      **             IF      WRK-FEDT-SRYKBN     NOT =  "50"
+      **                 MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
+      **             END-IF
+                   IF      WRK-FEDT-SRYKBN     =  "40"
+                       COMPUTE WRK-FEDT-PREV-TEN = WRK-FEDT-PREV-TEN
+                                                +  WRK-FEDT-DEKIDAKA-TEN
+                   END-IF
+                   IF      WRK-FEDT-SRYKBN     =  "50"  OR  "40"
+                       CONTINUE
+                   ELSE
                        MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
                    END-IF
+      *--- AZU-MOD END 2015.10.20
                    MOVE    ZERO        TO  WRK-FEDT-PREV-TEN50
                    MOVE    ZERO        TO  WRK-FEDT-PREV-TEN721
                 END-IF

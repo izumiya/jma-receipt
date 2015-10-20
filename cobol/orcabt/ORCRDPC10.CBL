@@ -125,6 +125,7 @@
       *                                     包括分の場合は出来高・包括
       *                                     フラグに１をセットしない
       *              NACL-伊藤    15/10/20  閉麻計算見直し
+      *              NACL-小豆沢  15/10/20  処置の出来高実績点数セット修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3486,9 +3487,20 @@
                                        *   TBL-KOUI-TEN (IDX)
                                        /   100
                                        +   0.5
-                   IF      WRK-FEDT-SRYKBN     NOT =  "50"
+      *--- AZU-MOD START 2015.10.20
+      **             IF      WRK-FEDT-SRYKBN     NOT =  "50"
+      **                 MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
+      **             END-IF
+                   IF      WRK-FEDT-SRYKBN     =  "40"
+                       COMPUTE WRK-FEDT-PREV-TEN = WRK-FEDT-PREV-TEN
+                                                +  WRK-FEDT-DEKIDAKA-TEN
+                   END-IF
+                   IF      WRK-FEDT-SRYKBN     =  "50"  OR  "40"
+                       CONTINUE
+                   ELSE
                        MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
                    END-IF
+      *--- AZU-MOD END 2015.10.20
                    MOVE    ZERO        TO  WRK-FEDT-PREV-TEN50
                    MOVE    ZERO        TO  WRK-FEDT-PREV-TEN721
                 END-IF
