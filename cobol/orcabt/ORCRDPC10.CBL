@@ -124,6 +124,7 @@
       *              NACL-小豆沢  15/10/13  退院時投薬コメント入力分でも
       *                                     包括分の場合は出来高・包括
       *                                     フラグに１をセットしない
+      *              NACL-伊藤    15/10/20  閉麻計算見直し
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -734,6 +735,8 @@
                05  TBL-HEIMA-ZAN-SURYO          PIC 9(08)V9(5).
                05  TBL-HEIMA-COM-SURYO          PIC 9(08)V9(5).
                05  TBL-HEIMA-30M-SURYO          PIC 9(08)V9(5).
+               05  TBL-HEIMA-30M-IDX            PIC 9(02).
+               05  TBL-HEIMA-30M-TMP            PIC 9(08)V9(5).
       *
       *    診療行為データ用テーブル（告示等識別区分による記録順）
        01  WRK-KOUI-TAIHI-AREA.
@@ -3677,22 +3680,37 @@
                                        TO  TBL-HEIMA-30M-SURYO (IDXW)
            END-PERFORM
       *    30分以下を寄せ集め
+      *    数量の多い順になるのでここで多い順にインデックスを決定
+      *    TBL-HEIMA-30M-IDX()へ格納
+      *    一時使用の配列へ複写
+           PERFORM VARYING IDXW    FROM    1   BY  1
+                   UNTIL  (IDXW    >   TBL-HEIMA-MAX)
+               MOVE    TBL-HEIMA-30M-SURYO (IDXW)
+                                       TO  TBL-HEIMA-30M-TMP (IDXW)
+           END-PERFORM
+           PERFORM VARYING IDZ3    FROM    1   BY  1
+                   UNTIL  (IDZ3    >   TBL-HEIMA-MAX)
+               MOVE    ZERO                TO  WRK-30M-SURYO
+               PERFORM VARYING IDXW    FROM    1   BY  1
+                       UNTIL  (IDXW    >   TBL-HEIMA-MAX)
+                   IF     (TBL-HEIMA-30M-TMP (IDXW)  >
+                                               WRK-30M-SURYO)
+                       MOVE    IDXW    TO  TBL-HEIMA-30M-IDX (IDZ3)
+                       MOVE    TBL-HEIMA-30M-TMP (IDXW)
+                                       TO  WRK-30M-SURYO
+                   END-IF
+               END-PERFORM
+               MOVE    TBL-HEIMA-30M-IDX (IDZ3)    TO  IDXW
+               MOVE    ZERO            TO  TBL-HEIMA-30M-TMP (IDXW)
+           END-PERFORM
+      *
+           MOVE    ZERO                TO  IDZ3
            PERFORM UNTIL   ( TBL-HEIMA-TOT-SURYO = ZERO )
              MOVE    ZERO              TO  WRK-HEIMA-IDX
              MOVE    ZERO              TO  WRK-KZM-SURYO
-             MOVE    ZERO              TO  WRK-30M-SURYO
-      *      数量の多い順になるのでここで一番多いのを決める
-             PERFORM VARYING IDXW FROM 1  BY  1
-                     UNTIL   ( IDXW > TBL-HEIMA-MAX )
-               IF   (TBL-HEIMA-30M-SURYO (IDXW) >  WRK-30M-SURYO)  AND
-                    (TBL-HEIMA-ZAN-SURYO (IDXW) >  ZERO         )
-                 MOVE    IDXW              TO  WRK-HEIMA-IDX
-                 MOVE    TBL-HEIMA-ZAN-SURYO (IDXW)
-                                           TO  WRK-KZM-SURYO
-                 MOVE    TBL-HEIMA-30M-SURYO (IDXW)
-                                           TO  WRK-30M-SURYO
-               END-IF
-             END-PERFORM
+             COMPUTE IDZ3              =   IDZ3    +   1
+             MOVE    TBL-HEIMA-30M-IDX (IDZ3)
+                                           TO  WRK-HEIMA-IDX
              IF      WRK-HEIMA-IDX   NOT =   ZERO
                    MOVE    TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
                                           TO  WRK-KZM-SURYO
