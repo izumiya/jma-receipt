@@ -53,7 +53,8 @@
            COPY    "CPASGNPARA.INC".
       *
       *    帳票領域
-           COPY    "HCN63.INC".
+           COPY    "HCN63V2.INC"   REPLACING  //HCN63V2//
+                                   BY         //HCN63//.
       *
       *    システム領域
        01  SYS-AREA.
@@ -98,6 +99,13 @@
            03  WRK-STR-G.
                05  WRK-STR1        PIC X(100).
                05  WRK-STR2        PIC X(100).
+      *
+      *    プログラムオプション
+       01  PO-AREA.
+           03  PO-IN               PIC X(25).
+           03  PO-OT               PIC X(100).
+           03  PO-BUNBEN-TITLE     PIC X(01).
+           03  PO-KANANAME         PIC X(01).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -144,6 +152,9 @@
       *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    印刷パラメタ
            COPY    "CPORCSMKPRT.INC".
@@ -212,10 +223,55 @@
       *    患者情報
            PERFORM 900-PTINF-READ-SEC
       *
+           PERFORM 1001-PROGRAM-OPTION-SEC
+      *
            .
        100-INIT-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプション編集処理
+      *****************************************************************
+       1001-PROGRAM-OPTION-SEC     SECTION.
+      *
+           MOVE    "1"                 TO  PO-BUNBEN-TITLE
+           MOVE    "0"                 TO  PO-KANANAME
+      *
+           MOVE    "BUNBEN_TITLE"      TO  PO-IN
+           PERFORM 10011-ORCSPRGOPTION-SEC
+           IF    ( PO-OT  =   "0" OR "1" OR "2" )
+               MOVE    PO-OT           TO  PO-BUNBEN-TITLE
+           END-IF
+      *
+           MOVE    "KANANAME"          TO  PO-IN
+           PERFORM 10011-ORCSPRGOPTION-SEC
+           IF    ( PO-OT  =   "0" OR "1" )
+               MOVE    PO-OT           TO  PO-KANANAME
+           END-IF
+      *
+           .
+       1001-PROGRAM-OPTION-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプション編集処理
+      *****************************************************************
+       10011-ORCSPRGOPTION-SEC     SECTION.
+      *
+           MOVE    SPACE              TO  PO-OT
+      *
+            INITIALIZE                     ORCSPRGOPTIONAREA
+            MOVE    "ORCHCN63"         TO  ORCSPRGOPTION-PRGID
+      *
+            MOVE    PO-IN              TO  ORCSPRGOPTION-IN-DATA
+            CALL    "ORCSPRGOPTION"    USING
+                                       SPA-AREA
+                                       ORCSPRGOPTIONAREA
+            MOVE    ORCSPRGOPTION-OT-PARA
+                                       TO  PO-OT
+      *
+           .
+       10011-ORCSPRGOPTION-EXT.
+           EXIT.
       *****************************************************************
       *    主　　処理
       *****************************************************************
@@ -226,7 +282,9 @@
       *    分娩区分
            EVALUATE    BUNBEN-BUNBENKBN
                WHEN    1
-                   MOVE    "（正常分娩）"      TO  HCN63-BUNBENKBN
+                   IF    ( PO-BUNBEN-TITLE     =   "1" OR "2" )
+                       MOVE    "（正常分娩）"  TO  HCN63-BUNBENKBN
+                   END-IF
       *            分娩介助料
                    MOVE    "−　　　　"        TO  HCN63-KAIJO-MONEY
       *            分娩料
@@ -235,7 +293,9 @@
                    PERFORM 31011-KANA-HEN-SEC
                    MOVE    WRK-MOJI-OUT        TO  HCN63-BUNBEN-MONEY
                WHEN    2
-                   MOVE    "（異常分娩）"      TO  HCN63-BUNBENKBN
+                   IF    ( PO-BUNBEN-TITLE     =   "1" )
+                       MOVE    "（異常分娩）"  TO  HCN63-BUNBENKBN
+                   END-IF
       *            分娩介助料
                    MOVE    BUNBEN-KAIJO-MONEY  TO  WRK-Z10
                    MOVE    WRK-Z10             TO  WRK-MOJI-IN
@@ -248,8 +308,17 @@
       *    患者番号
            MOVE    BUNBEN-PTNUM    TO  HCN63-PTNUM
       *
+           IF    ( PO-KANANAME     =   "1" )
+               MOVE    PTINF-KANANAME
+                                   TO  HCN63-KANANAME
+           END-IF
+      *
       *    患者氏名
-           MOVE    PTINF-NAME      TO  HCN63-NAME
+           IF    ( PTINF-NAME (31:)    =   SPACE )
+               MOVE    PTINF-NAME  TO  HCN63-NAME
+           ELSE
+               MOVE    PTINF-NAME  TO  HCN63-NAME2
+           END-IF
       *
       *    日付セット
            MOVE    SPA-SYSYMD      TO  WRK-SYMD
@@ -426,6 +495,19 @@
       *     PERFORM 31011-KANA-HEN-SEC
       *     MOVE    WRK-MOJI-OUT        TO  HCN63-BIKOU
       *
+           IF    ( PTINF-NAME (31:)    =   SPACE )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L L2    "        DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCN63-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L L1    "        DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCN63-LOPTION
+               END-STRING
+           END-IF
       *    帳票印刷処理
            PERFORM 400-PRT-WRITE-SEC
       *
@@ -463,7 +545,7 @@
       *    帳票印刷処理
            INITIALIZE                  ORCSMKPRTAREA
            MOVE    "HC01.sh"       TO  MKPRT-ID
-           MOVE    "HCN63.red"     TO  MKPRT-DIA
+           MOVE    "HCN63V2.red"   TO  MKPRT-DIA
            MOVE    SPACE           TO  MKPRT-DEF
            MOVE    ASGNPARA        TO  MKPRT-DAT
            MOVE    SYS-1034-PRTNM(13)

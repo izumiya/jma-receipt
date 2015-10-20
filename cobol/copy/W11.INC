@@ -143,6 +143,7 @@
                         08  W11-ORCACSTNM-N    PIC X(20).
                       07  W11-ORCACSTCHK-N-G   OCCURS   10.
                         08  W11-ORCACSTCHK-N   PIC X.
+                      07  W11-BUNBEN           PIC X(20).
                     06  W11-N0102-STATE        PIC S9(9)   BINARY.
                 04  W11-MSG01-STYLE              PIC X(20).
                 04  W11-MSG01                    PIC X(100).

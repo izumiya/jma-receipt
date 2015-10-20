@@ -3479,6 +3479,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W11-ORCAORGNM-N09-COUNT
       *
            MOVE    "ORCHCM50"          TO  W11-JIHI-UCHIWAKE
+           MOVE    "ORCHCN63"          TO  W11-BUNBEN
       *
            PERFORM VARYING     IDZ2     FROM    1   BY  1
                    UNTIL       IDZ2     >       SPA-NPGNM-MAX

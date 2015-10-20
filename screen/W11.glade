@@ -3011,16 +3011,16 @@
                 <text>ORCHCM50</text>
                 <input_mode>XIM</input_mode>
                 <xim_enabled>False</xim_enabled>
-            <signal>
-              <name>changed</name>
-              <handler>entry_changed</handler>
-              <data>CHANGED</data>
-            </signal>
-            <signal>
-              <name>activate</name>
-              <handler>send_event</handler>
-              <data>ACTIVATE</data>
-            </signal>
+                <signal>
+                  <name>changed</name>
+                  <handler>entry_changed</handler>
+                  <data>CHANGED</data>
+                </signal>
+                <signal>
+                  <name>activate</name>
+                  <handler>send_event</handler>
+                  <data>ACTIVATE</data>
+                </signal>
               </widget>
             </widget>
             <widget>
@@ -5286,6 +5286,22 @@
                 <label>ユーザプログラム名</label>
                 <justify>GTK_JUSTIFY_CENTER</justify>
                 <wrap>False</wrap>
+              </widget>
+              <widget>
+                <class>GtkPandaEntry</class>
+                <name>BUNBEN</name>
+                <x>376</x>
+                <y>284</y>
+                <width>160</width>
+                <height>20</height>
+                <sensitive>True</sensitive>
+                <can_focus>True</can_focus>
+                <has_focus>False</has_focus>
+                <editable>False</editable>
+                <text_max_length>20</text_max_length>
+                <text>ORCHCN63</text>
+                <input_mode>XIM</input_mode>
+                <xim_enabled>False</xim_enabled>
               </widget>
             </widget>
             <widget>
