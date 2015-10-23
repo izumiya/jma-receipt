@@ -4727,8 +4727,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                          OR "016"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "021" OR "015"
                                                          OR "016" )
-      ****           MOVE    "3"            TO  WRK-FTN-FLG
-      *
       *              自立支援＋生保の組合せを作成しない
                      MOVE    "2"            TO  WRK-FTN-FLG
                END-IF
@@ -4736,24 +4734,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
              IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "201501"
                IF  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "054" OR "052" )
-      ****           MOVE    "3"            TO  WRK-FTN-FLG
-      *
+               AND ( WRK-KCOMB-HKNNUM (IDX2)     =  SPACE         )
+      *              主保険がない場合は、
       *              難病＋生保、小児慢性＋生保の組合せを作成しない
                      MOVE    "2"            TO  WRK-FTN-FLG
-               END-IF
-             END-IF
-      *
-             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200310"
-               IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3"  ) AND
-                    (WRK-KCOMB-KOH2HKNNUM (IDX2) = "051"         ))
-               OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "051"          )
-                     MOVE    "3"            TO  WRK-FTN-FLG
-               END-IF
-             END-IF
-             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200504"
-             AND   WRK-KCOMB-TEKSTYMD(IDX2)(1:6) <= "201412"
-               IF  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "052"          )
-                     MOVE    "3"            TO  WRK-FTN-FLG
                END-IF
              END-IF
       *
