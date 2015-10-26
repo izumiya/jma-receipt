@@ -69,11 +69,12 @@
       *
       *    フラグ領域
        01  FLG-AREA.
-           03  FLG-END                 PIC 9(01).
-           03  FLG-HENREI-K            PIC 9(01).
-           03  FLG-HENREI-B            PIC 9(01).
+           03  FLG-END             PIC 9(01).
+           03  FLG-HENREI-K        PIC 9(01).
+           03  FLG-HENREI-B        PIC 9(01).
+           03  FLG-HENREI-B-CHK    PIC 9(01).
       *
-           03  FLG-KANRI-ROW           PIC 9(01).
+           03  FLG-KANRI-ROW       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -106,6 +107,13 @@
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03  WRK-H03-KANRI-ROW   PIC S9(09).
+      *
+           03  WRK-RECEIPT-NO      PIC X(06).
+      *
+           01  CHK-HENREI-B-REC.
+           COPY    "CPHENREI-BODY.INC"
+                                   REPLACING   //HENREI-B-//
+                                   BY          //CHK-HENREI-B-//.
       *
        01  WRK-HEN-AREA.
            03  WRK-SYMD.
@@ -323,6 +331,30 @@
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG     TO  SPA-GMN-H03-K-TCREYMD   (IDX)
       *
+               INITIALIZE                      CHK-HENREI-B-REC
+               MOVE    SPA-HOSPNUM         TO  CHK-HENREI-B-HOSPNUM
+               MOVE    HENREI-K-SYORIYM    TO  CHK-HENREI-B-SYORIYM
+               MOVE    HENREI-K-TEISYUTUSAKI
+                                           TO  CHK-HENREI-B-TEISYUTUSAKI
+               MOVE    HENREI-K-TEISYUTUSAKI2
+                                           TO CHK-HENREI-B-TEISYUTUSAKI2
+               MOVE    CHK-HENREI-B-REC    TO  MCPDATA-REC
+               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+                   MOVE    "key6"              TO  MCP-PATHNAME
+                   PERFORM 900-HENREI-BODY-READ-SEC
+               END-IF
+               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+               IF      FLG-HENREI-B-CHK    =   ZERO
+                   MOVE  CHK-HENREI-B-ERRCD    TO
+                                       SPA-GMN-H03-K-TERRCD    (IDX)
+               END-IF
+     *
                MOVE    "tbl_henrei_kanri"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
@@ -438,9 +470,7 @@
            MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
-               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
-               PERFORM 900-HENREI-BODY-READ-SEC
+               PERFORM 900-HENREI-BODY-READ-KEY4-SEC
            ELSE
                MOVE    1               TO  FLG-HENREI-B
            END-IF
@@ -473,7 +503,23 @@
                                        TO  SPA-NAI-H03-B-TRECEIPT-KBN
                                                                    (IDX)
                MOVE    HENREI-B-HR-MSG TO  SPA-GMN-H03-B-TERR      (IDX)
-               MOVE    HENREI-B-ERRCD  TO  SPA-GMN-H03-B-TERRCD    (IDX)
+      *
+               MOVE    HENREI-B-REC        TO  MCPDATA-REC
+               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+                   MOVE    "key5"              TO  MCP-PATHNAME
+                   PERFORM 900-HENREI-BODY-READ-SEC
+               END-IF
+               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+               IF      FLG-HENREI-B-CHK    =   ZERO
+                   MOVE  CHK-HENREI-B-ERRCD    TO
+                                           SPA-GMN-H03-B-TERRCD    (IDX)
+               END-IF
       *
       *        患者ＩＤチェック
                IF      HENREI-B-PTID   >   ZERO
@@ -493,9 +539,7 @@
                    END-IF
                END-IF
       *
-               MOVE    "tbl_henrei_body"       TO  MCP-TABLE
-               MOVE    "key4"                  TO  MCP-PATHNAME
-               PERFORM 900-HENREI-BODY-READ-SEC
+               PERFORM 900-HENREI-BODY-READ-KEY4-SEC
            END-PERFORM
       *
            MOVE    "tbl_henrei_body"   TO  MCP-TABLE
@@ -637,6 +681,8 @@
                MOVE    SPA-GMN-H03-K-TCNT      (IDX)
                                            TO  WRK-ZZ9
                MOVE    WRK-ZZ9             TO  H03-KANRI-TCNT      (IDX)
+               MOVE    SPA-GMN-H03-K-TERRCD    (IDX)
+                                           TO  H03-KANRI-TERRCD    (IDX)
                MOVE    SPA-GMN-H03-K-TCREYMD (IDX)
                                            TO  H03-KANRI-TCREYMD   (IDX)
       *         
@@ -806,7 +852,7 @@
       *
            PERFORM 900-PUT-WINDOW
       *
-           MOVE    1                    TO  FLG-END              
+           MOVE    1                    TO  FLG-END
       *
            .
        510-ERRMSG-EXT.
@@ -836,6 +882,25 @@
       *
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
+               MOVE  MCPDATA-REC           TO  CHK-HENREI-B-REC
+               MOVE  ZERO                  TO  FLG-HENREI-B-CHK
+           ELSE
+               INITIALIZE                      CHK-HENREI-B-REC
+               MOVE  1                     TO  FLG-HENREI-B-CHK
+           END-IF
+           .
+       900-HENREI-BODY-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    オンライン返戻明細読込処理
+      *****************************************************************
+       900-HENREI-BODY-READ-KEY4-SEC   SECTION.
+      *
+           MOVE    "tbl_henrei_body"       TO  MCP-TABLE
+           MOVE    "key4"                  TO  MCP-PATHNAME
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
                MOVE  MCPDATA-REC           TO  HENREI-B-REC
                MOVE  ZERO                  TO  FLG-HENREI-B
            ELSE
@@ -843,7 +908,7 @@
                MOVE  1                     TO  FLG-HENREI-B
            END-IF
            .
-       900-HENREI-BODY-READ-EXT.
+       900-HENREI-BODY-READ-KEY4-EXT.
            EXIT.
       *
       *****************************************************************

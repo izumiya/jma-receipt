@@ -607,7 +607,7 @@
         <name>scrolledwindow1</name>
         <x>20</x>
         <y>20</y>
-        <width>390</width>
+        <width>420</width>
         <height>150</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -623,8 +623,8 @@
           <has_focus>False</has_focus>
           <border_width>0</border_width>
           <show_titles>True</show_titles>
-          <columns>6</columns>
-          <column_widths>50,50,80,25,60,70</column_widths>
+          <columns>7</columns>
+          <column_widths>50,50,80,25,60,30,70</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -715,6 +715,21 @@
             <xpad>0</xpad>
             <ypad>0</ypad>
             <label>件数</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label527</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>エラー</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>

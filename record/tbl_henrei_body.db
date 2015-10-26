@@ -424,7 +424,38 @@ path    key4            {
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
                     AND   PT_RENNUM       = 1
+                ORDER BY RECEIPT_NO
                 ;
         };
 };
 
+path    key5            {
+        DBSELECT        {
+                DECLARE tbl_henrei_body_key5_csr CURSOR FOR
+                SELECT *
+                FROM tbl_henrei_body
+                WHERE     HOSPNUM         = :HOSPNUM
+                    AND   TEISYUTUSAKI    = :TEISYUTUSAKI
+                    AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
+                    AND   SYORIYM         = :SYORIYM
+                    AND   RECEIPT_NO      = :RECEIPT_NO
+                    AND   ERRCD           <> ''
+                    AND   SUBSTRING(HENREI_INFO2,1,2) <> 'HG'
+                ORDER BY PT_RENNUM
+                ;
+        };
+};
+
+path    key6            {
+        DBSELECT        {
+                DECLARE tbl_henrei_body_key6_csr CURSOR FOR
+                SELECT *
+                FROM tbl_henrei_body
+                WHERE     HOSPNUM         = :HOSPNUM
+                    AND   TEISYUTUSAKI    = :TEISYUTUSAKI
+                    AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
+                    AND   SYORIYM         = :SYORIYM
+                    AND   SUBSTRING(HENREI_INFO2,1,2) = 'HG'
+                ;
+        };
+};

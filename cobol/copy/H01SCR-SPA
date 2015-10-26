@@ -311,6 +311,7 @@
                            11  SPA-GMN-H03-K-TTEISYUTUSAKI2
                                                        PIC X(2).
                            11  SPA-GMN-H03-K-TCNT      PIC 9(4).
+                           11  SPA-GMN-H03-K-TERRCD    PIC X(03).
                            11  SPA-GMN-H03-K-TCREYMD   PIC X(9).
                        09  SPA-GMN-H03-KANRI-MAX       PIC 9(03).
       *

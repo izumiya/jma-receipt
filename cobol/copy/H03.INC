@@ -13,6 +13,7 @@
                     06  H03-KANRI-TTEISYUTUSAKI2
                                                PIC X(2).
                     06  H03-KANRI-TCNT         PIC X(4).
+                    06  H03-KANRI-TERRCD       PIC X(3).
                     06  H03-KANRI-TCREYMD      PIC X(9).
                   05  H03-KANRI-LIST-SELECT    PIC X
                                                    OCCURS  100 TIMES.
