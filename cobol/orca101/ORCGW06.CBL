@@ -3863,6 +3863,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *H27.10
       *        有効開始日の変更は追加
                IF     (SPA-GMN-SYORI       =   1    )
+                  AND (SPA-GMN-SELNUM  NOT =   ZERO )
                    MOVE    "1005"          TO  SPA-WIDCD
                END-IF
            END-IF
@@ -3946,9 +3947,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *H27.10
            MOVE    ZERO                TO  FLG-CHK
-           MOVE    2                   TO  SPA-GMN-SYORI
       *    期間変更時に、追加可能かのチェック
            IF     (SPA-GMN-SELNUM  NOT =   ZERO )
+               MOVE    2                   TO  SPA-GMN-SYORI
                IF     (SPA-NAI-STYUKYMD    =   SPA-NAI-TSTYUKYMD
                                                    (SPA-GMN-SELNUM))
                  OR   (SPA-NAI-EDYUKYMD    =   SPA-NAI-TEDYUKYMD
