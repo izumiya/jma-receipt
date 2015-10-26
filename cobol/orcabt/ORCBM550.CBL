@@ -1785,7 +1785,10 @@
                        WHEN    3
                            IF      WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                    =   "1" OR  "2" OR
-                                                       "3"
+                                                       "3" OR  "4" OR
+                                                       "5" OR  "6" OR
+                                                       "7" OR  "8" OR
+                                                       "9"
                                CONTINUE
                            ELSE
                                MOVE    "W02"           TO  WRK-ERRCD
