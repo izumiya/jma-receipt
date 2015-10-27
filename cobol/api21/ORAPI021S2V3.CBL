@@ -1408,6 +1408,9 @@
            MOVE    WRK-SRYKA           TO  SPA-SRYKA
            MOVE    WRK-HKNCOMBI        TO  SPA-HKNCOMBINUM
       *
+           MOVE    WRK-SRYKA-NAME      TO  SPA-SRYKAMEI
+           MOVE    WRK-DRCD-NAME       TO  SPA-DRCD-NAME
+      *
            INITIALIZE                  ORCSC95AREA
            MOVE    "@"                 TO  LNK-SC95-KBN
            MOVE    SPA-SRYYMD          TO  LNK-SC95-SRYYMD
