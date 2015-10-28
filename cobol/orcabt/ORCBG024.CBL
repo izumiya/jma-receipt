@@ -112,12 +112,15 @@
            03  WRK-PARA-PTNUM      PIC X(20).
            03  WRK-PARA-BTUNUM     PIC X(02).
            03  WRK-PARA-SRTKBN     PIC X(01).
+           03  WRK-PARA-RESTRICTION PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
            03  WRK-RECEERR             PIC X(100).
            03  WRK-TITLE               PIC X(100).
            03  WRK-PTID                PIC 9(10).
+           03  WRK-SYMD                PIC X(08).
+           03  WRK-EOMYMD              PIC X(08).
            03  WRK-TNS-SRYCD           PIC X(09).
            03  WRK-TNS-KJNYMD          PIC X(08).
            03  WRK-RYOYO-DAY-G.
@@ -162,6 +165,10 @@
            COPY    "COMMON-SPA".
       *
            COPY    "CPRYOYOCD.INC".
+      *
+       01  TNRRK-AREA.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING   //PTNYUINRRK-//
+                                       BY          //TNRRK-//.
       *
        01  TNACCT-AREA.
            COPY    "CPNYUINACCT.INC"   REPLACING   //NACCT-//
@@ -212,6 +219,10 @@
       *
       *    療養レセコメントデータ作成
            COPY    "CPORCSS005.INC".
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
@@ -294,6 +305,7 @@
                                                WRK-PARA-PTNUM
                                                WRK-PARA-BTUNUM
                                                WRK-PARA-SRTKBN
+                                               WRK-PARA-RESTRICTION
            END-UNSTRING
       *
       *
@@ -337,6 +349,11 @@
                                        TO  BG0241-FULLNAME
            MOVE    SGETTEMP-FULLNAMES (2)
                                        TO  RECEERR
+      *
+           MOVE    WRK-PARA-SRYYM      TO  WRK-SYMD
+           MOVE    "01"                TO  WRK-SYMD(7:2)
+           PERFORM 800-EOMYMD-SEC
+           MOVE    WRK-SYMD            TO  WRK-EOMYMD
       *
            PERFORM 110-PARA-SEC
       *
@@ -603,6 +620,14 @@
       *
            PERFORM 900-PTINF-KEY-SEL-SEC
            PERFORM 900-PTNUM-KEY-SEL-SEC
+      *
+           IF    ( WRK-PARA-RESTRICTION  =   "1" )
+               PERFORM 900-PTNYUINRRK-KEY10-SEL-SEC
+               IF    ( FLG-PTNYUINRRK  NOT =   ZERO )
+                   MOVE    1           TO  FLG-SKIP
+               END-IF
+           END-IF
+      *
            PERFORM 900-PTNYUINRRK-KEY29-SEL-SEC
       *
            IF    ( WRK-PARA-BTUNUM     NOT =   SPACE )
@@ -796,6 +821,22 @@
            EXIT.
       *
       *****************************************************************
+      *    月末日取得処理
+      *****************************************************************
+       800-EOMYMD-SEC                  SECTION.
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY1-AREA
+           MOVE    "71"                TO   LNK-DAY7-IRAI
+           MOVE    WRK-SYMD (1 : 6)    TO   LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                       LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO  WRK-SYMD
+      *
+           .
+       800-EOMYMD-EXT.
+            EXIT.
+      *****************************************************************
       *    患者番号検索処理
       *****************************************************************
        900-PTNUM-KEY4-SEL-SEC     SECTION.
@@ -878,6 +919,36 @@
       *
            .
        900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY10-SEL-SEC    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE                      TNRRK-AREA
+           MOVE    SPA-HOSPNUM         TO  TNRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  TNRRK-PTID
+           MOVE    WRK-EOMYMD          TO  TNRRK-NYUINYMD
+                                           TNRRK-TAIINYMD
+           MOVE    TNRRK-AREA           TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TNRRK-AREA
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  TNRRK-AREA
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY10-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入院履歴検索処理
