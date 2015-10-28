@@ -1,4 +1,4 @@
-tbl_chksnd	{
+tspoilbl_chksnd	{
 	HOSPNUM				number(2,0);
 	CHKKBN			char(1);
 	SRYCD   		char(9);
@@ -764,8 +764,8 @@ path	tmpdel1	{
         AND   OPID		  =   :OPID
 		AND   YUKOSTYMD  <=   :YUKOSTYMD
 		AND   YUKOEDYMD  >=   :YUKOEDYMD
-		AND   (BYOMEI) IN  (
-        SELECT BYOMEI from pg_temp.tbl_chksnd
+		AND   (CDKBN,BYOMEI) IN  (
+        SELECT CDKBN,BYOMEI from pg_temp.tbl_chksnd
 		WHERE HOSPNUM	  =   :HOSPNUM
 		AND   CHKKBN      =   :CHKKBN
 		AND   SRYCD       =   :SRYCD
@@ -840,3 +840,28 @@ path	key32	{
 	};
 };
 
+path	key33	{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key33_csr CURSOR FOR
+			SELECT HOSPNUM,CHKKBN,SRYCD,COUNT(*) AS RENNUM
+			FROM TBL_CHKSND A
+			WHERE 	HOSPNUM	 = :HOSPNUM
+			AND  CHKKBN      = :CHKKBN
+			AND  CDKBN = '1'
+			AND  (case when TRIM(:SRYCD ) <> '' then  SRYCD  = :SRYCD  else TRUE end)
+			AND   YUKOSTYMD  <=   :YUKOSTYMD
+			AND   YUKOEDYMD  >=   :YUKOEDYMD
+			AND   NOT EXISTS (
+				SELECT *
+				FROM  TBL_CHKSND
+				WHERE HOSPNUM      = a.HOSPNUM
+				AND   CHKKBN       = a.CHKKBN
+				AND   SRYCD        = a.SRYCD
+				AND   YUKOSTYMD   <= :YUKOSTYMD
+				AND   YUKOEDYMD   >= :YUKOEDYMD
+				AND   CDKBN       = '0'
+			)
+			GROUP BY  HOSPNUM,CHKKBN,SRYCD
+		;
+	};
+};

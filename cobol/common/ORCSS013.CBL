@@ -359,6 +359,10 @@
            MOVE    "tmpdel1"       TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
       *
+           IF    ( SS013-TEKBYOKBN =   "2" )
+               PERFORM 80012-TMPSND-EDIT-SEC
+           END-IF
+      *
            .
        8001-TMPSND-EDIT-EXT.
             EXIT.
@@ -421,6 +425,48 @@
       *
            .
        80011-TMPSND-EDIT-EXT.
+            EXIT.
+      *****************************************************************
+      *    一時チェックマスタ２編集処理（基本情報レコード作成）
+      *****************************************************************
+       80012-TMPSND-EDIT-SEC           SECTION.
+      *
+           PERFORM 900-CHKSND-KEY33-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+      *
+               INITIALIZE              TMPSND-REC
+      *
+               MOVE    CHKSND-HOSPNUM  TO  TMPSND-HOSPNUM
+               MOVE    CHKSND-CHKKBN   TO  TMPSND-CHKKBN
+               MOVE    CHKSND-SRYCD    TO  TMPSND-SRYCD
+               MOVE    "00000000"      TO  TMPSND-YUKOSTYMD
+               MOVE    "99999999"      TO  TMPSND-YUKOEDYMD
+               MOVE    "0"             TO  TMPSND-CDKBN
+               MOVE    SPACE           TO  TMPSND-GRPCHKKBN
+               MOVE    SPACE           TO  TMPSND-GRPID
+               MOVE    SPACE           TO  TMPSND-NYUGAIKBN
+      *
+               MOVE    CHKSND-RENNUM   TO  TMPSND-RENNUM
+      *
+               MOVE    CONST-TEMP      TO  TMPSND-TERMID
+               MOVE    SS013-TEMP-KEY  TO  TMPSND-OPID
+      *
+               MOVE    TMPSND-REC      TO  MCPDATA-REC
+               MOVE    "tbl_chksnd"    TO  MCP-TABLE
+               MOVE    "tmpins2"       TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+      *
+               PERFORM 900-CHKSND-KEY33-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key33"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       80012-TMPSND-EDIT-EXT.
             EXIT.
       *****************************************************************
       *    終了処理
@@ -489,6 +535,53 @@
        900-CHKSND-KEY27-SEL-EXT.
            EXIT.
       *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY33-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    SS013-CHKKBN        TO  CHKSND-CHKKBN
+           MOVE    SS013-SRYCD         TO  CHKSND-SRYCD
+           MOVE    SS013-KJNYMD        TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key33"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY33-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY33-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key33"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY33-FET-EXT.
+           EXIT.
+      *****************************************************************
       *    適応病名マスタ情報検索(KEY2)
       *****************************************************************
        900-TEKIOUBYOMEI-KEY2-SEL-SEC       SECTION.
@@ -497,7 +590,11 @@
       *
            INITIALIZE                  TEKIOUBYOMEI-REC
            MOVE    SS013-CHKKBN        TO  TEKBYO-CHKKBN
-           MOVE    SS013-SRYCD         TO  TEKBYO-SRYCD
+           IF    ( SS013-SRYCD         =   SPACE )
+               MOVE    "%"             TO  TEKBYO-SRYCD
+           ELSE
+               MOVE    SS013-SRYCD     TO  TEKBYO-SRYCD
+           END-IF
            MOVE    TEKIOUBYOMEI-REC    TO  MCPDATA-REC
            MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
            MOVE    "key2"              TO   MCP-PATHNAME
@@ -537,7 +634,11 @@
            MOVE    ZERO                TO  FLG-TEKDIS
       *
            INITIALIZE                      TEKIOU-DISEASE-REC
-           MOVE    SS013-SRYCD         TO  TEKDIS-SELSRYCD
+           IF    ( SS013-SRYCD         =   SPACE )
+               MOVE    "%"             TO  TEKDIS-SELSRYCD
+           ELSE
+               MOVE    SS013-SRYCD     TO  TEKDIS-SELSRYCD
+           END-IF
            MOVE    TEKIOU-DISEASE-REC  TO  MCPDATA-REC
            MOVE    "tbl_tekiou_disease" TO  MCP-TABLE
            MOVE    "key3"              TO   MCP-PATHNAME

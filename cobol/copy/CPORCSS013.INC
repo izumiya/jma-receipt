@@ -33,6 +33,10 @@
            03  SS013-CHKKBN                 PIC X(01).
            03  SS013-SRYCD                  PIC X(09).
            03  SS013-KJNYMD                 PIC X(08).
+      *    適応病名マスタ区分
+      *    0:適応病名マスタをインポートしない
+      *    1:適応病名マスタをインポートする
+      *    2:チェックマスタの設定に従って適応病名マスタをインポートする
            03  SS013-TEKBYOKBN              PIC X(01).
            03  SS013-TEMP-NAME              PIC X(10).
            03  SS013-TEMP-KEY               PIC X(16).

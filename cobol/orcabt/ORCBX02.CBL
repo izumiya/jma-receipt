@@ -203,6 +203,7 @@
       *****************************************************************
       *
            COPY    "CPORCSS004.INC".
+           COPY    "CPORCSS013.INC".
       *
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
@@ -375,12 +376,31 @@
       *****************************************************************
        2001-BX0202-EDIT-SEC        SECTION.
       *
+           INITIALIZE                      SS013-AREA
+           MOVE    "DBCREATE"          TO  SS013-FUNC
+           MOVE    WRK-PARA-CHKMORE    TO  SS013-CHKKBN
+           MOVE    WRK-PARA-KJNYMD     TO  SS013-KJNYMD
+           MOVE    "0"                 TO  SS013-TEKBYOKBN
+           CALL     "ORCSS013"         USING
+                                       SS013-AREA
+                                       SPA-AREA
+      *
            OPEN    INPUT   TENSU-FILE
            OPEN    OUTPUT  BX0202-FILE
       *
            PERFORM 900-TENSU-READ-SEC
       *
            PERFORM UNTIL ( FLG-TENSU   NOT =   ZERO )
+      *
+               INITIALIZE                  SS013-AREA
+               MOVE    WRK-PARA-CHKMORE TO  SS013-CHKKBN
+               MOVE    TNS-SRYCD       TO  SS013-SRYCD
+               MOVE    "2"             TO  SS013-TEKBYOKBN
+               MOVE    WRK-PARA-KJNYMD TO  SS013-KJNYMD
+               MOVE    "DBINSERT"      TO  SS013-FUNC
+               CALL     "ORCSS013"     USING
+                                       SS013-AREA
+                                       SPA-AREA
       *
                PERFORM 900-CHKSND-KEY3-SEL-SEC
                IF    ( FLG-CHKSND      =   ZERO )
@@ -395,6 +415,12 @@
       *
            CLOSE   TENSU-FILE
                    BX0202-FILE
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBDROP"           TO  SS013-FUNC
+           CALL     "ORCSS013"         USING
+                                       SS013-AREA
+                                       SPA-AREA
       *
            .
        2001-BX0202-EDIT-EXT.
