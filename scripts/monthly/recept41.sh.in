@@ -227,12 +227,14 @@ fi
 
 	    export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
 	    export  APS_EXEC_PATH=$(dirname $0)
+		export  LDDIRECTORY
+		export  MONSQL=$PANDALIB/bin/monsql
 
 	    [ -e ${ERRLOG}  ] && rm -f ${ERRLOG}
 	    [ -e ${INFILE}  ] &&  nkf --ic=CP932 --oc=UTF-8 ${INFILE} > ${UTF8FILE}
 
 
-	    $DBSTUB -dir $LDDIRECTORY -bd orcabt Rosai_receden_check_start -parameter $PRM 2>  ${ERRLOG}
+	    rosai_receden_check.rb "$PRM" 2>  ${ERRLOG}
 	    if [ -s ${ERRLOG} ]; then
 	        cat ${ERRLOG} >> $LOG_FILE
 	        ERRCD='0099'

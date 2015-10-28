@@ -196,13 +196,15 @@ fi
 
 	export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
 	export  APS_EXEC_PATH=$(dirname $0)
+	export  LDDIRECTORY
+	export  MONSQL=$PANDALIB/bin/monsql
 
 	cleanup
 
 	[ -e ${ERRLOG}  ] && rm -f ${ERRLOG}
 	[ -e ${INFILE}  ] && nkf -I --ic=EUC-JP --oc=CP932 ${INFILE} | nkf --ic=CP932 --oc=UTF-8 > ${UTF8FILE}
 
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt Receden_check_start -parameter $PRM 2>  ${ERRLOG}
+	receden_check.rb "$PRM" 2>  ${ERRLOG}
 	if [ -s ${ERRLOG} ]; then
 	    cat ${ERRLOG} >> $LOG_FILE
 	    ERRCD='0099'

@@ -18,45 +18,6 @@ rescue LoadError => err
     raise "#{err.message}\n#{err.backtrace.join("\n")}"
 end
 
-
-class DBMAIN
-
-   def initialize
-     @data  = nil
-     @mcpIn = {"db" => {}}
-     @mcpOut = {}
-     @rc = MCP_OK
-   end
-
-   def exec(_func, _table=nil ,_pathname= nil, _query=nil)
-
-     @mcpIn["func"] = _func
-     @mcpIn["db"]["table"]=_table
-     @mcpIn["db"]["pathname"]=_pathname
-     @rc,@mcpOut,@data = monfunc(@mcpIn.to_json,_query.to_json)
-     @mcpOut=JSON.parse(@mcpOut) unless @mcpOut.nil?
-     @data=JSON.parse(@data) unless @data.nil?
-   rescue
-     @rc = -99
-   ensure
-     return @rc
-   end
-
-   def rc
-     @rc
-   end
-
-   def data
-     @data
-   end
-
-   def [](name)
-     @data[name]
-   end
-
-end
-
-
 class Csvline
 
   def set_tbl_tensu(tbl_tensu)
@@ -97,6 +58,7 @@ class Receden_check < Receden_common
   end
 
   def select_tensu(hospnum,srycd,sryymd)
+
     ret=Hash.new
     sryymd=wtos(sryymd)
     if @cache_tensu.key?(srycd)
@@ -111,43 +73,30 @@ class Receden_check < Receden_common
     end
 
     if ret.empty?
-      db = DBMAIN.new
-      query = {"HOSPNUM"   => hospnum,
-               "SRYCD"     => srycd,
-               "YUKOSTYMD" => sryymd,
-               "YUKOEDYMD" => sryymd,
-              }
-      db.exec("DBSELECT","tbl_tensu","key",query)
-      if db.rc == 0
-        db.exec("DBFETCH","tbl_tensu","key")
-        if db.rc == 0
-          ret = db.data
-          @cache_tensu[srycd] << db.data
-        end
+      sql="select * from tbl_tensu where HOSPNUM = #{hospnum} " +
+          "and SRYCD = '#{srycd}' and '#{sryymd}' between YUKOSTYMD and YUKOEDYMD"
+      data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+      if data != nil && data.size > 0
+        ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
+        @cache_tensu[srycd] << ret
       end
-      db.exec("DBCLOSECURSOR","tbl_tensu","key")
     end
     return ret
 
   end
 
   def select_byomei(byomeicd)
+
     ret=Hash.new
     if @cache_byomei.key?(byomeicd)
       ret = @cache_byomei[byomeicd]
     else
-      db = DBMAIN.new
-      query = {"BYOMEICD"   => byomeicd,
-              }
-      db.exec("DBSELECT","tbl_byomei","key",query)
-      if db.rc == 0
-        db.exec("DBFETCH","tbl_byomei","key")
-        if db.rc == 0
-          ret = db.data
-          @cache_byomei[byomeicd] = db.data
-        end
+      sql = "select * from tbl_byomei where BYOMEICD = '#{byomeicd}' "
+      data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+      if data != nil && data.size > 0
+        ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
+        @cache_byomei[byomeicd] = ret
       end
-      db.exec("DBCLOSECURSOR","tbl_byomei","key")
     end
 
     return ret
@@ -169,20 +118,13 @@ class Receden_check < Receden_common
     end
 
     if ret.empty?
-      db = DBMAIN.new
-      query = {"SYOCD"     => syocd,
-               "YUKOSTYMD" => sryymd,
-               "YUKOEDYMD" => sryymd
-              }
-      db.exec("DBSELECT","tbl_labor_sio","key",query)
-      if db.rc == 0
-        db.exec("DBFETCH","tbl_labor_sio","key")
-        if db.rc == 0
-          ret = db.data
-          @cache_labor_sio[syocd] << db.data
-        end
+      sql="select * from tbl_labor_sio where " +
+          "SYOCD = '#{syocd}' and '#{sryymd}' between YUKOSTYMD and YUKOEDYMD"
+      data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+      if data != nil && data.size > 0
+        ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
+        @cache_labor_sio[syocd] << ret
       end
-      db.exec("DBCLOSECURSOR","tbl_labor_sio","key")
     end
 
     return ret
@@ -1436,9 +1378,6 @@ class Receden_check < Receden_common
     @outfile=mcp_tempdir + "/" + @outfile
     @errlog=mcp_tempdir + "/" + @errlog
 
-    db = DBMAIN.new
-    db.exec("DBOPEN")
-    db.exec("DBSTART")
     @info=Recinfo.new
     @errors=Receden_error.new(@recefile)
 
@@ -1450,9 +1389,6 @@ class Receden_check < Receden_common
 
     @errors.write(@outfile)
 
-    db.exec("DBCOMMIT")
-    db.exec("DBDISCONNECT")
-
   rescue => err
     STDERR.puts "#{err.class}\n#{err.message}\n#{err.backtrace.join("\n")}"
     open(@errlog,"w"){|f|
@@ -1462,3 +1398,6 @@ class Receden_check < Receden_common
   end
 
 end
+
+receden_check = Receden_check.new
+receden_check.main(ARGV.join(','))

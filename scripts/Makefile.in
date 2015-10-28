@@ -138,13 +138,11 @@ ruby_sources = \
 	tools/orcred2textview.rb.in \
 	tools/redinspector.rb.in \
 	monthly/receden_check.rb.in \
-	monthly/Receden_check_start.rb.in \
 	monthly/receden_common.rb.in \
 	monthly/receden_common_const.rb.in \
 	monthly/receden_const.rb.in \
 	monthly/receden_error.rb.in \
 	monthly/receden.rb.in \
-	monthly/Rosai_receden_check_start.rb.in \
 	monthly/rosai_receden.rb.in \
 	monthly/rosai_receden_check.rb.in \
 	monthly/rosai_receden_common.rb.in \

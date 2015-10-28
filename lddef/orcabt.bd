@@ -10,17 +10,7 @@ handler "RubyExec" {
         locale "euc-jp";
 };
 
-
-handler "Ruby" {
-	class		"Ruby";
-	loadpath	"=/scripts/monthly";
-	locale 		"utf-8";
-};
-
-
 bind	"Sysbase"		    "RubyExec";
-bind	"Receden_check_start"	"Ruby";
-bind	"Rosai_receden_check_start"	"Ruby";
 
 bind    "ORCVTPTINF"    	"OpenCOBOL";
 bind    "ORCVTPTHKNINF" 	"OpenCOBOL";
