@@ -4580,6 +4580,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-IF
            END-PERFORM
+      *    画面ＳＰＡ書込み（画面遷移前）
+           IF      FLG-END             =   1
+               PERFORM 1003-K02SPA-OUT-SEC
+           END-IF
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    SPACE               TO  SPA-KIDCD
@@ -8955,6 +8959,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    悪性腫瘍検査一覧へ
            IF      SPA-AKUSEI-FLG      =   1
+      *    中途データ展開時はなし
+           AND    (FLG-INIT            =   ZERO  )
                PERFORM 5101-AKUSEI-K98-SEC
                GO    TO  510-TBLHEN-EXT
            END-IF
@@ -8969,6 +8975,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *    訂正展開時はチェックなし
            AND    (FLG-TEISEI          =   ZERO  )
+      *    中途データ展開時はなし
+           AND    (FLG-INIT            =   ZERO  )
                PERFORM 51010-KNKCHK-SEC
                IF      FLG-KINKI           =   1
                    GO      TO      510-TBLHEN-EXT

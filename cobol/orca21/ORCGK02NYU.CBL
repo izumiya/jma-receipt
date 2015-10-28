@@ -3079,6 +3079,11 @@
                END-IF
            END-PERFORM
       *
+      *    画面ＳＰＡ書込み（画面遷移前）
+           IF      FLG-END             =   1
+               PERFORM 1003-K02SPA-OUT-SEC
+           END-IF
+      *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    SPACE               TO  SPA-KIDCD
       *    内分泌負荷試験検査情報
@@ -6308,6 +6313,8 @@
            END-IF
       *    悪性腫瘍検査一覧へ
            IF      SPA-AKUSEI-FLG      =   1
+      *    中途データ展開時はなし
+           AND    (FLG-INIT            =   ZERO  )
                PERFORM 5101-AKUSEI-K98-SEC
                GO    TO  510-TBLHEN-EXT
            END-IF
