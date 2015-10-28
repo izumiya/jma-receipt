@@ -6563,9 +6563,6 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-SYOKBN1-STATE   TO  T01-SYOKBN1-STATE
            MOVE    SPA-RECEDEN-CHK-STATE
                                        TO  T01-RECEDEN-CHK-STATE
-           IF      SPA-MW              =   SPA-GINBEE
-               MOVE    WIDGET-INSENSITIVE  TO  T01-RECEDEN-CHK-STATE
-           END-IF
       *
            MOVE    SPA-DATAKBN1-STATE  TO  T01-DATAKBN1-STATE
            MOVE    SPA-DATAKBN2-STATE  TO  T01-DATAKBN2-STATE
