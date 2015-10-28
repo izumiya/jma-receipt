@@ -890,7 +890,6 @@ class Receden_check < Receden_common
     if rece.sy.empty?
       @errors.push("25540",rece)
     else
-      puts "byomei_tg_count=" + byomei_tg_count.to_s
       if rece.sy.size == byomei_tg_count
         @errors.push("42220",rece,nil)
       end
