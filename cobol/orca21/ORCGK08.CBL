@@ -1220,12 +1220,12 @@
                END-PERFORM
            END-PERFORM
       *H27.7
-      *    合計点数集計
-           MOVE    ZERO                TO  SPA-GMN-GOKEI
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   16
-               ADD     SPA-GMN-HKNTEN (IDX)    TO  SPA-GMN-GOKEI
-           END-PERFORM
+      *****合計点数集計
+      *    MOVE    ZERO                TO  SPA-GMN-GOKEI
+      *    PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL       IDX     >   16
+      *        ADD     SPA-GMN-HKNTEN (IDX)    TO  SPA-GMN-GOKEI
+      ***  END-PERFORM
       *!!
       *    点数再計算
       **** IF     (SPA-SYORIFLG    NOT =   1   )  AND
@@ -2013,7 +2013,7 @@
            IF      WRK-HKTZAI      NOT =   SPACE
                MOVE    ZERO            TO  WRK-KEI-G
            END-IF
-      *
+      *H27.7 (労災点数のみ）
            COMPUTE WRK-S-KEI-G         =   WRK-S-ZAITEN
                                        *   WRK-SRYKAISUKEI
            IF      WRK-HKTZAI      NOT =   SPACE
@@ -2022,12 +2022,12 @@
            MOVE    WRK-S-KEI-G         TO  SPA-NAI-HKNTEN  (IDX-NAI)
       *??? MOVE    WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
       *    労災金額の時、ゼロ（指導料、その他のみ）
-      *    IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
-      *        IF      FLG-RSIFLG          =   1
-      *            MOVE    ZERO            TO  SPA-NAI-HKNTEN
-      *                                                      (IDX-NAI)
-      *        END-IF
-      *??  END-IF
+           IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
+               IF      FLG-RSIFLG          =   1
+                   MOVE    ZERO            TO  SPA-NAI-HKNTEN
+                                                             (IDX-NAI)
+               END-IF
+           END-IF
       *
       *    剤点数がゼロの時、自費を点数へ
       *    IF      WRK-ZAITEN          =   ZERO
@@ -2373,21 +2373,21 @@
            END-IF
       *
       *H27.7
-           COMPUTE WRK-S-KEI-G         =   WRK-S-ZAITEN
-                                       *   WRK-KAISU-9
-           IF      WRK-HKTZAI      NOT =   SPACE
-               MOVE    ZERO            TO  WRK-S-KEI-G
-           END-IF
-           ADD     WRK-S-KEI-G         TO  SPA-NAI-HKNTEN  (IDX-NAI)
-      *??  ADD     WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
+      *??? COMPUTE WRK-S-KEI-G         =   WRK-S-ZAITEN
+      *                                *   WRK-KAISU-9
+      *    IF      WRK-HKTZAI      NOT =   SPACE
+      *        MOVE    ZERO            TO  WRK-S-KEI-G
+      *    END-IF
+      *??? ADD     WRK-S-KEI-G         TO  SPA-NAI-HKNTEN  (IDX-NAI)
+           ADD     WRK-KEI-G           TO  SPA-NAI-HKNTEN  (IDX-NAI)
       *
       **   労災金額の時、ゼロ（指導料、その他のみ）
-      *    IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
-      *        IF      FLG-RSIFLG          =   1
-      *            MOVE    ZERO            TO  SPA-NAI-HKNTEN
-      *                                                      (IDX-NAI)
-      *        END-IF
-      *?   END-IF
+           IF      LNK-WKSRY-SRYKBN (01)   =   "13"  OR  "80"
+               IF      FLG-RSIFLG          =   1
+                   MOVE    ZERO            TO  SPA-NAI-HKNTEN
+                                                             (IDX-NAI)
+               END-IF
+           END-IF
       *H27.7
       *
       *    計集計
@@ -3965,10 +3965,10 @@
            MOVE    ZERO                TO  SPA-GMN-HKNTEN (16)
       *H27.7
       *    点数クリア
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   16
-               MOVE    ZERO            TO  SPA-GMN-HKNTEN (IDX)
-           END-PERFORM
+      *??? PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL       IDX     >   16
+      *        MOVE    ZERO            TO  SPA-GMN-HKNTEN (IDX)
+      *??? END-PERFORM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-K08-MAX
@@ -3982,8 +3982,8 @@
                    PERFORM 410321-SYUNOU-TENSU-SEC
                    IF      IDX-TS                  =   ZERO
       *H27.7
-      *****************                            OR  1
-      *                                            OR  3
+                                                   OR  1
+                                                   OR  3
       *****************診察料は再計算なし
                        CONTINUE
                    ELSE
