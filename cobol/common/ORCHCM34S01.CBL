@@ -891,6 +891,7 @@
                MOVE    HCM34S01-HOSPNUM    TO  LNK-SYOTOKU-HOSPNUM
                MOVE    HCM34S01-PTID       TO  LNK-SYOTOKU-PTID
                MOVE    HCM34S01-SANTEIYM   TO  LNK-SYOTOKU-SRYYM
+               MOVE    "1"                 TO  LNK-SYOTOKU-SKJCHKFLG
                CALL    "ORCSSYOTOKU"       USING
                                            ORCSSYOTOKUAREA
                                            SPA-AREA

@@ -184,6 +184,7 @@
                  MOVE  LNK-FTNRATE-PTID    TO  LNK-SYOTOKU-PTID
                  MOVE  LNK-FTNRATE-SRYYMD(1:6)
                                            TO  LNK-SYOTOKU-SRYYM
+                 MOVE  SPACE               TO  LNK-SYOTOKU-SKJCHKFLG
                  CALL  "ORCSSYOTOKU"       USING  ORCSSYOTOKUAREA
                                                   SPA-AREA
                  IF    LNK-SYOTOKU-RC    =   ZERO

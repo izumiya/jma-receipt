@@ -233,6 +233,7 @@
       *                                     に退院日、転出日を条件に追加
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -413,6 +414,7 @@
            03  SYOTOKU-IDX                             PIC 9(02).
            03  SYOTOKU-IDX2                            PIC 9(02)
                                                        OCCURS 4.
+           03  SYOTOKU-IDX8                            PIC 9(02).
            03  SYOTOKU-IDX9                            PIC 9(02).
            03  SYOTOKU-IDX-ED                          PIC 9(02).
            03  KOHFTN-IDX                              PIC 9(02).
@@ -2139,6 +2141,12 @@
            MOVE  RECE62-HOSPNUM  TO  LNK-SYOTOKU-HOSPNUM
            MOVE  RECE62-PTID     TO  LNK-SYOTOKU-PTID
            MOVE  RECE62-SRYYM    TO  LNK-SYOTOKU-SRYYM
+           MOVE  "1"             TO  LNK-SYOTOKU-SKJCHKFLG
+           PERFORM  VARYING   SYOTOKU-IDX8   FROM   1   BY   1
+                     UNTIL    SYOTOKU-IDX8     >   10
+                MOVE  RECE62-HKNCOMBI(SYOTOKU-IDX8)
+                                 TO  LNK-SYOTOKU-HKNCOMBI(SYOTOKU-IDX8)
+           END-PERFORM
       *
            CALL    "ORCSSYOTOKU"   USING  ORCSSYOTOKUAREA
                                           SPA-AREA
@@ -2156,17 +2164,27 @@
                                  TO  RECE62-TEISYOTOKU2(KOHFTN-IDX)
                    END-IF
                 END-PERFORM
-                MOVE  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX)
-                                 TO  RECE62-TEISYOTOKU3
-                IF    (RECE62-TEISYOTOKU3  =   "2")
-                AND   (SYOTOKU-IDX-ED  NOT =  ZERO)
-                  PERFORM VARYING SYOTOKU-IDX9 FROM SYOTOKU-IDX BY 1
-                           UNTIL  SYOTOKU-IDX9   >  SYOTOKU-IDX-ED
-                    IF  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX9) = "3"
-                      MOVE  "3"  TO  RECE62-TEISYOTOKU3
-                      MOVE   31  TO  SYOTOKU-IDX9
-                    END-IF
-                  END-PERFORM
+      *
+                IF    RECE62-SRYYM        >=  "201501"
+                   IF    LNK-SYOTOKU-SKJIDX = ZERO
+                     MOVE  SPACE    TO  RECE62-TEISYOTOKU3
+                   ELSE
+                     MOVE  LNK-SYOTOKU-SKJKBN(LNK-SYOTOKU-SKJIDX)
+                                    TO  RECE62-TEISYOTOKU3
+                   END-IF
+                ELSE
+                   MOVE  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX)
+                                    TO  RECE62-TEISYOTOKU3
+                   IF    (RECE62-TEISYOTOKU3  =   "2")
+                   AND   (SYOTOKU-IDX-ED  NOT =  ZERO)
+                     PERFORM VARYING SYOTOKU-IDX9 FROM SYOTOKU-IDX BY 1
+                              UNTIL  SYOTOKU-IDX9   >  SYOTOKU-IDX-ED
+                       IF  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX9) = "3"
+                         MOVE  "3"  TO  RECE62-TEISYOTOKU3
+                         MOVE   31  TO  SYOTOKU-IDX9
+                       END-IF
+                     END-PERFORM
+                   END-IF
                 END-IF
            END-IF
       *
@@ -2181,12 +2199,12 @@
       *
            IF    RECE62-AGE         >=    70
              IF  (RECE62-HKNNUM       =  SPACE OR "040" OR "039"
-                                               OR "067" OR "069")
+                                               OR "068" OR "069")
              OR  (RECE62-HKNNUM(1:2)  =   "98" OR  "90" OR  "91")
                 CONTINUE
              ELSE
-              IF ( RECE62-HKNNUM      = "060" OR  "068" )
-              OR ((RECE62-HKNNUM  NOT = "060" AND "068") AND
+              IF ( RECE62-HKNNUM      = "060" OR  "067" )
+              OR ((RECE62-HKNNUM  NOT = "060" AND "067") AND
                   (RECE62-HOJOKBN     = SPACE          ))
                 MOVE      RECE61-SRYYM       TO   WRK-SRYYYMM
                 IF   RECE62-TEKSTYMD(1:6)  >=  RECE61-SRYYM

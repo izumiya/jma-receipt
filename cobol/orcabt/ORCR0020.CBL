@@ -272,6 +272,7 @@
       *                                    （入院日と退院日が同じとき）
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2581,6 +2582,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
            MOVE  RECE02-HOSPNUM  TO  LNK-SYOTOKU-HOSPNUM
            MOVE  RECE02-PTID     TO  LNK-SYOTOKU-PTID
            MOVE  RECE02-SRYYM    TO  LNK-SYOTOKU-SRYYM
+           MOVE  SPACE           TO  LNK-SYOTOKU-SKJCHKFLG
       *
            CALL    "ORCSSYOTOKU"   USING  ORCSSYOTOKUAREA
                                           SPA-AREA
@@ -2611,12 +2613,12 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *
            IF    RECE02-AGE         >=    70
              IF  (RECE02-HKNNUM       =  SPACE OR "040" OR "039"
-                                               OR "067" OR "069")
+                                               OR "068" OR "069")
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR  "90" OR  "91")
                 CONTINUE
              ELSE
-              IF ( RECE02-HKNNUM      = "060" OR  "068" )
-              OR ((RECE02-HKNNUM  NOT = "060" AND "068") AND
+              IF ( RECE02-HKNNUM      = "060" OR  "067" )
+              OR ((RECE02-HKNNUM  NOT = "060" AND "067") AND
                   (RECE02-HOJOKBN     = SPACE          ))
                 MOVE      RECE01-SRYYM       TO   WRK-SRYYYMM
                 IF   RECE02-TEKSTYMD(1:6)  >=  RECE01-SRYYM

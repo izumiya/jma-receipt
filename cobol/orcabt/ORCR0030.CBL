@@ -712,6 +712,7 @@
       *  04.08.04    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.05    NACL-門脇    15/10/05  難病特記事項対応
       *  04.08.06    NACL-門脇    15/10/08  システム管理２０１０機能追加対応
+      *  04.08.07    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -25288,10 +25289,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *    一部負担金・食事療養費標準負担額区分の編集
       *
-      ***> IF    ( RECE02-TEISYOTOKU   =   SPACE )
-      ***> OR    ( RECE02-ZAITAKU      =   SPACE )
-      ***>     CONTINUE
-      ***> ELSE
+           IF    ((RECE02-SRYYM          >=  "201204") AND
+                  (RECE02-ZAITAKU     NOT =   SPACE  ) AND
+                  (RECE02-TEISYOTOKU  NOT =   SPACE  ))
+           OR    ((RECE02-SRYYM          <   "201204") AND
+                  (RECE02-TEISYOTOKU  NOT =   SPACE  ))
                EVALUATE    RECE02-TEISYOTOKU
                    WHEN    "1"
                        MOVE    "3"   TO   RECE02-SHOKUJIFTNKBN
@@ -25300,7 +25302,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "4"
                        MOVE    "4"   TO   RECE02-SHOKUJIFTNKBN
                END-EVALUATE
-      ***> END-IF
+           END-IF
            PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                      UNTIL    KOHFTN-IDX     >    4
              EVALUATE  RECE02-TEISYOTOKU2(KOHFTN-IDX)

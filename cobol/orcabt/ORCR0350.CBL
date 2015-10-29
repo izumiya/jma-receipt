@@ -403,6 +403,7 @@
       *  04.08.02    NACL-藤原    14/06/02  請求情報への更新日設定
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-藤原    15/09/01  保険履歴の記載対応
+      *  04.08.05    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2779,7 +2780,7 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
-           IF     (RECE62-KOUREI           = "1"  )
+           IF     (RECE62-KOUREI       NOT = SPACE)
            AND    (RECE62-TEISYOTOKU   NOT = SPACE)
              EVALUATE    RECE62-TEISYOTOKU
                WHEN    "1"

@@ -3389,6 +3389,7 @@
            MOVE  LNK-SYU-HOSPNUM      TO  LNK-SYOTOKU-HOSPNUM
            MOVE  LNK-SYU-PTID         TO  LNK-SYOTOKU-PTID
            MOVE  LNK-SYU-SRYYMD(1:6)  TO  LNK-SYOTOKU-SRYYM
+           MOVE  SPACE                TO  LNK-SYOTOKU-SKJCHKFLG
       *
            CALL    "ORCSSYOTOKU"      USING  ORCSSYOTOKUAREA
                                              SPA-AREA
@@ -4143,11 +4144,11 @@
              OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
              OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
                                         OR "040" OR "039"
-                                        OR "067" OR "069")
+                                        OR "068" OR "069")
                 CONTINUE
              ELSE
-              IF ( COMB-HKNNUM      = "060" OR  "068" )
-              OR ((COMB-HKNNUM  NOT = "060" AND "068") AND
+              IF ( COMB-HKNNUM      = "060" OR  "067" )
+              OR ((COMB-HKNNUM  NOT = "060" AND "067") AND
                   (COMB-HOJOKBN     = SPACE          ))
                 INITIALIZE                     PTKOHINF-REC
                 MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM

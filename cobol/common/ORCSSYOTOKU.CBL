@@ -28,6 +28,8 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.05.01    NACL-ÌçÏÆ    09/07/28  ½êÆÀ¼Ô¾ðÊó¤Îµ¡Ç½ÄÉ²Ã
       *                                     ¡ÊÉ¸½àÉéÃ´³Û¤Î¤ß¤Î¸º³Û¡Ë
+      *
+      *  04.08.01    NACL-ÌçÏÆ    15/10/21  ¸½ÊªµëÉÕÂÐ¾Ý³°¤ÎÄã½êÆÀ¡Ê¿©»ö¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -46,10 +48,19 @@
        01  FLG-AREA.
            03  FLG-TNKRRK            PIC 9(01).
            03  FLG-TSYRRK            PIC 9(01).
+           03  FLG-PTKOHINF          PIC 9(01).
+           03  FLG-PTINF             PIC 9(01).
+           03  FLG-NYUINACCT         PIC 9(01).
+           03  FLG-HKNCOMBI          PIC 9(01).
+           03  FLG-CHECK             PIC 9(01).
+           03  FLG-ARI               PIC 9(01).
+           03  FLG-OK                PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                   PIC 9(02).
+           03  IDX2                  PIC 9(02).
+           03  IDX3                  PIC 9(02).
            03  IDX-ST                PIC 9(02).
            03  IDX-ED                PIC 9(02).
       *
@@ -64,9 +75,43 @@
                07  WRK-DAY-SKJ-TNK     PIC X(01).
                07  WRK-DAY-SKJ-TSY     PIC X(01).
       *
+               07  WRK-DAY-KOH966      PIC X(01).
+               07  WRK-DAY-KOH967      PIC X(01).
+               07  WRK-DAY-KOH956      PIC X(01).
+               07  WRK-DAY-KOH957      PIC X(01).
+      *
+               07  WRK-DAY-KOH968      PIC X(01).
+               07  WRK-DAY-KOH976      PIC X(01).
+      *
+               07  WRK-DAY-KOH012      PIC X(01).
+               07  WRK-DAY-KOH025      PIC X(01).
+      *
+               07  WRK-DAY-HKNCOMBI    PIC 9(04).
+               07  WRK-DAY-HKNNUM      PIC X(03).
+               07  WRK-DAY-KOH1HKNNUM  PIC X(03).
+               07  WRK-DAY-KOH2HKNNUM  PIC X(03).
+               07  WRK-DAY-KOH3HKNNUM  PIC X(03).
+               07  WRK-DAY-KOH4HKNNUM  PIC X(03).
+               07  WRK-DAY-HKNKOHSBTKBN
+                                       PIC X(01).
+               07  WRK-DAY-HOJOKBN     PIC X(01).
+      *
+               07  WRK-DAY-NENREIFLG   PIC X(01).
+      *
            03  WRK-SYOTOKU-YMD.
                05  WRK-SYOTOKU-YM      PIC 9(06).
                05  WRK-SYOTOKU-DD      PIC 9(02).
+      *
+           03  WRK-BIRTHDAY            PIC X(08).
+           03  WRK-NENREI              PIC 9(03).
+      *
+           03  WRK-FIRST-DAY           PIC 9(02).
+           03  WRK-FIRST-SKJKBN        PIC X(01).
+      *
+           03  WRK-CHECK-TABLE.
+             05  WRK-CHECK-T           OCCURS   31.
+               07  WRK-CHECK-HKNCOMBI  PIC 9(04).
+               07  WRK-CHECK-FLG       PIC 9(01).
       *
       *    ¸ÇÄêÃÍ
        01  WRK-CONS-AREA.
@@ -89,11 +134,33 @@
        01  TSYRRK-REC.
            COPY    "CPTSYRRK.INC".
       *
+      *    ´µ¼Ô¸øÈñ¾ðÊó
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
+      *
+      *    ´µ¼Ô¾ðÊó
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
+      *
+      *    Æþ±¡²ñ·×
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
+      *
+      *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
+      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
       *
            COPY    "MCPDATA.INC".
+      *
+      *    ÊÝ¸±»»ÄêÍÑÇ¯Îð¡¦³ä¹ç·×»»¥µ¥Ö
+           COPY    "CPORCSAGECHK.INC".
+      *
+      *    ÆÃÄê¼À´µÅù»»ÄêÈ½Äê¥µ¥Ö
+           COPY    "CPORCSSRHKOH.INC".
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -144,13 +211,40 @@
       *    ½èÍýÇ¯·î¥Á¥§¥Ã¥¯
            IF      LNK-SYOTOKU-SRYYM    =   SPACE
                MOVE    1                 TO  LNK-SYOTOKU-RC
-               GO  TO  100-PRM-CHK-EXT
            END-IF
       *
       *    ´µ¼Ô£É£Ä¥Á¥§¥Ã¥¯
-           IF      LNK-SYOTOKU-PTID     =   ZERO
+           IF  LNK-SYOTOKU-RC  =  ZERO
+             IF    LNK-SYOTOKU-PTID     =   ZERO
                MOVE    2                 TO  LNK-SYOTOKU-RC
-               GO  TO  100-PRM-CHK-EXT
+             ELSE
+               MOVE    SPACE                TO  WRK-BIRTHDAY
+               INITIALIZE                       PTINF-REC
+               MOVE    LNK-SYOTOKU-HOSPNUM  TO  PTINF-HOSPNUM
+               MOVE    LNK-SYOTOKU-PTID     TO  PTINF-PTID
+               MOVE    PTINF-REC            TO  MCPDATA-REC
+               MOVE    "DBSELECT"           TO  MCP-FUNC
+               MOVE    "tbl_ptinf"          TO  MCP-TABLE
+               MOVE    "key"                TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC  =  ZERO
+                  MOVE      "tbl_ptinf"     TO  MCP-TABLE
+                  MOVE      "key"           TO  MCP-PATHNAME
+                  PERFORM    910-PTINF-READ-SEC
+                  IF   FLG-PTINF  =  ZERO
+                     MOVE    PTINF-BIRTHDAY TO  WRK-BIRTHDAY
+                  ELSE
+                     MOVE    2              TO  LNK-SYOTOKU-RC
+                  END-IF
+               ELSE
+                     MOVE    2              TO  LNK-SYOTOKU-RC
+               END-IF
+               MOVE    "tbl_ptinf"          TO  MCP-TABLE
+               MOVE    "key"                TO  MCP-PATHNAME
+               PERFORM  910-DB-CLOSE-SEC
+             END-IF
            END-IF
       *
            .
@@ -298,6 +392,27 @@
               END-EVALUATE
       *
              END-PERFORM
+      *
+             PERFORM   VARYING   IDX     FROM    1   BY  1
+                        UNTIL    IDX      >     31
+                 MOVE  LNK-SYOTOKU-SKJKBN(IDX)
+                                      TO    LNK-SYOTOKU-SKJKBN-OLD(IDX)
+             END-PERFORM
+      *
+             MOVE      ZERO           TO    FLG-CHECK
+             IF  (LNK-SYOTOKU-SRYYM      >=  "201501")
+             AND (LNK-SYOTOKU-SKJCHKFLG   =  "1"     )
+               PERFORM  VARYING  IDX  FROM  1  BY  1
+                         UNTIL   IDX    >  31
+                 IF  LNK-SYOTOKU-SKJKBN(IDX) NOT = SPACE
+                       MOVE    1      TO    FLG-CHECK
+                       MOVE   31      TO    IDX
+                 END-IF
+               END-PERFORM
+               IF    FLG-CHECK   =   1
+                 PERFORM  230-NENREI-CHECK-SEC
+               END-IF
+             END-IF
       *
            END-IF
       *
@@ -461,6 +576,549 @@
            EXIT.
       *
       *****************************************************************
+      *    ¹âÎð¼Ô¡¦£·£°ºÐÌ¤ËþÈ½Äê
+      *****************************************************************
+       230-NENREI-CHECK-SEC            SECTION.
+      *
+      *    ´µ¼ÔÇ¯Îð
+           MOVE    ZERO                   TO  WRK-NENREI
+           INITIALIZE                         ORCSAGECHKAREA
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  AGECHK-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  AGECHK-PTID
+           MOVE    LNK-SYOTOKU-SRYYM      TO  AGECHK-SRYYMD(1:6)
+           MOVE    "01"                   TO  AGECHK-SRYYMD(7:2)
+           MOVE    WRK-BIRTHDAY           TO  AGECHK-BIRTHDAY
+           CALL    "ORCSAGECHK"           USING  ORCSAGECHKAREA
+                                                 SPA-AREA
+           IF      AGECHK-RC  =  ZERO
+              MOVE    AGECHK-NENREI       TO  WRK-NENREI
+           END-IF
+      *
+      *    Æþ±¡²ñ·×¤ÎÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
+           INITIALIZE                         NYUINACCT-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  NACCT-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  NACCT-PTID
+           MOVE    LNK-SYOTOKU-SRYYM      TO  NACCT-SRYYM
+           MOVE    "5"                    TO  NACCT-ZAISKBKBN
+           MOVE    NYUINACCT-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_nyuinacct"        TO  MCP-TABLE
+           MOVE    "key17"                TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_nyuinacct"   TO  MCP-TABLE
+              MOVE      "key17"           TO  MCP-PATHNAME
+              PERFORM    910-NYUINACCT-READ-SEC
+              IF   FLG-NYUINACCT  =  ZERO
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                   IF     NACCT-DAY(IDX2) NOT =  ZERO 
+                     MOVE NACCT-DAY(IDX2) TO  WRK-DAY-HKNCOMBI(IDX2)
+                   END-IF
+                END-PERFORM
+              END-IF
+           END-IF
+           MOVE    "tbl_nyuinacct"        TO  MCP-TABLE
+           MOVE    "key17"                TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           PERFORM   VARYING   IDX2    FROM    1   BY  1
+                      UNTIL    IDX2     >     31
+              IF   WRK-DAY-HKNCOMBI(IDX2)  NOT =  ZERO
+                INITIALIZE                         HKNCOMBI-REC
+                MOVE    LNK-SYOTOKU-HOSPNUM    TO  COMB-HOSPNUM
+                MOVE    LNK-SYOTOKU-PTID       TO  COMB-PTID
+                MOVE    WRK-DAY-HKNCOMBI(IDX2) TO  COMB-HKNCOMBINUM
+                MOVE    HKNCOMBI-REC           TO  MCPDATA-REC
+                MOVE    "DBSELECT"             TO  MCP-FUNC
+                MOVE    "tbl_hkncombi"         TO  MCP-TABLE
+                MOVE    "key"                  TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                      MCPDATA-REC
+                                                      SPA-AREA
+                IF      MCP-RC  =  ZERO
+                   MOVE      "tbl_hkncombi"    TO  MCP-TABLE
+                   MOVE      "key"             TO  MCP-PATHNAME
+                   PERFORM    910-HKNCOMBI-READ-SEC
+                   IF   FLG-HKNCOMBI  =  ZERO
+                     MOVE  COMB-HKNNUM      TO WRK-DAY-HKNNUM(IDX2)
+                     MOVE  COMB-KOH1HKNNUM  TO WRK-DAY-KOH1HKNNUM(IDX2)
+                     MOVE  COMB-KOH2HKNNUM  TO WRK-DAY-KOH2HKNNUM(IDX2)
+                     MOVE  COMB-KOH3HKNNUM  TO WRK-DAY-KOH3HKNNUM(IDX2)
+                     MOVE  COMB-KOH4HKNNUM  TO WRK-DAY-KOH4HKNNUM(IDX2)
+                     MOVE  COMB-SYU-HKNKOHSBTKBN
+                                       TO WRK-DAY-HKNKOHSBTKBN(IDX2)
+                     MOVE  COMB-HOJOKBN     TO WRK-DAY-HOJOKBN(IDX2)
+                   END-IF
+                END-IF
+                MOVE    "tbl_hkncombi"         TO  MCP-TABLE
+                MOVE    "key"                  TO  MCP-PATHNAME
+                PERFORM  910-DB-CLOSE-SEC
+              END-IF
+           END-PERFORM
+      *
+      *    ¸øÈñÃ±ÆÈ¤ÎÏ·¿ÍÊÝ¸±ÆþÎÏ
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "968"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH968(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+      *    ¹âÎðÈó³ºÅöÆþÎÏ
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "976"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH976(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+      *    Ç§Äê¾ÚÆþÎÏ
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "966"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH966(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "967"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH967(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "956"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH956(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "957"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH957(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+      *    À¸ÊÝ¡¦»ÄÎ±Ë®¿Í
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "012"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH012(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           INITIALIZE                         PTKOHINF-REC
+           MOVE    LNK-SYOTOKU-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYOTOKU-PTID       TO  PTKOH-PTID
+           MOVE    "025"                  TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE      "tbl_ptkohinf"    TO  MCP-TABLE
+              MOVE      "key4"            TO  MCP-PATHNAME
+              PERFORM    910-PTKOHINF-READ-SEC
+              PERFORM  UNTIL  FLG-PTKOHINF  =  1
+                PERFORM   VARYING   IDX2    FROM    1   BY  1
+                           UNTIL    IDX2     >     31
+                  MOVE  LNK-SYOTOKU-SRYYM TO  WRK-SYOTOKU-YM
+                  MOVE  IDX2              TO  WRK-SYOTOKU-DD
+                  IF  (PTKOH-TEKSTYMD  <=  WRK-SYOTOKU-YMD)
+                  AND (WRK-SYOTOKU-YMD <=  PTKOH-TEKEDYMD )
+                  AND (PTKOH-SAKJOKBN   =  SPACE          )
+                     MOVE   "1"           TO  WRK-DAY-KOH025(IDX2)
+                  END-IF
+                END-PERFORM
+                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
+                MOVE    "key4"            TO  MCP-PATHNAME
+                PERFORM  910-PTKOHINF-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+           MOVE    "key4"                 TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+      *    ¹âÎð¼Ô¡¦£·£°ºÐÌ¤ËþÈ½Äê
+           MOVE      ZERO                 TO  WRK-FIRST-DAY
+           MOVE      SPACE                TO  WRK-FIRST-SKJKBN
+           INITIALIZE                         WRK-CHECK-TABLE
+           PERFORM   VARYING   IDX2    FROM    1   BY  1
+                      UNTIL    IDX2     >     31
+              IF   WRK-DAY-HKNCOMBI(IDX2)  NOT =  ZERO
+                 IF  (WRK-DAY-HKNKOHSBTKBN(IDX2) =  "8" OR "9")
+                 OR  (WRK-DAY-HKNNUM(IDX2)       =
+                                "971" OR "973" OR "975" OR
+                                "068" OR "069" OR "040"       )
+                     MOVE   "9"           TO  WRK-DAY-NENREIFLG(IDX2)
+                     IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***              DISPLAY "DAY=" IDX2 " 9:SKJKBN(IDX2)="
+      ***                       LNK-SYOTOKU-SKJKBN(IDX2)
+                       MOVE   SPACE       TO  LNK-SYOTOKU-SKJKBN(IDX2)
+                     END-IF
+                 ELSE
+                   IF  ( WRK-NENREI                  >=  70   )
+                   OR  ((WRK-DAY-HKNNUM(IDX2)         = SPACE) AND
+                        (WRK-DAY-KOH1HKNNUM(IDX2) NOT = SPACE) AND
+                        (WRK-DAY-KOH2HKNNUM(IDX2)     = SPACE) AND
+                        (WRK-DAY-KOH3HKNNUM(IDX2)     = SPACE) AND
+                        (WRK-DAY-KOH4HKNNUM(IDX2)     = SPACE) AND
+                        (WRK-DAY-KOH968(IDX2)         = "1"  ))
+                   OR  ( WRK-DAY-HKNNUM(IDX2)         = "039" )
+                     MOVE   "1"           TO  WRK-DAY-NENREIFLG(IDX2)
+                   ELSE
+                     MOVE   "2"           TO  WRK-DAY-NENREIFLG(IDX2)
+                   END-IF
+                 END-IF
+      *
+                 IF      WRK-DAY-NENREIFLG(IDX2)  =  "1"
+                   IF    WRK-DAY-HKNNUM(IDX2)  =  SPACE OR "039"
+                     CONTINUE
+                   ELSE
+                     IF  ( WRK-DAY-HKNNUM(IDX2)     =
+                                                   "060" OR  "067" )
+                     OR  ((WRK-DAY-HKNNUM(IDX2) NOT =
+                                                   "060" AND "067") AND
+                          (WRK-DAY-HOJOKBN(IDX2)    =  SPACE      ))
+                       IF  WRK-DAY-KOH976(IDX2)     = "1"
+                          MOVE   "2"      TO  WRK-DAY-NENREIFLG(IDX2)
+                       END-IF
+                     END-IF
+                   END-IF
+                 END-IF
+      *
+                 IF      WRK-DAY-NENREIFLG(IDX2)  =  "2"
+                   IF    WRK-DAY-HKNNUM(IDX2)  =  SPACE
+      ***          OR    WRK-DAY-KOH012(IDX2)  =  "1"
+      ***          OR    WRK-DAY-KOH025(IDX2)  =  "1"
+                     CONTINUE
+                   ELSE
+                     PERFORM  2301-NENREI-CHECK2-SEC
+                   END-IF
+                 END-IF
+      *
+                 IF  LNK-SYOTOKU-HKNCOMBI(1)  NOT =  ZERO
+                   PERFORM  VARYING  IDX3  FROM  1  BY  1
+                             UNTIL   IDX3    >  10
+                     IF   WRK-DAY-HKNCOMBI(IDX2) =
+                                     LNK-SYOTOKU-HKNCOMBI(IDX3)
+                        IF ( WRK-FIRST-DAY                =  ZERO  )
+                        OR ((WRK-FIRST-DAY            NOT =  ZERO ) AND
+                            (WRK-FIRST-SKJKBN             =  SPACE) AND
+                            (LNK-SYOTOKU-SKJKBN(IDX2) NOT =  SPACE))
+                        OR ((WRK-FIRST-DAY            NOT =  ZERO ) AND
+                            (WRK-FIRST-SKJKBN             =  "2"  ) AND
+                            (LNK-SYOTOKU-SKJKBN(IDX2)     =  "3"  ))
+                           MOVE   IDX2      TO  WRK-FIRST-DAY
+                           MOVE   LNK-SYOTOKU-SKJKBN(IDX2)
+                                            TO  WRK-FIRST-SKJKBN
+                        END-IF
+                        MOVE      10        TO  IDX3
+                     END-IF
+                   END-PERFORM
+                 END-IF
+              ELSE
+                     IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***              DISPLAY "DAY=" IDX2 " 0:SKJKBN(IDX2)="
+      ***                       LNK-SYOTOKU-SKJKBN(IDX2)
+                       MOVE   SPACE       TO  LNK-SYOTOKU-SKJKBN(IDX2)
+                     END-IF
+              END-IF
+           END-PERFORM
+      *
+           MOVE      WRK-FIRST-DAY        TO  LNK-SYOTOKU-SKJIDX
+      *
+           .
+       230-NENREI-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¹âÎð¼Ô¡¦£·£°ºÐÌ¤ËþÈ½Äê£²
+      *****************************************************************
+       2301-NENREI-CHECK2-SEC            SECTION.
+      *
+           MOVE      ZERO       TO   FLG-ARI
+      *
+           IF   (WRK-DAY-KOH966(IDX2)  =  "1" )
+           AND  (FLG-ARI               =  ZERO)
+             MOVE    1          TO   FLG-ARI
+           END-IF
+           IF   (WRK-DAY-KOH967(IDX2)  =  "1" )
+           AND  (FLG-ARI               =  ZERO)
+             MOVE    1          TO   FLG-ARI
+           END-IF
+           IF   (WRK-DAY-KOH956(IDX2)  =  "1" )
+           AND  (FLG-ARI               =  ZERO)
+             MOVE    1          TO   FLG-ARI
+           END-IF
+      *
+      *    ÆÃÄê¼ÀÉÂµëÉÕÂÐ¾ÝÎÅÍÜ¤Î¿ÇÎÅ¥Á¥§¥Ã¥¯
+           IF   (WRK-DAY-KOH957(IDX2)  =  "1" )
+           AND  (FLG-ARI               =  ZERO)
+             MOVE     ZERO      TO   FLG-OK
+             PERFORM  VARYING  IDX3  FROM  1  BY  1
+                       UNTIL  (IDX3                     >  31 )
+                        OR    (WRK-CHECK-HKNCOMBI(IDX3) = ZERO)
+                        OR    (FLG-OK                   =   1 )
+               IF  WRK-DAY-HKNCOMBI(IDX2) = WRK-CHECK-HKNCOMBI(IDX3)
+                 IF   WRK-CHECK-FLG(IDX3) = 1
+                    CONTINUE
+                 ELSE
+                    IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***             DISPLAY "DAY=" IDX2 " 2-957:SKJKBN(IDX2)="
+      ***                      LNK-SYOTOKU-SKJKBN(IDX2)
+                      MOVE   SPACE   TO   LNK-SYOTOKU-SKJKBN(IDX2)
+                    END-IF
+                 END-IF
+                 MOVE    1      TO   FLG-OK
+               END-IF
+             END-PERFORM
+             IF    FLG-OK  =  ZERO
+             AND   IDX3   <=   31
+               INITIALIZE                         SSRHKOH-AREA
+               MOVE   LNK-SYOTOKU-PTID        TO  SSRHKOH-PTID
+               MOVE   "1"                     TO  SSRHKOH-NYUGAIKBN
+               MOVE   LNK-SYOTOKU-SRYYM       TO  SSRHKOH-SRYYM
+               MOVE   WRK-DAY-HKNCOMBI(IDX2)  TO  SSRHKOH-HKNCOMBI
+               CALL   "ORCSSRHKOH"            USING  SSRHKOH-AREA
+                                                     SPA-AREA
+               IF  SSRHKOH-RC  =  1
+                 CONTINUE
+               ELSE
+                 IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***          DISPLAY "DAY=" IDX2 " 2-957:SKJKBN(IDX2)="
+      ***                   LNK-SYOTOKU-SKJKBN(IDX2)
+                   MOVE   SPACE   TO   LNK-SYOTOKU-SKJKBN(IDX2)
+                 END-IF
+               END-IF
+               MOVE  WRK-DAY-HKNCOMBI(IDX2)
+                                TO   WRK-CHECK-HKNCOMBI(IDX3)
+               IF  SSRHKOH-RC  =  1
+                 MOVE    1      TO   WRK-CHECK-FLG(IDX3)
+               ELSE
+                 MOVE    ZERO   TO   WRK-CHECK-FLG(IDX3)
+               END-IF
+             END-IF
+             MOVE    1          TO   FLG-ARI
+           END-IF
+      *
+           IF    FLG-ARI  =  ZERO
+               IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***        DISPLAY "DAY=" IDX2 " 2:SKJKBN(IDX2)="
+      ***                 LNK-SYOTOKU-SKJKBN(IDX2)
+                 MOVE   SPACE   TO   LNK-SYOTOKU-SKJKBN(IDX2)
+               END-IF
+           END-IF
+      *
+           .
+       2301-NENREI-CHECK2-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    Äã½êÆÀ£±¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
       *****************************************************************
        910-TNKRRK-READ-SEC        SECTION.
@@ -500,6 +1158,90 @@
       *
            .
        910-TSYRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
+      *****************************************************************
+       910-PTKOHINF-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+               MOVE    ZERO            TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       910-PTKOHINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¾ðÊóÆÉ¹þ
+      *****************************************************************
+       910-PTINF-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTINF-REC
+               MOVE    ZERO            TO  FLG-PTINF
+           ELSE
+               INITIALIZE                  PTINF-REC
+               MOVE    1               TO  FLG-PTINF
+           END-IF
+      *
+           .
+       910-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Æþ±¡²ñ·×ÆÉ¹þ
+      *****************************************************************
+       910-NYUINACCT-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  NYUINACCT-REC
+               MOVE    ZERO            TO  FLG-NYUINACCT
+           ELSE
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    1               TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       910-NYUINACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»ÆÉ¹þ
+      *****************************************************************
+       910-HKNCOMBI-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+               MOVE    ZERO            TO  FLG-HKNCOMBI
+           ELSE
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+      *
+           .
+       910-HKNCOMBI-READ-EXT.
            EXIT.
       *
       *****************************************************************

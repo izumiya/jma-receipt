@@ -35,6 +35,8 @@
       *  04.07.02    NACL-門脇    15/01/26  平成２７年１月改正対応
       *                                     （都道府県独自難病対応）
       *  04.07.03    NACL-門脇    15/06/08  難病の実施機関番号追加対応（６０２）
+      *
+      *  04.08.01    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -59,9 +61,12 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-HKNHIT              PIC 9(01).
            03  FLG-KOH                 PIC 9(01).
+           03  FLG-OK                  PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
+           03  IDX1                    PIC 9(05).
+           03  IDX2                    PIC 9(05).
            03  IDX-KOH                 PIC 9(05).
            03  IDX-ZAI                 PIC 9(05).
       *
@@ -71,6 +76,14 @@
                04  WRK-JGNGET-OCC      OCCURS 4.
                  05  WRK-JGNGET-TEKIYOFLG
                                        PIC 9(01).
+      *
+           03  WRK-DAY-AREA.
+               04  WRK-DAY-OCC         OCCURS 31.
+                 05  WRK-DAY1          PIC 9(04).
+                 05  WRK-DAY5X.
+                   07  WRK-DAY5        PIC 9(04).
+                 05  WRK-DAY-MI        PIC X(01).
+           03  WRK-ZAISKBKBN           PIC X(01).
       *
        01  KEY-AREA.
            03  KEY-HKNNUM              PIC X(03).
@@ -135,6 +148,9 @@
       *
       *    公費月上限額取得サブ
            COPY    "CPORCSJGNGET.INC".
+      *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -258,34 +274,36 @@
       *
            INITIALIZE                  TNCOMB-AREA
       *
-           PERFORM 900-NYUINACCT-KEY17-SEL-SEC
+      ***  PERFORM 900-NYUINACCT-KEY17-SEL-SEC
       *
-           INITIALIZE              SS009-AREA
-           CALL    "ORCSS009"      USING
-                                   SS009-AREA
-                                   NACCT-REC
-                                   SPA-AREA
+      ***  INITIALIZE              SS009-AREA
+      ***  CALL    "ORCSS009"      USING
+      ***                          SS009-AREA
+      ***                          NACCT-REC
+      ***                          SPA-AREA
       *
-           PERFORM VARYING IDX-ZAI FROM    1   BY  1
-                   UNTIL ( IDX-ZAI >   SS009-HENKYAKU-MAX )
+      ***  PERFORM VARYING IDX-ZAI FROM    1   BY  1
+      ***          UNTIL ( IDX-ZAI >   SS009-HENKYAKU-MAX )
       *
-               IF    ( SS009-ZAITEN(IDX-ZAI) *  SS009-ZAIKAISU(IDX-ZAI)
-                                   >   ZERO )
-                   PERFORM VARYING IDX0    FROM    1   BY  1
-                           UNTIL ( IDX0    >   31 )
-                            OR   ( SS009-HKNCOMBI(IDX-ZAI)
-                                           =   TNCOMB-HKNCOMBI(IDX0))
+      ***      IF    ( SS009-ZAITEN(IDX-ZAI) *  SS009-ZAIKAISU(IDX-ZAI)
+      ***                          >   ZERO )
+      ***          PERFORM VARYING IDX0    FROM    1   BY  1
+      ***                  UNTIL ( IDX0    >   31 )
+      ***                   OR   ( SS009-HKNCOMBI(IDX-ZAI)
+      ***                                  =   TNCOMB-HKNCOMBI(IDX0))
       *
-                       IF    ( IDX0      >   TNCOMB-MAX )
-                           MOVE    IDX0  TO  TNCOMB-MAX
-                           MOVE    SS009-HKNCOMBI(IDX-ZAI)
-                                         TO  TNCOMB-HKNCOMBI(TNCOMB-MAX)
-                           MOVE    31    TO  IDX0
-                       END-IF
-                   END-PERFORM
-               END-IF
+      ***              IF    ( IDX0      >   TNCOMB-MAX )
+      ***                  MOVE    IDX0  TO  TNCOMB-MAX
+      ***                  MOVE    SS009-HKNCOMBI(IDX-ZAI)
+      ***                                TO  TNCOMB-HKNCOMBI(TNCOMB-MAX)
+      ***                  MOVE    31    TO  IDX0
+      ***              END-IF
+      ***          END-PERFORM
+      ***      END-IF
       *
-           END-PERFORM
+      ***  END-PERFORM
+      *
+           PERFORM 2001-NACCTHKN-CHK2-SEC
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   TNCOMB-MAX )
@@ -298,6 +316,88 @@
       *
            .
        2001-NACCTHKN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院会計チェック処理
+      *****************************************************************
+       2001-NACCTHKN-CHK2-SEC           SECTION.
+      *
+           INITIALIZE                  WRK-DAY-AREA
+      *
+      *    入院料
+           MOVE    "1"    TO   WRK-ZAISKBKBN
+           PERFORM 900-NYUINACCT-KEY17-SEL2-SEC
+           PERFORM UNTIL ( FLG-NACCT   NOT =   ZERO )
+             PERFORM   VARYING   IDX1    FROM    1   BY  1
+                        UNTIL    IDX1     >     31
+                IF     NACCT-DAY(IDX1) NOT =  ZERO 
+                  MOVE NACCT-DAY(IDX1)   TO  WRK-DAY1(IDX1)
+                END-IF
+             END-PERFORM
+             PERFORM 900-NYUINACCT-KEY17-FET2-SEC
+           END-PERFORM
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *    保険組み合わせ
+           MOVE    "5"    TO   WRK-ZAISKBKBN
+           PERFORM 900-NYUINACCT-KEY17-SEL2-SEC
+           PERFORM UNTIL ( FLG-NACCT   NOT =   ZERO )
+             PERFORM   VARYING   IDX1    FROM    1   BY  1
+                        UNTIL    IDX1     >     31
+                IF     NACCT-DAY(IDX1) NOT =  ZERO 
+                  MOVE NACCT-DAY(IDX1)   TO  WRK-DAY5(IDX1)
+                END-IF
+             END-PERFORM
+             PERFORM 900-NYUINACCT-KEY17-FET2-SEC
+           END-PERFORM
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *    入院料未算定日等の取得
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    SSRHKOH-PTID        TO  LNK-NYUINDAY-PTID
+           MOVE    SSRHKOH-SRYYM       TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                               SPA-AREA
+           IF      LNK-NYUINDAY-RC  =  ZERO
+                PERFORM   VARYING   IDX1    FROM    1   BY  1
+                           UNTIL    IDX1     >     31
+                   MOVE  LNK-NYUINDAY-KBN(IDX1)
+                                       TO  WRK-DAY-MI(IDX1)
+                END-PERFORM
+           END-IF
+      *
+      ***
+      *
+           PERFORM   VARYING   IDX1    FROM    1   BY  1
+                      UNTIL    IDX1     >     31
+              IF  ((WRK-DAY1(IDX1)  NOT = ZERO) AND
+                   (WRK-DAY5(IDX1)  NOT = ZERO))
+              OR  ((WRK-DAY-MI(IDX1)    = "1" ) AND
+                   (WRK-DAY5(IDX1)  NOT = ZERO))
+                MOVE     ZERO      TO   FLG-OK
+                PERFORM  VARYING  IDX2  FROM  1  BY  1
+                          UNTIL  (IDX2                     >  31  )
+                           OR    (TNCOMB-HKNCOMBI(IDX2)    = SPACE)
+                           OR    (FLG-OK                   =   1  )
+                  IF    WRK-DAY5X(IDX1) = TNCOMB-HKNCOMBI(IDX2)
+                    MOVE    1      TO   FLG-OK
+                  END-IF
+                END-PERFORM
+                IF    FLG-OK  =  ZERO
+                AND   IDX2   <=   31
+                  MOVE  WRK-DAY5X(IDX1) TO  TNCOMB-HKNCOMBI(IDX2)
+                  MOVE  IDX2            TO  TNCOMB-MAX
+                END-IF
+              END-IF
+           END-PERFORM
+      *
+           .
+       2001-NACCTHKN-CHK2-EXT.
            EXIT.
       *****************************************************************
       *    平成２１年５月改正対象公費存在チェック処理
@@ -500,12 +600,11 @@
        900-NYUINACCT-KEY17-SEL-SEC     SECTION.
       *
            MOVE    ZERO                TO  FLG-NACCT
-           INITIALIZE                      NACCT-REC
       *
+           INITIALIZE                      NACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SSRHKOH-PTID        TO  NACCT-PTID
            MOVE    SSRHKOH-SRYYM       TO  NACCT-SRYYM
-           MOVE    "1"                 TO  NACCT-NYUGAIKBN
            MOVE    "5"                 TO  NACCT-ZAISKBKBN
            MOVE    NACCT-REC           TO  MCPDATA-REC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -514,8 +613,8 @@
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC     TO  NACCT-REC
            ELSE
-               MOVE    ZERO            TO  FLG-NACCT
                INITIALIZE                  NACCT-REC
+               MOVE    1               TO  FLG-NACCT
            END-IF
       *
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -524,6 +623,52 @@
       *
            .
        900-NYUINACCT-KEY17-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院会計検索処理
+      *****************************************************************
+       900-NYUINACCT-KEY17-SEL2-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NACCT
+      *
+           INITIALIZE                      NACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SSRHKOH-PTID        TO  NACCT-PTID
+           MOVE    SSRHKOH-SRYYM       TO  NACCT-SRYYM
+           MOVE    WRK-ZAISKBKBN       TO  NACCT-ZAISKBKBN
+           MOVE    NACCT-REC           TO  MCPDATA-REC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  NACCT-REC
+           ELSE
+               INITIALIZE                  NACCT-REC
+               MOVE    1               TO  FLG-NACCT
+           END-IF
+      *
+           .
+       900-NYUINACCT-KEY17-SEL2-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院会計FETCH処理
+      *****************************************************************
+       900-NYUINACCT-KEY17-FET2-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NACCT
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  NACCT-REC
+           ELSE
+               INITIALIZE                  NACCT-REC
+               MOVE    1               TO  FLG-NACCT
+           END-IF
+      *
+           .
+       900-NYUINACCT-KEY17-FET2-EXT.
            EXIT.
       *****************************************************************
       *    診療会計検索処理

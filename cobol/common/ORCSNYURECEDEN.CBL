@@ -8654,6 +8654,7 @@
            MOVE    LNK-NYURECEDEN-HOSPNUM  TO  LNK-SYOTOKU-HOSPNUM
            MOVE    LNK-NYURECEDEN-PTID     TO  LNK-SYOTOKU-PTID
            MOVE    LNK-NYURECEDEN-SANTEIYM TO  LNK-SYOTOKU-SRYYM
+           MOVE    "1"                     TO  LNK-SYOTOKU-SKJCHKFLG
            CALL    "ORCSSYOTOKU"    USING      ORCSSYOTOKUAREA
                                                SPA-AREA
            IF    LNK-SYOTOKU-RC      =         ZERO

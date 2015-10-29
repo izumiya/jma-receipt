@@ -2753,6 +2753,7 @@
            MOVE  LNK-FTNJGNCHK-HOSPNUM  TO  LNK-SYOTOKU-HOSPNUM
            MOVE  LNK-FTNJGNCHK-PTID     TO  LNK-SYOTOKU-PTID
            MOVE  LNK-FTNJGNCHK-SRYYM    TO  LNK-SYOTOKU-SRYYM
+           MOVE  SPACE                  TO  LNK-SYOTOKU-SKJCHKFLG
       *
            CALL    "ORCSSYOTOKU"   USING  ORCSSYOTOKUAREA
                                           SPA-AREA

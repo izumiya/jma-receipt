@@ -693,6 +693,7 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    15/10/05  難病特記事項対応
+      *  04.08.04    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11333,16 +11334,74 @@
                                              LNK-ORCSJGNGET-REC
                                              SPA-AREA
                          IF   LNK-ORCSJGNGET-RC   =   ZERO
-                           IF RECE62-KOHNUMHC(IDX1 1) = "024" OR "079"
-                            IF  LNK-ORCSJGNGET-TAFTNRUIKEI = ZERO
+                           IF   (RECE62-KOHNUMHC(IDX1 1)    =
+                                                   "024" OR "079"     )
+                           AND  (LNK-ORCSJGNGET-TAFTNRUIKEI =  ZERO   )
                                MOVE    1     TO    FLG-SKJFTNNASI
-                            END-IF
                            END-IF
-                           IF RECE62-KOHNUMHC(IDX1 1) =
-                              "051" OR "052" OR "015" OR "016" OR "054"
-                            IF  LNK-ORCSJGNGET-NYUJGNGAK   = ZERO
+                           IF   (RECE62-KOHNUMHC(IDX1 1)    =
+                                          "051" OR "015" OR "016"     )
+                           AND  (LNK-ORCSJGNGET-NYUJGNGAK   =  ZERO   )
                                MOVE    1     TO    FLG-SKJFTNNASI
-                            END-IF
+                           END-IF
+                           IF   (RECE62-KOHNUMHC(IDX1 1)    = "052"   )
+                           AND  (RECE62-SRYYM              <  "201501")
+                           AND  (LNK-ORCSJGNGET-NYUJGNGAK   =  ZERO   )
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                           END-IF
+                           IF   (RECE62-KOHNUMHC(IDX1 1)    = "052"   )
+                           AND  (RECE62-SRYYM              >= "201501")
+                           AND  (LNK-ORCSJGNGET-NYUJGNGAK   =  ZERO   )
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(1)    )
+                             AND (RECE62-KOHFTNJANUM(1)(5:2) = "70")
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(2)    )
+                             AND (RECE62-KOHFTNJANUM(2)(5:2) = "70")
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(3)    )
+                             AND (RECE62-KOHFTNJANUM(3)(5:2) = "70")
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(4)    )
+                             AND (RECE62-KOHFTNJANUM(4)(5:2) = "70")
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                           END-IF
+                           IF   (RECE62-KOHNUMHC(IDX1 1)    = "054"   )
+                           AND  (RECE62-SRYYM              >= "201501")
+                           AND  (LNK-ORCSJGNGET-NYUJGNGAK   =  ZERO   )
+                           AND  (LNK-ORCSJGNGET-TAFTNRUIKEI
+                                              NOT = 9999999 AND 999999)
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(1))
+                             AND (RECE62-KOHFTNJANUM(1)(5:3) =
+                                                "601" OR "602" )
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(2))
+                             AND (RECE62-KOHFTNJANUM(2)(5:3) =
+                                                "601" OR "602" )
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(3))
+                             AND (RECE62-KOHFTNJANUM(3)(5:3) =
+                                                "601" OR "602" )
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
+                             IF  (RECE62-KOHIDHC(IDX1 1)     =
+                                                RECE62-KOHID(4))
+                             AND (RECE62-KOHFTNJANUM(4)(5:3) =
+                                                "601" OR "602" )
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                             END-IF
                            END-IF
                          END-IF
                        END-IF
@@ -22907,14 +22966,28 @@
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (SYU-SKJ-FTNKBN(IDX3)  =  "3"          ))
-                   OR   ((SYU-KOH1HKNNUM      =  "051" OR  "052"
-                                              OR "015" OR  "016"
-                                              OR "054"          ) AND
+                   OR   ((SYU-KOH1HKNNUM      =  "051" OR
+                                                 "015" OR  "016") AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
                                                          = ZERO ))
+                   OR   ((SYU-KOH1HKNNUM      =  "052"          ) AND
+                         (SYU-KOH2HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH3HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH4HKNNUM      =   SPACE         ) AND
+                         (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
+                                                         = ZERO ) AND
+                         (RECE62-SRYYM       <   "201501"       ))
+                   OR   ((SYU-KOH1HKNNUM      =  "052" OR  "054") AND
+                         (SYU-KOH2HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH3HKNNUM      =   SPACE         ) AND
+                         (SYU-KOH4HKNNUM      =   SPACE         ) AND
+                         (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
+                                                         = ZERO ) AND
+                         (SYU-KOH1SKJ-FTN                = ZERO ) AND
+                         (RECE62-SRYYM       >=  "201501"       ))
                    OR   ((SYU-KOH1HKNNUM  NOT =   SPACE         ) AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
@@ -24066,7 +24139,18 @@
       *
       *    一部負担金・食事療養費標準負担額区分の編集
       *
-           IF     (RECE62-KOUREI           = "1"  )
+           IF    RECE62-SRYYM        >=  "201501"
+             IF   (RECE62-TEISYOTOKU3   NOT = SPACE)
+             AND  (RECE62-SHOKUJIRYOYOHI(1) = ZERO )
+             AND  (RECE62-SHOKUJIRYOYOHI(2) = ZERO )
+             AND  (RECE62-SHOKUJIRYOYOHI(3) = ZERO )
+             AND  (RECE62-SHOKUJIRYOYOHI(4) = ZERO )
+             AND  (RECE62-SHOKUJIRYOYOHI(5) = ZERO )
+               MOVE   SPACE   TO   RECE62-TEISYOTOKU3
+             END-IF
+           END-IF
+      *
+           IF     (RECE62-KOUREI       NOT = SPACE)
            AND    (RECE62-TEISYOTOKU   NOT = SPACE)
                EVALUATE    RECE62-TEISYOTOKU
                    WHEN    "1"
