@@ -1106,13 +1106,13 @@
              MOVE    1          TO   FLG-ARI
            END-IF
       *
-           IF    FLG-ARI  =  ZERO
-               IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
+      ***> IF    FLG-ARI  =  ZERO
+      ***>     IF  LNK-SYOTOKU-SKJKBN(IDX2) NOT = SPACE
       ***        DISPLAY "DAY=" IDX2 " 2:SKJKBN(IDX2)="
       ***                 LNK-SYOTOKU-SKJKBN(IDX2)
-                 MOVE   SPACE   TO   LNK-SYOTOKU-SKJKBN(IDX2)
-               END-IF
-           END-IF
+      ***>       MOVE   SPACE   TO   LNK-SYOTOKU-SKJKBN(IDX2)
+      ***>     END-IF
+      ***> END-IF
       *
            .
        2301-NENREI-CHECK2-EXT.
