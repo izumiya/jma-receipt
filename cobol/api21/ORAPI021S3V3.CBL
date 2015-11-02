@@ -1781,6 +1781,7 @@
       *
       *    返却レスポンス番号
            IF     (SPA-ERRCD       =   SPACE )
+              AND (WRK-ERRCD       =   SPACE )
       *        終了処理
                PERFORM 300-SYORI-END-SEC
       *
@@ -1941,7 +1942,8 @@
            IF      LNK-SYUNOU-MAX      =   1
                MOVE    LNK-SYUNOU-REC (1)  TO  SYUNOU-REC
       *        請求金額等　収納の内容
-               IF      SPA-ERRCD       =   SPACE
+               IF     (SPA-ERRCD       =   SPACE )
+                 AND  (WRK-ERRCD       =   SPACE )
                    MOVE    SYU-SKYMONEY        TO  WRK-SKYMONY-GOK
                    MOVE    SYU-CHOSEI1         TO  WRK-CHOSEI1
                    MOVE    SYU-CHOSEI2         TO  WRK-CHOSEI2
