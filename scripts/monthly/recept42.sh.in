@@ -18,29 +18,35 @@ fi
 #        $15 SHELLID
 #        $16 エラーファイル名 
 #        $17 ファイル出力先区分
-#        $18 端末ｉｐアドレス
 #        $19 入外区分
 #        ${20} HOSPNUM
-#        ${24} レセ電データ履歴保存設定区分
-#            1:履歴保存する
+#        ${21} 8:ＥＦ 9:様式４
+#        ${24} PREFNUM
+#        ${26} HOSPCD
 #-------------------------------------------#
 
-    LOG_FILE="/var/log/jma-receipt/${20}recept42.log"
+  if [ ${21} -eq  '8' ]; then
+     LOG_FILE="/var/log/jma-receipt/${20}recept42.log"
+  else
+     LOG_FILE="/var/log/jma-receipt/${20}recept42_style4.log"
+  fi
 
     echo "arg5 =  [" ${5} "]"  >$LOG_FILE
     echo "arg12 = [" ${12} "]" >>$LOG_FILE
     echo "arg13 = [" ${13} "]" >>$LOG_FILE
     echo "arg17 = [" ${17} "]" >>$LOG_FILE
-    echo "arg18 = [" ${18} "]" >>$LOG_FILE
     echo "arg19 = [" ${19} "]" >>$LOG_FILE
     echo "arg20 = [" ${20} "]" >>$LOG_FILE
+    echo "arg21 = [" ${21} "]" >>$LOG_FILE
     echo "arg24 = [" ${24} "]" >>$LOG_FILE
+    echo "arg26 = [" ${26} "]" >>$LOG_FILE
 
     rennum=0
 
 ##      エラーファイル削除
 	echo "errfile = [" ${MCP_TEMPDIR}/${16}  "]" >> $LOG_FILE
         rm  -f ${MCP_TEMPDIR}/${16}
+
 
 #   一時請求
     RECEFILE1="E"
@@ -53,6 +59,30 @@ fi
     rm  ${13}${20}${RECEFILE2}g*.txt
     rm  ${13}${20}${RECEFILE2}n*.txt
     rm ${MCP_TEMPDIR}/${20}${RECEFILE9}*.txt
+    rm  ${13}${20}FF4*.txt
+
+
+#       様式４作成
+    if [ ${21} -eq  '9' ]; then
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM620 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${24},${26},${12},${14},${15},${17},${20},${16} >> $LOG_FILE 2>&1
+        if  [ -e ${MCP_TEMPDIR}/${16} ]; then
+            echo "--- BM620 err file exist ---" >> $LOG_FILE 2>&1
+            exit 
+        fi
+
+#       漢字コード変換
+        if  [ ${17} -eq '4' ]; then
+            echo "nkf " ${13}${20}${12} >> $LOG_FILE 2>&1
+            nkf -s -Lw ${MCP_TEMPDIR}/${20}${RECEFILE9}${12} > ${13}${20}${12}
+            chmod -R g+r ${13}${20}${12}
+        else
+            echo "nkf " ${MCP_TEMPDIR}/${20}${12} >> $LOG_FILE 2>&1
+            nkf -s -Lw ${MCP_TEMPDIR}/${20}${RECEFILE9}${12} > ${MCP_TEMPDIR}/${20}${12}
+        fi
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20} >> $LOG_FILE
+        exit 
+    fi
 
 
 #   ＥＦファイル作成

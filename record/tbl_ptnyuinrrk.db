@@ -1153,4 +1153,20 @@ path	key65		{
 	};
 };
 
+path	key66		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptnyuinrrk_key66_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnyuinrrk
+			WHERE		HOSPNUM		=	:HOSPNUM
+			AND		RRKEDANUM	=	1
+			AND		TAIINYMD	<=	:NYUINYMD
+			AND		TAIINYMD	>=	:TAIINYMD
+			AND		JTIKBN		<>	'5'
+			AND		JTIKBN		<>	'6'
+			ORDER BY NYUINYMD DESC,TAIINYMD DESC
+		;
+	};
+};
+
 

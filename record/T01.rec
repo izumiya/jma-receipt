@@ -59,7 +59,7 @@ T01 {
         textdata varchar(32);
       };
       count int;
-        item varchar(32)[5];
+        item varchar(32)[10];
     };
     RECEDEN_CHK_COMBO {
       state int;

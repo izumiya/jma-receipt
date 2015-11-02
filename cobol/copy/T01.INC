@@ -28,7 +28,7 @@
                   05  T01-VALUE    PIC X(32).
                 04  T01-PRTKBN-COUNT PIC S9(9)   BINARY.
                 04  T01-PRTKBN-ITEM
-                        PIC X(32)   OCCURS  5 TIMES.
+                        PIC X(32)   OCCURS  10 TIMES.
               03  T01-RECEDEN-CHK-COMBO.
                 04  T01-RECEDEN-CHK-STATE PIC S9(9)   BINARY.
                 04  T01-RECEDEN-CHK.
