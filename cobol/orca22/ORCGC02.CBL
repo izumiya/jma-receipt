@@ -320,6 +320,7 @@
       *                                     登録時間を追加
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
+      *  04.08.02    NACL-藤原    15/11/02  簡単修正時の死亡区分の更新
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2748,6 +2749,31 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
            END-PERFORM
       *
+      *    患者マスタ更新（転帰区分＝２）のとき
+           IF      WRK-HENSYU-DATA-O (1)   =   "2"
+               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+               MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+               PERFORM 900-PTINF-READ-SEC
+               IF    ( FLG-PTINF               =   ZERO )
+               AND   ( PTINF-DEATHKBN      NOT =   "1"  )
+                   MOVE    MCPDATA-REC         TO  PTINF-REC
+                   MOVE    "1"                 TO  PTINF-DEATHKBN
+      *
+                   MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  PTINF-UPHMS
+                   MOVE    PTINF-REC           TO  MCPDATA-REC
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+                   MOVE    "tbl_ptinf"         TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC          NOT =   ZERO 
+                       MOVE    "1004"              TO  SPA-ERRCD
+                       DISPLAY "UPD PTINF-KEY =>" PTINF-KEY 
+                       GO  TO  320-C10SPASET-EXT
+                   END-IF
+               END-IF
+           END-IF     
+      *
            MOVE    SPACE               TO  WRK-HAISIYMDH
                                            SPA-CID1-FLG
                                            SPA-CID3-FLG
@@ -4356,6 +4382,31 @@ grpsys                                         SPA-AREA
                    END-PERFORM
                END-IF
            END-PERFORM
+      *
+      *    患者マスタ更新（転帰区分＝２）のとき
+           IF      WRK-HENSYU-DATA-O (1)   =   "2"
+               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+               MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+               PERFORM 900-PTINF-READ-SEC
+               IF    ( FLG-PTINF               =   ZERO )
+               AND   ( PTINF-DEATHKBN      NOT =   "1"  )
+                   MOVE    MCPDATA-REC         TO  PTINF-REC
+                   MOVE    "1"                 TO  PTINF-DEATHKBN 
+      *
+                   MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  PTINF-UPHMS
+                   MOVE    PTINF-REC           TO  MCPDATA-REC
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+                   MOVE    "tbl_ptinf"         TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC          NOT =   ZERO 
+                       MOVE    "1004"              TO  SPA-ERRCD
+                       DISPLAY "UPD PTINF-KEY =>" PTINF-KEY 
+                       GO  TO  410113-KANTAN-SYUSEI-EXT
+                   END-IF
+               END-IF
+           END-IF     
       *
            MOVE    SPACE               TO  WRK-HAISIYMDH
            MOVE    ZERO                TO  SPA-C02-IKOFLG
