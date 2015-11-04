@@ -1628,6 +1628,7 @@
                            MOVE     ZERO         TO  FLG-SYORI
                          ELSE
                            MOVE    ZERO          TO  WRK-ZOGEN
+                           MOVE    1             TO  FLG-SYORI
                          END-IF
                        ELSE
                          MOVE     7    TO   WRK-ZOGEN
