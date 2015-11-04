@@ -683,7 +683,7 @@
                        MOVE    3               TO  WRK-HKNNUM
                    WHEN    SPACE
                        IF      SYS-9102-KOH-RECEIPT
-                                               =   SPACE
+                                               =   "0"
                            MOVE    2               TO  WRK-HKNNUM
                        END-IF
                    WHEN    OTHER
