@@ -97,6 +97,8 @@
       *  04.07.05    NACL-ÌçÏÆ    14/04/08  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/06/17  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/07/31  ±ÉÍÜ´ÉÍýÂÎÀ©¸º»»µ¬Äê³ºÅöÂÐ±þ
+      *
+      *  04.08.01    NACL-ÌçÏÆ    15/11/09  Â¾°å¼õ¿Ç¥Á¥§¥Ã¥¯ÄÉ²Ã
       *****************************************************************
       *
       *
@@ -4783,14 +4785,23 @@
                     WHEN     5
                     WHEN     6
                     WHEN     7
-                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                      IF     FLG-KENPOJYUNKYO  = ZERO
+                         MOVE      1       TO  WRK-TAIJYUSIN-ERR
+                      ELSE
+                         PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                      END-IF
                     WHEN     8
                     WHEN     9
                     WHEN    10
                     WHEN    11
                     WHEN    12
                     WHEN    13
-                      PERFORM   2101-GAIHAKU-GENSAN-SEC
+                      IF    (FLG-KENPOJYUNKYO  = ZERO                )
+                      AND   (NACCT-DAY(IDX1)   = 10 OR 11 OR 12 OR 13)
+                         MOVE      1       TO  WRK-TAIJYUSIN-ERR
+                      ELSE
+                         PERFORM   2101-GAIHAKU-GENSAN-SEC
+                      END-IF
                  END-EVALUATE
               WHEN     "92"
                  EVALUATE   NACCT-DAY(IDX1)
@@ -4802,14 +4813,23 @@
                     WHEN     5
                     WHEN     6
                     WHEN     7
-                      PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                      IF     FLG-KENPOJYUNKYO  = ZERO
+                         MOVE      1       TO  WRK-TAIJYUSIN-ERR
+                      ELSE
+                         PERFORM   2101-GAIHAKU-TAKIKAN-SEC
+                      END-IF
                     WHEN     8
                     WHEN     9
                     WHEN    10
                     WHEN    11
                     WHEN    12
                     WHEN    13
-                      PERFORM   2101-GAIHAKU-GENSAN-SEC
+                      IF    (FLG-KENPOJYUNKYO  = ZERO                )
+                      AND   (NACCT-DAY(IDX1)   = 10 OR 11 OR 12 OR 13)
+                         MOVE      1       TO  WRK-TAIJYUSIN-ERR
+                      ELSE
+                         PERFORM   2101-GAIHAKU-GENSAN-SEC
+                      END-IF
                  END-EVALUATE
            END-EVALUATE
       *
