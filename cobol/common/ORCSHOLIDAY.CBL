@@ -333,6 +333,10 @@
                    07  CONST-NH-0505-STYY  PIC X(04)   VALUE   "0000".
                    07  CONST-NH-0505-EDYY  PIC X(04)   VALUE   "9999".
                    07  CONST-NH-0505-MMDD  PIC X(04)   VALUE   "0505".
+               05  CONST-NH-0811-G.
+                   07  CONST-NH-0505-STYY  PIC X(04)   VALUE   "2016".
+                   07  CONST-NH-0505-EDYY  PIC X(04)   VALUE   "9999".
+                   07  CONST-NH-0505-MMDD  PIC X(04)   VALUE   "0811".
                05  CONST-NH-1103-G.
                    07  CONST-NH-1103-STYY  PIC X(04)   VALUE   "0000".
                    07  CONST-NH-1103-EDYY  PIC X(04)   VALUE   "9999".
@@ -347,11 +351,11 @@
                    07  CONST-NH-1223-MMDD  PIC X(04)   VALUE   "1223".
            03  CONST-NATIONAL-HOLIDAY-R    REDEFINES
                                            CONST-NATIONAL-HOLIDAY-G.
-               05  CONST-NATIONAL-HOLIDAY              OCCURS  9.
+               05  CONST-NATIONAL-HOLIDAY              OCCURS  10.
                    07  CONST-NH-STYY       PIC X(04).
                    07  CONST-NH-EDYY       PIC X(04).
                    07  CONST-NH-MMDD       PIC X(04).
-           03  CONST-NATIONAL-HOLIDAY-MAX  PIC 9(05)   VALUE   9.
+           03  CONST-NATIONAL-HOLIDAY-MAX  PIC 9(05)   VALUE   10.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -420,6 +424,7 @@
       *
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   TYEAR-MAX )
+      *
                IF    ( SHOLIDAY-DATE
                                    =   TYEAR-DATE (IDX-DAY))
                    IF    ( TYEAR-HOLIDAY (IDX-DAY) =   1 )
