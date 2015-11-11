@@ -814,6 +814,12 @@
            05 PIC  X(30)   VALUE   "加算の算定があります          ".
            05 PIC  X(30)   VALUE   "                              ".
       *
+           05 PIC  X(06)   VALUE   "990035".
+           05 PIC  X(30)   VALUE   "患者負担額が計算できません。保".
+           05 PIC  X(30)   VALUE   "険組合せが多すぎます          ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
@@ -821,10 +827,10 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  126.
+           05 ERRMES-OCC   OCCURS  127.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   126.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   127.
 
 
 

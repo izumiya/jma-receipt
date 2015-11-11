@@ -241,6 +241,8 @@
                "特定曜日入退院減算（外泊）の入力に誤りがあります".
            03  ERR-MSG29                   PIC X(100)    VALUE
                "入院時食事療養（２）算定時に特別食加算の算定があります".
+           03  ERR-MSG30                  PIC X(100)    VALUE
+               "保険組合せの数が多すぎます".
            03  ERR-MSG101                  PIC X(100)    VALUE
                "包括入院期間に算定できない入院料加算の算定があります".
            03  ERR-MSG88                   PIC X(100)    VALUE
@@ -991,6 +993,8 @@
                    MOVE    "0027"      TO  ERR-ERRCD
                WHEN    29
                    MOVE    "0029"      TO  ERR-ERRCD
+               WHEN    30
+                   MOVE    "0030"      TO  ERR-ERRCD
                WHEN    101
                    MOVE    "0101"      TO  ERR-ERRCD
                WHEN    OTHER
@@ -1655,6 +1659,8 @@
                MOVE    ERR-MSG27       TO  ERR-ERRMSG
            WHEN    "0029"
                MOVE    ERR-MSG29       TO  ERR-ERRMSG
+           WHEN    "0030"
+               MOVE    ERR-MSG30       TO  ERR-ERRMSG
            WHEN    "0101"
                MOVE    ERR-MSG101      TO  ERR-ERRMSG
            WHEN    "8888"

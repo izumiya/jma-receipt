@@ -146,11 +146,16 @@
                                            DELIMITED   BY  SIZE
                INTO    WRK-MSG
                END-STRING
-           WHEN    28
+           WHEN    29
                STRING  "入院時食事療養（２）算定時に特別食"
                                            DELIMITED   BY  SIZE
                        "加算の算定があります"
                                            DELIMITED   BY  SIZE
+               INTO    WRK-MSG
+               END-STRING
+           WHEN    30
+               STRING  "保険組合せの数が多すぎます"
+                                           DELIMITED   BY  SPACE
                INTO    WRK-MSG
                END-STRING
            WHEN    101
