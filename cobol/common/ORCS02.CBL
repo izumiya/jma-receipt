@@ -27107,8 +27107,7 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-      ***              MOVE  WK-KOH-COMPFTN(1)
-                       MOVE  LNK-SYU-KOH-COMPFTN(1)
+                       MOVE  WK-KOH-COMPFTN(1)
                                             TO  WK-KOH-COMPFTN(2)
                    END-IF
                  END-IF
@@ -27120,8 +27119,7 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(2)      < WK-KOH-COMPFTN(3)
-      ***              MOVE  WK-KOH-COMPFTN(2)
-                       MOVE  LNK-SYU-KOH-COMPFTN(2)
+                       MOVE  WK-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
                    END-IF
                  END-IF
@@ -27133,8 +27131,7 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(3)      < WK-KOH-COMPFTN(4)
-      ***              MOVE  WK-KOH-COMPFTN(3)
-                       MOVE  LNK-SYU-KOH-COMPFTN(3)
+                       MOVE  WK-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
                    END-IF
                  END-IF
@@ -27183,8 +27180,7 @@
                   IF  WK-DAY-KOH-COMPFTN(1)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(1)      < WK-DAY-KOH-COMPFTN(2)
                     AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-      ***               MOVE  WK-KOH-COMPFTN(1)
-                        MOVE  LNK-SYU-KOH-COMPFTN(1)
+                        MOVE  WK-KOH-COMPFTN(1)
                                              TO  WK-DAY-KOH-COMPFTN(2)
                     END-IF
                   ELSE
@@ -27214,8 +27210,7 @@
                   IF  WK-DAY-KOH-COMPFTN(2)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(2)      < WK-DAY-KOH-COMPFTN(3)
                     AND LNK-SYU-KOH2HKNNUM   NOT =  SPACE
-      ***               MOVE  WK-KOH-COMPFTN(2)
-                        MOVE  LNK-SYU-KOH-COMPFTN(2)
+                        MOVE  WK-KOH-COMPFTN(2)
                                              TO  WK-DAY-KOH-COMPFTN(3)
                     END-IF
                   ELSE
@@ -27245,8 +27240,7 @@
                   IF  WK-DAY-KOH-COMPFTN(3)  =  ALL"9"
                     IF  WK-KOH-COMPFTN(3)      < WK-DAY-KOH-COMPFTN(4)
                     AND LNK-SYU-KOH3HKNNUM   NOT =  SPACE
-      ***               MOVE  WK-KOH-COMPFTN(3)
-                        MOVE  LNK-SYU-KOH-COMPFTN(3)
+                        MOVE  WK-KOH-COMPFTN(3)
                                              TO  WK-DAY-KOH-COMPFTN(4)
                     END-IF
                   ELSE

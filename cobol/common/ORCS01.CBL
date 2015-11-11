@@ -774,6 +774,9 @@
            03  WK-TAIHI-JGNGAKEN-OCC.
                05  WK-TAIHI-JGNGAKEN   PIC 9(7)    OCCURS   4.
       *
+           03  WK-TAIHI-CHITAIFLG-OCC.
+               05  WK-TAIHI-CHITAIFLG  PIC 9(1)    OCCURS   4.
+      *
       *    ÆÃ¼ì·×»»ÍÑ
            03  WK-TOKUSYU-COMPFTN      PIC 9(07).
            03  WK-TOKUSYU-COMPFTN2     PIC 9(07).
@@ -21929,6 +21932,7 @@
       *
            INITIALIZE               WK-SYOUKAN-FLG-TAIHI-AREA.
            INITIALIZE               WK-TAIHI-FTNGAKEN-OCC.
+           INITIALIZE               WK-TAIHI-CHITAIFLG-OCC.
       *
            MOVE    ZERO      TO     WK-TOKUSYU-COMPFTN.
            MOVE    9999999   TO     WK-TOKUSYU-COMPFTN2.
@@ -24214,6 +24218,43 @@
              END-IF
            END-IF.
       *
+           IF   COMB-KOHHKNNUM(KOH-IDX)(1:1)  >=  "1" AND <=  "8"
+               EVALUATE  KOH-IDX
+                 WHEN       1
+                   IF  (  MAX-KIN-KOHI1-D  NOT =  ZERO  )
+                   OR  (( MAX-KIN-KOHI1-D      =  ZERO ) AND
+                        ( MAX-KIN-KOHI1-M      =  ZERO ) AND
+                        ((MAX-KIN-KOHI1-K  NOT =  ZERO) OR
+                         (TEI-KIN-KOHI1-K  NOT =  ZERO)))
+                      MOVE     1     TO    WK-TAIHI-CHITAIFLG(KOH-IDX)
+                   END-IF
+                 WHEN       2
+                   IF  (  MAX-KIN-KOHI2-D  NOT =  ZERO  )
+                   OR  (( MAX-KIN-KOHI2-D      =  ZERO ) AND
+                        ( MAX-KIN-KOHI2-M      =  ZERO ) AND
+                        ((MAX-KIN-KOHI2-K  NOT =  ZERO) OR
+                         (TEI-KIN-KOHI2-K  NOT =  ZERO)))
+                      MOVE     1     TO    WK-TAIHI-CHITAIFLG(KOH-IDX)
+                   END-IF
+                 WHEN       3
+                   IF  (  MAX-KIN-KOHI3-D  NOT =  ZERO  )
+                   OR  (( MAX-KIN-KOHI3-D      =  ZERO ) AND
+                        ( MAX-KIN-KOHI3-M      =  ZERO ) AND
+                        ((MAX-KIN-KOHI3-K  NOT =  ZERO) OR
+                         (TEI-KIN-KOHI3-K  NOT =  ZERO)))
+                      MOVE     1     TO    WK-TAIHI-CHITAIFLG(KOH-IDX)
+                   END-IF
+                 WHEN       4
+                   IF  (  MAX-KIN-KOHI4-D  NOT =  ZERO  )
+                   OR  (( MAX-KIN-KOHI4-D      =  ZERO ) AND
+                        ( MAX-KIN-KOHI4-M      =  ZERO ) AND
+                        ((MAX-KIN-KOHI4-K  NOT =  ZERO) OR
+                         (TEI-KIN-KOHI4-K  NOT =  ZERO)))
+                      MOVE     1     TO    WK-TAIHI-CHITAIFLG(KOH-IDX)
+                   END-IF
+               END-EVALUATE
+           END-IF.
+      *
        2304-KOH-HKNREAD-EXT.
            EXIT.
       *
@@ -25540,9 +25581,13 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-      ***              MOVE  WK-KOH-COMPFTN(1)
+                     IF  WK-TAIHI-CHITAIFLG(2) =  1
                        MOVE  LNK-SYU-KOH-COMPFTN(1)
                                             TO  WK-KOH-COMPFTN(2)
+                     ELSE
+                       MOVE  WK-KOH-COMPFTN(1)
+                                            TO  WK-KOH-COMPFTN(2)
+                     END-IF
                    END-IF
                  END-IF
                WHEN    3
@@ -25553,9 +25598,13 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(2)      < WK-KOH-COMPFTN(3)
-      ***              MOVE  WK-KOH-COMPFTN(2)
+                     IF  WK-TAIHI-CHITAIFLG(3) =  1
                        MOVE  LNK-SYU-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
+                     ELSE
+                       MOVE  WK-KOH-COMPFTN(2)
+                                            TO  WK-KOH-COMPFTN(3)
+                     END-IF
                    END-IF
                  END-IF
                WHEN    4
@@ -25566,9 +25615,13 @@
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(3)      < WK-KOH-COMPFTN(4)
-      ***              MOVE  WK-KOH-COMPFTN(3)
+                     IF  WK-TAIHI-CHITAIFLG(4) =  1
                        MOVE  LNK-SYU-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
+                     ELSE
+                       MOVE  WK-KOH-COMPFTN(3)
+                                            TO  WK-KOH-COMPFTN(4)
+                     END-IF
                    END-IF
                  END-IF
              END-EVALUATE
