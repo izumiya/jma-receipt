@@ -17399,6 +17399,14 @@
               MOVE    ERR-HEN-ERRMSG    TO  WRK-RECEERR
               PERFORM 500-ERR-HENSYU-SEC
               MOVE    1                 TO  FLG-RECE62
+      *
+              MOVE    SPACE             TO  WRK-ERRMSG
+              STRING  "ORCR0640 "           DELIMITED  BY  SIZE
+                      WRK-RECEERR           DELIMITED  BY  SIZE
+                      LOW-VALUE             DELIMITED  BY  SIZE
+                                            INTO    WRK-ERRMSG
+              END-STRING
+              PERFORM 500-COBABORT-SEC
            END-IF
       *
            .

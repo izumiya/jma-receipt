@@ -170,6 +170,9 @@
       *  04.07.15    NACL-門脇    15/02/02  システム管理２０１０機能追加対応
       *  04.07.16    NACL-門脇    15/06/02  短期滞在手術等基本料算定時の
       *                                     入院負担金計算対応
+      *
+      *  04.08.01    NACL-門脇    15/11/09  該当期間に１０超の保険組合せの
+      *                                     使用があるかチェック
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -205,6 +208,7 @@
            03  WRK-GENSAN-ERR              PIC 9(01).
            03  WRK-GENSAN-ERR2             PIC 9(01).
            03  WRK-TENTEKI-ERR             PIC 9(01).
+           03  WRK-KENSU-ERR               PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
@@ -816,6 +820,11 @@
            IF    FLG-KAIKEI-SAKUSEI    =    ZERO
                  MOVE   13       TO    LNK-S02-RC
                  GO   TO   MAIN-EXT
+           ELSE
+             IF  WRK-KENSU-ERR  =  1
+                 MOVE   30       TO    LNK-S02-RC
+                 GO   TO   MAIN-EXT
+             END-IF
            END-IF.
       *
            PERFORM       SYUNOU-SET-SEC.
@@ -1435,10 +1444,14 @@
                   END-PERFORM
       *
                   IF   FLG-HANBETU   =   ZERO
+                   IF  IDZ <= 10
                      MOVE WRK-SKYYM(IDX)     TO WRK-HANBETU-SKYYM(IDZ)
                      MOVE WRK-DAY5(IDX IDY)  TO  
                                           WRK-HANBETU-HKNCOMBINUM(IDZ)
                      MOVE "1"                TO WRK-HANBETU-DAY(IDZ IDY)
+                   ELSE
+                     MOVE  1                 TO WRK-KENSU-ERR
+                   END-IF
                   END-IF
       *
                ELSE
@@ -1460,10 +1473,14 @@
                   END-PERFORM
       *
                   IF   FLG-HANBETU   =   ZERO
+                   IF  IDZ <= 10
                      MOVE WRK-SKYYM(IDX)     TO WRK-HANBETU-SKYYM(IDZ)
                      MOVE WRK-DAY5(IDX IDY)  TO  
                                           WRK-HANBETU-HKNCOMBINUM(IDZ)
                      MOVE "3"                TO WRK-HANBETU-DAY(IDZ IDY)
+                   ELSE
+                     MOVE  1                 TO WRK-KENSU-ERR
+                   END-IF
                   END-IF
       *
                 END-IF
@@ -1618,7 +1635,7 @@
              END-PERFORM
       *
              IF   FLG-HANBETU   =   ZERO
-      *
+               IF IDY <= 10
                    MOVE  WRK-HANBETU2-SKYYM(IDX)
                                  TO  WRK-HANBETU-SKYYM(IDY)
                    MOVE  WRK-HANBETU2-HKNCOMBINUM(IDX)
@@ -1629,7 +1646,9 @@
                           MOVE  "2"     TO  WRK-HANBETU-DAY(IDY IDZ)
                       END-IF 
                    END-PERFORM
-      *
+               ELSE
+                   MOVE   1      TO  WRK-KENSU-ERR
+               END-IF
              END-IF
       *
            END-PERFORM.
@@ -1660,11 +1679,15 @@
                    END-IF
                  END-PERFORM
                  IF   FLG-HANBETU   =   ZERO
+                   IF IDZ <= 10
                      MOVE   WRK-SKYYM(IDX) 
                                        TO  WRK-HANBETU2-SKYYM(IDZ)
                      MOVE   ACCT-HKNCOMBI      
                                        TO  WRK-HANBETU2-HKNCOMBINUM(IDZ)
                      MOVE   "2"        TO  WRK-HANBETU2-DAY(IDZ IDY)
+                   ELSE
+                     MOVE    1         TO  WRK-KENSU-ERR
+                   END-IF
                  END-IF
               ELSE
                  MOVE   ZERO     TO    FLG-HANBETU
@@ -1679,10 +1702,14 @@
                    END-IF
                  END-PERFORM
                  IF   FLG-HANBETU   =   ZERO
+                   IF IDZ <= 10
                      MOVE   WRK-SKYYM(IDX) 
                                        TO  WRK-HANBETU2-SKYYM(IDZ)
                      MOVE   ACCT-HKNCOMBI      
                                        TO  WRK-HANBETU2-HKNCOMBINUM(IDZ)
+                   ELSE
+                     MOVE    1         TO  WRK-KENSU-ERR
+                   END-IF
                  END-IF
               END-IF
              END-IF
@@ -1719,11 +1746,15 @@
                    END-IF
                  END-PERFORM
                  IF   FLG-HANBETU   =   ZERO
+                  IF  IDZ <= 10
                    MOVE   WRK-SKYYM(IDX) 
                                    TO  WRK-HANBETU3-SKYYM(IDZ)
                    MOVE   WRK-NYUINDAY-TAIHI-DOU-HKNCOMBI(IDX IDY)
                                    TO  WRK-HANBETU3-HKNCOMBINUM(IDZ)
                    MOVE   "9"      TO  WRK-HANBETU3-DAY(IDZ IDY)
+                  ELSE
+                   MOVE    1       TO  WRK-KENSU-ERR
+                  END-IF
                  END-IF
                END-IF
       *
@@ -1748,6 +1779,7 @@
                END-IF
              END-PERFORM
              IF   FLG-HANBETU   =   ZERO
+              IF  IDY <= 10
                MOVE  WRK-HANBETU3-SKYYM(IDX)
                                  TO  WRK-HANBETU-SKYYM(IDY)
                MOVE  WRK-HANBETU3-HKNCOMBINUM(IDX)
@@ -1758,6 +1790,9 @@
                      MOVE  "9"   TO  WRK-HANBETU-DAY(IDY IDZ)
                   END-IF 
                END-PERFORM
+              ELSE
+               MOVE     1        TO  WRK-KENSU-ERR
+              END-IF
              END-IF
       *
            END-PERFORM.
