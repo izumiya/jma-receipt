@@ -980,10 +980,6 @@
            03  WK-SYOUKAN-FTNRATE          PIC  9(03).
            03  WK-MARUTOARI-COMPFTN        PIC  9(07).
       *
-           03  WK-KUMAMOTO-TBL.
-               05  WK-KUMAMOTO-OCC         OCCURS   4.
-                 06  WK-KUMAMOTO-FLG       PIC  9(01).
-      *
            03  WK-KUMAMOTO-SYUCOMPFTN      PIC  9(07).
            03  WK-KUMAMOTO-HANTEIKIN       PIC  9(10).
            03  WK-KUMAMOTO-HANTEIJGN       PIC  9(10).
@@ -20643,7 +20639,6 @@
       *
            MOVE     ZERO     TO     WK-TOKUTEI-COMPFTN3.
            MOVE     SPACE    TO     FLG-KUMAMOTO.
-           INITIALIZE               WK-KUMAMOTO-TBL.
            MOVE     ZERO     TO     FLG-KUMAMOTO-CYO.
            MOVE     ZERO     TO     WK-KUMAMOTO-HANTEIJGN.
            INITIALIZE               WK-TAIHI-RECEFTNDSPKBN-OCC.
@@ -26301,8 +26296,7 @@
                   ELSE
                    IF  WK-KOH-COMPFTN(KOH-IDX)
                                        >  LNK-SYU-SYUCOMPFTN-ENTANI
-      ***            MOVE   LNK-SYU-SYUCOMPFTN-ENTANI     TO
-                     MOVE   LNK-SYU-SYUCOMPFTN            TO
+                     MOVE   LNK-SYU-SYUCOMPFTN-ENTANI     TO
                                           WK-KOH-COMPFTN(KOH-IDX)
                    END-IF
                   END-IF
@@ -26479,7 +26473,7 @@
                IF  (WK-1001-PREFNUM             =  43           ) AND
                    (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "143" OR "342") AND
                    (LNK-SYU-SRYYMD(1:6)        >= "200912"      )
-                  MOVE   1    TO  WK-KUMAMOTO-FLG(KOH-IDX)
+                  MOVE   1    TO  WK-TAIHI-FTNGAKEN(KOH-IDX)
                   MOVE  "1"   TO  WK-TAIHI-RECEFTNDSPKBN(KOH-IDX)
                   PERFORM   23081-KUMAMOTO-KOHI2-SEC
                   GO    TO  2307-KOH-KEISAN-EXT
@@ -26573,8 +26567,7 @@
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
                            PERFORM    23073-KOHHI-HIKAKU2-SEC
                        ELSE
-      ***                  MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
-                           MOVE  LNK-SYU-SYUCOMPFTN
+                           MOVE  LNK-SYU-SYUCOMPFTN-ENTANI
                                             TO  WK-KOH-COMPFTN(KOH-IDX)
                            PERFORM    23073-KOHHI-HIKAKU2-SEC
                        END-IF
@@ -29899,7 +29892,7 @@
              IF  LNK-SYU-KOH-COMPFTN(KOH-IDX) >  ZAN-KOHI-T(KOH-IDX)
                  MOVE   ZAN-KOHI-T(KOH-IDX)
                               TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                 MOVE   1     TO  WK-KUMAMOTO-FLG(KOH-IDX)
+                 MOVE   1     TO  WK-TAIHI-FTNGAKEN(KOH-IDX)
              END-IF
              IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
                                               >  ZAN-KOHI-T3(KOH-IDX)
@@ -30946,7 +30939,6 @@
                     ( FLG-IRYOHI70 = 3 OR 4 OR 9 OR 10 ) AND
                     ( FLG-SYOUKAN(1)         =    "1"  ))
                OR  (  WK-TAIHI-FTNGAKEN(1)   =     1    )
-               OR  (  WK-KUMAMOTO-FLG(1)     =     1    )
                     MOVE     LNK-SYU-KOH1COMPFTN  TO
                                           LNK-SYU-KOH1HKNFTNMONEY
                ELSE
@@ -30967,6 +30959,7 @@
              OR ((FLG-KOUGAKUCYO-GEN70  NOT =  ZERO     ) AND
                  (COMB-KOH1HKNNUM       = "970"         ) AND
                  (WK-1001-DAISANKBN     = "1"           ))
+             OR ( WK-TAIHI-FTNGAKEN(1)  =  1             )
                     MOVE     LNK-SYU-KOH1COMPFTN  TO
                                           LNK-SYU-KOH1HKNFTNMONEY
              ELSE
@@ -30995,7 +30988,6 @@
                     ( FLG-KOUGAKUCYO-GEN70K
                                          NOT =    ZERO ) AND
                     ( FLG-SYOUKAN(2)         =    "1"  ))
-               OR  (  WK-KUMAMOTO-FLG(2)     =     1    )
                     MOVE     LNK-SYU-KOH2COMPFTN  TO
                                           LNK-SYU-KOH2HKNFTNMONEY
                ELSE
@@ -31007,9 +30999,10 @@
                                     LNK-SYU-KOH2HKNFTNMONEY *  10        
                END-IF
             ELSE
-             IF  (WK-1001-PREFNUM       =  43           )
-             AND (COMB-KOH2HKNNUM       = "143" OR "342")
-             AND (LNK-SYU-SRYYMD(1:6)  <= "200911"      )
+             IF ((WK-1001-PREFNUM       =  43           ) OR
+                 (COMB-KOH2HKNNUM       = "143" OR "342") OR
+                 (LNK-SYU-SRYYMD(1:6)  <= "200911"      ))
+             OR ( WK-TAIHI-FTNGAKEN(2)  =  1             )
                     MOVE     LNK-SYU-KOH2COMPFTN  TO
                                           LNK-SYU-KOH2HKNFTNMONEY
              ELSE
@@ -31025,7 +31018,6 @@
            IF    COMB-KOH3HKNNUM         NOT = SPACE
             IF    COMB-KOH3-NYUJGNKBN     =     "1"
                IF  (WK-TAIHI-FTNGAKEN(3) = 1)
-               OR  (WK-KUMAMOTO-FLG(3)   = 1)
                     MOVE     LNK-SYU-KOH3COMPFTN  TO
                                           LNK-SYU-KOH3HKNFTNMONEY
                ELSE
@@ -31037,9 +31029,10 @@
                                     LNK-SYU-KOH3HKNFTNMONEY *  10        
                END-IF
             ELSE
-             IF  (WK-1001-PREFNUM       =  43           )
-             AND (COMB-KOH3HKNNUM       = "143" OR "342")
-             AND (LNK-SYU-SRYYMD(1:6)  <= "200911"      )
+             IF ((WK-1001-PREFNUM       =  43           ) OR
+                 (COMB-KOH3HKNNUM       = "143" OR "342") OR
+                 (LNK-SYU-SRYYMD(1:6)  <= "200911"      ))
+             OR ( WK-TAIHI-FTNGAKEN(3)  =  1             )
                     MOVE     LNK-SYU-KOH3COMPFTN  TO
                                           LNK-SYU-KOH3HKNFTNMONEY
              ELSE
@@ -31055,7 +31048,6 @@
            IF    COMB-KOH4HKNNUM         NOT = SPACE
             IF    COMB-KOH4-NYUJGNKBN     =     "1"
                IF  (WK-TAIHI-FTNGAKEN(4) = 1)
-               OR  (WK-KUMAMOTO-FLG(4)   = 1)
                     MOVE     LNK-SYU-KOH4COMPFTN  TO
                                           LNK-SYU-KOH4HKNFTNMONEY
                ELSE
@@ -31067,9 +31059,10 @@
                                     LNK-SYU-KOH4HKNFTNMONEY *  10        
                END-IF
             ELSE
-             IF  (WK-1001-PREFNUM       =  43           )
-             AND (COMB-KOH4HKNNUM       = "143" OR "342")
-             AND (LNK-SYU-SRYYMD(1:6)  <= "200911"      )
+             IF ((WK-1001-PREFNUM       =  43           ) OR
+                 (COMB-KOH4HKNNUM       = "143" OR "342") OR
+                 (LNK-SYU-SRYYMD(1:6)  <= "200911"      ))
+             OR ( WK-TAIHI-FTNGAKEN(4)  =  1             )
                     MOVE     LNK-SYU-KOH4COMPFTN  TO
                                           LNK-SYU-KOH4HKNFTNMONEY
              ELSE
@@ -31109,7 +31102,6 @@
                       ( COMB-KOH1HKNNUM        =   "970" ) AND
                       ( WK-1001-DAISANKBN      =    "1"  ))
                   OR (  WK-TAIHI-FTNGAKEN(1)   =     1    )
-                  OR (  WK-KUMAMOTO-FLG(1)     =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -31150,7 +31142,6 @@
                       ( COMB-KOH1HKNNUM        =   "970" ) AND
                       ( WK-1001-DAISANKBN      =    "1"  ))
                   OR (  WK-TAIHI-FTNGAKEN(1)   =     1    )
-                  OR (  WK-KUMAMOTO-FLG(1)     =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH1COMPFTN  =
@@ -31197,7 +31188,6 @@
                                            NOT =    ZERO ) AND
                       ( FLG-SYOUKAN(2)         =    "1"  ))
                   OR (  WK-TAIHI-FTNGAKEN(2)   =     1    )
-                  OR (  WK-KUMAMOTO-FLG(2)     =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -31229,7 +31219,6 @@
                                            NOT =    ZERO ) AND
                       ( FLG-SYOUKAN(2)         =    "1"  ))
                   OR (  WK-TAIHI-FTNGAKEN(2)   =     1    )
-                  OR (  WK-KUMAMOTO-FLG(2)     =     1    )
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH2COMPFTN  =
@@ -31265,7 +31254,6 @@
              IF    WK-KOH-COMPFTN(3)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
                   IF (WK-TAIHI-FTNGAKEN(3) = 1)
-                  OR (WK-KUMAMOTO-FLG(3)   = 1)
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -31286,7 +31274,6 @@
              IF    WK-DAY-KOH-COMPFTN(3)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(3) = SPACE
                   IF (WK-TAIHI-FTNGAKEN(3) = 1)
-                  OR (WK-KUMAMOTO-FLG(3)   = 1)
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH3COMPFTN  =
@@ -31322,7 +31309,6 @@
              IF    WK-KOH-COMPFTN(4)  =  ALL"9"                           
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
                   IF (WK-TAIHI-FTNGAKEN(4) = 1)
-                  OR (WK-KUMAMOTO-FLG(4)   = 1)
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -31343,7 +31329,6 @@
              IF    WK-DAY-KOH-COMPFTN(4)  =  ALL"9"
                 IF   WK-TAIHI-RECEFTNDSPKBN(4) = SPACE
                   IF (WK-TAIHI-FTNGAKEN(4) = 1)
-                  OR (WK-KUMAMOTO-FLG(4)   = 1)
                     CONTINUE
                   ELSE
                     COMPUTE  LNK-SYU-KOH4COMPFTN  =
@@ -31496,25 +31481,21 @@
       *
            MOVE       ZERO         TO    FLG-FTNGAKEN.
            IF   WK-TAIHI-FTNGAKEN(1)    =    1
-           OR   WK-KUMAMOTO-FLG(1)      =    1
                IF   FLG-HIKAKU     =     1
                     MOVE    1      TO    FLG-FTNGAKEN
                END-IF
            END-IF.
            IF   WK-TAIHI-FTNGAKEN(2)    =    1
-           OR   WK-KUMAMOTO-FLG(2)      =    1
                IF   FLG-HIKAKU     =     2
                     MOVE    1      TO    FLG-FTNGAKEN
                END-IF
            END-IF.
            IF   WK-TAIHI-FTNGAKEN(3)    =    1
-           OR   WK-KUMAMOTO-FLG(3)      =    1
                IF   FLG-HIKAKU     =     3
                     MOVE    1      TO    FLG-FTNGAKEN
                END-IF
            END-IF.
            IF   WK-TAIHI-FTNGAKEN(4)    =    1
-           OR   WK-KUMAMOTO-FLG(4)      =    1
                IF   FLG-HIKAKU     =     4
                     MOVE    1      TO    FLG-FTNGAKEN
                END-IF
