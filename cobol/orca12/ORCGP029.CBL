@@ -52,6 +52,7 @@
       *  04.07.00    NACL-多々納  12/12/21  レセプト分割対応
       *  04.07.00    NACL-多々納  14/02/XX  患者介護情報追加対応
       *  04.07.00    NACL-多々納  14/03/XX  地域包括診療対象疾病対応
+      *  04.08.00    NACL-多々納  15/11/XX  APIV3(HAORI)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -390,17 +391,20 @@
                PERFORM 1001-HKNCOMBI-KIKANCHK-SEC
                MOVE    1               TO  FLG-END
            END-IF
+      *APIV3   チェックのみ
+           IF      SPA-P02-GAMEN   =   "APICHK"
+               MOVE    1               TO  FLG-END
+           END-IF
       *
            IF      FLG-END         =   ZERO
                IF      SPA-P02-GAMEN   =   "API"
-      *        ＡＰＩ更新処理
+      *            ＡＰＩ更新処理
                    PERFORM 300-API-KOUSIN-SEC
                ELSE
       *
-      *        ＤＢ更新処理
-               PERFORM 200-MAIN-SEC
-           END-IF
-      *
+      *            ＤＢ更新処理
+                   PERFORM 200-MAIN-SEC
+               END-IF
            END-IF
       *
            MOVE    SPA-P02KYOUTU   TO  SPA-WORK
@@ -2274,6 +2278,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-HMS        TO  PTKOHFTN-UPHMS
       *
                MOVE    SPA-OPID            TO  PTKOHFTN-OPID
+               MOVE    SPACE               TO  PTKOHFTN-TERMID
       *
       *        新規
                MOVE    SPA-GMN-PTID        TO  PTKOHFTN-PTID
@@ -3008,6 +3013,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        ADD     1        TO  WRK-KOH-CNT
                    WHEN    "HKNCOMBI"
                        PERFORM 250-HKNCOMBI-SYORI-SEC
+      *            労災保険
+                   WHEN    "PTRSIINF"
+                       IF      SPA-RSIAPI-FLG      =   "1"
+                           PERFORM 292-PTRSIINF-SYORI-SEC
+                       END-IF
                END-EVALUATE
       *
                MOVE    "tbl_para"          TO  MCP-TABLE

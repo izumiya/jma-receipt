@@ -195,6 +195,8 @@
       *
       *    労災保険パラメタデータ
            03  SPA-RSPAR-FLG                PIC X(01).
+      *API 労災保険処理
+           03  SPA-RSIAPI-FLG               PIC X(01).
       *
       *    ＱＲ情報有無
            03  SPA-QRFLG                    PIC 9(01).

@@ -1,0 +1,98 @@
+xml_patientmodv3req3 {
+	context	        int;
+	object		object;
+	mode		int;
+	recordname	varchar(128);
+	patientmodreq {
+	Request_Number		varchar(2);
+	Karte_Uid		varchar(36);
+	Orca_Uid		varchar(36);
+	Base_Date		varchar(10);
+	Select_Answer		varchar(03);
+	Continue_Mode		varchar(05);
+	Patient_Information	{
+		Patient_ID		varchar(20);
+		WholeName		varchar(100);
+		WholeName_inKana	varchar(100);
+		BirthDate		varchar(10);
+		Sex			varchar(1);
+        };
+#-----> 労災情報
+	Accident_Insurance_Information	{
+	    Accident_Insurance_Info 	{
+#-----> 	処理区分
+            	Accident_Mode			varchar(6);
+#-----> 	労災保険ＩＤ
+		InsuranceProvider_Id		varchar(10);
+#-----> 	労災公費ＩＤ
+		PublicInsurance_Id		varchar(10);
+#-----> 	労災保険の種類
+		InsuranceProvider_Class		varchar(03);
+		InsuranceProvider_WholeName	varchar(20);
+#-----> 	労災保険区分
+		Accident_Insurance          	varchar(01);
+#-----> 	労災保険名称
+		Accident_Insurance_WholeName	varchar(50);
+#-----> 	傷病の部位
+		Disease_Location		varchar(100);
+#-----> 	傷病年月日
+		Disease_Date			varchar(10);
+#-----> 	療養開始日
+		Accident_StartDate		varchar(10);
+#-----> 	療養終了日
+		Accident_ExpiredDate		varchar(10);
+#-----> 	労働保険番号
+		Accident_Insurance_Number	varchar(14);
+#-----> 	年金証書番号
+		PensionCertificate_Number	varchar(09);
+#-----> 	災害区分
+		Accident_Class			varchar(01);
+#-----> 	労働基準監督署コード
+		Labor_Station_Code		varchar(05);
+#-----> 	新規継続区分
+		Accident_Continuous		varchar(01);
+#-----> 	転帰事由
+		Outcome_Reason	     		varchar(01);
+#-----> 	四肢特例区分
+		Limbs_Exception     		varchar(01);
+#----->
+		Liability_Office_Information	{
+#-----> 	事業所名称
+			L_WholeName		varchar(80);
+#-----> 	        所在地都道府県
+			Prefecture_Information	{
+				P_WholeName	varchar(20);
+				P_Class		varchar(01);
+				P_Class_Name	varchar(02);
+				};
+#-----> 	        所在地郡市
+			City_Information	{
+				C_WholeName	varchar(80);
+				C_Class		varchar(01);
+				C_Class_Name	varchar(02);
+				};
+			};
+#-----> 	労災レセ回数記載 基準年月
+		Accident_Base_Month		varchar(07);
+#-----> 	労災レセ回数記載 回数
+		Accident_Receipt_Count 		varchar(03);
+#-----> 	自賠責請求区分
+		Liability_Insurance		varchar(01);
+#-----> 	自賠責保険会社名
+		Liability_Insurance_Office_Name	varchar(80);
+#-----> 	自賠責担当医
+		Liability_Physician_Code	varchar(05);
+#-----> 	アフターケア  健康管理手帳番号
+		PersonalHealthRecord_Number	varchar(13);
+		Damage_Class	{
+#-----> 	        損傷区分
+			D_Code			varchar(03);
+			};
+#-----> 	第三者行為  現物支給区分
+		Third_Party_Supply		varchar(1);
+#-----> 	第三者行為  特記事項区分
+		Third_Party_Report		varchar(1);
+            } [40];
+        };
+    };
+};

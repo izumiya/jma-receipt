@@ -4494,6 +4494,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SYS-1050-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY-SEC
            IF    ( FLG-SYSKANRI        =   ZERO )
+             AND  (SPA-GMN-SYORI       =   2    )
                PERFORM 49051-SYS1050-UPD-SEC
                MOVE    SMCNDATE-YMD        TO  SYS-1050-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYS-1050-UPHMS

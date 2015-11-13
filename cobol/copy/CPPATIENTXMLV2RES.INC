@@ -176,7 +176,7 @@
       *                  Ï«Æ¯ÊÝ¸±ÈÖ¹æ
                          07  PTRES-ACCIDENT-NUMBER         PIC X(14).
       *                  Ç¯¶â¾Ú½ñÈÖ¹æ
-                         07  PTRES-PENSIONCERTIFICATE      PIC X(08).
+                         07  PTRES-PENSIONCERTIFICATE      PIC X(09).
       *                  ºÒ³²¶èÊ¬¡ÊÌ¾¾Î¡Ë
                          07  PTRES-ACCIDENT-CLASS          PIC X(20).
       *                  Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥É

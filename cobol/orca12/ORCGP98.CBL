@@ -519,6 +519,7 @@
            MOVE    "P98"               TO  SPA-GMN981-MOTOPG
            MOVE    SPACE               TO  P981
       *
+           INITIALIZE                      P981
            MOVE   "NEW"                TO  MCP-PUTTYPE.
            MOVE   "P981   "            TO  MCP-WINDOW.
       *

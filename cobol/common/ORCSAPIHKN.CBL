@@ -31,6 +31,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  13/11/01  ÊÝ¸±ÁÈ¹ç¤»£²£°·ï°Ê¾åÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/03/XX  Á°´ü¹âÎð¼Ô£²³äÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/11/XX  ÊÝ¸±³ÎÇ§ÆüÉÕÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  15/10/XX  Êä½õ¶èÊ¬Ì¾¾Î¥µ¥ÖÂÐ±þ
       *****************************************************************
       *
       *
@@ -246,6 +247,9 @@
            COPY    "CPORCSKANACHK.INC".
       *    Ç¯Îð¡¦ÉéÃ´³ä¹ç¥µ¥Ö
       ***  COPY    "CPORCSAGECHK.INC".
+      *H27.10
+      *    Êä½õ¶èÊ¬Ì¾¾ÎÊÔ½¸¥Ñ¥é¥á¥¿
+           COPY    "CPORAPI012SUB1.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -959,7 +963,9 @@
                    COMPUTE IDXH            =   IDXH    -   1
                END-PERFORM
                MOVE    20                  TO  IDX-TBL
-               MOVE    9                   TO  ORCSAPIHKN-ERRCD
+               IF      ORCSAPIHKN-ERRCD    =   ZERO
+                   MOVE    9                   TO  ORCSAPIHKN-ERRCD
+               END-IF
            ELSE
                MOVE    1                   TO  IDXH
                PERFORM VARYING     IDX      FROM    1   BY  1
@@ -989,6 +995,10 @@
                        MOVE    1               TO  FLG-COMBIOK
                    END-IF
                END-PERFORM
+      *        ÂÐ¾Ý¤Ê¤·
+               IF      FLG-COMBIOK         =   ZERO
+                   MOVE    4                   TO  ORCSAPIHKN-ERRCD
+               END-IF
            END-IF
            .
        290-HKNCOMBI-OUTHENSYU-EXT.
@@ -1011,6 +1021,10 @@
                    MOVE    1               TO  FLG-COMBIOK
                END-IF
            END-PERFORM
+      *    ÂÐ¾Ý¤Ê¤·
+           IF      FLG-COMBIOK         =   ZERO
+               MOVE    4                   TO  ORCSAPIHKN-ERRCD
+           END-IF
            .
        291-HKNCOMBI-ONLYHEN-EXT.
            EXIT.
@@ -1120,161 +1134,17 @@
       *****************************************************************
        29013-HOJOKBN-NAME-HEN-SEC             SECTION.
       *
-           EVALUATE    TBL-COMB-HKNNUM (IDX)
-      *    Á¥°÷
-               WHEN    "002"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "1"
-                       MOVE    "¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "2"
-                       MOVE    "²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "3"
-                       MOVE    "ÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "7"
-                       MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "8"
-                       MOVE    "£²³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "9"
-                       MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "A"
-                       MOVE    "£±³ä¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "B"
-                       MOVE    "£±³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "C"
-                       MOVE    "£±³äÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "D"
-                       MOVE    "£²³ä¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "E"
-                       MOVE    "£²³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "F"
-                       MOVE    "£²³äÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "G"
-                       MOVE    "£³³ä¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "H"
-                       MOVE    "£³³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "I"
-                       MOVE    "£³³äÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
-      *    ¸å´ü¹âÎð¼Ô
-               WHEN    "039"
-               WHEN    "040"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "1"
-                       MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "3"
-                       MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
-      *        ¶¦ºÑ
-               WHEN    "031"
-               WHEN    "032"
-               WHEN    "033"
-               WHEN    "034"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "2"
-                       MOVE    "²¼Á¥£³·î"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "7"
-                       MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "8"
-                       MOVE    "£²³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "9"
-                       MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "B"
-                       MOVE    "£±³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "E"
-                       MOVE    "£²³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "H"
-                       MOVE    "£³³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
-      *        ¹ñÊÝ
-               WHEN    "060"
-               WHEN    "068"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "0"
-                       MOVE    "Ìµ¤·"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "1"
-                       MOVE    "£±³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "2"
-                       MOVE    "£²³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "3"
-                       MOVE    "£³³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "4"
-                       MOVE    "³°£±³ä Æþ£°³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "5"
-                       MOVE    "³°£²³ä Æþ£±³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "6"
-                       MOVE    "³°£³³ä Æþ£²³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
-      *        ¼£¸³
-               WHEN    "900"
-               WHEN    "901"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "1"
-                       MOVE    "²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "2"
-                       MOVE    "Èó²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
-      *        ¼«Èñ
-               WHEN    "980"   THRU   "989"
-               EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                   WHEN    "1"
-                       MOVE    "²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   WHEN    "2"
-                       MOVE    "Èó²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-               END-EVALUATE
       *
-               WHEN    OTHER
-                   IF      TBL-COMB-HKNNUM (IDX)(1:1)  =   "9"
-                       CONTINUE
-                   ELSE
-      *            ¶¨²ñÅù
-                   EVALUATE    TBL-COMB-HOJOKBN (IDX)
-                       WHEN    "9"
-                           MOVE    "£±³ä" 
+           INITIALIZE                  ORAPI012SUB1AREA
+           MOVE    TBL-COMB-HKNNUM (IDX)   TO  API012SUB1-HKNNUM
+           MOVE    TBL-COMB-HOJOKBN (IDX)  TO  API012SUB1-HOJOKBN
+           MOVE    SPA-SYSYMD              TO  API012SUB1-SYSYMD
+           CALL    "ORAPI012SUB1"          USING
+                                           ORAPI012SUB1AREA
+                                           SPA-AREA
+           MOVE    API012SUB1-HOJOKBN-NAME
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                       WHEN    "8"
-                           MOVE    "£²³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                       WHEN    "7"
-                           MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
-                   END-EVALUATE
-                   END-IF
-           END-EVALUATE
+      *
            .
        29013-HOJOKBN-NAME-HEN-EXT.
            EXIT.

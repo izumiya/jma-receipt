@@ -43,6 +43,7 @@
       *  04.07.00    NACL-多々納  13/07/XX  労災選択対応
       *                                     第三者行為対応
       *  04.07.00    NACL-多々納  14/10/XX  第三者現物支給対象等対応
+      *  04.08.00    NACL-多々納  15/11/XX  APIV3(HAORI)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -107,6 +108,8 @@
                05  WRK-SMM         PIC 9(02).
                05  WRK-SDD         PIC 9(02).
       *
+           03  WRK-SYSYMD          PIC X(08).
+      *
            03  WRK-EDANUM          PIC 9(04).
       *
            03  WRK-N-IDX           PIC 9(04).
@@ -122,6 +125,9 @@
            03  WRK-IN-SYMD             PIC X(08).
            03  WRK-IN-EYMD             PIC X(08).
            03  WRK-IDR                 PIC 9(03).
+      *
+      *APIV3
+           03  WRK-PARA-GYOUMUID       PIC X(04).
       *
       *    半角全角変換
       *01  WRK-HENKAN-AREA.
@@ -521,6 +527,11 @@
       *
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
+      *APIV3
+           IF      WRK-PARA-GYOUMUID   NOT =   SPACE
+               MOVE    WRK-PARA-GYOUMUID   TO  PARA-GYOUMUID
+           END-IF
+      *
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "PTRSIINF"          TO  PARA-FILEMEI
            MOVE    SPA-NAI2D-RSHKN-EDANUM
@@ -554,6 +565,14 @@
       *    労災保険区分
            MOVE    PTRSI-HKNKBN        TO  SPA-GMN2D-HKNKBN
            MOVE    PTRSI-HKNKBN        TO  SPA-NAI2D-HKNKBN-MAE
+      *APIV3
+           IF      WRK-PARA-GYOUMUID   NOT =   SPACE
+      *        ＩＤ未設定を新規分とする
+               IF     (PTRSI-HKNID         =   ZERO )
+                  AND (PTRSI-KOHID         =   ZERO )
+                   MOVE    SPACE           TO  SPA-NAI2D-HKNKBN-MAE
+               END-IF
+           END-IF
       *    保険番号
            MOVE    PTRSI-HKNNUM        TO  SPA-NAI2D-HKNNUM
       *    患者交付番号
@@ -669,6 +688,11 @@
       *        第三者
                WHEN    "6"
                    PERFORM 30013-DAISAN-HEN-SEC
+      *        アフターケア
+               WHEN    "3"
+      *            損傷区分
+                   MOVE    PTRSI-SINSATUYMD    TO  WRK-SYSYMD
+                   PERFORM 30021-SONSHOUKBN-SET-SEC
            END-EVALUATE
       *
            .
@@ -954,11 +978,27 @@
            MOVE    2                   TO  SPA-GMN2D-D3-TOKKIKBN-MAX
       *
       *    損傷区分
+           MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
+           PERFORM 30021-SONSHOUKBN-SET-SEC
+      *
+      *
+           .
+       3002-COMBBOX-HEX-EXT.
+           EXIT.
+      *
+      *H27.11
+      *****************************************************************
+      *    損傷区分編集処理
+      *****************************************************************
+       30021-SONSHOUKBN-SET-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  SPA-GMN2D-SONSHOUKBN-MAX
+      *
            MOVE    SPACE               TO  SYS-4002-REC
            INITIALIZE                  SYS-4002-REC
            MOVE    "4002"              TO  SYS-4002-KANRICD
-           MOVE    SPA-SYSYMD          TO  SYS-4002-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-4002-EDYUKYMD
+           MOVE    WRK-SYSYMD          TO  SYS-4002-STYUKYMD
+           MOVE    WRK-SYSYMD          TO  SYS-4002-EDYUKYMD
       *    システム管理検索
            MOVE    SPA-HOSPNUM         TO  SYS-4002-HOSPNUM
            MOVE    SYS-4002-REC        TO  MCPDATA-REC
@@ -1001,9 +1041,8 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-      *
            .
-       3002-COMBBOX-HEX-EXT.
+       30021-SONSHOUKBNHEX-EXT.
            EXIT.
       *
       *!!!
@@ -1676,6 +1715,11 @@
       *    次
                WHEN    "CLICKED"       ALSO    "B07"
                    PERFORM 460-NEXT-TBL-SEC
+      *
+      *H27.11
+      *   API 処理
+               WHEN    "CLICKED"       ALSO    "APIV3"
+                   PERFORM 4199-API-SYORI-SEC
            END-EVALUATE
       *
            .
@@ -1903,8 +1947,8 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4101-SINSATUEND-CHK-SEC
            END-IF
-           .
       *
+           .
        4102-KIHON-CHK-EXT.
            EXIT.
       *
@@ -3847,6 +3891,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
+      *APIV3
+           IF      WRK-PARA-GYOUMUID   NOT =   SPACE
+               MOVE    WRK-PARA-GYOUMUID   TO  PARA-GYOUMUID
+           END-IF
+      *
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "PTRSIINF"          TO  PARA-FILEMEI
            MOVE    SPA-NAI2D-RSHKN-EDANUM
@@ -3873,6 +3922,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *        追加
                INITIALIZE                      PARA-REC
                MOVE    "P02"               TO  PARA-GYOUMUID
+      *APIV3
+               IF      WRK-PARA-GYOUMUID   NOT =   SPACE
+                   MOVE    WRK-PARA-GYOUMUID   TO  PARA-GYOUMUID
+               END-IF
                MOVE    SPA-TERMID          TO  PARA-TERMID
                MOVE    "PTRSIINF"          TO  PARA-FILEMEI
                MOVE    SPA-NAI2D-RSHKN-EDANUM
@@ -3949,7 +4002,69 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        49013-PTKOHINF-HEN-EXT.
            EXIT.
-      *!!!!!!!!!!!!!!!!
+      *
+      *H27.11
+      *!APIV3
+      *****************************************************************
+      *    ＡＰＩ編集処理
+      *****************************************************************
+       4199-API-SYORI-SEC         SECTION.
+      *
+      *    API継続
+           IF      SPA-RSIAPI-FLG      =   "1"
+               MOVE    "AP12"             TO  WRK-PARA-GYOUMUID
+               MOVE    1                  TO  SPA-NAI2D-RSHKN-EDANUM
+           ELSE
+      *
+      *    労災保険情報
+           MOVE    SPACE               TO  SPA-P02D-AREA
+           INITIALIZE                      SPA-P02D-AREA
+      *    コンボボクスの編集
+           PERFORM 3002-COMBBOX-HEX-SEC
+      *    労災内容編集
+           MOVE    "AP12"             TO  WRK-PARA-GYOUMUID
+           MOVE    1                  TO  SPA-NAI2D-RSHKN-EDANUM
+           PERFORM 3001-RSHKN-SET-SEC
+      *
+      *    区分毎コンボボクス編集
+           PERFORM 41012-SINKEI-SET-SEC
+      *    コンボボクスの編集
+           PERFORM 3003-COMBBOX-SET-SEC
+      *
+           END-IF
+      *
+      *    内容チェック
+      *    基本チェックと別画面処理
+           PERFORM 4102-KIHON-CHK-SEC
+      *    登録時、必須入力チェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4109-TOUROKU-CHK-SEC
+           END-IF
+      *
+      *
+      *    患者保険処理
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-GMN2D-HKNKBN    =   "6"
+      *            第三者行為
+                   PERFORM 49013-PTKOHINF-HEN-SEC
+               ELSE
+                   PERFORM 49012-PTHKNINF-HEN-SEC
+               END-IF
+           END-IF
+      *
+      *    労災保険編集処理
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4905-PTRSIINF-HEN-SEC
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-ERRMSG
+           IF      SPA-ERRCD       NOT =   SPACE
+               PERFORM 510-ERRMSG-SET-SEC
+           END-IF
+      *
+           .
+       4199-API-SYORI-EXT.
+           EXIT.
       *
       *****************************************************************
       *    戻る　処理
@@ -4030,6 +4145,34 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    エラーメッセージ表示理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
+      *
+      *    エラーメッセージ編集
+           PERFORM 510-ERRMSG-SET-SEC
+      *
+           MOVE    SPACE               TO  PERR
+           MOVE    SPA-ERRCD           TO  PERR-ERRCODE
+           MOVE    SPA-ERRMSG          TO  PERR-ERRMSG
+           MOVE    "B01"               TO  MCP-WIDGET
+      *
+           MOVE    "P02D"              TO  SPA-MOTOPG
+           MOVE    "PERR"              TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"               TO  MCP-PUTTYPE.
+           MOVE    "PERR"              TO  MCP-WINDOW.
+      *
+           PERFORM 900-PUT-WINDOW.
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       510-ERRMSG-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラーメッセージ編集
+      *****************************************************************
+       510-ERRMSG-SET-SEC        SECTION.
+      *
            MOVE    SPACE               TO  SPA-ERRMSG
       *
            EVALUATE    SPA-ERRCD
@@ -4213,24 +4356,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                INTO  SPA-ERRMSG
                    END-STRING
            END-EVALUATE
-      *
-           MOVE    SPACE               TO  PERR
-           MOVE    SPA-ERRCD           TO  PERR-ERRCODE
-           MOVE    SPA-ERRMSG          TO  PERR-ERRMSG
-           MOVE    "B01"               TO  MCP-WIDGET
-      *
-           MOVE    "P02D"              TO  SPA-MOTOPG
-           MOVE    "PERR"              TO  SPA-SAKIPG
-      *
-           MOVE    "NEW"               TO  MCP-PUTTYPE.
-           MOVE    "PERR"              TO  MCP-WINDOW.
-      *
-           PERFORM 900-PUT-WINDOW.
-      *
-           MOVE    1                   TO  FLG-END
-      *
            .
-       510-ERRMSG-EXT.
+       510-ERRMSG-SET-EXT.
            EXIT.
       *
       *****************************************************************

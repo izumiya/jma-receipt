@@ -82,7 +82,7 @@ xml_patientinfov2res {
 #-----> 	Ï«Æ¯ÊÝ¸±ÈÖ¹æ
 			Accident_Insurance_Number	varchar(14);
 #-----> 	Ç¯¶â¾Ú½ñÈÖ¹æ
-			PensionCertificate_Number	varchar(08);
+			PensionCertificate_Number	varchar(09);
 #-----> 	ºÒ³²¶èÊ¬Ì¾¾Î
 			Accident_Class			varchar(20);
 #-----> 	Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥É

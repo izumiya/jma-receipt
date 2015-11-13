@@ -2043,6 +2043,11 @@
                    COMPUTE SPA-GMN-CUR     =   SPA-GMN-CUR
                                            +  ((IDX-K  -   1  )  *  6 )
                END-IF
+      *APIV3ÂÐ±þ
+               IF     (SPA-ERRCD       NOT =   SPACE )  OR
+                      (SPA-PIDCD       NOT =   SPACE )
+                   MOVE    IDX-K           TO  SPA-KOH-ERRIDX
+               END-IF
            END-PERFORM
       *
            .

@@ -772,14 +772,14 @@
                     06  P02-P026-HDLST.
                       07  P02-P026-HDLST-COUNT   PIC S9(9)   BINARY.
                       07  P02-P026-HDLST-ROW PIC S9(9)   BINARY.
-                      07  P02-ITEM        OCCURS  10 TIMES.
+                      07  P02-ITEM        OCCURS  50 TIMES.
                         08  P02-P026-THDNUM PIC X(3).
                         08  P02-P026-THDSRYYM  PIC X(10).
                         08  P02-P026-THDDAY    PIC X(2).
                         08  P02-P026-TDNYUGAI  PIC X(20).
                         08  P02-P026-TDRESEKBN  PIC X(20).
                       07  P02-P026-HDLST-SELECT
-                              PIC X       OCCURS  10 TIMES.
+                              PIC X       OCCURS  50 TIMES.
                   05  P02-P026-HDSELNUM.
                     06  P02-VALUE   PIC S9(3).
                   05  P02-P026-HD-NYUGAI-COMB.

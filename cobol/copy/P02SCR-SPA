@@ -123,9 +123,13 @@
                        09  SPA-GMN-DISH        PIC X(01).
                        09  SPA-GMN-DISCOUNTKBN-MEI
                                                PIC X(20).
-                   07  SPA-GMN-DISCOUNT        PIC X(14).
-                   07  SPA-GMN-CONDITION       PIC X(23)
-                                               OCCURS   3.
+                   07  SPA-GMN-DISCOUNT.
+                       09  SPA-GMN-DISCOUNT-CD     PIC X(02).
+                       09  SPA-GMN-DISCOUNT-MEI    PIC X(12).
+                   07  SPA-GMN-CONDITION       OCCURS   3.
+                       09  SPA-GMN-CONDITION-CD    PIC X(02).
+                       09  SPA-GMN-COND-H          PIC X(01).
+                       09  SPA-GMN-CONDITION-MEI   PIC X(20).
       *            入金方法
                    07  SPA-GMN-NYUKIN-HOHO-G.
                        09  SPA-GMN-NYUKIN-HOHO     PIC X(02).
@@ -1032,6 +1036,7 @@
                05  SPA-GMN26-SYORI           PIC 9(01).
                05  SPA-P026-KOHKEIFLG        PIC 9(01).
                05  SPA-NAI26-HDSELNUM-CHK    PIC 9(03).
+               05  SPA-NAI26-INIT                PIC 9(01).
       *
       *        初期設定内容
                05  SPA-GMN26-INIT.
@@ -1118,7 +1123,7 @@
       *
       *        患者レセプト分割リスト
                05  SPA-GMN26-HDLIST-TBL.
-                   07  SPA-GMN26-HDLIST-OCC         OCCURS  20.
+                   07  SPA-GMN26-HDLIST-OCC         OCCURS  50.
                        09  SPA-GMN26-THDNUM          PIC 9(03).
                        09  SPA-GMN26-THDSRYYM        PIC X(06).
                        09  SPA-GMN26-THDDAY          PIC X(02).

@@ -56,7 +56,8 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/03/XX  ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/06/16  ¿ÇÎÅ²Ê¡¦ÊÝ¸±ÁÈ¹ç¤»·ï¿ôÂÐ±þ
-      * 04.08.00     NACL-Â¿¡¹Ç¼  15/08/10  ÎÎ¼ý¡¦ÌÀºÙ¡¡ÀÁµá½ñÉÔÍ×ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  15/08/05  ÎÎ¼ý¡¦ÌÀºÙ¡¡ÀÁµá½ñÉÔÍ×ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  15/11/XX  ¥ì¥»¥×¥ÈÊ¬³ä£µ£°·ïÂ¾ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -164,6 +165,10 @@
       *
            03  WRK-HFTNLST2-ROW        PIC S9(09).
            03  WRK-HKNKUMI-ROW         PIC S9(09).
+      *
+           03  WRK-P026-ROW1           PIC S9(09).
+           03  WRK-P026-ROW2           PIC S9(09).
+      *
       *   Ç¯ÎðÉ½¼¨
        01  WRK-NENREI-AREA.
            03  WRK-YMDS1.
@@ -3364,6 +3369,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    P02-P027-HKNKUMI-ROW    TO  WRK-HKNKUMI-ROW
            END-IF
       *
+           IF     (SPA-NAI26-INIT      =   1      )
+             OR   (SPA-P02-GAMEN    NOT =   "P026")
+               MOVE    ZERO                TO  WRK-P026-ROW1
+               MOVE    ZERO                TO  WRK-P026-ROW2
+               MOVE    ZERO                TO  SPA-NAI26-INIT
+           ELSE
+               MOVE    P02-P026-HDLST-ROW  TO  WRK-P026-ROW2
+               MOVE    P02-P026-TOK-ROW    TO  WRK-P026-ROW1
+           END-IF
+      *
            MOVE    SPACE               TO  P02
            INITIALIZE                      P02
       *
@@ -4498,6 +4513,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        2001-P026-SET-SEC         SECTION.
       *
+           MOVE    WRK-P026-ROW1       TO  P02-P026-TOK-ROW
+           MOVE    WRK-P026-ROW2       TO  P02-P026-HDLST-ROW
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                     UNTIL    ( IDX     >   SPA-GMN26-TMAX )
                MOVE    IDX                     TO  WRK-RENNUMZ3
@@ -4539,10 +4557,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN26-TOKMAX    TO  P02-P026-TOKCD-COUNT
       *
       *    ¥ì¥»¥×¥ÈÊ¬³ä
-      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                     UNTIL    ( IDX     >   SPA-GMN26-HDLSTMAX )
-                        OR   ( IDX     >   10    )
+                        OR   ( IDX     >   50    )
                MOVE    SPA-GMN26-THDNUM (IDX)  TO  WRK-RENNUMZ3
                MOVE    WRK-RENNUMZ3            TO  P02-P026-THDNUM (IDX)
                MOVE    SPA-GMN26-THDSRYYM (IDX)
