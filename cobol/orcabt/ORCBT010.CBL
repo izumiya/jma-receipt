@@ -132,6 +132,8 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    15/10/08  複数枚レセプト分割対応
       *                                     公費単独の２回以上の分割対応
+      *  04.08.03    NACL-藤原    15/11/13  診療データがない場合は対象の
+      *                                     病名があっても病名データも作成しない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2931,7 +2933,9 @@ grpsys                                         SPA-AREA
            END-IF
       *
       *    病名ファイル出力処理
-           PERFORM 20022-BYOMEI-HENSYU-SEC
+           IF      WRK-TOUKEI01-HOSPNUM (1)    >   ZERO
+               PERFORM 20022-BYOMEI-HENSYU-SEC
+           END-IF
            .
        2002-KIHON-WRITE-EXT.
            EXIT. 
