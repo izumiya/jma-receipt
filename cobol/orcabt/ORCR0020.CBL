@@ -273,6 +273,8 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
+      *  04.08.03    NACL-藤原    15/10/08  複数枚レセプト分割対応
+      *                                     公費単独の２回以上の分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -423,11 +425,15 @@
       *
        01  KEY-AREA1                           VALUE   LOW-VALUE.
            03  KEY-NEW1.
-               05  KEY-N-SRYYM                         PIC 9(06).
-               05  KEY-N-PTID                          PIC 9(10).
+               05  KEY-NEW11.
+                   07  KEY-N-SRYYM                     PIC 9(06).
+                   07  KEY-N-PTID                      PIC 9(10).
+               05  KEY-N-RECEIPT-KBN                   PIC X(10).
            03  KEY-OLD1.
-               05  KEY-O-SRYYM                         PIC 9(06).
-               05  KEY-O-PTID                          PIC 9(10).
+               05  KEY-OLD11.
+                   07  KEY-O-SRYYM                     PIC 9(06).
+                   07  KEY-O-PTID                      PIC 9(10).
+               05  KEY-O-RECEIPT-KBN                   PIC X(10).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1283,66 +1289,74 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                INITIALIZE                  WRK-SEIHO-RECE01-AREA
                                            TABLE-RECE09-AREA
       *
-               MOVE    KEY-NEW1        TO  KEY-OLD1
+               MOVE    KEY-NEW11       TO  KEY-OLD11
                PERFORM         UNTIL   FLG-RECE01      =   1
                                OR      FLG-END         =   1 
-                               OR      KEY-NEW1    NOT =   KEY-OLD1
-      *            保険履歴情報編集処理
-                   IF      IDZ             =   1               
-                       PERFORM 230-RECE09-HENSYU-SEC
-                   END-IF
-      *            患者特記情報取得処理
-                   IF      IDZ             =   1               
-                       PERFORM 230-PTTOKKI-HENSYU-SEC
-                   END-IF
-      *            
-      *            編集処理
-      *            処理区分（社保・国保）により読み飛ばす
-                   EVALUATE    WRK-PARA-RECEKBN
-                       WHEN    "0"
-                           PERFORM 210-HENSYU-SEC
-                       WHEN    "1"
-                           IF      RECE01-HKNNUM   NOT =
-                                                       "060" AND "067"
-                                                   AND "068" AND "069"    
-                                                   AND "039" AND "040"    
+                               OR      KEY-NEW11   NOT =   KEY-OLD11
+                   MOVE    ZERO            TO  FLG-SEIHO
+                   INITIALIZE                  WRK-SEIHO-RECE01-AREA
+      *
+                   MOVE    KEY-NEW1        TO  KEY-OLD1
+                   PERFORM         UNTIL   FLG-RECE01      =   1
+                                   OR      FLG-END         =   1 
+                                   OR      KEY-NEW1    NOT =   KEY-OLD1
+                       IF      IDZ             =   1
+      *                    保険履歴情報編集処理
+                           PERFORM 230-RECE09-HENSYU-SEC
+      *                    患者特記情報取得処理
+                           PERFORM 230-PTTOKKI-HENSYU-SEC
+                       END-IF
+      *
+      *                編集処理
+      *                処理区分（社保・国保）により読み飛ばす
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "0"
                                PERFORM 210-HENSYU-SEC
-                           END-IF
-                       WHEN    "2"
-                           IF      RECE01-HKNNUM       =
+                           WHEN    "1"
+                               IF      RECE01-HKNNUM   NOT =
+                                                       "060" AND "067"
+                                                   AND "068" AND "069"
+                                                   AND "039" AND "040"
+                                   PERFORM 210-HENSYU-SEC
+                               END-IF
+                           WHEN    "2"
+                               IF      RECE01-HKNNUM       =
                                                        "060" OR  "067"
                                                    OR  "068" OR  "069"
-                               PERFORM 210-HENSYU-SEC
-                           END-IF
-                       WHEN    "7"
-                           IF      RECE01-HKNNUM       =
+                                   PERFORM 210-HENSYU-SEC
+                               END-IF
+                           WHEN    "7"
+                               IF      RECE01-HKNNUM       =
                                                        "039" OR  "040"
-                               PERFORM 210-HENSYU-SEC
+                                   PERFORM 210-HENSYU-SEC
+                               END-IF
+                       END-EVALUATE
+      *
+                       PERFORM     RECE01-READ-SEC
+      *
+      *                処理中止設定処理
+                       IF      CNT-IN-CANCEL       =   50
+                           MOVE    ZERO                TO  CNT-IN-CANCEL
+                           PERFORM 500-CANCEL-HENSYU-SEC
+                       END-IF
+                   END-PERFORM
+      *
+                   IF      IDZ             =   1               
+      *                生保単独レセの出力処理
+                       IF    ( WRK-SEIHO-RECE01-MAX    >   ZERO )
+                       AND   ( FLG-END                 =   ZERO )
+                           IF      FLG-RECE01          =   ZERO
+                               MOVE    RECE01-REC  TO  WRK-RECE01-REC
                            END-IF
-                   END-EVALUATE
-      *
-                   PERFORM     RECE01-READ-SEC
-      *
-      *            処理中止設定処理
-                   IF      CNT-IN-CANCEL       =   50
-                       MOVE    ZERO                TO  CNT-IN-CANCEL
-                       PERFORM 500-CANCEL-HENSYU-SEC
+                           PERFORM 250-SEIHO-RECE01-WRITE-SEC
+                           IF      FLG-RECE01          =   ZERO
+                               MOVE    WRK-RECE01-REC  TO  RECE01-REC
+                           END-IF
+                       END-IF
                    END-IF
                END-PERFORM
       *
                IF      IDZ             =   1               
-      *            生保単独レセの出力処理
-                   IF    ( WRK-SEIHO-RECE01-MAX    >   ZERO )
-                   AND   ( FLG-END                 =   ZERO )
-                       IF      FLG-RECE01          =   ZERO
-                           MOVE    RECE01-REC      TO  WRK-RECE01-REC
-                       END-IF
-                       PERFORM 250-SEIHO-RECE01-WRITE-SEC
-                       IF      FLG-RECE01          =   ZERO
-                           MOVE    WRK-RECE01-REC      TO  RECE01-REC
-                       END-IF
-                   END-IF
-      *
       *            保険履歴情報編集処理
                    PERFORM VARYING IDYY    FROM    1   BY  1
                            UNTIL   IDYY    >       100
@@ -4881,6 +4895,7 @@ grpsys     MOVE    RECE02-KEY          TO  RECE12-KEY1
            AND   (  WRK-KOH-01-HOSPNUM     >   ZERO )
                MOVE    WRK-KOH-RECE01-REC  TO  RECE01-REC
       *        ファイル編集処理
+               DISPLAY "SEH"
                PERFORM 2101-RECE02-HENSYU-SEC
            ELSE
                PERFORM VARYING IDXX    FROM    1   BY  1
@@ -4892,6 +4907,7 @@ grpsys     MOVE    RECE02-KEY          TO  RECE12-KEY1
                        MOVE    WRK-SEIHO-RECE01-REC (IDXX)
                                                TO  RECE01-REC
       *                ファイル編集処理
+               DISPLAY "SEH"
                        PERFORM 2101-RECE02-HENSYU-SEC
                    END-IF
                END-PERFORM
@@ -5555,8 +5571,12 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                  TO    KEY-N-PTID
                    MOVE    RECE01-SRYYM
                                  TO    KEY-N-SRYYM
+                   MOVE    RECE01-RECEIPT-KBN
+                                 TO    KEY-N-RECEIPT-KBN
       *
-                   DISPLAY "RECE01 " IDZ " PTNUM=" RECE01-PTNUM
+                   DISPLAY "RECE01 " IDZ " PTID=" RECE01-PTID 
+                                         " PTNUM=" RECE01-PTNUM 
+                           " RECEIPT-KBN=" RECE01-RECEIPT-KBN
            END-READ
            .
        RECE01-READ-EXT.

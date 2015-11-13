@@ -1,4 +1,4 @@
-      *******************************************************************
+       *******************************************************************
       * Project code name "ORCA"
       * 日医標準レセプトソフト（JMA standard receipt software）
       * Copyright(C) 2002 JMA (Japan Medical Association)
@@ -120,6 +120,9 @@
       *  04.07.03    NACL-藤原    14/12/08  月途中に公費の負担者番号等の
       *                                     変更があった場合の記載対応
       *                                     法別番号、適用開始日の順とする
+      *
+      *  04.08.01    NACL-藤原    15/10/08  複数枚レセプト分割対応
+      *                                     公費単独の２回以上の分割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -204,6 +207,8 @@
       *
            03  WRK-SEIHO-FLG           PIC 9(01).
       *
+           03  WRK-RECEIPT-KBN         PIC X(10).
+      *
       *    年齢
            03  WRK-NENREI              PIC 9(03).
       *    後期高齢者非該当フラグ
@@ -256,6 +261,9 @@
                05  WRK-KOHJKYSNUM      PIC  X(20).
       *
            03  TBL-MAX                 PIC 9(03).
+      *
+           03  ST-IDX                  PIC 9(03).
+      ***  03  ED-IDX                  PIC 9(03).
       *
       *    請求区分別公費情報（１：レセプト　２：請求書）
            03  WRK-SEIKYUKBN-KOHI-AREA.
@@ -411,6 +419,8 @@
            03  TBL-RECE61-KOH-AREA     OCCURS  10. 
       *       公費−法別番号
                05  TBL-RECE61-KOHHBTNUM    PIC X(02).
+      *    処理区分
+           03  TBL-RECE61-SYOKBN       PIC X(01).
       *     
        01  WRK-SEIHO-RECE61-REC. 
            COPY    "CPRCF061.INC"  REPLACING  //RECE61//
@@ -912,6 +922,9 @@ grpsys         MOVE    LNK-SYUBETU-HOSPNUM TO  COMB-HOSPNUM
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL   IDX2    >       10
                        OR      WRK-COMB-HKNCOMBINUM (IDX2) =   ZERO
+                   MOVE    SPACE               TO  WRK-ERR-AREA
+                   INITIALIZE                      WRK-ERR-AREA
+      *
                    MOVE    WRK-HKNCOMBI-REC (IDX2)
                                                TO  HKNCOMBI-REC    
                    PERFORM 20019-FILE-SYORI-SEC
@@ -2080,8 +2093,40 @@ grpsys         IF      TBL-RECE61-HOSPNUM (1)  =   ZERO
       *********    MOVE    4               TO  LNK-SYUBETU-RC
                    CONTINUE 
                ELSE
-      *            出力処理
-                   PERFORM   3001-RECESYUBETU-HENSYU-SEC
+                   MOVE    ZERO            TO  IDZZ
+      *
+                   IF      TBL-PT-HDIST-DAY-MAX
+                                           =   ZERO
+                       MOVE    1               TO  ST-IDX
+                       MOVE    SPACE           TO  WRK-RECEIPT-KBN
+      *                出力処理
+                       PERFORM 3001-RECESYUBETU-HENSYU-SEC
+                   ELSE
+                       MOVE    ZERO            TO  ST-IDX
+                       PERFORM         UNTIL   ST-IDX  =   999
+                           MOVE    SPACE           TO  WRK-RECEIPT-KBN
+                           MOVE    ZERO            TO  ST-IDX
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       100
+                                   OR      TBL-RECE61-HOSPNUM (IDXX)
+                                                   =   ZERO
+                               IF      TBL-RECE61-SYOKBN (IDXX)
+                                                   =   SPACE
+                                   MOVE    TBL-RECE61-RECEIPT-KBN (IDXX)
+                                                   TO  WRK-RECEIPT-KBN
+                                   MOVE    IDXX    TO  ST-IDX
+                                   MOVE    100     TO  IDXX
+                               END-IF 
+                           END-PERFORM
+      *
+                           IF      ST-IDX          >   ZERO
+      *                        出力処理
+                               PERFORM 3001-RECESYUBETU-HENSYU-SEC
+                           ELSE
+                               MOVE    999             TO  ST-IDX
+                           END-IF
+                       END-PERFORM
+                   END-IF
                END-IF
            END-IF
       *
@@ -2095,17 +2140,16 @@ grpsys         IF      TBL-RECE61-HOSPNUM (1)  =   ZERO
        3001-RECESYUBETU-HENSYU-SEC     SECTION.
       *
            MOVE    ZERO                TO  FLG-SEIHO
-                                           IDZZ
            INITIALIZE                      TBL-SEIHO-RECE61-AREA
                                            WRK-KOH-RECE61-REC
       *
            MOVE    ZERO                TO  WRK-SEIHO-FLG
-      *
       *    公費単独の退避（生保、中国残留邦人等、自立支援）
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       100
 grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                    OR      FLG-SEIHO                  =   1
+             IF      WRK-RECEIPT-KBN   =   TBL-RECE61-RECEIPT-KBN (IDXX)
                MOVE    TBL-RECE61-OCC (IDXX)   TO  WRK-RECE61-REC
       *
       *        公費単独の場合（精神入院、心身喪失以外）
@@ -2191,6 +2235,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                        END-IF
                    END-IF
                END-IF
+             END-IF
            END-PERFORM
       *
            IF      FLG-SEIHO           =   1
@@ -2201,6 +2246,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       100
 grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
+             IF      WRK-RECEIPT-KBN   =   TBL-RECE61-RECEIPT-KBN (IDXX)
                MOVE    TBL-RECE61-OCC (IDXX)   TO  WRK-RECE61-REC
       *
                MOVE    ZERO            TO  FLG-WRITE 
@@ -2342,6 +2388,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *            レセプト情報設定処理
                    PERFORM 30011-SYUBETUGET-CALL-SEC
                END-IF
+      *
+               MOVE    "1"                  TO  TBL-RECE61-SYOKBN (IDXX) 
+             END-IF
            END-PERFORM
       *
       *    公費単独レセの出力処理
