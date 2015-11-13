@@ -25602,8 +25602,10 @@
                    IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
                      IF  WK-TAIHI-CHITAIFLG(2) =  1
-                       MOVE  LNK-SYU-KOH-COMPFTN(1)
-                                            TO  WK-KOH-COMPFTN(2)
+                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(1) +  5
+                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
+                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
+                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(2)
                      ELSE
                        MOVE  WK-KOH-COMPFTN(1)
                                             TO  WK-KOH-COMPFTN(2)
@@ -25619,8 +25621,10 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(2)      < WK-KOH-COMPFTN(3)
                      IF  WK-TAIHI-CHITAIFLG(3) =  1
-                       MOVE  LNK-SYU-KOH-COMPFTN(2)
-                                            TO  WK-KOH-COMPFTN(3)
+                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(2) +  5
+                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
+                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
+                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(3)
                      ELSE
                        MOVE  WK-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
@@ -25636,8 +25640,10 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(3)      < WK-KOH-COMPFTN(4)
                      IF  WK-TAIHI-CHITAIFLG(4) =  1
-                       MOVE  LNK-SYU-KOH-COMPFTN(3)
-                                            TO  WK-KOH-COMPFTN(4)
+                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(3) +  5
+                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
+                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
+                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(4)
                      ELSE
                        MOVE  WK-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
