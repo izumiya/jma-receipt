@@ -84,7 +84,7 @@ xml_medicalv3res2 {
 #--- 診療内容
 	Medical_Information  {
 		Medical_Info  {
-			Medical_Class_Sub		varchar(02);
+			Medical_Class_Group		varchar(02);
 			Medical_Class			varchar(03);
 			Medical_Class_Name		varchar(40);
 			Medical_Class_Number		varchar(03);
