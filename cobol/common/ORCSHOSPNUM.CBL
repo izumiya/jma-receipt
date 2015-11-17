@@ -27,6 +27,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-多々納  15/04/28  パスワードチェック追加
+      *  04.08.00    NACL-太田    15/11/17  パスワードチェック廃止
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -92,9 +93,9 @@
            INITIALIZE                     FLG-AREA
       *
       *    パスワード登録チェック（API対応）
-           IF      SPA-MOTOPG          =   "API"
-               PERFORM 100-PASSWD-CHECK-SEC
-           END-IF
+      *    IF      SPA-MOTOPG          =   "API"
+      *        PERFORM 100-PASSWD-CHECK-SEC
+      *    END-IF
       *
       *    医療機関識別番号設定
            IF      SPA-ERRCD           =   SPACE
