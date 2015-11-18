@@ -1581,9 +1581,14 @@
                    MOVE    ZERO                TO  WRK-ZOGEN
                END-IF
       *        退院取消時は入院会計作成が退院日翌日からとなるので、
-      *        増減日数をマイナス１しておく
+      *        増減日数をマイナス１しておく（加算の上限日数が１日の時は
+      *        会計作成しない）
                IF    LNK-SCNYUACCT-SYORI-KBN   =    "7"
+                   IF  TNS-JGNCNT         =     1
+                       MOVE   1           TO    FLG-SYORI
+                   ELSE
                      COMPUTE  WRK-ZOGEN   =     WRK-ZOGEN   -   1
+                   END-IF
                END-IF
       *        入院日のみの加算（褥瘡患者管理加算）
                IF      LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
