@@ -1,4 +1,4 @@
-tspoilbl_chksnd	{
+tbl_chksnd	{
 	HOSPNUM				number(2,0);
 	CHKKBN			char(1);
 	SRYCD   		char(9);
