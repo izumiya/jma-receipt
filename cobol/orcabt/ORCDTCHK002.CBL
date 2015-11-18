@@ -372,6 +372,7 @@
            03  FLG-BYOMEI-ERR                          PIC 9(01).
            03  FLG-CHKMST-SRY                          PIC 9(01).
            03  FLG-HIT                                 PIC 9(01).
+           03  FLG-SRYKA                               PIC 9(01).
            03  FLG-INTERACT                            PIC 9(01).
            03  FLG-JNISSU-HIT                          PIC 9(01).
            03  FLG-SEIHO                               PIC 9(01).
@@ -10060,9 +10061,28 @@
       *****************************************************************
       *    チェックマスタ５チェック処理
       *****************************************************************
-       20011211-CHK005-CHK-SEC          SECTION.
+       20011211-CHK005-CHK-SEC         SECTION.
       *
            MOVE    ZERO            TO  FLG-HIT
+      *
+           IF    ( SYS-1101-BYOSRYKAKBN =  "1" OR SPACE )
+      *
+               MOVE    ZERO        TO  FLG-SRYKA
+               PERFORM VARYING IDX34   FROM    1   BY  1
+                       UNTIL ( IDX34   >   TSRYKA-MAX )
+                        OR   ( FLG-SRYKA   =   1 )
+                   IF    ( TSRYKA-SRYKA (IDX34)
+                                       =   SDTCHK06-O-SRYKA(IDX33))
+                       MOVE    1       TO  FLG-SRYKA
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( FLG-SRYKA       =   ZERO )
+                       MOVE    1       TO  FLG-HIT
+               END-IF
+      *
+           END-IF
+      *
            PERFORM VARYING IDX31   FROM    1   BY  1
                    UNTIL ( IDX31   >  TCHK-ACT-CD-MAX )
                     OR   ( FLG-HIT =   1 )
