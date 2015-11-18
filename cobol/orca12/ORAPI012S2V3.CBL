@@ -931,7 +931,7 @@
       *
       *    診療日チェック
            IF      WRK-ERRCD           =   SPACE
-               PERFORM 20011-BASEYMD-CHK-SEC
+               PERFORM 20011-BASEYMD-CHK02-SEC
            END-IF
       *    患者基本チェック処理
            IF      WRK-ERRCD           =   SPACE
@@ -973,11 +973,15 @@
            PERFORM 802-DAYHEN02-SEC
            MOVE    WRK-SYMD                TO  WRK-BASE-YMD
       *    未設定時はシステム情報設定
-           IF      WRK-BASE-YMD         =   SPACE
+           IF      WRK-BASE-YMD        =   SPACE
                MOVE    SMCNDATE-YMD        TO  WRK-BASE-YMD
+           ELSE
+               PERFORM 20011-BASEYMD-CHK-SEC
+               IF      WRK-ERRCD           =   SPACE
+      *            基準日をシステム日付へ
+                   MOVE    WRK-BASE-YMD        TO  SPA-SYSYMD
+               END-IF
            END-IF
-      *    基準日をシステム日付へ
-           MOVE    WRK-BASE-YMD        TO  SPA-SYSYMD
       *    画面表示編集
            INITIALIZE                      STS-AREA-DAY
            INITIALIZE                      LNK-DAY2-AREA
@@ -1081,13 +1085,23 @@
            IF      STS-DAY-RC1     NOT =   ZERO
                MOVE    "11"                TO  WRK-ERRCD
            END-IF
+      *
+           .
+       20011-BASEYMD-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    基準日付チェック２
+      *****************************************************************
+       20011-BASEYMD-CHK02-SEC     SECTION.
+      *
       *    H27.4.1からとする
            IF      WRK-BASE-YMD        <   "20150401"
                MOVE    "12"                TO  WRK-ERRCD
            END-IF
       *
            .
-       20011-BASEYMD-CHK-EXT.
+       20011-BASEYMD-CHK02-EXT.
            EXIT.
       *****************************************************************
       *    患者氏名チェック処理
