@@ -158,7 +158,7 @@
                                        //SPA-// BY //WRK-HZN-//.
       *
       *    診療行為用共通パラメタ
-      **** COPY    "K01COMMON-SPA".
+           COPY    "K01COMMON-SPA".
       *
            COPY    "MCPAREA".
       *
@@ -197,8 +197,13 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
       *
-      ***  MOVE    SPA-WORK            TO  SPA-K01KYOUTU
-      * 
+           IF      ORCSCSETHEN-PG      =   "K02"
+                                       OR  "KT01"
+               MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+           ELSE
+               INITIALIZE                  SPA-K01KYOUTU
+           END-IF
+      *
       *    診療種別テーブルセット
            CALL    "ORCSSRYSYU"        USING
                                        MSYU-DATA-REC
@@ -417,11 +422,21 @@
       *    残量廃棄の有無判定
            PERFORM VARYING     IDX-H   FROM    WRK-GMN-STR BY  1
                    UNTIL       IDX-H   >   SPA-GMN-IDX
-               IF     (SPA-COM-SRYKBN (IDX-H)(1:1)  =   "3" )  AND
-                      (SPA-COM-INPUTCD(IDX-H)(1:1)  =   "6" )
+               IF    ((SPA-COM-SRYKBN (IDX-H)(1:1) =   "3" )  AND
+                      (SPA-COM-INPUTCD(IDX-H)(1:1) =   "6" ))
+      *H27.11   全診区　追加
+               OR    ((SPA-HAIKIKBN-FLG            =   2  )  AND
+                      (SPA-COM-SRYKBN (IDX-H)(1:1) =   "4"
+                                                   OR  "5"
+                                                   OR  "6"
+                                                   OR  "7"
+                                                   OR  "8" )  AND
+                      (SPA-COM-INPUTCD(IDX-H)(1:1) =   "6" ))
                    MOVE    SPA-COM-SURYO(IDX-H)    TO  WRK-SURYO
       *        注射薬でアンプル、少数以下がある時、次に残量廃棄がある
-                   IF      (SPA-COM-YKZKBN (IDX-H)  =   "4"  )  AND
+      *H27.11  外用薬追加
+                   IF      (SPA-COM-YKZKBN (IDX-H)  =   "4"
+                                                    OR  "6"  )  AND
                            (SPA-COM-TANICD (IDX-H)  =   "014"
                                                     OR  "022"
                                                     OR  "046" )  AND

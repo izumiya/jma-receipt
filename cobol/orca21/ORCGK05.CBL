@@ -50,6 +50,7 @@
       *  04.06.00    NACL-多々納  10/07/XX  エラー内容変更他
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
       *  04.08.00    NACL-多々納  15/09/XX  セットコード入力ＣＤ対応
+      *  04.08.00    NACL-多々納  15/11/XX  残量廃棄システム設定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1351,14 +1352,26 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                ORCSC92AREA
                                                SPA-SCR-REC
                                                SPA-AREA
-                  IF      SPA-ERRCD       NOT =   SPACE
-                      MOVE    SPACE           TO  SPA-ERRCD
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       MOVE    SPACE           TO  SPA-ERRCD
                    END-IF
       *            残量廃棄の判定
                    IF     (SPA-COM-SRYKBN (IDX)(1:1)  =   "3" )  AND
                           (SPA-COM-INPUTCD(IDX)(1:1)  =   "6" )
                        PERFORM 31034-HAIKI-CHKI-SEC
                    END-IF
+      *H27.11
+      *            注射以下
+                   IF     (SPA-HAIKIKBN-FLG    =   "2"   )   AND
+                          (SPA-COM-INPUTCD(IDX-1)(1:1)  =   "6" ) AND
+                          (SPA-COM-SRYKBN (IDX-1)(1:1)  =   "4"
+                                                        OR  "5"
+                                                        OR  "6"
+                                                        OR  "7"
+                                                        OR  "8" )
+                       PERFORM 31034-HAIKI-CHKI-SEC
+                   END-IF
+      *
       *            換算値×換算値数量＝数量へ変更
                    IF      SPA-COM-KANSURYO (IDX)  >   ZERO
                        COMPUTE WRK-KANSURYO    =   SPA-COM-KANZANCHI
@@ -1501,7 +1514,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        31034-HAIKI-CHKI-SEC              SECTION.
       *
-           IF      (SPA-COM-YKZKBN (IDX)  =   "4"  )  AND
+           IF      (SPA-COM-YKZKBN (IDX)  =   "4"
+      *H27.11  外用薬追加
+                                          OR  "6"  )  AND
                    (SPA-COM-TANICD (IDX)  =   "014"
                                             OR  "022"
                                             OR  "046" )  AND
@@ -3975,10 +3990,21 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    残量廃棄の有無判定
            PERFORM VARYING     IDX-H   FROM    WRK-GMN-STR  BY 1
                    UNTIL       IDX-H       >   SPA-GMN-IDX
-               IF     (SPA-COM-SRYKBN (IDX-H)(1:1)  =   "3" )  AND
-                      (SPA-COM-INPUTCD(IDX-H)(1:1)  =   "6" )
+               IF    ((SPA-COM-SRYKBN (IDX-H)(1:1)  =   "3" )  AND
+                      (SPA-COM-INPUTCD(IDX-H)(1:1)  =   "6" ))
+      *H27.11
+      *            注射以下
+               OR    ((SPA-HAIKIKBN-FLG    =   "2"   )   AND
+                      (SPA-COM-INPUTCD(IDX-H)(1:1)  =   "6" ) AND
+                      (SPA-COM-SRYKBN (IDX-H)(1:1)  =   "4"
+                                                    OR  "5"
+                                                    OR  "6"
+                                                    OR  "7"
+                                                    OR  "8" ))
+      *
       *        注射薬でアンプル、少数以下がある時、次に残量廃棄がある
-                   IF      (SPA-COM-YKZKBN (IDX-H)  =   "4"  )  AND
+                   IF      (SPA-COM-YKZKBN (IDX-H)  =   "4"
+                                                    OR  "6"  )  AND
                            (SPA-COM-TANICD (IDX-H)  =   "014"
                                                     OR  "022"
                                                     OR  "046" )  AND
@@ -5034,6 +5060,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-CHG310FLG       TO  LNK-ORCSC-CHG310FLG
       *    腫瘍マーカー一覧展開選択
            MOVE    SPA-AKUSEIHYOFLG    TO  LNK-ORCSC-AKUSEIHYOFLG
+      *    残量廃棄区分
+           MOVE    SPA-HAIKIKBN-FLG    TO  LNK-ORCSC-HAIKIKBN-FLG
       *
            EVALUATE    WRK-COM-SRYKBN (01)
       *        診療
@@ -7344,7 +7372,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 990-DBCLOSE-SEC
       *
            .
-       920-INPUTCD-NEXT-EXT.
+       930-INPUTCD-READ-EXT.
            EXIT.
       *
       *****************************************************************
