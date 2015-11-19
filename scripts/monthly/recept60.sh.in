@@ -67,11 +67,11 @@ fi
 #       コード区分によりコード変換
 
         if   [ ${14} = '1' ]; then
-            echo "nkf -sx"   >> $LOG_FILE
+            echo "nkf -Esx"   >> $LOG_FILE
             if  [ ${6} != '5' ]&& [ ${6} != '6' ]; then
-                 nkf -sx $FILE_1 > $FILE_2
+                 nkf -Esx $FILE_1 > $FILE_2
             else
-                 nkf -sx $FILE_1 > $FILE_3
+                 nkf -Esx $FILE_1 > $FILE_3
             fi
         else
             if   [ ${14} = '3' ]; then
