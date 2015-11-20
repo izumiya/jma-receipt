@@ -890,9 +890,11 @@
                MOVE    1                   TO  FLG-CHK-SRYACCT
            END-IF
       *
+      *    自費保険のときは診療内容に関係なく自費扱いとする
            PERFORM             UNTIL   FLG-CHK-SRYACCT =   1
                                OR      WRK-CHK (5)     =   "1"
-               IF      CHK-ACCT-SRYKBN =   "95"    OR  "96"
+               IF    ( CHK-ACCT-SRYKBN =   "95"    OR  "96" )
+               AND   ( WRK-HKNNUM          NOT =   5        )
                    INITIALIZE                      SRYACT-REC
                    MOVE    CHK-ACCT-HOSPNUM    TO  SRY-HOSPNUM
                    MOVE    CHK-ACCT-NYUGAIKBN  TO  SRY-NYUGAIKBN
