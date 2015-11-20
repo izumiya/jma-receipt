@@ -635,7 +635,6 @@
                    UNTIL       IDX     >   17
                MOVE    ZERO                TO  SYU-HKNTEN(IDX)
            END-PERFORM
-           MOVE    ZERO                TO  SYU-SHOHOU-SAI
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   16
