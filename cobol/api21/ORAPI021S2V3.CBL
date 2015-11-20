@@ -1237,8 +1237,8 @@
                    MOVE    MDCREQ-PRSCRPT-NUMBER (IDX IDY)
                                        TO  MDCRES-REQ-PRSCRPT-NUMBER
                                                            (IDX IDY)
-                   MOVE    MDCREQ-PRSCRPT-MOENY (IDX IDY)
-                                       TO  MDCRES-REQ-PRSCRPT-MOENY
+                   MOVE    MDCREQ-PRSCRPT-MONEY (IDX IDY)
+                                       TO  MDCRES-REQ-PRSCRPT-MONEY
                                                            (IDX IDY)
                    MOVE    MDCREQ-PRSCRPT-ATAI-G (IDX IDY)
                                        TO  MDCRES-REQ-PRSCRPT-ATAI-G
@@ -1659,8 +1659,8 @@
                    MOVE    MDCREQ-PRSCRPT-NUMBER (IDX IDY)
                                        TO  ORAPISUB01-PRSCRPT-NUMBER
                                                            (IDX IDY)
-                   MOVE    MDCREQ-PRSCRPT-MOENY (IDX IDY)
-                                       TO  ORAPISUB01-PRSCRPT-MOENY
+                   MOVE    MDCREQ-PRSCRPT-MONEY (IDX IDY)
+                                       TO  ORAPISUB01-PRSCRPT-MONEY
                                                            (IDX IDY)
                    MOVE    MDCREQ-PRSCRPT-ATAI-G (IDX IDY)
                                        TO  ORAPISUB01-ATAI-G
@@ -1677,7 +1677,7 @@
                END-PERFORM
            END-PERFORM
       *
-           MOVE    "1"                 TO  ORAPISUB01-SYORIKBN
+           MOVE    SPACE               TO  ORAPISUB01-SYORIKBN
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
            CALL    "ORAPI021SUB1V3"   USING
                                        MCPAREA
@@ -2376,7 +2376,7 @@
                MOVE    SPA-COM-JIHIMONEY (IDX) TO  WRK-SURYO
                PERFORM 810-NUMHENKAN-SEC
                MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
-                                               TO  MDCRES-PRSCRPT-MOENY
+                                               TO  MDCRES-PRSCRPT-MONEY
                                                              (IDY IDZ)
            END-IF
       *    ¥Ô∫‡§Œæ¶… Ãæ∆˛Œœ§¨§¢§Îª˛
@@ -2593,7 +2593,7 @@
                MOVE    WRK-KINGAK          TO  WRK-SURYO
                PERFORM 810-NUMHENKAN-SEC
                MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
-                                           TO  MDCRES-MDC-MOENY(IDY)
+                                           TO  MDCRES-MDC-MONEY(IDY)
            END-IF
       *    ∫ﬁ∂Ë ¨°  Ò≥Á ¨°À
            IF      SPA-COM-HOUKATU-ZAI (IDX)   =   1
@@ -3291,8 +3291,8 @@
                                                                (IDX)
                MOVE    ORAPISUB2-MDC-POINT (IDX)
                                            TO  MDCRES-MDC-POINT (IDX)
-               MOVE    ORAPISUB2-MDC-MOENY (IDX)
-                                           TO  MDCRES-MDC-MOENY (IDX)
+               MOVE    ORAPISUB2-MDC-MONEY (IDX)
+                                           TO  MDCRES-MDC-MONEY (IDX)
       *        ∫ﬁ∂Ë ¨°  Ò≥Á ¨°À
                IF       ORAPISUB2-MDC-CODE (IDX)  =   "1"
                     MOVE    "True"         TO  MDCRES-INCLUSION-CLASS
@@ -3314,8 +3314,8 @@
                    MOVE    ORAPISUB2-PRSCRPT-NUMBER (IDX IDY)
                                        TO  MDCRES-PRSCRPT-NUMBER
                                                             (IDX IDY)
-                   MOVE    ORAPISUB2-PRSCRPT-MOENY (IDX IDY)
-                                       TO  MDCRES-PRSCRPT-MOENY
+                   MOVE    ORAPISUB2-PRSCRPT-MONEY (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-MONEY
                                                             (IDX IDY)
                    MOVE    ORAPISUB2-PRSCRPT-ATAI-G (IDX IDY)
                                        TO  MDCRES-PRSCRPT-ATAI-G

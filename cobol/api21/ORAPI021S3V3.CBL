@@ -1471,8 +1471,8 @@
                                                                (IDX)
                MOVE    ORAPISUB2-MDC-POINT (IDX)
                                            TO  MDCRES-MDC-POINT (IDX)
-               MOVE    ORAPISUB2-MDC-MOENY (IDX)
-                                           TO  MDCRES-MDC-MOENY (IDX)
+               MOVE    ORAPISUB2-MDC-MONEY (IDX)
+                                           TO  MDCRES-MDC-MONEY (IDX)
       *        ∫ﬁ∂Ë ¨°  Ò≥Á ¨°À
                IF       ORAPISUB2-MDC-CODE (IDX)  =   "1"
                     MOVE    "True"         TO  MDCRES-INCLUSION-CLASS
@@ -1494,8 +1494,8 @@
                    MOVE    ORAPISUB2-PRSCRPT-NUMBER (IDX IDY)
                                        TO  MDCRES-PRSCRPT-NUMBER
                                                             (IDX IDY)
-                   MOVE    ORAPISUB2-PRSCRPT-MOENY (IDX IDY)
-                                       TO  MDCRES-PRSCRPT-MOENY
+                   MOVE    ORAPISUB2-PRSCRPT-MONEY (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-MONEY
                                                             (IDX IDY)
                    MOVE    ORAPISUB2-PRSCRPT-ATAI-G (IDX IDY)
                                        TO  MDCRES-PRSCRPT-ATAI-G

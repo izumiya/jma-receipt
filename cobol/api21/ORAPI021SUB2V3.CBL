@@ -302,7 +302,7 @@
                                            TO  WRK-SURYO
                PERFORM 810-NUMHENKAN-SEC
                MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
-                                           TO  ORAPISUB2-MDC-MOENY(IDY)
+                                           TO  ORAPISUB2-MDC-MONEY(IDY)
            END-IF
       *    ∫ﬁ∂Ë ¨°  Ò≥Á ¨°À
            IF      LNK-WKSRY-CONTKBN (IDX) =   "H"
@@ -406,7 +406,7 @@
                    MOVE    LNK-WKSRY-JIHIMONEY(IDX IDW) TO  WRK-SURYO
                    PERFORM 810-NUMHENKAN-SEC
                    MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
-                                           TO  ORAPISUB2-PRSCRPT-MOENY
+                                           TO  ORAPISUB2-PRSCRPT-MONEY
                                                              (IDY IDZ)
                END-IF
            END-IF

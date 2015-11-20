@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  15/11/XX  セット登録対応他
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -49,6 +50,7 @@
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SURYO               PIC 9(01).
            03  FLG-JIDO-ARI            PIC 9(01).
+           03  FLG-SURYO-ZER           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -101,7 +103,7 @@
            03  WRK-ZAITENKEI           PIC 9(08).
            03  WRK-SRYCD               PIC X(09).
            03  WRK-SURYO               PIC 9(05)V9(5).
-           03  WRK-MOENY               PIC 9(07).
+           03  WRK-MONEY               PIC 9(07).
       *    コメント入力値編集
            03  WRK-INPUTCHI-G.
                05  WRK-INPUTCHI        PIC X(40)   OCCURS  5.
@@ -111,6 +113,8 @@
       *
            03  WRK-OPID                PIC X(16).
            03  WRK-TERMID              PIC X(64).
+      *
+           03  WRK-GYOUMUID            PIC X(04).
       *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
@@ -261,6 +265,14 @@
        100-INIT-SEC                SECTION.
       *
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+      *H27.11
+      *    セット登録
+           IF      ORAPISUB01-SYORIKBN =   "SET"
+               IF      SPA-SRYYMD      =   SPACE
+                   MOVE    SPA-SYSYMD      TO  SPA-SRYYMD
+               END-IF
+           ELSE
+      *
       *
            IF     (SPA-PTID            =   ZERO )
               OR  (SPA-SRYKA           =   SPACE)
@@ -271,10 +283,12 @@
                MOVE    "項目未設定"        TO  ORAPISUB01-ERRMSG
                GO      TO      100-INIT-EXT
            END-IF
-      *    診療種別テーブルセット
-           PERFORM 1001-SRYKBN-SET-SEC
+      *
+           END-IF
       *
            MOVE    ORAPISUB01-HKNCOMBI     TO  WRK-HKNCOMBI
+      *    診療種別テーブルセット
+           PERFORM 1001-SRYKBN-SET-SEC
       *
       *    一時データ削除
            INITIALIZE                      PARA-REC
@@ -450,6 +464,7 @@
            END-IF
            MOVE    ZERO                TO  IDZ
            IF      WRK-ERRCD       NOT =   SPACE
+               MOVE    SPACE               TO  WRK-SRYCD
                PERFORM 200210-ERRCD-HENSYU-SEC
            END-IF
       *
@@ -563,6 +578,23 @@
       *
            MOVE    ZERO                 TO  FLG-SURYO
       *
+      *H27.11
+      *    数量ゼロ、有
+           MOVE    ZERO                TO  FLG-SURYO-ZER
+           IF     (SPA-SURYOZERO-FLG   =   1   )
+             AND  (ORAPISUB01-SYORIKBN =   "SET")
+               IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
+                                           =   "7"
+                                           OR  "6"   )
+                 OR   (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
+                                           =   "059" )
+                 OR  ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
+                                           =   "1"   ) AND
+                      (TNS-KZMCOMPSIKIBETU NOT =   0 ))
+                   MOVE    1                   TO  FLG-SURYO-ZER
+               END-IF
+           END-IF
+      *
       *    画像診断のフィルム
            IF    ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
                                        =   "7"   )  OR
@@ -597,9 +629,11 @@
                        MOVE    "007"               TO  WRK-ERRCD
                    ELSE
                        MOVE    SNUM-OUTNUM         TO  WRK-SURYO
-                   END-IF
-                   IF      WRK-SURYO           =   ZERO
-                       MOVE    "007"               TO  WRK-ERRCD
+                       IF      WRK-SURYO           =   ZERO
+                           IF      FLG-SURYO-ZER       =   ZERO
+                               MOVE    "007"           TO  WRK-ERRCD
+                           END-IF
+                       END-IF
                    END-IF
                    MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
                                                      (TBL-MAX IDX-S)
@@ -610,15 +644,15 @@
                END-IF
            END-IF
       *    自費金額
-           IF     (ORAPISUB01-PRSCRPT-MOENY (IDY IDZ)
+           IF     (ORAPISUB01-PRSCRPT-MONEY (IDY IDZ)
                                    NOT =   SPACE  )
                IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
                                            =   "095"
                                            OR  "096"  )
                  AND  (TNS-TEN             =   ZERO   )
-                   MOVE    ZERO                TO  WRK-MOENY
+                   MOVE    ZERO                TO  WRK-MONEY
                    INITIALIZE                      ORCSNUMAREA
-                   MOVE    ORAPISUB01-PRSCRPT-MOENY(IDY IDZ)
+                   MOVE    ORAPISUB01-PRSCRPT-MONEY(IDY IDZ)
                                                TO  SNUM-INX
                    CALL    "ORCSNUM"           USING
                                                ORCSNUMAREA
@@ -628,14 +662,14 @@
                           (SNUM-SYOSUU         >   ZERO  )
                        MOVE    "008"               TO  WRK-ERRCD
                    ELSE
-                       MOVE    SNUM-OUTNUM         TO  WRK-MOENY
+                       MOVE    SNUM-OUTNUM         TO  WRK-MONEY
                    END-IF
-                   MOVE    WRK-MOENY           TO  TBL-WKSRY-JIHIMONEY
+                   MOVE    WRK-MONEY           TO  TBL-WKSRY-JIHIMONEY
                                                      (TBL-MAX IDX-S)
       *            数量と金額の両方はエラー
                    IF     (TBL-WKSRY-SRYSURYO(TBL-MAX IDX-S)
                                            NOT =   1     )
-                      AND (WRK-MOENY           >   ZERO  )
+                      AND (WRK-MONEY           >   ZERO  )
                       AND (WRK-ERRCD           =   SPACE )
                        MOVE    "012"               TO  WRK-ERRCD
                    END-IF
@@ -902,12 +936,14 @@
                   (SNUM-MINKBN         =   "1"   )   OR
                   (SNUM-SEISUU         >   7     )   OR
                   (SNUM-SYOSUU         >   5     )
-               MOVE    ZERO                TO  WRK-SURYO
+               MOVE    "007"               TO  WRK-ERRCD
            ELSE
                MOVE    SNUM-OUTNUM         TO  WRK-SURYO
-           END-IF
-           IF      WRK-SURYO           =   ZERO
-               MOVE    "007"               TO  WRK-ERRCD
+               IF      WRK-SURYO           =   ZERO
+                   IF      FLG-SURYO-ZER       =   ZERO
+                       MOVE    "007"           TO  WRK-ERRCD
+                   END-IF
+               END-IF
            END-IF
            MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
                                                      (TBL-MAX IDX-S)
@@ -991,6 +1027,9 @@
            IF      IDX-E               >   200
                GO      TO      200210-ERRCD-HENSYU-EXT
            END-IF
+      *H27.11
+           MOVE    WRK-SRYCD           TO  ORAPISUB01-IN-SRYCD (IDX-E)
+      *
            MOVE    WRK-ERRCD           TO  ORAPISUB01-IN-ERR (IDX-E)
            MOVE    IDY                 TO  ORAPISUB01-IN-POS (IDX-E)
            MOVE    IDZ                 TO  ORAPISUB01-IN-LINE (IDX-E)
@@ -1023,6 +1062,10 @@
                                                TO  ORAPISUB01-IN-ERRMSG
                                                                (IDX-E)
                WHEN    "007"
+                   MOVE    "数量の数値エラー"
+                                               TO  ORAPISUB01-IN-ERRMSG
+                                                               (IDX-E)
+               WHEN    "017"
                    MOVE    "数量の数値エラー"
                                                TO  ORAPISUB01-IN-ERRMSG
                                                                (IDX-E)

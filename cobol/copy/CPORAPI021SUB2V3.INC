@@ -45,7 +45,7 @@
       *             ºÞÅÀ¿ô
                     09  ORAPISUB2-MDC-POINT             PIC X(08).
       *             ºÞ¶â³Û
-                    09  ORAPISUB2-MDC-MOENY             PIC X(08).
+                    09  ORAPISUB2-MDC-MONEY             PIC X(08).
       *             ºÞ¶èÊ¬¡Ê£±¡§Êñ³çºÞ¡Ë
                     09  ORAPISUB2-MDC-CODE              PIC X(01).
       *
@@ -63,7 +63,7 @@
       *                 ¿ôÎÌ
                         11  ORAPISUB2-PRSCRPT-NUMBER        PIC X(11).
       *                 ¼«Èñ¶â³Û
-                        11  ORAPISUB2-PRSCRPT-MOENY         PIC X(07).
+                        11  ORAPISUB2-PRSCRPT-MONEY         PIC X(07).
       *                 ¥³¥á¥ó¥ÈËä¤á¹þ¤ßÃÍ
                         11  ORAPISUB2-PRSCRPT-ATAI-G.
                             13  ORAPISUB2-PRSCRPT-ATAI      PIC X(08)

@@ -118,7 +118,7 @@
       *                 数量
                         13  MDCREQ-PRSCRPT-NUMBER        PIC X(11).
       *                 自費金額
-                        13  MDCREQ-PRSCRPT-MOENY         PIC X(07).
+                        13  MDCREQ-PRSCRPT-MONEY         PIC X(07).
       *                 コメント埋め込み値
                         13  MDCREQ-PRSCRPT-ATAI-G.
                             15  MDCREQ-PRSCRPT-ATAI      PIC X(08)

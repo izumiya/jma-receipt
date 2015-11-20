@@ -60,7 +60,7 @@ xml_medicalv3res3 {
 			Medical_Class_Name		varchar(40);
 			Medical_Class_Number		varchar(03);
 			Medical_Point 			varchar(08);
-			Medical_Moeny			varchar(08);
+			Medical_Money			varchar(08);
 			Medical_Inclusion_Class		varchar(05);
 			Medical_Delete_Number		varchar(02);
 			Medical_Delete_Info		varchar(06);
@@ -68,7 +68,7 @@ xml_medicalv3res3 {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
 				Medication_Number	varchar(11);
-				Medication_Moeny 	varchar(07);
+				Medication_Money 	varchar(07);
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];

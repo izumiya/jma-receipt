@@ -122,7 +122,7 @@
       *             ºÞÅÀ¿ô
                     09  MDCRES-MDC-POINT             PIC X(08).
       *             ºÞ¶â³Û
-                    09  MDCRES-MDC-MOENY             PIC X(08).
+                    09  MDCRES-MDC-MONEY             PIC X(08).
       *             Êñ³ç¶èÊ¬¡ÊTrue¡§Êñ³çºÞ¡Ë
                     09  MDCRES-INCLUSION-CLASS       PIC X(05).
       *
@@ -141,7 +141,7 @@
       *                 ¿ôÎÌ
                         11  MDCRES-PRSCRPT-NUMBER        PIC X(11).
       *                 ¼«Èñ¶â³Û
-                        11  MDCRES-PRSCRPT-MOENY         PIC X(07).
+                        11  MDCRES-PRSCRPT-MONEY         PIC X(07).
       *                 ¥³¥á¥ó¥ÈËä¤á¹þ¤ßÃÍ
                         11  MDCRES-PRSCRPT-ATAI-G.
                             13  MDCRES-PRSCRPT-ATAI      PIC X(08)

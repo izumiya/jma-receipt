@@ -62,7 +62,7 @@ xml_medicalv3res2 {
 				Medication_Req_Code	varchar(09);
 				Medication_Req_Name	varchar(80);
 				Medication_Req_Number	varchar(11);
-				Medication_Req_Moeny 	varchar(07);
+				Medication_Req_Money 	varchar(07);
 				Medication_Req_Input_Info {
 					Medication_Req_Input	varchar(08);
 				} [5];
@@ -89,14 +89,14 @@ xml_medicalv3res2 {
 			Medical_Class_Name		varchar(40);
 			Medical_Class_Number		varchar(03);
 			Medical_Point 			varchar(08);
-			Medical_Moeny			varchar(08);
+			Medical_Money			varchar(08);
 			Medical_Inclusion_Class		varchar(05);
 			Medical_Delete_Number		varchar(02);
 			Medication_Info    {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
 				Medication_Number	varchar(11);
-				Medication_Moeny 	varchar(07);
+				Medication_Money 	varchar(07);
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];

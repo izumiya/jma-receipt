@@ -102,7 +102,7 @@ xml_medicalv3res1 {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
 				Medication_Number	varchar(11);
-				Medication_Moeny 	varchar(07);
+				Medication_Money 	varchar(07);
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];

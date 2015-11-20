@@ -194,7 +194,7 @@
       *                 数量
                         11  MDCRES-WKPRSCRPT-NUMBER        PIC X(11).
       *                 自費金額
-                        11  MDCRES-WKPRSCRPT-MOENY         PIC X(07).
+                        11  MDCRES-WKPRSCRPT-MONEY         PIC X(07).
       *                 コメント埋め込み値
                         11  MDCRES-WKPRSCRPT-ATAI-G.
                             13  MDCRES-WKPRSCRPT-ATAI      PIC X(08)

@@ -418,6 +418,45 @@
                MOVE   "99"             TO  WRK-ERRCD
                GO  TO         100-INIT-EXT
            END-IF
+      *
+      *    XML情報取り出し
+           PERFORM 1000-APTXMLREAD-SEC
+      *
+      *    ＳＰＡ共通設定
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 1001-ORCSCOMMON-SEC
+           END-IF
+      *
+      *    テーブル最大行
+           MOVE    MAX-LINE-VALUE      TO  SPA-MAX-LINE
+      *    診療種別テーブルセット
+           CALL    "ORCSSRYSYU"        USING
+                                       MSYU-DATA-REC
+      *
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＳＰＡ共通設定処理
+      *****************************************************************
+       1001-ORCSCOMMON-SEC           SECTION.
+      *
+      *    診療日をシステム日付へ
+           IF      MDCREQ-PERFORM-DATE NOT =   SPACE
+               MOVE    MDCREQ-PERFORM-DATE TO  WRK-HEN-DATE
+               MOVE    SPACE               TO  WRK-HEN-TIME
+               PERFORM 802-DAYHEN02-SEC
+               MOVE    WRK-SYMD            TO  WRK-PERFORM-YMD
+               PERFORM 20011-PERFORM-CHK-SEC
+      *        診療日をシステム日付へ
+               IF      WRK-ERRCD           =   SPACE
+                   MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
+               END-IF
+               MOVE    SPACE               TO  WRK-ERRCD
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-MOTOPG
       *    ＳＰＡ共通設定
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
@@ -430,16 +469,10 @@
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE   "89"             TO  WRK-ERRCD
            END-IF
-      *    テーブル最大行
-           MOVE    MAX-LINE-VALUE      TO  SPA-MAX-LINE
-      *
-      *    診療種別テーブルセット
-           CALL    "ORCSSRYSYU"        USING
-                                       MSYU-DATA-REC
-      *
            .
-       100-INIT-EXT.
+       1001-ORCSCOMMON-EXT.
            EXIT.
+      *
       *
       *****************************************************************
       *    UIDコード取得処理
@@ -460,12 +493,6 @@
       *    主　処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
-      *
-      *    XML情報取り出し
-           PERFORM 1000-APTXMLREAD-SEC
-           IF      WRK-ERRCD       NOT =   SPACE
-               GO      TO      200-MAIN-EXT
-           END-IF
       *
       *
            MOVE    ZERO                TO  MDCRES-API-RESULT
@@ -2369,8 +2396,8 @@
                    MOVE    ORAPISUB2-PRSCRPT-NUMBER (IDX IDY)
                                        TO  MDCRES-WKPRSCRPT-NUMBER
                                                             (IDX IDY)
-                   MOVE    ORAPISUB2-PRSCRPT-MOENY (IDX IDY)
-                                       TO  MDCRES-WKPRSCRPT-MOENY
+                   MOVE    ORAPISUB2-PRSCRPT-MONEY (IDX IDY)
+                                       TO  MDCRES-WKPRSCRPT-MONEY
                                                             (IDX IDY)
                    MOVE    ORAPISUB2-PRSCRPT-ATAI-G (IDX IDY)
                                        TO  MDCRES-WKPRSCRPT-ATAI-G
