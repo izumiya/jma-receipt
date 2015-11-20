@@ -600,6 +600,7 @@
       *
            MOVE    ZERO                TO  WRK-LNK-S01-SYUTEN
            MOVE    ZERO                TO  IDX-S1
+           MOVE    ZERO                TO  SYU-SHOHOU-SAI
       *
            PERFORM VARYING     IDY     FROM    1   BY  1
                    UNTIL       IDY     >  LNK-WKSRYACT-MAX
