@@ -693,7 +693,7 @@
                            MOVE    COMB-HOSPNUM    TO  HKN-HOSPNUM
                            MOVE    COMB-HKNNUM     TO  HKN-HKNNUM
                            MOVE    "00"            TO  HKN-PAYKBN
-                           MOVE    ACCT-SRYYM      TO  HKN-TEKSTYMD(1:6)
+                           MOVE    WRK-SRYYM       TO  HKN-TEKSTYMD(1:6)
                            MOVE    "01"            TO  HKN-TEKSTYMD(7:2)
                            MOVE    HKN-TEKSTYMD    TO  HKN-TEKEDYMD
                            PERFORM 900-HKNNUM-INV-SEC
@@ -892,7 +892,6 @@
       *
       *    自費保険のときは診療内容に関係なく自費扱いとする
            PERFORM             UNTIL   FLG-CHK-SRYACCT =   1
-                               OR      WRK-CHK (5)     =   "1"
                IF    ( CHK-ACCT-SRYKBN =   "95"    OR  "96" )
                AND   ( WRK-HKNNUM          NOT =   5        )
                    INITIALIZE                      SRYACT-REC
