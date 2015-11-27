@@ -387,6 +387,7 @@
       *
            03  IDX-STR             PIC 9(04).
            03  IDX-STR2            PIC 9(04).
+           03  IDX-STR3            PIC 9(04).
       *
            03  IDX-P               PIC 9(04).
            03  IDX-K               PIC 9(04).
@@ -2582,10 +2583,36 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      LNK-WKSRYACT-MAX    >   ZERO
                MOVE    3               TO  FLG-K09TUIKA
                PERFORM 3103-SAIHEN-HEN-SEC
-               MOVE    SPACE           TO  FLG-TOROKU
+      ***      MOVE    SPACE           TO  FLG-TOROKU
+      ***      PERFORM 510-TBLHEN-SEC
+           END-IF
+      *H27.12
+           COMPUTE IDX-STR3            =   IDX-STR2  +   1
+      *    入力コード・名称チェック処理
+           PERFORM VARYING IDX     FROM    IDX-STR3   BY  1
+                   UNTIL   (IDX        >   SPA-MAX-LINE )  OR
+                          ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
+                           (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+      *
+               IF      SPA-COM-CUR (IDX)   =   SPACE
+                   MOVE    SPA-GMN-INPUTCD(IDX)
+                                           TO  SPA-MAE-INPUTCD(IDX)
+               END-IF
+      *        警告表示をしない
+               MOVE    "1"                 TO  SPA-COM-KZMFLG (IDX)
+               MOVE    "1"                 TO  SPA-COM-HKEIFLG(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG2(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG3(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
+           END-PERFORM
+           IF      LNK-WKSRYACT-MAX    >   ZERO
+               MOVE    1                TO  FLG-INIT
                PERFORM 510-TBLHEN-SEC
            END-IF
-      *
       *    入力コード・名称チェック処理
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
@@ -2614,8 +2641,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
                END-IF
            END-PERFORM
+      *H27.12
       *    警告フラグクリア
-           PERFORM VARYING IDX     FROM    1   BY  1
+           PERFORM VARYING IDX     FROM    IDX-STR3   BY  1
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
@@ -2625,15 +2653,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
                END-IF
                MOVE    SPACE           TO  SPA-COM-KZMFLGAREA (IDX)
-      ****     MOVE    SPACE           TO  SPA-COM-KZMFLG (IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG4(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG6(IDX)
-      ******** MOVE    SPACE           TO  SPA-COM-KINKIFLG(IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1(IDX)
+      *        併用算定が警告の時、クリア
+               IF      SPA-COM-HKEIFLG (IDX)   =   "1"
+                   MOVE    SPACE               TO  SPA-COM-HKEIFLG (IDX)
+                   MOVE    SPACE               TO  SPA-COM-HCHKFLG (IDX)
+               END-IF
            END-PERFORM
       *
            MOVE    SPACE               TO  SPA-ERRCD
