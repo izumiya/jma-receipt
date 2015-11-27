@@ -859,6 +859,8 @@
       *
            EVALUATE    WRK-PARA-SRYKBN
       *         WHEN    ""
+               WHEN    "0"
+               WHEN    "00"
                WHEN    SPACE
                    MOVE    1               TO  FLG-SRYKBN
                WHEN    "14"
