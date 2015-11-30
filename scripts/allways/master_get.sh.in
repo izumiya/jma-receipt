@@ -67,7 +67,7 @@ fi
 case "${MASTERID}" in
   HKNNUM)
     FILENAME=hknnum-"${CODE1}"-"${CODE2}".dat
-    MSTURL="${MSTSRVPATH}"/hknnum
+    MSTURL="${MSTSRVPATH}"/hknnum/v01
     ;;
   SIORI)
     FILENAME="${CODE1}"-siori.dat
@@ -91,6 +91,7 @@ creymd=`date +'%Y%m%d'`
 sed -e "s/:HOSPNUM:/${HOSPNUM}/g" \
     -e "s/:TERMID:/${TERMID}/g" \
     -e "s/:CREYMD:/${creymd}/g" \
+    -e "s/:HKNNUM:/${CODE3}/g" \
     ${MCP_TEMPDIR}/${FILENAME} > ${MCP_TEMPDIR}/${FILENAME}.sql
 rm -f ${MCP_TEMPDIR}/${FILENAME}
 
