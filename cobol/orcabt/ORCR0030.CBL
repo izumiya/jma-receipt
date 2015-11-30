@@ -715,6 +715,8 @@
       *  04.08.07    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *  04.08.08    NACL-門脇    15/11/27  全国公費が月上限額に達する日の
       *                                     地方公費一部負担金編集対応
+      *  04.08.09    NACL-門脇    15/11/30  法別２４・７９の現物給付一部負担金
+      *                                     記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2955,6 +2957,10 @@ grpsys           PERFORM 900-DBSELECT-SEC
            IF      SYS-200501-KOUIKIOCRKBN
                                     =   SPACE
                MOVE    ZERO             TO  SYS-200501-KOUIKIOCRKBN
+           END-IF
+           IF      SYS-200501-GENBUTU-ICHIBU-KSIKBN
+                                    =   SPACE
+               MOVE    "0"   TO  SYS-200501-GENBUTU-ICHIBU-KSIKBN
            END-IF
       *
           .
@@ -22003,7 +22009,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM  21093-ZENKI-TOKUREI-OKIKAE-SEC
                 ELSE
                    IF   RECE02-ZAITAKU  =  "1" OR "2"
-                     CONTINUE
+                     IF  (RECE02-KOHNUM(KOHFTN-IDX) = "024" OR "079")
+                     AND (TBL-HKNFTNDATA-FLG(KOHFTN-IDX)   =  1     )
+                     AND (SYS-200501-GENBUTU-ICHIBU-KSIKBN = "1"    )
+                       COMPUTE RECE02-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE02-FTNMONEY(KOHFTN-IDX + 1) +  5
+                       COMPUTE RECE02-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE02-FTNMONEY(KOHFTN-IDX + 1) / 10
+                       COMPUTE RECE02-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE02-FTNMONEY(KOHFTN-IDX + 1) * 10
+                       PERFORM  2109A-CHIHO-ICHIBUFTN-HEN-SEC
+                     END-IF
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
                        IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)

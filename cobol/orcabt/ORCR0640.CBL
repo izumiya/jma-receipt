@@ -694,6 +694,8 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    15/10/05  難病特記事項対応
       *  04.08.04    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
+      *  04.08.05    NACL-門脇    15/11/30  法別２４・７９の現物給付一部負担金
+      *                                     記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2951,6 +2953,10 @@
            IF      SYS-200501-SHOKUJI-PRTKBN
                                     =   SPACE
                MOVE    "0"   TO  SYS-200501-SHOKUJI-PRTKBN
+           END-IF
+           IF      SYS-200501-GENBUTU-ICHIBU-KSIKBN
+                                    =   SPACE
+               MOVE    "0"   TO  SYS-200501-GENBUTU-ICHIBU-KSIKBN
            END-IF
       *
            MOVE    "tbl_syskanri"       TO  MCP-TABLE
@@ -25375,7 +25381,17 @@
                    PERFORM  210463-ZENKI-TOKUREI-OKIKAE-SEC
                 ELSE
                    IF   RECE62-KOUREI   =  "1" OR "2"
-                     CONTINUE
+                     IF  (RECE62-KOHNUM(KOHFTN-IDX) = "024" OR "079")
+                     AND (TBL-HKNFTNDATA-FLG(KOHFTN-IDX)   =  1     )
+                     AND (SYS-200501-GENBUTU-ICHIBU-KSIKBN = "1"    )
+                       COMPUTE RECE62-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE62-FTNMONEY(KOHFTN-IDX + 1) +  5
+                       COMPUTE RECE62-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE62-FTNMONEY(KOHFTN-IDX + 1) / 10
+                       COMPUTE RECE62-FTNMONEY(KOHFTN-IDX + 1) =
+                               RECE62-FTNMONEY(KOHFTN-IDX + 1) * 10
+                       PERFORM  21046A-CHIHO-ICHIBUFTN-HEN-SEC
+                     END-IF
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
                        IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
