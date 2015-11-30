@@ -713,6 +713,8 @@
       *  04.08.05    NACL-門脇    15/10/05  難病特記事項対応
       *  04.08.06    NACL-門脇    15/10/08  システム管理２０１０機能追加対応
       *  04.08.07    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
+      *  04.08.08    NACL-門脇    15/11/27  全国公費が月上限額に達する日の
+      *                                     地方公費一部負担金編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1218,6 +1220,7 @@
                  07  WRK-TAIHI-FTNMONEY-KOJ            PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN             PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN2            PIC 9(09)V9(01).
+                 07  WRK-TAIHI-FTNMONEY-SAGAKU         PIC S9(09).
       *
        01  WRK-SYUNOU-GENBUTU-AREA.
       *    ７０歳未満現物給付の収納データ退避（公費併用分）
@@ -1369,6 +1372,7 @@
                05  TBL-HKNFTNDATA-NYUIN                PIC  9(07).
                05  TBL-HKNFTNDATA-ZAN                  PIC  9(07).
                05  TBL-HKNFTNDATA-FLG                  PIC  9(01).
+               05  TBL-HKNFTNDATA-FLG2                 PIC  9(01).
                05  TBL-HKNFTNDATA-JGNXXX               PIC  9(07).
                05  TBL-HKNFTNDATA-TEKFLG               PIC  9(01).
       *
@@ -1453,6 +1457,7 @@
            03  WRK-KEISAN1                             PIC 9(07).
            03  WRK-KEISAN2                             PIC 9(07).
            03  WRK-KEISAN3                             PIC 9(07).
+           03  WRK-KEISAN4                             PIC 9(07).
            03  WRK-KEISAN9                             PIC 9(07).
            03  WRK-KEISAN-XXX                          PIC 9(07).
            03  WRK-KEISAN-YYY                          PIC 9(07).
@@ -19837,6 +19842,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ADD   SYU-KOH-COMPFTN(IDX3)      TO
                                         WRK-TAIHI-FTNMONEY(KH-IDX)
                                         WRK-TAIHI-FTNMONEY-KOJ(KH-IDX)
+                  IF  (TBL-HKNFTNDATA-FLG(KH-IDX - 1)  =  1)
+                  AND (IDX3                            =  1)
+                  AND (SYU-NYNSHOKAISU                 =  9)
+                     COMPUTE  WRK-TAIHI-FTNMONEY-SAGAKU(KH-IDX) =
+                              WRK-TAIHI-FTNMONEY-SAGAKU(KH-IDX) +
+                             (SYU-KOH-HKNFTNMONEY(IDX3) -
+                                         SYU-KOH-COMPFTN(IDX3))
+                     MOVE    1    TO    TBL-HKNFTNDATA-FLG2(KH-IDX - 1)
+                  END-IF
                 END-IF
               ELSE
                 IF   (RECE02-EKF-ENCHGKBN-K(KH-IDX) NOT = SPACE)
@@ -21992,8 +22006,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      CONTINUE
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
-                       PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
-                       PERFORM  2109A-CHIHO-ICHIBUFTN-HEN-SEC
+                       IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
+                                     = RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                         CONTINUE
+                       ELSE
+                         PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
+                         PERFORM  2109A-CHIHO-ICHIBUFTN-HEN-SEC
+                       END-IF
                      END-IF
                    END-IF
                 END-IF
@@ -24132,20 +24151,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
               END-IF
             END-IF
+      *     全国公費の月上限額到達日の収納データがある
+            IF   TBL-HKNFTNDATA-FLG2(KOHFTN-IDX) =  1
+               COMPUTE WRK-KEISAN4 = WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
+                                   + WRK-TAIHI-FTNMONEY-SAGAKU
+                                                       (KOHFTN-IDX + 1)
+               IF  RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = WRK-KEISAN4
+                 DISPLAY   "BE="  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                 MOVE WRK-KEISAN4 TO
+                                  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                                  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                 DISPLAY   "AF="  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                 IF   WRK-KOH-KINGAKU < RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                   MOVE  WRK-KOH-KINGAKU TO
+                                  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                                  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                   DISPLAY "AF2=" RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                 END-IF
+               END-IF
+            END-IF
            END-IF
-      *
-      ***  IF   WRK-KOH-KINGAKU   NOT = ZERO
-      ***   IF  WRK-KOH-KINGAKU < WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
-      ***       MOVE  WRK-KOH-KINGAKU  TO
-      ***                         RECE02-FTNMONEY(KOHFTN-IDX + 1)
-      ***                         RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-      ***   ELSE
-      ***       MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
-      ***                         RECE02-FTNMONEY(KOHFTN-IDX + 1)
-      ***       MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
-      ***                         RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-      ***   END-IF
-      ***  END-IF
       *
            .
        21095-KOH-ICHIBUFTN-HENSYU-EXT.
@@ -24848,6 +24873,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(3)
                 MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(3)
              END-IF
+             IF    RECE02-FTNMONEY(2)            = ZERO
+                MOVE  ZERO                   TO  RECE02-FTNMONEY(3)
+                                                 RECE02-FTNMONEY-KOJ(3)
+             END-IF
            END-IF
       *
            IF  ((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
@@ -24863,6 +24892,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(4)
                 MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(4)
              END-IF
+             IF    RECE02-FTNMONEY(2)            = ZERO
+                MOVE  ZERO                   TO  RECE02-FTNMONEY(4)
+                                                 RECE02-FTNMONEY-KOJ(4)
+             END-IF
            END-IF
       *
            IF  (RECE02-KOHNUM(1)       = "972" OR "974"    )
@@ -24876,6 +24909,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND  (RECE02-FTNMONEY(3)        NOT = ZERO       )
                 MOVE  RECE02-FTNMONEY(3)     TO  RECE02-FTNMONEY(4)
                 MOVE  RECE02-FTNMONEY-KOJ(3) TO  RECE02-FTNMONEY-KOJ(4)
+             END-IF
+             IF    RECE02-FTNMONEY(3)            = ZERO
+                MOVE  ZERO                   TO  RECE02-FTNMONEY(4)
+                                                 RECE02-FTNMONEY-KOJ(4)
              END-IF
            END-IF
       *

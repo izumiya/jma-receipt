@@ -25378,8 +25378,13 @@
                      CONTINUE
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
-                       PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
-                       PERFORM  21046A-CHIHO-ICHIBUFTN-HEN-SEC
+                       IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
+                                     = RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                         CONTINUE
+                       ELSE
+                         PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
+                         PERFORM  21046A-CHIHO-ICHIBUFTN-HEN-SEC
+                       END-IF
                      END-IF
                    END-IF
                 END-IF
@@ -27583,19 +27588,6 @@
             END-IF
            END-IF
       *
-      ***  IF   WRK-KOH-KINGAKU   NOT = ZERO
-      ***   IF  WRK-KOH-KINGAKU < WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
-      ***       MOVE  WRK-KOH-KINGAKU  TO
-      ***                         RECE62-FTNMONEY(KOHFTN-IDX + 1)
-      ***                         RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-      ***   ELSE
-      ***       MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
-      ***                         RECE62-FTNMONEY(KOHFTN-IDX + 1)
-      ***       MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
-      ***                         RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
-      ***   END-IF
-      ***  END-IF
-      *
            .
        210465-KOH-ICHIBUFTN-HENSYU-EXT.
            EXIT.
@@ -28241,6 +28233,10 @@
                 MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(3)
                 MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
              END-IF
+             IF    RECE62-FTNMONEY(2)            = ZERO
+                MOVE  ZERO                   TO  RECE62-FTNMONEY(3)
+                                                 RECE62-FTNMONEY-KOJ(3)
+             END-IF
            END-IF
       *
            IF  ((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
@@ -28256,6 +28252,10 @@
                 MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(4)
                 MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(4)
              END-IF
+             IF    RECE62-FTNMONEY(2)            = ZERO
+                MOVE  ZERO                   TO  RECE62-FTNMONEY(4)
+                                                 RECE62-FTNMONEY-KOJ(4)
+             END-IF
            END-IF
       *
            IF  (RECE62-KOHNUM(1)       = "972" OR "974"    )
@@ -28269,6 +28269,10 @@
              AND  (RECE62-FTNMONEY(3)        NOT = ZERO       )
                 MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
                 MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
+             IF    RECE62-FTNMONEY(3)            = ZERO
+                MOVE  ZERO                   TO  RECE62-FTNMONEY(4)
+                                                 RECE62-FTNMONEY-KOJ(4)
              END-IF
            END-IF
       *

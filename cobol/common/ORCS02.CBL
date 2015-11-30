@@ -619,7 +619,6 @@
                  06  WK-2010-IRYOKEIKBN-N-XXX    PIC X(01).
                  06  WK-2010-SKJKEIKBN           PIC X(01).
                  06  WK-2010-KINJYOKBN-N         PIC X(01).
-      *
                  06  WK-2010-SKJRYOKBN-HON       PIC X(01).
                  06  WK-2010-SEIRYOKBN-HON       PIC X(01).
                  06  WK-2010-SEIKANKBN-HON       PIC X(01).
@@ -629,23 +628,17 @@
                  06  WK-2010-SKJRYOKBN-TNK       PIC X(01).
                  06  WK-2010-SEIRYOKBN-TNK       PIC X(01).
                  06  WK-2010-SEIKANKBN-TNK       PIC X(01).
-      *
                  06  WK-2010-SYOKEIKBN-N         PIC X(01).
                  06  WK-2010-DAYKEIKBN-N         PIC X(01).
                  06  WK-2010-NINNASIKBN          PIC X(01).
                  06  WK-2010-NINJYOKBN           PIC X(01).
-      *
                  06  WK-2010-NYUKEIKBN-N         PIC X(01).
                  06  WK-2010-NYUKEI-KJNYMD       PIC X(08).
-      *
                  06  WK-2010-KOGAKKEIKBN         PIC X(01).
-      *
                  06  WK-2010-TANKIKBN            PIC X(01).
-      *
                  06  WK-2010-ZENDAYKBN-N         PIC X(01).
                  06  WK-2010-KAICNTKBN-N         PIC X(01).
                  06  WK-2010-CYOKEIKBN-N         PIC X(01).
-      *
                  06  WK-2010-JIRITUKBN           PIC X(01).
       *
            03  WK-DAYTAIHI-FTNMONEY    PIC 9(07).
@@ -16965,7 +16958,7 @@
                 IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM  )
                 AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID )
                 AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (SYU-NYNSHOKAISU      NOT =  1          )
                 AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
                 AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH1ID
@@ -16973,7 +16966,7 @@
                 IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM  )
                 AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID )
                 AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (SYU-NYNSHOKAISU      NOT =  1          )
                 AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
                 AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
                    MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH1ID
@@ -16983,7 +16976,7 @@
                 IF   (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM  )
                 AND  (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID )
                 AND  (WK-JIRITU-CYUKANSOU(1)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (SYU-NYNSHOKAISU      NOT =  1          )
                 AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
                 AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
                    MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH2ID
@@ -16991,7 +16984,7 @@
                 IF   (LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM  )
                 AND  (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID )
                 AND  (WK-JIRITU-CYUKANSOU(2)   =  2          )
-                AND  (SYU-NYNSHOKAISU          =  ZERO       )
+                AND  (SYU-NYNSHOKAISU      NOT =  1          )
                 AND  (COMB-TEKSTYMD      <=  WK-JIRITU-SRYYMD)
                 AND  (WRK-COMB-TEKSTYMD  <=  WK-JIRITU-SRYYMD)
                    MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH2ID
