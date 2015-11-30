@@ -286,8 +286,12 @@
            03  SYS-2010-JIRITUKBN           PIC  X(01).
            03  SYS-2010-JIRITU-TAIKBN       PIC  X(01).
       *
+      *全国公費併用時の特別計算２（外来）
+           03  SYS-2010-ZENKEI2KBN-G        PIC  X(01).
+           03  SYS-2010-ZENKEI2-TAIKBN-G    PIC  X(01).
+      *
       *予備
-           03  SYS-2010-YOBI                PIC  X(336).
+           03  SYS-2010-YOBI                PIC  X(334).
       *端末ＩＤ
            03  SYS-2010-TERMID              PIC  X(16).
       *オペレータＩＤ

@@ -6239,16 +6239,16 @@
               <text>0 対象区分６７８９０１２３４５</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
-          <signal>
-            <name>changed</name>
-            <handler>entry_changed</handler>
-            <data>CHANGED</data>
-          </signal>
-          <signal>
-            <name>activate</name>
-            <handler>send_event</handler>
-            <data>ACTIVATE</data>
-          </signal>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
             </widget>
           </widget>
           <widget>
@@ -6278,16 +6278,16 @@
               <text>0 入外それぞれで上限額までの計算をする</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
-          <signal>
-            <name>changed</name>
-            <handler>entry_changed</handler>
-            <data>CHANGED</data>
-          </signal>
-          <signal>
-            <name>activate</name>
-            <handler>send_event</handler>
-            <data>ACTIVATE</data>
-          </signal>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
             </widget>
           </widget>
         </widget>
@@ -8873,6 +8873,102 @@
               <class>GtkPandaEntry</class>
               <child_name>GtkPandaCombo:entry</child_name>
               <name>CYOKEITAIKBNN</name>
+              <width>163</width>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text_max_length>40</text_max_length>
+              <text>0 対象区分６７８９０１２３４５</text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label4</name>
+            <x>4</x>
+            <y>76</y>
+            <width>272</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>全国公費併用時の特別計算２（外来）</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>CMB_ZENKEI2KBNG</name>
+            <x>276</x>
+            <y>76</y>
+            <width>492</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>ZENKEI2KBNG</name>
+              <width>163</width>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text_max_length>80</text_max_length>
+              <text></text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>CMB_ZENKEI2TAIKBNG</name>
+            <x>768</x>
+            <y>76</y>
+            <width>240</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>ZENKEI2TAIKBNG</name>
               <width>163</width>
               <sensitive>True</sensitive>
               <can_focus>True</can_focus>

@@ -749,6 +749,14 @@
                        09  SPA-GMN-ZENDAYTAIKBNN            PIC X(01).
                        09  SPA-GMN-ZENDAYTAIKBNNF           PIC X(01).
                        09  SPA-GMN-ZENDAYTAIKBNNMEI         PIC X(38).
+                   07  SPA-GMN-ZENKEI2KBNG-G.
+                       09  SPA-GMN-ZENKEI2KBNG              PIC X(01).
+                       09  SPA-GMN-ZENKEI2KBNGF             PIC X(01).
+                       09  SPA-GMN-ZENKEI2KBNGMEI           PIC X(78).
+                   07  SPA-GMN-ZENKEI2TAIKBNG-G.
+                       09  SPA-GMN-ZENKEI2TAIKBNG           PIC X(01).
+                       09  SPA-GMN-ZENKEI2TAIKBNGF          PIC X(01).
+                       09  SPA-GMN-ZENKEI2TAIKBNGMEI        PIC X(38).
                05  SPA-GMN-CMB-AREA.
                    07  SPA-GMN-KOHNUMLST-G.
                        09  SPA-GMN-KOHNUM-MAX              PIC 9(03).
@@ -1243,6 +1251,20 @@
                            11  SPA-GMN-COMMONTAIKBNL       PIC X(01).
                            11  SPA-GMN-COMMONTAIKBNFL      PIC X(01).
                            11  SPA-GMN-COMMONTAIKBNMEIL    PIC X(38).
+      *
+                   07  SPA-GMN-ZENKEI2KBNGLST-G.
+                       09  SPA-GMN-ZENKEI2KBNG-MAX           PIC 9(03).
+                       09  SPA-GMN-ZENKEI2KBNGLST            OCCURS 10.
+                           11  SPA-GMN-ZENKEI2KBNGL          PIC X(01).
+                           11  SPA-GMN-ZENKEI2KBNGFL         PIC X(01).
+                           11  SPA-GMN-ZENKEI2KBNGMEIL       PIC X(78).
+      *
+                   07  SPA-GMN-ZENKEI2TAIKBNGLST-G.
+                       09  SPA-GMN-ZENKEI2TAIKBNG-MAX        PIC 9(03).
+                       09  SPA-GMN-ZENKEI2TAIKBNGLST         OCCURS 10.
+                           11  SPA-GMN-ZENKEI2TAIKBNGL       PIC X(01).
+                           11  SPA-GMN-ZENKEI2TAIKBNGFL      PIC X(01).
+                           11  SPA-GMN-ZENKEI2TAIKBNGMEIL    PIC X(38).
                05  SPA-GMN-KOHLST-AREA.
                    07  SPA-GMN-KOHLST-MAX                  PIC 9(5).
                    07  SPA-GMN-KOHLST-SEL                  PIC 9(5).
@@ -1841,6 +1863,12 @@
       *
       *    全国公費併用時の日の負担金計算（入院）対象区分コンボ編集処理
            PERFORM 3110-ZENDAYTAIKBNNLST-SEC
+      *
+      *    全国公費併用時の特別計算２（外来）コンボ編集処理
+           PERFORM 3110-ZENKEI2KBNGLST-SEC
+      *
+      *    全国公費併用時の特別計算２（外来）対象区分コンボ編集処理
+           PERFORM 3110-ZENKEI2TAIKBNGLST-SEC
       *
            .
        311-COMBO-EDIT-EXT.
@@ -3535,6 +3563,56 @@
        3110-JYUHENTAIKBNLST-EXT.
            EXIT.
       *****************************************************************
+      *    全国公費併用時の特別計算２（外来）コンボ編集処理
+      *****************************************************************
+       3110-ZENKEI2KBNGLST-SEC        SECTION.
+      *
+           INITIALIZE                  SPA-GMN-ZENKEI2KBNGLST-G
+      *
+           MOVE  "0"               TO  SPA-GMN-ZENKEI2KBNGL    (1)
+           MOVE  "設定なし"
+                                   TO  SPA-GMN-ZENKEI2KBNGMEIL (1)
+      *
+           MOVE  "1"               TO  SPA-GMN-ZENKEI2KBNGL    (2)
+           STRING  "全国公費が月上限額に達した日は"
+                                       DELIMITED BY SIZE
+                   "レセプト一部負担金の特殊計算を行う"
+                                       DELIMITED BY SIZE
+           INTO    SPA-GMN-ZENKEI2KBNGMEIL (2)
+           END-STRING
+      *
+      *
+           MOVE    2               TO  SPA-GMN-ZENKEI2KBNG-MAX
+      *
+           .
+       3110-ZENKEI2KBNGLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    全国公費併用時の特別計算２（外来）対象区分コンボ編集処理
+      *****************************************************************
+       3110-ZENKEI2TAIKBNGLST-SEC        SECTION.
+      *
+           INITIALIZE                  SPA-GMN-ZENKEI2TAIKBNGLST-G
+      *
+           MOVE  "0"               TO  SPA-GMN-ZENKEI2TAIKBNGL    (1)
+           MOVE  "該当公費対象者全員"
+                                   TO  SPA-GMN-ZENKEI2TAIKBNGMEIL (1)
+      *
+           MOVE  "1"               TO  SPA-GMN-ZENKEI2TAIKBNGL    (2)
+           MOVE  "国保・広域"
+                                   TO  SPA-GMN-ZENKEI2TAIKBNGMEIL (2)
+      *
+           MOVE  "2"               TO  SPA-GMN-ZENKEI2TAIKBNGL    (3)
+           MOVE  "社保"
+                                   TO  SPA-GMN-ZENKEI2TAIKBNGMEIL (3)
+      *
+      *
+           MOVE    3               TO  SPA-GMN-ZENKEI2TAIKBNG-MAX
+      *
+           .
+       3110-ZENKEI2TAIKBNGLST-EXT.
+           EXIT.
+      *****************************************************************
       *    公費の種類コンボ編集処理
       *****************************************************************
        3110-KOHNUMLST-SEC              SECTION.
@@ -4007,6 +4085,8 @@
            MOVE    W65-CYOKEITAIKBNN        TO  SPA-GMN-CYOKEITAIKBNN-G
            MOVE    W65-ZENDAYKBNN        TO  SPA-GMN-ZENDAYKBNN-G
            MOVE    W65-ZENDAYTAIKBNN        TO  SPA-GMN-ZENDAYTAIKBNN-G
+           MOVE    W65-ZENKEI2KBNG      TO  SPA-GMN-ZENKEI2KBNG-G
+           MOVE    W65-ZENKEI2TAIKBNG   TO  SPA-GMN-ZENKEI2TAIKBNG-G
       *
            MOVE    W65-YUKOSTYMD       TO  SPA-GMN-YUKOSTYMD
            MOVE    W65-YUKOEDYMD       TO  SPA-GMN-YUKOEDYMD
@@ -4878,6 +4958,14 @@
                PERFORM 4101-TANKITAIKBN-CHK-SEC
            END-IF
       *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-ZENKEI2KBNG-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-ZENKEI2TAIKBNG-CHK-SEC
+           END-IF
+      *
            IF    ( SPA-ERRCD   NOT =   SPACE )
                MOVE    7           TO  SPA-GMN-PAGENO
            END-IF
@@ -5543,6 +5631,8 @@
            MOVE    SPA-GMN-KAICNTTAIKBNN   TO SYS-2010-KAICNT-TAIKBN-N
            MOVE    SPA-GMN-CYOKEIKBNN      TO SYS-2010-CYOKEIKBN-N
            MOVE    SPA-GMN-CYOKEITAIKBNN   TO SYS-2010-CYOKEI-TAIKBN-N
+           MOVE    SPA-GMN-ZENKEI2KBNG      TO SYS-2010-ZENKEI2KBN-G
+           MOVE    SPA-GMN-ZENKEI2TAIKBNG   TO SYS-2010-ZENKEI2-TAIKBN-G
            MOVE    SPA-GMN-ZENDAYKBNN      TO SYS-2010-ZENDAYKBN-N
            MOVE    SPA-GMN-ZENDAYTAIKBNN   TO SYS-2010-ZENDAY-TAIKBN-N
       ***
@@ -6918,6 +7008,16 @@
                                        TO  WRK-CMB-CD
            PERFORM 4200-ZENDAYTAIKBNNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENDAYTAIKBNN-G
+      *
+           MOVE    SYS-2010-ZENKEI2KBN-G
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2KBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2KBNG-G
+      *
+           MOVE    SYS-2010-ZENKEI2-TAIKBN-G
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2TAIKBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2TAIKBNG-G
       *
       **
       *
@@ -9568,6 +9668,36 @@
        4101-ZENDAYTAIKBNN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    全国公費併用時の特別計算２（外来）チェック処理
+      *****************************************************************
+       4101-ZENKEI2KBNG-CHK-SEC      SECTION.
+      *
+           MOVE    SPA-GMN-ZENKEI2KBNG
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2KBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2KBNG-G
+      *
+           IF    ( SPA-GMN-ZENKEI2KBNG  =   "0" )
+               MOVE    "0"             TO  SPA-GMN-ZENKEI2TAIKBNG
+           END-IF
+      *
+           .
+       4101-ZENKEI2KBNG-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全国公費併用時の特別計算２（外来）対象区分チェック処理
+      *****************************************************************
+       4101-ZENKEI2TAIKBNG-CHK-SEC      SECTION.
+      *
+           MOVE    SPA-GMN-ZENKEI2TAIKBNG
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2TAIKBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2TAIKBNG-G
+      *
+           .
+       4101-ZENKEI2TAIKBNG-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    有効期間開始日
       *****************************************************************
        4101-YUKOSTYMD-CHK-SEC          SECTION.
@@ -10284,6 +10414,16 @@
            MOVE    "0"             TO  WRK-CMB-CD
            PERFORM 4200-ZENDAYTAIKBNNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENDAYTAIKBNN-G
+      *
+      *    全国公費併用時の特別計算２（外来）
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2KBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2KBNG-G
+      *
+      *    全国公費併用時の特別計算２（外来）対象区分
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-ZENKEI2TAIKBNGLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-ZENKEI2TAIKBNG-G
       *
            .
        42011-COMBO-SET-DEFAULT-ETXT.
@@ -11170,6 +11310,8 @@
            MOVE    SPA-GMN-CYOKEITAIKBNN-G     TO  W65-CYOKEITAIKBNN
            MOVE    SPA-GMN-ZENDAYKBNN-G        TO  W65-ZENDAYKBNN
            MOVE    SPA-GMN-ZENDAYTAIKBNN-G     TO  W65-ZENDAYTAIKBNN
+           MOVE    SPA-GMN-ZENKEI2KBNG-G       TO  W65-ZENKEI2KBNG
+           MOVE    SPA-GMN-ZENKEI2TAIKBNG-G    TO  W65-ZENKEI2TAIKBNG
       *
            MOVE    SPA-GMN-JNISSUKBN-MAX       TO  W65-JNISSUKBN-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
@@ -11980,6 +12122,24 @@
                                    TO  W65-ZENDAYTAIKBNN-ITEM (IDX-CMB)
            END-PERFORM
       *
+      *    全国公費併用時の特別計算２（外来）
+           MOVE    SPA-GMN-ZENKEI2KBNG-MAX
+                                   TO  W65-ZENKEI2KBNG-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-ZENKEI2KBNG-MAX )
+               MOVE    SPA-GMN-ZENKEI2KBNGLST (IDX-CMB)
+                                   TO  W65-ZENKEI2KBNG-ITEM (IDX-CMB)
+           END-PERFORM
+      *
+      *    全国公費併用時の特別計算２（外来）対象区分
+           MOVE    SPA-GMN-ZENKEI2TAIKBNG-MAX
+                                   TO  W65-ZENKEI2TAIKBNG-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-ZENKEI2TAIKBNG-MAX )
+               MOVE    SPA-GMN-ZENKEI2TAIKBNGLST (IDX-CMB)
+                                   TO  W65-ZENKEI2TAIKBNG-ITEM (IDX-CMB)
+           END-PERFORM
+      *
       *    公費リスト
            MOVE    SPA-GMN-KOHLST-MAX  TO  W65-KOHLST-COUNT
            PERFORM VARYING IDX-LST    FROM    1   BY  1
@@ -12275,6 +12435,8 @@
                                        W65-KOGAKKEITAIKBN-ITEM-STATE
                                        W65-TANKITAIKBN-STATE
                                        W65-TANKITAIKBN-ITEM-STATE
+                                       W65-ZENKEI2TAIKBNG-STATE
+                                       W65-ZENKEI2TAIKBNG-ITEM-STATE
                                        W65-YUKOSTYMD-STATE
                                        W65-YUKOEDYMD-STATE
                                        W65-SELNUM2-STATE
@@ -12693,6 +12855,11 @@
                                    TO  W65-ZENDAYTAIKBNN-STATE
                                        W65-ZENDAYTAIKBNN-ITEM-STATE
            END-IF
+           IF    ( SPA-GMN-ZENKEI2KBNG  =  "0" )
+               MOVE    WIDGET-INSENSITIVE
+                                   TO  W65-ZENKEI2TAIKBNG-STATE
+                                       W65-ZENKEI2TAIKBNG-ITEM-STATE
+           END-IF
       *
            IF    ( SPA-GMN-KOHLST-MAX  >=  CONST-KOHLST-MAX )
                MOVE    WIDGET-INSENSITIVE  TO  W65-B06-STATE
@@ -13067,6 +13234,10 @@
               MOVE    "ZENDAYKBNN"           TO  MCP-WIDGET
            WHEN    906
               MOVE    "ZENDAYTAIKBNN"           TO  MCP-WIDGET
+           WHEN    907
+              MOVE    "ZENKEI2KBNG"         TO  MCP-WIDGET
+           WHEN    908
+              MOVE    "ZENKEI2TAIKBNG"      TO  MCP-WIDGET
            WHEN    003
                MOVE    "SELNUM2"           TO  MCP-WIDGET
            WHEN    004
@@ -13442,6 +13613,10 @@
            WHEN    "ZENDAYKBNN"
                MOVE    906                 TO  SPA-GMN-CUR
            WHEN    "ZENDAYTAIKBNN"
+               MOVE    907                 TO  SPA-GMN-CUR
+           WHEN    "ZENKEI2KBNG"
+               MOVE    908                 TO  SPA-GMN-CUR
+           WHEN    "ZENKEI2TAIKBNG"
                MOVE    004                 TO  SPA-GMN-CUR
            WHEN    "SELNUM2"
                MOVE    002                 TO  SPA-GMN-CUR
@@ -14012,6 +14187,34 @@
                IF    ( W65-TANKITAIKBN-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    004                 TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   902 )
+               IF    ( W65-KAICNTTAIKBNN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    903         TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   904 )
+               IF    ( W65-CYOKEITAIKBNN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    905         TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   906 )
+               IF    ( W65-ZENDAYTAIKBNN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    907         TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   908 )
+               IF    ( W65-ZENKEI2TAIKBNG-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    004         TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
@@ -16397,6 +16600,64 @@
       *
            .
        4200-ZENDAYTAIKBNNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全国公費併用時の特別計算２（外来）コンボチェック処理
+      *****************************************************************
+       4200-ZENKEI2KBNGLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-ZENKEI2KBNG-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-ZENKEI2KBNGL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-ZENKEI2KBNGLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-ZENKEI2KBNGLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-ZENKEI2KBNGLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全国公費併用時の特別計算２（外来）対象区分コンボチェック処理
+      *****************************************************************
+       4200-ZENKEI2TAIKBNGLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-ZENKEI2TAIKBNG-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-ZENKEI2TAIKBNGL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-ZENKEI2TAIKBNGLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-ZENKEI2TAIKBNGLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-ZENKEI2TAIKBNGLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    公費の種類コンボボックスチェック処理
