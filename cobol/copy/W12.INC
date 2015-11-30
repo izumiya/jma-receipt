@@ -179,6 +179,12 @@
                     06  W12-HKN-RIREKI-COUNT   PIC S9(9)   BINARY.
                     06  W12-HKN-RIREKILST
                             PIC X(22)   OCCURS  2 TIMES.
+                  05  W12-GENBUTU-ICHIBU-COMBO.
+                    06  W12-GENBUTU-ICHIBU.
+                      07  W12-VALUE   PIC X(38).
+                    06  W12-GENBUTU-ICHIBU-COUNT   PIC S9(9)   BINARY.
+                    06  W12-GENBUTU-ICHIBULST
+                            PIC X(38)   OCCURS  5 TIMES.
                 04  W12-FI30.
                   05  W12-SYAPRTNM.
                     06  W12-VALUE   PIC X(16).

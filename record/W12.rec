@@ -216,6 +216,13 @@ W12 {
           count int;
             item varchar(22)[2];
         };
+        GENBUTU_ICHIBU_COMBO {
+          GENBUTU_ICHIBU {
+            textdata varchar(38);
+          };
+          count int;
+            item varchar(38)[5];
+        };
       };
       fi30 {
         SYAPRTNM {

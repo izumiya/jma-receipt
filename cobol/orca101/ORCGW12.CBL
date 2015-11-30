@@ -184,6 +184,8 @@
       *  04.08.04    NACL-藤原    15/08/17  自賠責レセプトの請求金額欄端
       *                                     数処理対応
       *  04.08.05    NACL-藤原    15/09/01  保険履歴の記載対応
+      *  04.08.06    NACL-藤原    15/11/30  現物給付一部負担金記載対応
+      *                                    （法別２４・７９）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -594,6 +596,13 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-HKN-RIREKIMEI
                                               PIC X(20).
+      *
+                       09  SPA-GMN-GENBUTU-ICHIBU-G.
+                           11  SPA-GMN-GENBUTU-ICHIBU
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-GENBUTU-ICHIBUMEI
+                                              PIC X(36).
       *
                        09  SPA-GMN-FRAME-ROUPRTKBN-G.
                            11  SPA-GMN-FRAME-ROUPRTKBN
@@ -1710,13 +1719,22 @@
                    07  SPA-GMN-JIBAI-FRACTION-KBN2-MAX
                                               PIC 9(02).   
       *
-                   07  SPA-GMN-HKN-RIREKILST      OCCURS  2.
+                   07  SPA-GMN-HKN-RIREKILST       OCCURS  2.
                        09  SPA-GMN-HKN-RIREKIL
                                               PIC X(01).
                        09  SPA-GMN-F1L        PIC X(01).
                        09  SPA-GMN-HKN-RIREKIMEIL
                                               PIC X(20).
                    07  SPA-GMN-HKN-RIREKI-MAX
+                                              PIC 9(02).
+      *
+                   07  SPA-GMN-GENBUTU-ICHIBULST   OCCURS  2.
+                       09  SPA-GMN-GENBUTU-ICHIBUL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-GENBUTU-ICHIBUMEIL
+                                              PIC X(36).
+                   07  SPA-GMN-GENBUTU-ICHIBU-MAX
                                               PIC 9(02).
       *
                05  SPA-NAIB-AREA.
@@ -3145,6 +3163,14 @@
            MOVE    "個人情報を記載しない"
                                        TO  SPA-GMN-HKN-RIREKIMEIL  (2)
            MOVE    2                   TO  SPA-GMN-HKN-RIREKI-MAX 
+      *     
+           MOVE    "0"                 TO  SPA-GMN-GENBUTU-ICHIBUL   (1)
+           MOVE    "上限１円単位の１０円未満四捨五入なし"
+                                       TO  SPA-GMN-GENBUTU-ICHIBUMEIL(1)
+           MOVE    "1"                 TO  SPA-GMN-GENBUTU-ICHIBUL   (2)
+           MOVE    "上限１円単位の１０円未満四捨五入あり"
+                                       TO  SPA-GMN-GENBUTU-ICHIBUMEIL(2)
+           MOVE    2                   TO  SPA-GMN-GENBUTU-ICHIBU-MAX 
       *
       *       医療機関情報
            MOVE    SPACE               TO  SYS-1001-REC
@@ -4322,6 +4348,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-GENBUTU-ICHIBU-KSIKBN
+                                       TO  SPA-GMN-GENBUTU-ICHIBU
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-GENBUTU-ICHIBU-MAX
+               IF      SPA-GMN-GENBUTU-ICHIBU
+                               =   SPA-GMN-GENBUTU-ICHIBUL (IDY)
+                   MOVE    SPA-GMN-GENBUTU-ICHIBULST (IDY)
+                                       TO  SPA-GMN-GENBUTU-ICHIBU-G
+                   MOVE    SPA-GMN-GENBUTU-ICHIBU-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
       *    レセプト・総括編集情報（区分コード１０のデータ読込）
            MOVE    SPACE               TO  SYS-200505-REC
            INITIALIZE                      SYS-200505-REC
@@ -5069,10 +5108,13 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-ZERO-KOH-PRTKBNLST  (2)
                                            TO  SPA-GMN-ZERO-KOH-PRTKBN-G
            END-IF                                              
-           IF     SPA-GMN-HKN-RIREKI-G
-                                           =   SPACE
+           IF     SPA-GMN-HKN-RIREKI-G     =   SPACE
                MOVE    SPA-GMN-HKN-RIREKILST  (1)
                                            TO  SPA-GMN-HKN-RIREKI-G
+           END-IF                                              
+           IF     SPA-GMN-GENBUTU-ICHIBU-G =   SPACE
+               MOVE    SPA-GMN-GENBUTU-ICHIBULST  (1)
+                                           TO  SPA-GMN-GENBUTU-ICHIBU-G
            END-IF                                              
       *
       *    労災医療機関情報
@@ -5259,6 +5301,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-RECEIPT-MAKE    TO  SPA-GMN-RECEIPT-MAKEKBN-G 
            MOVE    W12-ZERO-KOH-PRTKBN TO  SPA-GMN-ZERO-KOH-PRTKBN-G
            MOVE    W12-HKN-RIREKI      TO  SPA-GMN-HKN-RIREKI-G
+           MOVE    W12-GENBUTU-ICHIBU  TO  SPA-GMN-GENBUTU-ICHIBU-G
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
            MOVE    W12-SRYKAHENKBN     TO  SPA-GMN-SRYKAHENKBN-G
@@ -5559,6 +5602,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            PERFORM 4204-HKN-RIREKI-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4205-GENBUTU-ICHIBU-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  4102-KIHON-CHK-EXT
            END-IF
       *
            PERFORM 4150-PRTJYUN4-CHK-SEC
@@ -9070,6 +9118,35 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    保険履歴記載区分チェック
+      *****************************************************************
+       4205-GENBUTU-ICHIBU-CHK-SEC        SECTION.
+      *
+           IF      SPA-GMN-GENBUTU-ICHIBU =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-GENBUTU-ICHIBU-MAX
+                        OR     SPA-GMN-GENBUTU-ICHIBU
+                                   =   SPA-GMN-GENBUTU-ICHIBUL (IDY)
+                   CONTINUE
+               END-PERFORM
+      * 
+               IF      IDY <=      SPA-GMN-GENBUTU-ICHIBU-MAX
+                   MOVE    SPA-GMN-GENBUTU-ICHIBULST (IDY)
+                                           TO
+                                           SPA-GMN-GENBUTU-ICHIBU-G
+               ELSE
+                   MOVE    401             TO  SPA-GMN-CUR
+                   MOVE    "0131"          TO  SPA-ERRCD
+               END-IF
+           END-IF    
+      *
+           .
+       4205-GENBUTU-ICHIBU-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    主科社保設定フラグチェック
       *****************************************************************
        4148-SYUKA-SYAHO-CHK-SEC   SECTION.
@@ -9811,6 +9888,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO
                                        SYS-200501-JIBAI-FRACTION-KBN (2)
            MOVE    SPA-GMN-HKN-RIREKI      TO  SYS-200501-HKN-RIREKI-KBN
+           MOVE    SPA-GMN-GENBUTU-ICHIBU  TO
+                                       SYS-200501-GENBUTU-ICHIBU-KSIKBN
            MOVE    SPA-GMN-BTUNUM-KSIKBN   TO  SYS-200501-BTUNUM-KSIKBN
            MOVE    SPA-GMN-DRNAME-KSIKBN   TO  SYS-200501-DRNAME-KSIKBN
            MOVE    SPA-GMN-PRT-CHECKKBN    TO  SYS-200501-PRT-CHECKKBN
@@ -10873,6 +10952,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W12-HKN-RIREKI-COUNT 
       *
            PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-GENBUTU-ICHIBU-MAX
+               MOVE    SPA-GMN-GENBUTU-ICHIBULST (IDY)
+                                       TO  W12-GENBUTU-ICHIBULST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-GENBUTU-ICHIBU-MAX
+                                       TO  W12-GENBUTU-ICHIBU-COUNT
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECECOMKBN-MAX
                MOVE    SPA-GMN-RECECOMKBNLST (IDY)
                                        TO  W12-RECECOMKBNLST (IDY)
@@ -10995,6 +11082,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-HKN-RIREKI-G
                                        TO  W12-HKN-RIREKI
+      *
+           MOVE    SPA-GMN-GENBUTU-ICHIBU-G
+                                       TO  W12-GENBUTU-ICHIBU
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-AUTODSPKBN-MAX
@@ -11893,6 +11983,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0130"
                    MOVE    "保険履歴記載区分入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0131"
+                   MOVE    "現物給付一部負担金記載入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12091,6 +12184,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                 WHEN    400
                     MOVE  "HKN_RIREKI"       TO   MCP-WIDGET
+                WHEN    401
+                    MOVE  "GENBUTU_ICHIBU"   TO   MCP-WIDGET
       *
                 WHEN    9
                     MOVE  "SYAPRTNM"         TO   MCP-WIDGET
@@ -12329,7 +12424,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    304
                 WHEN    307 THRU    309
                     MOVE    0                TO  W12-PAGENO
-                WHEN    400
+                WHEN    400 THRU    401
                     MOVE    1                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -12461,6 +12556,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    40          TO  SPA-GMN-CUR
       *
                WHEN    "HKN_RIREKI"
+                   MOVE    401         TO  SPA-GMN-CUR
+               WHEN    "GENBUTU_ICHIBU"
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "PRTJYUNKBN4"
