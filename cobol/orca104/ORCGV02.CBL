@@ -41,6 +41,7 @@
       *  04.02.01    NACL-藤原    08/03/25  平成２０年４月改正対応
       *  04.05.00    NACL-太田    09/06/23  食事療養費区分"5"追加
       *  04.06.00    NACL-多々納  11/03/22  LD104 ,LD105,LD106,LD108,LD109　統合
+      *  04.08.00    NACL-森脇    15/11/05  複写元保険番号追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -633,18 +634,28 @@
            MOVE    "チェックする"      TO  SPA-GMN-HBTNUMCHKKBN-LST(2)
                                                                (3:)
       *
-      *    保険番号マスタより編集  
-           INITIALIZE                      HKNNUM-REC
-      *****MOVE    SPA-HOSPID              TO  HKN-HOSPID
-           MOVE    SPA-V01-HKNNUM          TO  HKN-HKNNUM
-           MOVE    SPA-V01-PAYKBN          TO  HKN-PAYKBN
-           IF      SPA-OLD-STYUKYMD        =   SPACE
-               MOVE    SPA-V01-STYUKYMD        TO  HKN-TEKSTYMD
-               MOVE    SPA-V01-EDYUKYMD        TO  HKN-TEKEDYMD
+      *----(04.08.00)--UPD-START---
+      *    複写元保険番号がある場合
+           IF      SPA-V01-CPHKNNUM    NOT =   SPACE
+               INITIALIZE                      HKNNUM-REC
+               MOVE    SPA-V01-CPHKNNUM        TO  HKN-HKNNUM
+               MOVE    SPA-V01-PAYKBN          TO  HKN-PAYKBN
+               MOVE    SPA-SYSYMD              TO  HKN-TEKSTYMD
+               MOVE    SPA-SYSYMD              TO  HKN-TEKEDYMD
            ELSE
-               MOVE    SPA-OLD-STYUKYMD        TO  HKN-TEKSTYMD
-               MOVE    SPA-OLD-EDYUKYMD        TO  HKN-TEKEDYMD
+      *        保険番号マスタより編集  
+               INITIALIZE                          HKNNUM-REC
+               MOVE    SPA-V01-HKNNUM          TO  HKN-HKNNUM
+               MOVE    SPA-V01-PAYKBN          TO  HKN-PAYKBN
+               IF      SPA-OLD-STYUKYMD        =   SPACE
+                   MOVE    SPA-V01-STYUKYMD        TO  HKN-TEKSTYMD
+                   MOVE    SPA-V01-EDYUKYMD        TO  HKN-TEKEDYMD
+               ELSE
+                   MOVE    SPA-OLD-STYUKYMD        TO  HKN-TEKSTYMD
+                   MOVE    SPA-OLD-EDYUKYMD        TO  HKN-TEKEDYMD
+               END-IF
            END-IF
+      *----(04.08.00)--UPD-END-----
       *
            MOVE    SPA-HOSPNUM             TO  HKN-HOSPNUM
            MOVE    HKNNUM-REC              TO  MCPDATA-REC

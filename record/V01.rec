@@ -50,6 +50,10 @@ V01 {
       count int;
         item varchar(23)[50];
     };
+    CPHKNNUM {
+      state int;
+      textdata varchar(4);
+    };
     MESSAGE {
       style varchar(20);
       textdata varchar(100);

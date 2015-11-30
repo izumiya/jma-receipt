@@ -49,6 +49,9 @@
                 05  V01-PREFNUM-STATE      PIC S9(9)   BINARY.
                 05  V01-PREFNUM-COUNT      PIC S9(9)   BINARY.
                 05  V01-PREFNUMLST         PIC X(23)   OCCURS  50 TIMES.
+              04  V01-CPHKNNUM-STATE
+                                PIC S9(9)   BINARY.
+              04  V01-CPHKNNUM  PIC X(4).
               04  V01-MESSAGE-STYLE  PIC X(20).
               04  V01-MESSAGE        PIC X(100).
               04  V01-DURATION       PIC S9(09) BINARY.
