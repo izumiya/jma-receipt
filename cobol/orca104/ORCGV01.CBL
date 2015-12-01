@@ -1088,12 +1088,16 @@
       *
       *----(04.08.00)--UPD-START----
            IF      FLG-OK          =   ZERO
-               MOVE    V01-CPHKNNUM    TO  SPA-GMN-CPHKNNUM
                MOVE    SPACE           TO  SKBN-RUN
                MOVE    "該当データはありませんでした。"
                                        TO  SPA-GMN-MESSAGE
                MOVE    "blue"          TO  SPA-GMN-MESSAGE-STYLE
-               MOVE    7               TO  SPA-GMN-CUR
+               IF      V01-CPHKNNUM    =   SPACE
+                   MOVE    1               TO  SPA-GMN-CUR
+               ELSE
+                   MOVE    V01-CPHKNNUM    TO  SPA-GMN-CPHKNNUM
+                   MOVE    7               TO  SPA-GMN-CUR
+               END-IF
                GO  TO  400-JYOKYO-EXT
            END-IF
       *----(04.08.00)--UPD-END-----
