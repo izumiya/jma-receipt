@@ -884,6 +884,9 @@
                INITIALIZE                      HKNNUM-REC
            END-IF
       *
+      *----(04.08.00)--ADD-START---
+           MOVE    ZERO                TO  FLG-OK
+      *----(04.08.00)--ADD-END-----
            MOVE    ZERO                TO  IDX
            PERFORM             UNTIL   FLG-HKNNUM   =   1
                                OR      IDX            >=  100
@@ -900,6 +903,12 @@
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG        TO  SPA-GMN-TEDYUKYMD (IDX)
                MOVE    IDX                TO  SPA-GMN-MAX
+      *----(04.08.00)--ADD-START---
+               IF    ( HKN-TEKSTYMD       =   "99999999" ) AND
+                     ( HKN-TEKEDYMD       =   "99999999" )
+                   MOVE    1                  TO  FLG-OK
+               END-IF
+      *----(04.08.00)--ADD-END-----
       *
                PERFORM 900-HKNNUM-FETCH-SEC
            END-PERFORM
@@ -1077,15 +1086,17 @@
       *
            PERFORM 4104-HKNNUM-CHK-SEC
       *
-           IF      SPA-GMN-MAX     =   ZERO
+      *----(04.08.00)--UPD-START----
+           IF      FLG-OK          =   ZERO
+               MOVE    V01-CPHKNNUM    TO  SPA-GMN-CPHKNNUM
                MOVE    SPACE           TO  SKBN-RUN
                MOVE    "該当データはありませんでした。"
                                        TO  SPA-GMN-MESSAGE
                MOVE    "blue"          TO  SPA-GMN-MESSAGE-STYLE
-               MOVE    SPACE           TO  SPA-GMN-PREFNUM-G
-               MOVE    4               TO  SPA-GMN-CUR
+               MOVE    7               TO  SPA-GMN-CUR
                GO  TO  400-JYOKYO-EXT
            END-IF
+      *----(04.08.00)--UPD-END-----
       *
            PERFORM 41041-HKNNUM-HENSYU-SEC
       *
