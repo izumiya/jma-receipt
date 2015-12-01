@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * 擔堛昗弨儗僙僾僩僜僼僩乮JMA standard receipt software乯
+      * 泣板筛洁レセプトソフト∈JMA standard receipt software∷
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
       ******************************************************************
-      *    俙俹俬儕僋僄僗僩庴晅忣曬丂丂       COPY (CPACCPTXMLV2REQ.INC)
+      *    ＡＰＩリクエスト减烧攫鼠　　       COPY (CPACCPTXMLV2REQ.INC)
       ******************************************************************
         01  XML-ACCEPTREQ.
             02  ACCPTREQ-CONTEXT          PIC S9(9)   BINARY.
@@ -24,56 +24,58 @@
             02  ACCPTREQ-MODE             PIC S9(9)   BINARY.
             02  ACCPTREQ-RECORDNAME       PIC X(128).
             02  ACCPTREQ-REGIST.
-      *       姵幰斣崋
+      *       吹荚戎规
               03  ACCPTREQ-PATIENTID    PIC X(20).
-      *       庴晅擔
+      *       减烧泣
               03  ACCPTREQ-REGIST-DATE  PIC X(10).
-      *       庴晅帪娫
+      *       减烧箕粗
               03  ACCPTREQ-REGIST-TIME  PIC X(8).
-      *       庴晅俬俢
+      *       减烧ＩＤ
               03  ACCPTREQ-REGIST-ID    PIC X(5).
-      *       恌椕壢
+      *       壳闻彩
               03  ACCPTREQ-REGIST-DEP-CODE PIC X(2).
-      *       僪僋僞乕僐乕僪
+      *       ドクタ〖コ〖ド
               03  ACCPTREQ-REGIST-DR-CODE  PIC X(5).
-      *       恌椕撪梕僐乕僪
+      *       壳闻柒推コ〖ド
               03  ACCPTREQ-REGIST-DEP-INFO PIC X(2).
-      *       曐尟忣曬
+      *       瘦副攫鼠
               03  ACCPTREQ-INSURANCE-INFO.
-      *         曐尟偺庬椶
+      *         瘦副寥圭せ戎规
+                04  ACCPTREQ-COMBINATION-NUMBER     PIC X(04).
+      *         瘦副の硷梧
                 04  ACCPTREQ-MAIN-INSURANCE-CLASS   PIC X(03).
-      *         曐尟幰斣崋
+      *         瘦副荚戎规
                 04  ACCPTREQ-MAIN-INSURANCE-NUMBER  PIC X(08).
-      *         曐尟偺庬椶柤徧
+      *         瘦副の硷梧叹疚
                 04  ACCPTREQ-MAIN-INSURANCE-NAME    PIC X(20).
-      *         婰崋
+      *         淡规
                 04  ACCPTREQ-MAIN-MARK              PIC X(80).
-      *         斣崋
+      *         戎规
                 04  ACCPTREQ-MAIN-NUMBER            PIC X(80).
-      *         宲懕嬫暘
+      *         费鲁惰尸
                 04  ACCPTREQ-MAIN-CONTINUATION      PIC X(01).
-      *         曐尟偺庬椶
+      *         瘦副の硷梧
                 04  ACCPTREQ-MAIN-ASSISTANCE        PIC X(01).
-      *         杮恖壠懓嬫暘
+      *         塑客踩虏惰尸
                 04  ACCPTREQ-MAIN-FAMILY            PIC X(01).
-      *         旐曐尟幰柤
+      *         蕊瘦副荚叹
                 04  ACCPTREQ-MAIN-POLICYHOLDER      PIC X(100).
-      *         桳岠奐巒擔
+      *         铜跟倡幌泣
                 04  ACCPTREQ-MAIN-START-DATE        PIC X(10).
-      *         桳岠廔椆擔
+      *         铜跟姜位泣
                 04  ACCPTREQ-MAIN-END-DATE          PIC X(10).
-      *         岞旓忣曬
+      *         给锐攫鼠
                 04  ACCPTREQ-PUBLIC-INSURANCE-INFO
                                        OCCURS  4 TIMES.
-      *           岞旓偺庬椶
+      *           给锐の硷梧
                   05  ACCPTREQ-INSURANCE-CLASS      PIC X(03).
-      *           岞旓偺庬椶柤徧
+      *           给锐の硷梧叹疚
                   05  ACCPTREQ-INSURANCE-NAME       PIC X(20).
-      *           晧扴幰斣崋
+      *           砷么荚戎规
                   05  ACCPTREQ-PROVIDER-NUMBER      PIC X(08).
-      *           庴媼幰斣崋
+      *           减惦荚戎规
                   05  ACCPTREQ-RECIPIENT-NUMBER     PIC X(20).
-      *           桳岠奐巒擔
+      *           铜跟倡幌泣
                   05  ACCPTREQ-INSURANCE-START-DATE PIC X(10).
-      *           桳岠廔椆擔
+      *           铜跟姜位泣
                   05  ACCPTREQ-INSURANCE-END-DATE   PIC X(10).

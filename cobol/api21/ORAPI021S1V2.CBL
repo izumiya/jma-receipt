@@ -31,6 +31,7 @@
       *  04.07.00    NACL-多々納  14/10/XX  詳細メッセージ追加等対応
       *  04.07.00    NACL-多々納  14/11/XX  保険組合せ設定対応
       *  04.07.00    NACL-多々納  14/11/XX  CLASS=4 外来追加対応他
+      *  04.08.00    NACL-多々納  15/12/01  保険組合せ番号送信追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -207,6 +208,9 @@
            COPY    "CPORCSLOCK.INC".
       *    ユーザプログラム起動チェックサブパラメタ
            COPY    "CPORCSUSERCHK.INC".
+      *
+      *    数字変換領域
+           COPY    "CPORCSNUM.INC".
       *
       *    API XML読み込み用定義体
            COPY    "CPMDCXMLV2REQ.INC".
@@ -1683,6 +1687,8 @@
       *****************************************************************
        2002151-HKNCOMBI-CALL-SEC     SECTION.
       *
+           IF      MDCREQ-COMBINATION-NUMBER   =   SPACE
+      *
       *    保険組合せ編集処理
            INITIALIZE                      ORCSAPIHKNAREA
       *    保険組合せ決定
@@ -1699,7 +1705,7 @@
            MOVE    MDCREQ-MAIN-INSURANCE-NAME 
                                        TO  ORCSAPIHKN-IN-HKNNUM-NAME
       *    記号
-           MOVE    MDCREQ-MAIN-MARK  TO  ORCSAPIHKN-IN-MARK
+           MOVE    MDCREQ-MAIN-MARK    TO  ORCSAPIHKN-IN-MARK
       *    番号
            MOVE    MDCREQ-MAIN-NUMBER
                                        TO  ORCSAPIHKN-IN-NUMBER
@@ -1730,20 +1736,56 @@
                MOVE    MDCREQ-RECIPIENT-NUMBER (IDX)
                                        TO  ORCSAPIHKN-IN-JKYSNUM  (IDX)
            END-PERFORM
+      *
+           ELSE
+      *        保険組合せチェック
+               PERFORM 200311-HKNCOMBI-NUM-SEC
+      *        保険組合せ編集処理
+               INITIALIZE                      ORCSAPIHKNAREA
+               MOVE    "2"                 TO  ORCSAPIHKN-KBN
+               MOVE    SPACE               TO  ORCSAPIHKN-KBN2
+      *        診療科
+               MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
+               MOVE    WRK-HKNCOMBI        TO  ORCSAPIHKN-IN-HKNCOMBI
+           END-IF
            CALL    "ORCSAPIHKN"        USING
                                        SPA-AREA
                                        ORCSAPIHKNAREA
-           IF      ORCSAPIHKN-OT-HKNCOMBI  =   SPACE
+           IF     (ORCSAPIHKN-OT-HKNCOMBI  =   SPACE )
+      *        保険番号対象なし
+              OR  (ORCSAPIHKN-ERRCD        =   4     )
                MOVE    ZERO                    TO  WRK-HKNCOMBI
            ELSE
                MOVE    ORCSAPIHKN-OT-HKNCOMBI  TO  WRK-HKNCOMBI
       *
-      *        出力領域保険情報編集
                MOVE    1                   TO  IDX
+      *        出力領域保険情報編集
                PERFORM 2002101-HKNHEN-TBL-SEC
            END-IF
            .
        2002151-HKNCOMBI-CALL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ番号数値チェック
+      *****************************************************************
+       200311-HKNCOMBI-NUM-SEC          SECTION.
+      *
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    MDCREQ-COMBINATION-NUMBER   TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-MINKBN     NOT =   SPACE )   OR
+                  (SNUM-SYOKBN     NOT =   SPACE )
+      *        数値エラーはゼロ（送信なし）
+               MOVE    ZERO                TO  WRK-HKNCOMBI
+           ELSE
+               MOVE    SNUM-OUTEDT(12:4)   TO  WRK-HKNCOMBI
+           END-IF
+      *
+           .
+       200311-HKNCOMBI-NUM-EXT.
            EXIT.
       *
       *****************************************************************

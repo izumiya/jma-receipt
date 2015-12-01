@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  13/09/26  CLAIM診療区分名称編集
       *  04.07.00    NACL-多々納  14/06/XX  ワーニングメッセージ対応他
+      *  04.08.00    NACL-多々納  15/12/01  保険組合せ番号送信追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1069,6 +1070,22 @@
       *****************************************************************
        20023-HKNCOMBI-HEN-SEC     SECTION.
       *
+           IF      ACCPTREQ-COMBINATION-NUMBER   =   SPACE
+               PERFORM 200231-HKNCOMBI-HEN-SEC
+           ELSE
+      *        保険組合せ番号あり
+               PERFORM 200232-COMBINATION-HEN-SEC
+           END-IF
+      *
+           .
+       20023-HKNCOMBI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ編集処理
+      *****************************************************************
+       200231-HKNCOMBI-HEN-SEC     SECTION.
+      *
       *    保険組合せ編集処理
            INITIALIZE                      ORCSAPIHKNAREA
            IF      FLG-SYORI           =   1
@@ -1121,6 +1138,7 @@
                MOVE    ACCPTREQ-RECIPIENT-NUMBER (IDX)
                                        TO  ORCSAPIHKN-IN-JKYSNUM  (IDX)
            END-PERFORM
+      *
            CALL    "ORCSAPIHKN"        USING
                                        SPA-AREA
                                        ORCSAPIHKNAREA
@@ -1140,7 +1158,62 @@
                    MOVE    "23"                TO  WRK-ERRCD
            END-EVALUATE
            .
-       20023-HKNCOMBI-HEN-EXT.
+       200231-HKNCOMBI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ番号から保険組合せ編集処理
+      *****************************************************************
+       200232-COMBINATION-HEN-SEC          SECTION.
+      *
+      *    保険組合せチェック
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    ACCPTREQ-COMBINATION-NUMBER TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-MINKBN     NOT =   SPACE )   OR
+                  (SNUM-SYOKBN     NOT =   SPACE )
+      *        数値エラーはゼロ（送信なし）
+               MOVE    ACCPTREQ-COMBINATION-NUMBER
+                                           TO  WRK-HKNCOMBI
+               MOVE    "24"                TO  WRK-ERRCD
+           ELSE
+               MOVE    SNUM-OUTEDT(12:4)   TO  WRK-HKNCOMBI
+           END-IF
+      *
+      *    保険組合せ編集処理
+           IF      WRK-ERRCD           =   SPACE
+               INITIALIZE                      ORCSAPIHKNAREA
+               IF      FLG-SYORI           =   1
+      *            追加処理
+                   MOVE    "1"                 TO  ORCSAPIHKN-KBN
+               ELSE
+      *            削除処理
+                   MOVE    "2"                 TO  ORCSAPIHKN-KBN
+               END-IF
+               MOVE    SPACE               TO  ORCSAPIHKN-KBN2
+      *        診療科
+               MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
+               MOVE    WRK-HKNCOMBI        TO  ORCSAPIHKN-IN-HKNCOMBI
+               CALL    "ORCSAPIHKN"        USING
+                                           SPA-AREA
+                                           ORCSAPIHKNAREA
+               IF      ORCSAPIHKN-OT-HKNCOMBI  =   SPACE
+                   MOVE    ZERO                    TO  WRK-IN-HKNCOMBI
+               ELSE
+                   MOVE    ORCSAPIHKN-OT-HKNCOMBI  TO  WRK-HKNCOMBI
+                   MOVE    ORCSAPIHKN-OT-HKNCOMBI  TO  WRK-IN-HKNCOMBI
+               END-IF
+      *        保険番号対象なし
+               IF      ORCSAPIHKN-ERRCD        =   4
+                   MOVE    "24"                TO  WRK-ERRCD
+                   MOVE    ZERO                    TO  WRK-HKNCOMBI
+                   MOVE    ZERO                    TO  WRK-IN-HKNCOMBI
+               END-IF
+           END-IF
+           .
+       200232-COMBINATION-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1183,6 +1256,11 @@
        200231-HKNHEN-TBL-SEC              SECTION.
       *
            ADD     1                   TO  IDY
+      *H27.12
+      *    保険組合せ番号
+           MOVE    ORCSAPIHKN-THKNCOMBI (IDX)
+                                       TO  ACCPTRES-COMBINATION-NUMBER
+                                                                 (IDY)
       *    保険の種類
            MOVE    ORCSAPIHKN-HKNNUM (IDX)
                                    TO  ACCPTRES-MAIN-INSURANCE-CLASS
@@ -2181,6 +2259,10 @@
                                                TO  WRK-ERRMSG
            WHEN    "23"
                MOVE    "保険情報と一致する保険組合せがありません"
+                                               TO  WRK-ERRMSG
+      *!!
+           WHEN    "24"
+               MOVE    "保険組合せ番号がありません"
                                                TO  WRK-ERRMSG
            WHEN    "50"
                STRING  "受付登録件数が上限以上となります。"

@@ -48,6 +48,8 @@
                 04  MDCREQ-APPOINT-DR-CODE  PIC X(5).
       *         保険情報
                 04  MDCREQ-INSURANCE-INFO.
+      *           保険組合せ番号
+                  05  MDCREQ-COMBINATION-NUMBER      PIC X(04).
       *           保険の種類
                   05  MDCREQ-MAIN-INSURANCE-CLASS    PIC X(03).
       *           保険者番号

@@ -75,6 +75,8 @@
       *         保険情報
                 04  ACCPTRES-INSURANCE-G.
                   05  ACCPTRES-INSURANCE-INFO          OCCURS 20 TIMES.
+      *             保険組合せ番号
+                    06  ACCPTRES-COMBINATION-NUMBER     PIC X(04).
       *             保険の種類
                     06  ACCPTRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *             保険者番号

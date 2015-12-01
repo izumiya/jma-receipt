@@ -14,6 +14,7 @@ xml_medicalv2req {
 			Department_Code		varchar(2);
 			Physician_Code		varchar(5);
 			HealthInsurance_Information  {
+				Insurance_Combination_Number	varchar(04);
 				InsuranceProvider_Class		varchar(03);
 				InsuranceProvider_Number	varchar(08);
 				InsuranceProvider_WholeName	varchar(20);
