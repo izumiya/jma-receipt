@@ -1859,7 +1859,7 @@
            IF     (SPA-GMN982-MAX      =   ZERO  )
              AND  (WRK-ERRCD           =   SPACE )
                MOVE    "2106"              TO  WRK-KEIERRCD
-               GO  TO  200211-POST-CHK-EXT
+               GO  TO  200211-OFFPOST-CHK-EXT
            END-IF
       *    £±∑Ô§«ΩªΩÍ§ §∑§œ ‘Ω∏
            IF     (SPA-GMN982-MAX      =   1  )
