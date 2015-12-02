@@ -463,6 +463,8 @@
       *  04.08.03    NACL-ÌçÏÆ    15/11/11  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.04    NACL-ÌçÏÆ    15/11/27  Á´¹ñ¸øÈñ¤¬·î¾å¸Â³Û¤ËÃ£¤¹¤ëÆü¤Î
       *                                     ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âÊÔ½¸ÂÐ±þ
+      *  04.08.05    NACL-ÌçÏÆ    15/12/01  ¸½ÊªµëÉÕ¤Î°ì³çºÆ·×»»¥á¥Ã¥»¡¼¥¸
+      *                                     É½¼¨¤Î¾ò·ï½¤Àµ¡ÊÄûÀµ»þ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1035,6 +1037,7 @@
            03  WK-SYUNOU-GENBUTU-KR-SYUHKNFLG           PIC  9(01).
       *
            03  WK-SYUNOU-GENBUTU-SECMONEY-MAE           PIC  9(07).
+           03  WK-SYUNOU-GENBUTU-TOTALTEN-MAE           PIC  9(07).
       *
            03  WK-SHOHOUSEN-HKNCOMBINUM-TBL.
                05  WK-SHOHOUSEN-HKNCOMBINUM-OCC         OCCURS 50.
@@ -6979,6 +6982,7 @@
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KR-SKYMONEY2.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KR-SYUHKNFLG.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-SECMONEY-MAE.
+           MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-TOTALTEN-MAE.
            IF    LNK-SYU-SRYYMD(1:6)   >=  "201204"
              IF  (FLG-GENBUTU70           NOT =   ZERO)
              AND (FLG-OITA-GENBUTU70          =   ZERO)
@@ -30084,7 +30088,22 @@
            IF  (WK-SYUNOU-GENBUTU70-MSG  NOT =  ZERO   )
            AND (LNK-S01-IKTGENKEIFLG         =  SPACE  )
            AND (LNK-SYU-SRYYMD(1:6)         >= "201204")
-             IF     WK-GENGAKUKBN  =  3  OR  4
+             IF  (LNK-S01-SAIKEISAN-KBN           = "1"    )
+             AND (WK-SYUNOU-GENBUTU-SECMONEY-MAE  =  9     )
+             AND (LNK-SYU-TOTAL-HKNTEN  =
+                             WK-SYUNOU-GENBUTU-TOTALTEN-MAE)
+                  MOVE     9    TO   LNK-SYU-SECMONEY
+             END-IF
+           END-IF
+      *
+           IF  (WK-SYUNOU-GENBUTU70-MSG  NOT =  ZERO   )
+           AND (LNK-S01-IKTGENKEIFLG         =  SPACE  )
+           AND (LNK-SYU-SRYYMD(1:6)         >= "201204")
+             IF   ( WK-GENGAKUKBN  =  3  OR  4                )
+             OR   ((LNK-S01-SAIKEISAN-KBN           = "1"    ) AND
+                   (WK-SYUNOU-GENBUTU-SECMONEY-MAE  =  9     ) AND
+                   (LNK-SYU-TOTAL-HKNTEN  =
+                               WK-SYUNOU-GENBUTU-TOTALTEN-MAE))
                CONTINUE
              ELSE
                MOVE    ZERO    TO   WK-GENBUTU-SKYMONEY
@@ -31681,6 +31700,8 @@
                        AND (LNK-SYU-DENPNUM        =  SYU-DENPNUM)
                          MOVE  SYU-SECMONEY      TO
                                    WK-SYUNOU-GENBUTU-SECMONEY-MAE
+                         MOVE  SYU-TOTAL-HKNTEN  TO
+                                   WK-SYUNOU-GENBUTU-TOTALTEN-MAE
                        END-IF
                        GO    TO    SYUNOU-READ2-100
                ELSE
