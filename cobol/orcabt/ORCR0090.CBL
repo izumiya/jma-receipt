@@ -273,6 +273,7 @@
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.04    NACL-門脇    15/12/02  ０点地域公費記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -994,6 +995,8 @@
            03  FILLER          PIC X(09)   VALUE   "120003610".
       *    処方料（紹介率が低い大病院３０日以上投薬減算）
            03  FILLER          PIC X(09)   VALUE   "120003870".
+      *    【レセプト】０点地域公費記載
+           03  FILLER          PIC X(09)   VALUE   "099999925".
       *
       *    再診（妥結率５割以下）
            03  FILLER          PIC X(09)   VALUE   "112016610".
@@ -1028,9 +1031,9 @@
            03  FILLER          PIC X(09)   VALUE   "112017270".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   76.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   77.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   76.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   77.
       *
       *    固定値
        01  CONST-AREA.

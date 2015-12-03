@@ -717,6 +717,8 @@
       *                                     ÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âÊÔ½¸ÂÐ±þ
       *  04.08.09    NACL-ÌçÏÆ    15/11/30  Ë¡ÊÌ£²£´¡¦£·£¹¤Î¸½ÊªµëÉÕ°ìÉôÉéÃ´¶â
       *                                     µ­ºÜÂÐ±þ
+      *  04.08.10    NACL-ÌçÏÆ    15/12/02  £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº
+      *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1049,6 +1051,7 @@
            03  IDX27                                   PIC 9(03).
            03  IDX28                                   PIC 9(03).
            03  IDX29                                   PIC 9(03).
+           03  IDX30                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
       *
@@ -1406,6 +1409,11 @@
              05  TBL-ZAITAKU-KAISU-XXX3                OCCURS   9.
                07  TBL-ZAITAKU-KAISU-XXX4              OCCURS  31.
                  09  TBL-ZAITAKU-KAISU                 PIC  9(03).
+      *
+       01  TBL-CHIIKI-SANTEI.
+           03  TBL-CHIIKI-SANTEI-OCC                   OCCURS   5.
+               05  TBL-CHIIKI-SANTEI-FLG               PIC  9(01)
+                                                       OCCURS  31.
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -3205,6 +3213,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
            INITIALIZE                   WRK-DAISAN-INGAI-TABLE
       *
            INITIALIZE                   TBL-ZAITAKU-KAISU-XXX
+      *
+           INITIALIZE                   TBL-CHIIKI-SANTEI
       *
            MOVE      ZERO       TO      WK-GENGAKU-KEISAN2
       *
@@ -16624,6 +16634,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           WHEN  RECE02-KOHNUM(1)  =  SYU-KOH-HKNNUM(4)
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
+                      MOVE      2             TO   IDX30
                       PERFORM   210522-KOHJNISSUTBL-SET-SEC
                  END-IF
                  IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(2)
@@ -16638,6 +16649,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(4)
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
+                      MOVE      3             TO   IDX30
                       PERFORM   210522-KOHJNISSUTBL-SET-SEC
                  END-IF
                  IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(3)
@@ -16652,6 +16664,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           WHEN  RECE02-KOHNUM(3)  =  SYU-KOH-HKNNUM(4)
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
+                      MOVE      4             TO   IDX30
                       PERFORM   210522-KOHJNISSUTBL-SET-SEC
                  END-IF
                  IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(4)
@@ -16666,10 +16679,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           WHEN  RECE02-KOHNUM(4)  =  SYU-KOH-HKNNUM(4)
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
+                      MOVE      5             TO   IDX30
                       PERFORM   210522-KOHJNISSUTBL-SET-SEC
                  END-IF
               END-IF
            END-PERFORM
+      *
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô½¸·×
+           EVALUATE   SYS-1001-PREFNUM
+             WHEN    "38"
+               IF   (SYU-KOH-HKNNUM(1) = "394")
+               OR   (SYU-KOH-HKNNUM(2) = "394")
+               OR   (SYU-KOH-HKNNUM(3) = "394")
+               OR   (SYU-KOH-HKNNUM(4) = "394")
+                 IF  RECE02-TEISYUTUSAKI  =  2
+                    MOVE   1                TO  RECE02-SEIKENFLG
+                    ADD   SYU-TOTAL-HKNTEN  TO  RECE02-SEIKENTEN
+                 END-IF
+               END-IF
+           END-EVALUATE
       *
            .
        21052X-KOHJNISSUTBL-HENSYU-EXT.
@@ -19636,9 +19664,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 "4" OR "5" OR "6" OR
                                                 "7" OR "8"
                     MOVE   SYU-SRYYMD(7:2)  TO   IDX8
-                    MOVE     "1"     TO   RECE02-KOHJNISSUTBL(IDX8)
+                    MOVE     1   TO   TBL-CHIIKI-SANTEI-FLG(IDX30 IDX8)
                     IF  SYU-TOTAL-HKNTEN  NOT = ZERO
-                      MOVE   "2"     TO   RECE02-KOHJNISSUTBL(IDX8)
+                      MOVE   2   TO   TBL-CHIIKI-SANTEI-FLG(IDX30 IDX8)
                     END-IF
                END-IF
       *
@@ -20631,15 +20659,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                END-PERFORM
            END-PERFORM
-      *¸øÈñ¼ÂÆü¿ô¥Æ¡¼¥Ö¥ëºÆÊÔ½¸
-           PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
-                      UNTIL      ACCT-IDX    >     31
-              IF    RECE02-KOHJNISSUTBL(ACCT-IDX)  NOT =  SPACE
-                 IF  (RECE02-JNISSUTBL(ACCT-IDX)     = SPACE)
-                 AND (RECE02-KOHJNISSUTBL(ACCT-IDX)  =  "1" )
-                     MOVE   SPACE   TO   RECE02-KOHJNISSUTBL(ACCT-IDX)
-                 END-IF
-              END-IF
+      *¸øÈñ¼ÂÆü¿ô¥Æ¡¼¥Ö¥ëÊÔ½¸
+           PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
+                      UNTIL      HKN-IDX    >      5
+             PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
+                        UNTIL      ACCT-IDX    >     31
+               IF   TBL-CHIIKI-SANTEI-FLG(HKN-IDX ACCT-IDX) =   2
+                    MOVE   "2"    TO    RECE02-KOHJNISSUTBL(ACCT-IDX)
+               END-IF
+               IF  (TBL-CHIIKI-SANTEI-FLG(HKN-IDX ACCT-IDX) =   1  )
+               AND (RECE02-JNISSUTBL(ACCT-IDX)              =  "1" )
+               AND (RECE02-KOHJNISSUTBL(ACCT-IDX)       NOT =  "2" )
+               AND (RECE02-HENTOTALTEN(HKN-IDX)         NOT =  ZERO)
+                    MOVE   "1"    TO    RECE02-KOHJNISSUTBL(ACCT-IDX)
+               END-IF
+             END-PERFORM
            END-PERFORM
       *
       ***

@@ -170,6 +170,8 @@
       *  04.08.03    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
       *                                     ¡Ê¥³¥ó¥Ñ¥¤¥ë»þ¤Î¥ï¡¼¥Ë¥ó¥°½¤Àµ¡Ë
       *  04.08.04    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
+      *  04.08.05    NACL-ÌçÏÆ    15/12/02  £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº
+      *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -428,6 +430,8 @@
            03  IDX28               PIC 9(02).
            03  IDX29               PIC 9(02).
            03  IDX30               PIC 9(02).
+           03  IDX31               PIC 9(02).
+           03  IDX32               PIC 9(02).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -605,6 +609,8 @@
       *
            03  WRK-ZAIKYO-YMD9               PIC X(08).
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
+      *
+           03  WRK-SEIKENTEN                 PIC ZZZZZZ9.
       *
        01  WRK-RECE04-REC. 
            COPY    "CPRCF004.INC"  REPLACING   //RECE04//
@@ -1739,6 +1745,13 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               PERFORM   2001-KOHJYUSIN-COMMENT-SEC
            END-IF
       *
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô¥³¥á¥ó¥È
+      *
+           IF   RECE02-SEIKENFLG      =  1
+           AND  RECE02-SEIKENTEN  NOT = ZERO
+              PERFORM   2001-KOHTEN-COMMENT-SEC
+           END-IF
+      *
       *    Îà»öÏ·¿ÍÁë¸ýÄ§¼ý³Û¤Î¥³¥á¥ó¥È
       *
            IF   RECE02-KOH-SAIKEIFLG    =   1
@@ -2704,6 +2717,93 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2001-KOHJYUSIN-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-KOHTEN-COMMENT-SEC          SECTION.
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    SPACE               TO  WRK-RECE05XX-REC
+           INITIALIZE                      WRK-RECE05XX-REC
+      *
+           MOVE    "810000001"         TO  WRK-RECE05XX-SRYCD(1 1)
+           MOVE    ZERO                TO  WRK-RECE05XX-SRYSURYO(1 1)
+      *
+           MOVE    ZERO                TO  IDX31
+           MOVE    RECE02-SEIKENTEN    TO  WRK-SEIKENTEN
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-SEIKENTEN       TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           IF    ( KANACHK-RC      =   ZERO )
+           AND   ( KANACHK-MAX     >   ZERO )
+             PERFORM  VARYING   IDX   FROM   1   BY   2
+                       UNTIL    IDX     >    KANACHK-MAX
+               IF  KANACHK-OUT-INPUT(IDX:2)  NOT =  "¡¡"
+                   MOVE   IDX          TO  IDX31
+                   MOVE   KANACHK-MAX  TO  IDX
+               END-IF
+             END-PERFORM
+             IF    IDX31  NOT = ZERO
+               COMPUTE  IDX32  =  KANACHK-MAX - IDX31 + 1
+               STRING  "£³ºÐ»ùÀºÌ©·ò¿Ç¡¡"  DELIMITED  BY  SIZE
+                        KANACHK-OUT-INPUT(IDX31:IDX32)
+                                           DELIMITED  BY  SIZE
+                       "ÅÀ"                DELIMITED  BY  SIZE
+                                           INTO  WRK-RECE05XX-NAME(1 1)
+               END-STRING
+             END-IF
+           END-IF
+           COMPUTE  WRK-RECE05XX-YUKOKETA(1 1) = 9 + (IDX32 / 2)
+      *
+      *    ¼õ¿ÇÆü¤ÎÊÔ½¸¤ò´Þ¤ó¤ÀÆâÍÆ¤ÇÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎºÆºîÀ®
+           MOVE       ZERO             TO      FLG-WRKRECE05
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE05
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE05  =    1
+                PERFORM 800-RECE02-SET059-SEC
+                MOVE    99999970             TO  RECE059-ZAINUM
+                MOVE    WRK-KOHBUNRI-JIDO    TO  RECE059-KOHBUNRI
+                MOVE    "99"                 TO  RECE059-SRYKBN
+                ADD     1                    TO  WRK-RENNUM
+                MOVE    WRK-RENNUM           TO  RECE059-RENNUM
+                PERFORM  VARYING   IDX   FROM   1   BY   1
+                         UNTIL   (IDX       >    5)   OR
+                                 (FLG-WRKRECE05   =   1)
+                   ADD         1             TO    IDX-RECE05
+                   IF (WRK-RECE05XX-SRYCD(IDX-RECE05 1) = SPACE)
+                   OR (IDX-RECE05                       >  100 )
+                       MOVE    1             TO    FLG-WRKRECE05
+                   ELSE
+                       MOVE  WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+                                        TO   RECE059-SRYACT-TBL(IDX)
+                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF  
+                END-PERFORM
+                IF   RECE059-SRYCD(1)  NOT =  SPACE
+                   WRITE   RECE059-REC
+                   ADD     1            TO   CNT-RECE059
+                END-IF
+           END-PERFORM
+      *
+      *
+           PERFORM 800-RECE02-SET049-SEC
+           MOVE    99999970            TO  RECE049-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE049-KOHBUNRI
+           MOVE    "99"                TO  RECE049-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE049-HKNCOMBI
+      *
+           MOVE    WRK-CNT-MEISAI      TO  RECE049-MEISAISU
+      *
+           WRITE   RECE049-REC
+           ADD     1                   TO  CNT-RECE049
+      *
+           .
+       2001-KOHTEN-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

@@ -105,6 +105,7 @@
       *  04.07.09    NACL-ÌçÏÆ    15/05/18  ÀÁµáÅÀ¿ô£°ÅÀ¸øÈñ¥ì¥»µ­ºÜÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    15/10/13  ÀÁµá¥¼¥í¥Õ¥é¥°ÊÔ½¸
+      *  04.08.02    NACL-ÌçÏÆ    15/12/02  £°ÅÀÃÏ°è¸øÈñµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -126,6 +127,8 @@
            03  FLG-HKNNUM          PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-SYUNOU          PIC 9(01).
+           03  FLG-SRYACCT         PIC 9(01).
+           03  FLG-SRYACT          PIC 9(01).
            03  FLG-CHECK           PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
@@ -147,6 +150,7 @@
            03  FLG-HKNCOMBI-CHECK  PIC 9(01).
            03  FLG-SKJ-CHECK       PIC 9(01).
            03  FLG-SRYACCT-CHECK   PIC 9(01).
+           03  FLG-SRYACT-CHECK    PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -268,6 +272,10 @@
       *    ¿ÇÎÅ²ñ·×
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
+      *
+      *    ¿ÇÎÅ¹Ô°Ù
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK1001.INC".
@@ -2107,8 +2115,25 @@
                        MOVE    1        TO  FLG-TENKEN
                      END-IF
                   ELSE
+                     IF  LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8"
+                       MOVE     ZERO    TO   FLG-SRYACT-CHECK
+                       PERFORM  VARYING  IDX2  FROM  1  BY  1
+                                 UNTIL  (IDX2               >  50)
+                                  OR    (FLG-SRYACT-CHECK   =  1 )
+                         IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                           PERFORM  2004117-SRYACCT-CHECK2-SEC
+                         END-IF
+                       END-PERFORM
+                       IF   FLG-SRYACT-CHECK = 1
+                         CONTINUE
+                       ELSE
+                         MOVE 01        TO  LNK-FTNJGNCHK-RC
+                         MOVE  1        TO  FLG-TENKEN
+                       END-IF
+                     ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
+                     END-IF
                   END-IF
                   MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
@@ -2507,14 +2532,10 @@
                                                   MCPDATA-REC
                                                   SPA-AREA
            IF      MCP-RC   =   ZERO
-             MOVE   "DBFETCH"              TO  MCP-FUNC
              MOVE   "tbl_sryacct"          TO  MCP-TABLE
              MOVE   "key64"                TO  MCP-PATHNAME
-             CALL   "ORCDBMAIN"            USING  MCPAREA
-                                                  MCPDATA-REC
-                                                  SPA-AREA
-             IF    MCP-RC   =   ZERO
-                MOVE    MCPDATA-REC        TO  SRYACCT-REC
+             PERFORM 910-SRYACCT-READ-SEC
+             IF    FLG-SRYACCT  =  ZERO
                 MOVE    1                  TO  FLG-SRYACCT-CHECK
              END-IF
            END-IF
@@ -2565,6 +2586,73 @@
       *
            .
        2004116-SYS2005-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Á¥§¥Ã¥¯£²
+      *****************************************************************
+       2004117-SRYACCT-CHECK2-SEC            SECTION.
+      *
+           INITIALIZE                          SRYACCT-REC
+           MOVE   LNK-FTNJGNCHK-HOSPNUM    TO  ACCT-HOSPNUM
+           MOVE   LNK-FTNJGNCHK-NYUGAIKBN  TO  ACCT-NYUGAIKBN
+           MOVE   LNK-FTNJGNCHK-PTID       TO  ACCT-PTID
+           MOVE   LNK-FTNJGNCHK-SRYYM      TO  ACCT-SRYYM
+           MOVE   WRK-HKNCOMBINUM(IDX2)    TO  ACCT-HKNCOMBI
+           MOVE   SRYACCT-REC              TO  MCPDATA-REC
+           MOVE   "DBSELECT"               TO  MCP-FUNC
+           MOVE   "tbl_sryacct"            TO  MCP-TABLE
+           MOVE   "key67"                  TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"              USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+           IF      MCP-RC   =   ZERO
+             MOVE   "tbl_sryacct"          TO  MCP-TABLE
+             MOVE   "key67"                TO  MCP-PATHNAME
+             PERFORM 910-SRYACCT-READ-SEC
+             PERFORM  UNTIL  (FLG-SRYACCT      =  1)
+                       OR    (FLG-SRYACT-CHECK =  1)
+               INITIALIZE                      SRYACT-REC
+               MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+               MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+               MOVE    ACCT-PTID           TO  SRY-PTID
+               MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+               MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+               MOVE    "099999925"         TO  SRY-SRYCD(1)
+               MOVE    "099999925"         TO  SRY-SRYCD(2)
+               MOVE    "099999925"         TO  SRY-SRYCD(3)
+               MOVE    "099999925"         TO  SRY-SRYCD(4)
+               MOVE    "099999925"         TO  SRY-SRYCD(5)
+               MOVE    SRYACT-REC          TO  MCPDATA-REC
+               MOVE    "DBSELECT"          TO  MCP-FUNC
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+               IF      MCP-RC   =   ZERO
+                 MOVE   "tbl_sryact"       TO  MCP-TABLE
+                 MOVE   "key8"             TO  MCP-PATHNAME
+                 PERFORM 910-SRYACT-READ-SEC
+                 IF    FLG-SRYACT  =  ZERO
+                    MOVE    1              TO  FLG-SRYACT-CHECK
+                 END-IF
+               END-IF
+               MOVE     "tbl_sryact"       TO  MCP-TABLE
+               MOVE     "key8"             TO  MCP-PATHNAME
+               PERFORM   910-DB-CLOSE-SEC
+      *
+               MOVE     "tbl_sryacct"      TO  MCP-TABLE
+               MOVE     "key67"            TO  MCP-PATHNAME
+               PERFORM   910-SRYACCT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE     "tbl_sryacct"          TO  MCP-TABLE
+           MOVE     "key67"                TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+       2004117-SRYACCT-CHECK2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2694,8 +2782,25 @@
                        MOVE    1        TO  FLG-TENKEN
                      END-IF
                   ELSE
+                     IF  LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8"
+                       MOVE     ZERO    TO   FLG-SRYACT-CHECK
+                       PERFORM  VARYING  IDX2  FROM  1  BY  1
+                                 UNTIL  (IDX2               >  50)
+                                  OR    (FLG-SRYACT-CHECK   =  1 )
+                         IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                           PERFORM  2004117-SRYACCT-CHECK2-SEC
+                         END-IF
+                       END-PERFORM
+                       IF   FLG-SRYACT-CHECK = 1
+                         CONTINUE
+                       ELSE
+                         MOVE 01        TO  LNK-FTNJGNCHK-RC
+                         MOVE  1        TO  FLG-TENKEN
+                       END-IF
+                     ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                        MOVE    1        TO  FLG-TENKEN
+                     END-IF
                   END-IF
                   MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
@@ -3227,6 +3332,48 @@
       *
            .
        910-PTKOHINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×ÆÉ¹þ
+      *****************************************************************
+       910-SRYACCT-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACCT-REC
+               MOVE    ZERO            TO  FLG-SRYACCT
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+       910-SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°ÙÆÉ¹þ
+      *****************************************************************
+       910-SRYACT-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACT-REC
+               MOVE    ZERO            TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
