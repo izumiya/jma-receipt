@@ -208,6 +208,8 @@
            03  FLG-GAIDEL          PIC 9(01).
            03  FLG-ARI1            PIC 9(01).
            03  FLG-ARIRS           PIC 9(01).
+      *H27.12
+           03  FLG-JIHI-ARI        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -6359,6 +6361,8 @@
            MOVE    IDX2                TO  IDX-INT-MAX
       *
            MOVE    ZERO                TO  FLG-ARIRS
+      *
+           MOVE    ZERO                TO  FLG-JIHI-ARI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
                              ((HZN-COM-INPUTCD (IDX)   =   SPACE ) AND
@@ -6423,6 +6427,23 @@
                                                                 (IDX2)
                        MOVE    SPACE               TO  SPA-COM-CHKFLG
                                                                 (IDX2)
+      *H27.12
+      *                前が自費の時
+                       IF     (IDX4                =   1   )
+                          AND (FLG-JIHI-ARI        =   1   )
+                           PERFORM 101023-JIHIEND-CHK-SEC
+                       END-IF
+      *H27.12
+      *                自費診療種別有
+                       IF      (IDX4               =   1  )
+                           IF  (SPA-GMN-INPUTCD(IDX2)(1:4)
+                                                   =   ".950"
+                                                   OR  ".960")
+                               MOVE    1           TO  FLG-JIHI-ARI
+                           ELSE
+                               MOVE    ZERO        TO  FLG-JIHI-ARI
+                           END-IF
+                      END-IF
                    END-PERFORM
                    INITIALIZE                  WRK-SCR-REC
                    MOVE    ZERO                TO  IDX3
@@ -6452,6 +6473,12 @@
                    MOVE    SPACE               TO  SPA-MAE-INPUTCD(IDX2)
                    MOVE    SPACE               TO  SPA-COM-CHKFLG
                                                                 (IDX2)
+      *H27.12
+      *            前が自費の時
+                   IF     (IDX3                =   1   )
+                      AND (FLG-JIHI-ARI        =   1   )
+                       PERFORM 101023-JIHIEND-CHK-SEC
+                   END-IF
                END-PERFORM
            END-IF
       *    時間外入力あり
@@ -6521,6 +6548,30 @@
       *
            .
        4201-ZAIDEL-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    自費剤の剤分離判定処理
+      *****************************************************************
+       101023-JIHIEND-CHK-SEC              SECTION.
+      *
+           IF     (SPA-COM-ZAIEND (IDX2 - 1)   =   "1"  )
+              AND (SPA-COM-KAIFLG (IDX2 - 1)   =   SPACE)
+              AND (SPA-GMN-INPUTCD(IDX2)(1:1)  NOT =   "." )
+      *        自費の次が診療種別でない時
+               MOVE    "1"                 TO  SPA-COM-KAIFLG
+                                                         (IDX2 - 1)
+               INITIALIZE                  ORCSC94AREA
+               MOVE    "1"                 TO  LNK-SC94-KBN
+               MOVE    "K02"               TO  LNK-SC94-PG
+               COMPUTE LNK-SC94-IDX        =   IDX2  -  1
+               CALL    "ORCSC94"           USING
+                                               ORCSC94AREA
+                                               SPA-SCR-REC
+                                               SPA-AREA
+           END-IF
+      *
+           .
+       101023-JIHIEND-CHK-EXT.
            EXIT.
       *****************************************************************
       *    診察料チェック変換処理
