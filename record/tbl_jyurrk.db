@@ -1247,4 +1247,36 @@ path	key60	{
 	};
 };
 
+path	key61 	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key61_csr CURSOR FOR
+		SELECT a.*
+                FROM tbl_jyurrk a,tbl_ptnum b, tbl_ptinf c
+			WHERE   a.HOSPNUM    =   :HOSPNUM
+			AND   a.NYUGAIKBN   =   :NYUGAIKBN
+			AND   a.SRYKA       LIKE  :SRYKA
+			AND   a.HKNCOMBINUM <>  '9999'
+            AND   (a.HOSPNUM,a.PTID,a.SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
+                                   FROM tbl_jyurrk 
+                               	WHERE   HOSPNUM    =   a.HOSPNUM
+		        	AND   PTID        =   a.PTID
+         			AND   NYUGAIKBN   =   a.NYUGAIKBN
+                                AND   SRYYMD      >=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
+	        	AND   a.HOSPNUM     =  b.HOSPNUM
+	        	AND   a.PTID       =  b.PTID
+	        	AND   a.HOSPNUM     =  c.HOSPNUM
+	        	AND   a.PTID       =  c.PTID
+        		AND   c.TSTPTNUMKBN  <> '1'
+			ORDER BY ( CASE :UPEDANUM
+			             WHEN 1 THEN (c.KANANAME,b.PTNUM)
+			             ELSE (b.PTNUM,'')
+			           END),
+			         a.RENNUM,
+			         a.DOUJI_RENNUM,
+			         a.EDANUM
+		;
+	};
+};
 
