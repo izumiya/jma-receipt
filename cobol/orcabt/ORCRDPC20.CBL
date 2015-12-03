@@ -3076,7 +3076,9 @@
                    END-IF
                END-PERFORM
                MOVE    TBL-HEIMA-30M-IDX (IDZ3)    TO  IDXW
-               MOVE    ZERO            TO  TBL-HEIMA-30M-TMP (IDXW)
+               IF      IDXW                >   ZERO
+                   MOVE    ZERO            TO  TBL-HEIMA-30M-TMP (IDXW)
+               END-IF
            END-PERFORM
       *
            MOVE    ZERO                TO  IDZ3
