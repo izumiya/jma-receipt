@@ -696,6 +696,8 @@
       *  04.08.04    NACL-ÌçÏÆ    15/10/21  ¸½ÊªµëÉÕÂÐ¾Ý³°¤ÎÄã½êÆÀ¡Ê¿©»ö¡ËÂÐ±þ
       *  04.08.05    NACL-ÌçÏÆ    15/11/30  Ë¡ÊÌ£²£´¡¦£·£¹¤Î¸½ÊªµëÉÕ°ìÉôÉéÃ´¶â
       *                                     µ­ºÜÂÐ±þ
+      *  04.08.06    NACL-ÌçÏÆ    15/12/02  £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº
+      *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -18649,6 +18651,21 @@
                  END-IF
               END-IF
            END-PERFORM
+      *
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô½¸·×
+           EVALUATE   WRK-PREFNUM
+             WHEN    "38"
+               IF   (SYU-KOH-HKNNUM(1) = "394")
+               OR   (SYU-KOH-HKNNUM(2) = "394")
+               OR   (SYU-KOH-HKNNUM(3) = "394")
+               OR   (SYU-KOH-HKNNUM(4) = "394")
+                 IF  RECE62-TEISYUTUSAKI  =  2
+                    MOVE   1                TO  RECE62-SEIKENFLG
+                    ADD   SYU-TOTAL-HKNTEN  TO  RECE62-SEIKENTEN
+                 END-IF
+               END-IF
+           END-EVALUATE
+      *
            .
        21044-RECE62-FTN-HENSYU-EXT.
            EXIT.

@@ -166,6 +166,8 @@
       *  04.08.02    NACL-ÌçÏÆ    14/07/29  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
       *                                     ¡Ê¥³¥ó¥Ñ¥¤¥ë»þ¤Î¥ï¡¼¥Ë¥ó¥°½¤Àµ¡Ë
       *  04.08.03    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
+      *  04.08.04    NACL-ÌçÏÆ    15/12/02  £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº
+      *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -679,6 +681,8 @@
                05  WRK-CYOJKSN2-TAIHIYY         PIC X(04).
                05  WRK-CYOJKSN2-TAIHIMM         PIC X(04).
                05  WRK-CYOJKSN2-TAIHIDD         PIC X(04).
+      *
+           03  WRK-SEIKENTEN                    PIC ZZZZZZ9.
       *
        01  WRK-RECE64-REC. 
            COPY    "CPRCF064.INC"  REPLACING   //RECE64//
@@ -1690,6 +1694,13 @@
               PERFORM   2001-KOHJYUSIN-COMMENT-SEC
            END-IF
       *
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô¥³¥á¥ó¥È
+      *
+           IF   RECE62-SEIKENFLG      =  1
+           AND  RECE62-SEIKENTEN  NOT = ZERO
+              PERFORM   2001-KOHTEN-COMMENT-SEC
+           END-IF
+      *
       *    Îà»öÏ·¿ÍÁë¸ýÄ§¼ý³Û¤Î¥³¥á¥ó¥È
       *
            IF   RECE62-KOH-SAIKEIFLG    =   1
@@ -2048,6 +2059,93 @@
       *
            .
        2001-KOHJYUSIN-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £³ºÐ»ù»ë³ÐÄ°³ÐÀºÌ©·ò¹¯¿Çºº¡ÊÃÏ°è¸øÈñ¡Ë¤ÎÅÀ¿ô¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-KOHTEN-COMMENT-SEC          SECTION.
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    SPACE               TO  WRK-RECE65XX-REC
+           INITIALIZE                      WRK-RECE65XX-REC
+      *
+           MOVE    "810000001"         TO  WRK-RECE65XX-SRYCD(1 1)
+           MOVE    ZERO                TO  WRK-RECE65XX-SRYSURYO(1 1)
+      *
+           MOVE    ZERO                TO  IDX31
+           MOVE    RECE62-SEIKENTEN    TO  WRK-SEIKENTEN
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "2"                 TO  KANACHK-SYORI
+           MOVE    WRK-SEIKENTEN       TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           IF    ( KANACHK-RC      =   ZERO )
+           AND   ( KANACHK-MAX     >   ZERO )
+             PERFORM  VARYING   IDX   FROM   1   BY   2
+                       UNTIL    IDX     >    KANACHK-MAX
+               IF  KANACHK-OUT-INPUT(IDX:2)  NOT =  "¡¡"
+                   MOVE   IDX          TO  IDX31
+                   MOVE   KANACHK-MAX  TO  IDX
+               END-IF
+             END-PERFORM
+             IF    IDX31  NOT = ZERO
+               COMPUTE  IDX32  =  KANACHK-MAX - IDX31 + 1
+               STRING  "£³ºÐ»ùÀºÌ©·ò¿Ç¡¡"  DELIMITED  BY  SIZE
+                        KANACHK-OUT-INPUT(IDX31:IDX32)
+                                           DELIMITED  BY  SIZE
+                       "ÅÀ"                DELIMITED  BY  SIZE
+                                           INTO  WRK-RECE65XX-NAME(1 1)
+               END-STRING
+             END-IF
+           END-IF
+           COMPUTE  WRK-RECE65XX-YUKOKETA(1 1) = 9 + (IDX32 / 2)
+      *
+      *    ¼õ¿ÇÆü¤ÎÊÔ½¸¤ò´Þ¤ó¤ÀÆâÍÆ¤ÇÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎºÆºîÀ®
+           MOVE       ZERO             TO      FLG-WRKRECE65
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE65
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE65  =    1
+               PERFORM 500-RECE65-KEY-HENSYU-SEC
+                MOVE    99999970             TO  RECE659-ZAINUM
+                MOVE    WRK-KOHBUNRI-JIDO    TO  RECE659-KOHBUNRI
+                MOVE    "99"                 TO  RECE659-SRYKBN
+                ADD     1                    TO  WRK-RENNUM
+                MOVE    WRK-RENNUM           TO  RECE659-RENNUM
+                PERFORM  VARYING   IDX   FROM   1   BY   1
+                         UNTIL   (IDX       >    5)   OR
+                                 (FLG-WRKRECE65   =   1)
+                   ADD         1             TO    IDX-RECE65
+                   IF (WRK-RECE65XX-SRYCD(IDX-RECE65 1) = SPACE)
+                   OR (IDX-RECE65                       >  100 )
+                       MOVE    1             TO    FLG-WRKRECE65
+                   ELSE
+                       MOVE  WRK-RECE65XX-SRYACT-TBL(IDX-RECE65 1)
+                                        TO   RECE659-SRYACT-TBL(IDX)
+                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF  
+                END-PERFORM
+                IF   RECE659-SRYCD(1)  NOT =  SPACE
+                   WRITE   RECE659-REC
+                   ADD     1            TO   CNT-RECE659
+                END-IF
+           END-PERFORM
+      *
+      *
+           PERFORM 500-RECE64-KEY-HENSYU-SEC
+           MOVE    99999970            TO  RECE649-ZAINUM
+           MOVE    WRK-KOHBUNRI-JIDO   TO  RECE649-KOHBUNRI
+           MOVE    "99"                TO  RECE649-SRYKBN
+           MOVE    WRK-HKNCOMBI-JIDO   TO  RECE649-HKNCOMBI
+      *
+           MOVE    WRK-CNT-MEISAI      TO  RECE649-MEISAISU
+      *
+           WRITE   RECE649-REC
+           ADD     1                   TO  CNT-RECE649
+      *
+           .
+       2001-KOHTEN-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
