@@ -133,6 +133,8 @@
       *                                     存在チェックの修正
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
+      *  04.08.02    NACL-藤原    15/12/02  病名入力時の廃止年月日変換の
+      *                                     条件追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3890,11 +3892,16 @@ grpsys                                         SPA-AREA
                                        TO  SPA-NAI-C03-TOKSKNCD (IDZ)
                MOVE    LNK-BYO-TNANBYOCD  (IDX)
                                        TO  SPA-NAI-C03-NANBYOCD-O(IDZ)
-               MOVE    LNK-BYO-THAISIYMD (IDX)
-                                       TO  WRK-SYMD
-               PERFORM 5002-HIZUKE-HEN-SEC
-               MOVE    LNK-DAY2-EDTYMD3
-                                       TO  WRK-HAISIYMDH
+               IF      LNK-BYO-THAISIYMD (IDX)
+                                       =   ALL "9" OR  SPACE
+                   CONTINUE
+               ELSE
+                   MOVE    LNK-BYO-THAISIYMD (IDX)
+                                           TO  WRK-SYMD
+                   PERFORM 5002-HIZUKE-HEN-SEC
+                   MOVE    LNK-DAY2-EDTYMD3
+                                           TO  WRK-HAISIYMDH
+               END-IF
            END-PERFORM
       *
       *    病名コード最大個数オーバー
@@ -4046,7 +4053,7 @@ grpsys                                         SPA-AREA
                ELSE
                    MOVE    "0071"              TO  SPA-ERRCD
                    MOVE    12                  TO  SPA-GMN-C03-CUR
-                   GO  TO  41013-BYOMEI-CHK-EXT
+                   GO  TO 41022-CHARTBYOMEI-CHK-EXT
                END-IF
            END-IF    
       *
@@ -4063,7 +4070,7 @@ grpsys                                         SPA-AREA
            COMPUTE WRK-MOJISU   =   WRK-MOJISU  /   2        
            MOVE    WRK-MOJISU           TO  SPA-NAI-C03-CHARTBYOMEIMOJI
            .
-       41013-BYOMEI-CHK-EXT.
+       41022-CHARTBYOMEI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4926,6 +4933,7 @@ grpsys                                         SPA-AREA
       *  
            MOVE    SPACE                TO  C09
       *
+           INITIALIZE                       C09
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       WRK-CONS-BYOMEICD-MAX
                    OR      SPA-NAI-C03-BYOMEICD (IDX)  =   SPACE
@@ -5887,6 +5895,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            MOVE    SPACE               TO  SPA-CID1-FLG
       *
            MOVE    SPACE               TO  CID1
+           INITIALIZE                      CID1
            EVALUATE    SPA-CIDCD
                WHEN    "0105"
                    MOVE    WRK-ERR-BYOMEI
@@ -5958,6 +5967,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID2
+           INITIALIZE                      CID2
            MOVE    WRK-CIDMSG          TO  CID2-MSG
            MOVE    SPA-C03-IKOMOTO-BYOMEICD
                                        TO  CID2-BYOMEICD1
@@ -5999,6 +6009,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            MOVE    SPACE               TO  SPA-CID3-FLG
       *
            MOVE    SPACE               TO  CID3
+           INITIALIZE                      CID3
            MOVE    SPA-CIDCD3          TO  CID3-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID3-MSG
            MOVE    "F11:分類名のみ削除"  
@@ -6029,6 +6040,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            MOVE    SPACE               TO  SPA-CID4-FLG
       *
            MOVE    SPACE               TO  CID4
+           INITIALIZE                      CID4
            MOVE    SPA-CIDCD4          TO  CID4-ID1CODE
            EVALUATE    SPA-CIDCD4
                WHEN    "0103"
@@ -6069,6 +6081,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
            MOVE    SPACE               TO  SPA-CID5-FLG
       *
            MOVE    SPACE               TO  CID5
+           INITIALIZE                      CID5
            MOVE    SPA-CIDCD5          TO  CID5-ID1CODE
            MOVE    WRK-CIDMSG          TO  CID5-MSG
            MOVE    "B01"               TO  MCP-WIDGET
