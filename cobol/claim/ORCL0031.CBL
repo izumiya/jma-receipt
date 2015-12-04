@@ -1719,10 +1719,12 @@
                    MOVE    "5"                 TO  WRK-TIMEKBN
       *        µÙÆü²Ã»»
                WHEN    "113007170"
-                   MOVE    "6"                 TO  WRK-TIMEKBN
+      **           MOVE    "6"                 TO  WRK-TIMEKBN
+                   MOVE    "2"                 TO  WRK-TIMEKBN
       *        ¿¼Ìë²Ã»»
                WHEN    "113007270"
-                   MOVE    "7"                 TO  WRK-TIMEKBN
+      **           MOVE    "7"                 TO  WRK-TIMEKBN
+                   MOVE    "3"                 TO  WRK-TIMEKBN
       *        ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡ÊºÆ¿Ç¡Ë
       *        »þ´Ö³°²Ã»»
                WHEN    "113009770"
@@ -1732,10 +1734,12 @@
                    MOVE    "5"                 TO  WRK-TIMEKBN
       *        µÙÆü²Ã»»
                WHEN    "113007470"
-                   MOVE    "6"                 TO  WRK-TIMEKBN
+      *****        MOVE    "6"                 TO  WRK-TIMEKBN
+                   MOVE    "2"                 TO  WRK-TIMEKBN
       *        ¿¼Ìë²Ã»»
                WHEN    "113007570"
-                   MOVE    "7"                 TO  WRK-TIMEKBN
+      ****         MOVE    "7"                 TO  WRK-TIMEKBN
+                   MOVE    "3"                 TO  WRK-TIMEKBN
       *        ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡Ê³°Íè¿Ç»¡ÎÁ¡Ë
       *        »þ´Ö³°²Ã»»
                WHEN    "113009870"
@@ -1745,10 +1749,12 @@
                    MOVE    "5"                 TO  WRK-TIMEKBN
       *        µÙÆü²Ã»»
                WHEN    "113007770"
-                   MOVE    "6"                 TO  WRK-TIMEKBN
+      ****         MOVE    "6"                 TO  WRK-TIMEKBN
+                   MOVE    "2"                 TO  WRK-TIMEKBN
       *        ¿¼Ìë²Ã»»
                WHEN    "113007870"
-                   MOVE    "7"                 TO  WRK-TIMEKBN
+      ****         MOVE    "7"                 TO  WRK-TIMEKBN
+                   MOVE    "3"                 TO  WRK-TIMEKBN
       *
                WHEN    OTHER
                    EVALUATE    TNS-TIMEKSNKBN
