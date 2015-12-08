@@ -173,6 +173,8 @@
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    15/12/02  ０点地域公費記載対応
+      *  04.08.05    NACL-門脇    15/12/08  労災コードの表用番号・公表順序番号
+      *                                     編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3938,6 +3940,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    END-EVALUATE
                  ELSE
                    IF  WRK-ZAIW-SRYCD1(1:3) = "101"
+                   AND WRK-ZAIW-CDKBN-KBN   = SPACE
                        MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
                        MOVE  WRK-ZAIW-SRYCD1 TO  WRK-ZAIW-KOUHYOJYUNNUM
                    END-IF
