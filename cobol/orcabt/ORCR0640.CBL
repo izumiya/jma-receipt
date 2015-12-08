@@ -700,6 +700,7 @@
       *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *  04.08.07    NACL-ÌçÏÆ    15/12/08  À¸ÊÝ¤Î·î¾å¸Â³ÛÅþÃ£¥Á¥§¥Ã¥¯¡¢µÚ¤Ó¡¢
       *                                     Á´¹ñ¸øÈñ°ìÉôÉéÃ´¶â¥ì¥»¥×¥Èµ­ºÜ½¤Àµ
+      *  04.08.08    NACL-ÌçÏÆ    15/12/08  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -26283,9 +26284,9 @@
                END-IF
       *      ÅìµþÅÔÃÏÊý¸øÈñ
              WHEN    "13"
-               IF  (RECE62-SRYYM        >=  "200804" )
-               AND (RECE62-TEISYUTUSAKI  =   2  OR  6)
-               AND (RECE62-KOUREI        =  "1"      )
+               IF  (RECE62-SRYYM        >=  "200804"  )
+               AND (RECE62-TEISYUTUSAKI  =   2  OR  6 )
+               AND (RECE62-KOUREI        =  "1" OR "2")
                  IF  (RECE62-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
                  AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
       ***********IF  (RECE62-KOHNUM(1)   =  "282"                )

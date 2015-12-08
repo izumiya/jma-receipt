@@ -721,6 +721,7 @@
       *                                     ¡ÊÃÏ°è¸øÈñ¡ËÂÐ±þ
       *  04.08.11    NACL-ÌçÏÆ    15/12/08  À¸ÊÝ¤Î·î¾å¸Â³ÛÅþÃ£¥Á¥§¥Ã¥¯¡¢µÚ¤Ó¡¢
       *                                     Á´¹ñ¸øÈñ°ìÉôÉéÃ´¶â¥ì¥»¥×¥Èµ­ºÜ½¤Àµ
+      *  04.08.12    NACL-ÌçÏÆ    15/12/08  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -22934,9 +22935,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *      ÅìµþÅÔÃÏÊý¸øÈñ
              WHEN    "13"
-               IF  (RECE02-SRYYM        >=  "200804" )
-               AND (RECE02-TEISYUTUSAKI  =   2  OR  6)
-               AND (RECE02-ZAITAKU       =  "1"      )
+               IF  (RECE02-SRYYM        >=  "200804"  )
+               AND (RECE02-TEISYUTUSAKI  =   2  OR  6 )
+               AND (RECE02-ZAITAKU       =  "1" OR "2")
                  IF  (RECE02-KOHNUM(1)(1:1) >= "1" AND <= "8"    )
                  AND (TBL-TOKATUKAIFLG(1)    =  ZERO             )
       ***********IF  (RECE02-KOHNUM(1)   =  "282"                )
