@@ -31,6 +31,7 @@ bind	"KERR2"		"OpenCOBOL"	"ORCGKERR2";
 bind	"KID1"		"OpenCOBOL"	"ORCGKID1";
 bind	"KID2"		"OpenCOBOL"	"ORCGKID2";
 bind	"KHELP"		"OpenCOBOL"	"ORCGKHELP";
+bindapi "medicalsetv2"  "OpenCOBOL"	"ORAPI021SETV2"; 
 
 multiplex_group	orca21;
 
@@ -65,7 +66,13 @@ data	{
                 KID1;
                 KID2;
                 KHELP;
+		medicalsetv2;
 	};
+};
+
+db "xml2" {
+ xml_medicalsetv2req;
+ xml_medicalsetv2res;
 };
 
 #include "orcadb.inc"
