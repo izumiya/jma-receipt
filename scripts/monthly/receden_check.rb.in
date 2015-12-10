@@ -81,7 +81,12 @@ class Receden_check < Receden_common
     if ret.empty?
       sql="select * from tbl_tensu where HOSPNUM = #{hospnum} " +
           "and SRYCD = '#{srycd}' and '#{sryymd}' between YUKOSTYMD and YUKOEDYMD"
-      data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+	  begin
+        data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+      rescue  => err
+        STDERR.puts err.message
+        data=nil
+      end
       if data != nil && data.size > 0
         ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
         @cache_tensu[srycd] << ret
@@ -98,7 +103,12 @@ class Receden_check < Receden_common
       ret = @cache_byomei[byomeicd]
     else
       sql = "select * from tbl_byomei where BYOMEICD = '#{byomeicd}' "
-      data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+	  begin
+        data=JSON.load(`#{ENV['MONSQL']} -dir #{ENV['LDDIRECTORY']} -c "#{sql}"`)
+      rescue  => err
+        STDERR.puts err.message
+        data=nil
+      end
       if data != nil && data.size > 0
         ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
         @cache_byomei[byomeicd] = ret

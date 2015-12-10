@@ -204,13 +204,14 @@ fi
 	[ -e ${ERRLOG}  ] && rm -f ${ERRLOG}
 	[ -e ${INFILE}  ] && nkf -I --ic=EUC-JP --oc=CP932 ${INFILE} | nkf --ic=CP932 --oc=UTF-8 > ${UTF8FILE}
 
-	receden_check.rb "$PRM" 2>  ${ERRLOG}
-	if [ -s ${ERRLOG} ]; then
-	    cat ${ERRLOG} >> $LOG_FILE
+    echo "--- receden check start $(LANG=C date) ---" >>$LOG_FILE
+	receden_check.rb "$PRM"  >> $LOG_FILE 2>&1
+	if [ $? -ne 0 ]; then
 	    ERRCD='0099'
 	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD:${#ERRCD}-4:4},${20} >> $LOG_FILE
 	    exit
 	fi
+    echo "--- receden check end   $(LANG=C date) ---" >>$LOG_FILE
 
         rennum=1
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM560 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${21},'0',${14},${15},${25},$(basename ${ERRFILE}),${20},${16} >> $LOG_FILE 2>&1
