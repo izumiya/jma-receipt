@@ -375,10 +375,19 @@
                                    TO  LNK-S02-TIMEKBN-ED
            END-IF
            MOVE    SPA-SYSYMD      TO  LNK-S02-SYSYMD
-           IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
-               MOVE    "1"         TO  LNK-S02-SYORI-KBN
+           IF    ( WRK-SKYKBN          =   "1" )
+               IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+                   MOVE    "1"     TO  LNK-S02-SYORI-KBN
+               ELSE
+                   MOVE    "8"     TO  LNK-S02-SYORI-KBN
+               END-IF
            ELSE
-               MOVE    "8"         TO  LNK-S02-SYORI-KBN
+               MOVE    "A"         TO  LNK-S02-TEIKI-KBN
+               IF    ( SBUNBENCHK-BUNBEN   =   ZERO )
+                   MOVE    "2"     TO  LNK-S02-SYORI-KBN
+               ELSE
+                   MOVE    "9"     TO  LNK-S02-SYORI-KBN
+               END-IF
            END-IF
            CALL    "ORCSNYUFTN"    USING
                                    SPA-AREA
