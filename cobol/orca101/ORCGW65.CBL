@@ -14516,20 +14516,24 @@
       *        WHEN    CONST-KYOTO
                WHEN    CONST-IBARAKI
                WHEN    CONST-SHIMANE
-                   MOVE    SPA-GMN-SYUKEIKBNLST (3)
+      *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
+                   MOVE    SPA-GMN-SYUKEIKBNLST (5)
                                    TO  WRK-CMB-ITM
                    MOVE    "1"     TO  WRK-CMB-ITM2
                WHEN    CONST-EHIME
       *        WHEN    CONST-WAKAYAMA
-                   MOVE    SPA-GMN-SYUKEIKBNLST (2)
+      *            MOVE    SPA-GMN-SYUKEIKBNLST (2)
+                   MOVE    SPA-GMN-SYUKEIKBNLST (4)
                                    TO  WRK-CMB-ITM
                    MOVE    "1"     TO  WRK-CMB-ITM2
                WHEN    CONST-GUNMA
-                   MOVE    SPA-GMN-SYUKEIKBNLST (3)
+      *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
+                   MOVE    SPA-GMN-SYUKEIKBNLST (5)
                                    TO  WRK-CMB-ITM
                    MOVE    "4"     TO  WRK-CMB-ITM2
                WHEN    CONST-TOKUSHIMA
-                   MOVE    SPA-GMN-SYUKEIKBNLST (3)
+      *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
+                   MOVE    SPA-GMN-SYUKEIKBNLST (5)
                                    TO  WRK-CMB-ITM
                    MOVE    "0"     TO  WRK-CMB-ITM2
                WHEN    OTHER

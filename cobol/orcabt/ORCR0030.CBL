@@ -722,6 +722,8 @@
       *  04.08.11    NACL-門脇    15/12/08  生保の月上限額到達チェック、及び、
       *                                     全国公費一部負担金レセプト記載修正
       *  04.08.12    NACL-門脇    15/12/08  東京都地方公費対応
+      *  04.08.13    NACL-門脇    15/12/10  システム管理２０１０のデフォルト
+      *                                     設定修正（全国公費併用分請求点集計）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4771,17 +4773,21 @@ grpsys           PERFORM 900-DBSELECT-SEC
                       WHEN     "32"
                       WHEN     "13"
                       WHEN     "26"
-                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "30"
                       WHEN     "38"
-                          MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "36"
-                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "10"
-                          MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "4" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                     END-EVALUATE
                   END-IF
@@ -4823,25 +4829,31 @@ grpsys           PERFORM 900-DBSELECT-SEC
                    WHEN     "32"
                    WHEN     "13"
                    WHEN     "08"
-                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
-                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "10"
-                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "38"
-                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
-                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
                      IF  RECE02-SRYYM  <=  "201003"
-                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
@@ -4853,12 +4865,14 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  EVALUATE   SYS-1001-PREFNUM
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
-                       MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
                      IF  RECE02-SRYYM  <=  "201003"
-                       MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                  END-EVALUATE
@@ -4870,6 +4884,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                                     TO   RECE02-SYUKEIKBN(IDX11 2)
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE02-SYUKEI-TAIKBN(IDX11 2)
+                 IF   RECE02-SYUKEIKBN(IDX11 2) = "1"
+                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
+                 END-IF
+                 IF   RECE02-SYUKEIKBN(IDX11 2) = "2"
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+                 END-IF
            END-EVALUATE
       *
            .
