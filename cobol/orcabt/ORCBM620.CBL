@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.01    NACL-藤原    15/12/10  テスト患者を対象外とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -83,6 +84,7 @@
            03  FLG-HKNNUM          PIC 9(01). 
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
+           03  FLG-PTINF           PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
       *
@@ -290,6 +292,10 @@
       *    印刷
        01  PRTDATA-REC.
            COPY    "CPPRTDATA.INC".
+      *
+      *    患者情報
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -505,14 +511,23 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
-           DISPLAY "PTID=" PTNYUINRRK-PTID 
-                       " " PTNYUINRRK-NYUINYMD " " PTNYUINRRK-TAIINYMD
-           MOVE    PTNYUINRRK-NYUINYMD (1:6)
+      *    テスト患者は読み飛ばす
+           MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+      *
+             DISPLAY "PTID=" PTNYUINRRK-PTID " " PTINF-TSTPTNUMKBN " "
+                             PTNYUINRRK-NYUINYMD " " PTNYUINRRK-TAIINYMD
+      *
+           IF      PTINF-TSTPTNUMKBN   =   "1"
+               CONTINUE
+           ELSE
+             MOVE    PTNYUINRRK-NYUINYMD (1:6)
                                        TO  WRK-SRYYM
       *
-           INITIALIZE                      WRK-CHK-AREA
+             INITIALIZE                      WRK-CHK-AREA
       *
-           PERFORM         UNTIL   WRK-SRYYM
+             PERFORM         UNTIL   WRK-SRYYM
                                        >   PTNYUINRRK-TAIINYMD (1:6)
                MOVE    1                   TO  WRK-ST
                MOVE    31                  TO  WRK-ED
@@ -547,9 +562,10 @@
                                                    LNK-DAY6-AREA
                MOVE    LNK-DAY6-KEISAN(1:6)
                                            TO  WRK-SRYYM
-           END-PERFORM
+             END-PERFORM
       *
-           PERFORM 2004-HENSYU-SEC
+             PERFORM 2004-HENSYU-SEC
+           END-IF
       *
            PERFORM 900-PTNYUINRRK-READ-SEC
            .
@@ -1633,6 +1649,39 @@
            PERFORM 900-CLOSE-SEC
            .
        900-HKNNUM-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者読込
+      *****************************************************************
+       900-PTINF-READ-SEC          SECTION.
+      *
+           MOVE    PTINF-REC           TO  MCPDATA-REC
+      *  
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM    900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptinf"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM    900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTINF
+                   MOVE    MCPDATA-REC         TO  PTINF-REC
+               ELSE
+                   MOVE    1                   TO  FLG-PTINF
+                   INITIALIZE                  PTINF-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTINF
+               INITIALIZE                  PTINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-PTINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
