@@ -1287,9 +1287,11 @@
                                        TO  MDC01RES-COMBINATION-NUMBER
                                                                (IDX)
       *        ≈¡…º»÷πÊ
-               MOVE    TBL-RRK-DENPNUM (IDX)
+               IF      SPA-NYUGAIKBN   =   "2"
+                   MOVE    TBL-RRK-DENPNUM (IDX)
                                        TO  MDC01RES-INVOICD-NUMBER
                                                                (IDX)
+               END-IF
                PERFORM 20011-HKNCOMBI-HEN01-SEC
            END-PERFORM
            .
