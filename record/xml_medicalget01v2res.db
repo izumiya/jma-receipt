@@ -35,6 +35,8 @@ xml_medicalget01v2res {
 	                	PublicInsuredPerson_Number	varchar(20);
 	            	} [4];
         	};
+#--- ≈¡…º»÷πÊ
+		Invoicd_Number				varchar(07);
        	} [150];
    	};
 };

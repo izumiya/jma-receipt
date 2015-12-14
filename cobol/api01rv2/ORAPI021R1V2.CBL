@@ -33,6 +33,7 @@
       * 04.07.00     NACL-多々納  14/12/XX  診療月数対応
       * 04.07.00     NACL-多々納  15/08/XX  入院対応、単位追加対応
       *                                     包括対象項目追加
+      * 04.08.00     NACL-多々納  15/12/14  伝票番号追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -205,6 +206,8 @@
                05  TBL-RRK-HKNCOMBI            PIC X(04).
                05  TBL-RRK-RENNUM              PIC 9(01).
                05  TBL-RRK-DOUJI-RENNUM        PIC 9(01).
+      *        伝票番号
+               05  TBL-RRK-DENPNUM             PIC 9(07).
       *    月集計
        01  TBL-SYORI03-AREA.
            03  TBL-SYORI03-REC              OCCURS   40.
@@ -1182,6 +1185,9 @@
                        MOVE    JYURRK-DOUJI-RENNUM
                                                TO  TBL-RRK-DOUJI-RENNUM
                                                              (TBL-MAX)
+                       MOVE    JYURRK-DENPNUM
+                                               TO  TBL-RRK-DENPNUM
+                                                             (TBL-MAX)
                    END-IF
                END-IF
       *
@@ -1279,6 +1285,10 @@
       *        保険組合せ
                MOVE    TBL-RRK-HKNCOMBI(IDX)
                                        TO  MDC01RES-COMBINATION-NUMBER
+                                                               (IDX)
+      *        伝票番号
+               MOVE    TBL-RRK-DENPNUM (IDX)
+                                       TO  MDC01RES-INVOICD-NUMBER
                                                                (IDX)
                PERFORM 20011-HKNCOMBI-HEN01-SEC
            END-PERFORM

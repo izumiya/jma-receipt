@@ -22,6 +22,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  15/12/14  伝票番号追加対応
       *****************************************************************
         01  XML-MEDICALGET01RES.
             02  MDC01RES-CONTEXT           PIC S9(9)   BINARY.
@@ -86,4 +87,6 @@
                       07  MDC01RES-PROVIDER-NUMBER         PIC X(08).
       *               受給者番号
                       07  MDC01RES-RECIPIENT-NUMBER        PIC X(20).
+      *           伝票番号
+                  05  MDC01RES-INVOICD-NUMBER    PIC X(07).
       *
