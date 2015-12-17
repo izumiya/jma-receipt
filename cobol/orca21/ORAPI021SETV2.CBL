@@ -2659,13 +2659,12 @@
       *    ÆþÎÏ£Ã£Äºï½ü
            INITIALIZE                      INPUTCD-REC
            MOVE    SPA-HOSPNUM         TO  ICD-HOSPNUM
-           MOVE    "6"                 TO  ICD-CDSYU
-           MOVE    MDCREQ-SETCD        TO  ICD-INPUTCD
+           MOVE    MDCREQ-SETCD        TO  ICD-SRYCD
       *
            MOVE    INPUTCD-REC         TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_inputcd"       TO  MCP-TABLE
-           MOVE    "del12"             TO  MCP-PATHNAME
+           MOVE    "del22"             TO  MCP-PATHNAME
            PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "INPUTCD    DEL ERR:"  MCP-RC
@@ -2722,13 +2721,12 @@
            IF      FLG-INPUTSET        =   1
                INITIALIZE                      INPUTCD-REC
                MOVE    SPA-HOSPNUM         TO  ICD-HOSPNUM
-               MOVE    "6"                 TO  ICD-CDSYU
-               MOVE    MDCREQ-SETCD        TO  ICD-INPUTCD
+               MOVE    MDCREQ-SETCD        TO  ICD-SRYCD
       *
                MOVE    INPUTCD-REC         TO  MCPDATA-REC
                MOVE    "DBDELETE"          TO  MCP-FUNC
                MOVE    "tbl_inputcd"       TO  MCP-TABLE
-               MOVE    "del12"             TO  MCP-PATHNAME
+               MOVE    "del22"             TO  MCP-PATHNAME
                PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC          NOT =   ZERO
                    DISPLAY "INPUTCD    DEL ERR:"  MCP-RC

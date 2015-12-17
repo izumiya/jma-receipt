@@ -173,4 +173,13 @@ path	key9	{
 	};
 };
 
+path	del2	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_inputset
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   SETCD       =   :SETCD
+		;
+	};
+};
 
