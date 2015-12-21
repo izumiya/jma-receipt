@@ -36,7 +36,7 @@ xml_medicalget01v2res {
 	            	} [4];
         	};
 #--- ≈¡…º»÷πÊ
-		Invoicd_Number				varchar(07);
+		Invoice_Number				varchar(07);
        	} [150];
    	};
 };

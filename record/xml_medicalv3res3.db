@@ -51,7 +51,7 @@ xml_medicalv3res3 {
         	};
     	};
 #--- 伝票番号
-        Invoicd_Number			varchar(07);
+        Invoice_Number			varchar(07);
 #--- 診療内容
 	Medical_Information  {
 		Medical_Info  {
