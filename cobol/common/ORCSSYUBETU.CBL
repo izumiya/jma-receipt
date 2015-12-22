@@ -123,6 +123,7 @@
       *
       *  04.08.01    NACL-藤原    15/10/08  複数枚レセプト分割対応
       *                                     公費単独の２回以上の分割対応
+      *  04.08.02    NACL-藤原    15/12/22  施設入所時の分割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2095,8 +2096,10 @@ grpsys         IF      TBL-RECE61-HOSPNUM (1)  =   ZERO
                ELSE
                    MOVE    ZERO            TO  IDZZ
       *
-                   IF      TBL-PT-HDIST-DAY-MAX
-                                           =   ZERO
+                   IF    ( TBL-PT-HDIST-DAY-MAX
+                                           =   ZERO )
+                   AND   ( TBL-PTKOHINF-MAX
+                                           =   ZERO )
                        MOVE    1               TO  ST-IDX
                        MOVE    SPACE           TO  WRK-RECEIPT-KBN
       *                出力処理
