@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-藤原    15/12/10  テスト患者を対象外とする
+      *  04.08.02    NACL-藤原    15/12/22  公費単独の医療保険との組合せ
+      *                                     を５にする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -123,7 +125,7 @@
                05  WRK-SDD         PIC 9(02).
       *
            03  WRK-CHK-AREA.
-      *        1:医保 2: 3:公害、労災、自賠責 4:治験 5:自費
+      *        1:医保 2:公費単独 3:公害、労災、自賠責 4:治験 5:自費
                05  WRK-CHK         PIC X(01)   OCCURS  5.
            03  WRK-HKNNUM          PIC 9(01).
       *
@@ -737,6 +739,7 @@
        2003-SRYACCT-CHECK-SEC                SECTION.
       *
            IF    ( WRK-CHK (1)         =   "1" )
+           AND   ( WRK-CHK (2)         =   "1" )
            AND   ( WRK-CHK (3)         =   "1" )
            AND   ( WRK-CHK (4)         =   "1" )
            AND   ( WRK-CHK (5)         =   "1" )
@@ -982,27 +985,31 @@
       *                         WRK-CHK (5) "#"
       *??
       *
-           IF    ( WRK-CHK (1)     =   SPACE )
-           AND   ( WRK-CHK (2)     =   SPACE )
-      *        医保分がないとき
-               IF    ( WRK-CHK (3)     =   "1" )
-               OR    ( WRK-CHK (4)     =   "1" )
-               OR    ( WRK-CHK (5)     =   "1" )
-                   MOVE    "3"             TO  WRK-KBN
-               END-IF
+           IF      WRK-CHK (2)     =   "1"
+      *        公費単独があるとき
+               MOVE    "5"             TO  WRK-KBN
            ELSE
-      *        医保分があるとき
-               IF    ( WRK-CHK (3)     =   SPACE )
-               AND   ( WRK-CHK (4)     =   SPACE )
-               AND   ( WRK-CHK (5)     =   SPACE )
-                   MOVE    "1"             TO  WRK-KBN
+               IF    ( WRK-CHK (1)     =   SPACE )
+      *            医保分がないとき
+                   IF    ( WRK-CHK (3)     =   "1" )
+                   OR    ( WRK-CHK (4)     =   "1" )
+                   OR    ( WRK-CHK (5)     =   "1" )
+                       MOVE    "3"             TO  WRK-KBN
+                   END-IF
                ELSE
-                   IF      WRK-CHK (5)     =   "1"
-                       MOVE    "5"             TO  WRK-KBN
+      *            医保分があるとき
+                   IF    ( WRK-CHK (3)     =   SPACE )
+                   AND   ( WRK-CHK (4)     =   SPACE )
+                   AND   ( WRK-CHK (5)     =   SPACE )
+                       MOVE    "1"             TO  WRK-KBN
                    ELSE
-                       IF    ( WRK-CHK (3)     =   "1" )
-                       OR    ( WRK-CHK (4)     =   "1" )
-                           MOVE    "4"             TO  WRK-KBN
+                       IF      WRK-CHK (5)     =   "1"
+                           MOVE    "5"             TO  WRK-KBN
+                       ELSE
+                           IF    ( WRK-CHK (3)     =   "1" )
+                           OR    ( WRK-CHK (4)     =   "1" )
+                               MOVE    "4"             TO  WRK-KBN
+                           END-IF
                        END-IF
                    END-IF
                END-IF
