@@ -500,6 +500,7 @@ RECORD_files = \
 	patientmodv33.rec \
 	medicalsetv2.rec \
 	insuranceinf1v2.rec \
+	birthdeliveryv2.rec \
 
 DEF_files = \
 
@@ -821,6 +822,8 @@ DB_files = \
 	xml_medicalsetv2res.db \
 	xml_insuranceinf1v2req.db \
 	xml_insuranceinf1v2res.db \
+	xml_birthdeliveryv2req.db \
+	xml_birthdeliveryv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

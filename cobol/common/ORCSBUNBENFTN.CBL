@@ -184,7 +184,10 @@
       *
            IF    ( LNKBUNBEN-NYUGAIKBN =   "1" )
                PERFORM 900-PTNYUINRRK-KEY4-SEL-SEC
-               MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
+               MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SRYYMD
+               IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                   MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
+               END-IF
            ELSE
                PERFORM 900-SYUNOU-KEY-SEL-SEC
                MOVE    SYU-SRYYMD          TO  WRK-SRYYMD
@@ -194,14 +197,10 @@
       *
            MOVE    SPACE               TO  WRK-KYUSEINAME
            PERFORM 900-KYUSEIRRK-KEY3-SEL-SEC
-           PERFORM UNTIL ( FLG-KYUSEIRRK   NOT =   ZERO )
+           IF    ( FLG-KYUSEIRRK   =   ZERO )
                MOVE    KYUSEI-KANANAME
                                        TO  WRK-KYUSEINAME
-               PERFORM 900-KYUSEIRRK-KEY3-FET-SEC
-           END-PERFORM
-           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
       *
            PERFORM 900-PTNUM-KEY-SEL-SEC
       *
@@ -989,28 +988,12 @@
                MOVE    1               TO  FLG-KYUSEIRRK
            END-IF
       *
-           .
-       900-KYUSEIRRK-KEY3-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    µìÀ«ÍúÎòFETCH½èÍý
-      *****************************************************************
-       900-KYUSEIRRK-KEY3-FET-SEC          SECTION.
-      *
-           MOVE    ZERO                TO  FLG-KYUSEIRRK
-      *
            MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  KYUSEIRRK-REC
-           ELSE
-               INITIALIZE                  KYUSEIRRK-REC
-               MOVE    1               TO  FLG-KYUSEIRRK
-           END-IF
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-KYUSEIRRK-KEY3-FET-EXT.
+       900-KYUSEIRRK-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ÊÝ¸±ÁÈ¹ç¤»¼èÆÀ½èÍý

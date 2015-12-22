@@ -66,6 +66,8 @@
            03  FLG-HIT                 PIC 9(01).
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-NSRYSRH             PIC 9(01).
+           03  FLG-BUNBEN              PIC 9(01).
+           03  FLG-BUNBEN-NYUIN        PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -133,6 +135,7 @@
       *
        01  CONST-AREA.
            03  CONST-H180401           PIC X(08)   VALUE "20060401".
+           03  CONST-H211001           PIC X(08)   VALUE "20091001".
            03  CONST-SYU-MAX           PIC 9(05)   VALUE   10.
            03  CONST-JOB-SHELLID       PIC X(08)   VALUE   "TEIKI1".
            03  CONST-JOB-JOBID         PIC 9(07)   VALUE   1.
@@ -217,6 +220,9 @@
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
       *
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -270,6 +276,12 @@
       *
       *    入院請求期間取得サブ
            COPY    "CPORCSS006.INC".
+      *
+      *    分娩情報編集サブ
+           COPY    "CPORCSI02.INC".
+       01  SNRRK-AREA.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                       BY         //SNRRK-//.
       *
       *    排他制御
            COPY    "CPORCSLOCK.INC".
@@ -354,6 +366,15 @@
                                                   ITEM-HKNCOMBI
            END-IF
       *
+           IF    ( ERRCD-ITEM-G    =   SPACE )
+               PERFORM 900-BUNBEN-KEY3-SEL-SEC
+               IF    ( FLG-BUNBEN  =   ZERO )
+                 AND ( BUNBEN-BUNBENKBN    =   "1" OR "2" )
+                 AND ( SODR-SRYYMD        >=   CONST-H211001 )
+                   MOVE    1           TO  FLG-BUNBEN-NYUIN
+               END-IF
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -418,6 +439,13 @@
                    PERFORM 2102-SYUNOU-UPD-SEC
       *
                END-PERFORM
+      *
+               IF    ( FLG-END  =   ZERO )
+                   IF    ( SODR-SRCKBN =   "1" OR "2" )
+                    AND  ( FLG-BUNBEN-NYUIN    NOT =   ZERO )
+                       PERFORM 2101-ORCSI02-CALL-SEC
+                   END-IF
+               END-IF
       *
                IF    ( FLG-END  =   ZERO )
                    IF    ( SODR-PROCKBN    =   "1" )
@@ -1957,6 +1985,29 @@
        21021-DENPNUM-GET-EXT.
            EXIT.
       *****************************************************************
+      *    分娩管理更新処理
+      *****************************************************************
+       2101-ORCSI02-CALL-SEC           SECTION.
+      *
+           INITIALIZE                  SI02-AREA
+           MOVE    "4"             TO  SI02-REQID
+           MOVE    TRRK-REC        TO  SNRRK-AREA
+           CALL    "ORCSI02"       USING
+                                   SI02-AREA
+                                   SNRRK-AREA
+                                   MCPAREA
+                                   SPA-AREA
+           IF     ( SI02-RC        NOT =  ZERO )
+               DISPLAY "ORCSDR02 ERROR 021:BUNBEN UPDATE ERR"
+                       " PTID="        SODR-PTID
+                       " KARTE-KEY="   SODR-KARTE-KEY
+               MOVE    1               TO  FLG-END
+           END-IF
+      *
+           .
+       2101-ORCSI02-CALL-EXT.
+           EXIT.
+      *****************************************************************
       *    終了処理
       *****************************************************************
        300-END-SEC                     SECTION.
@@ -2398,6 +2449,38 @@
       *
            .
        900-HKNCOMBI-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理検索処理
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+           INITIALIZE                  BUNBEN-REC
+      *
+           MOVE    SODR-HOSPNUM    TO  BUNBEN-HOSPNUM
+           MOVE    SODR-PTID       TO  BUNBEN-PTID
+           MOVE    "1"             TO  BUNBEN-NYUGAIKBN
+           MOVE    TRRK-RRKNUM     TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

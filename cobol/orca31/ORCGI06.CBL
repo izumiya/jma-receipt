@@ -80,6 +80,8 @@
            03  FLG-RYOYOKHN                PIC 9(01).
            03  FLG-SKIP                    PIC 9(01).
            03  FLG-EDIT                    PIC 9(01).
+           03  FLG-BUNBENCHK               PIC 9(01).
+           03  FLG-BUNBEN                  PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -174,6 +176,16 @@
                05  WRK-TOKHIGAITO-CD       PIC X(09).
            03  WRK-STATE                   PIC S9(9).
            03  WRK-SELNUMBER               PIC 9(9).
+           03  WRK-BIRTHDAY.
+               05  WRK-BIRTHDAY-YY         PIC 9(04).
+               05  WRK-BIRTHDAY-MM         PIC 9(02).
+               05  WRK-BIRTHDAY-DD         PIC 9(02).
+           03  WRK-NOW.
+               05  WRK-NOW-YY              PIC 9(04).
+               05  WRK-NOW-MM              PIC 9(02).
+               05  WRK-NOW-DD              PIC 9(02).
+           03  WRK-AGE                     PIC S9(03).
+           03  WRK-BUNBENKBN               PIC X(01).
       *
        01  WRK-ROW-AREA.
            03  WRK-ALLIDOLST-ROW           PIC S9(9).
@@ -499,6 +511,9 @@
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
       *
+       01  BUNBEN-REC.
+           COPY    "CPBUNBEN.INC".
+      *
       *    オーダーテーブル
        01  ORDER-REC.
            COPY    "CPORDER.INC".
@@ -733,6 +748,12 @@
       *
       *    介護区分設定処理
            PERFORM 3101-KAIGOKBNLST-SET-SEC
+      *
+      *    分娩区分設定処理
+           PERFORM 3101-BUNBENKBNLST-SET-SEC
+      *
+      *    直接利用制度利用区分設定処理
+           PERFORM 3101-RIYOUKBNLST-SET-SEC
       *
       *    担当医設定処理
            PERFORM 3101-DRLST-SET-SEC
@@ -1061,6 +1082,45 @@
       *
            . 
        3101-TAIINCDLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩区分設定処理
+      *****************************************************************
+       3101-BUNBENKBNLST-SET-SEC       SECTION.
+      *
+           INITIALIZE                      SPA-GMN-BUNBENKBNLST-G
+      *
+           MOVE    3                   TO  SPA-GMN-BUNBENKBN-MAX
+      *
+           MOVE    "0"                 TO  SPA-GMN-BUNBENKBNL (01)
+           MOVE    "分娩入院でない"    TO  SPA-GMN-BUNBENKBNMEIL (01)
+      *
+           MOVE    "1"                 TO  SPA-GMN-BUNBENKBNL (02)
+           MOVE    "正常分娩"          TO  SPA-GMN-BUNBENKBNMEIL (02)
+      *
+           MOVE    "2"                 TO  SPA-GMN-BUNBENKBNL (03)
+           MOVE    "異常分娩"          TO  SPA-GMN-BUNBENKBNMEIL (03)
+      *
+           . 
+       3101-BUNBENKBNLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩区分設定処理
+      *****************************************************************
+       3101-RIYOUKBNLST-SET-SEC        SECTION.
+      *
+           INITIALIZE                      SPA-GMN-RIYOUKBNLST-G
+      *
+           MOVE    2                   TO  SPA-GMN-RIYOUKBN-MAX
+      *
+           MOVE    "0"                 TO  SPA-GMN-RIYOUKBNL (01)
+           MOVE    "利用しない"        TO  SPA-GMN-RIYOUKBNMEIL (01)
+      *
+           MOVE    "1"                 TO  SPA-GMN-RIYOUKBNL (02)
+           MOVE    "利用する"          TO  SPA-GMN-RIYOUKBNMEIL (02)
+      *
+           . 
+       3101-RIYOUKBNLST-SET-EXT.
            EXIT.
       *****************************************************************
       *    担当医設定処理
@@ -2532,6 +2592,8 @@
            MOVE    I06-DISPKBN         TO  SPA-GMN-DISPKBN-G
            MOVE    I06-SKJTIME         TO  SPA-GMN-SKJTIME-G
            MOVE    I06-NISSU           TO  SPA-GMN-NISSU
+           MOVE    I06-BUNBENKBN       TO  SPA-GMN-BUNBENKBN-G
+           MOVE    I06-RIYOUKBN        TO  SPA-GMN-RIYOUKBN-G
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -2604,6 +2666,7 @@
                WHEN    NORDERID-GPTSTID
                WHEN    NORDERID-FOODID
                WHEN    NORDERID-PTEVALID
+               WHEN    NORDERID-BUNBENID
                    PERFORM 41011-INPUT-AREA-HEN-SEC
                END-EVALUATE
            END-EVALUATE
@@ -2784,6 +2847,8 @@
                        PERFORM 410111-FOOD-HEN-SEC
                    WHEN    NORDERID-PTEVALID
                        PERFORM 410111-PTEVAL-HEN-SEC
+                   WHEN    NORDERID-BUNBENID
+                       PERFORM 410111-BUNBEN-HEN-SEC
                    END-EVALUATE
       *
                END-IF
@@ -2913,6 +2978,12 @@
            WHEN    NCLAIMID-DISPKBNJMA
                PERFORM 4101111-DISPKBN-HEN-SEC
       *
+           WHEN    NCLAIMID-BUNBENKBNJMA
+               PERFORM 4101111-BUNBENKBN-HEN-SEC
+      *
+           WHEN    NCLAIMID-RIYOUKBNJMA
+               PERFORM 4101111-RIYOUKBN-HEN-SEC
+      *
            END-EVALUATE
       *
            .
@@ -2956,6 +3027,12 @@
       *
            WHEN    NCLAIMID-DISPKBNJMA
                PERFORM 4101111-DISPKBN-HEN-SEC
+      *
+           WHEN    NCLAIMID-BUNBENKBNJMA
+               PERFORM 4101111-BUNBENKBN-HEN-SEC
+      *
+           WHEN    NCLAIMID-RIYOUKBNJMA
+               PERFORM 4101111-RIYOUKBN-HEN-SEC
       *
            END-EVALUATE
       *
@@ -3085,6 +3162,12 @@
            WHEN    NCLAIMID-KSNCDJMA
                PERFORM 4101111-KSNCD-HEN-SEC
       *
+           WHEN    NCLAIMID-BUNBENKBNJMA
+               PERFORM 4101111-BUNBENKBN-HEN-SEC
+      *
+           WHEN    NCLAIMID-RIYOUKBNJMA
+               PERFORM 4101111-RIYOUKBN-HEN-SEC
+      *
            END-EVALUATE
       *
            .
@@ -3163,6 +3246,18 @@
        410111-PTEVAL-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    出産育児一時金情報登録編集処理
+      *****************************************************************
+       410111-BUNBEN-HEN-SEC      SECTION.
+      *
+           COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
+      *
+           PERFORM 410111-INPUT-COMMON-HEN-SEC
+      *
+           .
+       410111-BUNBEN-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    共通入力項目編集処理
       *****************************************************************
        410111-INPUT-COMMON-HEN-SEC     SECTION.
@@ -3202,6 +3297,8 @@
                PERFORM 4101112-TOKNYUINMEI-HEN-SEC
                PERFORM 4101112-SENTEIKBN-HEN-SEC
                PERFORM 4101112-KAIGOKBN-HEN-SEC
+               PERFORM 4101112-RIYOUKBN-HEN-SEC
+               PERFORM 4101112-BUNBENKBN-HEN-SEC
                PERFORM 4101112-NACCTKBN-HEN-SEC
                PERFORM 4101112-KSNCD-HEN-SEC
                PERFORM 4101112-TEIKIKBN-HEN-SEC
@@ -3212,6 +3309,8 @@
                PERFORM 4101112-TAIINCDMEI-HEN-SEC
            WHEN    NORDERID-HENKOID
                PERFORM 4101112-DRMEI-HEN-SEC
+               PERFORM 4101112-RIYOUKBN-HEN-SEC
+               PERFORM 4101112-BUNBENKBN-HEN-SEC
                PERFORM 4101112-TEIKIKBN-HEN-SEC
                PERFORM 4101112-DISPKBN-HEN-SEC
       *
@@ -3241,6 +3340,8 @@
                PERFORM 4101112-BTUNUM-HEN-SEC
                PERFORM 4101112-SAGAKUMEI-HEN-SEC
                PERFORM 4101112-SENTEIKBN-HEN-SEC
+               PERFORM 4101112-RIYOUKBN-HEN-SEC
+               PERFORM 4101112-BUNBENKBN-HEN-SEC
                PERFORM 4101112-DRMEI-HEN-SEC
                PERFORM 4101112-TOKNYUINMEI-HEN-SEC
                PERFORM 4101112-NACCTKBN-HEN-SEC
@@ -3252,6 +3353,7 @@
            WHEN    NORDERID-GPTSTID
            WHEN    NORDERID-FOODID
            WHEN    NORDERID-PTEVALID
+           WHEN    NORDERID-BUNBENID
                CONTINUE
            END-EVALUATE
       *
@@ -3521,6 +3623,30 @@
        4101111-DISPKBN-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    分娩区分編集処理
+      *****************************************************************
+       4101111-BUNBENKBN-HEN-SEC       SECTION.
+      *
+           IF    ( ODRITEM-ITEM        NOT =   SPACE )
+               MOVE    ODRITEM-ITEM    TO  SPA-GMN-BUNBENKBN
+           END-IF
+      *
+           .
+       4101111-BUNBENKBN-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分編集処理
+      *****************************************************************
+       4101111-RIYOUKBN-HEN-SEC        SECTION.
+      *
+           IF    ( ODRITEM-ITEM        NOT =   SPACE )
+               MOVE    ODRITEM-ITEM    TO  SPA-GMN-RIYOUKBN
+           END-IF
+      *
+           .
+       4101111-RIYOUKBN-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    初回編集処理
       *****************************************************************
        4101112-SHOKAI-HEN-SEC          SECTION.
@@ -3745,6 +3871,36 @@
        4101112-KAIGOKBN-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    分娩区分編集処理
+      *****************************************************************
+       4101112-BUNBENKBN-HEN-SEC       SECTION.
+      *
+           PERFORM 3101-BUNBENKBNLST-SET-SEC
+           MOVE    SPA-GMN-BUNBENKBN   TO  WRK-CMB-CD
+           PERFORM 4200-BUNBENKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-BUNBENKBN-G
+           END-IF
+      *
+           .
+       4101112-BUNBENKBN-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分編集処理
+      *****************************************************************
+       4101112-RIYOUKBN-HEN-SEC       SECTION.
+      *
+           PERFORM 3101-RIYOUKBNLST-SET-SEC
+           MOVE    SPA-GMN-RIYOUKBN   TO  WRK-CMB-CD
+           PERFORM 4200-RIYOUKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-RIYOUKBN-G
+           END-IF
+      *
+           .
+       4101112-RIYOUKBN-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    入院会計区分編集処理
       *****************************************************************
        4101112-NACCTKBN-HEN-SEC       SECTION.
@@ -3872,6 +4028,8 @@
       *
            MOVE    PTINF-NAME          TO  SPA-GMN-NAME
       *
+           MOVE    PTINF-SEX           TO  SPA-NAI-SEX
+      *
            EVALUATE    PTINF-SEX
            WHEN    "1"
                MOVE    "男"            TO  SPA-GMN-SEX
@@ -3953,6 +4111,12 @@
                                                TO  SPA-GMN-HHKNCOMBI
                        END-IF
                    END-IF
+      *
+                   PERFORM 900-BUNBEN-KEY3-SEL-SEC
+                   IF    ( FLG-BUNBEN           =  ZERO )
+                       MOVE    BUNBEN-BUNBENKBN TO SPA-NAI-BUNBENKBN
+                   END-IF
+      *
                END-IF
            END-IF
       *
@@ -4339,6 +4503,18 @@
            IF    ( SPA-ERRCD       =   SPACE )
                IF    ( SPA-GMN-NISSU       NOT =   SPACE )
                    PERFORM 4101-NISSU-CHK-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-BUNBENKBN   NOT =   SPACE )
+                   PERFORM 4101-BUNBENKBN-CHK-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-RIYOUKBN    NOT =   SPACE )
+                   PERFORM 4101-RIYOUKBN-CHK-SEC
                END-IF
            END-IF
       *
@@ -5048,6 +5224,98 @@
        4101-NISSU-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    分娩区分チェック
+      *****************************************************************
+       4101-BUNBENKBN-CHK-SEC          SECTION.
+      *
+           PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+           IF    ( FLG-BUNBENCHK       =   1 )
+               MOVE    SPA-GMN-BUNBENKBN
+                                       TO  WRK-CMB-CD
+               PERFORM 4200-BUNBENKBNLST-CHK-SEC
+               IF    ( WRK-CMB-CD      =   SPACE )
+                   MOVE    "0036"      TO  SPA-ERRCD
+                   MOVE    33          TO  SPA-GMN-CUR
+               END-IF
+           ELSE
+                   MOVE    SPACE       TO  SPA-GMN-BUNBENKBN-G
+           END-IF
+      *
+           .
+       4101-BUNBENKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩入院チェック
+      *****************************************************************
+       41011-BUNBEN-NYUIN-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                    TO  FLG-BUNBENCHK
+      *
+           IF    ( SPA-NAI-PTID            =   ZERO )
+               CONTINUE
+           ELSE
+      *
+               INITIALIZE                  SYS-1005-REC
+               IF    ( SPA-GMN-NYUINKA     NOT =   SPACE )
+                   INITIALIZE                  SYSKANRI-REC
+                   MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+                   MOVE    "1005"          TO  SYS-KANRICD
+                   MOVE    SPA-GMN-NYUINKA TO  SYS-KBNCD
+                   MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
+                                               SYS-EDYUKYMD
+                   PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-1005-REC
+               END-IF
+      *
+               MOVE    ZERO                TO  WRK-AGE
+      *
+               MOVE    SPA-NAI-BIRTHDAY    TO  WRK-BIRTHDAY
+               MOVE    SPA-NAI-KJNYMD      TO  WRK-NOW
+               COMPUTE WRK-AGE         =   WRK-NOW-YY
+                                       -   WRK-BIRTHDAY-YY
+               IF    ( WRK-BIRTHDAY (5:4)  >   WRK-NOW (5:4) )
+                   COMPUTE WRK-AGE = WRK-AGE   -   1
+               END-IF
+      *
+               IF    ( SYS-1005-RECESRYKA  =   "23" OR "24" )
+                AND  ( SPA-NAI-SEX         =   "2" )
+                AND  ( WRK-AGE             >   10 )
+                   MOVE    1                   TO  FLG-BUNBENCHK
+               END-IF
+      *
+               IF    ( SPA-NAI-BUNBENKBN   NOT =   SPACE )
+                   MOVE    1               TO  FLG-BUNBENCHK
+               END-IF
+           END-IF
+      *
+           .
+       41011-BUNBEN-NYUIN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分チェック
+      *****************************************************************
+       4101-RIYOUKBN-CHK-SEC           SECTION.
+      *
+           MOVE    SPA-GMN-BUNBENKBN   TO  WRK-BUNBENKBN
+           IF    ( SPA-GMN-BUNBENKBN   =   SPACE  )
+               MOVE    SPA-NAI-BUNBENKBN   TO  WRK-BUNBENKBN
+           END-IF
+      *
+           IF    ( WRK-BUNBENKBN       =   "1" OR "2" )
+               MOVE    SPA-GMN-RIYOUKBN TO WRK-CMB-CD
+               PERFORM 4200-RIYOUKBNLST-CHK-SEC
+               IF    ( WRK-CMB-CD      =   SPACE )
+                   MOVE    "0037"      TO  SPA-ERRCD
+                   MOVE    34          TO  SPA-GMN-CUR
+               END-IF
+           ELSE
+               MOVE    SPACE           TO  SPA-GMN-RIYOUKBN-G
+           END-IF
+      *
+           .
+       4101-RIYOUKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    病棟名コンボチェック処理
       *****************************************************************
        4200-BTUNAMELST-CHK-SEC         SECTION.
@@ -5570,6 +5838,48 @@
        4200-DISPKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    分娩区分コンボチェック処理
+      *****************************************************************
+       4200-BUNBENKBNLST-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB         >   SPA-GMN-BUNBENKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-BUNBENKBNL (IDX-CMB)  =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-BUNBENKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-BUNBENKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分コンボチェック処理
+      *****************************************************************
+       4200-RIYOUKBNLST-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB         >   SPA-GMN-RIYOUKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-RIYOUKBNL (IDX-CMB)  =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-RIYOUKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-RIYOUKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    戻る　処理
       *****************************************************************
        210-BACK                    SECTION.
@@ -5872,6 +6182,7 @@
            WHEN    NORDERID-GPTSTID
            WHEN    NORDERID-FOODID
            WHEN    NORDERID-PTEVALID
+           WHEN    NORDERID-BUNBENID
                CONTINUE
            END-EVALUATE
       *
@@ -5959,6 +6270,14 @@
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                PERFORM 2300-DISPKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-BUNBENKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-RIYOUKBN-SET-SEC
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -6068,6 +6387,14 @@
            MOVE    ZERO                TO  IDX-ITM
       *
            MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-BUNBENKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-RIYOUKBN-SET-SEC
+           END-IF
       *
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL ( IDX2    >   3 )
@@ -6312,6 +6639,14 @@
                    PERFORM 2300-KSNCD-SET-SEC
                END-IF
            END-PERFORM
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-BUNBENKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               PERFORM 2300-RIYOUKBN-SET-SEC
+           END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                PERFORM 2300-NYUINKA-SET-SEC
@@ -6572,6 +6907,42 @@
       *
            .
        2300-KAIGOKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩区分設定処理
+      *****************************************************************
+       2300-BUNBENKBN-SET-SEC      SECTION.
+      *
+           IF    ( SPA-GMN-BUNBENKBN   NOT =   SPACE )
+               PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+               MOVE    NCLAIMID-BUNBENKBNJMA
+                                   TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+      *
+               MOVE    SPA-GMN-BUNBENKBN
+                                   TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           END-IF
+      *
+           .
+       2300-BUNBENKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分設定処理
+      *****************************************************************
+       2300-RIYOUKBN-SET-SEC      SECTION.
+      *
+           IF    ( SPA-GMN-RIYOUKBN   NOT =   SPACE )
+               PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+               MOVE    NCLAIMID-RIYOUKBNJMA
+                                   TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+      *
+               MOVE    SPA-GMN-RIYOUKBN
+                                   TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           END-IF
+      *
+           .
+       2300-RIYOUKBN-SET-EXT.
            EXIT.
       *****************************************************************
       *    担当医設定処理
@@ -6849,10 +7220,11 @@
        500-GMNHEN-SEC              SECTION.
       *
            MOVE   I06-ALLIDOLST-ROW    TO  WRK-ALLIDOLST-ROW
-           MOVE   I06-PTIDOLST-ROW    TO  WRK-PTIDOLST-ROW
+           MOVE   I06-PTIDOLST-ROW     TO  WRK-PTIDOLST-ROW
            MOVE   I06-ERRMSGLST-ROW    TO  WRK-ERRMSGLST-ROW
       *
-           INITIALIZE                  I06
+           MOVE    SPACE               TO  I06
+           INITIALIZE                      I06
       *
            EVALUATE    FLG-ALLIDOLST-ROW
            WHEN    1
@@ -7008,6 +7380,36 @@
                MOVE    SPA-GMN-HKNCOMBILST (IDX-CMB)
                                        TO  I06-HKNCOMBI-ITEM (IDX-CMB)
            END-PERFORM
+      *
+           PERFORM 41011-BUNBEN-NYUIN-CHK-SEC
+           IF    ( FLG-BUNBENCHK           =   1 )
+      *
+      *        分娩入院
+               MOVE    SPA-GMN-BUNBENKBN-G     TO  I06-BUNBENKBN
+               MOVE    SPA-GMN-BUNBENKBN-MAX   TO  I06-BUNBENKBN-COUNT
+               PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL     ( IDX-CMB >       SPA-GMN-BUNBENKBN-MAX )
+                   MOVE    SPA-GMN-BUNBENKBNLST (IDX-CMB)
+                                       TO  I06-BUNBENKBN-ITEM (IDX-CMB)
+               END-PERFORM
+      *
+               MOVE    SPA-GMN-BUNBENKBN       TO  WRK-BUNBENKBN
+               IF    ( SPA-GMN-BUNBENKBN   =   SPACE  )
+                   MOVE    SPA-NAI-BUNBENKBN   TO  WRK-BUNBENKBN
+               END-IF
+      *
+               IF    ( WRK-BUNBENKBN       =   "1" OR "2" )
+      *
+      *            直接支払制度利用区分
+                   MOVE    SPA-GMN-RIYOUKBN      TO  I06-RIYOUKBN
+                   MOVE    SPA-GMN-RIYOUKBN-MAX  TO  I06-RIYOUKBN-COUNT
+                   PERFORM VARYING IDX-CMB FROM  1   BY  1
+                           UNTIL ( IDX-CMB >   SPA-GMN-RIYOUKBN-MAX )
+                       MOVE    SPA-GMN-RIYOUKBNLST (IDX-CMB)
+                                       TO  I06-RIYOUKBN-ITEM (IDX-CMB)
+                   END-PERFORM
+               END-IF
+           END-IF
       *
            MOVE    SPA-GMN-TOKNYUIN-G  TO  I06-TOKNYUIN
            MOVE    SPA-GMN-TOKNYUIN-MAX
@@ -7242,6 +7644,10 @@
                                                I06-SKJTIME-STATE
                                                I06-SKJTIME-ITEM-STATE
                                                I06-NISSU-STATE
+                                               I06-BUNBENKBN-STATE
+                                               I06-BUNBENKBN-ITEM-STATE
+                                               I06-RIYOUKBN-STATE
+                                               I06-RIYOUKBN-ITEM-STATE
                                                I06-B06-STATE
                                                I06-B06S-STATE
                                                I06-B07-STATE
@@ -7295,6 +7701,10 @@
                                                I06-SKJTIME-STATE
                                                I06-SKJTIME-ITEM-STATE
                                                I06-NISSU-STATE
+                                               I06-BUNBENKBN-STATE
+                                               I06-BUNBENKBN-ITEM-STATE
+                                               I06-RIYOUKBN-STATE
+                                               I06-RIYOUKBN-ITEM-STATE
                MOVE    WIDGET-INSENSITIVE  TO  I06-B12-STATE
            ELSE
                IF    ( SPA-NAI-STATUS-ORDER    =   "2" )
@@ -7348,6 +7758,9 @@
                           MOVE    WIDGET-NORMAL
                                            TO  I06-KAIGOKBN-ITEM-STATE
                        END-IF
+      *
+                       PERFORM 5001-GMNHEN-STATE-EDIT-SEC
+      *
                    WHEN    NORDERID-TAIINID
                        MOVE    WIDGET-NORMAL
                                            TO  I06-TAIINCD-STATE
@@ -7366,6 +7779,9 @@
                                                I06-DISPKBN-STATE
                                                I06-DISPKBN-ITEM-STATE
                                                I06-B12-STATE
+      *
+                       PERFORM 5001-GMNHEN-STATE-EDIT-SEC
+      *
                    WHEN    NORDERID-GAIHKID
                    WHEN    NORDERID-GBACKID
                        MOVE    WIDGET-NORMAL
@@ -7427,6 +7843,9 @@
                                                I06-KSNCD-ITEM-STATE (2)
                                                I06-KSNCD-STATE (3)
                                                I06-KSNCD-ITEM-STATE (3)
+      *
+                           PERFORM 5001-GMNHEN-STATE-EDIT-SEC
+      *
                        END-IF
                    WHEN    NORDERID-DELNYUINID
                    WHEN    NORDERID-ALLDELNYUINID
@@ -7437,6 +7856,7 @@
                    WHEN    NORDERID-GPTSTID
                    WHEN    NORDERID-FOODID
                    WHEN    NORDERID-PTEVALID
+                   WHEN    NORDERID-BUNBENID
                        CONTINUE
                    END-EVALUATE
       *
@@ -7468,6 +7888,24 @@
       *
            .
        500-GMNHEN-STATE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    項目状態編集処理
+      *****************************************************************
+       5001-GMNHEN-STATE-EDIT-SEC      SECTION.
+      *
+           IF    ( I06-RIYOUKBN-COUNT  >   ZERO )
+               MOVE    WIDGET-NORMAL   TO  I06-RIYOUKBN-STATE
+                                           I06-RIYOUKBN-ITEM-STATE
+           END-IF
+      *
+           IF    ( I06-BUNBENKBN-COUNT >   ZERO )
+               MOVE    WIDGET-NORMAL   TO  I06-BUNBENKBN-STATE
+                                           I06-BUNBENKBN-ITEM-STATE
+           END-IF
+      *
+           .
+       5001-GMNHEN-STATE-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    カーソル位置処理
@@ -7544,6 +7982,10 @@
                MOVE    "TEIKIKBN"      TO  MCP-WIDGET
            WHEN    32
                MOVE    "DISPKBN"       TO  MCP-WIDGET
+           WHEN    33
+               MOVE    "BUNBENKBN"     TO  MCP-WIDGET
+           WHEN    34
+               MOVE    "RIYOUKBN"      TO  MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -7599,6 +8041,10 @@
            WHEN    "DR3"
                MOVE    15              TO  SPA-GMN-CUR
            WHEN    "HKNCOMBI"
+               MOVE    33              TO  SPA-GMN-CUR
+           WHEN    "BUNBENKBN"
+               MOVE    34              TO  SPA-GMN-CUR
+           WHEN    "RIYOUKBN"
                MOVE    17              TO  SPA-GMN-CUR
            WHEN    "TOKNYUIN"
                MOVE    26              TO  SPA-GMN-CUR
@@ -7717,6 +8163,18 @@
       *
            IF    ( SPA-GMN-CUR         =   15 )
                IF    ( I06-HKNCOMBI-STATE  =   WIDGET-INSENSITIVE )
+                   MOVE    33          TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR         =   33 )
+               IF    ( I06-BUNBENKBN-STATE =   WIDGET-INSENSITIVE )
+                   MOVE    34          TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR         =   34 )
+               IF    ( I06-RIYOUKBN-STATE  =   WIDGET-INSENSITIVE )
                    MOVE    17          TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -7893,6 +8351,12 @@
                                        TO  SPA-ERRMSG
            WHEN    "0035"
                MOVE    "検索時患者表示入力エラー" 
+                                       TO  SPA-ERRMSG
+           WHEN    "0036"
+               MOVE    "分娩区分入力エラー" 
+                                       TO  SPA-ERRMSG
+           WHEN    "0037"
+               MOVE    "直接支払制度利用区分入力エラー" 
                                        TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "異動歴を選択してください"
@@ -8926,6 +9390,39 @@
       *
            .
        900-SYSKANRI-KEY23-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理検索処理
+      *****************************************************************
+       900-BUNBEN-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BUNBEN
+           INITIALIZE                  BUNBEN-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  BUNBEN-HOSPNUM
+           MOVE    SPA-NAI-PTID    TO  BUNBEN-PTID
+           MOVE    "1"             TO  BUNBEN-NYUGAIKBN
+           MOVE    PTNYUINRRK-RRKNUM
+                                   TO  BUNBEN-RRKNUM
+           MOVE    BUNBEN-REC      TO  MCPDATA-REC
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BUNBEN-REC
+           ELSE
+               INITIALIZE              BUNBEN-REC
+               MOVE    1           TO  FLG-BUNBEN
+           END-IF
+      *
+           MOVE    "tbl_bunben"    TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-BUNBEN-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

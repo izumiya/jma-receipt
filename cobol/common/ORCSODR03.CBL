@@ -62,20 +62,32 @@
            03  IDX2                    PIC 9(05).
            03  IDX3                    PIC 9(05).
            03  IDX4                    PIC 9(05).
+           03  IDXD                    PIC 9(05).
            03  IDX-ODR                    PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
+           03  WRK-SYMD                PIC X(08).
+           03  WRK-DOW                 PIC 9(01).
            03  WRK-COMBI-HKNCOMBI      PIC 9(04).
            03  WRK-SYS-KANRICD         PIC X(04).
            03  WRK-SYS-KBNCD           PIC X(08).
            03  WRK-DIALOG              PIC 9(02).
            03  WRK-MCP-WINDOW          PIC X(64).
+           03  WRK-STARTYMD            PIC X(08).
+           03  WRK-ENDYMD              PIC X(08).
+           03  WRK-SRYYMD.
+               05  WRK-SRYYM           PIC X(06).
+               05  WRK-SRYDD           PIC 9(02).
+           03  WRK-EOMYMD.
+               05  WRK-EOMYM           PIC X(06).
+               05  WRK-EOMDD           PIC 9(02).
       *
        01  ITEM-AREA.
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
-           03  ITEM-GAIHAKUKBN         PIC X(01).
+           03  ITEM-GAIHAKUKBN         PIC X(02).
+           03  ITEM-ENDYMD             PIC X(08).
       *
        01  ERRCD-AREA.
            03  ERRCD-ITEM-G.
@@ -135,6 +147,10 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
       *    入院会計作成サブ
            COPY    "CPORCSODRNACCT.INC".
@@ -293,6 +309,8 @@
                    PERFORM 20011-HKNCOMBI-CHK-SEC
                WHEN    NCLAIMID-GAIHAKUKBNJMA
                    PERFORM 20011-GAIHAKUKBN-CHK-SEC
+               WHEN    NCLAIMID-ENDYMDJMA
+                   PERFORM 20011-ENDYMD-CHK-SEC
                END-EVALUATE
       *
            END-PERFORM
@@ -376,6 +394,17 @@
        20011-GAIHAKUKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    終了日チェック処理
+      *****************************************************************
+       20011-ENDYMD-CHK-SEC            SECTION.
+      *
+           MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                   TO  ITEM-ENDYMD
+      *
+           .
+       20011-ENDYMD-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    項目未処理状態設定処理
       *****************************************************************
        2100-ITEM-UNPROCSTS-SET-SEC        SECTION.
@@ -426,6 +455,13 @@
            IF    ( ERRCD-ORDER     =   SPACE )
       *        入院会計チェック処理
                PERFORM 20021-NACCT-CHK-SEC
+           END-IF
+      *
+           IF    ( ERRCD-ORDER     =   SPACE )
+               IF    ( SODR-ORDERID    =   NORDERID-GPTSTID )
+      *            入院API外泊チェック処理
+                   PERFORM 20021-GPTSTID-CHK-SEC
+               END-IF
            END-IF
       *
            .
@@ -496,6 +532,54 @@
       *
            .
        20021-NACCT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院API外泊チェック処理
+      *****************************************************************
+       20021-GPTSTID-CHK-SEC             SECTION.
+      *
+           IF    ( ITEM-GAIHAKUKBN     =   "09" OR "13" )
+      *
+               MOVE    SODR-SRYYMD     TO  WRK-STARTYMD
+      *
+               MOVE    ITEM-ENDYMD     TO  WRK-ENDYMD
+               IF    ( WRK-ENDYMD      =   SPACE )
+                   MOVE    SODR-SRYYMD TO  WRK-ENDYMD
+               ELSE
+                   IF    ( WRK-ENDYMD  >   TRRK-TAIINYMD )
+                       MOVE    TRRK-TAIINYMD
+                                       TO  WRK-ENDYMD
+                   END-IF
+               END-IF
+      *
+               MOVE    SODR-SRYYMD(1:6) TO  WRK-SRYYM
+               MOVE    SODR-SRYYMD      TO  WRK-SYMD
+               PERFORM 800-EOM-SEC
+      *
+               PERFORM VARYING IDXD    FROM    1   BY  1
+                       UNTIL ( IDXD    >   31 )
+                        OR   ( ERRCD-ORDER     NOT =   SPACE )
+      *
+                   MOVE    IDXD        TO  WRK-SRYDD
+      *
+                   IF    ( WRK-SRYYMD  >=  WRK-STARTYMD)
+                    AND  ( WRK-SRYYMD  <=  WRK-ENDYMD  )
+                    AND  ( WRK-SRYYMD  <=  WRK-EOMYMD  )
+                       MOVE    WRK-SRYYMD  TO  WRK-SYMD
+                       PERFORM 800-DOW-SEC
+                       IF    ( WRK-DOW  =  1 OR 7 )
+                           CONTINUE
+                       ELSE
+                           MOVE    "0161"  TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
+      *
+               END-PERFORM
+      *
+           END-IF
+      *
+           .
+       20021-GPTSTID-CHK-EXT.
            EXIT.
       *****************************************************************
       *    オーダー情報再編成処理
@@ -659,19 +743,51 @@
            INITIALIZE                  SODRNACCT-AREA
            EVALUATE    SODR-ORDERID
            WHEN    NORDERID-GPTSTID
-               IF    ( ITEM-GAIHAKUKBN    =   "0" )
+               EVALUATE    ITEM-GAIHAKUKBN
+               WHEN    ZERO
                    MOVE    NORDERID-GBACKID
                                    TO  SODRNACCT-ORDERID
-               ELSE
+               WHEN    "01"
                    MOVE    NORDERID-GAIHKID
                                    TO  SODRNACCT-ORDERID
-               END-IF
+               WHEN    "02"
+                   MOVE    NORDERID-GCUREID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "03"
+                   MOVE    NORDERID-GSENTID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "04"
+                   MOVE    NORDERID-TAIJUSHIN70ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "05"
+                   MOVE    NORDERID-TAIJUSHIN30ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "06"
+                   MOVE    NORDERID-TAIJUSHIN55ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "07"
+                   MOVE    NORDERID-TAIJUSHIN15ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "08"
+                   MOVE    NORDERID-JIKANGENID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "09"
+                   MOVE    NORDERID-YOBIGENID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "13"
+                   MOVE    NORDERID-YOBI2GENID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "99"
+                   MOVE    NORDERID-GCANCELID
+                                   TO  SODRNACCT-ORDERID
+               END-EVALUATE
            WHEN    OTHER
                MOVE    SODR-ORDERID
                                    TO  SODRNACCT-ORDERID
            END-EVALUATE
            MOVE    ZERO            TO  SODRNACCT-NYUKBN
            MOVE    SODR-SRYYMD     TO  SODRNACCT-STARTYMD
+           MOVE    ITEM-ENDYMD     TO  SODRNACCT-ENDYMD
            MOVE    SODR-OPID       TO  SODRNACCT-OPID
            MOVE    SODR-UPYMD      TO  SODRNACCT-UPYMD
            MOVE    SODR-UPHMS      TO  SODRNACCT-UPHMS
@@ -723,6 +839,46 @@
            .
        300-END-EXT.
            EXIT.
+      *****************************************************************
+      *    曜日取得処理(1:日曜日...7:土曜日）
+      *****************************************************************
+       800-DOW-SEC                     SECTION.
+      *
+           MOVE    ZERO            TO  WRK-DOW
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY3-AREA
+           MOVE    "31"            TO  LNK-DAY3-IRAI
+           MOVE    WRK-SYMD        TO  LNK-DAY3-YMD
+           CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                           LNK-DAY3-AREA
+           IF    ( LNK-DAY3-YOBI   =   7 )
+               COMPUTE WRK-DOW     =   1
+           ELSE
+               COMPUTE WRK-DOW     =   LNK-DAY3-YOBI + 1
+           END-IF
+      *
+           .
+       800-DOW-EXT.
+      *
+      *****************************************************************
+      *    月末日取得処理
+      *****************************************************************
+       800-EOM-SEC                     SECTION.
+      *
+           INITIALIZE                  WRK-EOMYMD
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY1-AREA
+           MOVE    "71"                TO   LNK-DAY7-IRAI
+           MOVE    WRK-SYMD (1 : 6)    TO   LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                       LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO  WRK-EOMYMD
+      *
+           .
+       800-EOM-EXT.
+            EXIT.
       *****************************************************************
       *    入院履歴検索処理(KEY42)
       *****************************************************************
@@ -895,7 +1051,7 @@
       *
            .
       *
-       910-DB-SELECT-EXT.
+       910-DBSELECT-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

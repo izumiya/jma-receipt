@@ -12,6 +12,7 @@ SRCS = ORCGI01.CBL \
        ORCGI0SUB02.CBL \
        ORCGI0SUB03.CBL \
        ORCGI0API01.CBL \
+       ORCGI0API02.CBL \
        ORCGI0API09.CBL \
 
 top_builddir = ../..

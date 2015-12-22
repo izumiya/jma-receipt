@@ -15,21 +15,19 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-      *    orca31（入退院登録）画面
-      ******************************************************************
-           COPY    "I01.INC".
-           COPY    "I02.INC".
-           COPY    "I03.INC".
-           COPY    "I04.INC".
-           COPY    "I05.INC".
-           COPY    "I06.INC".
-           COPY    "I0ERR.INC".
-           COPY    "I0ID1.INC".
-           COPY    "I0ID2.INC".
-           COPY    "I041.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API01-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API02-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API09-//.
+      ************************************************************
+      *    分娩管理情報編集サブ　COPY (CPORCSI02.INC)
+      ************************************************************
+      ************************************************************
+      *  コピー句修正履歴
+      * Maj/Min/Rev  修正者       日付      内容
+      ************************************************************
+       01  SI02-AREA.
+      *    REQID
+      *    1:チェック/2:更新/3:チェック＆更新
+           03  SI02-REQID          PIC X(01).
+           03  SI02-BUNBENKBN      PIC X(01).
+           03  SI02-RIYOUKBN       PIC X(01).
+           03  SI02-BUNBENCHK      PIC 9(01).
+           03  SI02-BUNBENNUM      PIC 9(03).
+           03  SI02-RC             PIC 9(02).

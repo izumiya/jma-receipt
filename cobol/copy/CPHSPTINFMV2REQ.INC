@@ -63,6 +63,8 @@
               05  HSPTINFMREQ-KHNCD             PIC X(9).
               05  HSPTINFMREQ-TOKHIGAITOKBN     PIC X(1).
               05  HSPTINFMREQ-NACCTKBN          PIC X(1).
+              05  HSPTINFMREQ-BUNBENKBN         PIC X(1).
+              05  HSPTINFMREQ-RIYOUKBN          PIC X(1).
               05  HSPTINFMREQ-KSNCD             PIC X(9) OCCURS 3.
               05  HSPTINFMREQ-TEIKIKBN          PIC X(1).
               05  HSPTINFMREQ-DISPKBN           PIC X(1).

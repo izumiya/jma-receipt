@@ -108,6 +108,14 @@
                           11   HSPTINFM01RES-NACCTKBN-LBL     PIC X(20).
                           11   HSPTINFM01RES-NACCTKBN-DATA    PIC X(01).
                           11   HSPTINFM01RES-NACCTKBN-NAME    PIC X(30).
+                      09  HSPTINFM01RES-BUNBENKBN-G.
+                          11   HSPTINFM01RES-BUNBENKBN-LBL   PIC X(20).
+                          11   HSPTINFM01RES-BUNBENKBN-DATA  PIC X(01).
+                          11   HSPTINFM01RES-BUNBENKBN-NAME  PIC X(20).
+                      09  HSPTINFM01RES-RIYOUKBN-G.
+                          11   HSPTINFM01RES-RIYOUKBN-LBL     PIC X(20).
+                          11   HSPTINFM01RES-RIYOUKBN-DATA    PIC X(01).
+                          11   HSPTINFM01RES-RIYOUKBN-NAME    PIC X(20).
                       09  HSPTINFM01RES-TEIKIKBN-G.
                           11   HSPTINFM01RES-TEIKIKBN-LBL     PIC X(20).
                           11   HSPTINFM01RES-TEIKIKBN-DATA    PIC X(01).

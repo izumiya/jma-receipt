@@ -182,6 +182,12 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
       *
+      *    分娩情報編集サブ
+           COPY    "CPORCSI02.INC".
+       01  SNRRK-AREA.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                       BY         //SNRRK-//.
+      *
       *    排他制御
            COPY    "CPORCSLOCK.INC".
       *
@@ -290,6 +296,18 @@
       *
                IF    ( FLG-END  =   ZERO )
                   PERFORM  2101-ORCSODRNACCT-CALL-SEC
+               END-IF
+      *
+               IF    ( FLG-END  =   ZERO )
+                   IF    ( SODR-SRCKBN =   "1" OR "2" )
+                       PERFORM 2101-ORCSI02-CALL-SEC
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-END  =   ZERO )
+                   IF    ( SODR-PROCKBN    =   "1" )
+                       PERFORM 2101-ORDER-RECONF-SEC
+                   END-IF
                END-IF
       *
                IF    ( FLG-END  =   ZERO )
@@ -626,6 +644,29 @@
       *
            .
        2101-ORCSODRNACCT-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理情報更新処理
+      *****************************************************************
+       2101-ORCSI02-CALL-SEC           SECTION.
+      *
+           INITIALIZE                  SI02-AREA
+           MOVE    "3"             TO  SI02-REQID
+           MOVE    TRRK-REC        TO  SNRRK-AREA
+           CALL    "ORCSI02"       USING
+                                   SI02-AREA
+                                   SNRRK-AREA
+                                   MCPAREA
+                                   SPA-AREA
+           IF     ( MCP-RC         NOT =  ZERO )
+               DISPLAY "ORCSDR09 ERROR 010:BUNBEN UPDATE ERR"
+                       " PTID="        SODR-PTID
+                       " KARTE-KEY="   SODR-KARTE-KEY
+               MOVE    1               TO  FLG-END
+           END-IF
+      *
+           .
+       2101-ORCSI02-CALL-EXT.
            EXIT.
       *****************************************************************
       *    患者情報更新処理

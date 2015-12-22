@@ -78,6 +78,14 @@
                        09  SPA-GMN-HKNCOMBI        PIC X(04).
                        09  SPA-GMN-HKNCOMBIFL      PIC X(01).
                        09  SPA-GMN-HKNCOMBIMEI     PIC X(46).
+                   07  SPA-GMN-BUNBENKBN-G.
+                       09  SPA-GMN-BUNBENKBN       PIC X(01).
+                       09  SPA-GMN-BUNBENKBNFL     PIC X(01).
+                       09  SPA-GMN-BUNBENKBNMEI    PIC X(18).
+                   07  SPA-GMN-RIYOUKBN-G.
+                       09  SPA-GMN-RIYOUKBN        PIC X(01).
+                       09  SPA-GMN-RIYOUKBNFL      PIC X(01).
+                       09  SPA-GMN-RIYOUKBNMEI     PIC X(18).
                    07  SPA-GMN-NYUKBN-G.
                        09  SPA-GMN-NYUKBN          PIC X(02).
                        09  SPA-GMN-NYUKBNFL        PIC X(01).
@@ -225,6 +233,18 @@
                            11  SPA-GMN-HKNCOMBIL       PIC X(04).
                            11  SPA-GMN-HKNCOMBIFLL     PIC X(01).
                            11  SPA-GMN-HKNCOMBIMEIL    PIC X(46).
+                   07  SPA-GMN-BUNBENKBNLST-G.
+                       09  SPA-GMN-BUNBENKBN-MAX       PIC 9(05).
+                       09  SPA-GMN-BUNBENKBNLST        OCCURS  5.
+                           11  SPA-GMN-BUNBENKBNL      PIC X(01).
+                           11  SPA-GMN-BUNBENKBNFLL    PIC X(01).
+                           11  SPA-GMN-BUNBENKBNMEIL   PIC X(18).
+                   07  SPA-GMN-RIYOUKBNLST-G.
+                       09  SPA-GMN-RIYOUKBN-MAX        PIC 9(05).
+                       09  SPA-GMN-RIYOUKBNLST         OCCURS  5.
+                           11  SPA-GMN-RIYOUKBNL       PIC X(01).
+                           11  SPA-GMN-RIYOUKBNFLL     PIC X(01).
+                           11  SPA-GMN-RIYOUKBNMEIL    PIC X(18).
                    07  SPA-GMN-NYUKBNLST-G.
                        09  SPA-GMN-NYUKBN-MAX          PIC 9(05).
                        09  SPA-GMN-NYUKBNLST           OCCURS  2.
@@ -292,11 +312,13 @@
                    07  SPA-NAI-HIDOYMD             PIC X(08).
                    07  SPA-NAI-ORDERID             PIC X(04).
                    07  SPA-NAI-PTID                PIC X(20).
+                   07  SPA-NAI-SEX                 PIC X(01).
                    07  SPA-NAI-BIRTHDAY            PIC X(08).
                    07  SPA-NAI-HSRYKA              PIC X(02).
                    07  SPA-NAI-HHKNCOMBI           PIC X(04).
                    07  SPA-NAI-HNYUINYMD           PIC X(08).
                    07  SPA-NAI-LASTIDOYMD          PIC X(08).
+                   07  SPA-NAI-BUNBENKBN           PIC X(01).
                    07  SPA-NAI-DIRECT-KHNERR       PIC 9(01).
                    07  SPA-NAI-ORDER-DAT           PIC X(1000).
                    07  SPA-NAI-INF-CHK             PIC 9(05).

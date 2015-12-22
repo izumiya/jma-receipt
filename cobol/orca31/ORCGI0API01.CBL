@@ -123,6 +123,8 @@
            03  REG-NYUINRYOCD          PIC X(03).
            03  REG-TOKHIGAITOKBN       PIC X(01).
            03  REG-NACCTKBN            PIC X(01).
+           03  REG-BUNBENKBN           PIC X(01).
+           03  REG-RIYOUKBN            PIC X(01).
            03  REG-KSNCD               PIC X(09)
                                        OCCURS   3.
            03  REG-TEIKIKBN            PIC X(01).
@@ -604,6 +606,10 @@
                                        TO  REG-TOKHIGAITOKBN
            MOVE    HSPTINFMREQ-NACCTKBN
                                        TO  REG-NACCTKBN
+           MOVE    HSPTINFMREQ-BUNBENKBN
+                                       TO  REG-BUNBENKBN
+           MOVE    HSPTINFMREQ-RIYOUKBN
+                                       TO  REG-RIYOUKBN
       *
            PERFORM VARYING  IDX0    FROM   1   BY  1
                   UNTIL  ( IDX0    >   3 )
@@ -642,6 +648,10 @@
                                        TO  REG-DR (IDX0)
            END-PERFORM
       *
+           MOVE    HSPTINFMREQ-BUNBENKBN
+                                       TO  REG-BUNBENKBN
+           MOVE    HSPTINFMREQ-RIYOUKBN
+                                       TO  REG-RIYOUKBN
            MOVE    HSPTINFMREQ-TEIKIKBN TO REG-TEIKIKBN
            MOVE    HSPTINFMREQ-DISPKBN TO  REG-DISPKBN
       *
@@ -703,6 +713,10 @@
                                        TO  REG-TOKHIGAITOKBN
            MOVE    HSPTINFMREQ-NACCTKBN
                                        TO  REG-NACCTKBN
+           MOVE    HSPTINFMREQ-BUNBENKBN
+                                       TO  REG-BUNBENKBN
+           MOVE    HSPTINFMREQ-RIYOUKBN
+                                       TO  REG-RIYOUKBN
       *
            PERFORM VARYING  IDX0    FROM   1   BY  1
                   UNTIL  ( IDX0    >   3 )
@@ -1047,6 +1061,18 @@
                END-IF
            END-IF
       *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-BUNBENKBN       NOT =   SPACE )
+                   PERFORM 2300-BUNBENKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-RIYOUKBN        NOT =   SPACE )
+                   PERFORM 2300-RIYOUKBN-SET-SEC
+               END-IF
+           END-IF
+      *
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL ( IDX2    >   3 )
                IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -1142,6 +1168,18 @@
                    PERFORM 2300-DR-SET-SEC
                END-IF
            END-PERFORM
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-BUNBENKBN       NOT =   SPACE )
+                   PERFORM 2300-BUNBENKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-RIYOUKBN        NOT =   SPACE )
+                   PERFORM 2300-RIYOUKBN-SET-SEC
+               END-IF
+           END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
                IF    ( REG-TEIKIKBN      NOT =   SPACE )
@@ -1257,10 +1295,9 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
-               IF    ( REG-SENTEIKBN     =   SPACE )
-                   MOVE    TRRK-SENTEIKBN    TO  REG-SENTEIKBN
+               IF    ( REG-SENTEIKBN     NOT =   SPACE )
+                   PERFORM 2300-SENTEIKBN-SET-SEC
                END-IF
-               PERFORM 2300-SENTEIKBN-SET-SEC
            END-IF
       *
            PERFORM VARYING IDX2    FROM    1   BY  1
@@ -1277,10 +1314,9 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
-               IF    ( REG-TOKHIGAITOKBN     =   SPACE )
-                   MOVE    "0"           TO  REG-TOKHIGAITOKBN
+               IF    ( REG-TOKHIGAITOKBN     NOT =   SPACE )
+                   PERFORM 2300-TOKHIGAITOKBN-SET-SEC
                END-IF
-               PERFORM 2300-TOKHIGAITOKBN-SET-SEC
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
@@ -1292,10 +1328,21 @@
            END-IF
       *
            IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
-               IF    ( REG-NACCTKBN          =   SPACE )
-                   MOVE    TRRK-NYUCALKBN TO REG-NACCTKBN
+               IF    ( REG-NACCTKBN      NOT =   SPACE )
+                   PERFORM 2300-NACCTKBN-SET-SEC
                END-IF
-               PERFORM 2300-NACCTKBN-SET-SEC
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-BUNBENKBN       NOT =   SPACE )
+                   PERFORM 2300-BUNBENKBN-SET-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( CONST-ODRITEM-MAX     >   IDX-ITM )
+               IF    ( REG-RIYOUKBN        NOT =   SPACE )
+                   PERFORM 2300-RIYOUKBN-SET-SEC
+               END-IF
            END-IF
       *
            PERFORM VARYING IDX2    FROM    1   BY  1
@@ -1502,10 +1549,38 @@
       *
            MOVE    NCLAIMID-NACCTKBNJMA 
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-NACCTKBN       TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    REG-NACCTKBN        TO  LNK-ODRITEM-ITEM   (IDX-ITM)
       *
            .
        2300-NACCTKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩区分設定処理
+      *****************************************************************
+       2300-BUNBENKBN-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-BUNBENKBNJMA 
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-BUNBENKBN        TO  LNK-ODRITEM-ITEM   (IDX-ITM)
+      *
+           .
+       2300-BUNBENKBN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分設定処理
+      *****************************************************************
+       2300-RIYOUKBN-SET-SEC          SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-RIYOUKBNJMA
+                                       TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-RIYOUKBN        TO  LNK-ODRITEM-ITEM   (IDX-ITM)
+      *
+           .
+       2300-RIYOUKBN-SET-EXT.
            EXIT.
       *****************************************************************
       *    入院加算設定処理
@@ -1804,6 +1879,18 @@
                                    TO HSPTINFM01RES-NACCTKBN-DATA
            MOVE    SNINF01-NACCTKBN-NAME (IDXA)
                                    TO HSPTINFM01RES-NACCTKBN-NAME
+           MOVE    SNINF01-BUNBENKBN-LBL (IDXA)
+                                   TO HSPTINFM01RES-BUNBENKBN-LBL
+           MOVE    SNINF01-BUNBENKBN-DATA (IDXA)
+                                   TO HSPTINFM01RES-BUNBENKBN-DATA
+           MOVE    SNINF01-BUNBENKBN-NAME (IDXA)
+                                   TO HSPTINFM01RES-BUNBENKBN-NAME
+           MOVE    SNINF01-RIYOUKBN-LBL (IDXA)
+                                   TO HSPTINFM01RES-RIYOUKBN-LBL
+           MOVE    SNINF01-RIYOUKBN-DATA (IDXA)
+                                   TO HSPTINFM01RES-RIYOUKBN-DATA
+           MOVE    SNINF01-RIYOUKBN-NAME (IDXA)
+                                   TO HSPTINFM01RES-RIYOUKBN-NAME
            MOVE    SNINF01-TEIKIKBN-LBL (IDXA)
                                    TO HSPTINFM01RES-TEIKIKBN-LBL
            MOVE    SNINF01-TEIKIKBN-DATA (IDXA)

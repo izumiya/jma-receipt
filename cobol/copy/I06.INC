@@ -165,6 +165,20 @@
               03  I06-NISSU-G.
                 04  I06-NISSU                  PIC X(50).
                 04  I06-NISSU-STATE            PIC S9(9)   BINARY.
+              03  I06-CMB-BUNBENKBN.
+                04  I06-BUNBENKBN                 PIC X(20).
+                04  I06-BUNBENKBN-STATE           PIC S9(9)   BINARY.
+                04  I06-BUNBENKBN-COUNT           PIC S9(9)   BINARY.
+                04  I06-BUNBENKBN-ITEM            PIC X(20)
+                                                  OCCURS  5.
+                04  I06-BUNBENKBN-ITEM-STATE      PIC S9(9)   BINARY.
+              03  I06-CMB-RIYOUKBN.
+                04  I06-RIYOUKBN                  PIC X(20).
+                04  I06-RIYOUKBN-STATE            PIC S9(9)   BINARY.
+                04  I06-RIYOUKBN-COUNT            PIC S9(9)   BINARY.
+                04  I06-RIYOUKBN-ITEM             PIC X(20)
+                                                  OCCURS  5.
+                04  I06-RIYOUKBN-ITEM-STATE       PIC S9(9)   BINARY.
               03  I06-SCROLLEDWINDOW4.
                 04  I06-ERRMSGLST.
                   05  I06-ERRMSGLST-COUNT      PIC S9(9)   BINARY.

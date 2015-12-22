@@ -43,6 +43,8 @@ xml_hsptinfmodv2req {
 		Hospital_Charge						varchar(09);
 		Hospital_Charge_NotApplicable		varchar(01);
 		Editing_Hospital_Charge				varchar(01);
+		Delivery							varchar(1);
+		Direct_Payment						varchar(1);
 		Additional_Hospital_Charge			varchar(09)[3];
 		Recurring_Billing					varchar(01);
 		Search_Function						varchar(01);

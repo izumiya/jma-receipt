@@ -409,13 +409,15 @@
       *
            IF    ( SPA-S08-NYUGAIKBN   =   "1" )
                PERFORM 900-PTNYUINRRK-KEY4-SEL-SEC
-               MOVE    PTNYUINRRK-TAIINYMD
+               MOVE    PTNYUINRRK-NYUINYMD
                                    TO  SPA-NAI-SRYYMD
       *
                MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SYMD
                PERFORM 800-HIZUKE-CHK-SEC
                MOVE    WRK-HENYMDG         TO  SPA-GMN-NYUINYMD
                IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                   MOVE    PTNYUINRRK-TAIINYMD
+                                   TO      SPA-NAI-SRYYMD
                    MOVE    PTNYUINRRK-TAIINYMD
                                            TO  WRK-SYMD
                    PERFORM 800-HIZUKE-CHK-SEC
@@ -434,13 +436,10 @@
       *
            MOVE    SPACE               TO  WRK-KYUSEINAME
            PERFORM 900-KYUSEIRRK-KEY3-SEL-SEC
-           PERFORM UNTIL ( FLG-KYUSEIRRK   NOT =   ZERO )
-               MOVE    KYUSEI-NAME     TO  WRK-KYUSEINAME
-               PERFORM 900-KYUSEIRRK-KEY3-FET-SEC
-           END-PERFORM
-           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           IF    ( FLG-KYUSEIRRK   =   ZERO )
+               MOVE    KYUSEI-NAME
+                                       TO  WRK-KYUSEINAME
+           END-IF
       *
            INITIALIZE                  SYSKANRI-REC
            MOVE    "1001"          TO  SYS-KANRICD
@@ -3414,6 +3413,10 @@
                INITIALIZE                  KYUSEIRRK-REC
                MOVE    1               TO  FLG-KYUSEIRRK
            END-IF
+      *
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
        900-KYUSEIRRK-KEY3-SEL-EXT.

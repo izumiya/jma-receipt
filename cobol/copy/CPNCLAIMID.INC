@@ -224,6 +224,230 @@
                07  NCLAIMID-KSNCDMES
                                 PIC X(100)
                                     VALUE  "∆˛±°≤√ªª".
+             05  NCLAIMID-ENDYMD-G.
+               07  NCLAIMID-ENDYMD
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ENDYMDJMA
+                                PIC X(05)   VALUE  "00029".
+               07  NCLAIMID-ENDYMDMES
+                                PIC X(100)
+                                    VALUE  "Ω™Œª∆¸".
+             05  NCLAIMID-BUNBENKBN-G.
+               07  NCLAIMID-BUNBENKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-BUNBENKBNJMA
+                                PIC X(05)   VALUE  "00030".
+               07  NCLAIMID-BUNBENKBNMES
+                                PIC X(100)
+                                    VALUE  " ¨ ⁄∂Ë ¨".
+             05  NCLAIMID-RIYOUKBN-G.
+               07  NCLAIMID-RIYOUKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-RIYOUKBNJMA
+                                PIC X(05)   VALUE  "00031".
+               07  NCLAIMID-RIYOUKBNMES
+                                PIC X(100)
+                                    VALUE  "ƒæ¿‹ªŸ ß¿©≈ŸÕ¯Õ—∂Ë ¨".
+             05  NCLAIMID-HONKZKKBN-G.
+               07  NCLAIMID-HONKZKKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-HONKZKKBNJMA
+                                PIC X(05)   VALUE  "00032".
+               07  NCLAIMID-HONKZKKBNMES
+                                PIC X(100)
+                                    VALUE  "À‹øÕ≤»¬≤∂Ë ¨".
+             05  NCLAIMID-HKNJANUM-G.
+               07  NCLAIMID-HKNJANUM
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-HKNJANUMJMA
+                                PIC X(05)   VALUE  "00033".
+               07  NCLAIMID-HKNJANUMMES
+                                PIC X(100)
+                                    VALUE  " ›∏±º‘»÷πÊ".
+             05  NCLAIMID-KIGO-G.
+               07  NCLAIMID-KIGO
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-KIGOJMA
+                                PIC X(05)   VALUE  "00034".
+               07  NCLAIMID-KIGOMES
+                                PIC X(100)
+                                    VALUE  "»Ô ›∏±º‘æ⁄µ≠πÊ".
+             05  NCLAIMID-NUM-G.
+               07  NCLAIMID-NUM
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-NUMJMA
+                                PIC X(05)   VALUE  "00035".
+               07  NCLAIMID-NUMMES
+                                PIC X(100)
+                                    VALUE  "»Ô ›∏±º‘æ⁄»÷πÊ".
+             05  NCLAIMID-SKYYM-G.
+               07  NCLAIMID-SKYYM
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SKYYMJMA
+                                PIC X(05)   VALUE  "00036".
+               07  NCLAIMID-SKYYMMES
+                                PIC X(100)
+                                    VALUE  "¿¡µ·«Ø∑Ó".
+             05  NCLAIMID-TEISYUTUBIKBN-G.
+               07  NCLAIMID-TEISYUTUBIKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-TEISYUTUBIKBNJMA
+                                PIC X(05)   VALUE  "00037".
+               07  NCLAIMID-TEISYUTUBIKBNMES
+                                PIC X(100)
+                                    VALUE  "ƒÛΩ–∆¸∂Ë ¨".
+             05  NCLAIMID-SKYKBN-G.
+               07  NCLAIMID-SKYKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SKYKBNJMA
+                                PIC X(05)   VALUE  "00038".
+               07  NCLAIMID-SKYKBNMES
+                                PIC X(100)
+                                    VALUE  "¿¡µ·∂Ë ¨".
+             05  NCLAIMID-TEISYUTUSAKI-G.
+               07  NCLAIMID-TEISYUTUSAKI
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-TEISYUTUSAKIJMA
+                                PIC X(05)   VALUE  "00039".
+               07  NCLAIMID-TEISYUTUSAKIMES
+                                PIC X(100)
+                                    VALUE  "ƒÛΩ–¿Ë∂Ë ¨".
+             05  NCLAIMID-ZAIWEEK-G.
+               07  NCLAIMID-ZAIWEEK
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ZAIWEEKJMA
+                                PIC X(05)   VALUE  "00040".
+               07  NCLAIMID-ZAIWEEKMES
+                                PIC X(100)
+                                    VALUE  "∫ﬂ¬€ΩµøÙ".
+             05  NCLAIMID-BIRTHDAY-G.
+               07  NCLAIMID-BIRTHDAY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-BIRTHDAYJMA
+                                PIC X(05)   VALUE  "00041".
+               07  NCLAIMID-BIRTHDAYMES
+                                PIC X(100)
+                                    VALUE  "Ω–ª∫«Ø∑Ó∆¸".
+             05  NCLAIMID-SIZANKBN-G.
+               07  NCLAIMID-SIZANKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SIZANKBNJMA
+                                PIC X(05)   VALUE  "00042".
+               07  NCLAIMID-SIZANKBNMES
+                                PIC X(100)
+                                    VALUE  "ª‡ª∫Õ≠Ãµ∂Ë ¨".
+             05  NCLAIMID-BIRTHCNT-G.
+               07  NCLAIMID-BIRTHCNT
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-BIRTHCNTJMA
+                                PIC X(05)   VALUE  "00043".
+               07  NCLAIMID-BIRTHCNTMES
+                                PIC X(100)
+                                    VALUE  "Ω–ª∫øÙ".
+             05  NCLAIMID-NYUIN-DAY-G.
+               07  NCLAIMID-NYUIN-DAY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-NYUIN-DAYJMA
+                                PIC X(05)   VALUE  "00044".
+               07  NCLAIMID-NYUIN-DAYMES
+                                PIC X(100)
+                                    VALUE  "∆˛±°∆¸øÙ".
+             05  NCLAIMID-SANKAKBN-G.
+               07  NCLAIMID-SANKAKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SANKAKBNJMA
+                                PIC X(05)   VALUE  "00045".
+               07  NCLAIMID-SANKAKBNMES
+                                PIC X(100)
+                                    VALUE  "ª∫≤ ∞ÂŒ≈ ‰Ω˛¿©≈Ÿ¬–æ›∂Ë ¨".
+             05  NCLAIMID-NYU-MONEY-G.
+               07  NCLAIMID-NYU-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-NYU-MONEYJMA
+                                PIC X(05)   VALUE  "00046".
+               07  NCLAIMID-NYU-MONEYMES
+                                PIC X(100)
+                                    VALUE  "∆˛±°Œ¡".
+             05  NCLAIMID-RMSGK-MONEY-G.
+               07  NCLAIMID-RMSGK-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-RMSGK-MONEYJMA
+                                PIC X(05)   VALUE  "00047".
+               07  NCLAIMID-RMSGK-MONEYMES
+                                PIC X(100)
+                                    VALUE  "ººŒ¡∫π≥€".
+             05  NCLAIMID-KAIJO-MONEY-G.
+               07  NCLAIMID-KAIJO-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-KAIJO-MONEYJMA
+                                PIC X(05)   VALUE  "00048".
+               07  NCLAIMID-KAIJO-MONEYMES
+                                PIC X(100)
+                                    VALUE  " ¨ ⁄≤ΩıŒ¡".
+             05  NCLAIMID-BUNBEN-MONEY-G.
+               07  NCLAIMID-BUNBEN-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-BUNBEN-MONEYJMA
+                                PIC X(05)   VALUE  "00049".
+               07  NCLAIMID-BUNBEN-MONEYMES
+                                PIC X(100)
+                                    VALUE  " ¨ ⁄Œ¡".
+             05  NCLAIMID-SHIN-MONEY-G.
+               07  NCLAIMID-SHIN-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SHIN-MONEYJMA
+                                PIC X(05)   VALUE  "00050".
+               07  NCLAIMID-SHIN-MONEYMES
+                                PIC X(100)
+                                    VALUE  "ø∑¿∏ª˘¥…Õ˝ ›∞ÈŒ¡".
+             05  NCLAIMID-KNS-MONEY-G.
+               07  NCLAIMID-KNS-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-KNS-MONEYJMA
+                                PIC X(05)   VALUE  "00051".
+               07  NCLAIMID-KNS-MONEYMES
+                                PIC X(100)
+                                    VALUE  "∏°∫∫°¶ÃÙ∫ﬁŒ¡".
+             05  NCLAIMID-SYC-MONEY-G.
+               07  NCLAIMID-SYC-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SYC-MONEYJMA
+                                PIC X(05)   VALUE  "00052".
+               07  NCLAIMID-SYC-MONEYMES
+                                PIC X(100)
+                                    VALUE  "ΩË√÷°¶ºÍ≈ˆŒ¡".
+             05  NCLAIMID-SNK-MONEY-G.
+               07  NCLAIMID-SNK-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SNK-MONEYJMA
+                                PIC X(05)   VALUE  "00053".
+               07  NCLAIMID-SNK-MONEYMES
+                                PIC X(100)
+                                    VALUE  "ª∫≤ ∞ÂŒ≈ ‰Ω˛¿©≈Ÿ≥›∂‚".
+             05  NCLAIMID-ETC-MONEY-G.
+               07  NCLAIMID-ETC-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ETC-MONEYJMA
+                                PIC X(05)   VALUE  "00054".
+               07  NCLAIMID-ETC-MONEYMES
+                                PIC X(100)
+                                    VALUE  "§Ω§Œ¬æ".
+             05  NCLAIMID-ICBFTN-MONEY-G.
+               07  NCLAIMID-ICBFTN-MONEY
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-ICBFTN-MONEYJMA
+                                PIC X(05)   VALUE  "00055".
+               07  NCLAIMID-ICBFTN-MONEYMES
+                                PIC X(100)
+                                    VALUE  "∞Ï…Ù…È√¥∂‚≈˘".
+             05  NCLAIMID-BIKOU-G.
+               07  NCLAIMID-BIKOU
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-BIKOUJMA
+                                PIC X(05)   VALUE  "00056".
+               07  NCLAIMID-BIKOUMES
+                                PIC X(100)
+                                    VALUE  "»˜πÕ".
              05  NCLAIMID-UNCHKECK-G.
                07  NCLAIMID-UNCHKECK
                                 PIC X(20)   VALUE  "XXXXXXX".
@@ -232,8 +456,8 @@
                07  NCLAIMID-UNCHKECKMES
                                 PIC X(100)  VALUE  "…‘Ã¿".
            03  NCLAIMID-ITEM-R          REDEFINES   NCLAIMID-ITEM-VAL.
-             05  NCLAIMID-ITEM-OCC      OCCURS  29.
+             05  NCLAIMID-ITEM-OCC      OCCURS  57.
                07  NCLAIMID-ITEM        PIC X(20).
                07  NCLAIMID-ITEMJMA     PIC X(05).
                07  NCLAIMID-ITEMMES     PIC X(100).
-           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   29.
+           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   57.

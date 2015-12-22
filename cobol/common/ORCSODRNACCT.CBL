@@ -88,6 +88,7 @@
            03  IDX15                       PIC 9(05).
            03  IDX16                       PIC 9(05).
            03  START-IDX                   PIC 9(05).
+           03  END-IDX                     PIC 9(05).
            03  IDX-SKJ-TAIHI               PIC 9(02).
            03  IDX-KSN                     PIC 9(05).
       *
@@ -285,6 +286,11 @@
                05  WRK-STARTYMD-Y          PIC 9(04).
                05  WRK-STARTYMD-M          PIC 9(02).
            03  WRK-STARTYMD-D              PIC 9(02).
+       01  WRK-ENDYMD.
+           03  WRK-ENDYMD-YM.
+               05  WRK-ENDYMD-Y            PIC 9(04).
+               05  WRK-ENDYMD-M            PIC 9(02).
+           03  WRK-ENDYMD-D                PIC 9(02).
        01  WRK-GETSUMATSU-YMD.
            03  WRK-GETSUMATSU-Y            PIC 9(04).
            03  WRK-GETSUMATSU-M            PIC 9(02).
@@ -517,12 +523,41 @@
                WHEN    "0116"
                    PERFORM   4801-IDOKAIKEI-CANCEL-SEC
       *       （外泊）
+      *        0201:外泊
+      *        0202:治療の為の外泊
+      *        0203:選定入院中の外泊
+      *        0205:帰院
                WHEN    "0201"
                WHEN    "0202"
                WHEN    "0203"
-               WHEN    "0204"
                WHEN    "0205"
-                   PERFORM   4801-GAIHAKU-SEC
+                   IF   SODRNACCT-ENDYMD   =   SPACE
+                       PERFORM   4801-GAIHAKU-SEC
+                   ELSE
+                       PERFORM   4801-GAIHAKU-KIKAN-SEC
+                   END-IF
+      *       （取り消し・他医療機関受診・特定時間退院減算・特定曜日入退院減算）
+      *        0200:取り消し
+      *        0207:他医療機関７０％減
+      *        0208:他医療機関３０％減
+      *        0209:他医療機関５５％減
+      *        0210:他医療機関１５％減
+      *        0211:特定時間退院減算
+      *        0212:特定曜日入退院減算
+      *        0213:特定曜日入退院減算＋他医療機関３０％減
+               WHEN    "0200"
+               WHEN    "0207"
+               WHEN    "0208"
+               WHEN    "0209"
+               WHEN    "0210"
+               WHEN    "0211"
+               WHEN    "0212"
+               WHEN    "0213"
+                   IF   SODRNACCT-ENDYMD   =   SPACE
+                       PERFORM   4801-GENSAN-SEC
+                   ELSE
+                       PERFORM   4801-GAIHAKU-KIKAN-SEC
+                   END-IF
       *       （食事）
                WHEN    "0301"
                WHEN    "0302"
@@ -5351,6 +5386,7 @@
            .
        4801-TAIINKAIKEI-EDIT-EXT.
            EXIT.
+      *
       *****************************************************************
       *    外泊　会計テーブル編集処理
       *****************************************************************
@@ -5366,6 +5402,7 @@
            .
        4801-GAIHAKU-EXT.
            EXIT.
+      *
       *****************************************************************
       *    外泊　会計テーブル編集処理（入院中）
       *****************************************************************
@@ -5406,6 +5443,10 @@
       *            外泊区分のセット
                    PERFORM  VARYING IDX  FROM  START-IDX   BY 1
                                 UNTIL   IDX  >    WRK-GETSUMATSU-D
+      *                0201:外泊
+      *                0202:治療の為の外泊
+      *                0203:選定入院中の外泊
+      *                0205:帰院
                        EVALUATE   SODRNACCT-ORDERID(3:2)
                            WHEN   "01"
                              MOVE   1    TO   NACCT-DAY(IDX)
@@ -5413,8 +5454,6 @@
                              MOVE   2    TO   NACCT-DAY(IDX)
                            WHEN   "03"
                              MOVE   3    TO   NACCT-DAY(IDX)
-                           WHEN   "04"
-                             MOVE   4    TO   NACCT-DAY(IDX)
                            WHEN   "05"
                              MOVE   0    TO   NACCT-DAY(IDX)
                        END-EVALUATE
@@ -5468,6 +5507,7 @@
            .
        4801-GAIHAKU-1-EXT.
            EXIT.
+      *
       *****************************************************************
       *    外泊　会計テーブル編集処理（退院済）
       *****************************************************************
@@ -5514,6 +5554,10 @@
       *            外泊区分のセット
                    PERFORM  VARYING IDX  FROM  START-IDX   BY 1
                                 UNTIL   IDX  >    WRK-GETSUMATSU-D
+      *                0201:外泊
+      *                0202:治療の為の外泊
+      *                0203:選定入院中の外泊
+      *                0205:帰院
                        EVALUATE   SODRNACCT-ORDERID(3:2)
                            WHEN   "01"
                              MOVE   1    TO   NACCT-DAY(IDX)
@@ -5521,8 +5565,6 @@
                              MOVE   2    TO   NACCT-DAY(IDX)
                            WHEN   "03"
                              MOVE   3    TO   NACCT-DAY(IDX)
-                           WHEN   "04"
-                             MOVE   4    TO   NACCT-DAY(IDX)
                            WHEN   "05"
                              MOVE   0    TO   NACCT-DAY(IDX)
                        END-EVALUATE
@@ -5575,6 +5617,233 @@
       *
            .
        4801-GAIHAKU-2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    外泊　会計テーブル編集処理（起算日−終了日の期間指定）
+      *****************************************************************
+       4801-GAIHAKU-KIKAN-SEC         SECTION.
+      *
+      *    起算日−終了日の会計データについて更新を行う
+      *
+      *    外泊のセット
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "2"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               MOVE    SODRNACCT-STARTYMD  TO  WRK-STARTYMD
+               MOVE    SODRNACCT-ENDYMD    TO  WRK-ENDYMD
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)  OR
+                                 (NACCT-SRYYM >
+                                     LNK-PTNYUINRRK-TAIINYMD(1:6))  OR
+                                 (NACCT-SRYYM >   WRK-ENDYMD(1:6))
+      *            開始日のセット
+                   IF      NACCT-SRYYM      =  SODRNACCT-STARTYMD(1:6)
+                       MOVE   WRK-STARTYMD-D   TO   START-IDX
+                   ELSE
+                       MOVE   1                TO   START-IDX
+                   END-IF
+      *            終了日のセット
+                   IF      NACCT-SRYYM      =  SODRNACCT-ENDYMD(1:6)
+                      MOVE   SODRNACCT-ENDYMD TO   WRK-GETSUMATSU-YMD
+      *               退院月については退院日が上限
+                      IF   NACCT-SRYYM   =  LNK-PTNYUINRRK-TAIINYMD(1:6)
+                          IF   WRK-GETSUMATSU-YMD  > 
+                                              LNK-PTNYUINRRK-TAIINYMD
+                             MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO    WRK-GETSUMATSU-YMD
+                          END-IF
+                      END-IF
+                   ELSE
+      *               月末日を算定
+                      INITIALIZE               STS-AREA-DAY
+                      INITIALIZE               LNK-DAY7-AREA
+                      MOVE    "71"             TO  LNK-DAY7-IRAI
+                      MOVE   NACCT-SRYYM       TO  LNK-DAY7-YM
+                      CALL  "ORCSDAY"          USING STS-AREA-DAY
+                                                     LNK-DAY7-AREA
+                      MOVE   LNK-DAY7-KOYOMI   TO    WRK-GETSUMATSU-YMD
+      *               退院月については退院日が上限
+                      IF   NACCT-SRYYM   =  LNK-PTNYUINRRK-TAIINYMD(1:6)
+                          MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO    WRK-GETSUMATSU-YMD
+                      END-IF
+                   END-IF
+      *
+      *            外泊区分のセット
+                   PERFORM  VARYING IDX  FROM  START-IDX   BY 1
+                                UNTIL   IDX  >    WRK-GETSUMATSU-D
+      *                0200:取り消し
+      *                0201:外泊
+      *                0202:治療の為の外泊
+      *                0203:選定入院中の外泊
+      *                0205:帰院
+      *                0207:他医療機関７０％減
+      *                0208:他医療機関３０％減
+      *                0209:他医療機関５５％減
+      *                0210:他医療機関１５％減
+      *                0211:特定時間退院減算
+      *                0212:特定曜日入退院減算
+      *                0213:特定曜日入退院減算＋他医療機関３０％減
+                       EVALUATE   SODRNACCT-ORDERID(3:2)
+                           WHEN   "00"
+                             MOVE   0    TO   NACCT-DAY(IDX)
+                           WHEN   "01"
+                             MOVE   1    TO   NACCT-DAY(IDX)
+                           WHEN   "02"
+                             MOVE   2    TO   NACCT-DAY(IDX)
+                           WHEN   "03"
+                             MOVE   3    TO   NACCT-DAY(IDX)
+                           WHEN   "05"
+                             MOVE   0    TO   NACCT-DAY(IDX)
+                           WHEN   "07"
+                             MOVE   4    TO   NACCT-DAY(IDX)
+                           WHEN   "08"
+                             MOVE   5    TO   NACCT-DAY(IDX)
+                           WHEN   "09"
+                             MOVE   6    TO   NACCT-DAY(IDX)
+                           WHEN   "10"
+                             MOVE   7    TO   NACCT-DAY(IDX)
+                           WHEN   "11"
+                             MOVE   8    TO   NACCT-DAY(IDX)
+                           WHEN   "12"
+                             MOVE   9    TO   NACCT-DAY(IDX)
+                           WHEN   "13"
+                             MOVE  13    TO   NACCT-DAY(IDX)
+                       END-EVALUATE
+                   END-PERFORM
+      *
+      *            オペーレータＩＤ
+                   MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *            更新年月日
+                   MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *            更新時間
+                   MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+                   MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+                   MOVE    "DBUPDATE"      TO   MCP-FUNC
+                   MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *            入院会計クローズ
+                   MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE     "key17"                 TO  MCP-PATHNAME
+                   PERFORM   910-DBCLOSECURSOR-SEC
+      *            次月の会計読み込み
+                   MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                   MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+                   IF      WRK-STARTYMD-M  =   12
+                      ADD     1      TO    WRK-STARTYMD-Y
+                      MOVE    1      TO    WRK-STARTYMD-M
+                   ELSE
+                      ADD     1      TO    WRK-STARTYMD-M
+                   END-IF
+                   MOVE    "2"                     TO  NACCT-ZAISKBKBN
+                   MOVE    WRK-STARTYMD-YM         TO  NACCT-SRYYM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT    =   ZERO
+                       MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                       MOVE    "key17"                 TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-READ-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       4801-GAIHAKU-KIKAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    他医療機関受診等の減算　会計テーブル編集処理
+      *****************************************************************
+       4801-GENSAN-SEC         SECTION.
+      *
+      *    取り消しと減算なので起算日のみ入院会計を更新する
+      *
+      *    外泊のセット
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "2"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               MOVE    SODRNACCT-STARTYMD  TO  WRK-STARTYMD
+      *        開始日のセット
+               MOVE    WRK-STARTYMD-D      TO  IDX
+      *        外泊区分のセット
+      *        0200:取り消し
+      *        0207:他医療機関７０％減
+      *        0208:他医療機関３０％減
+      *        0209:他医療機関５５％減
+      *        0210:他医療機関１５％減
+      *        0211:特定時間退院減算
+      *        0212:特定曜日入退院減算
+      *        0213:特定曜日入退院減算＋他医療機関３０％減
+               EVALUATE   SODRNACCT-ORDERID(3:2)
+                   WHEN   "00"
+                     MOVE   0    TO   NACCT-DAY(IDX)
+                   WHEN   "07"
+                     MOVE   4    TO   NACCT-DAY(IDX)
+                   WHEN   "08"
+                     MOVE   5    TO   NACCT-DAY(IDX)
+                   WHEN   "09"
+                     MOVE   6    TO   NACCT-DAY(IDX)
+                   WHEN   "10"
+                     MOVE   7    TO   NACCT-DAY(IDX)
+                   WHEN   "11"
+                     MOVE   8    TO   NACCT-DAY(IDX)
+                   WHEN   "12"
+                     MOVE   9    TO   NACCT-DAY(IDX)
+                   WHEN   "13"
+                     MOVE  13    TO   NACCT-DAY(IDX)
+               END-EVALUATE
+      *
+      *        オペーレータＩＤ
+               MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *        更新年月日
+               MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *        更新時間
+               MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+               MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+               MOVE    "DBUPDATE"      TO   MCP-FUNC
+               MOVE    "tbl_nyuinacct" TO   MCP-TABLE
+               MOVE    "key"           TO   MCP-PATHNAME
+               CALL    "ORCDBMAIN"          USING
+                                            MCPAREA
+                                            MCPDATA-REC
+                                            SPA-AREA
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       4801-GENSAN-EXT.
            EXIT.
       *
       *****************************************************************

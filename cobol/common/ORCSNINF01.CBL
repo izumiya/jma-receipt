@@ -148,6 +148,12 @@
       *    保険組合せセット領域
            COPY    "CPORCSAPIHKN.INC".
       *
+      *    分娩情報編集サブ
+           COPY    "CPORCSI02.INC".
+       01  SNRRK-AREA.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                       BY         //SNRRK-//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -358,6 +364,16 @@
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-1005-REC
       *
+      *
+           INITIALIZE                  SI02-AREA
+           MOVE    PTNYUINRRK-REC  TO  SNRRK-AREA
+           MOVE    "1"             TO  SI02-REQID
+           CALL    "ORCSI02"           USING
+                                       SI02-AREA
+                                       SNRRK-AREA
+                                       MCPAREA
+                                       SPA-AREA
+      *
            MOVE    PTNYUINRRK-RRKNUM
                                TO  SNINF01-RRKNUM (IDXA)
       *
@@ -567,8 +583,9 @@
                                    TO  SNINF01-NACCTKBN-NAME(IDXA)
            END-EVALUATE
       *
-           PERFORM 900-BUNBEN-KEY3-SEL-SEC
-           IF    ( FLG-BUNBEN      =   ZERO )
+           IF    ( SI02-BUNBENCHK  NOT =   ZERO )
+      *
+               PERFORM 900-BUNBEN-KEY3-SEL-SEC
       *
                MOVE    "分娩区分"  TO  SNINF01-BUNBENKBN-LBL(IDXA)
                MOVE    BUNBEN-BUNBENKBN
@@ -586,8 +603,9 @@
                END-EVALUATE
       *
                IF    ( BUNBEN-BUNBENKBN    =   "1" OR "2" )
-                AND  ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
-                AND  ( PTNYUINRRK-TAIINYMD    >=   CONST-H211001 )
+                AND((( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+                AND  ( PTNYUINRRK-TAIINYMD    >=   CONST-H211001 ))
+                 OR  ( PTNYUINRRK-NYUINYMD    >=   CONST-H211001 ))
                    MOVE    "直接支払制度"
                                    TO  SNINF01-RIYOUKBN-LBL (IDXA)
                    MOVE    BUNBEN-RIYOUKBN

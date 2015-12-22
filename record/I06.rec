@@ -290,6 +290,24 @@ I06 {
       textdata varchar(50);
       state int;
     };
+    CMB_BUNBENKBN {
+      BUNBENKBN {
+        textdata varchar(20);
+        state int;
+      };
+      count int;
+        item varchar(20)[5];
+      state int;
+    };
+    CMB_RIYOUKBN {
+      RIYOUKBN {
+        textdata varchar(20);
+        state int;
+      };
+      count int;
+        item varchar(20)[5];
+      state int;
+    };
     scrolledwindow4 {
       ERRMSGLST {
         count int;

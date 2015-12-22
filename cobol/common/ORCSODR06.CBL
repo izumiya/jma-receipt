@@ -58,6 +58,7 @@
            03  FLG-TAINDOUJITU         PIC 9(01).
            03  FLG-TAINTUSANMINUS      PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
+           03  FLG-BUNBENCHK           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -126,6 +127,8 @@
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
            03  ITEM-NACCTKBN           PIC X(01).
+           03  ITEM-BUNBENKBN          PIC X(01).
+           03  ITEM-RIYOUKBN           PIC X(01).
            03  ITEM-KSNCD-G.
                05  ITEM-KSNCD-MAX      PIC 9(02).
                05  ITEM-KSNCD          PIC X(09)   OCCURS  3.
@@ -223,6 +226,12 @@
        01  LNK-PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
+      *
+      *    分娩情報編集サブ
+           COPY    "CPORCSI02.INC".
+       01  SNRRK-AREA.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                       BY         //SNRRK-//.
        *
       *    特定入院料コード取得サブ
            COPY  "CPORCSTOKNYUIN.INC".
@@ -336,6 +345,12 @@
                END-IF
       *
                IF    ( FLG-END  =   ZERO )
+                   IF    ( SODR-SRCKBN =   "1" OR "2" )
+                       PERFORM 2101-ORCSI02-CALL-SEC
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-END  =   ZERO )
                   PERFORM 2101-PTINF-UPDATE-SEC
                END-IF
       *
@@ -402,6 +417,45 @@
                END-EVALUATE
       *
            END-PERFORM
+      *
+           IF    ( SODR-SRCKBN     =   "1" OR "2" )
+      *
+               INITIALIZE              SI02-AREA
+               MOVE    "1"         TO  SI02-REQID
+               MOVE    TRRK-REC    TO  SNRRK-AREA
+               MOVE    ITEM-NYUINKA TO SNRRK-NYUINKA
+               CALL    "ORCSI02"       USING
+                                       SI02-AREA
+                                       SNRRK-AREA
+                                       MCPAREA
+                                       SPA-AREA
+      *
+      *
+               MOVE    SI02-BUNBENCHK  TO  FLG-BUNBENCHK
+           END-IF
+      *
+           IF    ( FLG-BUNBENCHK   NOT =   ZERO )
+      *
+               MOVE    "1"         TO  ITEM-BUNBENKBN
+               MOVE    "1"         TO  ITEM-RIYOUKBN
+               IF    ( SI02-BUNBENKBN  NOT =   SPACE )
+                   MOVE    SI02-BUNBENKBN
+                                   TO  ITEM-BUNBENKBN
+                   MOVE    SI02-RIYOUKBN
+                                   TO  ITEM-RIYOUKBN
+               END-IF
+      *
+               PERFORM VARYING IDX-ODR    FROM    1   BY  1
+                       UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
+      *
+                   EVALUATE    LNK-ODRITEM-ITEMID (IDX-ODR)
+                   WHEN    NCLAIMID-BUNBENKBNJMA
+                       PERFORM 20011-BUNBENKBN-CHK-SEC
+                   WHEN    NCLAIMID-RIYOUKBNJMA
+                       PERFORM 20011-RIYOUKBN-CHK-SEC
+                   END-EVALUATE
+               END-PERFORM
+           END-IF
       *
            .
        2001-INPUT-CHK-EXT.
@@ -810,6 +864,47 @@
       *
            .
        20011-KSNCD-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩区分チェック処理
+      *****************************************************************
+       20011-BUNBENKBN-CHK-SEC         SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( FLG-BUNBENCHK   NOT =   ZERO )
+                   IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "0" OR "1" OR "2" )
+                       MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-BUNBENKBN
+                   ELSE
+                       MOVE    "0162"  TO  ERRCD-ERRCD
+                       PERFORM 2100-ITEM-ERR-SET-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       20011-BUNBENKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    直接支払制度利用区分チェック処理
+      *****************************************************************
+       20011-RIYOUKBN-CHK-SEC         SECTION.
+      *
+           IF    ( ITEM-BUNBENKBN         =    "1" OR "2" )
+            AND  ( LNK-ODRITEM-ITEM (IDX-ODR)  NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       =   "0" OR "1" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-RIYOUKBN
+               ELSE
+                   MOVE    "0163"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-RIYOUKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    項目未処理状態設定処理
@@ -1433,6 +1528,8 @@
                                        OR  NCLAIMID-TOKHIGAITOKBNJMA
                                        OR  NCLAIMID-NACCTKBNJMA
                                        OR  NCLAIMID-KSNCDJMA
+                                       OR  NCLAIMID-BUNBENKBNJMA
+                                       OR  NCLAIMID-RIYOUKBNJMA
                                            )
                CONTINUE
            ELSE
@@ -1501,6 +1598,31 @@
       *
            .
        2101-ORCSODRNACCT-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    分娩管理情報更新処理
+      *****************************************************************
+       2101-ORCSI02-CALL-SEC           SECTION.
+      *
+           INITIALIZE                  SI02-AREA
+           MOVE    "2"             TO  SI02-REQID
+           MOVE    ITEM-BUNBENKBN  TO  SI02-BUNBENKBN
+           MOVE    ITEM-RIYOUKBN   TO  SI02-RIYOUKBN
+           MOVE    TRRK-REC        TO  SNRRK-AREA
+           CALL    "ORCSI02"       USING
+                                   SI02-AREA
+                                   SNRRK-AREA
+                                   MCPAREA
+                                   SPA-AREA
+           IF     ( MCP-RC         NOT =  ZERO )
+               DISPLAY "ORCSDR06 ERROR 010:BUNBEN UPDATE ERR"
+                       " PTID="        SODR-PTID
+                       " KARTE-KEY="   SODR-KARTE-KEY
+               MOVE    1               TO  FLG-END
+           END-IF
+      *
+           .
+       2101-ORCSI02-CALL-EXT.
            EXIT.
       *****************************************************************
       *    患者情報更新処理

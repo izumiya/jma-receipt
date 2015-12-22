@@ -30,9 +30,10 @@
                05  HSACCTMREQ-PTNUM          PIC X(20).
                05  HSACCTMREQ-NYUINYMD       PIC X(10).
                05  HSACCTMREQ-SRYYMD         PIC X(10).
+               05  HSACCTMREQ-ENDYMD         PIC X(10).
                05  HSACCTMREQ-SKJ-AREA.
                    07  HSACCTMREQ-SKJ-OCC    OCCURS  3.
                        09  HSACCTMREQ-SKJTIME    PIC X(2).
                        09  HSACCTMREQ-SKJTYPE    PIC X(1).
                        09  HSACCTMREQ-NISSU      PIC X(50).
-               05  HSACCTMREQ-GAIHAKUKBN        PIC X(1).
+               05  HSACCTMREQ-GAIHAKUKBN        PIC X(2).

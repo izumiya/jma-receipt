@@ -98,6 +98,16 @@ xml_hsptinfmod01v2res {
 				Data			varchar(1);
 				Name			varchar(30);
 			};
+			Delivery	{
+				Label			varchar(20);
+				Data			varchar(1);
+				Name			varchar(20);
+			};
+			Direct_Payment	{
+				Label			varchar(20);
+				Data			varchar(1);
+				Name			varchar(20);
+			};
 			Recurring_Billing{
 				Label			varchar(20);
 				Data			varchar(1);
