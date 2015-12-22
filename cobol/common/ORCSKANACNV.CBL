@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    MCC-太田     02/05/29
+      *  04.08.01    NACL-森脇    15/12/21  ひらがな変換対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -224,6 +225,7 @@
            .
        100-EDIT-EXT.
            EXIT.
+      *----(04.08.01)--UPD-START---
       *****************************************************************
       *    かなチェック処理
       *****************************************************************
@@ -236,8 +238,13 @@
            WHEN    CONST-HIRAGANA-ST   THRU    CONST-HIRAGANA-ED
                IF  ( FLG-BFTYPE        =       0 OR 1 OR 3)
                    MOVE    1           TO      FLG-BFTYPE
-                   MOVE    CONST-KANA (IDX2 + 100 )
+                   IF      KANACNV-SYORI   =   "1"
+                       MOVE    CONST-KANA (IDX2)
                                        TO      WRK-ATO-STR (IDX1)
+                   ELSE
+                       MOVE    CONST-KANA (IDX2 + 100 )
+                                       TO      WRK-ATO-STR (IDX1)
+                   END-IF
                ELSE
                    MOVE    9           TO      FLG-BFTYPE
                    MOVE    1           TO      FLG-EXIT
@@ -246,8 +253,13 @@
            WHEN    CONST-KATAKANA-ST   THRU    CONST-KATAKANA-ED
                IF  ( FLG-BFTYPE        =       0 OR 2 OR 3)
                    MOVE    2           TO      FLG-BFTYPE
-                   MOVE    CONST-KANA (IDX2)
+                   IF      KANACNV-SYORI   =   "1"
+                       MOVE    CONST-KANA (IDX2 - 100 )
                                        TO      WRK-ATO-STR (IDX1)
+                   ELSE
+                       MOVE    CONST-KANA (IDX2)
+                                       TO      WRK-ATO-STR (IDX1)
+                   END-IF
                ELSE
                    MOVE    9           TO      FLG-BFTYPE
                    MOVE    1           TO      FLG-EXIT
@@ -264,6 +276,7 @@
            .
        101-KANA-EXT.
            EXIT.
+      *----(04.08.01)--UPD-END-----
       *****************************************************************
       *    全角半角混在チェック
       *****************************************************************
