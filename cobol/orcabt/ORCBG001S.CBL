@@ -73,7 +73,7 @@
            03  TOKEI-NAME              PIC X(40).
            03  TOKEI-TANI              PIC X(10).
            03  TOKEI-TEN               PIC 9(07)V9(02).
-           03  TOKEI-SRYSURYO          PIC 9(05)V9(05).
+           03  TOKEI-SRYSURYO          PIC 9(10)V9(05).
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -165,17 +165,17 @@
            03  WRK-CYUSRYCD            PIC X(9).
            03  WRK-CYUSURYO            PIC 9(05)V9(05).
       *
-           03  WRK-GSURYO              PIC 9(05)V9(05).
+           03  WRK-GSURYO              PIC 9(10)V9(05).
       *
-           03  WRK-HENSURYO            PIC X(11).
-           03  WRK-SURYO               PIC 9(05)V9(05).
+           03  WRK-HENSURYO            PIC X(16).
+           03  WRK-SURYO               PIC 9(10)V9(05).
            03  WRK-SURYO-R             REDEFINES   WRK-SURYO.
-               05  WRK-SURYO-S1        PIC 9(05).
+               05  WRK-SURYO-S1        PIC 9(10).
                05  WRK-SURYO-S2        PIC 9(05).
            03  WRK-SURYO-X.
-               05  WRK-SURYO-Z1        PIC ZZZZZ.
+               05  WRK-SURYO-Z1        PIC ZZZZZZZZZZ.
                05  WRK-SURYO-Z1-9      REDEFINES   WRK-SURYO-Z1
-                                       PIC ZZZZ9.
+                                       PIC ZZZZZZZZZ9.
                05  WRK-SURYO-Z2        PIC X(01).
                05  WRK-SURYO-Z3        PIC ZZZZZ.
       *
@@ -229,7 +229,7 @@
                  07  WRK-NAI-NAME      PIC X(40).
                  07  WRK-NAI-TEN       PIC X(10).
                  07  WRK-NAI-TANI      PIC X(10).
-                 07  WRK-NAI-SURYO     PIC X(11)
+                 07  WRK-NAI-SURYO     PIC X(16)
                                        OCCURS  100  TIMES.
                  07  WRK-NAI-GAKU      PIC X(16)
                                        OCCURS  100  TIMES.
@@ -1010,8 +1010,7 @@
                END-IF
       *
                MOVE    WRK-CYUSRYCD    TO  WRK-SRYCD
-               COMPUTE WRK-SURYO       =   WRK-CYUSURYO
-                                       *   WRK-KAISU
+               MOVE    WRK-CYUSURYO    TO  WRK-SURYO
       *
                PERFORM 250-TOKEI-SET-SEC
            ELSE
@@ -1099,8 +1098,7 @@
                END-IF
       *
                MOVE    SRY-SRYCD(IDX)  TO  WRK-SRYCD
-               COMPUTE WRK-SURYO       =   SRY-SRYSURYO(IDX)
-                                       *   WRK-KAISU
+               MOVE    SRY-SRYSURYO(IDX)   TO  WRK-SURYO
       *
                PERFORM 250-TOKEI-SET-SEC
            ELSE
@@ -1243,8 +1241,10 @@
            MOVE    TNS-TANINAME    TO  TOKEI-TANI
            MOVE    ZERO            TO  TOKEI-SRYSURYO
            PERFORM 900-TOKEI-READ-SEC
+           COMPUTE WRK-GSURYO      =   WRK-SURYO
+                                   *   WRK-KAISU
            COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
-                                   +   WRK-SURYO
+                                   +   WRK-GSURYO
       *
            IF      FLG-TOKEI       =   1
                WRITE   TOKEI-REC
@@ -1884,7 +1884,7 @@
            MOVE    SPACE           TO  WRK-HENSURYO
            MOVE    ZERO            TO  CNT-KETA
            PERFORM VARYING CNT-KETA2   FROM    1   BY  1
-                   UNTIL   CNT-KETA2   >   11
+                   UNTIL   CNT-KETA2   >   16
                IF      WRK-SURYO-X(CNT-KETA2:1)    NOT =   SPACE
                    COMPUTE CNT-KETA    =   CNT-KETA    +   1
                    MOVE    WRK-SURYO-X(CNT-KETA2:1)
