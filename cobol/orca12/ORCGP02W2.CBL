@@ -130,6 +130,8 @@
       *                                     （０５４対応）
       *  04.07.09    NACL-門脇    15/07/23  062Ｂ型肝炎と地方公費の
       *                                     保険組合せ作成
+      *  04.08.01    NACL-門脇    15/12/22  「入所中」入力時の保険組合せ
+      *                                     適用期間対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -389,6 +391,7 @@
                05  WRK-NYUSYO-OCC          OCCURS   100.
                    07  WRK-NYUSYO-TEKSTYMD PIC 9(08).
                    07  WRK-NYUSYO-TEKEDYMD PIC 9(08).
+                   07  WRK-NYUSYO-JKYSNUM  PIC X(20).
       *
            03  WRK-SEIHO-YMD               PIC X(08).
       *
@@ -605,6 +608,7 @@
                      ADD     1             TO  IDY3
                      MOVE  PTKOH-TEKSTYMD  TO  WRK-NYUSYO-TEKSTYMD(IDY3)
                      MOVE  PTKOH-TEKEDYMD  TO  WRK-NYUSYO-TEKEDYMD(IDY3)
+                     MOVE  PTKOH-JKYSNUM   TO  WRK-NYUSYO-JKYSNUM(IDY3)
                    END-IF
                ELSE
                    ADD     1               TO  CNT-KOH
@@ -1123,6 +1127,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
+                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
+                               WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
+                  ELSE
                    INITIALIZE                  STS-AREA-DAY
                    INITIALIZE                  LNK-DAY6-AREA
                    MOVE    "61"            TO  LNK-DAY6-IRAI
@@ -1134,6 +1142,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    LNK-DAY6-AREA
                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
+                  END-IF
                  END-IF
                  IF  (WRK-TCOMB2-TEKSTYMD(IDZ)
                                          <  WRK-NYUSYO-TEKSTYMD(IDY3))
@@ -1146,6 +1155,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
+                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
+                               WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
+                  ELSE
                    INITIALIZE                  STS-AREA-DAY
                    INITIALIZE                  LNK-DAY6-AREA
                    MOVE    "61"            TO  LNK-DAY6-IRAI
@@ -1157,6 +1170,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    LNK-DAY6-AREA
                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
+                  END-IF
       *
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
@@ -1173,6 +1187,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
+                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
+                               WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
+                  ELSE
                    INITIALIZE                  STS-AREA-DAY
                    INITIALIZE                  LNK-DAY6-AREA
                    MOVE    "61"            TO  LNK-DAY6-IRAI
@@ -1184,6 +1202,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    LNK-DAY6-AREA
                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
+                  END-IF
       *
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
@@ -1196,6 +1215,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
+                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
+                               WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
+                  ELSE
                    INITIALIZE                  STS-AREA-DAY
                    INITIALIZE                  LNK-DAY6-AREA
                    MOVE    "61"            TO  LNK-DAY6-IRAI
@@ -1207,6 +1230,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    LNK-DAY6-AREA
                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
+                  END-IF
                  END-IF
                  IF   FLG-TUUKA  =  ZERO
                    ADD     1    TO  WRK-TCOMB2-MAX
