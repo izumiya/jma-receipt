@@ -724,6 +724,7 @@
       *  04.08.12    NACL-門脇    15/12/08  東京都地方公費対応
       *  04.08.13    NACL-門脇    15/12/10  システム管理２０１０のデフォルト
       *                                     設定修正（全国公費併用分請求点集計）
+      *  04.08.14    NACL-門脇    15/12/24  器材の単価編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11619,13 +11620,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
       *        特定器材（画像診断のフィルム以外）のとき単価を編集
                IF      SRY-SRYCD (IDX2) (1:1)  =   "7"
-      ***          IF   (( SRY-SRYKBN               =   "70" )  AND
-      ***                ( TNS-DATAKBN              =   "3"  ))
-                   IF   (  TNS-DATAKBN              =   "3"   )
-                   OR   (  SRY-SRYCD (IDX2)         =
+                   IF   (  SRY-SRYCD (IDX2)         =
                                     CONS-FILM-YOUJI-KASAN  OR  
                                     CONS-SANSO             OR
                                     CONS-SANSO2               )
+      ***          OR   (  TNS-DATAKBN              =   "3"   )
                        CONTINUE
                    ELSE
       *********        SET     TBL-SANSO           TO  1
@@ -11637,7 +11636,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *                         MOVE    1               TO  FLG-SANSO-OK
       *                END-SEARCH
       *********        IF      FLG-SANSO-OK        =   "1"
-                     IF      TNS-TEN         =   ZERO
+                     IF      RECE05-TEN(IDX4)  =   ZERO
                        CONTINUE
                      ELSE
                        PERFORM 2104412-RECE05-TANKA-HEN-SEC
@@ -12750,7 +12749,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            MOVE    SPACE           TO  WRK-TANKA-X
       * 
       *    数字表示用編集（半角）
-           MOVE    TNS-TEN         TO  WRK-TANKA
+           MOVE    RECE05-TEN(IDX4)
+                                   TO  WRK-TANKA
            MOVE    WRK-TANKA-S1    TO  WRK-TANKA-Z1
            MOVE    ZERO            TO  FLG-SP
            PERFORM   VARYING   IDY   FROM    2   BY  -1

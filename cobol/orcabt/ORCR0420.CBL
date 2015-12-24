@@ -292,6 +292,7 @@
       *                                     対応
       *  04.08.06    NACL-門脇    15/10/19  労災レセプト回数１回目の
       *                                     「継続請求分」対応
+      *  04.08.07    NACL-門脇    15/12/24  器材の単価編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3718,13 +3719,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
       *        特定器材（画像診断のフィルム以外）のとき単価を編集
                IF      SRY-SRYCD (IDX2) (1:1)  =   "7"
-      ***          IF   (( SRY-SRYKBN               =   "70" )  AND
-      ***                ( TNS-DATAKBN              =   "3"  ))
-                   IF   (  TNS-DATAKBN              =   "3"   )
-                   OR   (  SRY-SRYCD (IDX2)         =
+                   IF   (  SRY-SRYCD (IDX2)         =
                                     CONS-FILM-YOUJI-KASAN  OR  
                                     CONS-SANSO             OR
                                     CONS-SANSO2               )
+      ***          OR   (  TNS-DATAKBN              =   "3"   )
                        CONTINUE
                    ELSE
       **               SET     TBL-SANSO           TO  1
@@ -3736,7 +3735,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **                       MOVE    1               TO  FLG-SANSO-OK
       **               END-SEARCH
       **               IF      FLG-SANSO-OK        =   "1"
-                     IF      TNS-TEN         =   ZERO
+                     IF      RECE45-TEN(IDX4)  =   ZERO
                        CONTINUE
                      ELSE
                        PERFORM 2101212-RECE45-TANKA-HEN-SEC
@@ -4890,7 +4889,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    SPACE           TO  WRK-TANKA-X
       * 
       *    数字表示用編集（半角）
-           MOVE    TNS-TEN         TO  WRK-TANKA-9
+           MOVE    RECE45-TEN(IDX4)
+                                   TO  WRK-TANKA-9
            MOVE    WRK-TANKA-S1    TO  WRK-TANKA-Z1
            MOVE    ZERO            TO  FLG-SP
            PERFORM   VARYING   IDY   FROM    2   BY  -1
