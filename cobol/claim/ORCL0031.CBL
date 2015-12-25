@@ -1664,6 +1664,19 @@
                                                           (TBL-MAX))  OR
                           (WRK-SRYSYUKBN      =   SPACE            ))
                        CONTINUE
+      *H27.12
+      *                ≤√ªª§Œø«Œ≈ºÔ Ã∂Ë ¨
+                       IF     (WRK-SRYSYUKBN       =   "143"
+                                                   OR  "403"
+                                                   OR  "603"
+                                                   OR  "643"
+                                                   OR  "704" )
+                         AND  (WRK-SRYSYUKBN       =
+                                                   TBL-WKSRY-SRYSYUKBN
+                                                          (TBL-MAX))
+                           MOVE    1               TO  FLG-ZAIEND
+                       END-IF
+      *!!
                    ELSE
                        MOVE    1                   TO  FLG-ZAIEND
                    END-IF
