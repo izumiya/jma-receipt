@@ -725,6 +725,8 @@
       *  04.08.13    NACL-ÌçÏÆ    15/12/10  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥È
       *                                     ÀßÄê½¤Àµ¡ÊÁ´¹ñ¸øÈñÊ»ÍÑÊ¬ÀÁµáÅÀ½¸·×¡Ë
       *  04.08.14    NACL-ÌçÏÆ    15/12/24  ´ïºà¤ÎÃ±²ÁÊÔ½¸½¤Àµ
+      *  04.08.15    NACL-ÌçÏÆ    16/01/07  °åÊÝ¥ì¥»¥×¥È¡ÖÂ¾ÊÝ¸±¤Ë¤Æ¿Ç»¡ÎÁ»»ÄêºÑ¡×
+      *                                     ¥³¥á¥ó¥ÈÉÔµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -815,6 +817,7 @@
            03  FLG-SRYACT                              PIC 9(01).
            03  FLG-TENSU                               PIC 9(01).
            03  FLG-SYUNOU                              PIC 9(01).
+           03  FLG-JYURRK                              PIC 9(01).
            03  FLG-SYSKANRI                            PIC 9(01).
            03  FLG-SRYACCTPLUS                         PIC 9(01).
            03  FLG-ZAITAKU                             PIC 9(01).
@@ -939,6 +942,7 @@
            03  FLG-CYOKI-HENSYU2                       PIC 9(01).
            03  FLG-DAISAN-GENBUTU                      PIC 9(01).
            03  FLG-ARI                                 PIC 9(01).
+           03  FLG-ARI2                                PIC 9(01).
            03  FLG-NYUIN-CHECK                         PIC 9(01).
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
            03  FLG-RECECOM                             PIC 9(01).
@@ -998,6 +1002,7 @@
            03  IDX3                                    PIC 9(03).
            03  IDX4                                    PIC 9(03).
            03  IDX8                                    PIC 9(02).
+           03  IDX9                                    PIC 9(02).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -2608,6 +2613,10 @@
       *    ¥ì¥»¥×¥È¥³¥á¥ó¥È¥Þ¥¹¥¿
        01  RECECOM-REC.
            COPY    "CPRECECOM.INC".
+      *
+      *    ¼õ¿ÇÍúÎò
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -11574,6 +11583,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                AND (IDX2               =   1         )
                AND (SRY-SRYCD(IDX2)    =  "099999902")
                     MOVE      1         TO  FLG-TAHOKEN
+      *
+                    MOVE     ZERO       TO  FLG-ARI2
+                    IF  RECE02-HKNNUM(1:2) = "98" OR "90" OR "91"
+                      MOVE    1         TO  FLG-ARI2
+                    ELSE
+                      PERFORM 2104416-JYURRK-CHECK-SEC
+                    END-IF
+                    IF  FLG-ARI2 = ZERO
+                      MOVE     "1"      TO  RECE05-RECEPTFLG(IDX4)
+                      MOVE     "1"      TO  RECE05-RECEDENFLG(IDX4)
+                    END-IF
                END-IF
                IF  (FLG-TAHOKEN           =   1              )
                AND (SRY-RENNUM            =   1              )
@@ -13356,6 +13376,62 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
            .
        2104415-ICHIBUCOM-HENSYU3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¼õ¿ÇÍúÎò¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2104416-JYURRK-CHECK-SEC                 SECTION.
+      *
+           PERFORM  VARYING  IDX9  FROM  1  BY  1
+                     UNTIL  (IDX9      >  31)
+                      OR    (FLG-ARI2  =   1)
+             IF  ACCT-DAY(1 IDX9)  NOT =  ZERO
+               INITIALIZE                      JYURRK-REC
+               MOVE    RECE02-HOSPNUM      TO  JYURRK-HOSPNUM
+               MOVE    RECE02-PTID         TO  JYURRK-PTID
+               MOVE    RECE02-NYUGAIKBN    TO  JYURRK-NYUGAIKBN
+               MOVE    ACCT-SRYKA          TO  JYURRK-SRYKA
+               MOVE    RECE02-SRYYM        TO  JYURRK-SRYYMD(1:6)
+               MOVE    IDX9                TO  JYURRK-SRYYMD(7:2)
+               MOVE    1                   TO  JYURRK-RENNUM
+               MOVE    JYURRK-REC          TO  MCPDATA-REC
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5 "             TO  MCP-PATHNAME
+               PERFORM   900-DBSELECT-SEC
+               IF    MCP-RC  =  ZERO
+                 MOVE    "tbl_jyurrk"      TO  MCP-TABLE
+                 MOVE    "key5 "           TO  MCP-PATHNAME
+                 PERFORM   900-JYURRK-READ-SEC
+                 IF   FLG-JYURRK  =  ZERO
+                   IF    JYURRK-HKNKBN  NOT =  "0" AND "7"
+                          MOVE     1       TO  FLG-ARI2
+                   ELSE
+                    IF   JYURRK-HKNKBN  =  "0"
+                      INITIALIZE               HKNCOMBI-REC
+                      MOVE  RECE02-HOSPNUM TO  COMB-HOSPNUM
+                      MOVE  RECE02-PTID    TO  COMB-PTID
+                      MOVE  JYURRK-HKNCOMBINUM
+                                           TO  COMB-HKNCOMBINUM
+                      MOVE  HKNCOMBI-REC   TO  MCPDATA-REC
+                      PERFORM 900-HKNCOMBI-INV-SEC
+                      IF    FLG-HKNCOMBI   =   ZERO
+                        IF  COMB-HKNNUM(1:2) = "98" OR "90" OR "91"
+                          MOVE     1       TO  FLG-ARI2
+                        END-IF
+                      END-IF
+                    END-IF
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5 "             TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+             END-IF
+           END-PERFORM
+      *
+           .
+       2104416-JYURRK-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -27323,6 +27399,24 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        900-RECECOM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¼õ¿ÇÍúÎòÆÉ¹þ
+      *****************************************************************
+       900-JYURRK-READ-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+               MOVE    ZERO            TO  FLG-JYURRK
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           .
+       900-JYURRK-READ-EXT.
            EXIT.
       *
       *****************************************************************
