@@ -727,6 +727,7 @@
       *  04.08.14    NACL-門脇    15/12/24  器材の単価編集修正
       *  04.08.15    NACL-門脇    16/01/07  医保レセプト「他保険にて診察料算定済」
       *                                     コメント不記載対応
+      *  04.08.16    NACL-門脇    16/01/07  第三者行為の登録有無チェック修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4369,11 +4370,11 @@ grpsys           PERFORM 900-DBSELECT-SEC
              MOVE     RECE02-PTID          TO    COMB-PTID
              MOVE     HKNCOMBI-REC         TO    MCPDATA-REC
              MOVE     "tbl_hkncombi"       TO    MCP-TABLE
-             MOVE     "key7"               TO    MCP-PATHNAME
+             MOVE     "key8"               TO    MCP-PATHNAME
              PERFORM   900-DBSELECT-SEC
              IF     MCP-RC   =   ZERO
                MOVE   "tbl_hkncombi"       TO    MCP-TABLE
-               MOVE   "key7"               TO    MCP-PATHNAME
+               MOVE   "key8"               TO    MCP-PATHNAME
                PERFORM 900-DBFETCH-SEC
                IF   MCP-RC   =   ZERO
                  CONTINUE
@@ -4384,7 +4385,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                MOVE       9     TO  RECE02-DAISAN-GAITO
              END-IF
              MOVE     "tbl_hkncombi"       TO    MCP-TABLE
-             MOVE     "key7"               TO    MCP-PATHNAME
+             MOVE     "key8"               TO    MCP-PATHNAME
              PERFORM   900-CLOSE-SEC
       *
            END-IF

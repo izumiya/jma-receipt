@@ -702,6 +702,7 @@
       *                                     全国公費一部負担金レセプト記載修正
       *  04.08.08    NACL-門脇    15/12/08  東京都地方公費対応
       *  04.08.09    NACL-門脇    15/12/24  器材の単価編集修正
+      *  04.08.10    NACL-門脇    16/01/07  第三者行為の登録有無チェック修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3958,11 +3959,11 @@
              MOVE     RECE62-PTID          TO    COMB-PTID
              MOVE     HKNCOMBI-REC         TO    MCPDATA-REC
              MOVE     "tbl_hkncombi"       TO    MCP-TABLE
-             MOVE     "key7"               TO    MCP-PATHNAME
+             MOVE     "key8"               TO    MCP-PATHNAME
              PERFORM   900-DBSELECT-SEC
              IF     MCP-RC   =   ZERO
                MOVE   "tbl_hkncombi"       TO    MCP-TABLE
-               MOVE   "key7"               TO    MCP-PATHNAME
+               MOVE   "key8"               TO    MCP-PATHNAME
                PERFORM 900-DBFETCH-SEC
                IF   MCP-RC   =   ZERO
                  CONTINUE
@@ -3973,7 +3974,7 @@
                MOVE       9     TO  RECE62-DAISAN-GAITO
              END-IF
              MOVE     "tbl_hkncombi"       TO    MCP-TABLE
-             MOVE     "key7"               TO    MCP-PATHNAME
+             MOVE     "key8"               TO    MCP-PATHNAME
              PERFORM   900-CLOSE-SEC
       *
            END-IF

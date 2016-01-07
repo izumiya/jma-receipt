@@ -241,3 +241,17 @@ path	key7	{
 		;
 	};
 };
+
+path	key8	{ 	
+	DBSELECT	{
+		DECLARE tbl_hkncombi_key8_csr CURSOR FOR
+		SELECT *
+		FROM tbl_hkncombi
+			WHERE   HOSPNUM      =   :HOSPNUM
+			AND   PTID          =   :PTID
+			AND   KOH1HKNNUM    =   '970'
+			ORDER   BY  HKNCOMBINUM
+		;
+	};
+};
+
