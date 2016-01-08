@@ -558,6 +558,13 @@
                        MOVE    "1055"          TO  SPA-ERRCD
                        MOVE    "1"             TO  SPA-COM-CUR(IDX)
                    END-IF
+      *H28.1
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       IF      WRK-ERRCD       =   SPACE
+                           MOVE    SPA-ERRCD       TO  WRK-ERRCD
+                       END-IF
+                       MOVE    SPACE           TO  SPA-ERRCD
+                   END-IF
                END-IF
                IF      SPA-ERRCD           =   SPACE
       *            ºÞÊ¬Î¥
