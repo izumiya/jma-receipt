@@ -321,6 +321,8 @@
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
       *  04.08.02    NACL-藤原    15/11/02  簡単修正時の死亡区分の更新
+      *  04.08.03    NACL-藤原    16/01/12  削除された保険組合せ、第三者
+      *                                     行為のコラムリストへの表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2137,14 +2139,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        TO  SPA-NAI-C02-THKNCOMBI  (IDX)
                                            WRK-KBN 
                    PERFORM 5001-HKNCOMBI-HENSYU-SEC
-                   MOVE    WRK-KBNMEI  TO  SPA-GMN-C02-THKNCOMBI  (IDX)
+                   IF      WRK-KBNMEI  =   SPACE
+                       PERFORM 31011-HKNCOMBI-HENSYU-SEC
+                   ELSE
+                       MOVE    WRK-KBNMEI  TO
+                                           SPA-GMN-C02-THKNCOMBI  (IDX)
+                   END-IF
       * 
                    MOVE    WRK-PTBYO-SRYYMD-KOHID    (IDZZ)
                                        TO  SPA-NAI-C02-TKOHID  (IDX)
                                            WRK-KOHID
                    MOVE    SPACE       TO  WRK-KBNMEI 
                    PERFORM 5001-KOHID-HENSYU-SEC
-                   MOVE    WRK-KBNMEI  TO  SPA-GMN-C02-TKOHID  (IDX)
+                   IF      WRK-KBNMEI  =   SPACE
+                       PERFORM 31011-PTRSIINF-HENSYU-SEC
+                   ELSE
+                       MOVE    WRK-KBNMEI  TO  SPA-GMN-C02-TKOHID (IDX)
+                   END-IF
       * 
                    MOVE    WRK-PTBYO-SRYYMD-HKNBYOMEIFLG(IDZZ)
                                        TO  WRK-KBN 
@@ -2247,6 +2258,192 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF           
            .
        3101-PTBYO-SPA-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ名称（削除分）編集処理
+      *****************************************************************
+       31011-HKNCOMBI-HENSYU-SEC   SECTION.
+      *
+           IF      WRK-PTBYO-SRYYMD-HKNCOMBI (IDZZ)
+                                   =   ZERO
+               GO  TO  3101-HKNCOMBI-HENSYU-EXT
+           END-IF
+      *
+           INITIALIZE                  HKNCOMBI-REC
+           MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID
+                                   TO  COMB-PTID
+           MOVE    WRK-PTBYO-SRYYMD-HKNCOMBI (IDZZ)
+                                   TO  COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-COMB-INV-SEC
+           IF      FLG-HKNCOMBI     =   1
+               GO  TO  3101-HKNCOMBI-HENSYU-EXT
+           END-IF
+      *
+           MOVE    SPACE           TO  WRK-HKNCOMBIMEI
+      *
+           STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
+                   " "                     DELIMITED  BY  SIZE
+                   COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
+                   " "                     DELIMITED  BY  SIZE
+                   COMB-KOH2-TANSEIDONAME  DELIMITED  BY  SPACE
+                   " "                     DELIMITED  BY  SIZE
+                   COMB-KOH3-TANSEIDONAME  DELIMITED  BY  SPACE
+                   " "                     DELIMITED  BY  SIZE
+                   COMB-KOH4-TANSEIDONAME  DELIMITED  BY  SPACE
+                         INTO              WRK-HKNCOMBIMEI
+           END-STRING
+      *    主保険がない時
+           IF      COMB-SYU-TANSEIDONAME   =   SPACE
+               MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+               STRING  COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
+                       " "                     DELIMITED  BY  SIZE
+                       COMB-KOH2-TANSEIDONAME  DELIMITED  BY  SPACE
+                       " "                     DELIMITED  BY  SIZE
+                       COMB-KOH3-TANSEIDONAME  DELIMITED  BY  SPACE
+                       " "                     DELIMITED  BY  SIZE
+                       COMB-KOH4-TANSEIDONAME  DELIMITED  BY  SPACE
+                         INTO              WRK-HKNCOMBIMEI
+               END-STRING
+           END-IF
+      *    労災・自賠責保険検索
+           IF    ( COMB-HKNNUM         =   "971"   OR  "973" )
+           OR    ( COMB-KOH1HKNNUM     =   "970"             )
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+               MOVE    SPA-PTID            TO  PTRSI-PTID
+               MOVE    COMB-HKNID          TO  PTRSI-HKNID
+      *        第三者行為
+               IF      COMB-KOH1HKNNUM     =   "970"
+                   MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
+                   MOVE    ZERO                TO  PTRSI-HKNID
+               END-IF
+               MOVE    PTRSIINF-REC    TO  MCPDATA-REC
+               MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 900-PTRSIINF-READ-N-SEC
+               ELSE
+                   MOVE    1               TO  FLG-PTRSIINF
+               END-IF
+               MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+      *        労災の時、コメントの追加
+               IF      COMB-HKNNUM         =   "971"  OR  "973"
+                   MOVE    SPACE               TO  WRK-HKNKBN-MEI
+                   EVALUATE    PTRSI-HKNKBN
+                       WHEN    "1"
+                           MOVE    "短"        TO  WRK-HKNKBN-MEI
+                       WHEN    "2"
+                           MOVE    "傷"        TO  WRK-HKNKBN-MEI
+                       WHEN    "3"
+                           MOVE    "ア"        TO  WRK-HKNKBN-MEI
+                       WHEN    "5"
+                           MOVE    "公"        TO  WRK-HKNKBN-MEI
+                   END-EVALUATE
+                   IF      PTRSI-COMMENT       =   SPACE
+                       MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+                       STRING  COMB-SYU-TANSEIDONAME
+                                                   DELIMITED  BY  SPACE
+                              " "                  DELIMITED  BY  SIZE
+                               WRK-HKNKBN-MEI      DELIMITED  BY  SPACE
+                               INTO                WRK-HKNCOMBIMEI
+                       END-STRING
+                   ELSE
+                       MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+                       STRING  COMB-SYU-TANSEIDONAME
+                                                   DELIMITED  BY  SPACE
+                               " "                 DELIMITED  BY  SIZE
+                               WRK-HKNKBN-MEI      DELIMITED  BY  SPACE
+                               "（"                DELIMITED  BY  SIZE
+                               PTRSI-COMMENT(1:24) DELIMITED  BY  SPACE
+                               "）"                DELIMITED  BY  SIZE
+                               INTO                WRK-HKNCOMBIMEI
+                       END-STRING
+                   END-IF
+               END-IF
+      *        第三者行為
+               IF      COMB-KOH1HKNNUM     =   "970"
+                   IF      PTRSI-COMMENT   NOT =   SPACE
+      *                保険＋公費１のみとなる
+                       MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+                       STRING  COMB-SYU-TANSEIDONAME
+                                                   DELIMITED  BY  SPACE
+                               " "                 DELIMITED  BY  SIZE
+                               COMB-KOH1-TANSEIDONAME
+                                                   DELIMITED  BY  SPACE
+                               "（"                DELIMITED  BY  SIZE
+                               PTRSI-COMMENT(1:24) DELIMITED  BY  SPACE
+                               "）"                DELIMITED  BY  SIZE
+                               INTO                WRK-HKNCOMBIMEI
+                       END-STRING
+                   END-IF
+              END-IF
+           END-IF
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
+           MOVE    50                  TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-HKNCOMBIMEI
+           MOVE    WRK-HKNCOMBIMEI     TO  SPA-GMN-C02-THKNCOMBI  (IDX)
+           .
+       3101-HKNCOMBI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    第三者行為名称（削除分）編集処理
+      *****************************************************************
+       31011-PTRSIINF-HENSYU-SEC   SECTION.
+      *
+           IF      WRK-PTBYO-SRYYMD-KOHID (IDZZ)
+                                       =   ZERO
+               GO  TO  31011-PTRSIINF-HENSYU-EXT
+           END-IF
+      *
+           INITIALIZE                  PTRSIINF-REC
+           MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID
+                                   TO  PTRSI-PTID
+           MOVE    ZERO            TO  PTRSI-HKNID
+           MOVE    WRK-PTBYO-SRYYMD-KOHID (IDZZ)
+                                   TO  PTRSI-KOHID
+           MOVE    PTRSIINF-REC    TO  MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 900-PTRSIINF-READ-N-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF      FLG-PTRSIINF    =   ZERO
+               STRING  "第三者（"          DELIMITED   BY  SIZE
+                        PTRSI-COMMENT (1:12)
+                                           DELIMITED   BY  SPACE
+                       "）"                DELIMITED   BY  SIZE
+                                           INTO
+                                               SPA-GMN-C02-TKOHID (IDX)
+               END-STRING
+           END-IF
+           .
+       31011-PTRSIINF-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
