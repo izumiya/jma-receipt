@@ -120,6 +120,7 @@ shell_sources = \
 ruby_sources = \
 	daily/print_parent2.rb.in \
 	daily/print_parent_prv.rb.in \
+	daily/print_parent_common.rb.in \
 	daily/apslib.rb.in \
 	daily/monlib.rb.in \
 	allways/cachedl.rb.in \

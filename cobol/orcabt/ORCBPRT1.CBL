@@ -144,6 +144,9 @@ grpsys COPY    "COMMON-SPA".
            03  WRK-ENCODING        PIC X(01).
            03  WRK-ENCODING9       REDEFINES WRK-ENCODING
                                    PIC 9(01).
+           03  WRK-PAGE            PIC 9(05).
+           03  WRK-STPAGE          PIC 9(05).
+           03  WRK-EDPAGE          PIC 9(05).
       *
       *    一時ディレクトリ名
            03  WRK-SGETTEMP-TEMPDIR    PIC X(1024).
@@ -328,10 +331,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    プレビュー用前処理
            MOVE    ZERO            TO  WRK-MOJISU
            IF      WRK-PARA-PRTFLG     =   "3"
-             IF    WRK-PARA-STPAGE     NOT =   ZERO   AND
-                   WRK-PARA-EDPAGE     NOT =   99999
-               PERFORM 900-PRVKANRI-SELECT1-SEC
-             END-IF
+               PERFORM 900-PRVKANRI-KEY9-SEL-SEC
            END-IF
       *
            .
@@ -821,104 +821,116 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
       *****************************************************************
       *     プレビュー管理ＤＢ読み込み
       *****************************************************************
-       900-PRVKANRI-SELECT1-SEC         SECTION.
+       900-PRVKANRI-KEY9-SEL-SEC          SECTION.
       *
            INITIALIZE                      PRVKANRI-REC
+grpsys     MOVE    SPA-HOSPNUM         TO  PRVKANRI-HOSPNUM
            MOVE    LNK-PRTKANRI-TBL-KEY
                                        TO  PRVKANRI-TBL-KEY
            MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  PRVKANRI-TBL-GROUP
            MOVE    LNK-PRTKANRI-RENNUM
                                        TO  PRVKANRI-RENNUM
-           MOVE    LNK-PRTKANRI-SHORI-RENNUM
-                                       TO  PRVKANRI-SHORI-RENNUM
-           MOVE    WRK-PARA-STPAGE     TO  PRVKANRI-PAGE
-grpsys     MOVE    SPA-HOSPNUM         TO  PRVKANRI-HOSPNUM
            MOVE    LNK-PRTKANRI-TBL-UUID
                                        TO  PRVKANRI-TBL-UUID
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  PRVKANRI-SHORI-RENNUM
+           MOVE    WRK-PARA-STPAGE     TO  PRVKANRIXX-STPAGE
+           MOVE    WRK-PARA-EDPAGE     TO  PRVKANRIXX-EDPAGE
            MOVE    PRVKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_prvkanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key9"              TO  MCP-PATHNAME
 grpsys     PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_prvkanri"  TO  MCP-TABLE
+               MOVE    "key9"          TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    ZERO        TO  FLG-PRVKANRI
+                   MOVE    MCPDATA-REC TO  PRVKANRI-REC
       *
-           IF      MCP-RC             =   ZERO
-               PERFORM 900-PRVKANRI-FET1-SEC
+                   IF    ( WRK-PARA-STPAGE  NOT =   ZERO )
+                       MOVE    WRK-PARA-STPAGE
+                                       TO   WRK-STPAGE
+                   ELSE
+                       MOVE    PRVKANRIXX-STPAGE
+                                       TO   WRK-STPAGE
+                   END-IF
+                   IF    ( WRK-PARA-EDPAGE  NOT =   99999 )
+                       MOVE    WRK-PARA-EDPAGE
+                                       TO   WRK-EDPAGE
+                   ELSE
+                       MOVE    PRVKANRIXX-EDPAGE
+                                       TO   WRK-EDPAGE
+                   END-IF
+      *
+                   COMPUTE WRK-PAGE = WRK-EDPAGE - WRK-STPAGE + 1
+      *
+                   DISPLAY "PAGE COUNT   =" PRVKANRI-PAGE
+                   DISPLAY "PAGE MIN     =" PRVKANRIXX-STPAGE
+                   DISPLAY "PAGE MAX     =" PRVKANRIXX-EDPAGE
+                   DISPLAY "PRINT PAGES  =" WRK-PAGE
+      *
+                   IF    ( PRVKANRI-PAGE   <   WRK-PAGE )
+                       MOVE    1       TO  FLG-PRVKANRI
+                   END-IF
+      *
+               ELSE
+                   MOVE    SPACE       TO  PRVKANRI-REC
+                   MOVE    1           TO  FLG-PRVKANRI
+               END-IF
            ELSE 
-               MOVE    1                   TO  FLG-PRVKANRI
-                                               FLG-END
+               MOVE    1               TO  FLG-PRVKANRI
+                                           FLG-END
                DISPLAY "ORCBPRT1 SYSTEM ERR!!"
            END-IF
       *
            MOVE    "tbl_prvkanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            IF      FLG-PRVKANRI        =   1 
-               GO      TO             900-PRVKANRI-SELECT1-EXT
+               MOVE    1               TO  FLG-NODATA
+               GO      TO             900-PRVKANRI-KEY9-SEL-EXT
            END-IF
       *
-               DISPLAY "ORCBPRT1 start hit ok!!"
-      *
-           INITIALIZE                      PRVKANRI-REC
-           MOVE    LNK-PRTKANRI-TBL-KEY
-                                       TO  PRVKANRI-TBL-KEY
-           MOVE    LNK-PRTKANRI-TBL-GROUP
-                                       TO  PRVKANRI-TBL-GROUP
-           MOVE    LNK-PRTKANRI-RENNUM
-                                       TO  PRVKANRI-RENNUM
-           MOVE    LNK-PRTKANRI-SHORI-RENNUM
-                                       TO  PRVKANRI-SHORI-RENNUM
-           MOVE    LNK-PRTKANRI-TBL-UUID
-                                       TO  PRVKANRI-TBL-UUID
-           MOVE    WRK-PARA-EDPAGE     TO  PRVKANRI-PAGE
-grpsys     MOVE    SPA-HOSPNUM         TO  PRVKANRI-HOSPNUM
-           MOVE    PRVKANRI-REC        TO  MCPDATA-REC
-           MOVE    "tbl_prvkanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
-      *
-           IF      MCP-RC             =   ZERO
-               PERFORM 900-PRVKANRI-FET1-SEC
-           ELSE 
-               MOVE    1                   TO  FLG-PRVKANRI
-                                               FLG-END
-               DISPLAY "ORCBPRT1 SYSTEM ERR!!"
-           END-IF
-      *
-           MOVE    "tbl_prvkanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           IF      FLG-PRVKANRI        =   1 
-               GO      TO             900-PRVKANRI-SELECT1-EXT
-           END-IF
+           DISPLAY "ORCBPRT1 start hit ok!!"
       *
                DISPLAY "ORCBPRT1 next hit ok!!"
       *    プレビュー以外の時
-           IF WRK-PARA-PRTFLG        =    "3"
-               MOVE    SPACE          TO  ORCF-FILE-NAME
-      *********STRING  "/var/lib/jma-receipt/orca_ps/"
-               STRING  WRK-SGETTEMP-TEMPDIR
-                                       DELIMITED  BY  SPACE
-                   PRVKANRI-TBL-KEY    DELIMITED  BY  SPACE
-                   PRVKANRI-RENNUM     DELIMITED  BY  SPACE
-                   PRVKANRI-TBL-GROUP  DELIMITED  BY  SPACE
-                   PRVKANRI-SHORI-RENNUM
-                                       DELIMITED  BY  SPACE
-                   PRVKANRI-PAGE       DELIMITED  BY  SPACE
-                                       INTO   ORCF-FILE-NAME
-               END-STRING
-               MOVE    "r"             TO  ORCF-FILE-MODE
-               CALL    "orcfileio"     USING ST  ORCFILEGET-AREA
-               IF      ORCF-RET        =   ZERO
-                       MOVE    1       TO  FLG-END
-               ELSE
-                       MOVE    ZERO    TO  FLG-END
-                       MOVE    1       TO  FLG-NODATA
-               END-IF
+           IF WRK-PARA-PRTFLG         =    "3"
+               PERFORM VARYING IDX    FROM    WRK-STPAGE BY 1
+                       UNTIL ( IDX    >       WRK-EDPAGE )
+                        OR   ( FLG-NODATA     NOT =   ZERO )
+      *
+                  MOVE    IDX            TO  PRVKANRI-PAGE
+      *
+                  MOVE    SPACE          TO  ORCF-FILE-NAME
+                  STRING  WRK-SGETTEMP-TEMPDIR
+                                          DELIMITED  BY  SPACE
+                      PRVKANRI-HOSPNUM    DELIMITED  BY  SPACE
+                      PRVKANRI-TBL-KEY    DELIMITED  BY  SPACE
+                      PRVKANRI-RENNUM     DELIMITED  BY  SPACE
+                      PRVKANRI-TBL-GROUP  DELIMITED  BY  SPACE
+                      PRVKANRI-SHORI-RENNUM
+                                          DELIMITED  BY  SPACE
+                      PRVKANRI-PAGE       DELIMITED  BY  SPACE
+                      PRVKANRI-TBL-UUID   DELIMITED  BY  SPACE
+                      ".pdf"              DELIMITED  BY  SIZE
+                                          INTO   ORCF-FILE-NAME
+                  END-STRING
+                  MOVE    "r"             TO  ORCF-FILE-MODE
+                  CALL    "orcfileio"     USING ST  ORCFILEGET-AREA
+                  IF      ORCF-RET        =   ZERO
+                          MOVE    1       TO  FLG-END
+                  ELSE
+                          MOVE    ZERO    TO  FLG-END
+                          MOVE    1       TO  FLG-NODATA
+                  END-IF
+               END-PERFORM
            END-IF
            .
-       900-PRVKANRI-SELECT1-EXT.
+       900-PRVKANRI-KEY9-SEL-EXT.
            EXIT.
       *
       *****************************************************************

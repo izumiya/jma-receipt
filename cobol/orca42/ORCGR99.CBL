@@ -367,12 +367,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *        
                IF      SPA-R01-GMNKBN  =   "R02"  OR  "R04"
                    MOVE    SPACE           TO  SHELLTBL
-      *            ファイルデイレクトリ位置指定
-                   INITIALIZE              ORCSMKPASSAREA
-                   MOVE    "scripts/allways/print_stop.sh"
-                                           TO  MKPASS-IN-01
-                   CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-                   MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+                   MOVE    "print_stop.sh"
+                                           TO  SHELLTBL-NAME
       *     
                    MOVE    WRK-CONS-JOB-SHELLID1
                                            TO  SHELLTBL-ARG1
@@ -382,7 +378,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    SHELLTBL        TO  MCPDATA-REC
                    MOVE    "SHELL"         TO  MCP-FUNC
                    MOVE    "shell"         TO  MCP-TABLE
-                   MOVE    "shell"         TO  MCP-PATHNAME
+                   MOVE    "allways"       TO  MCP-PATHNAME
                    PERFORM 900-ORCDBMAIN-SEC
                END-IF
              END-IF

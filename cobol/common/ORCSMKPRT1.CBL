@@ -218,6 +218,7 @@
                IF    ( STS-IN      NOT =   ZERO )
                    DISPLAY "INPUT OPEN ERR"
                ELSE
+                   INITIALIZE      PRT-IN-REC
                    READ    PRT-IN-FILE
                    END-READ
                    MOVE    PRT-IN-REC  TO WRK-PRTDATA

@@ -8,8 +8,10 @@ if ! test -f "$JMARECEIPT_ENV"; then
 fi
 
 . $JMARECEIPT_ENV
+
 export HOME=/home/orca
 export PATH=$SITESCRIPTSDIR/daily:$PATCHSCRIPTSDIR/daily:$SCRIPTSDIR/daily:$(dirname ${MONUPLOAD}):$PATH
+
 
 #----------------------------------------------------------------------#
 #       引数	
@@ -21,25 +23,46 @@ export PATH=$SITESCRIPTSDIR/daily:$PATCHSCRIPTSDIR/daily:$SCRIPTSDIR/daily:$(dir
 #       6:ダイアログ表示区分（1:ダイアログ表示　クライアント印刷用）
 #----------------------------------------------------------------------#
 
-echo	`date`
-echo $#
-
 PRT_FILE_BASE=$1
+HOSPNUM=$2
 PRT_FILE_FULL=${MCP_TEMPDIR}/${PRT_FILE_BASE}
+YAML_FILE=$(mktemp --suffix=.yaml ${MCP_TEMPDIR}/print_parent_prv.XXXXX)
 
 REPORT_TITLE=""
 [ -n "$5" ] && REPORT_TITLE=$(echo $5 | nkf -w)
 
-print_parent_prv.rb ${PRT_FILE_FULL} ${FORMDIR} ${RECORDDIR} ${SITEFORMDIR} ${SITERECORDDIR} ${PATCHFORMDIR} ${MCP_TEMPDIR} "${REPORT_TITLE}" "$6"
-if	[ $?  -eq  0 ]; then
-       	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBPREV -parameter ${PRT_FILE_BASE},$2
-fi
+LOG=${LOGDIR}/${HOSPNUM}$(basename ${0%.*}).log
+[ -e ${LOG} ] && rm ${LOG}
+
+echo  `date` >> ${LOG} 2>&1
+echo  $#  >> ${LOG} 2>&1
+
+
+ cat << EOS > ${YAML_FILE}
+hospnum: "${HOSPNUM}"
+data_file: "${PRT_FILE_FULL}"
+form_dir: "${FORMDIR}"
+site_form_dir: "${SITEFORMDIR}"
+patch_form_dir: "${PATCHFORMDIR}"
+mcp_temp_dir: "${MCP_TEMPDIR}"
+report_title: "${REPORT_TITLE}"
+show_dialog: "$6"
+EOS
+
+echo "yaml"  >> ${LOG}
+cat ${YAML_FILE} >> ${LOG}
+echo "--" >> ${LOG}
+
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBPREV -parameter ${PRT_FILE_BASE},$2  >> ${LOG} 2>&1
+print_parent_prv.rb ${YAML_FILE} >> ${LOG} 2>&1
+[ -e ${YAML_FILE} ] && rm ${YAML_FILE}
 
 #------ お薬手帳、処方せんQRイメージ削除
 #       （一時ディレクトリに作成されたpngファイルを削除）
-grep -Eo "${MCP_TEMPDIR}/([0-9a-zA-Z]|\.|\-|\_)+\.png" ${PRT_FILE_FULL} | xargs -r rm -f
-
+grep -Eo "${MCP_TEMPDIR}/([0-9a-zA-Z]|\.|\-|\_)+\.png" ${PRT_FILE_FULL} | xargs -r rm -f  >> ${LOG} 2>&1
 [ -e ${PRT_FILE_FULL} ] && rm ${PRT_FILE_FULL}
 
-	echo	`date`
-	echo "HCALL end"
+echo `date` >> ${LOG} 2>&1
+echo "HCALL end" >> ${LOG} 2>&1
+
+cat ${LOG}

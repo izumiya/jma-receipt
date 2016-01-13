@@ -224,3 +224,22 @@ path	del15	{
 	};
 };
 
+path	key9		{ 	
+	DBSELECT	{
+		DECLARE tbl_prvkanri_key9_csr CURSOR FOR
+		SELECT HOSPNUM,TBL_KEY,RENNUM,TBL_GROUP,TBL_UUID,SHORI_RENNUM,
+        COUNT(*) as PAGE,MIN(PAGE) as STPAGE,MAX(PAGE) as EDPAGE
+		FROM   tbl_prvkanri
+		WHERE  HOSPNUM	= :HOSPNUM
+                    AND   TBL_KEY	=	:TBL_KEY
+                    AND     RENNUM       =   :RENNUM
+                    AND     TBL_GROUP    =   :TBL_GROUP
+                    AND     TBL_UUID     =   :TBL_UUID
+                    AND     SHORI_RENNUM =   :SHORI_RENNUM
+                    AND     PAGE         >=  :STPAGE
+                    AND     PAGE         <=  :EDPAGE
+        GROUP   BY  HOSPNUM,TBL_KEY,RENNUM,TBL_GROUP,TBL_UUID,SHORI_RENNUM
+		;
+	};
+};
+
