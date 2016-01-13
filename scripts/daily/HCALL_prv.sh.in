@@ -65,4 +65,4 @@ grep -Eo "${MCP_TEMPDIR}/([0-9a-zA-Z]|\.|\-|\_)+\.png" ${PRT_FILE_FULL} | xargs 
 echo `date` >> ${LOG} 2>&1
 echo "HCALL end" >> ${LOG} 2>&1
 
-cat ${LOG}
+#cat ${LOG}
