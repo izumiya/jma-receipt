@@ -165,6 +165,13 @@ W13 {
       count int;
         item varchar(10)[2];
     };
+    DAISANGENBTKBN_COMBO {
+      DAISANGENBTKBN {
+        textdata varchar(20);
+      };
+      count int;
+        item varchar(20)[5];
+    };
     KOMUSKYKBN_COMBO {
       KOMUSKYKBN {
         textdata varchar(10);

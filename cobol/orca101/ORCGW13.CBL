@@ -159,6 +159,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-JBISKYKBNMEI
                                               PIC X(08).
+                       09  SPA-GMN-DAISANGENBTKBN-G.
+                           11  SPA-GMN-DAISANGENBTKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-DAISANGENBTKBNMEI
+                                              PIC X(18).
                        09  SPA-GMN-KOMUSKYKBN-G.
                            11  SPA-GMN-KOMUSKYKBN
                                               PIC X(01).
@@ -260,6 +266,11 @@
                        09  SPA-GMN-F1L             PIC X(01).
                        09  SPA-GMN-JBISKYKBNMEIL     PIC X(08).
                    07  SPA-GMN-JBISKYKBN-MAX         PIC 9(02).
+                   07  SPA-GMN-DAISANGENBTKBNLST OCCURS  2.
+                       09  SPA-GMN-DAISANGENBTKBNL        PIC X(01).
+                       09  SPA-GMN-F1L             PIC X(01).
+                       09  SPA-GMN-DAISANGENBTKBNMEIL     PIC X(18).
+                   07  SPA-GMN-DAISANGENBTKBN-MAX         PIC 9(02).
                    07  SPA-GMN-KOMUSKYKBNLST OCCURS  2.
                        09  SPA-GMN-KOMUSKYKBNL        PIC X(01).
                        09  SPA-GMN-F1L             PIC X(01).
@@ -968,6 +979,16 @@
                MOVE    WRK-CMB-ITM TO  SPA-GMN-JBISKYKBN-G
            END-IF
       *
+           MOVE    SYS-4001-DAISAN-GENBTKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-DAISANGENBTKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-GMN-DAISANGENBTKBNLST (1)
+                                       TO  SPA-GMN-DAISANGENBTKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-DAISANGENBTKBN-G
+           END-IF
+      *
            MOVE    SYS-4001-KOMU-SEIKYUKBN
                                        TO  WRK-CMB-CD
            PERFORM 4200-KOMUSKYKBNLST-CHK-SEC
@@ -1358,6 +1379,12 @@
            MOVE    "£°¡ó"              TO  SPA-GMN-JBISKYKBNMEIL   (2)
            MOVE    2                   TO  SPA-GMN-JBISKYKBN-MAX 
       *     
+           MOVE    "1"                 TO  SPA-GMN-DAISANGENBTKBNL   (1)
+           MOVE    "ÂÐ¾Ý³°"            TO  SPA-GMN-DAISANGENBTKBNMEIL(1)
+           MOVE    "2"                 TO  SPA-GMN-DAISANGENBTKBNL   (2)
+           MOVE    "ÂÐ¾Ý"              TO  SPA-GMN-DAISANGENBTKBNMEIL(2)
+           MOVE    2                   TO  SPA-GMN-DAISANGENBTKBN-MAX 
+      *     
            MOVE    "1"                 TO  SPA-GMN-KOMUSKYKBNL      (1)
            MOVE    "£±£°£°¡ó"          TO  SPA-GMN-KOMUSKYKBNMEIL   (1)
            MOVE    "2"                 TO  SPA-GMN-KOMUSKYKBNL      (2)
@@ -1473,6 +1500,7 @@
            MOVE    W13-KOMURSITANKA    TO  SPA-GMN-KOMURSITANKA
            MOVE    W13-KOMUTENTANKA    TO  SPA-GMN-KOMUTENTANKA
            MOVE    W13-JBISKYKBN       TO  SPA-GMN-JBISKYKBN-G
+           MOVE    W13-DAISANGENBTKBN  TO  SPA-GMN-DAISANGENBTKBN-G
            MOVE    W13-KOMUSKYKBN      TO  SPA-GMN-KOMUSKYKBN-G
            MOVE    W13-KYUGYOPRTKBN    TO  SPA-GMN-KYUGYOPRTKBN-G
       *    Â»½ý¶èÊ¬
@@ -1575,6 +1603,11 @@
            END-IF
       *
            PERFORM 4101-KOMURSITANKA-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4101-DAISANGENBTKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -2042,6 +2075,28 @@
       *
            .
        4101-JBISKYKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ¶èÊ¬¥Á¥§¥Ã¥¯
+      *****************************************************************
+       4101-DAISANGENBTKBN-CHK-SEC        SECTION.
+      *
+           IF    ( SPA-GMN-DAISANGENBTKBN      =   SPACE )
+               MOVE    SPA-GMN-DAISANGENBTKBNLST (1)
+                                       TO  SPA-GMN-DAISANGENBTKBN-G
+           ELSE
+               MOVE    SPA-GMN-DAISANGENBTKBN  TO  WRK-CMB-CD
+               PERFORM 4200-DAISANGENBTKBNLST-CHK-SEC
+               IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-DAISANGENBTKBNLST (1)
+                                       TO  SPA-GMN-DAISANGENBTKBN-G
+               ELSE
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-DAISANGENBTKBN-G
+               END-IF
+           END-IF
+      *
+           .
+       4101-DAISANGENBTKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¸øÌ³ºÒ³²ÀÁµá¶èÊ¬¥Á¥§¥Ã¥¯
@@ -2536,6 +2591,27 @@
        4200-JBISKYKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4200-DAISANGENBTKBNLST-CHK-SEC      SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL ( IDY >       SPA-GMN-DAISANGENBTKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-DAISANGENBTKBNL (IDY) )
+                   MOVE    SPA-GMN-DAISANGENBTKBNLST (IDY)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-DAISANGENBTKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    ¸øÌ³ºÒ³²ÀÁµá¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        4200-KOMUSKYKBNLST-CHK-SEC      SECTION.
@@ -2890,6 +2966,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KOMUTENTANKA    TO  SYS-4001-KOMUTENTANKA
            MOVE    SPA-GMN-RSIPRT          TO  SYS-4001-RSIPRTKBN
            MOVE    SPA-GMN-JBISKYKBN       TO  SYS-4001-JIBAI-SEIKYUKBN
+           MOVE    SPA-GMN-DAISANGENBTKBN  TO  SYS-4001-DAISAN-GENBTKBN
            MOVE    SPA-GMN-KOMUSKYKBN      TO  SYS-4001-KOMU-SEIKYUKBN
            MOVE    SPA-GMN-KYUGYOPRTKBN    TO  SYS-4001-KYUGYO-PRTKBN
            MOVE    SYS-4001-REC            TO  SYSKANRI-REC
@@ -3251,6 +3328,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KOMUTENTANKA     TO  W13-KOMUTENTANKA
            MOVE    SPA-GMN-RSIPRT-G         TO  W13-RSIPRT
            MOVE    SPA-GMN-JBISKYKBN-G      TO  W13-JBISKYKBN
+           MOVE    SPA-GMN-DAISANGENBTKBN-G TO  W13-DAISANGENBTKBN
            MOVE    SPA-GMN-KOMUSKYKBN-G     TO  W13-KOMUSKYKBN
            MOVE    SPA-GMN-KYUGYOPRTKBN-G   TO  W13-KYUGYOPRTKBN
       *     
@@ -3338,6 +3416,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-JBISKYKBN-MAX
                                        TO  W13-JBISKYKBN-COUNT
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-DAISANGENBTKBN-MAX
+               MOVE    SPA-GMN-DAISANGENBTKBNLST (IDY)
+                                       TO  W13-DAISANGENBTKBNLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-DAISANGENBTKBN-MAX
+                                       TO  W13-DAISANGENBTKBN-COUNT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-KOMUSKYKBN-MAX
@@ -3664,6 +3749,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "SYUTENTANKA_N"  TO   MCP-WIDGET
                 WHEN    27
                     MOVE  "YKZTENTANKA_N"  TO   MCP-WIDGET
+                WHEN    28
+                    MOVE  "DAISANGENBTKBN" TO   MCP-WIDGET
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
             END-EVALUATE
@@ -3716,6 +3803,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "KOMURSITANKA"
                    MOVE    20              TO  SPA-GMN-CUR
                WHEN    "KOMUTENTANKA"
+                   MOVE    28              TO  SPA-GMN-CUR
+               WHEN    "DAISANGENBTKBN"
                    MOVE    14              TO  SPA-GMN-CUR
                WHEN    "RSIPRT"
                    MOVE    23               TO  SPA-GMN-CUR

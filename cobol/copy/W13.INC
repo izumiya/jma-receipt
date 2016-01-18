@@ -116,6 +116,10 @@
                 04  W13-JBISKYKBN           PIC X(10).
                 04  W13-JBISKYKBN-COUNT   PIC S9(9)   BINARY.
                 04  W13-JBISKYKBNLST      PIC X(10)   OCCURS  2 TIMES.
+              03  W13-DAISANGENBTKBN-COMBO.
+                04  W13-DAISANGENBTKBN         PIC X(20).
+                04  W13-DAISANGENBTKBN-COUNT   PIC S9(9)   BINARY.
+                04  W13-DAISANGENBTKBNLST PIC X(20)   OCCURS  5 TIMES.
               03  W13-KOMUSKYKBN-COMBO.
                 04  W13-KOMUSKYKBN           PIC X(10).
                 04  W13-KOMUSKYKBN-COUNT   PIC S9(9)   BINARY.
