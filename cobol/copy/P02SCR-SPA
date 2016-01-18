@@ -1588,6 +1588,8 @@
       *     第三者対応
       *        労災保険の時、労災保険の連番
                05  SPA-NAI2D-RSHKN-EDANUM      PIC 9(04).
+      *H28.1   現物給付初期区分
+               05  SPA-DAISAN-GEN              PIC X(01).
       *
                05  SPA-NAI2D-HKNID             PIC 9(10).
                05  SPA-NAI2D-KOHID             PIC 9(10).

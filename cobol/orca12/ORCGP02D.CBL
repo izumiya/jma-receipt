@@ -1207,12 +1207,15 @@
       *
            MOVE    SPACE               TO  SPA-JIBAI-SEI
            MOVE    SPACE               TO  SPA-KOMU-SEI
+           MOVE    SPACE               TO  SPA-DAISAN-GEN
            IF      (FLG-SYSKANRI       =   0  )
                MOVE    MCPDATA-REC         TO  SYS-4001-REC
       *        º´«Â¿’¿¡µ·∂Ë ¨
                MOVE    SYS-4001-JIBAI-SEIKYUKBN    TO  SPA-JIBAI-SEI
       *        ∏¯Ã≥∫“≥≤¿’¿¡µ·∂Ë ¨
                MOVE    SYS-4001-KOMU-SEIKYUKBN     TO  SPA-KOMU-SEI
+      *H28.1   ¬Ëª∞º‘π‘∞Ÿ∏Ω ™µÎ…’∂Ë ¨
+               MOVE    SYS-4001-DAISAN-GENBTKBN    TO  SPA-DAISAN-GEN
            END-IF
            .
        30022-JIBAISEIKBN-SET-EXT.
@@ -1947,8 +1950,8 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4101-SINSATUEND-CHK-SEC
            END-IF
-      *
            .
+      *
        4102-KIHON-CHK-EXT.
            EXIT.
       *
@@ -2988,6 +2991,11 @@
       *        ¬Ëª∞º‘π‘∞Ÿ
                IF      SPA-GMN2D-D3-GENBTKBN   =   SPACE
                    MOVE    "1"             TO  SPA-GMN2D-D3-GENBTKBN
+      *H28.1       ΩÈ¥¸¿ﬂƒÍ
+                   IF      SPA-DAISAN-GEN  NOT =   SPACE
+                       MOVE    SPA-DAISAN-GEN
+                                               TO  SPA-GMN2D-D3-GENBTKBN
+                   END-IF
                END-IF
            ELSE
                MOVE    SPACE           TO  SPA-GMN2D-D3-GENBTKBN-G
