@@ -15293,7 +15293,7 @@
       *
       *    入院会計削除前に会計データの食事区分と保険組合せを退避
            INITIALIZE                      NYUINACCT-REC
-           MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
            MOVE    "1"                 TO  NACCT-NYUGAIKBN
            MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
            MOVE    "00"                TO  NACCT-SRYKA
@@ -15348,7 +15348,7 @@
                INITIALIZE                      NYUINACCT-REC
                MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
                MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+               MOVE    SPA-NAI-I01-MAEIDOYMD(1:6)
                                            TO  NACCT-SRYYM
                                                WRK-TENROOM-SKJ-SRYYMX
       *
@@ -15512,7 +15512,7 @@
                INITIALIZE                      NYUINACCT-REC
                MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
                MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+               MOVE    SPA-NAI-I01-MAEIDOYMD(1:6)
                                            TO  NACCT-SRYYM
                                                WRK-TENROOM-SKJ-SRYYMX
       *
@@ -15524,9 +15524,9 @@
                    MOVE     MCPDATA-REC    TO  NYUINACCT-REC
       *            食事を退避
                    MOVE    NACCT-SRYYM     TO  WRK-TENROOM-SKJ-SRYYM(1)
-                   MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+                   MOVE    SPA-NAI-I01-MAEIDOYMD(7:2)
                                            TO  IDX-SHOKUJIX
-                   MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+                   MOVE    SPA-NAI-I01-MAEIDOYMD(7:2)
                                            TO  WRK-TENROOM-SKJ-DD(1)
                    PERFORM  VARYING   IDX-SKJ FROM  IDX-SHOKUJI9  BY  1
                             UNTIL     IDX-SKJ   >   31
@@ -15575,7 +15575,7 @@
            INITIALIZE                      NYUINACCT-REC
            MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
            MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
-           MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+           MOVE    SPA-NAI-I01-MAEIDOYMD(1:6)
                                        TO  NACCT-SRYYM
                                            WRK-TENROOM-SKJ-SRYYMX
       *
@@ -15587,9 +15587,9 @@
                MOVE     MCPDATA-REC    TO  NYUINACCT-REC
       *        外泊を退避
                MOVE    NACCT-SRYYM     TO  WRK-TENROOM-SKJ-SRYYM(1)
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+               MOVE    SPA-NAI-I01-MAEIDOYMD(7:2)
                                        TO  IDX-SHOKUJIX
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+               MOVE    SPA-NAI-I01-MAEIDOYMD(7:2)
                                        TO  WRK-TENROOM-SKJ-DD(1)
                PERFORM   VARYING   IDX-SKJ FROM  IDX-SHOKUJI9  BY  1
                          UNTIL     IDX-SKJ   >   31
