@@ -125,6 +125,7 @@
            03  CNT-PAGE                            PIC 9(03).
            03  CNT-BG004                           PIC 9(05).
            03  CNT-BG00401DYN                      PIC 9(03).
+           03  CNT-NO                              PIC 9(05).
       *
       *    システム領域
        01  SYS-AREA.
@@ -163,12 +164,13 @@ grpsys     03  WRK-PARA-HOSPNUM                    PIC 9(02).
                05  WRK-SMM                         PIC 9(02).
                05  WRK-SDD                         PIC 9(02).
       *----(04.08.01)--UPD-END-----
-           03  WRK-YMD                             PIC X(08).
+           03  WRK-EOMYMD                          PIC X(08).
            03  WRK-EDTYMD1                         PIC X(10).
            03  WRK-EDTYMD3                         PIC X(22).
            03  WRK-KJNYMD                          PIC X(22).
            03  WRK-SYORIYMD                        PIC X(22).
            03  WRK-PAGE                            PIC ZZ9.
+           03  WRK-NO                              PIC ZZZ9.
            03  WRK-HCMG004.
                05  WRK-HCMG004-BTUNAME             PIC X(10).
                05  WRK-HCMG004-BRMNUM              PIC X(6).
@@ -496,6 +498,18 @@ grpsys     MOVE    SPA-HOSPNUM         TO  ORCBG00401PARA-HOSPNUM
       *****************************************************************
        110-PARA-HENSYU-SEC         SECTION.
       *
+           IF    ( WRK-PARA-PROCKBN    =   "0" OR "1" OR "2" )
+               CONTINUE
+           ELSE
+               MOVE    ZERO            TO  WRK-PARA-PROCKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-PROCKBN    =   "2" )
+               MOVE    WRK-PARA-KJNYMD TO  WRK-SYMD
+               PERFORM 800-EOM-SEC
+               MOVE    WRK-EOMYMD      TO  WRK-PARA-KJNYMD
+           END-IF
+      *
       *    基準日
            MOVE    WRK-PARA-KJNYMD     TO  WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
@@ -580,7 +594,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  ORCBG00401PARA-HOSPNUM
            MOVE    ZERO                TO  FLG-PTNYUINRRK
            INITIALIZE                      PTNYUINRRK-REC
       *
-           IF    ( WRK-PARA-PROCKBN   =    "1" )
+           IF    ( WRK-PARA-PROCKBN   =    "1" OR "2" )
 grpsys*DD      MOVE    WRK-PARA-HOSPID     TO  PTNYUINRRK-HOSPID
 grpsys         MOVE    WRK-PARA-HOSPNUM    TO  PTNYUINRRK-HOSPNUM
                MOVE    WRK-PARA-KJNYMD     TO  PTNYUINRRK-NYUINYMD
@@ -711,6 +725,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  PTNYUINRRK-HOSPNUM
        210-BODY-EDIT-SEC           SECTION.
       *
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
+           COMPUTE CNT-NO      =   CNT-NO      +   1
+      *
+           MOVE    CNT-NO          TO  WRK-NO
+           MOVE    WRK-NO          TO  HCMG004-NO (CNT-LINE)
       *
            MOVE    SPACE           TO      WRK-HCMG004-BTUNAME
                                            WRK-HCMG004-BRMNUM
@@ -1392,19 +1410,20 @@ grpsys                                 SPA-AREA
       *****************************************************************
       *    月末日取得処理
       *****************************************************************
-       800-GETUMATU-SEC      SECTION.
+       800-EOM-SEC                     SECTION.
+      *
+           INITIALIZE                  WRK-EOMYMD
       *
            INITIALIZE                  STS-AREA-DAY
            INITIALIZE                  LNK-DAY1-AREA
-           MOVE    "71"                TO  LNK-DAY7-IRAI
-           MOVE    WRK-SYMD (1 : 6)    TO  LNK-DAY7-YM
-           CALL    "ORCSDAY"               USING
-                                           STS-AREA-DAY
-                                           LNK-DAY7-AREA
-           MOVE    LNK-DAY7-KOYOMI     TO  WRK-YMD
+           MOVE    "71"                TO   LNK-DAY7-IRAI
+           MOVE    WRK-SYMD (1 : 6)    TO   LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                       LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO  WRK-EOMYMD
       *
            .
-       800-GETUMATU-EXT.
+       800-EOM-EXT.
             EXIT.
       *****************************************************************
       *    西暦日本語変換処理
