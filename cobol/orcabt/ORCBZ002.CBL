@@ -73,6 +73,8 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
+           03  FLG-BTPARA              PIC 9(01).
+           03  FLG-PTNUM               PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -114,6 +116,7 @@
                05  WRK-SYSMM           PIC 9(02).
                05  WRK-SYSDD           PIC 9(02).
            03  WRK-HENYMDG             PIC X(22).
+           03  WRK-PTNUM               PIC X(20).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -131,6 +134,10 @@
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
       *
+      *    患者番号
+       01  PTNUM-REC.
+           COPY    "CPPTNUM.INC".
+      *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
@@ -142,6 +149,11 @@
       *    印刷用データ
       *01  PRTDATA-REC.
       *    COPY    "CPPRTDATA.INC".
+      *
+      *    バッチパラメタ
+       01  BTPARA-REC.
+           COPY    "CPBTPARA.INC".
+           COPY    "CPQTOANY.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -417,12 +429,17 @@
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
            MOVE    "1"                 TO  SPRT-SITEKBN
       *
-           IF      WRK-PARA-NYUGAIKBN  =   "1"
-      *        入院
-               PERFORM 2001-NYUIN-SYORI-SEC
+           IF    ( WRK-PARA-PTNUM  NOT =   "*" )
+               MOVE    WRK-PARA-PTNUM  TO  WRK-PTNUM
+               IF      WRK-PARA-NYUGAIKBN  =   "1"
+      *            入院
+                   PERFORM 2001-NYUIN-SYORI-SEC
+               ELSE
+      *            外来
+                   PERFORM 2002-GAIRAI-SYORI-SEC
+               END-IF
            ELSE
-      *        外来
-               PERFORM 2002-GAIRAI-SYORI-SEC
+               PERFORM 2003-SHOKAI-RENKEI-SEC
            END-IF
       *
              .
@@ -442,10 +459,10 @@
            MOVE    WRK-PARA-SRYYM-END  TO  PTINF-CREYMD(1:6)
            MOVE    "31"                TO  PTINF-CREYMD(7:2)
       *
-           IF    ( WRK-PARA-PTNUM      =   SPACE )
+           IF    ( WRK-PTNUM      =   SPACE )
                MOVE    "key10"         TO  WRK-MCP-PATHNAME
            ELSE
-               MOVE    WRK-PARA-PTNUM  TO  PTINF-VPTNUM
+               MOVE    WRK-PTNUM  TO  PTINF-VPTNUM
                MOVE    "key20"         TO  WRK-MCP-PATHNAME
            END-IF
       *
@@ -463,6 +480,8 @@
            PERFORM
                    UNTIL     (FLG-PTINF    =   1  )  OR
                              (FLG-END      =   1  )
+      *
+               MOVE    PTINF-PTID          TO  SPRT-PTID
       *
                INITIALIZE                  ORCHC33AREA
                MOVE    "2"                 TO  ORCHC33-KBN
@@ -523,10 +542,10 @@
            MOVE    WRK-PARA-SRYYM-END  TO  PTINF-CREYMD(1:6)
            MOVE    "31"                TO  PTINF-CREYMD(7:2)
       *
-           IF    ( WRK-PARA-PTNUM      =   SPACE )
+           IF    ( WRK-PTNUM       =   SPACE )
                MOVE    "key15"         TO  WRK-MCP-PATHNAME
            ELSE
-               MOVE    WRK-PARA-PTNUM  TO  PTINF-VPTNUM
+               MOVE    WRK-PTNUM       TO  PTINF-VPTNUM
                MOVE    "key21"         TO  WRK-MCP-PATHNAME
            END-IF
       *
@@ -545,6 +564,8 @@
            PERFORM
                    UNTIL     (FLG-PTINF    =   1  )  OR
                              (FLG-END      =   1  )
+      *
+               MOVE    PTINF-PTID          TO  SPRT-PTID
       *
                INITIALIZE                  ORCHC33AREA
                MOVE    "2"                 TO  ORCHC33-KBN
@@ -590,6 +611,41 @@
        2001-NYUIN-SYORI-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    照会連携処理
+      *****************************************************************
+       2003-SHOKAI-RENKEI-SEC             SECTION.
+      *
+           PERFORM 900-BTPARA-KEY8-SEL-SEC
+           MOVE    BTPARA-INFO-PARA    TO  QTOANY-AREA
+      *
+           PERFORM UNTIL ( FLG-BTPARA  NOT =   ZERO )
+      *
+               PERFORM 900-PTNUM-KEY-SEL-SEC
+               IF    ( FLG-PTNUM       =   ZERO )
+                   MOVE    PTNUM-PTNUM TO  WRK-PTNUM
+                   IF      WRK-PARA-NYUGAIKBN  =   "1"
+      *                入院
+                       PERFORM 2001-NYUIN-SYORI-SEC
+                   ELSE
+      *                外来
+                       PERFORM 2002-GAIRAI-SYORI-SEC
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-BTPARA-KEY8-FET-SEC
+               MOVE    BTPARA-INFO-PARA
+                                       TO  QTOANY-AREA
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_btpara"    TO  MCP-TABLE
+           MOVE    "key8"          TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+             .
+       2003-SHOKAI-RENKEI-EXT.
+           EXIT.
       *****************************************************************
       *    終了　　処理
       *****************************************************************
@@ -701,6 +757,85 @@
       *
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者番号読み込み
+      *****************************************************************
+       900-PTNUM-KEY-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTNUM
+      *
+           INITIALIZE                  PTNUM-REC
+           MOVE    SPA-HOSPNUM     TO  PTNUM-HOSPNUM
+           MOVE    QTOANY-PTID     TO  PTNUM-PTID
+           MOVE    PTNUM-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptnum"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_ptnum" TO  MCP-TABLE
+               MOVE    "key"       TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC      =   ZERO
+                   MOVE    MCPDATA-REC
+                                   TO  PTNUM-REC
+               END-IF
+           ELSE
+               MOVE    1           TO  FLG-PTNUM
+           END-IF
+      *
+           MOVE    "tbl_ptnum"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-PTNUM-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    バッチパラメタ検索
+      *****************************************************************
+       900-BTPARA-KEY8-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-BTPARA
+      *
+           INITIALIZE                      BTPARA-REC
+           MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
+           MOVE    "ORCBQL01"          TO  BTPARA-SHELLID
+           MOVE    2                   TO  BTPARA-JOBID
+           MOVE    2                   TO  BTPARA-DSP-RENNUM
+           MOVE    BTPARA-REC          TO  MCPDATA-REC
+           MOVE    "tbl_btpara"        TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               PERFORM 900-BTPARA-KEY8-FET-SEC
+           ELSE
+               INITIALIZE                  BTPARA-REC
+               MOVE    1               TO  FLG-BTPARA
+           END-IF
+      *
+           .
+       900-BTPARA-KEY8-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    バッチパラメタ読込
+      *****************************************************************
+       900-BTPARA-KEY8-FET-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-BTPARA
+      *
+           MOVE    "tbl_btpara"        TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 920-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  BTPARA-REC
+           ELSE
+               INITIALIZE                  BTPARA-REC
+               MOVE    1               TO  FLG-BTPARA
+           END-IF
+      *
+           .
+       900-BTPARA-KEY8-FET-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
