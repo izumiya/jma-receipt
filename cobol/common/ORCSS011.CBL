@@ -51,6 +51,7 @@
            03  FLG-TENSU               PIC 9(01).
            03  FLG-RYOYO               PIC 9(01).
            03  FLG-TARGET              PIC 9(01).
+           03  FLG-PTNYUINRRK          PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -81,15 +82,25 @@
            03  WRK-MEISAISU            PIC 9(05).
            03  WRK-SRYCDTOTAL          PIC 9(14).
            03  WRK-ZAITENV99           PIC S9(09)V99.
+           03  WRK-SRYYMD.
+               05  WRK-SRYYM           PIC X(06).
+               05  WRK-SRYDD           PIC 9(02).
+           03  WRK-RRKNUM              PIC 9(03).
+           03  WRK-SANTEIKBN           PIC X(01).
+           03  WRK-LOW-DAY-G.
+               05  WRK-LOW-DAY         PIC  9(01)
+                                       OCCURS   31.
       *
        01  TNACCT-AREA.
-           03    TNACCT-KHN-OCC            OCCURS  50.
+           03  TNACCT-KHN-OCC              OCCURS  50.
                05  TNACCT-KHN-CNT          PIC  9(07).
                05  TNACCT-RYOYO-OCC        OCCURS  9.
                    07  TNACCT-SRYCDTOTAL   PIC  9(14).
                    07  TNACCT-ZAIKAISU     PIC  9(07).
                    07  TNACCT-DAY          PIC  9(03)
                                            OCCURS   31.
+           03  TNACCT-LOWEST-DAY-OCC       OCCURS   31.
+               05  TNACCT-LOW-DAY          PIC  9(01).
       *
        01  WNACCT-AREA.
          02    WNACCT-RYOYOCD          PIC X(09)
@@ -146,6 +157,9 @@
       *
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
+      *
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -279,6 +293,54 @@
                    MOVE    WRK-SRYCD9  TO  TNACCT-SRYCDTOTAL (IDXK IDXR)
                END-PERFORM
            END-PERFORM
+      *
+           PERFORM 900-PTNYUINRRK-KEY41-SEL-SEC
+      *
+           MOVE    SS011-SRYYM         TO  WRK-SRYYM
+           PERFORM UNTIL ( FLG-PTNYUINRRK  NOT =   ZERO )
+      *
+               MOVE    PTNYUINRRK-RRKNUM   TO  WRK-RRKNUM
+               INITIALIZE                      WRK-LOW-DAY-G
+      *
+               PERFORM UNTIL ( FLG-PTNYUINRRK    NOT =   ZERO )
+                        OR   ( PTNYUINRRK-RRKNUM NOT = WRK-RRKNUM )
+      *
+                   PERFORM VARYING IDX-DAY FROM    1   BY  1
+                           UNTIL ( IDX-DAY >   31 )
+      *
+                       MOVE    IDX-DAY     TO  WRK-SRYDD
+                       IF    ( WRK-SRYYMD  >=  PTNYUINRRK-TENNYUYMD )
+                        AND  ( WRK-SRYYMD  <=  PTNYUINRRK-TENSTUYMD )
+                           IF    ( PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                           =   "1" )
+                               MOVE    1   TO  WRK-LOW-DAY (IDX-DAY)
+                           ELSE
+                               MOVE    9   TO  WRK-LOW-DAY (IDX-DAY)
+                           END-IF
+                       END-IF
+      *
+                   END-PERFORM
+      *
+                   PERFORM 900-PTNYUINRRK-KEY41-FET-SEC
+      *
+               END-PERFORM
+      *
+               PERFORM VARYING IDX-DAY FROM    1   BY  1
+                       UNTIL ( IDX-DAY >   31 )
+                   IF    ( WRK-LOW-DAY (IDX-DAY)   NOT =   ZERO )
+                       IF    ( TNACCT-LOW-DAY (IDX-DAY)
+                                               =   ZERO )
+                           MOVE    WRK-LOW-DAY (IDX-DAY)
+                                           TO  TNACCT-LOW-DAY (IDX-DAY)
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key41"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
        1001-INIT-TNACCT-EXT.
@@ -608,9 +670,13 @@
                        END-IF
       *
                    MOVE    IDX-RYO     TO  IDX-PTRYO
-                   IF    ( IDX-KHN     =   5 OR 6 OR 9 OR 10 )
+                   EVALUATE    TRUE
+                   WHEN   ( IDX-KHN     =   5 OR 6 OR 9 OR 10 )
                            MOVE    1   TO  IDX-RYO
-                   END-IF
+                   WHEN  ( TNACCT-LOW-DAY (IDX-DAY)    =   1 )
+                    AND  ( SYS-1001-HOSPSBT            =   1 )
+                           MOVE    9   TO  IDX-RYO
+                   END-EVALUATE
       *
                    COMPUTE TNACCT-KHN-CNT (IDX-KHN)
                        =   TNACCT-KHN-CNT (IDX-KHN)
@@ -1245,6 +1311,56 @@
            .
       *
        900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY41-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SS011-PTID          TO  PTNYUINRRK-PTID
+           MOVE    SS011-SRYYM         TO  PTNYUINRRK-TENNYUYMD
+           MOVE    "31"                TO  PTNYUINRRK-TENNYUYMD(7:2)
+           MOVE    SS011-SRYYM         TO  PTNYUINRRK-TENSTUYMD
+           MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD(7:2)
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key41"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+           END-IF
+      *
+           .
+      *
+       900-PTNYUINRRK-KEY41-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY41-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key41"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+           END-IF
+      *
+           .
+      *
+       900-PTNYUINRRK-KEY41-FET-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)
