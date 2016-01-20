@@ -334,6 +334,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                PERFORM 900-PRVKANRI-KEY9-SEL-SEC
            END-IF
       *
+           IF    ( FLG-END         =   ZERO )
+               MOVE    ZERO        TO  CNT-OUT
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -524,6 +528,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                    PERFORM 900-PRVKANRI-INV-SEC
              IF    FLG-PRVKANRI           =    ZERO
              AND   FLG-NODATA             =    ZERO
+                   ADD     1              TO  CNT-OUT
                    GO      TO          2001-PRTDATA-PRINT-EXT
              END-IF
            END-IF
@@ -923,6 +928,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   CALL    "orcfileio"     USING ST  ORCFILEGET-AREA
                   IF      ORCF-RET        =   ZERO
                           MOVE    1       TO  FLG-END
+                          ADD     1       TO  CNT-OUT
                   ELSE
                           MOVE    ZERO    TO  FLG-END
                           MOVE    1       TO  FLG-NODATA
