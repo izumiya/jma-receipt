@@ -280,6 +280,7 @@ RID4.glade	orca42	(RID4)確認画面
 
 H01.glade	orca43	(H01)レセプト請求管理登録−手書き訂正入力
 H02.glade	orca43	(H02)返戻情報設定
+H03.glade	orca43	(H03)取込済み返戻データ一覧
 H99.glade	orca43	(H99)レセプト請求管理登録−レセプト検索
 HERR.glade	orca43	(HERR)エラー情報
 HID1.glade	orca43	(HID1)確認画面
