@@ -4061,7 +4061,7 @@
                INITIALIZE                      NYUINACCT-REC
                MOVE    LNK-PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
                MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+               MOVE    LNK-PTNYUINRRK-TENNYUYMD(1:6)
                                            TO  NACCT-SRYYM
                                                WRK-TENROOM-SKJ-SRYYMX
       *
@@ -4225,7 +4225,7 @@
                INITIALIZE                      NYUINACCT-REC
                MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
                MOVE    LNK-PTNYUINRRK-PTID      TO  NACCT-PTID
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+               MOVE    LNK-PTNYUINRRK-TENNYUYMD(1:6)
                                            TO  NACCT-SRYYM
                                                WRK-TENROOM-SKJ-SRYYMX
       *
@@ -4288,7 +4288,7 @@
            INITIALIZE                      NYUINACCT-REC
            MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
            MOVE    LNK-PTNYUINRRK-PTID      TO  NACCT-PTID
-           MOVE    LNK-SCNYUACCT-EDSRYYMD(1:6)
+           MOVE    LNK-PTNYUINRRK-TENNYUYMD(1:6)
                                        TO  NACCT-SRYYM
                                            WRK-TENROOM-SKJ-SRYYMX
       *
@@ -4300,9 +4300,9 @@
                MOVE     MCPDATA-REC    TO  NYUINACCT-REC
       *        ³°Çñ¤òÂàÈò
                MOVE    NACCT-SRYYM     TO  WRK-TENROOM-SKJ-SRYYM(1)
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+               MOVE    LNK-PTNYUINRRK-TENNYUYMD(7:2)
                                        TO  IDX-SHOKUJIX
-               MOVE    LNK-SCNYUACCT-EDSRYYMD(7:2)
+               MOVE    LNK-PTNYUINRRK-TENNYUYMD(7:2)
                                        TO  WRK-TENROOM-SKJ-DD(1)
                PERFORM   VARYING   IDX-SKJ FROM  IDX-SHOKUJI9  BY  1
                          UNTIL     IDX-SKJ   >   31
