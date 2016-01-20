@@ -3774,6 +3774,15 @@
       *    基礎点数
            MOVE    TNS-TEN             TO  SPA-COM-TEN      (IDX-T)
            MOVE    TNS-TEN             TO  SPA-COM-KISOTEN  (IDX-T)
+      *!!
+      *    コメント金額クリア
+           IF     (TNS-SRYCD(1:1)      =   "8"  )
+              OR  (TNS-SRYCD(1:3)      =   "008"
+                                       OR  "002")
+               MOVE    ZERO            TO  SPA-COM-TEN      (IDX-T)
+               MOVE    ZERO            TO  SPA-COM-KISOTEN  (IDX-T)
+           END-IF
+      *!!
       *    名称
            MOVE    TNS-NAME            TO  SPA-COM-NAME     (IDX-T)
       *

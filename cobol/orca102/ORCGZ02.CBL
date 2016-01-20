@@ -43,6 +43,7 @@
       *  04.06.00    NACL-多々納  11/02/23  コメント変更チェック追加
       *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
       *  04.07.00    NACL-多々納  12/08/21  ユーザ登録複写機能追加
+      *  04.08.00    NACL-多々納  16/01/20  金額チェック追加他
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -451,6 +452,7 @@
            MOVE    "0"                   TO  SPA-GMN-BUIKBNL    (8)
            MOVE    "その他"              TO  SPA-GMN-BUIKBNMEIL (8)
            MOVE    8                     TO  SPA-GMN-BUIKBN-MAX
+      *
       *    自賠責
            IF      SPA-Z01-SRYCD(1:5)  =   "09593"
       *        自賠責集計等取扱（外来）
@@ -1011,6 +1013,10 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 506-HKNTEKKBN-CHK-SEC
            END-IF
+      *    金額チェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 506-KINGAKU-CHK-SEC
+           END-IF
       *    点数欄集計先チェック
            IF      SPA-ERRCD           =   SPACE
                PERFORM 506-GAITENTTLKBN-CHK-SEC
@@ -1142,6 +1148,22 @@
        505-FORMALNAME-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    金額チェック処理
+      *****************************************************************
+       506-KINGAKU-CHK-SEC          SECTION.
+      *
+      *    自費コード以外はゼロ
+           IF      SPA-JIHIKBN         =   ZERO
+               IF      SPA-GMN-TEN     NOT =   ZERO
+                   MOVE    "0012"              TO  SPA-ERRCD
+                   MOVE    14                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           .
+      *
+       506-KINGAKU-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    保険適用チェック処理
       *****************************************************************
        506-HKNTEKKBN-CHK-SEC          SECTION.
@@ -1188,6 +1210,7 @@
        507-BUIKBN-CHK-SEC          SECTION.
       *
            MOVE    ZERO                TO  FLG-OK
+      *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >   SPA-GMN-BUIKBN-MAX
                IF      SPA-GMN-BUIKBN      =   SPA-GMN-BUIKBNL (IDXX)
@@ -2625,11 +2648,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "NAME"
                    MOVE    5                   TO  SPA-GMN-CUR
                WHEN    "FORMALNAME"
-                    MOVE    6                   TO  SPA-GMN-CUR
+      *            入力チェック区分へ
+                   MOVE    19                  TO  SPA-GMN-CUR
+                   IF      SPA-Z01-SRYCD(1:4)  =   "0084"
+                      OR   SPA-Z01-SRYCD(1:2)  =   "84"
+      *                カラム位置へ
+                       MOVE    6                   TO  SPA-GMN-CUR
+                   END-IF
                    IF      SPA-Z01-SRYCD(1:3)  =   "095"  OR
                                                    "096"
       *                金額へ
                        MOVE    14                  TO  SPA-GMN-CUR
+                   END-IF
+                   IF      SPA-Z01-SRYCD(1:3)  =   "002"
+      *                部位へ
+                       MOVE    18                  TO  SPA-GMN-CUR
                    END-IF
                WHEN    "COLUMN1"
                    MOVE    7                   TO  SPA-GMN-CUR
@@ -2647,6 +2680,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    13                  TO  SPA-GMN-CUR
                WHEN    "DIGIT4 "
                    MOVE    14                  TO  SPA-GMN-CUR
+                   IF     (SPA-Z01-SRYCD(1:3)  =   "008" )
+                       OR (SPA-Z01-SRYCD(1:1)  =   "8"   )
+      *                登録へ
+                       MOVE    19                  TO  SPA-GMN-CUR
+                   END-IF
                WHEN    "TEN      "
                    MOVE    15                  TO  SPA-GMN-CUR
                WHEN    "HKNTEKKBN"
@@ -2659,6 +2697,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      SPA-Z01-SRYCD(1:5)  =   "09593"
                        MOVE    20                  TO  SPA-GMN-CUR
                    ELSE
+                       MOVE    19                  TO  SPA-GMN-CUR
+                   END-IF
+                   IF      SPA-Z01-SRYCD(1:3)  =   "002"
+      *                登録へ
                        MOVE    19                  TO  SPA-GMN-CUR
                    END-IF
                WHEN    "GAIJIBAIKBN"
@@ -2716,6 +2758,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-STRING
                WHEN    "0011"
                    STRING  "カラム位置と桁数の設定をして下さい。"
+                                                   DELIMITED BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0012"
+                   STRING  "金額は自費コードでのみ設定可能です。"
                                                    DELIMITED BY  SIZE
                                                    INTO    SPA-ERRMSG
                    END-STRING
@@ -2847,6 +2894,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE                TO  ZID1
+           INITIALIZE                       ZID1
            MOVE    SPA-ZIDCD            TO  ZID1-ID1CODE
            MOVE    WRK-ZIDMSG           TO  ZID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
