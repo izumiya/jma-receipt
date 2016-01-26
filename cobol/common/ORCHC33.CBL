@@ -477,6 +477,11 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-HKNCOMBIKBN
       *
+      *    バッチは保険区分なし
+           IF      ORCHC33-KBN         =   "2"
+               MOVE    "0"             TO  PARA-HKNCOMBIKBN
+           END-IF
+      *
            .
        100-OPTION-SELECT-EXT.
            EXIT.
