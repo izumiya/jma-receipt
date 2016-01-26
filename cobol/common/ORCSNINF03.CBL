@@ -429,7 +429,7 @@
                MOVE    "迹闻の百の嘲邱"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
            WHEN    3
-               MOVE    "戮板闻怠簇减壳７０◇负"
+               MOVE    "联年掐薄面の嘲邱"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
            WHEN    4
                MOVE    "戮板闻怠簇减壳７０◇负"
