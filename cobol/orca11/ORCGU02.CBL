@@ -2047,6 +2047,19 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                END-IF
            END-IF
       *
+      *H28.2
+      *    選択番号エラー対応
+           IF     (SPA-GMN-SELNUM      =   SPA-NAI-SELNUM)
+            AND   (SPA-GMN-SELNUM   NOT=   ZERO       )
+            AND   (FLG-TOUROKU         =   1          )
+            AND  ((FLG-IN-PTNUM        =   1          )  OR
+                  (FLG-IN-NAME         =   1          ))
+               PERFORM 493-CLEAR-SEC
+               MOVE    1                   TO  SPA-GMN-CUR
+               MOVE    "0032"              TO  SPA-ERRCD
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
       *    患者番号
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (FLG-END             =   ZERO  )
@@ -2975,6 +2988,9 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    未入力の時、患者番号へ
            IF      SPA-GMN-SELNUM      =   ZERO
                MOVE    2                   TO  SPA-GMN-CUR
+               IF      SPA-NAI-SELNUM  NOT =   ZERO
+                   PERFORM 493-CLEAR-SEC
+               END-IF
            ELSE
       *
       *    選択番号チェック
@@ -4867,6 +4883,32 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****  AND  (SPA-NAI-NENREI      >=  70    )
                IF      SPA-NAI-KEIFLG2     =   ZERO
                    PERFORM 41092-HKNHOJOKBN-CHK-SEC
+               END-IF
+           END-IF
+      *H28.2
+      *    予約受付済み判定
+           IF     (FLG-TOUROKU         =   1     )  AND
+                  (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-NAI-YYKID   NOT =   ZERO  )  AND
+                  (SPA-NAI-UKEID       =   ZERO  )  AND
+                  (SPA-GMN-SELNUM  NOT =   ZERO  )
+               MOVE    SPA-GMN-SELNUM        TO  IDX
+               INITIALIZE                    YYK-KEY
+               MOVE   SPA-HOSPNUM            TO  YYK-HOSPNUM
+               MOVE   SPA-GMN-TSRYNAIYOCD(IDX)
+                                             TO  YYK-SRYNAIYO
+               MOVE   "1"                    TO  YYK-DRCD
+               MOVE   SPA-GMN-TDRCD    (IDX) TO  YYK-DRCD(2:4)
+               MOVE   SPA-SYSYMD             TO  YYK-YYKYMD
+               MOVE   SPA-GMN-TKYYKTIME(IDX) TO  YYK-KEYYYKTIME
+               MOVE   SPA-GMN-TYYKID   (IDX) TO  YYK-YYKID
+               PERFORM 900-YOYAKU-READ-SEC
+               IF      FLG-YYK             =   ZERO
+                   IF      YYK-RAIINZUMI       =   "1"
+                       PERFORM 493-CLEAR-SEC
+                       MOVE    1                   TO  SPA-GMN-CUR
+                       MOVE    "0033"              TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-IF
            .
@@ -7029,6 +7071,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+      *H28.2 
+               WHEN    "0032"
+                   STRING  "前回選択は有効ではありません。"
+                           "再度、選択をして下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0033"
+                   STRING  "予約が来院済みとなっています。"
+                           "再度、選択をして下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "2001"
                    MOVE    "前の未確認保険はありません。"
                                                 TO  SPA-ERRMSG
