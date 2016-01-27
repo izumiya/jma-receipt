@@ -111,7 +111,7 @@ C50 {
       hpos int;
       vpos int;
       COMMENT {
-        textdata varchar(2400);
+        textdata varchar(2420);
       };
     };
     MCNT {

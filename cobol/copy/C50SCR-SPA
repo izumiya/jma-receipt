@@ -32,7 +32,7 @@
       *
                05  SPA-GMN-SRYYM          PIC X(06).
       *
-               05  SPA-GMN-COMMENT        PIC X(2400).
+               05  SPA-GMN-COMMENT        PIC X(2420).
       *
                05  SPA-GMN-NYUGAIKBN-G.
                    07  SPA-GMN-NYUGAIKBN      PIC X(01).
@@ -128,7 +128,7 @@
            03  SPA-NAI-AREA.
                05  SPA-NAI-SRYYM          PIC X(06).
       *
-               05  SPA-NAI-COMMAX         PIC 9(05).
+               05  SPA-NAI-COMMAX         PIC 9(04).
                05  SPA-NAI-KEIFLG         PIC 9(01).
                05  SPA-NAI-KEIMSG         PIC X(04).
       *

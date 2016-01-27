@@ -90,7 +90,7 @@
                 04  C50-HPOS    PIC S9(9)   BINARY.
                 04  C50-VPOS    PIC S9(9)   BINARY.
                 04  C50-COMMENT.
-                  05  C50-VALUE   PIC X(2400).
+                  05  C50-VALUE   PIC X(2420).
               03  C50-MCNT.
                 04  C50-VALUE   PIC X(20).
 
