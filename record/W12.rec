@@ -825,6 +825,13 @@ W12 {
           count int;
             item varchar(24)[5];
         };
+        INSPECT_GENERAL_COMBO {
+          INSPECT_GENERAL {
+            textdata varchar(30);
+          };
+          count int;
+            item varchar(30)[5];
+        };
         DRNAME_KSIKBN_COMBO {
           DRNAME_KSIKBN {
             textdata varchar(20);

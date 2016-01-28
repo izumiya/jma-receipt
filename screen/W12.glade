@@ -7600,7 +7600,7 @@
             <class>GtkLabel</class>
             <name>labe2217</name>
             <x>30</x>
-            <y>136</y>
+            <y>176</y>
             <width>150</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7692,7 +7692,7 @@
             <class>GtkPandaCombo</class>
             <name>DRNAME_KSIKBN_COMBO</name>
             <x>190</x>
-            <y>136</y>
+            <y>176</y>
             <width>208</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -7748,6 +7748,41 @@
               <has_focus>False</has_focus>
               <editable>True</editable>
               <text>0 包括算定分を記載しない</text>
+              <input_mode>ASCII</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>INSPECT_GENERAL_COMBO</name>
+            <x>190</x>
+            <y>136</y>
+            <width>250</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>INSPECT_GENERAL</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text>0 一般名処方を銘柄名で記載する</text>
               <input_mode>ASCII</input_mode>
               <xim_enabled>False</xim_enabled>
               <signal>

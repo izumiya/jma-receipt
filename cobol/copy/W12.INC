@@ -688,6 +688,13 @@
                                       PIC S9(9)   BINARY.
                     06  W12-INSPECT-INCLUDE-KBNLST
                             PIC X(24)   OCCURS  5 TIMES.
+                  05  W12-INSPECT-GENERAL-KBN-COMBO.
+                    06  W12-INSPECT-GENERAL-KBN.
+                      07  W12-VALUE   PIC X(30).
+                    06  W12-INSPECT-GENERAL-KBN-COUNT
+                                      PIC S9(9)   BINARY.
+                    06  W12-INSPECT-GENERAL-KBNLST
+                            PIC X(30)   OCCURS  5 TIMES.
                   05  W12-DRNAME-KSIKBN-COMBO.
                     06  W12-DRNAME-KSIKBN.
                       07  W12-VALUE   PIC X(20).
