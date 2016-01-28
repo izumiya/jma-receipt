@@ -196,12 +196,18 @@
       *  04.08.06    NACL-藤原    15/08/07  医療情報連携基盤のクライアン
       *                                     ト保存対応
       *  04.08.07    NACL-藤原    15/10/15  様式４対応
+      *  04.08.08    NACL-藤原    16/01/18  地方公費処理スクリプトの存在
+      *                                     チェック対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
+      *    
+      *    処理スクリプトチェック用ワークファイル
+           SELECT  WRK-FILE        ASSIGN  WRKPARA
+                                   FILE    STATUS  IS  STS-WRK.
       *
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -209,6 +215,10 @@
       *
        DATA                        DIVISION.
        FILE                        SECTION.
+      *
+      *    処理スクリプトチェック用ワークファイル
+       FD  WRK-FILE.
+       01  WRK-R                   PIC X(10).
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -241,6 +251,7 @@
       *    フラグ領域
        01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
+           03  STS-WRK             PIC X(02).
       *
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
@@ -335,6 +346,15 @@
                05  WRK-BTPARA-WRNO PIC 9(02).
       *
            03  WRK-SYS-SRYYMD      PIC X(08).
+      *
+           03  WRK-CHK-AREA.
+               05  WRK-CHK-CNT     PIC 9(02).
+               05  WRK-CHK-SHELLID PIC X(20).
+               05  WRK-CHK-SHORIMSG
+                                   PIC X(40).
+           03  WRK-Z9              PIC Z9.
+      *
+       01  WRKPARA                 PIC X(200).
       *
       *    直接請求する保険者番号
        01  WRK-HKNJANUM-AREA.
@@ -3491,6 +3511,31 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  450-PRINT-GID-EXT
            END-IF
+      *       
+      *    処理スクリプトの存在チェック
+           IF      SPA-ERRCD       =   SPACE
+               INITIALIZE              WRK-CHK-AREA
+      *
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       SPA-3004-MAX
+                   IF    ( T01-DATAKBN4-VALUE      =   "T" ) 
+                   AND   ( SPA-3004-CHKFLG (IDX 1) =   "T" )
+                       PERFORM 4502-SCRIPT-CHECK-SEC
+                   END-IF 
+                   IF    ( T01-DATAKBN5-VALUE      =   "T" ) 
+                   AND   ( SPA-3004-CHKFLG (IDX 2) =   "T" )
+                       PERFORM 4502-SCRIPT-CHECK-SEC
+                   END-IF
+                   IF    ( T01-DATAKBN1-VALUE      =   "T" ) 
+                   AND   ( SPA-3004-CHKFLG (IDX 4) =   "T" )
+                       PERFORM 4502-SCRIPT-CHECK-SEC
+                   END-IF
+                   IF    ( T01-DATAKBN3-VALUE      =   "T" )
+                   AND   ( SPA-3004-CHKFLG (IDX 3) =   "T" )
+                       PERFORM 4502-SCRIPT-CHECK-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
       *
       *    ジョブ管理チェック処理
            IF      SPA-ERRCD       =   SPACE
@@ -3598,6 +3643,40 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF    
            .
        4501-JOBKANRI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    処理スクリプトの存在チェック
+      *****************************************************************
+       4502-SCRIPT-CHECK-SEC              SECTION.
+      *
+      *    ファイルデイレクトリ位置指定
+           MOVE    SPA-3004-SHELLID (IDX)
+                                   TO  WRK-SHELL-SHELL
+           INITIALIZE                  ORCSMKPASSAREA
+           MOVE    WRK-SHELL-KENTAN
+                                   TO  MKPASS-IN-01
+           CALL    "ORCSMKPASSSITE"    USING   ORCSMKPASSAREA
+           MOVE    MKPASS-OT-01    TO  WRKPARA
+      *
+           OPEN    INPUT               WRK-FILE
+      *??
+           DISPLAY "WRKPARA="  WRKPARA "#" STS-WRK 
+      *??
+           IF      STS-WRK         =   "00"
+               CLOSE   WRK-FILE
+           ELSE
+               ADD     1               TO  WRK-CHK-CNT
+               IF      SPA-ERRCD       =   SPACE
+                   MOVE    "0018"          TO  SPA-ERRCD
+                   MOVE    SPA-3004-SHELLID  (IDX)
+                                           TO  WRK-CHK-SHELLID
+                   MOVE    SPA-3004-SHORIMSG (IDX)
+                                           TO  WRK-CHK-SHORIMSG
+               END-IF
+           END-IF
+           .
+       4502-SCRIPT-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6859,9 +6938,10 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    エラーメッセージ表示理
+      *    エラーメッセージ表示処理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
+      *
            MOVE    SPACE               TO  SPA-ERRMSG
       *
            MOVE    SPACE                TO  TERR
@@ -6929,6 +7009,29 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0017"
                    MOVE    "ファイル出力先入力エラー" 
                                                TO  TERR-ERRMSG
+               WHEN    "0018"
+                   IF      WRK-CHK-CNT         =   1
+                       STRING  WRK-CHK-SHORIMSG 
+                                               DELIMITED   BY  SPACE
+                               "の処理スクリプトが存在しません"
+                                               DELIMITED   BY  SIZE
+                               "、システム管理で確認して下さい"
+                                               DELIMITED   BY  SIZE
+                                               INTO    TERR-ERRMSG
+                       END-STRING
+                   ELSE
+                       MOVE    WRK-CHK-CNT     TO  WRK-Z9
+                       STRING  WRK-CHK-SHORIMSG
+                                               DELIMITED   BY  SPACE
+                               "を含む"        DELIMITED   BY  SIZE
+                               WRK-Z9          DELIMITED   BY  SIZE
+                               "個の処理スクリプトが存在しません"
+                                               DELIMITED   BY  SIZE
+                               "、システム管理で確認して下さい"
+                                               DELIMITED   BY  SIZE
+                                               INTO    TERR-ERRMSG
+                       END-STRING
+                   END-IF
                WHEN    "0020"
                    STRING  "改正パッチ提供以降に平成２４年３月以前の"
                                                    DELIMITED  BY  SIZE

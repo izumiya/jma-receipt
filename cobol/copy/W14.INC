@@ -17,6 +17,9 @@
       ********************************************************************
         02  W14.
                 04  W14-FIXED2.
+                  05  W14-MSG-STYLE PIC X(20).
+                  05  W14-MSG.
+                    06  W14-VALUE   PIC X(50).
                   05  W14-STYUKYMD.
                     06  W14-VALUE   PIC X(9).
                   05  W14-EDYUKYMD.
@@ -25,6 +28,7 @@
                   05  W14-CD.
                     06  W14-VALUE   PIC X(4).
                 04  W14-SHELLID-G   OCCURS 25.
+                  05  W14-SHELLID-STYLE PIC X(20).
                   05  W14-SHELLID.
                     06  W14-VALUE   PIC X(20).
                 04  W14-SHORIMSG-G   OCCURS 25.

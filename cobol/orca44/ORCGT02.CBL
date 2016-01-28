@@ -33,15 +33,27 @@
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.02    NACL-藤原    13/04/10  個別作成時のプレビュー画面表示
+      *
+      *  04.08.01    NACL-藤原    16/01/18  地方公費処理スクリプトの存在
+      *                                     チェック対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
+      *    
+      *    処理スクリプトチェック用ワークファイル
+           SELECT  WRK-FILE        ASSIGN  WRKPARA
+                                   FILE    STATUS  IS  STS-WRK.
+      *
       *
        DATA                        DIVISION.
        FILE                        SECTION.
+      *
+      *    処理スクリプトチェック用ワークファイル
+       FD  WRK-FILE.
+       01  WRK-R                   PIC X(10).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -55,6 +67,10 @@
            COPY    "T01SCR-SPA".
       *
            COPY    "ENUM-VALUE".
+      *
+      *    フラグ領域
+       01  STS-AREA.
+           03  STS-WRK             PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -91,6 +107,15 @@
            03  WRK-MOTOPG          PIC X(08).
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
+      *
+           03  WRK-CHK-AREA.
+               05  WRK-CHK-CNT     PIC 9(02).
+               05  WRK-CHK-SHELLID PIC X(20).
+               05  WRK-CHK-SHORIMSG
+                                   PIC X(40).
+           03  WRK-Z9              PIC Z9.
+      *
+       01  WRKPARA                 PIC X(200).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -138,6 +163,12 @@
       *    エラーファイルＩＤ
            03  WRK-CONS-FILE-ID    PIC X(08)   VALUE   "OR044ERR".
       *
+      *    県単独事業用シェル
+       01  WRK-SHELL-KENTAN.
+           03  FILLER             PIC X(15) VALUE
+                                             "scripts/kentan/".
+           03  WRK-SHELL-SHELL    PIC X(30).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -172,6 +203,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    ファイルデイレクトリ位置指定サブ
+           COPY  "CPMKPASS.INC".
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
@@ -1240,7 +1274,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                END-IF
            END-IF
       *       
-      *    ジョブ管理チェック処理
+      *    処理スクリプトの存在チェック
+           IF      SPA-ERRCD       =   SPACE
+               PERFORM 4502-SCRIPT-CHECK-SEC
+           END-IF
+      *
            IF      SPA-ERRCD       =   SPACE
                PERFORM 4501-JOBKANRI-CHK-SEC
                IF      SPA-ERRCD       =   SPACE
@@ -1325,6 +1363,48 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
        4501-JOBKANRI-CHK-EXT.
            EXIT.
       *     
+      *****************************************************************
+      *    処理スクリプトの存在チェック
+      *****************************************************************
+       4502-SCRIPT-CHECK-SEC              SECTION.
+      *
+           INITIALIZE              WRK-CHK-AREA
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       SPA-GMN-T02-SHELLID-MAX
+               IF      SPA-GMN-T02-TSYORIFLG (IDX)
+                                               =   "1"
+      *            ファイルデイレクトリ位置指定
+                   MOVE    SPA-NAI-T02-TSHELLID (IDX)
+                                           TO  WRK-SHELL-SHELL
+                   INITIALIZE                  ORCSMKPASSAREA
+                   MOVE    WRK-SHELL-KENTAN
+                                           TO  MKPASS-IN-01
+                   CALL    "ORCSMKPASSSITE"    USING   ORCSMKPASSAREA
+                   MOVE    MKPASS-OT-01    TO  WRKPARA
+      *
+                   OPEN    INPUT               WRK-FILE
+      *??
+           DISPLAY "WRKPARA="  WRKPARA "#" STS-WRK 
+      *??
+                   IF      STS-WRK         =   "00"
+                       CLOSE   WRK-FILE
+                   ELSE
+                       ADD     1               TO  WRK-CHK-CNT
+                       IF      SPA-ERRCD       =   SPACE
+                           MOVE    "0018"          TO  SPA-ERRCD
+                           MOVE    SPA-NAI-T02-TSHELLID  (IDX)
+                                                   TO  WRK-CHK-SHELLID
+                           MOVE    SPA-GMN-T02-TSHORIMSG (IDX)
+                                                   TO  WRK-CHK-SHORIMSG
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       4502-SCRIPT-CHECK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    自画面編集処理
       *****************************************************************
@@ -1473,77 +1553,101 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    エラーメッセージ表示理
+      *    エラーメッセージ表示処理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
-           MOVE    SPACE               TO  SPA-ERRMSG
       *
-           EVALUATE    SPA-ERRCD
-               WHEN    "0001"
-                   MOVE    "選択番号エラー"            TO  SPA-ERRMSG
-               WHEN    "0002"
-                   MOVE    "これ以上追加できません"    TO  SPA-ERRMSG
-               WHEN    "0003"
-                   MOVE
-                       "該当の患者が存在しません"      TO  SPA-ERRMSG
-               WHEN    "0004"
-                   MOVE    "対象のデータを選択してありません" 
-                                                       TO  SPA-ERRMSG
-               WHEN    "0006"
-                   MOVE    "対象の処理が選択してありません"
-                                                       TO  SPA-ERRMSG
-               WHEN    "0005"
-                   MOVE    "対象のデータが選択してあります"
-                                                       TO  SPA-ERRMSG
-               WHEN    "0007"
-                   MOVE    "既に入力済です"            TO  SPA-ERRMSG
-               WHEN    "0008"
-                   MOVE    "処理区分入力エラー"        TO  SPA-ERRMSG
-               WHEN    "0009"
-                   MOVE    "選択番号エラー"            TO  SPA-ERRMSG
-               WHEN    "0011"
-                   MOVE
-                       "パラメタ区分が指定してないので入力できません"
-                                                       TO  SPA-ERRMSG
-               WHEN    "0012"
-                   MOVE    "該当の保険者番号が存在しません"
-                                                       TO  SPA-ERRMSG
-               WHEN    "0013"
-                   MOVE
-                       "対象となる処理が選択してありません"
-                                                       TO  SPA-ERRMSG
-               WHEN    "0014"
-                   MOVE
-                       "パラメタの入力中です"          TO  SPA-ERRMSG
-               WHEN    "0015" 
-                   MOVE
-                       "患者番号が未入力です"          TO  SPA-ERRMSG
-               WHEN    "0016" 
-                   MOVE
-                       "保険者番号が未入力です"        TO  SPA-ERRMSG
-               WHEN    "1002"
-                   MOVE    "パラメタＤＢの追加処理でエラーとなりました" 
-                                                       TO  SPA-ERRMSG
-               WHEN    "1003"
-                   MOVE    "パラメタＤＢの更新処理でエラーとなりました" 
-                                                       TO  SPA-ERRMSG
-               WHEN    "1004"
-                   MOVE    "対象のパラメタＤＢが存在しません" 
-                                                       TO  SPA-ERRMSG
-               WHEN    "1005"
-                   MOVE    "パラメタＤＢの削除処理でエラーとなりました" 
-                                                       TO  SPA-ERRMSG
-               WHEN    "1006"
-                   MOVE
-                  "パラメタＤＢのＪＯＢＩＤ更新処理でエラーとなりました"
-                                                       TO  SPA-ERRMSG
-               WHEN    "7777"
-                   MOVE    WRK-RECEERR                 TO  SPA-ERRMSG
-           END-EVALUATE
+           MOVE    SPACE               TO  SPA-ERRMSG
       *
            MOVE    SPACE                TO  TERR
            MOVE    SPA-ERRCD            TO  TERR-ERRCODE
-           MOVE    SPA-ERRMSG           TO  TERR-ERRMSG
+      *
+           EVALUATE    SPA-ERRCD
+               WHEN    "0001"
+                   MOVE    "選択番号エラー"            TO  TERR-ERRMSG
+               WHEN    "0002"
+                   MOVE    "これ以上追加できません"    TO  TERR-ERRMSG
+               WHEN    "0003"
+                   MOVE
+                       "該当の患者が存在しません"      TO  TERR-ERRMSG
+               WHEN    "0004"
+                   MOVE    "対象のデータを選択してありません" 
+                                                       TO  TERR-ERRMSG
+               WHEN    "0006"
+                   MOVE    "対象の処理が選択してありません"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0005"
+                   MOVE    "対象のデータが選択してあります"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0007"
+                   MOVE    "既に入力済です"            TO  TERR-ERRMSG
+               WHEN    "0008"
+                   MOVE    "処理区分入力エラー"        TO  TERR-ERRMSG
+               WHEN    "0009"
+                   MOVE    "選択番号エラー"            TO  TERR-ERRMSG
+               WHEN    "0011"
+                   MOVE
+                       "パラメタ区分が指定してないので入力できません"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0012"
+                   MOVE    "該当の保険者番号が存在しません"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0013"
+                   MOVE
+                       "対象となる処理が選択してありません"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0014"
+                   MOVE
+                       "パラメタの入力中です"          TO  TERR-ERRMSG
+               WHEN    "0015" 
+                   MOVE
+                       "患者番号が未入力です"          TO  TERR-ERRMSG
+               WHEN    "0016" 
+                   MOVE
+                       "保険者番号が未入力です"        TO  TERR-ERRMSG
+               WHEN    "0018"
+                   IF      WRK-CHK-CNT         =   1
+                       STRING  WRK-CHK-SHORIMSG 
+                                               DELIMITED   BY  SPACE
+                               "の処理スクリプトが存在しません"
+                                               DELIMITED   BY  SIZE
+                               "、システム管理で確認して下さい"
+                                               DELIMITED   BY  SIZE
+                                               INTO    TERR-ERRMSG
+                       END-STRING
+                   ELSE
+                       MOVE    WRK-CHK-CNT     TO  WRK-Z9
+                       STRING  WRK-CHK-SHORIMSG
+                                               DELIMITED   BY  SPACE
+                               "を含む"        DELIMITED   BY  SIZE
+                               WRK-Z9          DELIMITED   BY  SIZE
+                               "個の処理スクリプトが存在しません"
+                                               DELIMITED   BY  SIZE
+                               "、システム管理で確認して下さい"
+                                               DELIMITED   BY  SIZE
+                                               INTO    TERR-ERRMSG
+                       END-STRING
+                   END-IF
+               WHEN    "1002"
+                   MOVE    "パラメタＤＢの追加処理でエラーとなりました" 
+                                                       TO  TERR-ERRMSG
+               WHEN    "1003"
+                   MOVE    "パラメタＤＢの更新処理でエラーとなりました" 
+                                                       TO  TERR-ERRMSG
+               WHEN    "1004"
+                   MOVE    "対象のパラメタＤＢが存在しません" 
+                                                       TO  TERR-ERRMSG
+               WHEN    "1005"
+                   MOVE    "パラメタＤＢの削除処理でエラーとなりました" 
+                                                       TO  TERR-ERRMSG
+               WHEN    "1006"
+                   MOVE
+                  "パラメタＤＢのＪＯＢＩＤ更新処理でエラーとなりました"
+                                                       TO  TERR-ERRMSG
+               WHEN    "7777"
+                   MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
+           END-EVALUATE
+      *
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T02"                TO  SPA-MOTOPG
@@ -1574,6 +1678,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-EVALUATE
       *
            MOVE    SPACE                TO  TID1
+           INITIALIZE                       TID1
            MOVE    SPA-TIDCD            TO  TID1-ID1CODE
            MOVE    WRK-TIDMSG           TO  TID1-ID1MSG
            MOVE    "戻る"               TO  TID1-B01-LABEL
@@ -1609,6 +1714,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-EVALUATE
       *
            MOVE    SPACE                TO  TID2
+           INITIALIZE                       TID2
            MOVE    SPA-TIDCD            TO  TID2-ID1CODE
            MOVE    WRK-TIDMSG           TO  TID2-ID1MSG
            MOVE    "T"                  TO  TID2-B10-VISIBLE

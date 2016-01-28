@@ -1,5 +1,9 @@
 W14 {
   fixed2 {
+    MSG {
+      style varchar(20);
+      textdata varchar(50);
+    };
     STYUKYMD {
       textdata varchar(9);
     };
@@ -82,78 +86,103 @@ W14 {
       textdata varchar(4);
     };
     SHELLID01 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID02 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID03 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID04 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID05 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID06 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID07 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID08 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID09 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID10 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID11 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID12 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID13 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID14 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID15 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID16 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID17 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID18 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID19 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID20 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID21 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID22 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID23 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID24 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHELLID25 {
+      style varchar(20);
       textdata varchar(20);
     };
     SHORIMSG01 {
