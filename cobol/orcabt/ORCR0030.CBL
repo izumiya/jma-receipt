@@ -729,6 +729,8 @@
       *                                     コメント不記載対応
       *  04.08.16    NACL-門脇    16/01/07  第三者行為の登録有無チェック修正
       *  04.08.17    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.18    NACL-門脇    16/01/27  医保レセプト「他保険にて診察料算定済」
+      *                                     コメント不記載対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13426,16 +13428,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                MOVE    ACCT-SRYKA          TO  JYURRK-SRYKA
                MOVE    RECE02-SRYYM        TO  JYURRK-SRYYMD(1:6)
                MOVE    IDX9                TO  JYURRK-SRYYMD(7:2)
-               MOVE    1                   TO  JYURRK-RENNUM
                MOVE    JYURRK-REC          TO  MCPDATA-REC
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key5 "             TO  MCP-PATHNAME
+               MOVE    "key4 "             TO  MCP-PATHNAME
                PERFORM   900-DBSELECT-SEC
                IF    MCP-RC  =  ZERO
                  MOVE    "tbl_jyurrk"      TO  MCP-TABLE
-                 MOVE    "key5 "           TO  MCP-PATHNAME
+                 MOVE    "key4 "           TO  MCP-PATHNAME
                  PERFORM   900-JYURRK-READ-SEC
-                 IF   FLG-JYURRK  =  ZERO
+                 PERFORM  UNTIL  (FLG-JYURRK  =  1)
+                           OR    (FLG-ARI2    =  1)
                    IF    JYURRK-HKNKBN  NOT =  "0" AND "7"
                           MOVE     1       TO  FLG-ARI2
                    ELSE
@@ -13454,10 +13456,13 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       END-IF
                     END-IF
                    END-IF
-                 END-IF
+                   MOVE    "tbl_jyurrk"    TO  MCP-TABLE
+                   MOVE    "key4 "         TO  MCP-PATHNAME
+                   PERFORM   900-JYURRK-READ-SEC
+                 END-PERFORM
                END-IF
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key5 "             TO  MCP-PATHNAME
+               MOVE    "key4 "             TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
              END-IF
            END-PERFORM
