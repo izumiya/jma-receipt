@@ -69,6 +69,7 @@
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    15/12/02  ０点地域公費記載対応
+      *  04.08.04    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1169,6 +1170,12 @@
                                      TO  TBL-ZAIW-SRYACTINF (IDY IDZ)
                        MOVE    RECE230-NAMEINF   (IDX)
                                      TO  TBL-ZAIW-NAMEINF   (IDY IDZ)
+                       IF  RECE230-INGAIFLG-RECE(IDX) = "1"
+                         MOVE  RECE230-GENERICNAME(IDX)
+                                     TO  TBL-ZAIW-NAME(IDY IDZ)
+                         MOVE  RECE230-GENERICYUKOKETA(IDX)
+                                     TO  TBL-ZAIW-YUKOKETA(IDY IDZ)
+                       END-IF
                        MOVE    RECE230-RECEHENFLG(IDX)
                                      TO  TBL-ZAIW-RECEHENFLG(IDY IDZ)
                        MOVE    RECE230-SRYSYUKBN  TO

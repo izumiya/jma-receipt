@@ -39,6 +39,9 @@
       *
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.02    NACL-門脇    14/09/11  点数マスタの診療区分追加
+      *
+      *  04.08.01    NACL-門脇    16/01/12  点検用レセプト院外処方
+      *                                     一般名記載対応
       ************************************************************
       *01  RECE45-REC.
            03  RECE45-KEY.
@@ -170,4 +173,19 @@
                  07  RECE45-SETCOMATFLG      PIC  9(03).
       *点数マスタの診療区分
                  07  RECE45-TNSSRYKBN        PIC  X(02).
+      *
+      *医療情報連携用情報
+             05  RECE45-IRYORENKEIINF.
+      *一般名記載院外処方フラグ
+                 07  RECE45-INGAIFLG         PIC  X(01).
+      *一般名記載院外処方フラグ（レセプト用）
+                 07  RECE45-INGAIFLG-RECE    PIC  X(01).
+      *一般名コード（薬価基準コード）
+                 07  RECE45-YAKKAKJNCD       PIC  X(12).
+      *一般名処方加算区分
+                 07  RECE45-GENERIC-KBN      PIC  X(01).
+      *一般名称
+                 07  RECE45-GENERICNAME      PIC  X(200).
+      *漢字有効桁数
+                 07  RECE45-GENERICYUKOKETA  PIC  9(03).
       *

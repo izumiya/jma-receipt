@@ -728,6 +728,7 @@
       *  04.08.15    NACL-ÌçÏÆ    16/01/07  °åÊÝ¥ì¥»¥×¥È¡ÖÂ¾ÊÝ¸±¤Ë¤Æ¿Ç»¡ÎÁ»»ÄêºÑ¡×
       *                                     ¥³¥á¥ó¥ÈÉÔµ­ºÜÂÐ±þ
       *  04.08.16    NACL-ÌçÏÆ    16/01/07  Âè»°¼Ô¹Ô°Ù¤ÎÅÐÏ¿Í­Ìµ¥Á¥§¥Ã¥¯½¤Àµ
+      *  04.08.17    NACL-ÌçÏÆ    16/01/12  ÅÀ¸¡ÍÑ¥ì¥»¥×¥È±¡³°½èÊý°ìÈÌÌ¾µ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1002,19 +1003,43 @@
            03  IDX2                                    PIC 9(03).
            03  IDX3                                    PIC 9(03).
            03  IDX4                                    PIC 9(03).
+           03  IDX5                                    PIC 9(03).
+           03  IDX6                                    PIC 9(03).
+           03  IDX7                                    PIC 9(03).
            03  IDX8                                    PIC 9(02).
            03  IDX9                                    PIC 9(02).
+           03  IDX10                                   PIC 9(03).
+           03  IDX11                                   PIC 9(03).
+           03  IDX13                                   PIC 9(03).
+           03  IDX14                                   PIC 9(03).
+           03  IDX15                                   PIC 9(03).
+           03  IDX16                                   PIC 9(03).
+           03  IDX17                                   PIC 9(03).
+           03  IDX18                                   PIC 9(03).
+           03  IDX19                                   PIC 9(03).
+           03  IDX20                                   PIC 9(03).
+           03  IDX21                                   PIC 9(03).
+           03  IDX22                                   PIC 9(02).
+           03  IDX23                                   PIC 9(03).
+           03  IDX24                                   PIC 9(03).
+           03  IDX25                                   PIC 9(03).
+           03  IDX27                                   PIC 9(03).
+           03  IDX28                                   PIC 9(03).
+           03  IDX29                                   PIC 9(03).
+           03  IDX30                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
-           03  IDYY                                    PIC 9(02).
-           03  IDYX                                    PIC 9(02).
-           03  IDZX                                    PIC 9(02).
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  IDY3                                    PIC 9(03).
            03  IDY4                                    PIC 9(03).
+           03  IDYX                                    PIC 9(02).
+           03  IDYY                                    PIC 9(02).
            03  IDZ                                     PIC 9(03).
+           03  IDZ1                                    PIC 9(02).
+           03  IDZ2                                    PIC 9(02).
+           03  IDZX                                    PIC 9(02).
            03  IDW                                     PIC 9(03).
            03  IDW2                                    PIC 9(03).
            03  IDW3                                    PIC 9(03).
@@ -1023,6 +1048,8 @@
            03  IDW6                                    PIC 9(03).
            03  IDW7                                    PIC 9(03).
            03  IDW8                                    PIC 9(03).
+           03  IDA                                     PIC 9(04).
+           03  IDB                                     PIC 9(04).
            03  IDV                                     PIC 9(03).
            03  IDU                                     PIC 9(03).
            03  NUM-IDX                                 PIC 9(01).
@@ -1045,39 +1072,11 @@
            03  TOKU75-IDX2                             PIC 9(03).
            03  SYU-IDX                                 PIC 9(03).
            03  SYU-IDX2                                PIC 9(03).
-           03  IDX10                                   PIC 9(03).
-           03  IDX11                                   PIC 9(03).
-           03  IDX13                                   PIC 9(03).
-           03  IDX14                                   PIC 9(03).
-           03  IDX15                                   PIC 9(03).
-           03  IDX16                                   PIC 9(03).
-           03  IDX17                                   PIC 9(03).
-           03  IDX18                                   PIC 9(03).
-           03  IDX19                                   PIC 9(03).
-           03  IDX20                                   PIC 9(03).
-           03  IDX21                                   PIC 9(03).
-           03  IDX22                                   PIC 9(02).
-           03  IDX23                                   PIC 9(03).
-           03  IDX24                                   PIC 9(03).
-           03  IDX25                                   PIC 9(03).
-           03  IDX27                                   PIC 9(03).
-           03  IDX28                                   PIC 9(03).
-           03  IDX29                                   PIC 9(03).
-           03  IDX30                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
            03  IDX-NEXT                                PIC 9(03).
-      *
-           03  IDA                 PIC 9(04).
-           03  IDB                 PIC 9(04).
-           03  IDX5                PIC 9(03).
-           03  IDX6                PIC 9(03).
-           03  IDX7                PIC 9(03).
-           03  SEIHIDX             PIC 9(02).
-           03  KAKKIDX             PIC 9(02).
-           03  SESNIDX             PIC 9(02).
-      *
-           03 IDZ1                 PIC 9(02).
-           03 IDZ2                 PIC 9(02).
+           03  SEIHIDX                                 PIC 9(02).
+           03  KAKKIDX                                 PIC 9(02).
+           03  SESNIDX                                 PIC 9(02).
       *
       *    £Ï£Ã£ÒÊÔ½¸ÎÎ°è
        01  OCR1-AREA.
@@ -2799,7 +2798,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               END-PERFORM
       *       Ä¢É¼ÊÔ½¸¶èÊ¬¾ðÊó
               MOVE    SPACE            TO  WRK-1030-KOUHATUKA
-              IF      WRK-PARA-PRTKBN     =   "9"
+              IF      WRK-PARA-PRTKBN = "9" OR "2" OR "3" OR "4" OR "5"
                 INITIALIZE                   SYSKANRI-REC
                 MOVE    "1030"           TO  SYS-KANRICD
                 MOVE    "*"              TO  SYS-KBNCD
@@ -2905,7 +2904,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
               MOVE     ZERO               TO  SYSKAN-IDX
               MOVE     SPACE              TO  TBL-SYS1030-T
               INITIALIZE                      TBL-SYS1030-T
-              IF      WRK-PARA-PRTKBN     =   "9"
+              IF      WRK-PARA-PRTKBN = "9" OR "2" OR "3" OR "4" OR "5"
                 INITIALIZE                      SYSKANRI-REC
                 MOVE    "1030"              TO  SYS-KANRICD
                 MOVE    "*"                 TO  SYS-KBNCD
@@ -2985,6 +2984,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
            IF      SYS-200501-GENBUTU-ICHIBU-KSIKBN
                                     =   SPACE
                MOVE    "0"   TO  SYS-200501-GENBUTU-ICHIBU-KSIKBN
+           END-IF
+           IF      SYS-200501-INSPECT-GENERAL-KBN   =   SPACE
+               MOVE    "0"   TO  SYS-200501-INSPECT-GENERAL-KBN
            END-IF
       *
           .
@@ -10480,8 +10482,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            INITIALIZE     WRK-ORCSGETGE-OUT-AREA
            MOVE    ZERO                 TO      FLG-IRYORENKEI
-           IF     (WRK-PARA-PRTKBN     =   "9"     )
-           AND    (RECE02-SRYYM       >=   "201204")
+           IF    ((WRK-PARA-PRTKBN  =  "9"                     ) AND
+                  (RECE02-SRYYM         >=   "201204"          ))
+           OR    ((WRK-PARA-PRTKBN  =  "2" OR "3" OR "4" OR "5") AND
+                  (SYS-200501-INSPECT-GENERAL-KBN  =   "1"     ) AND
+                  (RECE02-SRYYM         >=   "201204"          ))
              PERFORM 210443-IRYORENKEI-HENSYU-SEC
            END-IF
            MOVE    ZERO                 TO      IDX17
@@ -10930,13 +10935,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         IF   (RECE05-SRYCD(IDX4)(1:1) = "6"   )
                         AND  (WRK-ORCSGETGE-GENERICNAME(IDX17)
                                                   NOT =  SPACE)
-                          MOVE  "1"       TO    RECE05-INGAIFLG(IDX4)
+                          IF    WRK-PARA-PRTKBN  =  "9"
+                            MOVE  "1"  TO  RECE05-INGAIFLG(IDX4)
+                          ELSE
+                            MOVE  "1"  TO  RECE05-INGAIFLG-RECE(IDX4)
+                          END-IF
                           MOVE  WRK-ORCSGETGE-YAKKAKJNCD(IDX17)
                                           TO    RECE05-YAKKAKJNCD(IDX4)
                           MOVE  WRK-ORCSGETGE-GENERIC-KBN(IDX17)
                                           TO    RECE05-GENERIC-KBN(IDX4)
                           MOVE  WRK-ORCSGETGE-GENERICNAME(IDX17)
                                           TO    RECE05-GENERICNAME(IDX4)
+                          PERFORM  VARYING  IDX15  FROM  200  BY  -1
+                                    UNTIL   IDX15   <     1
+                            IF  RECE05-GENERICNAME(IDX4)(IDX15:1)
+                                                        NOT =   SPACE
+                               COMPUTE RECE05-GENERICYUKOKETA(IDX4) =
+                                       IDX15  /  2
+                               MOVE    1   TO  IDX15
+                            END-IF
+                          END-PERFORM
                         END-IF
                     END-IF
                   END-IF
@@ -10969,13 +10987,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         IF   (RECE05-SRYCD(IDX4)(1:1) = "6"   )
                         AND  (WRK-ORCSGETGE-GENERICNAME(IDX17)
                                                   NOT =  SPACE)
-                          MOVE  "1"       TO    RECE05-INGAIFLG(IDX4)
+                          IF    WRK-PARA-PRTKBN  =  "9"
+                            MOVE  "1"  TO  RECE05-INGAIFLG(IDX4)
+                          ELSE
+                            MOVE  "1"  TO  RECE05-INGAIFLG-RECE(IDX4)
+                          END-IF
                           MOVE  WRK-ORCSGETGE-YAKKAKJNCD(IDX17)
                                           TO    RECE05-YAKKAKJNCD(IDX4)
                           MOVE  WRK-ORCSGETGE-GENERIC-KBN(IDX17)
                                           TO    RECE05-GENERIC-KBN(IDX4)
                           MOVE  WRK-ORCSGETGE-GENERICNAME(IDX17)
                                           TO    RECE05-GENERICNAME(IDX4)
+                          PERFORM  VARYING  IDX15  FROM  200  BY  -1
+                                    UNTIL   IDX15   <     1
+                            IF  RECE05-GENERICNAME(IDX4)(IDX15:1)
+                                                        NOT =   SPACE
+                               COMPUTE RECE05-GENERICYUKOKETA(IDX4) =
+                                       IDX15  /  2
+                               MOVE    1   TO  IDX15
+                            END-IF
+                          END-PERFORM
                         END-IF
                     END-IF
                   END-IF
@@ -27739,7 +27770,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
            MOVE    ZERO                TO  FLG-SET
            MOVE    SPACE               TO  WRK-1030-KOUHATUKA
       *
-           IF      WRK-PARA-PRTKBN     =   "9"
+           IF      WRK-PARA-PRTKBN = "9" OR "2" OR "3" OR "4" OR "5"
              PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
                      UNTIL ( SYSKAN-IDX              >  100  )
                      OR    ( TBL-SYS1030(SYSKAN-IDX) = SPACE )

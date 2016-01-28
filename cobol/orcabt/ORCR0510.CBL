@@ -37,6 +37,7 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
       *                                     対応
+      *  04.08.03    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -355,6 +356,7 @@
            03  WRK-KHNTENZ         PIC ZZ.
            03  WRK-KAISUZ          PIC ZZZ.
            03  WRK-TENSUZ          PIC ZZZZZZZ.
+           03  WRK-TENSUZ2         PIC ZZZZZZ9.
            03  WRK-JNISSU          PIC ZZ9.
            03  WRK-TOTALTEN        PIC ZZZ,ZZZ.
            03  WRK-NENREI-X        PIC ZZ9.
@@ -1526,11 +1528,15 @@
            END-PERFORM
       *
       *    １０〜８０点数計
-           MOVE    RECE41-TOTALTEN     TO  WRK-TOTALTEN
-           MOVE    WRK-TOTALTEN        TO  HCM76-KOUTENG
+      ***  MOVE    RECE41-TOTALTEN     TO  WRK-TOTALTEN
+      ***  MOVE    WRK-TOTALTEN        TO  HCM76-KOUTENG
+           MOVE    RECE41-TOTALTEN     TO  WRK-TENSUZ
+           MOVE    WRK-TENSUZ          TO  HCM76-KOUTENG
       *
-           MOVE    RECE41-TOTALTEN-YAK TO  WRK-TOTALTEN
-           MOVE    WRK-TOTALTEN        TO  HCM76-YKZTENSUG
+      ***  MOVE    RECE41-TOTALTEN-YAK TO  WRK-TOTALTEN
+      ***  MOVE    WRK-TOTALTEN        TO  HCM76-YKZTENSUG
+           MOVE    RECE41-TOTALTEN-YAK TO  WRK-TENSUZ
+           MOVE    WRK-TENSUZ          TO  HCM76-YKZTENSUG
       *
       *    診療内容・金額
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -1982,8 +1988,10 @@
            INSPECT RECE47-TEKIYO-INF   REPLACING   ALL "  "    BY  "　"
       *
            IF      RECE47-TEKIYO2-KISAIFLG =   1
-               MOVE    RECE47-TEKIYO2-TEN  TO  WRK-TENSUZ
-               MOVE    WRK-TENSUZ          TO  WRK-TENSUX
+      ***      MOVE    RECE47-TEKIYO2-TEN  TO  WRK-TENSUZ
+      ***      MOVE    WRK-TENSUZ          TO  WRK-TENSUX
+               MOVE    RECE47-TEKIYO2-TEN  TO  WRK-TENSUZ2
+               MOVE    WRK-TENSUZ2         TO  WRK-TENSUX
                PERFORM VARYING IDZZ    FROM    7   BY  -1
                        UNTIL   IDZZ    <       1
                    IF      WRK-TENSUX-T (IDZZ)     =   SPACE

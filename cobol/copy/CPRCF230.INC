@@ -22,6 +22,9 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
+      *
+      *  04.08.01    NACL-門脇    16/01/12  点検用レセプト院外処方
+      *                                     一般名記載対応
       ************************************************************
       *01  RECE230-REC.
            03  RECE230-KEY.
@@ -136,4 +139,19 @@
                    07  RECE230-RECEPTFLG       PIC X(01).
       *レセ用特定器材商品名編集フラグ
                    07  RECE230-RECEHENFLG      PIC X(01).
+      *
+      *医療情報連携用情報
+               05  RECE230-IRYORENKEIINF.
+      *一般名記載院外処方フラグ
+                   07  RECE230-INGAIFLG        PIC X(01).
+      *一般名記載院外処方フラグ（レセプト用）
+                   07  RECE230-INGAIFLG-RECE   PIC X(01).
+      *一般名コード（薬価基準コード）
+                   07  RECE230-YAKKAKJNCD      PIC X(12).
+      *一般名処方加算区分
+                   07  RECE230-GENERIC-KBN     PIC X(01).
+      *一般名称
+                   07  RECE230-GENERICNAME     PIC X(200).
+      *漢字有効桁数
+                   07  RECE230-GENERICYUKOKETA PIC 9(03).
       *

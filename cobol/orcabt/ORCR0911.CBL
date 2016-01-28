@@ -39,6 +39,7 @@
       *  04.08.02    NACL-門脇    15/12/02  ０点地域公費記載対応
       *  04.08.03    NACL-門脇    15/12/08  労災コードの表用番号・公表順序番号
       *                                     編集修正
+      *  04.08.04    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1252,6 +1253,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                      TO  TBL-ZAIW-SRYACTINF (IDY IDZ)
                        MOVE    RECE85-NAMEINF   (IDX)
                                      TO  TBL-ZAIW-NAMEINF   (IDY IDZ)
+                       IF  RECE85-INGAIFLG-RECE(IDX) = "1"
+                         MOVE  RECE85-GENERICNAME(IDX)
+                                     TO  TBL-ZAIW-NAME(IDY IDZ)
+                         MOVE  RECE85-GENERICYUKOKETA(IDX)
+                                     TO  TBL-ZAIW-YUKOKETA(IDY IDZ)
+                       END-IF
                        MOVE    RECE85-RECEHENFLG(IDX)
                                      TO  TBL-ZAIW-RECEHENFLG(IDY IDZ)
                        MOVE    RECE85-SRYSYUKBN  TO

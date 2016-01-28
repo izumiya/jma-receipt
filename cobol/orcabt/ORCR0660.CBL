@@ -168,6 +168,7 @@
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    15/12/02  ３歳児視覚聴覚精密健康診査
       *                                     （地域公費）対応
+      *  04.08.05    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -621,6 +622,10 @@
            03  WRK-HEN-RENNUM-J2             PIC 9(02).
            03  WRK-HEN-SHORI-RENNUM-J2       PIC 9(01).
            03  WRK-HEN-SEQNO-J2              PIC 9(02).
+      *
+           03  WRK-HEN-RENNUM-J3             PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM-J3       PIC 9(01).
+           03  WRK-HEN-SEQNO-J3              PIC 9(02).
       *
            03  WRK-KAISIEN-FSANTEIYMD        PIC X(08).
            03  WRK-KAISIEN-YMD               PIC X(08).
@@ -10821,6 +10826,9 @@
            MOVE    ZERO    TO    WRK-HEN-RENNUM-J2
                                  WRK-HEN-SHORI-RENNUM-J2
                                  WRK-HEN-SEQNO-J2
+           MOVE    ZERO    TO    WRK-HEN-RENNUM-J3
+                                 WRK-HEN-SHORI-RENNUM-J3
+                                 WRK-HEN-SEQNO-J3
       *
            INITIALIZE                       RECE651-REC
            MOVE    RECE641-KEY1         TO  RECE651-KEY1
@@ -11010,6 +11018,27 @@
                        MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J2
                        MOVE   ZERO            TO  WRK-HEN-SEQNO-J2
                     END-IF
+      *
+      *             医療情報連携編集
+                    IF    RECE651-INGAIFLG(IDX)  =   "1"
+                       MOVE   RECE651-RENNUM  TO  WRK-HEN-RENNUM-J3
+                       MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J3
+                       MOVE   ZERO            TO  WRK-HEN-SEQNO-J3
+      *
+                       ADD    1         TO  WRK-HEN-SEQNO-J3
+                       MOVE   WRK-HEN-RENNUM-J3
+                                        TO  WRK-HEN-RENNUM
+                       MOVE   WRK-HEN-SHORI-RENNUM-J3
+                                        TO  WRK-HEN-SHORI-RENNUM
+                       MOVE   WRK-HEN-SEQNO-J3
+                                        TO  WRK-HEN-SEQNO
+                       PERFORM  26011-SETCOM-HENSYU3-SEC
+                       IF  (WRK-HEN-RENNUM-J3 = WRK-HEN-RENNUM-X)
+                       AND (WRK-HEN-SHORI-RENNUM-J3
+                                        = WRK-HEN-SHORI-RENNUM-X)
+                         ADD  1         TO  WRK-HEN-SEQNO-X
+                       END-IF
+                    END-IF
                  END-IF
                END-PERFORM
       *
@@ -11040,35 +11069,58 @@
            MOVE    WRK-HEN-SHORI-RENNUM  TO  RECE655-SHORI-RENNUM
            MOVE    WRK-HEN-SEQNO         TO  RECE655-SEQNO
       *
-           MOVE    RECE651-SRYCD(IDX)    TO  RECE655-SRYCD
-      *    後ろの全角空白を削除する
-           INITIALIZE                      ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    "1"                 TO  KANACHK-SYORIKBN
-           MOVE    RECE651-NAME (IDX) TO  KANACHK-MAE-INPUT
-           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
-           IF    ( KANACHK-RC          =   ZERO )
-           AND   ( KANACHK-MAX         >   ZERO )
-               MOVE    SPACE               TO  RECE651-NAME (IDX)
+           IF    RECE651-INGAIFLG(IDX)  =   "1"
+             IF   RECE651-GENERIC-KBN(IDX)  =  "1"
+               MOVE  RECE651-YAKKAKJNCD(IDX)(1:9)
+                                         TO  RECE655-SRYCD
+             END-IF
+      *      後ろの全角空白を削除する
+             INITIALIZE                      ORCSKANACHKAREA
+             MOVE    "1"                 TO  KANACHK-SYORI
+             MOVE    "1"                 TO  KANACHK-SYORIKBN
+             MOVE    RECE651-GENERICNAME (IDX)
+                                         TO  KANACHK-MAE-INPUT
+             CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+             IF    ( KANACHK-RC          =   ZERO )
+             AND   ( KANACHK-MAX         >   ZERO )
+               MOVE    SPACE             TO  RECE651-GENERICNAME (IDX)
                MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
-                                           TO  RECE651-NAME (IDX)
-           END-IF
-           MOVE    RECE651-NAME(IDX)     TO  RECE655-NAME
-      *    後ろの全角空白を削除する
-           INITIALIZE                      ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    "1"                 TO  KANACHK-SYORIKBN
-           MOVE    RECE651-INPUTCOMENT(IDX)
-                                       TO  KANACHK-MAE-INPUT
-           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
-           IF    ( KANACHK-RC          =   ZERO )
-           AND   ( KANACHK-MAX         >   ZERO )
-               MOVE    SPACE               TO  RECE651-INPUTCOMENT (IDX)
+                                         TO  RECE651-GENERICNAME (IDX)
+             END-IF
+             MOVE    RECE651-GENERICNAME(IDX)
+                                         TO  RECE655-NAME
+                                             RECE655-INPUTCOMENT
+           ELSE
+             MOVE    RECE651-SRYCD(IDX)  TO  RECE655-SRYCD
+      *      後ろの全角空白を削除する
+             INITIALIZE                      ORCSKANACHKAREA
+             MOVE    "1"                 TO  KANACHK-SYORI
+             MOVE    "1"                 TO  KANACHK-SYORIKBN
+             MOVE    RECE651-NAME (IDX) TO  KANACHK-MAE-INPUT
+             CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+             IF    ( KANACHK-RC          =   ZERO )
+             AND   ( KANACHK-MAX         >   ZERO )
+               MOVE    SPACE             TO  RECE651-NAME (IDX)
                MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
-                                           TO  RECE651-INPUTCOMENT (IDX)
-           END-IF
-           MOVE    RECE651-INPUTCOMENT(IDX)
+                                         TO  RECE651-NAME (IDX)
+             END-IF
+             MOVE    RECE651-NAME(IDX)   TO  RECE655-NAME
+      *      後ろの全角空白を削除する
+             INITIALIZE                      ORCSKANACHKAREA
+             MOVE    "1"                 TO  KANACHK-SYORI
+             MOVE    "1"                 TO  KANACHK-SYORIKBN
+             MOVE    RECE651-INPUTCOMENT(IDX)
+                                         TO  KANACHK-MAE-INPUT
+             CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+             IF    ( KANACHK-RC          =   ZERO )
+             AND   ( KANACHK-MAX         >   ZERO )
+               MOVE    SPACE             TO  RECE651-INPUTCOMENT (IDX)
+               MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                         TO  RECE651-INPUTCOMENT (IDX)
+             END-IF
+             MOVE    RECE651-INPUTCOMENT(IDX)
                                          TO  RECE655-INPUTCOMENT
+           END-IF
       *
            WRITE   RECE655-REC
            ADD     1                     TO  CNT-RECE655
