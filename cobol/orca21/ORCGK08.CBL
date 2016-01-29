@@ -2789,9 +2789,10 @@
            END-IF
       *    単位
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1) =   "1" )  AND
-                  (TNS-TANICD                 NOT =   ZERO ) AND
-                 ((LNK-WKSRY-SRYKBN   (IDX)   NOT =   "70" ) OR
-                  (LNK-WKSRY-AUTOKBN (IDX IDZ)    =   "S"  ))
+                  (TNS-TANICD                 NOT =   ZERO )
+      *H28.2   画像診断もすべて表示
+      *      AND ((LNK-WKSRY-SRYKBN   (IDX)   NOT =   "70" ) OR
+      *           (LNK-WKSRY-AUTOKBN (IDX IDZ)    =   "S"  ))
       *****    IF      LNK-WKSRY-SRYSURYO (IDX IDZ)   >   1
                    MOVE    LNK-WKSRY-SRYSURYO (IDX IDZ)  TO  WRK-SURYO
                    PERFORM 310121-SURYO-HEN-SEC
