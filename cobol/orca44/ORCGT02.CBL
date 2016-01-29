@@ -1384,9 +1384,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    MKPASS-OT-01    TO  WRKPARA
       *
                    OPEN    INPUT               WRK-FILE
-      *??
-           DISPLAY "WRKPARA="  WRKPARA "#" STS-WRK 
-      *??
                    IF      STS-WRK         =   "00"
                        CLOSE   WRK-FILE
                    ELSE
@@ -1622,8 +1619,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                "を含む"        DELIMITED   BY  SIZE
                                WRK-Z9          DELIMITED   BY  SIZE
                                "個の処理スクリプトが存在しません"
-                                               DELIMITED   BY  SIZE
-                               "、システム管理で確認して下さい"
                                                DELIMITED   BY  SIZE
                                                INTO    TERR-ERRMSG
                        END-STRING
