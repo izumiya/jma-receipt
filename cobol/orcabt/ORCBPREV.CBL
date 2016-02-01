@@ -241,7 +241,6 @@ grpsys COPY    "COMMON-SPA".
            END-IF
       *
            IF  PRT-TBL-KEY             =   "RECEPT2"
-           AND PRT-PRTKBN              =   "2"
                DISPLAY "For RECEIPT SKIP " PRT-PRTKBN 
                MOVE    1               TO  FLG-END 
                GO  TO  100-INIT-EXT
