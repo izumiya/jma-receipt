@@ -947,6 +947,8 @@
            03  FLG-DAISAN-GENBUTU                      PIC 9(01).
            03  FLG-ARI                                 PIC 9(01).
            03  FLG-ARI2                                PIC 9(01).
+           03  FLG-ARI3                                PIC 9(01).
+           03  FLG-ARI4                                PIC 9(01).
            03  FLG-NYUIN-CHECK                         PIC 9(01).
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
            03  FLG-RECECOM                             PIC 9(01).
@@ -13421,6 +13423,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                      UNTIL  (IDX9      >  31)
                       OR    (FLG-ARI2  =   1)
              IF  ACCT-DAY(1 IDX9)  NOT =  ZERO
+               MOVE    ZERO                TO  FLG-ARI3
+               MOVE    ZERO                TO  FLG-ARI4
+      *
                INITIALIZE                      JYURRK-REC
                MOVE    RECE02-HOSPNUM      TO  JYURRK-HOSPNUM
                MOVE    RECE02-PTID         TO  JYURRK-PTID
@@ -13452,8 +13457,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       IF    FLG-HKNCOMBI   =   ZERO
                         IF  COMB-HKNNUM(1:2) = "98" OR "90" OR "91"
                           MOVE     1       TO  FLG-ARI2
+                        ELSE
+                          MOVE     1       TO  FLG-ARI3
                         END-IF
                       END-IF
+                    ELSE
+                          MOVE     1       TO  FLG-ARI4
                     END-IF
                    END-IF
                    MOVE    "tbl_jyurrk"    TO  MCP-TABLE
@@ -13464,6 +13473,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    "key4 "             TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
+      *
+               IF  FLG-ARI2 = ZERO
+                 IF    FLG-ARI3  =   1
+                 AND   FLG-ARI4  =   1
+                   CONTINUE
+                 ELSE
+                   MOVE   1   TO   FLG-ARI2
+                 END-IF
+               END-IF
              END-IF
            END-PERFORM
       *
