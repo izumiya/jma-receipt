@@ -502,7 +502,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                                        TO  SHELLTBL-ARG1
 grpsys         MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
                MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
-               MOVE    SPACE           TO  SHELLTBL-ARG4
+               MOVE    "1"             TO  SHELLTBL-ARG4
                IF    ( WRK-PARA-PRTFLG     =  "5" )
                    MOVE    TPRT-TITLE  TO  SHELLTBL-ARG5
                    MOVE    SPA-CLIENT-SHOWDIALOG
