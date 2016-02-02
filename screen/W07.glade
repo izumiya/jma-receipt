@@ -9156,16 +9156,16 @@
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
-          <signal>
-            <name>changed</name>
-            <handler>entry_changed</handler>
-            <data>CHANGED</data>
-          </signal>
-          <signal>
-            <name>activate</name>
-            <handler>send_event</handler>
-            <data>ACTIVATE</data>
-          </signal>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
             </widget>
           </widget>
         </widget>
@@ -9343,11 +9343,48 @@
             </widget>
           </widget>
           <widget>
+            <class>GtkPandaCombo</class>
+            <name>MSG5_DSPKBN_COMBO</name>
+            <x>270</x>
+            <y>296</y>
+            <width>200</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>MSG5_DSPKBN</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text></text>
+              <input_mode>ASCII</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
             <class>GtkLabel</class>
             <name>label279</name>
             <x>40</x>
-            <y>296</y>
-            <width>240</width>
+            <y>346</y>
+            <width>224</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -9361,10 +9398,28 @@
             <wrap>False</wrap>
           </widget>
           <widget>
+            <class>GtkLabel</class>
+            <name>label388</name>
+            <x>40</x>
+            <y>296</y>
+            <width>224</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>死亡区分更新確認メッセージの表示</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
             <class>GtkPandaCombo</class>
             <name>SYOKBN_DSPKBN_COMBO</name>
             <x>270</x>
-            <y>346</y>
+            <y>396</y>
             <width>200</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9438,7 +9493,7 @@
             <class>GtkPandaCombo</class>
             <name>SRYKA_DSPKBN_COMBO</name>
             <x>270</x>
-            <y>296</y>
+            <y>346</y>
             <width>310</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9475,7 +9530,7 @@
             <class>GtkPandaCombo</class>
             <name>UTAGAIFLG_KBN_COMBO</name>
             <x>270</x>
-            <y>396</y>
+            <y>446</y>
             <width>310</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9587,7 +9642,7 @@
             <class>GtkLabel</class>
             <name>label280</name>
             <x>40</x>
-            <y>346</y>
+            <y>396</y>
             <width>240</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9605,7 +9660,7 @@
             <class>GtkLabel</class>
             <name>label368</name>
             <x>40</x>
-            <y>396</y>
+            <y>446</y>
             <width>230</width>
             <height>24</height>
             <sensitive>True</sensitive>

@@ -126,6 +126,11 @@
       *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *  04.07.00    NACL-多々納  15/03/XX  低紹介率追加
       *  04.07.00    NACL-多々納  15/06/11  保険初期表示区分追加
+      *
+      *  04.08.01    NACL-藤原    16/01/20  転帰区分の死亡変更時の患者
+      *                                     情報更新対応
+      *                                     死亡区分更新確認メッセージ表示
+      *                                     有無区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1153,6 +1158,18 @@
                                13  SPA-GMN-MSG4-DSPKBNL    PIC X(01).
                                13  SPA-GMN-MSG4-DSPKBN-F1L PIC X(01).
                                13  SPA-GMN-MSG4-DSPKBNMEIL PIC X(10).
+      *
+                       09  SPA-GMN-MSG5-DSPKBN-G.
+                           11  SPA-GMN-MSG5-DSPKBN         PIC X(01).
+                           11  SPA-GMN-MSG5-DSPKBN-F1      PIC X(01).
+                           11  SPA-GMN-MSG5-DSPKBNMEI      PIC X(10).
+      *
+                       09  SPA-GMN-MSG5-DSPKBNLST-G.
+                           11  SPA-GMN-MSG5-DSPKBN-MAX     PIC 9(03).
+                           11  SPA-GMN-MSG5-DSPKBNLST      OCCURS  2.
+                               13  SPA-GMN-MSG5-DSPKBNL    PIC X(01).
+                               13  SPA-GMN-MSG5-DSPKBN-F1L PIC X(01).
+                               13  SPA-GMN-MSG5-DSPKBNMEIL PIC X(10).
       *
                        09  SPA-GMN-SRYKA-DSPKBN-G.
                            11  SPA-GMN-SRYKA-DSPKBN        PIC X(01).
@@ -2195,6 +2212,10 @@
            MOVE    "0 表示しない"      TO  SPA-GMN-MSG4-DSPKBNLST(1)
            MOVE    "1 表示する"        TO  SPA-GMN-MSG4-DSPKBNLST(2)
            MOVE    2                   TO  SPA-GMN-MSG4-DSPKBN-MAX
+      *
+           MOVE    "0 表示する"        TO  SPA-GMN-MSG5-DSPKBNLST(1)
+           MOVE    "1 表示しない"      TO  SPA-GMN-MSG5-DSPKBNLST(2)
+           MOVE    2                   TO  SPA-GMN-MSG5-DSPKBN-MAX
       *
            MOVE    "0 標準（最終受診科、遷移時は選択診療科）"
                                        TO  SPA-GMN-SRYKA-DSPKBNLST(1)
@@ -4674,6 +4695,27 @@
                                        TO  SPA-GMN-MSG4-DSPKBN-G
            END-IF
       *
+      *    死亡区分更新確認メッセージ表示有無
+           MOVE    SYS-1042-MSG5-DSPKBN
+                                       TO  SPA-GMN-MSG5-DSPKBN
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-MSG5-DSPKBN-MAX
+               IF      SPA-GMN-MSG5-DSPKBN
+                                       =   SPA-GMN-MSG5-DSPKBNL (IDY)
+                   MOVE    SPA-GMN-MSG5-DSPKBNLST(IDY)
+                                       TO  SPA-GMN-MSG5-DSPKBN-G
+                   MOVE    1           TO  FLG-OK
+                   MOVE    SPA-GMN-MSG5-DSPKBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-MSG5-DSPKBNLST (1)
+                                       TO  SPA-GMN-MSG5-DSPKBN-G
+           END-IF
+      *
       *    診療科初期表示区分
            MOVE    SYS-1042-SRYKA-DSPKBN
                                        TO  SPA-GMN-SRYKA-DSPKBN
@@ -5387,6 +5429,7 @@
            MOVE    W07-MSG2-DSPKBN     TO  SPA-GMN-MSG2-DSPKBN-G
            MOVE    W07-MSG3-DSPKBN     TO  SPA-GMN-MSG3-DSPKBN-G
            MOVE    W07-MSG4-DSPKBN     TO  SPA-GMN-MSG4-DSPKBN-G
+           MOVE    W07-MSG5-DSPKBN     TO  SPA-GMN-MSG5-DSPKBN-G
            MOVE    W07-SRYKA-DSPKBN    TO  SPA-GMN-SRYKA-DSPKBN-G
            MOVE    W07-SYOKBN-DSPKBN   TO  SPA-GMN-SYOKBN-DSPKBN-G
            MOVE    W07-UTAGAIFLG-KBN   TO  SPA-GMN-UTAGAIFLG-KBN-G
@@ -5875,6 +5918,10 @@
       *            同一病名警告メッセージ表示有無チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4111-MSG4-DSPKBN-CHK-SEC
+                   END-IF
+      *            死亡区分更新確認メッセージ表示有無チェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4111-MSG5-DSPKBN-CHK-SEC
                    END-IF
       *            診療科初期表示区分チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -7509,7 +7556,7 @@
        4107-KOHHBTKBN-FLG-EXT.
            EXIT.
       *****************************************************************
-      *    保険初期表示区分チェック処理
+      *    公費法別一覧表示区分チェック処理
       *****************************************************************
        4107-HKNINITKBN-FLG-SEC       SECTION.
       *
@@ -9185,6 +9232,29 @@
        4111-MSG4-DSPKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    死亡区分更新確認メッセージ表示有無チェック処理（病名機能情報）
+      *****************************************************************
+       4111-MSG5-DSPKBN-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-MSG5-DSPKBN-MAX
+               IF      SPA-GMN-MSG5-DSPKBN
+                                       =   SPA-GMN-MSG5-DSPKBNL (IDX)
+                   MOVE    SPA-GMN-MSG5-DSPKBNLST(IDX)
+                                          TO  SPA-GMN-MSG5-DSPKBN-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    508             TO  SPA-GMN-CUR
+               MOVE    "4009"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4111-MSG5-DSPKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    診療科初期表示区分チェック処理（病名機能情報）
       *****************************************************************
        4111-SRYKA-DSPKBN-CHK-SEC       SECTION.
@@ -10515,6 +10585,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-MSG2-DSPKBN     TO  SYS-1042-MSG2-DSPKBN
            MOVE    SPA-GMN-MSG3-DSPKBN     TO  SYS-1042-MSG3-DSPKBN
            MOVE    SPA-GMN-MSG4-DSPKBN     TO  SYS-1042-MSG4-DSPKBN
+           MOVE    SPA-GMN-MSG5-DSPKBN     TO  SYS-1042-MSG5-DSPKBN
            MOVE    SPA-GMN-SRYKA-DSPKBN    TO  SYS-1042-SRYKA-DSPKBN
            MOVE    SPA-GMN-SYOKBN-DSPKBN   TO  SYS-1042-SYOKBN-DSPKBN
            MOVE    SPA-GMN-UTAGAIFLG-KBN   TO  SYS-1042-UTAGAIFLG-KBN
@@ -11879,6 +11950,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-MSG4-DSPKBN-MAX
                                        TO  W07-MSG4-DSPKBN-COUNT
       *
+      *    死亡区分更新確認メッセージ表示有無区分（病名機能情報）
+           MOVE    SPA-GMN-MSG5-DSPKBN-G   TO  W07-MSG5-DSPKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-MSG5-DSPKBN-MAX
+               MOVE    SPA-GMN-MSG5-DSPKBNLST (IDX)
+                                       TO  W07-MSG5-DSPKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-MSG5-DSPKBN-MAX
+                                       TO  W07-MSG5-DSPKBN-COUNT
+      *
       *    診療科初期表示区分（病名機能情報）
            MOVE    SPA-GMN-SRYKA-DSPKBN-G   TO  W07-SRYKA-DSPKBN
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -12485,6 +12566,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "4008"
                    MOVE    "疑いフラグ設定区分がありません。"
                                                        TO  SPA-ERRMSG
+               WHEN    "4009"
+                   MOVE
+                  "死亡区分更新確認メッセージ表示有無区分がありません。"
+                                                       TO  SPA-ERRMSG
       *        会計照会機能情報
                WHEN    "5001"
                    MOVE    "全科の表示順区分がありません。"
@@ -12984,6 +13069,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "SJKBN"           TO   MCP-WIDGET
                WHEN    507
                    MOVE  "UTAGAIFLG_KBN"   TO   MCP-WIDGET
+               WHEN    508
+                   MOVE  "MSG5_DSPKBN"     TO   MCP-WIDGET
       *会計照会情報
                WHEN    600
                    MOVE  "SRYKBN_FLG"      TO   MCP-WIDGET
@@ -13422,6 +13509,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "MSG3_DSPKBN"
                    MOVE    503             TO  SPA-GMN-CUR
                WHEN    "MSG4_DSPKBN"
+                   MOVE    508             TO  SPA-GMN-CUR
+               WHEN    "MSG5_DSPKBN"
                    MOVE    504             TO  SPA-GMN-CUR
                WHEN    "SRYKA_DSPKBN"
                    MOVE    505             TO  SPA-GMN-CUR

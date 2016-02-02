@@ -888,3 +888,16 @@ path	key47	{
 		;
 	};
 };
+
+path	key48	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key48_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     TENKIKBN  =   '2'
+			AND   DLTFLG      =   ' '
+		;
+	};
+};

@@ -117,6 +117,8 @@
       *                                     登録時間を追加
       *
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
+      *  04.08.02    NACL-藤原    16/01/20  転帰区分の死亡変更時の患者
+      *                                     情報更新対応
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -412,6 +414,7 @@
       *       
                            11  SPA-NAI-C02-SRYYMD-OLD      PIC X(08).
                            11  SPA-NAI-C02-SRYKA-OLD       PIC X(02).
+                           11  SPA-NAI-C02-TENKIKBN-OLD    PIC X(01).
       * 
                            11  SPA-NAI-C02-HOSOKU-TBL.
                                13  SPA-NAI-C02-HOSOKU-OCC  OCCURS  3.
@@ -434,6 +437,7 @@
                                                            PIC X(40).
                                13  SPA-NAI-C02-TBYOMEIHENFLG
                                                            PIC X(01).
+                               13  SPA-NAI-C02-TTENKIKBN   PIC X(01).
       *
                                13  SPA-NAI-C02-TUPDOWN     PIC 9(01).
       *
@@ -472,6 +476,9 @@
       *            同一病名警告メッセージ表示有無区分
                        09  SPA-C02-1042-MSG4-DSPKBN
                                                    PIC X(01).
+      *            死亡区分更新確認メッセージ表示有無区分
+                       09  SPA-C02-1042-MSG5-DSPKBN
+                                                   PIC X(01).
       *            診療科初期表示区分
                        09  SPA-C02-1042-SRYKA-DSPKBN
                                                    PIC X(01).
@@ -492,7 +499,10 @@
                            11  SPA-C02-KEIKOKU-FLG3
                                                    PIC 9(01).  
       *            警告メッセージ用病名
-                       09  SPA-C02-KEIKOKU-BYOMEI  PIC X(80).
+                       09  SPA-C02-KEIKOKU-MSG-AREA.
+                           11  SPA-C02-KEIKOKU-BYOMEI  PIC X(80).
+                           11  SPA-C02-KEIKOKU-SRYYMD  PIC X(22).
+                           11  SPA-C02-KEIKOKU-SRYKA   PIC X(20).
       *            更新フラグ
                        09  SPA-C02-UPDFLG          PIC X(01).
       *            病名コード移行用領域

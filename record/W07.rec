@@ -1004,6 +1004,13 @@ W07 {
           count int;
             item varchar(12)[2];
         };
+        MSG5_DSPKBN_COMBO {
+          MSG5_DSPKBN {
+            textdata varchar(12);
+          };
+          count int;
+            item varchar(12)[2];
+        };
         SRYKA_DSPKBN_COMBO {
           SRYKA_DSPKBN {
             textdata varchar(40);
