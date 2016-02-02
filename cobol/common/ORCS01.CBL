@@ -25750,6 +25750,7 @@
                    END-IF
                 ELSE
                  IF  WK-KOH-COMPFTN(1)  =  ALL"9"
+                 OR  WK-TAIHI-CHITAIFLG(2) =  1
                    IF  LNK-SYU-KOH-COMPFTN(1) < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
                        MOVE  LNK-SYU-KOH-COMPFTN(1)
@@ -25758,54 +25759,35 @@
                  ELSE
                    IF  WK-KOH-COMPFTN(1)      < WK-KOH-COMPFTN(2)
                    AND LNK-SYU-KOH1HKNNUM   NOT =  SPACE
-                     IF  WK-TAIHI-CHITAIFLG(2) =  1
-                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(1) +  5
-                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
-                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
-                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(2)
-                     ELSE
                        MOVE  WK-KOH-COMPFTN(1)
                                             TO  WK-KOH-COMPFTN(2)
-                     END-IF
                    END-IF
                  END-IF
                 END-IF
                WHEN    3
                  IF  WK-KOH-COMPFTN(2)  =  ALL"9"
+                 OR  WK-TAIHI-CHITAIFLG(3) =  1
                    IF  LNK-SYU-KOH-COMPFTN(2) < WK-KOH-COMPFTN(3)
                        MOVE  LNK-SYU-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(2)      < WK-KOH-COMPFTN(3)
-                     IF  WK-TAIHI-CHITAIFLG(3) =  1
-                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(2) +  5
-                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
-                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
-                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(3)
-                     ELSE
                        MOVE  WK-KOH-COMPFTN(2)
                                             TO  WK-KOH-COMPFTN(3)
-                     END-IF
                    END-IF
                  END-IF
                WHEN    4
                  IF  WK-KOH-COMPFTN(3)  =  ALL"9"
+                 OR  WK-TAIHI-CHITAIFLG(4) =  1
                    IF  LNK-SYU-KOH-COMPFTN(3) < WK-KOH-COMPFTN(4)
                        MOVE  LNK-SYU-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
                    END-IF
                  ELSE
                    IF  WK-KOH-COMPFTN(3)      < WK-KOH-COMPFTN(4)
-                     IF  WK-TAIHI-CHITAIFLG(4) =  1
-                       COMPUTE WK-KEISAN = LNK-SYU-KOH-COMPFTN(3) +  5
-                       COMPUTE WK-KEISAN = WK-KEISAN              / 10
-                       COMPUTE WK-KEISAN = WK-KEISAN              * 10
-                       MOVE  WK-KEISAN      TO  WK-KOH-COMPFTN(4)
-                     ELSE
                        MOVE  WK-KOH-COMPFTN(3)
                                             TO  WK-KOH-COMPFTN(4)
-                     END-IF
                    END-IF
                  END-IF
              END-EVALUATE
