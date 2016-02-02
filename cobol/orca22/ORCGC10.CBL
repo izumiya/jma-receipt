@@ -2043,8 +2043,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                        WRK-STNUM-O (IDXX)  BY  1
                                UNTIL   IDX     >   WRK-EDNUM-O (IDXX)
                                OR      SPA-CIDCD       NOT =   SPACE
-                           IF      SPA-NAI-C02-TTENKIKBN (IDX)
-                                                   NOT =   "2"
+      *********************IF      SPA-NAI-C02-TTENKIKBN (IDX)
+      *********************                        NOT =   "2"
                                MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                                MOVE    SPA-NAI-C02-PTID
                                                        TO  PTINF-PTID
@@ -2055,7 +2055,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                END-IF
                                MOVE    WRK-EDNUM-O (IDXX)  TO  IDX
                                MOVE    5                   TO  IDXX
-                           END-IF
+      *********************END-IF
                        END-PERFORM
                    END-IF
                END-PERFORM
