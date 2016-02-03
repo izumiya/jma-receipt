@@ -155,7 +155,7 @@
            03  WRK-GMN-CUR         PIC 9(02).
            03  WRK-MCP-WIDGET      PIC X(64).
       *
-       01  WRKPARA                 PIC X(200).
+       01  WRKPARA                 PIC X(512).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -642,6 +642,12 @@
                GO      TO      410-INPUT-CHK-EXT
            END-IF
       *
+      *    処理スクリプトの存在チェック
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       25
+               PERFORM 3101-SCRIPT-CHECK-SEC
+           END-PERFORM
+      *
            .
        410-INPUT-CHK-EXT.
            EXIT.
@@ -874,15 +880,15 @@
       *
            MOVE    W14-CHKBTN(IDX IDY)    TO  SPA-GMN-CHKFLG (IDX IDY)
       *
-      *    処理スクリプトの存在チェック
-           PERFORM 3101-SCRIPT-CHECK-SEC
-      *
       *    入力チェック処理
            MOVE    ZERO                TO  FLG-TOUROKU
            PERFORM 410-INPUT-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      420-CHKFLG-CHK-EXT
            END-IF
+      *
+      *    処理スクリプトの存在チェック
+           PERFORM 3101-SCRIPT-CHECK-SEC
       *
            MOVE    WRK-GMN-CUR         TO  SPA-GMN-CUR
            COMPUTE IDX     =   (WRK-IDX3  +   3)  /   4
