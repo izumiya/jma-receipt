@@ -1879,7 +1879,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (SPA-GMN-SRYCD       =   SPACE )
                MOVE    "0008"              TO  SPA-ERRCD
                MOVE    2                   TO  SPA-GMN-CUR
+           ELSE
+      *H28.2
+               IF      SPA-GMN-RENNUM       >   ZERO
+                   IF      SPA-GMN-SRYCD    NOT =   SPA-GMN-TSRYCD
+                                                       (SPA-GMN-RENNUM)
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    1                   TO  SPA-GMN-CUR
+                   END-IF
+               ELSE
+      *            新規は、点数マスタチェック存在チェック
+                   PERFORM 41021-SRYCD-HEN-SEC
+                   IF      FLG-TENSU       NOT =   ZERO
+                       MOVE    "0012"              TO  SPA-ERRCD
+                       MOVE    2                   TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
            END-IF
+      *
            IF     (SPA-ERRCD           =   SPACE )
       *        初回算定日チェック
                IF      SPA-GMN-MSANTEID    >   ZERO
@@ -1907,6 +1924,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 900-SANTEI-INV-SEC
                IF      FLG-SANTEI          =   1
                    CONTINUE
+      *            初診は警告
+                   IF     (SPA-KEIFLG3         =   ZERO )
+                       PERFORM 45012-SYOSIN-CHK-SEC
+                   END-IF
                ELSE
                    MOVE    "0010"              TO  SPA-ERRCD
                    MOVE    2                   TO  SPA-GMN-CUR
@@ -1963,6 +1984,71 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        45011-SANTEIPLUS-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    新規の初診料チェック処理
+      *****************************************************************
+       45012-SYOSIN-CHK-SEC                SECTION.
+      *
+      *    初診料のみ対象
+           IF      SPA-GMN-SRYCD       =   "111000110"
+                                       OR  "111700210"
+                                       OR  "111003610"
+                                       OR  "111700110"
+                                       OR  "113003510"
+                                       OR  "113003710"
+                                       OR  "101110010"
+                                       OR  "099110001"
+                                       OR  "111012510"
+                                       OR  "111012710"
+               CONTINUE
+           ELSE
+               GO      TO      45012-SYOSIN-CHK-EXT
+           END-IF
+      *    初診算定チェック
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    "999999"            TO  SANTEI-SRYYM
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key11"             TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+           MOVE    SPACE               TO  WRK-SRYYMD
+           PERFORM
+                   UNTIL       (FLG-SANTEI     =   1    )
+      *        初回初診日
+               MOVE    SANTEI-SRYYM        TO  WRK-SRYYM-X
+               MOVE    ZERO                TO  WRK-SRYDD
+               PERFORM VARYING     IDX2    FROM    31  BY  -1
+                       UNTIL      (IDX2    <   1    )
+                   IF      SANTEI-DAY (IDX2)   >   ZERO
+                       MOVE    IDX2            TO  WRK-SRYDD
+                       MOVE    1               TO  IDX2
+                   END-IF
+               END-PERFORM
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key11"             TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    初診算定日登録あり
+           IF      WRK-SRYYM-X         <=  SPA-NAI-SRYYM
+               MOVE    "K035"          TO  SPA-ERRCD
+               MOVE    1               TO  SPA-KEIFLG3
+           END-IF
+           .
+       45012-SYOSIN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2695,6 +2781,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0034"
                    MOVE    "算定履歴が存在しません。更新できません。"
                                                        TO  SPA-ERRMSG
+      *H28.2
+               WHEN    "K035"
+                   STRING  "警告！"
+                           "既に初診料の登録があります。"
+                           "診療行為で登録して下さい。"
+                           DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
+                   END-STRING
       *H25.9
                WHEN    "1001"
                    MOVE    "更新処理でエラーになりました"
