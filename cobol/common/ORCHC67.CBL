@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
+      *  04.08.00    NACL-多々納  16/02/03  プログラムオプションメモ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -141,6 +142,16 @@
            03  WRK-THH             PIC 9(02).
            03  WRK-F1              PIC X(01)   VALUE    ":".
            03  WRK-TSS             PIC 9(02).
+      *H28.2
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-YUKOSTYMD          PIC X(08).
+           03  PARA-YUKOEDYMD          PIC X(08).
+           03  PARA-MEMO               PIC X(100).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(100).
+           03  WRK-PARA-MAX            PIC 9(04).
       *
       *
       *****************************************************************
@@ -187,6 +198,10 @@
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *H28.2
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    印刷パラメタ
            COPY    "CPORCSMKPRT.INC".
@@ -247,10 +262,83 @@
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
+      *    プログラムオプション取込み
+           PERFORM 100-OPTION-SELECT-SEC
+      *
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
            .
        100-INIT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+      *    有効開始日
+           MOVE    "YUKOSTYMD"         TO  WRK-PARA-NAME
+           MOVE    8                   TO  WRK-PARA-MAX
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:WRK-PARA-MAX)
+                                       TO  PARA-YUKOSTYMD
+      *    有効終了日
+           MOVE    "YUKOEDYMD"         TO  WRK-PARA-NAME
+           MOVE    8                   TO  WRK-PARA-MAX
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:WRK-PARA-MAX)
+                                       TO  PARA-YUKOEDYMD
+      *    メモ
+           MOVE    "MEMO"              TO  WRK-PARA-NAME
+           MOVE    100                 TO  WRK-PARA-MAX
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:WRK-PARA-MAX)
+                                       TO  PARA-MEMO
+      *    有効期間初期設定
+           IF      PARA-YUKOSTYMD      =   SPACE
+               MOVE    "00000000"          TO  PARA-YUKOSTYMD
+           END-IF
+           IF      PARA-YUKOEDYMD      =   SPACE
+               MOVE    "99999999"          TO  PARA-YUKOEDYMD
+           END-IF
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHC67"           TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           MOVE    SPACE               TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+               IF      WRK-PARA-MAX        >   ZERO
+                    MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                                   TO  WRK-PARA
+               END-IF
+           ELSE
+      *        全角判定
+               IF      WRK-PARA-MAX        >   ZERO
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                               TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-PARA-MAX        TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
+               END-IF
+           END-IF
+           .
+       1001-OPTION-CALL-EXT.
            EXIT.
       *****************************************************************
       *    初期編集処理
@@ -546,6 +634,13 @@
            MOVE    TBL-DRCD   (IDX)    TO  WRK-DRCD
            PERFORM 2009-DRNAME-HEN-SEC
            MOVE    WRK-DRCD-NAME       TO  HCM67-DRNAME  (CNT-LINE)
+      *
+      *H28.2
+      *    プログラムオプション編集
+           IF     (PARA-YUKOSTYMD      <=  SPA-SYSYMD )
+              AND (PARA-YUKOEDYMD      >=  SPA-SYSYMD )
+               MOVE    PARA-MEMO           TO  HCM67-MSG
+           END-IF
            .
        20021-YYKHYO-MEI-EXT.
            EXIT.
