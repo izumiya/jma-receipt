@@ -517,6 +517,7 @@
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
            INITIALIZE                      XML-MEDICALREQ
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_medicalv2req"  TO  MCP-TABLE
@@ -535,6 +536,8 @@
                MOVE   "97"             TO  WRK-ERRCD
                GO     TO   1000-APTXMLREAD-EXT
            END-IF
+      *
+           MOVE    SPACE               TO  APIREQ-PATIENTINFOREQ
       *
            MOVE    "XMLREAD"           TO  MCP-FUNC
            MOVE    "xml_medicalv2req"  TO  MCP-TABLE
