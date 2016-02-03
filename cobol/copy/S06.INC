@@ -56,16 +56,25 @@
                 04  S06-NYKNHOHO-ITEM      PIC X(33)   OCCURS  50 TIMES.
               03  S06-GAI-NYUKIN           PIC S9(9).
               03  S06-GAI-NYUKIN-STATE     PIC S9(9)   BINARY.
-              03  S06-GAI-NYUKIN-MAX       PIC S9(9).
-              03  S06-GAI-NYUKIN-MAX-STATE PIC S9(9)   BINARY.
+              03  S06-GAI-LNYUKIN-MAX      PIC X(10).
+              03  S06-GAI-NYUKIN-MAX       PIC X(12).
+              03  S06-GAI-HENKIN           PIC S9(9).
+              03  S06-GAI-HENKIN-STATE     PIC S9(9)   BINARY.
+              03  S06-GAI-LHENKIN-MAX      PIC X(10).
+              03  S06-GAI-HENKIN-MAX       PIC X(12).
               03  S06-NYU-NYUKIN           PIC S9(9).
               03  S06-NYU-NYUKIN-STATE     PIC S9(9)   BINARY.
-              03  S06-NYU-NYUKIN-MAX       PIC S9(9).
-              03  S06-NYU-NYUKIN-MAX-STATE PIC S9(9)   BINARY.
+              03  S06-NYU-LNYUKIN-MAX      PIC X(10).
+              03  S06-NYU-NYUKIN-MAX       PIC X(12).
+              03  S06-NYU-HENKIN           PIC S9(9).
+              03  S06-NYU-HENKIN-STATE     PIC S9(9)   BINARY.
+              03  S06-NYU-LHENKIN-MAX      PIC X(10).
+              03  S06-NYU-HENKIN-MAX       PIC X(12).
+              03  S06-LBLNYUKIN            PIC X(20).
               03  S06-NYUKIN               PIC S9(9).
               03  S06-NYUKIN-STATE         PIC S9(9)   BINARY.
-              03  S06-NYUKIN-MAX           PIC S9(9).
-              03  S06-NYUKIN-MAX-STATE     PIC S9(9)   BINARY.
+              03  S06-LNYUKIN-MAX          PIC X(10).
+              03  S06-NYUKIN-MAX           PIC X(12).
               03  S06-CMB-SKYPRTKBN.
                 04  S06-SKYPRTKBN          PIC X(32).
                 04  S06-SKYPRTKBN-COUNT    PIC S9(9)   BINARY.

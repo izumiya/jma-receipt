@@ -69,25 +69,54 @@ S06 {
       numdata number(9);
       state int;
     };
+    GAI_LNYUKIN_MAX {
+      textdata varchar(10);
+    };
     GAI_NYUKIN_MAX {
+      textdata varchar(12);
+    };
+    GAI_HENKIN {
       numdata number(9);
       state int;
+    };
+    GAI_LHENKIN_MAX {
+      textdata varchar(10);
+    };
+    GAI_HENKIN_MAX {
+      textdata varchar(12);
     };
     NYU_NYUKIN {
       numdata number(9);
       state int;
     };
+    NYU_LNYUKIN_MAX {
+      textdata varchar(10);
+    };
     NYU_NYUKIN_MAX {
+      textdata varchar(12);
+    };
+    NYU_HENKIN {
       numdata number(9);
       state int;
+    };
+    NYU_LHENKIN_MAX {
+      textdata varchar(10);
+    };
+    NYU_HENKIN_MAX {
+      textdata varchar(12);
+    };
+    LBLNYUKIN {
+      textdata varchar(20);
     };
     NYUKIN {
       numdata number(9);
       state int;
     };
+    LNYUKIN_MAX {
+      textdata varchar(10);
+    };
     NYUKIN_MAX {
-      numdata number(9);
-      state int;
+      textdata varchar(12);
     };
     CMB_SKYPRTKBN {
       SKYPRTKBN {
