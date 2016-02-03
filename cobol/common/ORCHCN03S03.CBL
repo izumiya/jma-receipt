@@ -49,7 +49,10 @@
            03  IDX0                        PIC 9(05).
            03  IDXD                        PIC 9(05).
       *
-      *01  WRK-AREA.
+       01  WRK-AREA.
+           03  WRK-SRYYMD.
+               05  WRK-SRYYM               PIC X(06).
+               05  WRK-SRYDD               PIC 9(02).
       *
        01  CONST-AREA.
            03  CONST-SYU-MAX               PIC 9(03)   VALUE 10.
@@ -168,16 +171,37 @@
       *
            PERFORM 900-SYUNOU-KEY-SEL-SEC
       *
-           PERFORM 900-HKNCOMBI-KEY-SEL-SEC
-           IF    ( FLG-HKNCOMBI    =   ZERO )
-               IF    ( COMB-TEKSTYMD   <   ORCHCN03S03-SKYSTYMD )
-                   MOVE    COMB-TEKSTYMD   TO  ORCHCN03S03-SKYSTYMD
-               END-IF
+      *    PERFORM 900-HKNCOMBI-KEY-SEL-SEC
+      *    IF    ( FLG-HKNCOMBI    =   ZERO )
+      *        IF    ( COMB-TEKSTYMD   <   ORCHCN03S03-SKYSTYMD )
+      *            MOVE    COMB-TEKSTYMD   TO  ORCHCN03S03-SKYSTYMD
+      *        END-IF
       *
-               IF    ( COMB-TEKEDYMD   >   ORCHCN03S03-SKYEDYMD )
-                   MOVE    COMB-TEKEDYMD   TO  ORCHCN03S03-SKYEDYMD
-               END-IF
-           END-IF
+      *        IF    ( COMB-TEKEDYMD   >   ORCHCN03S03-SKYEDYMD )
+      *            MOVE    COMB-TEKEDYMD   TO  ORCHCN03S03-SKYEDYMD
+      *        END-IF
+      *    END-IF
+      *
+           MOVE    SYU-SRYYMD          TO  WRK-SRYYMD
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   31 )
+      *
+             IF  ( SYU-DAY (IDX0)  >   ZERO )
+      *
+                 MOVE    IDX0              TO  WRK-SRYDD
+      *
+                 IF    ( WRK-SRYYMD    <   ORCHCN03S03-SKYSTYMD )
+                     MOVE    WRK-SRYYMD    TO  ORCHCN03S03-SKYSTYMD
+                 END-IF
+      *
+                 IF    ( WRK-SRYYMD    >   ORCHCN03S03-SKYEDYMD )
+                     MOVE    WRK-SRYYMD    TO  ORCHCN03S03-SKYEDYMD
+                 END-IF
+      *
+             END-IF
+      *
+           END-PERFORM
       *
            .
        20011-SEIKYU-KIKAN-EDIT-EXT.
