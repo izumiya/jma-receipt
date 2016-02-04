@@ -8434,11 +8434,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    1                   TO  FLG-TOUROKU 
            MOVE    1                   TO  FLG-TOUROKU2
       *
-           EVALUATE    SPA-P02-GAMEN
+      *    EVALUATE    SPA-P02-GAMEN
       *        保険組合せ履歴
-               WHEN    "P027"
-                   MOVE    2               TO  FLG-TOUROKU2
-           END-EVALUATE
+      *        WHEN    "P027"
+      *            MOVE    2               TO  FLG-TOUROKU2
+      *    END-EVALUATE
       *
       *    保険組合せを作成する（入力チェック込み）
            PERFORM 450-HKNCOMBI-SEC

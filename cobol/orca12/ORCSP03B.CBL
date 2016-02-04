@@ -50,6 +50,7 @@
       * 04.07.00     NACL-多々納  12/11/16  長期高額療養重複不可
       * 04.07.00     NACL-多々納  13/11/13  生活保護重複警告対応
       * 04.07.00     NACL-多々納  14/12/XX  難病等対応、公費名称編集修正
+      * 04.08.00     NACL-多々納  16/02/XX  京都府　京都子重複可対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2095,7 +2096,13 @@
       *                小児特定　Ｈ２６．１２まで
                           OR ((SPA-GMN-KOHNUM(IDX-K)   =   "052" ) AND
                               (SPA-NAI-KTEKSTYMD (IDX-K)
-                                                       <=  "20141231")))
+                                                       <=  "20141231"))
+      *H28.2
+      *                京都府　京都子　H25.9.1から
+                          OR ((SPA-GMN-KOHNUM(IDX-K)   =   "745" ) AND
+                              (SPA-PREFNUM             =   26    ) AND
+                              (SPA-NAI-KTEKSTYMD (IDX-K)
+                                                       >=  "20130901")))
                            CONTINUE
                        ELSE
       *
@@ -2253,6 +2260,12 @@
                          OR   (SPA-GMN-KOHNUM(IDX-K)   =   "970" )
       *H27.1             難病
                           OR ( SPA-GMN-KOHNUM(IDX-K)   =   "054" )
+      *H28.2
+      *                京都府　京都子　H25.9.1から
+                          OR ((SPA-GMN-KOHNUM(IDX-K)   =   "745" ) AND
+                              (SPA-PREFNUM             =   26    ) AND
+                              (SPA-NAI-KTEKSTYMD (IDX-K)
+                                                       >=  "20130901"))
       *
                              MOVE    ZERO              TO  FLG-CHK
                        END-IF

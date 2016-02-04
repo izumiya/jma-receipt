@@ -39,6 +39,7 @@
       *  04.06.00    NACL-多々納  12/09/25  生活保護重複対応
       *  04.08.00    NACL-多々納  13/07/XX  第三者行為対応
       *  04.07.00    NACL-多々納  14/12/XX  難病等対応
+      *  04.08.00    NACL-多々納  16/02/XX  京都府　京都子重複可対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -614,6 +615,14 @@
                    OR      (LNK-COMB-KOHHKNNUM (IDX IDKH)
                                                    =   "054"   )
       *
+      *H28.2
+      *            京都府　京都子　H25.9.1から
+                   OR  ((LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                 =   "745" ) AND
+                        (SPA-PREFNUM             =   26    ) AND
+                        (LNK-COMB-TEKSTYMD(IDX)
+                                                 >=  "20130901"))
+      *
                        MOVE    LNK-COMB-KOHHKNNUM (IDX IDKH)
                                                    TO  WRK-KOHNUM
                        MOVE    LNK-COMB-KOHID (IDX IDKH)
@@ -676,6 +685,14 @@
                       (SPA-PTKOH-KOHID (IDX4)  =   WRK-KOHID)
                    MOVE    SPA-PTKOH-JKYSNUM (IDX4)
                                                TO  WRK-JKYSNUM
+      *H28.2
+      *            京都府　京都子は負担者番号を表示
+                   IF      (LNK-COMB-KOHHKNNUM (IDX IDKH)
+                                                   =   "745" )
+                       MOVE    SPA-PTKOH-FTNJANUM(IDX4)
+                                               TO  WRK-JKYSNUM
+                   END-IF
+      *
                    MOVE    SPA-PTKOH-MAX       TO  IDX4
                END-IF
            END-PERFORM
