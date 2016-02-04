@@ -457,6 +457,8 @@
       *****************************************************************
        1000-RGTXMLREAD-SEC   SECTION.
       *
+           INITIALIZE                      XML-APIREQ
+           INITIALIZE                      XML-ACCEPTREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_acceptv2req"   TO  MCP-TABLE

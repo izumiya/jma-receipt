@@ -253,8 +253,6 @@
       *
       *    排他制御サブパラメタ
            COPY    "CPORCSLOCK.INC".
-      *    ユーザプログラム起動チェックサブパラメタ
-      **    COPY    "CPORCSUSERCHK.INC".
       *
       *    API XML読込用定義体
            COPY    "CPPATIENTMODV3REQ1.INC".
@@ -274,14 +272,6 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
-      *
-      *    システム基本
-      *01  SYSBASE-REC.
-      *    COPY    "CPSYSBASE.INC".
-      *
-      *    システムユーザー
-      *01  SYSUSER-REC.
-      *    COPY    "CPSYSUSER.INC".
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
@@ -337,12 +327,6 @@
       *    パラメタテーブル
        01  APIPARA-REC.
            COPY    "CPAPIPARA.INC".
-      *
-      *   （ＣＬＡＩＭ接続）
-      *    COPY    "CPSK9000.INC".
-      *    COPY    "CPSK9001.INC".
-      *
-      *    COPY    "CPSHELLTBL.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -444,6 +428,7 @@
                MOVE   "99"             TO  WRK-ERRCD
                GO  TO         100-INIT-EXT
            END-IF
+      *
       *    ＳＰＡ共通設定
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
@@ -619,6 +604,8 @@
            IF      APILST03-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-PATIENTMODREQ
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_patientmodv3req1"  TO  MCP-TABLE

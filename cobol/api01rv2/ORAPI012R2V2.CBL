@@ -316,6 +316,7 @@
            IF      APILST2-BODY        NOT =   LOW-VALUE
                DISPLAY "ACPLSTRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_patientlst1v2req"

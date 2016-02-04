@@ -684,6 +684,8 @@
            IF      APILST05-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-PATIENTMODREQ
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_patientmodv3req3"  TO  MCP-TABLE
@@ -1241,11 +1243,6 @@
                PERFORM 20012-PTINF-HEN-SEC
            END-IF
       *
-      *    保険公費チェック、保険組合せ作成
-      *    IF      WRK-ERRCD           =   SPACE
-      *        PERFORM 20022-HKNCOMBI-CHKSYORI-SEC
-      *        MOVE    ZERO            TO  FLG-HKNKOHERR
-      *    END-IF
       *    労災保険情報編集
            IF      WRK-ERRCD           =   SPACE
                MOVE    ZERO            TO  FLG-HENSYU

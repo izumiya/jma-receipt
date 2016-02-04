@@ -408,6 +408,8 @@
       *    IF      MEDIRES-OBJECT      NOT =   LOW-VALUE
       *        DISPLAY "MEDIRES-OBJECT not low_value"
       *    END-IF
+           INITIALIZE                      XML-MEDICATIONREQ
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE   "XMLOPEN"            TO  MCP-FUNC
            MOVE    "xml_medicationv2req"   TO  MCP-TABLE

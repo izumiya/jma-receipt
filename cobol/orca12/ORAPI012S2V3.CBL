@@ -668,6 +668,8 @@
            IF      APILST04-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-PATIENTMODREQ
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_patientmodv3req2"  TO  MCP-TABLE

@@ -424,6 +424,8 @@
            IF      APIMOD-BODY         NOT =   LOW-VALUE
                DISPLAY "APNTRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-APIREQ
+           INITIALIZE                      XML-APPOINTREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_appointv2req"  TO  MCP-TABLE

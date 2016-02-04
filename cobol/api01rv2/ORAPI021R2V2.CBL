@@ -367,6 +367,7 @@
            IF      APILST10-BODY     NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_visitptlstv2req"   TO  MCP-TABLE

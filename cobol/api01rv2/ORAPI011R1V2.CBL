@@ -355,6 +355,7 @@
                DISPLAY "ACPLSTRES-OBJECT not low_value"
            END-IF
            INITIALIZE                      XML-ACCEPTLSTREQ
+           INITIALIZE                      XML-APIREQ
       ***  INITIALIZE                      LNK-ACCEPTLSTREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
