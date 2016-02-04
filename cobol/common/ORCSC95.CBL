@@ -65,6 +65,7 @@
       *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *  04.08.00    NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
+      *  04.08.00    NACL=多々納  15/12/25  HAORI対応
       *****************************************************************
       *
       *
@@ -150,6 +151,7 @@
            03  FLG-CHK             PIC 9(01).
       *
            03  FLG-ATOPII          PIC 9(01).
+           03  FLG-HAORI           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -639,6 +641,11 @@
       *        API　患者初期情報取得
                WHEN    "@"
                    PERFORM 600-API-SPASET-SEC
+      *        HAORI　訂正時ワーク診療行為作成
+               WHEN    "R"
+                   MOVE    "4"             TO  LNK-SC95-KBN
+                   MOVE    1               TO  FLG-HAORI
+                   PERFORM 300-WKSRYACT-SYORI-SEC
       *
            END-EVALUATE
       *
@@ -4855,6 +4862,15 @@
            END-IF
       *    剤内容（薬評）
            MOVE    ACCT-ZAIKBN         TO  WKSRY-ZAIKBN
+      *!!!
+      *HAORI 対応
+           IF      FLG-HAORI           =   1
+               IF     (WKSRY-ZAIKBN        =   ZERO )
+                 AND  (ACCTP-PLUSKBN       =   1    )
+      *            減点
+                   MOVE    2               TO  WKSRY-ZAIKBN
+               END-IF
+           END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   5   )   OR

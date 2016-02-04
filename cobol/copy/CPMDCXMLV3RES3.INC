@@ -169,7 +169,7 @@
       *            入金方法区分
                    07  MDCRES-IC-CODE           PIC  X(02).
                    07  MDCRES-IC-CODE-NAME      PIC  X(20).
-      *            入金金額
+      *            今回入金金額
                    07  MDCRES-IC-MONEY          PIC  X(10).
       *
       *            調整金額１
@@ -178,6 +178,11 @@
                    07  MDCRES-AD-MONEY2         PIC  X(10).
       *            請求金額
                    07  MDCRES-AC-MONEY          PIC  X(10).
+      *
+      *            今回請求金額合計（訂正時は差額）
+                   07  MDCRES-TOTAL-AC-MONEY    PIC  X(10).
+      *            今回返金額（訂正時のみ）マイナス編集
+                   07  MDCRES-RE-MONEY          PIC  X(10).
       *
       *            収納情報返却（請求額内訳）
                    07  MDCRES-SYUNOU-AREA.
@@ -203,4 +208,14 @@
                             11  MDCRES-AC-POINT-TBL      OCCURS   16.
                                 13  MDCRES-AC-POINT-NAME   PIC  X(30).
                                 13  MDCRES-AC-POINT        PIC  X(10).
+      *        訂正前収納情報返却
+               05  MDCRES-OLD-CD-INF.
+      *            前回入金金額
+                   07  MDCRES-OLD-IC-MONEY         PIC  X(10).
+      *            前回請求金額
+                   07  MDCRES-OLD-AC-MONEY         PIC  X(10).
+      *            前回調整金額１
+                   07  MDCRES-OLD-AD-MONEY1        PIC  X(10).
+      *            前回調整金額２
+                   07  MDCRES-OLD-AD-MONEY2        PIC  X(10).
       *

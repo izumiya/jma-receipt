@@ -1,9 +1,9 @@
-xml_medicalv3res3 {
+xml_medicalv3res4 {
     context         int;
     object  object;
 	mode	int;
 	recordname	varchar(128);
-	medicalv3res3 {
+	medicalv3res4 {
 	Request_Number				varchar(02);
 	Response_Number				varchar(02);
 	Karte_Uid				varchar(36);
@@ -13,22 +13,26 @@ xml_medicalv3res3 {
 	Api_Result				varchar(3);
 	Api_Result_Message			varchar(100);
 	Reskey					varchar(100);
-#--- ø«Œ≈∆¸…’
-	Perform_Date				varchar(10);
-	Perform_Time				varchar(8);
-	Base_Date				varchar(10);
-        Department_Code				varchar(2);
-        Department_Name				varchar(80);
-        Physician_Code				varchar(5);
-        Physician_WholeName			varchar(80);
-#---
+#--- ÊÇ£ËÄÖÊÉÖÂ†±
 	Patient_Information {
 		Patient_ID			varchar(20);
         	WholeName			varchar(100);
         	WholeName_InKana		varchar(100);
         	BirthDate			varchar(10);
         	Sex				varchar(1);
-		HealthInsurance_Information  {
+    	};
+#--- Á¢∫Ë™çÈÅ∏Êäû„ÅÇ„Çä
+	Medical_Select_Flag			varchar(05);
+#--- Ë®∫ÁôÇÊó•‰ªò
+	Perform_Date				varchar(10);
+#--- ‰ºùÁ•®Áï™Âè∑
+	Invoice_Number				varchar(07);
+        Department_Code				varchar(2);
+        Department_Name				varchar(80);
+	Sequential_Number			varchar(1);
+        Physician_Code				varchar(5);
+        Physician_WholeName			varchar(80);
+	HealthInsurance_Information  {
 		Insurance_Combination_Number		varchar(04);
 		Insurance_Combination_Rate		varchar(03);
 		InsuranceProvider_Class			varchar(03);
@@ -48,11 +52,8 @@ xml_medicalv3res3 {
 			Rate_Outpatient			varchar(04);
 			Money_Outpatient		varchar(06);
             	} [4];
-        	};
     	};
-#--- ≈¡…º»÷πÊ
-        Invoice_Number			varchar(07);
-#--- ø«Œ≈∆‚Õ∆
+#--- Ë®∫ÁôÇÂÜÖÂÆπ
 	Medical_Information  {
 		Medical_Info  {
 			Medical_Class_Group		varchar(02);
@@ -62,8 +63,6 @@ xml_medicalv3res3 {
 			Medical_Point 			varchar(08);
 			Medical_Money			varchar(08);
 			Medical_Inclusion_Class		varchar(05);
-			Medical_Delete_Number		varchar(02);
-			Medical_Delete_Info		varchar(06);
 			Medication_Info    {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
@@ -72,51 +71,23 @@ xml_medicalv3res3 {
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];
-				Medication_Generic	varchar(1);
-     				Medication_Generic_Name		varchar(200);
 				Medication_Continue		varchar(01);
 				Medication_Internal_Kinds	varchar(01);
 				Medication_Auto_Addition 	varchar(01);
 			} [50];
 		}[120] ;
 		};
-#--- •·•√•ª°º•∏
+#--- „É°„ÉÉ„Çª„Éº„Ç∏
 	Medical_Message_Information {
-        Medical_Result			varchar(4);
-        Medical_Result_Message		varchar(100);
+        Medical_Warning_Info {
+       		 Medical_Warning        	varchar(3);
+       		 Medical_Warning_Message	varchar(100);
+            	} [40];
 	        };
-#--- º˝«ºæ Û
-	Cd_Information {
-	Ic_Code				varchar(2);
-	Ic_Code_Name			varchar(20);
-	Ic_Money			varchar(10);
-	Ad_Money1			varchar(10);
-	Ad_Money2			varchar(10);
-	Ac_Money			varchar(10);
-#---    ∫£≤Û¿¡µ·≥€πÁ∑◊
-	Total_Ac_Money			varchar(10);
-#---     ÷∂‚≥€° ƒ˚¿µª˛°À
-	Re_Money			varchar(10);
-	Cd_Ac_Information  {
-		Ai_Money		varchar(10);
-		Oe_Money		varchar(10);
-		Dg_Smoney		varchar(10);
-		Om_Smoney		varchar(10);
-		Pi_Smoney		varchar(10);
-		Lsi_Total_Money 	varchar(10);
+#--- Á¢∫Ë™ç„É°„ÉÉ„Çª„Éº„Ç∏
+	Medical_Select_Information {
+        Medical_Select			varchar(4);
+        Medical_Select_Message		varchar(100);
 		};
-		Ac_Point_Information  {
-			Ac_Ttl_Point	varchar(10);
-			Ac_Point_Detail   {
-				AC_Point_Name	varchar(30);
-				AC_Point	varchar(10);
-	 		} [16];
-		};
-    	};
-#---    ƒ˚¿µ¡∞æ Û
-	Old_Ic_Money			varchar(10);
-	Old_Ac_Money			varchar(10);
-	Old_Ad_Money1			varchar(10);
-	Old_Ad_Money2			varchar(10);
 	};
 };

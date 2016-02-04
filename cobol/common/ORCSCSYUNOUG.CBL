@@ -403,6 +403,11 @@
                END-IF
            END-PERFORM
       *
+      *    訂正処理
+           IF      SPA-SYORIFLG        =   1
+               MOVE    "1"             TO  LNK-S01-SAIKEISAN-KBN
+           END-IF
+      *
       *H27.4　以降から使用する
       *    在宅総合・在宅末期　算定患者区分
            IF     ( SPA-SRYYMD         <   "20021001")  OR
@@ -571,6 +576,7 @@
            END-PERFORM
       *    複数科まとめ集計フラグ
            MOVE    SPA-KAGRPFLG        TO  LNK-S01-KAGRPFLG
+      *
       *    負担金計算処理
            CALL    "ORCSGAIFTN"        USING
                                        MCPAREA

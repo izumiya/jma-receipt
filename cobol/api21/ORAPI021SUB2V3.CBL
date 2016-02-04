@@ -286,7 +286,8 @@
       *    ∫ﬁ≈¿øÙ
            IF      LNK-WKSRY-ZAITENKEI(IDX) NOT =   ZERO
       *        ∏∫≈¿
-               IF      LNK-WKSRYP-PLUSKBN (IDX) =   1
+               IF    ( LNK-WKSRYP-PLUSKBN (IDX) =   1 )
+               OR    ( LNK-WKSRY-ZAIKBN   (IDX) =   2 )
                    COMPUTE WRK-SURYO       =   LNK-WKSRY-ZAITENKEI(IDX)
                                            *   -1
                ELSE

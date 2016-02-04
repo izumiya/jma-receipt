@@ -44,6 +44,11 @@
               05  MDCREQ-PERFORM-TIME      PIC X(8).
       *       UID（オルカ）
               05  MDCREQ-ORCA-UID          PIC X(36).
+      *H27.12
+      *       処理区分
+              05  MDCREQ-PATIENT-MODE      PIC X(06).
+      *       伝票番号
+              05  MDCREQ-INVOICD-NUMBER    PIC X(07).
       *
       *       確認処理区分（１：最初の確認メッセージから）
               05  MDCREQ-SELECT-MODE        PIC X(01).

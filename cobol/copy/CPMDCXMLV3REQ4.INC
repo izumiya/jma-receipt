@@ -21,48 +21,38 @@
       *****************************************************************
       ******************************************************************
       *    ＡＰＩリクエスト診療行為登録情報 (一体化)
-      *                                       COPY (CPMDCXMLV3REQ3.INC)
-      *         診療行為内容
+      *                                       COPY (CPMDCXMLV3REQ4.INC)
+      *         診療行為削除
       ******************************************************************
-       01  XML-MEDICALV3REQ3.
+       01  XML-MEDICALV3REQ4.
            03  MDCREQ-CONTEXT          PIC S9(9)   BINARY.
            03  MDCREQ-OBJECT           PIC X(8).
            03  MDCREQ-MODE             PIC S9(9)   BINARY.
            03  MDCREQ-RECORDNAME       PIC X(128).
            03  MDCREQ-MEDICALREQ.
-      *       リクエスト番号
-              05  MDCREQ-REQUEST-NUMBER    PIC X(2).
-      *       UID（電子カルテ）
-              05  MDCREQ-KARTE-UID         PIC X(36).
-      *       基準日付（収納入金日）
-              05  MDCREQ-BASE-DATE         PIC X(10).
-      *       患者番号
-              05  MDCREQ-PATIENTID         PIC X(20).
-      *       診療日付
-              05  MDCREQ-PERFORM-DATE      PIC X(10).
-      *       診療時間
-              05  MDCREQ-PERFORM-TIME      PIC X(8).
-      *       UID（オルカ）
-              05  MDCREQ-ORCA-UID          PIC X(36).
-      *H27.12
-      *       処理区分
-              05  MDCREQ-PATIENT-MODE      PIC X(06).
+      *        リクエスト番号
+               05  MDCREQ-REQUEST-NUMBER    PIC X(2).
+      *        UID（電子カルテ）
+               05  MDCREQ-KARTE-UID         PIC X(36).
+      *        UID（オルカ）
+               05  MDCREQ-ORCA-UID          PIC X(36).
+      *        患者番号
+               05  MDCREQ-PATIENTID         PIC X(20).
+      *        診療日付
+               05  MDCREQ-PERFORM-DATE      PIC X(10).
+      *        処理区分
+               05  MDCREQ-PATIENT-MODE      PIC X(06).
+      *        伝票番号
+               05  MDCREQ-INVOICD-NUMBER    PIC X(07).
       *
-      *       自動発生剤削除区分（１：削除あり）
-              05  MDCREQ-MDC-MODE          PIC X(01).
-      *       自動発生剤削除連番
-              05  MDCREQ-DEL-NUMBER-G.
-                  07  MDCREQ-DEL-NUMBER        PIC X(02)
-                                               OCCURS   30.
+      *        診療科
+               05  MDCREQ-APPOINT-DEP-CODE  PIC X(2).
+      *        保険組合せ番号
+               05  MDCREQ-COMBINATION-NUMBER   PIC X(04).
+      *        連番
+               05  MDCREQ-NUMBER            PIC X(01).
       *
-      *       入金方法
-              05  MDCREQ-IC-CODE           PIC X(02).
-      *       入金金額
-              05  MDCREQ-IC-MONEY          PIC X(10).
-      *       調整金額１
-              05  MDCREQ-AD-MONEY1         PIC X(10).
-      *       調整金額２
-              05  MDCREQ-AD-MONEY2         PIC X(10).
-      *       返金額（訂正時）
-              05  MDCREQ-RE-MONEY          PIC X(10).
+      *        確認メッセージ返答
+               05  MDCREQ-SELECT-ANSWER     PIC X(02).
+      *
       *

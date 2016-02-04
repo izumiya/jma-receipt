@@ -47,6 +47,7 @@
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
            03  FLG-WKSRYACT            PIC 9(01).
+           03  FLG-SYUNOU              PIC 9(01).
       *    03  FLG-PTNYUINRRK          PIC 9(01).
       *    03  FLG-HKNNUM              PIC 9(01).
            03  FLG-SPATMP              PIC 9(01).
@@ -128,11 +129,19 @@
            03  WRK-SRYSYUKBN           PIC X(03).
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-SRYSYUKBNMEI        PIC X(40).
+      *    伝票番号
+           03  WRK-DENPNUM             PIC 9(07).
+           03  WRK-SYORI-MODE          PIC X(03).
       *
       *    金額
            03  WRK-KINGAKU             PIC S9(08).
       *    請求金額
-           03  WRK-SKYMONY-GOK         PIC S9(08).
+           03  WRK-SKYMONEY-GOK        PIC S9(08).
+      *    訂正用　入金上限額
+           03  WRK-NYUKIN-GOK          PIC S9(08).
+           03  WRK-HENKIN-GOK          PIC S9(08).
+           03  WRK-TEIKEI-SKYMONEY     PIC S9(08).
+           03  WRK-OLD-SKYMONEY        PIC S9(08).
       *
       *    数値変換用
            03  WRK-SURYO               PIC S9(08)V9(05).
@@ -190,6 +199,9 @@
            03  WRK-CHOSEI1             PIC S9(07).
       *    調整金２
            03  WRK-CHOSEI2             PIC S9(07).
+      *    返金額
+           03  WRK-HENKIN              PIC S9(07).
+           03  WRK-HENKIN-OK           PIC  9(01).
       *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
@@ -207,6 +219,11 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+               05  WRK-SELECT-CODE         PIC X(04).
+      *        処理区分
+               05  WRK-PARA-MODE           PIC X(03).
+      *        伝票番号
+               05  WRK-PARA-DENPNUM        PIC 9(07).
       *
       *処理最大行
        01  MAX-LINE-VALUE          PIC 9(04)   VALUE   400.
@@ -241,6 +258,10 @@
                                        //SYU-// BY //LNK-SYU2-//.
        01  LNK-SYUNOU2-MAX              PIC 9(02).
       *
+      *    収納マスタワーク（訂正前）
+       01  TEI-SYUNOU-REC.
+           COPY    "CPSYUNOU.INC"      REPLACING
+                                       //SYU-// BY //TEI-SYU-//.
       *
       *    診療行為マスタワーク(パラメタ）
        01  PARA-WKSRYACT-AREA.
@@ -589,6 +610,7 @@
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
            INITIALIZE                      XML-MEDICALV3REQ3
+           INITIALIZE                      XML-APIREQ
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_medicalv3req3" TO  MCP-TABLE
@@ -801,6 +823,16 @@
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20011-PERFORM-CHK-SEC
            END-IF
+      *!!!!
+      *    訂正判定
+           IF      WRK-ERRCD           =   SPACE
+      *        伝票番号
+               MOVE    SPACE               TO  MDCRES-INVOICD-NUMBER
+               IF     (MDCREQ-PATIENT-MODE =   "Modify")
+                  OR  (WRK-PARA-MODE       =   "UPD" )
+                   PERFORM 20011-DENPNUM-CHK-SEC
+               END-IF
+           END-IF
       *
            IF      WRK-ERRCD           =   SPACE
       *        ワーク診療行為検索
@@ -839,6 +871,11 @@
       *    調整金
            IF    (WRK-ERRCD            =   SPACE )
                PERFORM 20013-CHOSEIKIN-CHK-SEC
+           END-IF
+      *
+      *    返金
+           IF    (WRK-ERRCD            =   SPACE )
+               PERFORM 20013-HENKIN-CHK-SEC
            END-IF
            .
        2001-INPUT-CHK-EXT.
@@ -1001,6 +1038,43 @@
        20011-PTNUM-CHK-EXT.
            EXIT.
       *
+      *H28.1
+      *****************************************************************
+      *    伝票番号チェック処理
+      *****************************************************************
+       20011-DENPNUM-CHK-SEC         SECTION.
+      *
+      *    MOVE    ZERO                TO  WRK-DENPNUM
+      *
+      *    INITIALIZE                      ORCSNUMAREA
+      *    MOVE    MDCREQ-INVOICD-NUMBER   TO  SNUM-INX
+      *    CALL    "ORCSNUM"           USING
+      *                                ORCSNUMAREA
+      *    IF     (SNUM-RC         NOT =   ZERO  )   OR
+      *           (SNUM-SEISUU         >   7     )   OR
+      *           (SNUM-SYOSUU         >   0     )
+      *        数値７桁
+      *        MOVE    "27"                TO  WRK-ERRCD
+      *    ELSE
+      *        MOVE    SNUM-OUTNUM         TO  WRK-DENPNUM
+      *    END-IF
+      *
+           MOVE    WRK-PARA-DENPNUM    TO  WRK-DENPNUM
+      *
+           IF     (MDCREQ-PATIENT-MODE =   "Modify")
+              AND (WRK-PARA-MODE       =   "UPD"   )
+              AND (SPA-SYORIFLG        =   1       )
+               MOVE    "UPD"               TO  WRK-SYORI-MODE
+               IF     (SPA-DENPNUM     NOT =   WRK-PARA-DENPNUM)
+                   MOVE    "27"                TO  WRK-ERRCD
+               END-IF
+           ELSE
+               MOVE    "28"                TO  WRK-ERRCD
+           END-IF
+           .
+       20011-DENPNUM-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    入金方法区分チェック処理
       *****************************************************************
@@ -1142,6 +1216,44 @@
            EXIT.
       *
       *****************************************************************
+      *    返金金額数値チェック処理
+      *****************************************************************
+       20013-HENKIN-CHK-SEC         SECTION.
+      *
+           IF      MDCREQ-RE-MONEY     =   SPACE
+               MOVE    ZERO            TO  WRK-NYUKIN-OK
+           ELSE
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    MDCREQ-RE-MONEY     TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+      ****            (SNUM-MINKBN         =   "1"   )   OR
+                      (SNUM-SEISUU         >   7     )   OR
+                      (SNUM-SYOSUU         >   0     )
+      *            整数７桁
+                   MOVE    "16"                TO  WRK-ERRCD
+               ELSE
+      *            設定あり
+                   MOVE    SNUM-OUTNUM         TO  WRK-HENKIN
+                   MOVE    1                   TO  WRK-HENKIN-OK
+               END-IF
+               IF      WRK-HENKIN      NOT =   ZERO
+                   IF      SPA-HKNCOMBINUM     =   "9999"
+                       MOVE    "25"            TO  WRK-ERRCD
+                   END-IF
+                   IF      SPA-SYORIFLG    NOT =   1
+                       MOVE    "26"            TO  WRK-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       20013-HENKIN-CHK-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
       *    診療内容チェック処理
       *****************************************************************
        2002-SYORI-01-SEC        SECTION.
@@ -1169,10 +1281,16 @@
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20022-SYUNOU-HEN-SEC
            END-IF
+      *
       *    入金・請求額
            IF     (WRK-ERRCD           =   SPACE)
            AND    (LNK-SYUNOU2-MAX     =   1    )
            AND    (SPA-HKNCOMBINUM     NOT =   "9999" )
+      *        訂正前の収納編集
+               IF     (SPA-SYORIFLG        =   1     )
+                   PERFORM 20025-TEISEI-HENSYU-SEC
+               END-IF
+      *
                MOVE    LNK-SYUNOU2-REC (1) TO  SYUNOU-REC
                PERFORM 20023-NYUKIN-HEN-SEC
            END-IF
@@ -1292,6 +1410,38 @@
            EXIT.
       *
       *****************************************************************
+      *    訂正前の収納編集処理
+      *****************************************************************
+       20025-TEISEI-HENSYU-SEC        SECTION.
+      *
+           INITIALIZE                  TEI-SYUNOU-REC
+           MOVE    LNK-SYUNOU2-REC (1) TO  SYUNOU-REC
+      *
+           MOVE    SYUNOU-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TEI-SYUNOU-REC
+                   MOVE    ZERO                TO  FLG-SYUNOU
+               ELSE
+                   MOVE    1                   TO  FLG-SYUNOU
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+           MOVE    "tbl_syunou"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       20025-TEISEI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    剤削除処理
       *****************************************************************
        20021-ZAIDELETE-SEC        SECTION.
@@ -1391,23 +1541,60 @@
       *****************************************************************
        20023-NYUKIN-HEN-SEC        SECTION.
       *
-      *    請求額＋調整金
-           COMPUTE WRK-SKYMONY-GOK     =   SYU-SKYMONEY
+      *    今回請求額
+           IF      SPA-SYORIFLG        =   1
+      *        請求額（前回調整金を除く）
+               IF      SYU-SKYMONEY    <   SYU-CHOSEI
+                   MOVE    ZERO            TO  WRK-TEIKEI-SKYMONEY
+               ELSE
+                   COMPUTE WRK-TEIKEI-SKYMONEY
+                                           =   SYU-SKYMONEY
+                                           -   SYU-CHOSEI
+               END-IF
+      *        今回未入力であれば収納の調整金
+               IF      MDCREQ-AD-MONEY1    =   SPACE
+                   MOVE    SYU-CHOSEI1         TO  WRK-CHOSEI1
+               END-IF
+               IF      MDCREQ-AD-MONEY2    =   SPACE
+                   MOVE    SYU-CHOSEI2         TO  WRK-CHOSEI2
+               END-IF
+           ELSE
+               MOVE    SYU-SKYMONEY       TO  WRK-TEIKEI-SKYMONEY
+           END-IF
+      *
+      *    今回合計請求額（請求額＋調整金）
+           COMPUTE WRK-SKYMONEY-GOK    =   WRK-TEIKEI-SKYMONEY
                                        +   WRK-CHOSEI1
                                        +   WRK-CHOSEI2
-           IF      WRK-SKYMONY-GOK     <   ZERO
+           IF      WRK-SKYMONEY-GOK    <   ZERO
                MOVE    "22"            TO  WRK-ERRCD
            END-IF
+      *!!
+      *    入金上限額
+           MOVE    ZERO                TO  WRK-NYUKIN-GOK
+           MOVE    ZERO                TO  WRK-HENKIN-GOK
+           IF      SPA-SYORIFLG        =   1
+      *        今回請求額−前回請求額 
+               COMPUTE WRK-NYUKIN-GOK      =   WRK-SKYMONEY-GOK
+                                           -   TEI-SYU-SKYMONEY
+               IF      WRK-NYUKIN-GOK      <   ZERO
+                   MOVE    WRK-NYUKIN-GOK      TO  WRK-HENKIN-GOK
+                   MOVE    ZERO                TO  WRK-NYUKIN-GOK
+               END-IF
+           ELSE
+               MOVE    WRK-SKYMONEY-GOK    TO  WRK-NYUKIN-GOK
+           END-IF
+      *
       *    入金額チェック
            IF      WRK-NYUKIN-OK       =   1
-               IF      WRK-SKYMONY-GOK     <   WRK-NYUKIN
+               IF      WRK-NYUKIN-GOK      <   WRK-NYUKIN
                    MOVE    "21"            TO  WRK-ERRCD
                END-IF
            ELSE
       *        入金額設定
-               IF      WRK-SKYMONY-GOK     >   ZERO
+               IF      WRK-NYUKIN-GOK     >   ZERO
       *            今回請求額
-                   MOVE    WRK-SKYMONY-GOK     TO  WRK-NYUKIN
+                   MOVE    WRK-NYUKIN-GOK      TO  WRK-NYUKIN
                ELSE
                    MOVE    ZERO                TO  WRK-NYUKIN
                END-IF
@@ -1415,6 +1602,19 @@
       *            入金状態が未入金の時、ゼロ
                    MOVE    ZERO                TO  WRK-NYUKIN
                END-IF
+           END-IF
+      *
+      *    訂正時の返金
+           IF      SPA-SYORIFLG        =   1
+               IF      WRK-HENKIN-OK       =   "1"
+                   IF     WRK-HENKIN-GOK   >   WRK-HENKIN
+                       MOVE    "29"        TO  WRK-ERRCD
+                   END-IF
+               ELSE
+                   MOVE    WRK-HENKIN-GOK  TO  WRK-HENKIN
+               END-IF
+           ELSE
+               MOVE    ZERO            TO  WRK-HENKIN
            END-IF
       *
            .
@@ -1616,11 +1816,10 @@
                                        TO  MDCRES-AC-TOTAL-POINT
       *
       *    請求金額
-           MOVE    WRK-SKYMONY-GOK     TO  WRK-SURYO
+           MOVE    WRK-TEIKEI-SKYMONEY TO  WRK-SURYO
            PERFORM 810-NUMHENKAN-SEC
            MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
                                        TO  MDCRES-AC-MONEY
-      *
       *    入金金額
            MOVE    WRK-NYUKIN          TO  WRK-SURYO
            PERFORM 810-NUMHENKAN-SEC
@@ -1637,6 +1836,44 @@
            MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
                                        TO  MDCRES-AD-MONEY2
       *
+      *    今回請求額合計(入金上限）
+           MOVE    WRK-NYUKIN-GOK      TO  WRK-SURYO
+           PERFORM 810-NUMHENKAN-SEC
+           MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                       TO  MDCRES-TOTAL-AC-MONEY
+      *    返金額（訂正）
+           IF     (SPA-SYORIFLG        =   1    )
+              AND ((WRK-HENKIN      NOT =   ZERO ) OR
+                   (WRK-HENKIN-OK       =   "1"  ))
+               MOVE    WRK-HENKIN          TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-RE-MONEY
+           END-IF
+           IF     (SPA-SYORIFLG        =   1   )
+      *        前回までの入金額
+               MOVE    TEI-SYU-NYUKIN-TOTAL    TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-OLD-IC-MONEY
+      *        前回請求額
+               COMPUTE WRK-OLD-SKYMONEY    =   TEI-SYU-SKYMONEY
+                                           -   TEI-SYU-CHOSEI
+               MOVE    WRK-OLD-SKYMONEY    TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-OLD-AC-MONEY
+      *        前回調整金額１
+               MOVE    TEI-SYU-CHOSEI1     TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-OLD-AD-MONEY1
+      *        前回調整金額２
+               MOVE    TEI-SYU-CHOSEI2     TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-OLD-AD-MONEY2
+           END-IF
            .
        200212-SYUNOU-OUTHEN-EXT.
            EXIT.
@@ -1803,6 +2040,11 @@
       *    入金・請求額
            IF     (WRK-ERRCD           =   SPACE )
            AND    (SPA-HKNCOMBINUM NOT =   "9999" )
+      *        訂正前の収納編集
+               IF     (SPA-SYORIFLG        =   1     )
+                   PERFORM 20025-TEISEI-HENSYU-SEC
+               END-IF
+      *
                MOVE    LNK-SYUNOU-REC (1)  TO  SYUNOU-REC
                PERFORM 20023-NYUKIN-HEN-SEC
            END-IF
@@ -1825,7 +2067,7 @@
       *    請求書作成区分（発行なし）＃＃変更するかも
            MOVE    "0"                 TO  ORCSCGAIRAI-HAKFLG
       *    今回請求額
-           MOVE    WRK-SKYMONY-GOK     TO  ORCSCGAIRAI-KON-SKYMONEY
+           MOVE    SYU-SKYMONEY        TO  ORCSCGAIRAI-KON-SKYMONEY
       *    入金額
            MOVE    WRK-NYUKIN          TO  ORCSCGAIRAI-NYUKIN
       *    入金方法
@@ -1846,8 +2088,21 @@
       *        調整金合計
                COMPUTE SYU-CHOSEI          =   SYU-CHOSEI1
                                            +   SYU-CHOSEI2
-      *        入金額
-               MOVE    WRK-NYUKIN          TO  SYU-NYUKIN-TOTAL
+      *        請求額（調整金なし）
+               MOVE    WRK-TEIKEI-SKYMONEY
+                                           TO  SYU-SKYMONEY
+               IF     (SPA-SYORIFLG        =   1 )
+                 AND  (WRK-HENKIN      NOT =   ZERO )
+      **           COMPUTE ORCSCGAIRAI-SYU-HENKIN (IDX)
+      *                                        =   WRK-HENKIN
+      **                                       *   -1
+                   MOVE    WRK-HENKIN      TO  ORCSCGAIRAI-SYU-HENKIN
+                                                                (IDX)
+                   MOVE    ZERO                TO  SYU-NYUKIN-TOTAL
+               ELSE
+      *            入金額
+                   MOVE    WRK-NYUKIN          TO  SYU-NYUKIN-TOTAL
+               END-IF
       *
                MOVE    SYUNOU-REC          TO  ORCSCGAIRAI-SYUNOU-REC
                                                                (IDX)
@@ -1944,10 +2199,17 @@
       *        請求金額等　収納の内容
                IF     (SPA-ERRCD       =   SPACE )
                  AND  (WRK-ERRCD       =   SPACE )
-                   MOVE    SYU-SKYMONEY        TO  WRK-SKYMONY-GOK
+                   MOVE    SYU-SKYMONEY        TO  WRK-SKYMONEY-GOK
                    MOVE    SYU-CHOSEI1         TO  WRK-CHOSEI1
                    MOVE    SYU-CHOSEI2         TO  WRK-CHOSEI2
                    MOVE    SYU-NYUKIN-TOTAL    TO  WRK-NYUKIN
+                   IF      SYU-SKYMONEY    <   SYU-CHOSEI
+                       MOVE    ZERO            TO  WRK-TEIKEI-SKYMONEY
+                   ELSE
+                       COMPUTE WRK-TEIKEI-SKYMONEY
+                                           =   SYU-SKYMONEY
+                                           -   SYU-CHOSEI
+                   END-IF
                END-IF
       *
                PERFORM 200212-SYUNOU-OUTHEN-SEC
@@ -2198,6 +2460,9 @@
            MOVE    SPACE               TO  WRK-APIV3DATA-AREA
            MOVE    MDCRES-RESPONSE-NUMBER
                                        TO  WRK-RESPONSE-NUMBER
+           MOVE    WRK-DENPNUM         TO  WRK-PARA-DENPNUM
+           MOVE    WRK-SYORI-MODE      TO  WRK-PARA-MODE
+      *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
            MOVE    MDCRES-KARTE-UID    TO  APIPARA-KARTE-UID
@@ -2629,6 +2894,34 @@
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
+           WHEN    "25"
+               STRING  "包括分入力は収納を作成しません。"
+                       "返金額の設定はできません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "26"
+               STRING  "訂正処理ではありません。"
+                       "返金額の設定はできません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "27"
+               STRING  "伝票番号が違います。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "28"
+               STRING  "訂正処理の順番が違います。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "29"
+               STRING  "今回返金額以上です。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+      *
            WHEN    "30"
       *        ORCSCGAIRAI 警告
                CONTINUE

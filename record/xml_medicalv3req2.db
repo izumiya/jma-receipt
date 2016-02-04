@@ -11,6 +11,10 @@ xml_medicalv3req2 {
     		Perform_Date		varchar(10);
 		Perform_Time		varchar(8);
 		Orca_Uid		varchar(36);
+#--- ΩËÕ˝∂Ë ¨
+		Patient_Mode		varchar(06);
+#--- ≈¡…º»÷πÊ
+		Invoice_Number		varchar(07);
 		Select_Mode		varchar(01);
 		Select_Answer		varchar(03);
 		Diagnosis_Information  {

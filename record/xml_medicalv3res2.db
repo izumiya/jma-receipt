@@ -13,16 +13,18 @@ xml_medicalv3res2 {
 	Api_Result				varchar(3);
 	Api_Result_Message			varchar(100);
 	Reskey					varchar(100);
-#--- è¨ºç™‚æ—¥ä»˜
+#--- ¿ÇÎÅÆüÉÕ
 	Perform_Date				varchar(10);
 	Perform_Time				varchar(8);
-#--- ç¢ºèªé¸æŠã‚ã‚Š
+#--- ³ÎÇ§ÁªÂò¤¢¤ê
 	Medical_Select_Flag			varchar(05);
+#--- ÅÁÉ¼ÈÖ¹æ
+	Invoice_Number				varchar(07);
         Department_Code				varchar(2);
         Department_Name				varchar(80);
         Physician_Code				varchar(5);
         Physician_WholeName			varchar(80);
-#--- æ‚£è€…æƒ…å ±
+#--- ´µ¼Ô¾ğÊó
 	Patient_Information {
 		Patient_ID			varchar(20);
         	WholeName			varchar(100);
@@ -51,7 +53,7 @@ xml_medicalv3res2 {
             	} [4];
         	};
     	};
-#--- é€ä¿¡å†…å®¹
+#--- Á÷¿®ÆâÍÆ
 	Medical_Req_OffTime		varchar(1);
 	Medical_Req_Information  {
 		Medical_Req_Info  {
@@ -72,7 +74,7 @@ xml_medicalv3res2 {
 			} [50];
 		}[110] ;
 	};
-#--- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#--- ¥á¥Ã¥»¡¼¥¸
 	Medical_Req_Message_Information {
            Medical_Req_Message_Info {
        		 Medical_Req_Result       	varchar(3);
@@ -81,7 +83,7 @@ xml_medicalv3res2 {
        		 Medical_Req_Item_Position      varchar(2);
             	} [100];
         };
-#--- è¨ºç™‚å†…å®¹
+#--- ¿ÇÎÅÆâÍÆ
 	Medical_Information  {
 		Medical_Info  {
 			Medical_Class_Group		varchar(02);
@@ -108,7 +110,7 @@ xml_medicalv3res2 {
 			} [50];
 		}[120] ;
 	};
-#--- ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#--- ¥á¥Ã¥»¡¼¥¸
 	Medical_Message_Information {
         Medical_Result			varchar(4);
         Medical_Result_Message1		varchar(100);
@@ -125,7 +127,7 @@ xml_medicalv3res2 {
        		 Medical_Warning_Code		varchar(9);
             	} [100];
         };
-#--- ç¢ºèªãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#--- ³ÎÇ§¥á¥Ã¥»¡¼¥¸
 	Medical_Select_Information {
         Medical_Select			varchar(4);
         Medical_Select_Message		varchar(100);
