@@ -731,6 +731,8 @@
       *  04.08.17    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.18    NACL-門脇    16/01/27  医保レセプト「他保険にて診察料算定済」
       *                                     コメント不記載対応修正
+      *  04.08.19    NACL-門脇    16/02/05  医保レセプト「他保険にて診察料算定済」
+      *                                     コメント不記載対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1031,6 +1033,7 @@
            03  IDX28                                   PIC 9(03).
            03  IDX29                                   PIC 9(03).
            03  IDX30                                   PIC 9(03).
+           03  IDX31                                   PIC 9(02).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -11629,6 +11632,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     IF  FLG-ARI2 = ZERO
                       MOVE     "1"      TO  RECE05-RECEPTFLG(IDX4)
                       MOVE     "1"      TO  RECE05-RECEDENFLG(IDX4)
+                      MOVE     "1"      TO  RECE04-TAHOKENNGFLG
                     END-IF
                END-IF
                IF  (FLG-TAHOKEN           =   1              )
@@ -13426,53 +13430,60 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                MOVE    ZERO                TO  FLG-ARI3
                MOVE    ZERO                TO  FLG-ARI4
       *
-               INITIALIZE                      JYURRK-REC
-               MOVE    RECE02-HOSPNUM      TO  JYURRK-HOSPNUM
-               MOVE    RECE02-PTID         TO  JYURRK-PTID
-               MOVE    RECE02-NYUGAIKBN    TO  JYURRK-NYUGAIKBN
-               MOVE    ACCT-SRYKA          TO  JYURRK-SRYKA
-               MOVE    RECE02-SRYYM        TO  JYURRK-SRYYMD(1:6)
-               MOVE    IDX9                TO  JYURRK-SRYYMD(7:2)
-               MOVE    JYURRK-REC          TO  MCPDATA-REC
-               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key4 "             TO  MCP-PATHNAME
-               PERFORM   900-DBSELECT-SEC
-               IF    MCP-RC  =  ZERO
-                 MOVE    "tbl_jyurrk"      TO  MCP-TABLE
-                 MOVE    "key4 "           TO  MCP-PATHNAME
-                 PERFORM   900-JYURRK-READ-SEC
-                 PERFORM  UNTIL  (FLG-JYURRK  =  1)
-                           OR    (FLG-ARI2    =  1)
-                   IF    JYURRK-HKNKBN  NOT =  "0" AND "7"
-                          MOVE     1       TO  FLG-ARI2
-                   ELSE
-                    IF   JYURRK-HKNKBN  =  "0"
-                      INITIALIZE               HKNCOMBI-REC
-                      MOVE  RECE02-HOSPNUM TO  COMB-HOSPNUM
-                      MOVE  RECE02-PTID    TO  COMB-PTID
-                      MOVE  JYURRK-HKNCOMBINUM
-                                           TO  COMB-HKNCOMBINUM
-                      MOVE  HKNCOMBI-REC   TO  MCPDATA-REC
-                      PERFORM 900-HKNCOMBI-INV-SEC
-                      IF    FLG-HKNCOMBI   =   ZERO
-                        IF  COMB-HKNNUM(1:2) = "98" OR "90" OR "91"
-                          MOVE     1       TO  FLG-ARI2
-                        ELSE
-                          MOVE     1       TO  FLG-ARI3
-                        END-IF
-                      END-IF
-                    ELSE
-                          MOVE     1       TO  FLG-ARI4
-                    END-IF
-                   END-IF
-                   MOVE    "tbl_jyurrk"    TO  MCP-TABLE
-                   MOVE    "key4 "         TO  MCP-PATHNAME
+               PERFORM  VARYING  IDX31  FROM  1  BY  1
+                         UNTIL  (IDX31               >   20  )
+                          OR    (RECE02-SRYKA(IDX31) =  SPACE)
+                          OR    (FLG-ARI2            =    1  )
+      *
+                 INITIALIZE                      JYURRK-REC
+                 MOVE    RECE02-HOSPNUM      TO  JYURRK-HOSPNUM
+                 MOVE    RECE02-PTID         TO  JYURRK-PTID
+                 MOVE    RECE02-NYUGAIKBN    TO  JYURRK-NYUGAIKBN
+                 MOVE    RECE02-SRYKA(IDX31) TO  JYURRK-SRYKA
+                 MOVE    RECE02-SRYYM        TO  JYURRK-SRYYMD(1:6)
+                 MOVE    IDX9                TO  JYURRK-SRYYMD(7:2)
+                 MOVE    JYURRK-REC          TO  MCPDATA-REC
+                 MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                 MOVE    "key4 "             TO  MCP-PATHNAME
+                 PERFORM   900-DBSELECT-SEC
+                 IF    MCP-RC  =  ZERO
+                   MOVE    "tbl_jyurrk"      TO  MCP-TABLE
+                   MOVE    "key4 "           TO  MCP-PATHNAME
                    PERFORM   900-JYURRK-READ-SEC
-                 END-PERFORM
-               END-IF
-               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key4 "             TO  MCP-PATHNAME
-               PERFORM   900-CLOSE-SEC
+                   PERFORM  UNTIL  (FLG-JYURRK  =  1)
+                             OR    (FLG-ARI2    =  1)
+                     IF    JYURRK-HKNKBN  NOT =  "0" AND "7"
+                            MOVE     1       TO  FLG-ARI2
+                     ELSE
+                      IF   JYURRK-HKNKBN  =  "0"
+                        INITIALIZE               HKNCOMBI-REC
+                        MOVE  RECE02-HOSPNUM TO  COMB-HOSPNUM
+                        MOVE  RECE02-PTID    TO  COMB-PTID
+                        MOVE  JYURRK-HKNCOMBINUM
+                                             TO  COMB-HKNCOMBINUM
+                        MOVE  HKNCOMBI-REC   TO  MCPDATA-REC
+                        PERFORM 900-HKNCOMBI-INV-SEC
+                        IF    FLG-HKNCOMBI   =   ZERO
+                          IF  COMB-HKNNUM(1:2) = "98" OR "90" OR "91"
+                            MOVE     1       TO  FLG-ARI2
+                          ELSE
+                            MOVE     1       TO  FLG-ARI3
+                          END-IF
+                        END-IF
+                      ELSE
+                            MOVE     1       TO  FLG-ARI4
+                      END-IF
+                     END-IF
+                     MOVE    "tbl_jyurrk"    TO  MCP-TABLE
+                     MOVE    "key4 "         TO  MCP-PATHNAME
+                     PERFORM   900-JYURRK-READ-SEC
+                   END-PERFORM
+                 END-IF
+                 MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                 MOVE    "key4 "             TO  MCP-PATHNAME
+                 PERFORM   900-CLOSE-SEC
+      *
+               END-PERFORM
       *
                IF  FLG-ARI2 = ZERO
                  IF    FLG-ARI3  =   1
