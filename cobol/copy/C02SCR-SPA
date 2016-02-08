@@ -498,6 +498,8 @@
                                                    PIC 9(01).  
                            11  SPA-C02-KEIKOKU-FLG3
                                                    PIC 9(01).  
+                           11  SPA-C02-KEIKOKU-FLG4
+                                                   PIC 9(01).  
       *            警告メッセージ用病名
                        09  SPA-C02-KEIKOKU-MSG-AREA.
                            11  SPA-C02-KEIKOKU-BYOMEI  PIC X(80).
