@@ -383,6 +383,7 @@
            03  FLG-BYOMEIINPUTSET-CHK
                                    PIC 9(01).
            03  FLG-TENKIKBN-CHK    PIC 9(01).
+           03  FLG-TENKIKBN        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1172,7 +1173,7 @@
                    GO      TO      300-SCREEN-EXT
                END-IF
       *
-               IF      SPA-CIDCD       =   "0105"
+               IF      SPA-CIDCD       =   "0105"  OR  "0108"
                    IF      SPA-CID1-FLG    =   "OK"
                        IF      SPA-C02-KEIKOKU-FLG1
                                                =   1
@@ -1235,7 +1236,7 @@
                    GO  TO  300-SCREEN-EXT
                END-IF
       *
-               IF      SPA-CIDCD       =   "0107"
+               IF      SPA-CIDCD       =   "0107"  OR  "0109"
                    IF      SPA-CID1-FLG    =   "OK"
                        IF      SPA-C02-KEIKOKU-FLG1
                                                =   1
@@ -1266,6 +1267,8 @@
                                                SPA-CID1-AREA  
                    INITIALIZE                  SPA-C02-KEIKOKU-FLG-AREA
                                                SPA-C02-KEIKOKU-MSG-AREA
+                   INITIALIZE              SPA-C01-HENSYU-NUM-G
+                                           SPA-C01-HENSYU-DATA-G
                    GO  TO  300-SCREEN-EXT
                END-IF
            END-IF
@@ -3064,48 +3067,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      WRK-HENSYU-DATA-O (1)   =   SPACE
                CONTINUE
            ELSE
-               INITIALIZE                      PTINF-REC
-               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-               MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
-               PERFORM 900-PTINF-READ-SEC
-               MOVE    MCPDATA-REC         TO  PTINF-REC
-               IF      FLG-PTINF           =   ZERO
-                   IF      WRK-HENSYU-DATA-O (1)   =   "2"
-                       IF      PTINF-DEATHKBN      NOT =   "1"
+               IF      SPA-C02-KEIKOKU-FLG4    =   0
+                   CONTINUE
+               ELSE
+                   INITIALIZE                      PTINF-REC
+                   MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+                   MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+                   PERFORM 900-PTINF-READ-SEC
+                   IF      FLG-PTINF           =   ZERO
+      *                転帰区分が２で死亡区分が生存のとき
+                       IF      SPA-C02-KEIKOKU-FLG4    =   1
                            MOVE    MCPDATA-REC     TO  PTINF-REC
                            MOVE    "1"             TO  PTINF-DEATHKBN 
       *
-                           MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
-                           MOVE    SMCNDATE-HMS        TO  PTINF-UPHMS
-                           MOVE    PTINF-REC           TO  MCPDATA-REC
-                           MOVE    "DBUPDATE"          TO  MCP-FUNC
-                           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key"               TO  MCP-PATHNAME
+                           MOVE    SMCNDATE-YMD    TO  PTINF-UPYMD
+                           MOVE    SMCNDATE-HMS    TO  PTINF-UPHMS
+                           MOVE    PTINF-REC       TO  MCPDATA-REC
+                           MOVE    "DBUPDATE"      TO  MCP-FUNC
+                           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+                           MOVE    "key"           TO  MCP-PATHNAME
                            PERFORM 900-ORCDBMAIN-SEC
-                           IF      MCP-RC          NOT =   ZERO 
-                               MOVE    "1004"              TO  SPA-ERRCD
+                           IF      MCP-RC      NOT =   ZERO 
+                               MOVE    "1004"          TO  SPA-ERRCD
                                DISPLAY "UPD PTINF-KEY =>" PTINF-KEY 
                                GO  TO  320-C10SPASET-EXT
                            END-IF
       *???
                            DISPLAY "PTINF=" PTINF-DEATHKBN "#"
       *???
-                       END-IF
-                   ELSE 
-      *                修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
-                       IF    ( FLG-TENKIKBN-CHK    =   1   )
-                       AND   ( PTINF-DEATHKBN      =   "1" )
-                           INITIALIZE                      PTBYOMEI-REC
-                           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
-                           MOVE    SPA-NAI-C02-PTID    TO  PTBYO-PTID
-                           MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
-                           MOVE    "key48"             TO
-                                                       WRK-MCP-PATHNAME
-                           PERFORM 900-PTBYO-INV-SEC
-                           IF      FLG-PTBYOMEI        =   1
-      *                        転帰区分２の病名が存在しないとき
+                       ELSE 
+      *                    修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
+                           IF      SPA-C02-KEIKOKU-FLG4    =   9
                                MOVE    SPACE           TO
-                                                       PTINF-DEATHKBN 
+                                                       PTINF-DEATHKBN
                                MOVE    SMCNDATE-YMD    TO  PTINF-UPYMD
                                MOVE    SMCNDATE-HMS    TO  PTINF-UPHMS
                                MOVE    PTINF-REC       TO  MCPDATA-REC
@@ -3120,9 +3114,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                END-IF
       *???
                                DISPLAY "PTINF=" PTINF-DEATHKBN "#"
-      *???                
+      *???
                            END-IF
-                       END-IF
+                      END-IF
                    END-IF
                END-IF
            END-IF     
@@ -4725,7 +4719,7 @@ grpsys                                         SPA-AREA
                PERFORM 410114-KEIKOKU-CHK-SEC
            END-IF
       *
-      *    警告チェック
+      *    死亡区分の更新、他診療科の同一病名の警告チェック
            IF      SPA-ERRCD            =   SPACE
                MOVE    SPACE           TO  WRK-ERR-BYOMEI
                                            WRK-ERR-SRYYMD
@@ -4733,11 +4727,8 @@ grpsys                                         SPA-AREA
                INITIALIZE                  SPA-C02-KEIKOKU-FLG-AREA
                                            SPA-C02-KEIKOKU-MSG-AREA
       *
-      *        他診療科の同一病名の警告チェック
-               IF      SPA-C02-1042-MSG4-DSPKBN
-                                           =   1
-                   PERFORM 410115-KEIKOKU-CHK-SEC
-               END-IF
+      *        警告チェック
+               PERFORM 410115-KEIKOKU-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD       NOT =   SPACE )
@@ -4764,6 +4755,13 @@ grpsys                                         SPA-AREA
       *
       *    簡単修正時の更新処理
            PERFORM 410113-KANTAN-KOUSHIN-SEC
+      *
+           INITIALIZE                  SPA-CIDCD-AREA
+                                       SPA-CID1-AREA  
+           INITIALIZE                  SPA-C02-KEIKOKU-FLG-AREA
+                                       SPA-C02-KEIKOKU-MSG-AREA
+           INITIALIZE                  SPA-C01-HENSYU-NUM-G
+                                       SPA-C01-HENSYU-DATA-G
            .
        410113-KANTAN-SYUSEI-EXT.
            EXIT.
@@ -4801,14 +4799,15 @@ grpsys                                         SPA-AREA
            IF      WRK-HENSYU-DATA-O (1)   =   SPACE
                CONTINUE
            ELSE
-               INITIALIZE                      PTINF-REC
-               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-               MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
-               PERFORM 900-PTINF-READ-SEC
-               MOVE    MCPDATA-REC         TO  PTINF-REC
-               IF      FLG-PTINF           =   ZERO
-                   IF      WRK-HENSYU-DATA-O (1)   =   "2"
-                       IF      PTINF-DEATHKBN      NOT =   "1"
+               IF      SPA-C02-KEIKOKU-FLG4    =   0
+                   CONTINUE
+               ELSE
+                   INITIALIZE                      PTINF-REC
+                   MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+                   MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+                   PERFORM 900-PTINF-READ-SEC
+                   IF      FLG-PTINF           =   ZERO
+                       IF      SPA-C02-KEIKOKU-FLG4    =   1
                            MOVE    MCPDATA-REC     TO  PTINF-REC
                            MOVE    "1"             TO  PTINF-DEATHKBN 
       *
@@ -4827,20 +4826,9 @@ grpsys                                         SPA-AREA
       *???
                            DISPLAY "PTINF=" PTINF-DEATHKBN "#"
       *???
-                       END-IF
-                   ELSE 
+                       ELSE 
       *                修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
-                       IF    ( FLG-TENKIKBN-CHK    =   1   )
-                       AND   ( PTINF-DEATHKBN      =   "1" )
-                           INITIALIZE                      PTBYOMEI-REC
-                           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
-                           MOVE    SPA-NAI-C02-PTID    TO  PTBYO-PTID
-                           MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
-                           MOVE    "key48"             TO
-                                                       WRK-MCP-PATHNAME
-                           PERFORM 900-PTBYO-INV-SEC
-                           IF      FLG-PTBYOMEI        =   1
-      *                        転帰区分２の病名が存在しないとき
+                           IF      SPA-C02-KEIKOKU-FLG4    =   9
                                MOVE    SPACE           TO
                                                        PTINF-DEATHKBN 
                                MOVE    SMCNDATE-YMD    TO  PTINF-UPYMD
@@ -4857,7 +4845,7 @@ grpsys                                         SPA-AREA
                                END-IF
       *???
                                DISPLAY "PTINF=" PTINF-DEATHKBN "#"
-      *???                
+      *???
                            END-IF
                        END-IF
                    END-IF
@@ -5371,41 +5359,61 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
-      *    警告チェック処理
+      *    警告チェック処理（死亡区分更新、他診療科の同一病名の警告）
       *****************************************************************
        410115-KEIKOKU-CHK-SEC                SECTION.
       *
-      *    死亡区分更新確認メッセージ表示のチェック
-           IF    ( SPA-C02-1042-MSG5-DSPKBN
-                                           =   0   )
-           AND   ( WRK-HENSYU-DATA-O (1)   =   "2" )
-               PERFORM VARYING IDXX    FROM    1   BY  1
-                       UNTIL   IDXX    >       5
-                       OR      SPA-CIDCD           NOT =   SPACE
-                   IF      WRK-STNUM-O (IDXX)  >   ZERO
-                       PERFORM VARYING IDX     FROM
-                                       WRK-STNUM-O (IDXX)  BY  1
-                               UNTIL   IDX     >   WRK-EDNUM-O (IDXX)
-                               OR      SPA-CIDCD       NOT =   SPACE
-      *********************IF      SPA-NAI-C02-TTENKIKBN (IDX)
-      *********************                        NOT =   "2"
-                               MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
-                               MOVE    SPA-NAI-C02-PTID
-                                                       TO  PTINF-PTID
-                               PERFORM 900-PTINF-READ-SEC
-                               IF    ( FLG-PTINF           =   ZERO )
-                               AND   ( PTINF-DEATHKBN  NOT =   "1"  )
-                                   MOVE    "0107"          TO  SPA-CIDCD
-                               END-IF
-                               MOVE    WRK-EDNUM-O (IDXX)  TO  IDX
-                               MOVE    5                   TO  IDXX
-      *********************END-IF
-                       END-PERFORM
+      *    死亡区分更新のチェック
+           INITIALIZE                      PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF           =   ZERO
+      *        転帰区分が２で死亡区分が生存のとき
+               IF      PTINF-DEATHKBN  NOT =   "1"
+                   IF      WRK-HENSYU-DATA-O (1)
+                                               =   "2"
+                       IF      SPA-C02-1042-MSG5-DSPKBN
+                                           =   0
+                           MOVE    "0107"      TO  SPA-CIDCD
+                       END-IF 
+                       MOVE    1           TO  SPA-C02-KEIKOKU-FLG4
                    END-IF
-               END-PERFORM
+               ELSE
+      *            転帰区分を２以外に変更したときに死亡区分が死亡のとき
+                   IF      WRK-HENSYU-DATA-O (1)
+                                           NOT =   "2"
+                       MOVE    ZERO        TO  FLG-TENKIKBN
+                       PERFORM VARYING IDXX    FROM    1   BY  1
+                               UNTIL   IDXX    >       5
+                               OR      FLG-TENKIKBN    =   1
+                           IF      WRK-STNUM-O (IDXX)  >   ZERO
+                               PERFORM VARYING IDX     FROM
+                                           WRK-STNUM-O (IDXX)  BY  1
+                                       UNTIL   IDX     >
+                                                   WRK-EDNUM-O (IDXX)
+                                       OR      FLG-TENKIKBN
+                                                       =   1
+                                   IF      SPA-NAI-C02-TTENKIKBN  (IDX)
+                                                       =   "2"
+                                       MOVE    1   TO  FLG-TENKIKBN
+                                   END-IF
+                               END-PERFORM
+                          END-IF
+                       END-PERFORM
+                       IF      FLG-TENKIKBN     =   1
+                           PERFORM 4101151-KEIKOKU-TENKIKBN-CHK-SEC
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
       *    他診療科の同一病名の警告チェック
+           IF      SPA-C02-1042-MSG4-DSPKBN
+                                           =   0
+               GO  TO  410115-KEIKOKU-CHK-EXT
+           END-IF
+      * 
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       5
       ************ OR      SPA-CIDCD           NOT =   SPACE
@@ -5590,6 +5598,79 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            END-IF
            .
        410115-KEIKOKU-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    死亡区分更新確認メッセージ表示のチェック処理
+      *****************************************************************
+       4101151-KEIKOKU-TENKIKBN-CHK-SEC    SECTION.
+      *
+           MOVE    ZERO            TO  FLG-TENKIKBN
+      *
+           INITIALIZE                  PTBYOMEI-REC
+           MOVE    SPA-HOSPNUM     TO  PTBYO-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID
+                                   TO  PTBYO-PTID
+           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+           MOVE    "key48"         TO  MCP-PATHNAME
+           MOVE    PTBYOMEI-REC    TO  MCPDATA-REC
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_ptbyomei"
+                                       TO  MCP-TABLE
+               MOVE    "key48"     TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           ELSE
+               INITIALIZE              PTBYOMEI-REC
+               MOVE    1           TO  FLG-PTBYOMEI
+           END-IF
+           PERFORM     UNTIL   FLG-PTBYOMEI    =   1
+                       OR      FLG-TENKIKBN    =   9
+               MOVE    ZERO            TO  FLG-CHK
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       5
+                       OR      FLG-CHK =       9
+                   IF      WRK-STNUM-O (IDXX)  >   ZERO
+                       PERFORM VARYING IDX FROM
+                                           WRK-STNUM-O (IDXX)  BY  1
+                               UNTIL   IDX >   WRK-EDNUM-O (IDXX)
+                               OR      FLG-CHK     =   9
+                           IF    ( PTBYO-SRYYMD    =
+                                           SPA-NAI-C02-TSRYYMD (IDX) )
+                           AND   ( PTBYO-RENNUM    =
+                                           SPA-NAI-C02-TRENNUM (IDX) )
+                           AND   ( PTBYO-SRYKA     =
+                                           SPA-NAI-C02-TSRYKA  (IDX) )
+                               MOVE    9       TO  FLG-CHK
+                           END-IF
+                       END-PERFORM
+                   END-IF
+               END-PERFORM
+      *
+      *        対象病名以外に転帰区分２が存在するとき
+               IF      FLG-CHK         =   0
+                   MOVE    9               TO  FLG-TENKIKBN
+               END-IF
+      *
+               MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+               MOVE    "key48"         TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+           MOVE    "key48"         TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    転帰区分２の病名が存在しないとき
+           IF      FLG-TENKIKBN        =   0
+               IF      SPA-C02-1042-MSG5-DSPKBN
+                                           =   0
+                   MOVE    "0109"      TO  SPA-CIDCD
+               END-IF
+               MOVE    9           TO  SPA-C02-KEIKOKU-FLG4
+           END-IF
+           .
+       4101151-KEIKOKU-TENKIKBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10341,22 +10422,78 @@ grpsys             MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                                        SPA-C02-KEIKOKU-MSG-AREA
       *
       *    死亡区分更新確認メッセージ表示のチェック
-           IF    ( SPA-C02-1042-MSG5-DSPKBN
-                                           =   0   )
-           AND   ( SPA-GMN-C02-TENKIKBN    =   "2" )
-      *********IF  (   SPA-NAI-C02-SELNO       =   ZERO   )
-      *********OR  ( ( SPA-NAI-C02-SELNO       >   ZERO )
-      *********     AND
-      *********      ( SPA-NAI-C02-TENKIKBN-OLD
-      *********                            NOT =   "2"  ) )
-                   MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-                   MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
-                   PERFORM 900-PTINF-READ-SEC
-                   IF    ( FLG-PTINF               =   ZERO )
-                   AND   ( PTINF-DEATHKBN      NOT =   "1"  )
-                       MOVE    "0105"              TO  SPA-CIDCD
+           INITIALIZE                      PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF           =   ZERO
+               IF      SPA-GMN-C02-TENKIKBN    =   "2"
+      *            転帰区分が２で死亡区分が生存のとき
+                   IF      PTINF-DEATHKBN  NOT =   "1"
+                       MOVE    1           TO  SPA-C02-KEIKOKU-FLG4
+                       IF      SPA-C02-1042-MSG5-DSPKBN
+                                           =   0
+                           MOVE    "0105"      TO  SPA-CIDCD
+                       END-IF
                    END-IF
-      *********END-IF
+               ELSE
+      *            修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
+                   IF    ( SPA-NAI-C02-SELNO   >   ZERO )
+                   AND   ( SPA-NAI-C02-TENKIKBN-OLD
+                                               =   "2"  )
+                       IF      PTINF-DEATHKBN      =   "1"
+                           MOVE    ZERO        TO  FLG-TENKIKBN
+      *
+                           INITIALIZE                  PTBYOMEI-REC
+                           MOVE    SPA-HOSPNUM     TO  PTBYO-HOSPNUM
+                           MOVE    SPA-NAI-C02-PTID
+                                                   TO  PTBYO-PTID
+                           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                           MOVE    "key48"         TO  MCP-PATHNAME
+                           MOVE    PTBYOMEI-REC    TO  MCPDATA-REC
+                           PERFORM 900-DBSELECT-SEC
+                           IF      MCP-RC          =   ZERO
+                               MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                               MOVE    "key48"         TO  MCP-PATHNAME
+                               PERFORM 900-PTBYO-READ-SEC
+                           ELSE
+                               INITIALIZE              PTBYOMEI-REC
+                               MOVE    1           TO  FLG-PTBYOMEI
+                           END-IF
+                           PERFORM     UNTIL   FLG-PTBYOMEI    =   1
+                                       OR      FLG-TENKIKBN    =   9
+                               IF    ( PTBYO-SRYYMD    =
+                                                   SPA-NAI-C02-SRYYMD )
+                               AND   ( PTBYO-RENNUM    =
+                                                   SPA-NAI-C02-RENNUM )
+                               AND   ( PTBYO-SRYKA     =
+                                                   SPA-GMN-C02-BSRYKA )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    9       TO  FLG-TENKIKBN
+                               END-IF
+                               MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                               MOVE    "key48"         TO  MCP-PATHNAME
+                               PERFORM 900-PTBYO-READ-SEC
+                           END-PERFORM
+                           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                           MOVE    "key48"         TO  MCP-PATHNAME
+                           PERFORM 900-CLOSE-SEC
+      *
+                           IF      FLG-TENKIKBN        =   9
+                               CONTINUE
+                           ELSE
+      *                        転帰区分２の病名が存在しないとき
+                               IF      SPA-C02-1042-MSG5-DSPKBN
+                                                       =   0
+                                   MOVE    "0108"      TO  SPA-CIDCD
+                               END-IF
+                               MOVE    9           TO
+                                                   SPA-C02-KEIKOKU-FLG4
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
       *    他診療科の同一病名の警告チェック
@@ -11201,15 +11338,16 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
            END-IF
       *
       *    患者マスタ更新（死亡区分）
-           INITIALIZE                      PTINF-REC
-           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
-           MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
-           PERFORM 900-PTINF-READ-SEC
-           MOVE    MCPDATA-REC         TO  PTINF-REC
-           IF      FLG-PTINF           =   ZERO
-               IF      SPA-GMN-C02-TENKIKBN    =   "2"
+           IF      SPA-C02-KEIKOKU-FLG4    =   0
+               CONTINUE
+           ELSE
+               INITIALIZE                      PTINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+               MOVE    SPA-NAI-C02-PTID    TO  PTINF-PTID
+               PERFORM 900-PTINF-READ-SEC
+               IF      FLG-PTINF           =   ZERO
       *            転帰区分が２で死亡区分が生存のとき
-                   IF      PTINF-DEATHKBN  NOT =   "1"
+                   IF      SPA-C02-KEIKOKU-FLG4    =   1
                        MOVE    "1"                 TO  PTINF-DEATHKBN 
                        MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
                        MOVE    SMCNDATE-HMS        TO  PTINF-UPHMS
@@ -11225,22 +11363,10 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                        END-IF
       *???
                        DISPLAY "PTINF=" PTINF-DEATHKBN "#"
-      *???                
-                   END-IF
-               ELSE
-      *            修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
-                   IF    ( SPA-NAI-C02-SELNO   >   ZERO )
-                   AND   ( SPA-NAI-C02-TENKIKBN-OLD
-                                               =   "2"  )
-                     IF      PTINF-DEATHKBN      =   "1"
-                       INITIALIZE                      PTBYOMEI-REC
-                       MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
-                       MOVE    SPA-NAI-C02-PTID    TO  PTBYO-PTID
-                       MOVE    "tbl_ptbyomei"      TO  WRK-MCP-TABLE
-                       MOVE    "key48"             TO  WRK-MCP-PATHNAME
-                       PERFORM 900-PTBYO-INV-SEC
-                       IF      FLG-PTBYOMEI        =   1
-      *                    転帰区分２の病名が存在しないとき
+      *???
+                   ELSE
+      *                修正で転帰区分を２以外に変更したときに死亡区分が死亡のとき
+                       IF      SPA-C02-KEIKOKU-FLG4    =   9
                            MOVE    SPACE               TO
                                                        PTINF-DEATHKBN 
                            MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
@@ -11258,8 +11384,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
       *???
                            DISPLAY "PTINF=" PTINF-DEATHKBN "#"
       *???                
-                       END-IF
-                     END-IF 
+                       END-IF 
                    END-IF
                END-IF
            END-IF     
@@ -14073,6 +14198,14 @@ grpsys                                          SPA-AREA
                    STRING  "転帰区分の設定により患者情報の死亡区分を"
                                                 DELIMITED   BY  SIZE 
                            "「死亡」として更新します。よろしいですか"
+                                                DELIMITED   BY  SIZE 
+                                               INTO    WRK-CIDMSG
+                   END-STRING
+               WHEN    "0108"
+               WHEN    "0109"
+                   STRING  "転帰区分の変更により患者情報の死亡区分を"
+                                                DELIMITED   BY  SIZE 
+                           "「生存」として更新します。よろしいですか"
                                                 DELIMITED   BY  SIZE 
                                                INTO    WRK-CIDMSG
                    END-STRING
