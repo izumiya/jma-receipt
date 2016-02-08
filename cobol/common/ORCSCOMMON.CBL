@@ -29,6 +29,7 @@
       * 04.05.00     NACL-多々納  09/12/14  エンコーディング追加
       * 04.06.01     NACL-伊藤    11/01/28  リアルタイム送信
       * 04.07.01     NACL-竹田    11/06/29  クライアント印刷情報設定
+      * 04.08.00     NACL-太田    14/02/08  Ginbee対応(ユーザー登録なしを許可）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -459,10 +460,18 @@
            PERFORM 990-DBCLOSE-SEC
       *    職員情報なし
            IF     FLG-OK               =   ZERO
+      *
                INITIALIZE                  SYS-1010-REC
                INITIALIZE                  LNK-SYS-1010-REC
-               MOVE    "1001"              TO  SPA-ERRCD
-               GO      TO      1003-SYS1010-SPA-EXT
+      *
+               IF  ( SPA-MW            =   SPA-GINBEE )
+                AND( SPA-MOTOPG        =   "API"    )
+                   CONTINUE
+               ELSE
+                   MOVE    "1001"              TO  SPA-ERRCD
+                   GO      TO      1003-SYS1010-SPA-EXT
+               END-IF
+      *
            END-IF
       *
            INITIALIZE                  SYS-1050-REC
