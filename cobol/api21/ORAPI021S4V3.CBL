@@ -477,7 +477,7 @@
                MOVE    SPACE               TO  WRK-ERRCD
            END-IF
       *
-           MOVE    SPACE               TO  SPA-MOTOPG
+           MOVE    "API"               TO  SPA-MOTOPG
       *    £Ó£Ð£Á¶¦ÄÌÀßÄê
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
@@ -490,6 +490,7 @@
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE   "89"             TO  WRK-ERRCD
            END-IF
+           MOVE    SPACE               TO  SPA-MOTOPG
            .
        1001-ORCSCOMMON-EXT.
            EXIT.
