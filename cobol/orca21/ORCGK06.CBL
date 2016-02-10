@@ -36,6 +36,7 @@
       *  04.05.00    NACL-多々納  09/11/XX  移行履歴、リハビリコメント登録対応、登録変更対応
       *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
+      *  04.08.00    NACL-多々納  16/02/XX  初診料新規追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -68,6 +69,7 @@
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-PTRSIINF        PIC 9(01).
+           03  FLG-SRYKARRK        PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
            03  FLG-HEN             PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
@@ -142,6 +144,12 @@
            03  WRK-HKNKBN-MEI         PIC X(02).
            03  WRK-COMB-TEKSTYMD      PIC X(08).
            03  WRK-COMB-TEKEDYMD      PIC X(08).
+      *
+           03  WRK-LSTYMD             PIC X(08).
+           03  WRK-SANTEIYMD.
+               05  WRK-SANYM-X        PIC X(06).
+               05  WRK-SANDD          PIC X(02).
+      *
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -2006,6 +2014,31 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                GO      TO      45012-SYOSIN-CHK-EXT
            END-IF
+      *    最終来院日
+           MOVE    SPACE               TO  SRYKARRK-REC
+           INITIALIZE                      SRYKARRK-REC
+           MOVE    SPA-HOSPNUM         TO  KARRK-HOSPNUM
+           MOVE    SPA-PTID            TO  KARRK-PTID
+      *
+           MOVE    SRYKARRK-REC        TO  MCPDATA-REC
+           MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 975-SRYKARRK-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYKARRK
+           END-IF
+           MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-SRYKARRK        =   ZERO
+               MOVE    KARRK-LASTYMD       TO  WRK-LSTYMD
+           ELSE
+               MOVE    SPACE               TO  WRK-LSTYMD
+           END-IF
       *    初診算定チェック
            INITIALIZE                  SANTEI-REC
            MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
@@ -2022,16 +2055,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  FLG-SANTEI
            END-IF
-           MOVE    SPACE               TO  WRK-SRYYMD
+           MOVE    SPACE               TO  WRK-SANTEIYMD
            PERFORM
                    UNTIL       (FLG-SANTEI     =   1    )
       *        初回初診日
-               MOVE    SANTEI-SRYYM        TO  WRK-SRYYM-X
-               MOVE    ZERO                TO  WRK-SRYDD
+               MOVE    SANTEI-SRYYM        TO  WRK-SANYM-X
+               MOVE    ZERO                TO  WRK-SANDD
                PERFORM VARYING     IDX2    FROM    31  BY  -1
                        UNTIL      (IDX2    <   1    )
                    IF      SANTEI-DAY (IDX2)   >   ZERO
-                       MOVE    IDX2            TO  WRK-SRYDD
+                       MOVE    IDX2            TO  WRK-SANDD
                        MOVE    1               TO  IDX2
                    END-IF
                END-PERFORM
@@ -2043,9 +2076,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key11"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *    初診算定日登録あり
-           IF      WRK-SRYYM-X         <=  SPA-NAI-SRYYM
+           IF     (WRK-SANTEIYMD    NOT =   SPACE   )
+            AND   (WRK-SANYM-X         <=  SPA-NAI-SRYYM)
                MOVE    "K035"          TO  SPA-ERRCD
                MOVE    1               TO  SPA-KEIFLG3
+           ELSE
+               IF     (WRK-LSTYMD  NOT =   SPACE  )
+                 AND  (WRK-LSTYMD      <   WRK-SRYYMD )
+                   MOVE    "K036"              TO  SPA-ERRCD
+                   MOVE    1                   TO  SPA-KEIFLG3
+               END-IF
            END-IF
            .
        45012-SYOSIN-CHK-EXT.
@@ -2649,6 +2689,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "B03"        TO  MCP-WIDGET   
              WHEN    93
                     MOVE  "B04"        TO  MCP-WIDGET   
+             WHEN    94
+                    MOVE  "B10"        TO  MCP-WIDGET   
              WHEN    99
                     MOVE  "B12"        TO  MCP-WIDGET   
            END-EVALUATE
@@ -2786,6 +2828,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    STRING  "警告！"
                            "既に初診料の登録があります。"
                            "診療行為で登録して下さい。"
+                           DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K036"
+                   STRING  "警告！"
+                           "初診料算定日≦最終来院日で登録して下さい。"
                            DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
                    END-STRING
       *H25.9
@@ -3125,6 +3172,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-SANTEIPLUS-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療科歴データ主キー検索
+      *****************************************************************
+       975-SRYKARRK-READ-SEC           SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SRYKARRK-REC
+               MOVE    ZERO                TO  FLG-SRYKARRK
+           ELSE
+               MOVE    1                   TO  FLG-SRYKARRK
+               INITIALIZE                  SRYKARRK-REC
+           END-IF
+      *
+           .
+       975-SRYKARRK-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
