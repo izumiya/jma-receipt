@@ -132,6 +132,9 @@
       *                                     保険組合せ作成
       *  04.08.01    NACL-門脇    15/12/22  「入所中」入力時の保険組合せ
       *                                     適用期間対応
+      *  04.08.02    NACL-門脇    16/02/10  地方公費の保険組合せ作成修正
+      *                                     （同一保険番号が重複する
+      *                                       保険組合せは作成しない）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3944,7 +3947,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                           END-IF
                        ELSE
       ******************  地方公費
-                          IF  WRK-SRT-HJO-KOHNO  NOT  =  "020"
+                          IF  (WRK-SRT-HJO-KOHNO  NOT =  "020"       )
+                          AND (WRK-SRT-HJO-KOHNO  NOT =
+                                      WRK-KOH-HKNNUM(WRK-COMB-HJOIDX))
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                           END-IF
                        END-IF
