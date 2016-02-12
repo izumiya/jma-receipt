@@ -2647,11 +2647,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
-               IF     (SPA-COM-KZMFLG (IDX)    NOT =   SPACE )  OR
-                      (SPA-COM-KZMFLG2(IDX)    NOT =   SPACE )  OR
-                      (SPA-COM-KZMFLG3(IDX)    NOT =   SPACE )
-                   MOVE    SPACE               TO  SPA-MAE-INPUTCD (IDX)
-               END-IF
                MOVE    SPACE           TO  SPA-COM-KZMFLGAREA (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1(IDX)
