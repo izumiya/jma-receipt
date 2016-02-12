@@ -37,6 +37,8 @@
       *
       *  04.06.01    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
+      *
+      *  04.08.01    NACL-門脇    16/02/12  第三者行為対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -308,6 +310,9 @@ grpsys     COPY    "COMMON-SPA".
                        MOVE   WRK-SONOTA-TBL  TO  LNK-S01-SONOTA(IDX)
                        MOVE   WRK-KYUKYU    TO    LNK-S01-KYUKYU(IDX)
                     END-IF
+                    IF     LNK-SYU-KOH1HKNNUM(IDX) =   "970"
+                       MOVE   WRK-SONOTA-TBL  TO  LNK-S01-SONOTA(IDX)
+                    END-IF
                     IF     LNK-SYU-SYUHKNNUM(IDX)  =   "975"
                        MOVE   WRK-SYUTEN    TO    LNK-S01-SYUTEN(IDX)
                     END-IF
@@ -353,6 +358,24 @@ grpsys     COPY    "COMMON-SPA".
                       END-PERFORM
                       COMPUTE   WRK-KYUKYU  =  WRK-KYUKYU
                                             +  LNK-S01-KYUKYU(IDX)
+                    END-IF
+      *
+                    IF  LNK-SYU-KOH1HKNNUM(IDX) =   "970"
+                      PERFORM    VARYING   IDX2    FROM   1   BY   1
+                        UNTIL  (IDX2                           >    20 )
+                          OR   (LNK-S01-SONOTA-SRYCD(IDX IDX2) =  SPACE)
+                         IF   IDX3  >= 20
+                            DISPLAY "TABLE OVER"
+                         ELSE
+                            ADD    1      TO   IDX3
+                            MOVE   LNK-S01-SONOTA-SRYCD(IDX IDX2)
+                                          TO   WRK-SONOTA-SRYCD(IDX3)
+                            MOVE   LNK-S01-SONOTA-ZAIKAISU(IDX IDX2)
+                                          TO   WRK-SONOTA-ZAIKAISU(IDX3)
+                            MOVE   LNK-S01-SONOTA-TANKA(IDX IDX2)
+                                          TO   WRK-SONOTA-TANKA(IDX3)
+                         END-IF
+                      END-PERFORM
                     END-IF
       *
                     IF  LNK-SYU-SYUHKNNUM(IDX)  =   "975"
