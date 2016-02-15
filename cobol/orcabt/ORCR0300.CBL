@@ -433,6 +433,9 @@
       *  04.08.03    NACL-∞À∆£    15/06/23  ∞ÂŒ≈æ Ûœ¢∑»
       *                                     ∏Â»Ø…  —ππ…‘≤ƒ° ΩË ˝√±∞Ã°À
       *  04.08.04    NACL-∆£∏∂    15/09/01   ›∏±Õ˙ŒÚ§Œµ≠∫‹¬–±˛
+      *  04.08.05    NACL-ÃÁœ∆    16/02/08  RECE02§ŒÕΩ»˜π‡Ã‹ª»Õ— ¨§À§ƒ§§§∆°¢
+      *                                     ∏ƒ°π§Àπ‡Ã‹§Ú¿ﬂ§±§Îªˆ§À»º§¶Ω§¿µ°£
+      *                                     ¬Ë£≥¬Ë£¥∏¯»Ò§Œ≥Á∏Ã∫∆∑«µ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2817,8 +2820,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    æ⁄Ã¿ΩÒ»÷πÊ° ≈Ï¬Á∫Âª‘πÒ ›∏∫Ã»§Œ§»§≠°À
-           IF      RECE02-YOBIETC (10) >   0
-               MOVE    RECE02-YOBIETC (10) TO  WRK-NUM
+           IF      RECE02-GENMEN-COM   >   0
+               MOVE    RECE02-GENMEN-COM   TO  WRK-NUM
                MOVE    1                   TO  WRK-NAGASA
            END-IF    
            PERFORM 5005-NUM-HENSYU-SEC
@@ -3384,11 +3387,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° ∏¯»ÒµÎ…’¬–æ›≥∞ÕË∞Ï…Ù…È√¥∂‚°À
            IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-YOBIETC(6)   =   1                       ) AND
+                (RECE02-SAIKEIZEROKSI1       =   1               ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT = 999999999         ) AND
                 (IDY                 =   1                       ))
            OR  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-YOBIETC(6)   =  ZERO                     ) AND
+                (RECE02-SAIKEIZEROKSI1       =  ZERO             ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT = 999999999 AND ZERO) AND
                 (IDY                 =   1                       ))
            OR  ((RECE02-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
@@ -3398,14 +3401,28 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-YOBIETC(7)   =   1                       ) AND
+                (RECE02-SAIKEIZEROKSI2       =   1               ) AND
                 (RECE02-ZAITAKU-SAIKEI2  NOT = 999999999         ) AND
                 (IDY                 =   2                       ))
            OR  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE02-YOBIETC(7)   =  ZERO                     ) AND
+                (RECE02-SAIKEIZEROKSI2       =  ZERO             ) AND
                 (RECE02-ZAITAKU-SAIKEI2  NOT = 999999999 AND ZERO) AND
                 (IDY                 =   2                       ))
                MOVE   RECE02-ZAITAKU-SAIKEI2   TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
+           END-IF
+           IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-SAIKEIZEROKSI3       =   1               ) AND
+                (RECE02-ZAITAKU-SAIKEI3  NOT = 999999999         ) AND
+                (IDY                 =   3                       ))
+               MOVE   RECE02-ZAITAKU-SAIKEI3   TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
+           END-IF
+           IF  ((RECE02-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE02-SAIKEIZEROKSI4       =   1               ) AND
+                (RECE02-ZAITAKU-SAIKEI4  NOT = 999999999         ) AND
+                (IDY                 =   4                       ))
+               MOVE   RECE02-ZAITAKU-SAIKEI4   TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC
@@ -4044,7 +4061,8 @@ grpsys         MOVE    RECE041-HOSPNUM TO  COMB-HOSPNUM
       *    øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚§Œµ≠∫‹° ∫“£≤°À
            MOVE    SPACE               TO  WRK-DISASTER-COMMENT
            IF      RECE02-RJNGAIKOHFTN (1) =   4
-               MOVE    RECE02-YOBIETC (4)  TO  WRK-FUTAN
+               MOVE    RECE02-GENMEN-NASI-KIN
+                                       TO  WRK-FUTAN
                INITIALIZE              ORCSKANACHKAREA
                MOVE    "2"             TO  KANACHK-SYORI 
                MOVE    WRK-FUTAN       TO  KANACHK-MAE-INPUT

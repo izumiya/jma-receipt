@@ -236,6 +236,8 @@
       *  04.08.02    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *  04.08.03    NACL-藤原    15/10/08  複数枚レセプト分割対応
       *                                     公費単独の２回以上の分割対応
+      *  04.08.04    NACL-門脇    16/02/08  RECE62の予備項目使用分について、
+      *                                     個々に項目を設ける事に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1763,7 +1765,7 @@
                      RECE61-KOHID    NOT  =   ZERO   )   OR
                    ( FLG-ROUJINHOKEN      =   1      )   OR
                    ( RECE62-HKNNUM        =  "039"   ))
-           AND    (  RECE62-YOBIETC(8)    =  ZERO     )
+           AND    (  RECE62-KOREIHIGAITO  =  ZERO     )
                MOVE    "1"             TO  RECE62-KOUREI-HANTEIFLG
            END-IF
       *
@@ -1783,7 +1785,7 @@
       ***               RECE62-HKNNUM        =  "039"   )
                       ( FLG-ROUJINHOKEN      =   1      )   OR
                       ( RECE62-HKNNUM        =  "039"   ))
-                AND  (  RECE62-YOBIETC(8)    =  ZERO     )
+                AND  (  RECE62-KOREIHIGAITO  =  ZERO     )
                    MOVE     "1"     TO   RECE62-KOUREI
                 ELSE
                   IF  RECE62-SRYYM  >=  "200704"
@@ -2243,7 +2245,7 @@
                     IF    (PTKOH-TEKSTYMD  <=  WRK-SRYYMD    )
                     AND   (WRK-SRYYMD      <=  PTKOH-TEKEDYMD)
                     AND   (PTKOH-SAKJOKBN   =  SPACE         )
-                       MOVE    1    TO   RECE62-YOBIETC(8)
+                       MOVE    1    TO   RECE62-KOREIHIGAITO
                        MOVE    1    TO   FLG-PTKOHINF
                     ELSE
                        MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
@@ -2527,7 +2529,7 @@
                                        LNK-SYUBETUGET-RECESKYKBN (IDX)
                    END-IF 
                END-PERFORM
-               IF      RECE62-YOBIETC (8)  =   1
+               IF      RECE62-KOREIHIGAITO  =   1
                    MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
                END-IF
                MOVE    RECE62-BIRTHDAY TO  LNK-SYUBETUGET-BIRTHDAY

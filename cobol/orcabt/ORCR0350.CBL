@@ -154,7 +154,6 @@
       *                                     §Œµ≠œø§Ú§‰§·§Î
       *  03.03.08    NACL-∆£∏∂    06/11/14  œ∑øÕ∏∫Ã»¬–±˛
       *  03.03.09    NACL-∆£∏∂    06/11/16  ∏¯»Ò√±∆»§«∏¯»Ò§¨¡¥§∆¿∏≥ËŒ≈Õ‹
-
       *                                     ø©ªˆ…È√¥§¢§Í§ŒæÏπÁ§œ°÷97°◊§Œ
       *                                     µ≠∫‹§œ§∑§ §§
       *  03.03.10    NACL-∆£∏∂    06/11/17  ∏°∫∫§Œ»Ω√«Œ¡§Œ…È√¥∂Ë ¨§Œµ≠œø
@@ -170,7 +169,6 @@
       *  03.04.01    NACL-∆£∏∂    06/12/21  ∆˛±°Œ¡≤√ªª§Œ•≥•·•Û•»§Úµ≠œø§π§Î
       *  03.04.02    NACL-ÃÁœ∆    07/03/22  ∏¯»ÒµÎ…’¬–æ›∞Ï…Ù…È√¥∂‚ ‘Ω∏Ω§¿µ
       *  03.04.03    NACL-∆£∏∂    07/03/27  ∆√ƒÍ¥Ô∫‡§Œµ≠∫‹ ˝À°§Œ —ππ
-
       *  £≤£∞£∞£∑«Ø£¥∑Ó≤˛¿µ
       *  03.04.04    NACL-ÃÁœ∆    07/04/01  ∏Ω ™µÎ…’¬–±˛
       *  03.04.05    NACL-∆£∏∂    07/04/13  æ…æıæ‹µ≠∂Ë ¨•≥°º•…ƒ…≤√§À»º§¶¬–±˛
@@ -404,6 +402,9 @@
       *  04.08.03    NACL-∆£∏∂    14/07/07  ∞Ïª˛•«•£•Ï•Ø•»•Í¬–±˛
       *  04.08.04    NACL-∆£∏∂    15/09/01   ›∏±Õ˙ŒÚ§Œµ≠∫‹¬–±˛
       *  04.08.05    NACL-ÃÁœ∆    15/10/21  ∏Ω ™µÎ…’¬–æ›≥∞§Œƒ„ΩÍ∆¿° ø©ªˆ°À¬–±˛
+      *  04.08.06    NACL-ÃÁœ∆    16/02/08  RECE62§ŒÕΩ»˜π‡Ã‹ª»Õ— ¨§À§ƒ§§§∆°¢
+      *                                     ∏ƒ°π§Àπ‡Ã‹§Ú¿ﬂ§±§Îªˆ§À»º§¶Ω§¿µ°£
+      *                                     ¬Ë£≥¬Ë£¥∏¯»Ò§Œ≥Á∏Ã∫∆∑«µ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3108,8 +3109,8 @@
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
       *    æ⁄Ã¿ΩÒ»÷πÊ° ≈Ï¬Á∫Âª‘πÒ ›∏∫Ã»§Œ§»§≠°À
-           IF      RECE62-YOBIETC (10) >   0
-               MOVE    RECE62-YOBIETC (10) TO  WRK-NUM
+           IF      RECE62-GENMEN-COM   >   0
+               MOVE    RECE62-GENMEN-COM   TO  WRK-NUM
                MOVE    1                   TO  WRK-NAGASA
            END-IF    
            PERFORM 5005-NUM-HENSYU-SEC
@@ -3673,11 +3674,11 @@
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° œ∑øÕ∏¯»ÒµÎ…’¬–æ›œ∑øÕ∆˛±°∞Ï…Ù…È√¥∂‚°À
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-YOBIETC(6)   =   1                       ) AND
+                (RECE62-SAIKEIZEROKSI1       =   1               ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999         ) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-YOBIETC(6)   =  ZERO                     ) AND
+                (RECE62-SAIKEIZEROKSI1       =  ZERO             ) AND
                 (RECE62-KOUREI-SAIKEI    NOT = 999999999 AND ZERO) AND
                 (IDY                 =   1                       ))
            OR  ((RECE62-SRYYM       <   WRK-CONS-SRYYM-200804    ) AND
@@ -3687,14 +3688,28 @@
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-YOBIETC(7)   =   1                       ) AND
+                (RECE62-SAIKEIZEROKSI2       =   1               ) AND
                 (RECE62-KOUREI-SAIKEI2   NOT = 999999999         ) AND
                 (IDY                 =   2                       ))
            OR  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
-                (RECE62-YOBIETC(7)   =  ZERO                     ) AND
+                (RECE62-SAIKEIZEROKSI2       =  ZERO             ) AND
                 (RECE62-KOUREI-SAIKEI2   NOT = 999999999 AND ZERO) AND
                 (IDY                 =   2                       ))
                MOVE   RECE62-KOUREI-SAIKEI2    TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
+           END-IF
+           IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-SAIKEIZEROKSI3       =   1               ) AND
+                (RECE62-KOUREI-SAIKEI3   NOT = 999999999         ) AND
+                (IDY                 =   3                       ))
+               MOVE   RECE62-KOUREI-SAIKEI3    TO  WRK-NUM
+               MOVE    6                       TO  WRK-NAGASA
+           END-IF
+           IF  ((RECE62-SRYYM       >=  WRK-CONS-SRYYM-200804    ) AND
+                (RECE62-SAIKEIZEROKSI4       =   1               ) AND
+                (RECE62-KOUREI-SAIKEI4   NOT = 999999999         ) AND
+                (IDY                 =   4                       ))
+               MOVE   RECE62-KOUREI-SAIKEI4    TO  WRK-NUM
                MOVE    6                       TO  WRK-NAGASA
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC
@@ -4376,7 +4391,8 @@
            MOVE    SPACE               TO  WRK-DISASTER-COMMENT
            IF      RECE62-RJNGAIKOHFTN (1) =   4
       *        øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚§Œµ≠∫‹° ∫“£≤°À
-               MOVE    RECE62-YOBIETC (4)  TO  WRK-FUTAN
+               MOVE    RECE62-GENMEN-NASI-KIN
+                                           TO  WRK-FUTAN
                INITIALIZE                  ORCSKANACHKAREA
                MOVE    "2"                 TO  KANACHK-SYORI 
                MOVE    WRK-FUTAN           TO  KANACHK-MAE-INPUT
@@ -4405,7 +4421,8 @@
       *
       *        øÃ∫“∞ ¡∞∞Ï…Ùø©ªˆ¿∏≥ËŒ≈Õ‹…∏Ω‡…È√¥≥€§Œµ≠∫‹° ∫“£≤°À
                MOVE    SPACE               TO  WRK-DISASTER-COMMENT
-               MOVE    RECE62-YOBIETC (5)  TO  WRK-FUTAN1
+               MOVE    RECE62-GENMEN-NASI-SKJ
+                                           TO  WRK-FUTAN1
                INITIALIZE                  ORCSKANACHKAREA
                MOVE    "2"                 TO  KANACHK-SYORI 
                MOVE    WRK-FUTAN1          TO  KANACHK-MAE-INPUT

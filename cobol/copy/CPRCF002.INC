@@ -150,6 +150,9 @@
       *  04.08.01    NACL-門脇    15/10/08  システム管理２０１０機能追加対応
       *  04.08.02    NACL-門脇    15/12/02  ３歳児視覚聴覚精密健康診査
       *                                     （地域公費）対応
+      *  04.08.03    NACL-門脇    16/02/08  予備項目使用分について、
+      *                                     個々に項目を設ける。
+      *                                     第３第４公費の括弧再掲記載対応
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -550,6 +553,10 @@
            03  RECE02-ZAITAKU-SAIKEI      PIC  9(09).
       *在宅総合・在宅末期一部負担金再掲２
            03  RECE02-ZAITAKU-SAIKEI2     PIC  9(09).
+      *再掲３
+           03  RECE02-ZAITAKU-SAIKEI3     PIC  9(09).
+      *再掲４
+           03  RECE02-ZAITAKU-SAIKEI4     PIC  9(09).
       *公費の一部負担金再掲
            03  RECE02-KOH-SAIKEI          PIC  9(09).
       *公費の一部負担金再掲フラグ
@@ -811,6 +818,47 @@
       *３歳児視覚聴覚精密健康診査（地域公費）
            03  RECE02-SEIKENFLG                 PIC 9(01).
            03  RECE02-SEIKENTEN                 PIC 9(07).
+      *
+      *高齢非該当フラグ
+           03  RECE02-KOREIHIGAITO              PIC 9(01).
+      *公費分離区分置換フラグ
+           03  RECE02-KOHBUNRICHIKAN            PIC 9(01).
+      *非減免対象分扱い一部負担金
+           03  RECE02-GENMEN-NASI-KIN           PIC 9(09).
+      *括弧再掲上の０円記載フラグ
+           03  RECE02-SAIKEIZEROKSI1            PIC 9(01).
+      *括弧再掲下の０円記載フラグ
+           03  RECE02-SAIKEIZEROKSI2            PIC 9(01).
+      *括弧再掲３の０円記載フラグ
+           03  RECE02-SAIKEIZEROKSI3            PIC 9(01).
+      *括弧再掲４の０円記載フラグ
+           03  RECE02-SAIKEIZEROKSI4            PIC 9(01).
+      *東大阪市減免コメントフラグ
+           03  RECE02-GENMEN-COM                PIC 9(01).
+      *【レセプト】保険欄−一部負担金記載なしフラグ
+           03  RECE02-ICBKINKSI-NASI            PIC 9(01).
+      *【レセプト】保険欄−一部負担金記載ありフラグ
+           03  RECE02-ICBKINKSI-ARI             PIC 9(01).
+      *【レセプト】公費欄−一部負担金金額置換フラグ
+           03  RECE02-KOHCHIKAN                 PIC 9(01).
+      *「（再掲上）：」置換金額
+           03  RECE02-SAIKEI-CHIKAN-KIN1        PIC 9(09).
+      *「（再掲下）：」置換金額
+           03  RECE02-SAIKEI-CHIKAN-KIN2        PIC 9(09).
+      *「（再掲３）：」置換金額
+           03  RECE02-SAIKEI-CHIKAN-KIN3        PIC 9(09).
+      *「（再掲４）：」置換金額
+           03  RECE02-SAIKEI-CHIKAN-KIN4        PIC 9(09).
+      *「保険負担金：」置換金額
+           03  RECE02-HKN-CHIKAN-KIN            PIC 9(09).
+      *「公１負担金：」置換金額
+           03  RECE02-KOH-CHIKAN-KIN1           PIC 9(09).
+      *「公２負担金：」置換金額
+           03  RECE02-KOH-CHIKAN-KIN2           PIC 9(09).
+      *「公３負担金：」置換金額
+           03  RECE02-KOH-CHIKAN-KIN3           PIC 9(09).
+      *「公４負担金：」置換金額
+           03  RECE02-KOH-CHIKAN-KIN4           PIC 9(09).
       *
       *予備
            03  RECE02-YOBIETC-AREA.

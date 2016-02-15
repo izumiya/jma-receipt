@@ -213,6 +213,9 @@
       *  04.08.02    NACL-∆£∏∂    14/07/07  ∞Ïª˛•«•£•Ï•Ø•»•Í¬–±˛
       *  04.08.03    NACL-∆£∏∂    15/02/04  ¿¡µ·¥…Õ˝§ÿ§Œ∏¯»Òæ Û§Œππø∑
       *  04.08.04    NACL-∆£∏∂    15/09/01   ›∏±Õ˙ŒÚ§Œµ≠∫‹¬–±˛
+      *  04.08.05    NACL-ÃÁœ∆    16/02/08  RECE02§ŒÕΩ»˜π‡Ã‹ª»Õ— ¨§À§ƒ§§§∆°¢
+      *                                     ∏ƒ°π§Àπ‡Ã‹§Ú¿ﬂ§±§Îªˆ§À»º§¶Ω§¿µ°£
+      *                                     ¬Ë£≥¬Ë£¥∏¯»Ò§Œ≥Á∏Ã∫∆∑«µ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -451,6 +454,8 @@
            03  IDX3                PIC 9(02).
            03  IDX4                PIC 9(02).
            03  IDX5                PIC 9(02).
+           03  IDX6                PIC 9(02).
+           03  IDX7                PIC 9(02).
       *     
            03  SEIHIDX             PIC 9(02).
            03  KAKKIDX             PIC 9(02).
@@ -706,6 +711,7 @@
                05  WRK-KOH-FTNJANUM            PIC X(20).
                05  WRK-KOH-JNISSU              PIC X(04).
                05  WRK-KOH-FL                  PIC X(06).
+               05  WRK-KOH-SAIKEI              PIC X(14).
       *
            03  WRK-WLINETEK                    PIC 9(03).
            03  WRK-TNSIDX                      PIC 9(02).
@@ -1012,6 +1018,8 @@
                05  WRK-JINISSUZ    PIC  ZZ.
            03  WRK-JINISSU2.
                05  WRK-JINISSU2Z   PIC  Z9.
+           03  WRK-SAIKEI.
+               05  WRK-SAIKEIZ     PIC  ZZZZZZ9.
       *
        01  WRK-CNT                 PIC  9(5).
       *
@@ -5418,18 +5426,18 @@
                    END-IF
                END-IF
            END-IF
-           IF  ((RECE02-YOBIETC(6)           =   1                ) AND
+           IF  ((RECE02-SAIKEIZEROKSI1       =   1                ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999         ))
-           OR  ((RECE02-YOBIETC(6)           =  ZERO              ) AND
+           OR  ((RECE02-SAIKEIZEROKSI1       =  ZERO              ) AND
                 (RECE02-ZAITAKU-SAIKEI   NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI   TO  WRK-KGK7
              MOVE   WRK-KGK7                TO  HC06-FTNMONEYSAI(3:8)
              MOVE    ")"                    TO  HC06-FTNMONEYSAI(11:1)
            END-IF
-           IF  ((RECE02-YOBIETC(7)           =   1                ) AND
+           IF  ((RECE02-SAIKEIZEROKSI2       =   1                ) AND
                 (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999         ))
-           OR  ((RECE02-YOBIETC(7)           =  ZERO              ) AND
+           OR  ((RECE02-SAIKEIZEROKSI2       =  ZERO              ) AND
                 (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999 AND ZERO))
              MOVE    "("                    TO  HC06-FTNMONEYSAI2(1:1)
              MOVE   RECE02-ZAITAKU-SAIKEI2  TO  WRK-KGK7
@@ -6596,7 +6604,7 @@
       *****************************************************************
        34110-KOHNAME-SET-SEC          SECTION.
       *
-           IF      RECE02-YOBIETC(9)  =   ZERO
+           IF      RECE02-KOHBUNRICHIKAN  =   ZERO
               MOVE     SPACE             TO  WRK-KUGIRI6
               MOVE     SPACE             TO  WRK-KUGIRI2-KOHNAME
               MOVE     RECE02-KOHNUM (RECE061-KOHBUNRI)
@@ -7193,6 +7201,41 @@
                        MOVE    SPACE       TO  WRK-KOH-JNISSU  
                    END-IF
       *
+                   MOVE        SPACE       TO  WRK-KOH-SAIKEI
+                   IF  ((IDY                         =   3       ) AND
+                        (RECE02-SAIKEIZEROKSI3       =   1       ) AND
+                        (RECE02-ZAITAKU-SAIKEI3  NOT =  999999999))
+                   OR  ((IDY                         =   4       ) AND
+                        (RECE02-SAIKEIZEROKSI4       =   1       ) AND
+                        (RECE02-ZAITAKU-SAIKEI4  NOT =  999999999))
+                     EVALUATE  IDY
+                       WHEN     3
+                         MOVE  RECE02-ZAITAKU-SAIKEI3  TO  WRK-SAIKEIZ
+                       WHEN     4
+                         MOVE  RECE02-ZAITAKU-SAIKEI4  TO  WRK-SAIKEIZ
+                     END-EVALUATE
+                     MOVE    ZERO          TO  IDX7
+                     INITIALIZE            ORCSKANACHKAREA
+                     MOVE    "2"           TO  KANACHK-SYORI
+                     MOVE    WRK-SAIKEI    TO  KANACHK-MAE-INPUT
+                     CALL    "ORCSKANACHK" USING   ORCSKANACHKAREA
+                     IF    ( KANACHK-RC    =   ZERO )
+                     AND   ( KANACHK-MAX   >   ZERO )
+                       PERFORM  VARYING   IDX6  FROM   1   BY   2
+                                 UNTIL    IDX6    >    KANACHK-MAX
+                         IF  KANACHK-OUT-INPUT(IDX6:2)  NOT =  "°°"
+                             MOVE   IDX6         TO  IDX7
+                             MOVE   KANACHK-MAX  TO  IDX6
+                         END-IF
+                       END-PERFORM
+                       IF    IDX7   NOT = ZERO
+                         COMPUTE  IDX6  =  KANACHK-MAX - IDX7 + 1
+                         MOVE   KANACHK-OUT-INPUT(IDX7:IDX6)
+                                           TO  WRK-KOH-SAIKEI
+                       END-IF
+                     END-IF
+                   END-IF
+      *
                    ADD     1               TO  WRK-KOH-HENSYU-MAX
                    EVALUATE    IDZZ
                        WHEN    1
@@ -7232,6 +7275,17 @@
                                                INTO    WRK-KOH-HENSYU-X
                                                    (WRK-KOH-HENSYU-MAX)
                    END-STRING
+      *
+                   IF   WRK-KOH-SAIKEI  NOT =  SPACE
+                     ADD     1             TO  WRK-KOH-HENSYU-MAX
+                     STRING  "∏¯»ÒµÎ…’¬–æ›≥€° "
+                                               DELIMITED  BY  SIZE
+                             WRK-KOH-SAIKEI    DELIMITED  BY  SPACE
+                             "±ﬂ°À"            DELIMITED  BY  SIZE
+                                               INTO    WRK-KOH-HENSYU-X
+                                                   (WRK-KOH-HENSYU-MAX)
+                     END-STRING
+                   END-IF
                  END-IF
                END-PERFORM
       *    
@@ -7339,7 +7393,7 @@
       *        øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚§Œµ≠∫‹° ∫“£≤°À
                IF      RECE02-RJNGAIKOHFTN (1) =   4
                    MOVE    SPACE               TO  WRK-TITLE
-                   MOVE    RECE02-YOBIETC (4)
+                   MOVE    RECE02-GENMEN-NASI-KIN
                                            TO  WRK-FUTAN
                    INITIALIZE              ORCSKANACHKAREA
                    MOVE    "2"             TO  KANACHK-SYORI 
@@ -7655,7 +7709,7 @@
            END-IF
       *
       *    ≈Ï¬Á∫Âª‘∏∫Ã»•≥•·•Û•»
-           IF      RECE02-YOBIETC (10) =   1   OR  2
+           IF      RECE02-GENMEN-COM   =   1   OR   2
       *        ≈¶Õ◊ÕÛ§Àµ≠∫‹§µ§Ï§∆§§§ÎæÏπÁ£±π‘§¢§±§Î
                IF      WRK-LINETEK     >   ZERO
                    IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
@@ -7671,7 +7725,7 @@
                ADD     1                   TO  WRK-LINETEK
       *
                IF      CNT-PAGE        =   1
-                   EVALUATE    RECE02-YOBIETC (10)
+                   EVALUATE    RECE02-GENMEN-COM
                        WHEN    1
                            MOVE    "∑ËƒÍ∂Ë ¨£±"
                                            TO  HC06-TEKIYO (WRK-LINETEK)
@@ -7682,7 +7736,7 @@
                ELSE                    
                    EVALUATE    SYS-2005-NEXTPRTKBN-G
                        WHEN    "0"   
-                           EVALUATE    RECE02-YOBIETC (10)
+                           EVALUATE    RECE02-GENMEN-COM
                                WHEN    1
                                    MOVE    "∑ËƒÍ∂Ë ¨£±"
                                            TO  HC06-TEKIYO (WRK-LINETEK)
@@ -7691,7 +7745,7 @@
                                            TO  HC06-TEKIYO (WRK-LINETEK)
                            END-EVALUATE
                        WHEN    "1"   
-                           EVALUATE    RECE02-YOBIETC (10)
+                           EVALUATE    RECE02-GENMEN-COM
                                WHEN    1
                                    MOVE    "∑ËƒÍ∂Ë ¨£±"
                                            TO  HC061-TEKIYO(WRK-LINETEK)
@@ -7700,7 +7754,7 @@
                                            TO  HC061-TEKIYO(WRK-LINETEK)
                            END-EVALUATE
                        WHEN    "2"   
-                           EVALUATE    RECE02-YOBIETC (10)
+                           EVALUATE    RECE02-GENMEN-COM
                                WHEN    1
                                    MOVE    "∑ËƒÍ∂Ë ¨£±"
                                            TO  HC062-TEKIYO(WRK-LINETEK)
@@ -7709,7 +7763,7 @@
                                            TO  HC062-TEKIYO(WRK-LINETEK)
                            END-EVALUATE
                        WHEN    "3"   
-                           EVALUATE    RECE02-YOBIETC (10)
+                           EVALUATE    RECE02-GENMEN-COM
                                WHEN    1
                                    MOVE    "∑ËƒÍ∂Ë ¨£±"
                                            TO  HC063-TEKIYO(WRK-LINETEK)
@@ -9711,7 +9765,7 @@
                                        TO  RECE10-ETC-YKZFTN (1)
       *
       *    ∏Â¥¸π‚Œº‘»Û≥∫≈ˆ
-           IF      RECE02-YOBIETC (8)  =   1
+           IF      RECE02-KOREIHIGAITO  =   1
                MOVE    1                   TO  RECE10-ETC-YKZFTN (2)
            END-IF 
       *
@@ -9723,9 +9777,9 @@
                MOVE   RECE02-ZAITAKU   TO  RECE10-RESERVE-AREA(1:1)
            END-IF
       *
-           IF     (RECE02-YOBIETC(11)  =  1  OR  2  OR  3)
-           OR     (RECE02-YOBIETC(3)   =  1  OR  2  OR  3)
-             EVALUATE  RECE02-YOBIETC(11)
+           IF     (RECE02-ICBKINKSI-ARI    =  1  OR  2  OR  3)
+           OR     (RECE02-ICBKINKSI-NASI   =  1  OR  2  OR  3)
+             EVALUATE  RECE02-ICBKINKSI-ARI
                WHEN       1
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(2:1)
                WHEN       2
@@ -9733,7 +9787,7 @@
                WHEN       3
                  MOVE   "3"        TO  RECE10-RESERVE-AREA(2:1)
              END-EVALUATE
-             EVALUATE  RECE02-YOBIETC(3)
+             EVALUATE  RECE02-ICBKINKSI-NASI
                WHEN       1
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(3:1)
                WHEN       2
@@ -9741,36 +9795,50 @@
                WHEN       3
                  MOVE   "3"        TO  RECE10-RESERVE-AREA(3:1)
              END-EVALUATE
-             IF    RECE02-YOBIETC(12)  NOT =  123456789
-               IF  RECE02-YOBIETC(12)      =  009999999
+             IF    RECE02-SAIKEI-CHIKAN-KIN1  NOT =  123456789
+               IF  RECE02-SAIKEI-CHIKAN-KIN1      =  009999999
                  MOVE   "2"        TO  RECE10-RESERVE-AREA(4:1)
                ELSE
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(4:1)
                END-IF
              END-IF
-             IF    RECE02-YOBIETC(13)  NOT =  123456789
-               IF  RECE02-YOBIETC(13)      =  009999999
+             IF    RECE02-SAIKEI-CHIKAN-KIN2  NOT =  123456789
+               IF  RECE02-SAIKEI-CHIKAN-KIN2      =  009999999
                  MOVE   "2"        TO  RECE10-RESERVE-AREA(5:1)
                ELSE
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(5:1)
                END-IF
              END-IF
-             IF    RECE02-YOBIETC(14)  NOT =  123456789
+             IF    RECE02-SAIKEI-CHIKAN-KIN3  NOT =  123456789
+               IF  RECE02-SAIKEI-CHIKAN-KIN3      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(11:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(11:1)
+               END-IF
+             END-IF
+             IF    RECE02-SAIKEI-CHIKAN-KIN4  NOT =  123456789
+               IF  RECE02-SAIKEI-CHIKAN-KIN4      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(12:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(12:1)
+               END-IF
+             END-IF
+             IF    RECE02-HKN-CHIKAN-KIN      NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(6:1)
              END-IF
            END-IF
       *
-           IF      RECE02-YOBIETC(19)  =  1
-             IF    RECE02-YOBIETC(15)  NOT =  123456789
+           IF      RECE02-KOHCHIKAN  =  1
+             IF    RECE02-KOH-CHIKAN-KIN1     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(7:1)
              END-IF
-             IF    RECE02-YOBIETC(16)  NOT =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN2     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(8:1)
              END-IF
-             IF    RECE02-YOBIETC(17)  NOT =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN3     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(9:1)
              END-IF
-             IF    RECE02-YOBIETC(18)  NOT =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN4     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(10:1)
              END-IF
            END-IF

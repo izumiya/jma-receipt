@@ -275,6 +275,8 @@
       *  04.08.02    NACL-門脇    15/10/21  現物給付対象外の低所得（食事）対応
       *  04.08.03    NACL-藤原    15/10/08  複数枚レセプト分割対応
       *                                     公費単独の２回以上の分割対応
+      *  04.08.04    NACL-門脇    16/02/08  RECE02の予備項目使用分について、
+      *                                     個々に項目を設ける事に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2657,7 +2659,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
                     IF    (PTKOH-TEKSTYMD  <=  WRK-SRYYMD    )
                     AND   (WRK-SRYYMD      <=  PTKOH-TEKEDYMD)
                     AND   (PTKOH-SAKJOKBN   =  SPACE         )
-                       MOVE    1    TO   RECE02-YOBIETC(8)
+                       MOVE    1    TO   RECE02-KOREIHIGAITO
                        MOVE    1    TO   FLG-PTKOHINF
                     ELSE
                        MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
@@ -2972,7 +2974,7 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                                        LNK-SYUBETUGET-RECESKYKBN (IDX)
                    END-IF 
                END-PERFORM
-               IF      RECE02-YOBIETC (8)  =   1
+               IF      RECE02-KOREIHIGAITO  =   1
                    MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
                END-IF
                MOVE    RECE02-BIRTHDAY TO  LNK-SYUBETUGET-BIRTHDAY
@@ -3829,7 +3831,7 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                      RECE01-KOHID    NOT  =   ZERO   )   OR
                    ( FLG-ROUJINHOKEN      =   1      )   OR
                    ( RECE02-HKNNUM        =  "039"   ))
-           AND    (  RECE02-YOBIETC(8)    =  ZERO     )
+           AND    (  RECE02-KOREIHIGAITO  =  ZERO     )
                MOVE    "1"             TO  RECE02-KOUREI-HANTEIFLG
            END-IF
       *
@@ -3856,7 +3858,7 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
       ***            RECE02-HKNNUM        =  "039"   )
                    ( FLG-ROUJINHOKEN      =   1      )   OR
                    ( RECE02-HKNNUM        =  "039"   ))
-           AND    (  RECE02-YOBIETC(8)    =  ZERO     )
+           AND    (  RECE02-KOREIHIGAITO  =  ZERO     )
                MOVE   1    TO   FLG-GENBUTU70
            ELSE
              IF  RECE01-SRYYM    >=  "200704"

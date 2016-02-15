@@ -704,6 +704,9 @@
       *  04.08.09    NACL-門脇    15/12/24  器材の単価編集修正
       *  04.08.10    NACL-門脇    16/01/07  第三者行為の登録有無チェック修正
       *  04.08.11    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.12    NACL-門脇    16/02/08  RECE62の予備項目使用分について、
+      *                                     個々に項目を設ける事に伴う修正。
+      *                                     第３第４公費の括弧再掲記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3373,13 +3376,15 @@
            MOVE      ZERO      TO   WRK-TAIHI-OKIKAE2
            MOVE      ZERO      TO   WRK-TAIHI-ZAINUM3
       *
-           MOVE    123456789   TO   RECE62-YOBIETC(12)
-           MOVE    123456789   TO   RECE62-YOBIETC(13)
-           MOVE    123456789   TO   RECE62-YOBIETC(14)
-           MOVE    123456789   TO   RECE62-YOBIETC(15)
-           MOVE    123456789   TO   RECE62-YOBIETC(16)
-           MOVE    123456789   TO   RECE62-YOBIETC(17)
-           MOVE    123456789   TO   RECE62-YOBIETC(18)
+           MOVE    123456789   TO   RECE62-SAIKEI-CHIKAN-KIN1
+           MOVE    123456789   TO   RECE62-SAIKEI-CHIKAN-KIN2
+           MOVE    123456789   TO   RECE62-SAIKEI-CHIKAN-KIN3
+           MOVE    123456789   TO   RECE62-SAIKEI-CHIKAN-KIN4
+           MOVE    123456789   TO   RECE62-HKN-CHIKAN-KIN
+           MOVE    123456789   TO   RECE62-KOH-CHIKAN-KIN1
+           MOVE    123456789   TO   RECE62-KOH-CHIKAN-KIN2
+           MOVE    123456789   TO   RECE62-KOH-CHIKAN-KIN3
+           MOVE    123456789   TO   RECE62-KOH-CHIKAN-KIN4
       *
            PERFORM        2118-ETCKISAIFLGINF-HENSYU-SEC
            PERFORM        2119-HOTEIGAI-HENSYU-SEC
@@ -3624,9 +3629,9 @@
                          AND   (FLG-GENMEN-NASI  =  1      )
                            MOVE    4       TO  RECE62-RJNGAIKOHFTN (1)
                            MOVE  WRK-GENMEN-NASI-KIN
-                                           TO  RECE62-YOBIETC(4)
+                                           TO  RECE62-GENMEN-NASI-KIN
                            MOVE  WRK-GENMEN-NASI-SKJ
-                                           TO  RECE62-YOBIETC(5)
+                                           TO  RECE62-GENMEN-NASI-SKJ
                            IF   (FLG-SAIGAI-TAISYO  =   1       )
                            AND  (RECE62-HKNNUM  NOT =  SPACE    )
                              IF  RECE62-KOUREI      =  "1" OR "2"
@@ -3644,9 +3649,9 @@
                            AND (FLG-GENMEN-NASI2 =  1      )
                              MOVE    4     TO  RECE62-RJNGAIKOHFTN (1)
                              MOVE  WRK-GENMEN-NASI-KIN2
-                                           TO  RECE62-YOBIETC(4)
+                                           TO  RECE62-GENMEN-NASI-KIN
                              MOVE  WRK-GENMEN-NASI-SKJ2
-                                           TO  RECE62-YOBIETC(5)
+                                           TO  RECE62-GENMEN-NASI-SKJ
                            ELSE
                              MOVE    2     TO  RECE62-RJNGAIKOHFTN (1)
                            END-IF
@@ -3697,8 +3702,8 @@
                               WHEN      7
                                 MOVE   6    TO  RECE62-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE62-YOBIETC(4)
-                            MOVE    ZERO    TO  RECE62-YOBIETC(5)
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-KIN
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-SKJ
                             MOVE    ZERO    TO  RECE62-GENMENKBN
                          END-IF
                        WHEN        1
@@ -3717,8 +3722,8 @@
                               WHEN      7
                                 MOVE   6    TO  RECE62-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE62-YOBIETC(4)
-                            MOVE    ZERO    TO  RECE62-YOBIETC(5)
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-KIN
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-SKJ
                             MOVE    ZERO    TO  RECE62-GENMENKBN
                          END-IF
                        WHEN        9
@@ -3735,8 +3740,8 @@
                               WHEN      7
                                 MOVE   6    TO  RECE62-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE62-YOBIETC(4)
-                            MOVE    ZERO    TO  RECE62-YOBIETC(5)
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-KIN
+                            MOVE    ZERO    TO  RECE62-GENMEN-NASI-SKJ
                             MOVE    ZERO    TO  RECE62-GENMENKBN
                          END-IF
                      END-EVALUATE
@@ -3813,8 +3818,8 @@
                      END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
-                     MOVE    ZERO    TO   RECE62-YOBIETC(4)
-                     MOVE    ZERO    TO   RECE62-YOBIETC(5)
+                     MOVE    ZERO    TO   RECE62-GENMEN-NASI-KIN
+                     MOVE    ZERO    TO   RECE62-GENMEN-NASI-SKJ
                    END-IF
                END-IF
            END-IF
@@ -4468,7 +4473,7 @@
                      MOVE    3                TO  RECE62-GENMENKBN
               END-EVALUATE
       *
-              MOVE   WK-GENGAKU-KTKBN         TO  RECE62-YOBIETC(10)
+              MOVE   WK-GENGAKU-KTKBN         TO  RECE62-GENMEN-COM
            END-IF
       *
            .
@@ -7262,7 +7267,7 @@
       *
             IF       SRY-SRYCD(IDX2)   =  "099999909"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE62-YOBIETC(3)
+                  MOVE    1     TO    RECE62-ICBKINKSI-NASI
                   MOVE    2     TO    FLG-KIN-OKIKAE
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -7270,7 +7275,7 @@
             END-IF
             IF       SRY-SRYCD(IDX2)   =  "099999910"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE62-YOBIETC(11)
+                  MOVE    1     TO    RECE62-ICBKINKSI-ARI
                   MOVE    1     TO    FLG-KIN-OKIKAE
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -7278,7 +7283,7 @@
             END-IF
             IF       SRY-SRYCD(IDX2)   =  "099999921"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE62-YOBIETC(19)
+                  MOVE    1     TO    RECE62-KOHCHIKAN
                   MOVE    1     TO    FLG-KIN-OKIKAE2
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -9222,6 +9227,8 @@
       *
              IF  WRK-INPUTCOMENT(1:12)  =  "（再掲上）："
              OR  WRK-INPUTCOMENT(1:12)  =  "（再掲下）："
+             OR  WRK-INPUTCOMENT(1:12)  =  "（再掲３）："
+             OR  WRK-INPUTCOMENT(1:12)  =  "（再掲４）："
              OR  WRK-INPUTCOMENT(1:12)  =  "保険負担金："
                MOVE  WRK-INPUTCOMENT(13:14)
                                           TO  WRK-INPUTCOMENT2
@@ -9269,16 +9276,29 @@
                      END-IF
                    END-PERFORM
                    IF  WRK-INPUTCOMENT(1:12)  =  "（再掲上）："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(12)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(12)
+                     MOVE  ZERO        TO  RECE62-SAIKEI-CHIKAN-KIN1
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE62-SAIKEI-CHIKAN-KIN1
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "（再掲下）："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(13)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(13)
+                     MOVE  ZERO        TO  RECE62-SAIKEI-CHIKAN-KIN2
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE62-SAIKEI-CHIKAN-KIN2
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "（再掲３）："
+                     MOVE  ZERO        TO  RECE62-SAIKEI-CHIKAN-KIN3
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE62-SAIKEI-CHIKAN-KIN3
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "（再掲４）："
+                     MOVE  ZERO        TO  RECE62-SAIKEI-CHIKAN-KIN4
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE62-SAIKEI-CHIKAN-KIN4
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "保険負担金："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(14)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(14)
+                     MOVE  ZERO        TO  RECE62-HKN-CHIKAN-KIN
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE62-HKN-CHIKAN-KIN
                    END-IF
                  END-IF
                END-IF
@@ -9362,20 +9382,24 @@
                      END-IF
                    END-PERFORM
                    IF  WRK-INPUTCOMENT(1:12)  =  "公１負担金："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(15)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(15)
+                     MOVE  ZERO     TO  RECE62-KOH-CHIKAN-KIN1
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE62-KOH-CHIKAN-KIN1
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "公２負担金："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(16)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(16)
+                     MOVE  ZERO     TO  RECE62-KOH-CHIKAN-KIN2
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE62-KOH-CHIKAN-KIN2
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "公３負担金："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(17)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(17)
+                     MOVE  ZERO     TO  RECE62-KOH-CHIKAN-KIN3
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE62-KOH-CHIKAN-KIN3
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "公４負担金："
-                     MOVE  ZERO                 TO  RECE62-YOBIETC(18)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(18)
+                     MOVE  ZERO     TO  RECE62-KOH-CHIKAN-KIN4
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE62-KOH-CHIKAN-KIN4
                    END-IF
                  END-IF
                END-IF
@@ -17365,7 +17389,7 @@
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
              OR  (RECE62-AGE          <    70                        )
       ***    OR  (RECE62-AGE          >    74                        )
-             OR  (RECE62-YOBIETC(8)   =     1                        )
+             OR  (RECE62-KOREIHIGAITO =     1                        )
                CONTINUE
              ELSE
                IF  (RECE62-HOJOKBN     =   "1"  OR  "9")
@@ -25431,14 +25455,14 @@
                        CONTINUE
                      ELSE
                        MOVE   "2"      TO   RECE62-KOUREI
-                       MOVE    2       TO   RECE62-YOBIETC(11)
+                       MOVE    2       TO   RECE62-ICBKINKSI-ARI
                      END-IF
                  WHEN        2
                      IF  RECE62-KOUREI   = "3"
                        CONTINUE
                      ELSE
                        MOVE   "3"      TO   RECE62-KOUREI
-                       MOVE    2       TO   RECE62-YOBIETC(3)
+                       MOVE    2       TO   RECE62-ICBKINKSI-NASI
                      END-IF
                END-EVALUATE
       *
@@ -25493,14 +25517,14 @@
                        CONTINUE
                      ELSE
                        MOVE   "1"      TO   RECE62-KOUREI
-                       MOVE    2       TO   RECE62-YOBIETC(11)
+                       MOVE    2       TO   RECE62-ICBKINKSI-ARI
                      END-IF
                  WHEN        2
                      IF  RECE62-KOUREI   = "4"
                        CONTINUE
                      ELSE
                        MOVE   "4"      TO   RECE62-KOUREI
-                       MOVE    2       TO   RECE62-YOBIETC(3)
+                       MOVE    2       TO   RECE62-ICBKINKSI-NASI
                      END-IF
                END-EVALUATE
       *
@@ -25537,7 +25561,7 @@
       *
                EVALUATE  WRK-TAIHI-OKIKAE
                  WHEN        2
-                       MOVE    2       TO   RECE62-YOBIETC(3)
+                       MOVE    2       TO   RECE62-ICBKINKSI-NASI
                END-EVALUATE
       *
            END-IF
@@ -25719,7 +25743,7 @@
                                             RECE62-KOUREI-SAIKEI2
                   IF   (FLG-CYOKI-HENSYU       =   1     )
                   AND  (FLG-ZENKOKUKOHI-NISYU  =   2 OR 4)
-                     MOVE   1           TO  RECE62-YOBIETC(7)
+                     MOVE   1           TO  RECE62-SAIKEIZEROKSI2
                   END-IF
                   MOVE     ZERO         TO  FLG-ZENKOKUKOHI-NISYU
               ELSE
@@ -25834,7 +25858,7 @@
                           MOVE  WRK-CYOKI-KEISAN3
                                         TO   RECE62-KOUREI-SAIKEI2
                           IF    WRK-CYOKI-KEISAN3  = ZERO
-                             MOVE   1   TO   RECE62-YOBIETC(7)
+                             MOVE   1   TO   RECE62-SAIKEIZEROKSI2
                           END-IF
                         END-IF
                       END-IF
@@ -25949,7 +25973,7 @@
                    IF  FLG-CYOKI-HENSYU  =  1
                     IF  FLG-ZENKOKUKOHI-NISYU  =  2 OR 4
                       MOVE   ZERO   TO  RECE62-KOUREI-SAIKEI2
-                      MOVE    1     TO  RECE62-YOBIETC(7)
+                      MOVE    1     TO  RECE62-SAIKEIZEROKSI2
                     END-IF
                    ELSE
                     COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
@@ -25989,7 +26013,7 @@
                              MOVE WRK-CYOKI-KEISAN6
                                           TO   RECE62-KOUREI-SAIKEI2
                              IF   WRK-CYOKI-KEISAN6 = ZERO
-                                MOVE   1        TO  RECE62-YOBIETC(7)
+                                MOVE   1  TO   RECE62-SAIKEIZEROKSI2
                              END-IF
                             ELSE
                              MOVE  FTN-KOH-XX7  TO  WRK-CYOKI-KEISAN7
@@ -26012,7 +26036,7 @@
                             MOVE  WRK-CYOKI-KEISAN3
                                           TO   RECE62-KOUREI-SAIKEI2
                             IF    WRK-CYOKI-KEISAN3  = ZERO
-                               MOVE   1   TO   RECE62-YOBIETC(7)
+                               MOVE   1   TO   RECE62-SAIKEIZEROKSI2
                             END-IF
                           END-IF
                       END-IF
@@ -26078,23 +26102,25 @@
                     (RECE62-RECESKYKBN(4) NOT = SPACE  ))
                   CONTINUE
                 ELSE
-                  MOVE    1    TO    RECE62-YOBIETC(6)
+                  MOVE    1    TO    RECE62-SAIKEIZEROKSI1
                 END-IF
               END-IF
            END-IF
            IF      RECE62-SRYYM          >=  "200804"
              IF    RECE62-KOUREI-SAIKEI   =   ZERO
-             AND   RECE62-YOBIETC(6)      =   ZERO
+             AND   RECE62-SAIKEIZEROKSI1  =   ZERO
                   MOVE     999999999    TO  RECE62-KOUREI-SAIKEI
              END-IF
              IF    RECE62-KOUREI-SAIKEI2  =   ZERO
-             AND   RECE62-YOBIETC(7)      =   ZERO
+             AND   RECE62-SAIKEIZEROKSI2  =   ZERO
                 IF   FLG-ZENKOKUKOHI-NISYU =  3
-                  MOVE      1           TO  RECE62-YOBIETC(7)
+                  MOVE      1           TO  RECE62-SAIKEIZEROKSI2
                 ELSE
                   MOVE     999999999    TO  RECE62-KOUREI-SAIKEI2
                 END-IF
              END-IF
+             MOVE          999999999    TO  RECE62-KOUREI-SAIKEI3
+             MOVE          999999999    TO  RECE62-KOUREI-SAIKEI4
            END-IF
       *
            IF      RECE62-RJNGENMENKBN   =   "1"
@@ -26442,7 +26468,7 @@
                                 RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE     ZERO       TO  RECE62-KOUREI-SAIKEI
-                       MOVE      1         TO  RECE62-YOBIETC(6)
+                       MOVE      1         TO  RECE62-SAIKEIZEROKSI1
                      END-IF
                    END-IF
                  END-IF
@@ -26499,7 +26525,7 @@
                                 RECE62-KOUREI-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE   ZERO            TO  RECE62-KOUREI-SAIKEI
-                       MOVE    1              TO  RECE62-YOBIETC(6)
+                       MOVE    1              TO  RECE62-SAIKEIZEROKSI1
                      END-IF
                    END-IF
                  END-IF
@@ -27904,7 +27930,7 @@
              IF   FLG-CHIIKI    =   3
                MOVE  WRK-CHK-KOKIGAK3  TO  RECE62-KOUREI-SAIKEI2
                IF    RECE62-KOUREI-SAIKEI2  =   ZERO
-                  MOVE       1         TO  RECE62-YOBIETC(7)
+                  MOVE       1         TO  RECE62-SAIKEIZEROKSI2
                END-IF
              END-IF
       *
@@ -28054,7 +28080,7 @@
              IF   FLG-CHIIKI    =   3
                MOVE  WRK-CHK-KOKIGAK7  TO  RECE62-KOUREI-SAIKEI2
                IF    RECE62-KOUREI-SAIKEI2  =   ZERO
-                  MOVE       1         TO  RECE62-YOBIETC(7)
+                  MOVE       1         TO  RECE62-SAIKEIZEROKSI2
                END-IF
              END-IF
       *
@@ -28465,9 +28491,9 @@
                     RECE62-KOUREI-SAIKEI2  +
                     WRK-CHK-KOKIGAK8
            IF    RECE62-KOUREI-SAIKEI2   =  ZERO
-              MOVE     1     TO   RECE62-YOBIETC(7)
+              MOVE     1     TO   RECE62-SAIKEIZEROKSI2
            ELSE
-              MOVE    ZERO   TO   RECE62-YOBIETC(7)
+              MOVE    ZERO   TO   RECE62-SAIKEIZEROKSI2
            END-IF
       *
            .
@@ -31102,116 +31128,163 @@
            AND (RECE62-KOUREI       =  "1" OR "2")
            AND (WRK-TAIHI-OKIKAE    =   1        )
       *      再掲上置き換え
-             IF  ( RECE62-KOHNUM(1)        =  SPACE     )
-             OR  ((RECE62-YOBIETC(12)      =  009999999) AND
-                  (RECE62-KOUREI-SAIKEI    =  999999999))
-                 MOVE   123456789           TO   RECE62-YOBIETC(12)
+             IF  ( RECE62-KOHNUM(1)           =  SPACE     )
+             OR  ((RECE62-SAIKEI-CHIKAN-KIN1  =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI       =  999999999))
+                 MOVE   123456789   TO   RECE62-SAIKEI-CHIKAN-KIN1
              END-IF
-             IF    RECE62-YOBIETC(12)  =  123456789
+             IF    RECE62-SAIKEI-CHIKAN-KIN1  =  123456789
                  CONTINUE
              ELSE
-               IF  RECE62-YOBIETC(12)  =  009999999
-                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI
+               IF  RECE62-SAIKEI-CHIKAN-KIN1  =  009999999
+                 MOVE   999999999   TO   RECE62-KOUREI-SAIKEI
                ELSE
-                 MOVE      1                TO   RECE62-YOBIETC(6)
-                 MOVE   RECE62-YOBIETC(12)  TO   RECE62-KOUREI-SAIKEI
+                 MOVE      1        TO   RECE62-SAIKEIZEROKSI1
+                 MOVE   RECE62-SAIKEI-CHIKAN-KIN1
+                                    TO   RECE62-KOUREI-SAIKEI
                END-IF
              END-IF
       *      再掲下置き換え
-             IF  ( RECE62-KOHNUM(2)        =  SPACE     )
-             OR  ((RECE62-YOBIETC(13)      =  009999999) AND
-                  (RECE62-KOUREI-SAIKEI2   =  999999999))
-                 MOVE   123456789           TO   RECE62-YOBIETC(13)
+             IF  ( RECE62-KOHNUM(2)           =  SPACE     )
+             OR  ((RECE62-SAIKEI-CHIKAN-KIN2  =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI2      =  999999999))
+                 MOVE   123456789   TO   RECE62-SAIKEI-CHIKAN-KIN2
              END-IF
-             IF   (RECE62-KOUREI-SAIKEI        =  999999999)
-             AND  (RECE62-KOUREI-SAIKEI2   NOT =  999999999)
-                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI2
-                 MOVE   123456789           TO   RECE62-YOBIETC(13)
-             END-IF
-             IF    RECE62-YOBIETC(13)  =  123456789
+             IF    RECE62-SAIKEI-CHIKAN-KIN2  =  123456789
                  CONTINUE
              ELSE
-               IF  RECE62-YOBIETC(13)  =  009999999
-                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI2
+               IF  RECE62-SAIKEI-CHIKAN-KIN2  =  009999999
+                 MOVE   999999999   TO   RECE62-KOUREI-SAIKEI2
                ELSE
-                 MOVE      1                TO   RECE62-YOBIETC(7)
-                 MOVE   RECE62-YOBIETC(13)  TO   RECE62-KOUREI-SAIKEI2
+                 MOVE      1        TO   RECE62-SAIKEIZEROKSI2
+                 MOVE   RECE62-SAIKEI-CHIKAN-KIN2
+                                    TO   RECE62-KOUREI-SAIKEI2
+               END-IF
+             END-IF
+      *      再掲３置き換え
+             IF  ( RECE62-KOHNUM(3)           =  SPACE     )
+             OR  ((RECE62-SAIKEI-CHIKAN-KIN3  =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI3      =  999999999))
+                 MOVE   123456789   TO   RECE62-SAIKEI-CHIKAN-KIN3
+             END-IF
+             IF    RECE62-SAIKEI-CHIKAN-KIN3  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE62-SAIKEI-CHIKAN-KIN3  =  009999999
+                 MOVE   999999999   TO   RECE62-KOUREI-SAIKEI3
+               ELSE
+                 MOVE      1        TO   RECE62-SAIKEIZEROKSI3
+                 MOVE   RECE62-SAIKEI-CHIKAN-KIN3
+                                    TO   RECE62-KOUREI-SAIKEI3
+               END-IF
+             END-IF
+      *      再掲４置き換え
+             IF  ( RECE62-KOHNUM(4)           =  SPACE     )
+             OR  ((RECE62-SAIKEI-CHIKAN-KIN4  =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI4      =  999999999))
+                 MOVE   123456789   TO   RECE62-SAIKEI-CHIKAN-KIN4
+             END-IF
+             IF    RECE62-SAIKEI-CHIKAN-KIN4  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE62-SAIKEI-CHIKAN-KIN4  =  009999999
+                 MOVE   999999999   TO   RECE62-KOUREI-SAIKEI4
+               ELSE
+                 MOVE      1        TO   RECE62-SAIKEIZEROKSI4
+                 MOVE   RECE62-SAIKEI-CHIKAN-KIN4
+                                    TO   RECE62-KOUREI-SAIKEI4
                END-IF
              END-IF
       *      保険一部負担金置き換え
-             IF    RECE62-YOBIETC(14)  =  009999999
-                 MOVE   123456789           TO   RECE62-YOBIETC(14)
+             IF    RECE62-HKN-CHIKAN-KIN      =  009999999
+                 MOVE   123456789   TO   RECE62-HKN-CHIKAN-KIN
              END-IF
-             IF    RECE62-YOBIETC(14)  =  123456789
+             IF    RECE62-HKN-CHIKAN-KIN      =  123456789
                  CONTINUE
              ELSE
-                 MOVE   RECE62-YOBIETC(14)  TO   RECE62-FTNMONEY(1)
+                 MOVE   RECE62-HKN-CHIKAN-KIN
+                                    TO   RECE62-FTNMONEY(1)
              END-IF
       *
-             IF    RECE62-YOBIETC(12)  =  123456789
-             AND   RECE62-YOBIETC(13)  =  123456789
-             AND   RECE62-YOBIETC(14)  =  123456789
-               IF  RECE62-YOBIETC(11)  =  1
-                MOVE    ZERO                TO   RECE62-YOBIETC(11)
+             IF    RECE62-SAIKEI-CHIKAN-KIN1  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN2  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN3  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN4  =  123456789
+             AND   RECE62-HKN-CHIKAN-KIN      =  123456789
+               IF  RECE62-ICBKINKSI-ARI  =  1
+                MOVE    ZERO        TO   RECE62-ICBKINKSI-ARI
                END-IF
-               IF  RECE62-YOBIETC(11)  =  2
-                MOVE    3                   TO   RECE62-YOBIETC(11)
+               IF  RECE62-ICBKINKSI-ARI  =  2
+                MOVE    3           TO   RECE62-ICBKINKSI-ARI
                END-IF
              END-IF
-             MOVE       ZERO                TO   RECE62-YOBIETC(3)
+             MOVE       ZERO        TO   RECE62-ICBKINKSI-NASI
            END-IF
       *
            IF  (IDZ                   =   1)
            AND (RECE62-DAISAN-KOUREI  =   1)
            AND (WRK-TAIHI-OKIKAE      =   1)
       *      再掲上置き換え
-             MOVE       123456789           TO   RECE62-YOBIETC(12)
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN1
       *      再掲下置き換え
-             MOVE       123456789           TO   RECE62-YOBIETC(13)
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN2
+      *      再掲３置き換え
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN3
+      *      再掲４置き換え
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN4
       *      保険一部負担金置き換え
-             IF    RECE62-YOBIETC(14)  =  009999999
-                 MOVE   123456789           TO   RECE62-YOBIETC(14)
+             IF    RECE62-HKN-CHIKAN-KIN      =  009999999
+                 MOVE   123456789   TO   RECE62-HKN-CHIKAN-KIN
              END-IF
-             IF    RECE62-YOBIETC(14)  =  123456789
+             IF    RECE62-HKN-CHIKAN-KIN      =  123456789
                  CONTINUE
              ELSE
-                 MOVE   RECE62-YOBIETC(14)  TO   RECE62-FTNMONEY(1)
+                 MOVE   RECE62-HKN-CHIKAN-KIN
+                                    TO   RECE62-FTNMONEY(1)
              END-IF
       *
-             IF    RECE62-YOBIETC(12)  =  123456789
-             AND   RECE62-YOBIETC(13)  =  123456789
-             AND   RECE62-YOBIETC(14)  =  123456789
-               IF  RECE62-YOBIETC(11)  =  1
-                MOVE    ZERO                TO   RECE62-YOBIETC(11)
+             IF    RECE62-SAIKEI-CHIKAN-KIN1  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN2  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN3  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN4  =  123456789
+             AND   RECE62-HKN-CHIKAN-KIN      =  123456789
+               IF  RECE62-ICBKINKSI-ARI  =  1
+                MOVE    ZERO        TO   RECE62-ICBKINKSI-ARI
                END-IF
-               IF  RECE62-YOBIETC(11)  =  2
-                MOVE    3                   TO   RECE62-YOBIETC(11)
+               IF  RECE62-ICBKINKSI-ARI  =  2
+                MOVE    3           TO   RECE62-ICBKINKSI-ARI
                END-IF
              END-IF
-             MOVE       ZERO                TO   RECE62-YOBIETC(3)
+             MOVE       ZERO        TO   RECE62-ICBKINKSI-NASI
            END-IF
       *
            IF  (IDZ                     =   1         )
            AND (RECE62-KOUREI       NOT =  "1" AND "2")
            AND (WRK-TAIHI-OKIKAE        =   2         )
       *      再掲上置き換え
-             MOVE   123456789           TO   RECE62-YOBIETC(12)
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN1
       *      再掲下置き換え
-             MOVE   123456789           TO   RECE62-YOBIETC(13)
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN2
+      *      再掲３置き換え
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN3
+      *      再掲４置き換え
+             MOVE   123456789       TO   RECE62-SAIKEI-CHIKAN-KIN4
       *      保険一部負担金置き換え
-             MOVE   123456789           TO   RECE62-YOBIETC(14)
+             MOVE   123456789       TO   RECE62-HKN-CHIKAN-KIN
       *
-             IF    RECE62-YOBIETC(12)  =  123456789
-             AND   RECE62-YOBIETC(13)  =  123456789
-             AND   RECE62-YOBIETC(14)  =  123456789
-               IF  RECE62-YOBIETC(3)   =  1
-                MOVE    ZERO                TO   RECE62-YOBIETC(3)
+             IF    RECE62-SAIKEI-CHIKAN-KIN1  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN2  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN3  =  123456789
+             AND   RECE62-SAIKEI-CHIKAN-KIN4  =  123456789
+             AND   RECE62-HKN-CHIKAN-KIN      =  123456789
+               IF  RECE62-ICBKINKSI-NASI   =  1
+                MOVE    ZERO        TO   RECE62-ICBKINKSI-NASI
                END-IF
-               IF  RECE62-YOBIETC(3)   =  2
-                MOVE    3                   TO   RECE62-YOBIETC(3)
+               IF  RECE62-ICBKINKSI-NASI   =  2
+                MOVE    3           TO   RECE62-ICBKINKSI-NASI
                END-IF
              END-IF
-             MOVE       ZERO                TO   RECE62-YOBIETC(11)
+             MOVE       ZERO        TO   RECE62-ICBKINKSI-ARI
            END-IF
       *
            IF ((IDZ                     =   1         ) AND
@@ -31225,27 +31298,29 @@
                (WRK-TAIHI-OKIKAE        =   2         ))
              IF   (RECE62-DAISAN-KOUREI    =   1)
              AND  (WRK-TAIHI-OKIKAE        =   2)
-                MOVE    ZERO                TO   RECE62-DAISAN-KOUREI
-                MOVE    ZERO                TO   RECE62-FTNMONEY(1)
+                MOVE    ZERO        TO   RECE62-DAISAN-KOUREI
+                MOVE    ZERO        TO   RECE62-FTNMONEY(1)
              END-IF
            ELSE
-             MOVE       ZERO                TO   RECE62-YOBIETC(3)
-             MOVE       ZERO                TO   RECE62-YOBIETC(11)
-             MOVE       123456789           TO   RECE62-YOBIETC(12)
-             MOVE       123456789           TO   RECE62-YOBIETC(13)
-             MOVE       123456789           TO   RECE62-YOBIETC(14)
+             MOVE       ZERO        TO   RECE62-ICBKINKSI-NASI
+             MOVE       ZERO        TO   RECE62-ICBKINKSI-ARI
+             MOVE       123456789   TO   RECE62-SAIKEI-CHIKAN-KIN1
+             MOVE       123456789   TO   RECE62-SAIKEI-CHIKAN-KIN2
+             MOVE       123456789   TO   RECE62-SAIKEI-CHIKAN-KIN3
+             MOVE       123456789   TO   RECE62-SAIKEI-CHIKAN-KIN4
+             MOVE       123456789   TO   RECE62-HKN-CHIKAN-KIN
            END-IF
       *
            IF  (IDZ                 =   1)
            AND (WRK-TAIHI-OKIKAE2   =   1)
       *      公１一部負担金置き換え
-             IF    RECE62-KOHNUM(1)    =  SPACE
-                   MOVE    123456789    TO   RECE62-YOBIETC(15)
+             IF    RECE62-KOHNUM(1)        =  SPACE
+                   MOVE    123456789    TO   RECE62-KOH-CHIKAN-KIN1
              END-IF
-             IF    RECE62-YOBIETC(15)  =  123456789
+             IF    RECE62-KOH-CHIKAN-KIN1  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE62-YOBIETC(15)
+               EVALUATE  RECE62-KOH-CHIKAN-KIN1
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE62-FTNMONEY(2)
                    MOVE   SPACE         TO   RECE62-ZEROKISAIFLG(2)
@@ -31253,18 +31328,18 @@
                    MOVE   ZERO          TO   RECE62-FTNMONEY(2)
                    MOVE   "1"           TO   RECE62-ZEROKISAIFLG(2)
                  WHEN      OTHER
-                   MOVE   RECE62-YOBIETC(15)
+                   MOVE   RECE62-KOH-CHIKAN-KIN1
                                         TO   RECE62-FTNMONEY(2)
                END-EVALUATE
              END-IF
       *      公２一部負担金置き換え
-             IF    RECE62-KOHNUM(2)    =  SPACE
-                   MOVE    123456789    TO   RECE62-YOBIETC(16)
+             IF    RECE62-KOHNUM(2)        =  SPACE
+                   MOVE    123456789    TO   RECE62-KOH-CHIKAN-KIN2
              END-IF
-             IF    RECE62-YOBIETC(16)  =  123456789
+             IF    RECE62-KOH-CHIKAN-KIN2  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE62-YOBIETC(16)
+               EVALUATE  RECE62-KOH-CHIKAN-KIN2
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE62-FTNMONEY(3)
                    MOVE   SPACE         TO   RECE62-ZEROKISAIFLG(3)
@@ -31272,18 +31347,18 @@
                    MOVE   ZERO          TO   RECE62-FTNMONEY(3)
                    MOVE   "1"           TO   RECE62-ZEROKISAIFLG(3)
                  WHEN      OTHER
-                   MOVE   RECE62-YOBIETC(16)
+                   MOVE   RECE62-KOH-CHIKAN-KIN2
                                         TO   RECE62-FTNMONEY(3)
                END-EVALUATE
              END-IF
       *      公３一部負担金置き換え
-             IF    RECE62-KOHNUM(3)    =  SPACE
-                   MOVE    123456789    TO   RECE62-YOBIETC(17)
+             IF    RECE62-KOHNUM(3)        =  SPACE
+                   MOVE    123456789    TO   RECE62-KOH-CHIKAN-KIN3
              END-IF
-             IF    RECE62-YOBIETC(17)  =  123456789
+             IF    RECE62-KOH-CHIKAN-KIN3  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE62-YOBIETC(17)
+               EVALUATE  RECE62-KOH-CHIKAN-KIN3
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE62-FTNMONEY(4)
                    MOVE   SPACE         TO   RECE62-ZEROKISAIFLG(4)
@@ -31291,18 +31366,18 @@
                    MOVE   ZERO          TO   RECE62-FTNMONEY(4)
                    MOVE   "1"           TO   RECE62-ZEROKISAIFLG(4)
                  WHEN      OTHER
-                   MOVE   RECE62-YOBIETC(17)
+                   MOVE   RECE62-KOH-CHIKAN-KIN3
                                         TO   RECE62-FTNMONEY(4)
                END-EVALUATE
              END-IF
       *      公４一部負担金置き換え
-             IF    RECE62-KOHNUM(4)    =  SPACE
-                   MOVE    123456789    TO   RECE62-YOBIETC(18)
+             IF    RECE62-KOHNUM(4)        =  SPACE
+                   MOVE    123456789    TO   RECE62-KOH-CHIKAN-KIN4
              END-IF
-             IF    RECE62-YOBIETC(18)  =  123456789
+             IF    RECE62-KOH-CHIKAN-KIN4  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE62-YOBIETC(18)
+               EVALUATE  RECE62-KOH-CHIKAN-KIN4
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE62-FTNMONEY(5)
                    MOVE   SPACE         TO   RECE62-ZEROKISAIFLG(5)
@@ -31310,17 +31385,17 @@
                    MOVE   ZERO          TO   RECE62-FTNMONEY(5)
                    MOVE   "1"           TO   RECE62-ZEROKISAIFLG(5)
                  WHEN      OTHER
-                   MOVE   RECE62-YOBIETC(18)
+                   MOVE   RECE62-KOH-CHIKAN-KIN4
                                         TO   RECE62-FTNMONEY(5)
                END-EVALUATE
              END-IF
       *
-             IF    RECE62-YOBIETC(15)  =  123456789
-             AND   RECE62-YOBIETC(16)  =  123456789
-             AND   RECE62-YOBIETC(17)  =  123456789
-             AND   RECE62-YOBIETC(18)  =  123456789
-               IF  RECE62-YOBIETC(19)  =  1
-                MOVE    ZERO            TO   RECE62-YOBIETC(19)
+             IF    RECE62-KOH-CHIKAN-KIN1  =  123456789
+             AND   RECE62-KOH-CHIKAN-KIN2  =  123456789
+             AND   RECE62-KOH-CHIKAN-KIN3  =  123456789
+             AND   RECE62-KOH-CHIKAN-KIN4  =  123456789
+               IF  RECE62-KOHCHIKAN  =  1
+                MOVE    ZERO            TO   RECE62-KOHCHIKAN
                END-IF
              END-IF
            END-IF
@@ -31329,11 +31404,11 @@
            AND (WRK-TAIHI-OKIKAE2   =   1)
              CONTINUE
            ELSE
-             MOVE       ZERO                TO   RECE62-YOBIETC(19)
-             MOVE       123456789           TO   RECE62-YOBIETC(15)
-             MOVE       123456789           TO   RECE62-YOBIETC(16)
-             MOVE       123456789           TO   RECE62-YOBIETC(17)
-             MOVE       123456789           TO   RECE62-YOBIETC(18)
+             MOVE       ZERO            TO   RECE62-KOHCHIKAN
+             MOVE       123456789       TO   RECE62-KOH-CHIKAN-KIN1
+             MOVE       123456789       TO   RECE62-KOH-CHIKAN-KIN2
+             MOVE       123456789       TO   RECE62-KOH-CHIKAN-KIN3
+             MOVE       123456789       TO   RECE62-KOH-CHIKAN-KIN4
            END-IF
       *
            .

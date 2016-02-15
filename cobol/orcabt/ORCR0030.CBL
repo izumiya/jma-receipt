@@ -733,6 +733,9 @@
       *                                     •≥•·•Û•»…‘µ≠∫‹¬–±˛Ω§¿µ
       *  04.08.19    NACL-ÃÁœ∆    16/02/05  ∞Â ›•Ï•ª•◊•»°÷¬æ ›∏±§À§∆ø«ª°Œ¡ªªƒÍ∫—°◊
       *                                     •≥•·•Û•»…‘µ≠∫‹¬–±˛Ω§¿µ
+      *  04.08.20    NACL-ÃÁœ∆    16/02/08  RECE02§ŒÕΩ»˜π‡Ã‹ª»Õ— ¨§À§ƒ§§§∆°¢
+      *                                     ∏ƒ°π§Àπ‡Ã‹§Ú¿ﬂ§±§Îªˆ§À»º§¶Ω§¿µ°£
+      *                                     ¬Ë£≥¬Ë£¥∏¯»Ò§Œ≥Á∏Ã∫∆∑«µ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3252,13 +3255,15 @@ grpsys           PERFORM 900-DBSELECT-SEC
            MOVE      ZERO       TO      WRK-TAIHI-OKIKAE2
            MOVE      ZERO       TO      WRK-TAIHI-ZAINUM3
       *
-           MOVE    123456789    TO      RECE02-YOBIETC(12)
-           MOVE    123456789    TO      RECE02-YOBIETC(13)
-           MOVE    123456789    TO      RECE02-YOBIETC(14)
-           MOVE    123456789    TO      RECE02-YOBIETC(15)
-           MOVE    123456789    TO      RECE02-YOBIETC(16)
-           MOVE    123456789    TO      RECE02-YOBIETC(17)
-           MOVE    123456789    TO      RECE02-YOBIETC(18)
+           MOVE    123456789    TO      RECE02-SAIKEI-CHIKAN-KIN1
+           MOVE    123456789    TO      RECE02-SAIKEI-CHIKAN-KIN2
+           MOVE    123456789    TO      RECE02-SAIKEI-CHIKAN-KIN3
+           MOVE    123456789    TO      RECE02-SAIKEI-CHIKAN-KIN4
+           MOVE    123456789    TO      RECE02-HKN-CHIKAN-KIN
+           MOVE    123456789    TO      RECE02-KOH-CHIKAN-KIN1
+           MOVE    123456789    TO      RECE02-KOH-CHIKAN-KIN2
+           MOVE    123456789    TO      RECE02-KOH-CHIKAN-KIN3
+           MOVE    123456789    TO      RECE02-KOH-CHIKAN-KIN4
       *
            PERFORM     211J-SYUKEIKBN-HANBETU-SEC
       *
@@ -3272,7 +3277,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
              OR  (RECE02-AGE          <    70                        )
       ***    OR  (RECE02-AGE          >    74                        )
-             OR  (RECE02-YOBIETC(8)   =     1                        )
+             OR  (RECE02-KOREIHIGAITO =     1                        )
                CONTINUE
              ELSE
                IF  (RECE02-HOJOKBN     =   "1"  OR  "9")
@@ -3794,7 +3799,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                          AND (FLG-GENMEN-NASI  =  1      )
                            MOVE    4       TO  RECE02-RJNGAIKOHFTN (1)
                            MOVE  WRK-GENMEN-NASI-KIN
-                                           TO  RECE02-YOBIETC(4)
+                                           TO  RECE02-GENMEN-NASI-KIN
                            IF   (FLG-SAIGAI-TAISYO  =   1       )
                            AND  (RECE02-HKNNUM  NOT =  SPACE    )
                              IF  RECE02-ZAITAKU     =  "1" OR "2"
@@ -3851,7 +3856,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                               WHEN      7
                                 MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMEN-NASI-KIN
                             MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                        WHEN        1
@@ -3870,7 +3875,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                               WHEN      7
                                 MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMEN-NASI-KIN
                             MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                        WHEN        9
@@ -3887,7 +3892,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                               WHEN      7
                                 MOVE   6    TO  RECE02-RJNGAIKOHFTN(1)
                             END-EVALUATE
-                            MOVE    ZERO    TO  RECE02-YOBIETC(4)
+                            MOVE    ZERO    TO  RECE02-GENMEN-NASI-KIN
                             MOVE    ZERO    TO  RECE02-GENMENKBN
                          END-IF
                      END-EVALUATE
@@ -3964,7 +3969,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                      END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE02-RJNGAIKOHFTN (1)
-                     MOVE    ZERO    TO   RECE02-YOBIETC(4)
+                     MOVE    ZERO    TO   RECE02-GENMEN-NASI-KIN
                    END-IF
                END-IF
            END-IF
@@ -5812,7 +5817,7 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                      MOVE    3                TO  RECE02-GENMENKBN
               END-EVALUATE
       *
-              MOVE   WK-GENGAKU-KTKBN         TO  RECE02-YOBIETC(10)
+              MOVE   WK-GENGAKU-KTKBN         TO  RECE02-GENMEN-COM
            END-IF
       *
            .
@@ -10601,7 +10606,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
              IF       SRY-SRYCD(IDX2)  =  "099999909"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE02-YOBIETC(3)
+                  MOVE    1     TO    RECE02-ICBKINKSI-NASI
                   MOVE    2     TO    FLG-KIN-OKIKAE
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -10609,7 +10614,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
              IF       SRY-SRYCD(IDX2)  =  "099999910"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE02-YOBIETC(11)
+                  MOVE    1     TO    RECE02-ICBKINKSI-ARI
                   MOVE    1     TO    FLG-KIN-OKIKAE
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -10617,7 +10622,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
              IF       SRY-SRYCD(IDX2)  =  "099999921"
                IF     ACCT-JIHOKBN     =   SPACE
-                  MOVE    1     TO    RECE02-YOBIETC(19)
+                  MOVE    1     TO    RECE02-KOHCHIKAN
                   MOVE    1     TO    FLG-KIN-OKIKAE2
                ELSE
                   MOVE    1     TO    FLG-HENSYU-NG
@@ -13172,6 +13177,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
              IF  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«æÂ°À°ß"
              OR  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«≤º°À°ß"
+             OR  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«£≥°À°ß"
+             OR  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«£¥°À°ß"
              OR  WRK-INPUTCOMENT(1:12)  =  " ›∏±…È√¥∂‚°ß"
                MOVE  WRK-INPUTCOMENT(13:14)
                                           TO  WRK-INPUTCOMENT2
@@ -13219,16 +13226,29 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                      END-IF
                    END-PERFORM
                    IF  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«æÂ°À°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(12)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(12)
+                     MOVE  ZERO        TO  RECE02-SAIKEI-CHIKAN-KIN1
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE02-SAIKEI-CHIKAN-KIN1
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«≤º°À°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(13)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(13)
+                     MOVE  ZERO        TO  RECE02-SAIKEI-CHIKAN-KIN2
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE02-SAIKEI-CHIKAN-KIN2
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«£≥°À°ß"
+                     MOVE  ZERO        TO  RECE02-SAIKEI-CHIKAN-KIN3
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE02-SAIKEI-CHIKAN-KIN3
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "° ∫∆∑«£¥°À°ß"
+                     MOVE  ZERO        TO  RECE02-SAIKEI-CHIKAN-KIN4
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE02-SAIKEI-CHIKAN-KIN4
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  " ›∏±…È√¥∂‚°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(14)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(14)
+                     MOVE  ZERO        TO  RECE02-HKN-CHIKAN-KIN
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                       TO  RECE02-HKN-CHIKAN-KIN
                    END-IF
                  END-IF
                END-IF
@@ -13312,20 +13332,24 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                      END-IF
                    END-PERFORM
                    IF  WRK-INPUTCOMENT(1:12)  =  "∏¯£±…È√¥∂‚°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(15)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(15)
+                     MOVE  ZERO     TO  RECE02-KOH-CHIKAN-KIN1
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE02-KOH-CHIKAN-KIN1
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "∏¯£≤…È√¥∂‚°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(16)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(16)
+                     MOVE  ZERO     TO  RECE02-KOH-CHIKAN-KIN2
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE02-KOH-CHIKAN-KIN2
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "∏¯£≥…È√¥∂‚°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(17)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(17)
+                     MOVE  ZERO     TO  RECE02-KOH-CHIKAN-KIN3
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE02-KOH-CHIKAN-KIN3
                    END-IF
                    IF  WRK-INPUTCOMENT(1:12)  =  "∏¯£¥…È√¥∂‚°ß"
-                     MOVE  ZERO                 TO  RECE02-YOBIETC(18)
-                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE02-YOBIETC(18)
+                     MOVE  ZERO     TO  RECE02-KOH-CHIKAN-KIN4
+                     MOVE  WRK-INPUTCOMENT-KIN
+                                    TO  RECE02-KOH-CHIKAN-KIN4
                    END-IF
                  END-IF
                END-IF
@@ -21520,14 +21544,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        CONTINUE
                      ELSE
                        MOVE   "2"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(11)
+                       MOVE    2       TO   RECE02-ICBKINKSI-ARI
                      END-IF
                  WHEN        2
                      IF  RECE02-ZAITAKU  = "3"
                        CONTINUE
                      ELSE
                        MOVE   "3"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(3)
+                       MOVE    2       TO   RECE02-ICBKINKSI-NASI
                      END-IF
                END-EVALUATE
       *
@@ -21584,14 +21608,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        CONTINUE
                      ELSE
                        MOVE   "1"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(11)
+                       MOVE    2       TO   RECE02-ICBKINKSI-ARI
                      END-IF
                  WHEN        2
                      IF  RECE02-ZAITAKU  = "4"
                        CONTINUE
                      ELSE
                        MOVE   "4"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(3)
+                       MOVE    2       TO   RECE02-ICBKINKSI-NASI
                      END-IF
                END-EVALUATE
       *
@@ -22086,14 +22110,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        CONTINUE
                      ELSE
                        MOVE   "1"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(11)
+                       MOVE    2       TO   RECE02-ICBKINKSI-ARI
                      END-IF
                  WHEN        2
                      IF  RECE02-ZAITAKU  = "4"
                        CONTINUE
                      ELSE
                        MOVE   "4"      TO   RECE02-ZAITAKU
-                       MOVE    2       TO   RECE02-YOBIETC(3)
+                       MOVE    2       TO   RECE02-ICBKINKSI-NASI
                      END-IF
                END-EVALUATE
       *
@@ -22304,7 +22328,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              RECE02-ZAITAKU-SAIKEI2
                   IF   (FLG-CYOKI-HENSYU       =   1     )
                   AND  (FLG-ZENKOKUKOHI-NISYU  =   2 OR 4)
-                     MOVE   1            TO  RECE02-YOBIETC(7)
+                     MOVE   1            TO  RECE02-SAIKEIZEROKSI2
                   END-IF
                   MOVE     ZERO          TO  FLG-ZENKOKUKOHI-NISYU
               ELSE
@@ -22419,7 +22443,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           MOVE  WRK-CYOKI-KEISAN3
                                         TO   RECE02-ZAITAKU-SAIKEI2
                           IF    WRK-CYOKI-KEISAN3  = ZERO
-                             MOVE   1   TO   RECE02-YOBIETC(7)
+                             MOVE   1   TO   RECE02-SAIKEIZEROKSI2
                           END-IF
                         END-IF
                       END-IF
@@ -22534,7 +22558,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF  FLG-CYOKI-HENSYU  =  1
                     IF  FLG-ZENKOKUKOHI-NISYU  =  2 OR 4
                       MOVE   ZERO   TO  RECE02-ZAITAKU-SAIKEI2
-                      MOVE    1     TO  RECE02-YOBIETC(7)
+                      MOVE    1     TO  RECE02-SAIKEIZEROKSI2
                     END-IF
                    ELSE
                     COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
@@ -22574,7 +22598,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                              MOVE WRK-CYOKI-KEISAN6
                                           TO   RECE02-ZAITAKU-SAIKEI2
                              IF   WRK-CYOKI-KEISAN6 = ZERO
-                                MOVE   1        TO  RECE02-YOBIETC(7)
+                                MOVE   1  TO   RECE02-SAIKEIZEROKSI2
                              END-IF
                             ELSE
                              MOVE  FTN-KOH-XX7  TO  WRK-CYOKI-KEISAN7
@@ -22597,7 +22621,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             MOVE  WRK-CYOKI-KEISAN3
                                           TO   RECE02-ZAITAKU-SAIKEI2
                             IF    WRK-CYOKI-KEISAN3  = ZERO
-                               MOVE   1   TO   RECE02-YOBIETC(7)
+                               MOVE   1   TO   RECE02-SAIKEIZEROKSI2
                             END-IF
                           END-IF
                       END-IF
@@ -22663,23 +22687,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     (RECE02-RECESKYKBN(4) NOT = SPACE  ))
                   CONTINUE
                 ELSE
-                  MOVE    1    TO    RECE02-YOBIETC(6)
+                  MOVE    1    TO    RECE02-SAIKEIZEROKSI1
                 END-IF
               END-IF
            END-IF
            IF      RECE02-SRYYM           >=  "200804"
              IF    RECE02-ZAITAKU-SAIKEI   =   ZERO
-             AND   RECE02-YOBIETC(6)       =   ZERO
+             AND   RECE02-SAIKEIZEROKSI1   =   ZERO
                   MOVE     999999999    TO  RECE02-ZAITAKU-SAIKEI
              END-IF
              IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
-             AND   RECE02-YOBIETC(7)       =   ZERO
+             AND   RECE02-SAIKEIZEROKSI2   =   ZERO
                 IF   FLG-ZENKOKUKOHI-NISYU =  3
-                  MOVE      1           TO  RECE02-YOBIETC(7)
+                  MOVE      1           TO  RECE02-SAIKEIZEROKSI2
                 ELSE
                   MOVE     999999999    TO  RECE02-ZAITAKU-SAIKEI2
                 END-IF
              END-IF
+             MOVE          999999999    TO  RECE02-ZAITAKU-SAIKEI3
+             MOVE          999999999    TO  RECE02-ZAITAKU-SAIKEI4
            END-IF
       *
            IF      RECE02-RJNGENMENKBN   =   "1"
@@ -22965,7 +22991,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 RECE02-ZAITAKU-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE     ZERO       TO  RECE02-ZAITAKU-SAIKEI
-                       MOVE      1         TO  RECE02-YOBIETC(6)
+                       MOVE      1         TO  RECE02-SAIKEIZEROKSI1
                      END-IF
                    END-IF
                  END-IF
@@ -23024,7 +23050,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 RECE02-ZAITAKU-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE     ZERO       TO  RECE02-ZAITAKU-SAIKEI
-                       MOVE      1         TO  RECE02-YOBIETC(6)
+                       MOVE      1         TO  RECE02-SAIKEIZEROKSI1
                      END-IF
                    END-IF
                  END-IF
@@ -23090,7 +23116,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 RECE02-ZAITAKU-SAIKEI - WRK-CHK-KOKIGAK
                      ELSE
                        MOVE   ZERO            TO  RECE02-ZAITAKU-SAIKEI
-                       MOVE    1              TO  RECE02-YOBIETC(6)
+                       MOVE    1              TO  RECE02-SAIKEIZEROKSI1
                      END-IF
                    END-IF
                  END-IF
@@ -24445,7 +24471,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              IF   FLG-CHIIKI    =   3
                MOVE  WRK-CHK-KOKIGAK3  TO  RECE02-ZAITAKU-SAIKEI2
                IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
-                  MOVE       1         TO  RECE02-YOBIETC(7)
+                  MOVE       1         TO  RECE02-SAIKEIZEROKSI2
                END-IF
              END-IF
       *
@@ -24611,7 +24637,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              IF   FLG-CHIIKI    =   3
                MOVE  WRK-CHK-KOKIGAK7  TO  RECE02-ZAITAKU-SAIKEI2
                IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
-                  MOVE       1         TO  RECE02-YOBIETC(7)
+                  MOVE       1         TO  RECE02-SAIKEIZEROKSI2
                END-IF
              END-IF
       *
@@ -25062,9 +25088,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     RECE02-ZAITAKU-SAIKEI2 +
                     WRK-CHK-KOKIGAK8
            IF    RECE02-ZAITAKU-SAIKEI2  =  ZERO
-              MOVE     1     TO   RECE02-YOBIETC(7)
+              MOVE     1     TO   RECE02-SAIKEIZEROKSI2
            ELSE
-              MOVE    ZERO   TO   RECE02-YOBIETC(7)
+              MOVE    ZERO   TO   RECE02-SAIKEIZEROKSI2
            END-IF
       *
            .
@@ -26227,86 +26253,126 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            AND (RECE02-ZAITAKU      =  "1" OR "2")
            AND (WRK-TAIHI-OKIKAE    =   1        )
       *      ∫∆∑«æÂ√÷§≠¥π§®
-             IF  ( RECE02-KOHNUM(1)        =  SPACE     )
-             OR  ((RECE02-YOBIETC(12)      =  009999999) AND
-                  (RECE02-ZAITAKU-SAIKEI   =  999999999))
-                 MOVE   123456789           TO   RECE02-YOBIETC(12)
+             IF  ( RECE02-KOHNUM(1)           =  SPACE     )
+             OR  ((RECE02-SAIKEI-CHIKAN-KIN1  =  009999999) AND
+                  (RECE02-ZAITAKU-SAIKEI      =  999999999))
+                 MOVE   123456789   TO   RECE02-SAIKEI-CHIKAN-KIN1
              END-IF
-             IF    RECE02-YOBIETC(12)  =  123456789
+             IF    RECE02-SAIKEI-CHIKAN-KIN1  =  123456789
                  CONTINUE
              ELSE
-               IF  RECE02-YOBIETC(12)  =  009999999
-                 MOVE   999999999           TO   RECE02-ZAITAKU-SAIKEI
+               IF  RECE02-SAIKEI-CHIKAN-KIN1  =  009999999
+                 MOVE   999999999   TO   RECE02-ZAITAKU-SAIKEI
                ELSE
-                 MOVE      1                TO   RECE02-YOBIETC(6)
-                 MOVE   RECE02-YOBIETC(12)  TO   RECE02-ZAITAKU-SAIKEI
+                 MOVE      1        TO   RECE02-SAIKEIZEROKSI1
+                 MOVE   RECE02-SAIKEI-CHIKAN-KIN1
+                                    TO   RECE02-ZAITAKU-SAIKEI
                END-IF
              END-IF
       *      ∫∆∑«≤º√÷§≠¥π§®
-             IF  ( RECE02-KOHNUM(2)        =  SPACE     )
-             OR  ((RECE02-YOBIETC(13)      =  009999999) AND
-                  (RECE02-ZAITAKU-SAIKEI2  =  999999999))
-                 MOVE   123456789           TO   RECE02-YOBIETC(13)
+             IF  ( RECE02-KOHNUM(2)           =  SPACE     )
+             OR  ((RECE02-SAIKEI-CHIKAN-KIN2  =  009999999) AND
+                  (RECE02-ZAITAKU-SAIKEI2     =  999999999))
+                 MOVE   123456789   TO   RECE02-SAIKEI-CHIKAN-KIN2
              END-IF
-             IF   (RECE02-ZAITAKU-SAIKEI       =  999999999)
-             AND  (RECE02-ZAITAKU-SAIKEI2  NOT =  999999999)
-                 MOVE   999999999           TO   RECE02-ZAITAKU-SAIKEI2
-                 MOVE   123456789           TO   RECE02-YOBIETC(13)
-             END-IF
-             IF    RECE02-YOBIETC(13)  =  123456789
+             IF    RECE02-SAIKEI-CHIKAN-KIN2  =  123456789
                  CONTINUE
              ELSE
-               IF  RECE02-YOBIETC(13)  =  009999999
-                 MOVE   999999999           TO   RECE02-ZAITAKU-SAIKEI2
+               IF  RECE02-SAIKEI-CHIKAN-KIN2  =  009999999
+                 MOVE   999999999   TO   RECE02-ZAITAKU-SAIKEI2
                ELSE
-                 MOVE      1                TO   RECE02-YOBIETC(7)
-                 MOVE   RECE02-YOBIETC(13)  TO   RECE02-ZAITAKU-SAIKEI2
+                 MOVE      1        TO   RECE02-SAIKEIZEROKSI2
+                 MOVE   RECE02-SAIKEI-CHIKAN-KIN2
+                                    TO   RECE02-ZAITAKU-SAIKEI2
+               END-IF
+             END-IF
+      *      ∫∆∑«£≥√÷§≠¥π§®
+             IF  ( RECE02-KOHNUM(3)           =  SPACE     )
+             OR  ((RECE02-SAIKEI-CHIKAN-KIN3  =  009999999) AND
+                  (RECE02-ZAITAKU-SAIKEI3     =  999999999))
+                 MOVE   123456789   TO   RECE02-SAIKEI-CHIKAN-KIN3
+             END-IF
+             IF    RECE02-SAIKEI-CHIKAN-KIN3  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE02-SAIKEI-CHIKAN-KIN3  =  009999999
+                 MOVE   999999999   TO   RECE02-ZAITAKU-SAIKEI3
+               ELSE
+                 MOVE      1        TO   RECE02-SAIKEIZEROKSI3
+                 MOVE   RECE02-SAIKEI-CHIKAN-KIN3
+                                    TO   RECE02-ZAITAKU-SAIKEI3
+               END-IF
+             END-IF
+      *      ∫∆∑«£¥√÷§≠¥π§®
+             IF  ( RECE02-KOHNUM(4)           =  SPACE     )
+             OR  ((RECE02-SAIKEI-CHIKAN-KIN4  =  009999999) AND
+                  (RECE02-ZAITAKU-SAIKEI4     =  999999999))
+                 MOVE   123456789   TO   RECE02-SAIKEI-CHIKAN-KIN4
+             END-IF
+             IF    RECE02-SAIKEI-CHIKAN-KIN4  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE02-SAIKEI-CHIKAN-KIN4  =  009999999
+                 MOVE   999999999   TO   RECE02-ZAITAKU-SAIKEI4
+               ELSE
+                 MOVE      1        TO   RECE02-SAIKEIZEROKSI4
+                 MOVE   RECE02-SAIKEI-CHIKAN-KIN4
+                                    TO   RECE02-ZAITAKU-SAIKEI4
                END-IF
              END-IF
       *       ›∏±∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             IF    RECE02-YOBIETC(14)  =  009999999
-                 MOVE   123456789           TO   RECE02-YOBIETC(14)
+             IF    RECE02-HKN-CHIKAN-KIN      =  009999999
+                 MOVE   123456789   TO   RECE02-HKN-CHIKAN-KIN
              END-IF
-             IF    RECE02-YOBIETC(14)  =  123456789
+             IF    RECE02-HKN-CHIKAN-KIN      =  123456789
                  CONTINUE
              ELSE
-                 MOVE   RECE02-YOBIETC(14)  TO   RECE02-FTNMONEY(1)
+                 MOVE   RECE02-HKN-CHIKAN-KIN
+                                    TO   RECE02-FTNMONEY(1)
              END-IF
       *
-             IF    RECE02-YOBIETC(12)  =  123456789
-             AND   RECE02-YOBIETC(13)  =  123456789
-             AND   RECE02-YOBIETC(14)  =  123456789
-               IF  RECE02-YOBIETC(11)  =  1
-                MOVE    ZERO                TO   RECE02-YOBIETC(11)
+             IF    RECE02-SAIKEI-CHIKAN-KIN1  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN2  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN3  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN4  =  123456789
+             AND   RECE02-HKN-CHIKAN-KIN      =  123456789
+               IF  RECE02-ICBKINKSI-ARI  =  1
+                MOVE    ZERO        TO   RECE02-ICBKINKSI-ARI
                END-IF
-               IF  RECE02-YOBIETC(11)  =  2
-                MOVE    3                   TO   RECE02-YOBIETC(11)
+               IF  RECE02-ICBKINKSI-ARI  =  2
+                MOVE    3           TO   RECE02-ICBKINKSI-ARI
                END-IF
              END-IF
-             MOVE       ZERO                TO   RECE02-YOBIETC(3)
+             MOVE       ZERO        TO   RECE02-ICBKINKSI-NASI
            END-IF
       *
            IF  (IDZ                     =   1         )
            AND (RECE02-ZAITAKU      NOT =  "1" AND "2")
            AND (WRK-TAIHI-OKIKAE        =   2         )
       *      ∫∆∑«æÂ√÷§≠¥π§®
-             MOVE   123456789           TO   RECE02-YOBIETC(12)
+             MOVE   123456789       TO   RECE02-SAIKEI-CHIKAN-KIN1
       *      ∫∆∑«≤º√÷§≠¥π§®
-             MOVE   123456789           TO   RECE02-YOBIETC(13)
+             MOVE   123456789       TO   RECE02-SAIKEI-CHIKAN-KIN2
+      *      ∫∆∑«£≥√÷§≠¥π§®
+             MOVE   123456789       TO   RECE02-SAIKEI-CHIKAN-KIN3
+      *      ∫∆∑«£¥√÷§≠¥π§®
+             MOVE   123456789       TO   RECE02-SAIKEI-CHIKAN-KIN4
       *       ›∏±∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             MOVE   123456789           TO   RECE02-YOBIETC(14)
+             MOVE   123456789       TO   RECE02-HKN-CHIKAN-KIN
       *
-             IF    RECE02-YOBIETC(12)  =  123456789
-             AND   RECE02-YOBIETC(13)  =  123456789
-             AND   RECE02-YOBIETC(14)  =  123456789
-               IF  RECE02-YOBIETC(3)   =  1
-                MOVE    ZERO                TO   RECE02-YOBIETC(3)
+             IF    RECE02-SAIKEI-CHIKAN-KIN1  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN2  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN3  =  123456789
+             AND   RECE02-SAIKEI-CHIKAN-KIN4  =  123456789
+             AND   RECE02-HKN-CHIKAN-KIN      =  123456789
+               IF  RECE02-ICBKINKSI-NASI   =  1
+                MOVE    ZERO        TO   RECE02-ICBKINKSI-NASI
                END-IF
-               IF  RECE02-YOBIETC(3)   =  2
-                MOVE    3                   TO   RECE02-YOBIETC(3)
+               IF  RECE02-ICBKINKSI-NASI   =  2
+                MOVE    3           TO   RECE02-ICBKINKSI-NASI
                END-IF
              END-IF
-             MOVE       ZERO                TO   RECE02-YOBIETC(11)
+             MOVE       ZERO        TO   RECE02-ICBKINKSI-ARI
            END-IF
       *
            IF ((IDZ                     =   1         ) AND
@@ -26317,23 +26383,25 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                (WRK-TAIHI-OKIKAE        =   2         ))
              CONTINUE
            ELSE
-             MOVE       ZERO                TO   RECE02-YOBIETC(3)
-             MOVE       ZERO                TO   RECE02-YOBIETC(11)
-             MOVE       123456789           TO   RECE02-YOBIETC(12)
-             MOVE       123456789           TO   RECE02-YOBIETC(13)
-             MOVE       123456789           TO   RECE02-YOBIETC(14)
+             MOVE       ZERO        TO   RECE02-ICBKINKSI-NASI
+             MOVE       ZERO        TO   RECE02-ICBKINKSI-ARI
+             MOVE       123456789   TO   RECE02-SAIKEI-CHIKAN-KIN1
+             MOVE       123456789   TO   RECE02-SAIKEI-CHIKAN-KIN2
+             MOVE       123456789   TO   RECE02-SAIKEI-CHIKAN-KIN3
+             MOVE       123456789   TO   RECE02-SAIKEI-CHIKAN-KIN4
+             MOVE       123456789   TO   RECE02-HKN-CHIKAN-KIN
            END-IF
       *
            IF  (IDZ                 =   1)
            AND (WRK-TAIHI-OKIKAE2   =   1)
       *      ∏¯£±∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             IF    RECE02-KOHNUM(1)    =  SPACE
-                   MOVE    123456789    TO   RECE02-YOBIETC(15)
+             IF    RECE02-KOHNUM(1)        =  SPACE
+                   MOVE    123456789    TO   RECE02-KOH-CHIKAN-KIN1
              END-IF
-             IF    RECE02-YOBIETC(15)  =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN1  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE02-YOBIETC(15)
+               EVALUATE  RECE02-KOH-CHIKAN-KIN1
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE02-FTNMONEY(2)
                    MOVE   SPACE         TO   RECE02-ZEROKISAIFLG(2)
@@ -26341,18 +26409,18 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                    MOVE   ZERO          TO   RECE02-FTNMONEY(2)
                    MOVE   "1"           TO   RECE02-ZEROKISAIFLG(2)
                  WHEN      OTHER
-                   MOVE   RECE02-YOBIETC(15)
+                   MOVE   RECE02-KOH-CHIKAN-KIN1
                                         TO   RECE02-FTNMONEY(2)
                END-EVALUATE
              END-IF
       *      ∏¯£≤∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             IF    RECE02-KOHNUM(2)    =  SPACE
-                   MOVE    123456789    TO   RECE02-YOBIETC(16)
+             IF    RECE02-KOHNUM(2)        =  SPACE
+                   MOVE    123456789    TO   RECE02-KOH-CHIKAN-KIN2
              END-IF
-             IF    RECE02-YOBIETC(16)  =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN2  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE02-YOBIETC(16)
+               EVALUATE  RECE02-KOH-CHIKAN-KIN2
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE02-FTNMONEY(3)
                    MOVE   SPACE         TO   RECE02-ZEROKISAIFLG(3)
@@ -26360,18 +26428,18 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                    MOVE   ZERO          TO   RECE02-FTNMONEY(3)
                    MOVE   "1"           TO   RECE02-ZEROKISAIFLG(3)
                  WHEN      OTHER
-                   MOVE   RECE02-YOBIETC(16)
+                   MOVE   RECE02-KOH-CHIKAN-KIN2
                                         TO   RECE02-FTNMONEY(3)
                END-EVALUATE
              END-IF
       *      ∏¯£≥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             IF    RECE02-KOHNUM(3)    =  SPACE
-                   MOVE    123456789    TO   RECE02-YOBIETC(17)
+             IF    RECE02-KOHNUM(3)        =  SPACE
+                   MOVE    123456789    TO   RECE02-KOH-CHIKAN-KIN3
              END-IF
-             IF    RECE02-YOBIETC(17)  =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN3  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE02-YOBIETC(17)
+               EVALUATE  RECE02-KOH-CHIKAN-KIN3
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE02-FTNMONEY(4)
                    MOVE   SPACE         TO   RECE02-ZEROKISAIFLG(4)
@@ -26379,18 +26447,18 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                    MOVE   ZERO          TO   RECE02-FTNMONEY(4)
                    MOVE   "1"           TO   RECE02-ZEROKISAIFLG(4)
                  WHEN      OTHER
-                   MOVE   RECE02-YOBIETC(17)
+                   MOVE   RECE02-KOH-CHIKAN-KIN3
                                         TO   RECE02-FTNMONEY(4)
                END-EVALUATE
              END-IF
       *      ∏¯£¥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
-             IF    RECE02-KOHNUM(4)    =  SPACE
-                   MOVE    123456789    TO   RECE02-YOBIETC(18)
+             IF    RECE02-KOHNUM(4)        =  SPACE
+                   MOVE    123456789    TO   RECE02-KOH-CHIKAN-KIN4
              END-IF
-             IF    RECE02-YOBIETC(18)  =  123456789
+             IF    RECE02-KOH-CHIKAN-KIN4  =  123456789
                  CONTINUE
              ELSE
-               EVALUATE  RECE02-YOBIETC(18)
+               EVALUATE  RECE02-KOH-CHIKAN-KIN4
                  WHEN      009999999
                    MOVE   ZERO          TO   RECE02-FTNMONEY(5)
                    MOVE   SPACE         TO   RECE02-ZEROKISAIFLG(5)
@@ -26398,17 +26466,17 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                    MOVE   ZERO          TO   RECE02-FTNMONEY(5)
                    MOVE   "1"           TO   RECE02-ZEROKISAIFLG(5)
                  WHEN      OTHER
-                   MOVE   RECE02-YOBIETC(18)
+                   MOVE   RECE02-KOH-CHIKAN-KIN4
                                         TO   RECE02-FTNMONEY(5)
                END-EVALUATE
              END-IF
       *
-             IF    RECE02-YOBIETC(15)  =  123456789
-             AND   RECE02-YOBIETC(16)  =  123456789
-             AND   RECE02-YOBIETC(17)  =  123456789
-             AND   RECE02-YOBIETC(18)  =  123456789
-               IF  RECE02-YOBIETC(19)  =  1
-                MOVE    ZERO            TO   RECE02-YOBIETC(19)
+             IF    RECE02-KOH-CHIKAN-KIN1  =  123456789
+             AND   RECE02-KOH-CHIKAN-KIN2  =  123456789
+             AND   RECE02-KOH-CHIKAN-KIN3  =  123456789
+             AND   RECE02-KOH-CHIKAN-KIN4  =  123456789
+               IF  RECE02-KOHCHIKAN  =  1
+                MOVE    ZERO            TO   RECE02-KOHCHIKAN
                END-IF
              END-IF
            END-IF
@@ -26417,11 +26485,11 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            AND (WRK-TAIHI-OKIKAE2   =   1)
              CONTINUE
            ELSE
-             MOVE       ZERO                TO   RECE02-YOBIETC(19)
-             MOVE       123456789           TO   RECE02-YOBIETC(15)
-             MOVE       123456789           TO   RECE02-YOBIETC(16)
-             MOVE       123456789           TO   RECE02-YOBIETC(17)
-             MOVE       123456789           TO   RECE02-YOBIETC(18)
+             MOVE       ZERO            TO   RECE02-KOHCHIKAN
+             MOVE       123456789       TO   RECE02-KOH-CHIKAN-KIN1
+             MOVE       123456789       TO   RECE02-KOH-CHIKAN-KIN2
+             MOVE       123456789       TO   RECE02-KOH-CHIKAN-KIN3
+             MOVE       123456789       TO   RECE02-KOH-CHIKAN-KIN4
            END-IF
       *
            .
