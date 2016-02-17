@@ -132,6 +132,7 @@
       *
            03  FLG-CHK             PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
+           03  FLG-DRCD            PIC 9(01).
       *----(04.08.00)--ADD-START---
       *    クライアント印刷有
            03  FLG-CLIENT-OK       PIC 9(01).
@@ -526,7 +527,7 @@
                    UNTIL      (SPA-DRCD-MAX      >=  100 )   OR
                               (FLG-SYSKANRI      =   1   )
                MOVE    MCPDATA-REC      TO  SYS-1010-REC
-               IF     (SYS-1010-KBNCD(1:1) =   "1"  )
+               IF      SYS-1010-KBNCD(1:1) =   "1"
       *H27.12  非表示
                 AND   (SYS-1010-HYOJIFLG   NOT =   "1" )
                    ADD     1                   TO  SPA-DRCD-MAX
@@ -722,6 +723,7 @@
       *
       *    ドクター
            MOVE    ZERO                TO  IDX-D
+           MOVE    ZERO                TO  FLG-DRCD
            PERFORM VARYING     IDX-D   FROM    1   BY  1
                    UNTIL      (IDX-D   >   SPA-DRCD-MAX )
                IF     YYK-DRCD(2:4)        =   SPA-GMN-DRNCDL(IDX-D)
@@ -730,8 +732,14 @@
                    MOVE    "1"             TO  SPA-NAI-DRCDFLG
                                                               (IDX-D)
                    MOVE    SPA-DRCD-MAX    TO  IDX-D
+                   MOVE    1               TO  FLG-DRCD
                END-IF
            END-PERFORM
+      *H27.11
+      *    対象なし
+           IF      FLG-DRCD            =   ZERO
+               PERFORM 310112-DRCD-CHK-SEC
+           END-IF
       *
       *    診療内容
            PERFORM VARYING     IDX-D   FROM    1   BY  1
@@ -801,6 +809,61 @@
       *
            .
        3001-PTNUM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    システム管理テーブル編集処理
+      *****************************************************************
+       310112-DRCD-CHK-SEC           SECTION.
+      *
+      *    職員情報（ドクター）
+           MOVE    SPACE               TO  SYS-1010-REC
+           INITIALIZE                  SYS-1010-REC
+           MOVE    "1010"              TO  SYS-1010-KANRICD
+           MOVE    YYK-DRCD            TO  SYS-1010-KBNCD
+           MOVE    SPA-NAI-SINYMD      TO  SYS-1010-STYUKYMD
+           MOVE    SPA-NAI-SINYMD      TO  SYS-1010-EDYUKYMD
+      *
+      *    システム管理検索
+           MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
+           MOVE    SYS-1010-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               INITIALIZE                  SYS-1010-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1010-REC
+      *        最後の行へ編集する
+               IF      SPA-DRCD-MAX        =   99
+                   MOVE    99              TO  SPA-DRCD-MAX
+               ELSE
+                   ADD     1               TO  SPA-DRCD-MAX
+               END-IF
+               MOVE    SPACE               TO  SPA-GMN-DRNAMELST
+                                                      (SPA-DRCD-MAX)
+               MOVE    SYS-1010-KBNCD(2:4) TO  SPA-GMN-DRNCDL
+                                                      (SPA-DRCD-MAX)
+               MOVE    SYS-1010-NAME       TO  SPA-GMN-DRNAMEMEIL
+                                                      (SPA-DRCD-MAX)
+               MOVE    "1"                 TO  SPA-NAI-DRCDFLG
+                                                      (SPA-DRCD-MAX)
+      *
+               MOVE    SPA-GMN-DRNAMEMEIL(SPA-DRCD-MAX)
+                                           TO  SPA-GMN-TDRNAME (IDX)
+           END-IF
+      *
+           .
+       310112-DRCD-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1495,6 +1558,7 @@
            PERFORM 920-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-SYSKANRI
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
            ELSE
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
