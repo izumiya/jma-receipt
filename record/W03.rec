@@ -3,6 +3,10 @@ W03 {
     B03 {
       state int;
     };
+    B10 {
+      state int;
+      label varchar(10);
+    };
     CD01 {
       style varchar(20);
       textdata varchar(4);
@@ -327,6 +331,10 @@ W03 {
       numdata number(4);
     };
     YUKOKIKAN {
+      textdata varchar(30);
+    };
+    MIDASI { #GtkLabel
+      style varchar(20);
       textdata varchar(30);
     };
   };

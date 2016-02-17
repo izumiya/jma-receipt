@@ -2,6 +2,9 @@
       ****  02  W03-FIXED2.
               03  W03-B03.
                 04  W03-B03-STATE   PIC S9(9)   BINARY.
+              03  W03-B10.
+                04  W03-B10-STATE   PIC S9(9)   BINARY.
+                04  W03-B10-LABEL   PIC X(10).
               03  W03-CD01-G      OCCURS  25.
                 04  W03-CD-STYLE   PIC X(20).
                 04  W03-CD.
@@ -27,3 +30,6 @@
                 04  W03-VALUE   PIC S9(4).
               03  W03-YUKOKIKAN.
                   04  W03-VALUE   PIC X(30).
+              03  W03-MIDASI.
+                  04  W03-MIDASI-STYLE   PIC X(20).
+                  04  W03-MIDASI-DATA    PIC X(30).
