@@ -84,6 +84,7 @@
       *  04.07.01    NACL-多々納  12/01/05  クライアント印刷対応
       *  04.08.01    NACL-多々納  14/05/XX  診療行為一時データ対応
       *  04.08.01    NACL-多々納  15/06/16  診療科・保険組合せ件数対応
+      *  04.08.01    NACL-多々納  16/01/XX  医師一覧遷移対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -216,6 +217,8 @@
            03  WRK-MOTOPG            PIC X(08). 
       *H25.4
            03  WRK-HZN-MOTOPG          PIC X(08). 
+      *H28.01
+           03  WRK-HZN-DRCD            PIC X(05).
       *    入力項目名
            03  WRK-MCP-WIDGET          PIC X(64).
       *
@@ -629,18 +632,25 @@
       *
            MOVE    SPACE               TO  WRK-MOTOPG
            MOVE    SPACE               TO  WRK-HZN-MOTOPG
+           MOVE    SPACE               TO  WRK-HZN-DRCD
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
       *
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
                MOVE    SPA-HZN-MOTOPG      TO  WRK-HZN-MOTOPG
+      *H27.12
+               IF      WRK-MOTOPG          =   "UDR"
+                   MOVE    SPA-DRCD            TO  WRK-HZN-DRCD
+               END-IF
       *
       *        元の画面へ戻す
                IF      WRK-MOTOPG          =   "Y01"  OR  "U01"  OR
                                                "P97"
                                            OR  "XF01"
                                            OR  "U012"
+      *        ドクター一覧
+                                           OR  "UDR"
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-U02
                END-IF
@@ -664,6 +674,17 @@
                WHEN   "U01"
                WHEN   "P97"
                    PERFORM 3101-U01SPASET-SEC
+      *H28.01
+      *        ドクター一覧
+               WHEN   "UDR"
+      *            ドクター一覧更新
+                   PERFORM 31011-UDR-HENSYORI-SEC
+      *            受付編集
+                   IF      SPA-GMN-SELNUM      =   ZERO
+                       MOVE    ZERO                TO  SPA-NAI-SYORI1
+                       PERFORM 3101-UKETU-HEN-SEC
+                   END-IF
+      *
                WHEN    OTHER
                    MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
                    MOVE    SPACE               TO  WRK-MOTOPG
@@ -903,6 +924,45 @@
        30101-UKELIST-HEN-EXT.
            EXIT.
       *
+      *H27.12
+      *****************************************************************
+      *    医師選択より処理
+      *****************************************************************
+       31011-UDR-HENSYORI-SEC              SECTION.
+      *
+      *    ドクターを再編集する
+           INITIALIZE                  ORCSDRSETAREA
+           MOVE    SPA-SYSYMD          TO  ORCSDR-SYSYMD
+           MOVE    "1"                 TO  ORCSDR-KBN
+           MOVE    SPA-GMN-SRYKA       TO  ORCSDR-SRYKA
+           MOVE    WRK-HZN-DRCD(2:4)   TO  ORCSDR-IN-DRCD
+           CALL    "ORCSDRSET"         USING
+                                       SPA-AREA
+                                       ORCSDRSETAREA
+           MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
+           MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
+      *
+           IF      ORCSDR-DRCD-IDX     >   ZERO
+               MOVE    SPA-GMN-DRCDLST  (ORCSDR-DRCD-IDX)
+                                           TO  SPA-GMN-DRCD-G
+           ELSE
+               PERFORM VARYING   IDX       FROM    1   BY  1
+                   UNTIL     IDX           >   SPA-DRCD-MAX 
+                   IF      WRK-HZN-DRCD(2:4)   =   SPA-GMN-DRCDLST(IDX)
+                                                                 (1:4)
+                       MOVE    SPA-GMN-DRCDLST(IDX)
+                                               TO  SPA-GMN-DRCD-G
+                       MOVE    SPA-DRCD-MAX    TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+           MOVE    05                  TO  SPA-GMN-CUR
+      *
+           .
+       31011-UDR-HENSYORI-EXT.
+           EXIT.
+      *H27.12
+      *
       *****************************************************************
       *    ＱＲより受付処理
       *****************************************************************
@@ -1030,6 +1090,7 @@
       *
            MOVE    SPA-GMN-SRYKALST(01)
                                        TO  SPA-GMN-SRYKA-G
+           MOVE    SPA-GMN-SRYKA       TO  SPA-MAE-SRYKA
       *
       *    全職員情報をＳＰＡにセット
       *
@@ -2018,7 +2079,14 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            END-IF
       *
            MOVE    U02-SRYKA           TO  SPA-GMN-SRYKA-G
-           MOVE    U02-DRNAME          TO  SPA-GMN-DRCD-G
+      *
+      *H28.01
+           IF      U02-DRNAME(1:1)     =   "*"
+               CONTINUE
+           ELSE
+               MOVE    U02-DRNAME          TO  SPA-GMN-DRCD-G
+           END-IF
+      *
            MOVE    U02-SRYNAIYO        TO  SPA-GMN-SRYNAIYOCD-G
            MOVE    U02-KARUTE          TO  SPA-GMN-KARUTE-G
            MOVE    U02-SYOHO           TO  SPA-GMN-SYOHO-G
@@ -2047,6 +2115,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                END-IF
            END-IF
       *
+      *
       *H28.2
       *    選択番号エラー対応
            IF     (SPA-GMN-SELNUM      =   SPA-NAI-SELNUM)
@@ -2058,6 +2127,15 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                MOVE    1                   TO  SPA-GMN-CUR
                MOVE    "0032"              TO  SPA-ERRCD
                GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *H28.01
+      *    ドクター一覧へ
+           IF      WRK-MCP-WIDGET      =   "DRNAME"
+               IF      U02-DRNAME(1:1)     =   "*"
+                   PERFORM 4908-UDR-SYORI-SEC
+                   GO      TO      4102-KIHON-CHK-EXT
+               END-IF
            END-IF
       *
       *    患者番号
@@ -4188,6 +4266,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
                MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
            END-IF
+           MOVE    SPA-GMN-SRYKA       TO  SPA-MAE-SRYKA
            MOVE    SPA-GMN-DRCDLST  (1)
                                        TO  SPA-GMN-DRCD-G
            MOVE    SPA-GMN-SRYNAILST(1)
@@ -6397,7 +6476,41 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
        4908-B08S-SYORI-EXT.
            EXIT.
-      *TEST
+      *
+      *H28.01
+      *****************************************************************
+      *    選択一覧処理
+      *****************************************************************
+       4908-UDR-SYORI-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-KYOUTU          TO  LNK-COMMON
+           MOVE    SPA-U02             TO  LNK-SCRSPA
+      *
+      *    画面移行用のパラメタ変更
+           MOVE    "U02"               TO  SPA-MOTOPG
+           MOVE    "UDR"               TO  SPA-SAKIPG
+      *
+           INITIALIZE                  SPA-KYOTUKEY
+      *    引き継ぎ内容
+      *    診療科
+           MOVE    SPA-GMN-SRYKA       TO  SPA-SRYKA
+      *    患者氏名
+           MOVE    SPA-GMN-NAME        TO  SPA-NAME
+      *
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE.
+           MOVE   "UDR"                TO  MCP-WINDOW.
+      *
+           PERFORM 900-PUT-WINDOW.
+      *
+           MOVE    1                   TO  FLG-END
+           .
+      *
+       4908-UDR-SYORI-EXT.
+           EXIT.
+      *!!! 
       *
       *****************************************************************
       *    自画面編集処理
@@ -6488,6 +6601,16 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-DRCD-MAX        TO  U02-DRNAME-COUNT
            MOVE    SPA-GMN-DRCD-G      TO  U02-DRNAME
+      *!!
+      *H28.01
+           IF      SPA-DRCD-MAX        <   99
+               MOVE    SPA-DRCD-MAX    TO  IDX
+               ADD     1               TO  IDX
+               MOVE    "****  医師一覧"
+                                       TO  U02-DRNAME-ITEM(IDX)
+               MOVE    IDX             TO  U02-DRNAME-COUNT
+           END-IF
+      *!!
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >       SPA-SRYNAIYO-MAX

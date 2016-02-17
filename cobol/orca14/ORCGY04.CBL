@@ -394,7 +394,9 @@
                               (FLG-SYSKANRI      =   1   )
       *
                MOVE    MCPDATA-REC      TO  SYS-1010-REC
-               IF      SYS-1010-KBNCD(1:1) =   "1"
+               IF     (SYS-1010-KBNCD(1:1) =   "1"  )
+      *H27.12  »Û…Ωº®
+                AND   (SYS-1010-HYOJIFLG   NOT =   "1" )
                    ADD     1                   TO  SPA-DRCD-MAX
                    MOVE    SYS-1010-KBNCD(2:4) TO  SPA-GMN-DRNCD
                    MOVE    SPACE               TO  SPA-GMN-D1

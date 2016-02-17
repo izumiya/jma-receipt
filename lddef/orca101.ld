@@ -9,6 +9,7 @@ bind	"W03"		"OpenCOBOL"	"ORCGW03";
 bind	"W04"		"OpenCOBOL"	"ORCGW04";
 bind	"W05"		"OpenCOBOL"	"ORCGW05";
 bind	"W06"		"OpenCOBOL"	"ORCGW06";
+bind	"W061"		"OpenCOBOL"	"ORCGW061";
 bind	"W07"		"OpenCOBOL"	"ORCGW07";
 bind	"W08"		"OpenCOBOL"	"ORCGW08";
 bind	"W09"		"OpenCOBOL"	"ORCGW09";
@@ -76,6 +77,7 @@ data	{
 		W04;
 		W05;
 		W06;
+		W061;
 		W07;
 		W08;
 		W09;

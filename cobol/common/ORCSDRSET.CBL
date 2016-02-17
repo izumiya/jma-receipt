@@ -32,6 +32,7 @@
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/04/XX  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.03.00    NACL-Â¿¡¹Ç¼  08/06/XX  ºÇÂç£¹£¹·ïÂÐ±þ
       *  04.04.00    NACL-Â¿¡¹Ç¼  09/03/05  ÅöÆüÃ´Åö°åÂÐ±þ¤Ê¤·ÄÉ²Ã
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/01/XX  ¿ÇÎÅ²ÊÃ´Åö°å¡¦ÈóÉ½¼¨ÂÐ±þÄÉ²Ã
       *****************************************************************
       *
       *
@@ -58,7 +59,10 @@
            03  FLG-ARI             PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-OVER            PIC 9(01).
-           03  FLG-TANTOU            PIC 9(01).
+           03  FLG-TANTOU          PIC 9(01).
+      *
+           03  FLG-LSDOCTOR            PIC 9(01).
+           03  FLG-KADR-ARI            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -90,6 +94,10 @@
            COPY    "CPSK1010.INC".
       *    Ã´Åö°åÀßÄê 
            COPY  "CPSK1011.INC".
+      *
+      *    ¿ÇÎÅ²ÊÊÌ¥É¥¯¥¿¡¼
+       01  LIST-DOCTOR-REC.
+           COPY    "CPLIST_DOCTOR.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -183,8 +191,19 @@
                CONTINUE
            ELSE
                IF      ORCSDR-SRYKA    NOT =   SPACE
-                   PERFORM 1000-SYS1011-CHK-SEC
+      *H27.12
+      *            ¿ÇÎÅ²ÊÊÌ¤ÎÈ½Äê
+                   PERFORM 1003-LSDOCTOR-HEN-SEC
+                   IF      FLG-KADR-ARI        =   ZERO
+      *                ÅöÆüÃ´Åö°åÈ½Äê
+                       PERFORM 1000-SYS1011-CHK-SEC
+                   END-IF
                END-IF
+           END-IF
+      *
+      *H27.12
+           IF      FLG-KADR-ARI        =   1
+               GO  TO      100-HENSYU-SYORI-EXT
            END-IF
       *
            IF      FLG-TANTOU          =   ZERO
@@ -227,7 +246,11 @@
            PERFORM
                    UNTIL       (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC             TO  SYS-1010-REC
-               IF      SYS-1010-KBNCD(1:1)     =   "1"
+               IF     (SYS-1010-KBNCD(1:1)     =   "1"  )
+      *H27.12
+      *            É½¼¨Ê¬¤Î¤ß
+                 AND  (SYS-1010-HYOJIFLG   NOT =   "1"  )
+      *
                    MOVE    ZERO                TO  FLG-CHK
       *            ²ÊÊÌ¤Î»þ¡ÊÉÂ±¡¤Î¡Ë
                    IF     (ORCSDR-SRYKA    NOT =   SPACE )  AND
@@ -376,6 +399,95 @@
            .
        10001-DRCDNAME-HEN-EXT.
            EXIT.
+      *H27.11
+      *****************************************************************
+      *    ¿ÇÎÅ²ÊÃ´Åö°åÊóÊÔ½¸½èÍý
+      *****************************************************************
+       1003-LSDOCTOR-HEN-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KADR-ARI
+           MOVE    ZERO                TO  IDX
+      *
+           INITIALIZE                  LIST-DOCTOR-REC
+           MOVE    SPA-HOSPNUM         TO  LSDOCTOR-HOSPNUM
+           MOVE    ORCSDR-SRYKA        TO  LSDOCTOR-SRYKA
+      *
+           MOVE    LIST-DOCTOR-REC     TO  MCPDATA-REC
+           MOVE    "tbl_list_doctor"   TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_list_doctor"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-LSDOCTOR-READ-SEC
+           ELSE
+               INITIALIZE                  LIST-DOCTOR-REC
+               MOVE    1               TO  FLG-LSDOCTOR
+           END-IF
+           PERFORM
+               UNTIL  (FLG-LSDOCTOR    =   1  )
+                   OR (IDX             >=  99 )
+      *
+               MOVE    LSDOCTOR-DRCD        TO  WRK-KEY-DRCD
+               PERFORM 10001-DRCDNAME-HEN-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   ADD     1                   TO  IDX
+                   MOVE    LSDOCTOR-DRCD(2:4)  TO  ORCSDR-DRCD (IDX)
+                   MOVE    SYS-1010-NAME       TO  ORCSDR-DRCDMEI
+                                                              (IDX)
+                   MOVE    1                   TO  FLG-KADR-ARI
+               END-IF
+      *
+               MOVE    "tbl_list_doctor"   TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-LSDOCTOR-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_list_doctor"    TO  MCP-TABLE
+           MOVE    "key2"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    IDX                 TO  ORCSDR-DRCD-MAX
+           MOVE    1                   TO  ORCSDR-DRCD-IDX
+           .
+       1003-LSDOCTOR-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ²ÊÃ´Åö°åÅÐÏ¿¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       10031-LSDOCTOR-CHK-SEC               SECTION.
+      *
+      *
+           INITIALIZE                  LIST-DOCTOR-REC
+           MOVE    SPA-HOSPNUM         TO  LSDOCTOR-HOSPNUM
+           MOVE    ORCSDR-SRYKA        TO  LSDOCTOR-SRYKA
+      *
+           MOVE    LIST-DOCTOR-REC     TO  MCPDATA-REC
+           MOVE    "tbl_list_doctor"   TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_list_doctor"   TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-LSDOCTOR-READ-SEC
+           ELSE
+               INITIALIZE                  LIST-DOCTOR-REC
+               MOVE    1               TO  FLG-LSDOCTOR
+           END-IF
+           IF      FLG-LSDOCTOR         =   ZERO
+      *        ¿ÇÎÅ²ÊÊÌ¤¢¤ê
+               MOVE    1                   TO  FLG-KADR-ARI
+           ELSE
+               MOVE    ZERO                TO  FLG-KADR-ARI
+           END-IF
+      *
+           MOVE    "tbl_list_doctor"    TO  MCP-TABLE
+           MOVE    "key2"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       10031-LSDOCTOR-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ²ÊÊÌ¤ÎÊÔ½¸¡Ê¿ÇÎÅ½ê¡Ë½èÍý
       *****************************************************************
@@ -611,11 +723,21 @@
                PERFORM 100-DR-HENSYU-SEC
            ELSE
       *        ÅöÆüÃ´Åö°å
+      *        IF      ORCSDR-SRYKA    NOT =   SPACE
+      *            PERFORM 1000-SYS1011-CHK-SEC
+      *        END-IF
+      *H27.12
                IF      ORCSDR-SRYKA    NOT =   SPACE
-                   PERFORM 1000-SYS1011-CHK-SEC
+      *            ¿ÇÎÅ²ÊÊÌ¤ÎÈ½Äê
+                   PERFORM 10031-LSDOCTOR-CHK-SEC
+                   IF      FLG-KADR-ARI        =   ZERO
+      *                ÅöÆüÃ´Åö°åÈ½Äê
+                       PERFORM 1000-SYS1011-CHK-SEC
+                   END-IF
                END-IF
            END-IF
            IF      FLG-TANTOU          =   ZERO
+             AND   FLG-KADR-ARI        =   ZERO
       *        ÅöÆüÃ´Åö°åÌµ¤·
                IF      ORCSDR-IN-DRCD      =   SPACE
                    IF      ORCSDR-DRCD-IDX     =   ZERO
@@ -660,6 +782,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        900-SYSKANRI-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    Ã´Åö°å¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       900-LSDOCTOR-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  LIST-DOCTOR-REC
+               MOVE    ZERO            TO  FLG-LSDOCTOR
+           ELSE
+               INITIALIZE                  LIST-DOCTOR-REC
+               MOVE    1               TO  FLG-LSDOCTOR
+           END-IF
+      *
+           .
+       900-LSDOCTOR-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý
       *****************************************************************
@@ -672,6 +813,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£ÂÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       920-DBFETCH-EXT.
            EXIT.
       *
       *****************************************************************

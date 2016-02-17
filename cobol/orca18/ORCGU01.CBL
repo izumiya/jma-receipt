@@ -328,6 +328,7 @@
        01  SCRAREA.
            COPY    "U01.INC".
            COPY    "U012.INC".
+           COPY    "UDR.INC".
            COPY    "U1ERR.INC". 
            COPY    "U1ID1.INC". 
       *
@@ -539,6 +540,10 @@
       *        ÁªÂò°ìÍ÷
                WHEN    "CLICKED"       ALSO    "B09"
                    PERFORM 490-U012-SYORI-SEC
+      *ÊÝÎ±!!!!!!!!!
+      *        Ã´Åö°åÅÐÏ¿
+      *        WHEN    "CLICKED"       ALSO    "B06"
+      ******       PERFORM 460-UDR-SYORI-SEC
            END-EVALUATE
       *
            .
@@ -1113,6 +1118,35 @@
        440-ATOGMN-EXT.
            EXIT.
       *
+      *!!!!!!!!!!!!!
+      *TEST
+      *****************************************************************
+      *    Ã´Åö°åÅÐÏ¿¡¡½èÍý
+      *****************************************************************
+       460-UDR-SYORI-SEC             SECTION.
+      *
+      *
+           INITIALIZE                      SPA-U012-AREA
+      *
+           MOVE    "U01"               TO  SPA-U012-MOTOPG
+           MOVE    SPA-U01KYOUTU       TO  SPA-WORK
+           MOVE    SPACE               TO  LNK-KYOUTU
+      *
+           MOVE    "U01"               TO  SPA-MOTOPG
+           MOVE    "UDR"               TO  SPA-SAKIPG
+      *
+           MOVE    "CHANGE"            TO  MCP-PUTTYPE
+           MOVE    "UDR"               TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       460-UDR-SYORI-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!
+      *TEST
       *****************************************************************
       *    ¼«²èÌÌÊÔ½¸½èÍý
       *****************************************************************
@@ -1344,6 +1378,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  U1ID1
+           INITIALIZE                       U1ID1
            MOVE    SPA-U1IDCD           TO  U1ID1-ID1CODE
            MOVE    WRK-U1IDMSG          TO  U1ID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET

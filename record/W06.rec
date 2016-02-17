@@ -212,6 +212,13 @@ W06 {
           count int;
             item varchar(12)[2];
         };
+        HYOJIFLG_COMB {
+          HYOJIFLG  {
+            textdata varchar(10);
+          };
+          count int;
+            item varchar(10)[2];
+        };
       };
       TG2 {
         SKYPRTFLG_COMB {
@@ -416,6 +423,7 @@ W06 {
       SYOKUKBN {
         textdata varchar(20);
       };
+      state int;
       count int;
         item varchar(20)[10];
     };
@@ -423,6 +431,7 @@ W06 {
       SYOKUCOD {
         textdata varchar(35);
       };
+      state int;
       count int;
         item varchar(35)[100];
     };
@@ -441,6 +450,10 @@ W06 {
     };
     B03 {
       state int;
+    };
+    B05 {
+      state int;
+      label varchar(10);
     };
   };
 };

@@ -1167,6 +1167,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  K10
       *
       *    コラムリストの位置指定
+           INITIALIZE                      K10
            MOVE    ZERO                TO  K10-ROW
            MOVE    ZERO                TO  K10-ROWATTR
            IF      WRK-K10-ROW     NOT =   ZERO
@@ -1335,6 +1336,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  KID1
+           INITIALIZE                      KID1
            MOVE    SPA-KIDCD           TO  KID1-ID1CODE
            MOVE    WRK-KIDMSG          TO  KID1-ID1MSG
       *

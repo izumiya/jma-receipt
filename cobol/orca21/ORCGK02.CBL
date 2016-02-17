@@ -709,6 +709,9 @@
       *
            03  WRK-MAE-BIRTHDAY        PIC X(08).
       *
+      *H28.1
+           03  WRK-HZN-DRCD             PIC X(05).
+      *
       *    訂正時の内容保存
        01  WRK-ORCSC95AREA             PIC X(150).
       *
@@ -1421,6 +1424,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+      *H28.1
+               IF      SPA-MOTOPG          =   "UDR"
+                   MOVE    SPA-DRCD            TO  WRK-HZN-DRCD
+               END-IF
       *
       *        画面ＳＰＡ読み込み
                PERFORM 1002-K02SPA-SET-SEC
@@ -1430,6 +1437,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                       OR  "P97"
                                                       OR  "KA01"
                                                       OR  "XF01"
+                                                      OR  "UDR"
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-K02
                    MOVE    SPA-WORK        TO  SPA-K01KYOUTU
@@ -1462,6 +1470,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 3101-P97SPASET-SEC
                    GO      TO      300-SCREEN-EXT
                END-IF
+      *H28.1
+               IF      WRK-MOTOPG          =   "UDR"
+                   IF      SPA-PTID    NOT =   ZERO
+      *                ドクター一覧再編集
+                       PERFORM 30091-UDR-SETSYORI-SEC
+                   END-IF
+                   GO      TO      300-SCREEN-EXT
+               END-IF
+      *
            END-IF
       *!
            CALL    "ORCSSPACHK"        USING    SPA-AREA
@@ -2846,6 +2863,47 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        30112-AKUSEI-COMMENT-EXT.
            EXIT.
+      *H28.1
+      *****************************************************************
+      *    医師選択より処理
+      *****************************************************************
+       30091-UDR-SETSYORI-SEC              SECTION.
+      *
+      *    ドクターを再編集する
+           INITIALIZE                  ORCSDRSETAREA
+           MOVE    "1"                 TO  ORCSDR-KBN
+           MOVE    SPA-SRYYMD          TO  ORCSDR-SYSYMD
+           MOVE    SPA-SRYKA           TO  ORCSDR-SRYKA
+           MOVE    WRK-HZN-DRCD(2:4)   TO  ORCSDR-IN-DRCD
+           CALL    "ORCSDRSET"         USING
+                                       SPA-AREA
+                                       ORCSDRSETAREA
+           MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
+           MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
+      *
+           IF      ORCSDR-DRCD-IDX     >   ZERO
+               MOVE    SPA-GMN-DRCDLST  (ORCSDR-DRCD-IDX)
+                                           TO  SPA-GMN-DRCD-G
+           ELSE
+               PERFORM VARYING   IDX       FROM    1   BY  1
+                   UNTIL     IDX           >   SPA-DRCD-MAX 
+                   IF      WRK-HZN-DRCD(2:4)   =   SPA-GMN-DRCDLST(IDX)
+                                                                 (1:4)
+                       MOVE    SPA-GMN-DRCDLST(IDX)
+                                               TO  SPA-GMN-DRCD-G
+                       MOVE    SPA-DRCD-MAX    TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+           MOVE    SPA-GMN-DRCD-G      TO  SPA-DRCD-NAME
+           MOVE    "1"                 TO  WRK-DRCD1
+           MOVE    SPA-GMN-DRCD        TO  WRK-DRCD2
+           MOVE    WRK-DRCD            TO  SPA-DRCD
+      *
+           .
+       30091-UDR-SETSYORI-EXT.
+           EXIT.
+      *H28.1
       *@@
       *
       *****************************************************************
@@ -6575,6 +6633,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1               TO  SPA-GMN-CUR
                GO      TO      41013-DRCD-SYORI-EXT
            END-IF
+      *H28.01
+      *    医師一覧へ
+           IF      K02-DRCD (1:1)      =   "*"
+               PERFORM 410131-UDR-SYORI-SEC
+               GO      TO      41013-DRCD-SYORI-EXT
+           END-IF
+      *!!
            IF      SPA-PTID            =   ZERO
                MOVE    ZERO                TO  SPA-GMN-CUR
                MOVE    SPACE               TO  SPA-GMN-DRCD-G
@@ -6646,6 +6711,42 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        410131-DRCD-CHK-EXT.
            EXIT.
       *
+      *
+      *H28.01
+      *****************************************************************
+      *    選択一覧処理
+      *****************************************************************
+       410131-UDR-SYORI-SEC         SECTION.
+      *
+      *
+      *    ワーク行為負担パラメタを作成
+           PERFORM 4410-WSINPARA-SEC
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
+      *
+      *    戻り時、画面を元へ戻す
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-KYOUTU          TO  LNK-COMMON
+           MOVE    SPA-K02             TO  LNK-SCRSPA
+      *
+      *    画面移行用のパラメタ変更
+           MOVE    "K02"               TO  SPA-MOTOPG
+           MOVE    "K02"               TO  SPA-MOTOPG3
+           MOVE    "UDR"               TO  SPA-SAKIPG
+      *
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE.
+           MOVE   "UDR"                TO  MCP-WINDOW.
+      *
+           PERFORM 900-PUT-WINDOW.
+      *
+           MOVE    1                   TO  FLG-END
+           .
+      *
+       410131-UDR-SYORI-EXT.
+           EXIT.
+      *!!! 
       *****************************************************************
       *    診療行為検索処理
       *****************************************************************
@@ -12139,7 +12240,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-KIDCD       NOT =   SPACE )
                GO      TO      41002-KOUSIN-SYORI-EXT
            END-IF
-      *
       *H28.2
       *    画面ＳＰＡ書込み
            PERFORM 1003-K02SPA-OUT-SEC
@@ -13394,6 +13494,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                              (IDX)
            END-PERFORM
            MOVE    SPA-DRCD-MAX        TO  K02-DRCD-COUNT
+      *H28.1
+           IF      SPA-DRCD-MAX        <   99
+               MOVE    SPA-DRCD-MAX        TO  IDX
+               ADD     1                   TO  IDX
+               MOVE    "****  医師一覧"
+                                           TO  K02-DRCD-ITEM (IDX)
+               MOVE    IDX                 TO  K02-DRCD-COUNT
+            END-IF
+      *!!
       *
       *    病名
            PERFORM   VARYING   IDX     FROM    1   BY  1

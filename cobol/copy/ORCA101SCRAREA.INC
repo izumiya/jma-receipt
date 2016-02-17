@@ -23,6 +23,7 @@
            COPY    "W04.INC".
            COPY    "W05.INC".
            COPY    "W06.INC".
+           COPY    "W061.INC".
            COPY    "W07.INC". 
            COPY    "W08.INC". 
            COPY    "W09.INC".

@@ -64,6 +64,7 @@ db	{
 	tbl_tnkrrk;
 	tbl_spa_tmp;
 	tbl_med_image;
+    tbl_list_doctor;
 };
 
 /* #include "orcadb.inc" */

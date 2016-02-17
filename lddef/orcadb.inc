@@ -195,4 +195,5 @@ db	{
 	tbl_tekiou_medicine;
 	tbl_tekiou_disease;
 	tbl_api_para;
+	tbl_list_doctor;
 };
