@@ -189,7 +189,7 @@ class Jma_print
     end
 
     open(item[:temp_file], "w") do |fp|
-      fp.print item[:data]
+      fp.print item[:data].chomp
       fp.print " " * 20000
     end
 
