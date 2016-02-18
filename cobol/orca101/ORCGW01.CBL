@@ -102,6 +102,7 @@
       *  04.08.01    NACL-森脇    14/06/16  期間変更不可チェックに排他制御追加
       *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *  04.07.00    NACL-多々納  15/01/07  9103 処方せん連携基盤情報
+      *  04.08.02    NACL-森脇    15/08/28  1001 有効期間チェック
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -236,6 +237,9 @@
                05  WRK-W01-MAE-KANRICD PIC X(04).
                05  WRK-W01-MAE-KBNCD   PIC X(08).
            03  WRK-SELNUM              PIC 9(03).
+      *----(04.08.01)--ADD-START---
+           03  WRK-STYUKYMD            PIC X(08).
+      *----(04.08.01)--ADD-END-----
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -893,6 +897,13 @@
       *    戻る　処理
       *****************************************************************
        210-BACK                    SECTION.
+      *
+      *----(04.08.02)--ADD-START---
+           PERFORM 430-SYS1001-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  210-BACK-EXT
+           END-IF
+      *----(04.08.02)--ADD-END-----
       *
            IF    ( SPA-W01-MOTOPG  NOT =   SPACE )
                MOVE    SPA-W01-MOTOPG  TO  SPA-SAKIPG
@@ -2494,6 +2505,109 @@
            .
        420-W68-SENI-EXT.
            EXIT.
+      *----(04.08.02)--ADD-START---
+      *****************************************************************
+      *    システム管理基本情報有効期限チェック処理
+      *****************************************************************
+       430-SYS1001-CHK-SEC         SECTION.
+      *
+           MOVE    SPACE           TO  WRK-STYUKYMD
+           MOVE    SPACE           TO  SPA-ERRCD
+      *
+      *    当日有効レコードチェック
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "1001"          TO  SYS-KANRICD
+           MOVE    "*"             TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-STYUKYMD
+           MOVE    SPA-SYSYMD      TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    当日有効の存在エラー
+           IF      FLG-SYSKANRI    =   1
+               MOVE    "0025"          TO  SPA-ERRCD
+               GO  TO  430-SYS1001-CHK-EXT
+           END-IF
+      *
+      *    有効期限チェック
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "1001"          TO  SYS-KANRICD
+           MOVE    "*%"            TO  SYS-KBNCD
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
+                   OR    ( SPA-ERRCD   NOT =   SPACE )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+      *
+      *        有効開始日をチェック
+               IF      WRK-STYUKYMD    NOT =   SPACE
+      *            有効期限不連続エラー
+                   IF      SYS-STYUKYMD    NOT =   WRK-STYUKYMD
+                       MOVE    "0026"          TO  SPA-ERRCD
+                   END-IF
+               END-IF
+      *
+      *        次の有効開始日をセット
+               IF      SYS-EDYUKYMD    NOT =   "99999999"
+                   INITIALIZE                  STS-AREA-DAY
+                   INITIALIZE                  LNK-DAY6-AREA
+                   MOVE    "61"            TO  LNK-DAY6-IRAI
+                   MOVE    SYS-EDYUKYMD    TO  LNK-DAY6-KIJUN
+                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                   MOVE    1               TO  LNK-DAY6-ZOGEN
+                   CALL    "ORCSDAY"       USING
+                                           STS-AREA-DAY
+                                           LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KEISAN TO  WRK-STYUKYMD
+               END-IF
+      *
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      SPA-ERRCD       =   SPACE
+      *        最終期間終了日エラー
+               IF       SYS-EDYUKYMD   NOT =   "99999999"
+                   MOVE    "0027"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       430-SYS1001-CHK-EXT.
+           EXIT.
+      *----(04.08.02)--ADD-END-----
       *****************************************************************
       *    日付チェック・編集処理
       *****************************************************************
@@ -2575,6 +2689,7 @@
       *
            MOVE    SPACE               TO  W01
       *
+           INITIALIZE                      W01
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >       SPA-GMN-MAX
                MOVE    SPA-GMN-TBANGO    (IDX) TO  W01-TSELNUM  (IDX)
@@ -2710,6 +2825,26 @@
                    MOVE    "１日で入力して下さい"     TO  SPA-ERRMSG
                WHEN    "0024"
                    MOVE    "末日で入力して下さい"     TO  SPA-ERRMSG
+      *----(04.08.02)--ADD-START---
+               WHEN    "0025"
+                   STRING  "「１００１　医療機関情報−基本」"
+                           "本日有効な情報が登録されていません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0026"
+                   STRING  "「１００１　医療機関情報−基本」"
+                           "情報が登録されていない期間があります。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0027"
+                   STRING  "「１００１　医療機関情報−基本」"
+                           "最終期間の終了日が正しくありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING                                                    
+      *----(04.08.02)--ADD-END-----
                WHEN    "1016" 
                    STRING  "外来迅速検体検査設定は平成２０年４月１日"
                            "以降の開始日として下さい。"
