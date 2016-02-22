@@ -1,9 +1,9 @@
         02  W061.
-            03  W061-TITLE  PIC X(256).
-            03  W061-POPUP-SUMMARY  PIC X(256).
-            03  W061-POPUP-BODY PIC X(256).
-            03  W061-POPUP-ICON PIC X(256).
-            03  W061-POPUP-TIMEOUT  PIC S9(9)   BINARY.
+      *     03  W061-TITLE  PIC X(256).
+      *     03  W061-POPUP-SUMMARY  PIC X(256).
+      *     03  W061-POPUP-BODY PIC X(256).
+      *     03  W061-POPUP-ICON PIC X(256).
+      *     03  W061-POPUP-TIMEOUT  PIC S9(9)   BINARY.
       ******02  W061-FIXED32.
               03  W061-B01.
                 04  W061-B01-STATE  PIC S9(9)   BINARY.
