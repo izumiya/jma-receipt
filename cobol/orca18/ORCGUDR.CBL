@@ -2187,7 +2187,7 @@
       *
            EVALUATE    SPA-NAI-LISTKBN2
                WHEN    0
-                   MOVE    SPACE                   TO  WRK-MIDASI2
+                   MOVE    "（全体）"              TO  WRK-MIDASI2
                    MOVE    "専門科"                TO  UDR-B09-LABEL
                WHEN    1
                    MOVE    "（専門科）"            TO  WRK-MIDASI2
@@ -2396,7 +2396,7 @@
                    END-STRING
                WHEN    "0010"
                    STRING  "診療科担当医が９９件以上となります。"
-                           "これ以上登録できません。ん。"
+                           "これ以上登録できません。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
