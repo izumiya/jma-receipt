@@ -446,6 +446,7 @@
                MOVE    SPACE               TO  SPA-W061-PASSWD (IDX)
            END-IF
       *    È÷¹ÍÊÔ½¸
+           MOVE    SPACE               TO  SPA-W061-BIKOU (IDX)
            IF      SYS-1010-KANRIAUTHFLG   =   "T"
                MOVE    "´ÉÍý¼Ô"            TO  SPA-W061-BIKOU (IDX)
                IF      SPA-W061-PASSWD (IDX)   =   "1"
