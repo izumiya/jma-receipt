@@ -325,6 +325,10 @@
       *                                     行為のコラムリストへの表示
       *  04.08.04    NACL-藤原    16/01/20  転帰区分の死亡変更時の患者
       *                                     情報更新対応
+      *  04.08.05    NACL-藤原    16/02/10  自院病名への補足コメント追加
+      *                                     対応
+      *  04.08.06    NACL-藤原    16/02/17  退院証明書の傷病名欄記載対応
+      *                                     合併症に係わる情報追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -613,6 +617,10 @@
                05  WRK-GMN-C02-TTENKIYMD   PIC X(09).
                05  WRK-GMN-C02-THKNBYOMEIFLG
                                            PIC X(08).
+               05  WRK-GMN-C02-TDISCHARGEFLG
+                                           PIC X(04).
+               05  WRK-GMN-C02-TCLASS1     PIC X(08).
+               05  WRK-GMN-C02-TCLASS2     PIC X(10).
                05  WRK-GMN-C02-TCREYMD     PIC X(09).
                05  WRK-GMN-C02-TCREHMS     PIC X(08).
                05  WRK-GMN-C02-TUPYMD      PIC X(09).
@@ -1565,9 +1573,37 @@
            MOVE    "保険病名"      TO  SPA-GMN-C02-HKNBYOMEIFLGMEIL (1)
            MOVE    1               TO  SPA-GMN-C02-HKNBYOMEIFLG-MAX
       *
+      *
            MOVE    "1"             TO  SPA-GMN-C02-REZEFLGL         (1)
            MOVE    "表示しない"    TO  SPA-GMN-C02-REZEFLGMEIL      (1)
            MOVE    1               TO  SPA-GMN-C02-REZEFLG-MAX
+           MOVE    "1"             TO  SPA-GMN-C02-DISCHARGEFLGL    (1)
+           MOVE    "記載する"      TO  SPA-GMN-C02-DISCHARGEFLGMEIL (1)
+           MOVE    1               TO  SPA-GMN-C02-DISCHARGEFLG-MAX
+      *
+           MOVE    "01"            TO  SPA-GMN-C02-CLASS1L     (1)
+           MOVE    "原疾患ア"      TO  SPA-GMN-C02-CLASS1MEIL  (1)
+           MOVE    "02"            TO  SPA-GMN-C02-CLASS1L     (2)
+           MOVE    "原疾患イ"      TO  SPA-GMN-C02-CLASS1MEIL  (2)
+           MOVE    "03"            TO  SPA-GMN-C02-CLASS1L     (3)
+           MOVE    "原疾患ウ"      TO  SPA-GMN-C02-CLASS1MEIL  (3)
+           MOVE    "04"            TO  SPA-GMN-C02-CLASS1L     (4)
+           MOVE    "原疾患エ"      TO  SPA-GMN-C02-CLASS1MEIL  (4)
+           MOVE    "05"            TO  SPA-GMN-C02-CLASS1L     (5)
+           MOVE    "原疾患オ"      TO  SPA-GMN-C02-CLASS1MEIL  (5)
+           MOVE    5               TO  SPA-GMN-C02-CLASS1-MAX
+      *
+           MOVE    "01"            TO  SPA-GMN-C02-CLASS2L     (1)
+           MOVE    "アの合併症"    TO  SPA-GMN-C02-CLASS2MEIL  (1)
+           MOVE    "02"            TO  SPA-GMN-C02-CLASS2L     (2)
+           MOVE    "イの合併症"    TO  SPA-GMN-C02-CLASS2MEIL  (2)
+           MOVE    "03"            TO  SPA-GMN-C02-CLASS2L     (3)
+           MOVE    "ウの合併症"    TO  SPA-GMN-C02-CLASS2MEIL  (3)
+           MOVE    "04"            TO  SPA-GMN-C02-CLASS2L     (4)
+           MOVE    "エの合併症"    TO  SPA-GMN-C02-CLASS2MEIL  (4)
+           MOVE    "05"            TO  SPA-GMN-C02-CLASS2L     (5)
+           MOVE    "オの合併症"    TO  SPA-GMN-C02-CLASS2MEIL  (5)
+           MOVE    5               TO  SPA-GMN-C02-CLASS2-MAX
       *
            MOVE    "0"             TO  SPA-GMN-C02-SYOKBNL        (1)
            MOVE    "当月"          TO  SPA-GMN-C02-SYOKBNMEIL     (1)
@@ -2337,6 +2373,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        SPA-GMN-C02-TUPHMS (IDX) (3:1)
                                        SPA-GMN-C02-TUPHMS (IDX) (6:1)
                    END-IF
+      *
+                   MOVE    WRK-PTBYO-SRYYMD-DISCHARGEFLG(IDZZ)
+                                       TO  WRK-KBN 
+                   PERFORM 5001-DISCHARGEFLG-HENSYU-SEC
+                   MOVE    WRK-KBNMEI  TO
+                                       SPA-GMN-C02-TDISCHARGEFLG (IDX)
+      *
+                   MOVE    WRK-PTBYO-SRYYMD-CLASS1(IDZZ)
+                                       TO  WRK-KBN 
+                   PERFORM 5001-CLASS1-HENSYU-SEC
+                   MOVE    WRK-KBNMEI  TO
+                                       SPA-GMN-C02-TCLASS1  (IDX)
+      *
+                   MOVE    WRK-PTBYO-SRYYMD-CLASS2(IDZZ)
+                                       TO  WRK-KBN 
+                   PERFORM 5001-CLASS2-HENSYU-SEC
+                   MOVE    WRK-KBNMEI  TO
+                                       SPA-GMN-C02-TCLASS2  (IDX)
                END-PERFORM
            END-IF
       *
@@ -2870,19 +2924,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF      SPA-C01-INDEX   =   ZERO
-      *      自院病名検索時
-             IF      SPA-C01-B10-FLG =   ZERO    OR  2
-                 PERFORM VARYING IDZ FROM    1   BY  1
-                         UNTIL   IDZ >       3      
-                   MOVE    SPA-C01-THOSOKUCD (IDZ)
+      *        自院病名検索時
+               IF      SPA-C01-B10-FLG =   ZERO    OR  2
+                   IF      SPA-C01-HOSOKU-COMMENT  =   SPACE
+                       PERFORM VARYING IDZ FROM    1   BY  1
+                               UNTIL   IDZ >       3      
+                           MOVE    SPA-C01-THOSOKUCD (IDZ)
                                                TO
                                            SPA-GMN-C02-HOSOKUCD (IDZ)
-                   MOVE    SPA-GMN-C02-HOSOKUCD (IDZ)
+                           MOVE    SPA-GMN-C02-HOSOKUCD (IDZ)
                                                TO  USBYO-BYOMEIINPUTCD
-                   PERFORM 410243-HOSOKU-USERBYOMEI-HENSYU-SEC
-                 END-PERFORM
-                 PERFORM 3202-C04SPASET-HOSOKU-HENSYU-SEC
-             END-IF  
+                           PERFORM 410243-HOSOKU-USERBYOMEI-HENSYU-SEC
+                       END-PERFORM
+                       PERFORM 3202-C04SPASET-HOSOKU-HENSYU-SEC
+                   ELSE
+                       MOVE    SPA-C01-HOSOKU-COMMENT
+                                       TO  SPA-GMN-C02-HOSOKU-COMMENT
+                   END-IF
+               END-IF  
            ELSE
       *        自院病名コード検索時
                MOVE    SPA-C01-INDEX   TO  IDZ
@@ -2924,6 +2983,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM 41041-RECEDENFLG-CHK-SEC
            ELSE
                MOVE    SPACE               TO  SPA-NAI-C02-RECEDENFLG
+           END-IF
+      *    
+      *    複数病名のとき補足コメントの入力不可
+           IF    ( SPA-NAI-C02-BYOMEICD-MAX    >   1     )
+           AND   ( SPA-GMN-C02-HOSOKU-COMMENT
+                                           NOT =   SPACE )
+               INITIALIZE                  SPA-GMN-C02-HOSOKUCD-G
+                                           SPA-NAI-C02-HOSOKU-TBL
+               MOVE    SPACE           TO  SPA-GMN-C02-HOSOKU-COMMENT
            END-IF
       *
            MOVE    9               TO  SPA-GMN-C02-CUR
@@ -4006,6 +4074,12 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                    PERFORM 41025-HOSOKU-COMMENT-CHK-SEC
                WHEN    "ACTIVATE"      ALSO    "KOHID"
                    PERFORM 41026-KOHID-CHK-SEC
+               WHEN    "ACTIVATE"      ALSO    "DISCHARGEFLG"
+                   PERFORM 41027-DISCHARGEFLG-CHK-SEC
+               WHEN    "ACTIVATE"      ALSO    "CLASS1"
+                   PERFORM 41028-CLASS1-CHK-SEC
+               WHEN    "ACTIVATE"      ALSO    "CLASS2"
+                   PERFORM 41029-CLASS2-CHK-SEC
       *        病名行選択
                WHEN    ANY             ALSO    "BYOMEILST"
                    PERFORM 41020-BYOMEISEL-SEC
@@ -5941,6 +6015,26 @@ grpsys                 MOVE    SPA-HOSPNUM TO  USBYO-HOSPNUM
            MOVE    SPA-PTBYO-RECEDENFLG
                                        TO  SPA-NAI-C02-RECEDENFLG
       *
+           MOVE    SPA-PTBYO-DISCHARGEFLG
+                                       TO  SPA-GMN-C02-DISCHARGEFLG 
+                                           WRK-KBN
+           PERFORM 5001-DISCHARGEFLG-HENSYU-SEC
+           MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-DISCHARGEFLGMEI
+      *
+           IF      SPA-PTBYO-CLASS1    NOT =   ZERO
+               MOVE    SPA-PTBYO-CLASS1    TO  SPA-GMN-C02-CLASS1 
+                                               WRK-KBN
+               PERFORM 5001-CLASS1-HENSYU-SEC
+               MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-CLASS1MEI
+           END-IF
+      *
+           IF      SPA-PTBYO-CLASS2    NOT =   ZERO
+               MOVE    SPA-PTBYO-CLASS2    TO  SPA-GMN-C02-CLASS2 
+                                               WRK-KBN
+               PERFORM 5001-CLASS2-HENSYU-SEC
+               MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-CLASS2MEI
+           END-IF
+      *
            MOVE    ZERO                TO  SPA-NAI-C02-NANBYOCD
                                            SPA-NAI-C02-MANSEIKBN
            PERFORM VARYING IDX FROM    1   BY  1
@@ -6258,6 +6352,18 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                    MOVE    "1"           TO
                                          SPA-NAI-C02-USERBYOMEIFLG(IDZ)
                    MOVE    USBYO-BYOMEI  TO  SPA-NAI-C02-BYOMEI   (IDZ)
+                   MOVE    USBYO-HOSOKU-COMMENT
+                                         TO  SPA-NAI-C02-HOSOKU-COMMENT
+                                                                  (IDZ)
+                   IF      USBYO-HOSOKU-COMMENT
+                                         =   SPACE
+                       CONTINUE
+                   ELSE
+                       INITIALIZE            SPA-GMN-C02-HOSOKUCD-G
+                                             SPA-NAI-C02-HOSOKU-TBL
+                       MOVE    USBYO-HOSOKU-COMMENT
+                                         TO  SPA-GMN-C02-HOSOKU-COMMENT
+                   END-IF
                    MOVE    USBYO-CHARTBYOMEI
                                          TO
                                          SPA-NAI-C02-CHARTBYOMEI  (IDZ)
@@ -7126,12 +7232,18 @@ grpsys                         MOVE    SPA-HOSPNUM
                AND   ( SPA-GMN-C02-HOSOKU-COMMENT
                                        NOT =   SPACE )
                    MOVE    "0094"              TO  SPA-ERRCD
+                   INITIALIZE                  SPA-GMN-C02-HOSOKUCD-G
+                                               SPA-NAI-C02-HOSOKU-TBL
+                   MOVE    SPACE               TO
+                                           SPA-GMN-C02-HOSOKU-COMMENT
                END-IF
            END-IF        
       *
-      *    括弧で始まる部位が末尾の警告以外のとき
+      *    括弧で始まる部位が末尾の警告又は複数病名のときの補足コメントの
+      *    入力以外のとき
            IF    ( SPA-ERRCD            NOT =   SPACE  )
-           AND   ( SPA-ERRCD            NOT =   "0079" )     
+           AND   ( SPA-ERRCD            NOT =   "0079"  AND
+                                                "0094" )
                GO  TO  41021-BYOMEICD-HENSYU-EXT
            END-IF
       *
@@ -7864,7 +7976,7 @@ grpsys                         MOVE    SPA-HOSPNUM
       *
                    COMPUTE SPA-GMN-C02-CUR     =   IDZ +   1
       *
-                   IF      SPA-ERRCD           =   "0075"
+                   IF      SPA-ERRCD           =   "0075"  OR "0094"
                        GO  TO  410261-BYOMEIINPUTSET-HENSYU-EXT
                    END-IF
                END-IF
@@ -8300,7 +8412,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      SPA-GMN-C02-MANSEIKBN =   SPACE
                CONTINUE
            ELSE
-               IF      SPA-GMN-C02-MANSEIKBNMEI   =   SPACE    
+               IF      SPA-GMN-C02-MANSEIKBNMEI   =   SPACE
                   MOVE    "0021"               TO  SPA-ERRCD
                   GO  TO  4106-MANSEI-CHK-EXT
                END-IF
@@ -9007,7 +9119,7 @@ grpsys                                       SPA-AREA
                END-IF
            END-IF
       *     
-           MOVE    2                   TO  SPA-GMN-C02-CUR
+           MOVE    42                  TO  SPA-GMN-C02-CUR
            .
        41014-HKNBYOMEIFLG-CHK-EXT.
            EXIT.
@@ -9713,6 +9825,106 @@ grpsys                                       SPA-AREA
            EXIT.
       *
       *****************************************************************
+      *    退院証明書記載フラグ入力処理
+      *****************************************************************
+       41027-DISCHARGEFLG-CHK-SEC             SECTION.
+      *
+           MOVE    42                 TO  SPA-GMN-C02-CUR
+      *
+           IF      SPA-NAI-C02-BYOMEICD-MAX    >   1
+               MOVE    "0060"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-C02-CUR
+               GO  TO  41027-DISCHARGEFLG-CHK-EXT
+           END-IF
+      *
+           MOVE    C02-DISCHARGEFLG    TO  SPA-GMN-C02-DISCHARGEFLG-G
+      *
+           MOVE    SPA-GMN-C02-DISCHARGEFLG
+                                       TO  WRK-KBN
+           PERFORM 5001-DISCHARGEFLG-HENSYU-SEC
+           MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-DISCHARGEFLGMEI
+      *
+           IF      SPA-GMN-C02-DISCHARGEFLG =   SPACE
+               CONTINUE
+           ELSE
+               IF      SPA-GMN-C02-DISCHARGEFLGMEI =   SPACE
+                   MOVE    "0040"              TO  SPA-ERRCD
+                   GO  TO  41027-DISCHARGEFLG-CHK-EXT
+               END-IF
+           END-IF
+      *
+           MOVE    43                 TO  SPA-GMN-C02-CUR
+           .
+       41027-DISCHARGEFLG-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    原疾患区分入力処理
+      *****************************************************************
+       41028-CLASS1-CHK-SEC             SECTION.
+      *
+           MOVE    43                 TO  SPA-GMN-C02-CUR
+      *
+           IF      SPA-NAI-C02-BYOMEICD-MAX    >   1
+               MOVE    "0060"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-C02-CUR
+               GO  TO  41028-CLASS1-CHK-EXT
+           END-IF
+      *
+           MOVE    C02-CLASS1        TO  SPA-GMN-C02-CLASS1-G
+      *
+           MOVE    SPA-GMN-C02-CLASS1 TO  WRK-KBN
+           PERFORM 5001-CLASS1-HENSYU-SEC
+           MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-CLASS1MEI
+      *
+           IF      SPA-GMN-C02-CLASS1 =   SPACE
+               CONTINUE
+           ELSE
+               IF      SPA-GMN-C02-CLASS1MEI   =   SPACE
+                   MOVE    "0041"               TO  SPA-ERRCD
+                   GO  TO  41028-CLASS1-CHK-EXT
+               END-IF
+           END-IF
+      *
+           MOVE    44                 TO  SPA-GMN-C02-CUR
+           .
+       41028-CLASS1-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    合併症区分入力処理
+      *****************************************************************
+       41029-CLASS2-CHK-SEC             SECTION.
+      *
+           MOVE    44                 TO  SPA-GMN-C02-CUR
+      *
+           IF      SPA-NAI-C02-BYOMEICD-MAX    >   1
+               MOVE    "0060"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-C02-CUR
+               GO  TO  41029-CLASS2-CHK-EXT
+           END-IF
+      *
+           MOVE    C02-CLASS2        TO  SPA-GMN-C02-CLASS2-G
+      *
+           MOVE    SPA-GMN-C02-CLASS2 TO  WRK-KBN
+           PERFORM 5001-CLASS2-HENSYU-SEC
+           MOVE    WRK-KBNMEI          TO  SPA-GMN-C02-CLASS2MEI
+      *
+           IF      SPA-GMN-C02-CLASS2 =   SPACE
+               CONTINUE
+           ELSE
+               IF      SPA-GMN-C02-CLASS2MEI   =   SPACE
+                   MOVE    "0042"               TO  SPA-ERRCD
+                   GO  TO  41029-CLASS2-CHK-EXT
+               END-IF
+           END-IF
+      *
+           MOVE    2                 TO  SPA-GMN-C02-CUR
+           .
+       41029-CLASS2-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    行選択処理
       *****************************************************************
        41020-BYOMEISEL-SEC       SECTION.
@@ -10198,6 +10410,24 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                IF      SPA-ERRCD           NOT =   SPACE         
                    GO  TO  450-TOUROKU-EXT
                END-IF
+               MOVE    SPA-GMN-C02-DISCHARGEFLG-G
+                                           TO  C02-DISCHARGEFLG
+               PERFORM 41027-DISCHARGEFLG-CHK-SEC
+               IF      SPA-ERRCD           NOT =   SPACE
+                   GO  TO  450-TOUROKU-EXT
+               END-IF
+               MOVE    SPA-GMN-C02-CLASS1-G
+                                           TO  C02-CLASS1
+               PERFORM 41028-CLASS1-CHK-SEC
+               IF      SPA-ERRCD           NOT =   SPACE
+                   GO  TO  450-TOUROKU-EXT
+               END-IF
+               MOVE    SPA-GMN-C02-CLASS2-G
+                                           TO  C02-CLASS2
+               PERFORM 41029-CLASS2-CHK-SEC
+               IF      SPA-ERRCD           NOT =   SPACE
+                   GO  TO  450-TOUROKU-EXT
+               END-IF
            END-IF    
       *
       *    病名が未入力のとき
@@ -10255,6 +10485,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            AND   ( SPA-GMN-C02-HOSOKU-COMMENT
                                            NOT =   SPACE )
                MOVE    "0094"              TO  SPA-ERRCD
+               INITIALIZE                  SPA-GMN-C02-HOSOKUCD-G
+                                           SPA-NAI-C02-HOSOKU-TBL
+               MOVE    SPACE               TO
+                                           SPA-GMN-C02-HOSOKU-COMMENT
+      *??
                MOVE    34                  TO  SPA-GMN-C02-CUR
                GO  TO  450-TOUROKU-EXT
            END-IF
@@ -10296,6 +10531,18 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    "0076"              TO  SPA-ERRCD
                MOVE    8                   TO  SPA-GMN-C02-CUR
                GO  TO  450-TOUROKU-EXT
+           END-IF
+      *
+      *    退院証明書記載フラグ重複チェック処理
+           IF    ( SPA-NAI-C02-BYOMEICD-MAX
+                                       =   1   )
+           AND   ( SPA-GMN-C02-DISCHARGEFLG
+                                       =   "1" )
+               PERFORM 4508-DISCHARGEFLG-DABURI-CHK-SEC
+               IF      SPA-ERRCD       NOT =   SPACE
+                   MOVE    42                  TO  SPA-GMN-C02-CUR
+                   GO  TO  450-TOUROKU-EXT
+               END-IF
            END-IF
       *
       *    新規又は科変更、開始日変更時の行番号追加が可能か
@@ -10949,6 +11196,20 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                                                (IDXX)
                MOVE    SPA-GMN-C02-REZEFLG
                                        TO  WRK-PTBYO-REZEFLG   (IDXX)
+               MOVE    SPA-GMN-C02-DISCHARGEFLG
+                                       TO  WRK-PTBYO-DISCHARGEFLG (IDXX)
+               IF      SPA-GMN-C02-CLASS1  =   SPACE
+                   MOVE    ZERO        TO  WRK-PTBYO-CLASS1 (IDXX)
+               ELSE                            
+                   MOVE    SPA-GMN-C02-CLASS1
+                                       TO  WRK-PTBYO-CLASS1 (IDXX)
+               END-IF
+               IF      SPA-GMN-C02-CLASS1  =   SPACE
+                   MOVE    ZERO        TO  WRK-PTBYO-CLASS1 (IDXX)
+               ELSE                            
+                   MOVE    SPA-GMN-C02-CLASS2
+                                       TO  WRK-PTBYO-CLASS2 (IDXX)
+               END-IF
       *********MOVE    SPA-GMN-C02-HKNNUM
       *********                        TO  WRK-PTBYO-HKNNUM (IDXX)
            ELSE
@@ -11665,6 +11926,75 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
+      *    退院証明書記載フラグ重複チェック処理
+      *****************************************************************
+       4508-DISCHARGEFLG-DABURI-CHK-SEC   SECTION.
+      *
+           INITIALIZE                      PTBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+           MOVE    SPA-NAI-C02-PTID    TO  PTBYO-PTID
+           MOVE    SPA-GMN-C02-BSRYKA  TO  PTBYO-SRYKA
+      *
+           MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTBYOMEI
+           END-IF
+      *
+           PERFORM         UNTIL   FLG-PTBYOMEI    =   1
+                           OR      SPA-ERRCD   NOT =   SPACE
+               IF      SPA-NAI-C02-SRYYMD-OLD  =   PTBYO-SRYYMD
+               AND     SPA-NAI-C02-SRYKA-OLD   =   PTBYO-SRYKA
+               AND     SPA-NAI-C02-RENNUM      =   PTBYO-RENNUM
+                   CONTINUE
+               ELSE
+                   EVALUATE    TRUE
+                       WHEN    SPA-NAI-C02-SRYYMD  =   PTBYO-SRYYMD
+                           MOVE    "0043"              TO  SPA-ERRCD
+                       WHEN    SPA-NAI-C02-SRYYMD  <   PTBYO-SRYYMD
+                           IF      SPA-NAI-C02-TENKIYMD    =   SPACE
+                               MOVE    "0043"          TO  SPA-ERRCD
+                           ELSE
+                               IF     SPA-NAI-C02-TENKIYMD
+                                                   >   PTBYO-SRYYMD
+                                   MOVE    "0043"          TO  SPA-ERRCD
+                               END-IF
+                           END-IF
+                       WHEN    SPA-NAI-C02-SRYYMD  >   PTBYO-SRYYMD
+                           IF      PTBYO-TENKIYMD  =   SPACE
+                               MOVE    "0043"      TO  SPA-ERRCD
+                           ELSE
+                               IF      SPA-NAI-C02-SRYYMD
+                                                   <   PTBYO-TENKIYMD
+                                   MOVE    "0043"      TO  SPA-ERRCD
+                               END-IF
+                           END-IF
+                   END-EVALUATE
+      *
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       MOVE    PTBYO-BYOMEI    TO  WRK-ERR-BYOMEI
+                   END-IF 
+               END-IF
+      *
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .                   
+       4508-DISCHARGEFLG-DABURI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    移動処理分登録処理
       *****************************************************************
        4509-UPDOWN-KOUSIN-SEC             SECTION.
@@ -11770,7 +12100,6 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            .
        4509-UPDOWN-KOUSIN-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    レセプト作成管理マスタ更新処理
@@ -12676,7 +13005,7 @@ grpsys                                          SPA-AREA
                                            TO  SPA-C01-TBYOMEISBT (IDY)
                    MOVE    IDX             TO  SPA-C01-TBYOMEICD-INDEX
                                                                   (IDY)
-               END-IF                              
+               END-IF
            END-PERFORM
       *
            MOVE    ZERO                TO  IDY
@@ -12693,6 +13022,11 @@ grpsys                                          SPA-AREA
                                                                   (IDY)
                END-IF
            END-PERFORM
+           IF      SPA-C01-THOSOKUCD (1)
+                                       =   SPACE
+               MOVE    SPA-GMN-C02-HOSOKU-COMMENT
+                                           TO  SPA-C01-HOSOKU-COMMENT
+           END-IF
       *
            EVALUATE    MCP-WIDGET
                WHEN    "HOSOKUCD_1"
@@ -13220,6 +13554,82 @@ grpsys                                          SPA-AREA
            EXIT.
       *
       *****************************************************************
+      *    退院証明書記載フラグ編集処理
+      *****************************************************************
+       5001-DISCHARGEFLG-HENSYU-SEC       SECTION.
+      *
+           MOVE    SPACE              TO  WRK-KBNMEI
+      *
+           IF      WRK-KBN            =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM   1   BY  1
+                       UNTIL   IDY >      SPA-GMN-C02-DISCHARGEFLG-MAX
+                   IF      WRK-KBN     =
+                                       SPA-GMN-C02-DISCHARGEFLGL (IDY)
+                       MOVE    SPA-GMN-C02-DISCHARGEFLGMEIL (IDY)
+                                          TO  WRK-KBNMEI
+                       MOVE    SPA-GMN-C02-DISCHARGEFLG-MAX
+                                          TO  IDY
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       5001-DISCHARGEFLG-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    原疾患区分編集処理
+      *****************************************************************
+       5001-CLASS1-HENSYU-SEC       SECTION.
+      *
+           MOVE    SPACE              TO  WRK-KBNMEI
+      *
+           IF      WRK-KBN (1:2)      =   SPACE    OR  ZERO
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM   1   BY  1
+                       UNTIL   IDY >      SPA-GMN-C02-CLASS1-MAX
+                   IF      WRK-KBN (1:2)  =  SPA-GMN-C02-CLASS1L (IDY)
+                       MOVE    SPA-GMN-C02-CLASS1MEIL (IDY)
+                                          TO  WRK-KBNMEI
+                       MOVE    SPA-GMN-C02-CLASS1-MAX
+                                          TO  IDY
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       5001-CLASS1-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    合併症区分編集処理
+      *****************************************************************
+       5001-CLASS2-HENSYU-SEC       SECTION.
+      *
+           MOVE    SPACE              TO  WRK-KBNMEI
+      *
+           IF      WRK-KBN (1:2)      =   SPACE    OR  ZERO
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM   1   BY  1
+                       UNTIL   IDY >      SPA-GMN-C02-CLASS2-MAX
+                   IF      WRK-KBN (1:2)  =   SPA-GMN-C02-CLASS2L (IDY)
+                       MOVE    SPA-GMN-C02-CLASS2MEIL (IDY)
+                                          TO  WRK-KBNMEI
+                       MOVE    SPA-GMN-C02-CLASS2-MAX
+                                          TO  IDY
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       5001-CLASS2-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    日付チェック・編集処理
       *****************************************************************
        5002-HIZUKE-CHK-SEC         SECTION.
@@ -13402,6 +13812,12 @@ grpsys                                          SPA-AREA
                                            TO  C02-TTENKIYMD (IDX)
                MOVE    SPA-GMN-C02-THKNBYOMEIFLG (IDX)
                                            TO  C02-THKNBYOMEIFLG (IDX)
+               MOVE    SPA-GMN-C02-TDISCHARGEFLG (IDX)
+                                           TO  C02-TDISCHARGEFLG (IDX)
+               MOVE    SPA-GMN-C02-TCLASS1 (IDX)
+                                           TO  C02-TCLASS1 (IDX)
+               MOVE    SPA-GMN-C02-TCLASS2 (IDX)
+                                           TO  C02-TCLASS2 (IDX)
                MOVE    SPA-GMN-C02-TCREYMD    (IDX)
                                            TO  C02-TCREYMD  (IDX)
                MOVE    SPA-GMN-C02-TCREHMS    (IDX)
@@ -13595,6 +14011,35 @@ grpsys                                          SPA-AREA
                MOVE    IDX                 TO  C02-REZEFLG-COUNT
            END-PERFORM
       *
+           MOVE    SPA-GMN-C02-DISCHARGEFLG-G TO  C02-DISCHARGEFLG
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL       IDX         >
+                                           SPA-GMN-C02-DISCHARGEFLG-MAX
+                   OR          SPA-GMN-C02-DISCHARGEFLGL(IDX) =   SPACE
+               MOVE    SPA-GMN-C02-DISCHARGEFLGLST (IDX)
+                                       TO  C02-DISCHARGEFLG-ITEM (IDX)
+               MOVE    IDX             TO  C02-DISCHARGEFLG-COUNT
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-C02-CLASS1-G TO  C02-CLASS1
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL       IDX         >
+                                           SPA-GMN-C02-CLASS1-MAX
+                   OR          SPA-GMN-C02-CLASS1L(IDX) =   SPACE
+               MOVE    SPA-GMN-C02-CLASS1LST (IDX)
+                                       TO  C02-CLASS1-ITEM (IDX)
+               MOVE    IDX             TO  C02-CLASS1-COUNT
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-C02-CLASS2-G TO  C02-CLASS2
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL       IDX         >
+                                           SPA-GMN-C02-CLASS2-MAX
+                   OR          SPA-GMN-C02-CLASS2L(IDX) =   SPACE
+               MOVE    SPA-GMN-C02-CLASS2LST (IDX)
+                                       TO  C02-CLASS2-ITEM (IDX)
+               MOVE    IDX             TO  C02-CLASS2-COUNT
+           END-PERFORM
       *    
       **** IF    ( SPA-C02-MOTOPG      =   "K02"   OR  "U02" 
       *                                             OR  "K02N")
@@ -13704,77 +14149,77 @@ grpsys                                          SPA-AREA
        5001-MAPCUR-SEC             SECTION.
       *
            EVALUATE    SPA-GMN-C02-CUR
-             WHEN    1
-                     MOVE  "BANGO"      TO  MCP-WIDGET
-             WHEN    9
-                     MOVE  "SRYYMD"     TO  MCP-WIDGET
-             WHEN    2
-                     MOVE  "BYOMEICD_1" TO  MCP-WIDGET
-             WHEN    3
-                     MOVE  "BYOMEICD_2" TO  MCP-WIDGET
-             WHEN    4
-                     MOVE  "BYOMEICD_3" TO  MCP-WIDGET
-             WHEN    5
-                     MOVE  "BYOMEICD_4" TO  MCP-WIDGET
-             WHEN    6
-                     MOVE  "BYOMEICD_5" TO  MCP-WIDGET
-             WHEN    7
-                     MOVE  "BYOMEICD_6" TO  MCP-WIDGET
-             WHEN    18
-                     MOVE  "UTAGAIFLG"  TO  MCP-WIDGET
-             WHEN    19
-                     MOVE  "SYUBYOFLG"  TO  MCP-WIDGET
-             WHEN    20
-                     MOVE  "MANSEIFLG"  TO  MCP-WIDGET
-             WHEN    21
-                     MOVE  "NYUGAIKBN"  TO  MCP-WIDGET
-             WHEN    22
-                     MOVE  "HKNCOMBI"   TO  MCP-WIDGET
-             WHEN    23
-                     MOVE  "REZEFLG"    TO  MCP-WIDGET
-             WHEN    24
-                     MOVE  "REZEMM"     TO  MCP-WIDGET
-             WHEN    17
-                     MOVE  "TENKIKBN"   TO  MCP-WIDGET
-             WHEN    13
-                     MOVE  "TENKIYMD"   TO  MCP-WIDGET
-             WHEN    8
-                     MOVE  "BYOMEI"   TO  MCP-WIDGET
-             WHEN    28
-                     MOVE  "CHARTBYOMEI"
-                                      TO  MCP-WIDGET
-             WHEN    25
-                     MOVE  "HKNBYOMEIFLG"
-                                      TO  MCP-WIDGET
-             WHEN   26
-                    MOVE  "PTNUM"    TO  MCP-WIDGET
-             WHEN   27
-                    MOVE  "SRYKA"    TO  MCP-WIDGET
-             WHEN   30
-                    MOVE  "PTNUM"    TO  MCP-WIDGET
-             WHEN   31
-                    MOVE  "BSRYKA"   TO  MCP-WIDGET
-             WHEN   32
-                    MOVE  "SYOKBN"   TO  MCP-WIDGET
-             WHEN   33
-                    MOVE  "HNYUGAIKBN"
-                                     TO  MCP-WIDGET
-             WHEN   34
-                    MOVE  "HOSOKUCD_1"
-                                     TO  MCP-WIDGET
-             WHEN   35
-                    MOVE  "HOSOKUCD_2"
-                                     TO  MCP-WIDGET
-             WHEN   36
-                    MOVE  "HOSOKUCD_3"
-                                     TO  MCP-WIDGET
-             WHEN   40
-                    MOVE  "HOSOKU_COMMENT"
-                                     TO  MCP-WIDGET
-             WHEN   41
-                    MOVE  "KOHID"    TO  MCP-WIDGET
-             WHEN    2
-                     MOVE  "BYOMEICD_1" TO  MCP-WIDGET
+               WHEN    1
+                   MOVE  "BANGO"       TO  MCP-WIDGET
+               WHEN    9
+                   MOVE  "SRYYMD"      TO  MCP-WIDGET
+               WHEN    2
+                   MOVE  "BYOMEICD_1"  TO  MCP-WIDGET
+               WHEN    3
+                   MOVE  "BYOMEICD_2"  TO  MCP-WIDGET
+               WHEN    4
+                   MOVE  "BYOMEICD_3"  TO  MCP-WIDGET
+               WHEN    5
+                   MOVE  "BYOMEICD_4"  TO  MCP-WIDGET
+               WHEN    6
+                   MOVE  "BYOMEICD_5"  TO  MCP-WIDGET
+               WHEN    7
+                   MOVE  "BYOMEICD_6"  TO  MCP-WIDGET
+               WHEN    18
+                   MOVE  "UTAGAIFLG"   TO  MCP-WIDGET
+               WHEN    19
+                   MOVE  "SYUBYOFLG"   TO  MCP-WIDGET
+               WHEN    20
+                   MOVE  "MANSEIFLG"   TO  MCP-WIDGET
+               WHEN    21
+                   MOVE  "NYUGAIKBN"   TO  MCP-WIDGET
+               WHEN    22
+                   MOVE  "HKNCOMBI"    TO  MCP-WIDGET
+               WHEN    23
+                   MOVE  "REZEFLG"     TO  MCP-WIDGET
+               WHEN    24
+                   MOVE  "REZEMM"      TO  MCP-WIDGET
+               WHEN    17
+                   MOVE  "TENKIKBN"    TO  MCP-WIDGET
+               WHEN    13
+                   MOVE  "TENKIYMD"    TO  MCP-WIDGET
+               WHEN    8
+                   MOVE  "BYOMEI"      TO  MCP-WIDGET
+               WHEN    28
+                   MOVE  "CHARTBYOMEI" TO  MCP-WIDGET
+               WHEN    25
+                   MOVE  "HKNBYOMEIFLG"
+                                       TO  MCP-WIDGET
+               WHEN    26
+                   MOVE  "PTNUM"       TO  MCP-WIDGET
+               WHEN    27
+                   MOVE  "SRYKA"       TO  MCP-WIDGET
+               WHEN    30
+                   MOVE  "PTNUM"       TO  MCP-WIDGET
+               WHEN    31
+                   MOVE  "BSRYKA"      TO  MCP-WIDGET
+               WHEN    32
+                   MOVE  "SYOKBN"      TO  MCP-WIDGET
+               WHEN    33
+                   MOVE  "HNYUGAIKBN"  TO  MCP-WIDGET
+               WHEN   34
+                   MOVE  "HOSOKUCD_1"  TO  MCP-WIDGET
+               WHEN   35
+                   MOVE  "HOSOKUCD_2"  TO  MCP-WIDGET
+               WHEN   36
+                   MOVE  "HOSOKUCD_3"  TO  MCP-WIDGET
+               WHEN   40
+                   MOVE  "HOSOKU_COMMENT"
+                                       TO  MCP-WIDGET
+               WHEN   41
+                    MOVE  "KOHID"      TO  MCP-WIDGET
+               WHEN   42
+                   MOVE  "DISCHARGEFLG"
+                                       TO  MCP-WIDGET
+               WHEN   43
+                   MOVE  "CLASS1"      TO  MCP-WIDGET
+               WHEN   44
+                   MOVE  "CLASS2"      TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -13782,110 +14227,120 @@ grpsys                                          SPA-AREA
            EXIT.
       *
       *****************************************************************
-      *    エラーメッセージ表示理
+      *    エラーメッセージ表示処理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
-           MOVE    SPACE               TO  SPA-ERRMSG
+      *
+           MOVE    SPACE                TO  CERR
+      *
+           EVALUATE    SPA-ERRCD
+      *********WHEN    "0043"
+               WHEN    "0075"
+               WHEN    "0104"
+                   MOVE    WRK-ERR-BYOMEI  TO  CERR-BYOMEI
+           END-EVALUATE
+      *
+           MOVE    SPA-ERRCD            TO  CERR-ERRCODE
       *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
-                   MOVE    "入力エラーです"            TO  SPA-ERRMSG
+                   MOVE    "入力エラーです"            TO  CERR-ERRMSG
                WHEN    "0002"
                    STRING
                        WRK-ERR-BYOMEI          DELIMITED   BY  SPACE
                        "は"                    DELIMITED   BY  SIZE 
                        WRK-ERR-SRYYMD          DELIMITED   BY  SPACE
                        "に登録してあります。"  DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0003"
-                   MOVE    "警告メッセージ"            TO  SPA-ERRMSG
+                   MOVE    "警告メッセージ"            TO  CERR-ERRMSG
                WHEN    "0004"
                    MOVE    "対象のデータを選択してありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0005"
                    MOVE    "対象のデータが選択してあります"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0006"
-                   MOVE    "病名コード順がエラーです"  TO  SPA-ERRMSG
+                   MOVE    "病名コード順がエラーです"  TO  CERR-ERRMSG
                WHEN    "0007"
-                   MOVE    "病名が長すぎます"          TO  SPA-ERRMSG
+                   MOVE    "病名が長すぎます"          TO  CERR-ERRMSG
                WHEN    "0008"
-                   MOVE    "項目に入力がありません"    TO  SPA-ERRMSG
+                   MOVE    "項目に入力がありません"    TO  CERR-ERRMSG
                WHEN    "0009"
                    MOVE    "該当の保険組合せがありません" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0010"
                    MOVE    "病名が未入力か入力の途中です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0011"
                MOVE "開始日が該当の保険組合せの適用日の範囲外です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0012"
-                   MOVE    "病名番号入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "病名番号入力エラー"        TO  CERR-ERRMSG
                WHEN    "0013"
-                   MOVE    "年号入力エラー"            TO  SPA-ERRMSG
+                   MOVE    "年号入力エラー"            TO  CERR-ERRMSG
                WHEN    "0014"
-                   MOVE    "数字で入力してください"    TO  SPA-ERRMSG
+                   MOVE    "数字で入力してください"    TO  CERR-ERRMSG
                WHEN    "0015"
-                   MOVE    "開始日付入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "開始日付入力エラー"        TO  CERR-ERRMSG
                WHEN    "0016"
-                   MOVE    "転帰日付入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "転帰日付入力エラー"        TO  CERR-ERRMSG
                WHEN    "0017"
-                   MOVE    "日付入力エラー"            TO  SPA-ERRMSG
+                   MOVE    "日付入力エラー"            TO  CERR-ERRMSG
                WHEN    "0018"
-                   MOVE    "疑い入力エラー"            TO  SPA-ERRMSG
+                   MOVE    "疑い入力エラー"            TO  CERR-ERRMSG
                WHEN    "0019"
-                   MOVE    "主病名入力エラー"          TO  SPA-ERRMSG
+                   MOVE    "主病名入力エラー"          TO  CERR-ERRMSG
                WHEN    "0020"
                    MOVE    "既に主病名が入力されています"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0021"
-                   MOVE    "慢性区分入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "慢性区分入力エラー"        TO  CERR-ERRMSG
                WHEN    "0022"
-                   MOVE    "入外区分入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "入外区分入力エラー"        TO  CERR-ERRMSG
                WHEN    "0023"
-                   MOVE    "レセプト表示入力エラー"    TO  SPA-ERRMSG
+                   MOVE    "レセプト表示入力エラー"    TO  CERR-ERRMSG
                WHEN    "0024"
-                   MOVE    "転帰区分入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "転帰区分入力エラー"        TO  CERR-ERRMSG
                WHEN    "0025"
                    MOVE    "転帰年月日が入力してあります"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0026"
                    MOVE    "転帰年月日が入力してありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0027"
                    MOVE    "開始日付以前の転帰日付が入力してあります"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0028"
-                   MOVE    "保険病名入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "保険病名入力エラー"        TO  CERR-ERRMSG
                WHEN    "0029"
                    MOVE    "基本病名が入力してありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0030"
                    MOVE    "診療科入力エラー"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0031"
                    MOVE    "該当の患者が存在しません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0033"
-                   MOVE    "カルテ病名が長すぎます"    TO  SPA-ERRMSG
+                   MOVE    "カルテ病名が長すぎます"    TO  CERR-ERRMSG
                WHEN    "0034"
                    STRING  "これ以上追加できません、"
                                                DELIMITED  BY  SIZE
                            "削除一覧を確認し削除処理を行なって下さい"
                                                DELIMITED  BY  SIZE
-                                               INTO  SPA-ERRMSG
+                                               INTO  CERR-ERRMSG
                    END-STRING
                WHEN    "0035"
                    MOVE    "不明の病名コードが入力されています"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0036"
                    MOVE    "転帰区分が入力してあります"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0037"
                    MOVE    "転帰区分が入力してありません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0038"
                    STRING
                        WRK-ERR-BYOMEI          DELIMITED   BY  SPACE
@@ -13893,132 +14348,149 @@ grpsys                                          SPA-AREA
                        WRK-ERR-SRYYMD          DELIMITED   BY  SPACE
                        "に登録してあります。転帰日等を確認して下さい"
                                                DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0039"
                    MOVE
                    "（警告）開始日が未来日で入力されています" 
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
+               WHEN    "0040"
+                   MOVE    "退院証明書記載フラグ入力エラー"
+                                               TO  CERR-ERRMSG
+               WHEN    "0041"
+                   MOVE    "原疾患区分入力エラー"
+                                               TO  CERR-ERRMSG
+               WHEN    "0042"
+                   MOVE    "合併症区分表示入力エラー"
+                                               TO  CERR-ERRMSG
+               WHEN    "0043"
+                   STRING
+                       "退院証明書記載フラグが設定されている他の病名と"
+                                               DELIMITED   BY  SIZE 
+                       "期間が重複しているので登録できません。"
+                                               DELIMITED   BY  SIZE 
+                                               INTO    CERR-ERRMSG
+                   END-STRING
                WHEN    "0050"
                    MOVE    "患者番号・診療科の入力がありません" 
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0051"
-                   MOVE    "入力がありません"  TO  SPA-ERRMSG
+                   MOVE    "入力がありません"  TO  CERR-ERRMSG
                WHEN    "0052"
                    MOVE    "自院病名マスタが変更されています"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0053"
-                   MOVE    "自院病名コードがありません" TO  SPA-ERRMSG
+                   MOVE    "自院病名コードがありません" TO  CERR-ERRMSG
                WHEN    "0054"
-                   MOVE    "病名コードがありません"    TO  SPA-ERRMSG
+                   MOVE    "病名コードがありません"    TO  CERR-ERRMSG
                WHEN    "0055"
                    STRING   WRK-ERR-BYOMEI     DELIMITED   BY  SPACE
                             "が複数入力されています"
                                                DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0056"
                    MOVE    "変更処理のときは複数病名の入力はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0057"
                    MOVE    "すべて病名が登録できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0058"
                    MOVE    "複数病名の入力中なので病名検索はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0059"
-                   MOVE    "接頭語しか入力できません"  TO  SPA-ERRMSG
+                   MOVE    "接頭語しか入力できません"  TO  CERR-ERRMSG
                WHEN    "0060"
                    MOVE
                  "複数の病名を入力中ですので、この項目の編集は無効です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0061"
                    MOVE    "自院病名の病名・カルテ病名は変更できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0062"
                    MOVE
                "未コード化傷病名は他のコードといっしょに入力できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0063"
                    MOVE
                  "未コード化傷病名が入力されているので入力できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0064"
                    MOVE    "自院病名が入力されているので入力できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0065"
                  MOVE    "自院病名の入力があるので病名検索はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0066"
                    MOVE    "複数の病名が入力してあります"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0067"
                    STRING   WRK-ERR-BYOMEI     DELIMITED   BY  SPACE
                             "は接頭語で病名が終わっています"
                                                DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0068"
                    MOVE    "既にこのコードは登録されています"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0069"
                  MOVE
                  "自院病名以外の入力があるので自院病名検索はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0070"
                    MOVE    "病名入力コードの長さが違います"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0071"
-                   MOVE    "全角入力して下さい"        TO  SPA-ERRMSG
+                   MOVE    "全角入力して下さい"        TO  CERR-ERRMSG
                WHEN    "0072"
                    MOVE    "全角または半角のみで入力して下さい" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0073"
                    MOVE
                    "病名の入力中です。クリアして下さい。"
-                                       TO  SPA-ERRMSG
+                                       TO  CERR-ERRMSG
                WHEN    "0074"
                    MOVE
                    "病名を移行すると全ての病名コードを表示できません。"
-                                       TO  SPA-ERRMSG
+                                       TO  CERR-ERRMSG
                WHEN    "0075"
                    MOVE    "入力された病名はマスター上で"
-                                       TO  SPA-ERRMSG
+                                       TO  CERR-ERRMSG
                    MOVE    WRK-HAISIYMDH
-                                       TO  SPA-ERRMSG (29:22)
+                                       TO  CERR-ERRMSG (29:22)
                    MOVE    "で廃止の扱いとなっています。"
-                                       TO  SPA-ERRMSG (51:)
+                                       TO  CERR-ERRMSG (51:)
                WHEN    "0076"
                    STRING   WRK-TANDOKUKBN-BYOMEI  DELIMITED  BY  SPACE
                            "は単独使用禁止の病名です"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG
+                                                   INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0077"
                    MOVE
               "病名コードが２２個以上になりますので、編集病名とします。"
-                                       TO  SPA-ERRMSG
+                                       TO  CERR-ERRMSG
                WHEN    "0078"
                  MOVE    "編集病名なので病名検索はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0079"
                  MOVE    "最後の部位が（）で始まらない病名です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0080"
-                 MOVE    "修正項目が未入力です"       TO  SPA-ERRMSG
+                 MOVE    "修正項目が未入力です"       TO  CERR-ERRMSG
                WHEN    "0081"
-                 MOVE    "病名番号の指定数が多すぎます"  TO  SPA-ERRMSG
+                 MOVE    "病名番号の指定数が多すぎます"  TO  CERR-ERRMSG
                WHEN    "0082"
-                 MOVE    "修正項目が多すぎます"        TO  SPA-ERRMSG
+                 MOVE    "修正項目が多すぎます"        TO  CERR-ERRMSG
                WHEN    "0083"
                  MOVE    "全体表示のときは、全部指定はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0084"
                  MOVE
                      "入力した転帰日以降の診療開始日の病名が指定"
-                                                   TO  SPA-ERRMSG
+                                                   TO  CERR-ERRMSG
                  MOVE
-                     "してあります"                TO  SPA-ERRMSG (43:)
+                     "してあります"                TO  CERR-ERRMSG (43:)
                WHEN    "0085"
                    STRING
                        WRK-ERR-BYOMEI          DELIMITED   BY  SPACE
@@ -14026,75 +14498,78 @@ grpsys                                          SPA-AREA
                        WRK-ERR-SRYYMD          DELIMITED   BY  SPACE
                        "ですので該当の保険適用は範囲外です"
                                                DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0086"
                    MOVE    "患者番号の入力がありません" 
-                                                   TO  SPA-ERRMSG
+                                                   TO  CERR-ERRMSG
                WHEN    "0087"
                    MOVE   "移動処理中の診療科、開始日の変更はできません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0088"
                    MOVE
                    "指定された診療科の開始日にはこれ以上追加できません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0089"
                    MOVE
                    "指定された診療科の開始日にはこれ以上追加できません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0090"
-                   MOVE    "簡単修正処理中です"    TO  SPA-ERRMSG   
+                   MOVE    "簡単修正処理中です"    TO  CERR-ERRMSG   
                WHEN    "0091"
                    STRING
                        "存在しない病名コードが登録されています、"
                                                 DELIMITED   BY  SIZE 
                        "ＣＤ表示で確認して下さい"
                                                 DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0092"
                    MOVE    "補足コメントの前後に（）があります"
-                                               TO  SPA-ERRMSG   
+                                               TO  CERR-ERRMSG   
                WHEN    "0093"
                    MOVE    "補足コメントが入力の途中です"
-                                               TO  SPA-ERRMSG   
+                                               TO  CERR-ERRMSG   
                WHEN    "0094"
-                   MOVE
+                   STRING
                      "複数病名の入力時は補足コメントの入力はできません"
-                                               TO  SPA-ERRMSG   
+                                                DELIMITED   BY  SIZE 
+                       "ので、クリアします"     DELIMITED   BY  SIZE 
+                                               INTO    CERR-ERRMSG
+                   END-STRING
                WHEN    "0095"
                    MOVE    "補足コメントが長すぎます"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0096"
                    MOVE    "誕生日前の開始日は入力できません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0097"
                    MOVE    "セットコードの病名を全て表示できません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0098"
                    MOVE
                        "変更処理のときはセットコードの入力はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0099"
                    MOVE
                        "補足コメントにセットコードは入力できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "0100"
                    MOVE    "該当の第三者行為がありません" 
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0101"
                    MOVE
                        "開始日が該当の第三者行為の適用日の範囲外です"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0102"
                    MOVE
                        "保険組合せと第三者行為の両方の入力はできません"
-                                               TO  SPA-ERRMSG
+                                               TO  CERR-ERRMSG
                WHEN    "0103"
                    STRING  "病名コードでの組み立てができませんでした。"
                                                DELIMITED  BY  SIZE
                            "編集病名とします"  DELIMITED  BY  SIZE
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "0104"
                    STRING
@@ -14102,42 +14577,34 @@ grpsys                                          SPA-AREA
                                                 DELIMITED   BY  SIZE 
                        "レセプトに記載されます。確認して下さい。"
                                                 DELIMITED   BY  SIZE 
-                                               INTO    SPA-ERRMSG
+                                               INTO    CERR-ERRMSG
                    END-STRING
                WHEN    "1001"
                    MOVE    "更新処理でエラーになりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "1002"
                    MOVE    "削除処理でエラーになりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "1003"
                    MOVE    "患者病名マスタが存在しません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "1004"
                    MOVE    "患者マスタの更新処理でエラーになりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "1005"
                    MOVE    "自院病名の更新処理でエラーになりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
                WHEN    "1006"
                    MOVE
                   "レセプト作成管理マスタの更新処理でエラーになりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  CERR-ERRMSG
       *
                WHEN    "9999"
                    MOVE    "他端末で使用中です。"
-                                               TO  SPA-ERRMSG
-                   MOVE    SLOCK-MSG           TO  SPA-ERRMSG(21:)
+                                               TO  CERR-ERRMSG
+                   MOVE    SLOCK-MSG           TO  CERR-ERRMSG(21:)
            END-EVALUATE
       *
-           MOVE    SPACE                TO  CERR
-           EVALUATE    SPA-ERRCD
-               WHEN    "0075"
-               WHEN    "0104"
-                   MOVE    WRK-ERR-BYOMEI  TO  CERR-BYOMEI
-           END-EVALUATE
-           MOVE    SPA-ERRCD            TO  CERR-ERRCODE
-           MOVE    SPA-ERRMSG           TO  CERR-ERRMSG
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "C02"                TO  SPA-MOTOPG
@@ -14148,7 +14615,7 @@ grpsys                                          SPA-AREA
       *
            PERFORM 900-PUT-WINDOW
       *
-           MOVE    1                    TO  FLG-END              
+           MOVE    1                    TO  FLG-END
       *
            MOVE    SPACE                TO  WRK-HAISIYMDH
                                             WRK-ERR-BYOMEI
@@ -14157,7 +14624,6 @@ grpsys                                          SPA-AREA
        510-ERRMSG-EXT.
            EXIT.
       *
-      *----(01.00.02) LINE ADD START ----------------------------------
       *****************************************************************
       *    確認画面表示処理
       *****************************************************************

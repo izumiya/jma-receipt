@@ -32,6 +32,7 @@ tbl_userbyomei {
 	BYOMEIMOJI 			number(2);
 	CHARTBYOMEI			varchar(160);
 	CHARTBYOMEIMOJI		number(2);
+	HOSOKU_COMMENT			varchar(80);
 	BYOMEIHENFLG		char(1);
 	HKNBYOMEIFLG		char(1);
 	BYOMEISBT   		char(1);

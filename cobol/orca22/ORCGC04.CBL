@@ -75,8 +75,11 @@
       *  04.07.02    NACL-藤原    13/03/26  システム管理がチェックしない
       *                                     設定時の推奨病名チェックの修正
       *  04.07.03    NACL-藤原    13/07/30  自院病名のセット登録対応
-      *  04.07.03    NACL-藤原    13/07/30  セット登録選択時のコード置換え
+      *  04.07.04    NACL-藤原    14/05/20  セット登録選択時のコード置換え
       *                                     画面表示後の初期化
+      *
+      *  04.08.01    NACL-藤原    16/02/10  自院病名への補足コメント追加
+      *                                     対応
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -398,8 +401,8 @@
                    END-IF
                END-IF
       *
-               IF    ( SPA-C01-ERRCD       =   "0075" )
-               AND   ( SPA-C01-INDEX       >   ZERO   )
+               IF    ( SPA-C01-ERRCD       =   "0075"  OR  "0094" )
+               AND   ( SPA-C01-INDEX       >   ZERO               )
                    MOVE    SPACE           TO  SPA-C01-ERRCD
                    PERFORM 450-KAKUTEI-SEC
                    IF      SPA-ERRCD           =   SPACE
@@ -647,17 +650,22 @@
            PERFORM 3100-BYOMEI-HENSYU-SEC
       *   
       *    補足コメント編集
-           PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL   IDX     >       3
-               IF      SPA-C01-THOSOKUCD(IDX)  NOT =   SPACE
-                   MOVE    SPA-C01-THOSOKUCD(IDX)
+           IF      SPA-C01-HOSOKU-COMMENT  =   SPACE
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       3
+                   IF      SPA-C01-THOSOKUCD(IDX)  NOT =   SPACE
+                       MOVE    SPA-C01-THOSOKUCD(IDX)
                                        TO  SPA-GMN-C04-HOSOKUCD (IDX)
-                   MOVE    SPA-C01-THOSOKU-COMMENT(IDX)
+                       MOVE    SPA-C01-THOSOKU-COMMENT(IDX)
                                        TO  SPA-NAI-C04-HOSOKU-COMMENT
                                                                 (IDX)
-               END-IF
-           END-PERFORM
-           PERFORM 3103-HOSOKU-COMMENT-HENSYU-SEC
+                   END-IF
+               END-PERFORM
+               PERFORM 3103-HOSOKU-COMMENT-HENSYU-SEC
+           ELSE
+               MOVE    SPA-C01-HOSOKU-COMMENT
+                                       TO  SPA-GMN-C04-HOSOKU-COMMENT
+           END-IF
       *
            IF      SPA-C01-INDEX   =   ZERO
       *        分類一覧
@@ -1544,6 +1552,13 @@
                MOVE    "■■■"        TO  SPA-NAI-C04-BYOMEI (IDZ)
            ELSE
                MOVE    USBYO-BYOMEI    TO  SPA-NAI-C04-BYOMEI (IDZ)
+               IF      USBYO-HOSOKU-COMMENT
+                                       =   SPACE
+                   CONTINUE
+               ELSE
+                   MOVE    USBYO-HOSOKU-COMMENT
+                                         TO  SPA-GMN-C04-HOSOKU-COMMENT
+               END-IF
                MOVE    USBYO-BYOMEISBT TO  SPA-NAI-C04-BYOMEISBT (IDZ)
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       21
@@ -1761,7 +1776,7 @@
                        PERFORM 410023-BYOMEI-HENSYU-SEC
                    END-IF
       *
-                   IF      SPA-ERRCD           =   "0075"
+                   IF      SPA-ERRCD           =   "0075"  OR  "0094"
                        GO  TO  41002111-BYOMEIINPUTSET-HENSYU-EXT
                    END-IF
                END-IF
@@ -1803,7 +1818,20 @@
                        MOVE    "0003"              TO  SPA-ERRCD
                    END-IF
       *
-                   IF      SPA-ERRCD           =   SPACE
+      *            複数病名のとき補足コメントの入力不可
+                   IF      SPA-ERRCD               =   SPACE  
+                       IF    ( SPA-NAI-C04-BYOMEISU-MAX    >   1     )
+                       AND   ( SPA-GMN-C04-HOSOKU-COMMENT
+                                                       NOT =   SPACE )
+                           MOVE    "0094"              TO  SPA-ERRCD
+                           INITIALIZE          SPA-GMN-C04-HOSOKUCD-G
+                                               SPA-NAI-C04-HOSOKU-TBL
+                           MOVE    SPACE               TO
+                                           SPA-GMN-C04-HOSOKU-COMMENT
+                       END-IF
+                   END-IF
+      *
+                   IF      SPA-ERRCD           =   SPACE   OR  "0094"
                        IF    ( WRK-HAISIYMDH       =   SPACE )
                        OR    ( SPA-C02-1042-MSG3-DSPKBN
                                                    =   "1"   )
@@ -1875,7 +1903,20 @@
                END-IF
            END-IF        
       *
-           IF      SPA-ERRCD           =   SPACE
+      *    複数病名のとき補足コメントの入力不可
+           IF      SPA-ERRCD               =   SPACE  
+               IF    ( SPA-NAI-C04-BYOMEISU-MAX    >   1     )
+               AND   ( SPA-GMN-C04-HOSOKU-COMMENT
+                                               NOT =   SPACE )
+                   MOVE    "0094"              TO  SPA-ERRCD
+                   INITIALIZE          SPA-GMN-C04-HOSOKUCD-G
+                                       SPA-NAI-C04-HOSOKU-TBL
+                   MOVE    SPACE               TO
+                                       SPA-GMN-C04-HOSOKU-COMMENT
+               END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE   OR  "0094"
                IF    ( WRK-HAISIYMDH       =   SPACE )
                OR    ( SPA-C02-1042-MSG3-DSPKBN
                                            =   "1"   )
@@ -2440,7 +2481,8 @@
                GO  TO  41003-INPUTCD-CHK-EXT
            END-IF     
       *
-           IF      SPA-ERRCD           =   SPACE   OR  "0075"
+           IF      SPA-ERRCD           =   SPACE   OR  "0075"  OR
+                                           "0094"
                ADD     1                   TO  SPA-GMN-C04-CUR
                IF      SPA-GMN-C04-CUR     >   8
                    MOVE    2                   TO  SPA-GMN-C04-CUR
@@ -2944,6 +2986,13 @@
       *
            EVALUATE    SPA-NAI-C04-B10-WIDGET
                WHEN    "BYOMEICD"
+      *            複数病名入力時の補足コメント入力はエラー
+                   IF      SPA-NAI-C04-BYOMEISU-MAX
+                                           >   1
+                       MOVE    "0099"          TO  SPA-ERRCD
+                       GO  TO  490-KENSAKU-CHANGE-EXT
+                   END-IF
+      *
                    MOVE    "HOSOKUCD"      TO  SPA-NAI-C04-B10-WIDGET
                    EVALUATE    SPA-GMN-C04-CUR
                        WHEN    3   THRU    8
@@ -3042,19 +3091,24 @@
       *    補足コメント入力可のときのチェック
            IF      SPA-C01-B10-FLG =   ZERO    OR  2
       *        コードチェック
-               PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       3
-                   IF    ( SPA-GMN-C04-HOSOKUCD (IDX)
-                                               NOT =   SPACE )
-                   AND   ( SPA-NAI-C04-HOSOKU-COMMENT(IDX) (1:2)
-                                                   =   "■"  )
-                       COMPUTE SPA-GMN-C04-CUR     =   IDX     +   9
-                       MOVE    "0093"              TO  SPA-ERRCD
-                       GO  TO  450-KAKUTEI-EXT
-                   END-IF
-               END-PERFORM 
-      *        文字数チェック
-               PERFORM 3103-HOSOKU-COMMENT-HENSYU-SEC 
+               IF      SPA-GMN-C04-HOSOKUCD-G  =   SPACE
+                   MOVE    SPA-GMN-C04-HOSOKU-COMMENT
+                                       TO  WRK-BYOMEI 
+               ELSE
+                   PERFORM VARYING IDX FROM    1   BY  1
+                           UNTIL   IDX >       3
+                       IF    ( SPA-GMN-C04-HOSOKUCD (IDX)
+                                                   NOT =   SPACE )
+                       AND   ( SPA-NAI-C04-HOSOKU-COMMENT(IDX) (1:2)
+                                                       =   "■"  )
+                           COMPUTE SPA-GMN-C04-CUR     =   IDX     +   9
+                           MOVE    "0093"              TO  SPA-ERRCD
+                           GO  TO  450-KAKUTEI-EXT
+                       END-IF
+                   END-PERFORM 
+      *            文字数チェック
+                   PERFORM 3103-HOSOKU-COMMENT-HENSYU-SEC
+               END-IF 
                INITIALIZE                      ORCSKANACHKAREA
                MOVE    "1"                 TO  KANACHK-SYORI 
                MOVE    WRK-BYOMEI          TO  KANACHK-MAE-INPUT
@@ -3109,6 +3163,11 @@
                                                                  (IDY)
                    END-IF 
                END-PERFORM
+               IF      SPA-C01-THOSOKUCD (1)
+                                           =   SPACE
+                   MOVE    SPA-GMN-C04-HOSOKU-COMMENT
+                                           TO  SPA-C01-HOSOKU-COMMENT
+               END-IF
            ELSE    
                EVALUATE    SPA-C01-WIDGET (1:8)
                    WHEN    "HOSOKUCD"
@@ -3476,6 +3535,13 @@
                    MOVE    "補足コメントが入力の途中です"
                                                TO  SPA-ERRMSG   
                WHEN    "0094"
+                   STRING
+                     "複数病名の入力時は補足コメントの入力はできません"
+                                                DELIMITED   BY  SIZE 
+                       "ので、クリアします"     DELIMITED   BY  SIZE 
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0099"
                    MOVE
                      "複数病名の入力時は補足コメントの入力はできません"
                                                TO  SPA-ERRMSG   
@@ -3546,6 +3612,7 @@
            END-EVALUATE
       *
            MOVE    SPACE               TO  CID2
+           INITIALIZE                      CID2
            MOVE    WRK-CIDMSG          TO  CID2-MSG
            MOVE    SPA-C04-IKOMOTO-BYOMEICD
                                        TO  CID2-BYOMEICD1

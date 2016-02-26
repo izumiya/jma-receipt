@@ -119,6 +119,10 @@
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
       *  04.08.02    NACL-藤原    16/01/20  転帰区分の死亡変更時の患者
       *                                     情報更新対応
+      *  04.08.03    NACL-藤原    16/02/10  自院病名への補足コメント追加
+      *                                     対応
+      *  04.08.04    NACL-藤原    16/02/17  退院証明書の傷病名欄記載対応
+      *                                     合併症に係わる情報追加対応
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -227,8 +231,7 @@
                            11  SPA-GMN-C02-REZEFLG-G.
                                13  SPA-GMN-C02-REZEFLG     PIC X(01).
                                13  SPA-GMN-F1              PIC X(01).
-                               13  SPA-GMN-C02-REZEFLGMEI
-                                                           PIC X(10).
+                               13  SPA-GMN-C02-REZEFLGMEI  PIC X(10).
                            11  SPA-GMN-C02-REZEMM          PIC 9(02).
                            11  SPA-GMN-C02-TENKIKBN-G.
                                13  SPA-GMN-C02-TENKIKBN    PIC X(01).
@@ -245,6 +248,22 @@
                                13  SPA-GMN-F1              PIC X(01).
                                13  SPA-GMN-C02-HKNBYOMEIFLGMEI
                                                            PIC X(08).
+                           11  SPA-GMN-C02-DISCHARGEFLG-G.
+                               13  SPA-GMN-C02-DISCHARGEFLG
+                                                           PIC X(01).
+                               13  SPA-GMN-F1              PIC X(01).
+                               13  SPA-GMN-C02-DISCHARGEFLGMEI
+                                                           PIC X(08).
+                           11  SPA-GMN-C02-CLASS1-G.
+                               13  SPA-GMN-C02-CLASS1      PIC X(02).
+                               13  SPA-GMN-F1              PIC X(01).
+                               13  SPA-GMN-C02-CLASS1MEI   PIC X(08).
+                           11  SPA-GMN-C02-CLASS2-G.
+                               13  SPA-GMN-C02-CLASS2      PIC X(02).
+                               13  SPA-GMN-F1              PIC X(01).
+                               13  SPA-GMN-C02-CLASS2MEI   PIC X(10).
+
+
                            11  SPA-GMN-C02-BSRYKA-G.
                                13  SPA-GMN-C02-BSRYKA      PIC X(02).
                                13  SPA-GMN-C02-F1          PIC X(01).
@@ -273,6 +292,10 @@
                                13  SPA-GMN-C02-TTENKIYMD   PIC X(09).
                                13  SPA-GMN-C02-THKNBYOMEIFLG
                                                            PIC X(08).
+                               13  SPA-GMN-C02-TDISCHARGEFLG
+                                                           PIC X(04).
+                               13  SPA-GMN-C02-TCLASS1     PIC X(08).
+                               13  SPA-GMN-C02-TCLASS2     PIC X(10).
                                13  SPA-GMN-C02-TCREYMD     PIC X(09).
                                13  SPA-GMN-C02-TCREHMS     PIC X(08).
                                13  SPA-GMN-C02-TUPYMD      PIC X(09).
@@ -310,7 +333,7 @@
                            11  SPA-GMN-C02-NYUGAIKBNMEIL   PIC X(06).    
                        09  SPA-GMN-C02-NYUGAIKBN-MAX       PIC 9(02).
       *
-                       09  SPA-GMN-C02-HKNCOMBILST-G.                         
+                       09  SPA-GMN-C02-HKNCOMBILST-G.
                            11  SPA-GMN-C02-HKNCOMBILST     OCCURS  100.
                                13  SPA-GMN-C02-HKNCOMBIL   PIC X(04).
                                13  SPA-GMN-F1L             PIC X(01).
@@ -325,7 +348,7 @@
                        09  SPA-GMN-C02-REZEFLGLST          OCCURS  2.
                            11  SPA-GMN-C02-REZEFLGL        PIC X(01).
                            11  SPA-GMN-F1L                 PIC X(01).
-                           11  SPA-GMN-C02-REZEFLGMEIL     PIC X(10).    
+                           11  SPA-GMN-C02-REZEFLGMEIL     PIC X(10).
                        09  SPA-GMN-C02-REZEFLG-MAX         PIC 9(02).
       *                         
                        09  SPA-GMN-C02-TENKIKBNLST         OCCURS  5.
@@ -340,7 +363,25 @@
                            11  SPA-GMN-C02-HKNBYOMEIFLGMEIL
                                                            PIC X(08).    
                        09  SPA-GMN-C02-HKNBYOMEIFLG-MAX    PIC 9(02).
-      *                         
+      *
+                       09  SPA-GMN-C02-DISCHARGEFLGLST     OCCURS  2.
+                           11  SPA-GMN-C02-DISCHARGEFLGL   PIC X(01).
+                           11  SPA-GMN-F1L                 PIC X(01).
+                           11  SPA-GMN-C02-DISCHARGEFLGMEIL
+                                                           PIC X(08).
+                       09  SPA-GMN-C02-DISCHARGEFLG-MAX    PIC 9(02).
+      *
+                       09  SPA-GMN-C02-CLASS1LST           OCCURS  10.
+                           11  SPA-GMN-C02-CLASS1L         PIC X(02).
+                           11  SPA-GMN-F1L                 PIC X(01).
+                           11  SPA-GMN-C02-CLASS1MEIL      PIC X(08).
+                       09  SPA-GMN-C02-CLASS1-MAX          PIC 9(02).
+      *
+                       09  SPA-GMN-C02-CLASS2LST           OCCURS  10.
+                           11  SPA-GMN-C02-CLASS2L         PIC X(02).
+                           11  SPA-GMN-F1L                 PIC X(01).
+                           11  SPA-GMN-C02-CLASS2MEIL      PIC X(10).
+                       09  SPA-GMN-C02-CLASS2-MAX          PIC 9(02).
       *
                    07  SPA-NAIB-C02-AREA.
                        09  SPA-NAI-C02-SYSYMD              PIC X(08).
@@ -577,7 +618,7 @@
                                13  SPA-GMN-C03-TBYOMEIINPUTCD 
                                                            PIC X(10).
                                13  SPA-GMN-C03-TBYOMEISBT  PIC X(06).
-                               13  SPA-GMN-C03-TBYOMEI     PIC X(80).
+                               13  SPA-GMN-C03-TBYOMEI     PIC X(130).
                                13  SPA-GMN-C03-TCHARTBYOMEI
                                                        PIC X(80).
                                13  SPA-GMN-C03-TUTAGAIFLG  PIC X(14).
@@ -609,6 +650,7 @@
                                13  SPA-GMN-C03-MANSEIKBNMEI
                                                        PIC X(42).
                            11  SPA-GMN-C03-BYOMEI          PIC X(80).
+                           11  SPA-GMN-C03-HOSOKU-COMMENT  PIC X(40).
                            11  SPA-GMN-C03-CHARTBYOMEI     PIC X(80).
                            11  SPA-GMN-C03-BYOMEIHENFLG    PIC X(09).
                            11  SPA-GMN-C03-DSPSEQ          PIC 9(02).
@@ -800,11 +842,12 @@
                                                    PIC X(80)
                                                        OCCURS  21.
                        09  SPA-NAI-C04-BYOMEI-CHG  PIC X(03).
-                   07  SPA-NAI-C04-HOSOKU-G    OCCURS  3.
-                       09  SPA-NAI-C04-HOSOKU-COMMENT
+                   07  SPA-NAI-C04-HOSOKU-TBL.
+                       09  SPA-NAI-C04-HOSOKU-G    OCCURS  3.
+                           11  SPA-NAI-C04-HOSOKU-COMMENT
                                                    PIC X(80).
-                   07  SPA-NAI-C04-BYOMEICD-MAX    PIC 9(02).                                
-                   07  SPA-NAI-C04-BYOMEISU-MAX    PIC 9(02).                                
+                   07  SPA-NAI-C04-BYOMEICD-MAX    PIC 9(02).
+                   07  SPA-NAI-C04-BYOMEISU-MAX    PIC 9(02).
       *
                    07  SPA-NAI-C04-BYOMEI-TBL.
                        09  SPA-NAI-C04-TBLO        OCCURS   100.
@@ -956,6 +999,8 @@
                                13  SPA-NAI-C06-BYOMEI-O
                                                    PIC X(80)
                                                            OCCURS  21.
+                               13  SPA-NAI-C06-HOSOKU-COMMENT-O
+                                                   PIC X(40).
                        09  SPA-NAI-C06-BYOMEIINPUTSET-OLD
                                                    PIC X(10).
       *              

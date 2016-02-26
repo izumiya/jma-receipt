@@ -24,6 +24,9 @@ C03 {
     BYOMEI {
       textdata varchar(80);
     };
+    HOSOKU_COMMENT {
+      textdata varchar(40);
+    };
     CHARTBYOMEI {
       textdata varchar(80);
     };
@@ -61,7 +64,7 @@ C03 {
             column2 varchar(16);
             column3 varchar(10);
             column4 varchar(6);
-            column5 varchar(80);
+            column5 varchar(130);
             column6 varchar(80);
             column7 varchar(14);
             column8 varchar(42);

@@ -59,6 +59,9 @@ tbl_ptbyomei {
 	KHNBUICD_2  		varchar(7);
 	KHNBUICD_3  		varchar(7);
 	SEQNUM 			number(4);
+	DISCHARGEFLG		char(1);
+	CLASS1			number(2);
+	CLASS2			number(2);
 	DLTFLG  			char(1);
 	DLT_OPID    		varchar(16);
 	TERMID  			varchar(16);
@@ -898,6 +901,20 @@ path	key48	{
 			AND     PTID      =   :PTID
 			AND     TENKIKBN  =   '2'
 			AND   DLTFLG      =   ' '
+		;
+	};
+};
+
+path	key49	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key49_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     DISCHARGEFLG  =   '1'
+			AND   DLTFLG      =   ' '
+			ORDER  BY  SYUBYOFLG DESC,SRYYMD
 		;
 	};
 };

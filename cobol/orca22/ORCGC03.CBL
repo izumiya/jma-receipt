@@ -135,6 +135,8 @@
       *  04.08.01    NACL-藤原    13/02/05  編集病名の強調表示
       *  04.08.02    NACL-藤原    15/12/02  病名入力時の廃止年月日変換の
       *                                     条件追加
+      *  04.08.03    NACL-藤原    16/02/10  自院病名への補足コメント追加
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -368,6 +370,9 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *
+      *    病名組立サブ
+           COPY    "CPORCSMKBYOMEI.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -1264,8 +1269,14 @@
                                        SPA-GMN-C03-TBYOMEIINPUTCD  (IDX)
       *    表示連番
                MOVE    USBYO-DSPSEQ    TO  SPA-GMN-C03-TDSPSEQ     (IDX)
-      *    病名
-               MOVE    USBYO-BYOMEI    TO  SPA-GMN-C03-TBYOMEI     (IDX)
+      *    病名＋補足コメント
+               INITIALIZE              ORCSMKBYOMEIAREA
+               MOVE    USBYO-BYOMEI
+                                       TO  SMKBYO-BYOMEI
+               MOVE    USBYO-HOSOKU-COMMENT
+                                       TO  SMKBYO-HOSOKU-COMMENT
+               CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+               MOVE    SMKBYO-BYOMEI   TO  SPA-GMN-C03-TBYOMEI     (IDX)
       *    カルテ病名
                MOVE    USBYO-CHARTBYOMEI
                                        TO  SPA-GMN-C03-TCHARTBYOMEI(IDX)
@@ -1332,7 +1343,6 @@
       *
                MOVE    USBYO-BYOMEIHENFLG  TO  SPA-NAI-C03-TBYOMEIHENFLG
                                                                   (IDX)
-                
            END-IF
       *
            .
@@ -1403,7 +1413,7 @@
                                        TO  SPA-NAI-C03-BYOMEIHENFLG
            IF      SPA-NAI-C03-BYOMEIHENFLG  =   "1" 
                MOVE    "病名編集"      TO  SPA-GMN-C03-BYOMEIHENFLG
-           END-IF    
+           END-IF
       *
            MOVE    ZERO                TO  IDZ 
            PERFORM VARYING IDY FROM    1   BY  1
@@ -1459,7 +1469,10 @@
       *                                 
            MOVE    SPA-NAI-C02-BYOMEIMOJI
                                        TO  SPA-NAI-C03-BYOMEIMOJI
-      *      
+      *                                 
+           MOVE    SPA-GMN-C02-HOSOKU-COMMENT
+                                       TO  SPA-GMN-C03-HOSOKU-COMMENT
+      *
            MOVE    SPA-GMN-C02-CHARTBYOMEI
                                        TO  SPA-GMN-C03-CHARTBYOMEI
       *                                 
@@ -1980,6 +1993,9 @@
            MOVE    USBYO-BYOMEI        TO  SPA-GMN-C03-BYOMEI
       *                                 
            MOVE    USBYO-BYOMEIMOJI    TO  SPA-NAI-C03-BYOMEIMOJI
+      *
+           MOVE    USBYO-HOSOKU-COMMENT
+                                       TO  SPA-GMN-C03-HOSOKU-COMMENT
       *      
            MOVE    USBYO-CHARTBYOMEI   TO  SPA-GMN-C03-CHARTBYOMEI
       *                                 
@@ -2680,6 +2696,7 @@
            MOVE    C03-BYOMEISBT       TO  SPA-GMN-C03-BYOMEISBT-G
            MOVE    C03-BUNRUICD        TO  SPA-GMN-C03-BUNRUICD
            MOVE    C03-BUNRUIMEI       TO  SPA-GMN-C03-BUNRUIMEI
+           MOVE    C03-HOSOKU-COMMENT  TO  SPA-GMN-C03-HOSOKU-COMMENT
            MOVE    C03-CHARTBYOMEI     TO  SPA-GMN-C03-CHARTBYOMEI
            MOVE    C03-UTAGAIFLG       TO  SPA-GMN-C03-UTAGAIFLG-G
            MOVE    C03-MANSEIFLG       TO  SPA-GMN-C03-MANSEIKBN-G
@@ -2703,6 +2720,10 @@
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
            PERFORM 41004-BUNRUIMEI-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+           PERFORM 41005-HOSOKU-COMMENT-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -3677,33 +3698,50 @@
            EXIT.
       *
       *****************************************************************
-      *    表示連番チェック処理
+      *    補足コメント入力処理
       *****************************************************************
-       41010-DSPSEQ-CHK-SEC          SECTION.
+       41005-HOSOKU-COMMENT-CHK-SEC             SECTION.
       *
-           IF      SPA-GMN-C03-DSPSEQ     =   ZERO
-               MOVE    50                 TO  SPA-GMN-C03-DSPSEQ
-           END-IF              
+           IF      SPA-GMN-C03-HOSOKU-COMMENT
+                                       =   SPACE
+               CONTINUE
+           ELSE
+      *        全角チェック
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI 
+               MOVE    SPA-GMN-C03-HOSOKU-COMMENT
+                                           TO  KANACHK-MAE-INPUT
+               MOVE    40                  TO  KANACHK-MAX-CNT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC          =   ZERO )
+               AND   ( KANACHK-SYUBETU     =   "2"  )
+                   MOVE    KANACHK-OUT-INPUT   TO
+                                           SPA-GMN-C03-HOSOKU-COMMENT
+               ELSE
+                   MOVE    "0071"              TO  SPA-ERRCD
+               END-IF
+      *
+      *        前後の（）チェック
+               IF      SPA-ERRCD           =   SPACE
+                   COMPUTE IDX3    =   KANACHK-MAX     -   1
+                   IF    ( SPA-GMN-C03-HOSOKU-COMMENT (1:2)
+                                               =   "（" )
+                   OR    ( SPA-GMN-C03-HOSOKU-COMMENT (IDX3:2)
+                                               =   "）" )
+                       MOVE    "0092"              TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    12                  TO  SPA-GMN-C03-CUR
+           END-IF
            .
-       41010-DSPSEQ-CHK-EXT.
+       41005-HOSOKU-COMMENT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
-      *    疑い　入力処理
-      *****************************************************************
-       41007-UTAGAI-CHK-SEC                SECTION.
-      *
-           PERFORM 5001-UTAGAIFLG-HENSYU-SEC
-           IF      WRK-HENFLG          =   ZERO
-               MOVE    "0018"              TO  SPA-ERRCD
-               MOVE    13                  TO  SPA-GMN-C03-CUR
-           END-IF    
-           .
-       41007-UTAGAI-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    慢性　入力処理
+      *    慢性入力処理
       *****************************************************************
        41006-MANSEI-CHK-SEC                SECTION.
       *
@@ -3719,6 +3757,32 @@
            PERFORM 5001-HYOUJI-HENSYU-SEC
            .
        41006-MANSEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    疑い入力処理
+      *****************************************************************
+       41007-UTAGAI-CHK-SEC                SECTION.
+      *
+           PERFORM 5001-UTAGAIFLG-HENSYU-SEC
+           IF      WRK-HENFLG          =   ZERO
+               MOVE    "0018"              TO  SPA-ERRCD
+               MOVE    13                  TO  SPA-GMN-C03-CUR
+           END-IF    
+           .
+       41007-UTAGAI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    表示連番チェック処理
+      *****************************************************************
+       41010-DSPSEQ-CHK-SEC          SECTION.
+      *
+           IF      SPA-GMN-C03-DSPSEQ     =   ZERO
+               MOVE    50                 TO  SPA-GMN-C03-DSPSEQ
+           END-IF              
+           .
+       41010-DSPSEQ-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4052,7 +4116,7 @@ grpsys                                         SPA-AREA
                                                SPA-GMN-C03-CHARTBYOMEI
                ELSE
                    MOVE    "0071"              TO  SPA-ERRCD
-                   MOVE    12                  TO  SPA-GMN-C03-CUR
+                   MOVE    20                  TO  SPA-GMN-C03-CUR
                    GO  TO 41022-CHARTBYOMEI-CHK-EXT
                END-IF
            END-IF    
@@ -4500,6 +4564,8 @@ grpsys                                         SPA-AREA
                MOVE    SPA-GMN-C03-MANSEIKBN   TO  USBYO-MANSEIKBN
                MOVE    SPA-GMN-C03-BYOMEI      TO  USBYO-BYOMEI
                MOVE    SPA-NAI-C03-BYOMEIMOJI  TO  USBYO-BYOMEIMOJI
+               MOVE    SPA-GMN-C03-HOSOKU-COMMENT
+                                               TO  USBYO-HOSOKU-COMMENT
                MOVE    SPA-GMN-C03-CHARTBYOMEI TO  USBYO-CHARTBYOMEI
                MOVE    SPA-NAI-C03-CHARTBYOMEIMOJI
                                            TO  USBYO-CHARTBYOMEIMOJI
@@ -5490,6 +5556,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                MOVE    SPA-GMN-C03-BYOMEICD(IDX)  TO  C03-BYOMEICD (IDX)
            END-PERFORM
            MOVE    SPA-GMN-C03-BYOMEI         TO  C03-BYOMEI
+           MOVE    SPA-GMN-C03-HOSOKU-COMMENT TO  C03-HOSOKU-COMMENT
            MOVE    SPA-GMN-C03-CHARTBYOMEI    TO  C03-CHARTBYOMEI
            MOVE    SPA-GMN-C03-BYOMEIHENFLG   TO  C03-BYOMEIHENFLG
            MOVE    SPA-GMN-C03-DSPSEQ         TO  C03-DSPSEQ
@@ -5589,7 +5656,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                      MOVE  "BYOMEICD_6" TO  MCP-WIDGET
              WHEN    11
                      MOVE  "BYOMEI"     TO  MCP-WIDGET
-             WHEN    12
+             WHEN    20
                      MOVE  "CHARTBYOMEI"
                                         TO  MCP-WIDGET
              WHEN    13
@@ -5608,6 +5675,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                                         TO  MCP-WIDGET
              WHEN    19
                      MOVE  "BYOMEIINPUTCD_2"
+                                        TO  MCP-WIDGET
+             WHEN    12
+                     MOVE  "HOSOKU_COMMENT"
                                         TO  MCP-WIDGET
          END-EVALUATE
       *
@@ -5647,6 +5717,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                    MOVE    11                  TO  SPA-GMN-C03-CUR
                WHEN    "BYOMEI"
                    MOVE    12                  TO  SPA-GMN-C03-CUR
+               WHEN    "HOSOKU_COMMENT"
+                   MOVE    20                  TO  SPA-GMN-C03-CUR
                WHEN    "CHARTBYOMEI"
                    MOVE    13                  TO  SPA-GMN-C03-CUR
                WHEN    "UTAGAIFLG"
@@ -5795,6 +5867,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                                        TO  SPA-ERRMSG
                WHEN    "0079"
                    MOVE    "同じ入力コードが複数入力されています"
+                                               TO  SPA-ERRMSG
+               WHEN    "0092"
+                   MOVE    "補足コメントの前後に（）があります"
                                                TO  SPA-ERRMSG
                WHEN    "0056"
                WHEN    "0101"

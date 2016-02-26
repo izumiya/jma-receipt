@@ -79,6 +79,8 @@
            03  USBYO-CHARTBYOMEI       PIC X(160).
       *カルテ病名文字数
            03  USBYO-CHARTBYOMEIMOJI   PIC 9(02).
+      *補足コメント
+           03  USBYO-HOSOKU-COMMENT    PIC X(80).
       *病名編集フラグ
            03  USBYO-BYOMEIHENFLG      PIC X(01).
       *保険病名フラグ
