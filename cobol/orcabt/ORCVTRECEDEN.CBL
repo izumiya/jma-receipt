@@ -1495,9 +1495,9 @@
       *    コメントコードの対象外判定
            MOVE    HZN-IN-KOUMOKU (4)(1:9) TO  WRK-CO-SRYCD
            PERFORM 200110-COMMENT-PARACHK-SEC
-           IF      FLG-PARACHK         =   1
-               GO      TO      20011-CO-SYORI-EXT
-           END-IF
+      ***  IF      FLG-PARACHK         =   1
+      *        GO      TO      20011-CO-SYORI-EXT
+      ***  END-IF
       *
            INITIALIZE                  WRK-RECHEN-AREA
       *    診療識別
@@ -1508,9 +1508,10 @@
            MOVE    HZN-IN-KOUMOKU (5)      TO  WRK-HEN-MEISYO  (1)
       *
       *    診療識別＝９９、０１は症状詳記とする
-           IF     (WRK-HEN-SRYKBN      =   "99"
+           IF    ((WRK-HEN-SRYKBN      =   "99"
                                        OR  "01" )
-             OR   (FLG-SJ-KBN          =   1    )
+             OR   (FLG-SJ-KBN          =   1    ) )
+           AND   ( FLG-PARACHK         =   ZERO   )
       *        名称を変更
                MOVE    SPACE               TO  HZN-SJ-TBL
                MOVE    "99"                TO  HZN-SJ-KOUMOKU(2)
@@ -1530,6 +1531,11 @@
                MOVE    WRK-HEN-SRYKBN      TO  TBL-SRYKBN (IDX)
                MOVE    1                   TO  FLG-COMMENT
                MOVE    ZERO                TO  FLG-ZAIEND
+           END-IF
+      *    読み飛ばし
+           IF      FLG-PARACHK         =   1
+               INITIALIZE                  WRK-RECHEN-AREA
+               GO      TO      20011-CO-SYORI-EXT
            END-IF
       *
       *    明細編集
