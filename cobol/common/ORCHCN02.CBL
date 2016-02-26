@@ -32,6 +32,8 @@
       *                                     場合の入院日を修正
       *  01.00.03    NACL-小豆沢  06.06.12  入院歴、通算期間の編集追加
       *  03.05.00    NACL-多々納  07/05/09  グループ診療対応
+      *
+      *  04.08.01    NACL-藤原    16/02/23  傷病名欄記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -52,7 +54,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-           COPY    "HCN02V02.INC".
+           COPY    "HCN02V03.INC".
       *
       *    印刷用データ 名称領域 
            COPY    "CPCOMMONPRT.INC".
@@ -67,6 +69,8 @@
            03  FLG-END             PIC 9(01).
            03  FLG-PTINF           PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-PTBYOMEI        PIC 9(01).
+      *
            03  FLG-YOBI            PIC 9(01).
       *
       *    カウント領域
@@ -111,6 +115,9 @@
            03  WRK-NENREI-X.
                05  WRK-NENREI      PIC 9(03).
            03  WRK-YOBI-NISSU      PIC 9(05).
+      *
+           03  WRK-NYUINYMD        PIC X(08).
+           03  WRK-TAIINYMD        PIC X(08).
       *
       *    文字変換
            03  WRK-ZENKAKU-G.
@@ -190,6 +197,10 @@
       *    印刷パラメタ
            COPY    "CPORCSMKPRT.INC".
       *
+      *    患者病名
+       01  PTBYOMEI-REC.
+           COPY    "CPPTBYOMEI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -216,6 +227,9 @@
       *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    病名組立サブ
+           COPY    "CPORCSMKBYOMEI.INC".
       *
       *    ＤＢ検索
            COPY    "MCPAREA".
@@ -322,7 +336,7 @@
       *
             INITIALIZE                 ORCSMKPRTAREA
             MOVE   "HC01.sh"           TO  MKPRT-ID
-            MOVE   "HCN02V02.red"      TO  MKPRT-DIA
+            MOVE   "HCN02V03.red"      TO  MKPRT-DIA
             MOVE   SPACE               TO  MKPRT-DEF
             MOVE   ASGNPARA            TO  MKPRT-DAT
             MOVE   SYS-1034-PRTNM(2)   TO  MKPRT-PRTNM
@@ -490,6 +504,46 @@
                PERFORM 3101-NTYMD-HEN2-SEC
            END-IF
       *
+      *    傷病名
+           IF   SYS-5000-TAIKSIKBN     =   "1"
+               INITIALIZE                      PTBYOMEI-REC
+               MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+               MOVE    SPA-PTID            TO  PTBYO-PTID
+               MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC         =   ZERO )
+                   MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
+                   MOVE    ZERO            TO  FLG-PTBYOMEI
+               ELSE
+                   MOVE    1                   TO  FLG-PTBYOMEI
+               END-IF
+      *
+               PERFORM         UNTIL   FLG-PTBYOMEI    =   1
+                   IF    ( WRK-NYUINYMD        <=   PTBYO-SRYYMD )
+                   AND   ( WRK-TAIINYMD        >=   PTBYO-SRYYMD )
+                       INITIALIZE                      ORCSMKBYOMEIAREA
+                       MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
+                       MOVE    PTBYO-BYOMEI    TO  SMKBYO-BYOMEI
+                       MOVE    PTBYO-HOSOKU-COMMENT
+                                               TO  SMKBYO-HOSOKU-COMMENT
+                       CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+                       MOVE    SMKBYO-BYOMEI   TO  HCN02-BYOMEI
+      *
+                       MOVE    1               TO  FLG-PTBYOMEI
+                   ELSE
+                       MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                       MOVE    "key49"         TO  MCP-PATHNAME
+                       PERFORM 900-PTBYO-READ-SEC
+                   END-IF
+               END-PERFORM
+      *
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
       *    通算期間統計
       *     MOVE    ORCHCMT-TKIKAN      TO  WRK-Z4
       *     MOVE    WRK-Z4              TO  HCN02-TKIKAN
@@ -570,6 +624,7 @@
       *            入院日
                    MOVE    SNTYMD-NYUINYMD(IDX2)
                                                TO  WRK-SYMD
+                                                   WRK-NYUINYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG(1:4)    TO  HCN02-NYUINGEN
                    MOVE    WRK-HENYMDG(5:4)    TO  HCN02-NYUINYY
@@ -579,6 +634,7 @@
       *            退院日
                    MOVE    LNK-PTNYUINRRK-TAIINYMD
                                                TO  WRK-SYMD
+                                                   WRK-TAIINYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG(1:4)    TO  HCN02-TAIINGEN
                    MOVE    WRK-HENYMDG(5:4)    TO  HCN02-TAIINYY
@@ -616,6 +672,7 @@
       *            入院日
                    MOVE    SNTYMD-NYUINYMD(IDX2)
                                                TO  WRK-SYMD
+                                                   WRK-NYUINYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG(1:4)    TO  HCN02-NYUINGEN
                                                    HCN02-KIKANSTRGEN
@@ -631,6 +688,7 @@
       *            退院日
                    MOVE    LNK-PTNYUINRRK-TAIINYMD
                                                TO  WRK-SYMD
+                                                   WRK-TAIINYMD
                    PERFORM 31012-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG(1:4)    TO  HCN02-TAIINGEN
                                                    HCN02-KIKANENDGEN
@@ -830,6 +888,24 @@
       *
            .
        800-SYSKANRI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者病名マスター読込
+      *****************************************************************
+       900-PTBYO-READ-SEC           SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
+               MOVE    ZERO            TO  FLG-PTBYOMEI
+           ELSE
+               INITIALIZE                  PTBYOMEI-REC
+               MOVE    1               TO  FLG-PTBYOMEI
+           END-IF
+      *
+           .
+       900-PTBYO-READ-EXT.
            EXIT.
       *
       *****************************************************************
