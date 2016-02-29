@@ -3476,12 +3476,14 @@
                    GO  TO  210-BACK-USER-CHK-EXT
                END-IF
       *        当日有効のシステム管理者存在エラー
-               IF    ( FLG-KIKAN3          =   0 )
+               IF    ( FLG-KIKAN3          =   0 ) AND
+                     ( SPA-HOSPNUM         =   1 )
                    MOVE    "0040"          TO  SPA-ERRCD
                    GO  TO  210-BACK-USER-CHK-EXT
                END-IF
       *        無期限有効のシステム管理者存在エラー
-               IF    ( FLG-KIKAN4          =   0 )
+               IF    ( FLG-KIKAN4          =   0 ) AND
+                     ( SPA-HOSPNUM         =   1 )
                    MOVE    "0041"          TO  SPA-ERRCD
                    GO  TO  210-BACK-USER-CHK-EXT
                END-IF
@@ -3500,12 +3502,14 @@
       *        ログインユーザーが管理者
                PERFORM 210-KANRISYA-CHK-SEC
       *        当日有効のシステム管理者存在エラー
-               IF    ( FLG-KIKAN3          =   0 )
+               IF    ( FLG-KIKAN3          =   0 ) AND
+                     ( SPA-HOSPNUM         =   1 )
                    MOVE    "0040"          TO  SPA-ERRCD
                    GO  TO  210-BACK-USER-CHK2-EXT
                END-IF
       *        無期限有効のシステム管理者存在エラー
-               IF    ( FLG-KIKAN4          =   0 )
+               IF    ( FLG-KIKAN4          =   0 ) AND
+                     ( SPA-HOSPNUM         =   1 )
                    MOVE    "0041"          TO  SPA-ERRCD
                    GO  TO  210-BACK-USER-CHK2-EXT
                END-IF
