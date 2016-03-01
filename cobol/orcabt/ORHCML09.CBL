@@ -29,6 +29,7 @@
       *  00.00.02    NACL-森脇     CSV出力対応
       *  04.02.01    NACL-森脇     08/03/04  疾患区分変更
       *  04.08.01    NACL-森脇     14/08/19  一時ファイルディレクトリ設定
+      *  04.08.02    NACL-森脇     16/02/26  補足コメント対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -148,6 +149,10 @@
            03  WRK-HENYMDG         PIC X(22).
       *
            03  WRK-PAGE            PIC ZZ,ZZ9.
+      *
+      *----(04.08.02)--ADD-START---
+           03  WRK-BYOMEI          PIC X(100).
+      *----(04.08.02)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -428,10 +433,24 @@
            PERFORM UNTIL   FLG-BYOMEI  =   1
                    OR      CNT-LINE    =   28
       *
-               ADD     1                 TO  CNT-LINE
+               ADD     1               TO  CNT-LINE
                MOVE    USBYO-BYOMEIINPUTCD
                                TO  HCML09-BYOMEIINPUTCD(CNT-LINE)
-               MOVE    USBYO-BYOMEI      TO  HCML09-BYOMEI(CNT-LINE)
+      *----(04.08.02)--UPD-START---
+               MOVE    SPACE           TO  WRK-BYOMEI
+               IF      USBYO-HOSOKU-COMMENT    =   SPACE
+                   MOVE    USBYO-BYOMEI    TO  WRK-BYOMEI
+               ELSE
+                   STRING  USBYO-BYOMEI            DELIMITED BY SPACE
+                           "（"                    DELIMITED BY SIZE
+                           USBYO-HOSOKU-COMMENT    DELIMITED BY SPACE
+                           "）"                    DELIMITED BY SIZE
+                                           INTO    WRK-BYOMEI
+                   END-STRING
+                   MOVE    "*"             TO  WRK-BYOMEI(100:1)
+               END-IF
+               MOVE    WRK-BYOMEI      TO  HCML09-BYOMEI(CNT-LINE)
+      *----(04.08.02)--UPD-END-----
       *
                EVALUATE    USBYO-MANSEIKBN
                    WHEN    "00"
