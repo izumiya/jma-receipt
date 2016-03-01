@@ -26,6 +26,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
+      *                                     原疾患区分、合併症区分
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -265,6 +267,8 @@
                MOVE    PTBYO-BYOMEIHENFLG
                                        TO  SBYOINFO-BYOMEIHENFLG
                                                                (IDX)
+               MOVE    PTBYO-CLASS1    TO  SBYOINFO-CLASS1     (IDX)
+               MOVE    PTBYO-CLASS2    TO  SBYOINFO-CLASS2     (IDX)
       *??
                DISPLAY "IDX=" IDX " SRYKA=" SBYOINFO-SRYKA      (IDX)
                        " SRYYMD=" SBYOINFO-SRYYMD     (IDX)

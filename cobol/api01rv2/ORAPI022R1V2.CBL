@@ -28,6 +28,9 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  13/07/24  保険病名フラグ追加対応
+      *
+      *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
+      *                                     原疾患区分、合併症区分
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -755,6 +758,20 @@
                                                                   (IDX)
            ELSE
                MOVE    "False"         TO  DISERES-INSURANCE-DISEASE
+                                                                  (IDX)
+           END-IF
+      *    原疾患区分
+           IF      SBYOINFO-CLASS1(IDX) NOT =   ZERO
+               MOVE    SBYOINFO-CLASS1 (IDX)
+                                       TO
+                                   DISERES-CLASSIFICATION-NUMBER-MASTER
+                                                                 (IDX)
+           END-IF
+      *    合併症区分
+           IF      SBYOINFO-CLASS2(IDX) NOT =   ZERO
+               MOVE    SBYOINFO-CLASS2 (IDX)
+                                       TO
+                                   DISERES-CLASSIFICATION-NUMBER-SERVANT
                                                                   (IDX)
            END-IF
            .

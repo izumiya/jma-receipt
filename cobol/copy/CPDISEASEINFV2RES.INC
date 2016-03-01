@@ -90,4 +90,9 @@
                    05  DISERES-RECEIPT-PERIOD      PIC X(02).
       *             ›∏±…¬Ãæ•’•È•∞
                    05  DISERES-INSURANCE-DISEASE   PIC X(05).
-      *
+      *            ∏∂º¿¥µ∂Ë ¨
+                   05  DISERES-CLASSIFICATION-NUMBER-MASTER
+                                                   PIC X(02).
+      *            πÁ ªæ…∂Ë ¨
+                   05  DISERES-CLASSIFICATION-NUMBER-SERVANT
+                                                   PIC X(02).
