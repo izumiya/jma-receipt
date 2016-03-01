@@ -208,10 +208,10 @@ C02 {
     };
     DISCHARGEFLGCOMBO {
       DISCHARGEFLG {
-        textdata varchar(10);
+        textdata varchar(12);
       };
       count int;
-        item varchar(10)[2];
+        item varchar(12)[2];
     };
     CLASS1COMBO {
       CLASS1 {

@@ -1577,9 +1577,12 @@
            MOVE    "1"             TO  SPA-GMN-C02-REZEFLGL         (1)
            MOVE    "表示しない"    TO  SPA-GMN-C02-REZEFLGMEIL      (1)
            MOVE    1               TO  SPA-GMN-C02-REZEFLG-MAX
-           MOVE    "1"             TO  SPA-GMN-C02-DISCHARGEFLGL    (1)
-           MOVE    "記載する"      TO  SPA-GMN-C02-DISCHARGEFLGMEIL (1)
-           MOVE    1               TO  SPA-GMN-C02-DISCHARGEFLG-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-C02-DISCHARGEFLGL    (1)
+           MOVE    "記載しない"    TO  SPA-GMN-C02-DISCHARGEFLGMEIL (1)
+           MOVE    "1"             TO  SPA-GMN-C02-DISCHARGEFLGL    (2)
+           MOVE    "記載する"      TO  SPA-GMN-C02-DISCHARGEFLGMEIL (2)
+           MOVE    2               TO  SPA-GMN-C02-DISCHARGEFLG-MAX
       *
            MOVE    "01"            TO  SPA-GMN-C02-CLASS1L     (1)
            MOVE    "原疾患ア"      TO  SPA-GMN-C02-CLASS1MEIL  (1)
@@ -2374,11 +2377,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        SPA-GMN-C02-TUPHMS (IDX) (6:1)
                    END-IF
       *
-                   MOVE    WRK-PTBYO-SRYYMD-DISCHARGEFLG(IDZZ)
-                                       TO  WRK-KBN 
-                   PERFORM 5001-DISCHARGEFLG-HENSYU-SEC
-                   MOVE    WRK-KBNMEI  TO
+                   IF      WRK-PTBYO-SRYYMD-DISCHARGEFLG(IDZZ)
+                                       =   "1"
+                       MOVE    "記載"  TO
                                        SPA-GMN-C02-TDISCHARGEFLG (IDX)
+                   END-IF
       *
                    MOVE    WRK-PTBYO-SRYYMD-CLASS1(IDZZ)
                                        TO  WRK-KBN 

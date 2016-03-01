@@ -149,9 +149,9 @@
                 04  C02-REZEFLG-ITEM    PIC X(12)   OCCURS  5 TIMES.
               03  C02-DISCHARGEFLGCOMBO.
                 04  C02-DISCHARGEFLG.
-                  05  C02-VALUE   PIC X(10).
+                  05  C02-VALUE   PIC X(12).
                 04  C02-DISCHARGEFLG-COUNT   PIC S9(9)  BINARY.
-                04  C02-DISCHARGEFLG-ITEM    PIC X(10)  OCCURS  2 TIMES.
+                04  C02-DISCHARGEFLG-ITEM    PIC X(12)  OCCURS  2 TIMES.
               03  C02-CLASS1COMBO.
                 04  C02-CLASS1.
                   05  C02-VALUE   PIC X(11).
