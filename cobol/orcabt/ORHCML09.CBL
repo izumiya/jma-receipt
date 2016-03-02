@@ -63,6 +63,7 @@
        FD  ML09ERR-FILE.
        01  ML09ERR-REC             PIC X(200).
       *
+      *----(04.08.02)--UPD-START---
       *    CSVファイル
        FD  CSV-FILE.
        01  CSV-REC.
@@ -76,11 +77,14 @@
            03  CSV-FILLER4         PIC X(01).
            03  CSV-BYOMEI          PIC X(160).
            03  CSV-FILLER5         PIC X(01).
-           03  CSV-UTAGAIFLG       PIC X(01).
+           03  CSV-HOSOKU-COMMENT  PIC X(80).
            03  CSV-FILLER6         PIC X(01).
-           03  CSV-MANSEIKBN       PIC 9(02).
+           03  CSV-UTAGAIFLG       PIC X(01).
            03  CSV-FILLER7         PIC X(01).
+           03  CSV-MANSEIKBN       PIC 9(02).
+           03  CSV-FILLER8         PIC X(01).
            03  CSV-DSPSEQ          PIC 9(02).
+      *----(04.08.02)--UPD-END-----
       *
        WORKING-STORAGE             SECTION.
       *
@@ -359,6 +363,11 @@
                MOVE    ","                 TO  CSV-FILLER5
                MOVE    ","                 TO  CSV-FILLER6
                MOVE    ","                 TO  CSV-FILLER7
+      *----(04.08.02)--ADD-START---
+               MOVE    ","                 TO  CSV-FILLER8
+               MOVE    USBYO-HOSOKU-COMMENT
+                                           TO  CSV-HOSOKU-COMMENT
+      *----(04.08.02)--ADD-END-----
                IF      USBYO-BUNRUICD  NOT  =  SPACE
                    PERFORM 900-DBREAD-SEC
                    MOVE    USBUN-BYOMEI    TO  CSV-BUNRUIMEI
