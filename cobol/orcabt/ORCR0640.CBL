@@ -13700,6 +13700,23 @@
                         RECE64-RUIKEITOTAL  +
                         WRK-FUKA-KINGAKU
       *
+               MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+               PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                         UNTIL   FUKA-IDX   >    8
+                 MOVE   NSRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                         TO  WRK-FUKA-VALUE
+                 IF  WRK-FUKA-VALUE  =  ZERO
+                   CONTINUE
+                 ELSE
+                   COMPUTE  WRK-FUKA-KINGAKU  =
+                            WRK-FUKA-KINGAKU  +
+                          ((WRK-FUKA-VALUE^4) * FUKA-IDX)
+                 END-IF
+               END-PERFORM
+               COMPUTE  RECE64-RUIKEITOTAL  =
+                        RECE64-RUIKEITOTAL  +
+                        WRK-FUKA-KINGAKU
+      *
              END-IF  
            END-PERFORM
       *

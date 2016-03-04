@@ -173,6 +173,8 @@
       *
       *  04.08.01    NACL-門脇    15/11/09  該当期間に１０超の保険組合せの
       *                                     使用があるかチェック
+      *  04.08.02    NACL-門脇    16/03/03  公害の療養担当手当は
+      *                                     薬剤・器材点の取り扱いとする
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6740,8 +6742,8 @@ grpsys                              SPA-AREA
              END-IF
            END-IF
       *
-           IF  (ACCT-SRYKBN  =  "90" OR "92")
-           AND (ACCT-ZAIKBN   NOT =   2     )
+           IF  (ACCT-SRYKBN  =  "90" OR "92" OR "80")
+           AND (ACCT-ZAIKBN   NOT =   2             )
              INITIALIZE                      SRYACT-REC
              MOVE    ACCT-HOSPNUM       TO   SRY-HOSPNUM
              MOVE    ACCT-NYUGAIKBN     TO   SRY-NYUGAIKBN
@@ -6780,6 +6782,11 @@ grpsys                              SPA-AREA
                                              "102900030"  OR
                                              "102900040"
                          COMPUTE  WRK-KOGAI-TEN = WRK-KOGAI-TEN +
+                                 (TNS-TEN  *  SINRYO-COUNT)
+                      END-IF
+      *
+                      IF   SRY-SRYCD(IDZ) =  "199000510"
+                         COMPUTE  WRK-RYOYOTEATE = WRK-RYOYOTEATE +
                                  (TNS-TEN  *  SINRYO-COUNT)
                       END-IF
                     END-IF
@@ -6987,9 +6994,15 @@ grpsys                                    SPA-AREA
                                     -  WRK-SYUG-ZTK-HKNTEN(IDX)
       *
            COMPUTE   WRK-JIBAI-SYUTEN(IDX) =  WRK-SYUTEN
-                                           +  SYU-HKNTEN(15)
-                                           +  WRK-JIBAI-RYOYO-NACCT(IDX)
                                            -  WRK-KOGAI-TEN
+                                           -  WRK-RYOYOTEATE
+      *
+           ADD    SYU-HKNTEN(15)     TO    WRK-JIBAI-SYUTEN(IDX)
+      *
+           MOVE      WRK-RYOYOTEATE  TO    WRK-JIBAI-RYOYO(IDX)
+           COMPUTE   WRK-JIBAI-RYOYO(IDX)
+                                =  WRK-JIBAI-RYOYO(IDX)
+                                +  WRK-JIBAI-RYOYO-NACCT(IDX)
       *
            .
        KOGAI-TENSO-EXT.

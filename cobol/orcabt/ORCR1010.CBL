@@ -130,6 +130,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.05    NACL-門脇    15/12/24  器材の単価編集修正
       *  04.08.06    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.07    NACL-門脇    16/03/03  公害の療養担当手当は
+      *                                     薬剤・器材点の取り扱いとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -426,6 +428,7 @@
            03  WRK-FILMTEN                             PIC 9(07)V9(02).
            03  WRK-FILMTEN2                            PIC 9(07)V9(02).
       *
+           03  WRK-RYOYOTEATE                          PIC 9(07).
       *
       *    数字半角全角変換用     
            03  WRK-CHAR-IDX                    PIC 9(02).
@@ -1612,6 +1615,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  SPACE TO
                                            WRK-KZI058-TANINAME
       *
+                               MOVE  ZERO  TO   WRK-RYOYOTEATE
+      *
                                MOVE  ZERO  TO   FLG-WRITE05
                                MOVE  ZERO  TO   FLG-HENSYU-NG
                                MOVE  ZERO  TO   FLG-ZAITAKU-CHECK
@@ -1672,6 +1677,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                   WRK-KZI058-TANIMOJISU
                                       MOVE  SPACE TO
                                                   WRK-KZI058-TANINAME
+      *
+                                      MOVE  ZERO  TO   WRK-RYOYOTEATE
       *
                                       MOVE  ZERO  TO   FLG-WRITE05
                                       MOVE  ZERO  TO   FLG-HENSYU-NG
@@ -2280,6 +2287,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-IF
       *
                  END-IF
+               END-IF
+      *
+      *        療養担当手当
+               IF      SRY-SRYCD(IDX2)  =  "199000610"
+                  COMPUTE  WRK-RYOYOTEATE    =  WRK-RYOYOTEATE
+                                             +  TNS-TEN
+                  COMPUTE  RECE120-SYUTEN1   =  RECE120-SYUTEN1
+                                             -  TNS-TEN
+                  COMPUTE  RECE120-KIZAITEN  =  RECE120-KIZAITEN
+                                             +  TNS-TEN
                END-IF
       *
                IF      TNS-SRYKBN         =     "80"
@@ -3799,6 +3816,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                  -  ACCT-SYUTEN2
                              COMPUTE  WK-YKZTEN  =  WK-YKZTEN
                                                  +  ACCT-SYUTEN2
+                           END-IF
+                           IF  WRK-RYOYOTEATE  NOT =  ZERO
+                             COMPUTE  WK-SYUTEN  =  WK-SYUTEN
+                                                 -  WRK-RYOYOTEATE
+                             COMPUTE  WK-YKZTEN  =  WK-YKZTEN
+                                                 +  WRK-RYOYOTEATE
                            END-IF
                        END-IF
                        IF    SRY-SRYKBN     =  "14"

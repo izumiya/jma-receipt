@@ -74,6 +74,8 @@
       *                                     ¡Ê½éºÆ¿ÇÎÁ¡¦ÄãÂÅ·ëÎ¨ÂÐ±þ¡Ë
       *
       *  04.08.00    NACL-Â¿¡¹Ç¼  13/01/18  ¿ÇÎÅ²ó¿ô¥Æ¡¼¥Ö¥ë£±£°ÂÐ±þ
+      *  04.08.01    NACL-ÌçÏÆ    16/03/03  ¸ø³²¤ÎÎÅÍÜÃ´Åö¼êÅö¤Ï
+      *                                     ÌôºÞ¡¦´ïºàÅÀ¤Î¼è¤ê°·¤¤¤È¤¹¤ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1994,6 +1996,9 @@
       *
              COMPUTE   LNK-S01-SYUTEN(IDY)  =   WK-SYUTEN-KEI
                                             -   WK-KOGAI-TEN
+                                            -   WK-RYOYOTEATE
+      *
+             MOVE      WK-RYOYOTEATE   TO   LNK-S01-RYOYO(IDY)
       *
            END-IF
       *
@@ -2880,6 +2885,11 @@
                                                 OR  "102130020"
                                                 OR  "102400010"
                            COMPUTE WK-KOGAI-TEN = WK-KOGAI-TEN +
+                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                         END-IF
+      *
+                         IF    SRY-SRYCD (IDX3)  =   "199000610"
+                           COMPUTE WK-RYOYOTEATE = WK-RYOYOTEATE +
                                   (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                          END-IF
                       END-IF

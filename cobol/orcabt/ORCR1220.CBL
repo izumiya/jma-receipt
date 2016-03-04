@@ -135,6 +135,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-門脇    15/12/24  器材の単価編集修正
       *  04.08.05    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.06    NACL-門脇    16/03/03  公害の療養担当手当は
+      *                                     薬剤・器材点の取り扱いとする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -559,6 +561,8 @@
            03  WRK-SISETU3058      PIC 9(01).
            03  WRK-SISETU3168      PIC 9(01).
            03  WRK-SISETU3169      PIC 9(01).
+      *
+           03  WRK-RYOYOTEATE      PIC 9(07).
       *
       *    数字半角全角変換用
            03  WRK-CHAR-IDX PIC 9(02).
@@ -1749,6 +1753,8 @@
                       MOVE   SPACE  TO
                                     WRK-KZI058-TANINAME
       *
+                      MOVE   ZERO   TO   WRK-RYOYOTEATE
+      *
                       MOVE   ZERO   TO   FLG-WRITE230
                       MOVE   ZERO   TO   FLG-TENTEKI
                       MOVE   ZERO   TO   FLG-HENSYU-NG
@@ -1820,6 +1826,8 @@
                                                WRK-KZI058-TANIMOJISU
                                  MOVE   SPACE  TO
                                                WRK-KZI058-TANINAME
+      *
+                                 MOVE   ZERO   TO   WRK-RYOYOTEATE
       *
                                  MOVE   ZERO   TO   FLG-WRITE230
                                  MOVE   ZERO   TO   FLG-TENTEKI
@@ -2363,6 +2371,16 @@
                                       WRK-FILMTEN2
                          END-IF
                   END-IF
+               END-IF
+      *
+      *        療養担当手当
+               IF      SRY-SRYCD(IDX2)  =  "199000510"
+                  COMPUTE  WRK-RYOYOTEATE    =  WRK-RYOYOTEATE
+                                             +  TNS-TEN
+                  COMPUTE  RECE220-SYUTEN1   =  RECE220-SYUTEN1
+                                             -  TNS-TEN
+                  COMPUTE  RECE220-KIZAITEN  =  RECE220-KIZAITEN
+                                             +  TNS-TEN
                END-IF
       *
                IF      TNS-SRYKBN         =     "80"
@@ -3453,6 +3471,12 @@
                                                  -  ACCT-SYUTEN2
                              COMPUTE  WK-YKZTEN  =  WK-YKZTEN
                                                  +  ACCT-SYUTEN2
+                           END-IF
+                           IF  WRK-RYOYOTEATE  NOT =  ZERO
+                             COMPUTE  WK-SYUTEN  =  WK-SYUTEN
+                                                 -  WRK-RYOYOTEATE
+                             COMPUTE  WK-YKZTEN  =  WK-YKZTEN
+                                                 +  WRK-RYOYOTEATE
                            END-IF
                        END-IF
                    ELSE
@@ -5259,6 +5283,10 @@
            MOVE    NACCT-SYUTEN2        TO      RECE220-SYUTEN2
            MOVE    NACCT-YKZTEN         TO      RECE220-YKZTEN
            MOVE    NACCT-KIZAITEN       TO      RECE220-KIZAITEN
+           IF      NACCT-ZAISKBKBN      =       "7"
+             MOVE  NACCT-SYUTEN1        TO      RECE220-KIZAITEN
+             MOVE  ZERO                 TO      RECE220-SYUTEN1
+           END-IF
            MOVE    NACCT-DRCD           TO      RECE220-DRCD
            MOVE    SPACE                TO      RECE220-ZAIREQFLG
            MOVE    ZERO                 TO      RECE220-TEIGENRATE
@@ -5468,6 +5496,23 @@
                         RECE220-RUIKEITOTAL  +
                         WRK-FUKA-KINGAKU
       *
+               MOVE     ZERO    TO    WRK-FUKA-KINGAKU
+               PERFORM  VARYING  FUKA-IDX  FROM  1  BY  1
+                         UNTIL   FUKA-IDX   >    8
+                 MOVE   NSRY-SRYSURYO(IDX2)(FUKA-IDX:1)
+                                         TO  WRK-FUKA-VALUE
+                 IF  WRK-FUKA-VALUE  =  ZERO
+                   CONTINUE
+                 ELSE
+                   COMPUTE  WRK-FUKA-KINGAKU  =
+                            WRK-FUKA-KINGAKU  +
+                          ((WRK-FUKA-VALUE^4) * FUKA-IDX)
+                 END-IF
+               END-PERFORM
+               COMPUTE  RECE220-RUIKEITOTAL  =
+                        RECE220-RUIKEITOTAL  +
+                        WRK-FUKA-KINGAKU
+      *
              END-IF
            END-PERFORM
       *
@@ -5481,8 +5526,8 @@
        2102062-RECE200-HENSYU2-SEC                SECTION.
       *
       *    その他のレセ点数欄の編集
-           COMPUTE   RECE200-TENSU(20 1)  =
-                     RECE200-TENSU(20 1)  +
+           COMPUTE   RECE200-TENSU(21 2)  =
+                     RECE200-TENSU(21 2)  +
                     (NACCT-ZAITEN   *   CNT-DAY21)
       *
            .
