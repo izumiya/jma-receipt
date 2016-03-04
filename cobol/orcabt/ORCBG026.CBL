@@ -880,7 +880,7 @@
       *
       *    全体
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
-           MOVE    "全医薬品の規格単位数量　　　　…　（Ａ）"
+           MOVE    "全医薬品の規格単位数量　　　　　　　…（１）"
                                        TO  HCMG007-NAME(CNT-LINE)
            PERFORM VARYING IDX-T   FROM    1   BY  1
                    UNTIL   IDX-T   >   4
@@ -890,10 +890,10 @@
       *
       *    先発品と後発品
            COMPUTE CNT-LINE    =   CNT-LINE    +   2
-           MOVE    "後発医薬品のある先発医薬品"
+           MOVE    "後発医薬品あり先発医薬品"
                                        TO  HCMG007-NAME(CNT-LINE)
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
-           MOVE    "及び後発医薬品の規格単位数量　…　（Ｂ）"
+           MOVE    "及び後発医薬品の規格単位数量　　　　…（２）"
                                        TO  HCMG007-NAME(CNT-LINE)
            PERFORM VARYING IDX-T   FROM    1   BY  1
                    UNTIL   IDX-T   >   4
@@ -903,7 +903,7 @@
       *
       *    後発品
            COMPUTE CNT-LINE    =   CNT-LINE    +   2
-           MOVE    "後発医薬品の規格単位数量　　　…　（Ｃ）"
+           MOVE    "後発医薬品の規格単位数量　　　　　　…（３）"
                                        TO  HCMG007-NAME(CNT-LINE)
            PERFORM VARYING IDX-T   FROM    1   BY  1
                    UNTIL   IDX-T   >   4
@@ -913,7 +913,7 @@
       *
       *    置換え率
            COMPUTE CNT-LINE    =   CNT-LINE    +   2
-           MOVE    "数量シェア（Ｂ／Ａ）（％）"
+           MOVE    "カットオフ値の割合（２／１）（％）　…（４）"
                                        TO  HCMG007-NAME(CNT-LINE)
            PERFORM VARYING IDX-T   FROM    1   BY  1
                    UNTIL   IDX-T   >   4
@@ -930,7 +930,7 @@
       *
       *    置換え率
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
-           MOVE    "数量シェア（Ｃ／Ｂ）（％）"
+           MOVE    "後発医薬品の割合　（３／２）（％）　…（５）"
                                        TO  HCMG007-NAME(CNT-LINE)
            PERFORM VARYING IDX-T   FROM    1   BY  1
                    UNTIL   IDX-T   >   4
