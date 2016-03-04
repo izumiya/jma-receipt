@@ -904,6 +904,20 @@
                        PERFORM 910-TENSU-READ-SEC
                        ADD     TNS-TEN         TO  WRK-SYUTEN1
                    END-IF
+      *H28.3
+      *            療養担当手当の点数をゼロとする
+                   IF     (LNK2-WKSRY-SRYKBN(IDX)      =   "80")  AND
+                          (LNK2-WKSRY-SRYCD (IDX IDS)  =   "199000610")
+                       MOVE    LNK2-WKSRY-SRYCD (IDX IDS)  TO  TNS-SRYCD
+                       PERFORM 910-TENSU-READ-SEC
+                       ADD     TNS-TEN         TO  WRK-SYUTEN1
+      *                自賠責療養担当手当点数
+                       COMPUTE WRK-SINDAN      =   TNS-TEN
+                                               *   LNK2-WKSRY-ZAIKAIKEI
+                                                            (IDX-KOUI)
+                       ADD     WRK-SINDAN      TO  LNK-S01-RYOYO
+                                                      (LNK-SYUNOU2-MAX)
+                   END-IF
                END-PERFORM
            END-IF
       *
