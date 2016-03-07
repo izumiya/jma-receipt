@@ -394,10 +394,17 @@
       *****************************************************************
        110-PARA-HENSYU-SEC         SECTION.
       *
+           IF      WRK-PARA-SYORIYM    <   "201603"
+               MOVE    "診療年月は平成２８年３月以降を指定してください"
+                                      TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+               GO  TO  110-PARA-HENSYU-EXT
+           END-IF
+      *
            IF    ( WRK-PARA-MEISAIKBN  NOT =   0 ) AND
                  ( WRK-PARA-MEISAIKBN  NOT =   1 )
                MOVE    "明細区分が正しくありません"
-                                      TO  WRK-TOUKEIERR
+                                      TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
@@ -405,7 +412,7 @@
            IF    ( WRK-PARA-CSVKBN     NOT =   0 ) AND
                  ( WRK-PARA-CSVKBN     NOT =   1 )
                MOVE    "ＣＳＶ区分が正しくありません"
-                                      TO  WRK-TOUKEIERR
+                                      TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
@@ -414,7 +421,7 @@
                  ( WRK-PARA-TAISYOKBN  NOT =   1 ) AND
                  ( WRK-PARA-TAISYOKBN  NOT =   2 )
                MOVE    "対象区分が正しくありません"
-                                      TO  WRK-TOUKEIERR
+                                      TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
@@ -425,19 +432,19 @@
            MOVE    WRK-HENYMDG         TO  WRK-PRTYMD
       *
            MOVE    SPACE               TO  WRK-TUKI-G
-      *    対象年月編集（終了年月は２カ月後）
+      *    対象年月編集（開始年月は２カ月前）
            MOVE    WRK-PARA-SYORIYM    TO  WRK-SYMD(1:6)
-           PERFORM VARYING IDX-T   FROM    1   BY  1
-                   UNTIL   IDX-T   >   3
+           PERFORM VARYING IDX-T   FROM    3   BY  -1
+                   UNTIL   IDX-T   =   0
                MOVE    WRK-SYMD(1:6)   TO  WRK-TUKI(IDX-T)
                MOVE    WRK-SMM         TO  WRK-Z2
                MOVE    WRK-Z2          TO  CSV-HEAD-TUKI(IDX-T)
       *
-               IF      WRK-SMM     =   12
-                   COMPUTE WRK-SYY =   WRK-SYY +   1
-                   MOVE    1           TO  WRK-SMM
+               IF      WRK-SMM     =   1
+                   COMPUTE WRK-SYY =   WRK-SYY -   1
+                   MOVE    12          TO  WRK-SMM
                ELSE
-                   COMPUTE WRK-SMM =   WRK-SMM +   1
+                   COMPUTE WRK-SMM =   WRK-SMM -   1
                END-IF
            END-PERFORM
       *
@@ -1386,7 +1393,7 @@ grpsys                                     SPA-AREA
            MOVE    WRK-SRYCD           TO  TNS-SRYCD
            MOVE    ZERO                TO  FLG-TENSU
       *
-           MOVE    WRK-PARA-SYORIYM    TO  ORC-DBYMD(1:6)
+           MOVE    SRY-SRYYM           TO  ORC-DBYMD(1:6)
            MOVE    "01"                TO  ORC-DBYMD(7:2)
       *
            MOVE    TNS-SRYCD           TO  TTNS-CHK-SRYCD
