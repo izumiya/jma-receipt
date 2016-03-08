@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者        日付      内容
       * 04.08.00     NACL-多々納   14/07/17  一時ファイル対応
+      * 04.08.00     NACL-多々納   16/03/XX  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -81,6 +82,11 @@
            03  FLG-CNT-K2              PIC 9(01).
            03  FLG-CNT-K3              PIC 9(01).
            03  FLG-CNT-K4              PIC 9(01).
+      *H28.4
+      *    うつ薬あり
+           03  FLG-CNT-A3              PIC 9(01).
+      *    抗精神薬あり
+           03  FLG-CNT-A4              PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -122,6 +128,10 @@
            03  CNT-OUT-3-3             PIC 9(05).
            03  CNT-OUT-3-4             PIC 9(05).
       *
+           03  CNT-OUT-4               PIC 9(05).
+           03  CNT-OUT-4-3             PIC 9(05).
+           03  CNT-OUT-4-4             PIC 9(05).
+      *
       *    システム領域
        01  SYS-AREA.
            03  SYS-YMD.
@@ -152,6 +162,15 @@
            03  WRK-SRY-YYMM.
                05  WRK-SRY-YY          PIC 9(04).
                05  WRK-SRY-MM          PIC 9(02).
+      *    処理年月開始日（処理年月−３月）
+           03  WRK-STR-YMD.
+               05  WRK-STR-YY          PIC 9(04).
+               05  WRK-STR-MM          PIC 9(02).
+               05  WRK-STR-DD          PIC 9(02).
+           03  WRK-END-YMD.
+               05  WRK-END-YY          PIC 9(04).
+               05  WRK-END-MM          PIC 9(02).
+               05  WRK-END-DD          PIC 9(02).
       *
            03  WRK-KEY-AREA.
                05  WRK-KEY-PTID            PIC 9(10).
@@ -208,11 +227,13 @@
                05  FILLER              PIC X(02)   VALUE   SPACE.
                05  FILLER              PIC X(40)   VALUE
                    "＃＃　向精神薬投与患者一覧　＃＃".
-               05  FILLER              PIC X(16)   VALUE   SPACE.
+     ******    05  FILLER              PIC X(16)   VALUE   SPACE.
+               05  PRT-STRYM           PIC X(16).
+               05  FILLER              PIC X(02)   VALUE   "〜".
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
                    "分".
-               05  FILLER              PIC X(09)   VALUE   SPACE.
+               05  FILLER              PIC X(07)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
                05  PRT-PAGE            PIC ZZZ9.
@@ -278,8 +299,27 @@
                05  FILLER              PIC X(12)   VALUE
                                                    "対象患者数：".
                05  PRT-F-CNT1          PIC ZZZ9.
+               05  FILLER              PIC X(04)   VALUE   "名".
+               05  FILLER              PIC X(28)   VALUE
+                                       "抗うつ薬・抗精神病薬患者数：".
+               05  PRT-F-CNT4          PIC ZZZ9.
+               05  FILLER              PIC X(02)   VALUE   "名".
+               05  FILLER              PIC X(12)   VALUE
+                                           "（抗うつ薬：".
+               05  PRT-F-CNT43         PIC ZZZ9.
+               05  FILLER              PIC X(02)   VALUE   ",".
+               05  FILLER              PIC X(12)   VALUE
+                                                   "抗精神病薬：".
+               05  PRT-F-CNT44         PIC ZZZ9.
+               05  FILLER              PIC X(01)   VALUE   ")".
+      *
+           03  LST-PRT-FOOT-02.
+               05  FILLER              PIC X(02)   VALUE   SPACE.
+               05  FILLER              PIC X(12)   VALUE   SPACE.
+               05  FILLER              PIC X(04)   VALUE   SPACE.
+     **        05  PRT-F-CNT1          PIC ZZZ9.
                05  FILLER              PIC X(20)   VALUE
-                                           "名，多剤投与患者数：".
+                                           "　　多剤投与患者数：".
                05  PRT-F-CNT2          PIC ZZZ9.
                05  FILLER              PIC X(02)   VALUE   "名".
                05  FILLER              PIC X(12)   VALUE
@@ -597,6 +637,35 @@
                                        STS-AREA-DAY
                                        LNK-DAY2-AREA
            MOVE    LNK-DAY2-EDTYMD3(1:16)  TO  PRT-SRYYM
+      *H28.4
+      *    開始日
+           IF      WRK-SRY-YYMM        >=  "201606"
+      *        H28.6 からは前３カ月分
+               IF      WRK-SRY-MM          <= 2
+                   COMPUTE WRK-STR-YY      =   WRK-SRY-YY  -  1
+                   COMPUTE WRK-STR-MM      =  (12  +  WRK-SRY-MM)
+                                           -   2
+               ELSE 
+                   MOVE    WRK-SRY-YY      TO  WRK-STR-YY
+                   COMPUTE WRK-STR-MM      =   WRK-SRY-MM  -  2
+               END-IF
+           ELSE
+               MOVE    WRK-SRY-YY      TO  WRK-STR-YY
+               MOVE    WRK-SRY-MM      TO  WRK-STR-MM
+           END-IF
+           MOVE    01                  TO  WRK-STR-DD
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY2-AREA
+           MOVE    "21"            TO  LNK-DAY2-IRAI
+           MOVE    WRK-STR-YMD     TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING
+                                       STS-AREA-DAY
+                                       LNK-DAY2-AREA
+           MOVE    LNK-DAY2-EDTYMD3(1:16)  TO  PRT-STRYM
+      *    処理終了年月
+           MOVE    WRK-SRY-YYMM        TO  WRK-END-YMD(1:6)
+           MOVE    31                  TO  WRK-END-DD
       *
       *    診療科をＴＢＬにセット
            PERFORM 1101-SRYKA-TBLSET-SEC
@@ -660,17 +729,21 @@
            INITIALIZE                  JYURRK-REC
            MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    "2"                 TO  JYURRK-NYUGAIKBN
-           STRING  WRK-SRY-YYMM
-                   "%"                 DELIMITED  BY  SIZE
-                       INTO                JYURRK-SRYYMD
-           END-STRING
+      *    STRING  WRK-SRY-YYMM
+      *            "%"                 DELIMITED  BY  SIZE
+      *                INTO                JYURRK-SRYYMD
+      *    END-STRING
+      *H28.4
+           MOVE    WRK-STR-YMD         TO  JYURRK-SRYYMD
+           MOVE    WRK-END-YMD         TO  JYURRK-UPSRYYMD
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key57"             TO  MCP-PATHNAME
+     ***** MOVE    "key57"             TO  MCP-PATHNAME
+           MOVE    "key64"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "key57"             TO  MCP-PATHNAME
+               MOVE    "key64"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            ELSE
                INITIALIZE                  JYURRK-REC
@@ -704,11 +777,11 @@
                PERFORM 2001-JYURRK-HEN-SEC
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key57"             TO  MCP-PATHNAME
+               MOVE    "key64"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            END-PERFORM
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key57"             TO  MCP-PATHNAME
+           MOVE    "key64"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF    IDX-TBL           >   ZERO
@@ -1112,11 +1185,29 @@
            IF      ORCSPSYCHO-COUNT (2)    >=  3
                MOVE    1                   TO  FLG-CNT-K2
            END-IF
-           IF      ORCSPSYCHO-COUNT (3)    >=  4
-               MOVE    1                   TO  FLG-CNT-K3
+      *Ｈ28.4
+           IF      TBL-SRYYMD          <   "20160401"
+      *    Ｈ28.3まで　４種類以上
+               IF      ORCSPSYCHO-COUNT (3)    >=  4
+                  MOVE    1                   TO  FLG-CNT-K3
+               END-IF
+               IF      ORCSPSYCHO-COUNT (4)    >=  4
+                   MOVE    1                   TO  FLG-CNT-K4
+               END-IF
+           ELSE
+      *    Ｈ28.4から　３種類以上
+               IF      ORCSPSYCHO-COUNT (3)    >=  3
+                   MOVE    1                   TO  FLG-CNT-K3
+               END-IF
+               IF      ORCSPSYCHO-COUNT (4)    >=  3
+                   MOVE    1                   TO  FLG-CNT-K4
+               END-IF
            END-IF
-           IF      ORCSPSYCHO-COUNT (4)    >=  4
-               MOVE    1                   TO  FLG-CNT-K4
+           IF      ORCSPSYCHO-COUNT (3)    >   ZERO
+               MOVE    1                   TO  FLG-CNT-A3
+           END-IF
+           IF      ORCSPSYCHO-COUNT (4)    >   ZERO
+               MOVE    1                   TO  FLG-CNT-A4
            END-IF
            .
        20020-PRITN-SYORI-EXT.
@@ -1176,6 +1267,18 @@
            IF      FLG-CNT-K4          =   1
                ADD     1               TO  CNT-OUT-3-4
            END-IF
+      *    うつ薬
+           IF      FLG-CNT-A3          =   1
+               ADD     1               TO  CNT-OUT-4-3
+           END-IF
+           IF      FLG-CNT-A4          =   1
+               ADD     1               TO  CNT-OUT-4-4
+           END-IF
+      *    うつ薬・抗精神薬あり
+           IF     (FLG-CNT-A3          =   1 )
+              OR  (FLG-CNT-A4          =   1 )
+               ADD     1               TO  CNT-OUT-4
+           END-IF
       *
            MOVE    ZERO                TO  FLG-CNT-ARI
            MOVE    ZERO                TO  FLG-CNT-TAZAI
@@ -1183,6 +1286,9 @@
            MOVE    ZERO                TO  FLG-CNT-K2
            MOVE    ZERO                TO  FLG-CNT-K3
            MOVE    ZERO                TO  FLG-CNT-K4
+      *
+           MOVE    ZERO                TO  FLG-CNT-A3
+           MOVE    ZERO                TO  FLG-CNT-A4
       *
            .
        20029-CNT-SYORI-EXT.
@@ -1238,7 +1344,12 @@
            MOVE    CNT-OUT-3-2         TO  PRT-F-CNT32
            MOVE    CNT-OUT-3-3         TO  PRT-F-CNT33
            MOVE    CNT-OUT-3-4         TO  PRT-F-CNT34
-           IF     (CNT-LINE +  3 )     >   MAX-LINE
+      *H28.4
+           MOVE    CNT-OUT-4           TO  PRT-F-CNT4
+           MOVE    CNT-OUT-4-3         TO  PRT-F-CNT43
+           MOVE    CNT-OUT-4-4         TO  PRT-F-CNT44
+      *
+           IF     (CNT-LINE +  5 )     >   MAX-LINE
                PERFORM 400-PRINT-SEC
                MOVE    ZERO            TO  CNT-LINE
                PERFORM 280-HEAD-HENSYU-SEC
@@ -1247,6 +1358,8 @@
            MOVE    ALL "-"             TO  HCMSL80-MOJI (CNT-LINE)
            ADD     2                   TO  CNT-LINE
            MOVE    LST-PRT-FOOT-01     TO  HCMSL80-MOJI (CNT-LINE)
+           ADD     2                   TO  CNT-LINE
+           MOVE    LST-PRT-FOOT-02     TO  HCMSL80-MOJI (CNT-LINE)
       *
            .
        2004-GOUKEI-HENSYU-EXT.

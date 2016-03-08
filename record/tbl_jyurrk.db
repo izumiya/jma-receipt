@@ -1279,4 +1279,98 @@ path	key61 	{
 		;
 	};
 };
+path	key62	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key62_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk a,tbl_sryact b
+			WHERE   a.HOSPNUM    =   :HOSPNUM
+			AND   a.PTID        =   :PTID
+			AND   a.NYUGAIKBN   =   :NYUGAIKBN
+			AND   a.SRYKA       =   :SRYKA
+                        AND   a.HOSPNUM     =   b.HOSPNUM
+			AND   a.PTID        =   b.PTID
+			AND   a.NYUGAIKBN   =   b.NYUGAIKBN
+			AND   a.SRYKA       =   b.SRYKA
+                        AND   b.SRYYM       =   :UPHMS
+                        AND  (b.SRYCD1      =   '099209910')
+                        AND ((b.ZAINUM      =   a.ZAINUM1 )
+                        OR   (b.ZAINUM     =   a.ZAINUM2 )
+                        OR   (b.ZAINUM     =   a.ZAINUM3 )
+                        OR   (b.ZAINUM     =   a.ZAINUM4 )
+                        OR   (b.ZAINUM     =   a.ZAINUM5 )
+                        OR   (b.ZAINUM     =   a.ZAINUM6 )
+                        OR   (b.ZAINUM     =   a.ZAINUM7 )
+                        OR   (b.ZAINUM     =   a.ZAINUM8 )
+                        OR   (b.ZAINUM     =   a.ZAINUM9 )
+                        OR   (b.ZAINUM    =   a.ZAINUM10)
+                        OR   (b.ZAINUM    =   a.ZAINUM11)
+                        OR   (b.ZAINUM    =   a.ZAINUM12)
+                        OR   (b.ZAINUM    =   a.ZAINUM13)
+                        OR   (b.ZAINUM    =   a.ZAINUM14)
+                        OR   (b.ZAINUM    =   a.ZAINUM15))
+			ORDER   BY        a.SRYYMD,
+                                          a.RENNUM,
+                                          a.DOUJI_RENNUM,
+			                  a.EDANUM
+		;
+	};
+};
+
+path	key63	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key63_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID        =   :PTID
+			AND     NYUGAIKBN   =   :NYUGAIKBN
+			AND     SRYKA       =   :SRYKA
+                        AND ((  ZAINUM1     =   :ZAINUM1 )
+                        OR   (  ZAINUM2    =    :ZAINUM2 )
+                        OR   (  ZAINUM3    =    :ZAINUM3 )
+                        OR   (  ZAINUM4    =    :ZAINUM4 )
+                        OR   (  ZAINUM5    =    :ZAINUM5 )
+                        OR   (  ZAINUM6    =    :ZAINUM6 )
+                        OR   (  ZAINUM7    =    :ZAINUM7 )
+                        OR   (  ZAINUM8    =    :ZAINUM8 )
+                        OR   (  ZAINUM9    =    :ZAINUM9 )
+                        OR   (  ZAINUM10   =    :ZAINUM10)
+                        OR   (  ZAINUM12   =    :ZAINUM12)
+                        OR   (  ZAINUM13   =    :ZAINUM13)
+                        OR   (  ZAINUM14   =    :ZAINUM14)
+                        OR   (  ZAINUM15   =    :ZAINUM15))
+			ORDER   BY        SRYYMD,
+                                          RENNUM,
+                                          DOUJI_RENNUM,
+			                  EDANUM
+		;
+	};
+};
+
+
+path	key64	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key64_csr CURSOR FOR
+		SELECT a.*
+                FROM tbl_jyurrk a,tbl_ptnum b,tbl_ptinf c
+			WHERE a.HOSPNUM      =   :HOSPNUM
+			AND   a.NYUGAIKBN    =   :NYUGAIKBN
+			AND   (a.SRYYMD      >= :SRYYMD
+			AND    a.SRYYMD      <= :UPSRYYMD)
+			AND   a.HKNCOMBINUM  <>  '9999'
+	        	AND   a.HOSPNUM     =  b.HOSPNUM
+	        	AND   a.PTID        =  b.PTID
+	        	AND   a.HOSPNUM     =  c.HOSPNUM
+	        	AND   a.PTID        =  c.PTID
+        		AND   c.TSTPTNUMKBN  <> '1'
+			ORDER   BY        c.KANANAME,
+			                  b.PTNUM,
+			                  a.SRYYMD,
+			                  a.DENPNUM,
+			                  a.EDANUM
+		;
+	};
+};
+
 

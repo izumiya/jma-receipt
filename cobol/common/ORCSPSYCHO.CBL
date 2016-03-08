@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
       *****************************************************************
       *
       *
@@ -45,6 +46,8 @@
        01  FLG-AREA.
            03  FLG-CHK                 PIC 9(01).
            03  FLG-ERR                 PIC 9(01).
+      *H28.4
+           03  FLG-PSYCHOTROPIC        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -73,15 +76,19 @@
       *
       *
       *    向精神薬成分コードテーブル
-           COPY    "CMPSYCHOTROPIC.INC".
+      ***  COPY    "CMPSYCHOTROPIC.INC".
       *
       *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
       *
-      *    COPY    "MCPAREA".
-      *    COPY    "MCPDATA.INC".
+           COPY    "MCPAREA".
+           COPY    "MCPDATA.INC".
+      *
+      *    向精神薬成分コード
+       01  PSYCHOTROPIC-REC.
+           COPY    "CPPSYCHOTROPIC.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -135,7 +142,8 @@
       *        薬価基準コードの頭７桁で検索
                MOVE    ORCSPSYCHO-YAKKAKJNCD(IDX)
                                            TO  WRK-YAKKAKJNCD
-               PERFORM 2001-EFFECTKBN-CHEK-SEC
+      *****    PERFORM 2001-EFFECTKBN-CHEK-SEC
+               PERFORM 2001-EFFECTKBN-CHEK02-SEC
       *        薬剤の効能区分
                MOVE    WRK-CLASS          TO  ORCSPSYCHO-FFECT-KBN
                                                            (IDX)
@@ -180,6 +188,18 @@
               OR  (TBL-GRP-CNT (4)     >=  4 )
                MOVE    1                   TO  ORCSPSYCHO-TAZAI
            END-IF
+      *H28.4
+      *    多剤投与判定 Ｈ２８年度から
+      *     抗不安薬３種類以上、睡眠薬３種類以上
+      *     抗うつ薬３種類以上、抗精神病薬３種類以上
+           IF     (ORCSPSYCHO-SRYYMD   >=  "20160401")
+               IF     (TBL-GRP-CNT (1)     >=  3 )
+                  OR  (TBL-GRP-CNT (2)     >=  3 )
+                  OR  (TBL-GRP-CNT (3)     >=  3 )
+                  OR  (TBL-GRP-CNT (4)     >=  3 )
+                   MOVE    1                   TO  ORCSPSYCHO-TAZAI
+               END-IF
+           END-IF
       *
            .
        200-MAIN-SYORI-EXT.
@@ -188,26 +208,67 @@
       *****************************************************************
       *    補助マスターチェック処理
       *****************************************************************
-       2001-EFFECTKBN-CHEK-SEC            SECTION.
+      *2001-EFFECTKBN-CHEK-SEC            SECTION.
       *
-           SET     TBL-PSY             TO  1
-           SEARCH      TBL-PSYCHO-OCC  VARYING   TBL-PSY
-                   AT  END
-                       MOVE    ZERO            TO  WRK-CLASS
-                       MOVE    SPACE           TO  WRK-GROUP
-                   WHEN   (WRK-YAKCODE         =   TBL-PSYCHO-CODE
-                                                           (TBL-PSY))
-                   AND   ((WRK-SRYYMD          >=  TBL-PSYCHO-STYMD
-                                                           (TBL-PSY))
-                   AND    (WRK-SRYYMD          <=  TBL-PSYCHO-EDYMD
-                                                           (TBL-PSY)))
-                       MOVE    TBL-PSYCHO-CLASS (TBL-PSY)
-                                                TO  WRK-CLASS
-                       MOVE    TBL-PSYCHO-GROUP (TBL-PSY)
-                                                TO  WRK-GROUP
-           END-SEARCH
+      *    SET     TBL-PSY             TO  1
+      *    SEARCH      TBL-PSYCHO-OCC  VARYING   TBL-PSY
+      *            AT  END
+      *                MOVE    ZERO            TO  WRK-CLASS
+      *                MOVE    SPACE           TO  WRK-GROUP
+      *            WHEN   (WRK-YAKCODE         =   TBL-PSYCHO-CODE
+      *                                                    (TBL-PSY))
+      *            AND   ((WRK-SRYYMD          >=  TBL-PSYCHO-STYMD
+      *                                                    (TBL-PSY))
+      *            AND    (WRK-SRYYMD          <=  TBL-PSYCHO-EDYMD
+      *                                                    (TBL-PSY)))
+      *                MOVE    TBL-PSYCHO-CLASS (TBL-PSY)
+      *                                         TO  WRK-CLASS
+      *                MOVE    TBL-PSYCHO-GROUP (TBL-PSY)
+      *                                         TO  WRK-GROUP
+      *    END-SEARCH
+      *    .
+      *2001-EFFECTKBN-CHEK-EXT.
+      *    EXIT.
+      *
+      *****************************************************************
+      *    補助マスターチェック処理
+      *****************************************************************
+       2001-EFFECTKBN-CHEK02-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  WRK-CLASS
+           MOVE    SPACE               TO  WRK-GROUP
+      *
+           MOVE    SPACE               TO  PSYCHOTROPIC-REC
+           INITIALIZE                      PSYCHOTROPIC-REC
+           MOVE    WRK-YAKCODE         TO  PSYCHOTROPIC-CODE
+           MOVE    WRK-SRYYMD          TO  PSYCHOTROPIC-YUKOSTYMD
+           MOVE    WRK-SRYYMD          TO  PSYCHOTROPIC-YUKOEDYMD
+           MOVE    PSYCHOTROPIC-REC    TO  MCPDATA-REC
+           MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PSYCHOTROPIC-REC
+      *
+                   MOVE    PSYCHOTROPIC-CLASS      TO  WRK-CLASS
+                   MOVE    PSYCHOTROPIC-GROUPCODE  TO  WRK-GROUP
+               ELSE
+                   INITIALIZE                  PSYCHOTROPIC-REC
+                   MOVE    1                   TO  FLG-PSYCHOTROPIC
+               END-IF
+           ELSE
+               INITIALIZE                  PSYCHOTROPIC-REC
+               MOVE    1                   TO  FLG-PSYCHOTROPIC
+           END-IF
+           MOVE    "tbl_psychotropic" TO  MCP-TABLE
+           MOVE    "key"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
            .
-       2001-EFFECTKBN-CHEK-EXT.
+       2001-EFFECTKBN-CHEK02-EXT.
            EXIT.
       *
       *****************************************************************
@@ -235,4 +296,46 @@
            .
        2002-CLASS-GROUP-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    クロース処理
+      *****************************************************************
+       990-DBCLOSE-SEC                 SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       990-DBCLOSE-EXT.
+           EXIT.
+      *
       *
