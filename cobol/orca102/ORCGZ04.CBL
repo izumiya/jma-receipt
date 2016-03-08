@@ -46,6 +46,7 @@
       *  03.05.00    NACL-¬ø°π«º  07/05/07  •∞•Î°º•◊ø«Œ≈¬–±˛
       *  04.05.00    NACL-¬¿≈ƒ    10/01/15  ∑ÓæÂ∏¬≤ÛøÙ°¢∑Ó¡Ì≈ÍÕøŒÃ¿ﬂƒÍƒ…≤√
       *  04.06.00    NACL-¬ø°π«º  12/08/16  ¥¸¥÷ —ππ∑Ÿπƒ…≤√
+      *  04.08.00    NACL-¬ø°π«º  16/03/XX  £»£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -210,6 +211,20 @@
       *
                05  SPA-GMN-CHNGCD              PIC X(09).
                05  SPA-GMN-CHNGCDNAME          PIC X(100).
+      *H28.4
+      *        µ¨≥ √±∞ÃøÙ
+               05  SPA-GMN-KIKAKUTANI          PIC 9(05).
+      *        ºæ…€ÃÙ∂Ë ¨
+               05  SPA-GMN-SIPPKBN             PIC 9(01).
+      *        ºæ…€ÃÙ°°π—¬ŒŒÃ£±
+               05  SPA-GMN-SIPRYOU1            PIC 9(03).
+      *        ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£±
+               05  SPA-GMN-SIPIRISU1           PIC 9(03).
+      *        ºæ…€ÃÙ°°π—¬ŒŒÃ£≤
+               05  SPA-GMN-SIPRYOU2            PIC 9(03).
+      *        ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£≤
+               05  SPA-GMN-SIPIRISU2           PIC 9(03).
+      *
       *        ÃÙ∫ﬁ…’≤√æ Û
       *        ¡ÌŒÃ ‘Ω∏
                05  SPA-GMN-SOURYOKBN-G.
@@ -984,6 +999,19 @@
            PERFORM  832-YMDCONV21-SEC
            MOVE  WRK-HENYMDG           TO  SPA-GMN-KEIKASOCHIYMD
       *
+      *H28.4
+      *    µ¨≥ √±∞ÃøÙ
+           MOVE    TNS-SSTKIJUNCD(1)   TO  SPA-GMN-KIKAKUTANI
+      *    ºæ…€ÃÙ∂Ë ¨
+           MOVE    TNS-MEIUSESKB       TO  SPA-GMN-SIPPKBN
+      *    ºæ…€ÃÙ°°π—¬ŒŒÃ£±
+           MOVE    TNS-SSTKIJUNCD(2)   TO  SPA-GMN-SIPRYOU1
+      *    ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£±
+           MOVE    TNS-SSTKIJUNCD(3)   TO  SPA-GMN-SIPIRISU1
+      *    ºæ…€ÃÙ°°π—¬ŒŒÃ£≤
+           MOVE    TNS-SSTKIJUNCD(4)   TO  SPA-GMN-SIPRYOU2
+      *    ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£≤
+           MOVE    TNS-SSTKIJUNCD(5)   TO  SPA-GMN-SIPIRISU2
            .
        3001-SPASET-EXT.
            EXIT.
@@ -1466,6 +1494,16 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    1               TO  FLG-CHNGE
            END-IF
            MOVE    Z04-CHNGCD          TO  SPA-GMN-CHNGCD
+      *H28.4
+      *    µ¨≥ √±∞ÃøÙ
+           MOVE    Z04-KIKAKUTANI      TO  SPA-GMN-KIKAKUTANI
+      *    ºæ…€ÃÙ∂Ë ¨
+           MOVE    Z04-SIPPKBN         TO  SPA-GMN-SIPPKBN
+      *    ºæ…€ÃÙ
+           MOVE    Z04-SIPRYOU1        TO  SPA-GMN-SIPRYOU1
+           MOVE    Z04-SIPIRISU1       TO  SPA-GMN-SIPIRISU1
+           MOVE    Z04-SIPRYOU2        TO  SPA-GMN-SIPRYOU2
+           MOVE    Z04-SIPIRISU2       TO  SPA-GMN-SIPIRISU2
            .
        4101-GMN-SPA-SET-EXT.
            EXIT.
@@ -1540,6 +1578,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *    ∑–≤·¡º√÷«Ø∑Ó∆¸
            IF      SPA-ERRCD           =   SPACE
                PERFORM  523-KEIKASOCHIYMDCHK-SEC
+           END-IF
+      *H28.4
+      *    ºæ…€ÃÙ¥ÿ∑∏
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM  523-SIPPKBN-CHK-SEC
            END-IF
       *    ∆‚…˛ªªƒÍ
            IF      SPA-ERRCD           =   SPACE
@@ -2314,6 +2357,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE  SPA-GMN-SYUSAISKB             TO  TNS-SYUSAISKB
            MOVE  SPA-GMN-SYOMEIKANREN          TO  TNS-SYOMEIKANREN
            MOVE  SPA-NAI-KEIKASOCHIYMD         TO  TNS-KEIKASOCHIYMD
+      *H28.4
+      *    µ¨≥ √±∞ÃøÙ
+           MOVE    SPA-GMN-KIKAKUTANI          TO  TNS-SSTKIJUNCD(1)
+      *    ºæ…€ÃÙ∂Ë ¨
+           MOVE    SPA-GMN-SIPPKBN             TO  TNS-MEIUSESKB
+      *    ºæ…€ÃÙ°°π—¬ŒŒÃ£±
+           MOVE    SPA-GMN-SIPRYOU1            TO  TNS-SSTKIJUNCD(2)
+      *    ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£±
+           MOVE    SPA-GMN-SIPIRISU1           TO  TNS-SSTKIJUNCD(3)
+      *    ºæ…€ÃÙ°°π—¬ŒŒÃ£≤
+           MOVE    SPA-GMN-SIPRYOU2            TO  TNS-SSTKIJUNCD(4)
+      *    ºæ…€ÃÙ°° Ò¡ı∆˛øÙ£≤
+           MOVE    SPA-GMN-SIPIRISU2           TO  TNS-SSTKIJUNCD(5)
       *
            .
       *
@@ -3241,6 +3297,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        524-KANZANCHICHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ºæ…€ÃÙ¥ÿ∑∏•¡•ß•√•Ø
+      *****************************************************************
+       523-SIPPKBN-CHK-SEC        SECTION.
+      *
+           .
+       523-SIPPKBN-CHK-EXT.
+           EXIT.
+      *    
       *****************************************************************
       *    ¡ÌŒÃ ‘Ω∏•¡•ß•√•Ø
       *****************************************************************
@@ -3894,6 +3960,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-GENERICNAME TO  Z04-GENERICNAME
            MOVE    SPA-GMN-GENERICHEN  TO  Z04-GENERICHEN
+      *H28.4
+      *    µ¨≥ √±∞ÃøÙ
+           MOVE    SPA-GMN-KIKAKUTANI  TO  Z04-KIKAKUTANI
+      *    ºæ…€ÃÙ∂Ë ¨
+           MOVE    SPA-GMN-SIPPKBN     TO  Z04-SIPPKBN
+      *    ºæ…€ÃÙ
+           MOVE    SPA-GMN-SIPRYOU1    TO  Z04-SIPRYOU1
+           MOVE    SPA-GMN-SIPIRISU1   TO  Z04-SIPIRISU1
+           MOVE    SPA-GMN-SIPRYOU2    TO  Z04-SIPRYOU2
+           MOVE    SPA-GMN-SIPIRISU2   TO  Z04-SIPIRISU2
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -3992,6 +4068,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       MOVE  "IPNTANICD"        TO  MCP-WIDGET
                   WHEN   40
                       MOVE  "IPNKANZANCHI"     TO  MCP-WIDGET
+      *H28.4
+                  WHEN   42
+                      MOVE  "KIKAKUTANI"       TO  MCP-WIDGET
+                  WHEN   43
+                      MOVE  "SIPPKBN"          TO  MCP-WIDGET
+                  WHEN   44
+                      MOVE  "SIPRYOU1"         TO  MCP-WIDGET
+                  WHEN   45
+                      MOVE  "SIPIRISU1"        TO  MCP-WIDGET
+                  WHEN   46
+                      MOVE  "SIPRYOU2"         TO  MCP-WIDGET
+                  WHEN   47
+                      MOVE  "SIPIRISU2"        TO  MCP-WIDGET
       *
                    WHEN   110  THRU   119
                        COMPUTE ID1             =   SPA-GMN-CUR  -  110
@@ -4072,7 +4161,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "ZOEIZAIKBN"
                    MOVE    16          TO  SPA-GMN-CUR
                WHEN    "CSYYOURYO"
+      *H28         MOVE    17          TO  SPA-GMN-CUR
+      *            µ¨≥ √±∞Ã§ÿ
+                   MOVE    42          TO  SPA-GMN-CUR
+               WHEN    "KIKAKUTANI"
                    MOVE    17          TO  SPA-GMN-CUR
+      *
                WHEN    "YKZKBN"
                    MOVE    18          TO  SPA-GMN-CUR
                WHEN    "ZAIGATAKBN"
@@ -4089,13 +4183,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    23          TO  SPA-GMN-CUR
                WHEN    "SYUSAISKB"
       *D           MOVE    24          TO  SPA-GMN-CUR
-                   MOVE    36          TO  SPA-GMN-CUR
+      *H28         MOVE    36          TO  SPA-GMN-CUR
+      *            ∑–≤·¡º√÷§ÿ
+                   MOVE    25          TO  SPA-GMN-CUR
       *
                WHEN    "SYOMEIKANREN"
-                   MOVE    25          TO  SPA-GMN-CUR
+      *H28         MOVE    25          TO  SPA-GMN-CUR
+      *            ºæ…€ÃÙ¥ÿ∑∏
+                   MOVE    43          TO  SPA-GMN-CUR
+      *        ºæ…€ÃÙ
+               WHEN    "SIPPKBN"
+                   MOVE    44          TO  SPA-GMN-CUR
+               WHEN    "SIPRYOU1"
+                   MOVE    45          TO  SPA-GMN-CUR
+               WHEN    "SIPIRISU1"
+                   MOVE    46          TO  SPA-GMN-CUR
+               WHEN    "SIPRYOU2"
+                   MOVE    47          TO  SPA-GMN-CUR
+               WHEN    "SIPIRISU2"
+                   MOVE    21          TO  SPA-GMN-CUR
+      *∑–≤·¡º√÷«Ø∑Ó∆¸
                WHEN    "KEIKASOCHIYMD"
       ******       MOVE    26          TO  SPA-GMN-CUR
-                   MOVE    21          TO  SPA-GMN-CUR
+      *H28.4       MOVE    21          TO  SPA-GMN-CUR
+                   MOVE    36          TO  SPA-GMN-CUR
       *
                WHEN    "INPCHKKBN"
       **********   MOVE    27          TO  SPA-GMN-CUR

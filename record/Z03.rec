@@ -185,6 +185,9 @@ Z03 {
         DPCKBN {
           numdata number(1);
         };
+        ROSAIKBN { #GtkNumberEntry
+          numdata number(1);
+        };
       };
       fixed10 {
         JITUDAY {
@@ -385,6 +388,15 @@ Z03 {
         TIMEMASUIKBN {
           numdata number(1);
         };
+        HISINSYUMONKSN { #GtkNumberEntry
+          numdata number(1);
+        };
+        TOUKETUHOZONKSN { #GtkNumberEntry
+          numdata number(1);
+        };
+        SISIKSN { #GtkNumberEntry
+          numdata number(1);
+        };
       };
       fixed12 {
         SSTKIJUNCD1 {
@@ -467,6 +479,9 @@ Z03 {
         };
         KOUHYOJYUNNUM {
           numdata number(9);
+        };
+        KUBUNBANGOU { #GtkPandaEntry
+          textdata varchar(30);
         };
       };
     };

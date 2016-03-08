@@ -53,6 +53,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/11/XX  APIV3(HAORI)ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -972,6 +973,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN28-CHKHKTBYO-AREA    TO  WRK-CONF-CDATA
            END-IF
            MOVE    "TIIKIHOKATU"           TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+      *H28.4
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ
+           IF      SPA-GMN28-NNCHIKBN  =   ZERO
+               MOVE    SPACE           TO  SPA-GMN28-NNCHIKBN
+           END-IF
+           MOVE    SPA-GMN28-NNCHIKBN      TO  WRK-CONF-CDATA
+           MOVE    "NINTIHOKATU"           TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ
+           IF      SPA-GMN28-SYOUNIKBN =   ZERO
+               MOVE    SPACE           TO  SPA-GMN28-SYOUNIKBN
+           END-IF
+           MOVE    SPA-GMN28-SYOUNIKBN     TO  WRK-CONF-CDATA
+           MOVE    "SYOUNIKAKARI"          TO  WRK-CONF-CKEY
            PERFORM 2111-PTCONF-DBSYORI-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT

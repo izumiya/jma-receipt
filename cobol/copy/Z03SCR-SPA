@@ -228,6 +228,8 @@
                    07  SPA-GMN-TSUSOKUAGE      PIC 9(1).
                    07  SPA-GMN-KGNAGE          PIC X(2).
                    07  SPA-GMN-JGNAGE          PIC X(2).
+      *            労災算定不可区分
+                   07  SPA-GMN-ROSAIKBN        PIC 9(01).
       *            採血料区分
                    07  SPA-GMN-SAIKETUKBN-G.
                        09  SPA-GMN-SAIKETUKBN  PIC X(01).
@@ -325,6 +327,14 @@
                    07  SPA-GMN-NYUKHNKSNKBN    PIC 9(3).
                    07  SPA-GMN-KANGOKSN        PIC 9(2).
                    07  SPA-GMN-CHIIKIKSN       PIC 9(1).
+      *H28.4
+      *            非侵襲的血行動態モニタリング加算
+                   07  SPA-GMN-HISINSYUMONKSN   PIC 9(1).
+      *            凍結保存同種組織加算
+                   07  SPA-GMN-TOUKETUHOZONKSN  PIC 9(1).
+      *            労災四肢加算区分
+                   07  SPA-GMN-SISIKSN          PIC 9(01).
+      *            
                05  SPA-GMN-BANGO.
                    07  SPA-GMN-SSTKIJUNCDTBL   OCCURS 10.
                        09  SPA-GMN-SSTKIJUNCD  PIC 9(4).
@@ -345,6 +355,9 @@
                    07  SPA-GMN-KOKUCHI-KOUBAN  PIC 9(2).
                    07  SPA-GMN-KOKUJISKBKBN1   PIC 9(1).
                    07  SPA-GMN-KOKUJISKBKBN2   PIC 9(1).
+      *H28.4
+      *            点数表区分番号
+                   07  SPA-GMN-KUBUNBANGOU     PIC X(30).
       *
       *    第三画面内容
            03  SPA-NAI-AREA.

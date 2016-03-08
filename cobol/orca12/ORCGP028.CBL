@@ -306,6 +306,11 @@
                    MOVE    "P028_CHKHKTBYO3"    TO  MCP-WIDGET
                WHEN    33
                    MOVE    "P028_CHKHKTBYO4"    TO  MCP-WIDGET
+      *H28.4
+               WHEN    34
+                   MOVE    "P028_NNCHIKBN"     TO  MCP-WIDGET
+               WHEN    35
+                   MOVE    "P028_SYOUNIKBN"    TO  MCP-WIDGET
       *
                WHEN    90
                    MOVE    "B08"                TO  MCP-WIDGET
@@ -376,6 +381,11 @@
                WHEN    "P028_CHKHKTBYO3"
                    MOVE    33              TO  SPA-GMN28-CUR
                WHEN    "P028_CHKHKTBYO4"
+                   MOVE    34              TO  SPA-GMN28-CUR
+      *H28.4
+               WHEN    "P028_NNCHIKBN"
+                   MOVE    35              TO  SPA-GMN28-CUR
+               WHEN    "P028_SYOUNIKBN"
                    MOVE    90              TO  SPA-GMN28-CUR
            END-EVALUATE
       *
@@ -413,6 +423,13 @@
                WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO3"
                WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO4"
                    PERFORM 4802-CHKHTKBYO-SEC
+      *H28.4
+      *    認知症地域包括診療対象
+               WHEN    "CLICKED"       ALSO    "P028_NNCHIKBN"
+                   PERFORM 4802-NNCHIKBN-SEC
+      *    小児かかりつけ診療対象
+               WHEN    "CLICKED"       ALSO    "P028_SYOUNIKBN"
+                   PERFORM 4802-SYOUNIKBN-SEC
       *     以外はエラー
                WHEN    "CLICKED"       ALSO     ANY
                    MOVE    "0110"          TO  SPA-ERRCD
@@ -548,11 +565,59 @@
                    WHEN     3
                        MOVE    33              TO  SPA-GMN28-CUR
                    WHEN     4
-                       MOVE    90              TO  SPA-GMN28-CUR
+      *H28.4           MOVE    90              TO  SPA-GMN28-CUR
+                       MOVE    34              TO  SPA-GMN28-CUR
                END-EVALUATE
            END-IF
           .
        4802-CHKHTKBYO-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    認知症地域包括診療対象処理
+      *****************************************************************
+       4802-NNCHIKBN-SEC        SECTION.
+      *
+           EVALUATE    SPA-GMN28-NNCHIKBN
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN28-NNCHIKBN
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN28-NNCHIKBN
+           END-EVALUATE
+      *
+           MOVE    ZERO                TO  FLG-TOUROKU
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    35              TO  SPA-GMN28-CUR
+           END-IF
+          .
+       4802-NNCHIKBN-EXT.
+           EXIT.
+      *****************************************************************
+      *    小児かかりつけ診療対象処理
+      *****************************************************************
+       4802-SYOUNIKBN-SEC          SECTION.
+      *
+           EVALUATE    SPA-GMN28-SYOUNIKBN
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN28-SYOUNIKBN
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN28-SYOUNIKBN
+           END-EVALUATE
+      *
+           MOVE    ZERO                TO  FLG-TOUROKU
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    90              TO  SPA-GMN28-CUR
+           END-IF
+          .
+       4802-SYOUNIKBN-EXT.
            EXIT.
       *
       *****************************************************************

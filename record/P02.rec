@@ -1280,6 +1280,12 @@ P02 {
         P028_CHKHKTBYO4 {
           isactive bool;
         };
+        P028_NNCHIKBN {
+          isactive bool;
+        };
+        P028_SYOUNIKBN {
+          isactive bool;
+        };
       };
     };
   };

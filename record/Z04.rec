@@ -335,5 +335,23 @@ Z04 {
     TUKIJGNTOUYORYO {
       numdata number(8,3);
     };
+    KIKAKUTANI { #GtkNumberEntry
+      numdata number(5);
+    };
+    SIPPKBN { #GtkNumberEntry
+      numdata number(1);
+    };
+    SIPRYOU1 { #GtkNumberEntry
+      numdata number(3);
+    };
+    SIPIRISU1 { #GtkNumberEntry
+      numdata number(3);
+    };
+    SIPRYOU2 { #GtkNumberEntry
+      numdata number(3);
+    };
+    SIPIRISU2 { #GtkNumberEntry
+      numdata number(3);
+    };
   };
 };

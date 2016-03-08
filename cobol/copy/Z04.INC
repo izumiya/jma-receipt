@@ -177,4 +177,17 @@
                 04  Z04-VALUE   PIC X(200).
               03  Z04-TUKIJGNKAISU  PIC S9(3).
               03  Z04-TUKIJGNTOUYORYO  PIC S9(5)V9(3).
+              03  Z04-KIKAKUTANI.
+                04  Z04-NUMDATA PIC S9(5).
+              03  Z04-SIPPKBN.
+                04  Z04-NUMDATA PIC S9(1).
+              03  Z04-SIPRYOU1.
+                04  Z04-NUMDATA PIC S9(3).
+              03  Z04-SIPIRISU1.
+                04  Z04-NUMDATA PIC S9(3).
+              03  Z04-SIPRYOU2.
+                04  Z04-NUMDATA PIC S9(3).
+              03  Z04-SIPIRISU2.
+                04  Z04-NUMDATA PIC S9(3).
+
 

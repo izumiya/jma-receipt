@@ -58,6 +58,7 @@
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/06/16  ¿ÇÎÅ²Ê¡¦ÊÝ¸±ÁÈ¹ç¤»·ï¿ôÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/08/05  ÎÎ¼ý¡¦ÌÀºÙ¡¡ÀÁµá½ñÉÔÍ×ÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/11/XX  ¥ì¥»¥×¥ÈÊ¬³ä£µ£°·ïÂ¾ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2948,6 +2949,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
                        MOVE    PTCONF-CDATA(1:4)
                                            TO  SPA-GMN28-CHKHKTBYO-AREA
+      *H28.4
+                   WHEN    "NINTIHOKATU"
+      *            Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-NNCHIKBN
+                   WHEN    "SYOUNIKAKARI"
+      *            ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-SYOUNIKBN
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -5110,6 +5120,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "T"                 TO  P02-P028-CHKHKTBYO4
            ELSE
                MOVE    "F"                 TO  P02-P028-CHKHKTBYO4
+           END-IF
+      *H28.4
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý
+           IF      SPA-GMN28-NNCHIKBN  =   "1"
+               MOVE    "T"                 TO  P02-P028-NNCHIKBN
+           ELSE
+               MOVE    "F"                 TO  P02-P028-NNCHIKBN
+           END-IF
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÂÐ¾Ý
+           IF      SPA-GMN28-SYOUNIKBN  =   "1"
+               MOVE    "T"                 TO  P02-P028-SYOUNIKBN
+           ELSE
+               MOVE    "F"                 TO  P02-P028-SYOUNIKBN
            END-IF
            .
        2001-P028-SET-EXT.

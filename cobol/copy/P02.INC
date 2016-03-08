@@ -935,6 +935,10 @@
                     06  P02-VALUE   PIC X.
                   05  P02-P028-CHKHKTBYO4.
                     06  P02-VALUE   PIC X.
+                  05  P02-P028-NNCHIKBN.
+                    06  P02-VALUE   PIC X.
+                  05  P02-P028-SYOUNIKBN.
+                    06  P02-VALUE   PIC X.
 
 
 

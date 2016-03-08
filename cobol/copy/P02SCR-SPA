@@ -1275,6 +1275,10 @@
                05  SPA-GMN28-CHKHKTBYO-AREA.
                    07  SPA-GMN28-CHKHKTBYO         PIC X(01)
                                                    OCCURS   4.
+      *    認知症地域包括診療対象
+               05  SPA-GMN28-NNCHIKBN          PIC X(01).
+      *    小児かかりつけ診療対象
+               05  SPA-GMN28-SYOUNIKBN         PIC X(01).
       *
       *
       *    P0201（未登録受付者一覧）

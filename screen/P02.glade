@@ -12463,6 +12463,66 @@
               <after>True</after>
             </signal>
           </widget>
+          <widget>
+            <class>GtkCheckButton</class>
+            <name>P028_NNCHIKBN</name>
+            <x>616</x>
+            <y>490</y>
+            <width>194</width>
+            <height>24</height>
+            <visible>True</visible>
+            <sensitive>True</sensitive>
+            <can_focus>True</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <label>認知症地域包括診療料算定</label>
+            <relief>GTK_RELIEF_NORMAL</relief>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <response_id>0</response_id>
+            <active>False</active>
+            <draw_indicator>True</draw_indicator>
+            <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
+              <name>clicked</name>
+              <handler>send_event</handler>
+              <data>CLICKED</data>
+              <after>True</after>
+            </signal>
+          </widget>
+          <widget>
+            <class>GtkCheckButton</class>
+            <name>P028_SYOUNIKBN</name>
+            <x>616</x>
+            <y>524</y>
+            <width>190</width>
+            <height>24</height>
+            <visible>True</visible>
+            <sensitive>True</sensitive>
+            <can_focus>True</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <label>小児かかりつけ診療料算定</label>
+            <relief>GTK_RELIEF_NORMAL</relief>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <response_id>0</response_id>
+            <active>False</active>
+            <draw_indicator>True</draw_indicator>
+            <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
+              <name>clicked</name>
+              <handler>send_event</handler>
+              <data>CLICKED</data>
+              <after>True</after>
+            </signal>
+          </widget>
         </widget>
         <widget>
           <class>GtkLabel</class>
