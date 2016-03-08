@@ -66,6 +66,7 @@
       * 04.07.00     NACL-多々納  14/06/XX  外用薬（臨時投薬）対応
       * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       * 04.07.00     NACL-多々納  15/03/XX  Ｈ２７年４月改正対応他
+      * 04.08.00     NACL-多々納  16/03/XX  Ｈ２８年４月改正対応他
       *****************************************************************
       *
       *
@@ -840,6 +841,16 @@
                            MOVE    "0505"          TO  SPA-ERRCD
                            MOVE    "1"             TO  SPA-COM-CUR(IDX)
                        END-IF
+                   END-IF
+      *H28.? (保留)
+      *            初診・再診加算のみはＨ２８年４月から
+                   IF      WRK-SRYSYUKBN       =   "114"
+                                               OR  "124"
+                                               OR  "133"
+      *?               IF      SPA-SRYYMD          <   "20160401"
+                           MOVE    "0506"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  SPA-COM-CUR(IDX)
+      *?               END-IF
                    END-IF
                WHEN    OTHER
       *        その他
@@ -2059,6 +2070,12 @@
                        WHEN    "099209902"
       *                後発医薬品への変更不可
                        WHEN    "099209904"
+      *H28.4           湿布薬枚数制限解除
+                       WHEN    "099200201"
+      *                保険医療機関へ疑義照会した上で調剤
+                       WHEN    "099209921"
+      *                保険医療機関へ情報提供
+                       WHEN    "099209922"
                            MOVE    "98"            TO  SPA-COM-SRYKBN
                                                                   (IDX)
                            MOVE    "980"           TO  SPA-COM-SRYSYUKBN
@@ -2742,6 +2759,16 @@
       *        病理診断加算のみ
                IF     (WRK-SRYSYUKBN           =   "643" )  AND
                       (SPA-COM-TNSSRYKBN (IDX) =   "64"  )
+                   MOVE    1               TO  FLG-ARI
+               END-IF
+      *H28.1
+      *        初診・再診加算のみ
+               IF    ((WRK-SRYSYUKBN           =   "114" )  AND
+                      (SPA-COM-TNSSRYKBN (IDX) =   "11"  ))
+               OR    ((WRK-SRYSYUKBN           =   "124" )  AND
+                      (SPA-COM-TNSSRYKBN (IDX) =   "12"  ))
+               OR    ((WRK-SRYSYUKBN           =   "133" )  AND
+                      (SPA-COM-TNSSRYKBN (IDX) =   "13"  ))
                    MOVE    1               TO  FLG-ARI
                END-IF
            END-IF
