@@ -188,6 +188,7 @@
            03  WRK-5020-STYUKYMD                   PIC X(08).
            03  WRK-5020-EDYUKYMD                   PIC X(08).
            03  WRK-NYUKSN-MAX                      PIC 9(03).
+           03  WRK-TEXT                            PIC X(500).
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
@@ -200,6 +201,8 @@
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
       *
+           03  CONST-H280401           PIC X(08)   VALUE "20160401".
+           03  CONST-H280331           PIC X(08)   VALUE "20160331".
            03  CONST-H260401           PIC X(08)   VALUE "20140401".
            03  CONST-H260331           PIC X(08)   VALUE "20140331".
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
@@ -258,6 +261,37 @@
                05  CONST-NYUKSN-MAX    PIC 9(05)   VALUE   20.
                05  CONST-NYUKSN-H2604-MAX
                                        PIC 9(05)   VALUE   21.
+               05  CONST-NYUKSN-H2804-MAX
+                                       PIC 9(05)   VALUE   22.
+               05  CONST-NYUKSN-H2804-G.
+      *            ÉÂ±¡¤ÎÍÄ»ù²Ã»»¤Ï¾ÊÎ¬¡Ê»»Äê»þ¤Ë¡¢ÆýÍÄ»ù²Ã»»¤«¤éÃÖ¤­´¹¤¨¤ë¤è¤¦¤Ë¤¹¤ë¡£¡Ë
+                   07  CONST-NYUKSN-H2804-VAL.
+                       09              PIC X(09)   VALUE   "190190410".
+                       09              PIC X(09)   VALUE   "190190510".
+                       09              PIC X(09)   VALUE   "190190610".
+                       09              PIC X(09)   VALUE   "190099870".
+                       09              PIC X(09)   VALUE   "190117170".
+                       09              PIC X(09)   VALUE   "190119910".
+                       09              PIC X(09)   VALUE   "190172170".
+                       09              PIC X(09)   VALUE   "190100370".
+                       09              PIC X(09)   VALUE   "190100470".
+                       09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100970".
+                       09              PIC X(09)   VALUE   "190117270".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190120510".
+                       09              PIC X(09)   VALUE   "190136910".
+                       09              PIC X(09)   VALUE   "190147210".
+                       09              PIC X(09)   VALUE   "190147310".
+                       09              PIC X(09)   VALUE   "190147470".
+                       09              PIC X(09)   VALUE   "190147510".
+                       09              PIC X(09)   VALUE   "190191810".
+                       09              PIC X(09)   VALUE   "190191910".
+                       09              PIC X(09)   VALUE   "190192010".
+                   07  CONST-NYUKSN-H2804-R
+                               REDEFINES   CONST-NYUKSN-H2804-VAL.
+                       09  CONST-NYUKSN-H2804
+                                       PIC X(09)   OCCURS   22.
                05  CONST-NYUKSN-H2604-G.
                    07  CONST-NYUKSN-H2604-VAL.
                        09              PIC X(09)   VALUE   "190171810".
@@ -418,6 +452,19 @@
       *
       *    ÃÏ°è²Ã»»¾ðÊó
            03  CONST-CHIIKIKSN-SRYCD-AREA.
+               05  CONST-CHIIKIKSN-H2804-G.
+                   07  CONST-CHIIKIKSN-H2804-VAL.
+                       09              PIC X(09)   VALUE   "190077070".
+                       09              PIC X(09)   VALUE   "190077170".
+                       09              PIC X(09)   VALUE   "190120010".
+                       09              PIC X(09)   VALUE   "190077270".
+                       09              PIC X(09)   VALUE   "190120110".
+                       09              PIC X(09)   VALUE   "190077370".
+                       09              PIC X(09)   VALUE   "190191310".
+                   07  CONST-CHIIKIKSN-H2804-R
+                           REDEFINES   CONST-CHIIKIKSN-H2804-VAL.
+                       09  CONST-CHIIKIKSN-H2804
+                                       PIC X(09)   OCCURS  7.
                05  CONST-CHIIKIKSN-H1804-G.
                    07  CONST-CHIIKIKSN-H1804-VAL.
                        09              PIC X(09)   VALUE   "190077070".
@@ -426,10 +473,11 @@
                        09              PIC X(09)   VALUE   "190077270".
                        09              PIC X(09)   VALUE   "190120110".
                        09              PIC X(09)   VALUE   "190077370".
+                       09              PIC X(09)   VALUE   "         ".
                    07  CONST-CHIIKIKSN-H1804-R
                            REDEFINES   CONST-CHIIKIKSN-H1804-VAL.
                        09  CONST-CHIIKIKSN-H1804
-                                       PIC X(09)   OCCURS  6.
+                                       PIC X(09)   OCCURS  7.
                05  CONST-CHIIKIKSN-SRYCD-G.
                    07  CONST-CHIIKIKSN-SRYCD-VAL.
                        09              PIC X(09)   VALUE   "190077070".
@@ -438,10 +486,11 @@
                        09              PIC X(09)   VALUE   "190077370".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "         ".
                    07  CONST-CHIIKIKSN-SRYCD-R
                            REDEFINES   CONST-CHIIKIKSN-SRYCD-VAL.
                        09  CONST-CHIIKIKSN-SRYCD
-                                       PIC X(09)   OCCURS  6.
+                                       PIC X(09)   OCCURS  7.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -803,7 +852,27 @@
       *****************************************************************
        310-CHIIKIKSNLST-SET-SEC        SECTION.
       *
-           IF    ( SPA-W01-EDYUKYMD    >=  CONST-H180401 )
+           EVALUATE    TRUE
+           WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H280401 )
+      *
+               MOVE    7               TO  SPA-GMN-W24-CHIIKIKSN-MAX
+      *
+               MOVE    "1"             TO  SPA-GMN-W24-CHIIKIKSNL(1)
+               MOVE    "£±µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(1)
+               MOVE    "2"             TO  SPA-GMN-W24-CHIIKIKSNL    (2)
+               MOVE    "£²µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(2)
+               MOVE    "3"             TO  SPA-GMN-W24-CHIIKIKSNL    (3)
+               MOVE    "£³µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(3)
+               MOVE    "4"             TO  SPA-GMN-W24-CHIIKIKSNL    (4)
+               MOVE    "£´µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(4)
+               MOVE    "5"             TO  SPA-GMN-W24-CHIIKIKSNL    (5)
+               MOVE    "£µµéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(5)
+               MOVE    "6"             TO  SPA-GMN-W24-CHIIKIKSNL    (6)
+               MOVE    "£¶µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(6)
+               MOVE    "7"             TO  SPA-GMN-W24-CHIIKIKSNL    (7)
+               MOVE    "£·µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(7)
+           WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H180401 )
+      *
                MOVE    6               TO  SPA-GMN-W24-CHIIKIKSN-MAX
       *
                MOVE    "1"             TO  SPA-GMN-W24-CHIIKIKSNL(1)
@@ -818,7 +887,8 @@
                MOVE    "£µµéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(5)
                MOVE    "6"             TO  SPA-GMN-W24-CHIIKIKSNL    (6)
                MOVE    "£¶µéÃÏÃÏ°è²Ã»»" TO  SPA-GMN-W24-CHIIKIKSNMEIL(6)
-           ELSE
+      *
+           WHEN    OTHER
                MOVE    4               TO  SPA-GMN-W24-CHIIKIKSN-MAX
       *
                MOVE    "1"             TO  SPA-GMN-W24-CHIIKIKSNL    (1)
@@ -829,7 +899,7 @@
                MOVE    "£³¼ïÃÏ°è²Ã»»"  TO  SPA-GMN-W24-CHIIKIKSNMEIL (3)
                MOVE    "4"             TO  SPA-GMN-W24-CHIIKIKSNL    (4)
                MOVE    "£´¼ïÃÏ°è²Ã»»"  TO  SPA-GMN-W24-CHIIKIKSNMEIL (4)
-           END-IF
+           END-EVALUATE
       *
            .
        310-CHIIKIKSNLST-SET-EXT.
@@ -4691,6 +4761,9 @@
            MOVE    ZERO                TO  WRK-MAX
       *
            EVALUATE    TRUE
+           WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H280401 )
+               MOVE    CONST-NYUKSN-H2804-MAX
+                                           TO  WRK-NYUKSN-MAX
            WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H260401 )
                MOVE    CONST-NYUKSN-H2604-MAX
                                            TO  WRK-NYUKSN-MAX
@@ -4704,6 +4777,9 @@
                MOVE    SPACE           TO  WRK-KSNCD
       *
                EVALUATE    TRUE
+               WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H280401 )
+                   MOVE    CONST-NYUKSN-H2804 (IDX0)
+                                   TO  WRK-KSNCD
                WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H260401 )
                    MOVE    CONST-NYUKSN-H2604 (IDX0)
                                    TO  WRK-KSNCD
@@ -4838,8 +4914,24 @@
                                    TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( FLG-TENSU   =   ZERO )
-                   MOVE    TNS-NAME
+                   IF    ( SPA-W01-STYUKYMD    >=  CONST-H280401 )
+                    AND  ( TNS-SRYCD            =  "190100470" )
+                       MOVE    TNS-NAME
+                                   TO WRK-TEXT
+                       MOVE    "190100770"
+                                   TO  WRK-SRYCD
+                       PERFORM 900-TENSU-KEY-SEL-SEC
+                       MOVE    SPACE
                                    TO  SPA-GMN-W24-NYUKSNMEI (IDX0)
+                       STRING  WRK-TEXT        DELIMITED BY SPACE
+                               "¡¦"
+                               TNS-NAME        DELIMITED BY SPACE
+                       INTO    SPA-GMN-W24-NYUKSNMEI (IDX0)
+                       END-STRING
+                   ELSE
+                       MOVE    TNS-NAME
+                                   TO  SPA-GMN-W24-NYUKSNMEI (IDX0)
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -5552,7 +5644,7 @@
            MOVE    "Æþ±¡²ñ·×É½¼¨¾ðÊó"          TO  W24-FRAME4-LABEL
            MOVE    "ÁªÄêÆþ±¡ÎÁ"                TO  W24-FRAME5-LABEL
       *
-           MOVE    "±ÉÍÜ´ÉÍý·Ð²áÁ¼ÃÖ"          TO  W24-LBLEIYOUKSN
+           MOVE    "±ÉÍÜ´ÉÍýÂÎÀ©"              TO  W24-LBLEIYOUKSN
       *
            IF    ( SPA-HOSPSBT         =   2 )
             AND  ( SPA-W01-STYUKYMD   >=   CONST-H260401 )
@@ -6260,6 +6352,10 @@
       *
            MOVE    CONST-H260401   TO  WRK-KAISEISTYMD
            MOVE    CONST-H260331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           MOVE    CONST-H280401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H280331   TO  WRK-KAISEIEDYMD
            PERFORM 8001-KAISEI-CHK-SEC
       *
            .

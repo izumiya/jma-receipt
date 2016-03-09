@@ -30,7 +30,10 @@
                 05  W20-B10-STATE          PIC S9(9)   BINARY.
               04  W20-B12-STATE            PIC S9(9)   BINARY.
               04  W20-KJNYMD               PIC X(10).
-              04  W20-BTUNUM               PIC S9(2).
+              04  W20-BTUSELNUM            PIC S9(2).
+              04  W20-BTUNUM-G.
+                05  W20-BTUNUM             PIC S9(2).
+                05  W20-BTUNUM-STATE       PIC S9(9)   BINARY.
       *
               04  W20-NAME-G.
                 05  W20-NAME               PIC X(20).
@@ -87,10 +90,10 @@
               04  W20-LBLYKNCHOKAKBN          PIC X(40).
       *
               04  W20-CMB-YKNCHOKAKBN.
-                05  W20-YKNCHOKAKBN           PIC X(22).
+                05  W20-YKNCHOKAKBN           PIC X(52).
                 05  W20-YKNCHOKAKBN-STATE     PIC S9(9)   BINARY.
                 05  W20-YKNCHOKAKBN-CNT       PIC S9(9)   BINARY.
-                05  W20-YKNCHOKAKBN-ITM       PIC X(22)   OCCURS  10.
+                05  W20-YKNCHOKAKBN-ITM       PIC X(52)   OCCURS  10.
                 05  W20-YKNCHOKAKBN-ITM-STATE PIC S9(9)   BINARY.
       *
               04  W20-CMB-RECEDSPKBN.
@@ -103,6 +106,13 @@
                 05  W20-RECEDSPKBN-ITM     PIC X(13)   OCCURS  10.
                 05  W20-RECEDSPKBN-ITM-STATE
                                            PIC S9(9)   BINARY.
+      *
+              04  W20-CMB-BTUTYPE.
+                05  W20-BTUTYPE            PIC X(20).
+                05  W20-BTUTYPE-CNT        PIC S9(9)   BINARY.
+                05  W20-BTUTYPE-ITM        PIC X(20)   OCCURS  5.
+      *
+              04  W20-BTUCD                PIC S9(2).
       *
               04  W20-LBLRYOYOKBN          PIC X(40).
       *
@@ -141,10 +151,10 @@
                       08  W20-KSN-P01-ITM-STATE    PIC S9(9) BINARY.
                   06  W20-LBLKSN-P02-G.
                     07  W20-LBLKSN-P02             PIC X(36)
-                                                   OCCURS      8.
+                                                   OCCURS      16.
       *
                   06  W20-CMB-KSN-P02-G.
-                    07  W20-CMB-KSN-P02-OCC        OCCURS    8.
+                    07  W20-CMB-KSN-P02-OCC        OCCURS    16.
                       08  W20-KSN-P02              PIC X(30).
                       08  W20-KSN-P02-STATE        PIC S9(9) BINARY.
                       08  W20-KSN-P02-CNT          PIC S9(9) BINARY.

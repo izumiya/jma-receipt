@@ -105,7 +105,7 @@
       *
        01  CONST-AREA.
            03  CONST-H240401           PIC X(08) VALUE "20120401".
-           03  CONST-TMEDKBN-MAX       PIC 9(03) VALUE 41.
+           03  CONST-TMEDKBN-MAX       PIC 9(03) VALUE 42.
       *
       *****************************************************************
       *    サブプロ用　領域

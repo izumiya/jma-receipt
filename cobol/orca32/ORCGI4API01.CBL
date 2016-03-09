@@ -120,7 +120,7 @@
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
            03  CONST-ERR-MAX           PIC 9(03)   VALUE 10.
            03  CONST-ODRITEM-MAX       PIC 9(05)   VALUE 30.
-           03  CONST-MED-MAX           PIC 9(03)   VALUE 41.
+           03  CONST-MED-MAX           PIC 9(03)   VALUE 42.
            03  CONST-ADL-MAX           PIC 9(03)   VALUE 4.
       *
            COPY    "COMMON-SPA"        REPLACING   //SPA-//
@@ -756,7 +756,7 @@
       *
            MOVE    SNINF04-SRYYM       TO HSPTEVALMRES-SRYYM
       *
-           PERFORM VARYING IDXA FROM 1 BY 1  UNTIL IDXA > 41
+           PERFORM VARYING IDXA FROM 1 BY 1  UNTIL IDXA > CONST-MED-MAX
       *
                MOVE    SNINF04-MEDKBN-LV (IDXA)
                                        TO HSPTEVALMRES-MEDKBN-LV (IDXA)

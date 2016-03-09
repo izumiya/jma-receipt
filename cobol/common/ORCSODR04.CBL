@@ -100,6 +100,7 @@
            03  ERRCD-ERRCD             PIC X(04).
       *
        01  CONST-AREA.
+           03  CONST-H280401           PIC X(08)   VALUE "20160401".
            03  CONST-ITEMNUM-MAX       PIC 9(05)   VALUE 30.
            03  CONST-SKJRYOYO2         PIC X(09)   VALUE "197000710".
       *
@@ -471,14 +472,26 @@
                IF    ( LNK-ODRITEM-ITEM (IDX-ODR)  =   SPACE )
                    CONTINUE
                ELSE
-                   IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
-                                   = "0" OR "1" OR "2" )
-                       MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                   EVALUATE    TRUE
+                   WHEN  ( SODR-SRYYMD     >   CONST-H280401 )
+                       IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       = "0" OR "1" OR "2" OR "3" )
+                           MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
                                    TO  ITEM-SKJTYPE (CNT-SKJTYPE)
-                   ELSE
-                       MOVE    "0145"      TO  ERRCD-ERRCD
-                       PERFORM 2100-ITEM-ERR-SET-SEC
-                   END-IF
+                       ELSE
+                           MOVE    "0145"      TO  ERRCD-ERRCD
+                           PERFORM 2100-ITEM-ERR-SET-SEC
+                       END-IF
+                   WHEN  OTHER
+                       IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                       = "0" OR "1" OR "2" )
+                           MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                   TO  ITEM-SKJTYPE (CNT-SKJTYPE)
+                       ELSE
+                           MOVE    "0145"      TO  ERRCD-ERRCD
+                           PERFORM 2100-ITEM-ERR-SET-SEC
+                       END-IF
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -947,6 +960,9 @@
                                    TO  WRK-ORDERID
                    WHEN    "2"
                        MOVE    NORDERID-FSPCLID
+                                   TO  WRK-ORDERID
+                   WHEN    "3"
+                       MOVE    NORDERID-FLIQUIDID
                                    TO  WRK-ORDERID
                    END-EVALUATE
       *

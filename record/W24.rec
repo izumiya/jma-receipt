@@ -162,71 +162,71 @@ W24 {
           label varchar(1);
         };
         NYUKSNNM01 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM02 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM03 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM04 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM05 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM06 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM07 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM08 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM09 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM10 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM11 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM12 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM13 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM14 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM15 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM16 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM17 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM18 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM19 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         NYUKSNNM20 {
-          textdata varchar(32);
+          textdata varchar(50);
         };
         CMB_CHIIKIKSN {
           CHIIKIKSN {
             textdata varchar(28);
           };
           count int;
-            item varchar(28)[6];
+            item varchar(28)[7];
         };
       };
     };

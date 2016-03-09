@@ -138,7 +138,13 @@
                05  SYS-5001-KSN2.
                  09  SYS-5001-KSNCD2           PIC X(09) OCCURS 10.
       *予備 ** 予備の後にも項目があるので注意すること **
-               05  SYS-5001-YOBI               PIC X(152).
+               05  SYS-5001-YOBI               PIC X(141).
+      *病棟診療行為コード
+               05  SYS-5001-SRYCD          PIC  X(09).
+      *看護職員数等経過措置区分
+               05  SYS-5001-SYOKUINKBN     PIC  X(01).
+      *夜勤時間特別入院基本料区分
+               05  SYS-5001-YKNTOKUKBN     PIC  X(01).
       *月平均夜勤時間超過減算
                05  SYS-5001-YKNCHOKAKBN    PIC  X(01).
       *診療所一般・療養病床相互算定区分

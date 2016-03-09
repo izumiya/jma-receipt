@@ -143,6 +143,7 @@
            03  IDX-RYO                     PIC 9(05).
            03  IDX-MED                     PIC 9(05).
            03  IDX-ADL                     PIC 9(05).
+           03  IDXM                        PIC 9(05).
            03  IDXK                        PIC 9(05).
            03  IDXR                        PIC 9(05).
       *
@@ -243,6 +244,7 @@
       *
        01  CONST-AREA.
       *
+           03  CONST-H280401           PIC X(08)   VALUE   "20160401".
            03  CONST-H240401           PIC X(08)   VALUE   "20120401".
            03  CONST-H220401           PIC X(08)   VALUE   "20100401".
            03  CONST-H200401           PIC X(08)   VALUE   "20080401".
@@ -1777,7 +1779,6 @@
                        UNTIL ( IDX2 >   MEDH20-MAX )
                         OR   ( SPA-GMN-TNAME   (IDX-LST)
                                        NOT =   SPACE )
-                   DISPLAY IDX2 " MEDH20-ZAINUM:" MEDH20-ZAINUM (IDX2)
                    IF    ( MEDH20-STYMD  (IDX2)
                                       <=   SPA-I40-SRYYMD )
                      AND ( MEDH20-EDYMD  (IDX2)
@@ -1814,8 +1815,30 @@
        31011-EDIT-MEDINF-SEC           SECTION.
       *
            INITIALIZE                  MEDINF-AREA
+           MOVE    ZERO            TO  IDXM
       *
            EVALUATE    TRUE
+           WHEN      ( SPA-I40-SRYYMD  >=  CONST-H280401 )
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   MEDH20-MAX )
+      *
+                   IF    ( SPA-I40-SRYYMD  >=  MEDH20-STYMD (IDX0) )
+                    AND  ( SPA-I40-SRYYMD  <=  MEDH20-EDYMD (IDX0) )
+                       COMPUTE IDXM  = IDXM    +   1
+                       MOVE  IDXM          TO  MEDINF-MAX
+                       MOVE  MEDH20-MEDKBN (IDX0)
+                                           TO  MEDINF-MEDKBN (IDXM)
+                       MOVE  MEDH20-LIMIT (IDX0)
+                                           TO  MEDINF-LIMIT  (IDXM)
+                       MOVE  MEDH20-ALLKBN (IDX0)
+                                           TO  MEDINF-ALLKBN (IDXM)
+                       MOVE  MEDH20-ZAINUM (IDX0)
+                                           TO  MEDINF-ZAINUM (IDXM)
+                       MOVE  MEDH20-CDL (IDX0)
+                                           TO  MEDINF-SRYCD  (IDXM)
+                   END-IF
+      *
+               END-PERFORM
            WHEN      ( SPA-I40-SRYYMD  >=  CONST-H240401 )
                MOVE    CONST-MEDH24-MAX    TO  MEDINF-MAX
                PERFORM VARYING IDX0    FROM    1   BY  1

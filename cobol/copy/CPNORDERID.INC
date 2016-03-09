@@ -308,6 +308,15 @@
                    07  NORDERID-FOODMES2   PIC X(20)
                                            VALUE "¿©»ö".
       *
+               05  NORDERID-FLIQUID-G.
+                   07  NORDERID-FLIQUIDCL1  PIC X(02) VALUE "02".
+                   07  NORDERID-FLIQUIDCL2  PIC X(03) VALUE "021".
+                   07  NORDERID-FLIQUIDID   PIC X(04) VALUE "0307".
+                   07  NORDERID-FLIQUIDMES1 PIC X(30)
+                                           VALUE "·Ð´É±ÉÍÜ".
+                   07  NORDERID-FOODMES2   PIC X(20)
+                                           VALUE "·Ð´É±ÉÍÜ".
+      *
                05  NORDERID-PTEVAL-G.
                    07  NORDERID-PTEVALCL1  PIC X(02) VALUE "XX".
                    07  NORDERID-PTEVALCL2  PIC X(03) VALUE "XXX".
@@ -327,7 +336,7 @@
                                            VALUE "½Ð»º°é»ù°ì»þ¶â¾ðÊó".
       *
            03  NORDERID-R  REDEFINES       NORDERID-VAL.
-               05  NORDERID-OCC            OCCURS    37.
+               05  NORDERID-OCC            OCCURS    38.
                    07  NORDERID-CLAIMID.
                        09  NORDERID-CLAIMIDH   PIC X(02).
                        09  NORDERID-CLAIMIDT   PIC X(03).
@@ -335,4 +344,4 @@
                    07  NORDERID-ORCAMES1       PIC X(30).
                    07  NORDERID-ORCAMES2       PIC X(20).
       *
-           03  NORDERID-MAX                PIC 9(03) VALUE 37.
+           03  NORDERID-MAX                PIC 9(03) VALUE 38.

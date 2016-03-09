@@ -117,6 +117,7 @@
                03  REG-ERRMSG          PIC X(100).
       *
        01  CONST-AREA.
+           03  CONST-H280401           PIC X(08)   VALUE "20160401".
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
            03  CONST-ERR-MAX           PIC 9(03)   VALUE 10.
            03  CONST-ODRITEM-MAX       PIC 9(05)   VALUE 30.
@@ -520,18 +521,40 @@
       *****************************************************************
        10011-GAIHAKUKBN-CHECK-SEC      SECTION.
       *
+           MOVE    SPACE               TO  WRK-ERRCD
+      *
            MOVE    HSACCTMREQ-GAIHAKUKBN
                                        TO  WRK-SNUM-INX
            PERFORM 800-ORCSNUM-SEC
            IF    ( FLG-ORCSNUM         =   ZERO )
-            AND  ( WRK-SNUM-OUTNUM     =   ZERO OR 1 OR 2 OR 3 OR 4 OR 5
-                                           OR 6 OR 7 OR 8 OR 9 OR 13
-                                           OR 99 )
       *
+               EVALUATE    TRUE
+               WHEN  ( HSACCTMREQ-SRYYMD
+                                      >=   CONST-H280401 )
+                   IF    ( WRK-SNUM-OUTNUM =   ZERO OR 1 OR 2  OR 3 OR 4
+                                            OR 5 OR 6  OR 8
+                                            OR 9 OR 13 OR 99 )
+                       CONTINUE
+                   ELSE
+                       MOVE    "8011"  TO  WRK-ERRCD
+                   END-IF
+               WHEN    OTHER
+                   IF    ( WRK-SNUM-OUTNUM =   ZERO OR 1 OR 2  OR 3 OR 4
+                                                OR 5 OR 6  OR 7 OR 8
+                                                OR 9 OR 13 OR 99 )
+                       CONTINUE
+                   ELSE
+                       MOVE    "8011"  TO  WRK-ERRCD
+                   END-IF
+               END-EVALUATE
+           ELSE
+               MOVE    "8011"          TO  WRK-ERRCD
+           END-IF
+      *
+           IF    ( WRK-ERRCD           =   SPACE )
                MOVE    WRK-SNUM-OUTNUM TO  WRK-GAIHAKUKBN
                MOVE    WRK-GAIHAKUKBN-G TO REG-GAIHAKUKBN
            ELSE
-               MOVE    "8011"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
            END-IF
       *

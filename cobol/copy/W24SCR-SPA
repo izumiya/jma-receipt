@@ -134,7 +134,7 @@
                    13  SPA-GMN-W24-NYUKSN-G.
                      15 SPA-GMN-W24-NYUKSN-OCC         OCCURS 20.
                        17 SPA-GMN-W24-CHK-NYUKSN       PIC X(01).
-                       17 SPA-GMN-W24-NYUKSNMEI        PIC X(32).
+                       17 SPA-GMN-W24-NYUKSNMEI        PIC X(50).
       *            √œ∞Ë≤√ªª
                    13  SPA-GMN-W24-CHIIKIKSN-G.
                      15 SPA-GMN-W24-CHIIKIKSN          PIC X(01).
@@ -258,7 +258,7 @@
       *          √œ∞Ë≤√ªª
                  11  SPA-GMN-W24-CHIIKIKSNLST-G.
                    13  SPA-GMN-W24-CHIIKIKSN-MAX       PIC 9(03).
-                   13  SPA-GMN-W24-CHIIKIKSNLST        OCCURS  6.
+                   13  SPA-GMN-W24-CHIIKIKSNLST        OCCURS  7.
                        15  SPA-GMN-W24-CHIIKIKSNL      PIC X(01).
                        15  SPA-GMN-W24-CHIIKIKSNLFL    PIC X(01).
                        15  SPA-GMN-W24-CHIIKIKSNMEIL   PIC X(26).

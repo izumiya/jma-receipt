@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCHCN68.
+       PROGRAM-ID.             ORCHCN68H24.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 入院会計照会
@@ -53,7 +53,7 @@
            COPY    "CPASGNPARA.INC".
       *
       *    帳票領域
-           COPY    "HCN68H28.INC".
+           COPY    "HCN68.INC".
            COPY    "HCN69.INC".
       *
       *    ステータス領域
@@ -85,9 +85,6 @@
                05  WRK-ADLTEN      PIC 9(02).
            03  WRK-PRT-ADLTEN      PIC X(02).
            03  WRK-KANACHK-STR     PIC X(500).
-      *
-       01  CONST-AREA.
-           03  CONST-H2804         PIC X(06)   VALUE   "201604".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -155,21 +152,11 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
-           MOVE    ONPRTDATA-DATA  TO  ORCHCN68AREA
+           PERFORM 100-INIT-SEC
       *
-           IF    ( ORCHCN68-SRYYM  <   CONST-H2804 )
+           PERFORM 200-MAIN-SEC
       *
-               CALL    "ORCHCN68H24"   USING
-                                       SPA-AREA
-                                       ONPRTDATA
-      *
-           ELSE
-               PERFORM 100-INIT-SEC
-      *
-               PERFORM 200-MAIN-SEC
-      *
-               PERFORM 300-END-SEC
-           END-IF
+           PERFORM 300-END-SEC
       *
            EXIT    PROGRAM
            .
@@ -181,6 +168,8 @@
            INITIALIZE                  STS-AREA
            INITIALIZE                  FLG-AREA
            INITIALIZE                  WRK-AREA
+      *
+           MOVE    ONPRTDATA-DATA  TO  ORCHCN68AREA
       *
            PERFORM 800-MCNDATE-SEC
       *
@@ -438,10 +427,8 @@
                    MOVE    36      TO  IDX-MED
                WHEN    2035
                    MOVE    37      TO  IDX-MED
-               WHEN    2038
-                   MOVE    38      TO  IDX-MED
                WHEN    2092
-                   MOVE    39      TO  IDX-MED
+                   MOVE    38      TO  IDX-MED
                END-EVALUATE
       *
                IF    ( IDX-MED         >   ZERO )
@@ -555,7 +542,7 @@
       *    帳票印刷処理
            INITIALIZE                  ORCSMKPRTAREA
            MOVE    "HC01.sh"       TO  MKPRT-ID
-           MOVE    "HCN68H28.red"  TO  MKPRT-DIA
+           MOVE    "HCN68.red"     TO  MKPRT-DIA
            MOVE    SPACE           TO  MKPRT-DEF
            MOVE    ASGNPARA        TO  MKPRT-DAT
            MOVE    SYS-1034-PRTNM(14)
@@ -577,7 +564,7 @@
            MOVE    ORCHCN68-PRTAREA    TO  ORCSPRTAREA
       *
            MOVE    ORCHCN68-PTID       TO  SPRT-PTID
-           MOVE    "HCN68H28.red"      TO  SPRT-PRTID
+           MOVE    "HCN68.red"         TO  SPRT-PRTID
            MOVE    HCN68               TO  SPRT-PRTDATA
            CALL    "ORCSPRT"           USING
                                        ORCSPRTAREA

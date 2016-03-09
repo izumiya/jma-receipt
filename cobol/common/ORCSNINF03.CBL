@@ -115,6 +115,7 @@
                                        BY          //TGAIHAKU//.
       *
        01  CONST-AREA.
+           03  CONST-H2804             PIC X(06)   VALUE "201604".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
            03  CONST-ASA               PIC 9(03)   VALUE 1.
            03  CONST-HIRU              PIC 9(03)   VALUE 2.
@@ -420,39 +421,73 @@
            MOVE    TNACCT-DAY (CONST-GAIHAKU IDXD)
                                    TO  WRK-PTSTATUS-N
            MOVE    WRK-PTSTATUS-N  TO  SNINF03-PTSTATUS-DATA (IDXA)
-           EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
-           WHEN    ZERO
-               MOVE    "Æþ±¡Ãæ"        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    1
-               MOVE    "³°Çñ"          TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    2
-               MOVE    "¼£ÎÅ¤Î°Ù¤Î³°Çñ"
+      *
+           IF    ( KEY-SRYYM       >=  CONST-H2804 )
+               EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
+               WHEN    ZERO
+                   MOVE    "Æþ±¡Ãæ"    TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    1
+                   MOVE    "³°Çñ"      TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    2
+                   MOVE    "¼£ÎÅ¤Î°Ù¤Î³°Çñ"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    3
-               MOVE    "ÁªÄêÆþ±¡Ãæ¤Î³°Çñ"
+               WHEN    3
+                   MOVE    "ÁªÄêÆþ±¡Ãæ¤Î³°Çñ"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    4
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£·£°¡ó¸º"
+               WHEN    4
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£´£°¡ó¸º"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    5
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
+               WHEN    5
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£±£°¡ó¸º"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    6
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£µ£µ¡ó¸º"
+               WHEN    6
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£²£°¡ó¸º"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    7
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£±£µ¡ó¸º"
+               WHEN    8
+                   MOVE    "ÆÃÄê»þ´ÖÂà±¡¸º»»"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    8
-               MOVE    "ÆÃÄê»þ´ÖÂà±¡¸º»»"
+               WHEN    9
+                   MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    9
-               MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»"
+               WHEN    13
+                   MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡ÜÂ¾°åÎÅµ¡´Ø¼õ¿Ç£±£°¡ó¸º"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           WHEN    13
-               MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡ÜÂ¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
+               END-EVALUATE
+           ELSE
+               EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
+               WHEN    ZERO
+                   MOVE    "Æþ±¡Ãæ"    TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    1
+                   MOVE    "³°Çñ"      TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    2
+                   MOVE    "¼£ÎÅ¤Î°Ù¤Î³°Çñ"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
-           END-EVALUATE
+               WHEN    3
+                   MOVE    "ÁªÄêÆþ±¡Ãæ¤Î³°Çñ"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    4
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£·£°¡ó¸º"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    5
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    6
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£µ£µ¡ó¸º"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    7
+                   MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£±£µ¡ó¸º"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    8
+                   MOVE    "ÆÃÄê»þ´ÖÂà±¡¸º»»"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    9
+                   MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               WHEN    13
+                   MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡ÜÂ¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+               END-EVALUATE
+           END-IF
       *
            MOVE    "Ä«¿©"              TO  SNINF03-SKJ-ASA-LBL   (IDXA)
            MOVE    TNACCT-DAY (CONST-ASA IDXD)
@@ -589,15 +624,30 @@
       *
            MOVE    SPACE               TO  WRK-SKJ-NAME
       *
-           EVALUATE    WRK-DAY
-           WHEN    ZERO
-               MOVE    "¿©»ö¤Ê¤·"      TO  WRK-SKJ-NAME
-           WHEN    1
-               MOVE    "¿©»ö¤¢¤ê"      TO  WRK-SKJ-NAME
-           WHEN    2
-               MOVE    "¿©»ö¤¢¤ê¡ÊÆÃÊÌ¿©¡Ë"
+           IF    ( KEY-SRYYM       >=  CONST-H2804 )
+               EVALUATE    WRK-DAY
+               WHEN    ZERO
+                   MOVE    "¿©»ö¤Ê¤·"  TO  WRK-SKJ-NAME
+               WHEN    1
+                   MOVE    "¿©»ö¤¢¤ê"  TO  WRK-SKJ-NAME
+               WHEN    2
+                   MOVE    "¿©»ö¤¢¤ê¡ÊÆÃÊÌ¿©¡Ë"
                                        TO  WRK-SKJ-NAME
-           END-EVALUATE
+               WHEN    3
+                   MOVE    "¿©»ö¤¢¤ê¡ÊÎ®Æ°¿©¡Ë"
+                                       TO  WRK-SKJ-NAME
+               END-EVALUATE
+           ELSE
+               EVALUATE    WRK-DAY
+               WHEN    ZERO
+                   MOVE    "¿©»ö¤Ê¤·"  TO  WRK-SKJ-NAME
+               WHEN    1
+                   MOVE    "¿©»ö¤¢¤ê"  TO  WRK-SKJ-NAME
+               WHEN    2
+                   MOVE    "¿©»ö¤¢¤ê¡ÊÆÃÊÌ¿©¡Ë"
+                                       TO  WRK-SKJ-NAME
+               END-EVALUATE
+           END-IF
       *
           .
        200111-SKJ-EDIT-EXT.

@@ -111,6 +111,7 @@
       *
       *    ∏«ƒÍ√ÕŒŒ∞Ë
        01  CONST-AREA.
+           03  CONST-H280401           PIC X(08)   VALUE "20160401".
            03  CONST-SRYTBLP-MAX       PIC 9(05)   VALUE   20.
            03  CONST-SRYTBLC-MAX       PIC 9(05)   VALUE   20.
       *
@@ -469,6 +470,7 @@
                                                OR  NORDERID-FSELECL2
                                                OR  NORDERID-FSTOPCL2
                                                OR  NORDERID-FSPSLCL2
+                                               OR  NORDERID-FLIQUIDCL2
                                                                      )
                            COMPUTE CNT-IDOKBN  =   CNT-IDOKBN  +   1
                            MOVE    LF04-IJICD (IDXA IDXB)
@@ -499,35 +501,48 @@
            IF    ( CNT-ORDER           <=  ZERO )
                MOVE    "0009"          TO  ERRCD-KHNERR
                PERFORM 1001-KIHON-ERRSET-SEC
-               GO  TO  20011-NYUINIDOKBN-CHK-EXT
            END-IF
       *
-           IF    ( CNT-IDOKBN          <=  ZERO )
-               MOVE    "0008"          TO  ERRCD-KHNERR
-               PERFORM 1001-KIHON-ERRSET-SEC
-               GO  TO  20011-NYUINIDOKBN-CHK-EXT
+           IF    ( ERRCD-KHNERR         =  SPACE )
+               IF    ( CNT-IDOKBN          <=  ZERO )
+                   MOVE    "0008"          TO  ERRCD-KHNERR
+                   PERFORM 1001-KIHON-ERRSET-SEC
+               END-IF
            END-IF
       *
-           IF    ( CNT-ORDER           >   1 )
-               MOVE    "0011"          TO  ERRCD-KHNERR
-               PERFORM 1001-KIHON-ERRSET-SEC
-               GO  TO  20011-NYUINIDOKBN-CHK-EXT
+           IF    ( ERRCD-KHNERR         =  SPACE )
+               IF    ( CNT-ORDER           >   1 )
+                   MOVE    "0011"          TO  ERRCD-KHNERR
+                   PERFORM 1001-KIHON-ERRSET-SEC
+               END-IF
            END-IF
       *
-           IF    ( CNT-IDOKBN          >   1 )
-               MOVE    "0012"          TO  ERRCD-KHNERR
-               PERFORM 1001-KIHON-ERRSET-SEC
-               GO  TO  20011-NYUINIDOKBN-CHK-EXT
+           IF    ( ERRCD-KHNERR         =  SPACE )
+               IF    ( CNT-IDOKBN          >   1 )
+                   MOVE    "0012"          TO  ERRCD-KHNERR
+                   PERFORM 1001-KIHON-ERRSET-SEC
+               END-IF
            END-IF
       *
-           IF    ( WRK-IDOKBN          =   NORDERID-FSELECL2
-                                       OR  NORDERID-FSPSLCL2
+           IF    ( ERRCD-KHNERR         =  SPACE )
+               IF    ( WRK-IDOKBN          =   NORDERID-FSELECL2
+                                           OR  NORDERID-FSPSLCL2
                                                              )
-               MOVE    "0135"          TO  ERRCD-KHNERR
-               PERFORM 1001-KIHON-ERRSET-SEC
-               GO  TO  20011-NYUINIDOKBN-CHK-EXT
+                   MOVE    "0135"          TO  ERRCD-KHNERR
+                   PERFORM 1001-KIHON-ERRSET-SEC
+               END-IF
            END-IF
       *
+           IF    ( ERRCD-KHNERR         =  SPACE )
+               IF    ( SCL31N-SRYYMD      >=   CONST-H280401 )
+                   CONTINUE
+               ELSE
+                   IF    ( WRK-IDOKBN      =   NORDERID-FLIQUIDCL2 )
+                       MOVE    "0193"      TO  ERRCD-KHNERR
+                       PERFORM 1001-KIHON-ERRSET-SEC
+                   END-IF
+               END-IF
+           END-IF
       *
            .
        20011-NYUINIDOKBN-CHK-EXT.
@@ -640,6 +655,7 @@
            WHEN   NORDERID-FSELEID
            WHEN   NORDERID-FSTOPID
            WHEN   NORDERID-FSPSLID
+           WHEN   NORDERID-FLIQUIDID
       *
                PERFORM 20011-ORCSODR04-ITM-CHK-SEC
       *

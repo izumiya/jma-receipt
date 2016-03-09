@@ -7,6 +7,12 @@ W37 {
       label varchar(10);
       state int;
     };
+    B06 {
+      state int;
+    };
+    B07 {
+      state int;
+    };
     STYUKYMD {
       textdata varchar(10);
     };

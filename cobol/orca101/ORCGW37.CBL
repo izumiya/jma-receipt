@@ -50,16 +50,18 @@
       *
       *    画面用ＳＰＡ
        01  SPA-W37.
+           03  SPA-GMN-PAGE                       PIC 9(03).
+           03  SPA-GMN-PAGE-MAX                   PIC 9(03).
            03  SPA-GMN-CUR                        PIC 9(03).
            03  SPA-GMN-AREA.
                05  SPA-GMN-TANKI3-G.
                    07  SPA-GMN-TANKI3-MAX         PIC 9(03).
-                   07  SPA-GMN-TANKI3-OCC         OCCURS  25.
+                   07  SPA-GMN-TANKI3-OCC         OCCURS  100.
                        09  SPA-GMN-CHK-TANKI3     PIC X(01).
                        09  SPA-GMN-CHK-LBLTANKI3  PIC X(100).
            03  SPA-NAI-AREA.
                05  SPA-GMN-NAI-TANKI3-G.
-                   07  SPA-NAI-TANKI3-OCC         OCCURS  25.
+                   07  SPA-NAI-TANKI3-OCC         OCCURS  100.
                        09  SPA-NAI-TANKI3-SRYCD   PIC X(09).
                        09  SPA-NAI-TANKI3-TOKCD   PIC X(02).
       *
@@ -69,18 +71,26 @@
            03  FLG-SYSKANRI                        PIC 9(01).
            03  FLG-TENSU                           PIC 9(01).
            03  FLG-ALL                             PIC 9(01).
+           03  FLG-HIZUKE-ERR                      PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX0                                PIC 9(05).
            03  IDX1                                PIC 9(05).
            03  IDX2                                PIC 9(05).
+           03  IDXL                                PIC 9(05).
            03  IDXP                                PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
       *    入力項目名
            03  WRK-MCP-WIDGET                      PIC X(64).
+           03  WRK-YMD                             PIC X(10). 
+           03  WRK-SYMD.
+               05  WRK-SYY                         PIC 9(04).
+               05  WRK-SMM                         PIC 9(02).
+               05  WRK-SDD                         PIC 9(02).
+           03  WRK-HENYMDG                         PIC X(09).
            03  WRK-WIDMSG                          PIC X(200).
            03  WRK-TNS-SRYCD                       PIC X(09).
            03  WRK-TNS-KJNYMD                      PIC X(08).
@@ -91,19 +101,37 @@
            03  WRK-CMB-CD                          PIC X(10).
            03  WRK-CMB-ITM-G.
                05  WRK-CMB-ITM                     PIC X(200).
+           03  WRK-SELNUM                          PIC 9(05).
            03  WRK-STYUKYMD                        PIC X(08).
            03  WRK-EDYUKYMD                        PIC X(08).
+           03  WRK-SEL-STYUKYMD                    PIC X(08).
+           03  WRK-SEL-EDYUKYMD                    PIC X(08).
            03  WRK-KBNCD-G.
                05  WRK-KBNCD                       PIC 9(08).
+           03  WRK-KAISEISTYMD                     PIC X(08).
+           03  WRK-KAISEIEDYMD                     PIC X(08).
+           03  WRK-DELYMD                          PIC X(08).
+           03  WRK-FROM                            PIC 9(05).
+           03  WRK-TO                              PIC 9(05).
       *
        01  CONST-AREA.
-           03  CONST-GMN-TANKI3-MAX                PIC 9(03) VALUE 25.
+           03  CONST-H280331               PIC X(08) VALUE "20160331".
+           03  CONST-H280401               PIC X(08) VALUE "20160401".
+           03  CONST-GMN-TANKI3-MAX        PIC 9(03) VALUE 25.
+           03  CONST-TANKI3-MAX            PIC 9(03) VALUE 100.
       *
            COPY  "CPTANKI3.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
+      *
+      *    画面日付変換サブ
+           COPY    "CPORCSGDAY.INC".
       *
       *    システム管理マスタ
            COPY  "CPSYSKANRI.INC".
@@ -245,7 +273,21 @@
       *****************************************************************
        310-SPASET-SEC                  SECTION.
       *
+           PERFORM 800-KAISEI-CHK-SEC
+      *
+           PERFORM 3101-SPASET-SEC
+      *
+           .
+       310-SPASET-EXT.
+           EXIT.
+      *****************************************************************
+      *    スパ初期編集処理
+      *****************************************************************
+       3101-SPASET-SEC                  SECTION.
+      *
            INITIALIZE                  SPA-W37
+      *
+           MOVE    1               TO  SPA-GMN-PAGE
       *
            MOVE    ZERO            TO  IDX2
            PERFORM VARYING IDX1    FROM    1   BY  1
@@ -256,10 +298,13 @@
                                  <=   SPA-W01-EDYUKYMD )
                 AND  ( TANKI3-YUKOEDYMD (IDX1)
                                  >=   SPA-W01-STYUKYMD )
-                   PERFORM 3101-SPASET-SEC
+                   PERFORM 31011-SPASET-SEC
                END-IF
       *
            END-PERFORM
+      *
+           COMPUTE SPA-GMN-PAGE-MAX
+               = ( SPA-GMN-TANKI3-MAX / CONST-GMN-TANKI3-MAX ) + 1
       *
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
@@ -281,16 +326,16 @@
            END-IF
       *
            IF    ( SYS-STYUKYMD    NOT =   SPACE )
-               PERFORM 3102-SPASET-SEC
+               PERFORM 31012-SPASET-SEC
            END-IF
       *
            .
-       310-SPASET-EXT.
+       3101-SPASET-EXT.
            EXIT.
       *****************************************************************
       *    スパ初期編集処理
       *****************************************************************
-       3101-SPASET-SEC                     SECTION.
+       31011-SPASET-SEC                     SECTION.
       *
            COMPUTE IDX2 = IDX2 + 1
       *
@@ -314,12 +359,12 @@
                                        TO  SPA-NAI-TANKI3-TOKCD (IDX2)
       *
            .
-       3101-SPASET-EXT.
+       31011-SPASET-EXT.
            EXIT.
       *****************************************************************
       *    スパ初期編集処理
       *****************************************************************
-       3102-SPASET-SEC                     SECTION.
+       31012-SPASET-SEC                     SECTION.
       *
            PERFORM 900-SYSKANRI-KEY2-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-5003-REC
@@ -348,7 +393,7 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       3102-SPASET-EXT.
+       31012--SPASET-EXT.
            EXIT.
       *****************************************************************
       *    確認画面（ＣＩＤ１）ＯＫ処理
@@ -385,6 +430,18 @@
            WHEN    "CLICKED"       ALSO    "B01"
                MOVE   "CHANGE"         TO  MCP-PUTTYPE
                PERFORM  210-BACK
+      *    前頁
+           WHEN    "CLICKED"       ALSO    "B06"
+               IF    ( SPA-GMN-PAGE    >   1 )
+                 COMPUTE   SPA-GMN-PAGE
+                       =   SPA-GMN-PAGE    -   1
+               END-IF
+      *    次頁
+           WHEN    "CLICKED"       ALSO    "B07"
+               IF    ( SPA-GMN-PAGE    <   SPA-GMN-PAGE-MAX )
+                 COMPUTE   SPA-GMN-PAGE
+                       =   SPA-GMN-PAGE    +   1
+               END-IF
       *    全選択
            WHEN    "CLICKED"       ALSO    "B02"
                PERFORM 420-CLEAR-SEC
@@ -483,10 +540,14 @@
       *
            MOVE    WRK-MCP-WIDGET      TO  WRK-WIDGET-TANKI3-G
       *
-           MOVE    WRK-WIDGET-TANKI3   TO  IDX2
+           COMPUTE IDXL  = WRK-WIDGET-TANKI3
+      *
+           COMPUTE IDX2  = CONST-GMN-TANKI3-MAX
+                         * ( SPA-GMN-PAGE - 1 )
+                         + IDXL
       *
            IF    ( SPA-GMN-CHK-LBLTANKI3 (IDX2)  NOT = SPACE )
-               MOVE    W37-CHK-TANKI3 (IDX2)
+               MOVE    W37-CHK-TANKI3 (IDXL)
                                        TO  SPA-GMN-CHK-TANKI3 (IDX2)
            END-IF
       *
@@ -564,8 +625,7 @@
       *****************************************************************
        4301-DEL-SEC                    SECTION.
       *
-           MOVE    SPA-W01-SEL-STYUKYMD TO WRK-STYUKYMD
-           MOVE    SPA-W01-SEL-EDYUKYMD TO WRK-EDYUKYMD
+           MOVE    SPA-W01-SEL-STYUKYMD TO WRK-DELYMD
       *
            PERFORM 43011-DEL-SEC
            IF    ( SPA-ERRCD           =   SPACE )
@@ -584,15 +644,14 @@
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
            MOVE    SPA-W01-KANRICD     TO  SYS-KANRICD
-           MOVE    WRK-STYUKYMD        TO SYS-STYUKYMD
-           MOVE    WRK-EDYUKYMD        TO SYS-EDYUKYMD
+           MOVE    WRK-DELYMD          TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "del11"             TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    "JOIN"          TO  MCP-PUTTYPE
-               PERFORM 210-BACK
+               CONTINUE
            ELSE
                MOVE    "4001"          TO  SPA-ERRCD
            END-IF
@@ -628,13 +687,7 @@
       *
            PERFORM 800-MCNDATE-SEC
       *
-           MOVE    SPA-W01-STYUKYMD    TO  WRK-STYUKYMD
-                                           WRK-EDYUKYMD
-           PERFORM 43011-DEL-SEC
-      *
-           IF    ( SPA-ERRCD           =   SPACE )
-               PERFORM 48011-TOUROKU-SEC
-           END-IF
+           PERFORM 48011-TOUROKU-SEC
       *
            IF    ( SPA-ERRCD           =   SPACE )
                MOVE   "JOIN"           TO  MCP-PUTTYPE
@@ -648,6 +701,21 @@
       *    登録処理
       *****************************************************************
        48011-TOUROKU-SEC               SECTION.
+      *
+           MOVE    SPA-W01-STYUKYMD    TO  WRK-DELYMD
+           PERFORM 43011-DEL-SEC
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               PERFORM 480111-TOUROKU-SEC
+           END-IF
+      *
+           .
+       48011-TOUROKU-EXT.
+           EXIT.
+      *****************************************************************
+      *    登録処理
+      *****************************************************************
+       480111-TOUROKU-SEC               SECTION.
       *
            INITIALIZE                      SYS-5003-REC
            MOVE    SPA-HOSPNUM         TO  SYS-5003-HOSPNUM
@@ -694,7 +762,7 @@
            END-PERFORM
       *
            .
-       48011-TOUROKU-EXT.
+       480111--TOUROKU-EXT.
            EXIT.
       *****************************************************************
       *    共通関連チェック
@@ -739,26 +807,36 @@
            MOVE    SPACE               TO  W37
            INITIALIZE                      W37
       *
+           COMPUTE WRK-FROM
+                 = CONST-GMN-TANKI3-MAX
+                 * ( SPA-GMN-PAGE - 1 )  + 1
+      *
+           COMPUTE WRK-TO
+                 = CONST-GMN-TANKI3-MAX  * SPA-GMN-PAGE
+      *
            MOVE    SPA-W01-STYUKYMDH   TO  W37-STYUKYMD
            MOVE    SPA-W01-EDYUKYMDH   TO  W37-EDYUKYMD
       *
            MOVE    1                   TO  FLG-ALL
+           MOVE    ZERO                TO  IDXL
            PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL ( IDX2     >   CONST-GMN-TANKI3-MAX )
+                   UNTIL ( IDX2     >   CONST-TANKI3-MAX )
       *
-               MOVE    SPA-GMN-CHK-TANKI3 (IDX2)
-                                       TO  W37-CHK-TANKI3 (IDX2)
-               MOVE    SPA-GMN-CHK-LBLTANKI3 (IDX2)
-                                       TO  W37-CHK-LBLTANKI3
-                                                          (IDX2)
+               IF    ( IDX2         >=  WRK-FROM )
+                AND  ( IDX2         <=  WRK-TO )
+                   COMPUTE IDXL = IDXL  +  1
+                   MOVE    SPA-GMN-CHK-TANKI3 (IDX2)
+                                   TO  W37-CHK-TANKI3 (IDXL)
+                   MOVE    SPA-GMN-CHK-LBLTANKI3 (IDX2)
+                                   TO  W37-CHK-LBLTANKI3 (IDXL)
       *
-               IF    ( IDX2         >   SPA-GMN-TANKI3-MAX )
-                   MOVE    "F"         TO  W37-CHK-TANKI3 (IDX2)
-               ELSE
-                   IF    ( SPA-GMN-CHK-TANKI3 (IDX2)
-                                       NOT =   "T" )
-                       MOVE    ZERO    TO  FLG-ALL
+                   IF    ( IDX2    >   SPA-GMN-TANKI3-MAX )
+                       MOVE    "F" TO  W37-CHK-TANKI3 (IDXL)
                    END-IF
+               END-IF
+      *
+               IF    ( SPA-GMN-CHK-TANKI3 (IDX2)   NOT =   "T" )
+                   MOVE    ZERO    TO  FLG-ALL
                END-IF
       *
            END-PERFORM
@@ -786,19 +864,29 @@
        500-GMNHEN-STATE-EDIT-SEC       SECTION.
       *
            MOVE    WIDGET-NORMAL   TO  W37-B03-STATE
+                                       W37-B06-STATE
+                                       W37-B07-STATE
       *
            IF    ( SPA-W01-STYUKYMD    =   "00000000" )
             OR   ( SPA-W01-SELNUM      =   ZERO )
                MOVE    WIDGET-INSENSITIVE  TO  W37-B03-STATE
            END-IF
       *
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL ( IDX2    >   CONST-GMN-TANKI3-MAX )
+           IF    ( SPA-GMN-PAGE        <=  1 )
+               MOVE    WIDGET-INSENSITIVE  TO  W37-B06-STATE
+           END-IF
       *
-               MOVE    WIDGET-NORMAL  TO  W37-CHK-TANKI3-STATE (IDX2)
-               IF    ( IDX2         >   SPA-GMN-TANKI3-MAX )
+           IF    ( SPA-GMN-PAGE        >=  SPA-GMN-PAGE-MAX )
+               MOVE    WIDGET-INSENSITIVE  TO  W37-B07-STATE
+           END-IF
+      *
+           PERFORM VARYING IDXL    FROM    1   BY  1
+                   UNTIL ( IDXL    >   CONST-GMN-TANKI3-MAX )
+      *
+               MOVE    WIDGET-NORMAL  TO  W37-CHK-TANKI3-STATE (IDXL)
+               IF    ( W37-CHK-LBLTANKI3 (IDXL)    =   SPACE )
                    MOVE    WIDGET-INSENSITIVE
-                                      TO  W37-CHK-TANKI3-STATE (IDX2)
+                                      TO  W37-CHK-TANKI3-STATE (IDXL)
                END-IF
       *
            END-PERFORM
@@ -950,6 +1038,156 @@
            .
       *
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    西暦日本語変換処理
+      *****************************************************************
+       800-SEIWA-HEN-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HIZUKE-ERR
+           MOVE    SPACE               TO  WRK-SYMD
+                                           WRK-HENYMDG
+      *
+           IF    ( WRK-YMD             =   "00000000" 
+                                       OR  "99999999" )
+               MOVE    WRK-YMD         TO  WRK-HENYMDG
+                                           WRK-SYMD
+           ELSE
+      *
+               INITIALIZE                      ORCSGDAYAREA
+               MOVE    WRK-YMD         TO  SGDAY-INDAY
+               CALL    "ORCSGDAY"      USING
+                                       ORCSGDAYAREA
+               IF  ( SGDAY-RC          =   ZERO )
+                   MOVE    SGDAY-OTDAY TO  WRK-HENYMDG
+                   MOVE    SGDAY-SDAY  TO  WRK-SYMD
+               ELSE
+                   MOVE    1           TO  FLG-HIZUKE-ERR
+                END-IF
+           END-IF
+      *
+           .
+       800-SEIWA-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    改正チェック処理
+      *****************************************************************
+       800-KAISEI-CHK-SEC              SECTION.
+      *
+           MOVE    CONST-H280401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H280331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           .
+      *
+       800-KAISEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    改正チェック処理
+      *****************************************************************
+       8001-KAISEI-CHK-SEC           SECTION.
+      *
+           PERFORM 800-MCNDATE-SEC
+      *
+           IF    ( SPA-W01-SELNUM          >   ZERO )
+               IF    ( WRK-KAISEISTYMD     >   SPA-W01-SEL-STYUKYMD )
+                AND  ( WRK-KAISEISTYMD    <=   SPA-W01-EDYUKYMD )
+      *
+                   INITIALIZE                  SYSKANRI-REC
+                   MOVE    "5003"          TO  SYS-KANRICD
+                   MOVE    "*"             TO  SYS-KBNCD
+                   MOVE    SPA-W01-STYUKYMD TO SYS-STYUKYMD
+                                               SYS-EDYUKYMD
+                   PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+                   IF    ( FLG-SYSKANRI    =   ZERO )
+                       MOVE    SYS-EDYUKYMD        TO  WRK-EDYUKYMD
+                       MOVE    WRK-KAISEIEDYMD     TO  SYS-EDYUKYMD
+                       MOVE    SMCNDATE-YMD        TO  SYS-UPYMD
+                       MOVE    SMCNDATE-HMS        TO  SYS-UPHMS
+                       MOVE    SYS-HOSPNUM         TO  SYSUP-HOSPNUM
+                       MOVE    SYS-KANRICD         TO  SYSUP-KANRICD
+                       MOVE    SYS-STYUKYMD        TO  SYSUP-STYUKYMD
+                       MOVE    WRK-EDYUKYMD        TO  SYSUP-EDYUKYMD
+                       MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+                       MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                       MOVE    "upd2"              TO  MCP-PATHNAME
+                       PERFORM 910-DBUPDATE-SEC
+                       IF    ( MCP-RC  NOT =   ZERO )
+                           DISPLAY "1:DBUPDATE ERR"
+                       END-IF
+      *
+                       MOVE    SPA-W01-STYUKYMD    TO  WRK-STYUKYMD
+                       MOVE    SPA-W01-EDYUKYMD    TO  WRK-EDYUKYMD
+                       MOVE    SPA-W01-SELNUM      TO  WRK-SELNUM
+                       MOVE    SPA-W01-SEL-STYUKYMD
+                                                   TO  WRK-SEL-STYUKYMD
+                       MOVE    SPA-W01-SEL-EDYUKYMD
+                                                   TO  WRK-SEL-EDYUKYMD
+      *
+                       INITIALIZE                  SPA-W01-SEL-STYUKYMD
+                                                   SPA-W01-SEL-EDYUKYMD
+      *
+                       MOVE    WRK-KAISEISTYMD     TO  SPA-W01-STYUKYMD
+                       PERFORM 3101-SPASET-SEC
+                       PERFORM 48011-TOUROKU-SEC
+                       MOVE    SPACE               TO  SPA-ERRCD
+      *
+                       COMPUTE SPA-W01-SELNUM
+                           =   SPA-W01-SELNUM  +   1
+                       MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
+                                                   SPA-W01-SEL-EDYUKYMD
+      *
+                       MOVE    WRK-KAISEISTYMD TO  SPA-W01-SEL-STYUKYMD
+                                                   SPA-W01-STYUKYMD
+      *
+                       MOVE    SPA-W01-STYUKYMD    TO  WRK-YMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-HENYMDG TO  SPA-W01-STYUKYMDH
+      *
+                       MOVE    SPA-W01-EDYUKYMD    TO  WRK-YMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-HENYMDG TO  SPA-W01-EDYUKYMDH
+      *
+                   END-IF
+               END-IF
+           ELSE
+               IF    ( WRK-KAISEISTYMD      >  SPA-W01-STYUKYMD )
+                AND  ( WRK-KAISEISTYMD     <=  SPA-W01-EDYUKYMD )
+                   MOVE    SPA-W01-EDYUKYMD    TO  WRK-EDYUKYMD
+                   MOVE    WRK-KAISEIEDYMD     TO  SPA-W01-EDYUKYMD
+                   PERFORM 3101-SPASET-SEC
+                   PERFORM 48011-TOUROKU-SEC
+                   MOVE    SPACE               TO  SPA-ERRCD
+      *
+                   MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
+                   MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
+                   PERFORM 3101-SPASET-SEC
+                   PERFORM 48011-TOUROKU-SEC
+                   MOVE    SPACE               TO  SPA-ERRCD
+      *
+                   MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
+                                               SPA-W01-SEL-STYUKYMD
+                   MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
+                                               SPA-W01-SEL-EDYUKYMD
+      *
+                   COMPUTE SPA-W01-SELNUM
+                       =   SPA-W01-SELNUM  +   1
+      *
+                   MOVE    SPA-W01-STYUKYMD    TO  WRK-YMD
+                   PERFORM 800-SEIWA-HEN-SEC
+                   MOVE    WRK-HENYMDG TO  SPA-W01-STYUKYMDH
+      *
+                   MOVE    SPA-W01-EDYUKYMD    TO  WRK-YMD
+                   PERFORM 800-SEIWA-HEN-SEC
+                   MOVE    WRK-HENYMDG TO  SPA-W01-EDYUKYMDH
+      *
+               END-IF
+           END-IF
+      *
+           .
+      *
+       8001-KAISEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    システム管理検索処理

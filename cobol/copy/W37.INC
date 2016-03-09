@@ -20,6 +20,8 @@
               04  W37-B02-LABEL            PIC X(10).
               04  W37-B03-LABEL            PIC X(10).
               04  W37-B03-STATE            PIC S9(9)   BINARY.
+              04  W37-B06-STATE            PIC S9(9)   BINARY.
+              04  W37-B07-STATE            PIC S9(9)   BINARY.
               04  W37-STYUKYMD             PIC X(10).
               04  W37-EDYUKYMD             PIC X(10).
               04  W37-CHK-TANKI3-OCC       OCCURS  25.
