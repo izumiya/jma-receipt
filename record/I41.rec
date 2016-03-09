@@ -473,5 +473,9 @@ I41 {
       style varchar(20);
       textdata varchar(40);
     };
+    UPYMD {
+      style varchar(20);
+      textdata varchar(20);
+    };
   };
 };

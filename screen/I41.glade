@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -3347,6 +3347,25 @@
         <ypad>0</ypad>
         <label>入院科</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>UPYMD</name>
+        <x>839</x>
+        <y>660</y>
+        <width>150</width>
+        <height>24</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>更新年月日 H27.10.10</label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
         <wrap>False</wrap>
       </widget>
     </widget>

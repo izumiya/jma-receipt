@@ -134,3 +134,8 @@
               05  I41-VALUE       PIC X(20).
             04  I41-NYUINKA.
               05  I41-VALUE       PIC X(40).
+          03  I41-UPYMD-G.
+            04  I41-UPYMD-STYLE.
+              05  I41-VALUE       PIC X(20).
+            04  I41-UPYMD.
+              05  I41-VALUE       PIC X(20).
