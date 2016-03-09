@@ -155,6 +155,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    16/03/07  プリンタ設定の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2199,7 +2200,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-PERFORM
       *
       *        プリンタ設定
-               IF      FLG-PRTNM-SET           =   ZERO
+      *********IF      FLG-PRTNM-SET           =   ZERO
                    EVALUATE    SPA-NAI-TEISYUTUSAKI  (IDW IDX)
                        WHEN    "1"
                            MOVE    SPA-NAI-PRTNM-G (1)
@@ -2217,7 +2218,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            MOVE    SPA-NAI-PRTNM-G (6)
                                        TO  SPA-GMN-TPRTNM-N-G (IDW IDX)
                    END-EVALUATE
-               END-IF
+      *********END-IF
            END-PERFORM
       *
            MOVE    IDW             TO  SPA-GMN-PAGE-MAX
@@ -2397,7 +2398,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM 900-CLOSE-SEC
       *
       *    プリンタ設定
-           IF      FLG-PRTNM-SET           =   ZERO
+      *****IF      FLG-PRTNM-SET           =   ZERO
                EVALUATE    SPA-NAI-TEISYUTUSAKI  (IDW IDX)
                    WHEN    "1"
                        MOVE    SPA-NAI-PRTNM-G (1)
@@ -2415,7 +2416,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE    SPA-NAI-PRTNM-G (6)
                                        TO  SPA-GMN-TPRTNM-N-G (IDW IDX)
                END-EVALUATE
-           END-IF
+      *****END-IF
       *
            MOVE    IDW             TO  SPA-GMN-PAGE-MAX
            .
