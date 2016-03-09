@@ -459,6 +459,12 @@
       *    Ìë¶Ð»þ´ÖÄ¶²á¸º»»Æþ±¡ÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
            COPY "CPORCSYAKINGEN.INC".
       *
+      *    Ìë¶Ð»þ´ÖÆÃÊÌÆþ±¡´ðËÜÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
+           COPY "CPORCSYAKINTOKU.INC".
+      *
+      *    ´Ç¸î¿¦°÷¿ôÅùÆþ±¡´ðËÜÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
+           COPY "CPORCSKANGOCHG.INC".
+      *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
       *****************************************************************
@@ -564,10 +570,15 @@
                WHEN    "0303"
                WHEN    "0304"
                WHEN    "0305"
-                   IF   SODRNACCT-STARTYMD(1:6)  >= "200604"
-                       PERFORM   4801-SHOKUJI-200604-SEC
+               WHEN    "0307"
+                   IF   SODRNACCT-STARTYMD(1:6)  >= "201604"
+                       PERFORM   4801-SHOKUJI-201604-SEC
                    ELSE
-                       PERFORM   4801-SHOKUJI-SEC
+                     IF   SODRNACCT-STARTYMD(1:6)  >= "200604"
+                         PERFORM   4801-SHOKUJI-200604-SEC
+                     ELSE
+                         PERFORM   4801-SHOKUJI-SEC
+                     END-IF
                    END-IF
            END-EVALUATE
       *
@@ -728,6 +739,11 @@
       *        ¡¦°ìÈÌÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
+      *        °Ê²¼Æþ±¡ÎÁ¤òÄÉ²Ã¡ÊÊ¿À®£²£¸Ç¯²þÀµ¤ÇÂÐ±þ¡Ë
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£·ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£°ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£³ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -739,7 +755,12 @@
       *                                         ÆÃÄêÆþ±¡ÎÁ¤Î»»ÄêÍ×·ï³°¤Î»»Äê
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         Ê¿À®£²£¸Ç¯²þÀµÂÐ±þ
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -1495,10 +1516,13 @@
       *
       *****************************************************************
       *    Ìë¶Ð»þ´ÖÄ¶²á¸º»»¥³¡¼¥É¤Ø¤ÎÃÖ¤­´¹¤¨½èÍý
+      *    Ìë¶Ð»þ´ÖÆÃÊÌÆþ±¡´ðËÜÎÁ¥³¡¼¥É¤Ø¤ÎÃÖ¤­´¹¤¨½èÍý
+      *    ´Ç¸î¿¦°÷¿ôÅùÆþ±¡´ðËÜÎÁ¥³¡¼¥É¤Ø¤ÎÃÖ¤­´¹¤¨½èÍý
       *****************************************************************
        4801-YAKINGEN-CHG-SEC   SECTION.
       *
            IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20140401"
+      *        Ìë¶Ð»þ´ÖÄ¶²á¸º»»Æþ±¡ÎÁ¥³¡¼¥É¼èÆÀ
                INITIALIZE    ORCSYAKINGEN-AREA
                MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
                                    TO    LNK-YAKINGEN-SANTEIYM
@@ -1510,6 +1534,36 @@
                                                 SPA-AREA
                IF   LNK-YAKINGEN-RC     =       ZERO
                     MOVE LNK-YAKINGEN-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+           END-IF
+           IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20160401"
+      *        Ìë¶Ð»þ´ÖÆÃÊÌÆþ±¡´ðËÜÎÁ¥³¡¼¥É¼èÆÀ
+               INITIALIZE    ORCSYAKINTOKU-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-YAKINTOKU-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-YAKINTOKU-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-YAKINTOKU-SRYCD
+               CALL   "ORCSYAKINTOKU"    USING   ORCSYAKINTOKU-AREA
+                                                 SPA-AREA
+               IF   LNK-YAKINTOKU-RC     =       ZERO
+                    MOVE LNK-YAKINTOKU-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+      *        ´Ç¸î¿¦°÷¿ôÅùÆþ±¡´ðËÜÎÁ¥³¡¼¥É¼èÆÀ
+               INITIALIZE    ORCSKANGOCHG-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-KANGOCHG-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-KANGOCHG-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-KANGOCHG-SRYCD
+               CALL   "ORCSKANGOCHG"    USING   ORCSKANGOCHG-AREA
+                                                SPA-AREA
+               IF   LNK-KANGOCHG-RC     =       ZERO
+                    MOVE LNK-KANGOCHG-CHGSRYCD
                                    TO    SYOKIKSN-IN-KHNSRYCD
                END-IF
            END-IF
@@ -1847,6 +1901,11 @@
       *        ¡¦°ìÈÌÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
+      *        °Ê²¼Æþ±¡ÎÁ¤òÄÉ²Ã¡ÊÊ¿À®£²£¸Ç¯²þÀµ¤ÇÂÐ±þ¡Ë
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£·ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£°ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£³ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -1858,7 +1917,12 @@
       *                                         ÆÃÄêÆþ±¡ÎÁ¤Î»»ÄêÍ×·ï³°¤Î»»Äê
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         Ê¿À®£²£¸Ç¯²þÀµÂÐ±þ
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -3164,6 +3228,11 @@
       *        ¡¦°ìÈÌÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
+      *        °Ê²¼Æþ±¡ÎÁ¤òÄÉ²Ã¡ÊÊ¿À®£²£¸Ç¯²þÀµ¤ÇÂÐ±þ¡Ë
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£·ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£°ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£³ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -3175,7 +3244,12 @@
       *                                         ÆÃÄêÆþ±¡ÎÁ¤Î»»ÄêÍ×·ï³°¤Î»»Äê
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         Ê¿À®£²£¸Ç¯²þÀµÂÐ±þ
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -4550,6 +4624,11 @@
       *        ¡¦°ìÈÌÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
       *        ¡¦Àº¿ÀÉÂÅïÆÃÊÌÆþ±¡´ðËÜÎÁ
+      *        °Ê²¼Æþ±¡ÎÁ¤òÄÉ²Ã¡ÊÊ¿À®£²£¸Ç¯²þÀµ¤ÇÂÐ±þ¡Ë
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£·ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£°ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£³ÂÐ£±Æþ±¡´ðËÜÎÁ
+      *        ¡¦ÎÅÍÜÉÂÅï¡¦°ìÈÌÉÂÅï£±£µÂÐ£±Æþ±¡´ðËÜÎÁ
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -4561,7 +4640,12 @@
       *                                         ÆÃÄêÆþ±¡ÎÁ¤Î»»ÄêÍ×·ï³°¤Î»»Äê
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         Ê¿À®£²£¸Ç¯²þÀµÂÐ±þ
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -6137,6 +6221,153 @@
       *-------------------¿©Æ²²Ã»»¤³¤³¤Þ¤Ç----------------------------
            .
        4801-SHOKUJI-200604-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿©»ö¡¡²ñ·×¥Æ¡¼¥Ö¥ëÊÔ½¸½èÍý¡ÊÊ¿À®£²£¸Ç¯£´·î°Ê¹ß¡Ë
+      *****************************************************************
+       4801-SHOKUJI-201604-SEC         SECTION.
+      *
+      *    ¿©»ö¤Î¥»¥Ã¥È
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "4"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           EVALUATE   SODRNACCT-SKJTIME
+              WHEN    "01"
+                  MOVE    "key30"          TO  MCP-PATHNAME
+              WHEN    "02"
+                  MOVE    "key31"          TO  MCP-PATHNAME
+              WHEN    "03"
+                  MOVE    "key32"          TO  MCP-PATHNAME
+           END-EVALUATE
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               EVALUATE   SODRNACCT-SKJTIME
+                   WHEN    "01"
+                       MOVE   "key30"      TO  MCP-PATHNAME
+                   WHEN    "02"
+                       MOVE   "key31"      TO  MCP-PATHNAME
+                   WHEN    "03"
+                       MOVE   "key32"      TO  MCP-PATHNAME
+               END-EVALUATE
+               PERFORM   910-NYUINACCT-READ-SEC
+               IF        FLG-NYUINACCT     =   ZERO
+      *            ¿©»ö¶èÊ¬¤Î¥»¥Ã¥È
+                   PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+                            UNTIL     IDX-SKJ   >   31
+                       IF   SODRNACCT-DAY(IDX-SKJ)   =   1
+                           EVALUATE   SODRNACCT-ORDERID(3:2)
+                               WHEN   "01"
+                                   MOVE   1     TO   NACCT-DAY(IDX-SKJ)
+                               WHEN   "02"
+                                   MOVE   2     TO   NACCT-DAY(IDX-SKJ)
+                               WHEN   "05"
+                                   MOVE   0     TO   NACCT-DAY(IDX-SKJ)
+                               WHEN   "07"
+                                   MOVE   3     TO   NACCT-DAY(IDX-SKJ)
+                           END-EVALUATE
+                       END-IF
+                   END-PERFORM
+      *            ºÞ²ó¿ôºÆ¥»¥Ã¥È
+                   MOVE  ZERO           TO  NACCT-ZAIKAISU
+                   PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+                            UNTIL     IDX-SKJ   >   31
+                       IF   NACCT-DAY(IDX-SKJ)   NOT =  0
+                           ADD   1        TO  NACCT-ZAIKAISU
+                       END-IF
+                   END-PERFORM
+      *
+      *            ¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä
+                   MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *            ¹¹¿·Ç¯·îÆü
+                   MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *            ¹¹¿·»þ´Ö
+                   MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+      *            ¿©Æ²²Ã»»¤ÎÊÔ½¸ÍÑ¤ËÂàÈò
+                   MOVE    NACCT-DAY(WRK-STARTYMD-D)  TO WRK-SHOKUDOU
+      *
+                   MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+                   MOVE    "DBUPDATE"      TO   MCP-FUNC
+                   MOVE    "tbl_nyuinacct" TO   MCP-TABLE
+                   MOVE    "key"           TO   MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+               END-IF
+           END-IF
+      *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
+           MOVE     "tbl_nyuinacct"        TO  MCP-TABLE
+           EVALUATE   SODRNACCT-SKJTIME
+              WHEN    "01"
+                  MOVE    "key30"          TO  MCP-PATHNAME
+              WHEN    "02"
+                  MOVE    "key31"          TO  MCP-PATHNAME
+              WHEN    "03"
+                  MOVE    "key32"          TO  MCP-PATHNAME
+           END-EVALUATE
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+      *-------------------¿©Æ²²Ã»»¤³¤³¤«¤é----------------------------
+      *    ¿©»ö¤Î¥»¥Ã¥È
+      *     INITIALIZE                          NYUINACCT-REC
+      *     MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+      *     MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+      *     MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+      *     MOVE    "4"                     TO  NACCT-ZAISKBKBN
+      *     MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+      *     MOVE    "key17"                 TO  MCP-PATHNAME
+      *     PERFORM 910-NYUINACCT-SELECT-SEC
+      *     IF      FLG-NYUINACCT           =   ZERO
+      *         MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+      *         MOVE     "key17"            TO  MCP-PATHNAME
+      *         PERFORM   910-NYUINACCT-READ-SEC
+      *         PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+      *           IF   NACCT-SRYCDTOTAL  =  197000570
+      *            ¿©Æ²²Ã»»¤Î¥»¥Ã¥È
+      *             MOVE    SODRNACCT-STARTYMD      TO  WRK-STARTYMD
+      *             IF    WRK-SHOKUDOU    NOT =  ZERO
+      *                   MOVE   1   TO   NACCT-DAY(WRK-STARTYMD-D)
+      *             ELSE
+      *                   MOVE   0   TO   NACCT-DAY(WRK-STARTYMD-D)
+      *             END-IF
+      *            ºÞ²ó¿ôºÆ¥»¥Ã¥È
+      *             MOVE  ZERO           TO  NACCT-ZAIKAISU
+      *             PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+      *                      UNTIL     IDX-SKJ   >   31
+      *                 IF   NACCT-DAY(IDX-SKJ)   NOT =  0
+      *                     ADD   1        TO  NACCT-ZAIKAISU
+      *                 END-IF
+      *             END-PERFORM   
+      **
+      *             MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+      *             MOVE    "DBUPDATE"      TO   MCP-FUNC
+      *             MOVE    "tbl_nyuinacct" TO   MCP-TABLE
+      *             MOVE    "key"           TO   MCP-PATHNAME
+      *             CALL    "ORCDBMAIN"         USING
+      *                                         MCPAREA
+      *                                         MCPDATA-REC
+      *                                         SPA-AREA
+      *
+      *           END-IF
+      *           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+      *           MOVE    "key17"             TO  MCP-PATHNAME
+      *           PERFORM 910-NYUINACCT-READ-SEC
+      *         END-PERFORM
+      *     END-IF
+      *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
+      *     MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+      *     MOVE     "key17"                 TO  MCP-PATHNAME
+      *     PERFORM   910-DBCLOSECURSOR-SEC
+      *-------------------¿©Æ²²Ã»»¤³¤³¤Þ¤Ç----------------------------
+           .
+       4801-SHOKUJI-201604-EXT.
            EXIT.
       *****************************************************************
       *    Æþ±¡¿ÇÎÅ¹Ô°Ù¾È²ñ¥Æ¡¼¥Ö¥ëÊÔ½¸¥µ¥Ö¸Æ¤Ó½Ð¤·

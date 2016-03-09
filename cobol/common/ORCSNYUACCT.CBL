@@ -355,6 +355,12 @@
       *    夜勤時間超過減算入院料コード取得サブ
            COPY "CPORCSYAKINGEN.INC".
       *
+      *    夜勤時間特別入院基本料コード取得サブ
+           COPY "CPORCSYAKINTOKU.INC".
+      *
+      *    看護職員数等入院基本料コード取得サブ
+           COPY "CPORCSKANGOCHG.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -432,6 +438,7 @@
                CONTINUE
            ELSE
                IF   LNK-SCNYUACCT-NYUKHN-SRYCD (1)   NOT  =  SPACE
+      *             夜勤時間超過減算入院料コード取得
                     INITIALIZE    ORCSYAKINGEN-AREA
                     MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
                                            TO    LNK-YAKINGEN-SANTEIYM
@@ -445,6 +452,34 @@
                        MOVE LNK-YAKINGEN-CHGSRYCD   TO
                                          LNK-SCNYUACCT-NYUKHN-SRYCD (1)
                     END-IF
+      *             夜勤時間特別入院基本料コード取得
+                    INITIALIZE    ORCSYAKINTOKU-AREA
+                    MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
+                                           TO    LNK-YAKINTOKU-SANTEIYM
+                    MOVE  LNK-SCNYUACCT-BTU-NUM
+                                           TO    LNK-YAKINTOKU-BTU-NUM
+                    MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                                           TO    LNK-YAKINTOKU-SRYCD
+                    CALL   "ORCSYAKINTOKU"   USING   ORCSYAKINTOKU-AREA
+                                                     SPA-AREA
+                    IF   LNK-YAKINTOKU-RC     =       ZERO
+                       MOVE LNK-YAKINTOKU-CHGSRYCD   TO
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                    END-IF
+      *             看護職員数等入院基本料コード取得
+                    INITIALIZE    ORCSKANGOCHG-AREA
+                    MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
+                                           TO    LNK-KANGOCHG-SANTEIYM
+                    MOVE  LNK-SCNYUACCT-BTU-NUM
+                                           TO    LNK-KANGOCHG-BTU-NUM
+                    MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                                           TO    LNK-KANGOCHG-SRYCD
+                    CALL   "ORCSKANGOCHG"    USING   ORCSKANGOCHG-AREA
+                                                     SPA-AREA
+                    IF   LNK-KANGOCHG-RC     =       ZERO
+                       MOVE LNK-KANGOCHG-CHGSRYCD   TO
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                    END-IF
                END-IF
       *
                IF    LNK-SCNYUACCT-KAGEN-SRYCD(1)  NOT =  SPACE
@@ -452,6 +487,7 @@
                      UNTIL   (IDX-YAKIN     >   10)    OR
                              (LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
                                                   = SPACE)
+      *                 夜勤時間超過減算入院料コード取得
                         INITIALIZE    ORCSYAKINGEN-AREA
                         MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
                                            TO    LNK-YAKINGEN-SANTEIYM
@@ -463,6 +499,34 @@
                                                  SPA-AREA
                         IF   LNK-YAKINGEN-RC     =       ZERO
                              MOVE LNK-YAKINGEN-CHGSRYCD   TO
+                                 LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
+                        END-IF
+      *                 夜勤時間特別入院基本料コード取得
+                        INITIALIZE    ORCSYAKINTOKU-AREA
+                        MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
+                                           TO    LNK-YAKINTOKU-SANTEIYM
+                        MOVE  LNK-SCNYUACCT-BTU-NUM
+                                           TO    LNK-YAKINTOKU-BTU-NUM
+                        MOVE  LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
+                                           TO    LNK-YAKINTOKU-SRYCD
+                        CALL "ORCSYAKINTOKU" USING ORCSYAKINTOKU-AREA
+                                                   SPA-AREA
+                        IF   LNK-YAKINTOKU-RC     =       ZERO
+                             MOVE LNK-YAKINTOKU-CHGSRYCD   TO
+                                 LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
+                        END-IF
+      *                 看護職員数等入院基本料コード取得
+                        INITIALIZE    ORCSKANGOCHG-AREA
+                        MOVE  LNK-SCNYUACCT-STSRYYMD(1:6)
+                                           TO    LNK-KANGOCHG-SANTEIYM
+                        MOVE  LNK-SCNYUACCT-BTU-NUM
+                                           TO    LNK-KANGOCHG-BTU-NUM
+                        MOVE  LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
+                                           TO    LNK-KANGOCHG-SRYCD
+                        CALL "ORCSKANGOCHG" USING ORCSKANGOCHG-AREA
+                                                 SPA-AREA
+                        IF   LNK-KANGOCHG-RC     =       ZERO
+                             MOVE LNK-KANGOCHG-CHGSRYCD   TO
                                  LNK-SCNYUACCT-KAGEN-SRYCD (IDX-YAKIN)
                         END-IF
                    END-PERFORM
@@ -1179,6 +1243,91 @@
                    MOVE   "190167410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
                    MOVE   "190167610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
                    MOVE   "190167810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+                END-EVALUATE
+             END-IF
+      *
+             IF      LNK-SCNYUACCT-STSRYYMD   >=   "20160401"
+                EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+      *         療養病棟入院基本料２（看護職員数等経過措置）
+                 WHEN      "190183710"
+                 WHEN      "190183910"
+                 WHEN      "190184110"
+                 WHEN      "190184310"
+                 WHEN      "190184510"
+                 WHEN      "190184710"
+                 WHEN      "190184910"
+                 WHEN      "190185110"
+                 WHEN      "190185310"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190183710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190183910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190184110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190184310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190184510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190184710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190184910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190185110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190185310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院基本料２（生活療養）（看護職員数等経過措置）
+                 WHEN      "190183810"
+                 WHEN      "190184010"
+                 WHEN      "190184210"
+                 WHEN      "190184410"
+                 WHEN      "190184610"
+                 WHEN      "190184810"
+                 WHEN      "190185010"
+                 WHEN      "190185210"
+                 WHEN      "190185410"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190183810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190184010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190184210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190184410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190184610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190184810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190185010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190185210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190185410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院基本料２（夜勤時間特別入院基本料）
+                 WHEN      "190185510"
+                 WHEN      "190185710"
+                 WHEN      "190185910"
+                 WHEN      "190186110"
+                 WHEN      "190186310"
+                 WHEN      "190186510"
+                 WHEN      "190186710"
+                 WHEN      "190186910"
+                 WHEN      "190187110"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190185510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190185710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190185910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190186110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190186310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190186510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190186710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190186910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190187110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院基本料２（生活療養）（夜勤時間特別入院基本料）
+                 WHEN      "190185610"
+                 WHEN      "190185810"
+                 WHEN      "190186010"
+                 WHEN      "190186210"
+                 WHEN      "190186410"
+                 WHEN      "190186610"
+                 WHEN      "190186810"
+                 WHEN      "190187010"
+                 WHEN      "190187210"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190185610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190185810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190186010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190186210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190186410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190186610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190186810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190187010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190187210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
                 END-EVALUATE
              END-IF
       *

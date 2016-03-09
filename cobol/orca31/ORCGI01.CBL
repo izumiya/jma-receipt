@@ -1054,6 +1054,12 @@
       *    夜勤時間超過減算入院料コード取得サブ
            COPY "CPORCSYAKINGEN.INC".
       *
+      *    夜勤時間特別入院基本料コード取得サブ
+           COPY "CPORCSYAKINTOKU.INC".
+      *
+      *    看護職員数等入院基本料コード取得サブ
+           COPY "CPORCSKANGOCHG.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -1661,14 +1667,32 @@
            MOVE    "1"             TO  SPA-GMN-I01-SKJKBNL (2)
            MOVE    "食あり"        TO  SPA-GMN-I01-SKJKBNMEIL (2)
       *
-           IF    ( SYS-5000-SHOKUJIRYOYOCD
+           IF     WRK-KJNYMD       <=  "20160331"
+             IF    ( SYS-5000-SHOKUJIRYOYOCD
                                    =   CONST-SKJRYOYO2 )
                MOVE    2           TO  SPA-GMN-I01-SKJKBN-CNT
-           ELSE
+             ELSE
                MOVE    3           TO  SPA-GMN-I01-SKJKBN-CNT
       *
                MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (3)
                MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (3)
+             END-IF
+           ELSE
+             IF    ( SYS-5000-SHOKUJIRYOYOCD
+                                     =   CONST-SKJRYOYO2 )
+               MOVE    3           TO  SPA-GMN-I01-SKJKBN-CNT
+      *
+               MOVE    "3"         TO  SPA-GMN-I01-SKJKBNL (3)
+               MOVE    "流動食"    TO  SPA-GMN-I01-SKJKBNMEIL (3)
+             ELSE
+               MOVE    4           TO  SPA-GMN-I01-SKJKBN-CNT
+      *
+               MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (3)
+               MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (3)
+      *
+               MOVE    "3"         TO  SPA-GMN-I01-SKJKBNL (4)
+               MOVE    "流動食"    TO  SPA-GMN-I01-SKJKBNMEIL (4)
+             END-IF
            END-IF
       *
            .
@@ -11360,6 +11384,11 @@
       *        ・一般病棟特別入院基本料
       *        ・精神病棟１５対１入院基本料
       *        ・精神病棟特別入院基本料
+      *        以下入院料を追加（平成２８年改正で対応）
+      *        ・療養病棟・一般病棟７対１入院基本料
+      *        ・療養病棟・一般病棟１０対１入院基本料
+      *        ・療養病棟・一般病棟１３対１入院基本料
+      *        ・療養病棟・一般病棟１５対１入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -11371,7 +11400,12 @@
       *                                         特定入院料の算定要件外の算定
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         平成２８年改正対応
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -11585,6 +11619,8 @@
                    MOVE   1     TO  LNK-SCNYUACCT-SHOKUJIKBN
                WHEN   "2"
                    MOVE   2     TO  LNK-SCNYUACCT-SHOKUJIKBN
+               WHEN   "3"
+                   MOVE   3     TO  LNK-SCNYUACCT-SHOKUJIKBN
            END-EVALUATE
       *    食堂加算
            PERFORM     4801-BTUSEL-SEC
@@ -11778,7 +11814,7 @@
       *    同日再入院でない、又は他院歴からの同日再入院の場合は、
       *    入院時食事時間区分に従い入院会計データを更新する。
            IF   PTNYUINRRK-NYUINYMD      >=   "20060401"
-             IF   PTNYUINRRK-SKJKBN        =    "1"   OR   "2"
+             IF   PTNYUINRRK-SKJKBN        =    "1"   OR   "2"  OR  "3"
                IF   PTNYUINRRK-DOUJITSUKBN     =   SPACE  OR  "2"
       *            通常の入院又は他院歴からの同日入院
       *
@@ -12003,6 +12039,9 @@
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12039,6 +12078,9 @@
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12074,6 +12116,9 @@
                            END-IF
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
@@ -12115,6 +12160,9 @@
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12150,6 +12198,9 @@
                            END-IF
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
@@ -12191,6 +12242,9 @@
                            IF   PTNYUINRRK-SKJKBN        =    "2"
                                MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
                            END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "3"
+                               MOVE  3   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12231,7 +12285,7 @@
            IF      FLG-NYUINACCT        =   ZERO
                MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                        TO  IDX-SHOKUJIX
-               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                    MOVE    1           TO  WRK-SHOKUJI-ASA
                END-IF
            END-IF
@@ -12252,7 +12306,7 @@
            IF      FLG-NYUINACCT        =   ZERO
                MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                        TO  IDX-SHOKUJIX
-               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                    MOVE    1           TO  WRK-SHOKUJI-HIRU
                END-IF
            END-IF
@@ -12273,7 +12327,7 @@
            IF      FLG-NYUINACCT        =   ZERO
                MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                        TO  IDX-SHOKUJIX
-               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+               IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                    MOVE    1           TO  WRK-SHOKUJI-YORU
                END-IF
            END-IF
@@ -12821,7 +12875,7 @@
              IF      FLG-NYUINACCT        =   ZERO
                  MOVE     BAKRRK-NYUINYMD(7:2)
                                          TO  IDX-SHOKUJIX
-                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                      MOVE    1           TO  WRK-SHOKUJI-ASA
                  END-IF
              END-IF
@@ -12842,7 +12896,7 @@
              IF      FLG-NYUINACCT        =   ZERO
                  MOVE     BAKRRK-NYUINYMD(7:2)
                                          TO  IDX-SHOKUJIX
-                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                      MOVE    1           TO  WRK-SHOKUJI-HIRU
                  END-IF
              END-IF
@@ -12863,7 +12917,7 @@
              IF      FLG-NYUINACCT        =   ZERO
                  MOVE     BAKRRK-NYUINYMD(7:2)
                                          TO  IDX-SHOKUJIX
-                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2
+                 IF   NACCT-DAY(IDX-SHOKUJI9)  =  1  OR  2  OR  3
                      MOVE    1           TO  WRK-SHOKUJI-YORU
                  END-IF
              END-IF
@@ -13136,6 +13190,11 @@
       *        ・一般病棟特別入院基本料
       *        ・精神病棟１５対１入院基本料
       *        ・精神病棟特別入院基本料
+      *        以下入院料を追加（平成２８年改正で対応）
+      *        ・療養病棟・一般病棟７対１入院基本料
+      *        ・療養病棟・一般病棟１０対１入院基本料
+      *        ・療養病棟・一般病棟１３対１入院基本料
+      *        ・療養病棟・一般病棟１５対１入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -13147,7 +13206,12 @@
       *                                         特定入院料の算定要件外の算定
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         平成２８年改正対応
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -13996,6 +14060,11 @@
       *        ・一般病棟特別入院基本料
       *        ・精神病棟１５対１入院基本料
       *        ・精神病棟特別入院基本料
+      *        以下入院料を追加（平成２８年改正で対応）
+      *        ・療養病棟・一般病棟７対１入院基本料
+      *        ・療養病棟・一般病棟１０対１入院基本料
+      *        ・療養病棟・一般病棟１３対１入院基本料
+      *        ・療養病棟・一般病棟１５対１入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -14007,7 +14076,12 @@
       *                                         特定入院料の算定要件外の算定
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         平成２８年改正対応
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -14689,6 +14763,8 @@
                       MOVE   1     TO  LNK-SCNYUACCT-SHOKUJIKBN
                WHEN   "2"
                       MOVE   2     TO  LNK-SCNYUACCT-SHOKUJIKBN
+               WHEN   "3"
+                      MOVE   3     TO  LNK-SCNYUACCT-SHOKUJIKBN
            END-EVALUATE
       *    食堂加算
            PERFORM     4801-BTUSEL-SEC
@@ -15752,6 +15828,11 @@
       *        ・一般病棟特別入院基本料
       *        ・精神病棟１５対１入院基本料
       *        ・精神病棟特別入院基本料
+      *        以下入院料を追加（平成２８年改正で対応）
+      *        ・療養病棟・一般病棟７対１入院基本料
+      *        ・療養病棟・一般病棟１０対１入院基本料
+      *        ・療養病棟・一般病棟１３対１入院基本料
+      *        ・療養病棟・一般病棟１５対１入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -15763,7 +15844,12 @@
       *                                         特定入院料の算定要件外の算定
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         平成２８年改正対応
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -16662,6 +16748,9 @@
       *                （栄管経過措置）
                        MOVE   "190718710"  TO  STUSAN-TOKUTEI-SRYCD(3)
                        MOVE   "190718810"  TO  STUSAN-TOKUTEI-SRYCD(4)
+      *                （平成２８年度コード変更）
+                       MOVE   "190194310"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190194410"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "13"
                        MOVE   "190024810"  TO  STUSAN-TOKUTEI-SRYCD(1)
                    WHEN   "17"
@@ -17172,10 +17261,13 @@
       *
       *****************************************************************
       *    夜勤時間超過減算コードへの置き換え処理
+      *    夜勤時間特別入院基本料コードへの置き換え処理
+      *    看護職員数等入院基本料コードへの置き換え処理
       *****************************************************************
        4801-YAKINGEN-CHG-SEC   SECTION.
       *
            IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20140401"
+      *        夜勤時間超過減算入院料コード取得
                INITIALIZE    ORCSYAKINGEN-AREA
                MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
                                    TO    LNK-YAKINGEN-SANTEIYM
@@ -17187,6 +17279,36 @@
                                                 SPA-AREA
                IF   LNK-YAKINGEN-RC     =       ZERO
                     MOVE LNK-YAKINGEN-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+           END-IF
+           IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20160401"
+      *        夜勤時間特別入院基本料コード取得
+               INITIALIZE    ORCSYAKINTOKU-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-YAKINTOKU-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-YAKINTOKU-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-YAKINTOKU-SRYCD
+               CALL   "ORCSYAKINTOKU"    USING  ORCSYAKINTOKU-AREA
+                                                SPA-AREA
+               IF   LNK-YAKINTOKU-RC     =       ZERO
+                    MOVE LNK-YAKINTOKU-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+      *        看護職員数等入院基本料コード取得
+               INITIALIZE    ORCSKANGOCHG-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-KANGOCHG-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-KANGOCHG-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-KANGOCHG-SRYCD
+               CALL   "ORCSKANGOCHG"    USING   ORCSKANGOCHG-AREA
+                                                SPA-AREA
+               IF   LNK-KANGOCHG-RC     =       ZERO
+                    MOVE LNK-KANGOCHG-CHGSRYCD
                                    TO    SYOKIKSN-IN-KHNSRYCD
                END-IF
            END-IF

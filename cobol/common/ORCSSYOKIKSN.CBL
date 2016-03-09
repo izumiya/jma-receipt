@@ -59,6 +59,7 @@
            03  FLG-SINRYOJO-VAL-1804       PIC 9(01).
            03  FLG-SINRYOJO-VAL-2204       PIC 9(01).
            03  FLG-SINRYOJO-VAL-2604       PIC 9(01).
+           03  FLG-TENSU                   PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -180,6 +181,29 @@
                05  CONST-SINRYOJO-07-ST    PIC X(4)    VALUE   "1036".
                05  CONST-SINRYOJO-07-ED    PIC X(4)    VALUE   "9999".
       *
+      *    結核病棟入院基本料（平成２８年度改定）
+           03  CONST-KEKKAKU-VAL-2804.
+               05  CONST-KEKKAKU-01-ST      PIC X(4)    VALUE   "1001".
+               05  CONST-KEKKAKU-01-ED      PIC X(4)    VALUE   "1014".
+      *
+               05  CONST-KEKKAKU-02-ST      PIC X(4)    VALUE   "1015".
+               05  CONST-KEKKAKU-02-ED      PIC X(4)    VALUE   "1030".
+      *
+               05  CONST-KEKKAKU-03-ST      PIC X(4)    VALUE   "1031".
+               05  CONST-KEKKAKU-03-ED      PIC X(4)    VALUE   "1060".
+      *
+               05  CONST-KEKKAKU-04-ST      PIC X(4)    VALUE   "1061".
+               05  CONST-KEKKAKU-04-ED      PIC X(4)    VALUE   "1090".
+      *
+               05  CONST-KEKKAKU-05-ST      PIC X(4)    VALUE   "1091".
+               05  CONST-KEKKAKU-05-ED      PIC X(4)    VALUE   "1180".
+      *
+               05  CONST-KEKKAKU-06-ST      PIC X(4)    VALUE   "1181".
+               05  CONST-KEKKAKU-06-ED      PIC X(4)    VALUE   "3001".
+      *
+               05  CONST-KEKKAKU-07-ST      PIC X(4)    VALUE   "1180".
+               05  CONST-KEKKAKU-07-ED      PIC X(4)    VALUE   "9999".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -187,6 +211,9 @@
       *    入院料算定マスタ
        01  NYUINKHN-REC.
            COPY  "CPNYUINKHN.INC".
+      *
+      *    点数マスタ−
+           COPY    "CPTENSU.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -591,6 +618,22 @@
                MOVE    CONST-KGNTEN-VAL    TO  WRK-KIKAN-TBL
            END-IF
       *
+      *    結核病棟入院基本料（平成２８年度改定）
+           IF   SYOKIKSN-IN-SANTEISTYMD(1:6)  >=    "201604"
+      *        結核病棟入院基本料の判定の為、点数マスタ参照
+               INITIALIZE                        TNS-TENSU-REC
+               MOVE    SPA-HOSPNUM           TO  TNS-HOSPNUM
+               MOVE    SYOKIKSN-IN-KHNSRYCD  TO  TNS-SRYCD
+               MOVE    SYOKIKSN-IN-SANTEISTYMD
+                                             TO  TNS-YUKOSTYMD
+               MOVE    TNS-YUKOSTYMD         TO  TNS-YUKOEDYMD
+               PERFORM   910-TENSU-READ-SEC
+               IF    ( TNS-CDKBN-KBN        =    "A"  )   AND
+                     ( TNS-CDKBN-KBNNUM     =    102  )
+                   MOVE    CONST-KEKKAKU-VAL-2804  TO  WRK-KIKAN-TBL
+               END-IF
+           END-IF
+      *
       *    基準日取得処理
            PERFORM 210-KJNYMD-GET-SEC
       *
@@ -839,6 +882,39 @@
       *
            .
        5002-CALENDAR-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスター読込（主キー）
+      *****************************************************************
+       910-TENSU-READ-SEC         SECTION.
+      *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM   911-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM   910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+                   MOVE    ZERO            TO  FLG-TENSU
+               ELSE
+                   MOVE    1               TO  FLG-TENSU
+                   INITIALIZE              TNS-TENSU-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-TENSU
+               INITIALIZE                  TNS-TENSU-REC
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       910-TENSU-READ-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

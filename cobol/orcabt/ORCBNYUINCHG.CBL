@@ -428,6 +428,12 @@
       *    夜勤時間超過減算入院料コード取得サブ
            COPY "CPORCSYAKINGEN.INC".
       *
+      *    夜勤時間特別入院基本料コード取得サブ
+           COPY "CPORCSYAKINTOKU.INC".
+      *
+      *    看護職員数等入院基本料コード取得サブ
+           COPY "CPORCSKANGOCHG.INC".
+      *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
       *
@@ -1376,6 +1382,11 @@
       *        ・一般病棟特別入院基本料
       *        ・精神病棟１５対１入院基本料
       *        ・精神病棟特別入院基本料
+      *        以下入院料を追加（平成２８年改正で対応）
+      *        ・療養病棟・一般病棟７対１入院基本料
+      *        ・療養病棟・一般病棟１０対１入院基本料
+      *        ・療養病棟・一般病棟１３対１入院基本料
+      *        ・療養病棟・一般病棟１５対１入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -1387,7 +1398,12 @@
       *                                         特定入院料の算定要件外の算定
                                                 "190079010"   OR
                                                 "190083810"   OR
-                                                "190085010"
+                                                "190085010"   OR
+      *                                         平成２８年改正対応
+                                                "190198110"   OR
+                                                "190198210"   OR
+                                                "190198310"   OR
+                                                "190198410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -2697,10 +2713,13 @@
       *
       *****************************************************************
       *    夜勤時間超過減算コードへの置き換え処理
+      *    夜勤時間特別入院基本料コードへの置き換え処理
+      *    看護職員数等入院基本料コードへの置き換え処理
       *****************************************************************
        4801-YAKINGEN-CHG-SEC   SECTION.
       *
            IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20140401"
+      *        夜勤時間超過減算入院料コード取得
                INITIALIZE    ORCSYAKINGEN-AREA
                MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
                                    TO    LNK-YAKINGEN-SANTEIYM
@@ -2712,6 +2731,36 @@
                                                 SPA-AREA
                IF   LNK-YAKINGEN-RC     =       ZERO
                     MOVE LNK-YAKINGEN-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+           END-IF
+           IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20160401"
+      *        夜勤時間特別入院基本料コード取得
+               INITIALIZE    ORCSYAKINTOKU-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-YAKINTOKU-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-YAKINTOKU-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-YAKINTOKU-SRYCD
+               CALL   "ORCSYAKINTOKU"    USING  ORCSYAKINTOKU-AREA
+                                                SPA-AREA
+               IF   LNK-YAKINTOKU-RC     =       ZERO
+                    MOVE LNK-YAKINTOKU-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+      *        看護職員数等入院基本料コード取得
+               INITIALIZE    ORCSKANGOCHG-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-KANGOCHG-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-KANGOCHG-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-KANGOCHG-SRYCD
+               CALL   "ORCSKANGOCHG"    USING   ORCSKANGOCHG-AREA
+                                                SPA-AREA
+               IF   LNK-KANGOCHG-RC     =       ZERO
+                    MOVE LNK-KANGOCHG-CHGSRYCD
                                    TO    SYOKIKSN-IN-KHNSRYCD
                END-IF
            END-IF
