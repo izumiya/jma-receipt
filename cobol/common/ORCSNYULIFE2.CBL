@@ -445,20 +445,20 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-           PERFORM    VARYING IDX   FROM   1   BY  1
-                      UNTIL IDX   >   31
-             DISPLAY "IDX = " IDX
-             DISPLAY "LNK-NYULIFE2-KBN = " LNK-NYULIFE2-KBN(IDX)
-             DISPLAY "LNK-NYULIFE2-FTNKBN2 = " LNK-NYULIFE2-FTNKBN2(IDX)
-             PERFORM   VARYING   IDX-T   FROM  1  BY  1
-               UNTIL   IDX-T   >   3
-               DISPLAY "IDX-T = " IDX-T
-               DISPLAY "LNK-NYULIFE2-SKJ-SRYCD =" LNK-NYULIFE2-SKJ-SRYCD
-                                                            (IDX IDX-T)
-               DISPLAY "LNK-NYULIFE2-SKJ-MONEY =" LNK-NYULIFE2-SKJ-MONEY
-                                                            (IDX IDX-T)
-             END-PERFORM
-           END-PERFORM
+      **     PERFORM    VARYING IDX   FROM   1   BY  1
+      **                UNTIL IDX   >   31
+      **       DISPLAY "IDX = " IDX
+      **       DISPLAY "LNK-NYULIFE2-KBN = " LNK-NYULIFE2-KBN(IDX)
+      **       DISPLAY "LNK-NYULIFE2-FTNKBN2 = " LNK-NYULIFE2-FTNKBN2(IDX)
+      **       PERFORM   VARYING   IDX-T   FROM  1  BY  1
+      **         UNTIL   IDX-T   >   3
+      **         DISPLAY "IDX-T = " IDX-T
+      **         DISPLAY "LNK-NYULIFE2-SKJ-SRYCD =" LNK-NYULIFE2-SKJ-SRYCD
+      **                                                      (IDX IDX-T)
+      **         DISPLAY "LNK-NYULIFE2-SKJ-MONEY =" LNK-NYULIFE2-SKJ-MONEY
+      **                                                      (IDX IDX-T)
+      **       END-PERFORM
+      **     END-PERFORM
            .
        000-PROC-EXT.
       *
