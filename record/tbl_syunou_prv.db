@@ -205,6 +205,14 @@ tbl_syunou_prv {
 	SHOKUJI9  			number(7,0);
 	SHOKUJI10_NISSU                  number(2,0);
 	SHOKUJI10  			number(7,0);
+        SHOKUJI11_NISSU                 number(2,0);
+        SHOKUJI11                       number(7,0);
+        SHOKUJI12_NISSU                 number(2,0);
+        SHOKUJI12                       number(7,0);
+        SHOKUJI13_NISSU                 number(2,0);
+        SHOKUJI13                       number(7,0);
+        SHOKUJI14_NISSU                 number(2,0);
+        SHOKUJI14                       number(7,0);
         SYUSKJ_NISSU                    number(2,0);
         SYUSKJ_RYOYOHI                  number(7,0);
         SYUSKJ_FTN                      number(7,0);
@@ -304,6 +312,11 @@ tbl_syunou_prv {
 	JYO_COMPFTN                     number(7,0);
 	JYO_COMPFTN_ENTANI              number(8,1);
 	HKNTEKKBN			char(1);
+        NYUINETC1                       number(7,0);
+        NYUINETC2                       number(7,0);
+        NYUINETC3                       number(7,0);
+        NYUINETC4                       number(7,0);
+        NYUINETC5                       number(7,0);
 	TERMID  			varchar(16);
 	OPID    			varchar(16);
 	CREYMD  			char(8);

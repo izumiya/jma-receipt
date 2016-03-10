@@ -175,6 +175,7 @@
       *                                     ª»Õ—§¨§¢§Î§´•¡•ß•√•Ø
       *  04.08.02    NACL-ÃÁœ∆    16/03/03  ∏¯≥≤§ŒŒ≈Õ‹√¥≈ˆºÍ≈ˆ§œ
       *                                     ÃÙ∫ﬁ°¶¥Ô∫‡≈¿§ŒºË§Í∞∑§§§»§π§Î
+      *  04.08.03    NACL-ÃÁœ∆    16/03/07   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3296,22 +3297,41 @@ grpsys                            SPA-AREA
                                    PERFORM   NYUKHNKSNKBN-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       4
-                                     IF  SYU-SRYYMD(1:6) >= "200404"
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.3 ) + 0.5
+                                     IF    SYU-SRYYMD(1:6) >= "201604"
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.6 ) + 0.5
                                      ELSE
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.15) + 0.5
+                                       IF  SYU-SRYYMD(1:6) >= "200404"
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.3 ) + 0.5
+                                       ELSE
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.15) + 0.5
+                                       END-IF
                                      END-IF
                                     WHEN       5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.7 ) + 0.5
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.9 ) + 0.5
+                                     ELSE
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.7 ) + 0.5
+                                     END-IF
                                     WHEN       6
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.45) + 0.5
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.8 ) + 0.5
+                                     ELSE
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.45) + 0.5
+                                     END-IF
                                     WHEN       7
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.85) + 0.5
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                        CONTINUE
+                                     ELSE
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.85) + 0.5
+                                     END-IF
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3332,9 +3352,9 @@ grpsys                            SPA-AREA
       *                          ∏∫≥€° £π£≤°Û°À
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  10
+      ***                        WHEN  11
+      ***                        WHEN  12
                                  WHEN  13
                                    PERFORM   CHUKSNCD-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
@@ -3344,30 +3364,38 @@ grpsys                            SPA-AREA
                                     WHEN       9
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-KHNTEN * 0.92) + 0.5
-                                    WHEN      10
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.92) + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN
-                                                         * 0.3 ) + 0.5
-                                    WHEN      11
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.92) + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN
-                                                         * 0.7 ) + 0.5
-                                    WHEN      12
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.92) + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN
-                                                         * 0.3 ) + 0.5
+      ***                           WHEN      10
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-KHNTEN * 0.92) + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN
+      ***                                                * 0.3 ) + 0.5
+      ***                           WHEN      11
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-KHNTEN * 0.92) + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN
+      ***                                                * 0.7 ) + 0.5
+      ***                           WHEN      12
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-KHNTEN * 0.92) + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN
+      ***                                                * 0.3 ) + 0.5
                                     WHEN      13
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-KHNTEN * 0.92) + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN
-                                                         * 0.7 ) + 0.5
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.92) + 0.5
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-TENSU-KEISAN
+                                                           * 0.9 ) + 0.5
+                                     ELSE
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.92) + 0.5
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-TENSU-KEISAN
+                                                           * 0.7 ) + 0.5
+                                     END-IF
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3420,7 +3448,28 @@ grpsys                            SPA-AREA
       *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«
                                  WHEN   4
                                    PERFORM    NYUKHNKSNKBN-CHECK-SEC
-                                   IF  SYU-SRYYMD(1:6) >= "201004"
+                                   IF   SYU-SRYYMD(1:6) >= "201604"
+                                     COMPUTE  WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.6)
+                                                                + 0.5
+                                     COMPUTE  WRK-TENSU-KEISAN  =
+                                              WRK-TENSU-KEISAN  +
+                                              WRK-KSNTEN
+                                     IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-TENSU-KEISAN  -
+                                              (WRK-TENSU-KEISAN *
+                                               (WRK-HYOKETU-TEN / 100)))
+                                                                + 0.5
+                                     END-IF
+                                     COMPUTE  SYU-HKNTEN(15)  =
+                                              SYU-HKNTEN(15)  +
+                                              WRK-TENSU-KEISAN
+                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                              SDAY-HKNTEN(SYU-IDX) +
+                                              WRK-TENSU-KEISAN
+                                   ELSE
+                                    IF  SYU-SRYYMD(1:6) >= "201004"
                                      COMPUTE  WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.3)
                                                                 + 0.5
@@ -3440,7 +3489,7 @@ grpsys                            SPA-AREA
                                      COMPUTE  SDAY-HKNTEN(SYU-IDX) =
                                               SDAY-HKNTEN(SYU-IDX) +
                                               WRK-TENSU-KEISAN
-                                   ELSE
+                                    ELSE
                                      COMPUTE  SYU-HKNTEN(15)  =
                                               SYU-HKNTEN(15)  +
                                             ((WRK-KHNTEN      *
@@ -3451,6 +3500,7 @@ grpsys                            SPA-AREA
                                             ((WRK-KHNTEN      *        
                                               WRK-SENTEI-GAIHAKU-KEISU)
                                                               +  0.5)  
+                                    END-IF
                                    END-IF
       *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«
                                  WHEN   5
@@ -3459,17 +3509,33 @@ grpsys                            SPA-AREA
                                    PERFORM   NYUKHNKSNKBN-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       5
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.9 )
+                                                                + 0.5
+                                     ELSE
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.7 )
                                                                 + 0.5
+                                     END-IF
                                     WHEN       6
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.8 )
+                                                                + 0.5
+                                     ELSE
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.45)
                                                                 + 0.5
+                                     END-IF
                                     WHEN       7
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                      CONTINUE
+                                     ELSE
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.85)
                                                                 + 0.5
+                                     END-IF
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3490,9 +3556,9 @@ grpsys                            SPA-AREA
       *                          ∏∫≥€
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  10
+      ***                        WHEN  11
+      ***                        WHEN  12
                                  WHEN  13
                                    PERFORM   CHUKSNCD-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
@@ -3504,34 +3570,43 @@ grpsys                            SPA-AREA
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.92)
                                                                 + 0.5
-                                    WHEN      10
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-SENTEI-KHNTEN * 0.92)
-                                                                + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN  * 0.3 )
-                                                                + 0.5
-                                    WHEN      11
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-SENTEI-KHNTEN * 0.92)
-                                                                + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN  * 0.7 )
-                                                                + 0.5
-                                    WHEN      12
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-SENTEI-KHNTEN * 0.92)
-                                                                + 0.5
-                                      COMPUTE WRK-TENSU-KEISAN  =
-                                             (WRK-TENSU-KEISAN  * 0.3 )
-                                                                + 0.5
+      ***                           WHEN      10
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-SENTEI-KHNTEN * 0.92)
+      ***                                                       + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN  * 0.3 )
+      ***                                                       + 0.5
+      ***                           WHEN      11
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-SENTEI-KHNTEN * 0.92)
+      ***                                                       + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN  * 0.7 )
+      ***                                                       + 0.5
+      ***                           WHEN      12
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-SENTEI-KHNTEN * 0.92)
+      ***                                                       + 0.5
+      ***                             COMPUTE WRK-TENSU-KEISAN  =
+      ***                                    (WRK-TENSU-KEISAN  * 0.3 )
+      ***                                                       + 0.5
                                     WHEN      13
+                                     IF  SYU-SRYYMD(1:6) >= "201604"
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.92)
+                                                                + 0.5
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-TENSU-KEISAN  * 0.9 )
+                                                                + 0.5
+                                     ELSE
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.92)
                                                                 + 0.5
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-TENSU-KEISAN  * 0.7 )
                                                                 + 0.5
+                                     END-IF
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3752,7 +3827,69 @@ grpsys                                    SPA-AREA
       **************************************************************
        NYUKHNKSNKBN-CHECK-SEC           SECTION.
       *
-           IF   SYU-SRYYMD(1:6)  >=  "201004"
+           IF   SYU-SRYYMD(1:6)  >=  "201604"
+             IF   TBL-GAIHAKU(SYU-IDX)  =   7
+               MOVE    1    TO    WRK-TAIJYUSIN-ERR
+             END-IF
+             EVALUATE   WRK-NYUKHNKSNKBN
+      *        ∆√ƒÍ∆˛±°Œ¡
+               WHEN   201  THRU  206
+               WHEN   208  THRU  210
+               WHEN   212  THRU  217
+               WHEN   221
+               WHEN   227  THRU  229
+               WHEN   232  THRU  236
+               WHEN   238  THRU  239
+               WHEN   241  THRU  249
+               WHEN   250  THRU  254
+               WHEN   257  THRU  267
+      *        --- H28.4 TUIKA ---
+               WHEN   268  THRU  270
+                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+      *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
+                 IF    WRK-NYUKHNKSNKBN = 221 OR 232 OR 217
+                   CONTINUE
+                 ELSE
+                   IF  TBL-GAIHAKU(SYU-IDX) =  6
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                   END-IF
+                 END-IF
+      *        Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+               WHEN   152
+               WHEN   173  THRU  190
+               WHEN   196
+               WHEN   199
+      *        --- H28.4 TUIKA ---
+               WHEN   048  THRU  049
+               WHEN   051  THRU  054
+               WHEN   057  THRU  068
+                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+                 IF    TBL-GAIHAKU(SYU-IDX) =  6
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+      *        Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
+               WHEN   153  THRU  158
+                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+      *        √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
+               WHEN   226
+               WHEN   240
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+      *        ¬æ
+               WHEN   OTHER
+                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
+                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+             END-EVALUATE
+           ELSE
+            IF  SYU-SRYYMD(1:6)  >=  "201004"
              EVALUATE   WRK-NYUKHNKSNKBN
       *        ∆√ƒÍ∆˛±°¥À‹Œ¡
                WHEN   099  THRU  100
@@ -3896,6 +4033,7 @@ grpsys                                    SPA-AREA
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
              END-EVALUATE
+            END-IF
            END-IF
       *
            .
@@ -3908,10 +4046,42 @@ grpsys                                    SPA-AREA
       **************************************************************
        CHUKSNCD-CHECK-SEC           SECTION.
       *
-           EVALUATE   TBL-GAIHAKU(SYU-IDX)
+           IF   SYU-SRYYMD(1:6)  >=  "201604"
+            EVALUATE   TBL-GAIHAKU(SYU-IDX)
              WHEN        8
-             WHEN       10
-             WHEN       11
+      ***    WHEN       10
+      ***    WHEN       11
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   IF  TBL-GAIHAKU(SYU-IDX) = 10 OR 11
+                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
+                   END-IF
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR
+               END-EVALUATE
+             WHEN        9
+      ***    WHEN       12
+             WHEN       13
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   IF  TBL-GAIHAKU(SYU-IDX) = 12 OR 13
+                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
+                   END-IF
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR2
+               END-EVALUATE
+            END-EVALUATE
+           ELSE
+            EVALUATE   TBL-GAIHAKU(SYU-IDX)
+             WHEN        8
+      ***    WHEN       10
+      ***    WHEN       11
                EVALUATE   WRK-CHUKSNCD
                  WHEN   "9017"
                  WHEN   "9018"
@@ -3924,7 +4094,7 @@ grpsys                                    SPA-AREA
                    MOVE    1    TO    WRK-GENSAN-ERR
                END-EVALUATE
              WHEN        9
-             WHEN       12
+      ***    WHEN       12
              WHEN       13
                EVALUATE   WRK-CHUKSNCD
                  WHEN   "9017"
@@ -3937,7 +4107,8 @@ grpsys                                    SPA-AREA
                  WHEN    OTHER
                    MOVE    1    TO    WRK-GENSAN-ERR2
                END-EVALUATE
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
       *
@@ -3949,7 +4120,14 @@ grpsys                                    SPA-AREA
       **************************************************************
        NYUKHNKSNKBN-CHECK2-SEC           SECTION.
       *
-           EVALUATE   WRK-NYUKHNKSNKBN
+           IF   SYU-SRYYMD(1:6)  >=  "201604"
+               IF    TBL-GAIHAKU(SYU-IDX)  =   11 OR 13
+                  CONTINUE
+               ELSE
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+           ELSE
+            EVALUATE   WRK-NYUKHNKSNKBN
       *      ∆√ƒÍ∆˛±°¥À‹Œ¡
              WHEN   099  THRU  100
                CONTINUE
@@ -3960,7 +4138,8 @@ grpsys                                    SPA-AREA
                ELSE
                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
                END-IF
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
       *

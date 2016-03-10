@@ -510,7 +510,7 @@
            MOVE    SYUNYUIN-RMSAGAKU-TAX-SAI
                                        TO  SYU-RMSAGAKU-TAX-SAI
            PERFORM VARYING IDX1 FROM   1   BY  1
-                   UNTIL ( IDX1 >   10 )
+                   UNTIL ( IDX1 >   14 )
                MOVE    SYUNYUIN-SHOKUJI-NISSU (IDX1)
                                        TO  SYU-SHOKUJI-NISSU (IDX1)
                MOVE    SYUNYUIN-SHOKUJI (IDX1)
@@ -575,6 +575,11 @@
            END-PERFORM
            MOVE    SYUNYUIN-NYUIN-RRKNUM
                                        TO  SYU-NYUIN-RRKNUM
+           MOVE    SYUNYUIN-NYUINETC1  TO  SYU-NYUINETC1
+           MOVE    SYUNYUIN-NYUINETC2  TO  SYU-NYUINETC2
+           MOVE    SYUNYUIN-NYUINETC3  TO  SYU-NYUINETC3
+           MOVE    SYUNYUIN-NYUINETC4  TO  SYU-NYUINETC4
+           MOVE    SYUNYUIN-NYUINETC5  TO  SYU-NYUINETC5
       *
            .
        20011-SYUNYUIN-GET-EXT.
@@ -712,7 +717,7 @@
            MOVE    SYU-RMSAGAKU-TAX-SAI
                                        TO  SYUNYUIN-RMSAGAKU-TAX-SAI
            PERFORM VARYING IDX1 FROM   1   BY  1
-                   UNTIL ( IDX1 >   10 )
+                   UNTIL ( IDX1 >   14 )
                MOVE    SYU-SHOKUJI-NISSU (IDX1)
                                        TO  SYUNYUIN-SHOKUJI-NISSU (IDX1)
                MOVE    SYU-SHOKUJI (IDX1)
@@ -773,6 +778,11 @@
                                        TO  SYUNYUIN-DAY (IDX1)
            END-PERFORM
            MOVE    SYU-NYUIN-RRKNUM    TO  SYUNYUIN-NYUIN-RRKNUM
+           MOVE    SYU-NYUINETC1       TO  SYUNYUIN-NYUINETC1
+           MOVE    SYU-NYUINETC2       TO  SYUNYUIN-NYUINETC2
+           MOVE    SYU-NYUINETC3       TO  SYUNYUIN-NYUINETC3
+           MOVE    SYU-NYUINETC4       TO  SYUNYUIN-NYUINETC4
+           MOVE    SYU-NYUINETC5       TO  SYUNYUIN-NYUINETC5
            MOVE    SYU-SRYYMD          TO  SYUNYUIN-SELSRYYMD
            MOVE    SYU-CREATEKBN       TO  SYUNYUIN-SELCREATEKBN
            MOVE    SYU-SELNYUGAIKBN    TO  SYUNYUIN-SELNYUGAIKBN

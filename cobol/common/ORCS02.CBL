@@ -421,6 +421,7 @@
       *                                     ∆˛≥∞ Ã¬–±˛
       *  04.08.02    NACL-ÃÁœ∆    15/10/05  ∆Ò…¬∆√µ≠ªˆπ‡¬–±˛
       *  04.08.03    NACL-ÃÁœ∆    15/10/08  •∑•π•∆•‡¥…Õ˝£≤£∞£±£∞µ°«Ωƒ…≤√¬–±˛
+      *  04.08.04    NACL-ÃÁœ∆    16/02/29   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1332,6 +1333,7 @@
            03  IDX20                   PIC  9(03).
            03  IDX21                   PIC  9(03).
            03  IDX22                   PIC  9(02).
+           03  IDX23                   PIC  9(02).
            03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
            03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
            03  IDY                     PIC  9(02)  VALUE  ZERO.
@@ -1413,9 +1415,9 @@
            03  WK-TOKUKANRIKASAN-OCC.
                05  WK-TOKUKANRIKASAN   PIC 9(01)  OCCURS 31.
            03  WK-SHOKUJI-KINGAKU-OCC.
-               05  WK-SHOKUJI-KINGAKU      PIC 9(07)  OCCURS  7.
+               05  WK-SHOKUJI-KINGAKU      PIC 9(07)  OCCURS  9.
            03  WK-SHOKUJI-HYOJYUNFTN-OCC.
-               05  WK-SHOKUJI-HYOJYUNFTN   PIC 9(07)  OCCURS  4.
+               05  WK-SHOKUJI-HYOJYUNFTN   PIC 9(07)  OCCURS  6.
            03  WK-SHOKUJI-NISSU        PIC 9(02).
            03  WK-SHOKUJI-NISSUS       PIC 9(02).
            03  WK-SHOKUJI-NISSUL       PIC 9(02).
@@ -1447,15 +1449,15 @@
            03  WK-KNJFTNKIN-SKJL       PIC 9(07).
            03  WK-SRYCD                PIC X(09).
       *
-           03  WK-SHOKUJI-KAIKEI       OCCURS   31.
+           03  WK-SHOKUJI-KAIKEI.
+             04  WK-SHOKUJI-KAIKEI-OCC     OCCURS   31.
                05  WK-SHOKUDOKASAN     PIC 9(04).
-               05  WK-SHOKUJI-ASA      PIC 9(04).
-               05  WK-SHOKUJI-HIRU     PIC 9(04).
-               05  WK-SHOKUJI-YORU     PIC 9(04).
                05  WK-GAIHAKU          PIC 9(04).
       *
                05  WK-SHOKUJI-NYUINJI  PIC 9(04).
                05  WK-SHOKUJI-TOKUSYO  PIC 9(04).
+      *
+               05  WK-SHOKUJI-NYUINJI2 PIC 9(04).
       *
                05  WK-ROSAITOKU95      PIC 9(04).
                05  WK-ROSAITOKU96      PIC 9(04).
@@ -1463,12 +1465,29 @@
       *
                05  WK-SHOKUJI-KANFLG   PIC 9(01).
       *
-           03  WK-NYULIFE-AREA         OCCURS   31.
+           03  WK-SHOKUJI-KAIKEI2.
+             04  WK-SHOKUJI-KAIKEI2-OCC    OCCURS   31.
+               05  WK-SHOKUJI-ASA      PIC 9(04).
+               05  WK-SHOKUJI-HIRU     PIC 9(04).
+               05  WK-SHOKUJI-YORU     PIC 9(04).
+           03  WK-SHOKUJI-KAIKEI2-R  REDEFINES  WK-SHOKUJI-KAIKEI2
+                                           OCCURS   31.
+               05  WK-SHOKUJI-AHY      PIC 9(04)   OCCURS   3.
+      *
+           03  WK-NYULIFE-AREA.
+             04  WK-NYULIFE-OCC            OCCURS   31.
                05  WK-NYULIFE-KBN           PIC  X(01).
                05  WK-NYULIFE-SKJ-MONEY     PIC  9(07).
                05  WK-NYULIFE-KAN-MONEY     PIC  9(07).
                05  WK-NYULIFE-SKJFTN-MONEY  PIC  9(07).
                05  WK-NYULIFE-KANFTN-MONEY  PIC  9(07).
+               05  WK-NYULIFE2-OCC            OCCURS    3.
+                 07  WK-NYULIFE2-SKJ-MONEY     PIC  9(07).
+                 07  WK-NYULIFE2-SKJFTN-MONEY  PIC  9(07).
+      *
+           03  WK-SKJKEEP-AREA.
+             04  WK-SKJKEEP-OCC            OCCURS   31.
+               05  WK-SKJKEEP-KBN           PIC  X(01).
       *
       *√œ ˝∏¯»ÒÕ—•’•È•∞
        01  WK-CHIHOU-FLG-TAIHI-AREA.
@@ -1610,6 +1629,10 @@
            COPY    "CPORCSSYOTOKU.INC".
       *    ∆√ƒÍº¿¥µ≈˘ªªƒÍ»ΩƒÍ•µ•÷
            COPY    "CPORCSSRHKOH.INC".
+      *    ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò…È√¥≥€ºË∆¿•µ•÷£≤
+           COPY    "CPORCSNYULIFE2.INC".
+      *    ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿•µ•÷
+           COPY    "CPORCSSKJKEEP.INC".
       *
       *    £ƒ£¬∏°∫˜
            COPY    "MCPDATA.INC".
@@ -22501,54 +22524,174 @@
               EVALUATE   WK-SHOKUJI-ASA (IDY)
                 WHEN        1
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
                 WHEN        2
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
                                      WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
               END-EVALUATE
               EVALUATE   WK-SHOKUJI-HIRU(IDY)
                 WHEN        1
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
                 WHEN        2
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
                                      WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
               END-EVALUATE
               EVALUATE   WK-SHOKUJI-YORU(IDY)
                 WHEN        1
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
                 WHEN        2
                     ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
                                      WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
               END-EVALUATE
       *
            END-PERFORM
       *
       *    ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò…È√¥≥€ºË∆¿
-           IF   LNK-SYU-SRYYMD(1:6)      >=  "200610"
-             INITIALIZE                      ORCSNYULIFE-AREA
-             MOVE    LNK-SYU-HOSPNUM     TO  LNK-NYULIFE-HOSPNUM
-             MOVE    LNK-SYU-PTID        TO  LNK-NYULIFE-PTID
-             MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-NYULIFE-SANTEIYM
-             CALL    "ORCSNYULIFE"       USING
-                                         ORCSNYULIFE-AREA
+      *    ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿
+           IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+             INITIALIZE                      ORCSNYULIFE2-AREA
+             MOVE    LNK-SYU-HOSPNUM     TO  LNK-NYULIFE2-HOSPNUM
+             MOVE    LNK-SYU-PTID        TO  LNK-NYULIFE2-PTID
+             MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-NYULIFE2-SANTEIYM
+             CALL    "ORCSNYULIFE2"      USING
+                                         ORCSNYULIFE2-AREA
                                          SPA-AREA
-             IF      LNK-NYULIFE-RC  =   ZERO
+             IF      LNK-NYULIFE2-RC =   ZERO
                PERFORM  VARYING  NYULIFE-IDX  FROM  1  BY  1
                          UNTIL   NYULIFE-IDX   >   31
-                 MOVE  LNK-NYULIFE-KBN(NYULIFE-IDX)
-                                TO  WK-NYULIFE-KBN(NYULIFE-IDX)
-                 MOVE  LNK-NYULIFE-SKJ-MONEY(NYULIFE-IDX)
-                                TO  WK-NYULIFE-SKJ-MONEY(NYULIFE-IDX)
-                 MOVE  LNK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
-                                TO  WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
-                 MOVE  LNK-NYULIFE-SKJFTN-MONEY(NYULIFE-IDX)
-                                TO  WK-NYULIFE-SKJFTN-MONEY(NYULIFE-IDX)
-                 MOVE  LNK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
-                                TO  WK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
+                 MOVE  LNK-NYULIFE2-KBN(NYULIFE-IDX)
+                             TO  WK-NYULIFE-KBN(NYULIFE-IDX)
+                 PERFORM  VARYING  IDX23  FROM  1  BY  1
+                           UNTIL   IDX23   >    3
+                   MOVE  LNK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                       TO  WK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                   MOVE  LNK-NYULIFE2-SKJFTN-MONEY(NYULIFE-IDX IDX23)
+                       TO  WK-NYULIFE2-SKJFTN-MONEY(NYULIFE-IDX IDX23)
+                   EVALUATE  LNK-SYU-SYUHKNNUM
+                     WHEN       "971"
+                       IF   FLG-KENPOJYUNKYO  =  ZERO
+                         COMPUTE   WK-KEISAN  =
+                            WK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                                              *   1.2
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  +   5
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  /  10
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  *  10
+                         MOVE      WK-KEISAN  TO
+                            WK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                       END-IF
+                     WHEN       "973"
+                       IF   FLG-KENPOJYUNKYO  =  ZERO
+                         COMPUTE   WK-KEISAN  =
+                            WK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                                              *   1.2
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  +   5
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  /  10
+                         COMPUTE   WK-KEISAN  =   WK-KEISAN  *  10
+                         IF   WK-4001-SKJKBN  =   "2"
+                           COMPUTE WK-KEISAN  =   WK-KEISAN  *  1.2
+                         END-IF
+                         MOVE      WK-KEISAN  TO
+                            WK-NYULIFE2-SKJ-MONEY(NYULIFE-IDX IDX23)
+                       END-IF
+                   END-EVALUATE
+                 END-PERFORM
+                 MOVE  LNK-NYULIFE2-KAN-MONEY(NYULIFE-IDX)
+                             TO  WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                 MOVE  LNK-NYULIFE2-KANFTN-MONEY(NYULIFE-IDX)
+                             TO  WK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
+                 EVALUATE  LNK-SYU-SYUHKNNUM
+                   WHEN       "971"
+                     IF   FLG-KENPOJYUNKYO  =  ZERO
+                       COMPUTE   WK-KEISAN  =
+                          WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                                            *   1.2
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  +   5
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  /  10
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  *  10
+                       MOVE      WK-KEISAN  TO
+                          WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                     END-IF
+                   WHEN       "973"
+                     IF   FLG-KENPOJYUNKYO  =  ZERO
+                       COMPUTE   WK-KEISAN  =
+                          WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                                            *   1.2
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  +   5
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  /  10
+                       COMPUTE   WK-KEISAN  =   WK-KEISAN  *  10
+                       IF   WK-4001-SKJKBN  =   "2"
+                         COMPUTE WK-KEISAN  =   WK-KEISAN  *  1.2
+                       END-IF
+                       MOVE      WK-KEISAN  TO
+                          WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                     END-IF
+                 END-EVALUATE
                  IF   (LNK-SYU-SYUHKNNUM   =  "971" OR "973")
                  AND  (FLG-KENPOJYUNKYO    =  ZERO          )
                    MOVE  SPACE  TO  WK-NYULIFE-KBN(NYULIFE-IDX)
                  END-IF
                END-PERFORM
+             END-IF
+      *
+             INITIALIZE                      ORCSSKJKEEP-AREA
+             MOVE    LNK-SYU-HOSPNUM     TO  LNK-SKJKEEP-HOSPNUM
+             MOVE    LNK-SYU-PTID        TO  LNK-SKJKEEP-PTID
+             MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-SKJKEEP-SANTEIYM
+             CALL    "ORCSSKJKEEP"       USING
+                                         ORCSSKJKEEP-AREA
+                                         SPA-AREA
+             IF      LNK-SKJKEEP-RC  =   ZERO
+               PERFORM  VARYING  NYULIFE-IDX  FROM  1  BY  1
+                         UNTIL   NYULIFE-IDX   >   31
+                 MOVE  LNK-SKJKEEP-KBN(NYULIFE-IDX)
+                                TO  WK-SKJKEEP-KBN(NYULIFE-IDX)
+               END-PERFORM
+             END-IF
+           ELSE
+             IF    LNK-SYU-SRYYMD(1:6)  >=  "200610"
+               INITIALIZE                      ORCSNYULIFE-AREA
+               MOVE    LNK-SYU-HOSPNUM     TO  LNK-NYULIFE-HOSPNUM
+               MOVE    LNK-SYU-PTID        TO  LNK-NYULIFE-PTID
+               MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-NYULIFE-SANTEIYM
+               CALL    "ORCSNYULIFE"       USING
+                                           ORCSNYULIFE-AREA
+                                           SPA-AREA
+               IF      LNK-NYULIFE-RC  =   ZERO
+                 PERFORM  VARYING  NYULIFE-IDX  FROM  1  BY  1
+                           UNTIL   NYULIFE-IDX   >   31
+                   MOVE  LNK-NYULIFE-KBN(NYULIFE-IDX)
+                               TO  WK-NYULIFE-KBN(NYULIFE-IDX)
+                   MOVE  LNK-NYULIFE-SKJ-MONEY(NYULIFE-IDX)
+                               TO  WK-NYULIFE-SKJ-MONEY(NYULIFE-IDX)
+                   MOVE  LNK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                               TO  WK-NYULIFE-KAN-MONEY(NYULIFE-IDX)
+                   MOVE  LNK-NYULIFE-SKJFTN-MONEY(NYULIFE-IDX)
+                               TO  WK-NYULIFE-SKJFTN-MONEY(NYULIFE-IDX)
+                   MOVE  LNK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
+                               TO  WK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
+                   IF   (LNK-SYU-SYUHKNNUM   =  "971" OR "973")
+                   AND  (FLG-KENPOJYUNKYO    =  ZERO          )
+                     MOVE  SPACE  TO  WK-NYULIFE-KBN(NYULIFE-IDX)
+                   END-IF
+                 END-PERFORM
+               END-IF
              END-IF
            END-IF
       *
@@ -22696,7 +22839,738 @@
            IF       FLG-TENSU      =    ZERO
               MOVE    WK-KEISAN   TO  WK-SHOKUJI-HYOJYUNFTN(4)
            END-IF
+      *
+           IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+      *      ∆˛±°ª˛ø©ªˆŒ≈Õ‹° £±°À° £±ø©§À§ƒ§≠°À° ŒÆ∆∞ø©§Œ§ﬂ§ÚƒÛ∂°°À
+             MOVE    "197003110"    TO   WK-SRYCD
+             PERFORM    TENSU-TBL-SEC
+             IF       FLG-TENSU      =    ZERO
+                MOVE    WK-KEISAN   TO  WK-SHOKUJI-KINGAKU(8)
+             END-IF
+      *      ∆˛±°ª˛ø©ªˆŒ≈Õ‹° £≤°À° £±ø©§À§ƒ§≠°À° ŒÆ∆∞ø©§Œ§ﬂ§ÚƒÛ∂°°À
+             MOVE    "197003210"    TO   WK-SRYCD
+             PERFORM    TENSU-TBL-SEC
+             IF       FLG-TENSU      =    ZERO
+                MOVE    WK-KEISAN   TO  WK-SHOKUJI-KINGAKU(9)
+             END-IF
+      *      ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°¶æÆª˘À˝¿≠∆√ƒÍº¿…¬¥µº‘°À° ∞Ï»Ã°À
+             MOVE    "197003310"    TO   WK-SRYCD
+             PERFORM    TENSU-TBL-SEC
+             IF       FLG-TENSU      =    ZERO
+                MOVE    WK-KEISAN   TO  WK-SHOKUJI-HYOJYUNFTN(5)
+             END-IF
+      *      ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ¿∫ø¿£±«Øƒ∂°À° ∞Ï»Ã°À
+             MOVE    "197003410"    TO   WK-SRYCD
+             PERFORM    TENSU-TBL-SEC
+             IF       FLG-TENSU      =    ZERO
+                MOVE    WK-KEISAN   TO  WK-SHOKUJI-HYOJYUNFTN(6)
+             END-IF
+           END-IF
       **
+           IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+             PERFORM  230471-SHOKUJI-HEN201604-SEC
+           ELSE
+             PERFORM  230472-SHOKUJI-HEN200604-SEC
+           END-IF
+      *
+           .
+      *
+       23047-SHOKUJI-COUNT200604-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ø©ªˆŒ≈Õ‹»Ò≈˘§Œ ‘Ω∏°  ø¿Æ£≤£∏«Ø£¥∑Ó°¡°À                  *
+      ******************************************************************
+       230471-SHOKUJI-HEN201604-SEC         SECTION.
+      *
+           MOVE       ZERO        TO  FLG-SEIKATU
+           MOVE       ZERO        TO  FLG-SEIKATUS
+           MOVE       ZERO        TO  FLG-SEIKATUL
+           MOVE       ZERO        TO  FLG-SEIKATUL2
+      **
+           MOVE       LNK-SYU-SKYSTYMD(7:2)  TO   IDX-ST
+           MOVE       LNK-SYU-SKYEDYMD(7:2)  TO   IDX-ED
+      *
+           PERFORM    VARYING   IDY   FROM   IDX-ST   BY   1
+                       UNTIL    IDY     >    IDX-ED
+      *
+             MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+      *
+             IF     WK-NYULIFE-KBN(IDY)   NOT =   SPACE
+      *        ∆˛±°ª˛¿∏≥ËŒ≈Õ‹° ø©ªˆ°À
+               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDY)       >=   4         ))
+                  PERFORM   2304711-SHOKUJI-HEN201604X1-SEC
+               END-IF
+      *        ∆˛±°ª˛¿∏≥ËŒ≈Õ‹° ¥ƒ∂≠°À
+               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+               IF       ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDY)       >=   4         ))
+               AND      ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
+                  PERFORM   2304712-SHOKUJI-HEN201604X2-SEC
+               END-IF
+             ELSE
+               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDY)       >=   4         ))
+                  PERFORM   2304713-SHOKUJI-HEN201604X3-SEC
+               END-IF
+             END-IF
+      *
+      *      ∆√ Ãø© ‘Ω∏° ø«Œ≈π‘∞Ÿ∆˛Œœ ¨°À
+             PERFORM        2304714-SHOKUJI-HENSINTOKU-SEC
+      *
+           END-PERFORM
+      *
+           .
+      *
+       230471-SHOKUJI-HEN201604-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ø©ªˆŒ≈Õ‹»Ò≈˘§Œ ‘Ω∏°  ø¿Æ£≤£∏«Ø£¥∑Ó°¡°À  £±              *
+      ******************************************************************
+       2304711-SHOKUJI-HEN201604X1-SEC    SECTION.
+      *
+           EVALUATE   WK-SHOKUJIRYOYO(IDY)
+      *
+             WHEN        1
+      *
+               PERFORM  VARYING  IDX23  FROM  1  BY  1
+                         UNTIL   IDX23   >    3
+                 EVALUATE  WK-SHOKUJI-AHY(IDY IDX23)
+                   WHEN       1
+                   WHEN       2
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUL
+                     ADD     WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI5-NISSU
+                     MOVE    WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO LNK-SYU-SHOKUJI5
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                                       * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2L =
+                                 WK-SKJ-ZEIKEI2L +
+                                 WK-SKJ-ZEI
+                     END-IF
+                     IF    WK-SHOKUJI-AHY(IDY IDX23)  =  2
+                         ADD     WK-SHOKUJI-KINGAKU(6)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                         ADD     1            TO LNK-SYU-SHOKUJI7-NISSU
+                         MOVE    WK-SHOKUJI-KINGAKU(6)
+                                              TO LNK-SYU-SHOKUJI7
+                         IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                           COMPUTE   WK-SKJ-ZEI   =
+                                    (WK-SHOKUJI-KINGAKU(6) * WK-S4)
+                                                           + WK-S3
+                           COMPUTE   WK-SKJ-ZEIKEI2L =
+                                     WK-SKJ-ZEIKEI2L +
+                                     WK-SKJ-ZEI
+                         END-IF
+                     END-IF
+                   WHEN       3
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUL
+                     ADD     WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI13-NISSU
+                     MOVE    WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO LNK-SYU-SHOKUJI13
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                                       * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2L =
+                                 WK-SKJ-ZEIKEI2L +
+                                 WK-SKJ-ZEI
+                     END-IF
+                 END-EVALUATE
+               END-PERFORM
+               IF   WK-SHOKUDOKASAN(IDY)     NOT =  ZERO
+                     ADD     WK-SHOKUJI-KINGAKU(7)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI8-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(7)
+                                              TO LNK-SYU-SHOKUJI8
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(7) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2L =
+                                 WK-SKJ-ZEIKEI2L +
+                                 WK-SKJ-ZEI
+                     END-IF
+               END-IF
+      *
+             WHEN        2
+      *
+               PERFORM  VARYING  IDX23  FROM  1  BY  1
+                         UNTIL   IDX23   >    3
+                 EVALUATE  WK-SHOKUJI-AHY(IDY IDX23)
+                   WHEN       1
+                   WHEN       2
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUL
+                     ADD     WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI6-NISSU
+                     MOVE    WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO LNK-SYU-SHOKUJI6
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                                       * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2L =
+                                 WK-SKJ-ZEIKEI2L +
+                                 WK-SKJ-ZEI
+                     END-IF
+                   WHEN       3
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUL
+                     ADD     WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIL
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI6-NISSU
+                     MOVE    WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                              TO LNK-SYU-SHOKUJI6
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-NYULIFE2-SKJ-MONEY(IDY IDX23)
+                                                       * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2L =
+                                 WK-SKJ-ZEIKEI2L +
+                                 WK-SKJ-ZEI
+                     END-IF
+      *
+                     MOVE   31    TO   LNK-S02-RC
+                 END-EVALUATE
+               END-PERFORM
+      *
+           END-EVALUATE
+      *
+           IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
+           OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
+                             OR  "068"  OR  "069"  OR  "040" )
+             ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
+                                           WK-SHOKUJI-FTNL
+           ELSE
+             PERFORM  VARYING  IDX23  FROM  1  BY  1
+                       UNTIL   IDX23   >    3
+               EVALUATE  WK-SHOKUJI-AHY(IDY IDX23)
+                 WHEN       1
+                 WHEN       2
+                 WHEN       3
+                   ADD     WK-NYULIFE2-SKJFTN-MONEY(IDY IDX23)
+                                      TO   WK-SHOKUJI-FTN
+                                           WK-SHOKUJI-FTNL
+                   ADD     WK-NYULIFE2-SKJFTN-MONEY(IDY IDX23)
+                                      TO   WK-DAY-SKJFTN(IDY)
+                                           WK-DAY-SKJFTNL(IDY)
+                   ADD     1          TO   WK-DAY-KAISU(IDY)
+                                           WK-DAY-KAISUL(IDY)
+               END-EVALUATE
+             END-PERFORM
+           END-IF
+      *
+           IF    FLG-SEIKATU   =  ZERO
+               MOVE     2     TO      FLG-SEIKATU
+           END-IF
+           MOVE         1     TO      FLG-SEIKATUL
+      *
+           .
+      *
+       2304711-SHOKUJI-HEN201604X1-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ø©ªˆŒ≈Õ‹»Ò≈˘§Œ ‘Ω∏°  ø¿Æ£≤£∏«Ø£¥∑Ó°¡°À  £≤              *
+      ******************************************************************
+       2304712-SHOKUJI-HEN201604X2-SEC    SECTION.
+      *
+           EVALUATE   WK-SHOKUJIRYOYO(IDY)
+      *
+             WHEN        1
+      *
+               ADD     WK-NYULIFE-KAN-MONEY(IDY)
+                                     TO  WK-SHOKUJI-RYOYOHI
+                                         WK-SHOKUJI-RYOYOHIL
+                                         WK-SHOKUJI-JIHI
+                                         WK-SHOKUJI-RYOYOHIL2
+               ADD     1             TO  LNK-SYU-SHOKUJI9-NISSU
+               MOVE    WK-NYULIFE-KAN-MONEY(IDY)
+                                     TO  LNK-SYU-SHOKUJI9
+               IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                 COMPUTE   WK-SKJ-ZEI   =
+                          (WK-NYULIFE-KAN-MONEY(IDY) * WK-S4)
+                                                     + WK-S3
+                 COMPUTE   WK-SKJ-ZEIKEI2L  =
+                           WK-SKJ-ZEIKEI2L  +
+                           WK-SKJ-ZEI
+               END-IF
+      *
+             WHEN        2
+      *
+               ADD     WK-NYULIFE-KAN-MONEY(IDY)
+                                     TO  WK-SHOKUJI-RYOYOHI
+                                         WK-SHOKUJI-RYOYOHIL
+                                         WK-SHOKUJI-JIHI
+                                         WK-SHOKUJI-RYOYOHIL2
+               ADD     1             TO  LNK-SYU-SHOKUJI10-NISSU
+               MOVE    WK-NYULIFE-KAN-MONEY(IDY)
+                                     TO  LNK-SYU-SHOKUJI10
+               IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                  COMPUTE   WK-SKJ-ZEI   =
+                          (WK-NYULIFE-KAN-MONEY(IDY) * WK-S4)
+                                                     + WK-S3
+                 COMPUTE   WK-SKJ-ZEIKEI2L  =
+                           WK-SKJ-ZEIKEI2L  +
+                           WK-SKJ-ZEI
+               END-IF
+      *
+           END-EVALUATE
+      *
+           IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
+           OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
+                             OR  "068"  OR  "069"  OR  "040" )
+             ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
+                                           WK-SHOKUJI-FTNL
+           ELSE
+             ADD   WK-NYULIFE-KANFTN-MONEY(IDY)
+                                      TO   WK-SHOKUJI-FTN
+                                           WK-SHOKUJI-FTNL
+                                           WK-SHOKUJI-FTNL2
+             ADD   WK-NYULIFE-KANFTN-MONEY(IDY)
+                                      TO   WK-DAY-SKJFTN(IDY)
+                                           WK-DAY-SKJFTNL(IDY)
+                                           WK-DAY-SKJFTNL2(IDY)
+           END-IF
+      *
+           IF    FLG-SEIKATU   =  ZERO
+               MOVE     2     TO      FLG-SEIKATU
+           END-IF
+           MOVE         1     TO      FLG-SEIKATUL
+           MOVE         1     TO      FLG-SEIKATUL2
+      *
+           .
+      *
+       2304712-SHOKUJI-HEN201604X2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ø©ªˆŒ≈Õ‹»Ò≈˘§Œ ‘Ω∏°  ø¿Æ£≤£∏«Ø£¥∑Ó°¡°À  £≥              *
+      ******************************************************************
+       2304713-SHOKUJI-HEN201604X3-SEC    SECTION.
+      *
+           EVALUATE   WK-SHOKUJIRYOYO(IDY)
+      *
+             WHEN        1
+      *
+               PERFORM  VARYING  IDX23  FROM  1  BY  1
+                         UNTIL   IDX23   >    3
+                 EVALUATE  WK-SHOKUJI-AHY(IDY IDX23)
+                   WHEN       1
+                   WHEN       2
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUS
+                     ADD     WK-SHOKUJI-KINGAKU(1)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI1-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(1)
+                                              TO LNK-SYU-SHOKUJI1
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(1) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2  =
+                                 WK-SKJ-ZEIKEI2  +
+                                 WK-SKJ-ZEI
+                     END-IF
+                     IF    WK-SHOKUJI-AHY(IDY IDX23)  =  2
+                         ADD     WK-SHOKUJI-KINGAKU(3)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                         ADD     1            TO LNK-SYU-SHOKUJI3-NISSU
+                         MOVE    WK-SHOKUJI-KINGAKU(3)
+                                              TO LNK-SYU-SHOKUJI3
+                         IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                           COMPUTE   WK-SKJ-ZEI   =
+                                    (WK-SHOKUJI-KINGAKU(3) * WK-S4)
+                                                           + WK-S3
+                           COMPUTE   WK-SKJ-ZEIKEI2  =
+                                     WK-SKJ-ZEIKEI2  +
+                                     WK-SKJ-ZEI
+                         END-IF
+                     END-IF
+                   WHEN       3
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUS
+                     ADD     WK-SHOKUJI-KINGAKU(8)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI11-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(8)
+                                              TO LNK-SYU-SHOKUJI11
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(8) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2  =
+                                 WK-SKJ-ZEIKEI2  +
+                                 WK-SKJ-ZEI
+                     END-IF
+                 END-EVALUATE
+               END-PERFORM
+               IF   WK-SHOKUDOKASAN(IDY)     NOT =  ZERO
+                     ADD     WK-SHOKUJI-KINGAKU(4)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI4-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(4)
+                                              TO LNK-SYU-SHOKUJI4
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(4) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2  =
+                                 WK-SKJ-ZEIKEI2  +
+                                 WK-SKJ-ZEI
+                     END-IF
+               END-IF
+      *
+             WHEN        2
+      *
+               PERFORM  VARYING  IDX23  FROM  1  BY  1
+                         UNTIL   IDX23   >    3
+                 EVALUATE  WK-SHOKUJI-AHY(IDY IDX23)
+                   WHEN       1
+                   WHEN       2
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUS
+                     ADD     WK-SHOKUJI-KINGAKU(2)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI2-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(2)
+                                              TO LNK-SYU-SHOKUJI2
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(2) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2  =
+                                 WK-SKJ-ZEIKEI2  +
+                                 WK-SKJ-ZEI
+                     END-IF
+                   WHEN       3
+                     ADD     1                TO WK-SHOKUJI-NISSU
+                                                 WK-SHOKUJI-NISSUS
+                     ADD     WK-SHOKUJI-KINGAKU(9)
+                                              TO WK-SHOKUJI-RYOYOHI
+                                                 WK-SHOKUJI-RYOYOHIS
+                                                 WK-SHOKUJI-JIHI
+                     ADD     1                TO LNK-SYU-SHOKUJI12-NISSU
+                     MOVE    WK-SHOKUJI-KINGAKU(9)
+                                              TO LNK-SYU-SHOKUJI12
+                     IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                       COMPUTE   WK-SKJ-ZEI   =
+                                (WK-SHOKUJI-KINGAKU(9) * WK-S4)
+                                                       + WK-S3
+                       COMPUTE   WK-SKJ-ZEIKEI2  =
+                                 WK-SKJ-ZEIKEI2  +
+                                 WK-SKJ-ZEI
+                     END-IF
+                 END-EVALUATE
+               END-PERFORM
+      *
+           END-EVALUATE
+      *
+           IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
+           OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
+                             OR  "068"  OR  "069"  OR  "040" )
+             ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
+                                           WK-SHOKUJI-FTNS
+           ELSE
+             EVALUATE   WK-SYOTOKU-SKJKBN(IDY)
+               WHEN       SPACE
+                 EVALUATE  WK-SKJKEEP-KBN(IDY)
+      *            …∏Ω‡…È√¥≥€° ∞Ï»Ã°À
+                   WHEN     SPACE
+                     COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(1)
+                                          *  WK-SHOKUJI-NYUINJI(IDY)
+      *            …∏Ω‡…È√¥≥€° ∞Ï»Ã°¶∆Ò…¬≈˘°À
+                   WHEN     "1"
+                     COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(5)
+                                          *  WK-SHOKUJI-NYUINJI(IDY)
+      *            …∏Ω‡…È√¥≥€° ∞Ï»Ã°¶¿∫ø¿…¬æ≤°À
+                   WHEN     "2"
+                     COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(6)
+                                          *  WK-SHOKUJI-NYUINJI(IDY)
+                 END-EVALUATE
+                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-FTN
+                                         WK-SHOKUJI-FTNS
+                 MOVE    WK-KEISAN-XX TO WK-DAY-SKJFTN(IDY)
+                                         WK-DAY-SKJFTNS(IDY)
+                 MOVE    WK-SHOKUJI-NYUINJI(IDY)
+                                      TO WK-DAY-KAISU(IDY)
+                                         WK-DAY-KAISUS(IDY)
+               WHEN       "1"
+               WHEN       "4"
+      *          …∏Ω‡…È√¥≥€° ƒ„£±°À
+                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(2)
+                                      *  WK-SHOKUJI-NYUINJI(IDY)
+                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-FTN
+                                         WK-SHOKUJI-FTNS
+                 MOVE    WK-KEISAN-XX TO WK-DAY-SKJFTN(IDY)
+                                         WK-DAY-SKJFTNS(IDY)
+                 MOVE    WK-SHOKUJI-NYUINJI(IDY)
+                                      TO WK-DAY-KAISU(IDY)
+                                         WK-DAY-KAISUS(IDY)
+               WHEN       "2"
+      *          …∏Ω‡…È√¥≥€° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
+                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(3)
+                                      *  WK-SHOKUJI-NYUINJI(IDY)
+                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-FTN
+                                         WK-SHOKUJI-FTNS
+                 MOVE    WK-KEISAN-XX TO WK-DAY-SKJFTN(IDY)
+                                         WK-DAY-SKJFTNS(IDY)
+                 MOVE    WK-SHOKUJI-NYUINJI(IDY)
+                                      TO WK-DAY-KAISU(IDY)
+                                         WK-DAY-KAISUS(IDY)
+               WHEN       "3"
+      *          …∏Ω‡…È√¥≥€° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
+                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-HYOJYUNFTN(4)
+                                      *  WK-SHOKUJI-NYUINJI(IDY)
+                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-FTN
+                                         WK-SHOKUJI-FTNS
+                 MOVE    WK-KEISAN-XX TO WK-DAY-SKJFTN(IDY)
+                                         WK-DAY-SKJFTNS(IDY)
+                 MOVE    WK-SHOKUJI-NYUINJI(IDY)
+                                      TO WK-DAY-KAISU(IDY)
+                                         WK-DAY-KAISUS(IDY)
+             END-EVALUATE
+           END-IF
+      *
+           IF    FLG-SEIKATU   =  ZERO
+               MOVE     1     TO      FLG-SEIKATU
+           END-IF
+           MOVE         1     TO      FLG-SEIKATUS
+      *
+           .
+      *
+       2304713-SHOKUJI-HEN201604X3-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ∆√ Ãø© ‘Ω∏° ø«Œ≈π‘∞Ÿ∆˛Œœ ¨°À                            *
+      ******************************************************************
+       2304714-SHOKUJI-HENSINTOKU-SEC    SECTION.
+      *
+           IF     WK-NYULIFE-KBN(IDY)   NOT =   SPACE
+             IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
+             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+      *        …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+               COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
+                                    *  WK-ROSAITOKU95(IDY)
+               ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95L
+                                       WK-SHOKUJI-FTN95L
+             END-IF
+             IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
+             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+      *        …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+               IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                 COMPUTE   WK-SKJ-ZEI   =
+                          (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                 + WK-S3
+                 COMPUTE   WK-SKJ-ZEIKEIL  =
+                           WK-SKJ-ZEIKEIL  +
+                          (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
+               END-IF
+               COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
+                                    *  WK-ROSAITOKU96(IDY)
+               ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI96L
+                                       WK-SHOKUJI-FTN96L
+             END-IF
+             MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+             IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
+             AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
+             AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
+                   (WK-GAIHAKU(IDY)     >=   4         ))
+             AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
+               IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
+                 MOVE  WK-SHOKUJI-NYUINJI2(IDY)
+                               TO    WK-ROSAITOKU97(IDY)
+               END-IF
+               COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI2(IDY)
+                                            - WK-SHOKUJI-TOKUSYO(IDY)
+               IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
+                 MOVE  WK-TOKUSYOKU-SURYOU
+                               TO    WK-ROSAITOKU97(IDY)
+               END-IF
+             ELSE
+               MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+             END-IF
+             IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
+      **>    AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
+      *         …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+                IF    LNK-SYU-DAY(IDY)           =  "2"
+                AND   LNK-S02-KOREI-TANYUIN      =  "1"
+                  ADD     WK-ROSAITOKU97(IDY)
+                                          TO  WK-SHOKUJI-NISSU
+                                              WK-SHOKUJI-NISSUL
+                END-IF
+                COMPUTE WK-KEISAN-XX  =  WK-SHOKUJI-KINGAKU(5)
+                                      *  WK-ROSAITOKU97(IDY)
+                ADD     WK-KEISAN-XX      TO  WK-SHOKUJI-RYOYOHI
+                                              WK-SHOKUJI-RYOYOHIL
+                                              WK-SHOKUJI-JIHI
+                ADD     WK-ROSAITOKU97(IDY)
+                                          TO  LNK-SYU-SHOKUJI7-NISSU
+                MOVE    WK-SHOKUJI-KINGAKU(5)
+                                          TO  LNK-SYU-SHOKUJI7
+                IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                  COMPUTE   WK-SKJ-ZEI   =
+                           (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                  + WK-S3
+                  COMPUTE   WK-SKJ-ZEIKEI2L =
+                            WK-SKJ-ZEIKEI2L +
+                           (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
+                END-IF
+                IF ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
+                OR ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
+                                OR  "068"  OR  "069"  OR  "040" )
+                  ADD   WK-SHOKUJI-JIHI   TO  WK-SHOKUJI-FTN
+                                              WK-SHOKUJI-FTNL
+                END-IF
+                IF    FLG-SEIKATU   =  ZERO
+                      MOVE    2     TO    FLG-SEIKATU
+                END-IF
+                MOVE          1     TO    FLG-SEIKATUL
+             END-IF
+           ELSE
+             IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
+             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+      *        …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+               COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
+                                    *  WK-ROSAITOKU95(IDY)
+               ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95
+                                       WK-SHOKUJI-FTN95
+             END-IF
+             IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
+             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+      *        …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+               IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                 COMPUTE   WK-SKJ-ZEI   =
+                          (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                 + WK-S3
+                 COMPUTE   WK-SKJ-ZEIKEI   =
+                           WK-SKJ-ZEIKEI   +
+                          (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
+               END-IF
+               COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
+                                    *  WK-ROSAITOKU96(IDY)
+               ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI96
+                                       WK-SHOKUJI-FTN96
+             END-IF
+             MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+             IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
+             AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
+             AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
+                   (WK-GAIHAKU(IDY)     >=   4         ))
+             AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
+               IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
+                 MOVE  WK-SHOKUJI-NYUINJI2(IDY)
+                               TO    WK-ROSAITOKU97(IDY)
+               END-IF
+               COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI2(IDY)
+                                            - WK-SHOKUJI-TOKUSYO(IDY)
+               IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
+                 MOVE  WK-TOKUSYOKU-SURYOU
+                               TO    WK-ROSAITOKU97(IDY)
+               END-IF
+             ELSE
+               MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+             END-IF
+             IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
+      **>    AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
+      *         …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
+                IF    LNK-SYU-DAY(IDY)           =  "2"
+                AND   LNK-S02-KOREI-TANYUIN      =  "1"
+                  ADD     WK-ROSAITOKU97(IDY)
+                                          TO  WK-SHOKUJI-NISSU
+                                              WK-SHOKUJI-NISSUS
+                END-IF
+                COMPUTE WK-KEISAN-XX  =  WK-SHOKUJI-KINGAKU(5)
+                                      *  WK-ROSAITOKU97(IDY)
+                ADD     WK-KEISAN-XX      TO  WK-SHOKUJI-RYOYOHI
+                                              WK-SHOKUJI-RYOYOHIS
+                                              WK-SHOKUJI-JIHI
+                ADD     WK-ROSAITOKU97(IDY)
+                                          TO  LNK-SYU-SHOKUJI3-NISSU
+                MOVE    WK-SHOKUJI-KINGAKU(5)
+                                          TO  LNK-SYU-SHOKUJI3
+                IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
+                  COMPUTE   WK-SKJ-ZEI   =
+                           (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                  + WK-S3
+                  COMPUTE   WK-SKJ-ZEIKEI2  =
+                            WK-SKJ-ZEIKEI2  +
+                           (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
+                END-IF
+                IF ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
+                OR ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
+                                OR  "068"  OR  "069"  OR  "040" )
+                  ADD   WK-SHOKUJI-JIHI   TO  WK-SHOKUJI-FTN
+                                              WK-SHOKUJI-FTNS
+                END-IF
+                IF    FLG-SEIKATU   =  ZERO
+                      MOVE    1     TO    FLG-SEIKATU
+                END-IF
+                MOVE          1     TO    FLG-SEIKATUS
+             END-IF
+           END-IF
+      *
+           .
+      *
+       2304714-SHOKUJI-HENSINTOKU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ø©ªˆŒ≈Õ‹»Ò≈˘§Œ ‘Ω∏                                      *
+      ******************************************************************
+       230472-SHOKUJI-HEN200604-SEC         SECTION.
+      *
            MOVE       ZERO        TO  FLG-SEIKATU
            MOVE       ZERO        TO  FLG-SEIKATUS
            MOVE       ZERO        TO  FLG-SEIKATUL
@@ -23113,177 +23987,14 @@
       *
              END-IF
       *
-             IF     WK-NYULIFE-KBN(IDY)   NOT =   SPACE
-               IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
-               AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-      *          …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
-                                      *  WK-ROSAITOKU95(IDY)
-                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95L
-                                         WK-SHOKUJI-FTN95L
-               END-IF
-               IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
-               AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-      *          …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                 IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                   COMPUTE   WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * WK-S4)
-                                                   + WK-S3
-                   COMPUTE   WK-SKJ-ZEIKEIL  =
-                             WK-SKJ-ZEIKEIL  +
-                            (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
-                 END-IF
-                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
-                                      *  WK-ROSAITOKU96(IDY)
-                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI96L
-                                         WK-SHOKUJI-FTN96L
-               END-IF
-               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
-               IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
-               AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-               AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
-                     (WK-GAIHAKU(IDY)     >=   4         ))
-               AND  (WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO)
-                 IF  WK-SHOKUJI-NYUINJI(IDY) < WK-ROSAITOKU97(IDY)
-                   MOVE  WK-SHOKUJI-NYUINJI(IDY)
-                                 TO    WK-ROSAITOKU97(IDY)
-                 END-IF
-                 COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI(IDY)
-                                              - WK-SHOKUJI-TOKUSYO(IDY)
-                 IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
-                   MOVE  WK-TOKUSYOKU-SURYOU
-                                 TO    WK-ROSAITOKU97(IDY)
-                 END-IF
-               ELSE
-                 MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
-               END-IF
-               IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
-      **>      AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-               AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
-      *           …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                  IF    LNK-SYU-DAY(IDY)           =  "2"
-                  AND   LNK-S02-KOREI-TANYUIN      =  "1"
-                    ADD     WK-ROSAITOKU97(IDY)
-                                            TO  WK-SHOKUJI-NISSU
-                                                WK-SHOKUJI-NISSUL
-                  END-IF
-                  COMPUTE WK-KEISAN-XX  =  WK-SHOKUJI-KINGAKU(5)
-                                        *  WK-ROSAITOKU97(IDY)
-                  ADD     WK-KEISAN-XX      TO  WK-SHOKUJI-RYOYOHI
-                                                WK-SHOKUJI-RYOYOHIL
-                                                WK-SHOKUJI-JIHI
-                  ADD     WK-ROSAITOKU97(IDY)
-                                            TO  LNK-SYU-SHOKUJI7-NISSU
-                  MOVE    WK-SHOKUJI-KINGAKU(5)
-                                            TO  LNK-SYU-SHOKUJI7
-                  IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    COMPUTE   WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * WK-S4)
-                                                    + WK-S3
-                    COMPUTE   WK-SKJ-ZEIKEI2L =
-                              WK-SKJ-ZEIKEI2L +
-                             (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
-                  END-IF
-                  IF ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
-                  OR ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
-                                  OR  "068"  OR  "069"  OR  "040" )
-                    ADD   WK-SHOKUJI-JIHI   TO  WK-SHOKUJI-FTN
-                                                WK-SHOKUJI-FTNL
-                  END-IF
-                  IF    FLG-SEIKATU   =  ZERO
-                        MOVE    2     TO    FLG-SEIKATU
-                  END-IF
-                  MOVE          1     TO    FLG-SEIKATUL
-               END-IF
-             ELSE
-               IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
-               AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-      *          …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
-                                      *  WK-ROSAITOKU95(IDY)
-                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95
-                                         WK-SHOKUJI-FTN95
-               END-IF
-               IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
-               AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-      *          …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                 IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                   COMPUTE   WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * WK-S4)
-                                                   + WK-S3
-                   COMPUTE   WK-SKJ-ZEIKEI   =
-                             WK-SKJ-ZEIKEI   +
-                            (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
-                 END-IF
-                 COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
-                                      *  WK-ROSAITOKU96(IDY)
-                 ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI96
-                                         WK-SHOKUJI-FTN96
-               END-IF
-               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
-               IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
-               AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-               AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
-                     (WK-GAIHAKU(IDY)     >=   4         ))
-               AND  (WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO)
-                 IF  WK-SHOKUJI-NYUINJI(IDY) < WK-ROSAITOKU97(IDY)
-                   MOVE  WK-SHOKUJI-NYUINJI(IDY)
-                                 TO    WK-ROSAITOKU97(IDY)
-                 END-IF
-                 COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI(IDY)
-                                              - WK-SHOKUJI-TOKUSYO(IDY)
-                 IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
-                   MOVE  WK-TOKUSYOKU-SURYOU
-                                 TO    WK-ROSAITOKU97(IDY)
-                 END-IF
-               ELSE
-                 MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
-               END-IF
-               IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
-      **>      AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-               AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
-      *           …∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
-                  IF    LNK-SYU-DAY(IDY)           =  "2"
-                  AND   LNK-S02-KOREI-TANYUIN      =  "1"
-                    ADD     WK-ROSAITOKU97(IDY)
-                                            TO  WK-SHOKUJI-NISSU
-                                                WK-SHOKUJI-NISSUS
-                  END-IF
-                  COMPUTE WK-KEISAN-XX  =  WK-SHOKUJI-KINGAKU(5)
-                                        *  WK-ROSAITOKU97(IDY)
-                  ADD     WK-KEISAN-XX      TO  WK-SHOKUJI-RYOYOHI
-                                                WK-SHOKUJI-RYOYOHIS
-                                                WK-SHOKUJI-JIHI
-                  ADD     WK-ROSAITOKU97(IDY)
-                                            TO  LNK-SYU-SHOKUJI3-NISSU
-                  MOVE    WK-SHOKUJI-KINGAKU(5)
-                                            TO  LNK-SYU-SHOKUJI3
-                  IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    COMPUTE   WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * WK-S4)
-                                                    + WK-S3
-                    COMPUTE   WK-SKJ-ZEIKEI2  =
-                              WK-SKJ-ZEIKEI2  +
-                             (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
-                  END-IF
-                  IF ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
-                  OR ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
-                                  OR  "068"  OR  "069"  OR  "040" )
-                    ADD   WK-SHOKUJI-JIHI   TO  WK-SHOKUJI-FTN
-                                                WK-SHOKUJI-FTNS
-                  END-IF
-                  IF    FLG-SEIKATU   =  ZERO
-                        MOVE    1     TO    FLG-SEIKATU
-                  END-IF
-                  MOVE          1     TO    FLG-SEIKATUS
-               END-IF
-             END-IF
+      *      ∆√ Ãø© ‘Ω∏° ø«Œ≈π‘∞Ÿ∆˛Œœ ¨°À
+             PERFORM        2304714-SHOKUJI-HENSINTOKU-SEC
       *
            END-PERFORM
       *
            .
       *
-       23047-SHOKUJI-COUNT200604-EXT.
+       230472-SHOKUJI-HEN200604-EXT.
            EXIT.
       *
       ******************************************************************
