@@ -5031,7 +5031,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                IF    ( SPA-NAI-W20-HOSPSBT  =  "1" )
                    MOVE    CONST-H28-A101C10   TO  WRK-KSNCD
                ELSE
-                   MOVE    CONST-H28-A108C11   TO  WRK-KSNCD
+                   MOVE    CONST-H28-A109C11   TO  WRK-KSNCD
                END-IF
                MOVE    SPA-NAI-W20-ZTKFUKKI-IDX
                                             TO  WRK-KSNIDX
@@ -7082,7 +7082,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                    WHEN    CONST-H28-A101C10
                        MOVE    "2"     TO  SPA-GMN-W20-ZTKFUKKI
       *
-                   WHEN    CONST-H28-A108C11
+                   WHEN    CONST-H28-A109C11
                        MOVE    "2"     TO  SPA-GMN-W20-ZTKFUKKI
       *
                    WHEN    CONST-H28-A308C05 (1)
@@ -7945,13 +7945,15 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                MOVE    CONST-H28-A103C07
                                        TO  SPA-NAI-W20-SSNHKNFUKU-CD
       *
-               MOVE    "ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»"
-                                       TO  SPA-GMN-W20-ZTKFUKKI-LBL
                IF    ( SPA-NAI-W20-HOSPSBT  =  "1" )
+                   MOVE    "ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»"
+                                       TO  SPA-GMN-W20-ZTKFUKKI-LBL
                    MOVE    CONST-H28-A101C10
                                        TO  SPA-NAI-W20-ZTKFUKKI-CD
                ELSE
-                   MOVE    CONST-H28-A108C11
+                   MOVE    "ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»¡ÊÎÅÍÜÉÂ¾²¡Ë"
+                                       TO  SPA-GMN-W20-ZTKFUKKI-LBL
+                   MOVE    CONST-H28-A109C11
                                        TO  SPA-NAI-W20-ZTKFUKKI-CD
                END-IF
                MOVE    "ÂÎÀ©¶¯²½²Ã»»"  TO  SPA-GMN-W20-TAISEI-LBL
@@ -9102,9 +9104,9 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                MOVE    CONST-H28-A312C06
                                    TO  WRK-KSNCD-A312
       *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
-           WHEN    CONST-H28-A108C11
-               MOVE    CONST-H28-A109C11
-                                   TO  WRK-KSNCD-A109
+      *    WHEN    CONST-H28-A108C11
+      *        MOVE    CONST-H28-A109C11
+      *                            TO  WRK-KSNCD-A109
       *    ±ÉÍÜ´ÉÍý¼Â»Ü²Ã»»
            WHEN    CONST-H28-A108C10
                MOVE    CONST-H28-A109C10
