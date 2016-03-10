@@ -66,6 +66,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/05/27  °ì»þ¥Õ¥¡¥¤¥ëÊÑ¹¹
       *  04.08.00    NACL=Â¿¡¹Ç¼  15/12/25  HAORIÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -2348,6 +2349,9 @@
                MOVE    ZERO            TO  SPA-NAI-ZENKIFLG-ERR
                MOVE    1               TO  SPA-NAI-ZENKIFLG
            END-IF
+      *H28.4
+      *    Ì¤½¢³ØÁ°
+           MOVE    AGECHK-SYUGAKUKBN   TO  SPA-SYUGAKUKBN
            .
        4001-HKNCOMBI-HEN-EXT.
            EXIT.
@@ -2398,6 +2402,9 @@
        1101-PTINF-HENSYU-SEC         SECTION.
       *
            MOVE    ZERO                TO  SPA-CHKHKTBYO-ARI
+      *H28.4
+           MOVE    ZERO                TO  SPA-NNCHIH-ARI
+           MOVE    ZERO                TO  SPA-SYOUNI-ARI
       *
       *    ´µ¼Ô¥Þ¥¹¥¿¡¼ÆÉ¤ß¹þ¤ß
            MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
@@ -2456,6 +2463,14 @@
            IF     (SPA-SRYYMD          >=  "20140401" )
             AND   (SPA-CHKHTKKSN       =   1          )
                PERFORM 11019-CHKHTKBYO-SET-SEC
+           END-IF
+      *H28.4
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¡¦¾®»ù¤«¤«¤ê¤Ä¤±ÂÐ¾Ý
+           IF     (SPA-SRYYMD          >=  "20160401" )
+      *??»ÜÀß´ð½à¤ÎÈ½Äê
+      *?    AND  ((SPA-NNCHIHKJN       =   1     )  OR
+      *?          (SPA-SYOUNIKJN       =   1     )    )
+               PERFORM 110110-NNCHISYOU-SET-SEC
            END-IF
       *
            .
@@ -2840,6 +2855,55 @@
            END-IF
            .
        11019-CHKHTKBYO-SET-EXT.
+           EXIT.
+      *H28.4
+      *****************************************************************
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¡¦¾®»ù¤«¤«¤ê¤Ä¤±ÂÐ¾ÝÉÂÊÔ½¸½èÍý
+      *****************************************************************
+       110110-NNCHISYOU-SET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  SPA-NNCHIH-ARI
+           MOVE    ZERO                TO  SPA-SYOUNI-ARI
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           PERFORM UNTIL       FLG-PTCONF      =   1
+               EVALUATE    PTCONF-CKEY
+               WHEN    "NINTIHOKATU"
+      *            Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-NNCHIH-ARI
+                   END-IF
+               WHEN    "SYOUNIKAKARI"
+      *            ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-SYOUNI-ARI
+                   END-IF
+               END-EVALUATE
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       110110-NNCHISYOU-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3983,6 +4047,32 @@
            END-IF
       *    ±¡Æâ½èÊý   ½é¿Ç
            MOVE    "113003710"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF      WRK-YMDS        NOT =   SPACE
+               IF      WRK-YMDS        >   WRK-SYO-YMD
+                   MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+               END-IF
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                   MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+               END-IF
+           END-IF
+      *H28.4
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±
+      *    ±¡³°½èÊý   ½é¿Ç
+           MOVE    "113019710"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF      WRK-YMDS        NOT =   SPACE
+               IF      WRK-YMDS        >   WRK-SYO-YMD
+                   MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+               END-IF
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                   MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+               END-IF
+           END-IF
+      *    ±¡Æâ½èÊý   ½é¿Ç
+           MOVE    "113019910"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
            IF      WRK-YMDS        NOT =   SPACE
                IF      WRK-YMDS        >   WRK-SYO-YMD
@@ -5578,6 +5668,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      WKSRY-SRYKBN        =   "11"  OR  "12"
                MOVE    1               TO  FLG-CHK
            END-IF
+      *H28.1
+      *    ²Ã»»ÎÁ¤ÏÂÐ¾Ý
+           IF      WKSRY-SRYSYUKBN     =   "114"
+                                       OR  "124"
+                                       OR  "133"
+               MOVE    ZERO                TO  FLG-CHK
+           END-IF
       *
       *    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤ÎÈ½Äê
            PERFORM VARYING     IDXF    FROM    1   BY  1
@@ -5586,6 +5683,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "113003610"
                                                OR  "113003710"
                                                OR  "113003810"
+                   MOVE    1               TO  FLG-CHK
+               END-IF
+      *H28.4
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±
+               IF      WKSRY-SRYCD(IDXF)       =   "113019710"
+                                               OR  "113019810"
+                                               OR  "113019910"
+                                               OR  "113020010"
                    MOVE    1               TO  FLG-CHK
                END-IF
       *        Æ±Æü½é¿Ç¤ÏÂÐ¾Ý

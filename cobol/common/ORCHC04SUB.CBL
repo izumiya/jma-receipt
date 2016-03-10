@@ -488,6 +488,18 @@
                        MOVE    ZERO            TO  FLG-SRYACT
                    END-IF
                END-IF
+      *H28.4
+      *        院内外用薬は点数ゼロが存在
+               IF     (SRY-SRYSYUKBN       =   "231"
+                                           OR  "297")
+                   IF     (SRY-SRYCD (01)(1:1) =   "6")
+                      OR  (SRY-SRYCD (02)(1:1) =   "6")
+                      OR  (SRY-SRYCD (03)(1:1) =   "6")
+                      OR  (SRY-SRYCD (04)(1:1) =   "6")
+                      OR  (SRY-SRYCD (05)(1:1) =   "6")
+                       MOVE    ZERO            TO  FLG-SRYACT
+                   END-IF
+               END-IF
            END-IF
       *
            INITIALIZE                  WRK-MEISAI-AREA

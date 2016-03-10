@@ -112,6 +112,7 @@
       *  04.07.00    NACL-多々納  14/10/09  患者登録戻り処理変更
       *  04.08.00    NACL-多々納  14/10/23  連続挿入対応
       *  04.08.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
+      *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -361,6 +362,8 @@
            03  FLG-F7                  PIC 9(01).
            03  FLG-INSEND              PIC 9(01).
       *!!!!!!!!!!!!!!!!!!
+      *H28.4
+           03  FLG-CHUEND              PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -560,6 +563,8 @@
       *
            03  WRK-KIDMSG          PIC X(100).
            03  WRK-KID-SRYCD       PIC X(09).
+      *H28.4
+           03  WRK-KIDCD-MSG       PIC X(20).
       *
            03  WRK-MOTOPG          PIC X(08).
       *
@@ -3103,6 +3108,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *                初診料算定へ
                    IF      SPA-KID1-FLG        =   "OK"
                        MOVE    9               TO  SPA-SYONIKA-ARI
+                       MOVE    9               TO  SPA-SYONIKKR-ARI
                        PERFORM 300109-SYOSINSET-SEC
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
@@ -3112,6 +3118,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0135"
                    IF      SPA-KID1-FLG        =   "OK"
                        MOVE    9               TO  SPA-SYONIKA-ARI
+                       MOVE    9               TO  SPA-SYONIKKR-ARI
                        PERFORM 300110-SAISINSET-SEC
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
@@ -4375,6 +4382,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    AGECHK-NENREI2-YY   TO  SPA-NENREI-YY
            MOVE    AGECHK-NENREI2-MM   TO  SPA-NENREI-MM
            MOVE    AGECHK-NENREI2-DD   TO  SPA-NENREI-DD
+      *H28.4
+      *    未就学前
+           MOVE    AGECHK-SYUGAKUKBN   TO  SPA-SYUGAKUKBN
       *
       *    画面表示用
            IF      SPA-NENREI-YY       =   ZERO
@@ -4604,13 +4614,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *        警告フラグクリア
                MOVE    SPACE           TO  SPA-COM-KZMFLGAREA (IDX)
-      *******  MOVE    SPACE           TO  SPA-COM-KZMFLG (IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG4(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
-      *        MOVE    SPACE           TO  SPA-COM-KZMFLG6(IDX)
-      ******** MOVE    SPACE           TO  SPA-COM-KINKIFLG(IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG(IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1(IDX)
       *        併用算定が警告の時、クリア
@@ -6880,6 +6883,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    ZERO                TO  FLG-INPUT-NASI2
       *!!!!!!!!!!!!!!!!!!
                END-IF
+      *
       *ver.4.7
       *        今回変更位置
                IF     (K02-INPUTCD (WRK-IDX2)  NOT =
@@ -8647,6 +8651,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (SPA-COM-SRYKBN (IDX) =   "12" )  OR
                       (SPA-COM-INPUTCD(IDX) =   "113003610" OR
                                                 "113003810")
+                 OR   (SPA-COM-INPUTCD(IDX) =   "113019710" OR
+                                                "113019910")
                   MOVE    1               TO  FLG-OK
                END-IF
                IF     (SPA-COM-SRYKBN (IDX) =   "12" )  OR
@@ -8682,11 +8688,19 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *                再度、自動発生
                        MOVE    "0132"              TO  SPA-KIDCD
                    END-IF
+      *H28.4
+      *            小児かかりつけ診療料算定可能へ
+                   IF     (SPA-SYUGAKUKBN      =   1  )
+                      AND (SPA-SYOUNI-ARI      =   1  )
+                      AND (FLG-OK2             =   1  )
+                       MOVE    8               TO  SPA-SYONIKKR-ARI
+                   END-IF
       *H26.4
       *            小児科外来診療料算定可能へ
                    IF     (SPA-SYONIKA         =   1  )
                       AND (FLG-OK2             =   1  )
                       AND (SPA-SYONIKA-ARI     =   ZERO)
+                      AND (SPA-SYONIKKR-ARI    =   ZERO)
                        MOVE    8               TO  SPA-SYONIKA-ARI
                    END-IF
                END-IF
@@ -8710,6 +8724,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                       (SPA-COM-INPUTCD(IDX)(1:1)   =   "1" )) OR
                      ( SPA-COM-INPUTCD(IDX) =   "113003510" OR
                                                 "113003710")
+                OR    (SPA-COM-INPUTCD(IDX) =   "113019710" OR
+                                                "113019910")
                    MOVE    1               TO  FLG-OK
                END-IF
                IF     (SPA-COM-SRYKBN (IDX) =   "12" )  OR
@@ -8734,11 +8750,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *                再度、自動発生
                        MOVE    "0137"              TO  SPA-KIDCD
                    END-IF
+      *H28.4
+      *            小児かかりつけ診療料算定可能へ
+                   IF     (SPA-SYUGAKUKBN      =   1  )
+                      AND (SPA-SYOUNI-ARI      =   1  )
+                      AND (FLG-OK2             =   1  )
+                      AND (SPA-SYONIKA-ARI     =   ZERO)
+                       MOVE    8               TO  SPA-SYONIKKR-ARI
+                   END-IF
       *H26.4
       *            小児科外来診療料算定可能へ
                    IF     (SPA-SYONIKA         =   1  )
                       AND (FLG-OK2             =   1  )
                       AND (SPA-SYONIKA-ARI     =   ZERO)
+                      AND (SPA-SYONIKKR-ARI    =   ZERO)
                        MOVE    8               TO  SPA-SYONIKA-ARI
                    END-IF
                ELSE
@@ -8834,13 +8859,24 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        4101123-SYOUNIKA-CHENGE-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-OK
+           MOVE    SPACE               TO  WRK-KIDCD-MSG
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >=   SPA-GMN-IDX
                IF      SPA-COM-INPUTCD(IDX) =   "113003510"
                                             OR  "113003710"
                                             OR  "113003610"
                                             OR  "113003810"
-                   MOVE    1               TO  FLG-OK
+                   MOVE    1                   TO  FLG-OK
+                   MOVE    "小児科外来診療料"  TO  WRK-KIDCD-MSG
+               END-IF
+      *H28.4   小児かかりつけ
+               IF      SPA-COM-INPUTCD(IDX) =   "113019710"
+                                            OR  "113019810"
+                                            OR  "113019910"
+                                            OR  "113020010"
+                   MOVE    2                   TO  FLG-OK
+                   MOVE    "小児かかりつけ診療料"
+                                              TO  WRK-KIDCD-MSG
                END-IF
            END-PERFORM
       *
@@ -9063,6 +9099,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                  ORCSC100AREA
            MOVE    "1"                 TO  ORCSC100-KBN
            MOVE    FLG-TOROKU          TO  ORCSC100-TOROKU
+      *H28.4   中途終了
+           IF      FLG-CHUEND          =   1
+               MOVE    "4"                 TO  ORCSC100-KBN
+           END-IF
+      *
            MOVE    FLG-INIT            TO  ORCSC100-INIT
            MOVE    FLG-KENSADEL        TO  ORCSC100-KENSADEL
            MOVE    FLG-RIHTEI          TO  ORCSC100-RIHTEI
@@ -11102,8 +11143,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    基本チェックのみ
            MOVE    "2"                 TO  FLG-TOROKU
+      *H28.4    湿布薬チェックの為
+           MOVE    1                   TO  FLG-CHUEND
            PERFORM 510-TBLHEN-SEC
            MOVE    SPACE               TO  FLG-TOROKU
+           MOVE    ZERO                TO  FLG-CHUEND
       *    外来管理加算確認はしない
            IF      SPA-KIDCD           =   "0102"   OR
                                            "0113"
@@ -12330,6 +12374,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      SPA-COM-SRYSYUKBN(IDX)  =  "213"  OR
                                                       "223"  OR
                                                       "233"
+      *H28.4           院内投薬
+                                                   OR "211"
+                                                   OR "221"
+                                                   OR "231"
+                                                   OR "291"
+                                                   OR "294"
+                                                   OR "297"
                        CONTINUE
                    ELSE
                        MOVE    1               TO  FLG-SYOHOU-ARI
@@ -13223,6 +13274,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        K02-MEISYO-FGCOLOR (IDX)
                    END-IF
       *
+      *TEST        一般名表示
+                   IF      SPA-COM-MEI-KBN (WRK-IDX)   =   "1"
+                       MOVE    CL-GREEN        TO
+                                       K02-MEISYO-FGCOLOR (IDX)
+                   END-IF
       *!!          禁忌薬剤
                    IF      SPA-COM-PTKINKI-ARI (WRK-IDX)   =   1
                        MOVE    CL-RED        TO
@@ -14386,20 +14442,26 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-STRING
       *H26.4
                WHEN    "0133"
-                   STRING  "小児科外来診療料を初診料へ変更します。"
+      *H28.4       STRING  "小児科外来診療料を初診料へ変更します。"
+                   STRING  WRK-KIDCD-MSG
+                           "を初診料へ変更します。"
                            "よろしいですか？"
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
                WHEN    "0134"
-                   STRING  "小児科外来診療料を初診料へ変更しますが、"
+      *H28.4       STRING  "小児科外来診療料を初診料へ変更しますが、"
+                   STRING  WRK-KIDCD-MSG
+                           "を初診料へ変更しますが、"
                            "転帰が未入力の病名が存在します。"
                            "よろしいですか？"
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
                WHEN    "0135"
-                   STRING   "小児科外来診療料を再診料へ変更します。"
+      *H28.4       STRING   "小児科外来診療料を再診料へ変更します。"
+                   STRING  WRK-KIDCD-MSG
+                            "を再診料へ変更します。"
                             "よろしいですか？"
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG

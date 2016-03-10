@@ -1755,11 +1755,13 @@
            IF     (WKSRY-SRYKBN(1:1)   =   "2"  )  AND
                   (ACCT-ZAITEN         =   ZERO )  AND
                   (FLG-YAKUZAI         =   1    )
-               IF     (WKSRY-SRYSYUKBN     =   "213"
-                                           OR  "223"
-                                           OR  "233")
-                   CONTINUE
-               ELSE
+               IF     (WKSRY-SRYSYUKBN(3:1)    =   SPACE
+                                              OR  "0"   )
+      **       IF     (WKSRY-SRYSYUKBN     =   "213"
+      *                                    OR  "223"
+      *                                    OR  "233")
+      *            CONTINUE
+      **       ELSE
                    MOVE    "1"                 TO  SPA-NAI-INNAI
                END-IF
            END-IF
@@ -4147,6 +4149,9 @@
       *H26.10 (Àº¸º¡Ë
                                                    OR  CONS-SGEN-SRYCD
                                                    OR  "099209902" )
+      *H27.4
+                        OR    (SPA-WKSRY-SRYCD (IDX-W IDX-W2)
+                                                   =   "099200101" )
                            CONTINUE
                        ELSE
                            ADD     1           TO  IDX2
@@ -4310,6 +4315,9 @@
       *H26.10 (Àº¸º¡Ë
                                                    OR  CONS-SGEN-SRYCD
                                                    OR  "099209902" )
+      *H27.4
+                        OR    (SPA-WKSRY-SRYCD (IDX-W IDX-W2)
+                                                   =   "099200101" )
                            CONTINUE
                        ELSE
                            ADD     1           TO  IDX2

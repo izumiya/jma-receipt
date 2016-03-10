@@ -1871,6 +1871,14 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H28.1
+               WHEN    "0506"
+                   STRING   "この診療種別は平成２７年４月から"
+                            "有効です。"
+                            "入力できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *Ｈ２２．４から
                WHEN    "0270"
                    STRING  "ＣＴ、ＭＲＩが逓減になります。"
@@ -3163,6 +3171,40 @@
                                        INTO  SPA-ERRMSG
                    END-STRING
       *
+      *H28.4　改正から
+               WHEN    "K107"
+                   STRING  "警告！"
+                           "認知症地域包括診療料が算定済みです。"
+                           "診察料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K108"
+                   STRING  "警告！"
+                           "湿布薬が７０枚以上となります。"
+                           "減算対象となります。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K109"
+                   STRING  "警告！"
+                           "湿布薬の投薬があります。"
+                           "全量・１日量のコメントを入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0101"
+                   STRING  "処方せん無交付加算の在宅料ではありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0236"
+                   STRING  "外用薬院内投薬がゼロ点になります。"
+                           "診療種別を.231に変更して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      **
                WHEN    "K910"
                    STRING  "警告！"
                            "入院会計照会を確認して下さい。"
@@ -3399,6 +3441,14 @@
                WHEN    "K103"
                    STRING  "警告！！登録時と診療内容が違います。"
                            "必ず登録をして点数を変更して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K104"
+                   STRING  "警告！"
+                           "登録時と点数が違います。"
+                           "湿布薬減点対象であれば、"
+                           "訂正で点数を変更して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

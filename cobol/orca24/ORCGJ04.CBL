@@ -187,6 +187,8 @@
            03  FLG-IN1             PIC 9(01).
            03  FLG-HENKOU          PIC 9(01).
       *
+           03  FLG-SIP            PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDS                 PIC 9(04).
@@ -627,6 +629,8 @@
       *    点数算定基準
            COPY    "CPSK1201.INC".
       *
+           COPY    "CPSK1030.INC".
+      *
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
@@ -771,6 +775,11 @@
       *
       *    セット展開サブ
            COPY    "CPORCSCSETHEN.INC".
+      *TEST
+      *H28.2
+      *    院外処方名編集パラメタ
+           COPY    "CPORCSCGENNAME.INC".
+      *TEST
       *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
@@ -1344,11 +1353,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    訂正時点数変更チェック
            MOVE    ZERO                TO  SPA-TENKAI-CHK
            MOVE    ZERO                TO  SPA-TENKAI-ERR
+           MOVE    ZERO                TO  FLG-SIP
       *    点数変更エラー
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+      *H28.4
+               IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "6" )
+                  AND (SPA-COM-SRYKBN (IDX)        =   "23")
+                  AND (SPA-COM-SIPPUKBN(IDX)       =   "1" )
+                   MOVE    1                   TO  FLG-SIP
+               END-IF
       *H25.12
                IF     (SPA-COM-SRYKBN(IDX)     =   "95"
                                                OR  "96" ) AND
@@ -1382,6 +1398,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      SPA-TENKAI-ERR      =   1
                MOVE    "K103"              TO  SPA-ERRCD
+               IF      FLG-SIP             =   1
+                   MOVE    "K104"              TO  SPA-ERRCD
+                   MOVE    2                   TO  SPA-TENKAI-ERR
+               END-IF
            END-IF
       *
            MOVE    SPA-ZAINUM          TO  SPA-MAE-ZAINUM
@@ -1530,6 +1550,23 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *H27.1
       *    ステム管理共通（妥結率）
            PERFORM 1003-SYSKANRI-DAKETU-SEC
+      *H28.2
+      *    後発医薬品への変更可署名
+           MOVE    SPACE               TO  SYS-1030-REC
+           INITIALIZE                  SYS-1030-REC
+           MOVE    "1030"              TO  SYS-1030-KANRICD
+           MOVE    "*"                 TO  SYS-1030-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1030-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1030-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1030-HOSPNUM
+           MOVE    SYS-1030-REC        TO  SYSKANRI-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1030-REC
+               MOVE    SYS-1030-KOUHATUKA  TO  SPA-KOUHATUKA
+           ELSE
+               MOVE    "0"                 TO  SPA-KOUHATUKA
+           END-IF
       *
            .
        3101-SYSKANRI-SET-EXT.
@@ -8188,10 +8225,17 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 500-GMNHEN-SEC
       *
       *    展開時のエラー
-           IF     (SPA-TENKAI-ERR      =   1  )  AND
+           IF     (SPA-TENKAI-ERR      =   1
+                                       OR  2  )  AND
                   (SPA-TENKAI-CHK      =   ZERO)
-               IF      SPA-ERRCD       NOT =   "K103"
+               IF      SPA-ERRCD           =   "K103"
+                                           OR  "K104"
+                   CONTINUE
+               ELSE
                    MOVE    "K103"              TO  SPA-ERRCD
+                   IF      SPA-TENKAI-ERR      =   2
+                       MOVE    "K104"              TO  SPA-ERRCD
+                   END-IF
                    MOVE    1                   TO  SPA-TENKAI-CHK
                    MOVE    1                   TO  SPA-GMN-CUR
                END-IF

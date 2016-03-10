@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  15/04/XX  一般・銘柄名処方毎の対応
       *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
+      *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -61,6 +62,8 @@
            03  FLG-HKTCHK              PIC 9(01).
            03  FLG-HOUKATU-ZAI         PIC 9(01).
            03  FLG-AUTOERR             PIC 9(01).
+      *TEST 
+           03  FLG-INNAI               PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -262,6 +265,12 @@
            COPY    "K01COMMON-SPA".
       *
       *
+      *TEST
+      *    院外処方名編集パラメタ
+           COPY    "CPORCSCGENNAME.INC".
+      *TEST
+      *
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -304,6 +313,13 @@
                    PERFORM 100-GMN-SYORI-SEC
                WHEN    "2"
                    PERFORM 300-TOUROKU-SYORI-SEC
+      *H28.4   中途終了
+               WHEN    "4"
+                   PERFORM 100-GMN-SYORI-SEC
+                   IF     (SPA-ERRCD       =   SPACE )  OR
+                          (SPA-KIDCD       =   SPACE )
+                       PERFORM 200-TOUYAKUCHK-SEC
+                   END-IF
            END-EVALUATE
       *
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -328,7 +344,6 @@
       *
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD           =   "0180" )
-      *******  OR (ORCSC100-INIT       =   1      )
                GO      TO      100-GMN-SYORI-EXT
            END-IF
       *    診察料のみ変更時は、以下の処理なし
@@ -338,6 +353,11 @@
       *    登録前の全体のチェックを行う
            INITIALIZE                  ORCSC00AREA
            MOVE    "2"                 TO  LNK-ORCSC-KBN
+      *H28.4
+      *    登録時
+           IF      ORCSC100-TOROKU     =   "1"
+               MOVE    "1"                 TO  LNK-ORCSC-KBN2
+           END-IF
            PERFORM 520-ALL-CHEK-SEC
       *    更新前に確認画面を表示する
            IF      ORCSC100-TOROKU     =   SPACE
@@ -1564,10 +1584,10 @@
       *
            PERFORM 51021-ZAIBETU-CHK-SEC
            MOVE    WRK-SPA-SRYYMD      TO  SPA-SRYYMD
+      *
            .
        5102-ZAIBETU-EXT.
            EXIT.
-      *
       *****************************************************************
       *    剤別のチェック処理
       *****************************************************************
@@ -1882,6 +1902,23 @@
                    END-IF
                END-IF
            END-PERFORM
+      *TEST
+      *TEST
+      *H28.2
+      *!!! 院外投薬名称変換
+           IF     (SPA-NYUGAIKBN       =   "2" )
+             AND  (WRK-COM-SRYKBN (01) =   "21"
+                                       OR  "22"
+                                       OR  "23"
+                                       OR  "14" )
+             AND  (SPA-SRYYMD          >=  "20160101")
+      *!システム管理の設定あり
+             AND  (SPA-GENERICFLG      =   "1"   )
+               PERFORM 51023-MEIHENKAN-SEC
+           END-IF
+      *TEST
+      *TEST
+      *TEST
       *
       *    点数再セット
       *    診察日を戻す
@@ -2308,6 +2345,99 @@
        4201-ZAIDEL-CHK-EXT.
            EXIT.
       *
+      *H28.4
+      *****************************************************************
+      *    投薬の名称再編集処理
+      *****************************************************************
+       51023-MEIHENKAN-SEC          SECTION.
+      *
+           IF     (WRK-COM-INGAITEN (WRK-MAX)  NOT =   ZERO )
+              OR  (WRK-COM-SRYSYUKBN (01)  =   "148"
+                                           OR  "149"
+                                           OR  "212"
+                                           OR  "222"
+                                           OR  "232"
+                                           OR  "292"
+                                           OR  "298"
+                                           OR  "295" )
+      *        院外投薬
+               PERFORM 510231-IPN-HEN-SEC
+           ELSE
+      *        院内
+               PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                       UNTIL       IDX-Z       >   WRK-MAX
+      *
+                   IF     (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6"  )
+                       MOVE    WRK-COM-MEI-NAME(IDX-Z)
+                                           TO  WRK-GMN-MEISYO(IDX-Z)
+                       MOVE    SPACE       TO  WRK-COM-MEI-KBN(IDX-Z)
+                   END-IF
+               END-PERFORM
+           END-IF
+           .
+       51023-MEIHENKAN-EXT.
+           EXIT.
+      *****************************************************************
+      *    投薬の名称再編集処理
+      *****************************************************************
+       510231-IPN-HEN-SEC          SECTION.
+      *
+           INITIALIZE                  ORCSCGENNAMEAREA
+           MOVE    SPACE               TO  ORCSCGENN-SYORIKBN
+           MOVE    "1"                 TO  ORCSCGENN-SYORIKBN2
+           MOVE    SPA-SRYYMD          TO  ORCSCGENN-SRYYMD
+      *    後発医薬品への変更可署名(SYS-1030-KOUHATUKA)
+           MOVE    SPA-KOUHATUKA       TO  ORCSCGENN-1030-KOUHATUKA
+      *    後発品変更不可（処方毎）有
+           IF      SPA-GENECHG-KBN     =   1
+               MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z   >   WRK-MAX      )
+               MOVE    WRK-GMN-INPUTCD(IDX-Z)
+                                       TO  ORCSCGENN-INPUTCD(IDX-Z)
+               MOVE    WRK-COM-INPUTCD(IDX-Z)
+                                       TO  ORCSCGENN-SRYCD (IDX-Z)
+               MOVE    WRK-COM-KOUHATUKBN (IDX-Z)
+                                       TO  ORCSCGENN-TNS-KOUHATUKBN
+                                                            (IDX-Z) 
+               MOVE    WRK-COM-IPN-KISAIKBN (IDX-Z)
+                                       TO  ORCSCGENN-IPN-KISAIKBN
+                                                            (IDX-Z)
+               MOVE    WRK-COM-YAKKAKJNCD (IDX-Z)
+                                       TO  ORCSGETGE-YAKKAKJNCD
+                                                            (IDX-Z)
+               MOVE    IDX-Z           TO  ORCSCGENN-TBLMAX
+           END-PERFORM
+      *
+           CALL    "ORCSCGENNAME"      USING    ORCSCGENNAMEAREA
+                                                SPA-AREA
+      *
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z   >   WRK-MAX      )
+               IF     (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6"  )
+                   IF     (ORCSCGENN-NAME-KBN (IDX-Z)  =   "1"
+                                                       OR  "3"  )
+                      AND (WRK-COM-IPN-NAME(IDX-Z) NOT =   SPACE)
+      *                一般名
+                       MOVE    WRK-COM-IPN-NAME(IDX-Z)
+                                           TO  WRK-GMN-MEISYO(IDX-Z)
+                       MOVE    "1"         TO  WRK-COM-MEI-KBN(IDX-Z)
+                   ELSE
+      *                銘柄名
+                       MOVE    WRK-COM-MEI-NAME(IDX-Z)
+                                           TO  WRK-GMN-MEISYO(IDX-Z)
+                       MOVE    SPACE       TO  WRK-COM-MEI-KBN(IDX-Z)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           .
+       510231-IPN-HEN-EXT.
+           EXIT.
+      *TEST
+      *TEST
+      *
       *****************************************************************
       *    各診療行為チェックへ
       *****************************************************************
@@ -2449,8 +2579,9 @@
            MOVE    ZERO                TO  LNK-ORCSC-JIKANERR-FLG
            MOVE    SPACE               TO  SPA-GMN-JIKANMSG
       *
+           IF     (LNK-ORCSC-KBN2      =   SPACE )
       *            診療
-           IF      SPA-SRYKBN-CNT (01) >   ZERO
+           IF     (SPA-SRYKBN-CNT (01) >   ZERO  )
       *H25.7
       *            労災その他の時もチェックを行う（労災レセ電対応）
              OR  ((SPA-SRYKBN-CNT (09) >   ZERO      )  AND
@@ -2518,6 +2649,8 @@
                GO      TO    520-ALL-CHEK-EXT
            END-IF
       *
+           END-IF
+      *
       *    投薬（更新前チェックはすべて行う）
            IF     (SPA-SRYKBN-CNT (02) >   ZERO )
                OR (LNK-ORCSC-KBN       =   "3"  )
@@ -2542,6 +2675,12 @@
                   (SPA-KIDCD       NOT =   SPACE )
                GO      TO    520-ALL-CHEK-EXT
            END-IF
+      *H28.4
+      *    中途終了時は、投薬のみチェック
+           IF     (LNK-ORCSC-KBN2      =   "1" )
+               GO      TO    520-ALL-CHEK-EXT
+           END-IF
+      ****
       *            注射
            IF     (SPA-SRYKBN-CNT (03) >   ZERO )
       *            入院で手術の時も点滴チェックを行う
@@ -2753,6 +2892,20 @@
            END-IF
            .
        5201-SYOHOU-HKN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    中途終了時、投薬チェック処理
+      *****************************************************************
+       200-TOUYAKUCHK-SEC          SECTION.
+      *
+      *    登録前の全体のチェックを行う
+           INITIALIZE                  ORCSC00AREA
+           MOVE    "2"                 TO  LNK-ORCSC-KBN
+           MOVE    "1"                 TO  LNK-ORCSC-KBN2
+           PERFORM 520-ALL-CHEK-SEC
+           .
+       200-TOUYAKUCHK-EXT.
            EXIT.
       *
       *****************************************************************

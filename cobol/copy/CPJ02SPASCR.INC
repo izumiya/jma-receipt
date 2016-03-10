@@ -106,4 +106,6 @@
                        09  SPA-NAI-NYUAUTO         PIC  9(01).
       *ver.4.7         院外処方点数
                        09  SPA-NAI-INGAITEN        PIC  9(07).
+      *H28.2           後発品変更不可（処方）あり
+                       09  SPA-NAI-GENEFLG         PIC  X(01).
       *

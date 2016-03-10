@@ -254,6 +254,20 @@
       *    小児科外来診療科（院内処方）再診
            03  FILLER                  PIC X(04)   VALUE   "004".
            03  FILLER                  PIC X(09)   VALUE   "113003810".
+      *H28.4
+      *    小児かかりつけ診療科（院内処方）初診
+           03  FILLER                  PIC X(04)   VALUE   "004".
+           03  FILLER                  PIC X(09)   VALUE   "113019710".
+      *    小児かかりつけ診療科（院内処方）再診
+           03  FILLER                  PIC X(04)   VALUE   "004".
+           03  FILLER                  PIC X(09)   VALUE   "113019810".
+      *    小児かかりつけ診療科（院外処方）初診
+           03  FILLER                  PIC X(04)   VALUE   "004".
+           03  FILLER                  PIC X(09)   VALUE   "113019910".
+      *    小児かかりつけ診療科（院外処方）再診
+           03  FILLER                  PIC X(04)   VALUE   "004".
+           03  FILLER                  PIC X(09)   VALUE   "113020010".
+      *
       *    消炎鎮痛処置テーブル
            03  FILLER                  PIC X(04)   VALUE   "005".
            03  FILLER                  PIC X(09)   VALUE   "140029610".
@@ -325,14 +339,14 @@
       *****03  TBL-DOUJI-OCC           OCCURS   9   INDEXED   TBL-IDX.
       *****03  TBL-DOUJI-OCC           OCCURS   13  INDEXED   TBL-IDX.
       **** 03  TBL-DOUJI-OCC           OCCURS   24  INDEXED   TBL-IDX.
-           03  TBL-DOUJI-OCC           OCCURS   30  INDEXED   TBL-IDX.
+           03  TBL-DOUJI-OCC           OCCURS   34  INDEXED   TBL-IDX.
                05  TBL-CODE                PIC X(03).
                05  TBL-CHK                 PIC X(01).
                05  TBL-SRYCD               PIC X(09).
       *01  TBL-MAX                     PIC 9(04)   VALUE   9.
       *01  TBL-MAX                     PIC 9(04)   VALUE   18.
       *01  TBL-MAX                     PIC 9(04)   VALUE   24.
-       01  TBL-MAX                     PIC 9(04)   VALUE   30.
+       01  TBL-MAX                     PIC 9(04)   VALUE   34.
       *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".

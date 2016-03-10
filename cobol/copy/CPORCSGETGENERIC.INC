@@ -64,6 +64,9 @@
                    07  ORCSGETGE-KNS-TANICD     PIC 9(03).
       *            換算値の単位
                    07  ORCSGETGE-KNS-TANINAME   PIC X(24).
+      *        後発品変更不可（処方）あり
+               05  ORCSGETGE-GENEFLG            PIC X(01).
       *エラーコード
            03  ORCSGETGE-ERRCD           PIC 9(01).
+      *
       *

@@ -1036,8 +1036,6 @@
       *H24.4
       *    レセプトプレビュー区分初期処理
            PERFORM 3100-RESPRV-SET-SEC
-      *    一般名記載初期処理
-           PERFORM 30001-GENERIC-SET-SEC
       *
            PERFORM                     310-SPA-SET-SEC
       *
@@ -1053,23 +1051,6 @@
       *
            .
        3000-INIT-SCREEN-EXT.
-           EXIT.
-      *
-      *H24.4
-      *****************************************************************
-      *    一般名記載初期処理
-      *****************************************************************
-       30001-GENERIC-SET-SEC          SECTION.
-      *
-      *    一般名表示
-           MOVE    ZERO                TO  SPA-NAI-GENEINIT
-           IF      SYS-1038-GENERICFLG     =   "1"
-      *        銘柄名表示
-               MOVE    1                   TO  SPA-NAI-GENEINIT
-           END-IF
-      *
-           .
-       30001-GENERIC-SET-EXT.
            EXIT.
       *H24.4
       *
@@ -1377,9 +1358,28 @@
            ELSE
                MOVE    "1"                 TO  SPA-NAI-RESPRVFLG
            END-IF
+      *    一般名記載初期処理
+           PERFORM 30001-GENERIC-SET-SEC
       *
             .
        3100-RESPRV-SET-EXT.
+           EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    一般名記載初期処理
+      *****************************************************************
+       30001-GENERIC-SET-SEC          SECTION.
+      *
+      *    一般名表示
+           MOVE    ZERO                TO  SPA-NAI-GENEINIT
+           IF      SYS-1038-GENERICFLG     =   "1"
+      *        銘柄名表示
+               MOVE    1                   TO  SPA-NAI-GENEINIT
+           END-IF
+      *
+           .
+       30001-GENERIC-SET-EXT.
            EXIT.
       *****************************************************************
       *     パラメタファイルよりワーク編集とＳＯＲＴ処理
@@ -2721,7 +2721,13 @@
                                                NOT =   ZERO  )
                  OR    (LNK-WKSRY-SRYSYUKBN (IDX)  =   "213"
                                                    OR  "223"
-                                                   OR  "233" )
+                                                   OR  "233"
+                                                   OR  "211"
+                                                   OR  "221"
+                                                   OR  "231"
+                                                   OR  "291"
+                                                   OR  "294"
+                                                   OR  "297" )
                    CONTINUE
                ELSE
       *            銘柄名
@@ -2759,6 +2765,26 @@
                           WRK-MEISYO       DELIMITED   BY  SIZE
                           INTO             SPA-GMN-TMEISYO2(IDG)
                END-STRING
+      *H28.2
+      *        銘柄名・一般名
+               IF      SPA-GMN-ME-MEISYO (IDG) NOT =   SPACE
+                   MOVE    SPA-GMN-ME-MEISYO (IDG) TO  WRK-MEISYO
+                   MOVE    SPACE               TO  SPA-GMN-ME-MEISYO
+                                                               (IDG)
+                   STRING     "＞"             DELIMITED   BY  SIZE
+                              WRK-MEISYO       DELIMITED   BY  SIZE
+                              INTO             SPA-GMN-ME-MEISYO(IDG)
+                   END-STRING
+               END-IF
+               IF      SPA-GMN-GE-MEISYO (IDG) NOT =   SPACE
+                   MOVE    SPA-GMN-GE-MEISYO (IDG) TO  WRK-MEISYO
+                   MOVE    SPACE               TO  SPA-GMN-GE-MEISYO
+                                                               (IDG)
+                   STRING     "＞"             DELIMITED   BY  SIZE
+                              WRK-MEISYO       DELIMITED   BY  SIZE
+                              INTO             SPA-GMN-GE-MEISYO(IDG)
+                   END-STRING
+               END-IF
            END-IF
       *
       *    コメントの時、内容設定
@@ -2791,7 +2817,7 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1) =   "1" )  AND
                   (TNS-TANICD                 NOT =   ZERO )
       *H28.2   画像診断もすべて表示
-      *      AND ((LNK-WKSRY-SRYKBN   (IDX)   NOT =   "70" ) OR
+      *     AND  ((LNK-WKSRY-SRYKBN   (IDX)   NOT =   "70" ) OR
       *           (LNK-WKSRY-AUTOKBN (IDX IDZ)    =   "S"  ))
       *****    IF      LNK-WKSRY-SRYSURYO (IDX IDZ)   >   1
                    MOVE    LNK-WKSRY-SRYSURYO (IDX IDZ)  TO  WRK-SURYO
@@ -4577,6 +4603,15 @@
            END-PERFORM
       *    複数科まとめ集計フラグ
            MOVE    SPA-KAGRPFLG        TO  LNK-S01-KAGRPFLG
+      *TEST
+      *TEST
+      *    DISPLAY "K08 LNK-ORCS01-REC"
+      *    DISPLAY LNK-ORCS01-REC
+      *    DISPLAY "K08 SYUNOU(1)"
+      *    DISPLAY LNK-SYUNOU2-REC (1)
+      *    DISPLAY "K08 SYUNOU(2)"
+      *    DISPLAY LNK-SYUNOU2-REC (2)
+      *TEST
       *    負担金計算処理
            CALL    "ORCSGAIFTN"        USING
                                        MCPAREA
@@ -7587,15 +7622,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-      *!
-      *TEST
-               WHEN    "0052"
-                   STRING  "外用薬剤の回数が１回以上になります。"
-                           "同じ剤は回数をまとめて入力して下さい。"
-                                       DELIMITED  BY  SIZE
-                                       INTO  SPA-ERRMSG
-                   END-STRING
-      *!
                WHEN    "9001"
                    MOVE    "プレビューができない保険組合せです。"
                                        TO  SPA-ERRMSG

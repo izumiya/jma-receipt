@@ -43,6 +43,7 @@
       * 04.07.00     NACL-多々納  11/09/21  院外処方点数対応
       * 04.07.00     NACL-多々納  11/12/20  商品名コード単価対応
       * 04.07.00     NACL-多々納  12/11/07  警告区分等追加
+      * 04.08.00     NACL-多々納  16/02/XX  Ｈ２８年改正対応
       ************************************************************
       *
       *01  SPA-K02SCR-REC.
@@ -185,6 +186,7 @@
                            11  SPA-COM-KZMFLG6       PIC X(01).
       *                    警告（予備）
                            11  SPA-COM-KZMFLG7       PIC X(01).
+                           11  SPA-COM-KZMFLG8       PIC X(01).
       *                    入院料併用警告
                            11  SPA-COM-KZMFLGNK      PIC X(01).
       *
@@ -424,6 +426,21 @@
                        09  SPA-COM-GEN-PRICE           PIC  9(09)V99.
       *                薬価基準コード
                        09  SPA-COM-YAKKAKJNCD          PIC  X(12).
+      *H28.4 改正分
+      *                湿布薬区分
+                       09  SPA-COM-SIPPUKBN        PIC  X(01).
+      *                湿布薬　膏体量１
+                       09  SPA-COM-SIPRYO1         PIC 9(05).
+                       09  SPA-COM-SIPRYO2         PIC 9(05).
+      *                湿布薬換算数量
+                       09  SPA-COM-SIP-SURYO       PIC 9(05)V9(05).
+      *                湿布薬減算有
+                       09  SPA-COM-SIPGEN          PIC X(01).
+                       09  SPA-COM-SIPKBN          PIC X(01).
+      *                労災　算定不可
+                       09  SPA-COM-ROSAIKBN        PIC  X(01).
+      *                労災　四肢加算
+                       09  SPA-COM-SISIKSN         PIC  X(01).
       *
       *    点数マスタ付加情報より
       *                採血区分
@@ -464,6 +481,13 @@
                        09  SPA-COM-PTKINKICD           PIC 9(01).
       *v4.8  連続行挿入用
                        09  SPA-COM-GMNINS              PIC X(01).
+      *H28.2 一般名表示対応
+      *                銘柄名
+                       09  SPA-COM-MEI-NAME            PIC X(78).
+      *                一般名（処方せん記載）
+                       09  SPA-COM-IPN-NAME            PIC X(100).
+                       09  SPA-COM-IPN-TANINAME        PIC X(02).
+                       09  SPA-COM-MEI-KBN             PIC X(01).
       *ver.4.7 から予備
                        09  SPA-COM-YOBI1               PIC X(10).
                        09  SPA-COM-YOBI2               PIC X(10).

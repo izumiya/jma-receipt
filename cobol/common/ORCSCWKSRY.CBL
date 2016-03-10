@@ -1679,6 +1679,13 @@
                                        =   "731" ))
                MOVE    1               TO  FLG-SYUBETU
            END-IF
+      *H28.1
+      *    ½éºÆ¿Ç²Ã»»
+           IF     LNK-WKSRY-SRYSYUKBN(IDX)     =   "114"
+                                               OR  "124"
+                                               OR  "133"
+               MOVE    1               TO  FLG-SYUBETU
+           END-IF
       *
       *    ÄûÀµ¤Î»þ¡¢ºÆ¿ÇÎÁ»»Äê²Ê¤òºÆ¿Ç¤È¤¹¤ë
            IF     (LNK-WKSRY-SRYKBN    (IDX)       =   "12" AND

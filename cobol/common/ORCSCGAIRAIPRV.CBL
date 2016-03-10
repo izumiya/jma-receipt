@@ -2673,11 +2673,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        WHEN    "113003710"
                            MOVE    SYU-SRYYMD      TO
                                                    WRK-KARRK-SYOSINYMD2
+      *H28.4           ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁ
+                       WHEN    "113019710"
+                       WHEN    "113019910"
+                           MOVE    SYU-SRYYMD      TO
+                                                   WRK-KARRK-SYOSINYMD2
       *                Æ±Æü½é¿Ç
                        WHEN    "101110040"
                        WHEN    "111011810"
       *H25.4           ¾Ò²ð¤Ê¤·
                        WHEN    "111012610"
+      *H28.4           ÂÅ·ë£µ³ä°Ê²¼
+                       WHEN    "111012810"
                            IF      LNK-WKSRY-SRYKBN (IDX)  =   "11"
                                MOVE    1               TO  FLG-DOUJITU
                            END-IF

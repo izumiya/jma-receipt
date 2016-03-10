@@ -674,6 +674,10 @@
                MOVE    SYS-1038-ERRCOLORS      TO  SPA-ERRCOLORS
       *        ·Ù¹ðÇØ·Ê¿§
                MOVE    SYS-1038-KEICOLORS      TO  SPA-KEICOLORS
+      *H28.4   °ìÈÌÌ¾É½¼¨
+               IF      SYS-1038-GENERICFLG     =   "2"
+                   MOVE    "1"                 TO  SPA-GENERICFLG
+               END-IF
            END-IF
            IF      SPA-KAGRPFLG        =   SPACE
                MOVE    "0"                 TO  SPA-KAGRPFLG
@@ -738,6 +742,10 @@
       *******  MOVE    "pink1"             TO  SPA-KEICOLORS
                MOVE    "#FFB5C5"           TO  SPA-KEICOLORS
            END-IF
+      *H28.4   °ìÈÌÌ¾É½¼¨
+           IF      SPA-GENERICFLG      =   SPACE
+               MOVE    "0"                 TO  SPA-GENERICFLG
+            END-IF
       *
       *ver.4.8
       *    Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
@@ -898,6 +906,21 @@
                            MOVE    ZERO            TO  SPA-CHKHTKKSN
                        END-IF
                    END-IF
+      *H28.4
+      *            IF      SPA-SRYYMD      >=  "20160401"
+      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»¡ÊXXXX)
+      *                IF      SYS-1006-SSTKIJUN (195) =   1
+      *                    MOVE    1               TO  SPA-NNCHIHKJN
+      *                ELSE
+      *                    MOVE    ZERO            TO  SPA-NNCHIHKJN
+      *                END-IF
+      *                ¾®»ù¤«¤«¤ê¤Ä¤±¡ÊXXXX)
+      *                IF      SYS-1006-SSTKIJUN (195) =   1
+      *                    MOVE    1               TO  SPA-SYOUNIKJN
+      *                ELSE
+      *                    MOVE    ZERO            TO  SPA-SYOUNIKJN
+      *                END-IF
+      **           END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
@@ -961,6 +984,8 @@
            MOVE    ZERO                TO  SPA-HKTSANTEI-204
            MOVE    ZERO                TO  SPA-HKTSANTEI-205
            MOVE    ZERO                TO  SPA-HKTSANTEI-206
+           MOVE    ZERO                TO  SPA-HKTSANTEI-209
+           MOVE    ZERO                TO  SPA-HKTSANTEI-210
            MOVE    ZERO                TO  SPA-HKTNYUIN-FLG
            PERFORM UNTIL  (FLG-SYSKANRI    =   1  )
                MOVE    MCPDATA-REC         TO  SYS-1014-REC
@@ -1010,6 +1035,17 @@
       *H26.9
                            MOVE    SYS-1014-SANTEI-HOU
                                                    TO  SPA-HKTSANTEI-206
+                       END-IF
+      *H28.4
+      *                ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁ
+                       IF      SYS-1014-KBNCD      =   "209"
+                           MOVE    SYS-1014-SANTEI-HOU
+                                                   TO  SPA-HKTSANTEI-209
+                       END-IF
+      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                       IF      SYS-1014-KBNCD      =   "210"
+                           MOVE    SYS-1014-SANTEI-HOU
+                                                   TO  SPA-HKTSANTEI-210
                        END-IF
                    END-IF
                END-IF

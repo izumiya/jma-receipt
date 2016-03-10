@@ -311,9 +311,20 @@
                COMPUTE WRK-SYOKEIS2        =   LNK-COM-KISOTEN (IDX)
                                            *   WRK-SURYO-CHU
            ELSE
+      *H28.4
+      *        湿布薬の枚数変更
+               IF     (LNK-COM-SIPPUKBN (IDX)  =   "1" )
+                  AND (LNK-COM-SIPGEN (IDX)    =   "1"
+                                               OR  "2" )
+                   MOVE    LNK-COM-SIP-SURYO (IDX) TO  WRK-SURYO
+               ELSE
+                   MOVE    LNK-COM-SURYO  (IDX)    TO  WRK-SURYO
+               END-IF
+      *
       *        点数
                COMPUTE WRK-SYOKEIS2        =   LNK-COM-KISOTEN(IDX)
-                                           *   LNK-COM-SURYO  (IDX)
+                                           *   WRK-SURYO
+      *???                                 *   LNK-COM-SURYO  (IDX)
            END-IF
       *
            ADD     WRK-SYOKEIS2        TO  WRK-ZAIKEI

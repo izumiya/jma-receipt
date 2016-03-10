@@ -820,7 +820,12 @@
                IF      FLG-INNAI           =   1
                    IF     (WRK-SRYSYUKBN       =   "213"
                                                OR  "223"
-                                               OR  "233" )  OR
+                                               OR  "233"
+      *H28.4
+                                               OR  "211"
+                                               OR  "221"
+                                               OR  "231"
+                                               OR  "294" )  OR
                           (TBL-ACCT-ZAITEN NOT =   ZERO  )
                        MOVE    1               TO  FLG-HEN
                    END-IF
@@ -828,7 +833,12 @@
       *        ±¡³°
                    IF     (WRK-SRYSYUKBN       =   "213"
                                                OR  "223"
-                                               OR  "233" )  OR
+                                               OR  "233"
+      *H28.4
+                                               OR  "211"
+                                               OR  "221"
+                                               OR  "231"
+                                               OR  "294" )  OR
                           (TBL-ACCT-ZAITEN NOT =   ZERO  )
                        CONTINUE
                    ELSE

@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04/08/00    NACL-多々納  16/03/XX  後発品変更不可（処方）対応他
       *****************************************************************
       *
       *
@@ -49,6 +50,8 @@
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
            03  FLG-GENERICNAME     PIC 9(01).
+           03  FLG-JYURRK          PIC 9(01).
+           03  FLG-SRYACCT         PIC 9(01).
       *
       *    後発医薬品変更不可
            03  FLG-KOUHATU-FUKA        PIC 9(01).
@@ -93,6 +96,32 @@
            03  WRK-GENERIC-EDYMD       PIC X(08).
            03  WRK-YAKKAKJNCD-OLD      PIC X(12).
       *
+      *
+      *
+           03  WRK-SRYKA               PIC X(02).
+      *TEST
+       01  TBL-GENEINP-AREA.
+      *    予約コードの剤
+           03  TBL-GENINP-TBL1         OCCURS   40.
+               05  TBL-G-DENPNUM        PIC 9(07).
+               05  TBL-G-SRYYMD         PIC X(08).
+      *    予約コード算定日
+           03  TBL-GENINP2-TBL2.
+               05  TBL-GENINP2-OCCURS   OCCURS   31.
+                   07  TBL-H-ALLFUKA       PIC 9(01).
+      *
+           03  WRK-YMD.
+               05  WRK-YM              PIC X(06).
+               05  WRK-DD              PIC 9(02).
+           03  WRK-SRYCD               PIC X(09).
+           03  FLG-ALLFUKA             PIC 9(01).
+           03  FLG-ALLFUKA-ARI         PIC 9(01).
+           03  FLG-GENENASI            PIC 9(01).
+           03  FLG-GENE-ARI            PIC 9(01).
+           03  IDX-G                   PIC 9(04).
+           03  IDX-G2                  PIC 9(04).
+           03  IDX-JYU                 PIC 9(04).
+           03  IDD                     PIC 9(02).
       *
       *    剤内容テーブル
        01  WRK-SRYACT-GRP-AREA.
@@ -145,8 +174,12 @@
            COPY    "CPSRYACT.INC".
       *
       *    診療会計マスタ−
-      * 01  SRYACCT-REC.
-      *    COPY    "CPSRYACCT.INC".
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
+      *
+      *    受診履歴
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
       *    診療行為マスタワーク
        01  TBL-SRYACT-AREA.
@@ -202,24 +235,6 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-      *TEST
-      *    DISPLAY "ZAINUM:"  ORCSGETGE-ZAINUM
-      *          ",SRYKBN:"  WRK-SRYKBN
-      *          ",ERRCD:"  ORCSGETGE-ERRCD
-      *          ",TBLMAX:"  ORCSGETGE-TBLMAX
-      *    PERFORM VARYING   IDX   FROM   1  BY  1
-      *            UNTIL     IDX   >   50
-      *                OR   (ORCSGETGE-SRYCD (IDX) = SPACE)
-      *         DISPLAY "IDX:"  IDX
-      *             ",SRYCD:"  ORCSGETGE-SRYCD (IDX)
-      *           ",YAKK:" ORCSGETGE-YAKKAKJNCD (IDX)
-      *           ",GENERIC-KBN:" ORCSGETGE-GENERIC-KBN (IDX)
-      *           ",NAME-KBN:" ORCSGETGE-NAME-KBN (IDX)
-      *        IF    ORCSGETGE-GENERICNAME (IDX) NOT = SPACE
-      *         DISPLAY  "GENERICNAME:" ORCSGETGE-GENERICNAME (IDX)
-      *                      (1:20)
-      *        END-IF
-      **** END-PERFORM
            .
        000-PROC-EXT.
            EXIT    PROGRAM
@@ -275,9 +290,25 @@
                                            OR  "21"
                                            OR  "22"
                                            OR  "23")
+      *            院内対象外
+                   IF     (SRY-SRYSYUKBN       =   "211"
+                                               OR  "213"
+                                               OR  "221"
+                                               OR  "223"
+                                               OR  "231"
+                                               OR  "233"
+                                               OR  "291"
+                                               OR  "294"
+                                               OR  "297")
+                       CONTINUE
+                   ELSE
+      *
                    ADD     1               TO  IDX-SRY
                    MOVE    SRYACT-REC      TO  TBL-SRYACT-REC (IDX-SRY)
                    MOVE    SRY-SRYKBN      TO  WRK-SRYKBN
+                   MOVE    SRY-SRYKA       TO  WRK-SRYKA
+               END-IF
+      *
                END-IF
       *
                MOVE    "tbl_sryact"        TO  MCP-TABLE
@@ -287,6 +318,12 @@
            MOVE    "tbl_sryact"        TO  MCP-TABLE
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *H28.2
+           IF      IDX-SRY             >   ZERO
+      *        後発品変更不可編集
+               PERFORM 2009-SYORI-HENSYU-SEC
+           END-IF
       *
            IF      IDX-SRY             >   ZERO
                PERFORM 2001-SRYACT-CHK-SEC
@@ -357,6 +394,13 @@
                PERFORM 20012-ORCSGETGE-HEN-SEC
            END-PERFORM
            MOVE    IDX                 TO  ORCSGETGE-TBLMAX 
+      *
+      *    剤に後発品変更不可（処方）あり
+           IF     (FLG-ALLFUKA-ARI     =   0      )
+             AND  (FLG-GENE-ARI        =   1      )
+               MOVE    "1"             TO  ORCSGETGE-GENEFLG
+           END-IF
+      *
            .
        20021-SRYACT-CHK-EXT.
            EXIT.
@@ -467,11 +511,19 @@
            MOVE    TNSP-IPN-KISAIKBN   TO  WRK-IPN-KISAIKBN
       *    システム管理の変更可によって一般名記載とする
            IF     (WRK-IPN-KISAIKBN        =   ZERO    )
-              AND (ORCSGETGE-KOUHATUKA     =   "1"     )
-              AND (TNS-KOUHATUKBN          =   1
+             AND  (ORCSGETGE-KOUHATUKA     =   "1"     )
+             AND  (TNS-KOUHATUKBN          =   1
                                            OR  2
                                            OR  7       )
-               MOVE    1                   TO  WRK-IPN-KISAIKBN
+      *
+      *H28.2
+      *        後発品変更不可（処方）あり
+               IF     (FLG-ALLFUKA-ARI     =   0      )
+                 AND  (FLG-GENE-ARI        =   1      )
+                   CONTINUE
+               ELSE
+                   MOVE    1                   TO  WRK-IPN-KISAIKBN
+               END-IF
            END-IF
       *
            IF      WRK-IPN-KISAIKBN    =   1
@@ -600,6 +652,123 @@
            .
        20039-GENERICCD-HEN-EXT.
            EXIT.
+      *TEST
+      *
+      *H28.2
+      *****************************************************************
+      *    一般名記載編集
+      *****************************************************************
+       2009-SYORI-HENSYU-SEC         SECTION.
+      *
+      *    予約コードの剤番号取得
+           INITIALIZE                      TBL-GENEINP-AREA
+           MOVE    ZERO                TO  IDX-G
+      *    後発品変更不可（処方単位）
+           MOVE    "099209910"         TO  WRK-SRYCD
+           MOVE    1                   TO  FLG-ALLFUKA
+           PERFORM 20091-GENEINP-HEN-SEC
+      *
+           MOVE    SPACE               TO  JYURRK-REC
+           INITIALIZE                      JYURRK-REC
+           MOVE    ORCSGETGE-HOSPNUM   TO  JYURRK-HOSPNUM
+           MOVE    ORCSGETGE-PTID      TO  JYURRK-PTID
+           MOVE    ORCSGETGE-NYUGAIKBN TO  JYURRK-NYUGAIKBN
+           MOVE    WRK-SRYKA           TO  JYURRK-SRYKA
+           PERFORM VARYING     IDX-JYU     FROM    1   BY  1
+                   UNTIL      (IDX-JYU         >   15  )
+               MOVE    ORCSGETGE-ZAINUM    TO  JYURRK-ZAINUM(IDX-JYU)
+           END-PERFORM
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key63"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key63"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-JYURRK
+               INITIALIZE                      JYURRK-REC
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-ALLFUKA-ARI
+           MOVE    ZERO                TO  FLG-GENE-ARI
+      *
+           PERFORM UNTIL   (FLG-JYURRK     =   1 )
+               MOVE    ZERO                 TO  FLG-GENENASI
+               PERFORM VARYING     IDX-G   FROM    1   BY  1
+                       UNTIL      (IDX-G   >   40 )
+                              OR  (TBL-G-DENPNUM(IDX-G) =   ZERO)
+                   IF      JYURRK-DENPNUM      =   TBL-G-DENPNUM(IDX-G)
+                       MOVE    1               TO  FLG-GENENASI
+                       MOVE    40              TO  IDX-G
+                   END-IF
+               END-PERFORM
+               IF      FLG-GENENASI        =   ZERO
+      *            後発品変更不可（処方）なしの受診履歴あり
+                   MOVE    1               TO  FLG-ALLFUKA-ARI
+               ELSE
+                   MOVE    1               TO  FLG-GENE-ARI
+               END-IF
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key63"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key63"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       2009-SYORI-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    予約コードの剤番号取得編集
+      *****************************************************************
+       20091-GENEINP-HEN-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  JYURRK-REC
+           INITIALIZE                      JYURRK-REC
+           MOVE    ORCSGETGE-HOSPNUM   TO  JYURRK-HOSPNUM
+           MOVE    ORCSGETGE-PTID      TO  JYURRK-PTID
+           MOVE    ORCSGETGE-NYUGAIKBN TO  JYURRK-NYUGAIKBN
+           MOVE    WRK-SRYKA           TO  JYURRK-SRYKA
+           MOVE    ORCSGETGE-SRYYM     TO  JYURRK-UPHMS
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key62"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key62"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-JYURRK
+               INITIALIZE                      JYURRK-REC
+           END-IF
+           PERFORM
+                   UNTIL   FLG-JYURRK      =   1
+               IF      JYURRK-HKNCOMBINUM  NOT =   "9999"
+                   ADD     1                   TO  IDX-G
+                   IF      IDX-G               <   40
+                       MOVE    JYURRK-DENPNUM  TO  TBL-G-DENPNUM(IDX-G)
+                       MOVE    JYURRK-SRYYMD   TO  TBL-G-SRYYMD (IDX-G)
+                   END-IF
+               END-IF
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key62"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+      *
+           END-PERFORM
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key62"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       20091-GENEINP-HEN-EXT.
+           EXIT.
+      *H28.2
       *
       *****************************************************************
       *    点数マスター読込
@@ -727,6 +896,42 @@
            .
        900-SRYACT-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    受診履歴読込
+      *****************************************************************
+       970-JYURRK-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  JYURRK-REC
+               MOVE    ZERO                TO  FLG-JYURRK
+           ELSE
+               INITIALIZE                      JYURRK-REC
+               MOVE    1                   TO  FLG-JYURRK
+           END-IF
+      *
+           .
+       970-JYURRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計マスター読み込み
+      *****************************************************************
+      *930-SRYACCT-READ-SEC         SECTION.
+      *
+      *    PERFORM 920-DBFETCH-SEC
+      *    IF      MCP-RC              =   ZERO
+      *        MOVE    MCPDATA-REC         TO  SRYACCT-REC
+      *        MOVE    ZERO                TO  FLG-SRYACCT
+      *    ELSE
+      *        INITIALIZE                      SRYACCT-REC
+      *        MOVE    1                   TO  FLG-SRYACCT
+      *    END-IF
+      *
+      *    .
+      *930-SRYACCT-READ-EXT.
+      *    EXIT.
       *
       *****************************************************************
       *    テーブル検索処理

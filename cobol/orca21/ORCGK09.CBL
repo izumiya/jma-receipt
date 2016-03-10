@@ -42,6 +42,7 @@
       * 04.07.00     NACL-多々納  12/03/07  処方せん料表示対応（H24.4対応）
       * 04.07.00     NACL-多々納  13/05/XX  労災レセ電コード対応(H25.7)
       * 04.08.00     NACL-多々納  14/06/XX  一時保存データ修正
+      * 04.08.00     NACL-多々納  16/03/XX  一般名記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -332,6 +333,11 @@
            03  WRK-SRYCD               PIC X(09).
       *
            03  WRK-DAY                 PIC X(02).
+      *TEST
+      *TEST
+           03  WRK-FUKA-INPUT          PIC X(01).
+      *TEST
+      *TEST
       *
       *H26.6
       *     診療内容テーブル(SPAからWRKへ）
@@ -463,6 +469,11 @@
       *
       *    全角変換サブ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *H28.4
+      *    院外処方名編集パラメタ
+           COPY    "CPORCSCGENNAME.INC".
+      *
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -1168,6 +1179,25 @@
                       ADD     1                TO  IDX2
                       MOVE    SPA-NAI-TBANGO (IDX)
                                            TO  WRK-SELNUM-CHK (IDX2)
+      *H26.10
+                  ELSE
+      *                空白削除
+                       PERFORM VARYING  IDY     FROM   1   BY  1
+                               UNTIL   (IDY     >   MAX-SEL )
+                           IF      (WRK-SELNUM-CHK (IDY)   =   ZERO)
+                              AND  (IDY         <   MAX-SEL )
+                               IF      WRK-SELNUM-CHK (IDY + 1)
+                                                    =   ZERO
+                                   MOVE    MAX-SEL      TO  IDY
+                               ELSE
+                                   MOVE    WRK-SELNUM-CHK (IDY + 1)
+                                                   TO  WRK-SELNUM-CHK
+                                                             (IDY)
+                                   MOVE    ZERO    TO  WRK-SELNUM-CHK
+                                                            (IDY + 1)
+                               END-IF
+                           END-IF
+                       END-PERFORM
                   END-IF
               END-IF
            END-PERFORM
@@ -1681,6 +1711,18 @@
       *
            MOVE    1                   TO  FLG-GMN-INIT2
       *
+      *H28.4
+           MOVE    SPACE               TO  WRK-FUKA-INPUT
+      *    処方せん名称編集対応
+           IF     (SPA-K09NAI-RRKYMD(SPA-K09-DOSELNUM)
+                                       >=  "20160101")
+              AND (SPA-GENERICFLG      =   "1"  )
+      *        後発品変更不可（処方単位）判定
+               PERFORM 41019-SYOHOU-CHEK-SEC
+           END-IF
+      *H28.4
+      *
+      *
       *    パラメタファイルより、診療会計マスターを編集
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  IDG
@@ -1757,6 +1799,146 @@
            .
        4101-JYURRK-HEN-EXT.
            EXIT.
+      *H28.4
+      *****************************************************************
+      *     後発品変更不可（処方単位）判定処理
+      *****************************************************************
+       41019-SYOHOU-CHEK-SEC           SECTION.
+      *
+      *    受診歴を検索する
+           INITIALIZE                  JYURRK-KEY
+           MOVE    SPA-K09-HOSPNUM     TO  JYURRK-HOSPNUM
+           MOVE    SPA-K09-PTID        TO  JYURRK-PTID
+           MOVE    SPA-K09-NYUGAIKBN   TO  JYURRK-NYUGAIKBN
+           MOVE    SPA-K09NAI-RRK-SRYKA(SPA-K09-DOSELNUM)
+                                       TO  JYURRK-SRYKA
+           MOVE    SPA-K09NAI-RRKYMD(SPA-K09-DOSELNUM)
+                                       TO  JYURRK-SRYYMD
+           MOVE    SPA-K09NAI-RENNUM(SPA-K09-DOSELNUM)
+                                       TO  JYURRK-RENNUM
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           PERFORM
+                   UNTIL    FLG-JYURRK     =   1
+                      OR   (WRK-FUKA-INPUT NOT =   SPACE )
+               IF      SPA-K09NAI-DOUJI-RENNUM (SPA-K09-DOSELNUM)
+                                           =   JYURRK-DOUJI-RENNUM
+                   IF      (JYURRK-SRYKBN1     =   "01" )  OR
+                           (JYURRK-SRYKBN2     =   "01" )  OR
+                           (JYURRK-SRYKBN3     =   "01" )  OR
+                           (JYURRK-SRYKBN4     =   "01" )
+      *                診療区分の判定
+                       PERFORM VARYING     IDX-R   FROM    1   BY  1
+                           UNTIL      (IDG             >   MAX-LINE )
+                                  OR  (IDX-R           >   15  )
+                           IF      JYURRK-ZAINUM (IDX-R)   NOT =   ZERO
+                               PERFORM 410191-ZAINUM-CHK-SEC
+                           END-IF
+                       END-PERFORM
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *TEST
+          DISPLAY "41019-SYOHOU-CHEK-EXT:"
+                 ",WRK-FUKA-INPUT:" WRK-FUKA-INPUT
+      *TEST
+           .
+       41019-SYOHOU-CHEK-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為検索処理
+      *****************************************************************
+       410191-ZAINUM-CHK-SEC           SECTION.
+      *
+           INITIALIZE                  SRYACT-REC
+           MOVE    JYURRK-HOSPNUM      TO  SRY-HOSPNUM
+           MOVE    JYURRK-NYUGAIKBN    TO  SRY-NYUGAIKBN
+           MOVE    JYURRK-PTID         TO  SRY-PTID
+           MOVE    JYURRK-SRYKA        TO  SRY-SRYKA
+           MOVE    JYURRK-SRYYMD(1:6)  TO  SRY-SRYYM
+           MOVE    JYURRK-ZAINUM(IDX-R)
+                                       TO  SRY-ZAINUM
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           PERFORM
+                   UNTIL   FLG-SRYACT      =   1
+               IF     (SRY-SRYCD (01)      =   "099209910" )  OR
+                      (SRY-SRYCD (02)      =   "099209910" )  OR
+                      (SRY-SRYCD (03)      =   "099209910" )  OR
+                      (SRY-SRYCD (04)      =   "099209910" )  OR
+                      (SRY-SRYCD (05)      =   "099209910" )
+                   MOVE    "1"                 TO  WRK-FUKA-INPUT
+                   MOVE    1                   TO  FLG-SRYACT
+               ELSE
+                   MOVE    "tbl_sryact"        TO  MCP-TABLE
+                   MOVE    "key2"              TO  MCP-PATHNAME
+                   PERFORM 930-SRYACT-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      WRK-FUKA-INPUT      =   "1"
+               MOVE    JYURRK-SRYYMD(7:2)  TO  IDX-STR
+      *        剤回数取得
+               INITIALIZE                      SRYACCT-REC
+               MOVE    SRY-HOSPNUM         TO  ACCT-HOSPNUM
+               MOVE    SRY-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+               MOVE    SRY-PTID            TO  ACCT-PTID
+               MOVE    SRY-SRYKA           TO  ACCT-SRYKA
+               MOVE    SRY-SRYYM           TO  ACCT-SRYYM
+               MOVE    SRY-SRYKBN          TO  ACCT-SRYKBN
+               MOVE    SRY-ZAINUM          TO  ACCT-ZAINUM
+      *        主キー読み
+               PERFORM 940-SRYACCT-READ-SEC
+               IF      FLG-SRYACCT         =   ZERO
+                   IF      ACCT-DAY (JYURRK-RENNUM + 1 IDX-STR)
+                                               =   ZERO
+                       MOVE    "9"             TO  WRK-FUKA-INPUT
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       41011-ZAISET-HEN-EXT.
+           EXIT.
+      *TEST
+      *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      *
       *****************************************************************
       *     診察内容なし編集処理
       *****************************************************************
@@ -1995,7 +2177,7 @@
            END-IF
       *
            .
-       490111-ZAISET-HEN-EXT.
+       41011-ZAISET-HEN-EXT.
            EXIT.
       *****************************************************************
       *    診療行為マスタを作成する 
@@ -2068,7 +2250,9 @@
            MOVE    SRY-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
            MOVE    SRY-PTID            TO  WKSRY-PTID
            MOVE    SRY-SRYKA           TO  WKSRY-SRYKA
-           MOVE    SRY-SRYYM           TO  WKSRY-SRYYMD(1:6)
+      *TEST
+      *!!  MOVE    SRY-SRYYM           TO  WKSRY-SRYYMD(1:6)
+           MOVE    JYURRK-SRYYMD       TO  WKSRY-SRYYMD
            MOVE    SRY-SRYKBN          TO  WKSRY-SRYKBN
            MOVE    SRY-ZAINUM          TO  WKSRY-ZAINUM
            MOVE    SRY-RENNUM          TO  WKSRY-RENNUM
@@ -2232,10 +2416,101 @@
        410121-RSISRYCD-HEN-EXT.
            EXIT.
       *
+      *TEST
+      *TEST
+      *****************************************************************
+      *     診療行為内容編集処理
+      *****************************************************************
+       31018-GENERIC-NAME-SEC              SECTION.
+      *
+           INITIALIZE                  ORCSCGENNAMEAREA
+           MOVE    "0"                 TO  ORCSCGENN-SYORIKBN
+           MOVE    "0"                 TO  ORCSCGENN-SYORIKBN2
+           MOVE    LNK-WKSRY-SRYYMD (1)    TO  ORCSCGENN-SRYYMD
+      *    後発医薬品への変更可署名(SYS-1030-KOUHATUKA)
+           MOVE    SPA-KOUHATUKA       TO  ORCSCGENN-1030-KOUHATUKA
+      *    後発品変更不可（処方毎）有
+           IF      WRK-FUKA-INPUT      =   "1"
+               MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
+           MOVE    ZERO                TO  IDX-Z
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   IDX-KOUI )
+                          OR  (IDX-Z   >=  50 )
+      *        剤明細編集
+               PERFORM VARYING     IDZ     FROM    1   BY  1
+                       UNTIL      (IDZ         >   5   )  OR
+                                  (LNK-WKSRY-SRYCD (IDX IDZ) =  SPACE)
+                              OR  (IDX-Z       >=  50 )
+                   ADD     1                   TO  IDX-Z
+                   MOVE    LNK-WKSRY-SRYCD (IDX IDZ)
+                                           TO  ORCSCGENN-SRYCD (IDX-Z)
+                   MOVE    IDX-Z           TO  ORCSCGENN-TBLMAX
+               END-PERFORM
+           END-PERFORM
+      *
+           CALL    "ORCSCGENNAME"      USING    ORCSCGENNAMEAREA
+                                                SPA-AREA
+      *
+           MOVE    ZERO                TO  IDX-Z
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   IDX-KOUI )
+                          OR  (IDX-Z   >=  50 )
+      *        剤明細編集
+               PERFORM VARYING     IDZ     FROM    1   BY  1
+                       UNTIL      (IDZ         >   5   )  OR
+                                  (LNK-WKSRY-SRYCD (IDX IDZ) =  SPACE)
+                              OR  (IDX-Z       >=  50 )
+                   ADD     1                   TO  IDX-Z
+                   IF     (ORCSCGENN-SRYCD (IDX-Z)
+                                               =   LNK-WKSRY-SRYCD
+                                                         (IDX IDZ))
+                   AND    (ORCSCGENN-SRYCD (IDX-Z)(1:1)  =   "6"  )
+                       IF     (ORCSCGENN-NAME-KBN (IDX-Z)  =   "1"
+                                                           OR  "3")
+                          AND (ORCSCGENN-HEN-NAME(IDX-Z) NOT =   SPACE)
+      *                    一般名
+                           MOVE    ORCSCGENN-HEN-NAME (IDX-Z)
+                                           TO  LNK-WKSRY-INPUTCOMENT
+                                                            (IDX IDZ)
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+           .
+       31018-GENERIC-NAME-EXT.
+           EXIT.
+      *TEST
+      *TEST
+      *
       *****************************************************************
       *     診療行為内容編集処理
       *****************************************************************
        3101-WKSRYACT-HEN-SEC              SECTION.
+      *
+      *H28.4
+      *    一般名対応
+           IF     (LNK-WKSRY-SRYKBN(1)     =   "14"
+                                           OR  "21"
+                                           OR  "22"
+                                           OR  "23" )
+             AND  (LNK-WKSRY-ZAITENKEI(1)  =   ZERO )
+             AND  (LNK-WKSRY-SRYYMD (1)    >=  "20160101" )
+             AND  (SPA-GENERICFLG      =   "1"   )
+               IF     (LNK-WKSRY-SRYSYUKBN (1) =   "213"
+                                               OR  "223"
+                                               OR  "233"
+                                               OR  "231"
+                                               OR  "294" )
+                   CONTINUE
+               ELSE
+      *            院外処方のみ
+                   PERFORM 31018-GENERIC-NAME-SEC
+               END-IF
+           END-IF
+      *TEST
+      *TEST
       *
       *    診療コード計計算
            MOVE    ZERO                TO  IDZ
@@ -2501,6 +2776,16 @@
            END-IF
       *    行為名称
            MOVE    TNS-NAME            TO  SPA-GMN-TMEISYO2(IDG)
+      *TEST
+      *TEST
+           IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6" )
+              AND (LNK-WKSRY-INPUTCOMENT(IDX IDZ)  NOT =   SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                       TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *TEST
+      *TEST
+      *
       *    薬剤服用コメントの時、再編集
            IF      LNK-WKSRY-SRYCD (IDX IDZ)(1:3)  =   "001"
                 PERFORM 3100121-FUKIYO-MEISYO-SEC

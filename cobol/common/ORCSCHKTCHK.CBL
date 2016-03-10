@@ -39,6 +39,8 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ã»´üÂÚºß¼ê½ÑÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/09/XX  Ã»´üÂÚºß¼ê½Ñ£³¡¡³°ÍèÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ÂÐ¾Ý¥Æ¡¼¥Ö¥ë£²£°£°¤Ø
       *****************************************************************
       *
       *
@@ -170,7 +172,7 @@
                                            OCCURS   50.
                05  TBL-SRYCD-G.
                    07  TBL-SRYCD           PIC X(09)
-                                           OCCURS   99.
+                                           OCCURS   200.
            03  TBL-MAX                 PIC 9(04).
       *Æþ±¡ÎÁ
        01  TBL-NYUAREA.
@@ -185,7 +187,7 @@
                                              OCCURS   50.
                05  TBL-N-SRYCD-G.
                    07  TBL-N-SRYCD           PIC X(09)
-                                           OCCURS   99.
+                                             OCCURS   200.
            03  TBL-N-MAX                 PIC 9(04).
       *
        01  TBL-HKTSANTEI-AREA.
@@ -468,7 +470,7 @@
            END-IF
            MOVE    ZERO                TO  IDY
            PERFORM UNTIL  (FLG-HKTSRYCD    =   1  )
-                      OR  (IDY             >=  99 )
+                      OR  (IDY             >=  200 )
                IF      SYS-1014-KBNCD (1:3)    >=  "500"
                    ADD     1                   TO  IDY
                    MOVE    HKTSRYCD-SRYCD      TO  TBL-N-SRYCD
@@ -767,12 +769,12 @@
       *
            MOVE    ZERO                TO  FLG-CHK2
            PERFORM VARYING     IDY     FROM    1   BY  1
-                   UNTIL      (IDY     >   50   )  OR
+                   UNTIL      (IDY     >   200   )  OR
                               (TBL-SRYCD (IDX IDY) =   SPACE)
                IF      WRK-SRYCD           =   TBL-SRYCD (IDX IDY)
                    MOVE    TBL-SRYCD (IDX IDY) TO  WRK-K-SRYCD
                    MOVE    1                   TO  FLG-CHK2
-                   MOVE    50                  TO  IDY
+                   MOVE    200                 TO  IDY
                END-IF
            END-PERFORM
       *
@@ -2221,7 +2223,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   99   )  OR
+                       UNTIL      (IDY     >   200  )  OR
                                   (TBL-N-SRYCD (IDX-N IDY) =   SPACE)
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    TBL-N-SRYCD (IDX-N IDY)

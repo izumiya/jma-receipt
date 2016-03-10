@@ -74,6 +74,7 @@
       *  04.07.00    NACL-多々納  12/09/14  器材、コメントチェックマスタ対応
       *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *  04.07.00    NACL-多々納  14/04/25  施設基準チェック対応
+      *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
       *****************************************************************
       *
       *
@@ -102,6 +103,8 @@
            03  FLG-PTKINKI         PIC 9(01).
       *H24.4
            03  FLG-GENERICPRICE    PIC 9(01).
+      *H28.1
+           03  FLG-GENERICNAME     PIC 9(01).
       *
            03  FLG-ERR             PIC 9(01).
            03  FLG-SST             PIC 9(01).
@@ -436,6 +439,11 @@
       *    最低薬価マスタ
        01  GENERICPRICE-REC.
            COPY    "CPGENERICPRICE.INC".
+      *
+      *H28.2
+      *    一般名称マスタ
+       01  GENERICNAME-REC.
+           COPY    "CPGENERICNAME.INC".
       *
       *    患者禁忌薬剤マスタ
        01  PTKINKI-REC.
@@ -983,6 +991,8 @@
                   (LNK-SC92-SRYCD  (1:1)   =   "8"    )  OR
                   (LNK-SC92-SRYCD  (1:3)   =   "001"  )  OR
                   (LNK-SC92-SRYCD  (1:3)   =   "008"  )
+            OR    (LNK-SC92-SRYCD  (1:1)   =   "6"    )
+            OR    (LNK-SC92-SRYCD  (1:1)   =   "7"    )
       ******OR    (TNS-SSTKIJUNCD(01)      =   ZERO   )
                CONTINUE
            ELSE
@@ -1292,6 +1302,8 @@
                        CONTINUE
                    ELSE
                        MOVE    SPACE           TO  SPA-COM-KZMFLG5
+                                                              (IDX-T)
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG7
                                                               (IDX-T)
                        MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG
                                                               (IDX-T)
@@ -1893,6 +1905,15 @@
                    ELSE
                        MOVE    "0032"              TO  LNK-SC92-ERRCD5
                    END-IF
+      *H28.4
+               WHEN    "AE"
+      *            生後９０日
+                   IF     (LNK-SC92-NENREI-YY   =   ZERO )  AND
+                          (LNK-SC92-NENREI-MM   <=  3    )
+                       PERFORM 20031-NENREI-DAY90-SEC
+                   ELSE
+                       MOVE    "0032"              TO  LNK-SC92-ERRCD5
+                   END-IF
                WHEN    "B3"
       *            ３歳までに受診があった時にのみ可能（H24.4改正）
                    IF     (LNK-SC92-NENREI-YY      >=  3  )
@@ -1963,6 +1984,31 @@
            MOVE    SPACE               TO  LNK-SC92-ERRCD5
            .
        20032-NENREI-RRKCHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    生後90日チェック（未熟児加算）処理
+      *****************************************************************
+       20031-NENREI-DAY90-SEC        SECTION.
+      *
+           IF      SPA-PTID            =   ZERO
+               GO     TO       20031-NENREI-DAY90-EXT
+           END-IF
+      *
+      *    年齢期間算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY5-AREA
+           MOVE    "51"                TO  LNK-DAY5-IRAI
+           MOVE    SPA-BIRTHDAY        TO  LNK-DAY5-START
+           MOVE    SPA-SRYYMD          TO  LNK-DAY5-END
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY5-AREA
+           IF      LNK-DAY5-NISSU2     <   90
+               CONTINUE
+           ELSE
+               MOVE    "0032"              TO  LNK-SC92-ERRCD5
+           END-IF
+           .
+       20031-NENREI-DAY90-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4090,6 +4136,18 @@
            MOVE    TNS-TIMEMASUIKBN    TO  SPA-COM-YOBI1 (IDX-T)(4:1)
       *    脊髄誘発電位測定
            MOVE    TNS-SEKIZUISOKUTEI  TO  SPA-COM-YOBI1 (IDX-T)(5:1)
+      *H28.4
+      *    湿布薬区分
+           IF     (TNS-SRYCD(1:1)      =   "6" )
+             AND  (TNS-MEIUSESKB       =   1   )
+               MOVE    "1"                 TO  SPA-COM-SIPPUKBN (IDX-T)
+               MOVE    TNS-SSTKIJUNCD(2)   TO  SPA-COM-SIPRYO1 (IDX-T)
+               MOVE    TNS-SSTKIJUNCD(4)   TO  SPA-COM-SIPRYO2 (IDX-T)
+           END-IF
+      *H28.4
+      *    労災算定不可
+           MOVE    TNS-ROSAIKBN        TO  SPA-COM-ROSAIKBN (IDX-T)
+           MOVE    TNS-SISIKSN         TO  SPA-COM-SISIKSN  (IDX-T)
       *
       *    点数マスタ付加情報より編集
            PERFORM 3006-TENSUPLUS-HEN-SEC
@@ -4135,6 +4193,20 @@
       *    薬価基準コード
            MOVE    TNS-YAKKAKJNCD      TO  SPA-COM-YAKKAKJNCD (IDX-T)
       *!!
+      *H28.2 一般名表示対応
+           IF     (SPA-SRYYMD          >=  "20140401")
+            AND   (TNS-SRYCD(1:1)      =   "6"  )
+      *        銘柄名称（初期画面）
+               MOVE    SPA-GMN-MEISYO (IDX-T)
+                                           TO  SPA-COM-MEI-NAME(IDX-T)
+               MOVE    SPACE               TO  SPA-COM-IPN-NAME(IDX-T)
+      *        一般名称
+               IF     (TNS-YAKKAKJNCD      NOT =   SPACE )
+                AND   (TNSP-IPN-KISAIKBN   =   1
+                                           OR  3   )
+                   PERFORM 300002-GENERICNAME-HEN-SEC
+               END-IF
+           END-IF
            .
        300-TENSU-HENSYU-EXT.
            EXIT.
@@ -4186,6 +4258,75 @@
        300001-GENERICPRICE-CHEK-EXT.
            EXIT.
       *
+      *TEST
+      *H28.2
+      *****************************************************************
+      *     一般名称編集処理
+      *****************************************************************
+       300002-GENERICNAME-HEN-SEC        SECTION.
+      *
+           MOVE    SPACE               TO  GENERICNAME-REC
+           INITIALIZE                      GENERICNAME-REC
+           MOVE    TNS-YAKKAKJNCD      TO  GENERIC-YAKKAKJNCD
+      **** MOVE    SPA-HOSPNUM         TO  GENERIC-HOSPNUM
+      *
+           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
+           MOVE    "tbl_genericname"   TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_genericname"   TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  GENERICNAME-REC
+                   MOVE    ZERO                TO  FLG-GENERICNAME
+               ELSE
+                   INITIALIZE                  GENERICNAME-REC
+                   MOVE    1                   TO  FLG-GENERICNAME
+               END-IF
+           ELSE
+               INITIALIZE                      GENERICNAME-REC
+               MOVE    1                   TO  FLG-GENERICNAME
+           END-IF
+           MOVE    "tbl_genericname"   TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-GENERICNAME     NOT =   ZERO
+               GO      TO      300002-GENERICNAME-HEN-EXT
+           END-IF
+           EVALUATE    TNSP-IPN-KISAIKBN
+               WHEN    1
+                   MOVE    SPACE               TO  WRK-MEISYO
+                   STRING  "【般】"                DELIMITED  BY  SIZE
+                           GENERIC-GENERICNAME     DELIMITED  BY  SPACE
+                                               INTO    WRK-MEISYO
+                   END-STRING
+                   MOVE    WRK-MEISYO          TO  SPA-COM-IPN-NAME
+                                                              (IDX-T)
+                   MOVE    GENERIC-TANICD      TO  TNS-TANICD
+                   MOVE    GENERIC-TANINAME    TO  TNS-TANINAME
+                   PERFORM 3004-TANI-HENSYU-SEC
+                   MOVE    WRK-TANINAME        TO  SPA-COM-IPN-TANINAME
+                                                               (IDX-T)
+               WHEN    3
+                   MOVE    SPACE               TO  WRK-MEISYO
+                   STRING  "【般】"                DELIMITED  BY  SIZE
+                           TNSP-SHONAME            DELIMITED  BY  SPACE
+                                               INTO    WRK-MEISYO
+                   END-STRING
+                   MOVE    WRK-MEISYO          TO  SPA-COM-IPN-NAME
+                                                              (IDX-T)
+                   MOVE    SPA-GMN-TANINAME(IDX-T)
+                                               TO  SPA-COM-IPN-TANINAME
+                                                               (IDX-T)
+           END-EVALUATE
+           .
+       300002-GENERICNAME-HEN-EXT.
+           EXIT.
+      *TEST
+      *TEST
       *
       *****************************************************************
       *     酸素・窒素の時、酸素区分再設定処理
