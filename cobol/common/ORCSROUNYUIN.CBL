@@ -263,6 +263,30 @@
            03  CONS-201407-KSN3            PIC X(09) VALUE "101900150".
       *    栄養管理体制減算規定該当（特定入院料短期滞在手術基２）（労災用）
            03  CONS-201407-KSN4            PIC X(09) VALUE "101900160".
+      *
+      *--平成２８年４月以降に対処を追加した加算------------------------
+      *    看護必要度加算１（一般病棟入院基本料）
+           03  CONS-201604-KSN1            PIC X(09) VALUE "190183070".
+      *    看護必要度加算２（一般病棟入院基本料）
+           03  CONS-201604-KSN2            PIC X(09) VALUE "190183170".
+      *    看護必要度加算３（一般病棟入院基本料）
+           03  CONS-201604-KSN3            PIC X(09) VALUE "190183270".
+      *    看護必要度加算１（特定機能病院入院基本料）
+           03  CONS-201604-KSN4            PIC X(09) VALUE "190188870".
+      *    看護必要度加算２（特定機能病院入院基本料）
+           03  CONS-201604-KSN5            PIC X(09) VALUE "190188970".
+      *    看護必要度加算３（特定機能病院入院基本料）
+           03  CONS-201604-KSN6            PIC X(09) VALUE "190189070".
+      *    看護必要度加算１（専門病院入院基本料）
+           03  CONS-201604-KSN7            PIC X(09) VALUE "190189170".
+      *    看護必要度加算２（専門病院入院基本料）
+           03  CONS-201604-KSN8            PIC X(09) VALUE "190189270".
+      *    看護必要度加算３（専門病院入院基本料）
+           03  CONS-201604-KSN9            PIC X(09) VALUE "190189370".
+      *    有床診療所在宅復帰機能強化加算（有床診療所入院基本料）
+           03  CONS-201604-KSN10           PIC X(09) VALUE "190190270".
+      *    有床診療所療養病床在宅復帰機能強化加算
+           03  CONS-201604-KSN11           PIC X(09) VALUE "190190370".
       *----------------------------------------------------------------
       *
       *    労災治療計画加算
@@ -425,6 +449,18 @@
       *--平成２６年７月以降に新設された加算の退避領域--------------
            03  WRK-201407-KSN1             PIC 9(03) OCCURS 31.
            03  WRK-201407-KSN2             PIC 9(03) OCCURS 31.
+      *--平成２８年４月以降に新設された加算の退避領域--------------
+           03  WRK-201604-KSN1             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN2             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN3             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN4             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN5             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN6             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN7             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN8             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN9             PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN10            PIC 9(03) OCCURS 31.
+           03  WRK-201604-KSN11            PIC 9(03) OCCURS 31.
       *----------------------------------------------------------------
       *
       *    診療コード計集計用
@@ -3748,6 +3784,17 @@
                                                   OR CONS-201407-KSN2
                                                   OR CONS-201407-KSN3
                                                   OR CONS-201407-KSN4)
+                         OR (NACCT-SRYCDTOTAL(6:9) = CONS-201604-KSN1
+                                                  OR CONS-201604-KSN2
+                                                  OR CONS-201604-KSN3
+                                                  OR CONS-201604-KSN4
+                                                  OR CONS-201604-KSN5
+                                                  OR CONS-201604-KSN6
+                                                  OR CONS-201604-KSN7
+                                                  OR CONS-201604-KSN8
+                                                  OR CONS-201604-KSN9
+                                                  OR CONS-201604-KSN10
+                                                  OR CONS-201604-KSN11)
                           IF  (WRK-NYUINKHN(IDX1)      NOT = SPACE)
                           AND ((LNK-SROUNYUIN-GAIHAKU(IDX1)
                                                            = ZERO) OR
@@ -3848,6 +3895,40 @@
                              WHEN  CONS-201407-KSN4
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201407-KSN2(IDX1)
+      *
+                             WHEN  CONS-201604-KSN1
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN1(IDX1)
+                             WHEN  CONS-201604-KSN2
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN2(IDX1)
+                             WHEN  CONS-201604-KSN3
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN3(IDX1)
+                             WHEN  CONS-201604-KSN4
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN4(IDX1)
+                             WHEN  CONS-201604-KSN5
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN5(IDX1)
+                             WHEN  CONS-201604-KSN6
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN6(IDX1)
+                             WHEN  CONS-201604-KSN7
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN7(IDX1)
+                             WHEN  CONS-201604-KSN8
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN8(IDX1)
+                             WHEN  CONS-201604-KSN9
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN9(IDX1)
+                             WHEN  CONS-201604-KSN10
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN10(IDX1)
+                             WHEN  CONS-201604-KSN11
+                                  MOVE   NACCT-DAY(IDX1)
+                                        TO  WRK-201604-KSN11(IDX1)
                            END-EVALUATE
       *
                            IF   FLG-RYAKU   =   ZERO
@@ -3986,6 +4067,17 @@
                                               OR CONS-201407-KSN2
                                               OR CONS-201407-KSN3
                                               OR CONS-201407-KSN4)
+                            OR (SRY-SRYCD(1)  =  CONS-201604-KSN1
+                                              OR CONS-201604-KSN2
+                                              OR CONS-201604-KSN3
+                                              OR CONS-201604-KSN4
+                                              OR CONS-201604-KSN5
+                                              OR CONS-201604-KSN6
+                                              OR CONS-201604-KSN7
+                                              OR CONS-201604-KSN8
+                                              OR CONS-201604-KSN9
+                                              OR CONS-201604-KSN10
+                                              OR CONS-201604-KSN11)
                                 MOVE  SRY-SRYCD(1)   TO
                                                ACCT-SRYCDTOTAL(6:9)
                             END-IF
@@ -4036,6 +4128,18 @@
                                         OR  CONS-201407-KSN2
                                         OR  CONS-201407-KSN3
                                         OR  CONS-201407-KSN4)
+                     OR (  ACCT-SRYCDTOTAL(6:9)  =
+                                            CONS-201604-KSN1
+                                        OR  CONS-201604-KSN2
+                                        OR  CONS-201604-KSN3
+                                        OR  CONS-201604-KSN4
+                                        OR  CONS-201604-KSN5
+                                        OR  CONS-201604-KSN6
+                                        OR  CONS-201604-KSN7
+                                        OR  CONS-201604-KSN8
+                                        OR  CONS-201604-KSN9
+                                        OR  CONS-201604-KSN10
+                                        OR  CONS-201604-KSN11)
       *                入院料加算の退避
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -4196,6 +4300,62 @@
                                       MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201407-KSN2(IDX1)
                                   END-IF
+      *
+                                WHEN  CONS-201604-KSN1
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN1(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN2
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN2(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN3
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN3(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN4
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN4(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN5
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN5(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN6
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN6(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN7
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN7(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN8
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN8(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN9
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN9(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN10
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN10(IDX1)
+                                  END-IF
+                                WHEN  CONS-201604-KSN11
+                                  IF  ACCT-DAY(1 IDX1)   NOT = ZERO
+                                      MOVE   ACCT-DAY(1 IDX1)
+                                        TO  WRK-201604-KSN11(IDX1)
+                                  END-IF
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO
@@ -4339,87 +4499,51 @@
                    MOVE    "2"           TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        夜間緊急体制確保加算
-               IF         WRK-200804-KSN1(IDX1)   NOT =   ZERO
-                   ADD      1                 TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN1  TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"            TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        医師配置加算１
-               IF         WRK-201004-KSN12(IDX1)     NOT =   ZERO
+      *
+               IF   LNK-SROUNYUIN-SANTEIYM   >=   "201604"
+      *          看護必要度加算１（一般病棟入院基本料）(9017-4)
+                 IF       WRK-201604-KSN1 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN12    TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201604-KSN1     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
-               END-IF
-      *        医師配置加算２
-               IF         WRK-200804-KSN2(IDX1)     NOT =   ZERO
+                 END-IF
+      *          看護必要度加算２（一般病棟入院基本料）(9017-4)
+                 IF       WRK-201604-KSN2 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201604-KSN2     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
-               END-IF
-      *        看護配置加算１
-               IF         WRK-200804-KSN4(IDX1)     NOT =   ZERO
+                 END-IF
+      *          看護必要度加算３（一般病棟入院基本料）(9017-4)
+                 IF       WRK-201604-KSN3 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN4     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201604-KSN3     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
-               END-IF
-      *        看護配置加算２
-               IF         WRK-200804-KSN3(IDX1)     NOT =   ZERO
+                 END-IF
+               ELSE
+      *          看護必要度加算１（一般病棟入院基本料）(9017-4)
+                 IF       WRK-201204-KSN4 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN3     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201204-KSN4     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
-               END-IF
-      *        夜間看護配置加算１
-               IF         WRK-200804-KSN6(IDX1)     NOT =   ZERO
+                 END-IF
+      *          看護必要度加算２（一般病棟入院基本料）(9017-4)
+                 IF       WRK-201204-KSN5 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN6     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201204-KSN5     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
+                 END-IF
                END-IF
-      *        夜間看護配置加算２
-               IF         WRK-200804-KSN5(IDX1)     NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN5     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        重度認知症加算（特定機能病院精神病棟）
-               IF         WRK-200804-KSN7(IDX1)     NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN7     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        褥瘡評価実施加算（療養病棟）
-               IF         WRK-200804-KSN8(IDX1)     NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN8     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        褥瘡評価実施加算（有床診療所）
-               IF         WRK-200804-KSN9(IDX1)     NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-200804-KSN9     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        一般病棟看護必要度評価加算
+      *        一般病棟看護必要度評価加算（一般病棟入院基本料）(9017-6)
                IF         WRK-201004-KSN13(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
@@ -4432,20 +4556,113 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        重度認知症加算（精神病棟入院基本料）
-               IF         WRK-201004-KSN15(IDX1)      NOT =   ZERO
+      *
+      *        精神保健福祉士配置加算（精神病棟入院基本料）(9024-2)
+               IF         WRK-201404-KSN3 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
-                    MOVE  CONS-201307-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201404-KSN3     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
-                   ELSE
-                    MOVE  CONS-201004-KSN15    TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        一般病棟看護必要度評価加算（専門病院）
+      *
+               IF   LNK-SROUNYUIN-SANTEIYM   >=   "201604"
+      *          看護必要度加算１（特定機能病院入院基本料）(9026-3)
+                 IF       WRK-201604-KSN4 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN4     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算２（特定機能病院入院基本料）(9026-3)
+                 IF       WRK-201604-KSN5 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN5     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算３（特定機能病院入院基本料）(9026-3)
+                 IF       WRK-201604-KSN6 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN6     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+               ELSE
+      *          看護必要度加算１（特定機能病院入院基本料）(9026-3)
+                 IF       WRK-201204-KSN8 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201204-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算２（特定機能病院入院基本料）(9026-3)
+                 IF       WRK-201204-KSN9 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201204-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+               END-IF
+      *
+      *        重度認知症加算（特定機能病院精神病棟入院基本料）(9029-2)
+               IF         WRK-200804-KSN7(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN7     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+               IF   LNK-SROUNYUIN-SANTEIYM   >=   "201604"
+      *          看護必要度加算１（専門病院入院基本料）(9030-3)
+                 IF       WRK-201604-KSN7 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN7     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算２（専門病院入院基本料）(9030-3)
+                 IF       WRK-201604-KSN8 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算３（専門病院入院基本料）(9030-3)
+                 IF       WRK-201604-KSN9 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+               ELSE
+      *          看護必要度加算１（専門病院入院基本料）(9030-3)
+                 IF       WRK-201204-KSN10(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201204-KSN10    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+      *          看護必要度加算２（専門病院入院基本料）(9030-3)
+                 IF       WRK-201204-KSN11(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201204-KSN11    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+                 END-IF
+               END-IF
+      *        一般病棟看護必要度評価加算（専門病院入院基本料）(9030-5)
                IF         WRK-201004-KSN17(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
@@ -4459,80 +4676,63 @@
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *
-      *        看護必要度加算１（一般病棟入院基本料）
-               IF         WRK-201204-KSN4 (IDX1)      NOT =   ZERO
+      *        夜間緊急体制確保加算（有床診療所入院基本料）(9039-1)
+               IF         WRK-200804-KSN1(IDX1)   NOT =   ZERO
+                   ADD      1                 TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN1  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"            TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        医師配置加算１（有床診療所入院基本料）(9039-2)
+               IF         WRK-201004-KSN12(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN4     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-201004-KSN12    TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護必要度加算２（一般病棟入院基本料）
-               IF         WRK-201204-KSN5 (IDX1)      NOT =   ZERO
+      *        医師配置加算２（有床診療所入院基本料）(9039-2)
+               IF         WRK-200804-KSN2(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN5     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-200804-KSN2     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護必要度加算１（特定機能病院入院基本料）
-               IF         WRK-201204-KSN8 (IDX1)      NOT =   ZERO
+      *        看護配置加算１（有床診療所入院基本料）(9039-3)
+               IF         WRK-200804-KSN4(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-200804-KSN4     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護必要度加算２（特定機能病院入院基本料）
-               IF         WRK-201204-KSN9 (IDX1)      NOT =   ZERO
+      *        看護配置加算２（有床診療所入院基本料）(9039-3)
+               IF         WRK-200804-KSN3(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-200804-KSN3     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護必要度加算１（専門病院入院基本料）
-               IF         WRK-201204-KSN10(IDX1)      NOT =   ZERO
+      *        夜間看護配置加算１（有床診療所入院基本料）(9039-4)
+               IF         WRK-200804-KSN6(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN10    TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-200804-KSN6     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護必要度加算２（専門病院入院基本料）
-               IF         WRK-201204-KSN11(IDX1)      NOT =   ZERO
+      *        夜間看護配置加算２（有床診療所入院基本料）(9039-4)
+               IF         WRK-200804-KSN5(IDX1)     NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201204-KSN11    TO  LNK-SROUNYUIN-SRYCD
+                   MOVE   CONS-200804-KSN5     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *
-      *        慢性維持透析管理加算（療養病棟入院基本料）
-               IF         WRK-201404-KSN1 (IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201404-KSN8     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        在宅復帰機能強化加算（療養病棟入院基本料）
-               IF         WRK-201404-KSN2 (IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201404-KSN9     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        精神保健福祉士配置加算（精神病棟入院基本料）
-               IF         WRK-201404-KSN3 (IDX1)      NOT =   ZERO
-                   ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201404-KSN3     TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
-               END-IF
-      *        看護補助配置加算１（有床診療所入院基本料）
+      *        看護補助配置加算１（有床診療所入院基本料）(9039-5)
                IF         WRK-201404-KSN4 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201404-KSN4     TO  LNK-SROUNYUIN-SRYCD
@@ -4540,7 +4740,7 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        看護補助配置加算２（有床診療所入院基本料）
+      *        看護補助配置加算２（有床診療所入院基本料）(9039-5)
                IF         WRK-201404-KSN5 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201404-KSN5     TO  LNK-SROUNYUIN-SRYCD
@@ -4548,7 +4748,7 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        栄養管理実施加算（有床診療所入院基本料）
+      *        栄養管理実施加算（有床診療所入院基本料）(9039-6)
                IF         WRK-201404-KSN6 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201404-KSN6     TO  LNK-SROUNYUIN-SRYCD
@@ -4556,7 +4756,33 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        栄養管理実施加算（有床診療所療養病床入院基本料）
+      *        有床診療所在宅復帰機能強化加算（有床診療所入院基本料）(9039-7)
+               IF         WRK-201604-KSN10(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN10    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+      *        褥瘡評価実施加算（療養病棟）(9058-1)
+               IF         WRK-200804-KSN8(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+      *        褥瘡評価実施加算（有床診療所療養病床入院基本料）(9085-1)
+               IF         WRK-200804-KSN9(IDX1)     NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-200804-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        栄養管理実施加算（有床診療所療養病床入院基本料）(9085-2)
                IF         WRK-201404-KSN7 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201404-KSN7     TO  LNK-SROUNYUIN-SRYCD
@@ -4564,7 +4790,46 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        栄養管理体制減算規定該当（入院基本料）
+      *        有床診療所療養病床在宅復帰機能強化加算  (9085-3)
+               IF         WRK-201604-KSN11(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201604-KSN11    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+      *        重度認知症加算（精神病棟入院基本料）(0000-0)
+               IF         WRK-201004-KSN15(IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
+                    MOVE  CONS-201307-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   ELSE
+                    MOVE  CONS-201004-KSN15    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        慢性維持透析管理加算（療養病棟入院基本料）(0000-0)
+               IF         WRK-201404-KSN1 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201404-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *        在宅復帰機能強化加算（療養病棟入院基本料）(0000-0)
+               IF         WRK-201404-KSN2 (IDX1)      NOT =   ZERO
+                   ADD      1                  TO  WRK-MEISAISU
+                   MOVE   CONS-201404-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
+      *        栄養管理体制減算規定該当（入院基本料）(0000-0)
                IF         WRK-201407-KSN1 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201407-KSN3     TO  LNK-SROUNYUIN-SRYCD
@@ -4572,7 +4837,7 @@
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
-      *        栄養管理体制減算規定該当（特定入院料及び短期滞在手術等基本料２）
+      *        栄養管理体制減算規定該当（特定入院料及び短期滞在手術等基本料２）(0000-0)
                IF         WRK-201407-KSN2 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    MOVE   CONS-201407-KSN4     TO  LNK-SROUNYUIN-SRYCD
@@ -6200,6 +6465,9 @@
                                  OR "190166070"
                                  OR "190169070"
                                  OR "190169170"
+      *
+                                 OR "190198570"
+                                 OR "190198670"
                    CONTINUE
                  ELSE
                    ADD     1        TO  IDX1
