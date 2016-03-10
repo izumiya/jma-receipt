@@ -2548,9 +2548,9 @@
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
-                    WHEN    10
-                    WHEN    11
-                    WHEN    12
+      ***           WHEN    10
+      ***           WHEN    11
+      ***           WHEN    12
                     WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
@@ -2567,9 +2567,9 @@
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
-                    WHEN    10
-                    WHEN    11
-                    WHEN    12
+      ***           WHEN    10
+      ***           WHEN    11
+      ***           WHEN    12
                     WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
@@ -2584,10 +2584,81 @@
       *****************************************************************
        2101-GAIHAKU-TAKIKAN-SEC           SECTION.
       *
-           EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+           IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201604"
+             EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+      *        ÆÃÄêÆþ±¡ÎÁ
+               WHEN   201  THRU  206
+               WHEN   208  THRU  210
+               WHEN   212  THRU  217
+               WHEN   221
+               WHEN   227  THRU  229
+               WHEN   232  THRU  236
+               WHEN   238  THRU  239
+               WHEN   241  THRU  249
+               WHEN   250  THRU  254
+               WHEN   257  THRU  267
+      *        --- H28.4 TUIKA ---
+               WHEN   268  THRU  270
+      *          Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ¡¢Àº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ
+                 IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232 OR 217
+                   EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     6
+                      MOVE   "190182990"    TO   WRK-GAIHAKU(IDX1)
+                   END-EVALUATE
+                 ELSE
+                   EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     4
+                      MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
+                   END-EVALUATE
+                 END-IF
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+               WHEN   152
+               WHEN   173  THRU  190
+               WHEN   196
+               WHEN   199
+      *        --- H28.4 TUIKA ---
+               WHEN   048  THRU  049
+               WHEN   051  THRU  054
+               WHEN   057  THRU  068
+                 EVALUATE   NACCT-DAY(IDX1)
+                  WHEN     4
+                    MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                  WHEN     5
+                    MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ
+               WHEN   153  THRU  158
+                 EVALUATE   NACCT-DAY(IDX1)
+                  WHEN     4
+                    MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
+                  WHEN     5
+                    MOVE   "190142190"    TO   WRK-GAIHAKU(IDX1)
+                  WHEN     6
+                    MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+      *        Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¡¦Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³
+               WHEN   226
+               WHEN   240
+                 CONTINUE
+               WHEN   OTHER
+                 EVALUATE   NACCT-DAY(IDX1)
+                  WHEN     5
+                    MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+             END-EVALUATE
+           ELSE
+             EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
       *
                WHEN   099  THRU  100
-                 IF   LNK-RNYURECEDEN-SANTEIYM   >=   "201004"
+                 IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201004"
                    EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
@@ -2611,14 +2682,14 @@
       *        (H26-ADD-ED)
                  IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232
                    EVALUATE   NACCT-DAY(IDX1)
-                      WHEN     4
-                        MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     5
-                        MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     6
-                        MOVE   "190153190"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     7
-                        MOVE   "190153390"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     4
+                      MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     6
+                      MOVE   "190153190"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     7
+                      MOVE   "190153390"    TO   WRK-GAIHAKU(IDX1)
                    END-EVALUATE
                  ELSE
                    IF  WRK-NYUKHNKSNKBN(IDX1) =
@@ -2668,19 +2739,19 @@
                  IF    WRK-NYUKHNKSNKBN(IDX1) =
                            153 OR 154 OR 155 OR 156 OR 157 OR 158
                    EVALUATE   NACCT-DAY(IDX1)
-                      WHEN     4
-                        MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     5
-                        MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     7
-                        MOVE   "190153290"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     4
+                      MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     7
+                      MOVE   "190153290"    TO   WRK-GAIHAKU(IDX1)
                    END-EVALUATE
                  ELSE
                    EVALUATE   NACCT-DAY(IDX1)
-                      WHEN     4
-                        MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
-                      WHEN     5
-                        MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     4
+                      MOVE   "190109090"    TO   WRK-GAIHAKU(IDX1)
+                    WHEN     5
+                      MOVE   "190142290"    TO   WRK-GAIHAKU(IDX1)
                    END-EVALUATE
                  END-IF
                WHEN   226
@@ -2738,7 +2809,8 @@
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
                  END-EVALUATE
       *
-           END-EVALUATE
+             END-EVALUATE
+           END-IF
       *
            .
        2101-GAIHAKU-TAKIKAN-EXT.
@@ -2749,13 +2821,63 @@
       *****************************************************************
        2101-GAIHAKU-GENSAN-SEC           SECTION.
       *
-           EVALUATE   NACCT-DAY(IDX1)
+           IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201604"
+            EVALUATE   NACCT-DAY(IDX1)
              WHEN     8
-             WHEN    10
-             WHEN    11
+      ***    WHEN    10
+      ***    WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      IF   LNK-RNYURECEDEN-SANTEIYM   >=  "201404"
+                      EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+                        WHEN     9
+                        WHEN   166   THRU  167
+                        WHEN   197   THRU  198
+                          MOVE  "190161570" TO   WRK-GAIHAKU(IDX1)
+                        WHEN   OTHER
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                      END-EVALUATE
+                   WHEN   "9026"
+                      MOVE   "190161870"    TO   WRK-GAIHAKU(IDX1)
+                   WHEN   "9030"
+                      MOVE   "190162070"    TO   WRK-GAIHAKU(IDX1)
+                   WHEN   "9090"
+                      MOVE   "190198570"    TO   WRK-GAIHAKU(IDX1)
+                END-EVALUATE
+                IF   NACCT-DAY(IDX1) = 10 OR 11
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
+             WHEN     9
+      ***    WHEN    12
+             WHEN    13
+                EVALUATE   WRK-CHUKSNCD(IDX1)
+                   WHEN   "9017"
+                      EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+                        WHEN     9
+                        WHEN   166   THRU  167
+                        WHEN   197   THRU  198
+                          MOVE  "190161770" TO   WRK-GAIHAKU(IDX1)
+                        WHEN   OTHER
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                      END-EVALUATE
+                   WHEN   "9026"
+                      MOVE   "190161970"    TO   WRK-GAIHAKU(IDX1)
+                   WHEN   "9030"
+                      MOVE   "190162170"    TO   WRK-GAIHAKU(IDX1)
+                   WHEN   "9090"
+                      MOVE   "190198670"    TO   WRK-GAIHAKU(IDX1)
+                END-EVALUATE
+                IF   NACCT-DAY(IDX1) = 12 OR 13
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
+            END-EVALUATE
+           ELSE
+            EVALUATE   NACCT-DAY(IDX1)
+             WHEN     8
+      ***    WHEN    10
+      ***    WHEN    11
+                EVALUATE   WRK-CHUKSNCD(IDX1)
+                   WHEN   "9017"
+                      IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
                         IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
                         OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
                           MOVE  "190161570" TO   WRK-GAIHAKU(IDX1)
@@ -2771,17 +2893,16 @@
                       MOVE   "190161870"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9030"
                       MOVE   "190162070"    TO   WRK-GAIHAKU(IDX1)
+                END-EVALUATE
                 IF   NACCT-DAY(IDX1) = 10 OR 11
                    PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
                 END-IF
-                END-EVALUATE
-      *
              WHEN     9
-             WHEN    12
+      ***    WHEN    12
              WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      IF   LNK-RNYURECEDEN-SANTEIYM   >=  "201404"
+                      IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
                         IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
                         OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
                           MOVE  "190161770" TO   WRK-GAIHAKU(IDX1)
@@ -2801,7 +2922,8 @@
                 IF   NACCT-DAY(IDX1) = 12 OR 13
                    PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
                 END-IF
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
        2101-GAIHAKU-GENSAN-EXT.
@@ -2812,7 +2934,14 @@
       *****************************************************************
        2101-GAIHAKU-TAKIKAN2-SEC           SECTION.
       *
-           EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+           IF   LNK-RNYURECEDEN-SANTEIYM  >=  "201604"
+                EVALUATE   NACCT-DAY(IDX1)
+                    WHEN    11
+                    WHEN    13
+                      MOVE   "190141590"    TO   WRK-GAIHAKU2(IDX1)
+                END-EVALUATE
+           ELSE
+            EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
              WHEN   099  THRU  100
                 EVALUATE   NACCT-DAY(IDX1)
                     WHEN    10
@@ -2828,7 +2957,8 @@
                     WHEN    13
                       MOVE   "190141590"    TO   WRK-GAIHAKU2(IDX1)
                 END-EVALUATE
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
       *
            .
        2101-GAIHAKU-TAKIKAN2-EXT.
