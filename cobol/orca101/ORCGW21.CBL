@@ -200,6 +200,12 @@
                05  WRK-KBN1                        PIC 9(01).
            03  WRK-KBN2-G.
                05  WRK-KBN2                        PIC 9(02).
+           03  WRK-TOKCHK1-G.
+               05  WRK-TOKCHK1-KBNCD               PIC X(02)
+                                                   OCCURS 100.
+           03  WRK-TOKCHK2-G.
+               05  WRK-TOKCHK2-KBNCD               PIC X(02)
+                                                   OCCURS 100.
       *
        01  TKSN-AREA.
            03  TKSN-MAX                            PIC 9(03).
@@ -1665,6 +1671,7 @@
                                    TO  WRK-CMB-CD
            PERFORM 4201-TOKNYUINLST-CHK-SEC
            MOVE    WRK-CMB-ITM     TO  SPA-GMN-W21-TOKNYUIN-G
+           MOVE    WRK-CMB-ITM4    TO  SPA-NAI-W21-TOKNYUIN
       *
       *    ¼ýÍÆ¿Í¿ô
            MOVE    SYS-5002-BRM-NINZU
@@ -4006,6 +4013,15 @@
            MOVE    SPA-NAI-W21-YUKOSTYMD
                                    TO  WRK-YUKOSTYMD
       *
+           INITIALIZE                  WRK-TOKCHK1-G
+                                       WRK-TOKCHK2-G
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-W21-TOKNYUIN-MAX )
+               MOVE    SPA-GMN-W21-TOKNYUINL-KBNCD (IDX0)
+                                   TO  WRK-TOKCHK1-KBNCD (IDX0)
+           END-PERFORM
+      *
            IF    ( SPA-NAI-W21-YUKOSTYMD-MOT   =   SPACE )
                MOVE    SPA-NAI-W21-YUKOSTYMD
                                    TO  SPA-NAI-W21-YUKOSTYMD-MOT
@@ -4058,6 +4074,12 @@
                PERFORM 4100-SYSKANRI-RESET-SEC
            END-IF
       *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-W21-TOKNYUIN-MAX )
+               MOVE    SPA-GMN-W21-TOKNYUINL-KBNCD (IDX0)
+                                   TO  WRK-TOKCHK2-KBNCD (IDX0)
+           END-PERFORM
+      *
            EVALUATE    TRUE
            WHEN   ( SPA-NAI-W21-YUKOSTYMD      >=   CONST-H180401 )
             AND  ( SPA-NAI-W21-YUKOSTYMD-MOT   <   CONST-H180401 )
@@ -4091,6 +4113,13 @@
                        INITIALIZE              SPA-NAI-W21-KHNSRYCD
                                                SPA-GMN-W21-KHNTEN
                                                SPA-GMN-W21-KHNRYO-G
+           END-IF
+      *
+           IF    ( WRK-TOKCHK1-G            NOT=   WRK-TOKCHK2-G )
+               MOVE    SPA-NAI-W21-TOKNYUIN TO WRK-CMB-CD
+               PERFORM 4201-TOKNYUINLST-CHK-SEC
+               MOVE    WRK-CMB-ITM          TO  SPA-GMN-W21-TOKNYUIN-G
+
            END-IF
       *
            PERFORM 4200-BRM-SEL-SEC
@@ -5666,6 +5695,7 @@
       *
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
