@@ -2535,6 +2535,9 @@
                WHEN    "12"
       *                另圭件缓袋泼年礁面迹闻技瓷妄瘟∈糠栏基∷
                        MOVE   "190066810"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "14"
+      *                办梧炊厉旧吹荚掐薄板闻瓷妄瘟
+                       MOVE   "190194310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "16"
       *                泼年礁面迹闻技瓷妄瘟３
                        MOVE   "190116310"   TO  LNK-TOKNYUIN-SRYCD
@@ -3136,9 +3139,6 @@
                WHEN    "BR"
       *                俱巢荚卉肋霹１５滦１掐薄答塑瘟∈板闻惰尸１∷
                        MOVE   "190190110"   TO  LNK-TOKNYUIN-SRYCD
-               WHEN    "BS"
-      *                办梧炊厉旧吹荚掐薄板闻瓷妄瘟
-                       MOVE   "190194310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "BT"
       *                泼检祭吹掐薄板闻瓷妄瘟∈板闻惰尸２∷
                        MOVE   "190194510"   TO  LNK-TOKNYUIN-SRYCD
