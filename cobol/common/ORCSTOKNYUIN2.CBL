@@ -1716,7 +1716,7 @@
       *      (A305)°ìÎà´¶À÷¾É´µ¼ÔÆþ±¡°åÎÅ´ÉÍýÎÁ
               WHEN      "190194310"
                   MOVE  "190194310"    TO  WRK-TOKNYUIN2-SRYCD(1)
-                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190194410"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
