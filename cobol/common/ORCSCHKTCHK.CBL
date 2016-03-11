@@ -478,6 +478,7 @@
                ELSE
                    ADD     1                   TO  IDY
                    MOVE    HKTSRYCD-SRYCD      TO  TBL-SRYCD(IDX IDY)
+      *
                END-IF
                MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -1293,6 +1294,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EVALUATE    SPA-COM-SRYKBN (IDX-Z)(1:1)
       *        髑泔
                WHEN    "2"
+      *            情陸
                    IF     (SPA-COM-SRYSYUKBN(IDX-Z)  =   "212"
                                                      OR  "213"
                                                      OR  "222"
@@ -1301,7 +1303,13 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                                      OR  "233")
                      OR  ((SPA-COM-TENSU  (IDX-Z)    =   ZERO )  AND
                           (FLG-INPUTOK2              =   ZERO))
-                       CONTINUE
+      *H28.4           情ま反鰾醒未伕手抁喟覆擂
+                       IF    (SPA-COM-SRYSYUKBN(IDX-Z)   =   "231"
+                                                         OR  "294")
+                           IF      WRK-HKTKBN20    =   1
+                               MOVE    1           TO  FLG-CHK3
+                           END-IF
+                       END-IF
                    ELSE
                        IF      WRK-HKTKBN20    =   1
                            MOVE    1           TO  FLG-CHK3
