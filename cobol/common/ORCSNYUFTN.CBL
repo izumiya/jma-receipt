@@ -3849,7 +3849,8 @@ grpsys                                    SPA-AREA
                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
       *          認知症治療病棟入院料、精神療養病棟入院料
-                 IF    WRK-NYUKHNKSNKBN = 221 OR 232 OR 217
+      *          地域移行機能強化病棟入院料
+                 IF  WRK-NYUKHNKSNKBN = 221 OR 232 OR 217 OR 268
                    CONTINUE
                  ELSE
                    IF  TBL-GAIHAKU(SYU-IDX) =  6

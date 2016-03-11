@@ -1561,7 +1561,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *        --- H28.4 TUIKA ---
                WHEN   268  THRU  270
       *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
-                 IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232 OR 217
+      *          √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡
+                 IF  WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232 OR 217 OR 268
                    EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
