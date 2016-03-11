@@ -2600,7 +2600,8 @@
       *        --- H28.4 TUIKA ---
                WHEN   268  THRU  270
       *          認知症治療病棟入院料、精神療養病棟入院料
-                 IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232 OR 217
+      *          地域移行機能強化病棟入院料
+                 IF  WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232 OR 217 OR 268
                    EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108790"    TO   WRK-GAIHAKU(IDX1)
