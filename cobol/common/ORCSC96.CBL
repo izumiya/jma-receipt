@@ -3204,6 +3204,56 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "8053"
+                   STRING  "廃用症候群リハビリテーション開始日が"
+                       "算定されていません。終了日の入力はできません"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8054"
+                   STRING  "廃用症候群リハビリテーション終了日は"
+                       "開始日と同日に入力できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K855"
+                   STRING  "警告！廃用症候群リハビリテーション"
+                           "発症日から１２０日以上です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K856"
+                   STRING  "警告！廃用症候群リハビリ"
+                           "発症日から１２０日以上です。"
+                           "月１３単位を超えました。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K857"
+                   STRING  "警告！廃用症候群リハビリテーション"
+                           "発症日から１８０日以上です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K858"
+                   STRING  "警告！廃用症候群リハビリ"
+                           "発症日から１８０日以上です。"
+                           "月１３単位を超えました。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K859"
+                   STRING  "警告！廃用症候群リハビリテーション"
+                           "発症日の１２０日超から算定して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K860"
+                   STRING  "警告！廃用症候群リハビリテーション"
+                           "発症日の１８０日超から算定して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"

@@ -606,6 +606,14 @@
               AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
                MOVE    1               TO  FLG-RIHA-OK
            END-IF
+      *    H28.4 ÇÑÍÑ¾É¸õ·²
+           IF     (SSANTEI-SRYYMD          >=  "20160401")
+              AND (FLG-RIHA-OK             =   ZERO    )
+              AND (TNS-CDKBN-KBN           =   "H"     )
+              AND (TNS-CDKBN-KBNNUM        =   "001"   )
+              AND (TNS-CDKBN-KBNNUM-EDA    =   "02"    )
+               MOVE    1               TO  FLG-RIHA-OK
+           END-IF
            IF      FLG-RIHA-OK         =   1
                MOVE    "099800201"         TO  WRK-SRYCD
            END-IF

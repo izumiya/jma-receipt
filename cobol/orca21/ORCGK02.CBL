@@ -2628,6 +2628,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG7(IDX)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
            END-PERFORM
@@ -4578,6 +4579,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG7(IDX)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
            END-PERFORM
@@ -7151,6 +7153,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
                    WHEN    "K122" 
                        MOVE    SPACE           TO  SPA-COM-KZMFLG6(IDX)
+                   WHEN    "K108" 
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG7(IDX)
                    WHEN    "K227"
                        MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1
                                                                   (IDX)
@@ -8386,6 +8390,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
       *H26.6
              AND  (SPA-COM-TNSSRYKBN (SPA-GMN-IDX)     =   "13")
+      *H28.5
+             AND  (SPA-COM-INPUTCD (SPA-GMN-IDX)
+                                           NOT =   "113018210")
                IF      SPA-ERRCD           =   "0032"
                    MOVE    SPACE               TO  SPA-ERRCD
                END-IF

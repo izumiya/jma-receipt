@@ -37,6 +37,7 @@
       *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *  04.08.00    NACL-多々納  16/02/XX  初診料新規追加対応
+      *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1051,6 +1052,7 @@
                                        OR  "099800161"
                                        OR  "099800171"
                                        OR  "099800181"
+                                       OR  "099800191"
                MOVE    1               TO  SPA-NAI-PLUSKBN
            ELSE
                MOVE    ZERO            TO  SPA-NAI-PLUSKBN
@@ -2010,6 +2012,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "099110001"
                                        OR  "111012510"
                                        OR  "111012710"
+                                       OR  "113019710"
+                                       OR  "113019910"
                CONTINUE
            ELSE
                GO      TO      45012-SYOSIN-CHK-EXT
@@ -2292,6 +2296,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "111012510"
       *H27.1           妥結率５割以下
                                        OR  "111012710"
+                                       OR  "113019710"
+                                       OR  "113019910"
                CONTINUE
            ELSE
                GO      TO      4510-KARRK-UPD-EXT

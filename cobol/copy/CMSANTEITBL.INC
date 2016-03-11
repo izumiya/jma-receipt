@@ -29,6 +29,7 @@
       *  03.03.00    NACL-多々納  06/10/20  矯正固定等追加
       *  03.04.00    NACL-多々納  07/01/11  リハビリ終了日追加
       *  03.04.01    NACL-多々納  07/03/XX  医学管理料追加
+      *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *****************************************************************
       *
       *    算定履歴保険番号毎のコード
@@ -129,6 +130,7 @@
            03  FILLER              PIC X(13)   VALUE   "   099800151".
            03  FILLER              PIC X(13)   VALUE   "   099800161".
            03  FILLER              PIC X(13)   VALUE   "   099800171".
+           03  FILLER              PIC X(13)   VALUE   "  H0998001919".
       *    リハビリ各終了日
            03  FILLER              PIC X(13)   VALUE   "  E0998001121".
            03  FILLER              PIC X(13)   VALUE   "  E0998001222".
@@ -137,6 +139,7 @@
            03  FILLER              PIC X(13)   VALUE   "   099800152".
            03  FILLER              PIC X(13)   VALUE   "   099800162".
            03  FILLER              PIC X(13)   VALUE   "   099800172".
+           03  FILLER              PIC X(13)   VALUE   "  E0998001929".
       *自賠責健保準拠追加（Ｈ１８／４から）
       *    ＣＴ・ＭＲＩ算定
            03  FILLER              PIC X(13)   VALUE   "   099700101".
@@ -160,7 +163,7 @@
       *****03  TBL-SANTEI-OCC      OCCURS   41  INDEXED   TBL-SAN.
       **** 03  TBL-SANTEI-OCC      OCCURS   65  INDEXED   TBL-SAN.
       **** 03  TBL-SANTEI-OCC      OCCURS   73  INDEXED   TBL-SAN.
-           03  TBL-SANTEI-OCC      OCCURS   77  INDEXED   TBL-SAN.
+           03  TBL-SANTEI-OCC      OCCURS   79  INDEXED   TBL-SAN.
       *        リハビリ（K:個別、S:集団）(H:Ｈ１８．４から）
                05  TBL-RIGAKU-RYO      PIC X(01).
       *        リハビリ（R:理学,S:作業, G:言語)
@@ -171,7 +174,8 @@
                05  TBL-RSI-KBN         PIC X(01).
       *
                05  TBL-SANTEI-SRYCD    PIC X(09).
-      *        疾患別リハビリ区分(1:心大血管,2:脳血管,3:運動器,4:呼吸器)
+      *        疾患別リハビリ区分(1:心大血管,2:脳血管,3:運動器,4:呼吸器
+      *                           9:廃用症候群)
                05  TBL-RIHA-SYUKBN     PIC X(01).
       *
       *    保険毎算定あり

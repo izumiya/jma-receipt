@@ -170,11 +170,13 @@
            03  FILLER          PIC X(09)   VALUE  "099800171".
       *    がん患者リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800181".
+      *    廃用症候群リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800191".
       *
        01  TBL-IKOU-SRYCD-GR   REDEFINES   TBL-IKOU-SRYCD-G.
            03  TBL-IKOU-SRYCD          PIC X(09)
-                                       OCCURS    8.
-       01  TBL-IKOU-MAX                PIC 9(02)   VALUE   8.
+                                       OCCURS    9.
+       01  TBL-IKOU-MAX                PIC 9(02)   VALUE   9.
       *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".
@@ -955,6 +957,18 @@
                    MOVE    PTRSI-SHOBYOYMD     TO  WRK-COMB-TEKSTYMD
                END-IF
            END-IF
+      *
+      *    保険組合せ名は２０バイト
+           IF      WRK-HKNCOMBIMEI NOT =   SPACE
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
+               MOVE    20                  TO  KANACHK-MAX-CNT
+               CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-HKNCOMBIMEI
+           END-IF
+      *
       *ver.4.7
       *    第三者行為
            IF      COMB-KOH1HKNNUM     =   "970"

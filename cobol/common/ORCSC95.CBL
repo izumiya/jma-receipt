@@ -4256,6 +4256,14 @@
                MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
            END-IF
       *
+      *H28.4  初診（同一日　妥結率５割以下）
+           MOVE    "111012810"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF     (WRK-SYOSINYMD1      =   SPACE  )  OR
+                  (WRK-YMDS            >   WRK-SYOSINYMD1)
+               MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
+           END-IF
+      *
       *    同日初診（労災）
            MOVE    "101110040"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
@@ -4307,6 +4315,18 @@
       *    同日初診（今月）
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
            IF      WRK-SRYYYMM         >=  "201304"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
+      *H28.4
+      *    同日初診（妥結率５割以下）
+           MOVE    "111012810"         TO  WRK-SRYCD
+           MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
+           IF      WRK-SRYYYMM         >=  "201604"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
+      *    同日初診（今月）
+           MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
+           IF      WRK-SRYYYMM         >=  "201604"
                PERFORM 3009111-DOU-SANTEI-SEC
            END-IF
       *
@@ -5213,6 +5233,14 @@
                   AND (TNS-CDKBN-KBNNUM        =   "001"
                                                OR  "002"   )
                   AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
+      *        H28.4 廃用症候群
+               IF     (SPA-SRYYMD              >=  "20160401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "02"    )
                    MOVE    1               TO  FLG-RIHA-OK
                END-IF
       *

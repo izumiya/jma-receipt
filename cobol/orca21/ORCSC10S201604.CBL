@@ -379,12 +379,12 @@
            03  WRK-RDD                 PIC 9(02).
       *   ¥ê¥Ï¥Ó¥êÈ¯¾ÉÆüÉ½¼¨
            03  WRK-RIHABIR-AREA.
-               05  WRK-RIHABIR-OCC     OCCURS   8.
+               05  WRK-RIHABIR-OCC     OCCURS   9.
                    07  WRK-RIHA-STR        PIC X(08).
                    07  WRK-RIHA-END        PIC X(08).
       *
            03  WRK-RIHABIR-AREA2.
-               05  WRK-RIHABIR-OCC2    OCCURS   8.
+               05  WRK-RIHABIR-OCC2    OCCURS   9.
                    07  WRK-RIHA-STR2       PIC X(08).
            03  WRK-RIHA-YMD                PIC X(08).
            03  WRK-RIHA-GMN                PIC X(09).
@@ -2224,7 +2224,7 @@
       *
            MOVE    ZERO                TO  IDX-R
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   8   )
+                   UNTIL      (IDX     >   9   )
                          OR   (IDX-R   >=  7   )
       *
       *        ÄûÀµ¤Ç½ªÎ»Æü¤¬ÅöÆü¤Ê¤é¡¢ÂÐ¾Ý³°
@@ -2381,6 +2381,18 @@
                            MOVE    ZERO            TO  FLG-CHK-END
                        END-IF
                    END-IF
+      *H28.4
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê
+               WHEN    "099800191"
+                   IF      WRK-RIHA-STR(9)         =   SPACE
+                       MOVE    WRK-YMD             TO  WRK-RIHA-STR(9)
+      *                ½ªÎ»Æü¸¡º÷
+                       PERFORM 1001931-SANTEIPLUS-CHK-SEC
+                       IF      WRK-ENDYMD      NOT =   SPACE
+                           MOVE    SPACE           TO  WRK-RIHA-STR(9)
+                           MOVE    ZERO            TO  FLG-CHK-END
+                       END-IF
+                   END-IF
                WHEN    "099800182"
                    IF      WRK-RIHA-END(8)         =   SPACE
                        MOVE    WRK-YMD             TO  WRK-RIHA-END(8)
@@ -2424,6 +2436,15 @@
                WHEN    8
                    MOVE    0                       TO  WRK-ZOGEN
                    MOVE    "¤¬¤ó´µ¼Ô¥ê¥Ï³«»ÏÆü¡§"  TO  WRK-RIHAMEI
+               WHEN    9
+                   MOVE    "ÇÑÍÑ¾É¸õ·²¥ê¥Ï³«»ÏÆü¡§"    TO  WRK-RIHAMEI
+                   IF      WRK-RIHA-STR2(IDX)      >=  "20160401"
+                       MOVE    120                     TO  WRK-ZOGEN
+                       MOVE    "£±£²£°ÆüÄ¶¡§"          TO  WRK-ZOGEN-MEI
+                   ELSE
+                       MOVE    180                     TO  WRK-ZOGEN
+                       MOVE    "£±£¸£°ÆüÄ¶¡§"          TO  WRK-ZOGEN-MEI
+                   END-IF
            END-EVALUATE
       *    £ÎÆü¸å·×»»
            IF      WRK-ZOGEN           >   ZERO

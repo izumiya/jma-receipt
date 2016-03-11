@@ -34,6 +34,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  13/01/15  ¿ÇÎÅ²ó¿ô¥Æ¡¼¥Ö¥ë£±£°ÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/05/28  °ì»þ¥Õ¥¡¥¤¥ëÊÑ¹¹
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -282,12 +283,12 @@
            03  WRK-MAE-HKNCOMBI        PIC X(04).
       *   ¥ê¥Ï¥Ó¥êÈ¯¾ÉÆüÉ½¼¨
            03  WRK-RIHABIR-AREA.
-               05  WRK-RIHABIR-OCC     OCCURS   8.
+               05  WRK-RIHABIR-OCC     OCCURS   9.
                    07  WRK-RIHA-STR        PIC X(08).
                    07  WRK-RIHA-END        PIC X(08).
       *
            03  WRK-RIHABIR-AREA2.
-               05  WRK-RIHABIR-OCC2    OCCURS   8.
+               05  WRK-RIHABIR-OCC2    OCCURS   9.
                    07  WRK-RIHA-STR2       PIC X(08).
            03  WRK-RIHA-YMD                PIC X(08).
            03  WRK-RIHA-GMN                PIC X(09).
@@ -2032,6 +2033,9 @@
       *****************************************************************
        1101-PTINF-HENSYU-SEC         SECTION.
       *
+      *H28.4
+           MOVE    ZERO                TO  SPA-NNCHIH-ARI
+           MOVE    ZERO                TO  SPA-SYOUNI-ARI
       *    ´µ¼Ô¥Þ¥¹¥¿¡¼ÆÉ¤ß¹þ¤ß
            MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
            MOVE    SPA-PTID            TO  PTINF-PTID
@@ -2087,6 +2091,14 @@
            IF     (SPA-SRYYMD          >=  "20140401" )
             AND   (SPA-CHKHTKKSN       =   1          )
                PERFORM 11019-CHKHTKBYO-SET-SEC
+           END-IF
+      *H28.4
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¡¦¾®»ù¤«¤«¤ê¤Ä¤±ÂÐ¾Ý
+           IF     (SPA-SRYYMD          >=  "20160401" )
+      *??»ÜÀß´ð½à¤ÎÈ½Äê
+      *?    AND  ((SPA-NNCHIHKJN       =   1     )  OR
+      *?          (SPA-SYOUNIKJN       =   1     )    )
+               PERFORM 110110-NNCHISYOU-SET-SEC
            END-IF
       *
       *
@@ -2207,6 +2219,55 @@
        11019-CHKHTKBYO-SET-EXT.
            EXIT.
       *
+      *H28.4
+      *****************************************************************
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¡¦¾®»ù¤«¤«¤ê¤Ä¤±ÂÐ¾ÝÉÂÊÔ½¸½èÍý
+      *****************************************************************
+       110110-NNCHISYOU-SET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  SPA-NNCHIH-ARI
+           MOVE    ZERO                TO  SPA-SYOUNI-ARI
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           PERFORM UNTIL       FLG-PTCONF      =   1
+               EVALUATE    PTCONF-CKEY
+               WHEN    "NINTIHOKATU"
+      *            Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-NNCHIH-ARI
+                   END-IF
+               WHEN    "SYOUNIKAKARI"
+      *            ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-SYOUNI-ARI
+                   END-IF
+               END-EVALUATE
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       110110-NNCHISYOU-SET-EXT.
+           EXIT.
       *
       *****************************************************************
       *    ¶Ø´÷¾ðÊóÀßÄê½èÍý
@@ -3087,7 +3148,7 @@
       *
            MOVE    ZERO                TO  IDX-R2
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   8   )
+                   UNTIL      (IDX     >   9   )
       *            SPA ¤Ï 7 ¤Þ¤Ç
                            OR (IDX-R2  >=  7   )
                IF      WRK-RIHA-STR (IDX)  NOT =   SPACE
@@ -3237,6 +3298,17 @@
                            MOVE    ZERO            TO  FLG-CHK-END
                        END-IF
                    END-IF
+      *H28.5   ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê
+               WHEN    "099800191"
+                   IF      WRK-RIHA-STR(9)         =   SPACE
+                       MOVE    WRK-YMD             TO  WRK-RIHA-STR(9)
+      *                ½ªÎ»Æü¸¡º÷
+                       PERFORM 1001931-SANTEIPLUS-CHK-SEC
+                       IF      WRK-ENDYMD      NOT =   SPACE
+                           MOVE    SPACE           TO  WRK-RIHA-STR(9)
+                           MOVE    ZERO            TO  FLG-CHK-END
+                       END-IF
+                   END-IF
                WHEN    "099800182"
                    IF      WRK-RIHA-END(8)         =   SPACE
                        MOVE    WRK-YMD             TO  WRK-RIHA-END(8)
@@ -3280,6 +3352,15 @@
                WHEN    8
                    MOVE    0                       TO  WRK-ZOGEN
                    MOVE    "¤¬¤ó´µ¼Ô¥ê¥Ï³«»ÏÆü¡§"  TO  WRK-RIHAMEI
+               WHEN    9
+                   MOVE    "ÇÑÍÑ¾É¸õ·²¥ê¥Ï³«»ÏÆü¡§"    TO  WRK-RIHAMEI
+                   IF      WRK-RIHA-STR2(IDX)      >=  "20160401"
+                       MOVE    120                     TO  WRK-ZOGEN
+                       MOVE    "£±£²£°ÆüÄ¶¡§"          TO  WRK-ZOGEN-MEI
+                   ELSE
+                       MOVE    180                     TO  WRK-ZOGEN
+                       MOVE    "£±£¸£°ÆüÄ¶¡§"          TO  WRK-ZOGEN-MEI
+                   END-IF
            END-EVALUATE
       *     £ÎÆü¸å·×»»
            IF      WRK-ZOGEN           >   ZERO
@@ -4611,6 +4692,15 @@
                   AND (TNS-CDKBN-KBNNUM-EDA    =   "00"    )
                    MOVE    1               TO  FLG-RIHA-OK
                END-IF
+      *        H28.4 ÇÑÍÑ¾É¸õ·²
+               IF     (SPA-SRYYMD              >=  "20160401")
+                  AND (FLG-RIHA-OK             =   ZERO    )
+                  AND (TNS-CDKBN-KBN           =   "H"     )
+                  AND (TNS-CDKBN-KBNNUM        =   "001"   )
+                  AND (TNS-CDKBN-KBNNUM-EDA    =   "02"    )
+                   MOVE    1               TO  FLG-RIHA-OK
+               END-IF
+      *
       *
                IF      FLG-RIHA-OK         =   1
                    MOVE    "099800201"         TO  WRK-HEN-SRYCD

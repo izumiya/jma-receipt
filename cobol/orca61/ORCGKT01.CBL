@@ -2386,6 +2386,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "ºÍ"                TO  WRK-NENREI-MEI
            END-IF
            MOVE    WRK-NENREI-G        TO  SPA-NENREI-HEN
+      *H28.4
+      *    Ì¤½¢³ØÁ°
+           MOVE    AGECHK-SYUGAKUKBN   TO  SPA-SYUGAKUKBN
       *
            .
        3102-AGECHK-HEN-EXT.
@@ -2484,6 +2487,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPACE           TO  SPA-COM-KZMFLG4(IDX)
                MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
                MOVE    SPACE           TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    SPACE           TO  SPA-COM-KZMFLG7(IDX)
                MOVE    SPACE           TO  SPA-COM-KINKIFLG(IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1(IDX)
@@ -4554,6 +4558,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
                    WHEN    "K122" 
                        MOVE    SPACE           TO  SPA-COM-KZMFLG6(IDX)
+                   WHEN    "K109" 
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG7(IDX)
                    WHEN    "K227"
                        MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1
                                                                   (IDX)
@@ -5464,6 +5470,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
       *        ¾®»ù²Ê³°Íè¿ÇÎÅÎÁ°Ê³°¤Ï¥¨¥é¡¼
              AND  (SPA-COM-SRYKBN  (SPA-GMN-IDX)  =   "13"   )
+      *H28.5
+             AND  (SPA-COM-INPUTCD (SPA-GMN-IDX)
+                                           NOT =   "113018210")
                IF      SPA-ERRCD           =   "0032"
                    MOVE    SPACE               TO  SPA-ERRCD
                END-IF
@@ -8153,6 +8162,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1"                 TO  SPA-COM-KZMFLG4 (IDX2)
                MOVE    "1"                 TO  SPA-COM-KZMFLG5 (IDX2)
                MOVE    "1"                 TO  SPA-COM-KZMFLG6 (IDX2)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG7 (IDX2)
                MOVE    "1"                 TO  SPA-COM-KINKIFLG(IDX2)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX2)
                MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX2)

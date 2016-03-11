@@ -319,6 +319,13 @@
                    PERFORM 100-GMN-SYORI-SEC
                WHEN    "2"
                    PERFORM 300-TOUROKU-SYORI-SEC
+      *H28.4   中途終了
+               WHEN    "4"
+                   PERFORM 100-GMN-SYORI-SEC
+                   IF     (SPA-ERRCD       =   SPACE )  OR
+                          (SPA-KIDCD       =   SPACE )
+                       PERFORM 200-TOUYAKUCHK-SEC
+                   END-IF
            END-EVALUATE
       *
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
@@ -350,6 +357,11 @@
       *    登録前の全体のチェックを行う
            INITIALIZE                  ORCSC00AREA
            MOVE    "2"                 TO  LNK-ORCSC-KBN
+      *H28.4
+      *    登録時
+           IF      ORCSC100-TOROKU     =   "1"
+               MOVE    "1"                 TO  LNK-ORCSC-KBN2
+           END-IF
            PERFORM 520-ALL-CHEK-SEC
       *    更新前に確認画面を表示する
            IF      ORCSC100-TOROKU     =   SPACE
@@ -2459,6 +2471,12 @@
                   (SPA-KIDCD       NOT =   SPACE )
                GO      TO    520-ALL-CHEK-EXT
            END-IF
+      *H28.4
+      *    中途終了時は、投薬のみチェック
+           IF     (LNK-ORCSC-KBN2      =   "1" )
+               GO      TO    520-ALL-CHEK-EXT
+           END-IF
+      ****
       *            注射
            IF     (SPA-SRYKBN-CNT (03) >   ZERO )
       *            入院で手術の時も点滴チェックを行う
@@ -2668,6 +2686,21 @@
            END-IF
            .
        5201-SYOHOU-HKN-EXT.
+           EXIT.
+      *
+      *H28.4
+      *****************************************************************
+      *    中途終了時、投薬チェック処理
+      *****************************************************************
+       200-TOUYAKUCHK-SEC          SECTION.
+      *
+      *    登録前の全体のチェックを行う
+           INITIALIZE                  ORCSC00AREA
+           MOVE    "2"                 TO  LNK-ORCSC-KBN
+           MOVE    "1"                 TO  LNK-ORCSC-KBN2
+           PERFORM 520-ALL-CHEK-SEC
+           .
+       200-TOUYAKUCHK-EXT.
            EXIT.
       *
       *****************************************************************

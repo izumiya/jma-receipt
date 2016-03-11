@@ -30,6 +30,7 @@
       *  04.07.00    NACL-多々納  11/08/XX  リハビリコメント終了日対応
       *  04.07.00    NACL-多々納  11/09/XX  精神科ケア開始日対応
       *  04.07.00    NACL-多々納  13/09/11  リハビリコメント削除対応
+      *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -240,6 +241,10 @@
            03  FILLER          PIC X(09)   VALUE  "099800181".
       *    がん患者リハビリ終了日
            03  FILLER          PIC X(09)   VALUE  "099800182".
+      *    廃用症候群リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800191".
+      *    廃用症候群リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800192".
       *    他医院退院日
            03  FILLER          PIC X(09)   VALUE  "099999906".
            03  FILLER          PIC X(09)   VALUE  SPACE.
@@ -260,7 +265,7 @@
            03  TBL-RRK-SRYCD-GT        OCCURS    13.
                05  TBL-RRK-SRYCD           PIC X(09).
                05  TBL-END-SRYCD           PIC X(09).
-       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   13.
+       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   15.
       *
       *
        01  WRK-MIDAIS-HEN.
@@ -1502,7 +1507,7 @@
                       (PTRSI-SHOBYOYMD         <   COMB-TEKSTYMD)
                    MOVE    PTRSI-SHOBYOYMD     TO  WRK-COMB-TEKSTYMD
                END-IF
-          END-IF
+           END-IF
            .
        31011-HKNCOMBI-SET-EXT.
            EXIT.
@@ -1884,6 +1889,9 @@
                                        OR  "111012510"
       *                妥結率５割以下
                                        OR  "111012710"
+      *H28.4           小児かかりつけ
+                                       OR  "113019710"
+                                       OR  "113019910"
                                                        )
                MOVE    "2"                 TO  SPA-K061-KBN2
            END-IF
@@ -1894,7 +1902,8 @@
                                        OR  "099800141"
                                        OR  "099800151"
                                        OR  "099800161"
-                                       OR  "099800171" )
+                                       OR  "099800171"
+                                       OR  "099800191" )
                MOVE    "1"                 TO  SPA-K061-KBN2
            END-IF
            .
