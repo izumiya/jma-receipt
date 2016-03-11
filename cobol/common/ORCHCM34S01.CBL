@@ -133,6 +133,7 @@
            03  IDXH                            PIC 9(05).
            03  IDXI                            PIC 9(05).
            03  IDXJ                            PIC 9(05).
+           03  IDXK                            PIC 9(05).
            03  IDX-KHN                         PIC 9(05).
            03  IDX-TAX                         PIC 9(05).
            03  IDX-SKJ                         PIC 9(05).
@@ -180,7 +181,9 @@
            03  WRK-BRMSAGAKUCD                 PIC X(02).
            03  WRK-SKJ-TEN-G.
                05  WRK-SKJ-TEN-RYOYO1          PIC 9(08).
+               05  WRK-SKJ-TEN-RYOYO1-RDS      PIC 9(08).
                05  WRK-SKJ-TEN-RYOYO2          PIC 9(08).
+               05  WRK-SKJ-TEN-RYOYO2-RDS      PIC 9(08).
                05  WRK-SKJ-TEN-TOKKANRI        PIC 9(08).
                05  WRK-SKJ-TEN-TOKSYOKU        PIC 9(08).
                05  WRK-SKJ-TEN-SYOKUDO         PIC 9(08).
@@ -189,8 +192,11 @@
                03  WRK-SKJ-TEN-SKJFTN-TEI2     PIC 9(08).
                03  WRK-SKJ-TEN-SKJFTN-TEI2-90  PIC 9(08).
                03  WRK-SKJ-TEN-SKJFTN-TEI1     PIC 9(08).
+               03  WRK-SKJ-TEN-SKJFTN-NANBYO   PIC 9(08).
+               03  WRK-SKJ-TEN-SKJFTN-SEISHIN  PIC 9(08).
            03  WRK-LIFE-TEN-G.
                05  WRK-LIFE-TEN-RYOYO1         PIC 9(08).
+               05  WRK-LIFE-TEN-RYOYO1-RDS     PIC 9(08).
                05  WRK-LIFE-TEN-RYOYO2         PIC 9(08).
                05  WRK-LIFE-TEN-TOKSYOKU       PIC 9(08).
                05  WRK-LIFE-TEN-SYOKUDO        PIC 9(08).
@@ -370,13 +376,17 @@
                    07  WSKJH1804-CNT-HIRU      PIC 9(05).
                    07  WSKJH1804-CNT-YUU       PIC 9(05).
                    07  WSKJH1804-CNT-SKJRYOYO1 PIC 9(05).
+                   07  WSKJH1804-CNT-SKJRYOYO1-RDS
+                                               PIC 9(05).
                    07  WSKJH1804-CNT-SKJRYOYO2 PIC 9(05).
+                   07  WSKJH1804-CNT-SKJRYOYO2-RDS
+                                               PIC 9(05).
                    07  WSKJH1804-CNT-TOKSYOKU  PIC 9(05).
                    07  WSKJH1804-CNT-SYOKUDO   PIC 9(05).
                    07  WSKJH1804-CNT-SKJFTN    PIC 9(05).
                    07  WSKJH1804-CNT-KANFTN    PIC 9(05).
                05  WSKJH1804-SRYCD-CNT-OCC     REDEFINES
-                   WSKJH1804-SRYCD-CNT-VAL     OCCURS  9.
+                   WSKJH1804-SRYCD-CNT-VAL     OCCURS 11.
                    07  WSKJH1804-SRYCD-CNT     PIC 9(05).
       *
       *    入院料加算
@@ -452,7 +462,8 @@
       *
       *    コンスタント値
        01  CONST-AREA.
-           03  CONST-H2710                 PIC X(08)   VALUE "999999".
+           03  CONST-H9999                 PIC X(08)   VALUE "999999".
+           03  CONST-H2804                 PIC X(08)   VALUE "201604".
            03  CONST-H2604                 PIC X(08)   VALUE "201404".
            03  CONST-H2404                 PIC X(06)   VALUE "201204".
            03  CONST-H2204                 PIC X(06)   VALUE "201004".
@@ -480,6 +491,12 @@
       *    入院時食事療養（２）
            03  CONST-SKJ-RYOYO2                PIC X(09)
                                                    VALUE "197000710".
+      *    入院時食事療養（１）（流動食）
+           03  CONST-SKJ-RYOYO1-RDS            PIC X(09)
+                                                   VALUE "197003110".
+      *    入院時食事療養（２）（流動食）
+           03  CONST-SKJ-RYOYO2-RDS            PIC X(09)
+                                                   VALUE "197003210".
       *    特別管理加算
            03  CONST-SKJ-TOKKANRI              PIC X(09)
                                                    VALUE "197000270".
@@ -495,6 +512,9 @@
       *    入院時生活療養（１）食事療養
            03  CONST-LIFE-RYOYO1               PIC X(09)
                                                    VALUE "197001310".
+      *    入院時生活療養（１）食事療養（流動食）
+           03  CONST-LIFE-RYOYO1-RDS           PIC X(09)
+                                                   VALUE "197003510".
       *    入院時生活療養（１）環境療養
            03  CONST-LIFE-KANKYO1              PIC X(09)
                                                    VALUE "197001410".
@@ -522,6 +542,12 @@
       *    食事療養標準負担額（低１）
            03  CONST-SKJFTN-TEI1               PIC X(09)
                                                    VALUE "197001110".
+      *    食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
+           03  CONST-SKJFTN-NANBYO               PIC X(09)
+                                                   VALUE "197003310".
+      *    食事療養標準負担額（精神１年超）（一般）
+           03  CONST-SKJFTN-SEISHIN               PIC X(09)
+                                                   VALUE "197003410".
       *    選定療養（入院１８０日超）減算（入院基本料）
            03  CONST-SENTEI                    PIC X(09)
                                                    VALUE "190122890".
@@ -613,6 +639,12 @@
       *
       *    入院時生活療養費負担額取得サブ
            COPY    "CPORCSNYULIFE.INC".
+      *
+      *    入院時生活療養費負担額取得サブ２
+           COPY    "CPORCSNYULIFE2.INC".
+      *
+      *    食事負担据え置き対象取得サブ
+           COPY    "CPORCSSKJKEEP.INC".
       *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
@@ -798,7 +830,7 @@
            END-IF
       *
            EVALUATE    TRUE
-           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2710 )
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H9999 )
                MOVE    0.10            TO  WRK-RATE1
            WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2604 )
                MOVE    0.08            TO  WRK-RATE1
@@ -868,6 +900,10 @@
                                            WRK-SENTEI-PTFTN-G
                                            FLG-NYUINGENDAY-G
                                            FLG-BRMSGKSANTEIDAY-G
+                                           ORCSNYULIFE-AREA
+                                           ORCSNYULIFE2-AREA
+                                           ORCSSYOTOKUAREA
+                                           ORCSSKJKEEP-AREA
       *
       *    医療機関情報取得処理
            PERFORM 1501-SYS1001-GET-SEC
@@ -875,7 +911,72 @@
       *    入院基本情報取得
            PERFORM 1501-SYS5000-GET-SEC
       *
-           IF    (   HCM34S01-SANTEIYM   >=  CONST-H1810 )
+           EVALUATE    TRUE
+           WHEN  (   HCM34S01-SANTEIYM   >=  CONST-H2804 )
+      *
+               INITIALIZE                      ORCSNYULIFE2-AREA
+               MOVE    HCM34S01-HOSPNUM    TO  LNK-NYULIFE2-HOSPNUM
+               MOVE    HCM34S01-PTID       TO  LNK-NYULIFE2-PTID
+               MOVE    HCM34S01-SANTEIYM   TO  LNK-NYULIFE2-SANTEIYM
+               CALL    "ORCSNYULIFE2"      USING
+                                           ORCSNYULIFE2-AREA
+                                           SPA-AREA
+               IF    ( LNK-NYULIFE2-RC  NOT =   ZERO )
+                   INITIALIZE              ORCSNYULIFE2-AREA
+               END-IF
+      *
+               MOVE    LNK-NYULIFE2-HOSPNUM
+                                       TO  LNK-NYULIFE-HOSPNUM
+               MOVE    LNK-NYULIFE2-PTID
+                                       TO  LNK-NYULIFE-PTID
+               MOVE    LNK-NYULIFE2-SANTEIYM
+                                       TO  LNK-NYULIFE-SANTEIYM
+               PERFORM VARYING IDXD    FROM    1   BY  1
+                       UNTIL ( IDXD    >   31 )
+                   MOVE    LNK-NYULIFE2-KBN (IDXD)
+                                   TO  LNK-NYULIFE-KBN (IDXD)
+                   MOVE    LNK-NYULIFE2-SKJKBN  (IDXD)
+                                   TO  LNK-NYULIFE-SKJKBN (IDXD)
+                   MOVE    LNK-NYULIFE2-FTNKBN1 (IDXD)
+                                   TO  LNK-NYULIFE-FTNKBN1 (IDXD)
+                   MOVE    LNK-NYULIFE2-FTNKBN2 (IDXD)
+                                   TO  LNK-NYULIFE-FTNKBN2 (IDXD)
+      *
+                   PERFORM VARYING IDXK    FROM    1   BY  1
+                           UNTIL ( IDXK    >   3 )
+      *
+                       IF    ( LNK-NYULIFE2-SKJFTN-SRYCD (IDXD IDXK)
+                                       NOT =   SPACE )
+                           MOVE    LNK-NYULIFE2-SKJFTN-SRYCD (IDXD IDXK)
+                                   TO  LNK-NYULIFE-SKJFTN-SRYCD (IDXD)
+                           MOVE    LNK-NYULIFE2-SKJFTN-MONEY (IDXD IDXK)
+                                   TO  LNK-NYULIFE-SKJFTN-MONEY (IDXD)
+                       END-IF
+      *
+                   END-PERFORM
+      *
+                   MOVE    LNK-NYULIFE2-KAN-SRYCD (IDXD)
+                                   TO  LNK-NYULIFE-KAN-SRYCD (IDXD)
+                   MOVE    LNK-NYULIFE2-KAN-MONEY (IDXD)
+                                   TO  LNK-NYULIFE-KAN-MONEY (IDXD)
+                   MOVE    LNK-NYULIFE2-KANFTN-SRYCD (IDXD)
+                                   TO  LNK-NYULIFE-KANFTN-SRYCD (IDXD)
+                   MOVE    LNK-NYULIFE2-KANFTN-MONEY (IDXD)
+                                   TO  LNK-NYULIFE-KANFTN-MONEY (IDXD)
+               END-PERFORM
+      *
+               INITIALIZE                      ORCSSKJKEEP-AREA
+               MOVE    HCM34S01-HOSPNUM    TO  LNK-SKJKEEP-HOSPNUM
+               MOVE    HCM34S01-PTID       TO  LNK-SKJKEEP-PTID
+               MOVE    HCM34S01-SANTEIYM   TO  LNK-SKJKEEP-SANTEIYM
+               CALL    "ORCSSKJKEEP"       USING
+                                           ORCSSKJKEEP-AREA
+                                           SPA-AREA
+               IF    ( LNK-SKJKEEP-RC  NOT =   ZERO )
+                   INITIALIZE              ORCSSKJKEEP-AREA
+               END-IF
+           WHEN  (   HCM34S01-SANTEIYM   >=  CONST-H1810 )
+      *
                INITIALIZE                      ORCSNYULIFE-AREA
                MOVE    HCM34S01-HOSPNUM     TO  LNK-NYULIFE-HOSPNUM
                MOVE    HCM34S01-PTID       TO  LNK-NYULIFE-PTID
@@ -887,6 +988,9 @@
       *            DISPLAY "ORCSNYULIFE ERR:" LNK-NYULIFE-RC
                    INITIALIZE              ORCSNYULIFE-AREA
                END-IF
+           END-EVALUATE
+      *
+           IF    (   HCM34S01-SANTEIYM   >=  CONST-H1810 )
                INITIALIZE                  ORCSSYOTOKUAREA
                MOVE    HCM34S01-HOSPNUM    TO  LNK-SYOTOKU-HOSPNUM
                MOVE    HCM34S01-PTID       TO  LNK-SYOTOKU-PTID
@@ -899,11 +1003,7 @@
       *             DISPLAY "ORCSSYTOKU RC = " LNK-SYOTOKU-RC
                     INITIALIZE                 ORCSSYOTOKUAREA
                END-IF
-           ELSE
-               INITIALIZE                      ORCSNYULIFE-AREA
-               INITIALIZE                      ORCSSYOTOKUAREA
            END-IF
-      *
       *
            INITIALIZE  ORCSNYUINDAY-AREA
            MOVE    HCM34S01-HOSPNUM    TO  LNK-NYUINDAY-HOSPNUM
@@ -1398,7 +1498,12 @@
                    PERFORM 200111-GAIHAKU-SRYCD-GET-SEC
       *
       *            外泊点数取得処理
-                   PERFORM 200111-GAIHAKU-TENSU-GET-SEC
+                   EVALUATE    TRUE
+                   WHEN  ( NACCT-SRYYM >=  CONST-H2804 )
+                       PERFORM 2002-H28-GAIHAKU-TENSU-GET-SEC
+                   WHEN    OTHER
+                       PERFORM 2002-GAIHAKU-TENSU-GET-SEC
+                   END-EVALUATE
       *
       *            外泊基本情報設定処理
                    PERFORM 200111-GAIHAKKHNINF-SET-SEC
@@ -1880,9 +1985,95 @@
        200111-GAIHAKU-SRYCD-GET-EXT.
            EXIT.
       *****************************************************************
-      *    他医療機関受診時外泊診療行為コード取得処理
+      *    他医療機関受診時外泊診療行為コード取得処理(H28.3迄)
       *****************************************************************
        2001111-TAKIKAN-SEC             SECTION.
+      *
+           EVALUATE    TRUE
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2804 )
+               PERFORM 20012-H28-TAKIKAN-SEC
+           WHEN    OTHER
+               PERFORM 20012-TAKIKAN-SEC
+           END-EVALUATE
+      *
+           .
+       2001111-TAKIKAN-EXT.
+           EXIT.
+      *****************************************************************
+      *    他医療機関受診時外泊診療行為コード取得処理(H28.4以降 )
+      *****************************************************************
+       20012-H28-TAKIKAN-SEC           SECTION.
+      *
+           EVALUATE   WRK-NYUKHNKSNKBN
+           WHEN   201  THRU  206
+           WHEN   208  THRU  210
+           WHEN   212  THRU  217
+           WHEN   221
+           WHEN   227  THRU  229
+           WHEN   232  THRU  236
+           WHEN   238  THRU  239
+           WHEN   241  THRU  249
+           WHEN   250  THRU  254
+           WHEN   257  THRU  267
+           WHEN   268  THRU  270
+               IF    WRK-NYUKHNKSNKBN = 221 OR 232 OR 217
+                   EVALUATE   FLG-GAIHAKUDAY(IDXD)
+                   WHEN     4
+                       MOVE   "190108790"    TO   WRK-GAIHAKU-SRYCD
+                   WHEN     5
+                       MOVE   "190142090"    TO   WRK-GAIHAKU-SRYCD
+                   WHEN     6
+                       MOVE   "190182990"    TO   WRK-GAIHAKU-SRYCD
+                   END-EVALUATE
+               ELSE
+                   EVALUATE   FLG-GAIHAKUDAY(IDXD)
+                   WHEN     4
+                       MOVE   "190108790"    TO   WRK-GAIHAKU-SRYCD
+                   WHEN     5
+                       MOVE   "190142090"    TO   WRK-GAIHAKU-SRYCD
+                   END-EVALUATE
+               END-IF
+           WHEN   004  THRU  008
+           WHEN   010  THRU  012
+           WHEN   152
+           WHEN   173  THRU  190
+           WHEN   196
+           WHEN   199
+           WHEN   048  THRU  049
+           WHEN   051  THRU  054
+           WHEN   057  THRU  068
+               EVALUATE   FLG-GAIHAKUDAY(IDXD)
+               WHEN     4
+                   MOVE   "190108890"    TO   WRK-GAIHAKU-SRYCD
+               WHEN     5
+                   MOVE   "190142190"    TO   WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+           WHEN   153  THRU  158
+               EVALUATE   FLG-GAIHAKUDAY(IDXD)
+               WHEN     4
+                   MOVE   "190108890"    TO   WRK-GAIHAKU-SRYCD
+               WHEN     5
+                   MOVE   "190142190"    TO   WRK-GAIHAKU-SRYCD
+               WHEN     6
+                   MOVE   "190109090"    TO   WRK-GAIHAKU-SRYCD
+              END-EVALUATE
+           WHEN   226
+           WHEN   240
+               CONTINUE
+           WHEN   OTHER
+               EVALUATE   FLG-GAIHAKUDAY(IDXD)
+               WHEN     5
+                   MOVE   "190141590"    TO   WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       20012-H28-TAKIKAN-EXT.
+           EXIT.
+      *****************************************************************
+      *    他医療機関受診時外泊診療行為コード取得処理(H28.3迄)
+      *****************************************************************
+       20012-TAKIKAN-SEC               SECTION.
       *
            EVALUATE   WRK-NYUKHNKSNKBN
            WHEN    099 THRU    100
@@ -1999,7 +2190,7 @@
            END-EVALUATE
       *
            .
-       2001111-TAKIKAN-EXT.
+       20012-TAKIKAN-EXT.
            EXIT.
       *****************************************************************
       *    他医療機関受診時外泊診療行為コード取得処理（選定入院時）
@@ -2060,35 +2251,76 @@
        2001111-SENTEI-TAKIKAN-EXT.
            EXIT.
       *****************************************************************
-      *    他医療機関受診時外泊診療行為コード取得処理
-      *****************************************************************
-       2001111-TAKIKAN2-SEC            SECTION.
-      *
-           EVALUATE   WRK-NYUKHNKSNKBN
-           WHEN   099  THRU  100
-               EVALUATE   FLG-GAIHAKUDAY (IDXD)
-               WHEN    10
-               WHEN    12
-                   MOVE   "190108890"  TO  WRK-TAKIKAN2-SRYCD
-               WHEN    11
-               WHEN    13
-                   MOVE   "190142190"  TO  WRK-TAKIKAN2-SRYCD
-               END-EVALUATE
-           WHEN   OTHER
-               EVALUATE   FLG-GAIHAKUDAY (IDXD)
-               WHEN    11
-               WHEN    13
-                   MOVE   "190141590"  TO  WRK-TAKIKAN2-SRYCD
-               END-EVALUATE
-           END-EVALUATE
-      *
-           .
-       2001111-TAKIKAN2-EXT.
-           EXIT.
-      *****************************************************************
       *    特定曜日・特定時間減算診療コード取得
       *****************************************************************
        2001111-GAIHAKU-GENSAN-SEC      SECTION.
+      *
+           EVALUATE    TRUE
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2804 )
+               PERFORM 2002-H28-GAIHAKU-GENSAN-SEC
+           WHEN    OTHER
+               PERFORM 2002-GAIHAKU-GENSAN-SEC
+           END-EVALUATE
+      *
+           .
+       2001111-GAIHAKU-GENSAN-EXT.
+           EXIT.
+           EXIT.
+      *****************************************************************
+      *    特定曜日・特定時間減算診療コード取得(H28.4以降)
+      *****************************************************************
+       2002-H28-GAIHAKU-GENSAN-SEC     SECTION.
+      *
+           EVALUATE   FLG-GAIHAKUDAY (IDXD)
+           WHEN     8
+               EVALUATE   WRK-CHUKSNCD
+               WHEN   "9017"
+                   EVALUATE   WRK-NYUKHNKSNKBN
+                   WHEN     9
+                   WHEN   166   THRU  167
+                   WHEN   197   THRU  198
+                       MOVE  "190161570" TO   WRK-GAIHAKU-SRYCD
+                   WHEN   OTHER
+                       MOVE  "190161470" TO   WRK-GAIHAKU-SRYCD
+                   END-EVALUATE
+               WHEN   "9026"
+                   MOVE   "190161870"    TO   WRK-GAIHAKU-SRYCD
+                WHEN   "9030"
+                   MOVE   "190162070"    TO   WRK-GAIHAKU-SRYCD
+               WHEN   "9090"
+                   MOVE   "190198570"    TO   WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+           WHEN     9
+           WHEN    13
+               EVALUATE   WRK-CHUKSNCD
+               WHEN   "9017"
+                   EVALUATE   WRK-NYUKHNKSNKBN
+                   WHEN     9
+                   WHEN   166   THRU  167
+                   WHEN   197   THRU  198
+                       MOVE  "190161770" TO   WRK-GAIHAKU-SRYCD
+                   WHEN   OTHER
+                       MOVE  "190161670" TO   WRK-GAIHAKU-SRYCD
+                   END-EVALUATE
+               WHEN   "9026"
+                   MOVE   "190161970"    TO   WRK-GAIHAKU-SRYCD
+               WHEN   "9030"
+                   MOVE   "190162170"    TO   WRK-GAIHAKU-SRYCD
+               WHEN   "9090"
+                   MOVE   "190198670"    TO   WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+               IF    ( FLG-GAIHAKUDAY (IDXD) = 13 )
+                   PERFORM   2002-TAKIKAN2-SEC
+               END-IF
+           END-EVALUATE
+      *
+           .
+       2002-H28-GAIHAKU-GENSAN-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定曜日・特定時間減算診療コード取得(H28.3迄)
+      *****************************************************************
+       2002-GAIHAKU-GENSAN-SEC      SECTION.
       *
            EVALUATE   FLG-GAIHAKUDAY (IDXD)
            WHEN     8
@@ -2114,7 +2346,7 @@
                    MOVE   "190162070"  TO  WRK-GAIHAKU-SRYCD
                END-EVALUATE
                IF    ( FLG-GAIHAKUDAY (IDXD)   =   10 OR 11 )
-                   PERFORM 2001111-TAKIKAN2-SEC
+                   PERFORM 2002-TAKIKAN2-SEC
                END-IF
            WHEN     9
            WHEN     12
@@ -2139,17 +2371,133 @@
                   MOVE    "190162170"  TO  WRK-GAIHAKU-SRYCD
                END-EVALUATE
                IF    ( FLG-GAIHAKUDAY (IDXD)   =   12 OR 13 )
-                   PERFORM 2001111-TAKIKAN2-SEC
+                   PERFORM 2002-TAKIKAN2-SEC
                END-IF
            END-EVALUATE
       *
            .
-       2001111-GAIHAKU-GENSAN-EXT.
+       2002-GAIHAKU-GENSAN-EXT.
+           EXIT.
+      *****************************************************************
+      *    他医療機関受診時外泊診療行為コード取得処理
+      *****************************************************************
+       2002-TAKIKAN2-SEC               SECTION.
+      *
+           EVALUATE    TRUE
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2804 )
+                EVALUATE   FLG-GAIHAKUDAY (IDXD)
+                WHEN   13
+                    MOVE   "190141590"    TO   WRK-TAKIKAN2-SRYCD
+                END-EVALUATE
+           WHEN    OTHER
+               EVALUATE   WRK-NYUKHNKSNKBN
+               WHEN   099  THRU  100
+                   EVALUATE   FLG-GAIHAKUDAY (IDXD)
+                   WHEN    10
+                   WHEN    12
+                       MOVE   "190108890"  TO  WRK-TAKIKAN2-SRYCD
+                   WHEN    11
+                   WHEN    13
+                       MOVE   "190142190"  TO  WRK-TAKIKAN2-SRYCD
+                   END-EVALUATE
+               WHEN   OTHER
+                   EVALUATE   FLG-GAIHAKUDAY (IDXD)
+                   WHEN    11
+                   WHEN    13
+                       MOVE   "190141590"  TO  WRK-TAKIKAN2-SRYCD
+                   END-EVALUATE
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       2002-TAKIKAN2-EXT.
            EXIT.
       *****************************************************************
       *    外泊点数取得処理
       *****************************************************************
-       200111-GAIHAKU-TENSU-GET-SEC    SECTION.
+       2002-H28-GAIHAKU-TENSU-GET-SEC  SECTION.
+      *
+           IF  ( FLG-SENTEIDAY (IDXD) NOT  =  ZERO )
+      *
+               PERFORM 200111-SENTEI-KEISU-GET-SEC
+      *
+               EVALUATE    FLG-GAIHAKUDAY(IDXD)
+               WHEN    1
+               WHEN    3
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   WRK-SENTEI-KEISU )  + 0.5
+               WHEN    4
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.6 )   +  0.5
+               WHEN    5
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.9 )   +  0.5
+               WHEN    8
+               WHEN    9
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
+               WHEN    13
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-TEN     *   0.9  )   +  0.5
+               END-EVALUATE
+      *
+               IF    ( FLG-GAIHAKUDAY(IDXD)   >=   4 )
+                   COMPUTE WRK-ZAI-TEN
+                       =   WRK-ZAI-TEN
+                       +   WRK-GAIHAKU-KSNTEN
+                   COMPUTE WRK-ZAI-TEN
+                       =   WRK-ZAI-TEN
+                       - ( WRK-ZAI-TEN * ( WRK-HYOKETU-TEN / 100 ))
+                       +   0.5
+               END-IF
+           ELSE
+               EVALUATE  FLG-GAIHAKUDAY(IDXD)
+               WHEN   1
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.15)   +  0.5
+               WHEN   2
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.3 )   +  0.5
+               WHEN   4
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.6 )   +  0.5
+               WHEN   5
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.9 )   +  0.5
+               WHEN   6
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.8 )  +  0.5
+               WHEN    8
+               WHEN    9
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
+               WHEN    13
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-TEN     *   0.9  )   +  0.5
+               END-EVALUATE
+      *
+               IF    ( FLG-GAIHAKUDAY(IDXD)   >=   4 )
+                   COMPUTE WRK-ZAI-TEN
+                       =   WRK-ZAI-TEN
+                       +   WRK-GAIHAKU-KSNTEN
+                   COMPUTE WRK-ZAI-TEN
+                       =   WRK-ZAI-TEN
+                       - ( WRK-ZAI-TEN * ( WRK-HYOKETU-TEN / 100 ))
+                       +   0.5
+               END-IF
+           END-IF
+      *
+           .
+       2002-H28-GAIHAKU-TENSU-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    外泊点数取得処理
+      *****************************************************************
+       2002-GAIHAKU-TENSU-GET-SEC    SECTION.
       *
            IF  ( FLG-SENTEIDAY (IDXD) NOT  =  ZERO )
       *
@@ -2266,7 +2614,7 @@
            END-IF
       *
            .
-       200111-GAIHAKU-TENSU-GET-EXT.
+       2002-GAIHAKU-TENSU-GET-EXT.
            EXIT.
       *****************************************************************
       *    選定外泊時の係数セット処理
@@ -3064,6 +3412,29 @@
                MOVE    TNS-TEN         TO  WRK-SKJ-TEN-SKJFTN-TEI1
            END-IF
       *
+           IF    ( HCM34S01-SANTEIYM  >=   CONST-H2804 )
+      *        入院時食事療養（１）（流動食）
+               MOVE    CONST-SKJ-RYOYO1-RDS
+                                       TO  WRK-TNS-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TEN         TO  WRK-SKJ-TEN-RYOYO1-RDS
+      *        入院時食事療養（２）（流動食）
+               MOVE    CONST-SKJ-RYOYO2-RDS
+                                       TO  WRK-TNS-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TEN         TO  WRK-SKJ-TEN-RYOYO2-RDS
+      *        食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
+               MOVE    CONST-SKJFTN-NANBYO
+                                       TO  WRK-TNS-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TEN         TO  WRK-SKJ-TEN-SKJFTN-NANBYO
+      *        食事療養標準負担額（精神１年超）（一般）
+               MOVE    CONST-SKJFTN-SEISHIN
+                                       TO  WRK-TNS-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TEN         TO  WRK-SKJ-TEN-SKJFTN-SEISHIN
+           END-IF
+      *
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
       *
@@ -3092,10 +3463,31 @@
                        MOVE   WRK-SKJ-TEN-SKJFTN-TEI1
                                          TO  TSKJFTN-MONEY(IDXD)
                    WHEN    OTHER
-                       MOVE   CONST-SKJFTN-IPN
+                       EVALUATE    TRUE
+                       WHEN ( HCM34S01-SANTEIYM  >=   CONST-H2804 )
+                           EVALUATE    LNK-SKJKEEP-KBN (IDXD)
+                           WHEN   "1"
+                               MOVE   CONST-SKJFTN-NANBYO
                                          TO  TSKJFTN-SRYCD(IDXD)
-                       MOVE   WRK-SKJ-TEN-SKJFTN-IPN
+                               MOVE   WRK-SKJ-TEN-SKJFTN-NANBYO
                                          TO  TSKJFTN-MONEY(IDXD)
+                           WHEN   "2"
+                               MOVE   CONST-SKJFTN-SEISHIN
+                                         TO  TSKJFTN-SRYCD(IDXD)
+                               MOVE   WRK-SKJ-TEN-SKJFTN-SEISHIN
+                                         TO  TSKJFTN-MONEY(IDXD)
+                           WHEN   OTHER
+                               MOVE   CONST-SKJFTN-IPN
+                                         TO  TSKJFTN-SRYCD(IDXD)
+                               MOVE   WRK-SKJ-TEN-SKJFTN-IPN
+                                         TO  TSKJFTN-MONEY(IDXD)
+                           END-EVALUATE
+                       WHEN   OTHER
+                           MOVE   CONST-SKJFTN-IPN
+                                         TO  TSKJFTN-SRYCD(IDXD)
+                           MOVE   WRK-SKJ-TEN-SKJFTN-IPN
+                                         TO  TSKJFTN-MONEY(IDXD)
+                       END-EVALUATE
                    END-EVALUATE
                END-IF
              END-IF
@@ -3152,6 +3544,14 @@
            PERFORM 900-TENSU-KEY-SEL-SEC
            IF    ( FLG-TENSU           =   ZERO )
                MOVE    TNS-TEN         TO  WRK-LIFE-TEN-SYOKUDO
+           END-IF
+      *
+           IF    ( HCM34S01-SANTEIYM  >=   CONST-H2804 )
+      *        入院時生活療養（１）食事療養（流動食）
+               MOVE    CONST-LIFE-RYOYO1-RDS
+                                       TO  WRK-TNS-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TEN         TO  WRK-LIFE-TEN-RYOYO1-RDS
            END-IF
       *
            .
@@ -3241,9 +3641,135 @@
       *****************************************************************
        200111-SYOKUJI-SRYCD-GET-SEC    SECTION.
       *
-      *
            INITIALIZE                      WRK-SKJ-SRYCD-G
            MOVE    ZERO                TO  IDX5
+      *
+           IF    ( HCM34S01-SANTEIYM  >=   CONST-H2804 )
+               PERFORM 2002-H28-SYOKUJI-SRYCD-GET-SEC
+           ELSE
+               PERFORM 2002-SYOKUJI-SRYCD-GET-SEC
+           END-IF
+      *
+           PERFORM VARYING IDX5    FROM    1   BY  1
+                   UNTIL ( IDX5    >   5 )
+               IF    ( WRK-SKJ-SRYCD (IDX5)    NOT =   SPACE )
+                   MOVE    WRK-SKJ-SRYCD (IDX5)    TO  WRK-SRYCD-NUM
+                   COMPUTE WRK-SKJ-SRYCDTOTAL  =   WRK-SKJ-SRYCDTOTAL
+                                               +   WRK-SRYCD-NUM
+               END-IF
+           END-PERFORM
+      *
+           .
+       200111-SYOKUJI-SRYCD-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    食事療行為コード取得処理
+      *****************************************************************
+       2002-H28-SYOKUJI-SRYCD-GET-SEC      SECTION.
+      *
+           IF    ( FLG-EXSYOKUJI       =   ZERO )
+               EVALUATE    FLG-SKJZAIPTN
+               WHEN    ZERO
+                   EVALUATE    NACCT-DAY (IDXD)
+                   WHEN  1
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *
+      *                    入院時食事療養（１）
+                           PERFORM 2001111-SKJ-RYOYO1-SET-SEC
+      *
+      *                    食堂加算
+                           PERFORM 2001111-SKJ-SYOKUDO-SET-SEC
+                       WHEN  2
+      *
+      *                    入院時食事療養（２）
+                           PERFORM 2001111-SKJ-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN  2
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *                    入院時食事療養（１）
+                           PERFORM 2001111-SKJ-RYOYO1-SET-SEC
+      *
+      *                    特別食加算
+                           PERFORM 2001111-SKJ-TOKSYOKU-SET-SEC
+      *
+      *                    食堂加算
+                           PERFORM 2001111-SKJ-SYOKUDO-SET-SEC
+                       WHEN    2
+      *                    入院時食事療養（２）
+                           PERFORM 2001111-SKJ-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN  3
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *                    入院時食事療養（１）（流動食）
+                           PERFORM 2001111-SKJ-RYOYO1-RDS-SET-SEC
+      *
+      *                    食堂加算
+                           PERFORM 2001111-SKJ-SYOKUDO-SET-SEC
+                       WHEN  2
+      *                    入院時食事療養（２）（流動食）
+                           PERFORM 2001111-SKJ-RYOYO2-RDS-SET-SEC
+                       END-EVALUATE
+      *
+                   END-EVALUATE
+               WHEN  2
+                   PERFORM 2001111-SKJ-SKJFTN-SET-SEC
+               END-EVALUATE
+           ELSE
+               EVALUATE    FLG-SKJZAIPTN
+               WHEN    ZERO
+      *
+                   IF    ( NACCT-DAY (IDXD)    =   1  OR 2 OR 3)
+                       EVALUATE    WRK-SKJCOMMENTCD
+                       WHEN    CONST-SKJ-ASA
+                           PERFORM 2001111-SKJ-ASA-SET-SEC
+                       WHEN    CONST-SKJ-HIRU
+                           PERFORM 2001111-SKJ-HIRU-SET-SEC
+                       WHEN    CONST-SKJ-YUU
+                           PERFORM 2001111-SKJ-YUU-SET-SEC
+                       END-EVALUATE
+                   END-IF
+                   EVALUATE    NACCT-DAY (IDXD)
+                   WHEN  1
+      *
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+                           PERFORM 2001111-SKJ-RYOYO1-SET-SEC
+      *
+                       WHEN    2
+                           PERFORM 2001111-SKJ-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN    2
+                       PERFORM 2001111-SKJ-RYOYO1-SET-SEC
+                       PERFORM 2001111-SKJ-TOKSYOKU-SET-SEC
+                   WHEN    3
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+                           PERFORM 2001111-SKJ-RYOYO1-RDS-SET-SEC
+                       WHEN    2
+                           PERFORM 2001111-SKJ-RYOYO2-RDS-SET-SEC
+                       END-EVALUATE
+                   END-EVALUATE
+               WHEN    1
+                   IF    ( WRK-SHOKUJIRYOYO    =   1 )
+                    AND  ( NACCT-DAY (IDXD)    =   1  OR 2 OR 3 )
+                       PERFORM 2001111-SKJ-SYOKUDO-SET-SEC
+                   END-IF
+               WHEN    2
+                   PERFORM 2001111-SKJ-SKJFTN-SET-SEC
+               END-EVALUATE
+           END-IF
+      *
+           .
+       2002-H28-SYOKUJI-SRYCD-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    食事療行為コード取得処理
+      *****************************************************************
+       2002-SYOKUJI-SRYCD-GET-SEC      SECTION.
       *
            IF    ( FLG-EXSYOKUJI       =   ZERO )
                EVALUATE    FLG-SKJZAIPTN
@@ -3352,17 +3878,8 @@
                END-EVALUATE
            END-IF
       *
-           PERFORM VARYING IDX5    FROM    1   BY  1
-                   UNTIL ( IDX5    >   5 )
-               IF    ( WRK-SKJ-SRYCD (IDX5)    NOT =   SPACE )
-                   MOVE    WRK-SKJ-SRYCD (IDX5)    TO  WRK-SRYCD-NUM
-                   COMPUTE WRK-SKJ-SRYCDTOTAL  =   WRK-SKJ-SRYCDTOTAL
-                                               +   WRK-SRYCD-NUM
-               END-IF
-           END-PERFORM
-      *
            .
-       200111-SYOKUJI-SRYCD-GET-EXT.
+       2002-SYOKUJI-SRYCD-GET-EXT.
            EXIT.
       *****************************************************************
       *    食事朝コメント設定処理
@@ -3420,6 +3937,22 @@
        2001111-SKJ-RYOYO1-SET-EXT.
            EXIT.
       *****************************************************************
+      *    入院時食事療養（１）（流動食）
+      *****************************************************************
+       2001111-SKJ-RYOYO1-RDS-SET-SEC      SECTION.
+      *
+           IF    ( IDX5                <   5 )
+               COMPUTE IDX5    =   IDX5    +   1
+               MOVE    CONST-SKJ-RYOYO1-RDS    TO  WRK-SKJ-SRYCD (IDX5)
+      *
+               COMPUTE WRK-SKJ-ZAITEN
+                   =   WRK-SKJ-ZAITEN      +   WRK-SKJ-TEN-RYOYO1-RDS
+           END-IF
+      *
+           .
+       2001111-SKJ-RYOYO1-RDS-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    入院時食事療養（２）設定処理
       *****************************************************************
        2001111-SKJ-RYOYO2-SET-SEC      SECTION.
@@ -3434,6 +3967,22 @@
       *
            .
        2001111-SKJ-RYOYO2-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院時食事療養（２）（流動食）
+      *****************************************************************
+       2001111-SKJ-RYOYO2-RDS-SET-SEC      SECTION.
+      *
+           IF    ( IDX5                <   5 )
+               COMPUTE IDX5    =   IDX5    +   1
+               MOVE    CONST-SKJ-RYOYO2-RDS    TO  WRK-SKJ-SRYCD (IDX5)
+      *
+               COMPUTE WRK-SKJ-ZAITEN
+                   =   WRK-SKJ-ZAITEN      +   WRK-SKJ-TEN-RYOYO2-RDS
+           END-IF
+      *
+           .
+       2001111-SKJ-RYOYO2-RDS-SET-EXT.
            EXIT.
       *****************************************************************
       *    特別管理加算設定処理
@@ -3557,6 +4106,132 @@
            INITIALIZE                      WRK-SKJ-SRYCD-G
            MOVE    ZERO                TO  IDX5
       *
+           IF    ( HCM34S01-SANTEIYM  >=   CONST-H2804 )
+               PERFORM 2002-H28-SEIKATU-SRYCD-GET-SEC
+           ELSE
+               PERFORM 2002-SEIKATU-SRYCD-GET-SEC
+           END-IF
+      *
+           PERFORM VARYING IDX5    FROM    1   BY  1
+                   UNTIL ( IDX5    >   5 )
+               IF    ( WRK-SKJ-SRYCD (IDX5)    NOT =   SPACE )
+                   MOVE    WRK-SKJ-SRYCD (IDX5)    TO  WRK-SRYCD-NUM
+                   COMPUTE WRK-SKJ-SRYCDTOTAL  =   WRK-SKJ-SRYCDTOTAL
+                                               +   WRK-SRYCD-NUM
+               END-IF
+           END-PERFORM
+      *
+           .
+       200111-SEIKATU-SRYCD-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    生活療行為コード取得処理
+      *****************************************************************
+       2002-H28-SEIKATU-SRYCD-GET-SEC      SECTION.
+      *
+           IF    ( FLG-EXSYOKUJI       =   ZERO )
+               EVALUATE    FLG-SKJZAIPTN
+               WHEN    ZERO
+                   EVALUATE    NACCT-DAY (IDXD)
+                   WHEN  1
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *
+      *                    入院時生活療養（１）
+                           PERFORM 2001111-LIFE-RYOYO1-SET-SEC
+      *
+      *                    食堂加算
+                           PERFORM 2001111-LIFE-SYOKUDO-SET-SEC
+                       WHEN  2
+      *
+      *                    入院時生活療養（２）
+                           PERFORM 2001111-LIFE-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN  2
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *                    入院時生活療養（１）
+                           PERFORM 2001111-LIFE-RYOYO1-SET-SEC
+      *
+      *                    特別食加算
+                           PERFORM 2001111-LIFE-TOKSYOKU-SET-SEC
+      *
+      *                    食堂加算
+                           PERFORM 2001111-LIFE-SYOKUDO-SET-SEC
+                       WHEN  2
+      *                    入院時生活療養（２）
+                           PERFORM 2001111-LIFE-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN  3
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+      *                    入院時生活療養（１）（流動食）
+                           PERFORM 2001111-LIFE-RYOYO1-RDS-SET-SEC
+      *                    食堂加算
+                           PERFORM 2001111-LIFE-SYOKUDO-SET-SEC
+                       WHEN  2
+      ***                  実際は無いパターンなので、（２）を設定しておく
+      *                    入院時生活療養（２）
+                           PERFORM 2001111-LIFE-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   END-EVALUATE
+               WHEN    2
+                   PERFORM 2002-LIFE-SKJFTN-SET-SEC
+               END-EVALUATE
+           ELSE
+               EVALUATE    FLG-SKJZAIPTN
+               WHEN    ZERO
+      *
+                   IF    ( NACCT-DAY (IDXD)    =   1  OR 2 )
+                       EVALUATE    WRK-SKJCOMMENTCD
+                       WHEN    CONST-SKJ-ASA
+                           PERFORM 2001111-SKJ-ASA-SET-SEC
+                       WHEN    CONST-SKJ-HIRU
+                           PERFORM 2001111-SKJ-HIRU-SET-SEC
+                       WHEN    CONST-SKJ-YUU
+                           PERFORM 2001111-SKJ-YUU-SET-SEC
+                       END-EVALUATE
+                   END-IF
+      *
+                   EVALUATE    NACCT-DAY (IDXD)
+                   WHEN  1
+      *
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+                           PERFORM 2001111-LIFE-RYOYO1-SET-SEC
+      *
+                       WHEN    2
+                           PERFORM 2001111-LIFE-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   WHEN    2
+                       PERFORM 2001111-LIFE-RYOYO1-SET-SEC
+                       PERFORM 2001111-LIFE-TOKSYOKU-SET-SEC
+                   WHEN    3
+                       EVALUATE    WRK-SHOKUJIRYOYO
+                       WHEN    1
+                           PERFORM 2001111-LIFE-RYOYO1-RDS-SET-SEC
+                       WHEN    2
+                           PERFORM 2001111-LIFE-RYOYO2-SET-SEC
+                       END-EVALUATE
+                   END-EVALUATE
+               WHEN    1
+                   IF    ( WRK-SHOKUJIRYOYO    =   1 )
+                    AND  ( NACCT-DAY (IDXD)    =   1  OR 2 OR 3)
+                       PERFORM 2001111-LIFE-SYOKUDO-SET-SEC
+                   END-IF
+               WHEN    2
+                   PERFORM 2002-LIFE-SKJFTN-SET-SEC
+               END-EVALUATE
+           END-IF
+      *
+           .
+       2002-H28-SEIKATU-SRYCD-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    生活療行為コード取得処理
+      *****************************************************************
+       2002-SEIKATU-SRYCD-GET-SEC      SECTION.
+      *
            IF    ( FLG-EXSYOKUJI       =   ZERO )
                EVALUATE    FLG-SKJZAIPTN
                WHEN    ZERO
@@ -3588,7 +4263,7 @@
       *
                    END-EVALUATE
                WHEN    2
-                   PERFORM 2001111-LIFE-SKJFTN-SET-SEC
+                   PERFORM 2002-LIFE-SKJFTN-SET-SEC
                END-EVALUATE
            ELSE
                EVALUATE    FLG-SKJZAIPTN
@@ -3625,21 +4300,12 @@
                        PERFORM 2001111-LIFE-SYOKUDO-SET-SEC
                    END-IF
                WHEN    2
-                   PERFORM 2001111-LIFE-SKJFTN-SET-SEC
+                   PERFORM 2002-LIFE-SKJFTN-SET-SEC
                END-EVALUATE
            END-IF
       *
-           PERFORM VARYING IDX5    FROM    1   BY  1
-                   UNTIL ( IDX5    >   5 )
-               IF    ( WRK-SKJ-SRYCD (IDX5)    NOT =   SPACE )
-                   MOVE    WRK-SKJ-SRYCD (IDX5)    TO  WRK-SRYCD-NUM
-                   COMPUTE WRK-SKJ-SRYCDTOTAL  =   WRK-SKJ-SRYCDTOTAL
-                                               +   WRK-SRYCD-NUM
-               END-IF
-           END-PERFORM
-      *
            .
-       200111-SEIKATU-SRYCD-GET-EXT.
+       2002-SEIKATU-SRYCD-GET-EXT.
            EXIT.
       *****************************************************************
       *    入院時生活療養（１）設定処理
@@ -3657,6 +4323,23 @@
       *
            .
        2001111-LIFE-RYOYO1-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院時生活療養（１）（流動食）設定処理
+      *****************************************************************
+       2001111-LIFE-RYOYO1-RDS-SET-SEC     SECTION.
+      *
+           IF    ( IDX5                <   5 )
+               COMPUTE IDX5    =   IDX5    +   1
+               MOVE    CONST-LIFE-RYOYO1-RDS   TO  WRK-SKJ-SRYCD (IDX5)
+                                               WRK-SRYCD-NUM
+      *
+               COMPUTE WRK-SKJ-ZAITEN
+                   =   WRK-SKJ-ZAITEN      +   WRK-LIFE-TEN-RYOYO1-RDS
+           END-IF
+      *
+           .
+       2001111-LIFE-RYOYO1-RDS-SET-EXT.
            EXIT.
       *****************************************************************
       *    入院時生活療養（２）設定処理
@@ -3723,7 +4406,7 @@
       *****************************************************************
       *    患者食事負担設定処理
       *****************************************************************
-       2001111-LIFE-SKJFTN-SET-SEC     SECTION.
+       2002-LIFE-SKJFTN-SET-SEC     SECTION.
       *
            IF    ( HCM34S01-HKNNUM(1:2)            =   "98" )
              OR  ( LNK-NYULIFE-SKJFTN-SRYCD (IDXD) =   SPACE )
@@ -3743,7 +4426,7 @@
       *
       *
            .
-       2001111-LIFE-SKJFTN-SET-EXT.
+       2002-LIFE-SKJFTN-SET-EXT.
            EXIT.
       *****************************************************************
       *    食事基本情報設定処理
@@ -4119,10 +4802,25 @@
                        =   WSKJH1804-CNT-SKJRYOYO1
                        +   1
                END-IF
+      *
                IF    ( WRK-SKJ-SRYCD (IDXF)
-                                       =   CONST-SKJ-RYOYO2 )
+                                           =   CONST-SKJ-RYOYO1-RDS )
+                   COMPUTE WSKJH1804-CNT-SKJRYOYO1-RDS
+                       =   WSKJH1804-CNT-SKJRYOYO1-RDS
+                       +   1
+               END-IF
+      *
+               IF    ( WRK-SKJ-SRYCD (IDXF)
+                                           =   CONST-SKJ-RYOYO2 )
                    COMPUTE WSKJH1804-CNT-SKJRYOYO2
                        =   WSKJH1804-CNT-SKJRYOYO2
+                       +   1
+               END-IF
+      *
+               IF    ( WRK-SKJ-SRYCD (IDXF)
+                                           =   CONST-SKJ-RYOYO2-RDS )
+                   COMPUTE WSKJH1804-CNT-SKJRYOYO2-RDS
+                       =   WSKJH1804-CNT-SKJRYOYO2-RDS
                        +   1
                END-IF
                IF    ( WRK-SKJ-SRYCD (IDXF)
@@ -4195,6 +4893,13 @@
                                        =   CONST-LIFE-RYOYO1 )
                    COMPUTE WSKJH1804-CNT-SKJRYOYO1
                        =   WSKJH1804-CNT-SKJRYOYO1
+                       +   1
+               END-IF
+      *
+               IF    ( WRK-SKJ-SRYCD (IDXF)
+                                       =   CONST-LIFE-RYOYO1-RDS )
+                   COMPUTE WSKJH1804-CNT-SKJRYOYO1-RDS
+                       =   WSKJH1804-CNT-SKJRYOYO1-RDS
                        +   1
                END-IF
                IF    ( WRK-SKJ-SRYCD (IDXF)
@@ -4325,11 +5030,26 @@
                MOVE    CONST-SKJ-RYOYO1
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
            END-IF
+      *
+           IF    ( WSKJH1804-CNT-SKJRYOYO1-RDS  >   ZERO )
+               COMPUTE IDXC    =   IDXC  +     1
+               MOVE    WSKJH1804-CNT-SKJRYOYO1-RDS
+                                   TO  WSYOKUJI-SURYO(IDXB IDXC)
+               MOVE    CONST-SKJ-RYOYO1-RDS
+                                   TO  WSYOKUJI-SRYCD(IDXB IDXC)
+           END-IF
            IF    ( WSKJH1804-CNT-SKJRYOYO2     >   ZERO )
                COMPUTE IDXC    =   IDXC  +     1
                MOVE    WSKJH1804-CNT-SKJRYOYO2
                                    TO  WSYOKUJI-SURYO(IDXB IDXC)
                MOVE    CONST-SKJ-RYOYO2
+                                   TO  WSYOKUJI-SRYCD(IDXB IDXC)
+           END-IF
+           IF    ( WSKJH1804-CNT-SKJRYOYO2-RDS     >   ZERO )
+               COMPUTE IDXC    =   IDXC  +     1
+               MOVE    WSKJH1804-CNT-SKJRYOYO2-RDS
+                                   TO  WSYOKUJI-SURYO(IDXB IDXC)
+               MOVE    CONST-SKJ-RYOYO2-RDS
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
            END-IF
            IF    ( WSKJH1804-CNT-TOKSYOKU      >   ZERO )
@@ -4392,6 +5112,14 @@
                MOVE    WSKJH1804-CNT-SKJRYOYO1
                                    TO  WSYOKUJI-SURYO(IDXB IDXC)
                MOVE    CONST-LIFE-RYOYO1
+                                   TO  WSYOKUJI-SRYCD(IDXB IDXC)
+           END-IF
+      *
+           IF    ( WSKJH1804-CNT-SKJRYOYO1-RDS >   ZERO )
+               COMPUTE IDXC    =   IDXC  +     1
+               MOVE    WSKJH1804-CNT-SKJRYOYO1-RDS
+                                   TO  WSYOKUJI-SURYO(IDXB IDXC)
+               MOVE    CONST-LIFE-RYOYO1-RDS
                                    TO  WSYOKUJI-SRYCD(IDXB IDXC)
            END-IF
            IF    ( WSKJH1804-CNT-SKJRYOYO2     >   ZERO )
@@ -5325,11 +6053,11 @@
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          NOT =   ZERO )
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+           ELSE
                MOVE    1               TO  FLG-TENSU
                INITIALIZE                  TNS-TENSU-REC
-           ELSE
-               MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
            END-IF
       *
            MOVE    "tbl_tensu"         TO  MCP-TABLE

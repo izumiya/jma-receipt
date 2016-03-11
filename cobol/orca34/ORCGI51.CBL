@@ -2974,6 +2974,8 @@
                    MOVE    "2029"      TO  SPA-ERRCD
                WHEN    30
                    MOVE    "2030"      TO  SPA-ERRCD
+               WHEN    31
+                   MOVE    "2031"      TO  SPA-ERRCD
                WHEN    101
                    MOVE    "2101"      TO  SPA-ERRCD
                WHEN    OTHER
@@ -4069,6 +4071,14 @@
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
                        "保険組合せの数が多すぎます"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2031"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                "入院時生活療養（２）算定時に流動食の入力があります"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

@@ -158,6 +158,13 @@
                                            DELIMITED   BY  SPACE
                INTO    WRK-MSG
                END-STRING
+           WHEN    31
+               STRING  "入院時生活療養（２）算定時に流動食"
+                                           DELIMITED   BY  SIZE
+                       "の入力があります"
+                                           DELIMITED   BY  SIZE
+               INTO    WRK-MSG
+               END-STRING
            WHEN    101
                STRING  "包括入院期間に算定できない入院料加算"
                                            DELIMITED   BY  SIZE
