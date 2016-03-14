@@ -2666,7 +2666,7 @@
       *
            INITIALIZE                      NYUINCDCHG-REC
            MOVE    HSPTINFMREQ-KHNCD   TO  NYUINCDCHG-SRYCD-BF
-           MOVE    REG-NYUINYMD        TO  NYUINCDCHG-YUKOSTYMD
+           MOVE    WRK-KJNYMD          TO  NYUINCDCHG-YUKOSTYMD
                                            NYUINCDCHG-YUKOEDYMD
            MOVE    NYUINCDCHG-REC      TO  MCPDATA-REC
            MOVE    "tbl_nyuincdchg"    TO  MCP-TABLE

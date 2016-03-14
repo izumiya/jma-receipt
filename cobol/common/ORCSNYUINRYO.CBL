@@ -82,6 +82,7 @@
       *
        01  CONST-AREA.
            03  CONST-NYUIN                 PIC X(02)   VALUE "01".
+           03  CONST-H280401               PIC X(08)   VALUE "20160401".
            03  CONST-H261001               PIC X(08)   VALUE "20141001".
            03  CONST-H260401               PIC X(08)   VALUE "20140401".
            03  CONST-H241001               PIC X(08)   VALUE "20121001".
@@ -90,217 +91,10 @@
            03  CONST-H200401               PIC X(08)   VALUE "20080401".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
-           03  CONST-TOK-LIFECD-G.
-               05  CONST-TOK-LIFECD-VAL.
-                   07  FILLER              PIC X(03)   VALUE   "213".
-                   07  FILLER              PIC X(03)   VALUE   "216".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "218".
-                   07  FILLER              PIC X(03)   VALUE   "219".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "220".
-                   07  FILLER              PIC X(03)   VALUE   "221".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "227".
-                   07  FILLER              PIC X(03)   VALUE   "228".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "229".
-                   07  FILLER              PIC X(03)   VALUE   "230".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "231".
-                   07  FILLER              PIC X(03)   VALUE   "232".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "302".
-                   07  FILLER              PIC X(03)   VALUE   "349".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "321".
-                   07  FILLER              PIC X(03)   VALUE   "350".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "325".
-                   07  FILLER              PIC X(03)   VALUE   "337".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "326".
-                   07  FILLER              PIC X(03)   VALUE   "338".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "327".
-                   07  FILLER              PIC X(03)   VALUE   "339".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "328".
-                   07  FILLER              PIC X(03)   VALUE   "340".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "329".
-                   07  FILLER              PIC X(03)   VALUE   "341".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "330".
-                   07  FILLER              PIC X(03)   VALUE   "342".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "331".
-                   07  FILLER              PIC X(03)   VALUE   "343".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "332".
-                   07  FILLER              PIC X(03)   VALUE   "344".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "333".
-                   07  FILLER              PIC X(03)   VALUE   "345".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "334".
-                   07  FILLER              PIC X(03)   VALUE   "346".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "335".
-                   07  FILLER              PIC X(03)   VALUE   "347".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "336".
-                   07  FILLER              PIC X(03)   VALUE   "348".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "323".
-                   07  FILLER              PIC X(03)   VALUE   "351".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "352".
-                   07  FILLER              PIC X(03)   VALUE   "353".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "363".
-                   07  FILLER              PIC X(03)   VALUE   "364".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "365".
-                   07  FILLER              PIC X(03)   VALUE   "366".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "367".
-                   07  FILLER              PIC X(03)   VALUE   "368".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "369".
-                   07  FILLER              PIC X(03)   VALUE   "370".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "371".
-                   07  FILLER              PIC X(03)   VALUE   "372".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "373".
-                   07  FILLER              PIC X(03)   VALUE   "374".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "375".
-                   07  FILLER              PIC X(03)   VALUE   "376".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "377".
-                   07  FILLER              PIC X(03)   VALUE   "378".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "379".
-                   07  FILLER              PIC X(03)   VALUE   "380".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "381".
-                   07  FILLER              PIC X(03)   VALUE   "382".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "383".
-                   07  FILLER              PIC X(03)   VALUE   "384".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "385".
-                   07  FILLER              PIC X(03)   VALUE   "386".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "387".
-                   07  FILLER              PIC X(03)   VALUE   "388".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "397".
-                   07  FILLER              PIC X(03)   VALUE   "398".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "399".
-                   07  FILLER              PIC X(03)   VALUE   "39A".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39B".
-                   07  FILLER              PIC X(03)   VALUE   "39C".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39D".
-                   07  FILLER              PIC X(03)   VALUE   "39E".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39F".
-                   07  FILLER              PIC X(03)   VALUE   "39G".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39H".
-                   07  FILLER              PIC X(03)   VALUE   "39I".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39J".
-                   07  FILLER              PIC X(03)   VALUE   "39K".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39L".
-                   07  FILLER              PIC X(03)   VALUE   "39M".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39N".
-                   07  FILLER              PIC X(03)   VALUE   "39O".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39P".
-                   07  FILLER              PIC X(03)   VALUE   "39Q".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39R".
-                   07  FILLER              PIC X(03)   VALUE   "39S".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39T".
-                   07  FILLER              PIC X(03)   VALUE   "39U".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39V".
-                   07  FILLER              PIC X(03)   VALUE   "39W".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39X".
-                   07  FILLER              PIC X(03)   VALUE   "39Y".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "39Z".
-                   07  FILLER              PIC X(03)   VALUE   "3A0".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3A1".
-                   07  FILLER              PIC X(03)   VALUE   "3A2".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3A3".
-                   07  FILLER              PIC X(03)   VALUE   "3A4".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3A5".
-                   07  FILLER              PIC X(03)   VALUE   "3A6".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3A7".
-                   07  FILLER              PIC X(03)   VALUE   "3A8".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3A9".
-                   07  FILLER              PIC X(03)   VALUE   "3AA".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AB".
-                   07  FILLER              PIC X(03)   VALUE   "3AC".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AD".
-                   07  FILLER              PIC X(03)   VALUE   "3AE".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AF".
-                   07  FILLER              PIC X(03)   VALUE   "3AG".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AL".
-                   07  FILLER              PIC X(03)   VALUE   "3AM".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AN".
-                   07  FILLER              PIC X(03)   VALUE   "3AO".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AP".
-                   07  FILLER              PIC X(03)   VALUE   "3AQ".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AR".
-                   07  FILLER              PIC X(03)   VALUE   "3AS".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "3AW".
-                   07  FILLER              PIC X(03)   VALUE   "3AX".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "241".
-                   07  FILLER              PIC X(03)   VALUE   "242".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "243".
-                   07  FILLER              PIC X(03)   VALUE   "244".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "245".
-                   07  FILLER              PIC X(03)   VALUE   "246".
-      *
-                   07  FILLER              PIC X(03)   VALUE   "247".
-                   07  FILLER              PIC X(03)   VALUE   "248".
-               05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS   67.
-                       09  CONST-TOK-LIFECD-IPN
-                                           PIC X(03).
-                       09  CONST-TOK-LIFECD-LIFE
-                                           PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   67.
            03  CONST-KANSATU               PIC X(02)    VALUE "10".
            03  CONST-TOKNYUIN-MAX          PIC 9(05)   VALUE  100.
+      *
+           COPY    "CPRYOYOCD.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -413,7 +207,7 @@
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
            MOVE    "5002"              TO  SYS-KANRICD
-           MOVE    SNYUINRYO-BRMNUM    TO  SYS-KBNCD(1:2)
+           MOVE    SNYUINRYO-BTUNUM    TO  SYS-KBNCD(1:2)
            MOVE    SBRMNUM-OT-BRMNUM   TO  SYS-KBNCD(3:6)
            MOVE    SNYUINRYO-SRYYMD    TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
@@ -555,23 +349,51 @@
                PERFORM 20011-RYOYOKHN-EDIT-SEC
            END-IF
       *
+           IF    ( SYS-5001-BTU-SBT    =   "04" )
+            AND  ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+               PERFORM 20011-RYOYOIPN-EDIT-SEC
+           END-IF
+      *
            IF    ( SYS-5001-BTU-TOKTEI-NYUIN   NOT =   SPACE )
                EVALUATE    TRUE
                WHEN  ( SYS-5001-BTU-TOKTEI-NYUIN
                            =   "01" OR "02" OR "14"
                             OR "17" OR "26" )
-                   IF    ( AGECHK-NENREI2-YY   <   15 )
+                   EVALUATE    TRUE
+                   WHEN  ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+                    AND  ( AGECHK-NENREI2-YY   <   20 )
+                   WHEN  ( SNYUINRYO-SRYYMD    <   CONST-H280401 )
+                    AND  ( AGECHK-NENREI2-YY   <   15 )
                        MOVE    "2"         TO  WRK-TOKNYUIN-KBN
                        MOVE    SYS-5001-BTU-TOKTEI-NYUIN
                                            TO  WRK-TOKNYUIN-CD
                        PERFORM 2002-NYUINRYO-EDIT-SEC
-                   END-IF
+                   END-EVALUATE
                WHEN    OTHER
                    MOVE    "2"         TO  WRK-TOKNYUIN-KBN
                    MOVE    SYS-5001-BTU-TOKTEI-NYUIN
                                        TO  WRK-TOKNYUIN-CD
                    PERFORM 2002-NYUINRYO-EDIT-SEC
                END-EVALUATE
+      *
+               IF    ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "03" )
+                       MOVE    "49"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "50"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "04" )
+                       MOVE    "51"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "52"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+               END-IF
       *
                IF    ( SYS-5001-BTU-TOKTEI-NYUIN   =   "11" )
                 AND  ( SNYUINRYO-SYORIKBN      NOT =   CONST-NYUIN )
@@ -628,6 +450,55 @@
                    PERFORM 2002-NYUINRYO-EDIT-SEC
                END-EVALUATE
       *
+               IF    ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+                   IF    ( SYS-5002-BRM-TOKTEI-NYUIN
+                                           =   "01" )
+                       MOVE    "BT"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "BU"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+               END-IF
+      *
+           END-IF
+      *
+           IF    ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+               IF    ( SYS-5001-BTU-SBT    =   "05" )
+                   IF    ( SYS-5001-BTU-KHNSRYCD   =   "190126310" )
+                       MOVE    "BK"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "BL"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+                   IF    ( SYS-5001-BTU-KHNSRYCD   =   "190093710" )
+                       MOVE    "BM"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "BN"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+                   IF    ( SYS-5001-BTU-KHNSRYCD   =   "190093810" )
+                       MOVE    "BO"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "BP"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+                   IF    ( SYS-5001-BTU-KHNSRYCD   =   "190093910" )
+                       MOVE    "BQ"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                       MOVE    "BR"        TO  WRK-TOKNYUIN-CD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 2002-NYUINRYO-EDIT-SEC
+                   END-IF
+               END-IF
            END-IF
       *
            IF    ( SNYUINRYO-SRYYMD >=   CONST-H240401 )
@@ -966,6 +837,46 @@
       *
            .
        20011-RYOYOKHN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    療養・一般病棟入院基本料編集処理
+      *****************************************************************
+       20011-RYOYOIPN-EDIT-SEC        SECTION.
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5111"          TO  SYS-KANRICD
+           MOVE    SNYUINRYO-SRYYMD TO SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY23-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+           PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
+      *
+               MOVE    1           TO  FLG-TARGET
+      *
+               IF    ( SYS-5111-BRM-NYUINRYOKBN    =   "12" )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO    TO  FLG-TARGET
+               END-IF
+      *
+               IF    ( FLG-TARGET  =   1 )
+                   MOVE    "3"             TO  WRK-TOKNYUIN-KBN
+                   MOVE    SYS-5111-KBNCD  TO  WRK-TOKNYUIN-CD
+                   PERFORM 2002-NYUINRYO-EDIT-SEC
+               END-IF
+      *
+               PERFORM 900-SYSKANRI-KEY23-FET-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           . 
+       20011-RYOYOIPN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    入院料編集処理
