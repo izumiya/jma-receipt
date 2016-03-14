@@ -3266,6 +3266,12 @@
                                        DELIMITED   BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0515"
+                   STRING  "凍結保存同種組織加算の"
+                           "算定できない手術です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"

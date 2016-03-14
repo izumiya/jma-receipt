@@ -219,7 +219,7 @@
       *    深夜
            03  FILLER              PIC X(14)   VALUE   "2310 113021070".
       *    時間外特例
-           03  FILLER              PIC X(14)   VALUE   "2410 112021170".
+           03  FILLER              PIC X(14)   VALUE   "2410 113021170".
       *    夜間（時間外）加算
            03  FILLER              PIC X(14)   VALUE   "2510 113021270".
       *    休日
