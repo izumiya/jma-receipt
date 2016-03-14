@@ -28,7 +28,7 @@
       * 01.00.04     NACL-多々納  04/03/08  時間外加算特例乳幼児加算追加
       * 01.00.05     NACL-多々納  05/12/26  急性発生日追加（入院）
       * 03.05.01     NACL-多々納  07/07/18  皮下筋肉注射料変換選択
-      * 04.08.01     NACL-多々納  16/03/XX  終了区分追加
+      * 04.08.01     NACL-多々納  16/03/XX  終了区分等追加
       ************************************************************
       *
        01  ORCSC00AREA.
@@ -253,6 +253,9 @@
                        09  LNK-ORCSC-SURYO         PIC 9(05)V9(05).
                        09  LNK-ORCSC-SRYCD-KS      PIC X(09).
                        09  LNK-ORCSC-TENSU-KS      PIC 9(05)V9(05).
+      *H28.4 追加
+                       09  LNK-ORCSC-SRYCD-KS2     PIC X(09).
+                       09  LNK-ORCSC-TENSU-KS2     PIC 9(05)V9(05).
                        09  LNK-ORCSC-ATAI-G.
                            11  LNK-ORCSC-ATAI   PIC X(08) OCCURS  5.
       *                入院時の回数

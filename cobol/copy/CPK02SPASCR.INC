@@ -441,6 +441,10 @@
                        09  SPA-COM-ROSAIKBN        PIC  X(01).
       *                労災　四肢加算
                        09  SPA-COM-SISIKSN         PIC  X(01).
+      *                非侵襲的血行動態モニタリング加算
+                       09  SPA-COM-HISINKSN        PIC  X(01).
+      *                凍結保存同種組織加算
+                       09  SPA-COM-TOUKETUHOZONKSN PIC  X(01).
       *
       *    点数マスタ付加情報より
       *                採血区分

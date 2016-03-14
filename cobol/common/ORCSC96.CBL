@@ -3254,6 +3254,18 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K542"
+                   STRING  "警告！非侵襲的血行動態モニタリング加算の"
+                           "算定できる手術の算定がありません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K543"
+                   STRING  "警告！非侵襲的血行動態モニタリング加算の"
+                           "算定できる麻酔の算定がありません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"

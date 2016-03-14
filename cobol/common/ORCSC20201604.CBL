@@ -4162,7 +4162,7 @@
            IF     (FLG-ERR             =   ZERO )
              AND  (FLG-GENERIC-OK      =   1    )
                IF     (FLG-GENERIC-NO      =   1 )
-                  OR  (CNT-GENERIC         <=  2 )
+                  OR  (CNT-GENERIC         <   2 )
       *            一般名表示なし有
                    MOVE    "120003570"         TO  WRK-SRYCD
                    MOVE    "120004270"         TO  WRK-SRYCD2

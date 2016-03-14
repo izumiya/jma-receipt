@@ -4127,7 +4127,7 @@
                MOVE    ZERO            TO  SPA-COM-YCOMKBN (IDX-T)
            END-IF
       *Ｈ２６年４月から
-      *    v4.7 はYOBI1 V4.8は追加
+      *    v4.7,4.8 はYOBI1 V4.9は追加
       *    副鼻腔手術用内視鏡加算
            MOVE    TNS-FUKUBIKUNAIKBN  TO  SPA-COM-YOBI1 (IDX-T)(2:1)
       *    副鼻腔切除機器加算
@@ -4148,6 +4148,11 @@
       *    労災算定不可
            MOVE    TNS-ROSAIKBN        TO  SPA-COM-ROSAIKBN (IDX-T)
            MOVE    TNS-SISIKSN         TO  SPA-COM-SISIKSN  (IDX-T)
+      *    非侵襲的血行動態モニタリング加算
+           MOVE    TNS-HISINSYUMONITORKSN  TO  SPA-COM-HISINKSN(IDX-T)
+      *    凍結保存同種組織加算
+           MOVE    TNS-TOUKETUHOZONKSN TO  SPA-COM-TOUKETUHOZONKSN
+                                                             (IDX-T)
       *
       *    点数マスタ付加情報より編集
            PERFORM 3006-TENSUPLUS-HEN-SEC
@@ -4162,10 +4167,9 @@
              AND  (LNK-SC92-PG     NOT =   "K05")
                PERFORM 3008-PTKINKI-CHK-SEC
            END-IF
-      *TEST
-      *TEST
+      *
       *H24.4
-      *    処方箋一般名記載区分（告示識別区分を使用）
+      *    処方箋一般名記載区分
            IF      SPA-SRYYMD          >=  "20120401"
                IF     (TNS-SRYCD(1:1)      =   "6"  )
                  AND ((TNS-KOUHATUKBN      =   1  OR  2 )  OR
@@ -4174,17 +4178,12 @@
       *            後発品・後発のある先発品の最低薬価
                    IF      TNSP-IPN-KISAIKBN   =   1
                                                OR  3
-      *ver.4.7.0
-      ***********      MOVE    9               TO  SPA-COM-KOKUJISKBKBN2
-      **********                                               (IDX-T)
                        MOVE    1               TO  SPA-COM-IPN-KISAIKBN
                                                                (IDX-T)
                    END-IF
-      *            最低金額の編集（きざみ値を流用する）ver.4.7は追加）
+      *            最低金額の編集
       *            最低薬価編集
                    PERFORM 300001-GENERICPRICE-CHEK-SEC
-      *ver.4.7.0
-      ************ MOVE    WRK-CHKTEN      TO  SPA-COM-KZMTEN (IDX-T)
                    MOVE    WRK-CHKTEN      TO  SPA-COM-GEN-PRICE(IDX-T)
       *
                END-IF
