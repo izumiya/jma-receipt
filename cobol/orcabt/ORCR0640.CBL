@@ -707,6 +707,9 @@
       *  04.08.12    NACL-門脇    16/02/08  RECE62の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正。
       *                                     第３第４公費の括弧再掲記載対応
+      *  04.08.13    NACL-門脇    16/03/15  第三者行為現物給付時の
+      *                                     請求額情報（食事）編集修正
+      *  04.08.14    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3926,9 +3929,43 @@
       *    第三者行為の院外処方の有無チェック
            PERFORM     211B1-DAISAN-CHECK2-SEC
       *
+      *    保険組み合わせの公費チェック（生保まとめ）
+           IF    IDZ              =   1
+           AND   RECE62-SEIHOFLG  =  "1"
+              PERFORM  211C-SEIHO-HKNCOMBI-CHECK-SEC
+           END-IF
+      *
            PERFORM     RECE62-REWRITE-SEC
            .
        210-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせの公費チェック（生保まとめ）
+      *****************************************************************
+       211C-SEIHO-HKNCOMBI-CHECK-SEC               SECTION.
+      *
+           PERFORM  VARYING  IDX16  FROM  1  BY  1
+                     UNTIL  (IDX16                  >   10 )
+                      OR    (RECE62-HKNCOMBI(IDX16) =  ZERO)
+      *
+              IF  (RECE62-KOHNUMHC(IDX16 1) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE62-KOHNUMHC(IDX16 2) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE62-KOHNUMHC(IDX16 3) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE62-KOHNUMHC(IDX16 4) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+                 CONTINUE
+              ELSE
+                 MOVE    1    TO    RECE62-YOBIETC(1)
+              END-IF
+      *
+           END-PERFORM
+      *
+           .
+       211C-SEIHO-HKNCOMBI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -23617,8 +23654,14 @@
       *
       *****
       *
-           ADD   SYU-RYOYOHI-SKJ    TO   RECE62-SKYSKJ-RYOYOHI
-           ADD   SYU-RYOYOHI-LIFE   TO   RECE62-SKYSKJ-RYOYOHI
+           IF     SYU-KOH-HKNNUM(1) = "970"
+             COMPUTE  WRK-SKY-KEISAN  =  SYU-SYUSKJ-RYOYOHI
+                                      -  SYU-SYUSKJ-FTN
+             ADD   WRK-SKY-KEISAN     TO   RECE62-SKYSKJ-RYOYOHI
+           ELSE
+             ADD   SYU-RYOYOHI-SKJ    TO   RECE62-SKYSKJ-RYOYOHI
+             ADD   SYU-RYOYOHI-LIFE   TO   RECE62-SKYSKJ-RYOYOHI
+           END-IF
       *
            IF   SYU-SYUHKNNUM   NOT =  SPACE
               ADD      SYU-SYUSKJ-NISSU TO   RECE62-SKYSKJ-KAISU
@@ -23634,20 +23677,28 @@
                                          -   SYU-SYUSKJ-FTN
                 ADD    WRK-SKY-KEISAN   TO   RECE62-SKYSKJ-HOKENJA
       *
-                ADD    SYU-SYUSKJ-FTN   TO   WRK-SKY-SKJ-ICHIBUFTN
+                IF     SYU-KOH-HKNNUM(1) = "970"
+                  CONTINUE
+                ELSE
+                  ADD  SYU-SYUSKJ-FTN   TO   WRK-SKY-SKJ-ICHIBUFTN
       *
-                COMPUTE  WRK-SKY-KEISAN  =   SYU-SKYMONEY-SKJ
-                                         +   SYU-SKYMONEY-LIFE
-                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-FTNMONEY
+                  COMPUTE  WRK-SKY-KEISAN  =   SYU-SKYMONEY-SKJ
+                                           +   SYU-SKYMONEY-LIFE
+                  ADD  WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-FTNMONEY
       *
-                ADD    SYU-SKYMONEY-SKJ TO   RECE62-SKYSKJ-ICHIBUFTN
-                ADD    SYU-SKYMONEY-LIFE
+                  ADD  SYU-SKYMONEY-SKJ TO   RECE62-SKYSKJ-ICHIBUFTN
+                  ADD  SYU-SKYMONEY-LIFE
                                         TO   RECE62-SKYSKJ-ICHIBUFTN
+                END-IF
               END-IF
       *
-              COMPUTE  WRK-SKY-KEISAN  =  SYU-RYOYOHI-SKJ
-                                       +  SYU-RYOYOHI-LIFE
-              ADD      WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-ZENGAKU
+              IF     SYU-KOH-HKNNUM(1) = "970"
+                CONTINUE
+              ELSE
+                COMPUTE  WRK-SKY-KEISAN  =  SYU-RYOYOHI-SKJ
+                                         +  SYU-RYOYOHI-LIFE
+                ADD    WRK-SKY-KEISAN   TO   WRK-SKY-SKJ-ZENGAKU
+              END-IF
            ELSE
               ADD      SYU-KOH1SKJ-NISSU
                                         TO   RECE62-SKYSKJ-KAISU

@@ -422,6 +422,9 @@
       *  04.08.02    NACL-ÌçÏÆ    15/10/05  ÆñÉÂÆÃµ­»ö¹àÂÐ±þ
       *  04.08.03    NACL-ÌçÏÆ    15/10/08  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.08.04    NACL-ÌçÏÆ    16/02/29  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.05    NACL-ÌçÏÆ    16/03/14  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°
+      *                                     ·îÅÓÃæ¼õµë¼Ô¾ÚÊÑ¹¹»þÉéÃ´¶â·×»»
+      *                                     ¿À¸Í»ÔÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -17133,7 +17136,15 @@
            MOVE    "key8"             TO  MCP-PATHNAME
            PERFORM  DB-CLOSE-SEC
       *
-           IF  WK-CHECK-FTNJANUM(3:5)  =  WK-CHECK-FTNJANUM2(3:5)
+           IF ( WK-CHECK-FTNJANUM(3:5)  =  WK-CHECK-FTNJANUM2(3:5) )
+           OR ((WK-CHECK-FTNJANUM(3:5)  =
+                "28401" OR "28402" OR "28403" OR "28405" OR
+                "28406" OR "28407" OR "28408" OR "28409" OR
+                "28410" OR "28411"                         ) AND
+               (WK-CHECK-FTNJANUM2(3:5) =
+                "28401" OR "28402" OR "28403" OR "28405" OR
+                "28406" OR "28407" OR "28408" OR "28409" OR
+                "28410" OR "28411"                         )       )
                MOVE       1           TO  FLG-CHECK-OK
            END-IF
       *
@@ -18177,7 +18188,17 @@
              WHEN      "3"
                  CONTINUE
              WHEN      "4"
-                 IF   WK-HKNJANUM2  =  WK-HKNJANUM
+                 IF ( WK-HKNJANUM2  =  WK-HKNJANUM        )
+                 OR ((WK-HKNJANUM2  =
+                      "284018" OR "284026" OR "284034" OR
+                      "284059" OR "284067" OR "284075" OR
+                      "284083" OR "284091" OR "284109" OR
+                      "284117"                           ) AND
+                     (WK-HKNJANUM   =
+                      "284018" OR "284026" OR "284034" OR
+                      "284059" OR "284067" OR "284075" OR
+                      "284083" OR "284091" OR "284109" OR
+                      "284117"                           ))
                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
                  ELSE
@@ -18185,7 +18206,17 @@
                    PERFORM   220144-KOHFUKA-HENSYU3-SEC
                  END-IF
              WHEN      "5"
-                 IF   WK-HKNJANUM2  =  WK-HKNJANUM
+                 IF ( WK-HKNJANUM2  =  WK-HKNJANUM        )
+                 OR ((WK-HKNJANUM2  =
+                      "284018" OR "284026" OR "284034" OR
+                      "284059" OR "284067" OR "284075" OR
+                      "284083" OR "284091" OR "284109" OR
+                      "284117"                           ) AND
+                     (WK-HKNJANUM   =
+                      "284018" OR "284026" OR "284034" OR
+                      "284059" OR "284067" OR "284075" OR
+                      "284083" OR "284091" OR "284109" OR
+                      "284117"                           ))
                    MOVE   2   TO   FLG-KOHFUKA-HENSYU
                    PERFORM   220142-KOHFUKA-HENSYU1-SEC
                  ELSE

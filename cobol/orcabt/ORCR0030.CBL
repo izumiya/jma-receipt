@@ -736,6 +736,7 @@
       *  04.08.20    NACL-門脇    16/02/08  RECE02の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正。
       *                                     第３第４公費の括弧再掲記載対応
+      *  04.08.21    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4077,9 +4078,43 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *    特記事項０９施有りフラグ編集
            PERFORM     210A-TOKKI09FLG-HENSYU-SEC
       *
+      *    保険組み合わせの公費チェック（生保まとめ）
+           IF    IDZ              =   1
+           AND   RECE02-SEIHOFLG  =  "1"
+              PERFORM  210B-SEIHO-HKNCOMBI-CHECK-SEC
+           END-IF
+      *
            PERFORM     RECE02-REWRITE-SEC
            .
        210-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせの公費チェック（生保まとめ）
+      *****************************************************************
+       210B-SEIHO-HKNCOMBI-CHECK-SEC               SECTION.
+      *
+           PERFORM  VARYING  IDX25  FROM  1  BY  1
+                     UNTIL  (IDX25                  >   10 )
+                      OR    (RECE02-HKNCOMBI(IDX25) =  ZERO)
+      *
+              IF  (RECE02-KOHNUMHC(IDX25 1) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE02-KOHNUMHC(IDX25 2) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE02-KOHNUMHC(IDX25 3) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+              OR  (RECE02-KOHNUMHC(IDX25 4) =
+                   "012" OR "025" OR "015" OR "016" OR "021" OR "053")
+                 CONTINUE
+              ELSE
+                 MOVE    1    TO    RECE02-YOBIETC(1)
+              END-IF
+      *
+           END-PERFORM
+      *
+           .
+       210B-SEIHO-HKNCOMBI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
