@@ -2496,6 +2496,13 @@
                IF      WRK-ERRCD1      NOT =   SPACE
                    MOVE    WRK-ERRCD1          TO  SPA-ERRCD
                END-IF
+      *H28.4   再チェックを行う
+               PERFORM VARYING IDX     FROM    WRK-STR   BY  1
+                       UNTIL   (IDX        >   SPA-MAX-LINE )  OR
+                              ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
+                               (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+                   MOVE    SPACE       TO  SPA-MAE-INPUTCD(IDX)
+               END-PERFORM
       *
       *        診療行為、計計算処理、編集
                MOVE    SPACE           TO  FLG-TOROKU
@@ -9429,7 +9436,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *H28.2
       *    画面ＳＰＡ書込み
            PERFORM 1003-K02SPA-OUT-SEC
-      *
       *!!!!!!
       *    再度、排他のチェック
            IF      SPA-LOCK            =   ZERO
