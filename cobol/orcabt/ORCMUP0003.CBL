@@ -33,6 +33,8 @@
       *                                     対応
       * 04.07.00     NACL-伊藤    14/03/06  点数マスタレイアウト変更
       *                                     対応
+      * 04.08.00     NACL-伊藤    16/03/01  点数マスタレイアウト変更
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1146,7 +1148,17 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****MOVE    ZERO                TO  TNSWK-TIMEMASUIKBN
       *****MOVE    ZERO                TO  TNSWK-DPCKBN
            MOVE    ZERO                TO  TNSWK-TENSU-REC (1095 : 4)
-           MOVE    TNSWK-V05-AREA-02   TO  TNSWK-TENSU-REC (1099 :)
+      *****MOVE    TNSWK-V05-AREA-02   TO  TNSWK-TENSU-REC (1099 :)
+      *2016.03
+      *****MOVE    ZERO                TO  TNSWK-HISINSYUMONITORKSN
+      *****MOVE    ZERO                TO  TNSWK-TOUKETUHOZONKSN
+      *****MOVE    SPACE               TO  TNSWK-KUBUNBANGOU
+      *****MOVE    ZERO                TO  TNSWK-ROSAIKBN
+      *****MOVE    ZERO                TO  TNSWK-SISIKSN
+           MOVE    ZERO                TO  TNSWK-TENSU-REC (1099 : 2)
+           MOVE    SPACE               TO  TNSWK-TENSU-REC (1101 : 30)
+           MOVE    ZERO                TO  TNSWK-TENSU-REC (1131 : 2)
+           MOVE    TNSWK-V05-AREA-02   TO  TNSWK-TENSU-REC (1133 :)
       *
           .
        900-TNSWK-V05-EXT.
