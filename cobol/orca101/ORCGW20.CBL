@@ -3947,6 +3947,8 @@ UPDATE*    ¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
                MOVE    SPA-GMN-W20-BTUCD
                                        TO  WRK-KBN4
                MOVE    WRK-KBN4-G      TO  SYS-5001-SRYCD(6:)
+           ELSE
+               MOVE    SPACE           TO  SYS-5001-SRYCD
            END-IF
       *
       *    Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡ªªƒÍ∂Ë ¨
@@ -8624,11 +8626,11 @@ UPDATE*    ¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
                 OR   ( SPA-GMN-W20-BTUCD      NOT =   ZERO )
                    IF    ( SPA-GMN-W20-BTUTYPE    =   SPACE )
                        MOVE    "1114"  TO  SPA-ERRCD
-                       MOVE    17      TO  SPA-GMN-W20-CUR
+                       MOVE    57      TO  SPA-GMN-W20-CUR
                    END-IF
                    IF    ( SPA-GMN-W20-BTUCD      =   ZERO )
                        MOVE    "1114"  TO  SPA-ERRCD
-                       MOVE    18      TO  SPA-GMN-W20-CUR
+                       MOVE    58      TO  SPA-GMN-W20-CUR
                    END-IF
                END-IF
            END-IF
@@ -11335,6 +11337,7 @@ UPDATE*    ¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
            END-EVALUATE
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
