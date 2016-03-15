@@ -505,7 +505,7 @@
            END-IF
       *
       *    ╫Щибл╬
-           IF   SYS-5000-TAIKSIKBN     =   "1"
+           IF   SYS-5000-TAIKSIKBN     =   "4"  OR  "5"
                INITIALIZE                      PTBYOMEI-REC
                MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                MOVE    SPA-PTID            TO  PTBYO-PTID
