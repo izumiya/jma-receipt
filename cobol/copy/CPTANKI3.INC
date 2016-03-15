@@ -473,14 +473,14 @@
       *        没缄３∈ガンマナイフによる年疤庶纪俐迹闻∷
       *        20160401-99999999
                05  FILLER          PIC X(01)   VALUE "0".
-               05  FILLER          PIC X(02)   VALUE "BH".
+               05  FILLER          PIC X(02)   VALUE "BI".
                05  FILLER          PIC X(09)   VALUE "190197910".
                05  FILLER          PIC X(08)   VALUE "20160401".
                05  FILLER          PIC X(08)   VALUE "99999999".
       *        没缄３∈ガンマナイフによる年疤庶纪俐迹闻∷∈栏宠闻蛙∷
       *        20160401-99999999
                05  FILLER          PIC X(01)   VALUE "1".
-               05  FILLER          PIC X(02)   VALUE "BI".
+               05  FILLER          PIC X(02)   VALUE "BJ".
                05  FILLER          PIC X(09)   VALUE "190198010".
                05  FILLER          PIC X(08)   VALUE "20160401".
                05  FILLER          PIC X(08)   VALUE "99999999".
