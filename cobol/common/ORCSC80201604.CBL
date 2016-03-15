@@ -1334,6 +1334,7 @@
                        END-IF
                        MOVE    IDX-Z           TO  IDX-ZS
                        MOVE    IDX-Z           TO  IDX-ZS2
+                       MOVE    IDX-Z           TO  IDX-SYU
                    END-IF
       *            施設基準不適合チェック
                    IF      WRK-COM-KIJUNTEIGENKBN(IDX-Z)
@@ -2473,7 +2474,7 @@
       *        通院・在宅精神療法（２０未満）加算
                WHEN    "180020570"
       *            手技料チェック
-                   IF      (IDX-SYU        >   ZERO )
+                   IF      IDX-SYU         >   ZERO
                        PERFORM 10011321-SYUGI-CHK-SEC
                    END-IF
                    IF     (WRK-ERRCD       =   SPACE       )
@@ -2495,7 +2496,7 @@
       *        児童思春期加算（１６歳未満）
                WHEN    "180047270"
       *            手技料チェック
-                   IF      (IDX-SYU        >   ZERO )
+                   IF      IDX-SYU         >   ZERO
                        PERFORM 10011321-SYUGI-CHK-SEC
                    END-IF
                    IF     (WRK-ERRCD       =   SPACE       )
@@ -2518,7 +2519,7 @@
       *        児童思春期加算（２０歳未満）
                WHEN    "180047370"
       *            手技料チェック
-                   IF      (IDX-SYU        >   ZERO )
+                   IF      IDX-SYU         >   ZERO
                        PERFORM 10011321-SYUGI-CHK-SEC
                    END-IF
       *            開始日からの期間に存在しないこと
@@ -2736,10 +2737,6 @@
            MOVE    "key15"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *TEST
-           DISPLAY "WRK-YMD:"  WRK-YMD
-                    ",WRK-SYOYMD:" WRK-SYOYMD
-      *TEST
            IF      WRK-YMD         NOT =   SPACE
                IF      WRK-YMD         >=  WRK-SYOYMD
       *            開始日後に算定あり
