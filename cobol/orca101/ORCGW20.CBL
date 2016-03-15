@@ -2983,7 +2983,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                        MOVE    W20-KSN-P01 (IDX-GKSN)
                                    TO  SPA-GMN-W20-KSNCD-G
                                                       (IDX-KSN)
-                   WHEN    15  THRU    22
+                   WHEN    15  THRU    30
                        COMPUTE IDX-GKSN  = IDX-GKSN  -  14
                        MOVE    W20-KSN-P02 (IDX-GKSN)
                                    TO  SPA-GMN-W20-KSNCD-G
