@@ -3272,6 +3272,13 @@
                                            DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K876"
+                   STRING  "·Ù¹ð¡ª´û¤Ë"
+                           "»ùÆ¸»×½Õ´üÀº¿À²ÊÀìÌç´ÉÍý²Ã»»¡Ê£²£°ºÐÌ¤Ëþ¡Ë"
+                           "¤Î»»Äê¤¬¤¢¤ê¤Þ¤¹¡£"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "·Ù¹ð¡ª"
