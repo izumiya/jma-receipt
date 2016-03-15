@@ -265,10 +265,9 @@
            COPY    "K01COMMON-SPA".
       *
       *
-      *TEST
+      *H28.3
       *    ±¡³°½èÊýÌ¾ÊÔ½¸¥Ñ¥é¥á¥¿
            COPY    "CPORCSCGENNAME.INC".
-      *TEST
       *
       *
       *****************************************************************
@@ -1902,8 +1901,8 @@
                    END-IF
                END-IF
            END-PERFORM
-      *TEST
-      *TEST
+      *
+      *
       *H28.2
       *!!! ±¡³°ÅêÌôÌ¾¾ÎÊÑ´¹
            IF     (SPA-NYUGAIKBN       =   "2" )
@@ -1916,9 +1915,8 @@
              AND  (SPA-GENERICFLG      =   "1"   )
                PERFORM 51023-MEIHENKAN-SEC
            END-IF
-      *TEST
-      *TEST
-      *TEST
+      *!!!!
+      *
       *
       *    ÅÀ¿ôºÆ¥»¥Ã¥È
       *    ¿Ç»¡Æü¤òÌá¤¹
@@ -2446,140 +2444,8 @@
            MOVE    ZERO                TO  FLG-TUIKA
       *    ÊÑ¹¹¤ÎÈ½ÄêÍÑ¤ËÊÝÂ¸
            MOVE    SPA-SCR-REC         TO  WRK-SCR-REC
-      *
-           MOVE    "K02"               TO  LNK-ORCSC-PG
-           MOVE    SPA-NAI-ROUJIN      TO  LNK-ORCSC-ROUJIN 
-           MOVE    SPA-NENREI          TO  LNK-ORCSC-NENREI 
-           MOVE    SPA-NAIACCT-AREA    TO  LNK-NAIACCT-AREA
-           MOVE    SPA-NAIACCT2-AREA   TO  LNK-NAIACCT2-AREA
-           MOVE    SPA-SYOYMD          TO  LNK-ORCSC-SYOYMD 
-           MOVE    SPA-SYOYMD-OLD      TO  LNK-ORCSC-SYOYMD-OLD
-           MOVE    SPA-LSTYMD          TO  LNK-ORCSC-LSTYMD 
-           MOVE    SPA-LSTSRYKA        TO  LNK-ORCSC-LSTSRYKA 
-           MOVE    SPA-LSTSRYKAMEI     TO  LNK-ORCSC-LSTSRYKAMEI 
-           MOVE    SPA-INGAIKBN        TO  LNK-ORCSC-INGAIKBN
-           MOVE    ORCSC100-TOROKU     TO  LNK-ORCSC-TOROKU
-      *    ºÇ½ª¼õ¿ÇÆü¡ÊÍúÎò¡Ë
-           MOVE    SPA-RRK-LSTYMD      TO  LNK-ORCSC-RRK-LSTYMD
-      *    ½èÍý¥Õ¥é¥°
-           MOVE    SPA-SYORIFLG        TO  LNK-ORCSC-SYORIFLG
-      *    ½é¿Ç¥Õ¥é¥°
-           MOVE    SPA-SYOSIN          TO  LNK-ORCSC-SYOSIN2
-      *    ½é¿Ç¥Õ¥é¥°¡Ê½é¿Ç¤Ç¡¢ÍúÎò¤ÎÌµ¤¤»þ¡¢¡Ç£±¡Ç¡Ë
-           IF      SPA-NYUGAIKBN       =   "2"
-               IF     ((SPA-SYOSIN         =   1   )  AND
-                       (SPA-GMN-MAX1       =   ZERO)) OR
-                       (SPA-SYOYMD         =   SPACE)
-                   MOVE    1                   TO  LNK-ORCSC-SYOSIN
-               ELSE
-                   MOVE    ZERO                TO  LNK-ORCSC-SYOSIN
-               END-IF
-           ELSE
-               MOVE    ZERO                TO  LNK-ORCSC-SYOSIN
-           END-IF
-      *
-           MOVE    SPA-CHOKI-FLG       TO  LNK-ORCSC-CHOKI-FLG
-           MOVE    SPA-YAKJYO-1        TO  LNK-ORCSC-YAKJYO-1
-           MOVE    SPA-YAKJYO-2        TO  LNK-ORCSC-YAKJYO-2
-           MOVE    SPA-YAKJYO-3        TO  LNK-ORCSC-YAKJYO-3
-           MOVE    SPA-TOKUTEI-FLG     TO  LNK-ORCSC-TOKUTEI-FLG
-      *³°Íè¿ÇÎÅÎÁ»»ÄêÍ­Ìµ
-           MOVE    SPA-GAIRAISIN       TO  LNK-ORCSC-GAIRAISIN
-      *
-           MOVE    SPA-ROUMANSEI-ARI   TO  LNK-ORCSC-ROUMANSEI-ARI
-           MOVE    SPA-ROUMANSEI-ARI2  TO  LNK-ORCSC-ROUMANSEI-ARI2
-           MOVE    SPA-NETAKIRI-ARI    TO  LNK-ORCSC-NETAKIRI-ARI
-           MOVE    SPA-NETAKIRI-ARI2   TO  LNK-ORCSC-NETAKIRI-ARI2
-           MOVE    SPA-NETAKIRI-ARI3   TO  LNK-ORCSC-NETAKIRI-ARI3
-           MOVE    SPA-SYONIKA-ARI     TO  LNK-ORCSC-SYONIKA-ARI
-           MOVE    SPA-SYONIKA-ARI2    TO  LNK-ORCSC-SYONIKA-ARI2
-      *    À¸³è½¬´·ÉÂ»ØÆ³´ÉÍýÎÁ
-           MOVE    SPA-SEIKATU-ARI     TO  LNK-ORCSC-SEIKATU-ARI
-           MOVE    SPA-SEIKATU-ARI2    TO  LNK-ORCSC-SEIKATU-ARI2
-           MOVE    SPA-NAI-GAIFLG      TO  LNK-ORCSC-GAIFLG
-      *    Ê£¿ô¿ÇÎÅ²Ê¤¢¤ê
-           MOVE    SPA-FUKU-SRYKA      TO  LNK-ORCSC-FUKU-SRYKA
-      *    ÄûÀµÁ°¿ÇÎÅ²Ê
-           MOVE    SPA-OLD-SRYKA       TO  LNK-ORCSC-OLD-SRYKA
-           MOVE    SPA-OLD-HKNCOMBI    TO  LNK-ORCSC-OLD-HKNCOMBI
-      *    ÅÅÏÃºÆ¿Ç¤ÎÍ­Ìµ
-           MOVE    SPA-TELSAI-ARI      TO  LNK-ORCSC-TELSAI-ARI
-      *    ÆÃÄê¼À´µ¤¢¤ê
-           MOVE    SPA-TOKUTEI         TO  LNK-ORCSC-TOKUTEI
-           MOVE    SPA-TOKUTEIFLG      TO  LNK-ORCSC-TOKUTEIFLG
-      *    »þ´Ö³°ÆÃÎã¶èÊ¬
-           MOVE    SPA-JIKANTOKU       TO  LNK-ORCSC-JIKANTOKU
-      *    »þ´Ö³°²Ã»»ÆÃÎãÆýÍÄ»ù
-           MOVE    SPA-JIKANTOKU-NYU   TO  LNK-ORCSC-JIKANTOKU-NYU
-      *    ¿Ç»¡²ó¿ô
-           MOVE    SPA-SINSATU-CNT     TO  LNK-ORCSC-SINSATU-CNT
-      *   £±£µºÐÌ¤ËþºÆ¿Ç²Ê»»ÄêÍ­¤ê
-           MOVE    SPA-15MIMAN-ARI     TO  LNK-ORCSC-15MIMAN-ARI
-      *    ÆÃÄêÌôºÞ¼£ÎÅ´ÉÍý²Ã»»¤Î½é²ó»»ÄêÆü
-           MOVE    SPA-TOKTEI-YMD      TO LNK-ORCSC-TOKTEI-YMD
-      *    ¸üÀ¸¾Ê¤¬Äê¤á¤ë´µ¼Ô
-           MOVE    SPA-TOKUTEI-KNJ     TO LNK-ORCSC-TOKUTEI-KNJ
-           MOVE    SPA-TOKUTEI-KNJ2    TO LNK-ORCSC-TOKUTEI-KNJ2
-      *    ¿Í¹©¿ÕÂ¡´µ¼Ô
-           MOVE    SPA-TOKUTEI-JNZ     TO LNK-ORCSC-TOKUTEI-JNZ
-      *    ¸üÀ¸¾Ê¤¬Äê¤á¤ë´µ¼Ô
-           MOVE    SPA-TOKUTEIG-KNJ    TO LNK-ORCSC-TOKUTEIG-KNJ
-           MOVE    SPA-TOKUTEIG-KNJ2   TO LNK-ORCSC-TOKUTEIG-KNJ2
-      *    ºÆ¿Ç¥Á¥§¥Ã¥¯ºÑ
-           MOVE    SPA-SAISIN-CHK      TO  LNK-ORCSC-SAISIN-CHK
-      *    ¾Ã±êÄÃÄË½èÃÖÅö·îÆâ»»Äê
-           MOVE    SPA-SYOEN-CNT       TO  LNK-ORCSC-SYOEN-CNT
-      *    µÞÀ­È¯À¸£±£¸£°Æü°ÊÆâ
-           MOVE    SPA-KYUSEI-90       TO  LNK-ORCSC-KYUSEI-90
-           MOVE    SPA-KYUSEI-180      TO  LNK-ORCSC-KYUSEI-180
-           MOVE    SPA-KYUSEI-FLG      TO  LNK-ORCSC-KYUSEI-FLG
-      *    µÞÀ­È¯À¸Æü
-           MOVE    WRK-KYUSEI-YMD      TO  LNK-ORCSC-KYUSEI-YMD
-           MOVE    WRK-KYUSEI-END      TO  LNK-ORCSC-KYUSEI-END
-      *    Åö·î³°Íè´ÉÍý²Ã»»¤Î¼è¤ì¤Ê¤¤´µ¼Ô
-           MOVE    SPA-GAIRAI-NASI     TO  LNK-ORCSC-GAIRAI-NASI
-      *    Ï«ºÒÍÑ ³°Íè´ÉÍýÅÀ¿ô
-           MOVE    SPA-GAIRAI-TEN      TO  LNK-ORCSC-GAIRAI-TEN
-      *
-      *    ·ÑÂ³ÎÎ°è
-           MOVE    SPA-CONTKBN         TO  LNK-ORCSC-CONTKBN
-           MOVE    SPA-DENPNUM         TO  LNK-ORCSC-DENPNUM
-           IF      SPA-SYORIFLG        =   1
-               MOVE    SPA-RENNUM          TO  LNK-ORCSC-DOUJI-RENNUM
-           ELSE
-               MOVE    SPA-DOUJI-RENNUM    TO  LNK-ORCSC-DOUJI-RENNUM
-           END-IF
-      *
-           MOVE    SPA-K02-TEISEI-AREA TO  LNK-ORCSC-TEISEI-AREA
-      *    ³°Íè´ÉÍý²Ã»»ºï½ü¤Î¥Á¥§¥Ã¥¯
-           MOVE    SPA-GAIKANRIKBN-CHK TO  LNK-ORCSC-GAIKANRIKBN-CHK
-      *
-      *    Æþ±¡´ü´Ö
-           MOVE    SPA-K02N-NYUINYMD   TO  LNK-ORCSC-NYUINYMD
-           MOVE    SPA-K02N-TAIINYMD   TO  LNK-ORCSC-TAIINYMD
-      *    ¥ê¥Ï¥Ó¥êÄþ¸º³ÎÇ§
-           MOVE    ORCSC100-RIHTEI     TO  LNK-ORCSC-FLG-RIHTEI
-      *    ¥ê¥Ï¥Ó¥ê»»Äê²ó¿ô
-           MOVE    SPA-RIGAKU-NCNT-AREA    TO  LNK-RIGAKU-NCNT-AREA
-      *    Æþ±¡¸¡ººÊñ³ç
-           IF      SPA-K02N-KENSAFLG   =   "T"
-               MOVE    1                   TO  LNK-ORCSC-KENSAFLG
-           END-IF
-      *    Èé²¼¶ÚÆùÃí¼ÍÎÁÊÑ´¹ÁªÂò
-           MOVE    SPA-CHG310FLG       TO  LNK-ORCSC-CHG310FLG
-      *    ¼ðáç¥Þ¡¼¥«¡¼°ìÍ÷Å¸³«ÁªÂò
-           MOVE    SPA-AKUSEIHYOFLG    TO  LNK-ORCSC-AKUSEIHYOFLG
-      *    »ÄÎÌÇÑ´þ¶èÊ¬
-           MOVE    SPA-HAIKIKBN-FLG    TO  LNK-ORCSC-HAIKIKBN-FLG
-      *v4.8
-      *    Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
-           MOVE    SPA-ROURECEKBN      TO  LNK-ORCSC-ROURECEKBN
-      *
-      *    ¾®»ù²ÊÆÃÎã»þ´Ö³°¥Á¥§¥Ã¥¯
-           MOVE    ZERO                TO  LNK-ORCSC-JIKANERR-FLG
-           MOVE    SPACE               TO  SPA-GMN-JIKANMSG
-      *
-           IF     (LNK-ORCSC-KBN2      =   SPACE )
+      *    ¥Ñ¥é¥á¥¿ÊÔ½¸½èÍý
+           PERFORM 5201-ORCS00-HEN-SEC
       *            ¿ÇÎÅ
            IF     (SPA-SRYKBN-CNT (01) >   ZERO  )
       *H25.7
@@ -2649,8 +2515,6 @@
                GO      TO    520-ALL-CHEK-EXT
            END-IF
       *
-           END-IF
-      *
       *    ÅêÌô¡Ê¹¹¿·Á°¥Á¥§¥Ã¥¯¤Ï¤¹¤Ù¤Æ¹Ô¤¦¡Ë
            IF     (SPA-SRYKBN-CNT (02) >   ZERO )
                OR (LNK-ORCSC-KBN       =   "3"  )
@@ -2675,12 +2539,7 @@
                   (SPA-KIDCD       NOT =   SPACE )
                GO      TO    520-ALL-CHEK-EXT
            END-IF
-      *H28.4
-      *    ÃæÅÓ½ªÎ»»þ¤Ï¡¢ÅêÌô¤Î¤ß¥Á¥§¥Ã¥¯
-           IF     (LNK-ORCSC-KBN2      =   "1" )
-               GO      TO    520-ALL-CHEK-EXT
-           END-IF
-      ****
+      *
       *            Ãí¼Í
            IF     (SPA-SRYKBN-CNT (03) >   ZERO )
       *            Æþ±¡¤Ç¼ê½Ñ¤Î»þ¤âÅÀÅ©¥Á¥§¥Ã¥¯¤ò¹Ô¤¦
@@ -2829,6 +2688,146 @@
        520-ALL-CHEK-EXT.
            EXIT.
       *****************************************************************
+      *    ¥Ñ¥é¥á¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       5201-ORCS00-HEN-SEC              SECTION.
+      *
+           MOVE    "K02"               TO  LNK-ORCSC-PG
+           MOVE    SPA-NAI-ROUJIN      TO  LNK-ORCSC-ROUJIN 
+           MOVE    SPA-NENREI          TO  LNK-ORCSC-NENREI 
+           MOVE    SPA-NAIACCT-AREA    TO  LNK-NAIACCT-AREA
+           MOVE    SPA-NAIACCT2-AREA   TO  LNK-NAIACCT2-AREA
+           MOVE    SPA-SYOYMD          TO  LNK-ORCSC-SYOYMD 
+           MOVE    SPA-SYOYMD-OLD      TO  LNK-ORCSC-SYOYMD-OLD
+           MOVE    SPA-LSTYMD          TO  LNK-ORCSC-LSTYMD 
+           MOVE    SPA-LSTSRYKA        TO  LNK-ORCSC-LSTSRYKA 
+           MOVE    SPA-LSTSRYKAMEI     TO  LNK-ORCSC-LSTSRYKAMEI 
+           MOVE    SPA-INGAIKBN        TO  LNK-ORCSC-INGAIKBN
+           MOVE    ORCSC100-TOROKU     TO  LNK-ORCSC-TOROKU
+      *    ºÇ½ª¼õ¿ÇÆü¡ÊÍúÎò¡Ë
+           MOVE    SPA-RRK-LSTYMD      TO  LNK-ORCSC-RRK-LSTYMD
+      *    ½èÍý¥Õ¥é¥°
+           MOVE    SPA-SYORIFLG        TO  LNK-ORCSC-SYORIFLG
+      *    ½é¿Ç¥Õ¥é¥°
+           MOVE    SPA-SYOSIN          TO  LNK-ORCSC-SYOSIN2
+      *    ½é¿Ç¥Õ¥é¥°¡Ê½é¿Ç¤Ç¡¢ÍúÎò¤ÎÌµ¤¤»þ¡¢¡Ç£±¡Ç¡Ë
+           IF      SPA-NYUGAIKBN       =   "2"
+               IF     ((SPA-SYOSIN         =   1   )  AND
+                       (SPA-GMN-MAX1       =   ZERO)) OR
+                       (SPA-SYOYMD         =   SPACE)
+                   MOVE    1                   TO  LNK-ORCSC-SYOSIN
+               ELSE
+                   MOVE    ZERO                TO  LNK-ORCSC-SYOSIN
+               END-IF
+           ELSE
+               MOVE    ZERO                TO  LNK-ORCSC-SYOSIN
+           END-IF
+      *
+           MOVE    SPA-CHOKI-FLG       TO  LNK-ORCSC-CHOKI-FLG
+           MOVE    SPA-YAKJYO-1        TO  LNK-ORCSC-YAKJYO-1
+           MOVE    SPA-YAKJYO-2        TO  LNK-ORCSC-YAKJYO-2
+           MOVE    SPA-YAKJYO-3        TO  LNK-ORCSC-YAKJYO-3
+           MOVE    SPA-TOKUTEI-FLG     TO  LNK-ORCSC-TOKUTEI-FLG
+      *³°Íè¿ÇÎÅÎÁ»»ÄêÍ­Ìµ
+           MOVE    SPA-GAIRAISIN       TO  LNK-ORCSC-GAIRAISIN
+      *
+           MOVE    SPA-ROUMANSEI-ARI   TO  LNK-ORCSC-ROUMANSEI-ARI
+           MOVE    SPA-ROUMANSEI-ARI2  TO  LNK-ORCSC-ROUMANSEI-ARI2
+           MOVE    SPA-NETAKIRI-ARI    TO  LNK-ORCSC-NETAKIRI-ARI
+           MOVE    SPA-NETAKIRI-ARI2   TO  LNK-ORCSC-NETAKIRI-ARI2
+           MOVE    SPA-NETAKIRI-ARI3   TO  LNK-ORCSC-NETAKIRI-ARI3
+           MOVE    SPA-SYONIKA-ARI     TO  LNK-ORCSC-SYONIKA-ARI
+           MOVE    SPA-SYONIKA-ARI2    TO  LNK-ORCSC-SYONIKA-ARI2
+      *    À¸³è½¬´·ÉÂ»ØÆ³´ÉÍýÎÁ
+           MOVE    SPA-SEIKATU-ARI     TO  LNK-ORCSC-SEIKATU-ARI
+           MOVE    SPA-SEIKATU-ARI2    TO  LNK-ORCSC-SEIKATU-ARI2
+           MOVE    SPA-NAI-GAIFLG      TO  LNK-ORCSC-GAIFLG
+      *    Ê£¿ô¿ÇÎÅ²Ê¤¢¤ê
+           MOVE    SPA-FUKU-SRYKA      TO  LNK-ORCSC-FUKU-SRYKA
+      *    ÄûÀµÁ°¿ÇÎÅ²Ê
+           MOVE    SPA-OLD-SRYKA       TO  LNK-ORCSC-OLD-SRYKA
+           MOVE    SPA-OLD-HKNCOMBI    TO  LNK-ORCSC-OLD-HKNCOMBI
+      *    ÅÅÏÃºÆ¿Ç¤ÎÍ­Ìµ
+           MOVE    SPA-TELSAI-ARI      TO  LNK-ORCSC-TELSAI-ARI
+      *    ÆÃÄê¼À´µ¤¢¤ê
+           MOVE    SPA-TOKUTEI         TO  LNK-ORCSC-TOKUTEI
+           MOVE    SPA-TOKUTEIFLG      TO  LNK-ORCSC-TOKUTEIFLG
+      *    »þ´Ö³°ÆÃÎã¶èÊ¬
+           MOVE    SPA-JIKANTOKU       TO  LNK-ORCSC-JIKANTOKU
+      *    »þ´Ö³°²Ã»»ÆÃÎãÆýÍÄ»ù
+           MOVE    SPA-JIKANTOKU-NYU   TO  LNK-ORCSC-JIKANTOKU-NYU
+      *    ¿Ç»¡²ó¿ô
+           MOVE    SPA-SINSATU-CNT     TO  LNK-ORCSC-SINSATU-CNT
+      *   £±£µºÐÌ¤ËþºÆ¿Ç²Ê»»ÄêÍ­¤ê
+           MOVE    SPA-15MIMAN-ARI     TO  LNK-ORCSC-15MIMAN-ARI
+      *    ÆÃÄêÌôºÞ¼£ÎÅ´ÉÍý²Ã»»¤Î½é²ó»»ÄêÆü
+           MOVE    SPA-TOKTEI-YMD      TO LNK-ORCSC-TOKTEI-YMD
+      *    ¸üÀ¸¾Ê¤¬Äê¤á¤ë´µ¼Ô
+           MOVE    SPA-TOKUTEI-KNJ     TO LNK-ORCSC-TOKUTEI-KNJ
+           MOVE    SPA-TOKUTEI-KNJ2    TO LNK-ORCSC-TOKUTEI-KNJ2
+      *    ¿Í¹©¿ÕÂ¡´µ¼Ô
+           MOVE    SPA-TOKUTEI-JNZ     TO LNK-ORCSC-TOKUTEI-JNZ
+      *    ¸üÀ¸¾Ê¤¬Äê¤á¤ë´µ¼Ô
+           MOVE    SPA-TOKUTEIG-KNJ    TO LNK-ORCSC-TOKUTEIG-KNJ
+           MOVE    SPA-TOKUTEIG-KNJ2   TO LNK-ORCSC-TOKUTEIG-KNJ2
+      *    ºÆ¿Ç¥Á¥§¥Ã¥¯ºÑ
+           MOVE    SPA-SAISIN-CHK      TO  LNK-ORCSC-SAISIN-CHK
+      *    ¾Ã±êÄÃÄË½èÃÖÅö·îÆâ»»Äê
+           MOVE    SPA-SYOEN-CNT       TO  LNK-ORCSC-SYOEN-CNT
+      *    µÞÀ­È¯À¸£±£¸£°Æü°ÊÆâ
+           MOVE    SPA-KYUSEI-90       TO  LNK-ORCSC-KYUSEI-90
+           MOVE    SPA-KYUSEI-180      TO  LNK-ORCSC-KYUSEI-180
+           MOVE    SPA-KYUSEI-FLG      TO  LNK-ORCSC-KYUSEI-FLG
+      *    µÞÀ­È¯À¸Æü
+           MOVE    WRK-KYUSEI-YMD      TO  LNK-ORCSC-KYUSEI-YMD
+           MOVE    WRK-KYUSEI-END      TO  LNK-ORCSC-KYUSEI-END
+      *    Åö·î³°Íè´ÉÍý²Ã»»¤Î¼è¤ì¤Ê¤¤´µ¼Ô
+           MOVE    SPA-GAIRAI-NASI     TO  LNK-ORCSC-GAIRAI-NASI
+      *    Ï«ºÒÍÑ ³°Íè´ÉÍýÅÀ¿ô
+           MOVE    SPA-GAIRAI-TEN      TO  LNK-ORCSC-GAIRAI-TEN
+      *
+      *    ·ÑÂ³ÎÎ°è
+           MOVE    SPA-CONTKBN         TO  LNK-ORCSC-CONTKBN
+           MOVE    SPA-DENPNUM         TO  LNK-ORCSC-DENPNUM
+           IF      SPA-SYORIFLG        =   1
+               MOVE    SPA-RENNUM          TO  LNK-ORCSC-DOUJI-RENNUM
+           ELSE
+               MOVE    SPA-DOUJI-RENNUM    TO  LNK-ORCSC-DOUJI-RENNUM
+           END-IF
+      *
+           MOVE    SPA-K02-TEISEI-AREA TO  LNK-ORCSC-TEISEI-AREA
+      *    ³°Íè´ÉÍý²Ã»»ºï½ü¤Î¥Á¥§¥Ã¥¯
+           MOVE    SPA-GAIKANRIKBN-CHK TO  LNK-ORCSC-GAIKANRIKBN-CHK
+      *
+      *    Æþ±¡´ü´Ö
+           MOVE    SPA-K02N-NYUINYMD   TO  LNK-ORCSC-NYUINYMD
+           MOVE    SPA-K02N-TAIINYMD   TO  LNK-ORCSC-TAIINYMD
+      *    ¥ê¥Ï¥Ó¥êÄþ¸º³ÎÇ§
+           MOVE    ORCSC100-RIHTEI     TO  LNK-ORCSC-FLG-RIHTEI
+      *    ¥ê¥Ï¥Ó¥ê»»Äê²ó¿ô
+           MOVE    SPA-RIGAKU-NCNT-AREA    TO  LNK-RIGAKU-NCNT-AREA
+      *    Æþ±¡¸¡ººÊñ³ç
+           IF      SPA-K02N-KENSAFLG   =   "T"
+               MOVE    1                   TO  LNK-ORCSC-KENSAFLG
+           END-IF
+      *    Èé²¼¶ÚÆùÃí¼ÍÎÁÊÑ´¹ÁªÂò
+           MOVE    SPA-CHG310FLG       TO  LNK-ORCSC-CHG310FLG
+      *    ¼ðáç¥Þ¡¼¥«¡¼°ìÍ÷Å¸³«ÁªÂò
+           MOVE    SPA-AKUSEIHYOFLG    TO  LNK-ORCSC-AKUSEIHYOFLG
+      *    »ÄÎÌÇÑ´þ¶èÊ¬
+           MOVE    SPA-HAIKIKBN-FLG    TO  LNK-ORCSC-HAIKIKBN-FLG
+      *v4.8
+      *    Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+           MOVE    SPA-ROURECEKBN      TO  LNK-ORCSC-ROURECEKBN
+      *
+      *    ¾®»ù²ÊÆÃÎã»þ´Ö³°¥Á¥§¥Ã¥¯
+           MOVE    ZERO                TO  LNK-ORCSC-JIKANERR-FLG
+           MOVE    SPACE               TO  SPA-GMN-JIKANMSG
+      *
+           .
+       5201-ORCS00-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    ÊÑ¹¹Í­ÌµÈ½Äê½èÍý
       *****************************************************************
        5209-HENKOUCHK-SEC              SECTION.
@@ -2901,9 +2900,29 @@
       *
       *    ÅÐÏ¿Á°¤ÎÁ´ÂÎ¤Î¥Á¥§¥Ã¥¯¤ò¹Ô¤¦
            INITIALIZE                  ORCSC00AREA
+      *    ¥Ñ¥é¥á¥¿ÊÔ½¸½èÍý
+           PERFORM 5201-ORCS00-HEN-SEC
            MOVE    "2"                 TO  LNK-ORCSC-KBN
            MOVE    "1"                 TO  LNK-ORCSC-KBN2
-           PERFORM 520-ALL-CHEK-SEC
+      *    ÅêÌô¡Ê¹¹¿·Á°¥Á¥§¥Ã¥¯¤Ï¤¹¤Ù¤Æ¹Ô¤¦¡Ë
+           IF     (SPA-SRYKBN-CNT (02) >   ZERO )
+               IF      LNK-ORCSC-KBN       =   "3"
+                   INITIALIZE                  SPA-SYOHOU-ZUMI
+                   MOVE    SPA-K01KYOUTU   TO  SPA-WORK
+               END-IF
+               CALL    "ORCSC20"       USING
+                                       MCPAREA
+                                       ORCSC00AREA
+                                       SPA-SCR-REC
+                                       SPA-AREA
+               IF      LNK-ORCSC-KBN       =   "3"
+                   MOVE    SPA-WORK        TO  SPA-K01KYOUTU
+                   PERFORM 5201-SYOHOU-HKN-SEC
+               END-IF
+               MOVE    LNK-ORCSC-CHK-IDX   TO  SPA-CHK-IDX
+               MOVE    LNK-ORCSC-KIDCD     TO  SPA-KIDCD
+               MOVE    LNK-ORCSC-ERRMSG    TO  SPA-ERRMSG2
+           END-IF
            .
        200-TOUYAKUCHK-EXT.
            EXIT.
