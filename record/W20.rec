@@ -108,12 +108,15 @@ W20 {
     CMB_BTUTYPE {
       BTUTYPE {
         textdata varchar(20);
+      state int;
       };
       count int;
         item varchar(20)[5];
+      state int;
     };
     BTUCD {
       numdata number(2);
+      state int;
     };
     LBLRYOYOKBN {
       textdata varchar(40);

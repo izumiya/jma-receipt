@@ -10727,6 +10727,9 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                                        W20-RYOYOKBN-STATE
                                        W20-RYOYOKBN-ITM-STATE
                                        W20-LBLKSNP02-STATE
+                                       W20-BTUTYPE-STATE
+                                       W20-BTUTYPE-ITM-STATE
+                                       W20-BTUCD-STATE
       *
            IF   ( SPA-GMN-W20-BTULST-SEL    >  ZERO )
                MOVE    WIDGET-INSENSITIVE
@@ -10787,6 +10790,13 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                MOVE    WIDGET-INSENSITIVE
                                        TO  W20-RYOYOKBN-STATE
                                            W20-RYOYOKBN-ITM-STATE
+           END-IF
+      *
+           IF    ( SPA-NAI-W20-HOSPSBT =   2 )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  W20-BTUTYPE-STATE
+                                           W20-BTUTYPE-ITM-STATE
+                                           W20-BTUCD-STATE
            END-IF
       *
            .
@@ -10894,6 +10904,22 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                MOVE    "KSN21"             TO  MCP-WIDGET
            WHEN    031
                MOVE    "KSN22"             TO  MCP-WIDGET
+           WHEN    032
+               MOVE    "KSN23"             TO  MCP-WIDGET
+           WHEN    033
+               MOVE    "KSN24"             TO  MCP-WIDGET
+           WHEN    034
+               MOVE    "KSN25"             TO  MCP-WIDGET
+           WHEN    035
+               MOVE    "KSN26"             TO  MCP-WIDGET
+           WHEN    036
+               MOVE    "KSN27"             TO  MCP-WIDGET
+           WHEN    037
+               MOVE    "KSN28"             TO  MCP-WIDGET
+           WHEN    038
+               MOVE    "KSN29"             TO  MCP-WIDGET
+           WHEN    039
+               MOVE    "KSN30"             TO  MCP-WIDGET
            WHEN    051
                MOVE    "YUKOSTYMD"         TO  MCP-WIDGET
            WHEN    052
@@ -10967,6 +10993,31 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                IF    ( W20-RYOYOKBN-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    8           TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   57 )
+               IF    ( W20-BTUTYPE-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    58          TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   58 )
+               IF    ( W20-BTUCD-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   IF    ( SPA-GMN-W20-KSN-PAGENO  =   ZERO )
+                       MOVE    009     TO  SPA-GMN-W20-CUR
+                   ELSE
+                       MOVE    024     TO  SPA-GMN-W20-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   9 )
+               IF    ( W20-KNGHJO-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    10          TO  SPA-GMN-W20-CUR
                END-IF
            END-IF
       *
@@ -11080,6 +11131,22 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
            WHEN    "KSN21"
                MOVE    031             TO  SPA-GMN-W20-CUR
            WHEN    "KSN22"
+               MOVE    032             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN23"
+               MOVE    033             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN24"
+               MOVE    034             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN25"
+               MOVE    035             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN26"
+               MOVE    036             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN27"
+               MOVE    037             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN28"
+               MOVE    038             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN29"
+               MOVE    039             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN30"
                MOVE    051             TO  SPA-GMN-W20-CUR
            WHEN    "YUKOSTYMD"
                MOVE    052             TO  SPA-GMN-W20-CUR

@@ -109,10 +109,14 @@
       *
               04  W20-CMB-BTUTYPE.
                 05  W20-BTUTYPE            PIC X(20).
+                05  W20-BTUTYPE-STATE      PIC S9(9)   BINARY.
                 05  W20-BTUTYPE-CNT        PIC S9(9)   BINARY.
                 05  W20-BTUTYPE-ITM        PIC X(20)   OCCURS  5.
+                05  W20-BTUTYPE-ITM-STATE
+                                           PIC S9(9)   BINARY.
       *
               04  W20-BTUCD                PIC S9(2).
+              04  W20-BTUCD-STATE          PIC S9(9)   BINARY.
       *
               04  W20-LBLRYOYOKBN          PIC X(40).
       *
