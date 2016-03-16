@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0222.
+       PROGRAM-ID.                 ORCMUP0223.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -140,7 +140,7 @@
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0222.CBL】".
+                                       "【PGID:ORCMUP0223.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -271,7 +271,7 @@
            OPEN    INPUT               IN-FILE
            IF  STS-IN              NOT =   ZERO
                MOVE    1               TO  FLG-IN
-               DISPLAY "*(ORCMUP0222)* IN-FILE OPN STS[" STS-IN "]"
+               DISPLAY "*(ORCMUP0223)* IN-FILE OPN STS[" STS-IN "]"
            END-IF
       *
       *    出力ファイル　初期処理
@@ -983,14 +983,14 @@
       *
            OPEN    OUTPUT              ERR-FILE
            IF      STS-ERR     NOT =   ZERO
-               DISPLAY "*(ORCMUP0222)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0223)* OUTFILE OPN STS[" STS-ERR "]"
                GO  TO  2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT             PLF-FILE
            IF      STS-PLF    NOT =   ZERO
-               DISPLAY "*(ORCMUP0222)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0223)* PLFFILE OPN STS[" STS-PLF "]"
                GO  TO  2700-OUTLST-INIT-EXT
            END-IF
       *
@@ -1033,13 +1033,13 @@
       *
            END-IF
       *
-           DISPLAY "*(ORCMUP0222)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0222)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0222)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0222)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0222)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0222)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0222)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0223)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0223)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0223)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0223)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0223)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0223)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0223)* RC             [" LNK-RC "]"
       *
            .
        300-END-EXT.

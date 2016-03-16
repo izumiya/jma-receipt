@@ -4,6 +4,7 @@ tbl_etensu_2 {
 	YUKOSTYMD			char(8);
 	YUKOEDYMD			char(8);
 	CHGYMD   			char(8);
+	TOKUREI				number(1,0);
 #-----> 検索キー項目
 	HOSPNUM				number(2,0),virtual;
 	SRYKBN				char(2),virtual;
@@ -147,7 +148,8 @@ path	upd1	{
 				SRYCD      = :SRYCD,
 				YUKOSTYMD      = :YUKOSTYMD,
 				YUKOEDYMD      = :YUKOEDYMD,
-				CHGYMD      = :CHGYMD
+				CHGYMD      = :CHGYMD,
+				TOKUREI     = :TOKUREI
 			WHERE 	H_GROUP      = :UPH_GROUP
 			AND	SRYCD      =  :UPSRYCD
 			AND	YUKOSTYMD	=	:UPYUKOSTYMD
