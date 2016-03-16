@@ -1,6 +1,6 @@
 tbl_hktsrycd {
 	KANRICD   			number(3);
-	RENNUM    			number(2);
+	RENNUM    			number(3);
 	YUKOSTYMD  			char(8);
 	YUKOEDYMD	  		char(8);
 	SRYCD				char(9);

@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0141.
+       PROGRAM-ID.                 ORCMUP0142.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -127,7 +127,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0141.CBL】".
+                                       "【PGID:ORCMUP0142.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -239,7 +239,7 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT               IN-FILE
            IF  STS-IN              NOT =   ZERO
                MOVE    1               TO  FLG-IN
-               DISPLAY "*(ORCMUP0141)* IN-FILE OPN STS["
+               DISPLAY "*(ORCMUP0142)* IN-FILE OPN STS["
                                        STS-IN "]"
            END-IF
       *
@@ -577,14 +577,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            OPEN    OUTPUT              ERR-FILE
            IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0141)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0142)* OUTFILE OPN STS[" STS-ERR "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT              PLF-FILE
            IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0141)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0142)* PLFFILE OPN STS[" STS-PLF "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
            MOVE    WRK-SYY             TO  MES-TITLE1-YY
@@ -627,13 +627,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-IF
       *
       *
-           DISPLAY "*(ORCMUP0141)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0141)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0141)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0141)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0141)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0141)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0141)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0142)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0142)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0142)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0142)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0142)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0142)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0142)* RC             [" LNK-RC "]"
       **** ACCEPT  WRK-IN
            .
        300-END-EXT.

@@ -22,6 +22,7 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.08.00     NACL-伊藤    16/03/13  連番２桁→３桁
       ************************************************************
       *01  HKTSRYCDWK-REC.
            03  HKTSRYCDWK-SYORIKBN            PIC  X(01).
@@ -29,7 +30,7 @@
       *包括管理番号
                05  HKTSRYCDWK-KANRICD         PIC  9(03).
       *包括管理番号連番
-               05  HKTSRYCDWK-RENNUM          PIC  9(02).
+               05  HKTSRYCDWK-RENNUM          PIC  9(03).
       *有効開始日
                05  HKTSRYCDWK-YUKOSTYMD       PIC  X(08).
       *有効終了日
