@@ -2847,7 +2847,7 @@
                    MOVE    "113019170"     TO  WRK-SRYCD
                WHEN    8
       *            ÁáÄ«²Ã»»
-                   MOVE    "113019570"     TO  WRK-SRYCD
+                   MOVE    "113019670"     TO  WRK-SRYCD
            END-EVALUATE
       *
            .
