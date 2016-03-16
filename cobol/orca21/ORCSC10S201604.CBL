@@ -898,8 +898,7 @@
            END-IF
       *
       *    小児かかりつけ診療判定　就学前のみ
-           IF     (SPA-SYOUNI-ARI      =   1   )
-              AND (SPA-SYUGAKUKBN      =   1   )
+           IF     (SPA-SYUGAKUKBN      =   1   )
               AND (FLG-SYONIKKR-NAI    =   ZERO )
                PERFORM 1001-SYONIKKR-CHK-SEC
            END-IF
@@ -2544,6 +2543,30 @@
            MOVE    ZERO                TO  FLG-SYONIKKR-ARI
            MOVE    ZERO                TO  SPA-SYONIKKR-ARI3
       *
+      *    包括まとめ入力対象外
+           IF      SPA-HKNCOMBINUM     =   "9999"
+               GO      TO      1001-SYONIKKR-CHK-EXT
+           END-IF
+      *    治験対象外
+           IF      SPA-CHIKENKBN       =   "1"
+               GO      TO      1001-SYONIKKR-CHK-EXT
+           END-IF
+      *
+      *    当日算定があればフラグを立てる
+           IF      WRK-SYOUNI-SUM      >   ZERO
+               MOVE    1                   TO  SPA-SYONIKKR-ARI2
+               MOVE    1                   TO  FLG-SYONIKKR-ARI
+           ELSE
+               MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
+           END-IF
+      *
+      *    小児かかりつけ診療算定設定
+           IF     (SPA-SYOUNI-ARI      =   1   )
+               CONTINUE
+           ELSE
+               GO      TO      1001-SYONIKKR-CHK-EXT
+           END-IF
+      *
       *    ３歳になる年月日を計算
            MOVE    SPA-BIRTHDAY        TO  WRK-BIRTHDAY
            COMPUTE WRK-BIRTH-YY        =   WRK-BIRTH-YY    +  3
@@ -2559,11 +2582,11 @@
            END-IF
       *
       *    当日算定があればフラグを立てる
-           IF      WRK-SYOUNI-SUM      >   ZERO
-               MOVE    1                   TO  SPA-SYONIKKR-ARI2
-           ELSE
-               MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
-           END-IF
+      *    IF      WRK-SYOUNI-SUM      >   ZERO
+      *        MOVE    1                   TO  SPA-SYONIKKR-ARI2
+      *    ELSE
+      *        MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
+      *    END-IF
       *    小児対象
            MOVE    1                   TO  FLG-SYONIKKR-ARI
            MOVE    1                   TO  SPA-SYONIKKR-ARI3
@@ -2759,6 +2782,10 @@
            MOVE    ZERO                TO  SPA-SYONIKA-ARI2
            MOVE    ZERO                TO  SPA-SYONIKA-ARI
       *
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI3
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI
+      *
            .
        1000-SANTEI-RSI-EXT.
            EXIT.
@@ -2939,6 +2966,7 @@
            MOVE    ZERO                TO  SPA-SYONIKA-ARI
            MOVE    ZERO                TO  SPA-SYOSIN-KEI
            MOVE    ZERO                TO  SPA-SYOSIN-KEIFLG
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI
       *
            MOVE    SPACE               TO  WRK-SRYCD
       *
@@ -3035,6 +3063,8 @@
                    END-IF
                    IF     (FLG-SYONIKA       =   1   )
                       OR  (FLG-SYONIKKR      =   1   )
+                      OR  (SPA-SYONIKA-ARI2  =   1   )
+                      OR  (SPA-SYONIKKR-ARI2 =   1   )
                        CONTINUE
                    ELSE
       *                健保の診察料算定
@@ -3123,6 +3153,8 @@
       *        小児科外来診察料は算定なしとする
                MOVE    ZERO                TO  SPA-SYONIKA-ARI2
                MOVE    ZERO                TO  SPA-SYONIKA-ARI3
+               MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
+               MOVE    ZERO                TO  SPA-SYONIKKR-ARI3
            END-IF
       *    労災・自賠責、コメント以外
            IF     (SPA-HKNKBN          =   1   )
@@ -4641,6 +4673,10 @@
            MOVE    ZERO                TO  SPA-SYONIKA-ARI
            MOVE    ZERO                TO  SPA-SYONIKA-ARI2
            MOVE    ZERO                TO  SPA-SYONIKA-ARI3
+      *    小児かかりつけ診療料は算定なしとする
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
+           MOVE    ZERO                TO  SPA-SYONIKKR-ARI3
       *
            MOVE    ZERO                TO  WRK-KAISU
            MOVE    SPACE               TO  WRK-SRYCD
@@ -6574,7 +6610,7 @@
            IF     (SPA-HKNKBN      NOT =   SPA-MAE-HKNKBN)
       *        小児科外来診療科判定
                IF    ((SPA-SYONIKA         =   1   )  OR
-                      (SPA-SYOUNI-ARI      =   1   ))
+                      (SPA-SYUGAKUKBN      =   1   ))
                  AND  (SPA-NYUGAIKBN       =   "2" )
       *            当月算定回数を求める
                    PERFORM 1001-TOUGETU-KAISU-SEC
