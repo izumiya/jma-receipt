@@ -77,15 +77,15 @@
                05  SPA-GMN-YUKOSTYMDH          PIC X(09).
                05  SPA-GMN-YUKOEDYMDH          PIC X(09).
       * 
-               05  SPA-GMN-TENSIKIBETULST      OCCURS  4.
+               05  SPA-GMN-TENSIKIBETULST      OCCURS  9.
                    07  SPA-GMN-TENSIKIBETUL    PIC X(01).
                    07  SPA-GMN-F1L             PIC X(01).
-                   07  SPA-GMN-TENSIKIBETUMEIL PIC X(18).
+                   07  SPA-GMN-TENSIKIBETUMEIL PIC X(40).
                05  SPA-TENSKB-MAX              PIC 9(02).
-               05  SPA-GMN-OLDTENSKBLST        OCCURS  4.
+               05  SPA-GMN-OLDTENSKBLST        OCCURS  9.
                    07  SPA-GMN-OLDTENSKBL      PIC X(01).
                    07  SPA-GMN-F1L             PIC X(01).
-                   07  SPA-GMN-OLDTENSKBMEIL   PIC X(18).
+                   07  SPA-GMN-OLDTENSKBMEIL   PIC X(40).
                05  SPA-GMN-TANICDLST           OCCURS  200.
                    07  SPA-GMN-TANICDL         PIC X(03).
                    07  SPA-GMN-F1L             PIC X(01).
@@ -150,12 +150,12 @@
                05  SPA-GMN-TENSIKIBETU-G.
                    07  SPA-GMN-TENSIKIBETU     PIC X(01).
                    07  SPA-GMN-F1              PIC X(01).
-                   07  SPA-GMN-TENSIKIBETUMEI  PIC X(18).
+                   07  SPA-GMN-TENSIKIBETUMEI  PIC X(40).
                05  SPA-GMN-OLDTEN              PIC 9(8)V9(2).
                05  SPA-GMN-OLDTENSKB-G.
                    07  SPA-GMN-OLDTENSKB       PIC X(01).
                    07  SPA-GMN-F1              PIC X(01).
-                   07  SPA-GMN-OLDTENSKBMEI    PIC X(18).
+                   07  SPA-GMN-OLDTENSKBMEI    PIC X(40).
                05  SPA-GMN-TANICD-G.
                    07  SPA-GMN-TANICD          PIC X(03).
                    07  SPA-GMN-F1              PIC X(01).
@@ -612,9 +612,12 @@
            MOVE    "¶â³Û"              TO  SPA-GMN-TENSIKIBETUMEIL(2)
            MOVE    "2"                 TO  SPA-GMN-TENSIKIBETUL   (3)
            MOVE    "ÅÔÆ»ÉÜ¸©¹ØÆþ²Á³Ê"  TO  SPA-GMN-TENSIKIBETUMEIL(3)
-           MOVE    "7"                 TO  SPA-GMN-TENSIKIBETUL   (4)
-           MOVE    "¸ºÅÀ"              TO  SPA-GMN-TENSIKIBETUMEIL(4)
-           MOVE    4                   TO  SPA-TENSKB-MAX
+           MOVE    "4"                 TO  SPA-GMN-TENSIKIBETUL   (4)
+           MOVE    "½ü»»¶â³Û¡Ê¶â³Û¤ò£±£°¤Ç½ü¤¹¡£¡Ë" 
+                                       TO  SPA-GMN-TENSIKIBETUMEIL(4)
+           MOVE    "7"                 TO  SPA-GMN-TENSIKIBETUL   (5)
+           MOVE    "¸ºÅÀ"              TO  SPA-GMN-TENSIKIBETUMEIL(5)
+           MOVE    5                   TO  SPA-TENSKB-MAX
       *
            MOVE    "0"                 TO  SPA-GMN-OLDTENSKBL     (1)
            MOVE    SPACE               TO  SPA-GMN-OLDTENSKBMEIL  (1)
@@ -622,8 +625,11 @@
            MOVE    "¶â³Û"              TO  SPA-GMN-OLDTENSKBMEIL  (2)
            MOVE    "2"                 TO  SPA-GMN-OLDTENSKBL     (3)
            MOVE    "ÅÔÆ»ÉÜ¸©¹ØÆþ²Á³Ê"  TO  SPA-GMN-OLDTENSKBMEIL  (3)
-           MOVE    "7"                 TO  SPA-GMN-OLDTENSKBL     (4)
-           MOVE    "¸ºÅÀ"              TO  SPA-GMN-OLDTENSKBMEIL  (4)
+           MOVE    "4"                 TO  SPA-GMN-OLDTENSKBL     (4)
+           MOVE    "½ü»»¶â³Û¡Ê¶â³Û¤ò£±£°¤Ç½ü¤¹¡£¡Ë" 
+                                       TO  SPA-GMN-OLDTENSKBMEIL  (4)
+           MOVE    "7"                 TO  SPA-GMN-OLDTENSKBL     (5)
+           MOVE    "¸ºÅÀ"              TO  SPA-GMN-OLDTENSKBMEIL  (5)
       *
            MOVE    "0"                 TO  SPA-GMN-MADOKUKBNL     (1)
            MOVE    "¤Ê¤·"              TO  SPA-GMN-MADOKUKBNMEIL  (1)

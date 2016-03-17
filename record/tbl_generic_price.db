@@ -2,7 +2,8 @@ tbl_generic_price {
 	YAKKAKJNCD			char(12);
 	YUKOSTYMD			char(8);
 	YUKOEDYMD			char(8);
-	PRICE   			number(11,2);
+	PRICE   			number(12,3);
+	GECODE				char(12);
 	CREYMD   			char(8);
 	UPYMD    			char(8);
 #-----> 主キー更新用項目
@@ -74,6 +75,18 @@ path	key3 	{
 		SELECT *
 		FROM tbl_generic_price
 		WHERE	YAKKAKJNCD    =  :YAKKAKJNCD
+			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+		;
+	};
+};
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_generic_price_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_generic_price
+		WHERE	GECODE           =  :GECODE
 			AND   YUKOSTYMD  <=  :YUKOSTYMD
 			AND   YUKOEDYMD  >=  :YUKOEDYMD
 		;

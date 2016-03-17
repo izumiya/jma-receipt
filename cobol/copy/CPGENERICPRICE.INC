@@ -21,6 +21,7 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  16/03/17  薬価桁数、一般名コード対応
       ************************************************************
       *01  GENERICPRICE-REC.
            03  GENERICPRICE-KEY.
@@ -31,7 +32,9 @@
       *有効期間終了
                05  GENERICPRICE-YUKOEDYMD    PIC  X(08).
       *薬価
-           03  GENERICPRICE-PRICE            PIC  9(09)V99.
+           03  GENERICPRICE-PRICE            PIC  9(09)V9(3).
+      *一般名コード
+           03  GENERICPRICE-GECODE           PIC  X(12).
       *作成年月日
            03  GENERICPRICE-CREYMD           PIC  X(08).
       *更新年月日

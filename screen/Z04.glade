@@ -2125,7 +2125,7 @@
         <name>TENSIKIBETU_COMBO</name>
         <x>464</x>
         <y>232</y>
-        <width>200</width>
+        <width>208</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -2414,7 +2414,7 @@
         <name>OLDTENSKB_COMBO</name>
         <x>464</x>
         <y>260</y>
-        <width>200</width>
+        <width>208</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>

@@ -157,6 +157,15 @@
            03  WRK-NOZ             PIC ZZZ.
            03  WRK-TENSUS-X.
                05  WRK-TENSUS      PIC ZZZZZZ9.99.
+      *H28.4
+           03  WRK-KISOTEN-CHK.
+               05  WRK-KISOTEN-6C   PIC 9(07)V9(3).
+           03  WRK-KISOTEN-CHK-R    REDEFINES   WRK-KISOTEN-CHK.
+               05  WRK-KISOTEN-R1   PIC 9(07).
+               05  WRK-KISOTEN-R2   PIC 9(02).
+               05  WRK-KISOTEN-R3   PIC 9(01).
+           03  WRK-TENSUS-X6.
+               05  WRK-TENSUS-S4   PIC ZZZZZ9.999.
       *
            03  WRK-MOJI1           PIC X(22).
            03  WRK-MOJI2           PIC X(22).
@@ -207,13 +216,14 @@
                05  WRK-GEN-YAKKAKJNCD      PIC X(12).
                05  WRK-GEN-NAME            PIC X(80).
                05  WRK-GEN-TANI            PIC X(24).
-               05  WRK-GEN-KISOTEN         PIC 9(07)V99.
+               05  WRK-GEN-KISOTEN         PIC 9(07)V9(3).
            03  IDXG                        PIC 9(04).
            03  IDX3                        PIC 9(04).
            03  FLG-SYORI                   PIC 9(01).
            03  WRK-TENSUS-X2.
                05  WRK-TENSUS-GX1          PIC X(01).
-               05  WRK-TENSUS-G            PIC ZZZZ9.99.
+      *H28.4   05  WRK-TENSUS-G            PIC ZZZZ9.99.
+               05  WRK-TENSUS-G            PIC X(08).
                05  WRK-TENSUS-GX2          PIC X(01).
            03  WRK-NAME                    PIC X(100).
            03  WRK-MSG-2                   PIC X(10).
@@ -2224,6 +2234,14 @@
                                                              (IDX)
            MOVE    TNS-TEN             TO  SPA-J98-GMN-KISOTEN
                                                             (IDX)
+      *H28.4
+      *    薬剤　除算金額（１０で除す）
+           IF     (TNS-SRYCD(1:1)      =   "6"  ) AND
+                  (TNS-TENSIKIBETU     =   4    ) AND
+                  (TNS-TEN             >   ZERO )
+               COMPUTE SPA-J98-GMN-KISOTEN (IDX)
+                                           =   TNS-TEN   /  10
+           END-IF
       *     薬剤・器材の時単位
            IF      TNS-SRYCD (1:1)     =   "6"  OR  "7"
                MOVE    TNS-TANINAME        TO  SPA-J98-GMN-TANI(IDX)
@@ -2645,6 +2663,15 @@
                    MOVE    SPA-J98-GMN-KISOTEN(IDX)
                                                TO  WRK-TENSUS
                    MOVE    WRK-TENSUS          TO  J98-KISOTEN (IDX)
+      *H28.4
+      *            小数点以下３位まで表示
+                   MOVE    SPA-J98-GMN-KISOTEN(IDX)
+                                               TO  WRK-KISOTEN-CHK
+                   IF      WRK-KISOTEN-R3  NOT =   ZERO
+                       MOVE    SPA-J98-GMN-KISOTEN(IDX)
+                                               TO  WRK-TENSUS-S4
+                       MOVE    WRK-TENSUS-S4   TO  J98-KISOTEN (IDX)
+                   END-IF
                END-IF
       *H24.4
       *        一般名称は、単価記載なし
@@ -2655,10 +2682,23 @@
                            MOVE    SPACE           TO  J98-KISOTEN(IDX)
                        ELSE
                            MOVE    SPA-J98-GMN-KISOTEN(IDX)
-                                                   TO  WRK-TENSUS-G
+                                                   TO  WRK-TENSUS
+                           MOVE    WRK-TENSUS(3:8) TO  WRK-TENSUS-G
                            MOVE    "("             TO  WRK-TENSUS-GX1
                            MOVE    ")"             TO  WRK-TENSUS-GX2
                            MOVE    WRK-TENSUS-X2   TO  J98-KISOTEN(IDX)
+      *H28.4
+      *                    小数点以下３位まで表示
+                           MOVE    SPA-J98-GMN-KISOTEN(IDX)
+                                               TO  WRK-KISOTEN-CHK
+                           IF      WRK-KISOTEN-R3  NOT =   ZERO
+                               MOVE    SPA-J98-GMN-KISOTEN(IDX)
+                                                   TO  WRK-TENSUS-S4
+                               MOVE    WRK-TENSUS-S4(3:8)
+                                                   TO  WRK-TENSUS-G
+                               MOVE    WRK-TENSUS-X2
+                                                   TO  J98-KISOTEN(IDX)
+                           END-IF
                        END-IF
                     END-IF
                END-IF

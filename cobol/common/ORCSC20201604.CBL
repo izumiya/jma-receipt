@@ -275,7 +275,7 @@
                05  WRK-ZAICNT2         PIC 9(05).
                05  WRK-KEIKEI2         PIC 9(08).
                05  WRK-SANTEN          PIC 9(08).
-               05  WRK-SANTEN-9        PIC 9(08)V99.
+               05  WRK-SANTEN-9        PIC 9(08)V9(4).
                05  WRK-TENKEI          PIC 9(08).
                05  WRK-ZAITEN          PIC 9(08).
                05  WRK-ZAITEN-G        PIC 9(08)V9(8).
@@ -398,7 +398,7 @@
                05  WRK-SYO-CHIKENKBN       PIC X(01).
       *
            03  WRK-YAKKAKJNCD           PIC X(12).
-           03  WRK-KEI-KISOTEN          PIC 9(07)V9(2).
+           03  WRK-KEI-KISOTEN          PIC 9(07)V9(4).
       *H24.6
            03  WRK-ERRCD2               PIC X(04).
       *H26.4

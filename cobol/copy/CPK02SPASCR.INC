@@ -96,9 +96,9 @@
       *                自費明細金額
                        09  SPA-COM-JIHIMONEY     PIC 9(07).
       *                点数
-                       09  SPA-COM-TEN           PIC 9(08)V99.
+                       09  SPA-COM-TEN           PIC 9(08)V9(4).
       *                点数（きざみ値計算後）
-                       09  SPA-COM-KISOTEN       PIC 9(08)V99.
+                       09  SPA-COM-KISOTEN       PIC 9(08)V9(4).
                        09  SPA-COM-KAISU         PIC 9(03).
                        09  SPA-COM-KEI           PIC 9(08).
       *                外用薬用入力用
@@ -423,7 +423,7 @@
       *                一般名記載区分（１：一般名）
                        09  SPA-COM-IPN-KISAIKBN        PIC  9(01).
       *                最低薬価
-                       09  SPA-COM-GEN-PRICE           PIC  9(09)V99.
+                       09  SPA-COM-GEN-PRICE           PIC  9(09)V9(4).
       *                薬価基準コード
                        09  SPA-COM-YAKKAKJNCD          PIC  X(12).
       *H28.4 改正分

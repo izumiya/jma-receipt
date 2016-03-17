@@ -88,17 +88,17 @@ Z04 {
     };
     TENSIKIBETU_COMBO {
       TENSIKIBETU {
-        textdata varchar(20);
+        textdata varchar(42);
       };
       count int;
-        item varchar(20)[4];
+        item varchar(42)[9];
     };
     OLDTENSKB_COMBO {
       OLDTENSKB {
-        textdata varchar(20);
+        textdata varchar(42);
       };
       count int;
-        item varchar(20)[4];
+        item varchar(42)[9];
     };
     SYUSAISKB {
       numdata number(1);

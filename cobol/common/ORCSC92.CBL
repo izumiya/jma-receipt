@@ -346,7 +346,7 @@
            03  WRK-PATH                PIC X(64).
       *H24.4
       *    ºÇÄãÌô²Á
-           03  WRK-CHKTEN               PIC 9(09)V9(2).
+           03  WRK-CHKTEN               PIC 9(09)V9(4).
       *
       *    »ÜÀßµ¬½à¥Æ¡¼¥Ö¥ë
        01  WRK-TBL-SSTKIJUN-AREA.
@@ -3820,6 +3820,14 @@
       *    ´ðÁÃÅÀ¿ô
            MOVE    TNS-TEN             TO  SPA-COM-TEN      (IDX-T)
            MOVE    TNS-TEN             TO  SPA-COM-KISOTEN  (IDX-T)
+      *H28.4
+      *    ÌôºÞ¡¡½ü»»¶â³Û¡Ê£±£°¤Ç½ü¤¹¡Ë
+           IF     (TNS-SRYCD(1:1)      =   "6"  ) AND
+                  (TNS-TENSIKIBETU     =   4    ) AND
+                  (TNS-TEN             >   ZERO )
+               COMPUTE SPA-COM-TEN     (IDX-T) =   TNS-TEN   /  10
+               COMPUTE SPA-COM-KISOTEN (IDX-T) =   TNS-TEN   /  10
+           END-IF
       *!!
       *    ¥³¥á¥ó¥È¶â³Û¥¯¥ê¥¢
            IF     (TNS-SRYCD(1:1)      =   "8"  )
