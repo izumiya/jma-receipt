@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04/08/00    NACL-多々納  16/03/XX  後発品変更不可（処方）対応他
+      *  04.08.00    NACL-多々納  16/03/XX  最低薬価テーブル対応
       *****************************************************************
       *
       *
@@ -52,6 +53,7 @@
            03  FLG-GENERICNAME     PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-SRYACCT         PIC 9(01).
+           03  FLG-GENERICPRICE    PIC 9(01).
       *
       *    後発医薬品変更不可
            03  FLG-KOUHATU-FUKA        PIC 9(01).
@@ -186,6 +188,10 @@
            02  TBL-SRYACT-REC         OCCURS   10.
            COPY    "CPSRYACT.INC"     REPLACING
                                       //SRY-// BY //TBL-SRY-//.
+      *H28.4
+      *    最低薬価マスタ
+       01  GENERICPRICE-REC.
+           COPY    "CPGENERICPRICE.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -607,37 +613,42 @@
            .
        200122-IPNKSN-HEN-EXT.
            EXIT.
-      *
+      *H28.4
       *****************************************************************
       *    一般名例外コード変換処理
       *****************************************************************
        200123-GENERICCD-HEN-SEC         SECTION.
       *
-           SET     TBL-GEN             TO  1
-           SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
-                   AT  END
-                       MOVE    SPACE           TO  WRK-GENERIC-CODE
-                       MOVE    SPACE           TO  WRK-GENERIC-STYMD
-                       MOVE    SPACE           TO  WRK-GENERIC-EDYMD
-                   WHEN    WRK-YAKKAKJNCD      =   TBL-YAKKAKJNCD
-                                                           (TBL-GEN)
-                       MOVE    TBL-GENERIC-CODE (TBL-GEN)
-                                                TO  WRK-GENERIC-CODE
-                       MOVE    TBL-GENERIC-STYMD (TBL-GEN)
-                                                TO  WRK-GENERIC-STYMD
-                       MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
-                                                TO  WRK-GENERIC-EDYMD
-           END-SEARCH
+           MOVE    SPACE               TO  WRK-GENERIC-CODE
       *
-           IF      WRK-GENERIC-CODE    NOT =   SPACE
-      *        有効期間判定
-               IF    (WRK-SRYYMD           >=  WRK-GENERIC-STYMD)
-                 AND (WRK-SRYYMD           <=  WRK-GENERIC-EDYMD)
-                   CONTINUE
+           MOVE    SPACE               TO  GENERICPRICE-REC
+           INITIALIZE                      GENERICPRICE-REC
+           MOVE    WRK-YAKKAKJNCD      TO  GENERICPRICE-YAKKAKJNCD
+           MOVE    WRK-SRYYMD          TO  GENERICPRICE-YUKOSTYMD
+           MOVE    WRK-SRYYMD          TO  GENERICPRICE-YUKOEDYMD
+           MOVE    GENERICPRICE-REC    TO  MCPDATA-REC
+           MOVE    "tbl_generic_price" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_generic_price" TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  GENERICPRICE-REC
+      *            一般名コード
+                   MOVE    GENERICPRICE-GECODE TO  WRK-GENERIC-CODE
                ELSE
-                   MOVE    SPACE           TO  WRK-GENERIC-CODE
+                   INITIALIZE                  GENERICPRICE-REC
+                   MOVE    1                   TO  FLG-GENERICPRICE
                END-IF
+           ELSE
+               INITIALIZE                  GENERICPRICE-REC
+               MOVE    1                   TO  FLG-GENERICPRICE
            END-IF
+           MOVE    "tbl_generic_price" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
       *
            IF      WRK-GENERIC-CODE      =   SPACE
                MOVE    WRK-YAKKAKJNCD        TO  WRK-YAKKAKJNCD-OLD
@@ -650,8 +661,55 @@
                MOVE    WRK-GENERIC-CODE    TO  WRK-YAKKAKJNCD
            END-IF
            .
-       20039-GENERICCD-HEN-EXT.
+       200123-GENERICCD-HEN-EXT.
            EXIT.
+      *
+      *!!未使用
+      *
+      *****************************************************************
+      *    一般名例外コード変換処理
+      *****************************************************************
+      *200123-GENERICCD-HEN-SEC         SECTION.
+      *
+      *    SET     TBL-GEN             TO  1
+      *    SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
+      *            AT  END
+      *                MOVE    SPACE           TO  WRK-GENERIC-CODE
+      *                MOVE    SPACE           TO  WRK-GENERIC-STYMD
+      *                MOVE    SPACE           TO  WRK-GENERIC-EDYMD
+      *            WHEN    WRK-YAKKAKJNCD      =   TBL-YAKKAKJNCD
+      *                                                    (TBL-GEN)
+      *                MOVE    TBL-GENERIC-CODE (TBL-GEN)
+      *                                         TO  WRK-GENERIC-CODE
+      *                MOVE    TBL-GENERIC-STYMD (TBL-GEN)
+      *                                         TO  WRK-GENERIC-STYMD
+      *                MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
+      *                                         TO  WRK-GENERIC-EDYMD
+      *    END-SEARCH
+      *
+      *    IF      WRK-GENERIC-CODE    NOT =   SPACE
+      *        有効期間判定
+      *        IF    (WRK-SRYYMD           >=  WRK-GENERIC-STYMD)
+      *          AND (WRK-SRYYMD           <=  WRK-GENERIC-EDYMD)
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    SPACE           TO  WRK-GENERIC-CODE
+      *        END-IF
+      *    END-IF
+      *
+      *    IF      WRK-GENERIC-CODE      =   SPACE
+      *        MOVE    WRK-YAKKAKJNCD        TO  WRK-YAKKAKJNCD-OLD
+      *        MOVE    SPACE                 TO  WRK-YAKKAKJNCD
+      *        STRING  WRK-YAKKAKJNCD-OLD(1:9)
+      *                "ZZZ"               DELIMITED  BY  SIZE
+      *                                    INTO    WRK-YAKKAKJNCD
+      *        END-STRING
+      *    ELSE
+      *        MOVE    WRK-GENERIC-CODE    TO  WRK-YAKKAKJNCD
+      *    END-IF
+      *    .
+      *20039-GENERICCD-HEN-EXT.
+      *    EXIT.
       *TEST
       *
       *H28.2

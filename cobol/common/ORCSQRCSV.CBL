@@ -38,6 +38,7 @@
       *  04.07.00    NACL-多々納  13/03/27  一般名例外テーブル期間対応
       *  04.07.00    NACL-多々納  14/05/XX  内服１回量対応
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
+      *  04.08.00    NACL-多々納  16/03/XX  最低薬価テーブル対応
       *****************************************************************
       *
       *
@@ -95,6 +96,7 @@
            03  FLG-PTHKNINF        PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
+           03  FLG-GENERICPRICE    PIC 9(01).
            03  FLG-SP              PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
       *
@@ -178,7 +180,7 @@
            COPY    "CPORCSQRENCODE.INC".
       *
       *    一般名例外コードテーブル
-           COPY    "CMGENERICTBL.INC".
+      **** COPY    "CMGENERICTBL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -195,6 +197,10 @@
       *    保険組合せ
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
+      *H28.4
+      *    最低薬価マスタ
+       01  GENERICPRICE-REC.
+           COPY    "CPGENERICPRICE.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1039,7 +1045,8 @@
       **       MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
       **                                   TO  TBL-QRCSV-DATA (6)
       *        一般名例外コード変換
-               PERFORM 20039-GENERICCD-HEN-SEC
+      *H28.4   PERFORM 20039-GENERICCD-HEN-SEC
+               PERFORM 20039-GENERICPRICE-HEN-SEC
                MOVE    WRK-YAKKAKJNCD      TO  TBL-QRCSV-DATA (6)
            END-IF
       *
@@ -1101,37 +1108,43 @@
        2003-RP201-EXT.
            EXIT.
       *
+      *H28.4
       *****************************************************************
       *    一般名例外コード変換処理
       *****************************************************************
-       20039-GENERICCD-HEN-SEC         SECTION.
+       20039-GENERICPRICE-HEN-SEC         SECTION.
       *
-           SET     TBL-GEN             TO  1
-           SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
-                   AT  END
-                       MOVE    SPACE            TO  WRK-YAKKAKJNCD
-                       MOVE    SPACE            TO  WRK-GENERIC-STYMD
-                       MOVE    SPACE            TO  WRK-GENERIC-EDYMD
-                   WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
-                                               =   TBL-YAKKAKJNCD
-                                                           (TBL-GEN)
-                       MOVE    TBL-GENERIC-CODE (TBL-GEN)
-                                                TO  WRK-YAKKAKJNCD
-                       MOVE    TBL-GENERIC-STYMD (TBL-GEN)
-                                                TO  WRK-GENERIC-STYMD
-                       MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
-                                                TO  WRK-GENERIC-EDYMD
-           END-SEARCH
-      *H25.4
-           IF      WRK-YAKKAKJNCD  NOT =   SPACE
-      *        有効期間判定
-               IF    (SPA-SRYYMD           >=  WRK-GENERIC-STYMD)
-                 AND (SPA-SRYYMD           <=  WRK-GENERIC-EDYMD)
-                   CONTINUE
+           MOVE    SPACE               TO  WRK-YAKKAKJNCD
+      *
+           MOVE    SPACE               TO  GENERICPRICE-REC
+           INITIALIZE                      GENERICPRICE-REC
+           MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+                                       TO  GENERICPRICE-YAKKAKJNCD
+           MOVE    SPA-SRYYMD          TO  GENERICPRICE-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  GENERICPRICE-YUKOEDYMD
+           MOVE    GENERICPRICE-REC    TO  MCPDATA-REC
+           MOVE    "tbl_generic_price" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_generic_price" TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  GENERICPRICE-REC
+      *            一般名コード
+                   MOVE    GENERICPRICE-GECODE TO  WRK-YAKKAKJNCD
                ELSE
-                   MOVE    SPACE           TO  WRK-YAKKAKJNCD
+                   INITIALIZE                  GENERICPRICE-REC
+                   MOVE    1                   TO  FLG-GENERICPRICE
                END-IF
+           ELSE
+               INITIALIZE                  GENERICPRICE-REC
+               MOVE    1                   TO  FLG-GENERICPRICE
            END-IF
+           MOVE    "tbl_generic_price" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
       *
            IF      WRK-YAKKAKJNCD      =   SPACE
                STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
@@ -1140,8 +1153,52 @@
                END-STRING
            END-IF
            .
-       20039-GENERICCD-HEN-EXT.
+       20039-GENERICPRICE-HEN-EXT.
            EXIT.
+      *
+      *!!未使用
+      *****************************************************************
+      *    一般名例外コード変換処理
+      *****************************************************************
+      *20039-GENERICCD-HEN-SEC         SECTION.
+      *
+      *    SET     TBL-GEN             TO  1
+      *    SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
+      *            AT  END
+      *                MOVE    SPACE            TO  WRK-YAKKAKJNCD
+      *                MOVE    SPACE            TO  WRK-GENERIC-STYMD
+      *                MOVE    SPACE            TO  WRK-GENERIC-EDYMD
+      *            WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+      *                                        =   TBL-YAKKAKJNCD
+      *                                                    (TBL-GEN)
+      *                MOVE    TBL-GENERIC-CODE (TBL-GEN)
+      *                                         TO  WRK-YAKKAKJNCD
+      *                MOVE    TBL-GENERIC-STYMD (TBL-GEN)
+      *                                         TO  WRK-GENERIC-STYMD
+      *                MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
+      *                                         TO  WRK-GENERIC-EDYMD
+      *    END-SEARCH
+      *H25.4
+      *    IF      WRK-YAKKAKJNCD  NOT =   SPACE
+      *        有効期間判定
+      *        IF    (SPA-SRYYMD           >=  WRK-GENERIC-STYMD)
+      *          AND (SPA-SRYYMD           <=  WRK-GENERIC-EDYMD)
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    SPACE           TO  WRK-YAKKAKJNCD
+      *        END-IF
+      *    END-IF
+      *
+      *    IF      WRK-YAKKAKJNCD      =   SPACE
+      *        STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
+      *                "ZZZ"               DELIMITED  BY  SIZE
+      *                                    INTO    WRK-YAKKAKJNCD
+      *        END-STRING
+      *    END-IF
+      *    .
+      *20039-GENERICCD-HEN-EXT.
+      *    EXIT.
+      *!!未使用
       *
       *****************************************************************
       *    １回服用量レコード作成処理
