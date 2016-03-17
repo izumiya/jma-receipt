@@ -792,6 +792,9 @@
       *    死亡コンボ初期処理
            PERFORM 3101-DEATH-CMB-SYOKI-SEC
       *
+      *    地域連携情報提供コンボ初期処理
+           PERFORM 3101-AGREEMENT-CMB-SYOKI-SEC
+      *
       *    テスト患者コンボ初期処理
            PERFORM 3101-TSTPT-CMB-SYOKI-SEC
            MOVE    SPA-GMN-Q01-TSTPTLST (1)
@@ -1080,6 +1083,24 @@
       *
            .
        3101-DEATH-CMB-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    地域連携情報提供コンボボックス初期処理
+      *****************************************************************
+       3101-AGREEMENT-CMB-SYOKI-SEC        SECTION.
+      *
+           INITIALIZE                      SPA-GMN-Q01-AGREEMENTLST-G
+      *
+           MOVE    2                   TO  SPA-GMN-Q01-AGREEMENTLST-MAX
+      *
+           MOVE    "0"                 TO  SPA-GMN-Q01-AGREEMENTL    (1)
+           MOVE    "同意しない"        TO  SPA-GMN-Q01-AGREEMENTMEIL (1)
+      *
+           MOVE    "1"                 TO  SPA-GMN-Q01-AGREEMENTL    (2)
+           MOVE    "同意する"          TO  SPA-GMN-Q01-AGREEMENTMEIL (2)
+      *
+           .
+       3101-AGREEMENT-CMB-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    テスト患者コンボボックス初期処理
@@ -2456,6 +2477,8 @@
            MOVE    Q01-SRYKA               TO  SPA-GMN-Q01-SRYKA-G
       *    死亡
            MOVE    Q01-DEATH               TO  SPA-GMN-Q01-DEATH-G
+      *    地域連携情報提供
+           MOVE    Q01-AGREEMENT           TO  SPA-GMN-Q01-AGREEMENT-G
       *    テスト患者
            MOVE    Q01-TSTPT               TO  SPA-GMN-Q01-TSTPT-G
       *    開始患者番号
@@ -2739,6 +2762,12 @@
       *
       *    死亡チェック
            PERFORM 4117-DEATH-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4101-KHN-INPUT-CHK-EXT
+           END-IF
+      *
+      *    地域連携情報提供チェック
+           PERFORM 4117-AGREEMENT-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4101-KHN-INPUT-CHK-EXT
            END-IF
@@ -3598,6 +3627,36 @@
       *
            .
        4117-DEATH-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    地域連携情報提供チェック
+      *****************************************************************
+       4117-AGREEMENT-CHK-SEC      SECTION.
+      *
+           IF    ( SPA-GMN-Q01-AGREEMENT-G     =   SPACE )
+               CONTINUE
+           ELSE
+      *
+               PERFORM VARYING IDX2    FROM    1   BY  1
+                       UNTIL ( IDX2    >   SPA-GMN-Q01-AGREEMENTLST-MAX)
+                          OR ( SPA-GMN-Q01-AGREEMENT
+                                       =   SPA-GMN-Q01-AGREEMENTL(IDX2))
+      *
+                   CONTINUE
+      *
+               END-PERFORM
+      *
+               IF    ( IDX2            <=  SPA-GMN-Q01-AGREEMENTLST-MAX)
+                   MOVE    SPA-GMN-Q01-AGREEMENTLST (IDX2)
+                                           TO  SPA-GMN-Q01-AGREEMENT-G
+               ELSE
+                   MOVE    "0153"          TO  SPA-ERRCD
+                   MOVE    166             TO  SPA-GMN-Q01-CUR
+               END-IF
+           END-IF
+      *
+           .
+       4117-AGREEMENT-CHK-EXT.
            EXIT.
       *****************************************************************
       *    テスト患者チェック
@@ -8355,6 +8414,10 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-EDPTNUM
       *
+           MOVE    SPA-GMN-Q01-AGREEMENT TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR       TO  SPA-Q01-AGREEMENT
+      *
            MOVE    SPA-GMN-Q01-TSTPT TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-CHKTSTPT
@@ -9011,6 +9074,8 @@
                MOVE    "1"                 TO  SPA-Q01-GBYOMEI
       *
            END-IF
+      *
+      *    該当（４，１３）
            IF  ( SPA-Q01-BYOMEI-G          NOT =   SPACE )
                IF    ( SPA-Q01-BYOMEI-JKN  NOT =   "9" )
                    MOVE    "1"     TO  SPA-Q01-GBYOMEI
@@ -9100,11 +9165,16 @@
       *
            END-IF
       *
-      *    該当（１３）
+      *    該当（１４）
            IF  ( SPA-Q01-XSRYCD-G          NOT =   SPACE )
       *
               MOVE     "1"                 TO  SPA-Q01-GXSRYACT
       *
+           END-IF
+      *
+      *    該当（１５）
+           IF  ( SPA-Q01-AGREEMENT         NOT =   SPACE )
+              MOVE     "1"                 TO  SPA-Q01-GPTNUM-PUBLIC
            END-IF
       *
       *    検索条件が未入力のとき
@@ -9550,6 +9620,18 @@
            MOVE    SPA-GMN-Q01-STPTNUM     TO  Q01-STPTNUM
       *    終了患者番号
            MOVE    SPA-GMN-Q01-EDPTNUM     TO  Q01-EDPTNUM
+      *    地域連携情報提供
+           MOVE    SPA-GMN-Q01-AGREEMENT-G     TO  Q01-AGREEMENT
+           MOVE    SPA-GMN-Q01-AGREEMENTLST-MAX
+                                           TO  Q01-CMB-AGREEMENT-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   SPA-GMN-Q01-AGREEMENTLST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-AGREEMENTLST (IDX1)
+                           TO  Q01-CMB-AGREEMENT-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
       *    テスト患者
            MOVE    SPA-GMN-Q01-TSTPT-G     TO  Q01-TSTPT
            MOVE    SPA-GMN-Q01-TSTPTLST-MAX
@@ -10436,6 +10518,8 @@
                MOVE  "TENKENRECE"  TO  MCP-WIDGET
            WHEN   165
                MOVE  "TSTPT"       TO  MCP-WIDGET
+           WHEN   166
+               MOVE  "AGREEMENT"   TO  MCP-WIDGET
       *
       *    保険・公費タブ
            WHEN   201
@@ -10704,6 +10788,8 @@
            WHEN   "STPTNUM"
                MOVE  111           TO  SPA-GMN-Q01-CUR
            WHEN   "EDPTNUM"
+               MOVE  166           TO  SPA-GMN-Q01-CUR
+           WHEN   "AGREEMENT"
                MOVE  165           TO  SPA-GMN-Q01-CUR
            WHEN   "TSTPT"
                MOVE  127           TO  SPA-GMN-Q01-CUR
@@ -11074,7 +11160,7 @@
       *
            EVALUATE    SPA-ERRCD
            WHEN    "0001"
-               MOVE    "入力エラー"    TO  SPA-ERRMSG
+               MOVE    "入力に誤りがあります"    TO  SPA-ERRMSG
            WHEN    "0002"
                MOVE    "患者番号の桁数が違います" 
                                        TO  SPA-ERRMSG
@@ -11100,97 +11186,97 @@
                MOVE    "全角文字でのみ入力してください"
                                        TO  SPA-ERRMSG
            WHEN    "0101"
-               MOVE    "診療年月日入力エラー"
+               MOVE    "診療年月日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0102"
-               MOVE    "生年月日入力エラー"
+               MOVE    "生年月日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0103"
-               MOVE    "年齢入力エラー"
+               MOVE    "年齢の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0104"
-               MOVE    "基準日入力エラー"
+               MOVE    "基準日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0105"
-               MOVE    "最終受診療日入力エラー"
+               MOVE    "最終受診療日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0106"
-               MOVE    "患者番号入力エラー"
+               MOVE    "患者番号の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0107"
-               MOVE    "病名コード入力エラー"
+               MOVE    "病名コードの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0108"
-               MOVE    "診療行為コード入力エラー"
+               MOVE    "診療行為コードの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0109"
-               MOVE    "性別入力エラー"
+               MOVE    "性別の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0110"
-               MOVE    "保険の種類入力エラー"
+               MOVE    "保険の種類の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0111"
-               MOVE    "公費の種類入力エラー"
+               MOVE    "公費の種類の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0112"
-               MOVE    "項目名入力エラー（検索結果　基本）"
+               MOVE    "項目名の入力に誤りがあります（検索結果　基本）"
                                        TO  SPA-ERRMSG
            WHEN    "0113"
-               MOVE    "本人家族入力エラー"
+               MOVE    "本人家族の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0114"
-               MOVE    "状態１入力エラー"
+               MOVE    "状態１の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0115"
-               MOVE    "状態２入力エラー"
+               MOVE    "状態２の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0116"
-               MOVE    "状態３入力エラー"
+               MOVE    "状態３の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0117"
-               MOVE    "診療科入力エラー"
+               MOVE    "診療科の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0118"
-               MOVE    "入外区分入力エラー"
+               MOVE    "入外区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0119"
-               MOVE    "疑い病名区分入力エラー"
+               MOVE    "疑い病名区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0120"
-               MOVE    "転帰区分入力エラー"
+               MOVE    "転帰区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0121"
-               MOVE    "開始転帰日入力エラー"
+               MOVE    "開始転帰日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0122"
-               MOVE    "終了転帰日入力エラー"
+               MOVE    "終了転帰日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0123"
-               MOVE    "減免事由入力エラー"
+               MOVE    "減免事由の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0124"
-               MOVE    "低所得１・２入力エラー"
+               MOVE    "低所得１・２の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0125"
-               MOVE    "低所得期間開始入力エラー"
+               MOVE    "低所得期間開始の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0126"
-               MOVE    "低所得開始月識別入力エラー"
+               MOVE    "低所得開始月識別の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0127"
-               MOVE    "低所得期間終了入力エラー"
+               MOVE    "低所得期間終了の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0128"
-               MOVE    "死亡区分入力エラー"
+               MOVE    "死亡区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0129"
-               MOVE    "診療区分入力エラー"
+               MOVE    "診療区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0130"
-               MOVE    "診療種別入力エラー"
+               MOVE    "診療種別の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0131"
-               MOVE    "コメント選択入力エラー"
+               MOVE    "コメント選択の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0132"
                MOVE    SPACE           TO  SPA-ERRMSG
@@ -11199,64 +11285,67 @@
                INTO    SPA-ERRMSG
                END-STRING
            WHEN    "0133"
-               MOVE    "誕生月入力エラー"
+               MOVE    "誕生月の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0134"
-               MOVE    "急性病名区分入力エラー"
+               MOVE    "急性病名区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0135"
-               MOVE    "主病名区分入力エラー"
+               MOVE    "主病名区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0136"
-               MOVE    "特記事項情報入力エラー"
+               MOVE    "特記事項情報の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0137"
-               MOVE    "特記事項コード入力エラー"
+               MOVE    "特記事項コードの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0138"
-               MOVE    "特記事項名称入力エラー"
+               MOVE    "特記事項名称の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0139"
-               MOVE    "項目名入力エラー（検索結果　点数）"
+               MOVE    "項目名の入力に誤りがあります（検索結果　点数）"
                                        TO  SPA-ERRMSG
            WHEN    "0140"
-               MOVE    "診療行為数値項目指定区分入力エラー"
+               MOVE    "診療行為数値項目指定区分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0141"
-               MOVE    "診療行為数値入力エラー"
+               MOVE    "診療行為数値の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0142"
-               MOVE    "診療行為数値項目比較条件入力エラー"
+               MOVE    "診療行為数値項目比較条件の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0143"
-               MOVE    "災害該当入力エラー"
+               MOVE    "災害該当の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0144"
-               MOVE    "病名比較条件入力エラー"
+               MOVE    "病名比較条件の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0145"
-               MOVE    "点検用レセプト入力エラー"
+               MOVE    "点検用レセプトの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0146"
-               MOVE    "開始診療開始日入力エラー"
+               MOVE    "開始診療開始日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0147"
-               MOVE    "終了診療開始日入力エラー"
+               MOVE    "終了診療開始日の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0148"
-               MOVE    "包括分入力エラー"
+               MOVE    "包括分の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0149"
-               MOVE    "テスト患者入力エラー"
+               MOVE    "テスト患者の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0150"
-               MOVE    "保険有効期間終了月入力エラー"
+               MOVE    "保険有効期間終了月の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0151"
-               MOVE    "公費適用期間終了月入力エラー"
+               MOVE    "公費適用期間終了月の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0152"
-               MOVE    "負担割合入力エラー"
+               MOVE    "負担割合の入力に誤りがあります"
+                                       TO  SPA-ERRMSG
+           WHEN    "0153"
+               MOVE    "地域連携情報提供の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "開始診療年月日＞終了診療年月日となっています"
@@ -11542,6 +11631,9 @@
                MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-EDPTNUM
                MOVE    SHODATA-ITEM    TO  Q01-EDPTNUM
+               MOVE    1               TO  FLG-PAGENO-00
+           WHEN    SHKITEMID-AGREEMENT
+               MOVE    SHODATA-ITEM    TO  Q01-AGREEMENT
                MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-TSTPT
                MOVE    SHODATA-ITEM    TO  Q01-TSTPT
@@ -12291,6 +12383,14 @@
                MOVE    SHKITEMID-EDPTNUM
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-EDPTNUM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-AGREEMENT     NOT =   SPACE )
+               MOVE    SHKITEMID-AGREEMENT
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-AGREEMENT
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF

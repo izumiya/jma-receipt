@@ -125,6 +125,7 @@
            03  FLG-PTINF               PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTSRH               PIC 9(01).
+           03  FLG-PTPUBLIC            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -210,6 +211,8 @@
            03  CSV-JYUSYO              PIC X(400).
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CSV-KANANAME            PIC X(100).
+           03  FILLER                  PIC X(01)   VALUE ",".
+           03  CSV-PATIENT-ID1         PIC X(20)   VALUE "ÃÏ°èÏ¢·È£É£Ä".
       * 
        01  CONST-AREA.
            03  CONST-FORMID            PIC X(20)   VALUE  "HCM28.red".
@@ -248,6 +251,12 @@
            03  CONST-CSV-JYUSYO        PIC X(20)   VALUE "½»½ê".
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CONST-CSV-KANANAME      PIC X(20)   VALUE "¥«¥Ê»áÌ¾".
+           03  FILLER                  PIC X(01)   VALUE ",".
+           03  CONST-CSV-PATIENT-ID1   PIC X(20)   VALUE "ÃÏ°èÏ¢·È£É£Ä".
+      *
+      *    ´µ¼Ô°ìÍ÷
+           COPY "HCM28.INC"        REPLACING  //HCM28//
+                                   BY         //HC28//.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -274,10 +283,10 @@
        01  PTSRH-REC.
            COPY    "CPPTSRH.INC".
       *
-      *    ´µ¼Ô°ìÍ÷
-           COPY "HCM28.INC"
-                                   REPLACING  //HCM28//
-                                   BY         //HC28//.
+      *    ´µ¼ÔÃÏ°èÏ¢·È
+       01  PTPUBLIC-REC.
+           COPY    "CPPTNUM-PUBLIC.INC".
+      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
@@ -503,6 +512,8 @@
       *
                PERFORM 900-PTINF-KEY-SEL-SEC
       *
+               PERFORM 900-PTNUM-PUBLIC-KEY-SEL-SEC
+      *
                IF  ( WKBQ01-PROC-FLG   =  ZERO )
       *
       *            £Ã£Ó£ÖÊÔ½¸½èÍý
@@ -677,6 +688,7 @@
                                        CSV-POST
                                        CSV-JYUSYO
                                        CSV-KANANAME
+                                       CSV-PATIENT-ID1
       *
            COMPUTE CNT-CSV =   CNT-CSV +   1
            IF    ( CNT-CSV =   1 )
@@ -752,6 +764,9 @@
            MOVE    WRK-ADRS        TO  CSV-JYUSYO
       *
            MOVE    PTINF-KANANAME  TO  CSV-KANANAME
+      *
+           MOVE    PTPUBLIC-PATIENT-ID1
+                                   TO  CSV-PATIENT-ID1
       *
            MOVE    CSV-EDIT-AREA   TO  CSV-REC
       *
@@ -847,11 +862,22 @@
       *
            PERFORM 900-ADRS-EDIT-SEC
       *
-           IF    ( WRK-ADRS (51:)  NOT =   SPACE )
-               MOVE    WRK-ADRS        TO  HC28-JYUSYO2 (CNT-LINE)
+           IF    ( PTPUBLIC-PATIENT-ID1 NOT =  SPACE )
+               IF    ( WRK-ADRS (35:)  NOT =   SPACE )
+                   MOVE    WRK-ADRS    TO  HC28-JYUSYO2 (CNT-LINE)
+               ELSE
+                   MOVE    WRK-ADRS    TO  HC28-JYUSYO  (CNT-LINE)
+               END-IF
            ELSE
-               MOVE    WRK-ADRS        TO  HC28-JYUSYO (CNT-LINE)
+               IF    ( WRK-ADRS (51:)  NOT =   SPACE )
+                   MOVE    WRK-ADRS    TO  HC28-JYUSYO2 (CNT-LINE)
+               ELSE
+                   MOVE    WRK-ADRS    TO  HC28-JYUSYO  (CNT-LINE)
+               END-IF
            END-IF
+      *
+           MOVE    PTPUBLIC-PATIENT-ID1
+                                   TO  HC28-PATIENT-ID1 (CNT-LINE)
       *
            IF  ( CNT-LINE         >=   CONST-LINE )
       *
@@ -1171,6 +1197,34 @@
       *
            .
        900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÃÏ°èÏ¢·È¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNUM-PUBLIC-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTPUBLIC
+      *
+           INITIALIZE                  PTPUBLIC-REC
+           MOVE    SPA-HOSPNUM     TO  PTPUBLIC-HOSPNUM
+           MOVE    PTSRH-PTID      TO  PTPUBLIC-PTID
+           MOVE    PTPUBLIC-REC    TO  MCPDATA-REC
+           MOVE    "tbl_ptnum_public" TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTPUBLIC-REC
+           ELSE
+               INITIALIZE              PTPUBLIC-REC
+               MOVE    1           TO  FLG-PTPUBLIC
+           END-IF
+      *
+           MOVE    "tbl_ptnum_public" TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNUM-PUBLIC-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ¥¹¥Æ¥Ã¥×´ÉÍý³«»Ï½èÍý

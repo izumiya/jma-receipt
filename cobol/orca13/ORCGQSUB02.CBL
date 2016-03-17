@@ -181,6 +181,7 @@
       *    M...TBL_SKYSRH"
       *    N...TBL_SRYSRH(NOT)"
       *    O...TBL_PTBYOMEI(NOT)"
+      *    P...TBL_PTNUM_PUBLIC"
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -767,6 +768,11 @@
       *****************************************************************
        1001-FROM-EDIT-SEC              SECTION.
       *
+      *    地域連携情報提供
+           IF  ( SPA-Q01-GPTNUM-PUBLIC      =   "1" )
+               PERFORM 1001-PTNUM-PUBLIC-JOKEN-SEC
+           END-IF
+      *
       *    低所得
            IF  ( SPA-Q01-GTSY      =   "1" )
                PERFORM 1001-TSY-JOKEN-EDIT-SEC
@@ -888,6 +894,13 @@
            INTO    WRK-SQL
            WITH    POINTER WRK-SQL-PNT
            END-STRING
+      *
+      *    地域連携情報提供
+           IF  ( SPA-Q01-GPTNUM-PUBLIC    =   "1" )
+               MOVE    FLG-JOKEN      TO  FLG-JOKEN-AND
+               PERFORM     1001-PTNUM-PUBLIC-SQL-EDIT-SEC
+               MOVE    1               TO  FLG-JOKEN
+           END-IF
       *
       *    低所得
            IF  ( SPA-Q01-GTSY  =   "1" )
@@ -1025,6 +1038,19 @@
       *
            .
        1001-WHERE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    地域連携情報提供条件編集処理
+      *****************************************************************
+       1001-PTNUM-PUBLIC-JOKEN-SEC        SECTION.
+      *
+           STRING  ",TBL_PTNUM_PUBLIC P "  DELIMITED  BY  SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       1001-PTNUM-PUBLIC-JOKEN-EXT.
            EXIT.
       *****************************************************************
       *    低所得条件編集処理
@@ -1616,6 +1642,26 @@
       *
            .
        1001-XBYOMEI-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    地域連携情報提供条件編集処理
+      *****************************************************************
+       1001-PTNUM-PUBLIC-SQL-EDIT-SEC           SECTION.
+      *
+           MOVE    "P"             TO  WRK-SQL-TBL-NAME
+           PERFORM 900-SQL-JOKEN-EDIT1-SEC
+      *
+           STRING  "(P.AGREEMENT   = '"    DELIMITED   BY  SIZE
+                   SPA-Q01-AGREEMENT       DELIMITED   BY  SPACE
+                   "')"                    DELIMITED   BY  SIZE
+           INTO        WRK-SQL
+           WITH POINTER    WRK-SQL-PNT
+           END-STRING
+      *
+           PERFORM 900-SQL-JOKEN-EDIT4-SEC
+      *
+           .
+       1001-PTNUM-PUBLIC-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    低所得者検索条件編集処理

@@ -59,6 +59,7 @@ Q02 {
             column9 varchar(15);
             column10 varchar(8);
             column11 varchar(200);
+            column12 varchar(20);
           }[200];
           selectdata bool[200];
       };

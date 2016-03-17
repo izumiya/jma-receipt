@@ -92,6 +92,13 @@ Q01 {
           count int;
             item varchar(10)[2];
         };
+        CMB_AGREEMENT {
+          AGREEMENT	{
+            textdata varchar(22);
+          };
+          count int;
+            item varchar(22)[5];
+        };
     	LBLTSTPT {
       		textdata varchar(20);
     	};

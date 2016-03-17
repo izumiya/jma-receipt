@@ -379,9 +379,10 @@
         <y>8</y>
         <width>720</width>
         <height>24</height>
+        <sensitive>True</sensitive>
         <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
         <editable>True</editable>
-        <text_visible>True</text_visible>
         <text_max_length>100</text_max_length>
         <text></text>
         <input_mode>XIM</input_mode>
@@ -637,8 +638,8 @@
           <has_focus>False</has_focus>
           <border_width>0</border_width>
           <show_titles>True</show_titles>
-          <columns>11</columns>
-          <column_widths>50,80,200,30,75,60,60,75,100,60,500</column_widths>
+          <columns>12</columns>
+          <column_widths>50,80,200,30,75,60,60,75,100,60,500,120</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -818,6 +819,21 @@
             <xpad>0</xpad>
             <ypad>0</ypad>
             <label>住所</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label422</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>地域連携ＩＤ</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>

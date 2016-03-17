@@ -112,6 +112,7 @@
            03  FLG-JOBEND                          PIC 9(01).
            03  FLG-HKNKOHSEL                       PIC 9(01).
            03  FLG-GMN-INIT                        PIC 9(01).
+           03  FLG-PTPUBLIC                        PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -286,6 +287,10 @@
       *    ¥¸¥ç¥Ö´ÉÍý¥Þ¥¹¥¿
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
+      *
+      *    ´µ¼ÔÃÏ°èÏ¢·È
+       01  PTPUBLIC-REC.
+           COPY    "CPPTNUM-PUBLIC.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -1032,6 +1037,8 @@
       *
                PERFORM 900-PTINF-KEY-SEL-SEC
       *
+               PERFORM 900-PTNUM-PUBLIC-KEY-SEL-SEC
+      *
       *        ÈÖ¹æ
                COMPUTE WRK-NUM     =   SPA-GMN-Q02-SKIP-KNS
                                    +   IDX-GMN
@@ -1195,6 +1202,10 @@
                    WITH    POINTER WRK-STR-PNT
                    END-STRING
                END-IF
+      *
+      *        ÃÏ°èÏ¢·È£É£Ä
+               MOVE    PTPUBLIC-PATIENT-ID1
+                                   TO  SPA-GMN-Q02-TPATIENT-ID1(IDX-GMN)
       *
                MOVE    IDX-GMN     TO  SPA-GMN-Q02-KEKKA-MAX
       *
@@ -2407,6 +2418,9 @@
       *        ¿ÇÎÅÆâÍÆ
                MOVE    SPA-GMN-Q02-TSRYACT (IDX1)
                                    TO  Q02-KEKKALST-SRYACTNAIYO (IDX1)
+      *        ÃÏ°èÏ¢·È£É£Ä
+               MOVE    SPA-GMN-Q02-TPATIENT-ID1 (IDX1)
+                                   TO  Q02-KEKKALST-PATIENT-ID1 (IDX1)
       *
                IF      ( SPA-GMN-Q02-KEKKA-SEL =   IDX1 )
                    MOVE    "T"     TO  Q02-KEKKALST-SELECT (IDX1)
@@ -2814,6 +2828,34 @@
       *
            .
        900-PTINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÃÏ°èÏ¢·È¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNUM-PUBLIC-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTPUBLIC
+      *
+           INITIALIZE                  PTPUBLIC-REC
+           MOVE    SPA-HOSPNUM     TO  PTPUBLIC-HOSPNUM
+           MOVE    PTSRH-PTID      TO  PTPUBLIC-PTID
+           MOVE    PTPUBLIC-REC    TO  MCPDATA-REC
+           MOVE    "tbl_ptnum_public" TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTPUBLIC-REC
+           ELSE
+               INITIALIZE              PTPUBLIC-REC
+               MOVE    1           TO  FLG-PTPUBLIC
+           END-IF
+      *
+           MOVE    "tbl_ptnum_public" TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNUM-PUBLIC-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ´µ¼Ô¾È²ñºï½ü½èÍý

@@ -122,6 +122,12 @@
                                13  SPA-GMN-Q01-DEATHFL PIC X(01).
                                13  SPA-GMN-Q01-DEATHMEI
                                                        PIC X(08).
+      *                    ÃÏ°èÏ¢·È¾ðÊóÄó¶¡
+                           11  SPA-GMN-Q01-AGREEMENT-G.
+                               13  SPA-GMN-Q01-AGREEMENT   PIC X(01).
+                               13  SPA-GMN-Q01-AGREEMENTFL PIC X(01).
+                               13  SPA-GMN-Q01-AGREEMENTMEI
+                                                       PIC X(20).
       *                    ¥Æ¥¹¥È´µ¼Ô
                            11  SPA-GMN-Q01-TSTPT-G.
                                13  SPA-GMN-Q01-TSTPT   PIC X(01).
@@ -598,6 +604,12 @@
                                13  SPA-GMN-Q01-DEATHL      PIC X(01).
                                13  SPA-GMN-Q01-DEATHFLL    PIC X(01).
                                13  SPA-GMN-Q01-DEATHMEIL   PIC X(08).
+                       09  SPA-GMN-Q01-AGREEMENTLST-G.
+                           11  SPA-GMN-Q01-AGREEMENTLST-MAX  PIC 9(05).
+                           11  SPA-GMN-Q01-AGREEMENTLST      OCCURS  10.
+                               13  SPA-GMN-Q01-AGREEMENTL    PIC X(01).
+                               13  SPA-GMN-Q01-AGREEMENTFLL  PIC X(01).
+                               13  SPA-GMN-Q01-AGREEMENTMEIL PIC X(20).
                        09  SPA-GMN-Q01-TSTPTLST-G.
                            11  SPA-GMN-Q01-TSTPTLST-MAX    PIC 9(05).
                            11  SPA-GMN-Q01-TSTPTLST        OCCURS  10.
@@ -955,6 +967,9 @@
       *                        È÷¹Í
                                13  SPA-GMN-Q02-TMEMO
                                                        PIC X(200).
+      *                        ÃÏ°èÏ¢·È£É£Ä
+                               13  SPA-GMN-Q02-TPATIENT-ID1
+                                                       PIC X(20).
       *
                            11  SPA-GMN-Q02-KEKKA-MAX   PIC 9(05).
                            11  SPA-GMN-Q02-KEKKA-SEL   PIC 9(05).
@@ -1208,9 +1223,10 @@
                            11  SPA-Q01-GSEIKYU         PIC X(01).
                            11  SPA-Q01-GXBYOMEI        PIC X(01).
                            11  SPA-Q01-GXSRYACT        PIC X(01).
+                           11  SPA-Q01-GPTNUM-PUBLIC   PIC X(01).
                        09  SPA-Q01-GITEM-R REDEFINES   SPA-Q01-GITEM-G.
                            11  SPA-Q01-GTBL            PIC X(01)
-                                                       OCCURS  14.
+                                                       OCCURS  15.
                    07  SPA-Q01-AGE-CALC-KBN            PIC 9(01).
                    07  SPA-Q01-STSRYYMD                PIC X(08).
                    07  SPA-Q01-EDSRYYMD                PIC X(08).
@@ -1229,7 +1245,8 @@
                        09  SPA-Q01-DEATH               PIC X(1).
                        09  SPA-Q01-STPTNUM             PIC X(20).
                        09  SPA-Q01-EDPTNUM             PIC X(20).
-                       09  SPA-Q01-CHKTSTPT            PIC X.
+                       09  SPA-Q01-AGREEMENT           PIC X(1).
+                       09  SPA-Q01-CHKTSTPT            PIC X(1).
                        09  SPA-Q01-JYUSHO-G.
                            11  SPA-Q01-JYUSHO          PIC X(50)
                                                        OCCURS  5.

@@ -59,6 +59,10 @@
                     07  Q01-DEATH              PIC         X(10).
                     07  Q01-CMB-DEATH-COUNT    PIC S9(9)   BINARY.
                     07  Q01-CMB-DEATH-ITEM     PIC X(10)   OCCURS  2.
+                  06  Q01-CMB-AGREEMENT.
+                    07  Q01-AGREEMENT              PIC         X(22).
+                    07  Q01-CMB-AGREEMENT-COUNT    PIC S9(9)   BINARY.
+                    07  Q01-CMB-AGREEMENT-ITEM     PIC X(22)   OCCURS 5.
                   06  Q01-LBLTSTPT             PIC         X(20).
                   06  Q01-CMB-TSTPT.
                     07  Q01-TSTPT              PIC         X(32).

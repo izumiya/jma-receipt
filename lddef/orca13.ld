@@ -58,6 +58,7 @@ db	{
         tbl_ptsrh; 
         tbl_ptinf; 
         tbl_spa_tmp; 
+        tbl_ptnum_public; 
 };
 
 /* #include "orcadb.inc" */
