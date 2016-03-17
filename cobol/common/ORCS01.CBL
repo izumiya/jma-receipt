@@ -19823,7 +19823,8 @@
            AND ((SYU-KOH2HKNNUM    =  "972" OR "974") OR
                 (SYU-KOH3HKNNUM    =  "972" OR "974") OR
                 (SYU-KOH4HKNNUM    =  "972" OR "974"))
-               MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+      ***      MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+               MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
            END-IF
       *
            IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
@@ -19836,7 +19837,8 @@
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
-               MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+      ***      MOVE  "00000000"  TO  WK-CHECK-TEKYMD
+               MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
              END-IF
            END-IF
       *
