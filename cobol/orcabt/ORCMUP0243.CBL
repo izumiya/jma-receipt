@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0242.
+       PROGRAM-ID.                 ORCMUP0243.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -30,8 +30,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.00     NACL-伊藤    12/05/10  レイアウト変更のため
       *                                     ORCMUP0241.CBLを複写して作成
-      * 04.08.00     NACL-伊藤    16/03/17  レイアウト変更のため更新データ
-      *                                     を変換
+      * 04.08.00     NACL-伊藤    16/03/17  レイアウト変更のため
+      *                                     ORCMUP0242.CBLを複写して作成
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -141,7 +141,7 @@
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0242.CBL】".
+                                       "【PGID:ORCMUP0243.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -244,7 +244,7 @@
            OPEN    INPUT               IN-FILE
            IF  STS-IN              NOT =   ZERO
                MOVE    1               TO  FLG-IN
-               DISPLAY "*(ORCMUP0242)* IN-FILE OPN STS[" STS-IN "]"
+               DISPLAY "*(ORCMUP0243)* IN-FILE OPN STS[" STS-IN "]"
            END-IF
       *
       *    出力ファイル　初期処理
@@ -695,14 +695,14 @@
       *
            OPEN    OUTPUT              ERR-FILE
            IF      STS-ERR     NOT =   ZERO
-               DISPLAY "*(ORCMUP0242)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0243)* OUTFILE OPN STS[" STS-ERR "]"
                GO  TO  2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT             PLF-FILE
            IF      STS-PLF    NOT =   ZERO
-               DISPLAY "*(ORCMUP0242)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0243)* PLFFILE OPN STS[" STS-PLF "]"
                GO  TO  2700-OUTLST-INIT-EXT
            END-IF
       *
@@ -744,13 +744,13 @@
                END-IF
            END-IF
       *
-           DISPLAY "*(ORCMUP0242)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0242)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0242)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0242)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0242)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0242)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0242)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0243)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0243)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0243)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0243)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0243)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0243)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0243)* RC             [" LNK-RC "]"
       *
            .
        300-END-EXT.
@@ -771,11 +771,7 @@
       *
           IF      FLG-IN           =   ZERO
               MOVE    SPACE            TO  GENERICWK-REC
-      *       2016.3.17 PRICE 9(9)V(2) -> 9(9)V3
-      *                 GECODE X(12) add
-              MOVE    IN-REC(1:48)     TO  GENERICWK-REC
-              MOVE    "0"              TO  GENERICWK-REC(49:)
-              MOVE    IN-REC(49:)      TO  GENERICWK-REC(62:)
+              MOVE    IN-REC           TO  GENERICWK-REC
           END-IF
       *
           .

@@ -30,6 +30,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.00     NACL-伊藤    12/05/10  レイアウト変更のため更新データ
       *                                     を変換
+      * 04.08.00     NACL-伊藤    16/03/17  レイアウト変更のため更新データ
+      *                                     を変換
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -770,8 +772,12 @@
           IF      FLG-IN           =   ZERO
               MOVE    SPACE            TO  GENERICWK-REC
       *       2012.5.10 YAKKAKJNCD 9 -> 12
+      *       2016.3.17 PRICE 9(9)V(2) -> 9(9)V3
+      *                 GECODE X(12) add
               MOVE    IN-REC(1:18)     TO  GENERICWK-REC
-              MOVE    IN-REC(19:)      TO  GENERICWK-REC(22:)
+              MOVE    IN-REC(19:27)    TO  GENERICWK-REC(22:)
+              MOVE    "0"              TO  GENERICWK-REC(49:)
+              MOVE    IN-REC(46:)      TO  GENERICWK-REC(62:)
           END-IF
       *
           .
