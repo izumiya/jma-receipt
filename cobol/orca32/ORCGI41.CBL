@@ -5161,6 +5161,23 @@
                    END-PERFORM
                END-IF
            END-IF
+      *    入院時食事療養２で生活療養算定時は、流動食を入力不可とする
+           IF      SPA-NAI-SRYYM         >=  "201604"
+             IF   SPA-NAI-TZAISKBKBN-41(SPA-NAI-BANGO)  =  "4"
+               IF      SPA-5000-NACCT-SKJKBN  =   "2"
+                   PERFORM   VARYING   IDX   FROM   1   BY  1
+                             UNTIL     IDX   >   31
+                       IF   (LNK-NYULIFE2-KBN(IDX)      =  "1")   AND
+                            (LNK-NYULIFE2-SKJKBN(IDX)   =  "2")   AND
+                            (SPA-GMN-DAY-41 (IDX)       =   3)
+                           MOVE   "0056"     TO   SPA-ERRCD
+                           GO      TO      470-KAKUTEI-EXT
+                       END-IF
+                   END-PERFORM
+               END-IF
+             END-IF
+           END-IF
+      *
            IF      SPA-NAI-SRYYM       =   SPA-NAI-NYUINBI(1:6)
                MOVE    SPA-NAI-NYUINBI(7:2)    TO  IDX-D
       *
