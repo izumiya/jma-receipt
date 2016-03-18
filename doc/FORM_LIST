@@ -40,20 +40,24 @@ HCN04.red           ＊  入院診療費明細書
 
 HC02.red                処方せん（Ａ５）                                            VER4.0.0
 HC02V01.red             処方せん（Ａ５）                                            VER4.5.0
-HC02V02.red         ＊  処方せん（Ａ５）                                            VER4.6.0
+HC02V02.red             処方せん（Ａ５）                                            VER4.6.0
+HC02V03.red         ＊  処方せん（Ａ５）                                            VER4.8.0
 HC02Q.red               処方せん（Ａ５）ＱＲコード                                  VER4.0.0
 HC02QV01.red            処方せん（Ａ５）ＱＲコード                                  VER4.5.0
-HC02QV02.red        ＊  処方せん（Ａ５）ＱＲコード                                  VER4.6.0
+HC02QV02.red            処方せん（Ａ５）ＱＲコード                                  VER4.6.0
+HC02QV03.red        ＊  処方せん（Ａ５）ＱＲコード                                  VER4.8.0
 HCM19.red               処方せん
 HCM19V01.red            処方せん                                                    VER4.5.0
-HCM19V02.red        ＊  処方せん                                                    VER4.6.0
+HCM19V02.red            処方せん                                                    VER4.6.0
+HCM19V03.red        ＊  処方せん                                                    VER4.8.0
 
 HC501.red           ＊  入院処方箋
 HC502.red           ＊  注射処方箋
 HC503.red           ＊  入院指示箋
 HCN02.red               退院証明書
 HCN02V01.red            退院証明書                                                  VER4.3.0
-HCN02V02.red        ＊  退院証明書                                                  VER4.3.0
+HCN02V02.red            退院証明書                                                  VER4.3.0
+HCN02V03.red        ＊  退院証明書                                                  VER4.8.0
 
 HCM300.red          ＊  薬剤情報（８行）                                            VER4.1.0
 HCM301.red          ＊  薬剤情報（６行）                                            VER4.2.0
@@ -529,6 +533,7 @@ HCM45.red           ＊  入院オーダー確認リスト
 
 HCMG001.red         ＊  診療科別医薬品使用量統計
 HCMG006.red         ＊  診療科別医薬品使用量統計（合計金額）
+HCMG007.red         ＊  後発医薬品シェア
 HCM38.red           ＊  未収金一覧表（集計表）
 HCM39.red           ＊  未収金一覧表（伝票別）
 HCMZ001.red         ＊  空き患者番号一覧
@@ -554,7 +559,8 @@ HCN63V2.red         ＊  分娩費用明細書                                          
 HCN64.red           ＊  出産育児一時金等送付書                                      VER4.5.0
 HCN65.red           ＊  出産育児一時金等集計票                                      VER4.5.0
 
-HCN68.red           ＊  医療区分・ＡＤＬ区分に係る評価票                            VER4.7.0
+HCN68.red               医療区分・ＡＤＬ区分に係る評価票                            VER4.7.0
+HCN68H28.red        ＊  医療区分・ＡＤＬ区分に係る評価票                            VER4.8.0
 HCN69.red           ＊  医療区分・ＡＤＬ区分に係る評価票（続紙）                    VER4.7.0
 
 HCM51.red               収納日報（明細）
