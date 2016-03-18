@@ -34,8 +34,9 @@
       *  04.03.01    NACL-森脇    08/07/29  パラメタに入外区分追加
       *  04.05.01    NACL-森脇    09/08/07  パラメタに期間範囲追加
       *  04.05.02    NACL-森脇    08/09/18  病棟別集計対応
-      * 04.05.03     NACL-森脇    09/12/15  ＣＳＶ出力対応
-      * 04.08.01     NACL-森脇    14/07/23  一時ファイルディレクトリ設定
+      *  04.05.03    NACL-森脇    09/12/15  ＣＳＶ出力対応
+      *  04.08.01    NACL-森脇    14/07/23  一時ファイルディレクトリ設定
+      *  04.08.02    NACL-森脇    16/03/17  金額種別４に対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -71,6 +72,9 @@
            03  TOKEI-TANI              PIC X(10).
            03  TOKEI-TEN               PIC 9(07)V9(02).
            03  TOKEI-SRYSURYO          PIC 9(10)V9(05).
+      *----(04.08.02)--ADD-START---
+           03  TOKEI-TENSIKIBETU       PIC 9(01).
+      *----(04.08.02)--ADD-END-----
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -174,14 +178,11 @@
                05  WRK-SURYO-Z3        PIC 9(05).
       *
            03  WRK-HENTEN              PIC X(10).
-           03  WRK-TEN                 PIC 9(07)V9(02).
-           03  WRK-TEN-R               REDEFINES   WRK-TEN.
-               05  WRK-TEN-S1          PIC 9(07).
-               05  WRK-TEN-S2          PIC 9(02).
-           03  WRK-TEN-X.
-               05  WRK-TEN-Z1          PIC ZZZZZZ9.
-               05  WRK-TEN-Z2          PIC X(01).
-               05  WRK-TEN-Z3          PIC 9(02).
+      *----(04.08.02)--UPD-START---
+           03  WRK-HENTENSU            PIC X(10).
+           03  WRK-TEN                 PIC 9(07)V9(03).
+           03  WRK-TENSU               PIC ZZZZZZ9.999.
+      *----(04.08.02)--UPD-START---
       *
            03  WRK-HENKIN              PIC X(16).
            03  WRK-KIN                 PIC 9(10)V9(05).
@@ -624,7 +625,6 @@
       *
            CLOSE                       TOKEI-FILE
       *
-           DISPLAY "CCCCCCCCCCCCCCCCCCCCCCCCCC"
            OPEN    INPUT               TOKEI-FILE
       *    集計統計データ順読込み
            PERFORM 900-TOKEI-NEXT-SEC
@@ -636,7 +636,6 @@
                        UNTIL   FLG-TOKEI   =   1
            END-IF
            CLOSE                       TOKEI-FILE
-           DISPLAY "DDDDDDDDDDDDDDDDDD"
       *
       *    データをクリアする
            OPEN    OUTPUT              TOKEI-FILE
@@ -769,8 +768,6 @@
                    MOVE    40          TO  CNT-MAX
                WHEN    40  THRU    44
                    MOVE    45          TO  CNT-MAX
-               WHEN    45  THRU    49
-                   MOVE    50          TO  CNT-MAX
                WHEN    45  THRU    49
                    MOVE    50          TO  CNT-MAX
                WHEN    50  THRU    54
@@ -1267,6 +1264,9 @@
            END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
            MOVE    TNS-TANINAME    TO  TOKEI-TANI
+      *----(04.08.02)--ADD-START---
+           MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
+      *----(04.08.02)--ADD-END-----
            MOVE    ZERO            TO  TOKEI-SRYSURYO
            PERFORM 900-TOKEI-READ-SEC
            COMPUTE WRK-GSURYO      =   WRK-SURYO
@@ -1319,6 +1319,9 @@
            END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
            MOVE    TNS-TANINAME    TO  TOKEI-TANI
+      *----(04.08.02)--ADD-START---
+           MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
+      *----(04.08.02)--ADD-END-----
            MOVE    ZERO            TO  TOKEI-SRYSURYO
            PERFORM 900-TOKEI-READ-SEC
            COMPUTE WRK-GSURYO      =   WRK-SURYO
@@ -1457,9 +1460,21 @@
                MOVE    TOKEI-NAME          TO  WRK-NAI-NAME  (IDY)
                MOVE    TOKEI-TANI          TO  WRK-NAI-TANI  (IDY)
       *        点数編集
-               MOVE    TOKEI-TEN           TO  WRK-TEN
-               PERFORM 400-ZHEN-TEN-SET-SEC
-               MOVE    WRK-HENTEN          TO  WRK-NAI-TEN(IDY)
+      *----(04.08.02)--UPD-START---
+               IF      TOKEI-TENSIKIBETU   =   4
+                   COMPUTE WRK-TEN     =   TOKEI-TEN   /   10
+                   MOVE    WRK-TEN             TO  WRK-TENSU
+                   MOVE    WRK-TENSU(2:10)     TO  WRK-HENTENSU
+                   PERFORM 400-ZHEN-TEN-SET-SEC
+                   MOVE    WRK-HENTEN          TO  WRK-NAI-TEN(IDY)
+               ELSE
+                   MOVE    TOKEI-TEN           TO  WRK-TEN
+                   MOVE    WRK-TEN             TO  WRK-TENSU
+                   MOVE    WRK-TENSU(1:10)     TO  WRK-HENTENSU
+                   PERFORM 400-ZHEN-TEN-SET-SEC
+                   MOVE    WRK-HENTEN          TO  WRK-NAI-TEN(IDY)
+               END-IF
+      *----(04.08.02)--UPD-START---
            ELSE
                MOVE    TOKEI-NAME          TO  WRK-NAI-NAME  (IDY)
            END-IF
@@ -1510,9 +1525,12 @@
                MOVE    0               TO  WRK-WARIAI
                COMPUTE WRK-WARIAI      =   CNT-KOUHATU
                                        /   CNT-TOKEI   *   100
-               MOVE    WRK-WARIAI      TO  WRK-TEN
+      *----(04.08.02)--UPD-START---
+               MOVE    WRK-WARIAI      TO  WRK-TENSU
+               MOVE    WRK-TENSU(1:10) TO  WRK-HENTENSU
                PERFORM 400-ZHEN-TEN-SET-SEC
                MOVE    WRK-HENTEN      TO  WRK-NAI-TEN(25)
+      *----(04.08.02)--UPD-END-----
            END-IF
       *
              .
@@ -1535,8 +1553,15 @@
                        MOVE    WRK-HENSURYO    TO
                                                WRK-NAI-SURYO(IDY IDX)
       *                合計編集
-                       COMPUTE WRK-KIN         =   TOKEI-TEN
+      *----(04.08.02)--UPD-START---
+                       IF      TOKEI-TENSIKIBETU   =   4
+                           COMPUTE WRK-TEN     =   TOKEI-TEN   /   10
+                       ELSE
+                           MOVE    TOKEI-TEN       TO  WRK-TEN
+                       END-IF
+                       COMPUTE WRK-KIN         =   WRK-TEN
                                                *   TOKEI-SRYSURYO
+      *----(04.08.02)--UPD-START---
                        PERFORM 400-ZHEN-KIN-SET-SEC
                        MOVE    WRK-HENKIN      TO  WRK-NAI-GAKU(IDY IDX)
                        MOVE    CNT-SRYKA       TO  IDX
@@ -2016,32 +2041,19 @@
            .
        400-ZHEN-SURYO-SET-EXT.
            EXIT.
-      *
+      *----(04.08.02)--UPD-START---
       *****************************************************************
       *   帳票Ｚ編集処理
       *****************************************************************
        400-ZHEN-TEN-SET-SEC        SECTION.
       *
            MOVE    SPACE           TO  WRK-HENTEN
-           MOVE    SPACE           TO  WRK-TEN-X
-      *
-      *    点数Ｚ編集
-           IF    ( WRK-TEN-S1      =   ZERO )  AND
-                 ( WRK-TEN-S2      =   ZERO )
-               GO  TO  400-ZHEN-TEN-SET-EXT
-           END-IF
-      *
-           MOVE    WRK-TEN-S1      TO  WRK-TEN-Z1
-           MOVE    "."             TO  WRK-TEN-Z2
-           MOVE    WRK-TEN-S2      TO  WRK-TEN-Z3
-      *
-           MOVE    SPACE           TO  WRK-HENTEN
            MOVE    ZERO            TO  CNT-KETA
            PERFORM VARYING CNT-KETA2   FROM    1   BY  1
                    UNTIL   CNT-KETA2   >   10
-               IF      WRK-TEN-X(CNT-KETA2:1)  NOT =   SPACE
+               IF      WRK-HENTENSU(CNT-KETA2:1)   NOT =   SPACE
                    COMPUTE CNT-KETA    =   CNT-KETA    +   1
-                   MOVE  WRK-TEN-X(CNT-KETA2:1)
+                   MOVE  WRK-HENTENSU(CNT-KETA2:1)
                                        TO  WRK-HENTEN(CNT-KETA:1)
                END-IF
            END-PERFORM
@@ -2049,6 +2061,7 @@
            .
        400-ZHEN-TEN-SET-EXT.
            EXIT.
+      *----(04.08.02)--UPD-END-----
       *****************************************************************
       *   帳票Ｚ編集処理
       *****************************************************************

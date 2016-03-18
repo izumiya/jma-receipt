@@ -38,6 +38,7 @@
       *  03.05.01    NACL-森脇    07/05/29  グループ診療対応
       *  04.03.01    NACL-森脇    08/06/13  ＣＳＶファイル出力対応
       *  04.08.01    NACL-森脇    14/07/31  一時ファイルディレクトリ設定
+      *  04.08.02    NACL-森脇    16/03/17  金額種別４に対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -73,7 +74,9 @@
            03  CSV-FILLER4         PIC X(1).
            03  CSV-NAME            PIC X(100).
            03  CSV-FILLER5         PIC X(1).
-           03  CSV-TEN             PIC 9(9).99.
+      *----(04.08.02)--UPD-START---
+           03  CSV-TEN             PIC X(12).
+      *----(04.08.02)--UPD-START---
            03  CSV-FILLER6         PIC X(1).
            03  CSV-TANINAME        PIC X(24).
            03  CSV-FILLER7         PIC X(1).
@@ -170,8 +173,11 @@
            03  WRK-HENYMDG         PIC X(22).
       *
            03  WRK-PAGE            PIC ZZ,ZZ9.
-           03  WRK-TEN             PIC ZZZ,ZZZ,ZZ9.99.
            03  WRK-CSYYOURYO       PIC ZZ,ZZ9.
+      *----(04.08.02)--ADD-START---
+           03  WRK-TEN             PIC ZZZ,ZZZ,ZZ9.999.
+           03  WRK-TENSU           PIC 9(09).999.
+      *----(04.08.02)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -473,8 +479,16 @@
       *
            ADD     1                   TO  CNT-LINE
       *
-           MOVE    TNS-TEN             TO  WRK-TEN
-           MOVE    WRK-TEN             TO  HCML01-TEN(CNT-LINE)
+      *----(04.08.02)--UPD-START---
+           IF      TNS-TENSIKIBETU     =   4
+               COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+               MOVE    WRK-TENSU           TO  WRK-TEN
+               MOVE    WRK-TEN(2:14)       TO  HCML01-TEN(CNT-LINE)
+           ELSE
+               MOVE    TNS-TEN             TO  WRK-TEN
+               MOVE    WRK-TEN(1:14)       TO  HCML01-TEN(CNT-LINE)
+           END-IF
+      *----(04.08.02)--UPD-END-----
            MOVE    TNS-CSYYOURYO       TO  WRK-CSYYOURYO
            MOVE    WRK-CSYYOURYO       TO  HCML01-CSYYOURYO(CNT-LINE)
       *
@@ -587,7 +601,15 @@
            MOVE    TNS-YUKOSTYMD       TO  CSV-YUKOSTYMD
            MOVE    TNS-YUKOEDYMD       TO  CSV-YUKOEDYMD
            MOVE    TNS-NAME            TO  CSV-NAME
-           MOVE    TNS-TEN             TO  CSV-TEN
+      *----(04.08.02)--UPD-START---
+           IF      TNS-TENSIKIBETU     =   4
+               COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+               MOVE    WRK-TENSU(2:12)     TO  CSV-TEN
+           ELSE
+               MOVE    TNS-TEN             TO  WRK-TENSU
+               MOVE    WRK-TENSU(1:12)     TO  CSV-TEN
+           END-IF
+      *----(04.08.02)--UPD-END-----
            MOVE    TNS-TANINAME        TO  CSV-TANINAME
            MOVE    TNS-CSYYOURYO       TO  CSV-CSYYOURYO
       *    麻毒区分

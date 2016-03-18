@@ -20,7 +20,7 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 点数マスタ
-      *  コンポーネント名  : 入力コード点数マスタ一覧表（HCML06）
+      *  コンポーネント名  : 入力コード点数マスタ一覧表・薬剤（HCML06）
       *  管理者            : 
       *  作成日付    作業者        記述
       *  02/04/08    MCC-森脇      新規作成
@@ -37,6 +37,7 @@
       *  03.05.01    NACL-森脇    07/05/29  グループ診療対応
       *  04.03.01    NACL-森脇    08/06/13  ＣＳＶファイル出力対応
       *  04.08.01    NACL-森脇    14/07/31  一時ファイルディレクトリ設定
+      *  04.08.02    NACL-森脇    16/03/17  金額種別４に対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -68,7 +69,9 @@
            03  CSV-FILLER2         PIC X(1).
            03  CSV-NAME            PIC X(60).
            03  CSV-FILLER3         PIC X(1).
-           03  CSV-TEN             PIC 9(09).99.
+      *----(04.08.02)--UPD-START---
+           03  CSV-TEN             PIC X(12).
+      *----(04.08.02)--UPD-START---
       *
        WORKING-STORAGE             SECTION.
       *    シェル用領域
@@ -143,7 +146,10 @@
            03  WRK-HENYMDG           PIC X(22).
       *
            03  WRK-PAGE              PIC ZZ9.
-           03  WRK-TEN               PIC ZZZ,ZZZ,ZZ9.99.   
+      *----(04.08.02)--ADD-START---
+           03  WRK-TEN            PIC ZZZ,ZZZ,ZZ9.999.
+           03  WRK-TENSU           PIC 9(09).999.
+      *----(04.08.02)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -465,8 +471,16 @@
                    PERFORM 310-HEAD-HEN-SEC
                END-IF
                ADD     1                 TO  CNT-LINE
-               MOVE    TNS-TEN           TO  WRK-TEN
-               MOVE    WRK-TEN           TO  HCML06-TEN(CNT-LINE)
+      *----(04.08.02)--UPD-START---
+               IF      TNS-TENSIKIBETU     =   4
+                   COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+                   MOVE    WRK-TENSU         TO  WRK-TEN
+                   MOVE    WRK-TEN(2:14)     TO  HCML06-TEN(CNT-LINE)
+               ELSE
+                   MOVE    TNS-TEN           TO  WRK-TEN
+                   MOVE    WRK-TEN(1:14)     TO  HCML06-TEN(CNT-LINE)
+               END-IF
+      *----(04.08.02)--UPD-END-----
                MOVE    ICD-INPUTCD       TO  HCML06-SRYCD(CNT-LINE)
                MOVE    TNS-NAME          TO  HCML06-NAME(CNT-LINE)
                PERFORM 900-ICDFETCH-SEC
@@ -490,7 +504,15 @@
                    ADD     1               TO  SUM-KENSU
                    INITIALIZE                  TENSUCSV-REC
                    MOVE    TNS-HOSPNUM     TO  CSV-HOSPNUM
-                   MOVE    TNS-TEN         TO  CSV-TEN
+      *----(04.08.02)--UPD-START---
+                   IF      TNS-TENSIKIBETU     =   4
+                       COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+                       MOVE    WRK-TENSU(2:12)     TO  CSV-TEN
+                   ELSE
+                       MOVE    TNS-TEN             TO  WRK-TENSU
+                       MOVE    WRK-TENSU(1:12)     TO  CSV-TEN
+                   END-IF
+      *----(04.08.02)--UPD-END-----
                    MOVE    ICD-INPUTCD     TO  CSV-SRYCD
                    MOVE    TNS-NAME        TO  CSV-NAME
                    MOVE    ","             TO  CSV-FILLER1

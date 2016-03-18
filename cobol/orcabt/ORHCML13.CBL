@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-森脇    14/07/31  一時ファイルディレクトリ設定
+      *  04.08.02    NACL-森脇    16/03/17  金額種別４に対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -63,7 +64,9 @@
            03  CSV-FILLER4         PIC X(1).
            03  CSV-NAME            PIC X(200).
            03  CSV-FILLER5         PIC X(1).
-           03  CSV-TEN             PIC 9(9).99.
+      *----(04.08.02)--UPD-START---
+           03  CSV-TEN             PIC X(12).
+      *----(04.08.02)--UPD-START---
            03  CSV-FILLER6         PIC X(1).
            03  CSV-TANINAME        PIC X(24).
            03  CSV-FILLER7         PIC X(1).
@@ -75,7 +78,9 @@
            03  CSV-FILLER10        PIC X(1).
            03  CSV-GNAME           PIC X(200).
            03  CSV-FILLER11        PIC X(1).
-           03  CSV-SAITEN          PIC 9(9).99.
+      *----(04.08.02)--UPD-START---
+           03  CSV-SAITEN          PIC X(12).
+      *----(04.08.02)--UPD-START---
            03  CSV-FILLER12        PIC X(1).
            03  CSV-KOUHATUKBN      PIC X(1).
            03  CSV-FILLER13        PIC X(1).
@@ -163,8 +168,11 @@
            03  WRK-HENYMDG         PIC X(22).
       *
            03  WRK-PAGE            PIC ZZ,ZZ9.
-           03  WRK-TEN             PIC ZZZ,ZZZ,ZZ9.99.
            03  WRK-CSYYOURYO       PIC ZZ,ZZ9.
+      *----(04.08.02)--ADD-START---
+           03  WRK-TEN             PIC ZZZ,ZZZ,ZZ9.999.
+           03  WRK-TENSU           PIC 9(09).999.
+      *----(04.08.02)--ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -479,10 +487,23 @@
       *
            ADD     1                   TO  CNT-LINE
       *
-           MOVE    TNS-TEN             TO  WRK-TEN
-           MOVE    WRK-TEN             TO  HCML13-TEN(CNT-LINE)
+      *----(04.08.02)--UPD-START---
+           IF      TNS-TENSIKIBETU     =   4
+               COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+               MOVE    WRK-TENSU           TO  WRK-TEN
+               MOVE    WRK-TEN(2:14)       TO  HCML13-TEN(CNT-LINE)
+           ELSE
+               MOVE    TNS-TEN             TO  WRK-TEN
+               MOVE    WRK-TEN(1:14)       TO  HCML13-TEN(CNT-LINE)
+           END-IF
+      *
            MOVE    GENERICPRICE-PRICE  TO  WRK-TEN
-           MOVE    WRK-TEN             TO  HCML13-SAITEN(CNT-LINE)
+           IF      WRK-TEN(15:1)   =   "0"
+               MOVE    WRK-TEN(1:14)   TO  HCML13-SAITEN(CNT-LINE)
+           ELSE
+               MOVE    WRK-TEN(2:14)   TO  HCML13-SAITEN(CNT-LINE)
+           END-IF
+      *----(04.08.02)--UPD-END-----
       *
            MOVE    TNS-SRYCD           TO  HCML13-SRYCD(CNT-LINE)
            MOVE    TNS-YAKKAKJNCD      TO  HCML13-YAKKAKJNCD(CNT-LINE)
@@ -568,10 +589,24 @@
            MOVE    TNS-YUKOSTYMD       TO  CSV-YUKOSTYMD
            MOVE    TNS-YUKOEDYMD       TO  CSV-YUKOEDYMD
            MOVE    TNS-NAME            TO  CSV-NAME
-           MOVE    TNS-TEN             TO  CSV-TEN
            MOVE    TNS-TANINAME        TO  CSV-TANINAME
       *
-           MOVE    GENERICPRICE-PRICE  TO  CSV-SAITEN
+      *----(04.08.02)--UPD-START---
+           IF      TNS-TENSIKIBETU     =   4
+               COMPUTE WRK-TENSU   =   TNS-TEN     /   10
+               MOVE    WRK-TENSU(2:12)     TO  CSV-TEN
+           ELSE
+               MOVE    TNS-TEN             TO  WRK-TENSU
+               MOVE    WRK-TENSU(1:12)     TO  CSV-TEN
+           END-IF
+      *
+           MOVE    GENERICPRICE-PRICE  TO  WRK-TENSU
+           IF      WRK-TENSU(13:1) =   "0"
+               MOVE    WRK-TENSU(1:12) TO  CSV-SAITEN
+           ELSE
+               MOVE    WRK-TENSU(2:12) TO  CSV-SAITEN
+           END-IF
+      *----(04.08.02)--UPD-END-----
       *
            MOVE    TNS-SYUSAISKB       TO  CSV-SYUSAISKB
            MOVE    TNS-KOUHATUKBN      TO  CSV-KOUHATUKBN
