@@ -396,10 +396,12 @@
            03  FLG-HKNNUMERR                           PIC 9(01).
            03  FLG-CHK004                              PIC 9(01).
            03  FLG-INNAI-DAY-G.
-               05  FLG-INNAI-DAY                       PIC 9(01)
+               05  FLG-INNAI-DAY-OCC                   OCCURS 2.
+                   07  FLG-INNAI-DAY                   PIC 9(01)
                                                        OCCURS  31.
            03  FLG-INGAI-DAY-G.
-               05  FLG-INGAI-DAY                       PIC 9(01)
+               05  FLG-INGAI-DAY-OCC                   OCCURS 2.
+                   07  FLG-INGAI-DAY                   PIC 9(01)
                                                        OCCURS  31.
            03  FLG-DATACHECK                           PIC 9(01).
            03  FLG-KIKANCHKCD                          PIC 9(01).
@@ -425,6 +427,7 @@
            03  FLG-KAIGO-CHK                           PIC 9(01).
            03  FLG-HKNKBN                              PIC 9(01).
            03  FLG-TEKDIS                              PIC 9(01).
+           03  FLG-DAY                                 PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -510,6 +513,7 @@
            03  IDXN                                    PIC 9(05).
            03  IDXP                                    PIC 9(05).
            03  IDXR                                    PIC 9(05).
+           03  IDXS                                    PIC 9(05).
            03  IDX-TSRYKA                              PIC 9(05).
            03  IDX-TKAISU                              PIC 9(05).
            03  IDX-ERRCD                               PIC 9(05).
@@ -3395,6 +3399,8 @@
                        EVALUATE    TRUE
                        WHEN  ( DCACCT-SRYKBN   =   "21" OR "22" OR "23")
                         AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "3" )
+                        AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "1" )
+                        AND  ( DCSRY-SRYSYUKBN         NOT =   "294" )
                         AND  ( DCACCT-ZAITEN               =   ZERO )
                        WHEN  ( DCSRY-SRYSYUKBN =   "148" OR "149"
                                                 OR "213" OR "223"
@@ -3429,6 +3435,15 @@
       *
            MOVE    1               TO  FLG-TAISYO-SRY
       *
+           IF    ( DCACCT-SRYKBN           =   "21" OR "22" OR "23" )
+            AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "3" )
+            AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "1" )
+            AND  ( DCSRY-SRYSYUKBN         NOT =   "294" )
+            AND  ( DCACCT-ZAITEN           =   ZERO )
+            AND  ( DCACCT-MINUS            =   ZERO )
+               MOVE                1       TO  FLG-INGAISYOHOU
+           END-IF
+      *
       *    薬剤の場合、院外処方の処理対象チェックを行う
            EVALUATE    TRUE
            WHEN  ( DCSRY-SRYSYUKBN     =   "213" OR "223" OR "233" )
@@ -3437,9 +3452,7 @@
                EVALUATE    ORCBSD01-INGAIPROCKBN
       *        院外処方を含まない
                WHEN    ZERO
-                   IF    ( DCACCT-SRYKBN(1:1)    =   "2"  )
-                    AND  ( DCACCT-MINUS          =   ZERO )
-                    AND  ( DCACCT-ZAITEN         =   ZERO )
+                   IF    ( FLG-INGAISYOHOU       =   1 )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
                    IF    ( DCSRY-SRYSYUKBN     =   "148"  )
@@ -3450,25 +3463,15 @@
                        CONTINUE
       *        院外処方のみ
                WHEN    "2"
-                   IF   (  DCACCT-SRYKBN(1:1)    =   "2"   )
-                       IF    ( DCACCT-ZAITEN NOT =   ZERO  )
-                        OR   ( DCACCT-MINUS  NOT =   ZERO  )
-                           MOVE    ZERO    TO  FLG-TAISYO-SRY
-                       END-IF
+                   MOVE    ZERO    TO  FLG-TAISYO-SRY
+                   IF    ( FLG-INGAISYOHOU       =   1 )
+                       MOVE    1   TO  FLG-TAISYO-SRY
                    END-IF
-                   IF    ( DCACCT-SRYKBN         =   "14"   )
-                    AND  ( DCSRY-SRYSYUKBN   NOT =   "148" )
-                       MOVE    ZERO    TO  FLG-TAISYO-SRY
+                   IF    ( DCSRY-SRYSYUKBN     =   "148"  )
+                       MOVE    1   TO  FLG-TAISYO-SRY
                    END-IF
                END-EVALUATE
            END-EVALUATE
-      *
-           IF    ( DCACCT-SRYKBN           =   "21" OR "22" OR "23" )
-            AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "3" )
-            AND  ( DCACCT-ZAITEN           =   ZERO )
-            AND  ( DCACCT-MINUS            =   ZERO )
-               MOVE                1       TO  FLG-INGAISYOHOU
-           END-IF
       *
            .
        200111-TAISO-SRY-CHK-EXT.
@@ -3612,6 +3615,7 @@
            IF   (( TNS-JITUDAY     =   2 )
             AND  ( TNS-DAYCNT      =   1 ))
             OR  (  TNS-SRYCD       =   "111011810"
+                                   OR  "111012810"
                                    OR  "101110040"
                                    OR  "111012610"
                                                     )
@@ -3627,6 +3631,7 @@
                                                  (IDX-TSRYKA IDX2)
       *
                        IF    ( TNS-SRYCD       =   "111011810"
+                                               OR  "111012810"
                                                OR  "101110040"
                                                OR  "111012610"
                                                                )
@@ -4153,6 +4158,7 @@
                                        OR  "112705950"
                                        OR  "112706050"
                                        OR  "111011810"
+                                       OR  "111012810"
                                        OR  "101110040"
                                        OR  "111012610"
                                        OR  "113013910"
@@ -4161,9 +4167,11 @@
                                        OR  "112015810"
                                        OR  "112015950"
                                        OR  "112016210"
+                                       OR  "112017610"
                                        OR  "112016410"
                                        OR  "112016550"
                                        OR  "113015810"
+                                       OR  "113018410"
       *
                                        OR  "112016850"
                                        OR  "112016950"
@@ -11403,12 +11411,17 @@
       *
            PERFORM VARYING IDX6    FROM    1   BY  1
                    UNTIL ( IDX6    >   TSRYCD-MAX )
-                    OR  (( FLG-INNAI-DAY-G NOT =   ZERO )
-                      AND( FLG-INGAI-DAY-G NOT =   ZERO ))
       *
-               EVALUATE    TSRYCD-SRYCD (IDX6)
-               WHEN    "113003510"
-               WHEN    "113003610"
+               IF    ( TSRYCD-SRYCD (IDX6)    =    "113003510"
+                                               OR  "113003610"
+                                               OR  "113019710"
+                                               OR  "113019810"
+                                               OR  "113003710"
+                                               OR  "113003810"
+                                               OR  "113019910"
+                                               OR  "113020010"
+                                                                )
+      *
                    PERFORM VARYING IDX-DAY FROM    1   BY  1
                            UNTIL ( IDX-DAY >   31 )
                        IF    ( TSRYCD-DAY (IDX6 IDX-DAY)   >   ZERO )
@@ -11416,43 +11429,75 @@
                                            =   1 )
                         AND  ( TSRYCD-DAY-NYUGAIKBN  (IDX6 IDX-DAY)
                                            =   ORCBSD01-NYUGAIKBN )
-                           MOVE    1       TO  FLG-INGAI-DAY (IDX-DAY)
+      *
+                           EVALUATE    TSRYCD-SRYCD (IDX6)
+                           WHEN    "113003510"
+                           WHEN    "113003610"
+                               MOVE    1   TO  FLG-INGAI-DAY (1 IDX-DAY)
+                           WHEN    "113019710"
+                           WHEN    "113019810"
+                               MOVE    1   TO  FLG-INGAI-DAY (2 IDX-DAY)
+                           WHEN    "113003710"
+                           WHEN    "113003810"
+                               MOVE    1   TO  FLG-INNAI-DAY (1 IDX-DAY)
+                           WHEN    "113019910"
+                           WHEN    "113020010"
+                               MOVE    1   TO  FLG-INNAI-DAY (2 IDX-DAY)
+                           END-EVALUATE
+      *
                        END-IF
                    END-PERFORM
-               WHEN    "113003710"
-               WHEN    "113003810"
-                   PERFORM VARYING IDX-DAY FROM    1   BY  1
-                           UNTIL ( IDX-DAY >   31 )
-                       IF    ( TSRYCD-DAY (IDX6 IDX-DAY)   >   ZERO )
-                        AND  ( TSRYCD-DAY-HKNFLG (IDX6 IDX-DAY)
-                                                           =   1 )
-                        AND  ( TSRYCD-DAY-NYUGAIKBN  (IDX6 IDX-DAY)
-                                           =   ORCBSD01-NYUGAIKBN )
-                           MOVE    1       TO  FLG-INNAI-DAY (IDX-DAY)
-                       END-IF
-                   END-PERFORM
-               END-EVALUATE
+               END-IF
       *
            END-PERFORM
       *
-           IF    ( FLG-INNAI-DAY-G NOT =   ZERO )
-            AND  ( FLG-INGAI-DAY-G NOT =   ZERO )
+           PERFORM VARYING IDXS    FROM    1   BY  1
+                   UNTIL ( IDXS    >   2 )
+      *
+               PERFORM 2001112-INNAI-INGAI-CHK-SEC
+      *
+           END-PERFORM
+      *
+           .
+       200111-INNAI-INGAI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    院内・院外混在チェック
+      *****************************************************************
+       2001112-INNAI-INGAI-CHK-SEC      SECTION.
+      *
+           MOVE    SPACE               TO  WRK-STR
+      *
+           IF    ( IDXS                =   2 )
+               MOVE    "小児かかりつけ診療料"
+                                       TO  WRK-STR
+           ELSE
+               MOVE    "小児科外来診療料"
+                                       TO  WRK-STR
+           END-IF
+      *
+           IF    ( FLG-INNAI-DAY-OCC (IDXS)
+                                       NOT =   ZERO )
+            AND  ( FLG-INGAI-DAY-OCC (IDXS)
+                                       NOT =   ZERO )
                INITIALIZE                  WRK-NISSU-AREA
                MOVE    SPACE       TO      WRK-INNAI-MES
                                            WRK-INGAI-MES
                                            WRK-ERRMES-PLUS
       *
-               MOVE    FLG-INNAI-DAY-G     TO  WRK-NISSU-DAY-G
+               MOVE    FLG-INNAI-DAY-OCC (IDXS)
+                                           TO  WRK-NISSU-DAY-G
                PERFORM 200111-NISSU-HEN-SEC
                MOVE    WRK-NISSU-MES       TO  WRK-INNAI-MES
       *
                INITIALIZE                  WRK-NISSU-AREA
-               MOVE    FLG-INGAI-DAY-G     TO  WRK-NISSU-DAY-G
+               MOVE    FLG-INGAI-DAY-OCC (IDXS)
+                                           TO  WRK-NISSU-DAY-G
                PERFORM 200111-NISSU-HEN-SEC
                MOVE    WRK-NISSU-MES       TO  WRK-INGAI-MES
       *
-               STRING  "小児科外来診療料　院内："
-                                           DELIMITED   BY  SIZE
+               STRING  WRK-STR             DELIMITED   BY  SPACE
+                       "　院内："          DELIMITED   BY  SIZE
                        WRK-INNAI-MES       DELIMITED   BY  SPACE
                        "　院外："          DELIMITED   BY  SIZE
                        WRK-INGAI-MES       DELIMITED   BY  SPACE
@@ -11465,7 +11510,8 @@
       *
            IF    ( ERRKBN-990009       =   "1" )
       *
-               IF    ( FLG-INGAI-DAY-G NOT =   ZERO )
+               IF    ( FLG-INGAI-DAY-OCC (IDXS)
+                                       NOT =   ZERO )
                 AND  ( FLG-INGAISYOHOU     =   ZERO )
       *
                    INITIALIZE                  WRK-NISSU-AREA
@@ -11473,11 +11519,13 @@
                                                WRK-ERRMES-PLUS
       *
                    INITIALIZE                  WRK-NISSU-AREA
-                   MOVE    FLG-INGAI-DAY-G     TO  WRK-NISSU-DAY-G
+                   MOVE    FLG-INGAI-DAY-OCC (IDXS)
+                                               TO  WRK-NISSU-DAY-G
                    PERFORM 200111-NISSU-HEN-SEC
                    MOVE    WRK-NISSU-MES       TO  WRK-INGAI-MES
       *
-                   STRING  "小児科外来診療料（処方せんを交付）"
+                   STRING  WRK-STR             DELIMITED   BY  SPACE
+                           "（処方せんを交付）"
                                                DELIMITED   BY  SIZE
                            WRK-INGAI-MES       DELIMITED   BY  SPACE
                    INTO    WRK-ERRMES-PLUS
@@ -11490,7 +11538,7 @@
            END-IF
       *
            .
-       200111-INNAI-INGAI-CHK-EXT.
+       2001112-INNAI-INGAI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    内分泌負荷試験チェック処理

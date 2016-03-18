@@ -91,6 +91,7 @@
                05  HCM34ACCT-RIHA                  PIC 9(01).
                05  HCM34ACCT-RIHA-SYS              PIC 9(01).
                03  HCM34ACCT-TENTEKSBT             PIC X(01).
+               03  HCM34ACCT-INGAIKBN              PIC X(01).
       *
       *    ¿ÇÎÅ¹Ô°Ù¥Õ¥¡¥¤¥ë
        FD  HCM34SRY-FILE.
@@ -479,6 +480,7 @@
            03  WRK-COMMENT                         PIC X(200).
            03  WRK-MAXZAINUM                       PIC 9(08).
            03  WRK-MAX                             PIC 9(05).
+           03  WRK-INGAIKBN                        PIC X(1).
       *
        01  COMMENT-CHK-AREA.
            03  COMMENT-IDX                         PIC 9(03).
@@ -842,6 +844,7 @@
                03 WKACCT-RIHA             PIC 9(01).
                03 WKACCT-RIHA-SYS         PIC 9(01).
                03 WKACCT-TENTEKSBT        PIC X(01).
+               03 WKACCT-INGAIKBN         PIC X(01).
       *
       *    ÊÝ¸±ÁÈ¹ç¤»
        01  TBLCOMBI-AREA.
@@ -3171,6 +3174,16 @@
            MOVE    FLG-RIHA        TO  HCM34ACCT-RIHA
            MOVE    FLG-RIHA-SYS    TO  HCM34ACCT-RIHA-SYS
       *
+           IF    ( ACCT-SRYKBN     =  "21" OR "22" OR "23" )
+            OR   ( WRK-SRYSYUKBN   =  "148" )
+               IF    ( WRK-SRYSYUKBN (3:1)    NOT =    "3" )
+                AND  ( WRK-SRYSYUKBN (3:1)    NOT =    "1" )
+                AND  ( WRK-SRYSYUKBN          NOT =    "294" )
+                AND  ( ACCT-ZAITEN =  ZERO )
+                   MOVE    "1"     TO  HCM34ACCT-INGAIKBN
+               END-IF
+           END-IF
+      *
            WRITE   HCM34ACCT-REC
       *
            .
@@ -3535,12 +3548,9 @@
                            MOVE    1       TO  SRT-SRYACCT-YKZHKTKBN
                                                           (SRT-IDX1)
                ELSE
-                   IF    ( ACCT-SRYKBN     =  "21" OR "22" OR "23" )
-                    OR   ( WRK-SRYSYUKBN   =  "148" )
-                       IF    ( ACCT-ZAITEN =  ZERO )
+                   IF    ( WKACCT-INGAIKBN (SRT-IDX1)     =    "1" )
                            MOVE    1       TO  SRT-SRYACCT-YKZINGAIKBN
                                                           (SRT-IDX1)
-                       END-IF
                    END-IF
                END-IF
       *
@@ -3857,6 +3867,8 @@
                                        TO  FLG-MINUS
            MOVE    WKACCT-RIHA (IDX11)
                                        TO  FLG-RIHA
+           MOVE    WKACCT-INGAIKBN (IDX11)
+                                       TO  WRK-INGAIKBN
       *
            MOVE    1                   TO  FLG-EDIT
       *
@@ -4229,8 +4241,7 @@
                             MOVE    "¡û"   TO  WRK-SRYACT-MARK
                             COMPUTE CNT-YKZHKT
                                 =   CNT-YKZHKT  +   1
-                   WHEN  ( ACCT-SRYKBN     =   "21" OR "22" OR "23" )
-                    OR   ( SRY-SRYSYUKBN   =  "148" )
+                   WHEN  (  WRK-INGAIKBN   =   "1" )
                             MOVE    "¡ù"   TO  WRK-SRYACT-MARK
                             COMPUTE CNT-YKZINGAI
                                 =   CNT-YKZINGAI    +   1

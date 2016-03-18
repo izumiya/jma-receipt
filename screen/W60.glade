@@ -1725,16 +1725,16 @@
               <text>1 参照する</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
-            <signal>
-              <name>changed</name>
-              <handler>entry_changed</handler>
-              <data>CHANGED</data>
-            </signal>
-            <signal>
-              <name>activate</name>
-              <handler>send_event</handler>
-              <data>ACTIVATE</data>
-            </signal>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
             </widget>
           </widget>
           <widget>
@@ -2001,7 +2001,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>CMB_ERR990009KBN</name>
-            <x>516</x>
+            <x>652</x>
             <y>128</y>
             <width>164</width>
             <height>24</height>
@@ -2371,7 +2371,6 @@
             <name>label325</name>
             <x>36</x>
             <y>128</y>
-            <width>480</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -2380,7 +2379,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>小児科外来診療料（処方せんを交付）を算定した月に院外処方がない場合</label>
+            <label>小児科外来診療料または小児かかりつけ診療料を「処方せん交付」で算定した月に院外処方がない場合</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
