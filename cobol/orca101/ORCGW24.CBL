@@ -1670,19 +1670,26 @@
                    PERFORM VARYING IDX0 FROM    1   BY  1
                            UNTIL ( IDX0 >   SPA-GMN-W24-CHIIKIKSN-MAX )
       *
-                       IF    ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
+                       EVALUATE    TRUE
+                       WHEN  ( SYS-5000-STYUKYMD   >=  CONST-H280401 )
+                           IF    ( CONST-CHIIKIKSN-H2804 (IDX0)
+                                           =   SYS-5000-CHIIKIKSN )
+                               MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
+                                   TO  SPA-GMN-W24-CHIIKIKSN-G
+                           END-IF
+                       WHEN  ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
                            IF    ( CONST-CHIIKIKSN-H1804 (IDX0)
                                            =   SYS-5000-CHIIKIKSN )
                                MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
                                    TO  SPA-GMN-W24-CHIIKIKSN-G
                            END-IF
-                       ELSE
+                       WHEN  OTHER
                            IF    ( CONST-CHIIKIKSN-SRYCD (IDX0)
                                            =   SYS-5000-CHIIKIKSN )
                                MOVE    SPA-GMN-W24-CHIIKIKSNLST (IDX0)
                                    TO  SPA-GMN-W24-CHIIKIKSN-G
                            END-IF
-                       END-IF
+                       END-EVALUATE
       *
                    END-PERFORM
                END-IF
@@ -2907,15 +2914,19 @@
       *
       *    地域加算情報
            IF    ( SPA-GMN-W24-CHIIKIKSN   >=  "1")
-            AND  ( SPA-GMN-W24-CHIIKIKSN   <=  "6" )
+            AND  ( SPA-GMN-W24-CHIIKIKSN   <=  "7" )
                MOVE    SPA-GMN-W24-CHIIKIKSN   TO  WRK-CHIIKIKSN-G
-               IF    ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
+               EVALUATE    TRUE
+               WHEN  ( SYS-5000-STYUKYMD   >=  CONST-H280401 )
+                   MOVE    CONST-CHIIKIKSN-H2804 (WRK-CHIIKIKSN)
+                                   TO  SYS-5000-CHIIKIKSN
+               WHEN  ( SYS-5000-STYUKYMD   >=  CONST-H180401 )
                    MOVE    CONST-CHIIKIKSN-H1804 (WRK-CHIIKIKSN)
                                    TO  SYS-5000-CHIIKIKSN
-               ELSE
+               WHEN    OTHER
                    MOVE    CONST-CHIIKIKSN-SRYCD (WRK-CHIIKIKSN)
                                    TO  SYS-5000-CHIIKIKSN
-               END-IF
+               END-EVALUATE
            END-IF
       *
       *    入院会計テーブル表示情報
@@ -6242,6 +6253,7 @@
       *
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
