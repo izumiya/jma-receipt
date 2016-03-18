@@ -36,6 +36,7 @@
       *  04.07.00    NACL-多々納  12/03/06  平成２４年４月改正対応
       *  04.07.00    NACL-多々納  14/03/06  平成２６年４月改正対応
       *  04.08.00    NACL-多々納  16/01/XX  表示内容切替え対応
+      *  04.08.00    NACL-多々納  16/03/18  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -434,6 +435,8 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+                   WHEN    "8"
+                       MOVE    3500            TO  IDX
                    WHEN    "17"
                        MOVE    8000            TO  IDX
                END-EVALUATE
@@ -538,6 +541,8 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+                   WHEN    "8"
+                       MOVE    3500            TO  IDX
                    WHEN    "17"
                        MOVE    8000            TO  IDX
                    END-EVALUATE
@@ -1254,7 +1259,10 @@
                IF     (SPA-NAI-SELCD       >=  1001  AND
                                            <=  3000   )
       *        3501から8000 はエラーとする
-                 OR   (SPA-NAI-SELCD       >=  3501  AND
+      *          OR   (SPA-NAI-SELCD       >=  3501  AND
+      *                                    <=  8000   )
+      *        3601から8000 はエラーとする
+                 OR   (SPA-NAI-SELCD       >=  3601  AND
                                            <=  8000   )
                    MOVE    "0001"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR
@@ -1440,8 +1448,13 @@
            END-IF
       *H26.4
       *    3501から8000 までは画面表示なしとする
+      *    IF      SPA-GMN-PAGE   =   320
+      *        MOVE    140        TO  SPA-GMN-PAGE
+      *    END-IF
+      *H28.4
+      *    3601から8000 までは画面表示なしとする
            IF      SPA-GMN-PAGE   =   320
-               MOVE    140        TO  SPA-GMN-PAGE
+               MOVE    144        TO  SPA-GMN-PAGE
            END-IF
       *
            PERFORM 3101-SSTKIJUN-HENSYU-SEC  
@@ -1482,7 +1495,12 @@
            END-IF
       *H26.4
       *    3501から8000 までは画面表示なしとする
-           IF      SPA-GMN-PAGE   =   141
+      *    IF      SPA-GMN-PAGE   =   141
+      *        MOVE    321        TO  SPA-GMN-PAGE
+      *    END-IF
+      *H28.4
+      *    3601から8000 までは画面表示なしとする
+           IF      SPA-GMN-PAGE   =   145
                MOVE    321        TO  SPA-GMN-PAGE
            END-IF
       *
@@ -1835,7 +1853,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *H26.4
       *        3501 →　8001　とする
-               IF     (WRK-KBNCD               =   8  )
+      *        IF     (WRK-KBNCD               =   8  )
+      *            MOVE    17                  TO  WRK-KBNCD
+      *            MOVE    8000                TO  IDX
+      *        END-IF
+      *H26.4
+      *        3601 →　8001　とする
+               IF     (WRK-KBNCD               =   9  )
                    MOVE    17                  TO  WRK-KBNCD
                    MOVE    8000                TO  IDX
                END-IF
