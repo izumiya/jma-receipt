@@ -596,6 +596,10 @@
                WHEN    IDY             <=  3500
                    MOVE    "7"                 TO  SYS-1006-KBNCD
                    MOVE    3000                TO  IDS
+      *H28.4
+               WHEN    IDY             <=  4000
+                   MOVE    "8"                 TO  SYS-1006-KBNCD
+                   MOVE    3500                TO  IDS
                WHEN    IDY             <=  8500
                    MOVE    "17"                TO  SYS-1006-KBNCD
                    MOVE    8000                TO  IDS

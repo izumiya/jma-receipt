@@ -907,20 +907,20 @@
                        END-IF
                    END-IF
       *H28.4
-      *            IF      SPA-SRYYMD      >=  "20160401"
-      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»¡ÊXXXX)
-      *                IF      SYS-1006-SSTKIJUN (195) =   1
-      *                    MOVE    1               TO  SPA-NNCHIHKJN
-      *                ELSE
-      *                    MOVE    ZERO            TO  SPA-NNCHIHKJN
-      *                END-IF
-      *                ¾®»ù¤«¤«¤ê¤Ä¤±¡ÊXXXX)
-      *                IF      SYS-1006-SSTKIJUN (195) =   1
-      *                    MOVE    1               TO  SPA-SYOUNIKJN
-      *                ELSE
-      *                    MOVE    ZERO            TO  SPA-SYOUNIKJN
-      *                END-IF
-      **           END-IF
+                   IF      SPA-SRYYMD      >=  "20160401"
+      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»¡Ê3339)
+                       IF      SYS-1006-SSTKIJUN (339) =   1
+                           MOVE    1               TO  SPA-NNCHIHKJN
+                       ELSE
+                           MOVE    ZERO            TO  SPA-NNCHIHKJN
+                       END-IF
+      *                ¾®»ù¤«¤«¤ê¤Ä¤±¡Ê3467)
+                       IF      SYS-1006-SSTKIJUN (467) =   1
+                           MOVE    1               TO  SPA-SYOUNIKJN
+                       ELSE
+                           MOVE    ZERO            TO  SPA-SYOUNIKJN
+                       END-IF
+                   END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
@@ -985,7 +985,6 @@
            MOVE    ZERO                TO  SPA-HKTSANTEI-205
            MOVE    ZERO                TO  SPA-HKTSANTEI-206
            MOVE    ZERO                TO  SPA-HKTSANTEI-209
-           MOVE    ZERO                TO  SPA-HKTSANTEI-210
            MOVE    ZERO                TO  SPA-HKTNYUIN-FLG
            PERFORM UNTIL  (FLG-SYSKANRI    =   1  )
                MOVE    MCPDATA-REC         TO  SYS-1014-REC
@@ -1041,11 +1040,6 @@
                        IF      SYS-1014-KBNCD      =   "209"
                            MOVE    SYS-1014-SANTEI-HOU
                                                    TO  SPA-HKTSANTEI-209
-                       END-IF
-      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ
-                       IF      SYS-1014-KBNCD      =   "210"
-                           MOVE    SYS-1014-SANTEI-HOU
-                                                   TO  SPA-HKTSANTEI-210
                        END-IF
                    END-IF
                END-IF

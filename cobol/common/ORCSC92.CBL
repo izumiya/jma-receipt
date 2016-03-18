@@ -1707,6 +1707,9 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+      *H28.4
+                   WHEN    "8"
+                       MOVE    3500            TO  IDX
       *H26.4
                    WHEN    "17"
                        MOVE    8000            TO  IDX

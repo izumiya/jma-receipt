@@ -53,6 +53,7 @@
       * 04.05.00     NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/11/XX  ¸øÈñSORTÇÑ»ßÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -96,6 +97,15 @@
            03  FLG-HKNNUM          PIC 9(01).
            03  FLG-PTMEMOINF       PIC 9(01).
            03  FLG-UID             PIC 9(01).
+      *H28.4
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁ¡¡»ÜÀßµ¬½à¤¢¤ê
+           03  FLG-SYONIKKR-ARI        PIC 9(01).
+           03  FLG-SYOUNI-ARI          PIC 9(01).
+           03  FLG-SYOUNIKA-CHK        PIC 9(01).
+           03  FLG-SYONIKKR-OK         PIC 9(01).
+      *
+           03  FLG-PTCONF              PIC 9(01).
+           03  FLG-SANTEI              PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -561,6 +571,14 @@
       *    ÅÀ¿ô
            COPY    "CPTENSU.INC".
       *
+      *    »»ÄêÍúÎò
+       01  SANTEI-REC.
+           COPY    "CPSANTEI.INC".
+      *
+      *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ë
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
+      *
       *    ¥·¥¹¥Æ¥à´ÉÍý¥Þ¥¹¥¿
            COPY    "CPSYSKANRI.INC".
       *
@@ -720,11 +738,11 @@
            MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
            MOVE    SYS-1006-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 901-SYSKANRI-READ-SEC
            ELSE
                MOVE    SPACE               TO  SYS-1006-REC
@@ -732,14 +750,33 @@
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
            MOVE    ZERO                TO  FLG-SYONIKA-ARI
-           IF      FLG-SYSKANRI        =   ZERO
+           MOVE    ZERO                TO  FLG-SYONIKKR-ARI
+           PERFORM UNTIL   FLG-SYSKANRI    =   1
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
-               IF      SYS-1006-SSTKIJUN (121) =   1
-                   MOVE    1               TO  FLG-SYONIKA-ARI
+               IF      SYS-1006-KBNCD      =   "1"
+      *            ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
+                   IF      SYS-1006-SSTKIJUN (121) =   1
+                       MOVE    1               TO  FLG-SYONIKA-ARI
+                   ELSE
+                       MOVE    0               TO  FLG-SYONIKA-ARI
+                   END-IF
                END-IF
-           END-IF
+      *H28.4
+               IF      SPA-SYSYMD      >=  "20160401"
+                   IF      SYS-1006-KBNCD      =   "7"
+      *                ¾®»ù¤«¤«¤ê¤Ä¤±¡Ê3467)
+                       IF      SYS-1006-SSTKIJUN (467) =   1
+                           MOVE    1               TO  FLG-SYONIKKR-ARI
+                       ELSE
+                           MOVE    ZERO            TO  FLG-SYONIKKR-ARI
+                       END-IF
+                    END-IF
+               END-IF
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 901-SYSKANRI-READ-SEC
+           END-PERFORM
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷¡Ê£Ã£Ì£Á£É£ÍÀÜÂ³¾ðÊó¡Ë
@@ -1504,14 +1541,23 @@
       *            ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤ÇÆ±ÆüºÆ¿Ç¤Î»þ
                    IF     (WRK-LF01-IJICD(1:3) =   "113") AND
                           (WRK-LSTYMD          =   SPA-SYSYMD)
-                       MOVE    "¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡¦Æ±ÆüºÆ¿Ç"
+                       MOVE    "¾®»ù²Ê³°Íè¿ÇÎÅÎÁ¡¦Æ±ÆüºÆ¿Ç"
                                                TO  WRK-LF01-HOSPSBT
+      *H28.4
+                       IF      FLG-SYONIKKR-OK =   1
+                           MOVE    "¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁ¡¦Æ±ÆüºÆ¿Ç"
+                                               TO  WRK-LF01-HOSPSBT
+                       END-IF
                    END-IF
                ELSE
                    DISPLAY "*** ORCL0011 TEN INVALID KEY=" 
                            WRK-LF01-IJICD 
                END-IF
            END-IF
+      *TEST
+             DISPLAY "*** ORCL0011 =" 
+                     ",WRK-LF01-IJICD:" WRK-LF01-IJICD
+                     ",:" WRK-LF01-HOSPSBT
       *
       *    ¿Ç»¡ÎÁ¥³¡¼¥É¤ò·èÄê¤¹¤ë
            MOVE    LNK-PARA-SINRYONAIYO
@@ -1538,13 +1584,14 @@
               AND (SYS-1001-BEDSU      >=  200  )
               AND (SPA-SYSYMD          >=  "20150101")
       *
-               MOVE    SPACE               TO  SYSKANRI-REC
-               INITIALIZE                  SYSKANRI-REC
-               MOVE    "1201"              TO  SYS-KANRICD
-               MOVE    "A0000001"          TO  SYS-KBNCD
-               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
-               MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
-               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    SPACE               TO  SYS-1201-REC
+               INITIALIZE                  SYS-1201-REC
+               MOVE    "1201"              TO  SYS-1201-KANRICD
+               MOVE    "A0000001"          TO  SYS-1201-KBNCD
+               MOVE    SPA-SYSYMD          TO  SYS-1201-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-1201-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-1201-HOSPNUM
+               MOVE    SYS-1201-REC        TO  SYSKANRI-REC
                MOVE    SYSKANRI-REC        TO  MCPDATA-REC
       *
                PERFORM 900-SYSKANRI-INV-SEC
@@ -1901,7 +1948,20 @@
            PERFORM 1000-SINSATU-KAISU-SEC
       *
            MOVE    ZERO                TO  FLG-ARIS
-      *    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ
+      *H28.4
+           MOVE    ZERO                TO  FLG-SYONIKKR-OK
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁÈ½Äê
+           IF     (SPA-SYSYMD          >=  "20160401" )
+      *    Ì¤½¢³ØÁ°
+             AND  (AGECHK-SYUGAKUKBN   =   1          )
+             AND  (FLG-SYONIKKR-ARI    =   1          )
+               PERFORM 20202-SYONIKAKARI-HEN-SEC
+               IF      FLG-ARIS        =   1
+                   GO      TO      2020-SRYCD-SET-EXT
+               END-IF
+           END-IF
+      *
+      *    ¾®»ù²Ê³°Íè¿ÇÎÅÎÁ
            IF      (FLG-SYONIKA-ARI    =   1   )  AND
                   ((WRK-NENREI-YY      <   3   )  OR
                    (WRK-NENREI-YY      =   3   AND
@@ -1958,23 +2018,36 @@
            MOVE    ZERO                TO  WRK-15MIMAN-ARI
       *
       *    Ç¯Îð·×»»
-           MOVE    PTINF-BIRTHDAY      TO  WRK-YMDS1
-           MOVE    SPA-SYSYMD          TO  WRK-YMDS2
-           COMPUTE WRK-NENREI-YY       =   WRK-YYS2
-                                       -   WRK-YYS1
-           IF      WRK-YMDS1(5:4)      >   WRK-YMDS2(5:4)
-               COMPUTE WRK-NENREI-YY   =   WRK-NENREI-YY
-                                           -   1
-               COMPUTE WRK-NENREI-MM   =  (WRK-MMS2  +  12 )
-                                           -   WRK-MMS1
-           ELSE
-               COMPUTE WRK-NENREI-MM   =   WRK-MMS2
-                                           -   WRK-MMS1
-           END-IF
-           IF      WRK-DDS1            >   WRK-DDS2
-               COMPUTE WRK-NENREI-MM   =   WRK-NENREI-MM
-                                           -   1
-           END-IF
+      *    MOVE    PTINF-BIRTHDAY      TO  WRK-YMDS1
+      *    MOVE    SPA-SYSYMD          TO  WRK-YMDS2
+      *    COMPUTE WRK-NENREI-YY       =   WRK-YYS2
+      *                                -   WRK-YYS1
+      *    IF      WRK-YMDS1(5:4)      >   WRK-YMDS2(5:4)
+      *        COMPUTE WRK-NENREI-YY   =   WRK-NENREI-YY
+      *                                    -   1
+      *        COMPUTE WRK-NENREI-MM   =  (WRK-MMS2  +  12 )
+      *                                    -   WRK-MMS1
+      *    ELSE
+      *        COMPUTE WRK-NENREI-MM   =   WRK-MMS2
+      *                                    -   WRK-MMS1
+      *    END-IF
+      *    IF      WRK-DDS1            >   WRK-DDS2
+      *        COMPUTE WRK-NENREI-MM   =   WRK-NENREI-MM
+      *                                    -   1
+      *    END-IF
+      *H28.4
+      *    Ç¯Îð»»Äê
+           INITIALIZE                  ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+           MOVE    SPA-PTID            TO  AGECHK-PTID
+           MOVE    SPA-SYSYMD          TO  AGECHK-SRYYMD
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+           MOVE    AGECHK-NENREI2-YY   TO  WRK-NENREI-YY
+           MOVE    AGECHK-NENREI2-MM   TO  WRK-NENREI-MM
+           MOVE    AGECHK-NENREI2-DD   TO  WRK-NENREI-DD
       *
       *    £±£µºÐ¤Ë¤Ê¤ëÇ¯·îÆü¤ò·×»»
            MOVE    PTINF-BIRTHDAY      TO  WRK-BIRTHDAY
@@ -2386,6 +2459,130 @@
       *
            .
        20210-SRYCD-TBL02-EXT.
+           EXIT.
+      *H28.4
+      *****************************************************************
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁÈ½ÄêÊÔ½¸½èÍý
+      *****************************************************************
+       20202-SYONIKAKARI-HEN-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYOUNI-ARI
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    "SYOUNIKAKARI"      TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-PTCONF          =   ZERO
+               IF      PTCONF-CDATA(1:1)   =   "1"
+                   MOVE    1               TO  FLG-SYOUNI-ARI
+               END-IF
+           END-IF
+           IF      FLG-SYOUNI-ARI      =   ZERO
+               GO      TO      20202-SYONIKAKARI-HEN-EXT
+           END-IF
+      *
+      *    £³ºÐ°Ê¾å¤Î»»ÄêÍúÎòÈ½Äê
+           IF      WRK-NENREI-YY       >=  3
+               PERFORM 10011-SYONIKKR-RRK-SEC 
+               IF      FLG-SYOUNIKA-CHK    =   ZERO
+                   GO      TO      20202-SYONIKAKARI-HEN-EXT
+               END-IF
+           END-IF
+      *
+           MOVE    1                   TO  FLG-ARIS
+           MOVE    1                   TO  FLG-SYONIKKR-OK
+      *    ¿Ç»¡ÎÁ¥³¡¼¥É¤ò·èÄê¤¹¤ë
+           IF      WRK-SYOSIN          =   1
+      *        ½é¿Ç
+               IF      SYS-1001-SYOHOKBN    =   "0"
+      *            ±¡Æâ
+                   MOVE    "113019910"         TO  WRK-LF01-IJICD
+               ELSE
+      *            ±¡³°
+                   MOVE    "113019710"         TO  WRK-LF01-IJICD
+               END-IF
+               MOVE    "130"           TO  WRK-LF01-BUNDLE-CLASSCODE
+           ELSE
+      *        ºÆ¿Ç
+               IF      SYS-1001-SYOHOKBN    =   "0"
+      *            ±¡Æâ
+                   MOVE    "113020010"         TO  WRK-LF01-IJICD
+               ELSE
+      *            ±¡³°
+                   MOVE    "113019810"         TO  WRK-LF01-IJICD
+               END-IF
+               MOVE    "130"           TO  WRK-LF01-BUNDLE-CLASSCODE
+           END-IF
+           .
+       20202-SYONIKAKARI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ²ó¿ô¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       10011-SYONIKKR-RRK-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYOUNIKA-CHK
+      *    »»ÄêÍúÎò¸¡º÷
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    "1130%"             TO  SANTEI-SRYCD
+           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                TO  SANTEI-SRYKA
+           MOVE    SPA-SYSYMD(1:6)     TO  SANTEI-SRYYM
+           MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key16"             TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           PERFORM
+               UNTIL      (FLG-SANTEI      =   1 )
+                       OR (FLG-SYOUNIKA-CHK    NOT =   ZERO )
+               EVALUATE    SANTEI-SRYCD
+      *        ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ²Ê
+               WHEN    "113019710"
+               WHEN    "113019910"
+               WHEN    "113019810"
+               WHEN    "113020010"
+                   MOVE    1               TO  FLG-SYOUNIKA-CHK
+               END-EVALUATE
+      *
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    "key16"             TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key16"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       10011-SYONIKKR-RRK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2906,6 +3103,41 @@
       *
            .
        910-PTMEMOINF-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆÃµ­»ö¹àÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       930-PTCONF-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTCONF-REC
+               MOVE    ZERO            TO  FLG-PTCONF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1               TO  FLG-PTCONF
+           END-IF
+      *
+           .
+       930-PTCONF-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    »»ÄêÎò¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       920-SANTEI-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SANTEI-REC
+               MOVE    ZERO                TO  FLG-SANTEI
+           ELSE
+               INITIALIZE                      SANTEI-REC
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           .
+       920-SANTEI-READ-EXT.
            EXIT.
       *
       *****************************************************************

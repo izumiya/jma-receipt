@@ -2467,9 +2467,6 @@
       *H28.4
       *    認知症地域包括診療対象・小児かかりつけ対象
            IF     (SPA-SRYYMD          >=  "20160401" )
-      *??施設基準の判定
-      *?    AND  ((SPA-NNCHIHKJN       =   1     )  OR
-      *?          (SPA-SYOUNIKJN       =   1     )    )
                PERFORM 110110-NNCHISYOU-SET-SEC
            END-IF
       *
@@ -2902,6 +2899,13 @@
            MOVE    "tbl_ptconf"        TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    小児かかりつけ診療は、施設基準の判定
+           IF      SPA-SYOUNI-ARI      =   1
+               IF      SPA-SYOUNIKJN   NOT =   1
+                   MOVE    ZERO            TO  SPA-SYOUNI-ARI
+               END-IF
+           END-IF
            .
        110110-NNCHISYOU-SET-EXT.
            EXIT.
