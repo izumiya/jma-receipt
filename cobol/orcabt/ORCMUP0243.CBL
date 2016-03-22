@@ -481,6 +481,8 @@
                    MOVE    GENERIC-KEY     TO  GENERIC-UP-KEY
                    MOVE    GENERICWK-KEY   TO  GENERIC-KEY
                    MOVE    GENERICWK-PRICE TO  GENERIC-PRICE
+                   MOVE    GENERICWK-GECODE
+                                           TO  GENERIC-GECODE
                    PERFORM 20101-GENERIC-UPD-SEC
                    MOVE    1               TO  FLG-SYORI
                ELSE
