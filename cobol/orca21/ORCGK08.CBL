@@ -615,6 +615,11 @@
        01  INFECTION-FILE          PIC X(17)   VALUE
                                    "infectiondata2.sh".
       *
+      *H28.4
+      * 湿布薬（減）
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1970,7 +1975,8 @@
                           (LNK-WKSRY-INPUTCD (IDX IDZ)
                                                    =   "820000047"
       *H26.10
-                                                   OR  "820000166")
+                                                   OR  "820000166"
+                                                   OR  CONS-SPCM-SRYCD)
                        MOVE    ZERO                TO  SPA-NAI-JIDFLG
                                                               (IDX-NAI)
                    END-IF

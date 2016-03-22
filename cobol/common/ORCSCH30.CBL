@@ -201,6 +201,8 @@
        01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
       * ∈篮负∷
        01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      * 季邵挑∈负∷
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -680,7 +682,8 @@
       *H25.4               ∈负∷滦据嘲
                                                    OR  "820000047"
       *H26.10               (篮负∷
-                                                   OR  CONS-SGEN-SRYCD)
+                                                   OR  CONS-SGEN-SRYCD
+                                                   OR  CONS-SPCM-SRYCD)
                        OR     (FLG-NO              =   1           )
                            CONTINUE
                        ELSE

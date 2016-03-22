@@ -662,6 +662,11 @@
       *H25.7
       *    労災コード置換えテーブル 
            COPY   "CMRSICNGTBL.INC".
+      *H28.4
+      * 湿布薬（減）
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
+      *
       *
       *    受診履歴
        01  WRK-JYURRK-REC.
@@ -3453,16 +3458,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (SRY-SRYYM           >=  "201604" )
               AND (SPA-NYUGAIKBN       =   "2"      )
               AND (SRY-SRYKBN          =   "23"     )
-              AND (SRY-SRYCD (IDZ)(1:1)    =   "6"  )
-              AND (TNS-MEIUSESKB       =   1        )
-              AND (SPA-NAI-ZAITENFLG (IDX) =   ZERO )
-               IF   (SRY-SRYSYUKBN     =   "231"
-                                       OR  "294" )
-                OR ((SRY-SRYSYUKBN     =   SPACE
-                                       OR  "230" )  AND
-                    (ACCT-ZAITEN       >   ZERO  ))
-                   MOVE    3           TO  SPA-NAI-ZAITENFLG (IDX)
-               END-IF
+              AND (SRY-SRYCD (IDZ)     =   CONS-SPCM-SRYCD)
+              AND (SRY-AUTOKBN (IDZ)   =   "3"      )
+               MOVE    2                   TO  SPA-NAI-ZAITENFLG (IDX)
            END-IF
       *
       *    算定履歴情報（剤内の最初に対象となるもの）

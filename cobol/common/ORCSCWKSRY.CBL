@@ -46,6 +46,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/07/28  Ï«ºÒ¶â³Û¡¦ÅÀ¿ôÊÔ½¸ÊÑ¹¹
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -272,7 +273,7 @@
       *
       *
       *    »þ´Ö³°²Ã»»¥Æ¡¼¥Ö¥ë
-       01  TBL-TIMEKSN-AREA.
+       01  TBL2-TIMEKSN-AREA.
       *¾®»ù²Ê³°Íè¿ÇÎÅ²Ê¡Ê½é¿Ç¡Ë
       *    »þ´Ö³°
            03  FILLER              PIC X(12)   VALUE   "11 113009670".
@@ -333,16 +334,19 @@
       *    ÁáÄ«²Ã»»
            03  FILLER              PIC X(12)   VALUE   "38 113017370".
       *
-       01  TBL-TIMEKSN-AREA-R      REDEFINES   TBL-TIMEKSN-AREA.
-           03  TBL-TIMEKSN-OCC     OCCURS   27
-                                   INDEXED  TBL-TIDX.
+       01  TBL2-TIMEKSN-AREA-R      REDEFINES   TBL2-TIMEKSN-AREA.
+           03  TBL2-TIMEKSN-OCC     OCCURS   27
+                                   INDEXED  TBL2-TIDX.
       *        1:½é¿Ç¡¢2¡§ºÆ¿Ç¡¢3:ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
-               05  TBL-TM-KBN1         PIC X(01).
+               05  TBL2-TM-KBN1         PIC X(01).
       *        1:»þ´Ö³°¡¢2¡§µÙÆü¡¢3:¿¼Ìë¡¢4:ÆÃÄê»þ´Ö³°¡¢5:Ìë´Ö¡¢8:Ìë´Ö¡¦ÁáÄ«
-               05  TBL-TM-KBN2         PIC X(01).
-               05  TBL-TM-YOBI         PIC X(01).
+               05  TBL2-TM-KBN2         PIC X(01).
+               05  TBL2-TM-YOBI         PIC X(01).
       *
-               05  TBL-TM-SRYCD        PIC X(09).
+               05  TBL2-TM-SRYCD        PIC X(09).
+      *H28.4
+      *    »þ´Ö³°²Ã»»¥Æ¡¼¥Ö¥ë(H28.4Ê¬¡Ë
+           COPY     "CMTIMEKSN2016.INC".
       *
       *H26.10
       * ¸þÀº¿ÀÌôÂ¿ºÞÅêÍ¿¸º»»¥³¡¼¥É
@@ -355,6 +359,13 @@
        01  CONS-TEIHP-SRYCD        PIC X(09)   VALUE    "630010006".
       * ¡Ê¸º¡Ë¡ÊÆâÉþÄþ¸º¤ÈÆ±¤¸¡Ë
        01  CONS-TGEN-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
+      *H28.4
+      * ¼¾ÉÛÌôËç¿ô¸º»»
+       01  CONS-SPGEN-SRYCD        PIC X(09)   VALUE    "630010007".
+      * ¼¾ÉÛÌô¡Ê¸º¡Ë
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1881,6 +1892,22 @@
       *****************************************************************
        310119-SYONIKA-CHK-SEC                  SECTION.
       *
+      *H28.4 ¤«¤é
+           IF      SPA-SRYYMD          >=  "20160401"
+      *        »þ´Ö³°²Ã»»¸¡º÷
+               SET     TBL-TIDX            TO  1
+               SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
+               AT  END
+                   MOVE    SPACE           TO  WRK-TIME-KBN2
+                WHEN   LNK-WKSRY-SRYCD (IDX IDY)
+                                           =   TBL-TM-SRYCD
+                                                      (TBL-TIDX)
+                   MOVE    TBL-TM-TIMKBN (TBL-TIDX)
+                                           TO  WRK-TIME-KBN2
+               END-SEARCH
+               GO      TO      310119-SYONIKA-CHK-EXT
+           END-IF
+      *
       *    ¿Ç»¡ÎÁ¸¡º÷
            SET     TBL-SYO             TO  1
            SEARCH  TBL-SYONIKA-OCC     VARYING   TBL-SYO
@@ -1899,14 +1926,14 @@
                GO      TO      310119-SYONIKA-CHK-EXT
            END-IF
       *    ¿Ç»¡ÎÁ¸¡º÷
-           SET     TBL-TIDX            TO  1
-           SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
+           SET     TBL2-TIDX            TO  1
+           SEARCH  TBL2-TIMEKSN-OCC     VARYING   TBL2-TIDX
                AT  END
                    MOVE    SPACE           TO  WRK-TIME-KBN2
                 WHEN   LNK-WKSRY-SRYCD (IDX IDY)
-                                           =   TBL-TM-SRYCD
-                                                      (TBL-TIDX)
-                   MOVE    TBL-TM-KBN2 (TBL-TIDX)
+                                           =   TBL2-TM-SRYCD
+                                                      (TBL2-TIDX)
+                   MOVE    TBL2-TM-KBN2 (TBL2-TIDX)
                                            TO  WRK-TIME-KBN2
            END-SEARCH
            .
@@ -3251,6 +3278,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              AND  (FLG-TEIGEN30-ZAI        =   1    )
                MOVE    1                   TO  WKSRYP-TEI-NKBN30
            END-IF
+      *H28.4 
+      *    ¼¾ÉÛÌô£·£°Ëç°Ê¾åÄþ¸ºÂÐ¾Ý
+           IF     (SPA-COM-SRYKBN(IDW2)    =   "23" )  AND
+                  (SPA-COM-INPUTCD(IDW2)   =   CONS-SPCM-SRYCD )
+               MOVE    1                   TO  WKSRYP-TEI-NKBN30
+           END-IF
       *
            .
        30022-WKSRYACTPLUS-HEN-EXT.
@@ -4429,6 +4462,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                  OR  CONS-TAZAI-SRYCD
       *H27.4                   Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»¥³¡¼¥É
                                                  OR  CONS-TEIHP-SRYCD
+      *H28.4                   ¼¾ÉÛÌôËç¿ô¡¡¸ºÅÀ
+                                                 OR  CONS-SPGEN-SRYCD
                            COMPUTE SUM-SYU-HKNTEN (04)
                                                =   SUM-SYU-HKNTEN(04)
                                                -   ORCSCWKSRY-KSN-TENSU
@@ -4650,6 +4685,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    Äã¾Ò²ðÎ¨ÉÂ±¡¡¡¸º»»
       *    ÌôºÞÎÁÄþ¸º¡¡¤ò¸º»»
            IF      ORCSCWKSRY-KSN-SRYCD (IDX)  =   CONS-TEIHP-SRYCD
+               MOVE    1                   TO  WKSRYP-PLUSKBN
+      *        ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
+               MOVE    2                   TO  WKSRYP-TEI-NKBN30
+               MOVE    "1"                 TO  WKSRYP-ADDKBN
+           END-IF
+      *
+      *H28.4
+      *    ¼¾ÉÛÌô¸ºÅÀ
+           IF      ORCSCWKSRY-KSN-SRYCD (IDX)  =   CONS-SPGEN-SRYCD
                MOVE    1                   TO  WKSRYP-PLUSKBN
       *        ÆâÉþ£·¼ïÎàÄþ¸ºÂÐ¾Ý
                MOVE    2                   TO  WKSRYP-TEI-NKBN30

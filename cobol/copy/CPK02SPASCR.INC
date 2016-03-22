@@ -437,6 +437,9 @@
       *                ¼¾ÉÛÌô¸º»»Í­
                        09  SPA-COM-SIPGEN          PIC X(01).
                        09  SPA-COM-SIPKBN          PIC X(01).
+      *                ¼¾ÉÛ¸ºÂÐ¾ÝºÞ
+                       09  SPA-COM-SIPZAI          PIC X(01).
+      *
       *                Ï«ºÒ¡¡»»ÄêÉÔ²Ä
                        09  SPA-COM-ROSAIKBN        PIC  X(01).
       *                Ï«ºÒ¡¡»Í»è²Ã»»

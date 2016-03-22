@@ -322,6 +322,11 @@
        01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
       * ° ¿∫∏∫°À
        01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *H28.4
+      * ºæ…€ÃÙÀÁøÙ∏∫ªª
+       01  CONS-SPGEN-SRYCD        PIC X(09)   VALUE    "630010007".
+      * ºæ…€ÃÙ° ∏∫°À
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
       *
       *
       *****************************************************************
@@ -2956,6 +2961,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *H27.4
                    IF     (LNK-WKSRY-SRYCD (IDX IDY)   =   "820000047")
                       AND (LNK-WKSRY-SRYKBN (IDX)      =   "22"  )
+                       MOVE    1               TO  FLG-GEN-ARI
+                   END-IF
+      *H28.4       ºæ…€ÃÙ∏∫≈¿
+                   IF     (LNK-WKSRY-SRYCD (IDX IDY)
+                                                   =   CONS-SPCM-SRYCD)
+                      AND (LNK-WKSRY-SRYKBN (IDX)      =   "23"  )
                        MOVE    1               TO  FLG-GEN-ARI
                    END-IF
       *H26.10

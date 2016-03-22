@@ -312,6 +312,12 @@
       *
       * ½èÊýÎÁ¡ÊÆýÍÄ»ù¡Ë²Ã»»
        01  CONS-KSN-SRYCD1         PIC X(09)   VALUE    "120002170".
+      *H28.4
+      * ¼¾ÉÛÌôËç¿ô¸º»»
+       01  CONS-SPGEN-SRYCD        PIC X(09)   VALUE    "630010007".
+      * ¼¾ÉÛÌô¡Ê¸º¡Ë
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1747,11 +1753,9 @@
                    MOVE    "5"                 TO  WRK-TIMEKBN
       *        µÙÆü²Ã»»
                WHEN    "113007470"
-      *****        MOVE    "6"                 TO  WRK-TIMEKBN
                    MOVE    "2"                 TO  WRK-TIMEKBN
       *        ¿¼Ìë²Ã»»
                WHEN    "113007570"
-      ****         MOVE    "7"                 TO  WRK-TIMEKBN
                    MOVE    "3"                 TO  WRK-TIMEKBN
       *        ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡Ê³°Íè¿Ç»¡ÎÁ¡Ë
       *        »þ´Ö³°²Ã»»
@@ -1762,11 +1766,9 @@
                    MOVE    "5"                 TO  WRK-TIMEKBN
       *        µÙÆü²Ã»»
                WHEN    "113007770"
-      ****         MOVE    "6"                 TO  WRK-TIMEKBN
                    MOVE    "2"                 TO  WRK-TIMEKBN
       *        ¿¼Ìë²Ã»»
                WHEN    "113007870"
-      ****         MOVE    "7"                 TO  WRK-TIMEKBN
                    MOVE    "3"                 TO  WRK-TIMEKBN
       *
                WHEN    OTHER
@@ -1859,6 +1861,12 @@
                                        OR  CONS-TEIHP-SYOHOU
                                        OR  CONS-TEIHP-SRYCD
                                        OR  CONS-KSN-SRYCD1
+               MOVE    1               TO  FLG-CHK
+           END-IF
+      *H28.4
+      *    ¼¾ÉÛÌô¸ºÅÀ ÂÐ±þ
+           IF      WRK-SRYCD           =   CONS-SPGEN-SRYCD
+                                       OR  CONS-SPCM-SRYCD
                MOVE    1               TO  FLG-CHK
            END-IF
       *

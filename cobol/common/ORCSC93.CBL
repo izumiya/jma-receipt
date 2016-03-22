@@ -982,7 +982,8 @@
                    ELSE
       *                ÌôºÞÎÁÄþ¸º¤Î»þ¡¢ÆâÉþÌôºÞ¤È¤¹¤ë
                        IF      (SPA-COM-INPUTCD(IDX)  =   "820000047")
-                         AND   (SPA-COM-AUTOKBN(IDX)  =   "3"        )
+      *???               AND   (SPA-COM-AUTOKBN(IDX)  =   "3"        )
+                         AND   (SPA-COM-AUTOKBN(IDX)  =   SPACE      )
                            MOVE    "21"            TO  SPA-COM-SRYKBN
                                                                 (IDX)
                        ELSE

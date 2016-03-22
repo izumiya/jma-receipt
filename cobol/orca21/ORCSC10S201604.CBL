@@ -2571,7 +2571,7 @@
            MOVE    SPA-BIRTHDAY        TO  WRK-BIRTHDAY
            COMPUTE WRK-BIRTH-YY        =   WRK-BIRTH-YY    +  3
       *
-      *    ３歳以上、３歳までに算定がなければ対象外
+      *    ３歳以上、算定がなければ対象外
            IF     (SPA-NENREI-YY       >=  3               )
                IF      WRK-SYOUNI          =   ZERO
                    PERFORM 10011-SYONIKKR-RRK-SEC 
@@ -2581,12 +2581,6 @@
                END-IF
            END-IF
       *
-      *    当日算定があればフラグを立てる
-      *    IF      WRK-SYOUNI-SUM      >   ZERO
-      *        MOVE    1                   TO  SPA-SYONIKKR-ARI2
-      *    ELSE
-      *        MOVE    ZERO                TO  SPA-SYONIKKR-ARI2
-      *    END-IF
       *    小児対象
            MOVE    1                   TO  FLG-SYONIKKR-ARI
            MOVE    1                   TO  SPA-SYONIKKR-ARI3
@@ -2611,7 +2605,7 @@
       *****************************************************************
       *    小児かかりつけ診療回数チェック処理
       *****************************************************************
-       10011-SYONIKKR-RRK-SEC                  SECTION.
+       10011-SYONIKKR-RRK-SEC          SECTION.
       *
       *    算定履歴検索
            MOVE    SPACE               TO  SANTEI-REC
@@ -2622,6 +2616,7 @@
            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
            MOVE    ZERO                TO  SANTEI-SRYKA
            MOVE    SPA-SRYYMD(1:6)     TO  SANTEI-SRYYM
+      *??? MOVE    WRK-BIRTH-YY(1:6)   TO  SANTEI-SRYYM
            MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
@@ -8065,9 +8060,10 @@
                END-IF
            END-IF
       *
-      *    小児科外来診察料の同日あり
+      *    小児科外来診察料・小児かかりつけの同日あり
            IF      SPA-SYONIKA-ARI2    =   1
-               GO      TO      1019-TELHEN-API-EXT
+               OR  SPA-SYONIKKR-ARI2   =   1
+               GO      TO      1019-API-SYORI-EXT
            END-IF
       *
       *
@@ -8115,7 +8111,7 @@
            END-IF
       *
            .
-       1019-TELHEN-API-EXT.
+       1019-API-SYORI-EXT.
            EXIT.
       *H27.07
       *

@@ -196,6 +196,10 @@
       *    診療種別名テーブル
            COPY    "CPORCSSRYSYU.INC".
       *
+      *H28.4
+      * 湿布薬（減）
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -647,7 +651,8 @@
                    END-IF
       *H26.10      （減）（精減）の自動コメントは対象外
                    IF     ( SPA-COM-INPUTCD (IDX)  =   "820000047"
-                                                   OR  "820000166")
+                                                   OR  "820000166"
+                                                   OR  CONS-SPCM-SRYCD)
                      AND  ( SPA-COM-AUTOKBN (IDX)  =   "3"        )
                         MOVE    1               TO  FLG-TAISYO
                    END-IF
@@ -2944,7 +2949,8 @@
                        UNTIL      (IDX     >   SPA-MAX-LINE      )   OR
                                   (SPA-GMN-INPUTCD (IDX)   =   SPACE )
                    IF     ( SPA-COM-INPUTCD (IDX)  =   "820000047"
-                                                   OR  "820000166")
+                                                   OR  "820000166"
+                                                   OR  CONS-SPCM-SRYCD)
                      AND  ( SPA-COM-AUTOKBN (IDX)  =   "3"        )
                         MOVE    SPACE       TO  SPA-GMN-INPUTCD(IDX)
                         MOVE    SPACE       TO  SPA-COM-INPUTCD(IDX)

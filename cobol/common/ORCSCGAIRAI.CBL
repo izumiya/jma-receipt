@@ -356,6 +356,9 @@
        01  CONS-TAZAI-SRYCD        PIC X(09)   VALUE    "630010005".
       * ¡ÊÀº¸º¡Ë
        01  CONS-SGEN-SRYCD         PIC X(09)   VALUE    "820000166".
+      *H28.4
+      * ¡Ê¼¾ÉÛ¸º¡Ë
+       01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -3307,6 +3310,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                       AND (LNK-WKSRY-SRYKBN (IDX)      =   "22"  )
                        MOVE    1               TO  FLG-GEN-ARI
                    END-IF
+      *H28.4       ¼¾ÉÛÌô¸ºÅÀ
+                   IF     (LNK-WKSRY-SRYCD (IDX IDY)
+                                                   =   CONS-SPCM-SRYCD)
+                      AND (LNK-WKSRY-SRYKBN (IDX)      =   "23"  )
+                       MOVE    1               TO  FLG-GEN-ARI
+                   END-IF
       *H26.10
       *            ¸þÀº¿ÀÌôÂ¿ºÞÄþ¸º¤Î¸º¤ÎÍ­ÌµÈ½Äê
                    IF     (LNK-WKSRY-SRYCD (IDX IDY)
@@ -3405,6 +3414,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (WRK-ZAINUM      NOT =   ZERO )  AND
                   (LNK-WKSRY-SRYKBN    (1) =   "21"
                                            OR  "22" )  AND
+                  (LNK-WKSRYP-TEI-NKBN30(1) =   2    )
+               PERFORM 45015-TEIGEN30-CHK-SEC
+           END-IF
+      *H28.4
+      *    ¼¾ÉÛ£·£°Ëç°Ê¾åÄþ¸º¤ÎºÞ¥Á¥§¥Ã¥¯
+           IF     (WRK-ZAINUM      NOT =   ZERO )  AND
+                  (LNK-WKSRY-SRYKBN    (1) =   "23" )  AND
                   (LNK-WKSRYP-TEI-NKBN30(1) =   2    )
                PERFORM 45015-TEIGEN30-CHK-SEC
            END-IF
