@@ -60,6 +60,7 @@ path	upd1	{
 				YUKOSTYMD      = :YUKOSTYMD,
 				YUKOEDYMD      = :YUKOEDYMD,
 				PRICE          = :PRICE,
+				GECODE         = :GECODE,
 				CREYMD      = :CREYMD,
 				UPYMD      = :UPYMD
 			WHERE 	YAKKAKJNCD      =  :UPYAKKAKJNCD
