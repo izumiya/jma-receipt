@@ -344,6 +344,7 @@
                        09  SPA-NAI-BTU-BRMTOK      PIC X(02).
                        09  SPA-NAI-BTU-BTUKHNKBNCD PIC X(03).
                        09  SPA-NAI-BTU-BRMKHNKBNCD PIC X(03).
+                   07  SPA-NAI-DIFF-INIT           PIC X(01).
                    07  SPA-NAI-NYUINYMD            PIC X(08).
                    07  SPA-NAI-SHONYUINYMD         PIC X(08).
                    07  SPA-NAI-TAIINYMD            PIC X(08).

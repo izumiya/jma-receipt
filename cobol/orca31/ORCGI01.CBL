@@ -1060,6 +1060,9 @@
       *    ´Ç¸î¿¦°÷¿ôÅùÆþ±¡´ðËÜÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
            COPY "CPORCSKANGOCHG.INC".
       *
+      *    »ÜÀß´ð½à¼èÆÀ
+           COPY "CPORCSS014.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
       *
@@ -5391,7 +5394,15 @@
       *
                IF    ( WRK-KJNYMD         >=   CONST-H280401 )
                 AND  ( SYS-5001-BTU-SBT    =   "04" )
-                   PERFORM 410111-RYOYOIPN-EDIT-SEC
+      *
+                   INITIALIZE                  SS014-AREA
+                   MOVE    WRK-KJNYMD      TO  SS014-SRYYMD
+                   CALL    "ORCSS014"      USING
+                                           SS014-AREA
+                                           SPA-AREA
+                   IF    ( SS014-SSTKJN-CD (8015)  =   "1" )
+                       PERFORM 410111-RYOYOIPN-EDIT-SEC
+                   END-IF
                END-IF
       *
                IF    ( SYS-5001-BTU-TOKTEI-NYUIN   NOT =   SPACE )

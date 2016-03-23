@@ -69,6 +69,9 @@
            03  WRK-TOKNYUIN-G.
                05  WRK-TOKNYUIN-KBN        PIC X(01).
                05  WRK-TOKNYUIN-CD         PIC X(02).
+           03  WRK-TOKTEMP-G.
+               05  WRK-TOKTEMP-KBN         PIC X(01).
+               05  WRK-TOKTEMP-CD          PIC X(02).
            03  WRK-NYUINRYO-AREA.
                05  WRK-NYUINRYO-NAME       PIC X(60).
                05  WRK-NYUINRYO-G.
@@ -76,6 +79,7 @@
                    07  WRK-NYUINRYO-CD     PIC X(02).
                05  WRK-NYUINRYO-SRYCD-X.
                    07  WRK-NYUINRYO-SRYCD  PIC 9(09).
+               05  WRK-NYUINRYO-TYPE       PIC X(02).
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-N02-G.
                05  WRK-N02                 PIC 99.
@@ -148,6 +152,12 @@
       *
       *    保険算定用年齢・割合計算サブ
            COPY    "CPORCSAGECHK.INC".
+      *
+      *    特定入院料コード取得サブ
+           COPY  "CPORCSTOKNYUIN.INC".
+      *
+      *    施設基準取得
+           COPY "CPORCSS014.INC".
       *
            COPY    "MCPAREA".
            COPY    "MCPDATA.INC".
@@ -351,7 +361,15 @@
       *
            IF    ( SYS-5001-BTU-SBT    =   "04" )
             AND  ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
-               PERFORM 20011-RYOYOIPN-EDIT-SEC
+      *
+               INITIALIZE                  SS014-AREA
+               MOVE    SNYUINRYO-SRYYMD TO SS014-SRYYMD
+               CALL    "ORCSS014"      USING
+                                       SS014-AREA
+                                       SPA-AREA
+               IF    ( SS014-SSTKJN-CD (8015)  =   "1" )
+                   PERFORM 20011-RYOYOIPN-EDIT-SEC
+               END-IF
            END-IF
       *
            IF    ( SYS-5001-BTU-TOKTEI-NYUIN   NOT =   SPACE )
@@ -629,7 +647,12 @@
                MOVE    "52"        TO  WRK-TOKNYUIN-CD
                PERFORM 2002-NYUINRYO-EDIT-SEC
            END-IF
-            
+      *
+           IF    ( SNYUINRYO-EXTRA-G   NOT =   SPACE )
+               MOVE    SNYUINRYO-EXTRA-KBN TO  WRK-TOKNYUIN-KBN
+               MOVE    SNYUINRYO-EXTRA-CD  TO  WRK-TOKNYUIN-CD
+               PERFORM 2002-NYUINRYO-EDIT-SEC
+           END-IF
       *
            .
        2001-NYUINRYO-EDIT-EXT.
@@ -816,15 +839,9 @@
                END-IF
       *
                IF    ( FLG-TARGET  =   1 )
-      *
-                   MOVE    SYS-5111-BRM-TOKUTEINYUIN-NM
-                                           TO  WRK-NYUINRYO-NAME
-                   MOVE    "3"             TO  WRK-NYUINRYO-KBN
-                   MOVE    SYS-5111-KBNCD
-                                           TO  WRK-NYUINRYO-CD
-                   MOVE    SYS-5111-SRYCD
-                                           TO  WRK-NYUINRYO-SRYCD-X
-                   PERFORM 200211-NYUINRYO-EDIT-SEC
+                   MOVE    "3"             TO  WRK-TOKNYUIN-KBN
+                   MOVE    SYS-5111-KBNCD  TO  WRK-TOKNYUIN-CD
+                   PERFORM 20021-NYUINRYO-EDIT-SEC
                END-IF
       *
                PERFORM 900-SYSKANRI-KEY23-FET-SEC
@@ -883,8 +900,8 @@
       *****************************************************************
        2002-NYUINRYO-EDIT-SEC              SECTION.
       *
-           MOVE    WRK-TOKNYUIN-KBN    TO  WRK-NYUINRYO-KBN
-           MOVE    WRK-TOKNYUIN-CD     TO  WRK-NYUINRYO-CD
+           MOVE    WRK-TOKNYUIN-KBN    TO  WRK-TOKTEMP-KBN
+           MOVE    WRK-TOKNYUIN-CD     TO  WRK-TOKTEMP-CD
       *
            IF    ( SYS-5001-BTU-SBT  =   "04" OR "09" )
       *
@@ -892,18 +909,18 @@
                         UNTIL ( IDX-LIFE    >   CONST-TOK-LIFECD-MAX )
       *
                    IF     ( FLG-LIFE-RJN        =   1    OR 2 )
-                       IF    ( WRK-NYUINRYO-G   =   CONST-TOK-LIFECD-IPN
-                                                             (IDX-LIFE))
+                       IF    ( CONST-TOK-LIFECD-IPN (IDX-LIFE)
+                                                =   WRK-TOKTEMP-G )
                            MOVE    CONST-TOK-LIFECD-LIFE (IDX-LIFE)
-                                               TO  WRK-NYUINRYO-G
+                                               TO   WRK-TOKTEMP-G
                            MOVE    CONST-TOK-LIFECD-MAX
                                                TO  IDX-LIFE
                        END-IF
                    ELSE
-                       IF    ( WRK-NYUINRYO-G  =   CONST-TOK-LIFECD-LIFE
-                                                             (IDX-LIFE))
+                       IF    ( CONST-TOK-LIFECD-LIFE (IDX-LIFE)
+                                                =   WRK-TOKTEMP-G )
                            MOVE    CONST-TOK-LIFECD-IPN (IDX-LIFE)
-                                               TO  WRK-NYUINRYO-G
+                                               TO   WRK-TOKTEMP-G
                            MOVE    CONST-TOK-LIFECD-MAX
                                                TO  IDX-LIFE
                        END-IF
@@ -915,12 +932,12 @@
            IF    ( SYS-5001-BTU-SBT    =   "04" OR "09" )
             AND  ( FLG-LIFE-RJN        =   2 )
       *
-               IF    ( WRK-NYUINRYO-CD     NOT =   WRK-TOKNYUIN-CD )
+               IF    ( WRK-TOKNYUIN-CD NOT =  WRK-TOKTEMP-CD )
                    PERFORM 20021-NYUINRYO-EDIT-SEC
                END-IF
            END-IF
       *
-           MOVE    WRK-NYUINRYO-CD     TO  WRK-TOKNYUIN-CD
+           MOVE    WRK-TOKTEMP-CD      TO  WRK-TOKNYUIN-CD
            PERFORM 20021-NYUINRYO-EDIT-SEC
       *
            .
@@ -930,6 +947,8 @@
       *    入院料編集処理
       *****************************************************************
        20021-NYUINRYO-EDIT-SEC         SECTION.
+      *
+           INITIALIZE                      WRK-NYUINRYO-AREA
       *
            MOVE    WRK-TOKNYUIN-KBN    TO  WRK-NYUINRYO-KBN
       *
@@ -958,6 +977,8 @@
                    END-IF
                    MOVE    SYS-5111-KBNCD  TO  WRK-NYUINRYO-CD
                    MOVE    SYS-5111-SRYCD  TO  WRK-NYUINRYO-SRYCD-X
+                   MOVE    SYS-5111-BRM-NYUINRYOKBN
+                                           TO  WRK-NYUINRYO-TYPE
                ELSE
                    MOVE    SYSKANRI-REC    TO  SYS-5110-REC
                    MOVE    SYS-5110-BTU-TOKUTEINYUIN-NM
@@ -965,6 +986,7 @@
                    MOVE    SYS-5110-KBNCD
                                            TO  WRK-NYUINRYO-CD
                    MOVE    SYS-5110-SRYCD  TO  WRK-NYUINRYO-SRYCD-X
+                   MOVE    SPACE           TO  WRK-NYUINRYO-TYPE
                END-IF
                PERFORM 200211-NYUINRYO-EDIT-SEC
            END-IF
@@ -977,7 +999,9 @@
       *****************************************************************
        200211-NYUINRYO-EDIT-SEC        SECTION.
       *
+           INITIALIZE                  TNS-TENSU-REC
            MOVE    ZERO                TO  FLG-SKIP
+      *
            IF    ( WRK-NYUINRYO-NAME   =   SPACE )
                MOVE    1               TO  FLG-SKIP
            END-IF
@@ -988,16 +1012,20 @@
                MOVE    WRK-NYUINRYO-SRYCD-X
                                        TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( TNS-HOSPSRYKBN  =   0 )
-                OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
-                   CONTINUE
+               IF    ( FLG-TENSU       =   ZERO )
+                   IF    ( TNS-HOSPSRYKBN  =   0 )
+                    OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                       CONTINUE
+                   ELSE
+                       MOVE    1       TO  FLG-SKIP
+                   END-IF
                ELSE
                    MOVE    1           TO  FLG-SKIP
                END-IF
            END-IF
       *
            PERFORM VARYING IDX17   FROM    1   BY  1
-                   UNTIL ( IDX17   >   CONST-TOKNYUIN-MAX )
+                   UNTIL ( IDX17   >   SNYUINRYO-MAX )
                     OR   ( FLG-SKIP    =   1 )
       *
                IF    ( SNYUINRYO-NYUINRYO-G (IDX17)
@@ -1021,11 +1049,41 @@
                MOVE    WRK-NYUINRYO-G  TO  SNYUINRYO-NYUINRYO-G (IDX10)
                MOVE    WRK-NYUINRYO-SRYCD-X
                                        TO  SNYUINRYO-SRYCD(IDX10)
+               MOVE    WRK-NYUINRYO-TYPE
+                                       TO  SNYUINRYO-TYPE (IDX10)
+      *
+               INITIALIZE                    ORCSTOKNYUIN-AREA
+               MOVE    WRK-NYUINRYO-KBN
+                                       TO  LNK-TOKNYUIN-KBN
+               MOVE    WRK-NYUINRYO-CD TO  LNK-TOKNYUIN-NYUIN
+               MOVE    SNYUINRYO-BTUNUM
+                                       TO  LNK-TOKNYUIN-BTUNUM
+               MOVE    "1"             TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+               MOVE    SNYUINRYO-SRYYMD
+                                       TO  LNK-TOKNYUIN-SANTEIYM
+               CALL    "ORCSTOKNYUIN"  USING
+                                       ORCSTOKNYUIN-AREA
+                                       SPA-AREA
+               IF    ( LNK-TOKNYUIN-RC          =   ZERO )
+                AND  ( LNK-TOKNYUIN-GAI-SRYCD   NOT =  SPACE )
+                   MOVE    LNK-TOKNYUIN-GAI-SRYCD
+                                       TO  SNYUINRYO-NASRYCD(IDX10)
+               END-IF
       *
                IF    ( WRK-NYUINRYO-SRYCD-X    IS  NUMERIC )
                    COMPUTE SNYUINRYO-SRYCDTTL
                        =   SNYUINRYO-SRYCDTTL
                        +   WRK-NYUINRYO-SRYCD
+               END-IF
+      *
+               IF    ( TNS-CDKBN-KBN       =   "A" )
+                 AND ( TNS-CDKBN-KBNNUM   >=   100 )
+                 AND ( TNS-CDKBN-KBNNUM   <=   199 )
+                   MOVE    1               TO  SNYUINRYO-SELECT
+               END-IF
+      *
+               IF    ( WRK-NYUINRYO-KBN    =   "4" )
+                   MOVE    1               TO  SNYUINRYO-SELECT
                END-IF
       *
            END-IF
@@ -1081,11 +1139,13 @@
       *
            PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
       *
+               INITIALIZE                      WRK-NYUINRYO-AREA
                MOVE    SYS-5112-KANSATUMEI TO  WRK-NYUINRYO-NAME
                MOVE    "4"                 TO  WRK-NYUINRYO-KBN
                MOVE    SYS-5112-KBNCD      TO  WRK-NYUINRYO-CD
                MOVE    ZERO                TO  WRK-NYUINRYO-SRYCD-X
                MOVE    SYS-5112-KBNCD(1:2) TO  WRK-NYUINRYO-SRYCD-X(8:2)
+               MOVE    SPACE               TO  WRK-NYUINRYO-TYPE
                PERFORM 200211-NYUINRYO-EDIT-SEC
       *
                PERFORM 900-SYSKANRI-KEY15-FET-SEC
@@ -1238,6 +1298,8 @@
            MOVE    "key6"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+           ELSE
                MOVE    1               TO  FLG-PTKOHINF
                INITIALIZE                  PTKOHINF-REC
            END-IF

@@ -33,6 +33,10 @@
            03  SNYUINRYO-BRMNUM            PIC X(06).
       *    保険組合せ
            03  SNYUINRYO-HKNCOMBI          PIC 9(04).
+      *    追加コード
+           03  SNYUINRYO-EXTRA-G.
+               05  SNYUINRYO-EXTRA-KBN     PIC X(01).
+               05  SNYUINRYO-EXTRA-CD      PIC X(02).
       *
       *    入院料件数
            03  SNYUINRYO-MAX               PIC 9(05).
@@ -50,7 +54,14 @@
                                            PIC X(02).
       *        入院料コード
                05  SNYUINRYO-SRYCD         PIC X(09).
+      *        特例算定コード
+               05  SNYUINRYO-NASRYCD       PIC X(09).
+      *        入院料の種類（初期表示用）
+               05  SNYUINRYO-TYPE          PIC X(02).
       *    診療コード合計
            03  SNYUINRYO-SRYCDTTL          PIC 9(14).
       *    病棟設定入院料コード
            03  SNYUINRYO-BTU-KHNSRYCD      PIC X(09).
+      *    入院料等選択
+      *    （特定入院料、短期滞在以外のコードの返却がある場合は１）
+           03  SNYUINRYO-SELECT            PIC 9(01).
