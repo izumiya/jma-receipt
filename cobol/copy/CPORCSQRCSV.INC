@@ -78,6 +78,8 @@
                05  ORCSQRCSV-MAYAKU        PIC  9(01).
       *        一部負担区分
                05  ORCSQRCSV-BIKO-FTN      PIC  X(01).
+      *        残量確認指示
+               05  ORCSQRCSV-ZANSIJI       PIC  X(01).
       *
       *    備考内容
            03  ORCSQRCSV-BIKOU-AREA.

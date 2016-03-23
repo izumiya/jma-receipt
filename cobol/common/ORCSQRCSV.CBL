@@ -300,6 +300,12 @@
       *    バージョン情報
            MOVE    SPACE               TO  TBL-QRCSV-AREA
            MOVE    "JAHIS2"            TO  TBL-QRCSV-DATA (1)
+           IF     (SPA-SRYYMD          >=  "20160401" )
+      *    残量確認指示
+            AND   (ORCSQRCSV-ZANSIJI   =   "1"
+                                       OR  "2"   )
+               MOVE    "JAHIS3"            TO  TBL-QRCSV-DATA (1)
+           END-IF
            MOVE    1                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *    医療機関コード
@@ -554,6 +560,17 @@
                MOVE    ORCSQRCSV-ADRS      TO  TBL-QRCSV-DATA (3)
                MOVE    ORCSQRCSV-TEL       TO  TBL-QRCSV-DATA (4)
                MOVE    4                   TO  TBL-MAX
+               PERFORM 400-DATAOUT-SEC
+           END-IF
+      *H28.4
+      *    残量確認指示
+           IF      ORCSQRCSV-ZANSIJI   =   "1"
+                                       OR  "2"
+               MOVE    SPACE               TO  TBL-QRCSV-AREA
+               MOVE    "62"                TO  TBL-QRCSV-DATA (1)
+      *        残量確認指示
+               MOVE    ORCSQRCSV-ZANSIJI   TO  TBL-QRCSV-DATA (2)
+               MOVE    2                   TO  TBL-MAX
                PERFORM 400-DATAOUT-SEC
            END-IF
       *    備考レコード
