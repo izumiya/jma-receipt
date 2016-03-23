@@ -180,7 +180,7 @@
            COPY    "CPORCSQRENCODE.INC".
       *
       *    一般名例外コードテーブル
-      **** COPY    "CMGENERICTBL.INC".
+           COPY    "CMGENERICTBL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1045,8 +1045,13 @@
       **       MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
       **                                   TO  TBL-QRCSV-DATA (6)
       *        一般名例外コード変換
-      *H28.4   PERFORM 20039-GENERICCD-HEN-SEC
-               PERFORM 20039-GENERICPRICE-HEN-SEC
+      *H28.4
+               IF      SPA-SRYYMD      <   "20160401"
+                   PERFORM 20039-GENERICCD-HEN-SEC
+               ELSE
+      *            最低薬価テーブルより
+                   PERFORM 20039-GENERICPRICE-HEN-SEC
+               END-IF
                MOVE    WRK-YAKKAKJNCD      TO  TBL-QRCSV-DATA (6)
            END-IF
       *
@@ -1156,49 +1161,47 @@
        20039-GENERICPRICE-HEN-EXT.
            EXIT.
       *
-      *!!未使用
       *****************************************************************
       *    一般名例外コード変換処理
       *****************************************************************
-      *20039-GENERICCD-HEN-SEC         SECTION.
+       20039-GENERICCD-HEN-SEC         SECTION.
       *
-      *    SET     TBL-GEN             TO  1
-      *    SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
-      *            AT  END
-      *                MOVE    SPACE            TO  WRK-YAKKAKJNCD
-      *                MOVE    SPACE            TO  WRK-GENERIC-STYMD
-      *                MOVE    SPACE            TO  WRK-GENERIC-EDYMD
-      *            WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
-      *                                        =   TBL-YAKKAKJNCD
-      *                                                    (TBL-GEN)
-      *                MOVE    TBL-GENERIC-CODE (TBL-GEN)
-      *                                         TO  WRK-YAKKAKJNCD
-      *                MOVE    TBL-GENERIC-STYMD (TBL-GEN)
-      *                                         TO  WRK-GENERIC-STYMD
-      *                MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
-      *                                         TO  WRK-GENERIC-EDYMD
-      *    END-SEARCH
+           SET     TBL-GEN             TO  1
+           SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
+                   AT  END
+                       MOVE    SPACE            TO  WRK-YAKKAKJNCD
+                       MOVE    SPACE            TO  WRK-GENERIC-STYMD
+                       MOVE    SPACE            TO  WRK-GENERIC-EDYMD
+                   WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+                                               =   TBL-YAKKAKJNCD
+                                                           (TBL-GEN)
+                       MOVE    TBL-GENERIC-CODE (TBL-GEN)
+                                                TO  WRK-YAKKAKJNCD
+                       MOVE    TBL-GENERIC-STYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-STYMD
+                       MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-EDYMD
+           END-SEARCH
       *H25.4
-      *    IF      WRK-YAKKAKJNCD  NOT =   SPACE
+           IF      WRK-YAKKAKJNCD  NOT =   SPACE
       *        有効期間判定
-      *        IF    (SPA-SRYYMD           >=  WRK-GENERIC-STYMD)
-      *          AND (SPA-SRYYMD           <=  WRK-GENERIC-EDYMD)
-      *            CONTINUE
-      *        ELSE
-      *            MOVE    SPACE           TO  WRK-YAKKAKJNCD
-      *        END-IF
-      *    END-IF
+               IF    (SPA-SRYYMD           >=  WRK-GENERIC-STYMD)
+                 AND (SPA-SRYYMD           <=  WRK-GENERIC-EDYMD)
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-YAKKAKJNCD
+               END-IF
+           END-IF
       *
-      *    IF      WRK-YAKKAKJNCD      =   SPACE
-      *        STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
-      *                "ZZZ"               DELIMITED  BY  SIZE
-      *                                    INTO    WRK-YAKKAKJNCD
-      *        END-STRING
-      *    END-IF
-      *    .
-      *20039-GENERICCD-HEN-EXT.
-      *    EXIT.
-      *!!未使用
+           IF      WRK-YAKKAKJNCD      =   SPACE
+               STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
+                       "ZZZ"               DELIMITED  BY  SIZE
+                                           INTO    WRK-YAKKAKJNCD
+               END-STRING
+           END-IF
+           .
+       20039-GENERICCD-HEN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    １回服用量レコード作成処理
