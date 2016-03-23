@@ -2531,7 +2531,7 @@
                        PERFORM 10011322-JIDOUKSN20-CHK-SEC
                    END-IF
                    IF     (WRK-ERRCD       =   SPACE       )
-                     AND  (SPA-SRYYMD      >=  WRK-SYOYMD-3 )
+                     AND  (SPA-SRYYMD      >   WRK-SYOYMD-3 )
       *                ３カ月以上は算定不可
                        IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)
                        AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
