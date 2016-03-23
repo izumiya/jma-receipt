@@ -525,7 +525,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "526"
                    MOVE    "短期滞在手術等基本料３" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
-      *H26.45
+      *H26.4
                WHEN    "527"
                    MOVE    "小児特定集中治療室管理料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
@@ -534,6 +534,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "529"
                    MOVE    "特定一般病棟入院料" 
+                                            TO  SPA-GMN-TKBNCD-MEI(IDX)
+      *H28.4
+               WHEN    "530"
+                   MOVE    "地域移行機能強化病棟入院料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
            END-EVALUATE
            . 
@@ -833,6 +837,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "529"
       *            特定一般病棟入院料
                    PERFORM 200211-KBNCD-529-SEC
+      *H28.4
+               WHEN    "530"
+      *            地域移行機能強化病棟入院料
+                   PERFORM 200211-KBNCD-530-SEC
                WHEN    OTHER
       *            包括なし
                    PERFORM 200211-KBNCD-999-SEC
@@ -1372,6 +1380,25 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-PERFORM
            .
        200211-KBNCD-529-EXT.
+           EXIT.
+      *****************************************************************
+      *    地域移行機能強化病棟入院料処理
+      *****************************************************************
+       200211-KBNCD-530-SEC       SECTION.
+      *
+      *    包括算定区分
+           MOVE    SPA-GMN-SANTEIKBN-LST (2)   TO  SPA-GMN-SANTEIKBN-G
+           MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    SPA-GMN-HKNCOMBIKBN-LST(1)  TO  SPA-GMN-HKNCOMBIKBN-G
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
+      *        すべて包括
+               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+           END-PERFORM
+           .
+       200211-KBNCD-530-EXT.
            EXIT.
       *****************************************************************
       *    番号選択チェック処理
