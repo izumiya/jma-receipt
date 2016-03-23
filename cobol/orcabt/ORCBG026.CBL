@@ -88,6 +88,7 @@
            03  FLG-SRYACT              PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
            03  FLG-GECLASS             PIC 9(01).
+           03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-OK                  PIC 9(01).
            03  FLG-SP                  PIC 9(01).
       *
@@ -239,6 +240,10 @@
       *    医薬品分類マスタ
        01  GECLASS-REC.
            COPY    "CPGENERICCLASS.INC".
+      *
+      *    保険組合せ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -564,6 +569,12 @@
       *    診療会計読み込み
            PERFORM 900-SRYACCT-READ-SEC
            IF      FLG-SRYACCT        =   1
+               GO  TO  230-MAIN-SRYACCT-EXT
+           END-IF
+      *
+      *    保険組合せ読み込み
+           PERFORM 900-HKNCOMBI-READ-SEC
+           IF      FLG-HKNCOMBI       =   1
                GO  TO  230-MAIN-SRYACCT-EXT
            END-IF
       *
@@ -1382,6 +1393,42 @@ grpsys                                     SPA-AREA
       *
            .
        900-SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せ検索
+      *****************************************************************
+       900-HKNCOMBI-READ-SEC        SECTION.
+      *
+      *    該当の診療会計データを検索
+           INITIALIZE                  HKNCOMBI-REC
+           MOVE    ACCT-HOSPNUM    TO  COMB-HOSPNUM
+           MOVE    ACCT-PTID       TO  COMB-PTID
+           MOVE    ACCT-HKNCOMBI   TO  COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_hkncombi"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-HKNCOMBI
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+      *
+               IF    ( COMB-HKNNUM     =   "980" ) OR
+                     ( COMB-HKNNUM     =   "975" ) OR
+                     ( COMB-HKNNUM     =   "973" ) OR
+                     ( COMB-HKNNUM     =   "971" )
+                   MOVE    1               TO  FLG-HKNCOMBI
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+      *
+           MOVE    "tbl_hkncombi"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBCLOSECURSOR-SEC
+      *
+           .
+       900-HKNCOMBI-READ-EXT.
            EXIT.
       *
       *****************************************************************
