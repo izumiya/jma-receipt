@@ -5142,7 +5142,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
       *
       *    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
            IF    ( SPA-GMN-W20-KNGYKNHICHI  >=  "2" )
-            AND  ( SPA-GMN-W20-KNGYKNHICHI  >=  "4" )
+            AND  ( SPA-GMN-W20-KNGYKNHICHI  <=  "4" )
                MOVE    SPA-GMN-W20-KNGYKNHICHI
                                    TO  WRK-KBN1-G
                COMPUTE WRK-KBN1    =   WRK-KBN1    -   1
