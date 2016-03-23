@@ -4504,7 +4504,7 @@
       *                   MOVE    "114040170"         TO  WRK-SRYCD
       *               END-EVALUATE
                   END-EVALUATE
-              WHEN    "21"
+              WHEN    "2"
       *       ºßÂð¤¬¤ó°åÁí¹ç(ºß»Ù¿ÇÅù)
       *               ´ËÏÂ¥±¥¢½¼¼Â
                       MOVE    "114040270"      TO  WRK-ZAIKSN-SRYCD(1)
