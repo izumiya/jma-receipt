@@ -1413,7 +1413,7 @@ grpsys                                     SPA-AREA
                MOVE    ZERO            TO  FLG-HKNCOMBI
                MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
       *
-               IF    ( COMB-HKNNUM     =   "980" ) OR
+               IF    ( COMB-HKNNUM(1:2)    =   "98" ) OR
                      ( COMB-HKNNUM     =   "975" ) OR
                      ( COMB-HKNNUM     =   "973" ) OR
                      ( COMB-HKNNUM     =   "971" )
