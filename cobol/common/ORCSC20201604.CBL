@@ -418,6 +418,14 @@
            03  WRK-SIP-SURYO           PIC 9(05)V9(5).
            03  WRK-SIP-SURYO1          PIC 9(05)V9(5).
            03  WRK-SIP-SURYO2          PIC 9(05)V9(5).
+      *
+           03  WRK-CHK-SURYO           PIC 9(05)V9(5).
+           03  WRK-CHK-SURYO-R         REDEFINES WRK-CHK-SURYO.
+               05  WRK-CHK-SURYO1      PIC 9(05).
+               05  WRK-CHK-SURYO2      PIC 9(05).
+      *
+           03  WRK-CHK-FLG1            PIC 9(01).
+           03  WRK-CHK-FLG2            PIC 9(01).
            03  WRK-SIP-KEI             PIC 9(05)V9(5).
            03  WRK-SIP-KBN             PIC X(01).
            03  FLG-SIP70-ARI           PIC 9(01).
@@ -1734,14 +1742,41 @@
            MOVE    ZERO                TO  WRK-SIP-SURYO
            MOVE    ZERO                TO  WRK-SIP-SURYO1
            MOVE    ZERO                TO  WRK-SIP-SURYO2
+           MOVE    ZERO                TO  WRK-CHK-FLG1
+           MOVE    ZERO                TO  WRK-CHK-FLG2
            IF      WRK-COM-SIPRYO1(IDX)  NOT =   ZERO
                COMPUTE WRK-SIP-SURYO1      =   WRK-COM-SURYO (IDX)
                                            /   WRK-COM-SIPRYO1(IDX)
+               MOVE    WRK-SIP-SURYO1      TO  WRK-CHK-SURYO
+               IF      WRK-CHK-SURYO2      =   ZERO
+                   MOVE    1                   TO  WRK-CHK-FLG1
+               END-IF
            END-IF
            IF      WRK-COM-SIPRYO2(IDX)  NOT =   ZERO
                COMPUTE WRK-SIP-SURYO2      =   WRK-COM-SURYO (IDX)
                                            /   WRK-COM-SIPRYO2(IDX)
+               MOVE    WRK-SIP-SURYO2      TO  WRK-CHK-SURYO
+               IF      WRK-CHK-SURYO2      =   ZERO
+                   MOVE    1                   TO  WRK-CHK-FLG2
+               END-IF
            END-IF
+      *
+           IF     (WRK-CHK-FLG1        =   1    )
+              AND (WRK-CHK-FLG2        =   ZERO )
+      *        ¹ÑÂÎÎÌ£±ÂÐ¾Ý
+               MOVE    WRK-SIP-SURYO1      TO  WRK-SIP-SURYO
+               MOVE    "1"                 TO  WRK-SIP-KBN
+               GO      TO      20011-SIP-SURYO-EXT
+           END-IF
+      *
+           IF     (WRK-CHK-FLG1        =   ZERO )
+              AND (WRK-CHK-FLG2        =   1    )
+      *        ¹ÑÂÎÎÌ£²ÂÐ¾Ý
+               MOVE    WRK-SIP-SURYO2      TO  WRK-SIP-SURYO
+               MOVE    "2"                 TO  WRK-SIP-KBN
+               GO      TO      20011-SIP-SURYO-EXT
+           END-IF
+      *
            IF     (WRK-SIP-SURYO1      <=  WRK-SIP-SURYO2)
               OR  (WRK-SIP-SURYO2      =   ZERO     )
       *        ¹ÑÂÎÎÌ£±ÂÐ¾Ý
