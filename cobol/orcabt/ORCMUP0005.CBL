@@ -143,6 +143,10 @@ grpsys     COPY    "COMMON-SPA".
       *    点数保存
            03  WRK-HZN-TEN             PIC  9(09)V99.
            03  WRK-HZN-OLDTEN          PIC  9(09)V99.
+      *    単位保存
+           03  WRK-HZN-TANICD          PIC  X(03).
+           03  WRK-HZN-TANIMOJISU      PIC  9(01).
+           03  WRK-HZN-TANINAME        PIC  X(24).
       *
            03  WRK-IN                  PIC X(01). 
       *
@@ -561,8 +565,19 @@ grpsys     MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
             AND   (TNS-SRYCD(1:1)      =   "7"  )
       ***** AND  ((TNS-TENSIKIBETU     =   2    ) OR
       *****       (TNS-OLDTEN      NOT =   WRK-TNS-TEN ))
-            AND   (TNS-TENSIKIBETU     =   2    )
-               MOVE    WRK-TNS-TEN         TO  TNS-TEN
+               IF     (TNS-TENSIKIBETU     =   2)  OR
+                      (TNS-SANSOKBN        =   2 OR 3 OR 4 OR 5)
+                   MOVE    WRK-TNS-TEN         TO  TNS-TEN
+               END-IF
+      *        ユーザーにより単位設定がある場合
+               IF     (TNS-TANICD          =   "000"   OR
+                                               SPACE)  AND
+                     ((WRK-TNS-TANICD  NOT =   "000")  AND
+                      (WRK-TNS-TANICD  NOT =   SPACE))
+                   MOVE    WRK-TNS-TANICD      TO  TNS-TANICD
+                   MOVE    WRK-TNS-TANIMOJISU  TO  TNS-TANIMOJISU
+                   MOVE    WRK-TNS-TANINAME    TO  TNS-TANINAME
+               END-IF
            END-IF
       *
            MOVE    LNK-MNTYMD          TO  TNS-CREYMD
@@ -774,6 +789,21 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                        MOVE    TNSWK-TEN       TO  WRK-HZN-TEN
                        MOVE    TNSWK-OLDTEN    TO  WRK-HZN-OLDTEN
                    END-IF
+      *            特定器材でユーザーにより単位設定がある場合
+                   IF     (TNSWK-SRYCD(1:1)    =   "7"  )  AND
+                          (TNSWK-TANICD        =   "000"   OR
+                                                   SPACE)  AND
+                         ((TNS-TANICD      NOT =   "000")  AND
+                          (TNS-TANICD      NOT =   SPACE))
+                       MOVE    TNS-TANICD      TO  WRK-HZN-TANICD
+                       MOVE    TNS-TANIMOJISU  TO  WRK-HZN-TANIMOJISU
+                       MOVE    TNS-TANINAME    TO  WRK-HZN-TANINAME
+                   ELSE
+                       MOVE    TNSWK-TANICD    TO  WRK-HZN-TANICD
+                       MOVE    TNSWK-TANIMOJISU
+                                               TO  WRK-HZN-TANIMOJISU
+                       MOVE    TNSWK-TANINAME  TO  WRK-HZN-TANINAME
+                   END-IF
       *
       *            更新
                    MOVE    TNS-KEY             TO  WRK-TNSUP-KEY
@@ -787,6 +817,10 @@ grpsys             MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
       *            点数の入れ替え
                    MOVE    WRK-HZN-TEN         TO  TNS-TEN
                    MOVE    WRK-HZN-OLDTEN      TO  TNS-OLDTEN
+      *            単位の入れ替え
+                   MOVE    WRK-HZN-TANICD      TO  TNS-TANICD
+                   MOVE    WRK-HZN-TANIMOJISU  TO  TNS-TANIMOJISU
+                   MOVE    WRK-HZN-TANINAME    TO  TNS-TANINAME
       *
                    MOVE    WRK-TNSUP-KEY       TO  TNSUP-KEY
                    PERFORM 20102-TENSU-UPD-SEC
