@@ -655,6 +655,11 @@
                GO  TO  250-TOKEI-HEN-EXT
            END-IF
       *
+      *    点数がない場合は対象外
+           IF      TNS-TEN             =   ZERO
+               GO  TO  250-TOKEI-HEN-EXT
+           END-IF
+      *
       *    単位数
            IF      TNS-SSTKIJUNCD(1)   =   ZERO
                MOVE    1                   TO  WRK-TANISU

@@ -1057,6 +1057,11 @@
       *    点数マスタ検索
            PERFORM 900-TNS-READ-SEC
       *
+      *    点数がない場合は対象外
+           IF      TNS-TEN             =   ZERO
+               GO  TO  250-TOKEI-HEN-EXT
+           END-IF
+      *
       *    薬剤区分チェック
            MOVE    ZERO            TO  FLG-OK
            EVALUATE    WRK-PARA-YKZKBN
