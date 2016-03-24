@@ -233,11 +233,13 @@
            03  FILLER          PIC X(09)   VALUE    "099110001".
            03  FILLER          PIC X(09)   VALUE    "111012510".
            03  FILLER          PIC X(09)   VALUE    "111012710".
+           03  FILLER          PIC X(09)   VALUE    "113019710".
+           03  FILLER          PIC X(09)   VALUE    "113019910".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    9.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS   11.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     9.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE    11.
       *
       *****************************************************************
       *    ファイルレイアウト
