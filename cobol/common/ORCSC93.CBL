@@ -94,6 +94,8 @@
            03  FLG-JIHI            PIC 9(01).
       *    手技料フラグ
            03  FLG-SYUGI           PIC 9(01).
+      *H28.4
+           03  FLG-KSNARI          PIC 9(01).
       *    １剤フラグ
            03  FLG-ZAI             PIC 9(01).
       *    発生日フラグ
@@ -496,6 +498,8 @@
            END-PERFORM
       *
            MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+           MOVE    ZERO                TO  FLG-KSNARI
       *!
            MOVE    SPACE               TO  WRK-HKNCOMBI
            MOVE    SPACE               TO  WRK-CHIKENKBN
@@ -683,6 +687,8 @@
                    MOVE    ZERO                TO  FLG-JIHI
                    MOVE    ZERO                TO  FLG-BUIKBN
                    MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+                   MOVE    ZERO            TO  FLG-KSNARI
                    MOVE    ZERO                TO  FLG-HASSYO
                    MOVE    ZERO                TO  FLG-AKUSEI-ARI
                    MOVE    ZERO                TO  FLG-YAKUHYO
@@ -708,6 +714,8 @@
                    MOVE    ZERO                TO  FLG-JIHI
                    MOVE    ZERO                TO  FLG-BUIKBN
                    MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+                   MOVE    ZERO            TO  FLG-KSNARI
                    MOVE    ZERO                TO  FLG-HASSYO
                    MOVE    ZERO                TO  FLG-AKUSEI-ARI
                    MOVE    ZERO                TO  FLG-YAKUHYO
@@ -734,6 +742,8 @@
                        MOVE    SPACE       TO  SPA-COM-ZAIEND (IDX)
                        MOVE    IDX                 TO  IDX-SET
                        MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+                       MOVE    ZERO            TO  FLG-KSNARI
                    END-IF
       *
                WHEN    "."
@@ -765,6 +775,8 @@
                    END-IF
                    MOVE    ZERO                TO  FLG-BUIKBN
                    MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+                   MOVE    ZERO            TO  FLG-KSNARI
                    MOVE    ZERO                TO  FLG-HASSYO
                    MOVE    ZERO                TO  FLG-AKUSEI-ARI
                    MOVE    ZERO                TO  FLG-YAKUHYO
@@ -894,6 +906,8 @@
                MOVE    ZERO            TO  FLG-JIHI
            END-IF
            MOVE    ZERO                TO  FLG-SYUGI
+      *H28.4
+           MOVE    ZERO                TO  FLG-KSNARI
            MOVE    ZERO                TO  FLG-AKUSEI-ARI
       *
            .
@@ -1344,10 +1358,16 @@
            IF     (SPA-COM-SRYKBN (IDX)(1:1)    =   "1" )  AND
                   (SPA-COM-DATAKBN (IDX)   =   "1"  )
                IF      FLG-SYUGI           =   1
+                  OR   FLG-KSNARI          =   1
                    MOVE    2               TO  FLG-SYORI
                END-IF
                MOVE    1               TO  FLG-SYUGI
            END-IF
+           IF     (SPA-COM-SRYKBN (IDX)(1:1)    =   "1" )  AND
+                  (SPA-COM-DATAKBN (IDX)   =   "2"  )
+               MOVE    1                TO  FLG-KSNARI
+           END-IF
+      *
       *H25.7
       *    労災コードのその他８０は剤分離
            IF     (SPA-SRYYMD          >=  "20130701" )
@@ -1513,6 +1533,8 @@
                    MOVE    SPACE           TO  WRK-SRYSYUKBN
                    MOVE    ZERO            TO  IDX-SET
                    MOVE    ZERO            TO  FLG-SYUGI
+      *H28.4
+                   MOVE    ZERO            TO  FLG-KSNARI
                    MOVE    ZERO            TO  FLG-AKUSEI-ARI
                END-IF
                IF      FLG-SYORI           =   2
@@ -1523,6 +1545,8 @@
                    MOVE    ZERO            TO  IDX-SET
                ELSE
                    MOVE    ZERO            TO  FLG-SYUGI
+      *H28.4
+                   MOVE    ZERO            TO  FLG-KSNARI
                END-IF
            END-IF
       *
