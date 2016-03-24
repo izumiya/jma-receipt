@@ -5046,7 +5046,7 @@
       *    一部負担割合備考
            MOVE    WRK-BIKOU-FTN       TO  ORCSQRCSV-BIKO-FTN
       *H28.4
-      *    残量確認指示
+      *    残薬確認指示
            IF      WRK-ZANSIJI1        =   "1"
                MOVE    "1"                 TO  ORCSQRCSV-ZANSIJI
            END-IF
