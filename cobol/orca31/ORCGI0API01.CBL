@@ -571,6 +571,8 @@
       *****************************************************************
        1001-NYUIN-SEC                  SECTION.
       *
+           MOVE    REG-NYUINYMD        TO  WRK-KJNYMD
+      *
            MOVE    HSPTINFMREQ-BTUNUM  TO  REG-BTUNUM
       *
            MOVE    HSPTINFMREQ-BRMNUM  TO  REG-BRMNUM
@@ -598,7 +600,6 @@
            PERFORM 10011-HOKEN-CHECK-SEC
       *
            IF    ( HSPTINFMREQ-KHNCD   NOT =   SPACE )
-               MOVE    REG-NYUINYMD    TO  WRK-KJNYMD
                PERFORM 10011-KHNCD-CHECK-SEC
            END-IF
       *
@@ -685,6 +686,8 @@
       *
            PERFORM 10011-IDOYMD-CHECK-SEC
       *
+           MOVE    REG-IDOYMD           TO  WRK-KJNYMD
+      *
            MOVE    HSPTINFMREQ-BTUNUM   TO  REG-BTUNUM
       *
            MOVE    HSPTINFMREQ-BRMNUM   TO  REG-BRMNUM
@@ -705,7 +708,6 @@
            PERFORM 10011-HOKEN-CHECK-SEC
       *
            IF    ( HSPTINFMREQ-KHNCD   NOT =   SPACE )
-               MOVE    REG-IDOYMD      TO  WRK-KJNYMD
                PERFORM 10011-KHNCD-CHECK-SEC
            END-IF
       *
@@ -750,7 +752,7 @@
                INITIALIZE                  SYSKANRI-REC
                MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
                MOVE    "5113"          TO  SYS-KANRICD
-               MOVE    REG-NYUINYMD    TO  SYS-STYUKYMD
+               MOVE    WRK-KJNYMD      TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
       *
                PERFORM 900-SYSKANRI-KEY2-SEL-SEC
@@ -829,7 +831,7 @@
            END-PERFORM
       *
            MOVE    SPA-AREA            TO  TSPA-AREA
-           MOVE    REG-NYUINYMD        TO  TSPA-SYSYMD
+           MOVE    WRK-KJNYMD          TO  TSPA-SYSYMD
       *
            CALL    "ORCSAPIHKN"        USING
                                        TSPA-AREA
