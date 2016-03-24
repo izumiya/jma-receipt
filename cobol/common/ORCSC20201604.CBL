@@ -3188,6 +3188,35 @@
                                                               (IDX-IP)
                        MOVE    IDX-IP          TO  LNK-ORCSC-KEI-IDX
                    END-IF
+      *H28.4
+               ELSE
+      *            加算のチェック
+                   IF     (FLG-GENERIC-NO      =   1 )
+                      OR  (CNT-GENERIC         <   2 )
+      *                一般名表示なし有
+                       IF      WRK-COM-INPUTCD (IDX-IP)
+                                              NOT =   "120003570"
+                           MOVE    "K222"          TO  SPA-ERRCD
+                       END-IF
+                   ELSE
+      *                すべて一般名
+                       IF      WRK-COM-INPUTCD (IDX-IP)
+                                              NOT =   "120004270"
+                           MOVE    "K223"          TO  SPA-ERRCD
+                       END-IF
+                   END-IF
+                   IF     (SPA-ERRCD          NOT =   SPACE)
+                       IF     (WRK-COM-KZMFLG (IDX-IP) =   SPACE)
+                         AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-IP)
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-IP)
+                           MOVE    IDX-IP          TO  LNK-ORCSC-KEI-IDX
+                       ELSE
+                           MOVE    SPACE           TO  SPA-ERRCD
+                       END-IF
+                   END-IF
                END-IF
            END-IF
       *!!!!

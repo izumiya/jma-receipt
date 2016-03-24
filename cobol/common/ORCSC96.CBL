@@ -3181,8 +3181,8 @@
                    END-STRING
                WHEN    "K108"
                    STRING  "警告！"
-                           "湿布薬が７０枚以上となります。"
-                           "減算対象となります。"
+                           "湿布薬が７０枚を超えています。"
+                           "減点対象となります。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
@@ -3197,6 +3197,20 @@
                    STRING  "処方せん無交付加算の在宅料ではありません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K222"
+                   STRING  "警告！"
+                           "一般名処方加算１（処方せん料）の対象では"
+                           "ありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K223"
+                   STRING  "警告！"
+                           "一般名処方加算２（処方せん料）の対象では"
+                           "ありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
                    END-STRING
                WHEN    "0236"
                    STRING  "外用薬院内投薬がゼロ点になります。"
