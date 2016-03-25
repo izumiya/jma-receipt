@@ -1545,13 +1545,7 @@ grpsys                                     SPA-AREA
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
                MOVE    MCPDATA-REC     TO  GECLASS-REC
-      *        ¸åÈ¯¶èÊ¬¤¬£²¤È£³¤Î¤ßÂÐ¾Ý
-               IF    ( GECLASS-KOUHATU =   2 )   OR
-                     ( GECLASS-KOUHATU =   3 )
-                   MOVE    ZERO            TO  FLG-GECLASS
-               ELSE
-                   MOVE    1               TO  FLG-GECLASS
-               END-IF
+               MOVE    ZERO            TO  FLG-GECLASS
            ELSE
                MOVE    1               TO  FLG-GECLASS
            END-IF
