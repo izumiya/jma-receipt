@@ -5290,6 +5290,14 @@
            MOVE    FLG-MAYAKU          TO  ORCSQRCSV-MAYAKU
       *    一部負担割合備考
            MOVE    WRK-BIKOU-FTN       TO  ORCSQRCSV-BIKO-FTN
+      *H28.4
+      *    残薬確認指示
+           IF      WRK-ZANSIJI1        =   "1"
+               MOVE    "1"                 TO  ORCSQRCSV-ZANSIJI
+           END-IF
+           IF      WRK-ZANSIJI2        =   "1"
+               MOVE    "2"                 TO  ORCSQRCSV-ZANSIJI
+           END-IF
       *    ファイル名組み立て項目
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
       *
