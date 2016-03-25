@@ -216,6 +216,7 @@
       *  04.08.05    NACL-門脇    16/02/08  RECE02の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正。
       *                                     第３第４公費の括弧再掲記載対応
+      *  04.08.06    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5319,17 +5320,26 @@
                        (RECE02-HENTOTALTEN(IDX1) NOT =
                                      RECE02-HENTOTALTEN(IDX2)))
                   IF    RECE02-SEIHOFLG    =  "1"
-                   MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
-                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+                    IF   RECE02-SYUTANARIFLG  =  ZERO
+                      MOVE  RECE02-TENSU(IDX IDX2) TO  WRK-TENSUZ
+                      MOVE  WRK-TENSU              TO  HC06-TENSU(IDX)
       *
-                   COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
-                                           -     RECE02-TENSU(IDX IDX1)
-                   MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
-                   MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
+                      COMPUTE WRK-SUM-TENSU = RECE02-TENSU(IDX IDX2)
+                                            - RECE02-TENSU(IDX IDX1)
+                      MOVE  WRK-SUM-TENSU          TO  WRK-KOUTENZ
+                      MOVE  WRK-KOUTEN             TO  HC06-KOUTEN(IDX)
+                    ELSE
+                      COMPUTE WRK-SUM-TENSU = RECE02-TENSU(IDX IDX2)
+                                            + RECE02-SYUTANTEN(IDX)
+                      MOVE  WRK-SUM-TENSU          TO  WRK-TENSUZ
+                      MOVE  WRK-TENSU              TO  HC06-TENSU(IDX)
+      *
+                      MOVE  RECE02-TENSU(IDX IDX2) TO  WRK-KOUTENZ
+                      MOVE  WRK-KOUTEN             TO  HC06-KOUTEN(IDX)
+                    END-IF
                   ELSE
-                   MOVE    RECE02-TENSU(IDX IDX2)
-                                                 TO  WRK-KOUTENZ
-                   MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
+                      MOVE  RECE02-TENSU(IDX IDX2) TO  WRK-KOUTENZ
+                      MOVE  WRK-KOUTEN             TO  HC06-KOUTEN(IDX)
                   END-IF
                  END-IF
                END-IF

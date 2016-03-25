@@ -547,17 +547,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                 MOVE    BUN-IDX     TO        KH-IDX
            END-IF
       *
-      ***  IF   (RECE02-SEIHOFLG                     =  "1" )
-      ***  AND  (KH-IDX                          NOT =  ZERO)
-      ***  AND  (RECE02-HENTOTALTEN(1)           NOT =  ZERO)
-      ***  AND  (RECE02-HENTOTALTEN(KH-IDX + 1)  NOT =  ZERO)
-      ***  AND  (RECE02-HENTOTALTEN(1) <
-      ***                     RECE02-HENTOTALTEN(KH-IDX + 1))
-      ***     IF   RECE02-HKNNUMHC(HC-IDX)  NOT = SPACE
-      ***       MOVE    ZERO        TO        KH-IDX
-      ***     END-IF
-      ***  END-IF
-      *
            IF    KH-IDX      NOT =   ZERO
                 IF  ( RECE04-KOHBUNRI  NOT =  ZERO )
                 OR  ( RECE02-SEIHOFLG      =  "1"  )

@@ -709,6 +709,7 @@
       *                                     第３第４公費の括弧再掲記載対応
       *  04.08.13    NACL-門脇    16/03/15  第三者行為現物給付時の
       *                                     請求額情報（食事）編集修正
+      *  04.08.14    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1020,6 +1021,8 @@
            03  BUN-IDX2                                PIC 9(03).
            03  BUN-IDX3                                PIC 9(03).
            03  BUN-IDX4                                PIC 9(03).
+           03  BUN-IDX5                                PIC 9(03).
+           03  BUN-IDX6                                PIC 9(03).
            03  SYUKEI-IDX                              PIC 9(03).
            03  SYUKEI-IDX2                             PIC 9(03).
            03  SYUKEI-IDX3                             PIC 9(03).
@@ -9501,10 +9504,20 @@
       *
       *    公費の分離表示用インデックスの確定
            MOVE          ZERO       TO     BUN-IDX
+           MOVE          ZERO       TO     BUN-IDX6
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
-           MOVE          1          TO     BUN-IDX
+               MOVE      1          TO     BUN-IDX
+               IF   (RECE62-SEIHOFLG             =   "1"  )
+               AND  (RECE62-SYUTANARIFLG         =    1   )
+               AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                  MOVE   6          TO     BUN-IDX6
+               END-IF
            END-IF
       *    インデックス２
            MOVE          ZERO       TO     BUN-IDX2
@@ -9525,32 +9538,6 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
-      ***                      IF   RECE62-SEIHOFLG  =  "1"
-      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                                  =  SPACE)
-      ***                          MOVE   ZERO   TO     BUN-IDX2
-      ***                        END-IF
-      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                                  =  SPACE)
-      ***                          MOVE    1     TO     BUN-IDX
-      ***                        END-IF
-      ***                      END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -9601,6 +9588,31 @@
                                                    RECE62-KOHID(3)
                            IF      RECE62-RECESKYKBN (3)       =   SPACE
                                MOVE      4       TO     BUN-IDX4
+                           END-IF
+                      END-IF
+                    END-IF
+                   END-PERFORM
+             END-IF
+           END-IF
+      *    インデックス５
+           MOVE          ZERO       TO     BUN-IDX5
+           IF  RECE62-HENTOTALTEN(5)       =      ZERO
+               CONTINUE
+           ELSE
+             IF ( RECE62-SRYYM    >=    "200804"                    )
+             OR ((RECE62-SRYYM    <     "200804"                   ) AND
+                 (RECE62-HENTOTALTEN(5) NOT = ZERO                 ) AND
+                 (RECE62-HENTOTALTEN(1) NOT = RECE62-HENTOTALTEN(5)))
+                   MOVE       IDX1              TO   HC-IDX
+                   PERFORM    VARYING   IDX2    FROM   1   BY   1
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
+                      IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
+                                                   RECE62-KOHNUM(4)
+                      AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
+                                                   RECE62-KOHID(4)
+                           IF      RECE62-RECESKYKBN (4)       =   SPACE
+                               MOVE      5       TO     BUN-IDX5
                            END-IF
                       END-IF
                     END-IF
@@ -9785,6 +9797,11 @@
                                   RECE62-TENSU(1 BUN-IDX4)  +
                                  (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE    RECE62-SYUTANTEN(1)  =
+                                  RECE62-SYUTANTEN(1)  +
+                                 (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
       *    指導のレセ点数欄の編集
                WHEN    "13"
                  IF  ACCT-ZAIKBN   =    2
@@ -9808,6 +9825,11 @@
                                   RECE6G-TENSU(2 BUN-IDX4)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE    RECE6G-SYUTANTEN(2)  =
+                                  RECE6G-SYUTANTEN(2)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                  ELSE
                    IF    BUN-IDX        =   1
                        COMPUTE    RECE62-TENSU(2 BUN-IDX)  =
@@ -9827,6 +9849,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE62-TENSU(2 BUN-IDX4)  =
                                   RECE62-TENSU(2 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE    RECE62-SYUTANTEN(2)  =
+                                  RECE62-SYUTANTEN(2)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                  END-IF
@@ -9853,6 +9880,11 @@
                                   RECE6G-TENSU(3 BUN-IDX4)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE    RECE6G-SYUTANTEN(3)  =
+                                  RECE6G-SYUTANTEN(3)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                  ELSE
                    IF    BUN-IDX        =   1
                        COMPUTE    RECE62-TENSU(3 BUN-IDX)  =
@@ -9872,6 +9904,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE62-TENSU(3 BUN-IDX4)  =
                                   RECE62-TENSU(3 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE    RECE62-SYUTANTEN(3)  =
+                                  RECE62-SYUTANTEN(3)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                  END-IF
@@ -9904,6 +9941,11 @@
                                      RECE62-TENSU(4 BUN-IDX4)  -
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX6       =   6
+                           COMPUTE   RECE62-SYUTANTEN(4)  =
+                                     RECE62-SYUTANTEN(4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
                      ELSE
                        ADD   WK-ZAIKAISU       TO   RECE62-KAISU(4)
                        IF    BUN-IDX        =   1
@@ -9924,6 +9966,11 @@
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE62-TENSU(4 BUN-IDX4)  =
                                      RECE62-TENSU(4 BUN-IDX4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX6       =   6
+                           COMPUTE   RECE62-SYUTANTEN(4)  =
+                                     RECE62-SYUTANTEN(4)  +
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                      END-IF
@@ -9950,6 +9997,11 @@
                                       RECE62-TENSU(4 BUN-IDX4)  +
                                      (WK-ZAITEN   *   WK-ZAIKAISU)
                         END-IF
+                        IF    BUN-IDX6       =   6
+                            COMPUTE   RECE62-SYUTANTEN(4)  =
+                                      RECE62-SYUTANTEN(4)  +
+                                     (WK-ZAITEN   *   WK-ZAIKAISU)
+                        END-IF
                      END-IF   
                    END-IF
                WHEN    "22"
@@ -9974,6 +10026,11 @@
                                  RECE62-TENSU(5 BUN-IDX4)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(5)  =
+                                 RECE62-SYUTANTEN(5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                WHEN    "23"
                    ADD    WK-ZAIKAISU    TO   RECE62-KAISU(6)
                    IF    BUN-IDX        =   1
@@ -9994,6 +10051,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(6 BUN-IDX4)  =
                                  RECE62-TENSU(6 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(6)  =
+                                 RECE62-SYUTANTEN(6)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
       *    調剤のレセ点数欄の編集
@@ -10025,6 +10087,11 @@
                                  RECE62-TENSU(7 BUN-IDX4)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(7)  =
+                                 RECE62-SYUTANTEN(7)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
                    IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
@@ -10054,6 +10121,11 @@
                                  RECE62-TENSU(8 BUN-IDX4)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(8)  =
+                                 RECE62-SYUTANTEN(8)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
       *    調基のレセ点数欄の編集
                WHEN    "27"
                    IF    BUN-IDX        =   1
@@ -10074,6 +10146,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(9 BUN-IDX4)  =
                                  RECE62-TENSU(9 BUN-IDX4)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(9)  =
+                                 RECE62-SYUTANTEN(9)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
       *    皮下筋肉内注射のレセ点数欄の編集
@@ -10111,6 +10188,14 @@
                                  RECE6C-TENSU(10 BUN-IDX4) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(10)  =
+                                 RECE62-SYUTANTEN(10)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-SYUTANTEN(10)  =
+                                 RECE6C-SYUTANTEN(10)  +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
       *    静脈内注射のレセ点数欄の編集
                WHEN    "32"
                    ADD    WK-ZAIKAISU     TO   RECE62-KAISU(11)
@@ -10146,6 +10231,14 @@
                                  RECE6C-TENSU(11 BUN-IDX4) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(11)  =
+                                 RECE62-SYUTANTEN(11)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-SYUTANTEN(11)  =
+                                 RECE6C-SYUTANTEN(11)  +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
       *    その他注射のレセ点数欄の編集
                WHEN    "33"
                  IF  ACCT-ZAIKBN   =    2
@@ -10167,6 +10260,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE6G-TENSU(12 BUN-IDX4)  =
                                  RECE6G-TENSU(12 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE6G-SYUTANTEN(12)  =
+                                 RECE6G-SYUTANTEN(12)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                  ELSE
@@ -10203,6 +10301,14 @@
                                  RECE6C-TENSU(12 BUN-IDX4) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(12)  =
+                                 RECE62-SYUTANTEN(12)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-SYUTANTEN(12)  =
+                                 RECE6C-SYUTANTEN(12)  +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
                  END-IF
       *    処置のレセ点数欄の編集
                WHEN    "40"
@@ -10229,6 +10335,11 @@
                                  RECE62-TENSU(13 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(13)  =
+                                 RECE62-SYUTANTEN(13)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(14 BUN-IDX)  =
                                  RECE62-TENSU(14 BUN-IDX)  +
@@ -10247,6 +10358,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(14 BUN-IDX4)  =
                                  RECE62-TENSU(14 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(14)  =
+                                 RECE62-SYUTANTEN(14)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
       *    手術のレセ点数欄の編集
@@ -10275,6 +10391,11 @@
                                  RECE62-TENSU(15 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(15)  =
+                                 RECE62-SYUTANTEN(15)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(16 BUN-IDX)  =
                                  RECE62-TENSU(16 BUN-IDX)  +
@@ -10293,6 +10414,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(16 BUN-IDX4)  =
                                  RECE62-TENSU(16 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(16)  =
+                                 RECE62-SYUTANTEN(16)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
       *    検査のレセ点数欄の編集
@@ -10319,6 +10445,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(17 BUN-IDX4)  =
                                  RECE62-TENSU(17 BUN-IDX4)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(17)  =
+                                 RECE62-SYUTANTEN(17)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    TNS-KNSJISKBN    =   2
@@ -10355,6 +10486,11 @@
                                  RECE62-TENSU(18 BUN-IDX4)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(18)  =
+                                 RECE62-SYUTANTEN(18)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
       *    画像診断のレセ点数欄の編集
                WHEN    "70"
                    IF    WK-SYUTEN       NOT =   ZERO
@@ -10380,6 +10516,11 @@
                                  RECE62-TENSU(19 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(19)  =
+                                 RECE62-SYUTANTEN(19)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(20 BUN-IDX)  =
                                  RECE62-TENSU(20 BUN-IDX)  +
@@ -10398,6 +10539,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(20 BUN-IDX4)  =
                                  RECE62-TENSU(20 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(20)  =
+                                 RECE62-SYUTANTEN(20)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
       *    その他のレセ点数欄の編集
@@ -10454,6 +10600,19 @@
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
+                   IF    BUN-IDX6       =   6
+                         COMPUTE     RECE62-SYUTANTEN(21)  =
+                                     RECE62-SYUTANTEN(21)  +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
+                         IF    TNS-NYUTENTTLKBN   =    130
+                           COMPUTE   RECE62-SYUTANTEN(2)  =
+                                     RECE62-SYUTANTEN(2)  +
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-SYUTANTEN(21)  =
+                                     RECE62-SYUTANTEN(21)  +
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
+                         END-IF
+                   END-IF
                    IF    BUN-IDX        =   1
                        COMPUTE   RECE62-TENSU(22 BUN-IDX)  =
                                  RECE62-TENSU(22 BUN-IDX)  +
@@ -10472,6 +10631,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(22 BUN-IDX4)  =
                                  RECE62-TENSU(22 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                       COMPUTE   RECE62-SYUTANTEN(22)  =
+                                 RECE62-SYUTANTEN(22)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
            END-EVALUATE
@@ -13733,10 +13897,20 @@
       *
       *    公費の分離表示用インデックスの確定
            MOVE          ZERO       TO     BUN-IDX
+           MOVE          ZERO       TO     BUN-IDX6
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
-           MOVE          1          TO     BUN-IDX
+               MOVE      1          TO     BUN-IDX
+               IF   (RECE62-SEIHOFLG             =   "1"  )
+               AND  (RECE62-SYUTANARIFLG         =    1   )
+               AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                  MOVE   6          TO     BUN-IDX6
+               END-IF
            END-IF
       *    インデックス２
            MOVE          ZERO       TO     BUN-IDX2
@@ -13757,32 +13931,6 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
-      ***                      IF   RECE62-SEIHOFLG  =  "1"
-      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                                  =  SPACE)
-      ***                          MOVE   ZERO   TO     BUN-IDX2
-      ***                        END-IF
-      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                              NOT =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                                  =  SPACE)
-      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                                  =  SPACE)
-      ***                          MOVE    1     TO     BUN-IDX
-      ***                        END-IF
-      ***                      END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -13839,6 +13987,31 @@
                    END-PERFORM
              END-IF
            END-IF
+      *    インデックス５
+           MOVE          ZERO       TO     BUN-IDX5
+           IF  RECE62-HENTOTALTEN(5)       =      ZERO
+               CONTINUE
+           ELSE
+             IF ( RECE62-SRYYM    >=    "200804"                    )
+             OR ((RECE62-SRYYM    <     "200804"                   ) AND
+                 (RECE62-HENTOTALTEN(5) NOT = ZERO                 ) AND
+                 (RECE62-HENTOTALTEN(1) NOT = RECE62-HENTOTALTEN(5)))
+                   MOVE       IDX1              TO   HC-IDX
+                   PERFORM    VARYING   IDX2    FROM   1   BY   1
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
+                      IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
+                                                   RECE62-KOHNUM(4)
+                      AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
+                                                   RECE62-KOHID(4)
+                           IF      RECE62-RECESKYKBN (4)       =   SPACE
+                               MOVE      5       TO     BUN-IDX5
+                           END-IF
+                      END-IF
+                    END-IF
+                   END-PERFORM
+             END-IF
+           END-IF
       *
       *    その他のレセ点数欄の編集
            IF    BUN-IDX        =   1
@@ -13859,6 +14032,11 @@
            IF    BUN-IDX4       =   4
                    COMPUTE   RECE62-TENSU(21 BUN-IDX4)  =
                              RECE62-TENSU(21 BUN-IDX4)  +
+                            (NACCT-ZAITEN   *   CNT-DAY21)
+           END-IF
+           IF    BUN-IDX6       =   6
+                   COMPUTE   RECE62-SYUTANTEN(21)  =
+                             RECE62-SYUTANTEN(21)  +
                             (NACCT-ZAITEN   *   CNT-DAY21)
            END-IF
       *
@@ -16354,10 +16532,20 @@
       *
       *    公費の分離表示用インデックスの確定
            MOVE          ZERO       TO     BUN-IDX
+           MOVE          ZERO       TO     BUN-IDX6
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
-           MOVE          1          TO     BUN-IDX
+               MOVE          1          TO     BUN-IDX
+               IF   (RECE62-SEIHOFLG             =   "1"  )
+               AND  (RECE62-SYUTANARIFLG         =    1   )
+               AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                  MOVE   6          TO     BUN-IDX6
+               END-IF
            END-IF
       *    インデックス２
            MOVE          ZERO       TO     BUN-IDX2
@@ -16376,33 +16564,9 @@
                                                    RECE62-KOHNUM(1)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(1)
+                         IF      RECE62-RECESKYKBN (1)       =   SPACE
                            MOVE      2       TO     BUN-IDX2
-      ***                  IF   RECE62-SEIHOFLG  =  "1"
-      ***                    IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                          NOT =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                          NOT =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                              =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                              =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                              =  SPACE)
-      ***                      MOVE   ZERO   TO     BUN-IDX2
-      ***                    END-IF
-      ***                    IF  (RECE62-HKNNUMHC(HC-IDX)
-      ***                                              =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 1)
-      ***                                          NOT =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 2)
-      ***                                              =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 3)
-      ***                                              =  SPACE)
-      ***                    AND (RECE62-KOHNUMHC(HC-IDX 4)
-      ***                                              =  SPACE)
-      ***                      MOVE    1     TO     BUN-IDX
-      ***                    END-IF
-      ***                  END-IF
+                         END-IF
                       END-IF
                     END-IF
                    END-PERFORM
@@ -16425,7 +16589,9 @@
                                                    RECE62-KOHNUM(2)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(2)
+                         IF      RECE62-RECESKYKBN (2)       =   SPACE
                            MOVE      3       TO     BUN-IDX3
+                         END-IF
                       END-IF
                     END-IF
                    END-PERFORM
@@ -16448,7 +16614,34 @@
                                                    RECE62-KOHNUM(3)
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(3)
+                         IF      RECE62-RECESKYKBN (3)       =   SPACE
                            MOVE      4       TO     BUN-IDX4
+                         END-IF
+                      END-IF
+                    END-IF
+                   END-PERFORM
+             END-IF
+           END-IF
+      *    インデックス５
+           MOVE          ZERO       TO     BUN-IDX5
+           IF  RECE62-HENTOTALTEN(5)       =      ZERO
+               CONTINUE
+           ELSE
+             IF ( RECE62-SRYYM    >=    "200804"                    )
+             OR ((RECE62-SRYYM    <     "200804"                   ) AND
+                 (RECE62-HENTOTALTEN(5) NOT = ZERO                 ) AND
+                 (RECE62-HENTOTALTEN(1) NOT = RECE62-HENTOTALTEN(5)))
+                   MOVE       IDX1              TO   HC-IDX
+                   PERFORM    VARYING   IDX2    FROM   1   BY   1
+                      UNTIL   (IDX2      >       4)
+                    IF     RECE62-KOHNUMHC(HC-IDX IDX2) NOT =  SPACE
+                      IF   RECE62-KOHNUMHC(HC-IDX IDX2) =
+                                                   RECE62-KOHNUM(4)
+                      AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
+                                                   RECE62-KOHID(4)
+                         IF      RECE62-RECESKYKBN (4)       =   SPACE
+                           MOVE      5       TO     BUN-IDX5
+                         END-IF
                       END-IF
                     END-IF
                    END-PERFORM
@@ -17202,6 +17395,14 @@
                            (RECE64-ZAITEN  *  RECE64-ZAIKAISU)
                  COMPUTE   RECE6C-TENSU(12 BUN-IDX4) =
                            RECE6C-TENSU(12 BUN-IDX4) +
+                           (RECE64-YKZTEN  *  RECE64-ZAIKAISU)
+           END-IF
+           IF    BUN-IDX6       =   6
+                 COMPUTE   RECE62-SYUTANTEN(12)  =
+                           RECE62-SYUTANTEN(12)  +
+                           (RECE64-ZAITEN  *  RECE64-ZAIKAISU)
+                 COMPUTE   RECE6C-SYUTANTEN(12)  =
+                           RECE6C-SYUTANTEN(12)  +
                            (RECE64-YKZTEN  *  RECE64-ZAIKAISU)
            END-IF
       *
@@ -30627,6 +30828,12 @@
            ELSE
              MOVE     ZERO    TO   RECE62-TENSU(2 4)
            END-IF
+           IF   RECE62-SYUTANTEN(2)  >=  RECE6G-SYUTANTEN(2)
+             COMPUTE  RECE62-SYUTANTEN(2)  =
+                      RECE62-SYUTANTEN(2)  -  RECE6G-SYUTANTEN(2)
+           ELSE
+             MOVE     ZERO    TO   RECE62-SYUTANTEN(2)
+           END-IF
       *
       *    在宅のレセ点数の編集（減点）
            IF   RECE62-TENSU(3 1)  >=  RECE6G-TENSU(3 1)
@@ -30652,6 +30859,12 @@
                       RECE62-TENSU(3 4)  -  RECE6G-TENSU(3 4)
            ELSE
              MOVE     ZERO    TO   RECE62-TENSU(3 4)
+           END-IF
+           IF   RECE62-SYUTANTEN(3)  >=  RECE6G-SYUTANTEN(3)
+             COMPUTE  RECE62-SYUTANTEN(3)  =
+                      RECE62-SYUTANTEN(3)  -  RECE6G-SYUTANTEN(3)
+           ELSE
+             MOVE     ZERO    TO   RECE62-SYUTANTEN(3)
            END-IF
       *
       *    その他注射のレセ点数の編集（減点）
@@ -30760,6 +30973,33 @@
                ELSE
                  COMPUTE  RECE62-TENSU(10 4)  =
                           RECE62-TENSU(10 4)  -  RECE6C-TENSU(10 4)
+               END-IF
+             END-IF
+           END-IF
+           IF   RECE6C-SYUTANTEN(12)  >=  RECE6G-SYUTANTEN(12)
+             COMPUTE  RECE62-SYUTANTEN(12)  =
+                      RECE62-SYUTANTEN(12)  -  RECE6G-SYUTANTEN(12)
+           ELSE
+             COMPUTE  RECE62-SYUTANTEN(12)  =
+                      RECE62-SYUTANTEN(12)  -  RECE6C-SYUTANTEN(12)
+             COMPUTE  RECE6G-SYUTANTEN(12) =
+                      RECE6G-SYUTANTEN(12) -
+                      RECE6C-SYUTANTEN(12)
+             IF  RECE6C-SYUTANTEN(11)  >=   RECE6G-SYUTANTEN(12)
+               COMPUTE  RECE62-SYUTANTEN(11)  =
+                        RECE62-SYUTANTEN(11)  -  RECE6G-SYUTANTEN(12)
+             ELSE
+               COMPUTE  RECE62-SYUTANTEN(11)  =
+                        RECE62-SYUTANTEN(11)  -  RECE6C-SYUTANTEN(11)
+               COMPUTE  RECE6G-SYUTANTEN(12) =
+                        RECE6G-SYUTANTEN(12) -
+                        RECE6C-SYUTANTEN(11)
+               IF  RECE6C-SYUTANTEN(10)  >=   RECE6G-SYUTANTEN(12)
+                 COMPUTE  RECE62-SYUTANTEN(10)  =
+                          RECE62-SYUTANTEN(10)  -  RECE6G-SYUTANTEN(12)
+               ELSE
+                 COMPUTE  RECE62-SYUTANTEN(10)  =
+                          RECE62-SYUTANTEN(10)  -  RECE6C-SYUTANTEN(10)
                END-IF
              END-IF
            END-IF

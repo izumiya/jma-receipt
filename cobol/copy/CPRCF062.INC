@@ -150,6 +150,7 @@
       *  04.08.03    NACL-門脇    16/02/08  予備項目使用分について、
       *                                     個々に項目を設ける。
       *                                     第３第４公費の括弧再掲記載対応
+      *  04.08.04    NACL-門脇    16/03/15  生保まとめ用項目追加
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -999,6 +1000,15 @@
            03  RECE62-KOH-CHIKAN-KIN3           PIC 9(09).
       *「公４負担金：」置換金額
            03  RECE62-KOH-CHIKAN-KIN4           PIC 9(09).
+      *
+      *生保まとめ用（主保険単独分診区別点数）
+           03  RECE62-SYUTANTEN-AREA.
+               05  RECE62-SYUTANTEN             PIC 9(08)  OCCURS 30.
+               05  RECE62-SYUTANTEN-NYUKHN      PIC 9(09)  OCCURS 10.
+               05  RECE62-SYUTANTEN-NYUKHN2     PIC S9(09).
+               05  RECE62-SYUTANTEN-NYUTOK      PIC 9(09)  OCCURS 10.
+               05  RECE62-SYUTANTEN-NYUTOK2     PIC S9(09).
+           03  RECE62-SYUTANARIFLG              PIC 9(01).
       *
       *予備
            03  RECE62-YOBIETC-AREA.

@@ -127,6 +127,7 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    15/12/10  システム管理２０１０のデフォルト
       *                                     設定修正（全国公費併用分請求点集計）
+      *  04.08.04    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *****************************************************************
       *
       *
@@ -196,7 +197,6 @@
            03  FLG-SET                                 PIC 9(01).
            03  FLG-NYURYAKUWRK                         PIC 9(01).
            03  FLG-NISSUSET                            PIC 9(01).
-           03  FLG-SEIHO-HENSYU                        PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -213,8 +213,10 @@
            03  IDX1                                    PIC 9(03).
            03  IDX2                                    PIC 9(03).
            03  IDX3                                    PIC 9(02).
+           03  IDX4                                    PIC 9(03).
            03  HC-IDX                                  PIC 9(03).
            03  KH-IDX                                  PIC 9(03).
+           03  KH-IDX2                                 PIC 9(03).
            03  NYUINACT-IDX                            PIC 9(03).
            03  NYUINACT-IDX2                           PIC 9(03).
            03  ACCT-IDX                                PIC 9(03).
@@ -321,15 +323,9 @@
                                                            OCCURS 5.
                    07  WRK-NYUTOKKEI                   PIC 9(09)
                                                            OCCURS 5.
-                   07  WRK-NYUKHNKEI-XX                PIC 9(09)
-                                                           OCCURS 5.
-                   07  WRK-NYUTOKKEI-XX                PIC 9(09)
-                                                           OCCURS 5.
                05  WRK-NYUINF-TBL2                     OCCURS   5.
                    07  WRK-NYUKHNKEI2                  PIC S9(09).
                    07  WRK-NYUTOKKEI2                  PIC S9(09).
-                   07  WRK-NYUKHNKEI2-XX               PIC S9(09).
-                   07  WRK-NYUTOKKEI2-XX               PIC S9(09).
       *
       *    入院略称退避ワーク
            03  WRK-NYURYAKU-OCC                       OCCURS  200.
@@ -1033,6 +1029,12 @@
            INITIALIZE                          TBL-FUKUSHI
       *
            PERFORM     200118-SYUKEIKBN-HANBETU-SEC
+      *
+      *    保険組み合わせの公費チェック（生保まとめ）
+           IF  (RECE62-SRYYM        >=  "200804")
+           AND (RECE62-SEIHOFLG      =  "1"     )
+              PERFORM  200119-SEIHO-HKNCOMBI-CHECK-SEC
+           END-IF
       *
       ***  PERFORM    VARYING    IDX    FROM   1   BY   1
       ***             UNTIL     (IDX      >   10)  OR
@@ -1813,43 +1815,37 @@
       *****************************************************************
        2001124-RECE62-TENSOU21-SEC                 SECTION.
       *
-           MOVE        ZERO         TO   FLG-SEIHO-HENSYU
+           MOVE       ZERO               TO        KH-IDX
+           MOVE       ZERO               TO        KH-IDX2
       *    入院基本料と加減算点数の計算
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
                       MOVE    1          TO        KH-IDX
+                      IF   (RECE62-SEIHOFLG             =   "1"  )
+                      AND  (RECE62-SYUTANARIFLG         =    1   )
+                      AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                        MOVE     1       TO        KH-IDX2
+                      END-IF
                       PERFORM      20011241-NYUINACCT-GET-SEC
            END-IF
       *
            MOVE       IDX1              TO   HC-IDX
       *
            MOVE       ZERO              TO   KH-IDX
+           MOVE       ZERO              TO   KH-IDX2
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
                MOVE        ZERO          TO        KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
-                 MOVE      ZERO          TO   FLG-SEIHO-HENSYU
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-      ***             IF   RECE62-SEIHOFLG  =  "1"
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -2119,16 +2115,6 @@
                          COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                                   RECE62-NYUTOKKEI2(KH-IDX)  -
                                   TBL-MIJISI-TENSU(IDY)
-                         IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                            COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                                     WRK-NYUTOKKEI2-XX(KH-IDX)  -
-                                     TBL-MIJISI-TENSU(IDY)
-                           IF   FLG-SEIHO-HENSYU  =  2
-                            COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                                     WRK-NYUTOKKEI2-XX(1)  -
-                                     TBL-MIJISI-TENSU(IDY)
-                           END-IF
-                         END-IF
                          MOVE     1      TO    FLG-MIJISI-GENSAN        
                   END-EVALUATE
                   IF   WRK-NYUKHNRYO  NOT = ZERO
@@ -2154,13 +2140,9 @@
                             END-IF
                             ADD   WRK-NYUKHNRYO
                                       TO   RECE62-NYUKHNKEI(ID1 KH-IDX)
-                            IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                               ADD   WRK-NYUKHNRYO
-                                      TO   WRK-NYUKHNKEI-XX(ID1 KH-IDX)
-                              IF   FLG-SEIHO-HENSYU  =  2
-                               ADD   WRK-NYUKHNRYO
-                                      TO   WRK-NYUKHNKEI-XX(ID1 1)
-                              END-IF
+                            IF  KH-IDX2  =  1
+                             ADD  WRK-NYUKHNRYO
+                                      TO   RECE62-SYUTANTEN-NYUKHN(ID1)
                             END-IF
                             MOVE  1   TO   FLG-ARI
                       END-IF
@@ -2178,13 +2160,9 @@
                       END-IF
                       ADD    WRK-NYUKHNRYO   
                                        TO  RECE62-NYUKHNKEI(ID1 KH-IDX)
-                      IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                         ADD    WRK-NYUKHNRYO   
-                                       TO  WRK-NYUKHNKEI-XX(ID1 KH-IDX)
-                        IF   FLG-SEIHO-HENSYU  =  2
-                         ADD    WRK-NYUKHNRYO   
-                                       TO  WRK-NYUKHNKEI-XX(ID1 1)
-                        END-IF
+                      IF  KH-IDX2  =  1
+                       ADD   WRK-NYUKHNRYO
+                                       TO  RECE62-SYUTANTEN-NYUKHN(ID1)
                       END-IF
                     END-IF
                   END-IF
@@ -2437,16 +2415,6 @@
                          COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                                   RECE62-NYUTOKKEI2(KH-IDX)  -
                                   TBL-MIJISI-TENSU(IDY)
-                         IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                            COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                                     WRK-NYUTOKKEI2-XX(KH-IDX)  -
-                                     TBL-MIJISI-TENSU(IDY)
-                           IF   FLG-SEIHO-HENSYU  =  2
-                            COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                                     WRK-NYUTOKKEI2-XX(1)  -
-                                     TBL-MIJISI-TENSU(IDY)
-                           END-IF
-                         END-IF
                          MOVE     1      TO    FLG-MIJISI-GENSAN        
                   END-EVALUATE
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
@@ -2484,13 +2452,9 @@
                             END-IF
                             ADD   WRK-NYUTOKRYO
                                       TO   RECE62-NYUTOKKEI(ID1 KH-IDX)
-                            IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                               ADD   WRK-NYUTOKRYO
-                                      TO   WRK-NYUTOKKEI-XX(ID1 KH-IDX)
-                              IF   FLG-SEIHO-HENSYU  =  2
-                               ADD   WRK-NYUTOKRYO
-                                      TO   WRK-NYUTOKKEI-XX(ID1 1)
-                              END-IF
+                            IF  KH-IDX2  =  1
+                             ADD  WRK-NYUTOKRYO
+                                      TO   RECE62-SYUTANTEN-NYUTOK(ID1)
                             END-IF
                             MOVE  1   TO   FLG-ARI
                       END-IF
@@ -2512,13 +2476,9 @@
                       END-IF
                       ADD    WRK-NYUTOKRYO   
                                        TO  RECE62-NYUTOKKEI(ID1 KH-IDX)
-                      IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                         ADD    WRK-NYUTOKRYO   
-                                       TO  WRK-NYUTOKKEI-XX(ID1 KH-IDX)
-                        IF   FLG-SEIHO-HENSYU  =  2
-                         ADD    WRK-NYUTOKRYO   
-                                       TO  WRK-NYUTOKKEI-XX(ID1 1)
-                        END-IF
+                      IF  KH-IDX2  =  1
+                       ADD   WRK-NYUTOKRYO
+                                       TO  RECE62-SYUTANTEN-NYUTOK(ID1)
                       END-IF
                     END-IF
                    ELSE
@@ -2543,13 +2503,9 @@
                             END-IF
                             ADD   WRK-NYUTOKRYO
                                       TO   RECE62-NYUTOKKEI(ID1 KH-IDX)
-                            IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                               ADD   WRK-NYUTOKRYO
-                                      TO   WRK-NYUTOKKEI-XX(ID1 KH-IDX)
-                              IF   FLG-SEIHO-HENSYU  =  2
-                               ADD   WRK-NYUTOKRYO
-                                      TO   WRK-NYUTOKKEI-XX(ID1 1)
-                              END-IF
+                            IF  KH-IDX2  =  1
+                             ADD  WRK-NYUTOKRYO
+                                      TO   RECE62-SYUTANTEN-NYUTOK(ID1)
                             END-IF
                             MOVE  1   TO   FLG-ARI
                       END-IF
@@ -2572,13 +2528,9 @@
                       END-IF
                       ADD    WRK-NYUTOKRYO   
                                        TO  RECE62-NYUTOKKEI(ID1 KH-IDX)
-                      IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                         ADD    WRK-NYUTOKRYO   
-                                       TO  WRK-NYUTOKKEI-XX(ID1 KH-IDX)
-                        IF   FLG-SEIHO-HENSYU  =  2
-                         ADD    WRK-NYUTOKRYO   
-                                       TO  WRK-NYUTOKKEI-XX(ID1 1)
-                        END-IF
+                      IF  KH-IDX2  =  1
+                       ADD   WRK-NYUTOKRYO
+                                       TO  RECE62-SYUTANTEN-NYUTOK(ID1)
                       END-IF
                     END-IF
                    END-IF
@@ -2650,43 +2602,37 @@
       *****************************************************************
        2001125-RECE62-TENSOU22-SEC                 SECTION.
       *
-           MOVE        ZERO         TO   FLG-SEIHO-HENSYU
+           MOVE       ZERO               TO        KH-IDX
+           MOVE       ZERO               TO        KH-IDX2
       *    入院基本料加減算点数の計算
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
                       MOVE    1          TO        KH-IDX
+                      IF   (RECE62-SEIHOFLG             =   "1"  )
+                      AND  (RECE62-SYUTANARIFLG         =    1   )
+                      AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+                      AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                        MOVE     1       TO        KH-IDX2
+                      END-IF
                       PERFORM      20011251-NYUINACCT-GET2-SEC
            END-IF
       *
            MOVE       IDX1              TO   HC-IDX
       *
            MOVE       ZERO              TO   KH-IDX
+           MOVE       ZERO              TO   KH-IDX2
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
                MOVE        ZERO          TO        KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
-                 MOVE      ZERO          TO   FLG-SEIHO-HENSYU
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-      ***             IF   RECE62-SEIHOFLG  =  "1"
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -2738,14 +2684,9 @@
                     END-IF
                     COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
                              RECE62-NYUKHNKEI2(KH-IDX)  -  NACCT-ZAITEN
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
-                                WRK-NYUKHNKEI2-XX(KH-IDX)  -
-                                NACCT-ZAITEN
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
-                                WRK-NYUKHNKEI2-XX(1)  -  NACCT-ZAITEN
-                      END-IF
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUKHN2   =
+                             RECE62-SYUTANTEN-NYUKHN2   -  NACCT-ZAITEN
                     END-IF
               END-EVALUATE
              ELSE
@@ -2760,14 +2701,9 @@
                     END-IF
                     COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
                              RECE62-NYUKHNKEI2(KH-IDX)  +  NACCT-ZAITEN
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
-                                WRK-NYUKHNKEI2-XX(KH-IDX)  +
-                                NACCT-ZAITEN
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
-                                WRK-NYUKHNKEI2-XX(1)  +  NACCT-ZAITEN
-                      END-IF
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUKHN2   =
+                             RECE62-SYUTANTEN-NYUKHN2   +  NACCT-ZAITEN
                     END-IF
               END-EVALUATE
              END-IF
@@ -2785,14 +2721,9 @@
                  END-IF
                  COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                           RECE62-NYUTOKKEI2(KH-IDX)  +  NACCT-ZAITEN
-                 IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                    COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                             WRK-NYUTOKKEI2-XX(KH-IDX)  +
-                             NACCT-ZAITEN
-                   IF   FLG-SEIHO-HENSYU  =  2
-                    COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                             WRK-NYUTOKKEI2-XX(1)  +  NACCT-ZAITEN
-                   END-IF
+                 IF  KH-IDX2  =  1
+                  COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                          RECE62-SYUTANTEN-NYUTOK2   +  NACCT-ZAITEN
                  END-IF
            END-IF
       *
@@ -3197,11 +3128,21 @@
       *****************************************************************
        2001126-RECE62-TENSOU23-SEC                 SECTION.
       *
-           MOVE        ZERO         TO   FLG-SEIHO-HENSYU
+           MOVE       ZERO               TO        KH-IDX
+           MOVE       ZERO               TO        KH-IDX2
       ***  IF    (RECE62-HKNNUM          NOT =   SPACE)   OR
            IF    (RECE62-HKNNUMHC(IDX1)  NOT =   SPACE)   OR
                  (RECE62-RJNHKNNUM       NOT =   SPACE)
                  MOVE    1          TO        KH-IDX
+                 IF   (RECE62-SEIHOFLG             =   "1"  )
+                 AND  (RECE62-SYUTANARIFLG         =    1   )
+                 AND  (RECE62-HKNNUMHC(IDX1)   NOT =   SPACE)
+                 AND  (RECE62-KOHNUMHC(IDX1 1)     =   SPACE)
+                 AND  (RECE62-KOHNUMHC(IDX1 2)     =   SPACE)
+                 AND  (RECE62-KOHNUMHC(IDX1 3)     =   SPACE)
+                 AND  (RECE62-KOHNUMHC(IDX1 4)     =   SPACE)
+                   MOVE     1       TO        KH-IDX2
+                 END-IF
                  PERFORM    VARYING   ACCT-IDX   FROM   1    BY   1
                             UNTIL    ACCT-IDX   >      31
                         IF  ((WRK-DAY1(ACCT-IDX)   NOT =  ZERO   ) OR
@@ -3217,31 +3158,15 @@
            MOVE       IDX1              TO   HC-IDX
       *
            MOVE       ZERO              TO   KH-IDX
+           MOVE       ZERO              TO   KH-IDX2
            PERFORM    VARYING   IDX2    FROM   1   BY   1
                                 UNTIL   (IDX2      >       4)
                MOVE        ZERO          TO        KH-IDX
                IF     RECE62-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
       *
-                 MOVE      ZERO          TO   FLG-SEIHO-HENSYU
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-      ***             IF   RECE62-SEIHOFLG  =  "1"
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
-      ***               END-IF
-      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -3302,15 +3227,10 @@
                     COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                              RECE62-NYUTOKKEI2(KH-IDX)  -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                                WRK-NYUTOKKEI2-XX(KH-IDX)  -
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                             RECE62-SYUTANTEN-NYUTOK2   -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                                WRK-NYUTOKKEI2-XX(1)  -
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      END-IF
                     END-IF
                  ELSE
                   IF   ACCT-SRYCDTOTAL  =  190182590  OR  190182690
@@ -3325,15 +3245,10 @@
                     COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
                              RECE62-NYUKHNKEI2(KH-IDX)  -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
-                                WRK-NYUKHNKEI2-XX(KH-IDX)  -
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUKHN2   =
+                             RECE62-SYUTANTEN-NYUKHN2   -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
-                                WRK-NYUKHNKEI2-XX(1)  -
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      END-IF
                     END-IF
                   ELSE
                     IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
@@ -3347,15 +3262,10 @@
                     COMPUTE  RECE62-NYUKHNKEI2(KH-IDX)  =
                              RECE62-NYUKHNKEI2(KH-IDX)  +
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(KH-IDX)  =
-                                WRK-NYUKHNKEI2-XX(KH-IDX)  +
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUKHN2   =
+                             RECE62-SYUTANTEN-NYUKHN2   +
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUKHNKEI2-XX(1)  =
-                                WRK-NYUKHNKEI2-XX(1)  +
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      END-IF
                     END-IF
                   END-IF
                  END-IF
@@ -3380,15 +3290,10 @@
                     COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                              RECE62-NYUTOKKEI2(KH-IDX)  -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                                WRK-NYUTOKKEI2-XX(KH-IDX)  -
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                             RECE62-SYUTANTEN-NYUTOK2   -
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                                WRK-NYUTOKKEI2-XX(1)  -
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      END-IF
                     END-IF
                  ELSE
                   IF  WRK-DAY5(ACCT-IDX)  NOT =  RECE62-HKNCOMBI(IDX1)
@@ -3403,15 +3308,10 @@
                     COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                              RECE62-NYUTOKKEI2(KH-IDX)  +
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                    IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                                WRK-NYUTOKKEI2-XX(KH-IDX)  +
+                    IF  KH-IDX2  =  1
+                     COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                             RECE62-SYUTANTEN-NYUTOK2   +
                              (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      IF   FLG-SEIHO-HENSYU  =  2
-                       COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                                WRK-NYUTOKKEI2-XX(1)  +
-                             (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                      END-IF
                     END-IF
                   END-IF
                  END-IF
@@ -3431,15 +3331,10 @@
                COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                         RECE62-NYUTOKKEI2(KH-IDX)  -
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-               IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                  COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                           WRK-NYUTOKKEI2-XX(KH-IDX)  -
+               IF  KH-IDX2  =  1
+                COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                        RECE62-SYUTANTEN-NYUTOK2   -
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                 IF   FLG-SEIHO-HENSYU  =  2
-                  COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                           WRK-NYUTOKKEI2-XX(1)  -
-                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                 END-IF
                END-IF
               ELSE
                IF     TBL-FUKUSHIFLG(IDX2)  NOT =  ZERO
@@ -3453,15 +3348,10 @@
                COMPUTE  RECE62-NYUTOKKEI2(KH-IDX)  =
                         RECE62-NYUTOKKEI2(KH-IDX)  +
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-               IF     FLG-SEIHO-HENSYU  =  ZERO OR 2
-                  COMPUTE  WRK-NYUTOKKEI2-XX(KH-IDX)  =
-                           WRK-NYUTOKKEI2-XX(KH-IDX)  +
+               IF  KH-IDX2  =  1
+                COMPUTE RECE62-SYUTANTEN-NYUTOK2   =
+                        RECE62-SYUTANTEN-NYUTOK2   +
                            (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                 IF   FLG-SEIHO-HENSYU  =  2
-                  COMPUTE  WRK-NYUTOKKEI2-XX(1)  =
-                           WRK-NYUTOKKEI2-XX(1)  +
-                           (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-                 END-IF
                END-IF
               END-IF
            END-IF
@@ -4514,26 +4404,6 @@
                              TBL-TOTALTEN2-ACCT(IDY)
            END-PERFORM
       *
-      ***  IF   RECE62-SEIHOFLG    =  "1"
-      ***    PERFORM    VARYING  IDX  FROM  1  BY  1
-      ***                UNTIL   IDX   >   10
-      ***      PERFORM  VARYING  IDY  FROM  1  BY  1
-      ***                UNTIL   IDY   >    5
-      ***        MOVE  WRK-NYUKHNKEI-XX(IDX IDY)
-      ***                        TO  RECE62-NYUKHNKEI(IDX IDY)
-      ***        MOVE  WRK-NYUTOKKEI-XX(IDX IDY)
-      ***                        TO  RECE62-NYUTOKKEI(IDX IDY)
-      ***      END-PERFORM
-      ***    END-PERFORM
-      ***    PERFORM    VARYING  IDY  FROM  1  BY  1
-      ***                UNTIL   IDY   >    5
-      ***        MOVE  WRK-NYUKHNKEI2-XX(IDY)
-      ***                        TO  RECE62-NYUKHNKEI2(IDY)
-      ***        MOVE  WRK-NYUTOKKEI2-XX(IDY)
-      ***                        TO  RECE62-NYUTOKKEI2(IDY)
-      ***    END-PERFORM
-      ***  END-IF
-      *
            IF   RECE62-SRYYM    >=    "200804"
              CONTINUE
            ELSE
@@ -4813,6 +4683,29 @@
       *
            .
        2001181-SYUKEIKBN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせの公費チェック（生保まとめ）
+      *****************************************************************
+       200119-SEIHO-HKNCOMBI-CHECK-SEC      SECTION.
+      *
+           IF    IDZ  =  1
+             PERFORM  VARYING  IDX4  FROM  1  BY  1
+                       UNTIL  (IDX4                  >   10 )
+                        OR    (RECE62-HKNCOMBI(IDX4) =  ZERO)
+               IF   (RECE62-HKNNUMHC(IDX4)   NOT =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX4 1)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX4 2)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX4 3)     =   SPACE)
+               AND  (RECE62-KOHNUMHC(IDX4 4)     =   SPACE)
+                 MOVE    1    TO    RECE62-SYUTANARIFLG
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+           .
+       200119-SEIHO-HKNCOMBI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
