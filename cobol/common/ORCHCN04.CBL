@@ -47,6 +47,7 @@
       *  04.07.00    NACL-多々納  14/03/XX  平成２６年４月改正対応
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.07.00    NACL-多々納  14/10/08  コメント・自費ゼロ対象対応
+      *  04.08.00    NACL-多々納  16/03/XX  入院料名称対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2522,6 +2523,13 @@
       *
            MOVE    HCM34S01-SRYCD(IDX IDX2)    TO  TNS-SRYCD
            PERFORM 910-TENSU-READ-SEC
+      *
+      *    出力名があれば出力名称
+           IF     (TNSP-SHONAME        =   SPACE )
+               CONTINUE
+           ELSE
+               MOVE    TNSP-SHONAME        TO  TNS-NAME
+           END-IF
       *
            ADD     1                   TO  IDX-S
            MOVE    HCM34S01-SRYCD(IDX IDX2)
