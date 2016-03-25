@@ -737,6 +737,7 @@
       *                                     ¸Ä¡¹¤Ë¹àÌÜ¤òÀß¤±¤ë»ö¤ËÈ¼¤¦½¤Àµ¡£
       *                                     Âè£³Âè£´¸øÈñ¤Î³ç¸ÌºÆ·Çµ­ºÜÂÐ±þ
       *  04.08.21    NACL-ÌçÏÆ    16/03/15  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóµ­ºÜ½¤Àµ
+      *  04.08.22    NACL-ÌçÏÆ    16/03/24  ¸½ÊªµëÉÕÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -921,6 +922,7 @@
            03  FLG-WRKFILE-KGKTAI                      PIC 9(01).
            03  FLG-SAIGAI-TAISYO                       PIC 9(01).
            03  FLG-CHIIKI                              PIC 9(01).
+           03  FLG-CHIIKI2                             PIC 9(01).
            03  FLG-KGKIPNTAI                           PIC 9(01).
            03  FLG-KGK                                 PIC 9(01).
            03  FLG-SKY-TOKKOH                          PIC 9(01).
@@ -23067,6 +23069,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND ((FLG-HOKENICHIBU2  NOT = ZERO             )  OR
                   (FLG-HOKENICHIBU3  NOT = ZERO             ))
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
              END-IF
       *@@@
@@ -23084,6 +23087,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (FLG-HOKENICHIBU3       = ZERO              )
              AND (FLG-HOKENICHIBU-SYU    =  1                )
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
              END-IF
       *
@@ -23095,6 +23099,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
              AND (RECE02-HON-GAIKFTNRATE(2)   =  100         )
+             AND (FLG-ZENKOKUKOHI-NISYU4      =  ZERO        )
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
@@ -23103,6 +23108,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   (WRK-TAIHI-TOTALTEN  =
                                       RECE02-HENTOTALTEN(3)) )
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
              END-IF
       *
@@ -23118,6 +23124,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND ((FLG-HOKENICHIBU2  NOT = ZERO             )  OR
                   (FLG-HOKENICHIBU3  NOT = ZERO             ))
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
       *@@@
@@ -23135,6 +23142,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (FLG-HOKENICHIBU3       = ZERO              )
              AND (FLG-HOKENICHIBU-SYU    =  1                )
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
       *
@@ -23146,6 +23154,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
              AND (RECE02-HON-GAIKFTNRATE(2)   =  100         )
+             AND (FLG-ZENKOKUKOHI-NISYU4      =  ZERO        )
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
@@ -23154,6 +23163,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   (WRK-TAIHI-TOTALTEN  =
                                       RECE02-HENTOTALTEN(3)) )
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     1       TO   FLG-CHIIKI2
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
       *
@@ -23193,6 +23203,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (FLG-HOKENICHIBU7       =  1                )
              AND (FLG-HOKENICHIBU-SYU    =  1                )
                  MOVE     ZERO    TO   FLG-CHIIKI
+                 MOVE     ZERO    TO   FLG-CHIIKI2
                  PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
       *
@@ -23214,14 +23225,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (WRK-TAIHI-TOTALTEN   =
                                            RECE02-HENTOTALTEN(3)) )
                    IF   FLG-ZENKOKUKOHI-NISYU  =  ZERO
-                     MOVE     1       TO   FLG-CHIIKI
+                     MOVE     ZERO    TO   FLG-CHIIKI
                    ELSE
-                     MOVE     3       TO   FLG-CHIIKI
+                     MOVE     1       TO   FLG-CHIIKI
                    END-IF
                    IF   RECE02-ZAITAKU   =  "1"
+                     MOVE     ZERO    TO   FLG-CHIIKI2
                      PERFORM  21096-HOKEN-ICHIBUFTN-CHK-SEC
                    END-IF
                    IF   RECE02-ZAITAKU   =  "2"
+                     MOVE     1       TO   FLG-CHIIKI2
                      PERFORM  21097-HOKEN-ICHIBUFTN-CHK2-SEC
                    END-IF
                  END-IF
@@ -24701,28 +24714,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE     ZERO    TO  WRK-CHK-KOKIGAK3
              END-IF
       *
-             IF   FLG-CHIIKI    =   ZERO
-               IF  (FLG-HOKENICHIBU2  NOT = ZERO)
-               AND (FLG-HOKENICHIBU3      = ZERO)
-               AND (FLG-HOKENICHIBU-SYU   =  1  )
+             IF  (FLG-HOKENICHIBU2  NOT = ZERO)
+             AND (FLG-HOKENICHIBU3      = ZERO)
+             AND (FLG-HOKENICHIBU-SYU   =  1  )
                   COMPUTE  WRK-SKY-FTNMONEY-XXX =
                            RECE02-FTNMONEY(1)   -
                            (WRK-CHK-KOKIGAK3    +    FTN-KOH-XXX)
                   DISPLAY  "4:WRK-SKY-FTNMONEY-XXX="
                               WRK-SKY-FTNMONEY-XXX
-               END-IF
              END-IF
       *
              COMPUTE  RECE02-FTNMONEY(1) = WRK-CHK-KOKIGAK3
                                          + FTN-KOH-XXX
       *
-             IF   FLG-CHIIKI    =   2
-               MOVE  WRK-CHK-KOKIGAK3  TO  RECE02-ZAITAKU-SAIKEI2
-               IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
-                  MOVE   999999999     TO  RECE02-ZAITAKU-SAIKEI2
-               END-IF
-             END-IF
-             IF   FLG-CHIIKI    =   3
+             IF   FLG-CHIIKI    =   1
                MOVE  WRK-CHK-KOKIGAK3  TO  RECE02-ZAITAKU-SAIKEI2
                IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
                   MOVE       1         TO  RECE02-SAIKEIZEROKSI2
@@ -24734,12 +24739,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            + WRK-CHK-KOKIGAK3
              END-IF
       *
-             IF   FLG-CHIIKI    =   ZERO
-                IF   FLG-HOKENICHIBU-SYU    = ZERO
-                AND  FLG-HOKENICHIBU2   NOT = ZERO
-                AND  FLG-HOKENICHIBU3   NOT = ZERO
+             IF   FLG-HOKENICHIBU-SYU    = ZERO
+             AND  FLG-HOKENICHIBU2   NOT = ZERO
+             AND  FLG-HOKENICHIBU3   NOT = ZERO
                   MOVE   1    TO   RECE02-RJNNYUKOHFTN(3)
-                END-IF
              END-IF
            END-IF
       *
@@ -24754,58 +24757,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE     ZERO    TO   FLG-HOKENICHIBU-CHK
            IF   RECE02-SRYYM   <=  "201203"
-             IF  (FLG-CHIIKI            = ZERO)
-             AND (RECE02-ZAITAKU        = "2" )
-             AND (FLG-HOKENICHIBU4  NOT = ZERO)
+             IF  (RECE02-ZAITAKU        = "2" )
              AND (FLG-HOKENICHIBU5  NOT = ZERO)
-                   MOVE     1     TO    FLG-HOKENICHIBU-CHK
-             END-IF
-             IF  (FLG-CHIIKI            = ZERO)
-             AND (RECE02-ZAITAKU        = "2" )
-             AND (FLG-HOKENICHIBU3      = ZERO)
-             AND (FLG-HOKENICHIBU5  NOT = ZERO)
-             AND (FLG-HOKENICHIBU-SYU   =  1  )
+             AND (FLG-CHIIKI2           = ZERO)
                    MOVE     1     TO    FLG-HOKENICHIBU-CHK
              END-IF
            ELSE
-             IF  (FLG-CHIIKI            = ZERO)
-             AND (RECE02-ZAITAKU        = "2" )
-             AND (FLG-HOKENICHIBU4  NOT = ZERO)
+             IF  (RECE02-ZAITAKU        = "2" )
              AND (FLG-HOKENICHIBU5  NOT = ZERO)
-             AND (FLG-HOKENICHIBU-SYU   =  1  )
-                COMPUTE WRK-FTNKEI5 = WRK-JYOGENKBN-TEN3
-                                    * 10
-                                    * RECE02-KYURATE
-                                    / 100
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 +  5
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 / 10
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 * 10
-                IF    WRK-FTNKEI5  >=  21000
+             AND (FLG-CHIIKI2           = ZERO)
+                IF  FLG-HOKENICHIBU6  NOT = ZERO
                    MOVE     1     TO    FLG-HOKENICHIBU-CHK
-                END-IF
-             END-IF
-             IF  (FLG-CHIIKI            = ZERO)
-             AND (RECE02-ZAITAKU        = "2" )
-             AND (FLG-HOKENICHIBU4  NOT = ZERO)
-             AND (FLG-HOKENICHIBU6  NOT = ZERO)
-             AND (FLG-HOKENICHIBU5  NOT = ZERO)
-             AND (FLG-HOKENICHIBU-SYU   = ZERO)
-                   MOVE     1     TO    FLG-HOKENICHIBU-CHK
-             END-IF
-             IF  (FLG-CHIIKI            = ZERO)
-             AND (RECE02-ZAITAKU        = "2" )
-             AND (FLG-HOKENICHIBU3      = ZERO)
-             AND (FLG-HOKENICHIBU5  NOT = ZERO)
-             AND (FLG-HOKENICHIBU-SYU   =  1  )
-                COMPUTE WRK-FTNKEI5 = WRK-JYOGENKBN-TEN4
-                                    * 10
-                                    * RECE02-KYURATE
-                                    / 100
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 +  5
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 / 10
-                COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 * 10
-                IF    WRK-FTNKEI5  >=  21000
-                   MOVE     1     TO    FLG-HOKENICHIBU-CHK
+                ELSE
+                   COMPUTE WRK-FTNKEI5 = WRK-JYOGENKBN-TEN3
+                                       * 10
+                                       * RECE02-KYURATE
+                                       / 100
+                   COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 +  5
+                   COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 / 10
+                   COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 * 10
+                   IF    WRK-FTNKEI5  >=  21000
+                      MOVE     1     TO    FLG-HOKENICHIBU-CHK
+                   END-IF
                 END-IF
              END-IF
            END-IF
@@ -24813,7 +24786,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
                 (FLG-HOKENICHIBU3  NOT = ZERO) AND
                 (FLG-HOKENICHIBU-SYU   = ZERO) AND
-                (FLG-CHIIKI            = ZERO))
+                (FLG-CHIIKI2           =  1  ))
            OR  ( FLG-HOKENICHIBU-CHK   =  1   )
              MOVE   WRK-TAIHI-TOTALTEN  TO  WRK-HANTEI-TOTALTEN
            ELSE
@@ -24832,11 +24805,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           IF  ( FLG-CHIIKI        NOT = ZERO )
-           OR  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
+           IF  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
                 (FLG-HOKENICHIBU3  NOT = ZERO) AND
                 (FLG-HOKENICHIBU-SYU   = ZERO) AND
-                (FLG-CHIIKI            = ZERO))
+                (FLG-CHIIKI2           =  1  ))
            OR  ( FLG-HOKENICHIBU-CHK   =  1   )
              IF   WRK-KINGAKU3  >  WRK-CHK-KOKIGAK2
                COMPUTE  WRK-CHK-KOKIGAK5  =  WRK-KINGAKU3
@@ -24867,28 +24839,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
            COMPUTE  WRK-CHK-KOKIGAK = RECE02-FTNMONEY(1)
                                     - FTN-KOH-XXX
            IF   WRK-CHK-KOKIGAK  NOT =  WRK-CHK-KOKIGAK7
-             IF   FLG-CHIIKI    =   ZERO
-               IF  (FLG-HOKENICHIBU2  NOT = ZERO)
-               AND (FLG-HOKENICHIBU3      = ZERO)
-               AND (FLG-HOKENICHIBU-SYU   =  1  )
+             IF  (FLG-HOKENICHIBU2  NOT = ZERO)
+             AND (FLG-HOKENICHIBU3      = ZERO)
+             AND (FLG-HOKENICHIBU-SYU   =  1  )
                   COMPUTE  WRK-SKY-FTNMONEY-XXX =
                            RECE02-FTNMONEY(1)   -
                            (WRK-CHK-KOKIGAK7    +    FTN-KOH-XXX)
                   DISPLAY  "5:WRK-SKY-FTNMONEY-XXX="
                               WRK-SKY-FTNMONEY-XXX
-               END-IF
              END-IF
       *
              COMPUTE  RECE02-FTNMONEY(1) = WRK-CHK-KOKIGAK7
                                          + FTN-KOH-XXX
       *
-             IF   FLG-CHIIKI    =   2
-               MOVE  WRK-CHK-KOKIGAK7  TO  RECE02-ZAITAKU-SAIKEI2
-               IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
-                  MOVE   999999999     TO  RECE02-ZAITAKU-SAIKEI2
-               END-IF
-             END-IF
-             IF   FLG-CHIIKI    =   3
+             IF   FLG-CHIIKI    =   1
                MOVE  WRK-CHK-KOKIGAK7  TO  RECE02-ZAITAKU-SAIKEI2
                IF    RECE02-ZAITAKU-SAIKEI2  =   ZERO
                   MOVE       1         TO  RECE02-SAIKEIZEROKSI2
@@ -24900,12 +24864,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            + WRK-CHK-KOKIGAK7
              END-IF
       *
-             IF   FLG-CHIIKI    =   ZERO
-                IF   FLG-HOKENICHIBU-SYU    = ZERO
-                AND  FLG-HOKENICHIBU2   NOT = ZERO
-                AND  FLG-HOKENICHIBU3   NOT = ZERO
+             IF   FLG-HOKENICHIBU-SYU    = ZERO
+             AND  FLG-HOKENICHIBU2   NOT = ZERO
+             AND  FLG-HOKENICHIBU3   NOT = ZERO
                   MOVE   1    TO   RECE02-RJNNYUKOHFTN(3)
-                END-IF
              END-IF
            END-IF
       *
