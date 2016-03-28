@@ -546,8 +546,8 @@
       *----------------------------------------------------------------
                05  MEDH28-38FLS     PIC X(08)    VALUE  "20160401".
                05  MEDH28-38FLE     PIC X(08)    VALUE  "99999999".
-               05  MEDH28-38FL01    PIC X(09)    VALUE  "82000232".
-               05  MEDH28-38FL02    PIC X(09)    VALUE  "82000232".
+               05  MEDH28-38FL01    PIC X(09)    VALUE  "820000232".
+               05  MEDH28-38FL02    PIC X(09)    VALUE  "820000232".
                05  MEDH28-38FL03    PIC X(01)    VALUE  "2".
                05  MEDH28-38FL04    PIC 9(03)    VALUE 0.
                05  MEDH28-38FL05    PIC 9(01)    VALUE 0.
