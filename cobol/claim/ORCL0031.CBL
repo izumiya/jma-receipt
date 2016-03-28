@@ -80,6 +80,7 @@
       *  04.07.05    NACL-多々納  14/09/XX  病名サブプロ対応他
       *  04.07.06    NACL-多々納  14/11/XX  保険組合せ・外来追加対応
       *                                     v2診療科レセ電廃止対応
+      *  04.08.00    NACL-多々納  16/03/28  Ｈ２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -292,6 +293,9 @@
       *
       *    用法レセ電コード
            COPY    "CPCLAIM006.INC".
+      *H28.4
+      *    時間外加算テーブル(H28.4分）
+           COPY     "CMTIMEKSN2016.INC".
       *
       *H26.10
       * 向精神薬多剤投与処方せん料
@@ -1698,6 +1702,13 @@
        20029-JIKAN-HEN-SEC                SECTION.
       *
            MOVE    SPACE               TO  WRK-TIMEKBN
+      *H28.4
+      *    時間外加算コード判定
+           IF      SPA-SRYYMD          >=  "20160401"
+               PERFORM 200291-JIKAN2016-HEN-SEC
+               GO      TO      20029-JIKAN-HEN-EXT
+           END-IF
+      *
       *    ６歳未満の乳幼児加算
            EVALUATE    WRK-SRYCD
       *        夜間（時間外）加算
@@ -1791,6 +1802,28 @@
            .
        20029-JIKAN-HEN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    時間外加算区分変更処理（２０１６年〜）
+      *****************************************************************
+       200291-JIKAN2016-HEN-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-TIMEKBN
+      *
+           SET     TBL-TIDX            TO  1
+           SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
+               AT  END
+                   MOVE    SPACE           TO  WRK-TIMEKBN
+                WHEN   WRK-SRYCD           =   TBL-TM-SRYCD
+                                                      (TBL-TIDX)
+                   MOVE    TBL-TM-TIMKBN (TBL-TIDX)
+                                           TO  WRK-TIMEKBN
+           END-SEARCH
+      *
+           .
+       200291-JIKAN2016-HEN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    対象のコードチェック処理
