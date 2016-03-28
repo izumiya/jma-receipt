@@ -233,7 +233,7 @@
            "気管切開又は気管内挿管が行われており、かつ、発熱を伴う状態".
       *----------------------------------------------------------------
                05  MEDH20-17FLS     PIC X(08)    VALUE  "00000000".
-               05  MEDH20-17FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH20-17FLE     PIC X(08)    VALUE  "20160331".
                05  MEDH20-17FL01    PIC X(09)    VALUE  "820000064".
                05  MEDH20-17FL02    PIC X(09)    VALUE  "820000112".
                05  MEDH20-17FL03    PIC X(01)    VALUE  "3".
@@ -244,6 +244,19 @@
                05  MEDH20-17FL08    PIC X(06)    VALUE  "１７　".
                05  MEDH20-17FL09    PIC X(100)   VALUE  
            "酸素療法を実施".
+      *----------------------------------------------------------------
+               05  MEDH28-17FLS     PIC X(08)    VALUE  "20160401".
+               05  MEDH28-17FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH28-17FL01    PIC X(09)    VALUE  "820000064".
+               05  MEDH28-17FL02    PIC X(09)    VALUE  "820000230".
+               05  MEDH28-17FL03    PIC X(01)    VALUE  "3".
+               05  MEDH28-17FL04    PIC 9(03)    VALUE 0.
+               05  MEDH28-17FL05    PIC 9(01)    VALUE 0.
+               05  MEDH28-17FL06    PIC 9(04)    VALUE  2008.
+               05  MEDH28-17FL07    PIC X(02)    VALUE  "17".
+               05  MEDH28-17FL08    PIC X(06)    VALUE  "１７　".
+               05  MEDH28-17FL09    PIC X(100)   VALUE  
+           "酸素療法を実施（密度の高い治療を要する状態）".
       *----------------------------------------------------------------
                05  MEDH20-18FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-18FLE     PIC X(08)    VALUE  "99999999".
@@ -259,7 +272,7 @@
            "感染症の治療の必要性から隔離室での管理を実施".
       *----------------------------------------------------------------
                05  MEDH20-19FLS     PIC X(08)    VALUE  "00000000".
-               05  MEDH20-19FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH20-19FLE     PIC X(08)    VALUE  "20160331".
                05  MEDH20-19FL01    PIC X(09)    VALUE  "820000067".
                05  MEDH20-19FL02    PIC X(09)    VALUE  "820000114".
                05  MEDH20-19FL03    PIC X(01)    VALUE  "2".
@@ -270,6 +283,19 @@
                05  MEDH20-19FL08    PIC X(06)    VALUE  "１９　".
                05  MEDH20-19FL09    PIC X(100)   VALUE  
            "筋ジストロフィー症".
+      *----------------------------------------------------------------
+               05  MEDH28-19FLS     PIC X(08)    VALUE  "20160401".
+               05  MEDH28-19FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH28-19FL01    PIC X(09)    VALUE  "820000067".
+               05  MEDH28-19FL02    PIC X(09)    VALUE  "820000114".
+               05  MEDH28-19FL03    PIC X(01)    VALUE  "2".
+               05  MEDH28-19FL04    PIC 9(03)    VALUE 0.
+               05  MEDH28-19FL05    PIC 9(01)    VALUE 1.
+               05  MEDH28-19FL06    PIC 9(04)    VALUE  2011.
+               05  MEDH28-19FL07    PIC X(02)    VALUE  "19".
+               05  MEDH28-19FL08    PIC X(06)    VALUE  "１９　".
+               05  MEDH28-19FL09    PIC X(100)   VALUE  
+           "筋ジストロフィー".
       *----------------------------------------------------------------
                05  MEDH20-20FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-20FLE     PIC X(08)    VALUE  "99999999".
@@ -311,7 +337,7 @@
            "パーキンソン病関連疾患".
       *----------------------------------------------------------------
                05  MEDH20-23FLS     PIC X(08)    VALUE  "00000000".
-               05  MEDH20-23FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH20-23FLE     PIC X(08)    VALUE  "20160331".
                05  MEDH20-23FL01    PIC X(09)    VALUE  "820000071".
                05  MEDH20-23FL02    PIC X(09)    VALUE  "820000118".
                05  MEDH20-23FL03    PIC X(01)    VALUE  "2".
@@ -322,6 +348,19 @@
                05  MEDH20-23FL08    PIC X(06)    VALUE  "２３　".
                05  MEDH20-23FL09    PIC X(100)   VALUE  
            "その他の難病（スモン及び２０〜２２までを除く。）".
+      *----------------------------------------------------------------
+               05  MEDH28-23FLS     PIC X(08)    VALUE  "20160401".
+               05  MEDH28-23FLE     PIC X(08)    VALUE  "99999999".
+               05  MEDH28-23FL01    PIC X(09)    VALUE  "820000071".
+               05  MEDH28-23FL02    PIC X(09)    VALUE  "820000231".
+               05  MEDH28-23FL03    PIC X(01)    VALUE  "2".
+               05  MEDH28-23FL04    PIC 9(03)    VALUE  0.
+               05  MEDH28-23FL05    PIC 9(01)    VALUE  1.
+               05  MEDH28-23FL06    PIC 9(04)    VALUE  2015.
+               05  MEDH28-23FL07    PIC X(02)    VALUE  "23".
+               05  MEDH28-23FL08    PIC X(06)    VALUE  "２３　".
+               05  MEDH28-23FL09    PIC X(100)   VALUE  
+           "その他の指定難病等（スモン、筋ジストロフィー等を除く）".
       *----------------------------------------------------------------
                05  MEDH20-24FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-24FLE     PIC X(08)    VALUE  "99999999".
@@ -507,8 +546,8 @@
       *----------------------------------------------------------------
                05  MEDH28-38FLS     PIC X(08)    VALUE  "20160401".
                05  MEDH28-38FLE     PIC X(08)    VALUE  "99999999".
-               05  MEDH28-38FL01    PIC X(09)    VALUE  "82900001".
-               05  MEDH28-38FL02    PIC X(09)    VALUE  "82900001".
+               05  MEDH28-38FL01    PIC X(09)    VALUE  "82000232".
+               05  MEDH28-38FL02    PIC X(09)    VALUE  "82000232".
                05  MEDH28-38FL03    PIC X(01)    VALUE  "2".
                05  MEDH28-38FL04    PIC 9(03)    VALUE 0.
                05  MEDH28-38FL05    PIC 9(01)    VALUE 0.
@@ -516,7 +555,7 @@
                05  MEDH28-38FL07    PIC X(02)    VALUE  "38".
                05  MEDH28-38FL08    PIC X(06)    VALUE  "３８　".
                05  MEDH28-38FL09    PIC X(100)   VALUE  
-           "酸素療法を実施している状態（１７を除く。）".
+           "酸素療法を実施（密度の高い治療を要する状態を除く）".
       *----------------------------------------------------------------
                05  MEDH22-91FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH22-91FLE     PIC X(08)    VALUE  "20120331".
@@ -558,7 +597,7 @@
            "身体抑制を実施している".
       *----------------------------------------------------------------
            03  MEDH20-R    REDEFINES   MEDH20-VAL.
-               05  MEDH20-OCC          OCCURS  41.
+               05  MEDH20-OCC          OCCURS  44.
                    07  MEDH20-STYMD.
                        09  MEDH20-STYM PIC X(06).
                        09  MEDH20-STDD PIC 9(02).
@@ -573,4 +612,4 @@
                    07  MEDH20-ZAINUM   PIC 9(04).
                    07  MEDH20-ID       PIC X(02).
                    07  MEDH20-MEIL     PIC X(106).
-       01  MEDH20-MAX                  PIC 9(03)     VALUE  41.
+       01  MEDH20-MAX                  PIC 9(03)     VALUE  44.
