@@ -36,20 +36,21 @@
            03  LNK-RIHASTDAY-HKNCOMBI             PIC  9(04).
       *
       *返却項目
-      *１：心大血管疾患　２：脳血管疾患等　３：運動器　４：呼吸器
-      *５：摂食　６：難病患者　７：障害児（者）
            03  LNK-RIHASTDAY-OUT-AREA.
-              04  LNK-RIHASTDAY-OUT-OCC           OCCURS   7.
-                 05  LNK-RIHASTDAY-OUT-OCC2       OCCURS 100.
-                    06  LNK-RIHASTDAY-MARK        PIC  X(01).
-                    06  LNK-RIHASTDAY-YUKOKETA    PIC  9(03).
-                    06  LNK-RIHASTDAY-COM         PIC  X(200).
-      *          該当月に入力があったリハビリ診療行為コード
-                 05  LNK-RIHASTDAY-OUT-OCC3.
-                    06  LNK-RIHASTDAY-SRYCD       PIC  X(09)
+              04  LNK-RIHASTDAY-OUT-DAT.
+      *          １：心大血管疾患　２：脳血管疾患等　３：廃用症候群、　４：運動器
+      *          ５：呼吸器　６：摂食　７：難病患者　８：障害児（者）
+                 05  LNK-RIHASTDAY-OUT-OCC          OCCURS   8.
+                   06  LNK-RIHASTDAY-OUT-OCC2       OCCURS 100.
+                      07  LNK-RIHASTDAY-MARK        PIC  X(01).
+                      07  LNK-RIHASTDAY-YUKOKETA    PIC  9(03).
+                      07  LNK-RIHASTDAY-COM         PIC  X(200).
+      *            該当月に入力があったリハビリ診療行為コード
+                   06  LNK-RIHASTDAY-OUT-OCC3.
+                      07  LNK-RIHASTDAY-SRYCD       PIC  X(09)
                                                   OCCURS  50.
-      *          リハビリ開始日コメントの有効インデックス
-                 05  LNK-RIHASTDAY-IDX            PIC  9(03).
+      *            リハビリ開始日コメントの有効インデックス
+                   06  LNK-RIHASTDAY-IDX            PIC  9(03).
       *       リハビリシステム予約コード一覧 (LNK-RIHASTDAY-HOSPNUM = ZERO の時返却)
               04  LNK-RIHASTDAY-SYSCDLST          PIC  X(09)
                                                   OCCURS  50.

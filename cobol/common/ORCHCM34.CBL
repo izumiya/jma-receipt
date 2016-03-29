@@ -4293,8 +4293,11 @@
                                        ORCSRIHASTDAYAREA
                                        SPA-AREA
       *
+           COMPUTE WRK-MAX = FUNCTION LENGTH(LNK-RIHASTDAY-OUT-DAT)
+                           / FUNCTION LENGTH(LNK-RIHASTDAY-OUT-OCC(1))
+      *
            PERFORM VARYING IDXL    FROM    1   BY  1
-                   UNTIL ( IDXL    >   7 )
+                   UNTIL ( IDXL    >   WRK-MAX )
       *
                IF    ( LNK-RIHASTDAY-IDX (IDXL)    >   ZERO )
       *
