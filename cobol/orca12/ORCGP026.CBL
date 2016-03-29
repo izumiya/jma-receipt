@@ -211,13 +211,14 @@
            03  FILLER              PIC X(15)   VALUE   "34 £³£´Â¿¥¨".
            03  FILLER              PIC X(15)   VALUE   "35 £³£µÂ¿¥ª".
            03  FILLER              PIC X(15)   VALUE   "36 £³£¶²Ã¼£".
+           03  FILLER              PIC X(15)   VALUE   "37 £³£·¿½½Ð".
        01  TBL-TOKKI-AREA-R        REDEFINES   TBL-TOKKI-AREA.
       **** 03  TBL-TOKKI-OCC       OCCURS   23.
-           03  TBL-TOKKI-OCC       OCCURS   34.
+           03  TBL-TOKKI-OCC       OCCURS   35.
                05  TBL-TOKK-CD     PIC X(02).
                05  TBL-TOKK-K      PIC X(01).
                05  TBL-TOKK-NAIYO  PIC X(12).
-       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   34.
+       01  TBL-TOKK-MAX            PIC 9(02)   VALUE   35.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -1889,6 +1890,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            AND    (SPA-NAI26-STYM  NOT =   ZERO  )
                IF      SPA-NAI26-STYM      <   "201411"
                    MOVE    "2615"              TO  SPA-ERRCD
+                   MOVE    05                  TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+      *
+      *    ¿½½Ð¡¡Ê¿À®£²£¸Ç¯£´·î¤«¤é
+           IF     (SPA-GMN26-CD        =   "37"  )
+           AND    (SPA-ERRCD           =   SPACE )
+           AND    (SPA-NAI26-STYM  NOT =   ZERO  )
+               IF      SPA-NAI26-STYM      <   "201604"
+                   MOVE    "2616"              TO  SPA-ERRCD
                    MOVE    05                  TO  SPA-GMN26-CUR
                END-IF
            END-IF
