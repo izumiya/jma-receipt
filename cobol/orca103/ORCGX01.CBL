@@ -1381,59 +1381,21 @@
            MOVE    SPACE                       TO  SPA-GMN-SELNUM
            MOVE    ZERO                        TO  SPA-NAI-SELNUM
       *
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL ( IDX         >   SPA-GMN-MAX )
-                    OR   ( SPA-GMN-SELNUM  NOT =   SPACE )
-      *
-               IF    ( SPA-SYSYMD  >=  SPA-NAI-TSTYUKYMD (IDX))
-                AND  ( SPA-SYSYMD  <=  SPA-NAI-TEDYUKYMD (IDX))
-                   MOVE    IDX                     TO  SPA-NAI-SELNUM
-                   MOVE    SPA-NAI-SELNUM          TO  SPA-GMN-SELNUM
-                                                       SPA-NAI-SELNO
-                   MOVE    SPA-NAI-TSTYUKYMD (IDX) TO  SPA-NAI-STYUKYMD
-                   MOVE    SPA-NAI-TEDYUKYMD (IDX) TO  SPA-NAI-EDYUKYMD
-                   MOVE    SPA-GMN-TSTYUKYMD (IDX) TO  SPA-GMN-STYUKYMD
-                   MOVE    SPA-GMN-TEDYUKYMD (IDX) TO  SPA-GMN-EDYUKYMD
-                   MOVE    SPA-NAI-TID (IDX)       TO  SPA-NAI-ID
-               ELSE
-                   IF    ( SPA-SYSYMD  >   SPA-NAI-TEDYUKYMD (IDX))
-                       MOVE    SPA-NAI-TEDYUKYMD (IDX)
-                                                   TO  WRK-SYMD
-                       MOVE    "1"                 TO  WRK-ZOGENPTN
-                       MOVE    1                   TO  WRK-ZOGEN
-                       PERFORM 800-CALENDAR-SEC
-                       MOVE    WRK-SYMD            TO  WRK-YMD
-                       PERFORM 5002-HIZUKE-CHK-SEC
-                       MOVE    WRK-SYMD            TO  SPA-NAI-STYUKYMD
-                       MOVE    WRK-HENYMDG         TO  SPA-GMN-STYUKYMD
-                   END-IF
-      *
-                   IF    ( SPA-SYSYMD  <   SPA-NAI-TEDYUKYMD (IDX))
-                       MOVE    SPA-NAI-TEDYUKYMD (IDX)
-                                                   TO  WRK-SYMD
-                       MOVE    "1"                 TO  WRK-ZOGENPTN
-                       MOVE    -1                  TO  WRK-ZOGEN
-                       PERFORM 800-CALENDAR-SEC
-                       MOVE    WRK-SYMD            TO  WRK-YMD
-                       PERFORM 5002-HIZUKE-CHK-SEC
-                       MOVE    WRK-SYMD            TO  SPA-NAI-EDYUKYMD
-                       MOVE    WRK-HENYMDG         TO  SPA-GMN-EDYUKYMD
-                   END-IF
-      *
-               END-IF
-      *
-           END-PERFORM
-      *
            IF    ( SPA-GMN-MAX     =   ZERO )
                MOVE    4                       TO  SPA-GMN-CUR
            ELSE
-               IF    ( SPA-GMN-SELNUM  NOT =   ZERO )
-                   MOVE    12              TO  SPA-GMN-CUR
-               ELSE
-                   MOVE    3               TO  SPA-GMN-CUR
-               END-IF
-           END-IF
+               MOVE    SPA-GMN-MAX             TO  SPA-NAI-SELNUM
+                                                   SPA-GMN-SELNUM
+                                                   SPA-NAI-SELNO
+                                                   IDX
+               MOVE    SPA-NAI-TSTYUKYMD (IDX) TO  SPA-NAI-STYUKYMD
+               MOVE    SPA-NAI-TEDYUKYMD (IDX) TO  SPA-NAI-EDYUKYMD
+               MOVE    SPA-GMN-TSTYUKYMD (IDX) TO  SPA-GMN-STYUKYMD
+               MOVE    SPA-GMN-TEDYUKYMD (IDX) TO  SPA-GMN-EDYUKYMD
+               MOVE    SPA-NAI-TID (IDX)       TO  SPA-NAI-ID
       *
+               MOVE    12              TO  SPA-GMN-CUR
+           END-IF
       *
            .
        41041-CHKKBNLIST-INIT-EXT.
