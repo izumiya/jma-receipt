@@ -4525,6 +4525,9 @@
                        WHEN    "111012510"
       *H27.1           ÂÅ·ëÎ¨£µ³ä°Ê²¼
                        WHEN    "111012710"
+      *H28.4
+                       WHEN    "113019710"
+                       WHEN    "113019910"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
                END-PERFORM
