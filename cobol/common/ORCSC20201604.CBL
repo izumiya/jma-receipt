@@ -1830,6 +1830,12 @@
                          OR  ((WRK-GMN-INPUTCD(IDX) =   SPACE) AND
                               (WRK-COM-INPUTCD(IDX) =   SPACE))
                          OR  ( SPA-ERRCD       NOT  =   SPACE )
+             IF    (WRK-COM-YAKUHYO (IDX)   =   "1"  )
+               OR  (WRK-COM-HKNCOMBI(IDX)   =   "9999")
+               OR  (WRK-COM-GENTEN  (IDX)   =   "1"   )
+                 CONTINUE
+             ELSE
+      *
       *        剤先頭
                IF      IDX-STR             =   ZERO
                    MOVE    IDX             TO  IDX-STR
@@ -1858,31 +1864,32 @@
                        END-IF
                    END-IF
       *
-                   IF     (SPA-ERRCD           =   SPACE )
-                     AND  (WRK-COM-KEI (IDX)   =   ZERO  )
-                     AND  (FLG-SIP-ARI         =   1     )
+      ****         IF     (SPA-ERRCD           =   SPACE )
+      *              AND  (WRK-COM-KEI (IDX)   =   ZERO  )
+      *              AND  (FLG-SIP-ARI         =   1     )
       *                診療種別チェック変換
-                       PERFORM 30001-SRYSYUKBN-SET-SEC
-                       IF     ( WRK-CHK-SRYSYUKBN       =   "231"
-                                                        OR  "294")
-                         AND  ( WRK-COM-SRYSYUKBN(IDX)  NOT =
-                                                  WRK-CHK-SRYSYUKBN)
-                           MOVE    "0236"          TO  SPA-ERRCD
-                           MOVE    "1"             TO  WRK-COM-CUR
-                                                        (IDX-STR)
-                       END-IF
-                   END-IF
+      *                PERFORM 30001-SRYSYUKBN-SET-SEC
+      *                IF     ( WRK-CHK-SRYSYUKBN       =   "231"
+      *                                                 OR  "294")
+      *                  AND  ( WRK-COM-SRYSYUKBN(IDX)  NOT =
+      *                                           WRK-CHK-SRYSYUKBN)
+      *                    MOVE    "0236"          TO  SPA-ERRCD
+      *                    MOVE    "1"             TO  WRK-COM-CUR
+      *                                                 (IDX-STR)
+      *                END-IF
+      ****         END-IF
                    MOVE    ZERO                TO  FLG-COMMENT
                    MOVE    ZERO                TO  FLG-SIP-ARI
                    MOVE    ZERO                TO  IDX-STR
                END-IF
+             END-IF
            END-PERFORM
       *
            .
        20012-SIPCOM-CHK-EXT.
            EXIT.
       *
-      *??????????
+      *
       *****************************************************************
       *    湿布薬剤点数再計算処理
       *****************************************************************
