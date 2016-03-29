@@ -423,6 +423,8 @@
            03  WRK-KYUSEI8-CHK             PIC X(01).
            03  WRK-KYUSEI9-YMD             PIC X(08).
            03  WRK-KYUSEI9-CHK             PIC X(01).
+           03  WRK-KYUSEI10-YMD             PIC X(08).
+           03  WRK-KYUSEI10-CHK             PIC X(01).
       *    Äþ¸ºÂÐ¾Ý³°
       **** 03  WRK-TEIGEN-GAI              PIC X(08).
       *

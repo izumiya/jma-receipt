@@ -2243,6 +2243,16 @@
                            MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                   (IDX)
                            MOVE    1               TO  FLG-ZAI
+      *H28.4           °ÍÂ¸¾É½¸ÃÄÎÅË¡³«»Ï
+                       WHEN    "099830103"
+                           MOVE    "80"            TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                           MOVE    "830"           TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+      *                    £±ºÞ£±ÌÀºÙ¤È¤¹¤ë
+                           MOVE    "1"             TO  SPA-COM-ZAIEND
+                                                                  (IDX)
+                           MOVE    1               TO  FLG-ZAI
                        WHEN    OTHER
       *                £È£±£¸¡¥£´¤«¤é¥ê¥Ï¥Ó¥êÈ¯À¸Æü
                        IF       SPA-COM-INPUTCD (IDX)(1:6) =   "099800"
