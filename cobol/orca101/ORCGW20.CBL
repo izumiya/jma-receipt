@@ -8503,6 +8503,13 @@ UPDATE*    看護職員夜間配置加算
       *****************************************************************
        4900-KANRENCHK-SEC              SECTION.
       *
+      *    病棟番号が入力されていること
+           IF    ( SPA-GMN-W20-BTUNUM  =   ZERO )
+               MOVE    "1101"      TO  SPA-ERRCD
+               MOVE    1           TO  SPA-GMN-W20-CUR
+               GO  TO  4900-KANRENCHK-EXT
+           END-IF
+      *
       *    病棟名称が入力されていること
            IF    ( SPA-GMN-W20-NAME    NOT =   SPACE )
                CONTINUE
