@@ -6085,7 +6085,8 @@
       *****************************************************************
        2001-JYUSYO-HANTEI-SEC          SECTION.
       *
-           IF      RECE220-FLG-JYUSYO-COMMENT    =    "1" OR "2"
+           IF      RECE220-FLG-JYUSYO-COMMENT    =
+                                         "1" OR "2" OR "3" OR "4"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -7286,6 +7287,7 @@
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000073"
              WHEN      "820000112"
+             WHEN      "820000229"
                 MOVE "¡Ö£±£·¡×"
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000074"
@@ -7294,6 +7296,7 @@
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000075"
              WHEN      "820000114"
+             WHEN      "820000230"
                 MOVE "¡Ö£±£¹¡×"
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000076"
@@ -7310,6 +7313,7 @@
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000079"
              WHEN      "820000118"
+             WHEN      "820000231"
                 MOVE "¡Ö£²£³¡×"
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000080"
@@ -7367,6 +7371,9 @@
              WHEN      "820000093"
              WHEN      "820000132"
                 MOVE "¡Ö£³£·¡×"
+                       TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000232"
+                MOVE "¡Ö£³£¸¡×"
                        TO  WRK-RECE230XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000158"
              WHEN      "820000160"

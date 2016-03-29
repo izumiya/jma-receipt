@@ -1037,6 +1037,14 @@
            03  CONS-NYUEIYO1-COMMENT PIC X(09)  VALUE  "113014810".
       *    ∆˛±°±…Õ‹ø©ªˆªÿ∆≥Œ¡£≤
            03  CONS-NYUEIYO2-COMMENT PIC X(09)  VALUE  "113014910".
+      *    ∆˛±°±…Õ‹ø©ªˆªÿ∆≥Œ¡£±° ΩÈ≤Û°À
+           03  CONS-NYUEIYO3-COMMENT PIC X(09)  VALUE  "113017610".
+      *    ∆˛±°±…Õ‹ø©ªˆªÿ∆≥Œ¡£±° £≤≤ÛÃ‹°À
+           03  CONS-NYUEIYO4-COMMENT PIC X(09)  VALUE  "113017710".
+      *    ∆˛±°±…Õ‹ø©ªˆªÿ∆≥Œ¡£≤° ΩÈ≤Û°À
+           03  CONS-NYUEIYO5-COMMENT PIC X(09)  VALUE  "113017810".
+      *    ∆˛±°±…Õ‹ø©ªˆªÿ∆≥Œ¡£≤° £≤≤ÛÃ‹°À
+           03  CONS-NYUEIYO6-COMMENT PIC X(09)  VALUE  "113017910".
       *    ¬‡±°¡∞À¨Ã‰ªÿ∆≥Œ¡
            03  CONS-HOUMON-COMMENT1  PIC X(09)  VALUE  "190030310".
       *    ° œ∑°À¬‡±°¡∞À¨Ã‰ªÿ∆≥Œ¡
@@ -1330,6 +1338,10 @@
            03  CONS-JYUSYO-COMMENT   PIC X(09)  VALUE  "190141370".
       *    Ω≈æ…º‘≤√ªª£±
            03  CONS-JYUSYO-COMMENT2  PIC X(09)  VALUE  "190151470".
+      *    Ω≈æ…º‘≤√ªª£±° √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡°À
+           03  CONS-JYUSYO-COMMENT3  PIC X(09)  VALUE  "190195770".
+      *    Ω≈æ…º‘≤√ªª£≤° √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡°À
+           03  CONS-JYUSYO-COMMENT4  PIC X(09)  VALUE  "190195870".
       *
       *    ≤∏Óø¶∞˜≈˘”Ω·‚µ€∞˙≈˘ªÿº®Œ¡
            03  CONS-KAISYOKU-COMMENT PIC X(09)  VALUE  "114020910".
@@ -4651,7 +4663,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT  OR
                                             CONS-NYUEIYO1-COMMENT OR
-                                            CONS-NYUEIYO2-COMMENT
+                                            CONS-NYUEIYO2-COMMENT OR
+                                            CONS-NYUEIYO3-COMMENT OR
+                                            CONS-NYUEIYO4-COMMENT OR
+                                            CONS-NYUEIYO5-COMMENT OR
+                                            CONS-NYUEIYO6-COMMENT
                    MOVE   "1"   TO    RECE84-FLG-NYUEIYO-COMMENT
               END-IF
       *
@@ -4939,6 +4955,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT2
                         MOVE   "2"    TO    RECE84-FLG-JYUSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT3
+                        MOVE   "3"    TO    RECE84-FLG-JYUSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT4
+                        MOVE   "4"    TO    RECE84-FLG-JYUSYO-COMMENT
                 END-IF
               END-IF
       *

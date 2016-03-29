@@ -1395,6 +1395,79 @@
       *    在医総管（在支診等以外・月１回・１０人〜）
            03  CONS-ZAIIKAN84-COMMENT PIC X(09) VALUE  "114034210".
       *
+      *    施医総管（機能強化在支診等・病床有・難病等月２回以上・１人）
+           03  CONS-SHIIKAN1-COMMENT  PIC X(09) VALUE  "114035510".
+      *    施医総管（機能強化在支診等・病床有・難病等月２回以上・２〜９人）
+           03  CONS-SHIIKAN2-COMMENT  PIC X(09) VALUE  "114035610".
+      *    施医総管（機能強化在支診等・病床有・難病等月２回以上・１０人〜）
+           03  CONS-SHIIKAN3-COMMENT  PIC X(09) VALUE  "114035710".
+      *    施医総管（機能強化在支診等・病床有・月２回以上・１人）
+           03  CONS-SHIIKAN4-COMMENT  PIC X(09) VALUE  "114035810".
+      *    施医総管（機能強化在支診等・病床有・月２回以上・２〜９人）
+           03  CONS-SHIIKAN5-COMMENT  PIC X(09) VALUE  "114035910".
+      *    施医総管（機能強化在支診等・病床有・月２回以上・１０人〜）
+           03  CONS-SHIIKAN6-COMMENT  PIC X(09) VALUE  "114036010".
+      *    施医総管（機能強化在支診等・病床有・月１回・１人）
+           03  CONS-SHIIKAN7-COMMENT  PIC X(09) VALUE  "114036110".
+      *    施医総管（機能強化在支診等・病床有・月１回・２〜９人）
+           03  CONS-SHIIKAN8-COMMENT  PIC X(09) VALUE  "114036210".
+      *    施医総管（機能強化在支診等・病床有・月１回・１０人〜）
+           03  CONS-SHIIKAN9-COMMENT  PIC X(09) VALUE  "114036310".
+      *    施医総管（機能強化在支診等・病床無・難病等月２回以上・１人）
+           03  CONS-SHIIKAN10-COMMENT PIC X(09) VALUE  "114036410".
+      *    施医総管（機能強化在支診等・病床無・難病等月２回以上・２〜９人）
+           03  CONS-SHIIKAN11-COMMENT PIC X(09) VALUE  "114036510".
+      *    施医総管（機能強化在支診等・病床無・難病等月２回以上・１０人〜）
+           03  CONS-SHIIKAN12-COMMENT PIC X(09) VALUE  "114036610".
+      *    施医総管（機能強化在支診等・病床無・月２回以上・１人）
+           03  CONS-SHIIKAN13-COMMENT PIC X(09) VALUE  "114036710".
+      *    施医総管（機能強化在支診等・病床無・月２回以上・２〜９人）
+           03  CONS-SHIIKAN14-COMMENT PIC X(09) VALUE  "114036810".
+      *    施医総管（機能強化在支診等・病床無・月２回以上・１０人〜）
+           03  CONS-SHIIKAN15-COMMENT PIC X(09) VALUE  "114036910".
+      *    施医総管（機能強化在支診等・病床無・月１回・１人）
+           03  CONS-SHIIKAN16-COMMENT PIC X(09) VALUE  "114037010".
+      *    施医総管（機能強化在支診等・病床無・月１回・２〜９人）
+           03  CONS-SHIIKAN17-COMMENT PIC X(09) VALUE  "114037110".
+      *    施医総管（機能強化在支診等・病床無・月１回・１０人〜）
+           03  CONS-SHIIKAN18-COMMENT PIC X(09) VALUE  "114037210".
+      *    施医総管（在支診等・難病等月２回以上・１人）
+           03  CONS-SHIIKAN19-COMMENT PIC X(09) VALUE  "114037310".
+      *    施医総管（在支診等・難病等月２回以上・２〜９人）
+           03  CONS-SHIIKAN20-COMMENT PIC X(09) VALUE  "114037410".
+      *    施医総管（在支診等・難病等月２回以上・１０人〜）
+           03  CONS-SHIIKAN21-COMMENT PIC X(09) VALUE  "114037510".
+      *    施医総管（在支診等・月２回以上・１人）
+           03  CONS-SHIIKAN22-COMMENT PIC X(09) VALUE  "114037610".
+      *    施医総管（在支診等・月２回以上・２〜９人）
+           03  CONS-SHIIKAN23-COMMENT PIC X(09) VALUE  "114037710".
+      *    施医総管（在支診等・月２回以上・１０人〜）
+           03  CONS-SHIIKAN24-COMMENT PIC X(09) VALUE  "114037810".
+      *    施医総管（在支診等・月１回・１人）
+           03  CONS-SHIIKAN25-COMMENT PIC X(09) VALUE  "114037910".
+      *    施医総管（在支診等・月１回・２〜９人）
+           03  CONS-SHIIKAN26-COMMENT PIC X(09) VALUE  "114038010".
+      *    施医総管（在支診等・月１回・１０人〜）
+           03  CONS-SHIIKAN27-COMMENT PIC X(09) VALUE  "114038110".
+      *    施医総管（在支診等以外・難病等月２回以上・１人）
+           03  CONS-SHIIKAN28-COMMENT PIC X(09) VALUE  "114038210".
+      *    施医総管（在支診等以外・難病等月２回以上・２〜９人）
+           03  CONS-SHIIKAN29-COMMENT PIC X(09) VALUE  "114038310".
+      *    施医総管（在支診等以外・難病等月２回以上・１０人〜）
+           03  CONS-SHIIKAN30-COMMENT PIC X(09) VALUE  "114038410".
+      *    施医総管（在支診等以外・月２回以上・１人）
+           03  CONS-SHIIKAN31-COMMENT PIC X(09) VALUE  "114038510".
+      *    施医総管（在支診等以外・月２回以上・２〜９人）
+           03  CONS-SHIIKAN32-COMMENT PIC X(09) VALUE  "114038610".
+      *    施医総管（在支診等以外・月２回以上・１０人〜）
+           03  CONS-SHIIKAN33-COMMENT PIC X(09) VALUE  "114038710".
+      *    施医総管（在支診等以外・月１回・１人）
+           03  CONS-SHIIKAN34-COMMENT PIC X(09) VALUE  "114038810".
+      *    施医総管（在支診等以外・月１回・２〜９人）
+           03  CONS-SHIIKAN35-COMMENT PIC X(09) VALUE  "114038910".
+      *    施医総管（在支診等以外・月１回・１０人〜）
+           03  CONS-SHIIKAN36-COMMENT PIC X(09) VALUE  "114039010".
+      *
       *    小児特定疾患カウンセリング料（１回目）
            03  CONS-SYOUNI1-COMMENT  PIC X(09)  VALUE  "113000810".
       *    小児特定疾患カウンセリング料（２回目）
@@ -4923,6 +4996,42 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-ZAIIKAN82-COMMENT
                                       OR    CONS-ZAIIKAN83-COMMENT
                                       OR    CONS-ZAIIKAN84-COMMENT
+                                      OR    CONS-SHIIKAN1-COMMENT
+                                      OR    CONS-SHIIKAN2-COMMENT
+                                      OR    CONS-SHIIKAN3-COMMENT
+                                      OR    CONS-SHIIKAN4-COMMENT
+                                      OR    CONS-SHIIKAN5-COMMENT
+                                      OR    CONS-SHIIKAN6-COMMENT
+                                      OR    CONS-SHIIKAN7-COMMENT
+                                      OR    CONS-SHIIKAN8-COMMENT
+                                      OR    CONS-SHIIKAN9-COMMENT
+                                      OR    CONS-SHIIKAN10-COMMENT
+                                      OR    CONS-SHIIKAN11-COMMENT
+                                      OR    CONS-SHIIKAN12-COMMENT
+                                      OR    CONS-SHIIKAN13-COMMENT
+                                      OR    CONS-SHIIKAN14-COMMENT
+                                      OR    CONS-SHIIKAN15-COMMENT
+                                      OR    CONS-SHIIKAN16-COMMENT
+                                      OR    CONS-SHIIKAN17-COMMENT
+                                      OR    CONS-SHIIKAN18-COMMENT
+                                      OR    CONS-SHIIKAN19-COMMENT
+                                      OR    CONS-SHIIKAN20-COMMENT
+                                      OR    CONS-SHIIKAN21-COMMENT
+                                      OR    CONS-SHIIKAN22-COMMENT
+                                      OR    CONS-SHIIKAN23-COMMENT
+                                      OR    CONS-SHIIKAN24-COMMENT
+                                      OR    CONS-SHIIKAN25-COMMENT
+                                      OR    CONS-SHIIKAN26-COMMENT
+                                      OR    CONS-SHIIKAN27-COMMENT
+                                      OR    CONS-SHIIKAN28-COMMENT
+                                      OR    CONS-SHIIKAN29-COMMENT
+                                      OR    CONS-SHIIKAN30-COMMENT
+                                      OR    CONS-SHIIKAN31-COMMENT
+                                      OR    CONS-SHIIKAN32-COMMENT
+                                      OR    CONS-SHIIKAN33-COMMENT
+                                      OR    CONS-SHIIKAN34-COMMENT
+                                      OR    CONS-SHIIKAN35-COMMENT
+                                      OR    CONS-SHIIKAN36-COMMENT
                                       OR    CONS-ZAIHOU-COMMENT
                                       OR    CONS-ZAIHOU3-COMMENT
                                       OR    CONS-ZAIHOU4-COMMENT

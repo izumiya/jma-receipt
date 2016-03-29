@@ -8156,12 +8156,12 @@
       *
            IF     RECE64-ZAISKBKBN             =    "6"
            AND    RECE64-MEISAISU              =     1
-             IF  (RECE64-FLG-KAKURI-COMMENT    =    "1"              )
-             OR  (RECE64-FLG-EISAPO-COMMENT    =    "1" OR "2"       )
-             OR  (RECE64-FLG-KOKKEA-COMMENT    =    "1"              )
-             OR  (RECE64-FLG-JYUSYO-COMMENT    =    "1" OR "2"       )
-             OR  (RECE64-FLG-SEIRIE-COMMENT    =    "1"              )
-             OR  (RECE64-FLG-BYOYAK-COMMENT    =    "1" OR "2" OR "3")
+             IF (RECE64-FLG-KAKURI-COMMENT = "1"                     )
+             OR (RECE64-FLG-EISAPO-COMMENT = "1" OR "2"              )
+             OR (RECE64-FLG-KOKKEA-COMMENT = "1"                     )
+             OR (RECE64-FLG-JYUSYO-COMMENT = "1" OR "2" OR "3" OR "4")
+             OR (RECE64-FLG-SEIRIE-COMMENT = "1"                     )
+             OR (RECE64-FLG-BYOYAK-COMMENT = "1" OR "2" OR "3"       )
                PERFORM    20012-NYUKASAN-HENSYU-SEC
              END-IF
            END-IF
@@ -8282,6 +8282,16 @@
              END-IF
             END-IF
            END-IF
+           IF  (RECE64-FLG-JYUSYO-COMMENT    =    "3")
+              MOVE   24       TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£±¡ÊÃÏ°è°Ü¹Ôµ¡Ç½¶¯²½ÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-JYUSYO-COMMENT    =    "4")
+              MOVE   24       TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£²¡ÊÃÏ°è°Ü¹Ôµ¡Ç½¶¯²½ÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
            IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
              MOVE   15        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
              MOVE  "Àº¿À²Ê¥ê¥¨¥¾¥ó¥Á¡¼¥à²Ã»»»»ÄêÆü"
@@ -8365,17 +8375,23 @@
                    IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994025  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "3")
                      COMPUTE RECE659-ZAINUM =  99994030  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "4")
                      COMPUTE RECE659-ZAINUM =  99994035  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                   IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994040  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994045  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994050  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                     COMPUTE RECE659-ZAINUM =  99994055  +  IDX19
                    END-IF
                    MOVE    "900"            TO   RECE659-SRYSYUKBN
                  WHEN      "92"
@@ -8397,17 +8413,23 @@
                    IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994525  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "3")
                      COMPUTE RECE659-ZAINUM =  99994530  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "4")
                      COMPUTE RECE659-ZAINUM =  99994535  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                   IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994540  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994545  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994550  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                     COMPUTE RECE659-ZAINUM =  99994555  +  IDX19
                    END-IF
                    MOVE    "920"            TO   RECE659-SRYSYUKBN
                END-EVALUATE
@@ -8460,17 +8482,23 @@
                IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994025  +  IDX19
                END-IF
-               IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "3")
                  COMPUTE RECE649-ZAINUM =  99994030  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "4")
                  COMPUTE RECE649-ZAINUM =  99994035  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+               IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994040  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994045  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994050  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                 COMPUTE RECE649-ZAINUM =  99994055  +  IDX19
                END-IF
              WHEN      "92"
                IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
@@ -8491,17 +8519,23 @@
                IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994525  +  IDX19
                END-IF
-               IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "3")
                  COMPUTE RECE649-ZAINUM =  99994530  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "4")
                  COMPUTE RECE649-ZAINUM =  99994535  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+               IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994540  +  IDX19
                END-IF
-               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994545  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994550  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-BYOYAK-COMMENT    =    "3")
+                 COMPUTE RECE649-ZAINUM =  99994555  +  IDX19
                END-IF
            END-EVALUATE
            MOVE    ZERO                TO  RECE649-ZAIREN
@@ -9086,7 +9120,8 @@
       *****************************************************************
        2001-JYUSYO-HANTEI-SEC          SECTION.
       *
-           IF      RECE64-FLG-JYUSYO-COMMENT    =    "1" OR "2"
+           IF      RECE64-FLG-JYUSYO-COMMENT     =
+                                         "1" OR "2" OR "3" OR "4"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -10452,6 +10487,7 @@
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000073"
              WHEN      "820000112"
+             WHEN      "820000229"
                 MOVE "¡Ö£±£·¡×"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000074"
@@ -10460,6 +10496,7 @@
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000075"
              WHEN      "820000114"
+             WHEN      "820000230"
                 MOVE "¡Ö£±£¹¡×"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000076"
@@ -10476,6 +10513,7 @@
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000079"
              WHEN      "820000118"
+             WHEN      "820000231"
                 MOVE "¡Ö£²£³¡×"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000080"
@@ -10533,6 +10571,9 @@
              WHEN      "820000093"
              WHEN      "820000132"
                 MOVE "¡Ö£³£·¡×"
+                       TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
+             WHEN      "820000232"
+                MOVE "¡Ö£³£¸¡×"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000158"
              WHEN      "820000160"
@@ -11054,6 +11095,8 @@
                           "113010710" OR "113010810" OR "120001610" OR
       *102
                           "113003310" OR "113014810" OR "113014910" OR
+                          "113017610" OR "113017710" OR "113017810" OR
+                          "113017910" OR
       *103
                           "190030310" OR
       *104
