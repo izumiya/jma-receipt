@@ -8103,7 +8103,8 @@
                                       OR "190116890" OR "999999984"
                                       OR "999999994"
                                       OR "190153190" OR "190153390"
-                                      OR "190153290" OR "190153090")
+                                      OR "190153290" OR "190153090"
+                                      OR "190182990"               )
               MOVE    1     TO    FLG-NG
            END-IF
       *
@@ -9302,7 +9303,18 @@
       *****************************************************************
        2001111-SRYACTINF-NAME-HEN-SEC     SECTION.
       *
-           IF   RECE62-SRYYM      >=    "201004"
+           IF    RECE62-SRYYM      >=    "201604"
+             EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+      *
+               WHEN   "190111590"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   8       TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "嘲邱∈联年闻蛙∷"
+                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+             END-EVALUATE
+           ELSE
+            IF   RECE62-SRYYM      >=    "201004"
              EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
       *
                WHEN   "190111590"
@@ -9366,7 +9378,7 @@
                  MOVE  "∈戮板减壳ˇ蜀崇壳闻乖百踏换年∷∈联年闻蛙∷"
                              TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:44)
              END-EVALUATE
-           ELSE
+            ELSE
              EVALUATE   WRK-RECE65XX-SRYCD(IDX-RECE65 1)
       *
                WHEN   "190111590"
@@ -9403,6 +9415,7 @@
                  MOVE  "∈戮板闻怠簇减壳∷∈联年闻蛙∷"
                              TO  WRK-RECE65XX-NAME(IDX-RECE65 1)(33:30)
              END-EVALUATE
+            END-IF
            END-IF
       *
            .
