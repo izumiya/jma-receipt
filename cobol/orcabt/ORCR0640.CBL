@@ -711,6 +711,7 @@
       *                                     請求額情報（食事）編集修正
       *  04.08.14    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *  04.08.15    NACL-門脇    16/03/24  現物給付保険欄一部負担金記載修正
+      *  04.08.16    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2097,6 +2098,10 @@
            03  CONS-CTMRI-COMMENT19  PIC X(09)  VALUE  "170033410".
       *    ＭＲＩ撮影（３テスラ以上の機器）
            03  CONS-CTMRI-COMMENT20  PIC X(09)  VALUE  "170033510".
+      *    ＣＴ撮影（６４列以上マルチスライス型機器）（共同利用施設）
+           03  CONS-CTMRI-COMMENT21  PIC X(09)  VALUE  "170034910".
+      *    ＭＲＩ撮影（３テスラ以上の機器）（共同利用施設）
+           03  CONS-CTMRI-COMMENT22  PIC X(09)  VALUE  "170035010".
       *    精神科退院前訪問指導料
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    精神科退院前訪問指導料算定日
@@ -2113,6 +2118,8 @@
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
       *    初診料（同一日２科目：紹介状なし）
            03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
+      *    初診（同一日複数科受診時の２科目・妥結率５割以下）
+           03  CONS-SYODOU4-COMMENT  PIC X(09)  VALUE  "111012810".
       *    心大血管疾患リハビリテーション料（１）
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    心大血管疾患リハビリテーション料（２）
@@ -2169,6 +2176,12 @@
            03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034310".
       *    脳血管疾患等リハビリテーション料（３）（要介護・廃用症候群）
            03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034410".
+      *    脳血管疾患等リハビリテーション料（１）（要介護・入院）
+           03  CONS-NOUKE17-COMMENT  PIC X(09)  VALUE  "180044310".
+      *    脳血管疾患等リハビリテーション料（２）（要介護・入院）
+           03  CONS-NOUKE18-COMMENT  PIC X(09)  VALUE  "180044410".
+      *    脳血管疾患等リハビリテーション料（３）（要介護・入院）
+           03  CONS-NOUKE19-COMMENT  PIC X(09)  VALUE  "180044510".
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -2189,6 +2202,12 @@
            03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180034610".
       *    運動器リハビリテーション料（３）（要介護）
            03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "180034710".
+      *    運動器リハビリテーション料（１）（要介護・入院）
+           03  CONS-UNDOKI11-COMMENT PIC X(09)  VALUE  "180045810".
+      *    運動器リハビリテーション料（２）（要介護・入院）
+           03  CONS-UNDOKI12-COMMENT PIC X(09)  VALUE  "180045910".
+      *    運動器リハビリテーション料（３）（要介護・入院）
+           03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180046010".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -2282,10 +2301,18 @@
            03  CONS-SEIKEA7-COMMENT  PIC X(09)  VALUE  "180039430".
       *    精神科デイ・ケア（大規模）（早期・入院中の患者）
            03  CONS-SEIKEA8-COMMENT  PIC X(09)  VALUE  "180039530".
+      *    精神科デイ・ケア（小規模）（３年超・週３日超）（入院中の患者）
+           03  CONS-SEIKEA9-COMMENT  PIC X(09)  VALUE  "180048930".
+      *    精神科デイ・ケア（小規模）（３年超・週３日超）（入院中の患者）
+           03  CONS-SEIKEA10-COMMENT PIC X(09)  VALUE  "180049030".
       *    精神科リエゾンチーム加算
            03  CONS-SEIRIE-COMMENT   PIC X(09)  VALUE  "190147010".
       *    病棟薬剤業務実施加算
            03  CONS-BYOYAK-COMMENT   PIC X(09)  VALUE  "190149110".
+      *    病棟薬剤業務実施加算１
+           03  CONS-BYOYAK-COMMENT2  PIC X(09)  VALUE  "190192110".
+      *    病棟薬剤業務実施加算２
+           03  CONS-BYOYAK-COMMENT3  PIC X(09)  VALUE  "190192210".
       *
       *    在宅持続陽圧呼吸療法指導管理料
            03  CONS-YOUATU-COMMENT   PIC X(09)  VALUE  "114009710".
@@ -8219,7 +8246,8 @@
            IF      RECE64-SRYKBN      =     "11"
       *       初診（同日複数診療科）
               IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-                                      OR    CONS-SYODOU3-COMMENT)
+                                      OR    CONS-SYODOU3-COMMENT
+                                      OR    CONS-SYODOU4-COMMENT)
               AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE64-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE64-SYODOU-SRYKA(1)
@@ -8340,6 +8368,9 @@
                                             CONS-NOUKE14-COMMENT  OR
                                             CONS-NOUKE15-COMMENT  OR
                                             CONS-NOUKE16-COMMENT  OR
+                                            CONS-NOUKE17-COMMENT  OR
+                                            CONS-NOUKE18-COMMENT  OR
+                                            CONS-NOUKE19-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -8348,6 +8379,9 @@
                                             CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
                                             CONS-UNDOKI10-COMMENT OR
+                                            CONS-UNDOKI11-COMMENT OR
+                                            CONS-UNDOKI12-COMMENT OR
+                                            CONS-UNDOKI13-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -8421,6 +8455,9 @@
                                       OR    CONS-NOUKE14-COMMENT
                                       OR    CONS-NOUKE15-COMMENT
                                       OR    CONS-NOUKE16-COMMENT
+                                      OR    CONS-NOUKE17-COMMENT
+                                      OR    CONS-NOUKE18-COMMENT
+                                      OR    CONS-NOUKE19-COMMENT
                         MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-NOUKE-COMMENT
                         PERFORM  VARYING  IDX16  FROM  1  BY  1
@@ -8440,6 +8477,9 @@
                                       OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
                                       OR    CONS-UNDOKI10-COMMENT
+                                      OR    CONS-UNDOKI11-COMMENT
+                                      OR    CONS-UNDOKI12-COMMENT
+                                      OR    CONS-UNDOKI13-COMMENT
                         MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-UNDOKI-COMMENT
                         PERFORM  VARYING  IDX16  FROM  1  BY  1
@@ -8696,7 +8736,9 @@
                                             CONS-CTMRI-COMMENT7  OR
                                             CONS-CTMRI-COMMENT18 OR
                                             CONS-CTMRI-COMMENT19 OR
-                                            CONS-CTMRI-COMMENT20)
+                                            CONS-CTMRI-COMMENT20 OR
+                                            CONS-CTMRI-COMMENT21 OR
+                                            CONS-CTMRI-COMMENT22)
               AND (RECE62-SRYYM       >=    "201004"            )
                    MOVE   "1"   TO    RECE64-FLG-CTMRI-COMMENT
               END-IF
@@ -8740,6 +8782,8 @@
                                       OR    CONS-SEIKEA6-COMMENT
                                       OR    CONS-SEIKEA7-COMMENT
                                       OR    CONS-SEIKEA8-COMMENT
+                                      OR    CONS-SEIKEA9-COMMENT
+                                      OR    CONS-SEIKEA10-COMMENT
                    MOVE   "1"   TO    RECE64-FLG-SEIKEA-COMMENT
                 END-IF
               END-IF
@@ -8779,6 +8823,12 @@
       *         病棟薬剤業務実施加算
                 IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT
                         MOVE   "1"    TO    RECE64-FLG-BYOYAK-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT2
+                        MOVE   "2"    TO    RECE64-FLG-BYOYAK-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT3
+                        MOVE   "3"    TO    RECE64-FLG-BYOYAK-COMMENT
                 END-IF
               END-IF
       *       超重症児（者）入院診療加算・準超重症児（者）入院診療加算
@@ -9135,6 +9185,7 @@
       *    初診（同日複数診療科）
            IF    RECE65-SRYCD(IDX4)   = CONS-SYODOU-COMMENT
                                      OR CONS-SYODOU3-COMMENT
+                                     OR CONS-SYODOU4-COMMENT
                  MOVE   4             TO  WRK-SETCOM-JIDO
            END-IF
       *    傷病手当金意見書交付料

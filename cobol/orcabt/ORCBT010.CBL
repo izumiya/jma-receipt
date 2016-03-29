@@ -134,6 +134,7 @@
       *                                     公費単独の２回以上の分割対応
       *  04.08.03    NACL-藤原    15/11/13  診療データがない場合は対象の
       *                                     病名があっても病名データも作成しない
+      *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -481,6 +482,8 @@
            03  WRK-CONS-SRYCD4         PIC X(09)   VALUE   "630010005".
       *    薬剤料逓減（６０／１００）（紹介率が低い大病院３０日以上投薬）
            03  WRK-CONS-SRYCD5         PIC X(09)   VALUE   "630010006".
+      *    薬剤料減点（湿布薬薬剤料上限超）
+           03  WRK-CONS-SRYCD6         PIC X(09)   VALUE   "630010007".
       *
       *    疑い
            03  WRK-CONS-UTAGAI     PIC X(06)   VALUE   "の疑い".
@@ -3444,6 +3447,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            OR  WRK-CONS-SRYCD3
                                            OR  WRK-CONS-SRYCD4
                                            OR  WRK-CONS-SRYCD5
+                                           OR  WRK-CONS-SRYCD6
                    COMPUTE TOUKEI02-ZAITEN     =   TOUKEI02-ZAITEN *
                                                    (-1)
                    IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1

@@ -26,6 +26,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.08.01    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -233,6 +234,12 @@
                05  CONS-NOUKE21-COMMENT   PIC X(09)   VALUE "101800260".
       *#       Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë
                05  CONS-NOUKE22-COMMENT   PIC X(09)   VALUE "101800270".
+      *        Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-NOUKE23-COMMENT   PIC X(09)   VALUE "180044310".
+      *        Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-NOUKE24-COMMENT   PIC X(09)   VALUE "180044410".
+      *        Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-NOUKE25-COMMENT   PIC X(09)   VALUE "180044510".
       *        ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
                05  CONS-UNDOKI1-COMMENT   PIC X(09)   VALUE "180027810".
       *        ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -257,6 +264,12 @@
                05  CONS-UNDOKI15-COMMENT  PIC X(09)   VALUE "101800290".
       *#       ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë
                05  CONS-UNDOKI16-COMMENT  PIC X(09)   VALUE "101800330".
+      *        ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-UNDOKI17-COMMENT  PIC X(09)   VALUE "180045810".
+      *        ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-UNDOKI18-COMMENT  PIC X(09)   VALUE "180045910".
+      *        ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-UNDOKI19-COMMENT  PIC X(09)   VALUE "180046010".
       *        ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
                05  CONS-NANBYO-COMMENT    PIC X(09)   VALUE "180017910".
       *        ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -591,6 +604,9 @@
                                    OR    CONS-NOUKE17-COMMENT
                                    OR    CONS-NOUKE18-COMMENT
                                    OR    CONS-NOUKE19-COMMENT
+                                   OR    CONS-NOUKE23-COMMENT
+                                   OR    CONS-NOUKE24-COMMENT
+                                   OR    CONS-NOUKE25-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
@@ -608,6 +624,9 @@
                                    OR    CONS-UNDOKI11-COMMENT
                                    OR    CONS-UNDOKI12-COMMENT
                                    OR    CONS-UNDOKI13-COMMENT
+                                   OR    CONS-UNDOKI17-COMMENT
+                                   OR    CONS-UNDOKI18-COMMENT
+                                   OR    CONS-UNDOKI19-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO

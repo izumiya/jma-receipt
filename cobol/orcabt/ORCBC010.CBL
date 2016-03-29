@@ -79,6 +79,8 @@
       *  04.07.05    NACL-ÌçÏÆ    14/12/15  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       *                                     ¡Ê½éºÆ¿ÇÎÁ¡¦ÄãÂÅ·ëÎ¨ÂÐ±þ¡Ë
       *  04.07.06    NACL-ÌçÏÆ    15/03/16  Ê¿À®£²£·Ç¯£´·î²þÀµÂÐ±þ
+      *
+      *  04.08.01    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3991,7 +3993,11 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                               OR "112016950"
                                               OR "112017010"
                                               OR "112017150"
-                                              OR "112017450"      )
+                                              OR "112017450"
+      *
+                                              OR "113018410"
+                                              OR "111012810"
+                                              OR "112017610"      )
                        OR ( (SRY-SRYCD(IDX2)  =  "101120100" ) AND
                             (SRY-SRYYM       <=  "201306"    )    )
                        OR ( (SRY-SRYCD(IDX2)  =  "101120040"
@@ -4183,9 +4189,8 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                 OR     ( COLDAT02-SRYCD      =   "099999912" )
                    CONTINUE
                ELSE
-                 IF  (ACCT-SRYCDTOTAL  =  630010002
-                                      OR  630010005
-                                      OR  630010006               )
+                 IF  (ACCT-SRYCDTOTAL  =  630010002  OR  630010005
+                                      OR  630010006  OR  630010007)
                  OR  (ACCT-ZAIKBN      =  2                       )
                    IF    ACCT-ZAIKBN        =    2
                          COMPUTE    WRK-TOTALTENSU(1)   =
@@ -4256,9 +4261,8 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                    OR     ( COLDAT02-SRYCD      =   "099999912" )
                      CONTINUE
                   ELSE
-                     IF  (ACCT-SRYCDTOTAL  =  630010002
-                                          OR  630010005
-                                          OR  630010006               )
+                     IF  (ACCT-SRYCDTOTAL  =  630010002  OR  630010005
+                                          OR  630010006  OR  630010007)
                      OR  (ACCT-ZAIKBN      =  2                       )
                          IF    ACCT-ZAIKBN        =    2
                              COMPUTE    WRK-TOTALTENSU(KH-IDX)   =

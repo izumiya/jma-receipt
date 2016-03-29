@@ -40,6 +40,7 @@
       *  04.08.03    NACL-門脇    15/12/08  労災コードの表用番号・公表順序番号
       *                                     編集修正
       *  04.08.04    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -646,6 +647,8 @@
            03  WRK-CONS-SYOSIN30   PIC X(09)  VALUE "111012470".
       *    初診料（同一日２科目：紹介状なし）
            03  WRK-CONS-SYOSIN32   PIC X(09)  VALUE "111012610".
+      *    初診（同一日複数科受診時の２科目・妥結率５割以下）
+           03  WRK-CONS-SYOSIN33   PIC X(09)  VALUE "111012810".
       *
       *    初診（他医療機関からの紹介状がない患者）
            03  WRK-CONS-SYOSIN101  PIC X(09)  VALUE "111012510".
@@ -1467,6 +1470,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                             OR  WRK-CONS-SYOSIN28
                                             OR  WRK-CONS-SYOSIN30
                                             OR  WRK-CONS-SYOSIN32
+                                            OR  WRK-CONS-SYOSIN33
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
@@ -3112,8 +3116,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                   END-IF
                   IF  (WRK-SRYSYUKBN      =  "330" OR "332"            )
                   AND (TBL-ZAI-SRYCD(1)   =  "130000110" OR "130000210"
-                                          OR "130000310" OR "130010570"
-                                          OR "130010670" OR "130011570")
+                                          OR "130000310"               )
                   AND (RECE86-TENTEKIKBN  =  ZERO                      )
                           MOVE   2              TO  RECE86-TENTEKIKBN
                   END-IF
@@ -3135,10 +3138,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
       *
                   IF  (WRK-SRYSYUKBN      =  "340")
                   AND (TBL-ZAI-SRYCD(1)   =  "130004410" OR "130008510"
-                                          OR "130004670" OR "130008270"
-                                          OR "130011070" OR "130012110"
-                                          OR "130011610" OR "130011810"
-                                          OR "130012010"               )
+                                          OR "130004670"               )
                     IF  (RECE84-YKZTEN      =  ZERO )
                     AND (RECE84-KIZAITEN    =  ZERO )
                     AND (RECE84-JIHOKBN     =  SPACE)
@@ -3152,8 +3152,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                   END-IF
                   IF  (WRK-SRYSYUKBN      =  "340")
                   AND (TBL-ZAI-SRYCD(1)   =  "130000110" OR "130000210"
-                                          OR "130000310" OR "130010570"
-                                          OR "130010670" OR "130011570")
+                                          OR "130000310"               )
                   AND (RECE86-TENTEKIKBN  =  ZERO )
                     IF  (RECE84-YKZTEN      =  ZERO )
                     AND (RECE84-KIZAITEN    =  ZERO )

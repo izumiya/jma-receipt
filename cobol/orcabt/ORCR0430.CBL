@@ -142,6 +142,7 @@
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7524,7 +7525,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
              END-PERFORM
       *
              IF      RECE44-SRYCDTOTAL  =   630010002  OR  630010005
-                                                       OR  630010006
+                                        OR  630010006  OR  630010007
                   MOVE      2      TO     TBL-YT1-FLG(IDX6)
              ELSE
                   MOVE      1      TO     TBL-YT1-FLG(IDX6)

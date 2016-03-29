@@ -132,6 +132,7 @@
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
       *  04.08.03    NACL-ÌçÏÆ    14/07/23  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
       *                                     ¡Ê¥³¥ó¥Ñ¥¤¥ë»þ¤Î¥ï¡¼¥Ë¥ó¥°½¤Àµ¡Ë
+      *  04.08.04    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6775,12 +6776,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            IF     RECE84-ZAISKBKBN             =    "6"
            AND    RECE84-MEISAISU              =     1
-             IF  (RECE84-FLG-KAKURI-COMMENT    =    "1"       )
-             OR  (RECE84-FLG-EISAPO-COMMENT    =    "1" OR "2")
-             OR  (RECE84-FLG-KOKKEA-COMMENT    =    "1"       )
-             OR  (RECE84-FLG-JYUSYO-COMMENT    =    "1" OR "2")
-             OR  (RECE84-FLG-SEIRIE-COMMENT    =    "1"       )
-             OR  (RECE84-FLG-BYOYAK-COMMENT    =    "1"       )
+             IF  (RECE84-FLG-KAKURI-COMMENT    =    "1"              )
+             OR  (RECE84-FLG-EISAPO-COMMENT    =    "1" OR "2"       )
+             OR  (RECE84-FLG-KOKKEA-COMMENT    =    "1"              )
+             OR  (RECE84-FLG-JYUSYO-COMMENT    =    "1" OR "2"       )
+             OR  (RECE84-FLG-SEIRIE-COMMENT    =    "1"              )
+             OR  (RECE84-FLG-BYOYAK-COMMENT    =    "1" OR "2" OR "3")
                PERFORM    20012-NYUKASAN-HENSYU-SEC
              END-IF
            END-IF
@@ -6874,19 +6875,31 @@ grpsys       PERFORM 900-DBSELECT-SEC
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
            END-IF
            IF  (RECE84-FLG-JYUSYO-COMMENT    =    "2")
-             MOVE   9         TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½Å¾É¼Ô²Ã»»£±»»ÄêÆü"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-JYUSYO-COMMENT    =    "1")
-            IF  RECE82-SRYYM   >=  "201204"
-             MOVE   9         TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½Å¾É¼Ô²Ã»»£²»»ÄêÆü"
+            IF  RECE82-SRYYM   >=  "201404"
+              MOVE   20       TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£±¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
             ELSE
-             MOVE   19        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½Å¾É¼Ô²Ã»»¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
+              MOVE   9        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£±»»ÄêÆü"
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+            END-IF
+           END-IF
+           IF  (RECE84-FLG-JYUSYO-COMMENT    =    "1")
+            IF  RECE82-SRYYM   >=  "201404"
+              MOVE   20       TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£²¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
+                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+            ELSE
+             IF  RECE82-SRYYM   >=  "201204"
+              MOVE   9        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»£²»»ÄêÆü"
+                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+             ELSE
+              MOVE   19       TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+              MOVE  "½Å¾É¼Ô²Ã»»¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë»»ÄêÆü"
+                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+             END-IF
             END-IF
            END-IF
            IF  (RECE84-FLG-SEIRIE-COMMENT    =    "1")
@@ -6897,6 +6910,16 @@ grpsys       PERFORM 900-DBSELECT-SEC
            IF  (RECE84-FLG-BYOYAK-COMMENT    =    "1")
              MOVE   13        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
              MOVE  "ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»»»ÄêÆü"
+                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE84-FLG-BYOYAK-COMMENT    =    "2")
+             MOVE   14        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»£±»»ÄêÆü"
+                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE84-FLG-BYOYAK-COMMENT    =    "3")
+             MOVE   14        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»£²»»ÄêÆü"
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
            END-IF
            IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
@@ -6973,8 +6996,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    IF  (RECE84-FLG-BYOYAK-COMMENT    =    "1")
                      COMPUTE RECE859-ZAINUM =  99994036
                    END-IF
-                   IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                   IF  (RECE84-FLG-BYOYAK-COMMENT    =    "2")
                      COMPUTE RECE859-ZAINUM =  99994041
+                   END-IF
+                   IF  (RECE84-FLG-BYOYAK-COMMENT    =    "3")
+                     COMPUTE RECE859-ZAINUM =  99994046
+                   END-IF
+                   IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                     COMPUTE RECE859-ZAINUM =  99994051
                    END-IF
                    MOVE    "900"            TO   RECE859-SRYSYUKBN
                  WHEN      "92"
@@ -7002,8 +7031,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    IF  (RECE84-FLG-BYOYAK-COMMENT    =    "1")
                      COMPUTE RECE859-ZAINUM =  99994536
                    END-IF
-                   IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                   IF  (RECE84-FLG-BYOYAK-COMMENT    =    "2")
                      COMPUTE RECE859-ZAINUM =  99994541
+                   END-IF
+                   IF  (RECE84-FLG-BYOYAK-COMMENT    =    "3")
+                     COMPUTE RECE859-ZAINUM =  99994546
+                   END-IF
+                   IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                     COMPUTE RECE859-ZAINUM =  99994551
                    END-IF
                    MOVE    "920"            TO   RECE859-SRYSYUKBN
                END-EVALUATE
@@ -7059,8 +7094,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
                IF  (RECE84-FLG-BYOYAK-COMMENT    =    "1")
                  COMPUTE RECE849-ZAINUM =  99994036
                END-IF
-               IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+               IF  (RECE84-FLG-BYOYAK-COMMENT    =    "2")
                  COMPUTE RECE849-ZAINUM =  99994041
+               END-IF
+               IF  (RECE84-FLG-BYOYAK-COMMENT    =    "3")
+                 COMPUTE RECE849-ZAINUM =  99994046
+               END-IF
+               IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                 COMPUTE RECE849-ZAINUM =  99994051
                END-IF
              WHEN      "92"
                IF  (RECE84-FLG-KAKURI-COMMENT    =    "1")
@@ -7087,8 +7128,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
                IF  (RECE84-FLG-BYOYAK-COMMENT    =    "1")
                  COMPUTE RECE849-ZAINUM =  99994536
                END-IF
-               IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+               IF  (RECE84-FLG-BYOYAK-COMMENT    =    "2")
                  COMPUTE RECE849-ZAINUM =  99994541
+               END-IF
+               IF  (RECE84-FLG-BYOYAK-COMMENT    =    "3")
+                 COMPUTE RECE849-ZAINUM =  99994546
+               END-IF
+               IF  (RECE84-FLG-CHIRYO-COMMENT    =    "1")
+                 COMPUTE RECE849-ZAINUM =  99994551
                END-IF
            END-EVALUATE
            MOVE    RECE84-SRYKBN       TO  RECE849-SRYKBN
@@ -7710,7 +7757,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2001-BYOYAK-HANTEI-SEC          SECTION.
       *
-           IF      RECE84-FLG-BYOYAK-COMMENT    =    "1"
+           IF      RECE84-FLG-BYOYAK-COMMENT    =    "1" OR "2" OR "3"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF

@@ -176,6 +176,7 @@
       *  04.08.05    NACL-門脇    15/12/08  労災コードの表用番号・公表順序番号
       *                                     編集修正
       *  04.08.06    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
+      *  04.08.07    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -867,6 +868,8 @@
            03  CONS-TEIGEN2    PIC X(09)   VALUE   "630010005".
       *    薬剤料逓減（６０／１００）（紹介率が低い大病院３０日以上投薬）
            03  CONS-TEIGEN3    PIC X(09)   VALUE   "630010006".
+      *    薬剤料減点（湿布薬薬剤料上限超）
+           03  CONS-TEIGEN4    PIC X(09)   VALUE   "630010007".
       *    包括点数の治験減点分
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *---- (01.00.05) LINE ADD START --------------------------------
@@ -952,6 +955,8 @@
            03  WRK-CONS-SYOSIN30   PIC X(09)  VALUE "111012470".
       *    初診料（同一日２科目：紹介状なし）
            03  WRK-CONS-SYOSIN32   PIC X(09)  VALUE "111012610".
+      *    初診（同一日複数科受診時の２科目・妥結率５割以下）
+           03  WRK-CONS-SYOSIN33   PIC X(09)  VALUE "111012810".
       *
       *    初診（他医療機関からの紹介状がない患者）
            03  WRK-CONS-SYOSIN101  PIC X(09)  VALUE "111012510".
@@ -1673,6 +1678,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                        IF      RECE45-SRYCD(IDX) =   CONS-TEIGEN
                                                  OR  CONS-TEIGEN2
                                                  OR  CONS-TEIGEN3
+                                                 OR  CONS-TEIGEN4
                                                  OR  CONS-GENTEN
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF 
@@ -1783,6 +1789,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                             OR  WRK-CONS-SYOSIN28
                                             OR  WRK-CONS-SYOSIN30
                                             OR  WRK-CONS-SYOSIN32
+                                            OR  WRK-CONS-SYOSIN33
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
@@ -4035,7 +4042,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
                                        "120003570" OR "120003710" OR
-                                       "120003970"
+                                       "120003970" OR "120004270"
                        MOVE   ZERO   TO   RECE46-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE46-SYOHOUFLG

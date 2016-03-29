@@ -137,6 +137,7 @@
       *  04.08.05    NACL-ÌçÏÆ    16/01/12  ÅÀ¸¡ÍÑ¥ì¥»¥×¥È±¡³°½èÊý°ìÈÌÌ¾µ­ºÜÂÐ±þ
       *  04.08.06    NACL-ÌçÏÆ    16/03/03  ¸ø³²¤ÎÎÅÍÜÃ´Åö¼êÅö¤Ï
       *                                     ÌôºÞ¡¦´ïºàÅÀ¤Î¼è¤ê°·¤¤¤È¤¹¤ë
+      *  04.08.07    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -727,6 +728,10 @@
            03  CONS-CTMRI-COMMENT19  PIC X(09)  VALUE  "170033410".
       *    £Í£Ò£É»£±Æ¡Ê£³¥Æ¥¹¥é°Ê¾å¤Îµ¡´ï¡Ë
            03  CONS-CTMRI-COMMENT20  PIC X(09)  VALUE  "170033510".
+      *    £Ã£Ô»£±Æ¡Ê£¶£´Îó°Ê¾å¥Þ¥ë¥Á¥¹¥é¥¤¥¹·¿µ¡´ï¡Ë¡Ê¶¦Æ±ÍøÍÑ»ÜÀß¡Ë
+           03  CONS-CTMRI-COMMENT21  PIC X(09)  VALUE  "170034910".
+      *    £Í£Ò£É»£±Æ¡Ê£³¥Æ¥¹¥é°Ê¾å¤Îµ¡´ï¡Ë¡Ê¶¦Æ±ÍøÍÑ»ÜÀß¡Ë
+           03  CONS-CTMRI-COMMENT22  PIC X(09)  VALUE  "170035010".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
@@ -741,6 +746,8 @@
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
       *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
            03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
+      *    ½é¿Ç¡ÊÆ±°ìÆüÊ£¿ô²Ê¼õ¿Ç»þ¤Î£²²ÊÌÜ¡¦ÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
+           03  CONS-SYODOU4-COMMENT  PIC X(09)  VALUE  "111012810".
       *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    ¿´Âç·ì´É¼À´µ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -797,6 +804,12 @@
            03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034310".
       *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²¡Ë
            03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034410".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-NOUKE17-COMMENT  PIC X(09)  VALUE  "180044310".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-NOUKE18-COMMENT  PIC X(09)  VALUE  "180044410".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-NOUKE19-COMMENT  PIC X(09)  VALUE  "180044510".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -817,6 +830,12 @@
            03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180034610".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡Ë
            03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "180034710".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-UNDOKI11-COMMENT PIC X(09)  VALUE  "180045810".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-UNDOKI12-COMMENT PIC X(09)  VALUE  "180045910".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180046010".
       *    ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -910,10 +929,18 @@
            03  CONS-SEIKEA7-COMMENT  PIC X(09)  VALUE  "180039430".
       *    Àº¿À²Ê¥Ç¥¤¡¦¥±¥¢¡ÊÂçµ¬ÌÏ¡Ë¡ÊÁá´ü¡¦Æþ±¡Ãæ¤Î´µ¼Ô¡Ë
            03  CONS-SEIKEA8-COMMENT  PIC X(09)  VALUE  "180039530".
+      *    Àº¿À²Ê¥Ç¥¤¡¦¥±¥¢¡Ê¾®µ¬ÌÏ¡Ë¡Ê£³Ç¯Ä¶¡¦½µ£³ÆüÄ¶¡Ë¡ÊÆþ±¡Ãæ¤Î´µ¼Ô¡Ë
+           03  CONS-SEIKEA9-COMMENT  PIC X(09)  VALUE  "180048930".
+      *    Àº¿À²Ê¥Ç¥¤¡¦¥±¥¢¡Ê¾®µ¬ÌÏ¡Ë¡Ê£³Ç¯Ä¶¡¦½µ£³ÆüÄ¶¡Ë¡ÊÆþ±¡Ãæ¤Î´µ¼Ô¡Ë
+           03  CONS-SEIKEA10-COMMENT PIC X(09)  VALUE  "180049030".
       *    Àº¿À²Ê¥ê¥¨¥¾¥ó¥Á¡¼¥à²Ã»»
            03  CONS-SEIRIE-COMMENT   PIC X(09)  VALUE  "190147010".
       *    ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»
            03  CONS-BYOYAK-COMMENT   PIC X(09)  VALUE  "190149110".
+      *    ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»£±
+           03  CONS-BYOYAK-COMMENT2  PIC X(09)  VALUE  "190192110".
+      *    ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»£²
+           03  CONS-BYOYAK-COMMENT3  PIC X(09)  VALUE  "190192210".
       *
       *    ºßÂð»ýÂ³ÍÛ°µ¸ÆµÛÎÅË¡»ØÆ³´ÉÍýÎÁ
            03  CONS-YOUATU-COMMENT   PIC X(09)  VALUE  "114009710".
@@ -2750,7 +2777,8 @@
            IF      RECE220-SRYKBN      =     "11"
       *       ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
               IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-                                      OR    CONS-SYODOU3-COMMENT)
+                                      OR    CONS-SYODOU3-COMMENT
+                                      OR    CONS-SYODOU4-COMMENT)
               AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE220-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE220-SYODOU-SRYKA(1)
@@ -2871,6 +2899,9 @@
                                             CONS-NOUKE14-COMMENT  OR
                                             CONS-NOUKE15-COMMENT  OR
                                             CONS-NOUKE16-COMMENT  OR
+                                            CONS-NOUKE17-COMMENT  OR
+                                            CONS-NOUKE18-COMMENT  OR
+                                            CONS-NOUKE19-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -2879,6 +2910,9 @@
                                             CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
                                             CONS-UNDOKI10-COMMENT OR
+                                            CONS-UNDOKI11-COMMENT OR
+                                            CONS-UNDOKI12-COMMENT OR
+                                            CONS-UNDOKI13-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -2940,6 +2974,9 @@
                                       OR    CONS-NOUKE14-COMMENT
                                       OR    CONS-NOUKE15-COMMENT
                                       OR    CONS-NOUKE16-COMMENT
+                                      OR    CONS-NOUKE17-COMMENT
+                                      OR    CONS-NOUKE18-COMMENT
+                                      OR    CONS-NOUKE19-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-NOUKE-COMMENT
                 END-IF
@@ -2953,6 +2990,9 @@
                                       OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
                                       OR    CONS-UNDOKI10-COMMENT
+                                      OR    CONS-UNDOKI11-COMMENT
+                                      OR    CONS-UNDOKI12-COMMENT
+                                      OR    CONS-UNDOKI13-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-UNDOKI-COMMENT
                 END-IF
@@ -3185,7 +3225,9 @@
                                             CONS-CTMRI-COMMENT7  OR
                                             CONS-CTMRI-COMMENT18 OR
                                             CONS-CTMRI-COMMENT19 OR
-                                            CONS-CTMRI-COMMENT20)
+                                            CONS-CTMRI-COMMENT20 OR
+                                            CONS-CTMRI-COMMENT21 OR
+                                            CONS-CTMRI-COMMENT22)
               AND (RECE200-SRYYM      >=    "201004"            )
                    MOVE   "1"   TO    RECE220-FLG-CTMRI-COMMENT
               END-IF
@@ -3210,6 +3252,8 @@
                                       OR    CONS-SEIKEA6-COMMENT
                                       OR    CONS-SEIKEA7-COMMENT
                                       OR    CONS-SEIKEA8-COMMENT
+                                      OR    CONS-SEIKEA9-COMMENT
+                                      OR    CONS-SEIKEA10-COMMENT
                    MOVE   "1"   TO    RECE220-FLG-SEIKEA-COMMENT
                 END-IF
               END-IF
@@ -3249,6 +3293,12 @@
       *         ÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»
                 IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT
                         MOVE   "1"    TO    RECE220-FLG-BYOYAK-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT2
+                        MOVE   "2"    TO    RECE220-FLG-BYOYAK-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT3
+                        MOVE   "3"    TO    RECE220-FLG-BYOYAK-COMMENT
                 END-IF
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»

@@ -75,6 +75,7 @@
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6400,7 +6401,7 @@ grpsys     MOVE    RECE120-HOSPNUM      TO  SANTEI-HOSPNUM
              END-PERFORM
       *
              IF      RECE120-SRYCDTOTAL  =   630010002  OR  630010005
-                                                        OR  630010006
+                                         OR  630010006  OR  630010007
                   MOVE      2      TO     TBL-YT1-FLG(IDX6)
              ELSE
                   MOVE      1      TO     TBL-YT1-FLG(IDX6)

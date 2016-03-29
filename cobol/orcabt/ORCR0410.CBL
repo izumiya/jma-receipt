@@ -125,6 +125,7 @@
       *
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/03/28  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1840,7 +1841,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112016950"
                                               OR "112017010"
                                               OR "112017150"
-                                              OR "112017450"   )
+                                              OR "112017450"
+      *
+                                              OR "113018410"
+                                              OR "111012810"
+                                              OR "112017610"   )
                        OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI19 ) AND
                             ( RECE41-SRYYM  <=   "201306"     ))
                        OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5
@@ -2293,6 +2298,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      IF        ACCT-SRYCDTOTAL    =    630010002
                                                   OR   630010005
                                                   OR   630010006
+                                                  OR   630010007
                          COMPUTE  TBL-YKZTEN-JI(ID1)  =
                                   TBL-YKZTEN-JI(ID1)  -
                                  ( WRK-ZAIKAISU-JI * ACCT-ZAITEN   )
@@ -2554,6 +2560,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF        ACCT-SRYCDTOTAL    =    630010002
                                                 OR   630010005
                                                 OR   630010006
+                                                OR   630010007
                      COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                  (ACCT-ZAITEN    *  
                                                   ACCT-ZAIKAISU)
@@ -2845,6 +2852,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF        ACCT-SRYCDTOTAL    =    630010002
                                               OR   630010005
                                               OR   630010006
+                                              OR   630010007
                    COMPUTE  RECE41-TOTALTEN =  RECE41-TOTALTEN   -
                                                (ACCT-ZAITEN    *  
                                                 WRK-ZAIKAISU)
