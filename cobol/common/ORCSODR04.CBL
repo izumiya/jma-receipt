@@ -473,7 +473,7 @@
                    CONTINUE
                ELSE
                    EVALUATE    TRUE
-                   WHEN  ( SODR-SRYYMD     >   CONST-H280401 )
+                   WHEN  ( SODR-SRYYMD     >=  CONST-H280401 )
                        IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
                                        = "0" OR "1" OR "2" OR "3" )
                            MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
