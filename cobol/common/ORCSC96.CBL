@@ -1786,7 +1786,7 @@
                    END-STRING
       *
                WHEN    "0221"
-                   STRING   "薬評・器評・加評は診療種別の直下に"
+                   STRING   "薬評・器評・加評・体評は診療種別の直下に"
                             "入力して下さい"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
