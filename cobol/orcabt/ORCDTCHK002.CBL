@@ -326,6 +326,7 @@
            03  FLG-TAISYO-HKN                          PIC 9(01).
            03  FLG-TAISYO-SRY                          PIC 9(01).
            03  FLG-INGAISYOHOU                         PIC 9(01).
+           03  FLG-INGAIZAI                            PIC 9(01).
            03  FLG-LOOP-END                            PIC 9(01).
            03  FLG-TSRYKA-OVER                         PIC 9(01).
            03  FLG-TKAISU-OVER                         PIC 9(01).
@@ -3435,6 +3436,8 @@
       *
            MOVE    1               TO  FLG-TAISYO-SRY
       *
+           MOVE    ZERO            TO  FLG-INGAIZAI
+      *
            IF    ( DCACCT-SRYKBN           =   "21" OR "22" OR "23" )
             AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "3" )
             AND  ( DCSRY-SRYSYUKBN(3:1)    NOT =   "1" )
@@ -3442,6 +3445,7 @@
             AND  ( DCACCT-ZAITEN           =   ZERO )
             AND  ( DCACCT-MINUS            =   ZERO )
                MOVE                1       TO  FLG-INGAISYOHOU
+               MOVE                1       TO  FLG-INGAIZAI
            END-IF
       *
       *    薬剤の場合、院外処方の処理対象チェックを行う
@@ -3452,7 +3456,7 @@
                EVALUATE    ORCBSD01-INGAIPROCKBN
       *        院外処方を含まない
                WHEN    ZERO
-                   IF    ( FLG-INGAISYOHOU       =   1 )
+                   IF    ( FLG-INGAIZAI    =   1 )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
                    IF    ( DCSRY-SRYSYUKBN     =   "148"  )
@@ -3464,7 +3468,7 @@
       *        院外処方のみ
                WHEN    "2"
                    MOVE    ZERO    TO  FLG-TAISYO-SRY
-                   IF    ( FLG-INGAISYOHOU       =   1 )
+                   IF    ( FLG-INGAIZAI    =   1 )
                        MOVE    1   TO  FLG-TAISYO-SRY
                    END-IF
                    IF    ( DCSRY-SRYSYUKBN     =   "148"  )
