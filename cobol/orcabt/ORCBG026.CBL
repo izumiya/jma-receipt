@@ -112,7 +112,7 @@
        01  IDX-AREA.
            03  IDX-T                   PIC 9(01).
            03  IDX-S                   PIC 9(04).
-           03  IDX-D                   PIC 9(04).
+           03  IDX-D                   PIC 9(02).
            03  IDX-W                   PIC 9(04).
       *
       *    ¥Ñ¥é¥á¥¿ÎÎ°è
