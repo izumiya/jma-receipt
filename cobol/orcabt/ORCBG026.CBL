@@ -125,6 +125,7 @@
            03  WRK-PARA-MEISAIKBN      PIC 9(01).
            03  WRK-PARA-CSVKBN         PIC 9(01).
            03  WRK-PARA-TAISYOKBN      PIC 9(01).
+           03  WRK-PARA-NYUGAIKBN      PIC 9(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -355,6 +356,7 @@
                                        WRK-PARA-MEISAIKBN
                                        WRK-PARA-CSVKBN
                                        WRK-PARA-TAISYOKBN
+                                       WRK-PARA-NYUGAIKBN
            END-UNSTRING
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -431,6 +433,15 @@
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
       *
+           IF    ( WRK-PARA-NYUGAIKBN  NOT =   0 ) AND
+                 ( WRK-PARA-NYUGAIKBN  NOT =   1 ) AND
+                 ( WRK-PARA-NYUGAIKBN  NOT =   2 )
+               MOVE    "入外区分が正しくありません"
+                                      TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+               GO  TO  110-PARA-HENSYU-EXT
+           END-IF
+      *
       *    システム日付セット
            MOVE    LNK-PRTKANRI-SKYYMD TO  WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
@@ -476,7 +487,16 @@
                WHEN    1
                    MOVE    "投薬"              TO  WRK-TAISYO
                WHEN    2
-                   MOVE    "在宅・投薬・注射"  TO  WRK-TAISYO
+                   MOVE    "在・投・注"        TO  WRK-TAISYO
+           END-EVALUATE
+      *
+           EVALUATE    WRK-PARA-NYUGAIKBN
+               WHEN    0
+                   MOVE    "入外"              TO  WRK-TAISYO(13:4)
+               WHEN    1
+                   MOVE    "入院"              TO  WRK-TAISYO(13:4)
+               WHEN    2
+                   MOVE    "外来"              TO  WRK-TAISYO(13:4)
            END-EVALUATE
       *
            .
@@ -529,26 +549,32 @@
            PERFORM 900-SRYACT-DBSELECT-SEC
       *
            PERFORM UNTIL   FLG-SRYACT  =   1
-               EVALUATE    WRK-PARA-TAISYOKBN
-      *            全て
-                   WHEN    0
-      *                診療会計集計処理
-                       PERFORM 230-MAIN-SRYACCT-SEC
-      *            投薬
-                   WHEN    1
-                       IF      SRY-SRYKBN(1:1)     =  "2"
-      *                    診療会計集計処理
-                           PERFORM 230-MAIN-SRYACCT-SEC
-                       END-IF
-      *            在宅、投薬、注射
-                   WHEN    2
-                       IF    ( SRY-SRYKBN(1:1)     =  "2" ) OR
-                             ( SRY-SRYKBN(1:1)     =  "3" ) OR
-                             ( SRY-SRYKBN          =  "14" )
-      *                    診療会計集計処理
-                           PERFORM 230-MAIN-SRYACCT-SEC
-                       END-IF
-               END-EVALUATE
+               IF    (WRK-PARA-NYUGAIKBN   =   0)   OR
+                    ((WRK-PARA-NYUGAIKBN   =   1 )  AND
+                     (SRY-NYUGAIKBN        =  "1")) OR
+                    ((WRK-PARA-NYUGAIKBN   =   2 )  AND
+                     (SRY-NYUGAIKBN        =  "2"))
+                 EVALUATE    WRK-PARA-TAISYOKBN
+      *              全て
+                     WHEN    0
+      *                  診療会計集計処理
+                         PERFORM 230-MAIN-SRYACCT-SEC
+      *              投薬
+                     WHEN    1
+                         IF      SRY-SRYKBN(1:1)     =  "2"
+      *                      診療会計集計処理
+                             PERFORM 230-MAIN-SRYACCT-SEC
+                         END-IF
+      *              在宅、投薬、注射
+                     WHEN    2
+                         IF    ( SRY-SRYKBN(1:1)     =  "2" ) OR
+                               ( SRY-SRYKBN(1:1)     =  "3" ) OR
+                               ( SRY-SRYKBN          =  "14" )
+      *                      診療会計集計処理
+                             PERFORM 230-MAIN-SRYACCT-SEC
+                         END-IF
+                 END-EVALUATE
+               END-IF
       *        診療行為読み込み
                PERFORM 900-SRYACT-DBFETCH-SEC
            END-PERFORM
