@@ -1031,11 +1031,13 @@
            03  FILLER          PIC X(09)   VALUE   "112015770".
       *    ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
            03  FILLER          PIC X(09)   VALUE   "112017270".
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+           03  FILLER          PIC X(09)   VALUE   "112017570".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   77.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   78.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   77.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   78.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -2361,11 +2363,11 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                             WRK-CONS-SYOSIN103
       *
                EVALUATE  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                 WHEN      WRK-CONS-SYOSIN101
-                     MOVE   1    TO   IDX6
-                 WHEN      WRK-CONS-SYOSIN102
-                     MOVE   2    TO   IDX6
                  WHEN      WRK-CONS-SYOSIN103
+                     MOVE   1    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN101
+                     MOVE   2    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN102
                      MOVE   3    TO   IDX6
                END-EVALUATE
       *
@@ -2554,6 +2556,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                 ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                        =   "112016610"  OR  "112016750"  OR
                            "112016850"  OR  "112016950"   ))
+            OR (( RECE02-SRYYM   >=  "201604"             ) AND
+                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                       =   "112017570"                    ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                WHEN       "112016610"
@@ -2587,6 +2592,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                   MOVE    14     TO     IDX6
                WHEN       "112017270"
                   MOVE    15     TO     IDX6
+               WHEN       "112017570"
+                  MOVE    16     TO     IDX6
              END-EVALUATE
       *
              MOVE     1              TO  TBL-SORT12-FLG(IDX6)
@@ -4313,8 +4320,13 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    MOVE    "¡ö"              TO  WRK-ZAI-MK
                    EVALUATE  IDX6
                      WHEN      2
+                      IF   RECE02-SRYYM   >=  "201604"
+                       MOVE  "½é¿Ç¡ÊÊ¸½ñ¤Ë¤è¤ë¾Ò²ð¤¬¤Ê¤¤´µ¼Ô¡Ë"
+                                             TO  WRK-ZAI-NAME(1:32)
+                      ELSE
                        MOVE  "½é¿Ç¡ÊÂ¾°åÎÅµ¡´Ø¤«¤é¤Î¾Ò²ð¾õ¤¬¤Ê¤¤´µ¼Ô¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
+                      END-IF
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
@@ -4373,9 +4385,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    99999999          TO  RECE06-ZAITEN
            MOVE    ZERO              TO  RECE06-KNSJISKBN
       *
-           IF      IDX6  =  1 OR 2
-             CONTINUE
-           ELSE
+           IF      IDX6  =  1
              MOVE    9               TO  RECE06-CDKBN-SYO
              MOVE    99              TO  RECE06-CDKBN-BU
              MOVE    "9"             TO  RECE06-CDKBN-KBN
@@ -4434,13 +4444,13 @@ grpsys         PERFORM 900-DBSELECT-SEC
                  WHEN      2
                  WHEN      3
                  WHEN      4
-                 WHEN      5
                  WHEN     10
                  WHEN     11
                  WHEN     12
                  WHEN     13
                  WHEN     14
                  WHEN     15
+                 WHEN     16
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    TBL-SORT12-TEN(IDX6)  TO  WRK-ZAITENX
@@ -4463,14 +4473,6 @@ grpsys         PERFORM 900-DBSELECT-SEC
                      WHEN      4
                        MOVE  "Æ±ÆüÅÅÏÃÅùºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë"
                                              TO  WRK-ZAI-NAME(1:32)
-                     WHEN      5
-                      IF   RECE02-SRYYM   >=  "201204"
-                       MOVE  "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã¡Ë²Ã»»"
-                                             TO  WRK-ZAI-NAME(1:22)
-                      ELSE
-                       MOVE  "»þ´Ö³°ÆÃÎã¡ÊºÆ¿Ç¡Ë"
-                                             TO  WRK-ZAI-NAME(1:18)
-                      END-IF
                      WHEN     10
                        MOVE  "ºÆ¿Ç¡ÊÌë´Ö¡¦ÁáÄ«Åù¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:24)
@@ -4494,6 +4496,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                      WHEN     15
                        MOVE  "ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»"
                                              TO  WRK-ZAI-NAME(1:16)
+                     WHEN     16
+                       MOVE  "Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»"
+                                             TO  WRK-ZAI-NAME(1:22)
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
@@ -4510,15 +4515,27 @@ grpsys         PERFORM 900-DBSELECT-SEC
                      WHEN      6
                        MOVE  "ºÆ¿Ç¡ÊÆýÍÄ»ù»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:36)
+                       IF   RECE02-SRYYM   >=  "201604"
+                        MOVE "¡ÊÆþ±¡³°¡Ë"    TO  WRK-ZAI-NAME(37:10)
+                       END-IF
                      WHEN      7
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ùÌë´Ö¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
+                       IF   RECE02-SRYYM   >=  "201604"
+                        MOVE "¡ÊÆþ±¡³°¡Ë"    TO  WRK-ZAI-NAME(41:10)
+                       END-IF
                      WHEN      8
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ùµÙÆü¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
+                       IF   RECE02-SRYYM   >=  "201604"
+                        MOVE "¡ÊÆþ±¡³°¡Ë"    TO  WRK-ZAI-NAME(41:10)
+                       END-IF
                      WHEN      9
                        MOVE  "¾®»ù²ÊºÆ¿Ç¡ÊÆýÍÄ»ù¿¼Ìë¡Ë²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë"
                                              TO  WRK-ZAI-NAME(1:40)
+                       IF   RECE02-SRYYM   >=  "201604"
+                        MOVE "¡ÊÆþ±¡³°¡Ë"    TO  WRK-ZAI-NAME(41:10)
+                       END-IF
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
@@ -4533,6 +4550,48 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
                    MOVE    2                 TO  WRK-SET-LINENUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+      *
+                 WHEN      5
+      *
+                   IF   RECE02-SRYYM   >=  "201604"
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    "¡ö"              TO  WRK-ZAI-MK
+                     MOVE    "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã»»"
+                                               TO  WRK-ZAI-NAME(1:30)
+                     MOVE    "¡ÊÆþ±¡³°¡Ë"      TO  WRK-ZAI-NAME(31:10)
+      *
+                     MOVE    1                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+      *@
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    TBL-SORT12-TEN(IDX6)  TO  WRK-ZAITENX
+                     MOVE    TBL-SORT12-ZAIKAISU(IDX6 IDX5)
+                                                   TO  WRK-ZAIKAISUX
+                     PERFORM 810-TENSUKAI-HEN-SEC
+                     MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
+      *
+                     MOVE    2                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+                   ELSE
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    TBL-SORT12-TEN(IDX6)  TO  WRK-ZAITENX
+                     MOVE    TBL-SORT12-ZAIKAISU(IDX6 IDX5)
+                                                   TO  WRK-ZAIKAISUX
+                     PERFORM 810-TENSUKAI-HEN-SEC
+                     MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
+      *
+                     MOVE    "¡ö"              TO  WRK-ZAI-MK
+                     IF   RECE02-SRYYM   >=  "201204"
+                       MOVE  "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã¡Ë²Ã»»"
+                                               TO  WRK-ZAI-NAME(1:22)
+                     ELSE
+                       MOVE  "»þ´Ö³°ÆÃÎã¡ÊºÆ¿Ç¡Ë"
+                                               TO  WRK-ZAI-NAME(1:18)
+                     END-IF
+      *
+                     MOVE    1                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+                   END-IF
       *
                END-EVALUATE
       *
@@ -4589,6 +4648,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                COMPUTE RECE06-ZAINUM   = 99992630 + IDX5
              WHEN    15
                COMPUTE RECE06-ZAINUM   = 99992640 + IDX5
+             WHEN    16
+               COMPUTE RECE06-ZAINUM   = 99992650 + IDX5
            END-EVALUATE
       *
            MOVE    1                 TO  RECE06-ZAIMEISAISU

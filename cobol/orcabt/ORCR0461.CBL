@@ -698,6 +698,8 @@
            03  FILLER          PIC X(09)   VALUE   "112015770".
       *    ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
            03  FILLER          PIC X(09)   VALUE   "112017270".
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+           03  FILLER          PIC X(09)   VALUE   "112017570".
       *
       *    ³°Íè´ÉÍý²Ã»»¡Ê£³·î°ÊÆâ¡Ë
            03  FILLER          PIC X(09)   VALUE   "101120070".
@@ -707,9 +709,9 @@
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   80.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   81.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   80.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   81.
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -1675,11 +1677,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                             WRK-CONS-SYOSIN103
       *
                EVALUATE  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                 WHEN      WRK-CONS-SYOSIN101
-                     MOVE   1    TO   IDX6
-                 WHEN      WRK-CONS-SYOSIN102
-                     MOVE   2    TO   IDX6
                  WHEN      WRK-CONS-SYOSIN103
+                     MOVE   1    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN101
+                     MOVE   2    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN102
                      MOVE   3    TO   IDX6
                END-EVALUATE
       *
@@ -1823,6 +1825,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                 ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                        =   "112016610"  OR  "112016750"  OR
                            "112016850"  OR  "112016950"   ))
+            OR (( RECE41-SRYYM   >=  "201604"             ) AND
+                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                       =   "112017570"                    ))
             OR (( RECE41-SRYYM   >=  "200804"             ) AND
                 ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                        =   "112000970"                    ) AND
@@ -1861,9 +1866,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                   MOVE    14     TO     IDX6
                WHEN       "112017270"
                   MOVE    15     TO     IDX6
+               WHEN       "112017570"
+                  MOVE    16     TO     IDX6
       *
                WHEN       "112000970"
-                  MOVE    16     TO     IDX6
+                  MOVE    17     TO     IDX6
              END-EVALUATE
       *
              MOVE     1              TO  TBL-SORT12-FLG(IDX6)
@@ -2959,14 +2966,29 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    "¡ö"              TO  WRK-ZAI-MK
-                   MOVE    "½é¿Ç¡ÊÂ¾°åÎÅµ¡´Ø¤«¤é¤Î¾Ò²ð¾õ¡õ"
+                   EVALUATE  IDX6
+                     WHEN      2
+                      IF   RECE41-SRYYM   >=  "201604"
+                       MOVE  "½é¿Ç¡ÊÊ¸½ñ¤Ë¤è¤ë¾Ò²ð¤¬¤Ê¤¤´µ¡õ"
                                              TO  WRK-ZAI-NAME(1:30)
+                      ELSE
+                       MOVE  "½é¿Ç¡ÊÂ¾°åÎÅµ¡´Ø¤«¤é¤Î¾Ò²ð¾õ¡õ"
+                                             TO  WRK-ZAI-NAME(1:30)
+                      END-IF
+                   END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
                    PERFORM 20101-SYOSAIMATOME-WRITE1-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "¤¬¤Ê¤¤´µ¼Ô¡Ë"    TO  WRK-ZAI-NAME(1:12)
+                   EVALUATE  IDX6
+                     WHEN      2
+                      IF   RECE41-SRYYM   >=  "201604"
+                       MOVE  "¼Ô¡Ë"          TO  WRK-ZAI-NAME(1:4)
+                      ELSE
+                       MOVE  "¤¬¤Ê¤¤´µ¼Ô¡Ë"  TO  WRK-ZAI-NAME(1:12)
+                      END-IF
+                   END-EVALUATE
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG
@@ -3015,9 +3037,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    99999999          TO  RECE46-ZAITEN
            MOVE    ZERO              TO  RECE46-KNSJISKBN
       *
-           IF      IDX6  =  1 OR 2
-             CONTINUE
-           ELSE
+           IF      IDX6  =  1
              MOVE    9               TO  RECE46-CDKBN-SYO
              MOVE    99              TO  RECE46-CDKBN-BU
              MOVE    "9"             TO  RECE46-CDKBN-KBN
@@ -3064,7 +3084,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  WHEN      1
                  WHEN      2
                  WHEN      3
-                 WHEN      5
                  WHEN     10
                  WHEN     11
                  WHEN     12
@@ -3072,6 +3091,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  WHEN     14
                  WHEN     15
                  WHEN     16
+                 WHEN     17
       *
                    INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
@@ -3086,14 +3106,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                      WHEN      3
                        MOVE  "Æ±ÆüºÆ¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë"
                                              TO  WRK-ZAI-NAME(1:26)
-                     WHEN      5
-                      IF   RECE41-SRYYM   >=  "201204"
-                       MOVE  "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã¡Ë²Ã»»"
-                                             TO  WRK-ZAI-NAME(1:22)
-                      ELSE
-                       MOVE  "»þ´Ö³°ÆÃÎã¡ÊºÆ¿Ç¡Ë"
-                                             TO  WRK-ZAI-NAME(1:18)
-                      END-IF
                      WHEN     10
                        MOVE  "ºÆ¿Ç¡ÊÌë´Ö¡¦ÁáÄ«Åù¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:24)
@@ -3118,6 +3130,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                        MOVE  "ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»"
                                              TO  WRK-ZAI-NAME(1:16)
                      WHEN     16
+                       MOVE  "Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»"
+                                             TO  WRK-ZAI-NAME(1:22)
+                     WHEN     17
                        MOVE  "ºÆ¿Ç¡ÊÆýÍÄ»ù¡Ë²Ã»»"
                                              TO  WRK-ZAI-NAME(1:18)
                    END-EVALUATE
@@ -3152,6 +3167,51 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    MOVE    2                 TO  WRK-SET-LINENUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
       *
+                 WHEN      5
+      *
+                   IF   RECE41-SRYYM   >=  "201604"
+                     INITIALIZE                    WRK-ZAI2
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    "¡ö"              TO  WRK-ZAI-MK
+                     MOVE    "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã°åÎÅµ¡´Ø¡Ë²Ã¡õ"
+                                               TO  WRK-ZAI-NAME(1:30)
+      *
+                     MOVE    1                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+      *@
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    "»»¡ÊÆþ±¡³°¡Ë"    TO  WRK-ZAI-NAME(1:12)
+      *
+                     INITIALIZE                      WRK-ZAI2
+                     MOVE  1                     TO  WRK-ZAI2-KISAIFLG
+                     MOVE  TBL-SORT12-TEN(IDX6)  TO  WRK-ZAI2-TEN
+                     MOVE  TBL-SORT12-ZAIKAISU(IDX6)
+                                                 TO  WRK-ZAI2-KAISU
+      *
+                     MOVE    2                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+                   ELSE
+                     INITIALIZE                    WRK-ZAI2
+                     MOVE    SPACE             TO  WRK-ZAI
+                     MOVE    "¡ö"              TO  WRK-ZAI-MK
+                     IF   RECE41-SRYYM   >=  "201204"
+                      MOVE  "ºÆ¿Ç¡Ê»þ´Ö³°ÆÃÎã¡Ë²Ã»»"
+                                               TO  WRK-ZAI-NAME(1:22)
+                     ELSE
+                      MOVE  "»þ´Ö³°ÆÃÎã¡ÊºÆ¿Ç¡Ë"
+                                               TO  WRK-ZAI-NAME(1:18)
+                     END-IF
+      *
+                     INITIALIZE                      WRK-ZAI2
+                     MOVE  1                     TO  WRK-ZAI2-KISAIFLG
+                     MOVE  TBL-SORT12-TEN(IDX6)  TO  WRK-ZAI2-TEN
+                     MOVE  TBL-SORT12-ZAIKAISU(IDX6)
+                                                 TO  WRK-ZAI2-KAISU
+      *
+                     MOVE    1                 TO  WRK-SET-LINENUM
+                     PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
+                   END-IF
+      *
                  WHEN      6
       *
                    INITIALIZE                    WRK-ZAI2
@@ -3164,7 +3224,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "´Ø¡Ë²Ã»»"        TO  WRK-ZAI-NAME(1:8)
+                   IF   RECE41-SRYYM   >=  "201604"
+                    MOVE   "´Ø¡Ë²Ã»»¡ÊÆþ±¡³°¡Ë"
+                                             TO  WRK-ZAI-NAME(1:18)
+                   ELSE
+                    MOVE   "´Ø¡Ë²Ã»»"        TO  WRK-ZAI-NAME(1:8)
+                   END-IF
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG
@@ -3186,7 +3251,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"    TO  WRK-ZAI-NAME(1:12)
+                   IF   RECE41-SRYYM   >=  "201604"
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë¡ÊÆþ±¡³°¡Ë"
+                                             TO  WRK-ZAI-NAME(1:22)
+                   ELSE
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"   TO  WRK-ZAI-NAME(1:12)
+                   END-IF
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG
@@ -3208,7 +3278,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"    TO  WRK-ZAI-NAME(1:12)
+                   IF   RECE41-SRYYM   >=  "201604"
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë¡ÊÆþ±¡³°¡Ë"
+                                             TO  WRK-ZAI-NAME(1:22)
+                   ELSE
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"   TO  WRK-ZAI-NAME(1:12)
+                   END-IF
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG
@@ -3230,7 +3305,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    PERFORM 20101-SYOSAIMATOME-WRITE2-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"    TO  WRK-ZAI-NAME(1:12)
+                   IF   RECE41-SRYYM   >=  "201604"
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë¡ÊÆþ±¡³°¡Ë"
+                                             TO  WRK-ZAI-NAME(1:22)
+                   ELSE
+                    MOVE    "¡Ê£¶ºÐÌ¤Ëþ¡Ë"   TO  WRK-ZAI-NAME(1:12)
+                   END-IF
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG
@@ -3293,6 +3373,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                COMPUTE RECE46-ZAINUM   = 99992641
              WHEN    16
                COMPUTE RECE46-ZAINUM   = 99992651
+             WHEN    17
+               COMPUTE RECE46-ZAINUM   = 99992661
            END-EVALUATE
       *
            MOVE    1                 TO  RECE46-ZAIMEISAISU

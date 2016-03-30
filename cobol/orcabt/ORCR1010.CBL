@@ -268,6 +268,7 @@
            03  FLG-KOKENKSN-ARI                        PIC 9(01).
            03  FLG-MESAIKSN-ARI                        PIC 9(01).
            03  FLG-CHIHOKATU-ARI                       PIC 9(01).
+           03  FLG-CHIHOKAT2-ARI                       PIC 9(01).
            03  FLG-JIKANTAI1-ARI                       PIC 9(01).
            03  FLG-JIKANTAI3-ARI                       PIC 9(01).
       *    乳幼児加算カウント
@@ -277,6 +278,7 @@
            03  CNT-KOKENKSN                            PIC 9(02).
            03  CNT-MESAIKSN                            PIC 9(02).
            03  CNT-CHIHOKATU                           PIC 9(02).
+           03  CNT-CHIHOKAT2                           PIC 9(02).
            03  CNT-JIKANTAI1                           PIC 9(02).
            03  CNT-JIKANTAI3                           PIC 9(02).
            03  CNT-SAISIN-DOUJITU                      PIC 9(02).
@@ -474,31 +476,12 @@
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
-      *
-      *    特定疾患処方管理加算（処方料）
-           03  WRK-TOKUTEI-SKAN                        PIC 9(03).
-      *    処方料（乳幼児）加算
-           03  WRK-NYUYOUJI-SKAN                       PIC 9(03).
-      *    特定疾患処方管理加算（処方せん料）
-           03  WRK-TOKUTEI-SKAN2                       PIC 9(03).
-      *    処方せん（乳幼児）加算
-           03  WRK-NYUYOUJI-SHOKAN                     PIC 9(03).
+      *    処方減回数
+           03  WRK-SYOHOU-KAISU                PIC 9(03).
+      *    処方せん減回数
+           03  WRK-SYOSEN-KAISU                PIC 9(03).
       *    処方料（麻・向・毒・覚）
-           03  WRK-MADOKU-SHOHO                        PIC 9(03).
-      *    長期投薬加算（処方料）
-           03  WRK-CYOKI-SKAN                          PIC 9(03).
-      *    長期投薬加算（処方せん料）
-           03  WRK-CYOKI-SKAN2                         PIC 9(03).
-      *    抗悪性腫瘍剤処方管理加算（処方料）
-           03  WRK-AKUSEI-SKAN                         PIC 9(03).
-      *    抗悪性腫瘍剤処方管理加算（処方せん料）
-           03  WRK-AKUSEI-SKAN2                        PIC 9(03).
-      *    一般名処方加算（処方せん料）
-           03  WRK-IPPAN-SKAN2                         PIC 9(03).
-      *    処方料（紹介率が低い大病院３０日以上投薬減算）
-           03  WRK-DAIBYOIN-SGEN                       PIC 9(03).
-      *    処方せん料（紹介率が低い大病院３０日以上投薬減算）
-           03  WRK-DAIBYOIN-SGEN2                      PIC 9(03).
+           03  WRK-MADOKU-SHOHO                PIC 9(03).
       *---------------------------------------------------------------
       *
       *    固定値
@@ -589,6 +572,8 @@
            03  CONS-MESAIKSN       PIC X(09) VALUE "112015770".
       *    地域包括診療加算
            03  CONS-CHIHOKATU      PIC X(09) VALUE "112017270".
+      *    認知症地域包括診療加算
+           03  CONS-CHIHOKAT2      PIC X(09) VALUE "112017570".
       *
       *    フィルム料（乳幼児）加算
            03  CONS-FILM-YOUJI-KASAN  
@@ -3995,28 +3980,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *****************************************************************
        210442-RECE100-HENSYU-SEC               SECTION.
       *
-      *    特定疾患処方管理加算の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-TOKUTEI-SKAN
-           MOVE   ZERO              TO   WRK-TOKUTEI-SKAN2
-      *    処方の乳幼児加算の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-NYUYOUJI-SKAN
-      *    処方せん(乳幼児加算)の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-NYUYOUJI-SHOKAN
+      *    処方減回数の初期化
+           MOVE   ZERO              TO   WRK-SYOHOU-KAISU
+      *    処方せん減回数の初期化
+           MOVE   ZERO              TO   WRK-SYOSEN-KAISU
       *    処方料（麻・向・毒・覚）の算定回数減算用領域の初期化
            MOVE   ZERO              TO   WRK-MADOKU-SHOHO
-      *    長期投薬加算の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-CYOKI-SKAN
-           MOVE   ZERO              TO   WRK-CYOKI-SKAN2
-      *    抗悪性腫瘍剤処方管理加算の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-AKUSEI-SKAN
-                                         WRK-AKUSEI-SKAN2
-      *    一般名処方加算の算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-IPPAN-SKAN2
-      *    紹介率が低い大病院３０日以上投薬減算の
-      *    算定回数減算用領域の初期化
-           MOVE   ZERO              TO   WRK-DAIBYOIN-SGEN
-           MOVE   ZERO              TO   WRK-DAIBYOIN-SGEN2
-      *
       *
       *    公費の分離表示用インデックスの確定
            IF   FLG-SHOSAISIN        =       1                      
@@ -4115,57 +4084,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
            END-PERFORM
       *
-      *    処方の算定回数から特定疾患処方管理加算の減算
-           COMPUTE    RECE100-KAISU(21)   =    RECE100-KAISU(21)  -
-                                              WRK-TOKUTEI-SKAN
-      *
-      *    処方の算定回数から処方(乳幼児)加算の減算
-           COMPUTE    RECE100-KAISU(21)   =    RECE100-KAISU(21)  -
-                                              WRK-NYUYOUJI-SKAN           
-      *
-      *    処方の算定回数から長期投薬加算（処方料)の減算
-           COMPUTE    RECE100-KAISU(21)   =    RECE100-KAISU(21)  -
-                                              WRK-CYOKI-SKAN     
-      *
-      *    処方の算定回数から抗悪性腫瘍剤処方管理加算（処方料）の減算
-           COMPUTE    RECE100-KAISU(21)   =    RECE100-KAISU(21)  -
-                                              WRK-AKUSEI-SKAN
-      *
-      *    処方の算定回数から
-      *    紹介率が低い大病院３０日以上投薬減算の減算
-           COMPUTE    RECE100-KAISU(21)   =    RECE100-KAISU(21)  -
-                                              WRK-DAIBYOIN-SGEN
-      *
-      *    処方の算定回数から特定疾患処方管理加算(処方料)の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-TOKUTEI-SKAN2           
-      *
-      *    処方せんの算定回数から処方せん(乳幼児)加算の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-NYUYOUJI-SHOKAN           
-      *
-      *    処方せんの算定回数から長期投薬加算(処方せん料)の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-CYOKI-SKAN2    
-      *
-      *    処方せんの算定回数から抗悪性腫瘍剤処方管理加算(処方せん料)の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-AKUSEI-SKAN2
-      *
-      *    処方せんの算定回数から一般名処方加算(処方せん料)の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-IPPAN-SKAN2
-      *
-      *    処方せんの算定回数から
-      *    紹介率が低い大病院３０日以上投薬減算の減算
-           COMPUTE    RECE100-KAISU(36)   =    RECE100-KAISU(36)  -
-                                              WRK-DAIBYOIN-SGEN2
-      *
+      *    処方の算定回数から減算
+           COMPUTE    RECE100-KAISU(21)  =    RECE100-KAISU(21)
+                                         -    WRK-SYOHOU-KAISU
+      *    処方せんの算定回数から減算
+           COMPUTE    RECE100-KAISU(36)  =    RECE100-KAISU(36)
+                                         -    WRK-SYOSEN-KAISU
       *    麻毒の算定回数から処方料（麻・向・毒・覚）の減算
-           COMPUTE    RECE100-KAISU(22)   =    RECE100-KAISU(22)  -
-                                              WRK-MADOKU-SHOHO           
+           COMPUTE    RECE100-KAISU(22)  =    RECE100-KAISU(22)
+                                         -    WRK-MADOKU-SHOHO
       *
-           .                                           
+           .
       *
        210442-RECE100-HENSYU-EXT.
            EXIT.
@@ -4372,6 +4301,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             COMPUTE  CNT-CHIHOKATU = CNT-CHIHOKATU
                                                    + WK-ZAIKAISU
                          END-IF
+                         IF  SRY-SRYCD(IDX3)  =  CONS-CHIHOKAT2
+                            COMPUTE  CNT-CHIHOKAT2 = CNT-CHIHOKAT2
+                                                   + WK-ZAIKAISU
+                         END-IF
                        END-IF
       **
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
@@ -4399,6 +4332,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                           AND (SRY-SRYCD(IDX3)  =  CONS-KOKENKSN  OR
                                                    CONS-MESAIKSN  OR
                                                    CONS-CHIHOKATU OR
+                                                   CONS-CHIHOKAT2 OR
                                                    CONS-JIKANTAI1 OR
                                                    CONS-JIKANTAI3 )
                             EVALUATE  SRY-SRYCD(IDX3)
@@ -4431,6 +4365,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                   ADD  WRK-TNS-TEN(IDX3)
                                                    TO  RECE100-KHNTEN(2)
                                   MOVE     1       TO  FLG-CHIHOKATU-ARI
+                                END-IF
+                              WHEN     CONS-CHIHOKAT2
+                                IF   FLG-CHIHOKAT2-ARI  =  ZERO
+                                  ADD  WRK-TNS-TEN(IDX3)
+                                                   TO  RECE100-KHNTEN(2)
+                                  MOVE     1       TO  FLG-CHIHOKAT2-ARI
                                 END-IF
                             END-EVALUATE
                           ELSE
@@ -4835,25 +4775,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    END-IF
       *    処方のレセ点数欄の編集
                WHEN    "25"
-                   IF SRY-SRYCD(IDX3)      =    "120002270"
-                      COMPUTE  WRK-TOKUTEI-SKAN  =  WRK-TOKUTEI-SKAN +
-                                                    ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    "120002170"
-                      COMPUTE  WRK-NYUYOUJI-SKAN  =  WRK-NYUYOUJI-SKAN +
-                                                     ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    "120003170"             
-                      COMPUTE  WRK-CYOKI-SKAN  =  WRK-CYOKI-SKAN +      
-                                                  ACCT-ZAIKAISU
-                   END-IF                                               
-                   IF SRY-SRYCD(IDX3)      =    "120003370"
-                      COMPUTE  WRK-AKUSEI-SKAN =  WRK-AKUSEI-SKAN +
-                                                  ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    "120003870"
-                      COMPUTE  WRK-DAIBYOIN-SGEN  =  WRK-DAIBYOIN-SGEN +
-                                                     ACCT-ZAIKAISU
+                   IF  SRY-SRYCD(IDX3) = "120002170" OR "120002270" OR
+                                         "120003170" OR "120003370" OR
+                                         "120003870" OR
+                                         "120004070" OR "120004170"
+                      COMPUTE  WRK-SYOHOU-KAISU  =  WRK-SYOHOU-KAISU
+                                                 +  ACCT-ZAIKAISU
                    END-IF
                    IF    WK-ZAITEN   NOT =  ZERO
                      IF    RECE100-KHNTEN(21)     = ZERO
@@ -5002,30 +4929,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN2
-                      COMPUTE  WRK-TOKUTEI-SKAN2 =  WRK-TOKUTEI-SKAN2 +
-                                                    ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN1
-                    COMPUTE WRK-NYUYOUJI-SHOKAN = WRK-NYUYOUJI-SHOKAN +
-                                                  ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN3          
-                      COMPUTE  WRK-CYOKI-SKAN2  =   WRK-CYOKI-SKAN2   + 
-                                                    ACCT-ZAIKAISU
-                   END-IF                                               
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN4
-                      COMPUTE  WRK-AKUSEI-SKAN2 =   WRK-AKUSEI-SKAN2  +
-                                                    ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN5
-                                          OR    CONS-SHOHOKSN7
-                      COMPUTE  WRK-IPPAN-SKAN2  =   WRK-IPPAN-SKAN2   +
-                                                    ACCT-ZAIKAISU
-                   END-IF
-                   IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN6
-                      COMPUTE  WRK-DAIBYOIN-SGEN2 = WRK-DAIBYOIN-SGEN2 +
-                                                    ACCT-ZAIKAISU
+                   IF  SRY-SRYCD(IDX3) =  CONS-SHOHOKSN1
+                                       OR CONS-SHOHOKSN2
+                                       OR CONS-SHOHOKSN3
+                                       OR CONS-SHOHOKSN4
+                                       OR CONS-SHOHOKSN5
+                                       OR CONS-SHOHOKSN6
+                                       OR CONS-SHOHOKSN7
+                      COMPUTE  WRK-SYOSEN-KAISU  =  WRK-SYOSEN-KAISU
+                                                 +  ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOSEN1 OR
                                                 CONS-SHOHOSEN2 OR
@@ -5371,6 +5283,10 @@ grpsys           PERFORM 900-DBSELECT-SEC
                END-IF
                IF    (CNT-CHIHOKATU    NOT =  ZERO         )
                AND   (CNT-SAISIN-ETC   NOT =  CNT-CHIHOKATU)
+                     MOVE   ZERO         TO   RECE100-KHNTEN(2)
+               END-IF
+               IF    (CNT-CHIHOKAT2    NOT =  ZERO         )
+               AND   (CNT-SAISIN-ETC   NOT =  CNT-CHIHOKAT2)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
              END-IF
