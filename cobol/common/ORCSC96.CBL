@@ -2117,6 +2117,12 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "1105"
+                   STRING  "この初診の初診算定日は平成２８年４月以降"
+                           "にして下さい。"
+                                           DELIMITED   BY  SIZE
+                                           INTO    SPA-ERRMSG
+                   END-STRING
       *H25.2
                WHEN    "7011"
                    STRING  "レセプト電算データから移行したデータです。"
@@ -3190,6 +3196,13 @@
                    STRING  "警告！"
                            "湿布薬の投薬があります。"
                            "全量・１日量のコメントを入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K110"
+                   STRING  "警告！"
+                           "湿布薬が７０枚を超えています。"
+                           "投与理由のコメントを入力して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
