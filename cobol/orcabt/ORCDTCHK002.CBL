@@ -3452,29 +3452,27 @@
            EVALUATE    TRUE
            WHEN  ( DCSRY-SRYSYUKBN     =   "213" OR "223" OR "233" )
                CONTINUE
-           WHEN  ( DCSRY-SRYCD (1:1)  =   "6" OR "S" )
-               EVALUATE    ORCBSD01-INGAIPROCKBN
-      *        院外処方を含まない
-               WHEN    ZERO
-                   IF    ( FLG-INGAIZAI    =   1 )
-                       MOVE    ZERO    TO  FLG-TAISYO-SRY
+           WHEN  ( DCACCT-SRYKBN       =   "21" OR "22" OR "23" )
+           WHEN  ( DCSRY-SRYSYUKBN     =   "148"  )
+               IF    ( DCSRY-SRYCD (1:1) = "6" OR "S" )
+                   EVALUATE    ORCBSD01-INGAIPROCKBN
+      *            院外処方を含まない
+                   WHEN    ZERO
+                       IF    ( FLG-INGAIZAI    =   1 )
+                           MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
-                   IF    ( DCSRY-SRYSYUKBN     =   "148"  )
-                       MOVE    ZERO    TO  FLG-TAISYO-SRY
-                   END-IF
-      *        院外処方を含む
-               WHEN    "1"
+      *            院外処方を含む
+                   WHEN    "1"
                        CONTINUE
-      *        院外処方のみ
-               WHEN    "2"
-                   MOVE    ZERO    TO  FLG-TAISYO-SRY
-                   IF    ( FLG-INGAIZAI    =   1 )
-                       MOVE    1   TO  FLG-TAISYO-SRY
-                   END-IF
-                   IF    ( DCSRY-SRYSYUKBN     =   "148"  )
-                       MOVE    1   TO  FLG-TAISYO-SRY
-                   END-IF
-               END-EVALUATE
+      *            院外処方のみ
+                   WHEN    "2"
+                       IF    ( FLG-INGAIZAI    =   1 )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO    TO  FLG-TAISYO-SRY
+                       END-IF
+                   END-EVALUATE
+               END-IF
            END-EVALUATE
       *
            .
