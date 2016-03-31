@@ -54,6 +54,8 @@
                    07  LNK-RYOCOM-IRYO-SRYCD     PIC  X(09).
       *医療区分コメント剤番号
                    07  LNK-RYOCOM-IRYO-ZAINUM    PIC  9(08).
+      *医療区分コメント先頭２文字（並び替え用）
+                   07  LNK-RYOCOM-IRYO-SORT-COM  PIC  X(04).
       *
       *ＡＤＬコメントコード（平成２２年３月までの返却項目）
                05  LNK-RYOCOM-ADL-SRYCD          PIC  X(09).

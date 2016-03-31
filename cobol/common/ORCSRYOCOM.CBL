@@ -1292,98 +1292,193 @@
       *
       *****************************************************************
       *    °åÎÅ¶èÊ¬¥³¥á¥ó¥È¤ÎÃÖ´¹¤¨¡ÊÊ¿À®£²£°Ç¯£´·î²þÄê¤è¤ê¡Ë
+      *    ¡Ê¡¡¡¡¡ËÆâ¤Î¿ô»ú¤Ï²þÄê»þÅÀ¤ÎºÇ¿·¤Î°åÎÅ¶èÊ¬
       *****************************************************************
        2101-RYOCOM-CHG-SEC            SECTION.
       *
            EVALUATE   RYOCOM-SRYCD
+      *      ¡Ê£±£°¡Ë
              WHEN   "820000057"
                 MOVE  "820000105"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£²¡Ë
              WHEN   "820000058"
                 MOVE  "820000107"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£³¡Ë
              WHEN   "820000059"
                 MOVE  "820000108"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±¡Ë
              WHEN   "820000060"
                 MOVE  "820000096"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£´¡Ë
              WHEN   "820000061"
                 MOVE  "820000109"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£µ¡Ë
              WHEN   "820000062"
                 MOVE  "820000110"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£¶¡Ë
              WHEN   "820000063"
                 MOVE  "820000111"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£·¡Ë
              WHEN   "820000064"
-                MOVE  "820000112"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *         Ê¿À®£²£¸Ç¯£³·î¤Þ¤Ç 820000112
+      *         Ê¿À®£²£¸Ç¯£´·î¤«¤é 820000229
+                IF  RYOCOM-SRYYM   <=   "201603"
+                    MOVE  "820000112"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                ELSE
+                    MOVE  "820000229"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                END-IF
+      *      ¡Ê£±£¸¡Ë
              WHEN   "820000065"
                 MOVE  "820000113"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£±¡Ë
              WHEN   "820000066"
                 MOVE  "820000106"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£±£¹¡Ë
              WHEN   "820000067"
-                MOVE  "820000114"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *         Ê¿À®£²£¸Ç¯£³·î¤Þ¤Ç 820000114
+      *         Ê¿À®£²£¸Ç¯£´·î¤«¤é 820000230
+                IF  RYOCOM-SRYYM   <=   "201603"
+                    MOVE  "820000114"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                ELSE
+                    MOVE  "820000230"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                END-IF
+      *      ¡Ê£²£°¡Ë
              WHEN   "820000068"
                 MOVE  "820000115"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£±¡Ë
              WHEN   "820000069"
                 MOVE  "820000116"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£²¡Ë
              WHEN   "820000070"
                 MOVE  "820000117"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£³¡Ë
              WHEN   "820000071"
-                MOVE  "820000118"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *         Ê¿À®£²£¸Ç¯£³·î¤Þ¤Ç 820000118
+      *         Ê¿À®£²£¸Ç¯£´·î¤«¤é 820000231
+                IF  RYOCOM-SRYYM   <=   "201603"
+                    MOVE  "820000118"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                ELSE
+                    MOVE  "820000231"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                END-IF
+      *      ¡Ê£²£´¡Ë
              WHEN   "820000072"
                 MOVE  "820000119"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£µ¡Ë
              WHEN   "820000073"
                 MOVE  "820000120"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£¹¡Ë
              WHEN   "820000074"
                 MOVE  "820000124"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£°¡Ë
              WHEN   "820000075"
                 MOVE  "820000125"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²¡Ë
              WHEN   "820000076"
                 MOVE  "820000097"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³¡Ë
              WHEN   "820000077"
                 MOVE  "820000098"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£´¡Ë
              WHEN   "820000078"
                 MOVE  "820000099"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£µ¡Ë
              WHEN   "820000079"
                 MOVE  "820000100"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£¶¡Ë
              WHEN   "820000080"
                 MOVE  "820000101"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£±¡Ë
              WHEN   "820000081"
                 MOVE  "820000126"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£²¡Ë
              WHEN   "820000082"
                 MOVE  "820000127"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£·¡Ë
              WHEN   "820000083"
                 MOVE  "820000102"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£³¡Ë
              WHEN   "820000084"
                 MOVE  "820000128"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£´¡Ë
              WHEN   "820000085"
                 MOVE  "820000129"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£¶¡Ë
              WHEN   "820000086"
                 MOVE  "820000121"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£¸¡Ë
              WHEN   "820000087"
                 MOVE  "820000103"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£µ¡Ë
              WHEN   "820000088"
                 MOVE  "820000130"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£¶¡Ë
              WHEN   "820000089"
                 MOVE  "820000131"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£¹¡Ë
              WHEN   "820000090"
                 MOVE  "820000104"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£³£·¡Ë
              WHEN   "820000091"
                 MOVE  "820000132"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£·¡Ë
              WHEN   "820000092"
                 MOVE  "820000122"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      ¡Ê£²£¸¡Ë
              WHEN   "820000093"
                 MOVE  "820000123"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
-      *      Ê¿À®£²£²Ç¯£´·îÄÉ²ÃÊ¬
+      *      ¡Ê£³£¸¡Ë  Ê¿À®£²£¸Ç¯£´·î¤«¤é
+             WHEN   "820000232"
+                MOVE  "820000232"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *      
+      *      ¡Ê£¹£±¡Ë  Ê¿À®£²£²Ç¯£´·î¤«¤éÊ¿À®£²£´Ç¯£³·î
              WHEN   "820000158"
                 MOVE  "820000158"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
              WHEN   "820000159"
       *         Ê¿À®£²£´Ç¯£´·î°Ê¹ß¤Ï "820000159" ==> "820000160"
+      *        ¡Ê£¹£²¡Ë
                 IF  RYOCOM-SRYYM   <=   "201203"
                     MOVE  "820000159"
                                    TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
                 ELSE
+      *        ¡Ê£¹£±¡Ë
                     MOVE  "820000160"
                                    TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
                 END-IF
            END-EVALUATE
       *
+           IF     LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)   NOT =    SPACE
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE   LNK-RYOCOM-SANTEIYM  TO  TNS-YUKOSTYMD (1:6)
+               MOVE   "01"                 TO  TNS-YUKOSTYMD (7:2)
+               MOVE   TNS-YUKOSTYMD        TO  TNS-YUKOEDYMD
+               MOVE   LNK-RYOCOM-HOSPNUM   TO  TNS-HOSPNUM
+               MOVE   LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                                           TO  TNS-SRYCD
+               MOVE   TNS-TENSU-REC        TO  MCPDATA-REC
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE  "tbl_tensu"       TO  MCP-TABLE
+                   MOVE  "key"             TO  MCP-PATHNAME
+                   PERFORM 910-DBFETCH-SEC
+                   IF      MCP-RC          =   ZERO
+                       MOVE  MCPDATA-REC   TO  TNS-TENSU-REC
+                       MOVE  TNS-NAME(1:4) TO  LNK-RYOCOM-IRYO-SORT-COM
+                                                            (IDX IDX2)
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_tensu"   TO  MCP-TABLE
+               MOVE    "key"         TO  MCP-PATHNAME
+               PERFORM  910-DB-CLOSE-SEC
+           END-IF
            .
        2101-RYOCOM-CHG-EXT.
            EXIT.
@@ -1403,8 +1498,8 @@
                    PERFORM   VARYING   SIDX3   FROM  WRK-IDX   BY   1
                      UNTIL (SIDX3    >   30)    OR
                            (LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX3) = SPACE)
-                         IF   LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX2)
-                                 >  LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX3)
+                         IF   LNK-RYOCOM-IRYO-SORT-COM(SIDX1 SIDX2)
+                                >  LNK-RYOCOM-IRYO-SORT-COM(SIDX1 SIDX3)
       *                       SIDX2¤«¤é¥ï¡¼¥¯¤Ø¤ÎÂàÈò
                               MOVE  LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX2)
                                             TO  WRK-RYOCOM-IRYO-SRYCD
