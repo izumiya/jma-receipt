@@ -5881,11 +5881,6 @@
            MOVE    "tbl_psychotropic" TO  MCP-TABLE
            MOVE    "key"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-      *TEST
-           DISPLAY "IDX-G:"  IDX-G
-                ",CD:"  WRK-COM-INPUTCD (IDX-G)
-              ",PSYCHOTROPIC-CLASS:" PSYCHOTROPIC-CLASS
-             ",TEN;"  WRK-COM-KISOTEN(IDX-G)
       *
            IF      FLG-GENOK          =   1
                COMPUTE WRK-SYOKEIS2        =   WRK-COM-KISOTEN (IDX-G)
@@ -5918,11 +5913,6 @@
            COMPUTE WRK-SC90-YKZTEN     =   WRK-SYOKEIS3   + 0.999999
            COMPUTE WRK-ZAITEN-K        =   WRK-SC90-YKZTEN
                                        *   WRK-COM-KAISU(IDX-G)
-      *TEST
-           DISPLAY "IDX-G:"  IDX-G
-             ",WRK-ZAITEN-K:" WRK-ZAITEN-K
-             ",WRK-CHK-SRYSYUKBN:" WRK-CHK-SRYSYUKBN
-      *TEST
       *
       *    頓服・外用毎の点数集計
            EVALUATE    WRK-CHK-SRYSYUKBN
