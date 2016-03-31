@@ -161,7 +161,7 @@ fi
     done
 
 #   ºÆÀÁµá
-    all=`ls  /tmp/${20}${RECEFILE4}*.txt`
+    all=`ls  ${20}${RECEFILE4}*.txt`
  
     for f in $all ; do
         echo "f= " $f >> $LOG_FILE 2>&1
