@@ -452,7 +452,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
       *H28.4
                WHEN    "209"
-                   MOVE    "井基かかつけ壳闻瘟" 
+                   MOVE    "井基かかりつけ壳闻瘟" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
       *掐薄
                WHEN    "504"
