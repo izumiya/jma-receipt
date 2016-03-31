@@ -45,6 +45,8 @@
       *                                     ときのエラー処理
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/01/15  労災レセ電の請求情報への
+      *                                     更新日設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -190,6 +192,8 @@
            03  WRK-SEIKYU-DATA.
                05  WRK-SEIKYU-SKYYM    PIC X(05).
                05  WRK-SEIKYU-SRYYM    PIC X(05).
+               05  WRK-SEIKYU-CREYMD   PIC X(08).
+               05  WRK-SEIKYU-CREHMS   PIC X(08).
       *
        01  CNT-RESEDEN.
            03  PATIENT-CNT             PIC 9(05).

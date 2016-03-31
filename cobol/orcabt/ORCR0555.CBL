@@ -48,6 +48,7 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.03    NACL-藤原    16/01/15  請求情報への更新日設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1618,7 +1619,13 @@
       *    記録条件仕様年月情報
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    請求情報
-           PERFORM 5004-MOJI-HENSYU-SEC         
+      *    請求情報（作成日時）
+           STRING  WRK-PARA-CREYMD     DELIMITED  BY SIZE
+                   WRK-PARA-CREHMS     DELIMITED  BY SIZE
+                                       INTO  WRK-DATA
+           END-STRING
+           MOVE    14                  TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
       *    診療科名１
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    人体の部位等１
