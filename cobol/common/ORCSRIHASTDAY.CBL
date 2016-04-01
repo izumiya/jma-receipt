@@ -123,10 +123,10 @@
                05  WK-FREE-YUKOKETA          PIC 9(03).
                05  WK-FREE-NAME              PIC X(200).
       *
-      *£±¡§¿´Âç·ì´É¼À´µ¡¡£²¡§Ç¾·ì´É¼À´µÅù¡¡£³¡§±¿Æ°´ï¡¡£´¡§¸ÆµÛ´ï
-      *£µ¡§ÀÝ¿©¡¡£¶¡§ÆñÉÂ´µ¼Ô¡¡£·¡§¾ã³²»ù¡Ê¼Ô¡Ë
+      *£±¡§¿´Âç·ì´É¼À´µ¡¡£²¡§Ç¾·ì´É¼À´µÅù¡¡£³¡§ÇÑÍÑ¾É¸õ·²¡¢¡¡£´¡§±¿Æ°´ï
+      *£µ¡§¸ÆµÛ´ï¡¡£¶¡§ÀÝ¿©¡¡£·¡§ÆñÉÂ´µ¼Ô¡¡£¸¡§¾ã³²»ù¡Ê¼Ô¡Ë
        01  WRK-RIHASANTEI-AREA.
-           03  WRK-RIHASANTEI-OCC            OCCURS  7.
+           03  WRK-RIHASANTEI-OCC            OCCURS  8.
                05  WRK-RIHASANTEI-FLG        PIC 9(01).
                05  WRK-RIHASANTEI-DAY-TBL.
                    06  WRK-RIHASANTEI-DAY    PIC 9(01)   OCCURS  31.
@@ -152,6 +152,8 @@
                05  CONS-SYOGAI            PIC X(09)   VALUE "099800171".
       *        ÀÝ¿©ÎÅË¡³«»ÏÆü
                05  CONS-SESSYOKU          PIC X(09)   VALUE "099800151".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï³«»ÏÆü
+               05  CONS-HAIYO             PIC X(09)   VALUE "099800191".
       *
       *        ¿´Âç¥ê¥Ï½ªÎ»Æü
                05  CONS-SINDAI-E          PIC X(09)   VALUE "099800112".
@@ -167,9 +169,12 @@
                05  CONS-SYOGAI-E          PIC X(09)   VALUE "099800172".
       *        ÀÝ¿©ÎÅË¡½ªÎ»Æü
                05  CONS-SESSYOKU-E        PIC X(09)   VALUE "099800152".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï³«»ÏÆü
+               05  CONS-HAIYO-E           PIC X(09)   VALUE "099800192".
+      *
            03  CONS-RIHA-SYSCD-R REDEFINES CONST-RIHA-SYSCD-VAL.
-               05  CONS-RIHA-SYSCD     PIC X(09)   OCCURS 14.
-           03  CONS-RIHA-SYSCD-MAX     PIC 9(03)   VALUE  14.
+               05  CONS-RIHA-SYSCD     PIC X(09)   OCCURS 16.
+           03  CONS-RIHA-SYSCD-MAX     PIC 9(03)   VALUE  16.
       *
       *****
       *    ¥ê¥Ï¥Ó¥ê¼êµ»ÎÁ
@@ -280,9 +285,34 @@
                05  CONS-SYOGAI3-COMMENT   PIC X(09)   VALUE "180028410".
       *        ÀÝ¿©µ¡Ç½ÎÅË¡
                05  CONS-SESSYOKU-COMMENT  PIC X(09)   VALUE "180016610".
+      *
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£±Ã±°Ì¡Ë
+               05  CONS-HAIYO1-COMMENT    PIC X(09)   VALUE "180044610".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£±Ã±°Ì¡Ë
+               05  CONS-HAIYO2-COMMENT    PIC X(09)   VALUE "180044710".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡Ê£±Ã±°Ì¡Ë
+               05  CONS-HAIYO3-COMMENT    PIC X(09)   VALUE "180044810".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-HAIYO4-COMMENT    PIC X(09)   VALUE "180044910".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡³°¡Ë
+               05  CONS-HAIYO5-COMMENT    PIC X(09)   VALUE "180045010".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-HAIYO6-COMMENT    PIC X(09)   VALUE "180045110".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡³°¡Ë
+               05  CONS-HAIYO7-COMMENT    PIC X(09)   VALUE "180045210".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+               05  CONS-HAIYO8-COMMENT    PIC X(09)   VALUE "180045310".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡³°¡Ë
+               05  CONS-HAIYO9-COMMENT    PIC X(09)   VALUE "180045410".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ£±¡ÊÍ×²ð¸î¡Ë´ð½àÉÔÅ¬¹ç
+               05  CONS-HAIYO10-COMMENT   PIC X(09)   VALUE "180045530".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ£²¡ÊÍ×²ð¸î¡Ë´ð½àÉÔÅ¬¹ç
+               05  CONS-HAIYO11-COMMENT   PIC X(09)   VALUE "180045630".
+      *        ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ£³¡ÊÍ×²ð¸î¡Ë´ð½àÉÔÅ¬¹ç
+               05  CONS-HAIYO12-COMMENT   PIC X(09)   VALUE "180045730".
            03  CONS-RIHA-COMMENT-R REDEFINES CONS-RIHA-COMMENT-VAL.
-               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 47.
-           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  47.
+               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 65.
+           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  65.
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -618,6 +648,29 @@
                    END-IF
                  END-PERFORM
              END-IF
+             IF   SRY-SRYCD(IDX12)  =    CONS-HAIYO1-COMMENT
+                                   OR    CONS-HAIYO2-COMMENT
+                                   OR    CONS-HAIYO3-COMMENT
+                                   OR    CONS-HAIYO4-COMMENT
+                                   OR    CONS-HAIYO5-COMMENT
+                                   OR    CONS-HAIYO6-COMMENT
+                                   OR    CONS-HAIYO7-COMMENT
+                                   OR    CONS-HAIYO8-COMMENT
+                                   OR    CONS-HAIYO9-COMMENT
+                                   OR    CONS-HAIYO10-COMMENT
+                                   OR    CONS-HAIYO11-COMMENT
+                                   OR    CONS-HAIYO12-COMMENT
+                 PERFORM  VARYING  IDX3  FROM  1  BY  1
+                           UNTIL   IDX3   >   31
+                   IF   ACCT-DAY(1 IDX3)  NOT = ZERO
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
+                     MOVE   3    TO    IDX17
+                     MOVE   SRY-SRYCD(IDX12)
+                                 TO    WRK-SRYCD3
+                   END-IF
+                 END-PERFORM
+             END-IF
              IF   SRY-SRYCD(IDX12)  =    CONS-UNDOKI1-COMMENT
                                    OR    CONS-UNDOKI2-COMMENT
                                    OR    CONS-UNDOKI9-COMMENT
@@ -630,19 +683,6 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
-                     MOVE   3    TO    IDX17
-                     MOVE   SRY-SRYCD(IDX12)
-                                 TO    WRK-SRYCD3
-                   END-IF
-                 END-PERFORM
-             END-IF
-             IF   SRY-SRYCD(IDX12)  =    CONS-KOKYUKI1-COMMENT
-                                   OR    CONS-KOKYUKI2-COMMENT
-                 PERFORM  VARYING  IDX3  FROM  1  BY  1
-                           UNTIL   IDX3   >   31
-                   IF   ACCT-DAY(1 IDX3)  NOT = ZERO
                      MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
                      MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
                      MOVE   4    TO    IDX17
@@ -651,7 +691,8 @@
                    END-IF
                  END-PERFORM
              END-IF
-             IF   SRY-SRYCD(IDX12)  =    CONS-SESSYOKU-COMMENT
+             IF   SRY-SRYCD(IDX12)  =    CONS-KOKYUKI1-COMMENT
+                                   OR    CONS-KOKYUKI2-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
@@ -663,7 +704,7 @@
                    END-IF
                  END-PERFORM
              END-IF
-             IF   SRY-SRYCD(IDX12)  =    CONS-NANBYO-COMMENT
+             IF   SRY-SRYCD(IDX12)  =    CONS-SESSYOKU-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
@@ -675,15 +716,27 @@
                    END-IF
                  END-PERFORM
              END-IF
-             IF   SRY-SRYCD(IDX12)  =    CONS-SYOGAI1-COMMENT
-                                   OR    CONS-SYOGAI2-COMMENT
-                                   OR    CONS-SYOGAI3-COMMENT
+             IF   SRY-SRYCD(IDX12)  =    CONS-NANBYO-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
                      MOVE   1    TO    WRK-RIHASANTEI-FLG(7)
                      MOVE   1    TO    WRK-RIHASANTEI-DAY(7 IDX3)
                      MOVE   7    TO    IDX17
+                     MOVE   SRY-SRYCD(IDX12)
+                                 TO    WRK-SRYCD3
+                   END-IF
+                 END-PERFORM
+             END-IF
+             IF   SRY-SRYCD(IDX12)  =    CONS-SYOGAI1-COMMENT
+                                   OR    CONS-SYOGAI2-COMMENT
+                                   OR    CONS-SYOGAI3-COMMENT
+                 PERFORM  VARYING  IDX3  FROM  1  BY  1
+                           UNTIL   IDX3   >   31
+                   IF   ACCT-DAY(1 IDX3)  NOT = ZERO
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(8)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(8 IDX3)
+                     MOVE   8    TO    IDX17
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -724,9 +777,9 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
-                     MOVE   3    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
+                     MOVE   4    TO    IDX17
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -737,9 +790,9 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
-                     MOVE   4    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
+                     MOVE   5    TO    IDX17
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -779,9 +832,9 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
-                     MOVE   3    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
+                     MOVE   4    TO    IDX17
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -792,9 +845,9 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
-                     MOVE   4    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
+                     MOVE   5    TO    IDX17
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -882,12 +935,12 @@
              END-IF
            END-IF
       *
-      *    ±¿Æ°´ï
+      *    ÇÑÍÑ¾É¸õ·²
            IF   WRK-RIHASANTEI-FLG(3)  =  1
              MOVE      3               TO   IDY
              MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-UNDOKI     TO   WRK-SRYCD
-             MOVE      CONS-UNDOKI-E   TO   WRK-SRYCD2
+             MOVE      CONS-HAIYO      TO   WRK-SRYCD
+             MOVE      CONS-HAIYO-E    TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(3)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -903,12 +956,12 @@
              END-IF
            END-IF
       *
-      *    ¸ÆµÛ´ï
+      *    ±¿Æ°´ï
            IF   WRK-RIHASANTEI-FLG(4)  =  1
              MOVE      4               TO   IDY
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
-             MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-UNDOKI     TO   WRK-SRYCD
+             MOVE      CONS-UNDOKI-E   TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(4)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -924,12 +977,12 @@
              END-IF
            END-IF
       *
-      *    ÀÝ¿©
+      *    ¸ÆµÛ´ï
            IF   WRK-RIHASANTEI-FLG(5)  =  1
              MOVE      5               TO   IDY
              MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-SESSYOKU   TO   WRK-SRYCD
-             MOVE      CONS-SESSYOKU-E TO   WRK-SRYCD2
+             MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
+             MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(5)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -945,12 +998,12 @@
              END-IF
            END-IF
       *
-      *    ÆñÉÂ´µ¼Ô
+      *    ÀÝ¿©
            IF   WRK-RIHASANTEI-FLG(6)  =  1
              MOVE      6               TO   IDY
-             MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-NANBYO     TO   WRK-SRYCD
-             MOVE      CONS-NANBYO-E   TO   WRK-SRYCD2
+             MOVE      ZERO            TO   FLG-COMOKIKAE
+             MOVE      CONS-SESSYOKU   TO   WRK-SRYCD
+             MOVE      CONS-SESSYOKU-E TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(6)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -966,12 +1019,12 @@
              END-IF
            END-IF
       *
-      *    ¾ã³²»ù¡Ê¼Ô¡Ë
+      *    ÆñÉÂ´µ¼Ô
            IF   WRK-RIHASANTEI-FLG(7)  =  1
              MOVE      7               TO   IDY
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-SYOGAI     TO   WRK-SRYCD
-             MOVE      CONS-SYOGAI-E   TO   WRK-SRYCD2
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-NANBYO     TO   WRK-SRYCD
+             MOVE      CONS-NANBYO-E   TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(7)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -984,6 +1037,27 @@
                PERFORM 2202-RIHAKAISHI-COMMENT-SEC
                MOVE    WRK-RIHASANTEI-SRYCD-TBL(7)
                                        TO   LNK-RIHASTDAY-OUT-OCC3(7)
+             END-IF
+           END-IF
+      *
+      *    ¾ã³²»ù¡Ê¼Ô¡Ë
+           IF   WRK-RIHASANTEI-FLG(8)  =  1
+             MOVE      8               TO   IDY
+             MOVE      ZERO            TO   FLG-COMOKIKAE
+             MOVE      CONS-SYOGAI     TO   WRK-SRYCD
+             MOVE      CONS-SYOGAI-E   TO   WRK-SRYCD2
+             MOVE      WRK-RIHASANTEI-DAY-TBL(8)
+                                       TO   TBL-HASSYO-TAIHI-DAY-T
+             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+             IF   FLG-HKNCOMBI-SET  =  1
+               MOVE    LNK-RIHASTDAY-HKNCOMBI
+                                       TO   WRK-RIHA-HKNCOMBI
+             END-IF
+             PERFORM   2201-RIHAKAISHI-HANTEI-SEC
+             IF   FLG-KYUSEI-COMMENT  =  1
+               PERFORM 2202-RIHAKAISHI-COMMENT-SEC
+               MOVE    WRK-RIHASANTEI-SRYCD-TBL(8)
+                                       TO   LNK-RIHASTDAY-OUT-OCC3(8)
              END-IF
            END-IF
       *
@@ -1624,6 +1698,33 @@
                WHEN       3
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
+                     MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE  "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    23   TO  IDC1
+                     MOVE    29   TO  IDC2
+                     MOVE    35   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       1
+                     MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE  "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¼ê½Ñ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    23   TO  IDC1
+                     MOVE    29   TO  IDC2
+                     MOVE    35   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       2
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                 MOVE  "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§µÞÀ­Áý°­¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                 END-EVALUATE
+               WHEN       4
+                 EVALUATE   FLG-COMOKIKAE2
+                   WHEN       0
                      MOVE    18   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                      MOVE  "±¿Æ°´ï¥ê¥Ï¡§È¯¾É¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                                   TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1648,7 +1749,7 @@
                      MOVE    35   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       4
+               WHEN       5
                  MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "¸ÆµÛ´ï¥ê¥Ï¡§¼£ÎÅ³«»Ï¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1656,7 +1757,7 @@
                  MOVE    29   TO  IDC2
                  MOVE    35   TO  IDC3
                  PERFORM 220221-RIHA-COM-DATE-SEC
-               WHEN       5
+               WHEN       6
                  MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "ÀÝ¿©µ¡Ç½ÎÅË¡¡§¼£ÎÅ³«»Ï¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1664,7 +1765,7 @@
                  MOVE    31   TO  IDC2
                  MOVE    37   TO  IDC3
                  PERFORM 220221-RIHA-COM-DATE-SEC
-               WHEN       6
+               WHEN       7
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
                      MOVE    19   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
@@ -1691,7 +1792,7 @@
                      MOVE    37   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       7
+               WHEN       8
                  MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¡§È¯¾É¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)

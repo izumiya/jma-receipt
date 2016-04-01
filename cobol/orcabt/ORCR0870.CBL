@@ -650,6 +650,8 @@
            03  CONS-SYOGAI          PIC X(09) VALUE "099800171".
       *    摂食療法開始日
            03  CONS-SESSYOKU        PIC X(09) VALUE "099800151".
+      *    廃用症候群リハ開始日
+           03  CONS-HAIYO           PIC X(09) VALUE "099800191".
       *
       *    心大リハ終了日
            03  CONS-SINDAI-E        PIC X(09) VALUE "099800112".
@@ -665,6 +667,8 @@
            03  CONS-SYOGAI-E        PIC X(09) VALUE "099800172".
       *    摂食療法終了日
            03  CONS-SESSYOKU-E      PIC X(09) VALUE "099800152".
+      *    廃用症候群リハ開始日
+           03  CONS-HAIYO-E         PIC X(09) VALUE "099800192".
       *
       *    心大血管疾患リハビリテーション医学管理料（１）
            03  CONS-SINDAI-IGAKU1   PIC X(09) VALUE "180029910".
@@ -771,6 +775,7 @@
            03  TBL-HASSYO-NANBYO-COMMENT    PIC 9(01).
            03  TBL-HASSYO-SYOGAI-COMMENT    PIC 9(01).
            03  TBL-HASSYO-SESSYOKU-COMMENT  PIC 9(01).
+           03  TBL-HASSYO-HAIYO-COMMENT     PIC 9(01).
       *
            03  TBL-HASSYO-SINDAI-DAY-T.
                05  TBL-HASSYO-SINDAI-DAY-OCC      OCCURS  31.
@@ -793,6 +798,9 @@
            03  TBL-HASSYO-SESSYOKU-DAY-T.
                05  TBL-HASSYO-SESSYOKU-DAY-OCC    OCCURS  31.
                    07  TBL-HASSYO-SESSYOKU-SANTEI PIC 9(01).
+           03  TBL-HASSYO-HAIYO-DAY-T.
+               05  TBL-HASSYO-HAIYO-DAY-OCC       OCCURS  31.
+                   07  TBL-HASSYO-HAIYO-SANTEI    PIC 9(01).
            03  TBL-HASSYO-TAIHI-DAY-T.
                05  TBL-HASSYO-TAIHI-DAY-OCC       OCCURS  31.
                    07  TBL-HASSYO-TAIHI-SANTEI    PIC 9(01).
@@ -1267,6 +1275,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                              END-IF
                             END-PERFORM
                          END-IF
+                         IF  RECE84-HAIYO-COMMENT       =  "1"
+                            MOVE   1   TO  TBL-HASSYO-HAIYO-COMMENT
+                            PERFORM  VARYING  IDX1  FROM  1  BY  1
+                                      UNTIL   IDX1   >   31
+                             IF   RECE84-KAISU(1 IDX1)  NOT = ZERO
+                              MOVE 1 TO TBL-HASSYO-HAIYO-SANTEI(IDX1)
+                             END-IF
+                            END-PERFORM
+                         END-IF
                    WHEN      "90"
                    WHEN      "92"
                          IF  (RECE82-CYOJKSNFLG  NOT = SPACE     )
@@ -1344,6 +1361,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                                       UNTIL   IDX1   >   31
                              IF   RECE84-KAISU(1 IDX1)  NOT = ZERO
                               MOVE 1 TO TBL-HASSYO-SESSYOKU-SANTEI(IDX1)
+                             END-IF
+                            END-PERFORM
+                         END-IF
+                         IF  RECE84-HAIYO-COMMENT       =  "1"
+                            MOVE   1   TO  TBL-HASSYO-HAIYO-COMMENT
+                            PERFORM  VARYING  IDX1  FROM  1  BY  1
+                                      UNTIL   IDX1   >   31
+                             IF   RECE84-KAISU(1 IDX1)  NOT = ZERO
+                              MOVE 1 TO TBL-HASSYO-HAIYO-SANTEI(IDX1)
                              END-IF
                             END-PERFORM
                          END-IF
@@ -2032,6 +2058,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                                            TO   TBL-HASSYO-TAIHI-DAY-T
                 PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
            END-IF
+      ***
+           IF   TBL-HASSYO-HAIYO-COMMENT    =  1
+                MOVE      1                TO   FLG-COMOKIKAE
+                MOVE      CONS-HAIYO       TO   WRK-SRYCD
+                MOVE      CONS-HAIYO-E     TO   WRK-SRYCD2
+                MOVE      TBL-HASSYO-HAIYO-DAY-T
+                                           TO   TBL-HASSYO-TAIHI-DAY-T
+                PERFORM   20011-RIHABIRIHASSYO-HANTEI-SEC
+           END-IF
       *
            .
        2001-HASSYO-HANTEI-EXT.
@@ -2486,7 +2521,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                MOVE    27   TO  IDC2
                MOVE    33   TO  IDC3
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
-               COMPUTE WRK-ZAINUM    =    99998000
+               COMPUTE WRK-ZAINUM    =    99980000
                                      +   (IDX16 + 31)
                MOVE    "40" TO  WRK-SRYKBN
              WHEN       CONS-SINDAI
@@ -2498,9 +2533,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                MOVE    41   TO  IDC3
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
-                 MOVE    99998201      TO   WRK-ZAINUM
+                 MOVE    99980201      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99998200
+                 COMPUTE WRK-ZAINUM    =    99980200
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2544,9 +2579,55 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
-                 MOVE    99998401      TO   WRK-ZAINUM
+                 MOVE    99980401      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99998400
+                 COMPUTE WRK-ZAINUM    =    99980400
+                                       +   (IDX16 + 31)
+               END-IF
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
+                    MOVE    "80" TO  WRK-SRYKBN
+               ELSE
+                 EVALUATE  WRK-PARA-JIBAIPRTKBN
+                  WHEN     "0"
+                    MOVE    "40" TO  WRK-SRYKBN
+                    MOVE    "1"  TO  WRK-OKIKAEFLG
+                  WHEN     "1"
+                  WHEN     "2"
+                    MOVE    "80" TO  WRK-SRYKBN
+                 END-EVALUATE
+               END-IF
+             WHEN       CONS-HAIYO
+               EVALUATE   FLG-COMOKIKAE2
+                 WHEN       0
+                   MOVE    20  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                   MOVE    "廃用症候群リハ：診断　　　年　　月　　日"
+                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+                   MOVE    23  TO  IDC1
+                   MOVE    29  TO  IDC2
+                   MOVE    35  TO  IDC3
+                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
+                 WHEN       1
+                   MOVE    20  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                   MOVE    "廃用症候群リハ：手術　　　年　　月　　日"
+                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+                   MOVE    23  TO  IDC1
+                   MOVE    29  TO  IDC2
+                   MOVE    35  TO  IDC3
+                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
+                 WHEN       2
+                   MOVE    22  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                   MOVE
+                       "廃用症候群リハ：急性増悪　　　年　　月　　日"
+                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+                   MOVE    27  TO  IDC1
+                   MOVE    33  TO  IDC2
+                   MOVE    39  TO  IDC3
+                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
+               END-EVALUATE
+               IF      FLG-RIHA      =  1
+                 MOVE    99980601      TO   WRK-ZAINUM
+               ELSE
+                 COMPUTE WRK-ZAINUM    =    99980600
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2589,9 +2670,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
-                 MOVE    99998601      TO   WRK-ZAINUM
+                 MOVE    99980801      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99998600
+                 COMPUTE WRK-ZAINUM    =    99980800
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2615,9 +2696,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                MOVE    35   TO  IDC3
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
-                 MOVE    99998801      TO   WRK-ZAINUM
+                 MOVE    99981001      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99998800
+                 COMPUTE WRK-ZAINUM    =    99981000
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2641,9 +2722,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                MOVE    37   TO  IDC3
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
-                 MOVE    99999001      TO   WRK-ZAINUM
+                 MOVE    99981201      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99999000
+                 COMPUTE WRK-ZAINUM    =    99981200
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2686,9 +2767,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
-                 MOVE    99999201      TO   WRK-ZAINUM
+                 MOVE    99981401      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99999200
+                 COMPUTE WRK-ZAINUM    =    99981400
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
@@ -2712,9 +2793,9 @@ grpsys        PERFORM  900-DBSELECT-SEC
                MOVE    37   TO  IDC3
                PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                IF      FLG-RIHA      =  1
-                 MOVE    99999401      TO   WRK-ZAINUM
+                 MOVE    99981601      TO   WRK-ZAINUM
                ELSE
-                 COMPUTE WRK-ZAINUM    =    99999400
+                 COMPUTE WRK-ZAINUM    =    99981600
                                        +   (IDX16 + 31)
                END-IF
                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"

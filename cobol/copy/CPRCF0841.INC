@@ -21,6 +21,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-門脇    14/04/07  改正対応項目追加
+      *  04.08.01    NACL-門脇    16/03/31  平成２８年４月改正対応
       ************************************************************
       *01  RECE841-REC.
            03  RECE841-KEY.
@@ -120,6 +121,8 @@
                05  RECE841-SYOGAI-COMMENT      PIC  X(01).
       *リハビリ（摂食）
                05  RECE841-SESSYOKU-COMMENT    PIC  X(01).
+      *リハビリ（廃用症候群）
+               05  RECE841-HAIYO-COMMENT       PIC  X(01).
       *介達牽引
                05  RECE841-KAITATU-COMMENT     PIC  X(01).
       *

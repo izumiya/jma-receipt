@@ -2227,6 +2227,20 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    ÀÝ¿©µ¡Ç½ÎÅË¡
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡Ê£±Ã±°Ì¡Ë
+           03  CONS-HAIYO1-COMMENT   PIC X(09)  VALUE  "180044610".
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡Ê£±Ã±°Ì¡Ë
+           03  CONS-HAIYO2-COMMENT   PIC X(09)  VALUE  "180044710".
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡Ê£±Ã±°Ì¡Ë
+           03  CONS-HAIYO3-COMMENT   PIC X(09)  VALUE  "180044810".
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-HAIYO4-COMMENT   PIC X(09)  VALUE  "180044910".
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-HAIYO5-COMMENT   PIC X(09)  VALUE  "180045110".
+      *    ÇÑÍÑ¾É¸õ·²¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦Æþ±¡¡Ë
+           03  CONS-HAIYO6-COMMENT   PIC X(09)  VALUE  "180045310".
+      *
       *    ¤¬¤ó´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    ²ðÃ£¸£°ú
@@ -8398,6 +8412,12 @@
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
+                                            CONS-HAIYO1-COMMENT   OR
+                                            CONS-HAIYO2-COMMENT   OR
+                                            CONS-HAIYO3-COMMENT   OR
+                                            CONS-HAIYO4-COMMENT   OR
+                                            CONS-HAIYO5-COMMENT   OR
+                                            CONS-HAIYO6-COMMENT   OR
                                             CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE62-COMCNTFLG
                         MOVE   "1"    TO    RECE64-RIHABIRI-COMMENT
@@ -8531,6 +8551,21 @@
                                   UNTIL   IDX16   >   31
                          IF  RECE64-KAISU(1 IDX16) NOT = ZERO
                           MOVE  1  TO  RECE62-RIHA-SESSYOKU(IDX1 IDX16)
+                         END-IF
+                        END-PERFORM
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-HAIYO1-COMMENT
+                                      OR    CONS-HAIYO2-COMMENT
+                                      OR    CONS-HAIYO3-COMMENT
+                                      OR    CONS-HAIYO4-COMMENT
+                                      OR    CONS-HAIYO5-COMMENT
+                                      OR    CONS-HAIYO6-COMMENT
+                        MOVE   "1"    TO    RECE62-COMCNTFLG
+                        MOVE   "1"    TO    RECE64-HAIYO-COMMENT
+                        PERFORM  VARYING  IDX16  FROM  1  BY  1
+                                  UNTIL   IDX16   >   31
+                         IF  RECE64-KAISU(1 IDX16) NOT = ZERO
+                          MOVE  1  TO  RECE62-RIHA-HAIYO(IDX1 IDX16)
                          END-IF
                         END-PERFORM
                 END-IF

@@ -1185,6 +1185,26 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
+      *
+      *    廃用症候群リハビリテーション料（１）（１単位）
+           03  CONS-HAIYO1-COMMENT   PIC X(09)  VALUE  "180044610".
+      *    廃用症候群リハビリテーション料（２）（１単位）
+           03  CONS-HAIYO2-COMMENT   PIC X(09)  VALUE  "180044710".
+      *    廃用症候群リハビリテーション料（３）（１単位）
+           03  CONS-HAIYO3-COMMENT   PIC X(09)  VALUE  "180044810".
+      *    廃用症候群リハビリテーション料（１）（要介護・入院外）
+           03  CONS-HAIYO4-COMMENT   PIC X(09)  VALUE  "180045010".
+      *    廃用症候群リハビリテーション料（２）（要介護・入院外）
+           03  CONS-HAIYO5-COMMENT   PIC X(09)  VALUE  "180045210".
+      *    廃用症候群リハビリテーション料（３）（要介護・入院外）
+           03  CONS-HAIYO6-COMMENT   PIC X(09)  VALUE  "180045410".
+      *    廃用症候群リハビリテーション料１（要介護）基準不適合
+           03  CONS-HAIYO7-COMMENT   PIC X(09)  VALUE  "180045530".
+      *    廃用症候群リハビリテーション料２（要介護）基準不適合
+           03  CONS-HAIYO8-COMMENT   PIC X(09)  VALUE  "180045630".
+      *    廃用症候群リハビリテーション料３（要介護）基準不適合
+           03  CONS-HAIYO9-COMMENT   PIC X(09)  VALUE  "180045730".
+      *
       *    がん患者リハビリテーション料
            03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    介達牽引
@@ -4555,6 +4575,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
+                                            CONS-HAIYO1-COMMENT   OR
+                                            CONS-HAIYO2-COMMENT   OR
+                                            CONS-HAIYO3-COMMENT   OR
+                                            CONS-HAIYO4-COMMENT   OR
+                                            CONS-HAIYO5-COMMENT   OR
+                                            CONS-HAIYO6-COMMENT   OR
+                                            CONS-HAIYO7-COMMENT   OR
+                                            CONS-HAIYO8-COMMENT   OR
+                                            CONS-HAIYO9-COMMENT   OR
                                             CONS-GANKNJ-COMMENT
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
@@ -4727,6 +4756,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 IF   SRY-SRYCD(IDX2)  =     CONS-SESSYOKU-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SESSYOKU-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-HAIYO1-COMMENT
+                                      OR    CONS-HAIYO2-COMMENT
+                                      OR    CONS-HAIYO3-COMMENT
+                                      OR    CONS-HAIYO4-COMMENT
+                                      OR    CONS-HAIYO5-COMMENT
+                                      OR    CONS-HAIYO6-COMMENT
+                                      OR    CONS-HAIYO7-COMMENT
+                                      OR    CONS-HAIYO8-COMMENT
+                                      OR    CONS-HAIYO9-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-HAIYO-COMMENT
                 END-IF
               END-IF
       *
