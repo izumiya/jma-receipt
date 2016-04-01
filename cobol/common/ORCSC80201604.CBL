@@ -2456,10 +2456,10 @@
       *
            IF      SPA-SRYYMD          <   WRK-SYOYMD3
       *        £²Ç¯Ì¤Ëþ¤Ç¤¢¤ì¤Ð¡¢»ÜÀß´ð½à¤ÎÈ½Äê
-      *???     PERFORM 10011321-GAIRI-SEISINCHK-SEC
+               PERFORM 10011321-GAIRI-SEISINCHK-SEC
       *        £±£¶ºÐÌ¤Ëþ¤Ç»ÜÀß´ð½à¤¢¤ê
                IF    (LNK-ORCSC-NENREI-YY  <   16   )
-      *??       AND  (FLG-NENREI           =   1    )
+                AND  (FLG-NENREI           =   1    )
                    MOVE    2               TO  FLG-NENREI2
                END-IF
            END-IF

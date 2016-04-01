@@ -622,7 +622,7 @@
       *    リハビリ初回
            MOVE    SPACE               TO  SPA-RIGAKU-INIT
       *    リハビリ算定回数
-           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:15)
+           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:19)
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE      )   OR
