@@ -1003,9 +1003,18 @@
            IF     (LNK-SC92-SRYCD(1:1) =   "1" )  OR
                   (LNK-SC92-SRYCD(1:1) =   "7" )
              OR   (LNK-SC92-SRYCD(1:3) =   "059" )
+      *H28.4
+      *        セット登録で患者指定なしは、年齢チェックなし
+               IF     (LNK-SC92-PG         =   "K05" )
+                 AND  (SPA-PTID            =   ZERO  )
+                   CONTINUE
+               ELSE
+      *!
                MOVE    TNS-KGNAGE          TO  WRK-TNS-KGNAGE
                MOVE    TNS-JGNAGE          TO  WRK-TNS-JGNAGE
                PERFORM 2003-NENREI-CHK-SEC
+           END-IF
+      *
            END-IF
       *
       *    病床数チェック
