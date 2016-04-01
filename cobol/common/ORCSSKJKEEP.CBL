@@ -698,12 +698,18 @@
            END-PERFORM
       *
            DISPLAY  "WRK-SYSYYK-RRKNUM(1) = " WRK-SYSYYK-RRKNUM(1)
+           DISPLAY  "WRK-SYSYYK-NYUINYMD(1)= " WRK-SYSYYK-NYUINYMD(1)
+           DISPLAY  "WRK-SYSYYK-TAIINYMD(1)= " WRK-SYSYYK-TAIINYMD(1)
            DISPLAY  "WRK-SYSYYK-RRKNUM(2) = " WRK-SYSYYK-RRKNUM(2)
+           DISPLAY  "WRK-SYSYYK-NYUINYMD(2)= " WRK-SYSYYK-NYUINYMD(2)
+           DISPLAY  "WRK-SYSYYK-TAIINYMD(2)= " WRK-SYSYYK-TAIINYMD(2)
            DISPLAY  "WRK-SYSYYK-RRKNUM(3) = " WRK-SYSYYK-RRKNUM(3)
+           DISPLAY  "WRK-SYSYYK-NYUINYMD(3)= " WRK-SYSYYK-NYUINYMD(3)
+           DISPLAY  "WRK-SYSYYK-TAIINYMD(3)= " WRK-SYSYYK-TAIINYMD(3)
       *
            PERFORM    VARYING    IDX    FROM  1   BY  1
              UNTIL    (IDX    >   20)   OR
-                      (WRK-SYSYYK-RRKNUM(IDX)  =  SPACE)
+                      (WRK-SYSYYK-RRKNUM(IDX)  =  ZERO)
                 IF  (WRK-SYSYYK-NYUINYM(IDX) <=  LNK-SKJKEEP-SANTEIYM)
                 AND (WRK-SYSYYK-TAIINYM(IDX) >=  LNK-SKJKEEP-SANTEIYM)
                   IF   WRK-SYSYYK-NYUINYM(IDX) <  LNK-SKJKEEP-SANTEIYM
@@ -719,9 +725,9 @@
                       MOVE    WRK-SYSYYK-TAIINDD(IDX)    TO    IDX-ED
                   END-IF
       *
-                  PERFORM    VARYING    IDX    FROM  IDX-ST   BY  1
-                    UNTIL    (IDX    >   IDX-ED)
-                        MOVE   "2"      TO    LNK-SKJKEEP-KBN(IDX)
+                  PERFORM    VARYING    IDX1    FROM  IDX-ST   BY  1
+                    UNTIL    (IDX1   >   IDX-ED)
+                        MOVE   "2"      TO    LNK-SKJKEEP-KBN(IDX1)
                   END-PERFORM
                 END-IF
            END-PERFORM
