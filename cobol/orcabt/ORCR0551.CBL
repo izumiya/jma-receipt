@@ -647,10 +647,14 @@
       *
       *    心臓ペースメーカー指導管理料（遠隔モニタリング）
            03  CONS-SINPESU         PIC X(09) VALUE "113001510".
+      *    心臓ペースメーカー指導管理料（イ以外）
+           03  CONS-SINPESU2        PIC X(09) VALUE "113001610".
       *    認知療法・認知行動療法
            03  CONS-NINRYO          PIC X(09) VALUE "180033210".
       *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
            03  CONS-NINRYO2         PIC X(09) VALUE "180035910".
+      *    認知療法・認知行動療法（精神保健指定医と看護師が共同で行う場合）
+           03  CONS-NINRYO5         PIC X(09) VALUE "180047810".
       *
       *    認知症専門診断管理料２
            03  CONS-NINSEN          PIC X(09) VALUE "113014610".
@@ -4739,7 +4743,11 @@
              INITIALIZE                      SANTEI-REC
              MOVE    RECE41-HOSPNUM      TO  SANTEI-HOSPNUM
              MOVE    RECE41-PTID         TO  SANTEI-PTID
-             MOVE    CONS-SINPESU        TO  SANTEI-SRYCD
+             IF   RECE41-SRYYM    >=     "201604"
+               MOVE  CONS-SINPESU2       TO  SANTEI-SRYCD
+             ELSE
+               MOVE  CONS-SINPESU        TO  SANTEI-SRYCD
+             END-IF
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
              MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
@@ -7392,11 +7400,14 @@
                MOVE    RECE44-HOSPNUM       TO  SANTEI-HOSPNUM
                MOVE    RECE44-PTID          TO  SANTEI-PTID
                MOVE    RECE44-SRYYM         TO  SANTEI-SRYYM
-               IF  RECE44-FLG-NINRYO-COMMENT  =    "1"
-                 MOVE  CONS-NINRYO          TO  SANTEI-SRYCD
-               ELSE
-                 MOVE  CONS-NINRYO2         TO  SANTEI-SRYCD
-               END-IF
+               EVALUATE  RECE44-FLG-NINRYO-COMMENT
+                 WHEN      "1"
+                   MOVE  CONS-NINRYO        TO  SANTEI-SRYCD
+                 WHEN      "2"
+                   MOVE  CONS-NINRYO2       TO  SANTEI-SRYCD
+                 WHEN      "5"
+                   MOVE  CONS-NINRYO5       TO  SANTEI-SRYCD
+               END-EVALUATE
                MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                 TO  SANTEI-SRYKA
                MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
@@ -9550,11 +9561,11 @@
                           "180034210" OR "180034310" OR "180034410" OR
                           "180034510" OR "180034610" OR "180034710" OR
       *17
-                          "113001510" OR
+                          "113001510" OR "113001610" OR
       *18
                           "113003410" OR
       *19
-                          "180033210" OR "180035910" OR
+                          "180033210" OR "180035910" OR "180047810" OR
       *20
                           "700010000" OR "700030000" OR "700050000" OR
                           "700080000" OR "700110000" OR "700140000" OR

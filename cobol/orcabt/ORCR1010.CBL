@@ -1082,6 +1082,8 @@
       *
       *    ¿´Â¡¥Ú¡¼¥¹¥á¡¼¥«¡¼»ØÆ³´ÉÍýÎÁ¡Ê±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°¡Ë
            03  CONS-SINPESU-COMMENT  PIC X(09)  VALUE  "113001510".
+      *    ±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°²Ã»»
+           03  CONS-SINPESU2-COMMENT PIC X(09)  VALUE  "113018070".
       *    ½¸ÃÄ±ÉÍÜ¿©»ö»ØÆ³ÎÁ
            03  CONS-SYUEIYO-COMMENT  PIC X(09)  VALUE  "113003410".
       *    ¿Í¹©¿ÕÂ¡¡Ê¤½¤ÎÂ¾¡Ë
@@ -1126,6 +1128,8 @@
            03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿À²ÊµßµÞÂÎÀ©¤ÎÀº¿ÀÊÝ·ò»ØÄê°å¡Ë
            03  CONS-NINRYO2-COMMENT  PIC X(09)  VALUE  "180035910".
+      *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿ÀÊÝ·ò»ØÄê°å¤È´Ç¸î»Õ¤¬¶¦Æ±¤Ç¹Ô¤¦¾ì¹ç¡Ë
+           03  CONS-NINRYO5-COMMENT  PIC X(09)  VALUE  "180047810".
       *
       *    Ç§ÃÎ¾ÉÀìÌç¿ÇÃÇ´ÉÍýÎÁ£²
            03  CONS-NINSEN-COMMENT   PIC X(09)  VALUE  "113014610".
@@ -3477,6 +3481,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO2-COMMENT
                         MOVE   "2"    TO    RECE120-FLG-NINRYO-COMMENT
                 END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO5-COMMENT
+                        MOVE   "5"    TO    RECE120-FLG-NINRYO-COMMENT
+                END-IF
               END-IF
       *       ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
               IF   RECE100-SRYYM     >=    "201404"
@@ -3609,6 +3616,13 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-GANSIDO2-COMMENT
                    MOVE   "2"   TO    RECE120-FLG-GANSIDO-COMMENT
+                END-IF
+              END-IF
+      *
+      *       ±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°²Ã»»
+              IF   RECE100-SRYYM    >=     "201604"
+                IF   SRY-SRYCD(IDX2) =  CONS-SINPESU2-COMMENT
+                   MOVE   "1"   TO    RECE120-FLG-SINPESU-COMMENT
                 END-IF
               END-IF
            END-IF
