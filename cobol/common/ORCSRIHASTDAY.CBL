@@ -1548,11 +1548,20 @@
                                  MOVE  ZERO  TO  WK-FREE-YUKOKETA(IDZ)
                                  COMPUTE  IDZ  =  IDZ - 1
                               END-IF
+                            WHEN     "840000058"
+                              IF   FLG-COMOKIKAE2 = ZERO
+                                 MOVE    3   TO  FLG-COMOKIKAE2
+                                 MOVE  SPACE TO  WK-FREE-SRYCD(IDZ)
+                                 MOVE  SPACE TO  WK-FREE-NAME(IDZ)
+                                 MOVE  ZERO  TO  WK-FREE-YUKOKETA(IDZ)
+                                 COMPUTE  IDZ  =  IDZ - 1
+                              END-IF
                           END-EVALUATE
                        END-IF
                        IF   FLG-COMOKIKAE  =   1
                           IF  SRY-SRYCD(IDX12) = "840000042" OR
-                                                 "840000101"
+                                                 "840000101" OR
+                                                 "840000058"
                             MOVE    1        TO  FLG-COMARI2
                           ELSE
                             MOVE    1        TO  FLG-COMARI
@@ -1632,6 +1641,15 @@
                            COMPUTE  IDZ  =  IDZ - 1
                         END-IF
                       END-IF
+                      IF   SANTEIPLUS-COMMENT(1:8)  = "¿ÇÃÇ¡¡Æü"
+                        IF   FLG-COMOKIKAE2 = ZERO
+                           MOVE    3    TO  FLG-COMOKIKAE2
+                           MOVE  SPACE  TO  WK-FREE-SRYCD(IDZ)
+                           MOVE  SPACE  TO  WK-FREE-NAME(IDZ)
+                           MOVE  ZERO   TO  WK-FREE-YUKOKETA(IDZ)
+                           COMPUTE  IDZ  =  IDZ - 1
+                        END-IF
+                      END-IF
                      END-IF
                     END-IF
                   END-IF
@@ -1694,20 +1712,22 @@
                      MOVE    35   TO  IDC2
                      MOVE    41   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       3
+                     MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE  "Ç¾·ì´É¼À´µÅù¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    25   TO  IDC1
+                     MOVE    31   TO  IDC2
+                     MOVE    37   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
                WHEN       3
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
+                   WHEN       1
+                   WHEN       3
                      MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                      MOVE  "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
-                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
-                     MOVE    23   TO  IDC1
-                     MOVE    29   TO  IDC2
-                     MOVE    35   TO  IDC3
-                     PERFORM 220221-RIHA-COM-DATE-SEC
-                   WHEN       1
-                     MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
-                     MOVE  "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¼ê½Ñ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                                   TO  LNK-RIHASTDAY-COM(IDY IDX)
                      MOVE    23   TO  IDC1
                      MOVE    29   TO  IDC2
@@ -1748,6 +1768,14 @@
                      MOVE    29   TO  IDC2
                      MOVE    35   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       3
+                     MOVE    18   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE  "±¿Æ°´ï¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    19   TO  IDC1
+                     MOVE    25   TO  IDC2
+                     MOVE    31   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
                WHEN       5
                  MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
@@ -1768,6 +1796,7 @@
                WHEN       7
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
+                   WHEN       3
                      MOVE    19   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                      MOVE  "ÆñÉÂ´µ¼Ô¥ê¥Ï¡§È¯¾É¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                                   TO  LNK-RIHASTDAY-COM(IDY IDX)

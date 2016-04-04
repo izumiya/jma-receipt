@@ -2316,11 +2316,19 @@ grpsys        PERFORM  900-DBSELECT-SEC
                                  MOVE  ZERO   TO  WK-FREE-YUKOKETA(IDZ)
                                  COMPUTE  IDZ  =  IDZ - 1
                               END-IF
+                            WHEN     "840000058"
+                              IF   FLG-COMOKIKAE2 = ZERO
+                                 MOVE    3    TO  FLG-COMOKIKAE2
+                                 MOVE  SPACE  TO  WK-FREE-NAME(IDZ)
+                                 MOVE  ZERO   TO  WK-FREE-YUKOKETA(IDZ)
+                                 COMPUTE  IDZ  =  IDZ - 1
+                              END-IF
                           END-EVALUATE
                        END-IF
                        IF   FLG-COMOKIKAE  =   1
                           IF  SRY-SRYCD(IDX12) = "840000042" OR
-                                                 "840000101"
+                                                 "840000101" OR
+                                                 "840000058"
                             MOVE    1    TO   FLG-COMARI2
                           ELSE
                             MOVE    1    TO   FLG-COMARI
@@ -2390,6 +2398,14 @@ grpsys        PERFORM  900-DBSELECT-SEC
                       IF   SANTEIPLUS-COMMENT(1:12) = "µÞÀ­Áý°­¡¡Æü"
                         IF   FLG-COMOKIKAE2 = ZERO
                            MOVE    2    TO  FLG-COMOKIKAE2
+                           MOVE  SPACE  TO  WK-FREE-NAME(IDZ)
+                           MOVE  ZERO   TO  WK-FREE-YUKOKETA(IDZ)
+                           COMPUTE  IDZ  =  IDZ - 1
+                        END-IF
+                      END-IF
+                      IF   SANTEIPLUS-COMMENT(1:8) = "¿ÇÃÇ¡¡Æü"
+                        IF   FLG-COMOKIKAE2 = ZERO
+                           MOVE    3    TO  FLG-COMOKIKAE2
                            MOVE  SPACE  TO  WK-FREE-NAME(IDZ)
                            MOVE  ZERO   TO  WK-FREE-YUKOKETA(IDZ)
                            COMPUTE  IDZ  =  IDZ - 1
@@ -2577,6 +2593,14 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    MOVE    35  TO  IDC2
                    MOVE    41  TO  IDC3
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
+                 WHEN       3
+                   MOVE    21  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                   MOVE    "Ç¾·ì´É¼À´µÅù¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+                   MOVE    25  TO  IDC1
+                   MOVE    31  TO  IDC2
+                   MOVE    37  TO  IDC3
+                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
                  MOVE    99980401      TO   WRK-ZAINUM
@@ -2599,16 +2623,10 @@ grpsys        PERFORM  900-DBSELECT-SEC
              WHEN       CONS-HAIYO
                EVALUATE   FLG-COMOKIKAE2
                  WHEN       0
+                 WHEN       1
+                 WHEN       3
                    MOVE    20  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
                    MOVE    "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
-                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
-                   MOVE    23  TO  IDC1
-                   MOVE    29  TO  IDC2
-                   MOVE    35  TO  IDC3
-                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
-                 WHEN       1
-                   MOVE    20  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
-                   MOVE    "ÇÑÍÑ¾É¸õ·²¥ê¥Ï¡§¼ê½Ñ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                                TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
                    MOVE    23  TO  IDC1
                    MOVE    29  TO  IDC2
@@ -2667,6 +2685,14 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    MOVE    23  TO  IDC1
                    MOVE    29  TO  IDC2
                    MOVE    35  TO  IDC3
+                   PERFORM 200111-HASSYO-COMMENT-DATE-SEC
+                 WHEN       3
+                   MOVE    18  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                   MOVE    "±¿Æ°´ï¥ê¥Ï¡§¿ÇÃÇ¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                               TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+                   MOVE    19  TO  IDC1
+                   MOVE    25  TO  IDC2
+                   MOVE    31  TO  IDC3
                    PERFORM 200111-HASSYO-COMMENT-DATE-SEC
                END-EVALUATE
                IF      FLG-RIHA      =  1
@@ -2742,6 +2768,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
              WHEN       CONS-NANBYO
                EVALUATE   FLG-COMOKIKAE2
                  WHEN       0
+                 WHEN       3
                    MOVE    19  TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
                    MOVE    "ÆñÉÂ´µ¼Ô¥ê¥Ï¡§È¯¾É¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
                                TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
