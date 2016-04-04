@@ -900,6 +900,9 @@
       *     (COPY に追加するのは、パッケージ対応で）
            IF      WRK-SRYCD           =   "099800181"
                                        OR  "099800182"
+      *H28.4
+             OR  (WRK-SRYCD(1:7)       =   "0998002"  )
+      *        早期・初期リハ開始日・終了日
       *        がん患者リハ開始日・終了日
                MOVE    1                   TO  FLG-HKNSAN
                MOVE    SPACE               TO  WRK-RIGAKU-RYO

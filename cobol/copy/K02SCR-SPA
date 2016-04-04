@@ -231,7 +231,7 @@ ito   *
       *        リハビリ当月内回数集計
                05  SPA-RIGAKU-NCNT-AREA.
                    07  SPA-RIGAKU-INIT               PIC X(01).
-                   07  SPA-RIGAKU-REC                PIC X(699).
+                   07  SPA-RIGAKU-REC                PIC X(1300).
       *
       *        更新前確認チェック
                05  SPA-MAE-CHKTBL          OCCURS   10.

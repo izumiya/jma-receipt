@@ -364,6 +364,12 @@
       *
       *    外来リハビリ（要介護）施設基準不適合
            03  WRK-ERRCHK              PIC 9(01).
+      *    早期・初期リハビリ開始日
+           03  WRK-KYUSEI-30S          PIC X(08).
+           03  WRK-KYUSEI-7S           PIC X(08).
+           03  WRK-SOUKI-YMD           PIC X(08).
+           03  WRK-CHK-SOUKIYMD        PIC X(08).
+           03  WRK-CHK-RIHA-KBN        PIC X(01).
       *
       *
       *   きざみ値行為再計算用
@@ -396,13 +402,17 @@
                    07  WRK-KYUSEI-ST       PIC X(01).
                    07  WRK-KYUSEI-ED       PIC X(01).
                05  WRK-TEIGEN-IN           PIC X(01).
+      *        早期加算
+               05  WRK-SOUKIK-IN-G         OCCURS   5.
+                   07  WRK-SOUKIK-ST       PIC X(01).
+                   07  WRK-SOUKIK-ED       PIC X(01).
       *    当月算定回数（算定履歴）
            03  WRK-RIHA-DAY-G.
                05  WRK-RIHA-DAY            PIC 9(03)
                                            OCCURS   31.
       *    疾患別今回算定回数
            03  WRK-RIHA-CNT-G.
-               05  WRK-RIHA-CNT-T          OCCURS   4.
+               05  WRK-RIHA-CNT-T          OCCURS   5.
                    07  WRK-RIHA-CNT2       PIC 9(03)
                                            OCCURS   31.
       *    月回数
@@ -423,14 +433,23 @@
            03  WRK-KYUSEI8-CHK             PIC X(01).
            03  WRK-KYUSEI9-YMD             PIC X(08).
            03  WRK-KYUSEI9-CHK             PIC X(01).
-           03  WRK-KYUSEI10-YMD             PIC X(08).
-           03  WRK-KYUSEI10-CHK             PIC X(01).
+      *    早期・初期加算開始日
+           03  WRK-SOUKIK1-YMD             PIC X(08).
+           03  WRK-SOUKIK1-CHK             PIC X(01).
+           03  WRK-SOUKIK2-YMD             PIC X(08).
+           03  WRK-SOUKIK2-CHK             PIC X(01).
+           03  WRK-SOUKIK3-YMD             PIC X(08).
+           03  WRK-SOUKIK3-CHK             PIC X(01).
+           03  WRK-SOUKIK4-YMD             PIC X(08).
+           03  WRK-SOUKIK4-CHK             PIC X(01).
+           03  WRK-SOUKIK9-YMD             PIC X(08).
+           03  WRK-SOUKIK9-CHK             PIC X(01).
       *    逓減対象外
       **** 03  WRK-TEIGEN-GAI              PIC X(08).
       *
       *    通院精神用同日初診
            03  WRK-DOUSYOSIN-AREA.
-               05  WRK-DOUSYOSIN-OCC       OCCURS   10.
+               05  WRK-DOUSYOSIN-OCC       OCCURS   5.
                    07  WRK-DOU-SRYKA       PIC X(02).
                    07  WRK-DOU-SRYYMD      PIC X(08).
       *H26.4
@@ -603,6 +622,7 @@
                INITIALIZE              WRK-RIGAKU-NCNT-AREA
            END-IF
       *
+      *
            EVALUATE    LNK-ORCSC-KBN
       *        剤別　チェック、編集、自動算定
                WHEN    "1"
@@ -752,12 +772,79 @@
            MOVE    "099800191"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-KYUSEI9-YMD
-           IF      WRK-KYUSEI2-YMD NOT =   SPACE
+           IF      WRK-KYUSEI9-YMD NOT =   SPACE
                MOVE    "099800192"         TO  WRK-SRYCD
                PERFORM 10001-KYUSEI-YMD-SEC
                IF      WRK-YMD         NOT =   SPACE
                    IF      WRK-KYUSEI9-YMD     <   WRK-YMD
                        MOVE    SPACE           TO  WRK-KYUSEI9-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    早期初期リハビリテーション
+      *
+           MOVE    "099800211"         TO  WRK-SRYCD
+           PERFORM 10001-RIHA-STRYMD-SEC
+           MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
+           IF      WRK-SOUKIK1-YMD  NOT =   SPACE
+               MOVE    "099800212"         TO  WRK-SRYCD
+               PERFORM 10001-KYUSEI-YMD-SEC
+               IF      WRK-YMD         NOT =   SPACE
+                   IF      WRK-SOUKIK1-YMD     <   WRK-YMD
+                       MOVE    SPACE           TO  WRK-SOUKIK1-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "099800221"         TO  WRK-SRYCD
+           PERFORM 10001-RIHA-STRYMD-SEC
+           MOVE    WRK-YMD             TO  WRK-SOUKIK2-YMD
+           IF      WRK-SOUKIK1-YMD  NOT =   SPACE
+               MOVE    "099800222"         TO  WRK-SRYCD
+               PERFORM 10001-KYUSEI-YMD-SEC
+               IF      WRK-YMD         NOT =   SPACE
+                   IF      WRK-SOUKIK2-YMD     <   WRK-YMD
+                       MOVE    SPACE           TO  WRK-SOUKIK2-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "099800231"         TO  WRK-SRYCD
+           PERFORM 10001-RIHA-STRYMD-SEC
+           MOVE    WRK-YMD             TO  WRK-SOUKIK3-YMD
+           IF      WRK-SOUKIK3-YMD  NOT =   SPACE
+               MOVE    "099800232"         TO  WRK-SRYCD
+               PERFORM 10001-KYUSEI-YMD-SEC
+               IF      WRK-YMD         NOT =   SPACE
+                   IF      WRK-SOUKIK3-YMD     <   WRK-YMD
+                       MOVE    SPACE           TO  WRK-SOUKIK3-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "099800241"         TO  WRK-SRYCD
+           PERFORM 10001-RIHA-STRYMD-SEC
+           MOVE    WRK-YMD             TO  WRK-SOUKIK4-YMD
+           IF      WRK-SOUKIK4-YMD  NOT =   SPACE
+               MOVE    "099800242"         TO  WRK-SRYCD
+               PERFORM 10001-KYUSEI-YMD-SEC
+               IF      WRK-YMD         NOT =   SPACE
+                   IF      WRK-SOUKIK4-YMD     <   WRK-YMD
+                       MOVE    SPACE           TO  WRK-SOUKIK4-YMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "099800291"         TO  WRK-SRYCD
+           PERFORM 10001-RIHA-STRYMD-SEC
+           MOVE    WRK-YMD             TO  WRK-SOUKIK9-YMD
+           IF      WRK-SOUKIK9-YMD  NOT =   SPACE
+               MOVE    "099800292"         TO  WRK-SRYCD
+               PERFORM 10001-KYUSEI-YMD-SEC
+               IF      WRK-YMD         NOT =   SPACE
+                   IF      WRK-SOUKIK9-YMD     <   WRK-YMD
+                       MOVE    SPACE           TO  WRK-SOUKIK9-YMD
                    END-IF
                END-IF
            END-IF
@@ -1188,14 +1275,14 @@
                        MOVE    SPACE           TO  WRK-YMD
                    END-IF
                    PERFORM VARYING     IDX     FROM    1   BY  1
-                           UNTIL      (IDX     >   10  )
+                           UNTIL      (IDX     >   5  )
                                   OR  (WRK-YMD =   SPACE )
                        IF      WRK-DOU-SRYKA (IDX) =   SPACE
                            MOVE    ACCT-SRYKA      TO  WRK-DOU-SRYKA
                                                              (IDX)
                            MOVE    WRK-YMD         TO  WRK-DOU-SRYYMD
                                                              (IDX)
-                           MOVE    10              TO  IDX
+                           MOVE    5               TO  IDX
                        ELSE
                            IF      WRK-DOU-SRYKA (IDX)
                                                    =   ACCT-SRYKA
@@ -1735,6 +1822,122 @@
                        END-IF
                    END-IF
       *
+      *H28.4
+      *   早期・初期リハビリ
+      *        心大血管疾患
+               WHEN    "099800211"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (1)
+               WHEN    "099800212"
+                   MOVE    "1"             TO  WRK-SOUKIK-ED (1)
+                   IF      WRK-SOUKIK1-CHK    =   SPACE
+                       MOVE    "099800211"         TO  WRK-SRYCD
+                        PERFORM 10001-RIHA-STRYMD-SEC
+                       MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
+                       MOVE    "1"                 TO  WRK-SOUKIK1-CHK
+                   END-IF
+                   IF     (WRK-SOUKIK1-YMD     =   SPACE  )  AND
+                          (WRK-SOUKIK-ST (1)   =   SPACE  )
+                       MOVE    "8056"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   ELSE
+                       IF     (WRK-SOUKIK1-YMD     =   SPA-SRYYMD) OR
+                              (WRK-SOUKIK-ST (1)   =   "1"    )
+                           MOVE    "8057"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
+                       END-IF
+                   END-IF
+      *
+      *        脳血管疾患
+               WHEN    "099800221"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (2)
+               WHEN    "099800222"
+                   MOVE    "1"             TO  WRK-SOUKIK-ED (2)
+                   IF      WRK-SOUKIK1-CHK    =   SPACE
+                       MOVE    "099800221"         TO  WRK-SRYCD
+                        PERFORM 10001-RIHA-STRYMD-SEC
+                       MOVE    WRK-YMD             TO  WRK-SOUKIK2-YMD
+                       MOVE    "1"                 TO  WRK-SOUKIK2-CHK
+                   END-IF
+                   IF     (WRK-SOUKIK2-YMD     =   SPACE  )  AND
+                          (WRK-SOUKIK-ST (2)   =   SPACE  )
+                       MOVE    "8058"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   ELSE
+                       IF     (WRK-SOUKIK2-YMD     =   SPA-SRYYMD) OR
+                              (WRK-SOUKIK-ST (2)   =   "1"    )
+                           MOVE    "8059"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
+                       END-IF
+                   END-IF
+      *
+      *        運動器
+               WHEN    "099800231"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (3)
+               WHEN    "099800232"
+                   MOVE    "1"             TO  WRK-SOUKIK-ED (3)
+                   IF      WRK-SOUKIK3-CHK    =   SPACE
+                       MOVE    "099800231"         TO  WRK-SRYCD
+                        PERFORM 10001-RIHA-STRYMD-SEC
+                       MOVE    WRK-YMD             TO  WRK-SOUKIK3-YMD
+                       MOVE    "1"                 TO  WRK-SOUKIK3-CHK
+                   END-IF
+                   IF     (WRK-SOUKIK3-YMD     =   SPACE  )  AND
+                          (WRK-SOUKIK-ST (3)   =   SPACE  )
+                       MOVE    "8060"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   ELSE
+                       IF     (WRK-SOUKIK3-YMD     =   SPA-SRYYMD) OR
+                              (WRK-SOUKIK-ST (3)   =   "1"    )
+                           MOVE    "8061"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
+                       END-IF
+                   END-IF
+      *
+      *        呼吸器
+               WHEN    "099800241"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (4)
+               WHEN    "099800242"
+                   MOVE    "1"             TO  WRK-SOUKIK-ED (4)
+                   IF      WRK-SOUKIK1-CHK    =   SPACE
+                       MOVE    "099800241"         TO  WRK-SRYCD
+                        PERFORM 10001-RIHA-STRYMD-SEC
+                       MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
+                       MOVE    "1"                 TO  WRK-SOUKIK1-CHK
+                   END-IF
+                   IF     (WRK-SOUKIK4-YMD     =   SPACE  )  AND
+                          (WRK-SOUKIK-ST (4)   =   SPACE  )
+                       MOVE    "8062"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   ELSE
+                       IF     (WRK-SOUKIK1-YMD     =   SPA-SRYYMD) OR
+                              (WRK-SOUKIK-ST (4)   =   "1"    )
+                           MOVE    "8063"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
+                       END-IF
+                   END-IF
+      *        廃用症候群
+               WHEN    "099800291"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (5)
+               WHEN    "099800292"
+                   MOVE    "1"             TO  WRK-SOUKIK-ED (5)
+                   IF      WRK-SOUKIK1-CHK    =   SPACE
+                       MOVE    "099800291"         TO  WRK-SRYCD
+                       PERFORM 10001-RIHA-STRYMD-SEC
+                       MOVE    WRK-YMD             TO  WRK-SOUKIK9-YMD
+                       MOVE    "1"                 TO  WRK-SOUKIK9-CHK
+                   END-IF
+                   IF     (WRK-SOUKIK9-YMD     =   SPACE  )  AND
+                          (WRK-SOUKIK-ST (5)   =   SPACE  )
+                       MOVE    "8064"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   ELSE
+                       IF     (WRK-SOUKIK9-YMD     =   SPA-SRYYMD) OR
+                              (WRK-SOUKIK-ST (5)   =   "1"    )
+                           MOVE    "8065"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
+                       END-IF
+                   END-IF
+      *
                WHEN    "099800401"
                    MOVE    "1"                 TO  WRK-TEIGEN-IN
            END-EVALUATE
@@ -1811,8 +2014,12 @@
       *****************************************************************
        20011-RIHAKSN-CHK-SEC                SECTION.
       *
+      *    早期・初期リハビリ加算開始日処理
+           PERFORM 200111-RIHAKSN-DATE-SEC
+      *
+      *
       *    各リハビリ発症日判定
-           IF      WRK-KYUSEI-CHK      =   SPACE
+           IF      WRK-SOUKI-YMD       =   SPACE
                IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)  AND
                       (LNK-ORCSC-KEI-IDX        =   ZERO )
                    MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
@@ -1825,7 +2032,7 @@
                INITIALIZE                      STS-AREA-DAY
                INITIALIZE                      LNK-DAY6-AREA
                MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    WRK-KYUSEI-CHK      TO  LNK-DAY6-KIJUN
+               MOVE    WRK-SOUKI-YMD       TO  LNK-DAY6-KIJUN
                MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
                MOVE    30                  TO  LNK-DAY6-ZOGEN
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
@@ -1837,7 +2044,7 @@
                MOVE    LNK-DAY6-KOYOMI     TO  LNK-DAY2-YMD
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY2-AREA
-               STRING  "発症日の３０日後は"  DELIMITED  BY  SIZE
+               STRING  "起算日の３０日後は"  DELIMITED  BY  SIZE
                        LNK-DAY2-EDTYMD3      DELIMITED  BY  SIZE
                        "です"                DELIMITED  BY  SIZE
                       INTO                 WRK-KYUSEI-30-MSG
@@ -1863,6 +2070,89 @@
            END-IF
            .
        20011-RIHAKSN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    早期・初期リハビリ加算開始日処理
+      *****************************************************************
+       200111-RIHAKSN-DATE-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-SOUKI-YMD
+           MOVE    SPACE               TO  WRK-CHK-SOUKIYMD
+      *    早期・初期開始日
+           EVALUATE    WRK-CHK-RIHA-KBN
+               WHEN    "1"
+                   MOVE    WRK-SOUKIK1-YMD     TO  WRK-CHK-SOUKIYMD
+                   IF      WRK-SOUKIK-ST (1)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
+                   END-IF
+               WHEN    "2"
+                   MOVE    WRK-SOUKIK2-YMD     TO  WRK-CHK-SOUKIYMD
+                   IF      WRK-SOUKIK-ST (2)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
+                   END-IF
+               WHEN    "3"
+                   MOVE    WRK-SOUKIK3-YMD     TO  WRK-CHK-SOUKIYMD
+                   IF      WRK-SOUKIK-ST (3)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
+                   END-IF
+               WHEN    "4"
+                   MOVE    WRK-SOUKIK4-YMD     TO  WRK-CHK-SOUKIYMD
+                   IF      WRK-SOUKIK-ST (4)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
+                   END-IF
+               WHEN    "9"
+                   MOVE    WRK-SOUKIK9-YMD     TO  WRK-CHK-SOUKIYMD
+                   IF      WRK-SOUKIK-ST (5)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
+                   END-IF
+           END-EVALUATE
+      *
+           IF      WRK-CHK-SOUKIYMD    NOT =   SPACE
+               IF     (WRK-KYUSEI-CHK  NOT =   SPACE   )
+                  AND (WRK-KYUSEI-CHK      >=  WRK-CHK-SOUKIYMD)
+      *            各リハビリ開始日−７日
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    WRK-KYUSEI-CHK      TO  LNK-DAY6-KIJUN
+                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                   MOVE    -6                  TO  LNK-DAY6-ZOGEN
+                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KOYOMI     TO  WRK-KYUSEI-7S
+      *            各リハビリ開始日−３０日
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    WRK-KYUSEI-CHK      TO  LNK-DAY6-KIJUN
+                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                   MOVE    -30                 TO  LNK-DAY6-ZOGEN
+                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KOYOMI     TO  WRK-KYUSEI-30S
+      *            発症日より３０日前は対象外
+                   IF     (WRK-KYUSEI-30S      <=  WRK-CHK-SOUKIYMD)
+                       MOVE    WRK-CHK-SOUKIYMD    TO  WRK-SOUKI-YMD
+      *                発症日より７日以上前は警告
+                       IF      WRK-KYUSEI-7S       >=  WRK-CHK-SOUKIYMD
+                           IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                           AND    (LNK-ORCSC-KEI-IDX       =   ZERO )
+                               MOVE    "K861"      TO  WRK-ERRCD
+                               MOVE    IDX-Z       TO  LNK-ORCSC-KEI-IDX
+                               MOVE    "1"         TO  WRK-COM-KZMFLG
+                                                              (IDX-Z)
+                           END-IF
+                       END-IF
+                   END-IF
+              END-IF
+           END-IF
+      *    早期開始日なし
+           IF      WRK-SOUKI-YMD       =   SPACE
+               MOVE    WRK-KYUSEI-CHK      TO  WRK-SOUKI-YMD
+           END-IF
+           .
+       200111-RIHAKSN-DATE-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1901,8 +2191,12 @@
       *****************************************************************
        20011-SYOKIKSN-CHK-SEC                SECTION.
       *
+      *
+      *    早期・初期リハビリ加算開始日処理
+           PERFORM 200111-RIHAKSN-DATE-SEC
+      *
       *    各リハビリ発症日判定
-           IF      WRK-KYUSEI-CHK      =   SPACE
+           IF      WRK-SOUKI-YMD       =   SPACE
                IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)  AND
                       (LNK-ORCSC-KEI-IDX        =   ZERO )
                    MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
@@ -1915,7 +2209,7 @@
                INITIALIZE                      STS-AREA-DAY
                INITIALIZE                      LNK-DAY6-AREA
                MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    WRK-KYUSEI-CHK      TO  LNK-DAY6-KIJUN
+               MOVE    WRK-SOUKI-YMD       TO  LNK-DAY6-KIJUN
                MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
                MOVE    14                  TO  LNK-DAY6-ZOGEN
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
@@ -1927,7 +2221,7 @@
                MOVE    LNK-DAY6-KOYOMI     TO  LNK-DAY2-YMD
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY2-AREA
-               STRING  "発症日の１４日後は"  DELIMITED  BY  SIZE
+               STRING  "起算日の１４日後は"  DELIMITED  BY  SIZE
                        LNK-DAY2-EDTYMD3      DELIMITED  BY  SIZE
                        "です"                DELIMITED  BY  SIZE
                       INTO                 WRK-KYUSEI-14-MSG
@@ -2278,6 +2572,8 @@
            MOVE    SPACE           TO  WRK-KYUSEI-CHK
            MOVE    SPACE           TO  WRK-KYUSEI-YMD
            MOVE    SPACE           TO  WRK-KYUSEI-MSG
+      *
+           MOVE    WRK-RIHA-KBN    TO  WRK-CHK-RIHA-KBN
       *    急性発生日計算処理
            EVALUATE    WRK-RIHA-KBN
                WHEN    "1"
@@ -2597,7 +2893,7 @@
                MOVE    WRK-COM-SRYKA (IDX-Z)   TO  WRK-SRYKA
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   10  )   OR
+                   UNTIL      (IDX     >   5   )   OR
                               (WRK-DOU-SRYKA (IDX) =   SPACE)
                IF      WRK-DOU-SRYKA (IDX) =   WRK-SRYKA
                    IF      WRK-DOU-SRYYMD(IDX) >   WRK-SYOYMD
@@ -3852,7 +4148,7 @@
                WHEN    "4"
                    MOVE    4               TO  IDE3
                WHEN    "9"
-                   MOVE    9               TO  IDE3
+                   MOVE    5               TO  IDE3
                WHEN    OTHER
                    MOVE    ZERO            TO  IDE3
            END-EVALUATE
@@ -4010,6 +4306,7 @@
                                        +   WRK-RIHA-CNT2(2 IDD)
                                        +   WRK-RIHA-CNT2(3 IDD)
                                        +   WRK-RIHA-CNT2(4 IDD)
+                                       +   WRK-RIHA-CNT2(5 IDD)
                                        +   WRK-KAISU
       *TEST
       *    DISPLAY "WRK-RIHA-CNT1:" WRK-RIHA-CNT2(1 IDD)

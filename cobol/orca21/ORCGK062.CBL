@@ -172,11 +172,21 @@
            03  FILLER          PIC X(09)   VALUE  "099800181".
       *    廃用症候群リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800191".
+      *    心大血管疾患　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800211".
+      *    脳血管疾患　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800221".
+      *    運動器　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800231".
+      *    呼吸器早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800241".
+      *    廃用症候群・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800291".
       *
        01  TBL-IKOU-SRYCD-GR   REDEFINES   TBL-IKOU-SRYCD-G.
            03  TBL-IKOU-SRYCD          PIC X(09)
-                                       OCCURS    9.
-       01  TBL-IKOU-MAX                PIC 9(02)   VALUE   9.
+                                       OCCURS    14.
+       01  TBL-IKOU-MAX                PIC 9(02)   VALUE   14.
       *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".

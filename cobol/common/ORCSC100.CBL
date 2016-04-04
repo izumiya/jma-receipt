@@ -140,6 +140,10 @@
                    07  WRK-KYUSEI-ST       PIC X(01).
                    07  WRK-KYUSEI-ED       PIC X(01).
                05  WRK-TEIGEN-IN           PIC X(01).
+      *        早期加算
+               05  WRK-SOUKIK-IN-G         OCCURS   5.
+                   07  WRK-SOUKIK-ST       PIC X(01).
+                   07  WRK-SOUKIK-ED       PIC X(01).
       *!!!!!!!!!!!!!!!!!
       *H27.4
       *    一般・銘柄名記載区分（処方毎）
@@ -622,7 +626,11 @@
       *    リハビリ初回
            MOVE    SPACE               TO  SPA-RIGAKU-INIT
       *    リハビリ算定回数
-           MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC (1:19)
+           IF      SPA-SRYYMD          >=  "20160401"
+               MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC(1:29)
+           ELSE
+               MOVE    WRK-KYUSEI-INP-G    TO  SPA-RIGAKU-REC(1:17)
+           END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE      )   OR
@@ -1324,6 +1332,17 @@
                    MOVE    "1"             TO  WRK-KYUSEI-ST (9)
                WHEN    "099800401"
                    MOVE    "1"             TO  WRK-TEIGEN-IN
+      *        早期加算
+               WHEN    "099800211"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (1)
+               WHEN    "099800221"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (2)
+               WHEN    "099800231"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (3)
+               WHEN    "099800241"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (4)
+               WHEN    "099800291"
+                   MOVE    "1"             TO  WRK-SOUKIK-ST (5)
            END-EVALUATE
       *
            .

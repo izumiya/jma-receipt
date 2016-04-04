@@ -245,6 +245,27 @@
            03  FILLER          PIC X(09)   VALUE  "099800191".
       *    廃用症候群リハビリ終了日
            03  FILLER          PIC X(09)   VALUE  "099800192".
+      *    心大血管疾患　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800211".
+      *    心大血管疾患　早期・初期リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800212".
+      *    脳血管疾患　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800221".
+      *    脳血管疾患　早期・初期リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800222".
+      *    運動器　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800231".
+      *    運動器　早期・初期リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800232".
+      *    呼吸器　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800241".
+      *    呼吸器　早期・初期リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800242".
+      *    廃用症候群　早期・初期リハビリ開始日
+           03  FILLER          PIC X(09)   VALUE  "099800291".
+      *    廃用症候群　早期・初期リハビリ終了日
+           03  FILLER          PIC X(09)   VALUE  "099800292".
+      *
       *    他医院退院日
            03  FILLER          PIC X(09)   VALUE  "099999906".
            03  FILLER          PIC X(09)   VALUE  SPACE.
@@ -259,16 +280,16 @@
            03  FILLER          PIC X(09)   VALUE  SPACE.
       *    依存症集団療法開始日
            03  FILLER          PIC X(09)   VALUE  "099830103".
-           03  FILLER          PIC X(09)   VALUE  SPACE.
+           03  FILLER          PIC X(09)   VALUE  "099830104".
       *    磁気による刺激法開始日
            03  FILLER          PIC X(09)   VALUE  "099400001".
            03  FILLER          PIC X(09)   VALUE  SPACE.
       *
        01  TBL-RRK-SRYCD-GR    REDEFINES   TBL-RRK-SRYCD-G.
-           03  TBL-RRK-SRYCD-GT        OCCURS    15.
+           03  TBL-RRK-SRYCD-GT        OCCURS    20.
                05  TBL-RRK-SRYCD           PIC X(09).
                05  TBL-END-SRYCD           PIC X(09).
-       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   15.
+       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   20.
       *
       *
        01  WRK-MIDAIS-HEN.
@@ -2359,6 +2380,7 @@
       *     (COPY に追加するのは、パッケージ対応で）
            IF      WRK-SRYCD           =   "099800181"
                                        OR  "099800182"
+              OR  (WRK-SRYCD(1:7)      =   "0998002"  )
       *        がん患者リハ開始日・終了日
                MOVE    1               TO  FLG-HKNSAN
            END-IF

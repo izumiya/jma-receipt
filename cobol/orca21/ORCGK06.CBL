@@ -1053,6 +1053,7 @@
                                        OR  "099800171"
                                        OR  "099800181"
                                        OR  "099800191"
+                                       OR  "099800211"
                MOVE    1               TO  SPA-NAI-PLUSKBN
            ELSE
                MOVE    ZERO            TO  SPA-NAI-PLUSKBN
@@ -1273,6 +1274,8 @@
       *     (COPY に追加するのは、パッケージ対応で）
            IF      WRK-SRYCD           =   "099800181"
                                        OR  "099800182"
+      *H28.4
+             OR  (WRK-SRYCD(1:7)       =   "0998002"  )
       *        がん患者リハ開始日・終了日
                MOVE    1               TO  FLG-HKNSAN
            END-IF

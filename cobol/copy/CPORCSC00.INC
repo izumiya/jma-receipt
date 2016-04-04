@@ -286,7 +286,7 @@
                05  LNK-ORCSC-JYO2            PIC X(01).
       *
       *リハビリ当月内回数集計
-           03  LNK-RIGAKU-NCNT-AREA          PIC X(700).
+           03  LNK-RIGAKU-NCNT-AREA          PIC X(1301).
       *
       *    検査逓減領域
            03  LNK-ORCSC-TEIGEN-AREA.

@@ -2815,6 +2815,11 @@
                    MOVE    TBL-RIHA-SYUKBN (TBL-SAN)
                                            TO  WRK-RIHA-SYUKBN
            END-SEARCH
+      *H28.4
+           IF    (WRK-SRYCD(1:7)       =   "0998002"  )
+      *        早期・初期リハ開始日・終了日
+               MOVE    1               TO  FLG-HKNSAN
+           END-IF
       *
            .
        1000-SANTEI-CHK-EXT.
