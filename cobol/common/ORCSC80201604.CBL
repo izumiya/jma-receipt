@@ -787,67 +787,22 @@
            MOVE    "099800211"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
-           IF      WRK-SOUKIK1-YMD  NOT =   SPACE
-               MOVE    "099800212"         TO  WRK-SRYCD
-               PERFORM 10001-KYUSEI-YMD-SEC
-               IF      WRK-YMD         NOT =   SPACE
-                   IF      WRK-SOUKIK1-YMD     <   WRK-YMD
-                       MOVE    SPACE           TO  WRK-SOUKIK1-YMD
-                   END-IF
-               END-IF
-           END-IF
       *
            MOVE    "099800221"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-SOUKIK2-YMD
-           IF      WRK-SOUKIK1-YMD  NOT =   SPACE
-               MOVE    "099800222"         TO  WRK-SRYCD
-               PERFORM 10001-KYUSEI-YMD-SEC
-               IF      WRK-YMD         NOT =   SPACE
-                   IF      WRK-SOUKIK2-YMD     <   WRK-YMD
-                       MOVE    SPACE           TO  WRK-SOUKIK2-YMD
-                   END-IF
-               END-IF
-           END-IF
       *
            MOVE    "099800231"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-SOUKIK3-YMD
-           IF      WRK-SOUKIK3-YMD  NOT =   SPACE
-               MOVE    "099800232"         TO  WRK-SRYCD
-               PERFORM 10001-KYUSEI-YMD-SEC
-               IF      WRK-YMD         NOT =   SPACE
-                   IF      WRK-SOUKIK3-YMD     <   WRK-YMD
-                       MOVE    SPACE           TO  WRK-SOUKIK3-YMD
-                   END-IF
-               END-IF
-           END-IF
       *
            MOVE    "099800241"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-SOUKIK4-YMD
-           IF      WRK-SOUKIK4-YMD  NOT =   SPACE
-               MOVE    "099800242"         TO  WRK-SRYCD
-               PERFORM 10001-KYUSEI-YMD-SEC
-               IF      WRK-YMD         NOT =   SPACE
-                   IF      WRK-SOUKIK4-YMD     <   WRK-YMD
-                       MOVE    SPACE           TO  WRK-SOUKIK4-YMD
-                   END-IF
-               END-IF
-           END-IF
       *
            MOVE    "099800291"         TO  WRK-SRYCD
            PERFORM 10001-RIHA-STRYMD-SEC
            MOVE    WRK-YMD             TO  WRK-SOUKIK9-YMD
-           IF      WRK-SOUKIK9-YMD  NOT =   SPACE
-               MOVE    "099800292"         TO  WRK-SRYCD
-               PERFORM 10001-KYUSEI-YMD-SEC
-               IF      WRK-YMD         NOT =   SPACE
-                   IF      WRK-SOUKIK9-YMD     <   WRK-YMD
-                       MOVE    SPACE           TO  WRK-SOUKIK9-YMD
-                   END-IF
-               END-IF
-           END-IF
       *    Äþ¸ºÂÐ¾Ý³°
       ***  MOVE    "099800401"         TO  WRK-SRYCD
       *    PERFORM 10001-KYUSEI-YMD-SEC
@@ -1827,119 +1782,21 @@
       *        ¿´Âç·ì´É¼À´µ
                WHEN    "099800211"
                    MOVE    "1"             TO  WRK-SOUKIK-ST (1)
-               WHEN    "099800212"
-                   MOVE    "1"             TO  WRK-SOUKIK-ED (1)
-                   IF      WRK-SOUKIK1-CHK    =   SPACE
-                       MOVE    "099800211"         TO  WRK-SRYCD
-                        PERFORM 10001-RIHA-STRYMD-SEC
-                       MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
-                       MOVE    "1"                 TO  WRK-SOUKIK1-CHK
-                   END-IF
-                   IF     (WRK-SOUKIK1-YMD     =   SPACE  )  AND
-                          (WRK-SOUKIK-ST (1)   =   SPACE  )
-                       MOVE    "8056"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   ELSE
-                       IF     (WRK-SOUKIK1-YMD     =   SPA-SRYYMD) OR
-                              (WRK-SOUKIK-ST (1)   =   "1"    )
-                           MOVE    "8057"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
-                       END-IF
-                   END-IF
-      *
       *        Ç¾·ì´É¼À´µ
                WHEN    "099800221"
                    MOVE    "1"             TO  WRK-SOUKIK-ST (2)
-               WHEN    "099800222"
-                   MOVE    "1"             TO  WRK-SOUKIK-ED (2)
-                   IF      WRK-SOUKIK1-CHK    =   SPACE
-                       MOVE    "099800221"         TO  WRK-SRYCD
-                        PERFORM 10001-RIHA-STRYMD-SEC
-                       MOVE    WRK-YMD             TO  WRK-SOUKIK2-YMD
-                       MOVE    "1"                 TO  WRK-SOUKIK2-CHK
-                   END-IF
-                   IF     (WRK-SOUKIK2-YMD     =   SPACE  )  AND
-                          (WRK-SOUKIK-ST (2)   =   SPACE  )
-                       MOVE    "8058"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   ELSE
-                       IF     (WRK-SOUKIK2-YMD     =   SPA-SRYYMD) OR
-                              (WRK-SOUKIK-ST (2)   =   "1"    )
-                           MOVE    "8059"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
-                       END-IF
-                   END-IF
-      *
       *        ±¿Æ°´ï
                WHEN    "099800231"
                    MOVE    "1"             TO  WRK-SOUKIK-ST (3)
-               WHEN    "099800232"
-                   MOVE    "1"             TO  WRK-SOUKIK-ED (3)
-                   IF      WRK-SOUKIK3-CHK    =   SPACE
-                       MOVE    "099800231"         TO  WRK-SRYCD
-                        PERFORM 10001-RIHA-STRYMD-SEC
-                       MOVE    WRK-YMD             TO  WRK-SOUKIK3-YMD
-                       MOVE    "1"                 TO  WRK-SOUKIK3-CHK
-                   END-IF
-                   IF     (WRK-SOUKIK3-YMD     =   SPACE  )  AND
-                          (WRK-SOUKIK-ST (3)   =   SPACE  )
-                       MOVE    "8060"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   ELSE
-                       IF     (WRK-SOUKIK3-YMD     =   SPA-SRYYMD) OR
-                              (WRK-SOUKIK-ST (3)   =   "1"    )
-                           MOVE    "8061"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
-                       END-IF
-                   END-IF
-      *
       *        ¸ÆµÛ´ï
                WHEN    "099800241"
                    MOVE    "1"             TO  WRK-SOUKIK-ST (4)
-               WHEN    "099800242"
-                   MOVE    "1"             TO  WRK-SOUKIK-ED (4)
-                   IF      WRK-SOUKIK1-CHK    =   SPACE
-                       MOVE    "099800241"         TO  WRK-SRYCD
-                        PERFORM 10001-RIHA-STRYMD-SEC
-                       MOVE    WRK-YMD             TO  WRK-SOUKIK1-YMD
-                       MOVE    "1"                 TO  WRK-SOUKIK1-CHK
-                   END-IF
-                   IF     (WRK-SOUKIK4-YMD     =   SPACE  )  AND
-                          (WRK-SOUKIK-ST (4)   =   SPACE  )
-                       MOVE    "8062"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   ELSE
-                       IF     (WRK-SOUKIK1-YMD     =   SPA-SRYYMD) OR
-                              (WRK-SOUKIK-ST (4)   =   "1"    )
-                           MOVE    "8063"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
-                       END-IF
-                   END-IF
       *        ÇÑÍÑ¾É¸õ·²
                WHEN    "099800291"
                    MOVE    "1"             TO  WRK-SOUKIK-ST (5)
-               WHEN    "099800292"
-                   MOVE    "1"             TO  WRK-SOUKIK-ED (5)
-                   IF      WRK-SOUKIK1-CHK    =   SPACE
-                       MOVE    "099800291"         TO  WRK-SRYCD
-                       PERFORM 10001-RIHA-STRYMD-SEC
-                       MOVE    WRK-YMD             TO  WRK-SOUKIK9-YMD
-                       MOVE    "1"                 TO  WRK-SOUKIK9-CHK
-                   END-IF
-                   IF     (WRK-SOUKIK9-YMD     =   SPACE  )  AND
-                          (WRK-SOUKIK-ST (5)   =   SPACE  )
-                       MOVE    "8064"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-                   ELSE
-                       IF     (WRK-SOUKIK9-YMD     =   SPA-SRYYMD) OR
-                              (WRK-SOUKIK-ST (5)   =   "1"    )
-                           MOVE    "8065"      TO  WRK-ERRCD
-                           MOVE    "1"         TO  WRK-COM-CUR(IDX-Z)
-                       END-IF
-                   END-IF
       *
                WHEN    "099800401"
-                   MOVE    "1"                 TO  WRK-TEIGEN-IN
+                   MOVE    "1"             TO  WRK-TEIGEN-IN
            END-EVALUATE
       *
            .
@@ -2082,6 +1939,7 @@
       *    Áá´ü¡¦½é´ü³«»ÏÆü
            EVALUATE    WRK-CHK-RIHA-KBN
                WHEN    "1"
+      *            ¿´Âç·ì´É¼À´µ
                    MOVE    WRK-SOUKIK1-YMD     TO  WRK-CHK-SOUKIYMD
                    IF      WRK-SOUKIK-ST (1)   =   "1"
                        MOVE    SPA-SRYYMD          TO  WRK-CHK-SOUKIYMD
@@ -2108,19 +1966,23 @@
                    END-IF
            END-EVALUATE
       *
+           IF      WRK-CHK-RIHA-KBN    =   "1"
+                                      OR   "4"
+      *        ¿´Âç·ì´É¼À´µ¡¦¸ÆµÛ´ï¤Ï¡¢¡Ü£·Æü
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    WRK-CHK-SOUKIYMD    TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE    7                   TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KOYOMI     TO  WRK-CHK-SOUKIYMD
+           END-IF
+      *
            IF      WRK-CHK-SOUKIYMD    NOT =   SPACE
                IF     (WRK-KYUSEI-CHK  NOT =   SPACE   )
                   AND (WRK-KYUSEI-CHK      >=  WRK-CHK-SOUKIYMD)
-      *            ³Æ¥ê¥Ï¥Ó¥ê³«»ÏÆü¡Ý£·Æü
-                   INITIALIZE                      STS-AREA-DAY
-                   INITIALIZE                      LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    WRK-KYUSEI-CHK      TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE    -6                  TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KOYOMI     TO  WRK-KYUSEI-7S
       *            ³Æ¥ê¥Ï¥Ó¥ê³«»ÏÆü¡Ý£³£°Æü
                    INITIALIZE                      STS-AREA-DAY
                    INITIALIZE                      LNK-DAY6-AREA
@@ -2134,16 +1996,6 @@
       *            È¯¾ÉÆü¤è¤ê£³£°ÆüÁ°¤ÏÂÐ¾Ý³°
                    IF     (WRK-KYUSEI-30S      <=  WRK-CHK-SOUKIYMD)
                        MOVE    WRK-CHK-SOUKIYMD    TO  WRK-SOUKI-YMD
-      *                È¯¾ÉÆü¤è¤ê£·Æü°Ê¾åÁ°¤Ï·Ù¹ð
-                       IF      WRK-KYUSEI-7S       >=  WRK-CHK-SOUKIYMD
-                           IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
-                           AND    (LNK-ORCSC-KEI-IDX       =   ZERO )
-                               MOVE    "K861"      TO  WRK-ERRCD
-                               MOVE    IDX-Z       TO  LNK-ORCSC-KEI-IDX
-                               MOVE    "1"         TO  WRK-COM-KZMFLG
-                                                              (IDX-Z)
-                           END-IF
-                       END-IF
                    END-IF
               END-IF
            END-IF
