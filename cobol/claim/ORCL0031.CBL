@@ -1902,6 +1902,10 @@
                                        OR  CONS-SPCM-SRYCD
                MOVE    1               TO  FLG-CHK
            END-IF
+      *    一般名処方加算１（処方せん料）
+           IF      WRK-SRYCD           =   "120004270"
+               MOVE    1               TO  FLG-CHK
+           END-IF
       *
            .
        20021-SRYCD-CHK-EXT.
