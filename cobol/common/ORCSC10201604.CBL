@@ -6957,19 +6957,20 @@
                MOVE    1                   TO  FLG-TAIIN
            END-IF
       *!!!
+      *H28.4 廃止
       *    他院退院日がある時、退院日
-           IF      FLG-TAITAIIN        =   1
-               MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
-               MOVE    2                   TO  FLG-TAIIN
-           ELSE
-               IF     (SPA-TAI-TAIINYMD    =   SPACE )  OR
-                      (SPA-TAI-TAIINYMD    <=  WRK-SYOYMD)
-                   CONTINUE
-               ELSE
-                   MOVE    SPA-TAI-TAIINYMD    TO  WRK-SYOYMD
-                   MOVE    2                   TO  FLG-TAIIN
-               END-IF
-           END-IF
+      *    IF      FLG-TAITAIIN        =   1
+      *        MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
+      *        MOVE    2                   TO  FLG-TAIIN
+      *    ELSE
+      *        IF     (SPA-TAI-TAIINYMD    =   SPACE )  OR
+      *               (SPA-TAI-TAIINYMD    <=  WRK-SYOYMD)
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    SPA-TAI-TAIINYMD    TO  WRK-SYOYMD
+      *            MOVE    2                   TO  FLG-TAIIN
+      *        END-IF
+      **** END-IF
       *    同日初診の入力がある時
            IF     (FLG-DOUJITU         =   1 )  AND
                   (IDX-SINSATU2        >   ZERO)
