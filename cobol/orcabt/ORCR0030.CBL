@@ -961,6 +961,7 @@
            03  FLG-NYUIN-CHECK                         PIC 9(01).
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
            03  FLG-RECECOM                             PIC 9(01).
+           03  FLG-SIPPU-COM                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -10252,6 +10253,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  ZERO  TO   FLG-HENSYU-NG2
                                MOVE  ZERO  TO   FLG-HENSYU-ARI
                                MOVE  ZERO  TO   FLG-ZAITAKU-CHECK
+                               MOVE  ZERO  TO   FLG-SIPPU-COM
                                IF  ACCT-JIHOKBN  =  SPACE
                                 PERFORM 21042-RECE02-TOTALTEN-HEN-SEC
                                END-IF
@@ -10264,14 +10266,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                              IF   ACCT-ZAIKAISU  NOT =    ZERO
                              AND  ACCT-JIHOKBN       =    SPACE
                                IF ( ACCT-SRYKBN  NOT =
-                                    "24" AND "90" AND "92" AND "93" AND
-                                    "97" AND "98"                 )
+                                    "24" AND "90" AND "92" AND
+                                    "93" AND "97"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
-                               OR ((ACCT-SRYKBN     = "98"       )  AND
-                                   (WRK-PARA-PRTKBN = "9" OR "8" )  AND
-                                   (ACCT-SRYCDTOTAL =
-                                      00000099209910  OR
-                                      00000099209911             ))
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
                                  AND (ACCT-MEISAISU      =   1    )
@@ -10322,6 +10319,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO   FLG-HENSYU-NG2
                                       MOVE  ZERO  TO   FLG-HENSYU-ARI
                                       MOVE  ZERO  TO   FLG-ZAITAKU-CHECK
+                                      MOVE  ZERO  TO   FLG-SIPPU-COM
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21046-SINRYO-CHECK-SEC
@@ -10878,6 +10876,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE     1     TO     FLG-HENSYU-ARI
                  END-IF
                  MOVE       1     TO     FLG-HENSYU-NG2
+               END-IF
+             END-IF
+      *
+             IF     ACCT-SRYKBN      =  "98"
+               IF  (WRK-PARA-PRTKBN  =  "9" OR "8"    )
+               AND (ACCT-SRYCDTOTAL  =  00000099209910
+                                    OR  00000099209911)
+                 CONTINUE
+               ELSE
+                 IF  (SRY-RENNUM       =   1         )
+                 AND (IDX2             =   1         )
+                 AND (SRY-SRYCD(IDX2)  =  "830000052")
+                     MOVE    1    TO     FLG-SIPPU-COM
+                 ELSE
+                   IF  FLG-SIPPU-COM   =   1
+                     CONTINUE
+                   ELSE
+                     MOVE    1    TO     FLG-HENSYU-NG
+                   END-IF
+                 END-IF
                END-IF
              END-IF
       *
@@ -11451,6 +11469,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE   "13"        TO    RECE04-SRYKBN
                                                 RECE05-SRYKBN
                    END-IF
+               END-IF
+      *
+               IF      FLG-SIPPU-COM      =     1
+                       MOVE   "99"        TO    RECE04-SRYKBN
+                                                RECE05-SRYKBN
+                       MOVE   "991"       TO    RECE04-SRYSYUKBN
+                                                RECE05-SRYSYUKBN
                END-IF
       *
                IF      ACCT-JIHOKBN       =     SPACE

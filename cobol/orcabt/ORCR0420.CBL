@@ -467,6 +467,7 @@
            03  FLG-KIN-OKIKAE                          PIC 9(01).
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-IRYORENKEI                          PIC 9(01).
+           03  FLG-SIPPU-COM                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -2393,6 +2394,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    ZERO    TO      FLG-ZAITAKU-CHECK
                                MOVE    ZERO    TO      FLG-KIN-OKIKAE
                                MOVE    ZERO    TO      FLG-KIN-OKIKAE2
+                               MOVE    ZERO    TO      FLG-SIPPU-COM
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
                                IF    FLG-WRITE45  =   1
@@ -2409,8 +2411,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **>                         (WRK-PARA-PRTKBN    =
       **>                                            "4" OR "5" ))
                                IF ( ACCT-SRYKBN  NOT =
-                                    "24" AND "90" AND "92" AND "93" AND
-                                    "97" AND "98"                 )
+                                    "24" AND "90" AND "92" AND
+                                    "93" AND "97"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
@@ -2470,6 +2472,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO  FLG-ZAITAKU-CHECK
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE2
+                                      MOVE  ZERO  TO  FLG-SIPPU-COM
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21014-SINRYO-CHECK-SEC
@@ -2777,6 +2780,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
              IF       SRY-SRYCD(IDX2)  =  "099140004" OR "099400001" OR
                                           "099999926"
                   MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
+      *
+             IF     ACCT-SRYKBN      =  "98"
+               IF  (SRY-RENNUM       =   1         )
+               AND (IDX2             =   1         )
+               AND (SRY-SRYCD(IDX2)  =  "830000052")
+                  MOVE    1     TO    FLG-SIPPU-COM
+               ELSE
+                 IF  FLG-SIPPU-COM   =   1
+                  CONTINUE
+                 ELSE
+                  MOVE    1     TO    FLG-HENSYU-NG
+                 END-IF
+               END-IF
              END-IF
       *
              IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
@@ -3358,6 +3375,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF                                                
       *
                END-IF                                                   
+      *
+               IF      FLG-SIPPU-COM      =     1
+                       MOVE   "99"        TO    RECE44-SRYKBN
+                                                RECE45-SRYKBN
+                       MOVE   "991"       TO    RECE44-SRYSYUKBN
+                                                RECE45-SRYSYUKBN
+               END-IF
       *
                IF      ACCT-JIHOKBN       =     SPACE
                   PERFORM  2101211-RECE45-COMCNT-HEN-SEC
@@ -10821,6 +10845,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    ZERO    TO    FLG-ZAITAKU-CHECK
                                MOVE    ZERO    TO    FLG-KIN-OKIKAE
                                MOVE    ZERO    TO    FLG-KIN-OKIKAE2
+                               MOVE    ZERO    TO    FLG-SIPPU-COM
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
                                IF    FLG-WRITE45  =   1
@@ -10837,8 +10862,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **>                         (WRK-PARA-PRTKBN    =
       **>                                            "4" OR "5" ))
                                IF ( ACCT-SRYKBN  NOT =
-                                    "24" AND "90" AND "92" AND "93" AND
-                                    "97" AND "98"                 )
+                                    "24" AND "90" AND "92" AND
+                                    "93" AND "97"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
@@ -10900,6 +10925,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO  FLG-ZAITAKU-CHECK
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE
                                       MOVE  ZERO  TO  FLG-KIN-OKIKAE2
+                                      MOVE  ZERO  TO  FLG-SIPPU-COM
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21014-SINRYO-CHECK-SEC
