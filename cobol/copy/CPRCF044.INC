@@ -269,6 +269,8 @@
                05  RECE44-FLG-BOKOHO-COMMENT   PIC  X(01).
       *通院・在宅精神療法（２０歳未満）加算
                05  RECE44-FLG-TUINZAI-COMMENT  PIC  X(01).
+      *依存症集団療法
+               05  RECE44-FLG-IZONSYO-COMMENT  PIC  X(01).
       *
       *手技毎の内容（手術・画像診断・処置）
                05  RECE44-ACCTP-SYUGI-TBL-G.

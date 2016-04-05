@@ -7362,14 +7362,12 @@
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
             IF       SRY-SRYCD(IDX2)(1:5)  =
-                     "09960" OR "09970" OR "09980"
+                     "09960" OR "09970" OR "09980" OR "09983"
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
-            IF       SRY-SRYCD(IDX2)   =  "099140004" OR "099830102"
-                                                      OR "099400001"
-                  MOVE    1     TO    FLG-HENSYU-NG
-            END-IF
-            IF       SRY-SRYCD(IDX2)   =  "099140011" OR "099140012"
+            IF       SRY-SRYCD(IDX2)   =  "099140004" OR "099400001" OR
+                                          "099140011" OR "099140012" OR
+                                          "099999926"
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
       *
@@ -7429,7 +7427,7 @@
                      "099999903" OR "099999904" OR
                      "099999905" OR "099999906" OR
                      "099999907" OR "099999908" OR
-                     "099830101" OR "099200101"            )
+                     "099200101"                           )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -7541,7 +7539,7 @@
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099830101" OR "099200101"            )
+                       "099200101"                           )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
                  IF  WRK-TAIHI-ZAINUM  =  ZERO

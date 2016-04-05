@@ -76,6 +76,8 @@
                05  RECE84-ZAINUM          PIC  9(08).
       *診療区分
            03  RECE84-SRYKBN              PIC  X(02).
+      *コード表用番号−区分番号
+           03  RECE84-CDKBN-KBNNUM        PIC  9(03).
       *
            03  RECE84-DATA-AREA. 
       *診療種別区分
@@ -290,5 +292,3 @@
                           11  RECE84-KAISU     PIC  9(03).
       *レセプト種別
                05  RECE84-RECESYUBETU          PIC 9(04).
-      *コード表用番号−区分番号
-           03  RECE84-CDKBN-KBNNUM        PIC  9(03).

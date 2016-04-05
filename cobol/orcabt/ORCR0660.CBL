@@ -11234,13 +11234,7 @@
                     ELSE
                       EVALUATE   RECE651-SETCOMATFLG(IDX)
                         WHEN    1
-                        WHEN    3  THRU   16
-                        WHEN   18
-                        WHEN   20
-                        WHEN   24
-                        WHEN   26
-                        WHEN   27  THRU   29
-                        WHEN   31
+                        WHEN    3  THRU   33
                         WHEN  101  THRU  107
                           ADD  1                 TO  WRK-HEN-SEQNO-J
                           IF   WRK-HEN-SEQNO-J  >  3

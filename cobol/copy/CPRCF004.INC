@@ -294,6 +294,8 @@
            03  RECE04-FLG-BOKOHO-COMMENT  PIC  X(01).
       *通院・在宅精神療法（２０歳未満）加算
            03  RECE04-FLG-TUINZAI-COMMENT PIC  X(01).
+      *依存症集団療法
+           03  RECE04-FLG-IZONSYO-COMMENT PIC  X(01).
       *
       *日数回数テーブル
            03  RECE04-DAY-AREA.

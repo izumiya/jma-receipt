@@ -1590,6 +1590,9 @@
       *    ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
       ***  03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
       *
+      *    °ÍÂ¸¾É½¸ÃÄÎÅË¡
+           03  CONS-IZONSYO-COMMENT  PIC X(09)  VALUE  "180047910".
+      *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
       *
@@ -2768,11 +2771,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
       *
              IF       SRY-SRYCD(IDX2)(1:5)  =
-                      "09960" OR "09970" OR "09980"
+                      "09960" OR "09970" OR "09980" OR "09983"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
-             IF       SRY-SRYCD(IDX2)  =  "099140004" OR "099830102"
-                                                      OR "099400001"
+             IF       SRY-SRYCD(IDX2)  =  "099140004" OR "099400001" OR
+                                          "099999926"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *
@@ -2801,7 +2804,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       "099999903" OR "099999904" OR
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
-                      "099830101" OR "099200101"            )
+                      "099200101"                           )
              OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
                   COMPUTE   RECE44-MEISAISU    =  RECE44-MEISAISU
                                                -  1
@@ -2852,7 +2855,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099830101" OR "099200101"            )
+                       "099200101"                           )
               OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
@@ -4812,6 +4815,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                 END-IF
               END-IF
+      *       °ÍÂ¸¾É½¸ÃÄÎÅË¡
+              IF   RECE41-SRYYM      >=    "201604"
+                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-IZONSYO-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE44-SRYKBN      =     "13"
@@ -4876,9 +4885,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *
               IF   RECE41-SRYYM      >=    "201004"
-      *         ¿´Â¡¥Ú¡¼¥¹¥á¡¼¥«¡¼»ØÆ³´ÉÍýÎÁ¡Ê±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°¡Ë
-                IF   SRY-SRYCD(IDX2)  =     CONS-SINPESU-COMMENT
+                IF   RECE41-SRYYM    >=    "201604"
+      *           ±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°²Ã»»
+                  IF   SRY-SRYCD(IDX2) =  CONS-SINPESU2-COMMENT
                         MOVE   "1"    TO    RECE44-FLG-SINPESU-COMMENT
+                  END-IF
+                ELSE
+      *           ¿´Â¡¥Ú¡¼¥¹¥á¡¼¥«¡¼»ØÆ³´ÉÍýÎÁ¡Ê±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°¡Ë
+                  IF   SRY-SRYCD(IDX2) =  CONS-SINPESU-COMMENT
+                        MOVE   "1"    TO    RECE44-FLG-SINPESU-COMMENT
+                  END-IF
                 END-IF
       *         ½¸ÃÄ±ÉÍÜ¿©»ö»ØÆ³ÎÁ
                 IF   SRY-SRYCD(IDX2)  =     CONS-SYUEIYO-COMMENT
@@ -4918,13 +4934,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-GANSIDO2-COMMENT
                    MOVE   "2"   TO    RECE44-FLG-GANSIDO-COMMENT
-                END-IF
-              END-IF
-      *
-      *       ±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°²Ã»»
-              IF   RECE41-SRYYM    >=     "201604"
-                IF   SRY-SRYCD(IDX2) =  CONS-SINPESU2-COMMENT
-                   MOVE   "1"   TO    RECE44-FLG-SINPESU-COMMENT
                 END-IF
               END-IF
            END-IF
