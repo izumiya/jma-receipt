@@ -312,7 +312,7 @@
            03  IDX-C               PIC 9(04).
       *
            03  IDXD                PIC 9(04).
-      *!!!!!!!!!!111
+      *!!!!!
            03  IDX-GEN             PIC 9(04).
       *
       *    一時領域
@@ -1893,7 +1893,7 @@
       *
            IF     (SPA-PTID            =   ZERO )  AND
                   (SPA-GMN-PTID        =   ZERO )
-               MOVE    00              TO  SPA-GMN-CUR
+               MOVE    00                  TO  SPA-GMN-CUR
            ELSE
                MOVE    1                   TO  SPA-GMN-CUR
                PERFORM 3000-PTID-INIT-SEC
@@ -1960,6 +1960,8 @@
       *    画面編集処理
       *****************************************************************
        3000-PTID-INIT-SEC                  SECTION.
+      *
+           MOVE    SPACE               TO  WRK-HZN-ERRCD
       *
       *    保険一覧編集
            PERFORM 3008-HKNCOMBI-HEN-SEC
@@ -2080,6 +2082,7 @@
            ELSE
                PERFORM 3106-PARA-DEL-SEC
            END-IF
+      *
       *
            IF     (SPA-MOTOPG2(1:3)    =   "K02" OR  "U02"  ) OR
                   (SPA-MOTOPG          =   "KT01"           )  OR
@@ -2710,7 +2713,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-JYURRK-ERR      =   1
                IF      SPA-ERRCD           =   SPACE
-                   MOVE    "0023"          TO  SPA-ERRCD
+                   MOVE    "0023"          TO  WRK-HZN-ERRCD
                END-IF
            END-IF
       *
@@ -5067,6 +5070,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    診療会計マスターより編集をする
            PERFORM 410181-SRYACCT-HEN-SEC
+      *
       *
            IF      SPA-GMN-MAX         =   ZERO
                MOVE    7                   TO  SPA-GMN-CUR
@@ -8600,6 +8604,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                    END-IF
            END-SEARCH
+      *H28.4
+           IF     (WRK-SRYCD           =   "099800181"
+                                       OR  "099800182")
+              OR  (WRK-SRYCD(1:7)      =   "0998002"  )
+      *        早期・初期リハ開始日・終了日
+      *        がん患者リハ開始日・終了日
+               MOVE    1                   TO  FLG-HKNSAN
+           END-IF
       *!!!!!!!!!!!!!! 
       *H25.7
       *    労災保険コード変更
@@ -9112,16 +9124,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        OR  "23"    )
                MOVE    "0027"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN-CUR
-           END-IF
-      *H28.4   湿布薬の剤は対象外
-           IF     (SPA-NAI-ZAITENFLG (SPA-NAI-BANGO)
-                                       =   3      )
-             AND  (SPA-NAI-SRYKBN  (SPA-NAI-BANGO)
-                                       =   "23"   )
-             AND  (SPA-NAI-KEIFLG2     =   ZERO   )
-               MOVE    "K037"              TO  SPA-ERRCD
-               MOVE    1                   TO  SPA-GMN-CUR
-               MOVE    1                   TO  SPA-NAI-KEIFLG2
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
@@ -14362,6 +14364,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        500-SET-SCREEN              SECTION.
       *
            PERFORM 500-GMNHEN-SEC
+      *
+           IF     (SPA-ERRCD           =   SPACE )
+            AND   (WRK-HZN-ERRCD   NOT =   SPACE )
+               MOVE    WRK-HZN-ERRCD       TO  SPA-ERRCD
+           END-IF
       *
       *    入院料算定なし
            IF     (SPA-ERRCD           =   SPACE )  AND
