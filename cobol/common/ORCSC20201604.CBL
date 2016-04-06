@@ -462,6 +462,7 @@
            03  FLG-SIP70-ALL           PIC 9(01).
            03  FLG-COM-OK              PIC 9(01).
            03  IDX-SP702               PIC 9(04).
+           03  IDX-SPOK                PIC 9(04).
       *    ÊÝ¸±Ëè¤ÎÄþ¸º·×»»¡Ê³°ÍÑ¡Ë
            03  WRK-HKNKEISP-G.
                05  WRK-CNT-HKNSP         PIC 9(03).
@@ -1951,6 +1952,7 @@
                            OR (SPA-ERRCD   NOT =   SPACE )
                MOVE    ZERO                TO  WRK-SUM-SURYO
                MOVE    ZERO                TO  IDX-SP702
+               MOVE    ZERO                TO  IDX-SPOK
                MOVE    ZERO                TO  FLG-COM-OK
       *
                PERFORM VARYING     IDX     FROM    1   BY  1
@@ -1988,11 +1990,19 @@
                                                    =   CONS-SP70-COMT
                            MOVE    1                   TO  FLG-COM-OK
                        END-IF
+      *                ²ò½ü
+                       IF      WRK-COM-INPUTCD (IDX)
+                                                   =   CONS-SP70-SRYCD
+                           MOVE    IDX             TO  IDX-SPOK
+                       END-IF
                    END-IF
                END-PERFORM
       *
                IF      IDX-SP702           >   ZERO
                    MOVE    IDX-SP702       TO  IDX
+                   IF      IDX-SPOK        >   ZERO
+                       MOVE    IDX-SPOK        TO  IDX
+                   END-IF
                    IF      FLG-COM-OK      =   ZERO
                        IF      WRK-COM-KZMFLG (IDX)    =   SPACE
                            MOVE    "K110"          TO  SPA-ERRCD
