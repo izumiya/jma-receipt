@@ -198,7 +198,8 @@
       *01  PRGSKBNO                PIC X(08)  VALUE "20081031".
       *01  PRGSKBNO                PIC X(08)  VALUE "20100128".
       *01  PRGSKBNO                PIC X(08)  VALUE "20100527".
-       01  PRGSKBNO                PIC X(08)  VALUE "20100604".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20100604".
+       01  PRGSKBNO                PIC X(08)  VALUE "20160401".
       *
            COPY    "CPCOMMONDAT5.INC"
                                    REPLACING  //TEIKI01PARA//
@@ -566,6 +567,19 @@
       *        生活療養食事療養標準負担額（医療区分２・３）（低１）
                05  WRK-CONS-HYOJYUN-FUTAN16
                                       PIC X(09)   VALUE   "197003010".
+      *        平成２８年度改定の追加分
+      *        食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
+               05  WRK-CONS-HYOJYUN-FUTAN17
+                                      PIC X(09)   VALUE   "197003310".
+      *        食事療養標準負担額（精神１年超）（一般）
+               05  WRK-CONS-HYOJYUN-FUTAN18
+                                      PIC X(09)   VALUE   "197003410".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（一般）
+               05  WRK-CONS-HYOJYUN-FUTAN19
+                                      PIC X(09)   VALUE   "197003610".
+      *        生活療養食事療養標準負担額（精神１年超・医療区分２・３）（一般）
+               05  WRK-CONS-HYOJYUN-FUTAN20
+                                      PIC X(09)   VALUE   "197003710".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1376,7 +1390,11 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
                                        OR  WRK-CONS-HYOJYUN-FUTAN13
                                        OR  WRK-CONS-HYOJYUN-FUTAN14
                                        OR  WRK-CONS-HYOJYUN-FUTAN15
-                                       OR  WRK-CONS-HYOJYUN-FUTAN16 )
+                                       OR  WRK-CONS-HYOJYUN-FUTAN16
+                                       OR  WRK-CONS-HYOJYUN-FUTAN17
+                                       OR  WRK-CONS-HYOJYUN-FUTAN18
+                                       OR  WRK-CONS-HYOJYUN-FUTAN19
+                                       OR  WRK-CONS-HYOJYUN-FUTAN20 )
                    MOVE    SPACE           TO  COLDAT02-REC
                    INITIALIZE                  COLDAT02-REC
       *            診療会計データ編集
