@@ -38,6 +38,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/04/24  ¾®»ùÆÃÄê½¸Ãæ´ÉÍýÎÁÅùÄÉ²Ã
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/04/XX  ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÊñ³ç³°ÂÐ±þÂ¾
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -437,7 +438,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    "ºßÂð»þ°å³ØÁí¹ç´ÉÍýÎÁ" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "205"
-                   MOVE    "ÆÃÄê»ÜÀßÆþµï»þÅù°å³ØÁí¹ç´ÉÍýÎÁ" 
+      *H28.4       MOVE    "ÆÃÄê»ÜÀßÆþµï»þÅù°å³ØÁí¹ç´ÉÍýÎÁ" 
+                   MOVE    "»ÜÀßÆþµï»þÅù°å³ØÁí¹ç´ÉÍýÎÁ" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "206"
       *H24.4       MOVE    "ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁ" 
@@ -1095,6 +1097,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
                MOVE    SPA-GMN-SRYKBN-LST (2)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
+      *H28.4
+      *        ¼ê½ÑÊñ³çÂÐ¾Ý³°
+               IF      SPA-HKT-YUKOSTYMD   >=  "20160401"
+                   IF      IDX             =    04
+                       MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                   END-IF
+               END-IF
            END-PERFORM
            .
        200211-KBNCD-524-EXT.
@@ -1859,6 +1869,17 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *            ³°Íè¿ÇÎÅÎÁ
                        MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
+      *H28.4
+      *            ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ
+                   WHEN    "524"
+                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+                          AND (IDX             =   04     )
+      *                    H28.4¤«¤é¼ê½Ñ¤ÏÊñ³çÂÐ¾Ý³°
+                           IF     (SPA-NAI-STYUKYMD    >=  "20160401")
+                               MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           END-IF
+                       END-IF
                END-EVALUATE
                MOVE    ZERO                TO  FLG-CHK
                PERFORM VARYING     IDY     FROM    1   BY  1
