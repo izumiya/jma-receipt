@@ -220,6 +220,7 @@
       *                                     個々に項目を設ける事に伴う修正。
       *                                     第３第４公費の括弧再掲記載対応
       *  04.08.07    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
+      *  04.08.08    NACL-藤原    16/04/01  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -958,11 +959,13 @@
            03  FILLER          PIC X(10)   VALUE   "９６".
            03  FILLER          PIC X(02)   VALUE   "97".
            03  FILLER          PIC X(10)   VALUE   "９７".
+           03  FILLER          PIC X(02)   VALUE   "37".
+           03  FILLER          PIC X(10)   VALUE   "３７申出".
        01  TBL-TOKKI-R         REDEFINES   TBL-TOKKI-AREA.
-           03  TBL-TOKKI       OCCURS   36.
+           03  TBL-TOKKI       OCCURS   37.
                05  TBL-TOKKICD             PIC X(02).
                05  TBL-TOKKINAME           PIC X(10).
-       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   36.
+       01  TBL-TOKKI-MAX                   PIC 9(02)   VALUE   37.
       *
       *   症状詳記区分の表題
        01  TBL-RECECOM-AREA.

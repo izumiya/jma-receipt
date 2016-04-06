@@ -47,6 +47,7 @@
       *  04.08.02    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
       *  04.08.03    NACL-藤原    16/01/15  請求情報への更新日設定
+      *  04.08.04    NACL-藤原    16/04/01  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2493,17 +2494,21 @@
                MOVE    ZERO                TO  FLG-TAISYO
       *        入院料はコメントか労災治療計画加算、病衣貸与料のみ対象とする
                IF      RECE84-SRYKBN       >=  "90"
-                   IF    ( RECE85-SRYCD (IDX) (1:1)
-                                               =   "8"   OR
-                           RECE85-SRYCD (IDX) (1:3)
-                                               =   "008"    )
-                   OR    ( RECE84-JIHOKBN  NOT =   SPACE     )
-                       MOVE    1                   TO  FLG-TAISYO
+                   IF    ( RECE85-SRYCD (IDX) (1:3)  =   "112" )
+                       MOVE    1                     TO  FLG-TAISYO
                    ELSE
+                     IF    ( RECE85-SRYCD (IDX) (1:1)
+                                                 =   "8"   OR
+                             RECE85-SRYCD (IDX) (1:3)
+                                                 =   "008"    )
+                     OR    ( RECE84-JIHOKBN  NOT =   SPACE     )
+                         MOVE    1                   TO  FLG-TAISYO
+                     ELSE
                        IF    ( RECE85-SRYCD (IDX)  =   "101910050"
                                                    OR  "101910060" )
                            MOVE    1                   TO  FLG-TAISYO
                        END-IF
+                     END-IF
                    END-IF
                ELSE
                    MOVE    1                  TO  FLG-TAISYO

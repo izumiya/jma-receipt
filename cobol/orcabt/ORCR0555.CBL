@@ -49,6 +49,7 @@
       *  04.08.02    NACL-ÌçÏÆ    14/07/23  £³£²Ê¸»ú°Ê¾å¤ÎÊ¸»úÎó½¤Àµ
       *                                     ¡Ê¥³¥ó¥Ñ¥¤¥ë»þ¤Î¥ï¡¼¥Ë¥ó¥°½¤Àµ¡Ë
       *  04.08.03    NACL-Æ£¸¶    16/01/15  ÀÁµá¾ðÊó¤Ø¤Î¹¹¿·ÆüÀßÄê
+      *  04.08.04    NACL-Æ£¸¶    16/04/01  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -933,6 +934,8 @@
            03  WRK-CONS-TEIGEN2       PIC X(09)   VALUE   "630010005".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¶£°¡¿£±£°£°¡Ë¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¡Ë
            03  WRK-CONS-TEIGEN3       PIC X(09)   VALUE   "630010006".
+      *    ÌôºÞÎÁ¸ºÅÀ¡Ê¼¾ÉÛÌôÌôºÞÎÁ¾å¸ÂÄ¶¡Ë
+           03  WRK-CONS-TEIGEN4       PIC X(09)   VALUE   "630010007".
       *
       *    ºÆ¿Ç¤Î»þ´Ö²Ã»»
            03  WRK-CONS-JIKANGAI-TABLE. 
@@ -2998,6 +3001,7 @@
            IF      RECE45-SRYCD (IDX)  =   WRK-CONS-TEIGEN
                                        OR  WRK-CONS-TEIGEN2
                                        OR  WRK-CONS-TEIGEN3
+                                       OR  WRK-CONS-TEIGEN4
                CONTINUE
            ELSE
                IF    ( RECE44-YKZTEN    =   ZERO  )
@@ -3013,6 +3017,7 @@
                                        =   WRK-CONS-TEIGEN
                                        OR  WRK-CONS-TEIGEN2
                                        OR  WRK-CONS-TEIGEN3
+                                       OR  WRK-CONS-TEIGEN4
                    MOVE    1               TO  FLG-TEIGEN
                END-IF
            END-IF
@@ -4031,6 +4036,7 @@
                                        =   WRK-CONS-TEIGEN
                                        OR  WRK-CONS-TEIGEN2
                                        OR  WRK-CONS-TEIGEN3
+                                       OR  WRK-CONS-TEIGEN4
                CONTINUE
            ELSE
                IF      TBL-ZAIW-SRYSURYO (1 IDX) >   ZERO
@@ -4047,6 +4053,7 @@
                                        =   WRK-CONS-TEIGEN
                                        OR  WRK-CONS-TEIGEN2
                                        OR  WRK-CONS-TEIGEN3
+                                       OR  WRK-CONS-TEIGEN4
                    MOVE    RECE44-ZAITEN      TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
                ELSE
