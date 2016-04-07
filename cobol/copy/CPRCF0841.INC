@@ -215,6 +215,8 @@
                05  RECE841-FLG-BOKOHO-COMMENT    PIC  X(01).
       *超重症児（者）入院診療加算・準超重症児（者）入院診療加算
                05  RECE841-FLG-CYOJKSN-COMMENT   PIC  X(01).
+      *排尿自立指導料
+               05  RECE841-FLG-HAIJRT-COMMENT    PIC  X(01).
       *
       *手技毎の内容（手術・画像診断・処置）
                05  RECE841-ACCTP-SYUGI-TBL-G.

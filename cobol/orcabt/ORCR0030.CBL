@@ -857,6 +857,7 @@
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
+           03  FLG-IZONSYO-COM                         PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
       *****03  FLG-HKNNUM                              PIC 9(01).
@@ -2579,6 +2580,8 @@
       *
       *    ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
            03  CONS-IZONSYO-COMMENT  PIC X(09)  VALUE  "180047910".
+      *    º£Œ≈≥´ªœ∆¸°°°°°°∑Ó°°°°∆¸
+           03  CONS-IZONSYO2-COMMENT PIC X(09)  VALUE  "840000076".
       *
       *    ≥∞ÕËø◊¬Æ∏°¬Œ∏°∫∫≤√ªª
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -10234,6 +10237,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-KENSA-COM
                                                 FLG-ZAIKYO-COM
                                                 FLG-BOKOHO-COM
+                                                FLG-IZONSYO-COM
       *
                                MOVE  ZERO  TO   WRK-FILMTEN
       *
@@ -10298,6 +10302,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-KENSA-COM
                                                        FLG-ZAIKYO-COM
                                                        FLG-BOKOHO-COM
+                                                       FLG-IZONSYO-COM
       *
                                       MOVE  ZERO  TO   WRK-FILMTEN
       *
@@ -12696,8 +12701,13 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
               IF   RECE02-SRYYM      >=    "201604"
-                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT
+                IF  (SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT)
+                AND (FLG-IZONSYO-COM  =     ZERO                )
                         MOVE   "1"    TO    RECE04-FLG-IZONSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO2-COMMENT
+                        MOVE  SPACE   TO    RECE04-FLG-IZONSYO-COMMENT
+                        MOVE    1     TO    FLG-IZONSYO-COM
                 END-IF
               END-IF
            END-IF
@@ -13052,6 +13062,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    MOVE   "1"   TO    RECE04-FLG-ZAIKYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                                        OR    CONS-ZAIKYO6-COMMENT
                    MOVE  SPACE  TO    RECE04-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
@@ -13469,6 +13480,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      OR CONS-ZAIKYO4-COMMENT
                  MOVE   29            TO  WRK-SETCOM-JIDO
            END-IF
+      *    ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
+           IF    RECE05-SRYCD(IDX4)   = CONS-IZONSYO-COMMENT
+                 MOVE   33            TO  WRK-SETCOM-JIDO
+           END-IF
       *
            IF  ((WRK-SETCOM-JIDO    =  1                        ) AND
                 (RECE05-SRYCD(IDX4) = "830000014" OR "840000038"))
@@ -13498,9 +13513,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            OR  ((WRK-SETCOM-JIDO    =  25                       ) AND
                 (RECE05-SRYCD(IDX4) = CONS-DOUJITU-COMMENT      ))
            OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE05-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT      ))
-           OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE05-SRYCD(IDX4) = CONS-ZAIKYO6-COMMENT      ))
+                (RECE05-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT
+                                   OR CONS-ZAIKYO6-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  33                       ) AND
+                (RECE05-SRYCD(IDX4) = CONS-IZONSYO2-COMMENT     ))
       *
                  MOVE  "1"              TO  RECE04-SETCOMFLG
                  MOVE  "2"              TO  RECE05-MEISKYFLG(IDX4)

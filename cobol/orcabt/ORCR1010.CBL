@@ -237,6 +237,7 @@
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
+           03  FLG-IZONSYO-COM                         PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
@@ -1160,6 +1161,8 @@
            03  CONS-ZAIKYO4-COMMENT  PIC X(09)  VALUE  "114027910".
       *    初回算定　　　月　　日
            03  CONS-ZAIKYO5-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-ZAIKYO6-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    在宅患者訪問リハビリテーション指導管理料（同一建物住居者以外）
            03  CONS-ZAIRIHA1-COMMENT PIC X(09)  VALUE  "114006410".
@@ -1186,6 +1189,8 @@
       *
       *    依存症集団療法
            03  CONS-IZONSYO-COMMENT  PIC X(09)  VALUE  "180047910".
+      *    治療開始日　　　月　　日
+           03  CONS-IZONSYO2-COMMENT PIC X(09)  VALUE  "840000076".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -1778,6 +1783,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-KENSA-COM
                                                 FLG-ZAIKYO-COM
                                                 FLG-BOKOHO-COM
+                                                FLG-IZONSYO-COM
       *
                                MOVE  ZERO  TO   WRK-FILMTEN
                                MOVE  ZERO  TO   FLG-NEBU
@@ -1842,6 +1848,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-KENSA-COM
                                                        FLG-ZAIKYO-COM
                                                        FLG-BOKOHO-COM
+                                                       FLG-IZONSYO-COM
       *
                                       MOVE  ZERO  TO   WRK-FILMTEN
                                       MOVE  ZERO  TO   FLG-NEBU
@@ -3538,8 +3545,13 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       依存症集団療法
               IF   RECE100-SRYYM     >=    "201604"
-                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT
+                IF  (SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT)
+                AND (FLG-IZONSYO-COM  =     ZERO                )
                         MOVE   "1"    TO    RECE120-FLG-IZONSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO2-COMMENT
+                        MOVE  SPACE   TO    RECE120-FLG-IZONSYO-COMMENT
+                        MOVE    1     TO    FLG-IZONSYO-COM
                 END-IF
               END-IF
            END-IF
@@ -3893,6 +3905,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    MOVE   "1"   TO    RECE120-FLG-ZAIKYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                                        OR    CONS-ZAIKYO6-COMMENT
                    MOVE  SPACE  TO    RECE120-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF

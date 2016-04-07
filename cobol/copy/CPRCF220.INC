@@ -211,6 +211,8 @@
            03  RECE220-FLG-BOKOHO-COMMENT    PIC  X(01).
       *Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
            03  RECE220-FLG-CYOJKSN-COMMENT   PIC  X(01).
+      *ÇÓÇ¢¼«Î©»ØÆ³ÎÁ
+           03  RECE220-FLG-HAIJRT-COMMENT    PIC  X(01).
       *
       *Æü¿ô²ó¿ô¥Æ¡¼¥Ö¥ë
            03  RECE220-DAY-AREA.

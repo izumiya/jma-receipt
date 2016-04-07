@@ -440,6 +440,7 @@
            03  FLG-KENSA-COM                           PIC 9(01).
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
+           03  FLG-HAIJRT-COM                          PIC 9(01).
            03  FLG-CYOJKSN-COM                         PIC 9(01).
            03  FLG-CYOJKSN-OK                          PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
@@ -1429,6 +1430,13 @@
            03  CONS-CYOJKSN4-COMMENT PIC X(09)  VALUE  "190127610".
       *    算定開始　　　年　　月　　日
            03  CONS-CYOJKSN5-COMMENT PIC X(09)  VALUE  "840000056".
+      *
+      *    排尿自立指導料
+           03  CONS-HAIJRT-COMMENT   PIC X(09)  VALUE  "113022810".
+      *    初回算定　　　月　　日
+           03  CONS-HAIJRT2-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-HAIJRT3-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -2545,6 +2553,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           FLG-ZAIKYO-COM
                                           FLG-BOKOHO-COM
                                           FLG-CYOJKSN-COM
+                                          FLG-HAIJRT-COM
       *
                        MOVE   SPACE  TO   WRK-FORMALNAME
                        MOVE   ZERO   TO
@@ -2634,6 +2643,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     FLG-ZAIKYO-COM
                                                     FLG-BOKOHO-COM
                                                     FLG-CYOJKSN-COM
+                                                    FLG-HAIJRT-COM
       *
                                  MOVE   SPACE  TO   WRK-FORMALNAME
                                  MOVE   ZERO   TO
@@ -4761,6 +4771,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE   "2"   TO    RECE84-FLG-GANSIDO-COMMENT
                 END-IF
               END-IF
+      *       排尿自立指導料
+              IF   RECE82-SRYYM    >=     "201604"
+                IF  (SRY-SRYCD(IDX2)  =     CONS-HAIJRT-COMMENT)
+                AND (FLG-HAIJRT-COM   =     ZERO               )
+                        MOVE   "1"    TO    RECE84-FLG-HAIJRT-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-HAIJRT2-COMMENT
+                                      OR    CONS-HAIJRT3-COMMENT
+                        MOVE  SPACE   TO    RECE84-FLG-HAIJRT-COMMENT
+                        MOVE    1     TO    FLG-HAIJRT-COM
+                END-IF
+              END-IF
            END-IF
       *
            IF    ((RECE82-HKNKBN    NOT  =  "4" AND "6") AND
@@ -4850,6 +4872,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE   "1"   TO    RECE84-FLG-ZAIKYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                                        OR    CONS-ZAIKYO6-COMMENT
                    MOVE  SPACE  TO    RECE84-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
@@ -5483,6 +5506,10 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                      OR CONS-ZAIKYO4-COMMENT
                  MOVE   29            TO  WRK-SETCOM-JIDO
            END-IF
+      *    排尿自立指導料
+           IF    RECE85-SRYCD(IDX4)   = CONS-HAIJRT-COMMENT
+                 MOVE   34            TO  WRK-SETCOM-JIDO
+           END-IF
       *    退院前訪問指導料
            IF    RECE85-SRYCD(IDX4)   = CONS-HOUMON-COMMENT1
                  MOVE   103           TO  WRK-SETCOM-JIDO
@@ -5508,9 +5535,11 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
            OR  ((WRK-SETCOM-JIDO    =  11                       ) AND
                 (RECE85-SRYCD(IDX4) = CONS-HOUSIJI2-COMMENT     ))
            OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE85-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT      ))
-           OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE85-SRYCD(IDX4) = CONS-ZAIKYO6-COMMENT      ))
+                (RECE85-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT
+                                   OR CONS-ZAIKYO6-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  34                       ) AND
+                (RECE85-SRYCD(IDX4) = CONS-HAIJRT2-COMMENT
+                                   OR CONS-HAIJRT3-COMMENT      ))
            OR  ((WRK-SETCOM-JIDO    =  103                      ) AND
                 (RECE85-SRYCD(IDX4) = CONS-HOUMON-COMMENT3      ))
            OR  ((WRK-SETCOM-JIDO    =  105                      ) AND

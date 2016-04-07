@@ -5674,37 +5674,23 @@ grpsys       PERFORM 900-DBSELECT-SEC
              MOVE     ZERO     TO     FLG-SHIDOU-COMMENT
       *
       *      算定履歴検索
-             INITIALIZE                  SANTEI-REC
-grpsys       MOVE    RECE04-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE04-PTID         TO  SANTEI-PTID
-             MOVE    RECE04-SRYYM        TO  SANTEI-SRYYM
+             INITIALIZE                      SANTEI-REC
+             MOVE    RECE02-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE02-PTID         TO  SANTEI-PTID
+             MOVE    RECE02-SRYYM        TO  SANTEI-SRYYM
              MOVE    CONS-MANSEI         TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
              MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
              MOVE    SANTEI-REC          TO  MCPDATA-REC
-             MOVE    "tbl_santei"        TO  MCP-TABLE
-             MOVE    "key"               TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
-             IF      MCP-RC              =   ZERO
-                    MOVE    "tbl_santei"     TO  MCP-TABLE
-                    MOVE    "key"            TO  MCP-PATHNAME
-                    PERFORM        900-SANTEI-READ-SEC
-                    PERFORM   UNTIL   FLG-SANTEI  =   1
-      *
-                       IF     SANTEI-FSANTEIYMD(1:6)  =  RECE04-SRYYM   
-                             MOVE    1    TO      FLG-SHIDOU-COMMENT
-                       END-IF
-      * 
-                       MOVE    "tbl_santei"       TO  MCP-TABLE
-                       MOVE    "key"              TO  MCP-PATHNAME
-                       PERFORM        900-SANTEI-READ-SEC
-                    END-PERFORM
+             MOVE    "tbl_santei"        TO  WRK-MCP-TABLE
+             MOVE    "key"               TO  WRK-MCP-PATHNAME
+             PERFORM  900-SANTEI-INV-SEC
+             IF       FLG-SANTEI        =   ZERO
+               IF     SANTEI-FSANTEIYMD(1:6)  =  RECE02-SRYYM
+                  MOVE    1    TO    FLG-SHIDOU-COMMENT
+               END-IF
              END-IF
-      *
-             MOVE    "tbl_santei"        TO  MCP-TABLE
-             MOVE    "key"               TO  MCP-PATHNAME
-             PERFORM 900-CLOSE-SEC
       *
              IF      FLG-SHIDOU-COMMENT    =      1
                  MOVE       99      TO     FLG-COMMENT
@@ -5835,7 +5821,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI              =   1 )
                              OR   ( FLG-NIKOCHINTOU-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                     MOVE  SANTEI-SRYYM     TO  WRK-NIKOCHINTOU-YMD(1:6)
                     MOVE  SANTEI-MSANTEID  TO  WRK-NIKOCHINTOU-YMD(7:2)
                     MOVE    1              TO  FLG-NIKOCHINTOU-COMMENT
@@ -5952,36 +5938,21 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *      算定履歴検索
              INITIALIZE                      SANTEI-REC
-             MOVE    RECE04-HOSPNUM      TO  SANTEI-HOSPNUM
-             MOVE    RECE04-PTID         TO  SANTEI-PTID
-             MOVE    RECE04-SRYYM        TO  SANTEI-SRYYM
+             MOVE    RECE02-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE02-PTID         TO  SANTEI-PTID
+             MOVE    RECE02-SRYYM        TO  SANTEI-SRYYM
              MOVE    CONS-SYOUNI         TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
              MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
              MOVE    SANTEI-REC          TO  MCPDATA-REC
-             MOVE    "tbl_santei"        TO  MCP-TABLE
-             MOVE    "key"               TO  MCP-PATHNAME
-             PERFORM 900-DBSELECT-SEC
-             IF      MCP-RC              =   ZERO
-                    MOVE    "tbl_santei"     TO  MCP-TABLE
-                    MOVE    "key"            TO  MCP-PATHNAME
-                    PERFORM        900-SANTEI-READ-SEC
-                    PERFORM   UNTIL  ( FLG-SANTEI         =   1 )
-                               OR    ( FLG-SYOUNI-COMMENT =   1 )
-      *
-                       MOVE  SANTEI-FSANTEIYMD TO WRK-SYOUNI-FSANTEIYMD
-                       MOVE    1               TO FLG-SYOUNI-COMMENT
-      *
-                       MOVE    "tbl_santei"    TO MCP-TABLE
-                       MOVE    "key"           TO MCP-PATHNAME
-                       PERFORM        900-SANTEI-READ-SEC
-                    END-PERFORM
+             MOVE    "tbl_santei"        TO  WRK-MCP-TABLE
+             MOVE    "key"               TO  WRK-MCP-PATHNAME
+             PERFORM  900-SANTEI-INV-SEC
+             IF       FLG-SANTEI        =   ZERO
+               MOVE  SANTEI-FSANTEIYMD   TO  WRK-SYOUNI-FSANTEIYMD
+               MOVE    1                 TO  FLG-SYOUNI-COMMENT
              END-IF
-      *
-             MOVE    "tbl_santei"        TO  MCP-TABLE
-             MOVE    "key"               TO  MCP-PATHNAME
-             PERFORM 900-CLOSE-SEC
       *
              IF      FLG-SYOUNI-COMMENT    =      1
                  INITIALIZE            WRK-JIDO-SETCOM-AREA
@@ -6116,7 +6087,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-SINPESU-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-SINPESU-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-SINPESU-YMD(7:2)
                      MOVE    1              TO  FLG-SINPESU-COMMENT
@@ -6248,7 +6219,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI           =   1 )
                              OR   ( FLG-SINPESUR-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-SINPESUR-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-SINPESUR-YMD(7:2)
                      MOVE    1              TO  FLG-SINPESUR-COMMENT
@@ -6379,8 +6350,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM  900-SANTEI-READ-SEC
                  PERFORM   UNTIL   FLG-SANTEI  =   1
       *
-      ***>         IF   SANTEI-SRYYM  <= RECE04-SRYYM
-                   IF   SANTEI-SRYYM  <  RECE04-SRYYM
+      ***>         IF   SANTEI-SRYYM  <= RECE02-SRYYM
+                   IF   SANTEI-SRYYM  <  RECE02-SRYYM
                      PERFORM  VARYING  IDX26  FROM  31  BY  -1
                                UNTIL   IDX26   <     1
                        IF  (SANTEI-DAY(IDX26)  NOT =  ZERO)
@@ -6417,7 +6388,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  IF  WRK-GANSIDO-YMD(IDX26)  NOT =  SPACE
                   ADD        1       TO     IDZ
       *
-                  IF   WRK-GANSIDO-YMD(IDX26)(1:6) = RECE04-SRYYM
+                  IF   WRK-GANSIDO-YMD(IDX26)(1:6) = RECE02-SRYYM
                     MOVE     15      TO     WK-FREE-YUKOKETA2(IDZ)
                     MOVE   "当月算定日　　　年　　月　　日"
                                      TO     WK-FREE-NAME2(IDZ)
@@ -6581,7 +6552,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                     PERFORM   UNTIL  ( FLG-SANTEI         =   1 ) OR
                                      ( FLG-HINKAI-COMMENT =   1 )
       *
-                      IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                      IF   SANTEI-SRYYM  <=  RECE02-SRYYM
       ***              MOVE   SANTEI-SRYYM     TO  WRK-FSANTEIYMD(1:6)
       ***              MOVE   SANTEI-MSANTEID  TO  WRK-FSANTEIYMD(7:2)
                        MOVE   SANTEI-FSANTEIYMD
@@ -6597,14 +6568,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                                        LNK-DAY6-AREA
                        MOVE    LNK-DAY6-KEISAN TO  WRK-AFTER2
       *
-                       MOVE    RECE04-SRYYM    TO  WRK-HINKAIYMD(1:6)
+                       MOVE    RECE02-SRYYM    TO  WRK-HINKAIYMD(1:6)
                        MOVE    WRK-DAY         TO  WRK-HINKAIYMD(7:2)
       *
                        IF     WRK-DAY      NOT  =  ZERO
                        AND    WRK-FSANTEIYMD   <=  WRK-HINKAIYMD
                          IF ((WRK-HINKAIYMD    <   WRK-AFTER2) AND
-                             (RECE04-SRYYM     <= "201003"   ))
-                         OR ( RECE04-SRYYM     >= "201004"    )
+                             (RECE02-SRYYM     <= "201003"   ))
+                         OR ( RECE02-SRYYM     >= "201004"    )
                              MOVE    1    TO   FLG-HINKAI-COMMENT
                              MOVE  WRK-FSANTEIYMD
                                           TO   WRK-TOSEKIYMD
@@ -6701,7 +6672,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-SINPESU-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-SINPESU-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-SINPESU-YMD(7:2)
                      MOVE    1              TO  FLG-SINPESU-COMMENT
@@ -6958,7 +6929,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-SINPESU-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-SINPESU-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-SINPESU-YMD(7:2)
                      MOVE    1              TO  FLG-SINPESU-COMMENT
@@ -7184,7 +7155,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2001-ZAIKYO-HANTEI-SEC          SECTION.
       *
            IF     RECE04-FLG-ZAIKYO-COMMENT   =    "1"
-             MOVE    RECE04-SRYYM        TO  WRK-ZAIKYO-YMD9(1:6)
+             MOVE    RECE02-SRYYM        TO  WRK-ZAIKYO-YMD9(1:6)
              MOVE    "99"                TO  WRK-ZAIKYO-YMD9(7:2)
       *
              MOVE    ZERO                TO  FLG-ZAIKYO-COMMENT
@@ -7208,12 +7179,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-ZAIKYO-COMMENT  =   1 )
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-ZAIKYO-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-ZAIKYO-YMD(7:2)
                      MOVE    1              TO  FLG-ZAIKYO-COMMENT
       *
-                     IF   SANTEI-SRYYM  =  RECE04-SRYYM
+                     IF   SANTEI-SRYYM  =  RECE02-SRYYM
                        MOVE   ZERO  TO  FLG-CHECK-MAE
                        MOVE   ZERO  TO  FLG-CHECK-ATO
                        MOVE  WRK-ZAIKYO-YMD(7:2)  TO  IDX28
@@ -7270,7 +7241,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-ZAIKYO-COMMENT  =   1 )
       *
-                   IF   SANTEI-SRYYM  <   RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <   RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-ZAIKYO-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-ZAIKYO-YMD(7:2)
                      MOVE    1              TO  FLG-ZAIKYO-COMMENT
@@ -7313,7 +7284,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       PERFORM  900-SANTEI-READ-SEC
                       PERFORM   UNTIL   FLG-SANTEI  =   1
       *
-                        IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                        IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                         AND  SANTEI-SRYYM  >=  WRK-ZAIKYO-YMD(1:6)
                           MOVE  WRK-ZAIKYO-YMD(7:2)  TO  IDX28
                           MOVE  WRK-ZAIKYO-YMD9(7:2) TO  IDX29
@@ -7645,7 +7616,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2001-BOKOHO-HANTEI-SEC          SECTION.
       *
            IF     RECE04-FLG-BOKOHO-COMMENT   =    "1"
-             MOVE    RECE04-SRYYM        TO  WRK-BOKOHO-YMD9(1:6)
+             MOVE    RECE02-SRYYM        TO  WRK-BOKOHO-YMD9(1:6)
              MOVE    "99"                TO  WRK-BOKOHO-YMD9(7:2)
       *
              MOVE    ZERO                TO  FLG-BOKOHO-COMMENT
@@ -7669,12 +7640,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-BOKOHO-COMMENT  =   1 )
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-BOKOHO-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-BOKOHO-YMD(7:2)
                      MOVE    1              TO  FLG-BOKOHO-COMMENT
       *
-                     IF   SANTEI-SRYYM  =  RECE04-SRYYM
+                     IF   SANTEI-SRYYM  =  RECE02-SRYYM
                        MOVE   ZERO  TO  FLG-CHECK-MAE
                        MOVE   ZERO  TO  FLG-CHECK-ATO
                        MOVE  WRK-BOKOHO-YMD(7:2)  TO  IDX28
@@ -7731,7 +7702,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-BOKOHO-COMMENT  =   1 )
       *
-                   IF   SANTEI-SRYYM  <   RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <   RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-BOKOHO-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-BOKOHO-YMD(7:2)
                      MOVE    1              TO  FLG-BOKOHO-COMMENT
@@ -7767,7 +7738,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  PERFORM  900-SANTEI-READ-SEC
                  PERFORM   UNTIL   FLG-SANTEI  =   1
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                    AND  SANTEI-SRYYM  >=  WRK-BOKOHO-YMD(1:6)
                      MOVE  WRK-BOKOHO-YMD(7:2)  TO  IDX28
                      MOVE  WRK-BOKOHO-YMD9(7:2) TO  IDX29
@@ -8591,9 +8562,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
            MOVE          SPACE          TO  WRK-RIHAIGAKU-FSANTEIYMD
       *    医学管理：算定履歴検索
            INITIALIZE                       SANTEI-REC
-grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
-           MOVE    RECE04-PTID          TO  SANTEI-PTID
-           MOVE    RECE04-SRYYM         TO  SANTEI-SRYYM
+grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
+           MOVE    RECE02-PTID          TO  SANTEI-PTID
+           MOVE    RECE02-SRYYM         TO  SANTEI-SRYYM
            MOVE    WRK-RIHAIGAKU-SRYCD  TO  SANTEI-SRYCD
            MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
            MOVE    ZERO                 TO  SANTEI-SRYKA
@@ -8609,9 +8580,9 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            INITIALIZE      WRK-RIHAIGAKU-SANTEI-AREA
       *    リハ実施ダミー：算定履歴検索
            INITIALIZE                       SANTEI-REC
-grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
-           MOVE    RECE04-PTID          TO  SANTEI-PTID
-           MOVE    RECE04-SRYYM         TO  SANTEI-SRYYM
+grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
+           MOVE    RECE02-PTID          TO  SANTEI-PTID
+           MOVE    RECE02-SRYYM         TO  SANTEI-SRYYM
            MOVE    WRK-RIHAIGAKU-SRYCD2 TO  SANTEI-SRYCD
            MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
            MOVE    ZERO                 TO  SANTEI-SRYKA
@@ -8729,9 +8700,9 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            IF     RECE04-FLG-NINRYO-COMMENT   NOT =  SPACE
                MOVE    SPACE                TO  WRK-NINRYO-FSANTEIYMD
                INITIALIZE                       SANTEI-REC
-               MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
-               MOVE    RECE04-PTID          TO  SANTEI-PTID
-               MOVE    RECE04-SRYYM         TO  SANTEI-SRYYM
+               MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
+               MOVE    RECE02-PTID          TO  SANTEI-PTID
+               MOVE    RECE02-SRYYM         TO  SANTEI-SRYYM
                EVALUATE  RECE04-FLG-NINRYO-COMMENT
                  WHEN      "1"
                    MOVE  CONS-NINRYO        TO  SANTEI-SRYCD
@@ -8845,12 +8816,12 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-TUINZAI-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-TUINZAI-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-TUINZAI-YMD(7:2)
                      MOVE    1              TO  FLG-TUINZAI-COMMENT
       *
-                     IF   SANTEI-SRYYM  =  RECE04-SRYYM
+                     IF   SANTEI-SRYYM  =  RECE02-SRYYM
                        MOVE   ZERO  TO  FLG-CHECK-MAE
                        MOVE   ZERO  TO  FLG-CHECK-ATO
                        MOVE  WRK-TUINZAI-YMD(7:2)  TO  IDX28
@@ -9004,12 +8975,12 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                  PERFORM   UNTIL  ( FLG-SANTEI          =   1 )
                              OR   ( FLG-TUINZAI-COMMENT =   1 )
       *
-                   IF   SANTEI-SRYYM  <=  RECE04-SRYYM
+                   IF   SANTEI-SRYYM  <=  RECE02-SRYYM
                      MOVE  SANTEI-SRYYM     TO  WRK-TUINZAI-YMD(1:6)
                      MOVE  SANTEI-MSANTEID  TO  WRK-TUINZAI-YMD(7:2)
                      MOVE    1              TO  FLG-TUINZAI-COMMENT
       *
-                     IF   SANTEI-SRYYM  =  RECE04-SRYYM
+                     IF   SANTEI-SRYYM  =  RECE02-SRYYM
                        MOVE   ZERO  TO  FLG-CHECK-MAE
                        MOVE   ZERO  TO  FLG-CHECK-ATO
                        MOVE  WRK-TUINZAI-YMD(7:2)  TO  IDX28
@@ -9053,47 +9024,16 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *
                 ADD        1       TO     IDZ
       *
-                MOVE       14      TO     WK-FREE-YUKOKETA2(IDZ)
-                MOVE   "治療開始　　　年　　月　　日"
+                MOVE       12      TO     WK-FREE-YUKOKETA2(IDZ)
+                MOVE   "治療開始日　　　月　　日"
                                    TO     WK-FREE-NAME2(IDZ)
       *
-                INITIALIZE                         STS-AREA-DAY
-                INITIALIZE                         LNK-DAY2-AREA
-                MOVE    "21"                   TO  LNK-DAY2-IRAI
-                MOVE    WRK-TUINZAI-YMD        TO  LNK-DAY2-YMD
-                CALL    "ORCSDAY"    USING     STS-AREA-DAY
-                                               LNK-DAY2-AREA
-                IF      STS-DAY-RC1            =   ZERO
-                   MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
-                   INITIALIZE                       ORCSKANACHKAREA
-                   MOVE    "2"                  TO  KANACHK-SYORI
-                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
-                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
-                   IF      KANACHK-RC      =   ZERO
-                      MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(11:4)
-                   END-IF
-      *
-                   MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
-                   INITIALIZE                       ORCSKANACHKAREA
-                   MOVE    "2"                  TO  KANACHK-SYORI
-                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
-                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
-                   IF      KANACHK-RC      =   ZERO
-                      MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(17:4)
-                   END-IF
-      *
-                   MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
-                   INITIALIZE                       ORCSKANACHKAREA
-                   MOVE    "2"                  TO  KANACHK-SYORI
-                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
-                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
-                   IF      KANACHK-RC      =   ZERO
-                      MOVE    KANACHK-OUT-INPUT(1:4)
-                                        TO  WK-FREE-NAME2(IDZ)(23:4)
-                   END-IF
-                END-IF
+                MOVE    WRK-TUINZAI-YMD(5:2)   TO  DAY-IDX2
+                MOVE    TBL-DAY(DAY-IDX2)
+                                   TO     WK-FREE-NAME2(IDZ)(13:4)
+                MOVE    WRK-TUINZAI-YMD(7:2)   TO  DAY-IDX2
+                MOVE    TBL-DAY(DAY-IDX2)
+                                   TO     WK-FREE-NAME2(IDZ)(19:4)
       *
                 IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
                   MOVE  "2"        TO     WK-FREE-MEISKYFLG2(IDZ)
@@ -10610,7 +10550,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                     ELSE
                       EVALUATE   RECE051-SETCOMATFLG(IDX)
                         WHEN    1
-                        WHEN    3  THRU   33
+                        WHEN    3  THRU   34
                           ADD  1                 TO  WRK-HEN-SEQNO-J
                           IF   WRK-HEN-SEQNO-J  >  3
                             MOVE   SPACE   TO  RECE051-MEISKYFLG(IDX)

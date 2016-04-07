@@ -247,6 +247,7 @@
            03  FLG-KENSA-COM       PIC 9(01).
            03  FLG-ZAIKYO-COM      PIC 9(01).
            03  FLG-BOKOHO-COM      PIC 9(01).
+           03  FLG-HAIJRT-COM      PIC 9(01).
            03  FLG-CYOJKSN-COM     PIC 9(01).
            03  FLG-CYOJKSN-OK      PIC 9(01).
            03  FLG-RINYAK          PIC 9(01).
@@ -981,6 +982,8 @@
            03  CONS-ZAIKYO4-COMMENT  PIC X(09)  VALUE  "114027910".
       *    初回算定　　　月　　日
            03  CONS-ZAIKYO5-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-ZAIKYO6-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    心臓ペースメーカー指導管理料（着用型自動除細動器）
            03  CONS-SINPESUR1-COMMENT PIC X(09) VALUE  "113015010".
@@ -1007,6 +1010,13 @@
            03  CONS-CYOJKSN4-COMMENT PIC X(09)  VALUE  "190127610".
       *    算定開始　　　年　　月　　日
            03  CONS-CYOJKSN5-COMMENT PIC X(09)  VALUE  "840000056".
+      *
+      *    排尿自立指導料
+           03  CONS-HAIJRT-COMMENT   PIC X(09)  VALUE  "113022810".
+      *    初回算定　　　月　　日
+           03  CONS-HAIJRT2-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-HAIJRT3-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -1796,6 +1806,7 @@
                                          FLG-ZAIKYO-COM
                                          FLG-BOKOHO-COM
                                          FLG-CYOJKSN-COM
+                                         FLG-HAIJRT-COM
       *
                       MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -1870,6 +1881,7 @@
                                                     FLG-ZAIKYO-COM
                                                     FLG-BOKOHO-COM
                                                     FLG-CYOJKSN-COM
+                                                    FLG-HAIJRT-COM
       *
                                  MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -3128,6 +3140,18 @@
                    MOVE   "2"   TO    RECE220-FLG-GANSIDO-COMMENT
                 END-IF
               END-IF
+      *       排尿自立指導料
+              IF   RECE200-SRYYM    >=     "201604"
+                IF  (SRY-SRYCD(IDX2)  =     CONS-HAIJRT-COMMENT)
+                AND (FLG-HAIJRT-COM   =     ZERO               )
+                        MOVE   "1"    TO    RECE220-FLG-HAIJRT-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-HAIJRT2-COMMENT
+                                      OR    CONS-HAIJRT3-COMMENT
+                        MOVE  SPACE   TO    RECE220-FLG-HAIJRT-COMMENT
+                        MOVE    1     TO    FLG-HAIJRT-COM
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE220-SRYKBN      =     "14"
@@ -3214,6 +3238,7 @@
                    MOVE   "1"   TO    RECE220-FLG-ZAIKYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                                        OR    CONS-ZAIKYO6-COMMENT
                    MOVE  SPACE  TO    RECE220-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF

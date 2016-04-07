@@ -448,6 +448,7 @@
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
+           03  FLG-IZONSYO-COM                         PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
@@ -1593,6 +1594,8 @@
       *
       *    ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
            03  CONS-IZONSYO-COMMENT  PIC X(09)  VALUE  "180047910".
+      *    º£Œ≈≥´ªœ∆¸°°°°°°∑Ó°°°°∆¸
+           03  CONS-IZONSYO2-COMMENT PIC X(09)  VALUE  "840000076".
       *
       *    ≥∞ÕËø◊¬Æ∏°¬Œ∏°∫∫≤√ªª
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -2374,6 +2377,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-KENSA-COM
                                                        FLG-ZAIKYO-COM
                                                        FLG-BOKOHO-COM
+                                                       FLG-IZONSYO-COM
       *
                                MOVE    SPACE   TO      WRK-KYUGYOFLG
                                MOVE    ZERO    TO      FLG-COUNT-ARI
@@ -2452,6 +2456,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
                                                       FLG-ZAIKYO-COM
                                                       FLG-BOKOHO-COM
+                                                      FLG-IZONSYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
@@ -4841,8 +4846,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *       ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
               IF   RECE41-SRYYM      >=    "201604"
-                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT
+                IF  (SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT)
+                AND (FLG-IZONSYO-COM  =     ZERO                )
                         MOVE   "1"    TO    RECE44-FLG-IZONSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO2-COMMENT
+                        MOVE  SPACE   TO    RECE44-FLG-IZONSYO-COMMENT
+                        MOVE    1     TO    FLG-IZONSYO-COM
                 END-IF
               END-IF
            END-IF
@@ -5195,6 +5205,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE   "1"   TO    RECE44-FLG-ZAIKYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                                        OR    CONS-ZAIKYO6-COMMENT
                    MOVE  SPACE  TO    RECE44-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
@@ -5715,6 +5726,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                      OR CONS-ZAIKYO4-COMMENT
                  MOVE   29            TO  WRK-SETCOM-JIDO
            END-IF
+      *    ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
+           IF    RECE45-SRYCD(IDX4)   = CONS-IZONSYO-COMMENT
+                 MOVE   33            TO  WRK-SETCOM-JIDO
+           END-IF
            IF  ((RECE45-SRYCD(IDX4)   = CONS-ROUSAI19) AND
                 (RECE41-SRYYM        <= "201306"     ))
            OR  ((RECE45-SRYCD(IDX4)   = CONS-ROUSAI5
@@ -5751,9 +5766,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            OR  ((WRK-SETCOM-JIDO    =  25                       ) AND
                 (RECE45-SRYCD(IDX4) = CONS-DOUJITU-COMMENT      ))
            OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE45-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT      ))
-           OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
-                (RECE45-SRYCD(IDX4) = CONS-ZAIKYO6-COMMENT      ))
+                (RECE45-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT
+                                   OR CONS-ZAIKYO6-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  33                       ) AND
+                (RECE45-SRYCD(IDX4) = CONS-IZONSYO2-COMMENT     ))
            OR  ((WRK-SETCOM-JIDO    =  225                      ) AND
                 (RECE45-SRYCD(IDX4) = CONS-DOUJITU-COMMENT      ))
       *
@@ -10825,6 +10841,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-KENSA-COM
                                                      FLG-ZAIKYO-COM
                                                      FLG-BOKOHO-COM
+                                                     FLG-IZONSYO-COM
       *
                                MOVE    SPACE   TO    WRK-KYUGYOFLG
                                MOVE    ZERO    TO    FLG-COUNT-ARI
@@ -10905,6 +10922,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-KENSA-COM
                                                       FLG-ZAIKYO-COM
                                                       FLG-BOKOHO-COM
+                                                      FLG-IZONSYO-COM
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
