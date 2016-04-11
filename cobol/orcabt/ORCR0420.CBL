@@ -1207,6 +1207,11 @@
       *    廃用症候群リハビリテーション料３（要介護）基準不適合
            03  CONS-HAIYO9-COMMENT   PIC X(09)  VALUE  "180045730".
       *
+      *    初期加算（リハビリテーション料）
+           03  CONS-RIHAKSN1-COMMENT PIC X(09)  VALUE  "180033870".
+      *    早期リハビリテーション加算
+           03  CONS-RIHAKSN2-COMMENT PIC X(09)  VALUE  "180030770".
+      *
       *    がん患者リハビリテーション料
            03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    介達牽引
@@ -4804,6 +4809,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-HAIYO9-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-HAIYO-COMMENT
+                END-IF
+              END-IF
+      *
+              IF   (RECE41-SRYYM    >=   "201604"             )
+              AND  (SRY-SRYCD(IDX2)  =   CONS-RIHAKSN1-COMMENT
+                                     OR  CONS-RIHAKSN2-COMMENT)
+                IF   RECE44-SINDAI-COMMENT = "1"
+                    MOVE   "1"    TO    RECE44-SINDAI9-COMMENT
+                END-IF
+                IF   RECE44-KOKYUKI-COMMENT = "1"
+                    MOVE   "1"    TO    RECE44-KOKYUKI9-COMMENT
+                END-IF
+                IF   RECE44-HAIYO-COMMENT = "1"
+                    MOVE   "1"    TO    RECE44-HAIYO9-COMMENT
                 END-IF
               END-IF
       *

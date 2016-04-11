@@ -126,6 +126,13 @@
       *²ðÃ£¸£°ú
                05  RECE841-KAITATU-COMMENT     PIC  X(01).
       *
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡Ê¿´Âç·ì´É¼À´µ¡Ë
+               05  RECE841-SINDAI9-COMMENT     PIC  X(01).
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡Ê¸ÆµÛ´ï¡Ë
+               05  RECE841-KOKYUKI9-COMMENT    PIC  X(01).
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+               05  RECE841-HAIYO9-COMMENT      PIC  X(01).
+      *
       *ÌôºÞ´ÉÍý»ØÆ³ÎÁ
                05  RECE841-FLG-YAKUKAN-COMMENT PIC  X(01).
       *Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ

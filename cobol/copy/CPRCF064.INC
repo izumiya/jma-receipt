@@ -174,6 +174,13 @@
       *²ðÃ£¸£°ú
            03  RECE64-KAITATU-COMMENT     PIC  X(01).
       *
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡Ê¿´Âç·ì´É¼À´µ¡Ë
+           03  RECE64-SINDAI9-COMMENT     PIC  X(01).
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡Ê¸ÆµÛ´ï¡Ë
+           03  RECE64-KOKYUKI9-COMMENT    PIC  X(01).
+      *¥ê¥Ï¥Ó¥ê²Ã»»¡ÊÇÑÍÑ¾É¸õ·²¡Ë
+           03  RECE64-HAIYO9-COMMENT      PIC  X(01).
+      *
       *ÌôºÞ´ÉÍý»ØÆ³ÎÁ
            03  RECE64-FLG-YAKUKAN-COMMENT PIC  X(01).
       *Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ

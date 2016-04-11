@@ -142,6 +142,13 @@
       *介達牽引
            03  RECE120-KAITATU-COMMENT     PIC X(01).
       *
+      *リハビリ加算（心大血管疾患）
+           03  RECE120-SINDAI9-COMMENT     PIC X(01).
+      *リハビリ加算（呼吸器）
+           03  RECE120-KOKYUKI9-COMMENT    PIC X(01).
+      *リハビリ加算（廃用症候群）
+           03  RECE120-HAIYO9-COMMENT      PIC X(01).
+      *
       *慢性疼痛疾患管理料
            03  RECE120-FLG-SHIDOU-COMMENT  PIC X(01).
       *傷病手当金意見書交付料

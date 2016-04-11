@@ -2187,6 +2187,11 @@
       *    廃用症候群リハビリテーション料３（要介護）基準不適合
            03  CONS-HAIYO9-COMMENT   PIC X(09)  VALUE  "180045730".
       *
+      *    初期加算（リハビリテーション料）
+           03  CONS-RIHAKSN1-COMMENT PIC X(09)  VALUE  "180033870".
+      *    早期リハビリテーション加算
+           03  CONS-RIHAKSN2-COMMENT PIC X(09)  VALUE  "180030770".
+      *
       *    がん患者リハビリテーション料
            03  CONS-GANKNJ-COMMENT   PIC X(09)  VALUE  "180033110".
       *    介達牽引
@@ -12653,6 +12658,38 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                           MOVE  1  TO  RECE02-RIHA-HAIYO(IDX1 IDX16)
                          END-IF
                         END-PERFORM
+                END-IF
+              END-IF
+      *
+              IF   (RECE02-SRYYM    >=   "201604"             )
+              AND  (SRY-SRYCD(IDX2)  =   CONS-RIHAKSN1-COMMENT
+                                     OR  CONS-RIHAKSN2-COMMENT)
+                IF   RECE04-SINDAI-COMMENT = "1"
+                    MOVE   "1"    TO    RECE04-SINDAI9-COMMENT
+                    PERFORM  VARYING  IDX16  FROM  1  BY  1
+                              UNTIL   IDX16   >   31
+                      IF  RECE04-KAISU(1 IDX16) NOT = ZERO
+                        MOVE  1  TO  RECE02-RIHA-SINDAI9(IDX1 IDX16)
+                      END-IF
+                    END-PERFORM
+                END-IF
+                IF   RECE04-KOKYUKI-COMMENT = "1"
+                    MOVE   "1"    TO    RECE04-KOKYUKI9-COMMENT
+                    PERFORM  VARYING  IDX16  FROM  1  BY  1
+                              UNTIL   IDX16   >   31
+                      IF  RECE04-KAISU(1 IDX16) NOT = ZERO
+                        MOVE  1  TO  RECE02-RIHA-KOKYUKI9(IDX1 IDX16)
+                      END-IF
+                    END-PERFORM
+                END-IF
+                IF   RECE04-HAIYO-COMMENT = "1"
+                    MOVE   "1"    TO    RECE04-HAIYO9-COMMENT
+                    PERFORM  VARYING  IDX16  FROM  1  BY  1
+                              UNTIL   IDX16   >   31
+                      IF  RECE04-KAISU(1 IDX16) NOT = ZERO
+                        MOVE  1  TO  RECE02-RIHA-HAIYO9(IDX1 IDX16)
+                      END-IF
+                    END-PERFORM
                 END-IF
               END-IF
       *

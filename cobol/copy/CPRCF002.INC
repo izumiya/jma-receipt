@@ -788,6 +788,12 @@
                    07  RECE02-RIHA-SYOGAI       PIC 9(01).
                    07  RECE02-RIHA-SESSYOKU     PIC 9(01).
                    07  RECE02-RIHA-HAIYO        PIC 9(01).
+      *リハビリ加算算定テーブル
+               05  RECE02-RIHA-DAY9-AREA.
+                 06  RECE02-RIHA-DAY9-OCC       OCCURS 31.
+                   07  RECE02-RIHA-SINDAI9      PIC 9(01).
+                   07  RECE02-RIHA-KOKYUKI9     PIC 9(01).
+                   07  RECE02-RIHA-HAIYO9       PIC 9(01).
       *
       *第三者行為レセプト該当フラグ
       *（０：第三者行為の請求点なし）
