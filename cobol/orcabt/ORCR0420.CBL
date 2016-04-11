@@ -1158,9 +1158,9 @@
       *!   運動器リハビリテーション料（１）
            03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "101800125".
       *    運動器リハビリテーション料（１）（要介護）
-           03  CONS-UNDOKI11-COMMENT  PIC X(09)  VALUE  "180034510".
+           03  CONS-UNDOKI11-COMMENT PIC X(09)  VALUE  "180034510".
       *    運動器リハビリテーション料（２）（要介護）
-           03  CONS-UNDOKI12-COMMENT  PIC X(09)  VALUE  "180034610".
+           03  CONS-UNDOKI12-COMMENT PIC X(09)  VALUE  "180034610".
       *    運動器リハビリテーション料（３）（要介護）
            03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180034710".
       *#   運動器リハビリテーション料（１）
@@ -1206,6 +1206,12 @@
            03  CONS-HAIYO8-COMMENT   PIC X(09)  VALUE  "180045630".
       *    廃用症候群リハビリテーション料３（要介護）基準不適合
            03  CONS-HAIYO9-COMMENT   PIC X(09)  VALUE  "180045730".
+      *#   廃用症候群リハビリテーション料（１）（１単位）
+           03  CONS-HAIYO10-COMMENT  PIC X(09)  VALUE  "101801110".
+      *#   廃用症候群リハビリテーション料（２）（１単位）
+           03  CONS-HAIYO11-COMMENT  PIC X(09)  VALUE  "101801120".
+      *#   廃用症候群リハビリテーション料（３）（１単位）
+           03  CONS-HAIYO12-COMMENT  PIC X(09)  VALUE  "101801130".
       *
       *    初期加算（リハビリテーション料）
            03  CONS-RIHAKSN1-COMMENT PIC X(09)  VALUE  "180033870".
@@ -4625,6 +4631,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-HAIYO7-COMMENT   OR
                                             CONS-HAIYO8-COMMENT   OR
                                             CONS-HAIYO9-COMMENT   OR
+                                            CONS-HAIYO10-COMMENT  OR
+                                            CONS-HAIYO11-COMMENT  OR
+                                            CONS-HAIYO12-COMMENT  OR
                                             CONS-GANKNJ-COMMENT
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
@@ -4807,6 +4816,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-HAIYO7-COMMENT
                                       OR    CONS-HAIYO8-COMMENT
                                       OR    CONS-HAIYO9-COMMENT
+                                      OR    CONS-HAIYO10-COMMENT
+                                      OR    CONS-HAIYO11-COMMENT
+                                      OR    CONS-HAIYO12-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-HAIYO-COMMENT
                 END-IF

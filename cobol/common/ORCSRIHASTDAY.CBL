@@ -310,9 +310,15 @@
                05  CONS-HAIYO11-COMMENT   PIC X(09)   VALUE "180045630".
       *        廃用症候群リハビリテーション料３（要介護）基準不適合
                05  CONS-HAIYO12-COMMENT   PIC X(09)   VALUE "180045730".
+      *#       廃用症候群リハビリテーション料（１）（１単位）
+               05  CONS-HAIYO13-COMMENT   PIC X(09)   VALUE "101801110".
+      *#       廃用症候群リハビリテーション料（２）（１単位）
+               05  CONS-HAIYO14-COMMENT   PIC X(09)   VALUE "101801120".
+      *#       廃用症候群リハビリテーション料（３）（１単位）
+               05  CONS-HAIYO15-COMMENT   PIC X(09)   VALUE "101801130".
            03  CONS-RIHA-COMMENT-R REDEFINES CONS-RIHA-COMMENT-VAL.
-               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 65.
-           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  65.
+               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 68.
+           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  68.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -660,6 +666,9 @@
                                    OR    CONS-HAIYO10-COMMENT
                                    OR    CONS-HAIYO11-COMMENT
                                    OR    CONS-HAIYO12-COMMENT
+                                   OR    CONS-HAIYO13-COMMENT
+                                   OR    CONS-HAIYO14-COMMENT
+                                   OR    CONS-HAIYO15-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
