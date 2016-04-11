@@ -64,7 +64,9 @@ db	{
 	tbl_tnkrrk;
 	tbl_spa_tmp;
 	tbl_med_image;
-    tbl_list_doctor;
+	tbl_list_doctor;
+        tbl_generic_price;
+	tbl_santei;
 };
 
 /* #include "orcadb.inc" */
