@@ -142,6 +142,13 @@
       *    定数超過入院基本料減額（１００分の２０）（特定入院料）
            03  CONS-TEISU4                 PIC X(09) VALUE "190123090".
       *
+      *
+      *    平成２８年度食事負担
+      *    食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
+           03  CONS-NANBYO-SKJFTN          PIC X(09) VALUE "197003310".
+      *    食事療養標準負担額（精神１年超）（一般）
+           03  CONS-SEISIN-SKJFTN          PIC X(09) VALUE "197003410".
+      *
       *    その他診療行為で入力した入院料加算
            03  CONS-ETCNYUIN-TBL.
              05  CONS-ETCNYUIN-KSN         PIC X(09)  OCCURS 10.
@@ -322,6 +329,9 @@
       *    選定入院時の外泊判定用
            03  WRK-SENTEI-GAIGAKU              PIC 9(01)   OCCURS  31..
       *
+      *    患者所得情報の退避領域
+       01  WRK-SYOTOKU-SKJKBN-AREA.
+           03  WRK-SYOTOKU-SKJKBN       PIC X(01)   OCCURS  93.
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -395,8 +405,17 @@
       *    入院時生活療養費負担額取得サブ
            COPY    "CPORCSNYULIFE.INC".
       *
+      *    入院時生活療養費負担額取得サブ（平成２８年４月改定対応）
+           COPY    "CPORCSNYULIFE2.INC".
+      *
+      *    患者所得情報編集サブ
+           COPY    "CPORCSSYOTOKU.INC".
+      *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
+      *
+      *    食事負担据え置き対象取得パラメタ
+           COPY    "CPORCSSKJKEEP.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -1535,12 +1554,24 @@
            END-PERFORM
       *
       *    食事情報の編集
-           PERFORM   2103-SHOKUJI-HENSHU3-SEC
+           IF    LNK-DPCNYUIN-SANTEIYM  <=  "201603"
+               PERFORM   2103-SHOKUJI-HENSHU3-SEC
+           ELSE
+               PERFORM   2103-SHOKUJI-HENSHU4-SEC
+           END-IF
       *
       *    入院時生活療養（環境療養）の編集
            IF  (LNK-DPCNYUIN-SANTEIYM  >=  "200610")  AND
-               (LNK-NYULIFE-RC           =    ZERO)
-               PERFORM   2104-KANKYO-HENSHU-SEC
+               (LNK-DPCNYUIN-SANTEIYM  <=  "201603")
+               IF  LNK-NYULIFE-RC         =    ZERO
+                   PERFORM   2104-KANKYO-HENSHU-SEC
+               END-IF
+           END-IF
+      *
+      *    入院時生活療養（環境療養）の編集
+           IF  (LNK-DPCNYUIN-SANTEIYM  >=  "201604")  AND
+               (LNK-NYULIFE2-RC         =    ZERO)
+               PERFORM   2104-KANKYO-HENSHU2-SEC
            END-IF
       *
       *    病棟番号（病棟区分）の編集
@@ -2362,6 +2393,7 @@
       *
       *****************************************************************
       *    食事情報の編集（平成１８年４月以降　食事療養費食数ベース）
+      *                  （平成２８年３月まで）
       *****************************************************************
        2103-SHOKUJI-HENSHU3-SEC        SECTION.
       *
@@ -3594,7 +3626,1075 @@
            EXIT.
       *
       *****************************************************************
-      *    入院時生活療養（環境療養）（平成１８年１０月以降）
+      *    食事情報の編集（平成２８年４月以降）
+      *                  （食事療養費の流動食対応）
+      *                  （食事負担の難病等、精神１年超の据え置き対応）
+      *****************************************************************
+       2103-SHOKUJI-HENSHU4-SEC        SECTION.
+      *
+      *食事情報の取得（朝食）（入院会計）
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-DPCNYUIN-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID     TO  NACCT-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM TO  NACCT-SRYYM
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key30"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key30"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   VARYING   IDX1   FROM  1   BY  1
+                         UNTIL     IDX1   >    31
+                   IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)  AND
+                         (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
+                        ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
+                         (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                         (WRK-GAIHAKU-KBN(IDX1)  >= 4))
+                       MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                       TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
+      *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
+      *                                     WRK-SKJ6-HKNCOMBI-DAY(IDX1)
+                                        WRK-SKJFTN2-HKNCOMBI-DAY(IDX1)
+                       EVALUATE   NACCT-DAY(IDX1)
+                           WHEN   1
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
+                               END-IF
+                           WHEN   2
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000470"
+                                           TO  WRK-SKJ5-TOKU-SHOKU(IDX1)
+                               END-IF
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                           TO  WRK-SKJFTN2-SRYCD(IDX1)
+                               END-IF
+                       END-EVALUATE
+      *                食堂加算
+                       IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
+                           MOVE  WRK-SYS5000-SHOKUCD(3 IDX1)
+                                          TO  WRK-SKJ6-SHOKUDOU(IDX1)
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    入院会計クローズ
+           MOVE    "tbl_nyuinacct"             TO  MCP-TABLE
+           MOVE    "key30"                     TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *食事情報の取得（昼食）（入院会計）
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-DPCNYUIN-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID     TO  NACCT-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM TO  NACCT-SRYYM
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key31"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key31"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   VARYING   IDX1   FROM  1   BY  1
+                         UNTIL     IDX1   >    31
+                   COMPUTE   IDX2   =    IDX1   +   31
+                   IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)  AND
+                         (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
+                        ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
+                         (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                         (WRK-GAIHAKU-KBN(IDX1)  >= 4))
+                       MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                       TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
+      *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
+      *                                     WRK-SKJ6-HKNCOMBI-DAY(IDX2)
+                                        WRK-SKJFTN2-HKNCOMBI-DAY(IDX2)
+                       EVALUATE   NACCT-DAY(IDX1)
+                           WHEN   1
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX2)
+                               END-IF
+                           WHEN   2
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000470"
+                                           TO  WRK-SKJ5-TOKU-SHOKU(IDX2)
+                               END-IF
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                           TO  WRK-SKJFTN2-SRYCD(IDX2)
+                               END-IF
+                       END-EVALUATE
+                       IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
+                           MOVE  WRK-SYS5000-SHOKUCD(3 IDX1)
+                                          TO  WRK-SKJ6-SHOKUDOU(IDX1)
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    入院会計クローズ
+           MOVE    "tbl_nyuinacct"             TO  MCP-TABLE
+           MOVE    "key31"                     TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *食事情報の取得（夕食）（入院会計）
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-DPCNYUIN-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID     TO  NACCT-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM TO  NACCT-SRYYM
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key32"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key32"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               PERFORM   VARYING   IDX1   FROM  1   BY  1
+                         UNTIL     IDX1   >    31
+                   COMPUTE   IDX3   =    IDX1   +   62
+                   IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)  AND
+                         (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
+                        ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
+                         (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                         (WRK-GAIHAKU-KBN(IDX1)  >= 4))
+                       MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                       TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
+      *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
+      *                                     WRK-SKJ6-HKNCOMBI-DAY(IDX3)
+                                        WRK-SKJFTN2-HKNCOMBI-DAY(IDX3)
+                       EVALUATE   NACCT-DAY(IDX1)
+                           WHEN   1
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                            TO  WRK-SKJFTN2-SRYCD(IDX3)
+                               END-IF
+                           WHEN   2
+                               MOVE   WRK-SYS5000-SHOKUCD(1 IDX1)
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000470"
+                                           TO  WRK-SKJ5-TOKU-SHOKU(IDX3)
+                               END-IF
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                           TO  WRK-SKJFTN2-SRYCD(IDX3)
+                               END-IF
+                       END-EVALUATE
+                       IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
+                           MOVE  WRK-SYS5000-SHOKUCD(3 IDX1)
+                                          TO  WRK-SKJ6-SHOKUDOU(IDX1)
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    入院会計クローズ
+           MOVE    "tbl_nyuinacct"             TO  MCP-TABLE
+           MOVE    "key32"                     TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *
+      *−−−−サブルーチンでの患者所得情報の取得ここから−−−−−
+           INITIALIZE                          WRK-SYOTOKU-SKJKBN-AREA
+           INITIALIZE                          ORCSSYOTOKUAREA
+           MOVE    LNK-DPCNYUIN-HOSPNUM    TO  LNK-SYOTOKU-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID       TO  LNK-SYOTOKU-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM   TO  LNK-SYOTOKU-SRYYM
+           MOVE    "1"                     TO  LNK-SYOTOKU-SKJCHKFLG
+           CALL    "ORCSSYOTOKU"    USING      ORCSSYOTOKUAREA
+                                               SPA-AREA
+           IF    LNK-SYOTOKU-RC      =         ZERO
+                PERFORM    VARYING   IDX1   FROM   1   BY  1
+                  UNTIL   (IDX1      >     31)
+                      MOVE    LNK-SYOTOKU-SKJKBN(IDX1)
+                                    TO  WRK-SYOTOKU-SKJKBN (IDX1)
+                      COMPUTE    IDX2   =   IDX1   +   31
+                      MOVE    LNK-SYOTOKU-SKJKBN(IDX1)
+                                    TO  WRK-SYOTOKU-SKJKBN (IDX2)
+                      COMPUTE    IDX2   =   IDX1   +   62
+                      MOVE    LNK-SYOTOKU-SKJKBN(IDX1)
+                                    TO  WRK-SYOTOKU-SKJKBN (IDX2)
+                END-PERFORM
+           ELSE
+                DISPLAY "ORCSSYTOKU RC = " LNK-SYOTOKU-RC
+           END-IF
+      *−−−−サブルーチンでの患者所得情報の取得ここまで−−−−−
+      *
+      *所得情報のセット
+           PERFORM   VARYING   IDX1   FROM   1  BY  1
+                     UNTIL     IDX1   >    93
+               IF    WRK-SKJ4-RYOYO(IDX1)  NOT =  SPACE
+                   EVALUATE    WRK-SYOTOKU-SKJKBN (IDX1)
+      *                低所得２
+                       WHEN    "2"
+                           MOVE   "197000910"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
+      *                低所得２（９０日越え）
+                       WHEN    "3"
+                           MOVE   "197001010"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
+      *                低所得１
+                       WHEN    "1"
+                       WHEN    "4"
+                           MOVE   "197001110"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
+                   END-EVALUATE
+               END-IF
+           END-PERFORM
+      *
+      *
+      *
+      *    入院時生活療養費の情報取得
+           INITIALIZE                        ORCSNYULIFE2-AREA
+           MOVE    LNK-DPCNYUIN-HOSPNUM  TO  LNK-NYULIFE2-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID     TO  LNK-NYULIFE2-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM TO  LNK-NYULIFE2-SANTEIYM
+           CALL    "ORCSNYULIFE2"     USING  ORCSNYULIFE-AREA
+                                             SPA-AREA
+           IF      LNK-NYULIFE2-RC          NOT =  ZERO
+               DISPLAY  "LNK-NYULIFE2-RC = " LNK-NYULIFE-RC
+           END-IF
+      *
+      *    食事負担据え置き対象取得サブ
+           INITIALIZE                          ORCSSKJKEEP-AREA
+           MOVE    LNK-DPCNYUIN-HOSPNUM    TO  LNK-SKJKEEP-HOSPNUM
+           MOVE    LNK-DPCNYUIN-PTID       TO  LNK-SKJKEEP-PTID
+           MOVE    LNK-DPCNYUIN-SANTEIYM   TO  LNK-SKJKEEP-SANTEIYM
+           CALL    "ORCSSKJKEEP"    USING      ORCSSKJKEEP-AREA
+                                               SPA-AREA
+      *
+      *    食事ワーク７の編集（同一剤まとめ用）
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+                        UNTIL      IDX1   >   31
+      *        食事療養費（朝）
+               IF    WRK-SKJ4-RYOYO(IDX1)  NOT =   SPACE
+                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
+                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                   MOVE  WRK-SKJ4-RYOYO(IDX1)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
+               END-IF
+      *        特別食加算（朝）
+               IF    WRK-SKJ5-TOKU-SHOKU(IDX1)  NOT =   SPACE
+                   MOVE  WRK-SKJ5-TOKU-SHOKU(IDX1)
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)  NOT =  SPACE
+                       MOVE  "197001570"
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+               END-IF
+      *        食事負担（朝）
+               IF    WRK-SKJFTN2-SRYCD(IDX1)  NOT =   SPACE
+                   MOVE  WRK-SKJFTN2-SRYCD(IDX1)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+      *            難病等と精神１年超の置き換え
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "1"
+                       MOVE   CONS-NANBYO-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "2"
+                       MOVE   CONS-SEISIN-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 1)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-SKJFTN-SU(IDX1)
+               END-IF
+      *        食事療養費（昼）
+               MOVE      ZERO          TO  IDX2
+               COMPUTE   IDX2     =    IDX1    +   31
+               IF    WRK-SKJ4-RYOYO(IDX2)  NOT =   SPACE
+                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
+                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                   MOVE  WRK-SKJ4-RYOYO(IDX2)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
+               END-IF
+      *        特別食加算（昼）
+               IF    WRK-SKJ5-TOKU-SHOKU(IDX2)  NOT =   SPACE
+                   MOVE  WRK-SKJ5-TOKU-SHOKU(IDX2)
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)  NOT =  SPACE
+                       MOVE  "197001570"
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+               END-IF
+      *        食事負担（昼）
+               IF    WRK-SKJFTN2-SRYCD(IDX2)  NOT =   SPACE
+                   MOVE  WRK-SKJFTN2-SRYCD(IDX2)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+      *            難病等と精神１年超の置き換え
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "1"
+                       MOVE   CONS-NANBYO-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "2"
+                       MOVE   CONS-SEISIN-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 2)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-SKJFTN-SU(IDX1)
+               END-IF
+      *        食事療養費（夕）
+               MOVE      ZERO          TO  IDX3
+               COMPUTE   IDX3     =    IDX1    +   62
+               IF    WRK-SKJ4-RYOYO(IDX3)  NOT =   SPACE
+                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
+                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                   MOVE  WRK-SKJ4-RYOYO(IDX3)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)
+                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
+               END-IF
+      *        特別食加算（夕）
+               IF    WRK-SKJ5-TOKU-SHOKU(IDX3)  NOT =   SPACE
+                   MOVE  WRK-SKJ5-TOKU-SHOKU(IDX3)
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)  NOT =  SPACE
+                       MOVE  "197001570"
+                                       TO  WRK-SKJ7-TOKU-SHOKU(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+               END-IF
+      *        食事負担（夕）
+               IF    WRK-SKJFTN2-SRYCD(IDX3)  NOT =   SPACE
+                   MOVE  WRK-SKJFTN2-SRYCD(IDX3)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+      *            難病等と精神１年超の置き換え
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "1"
+                       MOVE   CONS-NANBYO-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   IF    LNK-SKJKEEP-KBN(IDX1)    =   "2"
+                       MOVE   CONS-SEISIN-SKJFTN
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+      *            入院時生活療養費の置換え
+                   IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 3)
+                                       TO  WRK-SKJ7-SKJFTN(IDX1)
+                   END-IF
+                   ADD   1             TO  WRK-SKJ7-SKJFTN-SU(IDX1)
+               END-IF
+      *        食事回数
+      **         IF    (WRK-SKJ4-RYOYO(IDX1)  NOT =   SPACE)   AND
+      **               (WRK-SKJ4-RYOYO(IDX2)  NOT =   SPACE)   AND
+      **               (WRK-SKJ4-RYOYO(IDX3)  NOT =   SPACE)
+      **             MOVE      1         TO   WRK-SKJ7-KAISU(IDX1)
+      **         END-IF
+      *        食堂加算
+               IF    WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE
+                   MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
+                                       TO  WRK-SKJ7-SHOKUDOU(IDX1)
+      *            入院時生活療養費の置換え
+                   IF  (LNK-NYULIFE2-SKJ-SRYCD(IDX1 1) = SPACE) AND
+                       (LNK-NYULIFE2-SKJ-SRYCD(IDX1 2) = SPACE) AND
+                       (LNK-NYULIFE2-SKJ-SRYCD(IDX1 3) = SPACE)
+                         CONTINUE
+                   ELSE
+                       MOVE  "197001670"
+                                       TO  WRK-SKJ7-SHOKUDOU(IDX1)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    食事の診療コード計
+           PERFORM    VARYING   IDX1    FROM  1  BY  1
+                      UNTIL     IDX1    >   31
+               IF   WRK-SKJ7-RYOYO(IDX1)  NOT =  SPACE
+                   MOVE    WRK-SKJ7-RYOYO(IDX1)       TO WRK-SRYCD-X
+                   COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                           WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+               END-IF
+               IF   WRK-SKJ7-SHOKUDOU(IDX1)  NOT =  SPACE
+                   MOVE    WRK-SKJ7-SHOKUDOU(IDX1)    TO WRK-SRYCD-X
+                   COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                           WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+               END-IF
+      **         IF   WRK-SKJ7-TOKU-SHOKU(IDX1)  NOT =  SPACE
+      **             MOVE    WRK-SKJ7-TOKU-SHOKU(IDX1)  TO WRK-SRYCD-X
+      **             COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+      **                     WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+      **         END-IF
+               IF   WRK-SKJ7-SKJFTN(IDX1)      NOT =  SPACE
+                   MOVE    WRK-SKJ7-SKJFTN(IDX1)  TO WRK-SRYCD-X
+                   COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                           WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+               END-IF
+               ADD   WRK-SKJ7-RYOYO-SU(IDX1)
+                                     TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+      **         ADD   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+      **                               TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+               EVALUATE    WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+                   WHEN    1
+                       ADD  1   TO   WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1)
+                   WHEN    2
+                       ADD  1   TO   WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1)
+                   WHEN    3
+                       ADD  1   TO   WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)
+               END-EVALUATE
+               ADD   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                     TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+           END-PERFORM
+      *
+      *     DISPLAY "WRK-SKJ7  MATOME BEFORE"
+      *     PERFORM      VARYING    IDX1   FROM   1  BY  1
+      *                  UNTIL      IDX1   >   31
+      *          DISPLAY "IDX1 = " IDX1
+      *          DISPLAY "WRK-SKJ7-HKNCOMBI-DAY(IDX1) = "
+      *                   WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO(IDX1) = "
+      *                   WRK-SKJ7-RYOYO(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO-SU(IDX1) = "
+      *                   WRK-SKJ7-RYOYO-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-SHOKUDOU(IDX1) = "
+      *                   WRK-SKJ7-SHOKUDOU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-SU(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)
+      *          DISPLAY "WRK-SKJ7-SKJFTN(IDX1) = "
+      *                   WRK-SKJ7-SKJFTN(IDX1)
+      *          DISPLAY "WRK-SKJ7-SKJFTN-SU(IDX1) = "
+      *                   WRK-SKJ7-SKJFTN-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-KAISU =(IDX1) = "
+      *                   WRK-SKJ7-KAISU (IDX1)
+      *          DISPLAY "WRK-SKJ7-SRYCDTOTAL =(IDX1) = "
+      *                   WRK-SKJ7-SRYCDTOTAL (IDX1)
+      *     END-PERFORM
+      *
+      *
+      *    レセ電サブ返却エリアへの食事セット
+           MOVE       ZERO    TO   IDX2
+           MOVE       ZERO    TO   IDX3
+           PERFORM    VARYING   IDX1   FROM  1  BY  1
+                      UNTIL     (IDX1   >     31)
+      *          DISPLAY "WRK-SKJ7  MATOME AFTER"
+      *          DISPLAY "IDX1 = " IDX1
+      *          DISPLAY "WRK-SKJ7-HKNCOMBI-DAY(IDX1) = "
+      *                   WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO(IDX1) = "
+      *                   WRK-SKJ7-RYOYO(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO-SU(IDX1) = "
+      *                   WRK-SKJ7-RYOYO-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-SHOKUDOU(IDX1) = "
+      *                   WRK-SKJ7-SHOKUDOU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-SU(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1)
+      *          DISPLAY "WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1) = "
+      *                   WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)
+      *          DISPLAY "WRK-SKJ7-SKJFTN(IDX1) = "
+      *                   WRK-SKJ7-SKJFTN(IDX1)
+      *          DISPLAY "WRK-SKJ7-SKJFTN-SU(IDX1) = "
+      *                   WRK-SKJ7-SKJFTN-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-KAISU =(IDX1) = "
+      *                   WRK-SKJ7-KAISU (IDX1)
+              IF    WRK-SKJ7-RYOYO(IDX1)   NOT =  SPACE
+                IF (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001310")  AND
+                   (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001710")
+                    MOVE   IDX1     TO    IDX2
+                    MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
+                                    LNK-DPCNYUIN-HKNCOMBI(3 IDX2)
+                    MOVE   ZERO     TO    IDX4
+                    IF   WRK-SKJ7-RYOYO(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX4
+                        MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+      **                  IF     IDX4    =   1
+                            MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+      **                  END-IF
+                        MOVE   WRK-SKJ7-RYOYO(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                    END-IF
+                    MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
+                                      LNK-DPCNYUIN-SURYO(3 IDX2 IDX4)
+                    EVALUATE  WRK-SKJ7-RYOYO(IDX1)
+      *               入院時食事療養（１）
+                      WHEN  "197000110"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   640     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                            WHEN  2
+                                MOVE  1280     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                            WHEN  3
+                                MOVE  1920     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                        END-EVALUATE
+      *               入院時食事療養（２）
+                      WHEN  "197000710"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   506     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                            WHEN  2
+                                MOVE  1012     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                            WHEN  3
+                                MOVE  1518     TO  
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                        END-EVALUATE
+                    END-EVALUATE
+                    MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                    IF   WRK-SKJ7-SHOKUDOU(IDX1)  NOT =  SPACE
+                         ADD     1     TO    IDX4
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+                         MOVE   WRK-SKJ7-SHOKUDOU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                         MOVE   50     TO
+                                 LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                         MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                    END-IF
+                    IF   WRK-SKJ7-TOKU-SHOKU(IDX1)   =  SPACE
+                          CONTINUE
+                    ELSE
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1) NOT = 0
+                         ADD     1     TO    IDX4
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                         MOVE   1    TO
+                                  LNK-DPCNYUIN-SURYO(3 IDX2 IDX4)
+                         MOVE   76     TO
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                      END-IF
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1) NOT = 0
+                         ADD     1     TO    IDX4
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                         MOVE   2    TO
+                                  LNK-DPCNYUIN-SURYO(3 IDX2 IDX4)
+                         MOVE   152    TO
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                      END-IF
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1) NOT = 0
+                         ADD     1     TO    IDX4
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                         MOVE   3    TO
+                                  LNK-DPCNYUIN-SURYO(3 IDX2 IDX4)
+                         MOVE   228    TO
+                                      LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                      END-IF
+                    END-IF
+                    IF   WRK-SKJ7-SKJFTN(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX4
+                        MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(3 IDX2 IDX4)
+                        MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(3 IDX2 IDX4)
+                        MOVE   WRK-SKJ7-SKJFTN(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(3 IDX2 IDX4)
+                        MOVE   WRK-SKJ7-SKJFTN-SU(IDX1)  TO
+                                  LNK-DPCNYUIN-SURYO(3 IDX2 IDX4)
+                        EVALUATE   WRK-SKJ7-SKJFTN(IDX1)
+      *               食事療養標準負担額（一般）
+                            WHEN   "197000810"
+                              IF  (LNK-DPCNYUIN-SANTEIYM
+                                                        >= "201604") AND
+                                  (LNK-DPCNYUIN-SANTEIYM
+                                                        <= "201803")
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  360  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  720  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE 1080  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+                              END-IF
+                              IF  (LNK-DPCNYUIN-SANTEIYM
+                                                        >= "201804")
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  460  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  920  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE 1380  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+                              END-IF
+      *               食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
+                            WHEN   "197003310"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  520  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE  780  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+      *               食事療養標準負担額（精神１年超）（一般）
+                            WHEN   "197003410"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  520  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE  780  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+      *               食事療養標準負担額（低２・９０日以下）
+                            WHEN   "197000910"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  210  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  420  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE  630  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+      *               食事療養標準負担額（低２・９０日超）
+                            WHEN   "197001010"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  160  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  320  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE  480  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+      *               食事療養標準負担額（低１）
+                            WHEN   "197001110"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  100  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   2
+                                      MOVE  200  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                                   WHEN   3
+                                      MOVE  300  TO 
+                                         LNK-DPCNYUIN-TEN(3 IDX2 IDX4)
+                               END-EVALUATE
+      *
+                        END-EVALUATE
+      *
+                        MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                    LNK-DPCNYUIN-KAISU(3 IDX2 IDX4)
+                    END-IF
+                    MOVE  IDX4  TO  LNK-DPCNYUIN-MEISAISU(3 IDX2)
+                ELSE
+      *             入院時生活療養の食事療養は添字４の領域に返却
+                    MOVE  IDX1      TO    IDX3
+                    MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
+                                    LNK-DPCNYUIN-HKNCOMBI(4 IDX3)
+                    MOVE   ZERO     TO    IDX5
+                    IF   WRK-SKJ7-RYOYO(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX5
+                        MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+      **                  IF     IDX5    =   1
+                            MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+      **                  END-IF
+                        MOVE   WRK-SKJ7-RYOYO(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                    END-IF
+                    MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
+                                      LNK-DPCNYUIN-SURYO(4 IDX3 IDX5)
+                    EVALUATE  WRK-SKJ7-RYOYO(IDX1)
+      *               入院時生活療養（１）食事療養
+                      WHEN  "197001310"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   554     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                            WHEN  2
+                                MOVE  1108     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                            WHEN  3
+                                MOVE  1662     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                        END-EVALUATE
+      *               入院時生活療養（２）食事療養
+                      WHEN  "197001710"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   420     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                            WHEN  2
+                                MOVE   840     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                            WHEN  3
+                                MOVE  1260     TO  
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                        END-EVALUATE
+                    END-EVALUATE
+                    MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                    IF   WRK-SKJ7-SHOKUDOU(IDX1)  NOT =  SPACE
+                         ADD     1     TO    IDX5
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+                         MOVE   WRK-SKJ7-SHOKUDOU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                         MOVE   50     TO
+                                 LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                         MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                    END-IF
+                    IF   WRK-SKJ7-TOKU-SHOKU(IDX1)   =  SPACE
+                          CONTINUE
+                    ELSE
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1) NOT = 0
+                         ADD     1     TO    IDX5
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                         MOVE   1    TO
+                                  LNK-DPCNYUIN-SURYO(4 IDX3 IDX5)
+                         MOVE   76     TO
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU1(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                      END-IF
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1) NOT = 0
+                         ADD     1     TO    IDX5
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                         MOVE   2    TO
+                                  LNK-DPCNYUIN-SURYO(4 IDX3 IDX5)
+                         MOVE   152    TO
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU2(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                      END-IF
+                      IF  WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1) NOT = 0
+                         ADD     1     TO    IDX5
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+                         MOVE   WRK-SKJ7-TOKU-SHOKU(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                         MOVE   3    TO
+                                  LNK-DPCNYUIN-SURYO(4 IDX3 IDX5)
+                         MOVE   228    TO
+                                      LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                         MOVE  WRK-SKJ7-TOKU-SHOKU-KAISU3(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                      END-IF
+                    END-IF
+                    IF   WRK-SKJ7-SKJFTN(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX5
+                        MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(4 IDX3 IDX5)
+                       MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(4 IDX3 IDX5)
+                        MOVE   WRK-SKJ7-SKJFTN(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(4 IDX3 IDX5)
+                        MOVE   WRK-SKJ7-SKJFTN-SU(IDX1)  TO
+                                  LNK-DPCNYUIN-SURYO(4 IDX3 IDX5)
+                        EVALUATE   WRK-SKJ7-SKJFTN(IDX1)
+      *               生活療養（１）食事療養標準負担額（一般）
+                            WHEN   "197002010"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  460  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  920  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE 1380  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養（２）食事療養標準負担額（一般）
+                            WHEN   "197002110"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  420  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  840  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE 1260  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（低２）
+                            WHEN   "197002210"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  210  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  420  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  630  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（低１）
+                            WHEN   "197002310"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  130  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  390  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（老人低１（老福以外））
+                            WHEN   "197002410"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  130  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  390  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（老人低１（老福））
+                            WHEN   "197002510"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  100  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  200  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  300  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（医療区分２、３（一般））
+                            WHEN   "197002710"
+                              IF  (LNK-DPCNYUIN-SANTEIYM
+                                                        >= "201604") AND
+                                  (LNK-DPCNYUIN-SANTEIYM
+                                                        <= "201803")
+                                EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  360  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  720  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE 1080  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                END-EVALUATE
+                              END-IF
+                              IF  (LNK-DPCNYUIN-SANTEIYM
+                                                        >= "201804")
+                                EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  460  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  920  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE 1380  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                END-EVALUATE
+                              END-IF
+      *               生活療養食事療養標準負担額（指定難病）（医療区分２・３）（一般）
+                            WHEN   "197003610"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  520  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  780  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（精神１年超・医療区分２・３）（一般）
+                            WHEN   "197003710"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  260  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  520  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  780  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（医療区分２、３（低２・
+      *                                           ９０日以下））
+                            WHEN   "197002810"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  210  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  420  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  630  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（医療区分２、３（低２・
+      *                                           ９０日超））
+                            WHEN   "197002910"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  160  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  320  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  480  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *               生活療養食事療養標準負担額（医療区分２、３（低１））
+                            WHEN   "197003010"
+                               EVALUATE   WRK-SKJ7-SKJFTN-SU(IDX1)
+                                   WHEN   1
+                                      MOVE  100  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   2
+                                      MOVE  200  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                                   WHEN   3
+                                      MOVE  300  TO 
+                                         LNK-DPCNYUIN-TEN(4 IDX3 IDX5)
+                               END-EVALUATE
+      *
+                        END-EVALUATE
+      *
+                        MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                    LNK-DPCNYUIN-KAISU(4 IDX3 IDX5)
+                    END-IF
+                    MOVE  IDX5  TO  LNK-DPCNYUIN-MEISAISU(4 IDX3)
+                END-IF
+              END-IF
+           END-PERFORM
+      *
+           .
+       2103-SHOKUJI-HENSHU4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院時生活療養（環境療養）（平成１８年１０月から平成２８年３月迄）
       *****************************************************************
        2104-KANKYO-HENSHU-SEC        SECTION.
       *
@@ -3679,6 +4779,96 @@
       *
            .
        2104-KANKYO-HENSHU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院時生活療養（環境療養）（平成２８年４月以降）
+      *    ロジックは 2104-KANKYO-HENSHU-SEC と同じで、ORCSNYULIFE が
+      *    ORCSNYULIFE2 に変更のみ
+      *****************************************************************
+       2104-KANKYO-HENSHU2-SEC        SECTION.
+      *
+           PERFORM   VARYING   IDX1    FROM   1   BY   1
+             UNTIL   IDX1      >       31
+               IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)            AND
+                     (LNK-NYULIFE2-KAN-SRYCD(IDX1)   NOT =  SPACE)  AND
+                    ((WRK-NYUINKHN(IDX1) NOT =  SPACE)              OR
+                     (LNK-NYUINDAY-KBN(IDX1)     =  "1"  ))         AND
+                    ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                     (WRK-GAIHAKU-KBN(IDX1)  >=    4))
+                   MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                     TO  WRK-KANKYO-HKNCOMBI-DAY(IDX1)
+                   MOVE   LNK-NYULIFE2-KAN-SRYCD(IDX1)
+                                     TO  WRK-KANKYO-RYOYO(IDX1)
+                   MOVE   LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+                                     TO  WRK-KANKYO-FTN(IDX1)
+                   IF   LNK-NYULIFE2-KAN-SRYCD(IDX1)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-KAN-SRYCD(IDX1) TO WRK-SRYCD-X
+                       COMPUTE WRK-KANKYO-SRYCDTOTAL(IDX1)  =
+                           WRK-KANKYO-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+                   END-IF
+                   IF   LNK-NYULIFE2-KANFTN-SRYCD(IDX1)  NOT =  SPACE
+                       MOVE  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+                                                        TO WRK-SRYCD-X
+                       COMPUTE WRK-KANKYO-SRYCDTOTAL(IDX1)  =
+                           WRK-KANKYO-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *
+      *    レセ電サブ返却エリアへの環境療養セット
+           MOVE       ZERO    TO   IDX2
+           PERFORM    VARYING   IDX1   FROM  1  BY  1
+                      UNTIL     (IDX1   >     31)
+                IF    WRK-KANKYO-RYOYO(IDX1)   NOT =  SPACE
+                    MOVE   IDX1     TO    IDX2
+                    MOVE  WRK-KANKYO-HKNCOMBI-DAY(IDX1) TO
+                                    LNK-DPCNYUIN-HKNCOMBI(5 IDX2)
+                    MOVE   ZERO     TO    IDX4
+                    IF   WRK-KANKYO-RYOYO(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX4
+                        MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(5 IDX2 IDX4)
+      **                  IF     IDX4    =   1
+                            MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(5 IDX2 IDX4)
+      **                  END-IF
+                        MOVE   WRK-KANKYO-RYOYO(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(5 IDX2 IDX4)
+                    END-IF
+                    EVALUATE  WRK-KANKYO-RYOYO(IDX1)
+                      WHEN  "197001410"
+                          MOVE   398     TO  
+                                      LNK-DPCNYUIN-TEN(5 IDX2 IDX4)
+                      WHEN  "197001810"
+                          MOVE   398     TO  
+                                      LNK-DPCNYUIN-TEN(5 IDX2 IDX4)
+                    END-EVALUATE
+                    MOVE  WRK-KANKYO-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(5 IDX2 IDX4)
+                    IF   WRK-KANKYO-FTN(IDX1)  NOT =  SPACE
+                         ADD     1     TO    IDX4
+                         MOVE   "SI"   TO
+                              LNK-DPCNYUIN-RECSKB(5 IDX2 IDX4)
+                         MOVE   "97"   TO
+                              LNK-DPCNYUIN-SRYSKB(5 IDX2 IDX4)
+                         MOVE   WRK-KANKYO-FTN(IDX1)  TO
+                                  LNK-DPCNYUIN-SRYCD(5 IDX2 IDX4)
+                         MOVE   320     TO  
+                                      LNK-DPCNYUIN-TEN(5 IDX2 IDX4)
+                         MOVE  WRK-KANKYO-KAISU(IDX1)  TO
+                                LNK-DPCNYUIN-KAISU(5 IDX2 IDX4)
+                    END-IF
+      *
+                    MOVE  WRK-KANKYO-KAISU(IDX1)  TO
+                                    LNK-DPCNYUIN-KAISU(5 IDX2 IDX4)
+                    MOVE  IDX4  TO  LNK-DPCNYUIN-MEISAISU(5 IDX2)
+                END-IF
+           END-PERFORM
+      *
+           .
+       2104-KANKYO-HENSHU2-EXT.
            EXIT.
       *
       *****************************************************************

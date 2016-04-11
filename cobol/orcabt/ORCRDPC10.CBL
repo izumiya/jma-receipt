@@ -1097,6 +1097,19 @@
       *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
                05  WRK-CONS-HYOJYUN-FUTAN15
                                       PIC X(09)   VALUE   "197003010".
+      *         ø¿Æ£≤£∏«Ø≈Ÿ≤˛ƒÍ§Œƒ…≤√ ¨
+      *        ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°¶æÆª˘À˝¿≠∆√ƒÍº¿…¬¥µº‘°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN16
+                                      PIC X(09)   VALUE   "197003310".
+      *        ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ¿∫ø¿£±«Øƒ∂°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN17
+                                      PIC X(09)   VALUE   "197003410".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN18
+                                      PIC X(09)   VALUE   "197003610".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ¿∫ø¿£±«Øƒ∂°¶∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN19
+                                      PIC X(09)   VALUE   "197003710".
       *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.
       *
@@ -4356,7 +4369,11 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN12
                                            OR  WRK-CONS-HYOJYUN-FUTAN13
                                            OR  WRK-CONS-HYOJYUN-FUTAN14
-                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15
+                                           OR  WRK-CONS-HYOJYUN-FUTAN16
+                                           OR  WRK-CONS-HYOJYUN-FUTAN17
+                                           OR  WRK-CONS-HYOJYUN-FUTAN18
+                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
                                    CONTINUE
                                ELSE
                                     IF    IDXZ       =  1
@@ -4490,7 +4507,11 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN12
                                            OR  WRK-CONS-HYOJYUN-FUTAN13
                                            OR  WRK-CONS-HYOJYUN-FUTAN14
-                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15
+                                           OR  WRK-CONS-HYOJYUN-FUTAN16
+                                           OR  WRK-CONS-HYOJYUN-FUTAN17
+                                           OR  WRK-CONS-HYOJYUN-FUTAN18
+                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
                                    CONTINUE
                                ELSE
                                     IF    IDXZ       =  1
