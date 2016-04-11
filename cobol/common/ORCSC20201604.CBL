@@ -903,6 +903,7 @@
                WHEN    "213"
                WHEN    "223"
                WHEN    "233"
+      *
       *            投薬の処方のみは、投薬が算定できない時のみ
                    IF      (LNK-ORCSC-ROUMANSEI-ARI    =   ZERO) AND
                            (LNK-ORCSC-ROUMANSEI-ARI2   =   ZERO) AND
@@ -917,6 +918,7 @@
                        AND (SPA-ZAIKANRI-ARI2          =   ZERO)
       *                特定施設入居時等医学管理料
                        AND (SPA-IGAKUKAN-ARI           =   ZERO)
+                       AND (SPA-IGAKUKAN-ARI2          =   ZERO)
       *H28.4           小児かかりつけ診療料
                        AND (SPA-SYONIKKR-ARI           =   ZERO)
                        AND (SPA-SYONIKKR-ARI2          =   ZERO)
