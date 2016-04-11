@@ -90,6 +90,8 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  15/04/XX  ¸åÈ¯ÊÑ¹¹ÉÔ²Ä½èÊýËèÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  16/02/XX  È÷¹Í¥³¥á¥ó¥È¥ª¥×¥·¥ç¥óÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÄêÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/04/XX  ÃÏ°èÊñ³ç¿ÇÎÅÊÔ½¸ÂÐ±þ
+      *                                     È÷¹ÍÂ³¤­¤ò½èÊýÍó¤Øµ­ºÜ
       *****************************************************************
       *
       *
@@ -199,6 +201,12 @@
            03  FLG-COMOK               PIC 9(01).
       *H28.4
            03  FLG-CHKNO               PIC 9(01).
+      *H28.4
+           03  FLG-CHIKHKT             PIC 9(01).
+           03  FLG-SANTEI              PIC 9(01).
+           03  FLG-SANTEI-OK           PIC 9(01).
+           03  FLG-BKOU-END            PIC 9(01).
+      *
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -255,6 +263,9 @@
            03  IDX-KB                  PIC 9(04).
            03  IDP2                    PIC 9(03).
            03  IDX-B2                  PIC 9(04).
+      *H28.4
+           03  IDX-BM                  PIC 9(04).
+           03  IDX-BM2                 PIC 9(04).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -424,6 +435,21 @@
                05  WRK-KOH-MEMO        PIC X(20)
                                        OCCURS   3.
            03  IDX-KM                  PIC 9(02).
+      *H28.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ
+           03  WRK-BIKOU-CHIK          PIC X(40).
+      *    È÷¹ÍÌÀºÙÊÔ½¸ÂÐ±þ
+           03  WRK-PAGE-SYOMAX         PIC 9(04).
+      *    È÷¹ÍÊÔ½¸
+           03  WRK-CHK-BIKOU           PIC X(172).
+           03  WRK-CHK-BIKOU-1-G       REDEFINES   WRK-CHK-BIKOU.
+               05  WRK-CHK-BIKOU-1     PIC X(86).
+               05  WRK-CHK-BIKOU-2     PIC X(86).
+           03  WRK-CHK-BIKOU-2-G       REDEFINES   WRK-CHK-BIKOU.
+               05  WRK-CHK-BIKOU-2-1   PIC X(82).
+               05  WRK-CHK-BIKOU-2-2   PIC X(82).
+               05  WRK-CHK-BIKOU-2-3   PIC X(08).
+      *
       *
       *    ºÞËè¤ÎÆâÍÆ
        01  WRK-NAIYOU-AREA.
@@ -545,7 +571,7 @@
            03  WRK-SYOHOU-PAGE         OCCURS   10.
                05  WRK-SYOHOU-TBL          OCCURS   19.
                    07  WRK-HENKOU          PIC X(02).
-                   07  WRK-NAIYOU          PIC X(84).
+                   07  WRK-NAIYOU          PIC X(82).
            03  WRK-PAGE-MAX                PIC 9(03).
       *
       *    ½èÊý¤»¤óÌÀºÙ¹Ô
@@ -557,18 +583,18 @@
       *    È÷¹Í¹Ô
        01  BIKOU2-MAX              PIC 9(02)  VALUE 2.
       *    £Ñ£ÒÈ÷¹Í¹Ô
-       01  BIKOU-MAXQ              PIC 9(02)  VALUE 6.
+       01  BIKOU-MAXQ              PIC 9(02)  VALUE 20.
       *
       *    ¥³¥á¥ó¥ÈÈ÷¹Í
        01  WRK-BIKOU-AREA.
       *    È÷¹Í¥³¥á¥ó¥ÈÊÔ½¸
            03  WRK-BIKOU-G.
                05  WRK-BIKOU-NAME      PIC X(172)
-                                       OCCURS   9.
+                                       OCCURS   20.
            03  WRK-BIKOU-G2            REDEFINES
                                        WRK-BIKOU-G.
                05  WRK-BIKOU-NAME2     PIC X(86)
-                                       OCCURS   18.
+                                       OCCURS   40.
            03  IDX-BIKOU                   PIC 9(04).
       *    È÷¹Í¥³¥á¥ó¥È¾åÃÊÊÔ½¸
            03  WRK-BIKOMEI             PIC X(80).
@@ -585,11 +611,21 @@
            03  IDX-COM                     PIC 9(04).
            03  IDX-COM2                    PIC 9(04).
            03  COM-MAX                     PIC 9(04).
+      *
+      *H28.4
+      *    È÷¹ÍÍóÊÔ½¸
+       01  WRK-HEN-BIKOU-AREA.
+           03  WRK-HEN-BIKOU-G         OCCURS   4.
+               05  WRK-HEN-BIKOU       PIC X(86).
+      *    È÷¹ÍÌÀºÙÍóÊÔ½¸
+       01  WRK-MEI-BIKOU-AREA.
+           03  WRK-MEI-BIKOU-G         OCCURS   19.
+               05  WRK-MEI-BIKOU       PIC X(82).
+      *
       *QR¡¡½èÊý¤»¤ó¥³¥á¥ó¥È
        01  WRK-QR-BIKOU-AREA.
-           03  WRK-QR-BIKOU-G.
-               05  WRK-QR-BIKOU-NAME       PIC X(100)
-                                           OCCURS   10.
+           03  WRK-QR-BIKOU-G          OCCURS   20.
+               05  WRK-QR-BIKOU-NAME       PIC X(100).
       *
       *    £Ñ£Ò°ÌÃÖ
        01  QR-FILE-NAME-PARA.
@@ -611,6 +647,16 @@
        01  KUHAKU-NAME.
            03  FILLER          PIC X(05)   VALUE   "data/".
            03  FILLER          PIC X(15)   VALUE   "transparent.jpg".
+      *
+      *H28.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+       01  CONS-CHKHTCD        PIC X(09)   VALUE   "113015810".
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+       01  CONS-NNCHICD        PIC X(09)   VALUE   "113018410".
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+       01  CONS-CHKHTKSN       PIC X(09)   VALUE   "112017270".
+      *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+       01  CONS-NNCHIKSN       PIC X(09)   VALUE   "112017570".
       *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  PARA-AREA.
@@ -642,6 +688,9 @@
                05  PARA-COM-KOHNUM-TBL     OCCURS   3.
                    07  PARA-COM-MEMO       PIC X(20).
                    07  PARA-COM-KOHNUM     PIC X(35).
+      *H28.4
+      *    ÃÏ°èÊñ³çÉ½¼¨
+           03  PARA-CHIIKI             PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -734,6 +783,11 @@
       *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊó
        01  PTRSIINF-REC.
            COPY    "CPPTRSIINF.INC".
+      *
+      *H28.4
+      *    »»ÄêÍúÎò
+       01  SANTEI-REC.
+           COPY    "CPSANTEI.INC".
       *
       *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¥ï¡¼¥¯
        01  LNK-WKSRYACT-AREA.
@@ -925,6 +979,11 @@
            MOVE    "QRCSVFILE"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-QR-CSVFILE
+      *H28.4
+      *    ÃÏ°èÊñ³çÉ½¼¨
+           MOVE    "CHIIKI"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-CHIIKI
       *H28.2
       *    ¸øÈñÈ÷¹Í¥³¥á¥ó¥ÈÊÔ½¸
            PERFORM VARYING     IDP     FROM    1   BY  1
@@ -1179,6 +1238,10 @@
       *
            END-IF
            MOVE    ZERO                TO  WRK-FILE-CNT
+      *
+      *H28.4
+      *    È÷¹ÍÊÔ½¸
+           PERFORM 4009-BIKOU-HENSYU-SEC
       *
       *H24.6
       *    £Ñ£Ò·ï¿ô¤È°õºþËç¿ô¤ÎÈ½Äê
@@ -1561,9 +1624,85 @@
                    MOVE    "2"                 TO  WRK-BIKOU-FTN
            END-EVALUATE
       *
+      *H28.4
+      *    ÃÏ°èÊñ³ç¡¦Ç§ÃÎ¾ÉÃÏ°èÊñ³ç»»Äê
+           IF     (PARA-CHIIKI         =   "1"  )
+             AND  (FLG-CHIKHKT         =   ZERO )
+               PERFORM 40013-CHIIKI-CHK-SEC
+           END-IF
+      *
            .
        4001-DB-KENSAKU-EXT.
            EXIT.
+      *H28.4
+      *****************************************************************
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ»»Äê¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       40013-CHIIKI-CHK-SEC        SECTION.
+      *
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+           MOVE    CONS-CHKHTCD        TO  WRK-SRYCD
+           PERFORM 400131-SANTEI-CHK-SEC
+           IF      FLG-SANTEI-OK       =   1
+               MOVE    1                   TO  FLG-CHIKHKT
+           ELSE
+      *        Ç§ÃÎ¾ÉÃÏ°èÊñ³ç
+               MOVE     CONS-NNCHICD       TO  WRK-SRYCD
+               PERFORM 400131-SANTEI-CHK-SEC
+               IF      FLG-SANTEI-OK       =   1
+                   MOVE    2                   TO  FLG-CHIKHKT
+               END-IF
+           END-IF
+      *
+           .
+       40013-CHIIKI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    »»ÄêÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       400131-SANTEI-CHK-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SANTEI-OK
+      *    »»ÄêÍúÎò¸¡º÷
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
+           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                TO  SANTEI-SRYKA
+           MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  SANTEI-REC
+                   MOVE    ZERO            TO  FLG-SANTEI
+               ELSE
+                   MOVE    1               TO  FLG-SANTEI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-SANTEI          =   ZERO
+               IF      SANTEI-MSANTEICNT   >   ZERO
+                   MOVE    1               TO  FLG-SANTEI-OK
+               END-IF
+           END-IF
+           .
+       400131-SANTEI-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ´µ¼Ô¸øÈñÊÑ´¹½èÍý
       *****************************************************************
@@ -1802,26 +1941,6 @@
                PERFORM 40022-KOHMEMO-HEN-SEC
            END-IF
       *
-      *    ÃÏÊý¸øÈñ¤òÈ÷¹Í¤Ø¡Ê¥³¥á¥ó¥È¤ÎºÇ½é¤Ø¡Ë
-      *    PERFORM VARYING     IDX-K3  FROM    4   BY  -1
-      *            UNTIL      (IDX-K3      <   1   )
-      *        IF      (WRK-HEN-KOH (IDX-K3)   NOT =   SPACE )
-      *            PERFORM VARYING     IDX-B1  FROM    9   BY  -1
-      *                    UNTIL      (IDX-B1      <   1   )
-      *                IF      IDX-B1          =   1
-      *                    MOVE    WRK-HEN-KOH (IDX-K3)
-      *                                        TO  WRK-BIKOU-NAME
-      *                                                   (IDX-B1)
-      *                    ADD     1                   TO  IDX-BIKOU
-      *                ELSE
-      *                    MOVE    WRK-BIKOU-NAME (IDX-B1 - 1)
-      *                                        TO  WRK-BIKOU-NAME
-      *                                                   (IDX-B1)
-      *                END-IF
-      *            END-PERFORM
-      *        END-IF
-      ***  END-PERFORM
-      *
       *    È÷¹Í¶Ø´÷ÊÔ½¸
            IF      PARA-TABOO          =   "1"
       *        ¶Ø´÷£±
@@ -1858,6 +1977,26 @@
                    MOVE    PTINF-COMMENT-2     TO  WRK-PTCOMMENT (2)
                END-IF
            END-IF
+      *
+      *H28.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ»»Äê
+           MOVE    SPACE               TO  WRK-BIKOU-CHIK
+           IF      PARA-CHIIKI         =   "1"
+               EVALUATE    FLG-CHIKHKT
+                   WHEN    1
+                       MOVE    "ÃÏ°èÊñ³ç¿ÇÎÅÎÁ»»Äê"
+                                               TO  WRK-BIKOU-CHIK
+                   WHEN    2
+                       MOVE    "Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ»»Äê"
+                                               TO  WRK-BIKOU-CHIK
+                   WHEN    3
+                       MOVE    "ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»»»Äê"
+                                               TO  WRK-BIKOU-CHIK
+                   WHEN    4
+                       MOVE    "Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»»»Äê"
+                                               TO  WRK-BIKOU-CHIK
+               END-EVALUATE
+           END-IF
       *!!
            .
        4002-USER-SETHEN-EXT.
@@ -1869,12 +2008,12 @@
       *
            IF      WRK-COMMENT-HEN NOT =   SPACE
                PERFORM VARYING     IDX-B1  FROM    1   BY  1
-                       UNTIL      (IDX-B1      >   9   )
+                       UNTIL      (IDX-B1      >   20   )
                    IF      WRK-BIKOU-NAME (IDX-B1) =   SPACE
                        MOVE    WRK-COMMENT-HEN     TO  WRK-BIKOU-NAME
                                                           (IDX-B1)
                        MOVE    IDX-B1              TO  IDX-BIKOU
-                       MOVE    9                   TO  IDX-B1
+                       MOVE    20                  TO  IDX-B1
                    END-IF
                END-PERFORM
            END-IF
@@ -2030,12 +2169,20 @@
                MOVE    WRK-HEN-JKYSNUM(2)  TO  HC02Q-JKYSNUM215
            END-EVALUATE
       *
+      *H28.4
+           IF      WRK-PAGE-SYOMAX     <   IDX
+      *        È÷¹Í¤ò½èÊýÆâÍÆ¤ØÊÔ½¸
+               PERFORM 3001-SYOHO-BIKOU-SEC
+           ELSE
+      *
       *    ½èÊýÆâÍÆ
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   LINE-MAX
                MOVE    WRK-HENKOU (IDX IDX2)   TO  HC02Q-HENKOU(IDX2)
                MOVE    WRK-NAIYOU (IDX IDX2)   TO  HC02Q-NAIYO (IDX2)
            END-PERFORM
+      *
+           END-IF
       *
       *    ¥Ñ¥é¥á¥¿ÀßÄê¤Ë¤è¤ëÊÔ½¸
            PERFORM 30011-USER-HENSYU-SEC
@@ -2046,6 +2193,33 @@
            IF      WRK-BIKOU       NOT =   SPACE
                ADD     1               TO  IDX-B2
                MOVE    WRK-BIKOU       TO  HC02Q-BIKOH2(IDX-B2)
+           END-IF
+      *H28.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ¡Ê¾åÃÊ¡Ë
+           IF      WRK-BIKOU-CHIK  NOT =   SPACE
+               IF      IDX-B2              =   ZERO
+                   ADD     1                   TO  IDX-B2
+               END-IF
+               IF      HC02Q-BIKOH2(IDX-B2)    =   SPACE
+                   MOVE    WRK-BIKOU-CHIK
+                                           TO  HC02Q-BIKOH2(IDX-B2)
+               ELSE
+                   MOVE    SPACE               TO  WRK-BIKOMEI
+                   STRING  HC02Q-BIKOH2(IDX-B2)    DELIMITED  BY  SPACE
+                           "¡¢"                    DELIMITED  BY  SIZE
+                           WRK-BIKOU-CHIK          DELIMITED  BY  SPACE
+                                               INTO    WRK-BIKOMEI
+                   END-STRING
+                   IF      WRK-BIKOMEI-2       =   SPACE
+                       MOVE    WRK-BIKOMEI     TO  HC02Q-BIKOH2(IDX-B2)
+                   ELSE
+                       ADD     1               TO  IDX-B2
+                       IF      IDX-B2          <=  BIKOU2-MAX
+                           MOVE    WRK-BIKOU-CHIK
+                                               TO  HC02Q-BIKOH2(IDX-B2)
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
       *    ¸øÈñÈ÷¹Í¥³¥á¥ó¥ÈÊÔ½¸¡Ê¾åÃÊ¡Ë
@@ -2078,29 +2252,10 @@
                END-IF
            END-PERFORM
       *
-      *    ËãÌôÊÔ½¸
-           MOVE    ZERO                TO  IDX-B
-           IF      FLG-MAYAKU          =   1
-               PERFORM 31020-MAYAKU-HEN-SEC
-           END-IF
-      *    ÃÏÊý¸øÈñ¤òÊÔ½¸
-           PERFORM VARYING     IDX-K3  FROM    1   BY  1
-                   UNTIL      (IDX-K3      >   4   )
-                          OR  (IDX-B       >=  BIKOU-MAX   )
-                          OR  (WRK-HEN-KOH (IDX-K3)    =   SPACE)
-               ADD     1                   TO  IDX-B
-               MOVE    WRK-HEN-KOH (IDX-K3)
-                                           TO  HC02Q-BIKOH (IDX-B)
-           END-PERFORM
-      *
-      *    È÷¹ÍÍó¥³¥á¥ó¥ÈÊÔ½¸
-           IF      IDX-BIKOU           >   ZERO
-               PERFORM 3009-COMMENT-HEN-SEC
-           END-IF
-      *!!
-      *    È÷¹ÍÍó´µ¼Ô¥³¥á¥ó¥ÈÊÔ½¸
-           IF      WRK-PTCOMMENT-G NOT =   SPACE
-               PERFORM 30011-PTCOMMENT-HEN-SEC
+      *    È÷¹ÍÍóÊÔ½¸¡ÊÈ÷¹ÍÌÀºÙ°Ê³°¡Ë
+           IF      IDX                 <=  WRK-PAGE-SYOMAX
+      *        È÷¹Í¤ò½èÊýÆâÍÆ¤ØÊÔ½¸
+               PERFORM 3002-BIKOU-HENSYU-SEC
            END-IF
       *
       *    ¸åÈ¯°åÌôÉÊÊÑ¹¹²Ä
@@ -2120,84 +2275,63 @@
            .
        300-HC02Q-HEN-EXT.
            EXIT.
-      *****************************************************************
-      *        ËãÌôÊÔ½¸ÊÔ½¸½èÍý
-      *****************************************************************
-       31020-MAYAKU-HEN-SEC      SECTION.
       *
-           PERFORM VARYING     IDX-H   FROM    1   BY  1
-                   UNTIL      (IDX-H   >   3   )  OR
-                              (IDX-B   >=  BIKOU-MAX   )
-               IF      WRK-HENSYU (IDX-H)  NOT =   SPACE
+      *H28.4
+      *****************************************************************
+      *        È÷¹ÍÍóÊÔ½¸½èÍý
+      *****************************************************************
+       3002-BIKOU-HENSYU-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  IDX-B
+           PERFORM VARYING     IDX-BM  FROM    1   BY  1
+                   UNTIL      (IDX-B   >=  BIKOU-MAX   )
+                          OR  (IDX-BM  >   BIKOU-MAX   )
+               IF     WRK-HEN-BIKOU(IDX-BM)    NOT =   SPACE
                    ADD     1                   TO  IDX-B
-                   MOVE    WRK-HENSYU (IDX-H)  TO  HC02Q-BIKOH (IDX-B)
-               END-IF
-           END-PERFORM
-      *
-           .
-       31020-MAYAKU-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    È÷¹ÍÍó¥³¥á¥ó¥ÈÊÔ½¸½èÍý
-      *****************************************************************
-       3009-COMMENT-HEN-SEC      SECTION.
-      *
-           PERFORM VARYING     IDX-BIKOU   FROM    1   BY  1
-                   UNTIL      (IDX-BIKOU   >   18  )  OR
-                              (IDX-B       >=  BIKOU-MAX   )
-               IF      WRK-BIKOU-NAME2(IDX-BIKOU)  NOT =   SPACE
-                   ADD     1                   TO  IDX-B
-                   MOVE    WRK-BIKOU-NAME2(IDX-BIKOU)
+                   MOVE    WRK-HEN-BIKOU(IDX-BM)
                                                TO  HC02Q-BIKOH (IDX-B)
                END-IF
            END-PERFORM
-      *
            .
-       3009-COMMENT-HEN-EXT.
+       3002-BIKOU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
-      *     ´µ¼Ô¥³¥á¥ó¥ÈÈ÷¹ÍÊÔ½¸½èÍý
+      *        È÷¹Í¤ò½èÊýÆâÍÆ¤ØÊÔ½¸½èÍý
       *****************************************************************
-       30011-PTCOMMENT-HEN-SEC      SECTION.
+       3001-SYOHO-BIKOU-SEC      SECTION.
       *
-           PERFORM VARYING     IDX-COM     FROM    1   BY  1
-                   UNTIL      (IDX-COM     >   2   )  OR
-                              (IDX-B       >=  BIKOU-MAX   )
-               IF      WRK-PTCOMMENT  (IDX-COM)    NOT =   SPACE
-                   ADD     1                   TO  IDX-B
-                   MOVE    ZERO                TO  IDX-COM2
-                   MOVE    86                  TO  COM-MAX
-                   MOVE    WRK-PTCOMMENT (IDX-COM)(1:COM-MAX)
-                                               TO  WRK-PTCOMMENT-HEN
+           MOVE    ZERO                TO  IDX2
+           MOVE    SPACE               TO  WRK-SYOHOU-PAGE (IDX)
       *
-                   INITIALIZE                  ORCSKANACHKAREA
-                   MOVE    "1"                 TO  KANACHK-SYORI
-                   MOVE    WRK-PTCOMMENT (IDX-COM)(1:COM-MAX)
-                                               TO  KANACHK-MAE-INPUT
-                   MOVE    COM-MAX             TO  KANACHK-MAX-CNT
-                   CALL    "ORCSKANACHK"       USING
-                                               ORCSKANACHKAREA
-                   MOVE    KANACHK-MAE-INPUT   TO  WRK-PTCOMMENT-HEN
-                   COMPUTE IDX-COM2        =   KANACHK-MAX   +   1
-                   IF      WRK-PTCOMMENT (IDX-COM)(IDX-COM2:)
-                                               =   SPACE
-                       MOVE    ZERO                TO  IDX-COM2
-                   END-IF
-                   MOVE    WRK-PTCOMMENT-HEN   TO  HC02Q-BIKOH (IDX-B)
-      *            »ÄÊ¸»ú¤ò¼¡¹Ô¤Ø
-                   IF      IDX-COM2            >   ZERO
-                       ADD     1                   TO  IDX-B
-                       IF      IDX-B               <=  BIKOU-MAX
-                           MOVE    WRK-PTCOMMENT(IDX-COM)(IDX-COM2:)
-                                               TO  HC02Q-BIKOH (IDX-B)
-                       END-IF
-                   END-IF
-               END-IF
+           ADD     1                   TO  IDX2
+           MOVE    SPACE               TO  WRK-HENKOU (IDX IDX2)
+           MOVE    "¡½¡¡¡ÖÈ÷¹Í¡×Íó¡¡Â³¤­¡¡¡½"
+                                       TO  WRK-NAIYOU (IDX IDX2)
+      *
+           PERFORM VARYING     IDX-BM  FROM    1   BY  1
+                   UNTIL      (IDX-BM  >    LINE-MAX  )
+                          OR  (WRK-MEI-BIKOU(IDX-BM)  =   SPACE )
+                          OR  (IDX2    >   LINE-MAX  )
+               ADD     1                   TO  IDX2
+               MOVE    WRK-MEI-BIKOU(IDX-BM)   TO  WRK-NAIYOU
+                                                          (IDX IDX2)
            END-PERFORM
+      *
+           IF     (IDX2                <   LINE-MAX)
+               ADD     1                   TO  IDX2
+               MOVE    "¡¡¡¡¡¡¡¡¡¡¡¡°Ê²¼Í¾Çò"
+                                           TO  WRK-NAIYOU  (IDX IDX2)
+           END-IF
+      *
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL       IDX2    >   LINE-MAX
+               MOVE    WRK-HENKOU (IDX IDX2)   TO  HC02Q-HENKOU(IDX2)
+               MOVE    WRK-NAIYOU (IDX IDX2)   TO  HC02Q-NAIYO (IDX2)
+           END-PERFORM
+      *
            .
-       30011-PTCOMMENT-HEN-EXT.
+       3001-SYOHO-BIKOU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2276,6 +2410,160 @@
            END-IF
            .
        30011-USER-HENSYU-EXT.
+           EXIT.
+      *
+      *H28.4
+      *****************************************************************
+      *     È÷¹ÍÊÔ½¸½èÍý
+      *****************************************************************
+       4009-BIKOU-HENSYU-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  IDX-BM
+           MOVE    ZERO                TO  IDX-BM2
+           INITIALIZE                  WRK-MEI-BIKOU-AREA
+           INITIALIZE                  WRK-HEN-BIKOU-AREA
+      *
+      *    ËãÌôÊÔ½¸
+           PERFORM VARYING     IDX-H   FROM    1   BY  1
+                   UNTIL      (IDX-H   >   3   )
+                           OR (IDX-BM  >=  BIKOU-MAX )
+               IF      WRK-HENSYU (IDX-H)  NOT =   SPACE
+                   ADD     1                   TO  IDX-BM
+                   MOVE    WRK-HENSYU (IDX-H)  TO  WRK-HEN-BIKOU 
+                                                      (IDX-BM)
+               END-IF
+           END-PERFORM
+      *
+      *    ÃÏÊý¸øÈñ¤òÊÔ½¸
+           PERFORM VARYING     IDX-K3  FROM    1   BY  1
+                   UNTIL      (IDX-K3      >   4   )
+                          OR  (WRK-HEN-KOH (IDX-K3)    =   SPACE)
+               IF      IDX-BM              <   BIKOU-MAX
+                   ADD     1                   TO  IDX-BM
+                   MOVE    WRK-HEN-KOH (IDX-K3)
+                                           TO  WRK-HEN-BIKOU (IDX-BM)
+               ELSE
+                   ADD     1               TO  IDX-BM2
+                   MOVE    WRK-HEN-KOH (IDX-K3)
+                                           TO  WRK-MEI-BIKOU (IDX-BM2)
+               END-IF
+           END-PERFORM
+      *    È÷¹ÍÍó¥³¥á¥ó¥ÈÊÔ½¸
+           PERFORM VARYING     IDX-BIKOU   FROM    1   BY  1
+                   UNTIL      (IDX-BIKOU   >   20   )
+                          OR  (WRK-BIKOU-NAME (IDX-BIKOU)
+                                           =   SPACE )
+                          OR  (IDX-BM2     >=  LINE-MAX )
+               MOVE    WRK-BIKOU-NAME (IDX-BIKOU)  TO  WRK-CHK-BIKOU
+               IF      IDX-BM              <   BIKOU-MAX
+      *            È÷¹ÍÍó¤Ø
+                   ADD     1                   TO  IDX-BM
+                   MOVE    WRK-CHK-BIKOU-1     TO  WRK-HEN-BIKOU
+                                                           (IDX-BM)
+                   IF      WRK-CHK-BIKOU-2 NOT =   SPACE
+                       IF     (IDX-BM          <   BIKOU-MAX)
+                           ADD     1               TO  IDX-BM
+                           MOVE    WRK-CHK-BIKOU-2 TO  WRK-HEN-BIKOU
+                                                           (IDX-BM)
+                       ELSE
+      *                ÌÀºÙ¤Ø
+                           ADD     1               TO  IDX-BM2
+                           MOVE    WRK-CHK-BIKOU-2 TO  WRK-MEI-BIKOU
+                                                           (IDX-BM2)
+                       END-IF
+                   END-IF
+               ELSE
+      *            ÌÀºÙ¤Ø
+                   ADD     1                   TO  IDX-BM2
+                   MOVE    WRK-CHK-BIKOU-2-1   TO  WRK-MEI-BIKOU
+                                                           (IDX-BM2)
+                   IF      WRK-CHK-BIKOU-2-2   NOT =   SPACE
+                       IF      IDX-BM2             <   LINE-MAX
+                           ADD     1                   TO  IDX-BM2
+                           MOVE    WRK-CHK-BIKOU-2-2   TO  WRK-MEI-BIKOU
+                                                           (IDX-BM2)
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+      *    ´µ¼Ô¥³¥á¥ó¥ÈÊÔ½¸
+           PERFORM VARYING     IDX-COM     FROM    1   BY  1
+                   UNTIL      (IDX-COM     >   2   )
+                          OR  (IDX-BM2     >=  LINE-MAX )
+               IF      WRK-PTCOMMENT  (IDX-COM)    NOT =   SPACE
+                   MOVE    ZERO                TO  IDX-COM2
+                   IF      IDX-BM              <   BIKOU-MAX
+                       MOVE    86                  TO  COM-MAX
+                   ELSE
+                       MOVE    82                  TO  COM-MAX
+                   END-IF
+                   MOVE    WRK-PTCOMMENT (IDX-COM)(1:COM-MAX)
+                                               TO  WRK-PTCOMMENT-HEN
+      *
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    WRK-PTCOMMENT (IDX-COM)(1:COM-MAX)
+                                               TO  KANACHK-MAE-INPUT
+                   MOVE    COM-MAX             TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-PTCOMMENT-HEN
+                   COMPUTE IDX-COM2        =   KANACHK-MAX   +   1
+                   IF      WRK-PTCOMMENT (IDX-COM)(IDX-COM2:)
+                                               =   SPACE
+                       MOVE    ZERO                TO  IDX-COM2
+                   END-IF
+      *
+                   IF      IDX-BM              <   BIKOU-MAX
+                       ADD     1               TO  IDX-BM
+                       MOVE    WRK-PTCOMMENT-HEN   TO  WRK-HEN-BIKOU
+                                                           (IDX-BM)
+      *                »ÄÊ¸»ú¤ò¼¡¹Ô¤Ø
+                       IF      IDX-COM2            >   ZERO
+                           IF      IDX-BM              <   BIKOU-MAX
+                               ADD     1               TO  IDX-BM
+                               MOVE    WRK-PTCOMMENT(IDX-COM)(IDX-COM2:)
+                                                   TO   WRK-HEN-BIKOU
+                                                         (IDX-BM)
+                           ELSE
+                               ADD     1               TO  IDX-BM2
+                               MOVE    WRK-PTCOMMENT(IDX-COM)(IDX-COM2:)
+                                                   TO   WRK-MEI-BIKOU
+                                                         (IDX-BM2)
+                           END-IF
+                       END-IF
+                   ELSE
+                       ADD     1               TO  IDX-BM2
+                       MOVE    WRK-PTCOMMENT-HEN   TO  WRK-MEI-BIKOU
+                                                           (IDX-BM2)
+                       IF      IDX-COM2            >   ZERO
+                           IF      IDX-BM2             <   LINE-MAX
+                               ADD     1               TO  IDX-BM2
+                               MOVE    WRK-PTCOMMENT(IDX-COM)(IDX-COM2:)
+                                                   TO   WRK-MEI-BIKOU
+                                                         (IDX-BM2)
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           MOVE    WRK-PAGE-MAX        TO  WRK-PAGE-SYOMAX
+      *
+           IF      IDX-BM2             >   ZERO
+      *        È÷¹Í¥Ú¡¼¥¸¤¢¤ê
+               IF      WRK-IDXMAX      NOT =   ZERO
+                   MOVE    WRK-IDXMAX          TO  IDX
+                   MOVE    SPACE               TO  WRK-NAIYOU
+                                                   (WRK-PAGE-MAX IDX)
+                   MOVE    "¼¡¥Ú¡¼¥¸¤ØÂ³¤¯"    TO  WRK-NAIYOU
+                                                   (WRK-PAGE-MAX IDX)
+                                                                (50:)
+               END-IF
+               COMPUTE WRK-PAGE-MAX    =   WRK-PAGE-MAX   +   1
+           END-IF
+           .
+       4009-BIKOU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2681,6 +2969,8 @@
            INITIALIZE                  WRK-QR-BIKOU-AREA
            INITIALIZE                  WRK-ZANSIJI-G
       *
+           MOVE    ZERO                TO  WRK-PAGE-SYOMAX
+      *
       *£Ñ£ÒÂÐ±þ
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
@@ -2968,6 +3258,24 @@
                IF      SRY-SRYSYUKBN       =   "820"
                    MOVE    1                   TO  FLG-SYOHOU
                END-IF
+      *H28.4
+      *        ÃÏ°èÊñ³ç¿ÇÎÅ
+               IF     (FLG-CHIKHKT         =   ZERO )
+                  AND (PARA-CHIIKI         =   "1"  )
+                  AND (SRY-SRYKBN          =   "12" )
+                   PERFORM VARYING     IDXA    FROM    1   BY  1
+                           UNTIL      (IDXA    >   5   )   OR
+                                      (SRY-SRYCD (IDXA)
+                                                       =   SPACE)
+                       IF      SRY-SRYCD (IDXA)    =   CONS-CHKHTKSN
+                           MOVE    3               TO  FLG-CHIKHKT
+                       END-IF
+                       IF      SRY-SRYCD (IDXA)    =   CONS-NNCHIKSN
+                           MOVE    4               TO  FLG-CHIKHKT
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
       *
                MOVE    "tbl_sryact"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -4282,7 +4590,7 @@
                        END-IF
                    END-IF
                    ADD     1                   TO  IDX-BIKOU
-                   IF      IDX-BIKOU           <=  9
+                   IF      IDX-BIKOU           <=  20
                        MOVE    WRK-TNS-NAME        TO  WRK-BIKOU-NAME
                                                            (IDX-BIKOU)
                    END-IF
@@ -4518,6 +4826,33 @@
                                                   (LNK-WKSRYACT-MAX)
                    MOVE    WRK-DRCD            TO  LNK-WKSRY-DRCD
                                                   (LNK-WKSRYACT-MAX)
+               END-IF
+      *
+      *H28.4
+      *        ÃÏ°èÊñ³ç¿ÇÎÅ
+               IF     (FLG-CHIKHKT         =   ZERO )
+                  AND (PARA-CHIIKI         =   "1"  )
+                  AND (WKSRY-SRYKBN        =   "12"
+                                           OR  "13" )
+                   PERFORM VARYING     IDXA    FROM    1   BY  1
+                           UNTIL      (IDXA    >   5   )   OR
+                                      (WKSRY-SRYCD (IDXA)
+                                                       =   SPACE)
+                       EVALUATE    WKSRY-SRYCD (IDXA)
+      *                ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                       WHEN    CONS-CHKHTCD
+                           MOVE    1               TO  FLG-CHIKHKT
+      *                ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+                       WHEN    CONS-CHKHTKSN
+                           MOVE    3               TO  FLG-CHIKHKT
+      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                       WHEN    CONS-NNCHICD
+                           MOVE    2               TO  FLG-CHIKHKT
+      *                Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
+                       WHEN    CONS-NNCHIKSN
+                           MOVE    4               TO  FLG-CHIKHKT
+                       END-EVALUATE
+                   END-PERFORM
                END-IF
       *
                MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -5113,6 +5448,13 @@
        6002-QRBIKOU-HENSYU-SEC           SECTION.
       *
            MOVE    ZERO                TO  IDX-QRB
+      *H28.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅ
+           IF      WRK-BIKOU-CHIK  NOT =   SPACE
+               ADD     1                   TO  IDX-QRB
+               MOVE    WRK-BIKOU-CHIK      TO  ORCSQRCSV-BIKOU(IDX-QRB)
+           END-IF
+      *
       *    ¸øÈñ¥³¥á¥ó¥È
            PERFORM VARYING     IDX-KM  FROM    1   BY  1
                    UNTIL      (IDX-KM      >   3   )
@@ -5133,7 +5475,7 @@
            END-PERFORM
       *    ½èÊý¤»¤óÈ÷¹Í¥³¥á¥ó¥È
            PERFORM VARYING     IDX-COM     FROM    1   BY  1
-                   UNTIL      (IDX-COM     >   10  )
+                   UNTIL      (IDX-COM     >   20  )
                           OR  (IDX-QRB     >=  BIKOU-MAXQ )
                           OR  (WRK-QR-BIKOU-NAME(IDX-COM)  =   SPACE)
                ADD     1                   TO  IDX-QRB

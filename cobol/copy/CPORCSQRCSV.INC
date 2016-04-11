@@ -83,7 +83,7 @@
       *
       *    »˜πÕ∆‚Õ∆
            03  ORCSQRCSV-BIKOU-AREA.
-               05  ORCSQRCSV-BIKOU-TBL       OCCURS   10.
+               05  ORCSQRCSV-BIKOU-TBL       OCCURS   20.
                    07  ORCSQRCSV-BIKOU       PIC X(100).
       *
       *    £—£“Õ—∫ﬁÀË§Œ∆‚Õ∆

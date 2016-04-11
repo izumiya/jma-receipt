@@ -39,6 +39,7 @@
       *  04.07.00    NACL-多々納  14/05/XX  内服１回量対応
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.00    NACL-多々納  16/03/XX  最低薬価テーブル対応
+      *  04.08.00    NACL-多々納  16/04/XX  備考を２０へ
       *****************************************************************
       *
       *
@@ -576,7 +577,7 @@
       *    備考レコード
            MOVE    ZERO                TO  IDX-B2
            PERFORM VARYING     IDX-B   FROM    1   BY  1
-                   UNTIL      (IDX-B   >   10  )
+                   UNTIL      (IDX-B   >   20  )
                            OR (ORCSQRCSV-BIKOU (IDX-B) =   SPACE)
                ADD     1                   TO  IDX-B2
                MOVE    SPACE               TO  TBL-QRCSV-AREA

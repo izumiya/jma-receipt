@@ -743,7 +743,7 @@
       *    備考レコード
            MOVE    ZERO                TO  IDX-B2
            PERFORM VARYING     IDX-B   FROM    1   BY  1
-                   UNTIL      (IDX-B   >   10  )
+                   UNTIL      (IDX-B   >   20  )
                            OR (ORCSQRCSV-BIKOU (IDX-B) =   SPACE)
                ADD     1                   TO  IDX-B2
                MOVE    SPACE               TO  TBL-QRCSV-AREA
