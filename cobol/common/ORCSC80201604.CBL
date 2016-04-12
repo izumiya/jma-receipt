@@ -3234,9 +3234,9 @@
            END-SEARCH
       *??
       *    «—Õ—æ…∏ı∑≤•Í•œ§œ…‘Ã¿
-           IF      WRK-RIHA-KBN        =   "9"
-               MOVE    ZERO            TO  FLG-RIHA-OK
-           END-IF
+      *    IF      WRK-RIHA-KBN        =   "9"
+      *        MOVE    ZERO            TO  FLG-RIHA-OK
+      *    END-IF
       *
            .
        10011312-RIGAKU-SERCH-EXT.
