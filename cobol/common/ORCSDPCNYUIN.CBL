@@ -186,6 +186,30 @@
                    07  WRK-CHUKSNCD        PIC X(04).
                    07  WRK-NYUKHNKBN       PIC 9(03).
       *
+      *     °åÎÅ´Ñ»¡ÍÑÂàÈòÎÎ°è
+           03  WRK-IRYOKNS-TABLE.
+               05  WRK-IRYOKNS-TBL         OCCURS  31.
+                   06  WRK-IRYOKNS-SRYCD-TBL.
+                     07  WRK-IRYOKNS-SRYCD1        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN1  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD2        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN2  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD3        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN3  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD4        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN4  PIC X(01).
+      *              Ê¿À®£²£¸Ç¯ÅÙ²þÄê¤Ç¿·Àß¤µ¤ì¤¿Å¾±¡Ä´À°²Ã»»¤Ï
+      *              ¿ÇÎÅ¹Ô°Ù²èÌÌ¤è¤êÆþÎÏ¤¹¤ë°Ù¡¢SRYCD5¤Ë³ÊÇ¼
+                     07  WRK-IRYOKNS-SRYCD5        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN5  PIC X(01).
+                   06   WRK-IRYOKNS-SRYCD-TBLR   REDEFINES
+                                             WRK-IRYOKNS-SRYCD-TBL.
+                     07  WRK-IRYOKNS-SRYCD-OCC     OCCURS  5.
+                       08  WRK-IRYOKNS-SRYCD       PIC X(09).
+                       08  WRK-IRYOKNS-CHUKSNTUBAN PIC X(01).
+                   06  WRK-IRYOKNS-SORT-FLG  PIC X(01).
+           03   WRK-IRYOKNS-TAIHI                  PIC X(10).
+      *
       *    Æþ±¡²ñ·×ÊÂ¤ÓÂØ¤¨¥ï¡¼¥¯
            03  WRK-NYUIN-SORT-TABLE.
                05  WRK-NYUIN-SORT-TBL      OCCURS  31.
@@ -641,6 +665,25 @@
                                MOVE    NSRY-SRYCD(1)   TO  
                                                    WRK-NYUINKHN(IDX1)
       *
+      *                      °åÎÅ´Ñ»¡
+                             IF  NSRY-SRYCD(2)(1:3) =  "188"
+                                  MOVE  NSRY-SRYCD(2)   TO
+                                              WRK-IRYOKNS-SRYCD1(IDX1)
+                             END-IF
+                             IF  NSRY-SRYCD(3)(1:3) =  "188"
+                                MOVE  NSRY-SRYCD(3)   TO
+                                              WRK-IRYOKNS-SRYCD2(IDX1)
+                             END-IF
+                             IF  NSRY-SRYCD(4)(1:3) =  "188"
+                                MOVE  NSRY-SRYCD(4)   TO
+                                              WRK-IRYOKNS-SRYCD3(IDX1)
+                             END-IF
+                             IF  NSRY-SRYCD(5)(1:3) =  "188"
+                                MOVE  NSRY-SRYCD(5)   TO
+                                              WRK-IRYOKNS-SRYCD4(IDX1)
+                             END-IF
+      *
+      *                      Æþ±¡¤Î´ü´Ö²Ã»»
                              IF  (NSRY-SRYCD(2) NOT =  SPACE)  AND
                                  (NSRY-SRYCD(2) NOT = CONS-HYOKETU1 AND
                                                       CONS-HYOKETU2 AND
@@ -650,6 +693,8 @@
                                                       CONS-TEISU2   AND
                                                       CONS-TEISU3   AND
                                                       CONS-TEISU4)
+                                                                AND
+                                   (NSRY-SRYCD(2)(1:3) NOT = "188")
                                  MOVE   NSRY-SRYCD(2)  TO
                                                    WRK-SHOKIKSN(IDX1)
                              END-IF
@@ -1138,6 +1183,26 @@
                          END-PERFORM
                       END-IF
       *
+      *               °åÎÅ´Ñ»¡¤Î²Ã»»¼êÆþÎÏÊ¬
+                      IF   SRY-SRYCD(1)(1:3)    =     "188"
+                         PERFORM    VARYING   IDX1   FROM   1   BY   1
+                           UNTIL     IDX1   >   31
+                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                            AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                                  (WRK-GAIHAKU-KBN(IDX1) >=   4))
+                            AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                            AND   (ACCT-HKNCOMBI  =
+                                                WRK-HKNCOMBI-DAY(IDX1))
+                               MOVE   SRY-SRYCD(1)  TO
+                                            WRK-IRYOKNS-SRYCD5(IDX1)
+                               MOVE   "1"           TO
+                                            WRK-IRYOKNS-SORT-FLG(IDX1)
+                            END-IF
+                         END-PERFORM
+                      END-IF
+      *
+      *
                     END-IF
       *
                    END-IF
@@ -1193,6 +1258,63 @@
                                       TO  WRK-CHUKSN-TBL-2(IDX-CHUKSN2S)
                    END-IF
                END-PERFORM
+           END-PERFORM
+      *
+      *
+      *    °åÎÅ´Ñ»¡¤Ç¼êÆþÎÏ¤µ¤ì¤¿²Ã»»¡ÊÅ¾±¡Ä´À°²Ã»»¡Ë¤¬¤¢¤ë¾ì¹ç¤ËÊÂ¤ÓÂØ¤¨
+      *    Ãí²Ã»»ÄÌÈÖ¤Î¥»¥Ã¥È
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+             UNTIL      IDX1      >   31
+               IF   WRK-IRYOKNS-SORT-FLG(IDX1)  =   "1"
+                    PERFORM     VARYING  IDX2   FROM  1 BY 1
+                      UNTIL     IDX2  >  5
+                      IF  WRK-IRYOKNS-SRYCD(IDX1 IDX2) NOT = SPACE
+      *                 ÅÀ¿ô¥Þ¥¹¥¿¤è¤êÃí²Ã»»ÄÌÈÖ¤Î¥»¥Ã¥È
+                        INITIALIZE                TNS-TENSU-REC
+                        MOVE    LNK-DPCNYUIN-HOSPNUM
+                                              TO  TNS-HOSPNUM
+                        MOVE    WRK-IRYOKNS-SRYCD(IDX1 IDX2)
+                                              TO  TNS-SRYCD
+                        MOVE    LNK-DPCNYUIN-SANTEIYM
+                                              TO TNS-YUKOSTYMD(1:6)
+                        MOVE    "01"          TO TNS-YUKOSTYMD(7:2)
+                        MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                        PERFORM   910-TENSU-READ-SEC
+                        MOVE    TNS-CHUKSNTUBAN
+                                            TO  WRK-IRYOKNS-CHUKSNTUBAN
+                                                       (IDX1 IDX2)
+                      END-IF
+                    END-PERFORM
+               END-IF
+           END-PERFORM
+      *    Ãí²Ã»»ÄÌÈÖ¤ÎÊÂ¤ÓÂØ¤¨
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+             UNTIL      IDX1      >   31
+               IF  WRK-IRYOKNS-SORT-FLG(IDX1)  =   "1"
+                   PERFORM     VARYING  IDX2   FROM  1 BY 1
+                     UNTIL     IDX2  >  4
+                     COMPUTE   IDX4   =    IDX2   +   1
+                     PERFORM   VARYING   IDX3  FROM  IDX4  BY  1
+                       UNTIL   IDX3    >  5
+                       IF (WRK-IRYOKNS-SRYCD(IDX1 IDX2) NOT = SPACE) AND
+                          (WRK-IRYOKNS-SRYCD(IDX1 IDX3) NOT = SPACE)
+                           IF  WRK-IRYOKNS-CHUKSNTUBAN(IDX1 IDX2)
+                                 <=  WRK-IRYOKNS-CHUKSNTUBAN(IDX1 IDX3)
+                               CONTINUE
+                           ELSE
+                              MOVE  WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX2)
+                                           TO  WRK-IRYOKNS-TAIHI
+                              MOVE  WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX3)
+                                           TO
+                                        WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX2)
+                              MOVE  WRK-IRYOKNS-TAIHI
+                                           TO
+                                        WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX3)
+                           END-IF
+                       END-IF
+                     END-PERFORM
+                   END-PERFORM
+               END-IF
            END-PERFORM
       *
       *
@@ -1257,7 +1379,36 @@
                    END-IF
                END-IF
       *
+      *        °åÎÅ´Ñ»¡
+               IF         WRK-IRYOKNS-SRYCD1(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD1(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD2(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD2(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD3(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD3(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD4(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD4(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD5(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD5(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+      *
       *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»»¤È£·£°¡ó¸º»»¡Ë
+      *        ÆÃÄê»þ´ÖÂà±¡¸º»»
+      *        ÆÃÄêÍËÆüÆþÂà±¡¸º»»
                IF     ((WRK-GAIHAKU(IDX1)        =
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
@@ -3874,7 +4025,7 @@
            MOVE    LNK-DPCNYUIN-HOSPNUM  TO  LNK-NYULIFE2-HOSPNUM
            MOVE    LNK-DPCNYUIN-PTID     TO  LNK-NYULIFE2-PTID
            MOVE    LNK-DPCNYUIN-SANTEIYM TO  LNK-NYULIFE2-SANTEIYM
-           CALL    "ORCSNYULIFE2"     USING  ORCSNYULIFE-AREA
+           CALL    "ORCSNYULIFE2"     USING  ORCSNYULIFE2-AREA
                                              SPA-AREA
            IF      LNK-NYULIFE2-RC          NOT =  ZERO
                DISPLAY  "LNK-NYULIFE2-RC = " LNK-NYULIFE-RC

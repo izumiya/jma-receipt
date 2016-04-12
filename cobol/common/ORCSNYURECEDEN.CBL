@@ -171,6 +171,8 @@
            03  IDX-CHUKSN2                 PIC 9(02).
            03  IDX-CHUKSN2S                PIC 9(02).
            03  IDX-CHUKSN2SS               PIC 9(02).
+           03  IDX-IRYOKNS                 PIC 9(02).
+           03  IDX-IRYOKNS2                PIC 9(02).
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
        01  CONSTANT-AREA.
@@ -281,10 +283,26 @@
       *     °åÎÅ´Ñ»¡ÍÑÂàÈòÎÎ°è
            03  WRK-IRYOKNS-TABLE.
                05  WRK-IRYOKNS-TBL         OCCURS  31.
-                   07  WRK-IRYOKNS-SRYCD1  PIC X(09).
-                   07  WRK-IRYOKNS-SRYCD2  PIC X(09).
-                   07  WRK-IRYOKNS-SRYCD3  PIC X(09).
-                   07  WRK-IRYOKNS-SRYCD4  PIC X(09).
+                   06  WRK-IRYOKNS-SRYCD-TBL.
+                     07  WRK-IRYOKNS-SRYCD1        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN1  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD2        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN2  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD3        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN3  PIC X(01).
+                     07  WRK-IRYOKNS-SRYCD4        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN4  PIC X(01).
+      *              Ê¿À®£²£¸Ç¯ÅÙ²þÄê¤Ç¿·Àß¤µ¤ì¤¿Å¾±¡Ä´À°²Ã»»¤Ï
+      *              ¿ÇÎÅ¹Ô°Ù²èÌÌ¤è¤êÆþÎÏ¤¹¤ë°Ù¡¢SRYCD5¤Ë³ÊÇ¼
+                     07  WRK-IRYOKNS-SRYCD5        PIC X(09).
+                     07  WRK-IRYOKNS-CHUKSNTUBAN5  PIC X(01).
+                   06   WRK-IRYOKNS-SRYCD-TBLR   REDEFINES
+                                             WRK-IRYOKNS-SRYCD-TBL.
+                     07  WRK-IRYOKNS-SRYCD-OCC     OCCURS  5.
+                       08  WRK-IRYOKNS-SRYCD       PIC X(09).
+                       08  WRK-IRYOKNS-CHUKSNTUBAN PIC X(01).
+                   06  WRK-IRYOKNS-SORT-FLG  PIC X(01).
+           03   WRK-IRYOKNS-TAIHI                  PIC X(10).
       *
       *    Æþ±¡²ñ·×ÊÂ¤ÓÂØ¤¨¥ï¡¼¥¯
            03  WRK-NYUIN-SORT-TABLE.
@@ -4779,8 +4797,8 @@
                      MOVE     "tbl_sryact"   TO  MCP-TABLE
                      MOVE     "key"          TO  MCP-PATHNAME
                      PERFORM   900-CLOSE-SEC
-      *             Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
-                    IF  TNS-CHUKSNCD         =   "0000"
+      *              Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+                     IF  TNS-CHUKSNCD         =   "0000"
                        ADD    1              TO  IDX-NYUKSN
                        MOVE   SRY-SRYCD(1)   TO  WRK-NYUKSN-SRYCD-1
                                                         (IDX-NYUKSN)
@@ -4799,7 +4817,7 @@
                                                       (IDX-NYUKSN IDX1)
                          END-IF
                        END-PERFORM
-                    ELSE
+                     ELSE
       *
                       IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
                           (TNS-CDKBN-KBNNUM   <=   199))  OR
@@ -4865,7 +4883,26 @@
                          END-PERFORM
                       END-IF
       *
-                    END-IF
+      *               °åÎÅ´Ñ»¡¤Î²Ã»»¼êÆþÎÏÊ¬
+                      IF   SRY-SRYCD(1)(1:3)    =     "188"
+                         PERFORM    VARYING   IDX1   FROM   1   BY   1
+                           UNTIL     IDX1   >   31
+                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                            AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                                  (WRK-GAIHAKU-KBN(IDX1) >=   4))
+                            AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                            AND   (ACCT-HKNCOMBI  =
+                                                WRK-HKNCOMBI-DAY(IDX1))
+                               MOVE   SRY-SRYCD(1)  TO
+                                            WRK-IRYOKNS-SRYCD5(IDX1)
+                               MOVE   "1"           TO
+                                            WRK-IRYOKNS-SORT-FLG(IDX1)
+                            END-IF
+                         END-PERFORM
+                      END-IF
+      *
+                     END-IF
       *
                    END-IF
                  END-IF
@@ -4921,6 +4958,64 @@
                    END-IF
                END-PERFORM
            END-PERFORM
+      *
+      *
+      *    °åÎÅ´Ñ»¡¤Ç¼êÆþÎÏ¤µ¤ì¤¿²Ã»»¡ÊÅ¾±¡Ä´À°²Ã»»¡Ë¤¬¤¢¤ë¾ì¹ç¤ËÊÂ¤ÓÂØ¤¨
+      *    Ãí²Ã»»ÄÌÈÖ¤Î¥»¥Ã¥È
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+             UNTIL      IDX1      >   31
+               IF   WRK-IRYOKNS-SORT-FLG(IDX1)  =   "1"
+                    PERFORM     VARYING  IDX2   FROM  1 BY 1
+                      UNTIL     IDX2  >  5
+                      IF  WRK-IRYOKNS-SRYCD(IDX1 IDX2) NOT = SPACE
+      *                 ÅÀ¿ô¥Þ¥¹¥¿¤è¤êÃí²Ã»»ÄÌÈÖ¤Î¥»¥Ã¥È
+                        INITIALIZE                TNS-TENSU-REC
+                        MOVE    LNK-NYURECEDEN-HOSPNUM
+                                              TO  TNS-HOSPNUM
+                        MOVE    WRK-IRYOKNS-SRYCD(IDX1 IDX2)
+                                              TO  TNS-SRYCD
+                        MOVE    LNK-NYURECEDEN-SANTEIYM
+                                              TO TNS-YUKOSTYMD(1:6)
+                        MOVE    "01"          TO TNS-YUKOSTYMD(7:2)
+                        MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                        PERFORM   910-TENSU-READ-SEC
+                        MOVE    TNS-CHUKSNTUBAN
+                                            TO  WRK-IRYOKNS-CHUKSNTUBAN
+                                                       (IDX1 IDX2)
+                      END-IF
+                    END-PERFORM
+               END-IF
+           END-PERFORM
+      *    Ãí²Ã»»ÄÌÈÖ¤ÎÊÂ¤ÓÂØ¤¨
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+             UNTIL      IDX1      >   31
+               IF  WRK-IRYOKNS-SORT-FLG(IDX1)  =   "1"
+                   PERFORM     VARYING  IDX2   FROM  1 BY 1
+                     UNTIL     IDX2  >  4
+                     COMPUTE   IDX4   =    IDX2   +   1
+                     PERFORM   VARYING   IDX3  FROM  IDX4  BY  1
+                       UNTIL   IDX3    >  5
+                       IF (WRK-IRYOKNS-SRYCD(IDX1 IDX2) NOT = SPACE) AND
+                          (WRK-IRYOKNS-SRYCD(IDX1 IDX3) NOT = SPACE)
+                           IF  WRK-IRYOKNS-CHUKSNTUBAN(IDX1 IDX2)
+                                 <=  WRK-IRYOKNS-CHUKSNTUBAN(IDX1 IDX3)
+                               CONTINUE
+                           ELSE
+                              MOVE  WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX2)
+                                           TO  WRK-IRYOKNS-TAIHI
+                              MOVE  WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX3)
+                                           TO
+                                        WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX2)
+                              MOVE  WRK-IRYOKNS-TAIHI
+                                           TO
+                                        WRK-IRYOKNS-SRYCD-OCC(IDX1 IDX3)
+                           END-IF
+                       END-IF
+                     END-PERFORM
+                   END-PERFORM
+               END-IF
+           END-PERFORM
+      *
       *
       *    ¼èÆÀ¤·¤¿Æþ±¡¾ðÊó¤«¤éÆüÃ±°Ì¤ÎÆþ±¡²ñ·×¾ðÊó¤òºÆ¹½ÃÛ
            PERFORM      VARYING    IDX1   FROM   1  BY  1
@@ -5002,6 +5097,11 @@
                IF         WRK-IRYOKNS-SRYCD4(IDX1)  NOT =   SPACE
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-IRYOKNS-SRYCD4(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+               END-IF
+               IF         WRK-IRYOKNS-SRYCD5(IDX1)  NOT =   SPACE
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE   WRK-IRYOKNS-SRYCD5(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *
