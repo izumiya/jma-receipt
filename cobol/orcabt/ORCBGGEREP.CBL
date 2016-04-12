@@ -94,6 +94,7 @@
            03  FLG-ERRKBN              PIC 9(01).
            03  FLG-ZAIEND              PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
+           03  FLG-OK                  PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -190,6 +191,8 @@
                05  WRK-KEY-PTID            PIC 9(10).
                05  WRK-KEY-SRYYMD          PIC X(08).
                05  WRK-KEY-DENPNUM         PIC 9(07).
+               05  WRK-KEY-SRYKA           PIC X(02).
+               05  WRK-KEY-GRPDENPNUM      PIC 9(07).
            03  WRK-ZAIKAISU            PIC 9(03).
       *
            03  WRK-MAE-PTID            PIC 9(10).
@@ -200,6 +203,7 @@
            03  WRK-CHK-SRYSYUKBN       PIC X(03).
            03  WRK-GENECHG-KBN         PIC X(01).
            03  CNT-GENERIC             PIC 9(02).
+           03  WRK-HKNCOMBI            PIC X(04).
       *
        01  TBL-SRY-AREA.
            03  TBL-PTID                PIC 9(10).
@@ -734,9 +738,18 @@
       *
                IF     (WRK-KEY-PTID        =   JYURRK-PTID   )
                  AND  (WRK-KEY-SRYYMD      =   JYURRK-SRYYMD )
-                 AND  (WRK-KEY-DENPNUM     =   JYURRK-DENPNUM)
-                   CONTINUE
+                 AND  (WRK-KEY-SRYKA       =   JYURRK-SRYKA  )
+                   IF     (JYURRK-DENPNUM      =   WRK-KEY-DENPNUM)
+                     OR  ((JYURRK-GRP-DENPNUM  NOT =   ZERO   )
+                     AND  (WRK-KEY-GRPDENPNUM  =   JYURRK-GRP-DENPNUM))
+                       MOVE    1               TO  FLG-OK
+                   ELSE
+                       MOVE    ZERO            TO  FLG-OK
+                   END-IF
                ELSE
+                   MOVE    ZERO            TO  FLG-OK
+               END-IF
+               IF      FLG-OK          =   ZERO
                    IF    IDX-TBL           >   ZERO
                    AND  (FLG-SYOHOU        =   1    )
       *                ≈¡…º»÷πÊÀËΩËÕ˝
@@ -749,6 +762,8 @@
                    MOVE    JYURRK-PTID         TO  WRK-KEY-PTID
                    MOVE    JYURRK-SRYYMD       TO  WRK-KEY-SRYYMD
                    MOVE    JYURRK-DENPNUM      TO  WRK-KEY-DENPNUM
+                   MOVE    JYURRK-GRP-DENPNUM  TO  WRK-KEY-GRPDENPNUM
+                   MOVE    JYURRK-SRYKA        TO  WRK-KEY-SRYKA
                    MOVE    JYURRK-RENNUM       TO  TBL-JYURRK-RENNUM
                END-IF
       *
@@ -1121,6 +1136,10 @@
     ****        MOVE    "9100"         TO  WRK-ERRCD1
                 GO      TO      10020-SPA-HEN-EXT
            END-IF
+      *
+           MOVE    LNK-WKSRY-HKNCOMBI(IDX)
+                                       TO  SPA-COM-HKNCOMBI (IDX2)
+      *
            MOVE    LNK-WKSRY-SRYKBN(IDX)
                                        TO  SPA-COM-SRYKBN  (IDX2)
            MOVE    LNK-WKSRY-SRYKBN(IDX)
@@ -1562,6 +1581,7 @@
       *    ø«Œ≈≤  ‘Ω∏
            PERFORM 200201-SRYKA-HEN-SEC
            MOVE    SPA-HKNCOMBINUM     TO  PRT-HKNCOMBI
+           MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBI
       *
       *    Ã¿∫Ÿ ‘Ω∏
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -1581,6 +1601,11 @@
                    MOVE    1               TO  FLG-CHK
                END-IF
                IF      FLG-CHK             =   1
+      * ›∏±¡»πÁ§ª
+                   IF      WRK-HKNCOMBI    NOT =   SPA-COM-HKNCOMBI(IDX)
+                       MOVE    SPA-COM-HKNCOMBI(IDX)   TO  PRT-HKNCOMBI
+                       MOVE    SPA-COM-HKNCOMBI(IDX)   TO  WRK-HKNCOMBI
+                   END-IF
                    MOVE    SPA-COM-SRYSYUKBN(IDX)
                                                    TO  PRT-SRYKBN
                    MOVE    SPA-GMN-MEISYO (IDX)    TO  PRT-TNS-NAME
