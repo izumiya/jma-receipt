@@ -4028,7 +4028,7 @@
            CALL    "ORCSNYULIFE2"     USING  ORCSNYULIFE2-AREA
                                              SPA-AREA
            IF      LNK-NYULIFE2-RC          NOT =  ZERO
-               DISPLAY  "LNK-NYULIFE2-RC = " LNK-NYULIFE-RC
+               DISPLAY  "LNK-NYULIFE2-RC = " LNK-NYULIFE2-RC
            END-IF
       *
       *    食事負担据え置き対象取得サブ
