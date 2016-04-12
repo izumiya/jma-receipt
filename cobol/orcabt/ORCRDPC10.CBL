@@ -4892,6 +4892,50 @@
                                            "190182690"
                MOVE    -40             TO  WRK-FEDT-DEKIDAKA-TEN
            END-IF
+      *
+      *    医療観察の減点記録
+           EVALUATE    TNS-SRYCD
+      *        未基準減算（病棟に掛かる基準を満たさない場合）
+               WHEN    "188000270"
+                   MOVE    -88         TO  WRK-FEDT-DEKIDAKA-TEN
+      *        未適合減算（入院決定日から９１日以上１年以内）
+               WHEN    "188000370"
+                   MOVE    -1170       TO  WRK-FEDT-DEKIDAKA-TEN
+      *        未適合減算（入院決定日から１年超）
+               WHEN    "188000470"
+                   MOVE    -1760       TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察回復期減算（算定開始日から２７１日以上）
+               WHEN    "188006570"
+                   IF    LNK-DPCNYUIN-SANTEIYM  <=  "201603"
+                      MOVE    -100     TO  WRK-FEDT-DEKIDAKA-TEN
+                   ELSE
+                      MOVE    -120     TO  WRK-FEDT-DEKIDAKA-TEN
+                   END-IF
+      *        観察回復期減算（算定開始日から１年９０日超）
+               WHEN    "188010170"
+                   MOVE    -220        TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察社会復帰期減算（算定開始日から１８１日以上１年以内）
+               WHEN    "188000770"
+                   MOVE    -310        TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察社会復帰期減算（算定開始日から１年超１年１８０日以内）
+               WHEN    "188000870"
+                   MOVE    -900        TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察社会復帰期減算（算定開始日から１８０超）
+               WHEN    "188005870"
+                   MOVE    -1400       TO  WRK-FEDT-DEKIDAKA-TEN
+      *        未経過減算（算定開始日から１年超、退院許可の申立て１８０日以内）
+               WHEN    "188000970"
+                   MOVE    -310        TO  WRK-FEDT-DEKIDAKA-TEN
+      *        未経過減算（算定開始日から１年１８０日超、退院許可申立１８０日以内）
+               WHEN    "188005970"
+                   MOVE    -900        TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察社会復帰期減算（開始から１８０日以内・遠隔地加算）
+               WHEN    "188009170"
+                   MOVE    -1400       TO  WRK-FEDT-DEKIDAKA-TEN
+      *        観察社会復帰期減算（開始から１年超１年１８０日超・遠隔地加算）
+               WHEN    "188009270"
+                   MOVE    -1900       TO  WRK-FEDT-DEKIDAKA-TEN
+           END-EVALUATE
       *出来高・包括フラグ
       * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
            MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
