@@ -834,6 +834,8 @@
            03  WRK-CONS-TEIGEN2       PIC X(09)   VALUE   "630010005".
       *    ÌôºÞÎÁÄþ¸º¡Ê£¶£°¡¿£±£°£°¡Ë¡Ê¾Ò²ðÎ¨¤¬Äã¤¤ÂçÉÂ±¡£³£°Æü°Ê¾åÅêÌô¡Ë
            03  WRK-CONS-TEIGEN3       PIC X(09)   VALUE   "630010006".
+      *    ÌôºÞÎÁ¸ºÅÀ¡Ê¼¾ÉÛÌôÌôºÞÎÁ¾å¸ÂÄ¶¡Ë
+           03  WRK-CONS-TEIGEN4       PIC X(09)   VALUE   "630010007".
       *****Âà±¡»þÅêÌô
       *****03  WRK-CONS-TAITOYAKU     PIC X(09)   VALUE   "840000006".
       *****03  WRK-CONS-TAITOYAKU1    PIC X(09)   VALUE   "008400002".
@@ -2164,7 +2166,8 @@
       *
            IF      RECE05-SRYCD (IDX)  =   (WRK-CONS-TEIGEN  OR
                                             WRK-CONS-TEIGEN2 OR
-                                            WRK-CONS-TEIGEN3)
+                                            WRK-CONS-TEIGEN3 OR
+                                            WRK-CONS-TEIGEN4)
                CONTINUE
            ELSE
       *         IF      RECE04-YKZTEN    =   ZERO
@@ -2180,7 +2183,8 @@
                IF      RECE05-SRYCD (IDX)
                                        =  (WRK-CONS-TEIGEN  OR
                                            WRK-CONS-TEIGEN2 OR
-                                           WRK-CONS-TEIGEN3)
+                                           WRK-CONS-TEIGEN3 OR
+                                           WRK-CONS-TEIGEN4)
                    MOVE    1               TO  FLG-TEIGEN
                END-IF
            END-IF
@@ -2203,7 +2207,8 @@
                                    TBL-ZAIW-TEN        (1 WRK-TBLMAX6)
                IF      RECE05-SRYCD (IDX)  =  (WRK-CONS-TEIGEN  OR
                                                WRK-CONS-TEIGEN2 OR
-                                               WRK-CONS-TEIGEN3)
+                                               WRK-CONS-TEIGEN3 OR
+                                               WRK-CONS-TEIGEN4)
                        MOVE   RECE04-ZAITEN    TO
                                    TBL-ZAIW-TEN        (1 WRK-TBLMAX6)
                END-IF
@@ -3318,7 +3323,8 @@
              IF    TBL-ZAIW-SRYCD (1 IDX)
                                        =  (WRK-CONS-TEIGEN  OR
                                            WRK-CONS-TEIGEN2 OR
-                                           WRK-CONS-TEIGEN3)
+                                           WRK-CONS-TEIGEN3 OR
+                                           WRK-CONS-TEIGEN4)
                MOVE  RECE04-ZAITEN    TO  WRK-FEDT-ZAITEN
                COMPUTE  WRK-FEDT-ZAITEN =  WRK-FEDT-ZAITEN  *  -1
              ELSE
@@ -3333,7 +3339,8 @@
       *ÌôºÞÎÁÄþ¸º
            IF    TBL-ZAIW-SRYCD (1 IDX)  =  (WRK-CONS-TEIGEN  OR
                                              WRK-CONS-TEIGEN2 OR
-                                             WRK-CONS-TEIGEN3)
+                                             WRK-CONS-TEIGEN3 OR
+                                             WRK-CONS-TEIGEN4)
                MOVE  RECE04-ZAITEN    TO  WRK-FEDT-YKZTEN
                COMPUTE   WRK-FEDT-YKZTEN  =  WRK-FEDT-YKZTEN  *  -1
            END-IF
@@ -3460,7 +3467,8 @@
            IF      TBL-ZAIW-SRYCD (1 IDX)
                                        =  (WRK-CONS-TEIGEN  OR
                                            WRK-CONS-TEIGEN2 OR
-                                           WRK-CONS-TEIGEN3)
+                                           WRK-CONS-TEIGEN3 OR
+                                           WRK-CONS-TEIGEN4)
                    MOVE    ZERO        TO  WRK-FEDT-SRYSURYO
            ELSE
                    MOVE    TBL-ZAIW-SRYSURYO (1 IDX)
@@ -3478,7 +3486,8 @@
            IF      TBL-ZAIW-SRYCD (1 IDX)
                                        =  (WRK-CONS-TEIGEN  OR
                                            WRK-CONS-TEIGEN2 OR
-                                           WRK-CONS-TEIGEN3)
+                                           WRK-CONS-TEIGEN3 OR
+                                           WRK-CONS-TEIGEN4)
                    COMPUTE   WRK-FEDT-MEISAI-YKZ
                                        =   TBL-ZAIW-TEN (1 IDX) * -1
            END-IF
