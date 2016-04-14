@@ -3721,10 +3721,6 @@
                 MOVE    "key10"             TO  MCP-PATHNAME
                 PERFORM 910-DBSELECT-SEC
                 IF      MCP-RC              =   ZERO
-                   MOVE  MCPDATA-REC   TO  SYS-5001-REC
-                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
-                   MOVE    "key10"             TO  MCP-PATHNAME
-                   PERFORM 910-DBCLOSECURSOR-SEC
       *            最終入院履歴が療養病棟（病床）の時、特定入院料で
       *            あるか判定を行い、そうであれば入院会計の参照して
       *            会計最終日のカレンダーに１が立っているかをチェック
@@ -3833,6 +3829,10 @@
                      END-IF
                    END-IF
                 END-IF
+                MOVE  MCPDATA-REC   TO  SYS-5001-REC
+                MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                MOVE    "key10"             TO  MCP-PATHNAME
+                PERFORM 910-DBCLOSECURSOR-SEC
               END-IF
             END-IF
            END-IF
