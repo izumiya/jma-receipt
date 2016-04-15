@@ -44,6 +44,9 @@
                07  LNK-SKJKEEP-KBN             PIC  X(01)  OCCURS  31.
       *精神病床入院年月日
              05  LNK-SKJKEEP-SEI-NYUINYMD      PIC  X(08).
+      *精神病床入院年月日コメント手入力区分
+      *  （空白：未入力　１：手入力）
+             05  LNK-SKJKEEP-SEI-COMMENT-KBN   PIC  X(01).
       *
       *復帰コード（１：算定年月エラー　２：患者検索エラー
       *            ３：入院会計なし　４：難病等、精神入院の据え置き対象外）

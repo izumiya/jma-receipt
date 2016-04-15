@@ -263,6 +263,8 @@
            END-PERFORM
            DISPLAY "LNK-SKJKEEP-SEI-NYUINYMD = "
                     LNK-SKJKEEP-SEI-NYUINYMD
+           DISPLAY "LNK-SKJKEEP-SEI-COMMENT-KBN = "
+                    LNK-SKJKEEP-SEI-COMMENT-KBN
       *
            .
        000-PROC-EXT.
@@ -793,10 +795,9 @@
                           IF      STS-DAY-RC1      =   ZERO
                               DISPLAY   "LNK-DAY1-YMD-X = "
                                          LNK-DAY1-YMD-X
-      *                         手入力された入院年月日コメントは返却
-      *                         しないよう変更
-      **                        MOVE   LNK-DAY1-YMD-X
-      **                                   TO  LNK-SKJKEEP-SEI-NYUINYMD
+                              MOVE   LNK-DAY1-YMD-X
+                                         TO  LNK-SKJKEEP-SEI-NYUINYMD
+                              MOVE   "1" TO  LNK-SKJKEEP-SEI-COMMENT-KBN
                           END-IF
                         END-IF
                    END-IF
