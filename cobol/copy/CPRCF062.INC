@@ -1018,6 +1018,10 @@
                05  RECE62-SYUTANTEN-NYUTOK2     PIC S9(09).
            03  RECE62-SYUTANARIFLG              PIC 9(01).
       *
+      *…∏Ω‡…È√¥≥€∑–≤·¡º√÷° ¿∫ø¿°À
+           03  RECE62-SEISIN-SKJFLG             PIC 9(01).
+           03  RECE62-SEISIN-NYUINYMD           PIC X(08).
+      *
       *ÕΩ»˜
            03  RECE62-YOBIETC-AREA.
                05  RECE62-YOBIETCINF          OCCURS 20.

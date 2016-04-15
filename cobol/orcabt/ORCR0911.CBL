@@ -1502,11 +1502,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                             WRK-CONS-SYOSIN103
       *
                EVALUATE  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                 WHEN      WRK-CONS-SYOSIN101
-                     MOVE   1    TO   IDX6
-                 WHEN      WRK-CONS-SYOSIN102
-                     MOVE   2    TO   IDX6
                  WHEN      WRK-CONS-SYOSIN103
+                     MOVE   1    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN101
+                     MOVE   2    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN102
                      MOVE   3    TO   IDX6
                END-EVALUATE
       *
@@ -2540,14 +2540,29 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                    INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    "¡ö"              TO  WRK-ZAI-MK
-                   MOVE    "½é¿Ç¡ÊÂ¾°åÎÅµ¡´Ø¤«¤é¤Î¾Ò²ð¾õ¡õ"
+                   EVALUATE  IDX6
+                     WHEN      2
+                      IF   RECE82-SRYYM   >=  "201604"
+                       MOVE  "½é¿Ç¡ÊÊ¸½ñ¤Ë¤è¤ë¾Ò²ð¤¬¤Ê¤¤´µ¡õ"
                                              TO  WRK-ZAI-NAME(1:30)
+                      ELSE
+                       MOVE  "½é¿Ç¡ÊÂ¾°åÎÅµ¡´Ø¤«¤é¤Î¾Ò²ð¾õ¡õ"
+                                             TO  WRK-ZAI-NAME(1:30)
+                      END-IF
+                   END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
                    PERFORM 20101-SYOSAIMATOME-WRITE1-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    "¤¬¤Ê¤¤´µ¼Ô¡Ë"    TO  WRK-ZAI-NAME(1:12)
+                   EVALUATE  IDX6
+                     WHEN      2
+                      IF   RECE82-SRYYM   >=  "201604"
+                       MOVE  "¼Ô¡Ë"          TO  WRK-ZAI-NAME(1:4)
+                      ELSE
+                       MOVE  "¤¬¤Ê¤¤´µ¼Ô¡Ë"  TO  WRK-ZAI-NAME(1:12)
+                      END-IF
+                   END-EVALUATE
       *
                    INITIALIZE                          WRK-ZAI2
                    MOVE  1                         TO  WRK-ZAI2-KISAIFLG

@@ -221,6 +221,7 @@
       *                                     Âè£³Âè£´¸øÈñ¤Î³ç¸ÌºÆ·Çµ­ºÜÂÐ±þ
       *  04.08.07    NACL-ÌçÏÆ    16/03/15  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóµ­ºÜ½¤Àµ
       *  04.08.08    NACL-Æ£¸¶    16/04/01  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.09    NACL-ÌçÏÆ    16/04/15  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -774,7 +775,7 @@
            03  WRK-KGK7                        PIC ZZZZ,ZZ9.
            03  WRK-KGK8                        PIC ZZZZZ,ZZ9.
            03  WRK-KGK6                        PIC ZZZ,ZZ9.
-           03  WRK-KGK4                        PIC ZZZ9.
+           03  WRK-KGK4                        PIC ZZZZ.
            03  WRK-KGK2                        PIC Z9.
            03  WRK-KGK10                       PIC ZZ,ZZZ,ZZ9.
       *
@@ -6449,7 +6450,7 @@
            END-PERFORM          
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   4
-               IF      RECE62-SHOKUJIKHNRYO (IDX)    >   ZERO      
+               IF      RECE62-SHOKUJIKHNNISSU (IDX)  >   ZERO
                    MOVE    RECE62-SHOKUJIKHNRYO (IDX)
                                              TO  WRK-KGK4
                    MOVE    WRK-KGK4          TO  HC06-SYOGAK (IDX)          
@@ -6466,7 +6467,7 @@
                                    TO  HC06-SYOKJN-KHNSEI         
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   2
-               IF      RECE62-SHOKUJIKHNRYO-SEI (IDX)  >   0
+               IF      RECE62-SHOKUJIKHNNISSU-SEI (IDX)  >   0
                    MOVE    RECE62-SHOKUJIKHNRYO-SEI (IDX)
                                              TO  WRK-KGK4
                    MOVE    WRK-KGK4          TO  HC06-SYOGAK-SEI   (IDX)          

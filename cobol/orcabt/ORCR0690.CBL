@@ -2088,11 +2088,11 @@
                                             WRK-CONS-SYOSIN103
       *
                EVALUATE  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                 WHEN      WRK-CONS-SYOSIN101
-                     MOVE   1    TO   IDX6
-                 WHEN      WRK-CONS-SYOSIN102
-                     MOVE   2    TO   IDX6
                  WHEN      WRK-CONS-SYOSIN103
+                     MOVE   1    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN101
+                     MOVE   2    TO   IDX6
+                 WHEN      WRK-CONS-SYOSIN102
                      MOVE   3    TO   IDX6
                END-EVALUATE
       *
@@ -3696,8 +3696,13 @@
                    MOVE    "＊"              TO  WRK-ZAI-MK
                    EVALUATE  IDX6
                      WHEN      2
+                      IF   RECE62-SRYYM   >=  "201604"
+                       MOVE  "初診（文書による紹介がない患者）"
+                                             TO  WRK-ZAI-NAME(1:32)
+                      ELSE
                        MOVE  "初診（他医療機関からの紹介状がない患者）"
                                              TO  WRK-ZAI-NAME(1:40)
+                      END-IF
                    END-EVALUATE
       *
                    MOVE    1                 TO  WRK-SET-LINENUM

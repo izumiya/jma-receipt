@@ -73,6 +73,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/04/15  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -386,7 +387,7 @@
            03  WRK-KGK9                        PIC ZZZ,ZZZ,ZZ9.
            03  WRK-KGK7                        PIC ZZZZ,ZZ9.
            03  WRK-KGK6                        PIC ZZZ,ZZ9.
-           03  WRK-KGK4                        PIC ZZZ9.
+           03  WRK-KGK4                        PIC ZZZZ.
            03  WRK-KGK2                        PIC Z9.
            03  WRK-KGK10                       PIC ZZ,ZZZ,ZZ9.
       *
@@ -2006,7 +2007,7 @@
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >       4
-               IF      RECE200-SHOKUJIKHNRYO (IDX) >   ZERO      
+               IF      RECE200-SHOKUJIKHNNISSU (IDX) >   ZERO
                    MOVE    RECE200-SHOKUJIKHNRYO (IDX)
                                                TO  WRK-KGK4
                    MOVE    WRK-KGK4            TO  HCN58-SYOKHNTEN (IDX)          
@@ -2014,10 +2015,18 @@
                                                TO  WRK-KGK2
                    MOVE    WRK-KGK2            TO  HCN58-SYOKAISU  (IDX)
       *
-                   COMPUTE WRK-SYOKUJIKEI = RECE200-SHOKUJIKHNRYO  (IDX)
-                                          * RECE200-SHOKUJIKHNNISSU(IDX)
-                   MOVE    WRK-SYOKUJIKEI      TO  WRK-TENSUZ
-                   MOVE    WRK-TENSU           TO  HCN58-SYOKINGAKU(IDX)
+                   IF   RECE200-SRYYM   >=  "201604"
+                   AND  IDX              =   1
+                     MOVE    RECE200-SHOKUJIKHNRYO-KEI
+                                               TO  WRK-TENSUZ
+                     MOVE    WRK-TENSU         TO  HCN58-SYOKINGAKU(IDX)
+                   ELSE
+                     COMPUTE WRK-SYOKUJIKEI =
+                             RECE200-SHOKUJIKHNRYO(IDX) *
+                             RECE200-SHOKUJIKHNNISSU(IDX)
+                     MOVE    WRK-SYOKUJIKEI    TO  WRK-TENSUZ
+                     MOVE    WRK-TENSU         TO  HCN58-SYOKINGAKU(IDX)
+                   END-IF
                    EVALUATE    IDX
                      WHEN    4
                            MOVE    "円×"      TO  HCN58-SYOKAKERU

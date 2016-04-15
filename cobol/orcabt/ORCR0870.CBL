@@ -1528,6 +1528,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                 PERFORM    2001-TAIN-TOKUBETU-COMMENT-SEC
            END-IF
       *
+      *    標準負担額経過措置（精神）入院年月日のコメント
+      *
+           IF   RECE82-SEISIN-SKJFLG        =   1
+           AND  RECE82-SEISIN-NYUINYMD  NOT =  SPACE
+              PERFORM      2001-SEISIN-SKJ-COMMENT-SEC
+           END-IF
+      *
            PERFORM 800-RECE82-SET84-SEC
            MOVE    ZERO                TO  RECE84-ZAINUM
       *
@@ -3724,6 +3731,82 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2001-TAIN-TOKUBETU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    標準負担額経過措置（精神）入院年月日のコメント
+      *****************************************************************
+       2001-SEISIN-SKJ-COMMENT-SEC          SECTION.
+      *
+           PERFORM 800-RECE82-SET849-SEC
+           MOVE    99999989            TO  RECE849-ZAINUM
+           MOVE    "99"                TO  RECE849-SRYKBN
+           MOVE    1                   TO  RECE849-MEISAISU
+      *
+           MOVE    RECE82-HKNCOMBI     TO  RECE849-HKNCOMBI
+           WRITE   RECE849-REC
+           ADD     1                   TO  CNT-RECE849
+      *
+           PERFORM 800-RECE82-SET859-SEC
+           MOVE    99999989            TO  RECE859-ZAINUM
+           MOVE    "99"                TO  RECE859-SRYKBN
+      *
+           MOVE    SPACE               TO  WRK-RECE85XX-REC
+           INITIALIZE                      WRK-RECE85XX-REC
+           MOVE   "810000001"          TO  WRK-RECE85XX-SRYCD(1 1)
+           MOVE    ZERO                TO  WRK-RECE85XX-SRYSURYO(1 1)
+           MOVE    31                  TO  WRK-RECE85XX-YUKOKETA(1 1)
+           MOVE   "標準負担額経過措置（精神）入院年月日："
+                                       TO  WRK-RECE85XX-NAME(1 1)(1:38)
+           MOVE    "平成　　　年　　月　　日"
+                                       TO  WRK-RECE85XX-NAME(1 1)(39:24)
+      *
+           INITIALIZE                         STS-AREA-DAY
+           INITIALIZE                         LNK-DAY2-AREA
+           MOVE    "21"                   TO  LNK-DAY2-IRAI
+           MOVE  RECE82-SEISIN-NYUINYMD   TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                          LNK-DAY2-AREA
+           IF      STS-DAY-RC1            =   ZERO
+              MOVE    LNK-DAY2-EDTYMD1-Y  TO  WRK-TAIHI-XX
+              INITIALIZE                      ORCSKANACHKAREA
+              MOVE    "2"                 TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX        TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING  ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                                 TO  WRK-RECE85XX-NAME(1 1)(45:4)
+              END-IF
+      *
+              MOVE    LNK-DAY2-EDTYMD1-M  TO  WRK-TAIHI-XX
+              INITIALIZE                      ORCSKANACHKAREA
+              MOVE    "2"                 TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX        TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING  ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                                 TO  WRK-RECE85XX-NAME(1 1)(51:4)
+              END-IF
+      *
+              MOVE    LNK-DAY2-EDTYMD1-D  TO  WRK-TAIHI-XX
+              INITIALIZE                      ORCSKANACHKAREA
+              MOVE    "2"                 TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX        TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING  ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                                 TO  WRK-RECE85XX-NAME(1 1)(57:4)
+              END-IF
+           END-IF
+      *
+           MOVE     "1"                TO  WRK-RECE85XX-SIKFLG(1 1)
+           MOVE    WRK-RECE85XX-SRYACT-TBL(1 1)
+                                       TO  RECE859-SRYACT-TBL(1)
+           WRITE   RECE859-REC
+           ADD     1                   TO  CNT-RECE859
+      *
+           .
+       2001-SEISIN-SKJ-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

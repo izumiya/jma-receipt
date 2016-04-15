@@ -67,6 +67,7 @@
       *
       *  04.08.01    NACL-門脇    15/08/27  自賠責・請求金額欄端数処理
       *                                     区分追加
+      *  04.08.02    NACL-門脇    16/04/15  平成２８年４月改正対応
       ************************************************************
       *01  RECE82-REC.
            03  RECE82-KEY.
@@ -458,6 +459,10 @@
            03  RECE82-JIBAI-CHIKANKIN     PIC  9(09).
            03  RECE82-JIBAI-CHIKANNAMEFLG PIC  9(01).
            03  RECE82-JIBAI-CHIKANNAME    PIC  X(80).
+      *
+      *標準負担額経過措置（精神）
+           03  RECE82-SEISIN-SKJFLG       PIC  9(01).
+           03  RECE82-SEISIN-NYUINYMD     PIC  X(08).
       *
       *予備
            03  RECE82-YOBIETC-AREA.

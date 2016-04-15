@@ -68,6 +68,7 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
       *                                     対応
+      *  04.08.05    NACL-門脇    16/04/15  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1256,7 +1257,7 @@ grpsys        PERFORM 900-DBSELECT-SEC
                END-IF                                        
            END-PERFORM
       *
-           IF      RECE82-SHOKUJIKHNRYO-SEI(1)  >   ZERO
+           IF      RECE82-SHOKUJIKHNNISSU-SEI(1)  >   ZERO
                MOVE    RECE82-SHOKUJISYUBETU-SEI
                                          TO  HC23-KIJYUN-SEI
                MOVE    RECE82-SHOKUJIKHNRYO-SEI(1)
@@ -1266,7 +1267,7 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                          TO  WRK-ZZZ
                MOVE    WRK-ZZZ           TO  HC23-SYOKAISU-SEI(1)
            END-IF
-           IF      RECE82-SHOKUJIKHNRYO-SEI(2)  >   ZERO
+           IF      RECE82-SHOKUJIKHNNISSU-SEI(2)  >   ZERO
                MOVE    "特別（生）"      TO  HC23-KIJYUNNAME-SEI
                MOVE    RECE82-SHOKUJIKHNRYO-SEI(2)
                                          TO  WRK-KINGAKUZZ

@@ -501,6 +501,7 @@
            03  IDX17                                   PIC 9(03).
            03  IDX25                                   PIC 9(02).
            03  IDX26                                   PIC 9(02).
+           03  IDX30                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDY                                     PIC 9(03).
@@ -602,9 +603,11 @@
                05  WRK-SKJ200604-SRYCDTOTAL            PIC 9(14).
                05  WRK-SKJ200604-MEISAISU              PIC 9(02).
                05  WRK-SKJ200604-SURYOUTOTAL           PIC 9(02).
-               05  WRK-SKJ200604-T2                    OCCURS    3.
+      **>      05  WRK-SKJ200604-T2                    OCCURS    3.
+               05  WRK-SKJ200604-T2                    OCCURS    4.
                    07  WRK-SKJ200604-DAY               PIC 9(04).
-               05  WRK-SKJ200604-T3                    OCCURS    9.
+      **>      05  WRK-SKJ200604-T3                    OCCURS    9.
+               05  WRK-SKJ200604-T3                    OCCURS   12.
                    07  WRK-SKJ200604-SRYCD             PIC 9(09).
                    07  WRK-SKJ200604-SURYOU            PIC 9(02).
       *
@@ -627,6 +630,10 @@
        01  WRK-NYULIFE-TABLE.
            03  WRK-NYULIFE-AREA                        OCCURS   31.
                05  WRK-NYULIFE-KBN                     PIC X(01).
+      *
+       01  WRK-SKJKEEP-TABLE.
+           03  WRK-SKJKEEP-AREA                        OCCURS   31.
+               05  WRK-SKJKEEP-KBN                     PIC X(01).
       *
        01  WRK-TENTEKI2-TABLE.
       *
@@ -1599,6 +1606,10 @@
            COPY    "CPORCSGETTEMP.INC".
       *    ±°≥∞ΩË ˝∞Ï»ÃÃæ ‘Ω∏•µ•÷
            COPY    "CPORCSGETGENERIC.INC".
+      *    ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò…È√¥≥€ºË∆¿•µ•÷£≤
+           COPY    "CPORCSNYULIFE2.INC".
+      *    ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿•µ•÷
+           COPY    "CPORCSSKJKEEP.INC".
       *
       *    £ƒ£¬∏°∫˜
            COPY    "MCPDATA.INC".
@@ -2403,6 +2414,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            INITIALIZE          WRK-SKJ200604-TABLE
       *
            INITIALIZE          WRK-NYULIFE-TABLE
+                               WRK-SKJKEEP-TABLE
       *
            INITIALIZE          WRK-TENTEKI2-TABLE
       *
@@ -3031,8 +3043,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
             IF       SRY-SRYCD(IDX2)   =  "099140004" OR "099400001" OR
-                                          "099140011" OR "099140012" OR
-                                          "099999926"
+                                          "099140011" OR "099140012"
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
       *
@@ -3070,7 +3081,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      "099999903" OR "099999904" OR
                      "099999905" OR "099999906" OR
                      "099999907" OR "099999908" OR
-                     "099200101"                           )
+                     "099200101" OR "099999926" OR
+                     "840000136"                           )
             OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
                   COMPUTE   RECE84-MEISAISU    =  RECE84-MEISAISU
                                                -  1
@@ -3146,7 +3158,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999903" OR "099999904" OR
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
-                       "099200101"                           )
+                       "099200101" OR "099999926" OR
+                       "840000136"                           )
               OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
@@ -8777,7 +8790,54 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò…È√¥≥€ºË∆¿
-           IF    RECE82-SRYYM   >=  "200610"
+           IF     RECE82-SRYYM   >=  "201604"
+             INITIALIZE                   ORCSNYULIFE2-AREA
+             MOVE    RECE82-HOSPNUM   TO  LNK-NYULIFE2-HOSPNUM
+             MOVE    RECE82-PTID      TO  LNK-NYULIFE2-PTID
+             MOVE    RECE82-SRYYM     TO  LNK-NYULIFE2-SANTEIYM
+             CALL    "ORCSNYULIFE2"       USING
+                                          ORCSNYULIFE2-AREA
+                                          SPA-AREA
+             IF      LNK-NYULIFE2-RC  =   ZERO
+               PERFORM  VARYING  SYUKEI-IDX3  FROM  1  BY  1
+                         UNTIL   SYUKEI-IDX3   >   31
+                 MOVE  LNK-NYULIFE2-KBN(SYUKEI-IDX3)
+                                  TO  WRK-NYULIFE-KBN(SYUKEI-IDX3)
+                 IF  ((RECE82-HKNKBN      =   "4") AND
+                      (RECE82-JIBAIKBN    =   "2"))
+                 OR  ((RECE82-HKNKBN      =   "5") AND
+                      (RECE82-KOMUKBN     =   "2"))
+                 OR  ( RECE82-HKNKBN      =   "6" )
+                    CONTINUE
+                 ELSE
+                    MOVE  SPACE   TO  WRK-NYULIFE-KBN(SYUKEI-IDX3)
+                 END-IF
+               END-PERFORM
+             END-IF
+      *
+      *      ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿
+             IF     RECE82-SRYYM         >=  "201604"
+               IF   RECE82-HKNKBN  =  "6"
+                 INITIALIZE                   ORCSSKJKEEP-AREA
+                 MOVE    RECE82-HOSPNUM   TO  LNK-SKJKEEP-HOSPNUM
+                 MOVE    RECE82-PTID      TO  LNK-SKJKEEP-PTID
+                 MOVE    RECE82-SRYYM     TO  LNK-SKJKEEP-SANTEIYM
+                 CALL    "ORCSSKJKEEP"        USING
+                                              ORCSSKJKEEP-AREA
+                                              SPA-AREA
+                 IF      LNK-SKJKEEP-RC   =   ZERO
+                   PERFORM  VARYING  IDX30  FROM  1  BY  1
+                             UNTIL   IDX30   >   31
+                     MOVE  LNK-SKJKEEP-KBN(IDX30)
+                                 TO  WRK-SKJKEEP-KBN(IDX30)
+                   END-PERFORM
+                   MOVE    LNK-SKJKEEP-SEI-NYUINYMD
+                                 TO  RECE82-SEISIN-NYUINYMD
+                 END-IF
+               END-IF
+             END-IF
+           ELSE
+            IF    RECE82-SRYYM   >=  "200610"
              INITIALIZE                   ORCSNYULIFE-AREA
              MOVE    RECE82-HOSPNUM   TO  LNK-NYULIFE-HOSPNUM
              MOVE    RECE82-PTID      TO  LNK-NYULIFE-PTID
@@ -8801,6 +8861,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  END-IF
                END-PERFORM
              END-IF
+            END-IF
            END-IF
       *
       *    £≤£∞£∞£∂«Ø£¥∑Ó∞ πﬂ§Œø©ªˆŒ≈Õ‹
@@ -8811,9 +8872,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
                                                     NOT =  ZERO
+                 OR   WRK-SKJ200604-DAY(SYUKEI-IDX3 4)
+                                                    NOT =  ZERO
                       PERFORM  2305X-RECE84-TENSOU2-SKJ2-SEC
                       PERFORM  2306X-RECE85-HENSYU2-SKJ2-SEC
                       PERFORM  900-RECE84-WRITE-SEC
+                      IF  (RECE82-SRYYM                >=  "201604")
+                      AND (WRK-SKJKEEP-KBN(SYUKEI-IDX3) =  "2"     )
+                         MOVE    1   TO  RECE82-SEISIN-SKJFLG
+                      END-IF
                  END-IF
       *
                  IF   WRK-SKJ200604-DAY-KAN(SYUKEI-IDX3)
@@ -8870,10 +8937,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
                        MOVE  ZERO    TO  WRK-DAY4(IDY)
                      END-IF
+                   WHEN  3
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                     IF    WRK-DAY4(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE  ZERO    TO  WRK-DAY4(IDY)
+                     END-IF
                  END-EVALUATE
               WHEN  2
+                 EVALUATE   WRK-DAY24(IDY)
+                   WHEN  1
+                   WHEN  2
                      MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                   WHEN  3
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                 END-EVALUATE
              END-EVALUATE
             END-IF
       *
@@ -9658,12 +9739,25 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *****************************************************************
        2305X-RECE84-TENSOU2-SKJ2-SEC                SECTION.
       *
-           ADD      1   TO   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)
+           IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 1)  NOT =  ZERO
+              ADD   1   TO   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)
+              ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
+                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+           END-IF
            IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 2)  NOT =  ZERO
               ADD   1   TO   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)
+              ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 2)
+                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
            END-IF
            IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 3)  NOT =  ZERO
               ADD   1   TO   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)
+              ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 3)
+                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+           END-IF
+           IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 4)  NOT =  ZERO
+              ADD   1   TO   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)
+              ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 4)
+                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
            END-IF
            IF  ((RECE82-HKNKBN      =   "4") AND
                 (RECE82-JIBAIKBN    =   "2"))
@@ -9681,57 +9775,93 @@ grpsys     PERFORM  900-DBSELECT-SEC
                          WRK-SKJ200604-MEISAISU(SYUKEI-IDX3) * 2
              END-IF
            END-IF
-      ***
-           ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
-                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-           ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 2)
-                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-           ADD  WRK-SKJ200604-DAY(SYUKEI-IDX3 3)
-                     TO   WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-      ***
+      *
            MOVE       ZERO     TO     IDX12
            IF   WRK-NYULIFE-KBN(SYUKEI-IDX3)  NOT =  SPACE
             EVALUATE   WRK-SKJ200604-KBN(SYUKEI-IDX3)
       *
             WHEN      1
       *
-             ADD  197001310 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-             ADD  1         TO IDX12
-             MOVE 197001310 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-             MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
-                            TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-             IF  ((RECE82-HKNKBN      =   "4") AND
-                  (RECE82-JIBAIKBN    =   "2"))
-             OR  ((RECE82-HKNKBN      =   "5") AND
-                  (RECE82-KOMUKBN     =   "2"))
-             OR  ( RECE82-HKNKBN      =   "6" )
-              CONTINUE
-             ELSE
-              IF      RECE82-HKNKBN    =   "4"
-              AND     RECE82-SKJKBN    =   "2"
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-                ADD   099609901
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  099609901
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              ELSE
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              END-IF
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 1)  NOT =  ZERO
+               ADD  197001310 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197001310 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
+             END-IF
+      *
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 4)  NOT =  ZERO
+               ADD  197003510 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197003510 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 4)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
              END-IF
       *
              IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 2)  NOT =  ZERO
@@ -9863,43 +9993,86 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
             WHEN      1
       *
-             ADD  197000110 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-             ADD  1         TO IDX12
-             MOVE 197000110 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-             MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
-                            TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-             IF  ((RECE82-HKNKBN      =   "4") AND
-                  (RECE82-JIBAIKBN    =   "2"))
-             OR  ((RECE82-HKNKBN      =   "5") AND
-                  (RECE82-KOMUKBN     =   "2"))
-             OR  ( RECE82-HKNKBN      =   "6" )
-              CONTINUE
-             ELSE
-              IF      RECE82-HKNKBN    =   "4"
-              AND     RECE82-SKJKBN    =   "2"
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-                ADD   099609901
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  099609901
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              ELSE
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              END-IF
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 1)  NOT =  ZERO
+               ADD  197000110 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197000110 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                 ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
+             END-IF
+      *
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 4)  NOT =  ZERO
+               ADD  197003110 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197003110 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 4)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                 ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
              END-IF
       *
              IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 2)  NOT =  ZERO
@@ -9986,43 +10159,86 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
             WHEN      2
       *
-             ADD  197000710 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-             ADD  1         TO IDX12
-             MOVE 197000710 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-             MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
-                            TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-             IF  ((RECE82-HKNKBN      =   "4") AND
-                  (RECE82-JIBAIKBN    =   "2"))
-             OR  ((RECE82-HKNKBN      =   "5") AND
-                  (RECE82-KOMUKBN     =   "2"))
-             OR  ( RECE82-HKNKBN      =   "6" )
-              CONTINUE
-             ELSE
-              IF      RECE82-HKNKBN    =   "4"
-              AND     RECE82-SKJKBN    =   "2"
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-                ADD   099609901
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  099609901
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              ELSE
-                ADD   101970010
-                           TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
-                ADD   1    TO  IDX12
-                MOVE  101970010
-                           TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
-                MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
-                ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
-              END-IF
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 1)  NOT =  ZERO
+               ADD  197000710 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197000710 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 1)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
+             END-IF
+      *
+             IF   WRK-SKJ200604-DAY(SYUKEI-IDX3 4)  NOT =  ZERO
+               ADD  197003210 TO WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+               ADD  1         TO IDX12
+               MOVE 197003210 TO WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+               MOVE WRK-SKJ200604-DAY(SYUKEI-IDX3 4)
+                              TO WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+               IF  ((RECE82-HKNKBN      =   "4") AND
+                    (RECE82-JIBAIKBN    =   "2"))
+               OR  ((RECE82-HKNKBN      =   "5") AND
+                    (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
+                CONTINUE
+               ELSE
+                IF      RECE82-HKNKBN    =   "4"
+                AND     RECE82-SKJKBN    =   "2"
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                  ADD   099609901
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  099609901
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                ELSE
+                  ADD   101970010
+                             TO  WRK-SKJ200604-SRYCDTOTAL(SYUKEI-IDX3)
+                  ADD   1    TO  IDX12
+                  MOVE  101970010
+                             TO  WRK-SKJ200604-SRYCD(SYUKEI-IDX3 IDX12)
+                  MOVE  1    TO  WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX12)
+                  ADD   1    TO  WRK-SKJ200604-SURYOUTOTAL(SYUKEI-IDX3)
+                END-IF
+               END-IF
              END-IF
       *
             END-EVALUATE
@@ -10237,7 +10453,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)  >  5
               MOVE      2      TO     IDX7
               MOVE      6      TO     IDX8
-              MOVE      9      TO     IDX9
+              MOVE      10     TO     IDX9
+              PERFORM   2306X1-RECE85-TENSOU2-SKJ2-SEC
+              PERFORM   900-RECE85-WRITE-SEC
+           END-IF
+      *
+           IF   WRK-SKJ200604-MEISAISU(SYUKEI-IDX3)  >  10
+              MOVE      3      TO     IDX7
+              MOVE      11     TO     IDX8
+              MOVE      12     TO     IDX9
               PERFORM   2306X1-RECE85-TENSOU2-SKJ2-SEC
               PERFORM   900-RECE85-WRITE-SEC
            END-IF
@@ -10781,12 +11005,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
                      END-IF
                    END-IF
+                   IF   WRK-SKJ-DOJITU-ASA (IDY) =  3
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
                    IF   WRK-SKJ-DOJITU-HIRU(IDY) =  1 OR 2
                      MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
                      IF   WRK-SKJ-DOJITU-HIRU(IDY) =  2
                        ADD   1       TO  WRK-SKJ200604-DAY(IDY 2)
                      END-IF
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-HIRU(IDY) =  3
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
                      IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
                        ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
                        MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
@@ -10803,18 +11043,38 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
                      END-IF
                    END-IF
+                   IF   WRK-SKJ-DOJITU-YORU(IDY) =  3
+                     MOVE    1       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                     IF   WRK-SKJ-DOJITU-SHOKUDO(IDY)  NOT =  ZERO
+                       ADD   1       TO  WRK-SKJ200604-DAY(IDY 3)
+                       MOVE ZERO  TO  WRK-SKJ-DOJITU-SHOKUDO(IDY)
+                     END-IF
+                   END-IF
                  WHEN  2
                    IF   WRK-SKJ-DOJITU-ASA (IDY) =  1 OR 2
                      MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
                    END-IF
+                   IF   WRK-SKJ-DOJITU-ASA (IDY) =  3
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                   END-IF
                    IF   WRK-SKJ-DOJITU-HIRU(IDY) =  1 OR 2
                      MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
                    END-IF
+                   IF   WRK-SKJ-DOJITU-HIRU(IDY) =  3
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
+                   END-IF
                    IF   WRK-SKJ-DOJITU-YORU(IDY) =  1 OR 2
                      MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
                      ADD     1       TO  WRK-SKJ200604-DAY(IDY 1)
+                   END-IF
+                   IF   WRK-SKJ-DOJITU-YORU(IDY) =  3
+                     MOVE    2       TO  WRK-SKJ200604-KBN(IDY)
+                     ADD     1       TO  WRK-SKJ200604-DAY(IDY 4)
                    END-IF
                END-EVALUATE
              END-IF
@@ -12179,6 +12439,22 @@ grpsys     PERFORM  900-DBSELECT-SEC
            MOVE    "key19"              TO      MCP-PATHNAME
            PERFORM  900-CLOSE-SEC
       *
+      *    ø©ªˆæ Û•Ø•Í•¢
+           IF   RECE82-SRYYM  >= "201604"
+             IF   RECE82-SHOKUJISYUBETU(1)      =  "£π°°"
+                MOVE   SPACE  TO   RECE82-SHOKUJISYUBETU(1)
+             END-IF
+             IF   RECE82-SHOKUJISYUBETU-SEI     =  "£π"
+                MOVE   SPACE  TO   RECE82-SHOKUJISYUBETU-SEI
+             END-IF
+             IF   RECE82-SHOKUJIKHNRYO(1)       =  999999999
+                MOVE   ZERO   TO   RECE82-SHOKUJIKHNRYO(1)
+             END-IF
+             IF   RECE82-SHOKUJIKHNRYO-SEI(1)   =  999999999
+                MOVE   ZERO   TO   RECE82-SHOKUJIKHNRYO-SEI(1)
+             END-IF
+           END-IF
+      *
       *    ø©ªˆŒ¨æŒ ‘Ω∏
       *
            IF   RECE82-SRYYM  >= "200604"
@@ -12208,6 +12484,152 @@ grpsys     PERFORM  900-DBSELECT-SEC
            AND  FLG-NYUINRYO             =   ZERO
                PERFORM         26011-NYUINRYOFLG-SET-SEC
            END-IF
+      *
+           IF   RECE82-SRYYM   >=  "201604"
+               PERFORM         26012-SKJ-KINGAKU-HENSYU2-SEC
+           ELSE
+               PERFORM         26012-SKJ-KINGAKU-HENSYU-SEC
+           END-IF
+      *
+           IF      SYU-SYUSKJ-RYOYOHI  NOT =  ZERO
+                   ADD   SYU-SYUSKJ-NISSU     TO  
+                                       RECE82-SHOKUJITOTALDAY
+                   ADD   SYU-SYUSKJ-RYOYOHI   TO
+                                       RECE82-SHOKUJITOTALKIN
+                   IF    RECE82-HKNKBN  =  "6"
+                     ADD SYU-SYUSKJ-FTN-RECE  TO
+                                       RECE82-SKJFTNMONEY
+                   END-IF
+           END-IF
+      *
+           .
+       2601-RECE82-FTN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¬æ ›∏±§À§∆∆˛±°Œ¡§ÚªªƒÍ§∑§∆§§§ÎæÏπÁ§Œ ›∏±∑ËƒÍ
+      *****************************************************************
+       26011-NYUINRYOFLG-SET-SEC               SECTION.
+      *
+           MOVE     SPACE    TO    RECE82-NYUINRYOFLG
+      *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                            UNTIL   IDY     >       31
+      *
+             IF      SYU-DAY(IDY)    =    "2"
+      *
+                IF         WRK-DAY5(IDY)      NOT =  ZERO
+                AND        WRK-DAY1(IDY)      NOT =  ZERO
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "2"
+                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
+                ELSE
+                   IF      WRK-DAY5(IDY)              NOT =  ZERO
+                   AND     RECE82-NYUINDAY-KBN(IDY)   NOT =  "1"
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "1"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "2"
+                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "3"
+                          PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
+                   END-IF
+                   IF      WRK-DAY5(IDY)              NOT =  ZERO
+                   AND     RECE82-NYUINDAY-KBN(IDY)       =  "1"
+                   AND     RECE82-SRYYM                  >=  "200904"
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "2"
+                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
+                   END-IF
+                END-IF
+      *
+                MOVE      1       TO     FLG-NYUINRYO
+                MOVE     31       TO     IDY
+      *
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       26011-NYUINRYOFLG-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     ›∏± ‘Ω∏
+      *****************************************************************
+       260111-NYUINRYOFLG-HENSYU-SEC               SECTION.
+      *
+           INITIALIZE                  HKNCOMBI-REC
+           MOVE    RECE82-HOSPNUM  TO  COMB-HOSPNUM
+           MOVE    RECE82-PTID     TO  COMB-PTID
+           MOVE    WRK-DAY5(IDY)   TO  COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+           PERFORM 900-HKNCOMBI-INV-SEC
+           IF      FLG-HKNCOMBI    =   ZERO
+              IF   COMB-HKNNUM(1:2)  =  "98"
+              OR   COMB-HKNNUM       =  "971"
+              OR   COMB-HKNNUM       =  "973"
+              OR   COMB-HKNNUM       =  "975"
+                IF   COMB-HKNNUM(1:2)  =  "98"
+                   MOVE    "1"   TO   RECE82-NYUINRYOFLG
+                END-IF
+                IF   COMB-HKNNUM       =  "971"
+                   IF   RECE82-HKNNUM  =  "971"
+                     CONTINUE
+                   ELSE
+                     MOVE   "2"  TO   RECE82-NYUINRYOFLG
+                   END-IF
+                END-IF
+                IF   COMB-HKNNUM       =  "973"
+                   IF   RECE82-HKNNUM  =  "973"
+                     CONTINUE
+                   ELSE
+                     MOVE   "3"  TO   RECE82-NYUINRYOFLG
+                   END-IF
+                END-IF
+                IF   COMB-HKNNUM       =  "975"
+                   MOVE    "7"   TO   RECE82-NYUINRYOFLG
+                END-IF
+              ELSE
+                EVALUATE  COMB-HKNNUM
+                  WHEN     "060"
+                  WHEN     "067"
+                  WHEN     "068"
+                  WHEN     "069"
+                    MOVE   "4"   TO   RECE82-NYUINRYOFLG
+                  WHEN     "039"
+                  WHEN     "040"
+                    MOVE   "8"   TO   RECE82-NYUINRYOFLG
+                  WHEN      OTHER
+                    MOVE   "5"   TO   RECE82-NYUINRYOFLG
+                    IF   COMB-HKNNUM(1:2)  =  "90" OR "91"
+                     MOVE SPACE  TO   RECE82-NYUINRYOFLG
+                    END-IF
+                END-EVALUATE
+              END-IF
+           END-IF
+      *
+           .
+       260111-NYUINRYOFLG-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ø©ªˆ∂‚≥€ ‘Ω∏
+      *****************************************************************
+       26012-SKJ-KINGAKU-HENSYU-SEC               SECTION.
       *
            IF    RECE82-SRYYM  >= "200610"
       *
@@ -12424,139 +12846,235 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
            END-IF
       *
-           IF      SYU-SYUSKJ-RYOYOHI  NOT =  ZERO
-                   ADD   SYU-SYUSKJ-NISSU     TO  
-                                       RECE82-SHOKUJITOTALDAY
-                   ADD   SYU-SYUSKJ-RYOYOHI   TO
-                                       RECE82-SHOKUJITOTALKIN
-                   IF    RECE82-HKNKBN  =  "6"
-                     ADD SYU-SYUSKJ-FTN-RECE  TO
-                                       RECE82-SKJFTNMONEY
-                   END-IF
-           END-IF
-      *
            .
-       2601-RECE82-FTN-HENSYU-EXT.
+       26012-SKJ-KINGAKU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ¬æ ›∏±§À§∆∆˛±°Œ¡§ÚªªƒÍ§∑§∆§§§ÎæÏπÁ§Œ ›∏±∑ËƒÍ
+      *    ø©ªˆ∂‚≥€ ‘Ω∏° £≤£∞£±£∂«Ø£¥∑Ó°¡°À
       *****************************************************************
-       26011-NYUINRYOFLG-SET-SEC               SECTION.
+       26012-SKJ-KINGAKU-HENSYU2-SEC               SECTION.
       *
-           MOVE     SPACE    TO    RECE82-NYUINRYOFLG
+           PERFORM  VARYING  ID1    FROM    1   BY  1
+                     UNTIL   ID1      >    14
       *
-           PERFORM  VARYING  IDY    FROM    1   BY  1
-                            UNTIL   IDY     >       31
-      *
-             IF      SYU-DAY(IDY)    =    "2"
-      *
-                IF         WRK-DAY5(IDY)      NOT =  ZERO
-                AND        WRK-DAY1(IDY)      NOT =  ZERO
-                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
-                       WHEN     "0"
-                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
-                       WHEN     "1"
-                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
-                       WHEN     "2"
-                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+             IF  SYU-SHOKUJI(ID1)   =   ZERO
+               CONTINUE
+             ELSE
+               IF  ((RECE82-HKNKBN         = "4") AND
+                    (WRK-PARA-RECEKBN      = "5") AND
+                    (WRK-PARA-JIBAIPRTKBN  = "1"))
+               OR  ((RECE82-HKNKBN         = "6") AND
+                    (WRK-PARA-JIBAIPRTKBN  = "1"))
+                 EVALUATE    ID1
+                   WHEN       1
+                   WHEN       2
+                   WHEN      11
+                   WHEN      12
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(1)
+                     IF    RECE82-SHOKUJIKHNRYO(1) = ZERO
+                         MOVE  SYU-SHOKUJI(ID1)
+                                       TO  RECE82-SHOKUJIKHNRYO(1)
+                     ELSE
+                       IF  RECE82-SHOKUJIKHNRYO(1)  NOT =
+                                                  SYU-SHOKUJI(ID1)
+                         MOVE  999999999
+                                       TO  RECE82-SHOKUJIKHNRYO(1)
+                       END-IF
+                     END-IF
+                     EVALUATE    ID1
+                       WHEN       1
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£±°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£±°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN       2
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£≤°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£≤°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN      11
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£≥°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£≥°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN      12
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£¥°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£¥°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
                      END-EVALUATE
-                ELSE
-                   IF      WRK-DAY5(IDY)              NOT =  ZERO
-                   AND     RECE82-NYUINDAY-KBN(IDY)   NOT =  "1"
-                     EVALUATE  SYS-200501-COMMENT-NYUINRYO-KSIKBN
-                       WHEN     "0"
-                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
-                       WHEN     "1"
-                          MOVE    "1"     TO   RECE82-NYUINRYOFLG
-                       WHEN     "2"
-                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
-                       WHEN     "3"
-                          PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
+                   WHEN       3
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(2)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(2)
+                     MOVE  "∆√ Ã" TO  RECE82-SHOKUJISYUBETU(2)
+                   WHEN       4
+                   WHEN       8
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(3)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(3)
+                     MOVE  "ø©∆≤" TO  RECE82-SHOKUJISYUBETU(3)
+                   WHEN       9
+                   WHEN      10
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(4)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(4)
+                     MOVE  "¥ƒ∂≠" TO  RECE82-SHOKUJISYUBETU(4)
+                   WHEN       5
+                   WHEN       6
+                   WHEN      13
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU-SEI(1)
+                     IF    RECE82-SHOKUJIKHNRYO-SEI(1) = ZERO
+                         MOVE  SYU-SHOKUJI(ID1)
+                                       TO  RECE82-SHOKUJIKHNRYO-SEI(1)
+                     ELSE
+                       IF  RECE82-SHOKUJIKHNRYO-SEI(1)  NOT =
+                                                  SYU-SHOKUJI(ID1)
+                         MOVE  999999999
+                                       TO  RECE82-SHOKUJIKHNRYO-SEI(1)
+                       END-IF
+                     END-IF
+                     EVALUATE    ID1
+                       WHEN       5
+                         IF    RECE82-SHOKUJISYUBETU-SEI = SPACE
+                            MOVE "£±" TO  RECE82-SHOKUJISYUBETU-SEI
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU-SEI NOT = "£±"
+                            MOVE "£π" TO  RECE82-SHOKUJISYUBETU-SEI
+                           END-IF
+                         END-IF
+                       WHEN       6
+                         IF    RECE82-SHOKUJISYUBETU-SEI = SPACE
+                            MOVE "£≤" TO  RECE82-SHOKUJISYUBETU-SEI
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU-SEI NOT = "£≤"
+                            MOVE "£π" TO  RECE82-SHOKUJISYUBETU-SEI
+                           END-IF
+                         END-IF
+                       WHEN      13
+                         IF    RECE82-SHOKUJISYUBETU-SEI = SPACE
+                            MOVE "£≥" TO  RECE82-SHOKUJISYUBETU-SEI
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU-SEI NOT = "£≥"
+                            MOVE "£π" TO  RECE82-SHOKUJISYUBETU-SEI
+                           END-IF
+                         END-IF
                      END-EVALUATE
-                   END-IF
-                   IF      WRK-DAY5(IDY)              NOT =  ZERO
-                   AND     RECE82-NYUINDAY-KBN(IDY)       =  "1"
-                   AND     RECE82-SRYYM                  >=  "200904"
-                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
-                       WHEN     "0"
-                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
-                       WHEN     "1"
-                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
-                       WHEN     "2"
-                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+                   WHEN       7
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU-SEI(2)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO-SEI(2)
+                   WHEN      14
+                     CONTINUE
+                 END-EVALUATE
+               ELSE
+                 EVALUATE    ID1
+                   WHEN       1
+                   WHEN       2
+                   WHEN       5
+                   WHEN       6
+                   WHEN      11
+                   WHEN      12
+                   WHEN      13
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(1)
+                     IF    RECE82-SHOKUJIKHNRYO(1) = ZERO
+                         MOVE  SYU-SHOKUJI(ID1)
+                                       TO  RECE82-SHOKUJIKHNRYO(1)
+                     ELSE
+                       IF  RECE82-SHOKUJIKHNRYO(1)  NOT =
+                                                  SYU-SHOKUJI(ID1)
+                         MOVE  999999999
+                                       TO  RECE82-SHOKUJIKHNRYO(1)
+                       END-IF
+                     END-IF
+                     EVALUATE    ID1
+                       WHEN       1
+                       WHEN       5
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£±°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£±°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN       2
+                       WHEN       6
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£≤°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£≤°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN      11
+                       WHEN      13
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£≥°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£≥°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
+                       WHEN      12
+                         IF    RECE82-SHOKUJISYUBETU(1) = SPACE
+                             MOVE  "£¥°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                         ELSE
+                           IF  RECE82-SHOKUJISYUBETU(1)  NOT = "£¥°°"
+                             MOVE  "£π°°"  TO  RECE82-SHOKUJISYUBETU(1)
+                           END-IF
+                         END-IF
                      END-EVALUATE
-                   END-IF
-                END-IF
-      *
-                MOVE      1       TO     FLG-NYUINRYO
-                MOVE     31       TO     IDY
-      *
+                   WHEN       3
+                   WHEN       7
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(2)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(2)
+                     MOVE  "∆√ Ã" TO  RECE82-SHOKUJISYUBETU(2)
+                   WHEN       4
+                   WHEN       8
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(3)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(3)
+                     MOVE  "ø©∆≤" TO  RECE82-SHOKUJISYUBETU(3)
+                   WHEN       9
+                   WHEN      10
+                     ADD   SYU-SHOKUJI-NISSU(ID1)  TO
+                                      RECE82-SHOKUJIKHNNISSU(4)
+                     MOVE  SYU-SHOKUJI(ID1)        TO
+                                      RECE82-SHOKUJIKHNRYO(4)
+                     MOVE  "¥ƒ∂≠" TO  RECE82-SHOKUJISYUBETU(4)
+                   WHEN      14
+                     CONTINUE
+                 END-EVALUATE
+               END-IF
              END-IF
       *
            END-PERFORM
       *
            .
-       26011-NYUINRYOFLG-SET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *     ›∏± ‘Ω∏
-      *****************************************************************
-       260111-NYUINRYOFLG-HENSYU-SEC               SECTION.
-      *
-           INITIALIZE                  HKNCOMBI-REC
-           MOVE    RECE82-HOSPNUM  TO  COMB-HOSPNUM
-           MOVE    RECE82-PTID     TO  COMB-PTID
-           MOVE    WRK-DAY5(IDY)   TO  COMB-HKNCOMBINUM
-           MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
-           PERFORM 900-HKNCOMBI-INV-SEC
-           IF      FLG-HKNCOMBI    =   ZERO
-              IF   COMB-HKNNUM(1:2)  =  "98"
-              OR   COMB-HKNNUM       =  "971"
-              OR   COMB-HKNNUM       =  "973"
-              OR   COMB-HKNNUM       =  "975"
-                IF   COMB-HKNNUM(1:2)  =  "98"
-                   MOVE    "1"   TO   RECE82-NYUINRYOFLG
-                END-IF
-                IF   COMB-HKNNUM       =  "971"
-                   IF   RECE82-HKNNUM  =  "971"
-                     CONTINUE
-                   ELSE
-                     MOVE   "2"  TO   RECE82-NYUINRYOFLG
-                   END-IF
-                END-IF
-                IF   COMB-HKNNUM       =  "973"
-                   IF   RECE82-HKNNUM  =  "973"
-                     CONTINUE
-                   ELSE
-                     MOVE   "3"  TO   RECE82-NYUINRYOFLG
-                   END-IF
-                END-IF
-                IF   COMB-HKNNUM       =  "975"
-                   MOVE    "7"   TO   RECE82-NYUINRYOFLG
-                END-IF
-              ELSE
-                EVALUATE  COMB-HKNNUM
-                  WHEN     "060"
-                  WHEN     "067"
-                  WHEN     "068"
-                  WHEN     "069"
-                    MOVE   "4"   TO   RECE82-NYUINRYOFLG
-                  WHEN     "039"
-                  WHEN     "040"
-                    MOVE   "8"   TO   RECE82-NYUINRYOFLG
-                  WHEN      OTHER
-                    MOVE   "5"   TO   RECE82-NYUINRYOFLG
-                    IF   COMB-HKNNUM(1:2)  =  "90" OR "91"
-                     MOVE SPACE  TO   RECE82-NYUINRYOFLG
-                    END-IF
-                END-EVALUATE
-              END-IF
-           END-IF
-      *
-           .
-       260111-NYUINRYOFLG-HENSYU-EXT.
+       26012-SKJ-KINGAKU-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
