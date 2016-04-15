@@ -1373,7 +1373,7 @@
       *****************************************************************
        3101-TOKKIINFO-CMB-SYOKI-SEC        SECTION.
       *
-           MOVE    34              TO  SPA-GMN-Q01-TOKKIINFOLST-MAX
+           MOVE    35              TO  SPA-GMN-Q01-TOKKIINFOLST-MAX
       *
            MOVE    "01"            TO  SPA-GMN-Q01-TOKKIINFOL    (01)
            MOVE    "¸ø"            TO  SPA-GMN-Q01-TOKKIINFOMEIL (01)
@@ -1476,6 +1476,9 @@
       *
            MOVE    "36"            TO  SPA-GMN-Q01-TOKKIINFOL    (34)
            MOVE    "²Ã¼£"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (34)
+      *
+           MOVE    "37"            TO  SPA-GMN-Q01-TOKKIINFOL    (35)
+           MOVE    "¿½½Ð"          TO  SPA-GMN-Q01-TOKKIINFOMEIL (35)
       *
            .
        3101-TOKKIINFO-CMB-SYOKI-EXT.
