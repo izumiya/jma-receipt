@@ -793,8 +793,10 @@
                           IF      STS-DAY-RC1      =   ZERO
                               DISPLAY   "LNK-DAY1-YMD-X = "
                                          LNK-DAY1-YMD-X
-                              MOVE   LNK-DAY1-YMD-X
-                                         TO  LNK-SKJKEEP-SEI-NYUINYMD
+      *                         手入力された入院年月日コメントは返却
+      *                         しないよう変更
+      **                        MOVE   LNK-DAY1-YMD-X
+      **                                   TO  LNK-SKJKEEP-SEI-NYUINYMD
                           END-IF
                         END-IF
                    END-IF
