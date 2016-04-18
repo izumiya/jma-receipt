@@ -247,24 +247,19 @@
            03  FILLER          PIC X(09)   VALUE  "099800192".
       *    心大血管疾患　早期・初期リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800211".
-      *    心大血管疾患　早期・初期リハビリ終了日
-           03  FILLER          PIC X(09)   VALUE  "099800212".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *    脳血管疾患　早期・初期リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800221".
-      *    脳血管疾患　早期・初期リハビリ終了日
-           03  FILLER          PIC X(09)   VALUE  "099800222".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *    運動器　早期・初期リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800231".
-      *    運動器　早期・初期リハビリ終了日
-           03  FILLER          PIC X(09)   VALUE  "099800232".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *    呼吸器　早期・初期リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800241".
-      *    呼吸器　早期・初期リハビリ終了日
-           03  FILLER          PIC X(09)   VALUE  "099800242".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *    廃用症候群　早期・初期リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800291".
-      *    廃用症候群　早期・初期リハビリ終了日
-           03  FILLER          PIC X(09)   VALUE  "099800292".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *
       *    他医院退院日
            03  FILLER          PIC X(09)   VALUE  "099999906".
