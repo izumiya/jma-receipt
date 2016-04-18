@@ -2484,6 +2484,7 @@
       *    ＤＯ画面（Ｋ０９）より、ＤＯ内容追加編集
            MOVE    SPA-GMN-MAX         TO  IDX2
            MOVE    SPA-GMN-MAX         TO  SPA-GMN-IDX
+           MOVE    SPA-GMN-MAX         TO  WRK-STR
       *
       *    再表示編集処理
            IF     (SPA-K09-SELOK       =   1    )  AND
@@ -2497,6 +2498,9 @@
                    MOVE    WRK-ERRCD1          TO  SPA-ERRCD
                END-IF
       *H28.4   再チェックを行う
+               IF      WRK-STR         =   ZERO
+                   MOVE    1               TO  WRK-STR
+               END-IF
                PERFORM VARYING IDX     FROM    WRK-STR   BY  1
                        UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                               ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND

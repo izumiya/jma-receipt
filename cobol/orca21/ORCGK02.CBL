@@ -3939,6 +3939,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WRK-ERRCD1          TO  SPA-ERRCD
                END-IF
       *H28.4   再チェックを行う
+               IF      WRK-STR         =   ZERO
+                   MOVE    1               TO  WRK-STR
+               END-IF
                PERFORM VARYING IDX     FROM    WRK-STR   BY  1
                        UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                               ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
