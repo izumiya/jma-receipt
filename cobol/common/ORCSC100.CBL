@@ -1785,6 +1785,10 @@
                        ADD     1               TO  SPA-SRYKBN-CNT (10)
                    END-IF
            END-EVALUATE
+      *
+           MOVE    LNK-ORCSC-KIDCD     TO  SPA-KIDCD
+           MOVE    LNK-ORCSC-CHK-IDX   TO  SPA-CHK-IDX
+           MOVE    LNK-ORCSC-ERRMSG    TO  SPA-ERRMSG2
       *@
       *    投薬附加情報チェック
            IF     (SPA-ERRCD           =   SPACE )  AND
@@ -1796,10 +1800,6 @@
            END-IF
       *@
       *
-           MOVE    LNK-ORCSC-KIDCD     TO  SPA-KIDCD
-           MOVE    LNK-ORCSC-CHK-IDX   TO  SPA-CHK-IDX
-           MOVE    LNK-ORCSC-ERRMSG    TO  SPA-ERRMSG2
-      *
       *    エラーコードを保存する
            IF      SPA-ERRCD       NOT =   SPACE
                IF      SPA-ERRCD(1:1)      =   "K"
@@ -1807,17 +1807,21 @@
                    IF     (WRK-ERR-ERRCD   NOT =   SPACE )  OR
                           (WRK-KEI-ERRCD   NOT =   SPACE )  OR
                           (WRK-KIDCD       NOT =   SPACE )
-                       MOVE    SPACE           TO  WRK-COM-KZMFLG
+                       IF      LNK-ORCSC-KEI-IDX   NOT =   ZERO
+                           MOVE    SPACE           TO  WRK-COM-KZMFLG
                                                     (LNK-ORCSC-KEI-IDX)
-                       MOVE    SPACE           TO  WRK-COM-KZMFLG3
+                           MOVE    SPACE           TO  WRK-COM-KZMFLG3
                                                     (LNK-ORCSC-KEI-IDX)
-                       MOVE    SPACE           TO  WRK-COM-CUR
+                           MOVE    SPACE           TO  WRK-COM-CUR
                                                     (LNK-ORCSC-KEI-IDX)
+                       END-IF
                    ELSE
                        MOVE    SPA-ERRCD       TO  WRK-KEI-ERRCD
                        MOVE    SPA-ERRMSG2     TO  WRK-KEI-ERRMSG2
       *ver.4.7
-                       IF      WRK-COM-CUR (LNK-ORCSC-KEI-IDX) =   SPACE
+                       IF     (LNK-ORCSC-KEI-IDX   NOT =   ZERO  )
+                         AND  (WRK-COM-CUR (LNK-ORCSC-KEI-IDX)
+                                                   =   SPACE )
                            MOVE    "2"         TO  WRK-COM-CUR
                                                      (LNK-ORCSC-KEI-IDX)
                        END-IF
@@ -1836,12 +1840,14 @@
                  ((WRK-ERR-ERRCD   NOT =   SPACE )  OR
                   (WRK-KEI-ERRCD   NOT =   SPACE )  OR
                   (WRK-KIDCD       NOT =   SPACE ))
-               MOVE    SPACE           TO  WRK-COM-KZMFLG
+               IF      LNK-ORCSC-KEI-IDX   NOT =   ZERO
+                   MOVE    SPACE           TO  WRK-COM-KZMFLG
                                                     (LNK-ORCSC-KEI-IDX)
-               MOVE    SPACE           TO  WRK-COM-KZMFLG3
+                   MOVE    SPACE           TO  WRK-COM-KZMFLG3
                                                     (LNK-ORCSC-KEI-IDX)
-               MOVE    SPACE           TO  WRK-COM-CUR
+                   MOVE    SPACE           TO  WRK-COM-CUR
                                                     (LNK-ORCSC-KEI-IDX)
+               END-IF
            END-IF
            IF     (SPA-KIDCD       NOT =   SPACE )  AND
                   (WRK-KIDCD           =   SPACE )
