@@ -271,6 +271,13 @@
       *超重症児（者）入院診療加算等の算定フラグ
            03  RECE200-CYOJKSNFLG          PIC X(01).
       *
+      *再診加算（入院）情報
+           03  RECE200-NYUSAIINF.
+               05  RECE200-NYUSAI-TENSU    PIC 9(08).
+      *入院料日別診療区分情報
+           03  RECE200-NYUDAYINF.
+               05  RECE200-NYUDAY-SRYKBN   PIC X(02)  OCCURS 31.
+      *
       *予備
            03  RECE200-YOBIETC-AREA.
                05  RECE200-YOBIETCINF      OCCURS 10.

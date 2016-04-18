@@ -152,6 +152,8 @@
            03  RECE64-ZAIKBN              PIC  9(03).
       *画像診断（２回目以降減算あり）
            03  RECE64-GAZOGEN             PIC  X(01).
+      *再診加算（入院）の剤
+           03  RECE64-NYUSAIFLG           PIC  X(01).
       *
       *リハビリ
            03  RECE64-RIHABIRI-COMMENT    PIC  X(01).

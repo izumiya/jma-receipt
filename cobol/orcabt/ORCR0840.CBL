@@ -502,6 +502,7 @@
            03  IDX25                                   PIC 9(02).
            03  IDX26                                   PIC 9(02).
            03  IDX30                                   PIC 9(03).
+           03  IDX31                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDY                                     PIC 9(03).
@@ -916,6 +917,8 @@
            03  WRK-JIBAI-SKYKIN-B              PIC 9(09).
       *
            03  WRK-1030-KOUHATUKA              PIC X(01).
+      *
+           03  WRK-NYUSAI-SRYKBN               PIC X(02).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -2595,6 +2598,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE   ZERO   TO   WRK-SETCOM-JIDO2
                        MOVE   ZERO   TO   FLG-KIN-OKIKAE
                        MOVE   ZERO   TO   FLG-KIN-OKIKAE2
+                       MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
                        IF  (ACCT-SRYKBN     = "97"     )
                        AND (ACCT-SRYCDTOTAL = 197000470
                                            OR 197001570
@@ -2685,6 +2689,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                  MOVE   ZERO   TO   WRK-SETCOM-JIDO2
                                  MOVE   ZERO   TO   FLG-KIN-OKIKAE
                                  MOVE   ZERO   TO   FLG-KIN-OKIKAE2
+                                 MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
                                  IF    ACCT-SRYKBN  =
                                        "60" OR "64" OR "80"
                                    PERFORM 2203-SINRYO-CHECK-SEC
@@ -2730,7 +2735,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-TEKSTYMD      TO      RECE84-TEKSTYMD
            MOVE    ACCT-ZAINUM          TO      RECE84-ZAINUM
            MOVE    ACCT-SRYKBN          TO      RECE84-SRYKBN
-           IF      ACCT-SRYKBN = "90" OR "92"
+           IF      ACCT-SRYKBN = "90" OR "92" OR "12"
                  MOVE    "6"            TO      RECE84-ZAISKBKBN
            ELSE 
               IF   ACCT-SRYKBN = "97"
@@ -3605,6 +3610,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF                                                
       *
                END-IF                                                   
+      *
+               IF      TNS-SRYKBN         =     "12"
+                 PERFORM  VARYING  IDX31  FROM  1  BY  1
+                           UNTIL   IDX31    >  31
+                   IF   ACCT-DAY(1 IDX31)   NOT =   ZERO
+                     IF   RECE82-NYUDAY-SRYKBN(IDX31) = "90"
+                       MOVE   "90"        TO  RECE84-SRYKBN
+                                              RECE85-SRYKBN
+                                              WRK-NYUSAI-SRYKBN
+                     ELSE
+                       MOVE   "92"        TO  RECE84-SRYKBN
+                                              RECE85-SRYKBN
+                                              WRK-NYUSAI-SRYKBN
+                     END-IF
+                     MOVE     "1"         TO  RECE84-NYUSAIFLG
+                     MOVE      31         TO  IDX31
+                   END-IF
+                 END-PERFORM
+               END-IF
       *
                IF      ACCT-JIHOKBN       =     SPACE
                   PERFORM  220211-RECE85-COMCNT-HEN-SEC
@@ -5952,7 +5976,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                             "31"  OR  "32"  OR  "33" OR
                                             "40"  OR  "50"  OR  "54" OR
                                             "60"  OR  "70"  OR  "80" OR
-                                            "13"  OR  "14"  OR  "64"
+                                            "13"  OR  "14"  OR  "64" OR
+                                            "12"
                            MOVE  ZERO          TO   WK-ZAIKAISU
                            MOVE  ZERO          TO   WK-ZAITEN
                            MOVE  ZERO          TO   WK-SYUTEN
@@ -5997,9 +6022,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                       "31"   OR   "32"   OR   "33"   OR
                                       "40"   OR   "50"   OR   "54"   OR
                                       "60"   OR   "70"   OR   "14"   OR
-                                      "64" )
+                                      "64"   OR   "12")
                OR  ((ACCT-ZAIKBN  =    2  ) AND
-                    (SRY-SRYKBN   =   "13"))
+                    (SRY-SRYKBN   =   "13")           )
                      MOVE    6      TO    IDX3
                END-IF
            END-PERFORM
@@ -6048,6 +6073,24 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    RECE82-KINGAKU2(2)  +
                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF  
+      *    再診のレセ点数欄の編集
+               WHEN    "12"
+                   COMPUTE        RECE82-NYUSAI-TENSU  =
+                                  RECE82-NYUSAI-TENSU  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   EVALUATE  WRK-NYUSAI-SRYKBN
+                     WHEN      "90"
+                       COMPUTE    RECE82-NYUKHNKEI2    =
+                                  RECE82-NYUKHNKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                     WHEN      "92"
+                       COMPUTE    RECE82-NYUTOKKEI2    =
+                                  RECE82-NYUTOKKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-EVALUATE
+                   COMPUTE        RECE82-NYUTOTALTEN   =
+                                  RECE82-NYUTOTALTEN   +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
       *    指導のレセ点数欄の編集
                WHEN    "13"
                    IF ((SRY-SRYCD(IDX3) =
@@ -6456,6 +6499,24 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    RECE82-KINGAKU2(2)  +
                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF  
+      *    再診のレセ点数欄の編集
+               WHEN    "12"
+                   COMPUTE        RECE82-NYUSAI-TENSU  =
+                                  RECE82-NYUSAI-TENSU  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   EVALUATE  WRK-NYUSAI-SRYKBN
+                     WHEN      "90"
+                       COMPUTE    RECE82-NYUKHNKEI2    =
+                                  RECE82-NYUKHNKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                     WHEN      "92"
+                       COMPUTE    RECE82-NYUTOKKEI2    =
+                                  RECE82-NYUTOKKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-EVALUATE
+                   COMPUTE        RECE82-NYUTOTALTEN   =
+                                  RECE82-NYUTOTALTEN   +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
       *    指導のレセ点数欄の編集
                WHEN    "13"
                    IF ((SRY-SRYCD(IDX3) =
@@ -7312,6 +7373,24 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                               TBL-SYUTEN-JI(1)   +
                                (TNS-TEN   *   ACCT-ZAIKAISU)
                  END-IF
+      *    再診のレセ点数欄の編集
+               WHEN    "12"
+                 COMPUTE        RECE82-NYUSAI-TENSU  =
+                                RECE82-NYUSAI-TENSU  +
+                               (WK-ZAITEN   *   WK-ZAIKAISU)
+                 EVALUATE  WRK-NYUSAI-SRYKBN
+                   WHEN      "90"
+                     COMPUTE    RECE82-NYUKHNKEI2    =
+                                RECE82-NYUKHNKEI2    +
+                               (WK-ZAITEN   *   WK-ZAIKAISU)
+                   WHEN      "92"
+                     COMPUTE    RECE82-NYUTOKKEI2    =
+                                RECE82-NYUTOKKEI2    +
+                               (WK-ZAITEN   *   WK-ZAIKAISU)
+                 END-EVALUATE
+                 COMPUTE        RECE82-NYUTOTALTEN   =
+                                RECE82-NYUTOTALTEN   +
+                               (WK-ZAITEN   *   WK-ZAIKAISU)
       *    指導のレセ点数欄の編集
                WHEN    "13"
                  IF   (RECE82-HKNKBN    =  "4")
@@ -7975,6 +8054,24 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                 RECE82-TENSU(1)    +
                                (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+      *    再診のレセ点数欄の編集
+               WHEN    "12"
+                   COMPUTE        RECE82-NYUSAI-TENSU  =
+                                  RECE82-NYUSAI-TENSU  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   EVALUATE  WRK-NYUSAI-SRYKBN
+                     WHEN      "90"
+                       COMPUTE    RECE82-NYUKHNKEI2    =
+                                  RECE82-NYUKHNKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                     WHEN      "92"
+                       COMPUTE    RECE82-NYUTOKKEI2    =
+                                  RECE82-NYUTOKKEI2    +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-EVALUATE
+                   COMPUTE        RECE82-NYUTOTALTEN   =
+                                  RECE82-NYUTOTALTEN   +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
       *    指導のレセ点数欄の編集
                WHEN    "13"
                    IF ((SRY-SRYCD(IDX3) =
@@ -13307,6 +13404,10 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   COMPUTE  WRK-YKZTEN-JI  =  WRK-YKZTEN-JI
                                           +  RECE82-YKZTEN-JI(ID3)
                END-PERFORM
+      ****     LEFT処理で再診加算（入院）の点数を「RECE82-NYUTOTALTEN」
+      ****     に加算したので「WRK-SYUTEN-JI」から加算した点数を差し引く
+               COMPUTE   WRK-SYUTEN-JI    =  WRK-SYUTEN-JI
+                                          -  RECE82-NYUSAI-TENSU
                COMPUTE   RECE82-TOTALTEN  =  RECE82-NYUTOTALTEN
                                           +  WRK-SYUTEN-JI
                                           +  WRK-YKZTEN-JI
@@ -13600,6 +13701,10 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   COMPUTE  WRK-YKZTEN-JI  =  WRK-YKZTEN-JI
                                           +  RECE82-YKZTEN-JI(ID3)
                END-PERFORM
+      ****     LEFT処理で再診加算（入院）の点数を「RECE82-NYUTOTALTEN」
+      ****     に加算したので「WRK-SYUTEN-JI」から加算した点数を差し引く
+               COMPUTE   WRK-SYUTEN-JI    =  WRK-SYUTEN-JI
+                                          -  RECE82-NYUSAI-TENSU
                COMPUTE   RECE82-TOTALTEN  =  RECE82-NYUTOTALTEN
                                           +  WRK-SYUTEN-JI
                                           +  WRK-YKZTEN-JI

@@ -3029,6 +3029,10 @@
                IF    RECE220-ZAISKBKBN   =   "1" OR "2" OR "4"
                    MOVE   RECE220-ZAINUM TO  RECE240-ZAISKBBAN
                END-IF
+               IF    RECE220-ZAISKBKBN  =   "6"
+               AND   RECE220-NYUSAIFLG  =   "1"
+                   MOVE   99999999       TO  RECE240-ZAISKBBAN
+               END-IF
                MOVE    TBL-ZAI (IDY)     TO  RECE240-TEKIYO-INF
       *
                IF      RECE220-SRYKBN      =  "33"

@@ -3120,6 +3120,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                IF    RECE84-ZAISKBKBN  =   "1" OR "2" OR "4"
                    MOVE   RECE84-ZAINUM  TO  RECE86-ZAISKBBAN
                END-IF
+               IF    RECE84-ZAISKBKBN  =   "6"
+               AND   RECE84-NYUSAIFLG  =   "1"
+                   MOVE   99999999       TO  RECE86-ZAISKBBAN
+               END-IF
                MOVE    TBL-ZAI (IDY)     TO  RECE86-TEKIYO-INF
       *
                IF      RECE84-SRYKBN      =  "33"

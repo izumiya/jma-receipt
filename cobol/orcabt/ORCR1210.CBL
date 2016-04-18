@@ -639,8 +639,10 @@
                     OR  ( NACCT-SRYCDTOTAL = 190799410 )
                     OR  ( NACCT-SRYCDTOTAL = 190799510 )
                        MOVE   903  TO  WRK-DAY1-NYUTENTTLKBN(IDY)
+                       MOVE   "90" TO  RECE200-NYUDAY-SRYKBN(IDY)
                     ELSE
                        MOVE   920  TO  WRK-DAY1-NYUTENTTLKBN(IDY)
+                       MOVE   "92" TO  RECE200-NYUDAY-SRYKBN(IDY)
                     END-IF
                   END-IF
                END-IF 

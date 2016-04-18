@@ -989,6 +989,7 @@
            03  IDX28                                   PIC 9(03).
            03  IDX29                                   PIC 9(03).
            03  IDX30                                   PIC 9(03).
+           03  IDX31                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -1942,6 +1943,8 @@
            03  WRK-TOKUSITU-TOKKI2             PIC X(02).
       *
            03  WRK-1030-KOUHATUKA              PIC X(01).
+      *
+           03  WRK-NYUSAI-SRYKBN               PIC X(02).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -7001,6 +7004,7 @@
                                MOVE   ZERO   TO   FLG-HENSYU-NG
                                MOVE   ZERO   TO   FLG-HENSYU-NG2
                                MOVE   ZERO   TO   FLG-HENSYU-ARI
+                               MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
                                IF  (ACCT-SRYKBN     = "97"     )
                                AND (ACCT-SRYCDTOTAL = 197000470
                                                    OR 197001570
@@ -7074,6 +7078,8 @@
                                       MOVE   ZERO   TO   FLG-HENSYU-NG
                                       MOVE   ZERO   TO   FLG-HENSYU-NG2
                                       MOVE   ZERO   TO   FLG-HENSYU-ARI
+                                      MOVE   SPACE  TO
+                                                  WRK-NYUSAI-SRYKBN
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21014-SINRYO-CHECK-SEC
@@ -7120,7 +7126,7 @@
            AND    (ACCT-SRYCDTOTAL  =  190182690)
              MOVE    "92"               TO      RECE64-SRYKBN
            END-IF
-           IF      ACCT-SRYKBN = "90" OR "92"
+           IF      ACCT-SRYKBN = "90" OR "92" OR "12"
                  MOVE    "6"            TO      RECE64-ZAISKBKBN
            ELSE 
               IF   ACCT-SRYKBN = "97"
@@ -7866,6 +7872,25 @@
                        MOVE   "13"        TO    RECE64-SRYKBN
                                                 RECE65-SRYKBN
                    END-IF
+               END-IF
+      *
+               IF      TNS-SRYKBN         =     "12"
+                 PERFORM  VARYING  IDX31  FROM  1  BY  1
+                           UNTIL   IDX31    >  31
+                   IF   ACCT-DAY(1 IDX31)   NOT =   ZERO
+                     IF   RECE62-NYUDAY-SRYKBN(IDX31) = "90"
+                       MOVE   "90"        TO    RECE64-SRYKBN
+                                                RECE65-SRYKBN
+                                                WRK-NYUSAI-SRYKBN
+                     ELSE
+                       MOVE   "92"        TO    RECE64-SRYKBN
+                                                RECE65-SRYKBN
+                                                WRK-NYUSAI-SRYKBN
+                     END-IF
+                     MOVE     "1"         TO    RECE64-NYUSAIFLG
+                     MOVE      31         TO    IDX31
+                   END-IF
+                 END-PERFORM
                END-IF
       *
                IF      ACCT-JIHOKBN       =     SPACE
@@ -9837,7 +9862,8 @@
                                             "31"  OR  "32"  OR  "33" OR
                                             "40"  OR  "50"  OR  "54" OR
                                             "60"  OR  "70"  OR  "80" OR
-                                            "13"  OR  "14"  OR  "64"
+                                            "13"  OR  "14"  OR  "64" OR
+                                            "12"
                            MOVE  ZERO          TO   WK-ZAIKAISU
                            MOVE  ZERO          TO   WK-ZAITEN
                            MOVE  ZERO          TO   WK-SYUTEN
@@ -9862,7 +9888,7 @@
                                       "31"   OR   "32"   OR   "33"   OR
                                       "40"   OR   "50"   OR   "54"   OR
                                       "60"   OR   "70"   OR   "13"   OR
-                                      "14"   OR   "64"
+                                      "14"   OR   "64"   OR   "12"
                      MOVE    6      TO    IDX3
                END-IF
            END-PERFORM
@@ -9988,6 +10014,68 @@
                        COMPUTE    RECE62-SYUTANTEN(1)  =
                                   RECE62-SYUTANTEN(1)  +
                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
+      *    再診のレセ点数欄の編集
+               WHEN    "12"
+                   IF    BUN-IDX        =   1
+                     COMPUTE        RECE62-NYUSAI-TENSU(BUN-IDX)  =
+                                    RECE62-NYUSAI-TENSU(BUN-IDX)  +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-NYUKHNKEI2(BUN-IDX)    =
+                                    RECE62-NYUKHNKEI2(BUN-IDX)    +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-NYUTOKKEI2(BUN-IDX)    =
+                                    RECE62-NYUTOKKEI2(BUN-IDX)    +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
+                   END-IF
+                   IF    BUN-IDX2       =   2
+                     COMPUTE        RECE62-NYUSAI-TENSU(BUN-IDX2) =
+                                    RECE62-NYUSAI-TENSU(BUN-IDX2) +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-NYUKHNKEI2(BUN-IDX2)   =
+                                    RECE62-NYUKHNKEI2(BUN-IDX2)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-NYUTOKKEI2(BUN-IDX2)   =
+                                    RECE62-NYUTOKKEI2(BUN-IDX2)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
+                   END-IF
+                   IF    BUN-IDX3       =   3
+                     COMPUTE        RECE62-NYUSAI-TENSU(BUN-IDX3) =
+                                    RECE62-NYUSAI-TENSU(BUN-IDX3) +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-NYUKHNKEI2(BUN-IDX3)   =
+                                    RECE62-NYUKHNKEI2(BUN-IDX3)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-NYUTOKKEI2(BUN-IDX3)   =
+                                    RECE62-NYUTOKKEI2(BUN-IDX3)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
+                   END-IF
+                   IF    BUN-IDX4       =   4
+                     COMPUTE        RECE62-NYUSAI-TENSU(BUN-IDX4) =
+                                    RECE62-NYUSAI-TENSU(BUN-IDX4) +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-NYUKHNKEI2(BUN-IDX4)   =
+                                    RECE62-NYUKHNKEI2(BUN-IDX4)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-NYUTOKKEI2(BUN-IDX4)   =
+                                    RECE62-NYUTOKKEI2(BUN-IDX4)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
                    END-IF
       *    指導のレセ点数欄の編集
                WHEN    "13"

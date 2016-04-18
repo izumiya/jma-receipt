@@ -136,6 +136,8 @@
                05  RECE84-ZAIKBN              PIC  9(03).
       *²èÁü¿ÇÃÇ¡Ê£²²óÌÜ°Ê¹ß¸º»»¤¢¤ê¡Ë
                05  RECE84-GAZOGEN             PIC  X(01).
+      *ºÆ¿Ç²Ã»»¡ÊÆþ±¡¡Ë¤ÎºÞ
+               05  RECE84-NYUSAIFLG           PIC  X(01).
       *
       *¥ê¥Ï¥Ó¥ê
                05  RECE84-RIHABIRI-COMMENT    PIC  X(01).

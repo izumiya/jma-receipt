@@ -4328,6 +4328,10 @@
                IF    RECE64-ZAISKBKBN  =   "1" OR "2" OR "4"
                    MOVE   RECE64-ZAINUM  TO  RECE66-ZAISKBBAN
                END-IF
+               IF    RECE64-ZAISKBKBN  =   "6"
+               AND   RECE64-NYUSAIFLG  =   "1"
+                   MOVE   99999999       TO  RECE66-ZAISKBBAN
+               END-IF
                MOVE    TBL-ZAI (IDY)     TO  RECE66-TEKIYO-INF
       *
                IF      RECE64-SRYKBN      =  "33"

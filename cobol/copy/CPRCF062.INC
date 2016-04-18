@@ -1022,6 +1022,13 @@
            03  RECE62-SEISIN-SKJFLG             PIC 9(01).
            03  RECE62-SEISIN-NYUINYMD           PIC X(08).
       *
+      *ºÆ¿Ç²Ã»»¡ÊÆþ±¡¡Ë¾ðÊó
+           03  RECE62-NYUSAIINF.
+               05  RECE62-NYUSAI-TENSU          PIC 9(08)  OCCURS  5.
+      *Æþ±¡ÎÁÆüÊÌ¿ÇÎÅ¶èÊ¬¾ðÊó
+           03  RECE62-NYUDAYINF.
+               05  RECE62-NYUDAY-SRYKBN         PIC X(02)  OCCURS 31.
+      *
       *Í½È÷
            03  RECE62-YOBIETC-AREA.
                05  RECE62-YOBIETCINF          OCCURS 20.

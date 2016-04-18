@@ -93,6 +93,7 @@
       *  04.07.08    NACL-門脇    15/01/14  同日入院時のフラグ編集修正
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-門脇    16/04/18  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1011,6 +1012,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     CONTINUE
                   ELSE
                     MOVE   NACCT-DAY(IDY)   TO  WRK-DAY1(IDY) 
+                    IF  ( NACCT-SRYKBN     = "90"      )
+                    OR  ( NACCT-SRYCDTOTAL = 190799410 )
+                    OR  ( NACCT-SRYCDTOTAL = 190799510 )
+                       MOVE   "90" TO  RECE82-NYUDAY-SRYKBN(IDY)
+                    ELSE
+                       MOVE   "92" TO  RECE82-NYUDAY-SRYKBN(IDY)
+                    END-IF
                   END-IF
                END-IF 
       *
