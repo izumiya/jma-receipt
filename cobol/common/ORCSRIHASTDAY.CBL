@@ -275,6 +275,10 @@
                05  CONS-UNDOKI18-COMMENT  PIC X(09)   VALUE "180045910".
       *        運動器リハビリテーション料（３）（要介護・入院）
                05  CONS-UNDOKI19-COMMENT  PIC X(09)   VALUE "180046010".
+      *#       運動器リハビリテーション料（１）（１．５倍）
+               05  CONS-UNDOKI20-COMMENT  PIC X(09)   VALUE "101801070".
+      *#       運動器リハビリテーション料（３）（１．５倍）
+               05  CONS-UNDOKI21-COMMENT  PIC X(09)   VALUE "101801080".
       *        難病患者リハビリテーション料
                05  CONS-NANBYO-COMMENT    PIC X(09)   VALUE "180017910".
       *        障害児（者）リハビリテーション料（６歳未満）
@@ -285,7 +289,6 @@
                05  CONS-SYOGAI3-COMMENT   PIC X(09)   VALUE "180028410".
       *        摂食機能療法
                05  CONS-SESSYOKU-COMMENT  PIC X(09)   VALUE "180016610".
-      *
       *        廃用症候群リハビリテーション料（１）（１単位）
                05  CONS-HAIYO1-COMMENT    PIC X(09)   VALUE "180044610".
       *        廃用症候群リハビリテーション料（２）（１単位）
@@ -317,8 +320,8 @@
       *#       廃用症候群リハビリテーション料（３）（１単位）
                05  CONS-HAIYO15-COMMENT   PIC X(09)   VALUE "101801130".
            03  CONS-RIHA-COMMENT-R REDEFINES CONS-RIHA-COMMENT-VAL.
-               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 68.
-           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  68.
+               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 70.
+           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  70.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -783,6 +786,8 @@
                IF SRY-SRYCD(IDX12)  =    CONS-UNDOKI14-COMMENT
                                    OR    CONS-UNDOKI15-COMMENT
                                    OR    CONS-UNDOKI16-COMMENT
+                                   OR    CONS-UNDOKI20-COMMENT
+                                   OR    CONS-UNDOKI21-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO

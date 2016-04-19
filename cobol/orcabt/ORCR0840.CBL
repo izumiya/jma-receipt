@@ -1275,6 +1275,10 @@
            03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180045910".
       *    運動器リハビリテーション料（３）（要介護・入院）
            03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180046010".
+      *#   運動器リハビリテーション料（１）（１．５倍）
+           03  CONS-UNDOKI20-COMMENT PIC X(09)  VALUE  "101801070".
+      *#   運動器リハビリテーション料（３）（１．５倍）
+           03  CONS-UNDOKI21-COMMENT PIC X(09)  VALUE  "101801080".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -1285,7 +1289,6 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
-      *
       *    廃用症候群リハビリテーション料（１）（１単位）
            03  CONS-HAIYO1-COMMENT   PIC X(09)  VALUE  "180044610".
       *    廃用症候群リハビリテーション料（２）（１単位）
@@ -4578,7 +4581,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-NOUKE22-COMMENT   OR
                                             CONS-UNDOKI14-COMMENT  OR
                                             CONS-UNDOKI15-COMMENT  OR
-                                            CONS-UNDOKI16-COMMENT
+                                            CONS-UNDOKI16-COMMENT  OR
+                                            CONS-UNDOKI20-COMMENT  OR
+                                            CONS-UNDOKI21-COMMENT
       ****              MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-RIHABIRI-COMMENT
                 END-IF
@@ -4693,6 +4698,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF   SRY-SRYCD(IDX2)  =   CONS-UNDOKI14-COMMENT
                                       OR    CONS-UNDOKI15-COMMENT
                                       OR    CONS-UNDOKI16-COMMENT
+                                      OR    CONS-UNDOKI20-COMMENT
+                                      OR    CONS-UNDOKI21-COMMENT
                         MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-UNDOKI-COMMENT
                   END-IF

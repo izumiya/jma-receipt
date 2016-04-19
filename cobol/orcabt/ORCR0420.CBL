@@ -1123,7 +1123,6 @@
            03  CONS-NOUKE21-COMMENT  PIC X(09)  VALUE  "101800260".
       *#   脳血管疾患等リハビリテーション料（３）
            03  CONS-NOUKE22-COMMENT  PIC X(09)  VALUE  "101800270".
-      *
       *    脳血管疾患等リハビリテーション料１（要介・廃用症以外）基準不適合
            03  CONS-NOUKE23-COMMENT  PIC X(09)  VALUE  "180043430".
       *    脳血管疾患等リハビリテーション料１（要介・廃用症）基準不適合
@@ -1136,7 +1135,6 @@
            03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180043830".
       *    脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
            03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180043930".
-      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -1169,14 +1167,16 @@
            03  CONS-UNDOKI15-COMMENT PIC X(09)  VALUE  "101800290".
       *#   運動器リハビリテーション料（３）
            03  CONS-UNDOKI16-COMMENT PIC X(09)  VALUE  "101800330".
-      *
       *    運動器リハビリテーション料（１）（要介護）（施設基準不適合）
            03  CONS-UNDOKI17-COMMENT PIC X(09)  VALUE  "180044030".
       *    運動器リハビリテーション料（２）（要介護）（施設基準不適合）
            03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180044130".
       *    運動器リハビリテーション料（３）（要介護）（施設基準不適合）
            03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180044230".
-      *
+      *#   運動器リハビリテーション料（１）（１．５倍）
+           03  CONS-UNDOKI20-COMMENT PIC X(09)  VALUE  "101801070".
+      *#   運動器リハビリテーション料（３）（１．５倍）
+           03  CONS-UNDOKI21-COMMENT PIC X(09)  VALUE  "101801080".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -1187,7 +1187,6 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
-      *
       *    廃用症候群リハビリテーション料（１）（１単位）
            03  CONS-HAIYO1-COMMENT   PIC X(09)  VALUE  "180044610".
       *    廃用症候群リハビリテーション料（２）（１単位）
@@ -4649,7 +4648,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-NOUKE22-COMMENT   OR
                                             CONS-UNDOKI14-COMMENT  OR
                                             CONS-UNDOKI15-COMMENT  OR
-                                            CONS-UNDOKI16-COMMENT
+                                            CONS-UNDOKI16-COMMENT  OR
+                                            CONS-UNDOKI20-COMMENT  OR
+                                            CONS-UNDOKI21-COMMENT
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
                 END-IF
@@ -4767,6 +4768,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF   SRY-SRYCD(IDX2)  =   CONS-UNDOKI14-COMMENT
                                       OR    CONS-UNDOKI15-COMMENT
                                       OR    CONS-UNDOKI16-COMMENT
+                                      OR    CONS-UNDOKI20-COMMENT
+                                      OR    CONS-UNDOKI21-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
                   END-IF

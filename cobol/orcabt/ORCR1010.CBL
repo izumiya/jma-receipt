@@ -713,24 +713,23 @@
       *    脳血管疾患等リハビリテーション料（３）
            03  CONS-NOUKE7-COMMENT   PIC X(09)  VALUE  "180030810".
       *    脳血管疾患等リハビリテーション料（１）（廃用症候群）
-           03  CONS-NOUKE8-COMMENT   PIC X(09)  VALUE  "180032410".
+           03  CONS-NOUKE11-COMMENT  PIC X(09)  VALUE  "180032410".
       *    脳血管疾患等リハビリテーション料（２）（廃用症候群）
-           03  CONS-NOUKE9-COMMENT   PIC X(09)  VALUE  "180032510".
+           03  CONS-NOUKE12-COMMENT  PIC X(09)  VALUE  "180032510".
       *    脳血管疾患等リハビリテーション料（３）（廃用症候群）
-           03  CONS-NOUKE10-COMMENT  PIC X(09)  VALUE  "180032610".
+           03  CONS-NOUKE13-COMMENT  PIC X(09)  VALUE  "180032610".
       *    脳血管疾患等リハビリテーション料（１）（要介護・廃用症候群以外）
-           03  CONS-NOUKE11-COMMENT  PIC X(09)  VALUE  "180033910".
+           03  CONS-NOUKE14-COMMENT  PIC X(09)  VALUE  "180033910".
       *    脳血管疾患等リハビリテーション料（１）（要介護・廃用症候群）
-           03  CONS-NOUKE12-COMMENT  PIC X(09)  VALUE  "180034010".
+           03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034010".
       *    脳血管疾患等リハビリテーション料（２）（要介護・廃用症候群以外）
-           03  CONS-NOUKE13-COMMENT  PIC X(09)  VALUE  "180034110".
+           03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034110".
       *    脳血管疾患等リハビリテーション料（２）（要介護・廃用症候群）
-           03  CONS-NOUKE14-COMMENT  PIC X(09)  VALUE  "180034210".
+           03  CONS-NOUKE17-COMMENT  PIC X(09)  VALUE  "180034210".
       *    脳血管疾患等リハビリテーション料（３）（要介護・廃用症候群以外）
-           03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034310".
+           03  CONS-NOUKE18-COMMENT  PIC X(09)  VALUE  "180034310".
       *    脳血管疾患等リハビリテーション料（３）（要介護・廃用症候群）
-           03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034410".
-      *
+           03  CONS-NOUKE19-COMMENT  PIC X(09)  VALUE  "180034410".
       *    脳血管疾患等リハビリテーション料１（要介・廃用症以外）基準不適合
            03  CONS-NOUKE23-COMMENT  PIC X(09)  VALUE  "180043430".
       *    脳血管疾患等リハビリテーション料１（要介・廃用症）基準不適合
@@ -743,7 +742,6 @@
            03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180043830".
       *    脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
            03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180043930".
-      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -757,21 +755,19 @@
       **   運動器リハビリテーション医学管理料（２）
            03  CONS-UNDOKI6-COMMENT  PIC X(09)  VALUE  "180030410".
       *    運動器リハビリテーション料（１）
-           03  CONS-UNDOKI7-COMMENT  PIC X(09)  VALUE  "180032710".
+           03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180032710".
       *    運動器リハビリテーション料（１）（要介護）
-           03  CONS-UNDOKI8-COMMENT  PIC X(09)  VALUE  "180034510".
+           03  CONS-UNDOKI11-COMMENT PIC X(09)  VALUE  "180034510".
       *    運動器リハビリテーション料（２）（要介護）
-           03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180034610".
+           03  CONS-UNDOKI12-COMMENT PIC X(09)  VALUE  "180034610".
       *    運動器リハビリテーション料（３）（要介護）
-           03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "180034710".
-      *
+           03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180034710".
       *    運動器リハビリテーション料（１）（要介護）（施設基準不適合）
            03  CONS-UNDOKI17-COMMENT PIC X(09)  VALUE  "180044030".
       *    運動器リハビリテーション料（２）（要介護）（施設基準不適合）
            03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180044130".
       *    運動器リハビリテーション料（３）（要介護）（施設基準不適合）
            03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180044230".
-      *
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -782,7 +778,6 @@
            03  CONS-SYOGAI3-COMMENT  PIC X(09)  VALUE  "180028410".
       *    摂食機能療法
            03  CONS-SESSYOKU-COMMENT PIC X(09)  VALUE  "180016610".
-      *
       *    廃用症候群リハビリテーション料（１）（１単位）
            03  CONS-HAIYO1-COMMENT   PIC X(09)  VALUE  "180044610".
       *    廃用症候群リハビリテーション料（２）（１単位）
@@ -3363,15 +3358,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-NOUKE3-COMMENT   OR
                                             CONS-NOUKE4-COMMENT   OR
                                             CONS-NOUKE7-COMMENT   OR
-                                            CONS-NOUKE8-COMMENT   OR
-                                            CONS-NOUKE9-COMMENT   OR
-                                            CONS-NOUKE10-COMMENT  OR
                                             CONS-NOUKE11-COMMENT  OR
                                             CONS-NOUKE12-COMMENT  OR
                                             CONS-NOUKE13-COMMENT  OR
                                             CONS-NOUKE14-COMMENT  OR
                                             CONS-NOUKE15-COMMENT  OR
                                             CONS-NOUKE16-COMMENT  OR
+                                            CONS-NOUKE17-COMMENT  OR
+                                            CONS-NOUKE18-COMMENT  OR
+                                            CONS-NOUKE19-COMMENT  OR
                                             CONS-NOUKE23-COMMENT  OR
                                             CONS-NOUKE24-COMMENT  OR
                                             CONS-NOUKE25-COMMENT  OR
@@ -3382,10 +3377,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
-                                            CONS-UNDOKI7-COMMENT  OR
-                                            CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
-                                            CONS-UNDOKI10-COMMENT OR
+                                            CONS-UNDOKI11-COMMENT OR
+                                            CONS-UNDOKI12-COMMENT OR
+                                            CONS-UNDOKI13-COMMENT OR
                                             CONS-UNDOKI17-COMMENT OR
                                             CONS-UNDOKI18-COMMENT OR
                                             CONS-UNDOKI19-COMMENT OR
@@ -3450,15 +3445,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-NOUKE5-COMMENT
                                       OR    CONS-NOUKE6-COMMENT
                                       OR    CONS-NOUKE7-COMMENT
-                                      OR    CONS-NOUKE8-COMMENT
-                                      OR    CONS-NOUKE9-COMMENT
-                                      OR    CONS-NOUKE10-COMMENT
                                       OR    CONS-NOUKE11-COMMENT
                                       OR    CONS-NOUKE12-COMMENT
                                       OR    CONS-NOUKE13-COMMENT
                                       OR    CONS-NOUKE14-COMMENT
                                       OR    CONS-NOUKE15-COMMENT
                                       OR    CONS-NOUKE16-COMMENT
+                                      OR    CONS-NOUKE17-COMMENT
+                                      OR    CONS-NOUKE18-COMMENT
+                                      OR    CONS-NOUKE19-COMMENT
                                       OR    CONS-NOUKE23-COMMENT
                                       OR    CONS-NOUKE24-COMMENT
                                       OR    CONS-NOUKE25-COMMENT
@@ -3474,10 +3469,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-UNDOKI4-COMMENT
                                       OR    CONS-UNDOKI5-COMMENT
                                       OR    CONS-UNDOKI6-COMMENT
-                                      OR    CONS-UNDOKI7-COMMENT
-                                      OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
-                                      OR    CONS-UNDOKI10-COMMENT
+                                      OR    CONS-UNDOKI11-COMMENT
+                                      OR    CONS-UNDOKI12-COMMENT
+                                      OR    CONS-UNDOKI13-COMMENT
                                       OR    CONS-UNDOKI17-COMMENT
                                       OR    CONS-UNDOKI18-COMMENT
                                       OR    CONS-UNDOKI19-COMMENT
