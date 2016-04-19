@@ -335,7 +335,10 @@
                    END-IF
       *        ÌóÂ«¥»¥Ã¥È
                WHEN    "S"
-                   IF      SPA-COM-SURYO  (IDX)     >  1
+                   IF      SPA-COM-SURYO  (IDX)    =   ZERO
+                       MOVE    1               TO  SPA-COM-SURYO (IDX)
+                   END-IF
+                   IF      SPA-COM-SURYO  (IDX)  NOT =  1
                        MOVE    SPA-COM-SURYO  (IDX)    TO  WRK-SURYO
                        PERFORM 2001-SURYO-HEN-SEC
                    END-IF
