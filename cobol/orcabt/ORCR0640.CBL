@@ -12066,6 +12066,8 @@
                         AND (WRK-SKJKEEP-KBN(SYUKEI-IDX3) =  "2"     )
                         AND (FLG-SKJFTNNASI               =   ZERO   )
                            MOVE    1   TO  RECE62-SEISIN-SKJFLG
+                           MOVE    1   TO  RECE62-SEISIN-SKJSAN
+                                                  (IDX1 SYUKEI-IDX3)
                         END-IF
                      END-IF
       *

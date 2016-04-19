@@ -6401,7 +6401,7 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
       *****************************************************************
        2001-NINRYO-HANTEI-SEC          SECTION.
       *
-           IF     RECE120-FLG-NINRYO-COMMENT   =    "1" OR "2"
+           IF     RECE120-FLG-NINRYO-COMMENT   NOT =  SPACE
                MOVE    SPACE                TO  WRK-NINRYO-FSANTEIYMD
                INITIALIZE                       SANTEI-REC
                MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM

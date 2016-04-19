@@ -357,6 +357,7 @@
            03  IDX29               PIC 9(02).
            03  IDX30               PIC 9(02).
            03  IDX32               PIC 9(02).
+           03  IDX33               PIC 9(02).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  DAY-IDX             PIC 9(04).
@@ -3741,6 +3742,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM 800-RECE82-SET849-SEC
            MOVE    99999989            TO  RECE849-ZAINUM
            MOVE    "99"                TO  RECE849-SRYKBN
+           MOVE    "991"               TO  RECE849-SRYSYUKBN
            MOVE    1                   TO  RECE849-MEISAISU
       *
            MOVE    RECE82-HKNCOMBI     TO  RECE849-HKNCOMBI
@@ -3750,10 +3752,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM 800-RECE82-SET859-SEC
            MOVE    99999989            TO  RECE859-ZAINUM
            MOVE    "99"                TO  RECE859-SRYKBN
+           MOVE    "991"               TO  RECE859-SRYSYUKBN
       *
            MOVE    SPACE               TO  WRK-RECE85XX-REC
            INITIALIZE                      WRK-RECE85XX-REC
-           MOVE   "810000001"          TO  WRK-RECE85XX-SRYCD(1 1)
+           MOVE   "840000136"          TO  WRK-RECE85XX-SRYCD(1 1)
            MOVE    ZERO                TO  WRK-RECE85XX-SRYSURYO(1 1)
            MOVE    31                  TO  WRK-RECE85XX-YUKOKETA(1 1)
            MOVE   "É¸½àÉéÃ´³Û·Ð²áÁ¼ÃÖ¡ÊÀº¿À¡ËÆþ±¡Ç¯·îÆü¡§"
@@ -3776,6 +3779,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF      KANACHK-RC      =   ZERO
                  MOVE    KANACHK-OUT-INPUT(1:4)
                                  TO  WRK-RECE85XX-NAME(1 1)(45:4)
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                          TO  WRK-RECE85XX-INPUTCOMENT(1 1)(1:4)
               END-IF
       *
               MOVE    LNK-DAY2-EDTYMD1-M  TO  WRK-TAIHI-XX
@@ -3786,6 +3791,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF      KANACHK-RC      =   ZERO
                  MOVE    KANACHK-OUT-INPUT(1:4)
                                  TO  WRK-RECE85XX-NAME(1 1)(51:4)
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                          TO  WRK-RECE85XX-INPUTCOMENT(1 1)(5:4)
               END-IF
       *
               MOVE    LNK-DAY2-EDTYMD1-D  TO  WRK-TAIHI-XX
@@ -3796,7 +3803,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF      KANACHK-RC      =   ZERO
                  MOVE    KANACHK-OUT-INPUT(1:4)
                                  TO  WRK-RECE85XX-NAME(1 1)(57:4)
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                          TO  WRK-RECE85XX-INPUTCOMENT(1 1)(9:4)
               END-IF
+      *
+              PERFORM  VARYING  IDX33  FROM  1  BY  2
+                        UNTIL   IDX33    >  12
+                 IF  WRK-RECE85XX-INPUTCOMENT(1 1)(IDX33:2) = "¡¡"
+                    MOVE  "£°"   TO
+                              WRK-RECE85XX-INPUTCOMENT(1 1)(IDX33:2)
+                 END-IF
+              END-PERFORM
            END-IF
       *
            MOVE     "1"                TO  WRK-RECE85XX-SIKFLG(1 1)

@@ -1021,6 +1021,10 @@
       *標準負担額経過措置（精神）
            03  RECE62-SEISIN-SKJFLG             PIC 9(01).
            03  RECE62-SEISIN-NYUINYMD           PIC X(08).
+           03  RECE62-SEISIN-SKJSAN-AREA.
+             04  RECE62-SEISIN-SKJSAN-OCC       OCCURS 10.
+               05  RECE62-SEISIN-SKJSAN-OCC2    OCCURS 31.
+                 06  RECE62-SEISIN-SKJSAN       PIC 9(01).
       *
       *再診加算（入院）情報
            03  RECE62-NYUSAIINF.
