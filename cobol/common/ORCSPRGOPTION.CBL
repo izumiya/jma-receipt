@@ -49,6 +49,8 @@
            03  FLG-CHK             PIC 9(01).
            03  FLG-CHK2            PIC 9(01).
       *
+           03  FLG-CHKEND           PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(05).
@@ -184,9 +186,11 @@
            MOVE    PRGOPTION-OPTION    TO  WRK-OPTION
            MOVE    SPACE               TO  WRK-PARA
            MOVE    ZERO                TO  FLG-CHK
+           MOVE    ZERO                TO  FLG-CHKEND
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   44000 )
                           OR  (FLG-OK  NOT =   ZERO   )
+                          OR  (FLG-CHKEND  =   1      )
       *        # 以降はコメントとする
                IF      WRK-OPTION(IDX:1)       =   "#"
                    MOVE    1                   TO  FLG-CHK
@@ -198,6 +202,14 @@
                END-IF
       *!!!
                IF      FLG-CHK         =   ZERO
+      *H28.5      空白で終了
+                  IF    ( WRK-OPTION(IDX:)   =   SPACE )
+                    OR  ((IDX +  WRK-MAX )   >   44000 )
+                      MOVE   1                TO  FLG-CHKEND
+                  END-IF
+      *
+                  IF     FLG-CHKEND       =   ZERO
+      *
       *            # から 改行までは対象外とする
                    IF      WRK-OPTION(IDX:WRK-MAX)
                                        =   ORCSPRGOPTION-IN-DATA
@@ -223,6 +235,8 @@
                                PERFORM 2001-PARA-HEN-SEC
                            END-IF
                        END-IF
+                   END-IF
+      *
                    END-IF
       *
                    END-IF
