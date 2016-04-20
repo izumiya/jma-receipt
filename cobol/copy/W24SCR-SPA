@@ -20,6 +20,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.04.00    NACL-多々納  06/10/26  検索画面連絡情報移動他 
       *  04.03.00    NACL-多々納  08/08/28  退院時院外処方せん区分追加
+      *
+      *  04.08.01    NACL-藤原    16.04.20  退院証明書記載区分の設定追加
       *****************************************************************
       *
        01  SPA-W24FREE.
@@ -213,7 +215,7 @@
                  11  SPA-GMN-W24-TAIKSIKBN-G.
                    13  SPA-GMN-W24-TAIKSIKBN           PIC X(01).
                    13  SPA-GMN-W24-TAIKSIKBNFL         PIC X(01).
-                   13  SPA-GMN-W24-TAIKSIKBNMEI        PIC X(18).
+                   13  SPA-GMN-W24-TAIKSIKBNMEI        PIC X(28).
       *!!
       *          退院時院外処方せん発行区分
                  11  SPA-GMN-W24-SHOHOUKBN-G.
@@ -329,10 +331,10 @@
       *          退院証明書記載区分
                  11  SPA-GMN-W24-TAIKSIKBNLST-G.
                    13  SPA-GMN-W24-TAIKSIKBN-MAX       PIC 9(03).
-                   13  SPA-GMN-W24-TAIKSIKBNLST        OCCURS  5.
+                   13  SPA-GMN-W24-TAIKSIKBNLST        OCCURS  10.
                        15  SPA-GMN-W24-TAIKSIKBNL      PIC X(01).
                        15  SPA-GMN-W24-TAIKSIKBNLFL    PIC X(01).
-                       15  SPA-GMN-W24-TAIKSIKBNMEIL   PIC X(18).
+                       15  SPA-GMN-W24-TAIKSIKBNMEIL   PIC X(28).
       *          選定入院区分
                  11  SPA-GMN-W24-SENTEIKBNLST-G.
                    13  SPA-GMN-W24-SENTEIKBN-MAX       PIC 9(03).

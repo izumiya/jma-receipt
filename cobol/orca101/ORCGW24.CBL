@@ -57,6 +57,8 @@
       *  04.05.00    NACL-太田    10.03.01  改正対応
       *  04.07.00    NACL-小豆沢  11.07.25  救急・在宅等支援療養病床初期
       *                                     加算の設定追加
+      *
+      *  04.08.01    NACL-藤原    16.04.20  退院証明書記載区分の設定追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -1146,10 +1148,10 @@
       *****************************************************************
        310-TAIKSIKBNLST-SET-SEC    SECTION.
       *
-           MOVE    4               TO  SPA-GMN-W24-TAIKSIKBN-MAX
+           MOVE    6               TO  SPA-GMN-W24-TAIKSIKBN-MAX
       *
            MOVE    "0"             TO  SPA-GMN-W24-TAIKSIKBNL    (1)
-           MOVE    "２と３を記載しない"
+           MOVE    "２と３と４を記載しない"
                                    TO  SPA-GMN-W24-TAIKSIKBNMEIL (1)
       *
            MOVE    "1"             TO  SPA-GMN-W24-TAIKSIKBNL    (2)
@@ -1163,6 +1165,14 @@
            MOVE    "3"             TO  SPA-GMN-W24-TAIKSIKBNL    (4)
            MOVE    "３の欄のみ記載する"
                                    TO  SPA-GMN-W24-TAIKSIKBNMEIL (4)
+      *
+           MOVE    "4"             TO  SPA-GMN-W24-TAIKSIKBNL    (5)
+           MOVE    "４の欄のみ記載する"
+                                   TO  SPA-GMN-W24-TAIKSIKBNMEIL (5)
+      *
+           MOVE    "5"             TO  SPA-GMN-W24-TAIKSIKBNL    (6)
+           MOVE    "２と３と４を記載する"
+                                   TO  SPA-GMN-W24-TAIKSIKBNMEIL (6)
       *
            .
        310-TAIKSIKBNLST-SET-EXT.

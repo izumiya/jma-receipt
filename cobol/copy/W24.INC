@@ -176,11 +176,11 @@
                 05  W24-TAIPRTKBN-ITM          PIC X(20)
                                                OCCURS  5.
               04  W24-CMB-TAIKSIKBN.
-                05  W24-TAIKSIKBN              PIC X(20).
+                05  W24-TAIKSIKBN              PIC X(30).
                 05  W24-TAIKSIKBN-CNT          PIC S9(9)
                                                BINARY.
-                05  W24-TAIKSIKBN-ITM          PIC X(20)
-                                               OCCURS  5.
+                05  W24-TAIKSIKBN-ITM          PIC X(30)
+                                               OCCURS  10.
               04  W24-CMB-HYOUKETU.
                 05  W24-HYOUKETU               PIC X(32).
                 05  W24-HYOUKETU-STATE         PIC S9(9)

@@ -408,10 +408,10 @@ W24 {
     };
     CMB_TAIKSIKBN {
       TAIKSIKBN {
-        textdata varchar(20);
+        textdata varchar(30);
       };
       count int;
-        item varchar(20)[5];
+        item varchar(30)[10];
     };
     CMB_HYOUKETU {
       HYOUKETU {
