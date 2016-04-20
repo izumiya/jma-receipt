@@ -234,6 +234,22 @@
            03  CONS-TEISU4                 PIC X(09) VALUE "190123090".
       *
       *    平成２８年度食事負担
+      *    入院時食事療養（１）（流動食以外）
+           03  CONS-SKJ-RYOYO-1-1          PIC X(09) VALUE "197000110".
+      *    入院時食事療養（２）（流動食以外）
+           03  CONS-SKJ-RYOYO-2-1          PIC X(09) VALUE "197000710".
+      *    入院時食事療養（１）（流動食）
+           03  CONS-SKJ-RYOYO-1-2          PIC X(09) VALUE "197003110".
+      *    入院時食事療養（２）（流動食）
+           03  CONS-SKJ-RYOYO-2-2          PIC X(09) VALUE "197003210".
+      *    入院時生活療養（１）食事療養（流動食以外）
+           03  CONS-SKJSEI-RYOYO-1-1       PIC X(09) VALUE "197001310".
+      *    入院時生活療養（１）食事療養（流動食）
+           03  CONS-SKJSEI-RYOYO-1-2       PIC X(09) VALUE "197003510".
+      *    入院時生活療養（２）食事療養
+           03  CONS-SKJSEI-RYOYO-2         PIC X(09) VALUE "197001710".
+      *
+      *    平成２８年度食事負担
       *    食事療養標準負担額（指定難病・小児慢性特定疾病患者）（一般）
            03  CONS-NANBYO-SKJFTN          PIC X(09) VALUE "197003310".
       *    食事療養標準負担額（精神１年超）（一般）
@@ -554,6 +570,8 @@
                    07  WRK-SKJ7-GRP.
                        09  WRK-SKJ7-RYOYO       PIC X(09).
                        09  WRK-SKJ7-RYOYO-SU    PIC 9(01).
+                       09  WRK-SKJ7-RYOYO-RYU       PIC X(09).
+                       09  WRK-SKJ7-RYOYO-RYU-SU    PIC 9(01).
                        09  WRK-SKJ7-SHOKUDOU    PIC X(09).
                        09  WRK-SKJ7-TOKU-SHOKU  PIC X(09).
                        09  WRK-SKJ7-TOKU-SHOKU-SU PIC 9(01).
@@ -10548,17 +10566,41 @@
            PERFORM      VARYING    IDX1   FROM   1  BY  1
                         UNTIL      IDX1   >   31
       *        食事療養費（朝）
-               IF    WRK-SKJ4-RYOYO(IDX1)  NOT =   SPACE
-                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
+               IF   WRK-SKJ4-RYOYO(IDX1)  NOT =   SPACE
+                   IF  LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)  =   SPACE
+                     MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
-                   MOVE  WRK-SKJ4-RYOYO(IDX1)
-                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                     IF   WRK-SKJ4-RYOYO(IDX1)   =   CONS-SKJ-RYOYO-1-1
+                                                 OR  CONS-SKJ-RYOYO-2-1
+                         MOVE  WRK-SKJ4-RYOYO(IDX1)
+                                         TO  WRK-SKJ7-RYOYO(IDX1)
+                         ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                     END-IF
+                     IF   WRK-SKJ4-RYOYO(IDX1)   =   CONS-SKJ-RYOYO-1-2
+                                                 OR  CONS-SKJ-RYOYO-2-2
+                         MOVE  WRK-SKJ4-RYOYO(IDX1)
+                                         TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                          ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                     END-IF
+                   END-IF
       *            入院時生活療養費の置換え
                    IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)  NOT =  SPACE
-                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
+                      MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
+                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1) =
+                                               CONS-SKJSEI-RYOYO-1-1 OR
+                                               CONS-SKJSEI-RYOYO-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
                                        TO  WRK-SKJ7-RYOYO(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                      END-IF
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 1) =
+                                               CONS-SKJSEI-RYOYO-1-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
+                                       TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                      END-IF
                    END-IF
-                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
                END-IF
       *        特別食加算（朝）
                IF    WRK-SKJ5-TOKU-SHOKU(IDX1)  NOT =   SPACE
@@ -10601,16 +10643,40 @@
                MOVE      ZERO          TO  IDX2
                COMPUTE   IDX2     =    IDX1    +   31
                IF    WRK-SKJ4-RYOYO(IDX2)  NOT =   SPACE
-                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
-                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
-                   MOVE  WRK-SKJ4-RYOYO(IDX2)
-                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                   IF  LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)  =   SPACE
+                     MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
+                                         TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                     IF   WRK-SKJ4-RYOYO(IDX2)   =   CONS-SKJ-RYOYO-1-1
+                                                 OR  CONS-SKJ-RYOYO-2-1
+                         MOVE  WRK-SKJ4-RYOYO(IDX2)
+                                         TO  WRK-SKJ7-RYOYO(IDX1)
+                         ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                     END-IF
+                     IF   WRK-SKJ4-RYOYO(IDX2)   =   CONS-SKJ-RYOYO-1-2
+                                                 OR  CONS-SKJ-RYOYO-2-2
+                         MOVE  WRK-SKJ4-RYOYO(IDX2)
+                                         TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                         ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                     END-IF
+                   END-IF
       *            入院時生活療養費の置換え
                    IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)  NOT =  SPACE
-                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)
+                      MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
+                                         TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2) =
+                                               CONS-SKJSEI-RYOYO-1-1 OR
+                                               CONS-SKJSEI-RYOYO-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)
                                        TO  WRK-SKJ7-RYOYO(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                      END-IF
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 2) =
+                                               CONS-SKJSEI-RYOYO-1-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 2)
+                                       TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                      END-IF
                    END-IF
-                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
                END-IF
       *        特別食加算（昼）
                IF    WRK-SKJ5-TOKU-SHOKU(IDX2)  NOT =   SPACE
@@ -10653,16 +10719,40 @@
                MOVE      ZERO          TO  IDX3
                COMPUTE   IDX3     =    IDX1    +   62
                IF    WRK-SKJ4-RYOYO(IDX3)  NOT =   SPACE
-                   MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
-                                       TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
-                   MOVE  WRK-SKJ4-RYOYO(IDX3)
-                                       TO  WRK-SKJ7-RYOYO(IDX1)
+                   IF  LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)  =   SPACE
+                      MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
+                                         TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                      IF   WRK-SKJ4-RYOYO(IDX3)   =   CONS-SKJ-RYOYO-1-1
+                                                  OR  CONS-SKJ-RYOYO-2-1
+                          MOVE  WRK-SKJ4-RYOYO(IDX3)
+                                          TO  WRK-SKJ7-RYOYO(IDX1)
+                          ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                      END-IF
+                      IF   WRK-SKJ4-RYOYO(IDX3)   =   CONS-SKJ-RYOYO-1-2
+                                                  OR  CONS-SKJ-RYOYO-2-2
+                          MOVE  WRK-SKJ4-RYOYO(IDX3)
+                                          TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                          ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                      END-IF
+                   END-IF
       *            入院時生活療養費の置換え
                    IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)  NOT =  SPACE
-                       MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)
+                      MOVE  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
+                                         TO  WRK-SKJ7-HKNCOMBI-DAY(IDX1)
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3) =
+                                               CONS-SKJSEI-RYOYO-1-1 OR
+                                               CONS-SKJSEI-RYOYO-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)
                                        TO  WRK-SKJ7-RYOYO(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-SU(IDX1)
+                      END-IF
+                      IF   LNK-NYULIFE2-SKJ-SRYCD(IDX1 3) =
+                                               CONS-SKJSEI-RYOYO-1-2
+                           MOVE  LNK-NYULIFE2-SKJ-SRYCD(IDX1 3)
+                                       TO  WRK-SKJ7-RYOYO-RYU(IDX1)
+                           ADD   1     TO  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                      END-IF
                    END-IF
-                   ADD   1             TO  WRK-SKJ7-RYOYO-SU(IDX1)
                END-IF
       *        特別食加算（夕）
                IF    WRK-SKJ5-TOKU-SHOKU(IDX3)  NOT =   SPACE
@@ -10731,6 +10821,11 @@
                    COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
                            WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
                END-IF
+               IF   WRK-SKJ7-RYOYO-RYU(IDX1)  NOT =  SPACE
+                   MOVE    WRK-SKJ7-RYOYO-RYU(IDX1)   TO WRK-SRYCD-X
+                   COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                           WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+               END-IF
                IF   WRK-SKJ7-SHOKUDOU(IDX1)  NOT =  SPACE
                    MOVE    WRK-SKJ7-SHOKUDOU(IDX1)    TO WRK-SRYCD-X
                    COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
@@ -10747,6 +10842,8 @@
                            WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
                END-IF
                ADD   WRK-SKJ7-RYOYO-SU(IDX1)
+                                     TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+               ADD   WRK-SKJ7-RYOYO-RYU-SU(IDX1)
                                      TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
                ADD   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
                                      TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
@@ -10773,6 +10870,10 @@
       *                   WRK-SKJ7-RYOYO(IDX1)
       *          DISPLAY "WRK-SKJ7-RYOYO-SU(IDX1) = "
       *                   WRK-SKJ7-RYOYO-SU(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO-RYU(IDX1) = "
+      *                   WRK-SKJ7-RYOYO-RYU(IDX1)
+      *          DISPLAY "WRK-SKJ7-RYOYO-RYU-SU(IDX1) = "
+      *                   WRK-SKJ7-RYOYO-RYU-SU(IDX1)
       *          DISPLAY "WRK-SKJ7-SHOKUDOU(IDX1) = "
       *                   WRK-SKJ7-SHOKUDOU(IDX1)
       *          DISPLAY "WRK-SKJ7-TOKU-SHOKU(IDX1) = "
@@ -10867,10 +10968,11 @@
       *                   WRK-SKJ7-SKJFTN-SU(IDX1)
       *          DISPLAY "WRK-SKJ7-KAISU =(IDX1) = "
       *                   WRK-SKJ7-KAISU (IDX1)
-              IF    WRK-SKJ7-RYOYO(IDX1)   NOT =  SPACE
+              IF   (WRK-SKJ7-RYOYO(IDX1)       NOT =  SPACE)  OR
+                   (WRK-SKJ7-RYOYO-RYU(IDX1)   NOT =  SPACE)
                 IF (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001310")  AND
                    (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001710")  AND
-                   (WRK-SKJ7-RYOYO(IDX1)   NOT = "197003510")
+                   (WRK-SKJ7-RYOYO-RYU(IDX1)   NOT = "197003510")
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
                                     LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
@@ -10887,9 +10989,9 @@
                         END-IF
                         MOVE   WRK-SKJ7-RYOYO(IDX1)  TO
                                   LNK-NYURECEDEN-SRYCD(3 IDX2 IDX4)
-                    END-IF
-                    MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
+                        MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
                                       LNK-NYURECEDEN-SURYO(3 IDX2 IDX4)
+                    END-IF
                     EVALUATE  WRK-SKJ7-RYOYO(IDX1)
       *               入院時食事療養（１）
                       WHEN  "197000110"
@@ -10917,9 +11019,26 @@
                                 MOVE  1518     TO  
                                       LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
                         END-EVALUATE
+                    END-EVALUATE
+                    MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-NYURECEDEN-KAISU(3 IDX2 IDX4)
+                    IF   WRK-SKJ7-RYOYO-RYU(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX4
+                        IF     IDX4   =   1
+                            MOVE   "SI"   TO
+                              LNK-NYURECEDEN-RECSKB(3 IDX2 IDX4)
+                            MOVE   "97"   TO
+                              LNK-NYURECEDEN-SRYSKB(3 IDX2 IDX4)
+                        END-IF
+                        MOVE   WRK-SKJ7-RYOYO-RYU(IDX1)  TO
+                                  LNK-NYURECEDEN-SRYCD(3 IDX2 IDX4)
+                        MOVE      WRK-SKJ7-RYOYO-RYU-SU(IDX1)  TO
+                                      LNK-NYURECEDEN-SURYO(3 IDX2 IDX4)
+                    END-IF
+                    EVALUATE  WRK-SKJ7-RYOYO-RYU(IDX1)
       *               入院時食事療養（１）（流動食）
                       WHEN  "197003110"
-                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                        EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
                             WHEN  1
                                 MOVE   575     TO  
                                       LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
@@ -10932,7 +11051,7 @@
                         END-EVALUATE
       *               入院時食事療養（２）（流動食）
                       WHEN  "197003210"
-                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                        EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
                             WHEN  1
                                 MOVE   455     TO  
                                       LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
@@ -11131,9 +11250,9 @@
                         END-IF
                         MOVE   WRK-SKJ7-RYOYO(IDX1)  TO
                                   LNK-NYURECEDEN-SRYCD(4 IDX3 IDX5)
-                    END-IF
-                    MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
+                        MOVE      WRK-SKJ7-RYOYO-SU(IDX1)  TO
                                       LNK-NYURECEDEN-SURYO(4 IDX3 IDX5)
+                    END-IF
                     EVALUATE  WRK-SKJ7-RYOYO(IDX1)
       *               入院時生活療養（１）食事療養
                       WHEN  "197001310"
@@ -11161,9 +11280,26 @@
                                 MOVE  1260     TO  
                                       LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
                         END-EVALUATE
+                    END-EVALUATE
+                    MOVE  WRK-SKJ7-KAISU(IDX1)  TO
+                                LNK-NYURECEDEN-KAISU(4 IDX3 IDX5)
+                    IF   WRK-SKJ7-RYOYO-RYU(IDX1)  NOT =  SPACE
+                        ADD     1     TO    IDX5
+                        IF     IDX5    =   1
+                            MOVE   "SI"   TO
+                              LNK-NYURECEDEN-RECSKB(4 IDX3 IDX5)
+                            MOVE   "97"   TO
+                              LNK-NYURECEDEN-SRYSKB(4 IDX3 IDX5)
+                        END-IF
+                        MOVE   WRK-SKJ7-RYOYO-RYU(IDX1)  TO
+                                  LNK-NYURECEDEN-SRYCD(4 IDX3 IDX5)
+                        MOVE      WRK-SKJ7-RYOYO-RYU-SU(IDX1)  TO
+                                      LNK-NYURECEDEN-SURYO(4 IDX3 IDX5)
+                    END-IF
+                    EVALUATE  WRK-SKJ7-RYOYO-RYU(IDX1)
       *               入院時生活療養（１）食事療養（流動食）
                       WHEN  "197003510"
-                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                        EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
                             WHEN  1
                                 MOVE   500     TO  
                                       LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
