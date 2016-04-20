@@ -10000,6 +10000,23 @@
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX1)
                                END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
+                               END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
                        IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
@@ -10047,6 +10064,23 @@
                                                                  SPACE
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX1)
+                               END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX1)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX1)
                                END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
@@ -10142,6 +10176,23 @@
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX2)
                                END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX2)
+                               END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
                        IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
@@ -10190,6 +10241,23 @@
                                                                  SPACE
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX2)
+                               END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX2)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX2)
                                END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
@@ -10285,6 +10353,23 @@
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX3)
                                END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX3)
+                               END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
                        IF    WRK-SYS5000-SHOKUCD(3 IDX1)  NOT = SPACE
@@ -10334,6 +10419,23 @@
                                                                  SPACE
                                    MOVE   "197000810"
                                            TO  WRK-SKJFTN2-SRYCD(IDX3)
+                               END-IF
+      *                    Î®Æ°¿©
+                           WHEN   3
+                               EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£±¡Ë
+                                   WHEN   "197000110"
+                                      MOVE   "197003110"
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+      *                            Æþ±¡»þ¿©»öÎÅÍÜÈñ¡Ê£²¡Ë
+                                   WHEN   "197000710"
+                                      MOVE   "197003210"
+                                              TO  WRK-SKJ4-RYOYO(IDX3)
+                               END-EVALUATE
+                               IF   WRK-SYS5000-SHOKUCD(1 IDX1) NOT =
+                                                                 SPACE
+                                   MOVE   "197000810"
+                                         TO  WRK-SKJFTN2-SRYCD(IDX3)
                                END-IF
                        END-EVALUATE
       *                ¿©Æ²²Ã»»
@@ -10767,7 +10869,8 @@
       *                   WRK-SKJ7-KAISU (IDX1)
               IF    WRK-SKJ7-RYOYO(IDX1)   NOT =  SPACE
                 IF (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001310")  AND
-                   (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001710")
+                   (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001710")  AND
+                   (WRK-SKJ7-RYOYO(IDX1)   NOT = "197003510")
                     ADD    1     TO    IDX2
                     MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
                                     LNK-NYURECEDEN-HKNCOMBI(3 IDX2)
@@ -10812,6 +10915,32 @@
                                       LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
                             WHEN  3
                                 MOVE  1518     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                        END-EVALUATE
+      *               Æþ±¡»þ¿©»öÎÅÍÜ¡Ê£±¡Ë¡ÊÎ®Æ°¿©¡Ë
+                      WHEN  "197003110"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   575     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  2
+                                MOVE  1150     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  3
+                                MOVE  1725     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                        END-EVALUATE
+      *               Æþ±¡»þ¿©»öÎÅÍÜ¡Ê£²¡Ë¡ÊÎ®Æ°¿©¡Ë
+                      WHEN  "197003210"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   455     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  2
+                                MOVE   910     TO  
+                                      LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  3
+                                MOVE  1365     TO  
                                       LNK-NYURECEDEN-TEN(3 IDX2 IDX4)
                         END-EVALUATE
                     END-EVALUATE
@@ -11030,6 +11159,19 @@
                                       LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
                             WHEN  3
                                 MOVE  1260     TO  
+                                      LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
+                        END-EVALUATE
+      *               Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê£±¡Ë¿©»öÎÅÍÜ¡ÊÎ®Æ°¿©¡Ë
+                      WHEN  "197003510"
+                        EVALUATE  WRK-SKJ7-RYOYO-SU(IDX1)
+                            WHEN  1
+                                MOVE   500     TO  
+                                      LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
+                            WHEN  2
+                                MOVE  1000     TO  
+                                      LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
+                            WHEN  3
+                                MOVE  1500     TO  
                                       LNK-NYURECEDEN-TEN(4 IDX3 IDX5)
                         END-EVALUATE
                     END-EVALUATE
