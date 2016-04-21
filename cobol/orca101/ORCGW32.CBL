@@ -39,6 +39,7 @@
       *  04.07.00    NACL-多々納  14/04/24  小児特定集中管理料等追加
       *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
       *  04.08.00    NACL-多々納  16/04/XX  地域包括ケア病棟包括外対応他
+      *                                     障害者施設等入院基本料対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -541,6 +542,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "530"
                    MOVE    "地域移行機能強化病棟入院料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
+               WHEN    "531"
+                   MOVE    "障害者施設等入院基本料（医療区分算定患者）"
+                                            TO  SPA-GMN-TKBNCD-MEI(IDX)
            END-EVALUATE
            . 
        3101-KBNCDMEI-HEN-EXT.
@@ -843,6 +847,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "530"
       *            地域移行機能強化病棟入院料
                    PERFORM 200211-KBNCD-530-SEC
+               WHEN    "531"
+      *            障害者施設等入院基本料
+                   PERFORM 200211-KBNCD-531-SEC
                WHEN    OTHER
       *            包括なし
                    PERFORM 200211-KBNCD-999-SEC
@@ -1409,6 +1416,35 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-PERFORM
            .
        200211-KBNCD-530-EXT.
+           EXIT.
+      *****************************************************************
+      *    障害者施設等入院基本料（医療区分算定患者）処理
+      *****************************************************************
+       200211-KBNCD-531-SEC       SECTION.
+      *
+      *    包括算定区分
+           MOVE    SPA-GMN-SANTEIKBN-LST (2)   TO  SPA-GMN-SANTEIKBN-G
+           MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    SPA-GMN-HKNCOMBIKBN-LST(1)  TO  SPA-GMN-HKNCOMBIKBN-G
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
+               IF      IDX             =    01
+                                       OR   02
+                                       OR   03
+                                       OR   05
+                                       OR   06
+                                       OR   10
+      *            投薬・注射・検査・病理診断・画像診断・処置　包括
+                   MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+               ELSE
+                   MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+               END-IF
+           END-PERFORM
+           .
+       200211-KBNCD-531-EXT.
            EXIT.
       *****************************************************************
       *    番号選択チェック処理
