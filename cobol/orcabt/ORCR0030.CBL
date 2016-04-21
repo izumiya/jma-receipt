@@ -963,6 +963,7 @@
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
            03  FLG-RECECOM                             PIC 9(01).
            03  FLG-SIPPU-COM                           PIC 9(01).
+           03  FLG-SIPPU-ARI                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -3180,6 +3181,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
            END-IF
            IF      SYS-200501-INSPECT-GENERAL-KBN   =   SPACE
                MOVE    "0"   TO  SYS-200501-INSPECT-GENERAL-KBN
+           END-IF
+           IF      SYS-200501-COMPRESS-KBN          =   SPACE
+               MOVE    "0"   TO  SYS-200501-COMPRESS-KBN
            END-IF
       *
           .
@@ -10258,6 +10262,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  ZERO  TO   FLG-HENSYU-ARI
                                MOVE  ZERO  TO   FLG-ZAITAKU-CHECK
                                MOVE  ZERO  TO   FLG-SIPPU-COM
+                               MOVE  ZERO  TO   FLG-SIPPU-ARI
                                IF  ACCT-JIHOKBN  =  SPACE
                                 PERFORM 21042-RECE02-TOTALTEN-HEN-SEC
                                END-IF
@@ -10325,6 +10330,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO   FLG-HENSYU-ARI
                                       MOVE  ZERO  TO   FLG-ZAITAKU-CHECK
                                       MOVE  ZERO  TO   FLG-SIPPU-COM
+                                      MOVE  ZERO  TO   FLG-SIPPU-ARI
                                       IF    ACCT-SRYKBN  =
                                             "60" OR "64" OR "80"
                                         PERFORM 21046-SINRYO-CHECK-SEC
@@ -10707,6 +10713,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21044-RECE05-HENSYU-SEC               SECTION.
       *
+           IF    (RECE02-SRYYM            >=  "201604")
+           AND   (ACCT-SRYKBN              =  "23"    )
+           AND   (ACCT-JIHOKBN             =   SPACE  )
+             PERFORM 210444-SIPPU-CHECK-SEC
+           END-IF
+      *
            INITIALIZE     WRK-ORCSGETGE-OUT-AREA
            MOVE    ZERO                 TO      FLG-IRYORENKEI
            IF    ((WRK-PARA-PRTKBN  =  "9"                     ) AND
@@ -10903,7 +10915,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
              END-IF
       *
-             IF     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
+             IF     ((SRY-SRYCD(IDX2)(1:3)  =  "001") AND
+                     (FLG-SIPPU-ARI         =  ZERO )       )
+             OR     ((SRY-SRYCD(IDX2)(1:3)  =  "001") AND
+                     (FLG-SIPPU-ARI         =   1   ) AND
+                     (SYS-200501-COMPRESS-KBN
+                                        NOT =  "1"  )       )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
@@ -10999,7 +11016,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                   "8"
       *
               IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
-              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
+              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "001") AND
+                      (FLG-SIPPU-ARI         =  ZERO )       )
+              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "001") AND
+                      (FLG-SIPPU-ARI         =   1   ) AND
+                      (SYS-200501-COMPRESS-KBN
+                                         NOT =  "1"  )       )
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
@@ -11215,6 +11237,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE      1         TO    WRK-DAISAN-INGAI(IDX1)
                   END-IF
                 END-IF
+               END-IF
+      *
+               IF     FLG-SIPPU-ARI  =  1
+      **********  １：院外分　２：院内分
+                  IF   RECE04-ZAITEN  =   ZERO
+                      MOVE  "1"         TO    RECE04-SIPPUFLG
+                  ELSE
+                      MOVE  "2"         TO    RECE04-SIPPUFLG
+                  END-IF
+                  IF  (SRY-SRYCD(IDX2)(1:1)  =  "6")
+                  AND (TNS-MEIUSESKB         =   1 )
+                      MOVE  "1"         TO    RECE05-SIPPUFLG(IDX4)
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)(1:3)  =  "001"
+                      MOVE  "810000001" TO    RECE05-SRYCD(IDX4)
+                  END-IF
                END-IF
       *
                IF    ( SRY-SRYKBN        =     "14"  )
@@ -11478,9 +11516,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                IF      FLG-SIPPU-COM      =     1
-                       MOVE   "99"        TO    RECE04-SRYKBN
+                       MOVE   "1"         TO    RECE04-SIPPUCOMFLG
+                       MOVE   "80"        TO    RECE04-SRYKBN
                                                 RECE05-SRYKBN
-                       MOVE   "991"       TO    RECE04-SRYSYUKBN
+                       MOVE   "800"       TO    RECE04-SRYSYUKBN
                                                 RECE05-SRYSYUKBN
                END-IF
       *
@@ -16171,6 +16210,54 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            .
       *
        210443-IRYORENKEI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    湿布薬チェック
+      *****************************************************************
+       210444-SIPPU-CHECK-SEC               SECTION.
+      *
+           INITIALIZE                     SRYACT-REC
+           MOVE    ACCT-HOSPNUM       TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN     TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID          TO  SRY-PTID
+           MOVE    ACCT-SRYKA         TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM         TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM        TO  SRY-ZAINUM
+           MOVE    SRYACT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryact"       TO  MCP-TABLE
+           MOVE    "key2"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_sryact"     TO  MCP-TABLE
+             MOVE    "key2"           TO  MCP-PATHNAME
+             PERFORM  900-SRYACT-READ-SEC
+             PERFORM  UNTIL (FLG-SRYACT     =  1)
+                       OR   (FLG-SIPPU-ARI  =  1)
+      *
+               PERFORM  VARYING  IDX2  FROM  1  BY  1
+                         UNTIL  (IDX2            >   5   )
+                          OR    (SRY-SRYCD(IDX2) =  SPACE)
+                          OR    (FLG-SIPPU-ARI   =   1   )
+                  PERFORM    900-TENSU-TBL-SEC
+                  IF  (SRY-SRYCD(IDX2)(1:1)  =  "6")
+                  AND (TNS-MEIUSESKB         =   1 )
+                     MOVE    1        TO  FLG-SIPPU-ARI
+                  END-IF
+               END-PERFORM
+      *
+               MOVE    "tbl_sryact"   TO  MCP-TABLE
+               MOVE    "key2"         TO  MCP-PATHNAME
+               PERFORM   900-SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_sryact"       TO  MCP-TABLE
+           MOVE    "key2"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+      *
+       210444-SIPPU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -27818,7 +27905,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *
            MOVE    ZERO                 TO      FLG-TENSU
            MOVE    SRY-SRYCD(IDX2)      TO      TTNS-CHK-SRYCD
-           MOVE    RECE05-SRYYM         TO      WK-TAIHI-SRYYM
+           MOVE    SRY-SRYYM            TO      WK-TAIHI-SRYYM
            MOVE    WK-TAIHI-DAY         TO      WK-TAIHI-SRYD
            MOVE    WK-TAIHI-SRYYMD      TO      TTNS-CHK-YMD
       *
@@ -27830,7 +27917,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                INITIALIZE                           TNS-TENSU-REC
 grpsys         MOVE    SPA-HOSPNUM          TO      TNS-HOSPNUM
                MOVE    SRY-SRYCD(IDX2)      TO      TNS-SRYCD
-               MOVE    RECE05-SRYYM         TO      WK-TAIHI-SRYYM
+               MOVE    SRY-SRYYM            TO      WK-TAIHI-SRYYM
                MOVE    WK-TAIHI-DAY         TO      WK-TAIHI-SRYD
                MOVE    WK-TAIHI-SRYYMD      TO      TNS-YUKOSTYMD
                                                     TNS-YUKOEDYMD

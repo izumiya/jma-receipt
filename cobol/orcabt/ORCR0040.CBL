@@ -382,6 +382,7 @@
            03  FLG-RETRY           PIC 9(01).
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
+           03  FLG-SP              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -430,6 +431,9 @@
            03  IDX30               PIC 9(02).
            03  IDX31               PIC 9(02).
            03  IDX32               PIC 9(02).
+           03  IDX33               PIC 9(03).
+           03  IDX34               PIC 9(03).
+           03  IDX35               PIC 9(03).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -609,6 +613,34 @@
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
       *
            03  WRK-SEIKENTEN                 PIC ZZZZZZ9.
+      *
+           03  WRK-SIPPU-ZAICNT              PIC 9(08).
+      *
+           03  WRK-SURYO-X.
+               05  WRK-SURYO-Z1              PIC ZZZZZ.
+               05  WRK-SURYO-Z2              PIC X(01).
+               05  WRK-SURYO-Z3              PIC ZZZZZ.
+           03  WRK-SURYOST                   PIC 9(02).
+           03  WRK-SURYOKETA                 PIC 9(02).
+           03  WRK-SURYOKETA1                PIC 9(02).
+           03  WRK-SURYOKETA2                PIC 9(02).
+           03  WRK-SURYO-N.
+               05  WRK-SURYO-N1              PIC X(10).
+               05  WRK-SURYO-N2              PIC X(02).
+               05  WRK-SURYO-N3              PIC X(10).
+           03  WRK-SRYSURYOW                 PIC X(24).
+           03  WRK-SURYO                     PIC 9(05)V9(05).
+           03  WRK-SURYO-R  REDEFINES  WRK-SURYO.
+               05  WRK-SURYO-S1              PIC 9(05).
+               05  WRK-SURYO-S2              PIC 9(05).
+           03  WRK-CHAR2-HENKAN-AREA.
+               05  WRK-CHAR2-X               PIC X(10).
+               05  WRK-CHAR2-N               PIC X(20).
+               05  WRK-CHAR2-CNT             PIC 9(02).
+               05  WRK-CHAR2-N-CNT           PIC 9(02).
+           03  WRK-CHAR2-IDX                 PIC 9(02).
+      *
+           03  WRK-INGAISIPPU-NAME           PIC X(200).
       *
        01  WRK-RECE04-REC. 
            COPY    "CPRCF004.INC"  REPLACING   //RECE04//
@@ -1375,6 +1407,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE       ZERO             TO  IDX6
       *
+           MOVE       ZERO             TO  IDX33
+           MOVE       ZERO             TO  IDX34
+      *
            MOVE  RECE02-KOHBUNRI-MIN   TO  WRK-KOHBUNRI-JIDO
            MOVE  RECE02-KOHBUNRI-MAX   TO  WRK-KOHBUNRI-JIDO2
            MOVE  ZERO                  TO  WRK-HKNCOMBI-JIDO
@@ -1715,6 +1750,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                       IF   RECE04-COMCDFLG   =   "2"
                         PERFORM    2001-YAKUTEI-HENSYU-SEC
                       ELSE
+                        IF  RECE04-SIPPUFLG  =   "1"
+                           PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                        END-IF
                         PERFORM    2099-RECE04-TENSOU-SEC
                       END-IF
                    WHEN      "33"
@@ -1792,6 +1830,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *            ¡Ê°ÍÂ¸¾É½¸ÃÄÎÅË¡¤Î¼£ÎÅ³«»ÏÆü¤Î¥»¥Ã¥È¡Ë
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-IZONSYO-HANTEI-SEC
+                      END-IF
+      *            ¡Ê±¡³°¼¾ÉÛÌô£·£°ËçÄ¶ÍýÍ³¥³¥á¥ó¥È¤ÎºÞÈÖ¹æÊÑ´¹¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-SIPPUCOM-HANTEI-SEC
                       END-IF
                       IF   FLG-COMMENT  =  ZERO
                             PERFORM   2099-RECE04-TENSOU-SEC
@@ -9653,6 +9695,88 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    ±¡³°¼¾ÉÛÌô£·£°ËçÄ¶ÍýÍ³¥³¥á¥ó¥È¤¬¤¢¤ë¤«È½Äê
+      *****************************************************************
+       2001-SIPPUCOM-HANTEI-SEC          SECTION.
+      *
+           IF     RECE04-SIPPUCOMFLG  =  "1"
+      *
+             MOVE    99                   TO  FLG-COMMENT
+      *
+             ADD     1                    TO  IDX34
+      *
+             MOVE    ZERO                 TO  IDX-RECE05
+             MOVE    SPACE                TO  WRK-RECE05XX-REC
+             INITIALIZE                       WRK-RECE05XX-REC
+      *
+             PERFORM  200111-RECE05-TAIHI-SEC
+      *
+             PERFORM  UNTIL  (FLG-RECE05         =   1            )
+                       OR    (RECE04-KEY1    NOT =   RECE05-KEY1  )
+                       OR    (RECE04-ZAINUM  NOT =   RECE05-ZAINUM)
+               PERFORM  VARYING  IDX  FROM  1  BY  1
+                         UNTIL  (IDX               >   5    )
+                          OR    (RECE05-SRYCD(IDX) =   SPACE)
+                   ADD    1   TO   IDX-RECE05
+                   MOVE   RECE05-SRYACT-TBL(IDX)
+                              TO   WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+               END-PERFORM
+               PERFORM  990-RECE05-NEXT-SEC
+             END-PERFORM
+      *
+             MOVE      ZERO                 TO   FLG-WRKRECE05
+             MOVE      ZERO                 TO   IDX
+             MOVE      ZERO                 TO   IDX-RECE05
+             MOVE      ZERO                 TO   WRK-RENNUM
+             MOVE      ZERO                 TO   WRK-CNT-MEISAI
+             PERFORM  UNTIL  FLG-WRKRECE05  =  1
+               INITIALIZE                        RECE059-REC
+               MOVE    WRK-RECE05-KEY       TO   RECE059-KEY
+               COMPUTE WRK-SIPPU-ZAICNT     =    99991900  +  IDX34
+               MOVE    WRK-SIPPU-ZAICNT     TO   RECE059-ZAINUM
+               ADD     1                    TO   WRK-RENNUM
+               MOVE    WRK-RENNUM           TO   RECE059-RENNUM
+               MOVE    WRK-RECE05-KOHBUNRI  TO   RECE059-KOHBUNRI
+               MOVE    WRK-RECE05-PTNUM     TO   RECE059-PTNUM
+               MOVE    WRK-RECE05-SRYKA     TO   RECE059-SRYKA
+               MOVE    "80"                 TO   RECE059-SRYKBN
+               MOVE    "800"                TO   RECE059-SRYSYUKBN
+               MOVE    WRK-RECE05-JIHIMONEY TO   RECE059-JIHIMONEY
+               PERFORM  VARYING  IDX  FROM  1  BY  1
+                         UNTIL  (IDX            >   5)
+                          OR    (FLG-WRKRECE05  =   1)
+                 ADD        1     TO   IDX-RECE05
+                 IF (WRK-RECE05XX-SRYCD(IDX-RECE05 1) = SPACE)
+                 OR (IDX-RECE05                       >  100 )
+                    MOVE    1     TO   FLG-WRKRECE05
+                 ELSE
+                    MOVE  WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+                                  TO   RECE059-SRYACT-TBL(IDX)
+                    ADD     1     TO   WRK-CNT-MEISAI
+                 END-IF
+               END-PERFORM
+               IF   RECE059-SRYCD(1)  NOT =  SPACE
+                    WRITE   RECE059-REC
+                    ADD     1     TO    CNT-RECE059
+               END-IF
+             END-PERFORM
+      *
+             MOVE     RECE04-REC        TO   RECE049-REC
+             MOVE     WRK-CNT-MEISAI    TO   RECE049-MEISAISU
+             COMPUTE  WRK-SIPPU-ZAICNT  =    99991900  +  IDX34
+             MOVE     WRK-SIPPU-ZAICNT  TO   RECE049-ZAINUM
+             MOVE     "80"              TO   RECE049-SRYKBN
+             MOVE     "800"             TO   RECE049-SRYSYUKBN
+             WRITE    RECE049-REC
+             ADD      1                 TO   CNT-RECE049
+      *
+           END-IF
+      *
+           .
+       2001-SIPPUCOM-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ëÊÔ½¸
       *****************************************************************
        2001-YAKUTEI-HENSYU-SEC          SECTION.
@@ -9704,6 +9828,226 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
       *
            .
        2001-YAKUTEI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ±¡³°¼¾ÉÛÌô¤Î¥³¥á¥ó¥ÈÊÑ´¹
+      *****************************************************************
+       2001-INGAISIPPU-COMMENT-SEC          SECTION.
+      *
+           ADD     1                    TO  IDX33
+      *
+           MOVE    ZERO                 TO  IDX-RECE05
+           MOVE    SPACE                TO  WRK-RECE05XX-REC
+           INITIALIZE                       WRK-RECE05XX-REC
+      *
+           PERFORM  200111-RECE05-TAIHI-SEC
+      *
+           PERFORM  UNTIL  (FLG-RECE05         =   1            )
+                     OR    (RECE04-KEY1    NOT =   RECE05-KEY1  )
+                     OR    (RECE04-ZAINUM  NOT =   RECE05-ZAINUM)
+             PERFORM  VARYING  IDX  FROM  1  BY  1
+                       UNTIL  (IDX               >   5    )
+                        OR    (RECE05-SRYCD(IDX) =   SPACE)
+               IF  (RECE05-SIPPUFLG(IDX)    =  "1"  )
+               OR  (RECE05-SRYCD(IDX)(1:1)  =  "8"  )
+               OR  (RECE05-SRYCD(IDX)(1:3)  =  "008")
+                 ADD    1   TO   IDX-RECE05
+                 IF   RECE05-SIPPUFLG(IDX)  =  "1"
+                    PERFORM  20011-INGAISIPPU-SURYO-SEC
+                 END-IF
+                 MOVE  "810000001"  TO   RECE05-SRYCD(IDX)
+                 MOVE   ZERO        TO   RECE05-SRYSURYO(IDX)
+                                         RECE05-TANICD(IDX)
+                                         RECE05-TANIMOJISU(IDX)
+                 MOVE   SPACE       TO   RECE05-TANINAME(IDX)
+                 MOVE   RECE05-SRYACT-TBL(IDX)
+                            TO   WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+               END-IF
+             END-PERFORM
+             PERFORM  990-RECE05-NEXT-SEC
+           END-PERFORM
+      *
+           MOVE      ZERO                 TO   FLG-WRKRECE05
+           MOVE      ZERO                 TO   IDX
+           MOVE      ZERO                 TO   IDX-RECE05
+           MOVE      ZERO                 TO   WRK-RENNUM
+           MOVE      ZERO                 TO   WRK-CNT-MEISAI
+           PERFORM  UNTIL  FLG-WRKRECE05  =  1
+             INITIALIZE                        RECE059-REC
+             MOVE    WRK-RECE05-KEY       TO   RECE059-KEY
+             COMPUTE WRK-SIPPU-ZAICNT     =    99991000  +  IDX33
+             MOVE    WRK-SIPPU-ZAICNT     TO   RECE059-ZAINUM
+             ADD     1                    TO   WRK-RENNUM
+             MOVE    WRK-RENNUM           TO   RECE059-RENNUM
+             MOVE    WRK-RECE05-KOHBUNRI  TO   RECE059-KOHBUNRI
+             MOVE    WRK-RECE05-PTNUM     TO   RECE059-PTNUM
+             MOVE    WRK-RECE05-SRYKA     TO   RECE059-SRYKA
+             MOVE    "80"                 TO   RECE059-SRYKBN
+             MOVE    "800"                TO   RECE059-SRYSYUKBN
+             MOVE    WRK-RECE05-JIHIMONEY TO   RECE059-JIHIMONEY
+             PERFORM  VARYING  IDX  FROM  1  BY  1
+                       UNTIL  (IDX            >   5)
+                        OR    (FLG-WRKRECE05  =   1)
+               ADD        1     TO   IDX-RECE05
+               IF (WRK-RECE05XX-SRYCD(IDX-RECE05 1) = SPACE)
+               OR (IDX-RECE05                       >  100 )
+                  MOVE    1     TO   FLG-WRKRECE05
+               ELSE
+                  MOVE  WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+                                TO   RECE059-SRYACT-TBL(IDX)
+                  ADD     1     TO   WRK-CNT-MEISAI
+               END-IF
+             END-PERFORM
+             IF   RECE059-SRYCD(1)  NOT =  SPACE
+                  WRITE   RECE059-REC
+                  ADD     1     TO    CNT-RECE059
+             END-IF
+           END-PERFORM
+      *
+           MOVE     RECE04-REC        TO   RECE049-REC
+           MOVE     WRK-CNT-MEISAI    TO   RECE049-MEISAISU
+           COMPUTE  WRK-SIPPU-ZAICNT  =    99991000  +  IDX33
+           MOVE     WRK-SIPPU-ZAICNT  TO   RECE049-ZAINUM
+           MOVE     "80"              TO   RECE049-SRYKBN
+           MOVE     "800"             TO   RECE049-SRYSYUKBN
+           MOVE     SPACE             TO   RECE049-TOYAKUFLG
+           WRITE    RECE049-REC
+           ADD      1                 TO   CNT-RECE049
+      *
+           .
+       2001-INGAISIPPU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ±¡³°¼¾ÉÛÌô¤Î¿ôÎÌÊÔ½¸
+      *****************************************************************
+       20011-INGAISIPPU-SURYO-SEC          SECTION.
+      *
+           MOVE    SPACE           TO  WRK-SURYO-X
+           MOVE    ZERO            TO  WRK-SURYOST
+           MOVE    ZERO            TO  WRK-SURYOKETA
+           MOVE    ZERO            TO  WRK-SURYOKETA1
+           MOVE    ZERO            TO  WRK-SURYOKETA2
+           MOVE    SPACE           TO  WRK-SURYO-N
+           MOVE    SPACE           TO  WRK-SRYSURYOW
+      * 
+      *    ¿ô»úÉ½¼¨ÍÑÊÔ½¸¡ÊÈ¾³Ñ¡Ë
+           MOVE    RECE05-SRYSURYO(IDX)
+                                   TO  WRK-SURYO
+           MOVE    WRK-SURYO-S1    TO  WRK-SURYO-Z1
+      *
+           MOVE    ZERO            TO  FLG-SP
+           PERFORM  VARYING  IDX35  FROM  5  BY  -1
+                     UNTIL   IDX35  =   ZERO
+             IF  WRK-SURYO-S2(IDX35:1)  NOT =  ZERO
+                 MOVE    1         TO  FLG-SP
+             END-IF
+             IF  FLG-SP  =  1
+                 MOVE    WRK-SURYO-S2(IDX35:1)
+                                   TO  WRK-SURYO-Z3(IDX35:1)
+             END-IF
+           END-PERFORM
+           IF    WRK-SURYO-Z3  NOT =  SPACE
+                 MOVE    "."       TO  WRK-SURYO-Z2
+           END-IF
+      *    É½¼¨Ê¸»ú¿ô¥«¥¦¥ó¥È
+           PERFORM  VARYING  IDX35  FROM  1  BY  1
+                     UNTIL   IDX35   >   11
+             IF  WRK-SURYO-X(IDX35:1)  NOT =  SPACE
+                 IF  WRK-SURYOST  =  ZERO
+                     MOVE    IDX35    TO   WRK-SURYOST
+                 END-IF
+      *          ¿ôÎÌ·å¿ô¥«¥¦¥ó¥È(£¶·åÌÜ¡§¥Ô¥ê¥ª¥É)
+                 ADD     1            TO   WRK-SURYOKETA
+                 IF  IDX35  <  6
+                     ADD     1        TO   WRK-SURYOKETA1
+                 END-IF
+                 IF  IDX35  >  6
+                     ADD     1        TO   WRK-SURYOKETA2
+                 END-IF
+             END-IF
+           END-PERFORM
+           IF  WRK-SURYOST  =  6
+               MOVE    "0"             TO  WRK-SURYO-Z1(5:1)
+               MOVE    5               TO  WRK-SURYOST
+               MOVE    1               TO  WRK-SURYOKETA1
+               ADD     1               TO  WRK-SURYOKETA
+           END-IF
+      *    Á´³ÑÊÑ´¹
+           IF  WRK-SURYOKETA1          >   ZERO
+               INITIALIZE              WRK-CHAR2-HENKAN-AREA
+               MOVE    WRK-SURYO-Z1 (WRK-SURYOST:WRK-SURYOKETA1)
+                                       TO  WRK-CHAR2-X
+               MOVE    WRK-SURYOKETA1  TO  WRK-CHAR2-CNT
+               PERFORM 200111-INGAISIPPU-HENKAN-SEC
+               MOVE    WRK-CHAR2-N     TO  WRK-SURYO-N1
+           END-IF
+           IF  WRK-SURYOKETA2          >   ZERO
+               MOVE    "¡¥"            TO  WRK-SURYO-N2
+               INITIALIZE              WRK-CHAR2-HENKAN-AREA
+               MOVE    WRK-SURYO-Z3 (1:WRK-SURYOKETA2)
+                                       TO  WRK-CHAR2-X
+               MOVE    WRK-SURYOKETA2  TO  WRK-CHAR2-CNT
+               PERFORM 200111-INGAISIPPU-HENKAN-SEC
+               MOVE    WRK-CHAR2-N     TO  WRK-SURYO-N3
+           END-IF
+           STRING      WRK-SURYO-N1    DELIMITED   BY  " "
+                       WRK-SURYO-N2    DELIMITED   BY  " "
+                       WRK-SURYO-N3    DELIMITED   BY  " "
+                       INTO            WRK-SRYSURYOW
+           END-STRING
+      *
+           MOVE        RECE05-NAME(IDX)  TO  WRK-INGAISIPPU-NAME
+           MOVE        SPACE             TO  RECE05-NAME(IDX)
+           STRING  WRK-INGAISIPPU-NAME   DELIMITED  BY  " "
+                   "¡¡"                  DELIMITED  BY  SIZE
+                   WRK-SRYSURYOW         DELIMITED  BY  " "
+                   RECE05-TANINAME(IDX)  DELIMITED  BY  " "
+                   INTO                  RECE05-NAME(IDX)
+           END-STRING
+      *
+           PERFORM  VARYING  IDX35  FROM  200  BY  -1
+                     UNTIL   IDX35   <    1
+              IF  RECE05-NAME(IDX)(IDX35:1)  NOT =  SPACE
+                  COMPUTE  RECE05-YUKOKETA(IDX)  =
+                           IDX35   /    2
+                  MOVE     1     TO      IDX35
+              END-IF
+           END-PERFORM
+      *
+           .
+       20011-INGAISIPPU-SURYO-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ôÃÍÈ¾³Ñ¢ªÁ´³ÑÊÑ´¹½èÍý
+      *****************************************************************
+       200111-INGAISIPPU-HENKAN-SEC    SECTION.
+      *
+           MOVE    1           TO  WRK-CHAR2-IDX
+           MOVE    ZERO        TO  WRK-CHAR2-N-CNT
+      *
+           PERFORM  VARYING  IDX35  FROM  1  BY  1
+                     UNTIL   IDX35   >   WRK-CHAR2-CNT
+             IF     WRK-CHAR2-X(IDX35:1)  IS  NUMERIC
+               IF      WRK-CHAR2-X(IDX35:1)  =  "0"
+                 MOVE    "£°"  TO  WRK-CHAR2-N(WRK-CHAR2-IDX:)
+               ELSE
+                 MOVE  WRK-CHAR2-X(IDX35:1)
+                               TO  IDX19
+                 MOVE  TBL-DAY(IDX19)(3:2)
+                               TO  WRK-CHAR2-N(WRK-CHAR2-IDX:)
+               END-IF
+             ELSE
+                 MOVE  "  "    TO  WRK-CHAR2-N(WRK-CHAR2-IDX:)
+             END-IF
+             ADD     2         TO  WRK-CHAR2-IDX
+                                   WRK-CHAR2-N-CNT
+           END-PERFORM
+      *
+           .
+       200111-INGAISIPPU-HENKAN-EXT.
            EXIT.
       *
       *****************************************************************

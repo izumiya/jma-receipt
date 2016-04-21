@@ -167,6 +167,10 @@
            03  RECE04-HOMONCOMFLG         PIC  X(01).
       *他保険にて診察料算定済不記載フラグ
            03  RECE04-TAHOKENNGFLG        PIC  X(01).
+      *院外湿布薬７０枚超理由コメントフラグ
+           03  RECE04-SIPPUCOMFLG         PIC  X(01).
+      *湿布薬フラグ
+           03  RECE04-SIPPUFLG            PIC  X(01).
       *
       *初診料算定科：
            03  RECE04-SYOSANTEIKA-COMMENT PIC  X(01).

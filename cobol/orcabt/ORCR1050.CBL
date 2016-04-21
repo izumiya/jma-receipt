@@ -3865,15 +3865,28 @@
                END-EVALUATE
       *
                IF      RECE120-SRYKBN     =   "80"
-                 IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
+                 IF (WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
                                        "120003570" OR "120003710" OR
-                                       "120003970" OR "120004270"
+                                       "120003970" OR "120004270")
+                 OR (RECE120-SIPPUCOMFLG  =   "1"                 )
+                 OR (RECE120-SIPPUFLG     =   "1"                 )
                        MOVE   ZERO   TO   RECE140-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE140-SYOHOUFLG
+                 END-IF
+                 IF (RECE120-SIPPUCOMFLG  =   "1")
+                 OR (RECE120-SIPPUFLG     =   "1")
+                       MOVE    9     TO   RECE140-CDKBN-SYO
+                       MOVE    99    TO   RECE140-CDKBN-BU
+                       MOVE    "9"   TO   RECE140-CDKBN-KBN
+                       MOVE    999   TO   RECE140-CDKBN-KBNNUM
+                       MOVE    99    TO   RECE140-CDKBN-KBNNUM-EDA
+                       MOVE    99    TO   RECE140-CDKBN-KOUBAN
+                       MOVE    999999999
+                                     TO   RECE140-KOUHYOJUNNUM
                  END-IF
                END-IF
       *

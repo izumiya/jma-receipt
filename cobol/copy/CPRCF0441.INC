@@ -102,6 +102,10 @@
                05  RECE441-GAZOGEN         PIC X(01).
       *訪問診療にかかる記録書コメントフラグ
                05  RECE441-HOMONCOMFLG     PIC X(01).
+      *院外湿布薬７０枚超理由コメントフラグ
+               05  RECE441-SIPPUCOMFLG     PIC X(01).
+      *湿布薬フラグ
+               05  RECE441-SIPPUFLG        PIC X(01).
       *
       *初診料算定科：
                05  RECE441-SYOSANTEIKA-COMMENT

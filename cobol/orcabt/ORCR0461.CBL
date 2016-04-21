@@ -4007,15 +4007,28 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                MOVE    RECE44-OKIKAEFLG  TO  RECE46-OKIKAEFLG
       *
                IF      RECE44-SRYKBN     =   "80"
-                 IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
+                 IF (WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
                                        "120003570" OR "120003710" OR
-                                       "120003970" OR "120004270"
+                                       "120003970" OR "120004270")
+                 OR (RECE44-SIPPUCOMFLG  =   "1"                 )
+                 OR (RECE44-SIPPUFLG     =   "1"                 )
                        MOVE   ZERO   TO   RECE46-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE46-SYOHOUFLG
+                 END-IF
+                 IF (RECE44-SIPPUCOMFLG  =   "1")
+                 OR (RECE44-SIPPUFLG     =   "1")
+                       MOVE    9     TO   RECE46-CDKBN-SYO
+                       MOVE    99    TO   RECE46-CDKBN-BU
+                       MOVE    "9"   TO   RECE46-CDKBN-KBN
+                       MOVE    999   TO   RECE46-CDKBN-KBNNUM
+                       MOVE    99    TO   RECE46-CDKBN-KBNNUM-EDA
+                       MOVE    99    TO   RECE46-CDKBN-KOUBAN
+                       MOVE    999999999
+                                     TO   RECE46-KOUHYOJUNNUM
                  END-IF
                END-IF
       *

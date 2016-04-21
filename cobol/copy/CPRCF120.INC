@@ -110,6 +110,10 @@
            03  RECE120-GAZOGEN             PIC X(01).
       *訪問診療にかかる記録書コメントフラグ
            03  RECE120-HOMONCOMFLG         PIC X(01).
+      *院外湿布薬７０枚超理由コメントフラグ
+           03  RECE120-SIPPUCOMFLG         PIC X(01).
+      *湿布薬フラグ
+           03  RECE120-SIPPUFLG            PIC X(01).
       *
       *初診料算定科：
            03  RECE120-SYOSANTEIKA-COMMENT PIC X(01).

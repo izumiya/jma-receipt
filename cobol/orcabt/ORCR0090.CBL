@@ -5340,15 +5340,28 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-EVALUATE
       *
                IF      RECE04-SRYKBN     =   "80"
-                 IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
+                 IF (WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR
                                        "120003570" OR "120003710" OR
-                                       "120003970" OR "120004270"
+                                       "120003970" OR "120004270")
+                 OR (RECE04-SIPPUCOMFLG  =   "1"                 )
+                 OR (RECE04-SIPPUFLG     =   "1"                 )
                        MOVE   ZERO   TO   RECE06-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE06-SYOHOUFLG
+                 END-IF
+                 IF (RECE04-SIPPUCOMFLG  =   "1")
+                 OR (RECE04-SIPPUFLG     =   "1")
+                       MOVE    9     TO   RECE06-CDKBN-SYO
+                       MOVE    99    TO   RECE06-CDKBN-BU
+                       MOVE    "9"   TO   RECE06-CDKBN-KBN
+                       MOVE    999   TO   RECE06-CDKBN-KBNNUM
+                       MOVE    99    TO   RECE06-CDKBN-KBNNUM-EDA
+                       MOVE    99    TO   RECE06-CDKBN-KOUBAN
+                       MOVE    999999999
+                                     TO   RECE06-KOUHYOJUNNUM
                  END-IF
                END-IF
       *
