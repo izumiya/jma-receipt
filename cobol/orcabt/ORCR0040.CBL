@@ -9854,6 +9854,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                OR  (RECE05-SRYCD(IDX)(1:3)  =  "008")
                  ADD    1   TO   IDX-RECE05
                  IF   RECE05-SIPPUFLG(IDX)  =  "1"
+                    IF  RECE05-INGAIFLG-SIPPU(IDX)  =  "1"
+                       MOVE  RECE05-GENERICNAME(IDX)
+                                    TO   RECE05-NAME(IDX)
+                    END-IF
                     PERFORM  20011-INGAISIPPU-SURYO-SEC
                  END-IF
                  MOVE  "810000001"  TO   RECE05-SRYCD(IDX)

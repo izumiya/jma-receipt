@@ -8320,6 +8320,10 @@
                OR  (RECE45-SRYCD(IDX)(1:3)  =  "008")
                   ADD    1   TO  IDX-RECE45
                   IF  RECE45-SIPPUFLG(IDX)  =  "1"
+                     IF  RECE45-INGAIFLG-SIPPU(IDX)  =  "1"
+                       MOVE  RECE45-GENERICNAME(IDX)
+                                     TO   RECE45-NAME(IDX)
+                     END-IF
                      PERFORM  20011-INGAISIPPU-SURYO-SEC
                   END-IF
                   MOVE  "810000001"  TO   RECE45-SRYCD(IDX)

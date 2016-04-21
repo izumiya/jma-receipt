@@ -2616,9 +2616,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            INITIALIZE     WRK-ORCSGETGE-OUT-AREA
            MOVE    ZERO                 TO      FLG-IRYORENKEI
-           IF     (WRK-PARA-PRTKBN       =  "2" OR "3" OR "4" OR "5")
-           AND    (SYS-200501-INSPECT-GENERAL-KBN  =  "1"           )
-           AND    (RECE41-SRYYM         >=  "201204"                )
+           IF    ((WRK-PARA-PRTKBN  =  "2" OR "3" OR "4" OR "5") AND
+                  (SYS-200501-INSPECT-GENERAL-KBN  =   "1"     ) AND
+                  (RECE41-SRYYM         >=   "201204"          ))
+           OR    ( FLG-SIPPU-ARI         =     1                )
              PERFORM 210125-IRYORENKEI-HENSYU-SEC
            END-IF
            MOVE    ZERO                 TO      IDX17
@@ -3058,7 +3059,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         IF   (RECE45-SRYCD(IDX4)(1:1) = "6"   )
                         AND  (WRK-ORCSGETGE-GENERICNAME(IDX17)
                                                   NOT =  SPACE)
-                          MOVE    "1"  TO  RECE45-INGAIFLG-RECE(IDX4)
+                          IF  (WRK-PARA-PRTKBN  =
+                                           "2" OR "3" OR "4" OR "5")
+                          AND (SYS-200501-INSPECT-GENERAL-KBN = "1")
+                             MOVE  "1"  TO  RECE45-INGAIFLG-RECE(IDX4)
+                          END-IF
+                          IF   FLG-SIPPU-ARI    =  1
+                             MOVE  "1"  TO  RECE45-INGAIFLG-SIPPU(IDX4)
+                          END-IF
                           MOVE  WRK-ORCSGETGE-YAKKAKJNCD(IDX17)
                                           TO    RECE45-YAKKAKJNCD(IDX4)
                           MOVE  WRK-ORCSGETGE-GENERIC-KBN(IDX17)
