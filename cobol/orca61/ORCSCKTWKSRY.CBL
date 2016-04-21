@@ -638,8 +638,10 @@
       *            MOVE    ORCSCWKSRY-DAY      TO  WRK-DAY
       *            PERFORM 210-PARA-DEL-SEC
       *????    END-IF
-               MOVE    ZERO                TO  SPA-NAI-RRKDAY
+               IF      ORCSCWKSRY-DAY      >   ZERO
+                   MOVE    ZERO                TO  SPA-NAI-RRKDAY
                                                   (ORCSCWKSRY-DAY)
+               END-IF
            END-IF
            .
        1001-WKSRYACT-INIT-EXT.
@@ -1788,7 +1790,12 @@
       *    診療日を日に設定
            INITIALIZE                  SPA-COM-NYUIN-AREA (IDX-1)
       *    日付
+      *
            MOVE    ORCSCWKSRY-DAY      TO  WRK-DAY
+           IF      ORCSCWKSRY-DAY      =   ZERO
+               MOVE    SPA-SRYYMD(7:2)     TO  WRK-DAY
+           END-IF
+      *
            MOVE    1                   TO  SPA-COM-NYUINDAY
                                            (IDX-1 WRK-DAY)
            ADD     1                   TO  SPA-COM-NYU-KAI
