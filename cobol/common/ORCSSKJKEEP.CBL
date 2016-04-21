@@ -519,9 +519,10 @@
                        PERFORM   910-PTNYUINRRK-READ-SEC
                        DISPLAY    "========  FLG-PTNYUINRRK(2) = "
                                              FLG-PTNYUINRRK
+                       MOVE     SPACE             TO  WRK-MATCH
                        PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)  OR
                                          (WRK-MATCH        =  "NG")
-                           MOVE     SPACE             TO  WRK-MATCH
+      **                     MOVE     SPACE             TO  WRK-MATCH
                            DISPLAY "PTNYUINRRK-RRKNUM = "
                                     PTNYUINRRK-RRKNUM
                            DISPLAY "PTNYUINRRK-TENNYUYMD = "
