@@ -223,6 +223,13 @@ W12 {
           count int;
             item varchar(38)[5];
         };
+        COMPRESS_COMBO {
+          COMPRESS {
+            textdata varchar(30);
+          };
+          count int;
+            item varchar(30)[2];
+        };
       };
       fi30 {
         SYAPRTNM {

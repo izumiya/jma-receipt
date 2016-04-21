@@ -185,6 +185,12 @@
                     06  W12-GENBUTU-ICHIBU-COUNT   PIC S9(9)   BINARY.
                     06  W12-GENBUTU-ICHIBULST
                             PIC X(38)   OCCURS  5 TIMES.
+                  05  W12-COMPRESS-COMBO.
+                    06  W12-COMPRESS.
+                      07  W12-VALUE   PIC X(30).
+                    06  W12-COMPRESS-COUNT   PIC S9(9)   BINARY.
+                    06  W12-COMPRESSLST
+                            PIC X(30)   OCCURS  2 TIMES.
                 04  W12-FI30.
                   05  W12-SYAPRTNM.
                     06  W12-VALUE   PIC X(16).
