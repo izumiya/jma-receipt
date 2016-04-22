@@ -6824,8 +6824,8 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
                MOVE    WRK-RENNUM            TO   RECE1309-RENNUM
                MOVE    WRK-RECE130-PTNUM     TO   RECE1309-PTNUM
                MOVE    WRK-RECE130-SRYKA     TO   RECE1309-SRYKA
-               MOVE    "80"                  TO   RECE1309-SRYKBN
-               MOVE    "800"                 TO   RECE1309-SRYSYUKBN
+               MOVE    WRK-RECE130-SRYKBN    TO   RECE1309-SRYKBN
+               MOVE    WRK-RECE130-SRYSYUKBN TO   RECE1309-SRYSYUKBN
                MOVE    WRK-RECE130-JIHIMONEY TO   RECE1309-JIHIMONEY
                PERFORM  VARYING  IDX  FROM  1  BY  1
                          UNTIL  (IDX             >  5)
@@ -6850,7 +6850,6 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
              MOVE     WRK-CNT-MEISAI    TO   RECE1209-MEISAISU
              COMPUTE  WRK-SIPPU-ZAICNT  =    99991900  +  IDX34
              MOVE     WRK-SIPPU-ZAICNT  TO   RECE1209-ZAINUM
-             MOVE     "80"              TO   RECE1209-SRYKBN
              WRITE    RECE1209-REC
              ADD      1                 TO   CNT-RECE1209
       *

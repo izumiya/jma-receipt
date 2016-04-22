@@ -11673,9 +11673,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE   "1"      TO  RECE04-GAZOGEN
                END-IF
       *
-               IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
-                      (SRY-SRYCD    (IDX2)(1:3)     =   "008"))
-               AND   ( SRY-INPUTNUM (IDX2)      NOT =   ZERO  )
+               IF   (((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
+                      (SRY-SRYCD    (IDX2)(1:3)     =   "008")) AND
+                     ( SRY-INPUTNUM (IDX2)      NOT =   ZERO  ))
+               OR   (( FLG-SIPPU-ARI                =    1    ) AND
+                     ( SRY-SRYCD    (IDX2)(1:3)     =   "001" ) AND
+                     ( SRY-INPUTNUM (IDX2)      NOT =   ZERO  ))
 grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    MOVE    SRY-PTID             TO  PTCOM-PTID
                    MOVE    SRY-ZAINUM           TO  PTCOM-ZAINUM

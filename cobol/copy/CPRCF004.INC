@@ -169,7 +169,7 @@
            03  RECE04-TAHOKENNGFLG        PIC  X(01).
       *院外湿布薬７０枚超理由コメントフラグ
            03  RECE04-SIPPUCOMFLG         PIC  X(01).
-      *湿布薬フラグ
+      *湿布薬フラグ（１：院外分　２：院内分）
            03  RECE04-SIPPUFLG            PIC  X(01).
       *
       *初診料算定科：

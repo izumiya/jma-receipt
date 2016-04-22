@@ -8099,8 +8099,8 @@
                MOVE    WRK-RENNUM           TO   RECE459-RENNUM
                MOVE    WRK-RECE45-PTNUM     TO   RECE459-PTNUM
                MOVE    WRK-RECE45-SRYKA     TO   RECE459-SRYKA
-               MOVE    "80"                 TO   RECE459-SRYKBN
-               MOVE    "800"                TO   RECE459-SRYSYUKBN
+               MOVE    WRK-RECE45-SRYKBN    TO   RECE459-SRYKBN
+               MOVE    WRK-RECE45-SRYSYUKBN TO   RECE459-SRYSYUKBN
                MOVE    WRK-RECE45-JIHIMONEY TO   RECE459-JIHIMONEY
                PERFORM  VARYING  IDX  FROM  1  BY  1
                          UNTIL  (IDX            >  5)
@@ -8128,8 +8128,6 @@
              MOVE     WRK-CNT-MEISAI    TO   RECE449-MEISAISU
              COMPUTE  WRK-SIPPU-ZAICNT  =    99991900  +  IDX34
              MOVE     WRK-SIPPU-ZAICNT  TO   RECE449-ZAINUM
-             MOVE     "80"              TO   RECE449-SRYKBN
-             MOVE     "800"             TO   RECE449-SRYSYUKBN
              PERFORM  800-RECE449-WRITE-SEC
       *
            END-IF
