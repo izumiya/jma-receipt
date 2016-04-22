@@ -256,6 +256,7 @@
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
            03  FLG-SP              PIC 9(01).
+           03  FLG-SIPPU-OK        PIC 9(01).
       *
       *    市它件玄恄啗
        01  CNT-AREA.
@@ -305,6 +306,8 @@
            03  IDX33               PIC 9(03).
            03  IDX34               PIC 9(03).
            03  IDX35               PIC 9(03).
+           03  IDX36               PIC 9(03).
+           03  IDX37               PIC 9(03).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
            03  DAY-IDX             PIC 9(04).
@@ -1856,7 +1859,11 @@
                         PERFORM    2001-YAKUTEI-HENSYU-SEC
                       ELSE
                         IF  RECE44-SIPPUFLG  =   "1"
-                           PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           MOVE    ZERO   TO   FLG-SIPPU-OK
+                           PERFORM 2001-INGAISIPPU-CHECK-SEC
+                           IF  FLG-SIPPU-OK  =  1
+                             PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           END-IF
                         END-IF
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
@@ -2094,7 +2101,11 @@
                         PERFORM    2001-YAKUTEI-HENSYU-SEC
                       ELSE
                         IF  RECE44-SIPPUFLG  =   "1"
-                           PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           MOVE    ZERO   TO   FLG-SIPPU-OK
+                           PERFORM 2001-INGAISIPPU-CHECK-SEC
+                           IF  FLG-SIPPU-OK  =  1
+                             PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           END-IF
                         END-IF
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
@@ -8289,6 +8300,28 @@
            EXIT.
       *
       *****************************************************************
+      *    情陸撫幵泔及民尼永弁
+      *****************************************************************
+       2001-INGAISIPPU-CHECK-SEC          SECTION.
+      *
+           IF    RECE41-SIPPUCHKFLG  =  1
+             PERFORM  VARYING  IDX36  FROM  2  BY  1
+                       UNTIL   IDX36   >   10
+               PERFORM  VARYING  IDX37  FROM  1  BY  1
+                         UNTIL   IDX37   >   31
+                 IF   RECE44-KAISU(IDX36 IDX37)     NOT =  ZERO
+                 AND  RECE41-SIPPUCHK(IDX36 IDX37)  NOT =  ZERO
+                    MOVE     1     TO    FLG-SIPPU-OK
+                 END-IF
+               END-PERFORM
+             END-PERFORM
+           END-IF
+      *
+           .
+       2001-INGAISIPPU-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    情陸撫幵泔及戊丟件玄庍晶
       *****************************************************************
        2001-INGAISIPPU-COMMENT-SEC          SECTION.
@@ -8314,8 +8347,8 @@
                        UNTIL  (IDX               >   5    )
                         OR    (RECE45-SRYCD(IDX) =   SPACE)
                IF  (RECE45-SIPPUFLG(IDX)    =  "1"  )
-               OR  (RECE45-SRYCD(IDX)(1:1)  =  "8"  )
-               OR  (RECE45-SRYCD(IDX)(1:3)  =  "008")
+      ***      OR  (RECE45-SRYCD(IDX)(1:1)  =  "8"  )
+      ***      OR  (RECE45-SRYCD(IDX)(1:3)  =  "008")
                   ADD    1   TO  IDX-RECE45
                   IF  RECE45-SIPPUFLG(IDX)  =  "1"
                      IF  RECE45-INGAIFLG-SIPPU(IDX)  =  "1"

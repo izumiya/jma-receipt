@@ -383,6 +383,7 @@
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
            03  FLG-SP              PIC 9(01).
+           03  FLG-SIPPU-OK        PIC 9(01).
       *
       *    市它件玄恄啗
        01  CNT-AREA.
@@ -434,6 +435,8 @@
            03  IDX33               PIC 9(03).
            03  IDX34               PIC 9(03).
            03  IDX35               PIC 9(03).
+           03  IDX36               PIC 9(03).
+           03  IDX37               PIC 9(03).
            03  DAY-IDX             PIC 9(04).
            03  DAY-IDX2            PIC 9(02).
            03  IDY                 PIC 9(04).
@@ -1751,7 +1754,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                         PERFORM    2001-YAKUTEI-HENSYU-SEC
                       ELSE
                         IF  RECE04-SIPPUFLG  =   "1"
-                           PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           MOVE    ZERO   TO   FLG-SIPPU-OK
+                           PERFORM 2001-INGAISIPPU-CHECK-SEC
+                           IF  FLG-SIPPU-OK  =  1
+                             PERFORM 2001-INGAISIPPU-COMMENT-SEC
+                           END-IF
                         END-IF
                         PERFORM    2099-RECE04-TENSOU-SEC
                       END-IF
@@ -9829,6 +9836,28 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    情陸撫幵泔及民尼永弁
+      *****************************************************************
+       2001-INGAISIPPU-CHECK-SEC          SECTION.
+      *
+           IF    RECE02-SIPPUCHKFLG  =  1
+             PERFORM  VARYING  IDX36  FROM  2  BY  1
+                       UNTIL   IDX36   >   10
+               PERFORM  VARYING  IDX37  FROM  1  BY  1
+                         UNTIL   IDX37   >   31
+                 IF   RECE04-KAISU(IDX36 IDX37)     NOT =  ZERO
+                 AND  RECE02-SIPPUCHK(IDX36 IDX37)  NOT =  ZERO
+                    MOVE     1     TO    FLG-SIPPU-OK
+                 END-IF
+               END-PERFORM
+             END-PERFORM
+           END-IF
+      *
+           .
+       2001-INGAISIPPU-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    情陸撫幵泔及戊丟件玄庍晶
       *****************************************************************
        2001-INGAISIPPU-COMMENT-SEC          SECTION.
@@ -9848,8 +9877,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                        UNTIL  (IDX               >   5    )
                         OR    (RECE05-SRYCD(IDX) =   SPACE)
                IF  (RECE05-SIPPUFLG(IDX)    =  "1"  )
-               OR  (RECE05-SRYCD(IDX)(1:1)  =  "8"  )
-               OR  (RECE05-SRYCD(IDX)(1:3)  =  "008")
+      ***      OR  (RECE05-SRYCD(IDX)(1:1)  =  "8"  )
+      ***      OR  (RECE05-SRYCD(IDX)(1:3)  =  "008")
                  ADD    1   TO   IDX-RECE05
                  IF   RECE05-SIPPUFLG(IDX)  =  "1"
                     IF  RECE05-INGAIFLG-SIPPU(IDX)  =  "1"

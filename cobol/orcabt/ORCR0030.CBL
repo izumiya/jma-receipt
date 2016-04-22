@@ -1047,6 +1047,8 @@
            03  IDX30                                   PIC 9(03).
            03  IDX31                                   PIC 9(02).
            03  IDX32                                   PIC 9(03).
+           03  IDX33                                   PIC 9(03).
+           03  IDX34                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -10912,6 +10914,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      MOVE    1    TO     FLG-HENSYU-NG
                    END-IF
+                 END-IF
+                 IF  (SRY-RENNUM       =   1         )
+                 AND (IDX2             =   1         )
+                 AND (SRY-SRYCD(IDX2)  =  "830000052"
+                                      OR  "099200201")
+                   PERFORM  VARYING  IDX33  FROM  1  BY  1
+                             UNTIL   IDX33   >   10
+                     PERFORM  VARYING  IDX34  FROM  1  BY  1
+                               UNTIL   IDX34   >   31
+                       IF   ACCT-DAY(IDX33 IDX34)  NOT =  ZERO
+                         MOVE    1    TO   RECE02-SIPPUCHKFLG
+                         MOVE    1    TO   RECE02-SIPPUCHK(IDX33 IDX34)
+                       END-IF
+                     END-PERFORM
+                   END-PERFORM
                  END-IF
                END-IF
              END-IF

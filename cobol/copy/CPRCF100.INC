@@ -137,6 +137,13 @@
                05  RECE100-ERR-TEKSTYMD    PIC 9(08).
                05  RECE100-ERR-TEKEDYMD    PIC 9(08).
       *
+      *湿布薬制限枚数解除及び院外湿布薬７０枚超理由コメント情報
+           03  RECE100-SIPPUCHKFLG         PIC 9(01).
+           03  RECE100-SIPPUCHKINF.
+             04  RECE100-SIPPUCHK-OCC      OCCURS  10.
+               05  RECE100-SIPPUCHK-OCC2   OCCURS  31.
+                   07  RECE100-SIPPUCHK    PIC 9(03).
+      *
       *予備
            03  RECE100-YOBIETC-AREA.
                05  RECE100-YOBIETCINF      OCCURS 10.

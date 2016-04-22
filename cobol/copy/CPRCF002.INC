@@ -874,6 +874,13 @@
                05  RECE02-SYUTANTEN             PIC 9(08)  OCCURS 50.
            03  RECE02-SYUTANARIFLG              PIC 9(01).
       *
+      *湿布薬制限枚数解除及び院外湿布薬７０枚超理由コメント情報
+           03  RECE02-SIPPUCHKFLG               PIC 9(01).
+           03  RECE02-SIPPUCHKINF.
+             04  RECE02-SIPPUCHK-OCC            OCCURS  10.
+               05  RECE02-SIPPUCHK-OCC2         OCCURS  31.
+                   07  RECE02-SIPPUCHK          PIC 9(03).
+      *
       *予備
            03  RECE02-YOBIETC-AREA.
                05  RECE02-YOBIETCINF          OCCURS 20.

@@ -388,6 +388,13 @@
            03  RECE41-JIBAI-CHIKANNAMEFLG PIC  9(01).
            03  RECE41-JIBAI-CHIKANNAME    PIC  X(80).
       *
+      *湿布薬制限枚数解除及び院外湿布薬７０枚超理由コメント情報
+           03  RECE41-SIPPUCHKFLG         PIC  9(01).
+           03  RECE41-SIPPUCHKINF.
+             04  RECE41-SIPPUCHK-OCC      OCCURS  10.
+               05  RECE41-SIPPUCHK-OCC2   OCCURS  31.
+                   07  RECE41-SIPPUCHK    PIC  9(03).
+      *
       *予備
            03  RECE41-YOBIETC-AREA.
                05  RECE41-YOBIETCINF           OCCURS  10.
