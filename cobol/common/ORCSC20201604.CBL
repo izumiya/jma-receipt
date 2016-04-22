@@ -4822,9 +4822,19 @@
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    )
            OR     (IDX-SYOHOU      NOT =   ZERO )
-      *H28.4  湿布70枚以上
-           OR     (FLG-SIP70-ARI       =   1    )
+               GO      TO      3002-INNAI-SYORI-EXT
+           END-IF
       *
+      *H28.4  湿布70枚以上
+           IF     (FLG-SIP70-ARI       =   1    )
+      *        訂正で自動発生なしの場合
+               IF     (LNK-ORCSC-SYORIFLG  =   1  )  AND
+                      (SPA-TEISEI-FLG      =   "0")
+                   CONTINUE
+               ELSE
+      *            薬剤情報提供料、調基
+                   PERFORM 30021-INNAI-AUTO1-SEC
+               END-IF
                GO      TO      3002-INNAI-SYORI-EXT
            END-IF
       *
@@ -4992,6 +5002,11 @@
                AND    (FLG-YAKZAI-ALL      =   1    )
                    PERFORM 30022-INNAI-YAKUJYOUCHK-SEC
                END-IF
+           END-IF
+      *
+      *H28.4  湿布70枚以上は調基なし
+           IF     (FLG-SIP70-ARI       =   1    )
+               GO      TO      30021-INNAI-AUTO1-EXT
            END-IF
       *
       *    調剤技術基本料（入院外）
