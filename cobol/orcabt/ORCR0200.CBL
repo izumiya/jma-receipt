@@ -66,6 +66,7 @@
       *                                     自費レセプトを対象とする
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/04/20  平成２８年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -407,6 +408,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE04-SETCOMFLG    TO  RECE041-SETCOMFLG
            MOVE    RECE04-ACCTP-SYUGI-TBL-G
                                        TO  RECE041-ACCTP-SYUGI-TBL-G
+           MOVE    RECE04-SIPPUFLG     TO  RECE041-SIPPUFLG
       *
            WRITE   RECE041-REC
       *

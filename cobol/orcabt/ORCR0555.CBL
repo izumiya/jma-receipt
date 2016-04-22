@@ -2438,7 +2438,21 @@
                                      PERFORM
                                       200711-SRYKBN13-COM-TAIHI-SEC
                                    ELSE
-                                     PERFORM 200711-COMMENT-TAIHI-SEC
+                                      IF    ( RECE44-SRYKBN
+                                                           =   "23"  )
+                                      AND   ( RECE44-SIPPUFLG
+                                                       NOT =   SPACE )
+                                        IF      RECE45-SRYCD (IDX)
+                                                           = "820000047"
+                                          PERFORM
+                                              200711-COMMENT-TAIHI-SEC
+                                        ELSE
+                                          PERFORM
+                                           200711-SRYKBN13-COM-TAIHI-SEC
+                                        END-IF
+                                      ELSE
+                                        PERFORM 200711-COMMENT-TAIHI-SEC
+                                      END-IF 
                                    END-IF
                                END-IF
                            END-IF
@@ -3849,6 +3863,15 @@
                    UNTIL   IDX >       WRK-TBLMAX6
                PERFORM 200722-YKZ-HENSYU-SEC
            END-PERFORM            
+      *
+      *    コメントデータの編集（診療区分２３）
+           IF    ( RECE44-SRYKBN       =   "23"  )
+           AND   ( RECE44-SIPPUFLG NOT =   SPACE )
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       WRK-TBLMAX8
+                   PERFORM 200724-COMMENT-HENSYU-SEC
+               END-PERFORM
+           END-IF
       *
       *    特定器材データの編集
            IF      RECE44-ZAIREQFLG       =   SPACE

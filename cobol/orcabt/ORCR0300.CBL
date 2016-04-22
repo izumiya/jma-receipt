@@ -4440,7 +4440,21 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                      PERFORM
                                       200711-SRYKBN13-COM-TAIHI-SEC
                                    ELSE
-                                     PERFORM 200711-COMMENT-TAIHI-SEC
+                                      IF    ( RECE041-SRYKBN
+                                                           =   "23"  )
+                                      AND   ( RECE041-SIPPUFLG
+                                                       NOT =   SPACE )
+                                        IF      RECE05-SRYCD (IDX)
+                                                           = "820000047"
+                                          PERFORM
+                                              200711-COMMENT-TAIHI-SEC
+                                        ELSE
+                                          PERFORM
+                                           200711-SRYKBN13-COM-TAIHI-SEC
+                                        END-IF
+                                      ELSE
+                                        PERFORM 200711-COMMENT-TAIHI-SEC
+                                      END-IF
                                    END-IF
                                END-IF
                            END-IF
@@ -5861,6 +5875,16 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                        PERFORM 200725-NIKKEI-HENSYU-SEC
                END-IF
              END-IF
+           END-IF
+      *
+      *    コメントデータの編集（診療区分１１〜１４）
+           IF    ( RECE041-SRYKBN      =   "23"  )
+           AND   ( RECE041-SIPPUFLG
+                                   NOT =   SPACE )
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       WRK-TBLMAX8
+                   PERFORM 200724-COMMENT-HENSYU-SEC
+               END-PERFORM
            END-IF
       *
       *    特定器材データの編集
