@@ -511,6 +511,7 @@
            03  WRK-BOKOHO-YMD                PIC X(08).
            03  WRK-TUINZAI-YMD               PIC X(08).
            03  WRK-NINRYO-FSANTEIYMD         PIC X(08).
+           03  WRK-SEIJYU-FSANTEIYMD         PIC X(08).
       *
            03  WRK-BUNKAKUKETA               PIC 9(02).
            03  WRK-BUNKAKU-N                 PIC X(10).
@@ -762,6 +763,15 @@
       *
       *    依存症集団療法開始日
            03  CONS-IZONSYO         PIC X(09) VALUE "099830103".
+      *
+      *    精神科重症患者早期集中支援管理料１（単一建物１人）
+           03  CONS-SEIJYU          PIC X(09) VALUE "180042110".
+      *    精神科重症患者早期集中支援管理料２（単一建物１人）
+           03  CONS-SEIJYU2         PIC X(09) VALUE "180042410".
+      *    精神科重症患者早期集中支援管理料１（単一建物２人以上）
+           03  CONS-SEIJYU3         PIC X(09) VALUE "180048710".
+      *    精神科重症患者早期集中支援管理料２（単一建物２人以上）
+           03  CONS-SEIJYU4         PIC X(09) VALUE "180048810".
       *
       *    在宅患者共同診療料テーブル
        01  TBL-ZAIKYO-CHECK-AREA.
@@ -1936,7 +1946,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-RIHASEN-HANTEI-SEC
                       END-IF
-      *            （認知療法・認知行動療法の算定日のセット）
+      *            （認知療法・認知行動療法の初回算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-NINRYO-HANTEI-SEC
                       END-IF
@@ -1948,6 +1958,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *            （依存症集団療法の治療開始日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-IZONSYO-HANTEI-SEC
+                      END-IF
+      *            （精神科重症患者早期集中支援管理料の
+      *              初回算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-SEIJYU-HANTEI-SEC
                       END-IF
       *            （院外湿布薬７０枚超理由コメントの剤番号変換）
                       IF   FLG-COMMENT  =  ZERO
@@ -2163,7 +2178,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-KYOKUIN-HANTEI-SEC
                       END-IF
-      *            （認知療法・認知行動療法の算定日のセット）
+      *            （認知療法・認知行動療法の初回算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-NINRYO-HANTEI-SEC
                       END-IF
@@ -2180,6 +2195,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *            （依存症集団療法の治療開始日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-IZONSYO-HANTEI-SEC
+                      END-IF
+      *            （精神科重症患者早期集中支援管理料の
+      *              初回算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-SEIJYU-HANTEI-SEC
                       END-IF
       *            （院外湿布薬７０枚超理由コメントの剤番号変換）
                       IF   FLG-COMMENT  =  ZERO
@@ -7679,15 +7699,15 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                   ADD        1       TO     IDZ
       *
-                  MOVE       12      TO     WK-FREE-YUKOKETA2(IDZ)
-                  MOVE   "初回算定日　　　月　　日"
+                  MOVE       11      TO     WK-FREE-YUKOKETA2(IDZ)
+                  MOVE   "初回算定　　　月　　日"
                                      TO     WK-FREE-NAME2(IDZ)
                   MOVE   WRK-NINRYO-FSANTEIYMD(5:2)   TO  DAY-IDX2
                   MOVE   TBL-DAY(DAY-IDX2)
-                                     TO     WK-FREE-NAME2(IDZ)(13:4)
+                                     TO     WK-FREE-NAME2(IDZ)(11:4)
                   MOVE   WRK-NINRYO-FSANTEIYMD(7:2)   TO  DAY-IDX2
                   MOVE   TBL-DAY(DAY-IDX2)
-                                     TO     WK-FREE-NAME2(IDZ)(19:4)
+                                     TO     WK-FREE-NAME2(IDZ)(17:4)
       *
                   IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
                     MOVE  "2"        TO     WK-FREE-MEISKYFLG2(IDZ)
@@ -8022,6 +8042,104 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        2001-IZONSYO-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    精神科重症患者早期集中支援管理料があるか判定
+      *****************************************************************
+       2001-SEIJYU-HANTEI-SEC          SECTION.
+      *
+           IF     RECE44-FLG-SEIJYU-COMMENT   NOT =  SPACE
+               MOVE    SPACE                TO  WRK-SEIJYU-FSANTEIYMD
+               INITIALIZE                       SANTEI-REC
+               MOVE    RECE41-HOSPNUM       TO  SANTEI-HOSPNUM
+               MOVE    RECE41-PTID          TO  SANTEI-PTID
+               MOVE    RECE41-SRYYM         TO  SANTEI-SRYYM
+               EVALUATE  RECE44-FLG-SEIJYU-COMMENT
+                 WHEN      "1"
+                   MOVE  CONS-SEIJYU        TO  SANTEI-SRYCD
+                 WHEN      "2"
+                   MOVE  CONS-SEIJYU2       TO  SANTEI-SRYCD
+                 WHEN      "3"
+                   MOVE  CONS-SEIJYU3       TO  SANTEI-SRYCD
+                 WHEN      "4"
+                   MOVE  CONS-SEIJYU4       TO  SANTEI-SRYCD
+               END-EVALUATE
+               MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
+               MOVE    ZERO                 TO  SANTEI-SRYKA
+               MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
+               MOVE    SANTEI-REC           TO  MCPDATA-REC
+               MOVE    "tbl_santei"         TO  WRK-MCP-TABLE
+               MOVE    "key"                TO  WRK-MCP-PATHNAME
+               PERFORM  900-SANTEI-INV-SEC
+               IF       FLG-SANTEI        =   ZERO
+                  MOVE  SANTEI-FSANTEIYMD   TO  WRK-SEIJYU-FSANTEIYMD
+               END-IF
+      *
+               IF   WRK-SEIJYU-FSANTEIYMD   NOT =  SPACE
+      *
+                  INITIALIZE                WRK-JIDO-SETCOM-AREA
+                  MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
+                  MOVE       35      TO     WRK-JIDO-SETCOMATFLG
+                  MOVE       99      TO     FLG-COMMENT
+      *
+                  MOVE      ZERO     TO     IDZ
+                  INITIALIZE                WRK-FREE-AREA2
+      *
+                  ADD        1       TO     IDZ
+      *
+                  MOVE       11      TO     WK-FREE-YUKOKETA2(IDZ)
+                  MOVE   "初回算定　　　月　　日"
+                                     TO     WK-FREE-NAME2(IDZ)
+                  MOVE   WRK-SEIJYU-FSANTEIYMD(5:2)   TO  DAY-IDX2
+                  MOVE   TBL-DAY(DAY-IDX2)
+                                     TO     WK-FREE-NAME2(IDZ)(11:4)
+                  MOVE   WRK-SEIJYU-FSANTEIYMD(7:2)   TO  DAY-IDX2
+                  MOVE   TBL-DAY(DAY-IDX2)
+                                     TO     WK-FREE-NAME2(IDZ)(17:4)
+      *
+                  IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+                    MOVE  "2"        TO     WK-FREE-MEISKYFLG2(IDZ)
+                    MOVE  WRK-JIDO-SETCOMATFLG
+                                     TO     WK-FREE-SETCOMATFLG2(IDZ)
+                  END-IF
+      *
+                  PERFORM  200111-RECE45-TAIHI-SEC
+      *
+      *           ＲＥＣＥ０５ファイルの内容をテーブルに退避
+                  MOVE    ZERO                 TO  IDX-RECE45
+                  MOVE    SPACE                TO  WRK-RECE45XX-REC
+                  INITIALIZE                       WRK-RECE45XX-REC
+      *
+                  MOVE    RECE44-MEISAISU      TO  MAX-MEISAISU
+      *
+                  PERFORM   VARYING   IDX   FROM    1   BY  1
+                             UNTIL  ( IDX                >   50    )
+                              OR    ( WK-FREE-NAME2(IDX) =   SPACE )
+                    COMPUTE  MAX-MEISAISU  =   MAX-MEISAISU  +  1
+                    MOVE  "810000001"
+                            TO  WRK-RECE45XX-SRYCD(MAX-MEISAISU 1)
+                    MOVE  ZERO
+                            TO  WRK-RECE45XX-SRYSURYO(MAX-MEISAISU 1)
+                    MOVE  WK-FREE-YUKOKETA2(IDX)
+                            TO  WRK-RECE45XX-YUKOKETA(MAX-MEISAISU 1)
+                    MOVE  WK-FREE-NAME2(IDX)
+                            TO  WRK-RECE45XX-NAME(MAX-MEISAISU 1)
+                    MOVE  WK-FREE-MEISKYFLG2(IDX)
+                            TO  WRK-RECE45XX-MEISKYFLG(MAX-MEISAISU 1)
+                    MOVE  WK-FREE-SETCOMATFLG2(IDX)
+                            TO  WRK-RECE45XX-SETCOMATFLG(MAX-MEISAISU 1)
+                    MOVE  "1"
+                            TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                  END-PERFORM
+      *
+                  PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+               END-IF
+           END-IF
+      *
+           .
+       2001-SEIJYU-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************

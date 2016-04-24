@@ -307,6 +307,8 @@
            03  RECE04-FLG-TUINZAI-COMMENT PIC  X(01).
       *依存症集団療法
            03  RECE04-FLG-IZONSYO-COMMENT PIC  X(01).
+      *精神科重症患者早期集中支援管理料
+           03  RECE04-FLG-SEIJYU-COMMENT  PIC  X(01).
       *
       *日数回数テーブル
            03  RECE04-DAY-AREA.

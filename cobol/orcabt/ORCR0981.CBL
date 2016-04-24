@@ -10244,7 +10244,7 @@
                     ELSE
                       EVALUATE   RECE851-SETCOMATFLG(IDX)
                         WHEN    1
-                        WHEN    3  THRU   34
+                        WHEN    3  THRU   35
                         WHEN  101  THRU  107
                         WHEN  204
                         WHEN  225
