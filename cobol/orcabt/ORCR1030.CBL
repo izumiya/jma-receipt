@@ -7067,6 +7067,8 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
                     IF  RECE130-INGAIFLG-SIPPU(IDX)  =  "1"
                       MOVE  RECE130-GENERICNAME(IDX)
                                     TO   RECE130-NAME(IDX)
+                      MOVE  RECE130-GENERICYUKOKETA(IDX)
+                                    TO   RECE130-YUKOKETA(IDX)
                     END-IF
                     PERFORM  20011-INGAISIPPU-SURYO-SEC
                  END-IF
@@ -7075,6 +7077,8 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
                                          RECE130-TANICD(IDX)
                                          RECE130-TANIMOJISU(IDX)
                  MOVE   SPACE       TO   RECE130-TANINAME(IDX)
+                 MOVE   SPACE       TO   RECE130-INGAIFLG(IDX)
+                                         RECE130-INGAIFLG-RECE(IDX)
                  MOVE   RECE130-SRYACT-TBL(IDX)
                             TO  WRK-RECE130XX-SRYACT-TBL(IDX-RECE130 1)
                END-IF

@@ -8336,6 +8336,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                      IF  RECE45-INGAIFLG-SIPPU(IDX)  =  "1"
                        MOVE  RECE45-GENERICNAME(IDX)
                                      TO   RECE45-NAME(IDX)
+                       MOVE  RECE45-GENERICYUKOKETA(IDX)
+                                     TO   RECE45-YUKOKETA(IDX)
                      END-IF
                      PERFORM  20011-INGAISIPPU-SURYO-SEC
                   END-IF
@@ -8344,6 +8346,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                           RECE45-TANICD(IDX)
                                           RECE45-TANIMOJISU(IDX)
                   MOVE   SPACE       TO   RECE45-TANINAME(IDX)
+                  MOVE   SPACE       TO   RECE45-INGAIFLG(IDX)
+                                          RECE45-INGAIFLG-RECE(IDX)
                   MOVE   RECE45-SRYACT-TBL(IDX)
                              TO  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
                END-IF
@@ -8396,6 +8400,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
            MOVE     "80"              TO   RECE449-SRYKBN
            MOVE     "800"             TO   RECE449-SRYSYUKBN
            MOVE     SPACE             TO   RECE449-TOYAKUFLG
+           MOVE     SPACE             TO   RECE449-SETCOMFLG
            WRITE    RECE449-REC
            ADD      1                 TO   CNT-RECE449
       *

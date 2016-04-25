@@ -9995,6 +9995,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                     IF  RECE05-INGAIFLG-SIPPU(IDX)  =  "1"
                        MOVE  RECE05-GENERICNAME(IDX)
                                     TO   RECE05-NAME(IDX)
+                       MOVE  RECE05-GENERICYUKOKETA(IDX)
+                                    TO   RECE05-YUKOKETA(IDX)
                     END-IF
                     PERFORM  20011-INGAISIPPU-SURYO-SEC
                  END-IF
@@ -10003,6 +10005,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                                          RECE05-TANICD(IDX)
                                          RECE05-TANIMOJISU(IDX)
                  MOVE   SPACE       TO   RECE05-TANINAME(IDX)
+                 MOVE   SPACE       TO   RECE05-INGAIFLG(IDX)
+                                         RECE05-INGAIFLG-RECE(IDX)
                  MOVE   RECE05-SRYACT-TBL(IDX)
                             TO   WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
                END-IF
@@ -10054,6 +10058,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
            MOVE     "80"              TO   RECE049-SRYKBN
            MOVE     "800"             TO   RECE049-SRYSYUKBN
            MOVE     SPACE             TO   RECE049-TOYAKUFLG
+           MOVE     SPACE             TO   RECE049-SETCOMFLG
            WRITE    RECE049-REC
            ADD      1                 TO   CNT-RECE049
       *

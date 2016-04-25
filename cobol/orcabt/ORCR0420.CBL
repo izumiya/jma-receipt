@@ -2012,7 +2012,7 @@ grpsys           MOVE    SPA-HOSPNUM       TO  SYS-1006-HOSPNUM
               END-PERFORM
       *       Ä¢É¼ÊÔ½¸¶èÊ¬¾ðÊó
               MOVE    SPACE               TO  WRK-1030-KOUHATUKA
-              IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
+      **>     IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
                 INITIALIZE                      SYS-1030-REC
                 MOVE    "1030"              TO  SYS-1030-KANRICD
                 MOVE    "*"                 TO  SYS-1030-KBNCD
@@ -2026,7 +2026,7 @@ grpsys           MOVE    SPA-HOSPNUM       TO  SYS-1006-HOSPNUM
                   MOVE  MCPDATA-REC         TO  SYS-1030-REC
                   MOVE  SYS-1030-KOUHATUKA  TO  WRK-1030-KOUHATUKA
                 END-IF
-              END-IF
+      **>     END-IF
            ELSE
               MOVE     ZERO               TO  SYSKAN-IDX
               MOVE     SPACE              TO  TBL-SYS1001-T
@@ -2116,7 +2116,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
               MOVE     ZERO               TO  SYSKAN-IDX
               MOVE     SPACE              TO  TBL-SYS1030-T
               INITIALIZE                      TBL-SYS1030-T
-              IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
+      **>     IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
                 INITIALIZE                      SYS-1030-REC
                 MOVE    "1030"              TO  SYS-1030-KANRICD
                 MOVE    "*"                 TO  SYS-1030-KBNCD
@@ -2144,7 +2144,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                 MOVE    "tbl_syskanri"      TO  MCP-TABLE
                 MOVE    "key8"              TO  MCP-PATHNAME
                 PERFORM 900-CLOSE-SEC
-              END-IF
+      **>     END-IF
            END-IF
       *
            INITIALIZE                      SYS-200501-REC
@@ -13114,7 +13114,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
              MOVE    ZERO                TO  FLG-SET
              MOVE    SPACE               TO  WRK-1030-KOUHATUKA
       *
-             IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
+      **>    IF      WRK-PARA-PRTKBN = "2" OR "3" OR "4" OR "5"
                PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
                        UNTIL ( SYSKAN-IDX              >  100  )
                        OR    ( TBL-SYS1030(SYSKAN-IDX) = SPACE )
@@ -13127,7 +13127,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                                            TO  WRK-1030-KOUHATUKA
                  END-IF
                END-PERFORM
-             END-IF
+      **>    END-IF
       *
            END-IF
       *
