@@ -617,7 +617,7 @@
            MOVE    31                  TO  WRK-END-DD
       *
            IF      WRK-PARA-SYORIKBN   =   "1"
-               MOVE    "（全体）"          TO  PRT-MIDASI
+               MOVE    "（処理１）"        TO  PRT-MIDASI
            ELSE
                MOVE    SPACE               TO  PRT-MIDASI
            END-IF
