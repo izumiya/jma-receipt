@@ -204,6 +204,7 @@
            03  WRK-GENECHG-KBN         PIC X(01).
            03  CNT-GENERIC             PIC 9(02).
            03  WRK-HKNCOMBI            PIC X(04).
+           03  WRK-MEISYO              PIC X(80).
       *
        01  TBL-SRY-AREA.
            03  TBL-PTID                PIC 9(10).
@@ -244,13 +245,14 @@
        01  LST-PRT-AREA.
            03  LST-PRT-HEAD1.
                05  FILLER              PIC X(02)   VALUE   SPACE.
-               05  FILLER              PIC X(50)   VALUE
+               05  FILLER              PIC X(44)   VALUE
                    "¡ô¡ô¡¡°ìÈÌÌ¾½èÊý²Ã»»¸í»»Äêµ¿¤¤´µ¼Ô°ìÍ÷¡¡¡ô¡ô".
+               05  PRT-MIDASI          PIC X(10).
      ******    05  FILLER              PIC X(16)   VALUE   SPACE.
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
                    "Ê¬".
-               05  FILLER              PIC X(07)   VALUE   SPACE.
+               05  FILLER              PIC X(05)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
                05  PRT-PAGE            PIC ZZZ9.
@@ -614,6 +616,12 @@
            MOVE    WRK-SRY-YYMM        TO  WRK-END-YMD(1:6)
            MOVE    31                  TO  WRK-END-DD
       *
+           IF      WRK-PARA-SYORIKBN   =   "1"
+               MOVE    "¡ÊÁ´ÂÎ¡Ë"          TO  PRT-MIDASI
+           ELSE
+               MOVE    SPACE               TO  PRT-MIDASI
+           END-IF
+      *
       *    ¿ÇÎÅ²Ê¤ò£Ô£Â£Ì¤Ë¥»¥Ã¥È
            PERFORM 1101-SRYKA-TBLSET-SEC
       *    Ä¢É¼ÊÔ½¸¾ðÊó¼èÆÀ
@@ -798,7 +806,7 @@
       *
            PERFORM VARYING     IDXJ    FROM    1   BY  1
                    UNTIL      (IDXJ    >   15  )
-                          AND (JYURRK-ZAINUM (IDXJ) =   ZERO )
+                          OR  (JYURRK-ZAINUM (IDXJ) =   ZERO )
                MOVE    SPACE               TO  SRYACT-REC
                INITIALIZE  SRYACT-REC
                MOVE    JYURRK-HOSPNUM      TO  SRY-HOSPNUM
@@ -1022,7 +1030,19 @@
            MOVE    LNK-WKSRY-SRYKA(1) TO  SPA-SRYKA
            MOVE    LNK-WKSRY-HKNCOMBI(1)
                                       TO  SPA-HKNCOMBINUM
+      *    ´µ¼Ô¥Þ¥¹¥¿¡¼ÆÉ¤ß¹þ¤ß
+           MOVE    SPACE               TO  PTINF-REC
+           INITIALIZE  PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF           =   1
+               MOVE    "20000401"          TO  SPA-BIRTHDAY
+           ELSE
+               MOVE    PTINF-BIRTHDAY      TO  SPA-BIRTHDAY
+           END-IF
       *
+           MOVE    400                 TO  SPA-MAX-LINE
            INITIALIZE                  SPA-SCR-REC
            MOVE    ZERO                TO  IDX2
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -1600,6 +1620,15 @@
                       (SPA-COM-INPUTCD (IDX)        =   "099209910")
                    MOVE    1               TO  FLG-CHK
                END-IF
+      *Ì¾¾Î¤Î¡ùºï½ü
+      *    Ì¾¾Î
+               IF     (SPA-COM-INPUTCD (IDX)(1:1)    =   "6"   )
+                 AND  (SPA-COM-YOBI1 (IDX)(7:1)  NOT =   SPACE )
+                 AND  (SPA-GMN-MEISYO(IDX)(1:2)  =   "¡ù"      )
+                   MOVE    SPA-GMN-MEISYO(IDX)(3:)   TO  WRK-MEISYO
+                   MOVE    WRK-MEISYO            TO  SPA-GMN-MEISYO(IDX)
+               END-IF
+      *
                IF      FLG-CHK             =   1
       *ÊÝ¸±ÁÈ¹ç¤»
                    IF      WRK-HKNCOMBI    NOT =   SPA-COM-HKNCOMBI(IDX)
@@ -1834,7 +1863,6 @@
            MOVE    SPA-COM-INPUTCD (IDX) TO  WRK-IN-DATA
            MOVE    9                   TO  WRK-IN-MAX
            PERFORM 5002-MOJI-HENSYU-SEC
-      *    Ì¾¾Î
            MOVE    SPA-GMN-MEISYO(IDX)   TO  WRK-IN-DATA
            MOVE    80                  TO  WRK-IN-MAX
            MOVE    1                   TO  WRK-END
