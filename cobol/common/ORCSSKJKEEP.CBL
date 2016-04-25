@@ -110,6 +110,7 @@
            03  WRK-SEI-NYUINYMD            PIC X(08).
       *
            03  WRK-MATCH                   PIC X(02).
+           03  WRK-MATCH2                  PIC X(02).
       *
       *    システム予約コードの入力日と該当する入院履歴番号
            03  WRK-SYSYYK-TBL              OCCURS  20.
@@ -595,6 +596,47 @@
                END-IF
       *        精神入院年月日のセット
                MOVE   WRK-SEI-NYUINYMD  TO  LNK-SKJKEEP-SEI-NYUINYMD
+      *
+               INITIALIZE                        PTNYUINRRK-REC
+               MOVE    LNK-SKJKEEP-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+               MOVE    LNK-SKJKEEP-PTID      TO  PTNYUINRRK-PTID
+               MOVE    WRK-RRKNUM            TO  PTNYUINRRK-RRKNUM
+               MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
+               MOVE    "key69"               TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-SELECT-SEC
+               IF      FLG-PTNYUINRRK         =   ZERO
+                   MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                   MOVE    "key69"            TO  MCP-PATHNAME
+                   PERFORM   910-PTNYUINRRK-READ-SEC
+                   MOVE     SPACE             TO  WRK-MATCH2
+                   PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)  OR
+                                     (WRK-MATCH2       =  "NG")
+                       IF   PTNYUINRRK-TENNYUYMD  <= "20150401"
+                               PERFORM    VARYING   IDX1  FROM  1  BY  1
+                                 UNTIL   (IDX1      >     IDX-SYS)
+                                  IF   WRK-CHKBTU-NUM(IDX1)  = 
+                                                      PTNYUINRRK-BTUNUM
+                                      MOVE   "OK"     TO   WRK-MATCH2
+                                      MOVE    PTNYUINRRK-TENNYUYMD
+                                           TO   WRK-SEI-NYUINYMD
+                                                LNK-SKJKEEP-SEI-NYUINYMD
+                                  END-IF
+                               END-PERFORM
+                               IF    WRK-MATCH2        =   SPACE
+                                   MOVE   "NG"         TO  WRK-MATCH
+                               END-IF
+                       END-IF
+                       MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                       MOVE    "key69"            TO  MCP-PATHNAME
+                       PERFORM 910-PTNYUINRRK-READ-SEC
+                   END-PERFORM
+               END-IF
+      *
+      *        患者入院履歴クローズ
+               MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+               MOVE    "key69"                 TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
            END-IF
            .
        210-SEISIN-CHK1-EXT.
