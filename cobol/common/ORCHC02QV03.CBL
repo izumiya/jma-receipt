@@ -2255,7 +2255,8 @@
            END-PERFORM
       *
       *    備考欄編集（備考明細以外）
-           IF      IDX                 <=  WRK-PAGE-SYOMAX
+           IF     (IDX                 <=  WRK-PAGE-SYOMAX)
+              OR  (FLG-NEXT-B          =   ZERO    )
       *        備考を処方内容へ編集
                PERFORM 3002-BIKOU-HENSYU-SEC
            END-IF
