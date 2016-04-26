@@ -4500,6 +4500,7 @@
                IF    ( DCSRY-SRYCD(1:2)    =   "84" )
                 OR   ( DCSRY-SRYCD(1:4)    =   "0084" )
                  IF  ( DCSRY-SRYCD         =   "840000042"
+                                           OR  "840000058"
                                            OR  "840000101" )
                    CONTINUE
                  ELSE
