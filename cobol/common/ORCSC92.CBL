@@ -75,6 +75,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/02/XX  Ï«ºÒ¥ì¥»ÅÅ¥³¡¼¥ÉÂÐ±þ(H25.7)
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/04/25  »ÜÀß´ð½à¥Á¥§¥Ã¥¯ÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/04/20  ¸þÀº¿ÀÌô¶èÊ¬ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
       *
@@ -105,6 +106,7 @@
            03  FLG-GENERICPRICE    PIC 9(01).
       *H28.1
            03  FLG-GENERICNAME     PIC 9(01).
+           03  FLG-PSYCHOTROPIC    PIC 9(01).
       *
            03  FLG-ERR             PIC 9(01).
            03  FLG-SST             PIC 9(01).
@@ -448,6 +450,10 @@
       *    ´µ¼Ô¶Ø´÷ÌôºÞ¥Þ¥¹¥¿
        01  PTKINKI-REC.
            COPY    "CPPTKINKI.INC".
+      *
+      *    ¸þÀº¿ÀÌôÀ®Ê¬¥³¡¼¥É
+       01  PSYCHOTROPIC-REC.
+           COPY    "CPPSYCHOTROPIC.INC".
       *
       *    »»ÄêÍúÎò
        01  HZN-SANTEI-REC.
@@ -4181,6 +4187,13 @@
            IF     (TNS-SRYCD(1:1)      =   "6" )
                PERFORM 3007-TENSUPLUS2-HEN-SEC
            END-IF
+      *H28.4
+      *    ¸þÀº¿ÀÌô¾ðÊóÊÔ½¸
+           MOVE    SPACE           TO  SPA-COM-YOBI1 (IDX-T) (7:1)
+           IF     (TNS-SRYCD(1:1)      =   "6" )
+             AND  (TNS-YAKKAKJNCD  NOT =   SPACE )
+               PERFORM 3009-PSYCHOTROPIC-HEN-SEC
+           END-IF
       *
       *    ´µ¼Ô¶Ø´÷ÌôºÞ¾ðÊó
            IF     (TNS-SRYCD(1:1)      =   "6" )
@@ -4226,6 +4239,32 @@
                    PERFORM 300002-GENERICNAME-HEN-SEC
                END-IF
            END-IF
+      *
+      *TEST
+      *H28.5
+      *    ¸þÀº¿ÀÌôÀßÄê
+      *    IF     (SPA-SRYYMD          >=  "20160401" )
+      *    AND    (SPA-COM-INPUTCD(IDX-T)(1:1) =   "6" )
+      *    AND    (SPA-COM-YOBI1 (IDX-T)(7:1)  =   "1" )
+      *        MOVE   SPA-GMN-MEISYO (IDX-T)   TO  WRK-MEISYO
+      *        MOVE   SPACE              TO  SPA-GMN-MEISYO (IDX-T)
+      *        STRING "¡ù"             DELIMITED   BY  SIZE
+      *               WRK-MEISYO       DELIMITED   BY  SPACE
+      *                        INTO             SPA-GMN-MEISYO (IDX-T)
+      *        END-STRING
+      *        MOVE    SPA-GMN-MEISYO (IDX-T)
+      *                                    TO  SPA-COM-MEI-NAME(IDX-T)
+      *
+      *        IF      SPA-COM-IPN-NAME(IDX-T) NOT =   SPACE
+      *            MOVE   SPA-COM-IPN-NAME(IDX-T)   TO  WRK-MEISYO
+      *            MOVE   SPACE                TO  SPA-COM-IPN-NAME
+      *                                                         (IDX-T)
+      *            STRING "¡ù"             DELIMITED   BY  SIZE
+      *                   WRK-MEISYO       DELIMITED   BY  SPACE
+      *                        INTO             SPA-COM-IPN-NAME(IDX-T)
+      *            END-STRING
+      *        END-IF
+      *****END-IF
            .
        300-TENSU-HENSYU-EXT.
            EXIT.
@@ -5382,6 +5421,47 @@
            END-IF
            .
        3007-TENSUPLUS2-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¸þÀº¿ÀÌô¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       3009-PSYCHOTROPIC-HEN-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  PSYCHOTROPIC-REC
+           INITIALIZE                      PSYCHOTROPIC-REC
+           MOVE    TNS-YAKKAKJNCD      TO  PSYCHOTROPIC-CODE
+           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOEDYMD
+           MOVE    PSYCHOTROPIC-REC    TO  MCPDATA-REC
+           MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PSYCHOTROPIC-REC
+      *
+                   IF     (PSYCHOTROPIC-CLASS  >=  1  AND  <=  4 )
+      *                ¸þÀº¿ÀÌô
+                       MOVE    "1"             TO  SPA-COM-YOBI1 (IDX-T)
+                                                                  (7:1)
+                   END-IF
+               ELSE
+                   INITIALIZE                  PSYCHOTROPIC-REC
+                   MOVE    1                   TO  FLG-PSYCHOTROPIC
+               END-IF
+           ELSE
+               INITIALIZE                  PSYCHOTROPIC-REC
+               MOVE    1                   TO  FLG-PSYCHOTROPIC
+           END-IF
+           MOVE    "tbl_psychotropic" TO  MCP-TABLE
+           MOVE    "key"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       3009-PSYCHOTROPIC-HEN-EXT.
            EXIT.
       *
       *****************************************************************

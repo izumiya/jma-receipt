@@ -65,6 +65,7 @@
       *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
       *  04.07.00    NACL-多々納  15/04/XX  後発品変更不可処方毎の対応
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/04/2X  向精神薬逓減の内服逓減対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -174,6 +175,7 @@
            03  FLG-TAZAI2              PIC 9(01).
            03  FLG-TAZAI-ARI           PIC 9(01).
            03  FLG-NASI                PIC 9(01).
+           03  FLG-ARI2                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -281,6 +283,13 @@
                05  WRK-TENKEI          PIC 9(08).
                05  WRK-ZAITEN          PIC 9(08).
                05  WRK-ZAITEN-G        PIC 9(08)V9(8).
+      *H28.4   向精神薬以外
+               05  WRK-KONGO-2         PIC 9(05).
+               05  WRK-SONOTA-2        PIC 9(05).
+               05  WRK-ZAICNT-2        PIC 9(05).
+               05  WRK-KEIKEI-2        PIC 9(08).
+               05  WRK-ZAICNT2-2       PIC 9(05).
+               05  WRK-ZAITEN-G-2      PIC 9(08)V9(8).
       *
                05  WRK-CHK-SRYSYUKBN   PIC X(03).
       *    保険毎の逓減計算
@@ -294,6 +303,7 @@
                    07  WRK-HKNKEI-COMBI    PIC X(04).
                    07  WRK-HKNKEI-CHIKEN   PIC X(01).
                    07  WRK-HKNKEI-KEIKEI   PIC 9(08).
+                   07  WRK-HKNKEI-KEIKEI-2   PIC 9(08).
       *H26.10
       *    保険毎の逓減計算（頓服）
            03  WRK-HKNKEI22-G.
@@ -3536,7 +3546,7 @@
       *****************************************************************
       *   処方内容チェク処理
       *****************************************************************
-       300301-YOUHO-HENSUB-SEC              SECTION.
+       300301-YOUHO-HENSUB-SEC         SECTION.
       *
            MOVE    ZERO            TO  WRK-KONGO
            MOVE    ZERO            TO  WRK-SONOTA
@@ -3807,14 +3817,26 @@
       *            種類数指示入力なし
                AND    (WRK-COM-TANDKKBN (IDX)  NOT =  "1"  )
                    MOVE    1               TO  WRK-KONGO
+      *H28.4       向精神薬以外の集計
+                   IF      WRK-COM-YOBI1 (IDX)(7:1)    =   SPACE
+                       MOVE    1               TO  WRK-KONGO-2
+                   END-IF
                ELSE
       *            粉砕コードがある時、混合とする
                    IF      (IDX            >   1   )  AND
                            (WRK-COM-INPUTCD (IDX - 1)
                                            =   "099209901" )
                        MOVE    1               TO  WRK-KONGO
+      *H28.4           向精神薬以外の集計
+                       IF      WRK-COM-YOBI1 (IDX)(7:1)    =   SPACE
+                           MOVE    1               TO  WRK-KONGO-2
+                       END-IF
                    ELSE
                        ADD     1               TO  WRK-SONOTA
+      *H28.4           向精神薬以外の集計
+                       IF      WRK-COM-YOBI1 (IDX)(7:1)    =   SPACE
+                           ADD     1               TO  WRK-SONOTA-2
+                       END-IF
                    END-IF
                END-IF
       *        点数
@@ -3823,6 +3845,10 @@
                COMPUTE WRK-SYOKEIS2        =   WRK-KEI-KISOTEN
                                            *   WRK-COM-SURYO  (IDX)
                ADD     WRK-SYOKEIS2        TO  WRK-ZAITEN-G
+      *H28.4   向精神薬以外の集計
+               IF      WRK-COM-YOBI1 (IDX)(7:1)    =   SPACE
+                   ADD     WRK-SYOKEIS2        TO  WRK-ZAITEN-G-2
+               END-IF
       *
            END-IF
       *----(01.00.01) LINE ADD START ----------------------------------
@@ -3870,6 +3896,48 @@
                MOVE    ZERO            TO  WRK-ZAITEN
                MOVE    ZERO            TO  WRK-ZAITEN-G
       *
+      *H28.4   向精神薬以外の集計
+               IF      WRK-ZAITEN-G-2      <=  205
+                   IF      WRK-ZAITEN-G-2      =   ZERO
+                       CONTINUE
+                   ELSE
+                       IF      WRK-CHK-SRYSYUKBN   =   "211"
+                                                   OR  "291"
+      *                院内
+                           ADD     1               TO  WRK-ZAICNT-2
+                       ELSE
+      *                院外
+                           ADD     1               TO  WRK-ZAICNT2-2
+                       END-IF
+      *
+                   END-IF
+               ELSE
+                   IF      WRK-CHK-SRYSYUKBN   =   "211"
+                                               OR  "291"
+                       COMPUTE WRK-ZAICNT-2    =   WRK-ZAICNT-2
+                                               +   WRK-KONGO-2
+                                               +   WRK-SONOTA-2
+                   ELSE
+                       COMPUTE WRK-ZAICNT2-2   =   WRK-ZAICNT2-2
+                                               +   WRK-KONGO-2
+                                               +   WRK-SONOTA-2
+                   END-IF
+               END-IF
+               IF     (WRK-CHK-SRYSYUKBN   =   "211"
+                                           OR  "291" )
+                 AND  (WRK-ZAITEN-G-2      >   ZERO  )
+                   MOVE    WRK-ZAITEN-G-2      TO  WRK-ZAIKEI
+                   MOVE    IDX                 TO  IDX-G
+                   PERFORM 300212-ZAITENSYUKEI-SEC
+                   ADD     WRK-ZAITEN-K        TO  WRK-KEIKEI-2
+                   ADD     WRK-ZAITEN-K        TO  WRK-HKNKEI-KEIKEI-2
+                                                       (WRK-CNT-HKN)
+               END-IF
+               MOVE    ZERO            TO  WRK-ZAIKEI
+               MOVE    ZERO            TO  WRK-KONGO-2
+               MOVE    ZERO            TO  WRK-SONOTA-2
+               MOVE    ZERO            TO  WRK-ZAITEN-G-2
+      *!!!!
            ELSE
                IF      (FLG-NAIFUKU            =   ZERO )
                  AND   (WRK-COM-ZAIEND (IDX)   =   "1"  )
@@ -3879,6 +3947,15 @@
                    ADD     WRK-COM-KEI (IDX)   TO  WRK-KEIKEI
                    ADD     WRK-COM-KEI (IDX)   TO  WRK-HKNKEI-KEIKEI
                                                        (WRK-CNT-HKN)
+      *H28.4
+                   IF     (WRK-ZAITEN-G-2      >   ZERO  )
+                       MOVE    WRK-ZAITEN-G-2      TO  WRK-ZAIKEI
+                       MOVE    IDX                 TO  IDX-G
+                       PERFORM 300212-ZAITENSYUKEI-SEC
+                       ADD     WRK-ZAITEN-K        TO  WRK-KEIKEI-2
+                       ADD     WRK-ZAITEN-K    TO  WRK-HKNKEI-KEIKEI-2
+                                                       (WRK-CNT-HKN)
+                   END-IF
                END-IF
            END-IF
       *
@@ -4743,6 +4820,8 @@
            IF      FLG-CHKCARKSN       =   1
                IF      WRK-ZAICNT      >=  7
                    MOVE    6               TO  WRK-ZAICNT
+      *            向精神薬以外もなし
+                   MOVE    6               TO  WRK-ZAICNT-2
                END-IF
            END-IF
       *
@@ -4759,7 +4838,10 @@
            END-IF
       *H26.10
       *
-           IF      WRK-ZAICNT          >=  7
+           IF    ( WRK-ZAICNT          >=  7 )
+      *H28.4
+           OR    ((FLG-GEN30-PSY       =   1 )  AND
+                  (WRK-ZAICNT-2        >=  7 ))
       *        内服の薬剤逓減有りチェック
                IF      SPA-NAIFUKU-CHK     =   ZERO
                    MOVE    1               TO  SPA-NAIFUKU-CHK
@@ -4767,13 +4849,25 @@
                    GO      TO      3002-INNAI-SYORI-EXT
                ELSE
                   IF      SPA-NAIFUKU-OK       =   1
-      *            薬剤料逓減あり
-                   COMPUTE WRK-SANTEN-9    =   WRK-KEIKEI
+      *
+      *           薬剤料逓減あり
+                  IF    ( WRK-ZAICNT          >=  7 )
+      *            全内服薬
+                       COMPUTE WRK-SANTEN-9    =   WRK-KEIKEI
                                            *   90
                                            /   100.00
                                            +   0.5
                        MOVE    WRK-SANTEN-9    TO  WRK-SANTEN
                        PERFORM 3001-GENHEN-SEC
+                  ELSE
+      *H28.4       向精神薬以外
+                       COMPUTE WRK-SANTEN-9    =   WRK-KEIKEI-2
+                                           *   90
+                                           /   100.00
+                                           +   0.5
+                       MOVE    WRK-SANTEN-9    TO  WRK-SANTEN
+                       PERFORM 3001-GENHEN-SEC
+                  END-IF
       *H27.4
                        MOVE    1               TO  FLG-GEN30-7GEN
                    ELSE
@@ -4837,6 +4931,7 @@
                END-IF
                GO      TO      3002-INNAI-SYORI-EXT
            END-IF
+      *
       *
       *    外来
       *    内服調剤料加算
@@ -5003,11 +5098,11 @@
                    PERFORM 30022-INNAI-YAKUJYOUCHK-SEC
                END-IF
            END-IF
-      *
       *H28.4  湿布70枚以上は調基なし
            IF     (FLG-SIP70-ARI       =   1    )
                GO      TO      30021-INNAI-AUTO1-EXT
            END-IF
+      *
       *
       *    調剤技術基本料（入院外）
            IF     (FLG-NAIYAK          =   1    )  OR
@@ -5084,10 +5179,7 @@
                                                TO  LNK-ORCSC-CHIKENKBN
                                                          (02 IDXS)
       *                自動発生分としない
-      *T               MOVE    "1"             TO  LNK-ORCSC-AUTOKBN
-      *TEST
                        MOVE    "5"             TO  LNK-ORCSC-AUTOKBN
-      *TEST
                                                          (02 IDXS)
                    END-IF
                    MOVE    1                   TO  FLG-TOKUSYO2
@@ -5104,10 +5196,7 @@
                        MOVE    "25"            TO  LNK-ORCSC-SRYKBN
                                                          (02 IDXS)
       *                自動発生分としない
-      *T               MOVE    "1"             TO  LNK-ORCSC-AUTOKBN
-      *TEST
                        MOVE    "5"             TO  LNK-ORCSC-AUTOKBN
-      *TEST
                                                          (02 IDXS)
                    END-IF
                    MOVE    1                   TO  FLG-TOKUSYO2
@@ -5506,6 +5595,7 @@
       *        点数ゼロ対象外（サ）のみの剤等
                IF      FLG-NAIFUKU             =   1
       *            薬剤料逓減チェック処理
+                AND   (FLG-ZAI                 =   ZERO  )
                    PERFORM 300110-GENTUIKA-CHK-SEC
                END-IF
       *
@@ -5520,6 +5610,11 @@
                        END-IF
                    ELSE
                        MOVE    IDX             TO  IDX-Z
+                   END-IF
+      *H28.4
+      *            （精減）の後
+                   IF      WRK-COM-INPUTCD (IDX-Z) =   CONS-SGEN-SRYCD
+                       ADD     1               TO  IDX-Z
                    END-IF
                    MOVE    "820000047"     TO  WRK-SRYCD
                    PERFORM 30011-GENTUIKA-SEC
@@ -5549,6 +5644,12 @@
            MOVE    ZERO                TO  WRK-SANTEN-G
            COMPUTE WRK-SANTEN-KEI      =   WRK-KEIKEI
                                        -   WRK-SANTEN
+      *H28.4
+           IF      FLG-GEN30-PSY       =   1
+               COMPUTE WRK-SANTEN-KEI      =   WRK-KEIKEI-2
+                                           -   WRK-SANTEN
+           END-IF
+      *
       *    複数保険最終行
            MOVE    ZERO                TO  WRK-CNT-HKN
            PERFORM VARYING IDX-GEN     FROM    1   BY  1
@@ -5574,6 +5675,20 @@
                    COMPUTE WRK-SANTENSU    =   WRK-HKNKEI-KEIKEI
                                                        (IDX-GEN)
                                            -   WRK-SANTEN-GEN
+      *H28.4
+                   IF      FLG-GEN30-PSY       =   1
+                       MOVE    ZERO            TO  WRK-SANTEN-9
+                       COMPUTE WRK-SANTEN-9    =   WRK-HKNKEI-KEIKEI-2
+                                                       (IDX-GEN)
+                                               *   90
+                                               /   100.00
+                                               +   0.5
+                       MOVE    WRK-SANTEN-9    TO  WRK-SANTEN-GEN
+                       COMPUTE WRK-SANTENSU    =   WRK-HKNKEI-KEIKEI-2
+                                                       (IDX-GEN)
+                                               -   WRK-SANTEN-GEN
+                   END-IF
+      *
                    ADD     WRK-SANTENSU    TO  WRK-SANTEN-G
                END-IF
       *
@@ -5604,15 +5719,31 @@
       *
       *
            MOVE    ZERO                TO  FLG-ZAIEND2
+           MOVE    ZERO                TO  FLG-ARI2
            PERFORM VARYING     IDX-G   FROM    IDX BY  1
                    UNTIL      (IDX-G   >   SPA-MAX-LINE  )
                        OR    ( FLG-ZAIEND2     =   1     )
+      *H28.4
+      *        向精神薬以外あり
+               IF     (WRK-COM-INPUTCD (IDX-G)(1:1) =  "6")
+                  AND (WRK-COM-YOBI1 (IDX-G)(7:1)   =  SPACE)
+                   MOVE    1               TO  FLG-ARI2
+               END-IF
       *
                IF      WRK-COM-ZAIEND (IDX-G)  =   "1"
                    MOVE    1               TO  FLG-ZAIEND2
                    IF     (WRK-COM-KEI (IDX-G) =   ZERO   )
       *                剤点数がゼロの時、対象外
                        MOVE    ZERO            TO  FLG-NAIFUKU
+                   END-IF
+      *H28.4
+                   IF    ( WRK-ZAICNT          >=  7 )
+                       CONTINUE
+                   ELSE
+                       IF      FLG-ARI2        =   ZERO
+      *                向精神薬のみは対象外
+                           MOVE    ZERO            TO  FLG-NAIFUKU
+                       END-IF
                    END-IF
                END-IF
            END-PERFORM
@@ -5839,7 +5970,7 @@
       *****************************************************************
       *    向精神薬薬剤料逓減チェック処理
       *****************************************************************
-       30021-TAZAIGENTUIKA-CHK-SEC         SECTION.
+       30021-TAZAIGENTUIKA-CHK-SEC     SECTION.
       *
            MOVE    ZERO                TO  FLG-ZAIEND2
            MOVE    ZERO                TO  FLG-GENOK-ALL
@@ -5860,12 +5991,13 @@
                        MOVE    ZERO            TO  FLG-NAIFUKU
                    ELSE
       *                対象剤点数
-                       PERFORM 300212-ZAITENSYUKEI-SEC
+      ***************  PERFORM 300212-ZAITENSYUKEI-SEC
+                       PERFORM 300212-TAZAITENSYUKEI-SEC
                    END-IF
                END-IF
            END-PERFORM
            .
-       30021-GENTUIKA-CHK-EXT.
+       30021-TAZAIGENTUIKA-CHK-EXT.
            EXIT.
       *
       *
@@ -5874,42 +6006,8 @@
       *****************************************************************
        300211-GENTUIKACHK-HAN-SEC         SECTION.
       *
-           MOVE    ZERO                TO  FLG-GENOK
-      *
-           MOVE    SPACE               TO  PSYCHOTROPIC-REC
-           INITIALIZE                      PSYCHOTROPIC-REC
-           MOVE    WRK-COM-YAKKAKJNCD(IDX-G)
-                                       TO  PSYCHOTROPIC-CODE
-           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOSTYMD
-           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOEDYMD
-           MOVE    PSYCHOTROPIC-REC    TO  MCPDATA-REC
-           MOVE    "tbl_psychotropic"  TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_psychotropic"  TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC         TO  PSYCHOTROPIC-REC
-      *
-                   IF     (PSYCHOTROPIC-CLASS  >=  1  AND  <=  4 )
-                      MOVE    1                TO  FLG-GENOK
-                      MOVE    1                TO  FLG-GENOK-ALL
-                   END-IF
-               ELSE
-                   INITIALIZE                  PSYCHOTROPIC-REC
-                   MOVE    1                   TO  FLG-PSYCHOTROPIC
-               END-IF
-           ELSE
-               INITIALIZE                  PSYCHOTROPIC-REC
-               MOVE    1                   TO  FLG-PSYCHOTROPIC
-           END-IF
-           MOVE    "tbl_psychotropic" TO  MCP-TABLE
-           MOVE    "key"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           IF      FLG-GENOK          =   1
+           IF      WRK-COM-YOBI1 (IDX-G)(7:1)  NOT =   SPACE
+               MOVE    1                   TO  FLG-GENOK-ALL
                COMPUTE WRK-SYOKEIS2        =   WRK-COM-KISOTEN (IDX-G)
                                            *   WRK-COM-SURYO   (IDX-G)
                ADD     WRK-SYOKEIS2        TO  WRK-ZAIKEI
@@ -5923,7 +6021,6 @@
       *****************************************************************
        300212-ZAITENSYUKEI-SEC         SECTION.
       *
-      *    薬剤点数計算処理
            MOVE    WRK-ZAIKEI          TO  WRK-SYOKEIS2
            IF      WRK-SYOKEIS2        <=  15
                IF     (WRK-SYOKEIS2        >   ZERO       )
@@ -5940,6 +6037,17 @@
            COMPUTE WRK-SC90-YKZTEN     =   WRK-SYOKEIS3   + 0.999999
            COMPUTE WRK-ZAITEN-K        =   WRK-SC90-YKZTEN
                                        *   WRK-COM-KAISU(IDX-G)
+           .
+       300212-ZAITENSYUKEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    向精神薬薬剤料点数集計処理
+      *****************************************************************
+       300212-TAZAITENSYUKEI-SEC         SECTION.
+      *
+      *    薬剤点数計算処理
+           PERFORM 300212-ZAITENSYUKEI-SEC
       *
       *    頓服・外用毎の点数集計
            EVALUATE    WRK-CHK-SRYSYUKBN
@@ -5957,7 +6065,7 @@
                    PERFORM 30023-TAZAI23-GENCHK-SEC
            END-EVALUATE
            .
-       300212-ZAITENSYUKEI-EXT.
+       300212-TAZAITENSYUKEI-EXT.
            EXIT.
       *
       *H26.10
