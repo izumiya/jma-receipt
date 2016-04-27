@@ -2055,6 +2055,18 @@
                      (TNS-CDKBN-KOUBAN  =   5)
                     MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
               END-IF
+      *       障害者施設等入院基本料（医療区分）（夜勤時間超過減算）
+      *       （表用番号で判定不可の為、算定コードを直判定）
+              IF      TNS-SRYCD       = "190198910"  OR
+                                        "190199010"  OR
+                                        "190199110"  OR
+                                        "190199210"  OR
+                                        "190199310"  OR
+                                        "190199410"  OR
+                                        "190199510"  OR
+                                        "190199610"
+                    MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
+              END-IF
            END-IF
            .
       *
