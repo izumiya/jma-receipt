@@ -57,7 +57,8 @@
            03  FLG-SEISIN-CHK              PIC 9(01).
            03  FLG-SEISIN-SANTEI           PIC 9(01).
            03  FLG-NANBYO                  PIC 9(01).
-           03  FLG-PTCOM           PIC 9(01).
+           03  FLG-PTCOM                   PIC 9(01).
+           03  FLG-SEISIN-IGAI             PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -98,6 +99,7 @@
       *
       *    ２７年４月１日から２８年４月１日に精神病棟入院期間の入院履歴番号
            03  WRK-RRKNUM                  PIC 9(03).
+           03  WRK-RRKNUM2                 PIC 9(03).
            03  WRK-NYUINYMD                PIC X(08).
            03  WRK-NYUINYMDR   REDEFINES   WRK-NYUINYMD.
                05  WRK-NYUIN-YYMM          PIC 9(06).
@@ -442,6 +444,7 @@
       *
       *    事前に病棟情報（システム管理）から精神病棟の病棟番号を
       *    取得しておく
+           MOVE    ZERO                TO  FLG-SEISIN-IGAI
            MOVE    ZERO                TO  IDX-SYS
            MOVE    ZERO                TO  FLG-SYSKANRI
            INITIALIZE                      SYSKANRI-REC
@@ -467,6 +470,8 @@
                                        TO  WRK-CHKBTU-STYUKYMD(IDX-SYS)
                     MOVE   SYS-5001-EDYUKYMD
                                        TO  WRK-CHKBTU-EDYUKYMD(IDX-SYS)
+                 ELSE
+                    MOVE   1           TO  FLG-SEISIN-IGAI
                  END-IF
                  MOVE    "tbl_syskanri" TO  MCP-TABLE
                  MOVE    "key5"         TO  MCP-PATHNAME
@@ -487,6 +492,7 @@
       *    入院履歴より２７年４月１日以前から２８年４月１日まで継続して
       *    精神病床に入院しているか判定
            MOVE    ZERO                   TO  WRK-RRKNUM
+           MOVE    ZERO                   TO  WRK-RRKNUM2
            INITIALIZE                         PTNYUINRRK-REC
            MOVE    LNK-SKJKEEP-HOSPNUM    TO  PTNYUINRRK-HOSPNUM
            MOVE    LNK-SKJKEEP-PTID       TO  PTNYUINRRK-PTID
@@ -620,6 +626,8 @@
                                       MOVE    PTNYUINRRK-TENNYUYMD
                                            TO   WRK-SEI-NYUINYMD
                                                 LNK-SKJKEEP-SEI-NYUINYMD
+                                      MOVE    PTNYUINRRK-RRKNUM
+                                                TO  WRK-RRKNUM2
                                   END-IF
                                END-PERFORM
                                IF    WRK-MATCH2        =   SPACE
@@ -636,6 +644,36 @@
                MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
                MOVE    "key69"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
+      *
+      *        歴作成された入院歴が継続入院中であれば対象履歴の入院年月日
+      *        を返却
+               IF     (FLG-SEISIN-IGAI            =     ZERO)    AND
+                      (WRK-SEI-NYUINYMD          NOT =  SPACE)
+                   INITIALIZE                        PTNYUINRRK-REC
+                   MOVE    LNK-SKJKEEP-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+                   MOVE    LNK-SKJKEEP-PTID      TO  PTNYUINRRK-PTID
+                   COMPUTE PTNYUINRRK-RRKNUM  =    WRK-RRKNUM2  -  1
+                   MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
+                   MOVE    "key4"                TO  MCP-PATHNAME
+                   PERFORM 910-PTNYUINRRK-SELECT-SEC
+                   IF      FLG-PTNYUINRRK         =   ZERO
+                       MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                       MOVE    "key4"            TO  MCP-PATHNAME
+                       PERFORM   910-PTNYUINRRK-READ-SEC
+                       IF   (FLG-PTNYUINRRK          =   ZERO)   AND
+                            (PTNYUINRRK-JTIKBN       =   "6")    AND
+                            (PTNYUINRRK-NYUINCHUKBN  =   "1")
+                           MOVE    PTNYUINRRK-NYUINYMD
+                                           TO   WRK-SEI-NYUINYMD
+                                                LNK-SKJKEEP-SEI-NYUINYMD
+                       END-IF
+                   END-IF
+      *
+      *            患者入院履歴クローズ
+                   MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+                   MOVE    "key4"                  TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+               END-IF
       *
            END-IF
            .
