@@ -257,6 +257,30 @@
       *        特定入院基本料（障害者施設等入院基本料）
                WHEN    "190161210"
                   MOVE "190161310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等７対１入院基本料（医療区分２）
+               WHEN    "190189410"
+                  MOVE "190198910" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等７対１入院基本料（医療区分１）
+               WHEN    "190189510"
+                  MOVE "190199010" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１０対１入院基本料（医療区分２）
+               WHEN    "190189610"
+                  MOVE "190199110" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１０対１入院基本料（医療区分１）
+               WHEN    "190189710"
+                  MOVE "190199210" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１３対１入院基本料（医療区分２）
+               WHEN    "190189810"
+                  MOVE "190199310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１３対１入院基本料（医療区分１）
+               WHEN    "190189910"
+                  MOVE "190199410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１５対１入院基本料（医療区分２）
+               WHEN    "190190010"
+                  MOVE "190199510" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１５対１入院基本料（医療区分１）
+               WHEN    "190190110"
+                  MOVE "190199610" TO  LNK-YAKINGEN-CHGSRYCD
                WHEN    OTHER
                        CONTINUE
            END-EVALUATE
