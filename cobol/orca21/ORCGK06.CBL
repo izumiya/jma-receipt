@@ -1054,6 +1054,10 @@
                                        OR  "099800181"
                                        OR  "099800191"
                                        OR  "099800211"
+                                       OR  "099800221"
+                                       OR  "099800231"
+                                       OR  "099800241"
+                                       OR  "099800291"
                MOVE    1               TO  SPA-NAI-PLUSKBN
            ELSE
                MOVE    ZERO            TO  SPA-NAI-PLUSKBN
