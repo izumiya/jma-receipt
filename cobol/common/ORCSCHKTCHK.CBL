@@ -2238,7 +2238,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                                    TO  WRK-NT-SRYCD
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    99                  TO  IDY
+                       MOVE    200                 TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
