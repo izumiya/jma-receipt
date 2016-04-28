@@ -9383,7 +9383,7 @@
       *
            MOVE    313                 TO   WRK-ERR-CUR
            MOVE    SPACE               TO   WRK-NAI-SRYCD-G
-           PERFORM VARYING IDXB    FROM    WRK-STIDX   BY  1
+           PERFORM VARYING IDXB    FROM     1   BY  1
                    UNTIL ( IDXB    >   5 )
       *
                IF    ( SPA-GMN-Q01-SRYCD(IDXB)(1:1) NOT = "-" )
