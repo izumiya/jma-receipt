@@ -504,7 +504,7 @@
                INITIALIZE                  ORCSFTNRATEAREA
                MOVE    COMB-HOSPNUM        TO  LNK-FTNRATE-HOSPNUM
                MOVE    COMB-PTID           TO  LNK-FTNRATE-PTID
-               MOVE    SPA-SRYYMD          TO  LNK-FTNRATE-SRYYMD
+               MOVE    WRK-SRYYMD          TO  LNK-FTNRATE-SRYYMD
                MOVE    COMB-HKNCOMBINUM    TO  LNK-FTNRATE-HKNCOMBINUM
                MOVE    "1"                 TO  LNK-FTNRATE-KBN
                CALL    "ORCSFTNRATE"       USING
@@ -540,11 +540,11 @@
            END-IF
       *    £³ºÐÌ¤Ëþ¤Î»þ¡¢£²³ä¤ò¾å¸Â¤È¤¹¤ë
            IF    ((COMB-TEKEDYMD       >=  "20021001") AND
-                  (SPA-SRYYMD          >=  "20021001") AND
+                  (WRK-SRYYMD          >=  "20021001") AND
                   (WRK-NENREI          <   03        ))
       *    £È£²£°¡¥£´²þÀµ
              OR  ((COMB-TEKEDYMD       >=  "20080401") AND
-                  (SPA-SRYYMD          >=  "20080401") AND
+                  (WRK-SRYYMD          >=  "20080401") AND
                   (AGECHK-SYUGAKUKBN   =   1         ))
       *        ¼«Èñ¡¦¼£¸³
                IF     (HKN-HKNKOHSBTKBN    =   "8"  OR  "9"    )
@@ -816,8 +816,8 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   ORCSHKN-HKN-MAX )  OR
                               (FLG-HKNCOMBICHK =   1   )
-               IF      (SPA-SRYYMD     >=  ORCSHKN-NAI-TEKSTYMD(IDX))
-                   AND (SPA-SRYYMD     <=  ORCSHKN-NAI-TEKEDYMD(IDX))
+               IF      (WRK-SRYYMD     >=  ORCSHKN-NAI-TEKSTYMD(IDX))
+                   AND (WRK-SRYYMD     <=  ORCSHKN-NAI-TEKEDYMD(IDX))
                    IF      WRK-HKNCOMBINUM
                                        =   ORCSHKN-GMN-HKNCOMBINUM
                                                                 (IDX)
@@ -849,8 +849,8 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   ORCSHKN-HKN-MAX
                MOVE    ZERO                TO  WRK-CNT-HKN2
-               IF      (SPA-SRYYMD     >=  ORCSHKN-NAI-TEKSTYMD(IDX))
-                   AND (SPA-SRYYMD     <=  ORCSHKN-NAI-TEKEDYMD(IDX))
+               IF      (WRK-SRYYMD     >=  ORCSHKN-NAI-TEKSTYMD(IDX))
+                   AND (WRK-SRYYMD     <=  ORCSHKN-NAI-TEKEDYMD(IDX))
                    AND (ORCSHKN-GMN-HKNCOMBINUM (IDX)
                                        NOT =   "9999"    )
       *
@@ -916,7 +916,7 @@
            MOVE    SPA-PTID            TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
-           MOVE    SPA-SRYYMD          TO  JYURRK-SRYYMD
+           MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
