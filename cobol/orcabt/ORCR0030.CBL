@@ -2528,6 +2528,8 @@
            03  CONS-NINRYO5-COMMENT  PIC X(09)  VALUE  "180047810".
       *    ΩÈ≤ÛªªƒÍ°°°°°°∑Ó°°°°∆¸
            03  CONS-NINRYO6-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    ∞ÂŒ≈¥—ª°«ß√ŒŒ≈À°°¶«ß√Œπ‘∆∞Œ≈À°° ¿∫ø¿ ›∑ÚªÿƒÍ∞Â§»¥«∏Óª’§¨∂¶∆±°À
+           03  CONS-NINRYO7-COMMENT  PIC X(09)  VALUE  "188010610".
       *
       *    «ß√Œæ…¿ÏÃÁø«√«¥…Õ˝Œ¡£≤
            03  CONS-NINSEN-COMMENT   PIC X(09)  VALUE  "113014610".
@@ -2589,6 +2591,8 @@
            03  CONS-IZONSYO-COMMENT  PIC X(09)  VALUE  "180047910".
       *    º£Œ≈≥´ªœ∆¸°°°°°°∑Ó°°°°∆¸
            03  CONS-IZONSYO2-COMMENT PIC X(09)  VALUE  "840000076".
+      *    ∞ÂŒ≈¥—ª°∞Õ¬∏æ…Ω∏√ƒŒ≈À°
+           03  CONS-IZONSYO3-COMMENT PIC X(09)  VALUE  "188010710".
       *
       *    ¿∫ø¿≤ Ω≈æ…¥µº‘¡·¥¸Ω∏√ÊªŸ±Á¥…Õ˝Œ¡£±° √±∞Ï∑˙ ™£±øÕ°À
            03  CONS-SEIJYU-COMMENT   PIC X(09)  VALUE  "180042110".
@@ -12797,6 +12801,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 AND (FLG-NINRYO-COM   =     ZERO                )
                         MOVE   "5"    TO    RECE04-FLG-NINRYO-COMMENT
                 END-IF
+                IF  (SRY-SRYCD(IDX2)  =     CONS-NINRYO7-COMMENT)
+                AND (FLG-NINRYO-COM   =     ZERO                )
+                        MOVE   "7"    TO    RECE04-FLG-NINRYO-COMMENT
+                END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO6-COMMENT
                         MOVE  SPACE   TO    RECE04-FLG-NINRYO-COMMENT
                         MOVE    1     TO    FLG-NINRYO-COM
@@ -12829,8 +12837,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
               IF   RECE02-SRYYM      >=    "201604"
-                IF  (SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT)
-                AND (FLG-IZONSYO-COM  =     ZERO                )
+                IF  (SRY-SRYCD(IDX2)  =     CONS-IZONSYO-COMMENT
+                                      OR    CONS-IZONSYO3-COMMENT)
+                AND (FLG-IZONSYO-COM  =     ZERO                 )
                         MOVE   "1"    TO    RECE04-FLG-IZONSYO-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-IZONSYO2-COMMENT
@@ -13620,6 +13629,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      OR CONS-NINRYO3-COMMENT
                                      OR CONS-NINRYO4-COMMENT
                                      OR CONS-NINRYO5-COMMENT
+                                     OR CONS-NINRYO7-COMMENT
                  MOVE   19            TO  WRK-SETCOM-JIDO
            END-IF
       *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
@@ -13641,6 +13651,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            END-IF
       *    ∞Õ¬∏æ…Ω∏√ƒŒ≈À°
            IF    RECE05-SRYCD(IDX4)   = CONS-IZONSYO-COMMENT
+                                     OR CONS-IZONSYO3-COMMENT
                  MOVE   33            TO  WRK-SETCOM-JIDO
            END-IF
       *    ¿∫ø¿≤ Ω≈æ…¥µº‘¡·¥¸Ω∏√ÊªŸ±Á¥…Õ˝Œ¡
@@ -14366,6 +14377,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *    ΩÈø«§Œ•Ï•ª≈¿øÙÕÛ§Œ ‘Ω∏
                WHEN    "11"
                    IF   WRK-TNS-CHUKSNTUBAN(IDX3)   =   "0"
+                   AND  SRY-SRYCD(IDX3)(1:1)        =   "1"
                         ADD   WK-ZAIKAISU  TO   RECE02-KAISU(1)
                    END-IF
       *
@@ -14482,6 +14494,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
                                                      CONS-KEIZOKU2 )
                        OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT =  "0"  )
+                       OR ( SRY-SRYCD(IDX3)(1:1)       NOT =  "1"  )
                            CONTINUE
                        ELSE
                            ADD   WK-ZAIKAISU    TO   RECE02-KAISU(2)
@@ -14523,6 +14536,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
                                                      CONS-KEIZOKU2 )
                        OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"   )
+                       OR ( SRY-SRYCD(IDX3)(1:1)       NOT = "1"   )
                            CONTINUE
                        ELSE
                            ADD   WK-ZAIKAISU    TO   RECE02-KAISU(2)

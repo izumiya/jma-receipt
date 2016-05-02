@@ -827,6 +827,8 @@
            03  CONS-NINRYO4         PIC X(09) VALUE "188007010".
       *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿ÀÊÝ·ò»ØÄê°å¤È´Ç¸î»Õ¤¬¶¦Æ±¤Ç¹Ô¤¦¾ì¹ç¡Ë
            03  CONS-NINRYO5         PIC X(09) VALUE "180047810".
+      *    °åÎÅ´Ñ»¡Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿ÀÊÝ·ò»ØÄê°å¤È´Ç¸î»Õ¤¬¶¦Æ±¡Ë
+           03  CONS-NINRYO7         PIC X(09) VALUE "188010610".
       *
       *    Ç§ÃÎ¾ÉÀìÌç¿ÇÃÇ´ÉÍýÎÁ£²
            03  CONS-NINSEN          PIC X(09) VALUE "113014610".
@@ -9353,6 +9355,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                    MOVE  CONS-NINRYO4       TO  SANTEI-SRYCD
                  WHEN      "5"
                    MOVE  CONS-NINRYO5       TO  SANTEI-SRYCD
+                 WHEN      "7"
+                   MOVE  CONS-NINRYO7       TO  SANTEI-SRYCD
                END-EVALUATE
                MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                 TO  SANTEI-SRYKA
@@ -9835,9 +9839,19 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                PERFORM  VARYING  IDX  FROM  1  BY  1
                          UNTIL  (IDX               >   5    )
                           OR    (RECE05-SRYCD(IDX) =   SPACE)
+                 IF  ((RECE05-SRYCD(IDX)(1:1)  =  "8"  ) OR
+                      (RECE05-SRYCD(IDX)(1:3)  =  "008"))
+                 AND ( RECE05-NAME(IDX)        =  SPACE )
+                   CONTINUE
+                 ELSE
+                   IF  (RECE05-SRYCD(IDX)(1:1)  =  "8"  )
+                   OR  (RECE05-SRYCD(IDX)(1:3)  =  "008")
+                     MOVE  "810000001"  TO   RECE05-SRYCD(IDX)
+                   END-IF
                    ADD    1   TO   IDX-RECE05
                    MOVE   RECE05-SRYACT-TBL(IDX)
                               TO   WRK-RECE05XX-SRYACT-TBL(IDX-RECE05 1)
+                 END-IF
                END-PERFORM
                PERFORM  990-RECE05-NEXT-SEC
              END-PERFORM
@@ -11710,7 +11724,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
                           "113003410" OR
       *19
                           "180033210" OR "180035910" OR "188006210" OR
-                          "188007010" OR "180047810" OR
+                          "188007010" OR "180047810" OR "188010610" OR
       *20
                           "700010000" OR "700030000" OR "700050000" OR
                           "700080000" OR "700110000" OR "700140000" OR
@@ -11746,7 +11760,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO  SANTEI-HOSPNUM
       *32
                           "114006410" OR "114015010" OR
       *33
-                          "180047910" OR
+                          "180047910" OR "188010710" OR
       *35
                           "180042110" OR "180042410" OR "180048710" OR
                           "180048810"
