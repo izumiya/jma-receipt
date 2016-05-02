@@ -12089,6 +12089,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    WHEN    "114011970"
                    WHEN    "114017570"
                    WHEN    "114017870"
+      *
+                   WHEN    "114029270"
+                   WHEN    "114029370"
+                   WHEN    "114029470"
+                   WHEN    "114029570"
+                   WHEN    "114029970"
+                   WHEN    "114030070"
+                   WHEN    "114030170"
+                   WHEN    "114030270"
                    IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
                    END-IF
@@ -15234,7 +15243,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         (SRY-SRYCD(IDX3)     NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)     NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)     NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)     NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)     NOT =    "114030270")))
                    OR (  FLG-OSINKBN             =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE02-KAISU(11)

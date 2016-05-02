@@ -4331,6 +4331,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114011970"
                    WHEN    "114017570"
                    WHEN    "114017870"
+      *
+                   WHEN    "114029270"
+                   WHEN    "114029370"
+                   WHEN    "114029470"
+                   WHEN    "114029570"
+                   WHEN    "114029970"
+                   WHEN    "114030070"
+                   WHEN    "114030170"
+                   WHEN    "114030270"
                    IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
                    END-IF
@@ -8043,7 +8052,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         END-EVALUATE
                       END-IF
                       IF    RECE82-KOMUKBN  =   "2"
-                        IF  TNS-CHUKSNTUBAN  NOT = "0"
+                        IF  TNS-CHUKSNTUBAN       NOT = "0"
+                        OR  SRY-SRYCD(IDX3)(1:1)  NOT = "1"
                             CONTINUE
                         ELSE
                             ADD   WK-ZAIKAISU  TO   RECE82-KAISU(1)
@@ -8158,7 +8168,15 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE82-KAISU(13)

@@ -4210,6 +4210,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114011970"
                    WHEN    "114017570"
                    WHEN    "114017870"
+      *
+                   WHEN    "114029270"
+                   WHEN    "114029370"
+                   WHEN    "114029470"
+                   WHEN    "114029570"
+                   WHEN    "114029970"
+                   WHEN    "114030070"
+                   WHEN    "114030170"
+                   WHEN    "114030270"
                    IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
                    END-IF
@@ -6701,7 +6710,15 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE41-KAISU(11)
@@ -7244,7 +7261,15 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(6)  =
@@ -7715,7 +7740,15 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(7)  =
@@ -8473,6 +8506,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
       **                 IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
       **                                              CONS-KEIZOKU2 )
       **                 OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
+      **                 OR ( SRY-SRYCD(IDX3)(1:1)       NOT = "1"  )
       **                     CONTINUE
       **                 ELSE
                              IF   FLG-COUNT-ARI  =  ZERO
@@ -8607,6 +8641,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                                CONS-DOUJITU2-GAI  OR
                                                CONS-DOUJITU3-GAI
                         IF   WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                        OR   SRY-SRYCD(IDX3)(1:1)       NOT = "1"
                             CONTINUE
                         ELSE
                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
@@ -8652,6 +8687,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
                                                      CONS-KEIZOKU2 )
                         OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
+                        OR ( SRY-SRYCD(IDX3)(1:1)       NOT = "1"  )
                             CONTINUE
                         ELSE
                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
@@ -8880,7 +8916,15 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        COMPUTE   RECE41-TENSU(8)   =
@@ -9463,6 +9507,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                       END-IF
                       IF    RECE41-KOMUKBN  =   "2"
                         IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                        OR  SRY-SRYCD(IDX3)(1:1)       NOT = "1"
                             CONTINUE
                         ELSE
                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(1)
@@ -9517,6 +9562,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                            END-IF
                          END-IF
                          IF  WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                         OR  SRY-SRYCD(IDX3)(1:1)       NOT = "1"
                              CONTINUE
                          ELSE
                              ADD   WK-ZAIKAISU  TO   RECE41-KAISU(3)
@@ -9529,6 +9575,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                            IF ( SRY-SRYCD(IDX3)   =   CONS-KEIZOKU1  OR
                                                       CONS-KEIZOKU2  )
                            OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0" )
+                           OR ( SRY-SRYCD(IDX3)(1:1)       NOT = "1" )
                              CONTINUE
                            ELSE
                              ADD    WK-ZAIKAISU  TO  RECE41-KAISU(2)
@@ -9802,7 +9849,15 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029270")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029370")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114029970")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030170")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114030270")))
                    OR (  FLG-OSINKBN           =     9           )
                        MOVE   1              TO   FLG-ZAITAKU
                        ADD    WK-ZAIKAISU    TO   RECE41-KAISU(13)
