@@ -8207,9 +8207,19 @@
                PERFORM  VARYING  IDX  FROM  1  BY  1
                          UNTIL  (IDX               >   5    )
                           OR    (RECE45-SRYCD(IDX) =   SPACE)
+                  IF  ((RECE45-SRYCD(IDX)(1:1)  =  "8"  ) OR
+                       (RECE45-SRYCD(IDX)(1:3)  =  "008"))
+                  AND ( RECE45-NAME(IDX)        =  SPACE )
+                    CONTINUE
+                  ELSE
+                    IF  (RECE45-SRYCD(IDX)(1:1)  =  "8"  )
+                    OR  (RECE45-SRYCD(IDX)(1:3)  =  "008")
+                      MOVE  "810000001"  TO   RECE45-SRYCD(IDX)
+                    END-IF
                     ADD    1   TO  IDX-RECE45
                     MOVE   RECE45-SRYACT-TBL(IDX)
                                TO  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
+                  END-IF
                END-PERFORM
                PERFORM  990-RECE45-NEXT-SEC
              END-PERFORM

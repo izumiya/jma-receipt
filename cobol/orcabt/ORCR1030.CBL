@@ -6908,9 +6908,19 @@ grpsys     MOVE    RECE100-HOSPNUM      TO  SANTEI-HOSPNUM
                PERFORM  VARYING  IDX  FROM  1  BY  1
                          UNTIL  (IDX                >   5    )
                           OR    (RECE130-SRYCD(IDX) =   SPACE)
+                 IF  ((RECE130-SRYCD(IDX)(1:1)  =  "8"  ) OR
+                      (RECE130-SRYCD(IDX)(1:3)  =  "008"))
+                 AND ( RECE130-NAME(IDX)        =  SPACE )
+                   CONTINUE
+                 ELSE
+                   IF  (RECE130-SRYCD(IDX)(1:1)  =  "8"  )
+                   OR  (RECE130-SRYCD(IDX)(1:3)  =  "008")
+                     MOVE  "810000001"  TO   RECE130-SRYCD(IDX)
+                   END-IF
                    ADD   1   TO  IDX-RECE130
                    MOVE  RECE130-SRYACT-TBL(IDX)
                              TO  WRK-RECE130XX-SRYACT-TBL(IDX-RECE130 1)
+                 END-IF
                END-PERFORM
                PERFORM  990-RECE130-NEXT-SEC
              END-PERFORM
