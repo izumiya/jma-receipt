@@ -9909,7 +9909,8 @@
            EVALUATE    SRY-SRYKBN
       *    初診のレセ点数欄の編集
                WHEN    "11"
-                   IF   TNS-CHUKSNTUBAN   =   "0"
+                   IF   TNS-CHUKSNTUBAN        =   "0"
+                   AND  SRY-SRYCD(IDX3)(1:1)   =   "1"
                         ADD   WK-ZAIKAISU  TO   RECE62-KAISU(1)
                    END-IF
       ***          IF   TNS-DATAKBN  =   2
