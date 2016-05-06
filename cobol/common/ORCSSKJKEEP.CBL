@@ -526,7 +526,7 @@
                        PERFORM   910-PTNYUINRRK-READ-SEC
                        DISPLAY    "========  FLG-PTNYUINRRK(2) = "
                                              FLG-PTNYUINRRK
-                       MOVE     SPACE             TO  WRK-MATCH
+      **                 MOVE     SPACE             TO  WRK-MATCH
                        PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)  OR
                                          (WRK-MATCH        =  "NG")
       **                     MOVE     SPACE             TO  WRK-MATCH
@@ -544,6 +544,7 @@
                                                                      OR
                               ((PTNYUINRRK-TENNYUYMD  <= "20160401") AND
                                (PTNYUINRRK-TENSTUYMD  >= "20160401"))
+                               MOVE     SPACE             TO  WRK-MATCH
                                PERFORM    VARYING   IDX1  FROM  1  BY  1
                                  UNTIL   (IDX1      >     IDX-SYS)
                                   IF   WRK-CHKBTU-NUM(IDX1)  = 
