@@ -1703,7 +1703,7 @@
            MOVE    ZERO            TO  LNK-SYU-RESE-YKZ-FTN.
       *
            PERFORM   VARYING   IDX   FROM   1    BY   1
-             UNTIL   IDX   >   10
+             UNTIL   IDX   >   14
                   MOVE    ZERO     TO  LNK-SYU-SHOKUJI(IDX)
                                        LNK-SYU-SHOKUJI-NISSU(IDX)
            END-PERFORM.              
