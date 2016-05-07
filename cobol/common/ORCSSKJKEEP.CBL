@@ -59,6 +59,7 @@
            03  FLG-NANBYO                  PIC 9(01).
            03  FLG-PTCOM                   PIC 9(01).
            03  FLG-SEISIN-IGAI             PIC 9(01).
+           03  FLG-KEIZOKU                 PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -113,6 +114,8 @@
       *
            03  WRK-MATCH                   PIC X(02).
            03  WRK-MATCH2                  PIC X(02).
+           03  WRK-MATCH3                  PIC X(02).
+           03  WRK-SHONUM                  PIC 9(03).
       *
       *    システム予約コードの入力日と該当する入院履歴番号
            03  WRK-SYSYYK-TBL              OCCURS  20.
@@ -604,6 +607,8 @@
       *        精神入院年月日のセット
                MOVE   WRK-SEI-NYUINYMD  TO  LNK-SKJKEEP-SEI-NYUINYMD
       *
+               MOVE    ZERO                  TO  FLG-KEIZOKU
+               MOVE    ZERO                  TO  WRK-SHONUM
                INITIALIZE                        PTNYUINRRK-REC
                MOVE    LNK-SKJKEEP-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
                MOVE    LNK-SKJKEEP-PTID      TO  PTNYUINRRK-PTID
@@ -629,6 +634,11 @@
                                                 LNK-SKJKEEP-SEI-NYUINYMD
                                       MOVE    PTNYUINRRK-RRKNUM
                                                 TO  WRK-RRKNUM2
+                                      IF      PTNYUINRRK-SHOKAIKBN = "2"
+                                        MOVE  1   TO  FLG-KEIZOKU
+                                        MOVE  PTNYUINRRK-SHONUM
+                                                  TO  WRK-SHONUM
+                                      END-IF
                                   END-IF
                                END-PERFORM
                                IF    WRK-MATCH2        =   SPACE
@@ -645,6 +655,48 @@
                MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
                MOVE    "key69"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
+      *
+               DISPLAY  "FLG-KEIZOKU = " FLG-KEIZOKU
+      *        精神病床の初回入院年月日のセット
+               IF      FLG-KEIZOKU      =    1
+                 INITIALIZE                        PTNYUINRRK-REC
+                 MOVE    LNK-SKJKEEP-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+                 MOVE    LNK-SKJKEEP-PTID      TO  PTNYUINRRK-PTID
+                 MOVE    WRK-SHONUM            TO  PTNYUINRRK-SHONUM
+                 MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
+                 MOVE    "key70"               TO  MCP-PATHNAME
+                 PERFORM 910-PTNYUINRRK-SELECT-SEC
+                 IF      FLG-PTNYUINRRK         =   ZERO
+                   MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                   MOVE    "key70"            TO  MCP-PATHNAME
+                   PERFORM   910-PTNYUINRRK-READ-SEC
+                   MOVE     SPACE             TO  WRK-MATCH3
+                   PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)  OR
+                                     (WRK-MATCH3       =  "OK")
+                       IF   PTNYUINRRK-TENNYUYMD  <= "20150401"
+                           PERFORM    VARYING   IDX1  FROM  1  BY  1
+                             UNTIL   (IDX1      >     IDX-SYS)
+                              IF   WRK-CHKBTU-NUM(IDX1)  = 
+                                                  PTNYUINRRK-BTUNUM
+                                  MOVE   "OK"     TO   WRK-MATCH3
+                                  MOVE    PTNYUINRRK-TENNYUYMD
+                                       TO   WRK-SEI-NYUINYMD
+                                            LNK-SKJKEEP-SEI-NYUINYMD
+                                  MOVE    PTNYUINRRK-RRKNUM
+                                                TO  WRK-RRKNUM2
+                              END-IF
+                           END-PERFORM
+                       END-IF
+                       MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                       MOVE    "key70"            TO  MCP-PATHNAME
+                       PERFORM 910-PTNYUINRRK-READ-SEC
+                   END-PERFORM
+                 END-IF
+      *          患者入院履歴クローズ
+                 MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+                 MOVE    "key70"                 TO  MCP-PATHNAME
+                 PERFORM   900-CLOSE-SEC
+               END-IF
       *
       *        歴作成された入院歴が継続入院中であれば対象履歴の入院年月日
       *        を返却
