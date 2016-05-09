@@ -4501,6 +4501,21 @@
                PERFORM   900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+      *
+      *            平成２８年改定で新設された入院料加算の注の加算を
+      *            告示等識別区分１を７から１に置き換える
+      *            夜間看護体制加算（急性期看護補助体制加算）
+                   IF      TNS-SRYCD       =   "190190770"
+                      MOVE   1             TO   TNS-KOKUJISKBKBN1
+                   END-IF
+      *            夜間７５対１看護補助加算
+                   IF      TNS-SRYCD       =   "190191170"
+                      MOVE   1             TO   TNS-KOKUJISKBKBN1
+                   END-IF
+      *            夜間看護体制加算（看護補助加算）
+                   IF      TNS-SRYCD       =   "190191270"
+                      MOVE   1             TO   TNS-KOKUJISKBKBN1
+                   END-IF
                    MOVE    ZERO                TO  FLG-TENSU
                ELSE
                    MOVE    1                   TO  FLG-TENSU
