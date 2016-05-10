@@ -719,6 +719,36 @@
                            MOVE    PTNYUINRRK-NYUINYMD
                                            TO   WRK-SEI-NYUINYMD
                                                 LNK-SKJKEEP-SEI-NYUINYMD
+      *
+      *
+      *                    歴作成分も初歴を遡って入院日を返却
+                           MOVE     PTNYUINRRK-SHONUM    TO  WRK-SHONUM
+                           INITIALIZE                   PTNYUINRRK-REC
+                           MOVE    LNK-SKJKEEP-HOSPNUM   TO
+                                                     PTNYUINRRK-HOSPNUM
+                           MOVE    LNK-SKJKEEP-PTID      TO
+                                                     PTNYUINRRK-PTID
+                           MOVE    WRK-SHONUM            TO
+                                                     PTNYUINRRK-SHONUM
+                           MOVE    "tbl_ptnyuinrrk"      TO MCP-TABLE
+                           MOVE    "key71"               TO MCP-PATHNAME
+                           PERFORM 910-PTNYUINRRK-SELECT-SEC
+                           IF      FLG-PTNYUINRRK         =   ZERO
+                              MOVE    "tbl_ptnyuinrrk"   TO MCP-TABLE
+                              MOVE    "key71"            TO MCP-PATHNAME
+                              PERFORM   910-PTNYUINRRK-READ-SEC
+                              IF       FLG-PTNYUINRRK   =   ZERO
+                                 MOVE    PTNYUINRRK-TENNYUYMD
+                                         TO   WRK-SEI-NYUINYMD
+                                              LNK-SKJKEEP-SEI-NYUINYMD
+                              END-IF
+                           END-IF
+      *                   患者入院履歴クローズ
+                          MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+                          MOVE    "key71"              TO  MCP-PATHNAME
+                          PERFORM   900-CLOSE-SEC
+      *
+      *
                        END-IF
                    END-IF
       *
