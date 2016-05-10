@@ -705,7 +705,7 @@
                    INITIALIZE                        PTNYUINRRK-REC
                    MOVE    LNK-SKJKEEP-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
                    MOVE    LNK-SKJKEEP-PTID      TO  PTNYUINRRK-PTID
-                   COMPUTE PTNYUINRRK-RRKNUM  =    WRK-RRKNUM2  -  1
+                   MOVE    WRK-RRKNUM2           TO  PTNYUINRRK-RRKNUM
                    MOVE    "tbl_ptnyuinrrk"      TO  MCP-TABLE
                    MOVE    "key4"                TO  MCP-PATHNAME
                    PERFORM 910-PTNYUINRRK-SELECT-SEC
@@ -713,13 +713,7 @@
                        MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
                        MOVE    "key4"            TO  MCP-PATHNAME
                        PERFORM   910-PTNYUINRRK-READ-SEC
-                       IF   (FLG-PTNYUINRRK          =   ZERO)   AND
-                            (PTNYUINRRK-JTIKBN       =   "6")    AND
-                            (PTNYUINRRK-NYUINCHUKBN  =   "1")
-                           MOVE    PTNYUINRRK-NYUINYMD
-                                           TO   WRK-SEI-NYUINYMD
-                                                LNK-SKJKEEP-SEI-NYUINYMD
-      *
+                       IF   (FLG-PTNYUINRRK          =   ZERO)
       *
       *                    歴作成分も初歴を遡って入院日を返却
                            MOVE     PTNYUINRRK-SHONUM    TO  WRK-SHONUM
