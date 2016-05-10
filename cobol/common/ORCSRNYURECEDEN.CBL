@@ -3803,8 +3803,11 @@
                END-IF
                ADD   WRK-SKJ7-RYOYO-SU(IDX1)
                                      TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
-               ADD   WRK-SKJ7-RYOYO-RYU-SU(IDX1)
-                                     TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+      **         ADD   WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+      **                               TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
+               COMPUTE    WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                          WRK-SKJ7-SRYCDTOTAL(IDX1)  +
+                         (WRK-SKJ7-RYOYO-RYU-SU(IDX1)  *  3)
                ADD   WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
                                      TO  WRK-SKJ7-SRYCDTOTAL(IDX1)
                EVALUATE    WRK-SKJ7-TOKU-SHOKU-SU(IDX1)
