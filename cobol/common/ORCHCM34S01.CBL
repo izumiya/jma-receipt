@@ -266,6 +266,7 @@
            03  WRK-RATE3                       PIC 999V99.
            03  WRK-RATE4                       PIC 999V99.
            03  WRK-HASU                        PIC 9V99999.
+           03  WRK-ZAITEN                      PIC  9(08).
       *
       *    Æþ±¡ÎÁ
        01  WNYUINRYO-AREA.
@@ -5357,6 +5358,7 @@
                     AND  ( FLG-TOKTEIDAY (IDXD)        =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
+                           MOVE    TNS-TEN TO  WRK-ZAITEN
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
                        END-IF
                        MOVE    1           TO  WNYUINKSN-DAY
@@ -5381,6 +5383,7 @@
                     AND  ( FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
+                           MOVE    TNS-TEN TO  WRK-ZAITEN
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
                        END-IF
                        MOVE    1           TO  WNYUINKSN-DAY
@@ -5425,7 +5428,7 @@
                                                            (IDXA IDXB)
            END-IF
       *
-           MOVE    TNS-TEN             TO  WNYUINKSN-ZAITEN
+           MOVE    WRK-ZAITEN          TO  WNYUINKSN-ZAITEN
                                                            (IDXA IDXB)
       *
            MOVE    TNS-SRYCD           TO  WNYUINKSN-SRYCD
@@ -5480,7 +5483,8 @@
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4 )
                     AND  ( FLG-TOKTEIDAY (IDXD)        =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
-                           MOVE    1       TO  FLG-TAISYO
+                           MOVE    1               TO  FLG-TAISYO
+                           MOVE    NACCT-ZAITEN    TO  WRK-ZAITEN
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
                        END-IF
                        MOVE    1           TO  WNYUINKSN-DAY
@@ -5504,7 +5508,8 @@
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4 )
                     AND  ( FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
-                           MOVE    1       TO  FLG-TAISYO
+                           MOVE    1               TO  FLG-TAISYO
+                           MOVE    NACCT-ZAITEN    TO  WRK-ZAITEN
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
                        END-IF
                        MOVE    1           TO  WNYUINKSN-DAY
