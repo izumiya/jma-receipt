@@ -76,6 +76,7 @@
            03  WRK-MEISAISU                PIC 9(03).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-TANKI-KBN               PIC X(01).
+           03  WRK-TANKI-KBN2              PIC X(01).
       *
       *
       *****************************************************************
@@ -101,6 +102,9 @@
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
       *
+      *    点数マスタ−の短期滞在チェック用ワークレコード
+           COPY    "CPTENSU.INC"   REPLACING //TNS-//  BY  //TTNS-//.
+      *
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -120,6 +124,9 @@
       *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
+      *
+      *    特定入院料コード取得サブ
+           COPY  "CPORCSTOKNYUIN.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -257,8 +264,13 @@
                        MOVE   "01"            TO    TNS-YUKOSTYMD(7:2)
                                                     TNS-YUKOEDYMD(7:2)
                        PERFORM    910-TENSU-READ-SEC
-                       IF     (NACCT-ZAIKAISU    NOT =  ZERO)  OR
-                              (WRK-TANKI-KBN     =      "1")
+      *                短期滞在手術等基本料の場合、入院料の名称から、
+      *                記載対象であるかを再チェック
+                       PERFORM    210-TANKI-NAMECHK-SEC
+      *
+                       IF    ((NACCT-ZAIKAISU    NOT =  ZERO)  OR
+                              (WRK-TANKI-KBN     =      "1"))  AND
+                              (WRK-TANKI-KBN2    =      SPACE)
       *                  入院基本料単位の入院日数カウント
                          PERFORM    210-NYUIN-COUNT-SEC
                        END-IF
@@ -315,6 +327,7 @@
              UNTIL   (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX) = SPACE) OR
                      (FLG-MATCH        =   1 )     OR
                      (NYUIN-IDX    >   10)
+               DISPLAY  "NYUIN-IDX = " NYUIN-IDX
       *        点数マスタより入院料名称の取得（ワークとの比較用）
                INITIALIZE    TNS-TENSU-REC
                MOVE   NSRY-SRYCD(1)   TO    TNS-SRYCD
@@ -322,6 +335,7 @@
                                             TNS-YUKOEDYMD(1:6)
                MOVE   "01"            TO    TNS-YUKOSTYMD(7:2)
                                             TNS-YUKOEDYMD(7:2)
+               DISPLAY  "TNS-NAME = " TNS-NAME
                PERFORM    910-TENSU-READ-SEC
                EVALUATE   NSRY-SRYCD(1)
                    WHEN   "111111111"
@@ -618,6 +632,13 @@
                     ELSE
                         INITIALIZE  ORCSNYUINDAY-AREA
                     END-IF
+               DISPLAY "====(1)===================="
+               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
+                        LNK-ORCHCN02SUB-SYUBETUMEI(1)
+               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
+                        LNK-ORCHCN02SUB-SYUBETUMEI(2)
+               DISPLAY "ST-IDX = " ST-IDX
+               DISPLAY "ED-IDX = " ED-IDX
       *
                     PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                       UNTIL   IDX1      >   ED-IDX
@@ -634,6 +655,7 @@
                END-IF
            END-PERFORM
       *
+           DISPLAY "FLG-MATCH = " FLG-MATCH
       *
            IF   (FLG-MATCH     =     ZERO)   AND
                 (NYUIN-IDX     <=       10)
@@ -965,6 +987,13 @@
                    INITIALIZE  ORCSNYUINDAY-AREA
                END-IF
       *
+               DISPLAY "====(2)===================="
+               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
+                        LNK-ORCHCN02SUB-SYUBETUMEI(1)
+               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
+                        LNK-ORCHCN02SUB-SYUBETUMEI(2)
+               DISPLAY "ST-IDX = " ST-IDX
+               DISPLAY "ED-IDX = " ED-IDX
                PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                  UNTIL   IDX1      >   ED-IDX
                      IF   NACCT-DAY(IDX1)    NOT =  ZERO
@@ -1010,6 +1039,67 @@
       *
            .
        210-NYUINACT-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴から短期滞在のコードを取得し、入院会計算定のコードと突合
+      *    （不一致の場合は記載対象外）
+      *****************************************************************
+       210-TANKI-NAMECHK-SEC            SECTION.
+      *
+           MOVE    SPACE                    TO  WRK-TANKI-KBN2
+      *
+           INITIALIZE                           PTNYUINRRK-REC
+           MOVE    LNK-ORCHCN02SUB-HOSPNUM  TO  PTNYUINRRK-HOSPNUM
+           MOVE    LNK-ORCHCN02SUB-PTID     TO  PTNYUINRRK-PTID
+           MOVE    LNK-ORCHCN02SUB-NYUINYMD TO  PTNYUINRRK-NYUINYMD
+           MOVE    "tbl_ptnyuinrrk"         TO  MCP-TABLE
+           MOVE    "key72"                  TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK          =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key72"             TO  MCP-PATHNAME
+               PERFORM   910-PTNYUINRRK-READ-SEC
+               IF    FLG-PTNYUINRRK        =   ZERO
+                   ADD   PTNYUINRRK-TAISYONISSU
+                                       TO   LNK-ORCHCN02SUB-NISSU(1)
+               END-IF
+           END-IF
+      *
+      *    患者入院履歴クローズ
+           MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+           MOVE    "key72"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *    特定入院料コードをサブプロより取得
+           IF    (PTNYUINRRK-TOKUTEI-KBN   NOT =   SPACE)   AND
+                 (PTNYUINRRK-TOKUTEI-NYUIN NOT =   SPACE)
+             INITIALIZE                           ORCSTOKNYUIN-AREA
+             MOVE    PTNYUINRRK-TOKUTEI-KBN   TO  LNK-TOKNYUIN-KBN
+             MOVE    PTNYUINRRK-TOKUTEI-NYUIN TO  LNK-TOKNYUIN-NYUIN
+             MOVE    PTNYUINRRK-BTUNUM        TO  LNK-TOKNYUIN-BTUNUM
+             MOVE    PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                        TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+             MOVE    LNK-ORCHCN02SUB-NYUINYMD(1:6)
+                                            TO  LNK-TOKNYUIN-SANTEIYM
+             CALL    "ORCSTOKNYUIN"      USING    ORCSTOKNYUIN-AREA
+                                                  SPA-AREA
+             IF      LNK-TOKNYUIN-RC          =   ZERO
+               IF    LNK-TOKNYUIN-GAI-SRYCD =  SPACE
+                  INITIALIZE    TTNS-TENSU-REC
+                  MOVE   LNK-TOKNYUIN-SRYCD  TO    TTNS-SRYCD
+                  MOVE   LNK-ORCHCN02SUB-NYUINYMD(1:6)
+                                             TO    TTNS-YUKOSTYMD(1:6)
+                                                   TTNS-YUKOEDYMD(1:6)
+                  MOVE   "01"                TO    TTNS-YUKOSTYMD(7:2)
+                                                   TTNS-YUKOEDYMD(7:2)
+                  PERFORM    910-TTENSU-READ-SEC
+               END-IF
+             END-IF
+           END-IF
+      *
+           .
+       210-TANKI-NAMECHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1239,6 +1329,47 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        910-TENSU-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスターワーク読込（主キー）
+      *****************************************************************
+       910-TTENSU-READ-SEC         SECTION.
+      *
+           MOVE    SPA-HOSPNUM         TO  TTNS-HOSPNUM
+           MOVE    TTNS-TENSU-REC      TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "DBFETCH"           TO  MCP-FUNC
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TTNS-TENSU-REC
+      *            短期滞在の判定用
+                   IF     TTNS-NYUKHNKSNKBN =  226  OR  240
+                       IF    TNS-SRYCD   =    TTNS-SRYCD
+                          CONTINUE
+                       ELSE
+                          MOVE   "1"       TO  WRK-TANKI-KBN2
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+       910-TTENSU-READ-EXT.
            EXIT.
       *
       *****************************************************************
