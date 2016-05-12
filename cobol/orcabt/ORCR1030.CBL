@@ -1087,6 +1087,7 @@
            INITIALIZE                      TBL-COUNT-INF
       *
            INITIALIZE                      TBL-HASSYO-INF
+           INITIALIZE                      TBL-HASSYO9-INF
            INITIALIZE                      TBL-ZAISIEN-INF
            INITIALIZE                      TBL-HOMONCOM-NINZU-INF
       *

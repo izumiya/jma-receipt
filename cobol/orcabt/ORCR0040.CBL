@@ -1410,6 +1410,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            INITIALIZE                      WRK-JINZOU-AREA
       *
            INITIALIZE                      TBL-HASSYO-INF
+           INITIALIZE                      TBL-HASSYO9-INF
            INITIALIZE                      TBL-ZAISIEN-INF
            INITIALIZE                      TBL-HOMONCOM-NINZU-INF
       *

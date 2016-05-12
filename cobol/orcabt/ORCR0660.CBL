@@ -1378,6 +1378,7 @@
        200-MAIN-SEC                SECTION.
       *
            INITIALIZE                      TBL-HASSYO-INF
+           INITIALIZE                      TBL-HASSYO9-INF
            INITIALIZE                      TBL-ZAISIEN-INF
            INITIALIZE                      TBL-RYOCOM-INF
            INITIALIZE                      TBL-CYOJKSN-INF
