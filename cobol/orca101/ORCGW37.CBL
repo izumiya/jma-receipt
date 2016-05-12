@@ -348,7 +348,7 @@
                                            WRK-TNS-SRYCD
            MOVE    TANKI3-YUKOEDYMD (IDX1)
                                        TO  WRK-TNS-KJNYMD
-           PERFORM 900-TENSU-KEY-SEL-SEC
+           PERFORM 900-TENSU-KEY34-SEL-SEC
       *
            MOVE    SPACE               TO  SPA-GMN-CHK-LBLTANKI3 (IDX2)
            STRING  TNS-NAME                DELIMITED BY SPACE
@@ -1288,20 +1288,20 @@
       *****************************************************************
       *    点数マスタ検索処理
       *****************************************************************
-       900-TENSU-KEY-SEL-SEC       SECTION.
+       900-TENSU-KEY34-SEL-SEC     SECTION.
       *
            MOVE    ZERO            TO  FLG-TENSU
       *
            INITIALIZE                  TNS-TENSU-REC
       *
            MOVE    WRK-TNS-SRYCD   TO  TNS-SRYCD
-           MOVE    WRK-TNS-KJNYMD  TO TNS-YUKOSTYMD
-                                       TNS-YUKOEDYMD
+           MOVE    SPA-W01-EDYUKYMD  TO TNS-YUKOSTYMD
+           MOVE    SPA-W01-STYUKYMD  TO TNS-YUKOEDYMD
            MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
       *
            MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key34"         TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  TNS-TENSU-REC
@@ -1311,12 +1311,12 @@
            END-IF
       *
            MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "key34"         TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
       *
-       900-TENSU-KEY-SEL-SEL-EXT.
+       900-TENSU-KEY34-SEL-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ削除処理
