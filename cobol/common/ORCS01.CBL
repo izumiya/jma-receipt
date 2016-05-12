@@ -468,6 +468,7 @@
       *  04.08.06    NACL-ÌçÏÆ    16/03/14  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°
       *                                     ·îÅÓÃæ¼õµë¼Ô¾ÚÊÑ¹¹»þÉéÃ´¶â·×»»
       *                                     ¿À¸Í»ÔÂÐ±þ
+      *  04.08.07    NACL-ÌçÏÆ    16/04/27  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1753,7 +1754,7 @@
            MOVE    SPACE           TO  LNK-SYU-HKNTEKKBN.
       *
            PERFORM   VARYING   IDX   FROM   1    BY   1
-             UNTIL   IDX   >   10
+             UNTIL   IDX   >   14
                   MOVE    ZERO     TO  LNK-SYU-SHOKUJI(IDX)
                                        LNK-SYU-SHOKUJI-NISSU(IDX)
            END-PERFORM.              
@@ -17773,6 +17774,16 @@
                          MOVE    SYU-KOH-FTN     TO  WK-SYU-SYUCOMPFTN
                          COMPUTE WK-ENTANI = SYU-KOH-FTN-ENTANI + 0.9
                          MOVE    ZERO            TO  FLG-TAISYO
+                      END-IF
+                      IF  ( FLG-TOKYO           =  1    )
+                      AND ((COMB-KOH2HKNNUM     = "974") OR
+                           (COMB-KOH3HKNNUM     = "974") OR
+                           (COMB-KOH4HKNNUM     = "974"))
+                      AND ( COMB-KOH1HKNNUM NOT =
+                                         SYU-KOH1HKNNUM )
+                         MOVE    ZERO            TO  WK-SYU-SYUCOMPFTN
+                         MOVE    ZERO            TO  WK-ENTANI
+                         MOVE    1               TO  FLG-TAISYO
                       END-IF
                     END-IF
                  ELSE
