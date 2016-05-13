@@ -200,8 +200,8 @@
                MOVE    MCPDATA-REC TO   SYS-5000-REC
       *        入院料加算
                PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL  (SYS-5000-KSNCD(IDX7)    =   SPACE)  OR
-                        (IDX7                    >   20)
+                 UNTIL  (IDX7                    >   20)     OR
+                        (SYS-5000-KSNCD(IDX7)    =   SPACE)
                     IF   SYS-5000-KSNKBN(IDX7)   =   "2"
       *                 平成２８年４月以降の病院設定は乳幼児加算(病院）だけと
       *                 なるので、患者年齢で置き換えする（診療所は従前のまま）
