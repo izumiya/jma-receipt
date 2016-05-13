@@ -1451,6 +1451,9 @@
            MOVE    AGECHK-NENREI2-YY   TO  SPA-NENREI-YY
            MOVE    AGECHK-NENREI2-MM   TO  SPA-NENREI-MM
            MOVE    AGECHK-NENREI2-DD   TO  SPA-NENREI-DD
+      *H28.4
+      *    未就学前
+           MOVE    AGECHK-SYUGAKUKBN   TO  SPA-SYUGAKUKBN
       *
       *    入外区分判定
            PERFORM 200211-NYUGAIKBN-CHK-SEC
@@ -1626,12 +1629,28 @@
                ADD     1                   TO  IDK
                MOVE    "W12"               TO  WRK-KEICD (IDK)
            END-IF
-      *    小児科外来診察料の同日算定済み
+      *    小児科外来診療料の同日算定済み
            IF     (LNK-SC10S-IDX2      =   ZERO )
               AND (SPA-SYONIKA-ARI2    =   1    )
                ADD     1                   TO  IDK
                MOVE    "W14"               TO  WRK-KEICD (IDK)
            END-IF
+      *H28.5
+      *    地域包括診療料算定時、ダミー
+           IF      (SPA-NNCHKT-ARI2     =   1      )
+               IF      SPA-COM-INPUTCD(1)(1:1) NOT =   "1"
+                   ADD     1                   TO  IDK
+                   MOVE    "W22"               TO  WRK-KEICD (IDK)
+               END-IF
+           END-IF
+      *H28.5
+      *    小児かかりつけ診療料の同日算定済み
+           IF     (LNK-SC10S-IDX2      =   ZERO )
+              AND (SPA-SYONIKKR-ARI2   =   1    )
+               ADD     1                   TO  IDK
+               MOVE    "W23"               TO  WRK-KEICD (IDK)
+           END-IF
+      *
       *    初診料の併用エラー
            IF      SPA-SYOSIN-KEI      =   1
       *        当月前に併用算定がある時、病名がすべて治癒である
@@ -2827,11 +2846,24 @@
                                                INTO    WRK-ERRMSG
                END-STRING
            WHEN    "W14"
-               STRING  "当日に小児科外来診察料を算定しています。"
+               STRING  "当日に小児科外来診療料を算定しています。"
                        "診察料は算定できません。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
+      *H28.5
+           WHEN    "W22"
+               STRING  "認知症地域包括診療料が算定済みです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "W23"
+               STRING  "当日に小児かかりつけ診療料を算定しています。"
+                       "診察料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+      *
            WHEN    "W17"
                STRING  "保険組合せが診察料の自動算定の対象外です。"
                                                DELIMITED  BY  SIZE
