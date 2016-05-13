@@ -1252,8 +1252,9 @@ path	key72		{
 		FROM tbl_ptnyuinrrk
 			WHERE   HOSPNUM      =   :HOSPNUM 
 			AND		PTID         =   :PTID
-			AND		RRKEDANUM    =   1
 			AND		NYUINYMD     =   :NYUINYMD
+			AND		TENNYUYMD    =   :TENNYUYMD
+			ORDER BY RRKEDANUM DESC
 		;
 	};
 };

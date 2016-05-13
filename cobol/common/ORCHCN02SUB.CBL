@@ -335,7 +335,7 @@
                                             TNS-YUKOEDYMD(1:6)
                MOVE   "01"            TO    TNS-YUKOSTYMD(7:2)
                                             TNS-YUKOEDYMD(7:2)
-               DISPLAY  "TNS-NAME = " TNS-NAME
+      *         DISPLAY  "TNS-NAME = " TNS-NAME
                PERFORM    910-TENSU-READ-SEC
                EVALUATE   NSRY-SRYCD(1)
                    WHEN   "111111111"
@@ -632,13 +632,13 @@
                     ELSE
                         INITIALIZE  ORCSNYUINDAY-AREA
                     END-IF
-               DISPLAY "====(1)===================="
-               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
-                        LNK-ORCHCN02SUB-SYUBETUMEI(1)
-               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
-                        LNK-ORCHCN02SUB-SYUBETUMEI(2)
-               DISPLAY "ST-IDX = " ST-IDX
-               DISPLAY "ED-IDX = " ED-IDX
+      *         DISPLAY "====(1)===================="
+      *         DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
+      *                  LNK-ORCHCN02SUB-SYUBETUMEI(1)
+      *         DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
+      *                  LNK-ORCHCN02SUB-SYUBETUMEI(2)
+      *         DISPLAY "ST-IDX = " ST-IDX
+      *         DISPLAY "ED-IDX = " ED-IDX
       *
                     PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                       UNTIL   IDX1      >   ED-IDX
@@ -655,7 +655,7 @@
                END-IF
            END-PERFORM
       *
-           DISPLAY "FLG-MATCH = " FLG-MATCH
+      *     DISPLAY "FLG-MATCH = " FLG-MATCH
       *
            IF   (FLG-MATCH     =     ZERO)   AND
                 (NYUIN-IDX     <=       10)
@@ -987,13 +987,13 @@
                    INITIALIZE  ORCSNYUINDAY-AREA
                END-IF
       *
-               DISPLAY "====(2)===================="
-               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
-                        LNK-ORCHCN02SUB-SYUBETUMEI(1)
-               DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
-                        LNK-ORCHCN02SUB-SYUBETUMEI(2)
-               DISPLAY "ST-IDX = " ST-IDX
-               DISPLAY "ED-IDX = " ED-IDX
+      *         DISPLAY "====(2)===================="
+      *         DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(1) = "
+      *                  LNK-ORCHCN02SUB-SYUBETUMEI(1)
+      *         DISPLAY "LNK-ORCHCN02SUB-SYUBETUMEI(2) = "
+      *                  LNK-ORCHCN02SUB-SYUBETUMEI(2)
+      *         DISPLAY "ST-IDX = " ST-IDX
+      *         DISPLAY "ED-IDX = " ED-IDX
                PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                  UNTIL   IDX1      >   ED-IDX
                      IF   NACCT-DAY(IDX1)    NOT =  ZERO
@@ -1053,6 +1053,7 @@
            MOVE    LNK-ORCHCN02SUB-HOSPNUM  TO  PTNYUINRRK-HOSPNUM
            MOVE    LNK-ORCHCN02SUB-PTID     TO  PTNYUINRRK-PTID
            MOVE    LNK-ORCHCN02SUB-NYUINYMD TO  PTNYUINRRK-NYUINYMD
+                                                PTNYUINRRK-TENNYUYMD
            MOVE    "tbl_ptnyuinrrk"         TO  MCP-TABLE
            MOVE    "key72"                  TO  MCP-PATHNAME
            PERFORM 910-PTNYUINRRK-SELECT-SEC
@@ -1061,6 +1062,11 @@
                MOVE    "key72"             TO  MCP-PATHNAME
                PERFORM   910-PTNYUINRRK-READ-SEC
                IF    FLG-PTNYUINRRK        =   ZERO
+      *             DISPLAY "PTNYUINRRK  KEY72  READ"
+      *             DISPLAY "PTNYUINRRK-TOKUTEI-KBN = "
+      *                      PTNYUINRRK-TOKUTEI-KBN
+      *             DISPLAY "PTNYUINRRK-TOKUTEI-NYUIN = "
+      *                      PTNYUINRRK-TOKUTEI-NYUIN
                    ADD   PTNYUINRRK-TAISYONISSU
                                        TO   LNK-ORCHCN02SUB-NISSU(1)
                END-IF
