@@ -165,6 +165,9 @@
       *    算定可能入院料取得
            COPY    "CPORCSNYUINRYO.INC".
       *
+      *    入院オーダーエラーメッセージ取得
+           COPY    "CPORCSODRS03.INC".
+      *
       *    入院異動チェックサブ
            COPY    "CPORCSODR.INC".
        01  LNK-ODRITEM-REC.
@@ -1165,16 +1168,12 @@
       *
            MOVE    SPACE               TO  WRK-ERRMSG
       *
-           PERFORM VARYING IDXE    FROM   1   BY  1
-                   UNTIL ( IDXE    >   NCLAIMERRCD-MAX )
-                    OR   ( WRK-ERRMSG  NOT =   SPACE )
-      *
-               IF    ( NCLAIMERRCDL (IDXE) =   WRK-ERRCD )
-                   MOVE    NCLAIMERRCDLMEI  (IDXE)
-                                       TO  WRK-ERRMSG
-               END-IF
-      *
-           END-PERFORM
+           INITIALIZE                      SODRS03-AREA
+           MOVE    WRK-ERRCD           TO  SODRS03-ERRCD
+           CALL    "ORCSODRS03"            USING
+                                           SODRS03-AREA
+           MOVE    SODRS03-ERRCD       TO  WRK-ERRCD
+           MOVE    SODRS03-ERRMSG      TO  WRK-ERRMSG
       *
            .
        890-ERRCD-MSG-EXT.

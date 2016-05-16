@@ -1451,7 +1451,7 @@
                MOVE    SPA-GMN-TALLERRCD (IDX-MAX)
                                        TO  SODRS03-ERRCD
                CALL    "ORCSODRS03"    USING
-                                       SODRS03-ERRCD
+                                       SODRS03-AREA
                MOVE    SODRS03-ERRCD   TO  SPA-GMN-TALLERRCD (IDX-MAX)
       *
                PERFORM 900-ORDER-KEY8-FET-SEC
@@ -1584,7 +1584,7 @@
                INITIALIZE                  SODRS03-AREA
                MOVE    ERR-ORDER-ERRCD TO  SODRS03-ERRCD
                CALL    "ORCSODRS03"    USING
-                                       SODRS03-ERRCD
+                                       SODRS03-AREA
                MOVE    SODRS03-ERRCD   TO  SPA-GMN-TERRCD (1)
                MOVE    SODRS03-ERRMSG  TO  SPA-GMN-TERRMSG(1)
                MOVE    1               TO  IDX-MAX
@@ -1608,7 +1608,7 @@
                        INITIALIZE              SODRS03-AREA
                        MOVE    ODRITEM-ERRCD   TO  SODRS03-ERRCD
                        CALL    "ORCSODRS03"    USING
-                                               SODRS03-ERRCD
+                                               SODRS03-AREA
                        MOVE    SODRS03-ERRCD
                                            TO  SPA-GMN-TERRCD (IDX-MAX)
                        MOVE    SODRS03-ERRMSG

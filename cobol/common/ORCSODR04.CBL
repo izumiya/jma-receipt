@@ -1025,6 +1025,7 @@
            END-IF
       *
            MOVE    ERRCD-ORDER     TO  SODR-ERRCD
+           DISPLAY "SODR-ERRCD=" SODR-ERRCD
       *
            MOVE    FLG-END         TO  SODR-RC
       *

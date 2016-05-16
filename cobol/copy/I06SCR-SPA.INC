@@ -311,7 +311,7 @@
                    07  SPA-NAI-STATUS-ORDER        PIC 9(01).
                    07  SPA-NAI-HIDOYMD             PIC X(08).
                    07  SPA-NAI-ORDERID             PIC X(04).
-                   07  SPA-NAI-PTID                PIC X(20).
+                   07  SPA-NAI-PTID                PIC 9(10).
                    07  SPA-NAI-SEX                 PIC X(01).
                    07  SPA-NAI-BIRTHDAY            PIC X(08).
                    07  SPA-NAI-HSRYKA              PIC X(02).

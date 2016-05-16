@@ -66,6 +66,7 @@
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-PTCONF                  PIC 9(01).
            03  FLG-IDOKAIKEI-CANCEL        PIC 9(01).
+           03  FLG-SHOKUJI                 PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -571,6 +572,9 @@
                WHEN    "0304"
                WHEN    "0305"
                WHEN    "0307"
+      *
+                   MOVE    1           TO      FLG-SHOKUJI
+      *
                    IF   SODRNACCT-STARTYMD(1:6)  >= "201604"
                        PERFORM   4801-SHOKUJI-201604-SEC
                    ELSE
@@ -6142,7 +6146,7 @@
                    MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
       *
       *            ¿©Æ²²Ã»»¤ÎÊÔ½¸ÍÑ¤ËÂàÈò
-                   MOVE    NACCT-DAY(WRK-STARTYMD-D)  TO WRK-SHOKUDOU
+      *            MOVE    NACCT-DAY(WRK-STARTYMD-D)  TO WRK-SHOKUDOU
       *
                    MOVE    NYUINACCT-REC   TO   MCPDATA-REC
                    MOVE    "DBUPDATE"      TO   MCP-FUNC
@@ -6289,7 +6293,7 @@
                    MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
       *
       *            ¿©Æ²²Ã»»¤ÎÊÔ½¸ÍÑ¤ËÂàÈò
-                   MOVE    NACCT-DAY(WRK-STARTYMD-D)  TO WRK-SHOKUDOU
+      *            MOVE    NACCT-DAY(WRK-STARTYMD-D)  TO WRK-SHOKUDOU
       *
                    MOVE    NYUINACCT-REC   TO   MCPDATA-REC
                    MOVE    "DBUPDATE"      TO   MCP-FUNC
@@ -6381,6 +6385,11 @@
            IF    ( WRK-EDYMD       =   SPACE )
             OR   ( NACCT-SRYYM >=  WRK-EDYMD (1:6) )
                MOVE    NACCT-SRYYM TO  WRK-EDYMD
+           END-IF
+      *
+           IF    ( FLG-SHOKUJI     =   1 )
+               MOVE    SODRNACCT-STARTYMD (1:6)
+                                   TO  WRK-EDYMD
            END-IF
       *
            IF    ( WRK-EDYMD       =   SPACE )
