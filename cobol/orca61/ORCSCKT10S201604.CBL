@@ -694,11 +694,6 @@
                PERFORM 1001-SYONIKA-CHK-SEC
            END-IF
       *
-      *TEST
-           DISPLAY "KT01 FLG-SYONIKKR-ARI:" FLG-SYONIKKR-ARI
-                 ",SPA-SYOUNI-ARI:" SPA-SYOUNI-ARI
-                 ",SPA-SYUGAKUKBN:" SPA-SYUGAKUKBN
-      *TEST
       *H28.4
       *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÎÁ
            IF     (FLG-SYONIKKR-ARI    =   1   )
@@ -729,13 +724,6 @@
       *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅ²ó¿ô½èÍý
       *****************************************************************
        1001-SYONIKKR-CHK-SEC                  SECTION.
-      *TEST
-           DISPLAY "KT01 1001-SYONIKKR-CHK-SEC"
-                 ",SPA-SYOUNI-ARI:" SPA-SYOUNI-ARI
-                 ",SPA-SYUGAKUKBN:" SPA-SYUGAKUKBN
-           ",SPA-BIRTHDAY :" SPA-BIRTHDAY 
-           ",SPA-NENREI-YY:" SPA-NENREI-YY
-      *TEST
       *
            MOVE    ZERO                TO  FLG-SYONIKKR-ARI
            MOVE    ZERO                TO  SPA-SYONIKKR-ARI3
@@ -2682,10 +2670,12 @@
                    WHEN    "113003610"
       *                ±¡³°
                        MOVE    "1"             TO  SPA-INGAIKBN
+                       MOVE    1               TO  SPA-SYONIKA-ARI
                    WHEN    "113003710"
                    WHEN    "113003810"
       *                ±¡Æâ
                        MOVE    "0"             TO  SPA-INGAIKBN
+                       MOVE    1               TO  SPA-SYONIKA-ARI
       *
       *                Æ±ÆüÂ¾²Ê¼õ¿Ç
                    WHEN    "830000020"
@@ -2896,6 +2886,8 @@
                WHEN    "113003810"
                    MOVE    1                   TO  SPA-SYONIKA-ARI2
                    MOVE    1                   TO  SPA-SYONIKA-ARI3
+      *            ¾®»ù²Ê³°Íè¿ÇÎÅÎÁÅö·î»»Äê¥Á¥§¥Ã¥¯
+                   MOVE    2                   TO  SPA-15MIMAN-ARI
       *
       *        ¹â·ì°µ¾É
                WHEN    "113003910"

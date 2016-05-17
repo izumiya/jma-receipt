@@ -8399,17 +8399,17 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    小児科外来診療科の時、年齢エラーはそのまま
-           IF     (SPA-SYONIKA-ARI3    NOT =   ZERO )   AND
-                  (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
+      **   IF     (SPA-SYONIKA-ARI3    NOT =   ZERO )   AND
+      *           (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:1)  =   "1" )
       *H26.6
-             AND  (SPA-COM-TNSSRYKBN (SPA-GMN-IDX)     =   "13")
+      *      AND  (SPA-COM-TNSSRYKBN (SPA-GMN-IDX)     =   "13")
       *H28.5
-             AND  (SPA-COM-INPUTCD (SPA-GMN-IDX)
-                                           NOT =   "113018210")
-               IF      SPA-ERRCD           =   "0032"
-                   MOVE    SPACE               TO  SPA-ERRCD
-               END-IF
-           END-IF
+      *      AND  (SPA-COM-INPUTCD (SPA-GMN-IDX)
+      *                                    NOT =   "113018210")
+      *        IF      SPA-ERRCD           =   "0032"
+      *            MOVE    SPACE               TO  SPA-ERRCD
+      *        END-IF
+      **   END-IF
       *---(01.00.01) LINE ADD  START  ----
       *    警告判定
            IF      SPA-ERRCD(1:1)      =   "K"
@@ -12089,12 +12089,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-SCR-REC
                                                SPA-AREA
       *
-      *            小児科外来診療科の時、年齢エラーはそのまま
-                   IF      SPA-SYONIKA-ARI3    NOT =   ZERO
-                       IF      LNK-SC92-ERRCD5 NOT =   SPACE
-                           MOVE    SPACE           TO  LNK-SC92-ERRCD5
-                       END-IF
-                   END-IF
+      **           小児科外来診療科の時、年齢エラーはそのまま
+      *            IF      SPA-SYONIKA-ARI3    NOT =   ZERO
+      *                IF      LNK-SC92-ERRCD5 NOT =   SPACE
+      *                    MOVE    SPACE           TO  LNK-SC92-ERRCD5
+      *                END-IF
+      **           END-IF
       *
                    PERFORM VARYING     IDX-ERR FROM    1  BY  1
                            UNTIL      (IDX-ERR     >   10     )  OR
@@ -13197,7 +13197,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 5002-GMNSPA-HEN-SEC
       *H27.8
       *    画面ＳＰＡ書込み
-           PERFORM 1003-K02SPA-OUT-SEC
+      ***  PERFORM 1003-K02SPA-OUT-SEC
       *
            IF     (FLG-GMN-INIT        =   1   )  OR
                   (SPA-GMN-MAX1        =   ZERO )
@@ -13305,11 +13305,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        K02-MEISYO-FGCOLOR (IDX)
                    END-IF
       *
-      *TEST        一般名表示
-                   IF      SPA-COM-MEI-KBN (WRK-IDX)   =   "1"
-                       MOVE    CL-GREEN        TO
-                                       K02-MEISYO-FGCOLOR (IDX)
-                   END-IF
       *!!          禁忌薬剤
                    IF      SPA-COM-PTKINKI-ARI (WRK-IDX)   =   1
                        MOVE    CL-RED        TO
@@ -13650,6 +13645,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *         カーソルセット
                 PERFORM 5001-MAPCUR-SEC
             END-IF
+      *H27.8
+      *    画面ＳＰＡ書込み
+           PERFORM 1003-K02SPA-OUT-SEC
            .
        500-GMNHEN-EXT.
            EXIT.

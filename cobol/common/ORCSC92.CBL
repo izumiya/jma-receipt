@@ -1938,8 +1938,8 @@
                        MOVE    "0032"              TO  LNK-SC92-ERRCD5
                        IF     (LNK-SC92-NENREI-YY  =   3  )
                           AND (SPA-SRYYMD(1:6)     =   WRK-NEN03-YM )
-                          AND (LNK-SC92-15MIMAN-ARI    =   2  )
-      *                    同じコードの算定チェック
+      ********            AND (LNK-SC92-15MIMAN-ARI    =   2  )
+      *                    当月受診チェック（小児科外来診療料のみの
                            PERFORM 20032-NENREI-RRKCHK-SEC
                        END-IF
                    END-IF
@@ -1950,8 +1950,9 @@
                        IF     (LNK-SC92-NENREI-YY  =   15  )
                           AND (SPA-SRYYMD(1:6)     =   WRK-NEN15-YM )
                           AND (LNK-SC92-15MIMAN-ARI    =   1  )
-      *                    同じコードの算定チェック
-                           PERFORM 20032-NENREI-RRKCHK-SEC
+      **********           同じコードの算定チェック
+      **********           PERFORM 20032-NENREI-RRKCHK-SEC
+                           MOVE    SPACE           TO  LNK-SC92-ERRCD5
                        END-IF
                    END-IF
       *H26.4
@@ -1992,10 +1993,21 @@
       *****************************************************************
        20032-NENREI-RRKCHK-SEC      SECTION.
       *
-      *    小児科外来診察料は別チェックとする
+      *    小児科外来診療料は別チェックとする
            IF     (TNS-CDKBN-KBN       =   "B" )
               AND (TNS-CDKBN-KBNNUM    =   001 )
               AND (TNS-CDKBN-KBNNUM-EDA    =   2 )
+      *
+               IF      SPA-SRYYMD      <   "20160401"
+                   IF      SPA-SYONIKA-ARI3    NOT =   ZERO
+                       MOVE    SPACE           TO  LNK-SC92-ERRCD5
+                   END-IF
+               ELSE
+      *            当月受診ありのチェック
+                   IF      (LNK-SC92-15MIMAN-ARI   =   2  )
+                       MOVE    SPACE           TO  LNK-SC92-ERRCD5
+                   END-IF
+               END-IF
                GO      TO      20032-NENREI-RRKCHK-EXT
            END-IF
       *

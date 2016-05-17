@@ -1404,9 +1404,12 @@
       *****************************************************************
        1001-TOUGETU-KAISU-SEC          SECTION.
       *
-      *    小児科外来診察料回数チェック
+      *    小児科外来診療料回数チェック
            MOVE    ZERO                TO  WRK-NYUYOJI
            MOVE    ZERO                TO  WRK-DAYCNT-SUM
+      *H28.5
+      *    小児科外来診療料当月算定チェック
+           MOVE    ZERO                TO  SPA-15MIMAN-ARI
       *H28.4
       *    小児かかりつけ診療料回数チェック
            MOVE    ZERO                TO  WRK-SYOUNI
@@ -1690,6 +1693,16 @@
                WHEN    "113003810"
                    ADD     SANTEI-MSANTEICNT   TO  WRK-NYUYOJI
                    ADD     WRK-DAYCNT          TO  WRK-DAYCNT-SUM
+      *H28.5
+      *            小児科外来診療料当日算定あり
+                   IF     (SPA-SYONIKA         =   ZERO )
+                    AND   (WRK-DAYCNT-SUM      >   ZERO )
+                       MOVE    1               TO  SPA-SYONIKA
+                   END-IF
+      *            小児科外来診療料当月算定チェック
+                   IF     (WRK-NYUYOJI          >   ZERO )
+                       MOVE    2               TO  SPA-15MIMAN-ARI
+                   END-IF
       *H28.4
       *        小児かかりつけ診療科
                WHEN    "113019710"
@@ -2817,7 +2830,7 @@
            END-SEARCH
       *H28.4
            IF    (WRK-SRYCD(1:7)       =   "0998002"  )
-      *        早期・初期リハ開始日・終了日
+      *        早期・初期リハ開始日
                MOVE    1               TO  FLG-HKNSAN
            END-IF
       *

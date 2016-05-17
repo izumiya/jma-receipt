@@ -9253,12 +9253,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-SCR-REC
                                                SPA-AREA
       *
-      *            凝價粗陸侳褲恓粗及凜﹜ヵ昦巨仿□反公及引引
-                   IF      SPA-SYONIKA-ARI     NOT =   ZERO
-                       IF      LNK-SC92-ERRCD5 NOT =   SPACE
-                           MOVE    SPACE           TO  LNK-SC92-ERRCD5
-                       END-IF
-                   END-IF
+      **           凝價粗陸侳褲恓粗及凜﹜ヵ昦巨仿□反公及引引
+      *            IF      SPA-SYONIKA-ARI     NOT =   ZERO
+      *                IF      LNK-SC92-ERRCD5 NOT =   SPACE
+      *                    MOVE    SPACE           TO  LNK-SC92-ERRCD5
+      *                END-IF
+      **           END-IF
       *
                    PERFORM VARYING     IDX-ERR FROM    1  BY  1
                            UNTIL      (IDX-ERR     >   10     )  OR
