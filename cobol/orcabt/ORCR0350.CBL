@@ -408,6 +408,7 @@
       *  04.08.07    NACL-藤原    16/04/01  平成２８年４月改正対応
       *  04.08.08    NACL-門脇    16/05/08  平成２８年４月改正対応
       *                                     （食事標準負担額追加）
+      *  04.08.09    NACL-門脇    16/05/17  標準負担額区分の記載条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2796,7 +2797,7 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
-           IF     (RECE62-KOUREI       NOT = SPACE)
+           IF     (RECE62-KOUREI           = "1"  )
            AND    (RECE62-TEISYOTOKU   NOT = SPACE)
              EVALUATE    RECE62-TEISYOTOKU
                WHEN    "1"
