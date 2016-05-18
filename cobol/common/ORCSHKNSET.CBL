@@ -718,7 +718,10 @@
                            INTO              WRK-HKNCOMBI
                    END-STRING
                END-IF
-          END-IF
+      *        傷病年月日
+               MOVE    PTRSI-SHOBYOYMD     TO  ORCSHKN-NAI-RSI-SHOBYOYMD
+                                                                  (IDX)
+           END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI
