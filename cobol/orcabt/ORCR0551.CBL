@@ -1681,11 +1681,18 @@
       *           乳幼児・幼児のコメント
                   IF   RECE41-NYUYOJIFLG   NOT =   SPACE
       *             誕生月で、誕生日が１日以外の日である場合
-                    IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
-                    AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
-                    AND (RECE41-AGE               <=   5               )
-                      PERFORM   2001-NYUYOJI-COMMENT-SEC
-                    END-IF
+      ***           IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
+      ***           AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
+      ***             IF   RECE41-SRYYM  >= "200604"
+      ***               IF   RECE41-AGE   =  5
+      ***                 PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***               END-IF
+      ***             ELSE
+      ***                 PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***             END-IF
+      ***           END-IF
+      *
+                    PERFORM   2001-NYUYOJI-COMMENT-SEC
                   END-IF
              END-EVALUATE
            END-IF
@@ -1695,11 +1702,18 @@
       *           乳幼児・幼児のコメント
                   IF   RECE41-NYUYOJIFLG   NOT =   SPACE
       *             誕生月で、誕生日が１日以外の日である場合
-                    IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
-                    AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
-                    AND (RECE41-AGE               <=   5               )
-                      PERFORM   2001-NYUYOJI-COMMENT-SEC
-                    END-IF
+      ***           IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
+      ***           AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
+      ***             IF   RECE41-SRYYM  >= "200604"
+      ***               IF   RECE41-AGE   =  5
+      ***                 PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***               END-IF
+      ***             ELSE
+      ***                 PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***             END-IF
+      ***           END-IF
+      *
+                    PERFORM   2001-NYUYOJI-COMMENT-SEC
                   END-IF
            END-IF
       *
@@ -4308,7 +4322,9 @@
            MOVE    TBL-DAY(DAY-IDX2)    TO  WRK-RECE45XX-NAME(1 1)(1:4)
            MOVE    RECE41-BIRTHDAY(7:2) TO  DAY-IDX2
            COMPUTE    DAY-IDX2   =   DAY-IDX2  -   1
-           MOVE    TBL-DAY(DAY-IDX2)    TO  WRK-RECE45XX-NAME(1 1)(7:4)
+           IF   DAY-IDX2  NOT =  ZERO
+             MOVE  TBL-DAY(DAY-IDX2)    TO  WRK-RECE45XX-NAME(1 1)(7:4)
+           END-IF
       *
            MOVE    "1"                  TO  WRK-RECE45XX-SIKFLG(1 1)
       *

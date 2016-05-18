@@ -1888,11 +1888,18 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF   RECE02-NYUYOJIFLG   NOT =   SPACE
       *      誕生月で、誕生日が１日以外の日である場合
-             IF  (RECE02-BIRTHDAY(5:2)      =  RECE02-SRYYM(5:2))
-             AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"             )
-             AND (RECE02-AGE               <=   5               )
-               PERFORM   2001-NYUYOJI-COMMENT-SEC
-             END-IF
+      ***    IF  (RECE02-BIRTHDAY(5:2)      =  RECE02-SRYYM(5:2))
+      ***    AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"             )
+      ***      IF   RECE02-SRYYM  >= "200604"
+      ***        IF   RECE02-AGE   =  5
+      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***        END-IF
+      ***      ELSE
+      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
+      ***      END-IF
+      ***    END-IF
+      *
+             PERFORM   2001-NYUYOJI-COMMENT-SEC
            END-IF
       *
       *    公費受診日のコメント
@@ -2679,7 +2686,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    TBL-DAY(DAY-IDX2)    TO  WRK-RECE05XX-NAME(1 1)(1:4)
            MOVE    RECE02-BIRTHDAY(7:2) TO  DAY-IDX2
            COMPUTE    DAY-IDX2   =   DAY-IDX2  -   1
-           MOVE    TBL-DAY(DAY-IDX2)    TO  WRK-RECE05XX-NAME(1 1)(7:4)
+           IF   DAY-IDX2  NOT =  ZERO
+             MOVE  TBL-DAY(DAY-IDX2)    TO  WRK-RECE05XX-NAME(1 1)(7:4)
+           END-IF
       *
            MOVE    WRK-RECE05XX-SRYACT-TBL(1 1)
                                         TO  RECE059-SRYACT-TBL(1)
