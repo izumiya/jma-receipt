@@ -2008,6 +2008,10 @@
                        MOVE    SPACE           TO  LNK-SC92-ERRCD5
                    END-IF
                END-IF
+      *        会計照会
+               IF      LNK-SC92-PG         =   "J04"
+                   MOVE    SPACE           TO  LNK-SC92-ERRCD5
+               END-IF
                GO      TO      20032-NENREI-RRKCHK-EXT
            END-IF
       *
