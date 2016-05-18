@@ -83,8 +83,10 @@
            03   CONS-SEISIN-ARI            PIC X(09) VALUE "099999926".
       *    システム予約−精神病床食事負担据え置き対象外
            03   CONS-SEISIN-NASI           PIC X(09) VALUE "099999927".
-      *    標準負担額経過措置（精神）入院年月日コメント
-           03   CONS-SEISIN-COMMENT        PIC X(09) VALUE "840000136".
+      *    標準負担額経過措置（精神）入院年月日コメント：平成
+           03   CONS-SEISIN-COMMENT-H      PIC X(09) VALUE "840000136".
+      *    標準負担額経過措置（精神）入院年月日コメント：昭和
+           03   CONS-SEISIN-COMMENT-S      PIC X(09) VALUE "840000140".
       *
       *    一時領域
        01  WRK-AREA.
@@ -901,14 +903,14 @@
            END-PERFORM
       *
       *
-      *    標準負担額経過措置（精神）入院年月日のコメント入力を検索
+      *    標準負担額経過措置（精神）入院年月日：平成のコメント入力を検索
            MOVE     ZERO                 TO   IDX-YYK
            INITIALIZE                         SRYACT-REC
            MOVE    LNK-SKJKEEP-HOSPNUM   TO   SRY-HOSPNUM
            MOVE    "1"                   TO   SRY-NYUGAIKBN
            MOVE    LNK-SKJKEEP-PTID      TO   SRY-PTID
            MOVE    "201604"              TO   SRY-SRYYM
-           MOVE    CONS-SEISIN-COMMENT   TO   SRY-SRYCD(1)
+           MOVE    CONS-SEISIN-COMMENT-H TO   SRY-SRYCD(1)
                                               SRY-SRYCD(2)
                                               SRY-SRYCD(3)
                                               SRY-SRYCD(4)
@@ -926,7 +928,7 @@
                    MOVE  SRY-HOSPNUM     TO   PTCOM-HOSPNUM
                    MOVE  SRY-PTID        TO   PTCOM-PTID
                    MOVE  SRY-ZAINUM      TO   PTCOM-ZAINUM
-                   MOVE  CONS-SEISIN-COMMENT
+                   MOVE  CONS-SEISIN-COMMENT-H
                                          TO   PTCOM-SRYCD
                    MOVE  1               TO   PTCOM-RENNUM
                    MOVE  "tbl_ptcom"     TO   MCP-TABLE
@@ -945,6 +947,75 @@
                           MOVE    "12"          TO  LNK-DAY1-IRAI
                           MOVE    ZERO          TO  LNK-DAY1-YMD
                           MOVE    "4"              TO  LNK-DAY1-YMD(2:1)
+                          MOVE    PTCOM-INPUTCHI1  TO  LNK-DAY1-YMD(3:2)
+                          MOVE    PTCOM-INPUTCHI2  TO  LNK-DAY1-YMD(5:2)
+                          MOVE    PTCOM-INPUTCHI3  TO  LNK-DAY1-YMD(7:2)
+                          CALL    "ORCSDAY"     USING   STS-AREA-DAY
+                                                        LNK-DAY1-AREA
+                          IF      STS-DAY-RC1      =   ZERO
+                              DISPLAY   "LNK-DAY1-YMD-X = "
+                                         LNK-DAY1-YMD-X
+                              MOVE   LNK-DAY1-YMD-X
+                                         TO  LNK-SKJKEEP-SEI-NYUINYMD
+                              MOVE   "1" TO  LNK-SKJKEEP-SEI-COMMENT-KBN
+                          END-IF
+                        END-IF
+                   END-IF
+      *            患者コメントクローズ
+                   MOVE     "tbl_ptcom"  TO  MCP-TABLE
+                   MOVE     "key"        TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+               END-IF
+           END-IF
+      *    診療行為クローズ
+           MOVE     "tbl_sryact"     TO  MCP-TABLE
+           MOVE     "key21"          TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *    標準負担額経過措置（精神）入院年月日：昭和のコメント入力を検索
+           MOVE     ZERO                 TO   IDX-YYK
+           INITIALIZE                         SRYACT-REC
+           MOVE    LNK-SKJKEEP-HOSPNUM   TO   SRY-HOSPNUM
+           MOVE    "1"                   TO   SRY-NYUGAIKBN
+           MOVE    LNK-SKJKEEP-PTID      TO   SRY-PTID
+           MOVE    "201604"              TO   SRY-SRYYM
+           MOVE    CONS-SEISIN-COMMENT-S TO   SRY-SRYCD(1)
+                                              SRY-SRYCD(2)
+                                              SRY-SRYCD(3)
+                                              SRY-SRYCD(4)
+                                              SRY-SRYCD(5)
+           MOVE    "tbl_sryact"          TO   MCP-TABLE
+           MOVE    "key21"               TO   MCP-PATHNAME
+           PERFORM 910-SRYACT-SELECT-SEC
+           IF      FLG-SRYACT            =    ZERO
+               MOVE     "tbl_sryact"     TO   MCP-TABLE
+               MOVE     "key21"          TO   MCP-PATHNAME
+               PERFORM   910-SRYACT-READ-SEC
+               IF    FLG-SRYACT          =    ZERO
+      *
+                   INITIALIZE                 PTCOM-REC
+                   MOVE  SRY-HOSPNUM     TO   PTCOM-HOSPNUM
+                   MOVE  SRY-PTID        TO   PTCOM-PTID
+                   MOVE  SRY-ZAINUM      TO   PTCOM-ZAINUM
+                   MOVE  CONS-SEISIN-COMMENT-S
+                                         TO   PTCOM-SRYCD
+                   MOVE  1               TO   PTCOM-RENNUM
+                   MOVE  "tbl_ptcom"     TO   MCP-TABLE
+                   MOVE  "key"           TO   MCP-PATHNAME
+                   PERFORM 910-PTCOM-SELECT-SEC
+                   IF     FLG-PTCOM      =    ZERO
+                       MOVE  "tbl_ptcom" TO   MCP-TABLE
+                       MOVE  "key"       TO   MCP-PATHNAME
+                       PERFORM   910-PTCOM-READ-SEC
+                       IF     FLG-PTCOM  =    ZERO
+      *                    DISPLAY "PTCOM-SRYCD = " PTCOM-SRYCD
+      *                    DISPLAY "PTCOM-INPUTCOMENT = " 
+      *                                            PTCOM-INPUTCOMENT
+                          INITIALIZE            STS-AREA-DAY
+                          INITIALIZE            LNK-DAY1-AREA
+                          MOVE    "12"          TO  LNK-DAY1-IRAI
+                          MOVE    ZERO          TO  LNK-DAY1-YMD
+                          MOVE    "3"              TO  LNK-DAY1-YMD(2:1)
                           MOVE    PTCOM-INPUTCHI1  TO  LNK-DAY1-YMD(3:2)
                           MOVE    PTCOM-INPUTCHI2  TO  LNK-DAY1-YMD(5:2)
                           MOVE    PTCOM-INPUTCHI3  TO  LNK-DAY1-YMD(7:2)
