@@ -76,6 +76,7 @@
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.05    NACL-門脇    16/05/18  乳幼児コメント自動記載条件修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1291,7 +1292,12 @@
       *
       *    乳幼児・幼児のコメント
            IF   RECE100-NYUYOJIFLG   NOT =   SPACE
-              PERFORM   2001-NYUYOJI-COMMENT-SEC
+      *      誕生月で、誕生日が１日以外の日である場合
+             IF  (RECE100-BIRTHDAY(5:2)      =  RECE100-SRYYM(5:2))
+             AND (RECE100-BIRTHDAY(7:2)  NOT =  "01"              )
+             AND (RECE100-AGE               <=   5                )
+               PERFORM   2001-NYUYOJI-COMMENT-SEC
+             END-IF
            END-IF
       *
       *    発症日のコメント

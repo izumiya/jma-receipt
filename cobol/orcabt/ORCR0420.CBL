@@ -10980,15 +10980,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 IF        FLG-KHNTEN15-JI2   =    1
                   MOVE    ZERO             TO   RECE41-KHNTEN(15)
                 END-IF
-      **>       IF   RECE41-JIBAIKBN    =   "2"
-      **>        IF   RECE41-SRYYM  >= "200604"
-      **>          IF    (CNT-NYUYOJI      NOT =  ZERO        )
-      ***          AND   (RECE41-KAISU(2)  NOT =  CNT-NYUYOJI )
-      **>          AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI )
-      **>             MOVE    "1"    TO   RECE41-NYUYOJIFLG
-      **>          END-IF
-      **>        END-IF
-      **>       END-IF
+      *
+                IF    (CNT-NYUYOJI      NOT =  ZERO       )
+                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
+                AND   (RECE41-SRYYM        >=  "200604"   )
+                AND   (RECE41-JIBAIKBN      =  "2"        )
+                  MOVE    "1"              TO   RECE41-NYUYOJIFLG
+                END-IF
             END-EVALUATE
            END-IF
       *
@@ -11016,6 +11014,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF        FLG-KHNTEN15-JI2   =    1
                   MOVE    ZERO             TO   RECE41-KHNTEN(15)
+                END-IF
+      *
+                IF    (CNT-NYUYOJI      NOT =  ZERO       )
+                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
+                AND   (RECE41-SRYYM        >=  "200604"   )
+                  MOVE    "1"              TO   RECE41-NYUYOJIFLG
                 END-IF
            END-IF
       *

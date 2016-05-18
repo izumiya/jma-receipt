@@ -143,6 +143,7 @@
       *  04.08.04    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.06    NACL-門脇    16/05/18  乳幼児コメント自動記載条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1693,10 +1694,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
                      PERFORM    2001-YKZTENTANKA-COMMENT-SEC
                   END-IF
       *           乳幼児・幼児のコメント
-                  IF    RECE41-NYUYOJIFLG   =  SPACE
-                     CONTINUE
-                  ELSE
-                     PERFORM    2001-NYUYOJI-COMMENT-SEC
+                  IF   RECE41-NYUYOJIFLG   NOT =   SPACE
+      *             誕生月で、誕生日が１日以外の日である場合
+                    IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
+                    AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
+                    AND (RECE41-AGE               <=   5               )
+                      PERFORM   2001-NYUYOJI-COMMENT-SEC
+                    END-IF
                   END-IF
              END-EVALUATE
            END-IF
@@ -1704,10 +1708,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *    第三者行為
            IF   RECE41-HKNKBN     =   "6"
       *           乳幼児・幼児のコメント
-                  IF    RECE41-NYUYOJIFLG   =  SPACE
-                     CONTINUE
-                  ELSE
-                     PERFORM    2001-NYUYOJI-COMMENT-SEC
+                  IF   RECE41-NYUYOJIFLG   NOT =   SPACE
+      *             誕生月で、誕生日が１日以外の日である場合
+                    IF  (RECE41-BIRTHDAY(5:2)      =  RECE41-SRYYM(5:2))
+                    AND (RECE41-BIRTHDAY(7:2)  NOT =  "01"             )
+                    AND (RECE41-AGE               <=   5               )
+                      PERFORM   2001-NYUYOJI-COMMENT-SEC
+                    END-IF
                   END-IF
            END-IF
       *

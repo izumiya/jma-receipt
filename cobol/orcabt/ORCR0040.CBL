@@ -173,6 +173,7 @@
       *  04.08.05    NACL-門脇    15/12/02  ３歳児視覚聴覚精密健康診査
       *                                     （地域公費）対応
       *  04.08.06    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.07    NACL-門脇    16/05/18  乳幼児コメント自動記載条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1886,9 +1887,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *    乳幼児・幼児のコメント
       *
            IF   RECE02-NYUYOJIFLG   NOT =   SPACE
-      *
-              PERFORM   2001-NYUYOJI-COMMENT-SEC
-      *
+      *      誕生月で、誕生日が１日以外の日である場合
+             IF  (RECE02-BIRTHDAY(5:2)      =  RECE02-SRYYM(5:2))
+             AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"             )
+             AND (RECE02-AGE               <=   5               )
+               PERFORM   2001-NYUYOJI-COMMENT-SEC
+             END-IF
            END-IF
       *
       *    公費受診日のコメント
