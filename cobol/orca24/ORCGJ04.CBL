@@ -6261,6 +6261,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-COM-BUNGSU (IDX)
                                            TO  SRY-SRYKAISU(IDS)
            END-IF
+      *
+      *    外用の個別回数を設定
+           IF      SPA-COM-SRYKBN (IDX)    =   "23"
+               MOVE    SPA-COM-KAISU2 (IDX) TO  SRY-SRYKAISU(IDS)
+           END-IF
       *    自動算定区分
            MOVE    SPA-COM-AUTOKBN (IDX)   TO  SRY-AUTOKBN (IDS)
       *    数量の入力がある時
@@ -6270,7 +6275,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *!!
       *    器材商品コード対応
-           IF      SPA-COM-AUTOKBN2 (IDX)  =   "1"
+           IF     (SPA-COM-INPUTCD (IDX)(1:1)   =   "7"   )
+             AND  (SPA-COM-AUTOKBN2 (IDX)  =   "1"        )
                MOVE    "1"                 TO  SRY-MEISKYFLG (IDS)
            END-IF
       *!!!!
