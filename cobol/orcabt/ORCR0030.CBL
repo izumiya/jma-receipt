@@ -25927,13 +25927,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND   (CNT-SAISIN-DOUJITU  NOT =  ZERO)
                      MOVE   ZERO         TO   RECE02-KHNTEN(2)
              END-IF
-             IF    (CNT-NYUYOJI      NOT =  ZERO       )
-             AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
+             IF    (CNT-NYUYOJI         NOT =  ZERO        )
+             AND   (CNT-SAISIN-ETC      NOT =  CNT-NYUYOJI )
                      MOVE   ZERO         TO   RECE02-KHNTEN(2)
              END-IF
-             IF     RECE02-NYUYOJIFLG      =  SPACE
-               IF    (CNT-NYUYOJI2     NOT =  ZERO        )
-               AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI2)
+             IF     RECE02-NYUYOJIFLG       =  SPACE
+               IF  (CNT-NYUYOJI2        NOT =  ZERO        )
+               AND (CNT-SAISIN-ETC      NOT =  CNT-NYUYOJI2)
                      MOVE     "1"        TO   RECE02-NYUYOJIFLG
                END-IF
              END-IF

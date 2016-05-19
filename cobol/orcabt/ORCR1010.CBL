@@ -5548,17 +5548,18 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2110-NYUYOJI-COMENTFLG-SET-SEC               SECTION.
       *
+           IF   RECE100-SRYYM  >= "200604"
              IF    (CNT-SAISIN-ETC      NOT =  ZERO)
              AND   (CNT-SAISIN-DOUJITU  NOT =  ZERO)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
              END-IF
-             IF    (CNT-NYUYOJI      NOT =  ZERO       )
-             AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
+             IF    (CNT-NYUYOJI         NOT =  ZERO        )
+             AND   (CNT-SAISIN-ETC      NOT =  CNT-NYUYOJI )
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
              END-IF
              IF     RECE100-NYUYOJIFLG      =  SPACE
-               IF    (CNT-NYUYOJI2     NOT =  ZERO        )
-               AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI2)
+               IF  (CNT-NYUYOJI2        NOT =  ZERO        )
+               AND (CNT-SAISIN-ETC      NOT =  CNT-NYUYOJI2)
                      MOVE     "1"        TO   RECE100-NYUYOJIFLG
                END-IF
              END-IF
@@ -5588,6 +5589,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
              END-IF
+           END-IF
       *
            .
        2110-NYUYOJI-COMENTFLG-SET-EXT.

@@ -1888,18 +1888,15 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF   RECE02-NYUYOJIFLG   NOT =   SPACE
       *      誕生月で、誕生日が１日以外の日である場合
-      ***    IF  (RECE02-BIRTHDAY(5:2)      =  RECE02-SRYYM(5:2))
-      ***    AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"             )
-      ***      IF   RECE02-SRYYM  >= "200604"
-      ***        IF   RECE02-AGE   =  5
-      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
-      ***        END-IF
-      ***      ELSE
-      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
-      ***      END-IF
-      ***    END-IF
-      *
-             PERFORM   2001-NYUYOJI-COMMENT-SEC
+             IF   RECE02-SRYYM  >= "200604"
+               IF  (RECE02-BIRTHDAY(5:2)      =  RECE02-SRYYM(5:2))
+               AND (RECE02-BIRTHDAY(7:2)  NOT =  "01"             )
+               AND (RECE02-AGE                =   5               )
+                   PERFORM   2001-NYUYOJI-COMMENT-SEC
+               END-IF
+             ELSE
+                   PERFORM   2001-NYUYOJI-COMMENT-SEC
+             END-IF
            END-IF
       *
       *    公費受診日のコメント

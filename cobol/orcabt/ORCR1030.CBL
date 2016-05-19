@@ -1293,18 +1293,12 @@
       *    乳幼児・幼児のコメント
            IF   RECE100-NYUYOJIFLG   NOT =   SPACE
       *      誕生月で、誕生日が１日以外の日である場合
-      ***    IF  (RECE100-BIRTHDAY(5:2)      =  RECE100-SRYYM(5:2))
-      ***    AND (RECE100-BIRTHDAY(7:2)  NOT =  "01"              )
-      ***      IF   RECE100-SRYYM  >= "200604"
-      ***        IF   RECE100-AGE   =  5
-      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
-      ***        END-IF
-      ***      ELSE
-      ***          PERFORM   2001-NYUYOJI-COMMENT-SEC
-      ***      END-IF
-      ***    END-IF
-      *
-             PERFORM   2001-NYUYOJI-COMMENT-SEC
+             IF  (RECE100-BIRTHDAY(5:2)      =  RECE100-SRYYM(5:2))
+             AND (RECE100-BIRTHDAY(7:2)  NOT =  "01"              )
+             AND (RECE100-AGE                =   5                )
+             AND (RECE100-SRYYM             >=  "200604"          )
+                   PERFORM   2001-NYUYOJI-COMMENT-SEC
+             END-IF
            END-IF
       *
       *    発症日のコメント

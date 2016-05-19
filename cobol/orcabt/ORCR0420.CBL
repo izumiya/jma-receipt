@@ -537,7 +537,7 @@
            03  CNT-CHIHOKAT2                           PIC 9(02).
            03  CNT-SAITOKKSN                           PIC 9(02).
            03  CNT-SAITOKKSN2                          PIC 9(02).
-           03  CNT-NYUYOJI                             PIC 9(02).
+           03  CNT-NYUYOJI2                            PIC 9(02).
            03  CNT-SAISIN-DOUJITU                      PIC 9(02).
            03  CNT-SAISIN-ETC                          PIC 9(02).
       *
@@ -8680,8 +8680,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         IF   RECE41-SRYYM  >= "200604"
                           IF  SRY-SRYCD(IDX3)  =  "112000970" OR
                                                   "112006270"
-                            COMPUTE  CNT-NYUYOJI =  CNT-NYUYOJI
-                                                 +  WK-ZAIKAISU
+                            COMPUTE  CNT-NYUYOJI2 =  CNT-NYUYOJI2
+                                                  +  WK-ZAIKAISU
                           END-IF
                         END-IF
                         IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
@@ -9470,8 +9470,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                     "112014170" OR
                                     "112014270" OR
                                     "112014370"
-                     COMPUTE  CNT-NYUYOJI  =  CNT-NYUYOJI
-                                           +  WK-ZAIKAISU
+                     COMPUTE  CNT-NYUYOJI2  =  CNT-NYUYOJI2
+                                            +  WK-ZAIKAISU
               END-IF
            END-IF
            .
@@ -10981,10 +10981,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    ZERO             TO   RECE41-KHNTEN(15)
                 END-IF
       *
-                IF    (CNT-NYUYOJI      NOT =  ZERO       )
-                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
-                AND   (RECE41-SRYYM        >=  "200604"   )
-                AND   (RECE41-JIBAIKBN      =  "2"        )
+                IF    (RECE41-JIBAIKBN      =  "2"         )
+                AND   (CNT-NYUYOJI2     NOT =  ZERO        )
+                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI2)
+                AND   (RECE41-SRYYM        >=  "200604"    )
                   MOVE    "1"              TO   RECE41-NYUYOJIFLG
                 END-IF
             END-EVALUATE
@@ -11016,9 +11016,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    ZERO             TO   RECE41-KHNTEN(15)
                 END-IF
       *
-                IF    (CNT-NYUYOJI      NOT =  ZERO       )
-                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
-                AND   (RECE41-SRYYM        >=  "200604"   )
+                IF    (CNT-NYUYOJI2     NOT =  ZERO        )
+                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI2)
+                AND   (RECE41-SRYYM        >=  "200604"    )
                   MOVE    "1"              TO   RECE41-NYUYOJIFLG
                 END-IF
            END-IF
