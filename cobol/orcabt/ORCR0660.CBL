@@ -170,6 +170,8 @@
       *                                     （地域公費）対応
       *  04.08.05    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.06    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.07    NACL-門脇    16/05/20  標準負担額経過措置（精神）入院年月日
+      *                                     のコメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1843,7 +1845,15 @@
       *
            IF   RECE62-SEISIN-SKJFLG        =   1
            AND  RECE62-SEISIN-NYUINYMD  NOT =  SPACE
-              PERFORM   2001-SEISIN-SKJ-COMMENT-SEC
+             INITIALIZE                         STS-AREA-DAY
+             INITIALIZE                         LNK-DAY2-AREA
+             MOVE    "21"                   TO  LNK-DAY2-IRAI
+             MOVE  RECE62-SEISIN-NYUINYMD   TO  LNK-DAY2-YMD
+             CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                            LNK-DAY2-AREA
+             IF      STS-DAY-RC1            =   ZERO
+                PERFORM 2001-SEISIN-SKJ-COMMENT-SEC
+             END-IF
            END-IF
       *
       *****差込編集２**********************
@@ -2108,21 +2118,32 @@
       *        コメントの挿入
                MOVE    SPACE         TO  WRK-RECE65XX-REC
                INITIALIZE                WRK-RECE65XX-REC
-               MOVE    "840000136"   TO  WRK-RECE65XX-SRYCD(1 1)
-               MOVE     ZERO         TO  WRK-RECE65XX-SRYSURYO(1 1)
-               MOVE     31           TO  WRK-RECE65XX-YUKOKETA(1 1)
-               MOVE    "標準負担額経過措置（精神）入院年月日："
+               EVALUATE   LNK-DAY2-EDTYMD1-G
+                 WHEN       "H"
+                   MOVE  "840000136" TO  WRK-RECE65XX-SRYCD(1 1)
+                   MOVE   ZERO       TO  WRK-RECE65XX-SRYSURYO(1 1)
+                   MOVE   31         TO  WRK-RECE65XX-YUKOKETA(1 1)
+                   MOVE  "標準負担額経過措置（精神）入院年月日："
                                      TO  WRK-RECE65XX-NAME(1 1)(1:38)
-               MOVE    "平成　　　年　　月　　日"
+                   MOVE  "平成　　　年　　月　　日"
                                      TO  WRK-RECE65XX-NAME(1 1)(39:24)
+                 WHEN       "S"
+                   MOVE  "840000140" TO  WRK-RECE65XX-SRYCD(1 1)
+                   MOVE   ZERO       TO  WRK-RECE65XX-SRYSURYO(1 1)
+                   MOVE   31         TO  WRK-RECE65XX-YUKOKETA(1 1)
+                   MOVE  "標準負担額経過措置（精神）入院年月日："
+                                     TO  WRK-RECE65XX-NAME(1 1)(1:38)
+                   MOVE  "昭和　　　年　　月　　日"
+                                     TO  WRK-RECE65XX-NAME(1 1)(39:24)
+               END-EVALUATE
       *
-               INITIALIZE                         STS-AREA-DAY
-               INITIALIZE                         LNK-DAY2-AREA
-               MOVE    "21"                   TO  LNK-DAY2-IRAI
-               MOVE  RECE62-SEISIN-NYUINYMD   TO  LNK-DAY2-YMD
-               CALL    "ORCSDAY"    USING     STS-AREA-DAY
-                                              LNK-DAY2-AREA
-               IF      STS-DAY-RC1            =   ZERO
+      ***      INITIALIZE                         STS-AREA-DAY
+      ***      INITIALIZE                         LNK-DAY2-AREA
+      ***      MOVE    "21"                   TO  LNK-DAY2-IRAI
+      ***      MOVE  RECE62-SEISIN-NYUINYMD   TO  LNK-DAY2-YMD
+      ***      CALL    "ORCSDAY"    USING     STS-AREA-DAY
+      ***                                     LNK-DAY2-AREA
+      ***      IF      STS-DAY-RC1            =   ZERO
                   MOVE    LNK-DAY2-EDTYMD1-Y  TO  WRK-TAIHI-XX
                   INITIALIZE                      ORCSKANACHKAREA
                   MOVE    "2"                 TO  KANACHK-SYORI
@@ -2166,7 +2187,7 @@
                                  WRK-RECE65XX-INPUTCOMENT(1 1)(IDX33:2)
                     END-IF
                   END-PERFORM
-               END-IF
+      ***      END-IF
       *
                MOVE    WRK-RECE65XX-SRYACT-TBL(1 1)
                                            TO  RECE659-SRYACT-TBL(1)
