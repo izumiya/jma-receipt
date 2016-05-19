@@ -950,6 +950,15 @@
                           MOVE    PTCOM-INPUTCHI1  TO  LNK-DAY1-YMD(3:2)
                           MOVE    PTCOM-INPUTCHI2  TO  LNK-DAY1-YMD(5:2)
                           MOVE    PTCOM-INPUTCHI3  TO  LNK-DAY1-YMD(7:2)
+      *                   ２７年４月２日以降であれば昭和の元号に置き換え
+                          IF    ( PTCOM-INPUTCHI1(1:2)   >=   "28") OR
+                                ((PTCOM-INPUTCHI1(1:2)   =   "27")  AND
+                                 (PTCOM-INPUTCHI2(1:2)   >=  "05")) OR
+                                ((PTCOM-INPUTCHI1(1:2)   =   "27")  AND
+                                 (PTCOM-INPUTCHI2(1:2)   =   "04")  AND
+                                 (PTCOM-INPUTCHI3(1:2)   =   "02"))
+                               MOVE    "3"       TO  LNK-DAY1-YMD(2:1)
+                          END-IF
                           CALL    "ORCSDAY"     USING   STS-AREA-DAY
                                                         LNK-DAY1-AREA
                           IF      STS-DAY-RC1      =   ZERO
