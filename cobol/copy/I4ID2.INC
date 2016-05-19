@@ -15,17 +15,10 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-      *    orca32（入院会計照会）画面
-      ******************************************************************
-           COPY    "I41.INC".
-           COPY    "I42.INC".
-           COPY    "I44.INC".
-           COPY    "I47.INC".
-           COPY    "I48.INC".
-           COPY    "I49.INC".
-           COPY    "I411.INC".
-           COPY    "I4ERR.INC".
-           COPY    "I4ID1.INC".
-           COPY    "I4ID2.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I4API01-//.
+         02  I4ID2.
+              03  I4ID2-ID1CODE.
+                04  I4ID2-VALUE    PIC X(10).
+              03  I4ID2-ID1MSG     PIC X(200).
+              03  I4ID2-B01        PIC X(20).
+              03  I4ID2-B11        PIC X(50).
+              03  I4ID2-B12        PIC X(20).

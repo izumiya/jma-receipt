@@ -13,6 +13,7 @@ bind	"I49"		"OpenCOBOL"	"ORCGI49";
 bind	"I411"		"OpenCOBOL"	"ORCGI411";
 bind	"I4ERR"		"OpenCOBOL"	"ORCGI4ERR";
 bind	"I4ID1"		"OpenCOBOL"	"ORCGI4ID1";
+bind	"I4ID2"		"OpenCOBOL"	"ORCGI4ID2";
 bindapi	"hsptevalmodv2"	"OpenCOBOL"	"ORCGI4API01";
 
 multiplex_group	orca32;
@@ -29,6 +30,7 @@ data 	{
 		I411;
 		I4ERR;
 		I4ID1;
+		I4ID2;
 		hsptevalmodv2;
 	};
 };

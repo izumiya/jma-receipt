@@ -1374,6 +1374,7 @@
       *
            EVALUATE    SPA-MOTOPG
            WHEN    "I4ID1"
+           WHEN    "I4ID2"
                PERFORM 330-I4ID1-SET-SEC
                GO  TO  300-SCREEN-EXT
            END-EVALUATE
@@ -1915,14 +1916,19 @@
            MOVE    SPACE           TO  SPA-IIDCD
            MOVE    SPACE           TO  SPA-I4ID-FLG
       *
-           IF    ( WRK-I4ID-FLG    =   "OK" )
+           DISPLAY "WRK-I4ID-FLG=" WRK-I4ID-FLG
+           IF    ( WRK-I4ID-FLG    =   "OK" OR "O2" )
                EVALUATE    WRK-IIDCD
                WHEN    "2001"
                    PERFORM 2121-TOUROKU-SEC
                WHEN    "2002"
                    PERFORM 2111-TOUROKU-SEC
                WHEN    "2003"
-                   PERFORM 2111-TOUROKU-SEC
+                   IF    ( WRK-I4ID-FLG    =   "OK" )
+                       PERFORM 2111-TOUROKU-SEC
+                   ELSE
+                       PERFORM 21211-TOUROKU-SEC
+                   END-IF
                    IF    ( SPA-ERRCD       =   SPACE )
                        PERFORM 2101-HYOKAHYO-SEC
                    END-IF
@@ -2348,7 +2354,7 @@
            MOVE    SPA-GMN-TDAYALL (IDX-LST)
                                    TO  RYOCOM-MONTH
       *
-           PERFORM VARYING IDX-DAY FROM    0   BY  1
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
                MOVE    SPA-GMN-TDAY (IDX-LST IDX-DAY)
                                    TO  RYOCOM-DAY (IDX-DAY)
@@ -2394,7 +2400,7 @@
       *
            MOVE    I47-DAYALL          TO  SPA-GMN-DAYALL
       *
-           PERFORM VARYING IDX-DAY FROM    0   BY  1
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
                MOVE    I47-DAY (IDX-DAY)
@@ -3393,8 +3399,15 @@
            END-IF
       *
            IF    ( SPA-IIDCD       NOT =   SPACE )
-               PERFORM 520-I4IDSET-SEC
+               EVALUATE    SPA-IIDCD
+               WHEN    "2003"
+                   PERFORM 521-I4IDSET-SEC
+               WHEN    OTHER
+                   PERFORM 520-I4IDSET-SEC
+               END-EVALUATE
+      *
                GO  TO  500-SET-SCREEN-EXT
+      *
            END-IF
       *
            MOVE    "CURRENT"           TO  MCP-PUTTYPE.
@@ -4133,9 +4146,6 @@
            WHEN    "2002"
              MOVE "医療区分・ＡＤＬ区分を登録後、入院料の変更を行います"
                                        TO  WRK-I4IDMSG
-           WHEN    "2003"
-               MOVE    "入院料変更処理後、評価票の発行を行います"
-                                       TO  WRK-I4IDMSG
            END-EVALUATE
       *
            MOVE    SPACE               TO  I4ID1
@@ -4159,6 +4169,44 @@
       *
            .
        520-I4IDSET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ガイドメッセージ表示
+      *****************************************************************
+       521-I4IDSET-SEC                 SECTION.
+      *
+           MOVE    SPACE               TO  WRK-I4IDMSG
+      *
+           EVALUATE    SPA-IIDCD
+           WHEN    "2003"
+               MOVE    "入院料変更処理後、評価票の発行を行います"
+                                       TO  WRK-I4IDMSG
+           END-EVALUATE
+      *
+           MOVE    SPACE               TO  I4ID2
+           INITIALIZE                      I4ID2
+           MOVE    SPA-IIDCD           TO  I4ID2-ID1CODE
+           MOVE    WRK-I4IDMSG         TO  I4ID2-ID1MSG
+      *
+           MOVE    "F1:戻る"           TO  I4ID2-B01
+           MOVE    "F11:入院料の変更を行わずに発行"
+                                       TO  I4ID2-B11
+           MOVE    "F12:ＯＫ"          TO  I4ID2-B12
+      *
+           MOVE    "B12"               TO  MCP-WIDGET
+      *
+           MOVE    "I47"               TO  SPA-MOTOPG
+           MOVE    "I4ID2"             TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "I4ID2"             TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       521-I4IDSET-EXT.
            EXIT.
       *****************************************************************
       *    カナチェック処理
