@@ -741,6 +741,7 @@
       *  04.08.23    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.24    NACL-ÌçÏÆ    16/05/20  É¸½àÉéÃ´³Û·Ð²áÁ¼ÃÖ¡ÊÀº¿À¡ËÆþ±¡Ç¯·îÆü
       *                                     ¤Î¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.08.25    NACL-ÌçÏÆ    16/05/20  ¸ºÌÈ¡¦ºÒ³²³ºÅö¤ÎÂÐ¾Ý¥Á¥§¥Ã¥¯
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -968,6 +969,7 @@
            03  FLG-RECECOM                             PIC 9(01).
            03  FLG-SIPPU-COM                           PIC 9(01).
            03  FLG-SIPPU-ARI                           PIC 9(01).
+           03  FLG-CHECK-ARI                           PIC 9(01).
       *
       *    ´ðËÜÅÀ¿ô¤ÎÈóÉ½¼¨È½ÄêÍÑ¥Õ¥é¥°
        01  FLG-KHNTEN-AREA.
@@ -1053,6 +1055,7 @@
            03  IDX32                                   PIC 9(03).
            03  IDX33                                   PIC 9(03).
            03  IDX34                                   PIC 9(03).
+           03  IDX35                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -1621,6 +1624,9 @@
            03  WK-GENGAKU3-YMD.
                05  WK-GENGAKU3-YM              PIC  9(06).
                05  WK-GENGAKU3-DD              PIC  9(02).
+      *
+           03  WK-CHECK-TEKSTYMD               PIC  X(08).
+           03  WK-CHECK-TEKEDYMD               PIC  X(08).
       *
            03  WRK-CHIHOU-KIN                  PIC  9(09).
            03  WRK-CHIHOU-KIN2                 PIC  9(09).
@@ -6069,6 +6075,9 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
       *****************************************************************
        21171-GENGAKU-HENSYU-SEC      SECTION.
       *
+           MOVE     SPACE    TO     WK-CHECK-TEKSTYMD
+           MOVE     SPACE    TO     WK-CHECK-TEKEDYMD
+      *
            PERFORM   VARYING   GEN-IDX   FROM   1    BY   1
                       UNTIL   (GEN-IDX    >    TBL-GENGAKU-MAX)
                         OR    (WK-GENGAKUKBN   NOT = ZERO     )
@@ -6122,6 +6131,17 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                           MOVE   1           TO  WK-GENGAKUKBN-KEISAN
                       END-IF
       *
+                      MOVE  PTKOH-TEKSTYMD   TO  WK-CHECK-TEKSTYMD
+                      IF    PTKOH-TEKSTYMD(1:6)  <  RECE02-SRYYM
+                        MOVE  RECE02-SRYYM   TO  WK-CHECK-TEKSTYMD(1:6)
+                        MOVE  "01"           TO  WK-CHECK-TEKSTYMD(7:2)
+                      END-IF
+                      MOVE  PTKOH-TEKEDYMD   TO  WK-CHECK-TEKEDYMD
+                      IF    PTKOH-TEKEDYMD(1:6)  >  RECE02-SRYYM
+                        MOVE  RECE02-SRYYM   TO  WK-CHECK-TEKEDYMD(1:6)
+                        MOVE  "31"           TO  WK-CHECK-TEKEDYMD(7:2)
+                      END-IF
+      *
                       MOVE       1           TO  FLG-PTKOHINF
                   ELSE
                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
@@ -6135,8 +6155,66 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
              PERFORM 900-CLOSE-SEC
            END-PERFORM
       *
+           MOVE     ZERO      TO  FLG-CHECK-ARI
+           IF   WK-GENGAKUKBN  NOT =  ZERO
+              PERFORM  211711-GENGAKU-CHECK-SEC
+              IF   FLG-CHECK-ARI  =  ZERO
+                MOVE   ZERO   TO  WK-GENGAKUKBN
+              END-IF
+           END-IF
+      *
            .
        21171-GENGAKU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸º³Û¡¦ÌÈ½ü¡¦»ÙÊ§Í±Í½¼Ô¤Î¥Á¥§¥Ã¥¯
+      *****************************************************************
+       211711-GENGAKU-CHECK-SEC      SECTION.
+      *
+           PERFORM  VARYING  IDX35   FROM    1   BY  1
+                     UNTIL  (IDX35                   >   10 )
+                      OR    (RECE02-HKNCOMBI(IDX35)  =  ZERO)
+                      OR    (FLG-CHECK-ARI           =   1  )
+             IF   RECE02-DAISANFLG(IDX35)   =   1
+               CONTINUE
+             ELSE
+               INITIALIZE                       SYUNOU-REC
+               MOVE  RECE02-HOSPNUM         TO  SYU-HOSPNUM
+               MOVE  RECE02-NYUGAIKBN       TO  SYU-NYUGAIKBN
+               MOVE  RECE02-PTID            TO  SYU-PTID
+               MOVE  RECE02-SRYYM           TO  SYU-SRYYMD(1:6)
+               MOVE  "__"                   TO  SYU-SRYYMD(7:2)
+               MOVE  RECE02-HKNCOMBI(IDX35) TO  SYU-HKNCOMBINUM
+               MOVE  SYUNOU-REC             TO  MCPDATA-REC
+               MOVE  "tbl_syunou"           TO  MCP-TABLE
+               MOVE  "key41"                TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF    MCP-RC   =   ZERO
+                 MOVE    "tbl_syunou"       TO  MCP-TABLE
+                 MOVE    "key41"            TO  MCP-PATHNAME
+                 PERFORM  900-SYUNOU-READ-SEC
+                 PERFORM  UNTIL  (FLG-SYUNOU      =  1)
+                           OR    (FLG-CHECK-ARI   =  1)
+                   IF    SYU-DENPJTIKBN    NOT =  "3"
+                     IF  (WK-CHECK-TEKSTYMD <= SYU-SRYYMD       )
+                     AND (SYU-SRYYMD        <= WK-CHECK-TEKEDYMD)
+                        MOVE   1   TO   FLG-CHECK-ARI
+                     END-IF
+                   END-IF
+                   MOVE    "tbl_syunou"     TO  MCP-TABLE
+                   MOVE    "key41"          TO  MCP-PATHNAME
+                   PERFORM  900-SYUNOU-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE      "tbl_syunou"       TO  MCP-TABLE
+               MOVE      "key41"            TO  MCP-PATHNAME
+               PERFORM    900-CLOSE-SEC
+             END-IF
+           END-PERFORM
+      *
+           .
+       211711-GENGAKU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -26844,6 +26922,9 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *****************************************************************
        211L1-SAIGAI-TAISYO-HENSYU-SEC      SECTION.
       *
+           MOVE     SPACE    TO     WK-CHECK-TEKSTYMD
+           MOVE     SPACE    TO     WK-CHECK-TEKEDYMD
+      *
            INITIALIZE                       PTKOHINF-REC
            MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
            MOVE    RECE02-PTID          TO  PTKOH-PTID
@@ -26868,6 +26949,18 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                     (WK-GENGAKU3-YMD NOT = "99999999"    ) AND
                     (PTKOH-SAKJOKBN   =   SPACE          ))
                   MOVE     1             TO  FLG-SAIGAI-TAISYO
+      *
+                  MOVE  PTKOH-TEKSTYMD   TO  WK-CHECK-TEKSTYMD
+                  IF    PTKOH-TEKSTYMD(1:6)  <  RECE02-SRYYM
+                    MOVE  RECE02-SRYYM   TO  WK-CHECK-TEKSTYMD(1:6)
+                    MOVE  "01"           TO  WK-CHECK-TEKSTYMD(7:2)
+                  END-IF
+                  MOVE  PTKOH-TEKEDYMD   TO  WK-CHECK-TEKEDYMD
+                  IF    PTKOH-TEKEDYMD(1:6)  >  RECE02-SRYYM
+                    MOVE  RECE02-SRYYM   TO  WK-CHECK-TEKEDYMD(1:6)
+                    MOVE  "31"           TO  WK-CHECK-TEKEDYMD(7:2)
+                  END-IF
+      *
                   MOVE     1             TO  FLG-PTKOHINF
                 ELSE
                   MOVE    "tbl_ptkohinf" TO  MCP-TABLE
@@ -26879,6 +26972,14 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
            MOVE    "key4"               TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+           MOVE     ZERO      TO  FLG-CHECK-ARI
+           IF   FLG-SAIGAI-TAISYO  =  1
+              PERFORM  211711-GENGAKU-CHECK-SEC
+              IF   FLG-CHECK-ARI  =  ZERO
+                MOVE   ZERO   TO  FLG-SAIGAI-TAISYO
+              END-IF
+           END-IF
       *
            .
        211L1-SAIGAI-TAISYO-HENSYU-EXT.
