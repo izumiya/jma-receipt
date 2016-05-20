@@ -175,6 +175,8 @@
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    15/10/09  削除処理を行わない場合の表示
+      *  04.08.04    NACL-藤原    16/05/20  情報削除から遷移時の共通スパ
+      *                                     設定の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -653,7 +655,7 @@
       *
       *        元の画面へ戻す
                IF      SPA-MOTOPG      =   "XB01"
-                   MOVE    LNK-COMMON      TO  SPA-KYOTUKEY
+                   MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-R01FREE
                    MOVE    SPA-WORK        TO  SPA-R01KYOUTU
                    GO  TO  300-SCREEN-EXT
@@ -4975,6 +4977,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
        490-JYOUHOU-DEL-SEC             SECTION.
       *
            MOVE    SPACE               TO  LINKAREA
+      *
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-R01FREE         TO  LNK-SCRSPA
       *
@@ -5037,7 +5040,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    画面移行用のパラメタ変更
            MOVE    "R01"               TO  SPA-R01-MOTOPG
       *
-           MOVE    SPA-R01KYOUTU       TO  SPA-WORK       
+           MOVE    SPA-R01KYOUTU       TO  SPA-WORK
       *
            MOVE   "CHANGE"             TO  MCP-PUTTYPE
            MOVE   SPA-SAKIPG           TO  MCP-WINDOW
