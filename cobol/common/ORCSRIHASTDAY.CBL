@@ -73,6 +73,7 @@
            03  IDX16                         PIC 9(02).
            03  IDX17                         PIC 9(02).
            03  IDX18                         PIC 9(02).
+           03  IDX19                         PIC 9(02).
            03  IDY                           PIC 9(02).
            03  IDZ                           PIC 9(03).
            03  IDC1                          PIC 9(02).
@@ -123,10 +124,19 @@
                05  WK-FREE-YUKOKETA          PIC 9(03).
                05  WK-FREE-NAME              PIC X(200).
       *
-      *１：心大血管疾患　２：脳血管疾患等　３：廃用症候群、　４：運動器
-      *５：呼吸器　６：摂食　７：難病患者　８：障害児（者）
+      *  １：心大血管疾患
+      *  ２：心大血管疾患の早期・初期リハ加算
+      *  ３：脳血管疾患等
+      *  ４：廃用症候群
+      *  ５：廃用症候群の早期・初期リハ加算
+      *  ６：運動器
+      *  ７：呼吸器
+      *  ８：呼吸器の早期・初期リハ加算
+      *  ９：摂食
+      *１０：難病患者
+      *１１：障害児（者）
        01  WRK-RIHASANTEI-AREA.
-           03  WRK-RIHASANTEI-OCC            OCCURS  8.
+           03  WRK-RIHASANTEI-OCC            OCCURS 11.
                05  WRK-RIHASANTEI-FLG        PIC 9(01).
                05  WRK-RIHASANTEI-DAY-TBL.
                    06  WRK-RIHASANTEI-DAY    PIC 9(01)   OCCURS  31.
@@ -155,6 +165,13 @@
       *        廃用症候群リハ開始日
                05  CONS-HAIYO             PIC X(09)   VALUE "099800191".
       *
+      *        心大リハ加算開始日
+               05  CONS-SINDAI-K          PIC X(09)   VALUE "099800211".
+      *        呼吸器リハ加算開始日
+               05  CONS-KOKYUKI-K         PIC X(09)   VALUE "099800241".
+      *        廃用症候群リハ加算開始日
+               05  CONS-HAIYO-K           PIC X(09)   VALUE "099800291".
+      *
       *        心大リハ終了日
                05  CONS-SINDAI-E          PIC X(09)   VALUE "099800112".
       *        呼吸器リハ終了日
@@ -173,8 +190,8 @@
                05  CONS-HAIYO-E           PIC X(09)   VALUE "099800192".
       *
            03  CONS-RIHA-SYSCD-R REDEFINES CONST-RIHA-SYSCD-VAL.
-               05  CONS-RIHA-SYSCD     PIC X(09)   OCCURS 16.
-           03  CONS-RIHA-SYSCD-MAX     PIC 9(03)   VALUE  16.
+               05  CONS-RIHA-SYSCD     PIC X(09)   OCCURS 19.
+           03  CONS-RIHA-SYSCD-MAX     PIC 9(03)   VALUE  19.
       *
       *****
       *    リハビリ手技料
@@ -319,9 +336,14 @@
                05  CONS-HAIYO14-COMMENT   PIC X(09)   VALUE "101801120".
       *#       廃用症候群リハビリテーション料（３）（１単位）
                05  CONS-HAIYO15-COMMENT   PIC X(09)   VALUE "101801130".
+      *        初期加算（リハビリテーション料）
+               05  CONS-RIHAKSN1-COMMENT  PIC X(09)   VALUE "180033870".
+      *        早期リハビリテーション加算
+               05  CONS-RIHAKSN2-COMMENT  PIC X(09)   VALUE "180030770".
+      *
            03  CONS-RIHA-COMMENT-R REDEFINES CONS-RIHA-COMMENT-VAL.
-               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 70.
-           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  70.
+               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 72.
+           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  72.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -626,6 +648,7 @@
                      MOVE   1    TO    WRK-RIHASANTEI-FLG(1)
                      MOVE   1    TO    WRK-RIHASANTEI-DAY(1 IDX3)
                      MOVE   1    TO    IDX17
+                     MOVE   1    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -649,9 +672,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(2)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(2 IDX3)
-                     MOVE   2    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
+                     MOVE   3    TO    IDX17
+                     MOVE   3    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -675,9 +699,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
-                     MOVE   3    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
+                     MOVE   4    TO    IDX17
+                     MOVE   4    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -695,9 +720,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
-                     MOVE   4    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(6)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(6 IDX3)
+                     MOVE   6    TO    IDX17
+                     MOVE   6    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -708,9 +734,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
-                     MOVE   5    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(7)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(7 IDX3)
+                     MOVE   7    TO    IDX17
+                     MOVE   7    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -720,9 +747,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(6)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(6 IDX3)
-                     MOVE   6    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(9)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(9 IDX3)
+                     MOVE   9    TO    IDX17
+                     MOVE   9    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -732,9 +760,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(7)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(7 IDX3)
-                     MOVE   7    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(10)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(10 IDX3)
+                     MOVE   10   TO    IDX17
+                     MOVE   10   TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -746,9 +775,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(8)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(8 IDX3)
-                     MOVE   8    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(11)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(11 IDX3)
+                     MOVE   11   TO    IDX17
+                     MOVE   11   TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -764,6 +794,7 @@
                      MOVE   1    TO    WRK-RIHASANTEI-FLG(1)
                      MOVE   1    TO    WRK-RIHASANTEI-DAY(1 IDX3)
                      MOVE   1    TO    IDX17
+                     MOVE   1    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -775,9 +806,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(2)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(2 IDX3)
-                     MOVE   2    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
+                     MOVE   3    TO    IDX17
+                     MOVE   3    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -791,9 +823,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
-                     MOVE   4    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(6)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(6 IDX3)
+                     MOVE   6    TO    IDX17
+                     MOVE   6    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -804,9 +837,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
-                     MOVE   5    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(7)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(7 IDX3)
+                     MOVE   7    TO    IDX17
+                     MOVE   7    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -821,6 +855,7 @@
                      MOVE   1    TO    WRK-RIHASANTEI-FLG(1)
                      MOVE   1    TO    WRK-RIHASANTEI-DAY(1 IDX3)
                      MOVE   1    TO    IDX17
+                     MOVE   1    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -832,9 +867,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(2)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(2 IDX3)
-                     MOVE   2    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(3)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(3 IDX3)
+                     MOVE   3    TO    IDX17
+                     MOVE   3    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -846,9 +882,10 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(4)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(4 IDX3)
-                     MOVE   4    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(6)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(6 IDX3)
+                     MOVE   6    TO    IDX17
+                     MOVE   6    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
@@ -859,14 +896,54 @@
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
-                     MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
-                     MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
-                     MOVE   5    TO    IDX17
+                     MOVE   1    TO    WRK-RIHASANTEI-FLG(7)
+                     MOVE   1    TO    WRK-RIHASANTEI-DAY(7 IDX3)
+                     MOVE   7    TO    IDX17
+                     MOVE   7    TO    IDX19
                      MOVE   SRY-SRYCD(IDX12)
                                  TO    WRK-SRYCD3
                    END-IF
                  END-PERFORM
                END-IF
+             END-IF
+      *
+             IF   SRY-SRYCD(IDX12)  =    CONS-RIHAKSN1-COMMENT
+                                   OR    CONS-RIHAKSN2-COMMENT
+               EVALUATE  IDX19
+                 WHEN      1
+                   PERFORM  VARYING  IDX3  FROM  1  BY  1
+                             UNTIL   IDX3   >   31
+                     IF   ACCT-DAY(1 IDX3)  NOT = ZERO
+                       MOVE   1    TO    WRK-RIHASANTEI-FLG(2)
+                       MOVE   1    TO    WRK-RIHASANTEI-DAY(2 IDX3)
+                       MOVE   2    TO    IDX17
+                       MOVE   SRY-SRYCD(IDX12)
+                                   TO    WRK-SRYCD3
+                     END-IF
+                   END-PERFORM
+                 WHEN      4
+                   PERFORM  VARYING  IDX3  FROM  1  BY  1
+                             UNTIL   IDX3   >   31
+                     IF   ACCT-DAY(1 IDX3)  NOT = ZERO
+                       MOVE   1    TO    WRK-RIHASANTEI-FLG(5)
+                       MOVE   1    TO    WRK-RIHASANTEI-DAY(5 IDX3)
+                       MOVE   5    TO    IDX17
+                       MOVE   SRY-SRYCD(IDX12)
+                                   TO    WRK-SRYCD3
+                     END-IF
+                   END-PERFORM
+                 WHEN      7
+                   PERFORM  VARYING  IDX3  FROM  1  BY  1
+                             UNTIL   IDX3   >   31
+                     IF   ACCT-DAY(1 IDX3)  NOT = ZERO
+                       MOVE   1    TO    WRK-RIHASANTEI-FLG(8)
+                       MOVE   1    TO    WRK-RIHASANTEI-DAY(8 IDX3)
+                       MOVE   8    TO    IDX17
+                       MOVE   SRY-SRYCD(IDX12)
+                                   TO    WRK-SRYCD3
+                     END-IF
+                   END-PERFORM
+               END-EVALUATE
              END-IF
       *
              IF    IDX17  NOT =  ZERO
@@ -928,12 +1005,12 @@
              END-IF
            END-IF
       *
-      *    脳血管疾患等
+      *    心大血管疾患の早期・初期リハ加算
            IF   WRK-RIHASANTEI-FLG(2)  =  1
              MOVE      2               TO   IDY
              MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-NOUKE      TO   WRK-SRYCD
-             MOVE      CONS-NOUKE-E    TO   WRK-SRYCD2
+             MOVE      CONS-SINDAI-K   TO   WRK-SRYCD
+             MOVE      "999999999"     TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(2)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -949,12 +1026,12 @@
              END-IF
            END-IF
       *
-      *    廃用症候群
+      *    脳血管疾患等
            IF   WRK-RIHASANTEI-FLG(3)  =  1
              MOVE      3               TO   IDY
              MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-HAIYO      TO   WRK-SRYCD
-             MOVE      CONS-HAIYO-E    TO   WRK-SRYCD2
+             MOVE      CONS-NOUKE      TO   WRK-SRYCD
+             MOVE      CONS-NOUKE-E    TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(3)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -970,12 +1047,12 @@
              END-IF
            END-IF
       *
-      *    運動器
+      *    廃用症候群
            IF   WRK-RIHASANTEI-FLG(4)  =  1
              MOVE      4               TO   IDY
              MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-UNDOKI     TO   WRK-SRYCD
-             MOVE      CONS-UNDOKI-E   TO   WRK-SRYCD2
+             MOVE      CONS-HAIYO      TO   WRK-SRYCD
+             MOVE      CONS-HAIYO-E    TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(4)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -991,12 +1068,12 @@
              END-IF
            END-IF
       *
-      *    呼吸器
+      *    廃用症候群の早期・初期リハ加算
            IF   WRK-RIHASANTEI-FLG(5)  =  1
              MOVE      5               TO   IDY
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
-             MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-HAIYO-K    TO   WRK-SRYCD
+             MOVE      "999999999"     TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(5)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -1012,12 +1089,12 @@
              END-IF
            END-IF
       *
-      *    摂食
+      *    運動器
            IF   WRK-RIHASANTEI-FLG(6)  =  1
              MOVE      6               TO   IDY
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-SESSYOKU   TO   WRK-SRYCD
-             MOVE      CONS-SESSYOKU-E TO   WRK-SRYCD2
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-UNDOKI     TO   WRK-SRYCD
+             MOVE      CONS-UNDOKI-E   TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(6)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -1033,12 +1110,12 @@
              END-IF
            END-IF
       *
-      *    難病患者
+      *    呼吸器
            IF   WRK-RIHASANTEI-FLG(7)  =  1
              MOVE      7               TO   IDY
-             MOVE      1               TO   FLG-COMOKIKAE
-             MOVE      CONS-NANBYO     TO   WRK-SRYCD
-             MOVE      CONS-NANBYO-E   TO   WRK-SRYCD2
+             MOVE      ZERO            TO   FLG-COMOKIKAE
+             MOVE      CONS-KOKYUKI    TO   WRK-SRYCD
+             MOVE      CONS-KOKYUKI-E  TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(7)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -1054,12 +1131,12 @@
              END-IF
            END-IF
       *
-      *    障害児（者）
+      *    呼吸器の早期・初期リハ加算
            IF   WRK-RIHASANTEI-FLG(8)  =  1
              MOVE      8               TO   IDY
-             MOVE      ZERO            TO   FLG-COMOKIKAE
-             MOVE      CONS-SYOGAI     TO   WRK-SRYCD
-             MOVE      CONS-SYOGAI-E   TO   WRK-SRYCD2
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-KOKYUKI-K  TO   WRK-SRYCD
+             MOVE      "999999999"     TO   WRK-SRYCD2
              MOVE      WRK-RIHASANTEI-DAY-TBL(8)
                                        TO   TBL-HASSYO-TAIHI-DAY-T
              MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
@@ -1072,6 +1149,69 @@
                PERFORM 2202-RIHAKAISHI-COMMENT-SEC
                MOVE    WRK-RIHASANTEI-SRYCD-TBL(8)
                                        TO   LNK-RIHASTDAY-OUT-OCC3(8)
+             END-IF
+           END-IF
+      *
+      *    摂食
+           IF   WRK-RIHASANTEI-FLG(9)  =  1
+             MOVE      9               TO   IDY
+             MOVE      ZERO            TO   FLG-COMOKIKAE
+             MOVE      CONS-SESSYOKU   TO   WRK-SRYCD
+             MOVE      CONS-SESSYOKU-E TO   WRK-SRYCD2
+             MOVE      WRK-RIHASANTEI-DAY-TBL(9)
+                                       TO   TBL-HASSYO-TAIHI-DAY-T
+             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+             IF   FLG-HKNCOMBI-SET  =  1
+               MOVE    LNK-RIHASTDAY-HKNCOMBI
+                                       TO   WRK-RIHA-HKNCOMBI
+             END-IF
+             PERFORM   2201-RIHAKAISHI-HANTEI-SEC
+             IF   FLG-KYUSEI-COMMENT  =  1
+               PERFORM 2202-RIHAKAISHI-COMMENT-SEC
+               MOVE    WRK-RIHASANTEI-SRYCD-TBL(9)
+                                       TO   LNK-RIHASTDAY-OUT-OCC3(9)
+             END-IF
+           END-IF
+      *
+      *    難病患者
+           IF   WRK-RIHASANTEI-FLG(10)  =  1
+             MOVE      10              TO   IDY
+             MOVE      1               TO   FLG-COMOKIKAE
+             MOVE      CONS-NANBYO     TO   WRK-SRYCD
+             MOVE      CONS-NANBYO-E   TO   WRK-SRYCD2
+             MOVE      WRK-RIHASANTEI-DAY-TBL(10)
+                                       TO   TBL-HASSYO-TAIHI-DAY-T
+             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+             IF   FLG-HKNCOMBI-SET  =  1
+               MOVE    LNK-RIHASTDAY-HKNCOMBI
+                                       TO   WRK-RIHA-HKNCOMBI
+             END-IF
+             PERFORM   2201-RIHAKAISHI-HANTEI-SEC
+             IF   FLG-KYUSEI-COMMENT  =  1
+               PERFORM 2202-RIHAKAISHI-COMMENT-SEC
+               MOVE    WRK-RIHASANTEI-SRYCD-TBL(10)
+                                       TO   LNK-RIHASTDAY-OUT-OCC3(10)
+             END-IF
+           END-IF
+      *
+      *    障害児（者）
+           IF   WRK-RIHASANTEI-FLG(11)  =  1
+             MOVE      11              TO   IDY
+             MOVE      ZERO            TO   FLG-COMOKIKAE
+             MOVE      CONS-SYOGAI     TO   WRK-SRYCD
+             MOVE      CONS-SYOGAI-E   TO   WRK-SRYCD2
+             MOVE      WRK-RIHASANTEI-DAY-TBL(11)
+                                       TO   TBL-HASSYO-TAIHI-DAY-T
+             MOVE      ZERO            TO   WRK-RIHA-HKNCOMBI
+             IF   FLG-HKNCOMBI-SET  =  1
+               MOVE    LNK-RIHASTDAY-HKNCOMBI
+                                       TO   WRK-RIHA-HKNCOMBI
+             END-IF
+             PERFORM   2201-RIHAKAISHI-HANTEI-SEC
+             IF   FLG-KYUSEI-COMMENT  =  1
+               PERFORM 2202-RIHAKAISHI-COMMENT-SEC
+               MOVE    WRK-RIHASANTEI-SRYCD-TBL(11)
+                                       TO   LNK-RIHASTDAY-OUT-OCC3(11)
              END-IF
            END-IF
       *
@@ -1703,6 +1843,35 @@
                WHEN       2
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
+                   WHEN       3
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：発症　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       1
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：手術　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       2
+                     MOVE    24   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE
+                      "早期・初期リハ加算：急性増悪　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    31   TO  IDC1
+                     MOVE    37   TO  IDC2
+                     MOVE    43   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                 END-EVALUATE
+               WHEN       3
+                 EVALUATE   FLG-COMOKIKAE2
+                   WHEN       0
                      MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                      MOVE  "脳血管疾患等リハ：発症　　　年　　月　　日"
                                   TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1735,7 +1904,7 @@
                      MOVE    37   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       3
+               WHEN       4
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
                    WHEN       1
@@ -1756,7 +1925,36 @@
                      MOVE    39   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       4
+               WHEN       5
+                 EVALUATE   FLG-COMOKIKAE2
+                   WHEN       0
+                   WHEN       3
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：発症　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       1
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：手術　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       2
+                     MOVE    24   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE
+                      "早期・初期リハ加算：急性増悪　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    31   TO  IDC1
+                     MOVE    37   TO  IDC2
+                     MOVE    43   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                 END-EVALUATE
+               WHEN       6
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
                      MOVE    18   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
@@ -1791,7 +1989,7 @@
                      MOVE    31   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       5
+               WHEN       7
                  MOVE    20   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "呼吸器リハ：治療開始　　　年　　月　　日"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1799,7 +1997,36 @@
                  MOVE    29   TO  IDC2
                  MOVE    35   TO  IDC3
                  PERFORM 220221-RIHA-COM-DATE-SEC
-               WHEN       6
+               WHEN       8
+                 EVALUATE   FLG-COMOKIKAE2
+                   WHEN       0
+                   WHEN       3
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：発症　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       1
+                     MOVE    22   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE "早期・初期リハ加算：手術　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    27   TO  IDC1
+                     MOVE    33   TO  IDC2
+                     MOVE    39   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                   WHEN       2
+                     MOVE    24   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
+                     MOVE
+                      "早期・初期リハ加算：急性増悪　　　年　　月　　日"
+                                  TO  LNK-RIHASTDAY-COM(IDY IDX)
+                     MOVE    31   TO  IDC1
+                     MOVE    37   TO  IDC2
+                     MOVE    43   TO  IDC3
+                     PERFORM 220221-RIHA-COM-DATE-SEC
+                 END-EVALUATE
+               WHEN       9
                  MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "摂食機能療法：治療開始　　　年　　月　　日"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)
@@ -1807,7 +2034,7 @@
                  MOVE    31   TO  IDC2
                  MOVE    37   TO  IDC3
                  PERFORM 220221-RIHA-COM-DATE-SEC
-               WHEN       7
+               WHEN       10
                  EVALUATE   FLG-COMOKIKAE2
                    WHEN       0
                    WHEN       3
@@ -1835,7 +2062,7 @@
                      MOVE    37   TO  IDC3
                      PERFORM 220221-RIHA-COM-DATE-SEC
                  END-EVALUATE
-               WHEN       8
+               WHEN       11
                  MOVE    21   TO  LNK-RIHASTDAY-YUKOKETA(IDY IDX)
                  MOVE  "障害児（者）リハ：発症　　　年　　月　　日"
                               TO  LNK-RIHASTDAY-COM(IDY IDX)
