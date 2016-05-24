@@ -2109,13 +2109,71 @@
                               TNS-NYUKHNKBN
                     IF  TNS-NYUTENTTLKBN   =   903
       *                 特別入院基本料は除く
-                        IF  (TNS-NYUKHNKBN   =  79  OR  88)  OR
-                            (TNS-SRYCD       =  "190121810"  OR
-                                                "190799510")
-                            CONTINUE
-                        ELSE
-                            MOVE   "190182590"
-                                       TO   WRK-EIYOU-GENSANCD
+                        IF   WRK-STYMD(1:6)  <=   "201603"
+                          IF  (TNS-NYUKHNKBN   =  79  OR  88)  OR
+                              (TNS-SRYCD       =  "190121810"  OR
+                                                  "190799510")
+                              CONTINUE
+                          ELSE
+                              MOVE   "190182590"
+                                         TO   WRK-EIYOU-GENSANCD
+                          END-IF
+                        END-IF
+                        IF   WRK-STYMD(1:6)  >=   "201604"
+                          IF  (TNS-SRYCD       =  "190121810"  OR
+                                                  "190799510") OR
+      *                      一般病棟特別入院基本料
+      *                     （選）一般病棟特別入院基本料
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =   6))       OR
+      *                      一般病棟入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =   7))       OR
+      *                     一般病棟入院基本料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =  18))       OR
+      *                     療養病棟入院基本料２（特別入院基本料）
+      *                     療養病棟入院基本料２（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 101)   AND
+                             (TNS-CDKBN-KOUBAN  =   3))       OR
+      *                     療養病棟入院基本料２（看護職員数等経過措置）
+                            ((TNS-CDKBN-KBNNUM  = 101)   AND
+                             (TNS-CDKBN-KOUBAN  =   9))       OR
+      *                     療養病棟入院基本料２（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 101)   AND
+                             (TNS-CDKBN-KOUBAN  =  10))       OR
+      *                     結核病棟特別入院基本料
+      *                     結核病棟入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 102)   AND
+                             (TNS-CDKBN-KOUBAN  =   7))       OR
+      *                     結核病棟入院基本料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 102)   AND
+                             (TNS-CDKBN-KOUBAN  =   9))       OR
+      *                     精神病棟特別入院基本料
+      *                     精神病棟入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 103)   AND
+                             (TNS-CDKBN-KOUBAN  =   6))       OR
+      *                     精神病棟入院基本料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 103)   AND
+                             (TNS-CDKBN-KOUBAN  =  11))       OR
+      *                     障害者施設等入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 106)   AND
+                             (TNS-CDKBN-KOUBAN  =   5))       OR
+      *                     障害者施設等入院基本料（医療区分）（夜勤時間超過減算）
+      *                   （表用番号で判定不可の為、算定コードを直判定）
+                             (TNS-SRYCD       = "190198910"  OR
+                                                "190199010"  OR
+                                                "190199110"  OR
+                                                "190199210"  OR
+                                                "190199310"  OR
+                                                "190199410"  OR
+                                                "190199510"  OR
+                                                "190199610")
+                              CONTINUE
+                          ELSE
+                              MOVE   "190182590"
+                                         TO   WRK-EIYOU-GENSANCD
+                          END-IF
                         END-IF
                     END-IF
                     IF   TNS-NYUTENTTLKBN   =   920
