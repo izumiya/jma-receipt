@@ -3602,6 +3602,11 @@
                                                =   WRK-FEDT-PREV-TEN721
                                                +   WRK-FEDT-DEKIDAKA-TEN
                    END-IF
+      *--- AZU-ADD START 2016.04.22
+                   IF    WRK-FEDT-SRYKBN       =  "50"
+                      MOVE WRK-FEDT-DEKIDAKA-TEN TO  WRK-FEDT-PREV-TEN50
+                   END-IF
+      *--- AZU-ADD END 2016.04.22
                ELSE
                    IF  TBL-KOUI-TENSIKIBETU (IDX)  =  6
                        COMPUTE WRK-FEDT-PREV-TEN
