@@ -488,11 +488,11 @@
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           DISPLAY "WRK-CHKBTU-NUM(1) = " WRK-CHKBTU-NUM(1)
-           DISPLAY "WRK-CHKBTU-NUM(2) = " WRK-CHKBTU-NUM(2)
-           DISPLAY "WRK-CHKBTU-NUM(3) = " WRK-CHKBTU-NUM(3)
-           DISPLAY "WRK-CHKBTU-NUM(4) = " WRK-CHKBTU-NUM(4)
-           DISPLAY "WRK-CHKBTU-NUM(5) = " WRK-CHKBTU-NUM(5)
+      *     DISPLAY "WRK-CHKBTU-NUM(1) = " WRK-CHKBTU-NUM(1)
+      *     DISPLAY "WRK-CHKBTU-NUM(2) = " WRK-CHKBTU-NUM(2)
+      *     DISPLAY "WRK-CHKBTU-NUM(3) = " WRK-CHKBTU-NUM(3)
+      *     DISPLAY "WRK-CHKBTU-NUM(4) = " WRK-CHKBTU-NUM(4)
+      *     DISPLAY "WRK-CHKBTU-NUM(5) = " WRK-CHKBTU-NUM(5)
       *
       *    入院履歴より２７年４月１日以前から２８年４月１日まで継続して
       *    精神病床に入院しているか判定
@@ -510,8 +510,8 @@
                MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
                MOVE    "key24"            TO  MCP-PATHNAME
                PERFORM   910-PTNYUINRRK-READ-SEC
-               DISPLAY    "========  FLG-PTNYUINRRK(1) = "
-                                     FLG-PTNYUINRRK
+      *         DISPLAY    "========  FLG-PTNYUINRRK(1) = "
+      *                               FLG-PTNYUINRRK
                MOVE    PTNYUINRRK-NYUINYMD       TO  WRK-SEI-NYUINYMD
                IF      FLG-PTNYUINRRK     =   ZERO
                    MOVE    PTNYUINRRK-RRKNUM     TO  WRK-RRKNUM
@@ -529,18 +529,18 @@
                        MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
                        MOVE    "key67"            TO  MCP-PATHNAME
                        PERFORM   910-PTNYUINRRK-READ-SEC
-                       DISPLAY    "========  FLG-PTNYUINRRK(2) = "
-                                             FLG-PTNYUINRRK
+      *                 DISPLAY    "========  FLG-PTNYUINRRK(2) = "
+      *                                       FLG-PTNYUINRRK
       **                 MOVE     SPACE             TO  WRK-MATCH
                        PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)  OR
                                          (WRK-MATCH        =  "NG")
       **                     MOVE     SPACE             TO  WRK-MATCH
-                           DISPLAY "PTNYUINRRK-RRKNUM = "
-                                    PTNYUINRRK-RRKNUM
-                           DISPLAY "PTNYUINRRK-TENNYUYMD = "
-                                    PTNYUINRRK-TENNYUYMD
-                           DISPLAY "PTNYUINRRK-TENSTUYMD = "
-                                    PTNYUINRRK-TENSTUYMD
+      *                     DISPLAY "PTNYUINRRK-RRKNUM = "
+      *                              PTNYUINRRK-RRKNUM
+      *                     DISPLAY "PTNYUINRRK-TENNYUYMD = "
+      *                              PTNYUINRRK-TENNYUYMD
+      *                     DISPLAY "PTNYUINRRK-TENSTUYMD = "
+      *                              PTNYUINRRK-TENSTUYMD
                            IF ((PTNYUINRRK-TENNYUYMD  <= "20150401") AND
                                (PTNYUINRRK-TENSTUYMD  >= "20150401"))
                                                                      OR
@@ -579,7 +579,7 @@
            MOVE    "key24"                 TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           DISPLAY    "WRK-MATCH = " WRK-MATCH
+      *     DISPLAY    "WRK-MATCH = " WRK-MATCH
       *
            IF        WRK-MATCH           =      "OK"
       *        据え置き区分のセット
@@ -658,7 +658,7 @@
                MOVE    "key69"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
       *
-               DISPLAY  "FLG-KEIZOKU = " FLG-KEIZOKU
+      *         DISPLAY  "FLG-KEIZOKU = " FLG-KEIZOKU
       *        精神病床の初回入院年月日のセット
                IF      FLG-KEIZOKU      =    1
                  INITIALIZE                        PTNYUINRRK-REC
@@ -832,9 +832,9 @@
            MOVE     "key21"          TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           DISPLAY  "WRK-SYSYYK-SRYYMD(1) = " WRK-SYSYYK-SRYYMD(1)
-           DISPLAY  "WRK-SYSYYK-SRYYMD(2) = " WRK-SYSYYK-SRYYMD(2)
-           DISPLAY  "WRK-SYSYYK-SRYYMD(3) = " WRK-SYSYYK-SRYYMD(3)
+      *     DISPLAY  "WRK-SYSYYK-SRYYMD(1) = " WRK-SYSYYK-SRYYMD(1)
+      *     DISPLAY  "WRK-SYSYYK-SRYYMD(2) = " WRK-SYSYYK-SRYYMD(2)
+      *     DISPLAY  "WRK-SYSYYK-SRYYMD(3) = " WRK-SYSYYK-SRYYMD(3)
       *
            PERFORM    VARYING    IDX    FROM  1   BY  1
              UNTIL    (IDX    >   20)   OR
@@ -867,15 +867,15 @@
              END-IF
            END-PERFORM
       *
-           DISPLAY  "WRK-SYSYYK-RRKNUM(1) = " WRK-SYSYYK-RRKNUM(1)
-           DISPLAY  "WRK-SYSYYK-NYUINYMD(1)= " WRK-SYSYYK-NYUINYMD(1)
-           DISPLAY  "WRK-SYSYYK-TAIINYMD(1)= " WRK-SYSYYK-TAIINYMD(1)
-           DISPLAY  "WRK-SYSYYK-RRKNUM(2) = " WRK-SYSYYK-RRKNUM(2)
-           DISPLAY  "WRK-SYSYYK-NYUINYMD(2)= " WRK-SYSYYK-NYUINYMD(2)
-           DISPLAY  "WRK-SYSYYK-TAIINYMD(2)= " WRK-SYSYYK-TAIINYMD(2)
-           DISPLAY  "WRK-SYSYYK-RRKNUM(3) = " WRK-SYSYYK-RRKNUM(3)
-           DISPLAY  "WRK-SYSYYK-NYUINYMD(3)= " WRK-SYSYYK-NYUINYMD(3)
-           DISPLAY  "WRK-SYSYYK-TAIINYMD(3)= " WRK-SYSYYK-TAIINYMD(3)
+      *     DISPLAY  "WRK-SYSYYK-RRKNUM(1) = " WRK-SYSYYK-RRKNUM(1)
+      *     DISPLAY  "WRK-SYSYYK-NYUINYMD(1)= " WRK-SYSYYK-NYUINYMD(1)
+      *     DISPLAY  "WRK-SYSYYK-TAIINYMD(1)= " WRK-SYSYYK-TAIINYMD(1)
+      *     DISPLAY  "WRK-SYSYYK-RRKNUM(2) = " WRK-SYSYYK-RRKNUM(2)
+      *     DISPLAY  "WRK-SYSYYK-NYUINYMD(2)= " WRK-SYSYYK-NYUINYMD(2)
+      *     DISPLAY  "WRK-SYSYYK-TAIINYMD(2)= " WRK-SYSYYK-TAIINYMD(2)
+      *     DISPLAY  "WRK-SYSYYK-RRKNUM(3) = " WRK-SYSYYK-RRKNUM(3)
+      *     DISPLAY  "WRK-SYSYYK-NYUINYMD(3)= " WRK-SYSYYK-NYUINYMD(3)
+      *     DISPLAY  "WRK-SYSYYK-TAIINYMD(3)= " WRK-SYSYYK-TAIINYMD(3)
       *
            PERFORM    VARYING    IDX    FROM  1   BY  1
              UNTIL    (IDX    >   20)   OR
@@ -962,8 +962,8 @@
                           CALL    "ORCSDAY"     USING   STS-AREA-DAY
                                                         LNK-DAY1-AREA
                           IF      STS-DAY-RC1      =   ZERO
-                              DISPLAY   "LNK-DAY1-YMD-X = "
-                                         LNK-DAY1-YMD-X
+      *                        DISPLAY   "LNK-DAY1-YMD-X = "
+      *                                   LNK-DAY1-YMD-X
                               MOVE   LNK-DAY1-YMD-X
                                          TO  LNK-SKJKEEP-SEI-NYUINYMD
                               MOVE   "1" TO  LNK-SKJKEEP-SEI-COMMENT-KBN
@@ -1031,8 +1031,8 @@
                           CALL    "ORCSDAY"     USING   STS-AREA-DAY
                                                         LNK-DAY1-AREA
                           IF      STS-DAY-RC1      =   ZERO
-                              DISPLAY   "LNK-DAY1-YMD-X = "
-                                         LNK-DAY1-YMD-X
+      *                        DISPLAY   "LNK-DAY1-YMD-X = "
+      *                                   LNK-DAY1-YMD-X
                               MOVE   LNK-DAY1-YMD-X
                                          TO  LNK-SKJKEEP-SEI-NYUINYMD
                               MOVE   "1" TO  LNK-SKJKEEP-SEI-COMMENT-KBN
@@ -1095,11 +1095,11 @@
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
            MOVE    "key6"               TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
-           DISPLAY "WRK-NANBYO-KOHID(1) = " WRK-NANBYO-KOHID(1)
-           DISPLAY "WRK-NANBYO-KOHID(2) = " WRK-NANBYO-KOHID(2)
-           DISPLAY "WRK-NANBYO-KOHID(3) = " WRK-NANBYO-KOHID(3)
-           DISPLAY "WRK-NANBYO-KOHID(4) = " WRK-NANBYO-KOHID(4)
-           DISPLAY "WRK-NANBYO-KOHID(5) = " WRK-NANBYO-KOHID(5)
+      *     DISPLAY "WRK-NANBYO-KOHID(1) = " WRK-NANBYO-KOHID(1)
+      *     DISPLAY "WRK-NANBYO-KOHID(2) = " WRK-NANBYO-KOHID(2)
+      *     DISPLAY "WRK-NANBYO-KOHID(3) = " WRK-NANBYO-KOHID(3)
+      *     DISPLAY "WRK-NANBYO-KOHID(4) = " WRK-NANBYO-KOHID(4)
+      *     DISPLAY "WRK-NANBYO-KOHID(5) = " WRK-NANBYO-KOHID(5)
       *
       *    小児慢性特定疾病
            INITIALIZE                          PTKOHINF-REC
@@ -1207,11 +1207,11 @@
                  END-IF
              END-PERFORM
       *
-             DISPLAY "WRK-NANBYO-HKNCOMBI(1) = " WRK-NANBYO-HKNCOMBI(1)
-             DISPLAY "WRK-NANBYO-HKNCOMBI(2) = " WRK-NANBYO-HKNCOMBI(2)
-             DISPLAY "WRK-NANBYO-HKNCOMBI(3) = " WRK-NANBYO-HKNCOMBI(3)
-             DISPLAY "WRK-NANBYO-HKNCOMBI(4) = " WRK-NANBYO-HKNCOMBI(4)
-             DISPLAY "WRK-NANBYO-HKNCOMBI(5) = " WRK-NANBYO-HKNCOMBI(5)
+      *       DISPLAY "WRK-NANBYO-HKNCOMBI(1) = " WRK-NANBYO-HKNCOMBI(1)
+      *       DISPLAY "WRK-NANBYO-HKNCOMBI(2) = " WRK-NANBYO-HKNCOMBI(2)
+      *       DISPLAY "WRK-NANBYO-HKNCOMBI(3) = " WRK-NANBYO-HKNCOMBI(3)
+      *       DISPLAY "WRK-NANBYO-HKNCOMBI(4) = " WRK-NANBYO-HKNCOMBI(4)
+      *       DISPLAY "WRK-NANBYO-HKNCOMBI(5) = " WRK-NANBYO-HKNCOMBI(5)
       *      診療会計テーブル（暫定で包括分以外のみ判定対象としておく）
              INITIALIZE                          SRYACCT-REC
              MOVE    LNK-SKJKEEP-HOSPNUM     TO  ACCT-HOSPNUM
