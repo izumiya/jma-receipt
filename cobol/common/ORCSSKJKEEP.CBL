@@ -264,15 +264,15 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
-           PERFORM    VARYING IDX   FROM   1   BY  1
-                      UNTIL IDX   >   31
-             DISPLAY "IDX = " IDX " LNK-SKJKEEP-KBN = "
-                       LNK-SKJKEEP-KBN(IDX)
-           END-PERFORM
-           DISPLAY "LNK-SKJKEEP-SEI-NYUINYMD = "
-                    LNK-SKJKEEP-SEI-NYUINYMD
-           DISPLAY "LNK-SKJKEEP-SEI-COMMENT-KBN = "
-                    LNK-SKJKEEP-SEI-COMMENT-KBN
+      **     PERFORM    VARYING IDX   FROM   1   BY  1
+      **                UNTIL IDX   >   31
+      **       DISPLAY "IDX = " IDX " LNK-SKJKEEP-KBN = "
+      **                 LNK-SKJKEEP-KBN(IDX)
+      **     END-PERFORM
+      **     DISPLAY "LNK-SKJKEEP-SEI-NYUINYMD = "
+      **              LNK-SKJKEEP-SEI-NYUINYMD
+      **     DISPLAY "LNK-SKJKEEP-SEI-COMMENT-KBN = "
+      **              LNK-SKJKEEP-SEI-COMMENT-KBN
       *
            .
        000-PROC-EXT.
