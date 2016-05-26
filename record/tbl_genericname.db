@@ -62,3 +62,14 @@ path	key3 	{
 	};
 };
 
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_genericname_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_genericname
+		WHERE   GENERICNAME    = :GENERICNAME
+			ORDER	BY	YAKKAKJNCD
+		;
+	};
+};
