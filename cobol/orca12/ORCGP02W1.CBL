@@ -217,6 +217,8 @@
            03  FLG-RJN-02              PIC 9(01).
       *H26.8
            03  FLG-RJNCHK5             PIC 9(01).
+      *H28.5
+           03  FLG-P027             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -3141,8 +3143,17 @@
       *****************************************************************
        410-INPUT-CHK-SEC          SECTION.
       *
+      *H28.5
+           IF      FLG-P027       =   1
+               CONTINUE
+           ELSE
+      *H28.5
+      *
       *    画面をＳＰＡセット
            PERFORM 4101-GMN-SPA-SET-SEC
+      *
+           END-IF
+      *
       *    基本チェックと別画面処理
            PERFORM 4102-KIHON-CHK-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
@@ -5434,6 +5445,8 @@
        4103-HKNKOH-TBL-SEC      SECTION.
       *
            IF      FLG-APICHK          =   ZERO
+      *H28.5
+              AND (FLG-P027            =   ZERO )
       *
       *    保険画面の内容をＴＢＬへ編集する
            PERFORM 41031-HKN-SPA-TBL-SET-SEC
@@ -8433,12 +8446,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    1                   TO  FLG-TOUROKU 
            MOVE    1                   TO  FLG-TOUROKU2
+           MOVE    ZERO                TO  FLG-P027
       *
-      *    EVALUATE    SPA-P02-GAMEN
+      *H28.5
+           EVALUATE    SPA-P02-GAMEN
       *        保険組合せ履歴
-      *        WHEN    "P027"
-      *            MOVE    2               TO  FLG-TOUROKU2
-      *    END-EVALUATE
+               WHEN    "P027"
+      ********     MOVE    2               TO  FLG-TOUROKU2
+                   MOVE    1               TO  FLG-P027
+           END-EVALUATE
       *
       *    保険組合せを作成する（入力チェック込み）
            PERFORM 450-HKNCOMBI-SEC
