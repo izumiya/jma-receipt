@@ -227,8 +227,19 @@
                MOVE    "key48"             TO  MCP-PATHNAME
                PERFORM   910-PTNYUINRRK-READ-SEC
                IF    FLG-PTNYUINRRK        =   ZERO
-                   ADD   PTNYUINRRK-TAISYONISSU
+      *            期間算出処理
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY5-AREA
+                   MOVE    "51"                TO  LNK-DAY5-IRAI
+                   MOVE    PTNYUINRRK-NYUINYMD TO  LNK-DAY5-START
+                   MOVE    PTNYUINRRK-TAIINYMD TO  LNK-DAY5-END
+                   CALL    "ORCSDAY"               USING
+                                                   STS-AREA-DAY
+                                                   LNK-DAY5-AREA
+                   IF     STS-DAY-RC1      =   ZERO
+                      ADD   LNK-DAY5-NISSU2
                                        TO   LNK-ORCHCN02SUB-NISSU(1)
+                   END-IF
                END-IF
            END-IF
       *    患者入院履歴クローズ
@@ -1067,8 +1078,9 @@
       *                      PTNYUINRRK-TOKUTEI-KBN
       *             DISPLAY "PTNYUINRRK-TOKUTEI-NYUIN = "
       *                      PTNYUINRRK-TOKUTEI-NYUIN
-                   ADD   PTNYUINRRK-TAISYONISSU
-                                       TO   LNK-ORCHCN02SUB-NISSU(1)
+      *****             ADD   PTNYUINRRK-TAISYONISSU
+      *****                                 TO   LNK-ORCHCN02SUB-NISSU(1)
+                    CONTINUE
                END-IF
            END-IF
       *
