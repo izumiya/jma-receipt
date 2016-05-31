@@ -106,6 +106,7 @@
       * 04.07.00     NACL-多々納  14/12/XX  難病等対応
       * 04.08.00     NACL-多々納  15/06/16  診療科・保険組合せ件数対応
       * 04.08.00     NACL-多々納  15/11/XX  APIV3(HAORI)対応
+      * 04.08.00     NACL-多々納  16/05/31  原爆一般対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7694,6 +7695,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            難病（０５４）（Ｈ２７．１から）
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "054" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20150101"))
+      *H28.5
+      *            原爆一般（０１９）（Ｈ２８．４から）
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "019" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20160401"))
       *ver.4.7
       *        地方公費で上限額設定対象
                  OR  ( SPA-PTKOH-JYOGENKBN (IDX)   NOT =   SPACE )

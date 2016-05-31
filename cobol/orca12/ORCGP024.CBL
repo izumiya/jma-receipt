@@ -45,8 +45,9 @@
       *                                     ∏¯»Ò…È√¥≥€Ã§∆˛Œœ∑Ÿπ¬–±˛
       *  04.07.00    NACL-¬ø°π«º  11/11/07  √œ ˝∏¯»Ò…È√¥≥€ —ππ¬–±˛
       *  04.07.00    NACL-¬ø°π«º  14/06/04  ∏¯»Ò…È√¥≥€æÂ∏¬∑ÔøÙ¬–±˛
-      * 04.07.00     NACL-¬ø°π«º  14/12/XX  ∆Ò…¬≈˘¬–±˛
-      *****************************************************************
+      *  04.07.00    NACL-¬ø°π«º  14/12/XX  ∆Ò…¬≈˘¬–±˛
+      *  04.08.00    NACL-¬ø°π«º  16/05/31  ∏∂«˙∞Ï»Ã¬–±˛
+      ****************************************************************
       *
        ENVIRONMENT             DIVISION.
        CONFIGURATION               SECTION.
@@ -696,6 +697,15 @@
                                            >=   "20150101"  ))
                    MOVE    "∆˛≥∞æÂ∏¬≥€"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "¬æ∞Ï…Ù…È√¥Œﬂ∑◊"     TO  SPA-GMN24-FTNMSG2
+               END-IF
+      *H28.6
+      *        ∏∂«˙∞Ï»Ã
+               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "019"   )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=   "20160401"  )
+                   MOVE    "≥∞ÕË…È√¥° °Û°À"     TO  SPA-GMN24-FTNMSG1
+                   MOVE    "∆˛±°…È√¥° °Û°À"     TO  SPA-GMN24-FTNMSG2
                END-IF
       *ver.4.7
       *        √œ ˝∏¯»Ò§Œ¿ﬂƒÍ
@@ -2245,6 +2255,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "012"
                                                OR  "020"
                                                OR  "025" )
+      *H28.6
+                OR  (SPA-NAI24-KOHNUM (IDX2)   =   "019" )
                MOVE    1                   TO  FLG-CHKNO
              END-IF
       *H27.7
