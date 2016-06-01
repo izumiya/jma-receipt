@@ -172,6 +172,7 @@
       *  04.08.06    NACL-ÃÁœ∆    16/03/28   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       *  04.08.07    NACL-ÃÁœ∆    16/05/20  …∏Ω‡…È√¥≥€∑–≤·¡º√÷° ¿∫ø¿°À∆˛±°«Ø∑Ó∆¸
       *                                     §Œ•≥•·•Û•»¬–±˛
+      *  04.08.08    NACL-ÃÁœ∆    16/05/30  £±£π∏∂«˙∞Ï»Ã§Œ∆√ºÏ∑◊ªª¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -694,6 +695,12 @@
       *
            03  WRK-SEIKENTEN                    PIC ZZZZZZ9.
       *
+           03  WRK-GENBAKU-TOTALKIN             PIC 9(07).
+           03  WRK-GENBAKU-FTNKIN               PIC 9(07)V9(01).
+           03  WRK-GENBAKU-FTNRATE.
+               05  WRK-GENBAKU-FTNRATE1         PIC 9(02).
+               05  WRK-GENBAKU-FTNRATE2         PIC 9(01).
+      *
            03  WRK-MCP-TABLE                 PIC X(64).
            03  WRK-MCP-PATHNAME              PIC X(64).
       *
@@ -1081,6 +1088,12 @@
                05  TBL-SEISIN-SKJ-COMMENT       PIC 9(01).
                05  TBL-SEISIN-SKJ-HKNCOMBI      PIC 9(04).
       *
+       01  TBL-GENBAKU-INF.
+           03  TBL-GENBAKU-INF2                 OCCURS  5.
+               05  TBL-GENBAKU-COMMENT          PIC 9(01).
+               05  TBL-GENBAKU-HKNCOMBI         PIC 9(04).
+               05  TBL-GENBAKU-FTNRATE          PIC 9(03).
+      *
       *    ª¿¡«° ∂‚≥€°¶øÙŒÃ°Àæ Û
        01  TBL-SANSO-INF.
            03  TBL-SANSO-INF2       OCCURS    10.
@@ -1386,6 +1399,7 @@
            INITIALIZE                      TBL-CYOJKSN-INF
            INITIALIZE                      TBL-CYOJKSN2-INF
            INITIALIZE                      TBL-SEISIN-SKJ-INF
+           INITIALIZE                      TBL-GENBAKU-INF
            INITIALIZE                      WRK-JIDO-SETCOM-AREA
       *
       *    Œ≈Õ‹•Ï•ª•≥•·•Û•»ºË∆¿
@@ -1856,6 +1870,12 @@
              END-IF
            END-IF
       *
+      *    £±£π∏∂«˙∞Ï»Ã∆√ºÏ∑◊ªª§Œ…È√¥≥‰πÁ•≥•·•Û•»
+      *
+           IF   RECE62-GENBAKU-TOKFLG   =   1
+                PERFORM 2001-GENBAKU-COMMENT-SEC
+           END-IF
+      *
       *****∫ππ˛ ‘Ω∏£≤**********************
            PERFORM     250-SASHIKOMI2-SEC
       *
@@ -2200,6 +2220,108 @@
       *
            .
        2001-SEISIN-SKJ-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £±£π∏∂«˙∞Ï»Ã∆√ºÏ∑◊ªª§Œ…È√¥≥‰πÁ•≥•·•Û•»
+      *****************************************************************
+       2001-GENBAKU-COMMENT-SEC          SECTION.
+      *
+           PERFORM  VARYING  IDX34  FROM  1  BY  1
+                     UNTIL  (IDX34   >   10                )
+                      OR    (RECE62-HKNCOMBI(IDX34) =  ZERO)
+             COMPUTE  WRK-KOHBUNRI = RECE62-RIHA-KOHBUNRI(IDX34)
+                                   + 1
+             IF   RECE62-GENBAKU-FTNKIN(IDX34)  NOT =  ZERO
+               MOVE  1   TO  TBL-GENBAKU-COMMENT(WRK-KOHBUNRI)
+               MOVE  RECE62-HKNCOMBI(IDX34)
+                         TO  TBL-GENBAKU-HKNCOMBI(WRK-KOHBUNRI)
+      *
+               MOVE  RECE62-GENBAKU-IDX(IDX34)  TO  IDX35
+               COMPUTE WRK-GENBAKU-TOTALKIN = RECE62-TOTALTEN(IDX35)
+                                            * 10
+               MOVE  RECE62-GENBAKU-FTNKIN(IDX34)
+                                                TO  WRK-GENBAKU-FTNKIN
+               COMPUTE TBL-GENBAKU-FTNRATE(WRK-KOHBUNRI) =
+                       (WRK-GENBAKU-FTNKIN / WRK-GENBAKU-TOTALKIN)
+                                           * 100
+             END-IF
+           END-PERFORM
+      *
+           PERFORM  VARYING  IDX34  FROM  1  BY  1
+                     UNTIL   IDX34   >    5
+      *
+             IF  TBL-GENBAKU-COMMENT(IDX34)  =  1
+      *
+               PERFORM 500-RECE64-KEY-HENSYU-SEC
+               COMPUTE WRK-ZAINUM    =  99999954  +  IDX34
+               MOVE    WRK-ZAINUM    TO  RECE649-ZAINUM
+               COMPUTE WRK-KOHBUNRI  =  IDX34  -  1
+               MOVE    WRK-KOHBUNRI  TO  RECE649-KOHBUNRI
+               MOVE    "99"          TO  RECE649-SRYKBN
+               MOVE    "990"         TO  RECE649-SRYSYUKBN
+               MOVE    TBL-GENBAKU-HKNCOMBI(IDX34)
+                                     TO  RECE649-HKNCOMBI
+               MOVE    1             TO  RECE649-MEISAISU
+               WRITE   RECE649-REC
+               ADD     1             TO  CNT-RECE649
+      *
+               PERFORM 500-RECE65-KEY-HENSYU-SEC
+               COMPUTE WRK-ZAINUM    =  99999954  +  IDX34
+               MOVE    WRK-ZAINUM    TO  RECE659-ZAINUM
+               COMPUTE WRK-KOHBUNRI  =  IDX34  -  1
+               MOVE    WRK-KOHBUNRI  TO  RECE659-KOHBUNRI
+               MOVE    "99"          TO  RECE659-SRYKBN
+               MOVE    "990"         TO  RECE659-SRYSYUKBN
+      *        •≥•·•Û•»§Œ¡ﬁ∆˛
+               MOVE    SPACE         TO  WRK-RECE65XX-REC
+               INITIALIZE                WRK-RECE65XX-REC
+               MOVE    "810000001"   TO  WRK-RECE65XX-SRYCD(1 1)
+               MOVE    ZERO          TO  WRK-RECE65XX-SRYSURYO(1 1)
+      *
+               MOVE    TBL-GENBAKU-FTNRATE(IDX34)
+                                     TO  WRK-GENBAKU-FTNRATE
+               IF   WRK-GENBAKU-FTNRATE2  =  ZERO
+                 MOVE  7             TO  WRK-RECE65XX-YUKOKETA(1 1)
+                 MOVE  "º´∏ …È√¥°°°°≥‰"
+                                     TO  WRK-RECE65XX-NAME(1 1)
+                 MOVE  WRK-GENBAKU-FTNRATE1
+                                     TO  DAY-IDX2
+                 IF    DAY-IDX2 = ZERO
+                   MOVE  "°°£∞"      TO  WRK-RECE65XX-NAME(1 1)(9:4)
+                 ELSE
+                   MOVE  TBL-DAY(DAY-IDX2)
+                                     TO  WRK-RECE65XX-NAME(1 1)(9:4)
+                 END-IF
+               ELSE
+                 MOVE  9             TO  WRK-RECE65XX-YUKOKETA(1 1)
+                 MOVE  "º´∏ …È√¥°°°°≥‰°° ¨"
+                                     TO  WRK-RECE65XX-NAME(1 1)
+                 MOVE  WRK-GENBAKU-FTNRATE1
+                                     TO  DAY-IDX2
+                 IF    DAY-IDX2 = ZERO
+                   MOVE  "°°£∞"      TO  WRK-RECE65XX-NAME(1 1)(9:4)
+                 ELSE
+                   MOVE  TBL-DAY(DAY-IDX2)
+                                     TO  WRK-RECE65XX-NAME(1 1)(9:4)
+                 END-IF
+                 MOVE  WRK-GENBAKU-FTNRATE2
+                                     TO  DAY-IDX2
+                 MOVE  TBL-DAY(DAY-IDX2)(3:2)
+                                     TO  WRK-RECE65XX-NAME(1 1)(15:2)
+               END-IF
+      *
+               MOVE    WRK-RECE65XX-SRYACT-TBL(1 1)
+                                     TO  RECE659-SRYACT-TBL(1)
+               WRITE   RECE659-REC
+               ADD     1             TO  CNT-RECE659
+      *
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2001-GENBAKU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

@@ -742,6 +742,7 @@
       *  04.08.24    NACL-ÌçÏÆ    16/05/20  É¸½àÉéÃ´³Û·Ð²áÁ¼ÃÖ¡ÊÀº¿À¡ËÆþ±¡Ç¯·îÆü
       *                                     ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  04.08.25    NACL-ÌçÏÆ    16/05/20  ¸ºÌÈ¡¦ºÒ³²³ºÅö¤ÎÂÐ¾Ý¥Á¥§¥Ã¥¯
+      *  04.08.26    NACL-ÌçÏÆ    16/05/30  £±£¹¸¶Çú°ìÈÌ¤ÎÆÃ¼ì·×»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1735,6 +1736,7 @@
                 07  WRK-FTNJYOSEI              PIC 9(01).
       *
            03  WRK-FTNMONEY-MAE                PIC 9(09).
+           03  WRK-FTNMONEY-ATO                PIC 9(09).
       *
            03  WRK-CYOKI-KEISAN                PIC 9(09).
            03  WRK-CYOKI-KEISAN2               PIC 9(09).
@@ -21011,9 +21013,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
                   ELSE
+                    IF   RECE02-KOHNUM(KH-IDX - 1)  =  "019"
+                      IF    SYU-KOH-COMPFTN-ENTANI(IDX3) NOT = ZERO
+                        MOVE  1       TO  RECE02-GENBAKU-TOKFLG
+                        ADD   SYU-KOH-COMPFTN-ENTANI(IDX3)
+                                      TO  RECE02-GENBAKU-FTNKIN(IDX1)
+                        MOVE  KH-IDX  TO  RECE02-GENBAKU-IDX(IDX1)
+                      END-IF
+                    ELSE
                       ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
+                    END-IF
                   END-IF
                 END-IF
               END-IF
@@ -23193,6 +23204,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-PERFORM
       *
+           MOVE    999999999   TO   WRK-FTNMONEY-ATO
            IF   RECE02-ZAITAKU  =  SPACE  OR  "3"  OR  "4"
                   MOVE     ZERO          TO  RECE02-ZAITAKU-SAIKEI
                                              RECE02-ZAITAKU-SAIKEI2
@@ -23210,6 +23222,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF  FLG-KOH  =   2
                      ADD   WRK-KOH-GAI   TO  RECE02-FTNMONEY(2)
                                              RECE02-FTNMONEY-KOJ(2)
+                     MOVE  RECE02-FTNMONEY(2)
+                                         TO  WRK-FTNMONEY-ATO
                   END-IF
                   MOVE     FTN-KOH-XXX   TO  RECE02-ZAITAKU-SAIKEI
       *
@@ -25313,8 +25327,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         - RECE02-TOTALTEN(2)
            PERFORM  21094-JYOGENGAKU-HENSYU-SEC
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
-                                       - WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK2 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
@@ -25414,8 +25433,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
            PERFORM  21094-JYOGENGAKU-HENSYU-SEC
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
-                                       - WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK2 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK2 = RECE02-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
@@ -25910,8 +25934,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
        210991-SAIKEIKIN-KASAN2-SEC               SECTION.
       *
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK8  =  RECE02-FTNMONEY(2)
-                                        -  WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK8 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK8 = RECE02-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE   TO  WRK-CHK-KOKIGAK8

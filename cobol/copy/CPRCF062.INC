@@ -152,6 +152,7 @@
       *                                     第３第４公費の括弧再掲記載対応
       *  04.08.04    NACL-門脇    16/03/15  生保まとめ用項目追加
       *  04.08.05    NACL-門脇    16/03/31  平成２８年４月改正対応
+      *  04.08.06    NACL-門脇    16/05/30  １９原爆一般の特殊計算対応
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -1032,6 +1033,13 @@
       *入院料日別診療区分情報
            03  RECE62-NYUDAYINF.
                05  RECE62-NYUDAY-SRYKBN         PIC X(02)  OCCURS 31.
+      *
+      *１９原爆一般特殊計算フラグ（患者７割負担）
+           03  RECE62-GENBAKUINF.
+               05  RECE62-GENBAKU-TOKFLG        PIC 9(01).
+               05  RECE62-GENBAKU-OCC           OCCURS 10.
+                   07  RECE62-GENBAKU-FTNKIN    PIC 9(07)V9(01).
+                   07  RECE62-GENBAKU-IDX       PIC 9(01).
       *
       *予備
            03  RECE62-YOBIETC-AREA.

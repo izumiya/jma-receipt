@@ -3751,7 +3751,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        2001-SEISIN-SKJ-COMMENT-SEC          SECTION.
       *
            PERFORM 800-RECE82-SET849-SEC
-           MOVE    99999989            TO  RECE849-ZAINUM
+           MOVE    99999975            TO  RECE849-ZAINUM
            MOVE    "99"                TO  RECE849-SRYKBN
            MOVE    "991"               TO  RECE849-SRYSYUKBN
            MOVE    1                   TO  RECE849-MEISAISU
@@ -3761,7 +3761,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            ADD     1                   TO  CNT-RECE849
       *
            PERFORM 800-RECE82-SET859-SEC
-           MOVE    99999989            TO  RECE859-ZAINUM
+           MOVE    99999975            TO  RECE859-ZAINUM
            MOVE    "99"                TO  RECE859-SRYKBN
            MOVE    "991"               TO  RECE859-SRYSYUKBN
       *

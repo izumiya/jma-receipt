@@ -469,6 +469,7 @@
       *                                     ·îÅÓÃæ¼õµë¼Ô¾ÚÊÑ¹¹»þÉéÃ´¶â·×»»
       *                                     ¿À¸Í»ÔÂÐ±þ
       *  04.08.07    NACL-ÌçÏÆ    16/04/27  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.08    NACL-ÌçÏÆ    16/05/30  £±£¹¸¶Çú°ìÈÌ¤ÎÆÃ¼ì·×»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -511,6 +512,7 @@
            03  WK-YAKFTN-TENSUU        PIC 9(10).
            03  WK-GAIKFTNRATE          PIC 9(03).
            03  WK-GAIKFTNRATE-TOKUSYU  PIC 9(03).
+           03  WK-GAIKFTNRATE019       PIC 9(03).
            03  WK-GAIYKZFTNKBN         PIC X(01).
            03  WK-GAIKKOTGAK           PIC 9(06).
            03  WK-TOKUTEI-COMPFTN      PIC 9(08).
@@ -10401,6 +10403,42 @@
              END-IF
       *
            END-PERFORM.
+      *
+      *    £±£¹¸¶Çú°ìÈÌ
+      *
+           MOVE     ZERO   TO   WK-GAIKFTNRATE019.
+      *
+           IF    (COMB-HKNNUM            =  SPACE   )
+           AND   (COMB-KOH1HKNNUM        =  "019"   )
+           AND   (COMB-KOH2HKNNUM        =  SPACE   )
+           AND   (COMB-KOH3HKNNUM        =  SPACE   )
+           AND   (COMB-KOH4HKNNUM        =  SPACE   )
+           AND   (LNK-SYU-SRYYMD(1:6)   >=  "201604")
+             INITIALIZE                    LNK-ORCSJGNGET-REC
+             MOVE  LNK-SYU-HOSPNUM     TO  LNK-ORCSJGNGET-HOSPNUM
+             MOVE  LNK-SYU-NYUGAIKBN   TO  LNK-ORCSJGNGET-NYUGAIKBN
+             MOVE  LNK-SYU-PTID        TO  LNK-ORCSJGNGET-PTID
+             MOVE  COMB-KOHHKNNUM(1)   TO  LNK-ORCSJGNGET-KOHHKNNUM
+             MOVE  COMB-KOHID(1)       TO  LNK-ORCSJGNGET-KOHID
+             MOVE  LNK-SYU-SRYYMD(1:6) TO  LNK-ORCSJGNGET-SRYYM
+             IF  COMB-KOHHKNNUM(1)(1:1)  >=  "1" AND <=  "8"
+               MOVE  WK-KOHJGNGET-TAISYOKBN(1)
+                                       TO  LNK-ORCSJGNGET-SETKBN
+               MOVE  WK-KOHJGNGET-TEKIYOFLG(1)
+                                       TO  LNK-ORCSJGNGET-SETKBN2
+             END-IF
+             CALL    "ORCSJGNGET"      USING
+                                       LNK-ORCSJGNGET-REC
+                                       SPA-AREA
+             IF    LNK-ORCSJGNGET-RC    =  ZERO
+               IF    WK-GENGAKUKBN  NOT =  ZERO
+                 MOVE     ZERO     TO     WK-GAIKFTNRATE019
+               ELSE
+                 MOVE     LNK-ORCSJGNGET-GAIJGNGAK
+                                   TO     WK-GAIKFTNRATE019
+               END-IF
+             END-IF
+           END-IF.
       *
        2107-KOHFTN-KINGAKU-EXT.
            EXIT.
@@ -25460,6 +25498,8 @@
                   (COMB-KOHHKNNUM(KOH-IDX) = "588"         ) AND
                   (LNK-SYU-SRYYMD(1:6)    >= "200710"      ) AND
                   (LNK-SYU-SRYYMD(1:6)    <= "200909"      ))
+             OR  ((COMB-KOHHKNNUM(KOH-IDX) = "019"         ) AND
+                  (WK-GAIKFTNRATE019   NOT =  ZERO         ))
       *
                IF (WK-1001-PREFNUM         =  43           ) AND
                   (COMB-KOHHKNNUM(KOH-IDX) = "143" OR "342") AND
@@ -25488,6 +25528,10 @@
                   (LNK-SYU-SRYYMD(1:6)    >= "200710"      ) AND
                   (LNK-SYU-SRYYMD(1:6)    <= "200909"      )
                   PERFORM   23064-TOKYO-KOHI-SEC
+               END-IF
+               IF (COMB-KOHHKNNUM(KOH-IDX) = "019"         ) AND
+                  (WK-GAIKFTNRATE019   NOT =  ZERO         )
+                  PERFORM   23067-GENBAKU-KOHI-SEC
                END-IF
       *
              ELSE
@@ -28109,6 +28153,31 @@
       *
        23066-JYOSEI-KOHI2-EXT.
            EXIT.                                                        
+      *
+      ******************************************************************
+      *        £±£¹¸¶Çú°ìÈÌ¤ÎÆÃ¼ì·×»»
+      ******************************************************************
+       23067-GENBAKU-KOHI-SEC           SECTION.
+      *
+           COMPUTE   WK-FUTANWARI  =  WK-GAIKFTNRATE019  /  100
+           COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                     WK-ZENGAKU  *  WK-FUTANWARI
+           COMPUTE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
+                     WK-ZENGAKU  *  WK-FUTANWARI
+      *
+           COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                     LNK-SYU-KOH-COMPFTN(KOH-IDX)  +  5
+           COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                     LNK-SYU-KOH-COMPFTN(KOH-IDX)  /  10
+           COMPUTE   LNK-SYU-KOH-COMPFTN(KOH-IDX)  =
+                     LNK-SYU-KOH-COMPFTN(KOH-IDX)  *  10
+      *
+           MOVE  WK-GAIYKZFTNKBN  TO  LNK-SYU-KOH-YKZFTNKBN(KOH-IDX)
+      *
+           .
+      *
+       23067-GENBAKU-KOHI-EXT.
+           EXIT.
       *
       ******************************************************************
       *        Îß·×¥Ù¡¼¥¹·×»»»þÍÑ

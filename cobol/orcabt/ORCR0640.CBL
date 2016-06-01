@@ -715,6 +715,7 @@
       *  04.08.17    NACL-ÌçÏÆ    16/05/20  É¸½àÉéÃ´³Û·Ð²áÁ¼ÃÖ¡ÊÀº¿À¡ËÆþ±¡Ç¯·îÆü
       *                                     ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  04.08.18    NACL-ÌçÏÆ    16/05/20  ¸ºÌÈ¡¦ºÒ³²³ºÅö¤ÎÂÐ¾Ý¥Á¥§¥Ã¥¯
+      *  04.08.19    NACL-ÌçÏÆ    16/05/30  £±£¹¸¶Çú°ìÈÌ¤ÎÆÃ¼ì·×»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1901,6 +1902,7 @@
                 07  WRK-FTNJYOSEI              PIC 9(01).
       *
            03  WRK-FTNMONEY-MAE                PIC 9(09).
+           03  WRK-FTNMONEY-ATO                PIC 9(09).
       *
            03  WRK-CYOKI-KEISAN                PIC 9(09).
            03  WRK-CYOKI-KEISAN2               PIC 9(09).
@@ -24162,11 +24164,20 @@
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                       RECE62-FTNMONEY-KOJ(KH-IDX)
                    ELSE
+                     IF   RECE62-KOHNUM(KH-IDX - 1) =  "019"
+                       IF    SYU-KOH-COMPFTN-ENTANI(IDX3) NOT = ZERO
+                         MOVE  1       TO  RECE62-GENBAKU-TOKFLG
+                         ADD   SYU-KOH-COMPFTN-ENTANI(IDX3)
+                                       TO  RECE62-GENBAKU-FTNKIN(IDX1)
+                         MOVE  KH-IDX  TO  RECE62-GENBAKU-IDX(IDX1)
+                       END-IF
+                     ELSE
                          ADD   SYU-KOH-COMPFTN(IDX3)  TO
                                       RECE62-FTNMONEY(KH-IDX)
                                       RECE62-FTNMONEY-KOJ(KH-IDX)
                          ADD   SYU-SKJ-FTN(IDX3)      TO
                                       WRK-SKJ-FTN(KH-IDX)
+                     END-IF
                    END-IF
                   END-IF
                 END-IF
@@ -27046,6 +27057,7 @@
              END-IF
            END-PERFORM
       *
+           MOVE    999999999   TO   WRK-FTNMONEY-ATO
            IF   RECE62-KOUREI  =  SPACE  OR  "3"  OR  "4"
                   MOVE     ZERO         TO  RECE62-KOUREI-SAIKEI
                                             RECE62-KOUREI-SAIKEI2
@@ -27063,6 +27075,8 @@
                   IF  FLG-KOH  =   2
                      ADD   WRK-KOH-GAI  TO  RECE62-FTNMONEY(2)
                                             RECE62-FTNMONEY-KOJ(2)
+                     MOVE  RECE62-FTNMONEY(2)
+                                        TO  WRK-FTNMONEY-ATO
                   END-IF
                   MOVE     FTN-KOH-XXX  TO  RECE62-KOUREI-SAIKEI
       *
@@ -29211,8 +29225,13 @@
                                         - RECE62-TOTALTEN(2)
            PERFORM  210464-JYOGENGAKU-HENSYU-SEC
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
-                                       - WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK2 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
@@ -29304,8 +29323,13 @@
            END-IF
            PERFORM  210464-JYOGENGAKU-HENSYU-SEC
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
-                                       - WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK2 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK2 = RECE62-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE    TO  WRK-CHK-KOKIGAK2
@@ -29760,8 +29784,13 @@
        2104691-SAIKEIKIN-KASAN2-SEC               SECTION.
       *
            IF   FLG-KOH  =   2
-             COMPUTE  WRK-CHK-KOKIGAK8  =  RECE62-FTNMONEY(2)
-                                        -  WRK-KOH-GAI
+             IF  WRK-FTNMONEY-ATO  NOT = 999999999
+               COMPUTE  WRK-CHK-KOKIGAK8 = WRK-FTNMONEY-ATO
+                                         - WRK-KOH-GAI
+             ELSE
+               COMPUTE  WRK-CHK-KOKIGAK8 = RECE62-FTNMONEY(2)
+                                         - WRK-KOH-GAI
+             END-IF
            ELSE
              IF  WRK-FTNMONEY-MAE  NOT = 999999999
                MOVE  WRK-FTNMONEY-MAE   TO  WRK-CHK-KOKIGAK8
