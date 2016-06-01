@@ -104,7 +104,7 @@
                                              OCCURS   50.
                05  TBL-N-SRYCD-G.
                    07  TBL-N-SRYCD           PIC X(09)
-                                           OCCURS   99.
+                                             OCCURS   200.
            03  TBL-N-MAX                 PIC 9(04).
       *
            03  TBL-HKTCHKFLG-G.
@@ -307,7 +307,7 @@
            END-IF
            MOVE    ZERO                TO  IDY
            PERFORM UNTIL  (FLG-HKTSRYCD    =   1  )
-                      OR  (IDY             >=  99 )
+                      OR  (IDY             >=  200 )
                ADD     1                   TO  IDY
                MOVE    HKTSRYCD-SRYCD      TO  TBL-N-SRYCD
                                                            (IDX-N IDY)
@@ -459,13 +459,13 @@
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   99   )  OR
+                       UNTIL      (IDY     >   200   )  OR
                                   (TBL-N-SRYCD (IDX-N IDY) =   SPACE)
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    NSRY-SRYCD(IDZ)     TO  WRK-K-SRYCD
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    99                  TO  IDY
+                       MOVE    200                 TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
