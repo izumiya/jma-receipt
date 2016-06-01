@@ -871,7 +871,8 @@
       *    チェック、自動算定
            PERFORM 1001-NAI-CHK-SEC
       *
-           IF     (WRK-GMN-INPUTCD(IDX-MAX)(1:1)
+           IF     (IDX-MAX             =   ZERO )   OR
+                  (WRK-GMN-INPUTCD(IDX-MAX)(1:1)
                                        =   "."   )  OR
                   (WRK-GMN-INPUTCD(IDX-MAX)
                                        =   SPACE )  OR
@@ -961,6 +962,7 @@
       *
       *    初診、再診、指導、在宅の時、回数は１のみ
            IF     (WRK-ERRCD           =   SPACE)
+              AND (IDX-MAX             >   ZERO )
                IF     (WRK-COM-SRYKBN (IDX-MAX)    =   "11"
                                                    OR  "12"
                                                    OR  "13"
