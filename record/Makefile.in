@@ -505,6 +505,7 @@ RECORD_files = \
 	receiptinf1v2.rec \
 	UDR.rec \
 	W061.rec \
+	I4ID2.rec \
 
 DEF_files = \
 
