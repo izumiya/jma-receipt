@@ -3308,7 +3308,7 @@
         <name>label2</name>
         <x>256</x>
         <y>432</y>
-        <width>100</width>
+        <width>152</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -3317,14 +3317,14 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>レセ電病棟情報</label>
+        <label>病床機能報告（入院料）</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
       <widget>
         <class>GtkPandaCombo</class>
         <name>CMB_BTUTYPE</name>
-        <x>360</x>
+        <x>428</x>
         <y>432</y>
         <width>160</width>
         <height>24</height>
@@ -3363,7 +3363,7 @@
       <widget>
         <class>GtkNumberEntry</class>
         <name>BTUCD</name>
-        <x>524</x>
+        <x>592</x>
         <y>432</y>
         <width>32</width>
         <height>24</height>
@@ -3386,8 +3386,106 @@
       <widget>
         <class>GtkLabel</class>
         <name>label3</name>
-        <x>556</x>
+        <x>624</x>
         <y>432</y>
+        <width>100</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>（１〜５０）</label>
+        <justify>GTK_JUSTIFY_CENTER</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>label4</name>
+        <x>256</x>
+        <y>456</y>
+        <width>178</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>　　　　　　（特定入院料）</label>
+        <justify>GTK_JUSTIFY_CENTER</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkPandaCombo</class>
+        <name>CMB_TBTUTYPE</name>
+        <x>428</x>
+        <y>456</y>
+        <width>160</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <items></items>
+        <case_sensitive>False</case_sensitive>
+        <use_arrows>True</use_arrows>
+        <widget>
+          <class>GtkPandaEntry</class>
+          <child_name>GtkPandaCombo:entry</child_name>
+          <name>TBTUTYPE</name>
+          <width>161</width>
+          <sensitive>True</sensitive>
+          <can_focus>True</can_focus>
+          <has_focus>False</has_focus>
+          <editable>True</editable>
+          <text_max_length>20</text_max_length>
+          <text>1 高度急性期</text>
+          <input_mode>XIM</input_mode>
+          <xim_enabled>False</xim_enabled>
+          <signal>
+            <name>changed</name>
+            <handler>entry_changed</handler>
+            <data>CHANGED</data>
+          </signal>
+          <signal>
+            <name>activate</name>
+            <handler>send_event</handler>
+            <data>ACTIVATE</data>
+          </signal>
+        </widget>
+      </widget>
+      <widget>
+        <class>GtkNumberEntry</class>
+        <name>TBTUCD</name>
+        <x>592</x>
+        <y>456</y>
+        <width>32</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
+        <editable>True</editable>
+        <format>ZZ</format>
+        <signal>
+          <name>changed</name>
+          <handler>entry_changed</handler>
+          <data>CHANGED</data>
+        </signal>
+        <signal>
+          <name>activate</name>
+          <handler>send_event</handler>
+          <data>ACTIVATE</data>
+        </signal>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>label5</name>
+        <x>624</x>
+        <y>456</y>
         <width>100</width>
         <height>24</height>
         <sensitive>True</sensitive>

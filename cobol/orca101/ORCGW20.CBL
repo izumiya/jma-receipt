@@ -2951,6 +2951,12 @@ UPDATE*    看護職員夜間配置加算
       *    病棟コード（連番）
            MOVE    W20-BTUCD       TO  SPA-GMN-W20-BTUCD
       *
+      *    病棟コード（病棟機能）（特定入院料）
+           MOVE    W20-TBTUTYPE    TO  SPA-GMN-W20-TBTUTYPE-G
+      *
+      *    病棟コード（連番）（特定入院料）
+           MOVE    W20-TBTUCD      TO  SPA-GMN-W20-TBTUCD
+      *
       *    療養病棟入院基本料算定区分
            MOVE    W20-RYOYOKBN    TO  SPA-GMN-W20-RYOYOKBN-G
       *
@@ -3067,6 +3073,16 @@ UPDATE*    看護職員夜間配置加算
            IF    ( SPA-ERRCD       =   SPACE )
       *        病棟コード（連番）チェック処理
                PERFORM 4101-BTUCD-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        病棟コード（病棟機能）（特定入院料）チェック処理
+               PERFORM 4101-TBTUTYPE-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        病棟コード（連番）（特定入院料）チェック処理
+               PERFORM 4101-TBTUCD-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
@@ -3949,6 +3965,17 @@ UPDATE*    看護職員夜間配置加算
                MOVE    WRK-KBN4-G      TO  SYS-5001-SRYCD(6:)
            ELSE
                MOVE    SPACE           TO  SYS-5001-SRYCD
+           END-IF
+           IF    ( SPA-GMN-W20-TBTUTYPE NOT =   SPACE )
+               MOVE    SPACE           TO  SYS-5001-TSRYCD
+               MOVE    "1906"          TO  SYS-5001-TSRYCD
+               MOVE    SPA-GMN-W20-TBTUTYPE
+                                       TO  SYS-5001-TSRYCD(5:1)
+               MOVE    SPA-GMN-W20-TBTUCD
+                                       TO  WRK-KBN4
+               MOVE    WRK-KBN4-G      TO  SYS-5001-TSRYCD(6:)
+           ELSE
+               MOVE    SPACE           TO  SYS-5001-TSRYCD
            END-IF
       *
       *    療養病棟入院基本料算定区分
@@ -5468,6 +5495,8 @@ UPDATE*    看護職員夜間配置加算
                            SPA-GMN-W20-RECEDSPKBN-G
                            SPA-GMN-W20-BTUTYPE-G
                            SPA-GMN-W20-BTUCD
+                           SPA-GMN-W20-TBTUTYPE-G
+                           SPA-GMN-W20-TBTUCD
                            SPA-GMN-W20-YKNCHOKAKBN-G
                            SPA-GMN-W20-RYOYOKBN-G
                            SPA-NAI-W20-SBT-MOT
@@ -5506,6 +5535,8 @@ UPDATE*    看護職員夜間配置加算
                            SPA-GMN-W20-RECEDSPKBN-G
                            SPA-GMN-W20-BTUTYPE-G
                            SPA-GMN-W20-BTUCD
+                           SPA-GMN-W20-TBTUTYPE-G
+                           SPA-GMN-W20-TBTUCD
                            SPA-GMN-W20-RYOYOKBN-G
       *
       *    入院基本料コンボ編集処理
@@ -6168,7 +6199,7 @@ UPDATE*    看護職員夜間配置加算
        4101-BTUTYPE-CHK-SEC     SECTION.
       *
            IF    ( SPA-GMN-W20-BTUTYPE-G   =   SPACE )
-               CONTINUE
+               MOVE    ZERO            TO   SPA-GMN-W20-BTUCD
            ELSE
       *
       *        該当コードのデータが存在するかチェック
@@ -6210,6 +6241,55 @@ UPDATE*    看護職員夜間配置加算
            .
       *
        4101-BTUCD-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    病棟コード（病棟機能）チェック処理
+      *****************************************************************
+       4101-TBTUTYPE-CHK-SEC           SECTION.
+      *
+           IF    ( SPA-GMN-W20-TBTUTYPE-G   =   SPACE )
+               MOVE    ZERO            TO   SPA-GMN-W20-TBTUCD
+           ELSE
+      *
+      *        該当コードのデータが存在するかチェック
+               MOVE    SPA-GMN-W20-TBTUTYPE
+                                   TO  WRK-CMB-CD
+               PERFORM 4200-BTUTYPELST-CHK-SEC
+               IF    ( WRK-CMB-ITM     =   SPACE )
+                   MOVE    59          TO  SPA-GMN-W20-CUR
+                   MOVE    "0017"      TO  SPA-ERRCD
+               ELSE
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-W20-TBTUTYPE-G
+               END-IF
+      *
+           END-IF
+      *
+           .
+      *
+       4101-TBTUTYPE-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    病棟コード（連番）チェック処理
+      *****************************************************************
+       4101-TBTUCD-CHK-SEC             SECTION.
+      *
+           IF    ( SPA-GMN-W20-TBTUCD   =   ZERO )
+               CONTINUE
+           ELSE
+      *
+               IF    ( SPA-GMN-W20-TBTUCD   >=  1 )
+                AND  ( SPA-GMN-W20-TBTUCD   <=  50 )
+                   CONTINUE
+               ELSE
+                   MOVE    60          TO  SPA-GMN-W20-CUR
+                   MOVE    "0018"      TO  SPA-ERRCD
+               END-IF
+      *
+           END-IF
+      *
+           .
+      *
+       4101-TBTUCD-CHK-EXT.
            EXIT.
       *****************************************************************
       *    療養病棟入院基本料算定区分チェック処理
@@ -6799,6 +6879,15 @@ UPDATE*    看護職員夜間配置加算
                MOVE    SYS-5001-SRYCD(6:4)
                                        TO  WRK-KBN4-G
                MOVE    WRK-KBN4        TO  SPA-GMN-W20-BTUCD
+           END-IF
+           IF    ( SYS-5001-TSRYCD      NOT =   SPACE )
+               MOVE    SYS-5001-TSRYCD(5:1)
+                                       TO  WRK-CMB-CD
+               PERFORM 4200-BTUTYPELST-CHK-SEC
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W20-TBTUTYPE-G
+               MOVE    SYS-5001-SRYCD(6:4)
+                                       TO  WRK-KBN4-G
+               MOVE    WRK-KBN4        TO  SPA-GMN-W20-TBTUCD
            END-IF
       *
       *    病棟終了区分
@@ -8643,6 +8732,20 @@ UPDATE*    看護職員夜間配置加算
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-W20-TBTUTYPE    NOT =   SPACE )
+                OR   ( SPA-GMN-W20-TBTUCD      NOT =   ZERO )
+                   IF    ( SPA-GMN-W20-TBTUTYPE    =   SPACE )
+                       MOVE    "1114"  TO  SPA-ERRCD
+                       MOVE    59      TO  SPA-GMN-W20-CUR
+                   END-IF
+                   IF    ( SPA-GMN-W20-TBTUCD      =   ZERO )
+                       MOVE    "1114"  TO  SPA-ERRCD
+                       MOVE    60      TO  SPA-GMN-W20-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
             AND  ( SPA-NAI-W20-YUKOSTYMD
                                   >=  CONST-H260401 )
       *        H26.4以降設定可能な加算の数がシステム管理の領域(14)を超えた
@@ -10442,7 +10545,7 @@ UPDATE*    看護職員夜間配置加算
                                    TO  W20-RECEDSPKBN-ITM (IDX1)
            END-PERFORM
       *
-      *    病棟機能
+      *    病棟機能（入院料）
            MOVE    SPA-GMN-W20-BTUTYPE-G    TO  W20-BTUTYPE
            MOVE    SPA-GMN-W20-BTUTYPE-MAX
                                        TO  W20-BTUTYPE-CNT
@@ -10452,8 +10555,16 @@ UPDATE*    看護職員夜間配置加算
                                    TO  W20-BTUTYPE-ITM (IDX1)
            END-PERFORM
       *
-      *    病棟コード
+      *    病棟コード（入院料）
            MOVE    SPA-GMN-W20-BTUCD   TO  W20-BTUCD
+      *
+      *    病棟機能（特定入院料）
+           MOVE    SPA-GMN-W20-TBTUTYPE-G
+                                       TO  W20-TBTUTYPE
+           MOVE    W20-BTUTYPE-LST     TO  W20-TBTUTYPE-LST
+      *
+      *    病棟コード（特定入院料）
+           MOVE    SPA-GMN-W20-TBTUCD  TO  W20-TBTUCD
       *
       *    療養病棟入院基本料算定区分
            PERFORM 42011-RYOYOSANTEI-CHK-SEC
@@ -10737,6 +10848,9 @@ UPDATE*    看護職員夜間配置加算
                                        W20-BTUTYPE-STATE
                                        W20-BTUTYPE-ITM-STATE
                                        W20-BTUCD-STATE
+                                       W20-TBTUTYPE-STATE
+                                       W20-TBTUTYPE-ITM-STATE
+                                       W20-TBTUCD-STATE
       *
            IF   ( SPA-GMN-W20-BTULST-SEL    >  ZERO )
                MOVE    WIDGET-INSENSITIVE
@@ -10804,6 +10918,19 @@ UPDATE*    看護職員夜間配置加算
                                        TO  W20-BTUTYPE-STATE
                                            W20-BTUTYPE-ITM-STATE
                                            W20-BTUCD-STATE
+                                           W20-TBTUTYPE-STATE
+                                           W20-TBTUTYPE-ITM-STATE
+                                           W20-TBTUCD-STATE
+           END-IF
+      *
+           IF    ( W20-BTUTYPE         =   SPACE )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  W20-BTUCD-STATE
+           END-IF
+      *
+           IF    ( W20-TBTUTYPE        =   SPACE )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  W20-TBTUCD-STATE
            END-IF
       *
            .
@@ -10943,6 +11070,10 @@ UPDATE*    看護職員夜間配置加算
                MOVE    "BTUTYPE"           TO  MCP-WIDGET
            WHEN    058
                MOVE    "BTUCD"             TO  MCP-WIDGET
+           WHEN    059
+               MOVE    "TBTUTYPE"          TO  MCP-WIDGET
+           WHEN    060
+               MOVE    "TBTUCD"            TO  MCP-WIDGET
            WHEN    100
                MOVE    "SELNUM"            TO  MCP-WIDGET
            WHEN    101
@@ -11012,6 +11143,20 @@ UPDATE*    看護職員夜間配置加算
       *
            IF    ( SPA-GMN-W20-CUR     =   58 )
                IF    ( W20-BTUCD-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    59          TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   59 )
+               IF    ( W20-TBTUTYPE-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    60          TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   60 )
+               IF    ( W20-TBTUCD-STATE
                                        =   WIDGET-INSENSITIVE )
                    IF    ( SPA-GMN-W20-KSN-PAGENO  =   ZERO )
                        MOVE    009     TO  SPA-GMN-W20-CUR
@@ -11088,6 +11233,10 @@ UPDATE*    看護職員夜間配置加算
            WHEN    "BTUTYPE"
                MOVE    058             TO  SPA-GMN-W20-CUR
            WHEN    "BTUCD"
+               MOVE    059             TO  SPA-GMN-W20-CUR
+           WHEN    "TBTUTYPE"
+               MOVE    060             TO  SPA-GMN-W20-CUR
+           WHEN    "TBTUCD"
                IF    ( SPA-GMN-W20-KSN-PAGENO  =   ZERO )
                    MOVE    009         TO  SPA-GMN-W20-CUR
                ELSE

@@ -105,7 +105,8 @@
                05  SYS-5002-YOBI                   PIC X(300).
                05  SYS-5002-KHNSRYCD               PIC X(09).
                05  SYS-5002-KHNKBNCD               PIC X(03).
-               05  SYS-5002-YOBI2                  PIC X(44).
+               05  SYS-5002-TSRYCD                 PIC X(09).
+               05  SYS-5002-YOBI2                  PIC X(35).
       *Ã¼Ëö£É£Ä
            03  SYS-5002-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

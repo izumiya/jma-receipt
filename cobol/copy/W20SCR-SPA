@@ -80,7 +80,14 @@
                  11  SPA-GMN-W20-BTUTYPEFL      PIC X(01).
                  11  SPA-GMN-W20-BTUTYPEMEI     PIC X(18).
       *        病棟コード
-               09  SPA-GMN-W20-BTUCD               PIC 9(02).
+               09  SPA-GMN-W20-BTUCD             PIC 9(02).
+      *        病棟機能
+               09  SPA-GMN-W20-TBTUTYPE-G.
+                 11  SPA-GMN-W20-TBTUTYPE        PIC X(01).
+                 11  SPA-GMN-W20-TBTUTYPEFL      PIC X(01).
+                 11  SPA-GMN-W20-TBTUTYPEMEI     PIC X(18).
+      *        病棟コード
+               09  SPA-GMN-W20-TBTUCD            PIC 9(02).
       *        療養病棟入院基本料算定区分
                09  SPA-GMN-W20-RYOYOKBN-G.
                  11  SPA-GMN-W20-RYOYOKBN          PIC X(01).
@@ -1067,6 +1074,16 @@
       *
       *        点数
                09  SPA-GMN-W21-KHNTEN              PIC 9(06).
+      *
+      *        病棟機能
+               09  SPA-GMN-W21-TBTUTYPE-G.
+                 11  SPA-GMN-W21-TBTUTYPE        PIC X(01).
+                 11  SPA-GMN-W21-TBTUTYPEFL      PIC X(01).
+                 11  SPA-GMN-W21-TBTUTYPEMEI     PIC X(18).
+      *
+      *        病棟コード
+               09  SPA-GMN-W21-TBTUCD            PIC 9(02).
+      *
                09  SPA-GMN-W21-KSN-G.
       *          新生児入院医療管理加算
                  11  SPA-GMN-W21-SINSEIJI-LBL      PIC X(36).
@@ -1204,6 +1221,13 @@
                    13  SPA-GMN-W21-KHNRYOL         PIC X(02).
                    13  SPA-GMN-W21-KHNRYOFL        PIC X(01).
                    13  SPA-GMN-W21-KHNRYOMEIL      PIC X(60).
+      *        病棟機能
+               09  SPA-GMN-W21-TBTUTYPELST-G.
+                 11  SPA-GMN-W21-TBTUTYPE-MAX       PIC 9(03).
+                 11  SPA-GMN-W21-TBTUTYPELST        OCCURS  5.
+                   13  SPA-GMN-W21-TBTUTYPEL        PIC X(01).
+                   13  SPA-GMN-W21-TBTUTYPEFL1      PIC X(01).
+                   13  SPA-GMN-W21-TBTUTYPEMEIL     PIC X(18).
                09  SPA-GMN-W21-KSNLST-G.
       *          新生児入院医療管理加算
                  11  SPA-GMN-W21-SINSEIJILST-G.

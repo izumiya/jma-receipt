@@ -114,6 +114,19 @@ W21 {
       numdata number(6);
       state int;
     };
+    CMB_TBTUTYPE {
+      TBTUTYPE {
+        textdata varchar(20);
+      state int;
+      };
+      count int;
+        item varchar(20)[5];
+      state int;
+    };
+    TBTUCD {
+      numdata number(2);
+      state int;
+    };
     LBLKSN01 {
       textdata varchar(36);
     };
