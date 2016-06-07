@@ -8458,6 +8458,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ¿ÇÎÅ¹Ô°ÙÆþÎÏ¥Á¥§¥Ã¥¯
            PERFORM 41011-KOUI-ALLHEN-SEC
+      *H28.6
+      *    ¿ôÎÌ¥¼¥í¤Ï£Ä£Ï¤Ø
+           IF      SPA-ERRCD           =   "A001"
+               MOVE    SPACE           TO  SPA-ERRCD
+           END-IF
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD           =   "0180" )  OR
                   (FLG-END             =   1     )
