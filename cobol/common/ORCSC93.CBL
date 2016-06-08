@@ -2763,6 +2763,22 @@
                            MOVE    1                   TO  FLG-ARI
                        END-IF
                    END-IF
+      *H28.5
+               ELSE
+      *            外来は、332,340のみ
+                   IF      (SPA-COM-TNSSRYSYUKBN (IDX) =   "300" OR
+                                                           "330" OR
+                                                           "340" )  AND
+                           (IDX                    >   1 )  AND
+                           (SPA-GMN-INPUTCD(IDX - 1)(1:4)
+                                                   =   ".332"
+                                                   OR  ".340" )
+      *                通則加算のみ
+                       IF     (SPA-COM-CDKBN-KBN (IDX)     =   "G"  )
+                         AND  (SPA-COM-CDKBN-KBNNUM(IDX)   =   "000")
+                           MOVE    1                   TO  FLG-ARI
+                       END-IF
+                   END-IF
                END-IF
       *
       *        入院種別が入力されていること
@@ -2798,6 +2814,7 @@
                       (SPA-COM-TNSSRYKBN (IDX) =   "64"  )
                    MOVE    1               TO  FLG-ARI
                END-IF
+      *
       *H28.1
       *        初診・再診加算のみ
                IF    ((WRK-SRYSYUKBN           =   "114" )  AND

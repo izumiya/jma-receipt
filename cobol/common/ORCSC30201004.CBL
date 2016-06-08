@@ -45,6 +45,7 @@
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  10/03/XX  Ｈ２２．４改正対応
       *  04.07.00    NACL-多々納  11/11/25  同日再入院対応
+      *  04.08.00    NACL-多々納  16/06/08  332　の外来対応追加
       *****************************************************************
       *
       *
@@ -467,10 +468,20 @@
                        IF      WRK-GMN-INPUTCD(IDX-Z)  =   ".350"
                                                        OR  ".332"
                                                        OR  ".352"
+      *H28.6
+      *                    H28.4 から、.332 入力可
+                           IF    (SPA-SRYYMD           >=  "20160401")
+                             AND (WRK-GMN-INPUTCD(IDX-Z)
+                                                       =   ".332" )
+                               CONTINUE
+                           ELSE
+      *
                            IF     SPA-NYUGAIKBN        =   "2"
                                MOVE    "9024"          TO  WRK-ERRCD
                                MOVE    "1"             TO  WRK-COM-CUR
                                                                (IDX-Z)
+                           END-IF
+      *
                            END-IF
                        END-IF
                        IF      WRK-GMN-INPUTCD(IDX-Z)  =   ".312"
