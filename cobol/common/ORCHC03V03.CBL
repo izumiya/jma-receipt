@@ -1210,7 +1210,7 @@
            MOVE    WRK-LBLSRYYMD       TO  HC03-LBLSRYYMD
            MOVE    WRK-SRYYMDG         TO  HC03-SRYYMD
       *    È¯¹ÔÆü
-           IF    ( ORCHC03-MOTOID      =    1 OR 3)
+           IF    ( ORCHC03-MOTOID      =    1 OR 3 OR 4 )
             AND  ( TPARA-HAKKOUBIKBN   =   "1" )
                MOVE    SPA-SYSYMD      TO  WRK-SYMD
            ELSE

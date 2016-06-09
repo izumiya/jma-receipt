@@ -939,7 +939,7 @@
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  HCN03-NYUINENDYMD
       *    È¯¹ÔÆü
-           IF    ( ORCHCN03-MOTOID     =   1 OR 3 )
+           IF    ( ORCHCN03-MOTOID     =   1 OR 3 OR 4)
             AND  ( TPARA-HAKKOUBIKBN   =   "1" )
                MOVE    ORCHCN03-SYSYMD TO  WRK-SYMD
            ELSE
