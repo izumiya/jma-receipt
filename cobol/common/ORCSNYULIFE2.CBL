@@ -330,6 +330,11 @@
            03  WRK-NYUIN-TABLE.
                05  WRK-NYUIN-TBL           OCCURS  31.
                    07  WRK-HKNCOMBI-DAY    PIC 9(03).
+      *    ÆñÉÂÂàÈò
+           03  WRK-NANBYO-TABLE.
+               05  WRK-NANBYO-TBL          OCCURS  31.
+                   07  WRK-NANBYO-DAY      PIC X(01).
+      *
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -616,12 +621,27 @@
              PERFORM   900-CLOSE-SEC
            END-IF
       *
+      *
+      *    ¿©»öÉéÃ´¿ø¤¨ÃÖ¤­ÂÐ¾Ý¼èÆÀ¥µ¥Ö¡ÊÆñÉÂ¿ø¤¨ÃÖ¤­È½ÄêÍÑ¡Ë
+           INITIALIZE                      ORCSSKJKEEP-AREA
+           MOVE    LNK-NYULIFE2-HOSPNUM    TO  LNK-SKJKEEP-HOSPNUM
+           MOVE    LNK-NYULIFE2-PTID       TO  LNK-SKJKEEP-PTID
+           MOVE    LNK-NYULIFE2-SANTEIYM   TO  LNK-SKJKEEP-SANTEIYM
+           CALL    "ORCSSKJKEEP"    USING      ORCSSKJKEEP-AREA
+                                               SPA-AREA
+      **     PERFORM    VARYING   IDX1   FROM   1   BY   1
+      **                UNTIL     IDX1   >   31
+      **        DISPLAY "IDX1 = " IDX1
+      **        DISPLAY "LNK-SKJKEEP-KBN(IDX1) = " LNK-SKJKEEP-KBN(IDX1)
+      **     END-PERFORM
+      *
+      *
       *    Æþ±¡»þÀ¸³èÎÅÍÜÈñ¤Î³ºÅöÆü¤È·Ú¸º¶èÊ¬£²¡ÊÆþ±¡ÎÁÈ½Äê¡Ë¤ò¼èÆÀ
            MOVE    ZERO                    TO  FLG-OK
            INITIALIZE                          NYUINACCT-REC
-           MOVE    LNK-NYULIFE2-HOSPNUM     TO  NACCT-HOSPNUM
-           MOVE    LNK-NYULIFE2-PTID        TO  NACCT-PTID
-           MOVE    LNK-NYULIFE2-SANTEIYM    TO  NACCT-SRYYM
+           MOVE    LNK-NYULIFE2-HOSPNUM    TO  NACCT-HOSPNUM
+           MOVE    LNK-NYULIFE2-PTID       TO  NACCT-PTID
+           MOVE    LNK-NYULIFE2-SANTEIYM   TO  NACCT-SRYYM
            MOVE    "1"                     TO  NACCT-ZAISKBKBN
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
@@ -663,51 +683,6 @@
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE2-FTNKBN2(IDX1)
                                END-IF
-      *                        ÆñÉÂ¸øÈñ¤ÎÈ½ÄêÄÉ²Ã¡Ê°Ê²¼Æþ±¡ÎÁ¤Î¾ì¹ç¤Î¤ß¡Ë
-      *                        ¡¦ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ
-      *                        ¡¦ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ
-                               IF  (IDX-SEI2   >=   94)   AND
-                                   (IDX-SEI2   <=  101)
-      *                          ÆñÉÂ¸øÈñ¤ò»ÈÍÑ¤µ¤ì¤Æ¤¤¤ë¤«È½Äê
-                                 MOVE   ZERO       TO   FLG-NANBYO
-                                 IF  WRK-HKNCOMBI-DAY(IDX1) NOT =  ZERO
-                                     INITIALIZE            HKNCOMBI-REC
-                                     MOVE   LNK-NYULIFE2-HOSPNUM
-                                                   TO  COMB-HOSPNUM
-                                     MOVE   LNK-NYULIFE2-PTID 
-                                                   TO  COMB-PTID
-                                     MOVE   WRK-HKNCOMBI-DAY(IDX1)
-                                                   TO  COMB-HKNCOMBINUM
-                                     MOVE   "tbl_hkncombi"
-                                                   TO  MCP-TABLE
-                                     MOVE    "key" TO  MCP-PATHNAME
-                                     PERFORM 910-HKNCOMBI-SELECT-SEC
-                                     IF   FLG-HKNCOMBI      =   ZERO
-                                       MOVE  "tbl_hkncombi"
-                                                   TO  MCP-TABLE
-                                       MOVE  "key"  TO  MCP-PATHNAME
-                                       PERFORM   910-HKNCOMBI-READ-SEC
-                                       IF  FLG-HKNCOMBI         =  ZERO
-                                         IF  (COMB-KOHHKNNUM(1) = "054")
-                                          OR (COMB-KOHHKNNUM(2) = "054")
-                                          OR (COMB-KOHHKNNUM(3) = "054")
-                                          OR (COMB-KOHHKNNUM(4) = "054")
-                                             MOVE  1    TO   FLG-NANBYO
-                                         END-IF
-                                       END-IF
-                                     END-IF
-      *                              ÊÝ¸±ÁÈ¹ç¤»¥¯¥í¡¼¥º
-                                     MOVE    "tbl_hkncombi"
-                                                        TO  MCP-TABLE
-                                     MOVE    "key"      TO  MCP-PATHNAME
-                                     PERFORM   900-CLOSE-SEC
-                                 END-IF
-      *
-                                 IF   FLG-NANBYO  =   1
-                                   MOVE   "1"   TO   
-                                             LNK-NYULIFE2-FTNKBN2(IDX1)
-                                 END-IF
-                               END-IF
       *                        ÉÂ¾õ¤ÎÄøÅÙ¡¢¼£ÎÅ¤ÎÆâÍÆ¤ò¤·¤ó¼à¤·¤ÆÉ¸½à
       *                        ÉéÃ´³Û¤ò·Ú¸º¤¹¤ë´µ¼Ô¤ÎÈ½Äê¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ»»Äê»þ¤Î
       *                                                    £Á£Ä£ÌÆþÎÏÈ½ÃÇ¡Ë
@@ -716,6 +691,11 @@
                                                              "3" )
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE2-FTNKBN2(IDX1)
+                               END-IF
+      *                        ÆñÉÂ¸øÈñ
+                               IF  LNK-SKJKEEP-KBN(IDX1)   =  "1"
+                                   MOVE   LNK-SKJKEEP-KBN(IDX1)
+                                                TO WRK-NANBYO-DAY(IDX1)
                                END-IF
                             END-IF
                           END-PERFORM
@@ -985,20 +965,12 @@
                  END-IF
                END-PERFORM
       *
-      *        ¿©»öÉéÃ´¿ø¤¨ÃÖ¤­ÂÐ¾Ý¼èÆÀ¥µ¥Ö
-               INITIALIZE                      ORCSSKJKEEP-AREA
-               MOVE    LNK-NYULIFE2-HOSPNUM    TO  LNK-SKJKEEP-HOSPNUM
-               MOVE    LNK-NYULIFE2-PTID       TO  LNK-SKJKEEP-PTID
-               MOVE    LNK-NYULIFE2-SANTEIYM   TO  LNK-SKJKEEP-SANTEIYM
-               CALL    "ORCSSKJKEEP"    USING      ORCSSKJKEEP-AREA
-                                                   SPA-AREA
-      *
       *        À¸³èÎÅÍÜ¿©»öÉ¸½àÉéÃ´³ÛÀßÄê¡Ê·Ú¸º¤¢¤ê¤Î´µ¼Ô¡Ë
                PERFORM   VARYING   IDX1   FROM   1  BY  1
                  UNTIL   IDX1   >    31
                  IF   LNK-NYULIFE2-KBN(IDX1)   =   "1"
-                    EVALUATE  LNK-NYULIFE2-FTNKBN2(IDX1)
-                        WHEN  SPACE
+                    IF   (LNK-NYULIFE2-FTNKBN2(IDX1)  =  SPACE) AND
+                         (WRK-NANBYO-DAY(IDX1)        =  SPACE)
       *                   ½êÆÀ¤Î¾õ¶·¤Ë¤è¤ë·Ú¸º
                             EVALUATE   LNK-NYULIFE2-FTNKBN1(IDX1)
                                 WHEN   "1"
@@ -1037,7 +1009,9 @@
                                          LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
                             END-EVALUATE
-                        WHEN  "1"
+                    END-IF
+                    IF   (LNK-NYULIFE2-FTNKBN2(IDX1)  =  "1")   OR
+                         (WRK-NANBYO-DAY(IDX1)        =  "1")
       *                   ÉÂ¾õ¤ÎÄøÅÙ¤Ë¤è¤ë·Ú¸º
                             EVALUATE   LNK-NYULIFE2-FTNKBN1(IDX1)
                                 WHEN   SPACE
@@ -1061,7 +1035,7 @@
                                        END-IF
                                     END-IF
       *                             ÆñÉÂÅù¿ø¤¨ÃÖ¤­´µ¼Ô¤ÎÃÖ´¹
-                                    EVALUATE     LNK-SKJKEEP-KBN(IDX1)
+                                    EVALUATE     WRK-NANBYO-DAY(IDX1)
                                         WHEN     "1"
                                            MOVE  "197003610"   TO
                                               LNK-NYULIFE2-SKJFTN-SRYCD
@@ -1069,14 +1043,16 @@
                                            MOVE   260      TO
                                              LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
-                                        WHEN     "2"
+                                    END-EVALUATE
+      *                             Àº¿ÀÉÂ¾²£±Ç¯Ä¶´µ¼Ô¤ÎÃÖ´¹
+                                    IF   LNK-SKJKEEP-KBN(IDX1)  =  "2"
                                            MOVE  "197003710"   TO
                                               LNK-NYULIFE2-SKJFTN-SRYCD
                                                             (IDX1 IDX-T)
                                            MOVE   260      TO
                                              LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
-                                    END-EVALUATE
+                                    END-IF
                                 WHEN   "1"
       *                           ¡Ê°åÎÅ¶èÊ¬£²¡¢£³¡ÊÄã£²¡¡£¹£°Æü°Ê²¼¡Ë¡Ë
                                     MOVE  "197002810"   TO
@@ -1103,16 +1079,18 @@
                                          LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
                             END-EVALUATE
-                    END-EVALUATE
+                    END-IF
                  END-IF
                END-PERFORM
+      *
             END-PERFORM
+      *
       *
       *      À¸³èÎÅÍÜ´Ä¶­ÎÅÍÜÉ¸½àÉéÃ´³ÛÀßÄê
              PERFORM   VARYING   IDX1   FROM   1  BY  1
                UNTIL   IDX1   >    31
                 IF   LNK-NYULIFE2-KBN(IDX1)   =   "1"
-                    IF  LNK-NYULIFE2-FTNKBN2(IDX1)   =   SPACE
+                    IF LNK-NYULIFE2-FTNKBN2(IDX1)   =   SPACE
                         MOVE  "197001910"       TO
                                         LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  320       TO
@@ -1123,6 +1101,18 @@
                         MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
                     END-IF
+      *             ÆñÉÂ¸øÈñ¤Ï´Ä¶­ÎÅÍÜ´µ¼ÔÉéÃ´Ìµ¤·¤ËÃÖ´¹¤¨
+                    IF  WRK-NANBYO-DAY(IDX1)   =   "1"
+                        MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+                        MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+                    END-IF
+      *             Àº¿ÀÉÂ¾²£±Ç¯Ä¶¤Ç°åÎÅ¶èÊ¬£²¡¢£³¤Ï´µ¼ÔÉéÃ´Ìµ¤·¤ËÃÖ´¹¤¨
+                    IF (LNK-NYULIFE2-FTNKBN2(IDX1)   =  "1")   AND
+                       (LNK-SKJKEEP-KBN(IDX1)        =  "2")
+                        MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+                        MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+                    END-IF
+
                 END-IF
              END-PERFORM
       *
@@ -1134,30 +1124,32 @@
                MOVE   4      TO   LNK-NYULIFE2-RC
            END-IF
       *
-      *     PERFORM   VARYING  IDX1   FROM  1   BY  1
-      *               UNTIL  IDX1   >   31
-      *          DISPLAY "IDX1 = " IDX1
-      *          DISPLAY "LNK-NYULIFE2-FTNKBN1(IDX1) = " 
-      *                   LNK-NYULIFE2-FTNKBN1(IDX1)
-      *          DISPLAY "LNK-NYULIFE2-FTNKBN2(IDX1) = " 
-      *                   LNK-NYULIFE2-FTNKBN2(IDX1)
-      *          DISPLAY  "LNK-NYULIFE2-SKJ-SRYCD(IDX1) = "
-      *                    LNK-NYULIFE2-SKJ-SRYCD(IDX1)
-      *          DISPLAY "LNK-NYULIFE2-SKJ-MONEY(IDX1) = "
-      *                   LNK-NYULIFE2-SKJ-MONEY(IDX1)
-      *          DISPLAY  "LNK-NYULIFE2-SKJFTN-SRYCD(IDX1) = "
-      *                    LNK-NYULIFE2-SKJFTN-SRYCD(IDX1)
-      *          DISPLAY "LNK-NYULIFE2-SKJFTN-MONEY(IDX1) = "
-      *                   LNK-NYULIFE2-SKJFTN-MONEY(IDX1)
-      *          DISPLAY  "LNK-NYULIFE2-KAN-SRYCD(IDX1) = "
-      *                    LNK-NYULIFE2-KAN-SRYCD(IDX1)
-      *          DISPLAY "LNK-NYULIFE2-KAN-MONEY(IDX1) = "
-      *                   LNK-NYULIFE2-KAN-MONEY(IDX1)
-      *          DISPLAY  "LNK-NYULIFE2-KANFTN-SRYCD(IDX1) = "
-      *                    LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
-      *          DISPLAY "LNK-NYULIFE2-KANFTN-MONEY(IDX1) = "
-      *                   LNK-NYULIFE2-KANFTN-MONEY(IDX1)
-      *     END-PERFORM
+      **     PERFORM   VARYING  IDX1   FROM  1   BY  1
+      **               UNTIL  IDX1   >   31
+      **          DISPLAY "IDX1 = " IDX1
+      **          DISPLAY "LNK-NYULIFE2-FTNKBN1(IDX1) = " 
+      **                   LNK-NYULIFE2-FTNKBN1(IDX1)
+      **          DISPLAY "LNK-NYULIFE2-FTNKBN2(IDX1) = " 
+      **                   LNK-NYULIFE2-FTNKBN2(IDX1)
+      **          DISPLAY "WRK-NANBYO-DAY(IDX1) = "
+      **                   WRK-NANBYO-DAY(IDX1)
+      **          DISPLAY  "LNK-NYULIFE2-SKJ-SRYCD(IDX1 1) = "
+      **                    LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
+      **          DISPLAY "LNK-NYULIFE2-SKJ-MONEY(IDX1 1) = "
+      **                   LNK-NYULIFE2-SKJ-MONEY(IDX1 1)
+      **          DISPLAY  "LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 1) = "
+      **                    LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 1)
+      **          DISPLAY "LNK-NYULIFE2-SKJFTN-MONEY(IDX1 1) = "
+      **                   LNK-NYULIFE2-SKJFTN-MONEY(IDX1 1)
+      **          DISPLAY  "LNK-NYULIFE2-KAN-SRYCD(IDX1) = "
+      **                    LNK-NYULIFE2-KAN-SRYCD(IDX1)
+      **          DISPLAY "LNK-NYULIFE2-KAN-MONEY(IDX1) = "
+      **                  LNK-NYULIFE2-KAN-MONEY(IDX1)
+      **          DISPLAY  "LNK-NYULIFE2-KANFTN-SRYCD(IDX1) = "
+      **                    LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+      **          DISPLAY "LNK-NYULIFE2-KANFTN-MONEY(IDX1) = "
+      **                   LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+      **     END-PERFORM
            .
        200-MAIN-EXT.
            EXIT.
