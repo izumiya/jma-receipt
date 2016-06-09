@@ -1212,18 +1212,18 @@
       *       DISPLAY "WRK-NANBYO-HKNCOMBI(3) = " WRK-NANBYO-HKNCOMBI(3)
       *       DISPLAY "WRK-NANBYO-HKNCOMBI(4) = " WRK-NANBYO-HKNCOMBI(4)
       *       DISPLAY "WRK-NANBYO-HKNCOMBI(5) = " WRK-NANBYO-HKNCOMBI(5)
-      *      診療会計テーブル（暫定で包括分以外のみ判定対象としておく）
+      *      診療会計テーブル（包括入力分も対象）
              INITIALIZE                          SRYACCT-REC
              MOVE    LNK-SKJKEEP-HOSPNUM     TO  ACCT-HOSPNUM
              MOVE    "1"                     TO  ACCT-NYUGAIKBN
              MOVE    LNK-SKJKEEP-PTID        TO  ACCT-PTID
              MOVE    LNK-SKJKEEP-SANTEIYM    TO  ACCT-SRYYM
              MOVE    "tbl_sryacct"           TO  MCP-TABLE
-             MOVE    "key30"                 TO  MCP-PATHNAME
+             MOVE    "key68"                 TO  MCP-PATHNAME
              PERFORM 910-SRYACCT-SELECT-SEC
              IF      FLG-SRYACCT             =   ZERO
                  MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                 MOVE    "key30"             TO  MCP-PATHNAME
+                 MOVE    "key68"             TO  MCP-PATHNAME
                  PERFORM   910-SRYACCT-READ-SEC
                  PERFORM   UNTIL   (FLG-SRYACCT    =   1)
       *
@@ -1237,22 +1237,26 @@
                                              WRK-NANBYO-HKNCOMBI(8) OR
                                              WRK-NANBYO-HKNCOMBI(9) OR
                                              WRK-NANBYO-HKNCOMBI(10)
-                      PERFORM    VARYING   IDX   FROM   1   BY   1
-                        UNTIL    IDX    >    31
-                            IF   ACCT-DAY(1 IDX)  NOT =   ZERO
-                                MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX)
-                            END-IF
-                      END-PERFORM
+                      IF   ACCT-SRYKBN   =   "95"  OR  "96"
+                          CONTINUE
+                      ELSE
+                        PERFORM    VARYING   IDX   FROM   1   BY   1
+                          UNTIL    IDX    >    31
+                              IF   ACCT-DAY(1 IDX)  NOT =   ZERO
+                                  MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX)
+                              END-IF
+                        END-PERFORM
+                      END-IF
                    END-IF
       *
                    MOVE     "tbl_sryacct"      TO  MCP-TABLE
-                   MOVE     "key30"            TO  MCP-PATHNAME
+                   MOVE     "key68"            TO  MCP-PATHNAME
                    PERFORM   910-SRYACCT-READ-SEC
                  END-PERFORM
              END-IF
       *      診療会計クローズ
              MOVE     "tbl_sryacct"    TO  MCP-TABLE
-             MOVE     "key30"          TO  MCP-PATHNAME
+             MOVE     "key68"          TO  MCP-PATHNAME
              PERFORM   900-CLOSE-SEC
       *
            END-IF

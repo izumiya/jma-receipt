@@ -1525,6 +1525,23 @@ path	key67 	{
 	};
 };
 
+path	key68 	{
+	DBSELECT	{
+		DECLARE tbl_sryacct_main_key68_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryacct_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+			AND   ZAIKAISU    >   0
+			AND   HKNCOMBI   <>  '9999'
+			ORDER  BY  PTID,HKNCOMBI,SRYKA,
+                                   ZAINUM
+		;
+	};
+};
+
 path	tmpkey 	{
 	DBCREATE	{
 		CREATE TEMP TABLE tbl_sryacct_main ON COMMIT PRESERVE ROWS AS
