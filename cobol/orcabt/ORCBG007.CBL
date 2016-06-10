@@ -654,10 +654,10 @@ grpsys     END-UNSTRING
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           IF    ( WRK-PARA-STDAY  NOT =   SPACE )
-            OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
-               PERFORM 800-TEMP-TABLE-CREATE-SEC
-           END-IF
+      *    IF    ( WRK-PARA-STDAY  NOT =   SPACE )
+      *     OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
+      *        PERFORM 800-TEMP-TABLE-CREATE-SEC
+      *    END-IF
       *
            EVALUATE    WRK-PARA-NYUGAIKBN
                                    ALSO WRK-PARA-PTNUM
@@ -682,10 +682,10 @@ grpsys     END-UNSTRING
                PERFORM 2101-KAIKEI-HEN-SEC
            END-IF
       *
-           IF    ( WRK-PARA-STDAY  NOT =   SPACE )
-            OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
-               PERFORM 800-TEMP-TABLE-DROP-SEC
-           END-IF
+      *    IF    ( WRK-PARA-STDAY  NOT =   SPACE )
+      *     OR   ( WRK-PARA-EDDAY  NOT =   SPACE )
+      *        PERFORM 800-TEMP-TABLE-DROP-SEC
+      *    END-IF
       *
            MOVE    1                   TO  FLG-END
       *
