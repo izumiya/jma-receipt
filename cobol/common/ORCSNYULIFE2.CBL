@@ -93,6 +93,8 @@
            03  IDX-SEI                     PIC 9(04).
            03  IDX-SEI2                    PIC 9(04).
            03  IDX-T                       PIC 9(04).
+           03  IDX-ST                      PIC 9(02).
+           03  IDX-ED                      PIC 9(02).
       *
       *    •≥•Û•π•ø•Û•»√Õ
       *     ø¿Æ£≤£∏«Ø≈Ÿ≤˛ƒÍ¿∏≥ËŒ≈Õ‹»ΩƒÍÕ—
@@ -330,11 +332,9 @@
            03  WRK-NYUIN-TABLE.
                05  WRK-NYUIN-TBL           OCCURS  31.
                    07  WRK-HKNCOMBI-DAY    PIC 9(03).
-      *    ∆Ò…¬¬‡»Ú
-           03  WRK-NANBYO-TABLE.
-               05  WRK-NANBYO-TBL          OCCURS  31.
-                   07  WRK-NANBYO-DAY      PIC X(01).
-      *
+      *    ªªƒÍÕ◊∑Ô≥∞∂Ë ¨¬‡»Ú
+           03  WRK-SANTEIYOUKENKBN-TABLE.
+               05  WRK-SANTEIYOUKENKBN     PIC X(01)  OCCURS  31.
       *
       *****************************************************************
       *    •’•°•§•Î•Ï•§•¢•¶•»
@@ -594,6 +594,8 @@
                                            TO  LNK-TOKNYUIN-BTUNUM
                       MOVE  PTNYUINRRK-TOKU-SANTEIYOUKENKBN
                                        TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+      *                DISPLAY "PTNYUINRRK-TOKU-SANTEIYOUKENKBN = "
+      *                         PTNYUINRRK-TOKU-SANTEIYOUKENKBN
                       MOVE  WRK-KYUKYU-YMD(1:6)
                                            TO  LNK-TOKNYUIN-SANTEIYM
                       CALL  "ORCSTOKNYUIN"   USING    ORCSTOKNYUIN-AREA
@@ -621,21 +623,81 @@
              PERFORM   900-CLOSE-SEC
            END-IF
       *
+      *    ¥µº‘∆˛±°Õ˙ŒÚ§´§È∆√ƒÍ∆˛±°Œ¡§ŒªªƒÍÕ◊∑Ô∂Ë ¨ºË∆¿
+           MOVE   SPACE                  TO  WRK-SANTEIYOUKENKBN-TABLE
+           INITIALIZE                        PTNYUINRRK-REC
+           MOVE   LNK-NYULIFE2-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+           MOVE   LNK-NYULIFE2-PTID      TO  PTNYUINRRK-PTID
+           MOVE   LNK-NYULIFE2-SANTEIYM  TO  PTNYUINRRK-TENNYUYMD(1:6)
+           MOVE   "99"                   TO  PTNYUINRRK-TENNYUYMD(7:2)
+           MOVE   LNK-NYULIFE2-SANTEIYM  TO  PTNYUINRRK-TENSTUYMD(1:6)
+           MOVE   "01"                   TO  PTNYUINRRK-TENSTUYMD(7:2)
+           MOVE   "tbl_ptnyuinrrk"       TO  MCP-TABLE
+           MOVE   "key44"                TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK        =   ZERO
+             MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+             MOVE    "key44"             TO  MCP-PATHNAME
+             PERFORM 910-PTNYUINRRK-READ-SEC
+             PERFORM  UNTIL   ( FLG-PTNYUINRRK         =   1  )
       *
-      *    ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿•µ•÷° ∆Ò…¬ø¯§®√÷§≠»ΩƒÍÕ—°À
+                IF (PTNYUINRRK-TENNYUYMD(1:6)  =  LNK-NYULIFE2-SANTEIYM)
+                AND
+                   (PTNYUINRRK-TENSTUYMD(1:6)  =  LNK-NYULIFE2-SANTEIYM)
+                    MOVE   PTNYUINRRK-TENNYUYMD(7:2)   TO  IDX-ST
+                    MOVE   PTNYUINRRK-TENSTUYMD(7:2)   TO  IDX-ED
+                END-IF
+                IF (PTNYUINRRK-TENNYUYMD(1:6)  <  LNK-NYULIFE2-SANTEIYM)
+                AND
+                   (PTNYUINRRK-TENSTUYMD(1:6)  =  LNK-NYULIFE2-SANTEIYM)
+                    MOVE   1                           TO  IDX-ST
+                    MOVE   PTNYUINRRK-TENSTUYMD(7:2)   TO  IDX-ED
+                END-IF
+                IF (PTNYUINRRK-TENNYUYMD(1:6)  =  LNK-NYULIFE2-SANTEIYM)
+                AND
+                   (PTNYUINRRK-TENSTUYMD(1:6)  >  LNK-NYULIFE2-SANTEIYM)
+                    MOVE   PTNYUINRRK-TENNYUYMD(7:2)   TO  IDX-ST
+                    MOVE   31                          TO  IDX-ED
+                END-IF
+                IF (PTNYUINRRK-TENNYUYMD(1:6)  <  LNK-NYULIFE2-SANTEIYM)
+                AND
+                   (PTNYUINRRK-TENSTUYMD(1:6)  >  LNK-NYULIFE2-SANTEIYM)
+                    MOVE   1                           TO  IDX-ST
+                    MOVE   31                          TO  IDX-ED
+                END-IF
+      *
+      **          DISPLAY "IDX-ST = " IDX-ST
+      **          DISPLAY "IDX-ED = " IDX-ED
+      **          DISPLAY "PTNYUINRRK-TOKU-SANTEIYOUKENKBN = "
+      **                   PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                PERFORM    VARYING   IDX1  FROM   IDX-ST  BY  1
+                  UNTIL   (IDX1    >  IDX-ED)
+      **                DISPLAY "SET IDX1 = " IDX1
+                      IF    PTNYUINRRK-TOKU-SANTEIYOUKENKBN  =  "1"
+                         MOVE  "1"    TO  WRK-SANTEIYOUKENKBN(IDX1)
+                      ELSE
+                         MOVE  SPACE  TO  WRK-SANTEIYOUKENKBN(IDX1)
+                      END-IF
+                END-PERFORM
+      *
+                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+                MOVE    "key44"             TO  MCP-PATHNAME
+                PERFORM 910-PTNYUINRRK-READ-SEC
+             END-PERFORM
+           END-IF
+      *
+           MOVE     "tbl_ptnyuinrrk"      TO  MCP-TABLE
+           MOVE     "key44"               TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *    ø©ªˆ…È√¥ø¯§®√÷§≠¬–æ›ºË∆¿•µ•÷
            INITIALIZE                      ORCSSKJKEEP-AREA
            MOVE    LNK-NYULIFE2-HOSPNUM    TO  LNK-SKJKEEP-HOSPNUM
            MOVE    LNK-NYULIFE2-PTID       TO  LNK-SKJKEEP-PTID
            MOVE    LNK-NYULIFE2-SANTEIYM   TO  LNK-SKJKEEP-SANTEIYM
            CALL    "ORCSSKJKEEP"    USING      ORCSSKJKEEP-AREA
                                                SPA-AREA
-      **     PERFORM    VARYING   IDX1   FROM   1   BY   1
-      **                UNTIL     IDX1   >   31
-      **        DISPLAY "IDX1 = " IDX1
-      **        DISPLAY "LNK-SKJKEEP-KBN(IDX1) = " LNK-SKJKEEP-KBN(IDX1)
-      **     END-PERFORM
-      *
-      *
+
       *    ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò§Œ≥∫≈ˆ∆¸§»∑⁄∏∫∂Ë ¨£≤° ∆˛±°Œ¡»ΩƒÍ°À§ÚºË∆¿
            MOVE    ZERO                    TO  FLG-OK
            INITIALIZE                          NYUINACCT-REC
@@ -683,6 +745,22 @@
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE2-FTNKBN2(IDX1)
                                END-IF
+      *                        ∆Ò…¬∏¯»Ò§Œ»ΩƒÍƒ…≤√° ∞ ≤º∆˛±°Œ¡§ŒæÏπÁ§Œ§ﬂ°À
+      *                        °¶√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡
+      *                        °¶√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+                               IF  (IDX-SEI2   >=   94)   AND
+                                   (IDX-SEI2   <=  101)
+      *                          ∆Ò…¬∏¯»Ò§Úª»Õ—§µ§Ï§∆§§§Î§´»ΩƒÍ
+                                 MOVE   ZERO       TO   FLG-NANBYO
+                                 IF  LNK-SKJKEEP-KBN(IDX1)  =   "1"
+                                     MOVE  1    TO   FLG-NANBYO
+                                 END-IF
+      *
+                                 IF   FLG-NANBYO  =   1
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                                 END-IF
+                               END-IF
       *                        …¬æı§Œƒ¯≈Ÿ°¢º£Œ≈§Œ∆‚Õ∆§Ú§∑§Ûº‡§∑§∆…∏Ω‡
       *                        …È√¥≥€§Ú∑⁄∏∫§π§Î¥µº‘§Œ»ΩƒÍ° ∆√ Ã∆˛±°¥À‹Œ¡ªªƒÍª˛§Œ
       *                                                    £¡£ƒ£Ã∆˛Œœ»Ω√«°À
@@ -692,10 +770,24 @@
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE2-FTNKBN2(IDX1)
                                END-IF
-      *                        ∆Ò…¬∏¯»Ò
-                               IF  LNK-SKJKEEP-KBN(IDX1)   =  "1"
-                                   MOVE   LNK-SKJKEEP-KBN(IDX1)
-                                                TO WRK-NANBYO-DAY(IDX1)
+      *                        ªªƒÍÕ◊∑Ô≥∞§«Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡§Œ£…§ÚªªƒÍª˛
+      *                        §œ∞ÂŒ≈∂Ë ¨§»∆Ò…¬∏¯»Ò§Œ•¿•÷•Î•¡•ß•√•Ø
+      **                         DISPLAY "IDX-SEI2 = " IDX-SEI2
+      **                         DISPLAY "IDX1 = " IDX1
+      **                         DISPLAY "WRK-SANTEIYOUKENKBN = "
+      **                                 WRK-SANTEIYOUKENKBN(IDX1)
+                               IF (IDX-SEI2       =  47  OR  50)  AND
+                                 ((SS008-MEDKBNDAY(IDX1) = "2" OR
+                                                           "3"))  AND
+                                  (WRK-SANTEIYOUKENKBN(IDX1) = "1")
+                                 MOVE   ZERO       TO   FLG-NANBYO
+                                 IF  LNK-SKJKEEP-KBN(IDX1)  =   "1"
+                                     MOVE  1    TO   FLG-NANBYO
+                                 END-IF
+                                 IF  FLG-NANBYO          =   1 
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                                 END-IF
                                END-IF
                             END-IF
                           END-PERFORM
@@ -969,8 +1061,8 @@
                PERFORM   VARYING   IDX1   FROM   1  BY  1
                  UNTIL   IDX1   >    31
                  IF   LNK-NYULIFE2-KBN(IDX1)   =   "1"
-                    IF   (LNK-NYULIFE2-FTNKBN2(IDX1)  =  SPACE) AND
-                         (WRK-NANBYO-DAY(IDX1)        =  SPACE)
+                    EVALUATE  LNK-NYULIFE2-FTNKBN2(IDX1)
+                        WHEN  SPACE
       *                   ΩÍ∆¿§Œæı∂∑§À§Ë§Î∑⁄∏∫
                             EVALUATE   LNK-NYULIFE2-FTNKBN1(IDX1)
                                 WHEN   "1"
@@ -1009,9 +1101,7 @@
                                          LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
                             END-EVALUATE
-                    END-IF
-                    IF   (LNK-NYULIFE2-FTNKBN2(IDX1)  =  "1")   OR
-                         (WRK-NANBYO-DAY(IDX1)        =  "1")
+                        WHEN  "1"
       *                   …¬æı§Œƒ¯≈Ÿ§À§Ë§Î∑⁄∏∫
                             EVALUATE   LNK-NYULIFE2-FTNKBN1(IDX1)
                                 WHEN   SPACE
@@ -1035,7 +1125,7 @@
                                        END-IF
                                     END-IF
       *                             ∆Ò…¬≈˘ø¯§®√÷§≠¥µº‘§Œ√÷¥π
-                                    EVALUATE     WRK-NANBYO-DAY(IDX1)
+                                    EVALUATE     LNK-SKJKEEP-KBN(IDX1)
                                         WHEN     "1"
                                            MOVE  "197003610"   TO
                                               LNK-NYULIFE2-SKJFTN-SRYCD
@@ -1043,16 +1133,14 @@
                                            MOVE   260      TO
                                              LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
-                                    END-EVALUATE
-      *                             ¿∫ø¿…¬æ≤£±«Øƒ∂¥µº‘§Œ√÷¥π
-                                    IF   LNK-SKJKEEP-KBN(IDX1)  =  "2"
+                                        WHEN     "2"
                                            MOVE  "197003710"   TO
                                               LNK-NYULIFE2-SKJFTN-SRYCD
                                                             (IDX1 IDX-T)
                                            MOVE   260      TO
                                              LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
-                                    END-IF
+                                    END-EVALUATE
                                 WHEN   "1"
       *                           ° ∞ÂŒ≈∂Ë ¨£≤°¢£≥° ƒ„£≤°°£π£∞∆¸∞ ≤º°À°À
                                     MOVE  "197002810"   TO
@@ -1079,18 +1167,16 @@
                                          LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
                             END-EVALUATE
-                    END-IF
+                    END-EVALUATE
                  END-IF
                END-PERFORM
-      *
             END-PERFORM
-      *
       *
       *      ¿∏≥ËŒ≈Õ‹¥ƒ∂≠Œ≈Õ‹…∏Ω‡…È√¥≥€¿ﬂƒÍ
              PERFORM   VARYING   IDX1   FROM   1  BY  1
                UNTIL   IDX1   >    31
                 IF   LNK-NYULIFE2-KBN(IDX1)   =   "1"
-                    IF LNK-NYULIFE2-FTNKBN2(IDX1)   =   SPACE
+                    IF  LNK-NYULIFE2-FTNKBN2(IDX1)   =   SPACE
                         MOVE  "197001910"       TO
                                         LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  320       TO
@@ -1101,18 +1187,12 @@
                         MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
                     END-IF
-      *             ∆Ò…¬∏¯»Ò§œ¥ƒ∂≠Œ≈Õ‹¥µº‘…È√¥Ãµ§∑§À√÷¥π§®
-                    IF  WRK-NANBYO-DAY(IDX1)   =   "1"
-                        MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
-                        MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
-                    END-IF
       *             ¿∫ø¿…¬æ≤£±«Øƒ∂§«∞ÂŒ≈∂Ë ¨£≤°¢£≥§œ¥µº‘…È√¥Ãµ§∑§À√÷¥π§®
                     IF (LNK-NYULIFE2-FTNKBN2(IDX1)   =  "1")   AND
                        (LNK-SKJKEEP-KBN(IDX1)        =  "2")
                         MOVE  SPACE  TO  LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  ZERO   TO  LNK-NYULIFE2-KANFTN-MONEY(IDX1)
                     END-IF
-
                 END-IF
              END-PERFORM
       *
@@ -1124,32 +1204,30 @@
                MOVE   4      TO   LNK-NYULIFE2-RC
            END-IF
       *
-      **     PERFORM   VARYING  IDX1   FROM  1   BY  1
-      **               UNTIL  IDX1   >   31
-      **          DISPLAY "IDX1 = " IDX1
-      **          DISPLAY "LNK-NYULIFE2-FTNKBN1(IDX1) = " 
-      **                   LNK-NYULIFE2-FTNKBN1(IDX1)
-      **          DISPLAY "LNK-NYULIFE2-FTNKBN2(IDX1) = " 
-      **                   LNK-NYULIFE2-FTNKBN2(IDX1)
-      **          DISPLAY "WRK-NANBYO-DAY(IDX1) = "
-      **                   WRK-NANBYO-DAY(IDX1)
-      **          DISPLAY  "LNK-NYULIFE2-SKJ-SRYCD(IDX1 1) = "
-      **                    LNK-NYULIFE2-SKJ-SRYCD(IDX1 1)
-      **          DISPLAY "LNK-NYULIFE2-SKJ-MONEY(IDX1 1) = "
-      **                   LNK-NYULIFE2-SKJ-MONEY(IDX1 1)
-      **          DISPLAY  "LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 1) = "
-      **                    LNK-NYULIFE2-SKJFTN-SRYCD(IDX1 1)
-      **          DISPLAY "LNK-NYULIFE2-SKJFTN-MONEY(IDX1 1) = "
-      **                   LNK-NYULIFE2-SKJFTN-MONEY(IDX1 1)
-      **          DISPLAY  "LNK-NYULIFE2-KAN-SRYCD(IDX1) = "
-      **                    LNK-NYULIFE2-KAN-SRYCD(IDX1)
-      **          DISPLAY "LNK-NYULIFE2-KAN-MONEY(IDX1) = "
-      **                  LNK-NYULIFE2-KAN-MONEY(IDX1)
-      **          DISPLAY  "LNK-NYULIFE2-KANFTN-SRYCD(IDX1) = "
-      **                    LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
-      **          DISPLAY "LNK-NYULIFE2-KANFTN-MONEY(IDX1) = "
-      **                   LNK-NYULIFE2-KANFTN-MONEY(IDX1)
-      **     END-PERFORM
+      *     PERFORM   VARYING  IDX1   FROM  1   BY  1
+      *               UNTIL  IDX1   >   31
+      *          DISPLAY "IDX1 = " IDX1
+      *          DISPLAY "LNK-NYULIFE2-FTNKBN1(IDX1) = " 
+      *                   LNK-NYULIFE2-FTNKBN1(IDX1)
+      *          DISPLAY "LNK-NYULIFE2-FTNKBN2(IDX1) = " 
+      *                   LNK-NYULIFE2-FTNKBN2(IDX1)
+      *          DISPLAY  "LNK-NYULIFE2-SKJ-SRYCD(IDX1) = "
+      *                    LNK-NYULIFE2-SKJ-SRYCD(IDX1)
+      *          DISPLAY "LNK-NYULIFE2-SKJ-MONEY(IDX1) = "
+      *                   LNK-NYULIFE2-SKJ-MONEY(IDX1)
+      *          DISPLAY  "LNK-NYULIFE2-SKJFTN-SRYCD(IDX1) = "
+      *                    LNK-NYULIFE2-SKJFTN-SRYCD(IDX1)
+      *          DISPLAY "LNK-NYULIFE2-SKJFTN-MONEY(IDX1) = "
+      *                   LNK-NYULIFE2-SKJFTN-MONEY(IDX1)
+      *          DISPLAY  "LNK-NYULIFE2-KAN-SRYCD(IDX1) = "
+      *                    LNK-NYULIFE2-KAN-SRYCD(IDX1)
+      *          DISPLAY "LNK-NYULIFE2-KAN-MONEY(IDX1) = "
+      *                   LNK-NYULIFE2-KAN-MONEY(IDX1)
+      *          DISPLAY  "LNK-NYULIFE2-KANFTN-SRYCD(IDX1) = "
+      *                    LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
+      *          DISPLAY "LNK-NYULIFE2-KANFTN-MONEY(IDX1) = "
+      *                   LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+      *     END-PERFORM
            .
        200-MAIN-EXT.
            EXIT.
