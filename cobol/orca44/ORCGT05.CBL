@@ -1648,8 +1648,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
        700211-HEAD-HENSYU-SEC        SECTION.
       *
       *??
-                DISPLAY "DATA=" WRK-KOUMOKU-NO "#" WRK-MO-CNT "#" 
-                         PARA-DATA (WRK-MO-ST:WRK-MO-CNT) "#"
+                DISPLAY "WRK-KOUMOKU-NO=" WRK-KOUMOKU-NO "#" 
+                        "WRK-MO-CNT="  WRK-MO-CNT "#" 
+                IF      WRK-MO-CNT > ZERO 
+                   DISPLAY  PARA-DATA (WRK-MO-ST:WRK-MO-CNT) "#"
+                END-IF
       *??
            EVALUATE    WRK-FILENM(1:6)
                WHEN    "RIhasp"
@@ -2788,6 +2791,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
        520-TIDSET-SEC              SECTION.
       *
            MOVE    SPACE                TO  TID1
+           INITIALIZE                       TID1
            MOVE    SPA-TIDCD            TO  TID1-ID1CODE
            EVALUATE    SPA-TIDCD
                 WHEN    "1001"
