@@ -159,8 +159,11 @@
       *
            03  WRK-TENSUKEI        PIC 9(08)V99.
            03  WRK-TENSUKEI-9      PIC 9(08).
-           03  WRK-TENSUKEI-G      PIC 9(08).
-           03  WRK-TENSUKEI-K      PIC 9(08).
+      *H28.6
+           03  WRK-TENSUKEI-G      PIC 9(08)V99.
+           03  WRK-TENSUKEI-K      PIC 9(08)V99.
+           03  WRK-SUM-TENSUKEI-K    PIC 9(09)V99.
+           03  WRK-GOK-TENGAKEI-K    PIC 9(09)V99.
       *
       *    手技料合計
            03  WRK-GOK-TENSUKEI    PIC 9(09).
@@ -2151,7 +2154,6 @@
            MOVE    LNK-SC90-TENSU      TO  WRK-COM-SYUTEN2 (IDX-SYU)
       *    労災の外来管理加算読み替え処理
            IF     (SPA-HKNKBN          =   1   )
-      ****   AND  (SPA-RSI-HKNKBN  NOT =   "5" )
              AND  (SPA-RSI-JUNKYO  NOT =   "1" )
       *      診療種別
              AND  (WRK-COM-SRYSYUKBN (IDX-SYU)
@@ -2168,8 +2170,10 @@
       *    終了時の通則外加算集計
            IF      FLG-LAST            =   1
                IF     (SPA-HKNKBN          =   1   )
-     *****       AND  (SPA-RSI-HKNKBN  NOT =   "5" )
                  AND  (SPA-RSI-JUNKYO  NOT =   "1" )
+      *          労災加算ありのみ
+                 AND ((FLG-ROUSAI-KSN      =   1   ) OR
+                      (IDX-R-SYU           >   ZERO ))
       *            労災の時、合計に時間外加算計算
                    PERFORM 10062-RSI-JIKAN-SEC
                END-IF
@@ -2197,6 +2201,7 @@
       *
            MOVE    IDX-Z               TO  IDX-STR
            MOVE    ZERO                TO  WRK-SUM-TENSUKEI
+           MOVE    ZERO                TO  WRK-SUM-TENSUKEI-K
            MOVE    ZERO                TO  LNK-SC90-TENSU
       *!!!!!
            MOVE    IDX-SYU             TO  IDX-OLD
@@ -2213,6 +2218,8 @@
       *    自動加算以外の加算（時間外、年齢以外）
            MOVE    ZERO                TO  WRK-TENSUKEI-G
            MOVE    ZERO                TO  WRK-TENSUKEI-K
+      *
+           MOVE    WRK-SUM-TENSUKEI    TO  WRK-SUM-TENSUKEI-K
       *
       *    手技料の点数を所定点数とする
            PERFORM VARYING     IDX     FROM    IDX-SYU  BY  1
@@ -2235,9 +2242,10 @@
                                                                (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-K
+      ***                                      +   0.5
+      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      ***          ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
                END-IF
       *        ％減算
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
@@ -2248,37 +2256,40 @@
                                                                (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
+      **           MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      **           ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
                END-IF
            END-PERFORM
       *
-           COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
+           COMPUTE WRK-SUM-TENSUKEI-K  =   WRK-SUM-TENSUKEI-K
                                        +   WRK-TENSUKEI-K
                                        -   WRK-TENSUKEI-G
       *
       *    自動加算の加算（年齢）
-           MOVE    ZERO                TO  WRK-TENSUKEI-G
+           MOVE    ZERO                TO  WRK-TENSUKEI-K
            PERFORM VARYING     IDX     FROM    IDX-SYU BY  1
                    UNTIL       IDX         >=  HZN-IDX
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
                       (WRK-COM-SANFLG     (IDX)    =   1   )
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI-K
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100.00
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-K
+      *                                        +   0.5
+      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
                END-IF
            END-PERFORM
       *
-           COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
-                                       +   WRK-TENSUKEI-G
+           COMPUTE WRK-SUM-TENSUKEI-K  =   WRK-SUM-TENSUKEI-K
+                                       +   WRK-TENSUKEI-K
+      **   COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
+      **                               +   WRK-TENSUKEI-G
       *
-           IF      SPA-HKNKBN          =   1
-      ****   AND  (SPA-RSI-HKNKBN  NOT =   "5" )
+           IF     (SPA-HKNKBN          =   1   )
              AND  (SPA-RSI-JUNKYO  NOT =   "1" )
       *        労災の加算
                PERFORM 10061-RSI-KSAN-SEC
@@ -2289,9 +2300,12 @@
                    (LNK-ORCSC-TIMEFLG  NOT =   ZERO ))
              OR   ( WRK-COM-TIMEFLG(IDX-SYU)
                                        NOT =   ZERO  )
-      *******  IF     (WRK-COM-TIMEKSNKBN(IDX-SYU) NOT =   ZERO )
-               IF     (WRK-SUM-TENSUKEI            >=   150    )
-                   MOVE    WRK-SUM-TENSUKEI    TO  WRK-SYOTEITEN
+      *        端数計算後の点数で判定
+               COMPUTE WRK-TENSUKEI-9      =   WRK-SUM-TENSUKEI-K
+                                           +   0.5
+               MOVE    WRK-TENSUKEI-9      TO  WRK-SYOTEITEN
+      ******   IF     (WRK-SUM-TENSUKEI         >=   150    )
+               IF     (WRK-SYOTEITEN           >=   150    )
                    PERFORM 10063-JIKANGAI-AUTO-SEC
                END-IF
            END-IF
@@ -2299,10 +2313,15 @@
            IF     (SPA-HKNKBN          =   ZERO)  OR
                   (SPA-RSI-JUNKYO      =   "1" )
              OR   (SPA-HKNKBN          =   2   )
+      *      労災加算なしは個別
+             OR   (FLG-ROUSAI-KSN      =   ZERO )
       *        時間外加算
                PERFORM 10060-JIKANGAI-KASAN-SEC
            END-IF
       *
+      *%加算・減算後、四捨五入
+           COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI-K
+                                       +   0.5
            .
        1006-KASAN-SET-EXT.
            EXIT.
@@ -2323,15 +2342,16 @@
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
                       (WRK-COM-SANFLG     (IDX)    =   2   )
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI-K
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100.00
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
+      *                                        +   0.5
+      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
                END-IF
            END-PERFORM
-           COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
+           COMPUTE WRK-SUM-TENSUKEI-K  =   WRK-SUM-TENSUKEI-K
                                        +   WRK-TENSUKEI-G
       *
            .
@@ -2346,26 +2366,39 @@
            MOVE    ZERO                TO  FLG-ROUSAI-KSN2
       *    労災の加算
            MOVE    ZERO                TO  WRK-TENSUKEI-G
+           MOVE    ZERO                TO  WRK-TENSUKEI-K
            PERFORM VARYING     IDX     FROM    IDX-SYU BY  1
                    UNTIL       IDX         >=  HZN-IDX
                IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )
+      *?           MOVE    ZERO                TO  WRK-TENSUKEI
+      *            COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI
+      *                                        *   WRK-COM-KISOTEN(IDX)
+      *                                        /   100.00
+      *                                        +   0.9
+      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+      *            IF      WRK-SUM-TENSUKEI    <   150
+      *                MOVE    1                   TO  FLG-ROUSAI-KSN2
+      *            END-IF
+      *            MOVE    1                   TO  FLG-ROUSAI-KSN
+      *            労災加算は切り上げ
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-SUM-TENSUKEI-K
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100.00
-                                               +   0.9
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
-                   IF      WRK-SUM-TENSUKEI    <   150
-                       MOVE    1                   TO  FLG-ROUSAI-KSN2
-                   END-IF
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
                    MOVE    1                   TO  FLG-ROUSAI-KSN
                END-IF
            END-PERFORM
       *
-           COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
-                                       +   WRK-TENSUKEI-G
+      *    端数切り上げ
+           IF      FLG-ROUSAI-KSN      =   1
+               COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI-K
+                                           +   WRK-TENSUKEI-G
+                                           +   0.9
+               MOVE    WRK-SUM-TENSUKEI    TO  WRK-SUM-TENSUKEI-K
+           END-IF
       *
            .
        10061-RSI-KSAN-EXT.
@@ -2438,6 +2471,7 @@
            IF      WRK-TENSUKEI-G      NOT =   ZERO
                MOVE    LNK-SC90-TENSUKEI   TO  WRK-RSI-TENSU-M
                IF      IDX-OLD         NOT =   IDX-SYU
+                 AND  (IDX-OLD             >   ZERO    )
                    MOVE    WRK-RSI-TENSU-M     TO  WRK-COM-SYUTEN-M
                                                            (IDX-OLD)
                    MOVE    ZERO                TO  WRK-RSI-TENSU-M

@@ -252,8 +252,8 @@
       *
            03  WRK-TENSUKEI        PIC 9(08)V99.
            03  WRK-TENSUKEI-9      PIC 9(08).
-           03  WRK-TENSUKEI-G      PIC 9(08).
-           03  WRK-TENSUKEI-GEN    PIC 9(08).
+           03  WRK-TENSUKEI-G      PIC 9(08)V99.
+           03  WRK-TENSUKEI-GEN    PIC 9(08)V99.
       *
            03  WRK-TENSU-KEISAN.
       *        ±ý¿Ç»þ¡¢½êÄêÅÀ¿ô²Ã»»Ê¬
@@ -5298,10 +5298,8 @@
                    COMPUTE WRK-TENSUKEI        =   WRK-TENSU-KEI
                                                *  (WRK-COM-KISOTEN(IDX)
                                                /   100 )
-                                               +   0.5
       *            %²Ã»»
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
                END-IF
       *        ¡ó¸º»»¡Ê¼êµ»¡Ë
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
@@ -5310,16 +5308,17 @@
                                                              (IDX-SYU)
                                                *  (WRK-COM-KISOTEN(IDX)
                                                /   100 )
-                                               +   0.4
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-GEN
+      *            %²Ã»»
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-GEN
                END-IF
            END-PERFORM
       *
-           COMPUTE LNK-SC90-TENSU      =   WRK-TENSU-KEI
+           COMPUTE WRK-TENSUKEI        =  (WRK-TENSU-KEI
                                        +   WRK-TENSU-GAI
                                        +   WRK-TENSUKEI-G
-                                       -   WRK-TENSUKEI-GEN
+                                       -   WRK-TENSUKEI-GEN)
+                                       +   0.5
+           MOVE    WRK-TENSUKEI        TO  LNK-SC90-TENSU
       *
            .
        1006-KASAN-SET-EXT.
