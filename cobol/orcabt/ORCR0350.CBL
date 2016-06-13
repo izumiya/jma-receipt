@@ -8449,7 +8449,6 @@
                    AND   ( WRK-BTUREC-CHK (IDZ2)
                                                =   ZERO )
                        PERFORM 2007741-BYOSHO-CHK-SEC
-                       MOVE    31              TO  IDZ2
                    END-IF
                END-PERFORM
       *
@@ -8655,6 +8654,10 @@
                        END-IF
                    END-IF 
                END-PERFORM
+           END-IF
+      *
+           IF      FLG-BTUREC      =   1
+               MOVE    31              TO  IDZ2
            END-IF
       *
            .
