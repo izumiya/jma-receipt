@@ -126,8 +126,12 @@
                05  WRK-SYSBTU-TBL          OCCURS  100.
                    07  WRK-SYSBTU-KBNCD    PIC X(02).
                    07  WRK-SYSBTU-SRYCD    PIC X(09).
+      *    システム管理病棟情報ワーク（特定入院料）
+           03  WRK-SYSBTU-TOKU-TABLE.
+               05  WRK-SYSBTU-TOKU-TBL     OCCURS  100.
+                   07  WRK-SYSBTU-TKBNCD   PIC X(02).
                    07  WRK-SYSBTU-TSRYCD   PIC X(09).
-      *    システム管理病室情報ワーク
+      *    システム管理病室情報ワーク（特定入院料）
            03  WRK-SYSBRM-TABLE.
                05  WRK-SYSBRM-TBL          OCCURS  500.
                    07  WRK-SYSBRM-KBNCD    PIC X(08).
@@ -433,13 +437,56 @@
                                        TO  WRK-SYSBTU-KBNCD(IDX-SYS)
                     MOVE   SYS-5001-SRYCD
                                        TO  WRK-SYSBTU-SRYCD(IDX-SYS)
-                    MOVE   SYS-5001-TSRYCD
-                                       TO  WRK-SYSBTU-TSRYCD(IDX-SYS)
       **              DISPLAY "IDX-SYS ="  IDX-SYS
       **              DISPLAY "WRK-SYSBTU-KBNCD(IDX-SYS) = "
       **                       WRK-SYSBTU-KBNCD(IDX-SYS)
       **              DISPLAY "WRK-SYSBTU-SRYCD(IDX-SYS) = "
       **                       WRK-SYSBTU-SRYCD(IDX-SYS)
+      **              DISPLAY "WRK-SYSBTU-TSRYCD(IDX-SYS) = "
+      **                       WRK-SYSBTU-TSRYCD(IDX-SYS)
+                 END-IF
+                 MOVE    "tbl_syskanri" TO  MCP-TABLE
+                 MOVE    "key5"         TO  MCP-PATHNAME
+                 PERFORM  910-SYSKANRI-READ-SEC
+               END-PERFORM
+           END-IF
+      *    システム管理クローズ
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+      *    事前に病棟情報（システム管理）から特定入院料の病棟コードを
+      *    取得しておく
+           MOVE    ZERO                TO  IDX-SYS
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    LNK-BTUREC-HOSPNUM  TO  SYS-HOSPNUM
+           MOVE    "5001"              TO  SYS-KANRICD
+           MOVE    LNK-BTUREC-SANTEIYM(1:6)
+                                       TO  SYS-STYUKYMD(1:6)
+           MOVE    "31"                TO  SYS-STYUKYMD(7:2)
+           MOVE    LNK-BTUREC-SANTEIYM(1:6)
+                                       TO  SYS-EDYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-EDYUKYMD(7:2)
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM   910-SYSKANRI-SELECT-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key5"          TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               PERFORM  UNTIL  (FLG-SYSKANRI   =   1)  OR
+                               (IDX-SYS        =   100)
+                 IF   SYS-5001-TSRYCD   NOT =   SPACE
+                    ADD    1           TO  IDX-SYS
+                    MOVE   SYS-5001-KBNCD
+                                       TO  WRK-SYSBTU-TKBNCD(IDX-SYS)
+                    MOVE   SYS-5001-TSRYCD
+                                       TO  WRK-SYSBTU-TSRYCD(IDX-SYS)
+      **              DISPLAY "IDX-SYS ="  IDX-SYS
+      **              DISPLAY "WRK-SYSBTU-TKBNCD(IDX-SYS) = "
+      **                       WRK-SYSBTU-TKBNCD(IDX-SYS)
       **              DISPLAY "WRK-SYSBTU-TSRYCD(IDX-SYS) = "
       **                       WRK-SYSBTU-TSRYCD(IDX-SYS)
                  END-IF
@@ -913,12 +960,10 @@
                      PERFORM   VARYING   IDX-SYS   FROM  1  BY  1
                        UNTIL  (IDX-SYS   >   100 )  OR
                               (FLG-SET   =   1)
-                       IF  WRK-BTUNUM(IDX)  =  WRK-SYSBTU-KBNCD(IDX-SYS)
-                           IF   WRK-SYSBTU-TSRYCD(IDX-SYS)  NOT =  SPACE
-                             MOVE   WRK-SYSBTU-TSRYCD(IDX-SYS)
-                                               TO  WRK-BTUCD(IDX)
-                             MOVE   1          TO  FLG-SET
-                           END-IF
+                       IF  WRK-BTUNUM(IDX)  = WRK-SYSBTU-TKBNCD(IDX-SYS)
+                           MOVE   WRK-SYSBTU-TSRYCD(IDX-SYS)
+                                             TO  WRK-BTUCD(IDX)
+                           MOVE   1          TO  FLG-SET
                        END-IF
                      END-PERFORM
                  END-IF
