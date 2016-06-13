@@ -150,6 +150,9 @@
                    07  WRK-TOKUTEI-KBN     PIC X(01).
       *            特定入院料
                    07  WRK-TOKUTEI-NYUIN   PIC X(02).
+      *            算定要件外区分
+                   07  WRK-TOKU-SANTEIYOUKENKBN
+                                           PIC X(01).
       *            入院料算定（１：入院基本料／２：特定入院料）
                    07  WRK-SANTEI-KBN      PIC X(01).
                    07  WRK-SRYSKB          PIC X(02).
@@ -268,6 +271,39 @@
            IF      LNK-BTUREC-RC      =    ZERO
                PERFORM 200-MAIN-SEC
            END-IF
+      *     DISPLAY  "LNK-BTUREC-RC = " LNK-BTUREC-RC
+      *     IF      LNK-BTUREC-RC    =   ZERO
+      *         PERFORM    VARYING  IDX   FROM 1  BY  1
+      *           UNTIL    IDX  >  31
+      *              DISPLAY "IDX = " IDX
+      *              DISPLAY "LNK-BTUREC-HKNCOMBI="
+      *                       LNK-BTUREC-HKNCOMBI(IDX)
+      *              DISPLAY "LNK-BTUREC-SRYSKB="
+      *                       LNK-BTUREC-SRYSKB(IDX)
+      *              DISPLAY "LNK-BTUREC-BTUCD="
+      *                       LNK-BTUREC-BTUCD(IDX)
+      *         END-PERFORM
+      *         DISPLAY   "LNK-BTUREC-SYU-HKNCOMBI-MEISAI = "
+      *                    LNK-BTUREC-SYU-HKNCOMBI-MEISAI
+      *         PERFORM    VARYING  IDX   FROM 1  BY  1
+      *           UNTIL    IDX  >  31
+      *              DISPLAY "IDX = " IDX
+      *              DISPLAY "LNK-BTUREC-SYU-HKNCOMBI(1)="
+      *                       LNK-BTUREC-SYU-HKNCOMBI(1 IDX)
+      *         END-PERFORM
+      *         PERFORM    VARYING  IDX   FROM 1  BY  1
+      *           UNTIL    IDX  >  31
+      *              DISPLAY "IDX = " IDX
+      *              DISPLAY "LNK-BTUREC-SYU-HKNCOMBI(2)="
+      *                       LNK-BTUREC-SYU-HKNCOMBI(2 IDX)
+      *         END-PERFORM
+      *         PERFORM    VARYING  IDX   FROM 1  BY  1
+      *           UNTIL    IDX  >  31
+      *              DISPLAY "IDX = " IDX
+      *              DISPLAY "LNK-BTUREC-SYU-HKNCOMBI(3)="
+      *                       LNK-BTUREC-SYU-HKNCOMBI(3 IDX)
+      *         END-PERFORM
+      *     END-IF
       *
            .
        000-PROC-EXT.
@@ -417,7 +453,7 @@
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-      *    事前に病室情報（システム管理）から病棟コードを取得しておく
+      *    事前に病室情報（システム管理）から病室コードを取得しておく
            MOVE    ZERO                TO  IDX-SYS
            MOVE    ZERO                TO  FLG-SYSKANRI
            INITIALIZE                      SYSKANRI-REC
@@ -843,13 +879,22 @@
                END-IF
            END-PERFORM
       *
+      **     PERFORM   VARYING   IDX   FROM  1  BY  1
+      **      UNTIL   (IDX     >   31)
+      **         DISPLAY "IDX = " IDX
+      **         DISPLAY "WRK-BTUNUM(IDX) = " WRK-BTUNUM(IDX)
+      **         DISPLAY "WRK-SRYSKB(IDX) = " WRK-SRYSKB(IDX)
+      **         DISPLAY "WRK-SANTEI-KBN(IDX) = " WRK-SANTEI-KBN(IDX)
+      **     END-PERFORM
       *
       *    病棟情報コードのセット
            PERFORM   VARYING   IDX   FROM  1  BY  1
             UNTIL   (IDX     >   31)
               IF   WRK-BTUNUM(IDX)  NOT =   SPACE
-      *          入院基本料
-                 IF  WRK-SANTEI-KBN(IDX)    =   "1"
+      *          入院基本料（特定入院料算定時も病棟、病室に特定入院料
+      *                      算定時の病棟情報コード未設定を考慮してセット
+      *                      しておく）
+                 IF  WRK-SANTEI-KBN(IDX)    =   "1"  OR  "2"
                      MOVE   ZERO     TO    FLG-SET
                      PERFORM   VARYING   IDX-SYS   FROM  1  BY  1
                        UNTIL  (IDX-SYS   >   100 )  OR
@@ -869,9 +914,11 @@
                        UNTIL  (IDX-SYS   >   100 )  OR
                               (FLG-SET   =   1)
                        IF  WRK-BTUNUM(IDX)  =  WRK-SYSBTU-KBNCD(IDX-SYS)
-                           MOVE   WRK-SYSBTU-TSRYCD(IDX-SYS)
-                                             TO  WRK-BTUCD(IDX)
-                           MOVE   1          TO  FLG-SET
+                           IF   WRK-SYSBTU-TSRYCD(IDX-SYS)  NOT =  SPACE
+                             MOVE   WRK-SYSBTU-TSRYCD(IDX-SYS)
+                                               TO  WRK-BTUCD(IDX)
+                             MOVE   1          TO  FLG-SET
+                           END-IF
                        END-IF
                      END-PERFORM
                  END-IF
@@ -929,10 +976,12 @@
                                       TO  WRK-TOKUTEI-KBN(IDX)
            MOVE   PTNYUINRRK-TOKUTEI-NYUIN
                                       TO  WRK-TOKUTEI-NYUIN(IDX)
-           IF   PTNYUINRRK-TOKU-SANTEIYOUKENKBN  =  "1"
-               MOVE  SPACE            TO  WRK-TOKUTEI-KBN(IDX)
-               MOVE  SPACE            TO  WRK-TOKUTEI-NYUIN(IDX)
-           END-IF
+           MOVE   PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                      TO  WRK-TOKU-SANTEIYOUKENKBN(IDX)
+      **     IF   PTNYUINRRK-TOKU-SANTEIYOUKENKBN  =  "1"
+      **         MOVE  SPACE            TO  WRK-TOKUTEI-KBN(IDX)
+      **         MOVE  SPACE            TO  WRK-TOKUTEI-NYUIN(IDX)
+      **     END-IF
       *
            .
        210-WRK-SET-EXT.
