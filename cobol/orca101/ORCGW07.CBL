@@ -131,6 +131,7 @@
       *                                     情報更新対応
       *                                     死亡区分更新確認メッセージ表示
       *                                     有無区分の追加
+      *  04.08.01    NACL-多々納  16/06/10  セット展開区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -785,6 +786,17 @@
                            11  SPA-GMN-PRVLAYOUT038-LST   PIC X(60)
                                                         OCCURS  5.
                            11  SPA-GMN-PRVLAYOUT038-MAX   PIC 9(02).
+      *
+      *H28.6
+      *                セット展開表示
+                       09  SPA-GMN-SETALLKBN-G.
+                           11  SPA-GMN-SETALLKBN       PIC X(01).
+                           11  SPA-GMN-SETALLKBN-F1    PIC X(01).
+                           11  SPA-GMN-SETALLKBN-MEI   PIC X(38).
+                       09  SPA-GMN-SETALLKBN-COMB.
+                           11  SPA-GMN-SETALLKBN-LST   PIC X(40)
+                                                        OCCURS  5.
+                           11  SPA-GMN-SETALLKBN-MAX   PIC 9(02).
       *
                    07  SPA-GMN-PAGE4-AREA.
       *                入金管理情報（収納機能情報）
@@ -2077,6 +2089,11 @@
            MOVE    "0 通常表示"        TO  SPA-GMN-PRVLAYOUT038-LST(1)
            MOVE    "1 一画面表示"      TO  SPA-GMN-PRVLAYOUT038-LST(2)
            MOVE    2                   TO  SPA-GMN-PRVLAYOUT038-MAX
+      *H28.6
+      *    セット内容展開表示
+           MOVE    "0 通常展開"        TO  SPA-GMN-SETALLKBN-LST(1)
+           MOVE    "1 全展開"          TO  SPA-GMN-SETALLKBN-LST(2)
+           MOVE    2                   TO  SPA-GMN-SETALLKBN-MAX
       *
       *    入金・返金額初期設定区分
            MOVE    "0 今回請求額のみ"  TO  SPA-GMN-NYKHNKKBN-LST(1)
@@ -2095,7 +2112,9 @@
       *    確認画面名称表示区分
            MOVE    "0 一般名表示"      TO  SPA-GMN-GENERICFLG-LST(1)
            MOVE    "1 銘柄名表示"      TO  SPA-GMN-GENERICFLG-LST(2)
-           MOVE    2                   TO  SPA-GMN-GENERICFLG-MAX
+           MOVE    "2 一般名表示（全画面）"
+                                       TO  SPA-GMN-GENERICFLG-LST(3)
+           MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
       *
            MOVE    "0 発行しない"      TO  SPA-GMN-SYUSKYPRTGLST(1)
            MOVE    "1 発行する"        TO  SPA-GMN-SYUSKYPRTGLST(2)
@@ -3438,6 +3457,9 @@
       *H24.12
       *    レセプトブレビューレイアウト
            MOVE    SYS-1038-PRVLAYOUT      TO  SPA-GMN-PRVLAYOUT038
+      *H28.6
+      *    セット展開表示
+           MOVE    SYS-1038-SETALLKBN      TO  SPA-GMN-SETALLKBN
       *
       *ver.4.7
       *    リハビリ・患者情報表示区分
@@ -3898,6 +3920,24 @@
            IF      FLG-OK              =   ZERO
                MOVE    SPA-GMN-PRVLAYOUT038-LST (1)
                                        TO  SPA-GMN-PRVLAYOUT038-G
+           END-IF
+      *H28.6
+      *    セット展開表示
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL  (IDY         >   SPA-GMN-SETALLKBN-MAX )
+                       OR (FLG-OK      =   1       )
+               IF      SPA-GMN-SETALLKBN
+                                       =   SPA-GMN-SETALLKBN-LST
+                                                       (IDY) (1:1)
+                   MOVE    SPA-GMN-SETALLKBN-LST (IDY)
+                                       TO  SPA-GMN-SETALLKBN-G
+                   MOVE    1           TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-SETALLKBN-LST (1)
+                                       TO  SPA-GMN-SETALLKBN-G
            END-IF
       *
            MOVE    301                  TO  SPA-GMN-CUR
@@ -5378,6 +5418,7 @@
            MOVE    W07-ERRCOLORS       TO  SPA-GMN-ERRCOLORS
            MOVE    W07-KEICOLORS       TO  SPA-GMN-KEICOLORS
            MOVE    W07-PRVLAYOUT038    TO  SPA-GMN-PRVLAYOUT038-G
+           MOVE    W07-SETALLKBN       TO  SPA-GMN-SETALLKBN-G
       *
       *    収納機能情報
            MOVE    W07-SYUNYKNKNRKBN   TO  SPA-GMN-SYUNYKNKNRKBN-G
@@ -5716,6 +5757,10 @@
       *            レセプトブレビューレイアウト
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4108-PRVLAYOUT038-CHK-SEC
+                   END-IF
+      *            セット展開表示
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4108-SETALLKBN-CHK-SEC
                    END-IF
       *            リハビリ・患者情報表示区分
                    IF      SPA-ERRCD           =   SPACE
@@ -7992,6 +8037,32 @@
       *
            .
        4108-PRVLAYOUT038-CHK-EXT.
+           EXIT.
+      *H28.6
+      *****************************************************************
+      *    セット展開表示チェック処理（診療行為機能情報）
+      *****************************************************************
+       4108-SETALLKBN-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-SETALLKBN-MAX)
+                       OR     (FLG-OK  =   1    ) 
+               IF      SPA-GMN-SETALLKBN
+                                       =   SPA-GMN-SETALLKBN-LST
+                                                      (IDX)(1:1)
+                   MOVE    SPA-GMN-SETALLKBN-LST(IDX)
+                                          TO  SPA-GMN-SETALLKBN-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    313             TO  SPA-GMN-CUR
+               MOVE    "2029"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4108-SETALLKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    リハビリ・患者情報表示区分チェック処理（診療行為機能情報）
@@ -10398,6 +10469,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SEI20KSNKBN     TO  SYS-1038-SEI20KSNKBN
            MOVE    SPA-GMN-YMDHENKBN       TO  SYS-1038-YMDHENKBN
            MOVE    SPA-GMN-PRVLAYOUT038    TO  SYS-1038-PRVLAYOUT
+           MOVE    SPA-GMN-SETALLKBN       TO  SYS-1038-SETALLKBN
       *
            MOVE    SPA-NAI-GMNHYOKBN (1)   TO  SYS-1038-GMNHYOKBN (1)
            MOVE    SPA-NAI-GMNHYOKBN (2)   TO  SYS-1038-GMNHYOKBN (2)
@@ -11500,6 +11572,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-PRVLAYOUT038-MAX
                                        TO  W07-PRVLAYOUT038-COUNT
+      *H28.6
+      *    セット展開表示（診療行為機能情報）
+           MOVE    SPA-GMN-SETALLKBN-G TO  W07-SETALLKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-SETALLKBN-MAX
+               MOVE    SPA-GMN-SETALLKBN-LST (IDX)
+                                       TO  W07-SETALLKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-SETALLKBN-MAX
+                                       TO  W07-SETALLKBN-COUNT
+      *
       *    リハビリ・患者情報表示区分（診療行為機能情報）
            MOVE    SPA-GMN-GMNHYOKBN-G(1)  TO  W07-GMNHYOKBN1
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -12524,6 +12607,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    DELIMITED  BY  SIZE
                                                    INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "2029"
+                   STRING  "セット展開区分がありません。"
+                                                   DELIMITED  BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
       *    収納情報
                WHEN    "3003"
                    MOVE    "登録時刻入力エラー"
@@ -12902,6 +12990,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "SEI20KSNKBN"     TO   MCP-WIDGET
                WHEN    312
                    MOVE  "PRVLAYOUT038"    TO   MCP-WIDGET
+               WHEN    313
+                   MOVE  "SETALLKBN"       TO   MCP-WIDGET
       *        請求選択
                WHEN    320
                    MOVE  "SRYNYKNKNRKBN"   TO   MCP-WIDGET
@@ -13333,6 +13423,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *H24.12      MOVE    330             TO  SPA-GMN-CUR
                    MOVE    312             TO  SPA-GMN-CUR
                WHEN    "PRVLAYOUT038"
+      *H28.6 ***   MOVE    330             TO  SPA-GMN-CUR
+                   MOVE    313             TO  SPA-GMN-CUR
+               WHEN    "SETALLKBN"
                    MOVE    330             TO  SPA-GMN-CUR
                WHEN    "GMNHYOKBN1"
                    MOVE    331             TO  SPA-GMN-CUR

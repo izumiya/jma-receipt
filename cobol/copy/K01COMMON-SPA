@@ -247,7 +247,10 @@
                05  SPA-ROURECEKBN             PIC 9(01).
       *ver.4.8
       *    電子点数表チェック区分
-               05  SPA-ETENSU-CHK          PIC  9(01).
+               05  SPA-ETENSU-CHK             PIC  9(01).
+      *H27.6
+      *        セット全展開
+               05  SPA-SETALLKBN              PIC  X(01).
       *
            03  SPA-K01SET-AREA.
       *処理フラグ（０：通常、１：訂正）
@@ -699,6 +702,11 @@
       *    投薬３割逓減確認
            03  SPA-TEIGEN30-CHK        PIC  9(01).
            03  SPA-TEIGEN30-OK         PIC  9(01).
+      *H27.6
+      *    抗精神薬３種類投与
+           03  SPA-PSYCHO-80           PIC  9(01).
+           03  SPA-PSYCHO-80CHK        PIC  9(01).
+           03  SPA-PSYCHO-80OK         PIC  9(01).
       *
       *(4.7　は予備使用）
       *    予備

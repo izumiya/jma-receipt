@@ -674,6 +674,8 @@
                MOVE    SYS-1038-ERRCOLORS      TO  SPA-ERRCOLORS
       *        警告背景色
                MOVE    SYS-1038-KEICOLORS      TO  SPA-KEICOLORS
+      *H28.6   セット展開区分
+               MOVE    SYS-1038-SETALLKBN      TO  SPA-SETALLKBN
       *H28.4   一般名表示
                IF      SYS-1038-GENERICFLG     =   "2"
                    MOVE    "1"                 TO  SPA-GENERICFLG
@@ -746,6 +748,10 @@
            IF      SPA-GENERICFLG      =   SPACE
                MOVE    "0"                 TO  SPA-GENERICFLG
             END-IF
+      *H28.6   セット展開区分
+           IF      SPA-SETALLKBN      =   SPACE
+               MOVE    "0"                 TO  SPA-SETALLKBN
+           END-IF
       *
       *ver.4.8
       *    労災レセ電対応

@@ -34,6 +34,7 @@
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応
       *  04.05.00    NACL-多々納  09/10/XX  換算値入力・関係コメント指示等対応
+      *  04.08.00    NACL-多々納  16/06/XX  全体展開処理追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -52,6 +53,7 @@
        01  FLG-AREA.
            03  FLG-INPUTSET        PIC 9(01).
            03  FLG-INPUTCD         PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
            03  FLG-ERR             PIC 9(01).
@@ -118,6 +120,10 @@
       *    入力コードマスタ−
        01  INPUTCD-REC.
            COPY    "CPINPUTCD.INC".
+      *
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1038.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -202,6 +208,9 @@
                MOVE    SPA-WORK            TO  SPA-K01KYOUTU
            ELSE
                INITIALIZE                  SPA-K01KYOUTU
+      *H28.6
+      *        セット展開区分設定
+               PERFORM 1001-SETALLKBN-SEC
            END-IF
       *
       *    診療種別テーブルセット
@@ -666,6 +675,25 @@
                MOVE    SPACE           TO  LNK-SC92-ERRCD(3)
            END-IF
       *
+      *H28.6
+      *    エラーでも展開する(約束セットは展開なし）
+           IF      SPA-SETALLKBN       =   "1"
+               IF     (SPA-ERRCD           NOT =   SPACE )  OR
+                      (LNK-SC92-ERRAREA    NOT =   SPACE )
+                   IF      SPA-COM-SET (SPA-GMN-IDX)   =  "1"
+                       MOVE    "S001"          TO  WRK-ERRCD
+                   END-IF
+                   MOVE    SPACE           TO  SPA-ERRCD
+                   MOVE    SPACE           TO  LNK-SC92-ERRAREA
+                   MOVE    SPACE           TO  SPA-COM-KZMFLG
+                                                        (SPA-GMN-IDX)
+                   MOVE    SPACE           TO  SPA-COM-HKEIFLG
+                                                        (SPA-GMN-IDX)
+                   MOVE    "1"             TO  SPA-COM-CUR
+                                                        (SPA-GMN-IDX)
+               END-IF
+           END-IF
+      *
       *    エラー時、追加しない
            IF     (SPA-ERRCD           NOT =   SPACE )  OR
                   (LNK-SC92-ERRAREA    NOT =   SPACE )
@@ -1046,6 +1074,33 @@
        41014-GYOINSN-EXT.
            EXIT.
       *****************************************************************
+      *    セット展開区分検索処理
+      *****************************************************************
+       1001-SETALLKBN-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1038-REC
+           INITIALIZE                  SYS-1038-REC
+           MOVE    "1038"              TO  SYS-1038-KANRICD
+           MOVE    "*"                 TO  SYS-1038-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1038-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1038-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1038-HOSPNUM
+           MOVE    SYS-1038-REC        TO  SYSKANRI-REC
+      *    システム管理キー検索
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1038-REC
+      *        セット展開区分
+               MOVE    SYS-1038-SETALLKBN  TO  SPA-SETALLKBN
+           END-IF
+           IF      SPA-SETALLKBN       =   SPACE
+               MOVE    "0"             TO  SPA-SETALLKBN
+           END-IF
+      *
+           .
+       1001-SETALLKBN-EXT.
+           EXIT.
+      *****************************************************************
       *    入力セットデータ次読込
       *****************************************************************
        910-INPUTSET-READ-SEC         SECTION.
@@ -1106,6 +1161,39 @@
            .
        9301-INPUTCD-NEXT-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    管理マスター読込（キー）
+      *****************************************************************
+       900-SYSKANRI-INV-SEC         SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYSKANRI-REC
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+               ELSE
+                   INITIALIZE                      SYSKANRI-REC
+                   MOVE    1                   TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+               MOVE    SPACE               TO  SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYSKANRI-INV-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    テーブル検索処理

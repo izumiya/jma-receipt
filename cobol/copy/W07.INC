@@ -523,6 +523,12 @@
                     06  W07-PRVLAYOUT038-COUNT   PIC S9(9)   BINARY.
                     06  W07-PRVLAYOUT038-ITEM
                             PIC X(60)   OCCURS  5 TIMES.
+                  05  W07-SETALLKBN-COMB.
+                    06  W07-SETALLKBN.
+                      07  W07-VALUE   PIC X(40).
+                    06  W07-SETALLKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W07-SETALLKBN-ITEM
+                            PIC X(40)   OCCURS  5 TIMES.
                 04  W07-TAGNAME3.
                   05  W07-TAGNAME3-STATE   PIC S9(9)   BINARY.
                 04  W07-TAG4.
