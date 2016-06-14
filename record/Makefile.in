@@ -506,6 +506,8 @@ RECORD_files = \
 	UDR.rec \
 	W061.rec \
 	I4ID2.rec \
+	claimfrontv2.rec \
+	claimaccountv2.rec \
 
 DEF_files = \
 
@@ -836,6 +838,10 @@ DB_files = \
 	tbl_list_doctor.db \
 	tbl_generic_class.db \
 	tbl_psychotropic.db \
+	xml_claim_frontv2req.db \
+	xml_claim_frontv2res.db \
+	xml_claim_accountv2req.db \
+	xml_claim_accountv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

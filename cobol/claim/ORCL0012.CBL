@@ -29,6 +29,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 03.05.00     NACL-多々納  07/05/09  グループ診療対応
+      * 04.08.00     NACL-多々納  16/05/XX  API対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -56,6 +57,10 @@
                05  WRK-SYSYY         PIC 9(04).
                05  WRK-SYSMM         PIC 9(02).
                05  WRK-SYSDD         PIC 9(02).
+      *API
+           03  WRK-ERRCD             PIC X(02).
+           03  WRK-UPDCNT            PIC 9(02).
+      *
       *    システム領域
        01  SYS-AREA.
            03  SYS-YMD.
@@ -102,6 +107,8 @@
        01  LNK-HKNCOMBI         PIC X(04).
        01  LNK-RC               PIC X(02).
        01  LNK-YMD              PIC X(08).
+      *API
+       01  LNK-ENDRC            PIC X(02).
       *
       *
       ******************************************************************
@@ -114,7 +121,9 @@
                                                LNK-DRCD
                                                LNK-HKNCOMBI
                                                LNK-RC
-                                               LNK-YMD.
+                                               LNK-YMD
+                                               LNK-ENDRC
+           .
       *
       *****************************************************************
       *    主　　処理
@@ -147,6 +156,7 @@
            MOVE    LNK-PTID            TO  SPA-PTID
            MOVE    LNK-YMD             TO  WRK-SYSYMD
       *
+           MOVE    SPACE               TO  LNK-ENDRC
            .
        100-INIT-EXT.
            EXIT.
@@ -211,6 +221,11 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                       IF      MCP-RC          NOT =   ZERO 
                            DISPLAY "ORCL0012 UKETUKE UPD ERR:"  MCP-RC
                                    ",KEY:" UKE-KEY
+      *API対応
+                           MOVE    "01"            TO  WRK-ERRCD
+                       ELSE
+                           ADD     1               TO  WRK-UPDCNT
+      *API対応
                        END-IF
                    END-IF
                END-IF
@@ -231,6 +246,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    終了　処理
       *****************************************************************
        300-END-SEC                SECTION.
+      *
+      *API
+           IF      WRK-ERRCD           =   SPACE
+               IF      WRK-UPDCNT          =   ZERO
+      *            対象なし
+                   MOVE    "01"            TO  LNK-ENDRC
+               ELSE
+      *            更新あり
+                   MOVE    "00"            TO  LNK-ENDRC
+               END-IF
+           ELSE
+      *        更新エラー
+               MOVE    "99"            TO  LNK-ENDRC
+           END-IF
            .
        300-END-EXT.
            EXIT.

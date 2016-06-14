@@ -13,6 +13,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    MCC-藤原     03.01.28  ファイル名に診療科を追加 
       * 03.05.00     NACL-多々納  07/05/09  グループ診療対応
+      * 04.08.00     NACL-多々納  16/05/XX  API対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -53,6 +54,8 @@
                05  WRK-PARA-RC      PIC  X(02).
                05  WRK-PARA-SYSYMD
                                     PIC  X(08).
+      *API
+               05  WRK-PARA-ENDRC    PIC X(02).
       *
            03  WRK-IN               PIC X(01).
       *
@@ -160,6 +163,9 @@
                                                WRK-PARA-HKNCOMBI
                                                WRK-PARA-RC
                                                SPA-SYSYMD
+      *API
+                                               WRK-PARA-ENDRC
+      *API
       *
            MOVE    WRK-PARA-HOSPNUM    TO  FILE-HOSPNUM
            MOVE    WRK-PARA-PTID       TO  FILE-PTID

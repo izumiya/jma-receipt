@@ -2206,7 +2206,7 @@
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 960-KANRIMST-READ-SEC
                IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC     TO  SYS-1013-REC
+                   MOVE    SYSKANRI-REC    TO  SYS-1013-REC
                END-IF
            ELSE
                INITIALIZE                  SYS-1013-REC
@@ -2214,6 +2214,7 @@
            END-IF
            PERFORM
                UNTIL       FLG-SYSKANRI    =   1
+               MOVE    SYSKANRI-REC        TO  SYS-1013-REC
                IF      SPA-NYUGAIKBN       =   SYS-1013-KBNCD(1:1)
                    EVALUATE    SYS-1013-KBNCD(2:1)
                        WHEN    "1"
@@ -2251,9 +2252,6 @@
       *
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 960-KANRIMST-READ-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC     TO  SYS-1013-REC
-               END-IF
            END-PERFORM
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -2385,7 +2383,7 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1038-REC
+               MOVE    SYSKANRI-REC     TO  SYS-1038-REC
       *        入金管理区分
                MOVE    SYS-1038-NYKNKNRKBN     TO  SPA-GMN-NYUKINKBN
       *        請求書発行方法
@@ -2493,7 +2491,7 @@
            PERFORM
                UNTIL     ( FLG-SYSKANRI    =   1  )  OR
                          ( SPA-NYUKINHOU-MAX   >=  99)
-               MOVE    MCPDATA-REC         TO  SYS-1041-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1041-REC
                ADD     1                   TO  SPA-NYUKINHOU-MAX
                MOVE    SYS-1041-KBNCD(1:2) TO  SPA-GMN-NYUKINHOU-LIST
                                                      (SPA-NYUKINHOU-MAX)
@@ -6087,6 +6085,16 @@
                   (SPA-FLG-CLAIM       =   1     )
                PERFORM 4906-CLAIM-SOUSIN-SEC
            END-IF
+      *!!!!
+      *H28.6
+      *    ginbee対応
+           IF     (SPA-MW              =   SPA-GINBEE)
+             AND  (SPA-ERRCD           =   SPACE     )
+      *        AIP CLAIM送信処理
+               PERFORM 49061-API-CLMAI-SEC
+           END-IF
+      *
+      *!!!!
       *    ユーザプログラム起動
            IF     (SPA-ERRCD           =   SPACE ) 
                MOVE    SPA-USERPG-FLG      TO  FLG-USERPG
@@ -6790,26 +6798,10 @@
            MOVE    SPA-SRYYMD          TO  SYS-9000-EDYUKYMD
       *    システム管理検索
            MOVE    SPA-HOSPNUM         TO  SYS-9000-HOSPNUM
-           MOVE    SYS-9000-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key10"             TO  MCP-PATHNAME
-               PERFORM 960-KANRIMST-READ-SEC
-           ELSE
-               INITIALIZE                  SYS-9000-REC
-               MOVE    1                   TO  FLG-SYSKANRI
-           END-IF
-      *    カーソルクロース
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           IF      FLG-SYSKANRI        =   1
-               CONTINUE
-           ELSE
-               MOVE    MCPDATA-REC         TO  SYS-9000-REC
+           MOVE    SYS-9000-REC        TO  SYSKANRI-REC
+           PERFORM 9009-SYSKANRI-KEY-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-9000-REC
                MOVE    SYS-9000-CODE       TO  SPA-GMN-SCODE
                MOVE    1                   TO  SPA-K03X-GMN-SEL
       *        マルチホストフラグ
@@ -6895,7 +6887,7 @@
            MOVE    ZERO                TO  WRK-RENNUM
            PERFORM
                    UNTIL       (FLG-SYSKANRI   =   1    )
-               MOVE    MCPDATA-REC         TO  SYS-9001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-9001-REC
                MOVE    ZERO                TO  FLG-SOUSIN
                IF      SPA-CLAIM-MULTIHOST =   1
       *            複数送信処理
@@ -6981,6 +6973,98 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        49061-CLAIM-SOUSINSYOSI-EXT.
            EXIT.
+      *H28.6
+      *****************************************************************
+      *    API ＣＬＡＩＭ送信処理
+      *****************************************************************
+       49061-API-CLMAI-SEC  SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CLAIM
+      *    ＣＬＡＩＭ接続判定
+           MOVE    SPACE               TO  SYS-9000-REC
+           INITIALIZE                  SYS-9000-REC
+           MOVE    "9000"              TO  SYS-9000-KANRICD
+           MOVE    "*"                 TO  SYS-9000-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-9000-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-9000-EDYUKYMD
+      *    システム管理検索
+           MOVE    SPA-HOSPNUM         TO  SYS-9000-HOSPNUM
+           MOVE    SYS-9000-REC        TO  SYSKANRI-REC
+           PERFORM 9009-SYSKANRI-KEY-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-9000-REC
+               MOVE    SYS-9000-CODE       TO  SPA-GMN-SCODE
+               IF      SYS-9000-SETUZOKU   =   ZERO
+                                           OR  SPACE
+                   CONTINUE
+               ELSE
+      *            ＣＬＡＩＭ送信あり
+                   MOVE    1               TO  FLG-CLAIM
+               END-IF
+           END-IF
+      *
+           IF      FLG-CLAIM           =   ZERO
+               GO  TO  49061-API-CLMAI-EXT
+           END-IF
+      *
+      *
+      *    フィアルデイレクトリ位置指定
+           INITIALIZE                  ORCSMKPASSAREA
+           MOVE    CLAIM-FILE          TO  MKPASS-IN-01
+           CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
+      *
+           MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+      *    連番
+           MOVE    ZERO                TO  WRK-RENNUM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-SYUNOU-MAX
+               MOVE    SPA-SYUNOU-REC(IDX) TO  SYUNOU-REC
+               IF     (SYU-SRYKA           =   ZERO OR
+                                               SPACE )  OR
+                      (SYU-HKNCOMBINUM     =   SPACE OR
+                                               ZERO  )
+                   CONTINUE
+               ELSE
+      *
+                   MOVE    "HL05.sh"           TO  SHELLTBL-NAME
+      *
+                   MOVE    SPA-GMN-SCODE       TO  SHELLTBL-ARG1
+                   MOVE    SPA-PTID            TO  WRK-PTID
+                   MOVE    WRK-PTID            TO  SHELLTBL-ARG2
+                   MOVE    SYU-SRYKA           TO  SHELLTBL-ARG3
+                   MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG4
+                   MOVE    SYU-HKNCOMBINUM     TO  SHELLTBL-ARG5
+                   MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG6
+      ****         MOVE    SYS-9001-ADDRESS    TO  SHELLTBL-ARG7
+      ****         MOVE    SYS-9001-PORT2      TO  SHELLTBL-ARG8
+      *            ドクター
+                   IF      SYU-DRCD-G          =   SPACE
+                       MOVE    "@@@@@"             TO  SHELLTBL-ARG9
+                   ELSE
+                       MOVE    SYU-DRCD-G          TO  SHELLTBL-ARG9
+                   END-IF
+                   MOVE    SYU-DENPNUM         TO  SHELLTBL-ARG10
+      *            連番
+      *            ADD     1                   TO  WRK-RENNUM
+      *D           MOVE    WRK-RENNUM          TO  SHELLTBL-ARG11 (1:2)
+                   MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG11
+      *            患者番号
+                   MOVE    SPA-PTNUM           TO  SHELLTBL-ARG12
+      *
+                   MOVE    SHELLTBL            TO  MCPDATA-REC
+                   MOVE    "SHELL"             TO  MCP-FUNC
+                   MOVE    "shell"             TO  MCP-TABLE
+                   MOVE    "allways"           TO  MCP-PATHNAME
+grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+               END-IF
+           END-PERFORM
+      *
+           .
+       49061-API-CLMAI-EXT.
+           EXIT.
       *****************************************************************
       *    ユーザプログラム起動処理
       *****************************************************************
@@ -7044,6 +7128,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    共通キー編集
            MOVE    "K03"               TO  SPA-MOTOPG
            MOVE    "XD01"              TO  SPA-SAKIPG
+      *H28.6
+      *    伝票番号
+           MOVE    WRK-DENPNUM         TO  SPA-DENPNUM
+           MOVE    SPA-K01KYOUTU       TO  SPA-WORK
+      *!!!
            MOVE    SPA-AREA            TO  LNK-KYOUTU
       *
       *    共通のキーをクリアする
@@ -7480,6 +7569,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 920-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-SYSKANRI
+               MOVE    MCPDATA-REC         TO  SYSKANRI-REC
            ELSE
                MOVE    1                   TO  FLG-SYSKANRI
            END-IF
@@ -7536,6 +7626,36 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        970-PTCONF-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    システム管理主キー検索
+      *****************************************************************
+       9009-SYSKANRI-KEY-READ-SEC         SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 960-KANRIMST-READ-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+               ELSE
+                   INITIALIZE                  SYSKANRI-REC
+               END-IF
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *    カーソルクロース
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       9009-SYSKANRI-KEY-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************
