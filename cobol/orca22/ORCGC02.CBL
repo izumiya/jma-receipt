@@ -6355,9 +6355,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                    MOVE    "1"           TO
                                          SPA-NAI-C02-USERBYOMEIFLG(IDZ)
                    MOVE    USBYO-BYOMEI  TO  SPA-NAI-C02-BYOMEI   (IDZ)
-                   MOVE    USBYO-HOSOKU-COMMENT
+                   IF      IDZ           <   4
+                       MOVE    USBYO-HOSOKU-COMMENT
                                          TO  SPA-NAI-C02-HOSOKU-COMMENT
                                                                   (IDZ)
+                   END-IF
                    IF      USBYO-HOSOKU-COMMENT
                                          =   SPACE
                        CONTINUE

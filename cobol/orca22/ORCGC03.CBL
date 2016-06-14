@@ -2123,7 +2123,14 @@
       *        病名入力コードエラー表示処理
                PERFORM 410022-BYOMEIINPUTCD-ERR-HYOUJI-SEC
       *        病名入力コード編集処理
-               MOVE    WRK-WIDGET2         TO  IDZ
+               EVALUATE    MCP-WIDGET
+                   WHEN    "BYOMEIINPUTCD"
+                       MOVE    1                   TO  IDZ
+                   WHEN    "BYOMEIINPUTCD_1"
+                       MOVE    2                   TO  IDZ
+                   WHEN    "BYOMEIINPUTCD_2"
+                       MOVE    3                   TO  IDZ
+               END-EVALUATE
                PERFORM 410023-BYOMEIINPUTCD-HENSYU-SEC
            END-IF
            .
