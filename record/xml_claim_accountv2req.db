@@ -8,7 +8,7 @@ xml_claim_accountv2req {
 # 送信用コード
 		Send_Character_Code	varchar(1);
 # 患者番号
-		Patient_Id		varchar(20);
+		Patient_ID		varchar(20);
 # 診療日付
 		Perform_Date		varchar(10);
 # 診療科コード
