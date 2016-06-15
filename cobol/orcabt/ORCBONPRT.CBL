@@ -37,9 +37,12 @@
       *
       *    °õºþÍÑ¥Ç¡¼¥¿
            SELECT  PRT-FILE        ASSIGN  PRTOUTPARA
-      *                            ORGANIZATION    IS  LINE
-      *                                                SEQUENTIAL 
                                    FILE    STATUS  IS  STS-PRT.
+      *
+      *    °õºþÍÑ¥Ç¡¼¥¿
+           SELECT  PRT2-FILE       ASSIGN  PRTOUTPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-PRT2.
       *
        DATA                        DIVISION.
        FILE                        SECTION.
@@ -48,6 +51,10 @@
        FD  PRT-FILE.
        01  PRT-REC.
            03  PRT-PRTDATA         PIC X(20000).
+      *
+       FD  PRT2-FILE.
+       01  PRT2-REC.
+           03  PRT2-PRTDATA        PIC X(20000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -60,10 +67,12 @@
       *    ¥¹¥ÑÎÎ°è
        01  STS-AREA.
            03  STS-PRT             PIC X(02).
+           03  STS-PRT2            PIC X(02).
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
+           03  FLG-PRT2            PIC 9(01).
            03  FLG-PRTKANRI        PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -77,6 +86,7 @@
       *
        COPY    "CPASGNPARA.INC"        REPLACING   //ASGNPARA//
                                        BY          //PRTOUTPARA//.
+      *
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -127,7 +137,7 @@
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
       *
-      *   ÆüÉÕÊÑ´¹¥µ¥Ö
+      *    ÆüÉÕÊÑ´¹¥µ¥Ö
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
       *
@@ -162,8 +172,13 @@
       *
            PERFORM 100-INIT-SEC
       *
-           PERFORM 200-MAIN-SEC
-                   UNTIL       FLG-END     =   1
+           IF    ( FLG-END         =   ZERO )
+               IF    ( LNK-PRTKANRI-SHELLID    =   "API" )
+                   PERFORM 201-MAIN-SEC
+               ELSE
+                   PERFORM 200-MAIN-SEC
+               END-IF
+           END-IF
       *
            PERFORM 300-END-SEC
       *
@@ -213,6 +228,15 @@
       *
            PERFORM 100-DBOPEN-SEC
       *
+      *    Ä¢É¼°õºþ½èÍý
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    WRK-PARA-DATASETNAME
+                                       TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  PRTOUTPARA
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -222,14 +246,6 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-      *    Ä¢É¼°õºþ½èÍý
-           INITIALIZE                  SGETTEMP-AREA
-           MOVE    WRK-PARA-DATASETNAME
-                                       TO  SGETTEMP-BASENAMES (1)
-           CALL    "ORCSGETTEMP"       USING
-                                       SGETTEMP-AREA
-           MOVE    SGETTEMP-FULLNAMES (1)
-                                       TO  PRTOUTPARA
            OPEN    INPUT               PRT-FILE
            MOVE    SPACE               TO  PRT-PRTDATA
            IF        ( STS-PRT         =   ZERO )
@@ -241,23 +257,57 @@
            ELSE
                DISPLAY "INPUT FILE OPEN ERR"
            END-IF
-      *     
+      *
+           MOVE    PRT-PRTDATA         TO  PRTDATA-PRTDATA
            PERFORM 390-PRINT-OUT-SEC
       *
            CLOSE                       PRT-FILE
-           DISPLAY "FILE = "    WRK-PARA-DATASETNAME
-           MOVE    WRK-PARA-DATASETNAME
-                                       TO  PRTOUTPARA
            MOVE    1                   TO  FLG-END     
            .
        200-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼ç¡¡¡¡½èÍý¡Ê£Á£Ð£ÉÍÑ¡Ë
+      *****************************************************************
+       201-MAIN-SEC                    SECTION.
+      *
+           OPEN    INPUT               PRT2-FILE
+      *
+           PERFORM 900-PRTKANRI-KEY-SEL-SEC
+      *
+           PERFORM 900-PRT2-READ-SEC
+      *
+           MOVE    ZERO                TO  CNT-OUT
+      *
+           PERFORM UNTIL ( FLG-PRT2    NOT =   ZERO )
+      *
+               COMPUTE CNT-OUT =   CNT-OUT +   1
+      *
+               IF    ( FLG-PRTKANRI    =   ZERO )
+                AND  ( CNT-OUT         =   1 )
+                   MOVE    ","             TO  PRTDATA-PRTDATA(1:1)
+                   MOVE    PRT2-PRTDATA    TO  PRTDATA-PRTDATA(2:)
+               ELSE
+                   MOVE    PRT2-PRTDATA    TO  PRTDATA-PRTDATA
+               END-IF
+               PERFORM 390-PRINT-OUT-SEC
+      *
+               PERFORM 900-PRT2-READ-SEC
+      *
+           END-PERFORM
+      *
+           CLOSE                       PRT2-FILE
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       201-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
       *    Ä¢É¼°õºþ½èÍý
       *****************************************************************
        390-PRINT-OUT-SEC                SECTION.
-      *     
+      *
            INITIALIZE                  ORCSPRTAREA
            MOVE    "INS"               TO  SPRT-MODE
            MOVE    LNK-PRTKANRI-RENNUM TO  SPRT-RENNUM
@@ -278,9 +328,9 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            MOVE    WRK-PARA-FORMID     TO  SPRT-PRTID
-           MOVE    PRT-PRTDATA         TO  SPRT-PRTDATA
+           MOVE    PRTDATA-PRTDATA     TO  SPRT-PRTDATA
            MOVE    WRK-PARA-TITLE0     TO  SPRT-TITLE
-      *         
+      *
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
@@ -314,13 +364,64 @@
       *     
            PERFORM 900-DBDISCONNECT-SEC
       *
-           DISPLAY "*** ORC IN  "  CNT-IN
-           DISPLAY "*** ORC OUT "  CNT-OUT
            DISPLAY "*** ORCBONPRT END ***"
            .
        300-END-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    Ä¢É¼¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       900-PRT2-READ-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PRT2
+      *
+           READ    PRT2-FILE
+           AT  END
+               MOVE    1               TO  FLG-PRT2
+           END-READ
+      *
+           .
+       900-PRT2-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþ´ÉÍý¸¡º÷½èÍý
+      *****************************************************************
+       900-PRTKANRI-KEY-SEL-SEC        SECTION.
+      *
+           INITIALIZE                      FLG-PRTKANRI
+      *
+           INITIALIZE                      PRTKANRI-REC
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                       TO  PRTKANRI-TBL-KEY
+           MOVE    LNK-PRTKANRI-RENNUM TO  PRTKANRI-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  PRTKANRI-TBL-GROUP
+           MOVE    LNK-PRTKANRI-TBL-UUID
+                                       TO  PRTKANRI-TBL-UUID
+           MOVE    LNK-PRTKANRI-GYOUMU-CD
+                                       TO  PRTKANRI-GYOUMU-CD
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  PRTKANRI-SHORI-RENNUM
+           MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
+           MOVE    PRTKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PRTKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-PRTKANRI
+               INITIALIZE                  PRTKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PRTKANRI-KEY-SEL-EXT.
+           EXIT.
       *****************************************************************
       *    £Ä£Â¡¡¥ª¡¼¥×¥ó½èÍý
       *****************************************************************
@@ -360,4 +461,63 @@
       *
            .
        900-DBDISCONNECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¸¡º÷½èÍý
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DB-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¸¡º÷½èÍý
+      *****************************************************************
+       911-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DB-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£ÂÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¥¯¥í¡¼¥º½èÍý
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC                 SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
            EXIT.

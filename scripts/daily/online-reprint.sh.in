@@ -10,7 +10,7 @@ fi
 . $JMARECEIPT_ENV
 
 #-------------------------------------------#
-#    ¥ª¥ó¥é¥¤¥óÄ¢É¼ºÆ°õºþÍÑDB³ÊÇ¼½èÍý
+#    ã‚ªãƒ³ãƒ©ã‚¤ãƒ³å¸³ç¥¨å†å°åˆ·ç”¨DBæ ¼ç´å‡¦ç†
 #        $1  RENNUM
 #        $2  TBL-KEY
 #        $3  TBL-GROUP
@@ -34,17 +34,24 @@ fi
 #        $20 PARA-CNT
 #        $21 DATASETNAME
 #        $22 TITLE
-#        $23 PRTFLG¡ÊºÆ°õºþ¥Ç¡¼¥¿¤òºîÀ®¤·¤Ê¤¤¾ì¹ç"D")
+#        $23 PRTFLGï¼ˆå†å°åˆ·ãƒ‡ãƒ¼ã‚¿ã‚’ä½œæˆã—ãªã„å ´åˆ"D")
 #        $24 ORGNAME
 #            END
 #-------------------------------------------#
-##      ¥¨¥é¡¼¥Õ¥¡¥¤¥ëºï½ü
+##      ã‚¨ãƒ©ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«å‰Šé™¤
     echo $0 $@ > /tmp/onreprint.log
+
 
 DATASETNAME=${MCP_TEMPDIR}/${21}
 ORGNAME=${MCP_TEMPDIR}/${24}
 echo DATASETNAME[${DATASETNAME}]
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBONPRT -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20},${21},${22},${23}, >>/tmp/onreprint.log
-	[ -e  ${DATASETNAME} ] && rm ${DATASETNAME}
-	[ -e  ${ORGNAME} ] && rm ${ORGNAME}
-	exit
+
+if [ $7 == "API" ]; then
+  shrink_rp.rb ${DATASETNAME} >> /tmp/onreprint.log 2>&1
+  nkf --ic=UTF8 --oc=eucJP-ms --overwrite ${DATASETNAME}
+fi
+
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBONPRT -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20},${21},${22},${23}, >>/tmp/onreprint.log
+[ -e  ${DATASETNAME} ] && rm ${DATASETNAME}
+[ -e  ${ORGNAME} ] && rm ${ORGNAME}
+exit

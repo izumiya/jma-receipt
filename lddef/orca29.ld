@@ -68,6 +68,10 @@ db	{
         tbl_generic_price;
 	tbl_santei;
 };
+db "xml2" {
+ rp_medication_note;
+};
+
 
 /* #include "orcadb.inc" */
 #include "orcadbh.inc"

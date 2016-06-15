@@ -15,10 +15,9 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-        02  XAID2.
-            03  XAID2-FIXED1.
-              04  XAID2-B10-VISIBLE  PIC X(01).
-              04  XAID2-ID1CODE.
-                05  XAID2-VALUE  PIC X(10).
-              04  XAID2-ID1MSG.
-                05  XAID2-VALUE  PIC X(70).
+       01  XMLDATA-REC.
+           03  XMLDATA-CONTEXT             PIC S9(9)   BINARY.
+           03  XMLDATA-OBJECT              PIC X(8).
+           03  XMLDATA-MODE                PIC S9(9)   BINARY.
+           03  XMLDATA-RECORDNAME          PIC X(128).
+           03  XMLDATA-DATA                PIC X(1000000).

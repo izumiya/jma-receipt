@@ -15,10 +15,7 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-        02  XAID2.
-            03  XAID2-FIXED1.
-              04  XAID2-B10-VISIBLE  PIC X(01).
-              04  XAID2-ID1CODE.
-                05  XAID2-VALUE  PIC X(10).
-              04  XAID2-ID1MSG.
-                05  XAID2-VALUE  PIC X(70).
+        01  RPMAIN-AREA.
+            03  RPMAIN-ID              PIC X(20).
+            03  RPMAIN-TITLE           PIC X(100).
+            03  RPMAIN-DATA            PIC X(1000000).

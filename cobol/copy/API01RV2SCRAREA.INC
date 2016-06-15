@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * Æï¬ä4W?·ãZ¥×¥È¥½¥Õ¥È¡ÊJMA standard receipt software¡Ë
+      * ????4W???Z?×¥È¥??Õ¥È¡?JMA standard receipt software??
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -15,7 +15,7 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-      *    api01rv2¡¡¡Ê£Á£Ð£É¾ðÊó¼èÆÀ¡Ë
+      *    api01rv2???Ê£Á£Ð£É¾??????À¡?
       ******************************************************************
       *ORAPI012R1V2
            COPY    "CPAPIPTAV2.INC".
@@ -93,4 +93,7 @@
       *ORAPICLAIM2RV2
            COPY    "CPAPILSTV2.INC"    REPLACING
                                        //APILST-// BY //APILST24-//.
+      *ORAPI001R1V2
+           COPY    "CPAPILSTV2.INC"    REPLACING
+                                       //APILST-// BY //APILST25-//.
       *

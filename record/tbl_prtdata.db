@@ -148,3 +148,34 @@ path	del16	{
 	};
 };
 
+path	key3		{ 	
+	DBSELECT	{
+		DECLARE tbl_prtdata_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_prtdata
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   TBL_KEY      =   :TBL_KEY
+                    AND     RENNUM       =   :RENNUM
+                    AND     TBL_GROUP    =   :TBL_GROUP
+                    AND     TBL_UUID     =   :TBL_UUID
+                    AND     SHORI_RENNUM =   :SHORI_RENNUM 
+                    ORDER BY PAGE    
+					OFFSET	:PAGE
+		;
+	};
+};
+
+path	upd1		{ 	
+	DBUPDATE	{
+		UPDATE	tbl_prtdata
+			SET PRTFLG     =   :PRTFLG
+			WHERE 	HOSPNUM	= :HOSPNUM
+            AND   TBL_KEY      =   :TBL_KEY
+            AND     RENNUM       =   :RENNUM
+            AND     TBL_GROUP    =   :TBL_GROUP
+            AND     TBL_UUID     =   :TBL_UUID
+            AND     SHORI_RENNUM =   :SHORI_RENNUM 
+		;
+	};
+};
+

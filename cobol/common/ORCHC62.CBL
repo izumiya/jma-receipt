@@ -117,6 +117,8 @@
            03  IDX-QRB             PIC 9(04).
            03  IDX-QY              PIC 9(04).
            03  IDQ                 PIC 9(04).
+           03  IDX                 PIC 9(04).
+           03  IDY                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -182,6 +184,25 @@
            03  WRK-SHO-TANINAME    PIC X(20).
       *
            03  WRK-QRKBN           PIC X(01).
+      *
+      *H28.4
+      *API
+      *    医療機関名称編集
+           03  WRK-AP-HOSPNAME-G.
+               05  WRK-AP-HOSPNAME        PIC X(120).
+               05  WRK-AP-HOSPNAME2       PIC X(120).
+               05  WRK-AP-HOSPNAME3       PIC X(120).
+           03  WRK-AP-HOSPADRS-G.
+               05  WRK-AP-HOSPADRS        PIC X(200).
+               05  WRK-AP-HOSPADRS2       PIC X(200).
+               05  WRK-AP-HOSPADRS3       PIC X(200).
+      *    日付編集
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
       *
       *    剤内容領域
        01  WRK-SRY-AREA.
@@ -267,9 +288,16 @@
       *----(04.08.02)--ADD-END-----
       ***  03  PARA-CSVKBN             PIC X(01).
       ***  03  PARA-CSVDIR             PIC X(256).
+      *H28.6
+           03  PARA-API-DATA           PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
+      *
+      *H28.6
+      * API対応
+      *    お薬手帳情報構造体
+           COPY    "CPRPMNOTE.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -347,6 +375,11 @@
       *    一時ファイル名取得
            COPY    "CPORCSGETTEMP.INC".
       *
+      *H28.6
+      *    API対応
+           COPY    "CPORCRPMAIN.INC".
+      *    画面色等
+           COPY    "ENUM-VALUE".
       *
       *****************************************************************
       *    連絡　領域
@@ -435,6 +468,14 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-KOUNOU
       *----(04.08.02)--ADD-END-----
+      *API
+      *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
+           MOVE    "API_DATA"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA(1:1)   =   "1" )
+               MOVE    WRK-PARA(1:1)   TO  PARA-API-DATA
+           END-IF
+      *
       *****CSVファイル作成
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
@@ -476,6 +517,21 @@
                    MOVE    "1"             TO  WRK-QRKBN
                END-IF
            END-IF
+      *H28.6
+      *    ginbee対応
+      *TEST
+      *TEST
+           MOVE    SPA-GINBEE           TO  SPA-MW
+      *TEST
+      *TEST
+           IF     (SPA-MW              =   SPA-GINBEE)
+              AND (PARA-API-DATA       =   "1"       )
+               CONTINUE
+           ELSE
+      *        API送信なし
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -535,6 +591,12 @@
                PERFORM 210-KOUNOU-MAIN-SEC
            END-IF
       *----(04.08.02)--ADD-END-----
+      *
+      *H28.5
+           IF      PARA-API-DATA        =   "1"
+      *        ＡＰＩ送信処理
+               PERFORM 600-API-SYORI-SEC
+           END-IF
       *
       *H24.9
       *    ＱＲ印刷
@@ -1277,6 +1339,11 @@
            IF      ORCHC62-PRTKBN      =   "1"
                GO      TO      400-PRT-WRITE-EXT
            END-IF
+      *H28.6
+      *    ＡＰＩ送信は印刷なし
+           IF      PARA-API-DATA       =   "1"
+               GO      TO      400-PRT-WRITE-EXT
+           END-IF
       *
       *
       *    印刷用ファイル作成
@@ -1506,6 +1573,8 @@
              AND  (ORCSQRCSV62-RET-COUNT   <=  12  )
              AND  (WRK-QRKBN               =   "1"  )
              AND  (ORCHC62-PRTKBN          =   SPACE)
+      *!API
+             AND  (PARA-API-DATA           =   "0"  )
                PERFORM 5003-QRIMAGE-HEN-SEC
            END-IF
            .
@@ -1734,6 +1803,141 @@
            EXIT.
       *
       *****************************************************************
+      *    ＡＰＩ送信処理
+      *****************************************************************
+       600-API-SYORI-SEC                 SECTION.
+      *
+      *    項目編集
+           PERFORM 6001-API-HENSYU-SEC
+      *
+           INITIALIZE                      RPMAIN-AREA
+           MOVE    "okusuri-techo"     TO  RPMAIN-ID
+           MOVE    "お薬手帳"          TO  RPMAIN-TITLE
+           MOVE    "rp_medication_note"
+                                       TO  MCP-TABLE
+           MOVE    RPMNOTE-DATA        TO  RPMAIN-DATA
+           CALL    "ORCRPMAIN"         USING
+                                       MCPAREA
+                                       RPMAIN-AREA
+                                       SPA-AREA
+      *
+           .
+       600-API-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ送信編集処理
+      *****************************************************************
+       6001-API-HENSYU-SEC                 SECTION.
+      *
+           INITIALIZE                  RPMNOTE-REC
+      *
+           MOVE    "okusuri-techo"     TO  RPMNOTE-REPORTID
+           MOVE    SYS-1031-PRTNM(16)  TO  RPMNOTE-PRINTER
+      *
+      *    診療日 YYYY-MM-DD
+           MOVE    ORCHC62-SRYYMD      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  RPMNOTE-SRYYMD
+      *    伝票番号
+           MOVE    ORCHC62-DENPNUM     TO  RPMNOTE-DENPNUM
+      *    患者情報
+      *    患者番号
+           MOVE    SPA-PTNUM           TO  RPMNOTE-PTNUM
+      *    氏名
+           MOVE    SPA-NAME            TO  RPMNOTE-NAME
+           MOVE    SPA-KANANAME        TO  RPMNOTE-KANANAME
+      *    性別区分
+           MOVE    SPA-SEX             TO  RPMNOTE-SEX
+      *    誕生日
+           MOVE    SPA-BIRTHDAY        TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  RPMNOTE-BIRTHDAY
+      *    医療機関情報
+      *    県番
+           MOVE    SYS-1001-PREFNUM    TO  RPMNOTE-PREFNUM
+      *    名称
+           MOVE    WRK-AP-HOSPNAME     TO  RPMNOTE-HOSP-NAME(1)
+           MOVE    WRK-AP-HOSPNAME2    TO  RPMNOTE-HOSP-NAME(2)
+           MOVE    WRK-AP-HOSPNAME3    TO  RPMNOTE-HOSP-NAME(3)
+      *    住所
+           MOVE    WRK-AP-HOSPADRS     TO  RPMNOTE-HOSP-ADRS(1)
+           MOVE    WRK-AP-HOSPADRS2    TO  RPMNOTE-HOSP-ADRS(2)
+           MOVE    WRK-AP-HOSPADRS3    TO  RPMNOTE-HOSP-ADRS(3)
+      *    電話番号
+           MOVE    WRK-HOSPTEL         TO  RPMNOTE-HOSP-TEL
+      *    ドクター
+           MOVE    SYS-1010-NAME       TO  RPMNOTE-DR-NAME
+           MOVE    ORCHC62-DRCD        TO  RPMNOTE-DR-CODE
+      *
+      *    明細
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   50   )
+                           OR (ORCSQRCSV62-SRYKBN (IDX)  =   SPACE )
+      *        診療区分
+               MOVE    ORCSQRCSV62-SRYKBN (IDX)
+                                       TO  RPMNOTE-SRYKBN (IDX)
+      *        剤回数
+               MOVE    ORCSQRCSV62-KAISU (IDX)
+                                       TO  WRK-SURYO
+               IF      WRK-SURYO       >   0
+                   PERFORM 250-ZHEN-SURYO-SET-SEC
+                   MOVE    WRK-HENSURYO    TO  WRK-KAISUU
+                   MOVE    WRK-KAISUU      TO  RPMNOTE-ZAIKAISU
+                                                           (IDX)
+               END-IF
+      *        剤単位名（回数／回分）
+               EVALUATE    ORCSQRCSV62-SRYKBN (IDX)
+                   WHEN    "21"
+                       MOVE    "日分"          TO  RPMNOTE-ZAITANINAME
+                                                           (IDX)
+                   WHEN    "22"
+                       MOVE    "回分"          TO  RPMNOTE-ZAITANINAME
+                                                           (IDX)
+               END-EVALUATE
+      *        診療明細
+               PERFORM VARYING     IDY     FROM    1   BY    1
+                       UNTIL     ( IDY     >   50   )
+                           OR    (ORCSQRCSV62-TNS-NAME (IDX IDY)
+                                                   =   SPACE )
+      *            薬剤名
+                   MOVE    ORCSQRCSV62-TNS-NAME (IDX IDY)
+                                               TO  RPMNOTE-YKZNAME
+                                                           (IDX IDY)
+      *            数量(ZZZZ9.99999)
+                   IF     (ORCSQRCSV62-SRYCD (IDX IDY)(1:1)
+                                               =   "6"
+                                               OR  "7"   )
+                      OR  (ORCSQRCSV62-SRYCD (IDX IDY)(1:3)
+                                               =   "059" )
+                       MOVE    ORCSQRCSV62-SURYOU (IDX IDY)
+                                               TO  WRK-SURYO
+                       PERFORM 250-ZHEN-SURYO-SET-SEC
+                       MOVE    WRK-HENSURYO    TO  RPMNOTE-SURYO
+                                                           (IDX IDY)
+                   END-IF
+      *            単位名
+                   MOVE    ORCSQRCSV62-TANINAME (IDX IDY)
+                                               TO  RPMNOTE-TANINAME
+                                                           (IDX IDY)
+      *            診療コード
+                   MOVE    ORCSQRCSV62-SRYCD (IDX IDY)
+                                               TO  RPMNOTE-SRYCD
+                                                           (IDX IDY)
+               END-PERFORM
+           END-PERFORM
+      *    備考
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   10   )
+                           OR (ORCSQRCSV62-BIKOU (IDX)  =   SPACE )
+               MOVE    ORCSQRCSV62-BIKOU (IDX)
+                                       TO  RPMNOTE-MEMO (IDX)
+           END-PERFORM
+           .
+       600-API-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    終了　　処理
       *****************************************************************
        300-END-SEC                 SECTION.
@@ -1760,6 +1964,30 @@
       *
            .
        31012-SEIWA-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           .
+       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1897,6 +2125,8 @@
            END-IF
       *
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+      *API
+           MOVE    SYS-1001-HOSPNAME   TO  WRK-AP-HOSPNAME
       *
            .
        900-1001-READ-EXT.
@@ -1923,7 +2153,9 @@
                INITIALIZE                  SYS-1002-REC
            END-IF
       *
-           MOVE    SYS-1002-TEL    TO  WRK-HOSPTEL
+           MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
+      *API
+           MOVE    SYS-1002-ADRS       TO  WRK-AP-HOSPADRS
       *
            .
        900-1002-READ-EXT.
@@ -2030,6 +2262,11 @@
                MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1
                                        TO  WRK-HOSPNAME
+      *API
+               MOVE    SPACE           TO  WRK-AP-HOSPNAME-G
+               MOVE    SYS-1901-HOSPNAME1  TO  WRK-AP-HOSPNAME
+               MOVE    SYS-1901-HOSPNAME2  TO  WRK-AP-HOSPNAME2
+               MOVE    SYS-1901-HOSPNAME3  TO  WRK-AP-HOSPNAME3
            ELSE
                INITIALIZE                  SYS-1901-REC
            END-IF
@@ -2057,6 +2294,11 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC    TO  SYS-1902-REC
                MOVE    SYS-1902-TEL    TO  WRK-HOSPTEL
+      *API
+               MOVE    SPACE           TO  WRK-AP-HOSPADRS-G
+               MOVE    SYS-1902-ADRS1  TO  WRK-AP-HOSPADRS
+               MOVE    SYS-1902-ADRS2  TO  WRK-AP-HOSPADRS2
+               MOVE    SYS-1902-ADRS3  TO  WRK-AP-HOSPADRS3
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF

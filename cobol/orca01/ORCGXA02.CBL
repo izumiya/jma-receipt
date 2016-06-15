@@ -123,6 +123,7 @@
                        09  SPA-NAI-BODY2.
                            11  SPA-NAI-PTID        PIC 9(10).
                            11  SPA-NAI-TBL-GROUP   PIC X(14).
+                           11  SPA-NAI-API         PIC X(1).
       *      
                    07  SPA-NAI-TBL.
                        09  SPA-NAI-OCC             OCCURS  300.
@@ -132,6 +133,7 @@
                            11  SPA-NAI-TPRTFLG     PIC X(01).
                            11  SPA-NAI-LPTID       PIC 9(10).
                            11  SPA-NAI-TSKYYMD     PIC X(09).
+                           11  SPA-NAI-TAPI        PIC X(1).
       *
                05  SPA-WRK-TBL-KEY                 PIC X(08).
                05  SPA-NAI-SMCNDATE-YMD            PIC 9(08).
@@ -154,6 +156,7 @@
       *    カウント領域
        01  CNT-AREA.
            03  CNT-PRTKANRI        PIC 9(05).
+           03  CNT-MONPE           PIC 9(05).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -215,6 +218,8 @@
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
            03  WRK-GMN-CUR         PIC 9(03).
+           03  WRK-RENNUM          PIC 9(04).
+           03  WRK-SHORI-RENNUM    PIC 9(04).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -673,8 +678,20 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
                                            TO  SPA-GMN-TSHORI-RENNUM
                                                                   (IDX)
                MOVE    PRTKANRI-PAGE       TO  SPA-GMN-TPAGE      (IDX)
-               MOVE    PRTKANRI-TITLE      TO  SPA-GMN-TPRT-TITLE (IDX)
+               IF    ( PRTKANRI-SHELLID    =   "API" )
+                   MOVE    SPACE           TO  SPA-GMN-TPRT-TITLE (IDX)
+                   STRING  "＊"                DELIMITED BY SIZE
+                           PRTKANRI-TITLE      DELIMITED BY SPACE
+                   INTO    SPA-GMN-TPRT-TITLE (IDX)
+                   END-STRING
+               ELSE
+                   MOVE    PRTKANRI-TITLE  TO  SPA-GMN-TPRT-TITLE (IDX)
+               END-IF
                MOVE    PRTKANRI-PRTFLG     TO  SPA-NAI-TPRTFLG    (IDX)
+      *
+               IF    ( PRTKANRI-SHELLID    =   "API" )
+                   MOVE    "1"             TO  SPA-NAI-TAPI    (IDX)
+               END-IF
       *
                PERFORM 3101-SPA-PTINFO-SEC
       *
@@ -952,8 +969,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
       *****************************************************************
        4101-GMN-SPA-SET-SEC       SECTION.
       *
-           MOVE    XA02-STPAGE         TO  SPA-GMN-STPAGE
-           MOVE    XA02-EDPAGE         TO  SPA-GMN-EDPAGE
+           IF    ( SPA-NAI-API     NOT =   "1" )
+               MOVE    XA02-STPAGE     TO  SPA-GMN-STPAGE
+               MOVE    XA02-EDPAGE     TO  SPA-GMN-EDPAGE
+           END-IF
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -1026,6 +1045,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
            MOVE    SPA-GMN-TLPTNAME    (IDY)   TO  SPA-GMN-NAME
            MOVE    SPA-NAI-LPTID       (IDY)   TO  SPA-NAI-PTID
            MOVE    SPA-GMN-TPRT-TITLE  (IDY)   TO  SPA-GMN-PRT-TITLE
+           MOVE    SPA-NAI-TAPI (IDY)          TO  SPA-NAI-API
       *
            MOVE    SPA-NAI-SELNUM      TO  XA02-ROW
       *
@@ -2124,6 +2144,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
        490-KAKUNIN-SEC            SECTION.
       *
            MOVE    SPACE               TO  XA99
+           INITIALIZE                      XA99
            MOVE    ZERO                TO  XA99-COUNT
            MOVE    WIDGET-INSENSITIVE  TO  XA99-B12-STATE
       *        
@@ -2168,8 +2189,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
                        MOVE    JOB-ENDTIME(5:2)
                                                TO  WRK-SS
                        MOVE    WRK-HENTIME     TO  XA99-ENDTIME  (IDX)
-                       MOVE    JOB-UPDCNT      TO  WRK-PAGE
-                       MOVE    WRK-PAGE(5:6)   TO  XA99-PAGE     (IDX)
+                       IF    ( JOB-UPDCNT  NOT =   ZERO )
+                           MOVE    JOB-UPDCNT      TO  WRK-PAGE
+                           MOVE    WRK-PAGE(5:6)   TO  XA99-PAGE (IDX)
+                       END-IF
                        MOVE    JOB-YOBI        TO  XA99-ERRMSG   (IDX)
                        IF      JOB-ENDYMD      =   SPACE
                            MOVE    "処理中です"    TO  XA99-MSG
@@ -2302,8 +2325,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
            MOVE    SPA-GMN-RENNUM      TO  XA02-RENNUM
            MOVE    SPA-GMN-SHORI-RENNUM 
                                        TO  XA02-SHORI-RENNUM
-           MOVE    SPA-GMN-STPAGE      TO  XA02-STPAGE
-           MOVE    SPA-GMN-EDPAGE      TO  XA02-EDPAGE                            
+           IF    ( SPA-NAI-API     NOT =   "1" )
+               MOVE    SPA-GMN-STPAGE  TO  XA02-STPAGE
+               MOVE    SPA-GMN-EDPAGE  TO  XA02-EDPAGE
+           END-IF
            MOVE    SPA-GMN-PRT-TITLE   TO  XA02-PRT-TITLE         
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -2331,8 +2356,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
                MOVE    SPA-GMN-TSHORI-RENNUM(IDX)
                                                TO
                                                XA02-TSHORI-RENNUM (IDX)
-               MOVE    SPA-GMN-TPAGE     (IDX) TO  WRK-PAGE
-               MOVE    WRK-PAGE(6:5)           TO  XA02-TPAGE     (IDX)
+               IF    ( SPA-NAI-TAPI (IDX)   NOT =   "1" )
+                   MOVE    SPA-GMN-TPAGE     (IDX) TO  WRK-PAGE
+                   MOVE    WRK-PAGE(6:5)       TO  XA02-TPAGE     (IDX)
+               END-IF
       *
                MOVE    SPA-GMN-TGYOUMU   (IDX) TO  XA02-GYOMUNM   (IDX)
       *
@@ -2537,6 +2564,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
            END-EVALUATE
       *
            MOVE    SPACE                TO  XAID1
+           INITIALIZE                       XAID1
            MOVE    SPA-XAIDCD           TO  XAID1-ID1CODE
            MOVE    WRK-XAIDMSG          TO  XAID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -2573,6 +2601,49 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-3003-HOSPNUM
            END-EVALUATE
       *
            MOVE    SPACE                TO  XAID2
+           INITIALIZE                       XAID2
+      *
+           IF    ( SPA-MW      =   SPA-GINBEE )
+      *
+               MOVE    ZERO                TO  CNT-MONPE
+      *
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL ( IDX     >   SPA-GMN-MAX )
+      *
+                   MOVE    ZERO            TO  WRK-RENNUM
+                                               WRK-SHORI-RENNUM
+                   IF    ( SPA-GMN-RENNUM  NOT =   ZERO )
+                       MOVE    SPA-GMN-TRENNUM (IDX)
+                                       TO  WRK-RENNUM
+                   END-IF
+      *
+                   IF    ( SPA-GMN-SHORI-RENNUM
+                                       NOT =   ZERO )
+                       MOVE    SPA-GMN-TSHORI-RENNUM (IDX)
+                                       TO  WRK-SHORI-RENNUM
+                   END-IF
+      *
+                   IF    ( SPA-NAI-TTBL-GROUP (IDX)
+                                       =   SPA-NAI-TBL-GROUP )
+                     AND ( SPA-NAI-TTBL-UUID (IDX)
+                                       =   SPA-GMN-TBL-UUID )
+                     AND ( WRK-RENNUM  =   SPA-GMN-RENNUM )
+                     AND ( WRK-SHORI-RENNUM
+                                       =   SPA-GMN-SHORI-RENNUM )
+                     AND ( SPA-NAI-TAPI (IDX)    NOT =   "1" )
+                       COMPUTE CNT-MONPE = CNT-MONPE   +   1
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( CNT-MONPE        >   ZERO )
+                   MOVE    "T"          TO  XAID2-B10-VISIBLE
+               ELSE
+                   MOVE    "F"          TO  XAID2-B10-VISIBLE
+               END-IF
+           ELSE
+               MOVE    "T"              TO  XAID2-B10-VISIBLE
+           END-IF
+      *
            MOVE    SPA-XAIDCD2          TO  XAID2-ID1CODE
            MOVE    WRK-XAIDMSG          TO  XAID2-ID1MSG
       *

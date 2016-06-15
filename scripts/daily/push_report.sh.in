@@ -1,0 +1,63 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+#----------------------------------------------------------------------#
+#       arguments
+#       1:data file name
+#       2:hospnum
+#----------------------------------------------------------------------#
+
+MONPUSHEVENT="/usr/lib/panda/bin/monpushevent"
+
+DATA_FILE_BASE=$1
+HOSPNUM=$2
+DATA_FILE_FULL=${MCP_TEMPDIR}/${DATA_FILE_BASE}
+
+RECFILE=push_print001.rec
+RECDIR=${RECORDDIR}
+
+if [ -e ${SITERECORDDIR}/${RECFILE} ]; then
+  RECDIR=${SITERECORDDIR}
+elif [ -e ${PATCHRECORDDIR}/${RECFILE} ]; then
+  RECDIR=${PATCHRECORDDIR}
+fi
+
+LOG=${LOGDIR}/${HOSPNUM}$(basename ${0%.*}).log
+LOGGZ=${LOG}.gz
+
+[ -e ${LOG} ] && rm ${LOG}
+echo >> ${LOG}
+echo $(date +"%Y-%m-%d %H:%M:%S") $(printf "[%s]" "$@") >> ${LOG}
+
+
+echo ${MONPUSHEVENT} ${RECDIR}/${RECFILE} ${DATA_FILE_FULL}  >> ${LOG} 2>&1
+${MONPUSHEVENT} ${RECDIR}/${RECFILE} ${DATA_FILE_FULL}  >> ${LOG} 2>&1
+cat ${DATA_FILE_FULL}  >> ${LOG} 2>&1
+
+[ -e ${DATA_FILE_FULL} ] && rm ${DATA_FILE_FULL}
+
+
+if [ -f ${LOGGZ} ];  then
+    if [ $(stat -c "%s" ${LOGGZ}) -ge 5242880 ] ; then
+    mv ${LOGGZ}  ${LOGGZ}.0
+    for NUM in $(seq 5 -1 1)
+    do
+      NEWLOG="${LOGGZ}.${NUM}"
+      NUM=$(expr ${NUM} - 1)
+      OLDLOG="${LOGGZ}.${NUM}"
+      echo mv ${OLDLOG} ${NEWLOG}
+      mv ${OLDLOG} ${NEWLOG} 2>/dev/null
+    done
+    fi
+fi
+
+gzip -c  ${LOG} >> ${LOGGZ}
+[ -e ${LOG} ] && rm ${LOG}

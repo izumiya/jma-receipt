@@ -73,6 +73,7 @@ data	{
 db "xml2" {
  xml_medicalsetv2req;
  xml_medicalsetv2res;
+ rp_medication_note;
 };
 
 #include "orcadb.inc"

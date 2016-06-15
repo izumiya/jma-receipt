@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * ﾆ�ｰ衙ｸｽ爭�･ｻ･ﾗ･ﾈ･ｽ･ﾕ･ﾈ｡ﾊJMA standard receipt software｡ﾋ
+      * 日医標準レセプトソフト（JMA standard receipt software）
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -15,10 +15,15 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-        02  XAID2.
-            03  XAID2-FIXED1.
-              04  XAID2-B10-VISIBLE  PIC X(01).
-              04  XAID2-ID1CODE.
-                05  XAID2-VALUE  PIC X(10).
-              04  XAID2-ID1MSG.
-                05  XAID2-VALUE  PIC X(70).
+      ******************************************************************
+      *    ＡＰＩリクエスト帳票情報    COPY (CPFORMDATAGETV2REQ.INC)
+      ******************************************************************
+       01  XML-FDGREQ.
+           03  FDGREQ-CONTEXT          PIC S9(9)   BINARY.
+           03  FDGREQ-OBJECT           PIC X(8).
+           03  FDGREQ-MODE             PIC S9(9)   BINARY.
+           03  FDGREQ-RECORDNAME       PIC X(128).
+      *
+           03  FDGREQ-DATA.
+               05  FDGREQ-DATAID       PIC X(80).
+               05  FDGREQ-OFFSET       PIC X(10).

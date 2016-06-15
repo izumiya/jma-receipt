@@ -1,0 +1,27 @@
+xml_formdatagetv2res {
+	context	int;
+	object	object;
+	mode	int;
+	recordname	varchar(128);
+	data {
+		Information_Date 		varchar(10);
+		Information_Time 		varchar(08);
+		Api_Result	     		varchar(04);
+		Api_Result_Message 		varchar(100);
+		Report_ID				varchar(20);
+		Report_Name				varchar(100);
+		Print_Date				varchar(10);
+		Print_Time				varchar(08);
+		Patient	{
+			Id	 				varchar(20);
+			Name 				varchar(50);
+			KanaName  			varchar(50);
+			BirthDate 			varchar(10);
+			Sex					varchar(1);
+		};
+		Perform_Date			varchar(10);
+		Data_ID					varchar(80);
+		Report_Data				varchar(20000)[10];
+		Offset					varchar(10);
+	};
+};

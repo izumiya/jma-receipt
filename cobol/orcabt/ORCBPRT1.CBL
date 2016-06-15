@@ -54,6 +54,11 @@
                                                        SEQUENTIAL 
                                    FILE    STATUS  IS  STS-PRT.
       *
+      *    PUSH用データ
+           SELECT  PUSH-FILE       ASSIGN  PUSHPARA
+                                   ORGANIZATION    IS  SEQUENTIAL 
+                                   FILE    STATUS  IS  STS-PUSH.
+      *
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -82,28 +87,33 @@
       *  01.01.02  ADD END
            03  PRT-PRTDATA         PIC X(20000).
       *
+      *    PUSH用データ
+       FD  PUSH-FILE.
+           COPY    "CPPUSHPRINT001.INC".
+      *
       *    エラーファイル
        FD  RECEERR-FILE.
        01  RECEERR-REC             PIC X(200). 
       *
        WORKING-STORAGE             SECTION.
 grpsys*
-grpsys COPY    "COMMON-SPA".
+grpsys     COPY    "COMMON-SPA".
+      *
+           COPY    "ENUM-VALUE".
       *
       *    印刷用データ 名称領域 
            COPY    "CPCOMMONPRT.INC".
            COPY    "CPASGNPARA.INC".
+           COPY    "CPASGNPARA.INC"    REPLACING //ASGNPARA//
+                                       BY        //PUSHPARA//.
       *
       *    エラーファイル 名称領域 
            COPY    "CPRECEERR.INC".
       *
-      *    システム領域
-       01  SYS-AREA.
-           03  SYS-TIME            PIC 9(08).    
-      *
       *    スパ領域
        01  STS-AREA.
            03  STS-PRT             PIC X(02).
+           03  STS-PUSH            PIC X(02).
            03  STS-RECEERR         PIC X(02).
       *
       *    フラグ領域
@@ -130,6 +140,9 @@ grpsys COPY    "COMMON-SPA".
            03  CNT-KETA            PIC 9(05).
            03  WRK-MOJISU          PIC 9(05).
       *  01.01.02  ADD END   
+           03  CNT-PUSH            PIC 9(05).
+      *
+       01  SYS-TIME                PIC X(08).
       *
       *    一時領域
        01  WRK-AREA.
@@ -161,6 +174,9 @@ grpsys COPY    "COMMON-SPA".
            03  WRK-PARA-HOSPNUM    PIC X(02).
            03  WRK-PARA-SHOWDIALOG PIC X(01).
       *
+       01  CONST-AREA.
+           03  CONST-PUSH-MAX              PIC 9(05)   VALUE 10.
+      *
       *    印刷用コンスタント領域 
            COPY    "CPPRTCONST.INC".          
       *
@@ -169,6 +185,9 @@ grpsys COPY    "COMMON-SPA".
        01  TPRT-REC.
            COPY    "CPPRTKANRI.INC"        REPLACING  //PRTKANRI//
                                            BY         //TPRT//.
+      *
+           COPY    "CPPUSHPRINT001.INC"    REPLACING  //PUSHP001-//
+                                           BY         //TPUSHP001-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -195,6 +214,9 @@ grpsys COPY    "COMMON-SPA".
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
       *
       *    monpe印刷データ泣き別れ修正サブ
            COPY  "CPORCSFIXREDDATA.INC".
@@ -260,8 +282,12 @@ grpsys COPY    "COMMON-SPA".
                                        SPA-AREA
                                        RECEERR
                                        TPRT-REC
+                                       TPUSHP001-REC
       *
-           ACCEPT  SYS-TIME            FROM    TIME     
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+           MOVE     SMCNDATE-TIME   TO  SYS-TIME
       *
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    LNK-PRTKANRI-RENNUM
@@ -303,6 +329,13 @@ grpsys COPY    "COMMON-SPA".
            END-IF
       *
            PERFORM 100-DBOPEN-SEC
+      *
+      *    SPA-MWの値を取得
+           INITIALIZE                      SGETTEMP-AREA
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           MOVE     SGETTEMP-MW        TO  SPA-MW
+      *
       *
            CALL    "ORCSENCODING"          USING
                                            MCPAREA
@@ -348,6 +381,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
        200-MAIN-SEC                SECTION.
       *
            IF    ( WRK-PARA-PRTFLG     =  "5" OR "6" )
+            OR   ( SPA-MW              =  SPA-GINBEE )
                PERFORM 2001-BIND-PRINT-SEC
            ELSE
                PERFORM 2001-COMMON-PRINT-SEC
@@ -442,32 +476,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
                COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
       *
-               INITIALIZE                  SGETTEMP-AREA
-               MOVE    HC01PARA-BASENAME
-                                       TO  SGETTEMP-BASENAMES (1)
-               CALL    "ORCSGETTEMP"       USING
-                                           SGETTEMP-AREA
-               MOVE    SGETTEMP-FULLNAMES (1)
-                                       TO  ASGNPARA
-               MOVE    SGETTEMP-ST     TO  ASGNPARA-ST
-      *
-               OPEN    OUTPUT              PRT-FILE
-      *
-      *        印刷ＤＢ編集処理
-               PERFORM 900-PRTDATA-SELECT-SEC
-               PERFORM                     UNTIL   FLG-PRTDATA  =   1
-                                           OR      FLG-END      =   1
-                   PERFORM 2001-PRTDATA-PRINT-SEC
-                   PERFORM 900-PRTDATA-FET-SEC
-               END-PERFORM    
-      *
-               MOVE    "tbl_prtdata"       TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
-      *
-               CLOSE   PRT-FILE
-      *
-               PERFORM 210-PRINT-SEC
+               IF    ( SPA-MW              =   SPA-GINBEE )
+                AND  ( PRTKANRI-SHELLID    =   "API" )
+                    IF    ( CNT-PUSH       <   CONST-PUSH-MAX )
+                        PERFORM 20011-PUSH-REPORT-SEC
+                    END-IF
+               ELSE
+                    PERFORM 20011-BIND-PRINT-SEC
+               END-IF
       *
                IF    ( TPRT-PRTFLG    =    "D" )
                    PERFORM 2003-PRTKANRI-DEL-SEC
@@ -479,8 +495,119 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
            END-PERFORM                                
       *
+           IF    ( CNT-PUSH        >   ZERO )
+      *
+               PERFORM 20012-PUSH-REPORT-SEC
+      *
+           END-IF
+      *
            .
        2001-BIND-PRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *   PUSH情報編集処理
+      *****************************************************************
+       20011-PUSH-REPORT-SEC           SECTION.
+      *
+      *    PUSH分はカウントから除外
+      *    ADD     1                   TO  CNT-OUT
+      *
+           ADD     1                   TO  CNT-GROUP
+           ADD     1                   TO  CNT-PUSH
+      *
+           MOVE    PRTKANRI-PRTNM  TO  TPUSHP001-GROUPID (CNT-PUSH)
+           MOVE    PRTKANRI-TITLE  TO  TPUSHP001-GROUPNAME (CNT-PUSH)
+           STRING  PRTKANRI-TBL-KEY    DELIMITED BY SPACE
+                   "#"                 DELIMITED BY SIZE
+                   PRTKANRI-TBL-UUID   DELIMITED BY SPACE
+                   "#"                 DELIMITED BY SIZE
+                   PRTKANRI-TBL-GROUP  DELIMITED BY SIZE
+                   "#"                 DELIMITED BY SIZE
+                   PRTKANRI-RENNUM     DELIMITED BY SIZE
+                   "#"                 DELIMITED BY SIZE
+                   PRTKANRI-SHORI-RENNUM
+                                       DELIMITED BY SIZE
+           INTO    TPUSHP001-DATAID (CNT-PUSH)
+           END-STRING
+      *
+           PERFORM 20021-PRTDATA-UPD-SEC
+      *
+           .
+       20011-PUSH-REPORT-EXT.
+           EXIT.
+      *****************************************************************
+      *   PUSH情報編集処理
+      *****************************************************************
+       20012-PUSH-REPORT-SEC           SECTION.
+      *
+           INITIALIZE                      SGETTEMP-AREA
+           MOVE    HC01PARA-BASENAME
+                                       TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  PUSHPARA
+           MOVE    SGETTEMP-ST         TO  PUSHPARA-ST
+      *
+           OPEN    OUTPUT                  PUSH-FILE
+      *
+           MOVE    TPUSHP001-REC       TO  PUSHP001-REC
+           MOVE    "print001"          TO  PUSHP001-EVENT
+           MOVE    LNK-PRTKANRI-OPID   TO  PUSHP001-OPID
+      *
+           WRITE   PUSHP001-REC
+      *
+           CLOSE   PUSH-FILE
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    "push_report.sh"    TO  SHELLTBL-NAME
+           MOVE    PUSHPARA (PUSHPARA-ST:)
+                                       TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           .
+       20012-PUSH-REPORT-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票毎印刷処理
+      *****************************************************************
+       20011-BIND-PRINT-SEC            SECTION.
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    HC01PARA-BASENAME
+                                   TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                   TO  ASGNPARA
+           MOVE    SGETTEMP-ST     TO  ASGNPARA-ST
+      *
+           OPEN    OUTPUT              PRT-FILE
+      *
+      *    印刷ＤＢ編集処理
+           PERFORM 900-PRTDATA-SELECT-SEC
+           PERFORM                     UNTIL   FLG-PRTDATA  =   1
+                                       OR      FLG-END      =   1
+               PERFORM 2001-PRTDATA-PRINT-SEC
+               PERFORM 900-PRTDATA-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_prtdata"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           CLOSE   PRT-FILE
+      *
+           PERFORM 210-PRINT-SEC
+      *
+           .
+       20011-BIND-PRINT-EXT.
            EXIT.
       *****************************************************************
       *    印刷処理
@@ -508,6 +635,9 @@ grpsys         MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
                    MOVE    SPA-CLIENT-SHOWDIALOG
                                        TO  SHELLTBL-ARG6
                END-IF
+               MOVE    WRK-PARA-SHELLID
+                                       TO  SHELLTBL-ARG7
+                        
                MOVE    SHELLTBL        TO  MCPDATA-REC
                MOVE    "SHELL"         TO  MCP-FUNC
                MOVE    "shell"         TO  MCP-TABLE
@@ -695,6 +825,40 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        2002-PRTDATA-DEL-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    印刷フラグセット処理
+      *****************************************************************
+       20021-PRTDATA-UPD-SEC          SECTION.
+      *
+      *    印刷フラグセット
+           INITIALIZE                      PRTDATA-REC
+           MOVE    PRTKANRI-RENNUM     TO  PRTDATA-RENNUM
+           MOVE    PRTKANRI-SHORI-RENNUM
+                                       TO  PRTDATA-SHORI-RENNUM
+           MOVE    PRTKANRI-TBL-GROUP  TO  PRTDATA-TBL-GROUP
+           MOVE    PRTKANRI-TBL-UUID   TO  PRTDATA-TBL-UUID
+           MOVE    PRTKANRI-TBL-KEY    TO  PRTDATA-TBL-KEY
+           MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
+      *
+           MOVE    "1"                 TO  PRTDATA-PRTFLG
+      *
+           MOVE    PRTDATA-REC         TO  MCPDATA-REC
+           MOVE    "tbl_prtdata"       TO  MCP-TABLE
+           MOVE    "upd1"              TO  MCP-PATHNAME
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC             =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    "印刷ＤＢの更新でエラーになりました"
+                                          TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+          END-IF
+      *
+           .
+      *
+       20021-PRTDATA-UPD-EXT.
+           EXIT.
       *****************************************************************
       *    印刷フラグセット処理
       *****************************************************************

@@ -61,7 +61,7 @@
            03  IDX                 PIC 9(04).
       *
        01  WRK-AREA.
-           03  WRK-PAGE            PIC ZZZZZZZZZ9.
+           03  WRK-PAGE            PIC ZZZZZZZZZZ.
       *     
        01  WRK-HEN-AREA.
            03  WRK-HENTIME.

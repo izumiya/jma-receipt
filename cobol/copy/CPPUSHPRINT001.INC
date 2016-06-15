@@ -1,6 +1,6 @@
       *******************************************************************
       * Project code name "ORCA"
-      * ﾆ�ｰ衙ｸｽ爭�･ｻ･ﾗ･ﾈ･ｽ･ﾕ･ﾈ｡ﾊJMA standard receipt software｡ﾋ
+      * 日医標準レセプトソフト（JMA standard receipt software）
       * Copyright(C) 2002 JMA (Japan Medical Association)
       *
       * This program is part of "JMA standard receipt software".
@@ -15,10 +15,14 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-        02  XAID2.
-            03  XAID2-FIXED1.
-              04  XAID2-B10-VISIBLE  PIC X(01).
-              04  XAID2-ID1CODE.
-                05  XAID2-VALUE  PIC X(10).
-              04  XAID2-ID1MSG.
-                05  XAID2-VALUE  PIC X(70).
+       01  PUSHP001-REC.
+           03  PUSHP001-EVENT                  PIC X(50).
+           03  PUSHP001-OPID                   PIC X(16).
+           03  PUSHP001-BODY.
+               05  PUSHP001-OCC                OCCURS 10.
+      *            グループＩＤ
+                   07  PUSHP001-GROUPID        PIC X(20).
+      *            グループ名称
+                   07  PUSHP001-GROUPNAME      PIC X(100).
+      *            データＩＤ
+                   07  PUSHP001-DATAID         PIC X(80).

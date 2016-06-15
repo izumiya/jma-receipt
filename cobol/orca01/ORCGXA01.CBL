@@ -631,7 +631,7 @@
            MOVE    SPA-GMN-EDPAGE      TO  LNK-XC01-ED-PAGE
            MOVE    SPA-XA01-MOTOPG     TO  LNK-XC01-MOTOPG
            MOVE    SPACE               TO  LNK-XC01-MODE
-      *          
+      *
            MOVE    LNK-XC01-AREA       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
@@ -1619,6 +1619,7 @@
        490-KAKUNIN-SEC            SECTION.
       *
            MOVE    SPACE               TO  XA99
+           INITIALIZE                      XA99
            MOVE    ZERO                TO  XA99-COUNT
            MOVE    WIDGET-INSENSITIVE  TO  XA99-B12-STATE
       *        
@@ -1663,8 +1664,10 @@
                        MOVE    JOB-ENDTIME(5:2)
                                                TO  WRK-SS
                        MOVE    WRK-HENTIME     TO  XA99-ENDTIME  (IDX)
-                       MOVE    JOB-UPDCNT      TO  WRK-PAGE
-                       MOVE    WRK-PAGE (5:6)  TO  XA99-PAGE     (IDX)
+                       IF    ( JOB-UPDCNT  NOT =   ZERO )
+                           MOVE    JOB-UPDCNT      TO  WRK-PAGE
+                           MOVE    WRK-PAGE (5:6)  TO  XA99-PAGE (IDX)
+                       END-IF
                        MOVE    JOB-YOBI        TO  XA99-ERRMSG   (IDX)
                        IF      JOB-ENDYMD      =   SPACE
                            MOVE    "処理中です"    TO  XA99-MSG
@@ -1968,6 +1971,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  XAID1
+           INITIALIZE                       XAID1
            MOVE    SPA-XAIDCD           TO  XAID1-ID1CODE
            MOVE    WRK-XAIDMSG          TO  XAID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -2004,6 +2008,10 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  XAID2
+           INITIALIZE                       XAID2
+      *
+           MOVE    "T"                  TO  XAID2-B10-VISIBLE
+      *
            MOVE    SPA-XAIDCD2          TO  XAID2-ID1CODE
            MOVE    WRK-XAIDMSG          TO  XAID2-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
