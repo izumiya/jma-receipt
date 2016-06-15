@@ -161,6 +161,11 @@ class Recedata < Receden_common
 
   end
 
+  def byoto_hokoku?
+
+    @value =~ /^1906[1234]/
+  end
+
 end
 
 class Infodata

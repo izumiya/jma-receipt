@@ -156,18 +156,22 @@ end
 
 class Tekiyo < Receden_common
 
-  attr_reader :zai,:srykbn,:hokatsu
+  attr_reader :zai,:srykbn
 
   def initialize(zaidata,check_level,info)
 
     @zai=Array.new
     @srykbn=""
     @hokatsu = false
+    @byoto_hokoku = false
 
     zaidata.each {|csv|
       case csv.rows[0]
       when "SI"
           @zai << csv_to_hash(info["SI"],csv)
+          if @zai.last["SRYCD"].byoto_hokoku?
+            @byoto_hokoku = true
+          end
       when "IY"
           @zai << csv_to_hash(info["IY"],csv)
       when "TO"
@@ -189,4 +193,13 @@ class Tekiyo < Receden_common
     end
 
   end
+  
+  def hokatsu?
+   @hokatsu
+  end
+  
+  def byoto_hokoku?
+   @byoto_hokoku
+  end
+  
 end

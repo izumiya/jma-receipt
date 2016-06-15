@@ -65,7 +65,7 @@ class Receden_check < Receden_common
 
   def select_tensu(hospnum,srycd,sryymd)
 
-    ret=Hash.new
+    ret=Hash.new("")
     sryymd=wtos(sryymd)
     if @cache_tensu.key?(srycd)
       @cache_tensu[srycd].each{|c|
@@ -87,7 +87,7 @@ class Receden_check < Receden_common
         STDERR.puts err.message
         data=nil
       end
-      if data != nil && data.size > 0
+      if data != nil && !data.empty?
         ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
         @cache_tensu[srycd] << ret
       end
@@ -98,7 +98,7 @@ class Receden_check < Receden_common
 
   def select_byomei(byomeicd)
 
-    ret=Hash.new
+    ret=Hash.new("")
     if @cache_byomei.key?(byomeicd)
       ret = @cache_byomei[byomeicd]
     else
@@ -109,7 +109,7 @@ class Receden_check < Receden_common
         STDERR.puts err.message
         data=nil
       end
-      if data != nil && data.size > 0
+      if data != nil && !data.empty?
         ret = Hash[data[0].map{|k,v|[k.upcase , v]}]
         @cache_byomei[byomeicd] = ret
       end
@@ -327,134 +327,7 @@ class Receden_check < Receden_common
       end
 
       if re["TOKKI"].value =~ /^(|(  |[0-9]{2})+)$/
-
-        if re["SRYYM"].wtos >= H210501
-          if rece.tokki.include?("17")
-            if [HONNIN,ROKUSAI,KAZOKU,KOREI7,KOUKI7].include?(rece.sbt.honkzk)
-            else
-               @errors.push("30110",rece,re,"TOKKI")
-            end
-          end
-
-          if rece.tokki.include?("18") || rece.tokki.include?("19")
-            if [HONNIN,ROKUSAI,KAZOKU,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)
-            else
-               @errors.push("30120",rece,re,"TOKKI")
-            end
-          end
-        end
-
-        if re["SRYYM"].wtos >= H210801
-          if rece.tokki.include?("22")
-            if [HONNIN,ROKUSAI,KAZOKU,KOREI7,KOUKI7].include?(rece.sbt.honkzk) &&
-               rece.sbt.nyugai == NYUIN
-            else
-               @errors.push("30130",rece,re,"TOKKI")
-            end
-          end
-
-          if rece.tokki.include?("23") || rece.tokki.include?("24")
-            if [HONNIN,ROKUSAI,KAZOKU].include?(rece.sbt.honkzk) &&
-               rece.sbt.nyugai == NYUIN
-            else
-               @errors.push("30140",rece,re,"TOKKI")
-            end
-          end
-        end
-
-        if re["SRYYM"].wtos >= H210501 &&
-           re["SRYYM"].wtos <  H210801
-          if rece.tokki.include?("22") || rece.tokki.include?("23") || rece.tokki.include?("24")
-            @errors.push("30150",rece,re,"TOKKI")
-          end
-        end
-
-        if re["SRYYM"].wtos >= H270101
-          if ((rece.tokki.include?("17") || rece.tokki.include?("18") || rece.tokki.include?("19")) && [KOREI7,KOUKI7,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)) ||
-             ( rece.tokki.include?("22") && [KOREI7,KOUKI7].include?(rece.sbt.honkzk))
-            myflg=false
-            rece.ko.each{|ko|
-              if ko["FTNNUM"].value =~ /^(51..601|51..602|52|54..501|54..601)/
-                myflg=true
-                break
-              end
-            }
-            if myflg == false
-              @errors.push("30160",rece,re,"TOKKI")
-            end
-          end
-        else
-          if ((rece.tokki.include?("17") || rece.tokki.include?("18") || rece.tokki.include?("19")) && [KOREI7,KOUKI7,KOREIIPN,KOUKIIPN].include?(rece.sbt.honkzk)) ||
-             ( rece.tokki.include?("22") && [KOREI7,KOUKI7].include?(rece.sbt.honkzk)) ||
-             ((rece.tokki.include?("22") || rece.tokki.include?("23") || rece.tokki.include?("24")) && [HONNIN,ROKUSAI,KAZOKU].include?(rece.sbt.honkzk))
-            myflg=false
-            rece.ko.each{|ko|
-              if ko["FTNNUM"].value =~ /^(51..601|51..602|52)/
-                myflg=true
-                break
-              end
-            }
-            if myflg == false
-              @errors.push("30160",rece,re,"TOKKI")
-            end
-          end
-        end
-
-        if re["SRYYM"].wtos >= H240301
-
-          if rece.sbt.ho_count == 1 &&
-            rece.sbt.ko_count >= 1 &&
-            rece.sbt.nyugai == NYUIN &&
-            rece.tokki.include?("96") &&
-            !(rece.ho.empty?) &&
-            (rece.ho[0]["DCKBN"].value == "2" || rece.ho[0]["DCKBN"].value == "3")
-
-            rece.ko.each{|ko|
-              if ko["TEN"].value != "0"
-                myfooter=sprintf("公費法別[%s]点数[%s]",ko["FTNNUM"].value[0,2],ko["TEN"].value)
-                @errors.push("30170",rece,re,"TOKKI",nil,myfooter)
-              end
-            }
-
-          end
-
-          if rece.sbt.nyugai == GAIRAI &&
-            rece.tokki.include?("96") &&
-            !(rece.ho.empty?) &&
-            (rece.ho[0]["DCKBN"].value == "2" || rece.ho[0]["DCKBN"].value == "3")
-
-            if rece.sbt.ko_count >= 1
-                @errors.push("30180",rece,re,"TOKKI")
-            end
-
-          end
-        end
-
-        if rece.sbt.honkzk != KOREIIPN && rece.tokki.include?("20")
-          @errors.push("31050",rece,re,"TOKKI")
-        end
-
-        if (rece.tokki.include?("02") && rece.tokki.include?("16")) ||
-           (rece.tokki.include?("02") && rece.tokki.include?("03")) ||
-           (rece.tokki.include?("16") && rece.tokki.include?("03"))
-          @errors.push("31060",rece,re,"TOKKI")
-        end
-
-        if ir["SSKKN"].value == SYAHO &&
-           (rece.sbt.honkzk == HONNIN || rece.sbt.honkzk == KOUHI ) &&
-           (rece.tokki.include?("21"))
-          @errors.push("31170",rece,re,"TOKKI")
-        end
-
-        if re["SRYYM"].wtos >= H210101 &&
-           rece.sbt.honkzk == KOREI7 &&
-           rece.tokki.include?("15")
-          @errors.push("31180",rece,re,"TOKKI")
-        end
-
-        if (rece.tokki & ["17","18","19","22","23","24"]).size >= 2
-          @errors.push("31280",rece,re,"TOKKI")
-        end
+        check_tokkijiko(ir, rece)
       else
         @errors.push("21650",rece,re,"TOKKI")
       end
@@ -544,7 +417,7 @@ class Receden_check < Receden_common
       check_format(rece,re)
       #---------------------------------------------------------------------------------------------------
 
-      check_sikaku(ir,rece)
+      check_shikaku(ir,rece)
       check_sy_tekiyo(ir,rece)
       check_sj(ir,rece)
       check_sai(ir,rece)
@@ -552,7 +425,7 @@ class Receden_check < Receden_common
     }
   end
 
-  def check_sikaku(ir,rece)
+  def check_shikaku(ir,rece)
 
     re=rece.re.first
 
@@ -913,8 +786,14 @@ class Receden_check < Receden_common
 
     rece.tekiyo.each{|tekiyo|
 
-      if tekiyo.hokatsu == true
+      if tekiyo.hokatsu?
         next
+      end
+
+      if tekiyo.byoto_hokoku?
+        if tekiyo.zai.size > 1
+          @errors.push("23412",rece,tekiyo.zai.last)
+        end
       end
 
       myzaikaisu=nil
@@ -978,7 +857,6 @@ class Receden_check < Receden_common
 
           case zai["RECID"].value
           when  "SI","IY","TO","CO"
-            tbl_tensu=select_tensu(@hospnum,zai["SRYCD"].value,re["SRYYM"].value)
             if tbl_tensu["TENSIKIBETU"].to_i == 7
               flg_minus = true
             else
@@ -986,11 +864,29 @@ class Receden_check < Receden_common
             end
 
             if zai["SRYCD"].hankaku[0,1] =~ /[1678]/
-              if tbl_tensu.empty?
+              if tbl_tensu.empty? && !(zai["SRYCD"].byoto_hokoku?)
                 @errors.push("33031",rece,zai,"SRYCD")
               else
                 case  zai["RECID"].value
                 when  "SI"
+                  if zai["SRYCD"].byoto_hokoku?
+                    if !(zai["SRYKBN"].value =~ /90|92/)
+                      if zai["SRYKBN"].value == ""
+                        @errors.push("23410", rece, zai, "SRYKBN")
+                      else
+                        @errors.push("23411", rece, zai, "SRYKBN")
+                      end
+                    end
+                    
+                    if zai["TEN"].value != "0"
+                      @errors.push("23420", rece, zai, "SRYKBN")
+                    end
+                    ["SURYO", "COMCD1", "COMMENT1", "COMCD2", "COMMENT2", "COMCD3", "COMMENT3"].each do |key|
+                      if zai[key].value != ""
+                        @errors.push("23430", rece, zai, key)
+                      end
+                    end
+                  end
 
                   case tbl_tensu["BYOSYOKBN"].to_i
                   when 1,2,6
@@ -1347,7 +1243,7 @@ class Receden_check < Receden_common
             end
 
             if flg_tensu_required == true
-              if ( @check_level == "1" )
+              if  @check_level == "1" && !tekiyo.byoto_hokoku?
                 if zai["RECID"].value == "IY" && tbl_tensu["TENSIKIBETU"].to_i == 7
                 else
                   if zai["TEN"].value.to_i == 0
@@ -1458,6 +1354,187 @@ class Receden_check < Receden_common
         @errors.push(["45350","45360","45640","45650"][i],rece,ko,"SSMONEY",nil,myfooter)
       end
     }
+
+  end
+
+  def check_tokkijiko(ir, rece)
+
+    re = rece.re.first
+
+    if re["SRYYM"].wtos >= H270101
+      if rece.tokki.any?{|t| ("23".."24").include?(t)}
+        @errors.push("30070",rece,re,"TOKKI")
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk))
+        if rece.tokki.any?{|t| ("26".."30").include?(t)}
+          @errors.push("30080",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
+        if rece.tokki.any?{|t| ("31".."35").include?(t)}
+          @errors.push("30090",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ KOREI7, KOUKI7 ].include?(rece.sbt.honkzk))
+        if rece.tokki.any?{|t| ("17").include?(t)}
+          @errors.push("30110",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ KOREIIPN, KOUKIIPN  ].include?(rece.sbt.honkzk))
+        if rece.tokki.any?{|t| ("18".."19").include?(t)}
+           @errors.push("30120",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ KOREI7, KOUKI7 ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN)
+        if rece.tokki.include?("22")
+           @errors.push("30130",rece,re,"TOKKI")
+        end
+      end
+
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^51..601/})
+        if [ KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk)
+          if rece.tokki.any?{|t| ("17".."19").include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+        if [ KOREI7, KOUKI7 ].include?(rece.sbt.honkzk)
+          if rece.tokki.any?{|t| ["17", "18", "19", "22"].include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+      end
+
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^(51..601|52|54)/})
+        if ([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN)
+          if rece.tokki.any?{|t| ("31".."35").include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+      end
+
+      if (rece.tokki & ["17", "18", "19", "22", "23", "24"]).size >= 2
+        @errors.push("31280",rece,re,"TOKKI")
+      end
+
+    else
+
+      if rece.tokki.any?{|t| ("26".."35").include?(t)}
+        @errors.push("30070",rece,re,"TOKKI")
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU, KOREI7, KOUKI7 ].include?(rece.sbt.honkzk))
+        if rece.tokki.any?{|t| ("17").include?(t)}
+          @errors.push("30110",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU, KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk))
+        if rece.tokki.any?{|t| ("18".."19").include?(t)}
+           @errors.push("30120",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU, KOREI7, KOUKI7 ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN)
+        if rece.tokki.include?("22")
+           @errors.push("30130",rece,re,"TOKKI")
+        end
+      end
+
+      if !([ HONNIN, ROKUSAI, KAZOKU].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
+        if rece.tokki.any?{|t| ("23".."24").include?(t)}
+           @errors.push("30140",rece,re,"TOKKI")
+        end
+      end
+
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^(51..601|51..602)/})
+        if [ KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk)
+          if rece.tokki.any?{|t| ("17".."19").include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+        if [ KOREI7, KOUKI7 ].include?(rece.sbt.honkzk)
+          if rece.tokki.any?{|t| ["17", "18", "19", "22"].include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+      end
+
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^(51..601|51..602|52)/})
+        if [ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk)
+          if rece.tokki.any?{|t| ("22".."24").include?(t)}
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+      end
+
+      if ( rece.tokki & ["17", "18", "19", "22", "26", "27", "28", "29", "30",
+        "31", "32", "33", "34", "35" ] ).size >= 2
+        @errors.push("31280",rece,re,"TOKKI")
+      end
+
+    end
+
+    if re["SRYYM"].wtos >= H210501 &&
+       re["SRYYM"].wtos <  H210801
+      if rece.tokki.any?{|t| ("22".."24").include?(t)}
+        @errors.push("30150",rece,re,"TOKKI")
+      end
+    end
+
+    if re["SRYYM"].wtos >= H240301
+      if rece.sbt.ho_count == 1 &&
+        rece.sbt.ko_count >= 1 &&
+        rece.sbt.nyugai == NYUIN &&
+        rece.tokki.include?("96") &&
+        !(rece.ho.empty?) &&
+        ["2", "3"].include?(rece.ho[0]["DCKBN"].value)
+
+        rece.ko.each{ |ko|
+          if ko["TEN"].value != "0"
+            @errors.push("30170",rece,re,"TOKKI",nil,
+             ("公費法別[%s]点数[%s]" % [ ko["FTNNUM"].value[0,2], ko["TEN"].value]) )
+          end
+        }
+      end
+    end
+
+    if re["SRYYM"].wtos >= H230301
+      if rece.sbt.ko_count >= 1 &&
+        rece.sbt.nyugai == GAIRAI  &&
+        rece.tokki.include?("96") &&
+        ["2", "3"].include?(rece.ho[0]["DCKBN"].value)
+        @errors.push("30180",rece,re,"TOKKI")
+      end
+    end
+
+    if !(rece.sbt.honkzk == KOREIIPN && re["BIRTHDAY"].wtos < S190402 )
+      if rece.tokki.include?("20")
+        @errors.push("31050",rece,re,"TOKKI")
+      end
+    end
+
+    if (rece.tokki.uniq & [ "02", "16" ]).size == 2 ||
+       (rece.tokki.uniq & [ "02", "03" ]).size == 2 ||
+       (rece.tokki.uniq & [ "16", "03" ]).size == 2
+      @errors.push("31060",rece,re,"TOKKI")
+    end
+
+    if ir["SSKKN"].value == SYAHO &&
+       (rece.sbt.honkzk == HONNIN || rece.sbt.honkzk == KOUHI ) &&
+       (rece.tokki.include?("21"))
+      @errors.push("31170",rece,re,"TOKKI")
+    end
+
+    if re["SRYYM"].wtos >= H210101 &&
+       rece.sbt.honkzk == KOREI7 &&
+       rece.tokki.include?("15")
+      @errors.push("31180",rece,re,"TOKKI")
+    end
 
   end
 

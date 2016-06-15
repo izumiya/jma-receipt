@@ -4,10 +4,12 @@ Encoding.default_external = "utf-8"
 
 class Receden_common_const
 
+  S190402 = "19440402"
   H200401 = "20080401"
   H210101 = "20090101"
   H210501 = "20090501"
   H210801 = "20090801"
+  H230301 = "2011001"
   H230401 = "20110401"
   H240301 = "20120301"
   H240401 = "20120401"
@@ -171,7 +173,6 @@ class Receden_common_const
   ["２９日の情報"                ,"DAY29"            ,N,   3,false,false],
   ["３０日の情報"                ,"DAY30"            ,N,   3,false,false],
   ["３１日の情報"                ,"DAY31"            ,N,   3,false,false]
-
 
   IYrecord=["レコード識別情報"            ,"RECID"            ,A,  2,true ,true],
   ["診療識別"                    ,"SRYKBN"           ,N,  2,false,false],
