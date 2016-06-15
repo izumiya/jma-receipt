@@ -81,6 +81,8 @@
       *  04.07.06    NACL-多々納  14/11/XX  保険組合せ・外来追加対応
       *                                     v2診療科レセ電廃止対応
       *  04.08.00    NACL-多々納  16/03/28  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/06/XX  自費金額対応
+      *                                     入院日付指定５０文字対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -241,6 +243,8 @@
            03  WRK-TEN             PIC 9(13)V9(05).
       *
            03  WRK-INPUTCD         PIC X(50).
+      *
+           03  WRK-KINGAKU         PIC 9(07).
       *
       *H26.10
            03  WRK-ERRCD           PIC X(03).
@@ -2186,6 +2190,33 @@
                MOVE    1               TO  FLG-SURYO
            END-IF
       *
+      *H28.6
+      *    自費金額入力対応
+           IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
+                                       =   "095"
+                                       OR  "096"  )
+             AND  (TNS-TEN             =   ZERO   )
+      *        数量を金額へ
+               MOVE    ZERO                TO  WRK-KINGAKU
+               INITIALIZE                      ORCSNUMAREA
+               MOVE    LF04-SURYO (IDX1 IDX2)
+                                           TO  SNUM-INX
+               CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+               IF     (SNUM-RC         NOT =   ZERO  )   OR
+                      (SNUM-MINKBN         =   "1"   )   OR
+                      (SNUM-SEISUU         >   7     )
+                   MOVE    SNUM-OUTNUM         TO  WRK-KINGAKU
+               ELSE
+                   MOVE    SNUM-OUTNUM         TO  WRK-KINGAKU
+               END-IF
+               MOVE    WRK-KINGAKU     TO  TBL-WKSRY-JIHIMONEY
+                                                     (TBL-MAX IDX-S)
+               MOVE    1               TO  FLG-SURYO
+               MOVE    1               TO  TBL-WKSRY-SRYSURYO
+                                                     (TBL-MAX IDX-S)
+           END-IF
+      *
            IF      FLG-SURYO           =   ZERO
       *        数量
                MOVE    ZERO                TO  WRK-SURYO
@@ -2655,10 +2686,12 @@
            INITIALIZE                      ORCSNDAYCHGAREA
            MOVE    SPA-SRYYMD          TO  ORCSNDAYCHG-SRYYMD
            MOVE    WRK-INPUTCD         TO  ORCSNDAYCHG-INPUTCD
-           MOVE    22                  TO  ORCSNDAYCHG-KETA
+     **    MOVE    22                  TO  ORCSNDAYCHG-KETA
+           MOVE    50                  TO  ORCSNDAYCHG-KETA
            CALL    "ORCSNDAYCHG"       USING   SPA-AREA
                                                ORCSNDAYCHGAREA
            IF      ORCSNDAYCHG-ERRCD   =   "0001"
+      *H28.6   ５0文字までとする
       *        ２２文字オーバーはエラーとする
                MOVE    "*/99"              TO  WRK-INPUTCD
                MOVE    1                   TO  WRK-KAISU
