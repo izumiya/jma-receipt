@@ -1379,7 +1379,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF    ( SPA-MW              NOT =   SPA-PANDA )
                MOVE    "F"                 TO  M96-B02-VISIBLE
-                                               M96-B09-VISIBLE
                                                M96-B10-VISIBLE
                                                M96-B11-VISIBLE
                                                M96-B12-VISIBLE
