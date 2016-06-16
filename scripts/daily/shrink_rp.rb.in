@@ -4,7 +4,7 @@ Encoding.default_external = "utf-8"
 
 require 'json'
 
-#euc-jp‚É•ÏŠ·‚·‚é‘O‚Ìutf-8‚Åƒf[ƒ^‚ğ®Œ`‚·‚é‚½‚ßA10%‚Ù‚ÇŒë·‚ğl—¶
+#euc-jpã«å¤‰æ›ã™ã‚‹å‰ã®utf-8ã§ãƒ‡ãƒ¼ã‚¿ã‚’æ•´å½¢ã™ã‚‹ãŸã‚ã€10%ã»ã©èª¤å·®ã‚’è€ƒæ…®
 MAX_BYTESIZE = 20000 * 0.9
 json_file_path = ARGV[0]
 
