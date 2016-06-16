@@ -4407,6 +4407,9 @@
       *    一般名で一般名を検索する
            MOVE    GENERIC-GENERICNAME TO  WRK-GENERICNAME
       *
+           MOVE    ZERO                TO  IDX2
+           MOVE    ZERO                TO  IDX3
+      *
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC
            MOVE    "tbl_genericname"   TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
@@ -4463,8 +4466,6 @@
            MOVE    WRK-PATH            TO  MCP-PATHNAME
            PERFORM 910-TENSU-SELECT-SEC
       *
-           MOVE    ZERO                TO  IDX2
-           MOVE    ZERO                TO  IDX3
            PERFORM
                UNTIL      (IDX         >    200 )   OR
                           (FLG-TENSU   =   1   )
