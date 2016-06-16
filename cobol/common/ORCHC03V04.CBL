@@ -1377,7 +1377,7 @@
       *    ¿ÇÎÅÆü
            PERFORM 3101-SRYYMD-HEN-SEC
       *    È¯¹ÔÆü
-           IF    ( ORCHC03-MOTOID      =    1 OR 3)
+           IF    ( ORCHC03-MOTOID      =    1 OR 3 OR 4 )
             AND  ( PARA-HAKKOUBIKBN    =   "1" )
                MOVE    SPA-SYSYMD          TO  WRK-SYMD
            ELSE
