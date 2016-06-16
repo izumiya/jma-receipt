@@ -260,6 +260,8 @@ grpsys     COPY    "COMMON-SPA".
       *
            PERFORM 100-DBOPEN-SEC
       *
+           PERFORM 800-MSTNAME-SEC
+      *
            INITIALIZE                  SGETTEMP-AREA
            MOVE    PARA-ERRFILE    TO  SGETTEMP-BASENAMES (1)
            CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
@@ -285,8 +287,6 @@ grpsys     COPY    "COMMON-SPA".
            END-IF
       *
            IF    ( FLG-END         =   ZERO )
-      *
-               PERFORM 800-MSTNAME-SEC
       *
       *        ステップ管理開始処理
                MOVE    "STS"           TO  SJOBKANRI-MODE
@@ -428,7 +428,6 @@ grpsys     COPY    "COMMON-SPA".
        200111-EDIT-PRF-HEAD-SEC        SECTION.
       *
            INITIALIZE          PRF-HEAD-AREA
-           PERFORM 800-MSTNAME-SEC
            STRING  "【"            DELIMITED   BY  SIZE 
                    WRK-MSTNAME     DELIMITED   SPACE
                    "】"            DELIMITED   BY  SIZE
@@ -668,8 +667,6 @@ grpsys                                 SPA-AREA
                CLOSE   MSTERR-FILE
            ELSE
                OPEN    OUTPUT              MSTERR-FILE
-      *
-               PERFORM 800-MSTNAME-SEC
       *
                INITIALIZE          MSTERR-REC
                STRING  WRK-MSTERR      DELIMITED   BY  SPACE
