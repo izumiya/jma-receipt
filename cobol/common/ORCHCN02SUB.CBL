@@ -279,6 +279,13 @@
       *                記載対象であるかを再チェック
                        PERFORM    210-TANKI-NAMECHK-SEC
       *
+                       IF     (NACCT-ZAIKAISU    =  ZERO)
+                          IF  (WRK-TANKI-KBN     =      "1")  AND
+                              (WRK-TANKI-KBN2    =      SPACE)
+      *                      入院基本料単位の入院日数カウント
+                              PERFORM    210-NYUIN-COUNT-SEC
+                          END-IF
+                       END-IF
                        IF     (NACCT-ZAIKAISU    NOT =  ZERO)
                           IF  (WRK-TANKI-KBN     =      "1")  AND
                               (WRK-TANKI-KBN2    =      SPACE)
