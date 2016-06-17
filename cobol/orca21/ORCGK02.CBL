@@ -113,6 +113,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/10/23  Ï¢Â³ÁÞÆþÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/06/XX  Ãæ¿´ÀÅÌ®¡Ê¿¢Æþ·¿¥«¥Æ¡¼¥Æ¥ë¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -5252,6 +5253,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                           (TNS-CDKBN-KBNNUM-EDA    =   00 )
                        MOVE    SRY-SRYCD (IDX2)
                                                TO  SPA-ACCT2-SRYCD-JYO2
+                   END-IF
+      *H28.6       Ãæ¿´ÀÅÌ®Ãí¼Í(¿¢Æþ·¿¥«¥Æ¡¼¥Æ¥ë¡Ë
+                   IF      SPA-SRYYMD          >=  "20160401"
+                       IF     (TNS-CDKBN-KBNNUM        =   006) AND
+                              (TNS-CDKBN-KBNNUM-EDA    =   00 )
+                           MOVE    SRY-SRYCD (IDX2)
+                                               TO  SPA-ACCT2-SRYCD-JYO2
+                       END-IF
                    END-IF
                END-IF
            END-IF

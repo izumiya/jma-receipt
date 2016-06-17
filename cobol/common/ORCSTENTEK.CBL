@@ -40,6 +40,7 @@
       *  04.05.00    NACL-多々納  09/11/30  日毎の表示順対応
       *  04.07.00    NACL-多々納  11/11/XX  同日再入院対応
       *  04.07.00    NACL-多々納  14/10/16  診療科編集対応
+      *  04.08.00    NACL-多々納  16/06/XX  中心静脈（植入型カテーテル）対応
       *****************************************************************
       *
       *
@@ -296,6 +297,10 @@
       *    動脈有無
            03  TBL-DOU-TBL             OCCURS   31.
                05  TBL-DOU-ARI         PIC 9(01).
+      *H28.6
+      *    中心静脈（植入型カテーテル）有無
+           03  TBL-CHU6-TBL             OCCURS   31.
+               05  TBL-CHU6-ARI         PIC 9(01).
       *
       *    当日分
        01  TBL-SYUKEI-AREA.
@@ -324,6 +329,11 @@
            02  TBL-SRYACT-REC         OCCURS  10.
            COPY    "CPSRYACT.INC"     REPLACING
                                      //SRY-// BY //TBL-SRY-//.
+      *
+      *H28.6
+      *    中心静脈注射(植入型カテーテル）
+       01  CON-CHUJYO6             PIC X(09)   VALUE   "130008510".
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -662,6 +672,13 @@
                                                        "130006120"
                        PERFORM 10015-DOU-HENSYU-SEC
                    END-IF
+      *H28.6       中心静脈注射(植入型カテーテル）
+                   IF      ORCSTEN-SRYYM       >=  "201604"
+                       IF      SRY-SRYCD (IDX2)        =   CON-CHUJYO6
+                           PERFORM 10016-CHU06-HENSYU-SEC
+                       END-IF
+                   END-IF
+      *
                END-PERFORM
            END-PERFORM
       *
@@ -1443,6 +1460,23 @@
            EXIT.
       *
       *****************************************************************
+      *    手技料（中心静脈注射(植入型カテーテル））チェック処理
+      *****************************************************************
+       10016-CHU06-HENSYU-SEC            SECTION.
+      *
+      *
+           PERFORM VARYING     IDX-D   FROM    1   BY  1
+                   UNTIL       IDX-D   >   31
+               IF      ACCT-DAY (1 IDX-D)  >   ZERO
+                   ADD     ACCT-DAY (1 IDX-D)  TO  TBL-CHU6-ARI (IDX-D)
+               END-IF
+           END-PERFORM
+      *
+           .
+       10016-CHU06-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    手技料編集処理
       *****************************************************************
        10013-SYUG-HENSYU-SEC            SECTION.
@@ -2055,6 +2089,17 @@
                        MOVE    1                   TO  FLG-OK
                    END-IF
                END-PERFORM
+      *!!
+      *H28.6
+      *        中心静脈注射(植入型カテーテル）算定あり
+               IF     (TBL-CHU6-ARI(IDX-D) >   ZERO )
+                   MOVE    ZERO            TO  FLG-OK
+      *            当日の中心静脈有
+                   IF      TBL-CHU-ARI (IDX-D) >   ZERO
+                       MOVE    9               TO  ORCSTEN-MIIVH-DAY
+                                                              (IDX-D)
+                   END-IF
+               END-IF
       *
                IF      FLG-OK              =   1
       *            今回対象あり
@@ -2127,6 +2172,7 @@
       *
       *    中心静脈あり
            IF      TBL-CHU-ARI (IDX-D) =   1
+             OR   (TBL-CHU6-ARI(IDX-D) =   1 )
                MOVE    1               TO  FLG-CHU-ARI
       *        他の点滴手技料を削除する
                PERFORM 49005-SYUGI-NASI-SEC
@@ -2173,6 +2219,7 @@
                       (TBL2-IVHFLG (IDY)       =   ZERO )
       *            当日の中心静脈点滴あり
                    IF      TBL-CHU-ARI (IDX-D) =   1
+                     OR   (TBL-CHU6-ARI(IDX-D) =   1 )
       *************IF      FLG-CHU-ARI         =   1
                        IF     (TBL-S-SEIBUTU (IDX-D)   =   1  )  AND
                               (TBL2-SEIBUTU  (IDY)     =   1  )
@@ -2253,6 +2300,7 @@
                           (TBL2-MADOKU  (IDY)      =   ZERO )  AND
                           (TBL2-IVHFLG  (IDY)      =   ZERO ))  OR
                          ( TBL-CHU-ARI (IDX-D)     =   1    )
+                    OR   ( TBL-CHU6-ARI (IDX-D)     =   1    )
                        MOVE    1                   TO  FLG-OK
                    END-IF
       *            加算
