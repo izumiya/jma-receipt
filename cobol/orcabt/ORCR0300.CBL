@@ -437,6 +437,8 @@
       *                                     個々に項目を設ける事に伴う修正。
       *                                     第３第４公費の括弧再掲記載対応
       *  04.08.06    NACL-藤原    16/04/01  平成２８年４月改正対応
+      *  04.08.07    NACL-藤原    16/06/20  診療行為データ用テーブル
+      *                                    （加算項目扱いの基本項目）を増やす
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1259,7 +1261,7 @@ grpsys     COPY    "COMMON-SPA".
        01  TBL-KOUI-SRYKBN12-AREA.
            03  TBL-KOUI-SRYKBN12-MAX                 PIC 9(02).
       *
-           03  TBL-KOUI-SRYKBN12-REC                 OCCURS  10.
+           03  TBL-KOUI-SRYKBN12-REC                 OCCURS  20.
                05  TBL-KOUI-SRYKBN12-KEY.
                    07  TBL-KOUI-SRYKBN12-HOSPNUM     PIC 9(2).
                    07  TBL-KOUI-SRYKBN12-SRYYM       PIC 9(06).

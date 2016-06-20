@@ -410,6 +410,8 @@
       *                                     （食事標準負担額追加）
       *  04.08.09    NACL-門脇    16/05/17  標準負担額区分の記載条件修正
       *  04.08.10    NACL-藤原    16/05/26  病床機能報告データ対応
+      *  04.08.11    NACL-藤原    16/06/20  診療行為データ用テーブル
+      *                                    （加算項目扱いの基本項目）を増やす
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1273,7 +1275,7 @@
        01  TBL-KOUI-SRYKBN13-AREA.
            03  TBL-KOUI-SRYKBN13-MAX                 PIC 9(02).
       *
-           03  TBL-KOUI-SRYKBN13-REC                 OCCURS  10.
+           03  TBL-KOUI-SRYKBN13-REC                 OCCURS  20.
                05  TBL-KOUI-SRYKBN13-KEY.
                    07  TBL-KOUI-SRYKBN13-HOSPNUM     PIC 9(2).
                    07  TBL-KOUI-SRYKBN13-SRYYM       PIC 9(06).
