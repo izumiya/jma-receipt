@@ -2111,6 +2111,9 @@
            PERFORM 200221-SAIHEN-HEN-SEC
       *
            MOVE    SPACE               TO  WRK-GENECHG-KBN
+      *    一般名記載とする
+           MOVE    "1"                 TO  SPA-GENERICFLG
+      *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
@@ -2166,7 +2169,7 @@
            END-IF
       *
       *    一般名記載区分編集
-           PERFORM 520-GENE-HEN-SYORI-SEC
+      **** PERFORM 520-GENE-HEN-SYORI-SEC
       *
       *    明細編集
            PERFORM 200222-MEDICAL-HEN-SEC
@@ -2594,6 +2597,7 @@
       *****************************************************************
        200222-MEDICAL-HEN-SEC          SECTION.
       *
+      *
            INITIALIZE                  MDCRES-MEDICAL-INF-G
            MOVE    ZERO                TO  IDY
            MOVE    ZERO                TO  IDZ
@@ -2704,7 +2708,7 @@
       *
       *    一般名記載
            IF      (SPA-COM-INPUTCD (IDX)(1:1) =   "6" )
-               IF     (SPA-COM-YOBI1 (IDX) (10:1) =   "1" )
+               IF     (SPA-COM-MEI-KBN (IDX)    =   "1"   )
                    PERFORM 9102-GENERICNAME-READ-SEC
                    IF      FLG-GENERICNAME     =   ZERO
                        MOVE    GENERIC-GENERICNAME
@@ -2714,7 +2718,7 @@
                                                              (IDY IDZ)
                    END-IF
                END-IF
-               IF     (SPA-COM-YOBI1 (IDX) (10:1) =   "3" )
+               IF     (SPA-COM-MEI-KBN (IDX)    =   "3"   )
       *            処方名称（一般）
                    MOVE    "3"            TO  MDCRES-PRSCRPT-GENERIC
                                                              (IDY IDZ)
@@ -2807,6 +2811,8 @@
            .
        2002221-MEISAI-HEN-EXT.
            EXIT.
+      *
+      *!!!!不使用
       *****************************************************************
       *    一般名記載編集処理
       *****************************************************************
@@ -2931,6 +2937,8 @@
            .
        2002221-GENE-HEN-EXT.
            EXIT.
+      *!!!!不使用　まで
+      *
       *****************************************************************
       *    剤編集処理
       *****************************************************************

@@ -1935,17 +1935,21 @@
            END-PERFORM
       *
       *
-      *H28.2
+      *H28.5
       *!!! ±¡³°ÅêÌôÌ¾¾ÎÊÑ´¹
-           IF     (SPA-NYUGAIKBN       =   "2" )
-             AND  (WRK-COM-SRYKBN (01) =   "21"
+      *??  IF     (SPA-NYUGAIKBN       =   "2" )
+           IF     (WRK-COM-SRYKBN (01) =   "21"
                                        OR  "22"
                                        OR  "23"
                                        OR  "14" )
-             AND  (SPA-SRYYMD          >=  "20160101")
-      *!¥·¥¹¥Æ¥à´ÉÍý¤ÎÀßÄê¤¢¤ê
-             AND  (SPA-GENERICFLG      =   "1"   )
-               PERFORM 51023-MEIHENKAN-SEC
+             AND  (SPA-SRYYMD          >=  "20160401")
+               IF      (SPA-GENERICFLG      =   "1"   )
+      *            °ìÈÌÌ¾µ­ºÜ
+                   PERFORM 51023-MEIHENKAN-SEC
+               ELSE
+      *            ÌÃÊÁµ­ºÜ
+                   PERFORM 51024-MEIHENKAN02-SEC
+               END-IF
            END-IF
       *!!!!
       *
@@ -2133,6 +2137,7 @@
            MOVE    LNK-SC98-YAKUZAI-AREA   TO  SPA-YAKUZAI-AREA
            IF      LNK-SC98-ERRMSG     NOT =   SPACE
                MOVE    LNK-SC98-ERRMSG     TO  LNK-ORCSC-ERRMSG
+               MOVE    LNK-ORCSC-ERRMSG    TO  SPA-ERRMSG2
            END-IF
            .
        51022-TENSUPLUS2-CHK-EXT.
@@ -2431,12 +2436,16 @@
                MOVE    WRK-COM-KOUHATUKBN (IDX-Z)
                                        TO  ORCSCGENN-TNS-KOUHATUKBN
                                                             (IDX-Z) 
-               MOVE    WRK-COM-IPN-KISAIKBN (IDX-Z)
+               MOVE    WRK-COM-TNSP-KISAIKBN (IDX-Z)
                                        TO  ORCSCGENN-IPN-KISAIKBN
                                                             (IDX-Z)
                MOVE    WRK-COM-YAKKAKJNCD (IDX-Z)
                                        TO  ORCSGETGE-YAKKAKJNCD
                                                             (IDX-Z)
+               MOVE    WRK-COM-IPN-NAME(IDX-Z)
+                                       TO  ORCSCGENN-HEN-NAME
+                                                            (IDX-Z)
+      *
                MOVE    IDX-Z           TO  ORCSCGENN-TBLMAX
            END-PERFORM
       *
@@ -2448,9 +2457,9 @@
                IF     (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6"  )
                    IF     (ORCSCGENN-NAME-KBN (IDX-Z)  =   "1"
                                                        OR  "3"  )
-                      AND (WRK-COM-IPN-NAME(IDX-Z) NOT =   SPACE)
+                      AND (ORCSCGENN-HEN-NAME(IDX-Z) NOT =   SPACE)
       *                °ìÈÌÌ¾
-                       MOVE    WRK-COM-IPN-NAME(IDX-Z)
+                       MOVE    ORCSCGENN-HEN-NAME(IDX-Z)
                                            TO  WRK-GMN-MEISYO(IDX-Z)
                        MOVE    "1"         TO  WRK-COM-MEI-KBN(IDX-Z)
                    ELSE
@@ -2464,6 +2473,25 @@
       *
            .
        510231-IPN-HEN-EXT.
+           EXIT.
+      *H28.4
+      *****************************************************************
+      *    ÅêÌô¤ÎÌÃÊÁµ­ºÜÊÔ½¸½èÍý
+      *****************************************************************
+       51024-MEIHENKAN02-SEC          SECTION.
+      *
+      *    ±¡Æâ
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL       IDX-Z       >   WRK-MAX
+      *
+               IF     (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "6"  )
+                   MOVE    WRK-COM-MEI-NAME(IDX-Z)
+                                           TO  WRK-GMN-MEISYO(IDX-Z)
+                   MOVE    SPACE           TO  WRK-COM-MEI-KBN(IDX-Z)
+               END-IF
+           END-PERFORM
+           .
+       51024-MEIHENKAN02-EXT.
            EXIT.
       *TEST
       *TEST

@@ -495,6 +495,10 @@
                        09  SPA-COM-IPN-NAME            PIC X(100).
                        09  SPA-COM-IPN-TANINAME        PIC X(02).
                        09  SPA-COM-MEI-KBN             PIC X(01).
+      *H28.5           °ìÈÌÌ¾µ­ºÜ¶èÊ¬
+                       09  SPA-COM-TNSP-KISAIKBN       PIC X(01).
+      *                ¸þÀº¿ÀÌô¶èÊ¬
+                       09  SPA-COM-PSY-CLASS           PIC X(01).
       *ver.4.7 ¤«¤éÍ½È÷
                        09  SPA-COM-YOBI1               PIC X(10).
                        09  SPA-COM-YOBI2               PIC X(10).

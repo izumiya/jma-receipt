@@ -493,6 +493,9 @@ ito   *
       *
                05  SPA-K09-SELNUM                 PIC 9(04).
                05  SPA-K09-DOSELNUM               PIC 9(04).
+      *H28.5
+      *一般名表示区分
+               05  SPA-K09-GENERICFLG             PIC X(01).
       *
       *!!      グループ医療機関
                05  SPA-K09-GRPHOSPNUM-AREA.

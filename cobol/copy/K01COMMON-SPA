@@ -704,9 +704,10 @@
            03  SPA-TEIGEN30-OK         PIC  9(01).
       *H27.6
       *    ¹³Àº¿ÀÌô£³¼ïÎàÅêÍ¿
-           03  SPA-PSYCHO-80           PIC  9(01).
-           03  SPA-PSYCHO-80CHK        PIC  9(01).
-           03  SPA-PSYCHO-80OK         PIC  9(01).
+           03  SPA-PSYCHO-80-AREA.
+               05  SPA-PSYCHO-80-OCC       OCCURS   10.
+                   07  SPA-PSY80-ARI       PIC 9(01).
+                   07  SPA-PSY80-KA        PIC X(02).
       *
       *(4.7¡¡¤ÏÍ½È÷»ÈÍÑ¡Ë
       *    Í½È÷

@@ -2593,12 +2593,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
       *!!!!
       *APIV3
-      *        APIの時、一般名記載分編集
+      *            APIの時、一般名記載分編集
                    IF     (FLG-SYORI           =   2  )
                      AND  (SPA-TERMID(1:4)     =   "API+")
                      AND  (SPA-COM-INPUTCD (IDX)(1:1) =   "6" )
-                     AND  (SPA-COM-YOBI1  (IDX)(10:1) =   "1"
-                                                      OR  "3" )
+                     AND  (SPA-COM-MEI-KBN(IDX)    =   "1"
+                                                   OR  "3"   )
                        PERFORM 2002-API-GENEHENSYU-SEC
                    END-IF
       *APIV3
@@ -2938,10 +2938,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        2002-API-GENEHENSYU-SEC              SECTION.
       *
       *    入力コメントに一般名区分編集
-           IF      SPA-COM-YOBI1  (IDX)(10:1) =   "1"
+           IF      SPA-COM-MEI-KBN(IDX)    =   "1"
                MOVE    "API+1"         TO  WKSRY-INPUTCOMENT (IDY)
            END-IF
-           IF      SPA-COM-YOBI1  (IDX)(10:1) =   "3"
+           IF      SPA-COM-MEI-KBN(IDX)    =   "3"
                MOVE    "API+3"         TO  WKSRY-INPUTCOMENT (IDY)
            END-IF
       *
@@ -3196,6 +3196,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                MOVE    "1"                 TO  WKSRYP-ADDKBN
                ADD     1                   TO  IDW
+               IF      IDW                 >   5
+                   GO      TO      30022-WKSRYACTPLUS-HEN-EXT
+               END-IF
+      *
       *        開始手技コード
                MOVE    SPA-COM-INPUTCD(IDW2)   TO  WKSRYP-SRYCD (IDW)
       *        手技点数
@@ -3212,6 +3216,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *        フィルム点数のみ
                IF      SPA-COM-FIRTEN-M(IDW2)  NOT =  ZERO
                    ADD     1                   TO  IDW
+                   IF      IDW                 >   5
+                       GO      TO      30022-WKSRYACTPLUS-HEN-EXT
+                   END-IF
+      *
                    MOVE    "1"                 TO  WKSRYP-ADDKBN
       *            その他器材点数（フィルム・酸素・窒素以外）
                    MOVE    SPA-COM-KIZTEN-M(IDW2)

@@ -3307,6 +3307,23 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H28.7 から
+               WHEN    "K877"
+                   STRING  "警告！"
+                           "通院・在宅精神療法等の減算規定に"
+                           "該当しません。"
+                           "算定コードを確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K878"
+                   STRING  "警告！"
+                           "通院・在宅精神療法等の減算規定に"
+                           "該当します。"
+                           "算定コードを確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"
