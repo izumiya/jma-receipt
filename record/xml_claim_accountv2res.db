@@ -259,7 +259,7 @@ xml_claim_accountv2res {
 # 終了日
 			A_ii_jj_19	varchar(10);
 # メモ
-			A_ii_jj_29	varchar(100);
+			A_ii_jj_20	varchar(100);
 		} [30];
 # 括りメモ
 		A_ii_15		varchar(1000);
