@@ -3702,11 +3702,8 @@
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                    ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-K
-      *                                        +   0.5
-      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
                END-IF
-      *        ¡ó¸º»»
+      *        ¡ó¸º»»¡ÊÏ«ºÒ¸º»»¤â·×»»¤¹¤ë¡Ë
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
                       (WRK-COM-SANFLG     (IDX)    =   ZERO)
@@ -3846,7 +3843,7 @@
                                                              (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
-                                               +   0.5
+                                               +   0.9
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    MOVE    WRK-TENSUKEI-9      TO  WRK-KSNTEN
       *
@@ -3855,7 +3852,7 @@
                                                              (IDX-SYU)
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
-                                               +   0.5
+                                               +   0.9
                    MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
                    MOVE    WRK-TENSUKEI-9      TO  WRK-KZMTEN
       *
@@ -4695,6 +4692,7 @@
                ELSE
       *            Àº¿À²Ê·ÑÂ³³°Íè»Ù±ç¡¦»ØÆ³ÎÁ
                    IF      WRK-COM-INPUTCD (IDX-Z) =   "180031410"
+                                                   OR  "180050230"
                        IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)  AND
                               (LNK-ORCSC-KEI-IDX        =   ZERO )
                            MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
