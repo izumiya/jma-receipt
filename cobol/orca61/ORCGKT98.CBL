@@ -33,6 +33,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/07/09  Ï«ºÒÅùÌ¾¾ÎÊÔ½¸ÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/03/01  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/09/XX  ¥»¥Ã¥ÈÆâÍÆÅ¸³«ÂÐ±þÂ¾
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/05/XX  °ìÈÌÌ¾¸¡º÷¡¦¸þÀº¿ÀÌôµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -83,6 +84,7 @@
            03  FLG-GENERICNAME         PIC 9(01).
            03  FLG-GENERICPRICE        PIC 9(01).
            03  FLG-TENSUPLUS           PIC 9(01).
+           03  FLG-PSYCHOTROPIC        PIC 9(01).
       *H27.9
            03  FLG-SET-SEL             PIC 9(01).
            03  FLG-SETKBN              PIC 9(01).
@@ -213,6 +215,8 @@
                05  WRK-TENSUS-GX2          PIC X(01).
            03  WRK-NAME                    PIC X(100).
            03  WRK-MSG-2                   PIC X(10).
+      *
+           03  WRK-PSY-MEI                 PIC X(04).
       *
       *H27.9
            03  WRK-SETTBL-G.
@@ -391,6 +395,11 @@
       *    ºÇÄãÌô²Á¥Þ¥¹¥¿
        01  GENERICPRICE-REC.
            COPY    "CPGENERICPRICE.INC".
+      *
+      *    ¸þÀº¿ÀÌôÀ®Ê¬¥³¡¼¥É
+       01  PSYCHOTROPIC-REC.
+           COPY    "CPPSYCHOTROPIC.INC".
+      *
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -2262,58 +2271,68 @@
                        INTO                    SPA-KT98-GMN-NAME(IDX)
                END-STRING
            END-IF
-      *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
-           IF     (TNS-SRYCD(1:1)      =   "6") AND
-                  (TNS-KOUHATUKBN      =   1  )
-                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
-                STRING  "¡Ú¸åÈ¯¡Û"    DELIMITED   BY  SIZE
-                        TNS-NAME      DELIMITED   BY  SIZE
-                               INTO        SPA-KT98-GMN-NAME(IDX)
-                END-STRING
+      *
+      *H28.6
+      *    ÌôºÞÌ¾¾Î
+           IF      TNS-SRYCD (1:1)     =   "6"
+      *        Ìô²Á´ð½à¥³¡¼¥É
+               MOVE    TNS-YAKKAKJNCD      TO  SPA-KT98-GMN-INPUTCD(IDX)
+      *        ÌôºÞÌ¾¾ÎÊÔ½¸
+               PERFORM 310212-YAKUZAI-NAME-SEC
            END-IF
+      *
       *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
-           IF     (TNS-SRYCD(1:1)      =   "6") AND
-                  (TNS-KOUHATUKBN      =   2  )
-                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
-                STRING  "¡Ú¸åÈ¯Í­¡Û"  DELIMITED   BY  SIZE
-                        TNS-NAME      DELIMITED   BY  SIZE
-                               INTO        SPA-KT98-GMN-NAME(IDX)
-                END-STRING
-           END-IF
+      *    IF     (TNS-SRYCD(1:1)      =   "6") AND
+      *           (TNS-KOUHATUKBN      =   1  )
+      *         MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+      *         STRING  "¡Ú¸åÈ¯¡Û"    DELIMITED   BY  SIZE
+      *                 TNS-NAME      DELIMITED   BY  SIZE
+      *                        INTO        SPA-KT98-GMN-NAME(IDX)
+      *         END-STRING
+      *    END-IF
+      *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
+      *    IF     (TNS-SRYCD(1:1)      =   "6") AND
+      *           (TNS-KOUHATUKBN      =   2  )
+      *         MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+      *         STRING  "¡Ú¸åÈ¯Í­¡Û"  DELIMITED   BY  SIZE
+      *                 TNS-NAME      DELIMITED   BY  SIZE
+      *                        INTO        SPA-KT98-GMN-NAME(IDX)
+      *         END-STRING
+      *    END-IF
       *H24.4
       *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
-           IF     (TNS-SRYCD(1:1)      =   "6") AND
-                  (TNS-KOUHATUKBN      =   7  )
-                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
-                STRING  "¡ÚÀèÈ¯Ìµ¡Û"  DELIMITED   BY  SIZE
-                        TNS-NAME      DELIMITED   BY  SIZE
-                               INTO        SPA-KT98-GMN-NAME(IDX)
-                END-STRING
-           END-IF
+      *    IF     (TNS-SRYCD(1:1)      =   "6") AND
+      *           (TNS-KOUHATUKBN      =   7  )
+      *         MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+      *         STRING  "¡ÚÀèÈ¯Ìµ¡Û"  DELIMITED   BY  SIZE
+      *                 TNS-NAME      DELIMITED   BY  SIZE
+      *                        INTO        SPA-KT98-GMN-NAME(IDX)
+      *         END-STRING
+      *    END-IF
       *H24.4
       *    Ìô²Á´ð½à¥³¡¼¥É
-           IF      TNS-SRYCD (1:1)     =   "6"
-               MOVE    TNS-YAKKAKJNCD      TO  SPA-KT98-GMN-INPUTCD(IDX)
+      *    IF      TNS-SRYCD (1:1)     =   "6"
+      *        MOVE    TNS-YAKKAKJNCD      TO  SPA-KT98-GMN-INPUTCD(IDX)
       *        °ìÈÌÌ¾µ­ºÜ¶èÊ¬
-               PERFORM 9101-TENSUPLUS-READ-SEC
+      *        PERFORM 9101-TENSUPLUS-READ-SEC
       *
-               MOVE    SPACE                TO  WRK-MSG-2
-               EVALUATE    TNSP-IPN-KISAIKBN
-                   WHEN    1
-                       MOVE    "¡ÌÈÌ¡Í"        TO  WRK-MSG-2
-                   WHEN    2
-                       MOVE    "¡Ì£²¡Í"        TO  WRK-MSG-2
-                   WHEN    3
-                       MOVE    "¡Ì½è¡Í"        TO  WRK-MSG-2
-               END-EVALUATE
-               MOVE    SPA-KT98-GMN-NAME(IDX)   TO  WRK-NAME
-               MOVE    SPACE                   TO  SPA-KT98-GMN-NAME
-                                                                (IDX)
-               STRING  WRK-MSG-2               DELIMITED   BY  SPACE
-                       WRK-NAME                DELIMITED   BY  SPACE
-                               INTO        SPA-KT98-GMN-NAME(IDX)
-               END-STRING
-           END-IF
+      *        MOVE    SPACE                TO  WRK-MSG-2
+      *        EVALUATE    TNSP-IPN-KISAIKBN
+      *            WHEN    1
+      *                MOVE    "¡ÌÈÌ¡Í"        TO  WRK-MSG-2
+      *            WHEN    2
+      *                MOVE    "¡Ì£²¡Í"        TO  WRK-MSG-2
+      *            WHEN    3
+      *                MOVE    "¡Ì½è¡Í"        TO  WRK-MSG-2
+      *        END-EVALUATE
+      *        MOVE    SPA-KT98-GMN-NAME(IDX)   TO  WRK-NAME
+      *        MOVE    SPACE                   TO  SPA-KT98-GMN-NAME
+      *                                                         (IDX)
+      *        STRING  WRK-MSG-2               DELIMITED   BY  SPACE
+      *                WRK-NAME                DELIMITED   BY  SPACE
+      *                        INTO        SPA-KT98-GMN-NAME(IDX)
+      *        END-STRING
+      **** END-IF
       *
       *    ¸¡ººÀµ¼°Ì¾¾Î
            IF     (TNS-SRYCD(1:1)      =   "1") AND
@@ -2412,6 +2431,93 @@
            .
        310211-KENSA-NAME-EXT.
            EXIT.
+      *H28.6
+      *****************************************************************
+      *    ÌôºÞÌ¾¾ÎÊÔ½¸½èÍý
+      *****************************************************************
+       310212-YAKUZAI-NAME-SEC             SECTION.
+      *
+      *    ¸þÀº¿ÀÌôÀ®Ê¬¥³¡¼¥É¸¡º÷
+           IF      TNS-YAKKAKJNCD      =   SPACE
+               MOVE    SPACE               TO  WRK-PSY-MEI
+           ELSE
+               PERFORM 9102-PSYCHOTROPIC-READ-SEC
+               MOVE    SPACE               TO  WRK-PSY-MEI
+      *        ¸þÀº¿ÀÌôÀßÄê
+               EVALUATE    PSYCHOTROPIC-CLASS
+               WHEN    "1"
+                   MOVE    "ÉÔ"            TO  WRK-PSY-MEI
+               WHEN    "2"
+                   MOVE    "¿ç"            TO  WRK-PSY-MEI
+               WHEN    "3"
+                   MOVE    "¤¦"            TO  WRK-PSY-MEI
+               WHEN    "4"
+                   MOVE    "Àº"            TO  WRK-PSY-MEI
+               END-EVALUATE
+           END-IF
+      *
+      *    °ìÈÌÌ¾µ­ºÜ¶èÊ¬
+           PERFORM 9101-TENSUPLUS-READ-SEC
+           MOVE    SPACE                TO  WRK-MSG-2
+           EVALUATE    TNSP-IPN-KISAIKBN
+               WHEN    1
+                   MOVE    "¡ÌÈÌ¡Í"        TO  WRK-MSG-2
+               WHEN    2
+                   MOVE    "¡Ì£²¡Í"        TO  WRK-MSG-2
+               WHEN    3
+                   MOVE    "¡Ì½è¡Í"        TO  WRK-MSG-2
+           END-EVALUATE
+      *
+      *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
+           EVALUATE    TNS-KOUHATUKBN
+           WHEN    1
+                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+                STRING  WRK-MSG-2          DELIMITED   BY  SPACE
+                        "¡Ú"
+                        WRK-PSY-MEI        DELIMITED   BY  SPACE
+                        "¸åÈ¯¡Û"           DELIMITED   BY  SIZE
+                        TNS-NAME           DELIMITED   BY  SIZE
+                               INTO        SPA-KT98-GMN-NAME(IDX)
+                END-STRING
+           WHEN    2
+                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+                STRING  WRK-MSG-2          DELIMITED   BY  SPACE
+                        "¡Ú"
+                        WRK-PSY-MEI        DELIMITED   BY  SPACE
+                        "¸åÈ¯Í­¡Û"         DELIMITED   BY  SIZE
+                        TNS-NAME           DELIMITED   BY  SIZE
+                               INTO        SPA-KT98-GMN-NAME(IDX)
+                END-STRING
+           WHEN    7
+                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+                STRING  WRK-MSG-2          DELIMITED   BY  SPACE
+                        "¡Ú"
+                        WRK-PSY-MEI        DELIMITED   BY  SPACE
+                        "ÀèÈ¯Ìµ¡Û"         DELIMITED   BY  SIZE
+                        TNS-NAME           DELIMITED   BY  SIZE
+                               INTO        SPA-KT98-GMN-NAME(IDX)
+                END-STRING
+           WHEN    OTHER
+               MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+               IF      WRK-PSY-MEI        =   SPACE
+                    STRING  WRK-MSG-2          DELIMITED   BY  SPACE
+                            TNS-NAME           DELIMITED   BY  SIZE
+                                   INTO        SPA-KT98-GMN-NAME(IDX)
+                   END-STRING
+               ELSE
+                    STRING  WRK-MSG-2          DELIMITED   BY  SPACE
+                            "¡Ú"
+                            WRK-PSY-MEI        DELIMITED   BY  SPACE
+                                  "¡Û"         DELIMITED   BY  SIZE
+                            TNS-NAME           DELIMITED   BY  SIZE
+                               INTO        SPA-KT98-GMN-NAME(IDX)
+                    END-STRING
+               END-IF
+           END-EVALUATE
+           .
+       310212-YAKUZAI-NAME-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ²èÌÌÊÔ½¸½èÍý
@@ -4436,6 +4542,9 @@
       *    °ìÈÌÌ¾¤Ç°ìÈÌÌ¾¤ò¸¡º÷¤¹¤ë
            MOVE    GENERIC-GENERICNAME TO  WRK-GENERICNAME
       *
+           MOVE    ZERO                TO  IDX2
+           MOVE    ZERO                TO  IDX3
+      *
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC
            MOVE    "tbl_genericname"   TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
@@ -4492,8 +4601,6 @@
            MOVE    WRK-PATH            TO  MCP-PATHNAME
            PERFORM 910-TENSU-SELECT-SEC
       *
-           MOVE    ZERO                TO  IDX2
-           MOVE    ZERO                TO  IDX3
            PERFORM
                UNTIL      (IDX         >    200 )   OR
                           (FLG-TENSU   =   1   )
@@ -5686,8 +5793,44 @@
            .
        9201-GENERICPRICE-READ-EXT.
            EXIT.
-      *H24.4
+      *H28.6
+      *****************************************************************
+      *    ¸þÀº¿ÀÌôÀ®Ê¬¥³¡¼¥É¸¡º÷½èÍý
+      *****************************************************************
+       9102-PSYCHOTROPIC-READ-SEC       SECTION.
       *
+           MOVE    SPACE               TO  PSYCHOTROPIC-REC
+           INITIALIZE                      PSYCHOTROPIC-REC
+           MOVE    TNS-YAKKAKJNCD      TO  PSYCHOTROPIC-CODE
+           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  PSYCHOTROPIC-YUKOEDYMD
+           MOVE    PSYCHOTROPIC-REC    TO  MCPDATA-REC
+           MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_psychotropic"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PSYCHOTROPIC-REC
+                   MOVE    ZERO                TO  FLG-PSYCHOTROPIC
+               ELSE
+                   INITIALIZE                  PSYCHOTROPIC-REC
+                   MOVE    1                   TO  FLG-PSYCHOTROPIC
+               END-IF
+           ELSE
+               INITIALIZE                  PSYCHOTROPIC-REC
+               MOVE    1                   TO  FLG-PSYCHOTROPIC
+           END-IF
+           MOVE    "tbl_psychotropic" TO  MCP-TABLE
+           MOVE    "key"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       9102-PSYCHOTROPIC-READ-EXT.
+           EXIT.
+      *H24.4
       *
       *****************************************************************
       *    ÆþÎÏ¥³¡¼¥É¥Þ¥¹¥¿¡¼ÆÉ¹þ
