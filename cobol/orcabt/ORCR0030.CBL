@@ -26439,7 +26439,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                 END-IF
       *
-                IF    RECE02-SRYYM        >=  "201604"
+                IF    RECE02-SRYYM        >=  "200804"
                   IF  (RECE02-HKNNUM       =   SPACE               )
                   AND (RECE02-KOHNUM(KOHFTN-IDX) =
                        "015" OR "016" OR "021" OR "024" OR "038" OR

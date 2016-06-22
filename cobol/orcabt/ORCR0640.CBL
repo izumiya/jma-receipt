@@ -25758,7 +25758,7 @@
                   END-IF
                 END-IF
       *
-                IF    RECE62-SRYYM        >=  "201604"
+                IF    RECE62-SRYYM        >=  "200804"
                   IF  (RECE62-HKNNUM       =   SPACE               )
                   AND (RECE62-KOHNUM(KOHFTN-IDX) =
                        "015" OR "016" OR "021" OR "024" OR "038" OR
