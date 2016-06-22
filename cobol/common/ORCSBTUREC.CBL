@@ -57,6 +57,8 @@
            03  FLG-PTHKNINF                PIC 9(01).
            03  FLG-SET                     PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
+           03  FLG-SRYKBN90                PIC 9(01).
+           03  FLG-SRYKBN92                PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -876,6 +878,8 @@
       *
       *
       *    入院料の取得
+           MOVE    ZERO                TO  FLG-SRYKBN90
+           MOVE    ZERO                TO  FLG-SRYKBN92
            INITIALIZE                      NYUINACCT-REC
            MOVE    LNK-BTUREC-HOSPNUM  TO  NACCT-HOSPNUM
            MOVE    LNK-BTUREC-PTID     TO  NACCT-PTID
@@ -889,6 +893,12 @@
                MOVE    "key17"             TO  MCP-PATHNAME
                PERFORM   910-NYUINACCT-READ-SEC
                PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                   IF   NACCT-SRYKBN  =   "90"
+                        MOVE   1           TO  FLG-SRYKBN90
+                   END-IF
+                   IF   NACCT-SRYKBN  =   "92"
+                        MOVE   1           TO  FLG-SRYKBN92
+                   END-IF
                    PERFORM    VARYING   IDX   FROM  1  BY  1
                      UNTIL    IDX       >    31
                          IF    NACCT-DAY(IDX)  =   1
@@ -910,6 +920,29 @@
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
+      *
+      *    入院会計のカレンダーがゼロの場合の対処
+           PERFORM   VARYING   IDX   FROM  1  BY  1
+            UNTIL   (IDX     >   31)
+                IF   (WRK-SANTEI-KBN(IDX)     =       SPACE)   AND
+                     (WRK-HKNCOMBI-DAY(IDX)   NOT =   ZERO)
+                    IF  (FLG-SRYKBN90    =   1)     AND
+                        (FLG-SRYKBN92    =   ZERO)
+                          MOVE   "90"       TO  WRK-SRYSKB(IDX)
+                          MOVE   "1"        TO  WRK-SANTEI-KBN(IDX)
+                    END-IF
+                    IF  (FLG-SRYKBN90    =   ZERO)     AND
+                        (FLG-SRYKBN92    =   1)
+                          MOVE   "92"       TO  WRK-SRYSKB(IDX)
+                          MOVE   "2"        TO  WRK-SANTEI-KBN(IDX)
+                    END-IF
+                    IF  (FLG-SRYKBN90    =   1)     AND
+                        (FLG-SRYKBN92    =   1)
+                          MOVE   "90"       TO  WRK-SRYSKB(IDX)
+                          MOVE   "1"        TO  WRK-SANTEI-KBN(IDX)
+                    END-IF
+                END-IF
+           END-PERFORM
       *
       *    短期滞在手術基本料２と３の入院料未算定日について取得
            INITIALIZE                             ORCSNYUINDAY-AREA
