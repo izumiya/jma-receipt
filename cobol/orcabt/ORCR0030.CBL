@@ -743,6 +743,9 @@
       *                                     のコメント対応
       *  04.08.25    NACL-門脇    16/05/20  減免・災害該当の対象チェック
       *  04.08.26    NACL-門脇    16/05/30  １９原爆一般の特殊計算対応
+      *  04.08.27    NACL-門脇    16/06/22  災害対応（記号あり、番号なしの場合）
+      *  04.08.28    NACL-門脇    16/06/22  主保険がないレセプトの全国公費一部
+      *                                     負担金記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3969,10 +3972,16 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        MOVE    3           TO  RECE02-RJNGAIKOHFTN (1)
                    ELSE
       *                記号・番号が不明のとき
-                       IF    ( RECE02-HKNNUM   NOT =   SPACE )
-                       AND   ( RECE02-KIGO         =   SPACE )
-                       AND   ( RECE02-NUM          =   SPACE )
+                       IF       RECE02-HKNNUM   NOT =   SPACE
+                         IF    (RECE02-KIGO         =   SPACE)
+                         AND   (RECE02-NUM          =   SPACE)
                            MOVE    1       TO  RECE02-RJNGAIKOHFTN (1)
+                         ELSE
+                           IF  (RECE02-KIGO     NOT =   SPACE)
+                           AND (RECE02-NUM          =   SPACE)
+                             MOVE  1       TO  RECE02-RJNGAIKOHFTN (1)
+                           END-IF
+                         END-IF
                        END-IF   
       *                老人保健の受給者番号が不明のとき
                        IF    ( RECE02-RJNHKNNUM
@@ -4190,6 +4199,17 @@ grpsys           PERFORM 900-DBSELECT-SEC
                             MOVE    97   TO      FLG-TOKKI
                             PERFORM   21045-TOKKI-HENSYU-SEC
                        END-EVALUATE
+                     END-IF
+                     IF  (RECE02-SRYYM        >= "201101")
+                     AND (RECE02-HKNNUM    NOT =  SPACE  )
+                     AND (RECE02-HKNJANUM  NOT =  SPACE  )
+                     AND (RECE02-KIGO      NOT =  SPACE  )
+                     AND (RECE02-NUM           =  SPACE  )
+                     AND (RECE02-RJNGAIKOHFTN(1) =  5    )
+                       MOVE  SPACE   TO   RECE02-KIGO
+                       MOVE  "0000000000"
+                                     TO   RECE02-OCR2(6:10)
+                       MOVE  "0"     TO   RECE02-OCR2(26:1)
                      END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE02-RJNGAIKOHFTN (1)
@@ -26416,6 +26436,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF   RECE02-KOHNUM(KOHFTN-IDX) =  "054"
                     MOVE  "1"   TO  RECE02-KISAIFLG(KOHFTN-IDX + 1)
                     MOVE  "1"   TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                  END-IF
+                END-IF
+      *
+                IF    RECE02-SRYYM        >=  "201604"
+                  IF  (RECE02-HKNNUM       =   SPACE               )
+                  AND (RECE02-KOHNUM(KOHFTN-IDX) =
+                       "015" OR "016" OR "021" OR "024" OR "038" OR
+                       "051" OR "052" OR "054" OR "079" OR
+                       "012" OR "025"                              )
+                  AND (TBL-HKNFTNDATA-JGNXXX(KOHFTN-IDX) = ZERO    )
+                    MOVE SPACE  TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                 END-IF
       *

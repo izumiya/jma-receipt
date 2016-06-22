@@ -10595,6 +10595,20 @@
                  MOVE   8       TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
                  MOVE  "³°Çñ¡ÊÁªÄêÎÅÍÜ¡Ë"
                                 TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+               WHEN   "190107490"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   12      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "³°Çñ¡ÊÆÃÄêÆþ±¡ÎÁ¤Î¸º³Û¡Ë"
+                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+               WHEN   "190107590"
+                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+                 MOVE   22      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+                 MOVE  "³°Çñ¡ÊÆÃÄêÆþ±¡ÎÁ¤Î¸º³Û¡Ë¡ÊÀº¿À¾ã³²Åù¤Î´µ¼Ô¡Ë"
+                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
              END-EVALUATE
            ELSE
             IF   RECE62-SRYYM      >=    "201004"

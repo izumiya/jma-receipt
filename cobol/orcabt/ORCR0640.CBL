@@ -716,6 +716,9 @@
       *                                     のコメント対応
       *  04.08.18    NACL-門脇    16/05/20  減免・災害該当の対象チェック
       *  04.08.19    NACL-門脇    16/05/30  １９原爆一般の特殊計算対応
+      *  04.08.20    NACL-門脇    16/06/22  災害対応（記号あり、番号なしの場合）
+      *  04.08.21    NACL-門脇    16/06/22  主保険がないレセプトの全国公費一部
+      *                                     負担金記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3674,10 +3677,16 @@
                        MOVE    3           TO  RECE62-RJNGAIKOHFTN (1)
                    ELSE
       *                記号・番号が不明のとき
-                       IF    ( RECE62-HKNNUM   NOT =   SPACE )
-                       AND   ( RECE62-KIGO         =   SPACE )
-                       AND   ( RECE62-NUM          =   SPACE )
+                       IF       RECE62-HKNNUM   NOT =   SPACE
+                         IF    (RECE62-KIGO         =   SPACE)
+                         AND   (RECE62-NUM          =   SPACE)
                            MOVE    1       TO  RECE62-RJNGAIKOHFTN (1)
+                         ELSE
+                           IF  (RECE62-KIGO     NOT =   SPACE)
+                           AND (RECE62-NUM          =   SPACE)
+                             MOVE  1       TO  RECE62-RJNGAIKOHFTN (1)
+                           END-IF
+                         END-IF
                        END-IF   
       *                老人保健の受給者番号が不明のとき
                        IF    ( RECE62-RJNHKNNUM
@@ -3914,6 +3923,17 @@
                             MOVE    97   TO      FLG-TOKKI
                             PERFORM   21013-TOKKI-HENSYU-SEC
                        END-EVALUATE
+                     END-IF
+                     IF  (RECE62-SRYYM        >= "201101")
+                     AND (RECE62-HKNNUM    NOT =  SPACE  )
+                     AND (RECE62-HKNJANUM  NOT =  SPACE  )
+                     AND (RECE62-KIGO      NOT =  SPACE  )
+                     AND (RECE62-NUM           =  SPACE  )
+                     AND (RECE62-RJNGAIKOHFTN(1) =  5    )
+                       MOVE  SPACE   TO   RECE62-KIGO
+                       MOVE  "0000000000"
+                                     TO   RECE62-OCR2(6:10)
+                       MOVE  "0"     TO   RECE62-OCR2(26:1)
                      END-IF
                    ELSE
                      MOVE    ZERO    TO   RECE62-RJNGAIKOHFTN (1)
@@ -11575,6 +11595,16 @@
                                          TO   WRK-DAY1-HYOKETU-TEN
                                                                (IDY)
                         END-IF                                          
+                     ELSE
+                        IF  RECE62-NYUINDAY-KBN(IDY)  =  "1"
+                           IF (NACCT-SRYKBN     =  "90"       )
+                           OR (NACCT-SRYCDTOTAL =   190799410 )
+                           OR (NACCT-SRYCDTOTAL =   190799510 )
+                              MOVE  903  TO  WRK-DAY1-NYUTENTTLKBN(IDY)
+                           ELSE
+                              MOVE  920  TO  WRK-DAY1-NYUTENTTLKBN(IDY)
+                           END-IF
+                        END-IF
                      END-IF
                    END-PERFORM
                  END-IF
@@ -11734,10 +11764,11 @@
                               END-IF
                             END-IF
       *                     *外泊
-                            IF  (WRK-DAY1(IDY)   NOT  =  ZERO)
-                            AND (NACCT-ZAITEN         =  ZERO)
-                            AND (NACCT-ZAISKBKBN      =  "2" )
-                            AND (NACCT-DAY(IDY)  NOT  =  ZERO)
+                            IF  ((WRK-DAY1(IDY)   NOT  =  ZERO  ) OR
+                                 (RECE62-NYUINDAY-KBN(IDY) = "1"))
+                            AND ( NACCT-ZAITEN         =  ZERO   )
+                            AND ( NACCT-ZAISKBKBN      =  "2"    )
+                            AND ( NACCT-DAY(IDY)  NOT  =  ZERO   )
                                MOVE   NACCT-DAY(IDY)  
                                             TO   WRK-DAY22(IDY) 
                                MOVE   WRK-DAY1-NYUTENTTLKBN(IDY)
@@ -13545,7 +13576,7 @@
                                      OR 12  OR 14         )  AND
                 (RECE62-SRYYM    <=    "201603"           ))
            OR  ((WRK-DAY22-NYUKHNRYO(IDY)      =  ZERO    )  AND
-                (SYUKEI-IDX   =   3  OR  8                )  AND
+                (SYUKEI-IDX   =   3  OR  8  OR  6  OR  7  )  AND
                 (RECE62-SRYYM    >=    "201604"           ))
       *
              MOVE     ZERO     TO    FLG-ARI
@@ -25724,6 +25755,17 @@
                   IF   RECE62-KOHNUM(KOHFTN-IDX) =  "054"
                     MOVE  "1"   TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                     MOVE  "1"   TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                  END-IF
+                END-IF
+      *
+                IF    RECE62-SRYYM        >=  "201604"
+                  IF  (RECE62-HKNNUM       =   SPACE               )
+                  AND (RECE62-KOHNUM(KOHFTN-IDX) =
+                       "015" OR "016" OR "021" OR "024" OR "038" OR
+                       "051" OR "052" OR "054" OR "079" OR
+                       "012" OR "025"                              )
+                  AND (TBL-HKNFTNDATA-JGNXXX(KOHFTN-IDX) = ZERO    )
+                    MOVE SPACE  TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                 END-IF
       *
