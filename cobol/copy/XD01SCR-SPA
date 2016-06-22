@@ -28,6 +28,9 @@
                05  SPA-GMN-NEXT                  PIC 9(04).
                05  SPA-GMN-CUR                   PIC 9(03).
                05  SPA-MAE-MOTOPG                PIC X(08).
+      *H28.6   ≈¡…º»÷πÊ
+               05  SPA-NAI-DENPNUM               PIC 9(07).
+      *
                05  SPA-GMN-AREA.
       *        ∏´Ω–ŒŒ∞Ë
                    07  SPA-GMN-PTNUM           PIC X(20).

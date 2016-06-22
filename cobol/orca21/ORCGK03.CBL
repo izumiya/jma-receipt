@@ -7089,6 +7089,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        削除
                    MOVE    3               TO  SPA-SYORI-FLG
            END-EVALUATE
+      *
            IF      SPA-GMN-USERPG      =   "1"
       *        ユーザプログラム実行画面表示へ
                PERFORM 49071-XD01-SYORI-SEC
@@ -7106,6 +7107,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-HKNCOMBINUM     TO  ORCSUSERCHK-HKNCOMBI
                    MOVE    SPA-DRCD            TO  ORCSUSERCHK-DRCD
                    MOVE    SPA-SYORI-FLG       TO  ORCSUSERCHK-SYORI-FLG
+      *H28.6
+      *            伝票番号
+                   MOVE    WRK-DENPNUM         TO  ORCSUSERCHK-DENPNUM
                    CALL    "ORCSUSERCHK"       USING
                                                ORCSUSERCHKAREA
                                                SPA-AREA

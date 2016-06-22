@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
+      *  04.08.00    NACL-多々納  16/06/22  伝票番号追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -245,6 +246,8 @@ grpsys*
            MOVE    ORCSUSERCHK-DRCD    TO  ORCSUSERPG-DRCD
       *    保険組合せ
            MOVE    ORCSUSERCHK-HKNCOMBI    TO  ORCSUSERPG-HKNCOMBI
+      *    伝票番号
+           MOVE    ORCSUSERCHK-DENPNUM     TO  ORCSUSERPG-DENPNUM
       *    処理・帳票名
            MOVE    SYS-9701-SYORINM    TO  ORCSUSERPG-SYORINM
       *    実行

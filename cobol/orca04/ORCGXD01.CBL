@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-多々納  06/02/14  MONFUNC 対応
+      *  04.08.00    NACL-多々納  16/06/22  伝票番号追加対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -181,6 +182,12 @@
       *    患者マスタ−
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
+      *
+      *H28.6
+      *    診療行為用共通パラメタ（伝票番号用）
+           COPY    "K01COMMON-SPA"  REPLACING
+                                     //SPA-// BY //WRK-SPA-//.
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -384,6 +391,12 @@
                    PERFORM 30012-SPA-HEN-SEC
                END-EVALUATE
            END-EVALUATE
+      *H28.6
+      *    伝票番号（Ｋ０３）のみ
+           IF      SPA-MAE-MOTOPG      =   "K03"
+               MOVE    SPA-WORK            TO  WRK-SPA-K01KYOUTU
+               MOVE    WRK-SPA-DENPNUM     TO  SPA-NAI-DENPNUM
+           END-IF
       *
       *    診療科初期編集
            MOVE    SPACE               TO  SYS-KEY
@@ -1423,6 +1436,11 @@
       *    プリンタ名
            MOVE    SPA-GMN-TPRTNM (IDX)
                                        TO  ORCSUSERPG-PRTNM
+      *H28.6
+      *    伝票番号
+           IF      SPA-MAE-MOTOPG      =   "K03"
+               MOVE    SPA-NAI-DENPNUM     TO  ORCSUSERPG-DENPNUM
+           END-IF
       *
            CALL    "ORCSUSERPG"        USING
                                        ORCSUSERPGAREA
@@ -1489,6 +1507,7 @@
       *
            MOVE    SPACE               TO  XD01
       *
+           INITIALIZE                      XD01
            MOVE    SPA-GMN-PTNUM       TO  XD01-PTNUM
            MOVE    SPA-GMN-NAME        TO  XD01-NAME
            MOVE    SPA-GMN-SEX         TO  XD01-SEX
@@ -1682,6 +1701,7 @@
        520-XD01IDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  XDID1
+           INITIALIZE                      XDID1
            EVALUATE    SPA-XDID1CD
                WHEN    "0101"
                    MOVE    "処理を実行します。よろしいですか？"

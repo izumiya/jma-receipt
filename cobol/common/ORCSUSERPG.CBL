@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
+      *  04.08.00    NACL-多々納  16/06/22  伝票番号追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -143,6 +144,8 @@ grpsys*
            MOVE    ORCSUSERPG-SYORINM  TO  SHELLTBL-ARG10
            MOVE    ORCSUSERPG-PRTNM    TO  SHELLTBL-ARG11
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG12
+      *    伝票番号
+           MOVE    ORCSUSERPG-DENPNUM  TO  SHELLTBL-ARG13
       *
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
