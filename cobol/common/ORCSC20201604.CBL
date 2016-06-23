@@ -2924,6 +2924,13 @@
              OR  (ORCSPSYCHO-COUNT (4) >=  3 )
       *         抗うつ薬(3)、抗精神薬(4)を３種類以上
                MOVE    1               TO  SPA-PSY80-ARI(IDX-80)
+               IF   ((ORCSPSYCHO-COUNT (3)  =  3 )
+                 AND (ORCSPSYCHO-COUNT (4)  <= 3 ))
+               OR   ((ORCSPSYCHO-COUNT (3)  <= 3 )
+                 AND (ORCSPSYCHO-COUNT (4)  =  3 ))
+      *          どちらかが３種類
+                   MOVE    2               TO  SPA-PSY80-ARI(IDX-80)
+               END-IF
            ELSE
                MOVE    ZERO            TO  SPA-PSY80-ARI(IDX-80)
            END-IF

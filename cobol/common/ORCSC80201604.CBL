@@ -4781,6 +4781,17 @@
                                                            (IDX-Z)
                    MOVE    "K878"          TO  SPA-ERRCD
                END-IF
+      *        Àº¿À²Ê·ÑÂ³³°Íè»Ù±ç¡¦»ØÆ³ÎÁ¤Î¸ºÅÀ
+               IF     (FLG-CHK-PSY         =   2 )
+                 AND  (WRK-COM-INPUTCD (IDX-Z) =   "180050230")
+      *            £³¼ïÎà¤Ç¤¢¤ì¤Ð¡¢¸º»»°Ê³°¤Î»»Äê²Ä
+                   MOVE    "K877"          TO  SPA-ERRCD
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                           (IDX-Z)
+                   MOVE    "1"             TO  WRK-COM-CUR
+                                                           (IDX-Z)
+               END-IF
            END-IF
            .
        30021-PSY-CHEKE-EXT.
