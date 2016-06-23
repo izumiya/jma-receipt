@@ -137,8 +137,8 @@
            03  WRK-IDX2            PIC 9(02).
            03  WRK-IDX3            PIC 9(03).
            03  WRK-WIDGET.
-               05  WRK-WIDGET1     PIC X(07).
-               05  WRK-WIDGET2     PIC 9(02).
+               05  WRK-WIDGET1     PIC X(06).
+               05  WRK-WIDGET2     PIC 9(03).
                05  WRK-WIDGET-FIL  PIC X(03). 
            03  WRK-HENFLG          PIC 9(01).
            03  WRK-YMD             PIC X(09). 
@@ -887,12 +887,12 @@
                GO      TO      420-CHKFLG-CHK-EXT
            END-IF
       *
-      *    処理スクリプトの存在チェック
-           PERFORM 3101-SCRIPT-CHECK-SEC
-      *
            MOVE    WRK-GMN-CUR         TO  SPA-GMN-CUR
            COMPUTE IDX     =   (WRK-IDX3  +   3)  /   4
            COMPUTE IDY     =    WRK-IDX3  -   (IDX    -   1)  *   4   
+      *
+      *    処理スクリプトの存在チェック
+           PERFORM 3101-SCRIPT-CHECK-SEC
       *
       *    次のカーソル位置指定
            IF      IDY                 <   3
