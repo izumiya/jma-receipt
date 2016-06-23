@@ -96,12 +96,20 @@
            03  WRK-EDDAY                   PIC 9(02).
            03  WRK-SHONUM                  PIC 9(03).
            03  WRK-GETUMATUYMD             PIC X(08).
+           03  WRK-NYUINYMD                PIC X(08).
+           03  WRK-SRYYMD.
+               05  WRK-SRYYMD-YM           PIC X(06).
+               05  WRK-SRYYMD-DD           PIC 9(02).
       *
        01  TSHONUM-AREA.
            03  TSHONUM-IDX                 PIC 9(03).
            03  TSHONUM-MAX                 PIC 9(03).
            03  TSHONUM-OCC                 OCCURS  31.
                05  TSHONUM-SHONUM          PIC 9(03).
+               05  TSHONUM-NYUINYMD        PIC X(08).
+      *
+       01  CONST-AREA.
+           03  CONST-H280401           PIC X(08)   VALUE "20160401".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -221,9 +229,15 @@
       *
                MOVE    TSHONUM-SHONUM (TSHONUM-IDX)
                                    TO  WRK-SHONUM
+               MOVE    TSHONUM-NYUINYMD (TSHONUM-IDX)
+                                   TO  WRK-NYUINYMD
       *
       *        日数取得処理
-               PERFORM 2100-NISSU-GET-SEC
+               IF    ( RSITUSAN-SRYYM >=   CONST-H280401 (1:6) )
+                   PERFORM 2101-NISSU-GET-SEC
+               ELSE
+                   PERFORM 2100-NISSU-GET-SEC
+               END-IF
       *
            END-PERFORM
       *
@@ -443,7 +457,8 @@
                    UNTIL ( IDX3    >   31 )
       *
                IF    ( FLG-HKNCOMBIDAY (IDX3)  >   ZERO )
-                AND  ( FLG-NYUINRYODAY (IDX3)  >   ZERO )
+                AND  ( FLG-NYUINRYODAY (IDX3)  >   ZERO
+                 OR    RSITUSAN-SRYYM          >=  CONST-H280401 (1:6))
                 AND  ( FLG-SHONUMDAY   (IDX3)  >   ZERO )
       *
                    MOVE    FLG-SHONUMDAY (IDX3)
@@ -480,6 +495,9 @@
                    COMPUTE TSHONUM-MAX =   TSHONUM-MAX +   1
                    MOVE    WRK-SHONUM
                                    TO  TSHONUM-SHONUM (TSHONUM-MAX)
+                   PERFORM 900-PTNYUINRRK-KEY52-SEL-SEC
+                   MOVE    PTNYUINRRK-NYUINYMD
+                                   TO  TSHONUM-NYUINYMD(TSHONUM-MAX)
       *
                END-IF
            END-IF
@@ -542,6 +560,49 @@
       *
            .
        2100-NISSU-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    日数取得処理
+      *****************************************************************
+       2101-NISSU-GET-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  WRK-NISSU
+      *
+           IF    ( WRK-NYUINYMD    NOT =   SPACE )
+            AND  ( WRK-NYUINYMD (1:6)  <   RSITUSAN-SRYYM )
+               MOVE    WRK-NYUINYMD    TO  WRK-STYMD
+               MOVE    WRK-TUKISTYMD   TO  WRK-EDYMD
+               PERFORM 800-NISSU-SEC
+               COMPUTE WRK-NISSU = WRK-NISSU1
+           END-IF
+      *
+           MOVE    RSITUSAN-SRYYM      TO  WRK-SRYYMD
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >       31 )
+      *
+               MOVE    IDX1            TO  WRK-SRYYMD-DD
+      *
+               IF    ( WRK-NYUINYMD    NOT =   SPACE )
+                 AND ( WRK-NYUINYMD       <=   WRK-SRYYMD )
+      *
+                   COMPUTE WRK-NISSU   =   WRK-NISSU   +   1
+      *
+                   IF    ( FLG-SHONUMDAY (IDX1)    =   WRK-SHONUM )
+                       IF   ( FLG-HKNCOMBIDAY (IDX1)  =   1 )
+                           IF    ( WRK-NISSU   <=  14 )
+                               MOVE    "1" TO  RSITUSAN-DAY (IDX1)
+                           ELSE
+                               MOVE    "2" TO  RSITUSAN-DAY (IDX1)
+                           END-IF
+                       END-IF
+                  END-IF
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       2101-NISSU-GET-EXT.
            EXIT.
       *****************************************************************
       *    自院歴より日数編集処理
@@ -695,9 +756,9 @@
        800-HIZUKE-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    期間算出処理
+      *    日数処理
       *****************************************************************
-       800-KIKAN-CALC-SEC                  SECTION.
+       800-NISSU-SEC                       SECTION.
       *
            INITIALIZE                      WRK-NISSU1
                                            WRK-NISSU2
@@ -710,16 +771,14 @@
            CALL    "ORCSDAY"               USING
                                            STS-AREA-DAY
                                            LNK-DAY5-AREA
-           IF    ( STS-DAY-RC1     NOT =   ZERO )
-               MOVE     07             TO  RSITUSAN-RC
-               GO  TO                      800-KIKAN-CALC-EXT
+           IF    ( STS-DAY-RC1         =   ZERO )
+               MOVE    LNK-DAY5-NISSU1 TO  WRK-NISSU1
+               MOVE    LNK-DAY5-NISSU2 TO  WRK-NISSU2
            END-IF
       *
-           MOVE    LNK-DAY5-NISSU1     TO  WRK-NISSU1
-           MOVE    LNK-DAY5-NISSU2     TO  WRK-NISSU2
       *
            .
-       800-KIKAN-CALC-EXT.
+       800-NISSU-EXT.
            EXIT.
       *****************************************************************
       *    カレンダー処理
@@ -739,6 +798,36 @@
       *
            .
        800-CALENDAR-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY52-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    RSITUSAN-PTID       TO  PTNYUINRRK-PTID
+           MOVE    WRK-GETUMATUYMD     TO  PTNYUINRRK-NYUINYMD
+           MOVE    WRK-SHONUM          TO  PTNYUINRRK-SHONUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key52"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk" TO     MCP-TABLE
+           MOVE    "key52"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSE-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY52-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
