@@ -23152,13 +23152,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      END-IF
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
-                       IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
-                                     = RECE02-FTNMONEY(KOHFTN-IDX + 1)
-                         CONTINUE
-                       ELSE
+      ***              IF   TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
+      ***                            = RECE02-FTNMONEY(KOHFTN-IDX + 1)
+      ***                CONTINUE
+      ***              ELSE
                          PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
                          PERFORM  2109A-CHIHO-ICHIBUFTN-HEN-SEC
-                       END-IF
+      ***              END-IF
                      END-IF
                    END-IF
                 END-IF
