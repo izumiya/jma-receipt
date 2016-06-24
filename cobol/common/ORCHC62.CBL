@@ -1848,7 +1848,12 @@
            MOVE    SPA-NAME            TO  RPMNOTE-NAME
            MOVE    SPA-KANANAME        TO  RPMNOTE-KANANAME
       *    性別区分
-           MOVE    SPA-SEX             TO  RPMNOTE-SEX
+           EVALUATE    SPA-SEX
+           WHEN    "男"
+               MOVE    "1"             TO  RPMNOTE-SEX
+           WHEN    "女"
+               MOVE    "2"             TO  RPMNOTE-SEX
+           END-EVALUATE
       *    誕生日
            MOVE    SPA-BIRTHDAY        TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
