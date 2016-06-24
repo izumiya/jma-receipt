@@ -910,11 +910,6 @@ class Receden_check < Receden_common
                 end
               when  "IY"
 
-                case tbl_tensu["YKZKBN"].to_i
-                when 8,9
-                   @errors.push("23950",rece,zai,"SRYCD",nil,tbl_tensu["NAME"])
-                end
-
                 case tbl_tensu["TENSIKIBETU"].to_i
                 when 1
                  if zai["SURYO"].value.to_f == 0
