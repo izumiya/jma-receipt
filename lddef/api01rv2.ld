@@ -124,7 +124,6 @@ db "xml2" {
  xml_claim_accountv2req;
  xml_claim_accountv2res;
  xml_formdatagetv2req;
- xml_formdatagetv2res;
 };
 
 #include "orcadb.inc"

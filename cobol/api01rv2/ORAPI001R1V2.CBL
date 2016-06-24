@@ -34,17 +34,40 @@
        INPUT-OUTPUT        SECTION.
        FILE-CONTROL.
       *
+      *    返却データ
+           SELECT  REPORT-FILE     ASSIGN  REPORTPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-REPORT.
+           SELECT  BODY-FILE       ASSIGN  BODYPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-BODY.
+      *
        DATA                        DIVISION.
        FILE                        SECTION.
       *
+       FD  REPORT-FILE.
+       01  REPORT-REC              PIC X(20000).
+      *
+       FD  BODY-FILE.
+       01  BODY-REC                PIC X(20000).
       *
        WORKING-STORAGE             SECTION.
+      *
+           COPY    "CPASGNPARA.INC"    REPLACING   //ASGN//
+                                       BY          //REPORT//.
+      *
+           COPY    "CPASGNPARA.INC"    REPLACING   //ASGN//
+                                       BY          //BODY//.
+      *
+           COPY    "CPASGNPARA.INC"    REPLACING   //ASGN//
+                                       BY          //UTF//.
       *
       *    スパ領域
            COPY    "COMMON-SPA".
       *
        01  STS-AREA.
-           03  STS-IN01                PIC X(02).
+           03  STS-REPORT              PIC X(02).
+           03  STS-BODY                PIC X(02).
       *
        01  FLG-AREA.
            03  FLG-IN01                PIC 9(01).
@@ -52,6 +75,7 @@
            03  FLG-PRTDATA             PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
            03  FLG-PTNUM               PIC 9(01).
+           03  FLG-BODY                PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -89,8 +113,12 @@
                05  WRK-SRYYMD-YM       PIC X(06).
                05  WRK-SRYYMD-DD       PIC 9(02).
            03  WRK-RENNUM              PIC 9(10).
-           03  WRK-OFFSET              PIC 9(10).
            03  WRK-NUMZ                PIC Z(10).
+           03  WRK-TEXT                PIC X(1024).
+           03  WRK-ELEMENT             PIC X(128).
+           03  WRK-JSON                PIC X(20000).
+           03  WRK-JSON-NEW            PIC X(20000).
+           03  WRK-LENGTH              PIC 9(08).
       *
        01  KEY-AREA.
            03  KEY-REQYMD              PIC X(08).
@@ -100,10 +128,6 @@
            03  KEY-GROUP               PIC X(14).
            03  KEY-RENNUM              PIC 9(04).
            03  KEY-SHORI-RENNUM        PIC 9(04).
-           03  KEY-OFFSET              PIC 9(10).
-      *
-       01  CONST-AREA.
-           03  CONST-LIMIT             PIC 9(05)   VALUE 10.
       *
        01  TPRTDATA-REC.
            COPY    "CPPRTDATA.INC"     REPLACING   //PRTDATA-//
@@ -112,6 +136,12 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *   ＵＩＤ取得用エリア
+       01 UIDIO-AREA.
+           03  UIDIO-RET   PIC X(2).
+           03  UIDIO-UID   PIC X(36).
+       01  UIDIO-ST        PIC 9(2).
       *
            COPY    "CPORCSCOMMON.INC".
       *
@@ -134,6 +164,9 @@
       *
       *   ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
+      *
+      *    ファイル削除パラメタ
+           COPY    "CPORCSFDEL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -158,6 +191,7 @@
            COPY    "CPPTNUM.INC".
       *
            COPY    "MCPDATA.INC".
+           COPY    "ORCA-BLOB".
       *
       *****************************************************************
       *    連絡領域
@@ -189,6 +223,7 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  KEY-AREA
            INITIALIZE                  SPA-AREA
+      *
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -248,6 +283,43 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
+           INITIALIZE              UIDIO-AREA.
+           CALL    "orcuidset"     USING
+                                   UIDIO-ST
+                                   UIDIO-AREA
+      *
+           MOVE    SPACE           TO  WRK-TEXT
+           STRING  SMCNDATE-YMD    DELIMITED BY SPACE
+                   SMCNDATE-TIME   DELIMITED BY SPACE
+                   UIDIO-UID       DELIMITED BY SPACE
+                   ".dat"          DELIMITED BY SIZE
+           INTO    WRK-TEXT
+           END-STRING
+      *
+           MOVE    SPACE           TO  REPORTPARA
+           STRING  "/tmp/"         DELIMITED BY SIZE
+                   "RPH"           DELIMITED BY SIZE
+                   WRK-TEXT        DELIMITED BY SPACE
+           INTO    REPORTPARA
+           END-STRING
+      *
+           MOVE    SPACE           TO  BODYPARA
+           STRING  "/tmp/"         DELIMITED BY SIZE
+                   "RPB"           DELIMITED BY SIZE
+                   WRK-TEXT        DELIMITED BY SPACE
+           INTO    BODYPARA
+           END-STRING
+      *
+           MOVE    SPACE           TO  UTFPARA
+           STRING  "/tmp/"         DELIMITED BY SIZE
+                   "RPU"           DELIMITED BY SIZE
+                   WRK-TEXT        DELIMITED BY SPACE
+           INTO    UTFPARA
+           END-STRING
+      *
+           OPEN OUTPUT BODY-FILE
+           CLOSE       BODY-FILE
+      *
       *    XML情報取り出し
            PERFORM 900-XML-READ-SEC
            IF    ( WRK-ERRCD           NOT =   SPACE )
@@ -264,17 +336,6 @@
       *    電文項目チェック処理
       *****************************************************************
        1001-INIT-CHECK-SEC             SECTION.
-      *
-           IF    ( FDGREQ-OFFSET       =   SPACE )
-               MOVE    ZERO            TO  KEY-OFFSET
-           ELSE
-               IF    ( FUNCTION TRIM(FDGREQ-OFFSET)    IS  NUMERIC )
-                   MOVE    FUNCTION NUMVAL (FDGREQ-OFFSET)
-                                       TO  KEY-OFFSET
-               ELSE
-                   MOVE    "0002"      TO  WRK-ERRCD
-               END-IF
-           END-IF
       *
            IF    ( WRK-ERRCD       =   SPACE )
                PERFORM 10011-PRTKANRI-CHECK-SEC
@@ -320,6 +381,12 @@
       *****************************************************************
        2001-RESPONSE-EDIT-SEC              SECTION.
       *
+           MOVE    ZERO                TO  IDXR
+      *
+           OPEN    OUTPUT                  BODY-FILE
+      *
+           MOVE    "["                 TO  BODY-REC
+           WRITE   BODY-REC
       *
            MOVE    PRTKANRI-PRTNM      TO  FDGRES-FORMID
            MOVE    PRTKANRI-TITLE      TO  FDGRES-FORMNAME
@@ -334,10 +401,7 @@
       *
            PERFORM 900-PRTDATA-KEY3-SEL-SEC
       *
-           MOVE    ZERO                TO  IDXR
-      *
            PERFORM UNTIL ( FLG-PRTDATA NOT =   ZERO )
-                    OR   ( IDXR           >=   CONST-LIMIT )
       *
                COMPUTE IDXR    =   IDXR    +   1
       *
@@ -346,39 +410,25 @@
                    PERFORM 20011-PTINF-EDIT-SEC
                END-IF
       *
-               IF    ( IDXR                =   1 )
-                AND  ( KEY-OFFSET          =   ZERO )
-                   MOVE    "["             TO  FDGRES-RPDATA (IDXR)(1:1)
-                   MOVE    PRTDATA-PRTDATA TO  FDGRES-RPDATA (IDXR)(2:)
-               ELSE
-                   MOVE    PRTDATA-PRTDATA TO  FDGRES-RPDATA (IDXR)
-               END-IF
+               MOVE    PRTDATA-PRTDATA TO  BODY-REC
+               WRITE   BODY-REC
       *
                PERFORM 900-PRTDATA-KEY3-FET-SEC
       *
            END-PERFORM
       *
-           IF    ( FLG-PRTDATA     =   ZERO )
-               COMPUTE WRK-OFFSET  =   KEY-OFFSET + CONST-LIMIT
-               MOVE    WRK-OFFSET      TO  WRK-NUMZ
-               MOVE    FUNCTION TRIM(WRK-NUMZ)
-                                       TO  FDGRES-OFFSET
-           ELSE
-               MOVE    SPACE           TO  TPRTDATA-PRTDATA
-               STRING  FUNCTION TRIM(FDGRES-RPDATA (IDXR) TRAILING)
-                                       DELIMITED BY SIZE
-                       "]"             DELIMITED BY SIZE
-               INTO    TPRTDATA-PRTDATA
-               END-STRING
-               MOVE    TPRTDATA-PRTDATA TO  FDGRES-RPDATA (IDXR)
-           END-IF
+           MOVE    "]"                 TO  BODY-REC
+           WRITE   BODY-REC
       *
            MOVE    "tbl_prtdata"       TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           CLOSE   BODY-FILE
+      *
            .
        2001-RESPONSE-EDIT-EXT.
+           EXIT.
       *****************************************************************
       *    患者情報編集処理
       *****************************************************************
@@ -397,7 +447,6 @@
       *
            .
        20011-PTINF-EDIT-EXT.
-      *
            EXIT.
       *****************************************************************
       *    終了処理
@@ -553,9 +602,6 @@
            WHEN    "0001"
                MOVE    "帳票データが存在しません"
                                        TO  WRK-ERRMSG
-           WHEN    "0002"
-               MOVE    "オフセットの値に誤りがあります"
-                                       TO  WRK-ERRMSG
       *共通エラー
            WHEN    "0089"
       *        ORCSCOMMON のエラー
@@ -655,47 +701,315 @@
       *****************************************************************
       *    XML情報を書き出す
       *****************************************************************
-       900-XML-WRITE-SEC             SECTION.
+       900-XML-WRITE-SEC           SECTION.
       *
-           IF    ( APILST25-BODY    NOT =   LOW-VALUE )
+           IF    ( APILST25-BODY   NOT =   LOW-VALUE )
                DISPLAY "formdatagetv2 object is not low_value"
            END-IF
       *
-           INITIALIZE                      XML-APIREQ
-           MOVE    "xml_formdatagetv2res" TO  MCP-TABLE
-           MOVE    "key"                   TO  MCP-PATHNAME
-           MOVE    1                       TO  APIREQ-MODE
-           PERFORM 910-XMLOPEN-SEC
-           IF    ( MCP-RC              =   ZERO  OR  1  )
-               CONTINUE
+           OPEN    OUTPUT              REPORT-FILE
+           OPEN    INPUT               BODY-FILE
+      *
+           PERFORM 9001-HEADER-EDIT-SEC
+      *
+           MOVE    WRK-JSON        TO  REPORT-REC
+           WRITE   REPORT-REC
+      *
+           MOVE    ZERO            TO  IDXR
+      *
+           PERFORM 900-BODY-READ-SEC
+      *
+           PERFORM UNTIL ( FLG-BODY    NOT =   ZERO )
+      *
+               COMPUTE IDXR    =   IDXR    +   1
+      *
+               IF    ( IDXR    =   1 )
+                   MOVE    ',"Reports":'
+                                       TO  REPORT-REC
+                   WRITE   REPORT-REC
+               END-IF
+      *
+               MOVE    BODY-REC    TO  REPORT-REC
+               WRITE   REPORT-REC
+      *
+               PERFORM 900-BODY-READ-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "}"             TO  REPORT-REC
+           WRITE   REPORT-REC
+      *
+           CLOSE   REPORT-FILE
+           CLOSE   BODY-FILE
+      *
+           CALL    "SYSTEM"    USING
+                               FUNCTION CONCATENATE
+                               ("nkf --ic=eucJP-ms "
+                               "--oc=utf-8 "
+                               REPORTPARA 
+                               " > "
+                               UTFPARA
+                               )
+      *
+           INITIALIZE                      ORCA-BLOB
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "blob"              TO  MCP-TABLE
+           MOVE     UTFPARA            TO  ORCA-BLOB-FILE
+      *
+           MOVE    "BLOBIMPORT"        TO  MCP-FUNC
+           MOVE    "blob"              TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "MONFUNC"               USING
+                                           MCPAREA
+                                           ORCA-BLOB
+      *
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    ORCA-BLOB-OBJECT    TO  APILST25-BODY
+               MOVE    "application/json"  TO  APILST25-CONTENT-TYPE
+      *
            ELSE
-               DISPLAY "XMLOPEN failure = " MCP-RC
+               DISPLAY "BLOBIMPORT failure = " MCP-RC
+               DISPLAY "formdataget blob export failure "
            END-IF
       *
-           MOVE    FDGRES-DATA            TO  APIREQ-PATIENTINFOREQ
-           MOVE    "xml_formdatagetv2res" TO  MCP-TABLE
-           MOVE    "key"                  TO  MCP-PATHNAME
-           MOVE    "data"                 TO  APIREQ-RECORDNAME
-           PERFORM 910-XMLWRITE-SEC
-           IF     (MCP-RC              =   ZERO  OR  1  )
-               CONTINUE
-           ELSE
-               DISPLAY "XMLWRITE failure = " MCP-RC
-           END-IF
       *
-           MOVE    "xml_formdatagetv2res" TO  MCP-TABLE
-           MOVE    "key"                   TO  MCP-PATHNAME
-           PERFORM 910-XMLCLOSE-SEC
-           IF     (MCP-RC              =   ZERO  OR  1  )
-               MOVE    APIREQ-OBJECT       TO  APILST25-BODY
-               MOVE    "application/xml"   TO  APILST25-CONTENT-TYPE
-           ELSE
-               DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "appoint xml write failure "
-           END-IF
+           MOVE    ZERO                TO  IF-RESULT
+           MOVE    BODYPARA            TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
+      *
+           MOVE    ZERO                TO  IF-RESULT
+           MOVE    REPORTPARA          TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
+      *
+           MOVE    ZERO                TO  IF-RESULT
+           MOVE    UTFPARA             TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
       *
            .
        900-XML-WRITE-EXT.
+           EXIT.
+      *****************************************************************
+      *    XML情報を書き出す
+      *****************************************************************
+       9001-HEADER-EDIT-SEC           SECTION.
+      *
+           MOVE    "{"             TO  WRK-JSON
+      *
+           MOVE    "Information_Date"
+                                   TO  WRK-ELEMENT
+           MOVE    FDGRES-INFORMATION-DATE
+                                   TO  WRK-TEXT
+           PERFORM 910-JSON-WRITE-SEC
+      *
+           MOVE    "Information_Time"
+                                   TO  WRK-ELEMENT
+           MOVE    FDGRES-INFORMATION-TIME
+                                   TO  WRK-TEXT
+           PERFORM 910-JSON-WRITE-SEC
+      *
+           MOVE    "Api_Result"
+                                   TO  WRK-ELEMENT
+           MOVE    FDGRES-API-RESULT
+                                   TO  WRK-TEXT
+           PERFORM 910-JSON-WRITE-SEC
+      *
+           MOVE    "Api_Result_Message"
+                                   TO  WRK-ELEMENT
+           MOVE    FDGRES-API-RESULT-MSG
+                                   TO  WRK-TEXT
+           PERFORM 910-JSON-WRITE-SEC
+      *
+           IF    ( FDGRES-FORMID
+                                   NOT =   SPACE )
+               MOVE    "Report_ID"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-FORMID
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           IF    ( FDGRES-FORMNAME
+                                   NOT =   SPACE )
+               MOVE    "Report_Name"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-FORMNAME
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           IF    ( FDGRES-PRTYMD
+                                   NOT =   SPACE )
+               MOVE    "Print_Date"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-PRTYMD
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           IF    ( FDGRES-PRTHMS
+                                   NOT =   SPACE )
+               MOVE    "Print_Time"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-PRTHMS
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           IF    ( FDGRES-PTINF-AREA
+                                   NOT =   SPACE )
+               MOVE FUNCTION CONCATENATE (
+                       FUNCTION TRIM (WRK-JSON TRAILING)
+                       ',"Patient":{'
+                       )               TO  WRK-JSON-NEW
+               MOVE    WRK-JSON-NEW    TO  WRK-JSON
+      *
+               IF    ( FDGRES-PTNUM
+                                   NOT =   SPACE )
+                   MOVE    "ID"
+                                   TO  WRK-ELEMENT
+                   MOVE    FDGRES-PTNUM
+                                   TO  WRK-TEXT
+                   PERFORM 910-JSON-WRITE-SEC
+               END-IF
+      *
+               IF    ( FDGRES-NAME
+                                   NOT =   SPACE )
+                   MOVE    "Name"
+                                   TO  WRK-ELEMENT
+                   MOVE    FDGRES-NAME
+                                   TO  WRK-TEXT
+                   PERFORM 910-JSON-WRITE-SEC
+               END-IF
+      *
+               IF    ( FDGRES-KANANAME
+                                   NOT =   SPACE )
+                   MOVE    "KanaName"
+                                   TO  WRK-ELEMENT
+                   MOVE    FDGRES-KANANAME
+                                   TO  WRK-TEXT
+                   PERFORM 910-JSON-WRITE-SEC
+               END-IF
+      *
+               IF    ( FDGRES-BIRTHDAY
+                                   NOT =   SPACE )
+                   MOVE    "BirthDate"
+                                   TO  WRK-ELEMENT
+                   MOVE    FDGRES-BIRTHDAY
+                                   TO  WRK-TEXT
+                   PERFORM 910-JSON-WRITE-SEC
+               END-IF
+      *
+               IF    ( FDGRES-SEX
+                                   NOT =   SPACE )
+                   MOVE    "Sex"
+                                   TO  WRK-ELEMENT
+                   MOVE    FDGRES-SEX
+                                   TO  WRK-TEXT
+                   PERFORM 911-JSON-WRITE-SEC
+               END-IF
+      *
+           END-IF
+      *
+           IF    ( FDGRES-SRYYMD
+                                   NOT =   SPACE )
+               MOVE    "Perform_Date"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-SRYYMD
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           IF    ( FDGRES-DATAID
+                                   NOT =   SPACE )
+               MOVE    "Data_ID"
+                                   TO  WRK-ELEMENT
+               MOVE    FDGRES-DATAID
+                                   TO  WRK-TEXT
+               PERFORM 910-JSON-WRITE-SEC
+           END-IF
+      *
+           .
+       9001-HEADER-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    JSON情報を書き出す
+      *****************************************************************
+       910-JSON-WRITE-SEC             SECTION.
+      *
+           PERFORM 9001-JSON-WRITE-SEC
+           MOVE    WRK-JSON-NEW    TO  WRK-JSON
+           PERFORM 9002-JSON-WRITE-SEC
+           MOVE    WRK-JSON-NEW    TO  WRK-JSON
+      *
+           .
+       910-JSON-WRITE-EXT.
+           EXIT.
+      *****************************************************************
+      *    JSON情報を書き出す
+      *****************************************************************
+       911-JSON-WRITE-SEC             SECTION.
+      *
+           PERFORM 9001-JSON-WRITE-SEC
+           MOVE    WRK-JSON-NEW    TO  WRK-JSON
+           PERFORM 9002-JSON-WRITE-SEC
+           MOVE    WRK-JSON-NEW    TO  WRK-JSON
+           PERFORM 9003-JSON-WRITE-SEC
+           MOVE    WRK-JSON-NEW    TO  WRK-JSON
+      *
+           .
+       911-JSON-WRITE-EXT.
+           EXIT.
+      *****************************************************************
+      *    JSON情報を書き出す
+      *****************************************************************
+       9001-JSON-WRITE-SEC             SECTION.
+      *
+           MOVE    FUNCTION LENGTH(FUNCTION TRIM(WRK-JSON TRAILING))
+                                       TO  WRK-LENGTH
+           IF    ( WRK-JSON (WRK-LENGTH : 1)   =   "{" OR "[" )
+               MOVE    WRK-JSON        TO  WRK-JSON-NEW
+           ELSE
+               MOVE FUNCTION CONCATENATE (
+                       FUNCTION TRIM (WRK-JSON TRAILING)
+                       ',' )           TO  WRK-JSON-NEW
+           END-IF
+      *
+           .
+       9001-JSON-WRITE-EXT.
+           EXIT.
+      *****************************************************************
+      *    JSON情報を書き出す
+      *****************************************************************
+       9002-JSON-WRITE-SEC             SECTION.
+      *
+           IF    ( WRK-TEXT        NOT =   SPACE )
+               MOVE FUNCTION CONCATENATE (
+                       FUNCTION TRIM (WRK-JSON TRAILING)
+                       ' "'
+                       FUNCTION TRIM (WRK-ELEMENT TRAILING)
+                       '": "'
+                       FUNCTION TRIM (WRK-TEXT  TRAILING)
+                       '"'
+                       )               TO  WRK-JSON-NEW
+           END-IF
+      *
+           .
+       9002-JSON-WRITE-EXT.
+           EXIT.
+      *****************************************************************
+      *    JSON情報を書き出す
+      *****************************************************************
+       9003-JSON-WRITE-SEC             SECTION.
+      *
+           MOVE FUNCTION CONCATENATE (
+                       FUNCTION TRIM (WRK-JSON TRAILING)
+                       '}' )           TO  WRK-JSON-NEW
+      *
+           .
+       9003-JSON-WRITE-EXT.
            EXIT.
       *****************************************************************
       *    帳票管理検索処理
@@ -743,7 +1057,6 @@
            MOVE    KEY-GROUP           TO  PRTDATA-TBL-GROUP
            MOVE    KEY-UUID            TO  PRTDATA-TBL-UUID
            MOVE    KEY-SHORI-RENNUM    TO  PRTDATA-SHORI-RENNUM
-           MOVE    KEY-OFFSET          TO  PRTDATA-PAGE
            MOVE    PRTDATA-REC         TO  MCPDATA-REC
            MOVE    "tbl_prtdata"       TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
@@ -835,6 +1148,21 @@
       *
            .
        900-PTNUM-KEY-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票データ読込処理
+      *****************************************************************
+       900-BODY-READ-SEC               SECTION.
+      *
+           MOVE    ZERO            TO  FLG-BODY
+      *
+           READ    BODY-FILE
+           AT  END
+               MOVE    1           TO  FLG-BODY
+           END-READ
+      *
+           .
+       900-BODY-READ-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

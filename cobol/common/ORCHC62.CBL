@@ -1811,7 +1811,7 @@
            PERFORM 6001-API-HENSYU-SEC
       *
            INITIALIZE                      RPMAIN-AREA
-           MOVE    "okusuri-techo"     TO  RPMAIN-ID
+           MOVE    "okusuri_techo"     TO  RPMAIN-ID
            MOVE    "¤ªÌô¼êÄ¢"          TO  RPMAIN-TITLE
            MOVE    "rp_medication_note"
                                        TO  MCP-TABLE
@@ -1832,7 +1832,7 @@
       *
            INITIALIZE                  RPMNOTE-REC
       *
-           MOVE    "okusuri-techo"     TO  RPMNOTE-REPORTID
+           MOVE    "okusuri_techo"     TO  RPMNOTE-REPORTID
            MOVE    SYS-1031-PRTNM(16)  TO  RPMNOTE-PRINTER
       *
       *    ¿ÇÎÅÆü YYYY-MM-DD

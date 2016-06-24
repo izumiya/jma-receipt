@@ -26,4 +26,3 @@
       *
            03  FDGREQ-DATA.
                05  FDGREQ-DATAID       PIC X(80).
-               05  FDGREQ-OFFSET       PIC X(10).

@@ -515,8 +515,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            ADD     1                   TO  CNT-GROUP
            ADD     1                   TO  CNT-PUSH
       *
-           MOVE    PRTKANRI-PRTNM  TO  TPUSHP001-GROUPID (CNT-PUSH)
-           MOVE    PRTKANRI-TITLE  TO  TPUSHP001-GROUPNAME (CNT-PUSH)
+           MOVE    PRTKANRI-PRTNM  TO  TPUSHP001-RPID (CNT-PUSH)
+           MOVE    PRTKANRI-TITLE  TO  TPUSHP001-RPNAME (CNT-PUSH)
            STRING  PRTKANRI-TBL-KEY    DELIMITED BY SPACE
                    "#"                 DELIMITED BY SIZE
                    PRTKANRI-TBL-UUID   DELIMITED BY SPACE
