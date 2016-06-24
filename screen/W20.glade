@@ -1124,8 +1124,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label1000</name>
-        <x>12</x>
-        <y>432</y>
+        <x>528</x>
+        <y>406</y>
         <width>120</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -1143,9 +1143,9 @@
         <class>GtkScrolledWindow</class>
         <name>scrolledwindow29</name>
         <x>788</x>
-        <y>296</y>
+        <y>276</y>
         <width>226</width>
-        <height>132</height>
+        <height>152</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
         <has_focus>False</has_focus>
@@ -1310,8 +1310,8 @@
       <widget>
         <class>GtkPandaCombo</class>
         <name>CMB_RECEDSPKBN</name>
-        <x>140</x>
-        <y>432</y>
+        <x>642</x>
+        <y>406</y>
         <width>92</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -1463,7 +1463,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label2</name>
-        <x>256</x>
+        <x>12</x>
         <y>432</y>
         <width>152</width>
         <height>24</height>
@@ -1474,16 +1474,16 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>病床機能報告（入院料）</label>
+        <label>病床機能報告　　入院料</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
       <widget>
         <class>GtkPandaCombo</class>
         <name>CMB_BTUTYPE</name>
-        <x>428</x>
+        <x>164</x>
         <y>432</y>
-        <width>160</width>
+        <width>140</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -1520,7 +1520,7 @@
       <widget>
         <class>GtkNumberEntry</class>
         <name>BTUCD</name>
-        <x>592</x>
+        <x>304</x>
         <y>432</y>
         <width>32</width>
         <height>24</height>
@@ -1543,9 +1543,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>label3</name>
-        <x>624</x>
+        <x>336</x>
         <y>432</y>
-        <width>100</width>
+        <width>160</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -1554,33 +1554,15 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>（１〜５０）</label>
-        <justify>GTK_JUSTIFY_CENTER</justify>
-        <wrap>False</wrap>
-      </widget>
-      <widget>
-        <class>GtkLabel</class>
-        <name>label4</name>
-        <x>256</x>
-        <y>456</y>
-        <width>178</width>
-        <height>24</height>
-        <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
-        <has_focus>False</has_focus>
-        <xalign>0</xalign>
-        <yalign>0.5</yalign>
-        <xpad>0</xpad>
-        <ypad>0</ypad>
-        <label>　　　　　　（特定入院料）</label>
+        <label>（１〜５０） 特定入院料</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
       <widget>
         <class>GtkPandaCombo</class>
         <name>CMB_TBTUTYPE</name>
-        <x>428</x>
-        <y>456</y>
+        <x>502</x>
+        <y>432</y>
         <width>160</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -1618,8 +1600,8 @@
       <widget>
         <class>GtkNumberEntry</class>
         <name>TBTUCD</name>
-        <x>592</x>
-        <y>456</y>
+        <x>662</x>
+        <y>432</y>
         <width>32</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -1641,8 +1623,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label5</name>
-        <x>624</x>
-        <y>456</y>
+        <x>694</x>
+        <y>432</y>
         <width>100</width>
         <height>24</height>
         <sensitive>True</sensitive>
