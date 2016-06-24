@@ -519,11 +519,6 @@
            END-IF
       *H28.6
       *    ginbeeÂÐ±þ
-      *TEST
-      *TEST
-           MOVE    SPA-GINBEE           TO  SPA-MW
-      *TEST
-      *TEST
            IF     (SPA-MW              =   SPA-GINBEE)
               AND (PARA-API-DATA       =   "1"       )
                CONTINUE
