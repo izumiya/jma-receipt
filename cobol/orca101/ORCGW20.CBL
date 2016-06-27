@@ -6885,7 +6885,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                                        TO  WRK-CMB-CD
                PERFORM 4200-BTUTYPELST-CHK-SEC
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-W20-TBTUTYPE-G
-               MOVE    SYS-5001-SRYCD(6:4)
+               MOVE    SYS-5001-TSRYCD(6:4)
                                        TO  WRK-KBN4-G
                MOVE    WRK-KBN4        TO  SPA-GMN-W20-TBTUCD
            END-IF
