@@ -2210,6 +2210,10 @@
                ELSE
                    MOVE    SNUM-OUTNUM         TO  WRK-KINGAKU
                END-IF
+      *        ¿ôÎÌ¡á£±¤Ï¥¼¥í±ß¤È¤¹¤ë
+               IF      WRK-KINGAKU         =   1
+                   MOVE    ZERO            TO  WRK-KINGAKU
+               END-IF
                MOVE    WRK-KINGAKU     TO  TBL-WKSRY-JIHIMONEY
                                                      (TBL-MAX IDX-S)
                MOVE    1               TO  FLG-SURYO
