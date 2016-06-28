@@ -1175,6 +1175,31 @@
                                    MOVE   SYS-5001-KSNCD(IDX7) TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
+      *                      有床診療所在宅復帰機能強化加算（有床診療所入院基本料）
+      *                      （システム管理には療養病床用のコードが設定されている
+      *                        ので、有床診療所入院基本料であれば置き換える）
+                             WHEN    "190190370"
+                                IF  LNK-NYUKSNGET-NYUIN-SRYCD  =
+      *                                                 有床診療所入院基本料１
+                                                           "190169610"
+                                                        OR "190169710"
+                                                        OR "190169810"
+      *                                                 有床診療所入院基本料２
+                                                        OR "190169910"
+                                                        OR "190170010"
+                                                        OR "190170110"
+      *                                                 有床診療所入院基本料３
+                                                        OR "190170210"
+                                                        OR "190170310"
+                                                        OR "190170410"
+                                   ADD    1            TO  IDX8
+                                   MOVE   "190190270"  TO
+                                             WRK-NYUKHNKSN-SRYCD(IDX8)
+                                ELSE
+                                   ADD    1            TO  IDX8
+                                   MOVE   "190190370"  TO
+                                             WRK-NYUKHNKSN-SRYCD(IDX8)
+                                END-IF
       *                      栄養管理実施加算
                              WHEN    "190170770"
       *                         栄養管理実施加算（有床診療所入院基本料）

@@ -226,6 +226,8 @@
            03  WRK-YUUSHO-NISSU                 PIC 9(05).
       *    救急・在宅等支援療養病床初期加算の算定済日数
            03  WRK-KYUKYU-NISSU                 PIC 9(05).
+      *    有床診療所在宅復帰機能強化加算（有床診療所入院基本料）の算定用
+           03  WRK-SCNYUACCT-STSRYYMD           PIC X(08).
       *
       *    栄養管理体制減算の減算コード
            03  WRK-EIYOU-GENSANCD               PIC X(09).
@@ -1987,7 +1989,82 @@
                                                  "190182690")
                            MOVE   WRK-STYMD    TO  WRK-OTYMD2
                    END-IF
+      *
                    MOVE    WRK-STYMD           TO  WRK-KHN-STYMD
+      *
+      *            有床診療所在宅復帰機能強化加算（有床診療所入院基本料）
+      *            は入院日１５日目以降に算定する
+                   IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
+                                                      = "190190270"
+      **                DISPLAY "//////ZAITAKU-FUKKI/////////////////"
+      **                DISPLAY "LNK-SCNYUACCT-NYUKHN-NISUU = "
+      **                         LNK-SCNYUACCT-NYUKHN-NISUU
+      **                DISPLAY "LNK-SCNYUACCT-SYORI-KBN = "
+      **                         LNK-SCNYUACCT-SYORI-KBN
+      **                DISPLAY "WRK-STYMD = "
+      **                         WRK-STYMD
+      **                DISPLAY "LNK-SCNYUACCT-STSRYYMD = "
+      **                         LNK-SCNYUACCT-STSRYYMD
+      *
+                     IF  LNK-SCNYUACCT-NYUKHN-NISUU  <  15
+      *               入院履歴を検索し入院日を取得
+                      INITIALIZE                    PTNYUINRRK-REC
+                      MOVE    SPA-HOSPNUM       TO  PTNYUINRRK-HOSPNUM
+                      MOVE    SPA-PTID          TO  PTNYUINRRK-PTID
+                      MOVE    WRK-STYMD         TO  PTNYUINRRK-TENNYUYMD
+                                                    PTNYUINRRK-TENSTUYMD
+                      MOVE    PTNYUINRRK-REC    TO  MCPDATA-REC
+                      MOVE    "tbl_ptnyuinrrk"  TO  MCP-TABLE
+                      MOVE    "key42"           TO  MCP-PATHNAME
+                      PERFORM 910-PTNYUINRRK-SELECT-SEC
+                      IF      FLG-PTNYUINRRK     =  ZERO
+                          MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                          MOVE    "key42"            TO  MCP-PATHNAME
+                          PERFORM 910-PTNYUINRRK-FETCH-SEC
+      **                    DISPLAY "FLG-PTNYUINRRK  = " FLG-PTNYUINRRK
+                          IF      FLG-PTNYUINRRK  =   ZERO
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                            TO  WRK-SCNYUACCT-STSRYYMD
+                          END-IF
+                      END-IF
+                      MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+                      MOVE    "key42"             TO  MCP-PATHNAME
+                      PERFORM 990-DBCLOSE-SEC
+      *
+      *               Ｎ日後算定
+                      INITIALIZE                      STS-AREA-DAY
+                      INITIALIZE                      LNK-DAY6-AREA
+                      MOVE    "61"                TO  LNK-DAY6-IRAI
+                      IF    WRK-SCNYUACCT-STSRYYMD  NOT =   SPACE
+                          MOVE    WRK-SCNYUACCT-STSRYYMD
+                                            TO  LNK-DAY6-KIJUN
+                      ELSE
+                          MOVE    LNK-SCNYUACCT-STSRYYMD
+                                            TO  LNK-DAY6-KIJUN
+                      END-IF
+                      MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                      MOVE    15                  TO  LNK-DAY6-ZOGEN
+                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "1"
+                          COMPUTE    LNK-DAY6-ZOGEN  =  LNK-DAY6-ZOGEN -
+                                           LNK-SCNYUACCT-NYUKHN-NISUU
+                      END-IF
+                      CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                          LNK-DAY6-AREA
+                      IF      STS-DAY-RC1         =   ZERO
+      **                    DISPLAY "LNK-DAY6-KEISAN = " LNK-DAY6-KEISAN
+      **                    DISPLAY "LNK-DAY6-KOYOMI = " LNK-DAY6-KOYOMI
+                          IF    WRK-STYMD    >=    LNK-DAY6-KOYOMI
+                               MOVE   WRK-STYMD   TO   WRK-KHN-STYMD
+                          ELSE
+                               MOVE   LNK-DAY6-KOYOMI
+                                                  TO  WRK-KHN-STYMD
+                          END-IF
+                      END-IF
+                     END-IF
+                   END-IF
+      *            有床診療所在宅復帰機能強化加算（有床診療所入院基本料）
+      *            ここまで
+      *
                    MOVE    WRK-OTYMD2          TO  WRK-KHN-EDYMD
                    IF      WRK-KHN-EDYMD       >   WRK-EDYMD
                        MOVE    WRK-EDYMD           TO  WRK-KHN-EDYMD

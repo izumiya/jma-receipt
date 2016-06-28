@@ -8042,7 +8042,7 @@ UPDATE*    看護職員夜間配置加算
                    MOVE    CONST-H28-A101C10
                                        TO  SPA-NAI-W20-ZTKFUKKI-CD
                ELSE
-                   MOVE    "在宅復帰機能強化加算（療養病床）"
+                   MOVE    "在宅復帰機能強化加算"
                                        TO  SPA-GMN-W20-ZTKFUKKI-LBL
                    MOVE    CONST-H28-A109C11
                                        TO  SPA-NAI-W20-ZTKFUKKI-CD
