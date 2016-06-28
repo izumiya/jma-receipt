@@ -30,6 +30,7 @@
       *  04.08.01    NACL-藤原    15/12/10  テスト患者を対象外とする
       *  04.08.02    NACL-藤原    15/12/22  公費単独の医療保険との組合せ
       *                                     を５にする
+      *  04.08.03    NACL-藤原    16/04/28  申出があるときは４にする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -87,6 +88,7 @@
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-PTINF           PIC 9(01).
+           03  FLG-PTTOKKI         PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
       *
@@ -298,6 +300,10 @@
       *    患者情報
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
+      *
+      *    患者特記事項情報
+       01  PTTOKKI-REC.
+           COPY    "CPPTTOKKI.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -566,6 +572,7 @@
                                            TO  WRK-SRYYM
              END-PERFORM
       *
+      *      明細編集処理
              PERFORM 2004-HENSYU-SEC
            END-IF
       *
@@ -1001,7 +1008,13 @@
                    IF    ( WRK-CHK (3)     =   SPACE )
                    AND   ( WRK-CHK (4)     =   SPACE )
                    AND   ( WRK-CHK (5)     =   SPACE )
-                       MOVE    "1"             TO  WRK-KBN
+      *                患者特記事項チェック処理（３７申出）
+                       PERFORM 20043-PTTOKKI-CHECK-SEC
+                       IF      FLG-PTTOKKI     =   "9"
+                           MOVE    "4"             TO  WRK-KBN
+                       ELSE
+                           MOVE    "1"             TO  WRK-KBN
+                       END-IF
                    ELSE
                        IF      WRK-CHK (5)     =   "1"
                            MOVE    "5"             TO  WRK-KBN
@@ -1020,6 +1033,48 @@
            PERFORM 20041-BODY-PRINT-SEC
            .
        2004-HENSYU-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    患者特記事項チェック処理（３７申出）
+      *****************************************************************
+       20043-PTTOKKI-CHECK-SEC     SECTION.
+      *
+           INITIALIZE                      PTTOKKI-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  PTTOKKI-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  PTTOKKI-PTID
+           MOVE    "2"                 TO  PTTOKKI-NYUGAIKBN
+           MOVE    PTNYUINRRK-NYUINYMD (1:6)
+                                       TO  PTTOKKI-STYM
+           MOVE    PTNYUINRRK-TAIINYMD (1:6)
+                                       TO  PTTOKKI-EDYM
+           MOVE    PTTOKKI-REC         TO  MCPDATA-REC
+           MOVE    "tbl_pttokki"       TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pttokki"       TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTTOKKI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTTOKKI
+           END-IF
+      *
+           PERFORM             UNTIL   FLG-PTTOKKI     =   1   OR  9
+               IF      PTTOKKI-CD          =   "37"
+                   MOVE    9                   TO  FLG-PTTOKKI
+               ELSE
+                   MOVE    "tbl_pttokki"   TO  MCP-TABLE
+                   MOVE    "key4"          TO  MCP-PATHNAME
+                   PERFORM 900-PTTOKKI-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_pttokki"       TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       20043-PTTOKKI-CHECK-EXT.
            EXIT. 
       *
       *****************************************************************
@@ -1689,6 +1744,24 @@
            PERFORM 900-CLOSE-SEC
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者特記事項読込
+      *****************************************************************
+       900-PTTOKKI-READ-SEC           SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTTOKKI-REC
+               MOVE    ZERO            TO  FLG-PTTOKKI
+           ELSE
+               INITIALIZE                  PTTOKKI-REC
+               MOVE    1               TO  FLG-PTTOKKI
+           END-IF
+      *
+           .
+       900-PTTOKKI-READ-EXT.
            EXIT.
       *
       *****************************************************************
