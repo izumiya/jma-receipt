@@ -1045,9 +1045,9 @@
            MOVE    PTNYUINRRK-PTID     TO  PTTOKKI-PTID
            MOVE    "2"                 TO  PTTOKKI-NYUGAIKBN
            MOVE    PTNYUINRRK-NYUINYMD (1:6)
-                                       TO  PTTOKKI-STYM
-           MOVE    PTNYUINRRK-TAIINYMD (1:6)
                                        TO  PTTOKKI-EDYM
+           MOVE    PTNYUINRRK-TAIINYMD (1:6)
+                                       TO  PTTOKKI-STYM
            MOVE    PTTOKKI-REC         TO  MCPDATA-REC
            MOVE    "tbl_pttokki"       TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
