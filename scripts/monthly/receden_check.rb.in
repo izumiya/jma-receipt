@@ -1391,7 +1391,7 @@ class Receden_check < Receden_common
         end
       end
 
-      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^51..601/})
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^(51..601|54)/})
         if [ KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk)
           if rece.tokki.any?{|t| ("17".."19").include?(t)}
             @errors.push("30160",rece,re,"TOKKI")
