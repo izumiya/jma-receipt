@@ -578,12 +578,12 @@
       *!!
       *                面看琅坍庙纪冉年
                        IF      WRK-COM-INPUTCD (IDX-Z) =   CON-CHUJYO
-                           MOVE    1                   TO  FLG-SYUGI-CHU
+                           MOVE    1               TO  FLG-SYUGI-CHU
                        END-IF 
       *!!
       *                面看琅坍庙纪冉年
                        IF      WRK-COM-INPUTCD (IDX-Z) =   CON-CHUJYO6
-                           MOVE    1                   TO  FLG-SYUGI-CHU6
+                           MOVE    1               TO  FLG-SYUGI-CHU6
                        END-IF 
       *!!
                    END-IF
