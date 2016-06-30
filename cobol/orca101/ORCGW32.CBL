@@ -1466,6 +1466,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *        包括算定編集
                PERFORM 2009-HOUKATU-HENSYU-SEC
                MOVE    6               TO  SPA-GMN-CUR
+      *H28.7
+               MOVE    2               TO  SPA-GMN-SYORI
            ELSE
                IF      SPA-GMN-SELNUM      =   ZERO
       *            選択番号が無い時、新規追加とする
