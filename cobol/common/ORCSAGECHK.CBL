@@ -806,6 +806,15 @@
                   (COMB-KOH4HKNNUM     =   "054" ))
                MOVE    1               TO  FLG-OK2
            END-IF
+      *H28.7
+      *    石綿のみの時
+           IF     (COMB-HKNNUM         =   SPACE )  AND
+                 ((COMB-KOH1HKNNUM     =   "066" )  OR
+                  (COMB-KOH2HKNNUM     =   "066" )  OR
+                  (COMB-KOH3HKNNUM     =   "066" )  OR
+                  (COMB-KOH4HKNNUM     =   "066" ))
+               MOVE    1               TO  FLG-OK2
+           END-IF
       *!!!!
       *    高齢者非該当あり
            IF      FLG-HI-ROUJIN2      =   1
