@@ -301,9 +301,9 @@
       *    ÆâÍÆ
        01  WRK-HEN-AREA.
       *    È¾³Ñ
-           03  WRK-TBL-REC             PIC X(108)  OCCURS   300.
+           03  WRK-TBL-REC             PIC X(108)  OCCURS   500.
       *    Á´³Ñ
-           03  WRK-TBL-REC2            PIC X(108)  OCCURS   300.
+           03  WRK-TBL-REC2            PIC X(108)  OCCURS   500.
       *
            03  WRK-PAGE-MAX            PIC 9(03).
       *
@@ -814,6 +814,11 @@
            MOVE    WRK-HENYMDG         TO  H04-YUKOEDYMD
            MOVE    "¡Á"                TO  H04-KARA
       *
+      *    °õºþÊÔ½¸½èÍý
+           IF      WRK-HEN-MAX         >=  500
+               PERFORM 2100-PRINT-HENSYU-SEC
+           END-IF
+      *
            ADD     1                   TO  WRK-HEN-MAX
            MOVE    HEAD-04             TO  WRK-TBL-REC (WRK-HEN-MAX)
            .
@@ -983,6 +988,11 @@
            INSPECT B01N-YOBI2          REPLACING  ALL "  "  BY  "¡¡"
            INSPECT B01N-ZUMIFLG        REPLACING  ALL "  "  BY  "¡¡"
            INSPECT B01N-NAME           REPLACING  ALL "  "  BY  "¡¡"
+      *
+           IF      WRK-HEN-MAX         >=  500
+      *        °õºþÊÔ½¸½èÍý
+               PERFORM 2100-PRINT-HENSYU-SEC
+           END-IF
       *
            ADD     1                   TO  WRK-HEN-MAX
            MOVE    BODY-01             TO  WRK-TBL-REC  (WRK-HEN-MAX)
