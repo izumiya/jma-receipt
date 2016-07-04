@@ -496,6 +496,17 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
+      *     DISPLAY "------------HENKYAKU--------------------------"
+      *     DISPLAY "LNK-DPCNYUIN-PTID = " LNK-DPCNYUIN-PTID
+      *     PERFORM   VARYING  IDX FROM 1 BY 1
+      *               UNTIL IDX > 31
+      *     DISPLAY "IDX = " IDX
+      *     DISPLAY "LNK-DPCNYUIN-PTID = " LNK-DPCNYUIN-PTID
+      *     DISPLAY "LNK-DPCNYUIN-RECSKB = " LNK-DPCNYUIN-RECSKB(3 IDX 1)
+      *     DISPLAY "LNK-DPCNYUIN-SRYSKB = " LNK-DPCNYUIN-SRYSKB(3 IDX 1)
+      *     DISPLAY "LNK-DPCNYUIN-SRYCD = " LNK-DPCNYUIN-SRYCD(3 IDX 1)
+      *     END-PERFORM
+      *
            .
        000-PROC-EXT.
       *
@@ -4461,7 +4472,7 @@
                 IF (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001310")  AND
                    (WRK-SKJ7-RYOYO(IDX1)   NOT = "197001710")  AND
                    (WRK-SKJ7-RYOYO-RYU(IDX1)   NOT = "197003510")
-                    ADD    1     TO    IDX2
+                    MOVE    IDX1     TO    IDX2
                     MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
                                     LNK-DPCNYUIN-HKNCOMBI(3 IDX2)
                     MOVE   ZERO     TO    IDX4
@@ -4730,7 +4741,7 @@
                     MOVE  IDX4  TO  LNK-DPCNYUIN-MEISAISU(3 IDX2)
                 ELSE
       *             ∆˛±°ª˛¿∏≥ËŒ≈Õ‹§Œø©ªˆŒ≈Õ‹§œ≈∫ª˙£¥§ŒŒŒ∞Ë§À ÷µ—
-                    ADD    1     TO    IDX3
+                    MOVE   IDX1       TO    IDX3
                     MOVE  WRK-SKJ7-HKNCOMBI-DAY(IDX1) TO
                                     LNK-DPCNYUIN-HKNCOMBI(4 IDX3)
                     MOVE   ZERO     TO    IDX5
