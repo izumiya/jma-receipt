@@ -29874,6 +29874,7 @@
                 MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
              END-IF
              IF    RECE62-FTNMONEY(2)            = ZERO
+             AND   RECE62-FTNMONEY-KOJ(2)        = ZERO
                 MOVE  ZERO                   TO  RECE62-FTNMONEY(3)
                                                  RECE62-FTNMONEY-KOJ(3)
              END-IF
@@ -29893,6 +29894,7 @@
                 MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(4)
              END-IF
              IF    RECE62-FTNMONEY(2)            = ZERO
+             AND   RECE62-FTNMONEY-KOJ(2)        = ZERO
                 MOVE  ZERO                   TO  RECE62-FTNMONEY(4)
                                                  RECE62-FTNMONEY-KOJ(4)
              END-IF
@@ -29911,6 +29913,7 @@
                 MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
              END-IF
              IF    RECE62-FTNMONEY(3)            = ZERO
+             AND   RECE62-FTNMONEY-KOJ(3)        = ZERO
                 MOVE  ZERO                   TO  RECE62-FTNMONEY(4)
                                                  RECE62-FTNMONEY-KOJ(4)
              END-IF

@@ -26002,6 +26002,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(3)
              END-IF
              IF    RECE02-FTNMONEY(2)            = ZERO
+             AND   RECE02-FTNMONEY-KOJ(2)        = ZERO
                 MOVE  ZERO                   TO  RECE02-FTNMONEY(3)
                                                  RECE02-FTNMONEY-KOJ(3)
              END-IF
@@ -26021,6 +26022,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(4)
              END-IF
              IF    RECE02-FTNMONEY(2)            = ZERO
+             AND   RECE02-FTNMONEY-KOJ(2)        = ZERO
                 MOVE  ZERO                   TO  RECE02-FTNMONEY(4)
                                                  RECE02-FTNMONEY-KOJ(4)
              END-IF
@@ -26039,6 +26041,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE  RECE02-FTNMONEY-KOJ(3) TO  RECE02-FTNMONEY-KOJ(4)
              END-IF
              IF    RECE02-FTNMONEY(3)            = ZERO
+             AND   RECE02-FTNMONEY-KOJ(3)        = ZERO
                 MOVE  ZERO                   TO  RECE02-FTNMONEY(4)
                                                  RECE02-FTNMONEY-KOJ(4)
              END-IF
