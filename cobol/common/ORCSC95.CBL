@@ -5092,7 +5092,8 @@
              OR  ((TNS-DATAKBN         =   "1"  ) AND
                   (TNS-CDKBN-KBN       =   "G"  ) AND
                   (TNS-CDKBN-KBNNUM    =   001
-                                       OR  005  ) AND
+                                       OR  005
+                                       OR  006  ) AND
                   (TNS-CDKBN-KBNNUM-EDA    =  00 ))
       *
                ADD     1               TO  IDX-TEI
