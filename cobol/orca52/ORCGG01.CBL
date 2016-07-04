@@ -440,6 +440,7 @@
                GO  TO  300-SCREEN-EXT
            WHEN    "G07"
                PERFORM 360-G07-SET-SEC
+               GO  TO  300-SCREEN-EXT
            WHEN    "G03"
                PERFORM 350-G03-SET-SEC
                GO  TO  300-SCREEN-EXT
