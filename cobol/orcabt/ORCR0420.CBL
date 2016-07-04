@@ -2892,6 +2892,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       "099999905" OR "099999906" OR
                       "099999907" OR "099999908" OR
                       "099200101" OR "099999926" OR
+                      "099999927" OR "099999928" OR
                       "840000136" OR "840000140"            )
              OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
                   COMPUTE   RECE44-MEISAISU    =  RECE44-MEISAISU
@@ -2949,6 +2950,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "099999905" OR "099999906" OR
                        "099999907" OR "099999908" OR
                        "099200101" OR "099999926" OR
+                       "099999927" OR "099999928" OR
                        "840000136" OR "840000140"            )
               OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
       *
