@@ -139,6 +139,11 @@
            03  WRK-NANBYO-HKNCOMBI-TAIHI-TBL.
                05  WRK-NANBYO-HKNCOMBI     PIC 9(04)  OCCURS   10.
       *
+      *    難病、小児慢性特定疾病の食事据え置き指定（システム予約）
+           03  WRK-NANBYO-INPUT-TAIHI-TBL.
+               05  WRK-NANBYO-INPUT-OK    PIC X(01)  OCCURS   31.
+               05  WRK-NANBYO-INPUT-NG    PIC X(01)  OCCURS   31.
+      *
       *    同日再入院日の翌日取得用
            03  WRK-DOUJITSU-YMD            PIC X(08).
            03  WRK-DOUJITSU-YMDR    REDEFINES   WRK-DOUJITSU-YMD.
@@ -1136,6 +1141,139 @@
       *    食事負担据え置き区分のセット
            IF        FLG-NANBYO      =     1
       *
+      *      難病等食事負担据え置きのシステム予約コード入力日を検索
+      *      据え置き対象
+             MOVE     ZERO                 TO   IDX-YYK
+             INITIALIZE                         SRYACT-REC
+             MOVE    LNK-SKJKEEP-HOSPNUM   TO   SRY-HOSPNUM
+             MOVE    "1"                   TO   SRY-NYUGAIKBN
+             MOVE    LNK-SKJKEEP-PTID      TO   SRY-PTID
+             MOVE    LNK-SKJKEEP-SANTEIYM  TO   SRY-SRYYM
+             MOVE    "099999927"           TO   SRY-SRYCD(1)
+                                                SRY-SRYCD(2)
+                                                SRY-SRYCD(3)
+                                                SRY-SRYCD(4)
+                                                SRY-SRYCD(5)
+             MOVE    "tbl_sryact"          TO   MCP-TABLE
+             MOVE    "key7"                TO   MCP-PATHNAME
+             PERFORM 910-SRYACT-SELECT-SEC
+             IF      FLG-SRYACT            =    ZERO
+                 MOVE     "tbl_sryact"     TO   MCP-TABLE
+                 MOVE     "key7"           TO   MCP-PATHNAME
+                 PERFORM   910-SRYACT-READ-SEC
+                 PERFORM   UNTIL  (FLG-SRYACT   =   1)
+      *
+                    INITIALIZE                          SRYACCT-REC
+                    MOVE    LNK-SKJKEEP-HOSPNUM     TO  ACCT-HOSPNUM
+                    MOVE    LNK-SKJKEEP-PTID        TO  ACCT-PTID
+                    MOVE    SRY-ZAINUM              TO  ACCT-ZAINUM
+                    MOVE    "tbl_sryacct"           TO  MCP-TABLE
+                    MOVE    "key57"                 TO  MCP-PATHNAME
+                    PERFORM 910-SRYACCT-SELECT-SEC
+                    IF      FLG-SRYACCT             =   ZERO
+                       MOVE    "tbl_sryacct"        TO  MCP-TABLE
+                       MOVE    "key57"              TO  MCP-PATHNAME
+                       PERFORM   910-SRYACCT-READ-SEC
+                       PERFORM   UNTIL   FLG-SRYACCT    =   1
+                          IF   ACCT-NYUGAIKBN   =     "1"
+                              PERFORM   VARYING  IDX-ACCT FROM  1  BY  1
+                                UNTIL   IDX-ACCT   >  31
+                                  IF   ACCT-DAY(1 IDX-ACCT)  NOT =  ZERO
+                                     MOVE    "1"       TO
+                                                    WRK-NANBYO-INPUT-OK
+                                                             (IDX-ACCT)
+                                  END-IF
+                              END-PERFORM
+                          END-IF
+                          MOVE     "tbl_sryacct"      TO  MCP-TABLE
+                          MOVE     "key57"            TO  MCP-PATHNAME
+                          PERFORM   910-SRYACCT-READ-SEC
+                      END-PERFORM
+      *               診療会計クローズ
+                      MOVE     "tbl_sryacct"   TO  MCP-TABLE
+                      MOVE     "key57"          TO  MCP-PATHNAME
+                      PERFORM   900-CLOSE-SEC
+                    END-IF
+                    MOVE     "tbl_sryact"     TO   MCP-TABLE
+                    MOVE     "key7"           TO   MCP-PATHNAME
+                    PERFORM   910-SRYACT-READ-SEC
+                 END-PERFORM
+             END-IF
+      *      診療行為クローズ
+             MOVE     "tbl_sryact"     TO  MCP-TABLE
+             MOVE     "key7"           TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+      *
+      *      難病等食事負担据え置きのシステム予約コード入力日を検索
+      *      据え置き対象外
+             MOVE     ZERO                 TO   IDX-YYK
+             INITIALIZE                         SRYACT-REC
+             MOVE    LNK-SKJKEEP-HOSPNUM   TO   SRY-HOSPNUM
+             MOVE    "1"                   TO   SRY-NYUGAIKBN
+             MOVE    LNK-SKJKEEP-PTID      TO   SRY-PTID
+             MOVE    LNK-SKJKEEP-SANTEIYM  TO   SRY-SRYYM
+             MOVE    "099999928"           TO   SRY-SRYCD(1)
+                                                SRY-SRYCD(2)
+                                                SRY-SRYCD(3)
+                                                SRY-SRYCD(4)
+                                                SRY-SRYCD(5)
+             MOVE    "tbl_sryact"          TO   MCP-TABLE
+             MOVE    "key7"                TO   MCP-PATHNAME
+             PERFORM 910-SRYACT-SELECT-SEC
+             IF      FLG-SRYACT            =    ZERO
+                 MOVE     "tbl_sryact"     TO   MCP-TABLE
+                 MOVE     "key7"           TO   MCP-PATHNAME
+                 PERFORM   910-SRYACT-READ-SEC
+                 PERFORM   UNTIL  (FLG-SRYACT   =   1)
+      *
+                    INITIALIZE                          SRYACCT-REC
+                    MOVE    LNK-SKJKEEP-HOSPNUM     TO  ACCT-HOSPNUM
+                    MOVE    LNK-SKJKEEP-PTID        TO  ACCT-PTID
+                    MOVE    SRY-ZAINUM              TO  ACCT-ZAINUM
+                    MOVE    "tbl_sryacct"           TO  MCP-TABLE
+                    MOVE    "key57"                 TO  MCP-PATHNAME
+                    PERFORM 910-SRYACCT-SELECT-SEC
+                    IF      FLG-SRYACCT             =   ZERO
+                       MOVE    "tbl_sryacct"        TO  MCP-TABLE
+                       MOVE    "key57"              TO  MCP-PATHNAME
+                       PERFORM   910-SRYACCT-READ-SEC
+                       PERFORM   UNTIL   FLG-SRYACCT    =   1
+                          IF   ACCT-NYUGAIKBN   =     "1"
+                              PERFORM   VARYING  IDX-ACCT FROM  1  BY  1
+                                UNTIL   IDX-ACCT   >  31
+                                  IF   ACCT-DAY(1 IDX-ACCT)  NOT =  ZERO
+                                     MOVE    "1"       TO
+                                                    WRK-NANBYO-INPUT-NG
+                                                             (IDX-ACCT)
+                                  END-IF
+                              END-PERFORM
+                          END-IF
+                          MOVE     "tbl_sryacct"      TO  MCP-TABLE
+                          MOVE     "key57"            TO  MCP-PATHNAME
+                          PERFORM   910-SRYACCT-READ-SEC
+                      END-PERFORM
+      *               診療会計クローズ
+                      MOVE     "tbl_sryacct"   TO  MCP-TABLE
+                      MOVE     "key57"          TO  MCP-PATHNAME
+                      PERFORM   900-CLOSE-SEC
+                    END-IF
+                    MOVE     "tbl_sryact"     TO   MCP-TABLE
+                    MOVE     "key7"           TO   MCP-PATHNAME
+                    PERFORM   910-SRYACT-READ-SEC
+                 END-PERFORM
+             END-IF
+      *      診療行為クローズ
+             MOVE     "tbl_sryact"     TO  MCP-TABLE
+             MOVE     "key7"           TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+      *
+      *       PERFORM   VARYING IDX FROM 1 BY 1
+      *         UNTIL   IDX > 31
+      *          DISPLAY "IDX = " IDX
+      *          DISPLAY "WRK-NANBYO-INPUT-OK= " WRK-NANBYO-INPUT-OK(IDX)
+      *          DISPLAY "WRK-NANBYO-INPUT-NG= " WRK-NANBYO-INPUT-NG(IDX)
+      *       END-PERFORM
+      *
       *      対象となる保険組合せ番号を検索
              PERFORM    VARYING   IDX   FROM   1   BY   1
                UNTIL   (IDX    >    10)    OR
@@ -1190,13 +1328,17 @@
                                  (COMB-KOHHKNNUM(2) = "054")  OR
                                  (COMB-KOHHKNNUM(3) = "054")  OR
                                  (COMB-KOHHKNNUM(4) = "054")
-                                MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX1)
+                                IF  WRK-NANBYO-INPUT-NG(IDX1)  =  SPACE
+                                  MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX1)
+                                END-IF
                              END-IF
                              IF  (COMB-KOHHKNNUM(1) = "052")  OR
                                  (COMB-KOHHKNNUM(2) = "052")  OR
                                  (COMB-KOHHKNNUM(3) = "052")  OR
                                  (COMB-KOHHKNNUM(4) = "052")
-                                MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX1)
+                                IF  WRK-NANBYO-INPUT-NG(IDX1)  =  SPACE
+                                  MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX1)
+                                END-IF
                              END-IF
                          END-IF
                     END-IF
@@ -1243,7 +1385,9 @@
                         PERFORM    VARYING   IDX   FROM   1   BY   1
                           UNTIL    IDX    >    31
                               IF   ACCT-DAY(1 IDX)  NOT =   ZERO
+                                IF  WRK-NANBYO-INPUT-NG(IDX)  =  SPACE
                                   MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX)
+                                END-IF
                               END-IF
                         END-PERFORM
                       END-IF
@@ -1258,6 +1402,15 @@
              MOVE     "tbl_sryacct"    TO  MCP-TABLE
              MOVE     "key68"          TO  MCP-PATHNAME
              PERFORM   900-CLOSE-SEC
+      *
+      *      システム予約で難病等の食事負担据え置きを入力された場合の
+      *      強制セット
+             PERFORM    VARYING IDX1   FROM   1   BY  1
+               UNTIL    IDX1   >   31
+                 IF  WRK-NANBYO-INPUT-OK(IDX1)  =  "1"
+                    MOVE   "1"  TO   LNK-SKJKEEP-KBN(IDX1)
+                 END-IF
+             END-PERFORM
       *
            END-IF
       *
