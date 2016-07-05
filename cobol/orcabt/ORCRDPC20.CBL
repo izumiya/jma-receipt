@@ -105,6 +105,8 @@
       *                                     い診療）のＥＦ出力可否対応
       *              NACL-伊藤    15/10/20  閉麻計算見直し
       *              NACL-小豆沢  15/10/20  処置の出来高実績点数セット修正
+      *
+      *              NACL-小豆沢  16/07/05  平成２８年度対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1082,6 +1084,19 @@
            03  WRK-FEDT-PREV-TEN       PIC 9(08).
            03  WRK-FEDT-PREV-TEN50     PIC 9(08).
            03  WRK-FEDT-PREV-TEN721    PIC 9(08).
+           03  WRK-FEDT-KOUI-MEISAI.
+             05  WRK-FEDT-KOUI-MEISAI1   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI2   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI3   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI4   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI5   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI6   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI7   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI8   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI9   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI10  PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI11  PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI12  PIC 9(01).
       *
       *    保険組み合わせ退避ワーク
        01  THKNCOMBI-AREA.
@@ -4114,15 +4129,46 @@
            ELSE
                PERFORM 5005-NUM-HENSYU-SEC
            END-IF
+      *--- AZU-MOD START 2016.07.05
       *出来高・包括フラグ
-           IF      WRK-FEDT-HOUKATU-FLG   =    "6"
-               MOVE   "1"              TO  WRK-FEDT-HOUKATU-FLG
+           IF     WRK-FEDT-SRYYM     <   201604
+               IF      WRK-FEDT-HOUKATU-FLG   =    "6"
+                   MOVE   "1"              TO  WRK-FEDT-HOUKATU-FLG
+               END-IF
+               MOVE    WRK-FEDT-HOUKATU-FLG
+                                           TO  WRK-DATA
+               MOVE    1                   TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-END
+               PERFORM 5004-MOJI-HENSYU-SEC
+           ELSE
+               IF    WRK-FEDT-HOUKATU-FLG   =  "8"  OR  "9"
+                    MOVE    1              TO  WRK-FEDT-KOUI-MEISAI1
+               ELSE
+                    MOVE    ZERO           TO  WRK-FEDT-KOUI-MEISAI1
+               END-IF
+               IF    WRK-FEDT-HOUKATU-FLG   =  "8"
+                    MOVE    1              TO  WRK-FEDT-KOUI-MEISAI2
+               ELSE
+                    MOVE    ZERO           TO  WRK-FEDT-KOUI-MEISAI2
+               END-IF
+               MOVE    ZERO                TO  WRK-FEDT-KOUI-MEISAI3
+                                               WRK-FEDT-KOUI-MEISAI4
+                                               WRK-FEDT-KOUI-MEISAI5
+                                               WRK-FEDT-KOUI-MEISAI6
+                                               WRK-FEDT-KOUI-MEISAI7
+                                               WRK-FEDT-KOUI-MEISAI8
+                                               WRK-FEDT-KOUI-MEISAI9
+                                               WRK-FEDT-KOUI-MEISAI10
+                                               WRK-FEDT-KOUI-MEISAI11
+                                               WRK-FEDT-KOUI-MEISAI12
+               MOVE    WRK-FEDT-KOUI-MEISAI
+                                           TO  WRK-DATA
+               MOVE    12                  TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-END
+               PERFORM 5004-MOJI-HENSYU-SEC
+               MOVE    "000000000000"      TO  WRK-FEDT-KOUI-MEISAI
            END-IF
-           MOVE    WRK-FEDT-HOUKATU-FLG
-                                       TO  WRK-DATA
-           MOVE    1                   TO  WRK-NAGASA
-           MOVE    1                   TO  WRK-END
-           PERFORM 5004-MOJI-HENSYU-SEC
+      *--- AZU-MOD END   2016.07.05
            .
        200799-ZAI-HENSYU-F-EXT.
            EXIT.
