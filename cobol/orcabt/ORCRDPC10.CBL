@@ -564,6 +564,10 @@
            03  WRK-ZEROKETA                    PIC 9(02).
            03  WRK-PTNUMKETA                   PIC 9(02).
       *
+      *    包括項目区分編集用
+           03  WRK-HOUKATU-TBL.
+               05  WRK-HOUKATU-KBN             PIC X(01)  OCCURS  31.
+      *
       *    医薬品・特定器材用テーブル
        01  TBL-ZAIW-AREA.
            03  TBL-ZAIW-TABLE          OCCURS  2.
@@ -1159,6 +1163,19 @@
            03  WRK-FEDT-PREV-TEN       PIC 9(08).
            03  WRK-FEDT-PREV-TEN50     PIC 9(08).
            03  WRK-FEDT-PREV-TEN721    PIC 9(08).
+           03  WRK-FEDT-KOUI-MEISAI.
+             05  WRK-FEDT-KOUI-MEISAI1   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI2   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI3   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI4   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI5   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI6   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI7   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI8   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI9   PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI10  PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI11  PIC 9(01).
+             05  WRK-FEDT-KOUI-MEISAI12  PIC 9(01).
       *
       *    保険組み合わせ退避ワーク
        01  THKNCOMBI-AREA.
@@ -1998,6 +2015,7 @@
       *
       *****************************************************************
       *    入院会計取得処理
+      *  （包括項目区分を判定する為のコード表用番号も取得を行う）
       *****************************************************************
        2001-NYUINRYO-GET-SEC           SECTION.
       *
@@ -2018,6 +2036,76 @@
                CALL    "ORCSNYUINDAY"     USING   ORCSNYUINDAY-AREA
                                                   SPA-AREA
            END-IF
+      *
+      *    ＤＰＣに係る特定入院料等
+           PERFORM     VARYING   IDX   FROM  1  BY  1
+             UNTIL     IDX   >   31
+                IF   (LNK-DPCNYUIN-SRYCD(1 IDX 1)  NOT = SPACE)  OR
+                     (LNK-DPCNYUIN-SRYCD(2 IDX 1)  NOT = SPACE)  OR
+                     (LNK-NYUINDAY-TANKI-KBN(IDX)  NOT = SPACE)
+      *
+                    MOVE   "2"            TO   WRK-HOUKATU-KBN(IDX)
+      *
+                    IF  LNK-DPCNYUIN-SRYCD(2 IDX 1)  NOT = SPACE
+                       INITIALIZE                  TNS-TENSU-REC
+                       MOVE    LNK-DPCNYUIN-SRYCD(2 IDX 1)
+                                               TO  TNS-SRYCD
+                       PERFORM 900-TENSU-READ-SEC
+                       IF   TNS-CDKBN-KBN     =   "A"
+                         IF  (TNS-CDKBN-KBNNUM      =  300)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  2)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  3)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  4)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  302)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  303)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  303)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  2)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  305)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  307)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                         IF  (TNS-CDKBN-KBNNUM      =  400)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  3)
+                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                         END-IF
+                       END-IF
+                    END-IF
+      *
+                    IF  LNK-NYUINDAY-TANKI3-KBN(IDX)   = "1"  OR  "2"
+                        MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
+                    END-IF
+      *
+                END-IF
+           END-PERFORM
+      *
            .
        2001-NYUINRYO-GET-EXT.
            EXIT.
@@ -2447,9 +2535,17 @@
                                                = SYS-9102-SRYCD(1))
                            OR   (RECE65-SRYCD(IDX)
                                                = SYS-9102-SRYCD(2)))
-                            IF  WRK-FEDT-HOUKATU-FLG     NOT =   "6"
-                               MOVE  "1"      TO WRK-FEDT-HOUKATU-FLG
+      *---AZU-MOD START 2016.07.04
+                            IF     RECE641-SRYYM     <   201604
+                              IF  WRK-FEDT-HOUKATU-FLG     NOT =   "6"
+                                MOVE  "1"      TO WRK-FEDT-HOUKATU-FLG
+                              END-IF
+                            ELSE
+                              IF  WRK-FEDT-HOUKATU-FLG     NOT =   "6"
+                                  MOVE   1     TO WRK-FEDT-KOUI-MEISAI1
+                              END-IF
                             END-IF
+      *---AZU-MOD END   2016.07.04
       *            テーブルが３件なので繰り返しは保留にしIF文のみとした 
       *                        PERFORM VARYING TBL-TAITOYAKU-IDX
       *                            FROM  1  BY  1
@@ -3095,9 +3191,6 @@
       *****************************************************************
        20073-ZAI-HENSYU-SEC          SECTION.
       *
-           DISPLAY  "RECE641-SRYCDTOTAL = " RECE641-SRYCDTOTAL
-           DISPLAY  "RECE641-SRYKBN = " RECE641-SRYKBN
-           DISPLAY  "RECE641-JIHOKBN = " RECE641-JIHOKBN
            IF     (RECE641-SRYKBN    =   "90" )    AND
                   (RECE641-JIHOKBN   =   "1")
               CONTINUE
@@ -3105,13 +3198,8 @@
               GO  TO   20073-ZAI-HENSYU-EXT
            END-IF
       *
-           DISPLAY  "WRK-RENNUM = " WRK-RENNUM
-      *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
-           DISPLAY  "IDXX = " IDXX
-           DISPLAY  "LNK-NYUINDAY-TANKI2-KBN(IDXX) = "
-                     LNK-NYUINDAY-TANKI2-KBN(IDXX)
       *    順序番号
                    ADD     1           TO  WRK-RENNUM
       *    行為明細番号リセット
@@ -3131,7 +3219,6 @@
                                                             "1" OR "2"
                                   CONTINUE
                                ELSE
-                                  DISPLAY "------EF-OUT2"
                                   IF    (IDX               =  1)
       *                               Ｅファイルは出力しない
                                       PERFORM 200721-ZAI-E-HENSYU-SEC
@@ -3176,9 +3263,6 @@
       *****************************************************************
        200731-ZAI-HENSYU-SEC          SECTION.
       *
-           DISPLAY  "RECE641-SRYCDTOTAL = " RECE641-SRYCDTOTAL
-           DISPLAY  "RECE641-SRYKBN = " RECE641-SRYKBN
-           DISPLAY  "RECE641-JIHOKBN = " RECE641-JIHOKBN
            IF     (RECE641-SRYKBN    =   "90" )    AND
                   (RECE641-JIHOKBN   =   "1")
               CONTINUE
@@ -3186,13 +3270,8 @@
               GO  TO   200731-ZAI-HENSYU-EXT
            END-IF
       *
-           DISPLAY  "WRK-RENNUM = " WRK-RENNUM
-      *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
-           DISPLAY  "IDXX = " IDXX
-           DISPLAY  "LNK-NYUINDAY-TANKI2-KBN(IDXX) = "
-                     LNK-NYUINDAY-TANKI2-KBN(IDXX)
       *    順序番号
       *****             ADD     1           TO  WRK-RENNUM
       *    行為明細番号リセット
@@ -3210,7 +3289,6 @@
                            WHEN    OTHER
                                IF   LNK-NYUINDAY-TANKI2-KBN(IDXX) =
                                                             "1" OR "2"
-                                  DISPLAY "------EF-OUT"
       ****                         ADD       1     TO   WRK-RENNUM
                                IF     (IDX               =  1)
                                 AND   (WRK-FEDT-1ST-FLG  =  ZERO)
@@ -3224,12 +3302,6 @@
                                           ADD     1    TO   WRK-RENNUM
                                       END-IF
       *                                ADD   1  TO   WRK-RENNUM-E
-                                      DISPLAY "WRK-RENNUM = "
-                                               WRK-RENNUM
-                                      DISPLAY "WRK-RENNUM-E = "
-                                               WRK-RENNUM-E
-                                      DISPLAY "WRK-RENNUM-E-TAIHI = "
-                                               WRK-RENNUM-E-TAIHI
                                       PERFORM 200721-ZAI-E-HENSYU-SEC
                                       PERFORM 5001-FILE-WRITE-SEC
                                   END-IF
@@ -3576,10 +3648,15 @@
                                        TO  WRK-FEDT-MEISAI-TEN
            END-IF
       *出来高・包括フラグ
-           IF      WRK-FEDT-HOUKATU-FLG    NOT =   "6"
-      * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
-               MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
+      *---AZU-MOD START 2016.07.04
+           IF     RECE641-SRYYM     <   201604
+             IF      WRK-FEDT-HOUKATU-FLG    NOT =   "6"
+                  MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
+             END-IF
+           ELSE
+                  MOVE    TNS-DPCKBN          TO  WRK-FEDT-KOUI-MEISAI5
            END-IF
+      *---AZU-MOD END   2016.07.04
       *使用量から出来高・包括フラグまで
            PERFORM 200799-ZAI-HENSYU-F-SEC
       *加算・減算のため行為点数を累積する
@@ -4469,8 +4546,6 @@
                    UNTIL   IDZ1    >       5
                PERFORM VARYING IDZ2    FROM    1   BY  1
                        UNTIL   IDZ2    >       31
-      *****            OR      LNK-DPCNYUIN-HKNCOMBI (IDZ1 IDZ2)
-      *****                                    =   ZERO
       *
                    MOVE    ZERO                    TO  FLG-CHK
       *
@@ -4519,25 +4594,10 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN19)
                                    CONTINUE
                                ELSE
-                                    IF    IDXZ       =  1
-                                    OR    LNK-DPCNYUIN-SRYSKB
+                                   IF   (IDXZ       =  1)   AND
+                                        (LNK-DPCNYUIN-SRYSKB
                                                        (IDZ1 IDZ2 IDXZ)
-                                                     = "97"
-      *                                外泊の場合
-      *                                平成２７年３月迄は１明細の記録
-      *                                平成２７年４月以降は２明細での記録
-                                       IF (LNK-DPCNYUIN-SANTEIYM  <=
-                                                              "201503")
-                                         IF  LNK-DPCNYUIN-SRYCD
-                                                       (IDZ1 IDZ2 2)
-                                                     = "190107290" OR
-                                                       "190107390" OR
-                                                       "190107490" OR
-                                                       "190107590"
-      *                                    ２行目のレコード
-                                           MOVE    2   TO  IDXZ
-                                         END-IF
-                                       END-IF
+                                                     = "97")
                                        MOVE  IDZ2  TO  WRK-FEDT-DD
                                        PERFORM
                                          200771-NYUIN-ZAI-E-HENSYU-SEC
@@ -4550,7 +4610,7 @@
                                     IF   WRK-REC-LENGTH  >  ZERO
                                          PERFORM 5001-FILE-F-WRITE-SEC
                                     END-IF
-                                  END-IF
+                               END-IF
                        END-EVALUATE
                    END-PERFORM
                END-PERFORM
@@ -4628,14 +4688,6 @@
                    MOVE    LNK-DPCNYUIN-PTID      TO  RECE900-PTID
                    MOVE    LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
                                                   TO  RECE900-SRYKBN
-                   DISPLAY   "LNK-DPCNYUIN-HOSPNUM = "
-                              LNK-DPCNYUIN-HOSPNUM
-                   DISPLAY   "LNK-DPCNYUIN-SANTEIYM = "
-                              LNK-DPCNYUIN-SANTEIYM
-                   DISPLAY   "LNK-DPCNYUIN-PTID = "
-                              LNK-DPCNYUIN-PTID
-                   DISPLAY   "LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ) = "
-                              LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
                    PERFORM   900-RECE900-READ-SEC
                    IF      FLG-RECE900         =   1
                        MOVE    ZERO             TO  WRK-RENNUM
@@ -5286,12 +5338,44 @@
            ELSE
                PERFORM 5005-NUM-HENSYU-SEC
            END-IF
-      *出来高・包括フラグ
-           MOVE    WRK-FEDT-HOUKATU-FLG
-                                       TO  WRK-DATA
-           MOVE    1                   TO  WRK-NAGASA
-           MOVE    1                   TO  WRK-END
-           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *--- AZU-MOD START 2016.07.04
+           IF     RECE641-SRYYM     <   201604
+      *        出来高・包括フラグ
+      *         DISPLAY "HOUKATU-FLG SET"
+               MOVE    WRK-FEDT-HOUKATU-FLG
+                                           TO  WRK-DATA
+               MOVE    1                   TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-END
+               PERFORM 5004-MOJI-HENSYU-SEC
+           ELSE
+      *        行為・明細区分情報
+      *         DISPLAY "KOUI-MEISAI SET"
+               IF      WRK-FEDT-HOUKATU-FLG   =   "6"
+                  IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "1"
+                     MOVE    1             TO  WRK-FEDT-KOUI-MEISAI2
+                  END-IF
+                  IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "2"
+                     MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
+                  END-IF
+               END-IF
+               MOVE    ZERO                TO  WRK-FEDT-KOUI-MEISAI3
+                                               WRK-FEDT-KOUI-MEISAI4
+                                               WRK-FEDT-KOUI-MEISAI6
+                                               WRK-FEDT-KOUI-MEISAI7
+                                               WRK-FEDT-KOUI-MEISAI8
+                                               WRK-FEDT-KOUI-MEISAI9
+                                               WRK-FEDT-KOUI-MEISAI10
+                                               WRK-FEDT-KOUI-MEISAI11
+                                               WRK-FEDT-KOUI-MEISAI12
+               MOVE    WRK-FEDT-KOUI-MEISAI
+                                           TO  WRK-DATA
+               MOVE    12                  TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-END
+               PERFORM 5004-MOJI-HENSYU-SEC
+               MOVE    "000000000000"      TO  WRK-FEDT-KOUI-MEISAI
+           END-IF
+      *--- AZU-MOD END   2016.07.04
            .
        200799-ZAI-HENSYU-F-EXT.
            EXIT.
