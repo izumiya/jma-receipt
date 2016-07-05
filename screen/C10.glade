@@ -143,9 +143,21 @@
           <data>CHANGED</data>
         </signal>
         <signal>
+          <name>button_press_event</name>
+          <handler>press_filter</handler>
+        </signal>
+        <signal>
           <name>activate</name>
           <handler>send_event</handler>
           <data>ACTIVATE</data>
+        </signal>
+        <signal>
+          <name>focus_in_event</name>
+          <handler>select_all</handler>
+        </signal>
+        <signal>
+          <name>focus_out_event</name>
+          <handler>unselect_all</handler>
         </signal>
       </widget>
       <widget>
