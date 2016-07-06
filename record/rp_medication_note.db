@@ -28,6 +28,7 @@ rp_medication_note {
 		Prescription	{
 			Medical_Class		varchar(2);
 			Amount				varchar(3);
+			Total_Amount_Flg    varchar(1);
 			Unit_Name			varchar(12);
 			Medication	{
 				Name				varchar(80);

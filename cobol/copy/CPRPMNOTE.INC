@@ -65,6 +65,8 @@
                    07  RPMNOTE-SRYKBN              PIC X(2).
       *                剤回数
                    07  RPMNOTE-ZAIKAISU            PIC X(3).
+      *                内服点剤区分
+                   07  RPMNOTE-NAIHENKBN           PIC X(01).
       *                剤単位名（回数／回分）
                    07  RPMNOTE-ZAITANINAME         PIC X(12).
                    07  RPMNOTE-MEDICATION          OCCURS  50 TIMES.
