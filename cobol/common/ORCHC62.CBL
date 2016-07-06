@@ -36,6 +36,7 @@
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.01    NACL-森脇    15/08/12  処方せん備考欄コメント表示
       *  04.08.02    NACL-森脇    15/09/14  注意事項・効能効果表示
+      *  04.08.00    NACL-多々納  16/07/XX  API(GINBEE)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1924,7 +1925,18 @@
                    MOVE    ORCSQRCSV62-SRYCD (IDX IDY)
                                                TO  RPMNOTE-SRYCD
                                                            (IDX IDY)
+      *            内服点剤
+                   IF      ORCSQRCSV62-NAIHENKBN (IDX IDY)
+                                               =   "1"
+                       MOVE    "1"             TO  RPMNOTE-NAIHENKBN
+                                                           (IDX)
+                   END-IF
                END-PERFORM
+      *        内服点剤ありは、単位名なし
+               IF      RPMNOTE-NAIHENKBN (IDX) =   "1"
+                   MOVE    SPACE               TO  RPMNOTE-ZAITANINAME
+                                                           (IDX)
+               END-IF
            END-PERFORM
       *    備考
            PERFORM VARYING     IDX     FROM    1   BY  1
