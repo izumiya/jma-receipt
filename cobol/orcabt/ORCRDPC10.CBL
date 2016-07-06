@@ -4999,7 +4999,13 @@
            END-EVALUATE
       *出来高・包括フラグ
       * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
-           MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
+      *---AZU-MOD START 2016.07.04
+           IF     RECE641-SRYYM     <   201604
+                MOVE    TNS-DPCKBN  TO  WRK-FEDT-HOUKATU-FLG
+           ELSE
+                MOVE    TNS-DPCKBN  TO  WRK-FEDT-KOUI-MEISAI5
+           END-IF
+      *---AZU-MOD START 2016.07.04
       **   SET     TBL-DPCDEKIDAKA-IDX TO  1
       **   SEARCH  TBL-DPCDEKIDAKA-OCC
       **                       VARYING TBL-DPCDEKIDAKA-IDX
