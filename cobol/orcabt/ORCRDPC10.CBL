@@ -3658,7 +3658,10 @@
                   MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
              END-IF
            ELSE
-                  MOVE    TNS-DPCKBN          TO  WRK-FEDT-KOUI-MEISAI5
+             IF      WRK-FEDT-HOUKATU-FLG    NOT =   "6"
+                  MOVE  "0"                   TO  WRK-FEDT-HOUKATU-FLG
+             END-IF
+             MOVE    TNS-DPCKBN          TO  WRK-FEDT-KOUI-MEISAI5
            END-IF
       *---AZU-MOD END   2016.07.04
       *使用量から出来高・包括フラグまで
@@ -5361,13 +5364,16 @@
            ELSE
       *        行為・明細区分情報
       *         DISPLAY "KOUI-MEISAI SET"
-               IF      WRK-FEDT-HOUKATU-FLG   =   "6"
+               IF     (WRK-FEDT-HOUKATU-FLG   =   "6")  AND
+                      (RECE641-JIHOKBN        =   "1")
                   IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "1"
                      MOVE    1             TO  WRK-FEDT-KOUI-MEISAI2
                   END-IF
                   IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "2"
                      MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
                   END-IF
+               ELSE
+                  MOVE    ZERO             TO  WRK-FEDT-KOUI-MEISAI2
                END-IF
                MOVE    ZERO                TO  WRK-FEDT-KOUI-MEISAI3
                                                WRK-FEDT-KOUI-MEISAI4
