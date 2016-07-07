@@ -128,6 +128,7 @@
       *              NACL-小豆沢  15/10/20  処置の出来高実績点数セット修正
       *
       *              NACL-小豆沢  16/07/04  平成２８年度対応
+      *                           16/07/07  入院料の包括対象か判定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -292,6 +293,8 @@
            03  FLG-HOUKATU-RECE04      PIC 9(01).
            03  FLG-TOKUTEINYUIN        PIC 9(01).
            03  FLG-TOKUTEINYUIN-SET    PIC 9(01).
+           03  FLG-ETENSU1             PIC 9(01).
+           03  FLG-ETENSU2             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -569,6 +572,10 @@
       *    包括項目区分編集用
            03  WRK-HOUKATU-TBL.
                05  WRK-HOUKATU-KBN             PIC X(01)  OCCURS  31.
+      *
+      *    電子点数表の退避用
+           03  WRK-ETENSU-TBL.
+               05  WRK-ETENSU1-H-GROUP1        PIC X(07)  OCCURS  31.
       *
       *    医薬品・特定器材用テーブル
        01  TBL-ZAIW-AREA.
@@ -1255,6 +1262,14 @@
       *    診療行為
        01  SRYACT-REC.
            COPY    "CPSRYACT.INC".
+      *
+      *    電子点数表　補助マスター
+       01  ETENSU1-REC.
+           COPY    "CPETENSU1.INC".
+      *
+      *    電子点数表　包括・被包括マスター
+       01  ETENSU2-REC.
+           COPY    "CPETENSU2.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -2102,11 +2117,141 @@
                        END-IF
                     END-IF
       *
+      *             補助マスターチェック用
                     IF  LNK-NYUINDAY-TANKI3-KBN(IDX)   = "1"  OR  "2"
                         MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
                     END-IF
-      *
                 END-IF
+      *
+      *         入院料の包括グループ番号取得
+                IF    LNK-DPCNYUIN-SRYCD(1 IDX 1)  NOT = SPACE
+                    MOVE    SPACE           TO  ETENSU1-REC
+                    INITIALIZE                  ETENSU1-REC
+                    MOVE    LNK-DPCNYUIN-SRYCD(1 IDX 1)
+                                            TO  ETENSU1-SRYCD
+                    MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                            TO  ETENSU1-YUKOEDYMD
+                    MOVE    ETENSU1-REC     TO  MCPDATA-REC
+                    MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                    MOVE    "key"           TO  MCP-PATHNAME
+                    PERFORM 900-DBSELECT-SEC
+                    IF      MCP-RC              =   ZERO
+                        MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                        MOVE    "key"           TO  MCP-PATHNAME
+                        PERFORM 900-ETENSU1-READ-SEC
+                        IF   FLG-ETENSU1        =   ZERO
+                            MOVE  ETENSU1-H-GROUP(1)
+                                                TO  WRK-ETENSU1-H-GROUP1
+                                                                 (IDX)
+                        END-IF
+                    ELSE
+                        MOVE    1               TO  FLG-ETENSU1
+                        INITIALIZE                  ETENSU1-REC
+                    END-IF
+                    MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+                    MOVE    "key"               TO  MCP-PATHNAME
+                    PERFORM 900-CLOSE-SEC
+                END-IF
+      *
+      *         特定入院料の包括グループ番号取得
+                IF    LNK-DPCNYUIN-SRYCD(2 IDX 1)  NOT = SPACE
+                    MOVE    SPACE           TO  ETENSU1-REC
+                    INITIALIZE                  ETENSU1-REC
+                    MOVE    LNK-DPCNYUIN-SRYCD(2 IDX 1)
+                                            TO  ETENSU1-SRYCD
+                    MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                            TO  ETENSU1-YUKOEDYMD
+                    MOVE    ETENSU1-REC     TO  MCPDATA-REC
+                    MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                    MOVE    "key"           TO  MCP-PATHNAME
+                    PERFORM 900-DBSELECT-SEC
+                    IF      MCP-RC              =   ZERO
+                        MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                        MOVE    "key"           TO  MCP-PATHNAME
+                        PERFORM 900-ETENSU1-READ-SEC
+                        IF   FLG-ETENSU1        =   ZERO
+                            MOVE  ETENSU1-H-GROUP(1)
+                                                TO  WRK-ETENSU1-H-GROUP1
+                                                                 (IDX)
+                        END-IF
+                    ELSE
+                        MOVE    1               TO  FLG-ETENSU1
+                        INITIALIZE                  ETENSU1-REC
+                    END-IF
+                    MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+                    MOVE    "key"               TO  MCP-PATHNAME
+                    PERFORM 900-CLOSE-SEC
+                END-IF
+      *
+      *         短期滞在手術等基本料２の包括グループ番号取得
+                IF   (LNK-NYUINDAY-TANKI2-KBN(IDX)   = "1"  OR  "2") AND
+                     (LNK-NYUINDAY-TANKI3-KBN(IDX)   =  SPACE)
+                    MOVE    SPACE           TO  ETENSU1-REC
+                    INITIALIZE                  ETENSU1-REC
+                    MOVE    "190076810"     TO  ETENSU1-SRYCD
+                    MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                            TO  ETENSU1-YUKOEDYMD
+                    MOVE    ETENSU1-REC     TO  MCPDATA-REC
+                    MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                    MOVE    "key"           TO  MCP-PATHNAME
+                    PERFORM 900-DBSELECT-SEC
+                    IF      MCP-RC              =   ZERO
+                        MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                        MOVE    "key"           TO  MCP-PATHNAME
+                        PERFORM 900-ETENSU1-READ-SEC
+                        IF   FLG-ETENSU1        =   ZERO
+                            MOVE  ETENSU1-H-GROUP(1)
+                                                TO  WRK-ETENSU1-H-GROUP1
+                                                                 (IDX)
+                        END-IF
+                    ELSE
+                        MOVE    1               TO  FLG-ETENSU1
+                        INITIALIZE                  ETENSU1-REC
+                    END-IF
+                    MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+                    MOVE    "key"               TO  MCP-PATHNAME
+                    PERFORM 900-CLOSE-SEC
+                END-IF
+      *
+      *         短期滞在手術等基本料３の包括グループ番号取得
+                IF   (LNK-NYUINDAY-TANKI2-KBN(IDX)   = "1"  OR  "2") AND
+                     (LNK-NYUINDAY-TANKI3-KBN(IDX)   = "1"  OR  "2")
+                    MOVE    SPACE           TO  ETENSU1-REC
+                    INITIALIZE                  ETENSU1-REC
+      *             グループ番号取得なので短手３のコードはなんでもよい
+                    MOVE    "190076810"     TO  ETENSU1-SRYCD
+                    MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                            TO  ETENSU1-YUKOEDYMD
+                    MOVE    ETENSU1-REC     TO  MCPDATA-REC
+                    MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                    MOVE    "key"           TO  MCP-PATHNAME
+                    PERFORM 900-DBSELECT-SEC
+                    IF      MCP-RC              =   ZERO
+                        MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                        MOVE    "key"           TO  MCP-PATHNAME
+                        PERFORM 900-ETENSU1-READ-SEC
+                        IF   FLG-ETENSU1        =   ZERO
+                            MOVE  ETENSU1-H-GROUP(1)
+                                                TO  WRK-ETENSU1-H-GROUP1
+                                                                 (IDX)
+                        END-IF
+                    ELSE
+                        MOVE    1               TO  FLG-ETENSU1
+                        INITIALIZE                  ETENSU1-REC
+                    END-IF
+                    MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+                    MOVE    "key"               TO  MCP-PATHNAME
+                    PERFORM 900-CLOSE-SEC
+                END-IF
+      *
            END-PERFORM
       *--- AZU-ADD END   2016.07.04
       *
@@ -6591,6 +6736,89 @@
                    GO      TO        9999-SRYACCT-HENSYU-EXT
            END-IF
       *
+      *--- AZU-ADD START 2016.07.07
+      *    入院料の包括対象か判定
+      *    診療行為データ読み込み
+           INITIALIZE                      SRYACT-REC
+           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"    TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SRYACT-READ-SEC
+               IF      FLG-SRYACT      =   ZERO
+      **             DISPLAY "SRY-SRYCD(1)(1:1) = " SRY-SRYCD(1)
+                   IF   SRY-SRYCD(1)(1:1)   =    "1"
+                      PERFORM    VARYING   IDX  FROM 1  BY  1
+                        UNTIL     IDX  >  31
+      **                     DISPLAY "IDX = " IDX
+      **                     DISPLAY "WRK-ETENSU1-H-GROUP1= "
+      **                             WRK-ETENSU1-H-GROUP1(IDX)
+                           IF   WRK-ETENSU1-H-GROUP1(IDX)  NOT =  SPACE
+                              MOVE    SPACE           TO  ETENSU2-REC
+                              INITIALIZE                  ETENSU2-REC
+                              MOVE    WRK-ETENSU1-H-GROUP1(IDX)
+                                            TO  ETENSU2-H-GROUP
+                              MOVE    SRY-SRYCD(1)
+                                            TO  ETENSU2-SRYCD
+                              MOVE    SRY-SRYYM
+                                            TO  ETENSU2-YUKOSTYMD(1:6)
+                              MOVE    "01"  TO  ETENSU2-YUKOSTYMD(7:2)
+                              MOVE    ETENSU2-YUKOSTYMD
+                                            TO  ETENSU2-YUKOEDYMD
+                              MOVE    ETENSU2-REC
+                                            TO  MCPDATA-REC
+                              MOVE    "tbl_etensu_2"
+                                            TO  MCP-TABLE
+                              MOVE    "key" TO  MCP-PATHNAME
+                              PERFORM 900-DBSELECT-SEC
+                              IF      MCP-RC              =   ZERO
+                                 MOVE    "tbl_etensu_2" TO  MCP-TABLE
+                                 MOVE    "key"          TO  MCP-PATHNAME
+                                 PERFORM 900-ETENSU2-READ-SEC
+                                 IF   FLG-ETENSU2        =   ZERO
+                                     CONTINUE
+                                 ELSE
+                                     MOVE   ZERO  TO   ACCT-DAY(1 IDX)
+                                 END-IF
+                              ELSE
+                                 MOVE    1      TO  FLG-ETENSU2
+                                 INITIALIZE         ETENSU2-REC
+                              END-IF
+                              MOVE    "tbl_etensu_2"  TO  MCP-TABLE
+                              MOVE    "key"           TO  MCP-PATHNAME
+                              PERFORM 900-CLOSE-SEC
+                           END-IF
+                      END-PERFORM
+                   END-IF
+               END-IF
+           END-IF
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           MOVE    ZERO       TO   ACCT-ZAIKAISU
+           PERFORM VARYING IJ  FROM  1  BY  1
+                   UNTIL   IJ  >  31
+               IF      ACCT-DAY(1 IJ)   NOT =  ZERO
+                   COMPUTE ACCT-ZAIKAISU       =   ACCT-ZAIKAISU
+                                               +   ACCT-DAY(1 IJ)
+               END-IF
+           END-PERFORM
+           IF      ACCT-ZAIKAISU       =   ZERO
+                   GO      TO        9999-SRYACCT-HENSYU-EXT
+           END-IF
+      *--- AZU-ADD END   2016.07.07
+      *
            MOVE    ZERO                TO  FLG-HOUKATU-RECE04
       *
       *    診療行為データ読み込み
@@ -6952,6 +7180,39 @@
        900-SRYACT-READ-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    補助マスターＲＥＡＤ
+      *****************************************************************
+       900-ETENSU1-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-ETENSU1
+               MOVE    MCPDATA-REC     TO  ETENSU1-REC
+           ELSE
+               MOVE    1               TO  FLG-ETENSU1
+           END-IF
+           .
+       900-ETENSU1-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    包括・被包括マスターＲＥＡＤ
+      *****************************************************************
+       900-ETENSU2-READ-SEC         SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-ETENSU2
+               MOVE    MCPDATA-REC     TO  ETENSU2-REC
+           ELSE
+               MOVE    1               TO  FLG-ETENSU2
+           END-IF
+           .
+       900-ETENSU2-READ-EXT.
+           EXIT.
       *
       *****************************************************************
       *    テーブルクローズ処理
