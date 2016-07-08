@@ -4746,10 +4746,25 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN19)
                                    CONTINUE
                                ELSE
-                                   IF   (IDXZ       =  1)   AND
-                                        (LNK-DPCNYUIN-SRYSKB
+                                    IF    IDXZ       =  1
+                                    OR    LNK-DPCNYUIN-SRYSKB
                                                        (IDZ1 IDZ2 IDXZ)
-                                                     = "97")
+                                                     = "97"
+      *                                外泊の場合
+      *                                平成２７年３月迄は１明細の記録
+      *                                平成２７年４月以降は２明細での記録
+                                       IF (LNK-DPCNYUIN-SANTEIYM  <=
+                                                              "201503")
+                                         IF  LNK-DPCNYUIN-SRYCD
+                                                       (IDZ1 IDZ2 2)
+                                                     = "190107290" OR
+                                                       "190107390" OR
+                                                       "190107490" OR
+                                                       "190107590"
+      *                                    ２行目のレコード
+                                           MOVE    2   TO  IDXZ
+                                         END-IF
+                                       END-IF
                                        MOVE  IDZ2  TO  WRK-FEDT-DD
                                        PERFORM
                                          200771-NYUIN-ZAI-E-HENSYU-SEC
