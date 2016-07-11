@@ -1648,7 +1648,7 @@
                                                +   WRK-SUM-TENSUKEI-TG
                    END-IF
                    MOVE    ZERO                TO  WRK-TENSUKEI
-                   COMPUTE WRK-TENSUKEI        =   WRK-GOK-TENSUKEI
+                   COMPUTE WRK-TENSUKEI        =   WRK-KEISAN-TEN
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                    ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-K
