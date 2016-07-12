@@ -2225,7 +2225,7 @@
                     MOVE    SPACE           TO  ETENSU1-REC
                     INITIALIZE                  ETENSU1-REC
       *             グループ番号取得なので短手３のコードはなんでもよい
-                    MOVE    "190076810"     TO  ETENSU1-SRYCD
+                    MOVE    "190196410"     TO  ETENSU1-SRYCD
                     MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
                     MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
                     MOVE    ETENSU1-YUKOSTYMD
@@ -2255,6 +2255,12 @@
            END-PERFORM
       *--- AZU-ADD END   2016.07.04
       *
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(1) = " WRK-ETENSU1-H-GROUP1(1)
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(2) = " WRK-ETENSU1-H-GROUP1(2)
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(3) = " WRK-ETENSU1-H-GROUP1(3)
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(4) = " WRK-ETENSU1-H-GROUP1(4)
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(5) = " WRK-ETENSU1-H-GROUP1(5)
+      *     DISPLAY "WRK-ETENSU1-H-GROUP1(6) = " WRK-ETENSU1-H-GROUP1(6)
            .
        2001-NYUINRYO-GET-EXT.
            EXIT.
@@ -7203,9 +7209,10 @@
            MOVE    "DBFETCH"           TO  MCP-FUNC
            PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    ZERO            TO  FLG-ETENSU1
                MOVE    MCPDATA-REC     TO  ETENSU1-REC
+               MOVE    ZERO            TO  FLG-ETENSU1
            ELSE
+               INITIALIZE                  ETENSU1-REC
                MOVE    1               TO  FLG-ETENSU1
            END-IF
            .
@@ -7220,9 +7227,10 @@
            MOVE    "DBFETCH"           TO  MCP-FUNC
            PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    ZERO            TO  FLG-ETENSU2
                MOVE    MCPDATA-REC     TO  ETENSU2-REC
+               MOVE    ZERO            TO  FLG-ETENSU2
            ELSE
+               INITIALIZE                  ETENSU2-REC
                MOVE    1               TO  FLG-ETENSU2
            END-IF
            .
