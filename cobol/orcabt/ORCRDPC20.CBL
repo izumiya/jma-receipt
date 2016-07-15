@@ -2832,7 +2832,8 @@
                 IF    WRK-FEDT-SRYKBN          =  "70"
                 AND   WRK-FEDT-DEKIDAKA-SUM    >  ZERO
                 AND  (TBL-KOUI-SRYCD(IDX)  NOT =  "170017170"
-                                           AND    "170017270")
+                                           AND    "170017270"
+                                           AND    "170034170")
                    COMPUTE WRK-FEDT-DEKIDAKA-TEN
                                        =   RECE04-ZAITEN
                                        -   WRK-FEDT-DEKIDAKA-SUM
@@ -2841,7 +2842,8 @@
       *!                               =   RECE04-ZAITEN
       *!                               -   TBL-KOUI-TEN (IDX - 1)
                    IF  (TBL-KOUI-SRYCD(IDX) =   "170017170"
-                                            OR  "170017270")
+                                            OR  "170017270"
+                                            OR  "170034170")
                    AND (WRK-FEDT-PREV-TEN721 >  ZERO)
                        MOVE WRK-FEDT-PREV-TEN721
                                        TO   WRK-FEDT-PREV-TEN
