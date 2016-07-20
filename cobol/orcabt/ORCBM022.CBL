@@ -97,6 +97,8 @@
       *  04.07.02    NACL-∆£∏∂    14/03/30   ø¿Æ£≤£∂«Ø£¥∑Ó≤˛¿µ¬–±˛
       *
       *  04.08.01    NACL-∆£∏∂    14/07/07  ∞Ïª˛•«•£•Ï•Ø•»•Í¬–±˛
+      *  04.08.02    NACL-∆£∏∂    16/06/13  º“ ›ø«Œ≈ ÛΩ∑¿¡µ·ΩÒ§Œ∫“≥≤≥∫≈ˆ
+      *                                      ¨§Œ§ﬁ§»§·¬–±˛
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -454,7 +456,7 @@ grpsys     COPY    "COMMON-SPA".
            MOVE    "STS"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
            MOVE    "ORCBM022"      TO  JOB-PGID
-           IF      WRK-PARA-GENMENKBN  =   ZERO 
+           IF      WRK-PARA-GENMENKBN  =   ZERO    OR  "9"
                MOVE    "º“ ›¡Ì≥Á…Ω° ≤˛¿µ»«°À"
                                    TO  JOB-SHELLMSG
            ELSE
@@ -1508,15 +1510,30 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
            END-IF
       *     
            MOVE    1                   TO  IDX1
-      *    
+      *
+      *    §ﬁ§»§·§Î§»§≠§Œ∫“≥≤»Û≥∫≈ˆ ¨§œ»˜πÕÕÛΩ∏∑◊§∑§ §§
+           IF    ( WRK-PARA-GENMENKBN
+                                   =   "9"               )
+           AND   ( RECE10-ETC-YKZFTN (1)
+                               NOT =   6   AND 7   AND 8 )
+               CONTINUE
+           ELSE
+               PERFORM 2101-HKN-BIKOU-SYUKEI-SEC
+           END-IF
+      *
+      *    §ﬁ§»§·§Î§»§≠§Œ∫“≥≤≥∫≈ˆ ¨§œΩËÕ˝Ω™Œª
+           IF    ( WRK-PARA-GENMENKBN
+                                   =   "9"               )
+           AND   ( RECE10-ETC-YKZFTN (1)
+                                   =   6   OR  7   OR  8 )
+               GO  TO  210-HKN-SYUKEI-EXT
+           END-IF
+      *
       *    ∑ÔøÙ
            ADD     1               TO  SUM-KENSU (IDY4 IDY3 IDY1 IDY2)
-                                       SUM-BIKOU-KENSU (IDY4 IDY3)
            IF      RECE10-SHOKUJINISSU(IDX1)   >   ZERO
                ADD     1           TO  SUM-SHOKUJIKENSU
                                       (IDY4 IDY3 IDY1 IDY2)
-                                       SUM-BIKOU-SHOKUJIKENSU
-                                      (IDY4 IDY3)
            END-IF
       *    ° £±°ÀπÁ∑◊°¢¡Ì∑ÔøÙ
            ADD     1                   TO  SUM-GOK-KENSU (IDY4 IDY3 1)
@@ -1529,43 +1546,30 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    ø«Œ≈º¬∆¸øÙ°¡∞Ï…Ù…È√¥∂‚ 
            ADD     RECE10-JNISSU         (IDX1)
                                  TO  SUM-NISSU     (IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-NISSU
-                                                   (IDY4 IDY3) 
            ADD     RECE10-TOTALTEN       (IDX1)
                                  TO  SUM-TOTALTEN  (IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-TOTALTEN
-                                                   (IDY4 IDY3)
            IF    ( WRK-PRTFLG          =   5                     )
            OR    ( WRK-PRTFLG          =   4   AND
                    WRK-NYUGAIKBN       =   "1" AND
                    RECE10-SRYYM        >=  WRK-CONS-SRYYM-201204 )
                ADD     RECE10-FTNMONEY       (IDX1)
                              TO  SUM-FTNMONEY      (IDY4 IDY3 IDY1 IDY2)
-                                 SUM-BIKOU-FTNMONEY(IDY4 IDY3)
            ELSE
                IF    (  IDY1               <   3        )
                OR    ( (IDY1               =   3 ) AND
-                       (IDY2               =   3 )      )                          
+                       (IDY2               =   3 )      )
                    ADD     RECE10-FTNMONEY       (IDX1)
                                  TO  SUM-FTNMONEY  (IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-FTNMONEY
-                                                   (IDY4 IDY3)
                END-IF
            END-IF                          
            ADD     RECE10-SHOKUJINISSU   (IDX1)
                                  TO  SUM-SHOKUJINISSU
                                                    (IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-SHOKUJINISSU
-                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIRYOYOHI (IDX1)
                                  TO  SUM-SHOKUJIRYOYOHI
                                                    (IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-SHOKUJIRYOYOHI
-                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIFTN     (IDX1)
                                  TO  SUM-SHOKUJIFTN(IDY4 IDY3 IDY1 IDY2)
-                                     SUM-BIKOU-SHOKUJIFTN
-                                                   (IDY4 IDY3)
       *
       *    æÆ∑◊
            IF      IDY2            >   1
@@ -1608,6 +1612,54 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    ∞ÂŒ≈ ›∏± ¨»˜πÕÕÛΩ∏∑◊ΩËÕ˝
+      *****************************************************************
+       2101-HKN-BIKOU-SYUKEI-SEC          SECTION.
+      *    
+      *    ∑ÔøÙ
+           ADD     1               TO  SUM-BIKOU-KENSU (IDY4 IDY3)
+           IF      RECE10-SHOKUJINISSU(IDX1)   >   ZERO
+               ADD     1               TO  SUM-BIKOU-SHOKUJIKENSU
+                                                           (IDY4 IDY3)
+           END-IF
+      *
+      *    ø«Œ≈º¬∆¸øÙ°¡∞Ï…Ù…È√¥∂‚ 
+           ADD     RECE10-JNISSU         (IDX1)
+                                   TO  SUM-BIKOU-NISSU (IDY4 IDY3) 
+           ADD     RECE10-TOTALTEN       (IDX1)
+                                   TO  SUM-BIKOU-TOTALTEN
+                                                       (IDY4 IDY3)
+           IF    ( WRK-PRTFLG          =   5                     )
+           OR    ( WRK-PRTFLG          =   4   AND
+                   WRK-NYUGAIKBN       =   "1" AND
+                   RECE10-SRYYM        >=  WRK-CONS-SRYYM-201204 )
+               ADD     RECE10-FTNMONEY       (IDX1)
+                                       TO  SUM-BIKOU-FTNMONEY(IDY4 IDY3)
+           ELSE
+               IF    (  IDY1               <   3        )
+               OR    ( (IDY1               =   3 ) AND
+                       (IDY2               =   3 )      )
+                   ADD     RECE10-FTNMONEY       (IDX1)
+                                           TO  SUM-BIKOU-FTNMONEY
+                                                             (IDY4 IDY3)
+               END-IF
+           END-IF                          
+           ADD     RECE10-SHOKUJINISSU   (IDX1)
+                                   TO  SUM-BIKOU-SHOKUJINISSU
+                                                       (IDY4 IDY3)
+           ADD     RECE10-SHOKUJIRYOYOHI (IDX1)
+                                   TO  SUM-BIKOU-SHOKUJIRYOYOHI
+                                                       (IDY4 IDY3)
+           ADD     RECE10-SHOKUJIFTN     (IDX1)
+                                   TO  SUM-BIKOU-SHOKUJIFTN
+                                                       (IDY4 IDY3)
+      *
+           MOVE    1               TO  FLG-UPD 
+           .
+       2101-HKN-BIKOU-SYUKEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ∏¯»Ò…È√¥ ¨Ω∏∑◊ΩËÕ˝
       *****************************************************************
        220-KOH-SYUKEI-SEC        SECTION.
@@ -1615,6 +1667,24 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
            PERFORM VARYING IDZ     FROM    1   BY  1
                    UNTIL   IDZ     >       4
                    OR  RECE10-KOHNUM (IDZ) =   SPACE
+      *
+      *      §ﬁ§»§·§Î§»§≠§Œ∫“≥≤»Û≥∫≈ˆ ¨§œ»˜πÕÕÛΩ∏∑◊§∑§ §§
+             IF    ( WRK-PARA-GENMENKBN
+                                     =   "9"               )
+             AND   ( RECE10-ETC-YKZFTN (1)
+                                 NOT =   6   AND 7   AND 8 )
+                 CONTINUE
+             ELSE
+                 PERFORM 2202-KOH-BIKOU-SYUKEI-01-SEC
+             END-IF
+      *
+      *      §ﬁ§»§·§Î§»§≠§Œ∫“≥≤≥∫≈ˆ ¨§œΩËÕ˝Ω™Œª
+             IF    ( WRK-PARA-GENMENKBN
+                                     =   "9"               )
+             AND   ( RECE10-ETC-YKZFTN (1)
+                                     =   6   OR  7   OR  8 )
+                 CONTINUE
+             ELSE
       *
                MOVE    SPACE               TO  WRK-MEISYO 
       *
@@ -1663,6 +1733,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                        MOVE    100             TO  IDX2
                    END-IF
                END-PERFORM
+             END-IF
            END-PERFORM                 
            .
        220-KOH-SYUKEI-EXT.
@@ -1677,13 +1748,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    
       *    ∑ÔøÙ
            ADD     1           TO  SUM-KOH-KENSU (IDY4 IDY3 IDX1 IDX2)
-                                   SUM-BIKOU-KENSU
-                                                 (IDY4 IDY3)
            IF      RECE10-SHOKUJINISSU(IDY)    >   ZERO
                ADD     1       TO  SUM-KOH-SHOKUJIKENSU
                                                  (IDY4 IDY3 IDX1 IDX2)
-                                   SUM-BIKOU-SHOKUJIKENSU
-                                                 (IDY4 IDY3)
            END-IF
       *   ° £≥°ÀπÁ∑◊°¢¡Ì∑ÔøÙ
            ADD     1                   TO  SUM-GOK-KENSU (IDY4 IDY3 3)
@@ -1696,24 +1763,50 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *    ø«Œ≈º¬∆¸øÙ°¡∞Ï…Ù…È√¥∂‚ 
            ADD     RECE10-TOTALTEN       (IDY)
                              TO  SUM-KOH-TOTALTEN  (IDY4 IDY3 IDX1 IDX2)
-                                 SUM-BIKOU-TOTALTEN(IDY4 IDY3)
            ADD     RECE10-FTNMONEY       (IDY)
                              TO  SUM-KOH-FTNMONEY  (IDY4 IDY3 IDX1 IDX2)
-                                 SUM-BIKOU-FTNMONEY(IDY4 IDY3)
       *                           
            ADD     RECE10-SHOKUJIRYOYOHI (IDY)
                              TO  SUM-KOH-SHOKUJIRYOYOHI
                                                    (IDY4 IDY3 IDX1 IDX2)
-                                 SUM-BIKOU-SHOKUJIRYOYOHI
-                                                   (IDY4 IDY3)
            ADD     RECE10-SHOKUJIFTN     (IDY)
                              TO  SUM-KOH-SHOKUJIFTN(IDY4 IDY3 IDX1 IDX2)
-                                 SUM-BIKOU-SHOKUJIFTN(IDY4 IDY3)
       *
            MOVE    1               TO  FLG-UPD 
       *
            .
        2201-KOH-SYUKEI-01-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∏¯»Ò»˜πÕÕÛΩ∏∑◊ΩËÕ˝
+      *****************************************************************
+       2202-KOH-BIKOU-SYUKEI-01-SEC        SECTION.
+      *
+           COMPUTE IDY     =   IDZ     +   1
+      *    
+      *    ∑ÔøÙ
+           ADD     1           TO  SUM-BIKOU-KENSU     (IDY4 IDY3)
+           IF      RECE10-SHOKUJINISSU(IDY)    >   ZERO
+               ADD     1       TO  SUM-BIKOU-SHOKUJIKENSU  (IDY4 IDY3)
+           END-IF
+      *
+      *    ø«Œ≈º¬∆¸øÙ°¡∞Ï…Ù…È√¥∂‚ 
+           ADD     RECE10-TOTALTEN       (IDY)
+                               TO  SUM-BIKOU-TOTALTEN  (IDY4 IDY3)
+           ADD     RECE10-FTNMONEY       (IDY)
+                               TO  SUM-BIKOU-FTNMONEY  (IDY4 IDY3)
+      *                           
+           ADD     RECE10-SHOKUJIRYOYOHI (IDY)
+                               TO  SUM-BIKOU-SHOKUJIRYOYOHI
+                                                       (IDY4 IDY3)
+           ADD     RECE10-SHOKUJIFTN     (IDY)
+                               TO  SUM-BIKOU-SHOKUJIFTN(IDY4 IDY3)
+      *
+           MOVE    1               TO  FLG-UPD 
+      *
+           .
+       2202-KOH-BIKOU-SYUKEI-01-EXT.
            EXIT.
       *
       *****************************************************************

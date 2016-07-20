@@ -189,6 +189,8 @@
       *  04.08.07    NACL-藤原    16/01/18  点検用レセプト一般名処方記載
       *                                     対応
       *  04.08.06    NACL-藤原    16/04/20  湿布薬用法レセプト記載対応
+      *  04.08.07    NACL-藤原    16/06/13  社保診療報酬請求書の災害該当
+      *                                     分のまとめ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -741,6 +743,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-SYAPRTKBNMEI
                                               PIC X(22).
+                       09  SPA-GMN-DISASTER-SYAPRTKBN-G.
+                           11  SPA-GMN-DISASTER-SYAPRTKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-DISASTER-SYAPRTKBNMEI
+                                              PIC X(30).
                        09  SPA-GMN-KOUIKIPRTKBN-G.
                            11  SPA-GMN-KOUIKIPRTKBN
                                               PIC X(01).
@@ -1029,6 +1037,15 @@
                        09  SPA-GMN-SYAPRTKBNMEIL
                                               PIC X(22).
                    07  SPA-GMN-SYAPRTKBN-MAX  PIC 9(02).    
+      *
+                   07  SPA-GMN-DISASTER-SYAPRTKBNLST   OCCURS  2.
+                       09  SPA-GMN-DISASTER-SYAPRTKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-DISASTER-SYAPRTKBNMEIL
+                                              PIC X(30).
+                   07  SPA-GMN-DISASTER-SYAPRTKBN-MAX
+                                              PIC 9(02).
       *                                        
                    07  SPA-GMN-KOUIKIPRTKBNLST       OCCURS  5.
                        09  SPA-GMN-KOUIKIPRTKBNL
@@ -2255,17 +2272,15 @@
                                    SPA-GMN-NYUTAIIN-KSIKBN-MAX 
       *     
            MOVE    "0"                 TO
-                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNL  (1)
+                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNL (1)
            MOVE    "入院料の算定がない入退院履歴を記載しない"
                                        TO
-                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNMEIL
-                                                                     (1)
+                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNMEIL (1)
            MOVE    "1"                 TO
                                    SPA-GMN-NYUTAIIN-NYU-KSIKBNL  (2)
            MOVE    "入院料の算定がない入退院履歴を記載する"
                                        TO
-                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNMEIL
-                                                                     (2)
+                                   SPA-GMN-NYUTAIIN-NYU-KSIKBNMEIL (2)
            MOVE    2                   TO
                                    SPA-GMN-NYUTAIIN-NYU-KSIKBN-MAX 
       *     
@@ -2284,6 +2299,18 @@
            MOVE    "マル長分を別作成する"
                                        TO  SPA-GMN-SYAPRTKBNMEIL (2)
            MOVE    2                   TO  SPA-GMN-SYAPRTKBN-MAX 
+      *
+           MOVE    "0"                 TO  SPA-GMN-DISASTER-SYAPRTKBNL
+                                                                   (1)
+           MOVE    "災害該当未確定分を別作成する"
+                                       TO SPA-GMN-DISASTER-SYAPRTKBNMEIL
+                                                                   (1)
+           MOVE    "1"                 TO  SPA-GMN-DISASTER-SYAPRTKBNL
+                                                                   (2)
+           MOVE    "災害該当未確定分を別作成しない"
+                                       TO SPA-GMN-DISASTER-SYAPRTKBNMEIL
+                                                                   (2)
+           MOVE    2                   TO SPA-GMN-DISASTER-SYAPRTKBN-MAX
       *     
            MOVE    "0"                 TO  SPA-GMN-KOUIKIPRTKBNL    (1)
            MOVE    "全て広域連合単位で作成"
@@ -4439,6 +4466,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-DISASTER-SYAPRTKBN
+                                       TO  SPA-GMN-DISASTER-SYAPRTKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >   SPA-GMN-DISASTER-SYAPRTKBN-MAX
+               IF      SPA-GMN-DISASTER-SYAPRTKBN 
+                               =   SPA-GMN-DISASTER-SYAPRTKBNL (IDY)
+                   MOVE    SPA-GMN-DISASTER-SYAPRTKBNLST (IDY)
+                                       TO  SPA-GMN-DISASTER-SYAPRTKBN-G
+                   MOVE    SPA-GMN-DISASTER-SYAPRTKBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
       *    レセプト・総括編集情報（区分コード１０のデータ読込）
            MOVE    SPACE               TO  SYS-200505-REC
            INITIALIZE                      SYS-200505-REC
@@ -5356,6 +5396,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-PREFPRGID1      TO  SPA-GMN-PREFPRGID1
            MOVE    W12-KKHPRTKBN       TO  SPA-GMN-KKHPRTKBN-G 
            MOVE    W12-SYAPRTKBN       TO  SPA-GMN-SYAPRTKBN-G 
+           MOVE    W12-DISASTER-SYAPRTKBN
+                                       TO  SPA-GMN-DISASTER-SYAPRTKBN-G
            MOVE    W12-KOUIKIPRTKBN    TO  SPA-GMN-KOUIKIPRTKBN-G 
            MOVE    W12-ROUSAIPRTKBN    TO  SPA-GMN-ROUSAIPRTKBN-G 
            MOVE    W12-FRAME-ROUSAIPRTKBN
@@ -6031,6 +6073,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4145-SYAPRTKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4208-DISASTER-SYAPRTKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -8794,6 +8841,36 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    診療報酬請求書災害該当分（非減免対象と減免対象）まとめチェック
+      *****************************************************************
+       4208-DISASTER-SYAPRTKBN-CHK-SEC       SECTION.
+      *
+           IF      SPA-GMN-DISASTER-SYAPRTKBN   =   SPACE
+               CONTINUE         
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-DISASTER-SYAPRTKBN-MAX
+                   IF      SPA-GMN-DISASTER-SYAPRTKBN
+                                   =   SPA-GMN-DISASTER-SYAPRTKBNL (IDY)
+                       MOVE    SPA-GMN-DISASTER-SYAPRTKBNLST (IDY)
+                                           TO
+                                           SPA-GMN-DISASTER-SYAPRTKBN-G
+                       MOVE    SPA-GMN-DISASTER-SYAPRTKBN-MAX
+                                           TO  IDY
+                   END-IF
+               END-PERFORM
+      *
+               IF      SPA-GMN-DISASTER-SYAPRTKBNMEI    =   SPACE
+                   MOVE    404                 TO  SPA-GMN-CUR
+                   MOVE    "0134"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4208-DISASTER-SYAPRTKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    枠記載区分（労災・入院外）チェック
       *****************************************************************
        4164-FRAME-ROUPRTKBN-CHK-SEC  SECTION.
@@ -10142,6 +10219,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO
                                    SYS-200501-NYUTAIINREKI-NYU-KSIKBN
            MOVE    SPA-GMN-ROURECEKBN      TO  SYS-200501-ROURECEKBN
+           MOVE    SPA-GMN-DISASTER-SYAPRTKBN
+                                           TO
+                                           SYS-200501-DISASTER-SYAPRTKBN
            MOVE    SYS-200501-REC          TO  SYSKANRI-REC
       *     
            PERFORM 800-MCNDATE-SEC
@@ -10697,6 +10777,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-NYUTAIIN-NYU-KSIKBN-G
                                             TO  W12-NYUTAIINREKI-NYU
            MOVE    SPA-GMN-SYAPRTKBN-G      TO  W12-SYAPRTKBN
+           MOVE    SPA-GMN-DISASTER-SYAPRTKBN-G
+                                            TO  W12-DISASTER-SYAPRTKBN
            MOVE    SPA-GMN-KKHPRTKBN-G      TO  W12-KKHPRTKBN
            MOVE    SPA-GMN-KOUIKIPRTKBN-G   TO  W12-KOUIKIPRTKBN
            MOVE    SPA-GMN-ROUSAIPRTKBN-G   TO  W12-ROUSAIPRTKBN
@@ -10936,6 +11018,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-SYAPRTKBN-MAX
                                        TO  W12-SYAPRTKBN-COUNT 
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   SPA-GMN-DISASTER-SYAPRTKBN-MAX
+               MOVE    SPA-GMN-DISASTER-SYAPRTKBNLST (IDY)
+                                       TO  W12-DISASTER-SYAPRTKBNLST
+                                                               (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-DISASTER-SYAPRTKBN-MAX
+                                       TO  W12-DISASTER-SYAPRTKBN-COUNT
       *     
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-KKHPRTKBN-MAX
@@ -11899,8 +11990,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "入退院履歴記載区分（入院外）入力エラー"
                                                          TO  SPA-ERRMSG
                WHEN    "0036"
-                   MOVE    "社保診療報酬請求書区分入力エラー"
-                                                         TO  SPA-ERRMSG
+                   STRING  "社保診療報酬請求書（マル長分）"
+                                               DELIMITED  BY  SIZE
+                           "入力エラー"        DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0037"
                    MOVE    "自賠責・枠記載区分（入院外）入力エラー"
                                                          TO  SPA-ERRMSG
@@ -12176,6 +12270,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0133"
                    MOVE    "湿布薬用法レセプト記載入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0134"
+                   STRING  "社保診療報酬請求書（災害該当分）"
+                                               DELIMITED  BY  SIZE
+                           "入力エラー"        DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12580,6 +12680,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "KKHPRTKBN"        TO   MCP-WIDGET
                 WHEN    150
                     MOVE  "SYAPRTKBN"        TO   MCP-WIDGET
+                WHEN    404
+                    MOVE  "DISASTER_SYAPRTKBN"
+                                             TO   MCP-WIDGET
                 WHEN    151
                     MOVE  "KOUIKIPRTKBN"     TO   MCP-WIDGET
                 WHEN    311
@@ -12649,6 +12752,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    11
                 WHEN    150 THRU    151
                 WHEN    311 THRU    312
+                WHEN    404
                     MOVE    7                TO  W12-PAGENO
                 WHEN    90  THRU    98
                     MOVE    8                TO  W12-PAGENO
@@ -12916,6 +13020,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "SYAPRTKBN"
+                   MOVE    404         TO  SPA-GMN-CUR
+               WHEN    "DISASTER_SYAPRTKBN"
                    MOVE    11          TO  SPA-GMN-CUR
                WHEN    "KKHPRTKBN"
                    MOVE    151         TO  SPA-GMN-CUR

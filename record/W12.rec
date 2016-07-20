@@ -723,6 +723,13 @@ W12 {
           count int;
             item varchar(24)[2];
         };
+        DISASTER_SYAPRTKBN_COMBO {
+          DISASTER_SYAPRTKBN {
+            textdata varchar(32);
+          };
+          count int;
+            item varchar(32)[2];
+        };
         KKHPRTKBN_COMBO {
           KKHPRTKBN {
             textdata varchar(20);

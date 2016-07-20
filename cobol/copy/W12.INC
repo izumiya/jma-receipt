@@ -599,6 +599,12 @@
                     06  W12-SYAPRTKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-SYAPRTKBNLST
                             PIC X(24)   OCCURS  2 TIMES.
+                  05  W12-DISASTER-SYAPRTKBN-COMBO.
+                    06  W12-DISASTER-SYAPRTKBN.
+                      07  W12-VALUE   PIC X(32).
+                    06  W12-DISASTER-SYAPRTKBN-COUNT   PIC S9(9) BINARY.
+                    06  W12-DISASTER-SYAPRTKBNLST
+                            PIC X(32)   OCCURS  2 TIMES.
                   05  W12-KKHPRTKBN-COMBO.
                     06  W12-KKHPRTKBN.
                       07  W12-VALUE   PIC X(20).

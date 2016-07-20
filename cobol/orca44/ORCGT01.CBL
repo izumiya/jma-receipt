@@ -198,6 +198,8 @@
       *  04.08.07    NACL-Æ£¸¶    15/10/15  ÍÍ¼°£´ÂÐ±þ
       *  04.08.08    NACL-Æ£¸¶    16/01/18  ÃÏÊý¸øÈñ½èÍý¥¹¥¯¥ê¥×¥È¤ÎÂ¸ºß
       *                                     ¥Á¥§¥Ã¥¯ÂÐ±þ
+      *  04.08.09    NACL-Æ£¸¶    16/06/13  ¼ÒÊÝ¿ÇÎÅÊó½·ÀÁµá½ñ¤ÎºÒ³²³ºÅö
+      *                                     Ê¬¤Î¤Þ¤È¤áÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -982,6 +984,10 @@ grpsys                                         SPA-AREA
                                        =   SPACE
                MOVE    "0"             TO  SYS-200501-FRAME-ROUSAIPRTKBN
            END-IF
+           IF     SYS-200501-DISASTER-SYAPRTKBN
+                                       =   SPACE
+               MOVE    "0"             TO  SYS-200501-DISASTER-SYAPRTKBN
+           END-IF
            MOVE    SYS-200501-KOUIKIKBN
                                        TO  SPA-NAI-200501-KOUIKIKBN
            MOVE    SYS-200501-KOUIKIRECEKBN
@@ -1011,6 +1017,9 @@ grpsys                                         SPA-AREA
            MOVE    SYS-200501-FRAME-ROUSAIPRTKBN
                                        TO
                                        SPA-NAI-200501-FRAME-ROUSAIPRTKBN
+           MOVE    SYS-200501-DISASTER-SYAPRTKBN
+                                       TO
+                                       SPA-NAI-200501-DISASTER-SYAPRTKBN
      *
            IF      SPA-MW              =   SPA-GINBEE
                MOVE    "0"                 TO
@@ -3823,33 +3832,42 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                              OR      WRK-HKNJANUM-S (IDYY)
                                                =   SPACE
                        MOVE    "1"                 TO  WRK-SHELL-RECEKBN
-                       MOVE    "1"                 TO  WRK-SHELL-SYOKBN
-                       PERFORM 45013-SOKATU-SYORI-SEC
-      *
-      *                ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
-      *                µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ 
-      *                Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
-      *                Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
-      *                Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
-      *                ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«ÂÐ±þ
-      *
-                       IF  (( SPA-PREFNUM     =   "15"            ) AND
-                            ( SPA-NAI-SKYYM  >=  200709           ))
-                       OR  (( SPA-PREFNUM     =   "03"   OR  "04" ) AND
-                            ( SPA-NAI-SKYYM  >=  200806           ))
-                       OR  (( SPA-PREFNUM     =   "35"   OR  "40" ) AND
-                            ( SPA-NAI-SKYYM  >=  200907           ))
-                       OR  (( SPA-PREFNUM     =   "28"   OR  "33" ) AND
-                            ( SPA-NAI-SKYYM  >=  200908           ))
-                       OR  (( SPA-PREFNUM     =   "34"            ) AND
-                            ( SPA-NAI-SKYYM  >=  201007           ))
-                       OR  (( SPA-PREFNUM     =   "46"            ) AND
-                            ( SPA-NAI-SKYYM  >=  201010           ))
-                       OR  (  SPA-NAI-SKYYM  >=  201101            )
-                           MOVE    "1"             TO  WRK-SHELL-RECEKBN
-                           MOVE    "2"             TO  WRK-SHELL-SYOKBN
+                       IF      SPA-NAI-200501-DISASTER-SYAPRTKBN
+                                               =   "1"
+                           MOVE    "9"             TO  WRK-SHELL-SYOKBN
                            PERFORM 45013-SOKATU-SYORI-SEC
-                       END-IF
+                       ELSE
+                           MOVE    "1"             TO  WRK-SHELL-SYOKBN
+                           PERFORM 45013-SOKATU-SYORI-SEC
+      *
+      *                    ¿·³ã¸©Ãæ±Û²­ÃÏ¿ÌÂÐ±þ 
+      *                    µÜ¾ë¸©¡¢´ä¼ê¸©ÃÏ¿ÌÂÐ±þ 
+      *                    Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ 
+      *                    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
+      *                    Ê¿À®£²£²Ç¯£··îÃæ¹ñÃÏÊý¹ë±«ÂÐ±þ
+      *                    ¼¯»ùÅç¸©±âÈþ»ÔÅù¤Ë¤ª¤±¤ë¶ÉÃÏÅªÂç±«ÂÐ±þ
+      *
+                           IF  (( SPA-PREFNUM     =   "15"        ) AND
+                                ( SPA-NAI-SKYYM  >=  200709       )    )
+                           OR  (( SPA-PREFNUM     =   "03"   OR
+                                                      "04"        ) AND
+                                ( SPA-NAI-SKYYM  >=  200806       )    )
+                           OR  (( SPA-PREFNUM     =   "35"   OR
+                                                      "40"        ) AND
+                                ( SPA-NAI-SKYYM  >=  200907       )    )
+                           OR  (( SPA-PREFNUM     =   "28"   OR
+                                                      "33"        ) AND
+                                ( SPA-NAI-SKYYM  >=  200908       )    )
+                           OR  (( SPA-PREFNUM     =   "34"        ) AND
+                                ( SPA-NAI-SKYYM  >=  201007       )    )
+                           OR  (( SPA-PREFNUM     =   "46"        ) AND
+                                ( SPA-NAI-SKYYM  >=  201010       )    )
+                           OR  (  SPA-NAI-SKYYM  >=  201101            )
+                               MOVE    "1"         TO  WRK-SHELL-RECEKBN
+                               MOVE    "2"         TO  WRK-SHELL-SYOKBN
+                               PERFORM 45013-SOKATU-SYORI-SEC
+                           END-IF
+                         END-IF
                      END-PERFORM
                    END-IF     
            END-EVALUATE                                               
@@ -4242,11 +4260,16 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
       *    Ãæ¹ñ¡¦¶å½£ËÌÉô¹ë±«ÂÐ±þ
       *    Ê¿À®£²£±Ç¯ÂæÉ÷Âè£¹¹æÂÐ±þ
            IF    ( WRK-SHELL-RECEKBN   =   "1" )
-           AND   ( WRK-SHELL-SYOKBN    =   "2" )
-               MOVE    "1"             TO  SHELLTBL-ARG25      
+           AND   ( WRK-SHELL-SYOKBN    =   "9" )
+               MOVE    "9"             TO  SHELLTBL-ARG25
            ELSE
-               MOVE    "0"             TO  SHELLTBL-ARG25
-           END-IF
+               IF    ( WRK-SHELL-RECEKBN   =   "1" )
+               AND   ( WRK-SHELL-SYOKBN    =   "2" )
+                   MOVE    "1"             TO  SHELLTBL-ARG25      
+               ELSE
+                   MOVE    "0"             TO  SHELLTBL-ARG25
+               END-IF
+           END-IF 
            EVALUATE    SPA-CHK31-VALUE ALSO    SPA-CHK32-VALUE
                WHEN    "T"             ALSO    "T"
                    MOVE    "0"             TO  SHELLTBL-ARG26

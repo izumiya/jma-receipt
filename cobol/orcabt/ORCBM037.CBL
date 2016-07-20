@@ -45,6 +45,8 @@
       *                                     追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/06/13  社保診療報酬請求書の災害該当
+      *                                     分のまとめ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -489,7 +491,8 @@
       *        
                    PERFORM VARYING IDX1    FROM   1   BY  1
                            UNTIL   IDX1    >      2
-                       IF      SUM-GOK-KENSU (IDX3 IDX1 4)     >   ZERO 
+                       IF    ( SUM-GOK-KENSU (IDX3 IDX1 4) >   ZERO )
+                       OR    ( SUM-BIKOU-KENSU (IDX3 IDX1) >   ZERO )
                            MOVE    ZERO            TO  FLG-PRTKBN
       *           
       *                    帳票編集<見出し・ＨＣＭ３Ｃ>処理
@@ -579,6 +582,7 @@
       *    新潟県中越沖地震対応
            EVALUATE    WRK-PARA-GENMENKBN
                WHEN    ZERO
+               WHEN    "9"
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3C-SRYKA
                WHEN    "1"
                    STRING  "（未確定分）"      DELIMITED   BY  SIZE
@@ -628,6 +632,7 @@
       *    新潟県中越沖地震対応
            EVALUATE    WRK-PARA-GENMENKBN
                WHEN    ZERO
+               WHEN    "9"
                    MOVE    SYS-1005-SRYKANAME    TO  HCM3D-SRYKA
                WHEN    "1"
                    STRING  "（未確定分）"      DELIMITED   BY  SIZE
@@ -941,7 +946,10 @@
            MOVE    WRK-GKENSUZ             TO  HCM3D-GKENSU
       *
       *    備考欄
-           IF      WRK-PARA-GENMENKBN  =   "1"
+           IF    ( WRK-PARA-GENMENKBN  =   "1"     )
+           OR    ( WRK-PARA-GENMENKBN  =   "9" AND
+                   SUM-BIKOU-KENSU (IDX3 IDX1)
+                                       >   ZERO    )
                MOVE    "未確定分："    TO  HCM3D-BIKOH-TITLE
                MOVE    "件数"          TO  HCM3D-BIKOH-TITLE-KENSU
                MOVE    "日数"          TO  HCM3D-BIKOH-TITLE-NISSU
@@ -1025,7 +1033,7 @@
                                                    TO  SPRT-TITLE
                END-EVALUATE
            END-IF
-           IF      WRK-PARA-GENMENKBN  =   "1"
+           IF      WRK-PARA-GENMENKBN  =   "1" 
                MOVE    SPRT-TITLE          TO  WRK-SPRT-TITLE
                MOVE    SPACE               TO  SPRT-TITLE
                STRING  "未確定分・"        DELIMITED  BY  SIZE

@@ -82,6 +82,8 @@
       *                                     対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/06/13  社保診療報酬請求書の災害該当
+      *                                     分のまとめ対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -271,6 +273,8 @@
                05  SPA-NAI-200501-RECEDEN-CHK-KBN  PIC X(01).
                05  SPA-NAI-200501-ROUSAIPRTKBN     PIC X(01).
                05  SPA-NAI-200501-FRAME-ROUSAIPRTKBN
+                                                   PIC X(01).
+               05  SPA-NAI-200501-DISASTER-SYAPRTKBN
                                                    PIC X(01).
       *
                05  SPA-NAI-4100-KGISKYKBN          PIC X(02).
