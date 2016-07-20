@@ -5205,6 +5205,8 @@
            MOVE    ZERO                TO  FLG-DAYSET
            MOVE    RECE62-SRYYM        TO  WRK-EDYM
            MOVE    WRK-FEDT-DD         TO  WRK-EDDD
+           MOVE    SPACE               TO  WRK-FEDT-NYUINYMD
+                                           WRK-FEDT-TAIINYMD
            PERFORM VARYING IDW         FROM    1  BY  1
                    UNTIL  (IDW         >   10)
                       OR  (WRK-NYUIN-RIREKI-NYUINYMD (IDW)
