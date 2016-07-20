@@ -68,6 +68,7 @@
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
+      *  04.08.02    NACL-藤原    16/07/20  ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -752,6 +753,9 @@
       *
            MOVE     SPACE       TO WRK-ARG
            STRING   WRK-PARA1      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                                   DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE

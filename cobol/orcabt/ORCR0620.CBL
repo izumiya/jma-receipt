@@ -238,6 +238,7 @@
       *                                     公費単独の２回以上の分割対応
       *  04.08.04    NACL-門脇    16/02/08  RECE62の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正
+      *  04.08.05    NACL-藤原    16/07/20  ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -457,6 +458,7 @@
                05  WRK-PARA-RECEKBN                    PIC  X(01).
                05  WRK-PARA-JOBID                      PIC  9(07).
                05  WRK-PARA-SHELLID                    PIC  X(08).
+           03  WRK-PARA-PRTKBN                         PIC X(01).
            03  WRK-PARA-HOSPNUM                        PIC  9(02).
       *
            03  WRK-SYS-SRYYMD                          PIC  X(08).
@@ -748,10 +750,14 @@
       *
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+      *
+           DISPLAY "WRK-PARA-HOSPNUM=" WRK-PARA-HOSPNUM
+           DISPLAY "WRK-PARA-PRTKBN =" WRK-PARA-PRTKBN
       *
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAMES  (1)
@@ -3778,8 +3784,10 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                    MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
                    MOVE    WRK-SRYDD           TO  IDX5
                END-IF
-      *        保険組合せのチェック（会計に対象の組合せがないときは全て）
-               IF      RECE61-DAY-AREA     =   ALL "0"
+      *        保険組合せのチェック
+      *       （会計に対象の組合せがないとき又はＥＦファイル作成時は全て）
+               IF    ( RECE61-DAY-AREA     =   ALL "0" )
+               OR    ( WRK-PARA-PRTKBN     =   "8"     )
                    MOVE    "1"   TO   RECE62-NYUINRYOFLG
                    PERFORM 2401-PTNYUINRRK-HENSYU-SEC
                ELSE
