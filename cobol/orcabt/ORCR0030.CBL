@@ -4723,7 +4723,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  IF    RECE02-DAISAN-GENBUTUFLG(IDX23) = ZERO
                   DISPLAY "現物給付対象未登録の第三者行為有"
                  ELSE
-                  DISPLAY "現物給付対象登録後の診療訂正再登録未実施分有"
+                  DISPLAY "現物給付対象登録後の再計算未実施分有"
+                  DISPLAY "又は、減額認定証適用期間外の診療分有"
                  END-IF
                  DISPLAY  "HKNCOMBI=" RECE02-HKNCOMBI(IDX23)
                  DISPLAY  "DAISAN-GENBUTUFLG="
