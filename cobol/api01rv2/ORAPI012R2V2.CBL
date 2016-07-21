@@ -471,9 +471,22 @@
                        OR    (WRK-ERRCD    NOT =   SPACE)
                IF      FLG-SYORI           =   1
       *            ¹¹¿·¡¦ÅÐÏ¿È½Äê
-                   IF     (PTNUM-CREYMD        >   WRK-END-YMD)
-                   AND    (PTNUM-UPYMD         >   WRK-END-YMD)
-                       MOVE    1               TO  FLG-SYORI-END
+      *            IF     (PTNUM-CREYMD        >   WRK-END-YMD)
+      *            AND    (PTNUM-UPYMD         >   WRK-END-YMD)
+      *                MOVE    1               TO  FLG-SYORI-END
+      *            END-IF
+      *
+      *H28.7       ¹¹¿·¡¦ÅÐÏ¿Æü¡¡ÂÐ¾ÝÈ½Äê
+                   MOVE    1               TO  FLG-SYORI-END
+                   IF     (PTNUM-CREYMD    NOT =   SPACE      )
+                      IF      (PTNUM-CREYMD    >=  WRK-START-YMD)
+                        AND   (PTNUM-CREYMD    <=  WRK-END-YMD  )
+                           MOVE    ZERO            TO  FLG-SYORI-END
+                      END-IF
+                   END-IF
+                   IF     (PTNUM-UPYMD         >=  WRK-START-YMD)
+                     AND  (PTNUM-UPYMD         <=  WRK-END-YMD  )
+                       MOVE    ZERO            TO  FLG-SYORI-END
                    END-IF
                ELSE
       *            ÅÐÏ¿È½Äê
