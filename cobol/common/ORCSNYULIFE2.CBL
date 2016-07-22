@@ -752,8 +752,37 @@
                                    (IDX-SEI2   <=  101)
       *                          難病公費を使用されているか判定
                                  MOVE   ZERO       TO   FLG-NANBYO
-                                 IF  LNK-SKJKEEP-KBN(IDX1)  =   "1"
-                                     MOVE  1    TO   FLG-NANBYO
+                                 IF  WRK-HKNCOMBI-DAY(IDX1) NOT =  ZERO
+                                     INITIALIZE            HKNCOMBI-REC
+                                     MOVE   LNK-NYULIFE2-HOSPNUM
+                                                   TO  COMB-HOSPNUM
+                                     MOVE   LNK-NYULIFE2-PTID 
+                                                   TO  COMB-PTID
+                                     MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                                   TO  COMB-HKNCOMBINUM
+                                     MOVE   "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                     MOVE    "key" TO  MCP-PATHNAME
+                                     PERFORM 910-HKNCOMBI-SELECT-SEC
+                                     IF   FLG-HKNCOMBI      =   ZERO
+                                       MOVE  "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                       MOVE  "key"  TO  MCP-PATHNAME
+                                       PERFORM   910-HKNCOMBI-READ-SEC
+                                       IF  FLG-HKNCOMBI         =  ZERO
+                                         IF  (COMB-KOHHKNNUM(1) = "054")
+                                          OR (COMB-KOHHKNNUM(2) = "054")
+                                          OR (COMB-KOHHKNNUM(3) = "054")
+                                          OR (COMB-KOHHKNNUM(4) = "054")
+                                             MOVE  1    TO   FLG-NANBYO
+                                         END-IF
+                                       END-IF
+                                     END-IF
+      *                              保険組合せクローズ
+                                     MOVE    "tbl_hkncombi"
+                                                        TO  MCP-TABLE
+                                     MOVE    "key"      TO  MCP-PATHNAME
+                                     PERFORM   900-CLOSE-SEC
                                  END-IF
       *
                                  IF   FLG-NANBYO  =   1
