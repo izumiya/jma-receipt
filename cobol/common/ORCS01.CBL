@@ -20032,17 +20032,6 @@
                    MOVE    8     TO  LNK-SYU-NYNSHOKAISU
                  END-IF
                END-IF
-             ELSE
-               IF   LNK-S01-SAIKEISAN-KBN   =   SPACE
-                   MOVE    8     TO  LNK-SYU-NYNSHOKAISU
-               ELSE
-                 IF  (LNK-SYU-DENPNUM     NOT =  ZERO)
-                 AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
-                   MOVE    8     TO  LNK-SYU-NYNSHOKAISU
-                 ELSE
-                   MOVE    8     TO  LNK-SYU-NYNSHOKAISU
-                 END-IF
-               END-IF
              END-IF
            END-IF
       *
