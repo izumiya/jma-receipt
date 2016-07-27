@@ -868,6 +868,7 @@
                                                CHK004-EDYUKYMD
                PERFORM 900-CHK004-KEY-SEL-SEC
                MOVE    CHK004-REC          TO  CK4-1201-REC
+               MOVE    CHK004-KANRITBL     TO  SPA-NAI-TCK4-1201 (IDXL)
       *
                PERFORM 900-CHKREIGAI-KEY5-SEL-SEC
                IF    ( FLG-CHKREIGAI   =   ZERO )
@@ -912,7 +913,8 @@
                                            TO  CHK004-KBNCD
                MOVE    SPA-SYSYMD          TO  CHK004-STYUKYMD
                                                CHK004-EDYUKYMD
-               PERFORM 900-CHK004-KEY-SEL-SEC
+               MOVE    SPA-NAI-TCK4-1201 (IDXL)
+                                           TO  CHK004-KANRITBL
                MOVE    CHK004-REC          TO  CK4-1201-REC
                PERFORM 900-CHKREIGAI-KEY5-SEL-SEC
                IF    ( FLG-CHKREIGAI   =   ZERO )
@@ -1472,7 +1474,11 @@
            INITIALIZE                      SS013-AREA
            MOVE    "DBCREATE"          TO  SS013-FUNC
            MOVE     SPA-NAI-CHKKBN     TO  SS013-CHKKBN
-           MOVE     SPA-GMN-SRYCD      TO  SS013-SRYCD
+           IF     ( SPA-GMN-SRYCD      =   SPACE )
+               MOVE     ALL "@"        TO  SS013-SRYCD
+           ELSE
+               MOVE     SPA-GMN-SRYCD  TO  SS013-SRYCD
+           END-IF
            MOVE     SPA-NAI-SRYYM      TO  SS013-KJNYMD
            MOVE     "01"               TO  SS013-KJNYMD(7:2)
            CALL     "ORCSS013"         USING
@@ -2519,7 +2525,8 @@
                                        TO  CHK004-KBNCD
            MOVE    SPA-SYSYMD          TO  CHK004-STYUKYMD
                                            CHK004-EDYUKYMD
-           PERFORM 900-CHK004-KEY-SEL-SEC
+           MOVE    SPA-NAI-TCK4-1201 (IDXL)
+                                       TO  CHK004-KANRITBL
            MOVE    CHK004-REC          TO  CK4-1201-REC
       *
            MOVE    SPA-GMN-ERRLST-SEL  TO  IDXL
