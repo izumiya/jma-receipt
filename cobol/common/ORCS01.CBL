@@ -20022,13 +20022,25 @@
            AND ( SYU-KOH2HKNNUM    =   SPACE         )
            AND ( SYU-KOH3HKNNUM    =   SPACE         )
            AND ( SYU-KOH4HKNNUM    =   SPACE         )
-             IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
-             AND (LNK-SYU-DENPNUM     NOT =  ZERO)
-             AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
-               MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
+             IF   WK-CHECK-TEKYMD  >  WK-CHECK2-TEKYMD
+               IF   LNK-S01-SAIKEISAN-KBN   =   SPACE
+                 IF  (LNK-SYU-SRYYMD      NOT = SPACE)
+                 AND (LNK-SYU-SRYYMD   <  SYU-SRYYMD )
+                   MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
+                 END-IF
+               ELSE
+                 IF ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                     (LNK-SYU-SRYYMD   <  SYU-SRYYMD ))
+                 OR ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                     (LNK-SYU-SRYYMD   =  SYU-SRYYMD ) AND
+                     (LNK-SYU-DENPNUM     NOT =  ZERO) AND
+                     (LNK-SYU-DENPNUM  <  SYU-DENPNUM))
+                   MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
+                 END-IF
+               END-IF
              END-IF
              IF   SYU-NYNSHOKAISU  =   8
-               MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
+                   MOVE  "99999999"  TO  WK-CHECK2-TEKYMD
              END-IF
            END-IF
       *
@@ -20041,10 +20053,19 @@
                 (SYU-KOH4HKNNUM         =  "972" OR "974"))
              IF   WK-CHECK-TEKYMD  <  WK-CHECK2-TEKYMD
                IF   LNK-S01-SAIKEISAN-KBN   =   SPACE
+                 IF  (LNK-SYU-SRYYMD      NOT = SPACE)
+                 AND (LNK-SYU-SRYYMD   <  SYU-SRYYMD )
+                   CONTINUE
+                 ELSE
                    MOVE    8     TO  LNK-SYU-NYNSHOKAISU
+                 END-IF
                ELSE
-                 IF  (LNK-SYU-DENPNUM     NOT =  ZERO)
-                 AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
+                 IF ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                     (LNK-SYU-SRYYMD   <  SYU-SRYYMD ))
+                 OR ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                     (LNK-SYU-SRYYMD   =  SYU-SRYYMD ) AND
+                     (LNK-SYU-DENPNUM     NOT =  ZERO) AND
+                     (LNK-SYU-DENPNUM  <  SYU-DENPNUM))
                    CONTINUE
                  ELSE
                    MOVE    8     TO  LNK-SYU-NYNSHOKAISU
