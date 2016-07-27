@@ -473,6 +473,8 @@
       *  04.08.09    NACL-ÌçÏÆ    16/06/28  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.10    NACL-ÌçÏÆ    16/07/21  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¤Î¹â³Û¸øÈñÅ¬ÍÑ
       *                                     ¥Á¥§¥Ã¥¯
+      *  04.08.11    NACL-ÌçÏÆ    16/07/26  ¸½ÊªµëÉÕÂÐ¾Ý¼Ô¤Î°ì³çºÆ·×»»³ºÅö
+      *                                     È½Äê½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13336,6 +13338,8 @@
                  AND ( SYU-SYUHKNNUM            NOT = SPACE )
                  AND ( WK-HKNJANUM2-TBL  =  WK-HKNJANUM-TBL )
                  AND ( LNK-SYU-SRYYMD(1:6)      >= "201204" )
+                 AND ( LNK-SYU-TOTAL-HKNTEN     NOT = ZERO  )
+                 AND ( SYU-TOTAL-HKNTEN         NOT = ZERO  )
                    IF  (COMB-KOH1HKNNUM    NOT  =  "970")
                    AND (SYU-KOH1HKNNUM          =  "970")
                    AND (SYU-SKJ-FTNGAKU(2) NOT  =   ZERO)
@@ -17458,7 +17462,9 @@
                              WK-GENBUTU-HKNKIN   +
                             (SYU-HKNTEN (17) * 10)
                  MOVE   ZERO  TO  FLG-TAISYO
-                 IF  LNK-SYU-SRYYMD(1:6)  >=  "201204"
+                 IF  (LNK-SYU-SRYYMD(1:6)         >=  "201204")
+                 AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                 AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
                    IF  (COMB-KOH1HKNNUM    NOT = "970")
                    AND (SYU-KOH1HKNNUM         = "970")
                    AND (SYU-SKJ-FTNGAKU(2) NOT =  ZERO)
@@ -17541,6 +17547,8 @@
                  MOVE   1     TO  FLG-TAISYO
                  IF  (LNK-SYU-SRYYMD(1:6)         >=  "201204")
                  AND (WK-SYUNOU-GENBUTU70-MSG  NOT =   4 AND 5)
+                 AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                 AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
                    IF  ((COMB-KOH1HKNNUM  = "972" OR "974") AND
                         (COMB-KOH2HKNNUM  = SPACE         ) AND
                         (COMB-KOH3HKNNUM  = SPACE         ) AND
@@ -17554,7 +17562,9 @@
                      END-IF
                    END-IF
                  END-IF
-                 IF  LNK-SYU-SRYYMD(1:6)  >=  "201204"
+                 IF  (LNK-SYU-SRYYMD(1:6)         >=  "201204")
+                 AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                 AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
                    IF  (COMB-KOH1HKNNUM    NOT = "970")
                    AND (SYU-KOH1HKNNUM         = "970")
                    AND (SYU-SKJ-FTNGAKU(2) NOT =  ZERO)
@@ -17744,6 +17754,8 @@
                    AND (COMB-HKNNUM              NOT =   SPACE  )
                    AND (COMB-KOH1HKNNUM          NOT =   SPACE  )
                    AND (COMB-KOH1HKNNUM          NOT =   "970"  )
+                   AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                   AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
       **>            MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>            MOVE    ZERO TO  WK-ENTANI
       **>            MOVE    1    TO  FLG-TAISYO
@@ -17756,7 +17768,9 @@
                        MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
       **>            END-IF
                    END-IF
-                   IF  LNK-SYU-SRYYMD(1:6)  >=  "201204"
+                   IF  (LNK-SYU-SRYYMD(1:6)         >=  "201204")
+                   AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                   AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
                      IF  (COMB-KOH1HKNNUM    NOT = "970")
                      AND (SYU-KOH1HKNNUM         = "970")
                      AND (SYU-SKJ-FTNGAKU(2) NOT =  ZERO)
@@ -17810,6 +17824,8 @@
                       AND (COMB-HKNNUM              NOT =   SPACE  )
                       AND (COMB-KOH1HKNNUM          NOT =   SPACE  )
                       AND (COMB-KOH1HKNNUM          NOT =   "970"  )
+                      AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                      AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
       **>               MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>               MOVE    ZERO TO  WK-ENTANI
       **>               MOVE    1    TO  FLG-TAISYO
@@ -17822,7 +17838,9 @@
                           MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
       **>               END-IF
                       END-IF
-                      IF  LNK-SYU-SRYYMD(1:6)  >=  "201204"
+                      IF  (LNK-SYU-SRYYMD(1:6)         >=  "201204")
+                      AND (LNK-SYU-TOTAL-HKNTEN     NOT =   ZERO   )
+                      AND (SYU-TOTAL-HKNTEN         NOT =   ZERO   )
                         IF  (COMB-KOH1HKNNUM    NOT = "970")
                         AND (SYU-KOH1HKNNUM         = "970")
                         AND (SYU-SKJ-FTNGAKU(2) NOT =  ZERO)
