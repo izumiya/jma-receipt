@@ -5465,6 +5465,8 @@
       *
            IF    ( SPA-I0-SYUNOU-UPDFLG (IDX-SYU)  =   ZERO )
             AND  ( SPA-NAI-I04-SAIKEISANFLG        =   1 )
+               CONTINUE
+           ELSE
                MOVE    SMCNDATE-YMD
                                    TO  SYU-CREYMD
            END-IF
