@@ -446,7 +446,6 @@
            MOVE    WRK-START-YMD       TO  PTNUM-CREYMD
       *    更新年月日
            MOVE    WRK-START-YMD       TO  PTNUM-UPYMD
-      *
            IF      FLG-SYORI           =   1
       *        更新・登録
                MOVE    "key6"              TO  WRK-MCP-PATHNAME
@@ -467,7 +466,7 @@
            MOVE    ZERO                TO  FLG-SYORI-END
            MOVE    ZERO                TO  WRK-CNT
            PERFORM UNTIL     (FLG-PTNUM    NOT =   ZERO )
-                       OR    (FLG-SYORI-END    =   1    )
+     ****              OR    (FLG-SYORI-END    =   1    )
                        OR    (WRK-ERRCD    NOT =   SPACE)
                IF      FLG-SYORI           =   1
       *            更新・登録判定
