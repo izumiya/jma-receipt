@@ -9215,10 +9215,6 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
            WHEN    CONST-H28-A103C07
                MOVE    CONST-H28-A312C06
                                    TO  WRK-KSNCD-A312
-      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
-      *    WHEN    CONST-H28-A108C11
-      *        MOVE    CONST-H28-A109C11
-      *                            TO  WRK-KSNCD-A109
       *    ±ÉÍÜ´ÉÍý¼Â»Ü²Ã»»
            WHEN    CONST-H28-A108C10
                MOVE    CONST-H28-A109C10
@@ -9243,6 +9239,13 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                MOVE    WRK-KSNCD-A312  TO  WRK-KSNCD
            END-EVALUATE
       *
+      *    Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
+           IF    WRK-KSNCD    =    CONST-H28-A109C11
+               IF   SPA-GMN-W20-SBT     =   "08"
+                   MOVE    CONST-H28-A108C11
+                                       TO  WRK-KSNCD
+               END-IF
+           END-IF
            .
        410111-H28-SSTKIJUN-CHK-EXT.
            EXIT.
