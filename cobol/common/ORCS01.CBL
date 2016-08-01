@@ -12498,7 +12498,7 @@
       *    …È√¥≥‰πÁ
       *
            MOVE         30    TO   WK-SYUNOU-GENBUTU70-FTNRATE
-           IF    COMB-HKNNUM   =   "060"
+           IF    COMB-HKNNUM   =   "060" OR "039"
              EVALUATE   COMB-HOJOKBN
                WHEN   "0"
                  MOVE   ZERO  TO   WK-SYUNOU-GENBUTU70-FTNRATE

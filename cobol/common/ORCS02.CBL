@@ -1055,6 +1055,9 @@
                05  WK-TANKI-MICYOSYU   PIC 9(07)  OCCURS  31.
            03  WK-TANKI-DAYJGN         PIC 9(07).
       *
+           03  WK-SYUNOU-GENBUTU70-FTNRATE
+                                       PIC 9(03).
+      *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
            03  MAX-KAI-KOHI1-M         PIC 9(05).
@@ -8384,6 +8387,11 @@
              END-IF
            END-IF.
       *
+           MOVE   ZERO   TO   WK-SYUNOU-GENBUTU70-FTNRATE.
+           IF    LNK-SYU-SRYYMD(1:6)   >=  "201204"
+             PERFORM       210C-SYUNOU-FTNRATE-HENSYU-SEC
+           END-IF.
+      *
            IF  LNK-S02-KOUREI-NYUIN-KBN   =   "1"
                IF  COMB-KOH1-HKNKOHSBTKBN   =   "3"
                    EVALUATE   COMB-KOH1PAYKBN
@@ -12318,6 +12326,89 @@
            .
       *
        210B-TOKU75-SETTEI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÉéÃ´³ä¹ç¤ÎÊÔ½¸
+      ******************************************************************
+       210C-SYUNOU-FTNRATE-HENSYU-SEC          SECTION.
+      *
+      *    ÉéÃ´³ä¹ç
+      *
+           MOVE         30    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+           IF    COMB-HKNNUM   =   "060" OR "039"
+             EVALUATE   COMB-HOJOKBN
+               WHEN   "0"
+               WHEN   "4"
+                 MOVE   ZERO  TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               WHEN   "1"
+               WHEN   "5"
+                 MOVE   10    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               WHEN   "2"
+               WHEN   "6"
+                 MOVE   20    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               WHEN   "3"
+                 MOVE   30    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+             END-EVALUATE
+           ELSE
+             EVALUATE   COMB-HOJOKBN
+               WHEN   "9"
+                 MOVE   10    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               WHEN   "8"
+                 MOVE   20    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               WHEN   "7"
+                 MOVE   30    TO   WK-SYUNOU-GENBUTU70-FTNRATE
+             END-EVALUATE
+           END-IF
+      *
+      *    µÁÌ³¶µ°é½¢³ØÁ°
+           IF    LNK-SYU-SRYYMD   >=  "20080401"
+             IF  FLG-SYUGAKUMAE    =   1
+               IF   COMB-HKNNUM    =  "060"
+                 IF   COMB-HOJOKBN   =  "0"  OR  "1"  OR  "4"  OR  "5"
+                   CONTINUE
+                 ELSE
+                   MOVE   20  TO   WK-SYUNOU-GENBUTU70-FTNRATE
+                 END-IF
+               ELSE
+                   MOVE   20  TO   WK-SYUNOU-GENBUTU70-FTNRATE
+               END-IF
+             END-IF
+           END-IF
+      *
+           IF    COMB-HKNNUM                =    "002"
+             EVALUATE   COMB-HOJOKBN
+               WHEN   "1"
+               WHEN   "2"
+               WHEN   "3"
+               WHEN   "A"
+               WHEN   "B"
+               WHEN   "C"
+               WHEN   "D"
+               WHEN   "E"
+               WHEN   "F"
+               WHEN   "G"
+               WHEN   "H"
+               WHEN   "I"
+      *****      IF   LNK-S02-SENINFLG  NOT =    "1"
+                   MOVE   ZERO   TO   WK-SYUNOU-GENBUTU70-FTNRATE
+      *****      END-IF
+             END-EVALUATE
+           END-IF
+      *
+           IF    COMB-HKNNUM   =  "031" OR "032" OR "033" OR "034"
+             EVALUATE   COMB-HOJOKBN
+               WHEN   "2"
+               WHEN   "B"
+               WHEN   "E"
+               WHEN   "H"
+                   MOVE   ZERO   TO   WK-SYUNOU-GENBUTU70-FTNRATE
+             END-EVALUATE
+           END-IF
+      *
+           .
+      *
+       210C-SYUNOU-FTNRATE-HENSYU-EXT.
            EXIT.
       *
       ******************************************************************
