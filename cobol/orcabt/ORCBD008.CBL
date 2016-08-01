@@ -161,6 +161,10 @@
            03  WRK-Z8              PIC ZZZZZZZ9.
            03  WRK-Z9              PIC ZZZZZZZZ9.
            03  WRK-Z99             PIC --------9.
+           03  WRK-SHO             PIC 9(07).
+           03  WRK-HKNHASU         PIC 9(02).
+           03  WRK-JIHIHASU        PIC 9(02).
+           03  WRK-HASU            PIC S9(07).
       *
        01  SUM-AREA                            VALUE   ZERO.
            03  SUM-OCC             OCCURS  11.
@@ -690,8 +694,28 @@
                                                +   SYU-YKZ-FTN
                                                +   SYU-SKYMONEY-SKJ-KEI
                                                +   SYU-SKYMONEY-LIFE-KEI
-                           COMPUTE WRK-JIHI    =   SYU-SKYMONEY
-                                               -   WRK-MONEY
+      *
+                           COMPUTE WRK-HASU
+                               =   SYU-SKYMONEY
+                               - ( WRK-MONEY   +   WRK-JIHI )
+      *
+                           DIVIDE  WRK-MONEY       BY 10
+                               GIVING  WRK-SHO REMAINDER WRK-HKNHASU
+      *
+                           DIVIDE  WRK-JIHI        BY 10
+                               GIVING  WRK-SHO REMAINDER WRK-JIHIHASU
+      *
+                           EVALUATE    TRUE
+                           WHEN    WRK-HKNHASU     =     ZERO
+                               COMPUTE WRK-JIHI
+                                   =   WRK-JIHI    +     WRK-HASU
+                           WHEN    WRK-JIHIHASU    =     ZERO
+                               COMPUTE WRK-MONEY
+                                   =   WRK-MONEY   +     WRK-HASU
+                           WHEN    OTHER
+                               COMPUTE WRK-JIHI
+                                   =   WRK-JIHI    +     WRK-HASU
+                           END-EVALUATE
                        END-IF
                    END-IF
                END-IF
@@ -827,8 +851,27 @@
                                                +   SYU-YKZ-FTN
                                                +   SYU-SKYMONEY-SKJ-KEI
                                                +   SYU-SKYMONEY-LIFE-KEI
-                           COMPUTE WRK-JIHI    =   SYU-SKYMONEY
-                                               -   WRK-MONEY
+                           COMPUTE WRK-HASU
+                               =   SYU-SKYMONEY
+                               - ( WRK-MONEY   +   WRK-JIHI )
+      *
+                           DIVIDE  WRK-MONEY       BY 10
+                               GIVING  WRK-SHO REMAINDER WRK-HKNHASU
+      *
+                           DIVIDE  WRK-JIHI        BY 10
+                               GIVING  WRK-SHO REMAINDER WRK-JIHIHASU
+      *
+                           EVALUATE    TRUE
+                           WHEN    WRK-HKNHASU     =     ZERO
+                               COMPUTE WRK-JIHI
+                                   =   WRK-JIHI    +     WRK-HASU
+                           WHEN    WRK-JIHIHASU    =     ZERO
+                               COMPUTE WRK-MONEY
+                                   =   WRK-MONEY   +     WRK-HASU
+                           WHEN    OTHER
+                               COMPUTE WRK-JIHI
+                                   =   WRK-JIHI    +     WRK-HASU
+                           END-EVALUATE
                        END-IF
                    END-IF
                END-IF
