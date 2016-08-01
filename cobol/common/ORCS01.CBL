@@ -20006,6 +20006,99 @@
       ******************************************************************
        2202C-CYOKI-HANTEI-SEC          SECTION.
       *
+           IF  ( WK-HKNJANUM-TBL   =   WK-HKNJANUM2-TBL)
+           AND ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH3HKNNUM   =  "972" OR "974") OR
+                (COMB-KOH4HKNNUM   =  "972" OR "974")  )
+           AND ( SYU-KOH1HKNNUM    =  "972" OR "974"   )
+           AND ( SYU-KOH2HKNNUM    =   SPACE           )
+           AND ( SYU-KOH3HKNNUM    =   SPACE           )
+           AND ( SYU-KOH4HKNNUM    =   SPACE           )
+           AND ( LNK-SYU-TOTAL-HKNTEN     NOT = ZERO   )
+           AND ( SYU-TOTAL-HKNTEN         NOT = ZERO   )
+           AND ( LNK-SYU-SRYYMD(1:6)  >=  "201204"     )
+             IF ((COMB-KOH2HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH1HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH2ID         =  WRK-COMB-KOH1ID))
+             OR ((COMB-KOH3HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH1HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH3ID         =  WRK-COMB-KOH1ID))
+             OR ((COMB-KOH4HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH1HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH4ID         =  WRK-COMB-KOH1ID))
+               IF   WK-CHECK-TEKYMD  >  WK-CHECK2-TEKYMD
+                 IF   LNK-S01-SAIKEISAN-KBN   =   SPACE
+                   IF  (LNK-SYU-SRYYMD      NOT = SPACE)
+                   AND (LNK-SYU-SRYYMD   <  SYU-SRYYMD )
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+                   END-IF
+                 ELSE
+                   IF ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                       (LNK-SYU-SRYYMD   <  SYU-SRYYMD ))
+                   OR ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                       (LNK-SYU-SRYYMD   =  SYU-SRYYMD ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO) AND
+                       (LNK-SYU-DENPNUM  <  SYU-DENPNUM))
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+                   END-IF
+                 END-IF
+               ELSE
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+               END-IF
+               IF   SYU-NYNSHOKAISU  =   8
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+               END-IF
+             END-IF
+           END-IF
+      *
+           IF  ( WK-HKNJANUM-TBL   =   WK-HKNJANUM2-TBL)
+           AND ( COMB-KOH1HKNNUM   =  "972" OR "974"   )
+           AND ( COMB-KOH2HKNNUM   =   SPACE           )
+           AND ( COMB-KOH3HKNNUM   =   SPACE           )
+           AND ( COMB-KOH4HKNNUM   =   SPACE           )
+           AND ((SYU-KOH2HKNNUM    =  "972" OR "974") OR
+                (SYU-KOH3HKNNUM    =  "972" OR "974") OR
+                (SYU-KOH4HKNNUM    =  "972" OR "974")  )
+           AND ( LNK-SYU-TOTAL-HKNTEN     NOT = ZERO   )
+           AND ( SYU-TOTAL-HKNTEN         NOT = ZERO   )
+           AND ( LNK-SYU-SRYYMD(1:6)  >=  "201204"     )
+             IF ((COMB-KOH1HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH2HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH1ID         =  WRK-COMB-KOH2ID))
+             OR ((COMB-KOH1HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH3HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH1ID         =  WRK-COMB-KOH3ID))
+             OR ((COMB-KOH1HKNNUM     = "972" OR "974"  ) AND
+                 (SYU-KOH4HKNNUM      = "972" OR "974"  ) AND
+                 (COMB-KOH1ID         =  WRK-COMB-KOH4ID))
+               IF   WK-CHECK-TEKYMD  <  WK-CHECK2-TEKYMD
+                 IF   LNK-S01-SAIKEISAN-KBN   =   SPACE
+                   IF  (LNK-SYU-SRYYMD      NOT = SPACE)
+                   AND (LNK-SYU-SRYYMD   <  SYU-SRYYMD )
+                     CONTINUE
+                   ELSE
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+                   END-IF
+                 ELSE
+                   IF ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                       (LNK-SYU-SRYYMD   <  SYU-SRYYMD ))
+                   OR ((LNK-SYU-SRYYMD      NOT = SPACE) AND
+                       (LNK-SYU-SRYYMD   =  SYU-SRYYMD ) AND
+                       (LNK-SYU-DENPNUM     NOT =  ZERO) AND
+                       (LNK-SYU-DENPNUM  <  SYU-DENPNUM))
+                     CONTINUE
+                   ELSE
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+                   END-IF
+                 END-IF
+               ELSE
+                     MOVE   "1"    TO  LNK-SYU-KOHTAIYKZKBN
+               END-IF
+             END-IF
+           END-IF
+      *
+      *****
+      *
            IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                 (COMB-KOH3HKNNUM   =  "972" OR "974") OR
                 (COMB-KOH4HKNNUM   =  "972" OR "974"))
