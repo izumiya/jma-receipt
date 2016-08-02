@@ -83,6 +83,7 @@
       * 04.08.00     NACL-多々納  14/12/XX  Ｈ２７年１月改正対応
       * 04.08.00     NACL-多々納  15/07/28  APIV3対応
       * 04.08.00     NACL-多々納  16/03/XX  平成２８年４月改正対応
+      * 04.08.00     NACL-多々納  16/08/XX  自賠責小児科外来診察料対応
       *****************************************************************
       *
       *
@@ -2740,18 +2741,7 @@
            IF      SPA-RSI-JUNKYO      =   "1"
                MOVE    SPA-RSI-SHOBYOYMD   TO  SPA-RSI-HASSYOYMD
            ELSE
-      *
-      *    発生日を求める　(使用なし　労災コード変更対応なし）
-      *    救急医療管理加算のチェック
-      *    MOVE    SPACE               TO  WRK-HASSYOYMD
-      *    MOVE    "101110030"         TO  WRK-SRYCD
-      *    PERFORM 10001-RSI-JYURRK-CHK-SEC
-      *    IF      WRK-HASSYOYMD       =   SPACE
                MOVE    SPA-RSI-SHOBYOYMD   TO  SPA-RSI-HASSYOYMD
-      *    ELSE
-      *        MOVE    WRK-HASSYOYMD       TO  SPA-RSI-HASSYOYMD
-      *    END-IF
-      *
            END-IF
       *
       *    発生日から３ヶ月の計算（現在使用なし）
@@ -5630,6 +5620,7 @@
                END-IF
            END-IF
       *
+      *
       *    在宅末期医療総合診察料チェック
            IF     (SPA-ZAIMATU-ARI     NOT =   ZERO )  OR
                   (SPA-ZAIMATU-ARI2    NOT =   ZERO )
@@ -5820,7 +5811,7 @@
                            END-IF
                          END-IF
                        WHEN    OTHER
-                           IF      SPA-HKTSANTEI-202   =   ZERO
+                           IF     (SPA-HKTSANTEI-202   =   ZERO)
                              AND  (SPA-SYONIKA-ARI NOT =   ZERO) 
       *
                             MOVE    "0044"      TO  SPA-ERRCD
@@ -5836,6 +5827,16 @@
       *                    その他の診療種別
                            IF      SPA-GMN-INPUTCD(IDX)(1:4)  =   ".800"
                                                               OR  ".850"
+      *H28.7                   自賠責対応
+                                                              OR  ".809"
+                               MOVE    SPACE       TO  SPA-ERRCD
+                               MOVE    SPACE       TO  SPA-COM-CUR
+                                                                (IDX)
+                           END-IF
+      *H28.7               自費コード(自賠責）
+                           IF     (SPA-COM-INPUTCD (IDX) (1:3)
+                                                       =   "095"
+                                                       OR  "096" )
                                MOVE    SPACE       TO  SPA-ERRCD
                                MOVE    SPACE       TO  SPA-COM-CUR
                                                                 (IDX)
