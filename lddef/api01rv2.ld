@@ -30,6 +30,7 @@ bindapi	"receiptinf1v2"		"OpenCOBOL"	"ORAPI042R1V2";
 bindapi	"claimfrontv2"	"OpenCOBOL"	"ORAPICLAIMR1V2";
 bindapi	"claimaccountv2"	"OpenCOBOL"	"ORAPICLAIMR2V2";
 bindapi	"formdatagetv2"	"OpenCOBOL"	"ORAPI001R1V2";
+bindapi	"contraindicationcheckv2"	"OpenCOBOL"	"ORAPI021R4V2";
 
 multiplex_group	api01rv2;
 
@@ -63,6 +64,7 @@ data	{
 		claimfrontv2;
 		claimaccountv2;
 		formdatagetv2;
+		contraindicationcheckv2;
 	};
 };
 db "xml2" {
@@ -124,6 +126,8 @@ db "xml2" {
  xml_claim_accountv2req;
  xml_claim_accountv2res;
  xml_formdatagetv2req;
+ xml_contraindication_checkv2req;
+ xml_contraindication_checkv2res;
 };
 
 #include "orcadb.inc"

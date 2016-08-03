@@ -228,6 +228,9 @@
                    PERFORM 200-KNKCHK-IN-SEC
                WHEN    "3"
                    PERFORM 300-KNKCHK-ALL-SEC
+      *APIÍÑ
+               WHEN    "4"
+                   PERFORM 100-SRYACT-SPASET-SEC
            END-EVALUATE
            . 
        000-PROC-EXT.

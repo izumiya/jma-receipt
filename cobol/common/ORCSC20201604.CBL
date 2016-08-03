@@ -7836,19 +7836,6 @@
                                                       (02 IDXS-2)
                                            -   WRK-SANTEN-9 )
                                            +   0.5
-      *!!!
-      *TEST
-               MOVE    ZERO                TO  WRK-SANTEN-G
-               COMPUTE WRK-SANTEN-G        =   LNK-ORCSC-TENSU
-                                                      (02 IDXS-2)
-                                           *  (TNS-TEN
-                                           /   100.00  )
-                                           +   0.5
-               MOVE    WRK-SANTEN-G        TO  WRK-SANTEN-9
-               COMPUTE WRK-SANTEN-KEI      =  (LNK-ORCSC-TENSU
-                                                      (02 IDXS-2)
-                                           -   WRK-SANTEN-9 )
-      *TEST
       *        Äþ¸º¸å¤Î¼êµ»ÎÁÅÀ¿ô
                MOVE    WRK-SANTEN-KEI      TO  LNK-ORCSC-TENSU
                                                       (02 IDXS-2)
