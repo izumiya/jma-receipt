@@ -719,6 +719,8 @@
       *  04.08.20    NACL-門脇    16/06/22  災害対応（記号あり、番号なしの場合）
       *  04.08.21    NACL-門脇    16/06/22  主保険がないレセプトの全国公費一部
       *                                     負担金記載修正
+      *  04.08.22    NACL-門脇    16/08/03  入院時生活療養算定時の標準負担額経過
+      *                                     措置（精神）入院年月日のコメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12192,9 +12194,18 @@
                         IF  (RECE62-SRYYM                >=  "201604")
                         AND (WRK-SKJKEEP-KBN(SYUKEI-IDX3) =  "2"     )
                         AND (FLG-SKJFTNNASI               =   ZERO   )
+                         IF  WRK-NYULIFE-KBN(SYUKEI-IDX3) NOT = SPACE
+                          IF WRK-NYULIFE-SKJFTN-SRYCD(SYUKEI-IDX3)
+                                                   =  "197003710"
                            MOVE    1   TO  RECE62-SEISIN-SKJFLG
                            MOVE    1   TO  RECE62-SEISIN-SKJSAN
                                                   (IDX1 SYUKEI-IDX3)
+                          END-IF
+                         ELSE
+                           MOVE    1   TO  RECE62-SEISIN-SKJFLG
+                           MOVE    1   TO  RECE62-SEISIN-SKJSAN
+                                                  (IDX1 SYUKEI-IDX3)
+                         END-IF
                         END-IF
                      END-IF
       *
