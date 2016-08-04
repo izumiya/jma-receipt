@@ -35,6 +35,7 @@
       * 04.07.00     NACL-多々納  14/09/XX  包括算定エラー対応
       * 04.08.00     NACL-多々納  14/12/XX  平成２７年１月改正対応
       * 04.08.00     NACL-多々納  15/03/XX  平成２７年４月改正対応
+      * 04.08.00     NACL-多々納  16/08/XX  相互作用チェック区分追加
       *****************************************************************
       *
       *
@@ -261,6 +262,10 @@
       *
       *        相互作用チェック期間
                MOVE    SYS-1008-INTERACT-KIKAN TO  SPA-INTERACT-KIKAN
+      *H28.8
+      *        相互作用チェック区分
+               MOVE    SYS-1008-INTERACT-CHKKBN
+                                           TO  SPA-INTERACT-CHKKBN
       *
       *        外来管理加算チェック
                MOVE    SYS-1008-GAIKANRIKBN-CHK
@@ -460,6 +465,9 @@
            ELSE
                MOVE    ZERO                TO  SPA-INTERACT-KIKAN
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
+      *H28.8
+      *        相互作用チェック区分
+               MOVE    ZERO                TO  SPA-INTERACT-CHKKBN
       *
                MOVE    ZERO                TO  SPA-IKUJIEIYO-FLG
                MOVE    SPACE               TO  SPA-IKUJIEIYO-SRYKA

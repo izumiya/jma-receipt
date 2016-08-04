@@ -63,6 +63,11 @@
                     06  W07-NYUSYOSIN-ITEM    PIC X(12)   OCCURS  2.
                   05  W07-KIKAN.
                     06  W07-VALUE   PIC S9(2).
+                  05  W07-KINKCHK-COMBO.
+                    06  W07-KINKCHK.
+                      07  W07-VALUE   PIC X(40).
+                    06  W07-KINKCHK-COUNT   PIC S9(9)   BINARY.
+                    06  W07-KINKCHK-ITEM    PIC X(40)   OCCURS  3.
                   05  W07-GAIKANKBN-COMBO.
                     06  W07-GAIKANKBN.
                       07  W07-VALUE   PIC X(32).

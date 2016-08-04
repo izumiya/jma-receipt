@@ -78,6 +78,13 @@ W07 {
         KIKAN {
           numdata number(2);
         };
+        KINKCHK_COMBO {
+          KINKCHK {
+            textdata varchar(40);
+          };
+          count int;
+            item varchar(40)[3];
+        };
         GAIKANKBN_COMBO {
           GAIKANKBN {
             textdata varchar(32);

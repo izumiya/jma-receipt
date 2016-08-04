@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  11/10/XX  チェックマスタの併用禁忌対応
       *  04.07.00    NACL-多々納  13/07/12  相互の症状コード編集対応
+      *  04.08.00    NACL-多々納  16/08/XX  相互作用チェック区分対応
       *****************************************************************
       *
       *
@@ -551,7 +552,15 @@
       *            禁忌薬剤チェック処理
                    IF      (SPA-COM-KNKFLG (IDX-Z)  =   SPACE )  AND
                            (SPA-COM-KNKUMU (IDX-Z)  =   SPACE )
-                       PERFORM 2001-KNKYAK-CHK-SEC
+      *H28.8
+      *                相互作用チェック区分判定
+                       IF      SPA-INTERACT-CHKKBN  =   "1"
+      *                    チェックマスタのみ対象
+                           PERFORM 2003-CHKMSTONLY-CHK-SEC
+                       ELSE
+      *
+                           PERFORM 2001-KNKYAK-CHK-SEC
+                       END-IF
                    END-IF
                END-IF
            END-PERFORM
@@ -967,6 +976,31 @@
            EXIT.
       *
       *
+      *H28.8
+      *****************************************************************
+      *    チェックマスタのみ対象処理
+      *****************************************************************
+       2003-CHKMSTONLY-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KINKI-ARI2
+      *    禁忌チェック
+           MOVE    ZERO                TO  IDX-K2
+           ADD     1                   TO  IDX-K1
+           MOVE    ZERO                TO  FLG-ARI2
+      *    チェックマスタとのチェック
+           PERFORM 2009-KNKYKCHKMST-CHK-SEC
+      *    禁忌なし
+           IF      FLG-ARI2            =   ZERO
+               MOVE    "1"             TO  SPA-COM-KNKUMU (IDX-Z)
+      *
+               INITIALIZE                  WRK-KNK-TBL (IDX-K1)
+               COMPUTE IDX-K1          =   IDX-K1   -   1
+           END-IF
+           .
+       2003-CHKMSTONLY-CHK-EXT.
+           EXIT.
+      *H28.8
+      *
       *****************************************************************
       *    禁忌エラーメッセージ表示処理
       *****************************************************************
@@ -1217,7 +1251,15 @@
                IF     (SPA-COM-INPUTCD(IDX-Z)(1:1)   =   "6" ) AND
                       (SPA-COM-KNKUMU (IDX-Z)  =   SPACE     )
                    MOVE    ZERO                TO  FLG-KINKI-ARI
-                   PERFORM 2001-KNKYAK-CHK-SEC
+      *H28.8
+      *            相互作用チェック区分判定
+                   IF      SPA-INTERACT-CHKKBN  =   "1"
+      *                チェックマスタのみ対象
+                       PERFORM 2003-CHKMSTONLY-CHK-SEC
+                   ELSE
+      *
+                       PERFORM 2001-KNKYAK-CHK-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *

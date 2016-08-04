@@ -31,6 +31,7 @@
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.07.00    NACL-多々納  11/10/XX  チェックマスタの併用禁忌対応
       *  04.07.00    NACL-多々納  13/07/12  相互の症状コード編集対応
+      *  04.08.00    NACL-多々納  16/08/XX  相互作用チェック区分対応
       *****************************************************************
       *
       *
@@ -534,7 +535,15 @@
       *            禁忌薬剤チェック処理
                    IF      (SPA-COM-KNKFLG (IDX-Z)  =   SPACE )  AND
                            (SPA-COM-KNKUMU (IDX-Z)  =   SPACE )
-                       PERFORM 2001-KNKYAK-CHK-SEC
+      *H28.8
+      *                相互作用チェック区分判定
+                       IF      SPA-INTERACT-CHKKBN  =   "1"
+      *                    チェックマスタのみ対象
+                           PERFORM 2003-CHKMSTONLY-CHK-SEC
+                       ELSE
+      *
+                           PERFORM 2001-KNKYAK-CHK-SEC
+                       END-IF
                    END-IF
                END-IF
            END-PERFORM
@@ -598,8 +607,6 @@
       *
            IF      IDX-K2              >   ZERO
                MOVE    "1"                 TO  SPA-COM-KNKFLG (IDX-Z)
-      **       MOVE    SPA-GMN-MEISYO (IDX-Z)
-      **                                   TO  WRK-KNK-TOUMEI (IDX-K1)
                MOVE    SPA-COM-NAME   (IDX-Z)
                                            TO  WRK-KNK-TOUMEI (IDX-K1)
                MOVE    SPA-COM-INPUTCD(IDX-Z)
@@ -680,10 +687,6 @@
       *            今回入力分は対象外
                    PERFORM 200111-INPUT-CHK-SEC
                END-IF
-      *****    IF    ((SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD ) OR
-      *               (SPA-KNK-SRYCD (IDX-S)   =  INTERACT-DRUGCD2)) AND
-      *              ( SPA-COM-INPUTCD (IDX-Z)
-      ************                         NOT =   SPA-KNK-SRYCD(IDX-S))
                IF      FLG-KINKI-CHK       NOT =   ZERO
                    MOVE    1                   TO  FLG-KINKI-ARI
                    MOVE    1                   TO  FLG-KINKI-ARI2
@@ -837,7 +840,6 @@
            PERFORM 990-DBCLOSE-SEC
            IF      IDX-K2              >   ZERO
                MOVE    "1"                 TO  SPA-COM-KNKFLG (IDX-Z)
-      ****     MOVE    SPA-GMN-MEISYO (IDX-Z)
                MOVE    SPA-COM-NAME   (IDX-Z)
                                            TO  WRK-KNK-TOUMEI (IDX-K1)
                MOVE    SPA-COM-INPUTCD(IDX-Z)
@@ -890,6 +892,31 @@
            .
        20091-KINCHK-SPASET-EXT.
            EXIT.
+      *
+      *H28.8
+      *****************************************************************
+      *    チェックマスタのみ対象処理
+      *****************************************************************
+       2003-CHKMSTONLY-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KINKI-ARI2
+      *    禁忌チェック
+           MOVE    ZERO                TO  IDX-K2
+           ADD     1                   TO  IDX-K1
+           MOVE    ZERO                TO  FLG-ARI2
+      *    チェックマスタとのチェック
+           PERFORM 2009-KNKYKCHKMST-CHK-SEC
+      *    禁忌なし
+           IF      FLG-ARI2            =   ZERO
+               MOVE    "1"             TO  SPA-COM-KNKUMU (IDX-Z)
+      *
+               INITIALIZE                  WRK-KNK-TBL (IDX-K1)
+               COMPUTE IDX-K1          =   IDX-K1   -   1
+           END-IF
+           .
+       2003-CHKMSTONLY-CHK-EXT.
+           EXIT.
+      *H28.8
       *
       *****************************************************************
       *    禁忌エラーメッセージ表示処理
@@ -1109,7 +1136,15 @@
                IF     (SPA-COM-INPUTCD(IDX-Z)(1:1)   =   "6" ) AND
                       (SPA-COM-KNKUMU (IDX-Z)  =   SPACE     )
                    MOVE    ZERO                TO  FLG-KINKI-ARI
-                   PERFORM 2001-KNKYAK-CHK-SEC
+      *H28.8
+      *            相互作用チェック区分判定
+                   IF      SPA-INTERACT-CHKKBN  =   "1"
+      *                チェックマスタのみ対象
+                       PERFORM 2003-CHKMSTONLY-CHK-SEC
+                   ELSE
+                       PERFORM 2001-KNKYAK-CHK-SEC
+                   END-IF
+      *
                    IF      FLG-KINKI-ARI2      =   1
                        MOVE    "3"             TO  SPA-COM-CUR (IDX-Z)
                    END-IF

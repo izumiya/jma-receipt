@@ -277,6 +277,16 @@
                                                            OCCURS  2.
       *                相互作用チェック期間
                        09  SPA-GMN-LAST-KIKAN              PIC 9(02).
+      *H28.8
+      *        相互作用チェック区分
+                       09  SPA-GMN-KINKCHK-G.
+                           11  SPA-GMN-KINKCHK             PIC X(01).
+                           11  SPA-GMN-KINKCHK-F1          PIC X(01).
+                           11  SPA-GMN-KINKCHK-MEI         PIC X(38).
+                       09  SPA-GMN-KINKCHK-COMB.
+                           11  SPA-GMN-KINKCHK-LIST        PIC X(40)
+                                                           OCCURS  3.
+                       09  SPA-GMN-KINKCHK-MAX             PIC 9(02).
       *                診療行為クリア確認チェック
                        09  SPA-GMN-CLEARCHK-G.
                            11  SPA-GMN-CLEARCHK            PIC X(01).
@@ -1829,6 +1839,15 @@
            MOVE    "1 チェックする"
                                        TO  SPA-GMN-JGAIKEIKBN-LIST(2)
            MOVE    2                   TO  SPA-JGAIKEIKBN-MAX
+      *H28.8
+      *    相互作用チェック区分
+           MOVE    "0 相互作用・チェックマスタを対象"
+                                       TO  SPA-GMN-KINKCHK-LIST (1)
+           MOVE    "1 チェックマスタのみを対象"
+                                       TO  SPA-GMN-KINKCHK-LIST (2)
+           MOVE    2                   TO  SPA-GMN-KINKCHK-MAX
+      *
+      *
       *    病名表示区分
            MOVE    "0 表示しない"      TO  SPA-GMN-BYOHYOKBN-LIST(1)
            MOVE    "1 表示する"        TO  SPA-GMN-BYOHYOKBN-LIST(2)
@@ -2592,6 +2611,10 @@
                                            TO  SPA-NAI-JIKANCHK-SED(1)
                MOVE      SYS-1008-JIKANCHK-SED(2)
                                            TO  SPA-NAI-JIKANCHK-SED(2)
+      *H28.8
+      *        相互作用チェック区分
+               MOVE    SYS-1008-INTERACT-CHKKBN
+                                           TO  SPA-GMN-KINKCHK
            END-IF
       *    チェック除外時間
            PERFORM VARYING     IDT     FROM    1   BY  1
@@ -3020,6 +3043,16 @@
                    MOVE    SPA-GMN-DATA-MAX    TO  IDY
                END-IF
            END-PERFORM
+      *H28.8
+      *    相互作用チェック区分
+           EVALUATE    SPA-GMN-KINKCHK
+               WHEN    "1"
+                   MOVE    SPA-GMN-KINKCHK-LIST (2)
+                                           TO  SPA-GMN-KINKCHK-G
+               WHEN    OTHER
+                   MOVE    SPA-GMN-KINKCHK-LIST (1)
+                                           TO  SPA-GMN-KINKCHK-G
+           END-EVALUATE
       *
             MOVE    1                  TO  SPA-GMN-CUR
       *
@@ -5338,6 +5371,9 @@
       *
       *    チェック制御
            MOVE    W07-KIKAN           TO  SPA-GMN-INTERACT-KIKAN
+      *H28.8
+      *    相互作用チェック区分
+           MOVE    W07-KINKCHK         TO  SPA-GMN-KINKCHK-G
            MOVE    W07-GAIKANKBN       TO  SPA-GMN-GAIKANRIKBN-G
            MOVE    W07-GAIMOVE         TO  SPA-GMN-GAIMOVE-G
            MOVE    W07-SURYOZERO       TO  SPA-GMN-SURYOZERO-G
@@ -6241,6 +6277,24 @@
       *****************************************************************
        4100-KIKAN-CHK2-SEC       SECTION.
       *
+      *H28.8
+      *    相互作用チェック区分
+           MOVE    ZERO                TO  FLG-OK
+      *
+           PERFORM VARYING     IDY     FROM    1   BY  1
+                   UNTIL       IDY     >   SPA-GMN-KINKCHK-MAX
+               IF      SPA-GMN-KINKCHK     =   SPA-GMN-KINKCHK-LIST
+                                                         (IDY)(1:1)
+                   MOVE    SPA-GMN-KINKCHK-LIST (IDY)
+                                           TO  SPA-GMN-KINKCHK-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-OK              =   ZERO
+               MOVE    "0044"              TO  SPA-ERRCD
+               MOVE    35                  TO  SPA-GMN-CUR
+           END-IF
           .
        4100-KIKAN-CHK2-EXT.
            EXIT.
@@ -10277,6 +10331,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-W01-STYUKYMD        TO  SYS-1008-STYUKYMD
            MOVE    SPA-W01-EDYUKYMD        TO  SYS-1008-EDYUKYMD
            MOVE    SPA-GMN-INTERACT-KIKAN  TO  SYS-1008-INTERACT-KIKAN
+           MOVE    SPA-GMN-KINKCHK         TO  SYS-1008-INTERACT-CHKKBN
            MOVE    SPA-GMN-GAIKANRIKBN-CHK TO  SYS-1008-GAIKANRIKBN-CHK
            MOVE    SPA-GMN-DATA(7)         TO  SYS-1008-IKUJIEIYO-FLG
            MOVE    SPA-GMN-SRYKACD         TO  SYS-1008-IKUJIEIYO-SRYKA
@@ -11085,6 +11140,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE  SPA-GMN-LAST-KIKAN    TO  W07-LASTKIKAN
       *
            MOVE  SPA-GMN-INTERACT-KIKAN    TO  W07-KIKAN
+      *H28.8
+      *    相互作用チェック区分
+           MOVE    SPA-GMN-KINKCHK-G   TO  W07-KINKCHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-KINKCHK-MAX
+               MOVE    SPA-GMN-KINKCHK-LIST (IDX)
+                                       TO  W07-KINKCHK-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-KINKCHK-MAX TO  W07-KINKCHK-COUNT
+      *
       *    外来管理加算チェック
            MOVE    SPA-GMN-GAIKANRIKBN-G   TO  W07-GAIKANKBN
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -12429,6 +12494,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0020"
                    MOVE    "外来初診・再診料区分エラー"
                                                        TO  SPA-ERRMSG
+      *H28.8
+               WHEN    "0044"
+                   MOVE    "相互作用チェック区分エラー"
+                                                       TO  SPA-ERRMSG
       *        
                WHEN    "1001"
                    MOVE    "カルテの病名対象区分がありません。"
@@ -12864,6 +12933,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                WHEN    30
                    MOVE  "KIKAN"           TO   MCP-WIDGET
+      *H28.8
+               WHEN    35
+                   MOVE  "KINKCHK"         TO   MCP-WIDGET
                WHEN    31
                    MOVE  "GAIKANKBN"       TO   MCP-WIDGET
                WHEN    32
@@ -13285,6 +13357,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "TEINYUAUTO"
                    MOVE    30              TO  SPA-GMN-CUR
                WHEN    "KIKAN"
+     ******        MOVE    31              TO  SPA-GMN-CUR
+                   MOVE    35              TO  SPA-GMN-CUR
+      *H28.8
+               WHEN    "KINKCHK"
                    MOVE    31              TO  SPA-GMN-CUR
                WHEN    "GAIKANKBN"
                    MOVE    32              TO  SPA-GMN-CUR
