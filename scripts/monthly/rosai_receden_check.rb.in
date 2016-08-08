@@ -891,7 +891,7 @@ class Receden_check < Receden_common
                   end
                 end
                 if tbl_tensu["SRYKBN"] == "11" && tbl_tensu["KOKUJISKBKBN2"].to_i == 1
-                  if rr["SHINKEIKBN"].value != "1"
+                 if !(["1","3","7"].include?(rr["SHINKEIKBN"].value))
                     @errors.push("40070",rece,rr,"SHINKEIKBN")
                   end
                 end
