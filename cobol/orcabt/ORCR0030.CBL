@@ -746,6 +746,7 @@
       *  04.08.27    NACL-門脇    16/06/22  災害対応（記号あり、番号なしの場合）
       *  04.08.28    NACL-門脇    16/06/22  主保険がないレセプトの全国公費一部
       *                                     負担金記載修正
+      *  04.08.29    NACL-門脇    16/08/03  全国公費一部負担金記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1666,6 +1667,7 @@
               05  WRK-TAIHI-GENKIN-OCC         OCCURS   4.
                 07  WRK-TAIHI-GENKIN           PIC  9(07).
                 07  WRK-TAIHI-GENKIN-EN        PIC  9(07)V9(01).
+                07  WRK-TAIHI-GENKIN9          PIC  9(07).
            03  WRK-TAIHI-GENKIN-XXX            PIC  9(07).
            03  WRK-TAIHI-GENKIN-XXX-EN         PIC  9(07).
       *
@@ -21081,6 +21083,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
                   WHEN       "012"
                   WHEN       "051"
                   WHEN       "025"
@@ -21108,6 +21113,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                               * 10
+                                               * RECE02-KYURATE
+                                               / 100
+                    MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
                   WHEN       "015"
                   WHEN       "016"
                   WHEN       "021"
@@ -21126,6 +21143,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
                   WHEN       "052"
                   WHEN       "054"
                     IF  ((FLG-ZENKI-TOKUREI         =  1      ) AND
@@ -21152,6 +21172,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    IF   (RECE02-KYURATE           >=  20     )
+                    AND  (RECE02-SRYYM             >= "201501")
+                      COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                                 * 10
+                                                 * 20
+                                                 / 100
+                    ELSE
+                      COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                                 * 10
+                                                 * RECE02-KYURATE
+                                                 / 100
+                    END-IF
+                    MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
                 END-EVALUATE
               END-IF
       *
@@ -21184,6 +21224,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                               * 10
+                                               * RECE02-KYURATE
+                                               / 100
+                    MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
               END-IF
       *
               IF    WRK-KOHJGNGET-TEKIYOFLG(KH-IDX - 1)  =   1
@@ -21208,6 +21260,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
                     ADD      WRK-TAIHI-GENKIN4  TO
                                         WRK-TAIHI-GENKIN(KH-IDX - 1)
+      *
+                    IF   RECE02-KYURATE    >=  20
+                      COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                                 * 10
+                                                 * 20
+                                                 / 100
+                    ELSE
+                      COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
+                                                 * 10
+                                                 * RECE02-KYURATE
+                                                 / 100
+                    END-IF
+                    MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN4 = WRK-TAIHI-GENKIN4 * 10
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN9(KH-IDX - 1)
               END-IF
       *
               IF   RECE02-KOHNUM(KH-IDX - 1)  =  "051"
@@ -25310,10 +25381,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
             ELSE
               IF  WRK-KOH-KINGAKU = WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
-                MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
+                MOVE  WRK-KOH-KINGAKU  TO
                                   RECE02-FTNMONEY(KOHFTN-IDX + 1)
-                MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+              ELSE
+                IF  (WRK-TAIHI-GENKIN9(KOHFTN-IDX)
+                                  = RECE02-FTNMONEY(KOHFTN-IDX + 1))
+                AND (WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
+                                  = RECE02-FTNMONEY(KOHFTN-IDX + 1))
+                  MOVE  WRK-KOH-KINGAKU  TO
+                                  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                                  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                END-IF
               END-IF
             END-IF
       *     全国公費の月上限額到達日の収納データがある
