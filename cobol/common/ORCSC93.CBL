@@ -1557,12 +1557,13 @@
                   (SPA-COM-KAIFLG (IDX - 1)    =   "1" )  AND
                   (SPA-GMN-INPUTCD(IDX - 1)(1:1)   NOT =  ".")
                MOVE    "1"             TO  SPA-COM-ZAIEND (IDX - 1)
-               IF     (SPA-COM-SRYKBN(IDX - 1) NOT =   "13" )
-               AND    (SPA-COM-SRYKBN(IDX)     =   "13"     )
-                   CONTINUE
-               ELSE
-                   MOVE    ZERO            TO  FLG-AKUSEI-ARI
-               END-IF
+      *H28.8   削除
+      *        IF     (SPA-COM-SRYKBN(IDX - 1) NOT =   "13" )
+      *        AND    (SPA-COM-SRYKBN(IDX)     =   "13"     )
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    ZERO            TO  FLG-AKUSEI-ARI
+      ****     END-IF
            END-IF
       *
       *    入院回数入力時、終了とする
