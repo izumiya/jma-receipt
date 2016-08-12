@@ -412,6 +412,9 @@
       *****************************************************************
        1000-RGTXMLREAD-SEC   SECTION.
       *
+           INITIALIZE                      XML-SUBJECTIVESREQ
+           INITIALIZE                      XML-APIREQ
+      *
       * XML情報取り出し
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            MOVE    "xml_subjectivesmodv2req"   TO  MCP-TABLE
