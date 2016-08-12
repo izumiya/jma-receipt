@@ -2155,12 +2155,22 @@
                    (TBL-WKSRY-SRYKBN (TBL-MAX)
                                        =   "11"  OR  "12"  OR "13") AND
                    (TNS-DATAKBN        =   "1"   )
-               MOVE    WRK-JIKAN       TO  TBL-WKSRY-INPUTCD
+      *H28.8
+      *        時間外算定不可、入院時間外加算は対象外
+               IF      (TNS-TIMEKSNKBN     =   0  )
+                  OR   (TNS-NYUGAITEKKBN   =   1  )
+                   MOVE    LF04-IJICD(IDX1 IDX2)(1:9)
+                                           TO  TBL-WKSRY-INPUTCD
+                                              (TBL-MAX IDX-S)
+               ELSE
+      *
+                   MOVE    WRK-JIKAN       TO  TBL-WKSRY-INPUTCD
                                              (TBL-MAX IDX-S)(1:1)
-               MOVE    LF04-IJICD(IDX1 IDX2)(1:9)
-                                       TO  TBL-WKSRY-INPUTCD
+                   MOVE    LF04-IJICD(IDX1 IDX2)(1:9)
+                                           TO  TBL-WKSRY-INPUTCD
                                              (TBL-MAX IDX-S)(3:)
-               MOVE    SPACE           TO  WRK-JIKAN
+                   MOVE    SPACE           TO  WRK-JIKAN
+               END-IF
            ELSE
                MOVE    LF04-IJICD(IDX1 IDX2)(1:9)
                                        TO  TBL-WKSRY-INPUTCD
