@@ -439,6 +439,7 @@
       *  04.08.06    NACL-∆£∏∂    16/04/01   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       *  04.08.07    NACL-∆£∏∂    16/06/20  ø«Œ≈π‘∞Ÿ•«°º•øÕ—•∆°º•÷•Î
       *                                    ° ≤√ªªπ‡Ã‹∞∑§§§Œ¥À‹π‡Ã‹°À§Ú¡˝§‰§π
+      *  04.08.09    NACL-ÃÁœ∆    16/08/18  À° Ã£µ£±§Œ∞Ï…Ù…È√¥∂‚§Œµ≠œøΩ§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3359,14 +3360,14 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            MOVE    8                      TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
       *    …È√¥∂‚≥€° ∏¯»Ò°À
-           IF     RECE02-KOHFTNJANUM (IDY) (1:2)
-                                           =   "51"
-               IF      RECE02-KOHFTNJANUM (IDY) (5:3)
-                                               =   "602"
-                   MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
-                   MOVE    8                      TO  WRK-NAGASA
-               END-IF
-           ELSE
+      ***  IF     RECE02-KOHFTNJANUM (IDY) (1:2)
+      ***                                  =   "51"
+      ***      IF      RECE02-KOHFTNJANUM (IDY) (5:3)
+      ***                                      =   "602"
+      ***          MOVE    RECE02-FTNMONEY(IDX)   TO  WRK-NUM
+      ***          MOVE    8                      TO  WRK-NAGASA
+      ***      END-IF
+      ***  ELSE
              IF  ((RECE02-PREFNUM     =   "45"      ) AND
                   (RECE02-KOHNUM(IDY) =   "190"     ) AND
                   (RECE02-SRYYM      <=  "200803"   ))
@@ -3380,7 +3381,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                    MOVE    8                      TO  WRK-NAGASA
                END-IF
              END-IF
-           END-IF
+      ***  END-IF
       *    ∏©√±Õ—π‡Ã‹
            IF      FLG-RECE11          =   ZERO
                IF      RECE11-RECEDEN-FTNMONEY(IDX)

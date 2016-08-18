@@ -4383,8 +4383,10 @@
                     MOVE    ZERO   TO    FLG-SAIGAI-JGN-SEIHO
                END-IF
              ELSE
-               IF   RECE62-KOHNUM(IDX-SAI)  =  "015" OR "016"
-                                            OR "011" OR "020"
+               IF ( RECE62-KOHNUM(IDX-SAI) = "015" OR "016"
+                                          OR "011" OR "020"  )
+               OR ((RECE62-KOHNUM(IDX-SAI) = "052" OR "054" ) AND
+                   (RECE62-SRYYM          >= "201501"       ))
                  IF   LNK-ORCSJGNGET-NYUJGNGAK  NOT = ZERO
                     MOVE     1     TO    FLG-SAIGAI-JGN-ETC2
                  END-IF
@@ -24700,8 +24702,10 @@
                      END-IF
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                     ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
+                     IF    SYU-YKZKENNUM = ZERO
+                       ADD SYU-SKJ-RYOYOHI(IDX3)  TO
                                    WRK-KOHTAN-SHOKUJIRYOYOHI(KH-IDX)
+                     END-IF
       *
                      MOVE   "1"    TO   RECE62-SKJFTNFLG(KH-IDX - 1)
                    ELSE
@@ -25449,7 +25453,6 @@
                            RECE62-FTNMONEY(KOHFTN-IDX + 1)      )
                   AND (WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
                                       NOT =  ZERO               )
-                  AND (WK-GENGAKUKBN      =  ZERO               )
                     COMPUTE  WRK-FTNKEI2 =
                              RECE62-FTNMONEY(KOHFTN-IDX + 1)  +
                              WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
@@ -32823,6 +32826,7 @@
                  WHEN      OTHER
                    MOVE   RECE62-KOH-CHIKAN-KIN1
                                         TO   RECE62-FTNMONEY(2)
+                   MOVE   "1"           TO   RECE62-KISAIFLG(2)
                END-EVALUATE
              END-IF
       *      ∏¯£≤∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -32842,6 +32846,7 @@
                  WHEN      OTHER
                    MOVE   RECE62-KOH-CHIKAN-KIN2
                                         TO   RECE62-FTNMONEY(3)
+                   MOVE   "1"           TO   RECE62-KISAIFLG(3)
                END-EVALUATE
              END-IF
       *      ∏¯£≥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -32861,6 +32866,7 @@
                  WHEN      OTHER
                    MOVE   RECE62-KOH-CHIKAN-KIN3
                                         TO   RECE62-FTNMONEY(4)
+                   MOVE   "1"           TO   RECE62-KISAIFLG(4)
                END-EVALUATE
              END-IF
       *      ∏¯£¥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -32880,6 +32886,7 @@
                  WHEN      OTHER
                    MOVE   RECE62-KOH-CHIKAN-KIN4
                                         TO   RECE62-FTNMONEY(5)
+                   MOVE   "1"           TO   RECE62-KISAIFLG(5)
                END-EVALUATE
              END-IF
       *

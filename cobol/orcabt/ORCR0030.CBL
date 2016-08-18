@@ -4993,7 +4993,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
                     MOVE    ZERO   TO    FLG-SAIGAI-JGN-SEIHO
                END-IF
              ELSE
-               IF   RECE02-KOHNUM(IDX-SAI)  =  "015" OR "016" OR "021"
+               IF ( RECE02-KOHNUM(IDX-SAI) = "015" OR "016" OR "021" )
+               OR ((RECE02-KOHNUM(IDX-SAI) = "052" OR "054" ) AND
+                   (RECE02-SRYYM          >= "201501"       )        )
                  IF   LNK-ORCSJGNGET-GAIJGNGAK  NOT = ZERO
                     MOVE     1     TO    FLG-SAIGAI-JGN-ETC2
                  END-IF
@@ -27436,6 +27438,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  WHEN      OTHER
                    MOVE   RECE02-KOH-CHIKAN-KIN1
                                         TO   RECE02-FTNMONEY(2)
+                   MOVE   "1"           TO   RECE02-KISAIFLG(2)
                END-EVALUATE
              END-IF
       *      ∏¯£≤∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -27455,6 +27458,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  WHEN      OTHER
                    MOVE   RECE02-KOH-CHIKAN-KIN2
                                         TO   RECE02-FTNMONEY(3)
+                   MOVE   "1"           TO   RECE02-KISAIFLG(3)
                END-EVALUATE
              END-IF
       *      ∏¯£≥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -27474,6 +27478,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  WHEN      OTHER
                    MOVE   RECE02-KOH-CHIKAN-KIN3
                                         TO   RECE02-FTNMONEY(4)
+                   MOVE   "1"           TO   RECE02-KISAIFLG(4)
                END-EVALUATE
              END-IF
       *      ∏¯£¥∞Ï…Ù…È√¥∂‚√÷§≠¥π§®
@@ -27493,6 +27498,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  WHEN      OTHER
                    MOVE   RECE02-KOH-CHIKAN-KIN4
                                         TO   RECE02-FTNMONEY(5)
+                   MOVE   "1"           TO   RECE02-KISAIFLG(5)
                END-EVALUATE
              END-IF
       *
