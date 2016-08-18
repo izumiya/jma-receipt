@@ -762,6 +762,14 @@
                                            DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H28.6
+               WHEN    "K804"
+                   STRING  "警告！"
+                           "四肢加算ができないコードです。"
+                           "労災加算を削除して下さい。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "8005"
                    MOVE    "労災加算は１．５倍のみです。"
                                        TO  SPA-ERRMSG
@@ -3160,6 +3168,14 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H28.9
+               WHEN    "K257"
+                   STRING  "警告！"
+                           "認知症地域包括診療の算定があります。"
+                           "投薬種類数が算定上限を超えています。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *==
       *
                WHEN    "1316"
@@ -3321,6 +3337,38 @@
                            "通院・在宅精神療法等の減算規定に"
                            "該当します。"
                            "算定コードを確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H28.7
+               WHEN    "8055"
+                   STRING  "労災加算は１．５倍のみです。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8056"
+                   STRING  "労災加算は２倍のみです。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K805"
+                   STRING  "警告！"
+                           "労災加算は１．５倍のみです。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K806"
+                   STRING  "警告！"
+                           "労災加算は２倍のみです。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H28.9
+               WHEN    "K511"
+                   STRING  "警告！"
+                           "多椎間又は多椎弓実施加算の"
+                           "下に手術の入力があります。"
+                           "数量まとめは行いません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
