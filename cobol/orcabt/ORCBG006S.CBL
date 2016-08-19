@@ -67,14 +67,16 @@
                05  TOKEI-YKZKBN        PIC 9(01).
                05  TOKEI-KANANAME      PIC X(200).
                05  TOKEI-SRYCD         PIC X(09).
+               05  TOKEI-ENDYMD        PIC X(08).
+               05  TOKEI-TEN           PIC 9(07)V9(02).
                05  TOKEI-SRYKA         PIC X(02).
            03  TOKEI-NAME              PIC X(40).
            03  TOKEI-TANI              PIC X(10).
-           03  TOKEI-TEN               PIC 9(07)V9(02).
            03  TOKEI-SRYSURYO          PIC 9(10)V9(05).
       *----(04.08.02)--ADD-START---
            03  TOKEI-TENSIKIBETU       PIC 9(01).
       *----(04.08.02)--ADD-END-----
+           03  TOKEI-KOME              PIC X(01).
       *
       *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ë
        FD  RECEERR-FILE.
@@ -109,6 +111,7 @@
            03  FLG-OK                  PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-SRYKBN              PIC 9(01).
+           03  FLG-KOME                PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -220,6 +223,7 @@
                05  WRK-NAI-TBL         OCCURS  25  TIMES.
                  07  WRK-NAI-SRYCD     PIC X(9).
                  07  WRK-NAI-NAME      PIC X(40).
+                 07  WRK-NAI-KOME      PIC X(01).
                  07  WRK-NAI-TEN       PIC X(10).
                  07  WRK-NAI-TANI      PIC X(10).
                  07  WRK-NAI-SURYO     PIC X(16)
@@ -1054,6 +1058,8 @@
       *
            INITIALIZE                  TNS-TENSU-REC
            MOVE    SRY-SRYCD(IDX)  TO  TNS-SRYCD
+           MOVE    SRY-SRYYM       TO  TNS-YUKOSTYMD(1:6)
+           MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
       *    ÅÀ¿ô¥Þ¥¹¥¿¸¡º÷
            PERFORM 900-TNS-READ-SEC
       *
@@ -1258,28 +1264,36 @@
            MOVE    TNS-KANANAME    TO  TOKEI-KANANAME
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            MOVE    ACCT-SRYKA      TO  TOKEI-SRYKA
-           IF    ( PARA-KOUHATU    =   1 ) AND
-                 ( TNS-KOUHATUKBN  =   1 )
-               STRING  "¡Ú¸å¡Û"        DELIMITED BY SIZE
-                      TNS-NAME         DELIMITED BY SIZE
-                                   INTO    TOKEI-NAME
-               END-STRING
-           ELSE
-               MOVE    TNS-NAME        TO  TOKEI-NAME
-           END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
-           MOVE    TNS-TANINAME    TO  TOKEI-TANI
-      *----(04.08.02)--ADD-START---
-           MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
-      *----(04.08.02)--ADD-END-----
-           MOVE    ZERO            TO  TOKEI-SRYSURYO
+           MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
            PERFORM 900-TOKEI-READ-SEC
-           COMPUTE WRK-GSURYO      =   WRK-SURYO
-                                   *   WRK-KAISU
-           COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
-                                   +   WRK-GSURYO
       *
            IF      FLG-TOKEI       =   1
+               IF    ( PARA-KOUHATU    =   1 ) AND
+                     ( TNS-KOUHATUKBN  =   1 )
+                   STRING  "¡Ú¸å¡Û"        DELIMITED BY SIZE
+                          TNS-NAME         DELIMITED BY SIZE
+                                   INTO    TOKEI-NAME
+                   END-STRING
+               ELSE
+                   MOVE    TNS-NAME        TO  TOKEI-NAME
+               END-IF
+      *
+               MOVE    TNS-TANINAME    TO  TOKEI-TANI
+      *----(04.08.02)--ADD-START---
+               MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
+      *----(04.08.02)--ADD-END-----
+      *
+               MOVE    ZERO            TO  TOKEI-SRYSURYO
+               COMPUTE WRK-GSURYO      =   WRK-SURYO
+                                       *   WRK-KAISU
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-GSURYO
+               IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
+                   MOVE    "*"         TO  TOKEI-KOME
+                   MOVE    1               TO  FLG-KOME
+               END-IF
+      *
                WRITE   TOKEI-REC
                COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
                IF    ( PARA-KOUHATU    =   1 ) AND
@@ -1287,6 +1301,10 @@
                    COMPUTE CNT-KOUHATU     =   CNT-KOUHATU   +   1
                END-IF
            ELSE
+               COMPUTE WRK-GSURYO      =   WRK-SURYO
+                                       *   WRK-KAISU
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-GSURYO
                REWRITE TOKEI-REC
            END-IF
       *
@@ -1313,28 +1331,36 @@
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            MOVE    SS009-BRMNUM-DAY(IDX-D)(1:2)
                                    TO  TOKEI-SRYKA
-           IF    ( PARA-KOUHATU    =   1 ) AND
-                 ( TNS-KOUHATUKBN  =   1 )
-               STRING  "¡Ú¸å¡Û"        DELIMITED BY SIZE
-                      TNS-NAME         DELIMITED BY SIZE
-                                   INTO    TOKEI-NAME
-               END-STRING
-           ELSE
-               MOVE    TNS-NAME        TO  TOKEI-NAME
-           END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
-           MOVE    TNS-TANINAME    TO  TOKEI-TANI
-      *----(04.08.02)--ADD-START---
-           MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
-      *----(04.08.02)--ADD-END-----
-           MOVE    ZERO            TO  TOKEI-SRYSURYO
+           MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
            PERFORM 900-TOKEI-READ-SEC
-           COMPUTE WRK-GSURYO      =   WRK-SURYO
-                                   *   ACCT-DAY (1 IDX-D)
-           COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
-                                   +   WRK-GSURYO
       *
            IF      FLG-TOKEI       =   1
+               IF    ( PARA-KOUHATU    =   1 ) AND
+                     ( TNS-KOUHATUKBN  =   1 )
+                   STRING  "¡Ú¸å¡Û"        DELIMITED BY SIZE
+                          TNS-NAME         DELIMITED BY SIZE
+                                   INTO    TOKEI-NAME
+                   END-STRING
+               ELSE
+                   MOVE    TNS-NAME        TO  TOKEI-NAME
+               END-IF
+      *
+               MOVE    TNS-TANINAME    TO  TOKEI-TANI
+      *----(04.08.02)--ADD-START---
+               MOVE    TNS-TENSIKIBETU TO  TOKEI-TENSIKIBETU
+      *----(04.08.02)--ADD-END-----
+      *
+               MOVE    ZERO            TO  TOKEI-SRYSURYO
+               COMPUTE WRK-GSURYO      =   WRK-SURYO
+                                       *   ACCT-DAY (1 IDX-D)
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-GSURYO
+               IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
+                   MOVE    "*"         TO  TOKEI-KOME
+                   MOVE    1               TO  FLG-KOME
+               END-IF
+      *
                WRITE   TOKEI-REC
                COMPUTE CNT-TOKEI       =   CNT-TOKEI   +   1
                IF    ( PARA-KOUHATU    =   1 ) AND
@@ -1342,8 +1368,13 @@
                    COMPUTE CNT-KOUHATU     =   CNT-KOUHATU   +   1
                END-IF
            ELSE
+               COMPUTE WRK-GSURYO      =   WRK-SURYO
+                                       *   ACCT-DAY (1 IDX-D)
+               COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
+                                       +   WRK-GSURYO
                REWRITE TOKEI-REC
            END-IF
+      *
            IF      WRK-GSURYO   NOT =   ZERO
                PERFORM   250-TOKEI-BTUNUM-GOKEI-SET-SEC 
            END-IF
@@ -1364,9 +1395,11 @@
            MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
            MOVE    "¹ç·×"          TO  TOKEI-KANANAME
            MOVE    "999999999"     TO  TOKEI-SRYCD
+           MOVE    "99999999"      TO  TOKEI-ENDYMD
            MOVE    ACCT-SRYKA      TO  TOKEI-SRYKA
            MOVE    "¹ç·×"          TO  TOKEI-NAME
            MOVE    ZERO            TO  TOKEI-SRYSURYO
+           MOVE    ZERO            TO  TOKEI-TEN
            PERFORM 900-TOKEI-READ-SEC
            COMPUTE WRK-GSURYO      =   TNS-TEN *
                                     (  WRK-SURYO *   WRK-KAISU )
@@ -1395,10 +1428,12 @@
            MOVE    TNS-YKZKBN      TO  TOKEI-YKZKBN
            MOVE    "¹ç·×"          TO  TOKEI-KANANAME
            MOVE    "999999999"     TO  TOKEI-SRYCD
+           MOVE    "99999999"      TO  TOKEI-ENDYMD
            MOVE    SS009-BRMNUM-DAY(IDX-D)(1:2)
                                    TO  TOKEI-SRYKA
            MOVE    "¹ç·×"          TO  TOKEI-NAME
            MOVE    ZERO            TO  TOKEI-SRYSURYO
+           MOVE    ZERO            TO  TOKEI-TEN
            PERFORM 900-TOKEI-READ-SEC
            COMPUTE WRK-GSURYO      =   TNS-TEN
                                    * ( WRK-SURYO *   ACCT-DAY (1 IDX-D))
@@ -1464,6 +1499,7 @@
                MOVE    TOKEI-SRYCD         TO  WRK-NAI-SRYCD (IDY)
                MOVE    TOKEI-NAME          TO  WRK-NAI-NAME  (IDY)
                MOVE    TOKEI-TANI          TO  WRK-NAI-TANI  (IDY)
+               MOVE    TOKEI-KOME          TO  WRK-NAI-KOME(IDY)
       *        ÅÀ¿ôÊÔ½¸
       *----(04.08.02)--UPD-START---
                IF      TOKEI-TENSIKIBETU   =   4
@@ -1485,12 +1521,14 @@
            END-IF
       *
            MOVE    TOKEI-SRYCD         TO  WRK-SRYCD
+           MOVE    TOKEI-TEN           TO  WRK-TEN
            MOVE    ZERO                TO  WRK-GSURYO
            PERFORM UNTIL ( FLG-TOKEI           =   1  )
                    OR    ( TOKEI-YKZKBN    NOT = WRK-YKZKBN )
                    OR    ( TOKEI-INGAIKBN  NOT = WRK-INGAIKBN )
                    OR    ( TOKEI-NYUGAIKBN NOT = WRK-NYUGAIKBN )
                    OR    ( TOKEI-SRYCD     NOT = WRK-SRYCD )
+                   OR    ( TOKEI-TEN       NOT = WRK-TEN )
       *        ¿ôÎÌÊÔ½¸½èÍý
                PERFORM 26011-SURYOU-HEN-SEC
       *
@@ -1672,6 +1710,11 @@
            MOVE    "Ã±°Ì"          TO  HCMG006-TAI-TANI
            MOVE    "Ìô²Á"          TO  HCMG006-TAI-TEN
       *
+           IF      FLG-KOME        =   1
+               MOVE    "*µìÌô²Á"
+                                       TO  HCMG006-LBL
+           END-IF
+      *
            .
        280-PRT-HEAD-SET-EXT.
            EXIT.
@@ -1692,6 +1735,8 @@
                                        TO  HCMG006-TANI(CNT-LINE)
                MOVE    WRK-NAI-TEN(CNT-LINE)
                                        TO  HCMG006-TEN(CNT-LINE)
+               MOVE    WRK-NAI-KOME(CNT-LINE)
+                                       TO  HCMG006-KOME(CNT-LINE)
            END-PERFORM
       *
       *    ¿ÇÎÅ²ÊÊÌÊÔ½¸
@@ -2312,10 +2357,11 @@
       *
            MOVE    ZERO            TO  FLG-TENSU
       *
-           MOVE    WRK-PARA-STRYMD TO  ORC-DBYMD
+      *     MOVE    WRK-PARA-STRYMD TO  ORC-DBYMD
       *
            MOVE    TNS-SRYCD       TO  TTNS-CHK-SRYCD
-           MOVE    ORC-DBYMD       TO  TTNS-CHK-YMD
+           MOVE    TNS-YUKOSTYMD   TO  TTNS-CHK-YMD
+      *     MOVE    ORC-DBYMD       TO  TTNS-CHK-YMD
       *
       *    ÅÀ¿ô¥Þ¥¹¥¿ÂàÈò¥ï¡¼¥¯¥Á¥§¥Ã¥¯
            PERFORM 9001-TTNS-CHK-SEC

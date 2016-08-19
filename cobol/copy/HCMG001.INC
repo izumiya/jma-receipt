@@ -27,6 +27,10 @@
               03  HCMG001-TANI
                         PIC X(10).
               03  HCMG001-NAIYO
-                        PIC X(14)       OCCURS 7 TIMES.
+                        PIC X(10)       OCCURS 7 TIMES.
             02  HCMG001-KIKAN
                         PIC X(50).
+            02  HCMG001-KOME
+                        PIC X(1)        OCCURS 35 TIMES.
+            02  HCMG001-LBL
+                        PIC X(40).
