@@ -1353,10 +1353,10 @@
                MOVE    "（外来）"      TO  HCG017-NYUGAIKBN
            END-IF
       *
-           IF    ( WRK-PARA-HOKATSUKBN =   "1" )
-               MOVE    "（包括分を含まない）"
-                                       TO  HCG017-HOKATSUKBN
-           END-IF
+      *     IF    ( WRK-PARA-HOKATSUKBN =   "1" )
+      *         MOVE    "（包括分を含まない）"
+      *                                 TO  HCG017-HOKATSUKBN
+      *     END-IF
       *
            COMPUTE CNT-PAGE        =   CNT-PAGE        +   1
       *
