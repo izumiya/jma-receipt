@@ -29,5 +29,3 @@
                                         OCCURS 80 TIMES.
               03  HCG017-KEI
                         PIC X(18).
-            02  HCG017-HOKATSUKBN
-                        PIC X(80).
