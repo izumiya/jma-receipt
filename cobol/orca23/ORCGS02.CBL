@@ -6295,6 +6295,7 @@
                     MOVE     "1"          TO   LNK-ORCSSKS-IKTKEISANKBN
                     MOVE     "1"          TO   LNK-ORCSSKS-IKTGENKEIFLG
                   END-IF
+                  MOVE       "1"          TO   LNK-ORCSSKS-IKTJISSIFLG
       *
                   CALL    "ORCSSAIKEISAN"     USING
                                               SPA-AREA
@@ -8896,6 +8897,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  SID1
+           INITIALIZE                       SID1
            MOVE    SPA-SIDCD            TO  SID1-ID1CODE
            MOVE    WRK-SIDMSG           TO  SID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -8920,6 +8922,7 @@
       *
            MOVE    SPACE                TO  SID2
       *
+           INITIALIZE                       SID2
            EVALUATE    SPA-SIDCD
            WHEN    "2101"
                MOVE   "すべての入金記録を取り消します。よろしいですか"

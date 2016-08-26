@@ -45,6 +45,8 @@
            03  LNK-ORCSSKS-BUNBENJIHIKBN   PIC  X(01).
       *一括再計算；現物給付計算フラグ
            03  LNK-ORCSSKS-IKTGENKEIFLG    PIC  X(01).
+      *一括再計算実施フラグ
+           03  LNK-ORCSSKS-IKTJISSIFLG     PIC  X(01).
       *
       *返却値
       *

@@ -828,6 +828,8 @@
            IF   FLG-GENBUTU  =  1
              MOVE    "1"         TO  LNK-S01-IKTGENMKJFLG
            END-IF
+           MOVE    LNK-ORCSSKS-IKTJISSIFLG
+                                 TO  LNK-S01-IKTJISSIFLG
       *
            CALL    "ORCSGAIFTN"        USING
                                        MCPAREA

@@ -30248,6 +30248,7 @@
       *
            IF  (WK-SYUNOU-GENBUTU70-MSG  NOT =  ZERO   )
            AND (LNK-S01-IKTGENKEIFLG         =  SPACE  )
+           AND (LNK-S01-IKTJISSIFLG          =  SPACE  )
            AND (LNK-SYU-SRYYMD(1:6)         >= "201204")
              IF  (LNK-S01-SAIKEISAN-KBN           = "1"    )
              AND (WK-SYUNOU-GENBUTU-SECMONEY-MAE  =  9     )
@@ -30259,6 +30260,7 @@
       *
            IF  (WK-SYUNOU-GENBUTU70-MSG  NOT =  ZERO   )
            AND (LNK-S01-IKTGENKEIFLG         =  SPACE  )
+           AND (LNK-S01-IKTJISSIFLG          =  SPACE  )
            AND (LNK-SYU-SRYYMD(1:6)         >= "201204")
              IF   ( WK-GENGAKUKBN  =  3  OR  4                )
              OR   ((LNK-S01-SAIKEISAN-KBN           = "1"    ) AND
