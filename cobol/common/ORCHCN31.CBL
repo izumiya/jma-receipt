@@ -191,7 +191,7 @@
                05  WRK-YKJ-HSPNAME     PIC X(100).
                05  WRK-YKJ-TEL         PIC X(15).
                05  WRK-YKJ-DRNAME      PIC X(26).
-               05  WRK-YKJ-COMMENT     PIC X(108)  OCCURS  3.
+               05  WRK-YKJ-COMMENT     PIC X(108)  OCCURS  2.
                05  WRK-YKJ-BTUNAME     PIC X(30).
       *
            03  WRK-YKJ-BODY.
@@ -1627,7 +1627,7 @@
            MOVE    WRK-YKJ-BTUNAME TO  HCN301-BTUNAME
       *
            PERFORM VARYING IDX-GYO FROM    1   BY 1
-                   UNTIL   IDX-GYO     >   3
+                   UNTIL   IDX-GYO     >   2
               MOVE    WRK-YKJ-COMMENT(IDX-GYO)
                                        TO  HCN301-COMMENT(IDX-GYO)
            END-PERFORM
