@@ -854,15 +854,15 @@
                            MOVE    "1"             TO  SPA-COM-CUR(IDX)
                        END-IF
                    END-IF
-      *H28.? (ÊÝÎ±)
+      *H28.9
       *            ½é¿Ç¡¦ºÆ¿Ç²Ã»»¤Î¤ß¤Ï£È£²£¸Ç¯£´·î¤«¤é
                    IF      WRK-SRYSYUKBN       =   "114"
                                                OR  "124"
                                                OR  "133"
-      *?               IF      SPA-SRYYMD          <   "20160401"
+                       IF      SPA-SRYYMD          <   "20160401"
                            MOVE    "0506"          TO  SPA-ERRCD
                            MOVE    "1"             TO  SPA-COM-CUR(IDX)
-      *?               END-IF
+                       END-IF
                    END-IF
                WHEN    OTHER
       *        ¤½¤ÎÂ¾
