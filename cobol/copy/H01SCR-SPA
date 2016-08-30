@@ -60,6 +60,9 @@
       *
       *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
       *  04.08.02    NACL-藤原    15/09/14  返戻データ取込一覧対応
+      *
+      *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -199,7 +202,8 @@
                    07  SPA-RECE10-NUM          PIC  X(80).
                    07  SPA-RECE10-FTNJANUM     PIC  X(08).
                    07  SPA-RECE10-JKYSNUM      PIC  X(07).
-               07  SPA-RECE10-SKYYM            PIC  X(06).
+                   07  SPA-RECE10-SKYYM        PIC  X(06).
+                   07  SPA-RECE10-DISASTER     PIC 9(02).
       *
                05  SPA-SYS-1001-HOSPSBT1       PIC 9(01).
       *
@@ -250,6 +254,7 @@
                        09  SPA-H02GMN-THKNJANUM    PIC X(8).
                        09  SPA-H02GMN-TKIGO        PIC X(20).
                        09  SPA-H02GMN-TRECEIPT-KBN PIC X(4).
+                       09  SPA-H02GMN-TDISASTER    PIC X(2).
                        09  SPA-H02GMN-TERR         PIC X(100).
       *
                        09  SPA-H02GMN-TS-MAKE-FLG  PIC X(2).
@@ -262,6 +267,7 @@
                                                    PIC X(2).
                        09  SPA-H02GMN-TS-RECEIPT-KBN
                                                    PIC X(4).
+                       09  SPA-H02GMN-TS-DISASTER  PIC X(2).
                        09  SPA-H02GMN-TS-RECESYUBETU
                                                    PIC X(10).
       *
@@ -350,6 +356,7 @@
                                                        PIC X(10).
                            11  SPA-NAI-H03-B-TRECEIPT-KBN
                                                        PIC X(4).
+                           11  SPA-NAI-H03-B-TDISASTER PIC X(2).
                            11  SPA-NAI-H03-B-TERRFLG   PIC 9(1).
       *
                    07  SPA-NAI-H03-KOUMOKU.
@@ -382,6 +389,7 @@
                        09  SPA-H99GMN-TKIGO       PIC X(20).
                        09  SPA-H99GMN-TRECEIPT-KBN
                                                   PIC X(10).
+                       09  SPA-H99GMN-TDISASTER   PIC X(2).
                        09  SPA-H99GMN-TCREYMD     PIC X(9).
       *
                05  SPA-H99NAI-SRYYM           PIC 9(06).

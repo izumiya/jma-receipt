@@ -191,6 +191,9 @@
       *  04.08.06    NACL-藤原    16/04/20  湿布薬用法レセプト記載対応
       *  04.08.07    NACL-藤原    16/06/13  社保診療報酬請求書の災害該当
       *                                     分のまとめ対応
+      *  04.08.08    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
+      *  04.08.09    NACL-藤原    16/08/24  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -420,7 +423,7 @@
                                               PIC X(01).
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-INSPECT-INCLUDE-KBNMEI
-                                              PIC X(22).
+                                              PIC X(30).
                        09  SPA-GMN-INSPECT-GENERAL-KBN-G.
                            11  SPA-GMN-INSPECT-GENERAL-KBN
                                               PIC X(01).
@@ -619,6 +622,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-COMPRESSMEI
                                               PIC X(28).
+                       09  SPA-GMN-DISASTER-RECEIPT-G.
+                           11  SPA-GMN-DISASTER-RECEIPT
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-DISASTER-RECEIPTMEI
+                                              PIC X(18).
       *
                        09  SPA-GMN-FRAME-ROUPRTKBN-G.
                            11  SPA-GMN-FRAME-ROUPRTKBN
@@ -1196,7 +1205,7 @@
                                               PIC X(01).
                        09  SPA-GMN-F1L        PIC X(01).
                        09  SPA-GMN-INSPECT-INCLUDE-KBNMEIL
-                                              PIC X(22).
+                                              PIC X(30).
                    07  SPA-GMN-INSPECT-INCLUDE-KBN-MAX
                                               PIC 9(02).    
       *
@@ -1783,6 +1792,15 @@
                        09  SPA-GMN-COMPRESSMEIL
                                               PIC X(28).
                    07  SPA-GMN-COMPRESS-MAX   PIC 9(02).
+      *
+                   07  SPA-GMN-DISASTER-RECEIPTLST     OCCURS  2.
+                       09  SPA-GMN-DISASTER-RECEIPTL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-DISASTER-RECEIPTMEIL
+                                              PIC X(18).
+                   07  SPA-GMN-DISASTER-RECEIPT-MAX
+                                              PIC 9(02).
       *
                05  SPA-NAIB-AREA.
                    07  SPA-NAI-STYUKYMD       PIC 9(08).
@@ -2705,12 +2723,12 @@
       *     
            MOVE    "0"                 TO
                                    SPA-GMN-INSPECT-INCLUDE-KBNL   (1)
-           MOVE    "包括診療分を記載しない"
+           MOVE    "包括診療分・持参薬を記載しない"
                                        TO
                                    SPA-GMN-INSPECT-INCLUDE-KBNMEIL(1)
            MOVE    "1"                 TO
                                    SPA-GMN-INSPECT-INCLUDE-KBNL   (2)
-           MOVE    "包括診療分を記載する"
+           MOVE    "包括診療分・持参薬を記載する"
                                        TO
                                    SPA-GMN-INSPECT-INCLUDE-KBNMEIL(2)
            MOVE    2                   TO
@@ -3249,6 +3267,14 @@
            MOVE    "用法コードの内容を記載する"
                                        TO  SPA-GMN-COMPRESSMEIL(2)
            MOVE    2                   TO  SPA-GMN-COMPRESS-MAX 
+      *
+           MOVE    "0"                 TO  SPA-GMN-DISASTER-RECEIPTL (1)
+           MOVE    "分割しない"        TO
+                                       SPA-GMN-DISASTER-RECEIPTMEIL  (1)
+           MOVE    "1"                 TO  SPA-GMN-DISASTER-RECEIPTL (2)
+           MOVE    "分割する"          TO
+                                       SPA-GMN-DISASTER-RECEIPTMEIL  (2)
+           MOVE    2                   TO  SPA-GMN-DISASTER-RECEIPT-MAX 
       *
       *       医療機関情報
            MOVE    SPACE               TO  SYS-1001-REC
@@ -4466,6 +4492,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-DISASTER-RECEIPT
+                                       TO  SPA-GMN-DISASTER-RECEIPT
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-DISASTER-RECEIPT-MAX
+               IF      SPA-GMN-DISASTER-RECEIPT
+                               =   SPA-GMN-DISASTER-RECEIPTL (IDY)
+                   MOVE    SPA-GMN-DISASTER-RECEIPTLST (IDY)
+                                       TO  SPA-GMN-DISASTER-RECEIPT-G
+                   MOVE    SPA-GMN-DISASTER-RECEIPT-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
            MOVE    SYS-200501-DISASTER-SYAPRTKBN
                                        TO  SPA-GMN-DISASTER-SYAPRTKBN
            PERFORM VARYING IDY FROM    1   BY  1
@@ -4510,8 +4549,7 @@
                                    SPA-GMN-HKNJALIST-THKNJANUM (IDX)
                MOVE    SYS-200505-HKNJANUM-63 (IDX)
                                            TO
-                                   SPA-GMN-HKNJALIST-THKNJANUM-63
-                                                                  (IDX)
+                                   SPA-GMN-HKNJALIST-THKNJANUM-63 (IDX)
       *
                MOVE    SPACE               TO  HKNJAINF-REC
                INITIALIZE                      HKNJAINF-REC
@@ -5244,6 +5282,12 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-COMPRESSLST  (1)
                                            TO  SPA-GMN-COMPRESS-G
            END-IF
+           IF     SPA-GMN-DISASTER-RECEIPT-G
+                                           =   SPACE
+               MOVE    SPA-GMN-DISASTER-RECEIPTLST  (1)
+                                           TO
+                                           SPA-GMN-DISASTER-RECEIPT-G
+           END-IF
       *
       *    労災医療機関情報
            INITIALIZE                      SYS-4001-REC
@@ -5435,6 +5479,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-HKN-RIREKI      TO  SPA-GMN-HKN-RIREKI-G
            MOVE    W12-GENBUTU-ICHIBU  TO  SPA-GMN-GENBUTU-ICHIBU-G
            MOVE    W12-COMPRESS        TO  SPA-GMN-COMPRESS-G
+           MOVE    W12-DISASTER-RECEIPT
+                                       TO  SPA-GMN-DISASTER-RECEIPT-G
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
            MOVE    W12-SRYKAHENKBN     TO  SPA-GMN-SRYKAHENKBN-G
@@ -5748,6 +5794,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4207-COMPRESS-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4209-DISASTER-RECEIPT-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -9380,7 +9431,36 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            .
        4207-COMPRESS-CHK-EXT.
            EXIT.
-
+      *
+      *****************************************************************
+      *    災害該当分（非減免対象と減免対象）レセプトの分割チェック
+      *****************************************************************
+       4209-DISASTER-RECEIPT-CHK-SEC        SECTION.
+      *
+           IF      SPA-GMN-DISASTER-RECEIPT
+                                       =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-DISASTER-RECEIPT-MAX
+                        OR     SPA-GMN-DISASTER-RECEIPT
+                                   =   SPA-GMN-DISASTER-RECEIPTL (IDY)
+                   CONTINUE
+               END-PERFORM
+      * 
+               IF      IDY <=      SPA-GMN-DISASTER-RECEIPT-MAX
+                   MOVE    SPA-GMN-DISASTER-RECEIPTLST (IDY)
+                                           TO
+                                           SPA-GMN-DISASTER-RECEIPT-G
+               ELSE
+                   MOVE    405             TO  SPA-GMN-CUR
+                   MOVE    "0135"          TO  SPA-ERRCD
+               END-IF
+           END-IF    
+      *
+           .
+       4209-DISASTER-RECEIPT-CHK-EXT.
+           EXIT.
       *
       *****************************************************************
       *    主科社保設定フラグチェック
@@ -10127,6 +10207,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-GENBUTU-ICHIBU  TO
                                        SYS-200501-GENBUTU-ICHIBU-KSIKBN
            MOVE    SPA-GMN-COMPRESS        TO  SYS-200501-COMPRESS-KBN
+           MOVE    SPA-GMN-DISASTER-RECEIPT
+                                           TO
+                                           SYS-200501-DISASTER-RECEIPT
            MOVE    SPA-GMN-BTUNUM-KSIKBN   TO  SYS-200501-BTUNUM-KSIKBN
            MOVE    SPA-GMN-DRNAME-KSIKBN   TO  SYS-200501-DRNAME-KSIKBN
            MOVE    SPA-GMN-PRT-CHECKKBN    TO  SYS-200501-PRT-CHECKKBN
@@ -11233,6 +11316,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W12-COMPRESS-COUNT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-DISASTER-RECEIPT-MAX
+               MOVE    SPA-GMN-DISASTER-RECEIPTLST (IDY)
+                                       TO  W12-DISASTER-RECEIPTLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-DISASTER-RECEIPT-MAX
+                                       TO  W12-DISASTER-RECEIPT-COUNT
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECECOMKBN-MAX
                MOVE    SPA-GMN-RECECOMKBNLST (IDY)
                                        TO  W12-RECECOMKBNLST (IDY)
@@ -11360,6 +11451,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W12-GENBUTU-ICHIBU
       *
            MOVE    SPA-GMN-COMPRESS-G  TO  W12-COMPRESS
+      *
+           MOVE    SPA-GMN-DISASTER-RECEIPT-G
+                                       TO  W12-DISASTER-RECEIPT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-AUTODSPKBN-MAX
@@ -12276,6 +12370,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                            "入力エラー"        DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0135"
+                   STRING  "災害該当分（非減免対象と減免対象）分割"
+                                               DELIMITED  BY  SIZE
+                           "入力エラー"        DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12478,6 +12578,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "GENBUTU_ICHIBU"   TO   MCP-WIDGET
                 WHEN    403
                     MOVE  "COMPRESS"         TO   MCP-WIDGET
+                WHEN    405
+                   MOVE  "DISASTER_RECEIPT"  TO   MCP-WIDGET
       *
                 WHEN    9
                     MOVE  "SYAPRTNM"         TO   MCP-WIDGET
@@ -12723,6 +12825,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE    0                TO  W12-PAGENO
                 WHEN    400 THRU    401
                 WHEN    403
+                WHEN    405
                     MOVE    1                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -12860,6 +12963,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "GENBUTU_ICHIBU"
                    MOVE    403         TO  SPA-GMN-CUR
                WHEN    "COMPRESS"
+                   MOVE    405         TO  SPA-GMN-CUR
+               WHEN    "DISASTER_RECEIPT"
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "PRTJYUNKBN4"

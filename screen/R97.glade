@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -754,8 +754,8 @@
           <has_focus>False</has_focus>
           <border_width>0</border_width>
           <show_titles>True</show_titles>
-          <columns>11</columns>
-          <column_widths>50,13,120,177,73,50,100,85,50,50,50</column_widths>
+          <columns>12</columns>
+          <column_widths>50,13,120,177,73,50,100,85,50,20.50,50</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -911,6 +911,21 @@
             <xpad>0</xpad>
             <ypad>0</ypad>
             <label>施設</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
+            <name>label3</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>災</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>

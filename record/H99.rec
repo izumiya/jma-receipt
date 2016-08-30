@@ -25,7 +25,8 @@ H99 {
             column7 varchar(8);
             column8 varchar(20);
             column9 varchar(10);
-            column10 varchar(9);
+            column10 varchar(2);
+            column11 varchar(9);
           }[50];
           selectdata bool[50];
       };

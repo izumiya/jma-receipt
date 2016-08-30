@@ -86,8 +86,9 @@ R97 {
             column7 varchar(8);
             column8 varchar(10);
             column9 varchar(4);
-            column10 varchar(6);
+            column10 varchar(2);
             column11 varchar(6);
+            column12 varchar(6);
           }[500];
           selectdata bool[500];
       };

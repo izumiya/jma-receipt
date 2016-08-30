@@ -196,6 +196,8 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -623,6 +625,14 @@
                03  WRK-HKNCOMBI-ERR-DAY
                                        PIC 9(02).   
       *
+      *    災害該当（９５９）退避用領域
+       01  TABLE-PTKOHINF-AREA.
+           02  TBL-PTKOHINF-REC        OCCURS  100.
+           COPY    "CPPTKOHINF.INC"
+                                   REPLACING   //PTKOH//
+                                   BY          //TBL-PTKOH//.
+           02  TBL-PTKOHINF-MAX    PIC 9(03).
+      *
       *    患者レセプト分割情報退避用領域
        01  TBL-PT-HDIST-DAY-T.
          02  TBL-PT-HDIST-DAY-REC      OCCURS  10.
@@ -689,6 +699,7 @@
            COPY    "CPSK2002.INC".
       *     
            COPY    "CPSK2005.INC".
+           COPY    "CPSK200501.INC".
       *
       *    公費記載順設定情報
            COPY    "CPSK2013.INC".
@@ -1005,7 +1016,27 @@
                IF      SYS-2005-RJNGNBKKBN =   SPACE
                    MOVE    ZERO                TO  SYS-2005-RJNGNBKKBN
                END-IF
-      *     
+      *
+               INITIALIZE                  SYS-200501-REC
+               MOVE    "2005"              TO  SYS-200501-KANRICD
+               MOVE    "01"                TO  SYS-200501-KBNCD
+               MOVE    WRK-PARA-SRYYM      TO  SYS-200501-STYUKYMD (1:6)
+               MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+               MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD 
+               MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
+               MOVE    SYS-200501-REC      TO  MCPDATA-REC
+               PERFORM 910-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-200501-REC
+               ELSE    
+                   MOVE    SPACE               TO  SYS-200501-REC
+               END-IF
+               IF      SYS-200501-DISASTER-RECEIPT
+                                           =   SPACE
+                   MOVE    ZERO                TO
+                                           SYS-200501-DISASTER-RECEIPT
+               END-IF
+      *
       *        公費記載順設定情報
                MOVE     ZERO               TO  TBL-SYS2013-MAX
                MOVE     SPACE              TO  TBL-SYS2013-T
@@ -1253,6 +1284,9 @@
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            ELSE
+      *        災害該当情報
+               PERFORM 500-SISETU-HENSYU-SEC
+      *
       *        患者レセプト分割情報情報
                PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
       *
@@ -1721,6 +1755,8 @@
                    PERFORM 900-NYUINACCT-READ-SEC
                END-PERFORM
            ELSE
+      *        災害該当情報
+               PERFORM 500-SISETU-HENSYU-SEC
       *
       *        患者レセプト分割情報情報
                PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
@@ -2498,6 +2534,41 @@
              END-EVALUATE
            END-IF               
            MOVE    SPACE               TO WRK-RECE61-RECEKA
+      *
+      *    災害該当の有無（平成２８年１０月以降）
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( WRK-RECE61-SRYYM        >=   201610 )
+               IF    ( WRK-RECE61-RECEIPT-KBN (5:1)
+                                               =   SPACE )
+               AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+                   PERFORM VARYING IDX1    FROM    1   BY  1
+                           UNTIL   IDX1    >       TBL-PTKOHINF-MAX
+                       IF    ( TBL-PTKOH-TEKSTYMD (IDX1)
+                                           <=  COMB-TEKSTYMD           )
+                       AND   ( COMB-TEKEDYMD
+                                           <=  TBL-PTKOH-TEKEDYMD(IDX1))
+                           IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "959"
+                               IF      WRK-RECE61-HKNNUM   =   SPACE
+                                   IF        TBL-PTKOH-FTNJANUM
+                                                       (IDX1) (1:1)
+                                                               =   "1"
+                                       MOVE    "1"         TO
+                                           WRK-RECE61-RECEIPT-KBN  (5:1)
+                                   END-IF
+                               ELSE
+                                   MOVE    "1"         TO
+                                               WRK-RECE61-RECEIPT-KBN
+                                                                   (5:1)
+                               END-IF
+                               MOVE    TBL-PTKOHINF-MAX
+                                                   TO  IDX1
+                           END-IF
+                       END-IF
+                   END-PERFORM
+               END-IF
+           END-IF
       *
       *    患者レセプト分割情報の有無
            IF    ( WRK-RECE61-RECEIPT-KBN (2:3)
@@ -3918,6 +3989,9 @@
                                                LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD
       *
+      *    災害該当情報
+           PERFORM 500-SISETU-HENSYU-SEC
+      *
       *    患者レセプト分割情報情報
            PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
       *
@@ -4062,6 +4136,9 @@
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                LNK-DAY7-AREA
                MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD 
+      *
+      *        災害該当情報
+               PERFORM 500-SISETU-HENSYU-SEC
       *
       *        患者レセプト分割情報情報
                PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
@@ -4615,6 +4692,60 @@
            EXIT.
       *
       *****************************************************************
+      *    災害該当情報処理
+      *****************************************************************
+       500-SISETU-HENSYU-SEC             SECTION.
+      *
+           INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    ９５９（災害該当）（平成２８年１０月以降）
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( WRK-SYUKA-SRYYM         >=   201610 )
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+               MOVE    WRK-SYUKA-PTID      TO  PTKOH-PTID
+               MOVE    "959"               TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 900-PTKOHINF-READ-N-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-PTKOHINF  
+               END-IF
+               PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                           OR      TBL-PTKOHINF-MAX
+                                                   >=  100
+                   IF    ( PTKOH-SAKJOKBN      =   SPACE      )
+                   AND   ( PTKOH-TEKSTYMD      >=  "20161001" )
+                       ADD     1               TO  TBL-PTKOHINF-MAX
+                       MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                       DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+                   END-IF
+      *
+                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                   MOVE    "key4"           TO  MCP-PATHNAME
+                   PERFORM  900-PTKOHINF-READ-N-SEC
+               END-PERFORM
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+           END-IF
+           .
+       500-SISETU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    患者レセプト分割情報処理
       *****************************************************************
        500-PT-HDIST-DAY-HENSYU-SEC     SECTION.
@@ -5081,6 +5212,24 @@
       *
            .
        900-PTKOHINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+               MOVE    ZERO            TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
            EXIT.
       *
       *****************************************************************

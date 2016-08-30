@@ -32,6 +32,7 @@
                     06  H03-BODY-THKNJANUM    PIC X(8).
                     06  H03-BODY-TKIGO        PIC X(40).
                     06  H03-BODY-TRECEIPT-KBN PIC X(4).
+                    06  H03-BODY-TDISASTER    PIC X(2).
                     06  H03-BODY-TERR         PIC X(100).
                     06  H03-BODY-TERRCD       PIC X(3).
                   05  H03-BODY-LIST-SELECT

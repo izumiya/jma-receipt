@@ -245,6 +245,8 @@
       *  04.08.01    NACL-Æ£¸¶    12/01/08  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­
       *                                     ºÜÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
+      *  04.08.03    NACL-Æ£¸¶    16/08/08  ºÒ³²³ºÅöÊ¬¡ÊÈó¸ºÌÈÂÐ¾Ý¤È¸ºÌÈÂÐ¾Ý¡Ë
+      *                                     ¥ì¥»¥×¥È¤ÎÊ¬³äÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -653,7 +655,7 @@
                    07  TBL-SYS2013     PIC X(610).
            03  TBL-SYS2013-MAX         PIC 9(03).
       *
-      *    »ÜÀßÆþ½ê¾ðÊó¡Ê£¹£µ£°¡¢£¹£µ£±¡ËÂàÈòÍÑÎÎ°è
+      *    »ÜÀßÆþ½ê¾ðÊó¡Ê£¹£µ£°¡¢£¹£µ£±¡Ë¡¢ºÒ³²³ºÅö¡Ê£¹£µ£¹¡ËÂàÈòÍÑÎÎ°è
        01  TABLE-PTKOHINF-AREA.
            02  TBL-PTKOHINF-REC        OCCURS  100.
            COPY    "CPPTKOHINF.INC"
@@ -731,6 +733,7 @@
            COPY    "CPSK1033.INC".
       *     
            COPY    "CPSK2005.INC".
+           COPY    "CPSK200501.INC".
       *
       *    ¸øÈñµ­ºÜ½çÀßÄê¾ðÊó
            COPY    "CPSK2013.INC".
@@ -1037,7 +1040,27 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
                IF      SYS-2005-RJNGNBKKBN =   SPACE
                    MOVE    ZERO                TO  SYS-2005-RJNGNBKKBN
                END-IF
-      *     
+      *
+               INITIALIZE                  SYS-200501-REC
+               MOVE    "2005"              TO  SYS-200501-KANRICD
+               MOVE    "01"                TO  SYS-200501-KBNCD
+               MOVE    WRK-PARA-SRYYM      TO  SYS-200501-STYUKYMD (1:6)
+               MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+               MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD 
+               MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
+               MOVE    SYS-200501-REC      TO  MCPDATA-REC
+               PERFORM 910-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-200501-REC
+               ELSE    
+                   MOVE    SPACE               TO  SYS-200501-REC
+               END-IF
+               IF      SYS-200501-DISASTER-RECEIPT
+                                           =   SPACE
+                   MOVE    ZERO                TO
+                                           SYS-200501-DISASTER-RECEIPT
+               END-IF
+      *
       *        ¸øÈñµ­ºÜ½çÀßÄê¾ðÊó
                MOVE     ZERO               TO  TBL-SYS2013-MAX
                MOVE     SPACE              TO  TBL-SYS2013-T
@@ -2018,6 +2041,42 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                                            TO  IDX1
                    END-IF
                END-PERFORM
+           END-IF
+      *
+      *    ºÒ³²³ºÅö¤ÎÍ­Ìµ¡ÊÊ¿À®£²£¸Ç¯£±£°·î°Ê¹ß¡Ë
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( WRK-RECE01-SRYYM        >=   201610 )
+               IF    ( WRK-RECE01-RECEIPT-KBN (5:1)
+                                               =   SPACE )
+               AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+                   PERFORM VARYING IDX1    FROM    1   BY  1
+                           UNTIL   IDX1    >       TBL-PTKOHINF-MAX
+                       IF    ( TBL-PTKOH-TEKSTYMD (IDX1)
+                                           <=  COMB-TEKSTYMD           )
+                       AND   ( COMB-TEKEDYMD
+                                           <=  TBL-PTKOH-TEKEDYMD(IDX1))
+                           IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "959"
+                               IF      WRK-RECE01-HKNNUM   =   SPACE
+                                   IF        TBL-PTKOH-FTNJANUM
+                                                       (IDX1) (1:1)
+                                                               =   "1"
+                                       MOVE    "1"         TO
+                                               WRK-RECE01-RECEIPT-KBN
+                                                                   (5:1)
+                                   END-IF
+                               ELSE
+                                   MOVE    "1"         TO
+                                               WRK-RECE01-RECEIPT-KBN
+                                                                   (5:1)
+                               END-IF
+                               MOVE    TBL-PTKOHINF-MAX
+                                                   TO  IDX1
+                           END-IF
+                       END-IF
+                   END-PERFORM
+               END-IF
            END-IF
       *
       *    ´µ¼Ô¥ì¥»¥×¥ÈÊ¬³ä¾ðÊó¤ÎÍ­Ìµ
@@ -4043,7 +4102,7 @@ grpsys                                     SPA-AREA
            EXIT.
       *
       *****************************************************************
-      *    »ÜÀßÆþ½ê¾ðÊó½èÍý
+      *    »ÜÀßÆþ½ê¡¢ºÒ³²³ºÅö¾ðÊó½èÍý
       *****************************************************************
        500-SISETU-HENSYU-SEC             SECTION.
       *
@@ -4128,6 +4187,50 @@ grpsys                                     SPA-AREA
            MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    £¹£µ£¹¡ÊºÒ³²³ºÅö¡Ë¡ÊÊ¿À®£²£¸Ç¯£±£°·î°Ê¹ß¡Ë
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( WRK-SYUKA-SRYYM         >=   201610 )
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+               MOVE    WRK-SYUKA-PTID      TO  PTKOH-PTID
+               MOVE    "959"               TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 900-PTKOHINF-READ-N-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-PTKOHINF  
+               END-IF
+               PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                           OR      TBL-PTKOHINF-MAX
+                                                   >=  100
+                   IF    ( PTKOH-SAKJOKBN      =   SPACE      )
+                   AND   ( PTKOH-TEKSTYMD      >=  "20161001" )
+                       ADD     1               TO  TBL-PTKOHINF-MAX
+                       MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                       DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+                   END-IF
+      *
+                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                   MOVE    "key4"           TO  MCP-PATHNAME
+                   PERFORM  900-PTKOHINF-READ-N-SEC
+               END-PERFORM
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+           END-IF
            .
        500-SISETU-HENSYU-EXT.
            EXIT.

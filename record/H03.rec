@@ -36,8 +36,9 @@ H03 {
             column7 varchar(8);
             column8 varchar(40);
             column9 varchar(4);
-            column10 varchar(100);
-            column11 varchar(3);
+            column10 varchar(2);
+            column11 varchar(100);
+            column12 varchar(3);
           }[100];
           selectdata bool[100];
           fgcolor varchar(16)[100];

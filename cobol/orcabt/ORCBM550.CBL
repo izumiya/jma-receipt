@@ -47,6 +47,8 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    16/01/15  労災レセ電の請求情報への
       *                                     更新日設定
+      *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -192,8 +194,12 @@
            03  WRK-SEIKYU-DATA.
                05  WRK-SEIKYU-SKYYM    PIC X(05).
                05  WRK-SEIKYU-SRYYM    PIC X(05).
+               05  FILLER              PIC X(14).
+      *
+           03  WRK-SEIKYU-DATA-R.
                05  WRK-SEIKYU-CREYMD   PIC X(08).
-               05  WRK-SEIKYU-CREHMS   PIC X(08).
+               05  WRK-SEIKYU-CREHMS   PIC X(06).
+               05  WRK-SEIKYU-DISASTER PIC X(02).
       *
        01  CNT-RESEDEN.
            03  PATIENT-CNT             PIC 9(05).
@@ -662,8 +668,8 @@
                                                    FLG-SIKIBETU-RC
                        END-IF
                        MOVE    1               TO  IDZZ
-                       MOVE    14              TO  SPLIT-CNT
-                       MOVE    15              TO  SPLIT-CNT1
+                       MOVE    21              TO  SPLIT-CNT
+                       MOVE    22              TO  SPLIT-CNT1
                        PERFORM 20011-PARA-SPLIT-SEC
                    WHEN    "HO"            ALSO     ANY
                        ADD     1               TO  IDZZ
@@ -1712,6 +1718,9 @@
       *    返戻ファイル項目別処理
       *****************************************************************
        2001133-RECEIPTC-KOUMOKU-BETU-SEC     SECTION.
+      *??
+           DISPLAY "WRK-PARA-REC=" WRK-PARA-REC(1:2) "#" WRK-KOUMOKU-NO
+      *??
       *
            EVALUATE    WRK-PARA-REC(1:2)
                WHEN    "HI"
@@ -2048,6 +2057,16 @@
                                MOVE    "W43"       TO  WRK-ERRCD
                                PERFORM 500-ERRCD-HENSYU-SEC
                            END-IF
+      *                請求情報（災害区分）
+                       WHEN    21
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               TO  WRK-SEIKYU-DATA-R
+                           IF      WRK-SEIKYU-DISASTER =   SPACE
+                               MOVE    "00"    TO  WRK-HENREI-B-DISASTER
+                           ELSE
+                               MOVE    WRK-SEIKYU-DISASTER
+                                               TO  WRK-HENREI-B-DISASTER
+                           END-IF
                    END-EVALUATE
                WHEN    "HO"
                    EVALUATE    WRK-KOUMOKU-NO
@@ -2059,23 +2078,32 @@
                            MOVE    WRK-PARA-REC    TO
                                        TBL-HENREI-B-HENREI-INFO2 (IDZZ)
                        WHEN    2
-                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                           IF      WRK-MO-CNT      >   ZERO
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                TO  WRK-HKNJANUM
-                           PERFORM VARYING IDW FROM    1   BY  1
-                                   UNTIL   IDW >       8
-                               IF      WRK-HKNJANUM (IDW:1)
-                                                   NOT =   SPACE
-                                   MOVE    WRK-HKNJANUM (IDW:)
+                               PERFORM VARYING IDW FROM    1   BY  1
+                                       UNTIL   IDW >       8
+                                   IF      WRK-HKNJANUM (IDW:1)
+                                                       NOT =   SPACE
+                                       MOVE    WRK-HKNJANUM (IDW:)
                                                TO  WRK-HENREI-B-HKNJANUM
-                                   MOVE    8   TO  IDW
-                               END-IF
-                           END-PERFORM
+                                       MOVE    8   TO  IDW
+                                   END-IF
+                               END-PERFORM
+                           END-IF
                        WHEN   3
-                           MOVE WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                           IF      WRK-MO-CNT      >   ZERO
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                TO  WRK-HENREI-B-KIGO
+                           END-IF
                        WHEN   4
-                           MOVE WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                           IF      WRK-MO-CNT      >   ZERO
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                TO  WRK-HENREI-B-NUM
+                           END-IF
                    END-EVALUATE
                WHEN    "KO"
                    EVALUATE    WRK-KOUMOKU-NO
@@ -2096,12 +2124,12 @@
                                                    TO
                                            WRK-HENREI-B-JKYNUM(KO-B-CNT)
                     END-EVALUATE
+               WHEN    "CO"
                WHEN    "KH"
                WHEN    "SY"
                WHEN    "SI"
                WHEN    "IY"
                WHEN    "TO"
-               WHEN    "CO"
                WHEN    "NI"
                WHEN    "SJ"
                    MOVE    0               TO  TBL-HENREI-B-SELECT-FLG
@@ -2230,8 +2258,10 @@
                            MOVE    "3"             TO
                                        WRK-HENREI-K-TEISYUTUSAKI
       *
-                           MOVE    PATIENT-CNT         TO
+                           MOVE    PATIENT-CNT     TO
                                                WRK-HENREI-B-RECEIPT-NO
+                           MOVE    "00"            TO
+                                               WRK-HENREI-B-DISASTER
       *
                            MOVE    0               TO  
                                        TBL-HENREI-B-SELECT-FLG   (IDZZ)
@@ -2378,20 +2408,24 @@
                            END-EVALUATE
       *                年金証書番号
                        WHEN    5
-                           IF       WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                           IF      WRK-MO-CNT      >   ZERO
+                               IF   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                    NOT =   SPACE
-                               MOVE
+                                   MOVE
                                    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                    TO  WRK-HENREI-B-KIGO
-                           END-IF    
+                               END-IF
+                           END-IF
       *                労働保険番号
                        WHEN    6
-                           IF       WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                           IF      WRK-MO-CNT      >   ZERO
+                               IF   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                    NOT =   SPACE
-                               MOVE
+                                   MOVE
                                    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                    TO  WRK-HENREI-B-KIGO
-                           END-IF    
+                               END-IF
+                           END-IF
                    END-EVALUATE
                WHEN    "SY"
                WHEN    "RI"

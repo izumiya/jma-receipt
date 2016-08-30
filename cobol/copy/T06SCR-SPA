@@ -46,6 +46,9 @@
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
+      *
+      *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
        01  SPA-T06.
       *    個別指示画面
@@ -95,6 +98,7 @@
                            11  SPA-GMN-T06-R-THOJOKBN  PIC X(02).
                            11  SPA-GMN-T06-R-TRECEIPT-KBN
                                                        PIC X(04).
+                           11  SPA-GMN-T06-R-TDISASTER PIC X(02).
                            11  SPA-GMN-T06-R-TCREYMD   PIC X(09).
                            11  SPA-GMN-T06-R-TERR      PIC X(01).
                        09  SPA-GMN-T06-RECE-MAX        PIC 9(04).
@@ -280,6 +284,7 @@
                        09  SPA-GMN-T09-THOJOKBN    PIC X(8).
                        09  SPA-GMN-T09-TRECEIPT-KBN
                                                    PIC X(4).
+                       09  SPA-GMN-T09-TDISASTER   PIC X(2).
                        09  SPA-GMN-T09-TCREYMD     PIC X(9).
                        09  SPA-GMN-T09-TCHK        PIC X(01).
       *
@@ -305,6 +310,7 @@
                                                        PIC X(01).
                        09  SPA-NAI-T09-RECE10-TKIGO    PIC X(40).
                        09  SPA-NAI-T09-RECE10-TNUM     PIC X(40).
+                       09  SPA-NAI-T09-TDISASTER       PIC 9(02).
       *
                        09  SPA-NAI-T09-RECE10-KEY.
                            11  SPA-NAI-T09-RECE10-THOSPNUM PIC 9(02).

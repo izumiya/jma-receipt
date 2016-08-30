@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -502,6 +504,8 @@
                MOVE    HENREI-B-RECEIPT-KBN
                                        TO  SPA-NAI-H03-B-TRECEIPT-KBN
                                                                    (IDX)
+               MOVE    HENREI-B-DISASTER
+                                       TO  SPA-NAI-H03-B-TDISASTER (IDX)
                MOVE    HENREI-B-HR-MSG TO  SPA-GMN-H03-B-TERR      (IDX)
       *
                MOVE    HENREI-B-REC        TO  MCPDATA-REC
@@ -753,6 +757,13 @@
                                                                   (IDX)
                    WHEN    "2"
                        MOVE    "老健"          TO  H03-BODY-TRECEIPT-KBN
+                                                                  (IDX)
+               END-EVALUATE
+               EVALUATE    SPA-NAI-H03-B-TDISASTER (IDX)
+                   WHEN    "00"
+                       CONTINUE
+                   WHEN    OTHER
+                       MOVE    "災"            TO  H03-BODY-TDISASTER
                                                                   (IDX)
                END-EVALUATE
                MOVE    SPA-GMN-H03-B-TERR      (IDX)

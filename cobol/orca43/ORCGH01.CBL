@@ -108,6 +108,8 @@
       *
       *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
       *  04.08.02    NACL-藤原    15/09/09  返戻取り込み済データ一覧対応
+      *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2196,6 +2198,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            WRK-ZAITAKU     DELIMITED   BY  SPACE
                                            INTO    SPA-H01GMN-ZAITAKU
                    END-STRING
+                   MOVE    RECE10-ETC-YKZFTN (1)
+                                       TO  SPA-RECE10-DISASTER
            END-EVALUATE
       *
            IF    ( RECE10-RECESYUBETU  =   "6666" )
@@ -3757,6 +3761,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                                                   (IDZZ)
                    MOVE    SPA-H01NAI-SKYYM    TO
                                       WRK-HENREI-B-S-HENREIYM     (IDZZ)
+                   MOVE    SPA-RECE10-DISASTER TO
+                                      WRK-HENREI-B-S-DISASTER     (IDZZ)
       *
                    MOVE    SMCNDATE-YMD        TO  WRK-HENREI-B-UPYMD
                    MOVE    SMCNDATE-HMS        TO  WRK-HENREI-B-UPHMS

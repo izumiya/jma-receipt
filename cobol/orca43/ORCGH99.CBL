@@ -73,6 +73,9 @@
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
+      *
+      *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -535,6 +538,10 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
                        MOVE    "老健"          TO
                                            SPA-H99GMN-TRECEIPT-KBN (IDX)
                END-EVALUATE
+               IF      RECE10-ETC-YKZFTN (1)   >   ZERO
+                   MOVE    "災"            TO
+                                           SPA-H99GMN-TDISASTER (IDX)
+               END-IF
       *
       *       公費単独で生保又は中国残留邦人等、自立支援のとき負担者番号、
       *       受給者番号をセット
@@ -1055,6 +1062,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                    TO  H99-TCREYMD      (IDX)
                MOVE    SPA-H99GMN-TRECEIPT-KBN (IDX)
                                    TO  H99-TRECEIPT-KBN (IDX)
+               MOVE    SPA-H99GMN-TDISASTER    (IDX)
+                                   TO  H99-TDISASTER    (IDX)
                MOVE    IDX         TO  H99-COUNT
            END-PERFORM
       ***  MOVE    "T"              TO  H99-SELECT (1)

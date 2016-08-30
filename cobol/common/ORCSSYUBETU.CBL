@@ -124,6 +124,8 @@
       *  04.08.01    NACL-藤原    15/10/08  複数枚レセプト分割対応
       *                                     公費単独の２回以上の分割対応
       *  04.08.02    NACL-藤原    15/12/22  施設入所時の分割対応
+      *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -485,6 +487,7 @@
       *****************************************************************
       *     
            COPY    "CPSK2005.INC".
+           COPY    "CPSK200501.INC".
       *     
       *    県内扱い保険者情報
            COPY    "CPSK1033.INC".
@@ -672,6 +675,29 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
                MOVE    ZERO                TO  SYS-2005-RJNGNBKKBN
            END-IF
       * 
+           INITIALIZE                  SYS-200501-REC
+           MOVE    "2005"              TO  SYS-200501-KANRICD
+           MOVE    "01"                TO  SYS-200501-KBNCD
+           MOVE    LNK-SYUBETU-SRYYM   TO  SYS-200501-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+grpsys     MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
+           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               MOVE    SPACE           TO  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-DISASTER-RECEIPT
+                                   =   SPACE
+               MOVE    ZERO            TO  SYS-200501-DISASTER-RECEIPT
+           END-IF
+      *??
+           display
+          "SYS-200501-DISASTER-RECEIPT=" SYS-200501-DISASTER-RECEIPT
+      *??
+      *
       *    県内扱い保険者情報（福岡のみ）
            IF    ( LNK-SYUBETU-PREFNUM =   "40"                  )
            AND   ( LNK-SYUBETU-SRYYM   <=  WRK-CONS-SRYYM-200609 )
@@ -1539,6 +1565,40 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
                END-PERFORM
            END-IF
       *
+      *    災害該当の有無（平成２８年１０月以降）
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( WRK-RECE61-SRYYM        >=   201610 )
+               IF    ( WRK-RECE61-RECEIPT-KBN (5:1)
+                                               =   SPACE )
+               AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+                   PERFORM VARYING IDXX    FROM    1   BY  1
+                           UNTIL   IDXX    >       TBL-PTKOHINF-MAX
+                       IF    ( TBL-PTKOH-TEKSTYMD (IDXX)
+                                           <=  COMB-TEKSTYMD           )
+                       AND   ( COMB-TEKEDYMD
+                                           <=  TBL-PTKOH-TEKEDYMD(IDXX))
+                           IF      TBL-PTKOH-KOHNUM (IDXX)
+                                               =   "959"
+                               IF      WRK-RECE61-HKNNUM   =   SPACE
+                                   IF        TBL-PTKOH-FTNJANUM
+                                                        (IDXX) (1:1)
+                                                               =   "1"
+                                       MOVE    "1"         TO
+                                           WRK-RECE61-RECEIPT-KBN (5:1)
+                                   END-IF
+                               ELSE
+                                   MOVE    "1"         TO
+                                           WRK-RECE61-RECEIPT-KBN (5:1)
+                               END-IF
+                               MOVE    TBL-PTKOHINF-MAX
+                                                   TO  IDXX
+                           END-IF
+                       END-IF
+                   END-PERFORM
+               END-IF
+           END-IF
+      *
       *    患者レセプト分割情報の有無
            IF    ( WRK-RECE61-RECEIPT-KBN (2:3)
                                            =   SPACE )
@@ -1589,6 +1649,9 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
                    END-PERFORM
                END-PERFORM
            END-IF
+      *??
+           DISPLAY "WRK-RECE61-RECEIPT-KBN=" WRK-RECE61-RECEIPT-KBN "#"
+      *??
       *
       *    地方公費のみの場合は出力しない
            IF    ( WRK-RECE61-HKNNUM      =   SPACE )
@@ -2798,11 +2861,58 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    施設入所情報処理
+      *    施設入所、災害該当情報処理
       *****************************************************************
        500-SISETU-HENSYU-SEC             SECTION.
       *
            INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    ９５９（災害該当）
+           IF    ( SYS-200501-DISASTER-RECEIPT
+                                           =   "1"     )
+           AND   ( LNK-SYUBETU-SRYYM       >=   201610 )
+               INITIALIZE                      PTKOHINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+               MOVE    LNK-SYUBETU-PTID    TO  PTKOH-PTID
+               MOVE    "959"               TO  PTKOH-KOHNUM
+               MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 900-PTKOHINF-READ-N-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-PTKOHINF  
+               END-IF
+               PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                           OR      TBL-PTKOHINF-MAX
+                                                   >=  100
+                   IF    ( PTKOH-SAKJOKBN      =   SPACE      )
+                   AND   ( PTKOH-TEKSTYMD      >=  "20161001" )
+                       ADD     1               TO  TBL-PTKOHINF-MAX
+                       MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                       DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+                   END-IF
+      *
+                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                   MOVE    "key4"           TO  MCP-PATHNAME
+                   PERFORM  900-PTKOHINF-READ-N-SEC
+               END-PERFORM
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+           END-IF
+      *??
+           DISPLAY "TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX 
+      *??
       *
       *    入院外のみ対象
            IF      LNK-SYUBETU-NYUGAIKBN   =   "1"

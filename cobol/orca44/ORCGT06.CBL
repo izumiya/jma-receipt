@@ -65,6 +65,8 @@
       *  04.08.01    NACL-¿¹ÏÆ    13/04/12  ¥·¥¹¥Æ¥à£Ä£ÂÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
       *  04.08.03    NACL-Æ£¸¶    14/08/26  fdd ÇÑ»ß¤ËÈ¼¤¦ÂÐ±þ
+      *  04.08.04    NACL-Æ£¸¶    16/08/08  ºÒ³²³ºÅöÊ¬¡ÊÈó¸ºÌÈÂÐ¾Ý¤È¸ºÌÈÂÐ¾Ý¡Ë
+      *                                     ¥ì¥»¥×¥È¤ÎÊ¬³äÂÐ±þ
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -1428,6 +1430,8 @@
                                                TO  RECE10-CREYMD
                        MOVE    SPA-GMN-T09-TPTNUM  (IDY)
                                                TO  RECE10-PTNUM
+                       MOVE    SPA-NAI-T09-TDISASTER  (IDY)
+                                               TO  RECE10-ETC-YKZFTN (1)
                        PERFORM 410411-TUIKA-HENSYU-SEC
       *
                        MOVE    SPA-GMN-T06-RECE-MAX
@@ -2946,6 +2950,15 @@
                                        SPA-GMN-T09-TRECEIPT-KBN (IDX)
            END-EVALUATE
       *
+           MOVE    RECE10-ETC-YKZFTN (1)
+                                   TO  SPA-NAI-T09-TDISASTER   (IDX)
+           EVALUATE    RECE10-ETC-YKZFTN (1)
+               WHEN    0
+                   CONTINUE
+               WHEN    OTHER
+                   MOVE    "ºÒ"        TO  SPA-GMN-T09-TDISASTER   (IDX)
+           END-EVALUATE
+      *
            MOVE    RECE10-CREYMD   TO  SPA-NAI-T09-TCREYMD (IDX)
                                        WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
@@ -3492,6 +3505,14 @@
                                        SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
            END-EVALUATE
       *
+           EVALUATE    RECE10-ETC-YKZFTN (1)
+               WHEN    0
+                   CONTINUE
+               WHEN    OTHER
+                   MOVE    "ºÒ"          TO
+                                       SPA-GMN-T06-R-TDISASTER   (IDX)
+           END-EVALUATE
+      *
            MOVE    RECE10-CREYMD   TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
            MOVE    WRK-HENYMDG     TO  SPA-GMN-T06-R-TCREYMD (IDX)
@@ -3517,6 +3538,7 @@
       *****************************************************************
        42032-T09-HENSYU-SEC         SECTION.
       *
+           MOVE    SPACE               TO  SPA-MOTOPG
            MOVE    SPA-T01KYOUTU       TO  SPA-WORK
            MOVE    SPA-AREA            TO  SPA-COMMON
            MOVE    SPA-T06             TO  SPA-FREE
@@ -4072,6 +4094,14 @@
                        MOVE    "Ï··ò"          TO
                                        SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
                END-EVALUATE
+      *
+               EVALUATE    RECE10-ETC-YKZFTN (1)
+                   WHEN    0
+                       CONTINUE
+                  WHEN    OTHER
+                       MOVE    "ºÒ"          TO
+                                       SPA-GMN-T06-R-TDISASTER   (IDX)
+           END-EVALUATE
       *
                MOVE    RECE10-CREYMD   TO  WRK-SYMD
                PERFORM 5002-HIZUKE-HEN-SEC
@@ -5475,6 +5505,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                    MOVE    SPA-GMN-T06-R-TRECEIPT-KBN (IDX)
                                            TO
                                            T06-RECE-TRECEIPT-KBN  (IDX)
+                   MOVE    SPA-GMN-T06-R-TDISASTER (IDX)
+                                           TO
+                                           T06-RECE-TDISASTER (IDX)
                END-IF
                MOVE    SPA-GMN-T06-R-TCREYMD    (IDX)
                                            TO  T06-RECE-TCREYMD   (IDX)
@@ -5840,6 +5873,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            END-EVALUATE
       *
            MOVE    SPACE               TO  TID1
+           INITIALIZE                      TID1
            MOVE    SPA-TIDCD           TO  TID1-ID1CODE
            MOVE    WRK-TIDMSG          TO  TID1-ID1MSG
       *
@@ -5885,6 +5919,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SPACE               TO  WRK-TIDMSG
       *
            MOVE    SPACE                TO  TID2
+           INITIALIZE                       TID2
            MOVE    SPA-TIDCD            TO  TID2-ID1CODE
       *
            EVALUATE    SPA-TIDCD

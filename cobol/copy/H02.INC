@@ -30,6 +30,7 @@
                     06  H02-THKNJANUM          PIC X(8).
                     06  H02-TKIGO              PIC X(20).
                     06  H02-TRECEIPT-KBN       PIC X(4).
+                    06  H02-TDISASTER          PIC X(2).
                     06  H02-TERR               PIC X(100).
                     06  H02-TS-MAKE-FLG        PIC X(2).
                     06  H02-TS-SKYYM           PIC X(6).
@@ -39,6 +40,7 @@
                     06  H02-TS-KIGO            PIC X(20).
                     06  H02-TS-HOJOKBN         PIC X(2).
                     06  H02-TS-RECEIPT-KBN     PIC X(4).
+                    06  H02-TS-DISASTER        PIC X(2).
                     06  H02-TS-HENREI-SIJI-FLG PIC X(2).
                   05  H02-HENREILIST-SELECT
                           PIC X       OCCURS  30 TIMES.

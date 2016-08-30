@@ -117,7 +117,8 @@ T06 {
             column9 varchar(40);
             column10 varchar(4);
             column11 varchar(2);
-            column12 varchar(9);
+            column12 varchar(2);
+            column13 varchar(9);
           }[1000];
           selectdata bool[1000];
       };

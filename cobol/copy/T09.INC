@@ -21,6 +21,7 @@
                     06  T09-THOJOKBN     PIC X(8).
                     06  T09-TKIGO        PIC X(40).
                     06  T09-TRECEIPT-KBN PIC X(4).
+                    06  T09-TDISASTER    PIC X(2).
                     06  T09-TCREYMD      PIC X(9).
                     06  T09-TCHK         PIC X(1).
                   05  T09-SELECT-G.

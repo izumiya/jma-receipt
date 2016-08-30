@@ -42,6 +42,9 @@
       *                                     支払機関請求対応
       *  04.07.02    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.03    NACL-藤原    13/10/07  労災レセ電対応
+      *
+      *  04.08.04    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *                                     レセプトの分割対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -1101,6 +1104,8 @@
                                        TO  T09-TKIGO        (IDX)
                MOVE    SPA-GMN-T09-TRECEIPT-KBN (IDX)
                                        TO  T09-TRECEIPT-KBN (IDX)
+               MOVE    SPA-GMN-T09-TDISASTER (IDX)
+                                       TO  T09-TDISASTER    (IDX)
                MOVE    SPA-GMN-T09-TCREYMD      (IDX)
                                        TO  T09-TCREYMD      (IDX)
                IF      SPA-GMN-T09-TCHK (IDX)  =   "1"
@@ -1265,6 +1270,7 @@
        520-TIDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  TID1
+           INITIALIZE                      TID1
            MOVE    SPA-TIDCD           TO  TID1-ID1CODE
       *
            EVALUATE    SPA-TIDCD
@@ -1318,6 +1324,7 @@
        530-TID2SET-SEC              SECTION.
       *
            MOVE    SPACE                TO  TID2
+           INITIALIZE                       TID2
            MOVE    SPA-TIDCD            TO  TID2-ID1CODE
       *
            EVALUATE    SPA-TIDCD

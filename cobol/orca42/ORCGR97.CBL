@@ -51,6 +51,9 @@
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       *
       *  04.07.01    NACL-Æ£¸¶    15/06/19  ¿ÇÎÅ²ÊÉ½¼¨·ï¿ô¤ÎÊÑ¹¹
+      *
+      *  04.08.01    NACL-Æ£¸¶    16/08/08  ºÒ³²³ºÅöÊ¬¡ÊÈó¸ºÌÈÂÐ¾Ý¤È¸ºÌÈÂÐ¾Ý¡Ë
+      *                                     ¥ì¥»¥×¥È¤ÎÊ¬³äÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -138,6 +141,7 @@
                            11  SPA-GMN-THOJOKBN    PIC X(20).
                            11  SPA-GMN-TRECEIPT-KBN
                                                    PIC X(04).
+                           11  SPA-GMN-TDISASTER   PIC X(02).
                            11  SPA-GMN-TSYUKA-AUTO PIC X(06).
                            11  SPA-GMN-TSYUKA-INPUT
                                                    PIC X(06).
@@ -1028,6 +1032,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                    WHEN    "2"
                        MOVE    "Ï··ò"  TO  SPA-GMN-TRECEIPT-KBN
                                                               (WRK-LINE)
+               END-EVALUATE
+               EVALUATE    LNK-SYUACC-IO-RECEIPT-KBN(IDX1) (5:1)
+                   WHEN    "1"
+                       MOVE    "ºÒ"    TO  SPA-GMN-TDISASTER  (WRK-LINE)
                END-EVALUATE
                MOVE    LNK-SYUACC-IO-SYUKA-AUTO (IDX1)
                                        TO  SPA-GMN-TSYUKA-AUTO(WRK-LINE)
@@ -2647,6 +2655,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        TO  R97-SYUKA-THOJOKBN    (IDX)
                MOVE    SPA-GMN-TRECEIPT-KBN(IDX)
                                        TO  R97-SYUKA-TRECEIPT-KBN(IDX)
+               MOVE    SPA-GMN-TDISASTER   (IDX)
+                                       TO  R97-SYUKA-TDISASTER   (IDX)
                MOVE    SPA-GMN-TSYUKA-INPUT(IDX)
                                        TO  R97-SYUKA-TSYUKA-INPUT(IDX)
                MOVE    SPA-GMN-TSYUKA-AUTO (IDX)
