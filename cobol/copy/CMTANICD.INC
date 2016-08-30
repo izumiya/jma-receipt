@@ -25,6 +25,7 @@
       * 01.00.02     NACL-多々納  02/12/13  060 シート追加(H14.12改正)
       * 01.00.03     NACL-多々納  04/12/22  000 単位なし追加
       * 01.00.04     NACL-多々納  06/03/15  125 から 128追加(H18.4改正）
+      * 04.08.00     NACL-多々納  16/08/30  061 カセット追加
       *****************************************************************
        01  MTANI-DATA-REC.
            03  FILLER          PIC X(03)  VALUE   "000".
@@ -209,6 +210,9 @@
       *
            03  FILLER          PIC X(03)  VALUE   "060".
            03  FILLER          PIC X(24)  VALUE   "シート".
+      *H28.8
+           03  FILLER          PIC X(03)  VALUE   "061".
+           03  FILLER          PIC X(24)  VALUE   "カセット".
       *
       *
            03  FILLER          PIC X(03)  VALUE   "101".
@@ -305,9 +309,9 @@
        01  MTANI-DATA-REC-R         REDEFINES   MTANI-DATA-REC.
       *****03  MTANI-TBL-OCC        OCCURS    59   INDEXED   MTANI-IDX.
       **** 03  MTANI-TBL-OCC        OCCURS    83   INDEXED   MTANI-IDX.
-           03  MTANI-TBL-OCC        OCCURS    91   INDEXED   MTANI-IDX.
+           03  MTANI-TBL-OCC        OCCURS    92   INDEXED   MTANI-IDX.
                05  MTANI-TANICD        PIC X(03).
                05  MTANI-TANINAME      PIC X(24).
       *
-       01  MTANI-MAX                   PIC 9(04)   VALUE   91.
+       01  MTANI-MAX                   PIC 9(04)   VALUE   92.
       *
