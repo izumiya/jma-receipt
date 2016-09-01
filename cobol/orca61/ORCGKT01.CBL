@@ -1409,6 +1409,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7     緊急時間外確認
                    MOVE    ZERO            TO  SPA-KENJIKAN-CHK
                    MOVE    ZERO            TO  SPA-GAZJIKAN-CHK
+      *H28.9       認知症地域包括投薬確認
+                   MOVE    ZERO            TO  SPA-NINCHI-CHK
       *!!
       *            最後の日を診療日とする
                    MOVE    SPA-NAI-SRYDD       TO  SPA-GMN-SRYDD

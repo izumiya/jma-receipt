@@ -1776,6 +1776,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7     緊急時間外確認
                    MOVE    ZERO            TO  SPA-KENJIKAN-CHK
                    MOVE    ZERO            TO  SPA-GAZJIKAN-CHK
+      *H28.9       認知症地域包括投薬確認
+                   MOVE    ZERO            TO  SPA-NINCHI-CHK
       *            診療行為、計計算処理、編集
                    MOVE    SPACE           TO  FLG-TOROKU
                    PERFORM 510-TBLHEN-SEC
