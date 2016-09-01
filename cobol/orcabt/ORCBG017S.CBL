@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.06.01     NACL-森脇    10/08/25  ＣＳＶ出力対応
       * 04.08.01     NACL-森脇    14/07/23  一時ファイルディレクトリ設定
+      * 04.08.02     NACL-森脇    16/09/01  持参薬システム予約コード対象外
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -845,6 +846,13 @@
                    GO  TO  20011-IN01-HEN-EXT
                END-IF
            END-IF
+      *
+      *----(04.08.02)--ADD-START---
+           IF  ( ACCT-JIHOKBN        = "1" )   AND
+               ( ACCT-TEIGENRATE     =  3 OR 4 )
+               GO  TO  20011-IN01-HEN-EXT
+           END-IF
+      *----(04.08.02)--ADD-END-----
       *
            MOVE    SRY-PTID            TO  WRK-PTID
            PERFORM 900-PTINF-PTNUM-KEY-SEL-SEC

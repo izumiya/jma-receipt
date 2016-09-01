@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.01    NACL-森脇    16/09/01  持参薬システム予約コード対象外
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -597,6 +598,13 @@
            IF      FLG-SRYACCT        =   1
                GO  TO  230-MAIN-SRYACCT-EXT
            END-IF
+      *
+      *----(04.08.01)--ADD-START---
+           IF  ( ACCT-JIHOKBN        = "1" )   AND
+               ( ACCT-TEIGENRATE     =  3 OR 4 )
+               GO  TO  230-MAIN-SRYACCT-EXT
+           END-IF
+      *----(04.08.01)--ADD-END-----
       *
       *    保険組合せ読み込み
            PERFORM 900-HKNCOMBI-READ-SEC

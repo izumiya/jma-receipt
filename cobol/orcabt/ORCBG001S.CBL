@@ -40,7 +40,7 @@
       * 04.05.03     NACL-森脇    09/12/15  ＣＳＶ出力対応
       * 04.08.01     NACL-森脇    14/07/23  一時ファイルディレクトリ設定
       * 04.08.02     NACL-森脇    16/03/17  金額種別４に対応
-      * 04.08.02     NACL-森脇    16/03/17  金額種別４に対応
+      * 04.08.03     NACL-森脇    16/09/01  持参薬システム予約コード対象外
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -904,6 +904,13 @@
            MOVE    "tbl_sryacct"   TO  MCP-TABLE
            MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-DBCLOSECURSOR-SEC
+      *
+      *----(04.08.03)--ADD-START---
+           IF  ( ACCT-JIHOKBN        = "1" )   AND
+               ( ACCT-TEIGENRATE     =  3 OR 4 )
+               GO  TO  230-MAIN-ACCT-EXT
+           END-IF
+      *----(04.08.03)--ADD-END-----
       *
            IF    ( ACCT-ZAIKBN     NOT = 1 )   AND
                  ( ACCT-ZAIKBN     NOT = 2 )
