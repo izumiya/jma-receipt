@@ -65,7 +65,10 @@
        01  FILE-NAME               PIC X(512).
       *
       *    ファイル名
-       01  DATA-FILE.
+       01  DATA-FILE1.
+           03  FILLER              PIC X(15)   VALUE  "patch-lib/data/".
+           03  FILLER              PIC X(15)   VALUE   "SRYKBNNAME.TXT".
+       01  DATA-FILE2.
            03  FILLER              PIC X(05)   VALUE   "data/".
            03  FILLER              PIC X(15)   VALUE   "SRYKBNNAME.TXT".
       *
@@ -102,15 +105,25 @@
       *
       *    フィアルデイレクトリ位置指定
            INITIALIZE                  ORCSMKPASSAREA
-           MOVE    DATA-FILE           TO  MKPASS-IN-01
+           MOVE    DATA-FILE1          TO  MKPASS-IN-01
            CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
            MOVE    MKPASS-OT-01        TO  FILE-NAME
       *
       *    診療種別テーブルセット
            OPEN    INPUT               SRYKBN-FILE
            IF      STS-SRYKBN      NOT =   ZERO
-               DISPLAY "SRYKBN-FILE OPEN ERR :" STS-SRYKBN "."
-            END-IF
+      *        DISPLAY "PATCH-LIB SRYKBN-FILE OPEN ERR :" STS-SRYKBN "."
+      *
+               INITIALIZE                  ORCSMKPASSAREA
+               MOVE    DATA-FILE2          TO  MKPASS-IN-01
+               CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
+               MOVE    MKPASS-OT-01        TO  FILE-NAME
+               OPEN    INPUT               SRYKBN-FILE
+               IF      STS-SRYKBN      NOT =   ZERO
+                   DISPLAY "SRYKBN-FILE OPEN ERR :" STS-SRYKBN "."
+               END-IF
+      *
+           END-IF
       *
            PERFORM 1001-SRYKBN-SET-SEC
       *
