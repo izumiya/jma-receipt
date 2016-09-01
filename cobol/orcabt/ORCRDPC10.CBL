@@ -129,6 +129,18 @@
       *
       *              NACL-小豆沢  16/07/04  平成２８年度対応
       *                           16/07/07  入院料の包括対象か判定
+      *              NACL-小豆沢  16/08/01  医療区分、ＡＤＬ点数コメントの
+      *                                     記録対応（平成２８年１０月診療分から）
+      *              NACL-小豆沢  16/08/18  再診の時間外加算対応
+      *                                     RECE641-NYUSAIFLG="1"が対象
+      *                                     （平成２８年４月診療分から）
+      *              NACL-小豆沢  16/08/23  持参薬対応
+      *                                     F-12（使用量）、F-13（基準単位）、
+      *                                     F-18（出来高実績点数）はそのままセット。
+      *                                     E-11（行為点数）、E-12（行為薬剤料）は
+      *                                     ゼロをセット。
+      *                                     F-19(2)（持参薬区分）、F-19(3)（持参薬
+      *                                     処方区分）をセット。
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -336,6 +348,7 @@
            03  II                      PIC 9(01).
            03  IJ                      PIC 9(02).
            03  IDX-HOUKATU             PIC 9(02).
+           03  IDX-COM                 PIC 9(03).
       *
        01  KEY-AREA                          VALUE   LOW-VALUE.
            03  KEY-NEW.
@@ -2317,14 +2330,16 @@
                                          NOT =   RECE641-RECEIPT-KBN  )
                OR     ( RECE641-SRYKBN       >=  "90"                 )
       *
-      *        明細テーブル退避処理
-               PERFORM 20071-ZAI-TAIHI-SEC
-      *        摘要データ編集処理
-               IF      FLG-END           =   ZERO
-                   PERFORM 20074-ZAI-KOUI-SORT-SEC
-                   PERFORM 20072-ZAI-HENSYU-SEC
+               IF      RECE641-NYUSAIFLG  =   SPACE
+      *           明細テーブル退避処理
+                  PERFORM 20071-ZAI-TAIHI-SEC
+      *           摘要データ編集処理
+                  IF      FLG-END           =   ZERO
+                      PERFORM 20074-ZAI-KOUI-SORT-SEC
+                      PERFORM 20072-ZAI-HENSYU-SEC
       *
-                   PERFORM 990-RECE641-NEXT-SEC
+                      PERFORM 990-RECE641-NEXT-SEC
+                  END-IF
                END-IF
            END-PERFORM
       *
@@ -2374,7 +2389,8 @@
                                          NOT =   RECE641-RECEIPT-KBN  )
                OR     ( RECE641-SRYKBN       >=  "91"                 )
       *
-               IF       RECE641-SRYKBN   =   "90"
+               IF      (RECE641-SRYKBN   =   "90")   AND
+                       (RECE641-NYUSAIFLG  =  SPACE)
       *            明細テーブル退避処理
                    PERFORM 20071-ZAI-TAIHI-SEC
       *            摘要データ編集処理
@@ -2390,7 +2406,7 @@
                    MOVE   1     TO   FLG-END
                END-IF
            END-PERFORM
-      *   AZU-END START 2015.6.9
+      *   AZU-ADD END 2015.6.9
       *
       *    入院会計編集処理（入院料）
            PERFORM 20077-NYUIN-HENSYU-SEC
@@ -2445,7 +2461,8 @@
                         MOVE   1         TO   FLG-END
                END-IF
                IF      (FLG-END          =   0)   AND
-                       (RECE641-SRYKBN   =   "90")
+                       (RECE641-SRYKBN   =   "90") AND
+                       (RECE641-NYUSAIFLG =  SPACE)
       *            明細テーブル退避処理
                    PERFORM 20071-ZAI-TAIHI-SEC
       *            摘要データ編集処理
@@ -2462,11 +2479,71 @@
                   MOVE   1     TO   FLG-END
                END-IF
            END-PERFORM
+      *   AZU-END END 2015.6.9
+      *
+      *
+      *   AZU-ADD START 2016.8.18
+      *    摘要情報（再診の時間外加算等）
+           INITIALIZE                      RECE641-REC
+           MOVE    RECE62-HOSPNUM      TO  RECE641-HOSPNUM
+           MOVE    RECE62-SRYYM        TO  RECE641-SRYYM
+           MOVE    RECE62-NYUGAIKBN    TO  RECE641-NYUGAIKBN
+           MOVE    RECE62-PTID         TO  RECE641-PTID
+           MOVE    RECE62-RECEKA       TO  RECE641-RECEKA
+           MOVE    RECE62-TEISYUTUSAKI TO  RECE641-TEISYUTUSAKI
+           MOVE    RECE62-RECESYUBETU  TO  RECE641-RECESYUBETU
+           MOVE    RECE62-HKNJANUM-KEY TO  RECE641-HKNJANUM
+           MOVE    RECE62-HOJOKBN-KEY  TO  RECE641-HOJOKBN
+           MOVE    RECE62-KOHID-KEY    TO  RECE641-KOHID
+           MOVE    RECE62-TEKSTYMD     TO  RECE641-TEKSTYMD
+           MOVE    RECE62-RECEIPT-KBN  TO  RECE641-RECEIPT-KBN
+      *
+           START   RECE641-FILE
+               KEY IS    >=   RECE641-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE64
+               NOT INVALID
+                   PERFORM 990-RECE641-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-END              =   1                   )
+               OR     ( FLG-RECE64           =   1                   )
+               OR     ( RECE62-HOSPNUM   NOT =   RECE641-HOSPNUM      )
+               OR     ( RECE62-SRYYM     NOT =   RECE641-SRYYM        )
+               OR     ( RECE62-NYUGAIKBN NOT =   RECE641-NYUGAIKBN    )
+               OR     ( RECE62-PTID      NOT =   RECE641-PTID         )
+               OR     ( RECE62-RECEKA    NOT =   RECE641-RECEKA       )
+               OR     ( RECE62-TEISYUTUSAKI
+                                         NOT =   RECE641-TEISYUTUSAKI )
+               OR     ( RECE62-RECESYUBETU
+                                         NOT =   RECE641-RECESYUBETU  )
+               OR     ( RECE62-HKNJANUM-KEY
+                                         NOT =   RECE641-HKNJANUM     )
+               OR     ( RECE62-HOJOKBN-KEY
+                                         NOT =   RECE641-HOJOKBN      )
+               OR     ( RECE62-KOHID-KEY NOT =   RECE641-KOHID        )
+               OR     ( RECE62-TEKSTYMD  NOT =   RECE641-TEKSTYMD     )
+               OR     ( RECE62-RECEIPT-KBN
+                                         NOT =   RECE641-RECEIPT-KBN  )
+               OR     ( RECE641-SRYKBN       >=  "93"                 )
+      *
+               IF      (RECE641-SRYKBN     =   "90"  OR  "92")   AND
+                       (RECE641-NYUSAIFLG  =   "1")
+      *          明細テーブル退避処理
+                 PERFORM 20071-ZAI-TAIHI-SEC
+      *          摘要データ編集処理
+                 IF      FLG-END           =   ZERO
+                     PERFORM 20074-ZAI-KOUI-SORT-SEC
+                     PERFORM 20072-ZAI-HENSYU-SEC
+                 END-IF
+               END-IF
+               PERFORM 990-RECE641-NEXT-SEC
+           END-PERFORM
+      *   AZU-ADD END 2016.8.18
       *
       *    入院会計編集処理（食事等）
            PERFORM 200771-NYUIN-HENSYU-SEC
       *
-      *   AZU-END START 2015.6.9
            .
        2007-HENSYU-EXT.
            EXIT. 
@@ -2658,6 +2735,9 @@
                         RECE65-SRYCD (IDX)       NOT =  "190128310" AND
                         RECE65-SRYCD (IDX)       NOT =  "190128410" AND
                         RECE65-SRYCD (IDX)       NOT =  "190128570" AND
+      *   AZU-ADD START 2016.8.18
+                        RECE65-SRYCD (IDX) (1:3) NOT =  "112"       AND
+      *   AZU-ADD END   2016.8.18
       *   AZU-ADD START 2015.6.8
                         WRK-FEDT-HOUKATU-FLG     NOT =   "6")
       *   AZU-ADD END   2015.6.8
@@ -2892,7 +2972,7 @@
                END-IF
            END-IF
            .
-       200711-KOUI-TAIHI-EXT.
+       2007111-KOUI-TAIHI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3211,7 +3291,8 @@
       *****************************************************************
        20072-ZAI-HENSYU-SEC          SECTION.
       *
-           IF      RECE641-SRYKBN   >=   "90"
+           IF     (RECE641-SRYKBN   >=   "90")   AND
+                  (RECE641-NYUSAIFLG  =  SPACE)
               GO  TO   20072-ZAI-HENSYU-EXT
            END-IF
       *
@@ -3460,8 +3541,8 @@
                                       PERFORM 200721-ZAI-E-HENSYU-SEC
                                       PERFORM 5001-FILE-WRITE-SEC
                                   END-IF
-                                  DISPLAY  "###  F-SET"
-                                  DISPLAY  "WRK-RENNUM = " WRK-RENNUM
+      *                            DISPLAY  "###  F-SET"
+      *                            DISPLAY  "WRK-RENNUM = " WRK-RENNUM
                                   MOVE   "92"   TO   WRK-FEDT-SRYKBN
                                   PERFORM 200721-ZAI-F-HENSYU-SEC
                                   PERFORM 5001-FILE-F-WRITE-SEC
@@ -4835,13 +4916,17 @@
                            END-IF
                    END-EVALUATE
       *
-      *            明細テーブル退避処理
-                   PERFORM 20071-ZAI-TAIHI-SEC
-      *            摘要データ編集処理
-                   IF      FLG-END           =   ZERO
-                       PERFORM 20072-ZAI-HENSYU-SEC
+                   IF    RECE641-NYUSAIFLG  =  SPACE
+      *              明細テーブル退避処理
+                     PERFORM 20071-ZAI-TAIHI-SEC
+      *              摘要データ編集処理
+                     IF      FLG-END           =   ZERO
+                         PERFORM 20072-ZAI-HENSYU-SEC
       *
-                       PERFORM 990-RECE641-NEXT-SEC
+                         PERFORM 990-RECE641-NEXT-SEC
+                     END-IF
+                   ELSE
+                     PERFORM 990-RECE641-NEXT-SEC
                    END-IF
            END-PERFORM
            .
@@ -4876,16 +4961,31 @@
            MOVE    "E"                 TO  WRK-FEDT-REC-FLG
       *退院年月日、入院年月日のセット
            PERFORM 200799-ZAI-HENSYU-0-SEC
+      *
+      *AZU-ADD START 2016.8.1
+      *Ｅファイルは医療区分、ＡＤＬ点数コメントを読み飛ばし
+      **     PERFORM    VARYING   IDX-COM   FROM  1  BY  1
+      **       UNTIL    LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDX-COM) (1:1)
+      **                             NOT =  "8"
+      **           CONTINUE
+      **     END-PERFORM
+      *AZU-ADD END   2016.8.1
+      *
       *診療コード、名称、解釈番号編集のセット
            MOVE    LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDXZ)
-                                       TO  WRK-FEDT-SRYCD
+                                     TO  WRK-FEDT-SRYCD
+      **     MOVE    LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDX-COM)
+      **                                 TO  WRK-FEDT-SRYCD
            INITIALIZE                      TNS-TENSU-REC
            MOVE    LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDXZ)
                                        TO  TNS-SRYCD
+      **   MOVE    LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDX-COM)
+      **                               TO  TNS-SRYCD
            PERFORM 900-TENSU-READ-SEC
            MOVE    TNS-NAME            TO  WRK-FEDT-NAME
            MOVE    2                   TO  WRK-FEDT-KBNNUM-FLG
            IF      LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
+      **   IF      LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDX-COM)
                                        =   "97"
                MOVE    SPACE           TO  WRK-KBNNUM-EDIT
                MOVE    3               TO  WRK-FEDT-KBNNUM-FLG
@@ -4900,6 +5000,8 @@
            MOVE    LNK-DPCNYUIN-PTID      TO  RECE900-PTID
            MOVE    LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
                                           TO  RECE900-SRYKBN
+      **   MOVE    LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDX-COM)
+      **                                  TO  RECE900-SRYKBN
            PERFORM   900-RECE900-READ-SEC
            IF      FLG-RECE900         =   1
                MOVE    LNK-DPCNYUIN-HOSPNUM   TO  RECE900-HOSPNUM
@@ -4907,6 +5009,8 @@
                MOVE    LNK-DPCNYUIN-PTID      TO  RECE900-PTID
                MOVE    LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDXZ)
                                           TO  RECE900-SRYKBN
+      **       MOVE    LNK-DPCNYUIN-SRYSKB (IDZ1 IDZ2 IDX-COM)
+      **                                  TO  RECE900-SRYKBN
                MOVE    WRK-RENNUM  TO  RECE900-RENNUM
                WRITE      RECE900-REC
            ELSE
@@ -5025,6 +5129,13 @@
                MOVE    SPACE           TO  WRK-KBNNUM-EDIT
                MOVE    3               TO  WRK-FEDT-KBNNUM-FLG
            END-IF
+      *AZU-ADD START 2016.8.1
+      *医療区分、ＡＤＬ点数コメントは解釈番号をセットしない
+           IF      LNK-DPCNYUIN-SRYCD (IDZ1 IDZ2 IDXZ)(1:1)  =  "8"
+               MOVE    SPACE           TO  WRK-KBNNUM-EDIT
+               MOVE    3               TO  WRK-FEDT-KBNNUM-FLG
+           END-IF
+      *AZU-ADD END   2016.8.1
       *退院年月日から順序番号まで
            PERFORM 200799-ZAI-HENSYU-1-SEC
       *行為明細番号から診療行為名称まで
@@ -5385,6 +5496,13 @@
            ELSE
                MOVE    WRK-FEDT-ZAITEN TO  WRK-TENSU
            END-IF
+      *--- AZU-ADD START 2016.08.23
+      *    持参薬は行為点数にゼロをセット
+           IF    RECE641-JISANYAKKBN  =  "1" OR "2" OR "3" OR "4" OR
+                                         "5" OR "6" OR "7" OR "8"
+                 MOVE     ZERO         TO  WRK-TENSU
+           END-IF
+      *--- AZU-ADD END 2016.08.23
            MOVE    WRK-TENSU           TO  WRK-NUM
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
@@ -5394,6 +5512,13 @@
            ELSE
                MOVE    WRK-FEDT-YKZTEN TO  WRK-TENSU
            END-IF
+      *--- AZU-ADD START 2016.08.23
+      *    持参薬は行為薬剤料にゼロをセット
+           IF    RECE641-JISANYAKKBN  =  "1" OR "2" OR "3" OR "4" OR
+                                         "5" OR "6" OR "7" OR "8"
+                 MOVE     ZERO         TO  WRK-TENSU
+           END-IF
+      *--- AZU-ADD END 2016.08.23
            MOVE    WRK-TENSU           TO  WRK-NUM
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5005-NUM-HENSYU-SEC
@@ -5476,6 +5601,12 @@
              MOVE  ZERO                TO  WRK-NUM
            ELSE
              MOVE  WRK-FEDT-SRYSURYO   TO  WRK-SRYSURYO
+      *--- AZU-ADD START 2016.08.23
+      *      持参薬で使用量不明はゼロをセット
+             IF    RECE641-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
+                 MOVE     ZERO         TO  WRK-SRYSURYO
+             END-IF
+      *--- AZU-ADD END 2016.08.23
              MOVE  WRK-SRYSURYO        TO  WRK-NUM
            END-IF
            MOVE    11                  TO  WRK-NAGASA
@@ -5510,6 +5641,12 @@
                    MOVE    ZERO        TO  WRK-FEDT-DEKIDAKA-TEN
                 END-IF
            END-IF
+      *--- AZU-ADD START 2016.08.23
+      *    持参薬で使用量不明はゼロをセット
+           IF    RECE641-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
+               MOVE     ZERO         TO  WRK-FEDT-DEKIDAKA-TEN
+           END-IF
+      *--- AZU-ADD END 2016.08.23
            MOVE    WRK-FEDT-DEKIDAKA-TEN
                                        TO  WRK-NUM
            MOVE    8                   TO  WRK-NAGASA
@@ -5545,9 +5682,41 @@
                ELSE
                   MOVE    ZERO             TO  WRK-FEDT-KOUI-MEISAI2
                END-IF
-               MOVE    ZERO                TO  WRK-FEDT-KOUI-MEISAI3
-                                               WRK-FEDT-KOUI-MEISAI4
-                                               WRK-FEDT-KOUI-MEISAI6
+      *--- AZU-ADD START 2016.08.23
+      *        持参薬区分
+               IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+                                                     "3" OR "4" OR
+                                                     "5" OR "6" OR
+                                                     "7" OR "8"
+                  IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+                                                        "5" OR "6"
+                     MOVE    1             TO  WRK-FEDT-KOUI-MEISAI3
+                  END-IF
+                  IF     RECE641-JISANYAKKBN        =   "3" OR "4" OR
+                                                        "7" OR "8"
+                     MOVE    2             TO  WRK-FEDT-KOUI-MEISAI3
+                  END-IF
+               ELSE
+                  MOVE   ZERO              TO  WRK-FEDT-KOUI-MEISAI3
+               END-IF
+      *        持参薬処方区分
+               IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+                                                     "3" OR "4" OR
+                                                     "5" OR "6" OR
+                                                     "7" OR "8"
+                  IF     RECE641-JISANYAKKBN        =   "1" OR "3" OR
+                                                        "5" OR "7"
+                     MOVE    1             TO  WRK-FEDT-KOUI-MEISAI4
+                  END-IF
+                  IF     RECE641-JISANYAKKBN        =   "2" OR "4" OR
+                                                        "6" OR "8"
+                     MOVE    2             TO  WRK-FEDT-KOUI-MEISAI4
+                  END-IF
+               ELSE
+                  MOVE   ZERO              TO  WRK-FEDT-KOUI-MEISAI4
+               END-IF
+      *--- AZU-ADD END   2016.08.23
+               MOVE    ZERO                TO  WRK-FEDT-KOUI-MEISAI6
                                                WRK-FEDT-KOUI-MEISAI7
                                                WRK-FEDT-KOUI-MEISAI8
                                                WRK-FEDT-KOUI-MEISAI9
@@ -6407,7 +6576,15 @@
                    MOVE    1         TO  FLG-RECE64
                NOT AT  END
                    IF      STS-RECE64          =   "00"
-                       CONTINUE
+      *--- AZU-ADD START 2016.08.23
+      *                持参薬の時は、自保区分をクリアする
+                       IF   (RECE641-SRYKBN  =  "21" OR "22" OR "23" OR
+                                                "14")   AND
+                            (RECE641-JIHOKBN =  "1")    AND
+                            (RECE641-ZAIKBN  =   3  OR  4)
+                            MOVE    SPACE    TO   RECE641-JIHOKBN
+                       END-IF
+      *--- AZU-ADD END   2016.08.23
                    ELSE
                        MOVE    SPACE               TO  WRK-ERR-AREA
                        INITIALIZE                      WRK-ERR-AREA
@@ -6710,7 +6887,7 @@
              MOVE    RECE62-SRYYM        TO  ACCT-SRYYM
              MOVE    RECE62-NYUGAIKBN    TO  ACCT-NYUGAIKBN
              MOVE    RECE62-PTID         TO  ACCT-PTID
-             DISPLAY "RECE62-SRYKA = " RECE62-SRYKA(IDX-HOUKATU)
+      *       DISPLAY "RECE62-SRYKA = " RECE62-SRYKA(IDX-HOUKATU)
              MOVE    RECE62-SRYKA(IDX-HOUKATU)
                                          TO  ACCT-SRYKA
              MOVE    9999                TO  ACCT-HKNCOMBI

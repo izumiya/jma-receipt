@@ -66,6 +66,11 @@
       *                                     が記録できなかった不具合を修正
       *              NACL-小豆沢  15/06/10  選定入院時の外泊もレコード記録
       *                                     する対応
+      *              NACL-小豆沢  15/06/10  選定入院時の外泊もレコード記録
+      *                                     する対応
+      *              NACL-小豆沢  16/03/10  平成２８年度改定対応
+      *              NACL-小豆沢  16/08/01  医療区分、ＡＤＬ点数コメントの
+      *                                     記録対応（平成２８年１０月診療分から）
       *****************************************************************
       *
       *
@@ -122,6 +127,7 @@
            03  IDX-CHUKSN2                 PIC 9(02).
            03  IDX-CHUKSN2S                PIC 9(02).
            03  IDX-CHUKSN2SS               PIC 9(02).
+           03  IDX-COM                     PIC 9(02).
       *
       *    コンスタント値
        01  CONSTANT-AREA.
@@ -458,6 +464,9 @@
       *    食事負担据え置き対象取得パラメタ
            COPY    "CPORCSSKJKEEP.INC".
       *
+      *    療養レセコメント取得サブ
+           COPY    "CPORCSRYOCOM.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -617,6 +626,16 @@
            MOVE    LNK-DPCNYUIN-SANTEIYM      TO  LNK-NYUINDAY-SANTEIYM
            CALL    "ORCSNYUINDAY"         USING   ORCSNYUINDAY-AREA
                                                   SPA-AREA
+      *
+      *医療区分、ＡＤＬ点数コメントの取得（平成２８年１０月診療分以降）
+           IF     LNK-DPCNYUIN-SANTEIYM       >=  "201610"
+              INITIALIZE                          ORCSRYOCOM-AREA
+              MOVE    LNK-DPCNYUIN-HOSPNUM    TO  LNK-RYOCOM-HOSPNUM
+              MOVE    LNK-DPCNYUIN-PTID       TO  LNK-RYOCOM-PTID
+              MOVE    LNK-DPCNYUIN-SANTEIYM   TO  LNK-RYOCOM-SANTEIYM
+              CALL    "ORCSRYOCOM"        USING   ORCSRYOCOM-AREA
+                                                  SPA-AREA
+           END-IF
       *
       *レセ電対象保険組合せ番号の取得
            PERFORM    VARYING   IDX   FROM   1   BY   1
@@ -1362,7 +1381,9 @@
       *        保険組合せ
                MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                         TO  WRK-SO-HKNCOMBI-DAY(IDX1)
+      *
                MOVE     ZERO                TO  WRK-MEISAISU
+      *
       *        入院基本料
                IF         WRK-NYUINKHN(IDX1)  NOT =        SPACE
                    ADD      1               TO  WRK-MEISAISU
@@ -1623,6 +1644,38 @@
                            INITIALIZE   WRK-NYUIN-SORT-TBL(IDX1)
                    END-EVALUATE
                END-IF
+      *
+      *        医療区分、ＡＤＬ点数コメント（平成２８年１０月診療分以降）
+               IF     LNK-DPCNYUIN-SANTEIYM       >=  "201610"
+                 IF     LNK-RYOCOM-NYUINKBN(IDX1)    =   "1"
+                   PERFORM    VARYING  IDX-COM  FROM  1  BY  1
+                     UNTIL   (IDX-COM    >   30)   OR
+                             (LNK-RYOCOM-IRYO-SRYCD(IDX1 IDX-COM) =
+                                                             SPACE)
+                       ADD    1             TO  WRK-MEISAISU
+                       MOVE     LNK-RYOCOM-IRYO-SRYCD(IDX1 IDX-COM)
+                                            TO  WRK-SO-SRYCD
+                                                (IDX1 WRK-MEISAISU)
+                   END-PERFORM
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE     LNK-RYOCOM-ADL-SRYCD-H28(IDX1 1)
+                                            TO  WRK-SO-SRYCD
+                                                (IDX1 WRK-MEISAISU)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE     LNK-RYOCOM-ADL-SRYCD-H28(IDX1 2)
+                                            TO  WRK-SO-SRYCD
+                                                (IDX1 WRK-MEISAISU)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE     LNK-RYOCOM-ADL-SRYCD-H28(IDX1 3)
+                                            TO  WRK-SO-SRYCD
+                                                (IDX1 WRK-MEISAISU)
+                   ADD      1               TO  WRK-MEISAISU
+                   MOVE     LNK-RYOCOM-ADL-SRYCD-H28(IDX1 4)
+                                            TO  WRK-SO-SRYCD
+                                                (IDX1 WRK-MEISAISU)
+                 END-IF
+               END-IF
+      *
            END-PERFORM
       *
       *    再構築した入院会計情報から点数の算定
