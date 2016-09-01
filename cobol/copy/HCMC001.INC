@@ -1,5 +1,5 @@
         01  HCMC001.
-            02  HCMC001-DAI PIC X(60).
+            02  HCMC001-DAI PIC X(82).
             02  HCMC001-YMD PIC X(22).
             02  HCMC001-PAGE    PIC X(3).
             02  HCMC001-TAI-TBL.
