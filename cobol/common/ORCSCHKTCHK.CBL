@@ -206,6 +206,20 @@
            COPY    "CPK02SPASCR.INC"  REPLACING
                                        //SPA-// BY //HZN-//.
       *
+      *H28.9
+      *»ý»²ÌôÍ½Ìó¥³¡¼¥É
+       01  CONS-AREA.
+           03  CONS-JSNYCD1        PIC X(09)    VALUE   "099209811".
+           03  CONS-JSNYCD2        PIC X(09)    VALUE   "099209812".
+           03  CONS-JSNYCD3        PIC X(09)    VALUE   "099209821".
+           03  CONS-JSNYCD4        PIC X(09)    VALUE   "099209822".
+      *
+           03  CONS-JSNYCD5        PIC X(09)    VALUE   "099209711".
+           03  CONS-JSNYCD6        PIC X(09)    VALUE   "099209712".
+           03  CONS-JSNYCD7        PIC X(09)    VALUE   "099209721".
+           03  CONS-JSNYCD8        PIC X(09)    VALUE   "099209722".
+      *
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -511,6 +525,18 @@
                END-IF
       *        Êñ³ç»»Äê¡ÊºÞ¡ËÈ½Äê
                IF      SPA-COM-INPUTCD (IDX-Z) =   "099999908"
+                   MOVE    1                   TO  ORCSCHKTCHK-HKTFLG
+               END-IF
+      *H28.9
+      *        »ý»²ÌôÍ½Ìó¥³¡¼¥É¤ÏÊñ³çºÞ¤È¤¹¤ë
+               IF      SPA-COM-INPUTCD (IDX-Z) =   CONS-JSNYCD1
+                                               OR  CONS-JSNYCD2
+                                               OR  CONS-JSNYCD3
+                                               OR  CONS-JSNYCD4
+                                               OR  CONS-JSNYCD5
+                                               OR  CONS-JSNYCD6
+                                               OR  CONS-JSNYCD7
+                                               OR  CONS-JSNYCD8
                    MOVE    1                   TO  ORCSCHKTCHK-HKTFLG
                END-IF
            END-PERFORM
@@ -1188,7 +1214,18 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    CONTINUE
                ELSE
       *            Êñ³ç»»Äê¡ÊºÞ¡Ë
-                   IF      SPA-COM-INPUTCD (IDX-Z) =   "099999908"
+                   IF     (SPA-COM-INPUTCD (IDX-Z) =   "099999908")
+      *H28.9
+      *        »ý»²ÌôÍ½Ìó¥³¡¼¥É¤ÏÊñ³çºÞ¤È¤¹¤ë
+                    OR    (SPA-COM-INPUTCD (IDX-Z) =   CONS-JSNYCD1
+                                                   OR  CONS-JSNYCD2
+                                                   OR  CONS-JSNYCD3
+                                                   OR  CONS-JSNYCD4
+                                                   OR  CONS-JSNYCD5
+                                                   OR  CONS-JSNYCD6
+                                                   OR  CONS-JSNYCD7
+                                                   OR  CONS-JSNYCD8)
+      *
                        MOVE    1                   TO  FLG-HKTINP
       *                Á°¹Ô¤âÊñ³ç¤È¤¹¤ë
                        IF      SPA-GMN-INPUTCD (IDX-Z - 1) =   "."

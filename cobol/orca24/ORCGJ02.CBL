@@ -74,6 +74,7 @@
       *  04.08.00    NACL-多々納  14/05/XX  一時データ変更対応
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *  04.08.00    NACL-多々納  16/06/XX  中心静脈（植入型カテーテル）対応
+      *  04.08.00    NACL-多々納  16/08/XX  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3207,6 +3208,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    包括分の名称編集
+           MOVE    SPACE               TO  WRK-SRYSYUMEI2
            IF      ACCT-JIHOKBN        =   "1"
                MOVE    SPACE               TO  WRK-SRYSYUMEI2
                IF      WRK-SRYSYUMEI(15:)  =   SPACE
@@ -3218,8 +3220,26 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        INTO    WRK-SRYSYUMEI2
                    END-STRING
                END-IF
+      *H28.9   MOVE    WRK-SRYSYUMEI2      TO  WRK-SRYSYUMEI
+           END-IF
+      *H28.9  持参薬
+           IF      ACCT-ZAIKBN         =   3
+                                       OR  4
+               MOVE    SPACE               TO  WRK-SRYSYUMEI2
+               IF      WRK-SRYSYUMEI(15:)  =   SPACE
+                   MOVE    WRK-SRYSYUMEI       TO  WRK-SRYSYUMEI2
+                   MOVE    "【持参薬】"        TO  WRK-SRYSYUMEI2(15:)
+               ELSE
+                   STRING  WRK-SRYSYUMEI       DELIMITED  BY  SPACE
+                           "【持参薬】"        DELIMITED  BY  SIZE
+                                       INTO    WRK-SRYSYUMEI2
+                   END-STRING
+               END-IF
+           END-IF
+           IF      WRK-SRYSYUMEI2  NOT =   SPACE
                MOVE    WRK-SRYSYUMEI2      TO  WRK-SRYSYUMEI
            END-IF
+      *
       *
            IF      SRY-SRYSYUKBN          =   SPACE
                MOVE    SPACE           TO  SPA-GMN-TMEISYO (IDG)
@@ -5331,6 +5351,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            OR     ( SPA-NAI-SRYSYU (SPA-NAI-BANGO)
                                        =   "148"
                                        OR  "149" )
+               MOVE    ZERO                TO  SPA-NAI-HKTGAIFLG
+           END-IF
+      *H28.9
+      *    持参薬は対象外とする
+           IF     (SPA-NAI-ZAIKBN (SPA-NAI-BANGO)  =   3
+                                                   OR  4   )
                MOVE    ZERO                TO  SPA-NAI-HKTGAIFLG
            END-IF
       *

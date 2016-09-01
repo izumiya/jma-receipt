@@ -630,6 +630,9 @@
                05  SPA-SYONIKKR-ARI        PIC 9(01).
                05  SPA-SYONIKKR-ARI2       PIC 9(01).
                05  SPA-SYONIKKR-ARI3       PIC 9(01).
+      *H28.9
+      *認知症地域包括薬剤チェック区分
+               05  SPA-NINCHI-CHK          PIC 9(01).
       *@
            03  SPA-SONOTA-AREA.
       *確認メッセージ

@@ -541,6 +541,9 @@
            03  WRK-HOUKNS-NAME         PIC X(100).
       *    Êñ³çºÞ¤ÎÈ½Äê
            03  WRK-HKTZAI              PIC X(01).
+      *
+           03  WRK-JISANKBN            PIC X(01).
+      *
       *    ¥×¥ì¥Ó¥å¡¼ÍÑ
            03  WRK-PRV-HKNKBN          PIC X(01).
            03  WRK-PRV-RSI-HKNKBN      PIC X(01).
@@ -1895,6 +1898,15 @@
                    MOVE    "1"                 TO  WRK-HKTZAI
                END-IF
            END-IF
+      *
+      *H28.9  »ý»²Ìô
+           IF     (LNK-WKSRY-ZAIKBN  (1)   =   3
+                                           OR  4  )
+               MOVE    "1"                 TO  WRK-JISANKBN
+           ELSE
+               MOVE    SPACE               TO  WRK-JISANKBN
+           END-IF
+      *
       *    ºÞÊÌÊÔ½¸
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-KOUI )
@@ -2627,6 +2639,11 @@
       *    Êñ³çºÞ
            IF      WRK-HKTZAI          =   "1"
                MOVE    "¡ÚÊñ³ç¿ÇÎÅ¡Û"  TO   SPA-GMN-TMEISYO1(IDG)(57:)
+           END-IF
+      *
+      *H28.9  »ý»²Ìô
+           IF      WRK-JISANKBN        =   "1"
+               MOVE    "¡Ú»ý»²Ìô¡Û"    TO   SPA-GMN-TMEISYO1(IDG)(57:)
            END-IF
       *
            INSPECT SPA-GMN-TMEISYO1 (IDG)  REPLACING  ALL "  "  BY "¡¡"
@@ -3604,6 +3621,9 @@
       *      ÌôÉ¾¡¦´ïÉ¾°Ê³°
              IF     (LNK-WKSRY-ZAIKBN  (IDX)   =   1  )
              OR     (LNK-WKSRY-ZAIKBN  (IDX)   =   2  )
+      *H28.9 »ý»²Ìô
+             OR     (LNK-WKSRY-ZAIKBN  (IDX)   =   3
+                                               OR  4  )
                CONTINUE
              ELSE
                IF     (LNK-WKSRY-SRYKBN (IDX)  =   "21"

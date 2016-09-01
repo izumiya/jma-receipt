@@ -29,6 +29,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/01/XX  ¼£¸³ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/11/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/08/XX  »ý»²ÌôÂÐ±þ
       *****************************************************************
       *
       *
@@ -334,6 +335,11 @@
                END-IF
       *        ÌôÉ¾¡¦´ïÉ¾ÂÐ¾Ý³°
                IF      ACCT-ZAIKBN         =   1
+                   MOVE    ZERO            TO  WRK-ZAIKAISU
+               END-IF
+      *H28.9   »ý»²Ìô¡¡ÂÐ¾Ý³°
+               IF      ACCT-ZAIKBN         =   3
+                                           OR  4
                    MOVE    ZERO            TO  WRK-ZAIKAISU
                END-IF
                IF      WRK-ZAIKAISU        >   ZERO

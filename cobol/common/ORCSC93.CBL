@@ -67,6 +67,7 @@
       * 04.07.00     NACL-¬ø°π«º  14/09/XX  £»£≤£∂«Ø£±£∞∑Ó≤˛¿µ¬–±˛
       * 04.07.00     NACL-¬ø°π«º  15/03/XX  £»£≤£∑«Ø£¥∑Ó≤˛¿µ¬–±˛¬æ
       * 04.08.00     NACL-¬ø°π«º  16/03/XX  £»£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛¬æ
+      * 04.08.00     NACL-¬ø°π«º  16/08/XX  ª˝ª≤ÃÙÕΩÃÛ•≥°º•…¬–±˛
       *****************************************************************
       *
       *
@@ -114,6 +115,8 @@
            03  FLG-YAKUHYO         PIC 9(01).
       *    ∏∫≈¿ ¨
            03  FLG-GENTEN          PIC 9(01).
+      *H28.9 ª˝ª≤ÃÙÕΩÃÛ•≥°º•…
+           03  FLG-JISANYAKU       PIC 9(01).
       *
        01  FLG-AREA2.
            03  FLG-KENSA-CHK       PIC 9(01).
@@ -201,6 +204,18 @@
            03  TBL-CHISRYCD1       PIC X(09)   VALUE   "112016070".
       *    ª˛¥÷≥∞¬–±˛≤√ªª£≥
            03  TBL-CHISRYCD3       PIC X(09)   VALUE   "112016170".
+      *
+      *H28.9
+      *ª˝ª≤ÃÙÕΩÃÛ•≥°º•…
+           03  CONS-JSNYCD1        PIC X(09)    VALUE   "099209811".
+           03  CONS-JSNYCD2        PIC X(09)    VALUE   "099209812".
+           03  CONS-JSNYCD3        PIC X(09)    VALUE   "099209821".
+           03  CONS-JSNYCD4        PIC X(09)    VALUE   "099209822".
+      *
+           03  CONS-JSNYCD5        PIC X(09)    VALUE   "099209711".
+           03  CONS-JSNYCD6        PIC X(09)    VALUE   "099209712".
+           03  CONS-JSNYCD7        PIC X(09)    VALUE   "099209721".
+           03  CONS-JSNYCD8        PIC X(09)    VALUE   "099209722".
       *
       *****************************************************************
       *    œ¢ÕÌ°°ŒŒ∞Ë
@@ -300,6 +315,7 @@
       *        ÃÙ…æ•Ø•Í•¢
                MOVE    SPACE               TO  SPA-COM-YAKUHYO (IDX)
                MOVE    SPACE               TO  SPA-COM-GENTEN  (IDX)
+               MOVE    SPACE               TO  SPA-COM-JISANYAKU(IDX)
       *
                IF      (SPA-GMN-INPUTCD(IDX) =   SPACE )   AND
                        (SPA-COM-INPUTCD(IDX) =   SPACE )
@@ -443,6 +459,8 @@
            MOVE    ZERO                TO  FLG-HOUKATU
            MOVE    ZERO                TO  FLG-YAKUHYO
            MOVE    ZERO                TO  FLG-GENTEN
+      *H28.9 ª˝ª≤ÃÙÕΩÃÛ•≥°º•…
+           MOVE    ZERO                TO  FLG-JISANYAKU
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX         >   SPA-MAX-LINE  )   OR
                              ((SPA-GMN-INPUTCD (IDX)   =   SPACE ) AND
@@ -455,6 +473,12 @@
                END-IF
                IF     (SPA-COM-YAKUHYO(IDX)    =   "1"  )
                    MOVE    1                   TO  FLG-YAKUHYO
+               END-IF
+               IF     (SPA-COM-JISANYAKU(IDX)   =   "1"  )
+                   MOVE    1                   TO  FLG-JISANYAKU
+               END-IF
+               IF     (SPA-COM-JISANYAKU(IDX)   =   "2"  )
+                   MOVE    2                   TO  FLG-JISANYAKU
                END-IF
                IF     (SPA-COM-ZAIEND (IDX)    =   "1"   )
                    PERFORM VARYING     IDX-Z   FROM    IDX-S  BY  1
@@ -471,11 +495,29 @@
                        ELSE
                            MOVE    SPACE       TO  SPA-COM-YAKUHYO (IDX)
                        END-IF
+      *H28.9 ª˝ª≤ÃÙÕΩÃÛ•≥°º•…
+                       MOVE    SPACE           TO  SPA-COM-JISANYAKU
+                                                               (IDX-Z)
+                       IF      FLG-JISANYAKU   =   1
+                           MOVE    "1"         TO  SPA-COM-JISANYAKU
+                                                              (IDX-Z)
+      *                     Ò≥Á∞∑§§
+                           MOVE    1           TO  SPA-COM-HOUKATU-ZAI
+                                                              (IDX-Z)
+                       END-IF
+                       IF      FLG-JISANYAKU   =   2
+                           MOVE    "2"         TO  SPA-COM-JISANYAKU
+                                                              (IDX-Z)
+      *                     Ò≥Á∞∑§§
+                           MOVE    1           TO  SPA-COM-HOUKATU-ZAI
+                                                              (IDX-Z)
+                       END-IF
                    END-PERFORM
                    MOVE    IDX-Z               TO  IDX-S
                    MOVE    ZERO                TO  FLG-HOUKATU
                    MOVE    ZERO                TO  FLG-YAKUHYO
                    MOVE    ZERO                TO  FLG-GENTEN
+                   MOVE    ZERO                TO  FLG-JISANYAKU
                END-IF
            END-PERFORM
            .
@@ -2160,6 +2202,68 @@
                                                                   (IDX)
                            ELSE
                                MOVE    "2071"        TO  SPA-ERRCD
+                           END-IF
+      *H28.9 ª˝ª≤ÃÙÕΩÃÛ•≥°º•…
+                       WHEN    CONS-JSNYCD1
+                       WHEN    CONS-JSNYCD2
+                       WHEN    CONS-JSNYCD3
+                       WHEN    CONS-JSNYCD4
+      *                    ≈ÍÃÙ§Œ£±∑ÔÃ‹§»§π§Î
+                           IF     (IDX             >   ZERO )
+                             AND  (SPA-GMN-INPUTCD (IDX - 1)(1:1)
+                                                   =   "."  )
+                             AND  (SPA-COM-SRYKBN(IDX - 1) =   "21"
+                                                           OR  "22"
+                                                           OR  "23"
+                                                           OR  "14" )
+                               MOVE    SPA-COM-SRYKBN(IDX - 1)
+                                                     TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                               MOVE    SPA-COM-SRYSYUKBN(IDX - 1)
+                                                   TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+      *                        ª˝ª≤ÃÙ∂Ë ¨
+                               MOVE    "1"         TO  SPA-COM-JISANYAKU
+                                                              (IDX)
+                               MOVE    "1"         TO  SPA-COM-JISANYAKU
+                                                              (IDX - 1)
+                           ELSE
+                               MOVE    "0227"        TO  SPA-ERRCD
+                           END-IF
+      *                     Ò≥Á ›∏±§œ•®•È°º
+                           IF      SPA-COM-HKNCOMBI (IDX)  =   "9999"
+                               MOVE    "0228"        TO  SPA-ERRCD
+                           END-IF
+      *                øÙŒÃ…‘Ã¿
+                       WHEN    CONS-JSNYCD5
+                       WHEN    CONS-JSNYCD6
+                       WHEN    CONS-JSNYCD7
+                       WHEN    CONS-JSNYCD8
+      *                    ≈ÍÃÙ§Œ£±∑ÔÃ‹§»§π§Î
+                           IF     (IDX             >   ZERO )
+                             AND  (SPA-GMN-INPUTCD (IDX - 1)(1:1)
+                                                   =   "."  )
+                             AND  (SPA-COM-SRYKBN(IDX - 1) =   "21"
+                                                           OR  "22"
+                                                           OR  "23"
+                                                           OR  "14" )
+                               MOVE    SPA-COM-SRYKBN(IDX - 1)
+                                                     TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                               MOVE    SPA-COM-SRYSYUKBN(IDX - 1)
+                                                   TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+      *                        ª˝ª≤ÃÙ∂Ë ¨
+                               MOVE    "2"         TO  SPA-COM-JISANYAKU
+                                                              (IDX)
+                               MOVE    "2"         TO  SPA-COM-JISANYAKU
+                                                              (IDX - 1)
+                           ELSE
+                               MOVE    "0227"        TO  SPA-ERRCD
+                           END-IF
+      *                     Ò≥Á ›∏±§œ•®•È°º
+                           IF      SPA-COM-HKNCOMBI (IDX)  =   "9999"
+                               MOVE    "0228"        TO  SPA-ERRCD
                            END-IF
       *H27.4
       *                ∏Â»Ø∞ÂÃÙ… §ÿ§Œ —ππ≤ƒ° ΩË ˝§ª§ÛÀË°À

@@ -499,6 +499,8 @@
                        09  SPA-COM-TNSP-KISAIKBN       PIC X(01).
       *                ¸þÀº¿ÀÌô¶èÊ¬
                        09  SPA-COM-PSY-CLASS           PIC X(01).
+      *H28.9           »ý»²ÌôºÞ¶èÊ¬
+                       09  SPA-COM-JISANYAKU           PIC X(01).
       *ver.4.7 ¤«¤éÍ½È÷
                        09  SPA-COM-YOBI1               PIC X(10).
                        09  SPA-COM-YOBI2               PIC X(10).

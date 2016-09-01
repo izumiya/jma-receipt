@@ -465,10 +465,18 @@
       *!!!!! IF     (ACCT-YKZTEN       >   ZERO  )
       *        包括まとめ入力は対象外とする
       *!!!!    AND  (ACCT-HKNCOMBI NOT =   "9999" )
-             IF     (ACCT-HKNCOMBI NOT =   "9999" )
+      *!     IF     (ACCT-HKNCOMBI NOT =   "9999" )
+      *!       薬評は対象外とする
+      *!       AND  (ACCT-ZAIKBN   NOT =   1      )
+      *H28.9
+             IF     (ACCT-HKNCOMBI     =   "9999" )
       *        薬評は対象外とする
-               AND  (ACCT-ZAIKBN   NOT =   1      )
-      *
+               OR   (ACCT-ZAIKBN       =   1      )
+      *        持参薬は対象外とする
+               OR   (ACCT-ZAIKBN       =   3      )
+               OR   (ACCT-ZAIKBN       =   4      )
+               CONTINUE
+             ELSE
       *H26.7
       *        前月分で入院日が診療年月以前の時
                IF      (WRK-SRYYM      NOT =   ORCSCHO-SRYYM)
@@ -766,9 +774,18 @@
       *!!!!!!  IF      ACCT-YKZTEN       >   ZERO
       *        包括まとめ入力は対象外とする
       *!!!       AND  (ACCT-HKNCOMBI NOT =   "9999" )
-               IF     (ACCT-HKNCOMBI NOT =   "9999" )
+      **       IF     (ACCT-HKNCOMBI NOT =   "9999" )
       *        薬評は対象外とする
-                 AND  (ACCT-ZAIKBN   NOT =   1      )
+      ***        AND  (ACCT-ZAIKBN   NOT =   1      )
+      *H28.9
+               IF     (ACCT-HKNCOMBI     =   "9999" )
+      *          薬評は対象外とする
+                 OR   (ACCT-ZAIKBN       =   1      )
+      *          持参薬は対象外とする
+                 OR   (ACCT-ZAIKBN       =   3      )
+                 OR   (ACCT-ZAIKBN       =   4      )
+                   CONTINUE
+               ELSE
       *
       *            最初の日を保存（点数マスタ検索のため）
                    MOVE    01                  TO  WRK-DD

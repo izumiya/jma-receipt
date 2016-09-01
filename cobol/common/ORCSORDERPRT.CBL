@@ -380,6 +380,13 @@
            IF      LNK-WKSRY-ZAIKBN  (1)   =   2
                MOVE    ZERO                TO  FLG-SYORI
            END-IF
+      *H28.9
+      *    持参薬は対象外
+           IF      LNK-WKSRY-ZAIKBN  (1)   =   3
+                                           OR  4
+               MOVE    ZERO                TO  FLG-SYORI
+           END-IF
+      *TEST
       *
            IF      FLG-SYORI           =   ZERO
                CONTINUE

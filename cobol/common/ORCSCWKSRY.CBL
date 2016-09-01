@@ -47,6 +47,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/07/28  Ï«ºÒ¶â³Û¡¦ÅÀ¿ôÊÔ½¸ÊÑ¹¹
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/08/XX  »ý»²ÌôÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -231,6 +232,9 @@
       *
            03  WRK-YAKUHYO             PIC X(01).
            03  WRK-GENTEN              PIC X(01).
+      *
+      *H28.9   »ý»²Ìô
+           03  WRK-JISANYAKU           PIC X(01).
       *
       *    Ï«ºÒ»Ü½Ñ²Ã»»ÅùÍÑ
            03  WRK-ENTANKA             PIC S9(08).
@@ -1493,6 +1497,15 @@
            IF      LNK-WKSRY-ZAIKBN  (IDX) =   2
                MOVE    "1"                 TO  SPA-COM-GENTEN  (IDX2)
            END-IF
+      *
+      *H28.9
+      *    »ý»²Ìô
+           IF      LNK-WKSRY-ZAIKBN  (IDX) =   3
+               MOVE    "1"                 TO  SPA-COM-JISANYAKU(IDX2)
+           END-IF
+           IF      LNK-WKSRY-ZAIKBN  (IDX) =   4
+               MOVE    "2"                 TO  SPA-COM-JISANYAKU(IDX2)
+           END-IF
       *!!
            IF      LNK-WKSRY-INPUTCD (IDX IDY) =   SPACE
                MOVE    SPA-COM-INPUTCD (IDX2)
@@ -2731,6 +2744,16 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-COM-GENTEN  (IDX)   =   "1"
                MOVE    2               TO  WKSRY-ZAIKBN
            END-IF
+      *
+      *H28.9
+      *    »ý»²Ìô
+           IF      SPA-COM-JISANYAKU(IDX)  =   "1"
+               MOVE    3               TO  WKSRY-ZAIKBN
+           END-IF
+           IF      SPA-COM-JISANYAKU(IDX)  =   "2"
+               MOVE    4               TO  WKSRY-ZAIKBN
+           END-IF
+      *
       *@
       *    ¥É¥¯¥¿¡¼
            MOVE    SPA-DRCD            TO  WKSRY-DRCD
@@ -2975,6 +2998,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-COM-HOUKATU-ZAI (IDX)   TO  WRK-HOUKATU-ZAI
            MOVE    SPA-COM-YAKUHYO     (IDX)   TO  WRK-YAKUHYO
            MOVE    SPA-COM-GENTEN      (IDX)   TO  WRK-GENTEN
+      *H28.9   »ý»²Ìô
+           MOVE    SPA-COM-JISANYAKU  (IDX)   TO  WRK-JISANYAKU
            PERFORM 300211-WKSRYPARA-WRITE-SEC
       *
            IF      SPA-COM-ZAIEND(IDX) =   "1"
@@ -3036,6 +3061,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¸ºÅÀ
            IF      WRK-GENTEN          =   "1"
                MOVE    2               TO  WKSRY-ZAIKBN
+           END-IF
+      *H28.9
+      *    »ý»²Ìô
+           IF      WRK-JISANYAKU       =   "1"
+               MOVE    3               TO  WKSRY-ZAIKBN
+           END-IF
+           IF      WRK-JISANYAKU       =   "2"
+               MOVE    4               TO  WKSRY-ZAIKBN
            END-IF
       *@
       *    ¥É¥¯¥¿¡¼
@@ -4664,6 +4697,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       ******                                   TO  WRK-HOUKATU-ZAI
                    MOVE    SPACE               TO  WRK-YAKUHYO
                    MOVE    SPACE               TO  WRK-GENTEN
+                   MOVE    SPACE               TO  WRK-JISANYAKU
                    PERFORM 300211-WKSRYPARA-WRITE-SEC
                    ADD     1                   TO  WRK-ZAINUM
                    MOVE    ZERO                TO  IDY

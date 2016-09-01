@@ -1548,6 +1548,10 @@
            IF      WRK-ZAIKAISU        =   ZERO
       *       泔刉反覆擂陸
               OR  (ACCT-ZAIKBN         =   1    )
+      *H28.9
+      *       儅輔泔反覆擂陸
+              OR  (ACCT-ZAIKBN         =   3    )
+              OR  (ACCT-ZAIKBN         =   4    )
                CONTINUE
            ELSE
                PERFORM 410121-WKSRYACT-HEN-SEC

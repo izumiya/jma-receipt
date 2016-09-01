@@ -58,6 +58,7 @@
       * 04.08.00     NACL-多々納  13/06/XX  労災レセ電対応
       * 04.07.00     NACL-多々納  14/02/13  労災金額％加算対応
       * 04.08.00     NACL-多々納  14/12/XX  平成２７年１月改正対応
+      * 04.08.00     NACL-多々納  16/08/XX  持参薬対応
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -450,6 +451,8 @@
            03  WRK-TENSUKEI-G          PIC S9(08).
            03  WRK-TENSUKEI-K          PIC S9(08).
       *
+           03  WRK-MAX                 PIC 9(04).
+      *
       *    行位置編集
        01  WRK-GMNGYO-AREA.
            03  WRK-MAP-MAX         PIC 9(04).
@@ -775,11 +778,10 @@
       *
       *    セット展開サブ
            COPY    "CPORCSCSETHEN.INC".
-      *TEST
-      *H28.2
+      *
+      *H28.3
       *    院外処方名編集パラメタ
            COPY    "CPORCSCGENNAME.INC".
-      *TEST
       *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
@@ -5654,6 +5656,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      SPA-COM-GENTEN  (IDX)   =   "1"
                        MOVE    2                   TO  WRK-ZAIKBN
                    END-IF
+      *
+      *H28.9
+      *            持参薬
+                   IF      SPA-COM-JISANYAKU(IDX)  =   "1"
+                       MOVE    3                   TO  WRK-ZAIKBN
+                   END-IF
+                   IF      SPA-COM-JISANYAKU(IDX)  =   "2"
+                       MOVE    4                   TO  WRK-ZAIKBN
+                   END-IF
                END-IF
       *
       *        各附加情報
@@ -5693,6 +5704,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE   "1"                  TO  SPA-J04-JIHOKBN
            ELSE
                MOVE   SPACE                TO  SPA-J04-JIHOKBN
+           END-IF
+      *H28.9
+      *    持参薬は包括診療へ
+           IF      WRK-ZAIKBN          =   3
+                                       OR  4
+               MOVE   "1"                  TO  SPA-J04-JIHOKBN
            END-IF
       *
       *    診療会計剤チェックサブ
@@ -6342,6 +6359,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-COM-GENTEN  (IDX)   =   "1"
                    MOVE    2                   TO  WRK-ZAIKBN
                END-IF
+      *H28.9
+      *        持参薬
+               IF      SPA-COM-JISANYAKU(IDX)  =   "1"
+                   MOVE    3                   TO  WRK-ZAIKBN
+               END-IF
+               IF      SPA-COM-JISANYAKU(IDX)  =   "2"
+                   MOVE    4                   TO  WRK-ZAIKBN
+               END-IF
+      *
            END-IF
       *****IF      SPA-COM-KEIFLG (IDX)    =   "1" OR  "2"
       *        MOVE    SPA-COM-KEI  (IDX)      TO  SRY-JIHIMONEY
