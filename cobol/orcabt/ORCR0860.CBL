@@ -41,6 +41,7 @@
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -454,6 +455,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
                MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU 
                MOVE    RECE84-JIHOKBN      TO  RECE843-JIHOKBN
+               MOVE    RECE84-JISANYAKKBN  TO  RECE843-JISANYAKKBN
                IF      RECE84-COMCDFLG   =   "2"
                  ADD     1                 TO  WRK-COMRENNUM
                  MOVE    WRK-COMRENNUM     TO  RECE843-COMRENNUM
@@ -842,6 +844,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE84-RUIKEITOTAL  TO  RECE843-RUIKEITOTAL
            MOVE    RECE84-MEISAISU     TO  RECE843-MEISAISU
            MOVE    RECE84-JIHOKBN      TO  RECE843-JIHOKBN
+           MOVE    RECE84-JISANYAKKBN  TO  RECE843-JISANYAKKBN
            START   RECE843-FILE
                KEY IS    >=   RECE843-KEY
                INVALID
@@ -865,6 +868,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                   (RECE84-RUIKEITOTAL  NOT =  RECE843-RUIKEITOTAL)  OR
                   (RECE84-MEISAISU     NOT =  RECE843-MEISAISU)     OR
                   (RECE84-JIHOKBN      NOT =  RECE843-JIHOKBN)      OR
+                  (RECE84-JISANYAKKBN  NOT =  RECE843-JISANYAKKBN)  OR
                   (FLG-RECE843             =  1)
       *
                   MOVE     ZERO     TO     FLG-NASHI

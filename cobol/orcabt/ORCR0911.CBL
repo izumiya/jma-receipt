@@ -41,6 +41,7 @@
       *                                     編集修正
       *  04.08.04    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.06    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -256,7 +257,8 @@
                05  WRK-SURYO-S1                PIC 9(05).
                05  WRK-SURYO-S2                PIC 9(05).
            03  WRK-SURYO-X.
-               05  WRK-SURYO-Z1                PIC ZZZZZ.
+      *********05  WRK-SURYO-Z1                PIC ZZZZZ.
+               05  WRK-SURYO-Z1                PIC ZZZZ9.
                05  WRK-SURYO-Z2                PIC X(01).
                05  WRK-SURYO-Z3                PIC ZZZZZ.
            03  WRK-SURYO-N.
@@ -2708,7 +2710,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
       *
            IF      TBL-ZAIW-SRYSURYO (WRK-WIDX1 WRK-WIDX2)
                                    =   ZERO
+             IF  (RECE84-JIHOKBN  NOT =  SPACE)
+             AND (RECE84-ZAIKBN       =   4   )
+               CONTINUE
+             ELSE
                GO  TO  4301-SURYO-HEN1-EXT  
+             END-IF
            END-IF
       * 
       *    数字表示用編集（半角）

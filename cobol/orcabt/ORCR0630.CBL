@@ -129,6 +129,7 @@
       *                                     設定修正（全国公費併用分請求点集計）
       *  04.08.04    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.06    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
       *
@@ -1177,7 +1178,7 @@
                            OR      RECE62-HKNCOMBI (IDX1)  =   ZERO 
                        IF     (ACCT-HKNCOMBI   =
                                                RECE62-HKNCOMBI (IDX1))
-                       AND    (ACCT-ZAIKBN    NOT = 1 AND 2          )
+                       AND    (ACCT-ZAIKBN     =  ZERO               )
       *
                            PERFORM    500-KUMIAWASE-HANBETU-SEC
       *
@@ -2711,7 +2712,7 @@
                MOVE    "key58"           TO   MCP-PATHNAME
                PERFORM  900-SRYACCT-READ-SEC
                PERFORM  UNTIL   FLG-SRYACCT  =  1
-                 IF   (ACCT-ZAIKBN     NOT =  1 AND 2     )
+                 IF   (ACCT-ZAIKBN         =  ZERO        )
                  AND  (ACCT-ZAITEN     NOT =  ZERO        )
                  AND  (ACCT-ZAIKAISU   NOT =  ZERO        )
                  AND  (ACCT-DAY(1 IDY) NOT =  ZERO        )
@@ -3667,7 +3668,7 @@
                            OR      RECE62-HKNCOMBI (IDX1)  =   ZERO 
                        IF     (ACCT-HKNCOMBI   =
                                                RECE62-HKNCOMBI (IDX1))
-                       AND    (ACCT-ZAIKBN    NOT = 1 AND 2          )
+                       AND    (ACCT-ZAIKBN     =  ZERO               )
                            IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                                 (ACCT-ZAIKAISU  NOT =    ZERO)
                              IF   ACCT-SRYKBN  =  "90" OR "92"  

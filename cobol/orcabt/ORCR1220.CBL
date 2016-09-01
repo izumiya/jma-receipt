@@ -140,6 +140,7 @@
       *  04.08.07    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.08    NACL-門脇    16/05/20  標準負担額経過措置（精神）入院年月日
       *                                     のコメント対応
+      *  04.08.09    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1784,7 +1785,7 @@
                       PERFORM   21015-TENTEKIMATOME-CHECK-SEC
                    END-IF
       *
-                   MOVE   ZERO          TO  FLG-RINYAK
+                   PERFORM   21016-FLG-KURIA-SEC
       *
                    IF  ((ACCT-ZAITEN    NOT =    ZERO ) AND
                         (ACCT-ZAIKAISU  NOT =    ZERO ) AND
@@ -1797,41 +1798,6 @@
                         (FLG-TENTEKIMATOME  =    ZERO ) AND
                         (WRK-PARA-PRTKBN    =
                                            "4" OR "5" ))
-                      MOVE   ZERO   TO   WRK-SRYSURYO
-                      MOVE   ZERO   TO   WRK-SRYSURYO2
-                      MOVE   ZERO   TO   WRK-SRYSURYO3
-                      MOVE   ZERO   TO   WRK-TANICD
-                      MOVE   ZERO   TO   WRK-TANIMOJISU
-                      MOVE   SPACE  TO   WRK-TANINAME
-                      MOVE   ZERO   TO   FLG-HOUSIJI-COM
-                                         FLG-SYOBYO-COM
-                                         FLG-RYOYO-COM
-                                         FLG-SYODOU-COM
-                                         FLG-OSIN-COM
-                                         FLG-HOUSEI-COM
-                                         FLG-HOUMON-COM
-                                         FLG-TAHOKEN
-                                         FLG-KENSA-COM
-                                         FLG-ZAIKYO-COM
-                                         FLG-BOKOHO-COM
-                                         FLG-CYOJKSN-COM
-                                         FLG-HAIJRT-COM
-      *
-                      MOVE   ZERO   TO   WRK-FILMTEN
-      *
-                      MOVE   ZERO   TO
-                                    WRK-KZI058-TEN
-                                    WRK-KZI058-TANICD
-                                    WRK-KZI058-TANIMOJISU
-                      MOVE   SPACE  TO
-                                    WRK-KZI058-TANINAME
-      *
-                      MOVE   ZERO   TO   WRK-RYOYOTEATE
-      *
-                      MOVE   ZERO   TO   FLG-WRITE230
-                      MOVE   ZERO   TO   FLG-TENTEKI
-                      MOVE   ZERO   TO   FLG-HENSYU-NG
-                      MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
                       IF  (ACCT-SRYKBN     = "97"     )
                       AND (ACCT-SRYCDTOTAL = 197000470
                                           OR 197001570
@@ -1873,41 +1839,6 @@
                             AND (ACCT-MEISAISU      =   1    )
                                  CONTINUE
                             ELSE
-                                 MOVE   ZERO   TO   WRK-SRYSURYO
-                                 MOVE   ZERO   TO   WRK-SRYSURYO2
-                                 MOVE   ZERO   TO   WRK-SRYSURYO3
-                                 MOVE   ZERO   TO   WRK-TANICD
-                                 MOVE   ZERO   TO   WRK-TANIMOJISU
-                                 MOVE   SPACE  TO   WRK-TANINAME
-                                 MOVE   ZERO   TO   FLG-HOUSIJI-COM
-                                                    FLG-SYOBYO-COM
-                                                    FLG-RYOYO-COM
-                                                    FLG-SYODOU-COM
-                                                    FLG-OSIN-COM
-                                                    FLG-HOUSEI-COM
-                                                    FLG-HOUMON-COM
-                                                    FLG-TAHOKEN
-                                                    FLG-KENSA-COM
-                                                    FLG-ZAIKYO-COM
-                                                    FLG-BOKOHO-COM
-                                                    FLG-CYOJKSN-COM
-                                                    FLG-HAIJRT-COM
-      *
-                                 MOVE   ZERO   TO   WRK-FILMTEN
-      *
-                                 MOVE   ZERO   TO
-                                               WRK-KZI058-TEN
-                                               WRK-KZI058-TANICD
-                                               WRK-KZI058-TANIMOJISU
-                                 MOVE   SPACE  TO
-                                               WRK-KZI058-TANINAME
-      *
-                                 MOVE   ZERO   TO   WRK-RYOYOTEATE
-      *
-                                 MOVE   ZERO   TO   FLG-WRITE230
-                                 MOVE   ZERO   TO   FLG-TENTEKI
-                                 MOVE   ZERO   TO   FLG-HENSYU-NG
-                                 MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
                                  IF    ACCT-SRYKBN  =
                                        "60" OR "64" OR "80"
                                    PERFORM 21014-SINRYO-CHECK-SEC
@@ -1918,6 +1849,17 @@
                                    PERFORM RECE220-WRITE-SEC
                                  END-IF
                             END-IF
+                         END-IF
+                      ELSE
+                         IF   (ACCT-ZAIKAISU     NOT =  ZERO )
+                         AND  (FLG-TENTEKIMATOME     =  ZERO )
+                         AND  (ACCT-JIHOKBN      NOT =  SPACE)
+                         AND  (ACCT-ZAIKBN       =  3 OR 4   )
+                                 PERFORM   21011-RECE220-TENSOU-SEC
+                                 PERFORM   21012-RECE230-HENSYU-SEC
+                                 IF    FLG-WRITE230  =   1
+                                   PERFORM RECE220-WRITE-SEC
+                                 END-IF
                          END-IF
                       END-IF
                    END-IF
@@ -2164,6 +2106,10 @@
                      "099999907" OR "099999908" OR
                      "099200101" OR "099999926" OR
                      "099999927" OR "099999928" OR
+                     "099209811" OR "099209812" OR
+                     "099209821" OR "099209822" OR
+                     "099209711" OR "099209712" OR
+                     "099209721" OR "099209722" OR
                      "840000136" OR "840000140"            )
                   COMPUTE   RECE220-MEISAISU    =  RECE220-MEISAISU
                                                 -  1
@@ -2239,9 +2185,37 @@
                        "099999907" OR "099999908" OR
                        "099200101" OR "099999926" OR
                        "099999927" OR "099999928" OR
+                       "099209811" OR "099209812" OR
+                       "099209821" OR "099209822" OR
+                       "099209711" OR "099209712" OR
+                       "099209721" OR "099209722" OR
                        "840000136" OR "840000140"            )
       *
-               CONTINUE
+               IF      SRY-SRYCD(IDX2)    =     "099209811"
+                  MOVE   "1"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209812"
+                  MOVE   "2"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209821"
+                  MOVE   "3"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209822"
+                  MOVE   "4"    TO    RECE220-JISANYAKKBN
+               END-IF
+      *
+               IF      SRY-SRYCD(IDX2)    =     "099209711"
+                  MOVE   "5"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209712"
+                  MOVE   "6"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209721"
+                  MOVE   "7"    TO    RECE220-JISANYAKKBN
+               END-IF
+               IF      SRY-SRYCD(IDX2)    =     "099209722"
+                  MOVE   "8"    TO    RECE220-JISANYAKKBN
+               END-IF
       *
               ELSE
       *
@@ -4140,6 +4114,51 @@
       *
            .
        21015-TENTEKIMATOME-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    フラグ等のクリア
+      *****************************************************************
+       21016-FLG-KURIA-SEC                 SECTION.
+      *
+           MOVE   ZERO   TO   FLG-RINYAK
+      *
+           MOVE   ZERO   TO   WRK-SRYSURYO
+           MOVE   ZERO   TO   WRK-SRYSURYO2
+           MOVE   ZERO   TO   WRK-SRYSURYO3
+           MOVE   ZERO   TO   WRK-TANICD
+           MOVE   ZERO   TO   WRK-TANIMOJISU
+           MOVE   SPACE  TO   WRK-TANINAME
+           MOVE   ZERO   TO   FLG-HOUSIJI-COM
+                              FLG-SYOBYO-COM
+                              FLG-RYOYO-COM
+                              FLG-SYODOU-COM
+                              FLG-OSIN-COM
+                              FLG-HOUSEI-COM
+                              FLG-HOUMON-COM
+                              FLG-TAHOKEN
+                              FLG-KENSA-COM
+                              FLG-ZAIKYO-COM
+                              FLG-BOKOHO-COM
+                              FLG-CYOJKSN-COM
+                              FLG-HAIJRT-COM
+      *
+           MOVE   ZERO   TO   WRK-FILMTEN
+      *
+           MOVE   ZERO   TO   WRK-KZI058-TEN
+                              WRK-KZI058-TANICD
+                              WRK-KZI058-TANIMOJISU
+           MOVE   SPACE  TO   WRK-KZI058-TANINAME
+      *
+           MOVE   ZERO   TO   WRK-RYOYOTEATE
+      *
+           MOVE   ZERO   TO   FLG-WRITE230
+           MOVE   ZERO   TO   FLG-TENTEKI
+           MOVE   ZERO   TO   FLG-HENSYU-NG
+           MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
+      *
+           .
+       21016-FLG-KURIA-EXT.
            EXIT.
       *
       *****************************************************************

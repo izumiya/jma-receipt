@@ -48,6 +48,7 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
+      *  04.08.04    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -469,6 +470,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    RECE84-RUIKEITOTAL  TO  RECE842-RUIKEITOTAL
                MOVE    RECE84-MEISAISU     TO  RECE842-MEISAISU 
                MOVE    RECE84-JIHOKBN      TO  RECE842-JIHOKBN
+               MOVE    RECE84-JISANYAKKBN  TO  RECE842-JISANYAKKBN
                IF      RECE84-COMCDFLG   =   "1"
                  ADD     1                 TO  WRK-COMRENNUM
                  MOVE    WRK-COMRENNUM     TO  RECE842-COMRENNUM
@@ -899,6 +901,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE84-RUIKEITOTAL  TO  RECE842-RUIKEITOTAL
            MOVE    RECE84-MEISAISU     TO  RECE842-MEISAISU
            MOVE    RECE84-JIHOKBN      TO  RECE842-JIHOKBN
+           MOVE    RECE84-JISANYAKKBN  TO  RECE842-JISANYAKKBN
            START   RECE842-FILE
                KEY IS    >=   RECE842-KEY
                INVALID
@@ -922,6 +925,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                   (RECE84-RUIKEITOTAL  NOT =  RECE842-RUIKEITOTAL)  OR
                   (RECE84-MEISAISU     NOT =  RECE842-MEISAISU)     OR
                   (RECE84-JIHOKBN      NOT =  RECE842-JIHOKBN)      OR
+                  (RECE84-JISANYAKKBN  NOT =  RECE842-JISANYAKKBN)  OR
                   (FLG-RECE842             =  1)
       *
                   MOVE     ZERO     TO     FLG-NASHI

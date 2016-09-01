@@ -48,6 +48,7 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.03    NACL-藤原    16/01/15  請求情報への更新日設定
       *  04.08.04    NACL-藤原    16/04/01  平成２８年４月改正対応
+      *  04.08.05    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4068,7 +4069,9 @@
                                        =   WRK-CONS-TEIGEN
                CONTINUE
            ELSE
-               IF      TBL-ZAIW-SRYSURYO (1 IDX) >   ZERO
+               IF  ( TBL-ZAIW-SRYSURYO (1 IDX)  >  ZERO )
+               OR  ((RECE84-JIHOKBN  NOT =  SPACE) AND
+                    (RECE84-ZAIKBN       =   4   )      )
                    MOVE    TBL-ZAIW-SRYSURYO (1 IDX) TO  WRK-SRYSURYO
                    MOVE    WRK-SRYSURYO              TO  WRK-NUM
                    MOVE    11                        TO  WRK-NAGASA
@@ -4083,7 +4086,8 @@
                    MOVE    RECE84-ZAITEN      TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
                ELSE
-                   IF      RECE84-YKZTEN      >   ZERO
+                   IF      RECE84-YKZTEN          >   ZERO
+                   OR      RECE84-TOYAKUFLG   NOT =   SPACE
                        MOVE    RECE84-YKZTEN      TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF

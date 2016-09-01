@@ -52,6 +52,7 @@
       *  04.08.02    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.04    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -437,6 +438,7 @@
                MOVE    RECE64-RUIKEITOTAL  TO  RECE642-RUIKEITOTAL
                MOVE    RECE64-MEISAISU     TO  RECE642-MEISAISU 
                MOVE    RECE64-JIHOKBN      TO  RECE642-JIHOKBN
+               MOVE    RECE64-JISANYAKKBN  TO  RECE642-JISANYAKKBN
                IF      RECE64-COMCDFLG   =   "1"
                  ADD     1                 TO  WRK-COMRENNUM
                  MOVE    WRK-COMRENNUM     TO  RECE642-COMRENNUM
@@ -863,6 +865,7 @@
            MOVE    RECE64-RUIKEITOTAL  TO  RECE642-RUIKEITOTAL
            MOVE    RECE64-MEISAISU     TO  RECE642-MEISAISU
            MOVE    RECE64-JIHOKBN      TO  RECE642-JIHOKBN
+           MOVE    RECE64-JISANYAKKBN  TO  RECE642-JISANYAKKBN
            START   RECE642-FILE
                KEY IS    >=   RECE642-KEY
                INVALID
@@ -881,6 +884,7 @@
                   (RECE64-RUIKEITOTAL  NOT =  RECE642-RUIKEITOTAL)  OR
                   (RECE64-MEISAISU     NOT =  RECE642-MEISAISU)     OR
                   (RECE64-JIHOKBN      NOT =  RECE642-JIHOKBN)      OR
+                  (RECE64-JISANYAKKBN  NOT =  RECE642-JISANYAKKBN)  OR
                   (FLG-RECE642             =  1)
       *
                   MOVE     ZERO     TO     FLG-NASHI

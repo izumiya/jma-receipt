@@ -34,6 +34,7 @@
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -370,6 +371,7 @@
                MOVE    RECE220-RUIKEITOTAL TO  RECE221-RUIKEITOTAL
                MOVE    RECE220-MEISAISU    TO  RECE221-MEISAISU 
                MOVE    RECE220-JIHOKBN     TO  RECE221-JIHOKBN
+               MOVE    RECE220-JISANYAKKBN TO  RECE221-JISANYAKKBN
                IF      RECE220-COMCDFLG    =   "1"
                  ADD     1                 TO  WRK-COMRENNUM
                  MOVE    WRK-COMRENNUM     TO  RECE221-COMRENNUM
@@ -758,6 +760,7 @@
            MOVE    RECE220-RUIKEITOTAL TO  RECE221-RUIKEITOTAL
            MOVE    RECE220-MEISAISU    TO  RECE221-MEISAISU
            MOVE    RECE220-JIHOKBN     TO  RECE221-JIHOKBN
+           MOVE    RECE220-JISANYAKKBN TO  RECE221-JISANYAKKBN
            START   RECE221-FILE
                KEY IS    >=   RECE221-KEY
                INVALID
@@ -775,6 +778,7 @@
                  ( RECE220-RUIKEITOTAL NOT =  RECE221-RUIKEITOTAL ) OR
                  ( RECE220-MEISAISU    NOT =  RECE221-MEISAISU    ) OR
                  ( RECE220-JIHOKBN     NOT =  RECE221-JIHOKBN     ) OR
+                 ( RECE220-JISANYAKKBN NOT =  RECE221-JISANYAKKBN ) OR
                  ( FLG-RECE221             =  1)
       *
                   MOVE     ZERO     TO     FLG-NASHI

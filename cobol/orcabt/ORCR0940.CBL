@@ -53,6 +53,7 @@
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -320,8 +321,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                           MOVE   4      TO      RECE87-KNSJISKBN
                   END-IF
               END-IF
-              IF   (RECE86-SAFLG   NOT =   SPACE )
-              OR   (RECE86-ZAIKBN      =   1 OR 2)
+              IF   (RECE86-SAFLG   NOT =  SPACE)
+              OR   (RECE86-ZAIKBN  NOT =  ZERO )
                    MOVE    9            TO      RECE87-KNSJISKBN
               END-IF
            END-IF     

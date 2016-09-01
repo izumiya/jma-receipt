@@ -94,6 +94,7 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    16/04/18  平成２８年４月改正対応
+      *  04.08.03    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -949,7 +950,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)    AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                         MOVE    ZERO     TO    FLG-SHOSAISIN
                                                FLG-SHOSAISIN-GEN
                                                FLG-KYUKYU
@@ -974,7 +975,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   (ACCT-ZAITEN    =        ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)    AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                         MOVE    ZERO     TO    FLG-SHOSAISIN
                                                FLG-SHOSAISIN-GEN
                                                FLG-KYUKYU
@@ -1603,7 +1604,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)
-                     IF  ACCT-ZAIKBN    NOT = 1 AND 2
+                     IF  ACCT-ZAIKBN        =    ZERO
                        MOVE    ZERO     TO    WRK-TEN
                                               WRK-KIN
                                               WRK-KIN2
@@ -1667,7 +1668,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   (ACCT-ZAITEN        =    ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)
-                     IF  ACCT-ZAIKBN    NOT = 1 AND 2
+                     IF  ACCT-ZAIKBN        =    ZERO
                        IF    RECE82-HKNKBN   =   "4" OR "6"
                          IF   ACCT-SRYKBN  =  "80"
                              PERFORM   2603-SINDAN-HANTEI-SEC

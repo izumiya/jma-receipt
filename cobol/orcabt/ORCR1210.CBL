@@ -50,6 +50,7 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.03    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -573,7 +574,7 @@
                    IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)    AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                         MOVE    ZERO     TO    FLG-SHOSAISIN
                                                FLG-SHOSAISIN-GEN
       ***               IF   ACCT-SRYKBN  =  "11"  OR
@@ -590,7 +591,7 @@
                    IF   (ACCT-ZAITEN    =        ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)    AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                         MOVE    ZERO     TO    FLG-SHOSAISIN
                                                FLG-SHOSAISIN-GEN
                         IF   ACCT-SRYKBN  =  "11"  OR  "99" 
@@ -601,7 +602,7 @@
                    IF   (ACCT-ZAITEN    NOT =    ZERO)    AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)    AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                         IF   ACCT-SRYKBN  =  "90" OR "92"
                             PERFORM   2001115-NYUINRYO-TAIHI-SEC
                         END-IF
@@ -1892,7 +1893,7 @@
                    IF   (ACCT-ZAITEN    NOT =    ZERO)  AND
                         (ACCT-ZAIKAISU  NOT =    ZERO)  AND
                         (ACCT-JIHOKBN       =   SPACE)  AND
-                        (ACCT-ZAIKBN    NOT = 1 AND 2)
+                        (ACCT-ZAIKBN        =    ZERO)
                      IF   ACCT-SRYKBN  =  "90" OR "92"
                         PERFORM VARYING ACCT-IDX FROM 1 BY 1
                                  UNTIL  ACCT-IDX  >  31

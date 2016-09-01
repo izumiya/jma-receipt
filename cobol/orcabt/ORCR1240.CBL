@@ -83,6 +83,7 @@
       *  04.08.03    NACL-門脇    14/07/23  ３２文字以上の文字列修正
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.05    NACL-門脇    16/08/23  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5323,8 +5324,47 @@
            ADD    1             TO IDX-RECE230
            MOVE  "810000001"    TO WRK-RECE230XX-SRYCD(IDX-RECE230 1)
            MOVE   ZERO          TO WRK-RECE230XX-SRYSURYO(IDX-RECE230 1)
-           MOVE   6             TO WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
-           MOVE  "【包括診療】" TO WRK-RECE230XX-NAME(IDX-RECE230 1)
+      *
+           IF    RECE220-ZAIKBN  =  3 OR 4
+             EVALUATE  RECE220-JISANYAKKBN
+              WHEN     "1"
+               MOVE  19    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療・自院処方分）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "2"
+               MOVE  19    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療・他院処方分）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "3"
+               MOVE  20    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療外・自院処方分）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "4"
+               MOVE  20    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療外・他院処方分）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "5"
+               MOVE  24    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療・自院処方分・数量不明）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "6"
+               MOVE  24    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療・他院処方分・数量不明）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "7"
+               MOVE  25    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療外・自院処方分・数量不明）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+              WHEN     "8"
+               MOVE  25    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【持参薬】（入院契機治療外・他院処方分・数量不明）"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+             END-EVALUATE
+           ELSE
+               MOVE   6    TO  WRK-RECE230XX-YUKOKETA(IDX-RECE230 1)
+               MOVE "【包括診療】"
+                           TO  WRK-RECE230XX-NAME(IDX-RECE230 1)
+           END-IF
       *
            PERFORM  200111-SRYACTINF-HENSYU-SEC
       *
@@ -6619,6 +6659,11 @@
                     ADD    1             TO      IDX-RECE230
                     MOVE   RECE230-SRYACT-TBL(IDX)
                            TO   WRK-RECE230XX-SRYACT-TBL(IDX-RECE230 1)
+                    IF  (RECE220-JIHOKBN  NOT =  SPACE)
+                    AND (RECE220-ZAIKBN       =   4   )
+                       MOVE  ZERO
+                           TO   WRK-RECE230XX-SRYSURYO(IDX-RECE230 1)
+                    END-IF
                END-PERFORM
       *
                PERFORM 990-RECE230-NEXT-SEC
@@ -6662,6 +6707,19 @@
       *
            MOVE    RECE220-REC       TO      RECE2209-REC
            MOVE    WRK-CNT-MEISAI    TO      RECE2209-MEISAISU
+           IF  (RECE220-JIHOKBN  NOT =  SPACE)
+           AND (RECE220-ZAIKBN       =   4   )
+             MOVE  ZERO              TO      RECE2209-ZAITEN
+             MOVE  ZERO              TO      RECE2209-SYUTEN1
+             MOVE  ZERO              TO      RECE2209-SYUTEN2
+             MOVE  ZERO              TO      RECE2209-YKZTEN
+             MOVE  ZERO              TO      RECE2209-KIZAITEN
+             MOVE  ZERO              TO      RECE2209-HOKATU-ZAITEN
+             MOVE  ZERO              TO      RECE2209-HOKATU-SYUTEN1
+             MOVE  ZERO              TO      RECE2209-HOKATU-SYUTEN2
+             MOVE  ZERO              TO      RECE2209-HOKATU-YKZTEN
+             MOVE  ZERO              TO      RECE2209-HOKATU-KIZAITEN
+           END-IF
            WRITE   RECE2209-REC
            ADD     1                 TO      CNT-RECE2209
       *
