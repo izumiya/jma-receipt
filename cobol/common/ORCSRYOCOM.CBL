@@ -224,6 +224,83 @@
                05  CONS-RYOYO-NYUIN-OCC-H22    OCCURS  50.
                    07  CONS-RYOYO-SRYCD-H22    PIC X(09).
       *
+      *    Ê¿À®£²£¸Ç¯£´·î¤Ë¿·Àß¤µ¤ì¤¿£Á£Ä£ÌÅÀ¿ô¥³¥á¥ó¥È¤Î¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
+           03  CONS-ADL-A.
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£±ÅÀ
+               05                          PIC X(09) VALUE "820000199".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£²ÅÀ
+               05                          PIC X(09) VALUE "820000200".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£³ÅÀ
+               05                          PIC X(09) VALUE "820000201".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£´ÅÀ
+               05                          PIC X(09) VALUE "820000202".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£µÅÀ
+               05                          PIC X(09) VALUE "820000203".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£¶ÅÀ
+               05                          PIC X(09) VALUE "820000204".
+      *        £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­¡¡£°ÅÀ
+               05                          PIC X(09) VALUE "820000198".
+           03  CONS-ADL-AR      REDEFINES    CONS-ADL-A.
+               05  CONS-ADL-A-OCC          OCCURS  7.
+                   07  CONS-ADL-A-COMCD    PIC X(09).
+      *
+           03  CONS-ADL-B.
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£±ÅÀ
+               05                          PIC X(09) VALUE "820000206".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£²ÅÀ
+               05                          PIC X(09) VALUE "820000207".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£³ÅÀ
+               05                          PIC X(09) VALUE "820000208".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£´ÅÀ
+               05                          PIC X(09) VALUE "820000209".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£µÅÀ
+               05                          PIC X(09) VALUE "820000210".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£¶ÅÀ
+               05                          PIC X(09) VALUE "820000211".
+      *        £Á£Ä£Ì£â¡¡°Ü¾è¡¡£°ÅÀ
+               05                          PIC X(09) VALUE "820000205".
+           03  CONS-ADL-BR      REDEFINES    CONS-ADL-B.
+               05  CONS-ADL-B-OCC          OCCURS  7.
+                   07  CONS-ADL-B-COMCD    PIC X(09).
+      *
+           03  CONS-ADL-C.
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£±ÅÀ
+               05                          PIC X(09) VALUE "820000213".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£²ÅÀ
+               05                          PIC X(09) VALUE "820000214".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£³ÅÀ
+               05                          PIC X(09) VALUE "820000215".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£´ÅÀ
+               05                          PIC X(09) VALUE "820000216".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£µÅÀ
+               05                          PIC X(09) VALUE "820000217".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£¶ÅÀ
+               05                          PIC X(09) VALUE "820000218".
+      *        £Á£Ä£Ì£ã¡¡¿©»ö¡¡£°ÅÀ
+               05                          PIC X(09) VALUE "820000212".
+           03  CONS-ADL-CR      REDEFINES    CONS-ADL-C.
+               05  CONS-ADL-C-OCC          OCCURS  7.
+                   07  CONS-ADL-C-COMCD    PIC X(09).
+      *
+           03  CONS-ADL-D.
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£±ÅÀ
+               05                          PIC X(09) VALUE "820000220".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£²ÅÀ
+               05                          PIC X(09) VALUE "820000221".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£³ÅÀ
+               05                          PIC X(09) VALUE "820000222".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£´ÅÀ
+               05                          PIC X(09) VALUE "820000223".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£µÅÀ
+               05                          PIC X(09) VALUE "820000224".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£¶ÅÀ
+               05                          PIC X(09) VALUE "820000225".
+      *        £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ¡¡£°ÅÀ
+               05                          PIC X(09) VALUE "820000219".
+           03  CONS-ADL-DR      REDEFINES    CONS-ADL-D.
+               05  CONS-ADL-D-OCC          OCCURS  7.
+                   07  CONS-ADL-D-COMCD    PIC X(09).
+      *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
       *
@@ -1097,38 +1174,117 @@
                               LNK-RYOCOM-SRYCDTOTAL(IDX)   +
                               LNK-RYOCOM-ADL-TEN(IDX)
                   ELSE
+      **              DISPLAY "==============================="
+      **              DISPLAY "IDX = " IDX
+      **              DISPLAY "LNK-RYOCOM-ADL-TEN-H22(IDX 1) = "
+      **                      LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+      **              DISPLAY "LNK-RYOCOM-ADL-TEN-H22(IDX 2) = "
+      **                       LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+      **              DISPLAY "LNK-RYOCOM-ADL-TEN-H22(IDX 3) = "
+      **                       LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+      **              DISPLAY "LNK-RYOCOM-ADL-TEN-H22(IDX 4) = "
+      **                       LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+      **              MOVE   LNK-RYOCOM-SRYCDTOTAL(IDX)
+      **                                   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
       *             £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
                     MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 1)
                                          TO  WRK-SRYCD-X
                     ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
-                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
-                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
-                              LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
+                    ADD    LNK-RYOCOM-ADL-TEN-H22(IDX 1)
+                                         TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
       *             £Á£Ä£Ì£â¡¡°Ü¾è
                     MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 2)
                                          TO  WRK-SRYCD-X
                     ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
-                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
-                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
-                              LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
+                    ADD    LNK-RYOCOM-ADL-TEN-H22(IDX 2)
+                                         TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
       *             £Á£Ä£Ì£ã¡¡¿©»ö
                     MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 3)
                                          TO  WRK-SRYCD-X
                     ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
-                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
-                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
-                              LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
+                    ADD    LNK-RYOCOM-ADL-TEN-H22(IDX 3)
+                                         TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
       *             £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
                     MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 4)
                                          TO  WRK-SRYCD-X
                     ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL(IDX)
-                    COMPUTE   LNK-RYOCOM-SRYCDTOTAL2(IDX)   =
-                              LNK-RYOCOM-SRYCDTOTAL(IDX)   +
-                              LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+                    ADD    WRK-SRYCD-9   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
+                    ADD    LNK-RYOCOM-ADL-TEN-H22(IDX 4)
+                                         TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
                   END-IF
                END-IF
            END-PERFORM
       *
+      **     PERFORM     VARYING   IDX1    FROM  1  BY  1
+      **       UNTIL     IDX1   >  31
+      **           DISPLAY "IDX1 = " IDX1
+      **           DISPLAY "LNK-RYOCOM-SRYCDTOTAL(IDX1) = "
+      **                    LNK-RYOCOM-SRYCDTOTAL(IDX1)
+      **           DISPLAY "LNK-RYOCOM-SRYCDTOTAL2(IDX1) = "
+      **                    LNK-RYOCOM-SRYCDTOTAL2(IDX1)
+      **     END-PERFORM
+      *
+      *    £Á£Ä£ÌÅÀ¿ô¤Î¥³¡¼¥ÉÊÑ´¹¡ÊÊ¿À®£²£¸Ç¯£´·î¤«¤é¤Î¿·Àß¥³¡¼¥ÉÊÖµÑÍÑ¡Ë
+           IF    LNK-RYOCOM-SANTEIYM       >=   "201604"
+             PERFORM   VARYING   IDX   FROM  1  BY  1
+               UNTIL   IDX    >   31
+                 IF   LNK-RYOCOM-NYUINKBN(IDX)  =  "1"
+      *             £Á£Ä£Ì£á¡¡¥Ù¥Ã¥É¾å¤Î²ÄÆ°À­
+                    IF      LNK-RYOCOM-ADL-TEN-H22(IDX 1)   =  ZERO
+                        MOVE  CONS-ADL-A-COMCD(7)
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 1)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 1)   TO  IDX1
+                        MOVE  CONS-ADL-A-COMCD(IDX1) 
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 1)
+                    END-IF
+      *             £Á£Ä£Ì£â¡¡°Ü¾è
+                    IF      LNK-RYOCOM-ADL-TEN-H22(IDX 2)   =  ZERO
+                        MOVE  CONS-ADL-B-COMCD(7)
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 2)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 2)   TO  IDX1
+                        MOVE  CONS-ADL-B-COMCD(IDX1) 
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 2)
+                    END-IF
+      *             £Á£Ä£Ì£ã¡¡¿©»ö
+                    IF      LNK-RYOCOM-ADL-TEN-H22(IDX 3)   =  ZERO
+                        MOVE  CONS-ADL-C-COMCD(7)
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 3)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 3)   TO  IDX1
+                        MOVE  CONS-ADL-C-COMCD(IDX1) 
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 3)
+                    END-IF
+      *             £Á£Ä£Ì£ä¡¡¥È¥¤¥ì¤Î»ÈÍÑ
+                    IF      LNK-RYOCOM-ADL-TEN-H22(IDX 4)   =  ZERO
+                        MOVE  CONS-ADL-D-COMCD(7)
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 4)
+                    ELSE
+                        MOVE  LNK-RYOCOM-ADL-TEN-H22(IDX 4)   TO  IDX1
+                        MOVE  CONS-ADL-D-COMCD(IDX1) 
+                                    TO  LNK-RYOCOM-ADL-SRYCD-H28(IDX 4)
+                    END-IF
+                 END-IF
+             END-PERFORM
+           END-IF
+      *
+      **     PERFORM     VARYING   IDX    FROM  1  BY  1
+      **       UNTIL     IDX   >  31
+      **           DISPLAY "-----------(H28 COMMENT-----------"
+      **           DISPLAY "IDX = " IDX
+      **           DISPLAY "LNK-RYOCOM-ADL-SRYCD-H28(IDX 1) = "
+      **                    LNK-RYOCOM-ADL-SRYCD-H28(IDX 1)
+      **           DISPLAY "LNK-RYOCOM-ADL-SRYCD-H28(IDX 2) = "
+      **                    LNK-RYOCOM-ADL-SRYCD-H28(IDX 2)
+      **           DISPLAY "LNK-RYOCOM-ADL-SRYCD-H28(IDX 3) = "
+      **                    LNK-RYOCOM-ADL-SRYCD-H28(IDX 3)
+      **           DISPLAY "LNK-RYOCOM-ADL-SRYCD-H28(IDX 4) = "
+      **                    LNK-RYOCOM-ADL-SRYCD-H28(IDX 4)
+      **     END-PERFORM
            .
        200-MAIN-EXT.
            EXIT.
