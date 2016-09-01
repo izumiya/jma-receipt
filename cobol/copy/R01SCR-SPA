@@ -38,6 +38,7 @@
       *
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
+      *  04.08.02    NACL-藤原    16/08/24  持参薬対応
       *****************************************************************
       *
        01  SPA-R01FREE.
@@ -49,7 +50,7 @@
                05  SPA-GMN-R01-PAGE                PIC 9(02).
                05  SPA-GMN-R01-CUR                 PIC 9(02).
                05  SPA-GMN-R01-AREA.
-                   07  SPA-GMN-R01-SYOKBN          PIC X(60).
+                   07  SPA-GMN-R01-SYOKBN          PIC X(68).
                    07  SPA-GMN-R01-LABEL           PIC X(10).
                    07  SPA-GMN-R01-LABEL1          PIC X(12).
                    07  SPA-GMN-R01-LABEL2          PIC X(14).

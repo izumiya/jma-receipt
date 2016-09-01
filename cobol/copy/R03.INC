@@ -21,7 +21,7 @@
                 04  R03-PRTKBN-ITEM    PIC X(32)    OCCURS  10 TIMES.
               03  R03-PRTKBN-LABEL-STYLE   PIC X(20).
               03  R03-PRTKBN-LABEL.
-                04  R03-VALUE   PIC X(28).
+                04  R03-VALUE   PIC X(36).
               03  R03-KOBETU.
                 04  R03-VALUE   PIC X.
               03  R03-DATAKBN1.

@@ -134,6 +134,7 @@
       *  04.08.01    NACL-疲付    12/01/08  蜀崇壳闻尸の爬浮脱レセプト淡
       *                                     很滦炳
       *  04.08.02    NACL-疲付    14/07/07  办箕ディレクトリ滦炳
+      *  04.08.03    NACL-疲付    16/08/24  积徊挑滦炳
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -207,7 +208,7 @@
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-PRTKBNMEI       PIC X(30).
       *             
-                   07  SPA-GMN-PRTKBN-LABEL        PIC X(28).
+                   07  SPA-GMN-PRTKBN-LABEL        PIC X(36).
       *
                    07  SPA-DATAKBN.         
                        09  SPA-DATAKBN1-VALUE      PIC X(01).
@@ -1142,10 +1143,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                            MOVE    "０爬给锐淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
                        WHEN    "0"     ALSO    "1"
-                           MOVE    "蜀崇壳闻尸淡很肋年"
+                           MOVE    "蜀崇壳闻尸ˇ积徊挑淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
                        WHEN    "1"     ALSO    "1"
-                           MOVE    "０爬给锐ˇ蜀崇壳闻尸淡很肋年"
+                           MOVE
+                               "０爬给锐ˇ蜀崇壳闻尸ˇ积徊挑淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
       ******           WHEN    "0"     ALSO    "0"
       ******               MOVE    "０爬给锐を淡很しない"
@@ -1495,10 +1497,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                            MOVE    "０爬给锐淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
                        WHEN    "0"    ALSO    "1"
-                           MOVE    "蜀崇壳闻尸淡很肋年"
+                           MOVE    "蜀崇壳闻尸ˇ积徊挑淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
                        WHEN    "1"    ALSO    "1"
-                           MOVE    "０爬给锐ˇ蜀崇壳闻尸淡很肋年"
+                           MOVE
+                               "０爬给锐ˇ蜀崇壳闻尸ˇ积徊挑淡很肋年"
                                                TO  SPA-GMN-PRTKBN-LABEL
       ******           WHEN    "0"    ALSO    "0"
       ******               MOVE    "０爬给锐を淡很しない"

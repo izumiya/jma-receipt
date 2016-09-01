@@ -849,7 +849,7 @@
         <name>PRTKBN_LABEL</name>
         <x>600</x>
         <y>64</y>
-        <width>200</width>
+        <width>250</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -858,7 +858,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>０点公費・包括算定分記載設定</label>
+        <label>０点公費・包括算定分・持参薬記載設定</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>

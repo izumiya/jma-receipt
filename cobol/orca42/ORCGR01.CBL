@@ -177,6 +177,7 @@
       *  04.08.03    NACL-藤原    15/10/09  削除処理を行わない場合の表示
       *  04.08.04    NACL-藤原    16/05/20  情報削除から遷移時の共通スパ
       *                                     設定の修正
+      *  04.08.05    NACL-藤原    16/08/24  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -336,7 +337,7 @@
              05  WRK-SHELL-SYSYMD  PIC X(08).  
            03  WRK-RECEKBN         PIC X(20).
            03  WRK-NYUGAIKBN       PIC X(10).
-           03  WRK-PRTKBN          PIC X(44).
+           03  WRK-PRTKBN          PIC X(52).
            03  WRK-ERRCD           PIC X(04).
       *
            03  WRK-KBNCD-X.
@@ -727,10 +728,11 @@
                    MOVE    "【点検用（０点公費記載設定）】"
                                            TO  WRK-PRTKBN
                WHEN    "4"
-                   MOVE    "【点検用（包括診療分記載設定）】"
+                   MOVE    "【点検用（包括診療分・持参薬記載設定）】"
                                            TO  WRK-PRTKBN
                WHEN    "5"
-                   MOVE    "【点検用（０点公費・包括診療分記載設定）】"
+                   MOVE
+                   "【点検用（０点公費・包括診療分・持参薬記載設定）】"
                                            TO  WRK-PRTKBN
                WHEN    "8"
                    MOVE    "【ＥＦファイル】"  TO  WRK-PRTKBN

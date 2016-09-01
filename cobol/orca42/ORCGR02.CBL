@@ -156,6 +156,7 @@
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    16/03/07  プリンタ設定の修正
+      *  04.08.04    NACL-藤原    16/08/24  持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -286,7 +287,7 @@
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
            03  WRK-RECEERR         PIC X(200).
-           03  WRK-PRTKBN          PIC X(40).
+           03  WRK-PRTKBN          PIC X(42).
            03  WRK-RECEKBN         PIC X(10).
            03  WRK-NYUGAIKBN       PIC X(06).
            03  WRK-PREFKBN         PIC X(01).
@@ -740,10 +741,10 @@
                    MOVE    "【点検用（０点公費）】"
                                            TO  WRK-PRTKBN
                WHEN    "4"
-                   MOVE    "【点検用（包括診療分）】"
+                   MOVE    "【点検用（包括診療分・持参薬）】"
                                            TO  WRK-PRTKBN
                WHEN    "5"
-                   MOVE    "【点検用（０点公費・包括診療）】"
+                   MOVE    "【点検用（０点公費・包括診療分・持参薬）】"
                                            TO  WRK-PRTKBN
                WHEN    OTHER
                    MOVE    SPACE           TO  WRK-PRTKBN

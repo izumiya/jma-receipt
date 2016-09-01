@@ -33,7 +33,7 @@ R03 {
     };
     PRTKBN_LABEL {
       style varchar(20);
-      textdata varchar(28);
+      textdata varchar(36);
     };
     KOBETU {
       isactive bool;

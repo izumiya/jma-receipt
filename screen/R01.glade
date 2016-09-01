@@ -1112,9 +1112,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>SYOKBN</name>
-        <x>50</x>
+        <x>3</x>
         <y>3</y>
-        <width>405</width>
+        <width>445</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -1123,7 +1123,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０</label>
+        <label>１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０１２３４</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
