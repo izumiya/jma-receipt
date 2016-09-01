@@ -81,6 +81,7 @@
       *  04.07.06    NACL-門脇    15/03/16  平成２７年４月改正対応
       *
       *  04.08.01    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.02    NACL-小豆沢  16/08/25  平成２８年１０月持参薬対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1710,13 +1711,19 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                        MOVE    KEY-NEW             TO  KEY-OLD
                        PERFORM     UNTIL   FLG-SRYACCT =   1
                                    OR      KEY-NEW NOT =   KEY-OLD
-                           PERFORM 2003-SRYACCT-HENSYU-SEC
+      *                    持参薬以外の時、編集処理を行う
+                           IF    ACCT-ZAIKBN   NOT =   3  AND  4
+                               PERFORM 2003-SRYACCT-HENSYU-SEC
+                           END-IF
                            MOVE    "tbl_sryacct"      TO  MCP-TABLE
                            MOVE    "key9"             TO  MCP-PATHNAME
                            PERFORM 900-SRYACCT-READ-SEC
                        END-PERFORM
                    ELSE
-                       PERFORM 2003-SRYACCT-HENSYU-SEC
+      *                持参薬以外の時、編集処理を行う
+                       IF    ACCT-ZAIKBN   NOT =   3  AND  4
+                           PERFORM 2003-SRYACCT-HENSYU-SEC
+                       END-IF
                        MOVE    "tbl_sryacct"      TO  MCP-TABLE
                        MOVE    "key9"             TO  MCP-PATHNAME
                        PERFORM 900-SRYACCT-READ-SEC
