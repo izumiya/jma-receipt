@@ -207,6 +207,7 @@
            03  CNT-YKZINGAI                        PIC 9(05).
            03  CNT-YKZHKT                          PIC 9(05).
            03  CNT-ZAIHKT                          PIC 9(05).
+           03  CNT-JISANYAKU                       PIC 9(05).
            03  CNT-SPACE                           PIC 9(05).
            03  CNT-STR                             PIC 9(05).
            03  CNT-BYOMEIMOJI                      PIC 9(05).
@@ -1127,6 +1128,7 @@
            MOVE    ZERO                TO  CNT-YKZINGAI
            MOVE    ZERO                TO  CNT-YKZHKT
            MOVE    ZERO                TO  CNT-ZAIHKT
+           MOVE    ZERO                TO  CNT-JISANYAKU
            MOVE    LOW-VALUE           TO  WRK-KEY-HKNCOMBI
            MOVE    ZERO                TO  WRK-TTL-TEN
            MOVE    ZERO                TO  WRK-TTL-KINGAKU
@@ -4231,9 +4233,15 @@
            MOVE    SPACE               TO  WRK-SRYACT-MARK
            EVALUATE    TRUE
            WHEN  ( ACCT-JIHOKBN    =   "1" )
-               MOVE    "¡ý"   TO  WRK-SRYACT-MARK
-               COMPUTE CNT-ZAIHKT
-                   =   CNT-ZAIHKT  +   1
+               IF    ( ACCT-ZAIKBN =   3 OR 4 )
+                   MOVE    "¡þ"   TO  WRK-SRYACT-MARK
+                   COMPUTE CNT-JISANYAKU
+                       =   CNT-JISANYAKU  +   1
+               ELSE
+                   MOVE    "¡ý"   TO  WRK-SRYACT-MARK
+                   COMPUTE CNT-ZAIHKT
+                       =   CNT-ZAIHKT  +   1
+               END-IF
            WHEN  ( ACCT-ZAITEN         =   ZERO )
             AND  ( FLG-SRYSTATUS       =   1 )
                    EVALUATE    TRUE
@@ -7032,6 +7040,7 @@
                MOVE    ZERO        TO  CNT-YKZINGAI
                MOVE    ZERO        TO  CNT-YKZHKT
                MOVE    ZERO        TO  CNT-ZAIHKT
+               MOVE    ZERO        TO  CNT-JISANYAKU
            END-IF
       *
            .
@@ -7437,6 +7446,13 @@
                END-STRING
            END-IF
       *
+           IF    ( CNT-JISANYAKU     >       ZERO )
+               STRING  "¡þ¡§»ý»²Ìô¡¡"  DELIMITED   BY  SIZE
+               INTO    HCM341-COMMENT
+               WITH    POINTER     IDX-PNT
+               END-STRING
+           END-IF
+      *
            IF    ( CNT-YKZINGAI    >       ZERO )
                STRING  "¡ù¡§±¡³°½èÊý¤ÎÌôºÞ¡¡"  DELIMITED   BY  SIZE
                INTO    HCM341-COMMENT
@@ -7497,6 +7513,14 @@
       *
            IF    ( CNT-ZAIHKT     >       ZERO )
                STRING  "¡ý¡§Êñ³çÂÐ¾ÝÊ¬¡¡"  DELIMITED   BY  SIZE
+               INTO    HCM342-COMMENT
+               WITH    POINTER     IDX-PNT
+               END-STRING
+           END-IF
+      *
+      *
+           IF    ( CNT-JISANYAKU     >       ZERO )
+               STRING  "¡þ¡§»ý»²Ìô¡¡"  DELIMITED   BY  SIZE
                INTO    HCM342-COMMENT
                WITH    POINTER     IDX-PNT
                END-STRING
