@@ -179,7 +179,7 @@ class Tekiyo < Receden_common
       when "CO"
           @zai << csv_to_hash(info["CO"],csv)
           if check_level != "1"
-            if @zai.last["SRYCD"].value == "810000001" && @zai.last["DATA"].value == "【包括診療】"
+            if @zai.last["SRYCD"].value == "810000001" && @zai.last["DATA"].value =~ /^(【包括診療】$|【持参薬】)/
               @hokatsu = true
             end
           end
