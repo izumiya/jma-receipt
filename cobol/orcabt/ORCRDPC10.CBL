@@ -141,6 +141,8 @@
       *                                     ゼロをセット。
       *                                     F-19(2)（持参薬区分）、F-19(3)（持参薬
       *                                     処方区分）をセット。
+      *              NACL-小豆沢  16/09/05  退院時処方（複数薬剤入力時）
+      *                                     の記録修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1198,6 +1200,10 @@
              05  WRK-FEDT-KOUI-MEISAI10  PIC 9(01).
              05  WRK-FEDT-KOUI-MEISAI11  PIC 9(01).
              05  WRK-FEDT-KOUI-MEISAI12  PIC 9(01).
+      *
+      *    退院時処方退避ワーク
+       01  WRK-TAIIN-SHOHOU-AREA.
+           03  WRK-TAIIN-SHOHOU                    PIC X(01).
       *
       *    保険組み合わせ退避ワーク
        01  THKNCOMBI-AREA.
@@ -2665,6 +2671,7 @@
                                            WRK-SRYCD71-MAX
                                            WRK-SRYCD72-MAX
                                            WRK-KOKUJISKBKBN1-KOUI-TEN
+           MOVE     SPACE              TO  WRK-TAIIN-SHOHOU
       *
       *    9999包括分剤は自保区分に１がセットされている
            IF       RECE641-JIHOKBN        =   "1"
@@ -2777,7 +2784,7 @@
                               END-IF
                             ELSE
                               IF  WRK-FEDT-HOUKATU-FLG     NOT =   "6"
-                                  MOVE   1     TO WRK-FEDT-KOUI-MEISAI1
+                                  MOVE  "1"     TO WRK-TAIIN-SHOHOU
                               END-IF
                             END-IF
       *---AZU-MOD END   2016.07.04
@@ -5681,6 +5688,9 @@
                   END-IF
                ELSE
                   MOVE    ZERO             TO  WRK-FEDT-KOUI-MEISAI2
+                  IF   WRK-TAIIN-SHOHOU    =    "1"
+                     MOVE    1             TO  WRK-FEDT-KOUI-MEISAI1
+                  END-IF
                END-IF
       *--- AZU-ADD START 2016.08.23
       *        持参薬区分
