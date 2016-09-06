@@ -2796,6 +2796,7 @@
       *H25.9
            IF    (SPA-ERRCD            =   SPACE   )
             AND  (SPA-K061-SYORIKBN    NOT =   "P" )
+            AND  (SPA-K061-SELNUM     >   ZERO )
       *        更新チェック
                PERFORM 45011-KANREN-UPDCHK-SEC
            END-IF

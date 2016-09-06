@@ -1402,7 +1402,7 @@
                    MOVE    SGDAY-OTDAY         TO  SPA-GMN28-CRNINYMD
                    MOVE    SGDAY-SDAY          TO  SPA-NAI28-CRNINYMD
                ELSE
-                   MOVE    "2814"          TO  SPA-ERRCD
+                   MOVE    "2822"          TO  SPA-ERRCD
                    MOVE    22              TO  SPA-GMN28-CUR
                END-IF
            END-IF

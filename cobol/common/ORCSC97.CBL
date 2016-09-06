@@ -1495,7 +1495,7 @@
       *****************************************************************
        930-INPUTCD-READ-SEC         SECTION.
       *
-           IF      WRK-CD-MCNT         =   20
+           IF      WRK-CD-MCNT         >=   20
                MOVE    "key2"          TO  WRK-PATH
            ELSE
                MOVE    "key"           TO  WRK-PATH
