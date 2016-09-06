@@ -281,6 +281,9 @@
       *                                     コメントのチェックを診療区分９８、
       *                                     院外湿布薬７０枚超理由コメントは
       *                                     対象としない
+      *  04.08.08    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
+      *                                     種別不明レセ対応
+      *                                     残留法人等の負担者番号、受給者番号なし
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1685,24 +1688,33 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    PERFORM 2008-SYS2006-HENSYU-SEC
                END-IF
       *
-      *        生保の負担者番号、受給者番号の入力がない時のエラー設定
+      *        生保・残留法人等の負担者番号、受給者番号の入力がない
+      *        時のエラー設定
       *        災害該当のときはチェックしない 
                IF  (   ( SYS-200501-CHKKBN     =   "1"    )
                     OR ( SYS-200501-CHKKBN     =   "2" AND
                          RECE02-RECESYUBETU
                                            NOT =   "8888" ) )
-               AND  (    RECE02-RJNGAIKOHFTN (1)
+               AND (     RECE02-RJNGAIKOHFTN (1)
                                                =   0        )
                    PERFORM VARYING IDX6    FROM    1   BY  1
                            UNTIL   IDX6 >          4
                            OR      RECE02-KOHNUM(IDX6) =   SPACE
                            OR      RECE02-ERR-ERRKBN   >   ZERO 
-                       IF      RECE02-KOHNUM (IDX6)    =   "012"    
+                       IF      RECE02-KOHNUM (IDX6)    =   "012"
                            IF    ( RECE02-KOHFTNJANUM (IDX6)
                                                        =   SPACE )
                            OR    ( RECE02-KOHJKYSNUM (IDX6)
                                                        =   SPACE )
                                MOVE    13      TO  RECE02-ERR-ERRKBN
+                           END-IF
+                       END-IF
+                       IF      RECE02-KOHNUM (IDX6)    =   "025"
+                           IF    ( RECE02-KOHFTNJANUM (IDX6)
+                                                       =   SPACE )
+                           OR    ( RECE02-KOHJKYSNUM (IDX6)
+                                                       =   SPACE )
+                               MOVE    14      TO  RECE02-ERR-ERRKBN
                            END-IF
                        END-IF
                    END-PERFORM

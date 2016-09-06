@@ -218,6 +218,9 @@
       *                                     第３第４公費の括弧再掲記載対応
       *  04.08.06    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *  04.08.07    NACL-藤原    16/04/01  平成２８年４月改正対応
+      *  04.08.08    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
+      *                                     種別不明レセ対応
+      *                                     残留法人等の負担者番号、受給者番号なし
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1202,6 +1205,12 @@
            03  WRK-ERR-MSG-15.
                05  FILLER          PIC X(20)  VALUE
                    "【０点公費記載あり】".
+      *
+           03  WRK-ERR-MSG-16.
+               05  FILLER          PIC X(42)   VALUE
+                   "残留法人等の負担者番号、受給者番号の入力が". 
+               05  FILLER          PIC X(10)   VALUE
+                   "ありません". 
       *
            03  WRK-ERR-MSG-88.
                05  FILLER          PIC X(24)  VALUE
@@ -3592,6 +3601,8 @@
                    MOVE    WRK-ERR-MSG-13  TO   HC06-HEAD4-G (5:)
                WHEN    13
                    MOVE    WRK-ERR-MSG-14  TO   HC06-HEAD4-G (5:)
+               WHEN    14
+                   MOVE    WRK-ERR-MSG-16  TO   HC06-HEAD4-G (5:)
                WHEN    88
                    MOVE    WRK-ERR-MSG-88  TO   HC06-HEAD4-G (5:)
            END-EVALUATE        

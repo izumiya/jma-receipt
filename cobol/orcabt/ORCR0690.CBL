@@ -200,6 +200,9 @@
       *  04.08.04    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.06    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.07    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
+      *                                     種別不明レセ対応
+      *                                     残留法人等の負担者番号、受給者番号なし
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1412,7 +1415,9 @@
                    PERFORM 2008-SYS2006-HENSYU-SEC
                END-IF
       *
-      *        生保の負担者番号、受給者番号の入力がない時のエラー設定
+      *        生保・残留法人等の負担者番号、受給者番号の入力がない
+      *        時のエラー設定
+      *        災害該当のときはチェックしない 
                IF  (   ( SYS-200501-CHKKBN     =   "1"    )
                     OR ( SYS-200501-CHKKBN     =   "2" AND
                          RECE62-RECESYUBETU
@@ -1429,6 +1434,14 @@
                            OR    ( RECE62-KOHJKYSNUM (IDX6)
                                                        =   SPACE )
                                MOVE    13      TO  RECE62-ERR-ERRKBN
+                           END-IF
+                       END-IF
+                       IF      RECE62-KOHNUM (IDX6)    =   "025"
+                           IF    ( RECE62-KOHFTNJANUM (IDX6)
+                                                       =   SPACE )
+                           OR    ( RECE62-KOHJKYSNUM (IDX6)
+                                                       =   SPACE )
+                               MOVE    14      TO  RECE62-ERR-ERRKBN
                            END-IF
                        END-IF
                    END-PERFORM
