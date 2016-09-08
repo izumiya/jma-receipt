@@ -5899,12 +5899,37 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF     (SPA-GMN-SETCODE     NOT =   SPACE )  AND
                   (SPA-K05-SYORI       =   "2"       )
-              MOVE    "0001"               TO  SPA-KIDCD
+      *H28.9 
+      ****    MOVE    "0001"               TO  SPA-KIDCD
+              CONTINUE
            ELSE
-              MOVE    "5007"               TO  SPA-ERRCD
-              MOVE    1                    TO  SPA-GMN5-CUR
+               MOVE    "5007"               TO  SPA-ERRCD
+               MOVE    1                    TO  SPA-GMN5-CUR
            END-IF
       *
+      *H28.9 
+      *    選択番号があること
+           IF     SPA-K05-SELNUM       =   ZERO
+               MOVE    "5025"              TO  SPA-ERRCD
+               MOVE    13                  TO  SPA-GMN5-CUR
+           END-IF
+           MOVE    ZERO                TO  FLG-CHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >  SPA-K05-RRK-MAX )
+                           OR (FLG-CHK        =   1    )
+                           OR (SPA-ERRCD  NOT =   SPACE )
+               IF      SPA-K05-TRENNUM (IDX) =   SPA-K05-SELNUM
+                   MOVE    1               TO  FLG-CHK
+               END-IF
+           END-PERFORM
+           IF      FLG-CHK             =   ZERO
+               MOVE    "5025"              TO  SPA-ERRCD
+               MOVE    13                  TO  SPA-GMN5-CUR
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    "0001"              TO  SPA-KIDCD
+           END-IF
            .
        430-SETDEL-EXT.
            EXIT.
