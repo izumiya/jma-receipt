@@ -755,7 +755,7 @@
           <border_width>0</border_width>
           <show_titles>True</show_titles>
           <columns>12</columns>
-          <column_widths>50,13,120,177,73,50,100,85,50,20.50,50</column_widths>
+          <column_widths>50,13,120,177,73,50,100,85,50,20,50,50</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
