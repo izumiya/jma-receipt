@@ -4650,6 +4650,7 @@
        20077-NYUIN-HENSYU-SEC           SECTION.
       *
            MOVE           0        TO      FLG-TOKUTEINYUIN-SET
+           MOVE           SPACE    TO      WRK-TAIIN-SHOHOU
       *
       *    Æþ±¡ÎÁ
            PERFORM VARYING IDZ1    FROM    1   BY  1
