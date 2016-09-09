@@ -747,6 +747,7 @@
       *  04.08.28    NACL-門脇    16/06/22  主保険がないレセプトの全国公費一部
       *                                     負担金記載修正
       *  04.08.29    NACL-門脇    16/08/03  全国公費一部負担金記載修正
+      *  04.08.30    NACL-門脇    16/09/09  全国公費一部負担金記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -25391,6 +25392,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                   = RECE02-FTNMONEY(KOHFTN-IDX + 1))
                 AND (WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
                                   = RECE02-FTNMONEY(KOHFTN-IDX + 1))
+                AND (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
+                              NOT = RECE02-FTNMONEY(KOHFTN-IDX + 1))
                   MOVE  WRK-KOH-KINGAKU  TO
                                   RECE02-FTNMONEY(KOHFTN-IDX + 1)
                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)

@@ -723,6 +723,7 @@
       *                                     措置（精神）入院年月日のコメント対応
       *  04.08.23    NACL-門脇    16/08/03  全国公費一部負担金記載修正
       *  04.08.24    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.25    NACL-門脇    16/09/09  全国公費一部負担金記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -29340,6 +29341,8 @@
                                   = RECE62-FTNMONEY(KOHFTN-IDX + 1))
                 AND (WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
                                   = RECE62-FTNMONEY(KOHFTN-IDX + 1))
+                AND (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)
+                              NOT = RECE62-FTNMONEY(KOHFTN-IDX + 1))
                   MOVE  WRK-KOH-KINGAKU  TO
                                   RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                   RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
