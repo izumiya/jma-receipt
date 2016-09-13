@@ -918,3 +918,18 @@ path	key49	{
 		;
 	};
 };
+
+path	key50		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key50_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID         =   :PTID
+			AND   SRYKA        like   :SRYKA 
+			AND   SRYYMD       <=  :SRYYMD
+			AND   DLTFLG       =   ' '
+			ORDER  BY  SRYYMD DESC,SEQNUM,SRYKA,RENNUM
+		;
+	};
+};

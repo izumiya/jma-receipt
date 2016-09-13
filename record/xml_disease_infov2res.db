@@ -9,6 +9,7 @@ xml_disease_infov2res {
 	Api_Result		varchar(2);
 	Api_Result_Message	varchar(100);
 	Reskey			varchar(100);
+	Information_Overflow	varchar(5);
 	Disease_Infores {
 		Patient_ID		varchar(20);
 		WholeName		varchar(100);

@@ -29,3 +29,5 @@
               03  DISEREQ-PATIENTID    PIC X(20).
       *       基準年月
               03  DISEREQ-BASE-DATE    PIC X(10).
+      *       出力設定
+              03  DISEREQ-SELECT-MODE  PIC X(3).

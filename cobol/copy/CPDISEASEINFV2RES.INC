@@ -35,6 +35,9 @@
               03  DISERES-API-RESULT-MSG      PIC X(100).
       *
               03  DISERES-RESKEY              PIC X(100).
+      *       病名情報オーバーフラグ
+              03  DISERES-INFORMATION-OVERFLOW
+                                              PIC X(5).
       *       患者情報
               03  DISERES-PATIENT-INFOMATION.
       *           患者番号

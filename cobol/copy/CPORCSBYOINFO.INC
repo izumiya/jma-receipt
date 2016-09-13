@@ -25,6 +25,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
       *                                     原疾患区分、合併症区分
+      *  04.08.02    NACL-藤原    16/09/08  全ての患者病名情報の取得対応
       ************************************************************
       *
        01  ORCSBYOINFOAREA.
@@ -35,8 +36,13 @@
       *    診療年月
            03  SBYOINFO-SRYYM              PIC 9(06).
       *
+           03  SBYOINFO-SELECT-MODE        PIC X(03).
+      *
       *    出力領域
            03  SBYOINFO-OUT-AREA.
+      *        病名情報オーバーフラグ
+      ***      05  SBYOINFO-OVERFLOW       PIC X(01).
+      *
                05  SBYOINFO-OUT-TBL        OCCURS  200.
       *        診療科
                    07  SBYOINFO-SRYKA      PIC X(02).

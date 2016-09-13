@@ -31,6 +31,7 @@
       *
       *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
       *                                     原疾患区分、合併症区分
+      *  04.08.02    NACL-藤原    16/09/08  全ての患者病名情報の取得対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -105,6 +106,7 @@
                05  WRK-BASE-YM          PIC X(06).
                05  WRK-BASE-DD          PIC X(02).
            03  WRK-PTNUM               PIC X(20).
+           03  WRK-SELECT-MODE         PIC X(03).
       *
       *
       *****************************************************************
@@ -473,6 +475,9 @@
            IF     DISEREQ-BASE-DATE     =   LOW-VALUE
                MOVE  SPACE             TO  DISEREQ-BASE-DATE
            END-IF
+           IF     DISEREQ-SELECT-MODE   =   LOW-VALUE
+               MOVE  SPACE             TO  DISEREQ-SELECT-MODE
+           END-IF
       *
            .
        10001-XML-REMAKE-EXT.
@@ -517,6 +522,13 @@
                MOVE    SMCNDATE-YMD        TO  WRK-BASE-YMD
                MOVE    DISERES-INFORMATION-DATE
                                            TO  DISEREQ-BASE-DATE
+           END-IF
+      *    出力設定
+           MOVE    DISEREQ-SELECT-MODE     TO  WRK-SELECT-MODE
+           IF      WRK-SELECT-MODE         =   "All"
+               CONTINUE
+           ELSE
+               MOVE    SPACE                   TO  WRK-SELECT-MODE
            END-IF
       *
       *    必須入力チェック
@@ -600,6 +612,9 @@
            MOVE    SPA-PTID            TO  SBYOINFO-PTID
       *    診療年月
            MOVE    WRK-BASE-YM         TO  SBYOINFO-SRYYM
+      *    出力設定
+           MOVE    WRK-SELECT-MODE     TO  SBYOINFO-SELECT-MODE
+      *
            CALL    "ORCSBYOINFO"   USING   ORCSBYOINFOAREA
                                            SPA-AREA
       *
@@ -613,7 +628,12 @@
       *
            IF      SBYOINFO-RC    NOT =   ZERO
       *        200件以上あり
+               MOVE    "True"             TO
+                                          DISERES-INFORMATION-OVERFLOW
                MOVE    "20"               TO  WRK-ERRCD
+           ELSE
+               MOVE    "False"           TO
+                                          DISERES-INFORMATION-OVERFLOW
            END-IF
       *
            IF      TBL-MAX             =   ZERO
