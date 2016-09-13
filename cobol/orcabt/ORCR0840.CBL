@@ -281,6 +281,9 @@
       *  04.08.09    NACL-ÌçÏÆ    16/05/20  É¸½àÉéÃ´³Û·Ð²áÁ¼ÃÖ¡ÊÀº¿À¡ËÆþ±¡Ç¯·îÆü
       *                                     ¤Î¥³¥á¥ó¥ÈÂÐ±þ
       *  04.08.10    NACL-ÌçÏÆ    16/08/23  »ý»²ÌôÂÐ±þ
+      *  04.08.11    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
+      *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
+      *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1011,6 +1014,11 @@
            03  CONS-ROUSAI42   PIC X(09)   VALUE   "101800880".
       *
            03  CONS-ROUSAI43   PIC X(09)   VALUE   "101801040".
+      *
+           03  CONS-ROUSAI44   PIC X(09)   VALUE   "101801150".
+           03  CONS-ROUSAI45   PIC X(09)   VALUE   "101801160".
+           03  CONS-ROUSAI46   PIC X(09)   VALUE   "101801170".
+           03  CONS-ROUSAI47   PIC X(09)   VALUE   "101801180".
       *
            03  CONS-ROUCOM1    PIC X(09)   VALUE   "840800001".
            03  CONS-ROUCOM2    PIC X(09)   VALUE   "840800002".
@@ -3498,13 +3506,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                         CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
                         CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
-                        CONS-ROUSAI43                       ) AND
+                        CONS-ROUSAI43 OR  CONS-ROUSAI44 OR
+                        CONS-ROUSAI45 OR  CONS-ROUSAI46 OR
+                        CONS-ROUSAI47                       ) AND
                        (RECE82-SRYYM    >=  "201307"        ))
                    OR ((SRY-SRYCD(IDX2)  >= "101800570" AND
                                          <= "101800860"     ) AND
                        (RECE82-SRYYM    >=  "201307"        ))
                    OR ((SRY-SRYCD(IDX2)  >= "101801010" AND
                                          <= "101801020"     ) AND
+                       (RECE82-SRYYM    >=  "201307"        ))
+                   OR ((SRY-SRYCD(IDX2)  >= "101801190" AND
+                                         <= "101801420"     ) AND
                        (RECE82-SRYYM    >=  "201307"        ))
                    OR ((SRY-SRYCD(IDX2)   = "101800550" OR
                              "101800560" OR "101800990" OR
@@ -3997,13 +4010,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                      CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
                      CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
-                     CONS-ROUSAI43                    )   AND
+                     CONS-ROUSAI43 OR  CONS-ROUSAI44 OR
+                     CONS-ROUSAI45 OR  CONS-ROUSAI46 OR
+                     CONS-ROUSAI47                    )   AND
                    ( RECE82-SRYYM   >= "201307"       ))
                OR (( SRY-SRYCD(IDX2) >= "101800570" AND
                                      <= "101800860"   )   AND
                    ( RECE82-SRYYM   >=  "201307"      ))
                OR (( SRY-SRYCD(IDX2) >= "101801010" AND
                                      <= "101801020"   )   AND
+                   ( RECE82-SRYYM   >=  "201307"      ))
+               OR (( SRY-SRYCD(IDX2) >= "101801190" AND
+                                     <= "101801420"   )   AND
                    ( RECE82-SRYYM   >=  "201307"      ))
                OR (( SRY-SRYCD(IDX2)  = "101800550" OR
                          "101800560" OR "101800990" OR
@@ -4172,19 +4190,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
                             CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
                             CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
-                            CONS-ROUSAI28 OR  CONS-ROUSAI29     ) AND
-                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
-                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
-                          ( RECE82-SRYYM   >=  "201307"         ))
-                      OR (( ACCT-SRYKBN     = "80"              ) AND
-                          ( WRK-CHECK-SRYCD =
+                            CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
                             CONS-ROUSAI30 OR  CONS-ROUSAI31 OR
                             CONS-ROUSAI32 OR  CONS-ROUSAI33 OR
                             CONS-ROUSAI34 OR  CONS-ROUSAI35 OR
                             CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                             CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
                             CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
-                            CONS-ROUSAI43                       ) AND
+                            CONS-ROUSAI43 OR  CONS-ROUSAI44 OR
+                            CONS-ROUSAI45 OR  CONS-ROUSAI46 OR
+                            CONS-ROUSAI47                       ) AND
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE82-SRYYM   >=  "201307"         ))
@@ -4197,6 +4212,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       OR (( ACCT-SRYKBN     = "80"              ) AND
                           ( WRK-CHECK-SRYCD >= "101801010" AND
                                             <= "101801020"      ) AND
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
+                          ( RECE82-SRYYM   >=  "201307"         ))
+                      OR (( ACCT-SRYKBN     = "80"              ) AND
+                          ( WRK-CHECK-SRYCD >= "101801190" AND
+                                            <= "101801420"      ) AND
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE82-SRYYM   >=  "201307"         ))
@@ -6278,6 +6299,10 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         CONS-ROUSAI26  OR  CONS-ROUSAI27  OR
                         CONS-ROUSAI28  OR  CONS-ROUSAI29 )  AND
                        (RECE82-SRYYM   >=   "201307"     ))
+                   OR ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                        CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                       (RECE82-SRYYM   >=   "201307"     ))
                    OR ((ACCT-SRYKBN          =  "80"     )  AND
                        (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
                          IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
@@ -6296,56 +6321,6 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    RECE82-KINGAKU2(2)  +
                                   (TNS-TEN  *   ACCT-ZAIKAISU)
                          END-IF
-                         EVALUATE   SRY-SRYCD(IDX3)
-                              WHEN   CONS-ROUSAI13
-                              WHEN   CONS-ROUSAI14
-                              WHEN   CONS-ROUSAI22
-                              WHEN   CONS-ROUSAI23
-                                  MOVE    1     TO   WRK-HEYA-NINZU
-                              WHEN   CONS-ROUSAI15
-                              WHEN   CONS-ROUSAI16
-                              WHEN   CONS-ROUSAI24
-                              WHEN   CONS-ROUSAI25
-                                  MOVE    2     TO   WRK-HEYA-NINZU
-                              WHEN   CONS-ROUSAI17
-                              WHEN   CONS-ROUSAI18
-                              WHEN   CONS-ROUSAI26
-                              WHEN   CONS-ROUSAI27
-                                  MOVE    3     TO   WRK-HEYA-NINZU
-                              WHEN   CONS-ROUSAI19
-                              WHEN   CONS-ROUSAI20
-                              WHEN   CONS-ROUSAI28
-                              WHEN   CONS-ROUSAI29
-                                  MOVE    4     TO   WRK-HEYA-NINZU
-                         END-EVALUATE
-                         EVALUATE   SRY-SRYCD(IDX3)(1:7)
-                              WHEN   "0959401"
-                              WHEN   "0959402"
-                                  MOVE    1     TO   WRK-HEYA-NINZU
-                              WHEN   "0959403"
-                              WHEN   "0959404"
-                                  MOVE    2     TO   WRK-HEYA-NINZU
-                              WHEN   "0959407"
-                              WHEN   "0959408"
-                                  MOVE    3     TO   WRK-HEYA-NINZU
-                              WHEN   "0959409"
-                              WHEN   "0959410"
-                                  MOVE    4     TO   WRK-HEYA-NINZU
-                         END-EVALUATE
-                         IF    RECE82-HEYA-NINZU   =   ZERO
-                         AND   FLG-HEYA            =   ZERO
-                           MOVE  WRK-HEYA-NINZU  TO   RECE82-HEYA-NINZU
-                           ADD   ACCT-ZAIKAISU   TO   RECE82-HEYA-NISSU
-                         ELSE
-                           IF  RECE82-HEYA-NINZU   =  WRK-HEYA-NINZU
-                           AND FLG-HEYA            =   ZERO
-                              ADD  ACCT-ZAIKAISU TO   RECE82-HEYA-NISSU
-                           ELSE
-                              MOVE  ZERO         TO   RECE82-HEYA-NINZU
-                              ADD  ACCT-ZAIKAISU TO   RECE82-HEYA-NISSU
-                              MOVE  1            TO   FLG-HEYA
-                           END-IF
-                         END-IF
                    ELSE
                      IF ((ACCT-SRYKBN          =  "80"   )  AND
                          (SRY-SRYCD(IDX3)(1:5) =  "09593"))
@@ -6357,6 +6332,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                          (RECE82-SRYYM   >=  "201307"    ))
                      OR ((SRY-SRYCD(IDX3) >= "101801010" AND
                                           <= "101801020" )  AND
+                         (RECE82-SRYYM   >=  "201307"    ))
+                     OR ((SRY-SRYCD(IDX3) >= "101801190" AND
+                                          <= "101801420" )  AND
                          (RECE82-SRYYM   >=  "201307"    ))
                      OR ((SRY-SRYCD(IDX3)  = "101800550" OR
                               "101800560" OR "101800990" OR
@@ -6900,8 +6878,31 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        CONS-ROUSAI26  OR  CONS-ROUSAI27  OR
                        CONS-ROUSAI28  OR  CONS-ROUSAI29 )  AND
                       (RECE82-SRYYM   >=   "201307"     ))
+                  OR ((SRY-SRYCD(IDX3) =
+                       CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                       CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                      (RECE82-SRYYM   >=   "201307"     ))
                   OR ((ACCT-SRYKBN          =  "80"     )  AND
                       (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
+                     IF ((SRY-SRYCD(IDX3) =
+                          CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                          CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                         (RECE82-SRYYM   >=   "201307"     ))
+                     OR ((ACCT-SRYKBN          =  "80"     )  AND
+                         (SRY-SRYCD(IDX3)(1:7) =
+                               "0959421" OR "0959422" OR
+                               "0959423" OR "0959424"      )  AND
+                         (RECE82-SRYYM   >=   "201604"     ))
+                       IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
+                         COMPUTE RECE82-KINGAKU3(2)  =
+                                 RECE82-KINGAKU3(2)  +
+                             (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
+                       ELSE
+                         COMPUTE RECE82-KINGAKU3(2)  =
+                                 RECE82-KINGAKU3(2)  +
+                             (TNS-TEN     *   ACCT-ZAIKAISU)
+                       END-IF
+                     ELSE
                        IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
                          COMPUTE RECE82-KINGAKU3(1)  =
                                  RECE82-KINGAKU3(1)  +
@@ -6912,6 +6913,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                  RECE82-KINGAKU3(1)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                        END-IF
+                       MOVE    ZERO   TO   WRK-HEYA-NINZU
                        EVALUATE   SRY-SRYCD(IDX3)
                               WHEN   CONS-ROUSAI13
                               WHEN   CONS-ROUSAI14
@@ -6949,6 +6951,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   MOVE    4     TO   WRK-HEYA-NINZU
                        END-EVALUATE
                        IF    RECE82-HEYA-NINZU   =   ZERO
+                       AND   RECE82-HEYA-NISSU   =   ZERO
                        AND   FLG-HEYA            =   ZERO
                            MOVE  WRK-HEYA-NINZU  TO   RECE82-HEYA-NINZU
                            ADD   ACCT-ZAIKAISU   TO   RECE82-HEYA-NISSU
@@ -6962,6 +6965,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                               MOVE  1            TO   FLG-HEYA
                            END-IF
                        END-IF
+                     END-IF
                   ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )   AND
                       ( SRY-SRYCD(IDX3)(1:5) =  "09591" OR
@@ -6978,6 +6982,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3) >= "101801010" AND
                                          <= "101801020" )  AND
+                        (RECE82-SRYYM   >=  "201307"    ))
+                    OR ((SRY-SRYCD(IDX3) >= "101801190" AND
+                                         <= "101801420" )  AND
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3)  = "101800550" OR
                              "101800560" OR "101800990" OR
@@ -7074,8 +7081,31 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        CONS-ROUSAI26  OR  CONS-ROUSAI27  OR
                        CONS-ROUSAI28  OR  CONS-ROUSAI29 )  AND
                       (RECE82-SRYYM   >=   "201307"     ))
+                  OR ((SRY-SRYCD(IDX3) =
+                       CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                       CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                      (RECE82-SRYYM   >=   "201307"     ))
                   OR ((ACCT-SRYKBN          =  "80"     )  AND
                       (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
+                     IF ((SRY-SRYCD(IDX3) =
+                          CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                          CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                         (RECE82-SRYYM   >=   "201307"     ))
+                     OR ((ACCT-SRYKBN          =  "80"     )  AND
+                         (SRY-SRYCD(IDX3)(1:7) =
+                               "0959421" OR "0959422" OR
+                               "0959423" OR "0959424"      )  AND
+                         (RECE82-SRYYM   >=   "201604"     ))
+                       IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
+                         COMPUTE RECE82-KINGAKU3(3)  =
+                                 RECE82-KINGAKU3(3)  +
+                             (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
+                       ELSE
+                         COMPUTE RECE82-KINGAKU3(3)  =
+                                 RECE82-KINGAKU3(3)  +
+                             (TNS-TEN     *   ACCT-ZAIKAISU)
+                       END-IF
+                     ELSE
                        IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
                          COMPUTE RECE82-KINGAKU3(1)  =
                                  RECE82-KINGAKU3(1)  +
@@ -7086,6 +7116,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                  RECE82-KINGAKU3(1)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                        END-IF
+                       MOVE    ZERO   TO   WRK-HEYA-NINZU
                        EVALUATE   SRY-SRYCD(IDX3)
                               WHEN   CONS-ROUSAI13
                               WHEN   CONS-ROUSAI14
@@ -7123,6 +7154,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   MOVE    4     TO   WRK-HEYA-NINZU
                        END-EVALUATE
                        IF    RECE82-HEYA-NINZU   =   ZERO
+                       AND   RECE82-HEYA-NISSU   =   ZERO
                        AND   FLG-HEYA            =   ZERO
                            MOVE  WRK-HEYA-NINZU  TO   RECE82-HEYA-NINZU
                            ADD   ACCT-ZAIKAISU   TO   RECE82-HEYA-NISSU
@@ -7136,6 +7168,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                               MOVE  1            TO   FLG-HEYA
                            END-IF
                        END-IF
+                     END-IF
                   ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )   AND
                       ( SRY-SRYCD(IDX3)(1:5) =  "09591" OR 
@@ -7152,6 +7185,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3) >= "101801010" AND
                                          <= "101801020" )  AND
+                        (RECE82-SRYYM   >=  "201307"    ))
+                    OR ((SRY-SRYCD(IDX3) >= "101801190" AND
+                                         <= "101801420" )  AND
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3)  = "101800550" OR
                              "101800560" OR "101800990" OR
@@ -7763,8 +7799,31 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        CONS-ROUSAI26  OR  CONS-ROUSAI27  OR
                        CONS-ROUSAI28  OR  CONS-ROUSAI29 )  AND
                       (RECE82-SRYYM   >=   "201307"     ))
+                  OR ((SRY-SRYCD(IDX3) =
+                       CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                       CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                      (RECE82-SRYYM   >=   "201307"     ))
                   OR ((ACCT-SRYKBN          =  "80"     )  AND
                       (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
+                     IF ((SRY-SRYCD(IDX3) =
+                          CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                          CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                         (RECE82-SRYYM   >=   "201307"     ))
+                     OR ((ACCT-SRYKBN          =  "80"     )  AND
+                         (SRY-SRYCD(IDX3)(1:7) =
+                               "0959421" OR "0959422" OR
+                               "0959423" OR "0959424"      )  AND
+                         (RECE82-SRYYM   >=   "201604"     ))
+                       IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
+                         COMPUTE  RECE82-SONOTAKIN-JYU =
+                                  RECE82-SONOTAKIN-JYU +
+                           (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
+                       ELSE
+                         COMPUTE  RECE82-SONOTAKIN-JYU  =
+                                  RECE82-SONOTAKIN-JYU  +
+                           (TNS-TEN   *   ACCT-ZAIKAISU)
+                       END-IF
+                     ELSE
                        IF   SRY-SRYCD(IDX3)(1:5) =  "09594"
                          COMPUTE RECE82-SITURYO-JYU  =
                                  RECE82-SITURYO-JYU  +
@@ -7775,6 +7834,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                  RECE82-SITURYO-JYU  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                        END-IF
+                       MOVE    ZERO   TO   WRK-HEYA-NINZU
                        EVALUATE   SRY-SRYCD(IDX3)
                               WHEN   CONS-ROUSAI13
                               WHEN   CONS-ROUSAI14
@@ -7812,6 +7872,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   MOVE    4     TO   WRK-HEYA-NINZU
                        END-EVALUATE
                        IF    RECE82-HEYA-NINZU   =   ZERO
+                       AND   RECE82-HEYA-NISSU   =   ZERO
                        AND   FLG-HEYA            =   ZERO
                            MOVE  WRK-HEYA-NINZU  TO   RECE82-HEYA-NINZU
                            ADD   ACCT-ZAIKAISU   TO   RECE82-HEYA-NISSU
@@ -7825,6 +7886,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                               MOVE  1            TO   FLG-HEYA
                            END-IF
                        END-IF
+                     END-IF
                   ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )   AND
                       ( SRY-SRYCD(IDX3)(1:5) =  "09591" OR 
@@ -7841,6 +7903,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3) >= "101801010" AND
                                          <= "101801020" )  AND
+                        (RECE82-SRYYM   >=  "201307"    ))
+                    OR ((SRY-SRYCD(IDX3) >= "101801190" AND
+                                         <= "101801420" )  AND
                         (RECE82-SRYYM   >=  "201307"    ))
                     OR ((SRY-SRYCD(IDX3)  = "101800550" OR
                              "101800560" OR "101800990" OR
@@ -8329,6 +8394,10 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         CONS-ROUSAI26  OR  CONS-ROUSAI27  OR
                         CONS-ROUSAI28  OR  CONS-ROUSAI29 )  AND
                        (RECE82-SRYYM   >=   "201307"     ))
+                   OR ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI44  OR  CONS-ROUSAI45  OR
+                        CONS-ROUSAI46  OR  CONS-ROUSAI47 )  AND
+                       (RECE82-SRYYM   >=   "201307"     ))
                    OR ((ACCT-SRYKBN          =  "80"     )  AND
                        (SRY-SRYCD(IDX3)(1:5) =  "09594"  ))
                      IF   (FLG-TAISYO           =   1     )
@@ -8349,6 +8418,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                          (RECE82-SRYYM   >=  "201307"    ))
                      OR ((SRY-SRYCD(IDX3) >= "101801010" AND
                                           <= "101801020" )  AND
+                         (RECE82-SRYYM   >=  "201307"    ))
+                     OR ((SRY-SRYCD(IDX3) >= "101801190" AND
+                                          <= "101801420" )  AND
                          (RECE82-SRYYM   >=  "201307"    ))
                      OR ((SRY-SRYCD(IDX3)  = "101800550" OR
                               "101800560" OR "101800990" OR

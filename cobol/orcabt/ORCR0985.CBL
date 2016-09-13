@@ -49,6 +49,9 @@
       *  04.08.03    NACL-Æ£¸¶    16/01/15  ÀÁµá¾ðÊó¤Ø¤Î¹¹¿·ÆüÀßÄê
       *  04.08.04    NACL-Æ£¸¶    16/04/01  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.05    NACL-ÌçÏÆ    16/08/23  »ý»²ÌôÂÐ±þ
+      *  04.08.06    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
+      *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
+      *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2548,6 +2551,19 @@
                          MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
                        WHEN      "10"
                          MOVE  "101800460"      TO  RECE85-SRYCD (IDX)
+                         MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
+      *
+                       WHEN      "21"
+                         MOVE  "101801150"      TO  RECE85-SRYCD (IDX)
+                         MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
+                       WHEN      "22"
+                         MOVE  "101801160"      TO  RECE85-SRYCD (IDX)
+                         MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
+                       WHEN      "23"
+                         MOVE  "101801170"      TO  RECE85-SRYCD (IDX)
+                         MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
+                       WHEN      "24"
+                         MOVE  "101801180"      TO  RECE85-SRYCD (IDX)
                          MOVE   1       TO  RECE85-KOKUJISKBKBN1 (IDX)
                      END-EVALUATE
                    END-IF

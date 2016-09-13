@@ -176,6 +176,9 @@
       *  04.08.02    NACL-ÌçÏÆ    16/03/03  ¸ø³²¤ÎÎÅÍÜÃ´Åö¼êÅö¤Ï
       *                                     ÌôºÞ¡¦´ïºàÅÀ¤Î¼è¤ê°·¤¤¤È¤¹¤ë
       *  04.08.03    NACL-ÌçÏÆ    16/03/07  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.04    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
+      *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
+      *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6565,39 +6568,23 @@ grpsys                              SPA-AREA
                            COMPUTE WRK-RSISHOSHIN = WRK-RSISHOSHIN +
                                   (WRK-TEN  *   SINRYO-COUNT)
                         END-IF
-                        IF   SRY-SRYCD(IDZ)   =   "101800880"
-                           COMPUTE WRK-RSIETC  = WRK-RSIETC +
+                        EVALUATE  SRY-SRYCD(IDZ)
+                          WHEN    "101800390"  THRU  "101800460"
+                          WHEN    "101800470"  THRU  "101800540"
+                          WHEN    "101800870"  THRU  "101800880"
+                          WHEN    "101800960"  THRU  "101800980"
+                          WHEN    "101801040"
+                          WHEN    "101801150"  THRU  "101801180"
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC  +
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
                                   (TNS-TEN  *   SINRYO-COUNT)
-                        END-IF
-                        IF   SRY-SRYCD(IDZ)   =
-                             "101800870" OR "101800470" OR
-                             "101800480" OR "101800490" OR
-                             "101800500" OR "101800510" OR
-                             "101800520" OR "101800530" OR
-                             "101800540" OR "101800960" OR
-                             "101800970" OR "101800980" OR
-                             "101801040"
-                           COMPUTE WRK-RSIETC  = WRK-RSIETC +
-                                  (WRK-TEN  *   SINRYO-COUNT)
-                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
-                                  (TNS-TEN  *   SINRYO-COUNT)
-                        END-IF
-                        IF   SRY-SRYCD(IDZ)   =
-                             "101800390" OR "101800400" OR
-                             "101800410" OR "101800420" OR
-                             "101800430" OR "101800440" OR
-                             "101800450" OR  "101800460"
-                           COMPUTE WRK-RSIETC = WRK-RSIETC +
-                                  (WRK-TEN  *   SINRYO-COUNT)
-                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
-                                  (TNS-TEN  *   SINRYO-COUNT)
-                        END-IF
+                        END-EVALUATE
                         EVALUATE  SRY-SRYCD(IDZ)
                           WHEN    "101800570"  THRU  "101800860"
                           WHEN    "101801010"  THRU  "101801020"
-                           COMPUTE WRK-RSIETC = WRK-RSIETC +
+                          WHEN    "101801190"  THRU  "101801420"
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC  +
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
                                   (TNS-TEN  *   SINRYO-COUNT)

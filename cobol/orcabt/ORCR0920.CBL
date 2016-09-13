@@ -52,6 +52,9 @@
       *  04.07.03    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *
       *  04.08.01    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
+      *  04.08.02    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
+      *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
+      *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -781,18 +784,31 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                   (RECE82-SRYYM   >=  "201307"   ))
                 MOVE    777             TO  RECE86-NYUTENTTLKBN
            ELSE
-              IF ( RECE86-SRYCD1(1:5)   =  "09594"                 )
+              IF ((RECE86-SRYKBN        =  "80"                   ) AND
+                  (RECE86-SRYCD1(1:5)   =  "09594"                ))
               OR ((RECE86-SRYCD1  =  "101910010" OR "101910020" OR
                                      "101910030" OR "101910040" OR
                                      "101910070" OR "101910080" OR
                                      "101910090" OR "101910100"   ) AND
                   (RECE82-SRYYM  <=  "201306"                     ))
-              OR ((RECE86-SRYCD1  =  "101800390" OR "101800400" OR
-                                     "101800410" OR "101800420" OR
-                                     "101800430" OR "101800440" OR
-                                     "101800450" OR "101800460"   ) AND
+              OR ((RECE86-SRYCD1 >=  "101800390" AND
+                                 <=  "101800460"                  ) AND
                   (RECE82-SRYYM  >=  "201307"                     ))
-                MOVE    779             TO  RECE86-NYUTENTTLKBN
+              OR ((RECE86-SRYCD1 >=  "101801150" AND
+                                 <=  "101801180"                  ) AND
+                  (RECE82-SRYYM  >=  "201307"                     ))
+                IF ((RECE86-SRYCD1 >=  "101801150" AND
+                                   <=  "101801180"     ) AND
+                    (RECE82-SRYYM  >=  "201307"        ))
+                OR ((RECE86-SRYKBN        =  "80"      ) AND
+                    (RECE86-SRYCD1(1:7)   =
+                           "0959421" OR "0959422" OR
+                           "0959423" OR "0959424"      ) AND
+                    (RECE82-SRYYM  >=  "201604"        ))
+                   MOVE    780             TO  RECE86-NYUTENTTLKBN
+                ELSE
+                   MOVE    779             TO  RECE86-NYUTENTTLKBN
+                END-IF
               ELSE
                 IF  RECE86-SRYCD1(1:5)  =  "09591" OR "09592" OR "09593"
                   EVALUATE  RECE86-SRYCD1(1:5)
@@ -819,6 +835,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                       (RECE82-SRYYM  >= "201307"   ))
                   OR ((RECE86-SRYCD1 >= "101801010" AND
                                      <= "101801020")  AND
+                      (RECE82-SRYYM  >= "201307"   ))
+                  OR ((RECE86-SRYCD1 >= "101801190" AND
+                                     <= "101801420")  AND
                       (RECE82-SRYYM  >= "201307"   ))
                     MOVE  997              TO  RECE86-NYUTENTTLKBN
                   ELSE
