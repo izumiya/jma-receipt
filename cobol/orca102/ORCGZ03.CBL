@@ -1472,7 +1472,16 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (3)
                MOVE    3                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
-           IF      SPA-GMN-DATAKBN        =   2
+           IF    ( SPA-GMN-DATAKBN        =   2  )
+      *H28.9
+      *        手技料で時間区分が時間外区分である時
+           OR    ((SPA-GMN-DATAKBN        =   1   )  AND
+                  (TNS-KOKUJISKBKBN2      =   "7" )  AND
+                  (TNS-TIMEKSNKBN         <>  "0" )  AND
+                  (TNS-SRYKBN             =   "11"
+                                          OR  "12"
+                                          OR  "13"
+                                          OR  "14" ))
                MOVE    "0 下記以外の診療行為"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (1)
                MOVE    "1 時間外加算"
