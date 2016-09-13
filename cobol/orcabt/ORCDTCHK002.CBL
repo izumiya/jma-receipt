@@ -1000,6 +1000,7 @@
            03  CONST-H009                      PIC X(03)   VALUE "009".
            03  CONST-H2004                 PIC X(06)   VALUE "200804".
            03  CONST-H2507                 PIC X(06)   VALUE "201307".
+           03  CONST-H2804                 PIC X(06)   VALUE "201604".
            03  CONST-TEMP                      PIC X(04)   VALUE "TEMP".
            03  CONST-RSI-KATAKANA-G.
                05  CONST-RSI-KATAKANA-VAL.
@@ -3915,14 +3916,22 @@
                        PERFORM 2001111-TRSIRECEDEN-HEN-SEC
                    END-IF
                    IF    ( DCSRY-SRYCD (1:5)       =   "09594" )
-                       IF    ( DCSRY-SRYCD (6:2)   =   "01" OR "02"
+                       EVALUATE    TRUE
+                       WHEN  ( DCSRY-SRYCD (6:2)   =   "01" OR "02"
+                                                    OR "03" OR "04"
+                                                    OR "07" OR "08"
+                                                    OR "09" OR "10"
+                                                    OR "21" OR "22"
+                                                    OR "23" OR "24" )
+                         AND ( ORCBSD01-SRYYM     >=   CONST-H2804 )
+                       WHEN  ( DCSRY-SRYCD (6:2)   =   "01" OR "02"
                                                     OR "03" OR "04"
                                                     OR "07" OR "08"
                                                     OR "09" OR "10" )
                            CONTINUE
-                       ELSE
+                       WHEN    OTHER
                            PERFORM 2001111-TRSIRECEDEN-HEN-SEC
-                       END-IF
+                       END-EVALUATE
                    END-IF
                END-IF
            END-IF
