@@ -428,6 +428,9 @@
                05  SPA-NNCHIH-ARI          PIC 9(01).
       *        小児かかりつけ対象（患者）
                05  SPA-SYOUNI-ARI          PIC 9(01).
+      *H28.9
+      *        要介護対象
+               05  SPA-YOUKAIGO-ARI        PIC 9(01).
       *
       *入院用（Ｋ０２Ｎ）
                05  SPA-K02N-DATA-REC.
@@ -525,6 +528,11 @@
                07  SPA-SYOEN-CNT           PIC  9(03).
       *当月外来管理加算の取れない患者
                07  SPA-GAIRAI-NASI         PIC  9(01).
+      *
+      *H28.9  改正
+      *目標設定等支援管理料算定日
+               07  SPA-MOKUHYO01-YMD       PIC  X(08).
+               07  SPA-MOKUHYO02-YMD       PIC  X(08).
       *
       *包括剤コード入力
                05  SPA-HKTSANTEI-08        PIC  9(01).

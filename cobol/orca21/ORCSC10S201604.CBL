@@ -83,7 +83,8 @@
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/12/XX  £È£²£·Ç¯£±·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  15/07/28  APIV3ÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
-      * 04.08.00     NACL-Â¿¡¹Ç¼  16/08/XX  ¼«ÇåÀÕ¾®»ù²Ê³°Íè¿Ç»¡ÎÁÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/08/XX  ¼«ÇåÀÕ¾®»ù²Ê³°Íè¿ÇÎÅÎÁÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/09/XX  Ê¿À®£²£¸Ç¯£±£°·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -216,6 +217,8 @@
            03  FLG-SYONIKKR         PIC 9(01).
            03  FLG-SYONIKKR-NAI     PIC 9(01).
            03  FLG-SYONIKKR-ARI     PIC 9(01).
+      *
+           03  FLG-TEISEI           PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1465,24 +1468,6 @@
               OR  (SPA-CHIKENKBN       =   "1"  )
                GO      TO      1001-TOUGETU-KAISU-EXT
            END-IF
-      *ÉÔ»ÈÍÑ
-      *    ÄûÀµ¤Ç¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤ò»»ÄêºÑ¤ß¤Î¾ì¹ç
-      *    MOVE    ZERO                TO  FLG-SYONIKA-TEI
-      *    IF      SPA-SYORIFLG        =   1
-      *        PERFORM VARYING    IDX-T    FROM    1   BY  1
-      *                UNTIL     (IDX-T    >   SPA-MAX-LINE )  OR
-      *                          (SPA-K02-TEI-SRYCD(IDX-T) =   SPACE)
-      *            EVALUATE    SPA-K02-TEI-SRYCD(IDX-T)
-      *            ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê
-      *                WHEN    "113003510"
-      *                WHEN    "113003610"
-      *                WHEN    "113003710"
-      *                WHEN    "113003810"
-      *                    MOVE    1           TO  FLG-SYONIKA-TEI
-      *                    MOVE    SPA-MAX-LINE    TO  IDX-T
-      *            END-EVALUATE
-      *        END-PERFORM
-      **** END-IF
       *
       *    µÞÀ­È¯À¸Æü·èÄê
            PERFORM 10019-KYUSEI-CHK-SEC
@@ -1525,6 +1510,10 @@
       *H24.4 ²þÀµ
       *    ³°Íè¥ê¥Ï¥Ó¥ê¿Ç»¡ÎÁÅù»»ÄêÈ½Äê
            PERFORM 10019-GAIRAIRIHA-CHK-SEC
+      *
+      *H28.9 ²þÀµ
+      *    ÌÜÉ¸ÀßÄêÅù»Ù±ç´ÉÍýÎÁÈ½Äê
+           PERFORM 100110-MOKUHYO-CHK-SEC
            .
        1001-TOUGETU-KAISU-EXT.
            EXIT.
@@ -1973,6 +1962,126 @@
            EXIT.
       *H24.4 ²þÀµ
       *!!
+      *H28.9
+      *****************************************************************
+      *    ÌÜÉ¸ÀßÄêÅù»Ù±ç´ÉÍýÎÁÈ½Äê½èÍý
+      *****************************************************************
+       100110-MOKUHYO-CHK-SEC        SECTION.
+      *
+      *    ÌÜÉ¸ÀßÄêÅù»Ù±ç´ÉÍýÎÁ¡Ê½é²ó¡Ë
+           MOVE    "180046110"         TO  WRK-SRYCD
+           PERFORM 1001101-SANTEI-YMD-SEC
+           IF      WRK-YMD             =   ZERO
+               MOVE    SPACE               TO  SPA-MOKUHYO01-YMD
+           ELSE
+               MOVE    WRK-YMD             TO  SPA-MOKUHYO01-YMD
+           END-IF
+      *    ÌÜÉ¸ÀßÄêÅù»Ù±ç´ÉÍýÎÁ¡Ê£²²óÌÜ°Ê¹ß¡Ë
+           MOVE    "180046210"         TO  WRK-SRYCD
+           PERFORM 1001101-SANTEI-YMD-SEC
+           IF      WRK-YMD             =   ZERO
+               MOVE    SPACE               TO  SPA-MOKUHYO02-YMD
+           ELSE
+               MOVE    WRK-YMD             TO  SPA-MOKUHYO02-YMD
+           END-IF
+      *
+      *
+           .
+       100110-MOKUHYO-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÇ½ª»»ÄêÆü½èÍý
+      *****************************************************************
+       1001101-SANTEI-YMD-SEC         SECTION.
+      *
+      *    ÄûÀµÊ¬¤ÏÂÐ¾Ý³°
+           MOVE    ZERO                TO  FLG-TEISEI
+           IF      SPA-SYORIFLG        =   1
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-MAX-LINE )  OR
+                                  (SPA-K02-TEI-SRYCD(IDX)
+                                               =   SPACE )
+                   IF      WRK-SRYCD       =   SPA-K02-TEI-SRYCD(IDX)
+                       MOVE    1               TO  FLG-TEISEI
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    »»ÄêÍúÎò¸¡º÷
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
+           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                TO  SANTEI-SRYKA
+           MOVE    SPA-SRYYMD(1:6)     TO  SANTEI-SRYYM
+      *
+      *    ´µ¼ÔËè¤È¤¹¤ë
+           MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key15"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key15"             TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+           END-IF
+      *
+           MOVE    ZERO                TO  WRK-YMD
+           PERFORM
+               UNTIL       FLG-SANTEI      =   1
+      *
+               IF     (SANTEI-MSANTEICNT   >   ZERO )  AND
+                      (SANTEI-SRYYM        <=  SPA-SRYYMD(1:6))
+      *            ºÇ¸å¤ÎÈ¯À¸Æü¡¢ÅöÆü°Ê¹ß¤ÏÂÐ¾Ý³°
+                   IF      SANTEI-SRYYM        =   SPA-SRYYMD(1:6)
+                       MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y3
+                   ELSE
+                       MOVE    31                  TO  IDX-Y3
+                   END-IF
+                   MOVE    ZERO                TO  WRK-DD
+                   PERFORM VARYING     IDX-Y2  FROM    IDX-Y3  BY  -1
+                           UNTIL       IDX-Y2  <   1
+                       IF      SANTEI-DAY (IDX-Y2) >   ZERO
+                           MOVE    IDX-Y2          TO  WRK-DD
+                           MOVE    1               TO  IDX-Y2
+                       END-IF
+                   END-PERFORM
+                   IF      WRK-DD              >   ZERO
+                       MOVE    SANTEI-SRYYM    TO  WRK-YYMM
+                       MOVE    1               TO  FLG-SANTEI
+      *                ÄûÀµÊ¬¤ÏÂÐ¾Ý³°
+                       IF     (FLG-TEISEI          =   1 )
+                          AND (WRK-YMD             =   SPA-SRYYMD)
+                           MOVE    ZERO            TO  FLG-SANTEI
+                           MOVE    ZERO            TO  WRK-YMD
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF     FLG-SANTEI           =   ZERO
+                   MOVE    "tbl_santei"        TO  MCP-TABLE
+                   MOVE    "key15"             TO  MCP-PATHNAME
+                   PERFORM 920-SANTEI-READ-SEC
+               END-IF
+           END-PERFORM
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key15"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      WRK-YYMM            =   ZERO
+               MOVE    ZERO            TO  WRK-YMD
+           END-IF
+      *
+           .
+       1001101-SANTEI-YMD-EXT.
+           EXIT.
+      *!!! 
       *****************************************************************
       *    µÞÀ­È¯À¸Æü·èÄê½èÍý
       *****************************************************************
@@ -1987,14 +2096,6 @@
       *    ³Æ¥ê¥Ï¥Ó¥êÈ¯¾ÉÆü
            PERFORM 100193-RIHABIRI-YMDHEN-SEC
       *!!!!
-      *    µÞÀ­È¯À¸Æü
-      *    MOVE    "099800101"         TO  WRK-SRYCD
-      *    PERFORM 100191-KYUSEI-SANTEI-SEC
-      *    MOVE    WRK-YMD             TO  SPA-KYUSEI-YMD
-      *
-      *    µÞÀ­È¯À¸½ªÎ»Æü
-      *    MOVE    "099800102"         TO  WRK-SRYCD
-      *    PERFORM 100191-KYUSEI-SANTEI-SEC
       *    ÄûÀµ¤Î»þÅöÆü¤Ê¤é¡¢ÂÐ¾Ý³°
            IF      SPA-SYORIFLG        =   1
                IF      SPA-KYUSEI-END      =   SPA-SRYYMD
@@ -2095,84 +2196,6 @@
       *
            .
        100192-KYUSEI-HENSYU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    µÞÀ­È¯À¸Æü»»ÄêÆü½èÍý
-      *****************************************************************
-       100191-KYUSEI-SANTEI-SEC                  SECTION.
-      *
-           MOVE    WRK-SRYCD           TO  TNS-SRYCD
-      *    »»ÄêÍúÎò¸¡º÷
-           MOVE    SPACE               TO  SANTEI-REC
-           INITIALIZE                  SANTEI-REC
-           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
-           MOVE    SPA-PTID            TO  SANTEI-PTID
-           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
-           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-           MOVE    ZERO                TO  SANTEI-SRYKA
-      *
-      *    Ï«ºÒËè¤È¤¹¤ë
-           IF      SPA-HKNKBN          =   1
-                                       OR  2
-               MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
-           ELSE
-               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
-           END-IF
-      *
-           MOVE    SANTEI-REC          TO  MCPDATA-REC
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 920-SANTEI-READ-SEC
-           ELSE
-               MOVE    1                   TO  FLG-SANTEI
-           END-IF
-      *
-           MOVE    ZERO                TO  WRK-YMD
-           PERFORM
-               UNTIL       FLG-SANTEI      =   1
-      *
-               IF     (SANTEI-MSANTEICNT   >   ZERO )  AND
-                      (SANTEI-SRYYM        <=  SPA-SRYYMD(1:6))
-      *            ºÇ¸å¤ÎÈ¯À¸Æü¡¢ÅöÆü°Ê¹ß¤ÏÂÐ¾Ý³°
-                   IF      SANTEI-SRYYM        =   SPA-SRYYMD(1:6)
-                       MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y3
-                   ELSE
-                       MOVE    31                  TO  IDX-Y3
-                   END-IF
-                   MOVE    ZERO                TO  WRK-DD
-                   PERFORM VARYING     IDX-Y2  FROM    IDX-Y3  BY  -1
-                           UNTIL       IDX-Y2  <   1
-                       IF      SANTEI-DAY (IDX-Y2) >   ZERO
-                           MOVE    IDX-Y2          TO  WRK-DD
-                           MOVE    1               TO  IDX-Y2
-                       END-IF
-                   END-PERFORM
-                   IF      WRK-DD              >   ZERO
-                       MOVE    SANTEI-SRYYM    TO  WRK-YYMM
-                       MOVE    1               TO  FLG-SANTEI
-                   END-IF
-               END-IF
-      *
-               IF     FLG-SANTEI           =   ZERO
-                   MOVE    "tbl_santei"        TO  MCP-TABLE
-                   MOVE    "key3"              TO  MCP-PATHNAME
-                   PERFORM 920-SANTEI-READ-SEC
-               END-IF
-           END-PERFORM
-           MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           IF      WRK-YYMM            =   ZERO
-               MOVE    ZERO            TO  WRK-YMD
-           END-IF
-      *
-           .
-       100191-KYUSEI-SANTEI-EXT.
            EXIT.
       *!!!!
       *

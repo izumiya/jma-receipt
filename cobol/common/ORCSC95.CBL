@@ -67,6 +67,7 @@
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
       *  04.08.00    NACL=多々納  15/12/25  HAORI対応
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/09/XX  Ｈ２８年１０月改正対応
       *****************************************************************
       *
       *
@@ -132,6 +133,7 @@
            03  FLG-PTSAME          PIC 9(01).
            03  FLG-SRYACCTPLUS     PIC 9(01).
            03  FLG-PTCONF          PIC 9(01).
+           03  FLG-PTCARE-NINTEI   PIC 9(01).
       *
            03  FLG-SYSKANRIOK      PIC 9(01).
            03  FLG-HKNCOMBICHK     PIC 9(01).
@@ -491,6 +493,11 @@
       *    患者個別設定テーブル
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
+      *
+      *H28.10
+      *    患者介護認定者情報テーブル
+       01  PTCARE-NINTEI-REC.
+           COPY    "CPPTCARE-NINTEI.INC".
       *
       *    パラメタテーブル
        01  PARA-REC.
@@ -2405,6 +2412,9 @@
       *H28.4
            MOVE    ZERO                TO  SPA-NNCHIH-ARI
            MOVE    ZERO                TO  SPA-SYOUNI-ARI
+      *H28.9
+      *    要介護対象
+           MOVE    ZERO                TO  SPA-YOUKAIGO-ARI
       *
       *    患者マスター読み込み
            MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
@@ -2468,6 +2478,11 @@
       *    認知症地域包括診療対象・小児かかりつけ対象
            IF     (SPA-SRYYMD          >=  "20160401" )
                PERFORM 110110-NNCHISYOU-SET-SEC
+           END-IF
+      *H28.10
+      *    要介護対象
+           IF     (SPA-SRYYMD          >=  "20161001" )
+               PERFORM 110111-YOUKAIGO-SET-SEC
            END-IF
       *
            .
@@ -2908,6 +2923,55 @@
            END-IF
            .
        110110-NNCHISYOU-SET-EXT.
+           EXIT.
+      *H28.10
+      *****************************************************************
+      *    要介護対象編集処理
+      *****************************************************************
+       110111-YOUKAIGO-SET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  SPA-YOUKAIGO-ARI
+      *    患者介護保険情報
+           INITIALIZE                  PTCARE-NINTEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCRNIN-PTID
+           MOVE    SPA-SRYYMD          TO  PTCRNIN-TEKSTYMD
+           MOVE    SPA-SRYYMD          TO  PTCRNIN-TEKEDYMD
+      *
+           MOVE    PTCARE-NINTEI-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key1"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key1"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCARE-NINTEI
+               INITIALIZE                  PTCARE-NINTEI-REC
+           END-IF
+           PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
+                          OR  (SPA-YOUKAIGO-ARI    NOT =   ZERO )
+      *
+      *        要介護状態
+               IF       PTCRNIN-CAREJOTAICD    =   "01"
+      *            自立　は対象外
+                   CONTINUE
+               ELSE
+                   MOVE    1               TO  SPA-YOUKAIGO-ARI
+               END-IF
+      *
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key1"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key1"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       110111-YOUKAIGO-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6196,6 +6260,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-HKNCOMBI-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者介護者認定情報データ読込処理
+      *****************************************************************
+       930-PTCARENINTEI-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-NINTEI
+               MOVE    MCPDATA-REC         TO  PTCARE-NINTEI-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-NINTEI
+               INITIALIZE                 PTCARE-NINTEI-REC
+           END-IF
+      *
+           .
+       930-PTCARENINTEI-READ-EXT.
            EXIT.
       *
       *****************************************************************

@@ -3384,6 +3384,49 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H28.9　改正から
+               WHEN    "K810"
+                   STRING  "警告！"
+                           "目標設定等支援・管理料（初回）の算定が"
+                           "ありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K816"
+                   STRING  "警告！"
+                           "前回が目標設定等支援・管理料（初回）の算定"
+                           "です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K812"
+                   STRING  "警告！"
+                           "前回の目標設定等支援・管理料算定日が"
+                           "３月以内です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K813"
+                   STRING  "警告！"
+                           "目標設定等支援・管理料の算定が３月以内に"
+                           "ありません。減点対象です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K814"
+                   STRING  "警告！"
+                           "目標設定等支援・管理料の算定があります。"
+                           "減点対象ではありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K815"
+                   STRING  "警告！"
+                           "減点対象開始日付未満です。"
+                           "減点対象ではありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"

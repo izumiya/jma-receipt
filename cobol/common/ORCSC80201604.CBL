@@ -57,6 +57,7 @@
       * 04.07.00     NACL-多々納  14/07/14  労災リハ（1.2倍）対応
       * 04.08.00     NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       * 04.08.00     NACL-多々納  16/06/XX  Ｈ２８年７月改正対応
+      * 04.08.00     NACL-多々納  16/06/XX  Ｈ２８年１０月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -357,7 +358,7 @@
       *H25.7
       *    疾患別リハビリ月回数
            03  WRK-TUKI-SRYCD.
-               05  WRK-SRYCDT          PIC X(09)   OCCURS   18.
+               05  WRK-SRYCDT          PIC X(09)   OCCURS   30.
            03  WRK-ACCT-CNT            PIC 9(03).
            03  WRK-TUKI-CNT2           PIC 9(03).
       *    月回数
@@ -386,6 +387,17 @@
                05  WRK-SYU-KZMTEN      PIC 9(08).
                05  FLG-RIHAEND         PIC 9(01).
       *
+      *H28.9
+      *   目標設定等支援
+           03  WRK-CHK-YMD.
+               05  WRK-CHK-YM.
+                   07  WRK-CHK-YY          PIC 9(04).
+                   07  WRK-CHK-MM          PIC 9(02).
+               05  WRK-CHK-DD              PIC 9(02).
+           03  WRK-MOKU-YM                 PIC X(06).
+           03  WRK-YOUKG-CHK               PIC X(01).
+           03  WRK-YOUKG-YMD               PIC X(08).
+           03  WRK-YOUKG-MSG               PIC X(80).
       *
        01  TBL-RIHA-ZAINUM-G.
            03  TBL-RIHA-ZAINUM-OCC     OCCURS  50.
@@ -462,6 +474,11 @@
       *    精神科ケア早期加算開始日
            03  WRK-KEASOKI-INT             PIC X(01).
            03  WRK-KEASOKI-YMD             PIC X(08).
+      *H28.9
+      *    目標設定等支援
+           03  WRK-MOKUHO-YMD.
+               05  WRK-MOKUHO-YM           PIC X(06).
+               05  WRK-MOKUHO-DD           PIC X(02).
       *    初期区分
            03  WRK-RIGAKU-INT              PIC X(01).
       *
@@ -1407,6 +1424,12 @@
                    IF      LNK-ORCSC-PG        =   "K02"
                        PERFORM 100113-SEISIN-CHK-SEC
                    END-IF
+      *H28.9
+      *            目標設定等支援・管理料チェック
+                   IF      WRK-COM-INPUTCD (IDX-Z) =   "180046110"
+                                                   OR  "180046210"
+                       PERFORM 1007-MOKUHYO-HEN-SEC
+                   END-IF 
       *ver.4.7
       *            加算チェック
                    IF      WRK-COM-DATAKBN (IDX-Z) =   "2"
@@ -2322,6 +2345,7 @@
                GO      TO      100112-RIGAKU-CHK-EXT
            END-IF
       *
+      *    リハビリコードテーブル検索（労災以外）
            SET     TBL-RIH16             TO  1
            SEARCH  TBL-RIHABIRI2016-OCC    VARYING   TBL-RIH16
                    AT  END
@@ -2329,6 +2353,7 @@
                        MOVE    SPACE           TO  WRK-RIHA-KBN
                        MOVE    SPACE           TO  WRK-RIHA-KBN2
                        MOVE    SPACE           TO  WRK-RIHA-KIG
+                       MOVE    SPACE           TO  WRK-RIHA-GEN
                    WHEN    WRK-COM-INPUTCD (IDX-Z)
                                                =   TBL-RIH16-SRYCD
                                                            (TBL-RIH16)
@@ -2338,6 +2363,9 @@
                                                TO  WRK-RIHA-KBN2
                        MOVE    TBL-RIH16-KIG (TBL-RIH16)
                                                TO  WRK-RIHA-KIG
+      *H28.9           リ減
+                       MOVE    TBL-RIH16-YOBO (TBL-RIH16)
+                                               TO  WRK-RIHA-GEN
                        MOVE    1               TO  FLG-RIHA-OK
            END-SEARCH
       *    リハビリテーション料の労災コード
@@ -2399,6 +2427,13 @@
       *
       *    急性発生日計算処理
            PERFORM 1001121-KYUSEIYMD15-SEC
+      *
+      *H28.9
+      *    H28.10　改正対応
+           IF     (SPA-SRYYMD          >=  "20161001" )
+               PERFORM 100123-YOUKAIGO-CHK-SEC
+           END-IF
+      *
       *
            IF     (SPA-NYUGAIKBN       =   "2" ) OR
                   (LNK-ORCSC-SYORIFLG  =   1   )
@@ -2539,6 +2574,230 @@
        1001121-KYUSEIYMD15-EXT.
            EXIT.
       *
+      *H28.9
+      *****************************************************************
+      *     H28.10　改正対応チェック処理
+      *****************************************************************
+       100123-YOUKAIGO-CHK-SEC            SECTION.
+      *
+           MOVE    SPACE           TO  WRK-KYUSEI
+           MOVE    SPACE           TO  WRK-YOUKG-CHK
+           MOVE    SPACE           TO  WRK-YOUKG-YMD
+           MOVE    SPACE           TO  WRK-YOUKG-MSG
+      *
+           EVALUATE    WRK-RIHA-KBN
+      *        脳血管疾患等リハ
+               WHEN    "2"
+                   MOVE    WRK-KYUSEI2-YMD     TO  WRK-KYUSEI
+                   IF      WRK-KYUSEI-ST (2)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-KYUSEI
+                   END-IF
+                   MOVE    60                  TO  WRK-ZOGEN
+      *        運動器リハ
+               WHEN    "3"
+                   MOVE    WRK-KYUSEI3-YMD     TO  WRK-KYUSEI
+                   IF      WRK-KYUSEI-ST (3)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-KYUSEI
+                   END-IF
+                   MOVE    50                  TO  WRK-ZOGEN
+      *        廃用症候群リハ
+               WHEN    "9"
+                   MOVE    WRK-KYUSEI9-YMD     TO  WRK-KYUSEI
+                   IF      WRK-KYUSEI-ST (9)   =   "1"
+                       MOVE    SPA-SRYYMD          TO  WRK-KYUSEI
+                   END-IF
+                   MOVE    40                  TO  WRK-ZOGEN
+           END-EVALUATE
+      *    算定上限日編集
+           IF      WRK-KYUSEI          =   SPACE
+               GO      TO      100123-YOUKAIGO-CHK-EXT 
+           END-IF
+      *
+      *    日後計算
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-KYUSEI          TO  LNK-DAY6-KIJUN
+           MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+           MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY6-AREA
+           MOVE    LNK-DAY6-KOYOMI     TO  WRK-YOUKG-YMD
+      *    要介護逓減開始日
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-YOUKG-YMD       TO  LNK-DAY6-KIJUN
+           MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+           MOVE    1                   TO  LNK-DAY6-ZOGEN
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY2-AREA
+           MOVE    "21"                TO  LNK-DAY2-IRAI
+           MOVE    LNK-DAY6-KEISAN     TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY2-AREA
+           STRING  "減点開始日："      DELIMITED  BY  SIZE
+                   LNK-DAY2-EDTYMD3    DELIMITED  BY  SIZE
+                  INTO                 WRK-YOUKG-MSG
+           END-STRING
+      *
+           IF     (SPA-NYUGAIKBN       =   "2" ) OR
+                  (LNK-ORCSC-SYORIFLG  =   1   )
+      *        外来か訂正の時の日
+               MOVE    SPA-SRYYMD          TO  WRK-SRYYMD
+               PERFORM 1001231-YOUKAIGO-SEC
+           ELSE
+      *        入院　入力日分のチェック
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL      (IDX2    >   31  )   OR
+                                  (SPA-ERRCD   NOT =   SPACE )
+                   IF      WRK-COM-NYUINDAY (IDX-Z IDX2)   >   ZERO
+                       MOVE    IDX2            TO  IDD
+                       MOVE    SPA-SRYYMD      TO  WRK-SRYYMD
+                       MOVE    IDD             TO  WRK-SRYYMD (7:2)
+                       PERFORM 1001231-YOUKAIGO-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+           .
+       100123-YOUKAIGO-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     H28.10　改正対応チェック処理
+      *****************************************************************
+       1001231-YOUKAIGO-SEC            SECTION.
+      *
+      *    算定上限日超
+           MOVE    SPACE               TO  WRK-MOKU-YM
+      *    減算開始日超の目標設定等支援管理料算定チェック
+           IF     (WRK-YOUKG-YMD       <   WRK-SRYYMD)
+      *        （リ減）以外の入力
+             AND  (WRK-RIHA-GEN        =   SPACE     )
+      *?
+      *         要介護対象
+             AND  (SPA-YOUKAIGO-ARI    =   1         )
+      *
+               IF     (SPA-MOKUHYO02-YMD    =   SPACE )
+                 OR   (SPA-MOKUHYO02-YMD    <=  SPA-MOKUHYO01-YMD)
+                   MOVE    SPA-MOKUHYO01-YMD(1:6)  TO  WRK-MOKU-YM
+               ELSE
+                   MOVE    SPA-MOKUHYO02-YMD(1:6)  TO  WRK-MOKU-YM
+               END-IF
+               IF     (WRK-MOKUHO-YMD      NOT =   SPACE)
+                  AND (WRK-MOKUHO-YMD          <=  WRK-SRYYMD )
+      *            今回入力
+                   MOVE    WRK-MOKUHO-YM       TO  WRK-MOKU-YM
+               END-IF
+      *        診療日付−３カ月
+               MOVE    WRK-SRYYMD          TO  WRK-CHK-YMD
+      *        診療年月−３月
+               IF      WRK-CHK-MM          >   3
+                   COMPUTE WRK-CHK-MM          =   WRK-CHK-MM
+                                               -   3
+               ELSE
+                   COMPUTE WRK-CHK-MM          =  (WRK-CHK-MM
+                                               +   12 )
+                                               -   3
+                   COMPUTE WRK-CHK-YY          =   WRK-CHK-YY
+                                               -   1
+               END-IF
+               IF    (WRK-MOKU-YM      =   SPACE )
+                  OR (WRK-MOKU-YM      <=  WRK-CHK-YM )
+      *           ３カ月以内に目標設定等支援管理料の算定なし
+                   IF     (WRK-COM-KZMFLG8(IDX-Z)   =   SPACE)
+                   AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
+                       MOVE    "K813"          TO  SPA-ERRCD
+                       MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                       MOVE    "1"             TO  WRK-COM-KZMFLG8
+                                                        (IDX-Z)
+                       MOVE    WRK-YOUKG-MSG
+                                                   TO  LNK-ORCSC-ERRMSG
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                               (IDX-Z)
+                   END-IF
+               END-IF
+           END-IF
+      *    （リ減）の入力
+           IF      WRK-RIHA-GEN        =   "G"
+               IF     (SPA-MOKUHYO02-YMD    =   SPACE )
+                 OR   (SPA-MOKUHYO02-YMD    <=  SPA-MOKUHYO01-YMD)
+                   MOVE    SPA-MOKUHYO01-YMD(1:6)  TO  WRK-MOKU-YM
+               ELSE
+                   MOVE    SPA-MOKUHYO02-YMD(1:6)  TO  WRK-MOKU-YM
+               END-IF
+               IF     (WRK-MOKUHO-YMD      NOT =   SPACE)
+                  AND (WRK-MOKUHO-YMD          <=  WRK-SRYYMD )
+      *            今回入力
+                   MOVE    WRK-MOKUHO-YM       TO  WRK-MOKU-YM
+               END-IF
+      *        診療日付−３カ月
+               MOVE    WRK-SRYYMD          TO  WRK-CHK-YMD
+      *        診療年月−３月
+               IF      WRK-CHK-MM          >   3
+                   COMPUTE WRK-CHK-MM          =   WRK-CHK-MM
+                                               -   3
+               ELSE
+                   COMPUTE WRK-CHK-MM          =  (WRK-CHK-MM
+                                               +   12 )
+                                               -   3
+                   COMPUTE WRK-CHK-YY          =   WRK-CHK-YY
+                                               -   1
+               END-IF
+      *        算定開始日未満
+               IF     (WRK-YOUKG-YMD       >   WRK-SRYYMD)
+                   MOVE    "K815"              TO  SPA-ERRCD
+               ELSE
+                   IF     (WRK-MOKU-YM         >    WRK-CHK-YM )
+      *           ３カ月以内に目標設定等支援管理料の算定あり
+                       MOVE    "K814"          TO  SPA-ERRCD
+                   END-IF
+               END-IF
+               IF      SPA-ERRCD       NOT =   SPACE
+                   IF     (WRK-COM-KZMFLG8 (IDX-Z)  =   SPACE)
+                   AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
+                       MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                       MOVE    "1"             TO  WRK-COM-KZMFLG8
+                                                        (IDX-Z)
+                       MOVE    WRK-YOUKG-MSG
+                                               TO  LNK-ORCSC-ERRMSG
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                               (IDX-Z)
+                   ELSE
+                       MOVE    SPACE           TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       1001231-YOUKAIGO-EXT.
+           EXIT.
+      *****************************************************************
+      *     H28.10　改正対応チェック処理
+      *****************************************************************
+       1007-MOKUHYO-HEN-SEC            SECTION.
+      *
+           IF     (SPA-NYUGAIKBN       =   "2" ) OR
+                  (LNK-ORCSC-SYORIFLG  =   1   )
+      *        外来か訂正の時の日
+               MOVE    SPA-SRYYMD          TO  WRK-MOKUHO-YMD
+           ELSE
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL      (IDX2    >   31  )
+                   IF      WRK-COM-NYUINDAY (IDX-Z IDX2)   >   ZERO
+                       MOVE    IDX2            TO  IDD
+                       MOVE    SPA-SRYYMD      TO  WRK-MOKUHO-YMD
+                       MOVE    IDD             TO  WRK-MOKUHO-DD
+                       MOVE    31              TO  IDD
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       1007-MOKUHYO-HEN-EXT.
+           EXIT.
       *****************************************************************
       *     精神通院の加算チェック処理
       *****************************************************************
@@ -4241,16 +4500,17 @@
            MOVE    ZERO                TO  IDXT
            PERFORM VARYING    IDX      FROM   1   BY  1
                    UNTIL      IDX      >   TBL-RIHA2016-MAX
-     **        SET     TBL-RIH16       TO  IDX
                IF      TBL-RIH16-KBN (IDX)       =   WRK-RIHA-KBN
                    ADD     1                  TO  IDXT
-                   MOVE    TBL-RIH16-SRYCD(IDX)
+                   IF      IDXT               <=  30
+                       MOVE    TBL-RIH16-SRYCD(IDX)
                                               TO  WRK-SRYCDT (IDXT)
+                   END-IF
                END-IF
            END-PERFORM
       *
            PERFORM VARYING     IDXT    FROM    1   BY  1
-                   UNTIL      (IDXT        >   18  )
+                   UNTIL      (IDXT        >   30  )
                          OR   (WRK-SRYCDT (IDXT)   =   SPACE )
       *
                IF      LNK-ORCSC-SYORIFLG      =   1
@@ -4521,6 +4781,14 @@
                    END-IF
                END-IF
       *
+      *H28.9
+      *        目標設定等支援・管理料チェック
+               IF     (LNK-ORCSC-PG        =   "K02"  )
+                 AND  (WRK-COM-INPUTCD (IDX-Z) =   "180046110"
+                                               OR  "180046210")
+                   PERFORM 20010-MOKUHYO-CHK-SEC
+               END-IF
+      *
            END-IF
            END-PERFORM
            .
@@ -4555,6 +4823,8 @@
                       (LNK-ORCSC-KEI-IDX        =   ZERO )
                    MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
                    MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                           (IDX-Z)
+                   MOVE    "1"                 TO  WRK-COM-CUR
                                                            (IDX-Z)
                    MOVE    "K264"              TO  SPA-ERRCD
                END-IF
@@ -4591,6 +4861,8 @@
                        MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
                        MOVE    "1"                 TO  WRK-COM-KZMFLG
                                                            (IDX-Z)
+                       MOVE    "1"                 TO  WRK-COM-CUR
+                                                           (IDX-Z)
                        MOVE    "K262"              TO  SPA-ERRCD
                    END-IF
                END-IF
@@ -4603,6 +4875,8 @@
                           (LNK-ORCSC-KEI-IDX        =   ZERO )
                        MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
                        MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                           (IDX-Z)
+                       MOVE    "1"                 TO  WRK-COM-CUR
                                                            (IDX-Z)
                        MOVE    "K263"              TO  SPA-ERRCD
                    END-IF
@@ -4652,6 +4926,69 @@
            .
        2001-RIHACHK-EXT.
            EXIT.
+      *H28.9
+      *****************************************************************
+      *    目標設定等支援・管理料チェック処理
+      *****************************************************************
+       20010-MOKUHYO-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-SRYYMD          TO  WRK-CHK-YMD
+      *    診療年月−３月
+           IF      WRK-CHK-MM          >   3
+               COMPUTE WRK-CHK-MM          =   WRK-CHK-MM
+                                           -   3
+           ELSE
+               COMPUTE WRK-CHK-MM          =  (WRK-CHK-MM
+                                           +   12 )
+                                           -   3
+               COMPUTE WRK-CHK-YY          =   WRK-CHK-YY
+                                           -   1
+           END-IF
+      *
+      *    目標設定等支援管理料（２回目以降）
+           IF     (WRK-COM-INPUTCD (IDX-Z) =   "180046210")
+      *        目標設定等支援管理料（初回）があること
+               IF     (SPA-MOKUHYO01-YMD   =   SPACE )
+                 AND  (SPA-MOKUHYO02-YMD   =   SPACE )
+                   MOVE    "K810"              TO  SPA-ERRCD
+               ELSE
+      *            前回初回の算定日が３カ月前
+                   IF     (SPA-MOKUHYO01-YMD(1:6)  >   WRK-CHK-YM )
+                       MOVE    "K812"              TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *    目標設定等支援管理料（初回）
+           IF     (WRK-COM-INPUTCD (IDX-Z) =   "180046110")
+      *        前回の初回、２回目以降が３月前以外
+               IF     (SPA-MOKUHYO01-YMD(1:6)  >   WRK-CHK-YM )
+                  OR  (SPA-MOKUHYO02-YMD(1:6)  >   WRK-CHK-YM )
+                   MOVE    "K812"              TO  SPA-ERRCD
+               END-IF
+      *        前回が初回で３月前であること
+               IF     (SPA-MOKUHYO01-YMD   NOT =   SPACE )
+                  AND (SPA-MOKUHYO01-YMD(1:6)  =   WRK-CHK-YM )
+                   MOVE    "K816"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+      *    警告
+           IF      SPA-ERRCD(1:1)      =   "K"
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE )
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO  )
+                   MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                           (IDX-Z)
+                   MOVE    "1"                 TO  WRK-COM-CUR
+                                                           (IDX-Z)
+               ELSE
+                   MOVE    SPACE               TO  SPA-ERRCD 
+               END-IF
+           END-IF
+           .
+       20010-MOKUHYO-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    自動算定処理

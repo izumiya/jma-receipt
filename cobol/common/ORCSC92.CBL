@@ -4068,13 +4068,16 @@
            MOVE    TNS-GAIKANRIKBN     TO  SPA-COM-GAIKANRIKBN (IDX-T)
       *    ∏°∫∫Õ—°°∂Ë ¨»÷πÊ
            MOVE    TNS-CDKBN-KBN       TO  SPA-COM-CDKBN-KBN (IDX-T)
-           MOVE    TNS-CDKBN-SYO       TO  SPA-COM-CDKBN-SYO (IDX-T)
-           MOVE    TNS-CDKBN-BU        TO  SPA-COM-CDKBN-BU  (IDX-T)
+      **** MOVE    TNS-CDKBN-SYO       TO  SPA-COM-CDKBN-SYO (IDX-T)
+      **** MOVE    TNS-CDKBN-BU        TO  SPA-COM-CDKBN-BU  (IDX-T)
       *    œ´∫“Õ—°°∂Ë ¨»÷πÊ
            MOVE    TNS-CDKBN-KBNNUM    TO  SPA-COM-CDKBN-KBNNUM (IDX-T)
       *    œ´∫“Õ—°°∂Ë ¨»÷πÊªﬁ»÷
            MOVE    TNS-CDKBN-KBNNUM-EDA
                                        TO  SPA-COM-CDKBN-KBNNUM-EDA
+                                                              (IDX-T)
+      *    π‡»÷
+           MOVE    TNS-CDKBN-KOUBAN    TO  SPA-COM-CDKBN-KOUBAN
                                                               (IDX-T)
       *    ∏°∫∫Õ—°° Ò≥Á¬–æ›∏°∫∫
            MOVE    TNS-HOUKNSKBN       TO  SPA-COM-HOUKNSKBN (IDX-T)

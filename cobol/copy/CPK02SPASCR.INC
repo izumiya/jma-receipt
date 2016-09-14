@@ -184,9 +184,12 @@
                            11  SPA-COM-KZMFLG5       PIC X(01).
       *ver.4.7             ½èÊý¤»¤óÎÁ·Ù¹ð£²
                            11  SPA-COM-KZMFLG6       PIC X(01).
-      *                    ·Ù¹ð¡ÊÍ½È÷¡Ë
+      *                    ·Ù¹ð¡Ê¼¾ÉÛÌô·Ù¹ð¡Ë
                            11  SPA-COM-KZMFLG7       PIC X(01).
+      *                    ·Ù¹ð¡Ê¥ê¥Ï¥Ó¥ê¸ºÅÀ¡Ë
                            11  SPA-COM-KZMFLG8       PIC X(01).
+      *                    ·Ù¹ð¡ÊÍ½È÷¡Ë
+                           11  SPA-COM-KZMFLG9       PIC X(01).
       *                    Æþ±¡ÎÁÊ»ÍÑ·Ù¹ð
                            11  SPA-COM-KZMFLGNK      PIC X(01).
       *
@@ -333,12 +336,14 @@
       *                ¸¡ººÍÑ¡¡¶èÊ¬ÈÖ¹æ
                        09  SPA-COM-CDKBN.
                            11  SPA-COM-CDKBN-KBN   PIC  X(01).
-                           11  SPA-COM-CDKBN-SYO   PIC  X(01).
-                           11  SPA-COM-CDKBN-BU    PIC  X(02).
+      ****                 11  SPA-COM-CDKBN-SYO   PIC  X(01).
+      ****                 11  SPA-COM-CDKBN-BU    PIC  X(02).
       *                    Ï«ºÒÍÑ¡¡¶èÊ¬ÈÖ¹æ
                            11  SPA-COM-CDKBN-KBNNUM     PIC  X(03).
       *                    Ï«ºÒÍÑ¡¡¶èÊ¬ÈÖ¹æ»ÞÈÖ
-                           11  SPA-COM-CDKBN-KBNNUM-EDA   PIC  X(02).
+                           11  SPA-COM-CDKBN-KBNNUM-EDA PIC  X(02).
+      *H28.9               ¹àÈÖ
+                           11  SPA-COM-CDKBN-KOUBAN     PIC  X(02).
       *                »»ÄêÍúÎò¶èÊ¬
                        09  SPA-COM-SANTEIRRKKBN    PIC  9(01).
       *                ³°Íè´ÉÍý²Ã»»¶èÊ¬
