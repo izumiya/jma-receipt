@@ -46,6 +46,8 @@
       *                                     追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/09/13  公費番号まとめ情報の公費番号
+      *                                     の追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -203,7 +205,7 @@
                05  WRK-2007-MEISYO PIC X(44).
                05  WRK-2007-KOH-AREA.
                    07  WRK-2007-KOHNUM
-                                   PIC X(03)   OCCURS  10.
+                                   PIC X(03)   OCCURS  30.
            03  WRK-2007-MAX        PIC 9(03).
       *
        01  WRK-2010-AREA.
@@ -542,11 +544,20 @@
       *
                ADD     1                   TO  IDX
                MOVE    SYS-2007-MEISYO (1) TO  WRK-2007-MEISYO   (IDX)
+               MOVE    ZERO                TO  IDZ
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       10
                        OR      SYS-2007-KOHNUM (IDY)   =   SPACE
+                   ADD     1               TO  IDZ
                    MOVE    SYS-2007-KOHNUM (IDY)
-                                           TO WRK-2007-KOHNUM (IDX IDY)
+                                           TO WRK-2007-KOHNUM (IDX IDZ)
+               END-PERFORM
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       20
+                       OR      SYS-2007-KOHNUM1(IDY)   =   SPACE
+                   ADD     1               TO  IDZ
+                   MOVE    SYS-2007-KOHNUM1(IDY)
+                                           TO WRK-2007-KOHNUM (IDX IDZ)
                END-PERFORM
       *
                MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
@@ -973,7 +984,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
                        PERFORM VARYING IDZ1    FROM    1   BY  1
                                UNTIL   IDZ1    >       WRK-2007-MAX
                            PERFORM VARYING IDZ2    FROM    1   BY  1
-                                   UNTIL   IDZ2    >       10
+                                   UNTIL   IDZ2    >       30
                                    OR      WRK-2007-KOHNUM (IDZ1 IDZ2)
                                                    =   SPACE
                                IF      RECE10-KOHNUM (IDZ)
@@ -982,7 +993,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
                                                TO  RECE10-KOHNUM (IDZ)
                                    MOVE    WRK-2007-MEISYO (IDZ1)
                                                TO  WRK-MEISYO
-                                   MOVE    10  TO  IDZ2
+                                   MOVE    30  TO  IDZ2
                                    MOVE    WRK-2007-MAX
                                                TO  IDZ1
                                END-IF

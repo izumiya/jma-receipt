@@ -19,6 +19,16 @@ W64 {
             column12 varchar(3);
             column13 varchar(3);
             column14 varchar(3);
+            column15 varchar(3);
+            column16 varchar(3);
+            column17 varchar(3);
+            column18 varchar(3);
+            column19 varchar(3);
+            column20 varchar(3);
+            column21 varchar(3);
+            column22 varchar(3);
+            column23 varchar(3);
+            column24 varchar(3);
           }[100];
           selectdata bool[100];
       };
@@ -96,6 +106,66 @@ W64 {
       textdata varchar(3);
     };
     SEIDONAME10 {
+      textdata varchar(50);
+    };
+    KOHNUM11 {
+      textdata varchar(3);
+    };
+    SEIDONAME11 {
+      textdata varchar(50);
+    };
+    KOHNUM12 {
+      textdata varchar(3);
+    };
+    SEIDONAME12 {
+      textdata varchar(50);
+    };
+    KOHNUM13 {
+      textdata varchar(3);
+    };
+    SEIDONAME13 {
+      textdata varchar(50);
+    };
+    KOHNUM14 {
+      textdata varchar(3);
+    };
+    SEIDONAME14 {
+      textdata varchar(50);
+    };
+    KOHNUM15 {
+      textdata varchar(3);
+    };
+    SEIDONAME15 {
+      textdata varchar(50);
+    };
+    KOHNUM16 {
+      textdata varchar(3);
+    };
+    SEIDONAME16 {
+      textdata varchar(50);
+    };
+    KOHNUM17 {
+      textdata varchar(3);
+    };
+    SEIDONAME17 {
+      textdata varchar(50);
+    };
+    KOHNUM18 {
+      textdata varchar(3);
+    };
+    SEIDONAME18 {
+      textdata varchar(50);
+    };
+    KOHNUM19 {
+      textdata varchar(3);
+    };
+    SEIDONAME19 {
+      textdata varchar(50);
+    };
+    KOHNUM20 {
+      textdata varchar(3);
+    };
+    SEIDONAME20 {
       textdata varchar(50);
     };
   };

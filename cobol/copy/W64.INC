@@ -8,7 +8,7 @@
                     06  W64-TMEISYO       PIC X(44).
                     06  W64-TSTYUKYMD     PIC X(9).
                     06  W64-TEDYUKYMD     PIC X(9).
-                    06  W64-TKOHNUM       PIC X(3) OCCURS  10.
+                    06  W64-TKOHNUM       PIC X(3) OCCURS  20.
                   05  W64-SELECT
                           PIC X       OCCURS  100 TIMES.
               03  W64-SELNUM.
@@ -21,7 +21,7 @@
                 04  W64-VALUE   PIC X(44).
               03  W64-MEISYO2.
                 04  W64-VALUE   PIC X(44).
-              03  W64-KOH-OCC   OCCURS  10.
+              03  W64-KOH-OCC   OCCURS  20.
                 04  W64-KOHNUM.
                   05  W64-VALUE   PIC X(3).
                 04  W64-SEIDONAME.

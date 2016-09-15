@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    09/07/21  表示名称の追加
+      *
+      *  04.08.01    NACL-藤原    16/09/13  公費番号の追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -49,8 +51,6 @@
       *    画面用ＳＰＡ
        01  SPA-W64.
            03  SPA-W64-AREA.
-               05  SPA-GMN-PAGE        PIC 9(02).
-               05  SPA-GMN-LINE        PIC 9(02).
                05  SPA-GMN-MAX         PIC 9(03).
                05  SPA-GMN-CUR         PIC 9(03).
       *
@@ -62,7 +62,7 @@
                            11  SPA-GMN-TSTYUKYMD   PIC X(09).
                            11  SPA-GMN-TEDYUKYMD   PIC X(09).  
                            11  SPA-GMN-TKOHNUM     PIC X(03)
-                                                       OCCURS  10.
+                                                       OCCURS  20.
       *
                    07  SPA-GMN-KOUMOKU.
                        09  SPA-GMN-SELNUM          PIC 9(03).
@@ -71,7 +71,7 @@
                        09  SPA-GMN-STYUKYMD        PIC X(10).
                        09  SPA-GMN-EDYUKYMD        PIC X(10).
                        09  SPA-GMN-KOH-KOUMOKU. 
-                           11  SPA-GMN-KOH-OCC     OCCURS  10.
+                           11  SPA-GMN-KOH-OCC     OCCURS  20.
                                13  SPA-GMN-KOHNUM  PIC X(03).
                                13  SPA-GMN-SEIDONAME
                                                    PIC X(50).
@@ -135,7 +135,7 @@
            03  WRK-MCP-PATHNAME        PIC X(64).
       *
        01  WRK-CONST-AREA.
-           03  WRK-KOHNUM-MAX          PIC 9(02)   VALUE   10. 
+           03  WRK-KOHNUM-MAX          PIC 9(02)   VALUE   20.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -348,11 +348,20 @@
                MOVE    WRK-HENYMDG         TO  SPA-GMN-TEDYUKYMD (IDX)
       *
                MOVE    SYS-2007-MEISYO (1) TO  SPA-GMN-TMEISYO   (IDX)
+               MOVE    ZERO                TO  IDZ 
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       10
                        OR      SYS-2007-KOHNUM (IDY)   =   SPACE
+                   ADD     1               TO  IDZ
                    MOVE    SYS-2007-KOHNUM (IDY)
-                                           TO SPA-GMN-TKOHNUM (IDX IDY)
+                                           TO SPA-GMN-TKOHNUM (IDX IDZ)
+               END-PERFORM
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       10
+                       OR      SYS-2007-KOHNUM1(IDY)   =   SPACE
+                   ADD     1               TO  IDZ
+                   MOVE    SYS-2007-KOHNUM1(IDY)
+                                           TO SPA-GMN-TKOHNUM (IDX IDZ)
                END-PERFORM
       *
                MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
@@ -623,9 +632,9 @@
       *
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       WRK-KOHNUM-MAX
-                       OR      SYS-2007-KOHNUM (IDX)
+                       OR      SPA-GMN-TKOHNUM (SPA-NAI-SELNUM IDX)
                                    =   SPACE
-                   MOVE    SYS-2007-KOHNUM (IDX)
+                   MOVE    SPA-GMN-TKOHNUM (SPA-NAI-SELNUM IDX)
                                                TO  SPA-GMN-KOHNUM (IDX)
                    MOVE    SPACE               TO  HKNNUM-REC
                    INITIALIZE                      HKNNUM-REC
@@ -879,7 +888,11 @@
                END-IF    
       *
                IF      SPA-ERRCD       NOT =   SPACE
-                   COMPUTE SPA-GMN-CUR     =   4   +   IDX
+                   IF      IDX             <   11
+                       COMPUTE SPA-GMN-CUR     =   4   +   IDX
+                   ELSE
+                       COMPUTE SPA-GMN-CUR     =   5   +   IDX
+                   END-IF
                END-IF
            END-PERFORM    
       *
@@ -897,17 +910,15 @@
       ****     MOVE    "0007"              TO  SPA-ERRCD
       ****     MOVE    4                   TO  SPA-GMN-CUR
       **** ELSE
-               IF    ( SPA-GMN-KOHNUM (1)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (2)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (3)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (4)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (5)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (6)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (7)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (8)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (9)  =   SPACE )
-               AND   ( SPA-GMN-KOHNUM (10) =   SPACE )
-                   MOVE    "0103"              TO  SPA-ERRCD
+               MOVE    "0103"              TO  SPA-ERRCD
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       WRK-KOHNUM-MAX
+                   IF    ( SPA-GMN-KOHNUM (IDX)    NOT =   SPACE )
+                       MOVE    SPACE               TO  SPA-ERRCD
+                       MOVE    WRK-KOHNUM-MAX      TO  IDX
+                   END-IF
+               END-PERFORM
+               IF      SPA-ERRCD       NOT =   SPACE
                    MOVE    5                   TO  SPA-GMN-CUR
                END-IF
       **** END-IF
@@ -943,7 +954,13 @@
                                IF      SPA-GMN-KOHNUM (IDX)
                                                =   SPA-GMN-KOHNUM (IDY)
                                    MOVE    "0109"      TO  SPA-ERRCD
-                                   COMPUTE SPA-GMN-CUR =   4   +   IDX
+                                   IF      IDX         <   11
+                                       COMPUTE SPA-GMN-CUR =   4   +
+                                                               IDX
+                                   ELSE
+                                       COMPUTE SPA-GMN-CUR =   5   +
+                                                               IDX
+                                   END-IF
                                END-IF
                            END-IF
                        END-PERFORM
@@ -983,12 +1000,17 @@
                                   END-PERFORM
                                END-IF
                            END-PERFORM
-                       END-IF 
+                       END-IF
+                   END-IF
+      *
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       IF      IDX             <   11
+                           COMPUTE SPA-GMN-CUR =   4   +  IDX
+                       ELSE
+                           COMPUTE SPA-GMN-CUR =   5   +  IDX
+                       END-IF
                    END-IF
                END-PERFORM 
-               IF      SPA-ERRCD           NOT =   SPACE
-                   MOVE    2                   TO  SPA-GMN-CUR
-               END-IF
            END-IF      
       *
            .
@@ -1158,16 +1180,23 @@
                    MOVE    SPA-NAI-EDYUKYMD    TO  SYS-2007-EDYUKYMD
                END-IF 
       *
-               MOVE    ZERO                TO  IDY
                INITIALIZE                      SYS-2007-KOH-AREA
-               PERFORM VARYING IDX FROM    1   BY  1
+                                               SYS-2007-KOH1-AREA
+               MOVE    ZERO                TO  IDY
+               PERFORM VARYING IDX FROM    1  BY  1
                        UNTIL   IDX >       WRK-KOHNUM-MAX
                    IF      SPA-GMN-KOHNUM (IDX)    =   SPACE
                        CONTINUE
                    ELSE
                        ADD     1               TO  IDY
-                       MOVE    SPA-GMN-KOHNUM (IDX)
+                       IF      IDY             <   11
+                           MOVE    SPA-GMN-KOHNUM (IDX)
                                                TO  SYS-2007-KOHNUM (IDY)
+                       ELSE
+                           COMPUTE IDZ =   IDY -   10
+                           MOVE    SPA-GMN-KOHNUM (IDX)
+                                               TO  SYS-2007-KOHNUM1(IDZ)
+                       END-IF
                    END-IF
                END-PERFORM
                MOVE    SPA-GMN-MEISYO      TO  SYS-2007-MEISYO (1)
@@ -1316,39 +1345,59 @@
            END-IF
       *
            EVALUATE    SPA-GMN-CUR
-             WHEN    1
-                    MOVE  "SELNUM"         TO  MCP-WIDGET   
-             WHEN    2
-                    MOVE  "STYUKYMD"       TO  MCP-WIDGET   
-             WHEN    3
-                    MOVE  "EDYUKYMD"       TO  MCP-WIDGET   
-             WHEN    4
-                    MOVE  "MEISYO"         TO  MCP-WIDGET   
-             WHEN    5
-                    MOVE  "KOHNUM1"        TO  MCP-WIDGET   
-             WHEN    6
-                    MOVE  "KOHNUM2"        TO  MCP-WIDGET   
-             WHEN    7
-                    MOVE  "KOHNUM3"        TO  MCP-WIDGET   
-             WHEN    8
-                    MOVE  "KOHNUM4"        TO  MCP-WIDGET   
-             WHEN    9
-                    MOVE  "KOHNUM5"        TO  MCP-WIDGET   
-             WHEN    10
-                    MOVE  "KOHNUM6"        TO  MCP-WIDGET   
-             WHEN    11
-                    MOVE  "KOHNUM7"        TO  MCP-WIDGET   
-             WHEN    12
-                    MOVE  "KOHNUM8"        TO  MCP-WIDGET   
-             WHEN    13
-                    MOVE  "KOHNUM9"        TO  MCP-WIDGET   
-             WHEN    14
-                    MOVE  "KOHNUM10"       TO  MCP-WIDGET   
-             WHEN    15
-                    MOVE  "MEISYO2"        TO  MCP-WIDGET   
+               WHEN    1
+                   MOVE    "SELNUM"        TO  MCP-WIDGET
+               WHEN    2
+                   MOVE    "STYUKYMD"      TO  MCP-WIDGET
+               WHEN    3
+                   MOVE    "EDYUKYMD"      TO  MCP-WIDGET
+               WHEN    4
+                   MOVE    "MEISYO"        TO  MCP-WIDGET
+               WHEN    5
+                   MOVE    "KOHNUM1"       TO  MCP-WIDGET
+               WHEN    6
+                   MOVE    "KOHNUM2"       TO  MCP-WIDGET
+               WHEN    7
+                   MOVE    "KOHNUM3"       TO  MCP-WIDGET
+               WHEN    8
+                   MOVE    "KOHNUM4"       TO  MCP-WIDGET
+               WHEN    9
+                   MOVE    "KOHNUM5"       TO  MCP-WIDGET
+               WHEN    10
+                   MOVE    "KOHNUM6"       TO  MCP-WIDGET
+               WHEN    11
+                   MOVE    "KOHNUM7"       TO  MCP-WIDGET
+               WHEN    12
+                   MOVE    "KOHNUM8"       TO  MCP-WIDGET
+               WHEN    13
+                   MOVE    "KOHNUM9"       TO  MCP-WIDGET
+               WHEN    14
+                   MOVE    "KOHNUM10"      TO  MCP-WIDGET
+               WHEN    15
+                   MOVE    "MEISYO2"       TO  MCP-WIDGET
+               WHEN    16
+                   MOVE    "KOHNUM11"      TO  MCP-WIDGET
+               WHEN    17
+                   MOVE    "KOHNUM12"      TO  MCP-WIDGET
+               WHEN    18
+                   MOVE    "KOHNUM13"      TO  MCP-WIDGET
+               WHEN    19
+                   MOVE    "KOHNUM14"      TO  MCP-WIDGET
+               WHEN    20
+                   MOVE    "KOHNUM15"      TO  MCP-WIDGET
+               WHEN    21
+                   MOVE    "KOHNUM16"      TO  MCP-WIDGET
+               WHEN    22
+                   MOVE    "KOHNUM17"      TO  MCP-WIDGET
+               WHEN    23
+                   MOVE    "KOHNUM18"      TO  MCP-WIDGET
+               WHEN    24
+                   MOVE    "KOHNUM19"      TO  MCP-WIDGET
+               WHEN    25
+                   MOVE    "KOHNUM20"      TO  MCP-WIDGET
       *
-             WHEN    999
-                    MOVE  "B12"            TO  MCP-WIDGET   
+               WHEN    999
+                   MOVE    "B12"           TO  MCP-WIDGET
          END-EVALUATE
       *
            .
@@ -1390,6 +1439,26 @@
                WHEN    "KOHNUM9"
                    MOVE    14          TO  SPA-GMN-CUR
                WHEN    "KOHNUM10"
+                   MOVE    16          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM11"
+                   MOVE    17          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM12"
+                   MOVE    18          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM13"
+                   MOVE    19          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM14"
+                   MOVE    20          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM15"
+                   MOVE    21          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM16"
+                   MOVE    22          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM17"
+                   MOVE    23          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM18"
+                   MOVE    24          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM19"
+                   MOVE    25          TO  SPA-GMN-CUR
+               WHEN    "KOHNUM20"
                    MOVE    999         TO  SPA-GMN-CUR
            END-EVALUATE
            .
@@ -1495,6 +1564,7 @@
        520-WIDSET-SEC              SECTION.
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
       *
            EVALUATE    SPA-WIDCD
