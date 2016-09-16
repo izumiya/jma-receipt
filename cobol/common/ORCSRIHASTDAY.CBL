@@ -27,6 +27,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.02    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -262,6 +263,42 @@
                05  CONS-NOUKE24-COMMENT   PIC X(09)   VALUE "180044410".
       *        脳血管疾患等リハビリテーション料（３）（要介護・入院）
                05  CONS-NOUKE25-COMMENT   PIC X(09)   VALUE "180044510".
+      *        脳血管疾患等リハビリテーション料１（要介・廃用症以外）基準不適合
+               05  CONS-NOUKE26-COMMENT   PIC X(09)   VALUE "180043430".
+      *        脳血管疾患等リハビリテーション料１（要介・廃用症）基準不適合
+               05  CONS-NOUKE27-COMMENT   PIC X(09)   VALUE "180043530".
+      *        脳血管疾患等リハビリテーション料２（要介・廃用症以外）基準不適合
+               05  CONS-NOUKE28-COMMENT   PIC X(09)   VALUE "180043630".
+      *        脳血管疾患等リハビリテーション料２（要介・廃用症）基準不適合
+               05  CONS-NOUKE29-COMMENT   PIC X(09)   VALUE "180043730".
+      *        脳血管疾患等リハビリテーション料３（要介・廃用症以外）基準不適合
+               05  CONS-NOUKE30-COMMENT   PIC X(09)   VALUE "180043830".
+      *        脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
+               05  CONS-NOUKE31-COMMENT   PIC X(09)   VALUE "180043930".
+      *        脳血管疾患等リハビリテーション料（１）（リ減）
+               05  CONS-NOUKE32-COMMENT   PIC X(09)   VALUE "180050330".
+      *        脳血管疾患等リハビリテーション料（２）（リ減）
+               05  CONS-NOUKE33-COMMENT   PIC X(09)   VALUE "180050430".
+      *        脳血管疾患等リハビリテーション料（３）（リ減）
+               05  CONS-NOUKE34-COMMENT   PIC X(09)   VALUE "180050530".
+      *        脳血管疾患等リハビリテーション料（１）（要介護・入院）（リ減）
+               05  CONS-NOUKE35-COMMENT   PIC X(09)   VALUE "180050630".
+      *        脳血管疾患等リハビリテーション料（１）（要介護・入院外）（リ減）
+               05  CONS-NOUKE36-COMMENT   PIC X(09)   VALUE "180050730".
+      *        脳血管疾患等リハビリテーション料（２）（要介護・入院）（リ減）
+               05  CONS-NOUKE37-COMMENT   PIC X(09)   VALUE "180050830".
+      *        脳血管疾患等リハビリテーション料（２）（要介護・入院外）（リ減）
+               05  CONS-NOUKE38-COMMENT   PIC X(09)   VALUE "180050930".
+      *        脳血管疾患等リハビリテーション料（３）（要介護・入院）（リ減）
+               05  CONS-NOUKE39-COMMENT   PIC X(09)   VALUE "180051030".
+      *        脳血管疾患等リハビリテーション料（３）（要介護・入院外）（リ減）
+               05  CONS-NOUKE40-COMMENT   PIC X(09)   VALUE "180051130".
+      *        脳血管疾患等リハビリテーション料（１）（要介護）基準不適合・リ減
+               05  CONS-NOUKE41-COMMENT   PIC X(09)   VALUE "180051230".
+      *        脳血管疾患等リハビリテーション料（２）（要介護）基準不適合・リ減
+               05  CONS-NOUKE42-COMMENT   PIC X(09)   VALUE "180051330".
+      *        脳血管疾患等リハビリテーション料（３）（要介護）基準不適合・リ減
+               05  CONS-NOUKE43-COMMENT   PIC X(09)   VALUE "180051430".
       *        運動器リハビリテーション料（１）
                05  CONS-UNDOKI1-COMMENT   PIC X(09)   VALUE "180027810".
       *        運動器リハビリテーション料（２）
@@ -296,6 +333,36 @@
                05  CONS-UNDOKI20-COMMENT  PIC X(09)   VALUE "101801070".
       *#       運動器リハビリテーション料（３）（１．５倍）
                05  CONS-UNDOKI21-COMMENT  PIC X(09)   VALUE "101801080".
+      *        運動器リハビリテーション料（１）（要介護）（施設基準不適合）
+               05  CONS-UNDOKI22-COMMENT  PIC X(09)   VALUE "180044030".
+      *        運動器リハビリテーション料（２）（要介護）（施設基準不適合）
+               05  CONS-UNDOKI23-COMMENT  PIC X(09)   VALUE "180044130".
+      *        運動器リハビリテーション料（３）（要介護）（施設基準不適合）
+               05  CONS-UNDOKI24-COMMENT  PIC X(09)   VALUE "180044230".
+      *        運動器リハビリテーション料（１）（リ減）
+               05  CONS-UNDOKI25-COMMENT  PIC X(09)   VALUE "180052730".
+      *        運動器リハビリテーション料（２）（リ減）
+               05  CONS-UNDOKI26-COMMENT  PIC X(09)   VALUE "180052830".
+      *        運動器リハビリテーション料（３）（リ減）
+               05  CONS-UNDOKI27-COMMENT  PIC X(09)   VALUE "180052930".
+      *        運動器リハビリテーション料（１）（要介護・入院）（リ減）
+               05  CONS-UNDOKI28-COMMENT  PIC X(09)   VALUE "180053030".
+      *        運動器リハビリテーション料（１）（要介護・入院外）（リ減）
+               05  CONS-UNDOKI29-COMMENT  PIC X(09)   VALUE "180053130".
+      *        運動器リハビリテーション料（２）（要介護・入院）（リ減）
+               05  CONS-UNDOKI30-COMMENT  PIC X(09)   VALUE "180053230".
+      *        運動器リハビリテーション料（２）（要介護・入院外）（リ減）
+               05  CONS-UNDOKI31-COMMENT  PIC X(09)   VALUE "180053330".
+      *        運動器リハビリテーション料（３）（要介護・入院）（リ減）
+               05  CONS-UNDOKI32-COMMENT  PIC X(09)   VALUE "180053430".
+      *        運動器リハビリテーション料（３）（要介護・入院外）（リ減）
+               05  CONS-UNDOKI33-COMMENT  PIC X(09)   VALUE "180053530".
+      *        運動器リハビリテーション料（１）（要介護）基準不適合・リ減
+               05  CONS-UNDOKI34-COMMENT  PIC X(09)   VALUE "180053630".
+      *        運動器リハビリテーション料（２）（要介護）基準不適合・リ減
+               05  CONS-UNDOKI35-COMMENT  PIC X(09)   VALUE "180053730".
+      *        運動器リハビリテーション料（３）（要介護）基準不適合・リ減
+               05  CONS-UNDOKI36-COMMENT  PIC X(09)   VALUE "180053830".
       *        難病患者リハビリテーション料
                05  CONS-NANBYO-COMMENT    PIC X(09)   VALUE "180017910".
       *        障害児（者）リハビリテーション料（６歳未満）
@@ -336,14 +403,38 @@
                05  CONS-HAIYO14-COMMENT   PIC X(09)   VALUE "101801120".
       *#       廃用症候群リハビリテーション料（３）（１単位）
                05  CONS-HAIYO15-COMMENT   PIC X(09)   VALUE "101801130".
+      *        廃用症候群リハビリテーション料（１）（リ減）
+               05  CONS-HAIYO16-COMMENT   PIC X(09)   VALUE "180051530".
+      *        廃用症候群リハビリテーション料（２）（リ減）
+               05  CONS-HAIYO17-COMMENT   PIC X(09)   VALUE "180051630".
+      *        廃用症候群リハビリテーション料（３）（リ減）
+               05  CONS-HAIYO18-COMMENT   PIC X(09)   VALUE "180051730".
+      *        廃用症候群リハビリテーション料（１）（要介護・入院）（リ減）
+               05  CONS-HAIYO19-COMMENT   PIC X(09)   VALUE "180051830".
+      *        廃用症候群リハビリテーション料（１）（要介護・入院外）（リ減）
+               05  CONS-HAIYO20-COMMENT   PIC X(09)   VALUE "180051930".
+      *        廃用症候群リハビリテーション料（２）（要介護・入院）（リ減）
+               05  CONS-HAIYO21-COMMENT   PIC X(09)   VALUE "180052030".
+      *        廃用症候群リハビリテーション料（２）（要介護・入院外）（リ減）
+               05  CONS-HAIYO22-COMMENT   PIC X(09)   VALUE "180052130".
+      *        廃用症候群リハビリテーション料（３）（要介護・入院）（リ減）
+               05  CONS-HAIYO23-COMMENT   PIC X(09)   VALUE "180052230".
+      *        廃用症候群リハビリテーション料（３）（要介護・入院外）（リ減）
+               05  CONS-HAIYO24-COMMENT   PIC X(09)   VALUE "180052330".
+      *        廃用症候群リハビリテーション料（１）（要介護）基準不適合・リ減
+               05  CONS-HAIYO25-COMMENT   PIC X(09)   VALUE "180052430".
+      *        廃用症候群リハビリテーション料（２）（要介護）基準不適合・リ減
+               05  CONS-HAIYO26-COMMENT   PIC X(09)   VALUE "180052530".
+      *        廃用症候群リハビリテーション料（３）（要介護）基準不適合・リ減
+               05  CONS-HAIYO27-COMMENT   PIC X(09)   VALUE "180052630".
       *        初期加算（リハビリテーション料）
                05  CONS-RIHAKSN1-COMMENT  PIC X(09)   VALUE "180033870".
       *        早期リハビリテーション加算
                05  CONS-RIHAKSN2-COMMENT  PIC X(09)   VALUE "180030770".
       *
            03  CONS-RIHA-COMMENT-R REDEFINES CONS-RIHA-COMMENT-VAL.
-               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 72.
-           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  72.
+               05  CONS-RIHA-COMMENT      PIC X(09)   OCCURS 117.
+           03  CONS-RIHA-COMMENT-MAX      PIC 9(03)   VALUE  117.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -669,6 +760,24 @@
                                    OR    CONS-NOUKE23-COMMENT
                                    OR    CONS-NOUKE24-COMMENT
                                    OR    CONS-NOUKE25-COMMENT
+                                   OR    CONS-NOUKE26-COMMENT
+                                   OR    CONS-NOUKE27-COMMENT
+                                   OR    CONS-NOUKE28-COMMENT
+                                   OR    CONS-NOUKE29-COMMENT
+                                   OR    CONS-NOUKE30-COMMENT
+                                   OR    CONS-NOUKE31-COMMENT
+                                   OR    CONS-NOUKE32-COMMENT
+                                   OR    CONS-NOUKE33-COMMENT
+                                   OR    CONS-NOUKE34-COMMENT
+                                   OR    CONS-NOUKE35-COMMENT
+                                   OR    CONS-NOUKE36-COMMENT
+                                   OR    CONS-NOUKE37-COMMENT
+                                   OR    CONS-NOUKE38-COMMENT
+                                   OR    CONS-NOUKE39-COMMENT
+                                   OR    CONS-NOUKE40-COMMENT
+                                   OR    CONS-NOUKE41-COMMENT
+                                   OR    CONS-NOUKE42-COMMENT
+                                   OR    CONS-NOUKE43-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
@@ -696,6 +805,18 @@
                                    OR    CONS-HAIYO13-COMMENT
                                    OR    CONS-HAIYO14-COMMENT
                                    OR    CONS-HAIYO15-COMMENT
+                                   OR    CONS-HAIYO16-COMMENT
+                                   OR    CONS-HAIYO17-COMMENT
+                                   OR    CONS-HAIYO18-COMMENT
+                                   OR    CONS-HAIYO19-COMMENT
+                                   OR    CONS-HAIYO20-COMMENT
+                                   OR    CONS-HAIYO21-COMMENT
+                                   OR    CONS-HAIYO22-COMMENT
+                                   OR    CONS-HAIYO23-COMMENT
+                                   OR    CONS-HAIYO24-COMMENT
+                                   OR    CONS-HAIYO25-COMMENT
+                                   OR    CONS-HAIYO26-COMMENT
+                                   OR    CONS-HAIYO27-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO
@@ -717,6 +838,21 @@
                                    OR    CONS-UNDOKI17-COMMENT
                                    OR    CONS-UNDOKI18-COMMENT
                                    OR    CONS-UNDOKI19-COMMENT
+                                   OR    CONS-UNDOKI22-COMMENT
+                                   OR    CONS-UNDOKI23-COMMENT
+                                   OR    CONS-UNDOKI24-COMMENT
+                                   OR    CONS-UNDOKI25-COMMENT
+                                   OR    CONS-UNDOKI26-COMMENT
+                                   OR    CONS-UNDOKI27-COMMENT
+                                   OR    CONS-UNDOKI28-COMMENT
+                                   OR    CONS-UNDOKI29-COMMENT
+                                   OR    CONS-UNDOKI30-COMMENT
+                                   OR    CONS-UNDOKI31-COMMENT
+                                   OR    CONS-UNDOKI32-COMMENT
+                                   OR    CONS-UNDOKI33-COMMENT
+                                   OR    CONS-UNDOKI34-COMMENT
+                                   OR    CONS-UNDOKI35-COMMENT
+                                   OR    CONS-UNDOKI36-COMMENT
                  PERFORM  VARYING  IDX3  FROM  1  BY  1
                            UNTIL   IDX3   >   31
                    IF   ACCT-DAY(1 IDX3)  NOT = ZERO

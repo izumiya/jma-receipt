@@ -66,7 +66,7 @@
               04  LNK-RIHASTDAY-SYSCDLST-IDX      PIC  9(03).
       *       リハビリコード一覧 (LNK-RIHASTDAY-HOSPNUM = ZERO の時返却)
               04  LNK-RIHASTDAY-SRYCDLST          PIC  X(09)
-                                                  OCCURS  100.
+                                                  OCCURS  300.
               04  LNK-RIHASTDAY-SRYCDLST-IDX      PIC  9(03).
       *
       *復帰コード

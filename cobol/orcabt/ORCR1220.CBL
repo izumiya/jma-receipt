@@ -141,6 +141,7 @@
       *  04.08.08    NACL-門脇    16/05/20  標準負担額経過措置（精神）入院年月日
       *                                     のコメント対応
       *  04.08.09    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.10    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -823,6 +824,20 @@
            03  CONS-NOUKE24-COMMENT  PIC X(09)  VALUE  "180044410".
       *    脳血管疾患等リハビリテーション料（３）（要介護・入院）
            03  CONS-NOUKE25-COMMENT  PIC X(09)  VALUE  "180044510".
+      *
+      *    脳血管疾患等リハビリテーション料（１）（リ減）
+           03  CONS-NOUKE26-COMMENT  PIC X(09)  VALUE  "180050330".
+      *    脳血管疾患等リハビリテーション料（２）（リ減）
+           03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180050430".
+      *    脳血管疾患等リハビリテーション料（３）（リ減）
+           03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180050530".
+      *    脳血管疾患等リハビリテーション料（１）（要介護・入院）（リ減）
+           03  CONS-NOUKE29-COMMENT  PIC X(09)  VALUE  "180050630".
+      *    脳血管疾患等リハビリテーション料（２）（要介護・入院）（リ減）
+           03  CONS-NOUKE30-COMMENT  PIC X(09)  VALUE  "180050830".
+      *    脳血管疾患等リハビリテーション料（３）（要介護・入院）（リ減）
+           03  CONS-NOUKE31-COMMENT  PIC X(09)  VALUE  "180051030".
+      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -849,6 +864,20 @@
            03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180045910".
       *    運動器リハビリテーション料（３）（要介護・入院）
            03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180046010".
+      *
+      *    運動器リハビリテーション料（１）（リ減）
+           03  CONS-UNDOKI22-COMMENT PIC X(09)  VALUE  "180052730".
+      *    運動器リハビリテーション料（２）（リ減）
+           03  CONS-UNDOKI23-COMMENT PIC X(09)  VALUE  "180052830".
+      *    運動器リハビリテーション料（３）（リ減）
+           03  CONS-UNDOKI24-COMMENT PIC X(09)  VALUE  "180052930".
+      *    運動器リハビリテーション料（１）（要介護・入院）（リ減）
+           03  CONS-UNDOKI25-COMMENT PIC X(09)  VALUE  "180053030".
+      *    運動器リハビリテーション料（２）（要介護・入院）（リ減）
+           03  CONS-UNDOKI26-COMMENT PIC X(09)  VALUE  "180053230".
+      *    運動器リハビリテーション料（３）（要介護・入院）（リ減）
+           03  CONS-UNDOKI27-COMMENT PIC X(09)  VALUE  "180053430".
+      *
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -871,6 +900,19 @@
            03  CONS-HAIYO5-COMMENT   PIC X(09)  VALUE  "180045110".
       *    廃用症候群リハビリテーション料（３）（要介護・入院）
            03  CONS-HAIYO6-COMMENT   PIC X(09)  VALUE  "180045310".
+      *
+      *    廃用症候群リハビリテーション料（１）（リ減）
+           03  CONS-HAIYO10-COMMENT  PIC X(09)  VALUE  "180051530".
+      *    廃用症候群リハビリテーション料（２）（リ減）
+           03  CONS-HAIYO11-COMMENT  PIC X(09)  VALUE  "180051630".
+      *    廃用症候群リハビリテーション料（３）（リ減）
+           03  CONS-HAIYO12-COMMENT  PIC X(09)  VALUE  "180051730".
+      *    廃用症候群リハビリテーション料（１）（要介護・入院）（リ減）
+           03  CONS-HAIYO13-COMMENT  PIC X(09)  VALUE  "180051830".
+      *    廃用症候群リハビリテーション料（２）（要介護・入院）（リ減）
+           03  CONS-HAIYO14-COMMENT  PIC X(09)  VALUE  "180052030".
+      *    廃用症候群リハビリテーション料（３）（要介護・入院）（リ減）
+           03  CONS-HAIYO15-COMMENT  PIC X(09)  VALUE  "180052230".
       *
       *    初期加算（リハビリテーション料）
            03  CONS-RIHAKSN1-COMMENT PIC X(09)  VALUE  "180033870".
@@ -2945,6 +2987,12 @@
                                             CONS-NOUKE23-COMMENT  OR
                                             CONS-NOUKE24-COMMENT  OR
                                             CONS-NOUKE25-COMMENT  OR
+                                            CONS-NOUKE26-COMMENT  OR
+                                            CONS-NOUKE27-COMMENT  OR
+                                            CONS-NOUKE28-COMMENT  OR
+                                            CONS-NOUKE29-COMMENT  OR
+                                            CONS-NOUKE30-COMMENT  OR
+                                            CONS-NOUKE31-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -2956,6 +3004,12 @@
                                             CONS-UNDOKI17-COMMENT OR
                                             CONS-UNDOKI18-COMMENT OR
                                             CONS-UNDOKI19-COMMENT OR
+                                            CONS-UNDOKI22-COMMENT OR
+                                            CONS-UNDOKI23-COMMENT OR
+                                            CONS-UNDOKI24-COMMENT OR
+                                            CONS-UNDOKI25-COMMENT OR
+                                            CONS-UNDOKI26-COMMENT OR
+                                            CONS-UNDOKI27-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -2965,6 +3019,12 @@
                                             CONS-HAIYO4-COMMENT   OR
                                             CONS-HAIYO5-COMMENT   OR
                                             CONS-HAIYO6-COMMENT   OR
+                                            CONS-HAIYO10-COMMENT  OR
+                                            CONS-HAIYO11-COMMENT  OR
+                                            CONS-HAIYO12-COMMENT  OR
+                                            CONS-HAIYO13-COMMENT  OR
+                                            CONS-HAIYO14-COMMENT  OR
+                                            CONS-HAIYO15-COMMENT  OR
                                             CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-RIHABIRI-COMMENT
@@ -3026,6 +3086,12 @@
                                       OR    CONS-NOUKE23-COMMENT
                                       OR    CONS-NOUKE24-COMMENT
                                       OR    CONS-NOUKE25-COMMENT
+                                      OR    CONS-NOUKE26-COMMENT
+                                      OR    CONS-NOUKE27-COMMENT
+                                      OR    CONS-NOUKE28-COMMENT
+                                      OR    CONS-NOUKE29-COMMENT
+                                      OR    CONS-NOUKE30-COMMENT
+                                      OR    CONS-NOUKE31-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-NOUKE-COMMENT
                 END-IF
@@ -3042,6 +3108,12 @@
                                       OR    CONS-UNDOKI17-COMMENT
                                       OR    CONS-UNDOKI18-COMMENT
                                       OR    CONS-UNDOKI19-COMMENT
+                                      OR    CONS-UNDOKI22-COMMENT
+                                      OR    CONS-UNDOKI23-COMMENT
+                                      OR    CONS-UNDOKI24-COMMENT
+                                      OR    CONS-UNDOKI25-COMMENT
+                                      OR    CONS-UNDOKI26-COMMENT
+                                      OR    CONS-UNDOKI27-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-UNDOKI-COMMENT
                 END-IF
@@ -3065,6 +3137,12 @@
                                       OR    CONS-HAIYO4-COMMENT
                                       OR    CONS-HAIYO5-COMMENT
                                       OR    CONS-HAIYO6-COMMENT
+                                      OR    CONS-HAIYO10-COMMENT
+                                      OR    CONS-HAIYO11-COMMENT
+                                      OR    CONS-HAIYO12-COMMENT
+                                      OR    CONS-HAIYO13-COMMENT
+                                      OR    CONS-HAIYO14-COMMENT
+                                      OR    CONS-HAIYO15-COMMENT
                         MOVE   "1"    TO    RECE200-COMCNTFLG
                         MOVE   "1"    TO    RECE220-HAIYO-COMMENT
                 END-IF

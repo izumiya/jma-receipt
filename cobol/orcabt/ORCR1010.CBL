@@ -135,6 +135,7 @@
       *  04.08.08    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.09    NACL-門脇    16/05/20  標準負担額経過措置（精神）入院年月日
       *                                     のコメント対応
+      *  04.08.10    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -749,6 +750,26 @@
            03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180043830".
       *    脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
            03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180043930".
+      *
+      *    脳血管疾患等リハビリテーション料（１）（リ減）
+           03  CONS-NOUKE29-COMMENT  PIC X(09)  VALUE  "180050330".
+      *    脳血管疾患等リハビリテーション料（２）（リ減）
+           03  CONS-NOUKE30-COMMENT  PIC X(09)  VALUE  "180050430".
+      *    脳血管疾患等リハビリテーション料（３）（リ減）
+           03  CONS-NOUKE31-COMMENT  PIC X(09)  VALUE  "180050530".
+      *    脳血管疾患等リハビリテーション料（１）（要介護・入院外）（リ減）
+           03  CONS-NOUKE32-COMMENT  PIC X(09)  VALUE  "180050730".
+      *    脳血管疾患等リハビリテーション料（２）（要介護・入院外）（リ減）
+           03  CONS-NOUKE33-COMMENT  PIC X(09)  VALUE  "180050930".
+      *    脳血管疾患等リハビリテーション料（３）（要介護・入院外）（リ減）
+           03  CONS-NOUKE34-COMMENT  PIC X(09)  VALUE  "180051130".
+      *    脳血管疾患等リハビリテーション料（１）（要介護）基準不適合・リ減
+           03  CONS-NOUKE35-COMMENT  PIC X(09)  VALUE  "180051230".
+      *    脳血管疾患等リハビリテーション料（２）（要介護）基準不適合・リ減
+           03  CONS-NOUKE36-COMMENT  PIC X(09)  VALUE  "180051330".
+      *    脳血管疾患等リハビリテーション料（３）（要介護）基準不適合・リ減
+           03  CONS-NOUKE37-COMMENT  PIC X(09)  VALUE  "180051430".
+      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -775,6 +796,26 @@
            03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180044130".
       *    運動器リハビリテーション料（３）（要介護）（施設基準不適合）
            03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180044230".
+      *
+      *    運動器リハビリテーション料（１）（リ減）
+           03  CONS-UNDOKI22-COMMENT PIC X(09)  VALUE  "180052730".
+      *    運動器リハビリテーション料（２）（リ減）
+           03  CONS-UNDOKI23-COMMENT PIC X(09)  VALUE  "180052830".
+      *    運動器リハビリテーション料（３）（リ減）
+           03  CONS-UNDOKI24-COMMENT PIC X(09)  VALUE  "180052930".
+      *    運動器リハビリテーション料（１）（要介護・入院外）（リ減）
+           03  CONS-UNDOKI25-COMMENT PIC X(09)  VALUE  "180053130".
+      *    運動器リハビリテーション料（２）（要介護・入院外）（リ減）
+           03  CONS-UNDOKI26-COMMENT PIC X(09)  VALUE  "180053330".
+      *    運動器リハビリテーション料（３）（要介護・入院外）（リ減）
+           03  CONS-UNDOKI27-COMMENT PIC X(09)  VALUE  "180053530".
+      *    運動器リハビリテーション料（１）（要介護）基準不適合・リ減
+           03  CONS-UNDOKI28-COMMENT PIC X(09)  VALUE  "180053630".
+      *    運動器リハビリテーション料（２）（要介護）基準不適合・リ減
+           03  CONS-UNDOKI29-COMMENT PIC X(09)  VALUE  "180053730".
+      *    運動器リハビリテーション料（３）（要介護）基準不適合・リ減
+           03  CONS-UNDOKI30-COMMENT PIC X(09)  VALUE  "180053830".
+      *
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -803,6 +844,25 @@
            03  CONS-HAIYO8-COMMENT   PIC X(09)  VALUE  "180045630".
       *    廃用症候群リハビリテーション料３（要介護）基準不適合
            03  CONS-HAIYO9-COMMENT   PIC X(09)  VALUE  "180045730".
+      *
+      *    廃用症候群リハビリテーション料（１）（リ減）
+           03  CONS-HAIYO13-COMMENT  PIC X(09)  VALUE  "180051530".
+      *    廃用症候群リハビリテーション料（２）（リ減）
+           03  CONS-HAIYO14-COMMENT  PIC X(09)  VALUE  "180051630".
+      *    廃用症候群リハビリテーション料（３）（リ減）
+           03  CONS-HAIYO15-COMMENT  PIC X(09)  VALUE  "180051730".
+      *    廃用症候群リハビリテーション料（１）（要介護・入院外）（リ減）
+           03  CONS-HAIYO16-COMMENT  PIC X(09)  VALUE  "180051930".
+      *    廃用症候群リハビリテーション料（２）（要介護・入院外）（リ減）
+           03  CONS-HAIYO17-COMMENT  PIC X(09)  VALUE  "180052130".
+      *    廃用症候群リハビリテーション料（３）（要介護・入院外）（リ減）
+           03  CONS-HAIYO18-COMMENT  PIC X(09)  VALUE  "180052330".
+      *    廃用症候群リハビリテーション料（１）（要介護）基準不適合・リ減
+           03  CONS-HAIYO19-COMMENT  PIC X(09)  VALUE  "180052430".
+      *    廃用症候群リハビリテーション料（２）（要介護）基準不適合・リ減
+           03  CONS-HAIYO20-COMMENT  PIC X(09)  VALUE  "180052530".
+      *    廃用症候群リハビリテーション料（３）（要介護）基準不適合・リ減
+           03  CONS-HAIYO21-COMMENT  PIC X(09)  VALUE  "180052630".
       *
       *    初期加算（リハビリテーション料）
            03  CONS-RIHAKSN1-COMMENT PIC X(09)  VALUE  "180033870".
@@ -3472,6 +3532,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-NOUKE26-COMMENT  OR
                                             CONS-NOUKE27-COMMENT  OR
                                             CONS-NOUKE28-COMMENT  OR
+                                            CONS-NOUKE29-COMMENT  OR
+                                            CONS-NOUKE30-COMMENT  OR
+                                            CONS-NOUKE31-COMMENT  OR
+                                            CONS-NOUKE32-COMMENT  OR
+                                            CONS-NOUKE33-COMMENT  OR
+                                            CONS-NOUKE34-COMMENT  OR
+                                            CONS-NOUKE35-COMMENT  OR
+                                            CONS-NOUKE36-COMMENT  OR
+                                            CONS-NOUKE37-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -3483,6 +3552,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-UNDOKI17-COMMENT OR
                                             CONS-UNDOKI18-COMMENT OR
                                             CONS-UNDOKI19-COMMENT OR
+                                            CONS-UNDOKI22-COMMENT OR
+                                            CONS-UNDOKI23-COMMENT OR
+                                            CONS-UNDOKI24-COMMENT OR
+                                            CONS-UNDOKI25-COMMENT OR
+                                            CONS-UNDOKI26-COMMENT OR
+                                            CONS-UNDOKI27-COMMENT OR
+                                            CONS-UNDOKI28-COMMENT OR
+                                            CONS-UNDOKI29-COMMENT OR
+                                            CONS-UNDOKI30-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -3495,6 +3573,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-HAIYO7-COMMENT   OR
                                             CONS-HAIYO8-COMMENT   OR
                                             CONS-HAIYO9-COMMENT   OR
+                                            CONS-HAIYO13-COMMENT  OR
+                                            CONS-HAIYO14-COMMENT  OR
+                                            CONS-HAIYO15-COMMENT  OR
+                                            CONS-HAIYO16-COMMENT  OR
+                                            CONS-HAIYO17-COMMENT  OR
+                                            CONS-HAIYO18-COMMENT  OR
+                                            CONS-HAIYO19-COMMENT  OR
+                                            CONS-HAIYO20-COMMENT  OR
+                                            CONS-HAIYO21-COMMENT  OR
                                             CONS-GANKNJ-COMMENT
       ****              MOVE   "1"    TO    RECE100-COMCNTFLG
                         MOVE   "1"    TO    RECE120-RIHABIRI-COMMENT
@@ -3559,6 +3646,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-NOUKE26-COMMENT
                                       OR    CONS-NOUKE27-COMMENT
                                       OR    CONS-NOUKE28-COMMENT
+                                      OR    CONS-NOUKE29-COMMENT
+                                      OR    CONS-NOUKE30-COMMENT
+                                      OR    CONS-NOUKE31-COMMENT
+                                      OR    CONS-NOUKE32-COMMENT
+                                      OR    CONS-NOUKE33-COMMENT
+                                      OR    CONS-NOUKE34-COMMENT
+                                      OR    CONS-NOUKE35-COMMENT
+                                      OR    CONS-NOUKE36-COMMENT
+                                      OR    CONS-NOUKE37-COMMENT
                         MOVE   "1"    TO    RECE100-COMCNTFLG
                         MOVE   "1"    TO    RECE120-NOUKE-COMMENT
                 END-IF
@@ -3575,6 +3671,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-UNDOKI17-COMMENT
                                       OR    CONS-UNDOKI18-COMMENT
                                       OR    CONS-UNDOKI19-COMMENT
+                                      OR    CONS-UNDOKI22-COMMENT
+                                      OR    CONS-UNDOKI23-COMMENT
+                                      OR    CONS-UNDOKI24-COMMENT
+                                      OR    CONS-UNDOKI25-COMMENT
+                                      OR    CONS-UNDOKI26-COMMENT
+                                      OR    CONS-UNDOKI27-COMMENT
+                                      OR    CONS-UNDOKI28-COMMENT
+                                      OR    CONS-UNDOKI29-COMMENT
+                                      OR    CONS-UNDOKI30-COMMENT
                         MOVE   "1"    TO    RECE100-COMCNTFLG
                         MOVE   "1"    TO    RECE120-UNDOKI-COMMENT
                 END-IF
@@ -3601,6 +3706,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-HAIYO7-COMMENT
                                       OR    CONS-HAIYO8-COMMENT
                                       OR    CONS-HAIYO9-COMMENT
+                                      OR    CONS-HAIYO13-COMMENT
+                                      OR    CONS-HAIYO14-COMMENT
+                                      OR    CONS-HAIYO15-COMMENT
+                                      OR    CONS-HAIYO16-COMMENT
+                                      OR    CONS-HAIYO17-COMMENT
+                                      OR    CONS-HAIYO18-COMMENT
+                                      OR    CONS-HAIYO19-COMMENT
+                                      OR    CONS-HAIYO20-COMMENT
+                                      OR    CONS-HAIYO21-COMMENT
                         MOVE   "1"    TO    RECE100-COMCNTFLG
                         MOVE   "1"    TO    RECE120-HAIYO-COMMENT
                 END-IF
