@@ -2691,9 +2691,9 @@
       *            今回入力
                    MOVE    WRK-MOKUHO-YM       TO  WRK-MOKU-YM
                END-IF
-      *        診療日付−３カ月
-               MOVE    WRK-SRYYMD          TO  WRK-CHK-YMD
+      *
       *        診療年月−３月
+               MOVE    WRK-SRYYMD          TO  WRK-CHK-YMD
                IF      WRK-CHK-MM          >   3
                    COMPUTE WRK-CHK-MM          =   WRK-CHK-MM
                                                -   3
@@ -2704,8 +2704,9 @@
                    COMPUTE WRK-CHK-YY          =   WRK-CHK-YY
                                                -   1
                END-IF
+      *
                IF    (WRK-MOKU-YM      =   SPACE )
-                  OR (WRK-MOKU-YM      <=  WRK-CHK-YM )
+                  OR (WRK-MOKU-YM      <   WRK-CHK-YM )
       *           ３カ月以内に目標設定等支援管理料の算定なし
                    IF     (WRK-COM-KZMFLG8(IDX-Z)   =   SPACE)
                    AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
@@ -2750,7 +2751,7 @@
                IF     (WRK-YOUKG-YMD       >   WRK-SRYYMD)
                    MOVE    "K815"              TO  SPA-ERRCD
                ELSE
-                   IF     (WRK-MOKU-YM         >    WRK-CHK-YM )
+                   IF     (WRK-MOKU-YM         >=   WRK-CHK-YM )
       *           ３カ月以内に目標設定等支援管理料の算定あり
                        MOVE    "K814"          TO  SPA-ERRCD
                    END-IF
