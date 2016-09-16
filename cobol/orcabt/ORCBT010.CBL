@@ -135,6 +135,7 @@
       *  04.08.03    NACL-藤原    15/11/13  診療データがない場合は対象の
       *                                     病名があっても病名データも作成しない
       *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.05    NACL-小豆沢  16/09/16  持参薬は出力しないよう対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3906,6 +3907,13 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    IF    ( ACCT-ZAITEN         =   ZERO   )
                    OR    ( ACCT-HKNCOMBI       =   "9999" )
                    OR    ( ACCT-JIHOKBN        =   "1"    )
+                       GO  TO  900-SRYACCT-READ-SEC
+                   END-IF
+               END-IF
+      *        包括を含むときでも持参薬入力分は出力しない
+               IF    ( WRK-PARA-HOUKATUKBN =   "2"  )
+                   IF    ( ACCT-JIHOKBN        =   "1"   )
+                   AND   ( ACCT-ZAIKBN         =   3  OR  4 )
                        GO  TO  900-SRYACCT-READ-SEC
                    END-IF
                END-IF
