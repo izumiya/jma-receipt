@@ -2635,7 +2635,11 @@
            INITIALIZE                      STS-AREA-DAY
            INITIALIZE                      LNK-DAY2-AREA
            MOVE    "21"                TO  LNK-DAY2-IRAI
+      *    H28/10/1　からとする
            MOVE    LNK-DAY6-KEISAN     TO  LNK-DAY2-YMD
+           IF      LNK-DAY6-KEISAN     <   "20161001"
+               MOVE    20161001            TO  LNK-DAY2-YMD
+           END-IF
            CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY2-AREA
            STRING  "減点開始日："      DELIMITED  BY  SIZE
