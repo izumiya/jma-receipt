@@ -866,6 +866,17 @@
                END-IF
            END-IF
       *
+      *H28.10
+      *    排他中判定
+           IF     (SPA-GMN-PTID    NOT =   ZERO )
+              AND (SPA-ERRCD           =   SPACE)
+      *        排他中
+               IF      SPA-LOCK        NOT  =  ZERO
+                   MOVE    "9998"              TO  SPA-ERRCD
+                   MOVE    4                   TO  SPA-K10GMN-CUR
+               END-IF
+           END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-PTID        NOT =   ZERO
                    IF      FLG-OK              =   1
@@ -942,6 +953,19 @@
                    MOVE    "0003"          TO  SPA-ERRCD
                    MOVE    2               TO  SPA-K10GMN-CUR
                END-IF
+           END-IF
+      *H28.10
+      *    排他中判定
+           IF     (SPA-GMN-PTID    NOT =   ZERO )
+              AND (SPA-ERRCD           =   SPACE)
+      *        排他中
+               IF      SPA-LOCK        NOT  =  ZERO
+                   MOVE    "9998"              TO  SPA-ERRCD
+                   MOVE    4                   TO  SPA-K10GMN-CUR
+               END-IF
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4610-TUIKA-SYORI-EXT
            END-IF
       *
            IF     (SPA-HKNCOMBINUM     =   "9999")  OR
@@ -1225,6 +1249,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "B12"             TO  MCP-WIDGET
                WHEN    03
                    MOVE    "B10"             TO  MCP-WIDGET
+               WHEN    04
+                   MOVE    "B01"             TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -1283,6 +1309,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0011"
                    STRING  "診療科がありません。" 
                            "患者を選択後、追加をして下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+      *
+               WHEN    "9998"
+                   STRING  "他端末で使用中です。" 
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
