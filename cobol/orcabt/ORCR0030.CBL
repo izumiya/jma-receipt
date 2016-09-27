@@ -749,6 +749,8 @@
       *  04.08.29    NACL-門脇    16/08/03  全国公費一部負担金記載修正
       *  04.08.30    NACL-門脇    16/09/09  全国公費一部負担金記載修正
       *  04.08.31    NACL-門脇    16/09/15  リハビリマスタ追加対応
+      *  04.08.32    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3281,6 +3283,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
            END-IF
            IF      SYS-200501-COMPRESS-KBN          =   SPACE
                MOVE    "0"   TO  SYS-200501-COMPRESS-KBN
+           END-IF
+           IF      SYS-200501-15-YKZ-PRTKBN         =   SPACE
+               MOVE    "0"   TO  SYS-200501-15-YKZ-PRTKBN
            END-IF
       *
           .
@@ -11138,10 +11143,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                     "60" OR "64" OR "70" OR
                                     "80"                   ) AND
-                     (ACCT-ZAITEN       NOT =  ZERO        ) AND
-                     (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
                      (ACCT-YKZTEN           =  ZERO        ) AND
+                     (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+             OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
+                                    "60" OR "64" OR "70" OR
+                                    "80"                   ) AND
+                     (ACCT-YKZTEN           =  ZERO        ) AND
+                     (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
+                     (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
+                     (RECE02-SRYYM          <  "201204"    ))
              OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
              OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
              OR     ( FLG-KIN-OKIKAE3   NOT =  ZERO         )
@@ -11240,10 +11251,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                      "60" OR "64" OR "70" OR
                                      "80"                   ) AND
-                      (ACCT-ZAITEN       NOT =  ZERO        ) AND
-                      (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
                       (ACCT-YKZTEN           =  ZERO        ) AND
+                      (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
+                                     "60" OR "64" OR "70" OR
+                                     "80"                   ) AND
+                      (ACCT-YKZTEN           =  ZERO        ) AND
+                      (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
+                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
+                      (RECE02-SRYYM          <  "201204"    ))
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE3   NOT =  ZERO         )
@@ -12384,6 +12401,16 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                   END-EVALUATE
                  END-IF
       *
+               END-IF
+      *
+               IF    ( SRY-SRYKBN = "40" OR "50" OR "54" OR
+                                    "60" OR "64" OR "70" OR
+                                    "80"                    )
+               AND   ( ACCT-YKZTEN       =     ZERO         )
+               AND   ( SYS-200501-15-YKZ-PRTKBN  =  "1"     )
+               AND   ( SRY-SRYCD(IDX2)(1:1)  =  "6"         )
+               AND   ( RECE02-SRYYM     >=    "201204"      )
+                     MOVE   "1"     TO  RECE04-YKZKISAIFLG
                END-IF
       *
                MOVE    ACCT-ZAIKBN  TO  RECE04-ZAIKBN

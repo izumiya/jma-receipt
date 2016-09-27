@@ -71,6 +71,8 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.03    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -459,6 +461,7 @@
            MOVE    RECE64-HKNCOMBI-DAY-AREA
                                        TO  RECE641-HKNCOMBI-DAY-AREA
            MOVE    RECE64-NYUSAIFLG    TO  RECE641-NYUSAIFLG
+           MOVE    RECE64-YKZKISAIFLG  TO  RECE641-YKZKISAIFLG
            MOVE    RECE64-JISANYAKKBN  TO  RECE641-JISANYAKKBN
       *
            WRITE   RECE641-REC

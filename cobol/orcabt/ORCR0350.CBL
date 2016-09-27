@@ -416,6 +416,8 @@
       *                                     レセプトの分割対応
       *  04.08.13    NACL-門脇    16/08/18  法別５１の一部負担金の記録修正
       *  04.08.14    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.15    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5630,8 +5632,9 @@
            IF      RECE65-SRYCD (IDX)  =   WRK-CONS-TEIGEN
                CONTINUE
            ELSE
-               IF    ( RECE641-YKZTEN    =   ZERO  )
-               AND   ( RECE641-TOYAKUFLG =   SPACE )
+               IF    ( RECE641-YKZTEN       =   ZERO  )
+               AND   ( RECE641-TOYAKUFLG    =   SPACE )
+               AND   ( RECE641-YKZKISAIFLG  =   SPACE )
                    GO  TO  200711-YKZ-TAIHI-EXT
                END-IF
            END-IF
@@ -6107,6 +6110,7 @@
                        ELSE
                            IF    WRK-RECE641-YKZTEN          >   ZERO
                            OR    WRK-RECE641-TOYAKUFLG   NOT =   SPACE
+                           OR    WRK-RECE641-YKZKISAIFLG     =   "1"
                                MOVE    WRK-RECE641-YKZTEN
                                                        TO  WRK-NUM
                                MOVE    7               TO  WRK-NAGASA
@@ -7083,6 +7087,7 @@
                ELSE
                    IF    RECE641-YKZTEN          >   ZERO
                    OR    RECE641-TOYAKUFLG   NOT =   SPACE
+                   OR    RECE641-YKZKISAIFLG     =   "1"
                        MOVE    RECE641-YKZTEN      TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF

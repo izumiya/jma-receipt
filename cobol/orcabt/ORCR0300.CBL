@@ -442,6 +442,8 @@
       *  04.08.08    NACL-Æ£¸¶    16/08/08  ºÒ³²³ºÅöÊ¬¡ÊÈó¸ºÌÈÂÐ¾Ý¤È¸ºÌÈÂÐ¾Ý¡Ë
       *                                     ¥ì¥»¥×¥È¤ÎÊ¬³äÂÐ±þ
       *  04.08.09    NACL-ÌçÏÆ    16/08/18  Ë¡ÊÌ£µ£±¤Î°ìÉôÉéÃ´¶â¤Îµ­Ï¿½¤Àµ
+      *  04.08.10    NACL-ÌçÏÆ    16/09/20  £±£µ±ß°Ê²¼ÌôºÞ¤ÎÄó½ÐÍÑ¥ì¥»¥×¥Èµ­ºÜ
+      *                                     ¡Êµ­Ï¿¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5031,8 +5033,9 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                                        OR  WRK-CONS-TEIGEN4
                CONTINUE
            ELSE
-               IF    ( RECE041-YKZTEN    =   ZERO  )
-               AND   ( RECE041-TOYAKUFLG =   SPACE )
+               IF    ( RECE041-YKZTEN       =   ZERO  )
+               AND   ( RECE041-TOYAKUFLG    =   SPACE )
+               AND   ( RECE041-YKZKISAIFLG  =   SPACE )
                    GO  TO  200711-YKZ-TAIHI-EXT
                END-IF
            END-IF
@@ -6092,7 +6095,9 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                    MOVE    RECE041-ZAITEN      TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
                ELSE
-                   IF      RECE041-YKZTEN      >   ZERO
+                   IF      RECE041-YKZTEN          >   ZERO
+                   OR      RECE041-TOYAKUFLG   NOT =   SPACE
+                   OR      RECE041-YKZKISAIFLG     =   "1"
                        MOVE    RECE041-YKZTEN      TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF

@@ -140,6 +140,8 @@
       *  04.08.05    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.06    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.07    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.08    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2010,6 +2012,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                IF    ((RECE84-YKZTEN           =   ZERO) AND
                       (RECE84-JIHOKBN          =  SPACE) AND
                       (RECE84-RYOTENKISAISU    =   ZERO) AND
+                      (RECE84-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE84-KIZAITEN         =   ZERO) AND
                       (RECE84-JIHOKBN          =  SPACE) AND
@@ -2018,6 +2021,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                OR    ((RECE84-HOKATU-YKZTEN    =   ZERO) AND
                       (RECE84-JIHOKBN      NOT =  SPACE) AND
                       (RECE84-RYOTENKISAISU    =   ZERO) AND
+                      (RECE84-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE84-HOKATU-KIZAITEN  =   ZERO) AND
                       (RECE84-JIHOKBN      NOT =  SPACE) AND
@@ -2083,6 +2087,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
                AND    ( RECE84-JIHOKBN      =   SPACE)
                  IF     RECE84-YKZTEN       >   ZERO
+                 OR     RECE84-YKZKISAIFLG  =   "1"
       ***          IF      RECE84-SRYKBN     >=  "31"   
       *****************IF      RECE84-SRYKBN     =   "31"    OR  
       **                                             "32"    OR  "33"  

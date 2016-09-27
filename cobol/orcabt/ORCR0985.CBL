@@ -52,6 +52,8 @@
       *  04.08.06    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
       *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
       *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
+      *  04.08.07    NACL-ÌçÏÆ    16/09/20  £±£µ±ß°Ê²¼ÌôºÞ¤ÎÄó½ÐÍÑ¥ì¥»¥×¥Èµ­ºÜ
+      *                                     ¡Êµ­Ï¿¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3105,8 +3107,9 @@
            IF      RECE85-SRYCD (IDX)  =   WRK-CONS-TEIGEN
                CONTINUE
            ELSE
-               IF    ( RECE84-YKZTEN    =   ZERO  )
-               AND   ( RECE84-TOYAKUFLG =   SPACE )
+               IF    ( RECE84-YKZTEN       =   ZERO  )
+               AND   ( RECE84-TOYAKUFLG    =   SPACE )
+               AND   ( RECE84-YKZKISAIFLG  =   SPACE )
                    GO  TO  200711-YKZ-TAIHI-EXT
                END-IF
            END-IF
@@ -4104,6 +4107,7 @@
                ELSE
                    IF      RECE84-YKZTEN          >   ZERO
                    OR      RECE84-TOYAKUFLG   NOT =   SPACE
+                   OR      RECE84-YKZKISAIFLG     =   "1"
                        MOVE    RECE84-YKZTEN      TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF

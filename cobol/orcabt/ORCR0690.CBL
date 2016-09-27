@@ -203,6 +203,8 @@
       *  04.08.07    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
       *                                     残留法人等の負担者番号、受給者番号なし
+      *  04.08.08    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2505,6 +2507,7 @@
                IF    ((RECE64-YKZTEN           =   ZERO) AND
                       (RECE64-JIHOKBN          =  SPACE) AND
                       (RECE64-RYOTENKISAISU    =   ZERO) AND
+                      (RECE64-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE64-KIZAITEN         =   ZERO) AND
                       (RECE64-JIHOKBN          =  SPACE) AND
@@ -2513,6 +2516,7 @@
                OR    ((RECE64-HOKATU-YKZTEN    =   ZERO) AND
                       (RECE64-JIHOKBN      NOT =  SPACE) AND
                       (RECE64-RYOTENKISAISU    =   ZERO) AND
+                      (RECE64-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE64-HOKATU-KIZAITEN  =   ZERO) AND
                       (RECE64-JIHOKBN      NOT =  SPACE) AND
@@ -2578,6 +2582,7 @@
                AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
                AND    ( RECE64-JIHOKBN      =   SPACE)
                  IF     RECE64-YKZTEN       >   ZERO
+                 OR     RECE64-YKZKISAIFLG  =   "1"
       ***          IF      RECE64-SRYKBN     >=  "31"   
       *****************IF      RECE64-SRYKBN     =   "31"    OR  
       **                                             "32"    OR  "33"  

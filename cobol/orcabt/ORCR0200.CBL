@@ -67,6 +67,8 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    16/04/20  平成２８年４月改正対応
+      *  04.08.03    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -409,6 +411,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE04-ACCTP-SYUGI-TBL-G
                                        TO  RECE041-ACCTP-SYUGI-TBL-G
            MOVE    RECE04-SIPPUFLG     TO  RECE041-SIPPUFLG
+           MOVE    RECE04-YKZKISAIFLG  TO  RECE041-YKZKISAIFLG
       *
            WRITE   RECE041-REC
       *

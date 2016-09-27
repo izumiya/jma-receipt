@@ -87,6 +87,8 @@
       *  04.08.06    NACL-ÌçÏÆ    16/03/03  ¸ø³²¤ÎÎÅÍÜÃ´Åö¼êÅö¤Ï
       *                                     ÌôºÞ¡¦´ïºàÅÀ¤Î¼è¤ê°·¤¤¤È¤¹¤ë
       *  04.08.07    NACL-ÌçÏÆ    16/03/28  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
+      *  04.08.08    NACL-ÌçÏÆ    16/09/20  £±£µ±ß°Ê²¼ÌôºÞ¤ÎÄó½ÐÍÑ¥ì¥»¥×¥Èµ­ºÜ
+      *                                     ¡Êµ­Ï¿¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2290,12 +2292,14 @@
                END-IF    
                IF    ((RECE120-YKZTEN           =   ZERO) AND
                       (RECE120-JIHOKBN          =  SPACE) AND
+                      (RECE120-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                     =   5   ))
                OR    ((RECE120-KIZAITEN         =   ZERO) AND
                       (RECE120-JIHOKBN          =  SPACE) AND
                       (IDX1                     =   4   ))
                OR    ((RECE120-HOKATU-YKZTEN    =   ZERO) AND
                       (RECE120-JIHOKBN      NOT =  SPACE) AND
+                      (RECE120-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                     =   5   ))
                OR    ((RECE120-HOKATU-KIZAITEN  =   ZERO) AND
                       (RECE120-JIHOKBN      NOT =  SPACE) AND
@@ -2364,6 +2368,7 @@
                AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
                AND    ( RECE120-JIHOKBN     =   SPACE)
                  IF     RECE120-YKZTEN      >   ZERO
+                 OR     RECE120-YKZKISAIFLG =   "1"
                    IF      RECE120-SRYKBN     >=   "33"
                        MOVE    RECE120-YKZTEN     TO  WRK-ZAITENX
                        MOVE    RECE120-ZAIKAISU   TO  WRK-ZAIKAISUX

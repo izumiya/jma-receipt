@@ -177,6 +177,8 @@
       *                                     編集修正
       *  04.08.06    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.07    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.08    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2410,12 +2412,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *************AND     IDX1              =   3
                IF    ((RECE44-YKZTEN           =   ZERO) AND
                       (RECE44-JIHOKBN          =  SPACE) AND
+                      (RECE44-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE44-KIZAITEN         =   ZERO) AND
                       (RECE44-JIHOKBN          =  SPACE) AND
                       (IDX1                    =   4   ))
                OR    ((RECE44-HOKATU-YKZTEN    =   ZERO) AND
                       (RECE44-JIHOKBN      NOT =  SPACE) AND
+                      (RECE44-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE44-HOKATU-KIZAITEN  =   ZERO) AND
                       (RECE44-JIHOKBN      NOT =  SPACE) AND
@@ -2484,6 +2488,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
                AND    ( RECE44-JIHOKBN      =   SPACE)
                  IF     RECE44-YKZTEN       >   ZERO
+                 OR     RECE44-YKZKISAIFLG  =   "1"
       ***          IF      RECE44-SRYKBN     >=  "31"   
       *                点数・回数セット
                        IF      RECE44-SRYKBN     >=   "33"

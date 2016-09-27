@@ -50,6 +50,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.03    NACL-藤原    16/01/15  請求情報への更新日設定
       *  04.08.04    NACL-藤原    16/04/01  平成２８年４月改正対応
+      *  04.08.05    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3018,8 +3020,9 @@
                                        OR  WRK-CONS-TEIGEN4
                CONTINUE
            ELSE
-               IF    ( RECE44-YKZTEN    =   ZERO  )
-               AND   ( RECE44-TOYAKUFLG =   SPACE )
+               IF    ( RECE44-YKZTEN       =   ZERO  )
+               AND   ( RECE44-TOYAKUFLG    =   SPACE )
+               AND   ( RECE44-YKZKISAIFLG  =   SPACE )
                    GO  TO  200711-YKZ-TAIHI-EXT
                END-IF
            END-IF
@@ -4080,7 +4083,9 @@
                    MOVE    RECE44-ZAITEN      TO  WRK-NUM
                    MOVE    7                   TO  WRK-NAGASA
                ELSE
-                   IF      RECE44-YKZTEN      >   ZERO
+                   IF      RECE44-YKZTEN          >   ZERO
+                   OR      RECE44-TOYAKUFLG   NOT =   SPACE
+                   OR      RECE44-YKZKISAIFLG     =   "1"
                        MOVE    RECE44-YKZTEN      TO  WRK-NUM
                        MOVE    7                   TO  WRK-NAGASA
                    END-IF

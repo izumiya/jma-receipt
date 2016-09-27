@@ -284,6 +284,8 @@
       *  04.08.08    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
       *                                     残留法人等の負担者番号、受給者番号なし
+      *  04.08.09    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3070,12 +3072,14 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *********ELSE    
                IF    ((RECE04-YKZTEN           =   ZERO) AND
                       (RECE04-JIHOKBN          =  SPACE) AND
+                      (RECE04-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE04-KIZAITEN         =   ZERO) AND
                       (RECE04-JIHOKBN          =  SPACE) AND
                       (IDX1                    =   4   ))
                OR    ((RECE04-HOKATU-YKZTEN    =   ZERO) AND
                       (RECE04-JIHOKBN      NOT =  SPACE) AND
+                      (RECE04-YKZKISAIFLG      =  SPACE) AND
                       (IDX1                    =   5   ))
                OR    ((RECE04-HOKATU-KIZAITEN  =   ZERO) AND
                       (RECE04-JIHOKBN      NOT =  SPACE) AND
@@ -3144,6 +3148,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
                AND    ( RECE04-JIHOKBN      =   SPACE)
                  IF     RECE04-YKZTEN       >   ZERO
+                 OR     RECE04-YKZKISAIFLG  =   "1"
       ***          IF      RECE04-SRYKBN     >=  "31"   
       *****************IF      RECE04-SRYKBN     =   "31"    OR  
       **                                             "32"    OR  "33"  
