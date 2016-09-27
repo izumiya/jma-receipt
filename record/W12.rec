@@ -237,6 +237,13 @@ W12 {
           count int;
             item varchar(20)[5];
         };
+        YKZ_15_COMBO {
+          YKZ_15 {
+            textdata varchar(20);
+          };
+          count int;
+            item varchar(20)[5];
+        };
       };
       fi30 {
         SYAPRTNM {

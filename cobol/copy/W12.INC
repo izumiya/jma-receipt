@@ -197,6 +197,12 @@
                     06  W12-DISASTER-RECEIPT-COUNT   PIC S9(9)   BINARY.
                     06  W12-DISASTER-RECEIPTLST
                             PIC X(20)   OCCURS  5 TIMES.
+                  05  W12-15-YKZ-COMBO.
+                    06  W12-15-YKZ.
+                      07  W12-VALUE    PIC X(20).
+                    06  W12-15-YKZ-COUNT   PIC S9(9)   BINARY.
+                    06  W12-15-YKZLST
+                            PIC X(20)   OCCURS  5 TIMES.
                 04  W12-FI30.
                   05  W12-SYAPRTNM.
                     06  W12-VALUE   PIC X(16).

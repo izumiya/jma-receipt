@@ -194,6 +194,7 @@
       *  04.08.08    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
       *  04.08.09    NACL-藤原    16/08/24  持参薬対応
+      *  04.08.10    NACL-藤原    16/09/21  １５円以下薬剤のレセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -627,6 +628,12 @@
                                               PIC X(01).
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-DISASTER-RECEIPTMEI
+                                              PIC X(18).
+                       09  SPA-GMN-15-YKZ-G.
+                           11  SPA-GMN-15-YKZ
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-15-YKZMEI
                                               PIC X(18).
       *
                        09  SPA-GMN-FRAME-ROUPRTKBN-G.
@@ -1800,6 +1807,15 @@
                        09  SPA-GMN-DISASTER-RECEIPTMEIL
                                               PIC X(18).
                    07  SPA-GMN-DISASTER-RECEIPT-MAX
+                                              PIC 9(02).
+      *
+                   07  SPA-GMN-15-YKZLST      OCCURS  2.
+                       09  SPA-GMN-15-YKZL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-15-YKZMEIL
+                                              PIC X(18).
+                   07  SPA-GMN-15-YKZ-MAX
                                               PIC 9(02).
       *
                05  SPA-NAIB-AREA.
@@ -3276,6 +3292,12 @@
                                        SPA-GMN-DISASTER-RECEIPTMEIL  (2)
            MOVE    2                   TO  SPA-GMN-DISASTER-RECEIPT-MAX 
       *
+           MOVE    "0"                 TO  SPA-GMN-15-YKZL     (1)
+           MOVE    "記載しない"        TO  SPA-GMN-15-YKZMEIL  (1)
+           MOVE    "1"                 TO  SPA-GMN-15-YKZL     (2)
+           MOVE    "記載する"          TO  SPA-GMN-15-YKZMEIL  (2)
+           MOVE    2                   TO  SPA-GMN-15-YKZ-MAX 
+      *
       *       医療機関情報
            MOVE    SPACE               TO  SYS-1001-REC
            INITIALIZE                      SYS-1001-REC
@@ -4518,6 +4540,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-15-YKZ-PRTKBN
+                                       TO  SPA-GMN-15-YKZ
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-15-YKZ-MAX
+               IF      SPA-GMN-15-YKZ
+                               =   SPA-GMN-15-YKZL (IDY)
+                   MOVE    SPA-GMN-15-YKZLST (IDY)
+                                       TO  SPA-GMN-15-YKZ-G
+                   MOVE    SPA-GMN-15-YKZ-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
       *    レセプト・総括編集情報（区分コード１０のデータ読込）
            MOVE    SPACE               TO  SYS-200505-REC
            INITIALIZE                      SYS-200505-REC
@@ -5288,6 +5323,16 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO
                                            SPA-GMN-DISASTER-RECEIPT-G
            END-IF
+           IF     SPA-GMN-DISASTER-SYAPRTKBN-G
+                                           =   SPACE
+               MOVE    SPA-GMN-DISASTER-SYAPRTKBNLST  (1)
+                                           TO
+                                           SPA-GMN-DISASTER-SYAPRTKBN-G
+           END-IF
+           IF     SPA-GMN-15-YKZ-G         =   SPACE
+               MOVE    SPA-GMN-15-YKZLST (1)
+                                           TO  SPA-GMN-15-YKZ-G
+           END-IF
       *
       *    労災医療機関情報
            INITIALIZE                      SYS-4001-REC
@@ -5481,6 +5526,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-COMPRESS        TO  SPA-GMN-COMPRESS-G
            MOVE    W12-DISASTER-RECEIPT
                                        TO  SPA-GMN-DISASTER-RECEIPT-G
+           MOVE    W12-15-YKZ          TO  SPA-GMN-15-YKZ-G
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
            MOVE    W12-SRYKAHENKBN     TO  SPA-GMN-SRYKAHENKBN-G
@@ -5799,6 +5845,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4209-DISASTER-RECEIPT-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4210-15-YKZ-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -9463,6 +9514,34 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    １５円以下薬剤のレセプト記載チェック
+      *****************************************************************
+       4210-15-YKZ-CHK-SEC        SECTION.
+      *
+           IF      SPA-GMN-15-YKZ      =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-15-YKZ-MAX
+                        OR     SPA-GMN-15-YKZ
+                                   =   SPA-GMN-15-YKZL (IDY)
+                   CONTINUE
+               END-PERFORM
+      *
+               IF      IDY <=      SPA-GMN-15-YKZ-MAX
+                   MOVE    SPA-GMN-15-YKZLST (IDY)
+                                           TO  SPA-GMN-15-YKZ-G
+               ELSE
+                   MOVE    406             TO  SPA-GMN-CUR
+                   MOVE    "0136"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4210-15-YKZ-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    主科社保設定フラグチェック
       *****************************************************************
        4148-SYUKA-SYAHO-CHK-SEC   SECTION.
@@ -10210,6 +10289,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-DISASTER-RECEIPT
                                            TO
                                            SYS-200501-DISASTER-RECEIPT
+           MOVE    SPA-GMN-15-YKZ          TO  SYS-200501-15-YKZ-PRTKBN
            MOVE    SPA-GMN-BTUNUM-KSIKBN   TO  SYS-200501-BTUNUM-KSIKBN
            MOVE    SPA-GMN-DRNAME-KSIKBN   TO  SYS-200501-DRNAME-KSIKBN
            MOVE    SPA-GMN-PRT-CHECKKBN    TO  SYS-200501-PRT-CHECKKBN
@@ -11324,6 +11404,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W12-DISASTER-RECEIPT-COUNT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-15-YKZ-MAX
+               MOVE    SPA-GMN-15-YKZLST (IDY)
+                                       TO  W12-15-YKZLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-15-YKZ-MAX  TO  W12-15-YKZ-COUNT
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECECOMKBN-MAX
                MOVE    SPA-GMN-RECECOMKBNLST (IDY)
                                        TO  W12-RECECOMKBNLST (IDY)
@@ -11454,6 +11541,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-DISASTER-RECEIPT-G
                                        TO  W12-DISASTER-RECEIPT
+      *
+           MOVE    SPA-GMN-15-YKZ-G    TO  W12-15-YKZ
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-AUTODSPKBN-MAX
@@ -12376,6 +12465,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                            "入力エラー"        DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "0136"
+                   MOVE    "１５円以下薬剤レセプト記載入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12580,6 +12672,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "COMPRESS"         TO   MCP-WIDGET
                 WHEN    405
                    MOVE  "DISASTER_RECEIPT"  TO   MCP-WIDGET
+                WHEN    406
+                   MOVE  "YKZ_15"            TO   MCP-WIDGET
       *
                 WHEN    9
                     MOVE  "SYAPRTNM"         TO   MCP-WIDGET
@@ -12825,7 +12919,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE    0                TO  W12-PAGENO
                 WHEN    400 THRU    401
                 WHEN    403
-                WHEN    405
+                WHEN    405 THRU    406
                     MOVE    1                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -12965,6 +13059,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "COMPRESS"
                    MOVE    405         TO  SPA-GMN-CUR
                WHEN    "DISASTER_RECEIPT"
+                   MOVE    406         TO  SPA-GMN-CUR
+               WHEN    "YKZ_15"
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "PRTJYUNKBN4"
