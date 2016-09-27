@@ -144,6 +144,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.06    NACL-門脇    16/05/18  乳幼児コメント自動記載条件修正
+      *  04.08.07    NACL-門脇    16/09/27  在宅患者訪問リハビリテーション指導
+      *                                     管理料の算定日コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1872,9 +1874,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       END-IF
       *             (在宅患者訪問リハビリテーション指導管理料の
       *              算定日のセット）
-      *************** IF   FLG-COMMENT  =  ZERO
-      ***************   PERFORM    2001-ZAIRIHA-HANTEI-SEC
-      *************** END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-ZAIRIHA-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
@@ -2113,9 +2115,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       END-IF
       *             (在宅患者訪問リハビリテーション指導管理料の
       *              算定日のセット）
-      *************** IF   FLG-COMMENT  =  ZERO
-      ***************   PERFORM    2001-ZAIRIHA-HANTEI-SEC
-      *************** END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-ZAIRIHA-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
@@ -6493,7 +6495,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                INITIALIZE            WRK-JIDO-SETCOM-AREA
                MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
                MOVE       32      TO     WRK-JIDO-SETCOMATFLG
-               MOVE       3       TO     FLG-COMMENT
+               MOVE       9       TO     FLG-COMMENT
                PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
            END-IF
       *
@@ -7280,6 +7282,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
                  MOVE     2          TO    WRK-KETA2
                  MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
                  MOVE    "麻酔"  TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
+              WHEN    9
+                 MOVE     8          TO    WRK-KETA
+                                           WRK-KETA-TAIHI
+                 MOVE     4          TO    WRK-KETA2
+                 MOVE    WRK-KETA2   TO    WK-FREE-YUKOKETA2(IDZ)
+                 MOVE    "訪問指導"
+                             TO    WK-FREE-NAME2(IDZ)(1:WRK-KETA)
            END-EVALUATE
       *
            IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO

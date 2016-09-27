@@ -300,6 +300,8 @@
       *  04.08.11    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *  04.08.12    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.13    NACL-門脇    16/09/27  在宅患者訪問リハビリテーション指導
+      *                                     管理料の算定日コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -458,6 +460,7 @@
            03  FLG-NINRYO-COM                          PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
+           03  FLG-ZAIRIHA-COM                         PIC 9(01).
            03  FLG-TAIGAI                              PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
            03  FLG-TAISYO                              PIC 9(01).
@@ -2473,6 +2476,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-SYOUNI-COM
                                                        FLG-SRYKBN-HEN
                                                        FLG-KENSA-COM
+                                                       FLG-ZAIRIHA-COM
                                                        FLG-ZAIKYO-COM
                                                        FLG-BOKOHO-COM
                                                        FLG-IZONSYO-COM
@@ -2555,6 +2559,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOUNI-COM
                                                       FLG-SRYKBN-HEN
                                                       FLG-KENSA-COM
+                                                      FLG-ZAIRIHA-COM
                                                       FLG-ZAIKYO-COM
                                                       FLG-BOKOHO-COM
                                                       FLG-IZONSYO-COM
@@ -3906,6 +3911,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       END-IF
                     END-PERFORM
                  END-IF
+               END-IF
+      *
+               IF  ( SRY-SRYKBN       =  "14"       )
+               AND ((SRY-SRYCD(IDX2)(1:1)  =  "8"  ) OR
+                    (SRY-SRYCD(IDX2)(1:3)  =  "008"))
+               AND ( FLG-ZAIRIHA-COM  =   ZERO      )
+                    PERFORM  VARYING  IDV  FROM  1  BY  2
+                              UNTIL  (IDV              >   200)
+                               OR    (FLG-ZAIRIHA-COM  =    1 )
+                      IF  RECE45-NAME(IDX4)(IDV:2)   =  "日"
+                        MOVE   SPACE  TO  RECE44-FLG-ZAIRIHA-COMMENT
+                        MOVE     1    TO  FLG-ZAIRIHA-COM
+                      END-IF
+                    END-PERFORM
                END-IF
       *
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
@@ -5514,9 +5533,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE  SPACE  TO    RECE44-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
-      *
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIRIHA1-COMMENT
-                                    OR  CONS-ZAIRIHA2-COMMENT
+              END-IF
+      *       在宅患者訪問リハビリテーション指導管理料
+              IF   RECE41-SRYYM    >=     "201611"
+                IF  (SRY-SRYCD(IDX2)    =     CONS-ZAIRIHA1-COMMENT
+                                        OR    CONS-ZAIRIHA2-COMMENT)
+                AND (FLG-ZAIRIHA-COM    =     ZERO                 )
                    MOVE   "1"   TO    RECE44-FLG-ZAIRIHA-COMMENT
                 END-IF
               END-IF
@@ -11259,6 +11281,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-SYOUNI-COM
                                                      FLG-SRYKBN-HEN
                                                      FLG-KENSA-COM
+                                                     FLG-ZAIRIHA-COM
                                                      FLG-ZAIKYO-COM
                                                      FLG-BOKOHO-COM
                                                      FLG-IZONSYO-COM
@@ -11343,6 +11366,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOUNI-COM
                                                       FLG-SRYKBN-HEN
                                                       FLG-KENSA-COM
+                                                      FLG-ZAIRIHA-COM
                                                       FLG-ZAIKYO-COM
                                                       FLG-BOKOHO-COM
                                                       FLG-IZONSYO-COM

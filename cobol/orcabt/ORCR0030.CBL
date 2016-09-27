@@ -751,6 +751,8 @@
       *  04.08.31    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *  04.08.32    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.33    NACL-門脇    16/09/27  在宅患者訪問リハビリテーション指導
+      *                                     管理料の算定日コメント対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -874,6 +876,7 @@
            03  FLG-NINRYO-COM                          PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
+           03  FLG-ZAIRIHA-COM                         PIC 9(01).
       *****03  FLG-HKNNUM                              PIC 9(01).
            03  FLG-RECESKYKBN                          PIC 9(01).
            03  FLG-ZENKOH-ARI                          PIC 9(01).
@@ -10433,6 +10436,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-TAHOKEN
                                                 FLG-SYOUNI-COM
                                                 FLG-KENSA-COM
+                                                FLG-ZAIRIHA-COM
                                                 FLG-ZAIKYO-COM
                                                 FLG-BOKOHO-COM
                                                 FLG-IZONSYO-COM
@@ -10501,6 +10505,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-TAHOKEN
                                                        FLG-SYOUNI-COM
                                                        FLG-KENSA-COM
+                                                       FLG-ZAIRIHA-COM
                                                        FLG-ZAIKYO-COM
                                                        FLG-BOKOHO-COM
                                                        FLG-IZONSYO-COM
@@ -12102,6 +12107,20 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                  END-IF
                END-IF
       *
+               IF  ( SRY-SRYKBN       =  "14"       )
+               AND ((SRY-SRYCD(IDX2)(1:1)  =  "8"  ) OR
+                    (SRY-SRYCD(IDX2)(1:3)  =  "008"))
+               AND ( FLG-ZAIRIHA-COM  =   ZERO      )
+                    PERFORM  VARYING  IDV  FROM  1  BY  2
+                              UNTIL  (IDV              >   200)
+                               OR    (FLG-ZAIRIHA-COM  =    1 )
+                      IF  RECE05-NAME(IDX4)(IDV:2)   =  "日"
+                        MOVE   SPACE  TO  RECE04-FLG-ZAIRIHA-COMMENT
+                        MOVE     1    TO  FLG-ZAIRIHA-COM
+                      END-IF
+                    END-PERFORM
+               END-IF
+      *
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
                  MOVE  TNS-FORMALYUKOKETA TO  RECE05-YUKOKETA(IDX4)
                  MOVE  TNS-FORMALNAME     TO  RECE05-NAME(IDX4)
@@ -13486,9 +13505,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    MOVE  SPACE  TO    RECE04-FLG-ZAIKYO-COMMENT
                    MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
-      *
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIRIHA1-COMMENT
-                                    OR  CONS-ZAIRIHA2-COMMENT
+              END-IF
+      *       在宅患者訪問リハビリテーション指導管理料
+              IF   RECE02-SRYYM    >=     "201611"
+                IF  (SRY-SRYCD(IDX2)    =     CONS-ZAIRIHA1-COMMENT
+                                        OR    CONS-ZAIRIHA2-COMMENT)
+                AND (FLG-ZAIRIHA-COM    =     ZERO                 )
                    MOVE   "1"   TO    RECE04-FLG-ZAIRIHA-COMMENT
                 END-IF
               END-IF
