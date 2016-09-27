@@ -475,6 +475,8 @@
       *                                     チェック
       *  04.08.11    NACL-門脇    16/07/26  現物給付対象者の一括再計算該当
       *                                     判定修正
+      *  04.08.12    NACL-門脇    16/07/27  日・月上限額設定のない地方公費
+      *                                     ＋マル長の負担金計算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1527,6 +1529,7 @@
            03  WK-CHIHOU-FLG-TAIHI-OCC OCCURS  4.
                05  FLG-CHIHOU          PIC X(01).
                05  FLG-CHIHOU2         PIC X(01).
+               05  FLG-CHIHOU3         PIC X(01).
       *
       *償還払い地方公費フラグ
        01  WK-SYOUKAN-FLG-TAIHI-AREA.
@@ -7519,15 +7522,6 @@
                  END-IF
                END-IF
       *
-               IF  (WK-1001-PREFNUM       =  42     )
-               AND (COMB-KOH1HKNNUM       = "280"   )
-               AND (LNK-S01-JIKANGAI      = "1"     )
-               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
-                    MOVE    800    TO    MAX-KIN-KOHI1-D
-                    MOVE   1600    TO    MAX-KIN-KOHI1-M
-                    MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
-               END-IF
-      *
                IF    WK-CYO-OKIKAE(1)  =  1
                    IF (COMB-KOH2HKNNUM         = "972") OR
                       (COMB-KOH3HKNNUM         = "972") OR
@@ -7535,6 +7529,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI1-M
                       MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(1)
+                      MOVE    "1"    TO    FLG-CHIHOU3(1)
                    END-IF
                    IF (COMB-KOH2HKNNUM         = "974") OR
                       (COMB-KOH3HKNNUM         = "974") OR
@@ -7542,7 +7537,19 @@
                       MOVE   20000   TO    MAX-KIN-KOHI1-M
                       MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(1)
+                      MOVE    "1"    TO    FLG-CHIHOU3(1)
                    END-IF
+               END-IF
+      *
+               IF  (WK-1001-PREFNUM       =  42     )
+               AND (COMB-KOH1HKNNUM       = "280"   )
+               AND (LNK-S01-JIKANGAI      = "1"     )
+               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
+                    MOVE    800    TO    MAX-KIN-KOHI1-D
+                    MOVE   1600    TO    MAX-KIN-KOHI1-M
+                    MOVE    "1"    TO    COMB-KOH1-GAIJGNKBN
+                    MOVE   SPACE   TO    FLG-CHIHOU(1)
+                    MOVE   SPACE   TO    FLG-CHIHOU3(1)
                END-IF
       *
                IF  (WK-1001-PREFNUM       =  35 OR 34)
@@ -7698,15 +7705,6 @@
                  END-IF
                END-IF
       *
-               IF  (WK-1001-PREFNUM       =  42     )
-               AND (COMB-KOH2HKNNUM       = "280"   )
-               AND (LNK-S01-JIKANGAI      = "1"     )
-               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
-                    MOVE    800    TO    MAX-KIN-KOHI2-D
-                    MOVE   1600    TO    MAX-KIN-KOHI2-M
-                    MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
-               END-IF
-      *
                IF    WK-CYO-OKIKAE(2)  =  1
                    IF (COMB-KOH1HKNNUM         = "972") OR
                       (COMB-KOH3HKNNUM         = "972") OR
@@ -7714,6 +7712,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI2-M
                       MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(2)
+                      MOVE    "1"    TO    FLG-CHIHOU3(2)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH3HKNNUM         = "974") OR
@@ -7721,7 +7720,19 @@
                       MOVE   20000   TO    MAX-KIN-KOHI2-M
                       MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(2)
+                      MOVE    "1"    TO    FLG-CHIHOU3(2)
                    END-IF
+               END-IF
+      *
+               IF  (WK-1001-PREFNUM       =  42     )
+               AND (COMB-KOH2HKNNUM       = "280"   )
+               AND (LNK-S01-JIKANGAI      = "1"     )
+               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
+                    MOVE    800    TO    MAX-KIN-KOHI2-D
+                    MOVE   1600    TO    MAX-KIN-KOHI2-M
+                    MOVE    "1"    TO    COMB-KOH2-GAIJGNKBN
+                    MOVE   SPACE   TO    FLG-CHIHOU(2)
+                    MOVE   SPACE   TO    FLG-CHIHOU3(2)
                END-IF
       *
                IF  (WK-1001-PREFNUM       =  35 OR 34)
@@ -7864,15 +7875,6 @@
                  END-IF
                END-IF
       *
-               IF  (WK-1001-PREFNUM       =  42     )
-               AND (COMB-KOH3HKNNUM       = "280"   )
-               AND (LNK-S01-JIKANGAI      = "1"     )
-               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
-                    MOVE    800    TO    MAX-KIN-KOHI3-D
-                    MOVE   1600    TO    MAX-KIN-KOHI3-M
-                    MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
-               END-IF
-      *
                IF    WK-CYO-OKIKAE(3)  =  1
                    IF (COMB-KOH1HKNNUM         = "972") OR
                       (COMB-KOH2HKNNUM         = "972") OR
@@ -7880,6 +7882,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI3-M
                       MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(3)
+                      MOVE    "1"    TO    FLG-CHIHOU3(3)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH2HKNNUM         = "974") OR
@@ -7887,7 +7890,19 @@
                       MOVE   20000   TO    MAX-KIN-KOHI3-M
                       MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(3)
+                      MOVE    "1"    TO    FLG-CHIHOU3(3)
                    END-IF
+               END-IF
+      *
+               IF  (WK-1001-PREFNUM       =  42     )
+               AND (COMB-KOH3HKNNUM       = "280"   )
+               AND (LNK-S01-JIKANGAI      = "1"     )
+               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
+                    MOVE    800    TO    MAX-KIN-KOHI3-D
+                    MOVE   1600    TO    MAX-KIN-KOHI3-M
+                    MOVE    "1"    TO    COMB-KOH3-GAIJGNKBN
+                    MOVE   SPACE   TO    FLG-CHIHOU(3)
+                    MOVE   SPACE   TO    FLG-CHIHOU3(3)
                END-IF
       *
                IF  (WK-1001-PREFNUM       =  35 OR 34)
@@ -8030,15 +8045,6 @@
                  END-IF
                END-IF
       *
-               IF  (WK-1001-PREFNUM       =  42     )
-               AND (COMB-KOH4HKNNUM       = "280"   )
-               AND (LNK-S01-JIKANGAI      = "1"     )
-               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
-                    MOVE    800    TO    MAX-KIN-KOHI4-D
-                    MOVE   1600    TO    MAX-KIN-KOHI4-M
-                    MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
-               END-IF
-      *
                IF    WK-CYO-OKIKAE(4)  =  1
                    IF (COMB-KOH1HKNNUM         = "972") OR
                       (COMB-KOH2HKNNUM         = "972") OR
@@ -8046,6 +8052,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI4-M
                       MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(4)
+                      MOVE    "1"    TO    FLG-CHIHOU3(4)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH2HKNNUM         = "974") OR
@@ -8053,7 +8060,19 @@
                       MOVE   20000   TO    MAX-KIN-KOHI4-M
                       MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(4)
+                      MOVE    "1"    TO    FLG-CHIHOU3(4)
                    END-IF
+               END-IF
+      *
+               IF  (WK-1001-PREFNUM       =  42     )
+               AND (COMB-KOH4HKNNUM       = "280"   )
+               AND (LNK-S01-JIKANGAI      = "1"     )
+               AND (LNK-SYU-SRYYMD(1:6)  >= "201104")
+                    MOVE    800    TO    MAX-KIN-KOHI4-D
+                    MOVE   1600    TO    MAX-KIN-KOHI4-M
+                    MOVE    "1"    TO    COMB-KOH4-GAIJGNKBN
+                    MOVE   SPACE   TO    FLG-CHIHOU(4)
+                    MOVE   SPACE   TO    FLG-CHIHOU3(4)
                END-IF
       *
                IF  (WK-1001-PREFNUM       =  35 OR 34)
@@ -19199,6 +19218,59 @@
       *            保険者変更時
                    PERFORM   220274-KOHFUKA-HENSYU3-SEC
                  END-IF
+             WHEN      "A"
+                 IF ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH4ID    ))
+                   CONTINUE
+                 ELSE
+                   PERFORM   220274-KOHFUKA-HENSYU3-SEC
+                 END-IF
            END-EVALUATE
       *
            .
@@ -19350,6 +19422,22 @@
              PERFORM      SYSKANRI-READ-SEC
              MOVE  SYS-2010-JYUHENKBN
                             TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+      *
+             IF ((COMB-KOH1HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH1ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(1)   =  "1"                      ))
+             OR ((COMB-KOH2HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH2ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(2)   =  "1"                      ))
+             OR ((COMB-KOH3HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH3ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(3)   =  "1"                      ))
+             OR ((COMB-KOH4HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH4ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(4)   =  "1"                      ))
+               MOVE   "A"   TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+             END-IF
+      *
              MOVE  SYS-2010-JYUHEN-TAIKBN
                             TO  WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17)
              IF    SYS-2010-JYUHEN-TAIKBN  =  "1"

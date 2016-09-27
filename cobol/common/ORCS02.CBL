@@ -427,6 +427,8 @@
       *                                     ¿À¸Í»ÔÂÐ±þ
       *  04.08.06    NACL-ÌçÏÆ    16/04/27  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *  04.08.07    NACL-ÌçÏÆ    16/05/30  £±£¹¸¶Çú°ìÈÌ¤ÎÆÃ¼ì·×»»ÂÐ±þ
+      *  04.08.08    NACL-ÌçÏÆ    16/07/27  Æü¡¦·î¾å¸Â³ÛÀßÄê¤Î¤Ê¤¤ÃÏÊý¸øÈñ
+      *                                     ¡Ü¥Þ¥ëÄ¹¤ÎÉéÃ´¶â·×»»ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1506,6 +1508,7 @@
            03  WK-CHIHOU-FLG-TAIHI-OCC OCCURS  4.
                05  FLG-CHIHOU          PIC X(01).
                05  FLG-CHIHOU2         PIC X(01).
+               05  FLG-CHIHOU3         PIC X(01).
       *
       *½þ´ÔÊ§¤¤ÃÏÊý¸øÈñ¥Õ¥é¥°
        01  WK-SYOUKAN-FLG-TAIHI-AREA.
@@ -7775,6 +7778,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI1-M
                       MOVE    "1"    TO    COMB-KOH1-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(1)
+                      MOVE    "1"    TO    FLG-CHIHOU3(1)
                    END-IF
                    IF (COMB-KOH2HKNNUM         = "974") OR
                       (COMB-KOH3HKNNUM         = "974") OR
@@ -7782,6 +7786,7 @@
                       MOVE   20000   TO    MAX-KIN-KOHI1-M
                       MOVE    "1"    TO    COMB-KOH1-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(1)
+                      MOVE    "1"    TO    FLG-CHIHOU3(1)
                    END-IF
                END-IF
       *
@@ -7937,6 +7942,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI2-M
                       MOVE    "1"    TO    COMB-KOH2-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(2)
+                      MOVE    "1"    TO    FLG-CHIHOU3(2)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH3HKNNUM         = "974") OR
@@ -7944,6 +7950,7 @@
                       MOVE   20000   TO    MAX-KIN-KOHI2-M
                       MOVE    "1"    TO    COMB-KOH2-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(2)
+                      MOVE    "1"    TO    FLG-CHIHOU3(2)
                    END-IF
                END-IF
       *
@@ -8092,6 +8099,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI3-M
                       MOVE    "1"    TO    COMB-KOH3-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(3)
+                      MOVE    "1"    TO    FLG-CHIHOU3(3)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH2HKNNUM         = "974") OR
@@ -8099,6 +8107,7 @@
                       MOVE   20000   TO    MAX-KIN-KOHI3-M
                       MOVE    "1"    TO    COMB-KOH3-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(3)
+                      MOVE    "1"    TO    FLG-CHIHOU3(3)
                    END-IF
                END-IF
       *
@@ -8247,6 +8256,7 @@
                       MOVE   10000   TO    MAX-KIN-KOHI4-M
                       MOVE    "1"    TO    COMB-KOH4-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(4)
+                      MOVE    "1"    TO    FLG-CHIHOU3(4)
                    END-IF
                    IF (COMB-KOH1HKNNUM         = "974") OR
                       (COMB-KOH2HKNNUM         = "974") OR
@@ -8254,6 +8264,7 @@
                       MOVE   20000   TO    MAX-KIN-KOHI4-M
                       MOVE    "1"    TO    COMB-KOH4-NYUJGNKBN
                       MOVE    "1"    TO    FLG-CHIHOU(4)
+                      MOVE    "1"    TO    FLG-CHIHOU3(4)
                    END-IF
                END-IF
       *
@@ -18374,6 +18385,59 @@
              WHEN      "6"
                  MOVE     1   TO   FLG-KOHFUKA-HENSYU
                  PERFORM     220142-KOHFUKA-HENSYU1-SEC
+             WHEN      "A"
+                 IF ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH1HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH1ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH2HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH2HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH2ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH3HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH3HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH3ID     = WRK-COMB-KOH4ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH1HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH1ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH2HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH2ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH3HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH3ID    ))
+                 OR ((COMB-KOH4HKNNUM = "972" OR "974"     ) AND
+                     (COMB-KOH4HKNNUM = WRK-COMB-KOH4HKNNUM) AND
+                     (COMB-KOH4ID     = WRK-COMB-KOH4ID    ))
+                   CONTINUE
+                 ELSE
+                   PERFORM   220144-KOHFUKA-HENSYU3-SEC
+                 END-IF
            END-EVALUATE
       *
            .
@@ -18525,6 +18589,22 @@
              PERFORM      SYSKANRI-READ-SEC
              MOVE  SYS-2010-JYUHENKBN
                             TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+      *
+             IF ((COMB-KOH1HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH1ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(1)   =  "1"                      ))
+             OR ((COMB-KOH2HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH2ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(2)   =  "1"                      ))
+             OR ((COMB-KOH3HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH3ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(3)   =  "1"                      ))
+             OR ((COMB-KOH4HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
+                 (COMB-KOH4ID      =  WRK-COMB-KOHID(IDX17)    ) AND
+                 (FLG-CHIHOU3(4)   =  "1"                      ))
+               MOVE   "A"   TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+             END-IF
+      *
              MOVE  SYS-2010-JYUHEN-TAIKBN
                             TO  WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17)
              IF    SYS-2010-JYUHEN-TAIKBN  =  "1"
