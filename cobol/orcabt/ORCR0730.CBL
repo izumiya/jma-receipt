@@ -228,6 +228,8 @@
       *                                     »ÄÎ±Ë¡¿ÍÅù¤ÎÉéÃ´¼ÔÈÖ¹æ¡¢¼õµë¼ÔÈÖ¹æ¤Ê¤·
       *  04.08.12    NACL-ÌçÏÆ    16/09/27  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶â¤Î¸º³Û¥³¥á¥ó¥È
       *                                     µ­ºÜ½¤Àµ
+      *  04.08.13    NACL-ÌçÏÆ    16/09/28  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡Ë
+      *                                     ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤Îµ¡Ç½ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -601,6 +603,11 @@
                                    PIC X(08).                                       
       *
            03  WRK-1009-KETA       PIC 9(02).                                      
+      *
+           03  WRK-DAISAN-DATA.
+               05  WRK-DAISAN-FTNMONEY     PIC 9(09).
+           03  WRK-DAISAN-DATA2.
+               05  WRK-DAISAN-SKJFTN       PIC 9(06).
       *
       ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
            03  WRK-FUTAN           PIC ZZZZZZZZ9.
@@ -11118,6 +11125,18 @@
              IF    RECE62-KOH-CHIKAN-KIN4     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(10:1)
              END-IF
+           END-IF
+      *
+      *    ¡Ö°åÊÝ¡ÜÂè»°¼Ô¹Ô°Ù¡×¤Î°åÎÅÈñ°ìÉôÉéÃ´³Û¡¢¿©»öÉ¸½àÉéÃ´³Û¤òµ­Ï¿
+           IF    RECE62-DAISAN-FTNMONEY  NOT = ZERO
+               MOVE  RECE62-DAISAN-FTNMONEY
+                                      TO  WRK-DAISAN-FTNMONEY
+               MOVE  WRK-DAISAN-DATA  TO  RECE10-RESERVE-AREA(13:9)
+           END-IF
+           IF    RECE62-DAISAN-SKJ-FTN-KEI  NOT = ZERO
+               MOVE  RECE62-DAISAN-SKJ-FTN-KEI
+                                      TO  WRK-DAISAN-SKJFTN
+               MOVE  WRK-DAISAN-DATA2 TO  RECE10-RESERVE-AREA(22:6)
            END-IF
       *
            IF      RECE62-SRYYM        >=  "201004"

@@ -33,6 +33,8 @@
       *  04.07.02    NACL-門脇    13/10/15  自賠責（第三者行為）対応
       *  04.08.01    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数
       *                                     処理対応
+      *  04.08.02    NACL-門脇    16/09/28  自賠責（第三者行為）
+      *                                     保険別請求チェック表の機能追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -76,6 +78,11 @@
              05  WRK-TAIHI-DAY           PIC 9(01)   OCCURS   31.
       *
            03  WRK-PTFTNRATE             PIC 9(03).
+      *
+           03  WRK-DAISAN-DATA.
+               05  WRK-DAISAN-FTNMONEY   PIC 9(09).
+           03  WRK-DAISAN-DATA2.
+               05  WRK-DAISAN-SKJFTN     PIC 9(06).
       *
       *    共通領域
            COPY    "MCPAREA".
@@ -213,6 +220,25 @@
       *
            MOVE   RECE10-SKYIRYO-INF   TO   LNK-SKYGET-IRYO-INF
            MOVE   RECE10-SKYSKJ-INF    TO   LNK-SKYGET-SKJ-INF
+      *
+           IF    LNK-SKYGET-PARA  =  "1"
+             MOVE    RECE10-RESERVE-AREA(13:9)  TO  WRK-DAISAN-DATA
+             IF      WRK-DAISAN-DATA   IS  NUMERIC
+             AND     WRK-DAISAN-FTNMONEY  NOT = ZERO
+               ADD   WRK-DAISAN-FTNMONEY
+                                   TO  LNK-SKYGET-IRYO-ICHIBUFTN
+             END-IF
+      *
+             IF    RECE10-NYUGAIKBN  =  "1"
+               MOVE  RECE10-RESERVE-AREA(22:6)  TO  WRK-DAISAN-DATA2
+               IF    WRK-DAISAN-DATA2  IS  NUMERIC
+               AND   WRK-DAISAN-SKJFTN    NOT = ZERO
+                 ADD   WRK-DAISAN-SKJFTN
+                                   TO  LNK-SKYGET-SKJ-RYOYOHI
+                                       LNK-SKYGET-SKJ-ICHIBUFTN
+               END-IF
+             END-IF
+           END-IF
       *
            IF    (LNK-SKYGET-IRYO-TOTALTEN   NOT = ZERO)
            OR    (LNK-SKYGET-SKJ-RYOYOHI     NOT = ZERO)
@@ -919,42 +945,39 @@
            MOVE    RECE10-TOTALTEN(1)       TO LNK-SKYGET-IRYO-TOTALTEN
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-ICHIBUFTN
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-HOKENJA
-           IF    WRK-PTFTNRATE   =  ZERO
-             IF    RECE10-NYUGAIKBN   =  "1"
-               COMPUTE   LNK-SKYGET-IRYO-HOKENJA   =
-                         RECE10-FTNMONEY(1)        -
-                         RECE10-SHOKUJIRYOYOHI(1)
-             ELSE
-               MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-HOKENJA
-             END-IF
-           ELSE
-      ***    IF    RECE10-NYUGAIKBN   =  "1"
-      ***      COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
-      ***                RECE10-FTNMONEY(1)        -
-      ***                RECE10-SHOKUJIRYOYOHI(1)
-      ***    ELSE
-      ***      MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
-      ***    END-IF
-      ***    IF    RECE10-NYUGAIKBN   =  "1"
-               COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
-                         RECE10-FTNMONEY-FTN(1)    +
-                         RECE10-FTNMONEY-KOJ(1)
-      ***    ELSE
-      ***      PERFORM   20011-SYUNOU-CHECK-SEC
-      ***    END-IF
-           END-IF
            MOVE    ZERO                     TO LNK-SKYGET-IRYO-KOHFTN
       *
            MOVE    RECE10-SHOKUJINISSU(1)   TO LNK-SKYGET-SKJ-KAISU
-           MOVE    RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-RYOYOHI
-           IF    WRK-PTFTNRATE   =  ZERO
-             MOVE  RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-HOKENJA
-             MOVE  ZERO                     TO LNK-SKYGET-SKJ-ICHIBUFTN
-           ELSE
-             MOVE  RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-ICHIBUFTN
-             MOVE  ZERO                     TO LNK-SKYGET-SKJ-HOKENJA
-           END-IF
+           MOVE    ZERO                     TO LNK-SKYGET-SKJ-RYOYOHI
+           MOVE    ZERO                     TO LNK-SKYGET-SKJ-ICHIBUFTN
+           MOVE    ZERO                     TO LNK-SKYGET-SKJ-HOKENJA
            MOVE    ZERO                     TO LNK-SKYGET-SKJ-KOHFTN
+      *
+           IF    LNK-SKYGET-PARA  =  "1"
+             IF    WRK-PTFTNRATE  =  ZERO
+               COMPUTE   LNK-SKYGET-IRYO-HOKENJA   =
+                         RECE10-FTNMONEY-KOJ(1)
+             ELSE
+               COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
+                         RECE10-FTNMONEY-KOJ(1)
+             END-IF
+           ELSE
+             IF    WRK-PTFTNRATE  =  ZERO
+               COMPUTE   LNK-SKYGET-IRYO-HOKENJA   =
+                         RECE10-FTNMONEY-FTN(1)    +
+                         RECE10-FTNMONEY-KOJ(1)
+               MOVE   RECE10-SHOKUJIRYOYOHI(1)
+                                     TO LNK-SKYGET-SKJ-RYOYOHI
+                                        LNK-SKYGET-SKJ-HOKENJA
+             ELSE
+               COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
+                         RECE10-FTNMONEY-FTN(1)    +
+                         RECE10-FTNMONEY-KOJ(1)
+               MOVE   RECE10-SHOKUJIRYOYOHI(1)
+                                     TO LNK-SKYGET-SKJ-RYOYOHI
+                                        LNK-SKYGET-SKJ-ICHIBUFTN
+             END-IF
+           END-IF
       *
            .
        2001-HENSYU6-EXT.

@@ -223,6 +223,8 @@
       *                                     »ÄÎ±Ë¡¿ÍÅù¤ÎÉéÃ´¼ÔÈÖ¹æ¡¢¼õµë¼ÔÈÖ¹æ¤Ê¤·
       *  04.08.09    NACL-ÌçÏÆ    16/09/27  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶â¤Î¸º³Û¥³¥á¥ó¥È
       *                                     µ­ºÜ½¤Àµ
+      *  04.08.10    NACL-ÌçÏÆ    16/09/28  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡Ë
+      *                                     ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤Îµ¡Ç½ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -773,6 +775,9 @@
                05  WRK-PAGE1       PIC Z9.
                05  WRK-PAGE-HEN    PIC X(01).
                05  WRK-PAGE2       PIC Z9.
+      *
+           03  WRK-DAISAN-DATA.
+               05  WRK-DAISAN-FTNMONEY     PIC 9(09).
       *
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
@@ -9886,6 +9891,13 @@
              IF    RECE02-KOH-CHIKAN-KIN4     NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(10:1)
              END-IF
+           END-IF
+      *
+      *    ¡Ö°åÊÝ¡ÜÂè»°¼Ô¹Ô°Ù¡×¤Î°åÎÅÈñ°ìÉôÉéÃ´³Û¤òµ­Ï¿
+           IF    RECE02-DAISAN-FTNMONEY  NOT = ZERO
+               MOVE  RECE02-DAISAN-FTNMONEY
+                                      TO  WRK-DAISAN-FTNMONEY
+               MOVE  WRK-DAISAN-DATA  TO  RECE10-RESERVE-AREA(13:9)
            END-IF
       *
            IF      RECE02-SRYYM    >=  "201004"

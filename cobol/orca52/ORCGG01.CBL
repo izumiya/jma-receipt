@@ -623,21 +623,26 @@
                                    UNTIL ( IDX-PARA
                                                >   WRK-CONS-PARA-MAX )
       *
-                               EVALUATE    IDX-PARA
-                               WHEN    9
-                                   MOVE    TKIMEMO-PARA09
+                               IF ( SPA-GMN-G01-PARAHYOJI (IDX IDX-PARA)
+                                           NOT =   SPACE )
+      *
+                                   EVALUATE    IDX-PARA
+                                   WHEN    9
+                                       MOVE    TKIMEMO-PARA09
                                                TO  SPA-GMN-G01-PARA
                                                          (IDX  IDX-PARA)
-                               WHEN    10
-                                   MOVE    TKIMEMO-PARA10
+                                   WHEN    10
+                                       MOVE    TKIMEMO-PARA10
                                                TO  SPA-GMN-G01-PARA
                                                          (IDX  IDX-PARA)
-                               WHEN    OTHER
-                                   MOVE    TKIMEMO-PARA (IDX-PARA)
+                                   WHEN    OTHER
+                                       MOVE    TKIMEMO-PARA (IDX-PARA)
                                                TO  SPA-GMN-G01-PARA
                                                          (IDX  IDX-PARA)
       *
-                               END-EVALUATE
+                                   END-EVALUATE
+      *
+                               END-IF
       *
                            END-PERFORM
       *
@@ -3366,6 +3371,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  GID1
+           INITIALIZE                       GID1
            MOVE    SPA-GIDCD            TO  GID1-ID1CODE
            MOVE    WRK-GIDMSG           TO  GID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -3398,6 +3404,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  GID2
+           INITIALIZE                       GID2
            MOVE    SPA-GIDCD            TO  GID2-ID1CODE
            MOVE    WRK-GIDMSG           TO  GID2-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET

@@ -491,6 +491,8 @@
                    INITIALIZE                  ORCSSKYGETAREA
                    MOVE    "1"             TO  LNK-SKYGET-KBN
                    MOVE    BGS100P-SRYYM   TO  LNK-SKYGET-SRYYM
+                   MOVE    BGS100P-SKYGET-PARA
+                                           TO  LNK-SKYGET-PARA
                    CALL    "ORCSSKYGET"        USING
                                                ORCSSKYGETAREA
                                                RECE10-REC
@@ -1024,6 +1026,8 @@
            INITIALIZE                  ORCSSKYGETAREA
            MOVE    "2"             TO  LNK-SKYGET-KBN
            MOVE    BGS100P-SRYYM   TO  LNK-SKYGET-SRYYM
+           MOVE    BGS100P-SKYGET-PARA
+                                   TO  LNK-SKYGET-PARA
            CALL    "ORCSSKYGET"        USING
                                        ORCSSKYGETAREA
                                        RECE10-REC
@@ -1158,6 +1162,8 @@
                        MOVE    "6"         TO  LNK-SKYGET-KBN
                    END-EVALUATE
                    MOVE    BGS100P-SRYYM   TO  LNK-SKYGET-SRYYM
+                   MOVE    BGS100P-SKYGET-PARA
+                                           TO  LNK-SKYGET-PARA
                    CALL    "ORCSSKYGET"        USING
                                                ORCSSKYGETAREA
                                                RECE10-REC

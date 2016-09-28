@@ -17845,25 +17845,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            ADD   SYU-TOTAL-HKNTEN   TO   RECE02-SKYIRYO-TOTALTEN
       *
-           IF   WRK-DAISAN-DAISANKBN  =  "1"
-             COMPUTE  WRK-SKY-KEISAN6 =  SYU-TOTAL-HKNTEN
-                                      *  10
-                                      *  RECE02-KYURATE
-                                      /  100
-             COMPUTE  WRK-SKY-KEISAN6 =
-                      WRK-SKY-KEISAN6 +  5
-             COMPUTE  WRK-SKY-KEISAN6 =
-                      WRK-SKY-KEISAN6 /  10
-             COMPUTE  WRK-SKY-KEISAN6 =
-                      WRK-SKY-KEISAN6 *  10
-             COMPUTE  WRK-SKY-KEISAN  = (SYU-TOTAL-HKNTEN * 10)
-                                      -  WRK-SKY-KEISAN6
-           ELSE
+      ***  IF   WRK-DAISAN-DAISANKBN  =  "1"
+      ***    COMPUTE  WRK-SKY-KEISAN6 =  SYU-TOTAL-HKNTEN
+      ***                             *  10
+      ***                             *  RECE02-KYURATE
+      ***                             /  100
+      ***    COMPUTE  WRK-SKY-KEISAN6 =
+      ***             WRK-SKY-KEISAN6 +  5
+      ***    COMPUTE  WRK-SKY-KEISAN6 =
+      ***             WRK-SKY-KEISAN6 /  10
+      ***    COMPUTE  WRK-SKY-KEISAN6 =
+      ***             WRK-SKY-KEISAN6 *  10
+      ***    COMPUTE  WRK-SKY-KEISAN  = (SYU-TOTAL-HKNTEN * 10)
+      ***                             -  WRK-SKY-KEISAN6
+      ***  ELSE
              COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
                                       *  10
                                       * (100 - RECE02-KYURATE)
                                       /  100
-           END-IF
+      ***  END-IF
            ADD   WRK-SKY-KEISAN     TO   RECE02-SKYIRYO-HOKENJA
       *
            .
