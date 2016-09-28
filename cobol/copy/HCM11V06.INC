@@ -177,3 +177,5 @@
                         PIC X(20).
             02  HCM11V06-LOPTION
                         PIC X(100).
+            02  HCM11V06-GENMEN3
+                        PIC X(20).

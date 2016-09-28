@@ -241,3 +241,5 @@
                         PIC X(14)       OCCURS 10 TIMES.
             02  HCN09V07-LOPTION
                         PIC X(100).
+            02  HCN09V07-GENMEN3
+                        PIC X(20).

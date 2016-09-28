@@ -226,6 +226,8 @@
       *  04.08.11    NACL-藤原    16/09/06  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
       *                                     残留法人等の負担者番号、受給者番号なし
+      *  04.08.12    NACL-門脇    16/09/27  保険欄−一部負担金の減額コメント
+      *                                     記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -548,6 +550,9 @@
            03  WRK-KYURATE-X.
                05  WRK-KYURATE-9   PIC 9(03).
            03  WRK-KYURATE         PIC Z9.
+           03  WRK-GENMEN-FTNRATE.
+               05  WRK-GENMEN-FTNRATE1  PIC 9(02).
+               05  WRK-GENMEN-FTNRATE2  PIC 9(01).
            03  WRK-BEDSU           PIC ZZZZ.
            03  WRK-HBTNUM-X.
                05  WRK-HBTNUM-9    PIC 9(03).
@@ -6567,10 +6572,26 @@
                        IF    ( KANACHK-RC      =   ZERO )
                        AND   ( KANACHK-MAX     >   ZERO )
                            MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
-                                                   TO  HC06-GENMEN(5:)
+                                               TO  HC06-GENMEN3(5:)
                        END-IF    
-                       MOVE   "減額"               TO  HC06-GENMEN(1:4)
-                       MOVE   "割"                 TO  HC06-GENMEN(9:2)
+                       MOVE   "減額"           TO  HC06-GENMEN3(1:4)
+                       MOVE   "割"             TO  HC06-GENMEN3(9:2)
+      *
+                       MOVE    RECE62-GENGAKURATE
+                                               TO  WRK-GENMEN-FTNRATE
+                       IF   WRK-GENMEN-FTNRATE2  NOT =  ZERO
+                         INITIALIZE            ORCSKANACHKAREA
+                         MOVE  "2"             TO  KANACHK-SYORI
+                         MOVE  WRK-GENMEN-FTNRATE2
+                                               TO  KANACHK-MAE-INPUT
+                         CALL  "ORCSKANACHK"   USING   ORCSKANACHKAREA
+                         IF  ( KANACHK-RC      =   ZERO )
+                         AND ( KANACHK-MAX     >   ZERO )
+                           MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               TO  HC06-GENMEN3(11:)
+                         END-IF
+                         MOVE "分"             TO  HC06-GENMEN3(13:2)
+                       END-IF
                    ELSE
                      IF  RECE62-GENGAKU      >   ZERO
                        MOVE    RECE62-GENGAKU      TO  WRK-KGK6
