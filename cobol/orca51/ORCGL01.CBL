@@ -626,8 +626,11 @@
                                    UNTIL ( IDX-PARA
                                                >   WRK-CONS-PARA-MAX )
       *
-                               MOVE    TKIMEMO-PARA (IDX-PARA)
+                               IF ( SPA-GMN-L01-PARAHYOJI (IDX IDX-PARA)
+                                           NOT =   SPACE )
+                                 MOVE    TKIMEMO-PARA (IDX-PARA)
                                    TO  SPA-GMN-L01-PARA (IDX  IDX-PARA)
+                               END-IF
       *
                            END-PERFORM
                        ELSE
