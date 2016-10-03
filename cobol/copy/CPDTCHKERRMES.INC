@@ -480,14 +480,20 @@
            05 PIC  X(30)   VALUE   "                              ".
       *                            +---------+---------+---------+.
            05 PIC  X(06)   VALUE   "120003".
-           05 PIC  X(30)   VALUE   "外泊のときに入院調剤料が発生し".
-           05 PIC  X(30)   VALUE   "ています                      ".
+           05 PIC  X(30)   VALUE   "外泊日に調剤料が算定されていま".
+           05 PIC  X(30)   VALUE   "す                            ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
       *                            +---------+---------+---------+.
            05 PIC  X(06)   VALUE   "120004".
            05 PIC  X(30)   VALUE   "実日数がゼロ日です。          ".
            05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "120005".
+           05 PIC  X(30)   VALUE   "外泊日に調剤技術基本料が算定さ".
+           05 PIC  X(30)   VALUE   "れています                    ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
       *
@@ -833,10 +839,10 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  128.
+           05 ERRMES-OCC   OCCURS  129.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   128.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   129.
 
 
 

@@ -50,6 +50,13 @@ W60 {
           count int;
             item varchar(22)[5];
         };
+        CMB_SRYSTTENKIKBN {
+          SRYSTTENKIKBN {
+            textdata varchar(60);
+          };
+          count int;
+            item varchar(60)[5];
+        };
         CHKMTRXNIL1 {
           state int;
           style varchar(20);
@@ -149,6 +156,8 @@ W60 {
           count int;
           item varchar(32)[5];
         };
+      };
+      fixed3 {
         CMB_SRYHEIWRNKBN {
           SRYHEIWRNKBN {
             textdata varchar(32);
@@ -172,8 +181,6 @@ W60 {
           item varchar(40)[5];
  		  state int;
         };
-      };
-      fixed3 {
         CMB_SRYKAISUMSTKBN {
           SRYKAISUMSTKBN {
             textdata varchar(22);

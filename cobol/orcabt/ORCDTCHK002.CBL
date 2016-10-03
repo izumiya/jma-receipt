@@ -2196,6 +2196,9 @@
            IF    ( SYS-1101-COMPBYONISSUKBN =  SPACE )
                MOVE    "1"             TO  SYS-1101-COMPBYONISSUKBN
            END-IF
+           IF    ( SYS-1101-SRYSTTENKIKBN   =   SPACE )
+               MOVE    "1"             TO  SYS-1101-SRYSTTENKIKBN
+           END-IF
            IF    ( SYS-1101-YBSJTYKZKBN    =   SPACE )
                MOVE    "1"             TO  SYS-1101-YBSJTYKZKBN
            END-IF
@@ -2864,7 +2867,7 @@
       *
       *        入院調剤料算定日編集処理（実日数チェック用）
                IF    ( DCACCT-ACCTKBN  =   "1" )
-                AND  ( DCACCT-SRYKBN   =   "24" )
+                AND  ( DCACCT-SRYKBN   =   "24" OR "27" )
                    PERFORM 200111-TNYUIN-CHOZAI-HEN-SEC
                END-IF
       *
@@ -4632,7 +4635,12 @@
                    UNTIL ( IDX0    >   31 )
       *
                IF    ( PTZAI-DAY (IDX-ZAI IDX0 )  >   ZERO )
-                   MOVE    1       TO  TNYUIN-CHOZAI-DAY (IDX0)
+                   EVALUATE    DCACCT-SRYKBN
+                   WHEN    "24"
+                       MOVE    1       TO  TNYUIN-CHOZAI-DAY (2 IDX0)
+                   WHEN    "27"
+                       MOVE    1       TO  TNYUIN-CHOZAI-DAY (3 IDX0)
+                   END-EVALUATE
                END-IF
       *
            END-PERFORM
@@ -7061,6 +7069,7 @@
       *
            IF    ( PTBYO-TENKIYMD      NOT =   SPACE )
                IF    ( PTBYO-TENKIKBN  =   "3" )
+                AND  ( SYS-1101-SRYSTTENKIKBN  =   "1" )
                    MOVE    PTBYO-TENKIYMD  TO  WRK-SYMD
                    MOVE    "2"             TO  WRK-ZOGENPTN
                    MOVE     1              TO  WRK-ZOGEN
@@ -10194,6 +10203,15 @@
       *
                IF    ( FLG-CHKEND (12) =   ZERO )
       *            入院調剤料算定日チェック処理
+                   MOVE    TNYUIN-CHOZAI-DAY-OCC (2)
+                                       TO  TNYUIN-CHOZAI-DAY-OCC (1)
+                   MOVE    "120003"    TO  WRK-ERRCD
+                   PERFORM 200112-NCHOZAI-DAY-CHK-SEC
+      *
+      *            入院調剤技術基本料算定日チェック処理
+                   MOVE    TNYUIN-CHOZAI-DAY-OCC (3)
+                                       TO  TNYUIN-CHOZAI-DAY-OCC (1)
+                   MOVE    "120005"    TO  WRK-ERRCD
                    PERFORM 200112-NCHOZAI-DAY-CHK-SEC
                END-IF
       *
@@ -10412,7 +10430,7 @@
                                            =   ZERO OR >= 4 )
                    CONTINUE
                ELSE
-                   IF    ( TNYUIN-CHOZAI-DAY (IDX0)    =   1 )
+                   IF    ( TNYUIN-CHOZAI-DAY (1 IDX0)   =   1 )
                        COMPUTE CNT-GAIHAKU-ERR
                            =   CNT-GAIHAKU-ERR +   1
                        MOVE    1       TO  WRK-NISSU-DAY (IDX0)
@@ -10424,7 +10442,6 @@
            IF    ( CNT-GAIHAKU-ERR     >   ZERO )
                PERFORM 200111-NISSU-HEN-SEC
                MOVE    WRK-NISSU-MES   TO  WRK-ERRMES-PLUS
-               MOVE    "120003"        TO  WRK-ERRCD
       *
                INITIALIZE              TERRINF-AREA
                PERFORM 215-ERRMES-HEN-SEC

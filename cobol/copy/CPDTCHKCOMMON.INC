@@ -189,7 +189,8 @@
       *
       *    Æþ±¡Ä´ºÞÎÁ»»ÄêÆüÂàÈò¥ï¡¼¥¯
          02  TNYUIN-CHOZAI-AREA.
-           03  TNYUIN-CHOZAI-DAY                       PIC 9(01)
+           03  TNYUIN-CHOZAI-DAY-OCC                   OCCURS 3.
+               05  TNYUIN-CHOZAI-DAY                   PIC 9(01)
                                                        OCCURS 31.
       *
       *    Æþ±¡¿ÇÎÅ¹Ô°ÙÆüÂàÈò¥ï¡¼¥¯

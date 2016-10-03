@@ -42,6 +42,10 @@
                 04  W60-COMPBYONISSUKBN       PIC X(22).
                 04  W60-COMPBYONISSUKBN-COUNT PIC S9(9)   BINARY.
                 04  W60-COMPBYONISSUKBN-ITEM  PIC X(22)   OCCURS  5.
+              03  W60-CMB-SRYSTTENKIKBN.
+                04  W60-SRYSTTENKIKBN       PIC X(60).
+                04  W60-SRYSTTENKIKBN-COUNT PIC S9(9)   BINARY.
+                04  W60-SRYSTTENKIKBN-ITEM  PIC X(60)   OCCURS  5.
               03  W60-CHKMTRXNIL-G.
                   05  W60-CHKMTRXNIL-OCC   OCCURS 4.
                    06 W60-CHKMTRXNIL-STATE PIC S9(9)   BINARY.
