@@ -34,7 +34,7 @@
                   05  W18-FAX.
                     06  W18-VALUE   PIC X(15).
                 04  W18-FI24.
-                  05  W18-PRTKBN-COMBO  OCCURS  23.
+                  05  W18-PRTKBN-COMBO  OCCURS  25.
                     06  W18-PRTKBN.
                       07  W18-VALUE   PIC X(21).
                     06  W18-PRTKBN-COUNT   PIC S9(9)   BINARY.

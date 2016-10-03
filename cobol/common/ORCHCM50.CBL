@@ -96,6 +96,11 @@
            03  WRK-ZZZZZZZZ9       PIC ZZZ,ZZZ,ZZ9.
            03  WRK-KINGAKU         PIC S9(11).
            03  WRK-LINE            PIC 9(05).
+           03  WRK-HOSPINF-G.
+               05  WRK-HOSP-1902   PIC X(01).
+               05  WRK-HOSP-NAME   PIC X(80)   OCCURS 2.
+               05  WRK-HOSP-ADRS   PIC X(100)  OCCURS 2.
+               05  WRK-HOSP-TEL    PIC X(15).
       *
        01  KEY-AREA.
            03  KEY-NYUGAIKBN       PIC X(01).
@@ -121,6 +126,18 @@
       *
       *    医療機関情報−所在地、連絡先
            COPY    "CPSK1002.INC".
+      *
+      *    出力先プリンタ名割り当て情報
+           COPY    "CPSK1031.INC".
+      *
+      *    医療機関編集情報
+           COPY    "CPSK1900.INC".
+      *
+      *    医療機関名称編集情報
+           COPY    "CPSK1901.INC".
+      *
+      *    医療機関住所編集情報
+           COPY    "CPSK1902.INC".
       *
       *    患者情報
        01  PTINF-REC.
@@ -205,12 +222,45 @@
            MOVE    "*"             TO  WRK-KBNCD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+           MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSP-NAME (1)
       *
       *    医療機関情報−所在地、連絡先読み込み
            MOVE    "1002"          TO  WRK-KANRICD
            MOVE    "*"             TO  WRK-KBNCD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-1002-REC
+           MOVE    SYS-1002-ADRS       TO  WRK-HOSP-ADRS (1)
+           MOVE    SYS-1002-TEL        TO  WRK-HOSP-TEL
+      *
+      *    医療機関編集情報読み込み
+           MOVE    "1900"          TO  WRK-KANRICD
+           MOVE    "*"             TO  WRK-KBNCD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-1900-REC
+           IF    ( SYS-1900-PRTKBN (24)    NOT =   SPACE )
+      *        医療機関名称編集情報読み込み
+               MOVE    "1901"      TO  WRK-KANRICD
+               MOVE    SYS-1900-PRTKBN (25)
+                                   TO  WRK-KBNCD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               IF    ( FLG-SYSKANRI    =   ZERO )
+                   MOVE    SYSKANRI-REC        TO  SYS-1901-REC
+                   MOVE    SYS-1901-HOSPNAME1  TO  WRK-HOSP-NAME (1)
+                   MOVE    SYS-1901-HOSPNAME2  TO  WRK-HOSP-NAME (2)
+               END-IF
+      *        医療機関住所編集情報読み込み
+               MOVE    "1902"      TO  WRK-KANRICD
+               MOVE    SYS-1900-PRTKBN (25)
+                                   TO  WRK-KBNCD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               IF    ( FLG-SYSKANRI    =   ZERO )
+                   MOVE    SYSKANRI-REC    TO  SYS-1902-REC
+                   MOVE    "1"             TO  WRK-HOSP-1902
+                   MOVE    SYS-1902-ADRS1  TO  WRK-HOSP-ADRS (1)
+                   MOVE    SYS-1902-ADRS2  TO  WRK-HOSP-ADRS (2)
+                   MOVE    SYS-1902-TEL    TO  WRK-HOSP-TEL
+               END-IF
+           END-IF
       *
       *    患者情報読み込み
            PERFORM 900-PTINF-KEY-SEL-SEC
@@ -375,9 +425,11 @@
            MOVE    PTINF-NAME          TO  HCM50-NAME
            MOVE    PTNUM-PTNUM         TO  HCM50-PTNUM
       *
-           MOVE    SYS-1002-ADRS       TO  HCM50-IRYOADRS
-           MOVE    SYS-1001-HOSPNAME   TO  HCM50-IRYOMEI
-           MOVE    SYS-1002-TEL        TO  HCM50-IRYOTEL
+           MOVE    WRK-HOSP-ADRS (1)   TO  HCM50-IRYOADRS (1)
+           MOVE    WRK-HOSP-ADRS (2)   TO  HCM50-IRYOADRS (2)
+           MOVE    WRK-HOSP-NAME (1)   TO  HCM50-IRYOMEI (1)
+           MOVE    WRK-HOSP-NAME (2)   TO  HCM50-IRYOMEI (2)
+           MOVE    WRK-HOSP-TEL        TO  HCM50-IRYOTEL
       *
            MOVE    HCM50SRY-SRYYMD     TO  KEY-SRYYMD
       *

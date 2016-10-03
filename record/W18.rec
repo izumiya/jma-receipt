@@ -215,6 +215,20 @@ W18 {
           count int;
             item varchar(21)[99];
         };
+        PRTKBN24_COMBO {
+          PRTKBN24 {
+            textdata varchar(21);
+          };
+          count int;
+            item varchar(21)[99];
+        };
+        PRTKBN25_COMBO {
+          PRTKBN25 {
+            textdata varchar(21);
+          };
+          count int;
+            item varchar(21)[99];
+        };
       };
     };
     HHOSPNAME {

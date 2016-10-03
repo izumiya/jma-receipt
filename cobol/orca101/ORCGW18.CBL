@@ -41,6 +41,7 @@
       *
       *  04.07.01    NACL-藤原    12/05/28  タブラベル対応
       *  04.07.02    NACL-藤原    15/08/18  開設者名追加対応
+      *  04.08.01    NACL-太田    16/08/04  支払証明書、自費内訳明細書追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -100,7 +101,7 @@
       *
       *----(04.06.02)--UPD-START---
                    07  SPA-GMN-KOUMOKU2.
-                       09  SPA-GMN-PRTKBN-G   OCCURS  23.
+                       09  SPA-GMN-PRTKBN-G   OCCURS  25.
                            11  SPA-GMN-PRTKBN
                                               PIC X(02).
                            11  SPA-GMN-F1     PIC X(01).
@@ -445,7 +446,7 @@
            INITIALIZE   SPA-W18-AREA
       *
       *----(04.06.02)--UPD-START---
-           MOVE    23                  TO  SPA-GMN-PRTKBN-MAX
+           MOVE    25                  TO  SPA-GMN-PRTKBN-MAX
       *----(04.06.02)--UPD-END-----
       *
            MOVE    SPA-W01-STYUKYMDH   TO  SPA-GMN-STYUKYMD
@@ -2371,6 +2372,10 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    123
                     MOVE  "PRTKBN23"          TO   MCP-WIDGET
       *----(04.06.02)--ADD-END-----
+                WHEN    124
+                    MOVE  "PRTKBN24"          TO   MCP-WIDGET
+                WHEN    125
+                    MOVE  "PRTKBN25"          TO   MCP-WIDGET
                 WHEN    200
                     MOVE  "B12"              TO   MCP-WIDGET
             END-EVALUATE
@@ -2451,7 +2456,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "PRTKBN11"
                    MOVE    112         TO  SPA-GMN-CUR
                WHEN    "PRTKBN12"
-                   MOVE    113         TO  SPA-GMN-CUR
+                   MOVE    124         TO  SPA-GMN-CUR
                WHEN    "PRTKBN13"
                    MOVE    118         TO  SPA-GMN-CUR
                WHEN    "PRTKBN18"
@@ -2462,6 +2467,10 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "PRTKBN23"
                    MOVE    109         TO  SPA-GMN-CUR
       *----(04.06.02)--UPD-END-----
+               WHEN    "PRTKBN24"
+                   MOVE    125         TO  SPA-GMN-CUR
+               WHEN    "PRTKBN25"
+                   MOVE    113         TO  SPA-GMN-CUR
            END-EVALUATE
       *
            .
