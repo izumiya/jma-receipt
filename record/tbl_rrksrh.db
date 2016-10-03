@@ -11,6 +11,7 @@ tbl_rrksrh {
 	UPHMS				char(6);
 	STSRYYMD			char(8),virtual;
 	EDSRYYMD			char(8),virtual;
+	KOHNUM				char(3)[5],virtual;
 };
 
 path	all 	{
@@ -153,30 +154,15 @@ path crtv01	{
          OR ( TBL_HKNCOMBI.KOH3ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH3HKNNUM = TBL_PTKOHINF.KOHNUM)
          OR ( TBL_HKNCOMBI.KOH4ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH4HKNNUM = TBL_PTKOHINF.KOHNUM)
          OR ( TBL_PTKOHINF.KOHNUM IN (
-                                   '950',
-                                   '951',
-                                   '954',
-                                   '955',
-                                   '956',
-                                   '957',
-                                   '958',
-                                   '959',
-                                   '960',
-                                   '961',
-                                   '962',
-                                   '963',
-                                   '964',
-                                   '965',
-                                   '966',
-                                   '967',
-                                   '968',
-                                   '969',
-                                   '976',
-                                   '977',
-                                   '978',
-                                   '979') AND (TBL_PTKOHINF.SAKJOKBN = '')
+                                   :KOHNUM[1],
+                                   :KOHNUM[2],
+                                   :KOHNUM[3],
+                                   :KOHNUM[4],
+                                   :KOHNUM[5]
+                                   ) AND (TBL_PTKOHINF.SAKJOKBN = '')
         AND (TBL_RRKSRH.SRYYMD >= TBL_PTKOHINF.TEKSTYMD 
-        AND  TBL_RRKSRH.SRYYMD <= TBL_PTKOHINF.TEKEDYMD))))
+        AND  TBL_RRKSRH.SRYYMD <= TBL_PTKOHINF.TEKEDYMD)
+)))
 		;
 	};
 };

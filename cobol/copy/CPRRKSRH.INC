@@ -48,4 +48,7 @@
             03  RRKSRH-STSRYYMD        PIC X(8).
       *½ªÎ»¿ÇÎÅÆü
             03  RRKSRH-EDSRYYMD        PIC X(8).
+      *¸øÈñ¤Î¼ïÎà
+            03  RRKSRH-KOHNUM-G.
+                05 RRKSRH-KOHNUM       PIC X(3) OCCURS 5.
 

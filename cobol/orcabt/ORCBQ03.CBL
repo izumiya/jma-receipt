@@ -138,6 +138,7 @@
            03  IDX0                    PIC 9(05).
            03  IDX1                    PIC 9(05).
            03  IDX2                    PIC 9(05).
+           03  IDXK                    PIC 9(05).
            03  IDXM                    PIC 9(05).
            03  IDX-SRY                 PIC 9(05).
       *
@@ -176,6 +177,7 @@
            03  SEL-TENKENRECE                      PIC X(01).
            03  SEL-SRYYM                           PIC X(06)
                                                    OCCURS 12.
+           03  SEL-KOHNUM                          PIC X(03).
       *
        01  TSRYCD-G.
            03  TSRYCD-IDX                          PIC 9(05).
@@ -206,15 +208,42 @@
                05  WRK-SRYDD                       PIC 9(02).
       *
        01  COSNT-AREA.
-           03  CONST-VALSURYO                      PIC X(01) VALUE "1".
-           03  CONST-VALKAISU                      PIC X(01) VALUE "2".
-           03  CONST-VALTOTAL                      PIC X(01) VALUE "3".
-           03  CONST-SRYACCT                       PIC X(01) VALUE "1".
-           03  CONST-NYUINACCT                     PIC X(01) VALUE "2".
-           03  CONST-EQUAL                         PIC X(01) VALUE "1".
-           03  CONST-GREATER-EQUAL                 PIC X(01) VALUE "2".
-           03  CONST-LESS-EQUAL                    PIC X(01) VALUE "3".
-           03  CONST-AND                           PIC X(01) VALUE "1".
+           03  CONST-VALSURYO          PIC X(01) VALUE "1".
+           03  CONST-VALKAISU          PIC X(01) VALUE "2".
+           03  CONST-VALTOTAL          PIC X(01) VALUE "3".
+           03  CONST-SRYACCT           PIC X(01) VALUE "1".
+           03  CONST-NYUINACCT         PIC X(01) VALUE "2".
+           03  CONST-EQUAL             PIC X(01) VALUE "1".
+           03  CONST-GREATER-EQUAL     PIC X(01) VALUE "2".
+           03  CONST-LESS-EQUAL        PIC X(01) VALUE "3".
+           03  CONST-AND               PIC X(01) VALUE "1".
+           03  CONST-NOT               PIC X(01) VALUE "9".
+           03  CONST-KOHNUM-VAL.
+               05                      PIC X(03) VALUE "950".
+               05                      PIC X(03) VALUE "951".
+               05                      PIC X(03) VALUE "954".
+               05                      PIC X(03) VALUE "955".
+               05                      PIC X(03) VALUE "956".
+               05                      PIC X(03) VALUE "957".
+               05                      PIC X(03) VALUE "958".
+               05                      PIC X(03) VALUE "959".
+               05                      PIC X(03) VALUE "960".
+               05                      PIC X(03) VALUE "961".
+               05                      PIC X(03) VALUE "962".
+               05                      PIC X(03) VALUE "963".
+               05                      PIC X(03) VALUE "964".
+               05                      PIC X(03) VALUE "965".
+               05                      PIC X(03) VALUE "966".
+               05                      PIC X(03) VALUE "967".
+               05                      PIC X(03) VALUE "968".
+               05                      PIC X(03) VALUE "969".
+               05                      PIC X(03) VALUE "976".
+               05                      PIC X(03) VALUE "977".
+               05                      PIC X(03) VALUE "978".
+               05                      PIC X(03) VALUE "979".
+           03  CONST-KOHNUM-R          REDEFINES CONST-KOHNUM-VAL.
+               05  CONST-KOHNUM        PIC X(03) OCCURS    22.
+           03  CONST-KOHNUM-MAX        PIC 9(03) VALUE     22.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -527,6 +556,33 @@
       *
            INITIALIZE                  RRKSRH-REC
            MOVE    SPA-TERMID      TO  RRKSRH-TERMID
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   5)
+      *
+               MOVE    SPACE       TO  SEL-KOHNUM
+      *
+               IF  ( SPA-Q01-KOHNUM-JKN    NOT =   CONST-NOT )
+                AND( SPA-Q01-KOHNUM (IDX1) NOT =   SPACE )
+                   PERFORM VARYING IDXK    FROM    1   BY  1
+                           UNTIL ( IDXK    >   CONST-KOHNUM-MAX )
+                            OR   ( SEL-KOHNUM  NOT =   SPACE )
+                       IF    ( CONST-KOHNUM (IDXK)
+                                       =   SPA-Q01-KOHNUM (IDX1) )
+                           MOVE    CONST-KOHNUM (IDXK)
+                                       TO  SEL-KOHNUM
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+               IF    ( SEL-KOHNUM  NOT =   SPACE )
+                   MOVE    SEL-KOHNUM  TO  RRKSRH-KOHNUM (IDX1)
+               ELSE
+                   MOVE    "@@@"       TO  RRKSRH-KOHNUM (IDX1)
+               END-IF
+      *
+           END-PERFORM
+      *
            MOVE    RRKSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_rrksrh"    TO  MCP-TABLE
            MOVE    "crtv01"        TO  MCP-PATHNAME
@@ -608,6 +664,9 @@
            MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
       *
+           PERFORM 910-DBCOMMIT-SEC
+           PERFORM 910-DBSTART-SEC
+      *
            INITIALIZE                  RRKSRH-REC
            MOVE    RRKSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_rrksrh"    TO  MCP-TABLE
@@ -620,7 +679,6 @@
            .
        200-MAIN-EXT.
            EXIT.
-      *
       *****************************************************************
       *    診療行為数値検索処理
       *****************************************************************
