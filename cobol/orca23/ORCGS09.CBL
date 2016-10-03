@@ -837,6 +837,7 @@
       *
                    PERFORM 800-MCNDATE-SEC
       *
+                   MOVE    SPA-OPID        TO  BUNBEN-OPID
                    MOVE    SMCNDATE-YMD    TO  BUNBEN-UPYMD
                    MOVE    SMCNDATE-HMS    TO  BUNBEN-UPHMS
                    MOVE    BUNBEN-REC      TO  MCPDATA-REC

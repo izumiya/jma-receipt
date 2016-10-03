@@ -8552,8 +8552,8 @@
             <class>GtkLabel</class>
             <name>label360</name>
             <x>12</x>
-            <y>112</y>
-            <width>136</width>
+            <y>88</y>
+            <width>176</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8562,7 +8562,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>３：請求一覧並び順</label>
+            <label>３：請求一覧初期表示</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -8660,9 +8660,9 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>S02SORTKBN_COMBO</name>
-            <x>188</x>
-            <y>112</y>
-            <width>120</width>
+            <x>364</x>
+            <y>88</y>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -8679,7 +8679,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <text>1 伝票番号順 </text>
+              <text>1 伝票番号順 （新しい順）</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
               <signal>
@@ -8992,8 +8992,8 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>TUKISUM_COMBO</name>
-            <x>188</x>
-            <y>88</y>
+            <x>680</x>
+            <y>64</y>
             <width>284</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -9178,7 +9178,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label9</name>
-            <x>328</x>
+            <x>12</x>
             <y>112</y>
             <width>200</width>
             <height>24</height>
@@ -9196,7 +9196,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>SAIKEISANSKYCHK_COMBO</name>
-            <x>532</x>
+            <x>220</x>
             <y>112</y>
             <width>380</width>
             <height>24</height>
@@ -9284,6 +9284,84 @@
                 <data>ACTIVATE</data>
               </signal>
             </widget>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>S02MODE_COMBO</name>
+            <x>188</x>
+            <y>88</y>
+            <width>168</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>S02MODE</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text></text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>LBLS02LIMIT</name>
+            <x>616</x>
+            <y>92</y>
+            <width>200</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>１頁毎の表示件数（全部指定時）</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkNumberEntry</class>
+            <name>S02LIMIT</name>
+            <x>816</x>
+            <y>92</y>
+            <width>40</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>True</can_focus>
+            <has_focus>False</has_focus>
+            <editable>True</editable>
+            <format>ZZZ</format>
+            <signal>
+              <name>changed</name>
+              <handler>entry_changed</handler>
+              <data>CHANGED</data>
+            </signal>
+            <signal>
+              <name>activate</name>
+              <handler>send_event</handler>
+              <data>ACTIVATE</data>
+            </signal>
           </widget>
         </widget>
         <widget>

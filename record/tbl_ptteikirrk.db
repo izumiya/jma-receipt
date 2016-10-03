@@ -245,6 +245,7 @@ path	upd4		{
 	DBUPDATE	{
 		UPDATE tbl_ptteikirrk
 		SET    DELFLG  =   1,
+		       OPID    =   :OPID,
 		       UPYMD   =   :UPYMD,
 		       UPHMS   =   :UPHMS
         WHERE  HOSPNUM  =   :HOSPNUM

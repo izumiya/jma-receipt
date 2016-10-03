@@ -3111,6 +3111,7 @@
                    END-IF
                END-IF
       *
+               MOVE    SPA-OPID            TO  SYU-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
@@ -3165,6 +3166,11 @@
                COMPUTE SYUTTL-CHOSEI
                    =   SYUTTL-CHOSEI1
                    +   SYUTTL-CHOSEI2
+      *
+               MOVE    SPA-OPID            TO  SYUTTL-OPID
+               PERFORM 800-MCNDATE-SEC
+               MOVE    SMCNDATE-YMD        TO  SYUTTL-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYUTTL-UPHMS
       *
                MOVE    SYUTOTAL-REC        TO  MCPDATA-REC
                MOVE    "tbl_syutotal"      TO  MCP-TABLE
@@ -3302,6 +3308,7 @@
                    MOVE    "8"             TO  SMEI-JOUTAIKBN
                END-EVALUATE
       *
+               MOVE    SPA-OPID            TO  SMEI-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-CREYMD
                                                SMEI-UPYMD
@@ -3423,6 +3430,7 @@
                    END-IF
                END-EVALUATE
       *
+               MOVE    SPA-OPID            TO  SMEI-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SMEI-UPHMS

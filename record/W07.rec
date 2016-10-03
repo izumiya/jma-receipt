@@ -727,6 +727,20 @@ W07 {
           count int;
             item varchar(40)[5];
         };
+        S02MODE_COMBO {
+          S02MODE	{
+            textdata varchar(22);
+          };
+          count int;
+            item varchar(22)[5];
+        };
+        LBLS02LIMIT {
+      	  textdata varchar(30);
+        };
+        S02LIMIT {
+          visible bool;
+          numdata number(3);
+        };
         S02SORTKBN_COMBO {
           S02SORTKBN {
             textdata varchar(22);

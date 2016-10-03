@@ -52,7 +52,8 @@ S02 {
       textdata varchar(100);
     };
     LBLMSG5 {
-      textdata varchar(10);
+      style varchar(20);
+      textdata varchar(18);
     };
     LBLMSG6 {
       style varchar(20);

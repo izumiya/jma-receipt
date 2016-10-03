@@ -116,8 +116,12 @@
                05  SYS-1039-SAIKEISANSKYCHK     PIC X(01).
       *支払証明書印刷画面自費内訳明細書
                05  SYS-1039-S04JIHIPRTKBN       PIC X(01).
+      *請求一覧画面コラムリスト初期表示
+               05  SYS-1039-S02MODE             PIC X(01).
+      *請求一覧画面コラムリスト最大件数
+               05  SYS-1039-S02LIMIT            PIC 9(03).
       *予備
-               05  SYS-1039-YOBI                PIC  X(422).
+               05  SYS-1039-YOBI                PIC  X(418).
       *端末ＩＤ
            03  SYS-1039-TERMID          PIC  X(16).
       *オペーレータＩＤ

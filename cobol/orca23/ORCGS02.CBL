@@ -157,6 +157,14 @@
                05  SPA-GMN-CUR                     PIC 9(03).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-SRYYM              PIC X(10).
+                   07  SPA-GMN-MODE-G.
+                       09  SPA-GMN-MODE        PIC X(01).
+                       09  SPA-GMN-F1          PIC X(01).
+                       09  SPA-GMN-MODEMEI     PIC X(20).
+                   07  SPA-GMN-SORTKBN-G.
+                       09  SPA-GMN-SORTKBN     PIC X(01).
+                       09  SPA-GMN-F1          PIC X(01).
+                       09  SPA-GMN-SORTKBNMEI  PIC X(20).
                    07  SPA-GMN-HEAD.
                        09  SPA-GMN-PTID            PIC 9(10).
                        09  SPA-GMN-PTNUM           PIC X(20).
@@ -173,16 +181,8 @@
                            11  SPA-GMN-F1          PIC X(01).
                            11  SPA-GMN-NYUGAIKBNMEI
                                                    PIC X(06).
-                       09  SPA-GMN-MODE-G.
-                           11  SPA-GMN-MODE        PIC X(01).
-                           11  SPA-GMN-F1          PIC X(01).
-                           11  SPA-GMN-MODEMEI     PIC X(20).
-                       09  SPA-GMN-SORTKBN-G.
-                           11  SPA-GMN-SORTKBN     PIC X(01).
-                           11  SPA-GMN-F1          PIC X(01).
-                           11  SPA-GMN-SORTKBNMEI  PIC X(20).
                    07  SPA-GMN-TBL.
-                       09  SPA-GMN-REL-MAX         PIC 9(05).
+                       09  SPA-GMN-SELECTED        PIC 9(01).
                        09  SPA-GMN-MAX             PIC 9(05).
                        09  SPA-GMN-NEXT            PIC 9(01).
                        09  SPA-GMN-TBLREC  OCCURS  500.
@@ -299,7 +299,6 @@
                    07  SPA-NAI-HEAD.
                        09  SPA-NAI-LOCK            PIC 9(01).
                        09  SPA-NAI-SLOCK-MSG       PIC X(32).
-                       09  SPA-NAI-MODE-SRYYM      PIC X(06).
                        09  SPA-NAI-SEX             PIC X(01).
                        09  SPA-NAI-BIRTHDAY        PIC X(08).
                        09  SPA-NAI-NYUKIN-HOHO     PIC X(02).
@@ -464,7 +463,7 @@
                05  WRK-WYY         PIC 9(02).
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
-           03  WRK-NAI-SRYYM       PIC X(06).
+           03  WRK-NAI-SRYYM       PIC X(08).
            03  WRK-PGNAME-G.
                05  WRK-PGNAME-OCC  OCCURS  3.
                    07  WRK-PGNAME  PIC X(20).
@@ -537,7 +536,7 @@
            03  WRK-SRYYM           PIC X(06).
            03  WRK-SYULIST-PAGE-G.
                05  WRK-SYULIST-PAGE    PIC ZZZZZ.
-               05  WRK-SYULIST-LBL     PIC X(02).
+               05  WRK-SYULIST-LBL     PIC X(12).
            03  WRK-SKYYM           PIC X(06).
            03  WRK-TABLE           PIC X(64).
            03  WRK-PATHNAME        PIC X(64).
@@ -553,6 +552,12 @@
            03  WRK-IKT-TABLE       PIC X(64).
            03  WRK-IKT-PATHNAME    PIC X(64).
            03  WRK-NAI-SYORINO     PIC X(02).
+           03  WRK-NUMX.
+               05  WRK-NUM9        PIC 9(01).
+           03  WRK-MAX             PIC 9(10).
+           03  WRK-GMN-MODE        PIC X(01).
+           03  WRK-GMN-SORTKBN     PIC X(01).
+           03  WRK-GMN-PTID        PIC 9(10).
       *
        01  WRK-ROW.
            05  WRK-SYULIST-ROW     PIC S9(9)   BINARY.
@@ -1348,6 +1353,7 @@
            PERFORM 4200-SORTKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-SORTKBN-G
       *
+      *
            .
        3101-COMBO-SYOKI-SET-EXT.
            EXIT.
@@ -1382,12 +1388,17 @@
            MOVE    SYSKANRI-REC        TO  SYS-1039-REC
            MOVE    SYS-1039-TBL        TO  SPA-NAI-SYS1039TBL
       *
-           MOVE    SPA-SYSYMDWH(1:6)    TO  SPA-GMN-SRYYM
-           MOVE    SPA-SYSYMD  (1:6)    TO  SPA-NAI-SRYYM
+           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-SRYYM
+           MOVE    SPA-SYSYMD          TO  SPA-NAI-SRYYM
       *
            PERFORM 3101-COMBO-EDIT-SEC
       *
            PERFORM 3101-COMBO-SYOKI-SET-SEC
+      *
+           MOVE    SPA-GMN-MODE    TO  S02-MODE
+           MOVE    SPACE           TO  SPA-GMN-MODE
+           MOVE    SPA-NAI-SRYYM   TO  SPA-NAI-THSRYYM
+           PERFORM 4106-MODE-CHK-SEC
       *
            PERFORM 3111-S10-CHK-SEC
       *
@@ -1559,16 +1570,25 @@
       *
            IF    ( SPA-GMN-MODE        =   CONST-MODE-MISYU
                                        OR  CONST-MODE-NYUHEN )
-
                MOVE    "0"             TO  SPA-GMN-SORTKBNL       (1)
-               MOVE    "È¯¹ÔÆü½ç"      TO  SPA-GMN-SORTKBNMEIL    (1)
+               MOVE    "È¯¹ÔÆü¤Î¸Å¤¤½ç"
+                                       TO  SPA-GMN-SORTKBNMEIL    (1)
+               MOVE    "1"             TO  SPA-GMN-SORTKBNL       (2)
+               MOVE    "È¯¹ÔÆü¤Î¿·¤·¤¤½ç"
+                                       TO  SPA-GMN-SORTKBNMEIL    (2)
            ELSE
                MOVE    "0"             TO  SPA-GMN-SORTKBNL       (1)
-               MOVE    "ÅÁÉ¼ÈÖ¹æ½ç"    TO  SPA-GMN-SORTKBNMEIL    (1)
+               MOVE    "ÅÁÉ¼ÈÖ¹æ¤Î¾®¤µ¤¤½ç"
+                                       TO  SPA-GMN-SORTKBNMEIL    (1)
+               MOVE    "1"             TO  SPA-GMN-SORTKBNL       (2)
+               MOVE    "ÅÁÉ¼ÈÖ¹æ¤ÎÂç¤­¤¤½ç"
+                                       TO  SPA-GMN-SORTKBNMEIL    (2)
            END-IF
-           MOVE    "1"                 TO  SPA-GMN-SORTKBNL       (2)
-           MOVE    "¿ÇÎÅÆü½ç"          TO  SPA-GMN-SORTKBNMEIL    (2)
-           MOVE    2                   TO  SPA-GMN-SORTKBN-MAX
+           MOVE    "2"                 TO  SPA-GMN-SORTKBNL       (3)
+           MOVE    "¿ÇÎÅÆü¤Î¸Å¤¤½ç"    TO  SPA-GMN-SORTKBNMEIL    (3)
+           MOVE    "3"                 TO  SPA-GMN-SORTKBNL       (4)
+           MOVE    "¿ÇÎÅÆü¤Î¿·¤·¤¤½ç"  TO  SPA-GMN-SORTKBNMEIL    (4)
+           MOVE    4                   TO  SPA-GMN-SORTKBN-MAX
       *
            .
        3101-SORTKBNLST-EXT.
@@ -1685,6 +1705,8 @@
       *
            INITIALIZE                  SPA-GMN-HEAD
                                        SPA-NAI-HEAD
+                                       SPA-GMN-MODE-G
+                                       SPA-GMN-SORTKBN-G
                                        SPA-GMN-PAGE
                                        SPA-GMN-TBL
                                        SPA-GMN-MISYU
@@ -1701,8 +1723,10 @@
       *
            PERFORM 3101-COMBO-SYOKI-SET-SEC
       *
-           MOVE    SPA-NAI-SRYYM   TO  S02-SRYYM
-           PERFORM 4104-SRYYM-CHK-SEC
+           MOVE    SPA-GMN-MODE    TO  S02-MODE
+           MOVE    SPACE           TO  SPA-GMN-MODE
+           MOVE    SPA-NAI-SRYYM   TO  SPA-NAI-THSRYYM
+           PERFORM 4106-MODE-CHK-SEC
            IF    ( SPA-GMN-MAX     = ZERO )
                MOVE    3           TO  SPA-GMN-CUR
            ELSE
@@ -2455,6 +2479,7 @@
            MOVE    CONST-PRTKANRI-TBL-GROUP
                                        TO  SYS-3003-TBL-GROUP
            MOVE    CNT-JOBID           TO  SYS-3003-JOBID
+           MOVE    SPA-OPID            TO  SYS-3003-OPID
       *
            MOVE    SYS-3003-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -2480,84 +2505,39 @@
       *
            MOVE    ZERO                TO  FLG-SYUNOU
       *
-           IF    ( SPA-GMN-SORTKBN     =   "1" )
-               EVALUATE SPA-GMN-MODE
-               WHEN    CONST-MODE-MISYU
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key66"         TO  WRK-PATHNAME
-               WHEN    CONST-MODE-NYUHEN
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key67"         TO  WRK-PATHNAME
-               WHEN    OTHER
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key85"         TO  WRK-PATHNAME
-               END-EVALUATE
-           ELSE
-               EVALUATE SPA-GMN-MODE
-               WHEN    CONST-MODE-MISYU
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key24"         TO  WRK-PATHNAME
-               WHEN    CONST-MODE-NYUHEN
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key58"         TO  WRK-PATHNAME
-               WHEN    OTHER
-                   MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key64"         TO  WRK-PATHNAME
-               END-EVALUATE
+      *
+           EVALUATE    SPA-GMN-MODE
+           WHEN    CONST-MODE-MISYU
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key93"         TO  WRK-PATHNAME
+           WHEN    CONST-MODE-NYUHEN
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key94"         TO  WRK-PATHNAME
+           WHEN    OTHER
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key95"         TO  WRK-PATHNAME
+           END-EVALUATE
+      *
+           MOVE    CONST-SYULST-MAX    TO  WRK-MAX
+           MOVE    SPA-NAI-SYS1039TBL  TO  SYS-1039-TBL
+           IF    ( SYS-1039-S02LIMIT   IS  NUMERIC )
+            AND  ( SYS-1039-S02LIMIT   >   ZERO )
+            AND  ( SPA-GMN-MODE        =   CONST-MODE-NORALL )
+               MOVE    SYS-1039-S02LIMIT
+                                       TO  WRK-MAX
+           END-IF
+           PERFORM 900-SYUNOU-SEL-SEC
+           IF    ( FLG-SYUNOU  =   ZERO )
+               MOVE    1               TO  SPA-GMN-SELECTED
+           END-IF
+           IF    ( SPA-NAI-LOCK    NOT =   ZERO )
+               MOVE    1               TO  FLG-SYUNOU
            END-IF
       *
-           PERFORM 900-SYUNOU-SEL-SEC
-      *
            PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
-                    OR   ( SPA-GMN-MAX    >=   CONST-SYULST-MAX )
+                    OR   ( SPA-GMN-MAX    >=   WRK-MAX )
       *
-               COMPUTE SPA-GMN-REL-MAX
-                   =   SPA-GMN-REL-MAX
-                   +   1
-      *
-               MOVE    1               TO  FLG-SYORI
-      *
-               IF    ( SPA-NAI-LOCK    =  ZERO )
-                   CONTINUE
-               ELSE
-                   MOVE    ZERO        TO  FLG-SYORI
-               END-IF
-      *
-               EVALUATE    SPA-GMN-NYUGAIKBN
-               WHEN    "0"
-                   CONTINUE
-               WHEN    "1"
-               WHEN    "2"
-                   IF    ( SPA-GMN-NYUGAIKBN   =   SYU-NYUGAIKBN )
-                       CONTINUE
-                   ELSE
-                       MOVE    ZERO    TO  FLG-SYORI
-                   END-IF
-               WHEN    OTHER
-                       MOVE    ZERO    TO  FLG-SYORI
-               END-EVALUATE
-      *
-               EVALUATE    SPA-GMN-SRYKA
-               WHEN    "00"
-                   CONTINUE
-               WHEN    SYU-SRYKA
-                   CONTINUE
-               WHEN    OTHER
-                       MOVE    ZERO    TO  FLG-SYORI
-               END-EVALUATE
-      *
-               IF    ( SPA-NAI-SRYYM   =   SPACE )
-                   IF    ( SPA-GMN-REL-MAX
-                               > ( SPA-GMN-PAGE * CONST-SYULST-MAX ))
-                       CONTINUE
-                   ELSE
-                       MOVE    ZERO    TO  FLG-SYORI
-                   END-IF
-               END-IF
-      *
-               IF    ( FLG-SYORI       =   1 )
-                   PERFORM 3101-SYULST-SEC
-               END-IF
+               PERFORM 3101-SYULST-SEC
       *
                PERFORM 900-SYUNOU-FET-SEC
       *
@@ -3373,7 +3353,10 @@
       *
                MOVE    "blue"                  TO  S02-LBLMSG2-STYLE
       *
-               IF    ( SPA-GMN-REL-MAX     =   ZERO )
+               IF    ( SPA-GMN-SELECTED    NOT =   ZERO )
+                OR   ( SPA-GMN-PAGE            >   ZERO )
+                   CONTINUE
+               ELSE
                    EVALUATE    SPA-GMN-MODE
                    WHEN    CONST-MODE-NORMON
                    WHEN    CONST-MODE-NORYEAR
@@ -3396,7 +3379,8 @@
                END-IF
            END-IF
       *
-           MOVE    "black"                     TO  S02-LBLMSG6-STYLE
+           MOVE    "black"                     TO  S02-LBLMSG5-STYLE
+                                                   S02-LBLMSG6-STYLE
                                                    S02-KANANAME-STYLE
                                                    S02-NAME-STYLE
       *
@@ -3415,10 +3399,16 @@
            IF    ( SPA-NAI-SRYYM   =   SPACE )
                IF    ( SPA-GMN-PAGE    >   ZERO )
                 OR   ( SPA-GMN-NEXT    =   1    )
+                   MOVE    "blue"      TO  S02-LBLMSG5-STYLE
                    INITIALIZE  WRK-SYULIST-PAGE-G
                    COMPUTE CNT-PAGE    =   SPA-GMN-PAGE    +   1
                    MOVE    CNT-PAGE    TO  WRK-SYULIST-PAGE
-                   MOVE    "ÊÇ"        TO  WRK-SYULIST-LBL
+                   IF    ( SPA-GMN-NEXT    =   1 )
+                       MOVE    "ÊÇ¡¡¼¡ÊÇÍ­¤ê"
+                                       TO  WRK-SYULIST-LBL
+                   ELSE
+                       MOVE    "ÊÇ"    TO  WRK-SYULIST-LBL
+                   END-IF
                    MOVE    WRK-SYULIST-PAGE-G  TO  S02-LBLMSG5
                END-IF
            END-IF
@@ -4442,8 +4432,10 @@
       *
                PERFORM 3101-COMBO-SYOKI-SET-SEC
       *
-               MOVE    SPA-NAI-SRYYM   TO  S02-SRYYM
-               PERFORM 4104-SRYYM-CHK-SEC
+               MOVE    SPA-GMN-MODE    TO  S02-MODE
+               MOVE    SPACE           TO  SPA-GMN-MODE
+               MOVE    SPA-NAI-SRYYM   TO  SPA-NAI-THSRYYM
+               PERFORM 4106-MODE-CHK-SEC
                IF    ( SPA-GMN-MAX     = ZERO )
                    MOVE    3           TO  SPA-GMN-CUR
                ELSE
@@ -4665,7 +4657,11 @@
                WHEN    CONST-MODE-MISYU
                        MOVE    SPACE       TO  S02-SRYYM
                WHEN    CONST-MODE-NYUHEN
+                   IF    ( S02-SRYYM (1:8) IS  NUMERIC )
+                       CONTINUE
+                   ELSE
                        MOVE    SPA-SYSYMD  TO  S02-SRYYM
+                   END-IF
                END-EVALUATE
       *
                PERFORM 4104-SRYYM-CHK-SEC
@@ -5832,6 +5828,7 @@
            MOVE    "3"             TO  SYU-DENPJTIKBN
            MOVE    ZERO            TO  SYU-SKYMONEY
       *
+           MOVE    SPA-OPID        TO  SYU-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD    TO  SYU-UPYMD
            MOVE    SMCNDATE-HMS    TO  SYU-UPHMS
@@ -5925,6 +5922,7 @@
       *
            MOVE    WKSYUMEI-REC        TO  SYUMEI-REC
       *
+           MOVE    SPA-OPID            TO  SMEI-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  SMEI-CREYMD
                                            SMEI-UPYMD
@@ -5964,6 +5962,7 @@
            MOVE    SPA-GMN-PTID        TO  PTTEIKIRRK-PTID
            MOVE    SYU-DENPNUM         TO  PTTEIKIRRK-DENPNUM
       *
+           MOVE    SPA-OPID            TO  PTTEIKIRRK-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  PTTEIKIRRK-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTTEIKIRRK-UPHMS
@@ -6357,6 +6356,7 @@
                 COMPUTE WRK-SAGAKU = SYU-SKYMONEY - SYU-NYUKIN-TOTAL
                 MOVE    SYU-SKYMONEY        TO    SYU-NYUKIN-TOTAL
       *
+                MOVE    SPA-OPID            TO  SYU-OPID
                 PERFORM 800-MCNDATE-SEC
                 MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
                 MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
@@ -6437,6 +6437,7 @@
       *¾õÂÖ¶èÊ¬
            MOVE    "4"                 TO  SMEI-JOUTAIKBN
       *
+           MOVE    SPA-OPID            TO  SMEI-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  SMEI-CREYMD
                                            SMEI-UPYMD
@@ -6633,6 +6634,7 @@
                   MOVE    ZERO       TO    SYU-NYUKIN-TOTAL
       ***         MOVE    ZERO       TO    SYU-NYUKIN-KAISU
       *
+                  MOVE    SPA-OPID            TO  SYU-OPID
                   PERFORM 800-MCNDATE-SEC
                   MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
                   MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
@@ -6862,6 +6864,7 @@
       *¾õÂÖ¶èÊ¬
            MOVE    "6"                 TO  SMEI-JOUTAIKBN
       *
+           MOVE    SPA-OPID            TO  SMEI-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  SMEI-CREYMD
                                            SMEI-UPYMD
@@ -7288,6 +7291,7 @@
                    END-IF
                END-IF
       *
+               MOVE    SPA-OPID            TO  SYU-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
@@ -7343,6 +7347,10 @@
                    =   SYUTTL-CHOSEI1
                    +   SYUTTL-CHOSEI2
       *
+               MOVE    SPA-OPID            TO  SYUTTL-OPID
+               PERFORM 800-MCNDATE-SEC
+               MOVE    SMCNDATE-YMD        TO  SYUTTL-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYUTTL-UPHMS
                MOVE    SYUTOTAL-REC        TO  MCPDATA-REC
                MOVE    "tbl_syutotal"      TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
@@ -7479,6 +7487,7 @@
                    MOVE    "8"             TO  SMEI-JOUTAIKBN
                END-EVALUATE
       *
+               MOVE    SPA-OPID            TO  SMEI-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-CREYMD
                                                SMEI-UPYMD
@@ -7607,6 +7616,7 @@
                    END-IF
                END-EVALUATE
       *
+               MOVE    SPA-OPID            TO  SMEI-OPID
                PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SMEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SMEI-UPHMS
@@ -8110,8 +8120,18 @@
            END-PERFORM
       *
            IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-NAI-SYS1039TBL  TO  SYS-1039-TBL
+               IF    ( SYS-1039-S02MODE    >=  "0" )
+                AND  ( SYS-1039-S02MODE    <=  "4" )
+                   MOVE    SYS-1039-S02MODE
+                                   TO  WRK-NUMX
+                   COMPUTE WRK-NUM9    =   WRK-NUM9    +   1
+                   MOVE    SPA-GMN-MODELST (WRK-NUM9)
+                                   TO  WRK-CMB-ITM
+               ELSE
                    MOVE    SPA-GMN-MODELST (1)
                                    TO  WRK-CMB-ITM
+               END-IF
            END-IF
       *
            .
@@ -8137,13 +8157,23 @@
       *
            IF    ( WRK-CMB-ITM         =   SPACE )
                MOVE    SPA-NAI-SYS1039TBL  TO  SYS-1039-TBL
-               IF    ( SYS-1039-S02SORTKBN =   "1" )
-                   MOVE    SPA-GMN-SORTKBNLST (2)
-                                   TO  WRK-CMB-ITM
-               ELSE
+               EVALUATE    SYS-1039-S02SORTKBN
+               WHEN    "0"
                    MOVE    SPA-GMN-SORTKBNLST (1)
                                    TO  WRK-CMB-ITM
-               END-IF
+               WHEN    "2"
+                   MOVE    SPA-GMN-SORTKBNLST (2)
+                                   TO  WRK-CMB-ITM
+               WHEN    "1"
+                   MOVE    SPA-GMN-SORTKBNLST (3)
+                                   TO  WRK-CMB-ITM
+               WHEN    "3"
+                   MOVE    SPA-GMN-SORTKBNLST (4)
+                                   TO  WRK-CMB-ITM
+               WHEN    OTHER
+                   MOVE    SPA-GMN-SORTKBNLST (1)
+                                   TO  WRK-CMB-ITM
+               END-EVALUATE
            END-IF
       *
            .
@@ -8484,33 +8514,22 @@
       *    ÇÓÂ¾À©¸æ²ò½ü½èÍý
            PERFORM 990-LOCK-OUT-SEC
       *
-           MOVE    SPACE              TO   WRK-NAI-SRYYM
-      *
-           IF    ( SPA-GMN-TBL-SEL    NOT  =   ZERO )
-               MOVE    SPA-NAI-TSRYYMD(SPA-GMN-SELBAN) (1:6)
-                                      TO   WRK-NAI-SRYYM
-           ELSE
-               IF    ( SPA-GMN-MODE   =    ZERO )
-                   MOVE    SPA-NAI-SRYYM
-                                      TO   WRK-NAI-SRYYM
-               ELSE
-                   MOVE    SPA-NAI-THSRYYM
-                                      TO   WRK-NAI-SRYYM
-               END-IF
-               IF    ( WRK-NAI-SRYYM (1:6) IS   NUMERIC )
-                   CONTINUE
-               ELSE
-                   MOVE    SPA-SYSYMD (1:6)
-                                      TO   WRK-NAI-SRYYM
-               END-IF
-           END-IF
+           MOVE    SPA-NAI-SRYYM       TO  WRK-NAI-SRYYM
+           MOVE    SPA-GMN-MODE        TO  WRK-GMN-MODE
+           MOVE    SPA-GMN-SORTKBN     TO  WRK-GMN-SORTKBN
+           MOVE    SPA-GMN-PTID        TO  WRK-GMN-PTID
       *
            PERFORM 311-SPA-SET-SEC
       *
-           MOVE    WRK-NAI-SRYYM       TO  WRK-SYMD
-           PERFORM 801-HIZUKE-CHK-SEC
-           MOVE    WRK-HENYMDG (1:6)   TO  SPA-GMN-SRYYM
-           MOVE    WRK-SYMD    (1:6)   TO  SPA-NAI-SRYYM
+           IF    ( WRK-GMN-PTID    NOT =   ZERO )
+               MOVE    WRK-GMN-SORTKBN    TO   SPA-GMN-SORTKBN
+               PERFORM 3101-COMBO-SYOKI-SET-SEC
+      *
+               MOVE    WRK-GMN-MODE    TO  S02-MODE
+               MOVE    SPACE           TO  SPA-GMN-MODE
+               MOVE    WRK-NAI-SRYYM   TO  SPA-NAI-THSRYYM
+               PERFORM 4106-MODE-CHK-SEC
+           END-IF
       *
            MOVE    ZERO                TO  FLG-S10-CHK
            PERFORM 3111-S10-CHK-SEC
@@ -9484,15 +9503,23 @@
       **************************************************************
        900-SYUNOU-SEL-SEC        SECTION.
       *
-           MOVE    ZERO            TO  FLG-SYUNOU
+           MOVE    ZERO                TO  FLG-SYUNOU
       *
            INITIALIZE  SYUNOU-REC
            MOVE    SPA-HOSPNUM         TO  SYU-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  SYU-PTID
+           MOVE    SPA-GMN-NYUGAIKBN   TO  SYU-NYUGAIKBN
+           MOVE    SPA-GMN-SRYKA       TO  SYU-SRYKA
            STRING  SPA-NAI-SRYYM       DELIMITED   BY  SPACE
                    "%"                 DELIMITED   BY  SIZE
            INTO    SYU-SRYYMD
            END-STRING
+           IF    ( SPA-NAI-SRYYM       =   SPACE )
+               MOVE    "ALL"           TO  SYU-UPSRYYMD
+               COMPUTE SYU-CHOSEI1 =   WRK-MAX + 1
+               COMPUTE SYU-CHOSEI2 =   WRK-MAX * SPA-GMN-PAGE
+           END-IF
+           MOVE    SPA-GMN-SORTKBN     TO  SYU-SELNYUGAIKBN
            MOVE    SYUNOU-REC          TO  MCPDATA-REC
            MOVE    WRK-TABLE           TO  MCP-TABLE
            MOVE    WRK-PATHNAME        TO  MCP-PATHNAME

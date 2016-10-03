@@ -132,6 +132,7 @@
       *                                     死亡区分更新確認メッセージ表示
       *                                     有無区分の追加
       *  04.08.01    NACL-多々納  16/06/10  セット展開区分追加
+      *  04.08.01    NACL-太田    16/08/05  収納請求一覧初期表示追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -915,6 +916,11 @@
                            11  SPA-GMN-TUKISUM             PIC X(01).
                            11  SPA-GMN-TUKISUM-F1          PIC X(01).
                            11  SPA-GMN-TUKISUMMEI          PIC X(38).
+                       09  SPA-GMN-S02MODE-G.
+                           11  SPA-GMN-S02MODE          PIC X(01).
+                           11  SPA-GMN-S02MODE-F1       PIC X(01).
+                           11  SPA-GMN-S02MODEMEI       PIC X(20).
+                       09  SPA-GMN-S02LIMIT             PIC 9(3).
                        09  SPA-GMN-S02SORTKBN-G.
                            11  SPA-GMN-S02SORTKBN          PIC X(01).
                            11  SPA-GMN-S02SORTKBN-F1       PIC X(01).
@@ -1051,6 +1057,12 @@
                                13  SPA-GMN-TUKISUML        PIC X(01).
                                13  SPA-GMN-TUKISUM-F1L     PIC X(01).
                                13  SPA-GMN-TUKISUMMEIL     PIC X(38).
+                       09  SPA-GMN-S02MODELST-G.
+                           11  SPA-GMN-S02MODE-MAX      PIC 9(03).
+                           11  SPA-GMN-S02MODELST       OCCURS  5.
+                               13  SPA-GMN-S02MODEL     PIC X(01).
+                               13  SPA-GMN-S02MODE-F1L  PIC X(01).
+                               13  SPA-GMN-S02MODEMEIL  PIC X(20).
                        09  SPA-GMN-S02SORTKBNLST-G.
                            11  SPA-GMN-S02SORTKBN-MAX      PIC 9(03).
                            11  SPA-GMN-S02SORTKBNLST       OCCURS  5.
@@ -1395,6 +1407,8 @@
                            11  SPA-NAI-JIKANCHK-SED.
                                13  SPA-NAI-JIKANSED-HH      PIC 9(02).
                                13  SPA-NAI-JIKANSED-MM      PIC 9(02).
+                   07  SPA-NAI-PAGE4-AREA.
+                       09  SPA-NAI-S02MODE-MAE              PIC X(01).
       *
            COPY    "ENUM-VALUE".
       *
@@ -2205,11 +2219,12 @@
                                        TO  SPA-GMN-TUKISKYMISYUPRTLST(2)
            MOVE    2                   TO  SPA-GMN-TUKISKYMISYUPRT-MAX
       *
-           MOVE    "0 伝票番号順"
-                                       TO  SPA-GMN-S02SORTKBNLST(1)
-           MOVE    "1 診療日順"
-                                       TO  SPA-GMN-S02SORTKBNLST(2)
-           MOVE    2                   TO  SPA-GMN-S02SORTKBN-MAX
+           MOVE    "0 収納一覧（月）"  TO  SPA-GMN-S02MODELST  (1)
+           MOVE    "1 収納一覧（年）"  TO  SPA-GMN-S02MODELST (2)
+           MOVE    "2 収納一覧（全部）" TO SPA-GMN-S02MODELST (3)
+           MOVE    "3 未収一覧"        TO  SPA-GMN-S02MODELST (4)
+           MOVE    "4 入返金日"        TO  SPA-GMN-S02MODELST (5)
+           MOVE    5                   TO  SPA-GMN-S02MODE-MAX
       *
            MOVE "0 しない"
                                        TO  SPA-GMN-SAIKEISANSKYCHKLST(1)
@@ -4095,9 +4110,28 @@
                                        TO  SPA-GMN-TUKISUM
            PERFORM 3101-TUKISUM-SYOKI-SEC
       *
+      *    請求一覧画面コラムリスト
+           MOVE    SYS-1039-S02MODE    TO  SPA-GMN-S02MODE
+           PERFORM 3101-S02MODE-SYOKI-SEC
+      *
+      *    IF    ( SYS-1039-S02LIMIT   IS  NOT NUMERIC )
+               MOVE    ZERO            TO  SPA-GMN-S02LIMIT
+      *    ELSE
+      *        MOVE    SYS-1039-S02LIMIT   TO  SPA-GMN-S02LIMIT
+      *    END-IF
+      *
       *    請求一覧画面並び順
-           MOVE    SYS-1039-S02SORTKBN
-                                       TO  SPA-GMN-S02SORTKBN
+           PERFORM 3101-S02SORTKBNLST-SEC
+           EVALUATE    SYS-1039-S02SORTKBN
+           WHEN    "0"
+               MOVE    "0"             TO  SPA-GMN-S02SORTKBN
+           WHEN    "1"
+               MOVE    "2"             TO  SPA-GMN-S02SORTKBN
+           WHEN    "2"
+               MOVE    "1"             TO  SPA-GMN-S02SORTKBN
+           WHEN    "3"
+               MOVE    "3"             TO  SPA-GMN-S02SORTKBN
+           END-EVALUATE
            PERFORM 3101-S02SORTKBN-SYOKI-SEC
       *
       *    再計算該当者チェック
@@ -4195,6 +4229,37 @@
       *
            . 
        310-SPASET-1039-EXT.
+           EXIT.
+      *****************************************************************
+      *    並び順ＳＰＡ画面編集処理
+      *****************************************************************
+       3101-S02SORTKBNLST-SEC          SECTION.
+      *
+           INITIALIZE                  SPA-GMN-S02SORTKBNLST-G
+      *
+           IF    ( SPA-GMN-S02MODE     =   "3" OR "4" )
+               MOVE    "0"             TO  SPA-GMN-S02SORTKBNL       (1)
+               MOVE    "発行日の古い順"
+                                       TO  SPA-GMN-S02SORTKBNMEIL    (1)
+               MOVE    "1"             TO  SPA-GMN-S02SORTKBNL       (2)
+               MOVE    "発行日の新しい順"
+                                       TO  SPA-GMN-S02SORTKBNMEIL    (2)
+           ELSE
+               MOVE    "0"             TO  SPA-GMN-S02SORTKBNL       (1)
+               MOVE    "伝票番号の小さい順"
+                                       TO  SPA-GMN-S02SORTKBNMEIL    (1)
+               MOVE    "1"             TO  SPA-GMN-S02SORTKBNL       (2)
+               MOVE    "伝票番号の大きい順"
+                                       TO  SPA-GMN-S02SORTKBNMEIL    (2)
+           END-IF
+           MOVE    "2"                 TO  SPA-GMN-S02SORTKBNL       (3)
+           MOVE    "診療日の古い順"    TO  SPA-GMN-S02SORTKBNMEIL    (3)
+           MOVE    "3"                 TO  SPA-GMN-S02SORTKBNL       (4)
+           MOVE    "診療日の新しい順"  TO  SPA-GMN-S02SORTKBNMEIL    (4)
+           MOVE    4                   TO  SPA-GMN-S02SORTKBN-MAX
+      *
+           .
+       3101-S02SORTKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    収納請求書兼領収書外来初期値設定処理
@@ -4537,6 +4602,31 @@
       *
            . 
        3101-TUKISUM-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    請求一覧コラムリスト初期値設定処理
+      *****************************************************************
+       3101-S02MODE-SYOKI-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-S02MODE-MAX
+               IF      SPA-GMN-S02MODE
+                                       =   SPA-GMN-S02MODEL(IDY)
+                   MOVE    SPA-GMN-S02MODELST(IDY)
+                                       TO  SPA-GMN-S02MODE-G
+                   MOVE    1           TO  FLG-OK
+                   MOVE    SPA-GMN-S02MODE-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-S02MODELST (1)
+                                       TO  SPA-GMN-S02MODE-G
+           END-IF
+      *
+           . 
+       3101-S02MODE-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    請求一覧画面並び順初期値設定処理
@@ -5479,6 +5569,8 @@
            MOVE    W07-TUKIGRP         TO  SPA-GMN-TUKIGRP-G
            MOVE    W07-TUKISKYMISYUPRT TO  SPA-GMN-TUKISKYMISYUPRT-G
            MOVE    W07-TUKISUM         TO  SPA-GMN-TUKISUM-G
+           MOVE    W07-S02MODE         TO  SPA-GMN-S02MODE-G
+           MOVE    W07-S02LIMIT        TO  SPA-GMN-S02LIMIT
            MOVE    W07-S02SORTKBN      TO  SPA-GMN-S02SORTKBN-G
            MOVE    W07-SAIKEISANSKYCHK TO  SPA-GMN-SAIKEISANSKYCHK-G
            MOVE    W07-IKTSORTKBN      TO  SPA-GMN-IKTSORTKBN-G
@@ -5954,6 +6046,14 @@
       *            月別請求書兼領収書集計区分チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4110-TUKISUM-CHK-SEC
+                   END-IF
+      *            請求一覧画コラムリストチェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4110-S02MODE-CHK-SEC
+                   END-IF
+      *            請求一覧画コラムリスト件数チェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4110-S02LIMIT-CHK-SEC
                    END-IF
       *            請求一覧画面並び順区分チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -8710,6 +8810,52 @@
        4110-TUKISUM-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    請求一覧画コラムリストチェック
+      *****************************************************************
+       4110-S02MODE-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-S02MODE-MAX
+               IF      SPA-GMN-S02MODE
+                                       =   SPA-GMN-S02MODEL(IDX)
+                   MOVE    SPA-GMN-S02MODELST(IDX)
+                                          TO  SPA-GMN-S02MODE-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-S02MODELST(1)
+                                          TO  SPA-GMN-S02MODE-G
+           END-IF
+      *
+           EVALUATE    TRUE
+           WHEN  ( SPA-NAI-S02MODE-MAE =   SPACE )
+               MOVE    SPA-GMN-S02MODE TO  SPA-NAI-S02MODE-MAE
+           WHEN  ( SPA-GMN-S02MODE NOT =   SPA-NAI-S02MODE-MAE )
+               PERFORM 3101-S02SORTKBNLST-SEC
+               MOVE    SPA-GMN-S02MODE TO  SPA-NAI-S02MODE-MAE
+           END-EVALUATE
+      *
+           .
+       4110-S02MODE-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    請求一覧画コラムリスト件数チェック
+      *****************************************************************
+       4110-S02LIMIT-CHK-SEC           SECTION.
+      *
+           IF    ( SPA-GMN-S02LIMIT    >=   ZERO)
+            AND  ( SPA-GMN-S02LIMIT    <=   500 )
+               CONTINUE
+           ELSE
+               MOVE    ZERO            TO   SPA-GMN-S02LIMIT
+           END-IF
+      *
+           .
+       4110-S02LIMIT-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    請求一覧画面並び順区分チェック
       *****************************************************************
        4110-S02SORTKBN-CHK-SEC      SECTION.
@@ -10628,8 +10774,22 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-TUKISKYMISYUPRT
                                        TO SYS-1039-TUKISKYMISYUPRTKBN
            MOVE    SPA-GMN-TUKISUM         TO SYS-1039-TUKISUMKBN
-           MOVE    SPA-GMN-S02SORTKBN
-                                       TO SYS-1039-S02SORTKBN
+           MOVE    SPA-GMN-S02MODE
+                                       TO SYS-1039-S02MODE
+           MOVE    SPA-GMN-S02LIMIT
+                                       TO SYS-1039-S02LIMIT
+           EVALUATE    SPA-GMN-S02SORTKBN
+           WHEN    "0"
+               MOVE    "0"             TO  SYS-1039-S02SORTKBN
+           WHEN    "2"
+               MOVE    "1"             TO  SYS-1039-S02SORTKBN
+           WHEN    "1"
+               MOVE    "2"             TO  SYS-1039-S02SORTKBN
+           WHEN    "3"
+               MOVE    "3"             TO  SYS-1039-S02SORTKBN
+           WHEN    OTHER
+               MOVE    "0"             TO  SYS-1039-S02SORTKBN
+           END-EVALUATE
            MOVE    SPA-GMN-SAIKEISANSKYCHK
                                        TO SYS-1039-SAIKEISANSKYCHK
            MOVE    SPA-GMN-IKTSORTKBN
@@ -11848,6 +12008,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-TUKISUM-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-GMN-TUKISUM-MAX TO  W07-TUKISUM-COUNT
+      *
+      *    請求一覧画面コラムリスト
+           MOVE    SPA-GMN-S02MODE-G TO  W07-S02MODE
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-S02MODE-MAX
+               MOVE    SPA-GMN-S02MODELST (IDX)
+                                       TO  W07-S02MODE-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-S02MODE-MAX
+                                       TO  W07-S02MODE-COUNT
+      *
+      *    請求一覧画面コラムリスト件数
+           MOVE    "F"                 TO  W07-S02LIMIT-VISIBLE
+           MOVE    SPA-GMN-S02LIMIT    TO  W07-S02LIMIT
       *
       *    請求一覧画面並び順区分
            MOVE    SPA-GMN-S02SORTKBN-G TO  W07-S02SORTKBN
@@ -13214,6 +13388,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "SAIKEISANSKYCHK" TO   MCP-WIDGET
                WHEN    434
                    MOVE  "SAIKEISANSKYCHK" TO   MCP-WIDGET
+               WHEN    435
+                   MOVE  "S02MODE"         TO   MCP-WIDGET
+               WHEN    436
+                   MOVE  "S02LIMIT"        TO   MCP-WIDGET
       *病名・コメント情報
                WHEN    500
                    MOVE  "MSG1_DSPKBN"     TO   MCP-WIDGET
@@ -13573,6 +13751,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "TUKISKYMISYUPRT"
                    MOVE    431             TO  SPA-GMN-CUR
                WHEN    "TUKISUM"
+                   MOVE    435             TO  SPA-GMN-CUR
+               WHEN    "S02MODE"
+      *            MOVE    436             TO  SPA-GMN-CUR
+      *        WHEN    "S02LIMIT"
                    MOVE    426             TO  SPA-GMN-CUR
                WHEN    "S02SORTKBN"
                    MOVE    433             TO  SPA-GMN-CUR

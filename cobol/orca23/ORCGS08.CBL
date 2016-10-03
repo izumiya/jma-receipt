@@ -929,6 +929,7 @@
                    MOVE    BUNBEN-NYUGAIKBN    TO  SYU-NYUGAIKBN
                    MOVE    BUNBEN-RRKNUM       TO  SYU-DENPNUM
                    MOVE    ZERO                TO  SYU-BUNBENINFFLG
+                   MOVE    SPA-OPID            TO  SYU-OPID
                    MOVE    BUNBEN-UPYMD        TO  SYU-UPYMD
                    MOVE    BUNBEN-UPHMS        TO  SYU-UPHMS
                    MOVE    SYUNOU-REC          TO  MCPDATA-REC
@@ -2021,15 +2022,17 @@
                PERFORM UNTIL ( FLG-BUNBEN  NOT =   ZERO )
                          OR  ( SPA-ERRCD   NOT =   SPACE )
       *
-                   IF    ( SPA-HOSPNUM =   BUNBEN-HOSPNUM )
-                    AND  ( SPA-PTID    =   BUNBEN-PTID )
-                    AND  ( SPA-S08-NYUGAIKBN
-                                       =   BUNBEN-NYUGAIKBN )
-                    AND  ( SPA-S08-RRKNUM
-                                       =   BUNBEN-RRKNUM )
-                       CONTINUE
-                   ELSE
-                       MOVE    "0013"  TO  SPA-ERRCD
+                   IF    ( BUNBEN-BUNBENKBN    =   "1" OR "2" )
+                       IF    ( SPA-HOSPNUM =   BUNBEN-HOSPNUM )
+                        AND  ( SPA-PTID    =   BUNBEN-PTID )
+                        AND  ( SPA-S08-NYUGAIKBN
+                                           =   BUNBEN-NYUGAIKBN )
+                        AND  ( SPA-S08-RRKNUM
+                                           =   BUNBEN-RRKNUM )
+                           CONTINUE
+                       ELSE
+                           MOVE    "0013"  TO  SPA-ERRCD
+                       END-IF
                    END-IF
       *
                    PERFORM 900-BUNBEN-KEY5-FET-SEC
@@ -2144,6 +2147,7 @@
            ELSE
                MOVE    "3"                 TO  BUNBEN-UPDKBN
            END-IF
+           MOVE    SPA-OPID                TO  BUNBEN-OPID
            PERFORM 800-MCNDATE-SEC
            MOVE    WRK-CREYMD              TO  BUNBEN-CREYMD
            MOVE    SMCNDATE-YMD            TO  BUNBEN-UPYMD
@@ -2180,6 +2184,7 @@
                    MOVE    BUNBEN-NYUGAIKBN    TO  SYU-NYUGAIKBN
                    MOVE    BUNBEN-RRKNUM       TO  SYU-DENPNUM
                    MOVE    "1"                 TO  SYU-BUNBENINFFLG
+                   MOVE    SPA-OPID            TO  SYU-OPID
                    MOVE    BUNBEN-UPYMD        TO  SYU-UPYMD
                    MOVE    BUNBEN-UPHMS        TO  SYU-UPHMS
                    MOVE    SYUNOU-REC          TO  MCPDATA-REC

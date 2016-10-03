@@ -562,6 +562,14 @@
                       07  W07-VALUE   PIC X(40).
                     06  W07-TUKISUM-COUNT          PIC S9(9) BINARY.
                     06  W07-TUKISUM-ITEM           PIC X(40) OCCURS 5.
+                  05  W07-S02MODE-COMBO.
+                    06  W07-S02MODE.
+                      07  W07-VALUE   PIC X(22).
+                    06  W07-S02MODE-COUNT   PIC S9(9)   BINARY.
+                    06  W07-S02MODE-ITEM    PIC X(22)   OCCURS  5.
+                  05  W07-LBLS02LIMIT       PIC X(30).
+                  05  W07-S02LIMIT-VISIBLE  PIC X(1).
+                  05  W07-S02LIMIT    PIC S9(3).
                   05  W07-S02SORTKBN-COMBO.
                     06  W07-S02SORTKBN.
                       07  W07-VALUE   PIC X(22).
