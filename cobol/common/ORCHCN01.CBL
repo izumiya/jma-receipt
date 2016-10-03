@@ -771,6 +771,14 @@
       *
       *    続柄
            MOVE    PTINF-ZOKUGARA      TO  HCN01-ZOKUGARA
+      *
+           EVALUATE    COMB-HONKZKKBN
+           WHEN    "1"
+               MOVE    "本人"          TO  HCN01-HONKZK
+           WHEN    "2"
+               MOVE    "家族"          TO  HCN01-HONKZK
+           END-EVALUATE
+      *
       *    保険者番号
            MOVE    WRK-HKNJA-G         TO  HCN01-HPTNUM
       *    記号番号
@@ -878,10 +886,14 @@
       *            保険者番号へ記号（労災区分名）
                    MOVE    WRK-HEN-KIGONUM     TO  HCN01-HPTNUM
       *            記号へ患者交付番号
-                   MOVE    PTRSI-KOFUNUM       TO  WRK-MAE-INPUT
-                   PERFORM 2009-HENKAN-SEC
-                   MOVE    WRK-OUT-INPUT(1:KANACHK-MAX)
+                   IF    ( PTRSI-KOFUNUM       =   SPACE )
+                       MOVE    SPACE           TO  HCN01-KIGONUM
+                   ELSE
+                       MOVE    PTRSI-KOFUNUM   TO  WRK-MAE-INPUT
+                       PERFORM 2009-HENKAN-SEC
+                       MOVE    WRK-OUT-INPUT(1:KANACHK-MAX)
                                                TO  HCN01-KIGONUM
+                   END-IF
       *
                END-IF
            END-IF

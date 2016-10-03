@@ -133,3 +133,5 @@
                         PIC X(2).
             02  HCN01-COMMENT
                         PIC X(40).
+            02  HCN01-HONKZK
+                        PIC X(4).
