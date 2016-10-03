@@ -2042,9 +2042,13 @@
                           MOVE    LNK-SCNYUACCT-STSRYYMD
                                             TO  LNK-DAY6-KIJUN
                       END-IF
+                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "8"
+                          MOVE    WRK-STYMD
+                                            TO  LNK-DAY6-KIJUN
+                      END-IF
                       MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
                       MOVE    15                  TO  LNK-DAY6-ZOGEN
-                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "1"
+                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "1" OR "8"
                           COMPUTE    LNK-DAY6-ZOGEN  =  LNK-DAY6-ZOGEN -
                                            LNK-SCNYUACCT-NYUKHN-NISUU
                       END-IF
