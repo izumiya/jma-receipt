@@ -16,27 +16,36 @@ I22 {
     LBLNUMSEL {
       textdata varchar(10);
     };
+    LBLNUMSEL2 {
+      textdata varchar(2);
+    };
     STNUM {
       numdata number(9);
+      state int;
+      visible bool;
     };
     EDNUM {
       numdata number(9);
+      state int;
+      visible bool;
     };
     FILE_COMBO {
-      state int;
       FILE {
         textdata varchar(22);
+      	state int;
       };
       count int;
-        item varchar(22)[6];
+      item varchar(22)[6];
+      state int;
     };
     CDKBN_COMBO {
-      state int;
       CDKBN {
         textdata varchar(22);
+        state int;
       };
       count int;
-        item varchar(22)[5];
+      item varchar(22)[5];
+      state int;
     };
   };
 };

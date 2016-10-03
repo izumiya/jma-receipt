@@ -22,6 +22,8 @@
               03  I21-B06-STATE            PIC S9(9)   BINARY.
               03  I21-B07-LABEL            PIC X(8).
               03  I21-B07-STATE            PIC S9(9)   BINARY.
+              03  I21-B10-STATE            PIC S9(9)   BINARY.
+              03  I21-B11-STATE            PIC S9(9)   BINARY.
               03  I21-B12-STATE            PIC S9(9)   BINARY.
               03  I21-DURATION             PIC S9(9)   BINARY.
               03  I21-STSRYYMD  PIC X(10).

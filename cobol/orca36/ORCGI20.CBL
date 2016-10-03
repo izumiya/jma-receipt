@@ -254,8 +254,7 @@
            03  CONST-LINE              PIC 9(05)  VALUE   30.
            03  CONST-JOBID             PIC 9(07)
                VALUE   1.
-           03  CONST-JOB-SHELLID       PIC X(08)
-               VALUE   "ORCBI201".
+           03  CONST-SHELLID           PIC X(08)   VALUE   "ORCBI201".
            03  CONST-UTF8              PIC 9(01)   VALUE 2.
       *
            COPY    "COMMON-SPA"    REPLACING  //SPA-//
@@ -459,13 +458,12 @@
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
-               MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
            END-IF
       *
            EVALUATE    SPA-MOTOPG
       *    情報削除画面
            WHEN    "XB01"
-               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+               MOVE    LNK-COMMON          TO  SPA-KYOUTU
                MOVE    LNK-SCRSPA          TO  SPA-I2FREE
                MOVE    SPA-WORK            TO  SPA-I2KYOUTU
                GO  TO      300-SCREEN-EXT
@@ -507,7 +505,7 @@
       *****************************************************************
        3001-I22SPASET-SEC             SECTION.
       *
-           IF  ( SPA-I20-I22-RTOK-FLG =   ZERO )
+           IF  ( SPA-I22-RTOK-FLG =   ZERO )
                GO  TO  3001-I22SPASET-EXT
            END-IF
       *
@@ -530,16 +528,16 @@
       *
            INITIALIZE                  BI201
       *
-           MOVE    SPA-I20-I22-PROC-FLG
+           MOVE    SPA-I22-PROC-FLG
                                        TO  BI201-PROC-FLG
-           MOVE    SPA-I20-I22-FILENAME
+           MOVE    SPA-I22-FILENAME
                                        TO  BI201-CSVFILENAME
-           MOVE    SPA-I20-I22-STPAGE
+           MOVE    SPA-I22-STPAGE
                                        TO  BI201-STPAGE
-           MOVE    SPA-I20-I22-EDPAGE
+           MOVE    SPA-I22-EDPAGE
                                        TO  BI201-EDPAGE
-           MOVE    SPA-I20-I22-STKNS   TO  BI201-STKNS
-           MOVE    SPA-I20-I22-EDKNS   TO  BI201-EDKNS
+           MOVE    SPA-I22-STKNS   TO  BI201-STKNS
+           MOVE    SPA-I22-EDKNS   TO  BI201-EDKNS
       *
            MOVE    SPA-SYSYMD          TO  BI201-KJYNYMD
       *
@@ -555,7 +553,7 @@
            MOVE    SPACE           TO  WRK-FILENM-AREA
            PERFORM VARYING IDX4    FROM    100 BY  -1
                    UNTIL   IDX4     <       1
-               IF      ( SPA-I20-I22-FILENAME (IDX4:1)
+               IF      ( SPA-I22-FILENAME (IDX4:1)
                                                =   "/" )
                    MOVE    SPA-GMN-I22-FILENAME (1:IDX4)
                                            TO  WRK-FILENM-FOLDER
@@ -567,15 +565,14 @@
            END-PERFORM
            IF      WRK-FILENM          =   SPACE
                MOVE    "/tmp/"             TO  WRK-FILENM-FOLDER
-               MOVE    SPA-I20-I22-FILENAME
+               MOVE    SPA-I22-FILENAME
                                            TO  WRK-FILENM
            END-IF             
       *
       *    ファイル保存情報削除
            INITIALIZE                  ORCSFILESVAREA
            MOVE    "D"             TO  SFILESV-MODE
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SFILESV-TBL-KEY
+           MOVE    CONST-SHELLID   TO  SFILESV-TBL-KEY
            MOVE    SPA-GMN-SELHMS  TO  SFILESV-SRYYM(1)
            CALL    "ORCSFILESV"    USING
                                        ORCSFILESVAREA
@@ -591,15 +588,15 @@
       *
            MOVE    "orcbi201.sh"   TO  SHELLTBL-NAME
       *
-           MOVE    SPA-I20-I22-PROC-FLG
+           MOVE    SPA-I22-PROC-FLG
                                    TO  SHELLTBL-ARG1
-           IF    ( SPA-I20-I22-FILE   =   "1" )
+           IF    ( SPA-I22-FILE   =   "1" )
                STRING   WRK-FILENM-FOLDER      DELIMITED  BY  SPACE
                         WRK-FILENM             DELIMITED  BY  SPACE
                                                INTO  SHELLTBL-ARG2
                END-STRING
            ELSE
-               MOVE    SPA-I20-I22-FILENAME
+               MOVE    SPA-I22-FILENAME
                                        TO  SHELLTBL-ARG2
            END-IF
            MOVE    ASGNPARA (ASGNPARA-ST:)
@@ -610,11 +607,10 @@
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG7
            MOVE    SPA-STAFFCD     TO  SHELLTBL-ARG8
            MOVE    CONST-JOBID     TO  SHELLTBL-ARG9
-           MOVE    CONST-JOB-SHELLID
-                                   TO  SHELLTBL-ARG10
-           MOVE    SPA-I20-I22-FILE
+           MOVE    CONST-SHELLID   TO  SHELLTBL-ARG10
+           MOVE    SPA-I22-FILE
                                    TO  SHELLTBL-ARG11
-           MOVE    SPA-I20-I22-CDKBN
+           MOVE    SPA-I22-CDKBN
                                    TO  SHELLTBL-ARG12
            MOVE    WRK-FILENM-FOLDER
                                    TO  SHELLTBL-ARG13
@@ -634,7 +630,7 @@
                                        MCPDATA-REC
                                        SPA-AREA
       *
-           IF    ( SPA-I20-I22-FILE   =   "1" )
+           IF    ( SPA-I22-FILE   =   "1" )
                MOVE    "SV"            TO  SPA-I2ID1-FLG
            ELSE
                MOVE    SPACE           TO  SPA-I2ID1-FLG
@@ -655,8 +651,7 @@
            IF    ( SPA-I2ID1-FLG    =   "SV" )
                INITIALIZE                  ORCSFILESVAREA
                MOVE    "D"             TO  SFILESV-MODE
-               MOVE    CONST-JOB-SHELLID
-                                       TO  SFILESV-TBL-KEY
+               MOVE    CONST-SHELLID   TO  SFILESV-TBL-KEY
                MOVE    SPA-GMN-SELHMS  TO  SFILESV-SRYYM(1)
                CALL    "ORCSFILESV"    USING
                                            ORCSFILESVAREA
@@ -2219,28 +2214,14 @@
       *    画面をＳＰＡセット
            PERFORM 4101-GMN-SPA-SET-SEC
       *
-           MOVE    "I20"           TO  SPA-MOTOPG
            MOVE    SPA-I2FREE      TO  SPA-FREE
            MOVE    SPA-I2KYOUTU    TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
       *
-           MOVE    "LINK"          TO  MCP-STATUS
-           MOVE    SPACE           TO  MCP-EVENT
-      *
-           CALL    "ORCGI21"       USING
-                                   MCPAREA
-                                   SPAAREA
-                                   LINKAREA
-                                   SCRAREA
-      *
-           MOVE    SPA-FREE        TO  SPA-I2FREE
-           MOVE    SPA-COMMON      TO  SPA-AREA
-           MOVE    SPA-WORK        TO  SPA-I2KYOUTU
-      *
            MOVE  "I20"             TO  SPA-MOTOPG
            MOVE  "I21"             TO  SPA-SAKIPG
       *
-           MOVE  "NEW"             TO  MCP-PUTTYPE
+           MOVE  "CHANGE"          TO  MCP-PUTTYPE
            MOVE  "I21"             TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
@@ -2298,7 +2279,7 @@
            MOVE    "I20"               TO  SPA-MOTOPG
            MOVE    "XB01"              TO  SPA-SAKIPG
       *
-           MOVE    CONST-JOB-SHELLID   TO  SPA-JOB-SHELLID
+           MOVE    CONST-SHELLID       TO  SPA-JOB-SHELLID
       *
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-I2KYOUTU        TO  SPA-WORK
@@ -2337,19 +2318,23 @@
                GO  TO  440-I22-SENI-EXT
            END-IF
       *
-           MOVE    SPACE           TO  SPA-I20-I22-SENI-AREA
-           INITIALIZE                  SPA-I20-I22-SENI-AREA
+           MOVE    SPACE           TO  SPA-I22-SENI-AREA
+           INITIALIZE                  SPA-I22-SENI-AREA
       *
-           MOVE    WRK-PROC-FLG    TO  SPA-I20-I22-PROC-FLG
-           MOVE    1               TO  SPA-I20-I22-STNUM
+           MOVE    WRK-PROC-FLG    TO  SPA-I22-PROC-FLG
+           MOVE    1               TO  SPA-I22-STNUM
       *
            IF  ( WRK-PROC-FLG      =   ZERO )
                MOVE    SPA-NAI-TOTAL
-                                   TO  SPA-I20-I22-EDNUM
+                                   TO  SPA-I22-EDNUM
+               MOVE    "OUTPUT.csv"
+                                   TO  SPA-I22-FILENAME
            ELSE
-               COMPUTE SPA-I20-I22-EDNUM
+               COMPUTE SPA-I22-EDNUM
                    =   SPA-NAI-TOTAL   /   CONST-LINE  +   0.99
            END-IF
+      *
+           MOVE    "I20"           TO  SPA-I22-MOTOPG
       *
            MOVE    SPACE           TO  SPA-MOTOPG
            MOVE    SPA-I2KYOUTU    TO  SPA-WORK  
@@ -2395,6 +2380,9 @@
       *
            INITIALIZE                  SPA-I23-AREA
       *
+           MOVE    "I20"           TO  SPA-I23-MOTOPG
+           MOVE    CONST-SHELLID   TO  SPA-I23-SHELLID
+      *
            MOVE    SPACE           TO  SPA-MOTOPG
            MOVE    SPA-I2KYOUTU    TO  SPA-WORK  
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -2420,7 +2408,6 @@
            MOVE  "B01"             TO  MCP-WIDGET
       *
            MOVE  "I20"             TO  SPA-MOTOPG
-                                       SPA-I23-MOTOPG
            MOVE  "I23"             TO  SPA-SAKIPG
       *
            MOVE  "NEW"             TO  MCP-PUTTYPE
@@ -4007,8 +3994,7 @@
            INITIALIZE                  JOBKANRI-REC
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            MOVE    CONST-JOBID     TO  JOB-JOBID
-           MOVE    CONST-JOB-SHELLID
-                                   TO  JOB-SHELLID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA 
                                    JOBKANRI-REC
@@ -4018,8 +4004,7 @@
            INITIALIZE                  JOBKANRI-REC
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            MOVE    CONST-JOBID     TO  JOB-JOBID
-           MOVE    CONST-JOB-SHELLID
-                                   TO  JOB-SHELLID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
            MOVE    SPA-TERMID      TO  JOB-TERMID
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA 
@@ -4041,8 +4026,7 @@
            INITIALIZE                  JOBKANRI-REC
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            MOVE    CONST-JOBID     TO  JOB-JOBID
-           MOVE    CONST-JOB-SHELLID
-                                   TO  JOB-SHELLID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
            CALL    "ORCSJOB"       USING
                                        ORCSJOBKANRIAREA
                                        JOBKANRI-REC
@@ -4052,7 +4036,6 @@
                    CONTINUE
                ELSE
                    MOVE    1           TO  FLG-JOBEND
-                   GO  TO  900-JOBKANRI-CHK-EXT
                END-IF
            ELSE
                    MOVE    2           TO  FLG-JOBEND

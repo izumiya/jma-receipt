@@ -32,7 +32,7 @@
                05  SPA-GMN-SELHMS      PIC X(08).
                05  SPA-GMN-MAX         PIC 9(04).
                05  SPA-GMN-PAGE        PIC 9(02).
-               05  SPA-GMN-CUR         PIC 9(02).
+               05  SPA-GMN-CUR         PIC 9(03).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-STAGELST        OCCURS  14.
                        09  SPA-GMN-STAGEL      PIC X(02).
@@ -208,6 +208,11 @@
                    07  SPA-NAI-I21-INPUT-AREA.
                        09  SPA-NAI-I21-STSRYYMD        PIC X(08).
                        09  SPA-NAI-I21-EDSRYYMD        PIC X(08).
+               05  SPA-NAI-I21-BTULIST-AREA.
+                   07  SPA-NAI-I21-BTULIST-SELYMD      PIC X(08).
+                   07  SPA-NAI-I21-BTULIST-SELHMS      PIC X(06).
+                   07  SPA-NAI-I21-BTULIST-STSRYYMD    PIC X(08).
+                   07  SPA-NAI-I21-BTULIST-EDSRYYMD    PIC X(08).
       *
            03  SPA-I22-AREA.
                05  SPA-GMN-I22-CUR             PIC 9(05).

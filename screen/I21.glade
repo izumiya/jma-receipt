@@ -10,25 +10,25 @@
   <widget>
     <class>GtkWindow</class>
     <name>I21</name>
-    <width>980</width>
-    <height>620</height>
+    <width>1024</width>
+    <height>768</height>
     <sensitive>True</sensitive>
     <can_focus>False</can_focus>
     <has_focus>False</has_focus>
     <border_width>0</border_width>
-    <type>GTK_WINDOW_DIALOG</type>
+    <type>GTK_WINDOW_TOPLEVEL</type>
     <title>(I21)入院患者数確認</title>
     <modal>True</modal>
     <position>GTK_WIN_POS_CENTER</position>
-    <wmclass_class>jma-receipt.dialog</wmclass_class>
+    <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
-    <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
     <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -44,9 +44,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B01</name>
-        <x>12</x>
-        <y>584</y>
-        <width>76</width>
+        <x>8</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -72,8 +72,8 @@
         <class>GtkButton</class>
         <name>B02</name>
         <x>88</x>
-        <y>584</y>
-        <width>76</width>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -98,9 +98,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B04</name>
-        <x>240</x>
-        <y>584</y>
-        <width>76</width>
+        <x>248</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -125,8 +125,8 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>STSRYYMD</name>
-        <x>88</x>
-        <y>16</y>
+        <x>140</x>
+        <y>56</y>
         <width>92</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -150,8 +150,8 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>EDSRYYMD</name>
-        <x>208</x>
-        <y>16</y>
+        <x>252</x>
+        <y>56</y>
         <width>92</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -175,8 +175,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label557</name>
-        <x>16</x>
-        <y>16</y>
+        <x>68</x>
+        <y>56</y>
         <width>72</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -193,8 +193,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label558</name>
-        <x>180</x>
-        <y>16</y>
+        <x>228</x>
+        <y>56</y>
         <width>28</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -211,8 +211,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label556</name>
-        <x>16</x>
-        <y>48</y>
+        <x>68</x>
+        <y>100</y>
         <width>120</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -229,9 +229,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B12</name>
-        <x>856</x>
-        <y>584</y>
-        <width>76</width>
+        <x>936</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -256,10 +256,10 @@
       <widget>
         <class>GtkScrolledWindow</class>
         <name>scrolledwindow1</name>
-        <x>12</x>
-        <y>72</y>
-        <width>880</width>
-        <height>476</height>
+        <x>68</x>
+        <y>126</y>
+        <width>840</width>
+        <height>540</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
         <has_focus>False</has_focus>
@@ -441,9 +441,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B06</name>
-        <x>396</x>
-        <y>584</y>
-        <width>76</width>
+        <x>432</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -468,9 +468,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B07</name>
-        <x>472</x>
-        <y>584</y>
-        <width>76</width>
+        <x>512</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -495,9 +495,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B03</name>
-        <x>164</x>
-        <y>584</y>
-        <width>76</width>
+        <x>168</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -512,9 +512,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B08</name>
-        <x>548</x>
-        <y>584</y>
-        <width>76</width>
+        <x>592</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -529,60 +529,90 @@
       <widget>
         <class>GtkButton</class>
         <name>B11</name>
-        <x>780</x>
-        <y>584</y>
-        <width>76</width>
+        <x>856</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>印刷</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
         <response_id>0</response_id>
+        <accelerator>
+          <modifiers>0</modifiers>
+          <key>GDK_F11</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
       </widget>
       <widget>
         <class>GtkButton</class>
         <name>B10</name>
-        <x>704</x>
-        <y>584</y>
-        <width>76</width>
+        <x>776</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>CSV出力</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
         <response_id>0</response_id>
+        <accelerator>
+          <modifiers>0</modifiers>
+          <key>GDK_F10</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
       </widget>
       <widget>
         <class>GtkButton</class>
         <name>B09</name>
-        <x>628</x>
-        <y>584</y>
-        <width>76</width>
+        <x>696</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>情報削除</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
         <response_id>0</response_id>
+        <accelerator>
+          <modifiers>0</modifiers>
+          <key>GDK_F9</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
       </widget>
       <widget>
         <class>GtkButton</class>
         <name>B04S</name>
-        <x>240</x>
-        <y>560</y>
-        <width>76</width>
+        <x>248</x>
+        <y>694</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -607,9 +637,9 @@
       <widget>
         <class>GtkButton</class>
         <name>B05</name>
-        <x>320</x>
-        <y>584</y>
-        <width>76</width>
+        <x>352</x>
+        <y>718</y>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -624,8 +654,8 @@
       <widget>
         <class>GtkPandaTimer</class>
         <name>pandatimer1</name>
-        <x>304</x>
-        <y>16</y>
+        <x>1</x>
+        <y>1</y>
         <width>21</width>
         <height>21</height>
         <sensitive>True</sensitive>
@@ -641,8 +671,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>LBLMSG01</name>
-        <x>176</x>
-        <y>48</y>
+        <x>200</x>
+        <y>100</y>
         <width>676</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -655,6 +685,33 @@
         <label></label>
         <justify>GTK_JUSTIFY_LEFT</justify>
         <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkButton</class>
+        <name>B12S</name>
+        <x>936</x>
+        <y>696</y>
+        <width>80</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <label>処理結果</label>
+        <relief>GTK_RELIEF_NORMAL</relief>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <response_id>0</response_id>
+        <accelerator>
+          <modifiers>GDK_SHIFT_MASK</modifiers>
+          <key>GDK_F12</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
       </widget>
     </widget>
   </widget>

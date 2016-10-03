@@ -35,32 +35,35 @@
                07  SPA-I2ID1-FLG            PIC X(02).
       *
       *        I20←→I22遷移情報
-           05  SPA-I20-I22-SENI-AREA.
-               07  SPA-I20-I22-PROC-FLG     PIC 9(01).
-      *        ファイル名(O)
-               07  SPA-I20-I22-FILENAME     PIC X(200).
+           05  SPA-I22-SENI-AREA.
+               07  SPA-I22-PROC-FLG     PIC 9(01).
+      *        ファイル名(IO)
+               07  SPA-I22-FILENAME     PIC X(200).
       *        開始件数（ページ数）(I)
-               07  SPA-I20-I22-STNUM        PIC 9(09).
+               07  SPA-I22-STNUM        PIC 9(09).
       *        終了件数（ページ数）(I)
-               07  SPA-I20-I22-EDNUM        PIC 9(09).
+               07  SPA-I22-EDNUM        PIC 9(09).
       *        開始件数(O)
-               07  SPA-I20-I22-STKNS        PIC 9(09).
+               07  SPA-I22-STKNS        PIC 9(09).
       *        終了件数(O)
-               07  SPA-I20-I22-EDKNS        PIC 9(09).
+               07  SPA-I22-EDKNS        PIC 9(09).
       *        開始ページ数(O)...印刷処理時のみ設定
-               07  SPA-I20-I22-STPAGE       PIC 9(09).
+               07  SPA-I22-STPAGE       PIC 9(09).
       *        終了ページ数(O)...印刷処理時のみ設定
-               07  SPA-I20-I22-EDPAGE       PIC 9(09).
+               07  SPA-I22-EDPAGE       PIC 9(09).
       *        ファイル出力先
-               07  SPA-I20-I22-FILE         PIC  X(01).
+               07  SPA-I22-FILE         PIC  X(01).
       *        文字コード
-               07  SPA-I20-I22-CDKBN        PIC  X(01).
+               07  SPA-I22-CDKBN        PIC  X(01).
+      *        遷移元画面
+               07  SPA-I22-MOTOPG       PIC  X(10).
       *        戻る／ＯＫフラグ(O)
-               07  SPA-I20-I22-RTOK-FLG     PIC 9(01).
+               07  SPA-I22-RTOK-FLG     PIC 9(01).
       *
       *    I23遷移情報
            05  SPA-I23KYOTU.
                07  SPA-I23-SELHMS           PIC X(08).
                07  SPA-I23-FILESV-CHK-FLG   PIC 9(01).
                07  SPA-I23-MOTOPG           PIC X(08).
+               07  SPA-I23-SHELLID          PIC X(08).
       *

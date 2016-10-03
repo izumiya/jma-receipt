@@ -59,10 +59,13 @@
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-BTULIST-ROW             PIC 9(01).
            03  FLG-CHGSRYYMD               PIC 9(01).
+           03  FLG-JOBEND                  PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
+           03  IDX4                        PIC 9(05).
+           03  IDX5                        PIC 9(05).
            03  IDXL                        PIC 9(05).
            03  IDXM                        PIC 9(05).
       *
@@ -97,13 +100,22 @@
                05  WRK-LBLNISSU-TITLE      PIC X(04).
                05  WRK-LBLNISSU-NISSU      PIC ZZZ9.
                05  WRK-LBLNISSU-FIL2       PIC X(04).
+           03  WRK-SHORIERR                PIC X(200).
+           03  WRK-PROC-FLG                PIC 9(1).
+           03  WRK-DATAKBN                 PIC X(01).
+      *
+           03  WRK-FILENM-AREA.
+               07  WRK-FILENM              PIC X(100).
+               07  WRK-FILENM-FOLDER       PIC X(100).
       *
        01  WRK-ROW.
            05  WRK-BTULIST-ROW             PIC S9(9)   BINARY.
       *
       *    固定値領域
        01  CONST-AREA.
-           03  CONST-BTULIST-MAX           PIC 9(05)   VALUE   100.
+           03  CONST-BTULIST-MAX       PIC 9(05)   VALUE   100.
+           03  CONST-JOBID             PIC 9(07)   VALUE   1.
+           03  CONST-SHELLID           PIC X(08)   VALUE   "ORCBI203".
       *
        01  BTUSUM-AREA.
            COPY    "CPBTUSUM.INC".
@@ -127,9 +139,16 @@
       *    シェルテーブル
            COPY    "CPSHELLTBL.INC".
       *
+      *    ジョブ管理マスタ
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *   ジョブ管理ＤＢ制御サブ
+           COPY    "CPORCSJOBKANRI.INC".
       *
       *    患者日単位入院情報取得（最大１年）
            COPY    "CPORCSNDAYINF.INC".
@@ -143,6 +162,9 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *
+      *    クライアント保存ＤＢ制御サブ
+           COPY    "CPORCSFILESV.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -251,12 +273,167 @@
       *****************************************************************
        300-SCREEN-SEC              SECTION.
       *
-           PERFORM 310-SPASET-SEC
+      *    他のＬＤより
+           IF      LINKAREA        NOT =   SPACE
+               MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
+           END-IF
+      *
+           EVALUATE    SPA-MOTOPG
+      *    情報削除画面
+           WHEN    "XB01"
+               MOVE    LNK-COMMON          TO  SPA-KYOUTU
+               MOVE    LNK-SCRSPA          TO  SPA-I2FREE
+               MOVE    SPA-WORK            TO  SPA-I2KYOUTU
+           WHEN    "I22"
+               PERFORM 3001-I22SPASET-SEC
+           WHEN    "I23"
+               PERFORM 3001-I23SPASET-SEC
+           WHEN    OTHER
+               PERFORM 310-SPASET-SEC
+           END-EVALUATE
       *
            .
        300-SCREEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    Ｉ２２戻りスパ編集処理
+      *****************************************************************
+       3001-I22SPASET-SEC             SECTION.
+      *
+           IF  ( SPA-I22-RTOK-FLG =   ZERO )
+               GO  TO  3001-I22SPASET-EXT
+           END-IF
+      *
+           PERFORM 800-MCNDATE-SEC
+      *
+           PERFORM 900-PTSRH-INS2-SEC
+      *
+           MOVE    ZERO            TO  SPA-I23-FILESV-CHK-FLG
+           MOVE    SPACE           TO  SPA-I23-SELHMS
+      *
+           MOVE    SPACE           TO  WRK-FILENM-AREA
+           PERFORM VARYING IDX4    FROM    100 BY  -1
+                   UNTIL   IDX4     <       1
+               IF      ( SPA-I22-FILENAME (IDX4:1)
+                                               =   "/" )
+                   MOVE    SPA-GMN-I22-FILENAME (1:IDX4)
+                                           TO  WRK-FILENM-FOLDER
+                   COMPUTE IDX5    =   IDX4    +   1
+                   MOVE    SPA-GMN-I22-FILENAME (IDX5:)
+                                           TO  WRK-FILENM
+                   MOVE    1               TO  IDX4
+               END-IF
+           END-PERFORM
+           IF      WRK-FILENM          =   SPACE
+               MOVE    "/tmp/"             TO  WRK-FILENM-FOLDER
+               MOVE    SPA-I22-FILENAME
+                                           TO  WRK-FILENM
+           END-IF
+      *
+      *    ファイル保存情報削除
+           INITIALIZE                  ORCSFILESVAREA
+           MOVE    "D"             TO  SFILESV-MODE
+           MOVE    CONST-SHELLID   TO  SFILESV-TBL-KEY
+           MOVE    SPACE           TO  SFILESV-SRYYM(1)
+           CALL    "ORCSFILESV"    USING
+                                       ORCSFILESVAREA
+                                       SPA-AREA  
+      *
+      *    ジョブ開始セット処理
+           PERFORM 900-JOBKANRI-HENSYU-SEC
+      *
+      *    印刷用スクリプト処理
+      *
+           MOVE    SPACE           TO  SHELLTBL
+           INITIALIZE                  SHELLTBL
+      *
+           MOVE    "orcbi203.sh"   TO  SHELLTBL-NAME
+      *
+           MOVE    SPA-I22-PROC-FLG
+                                   TO  SHELLTBL-ARG1
+           IF    ( SPA-I22-FILE   =   "1" )
+               STRING   WRK-FILENM-FOLDER      DELIMITED  BY  SPACE
+                        WRK-FILENM             DELIMITED  BY  SPACE
+                                               INTO  SHELLTBL-ARG2
+               END-STRING
+           ELSE
+               MOVE    SPA-I22-FILENAME
+                                       TO  SHELLTBL-ARG2
+           END-IF
+           MOVE    SPACE           TO  SHELLTBL-ARG3
+           MOVE    SPA-TERMID      TO  SHELLTBL-ARG4
+           MOVE    SPA-SYSYMD      TO  SHELLTBL-ARG5
+           MOVE    SPACE           TO  SHELLTBL-ARG6
+           MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG7
+           MOVE    SPA-STAFFCD     TO  SHELLTBL-ARG8
+           MOVE    CONST-JOBID     TO  SHELLTBL-ARG9
+           MOVE    CONST-SHELLID   TO  SHELLTBL-ARG10
+           MOVE    SPA-I22-FILE    TO  SHELLTBL-ARG11
+           MOVE    SPA-I22-CDKBN   TO  SHELLTBL-ARG12
+           MOVE    WRK-FILENM-FOLDER
+                                   TO  SHELLTBL-ARG13
+           MOVE    WRK-FILENM      TO  SHELLTBL-ARG14
+           STRING  "I21.csv."              DELIMITED  BY  SIZE
+                    SPA-TERMID             DELIMITED  BY  SIZE
+                    ".wk"                  DELIMITED  BY  SIZE
+           INTO  SHELLTBL-ARG15
+           END-STRING
+      *
+           MOVE    SPA-NAI-I21-BTULIST-SELYMD
+                                   TO  SHELLTBL-ARG16
+           MOVE    SPA-NAI-I21-BTULIST-SELHMS
+                                   TO  SHELLTBL-ARG17
+      *
+           MOVE    SPA-NAI-I21-STSRYYMD
+                                   TO  SHELLTBL-ARG18
+           MOVE    SPA-NAI-I21-EDSRYYMD
+                                   TO  SHELLTBL-ARG19
+      *
+           MOVE    SHELLTBL        TO  MCPDATA-REC
+           MOVE    "SHELL"         TO  MCP-FUNC
+           MOVE    "shell"         TO  MCP-TABLE
+           MOVE    "allways"       TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           IF    ( SPA-I22-FILE   =   "1" )
+               MOVE    "SV"            TO  SPA-I2ID1-FLG
+           ELSE
+               MOVE    SPACE           TO  SPA-I2ID1-FLG
+           END-IF
+           MOVE    SPACE           TO  SPA-I2IDCD
+      *
+           PERFORM 440-I23-SENI-SEC
+      *
+           .
+       3001-I22SPASET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    処理表示画面戻り処理
+      *****************************************************************
+       3001-I23SPASET-SEC             SECTION.
+      *
+           IF    ( SPA-I2ID1-FLG    =   "SV" )
+               INITIALIZE                  ORCSFILESVAREA
+               MOVE    "D"             TO  SFILESV-MODE
+               MOVE    CONST-SHELLID   TO  SFILESV-TBL-KEY
+               MOVE    SPA-GMN-SELHMS  TO  SFILESV-SRYYM(1)
+               CALL    "ORCSFILESV"    USING
+                                           ORCSFILESVAREA
+                                           SPA-AREA
+           END-IF
+      *
+           MOVE    SPACE           TO  SPA-I2ID1-FLG
+           MOVE    SPACE           TO  SPA-I2IDCD
+           MOVE    SPACE           TO  SPA-I23-MOTOPG
+      *
+           .
+       3001-I23SPASET-EXT.
+           EXIT.
       *****************************************************************
       *    スパ初期編集処理
       *****************************************************************
@@ -280,10 +457,15 @@
            MOVE    1                       TO  FLG-BTULIST-ROW
       *
            INITIALIZE                          SPA-GMN-I21-BTULIST-AREA
+                                               SPA-NAI-I21-BTULIST-AREA
            MOVE    SPA-GMN-I21-STSRYYMD
                                        TO  SPA-GMN-I21-BTULIST-STSRYYMD
            MOVE    SPA-GMN-I21-EDSRYYMD
                                        TO  SPA-GMN-I21-BTULIST-EDSRYYMD
+           MOVE    SPA-NAI-I21-STSRYYMD
+                                       TO  SPA-NAI-I21-BTULIST-STSRYYMD
+           MOVE    SPA-NAI-I21-EDSRYYMD
+                                       TO  SPA-NAI-I21-BTULIST-EDSRYYMD
       *
            MOVE    SPA-NAI-I21-STSRYYMD
                                        TO  WRK-STYMD
@@ -291,6 +473,9 @@
                                        TO  WRK-EDYMD
            PERFORM 800-KIKAN-NISSU-SEC
            MOVE    WRK-NISSU2          TO  SPA-GMN-I21-BTULIST-NISSU
+      *
+           MOVE    SPA-NAI-I21-SELYMD  TO  SPA-NAI-I21-BTULIST-SELYMD
+           MOVE    SPA-NAI-I21-SELHMS  TO  SPA-NAI-I21-BTULIST-SELHMS
       *
            PERFORM 900-PTSRH-KEY3-SEL-SEC
       *
@@ -343,8 +528,6 @@
            MOVE    "key3"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           PERFORM 900-PTSRH-DEL3-SEC
-      *
            MOVE    ZERO        TO  SPA-NAI-I21-DURATION
            MOVE    SPACE       TO  SPA-NAI-I21-SELYMD
                                    SPA-NAI-I21-SELHMS
@@ -380,9 +563,24 @@
            WHEN    "CLICKED"       ALSO    "B07"
                MOVE    1           TO  FLG-CHGSRYYMD
                PERFORM 4100-CHGSRYYMD-SEC
+      *    情報削除
+           WHEN    "CLICKED"       ALSO    "B09"
+               PERFORM 440-XB01-SENI-SEC
+      *    ＣＳＶ出力
+           WHEN    "CLICKED"       ALSO    "B10"
+               MOVE    ZERO        TO  WRK-PROC-FLG
+               PERFORM 440-I22-SENI-SEC
+      *    印刷
+           WHEN    "CLICKED"       ALSO    "B11"
+               MOVE    1           TO  WRK-PROC-FLG
+               PERFORM 440-I22-SENI-SEC
       *    確定
            WHEN    "CLICKED"       ALSO    "B12"
                PERFORM 480-KAKUTEI-SEC
+      *    処理結果画面
+           WHEN    "CLICKED"       ALSO    "B12S"
+               MOVE    1           TO  WRK-PROC-FLG
+               PERFORM 440-I23-SENI-SEC
       *    検索中確認
            WHEN    "CLICKED"       ALSO    "pandatimer1"
                IF    ( SPA-NAI-I21-SELYMD  NOT =   SPACE )
@@ -678,7 +876,7 @@
            MOVE    "I20"               TO  SPA-SAKIPG
            MOVE    "I21"               TO  SPA-MOTOPG
       *
-           MOVE   "JOIN  "             TO  MCP-PUTTYPE
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
            MOVE    "I20"               TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
@@ -689,6 +887,158 @@
        210-BACK-EXT.
            EXIT.
       *
+      *************************************************************
+      *    情報削除画面遷移処理
+      *************************************************************
+       440-XB01-SENI-SEC               SECTION.
+      *
+      *    画面をＳＰＡにセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+           INITIALIZE                  SPA-KYOTUKEY
+      *
+      *    画面移行用のパラメタ変更
+           MOVE    "I21"               TO  SPA-MOTOPG
+           MOVE    "XB01"              TO  SPA-SAKIPG
+      *
+           MOVE    CONST-SHELLID       TO  SPA-JOB-SHELLID
+      *
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-I2KYOUTU        TO  SPA-WORK
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+           MOVE    SPA-KYOUTU          TO  LNK-COMMON
+           MOVE    SPA-I2FREE          TO  LNK-SCRSPA
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
+           MOVE   "XB01"               TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       440-XB01-SENI-EXT.
+           EXIT.
+      *************************************************************
+      *    印刷指示画面遷移処理
+      *************************************************************
+       440-I22-SENI-SEC                SECTION.
+      *
+      *    画面をＳＰＡにセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+      *    ジョブ管理チェック処理
+           PERFORM 900-JOBKANRI-CHK-SEC
+           IF    ( FLG-JOBEND   =  ZERO )
+               MOVE    "7777"      TO  SPA-ERRCD
+               MOVE    SPACE       TO  WRK-SHORIERR
+               STRING  "処理中です【"  DELIMITED  BY  SIZE
+                       JOB-SHELLMSG    DELIMITED  BY  SPACE
+                       "】"            DELIMITED  BY  SIZE
+               INTO  WRK-SHORIERR
+               END-STRING
+               GO  TO  440-I22-SENI-EXT
+           END-IF
+      *
+           MOVE    SPACE           TO  SPA-I22-SENI-AREA
+           INITIALIZE                  SPA-I22-SENI-AREA
+      *
+           MOVE    WRK-PROC-FLG    TO  SPA-I22-PROC-FLG
+           IF    ( WRK-PROC-FLG    =   ZERO )
+               STRING  "BYOTO_"                        DELIMITED BY SIZE
+                       SPA-NAI-I21-BTULIST-STSRYYMD    DELIMITED BY SIZE
+                       "-"                             DELIMITED BY SIZE
+                       SPA-NAI-I21-BTULIST-EDSRYYMD    DELIMITED BY SIZE
+                       ".csv"                          DELIMITED BY SIZE
+               INTO    SPA-I22-FILENAME
+               END-STRING
+           END-IF
+           MOVE    "I21"           TO  SPA-I22-MOTOPG
+      *
+           MOVE    SPACE           TO  SPA-MOTOPG
+           MOVE    SPA-I2KYOUTU    TO  SPA-WORK  
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-I2FREE      TO  SPA-FREE
+      *
+           MOVE    "LINK"          TO  MCP-STATUS
+           MOVE    SPACE           TO  MCP-EVENT
+      *
+           CALL    "ORCGI22"       USING
+                                   MCPAREA
+                                   SPAAREA
+                                   LINKAREA
+                                   SCRAREA
+      *
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-FREE        TO  SPA-I2FREE
+           MOVE    SPA-WORK        TO  SPA-I2KYOUTU
+      *
+           MOVE  "B12"             TO  MCP-WIDGET
+      *
+           MOVE  "I20"             TO  SPA-MOTOPG
+           MOVE  "I22"             TO  SPA-SAKIPG
+      *
+           MOVE  "NEW"             TO  MCP-PUTTYPE
+           MOVE  "I22"             TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE  1                 TO  FLG-END
+           .
+      *
+       440-I22-SENI-EXT.
+           EXIT.
+      *************************************************************
+      *    処理結果確認画面遷移処理
+      *************************************************************
+       440-I23-SENI-SEC                SECTION.
+      *
+      *    画面をＳＰＡにセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+           INITIALIZE                  SPA-I23-AREA
+      *
+           MOVE  "I21"             TO  SPA-I23-MOTOPG
+           MOVE  CONST-SHELLID     TO  SPA-I23-SHELLID
+      *
+           MOVE    SPACE           TO  SPA-MOTOPG
+           MOVE    SPA-I2KYOUTU    TO  SPA-WORK  
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-I2FREE      TO  SPA-FREE
+      *
+           MOVE    "LINK"          TO  MCP-STATUS
+           MOVE    SPACE           TO  MCP-EVENT
+      *
+           MOVE    "LINK"          TO  MCP-STATUS
+           MOVE    SPACE           TO  MCP-EVENT
+      *
+           CALL    "ORCGI23"       USING
+                                   MCPAREA
+                                   SPAAREA
+                                   LINKAREA
+                                   SCRAREA
+      *
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-FREE        TO  SPA-I2FREE
+           MOVE    SPA-WORK        TO  SPA-I2KYOUTU
+      *
+           MOVE  "B01"             TO  MCP-WIDGET
+      *
+           MOVE  "I21"             TO  SPA-MOTOPG
+           MOVE  "I23"             TO  SPA-SAKIPG
+      *
+           MOVE  "NEW"             TO  MCP-PUTTYPE
+           MOVE  "I23"             TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE  1                 TO  FLG-END
+           .
+      *
+       440-I23-SENI-EXT.
+           EXIT.
       *****************************************************************
       *    確定処理
       *****************************************************************
@@ -710,6 +1060,7 @@
                MOVE    ZERO            TO  SPA-NAI-I21-DURATION
       *
                INITIALIZE                  SPA-GMN-I21-BTULIST-AREA
+                                           SPA-NAI-I21-BTULIST-AREA
       *
                MOVE    SPACE           TO  SHELLTBL
                INITIALIZE                  SHELLTBL
@@ -853,6 +1204,14 @@
                                        I21-B12-STATE
                                        I21-STSRYYMD-STATE
                                        I21-EDSRYYMD-STATE
+      *
+           IF    ( SPA-GMN-I21-BTULIST-MAX <=   ZERO )
+               MOVE    WIDGET-INSENSITIVE  TO  I21-B10-STATE
+                                               I21-B11-STATE
+           ELSE
+               MOVE    WIDGET-NORMAL       TO  I21-B10-STATE
+                                               I21-B11-STATE
+           END-IF
       *
            MOVE    SPA-NAI-I21-DURATION
                                    TO  I21-DURATION
@@ -1004,6 +1363,8 @@
            WHEN    "0006"
                MOVE    "１２ヶ月以内の期間を指定してください"
                                        TO  SPA-ERRMSG
+           WHEN    "7777"
+               MOVE    WRK-SHORIERR    TO  SPA-ERRMSG
            END-EVALUATE
       *
            MOVE    SPACE               TO  I2ERR
@@ -1101,6 +1462,65 @@
        800-KIKAN-NISSU-EXT.
            EXIT.
       *****************************************************************
+      *    ジョブ開始セット処理
+      *****************************************************************
+       900-JOBKANRI-HENSYU-SEC         SECTION.
+      *
+           MOVE    "DEL"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    CONST-JOBID     TO  JOB-JOBID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA 
+                                   JOBKANRI-REC
+                                   SPA-AREA
+      *
+           MOVE    "JBS"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    CONST-JOBID     TO  JOB-JOBID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
+           MOVE    SPA-TERMID      TO  JOB-TERMID
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA 
+                                   JOBKANRI-REC
+                                   SPA-AREA
+      *
+           .
+       900-JOBKANRI-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ジョブ管理チェック処理
+      *****************************************************************
+       900-JOBKANRI-CHK-SEC            SECTION.
+      *
+           MOVE    ZERO            TO  FLG-JOBEND
+      *
+      *    ジョブ管理チェック処理
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    CONST-JOBID     TO  JOB-JOBID
+           MOVE    CONST-SHELLID   TO  JOB-SHELLID
+           CALL    "ORCSJOB"       USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           IF    ( SJOBKANRI-RETURN    =   ZERO )
+               IF    ( JOB-ENDYMD      =   SPACE )
+                   CONTINUE
+               ELSE
+                   MOVE    1           TO  FLG-JOBEND
+               END-IF
+           ELSE
+                   MOVE    2           TO  FLG-JOBEND
+           END-IF
+      *
+           .
+       900-JOBKANRI-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    患者照会検索処理
       *****************************************************************
        900-PTSRH-KEY2-SEL-SEC          SECTION.
@@ -1180,6 +1600,48 @@
       *
            .
        900-PTSRH-KEY3-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会追加処理
+      *****************************************************************
+       900-PTSRH-INS2-SEC              SECTION.
+      *
+           MOVE    "3"             TO  WRK-DATAKBN
+           PERFORM 900-PTSRH-DEL1-SEC
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "3"             TO  PTSRH-DATAKBN
+           MOVE    SPA-NAI-I21-BTULIST-SELYMD
+                                   TO  PTSRH-UPYMD
+           MOVE    SPA-NAI-I21-BTULIST-SELHMS
+                                   TO  PTSRH-UPHMS
+           MOVE    "1"             TO  PTSRH-UPDATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "ins2"          TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
+           .
+       900-PTSRH-INS2-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL1-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    WRK-DATAKBN     TO  PTSRH-DATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del1"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL1-EXT.
            EXIT.
       *****************************************************************
       *    患者照会削除処理
@@ -1282,6 +1744,20 @@
            .
       *
        910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ追加処理
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
            EXIT.
       *****************************************************************
       *    ＰＵＴ　処理
