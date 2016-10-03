@@ -441,10 +441,10 @@
       *    ¹ÔÁªÂò
            MOVE    ZERO                TO  SPA-P02H-SELNUM
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   10
+                   UNTIL       IDX     >   SPA-P02H-MAX
                IF      P02H-LIST-SELECT  (IDX)  =   "T"
                    MOVE    IDX              TO  SPA-P02H-SELNUM
-                   MOVE    10               TO  IDX
+                   MOVE    SPA-P02H-MAX     TO  IDX
                END-IF
            END-PERFORM
       *
@@ -623,6 +623,7 @@
       *                                TO  PID1-ID1MSG
       *    END-EVALUATE
       *
+           INITIALIZE                      PID1
            MOVE    SPACE               TO  SPA-PID1-FLG
       *
            MOVE    SPA-PIDCD           TO  PID1-ID1CODE
