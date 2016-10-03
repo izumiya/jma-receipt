@@ -814,6 +814,52 @@ Q01 {
             item varchar(10)[5];
         };
       };
+      fixed20 { #GtkFixed
+        CMB_KHSKBT { #GtkPandaCombo
+          KHSKBT { #GtkPandaEntry
+            textdata varchar(10);
+          };
+          count int;
+          item varchar(10)[5];
+        };
+        STKHYM { #GtkPandaEntry
+          textdata varchar(10);
+        };
+        LBLKHYM { #GtkLabel
+          textdata varchar(2);
+        };
+        EDKHYM { #GtkPandaEntry
+          textdata varchar(10);
+          state int;
+        };
+        KHHKNJANUM { #GtkPandaEntry
+          textdata varchar(6);
+        };
+        CMB_KNSKBT { #GtkPandaCombo
+          KNSKBT { #GtkPandaEntry
+            textdata varchar(10);
+          };
+          count int;
+          item varchar(10)[5];
+        };
+        STKNYM { #GtkPandaEntry
+          textdata varchar(10);
+        };
+        LBLKNYM { #GtkLabel
+          textdata varchar(2);
+        };
+        EDKNYM { #GtkPandaEntry
+          textdata varchar(10);
+          state int;
+        };
+        CMB_KNJOTAI { #GtkPandaCombo
+          KNJOTAI { #GtkPandaEntry
+            textdata varchar(20);
+          };
+          count int;
+          item varchar(20)[20];
+        };
+      };
       fixed19 {
         CMB_KMK1 {
           KMK1 {

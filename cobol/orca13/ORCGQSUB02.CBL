@@ -93,9 +93,13 @@
            03  WRK-STTENKIYMD                      PIC X(08).
            03  WRK-EDTENKIYMD                      PIC X(08).
            03  WRK-STTSYYMD                        PIC X(08).
-           03  WRK-STTSYYMD-FROM                   PIC X(08).
-           03  WRK-STTSYYMD-TO                     PIC X(08).
            03  WRK-EDTSYYMD                        PIC X(08).
+           03  WRK-KHYMD-G.
+               05  WRK-STKHYMD                     PIC X(08).
+               05  WRK-EDKHYMD                     PIC X(08).
+           03  WRK-KNYMD-G.
+               05  WRK-STKNYMD                     PIC X(08).
+               05  WRK-EDKNYMD                     PIC X(08).
            03  WRK-AGE70DAY.
                05  WRK-AGE70DAY-Y                  PIC 9(04).
                05  WRK-AGE70DAY-M                  PIC X(02).
@@ -120,6 +124,12 @@
            03  WRK-ANDOR                           PIC X(03).
            03  WRK-SRYCD-G.
                05  WRK-SRYCD                       PIC X(09) OCCURS  5.
+           03  WRK-SKBT-G.
+               05  WRK-SKBT                        PIC X(1).
+               05  WRK-SKBT-STYMD                  PIC X(8).
+               05  WRK-SKBT-EDYMD                  PIC X(8).
+               05  WRK-SKBT-SEL-STYMD              PIC X(8).
+               05  WRK-SKBT-SEL-EDYMD              PIC X(8).
       *
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
@@ -182,6 +192,8 @@
       *    N...TBL_SRYSRH(NOT)"
       *    O...TBL_PTBYOMEI(NOT)"
       *    P...TBL_PTNUM_PUBLIC"
+      *    Q...TBL_PTCARE_HKNINF"
+      *    R...TBL_PTCARE_NINTEI"
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -484,45 +496,26 @@
                                    TO  WRK-EDTENKIYMD
            END-IF
       *
-           EVALUATE    SPA-Q01-STTSYSKBT
-           WHEN    "2"
-               CONTINUE
-           WHEN    "3"
-               CONTINUE
-           WHEN    OTHER
-               EVALUATE    TRUE
-               WHEN  ( SPA-Q01-STTSYYM     NOT =   SPACE )
-                   MOVE    SPA-Q01-STTSYYM TO  WRK-STTSYYMD
-                   IF    ( SPA-Q01-STTSYSKBT   =   "1" )
-                       MOVE    "01"        TO  WRK-STTSYYMD(7:2)
-                   END-IF
-               WHEN  ( SPA-Q01-STSRYYMD    NOT =   SPACE )
-      *            MOVE    SPA-Q01-STSRYYMD TO WRK-STTSYYMD
-      *            MOVE    "01"            TO  WRK-STTSYYMD(7:2)
-                   MOVE    SPA-Q01-STSRYYMD TO WRK-STTSYYMD
-               WHEN    OTHER
-                   MOVE    ALL "0"         TO  WRK-STTSYYMD
-               END-EVALUATE
+           MOVE    SPA-Q01-STTSYSKBT   TO  WRK-SKBT
+           MOVE    SPA-Q01-STTSYYM     TO  WRK-SKBT-STYMD
+           MOVE    SPA-Q01-EDTSYYM     TO  WRK-SKBT-EDYMD
+           PERFORM 10012-SKBTYM-INIT-SEC
+           MOVE    WRK-SKBT-SEL-STYMD  TO  WRK-STTSYYMD
+           MOVE    WRK-SKBT-SEL-EDYMD  TO  WRK-EDTSYYMD
       *
-               EVALUATE    TRUE
-               WHEN  ( SPA-Q01-EDTSYYM     NOT =   SPACE )
-                   IF    ( SPA-Q01-STTSYSKBT   =   "1" )
-                       MOVE    SPA-Q01-EDTSYYM TO  WRK-YMD
-                       PERFORM 10011-GET-GETUMATU-SEC
-                       MOVE    LNK-DAY7-KOYOMI TO  WRK-EDTSYYMD
-                   ELSE
-                       MOVE    SPA-Q01-EDTSYYM TO  WRK-EDTSYYMD
-                   END-IF
-               WHEN  ( SPA-Q01-EDSRYYMD    NOT =   SPACE )
-      *            MOVE    SPA-Q01-EDSRYYMD TO WRK-YMD
-      *            PERFORM 10011-GET-GETUMATU-SEC
-      *            MOVE    LNK-DAY7-KOYOMI TO  WRK-EDTSYYMD
-                   MOVE    SPA-Q01-EDSRYYMD TO WRK-EDTSYYMD
-               WHEN    OTHER
-                   MOVE    ALL "9"         TO  WRK-EDTSYYMD
-               END-EVALUATE
+           MOVE    SPA-Q01-KHSKBT      TO  WRK-SKBT
+           MOVE    SPA-Q01-STKHYM      TO  WRK-SKBT-STYMD
+           MOVE    SPA-Q01-EDKHYM      TO  WRK-SKBT-EDYMD
+           PERFORM 10012-SKBTYM-INIT-SEC
+           MOVE    WRK-SKBT-SEL-STYMD  TO  WRK-STKHYMD
+           MOVE    WRK-SKBT-SEL-EDYMD  TO  WRK-EDKHYMD
       *
-           END-EVALUATE
+           MOVE    SPA-Q01-KNSKBT      TO  WRK-SKBT
+           MOVE    SPA-Q01-STKNYM      TO  WRK-SKBT-STYMD
+           MOVE    SPA-Q01-EDKNYM      TO  WRK-SKBT-EDYMD
+           PERFORM 10012-SKBTYM-INIT-SEC
+           MOVE    WRK-SKBT-SEL-STYMD  TO  WRK-STKNYMD
+           MOVE    WRK-SKBT-SEL-EDYMD  TO  WRK-EDKNYMD
       *
            .
        1001-JOKEN-INIT-EXT.
@@ -764,6 +757,53 @@
        10011-GET-GETUMATU-EXT.
            EXIT.
       *****************************************************************
+      *    ¼±ÊÌ´ü´ÖÊÔ½¸½é´ü½èÍý
+      *****************************************************************
+       10012-SKBTYM-INIT-SEC            SECTION.
+      *
+           MOVE    SPACE                   TO  WRK-SKBT-SEL-STYMD
+                                               WRK-SKBT-SEL-EDYMD
+      *
+           EVALUATE    WRK-SKBT
+           WHEN    "2"
+               CONTINUE
+           WHEN    "3"
+               CONTINUE
+           WHEN    OTHER
+               EVALUATE    TRUE
+               WHEN  ( WRK-SKBT-STYMD      NOT =   SPACE )
+                   MOVE    WRK-SKBT-STYMD  TO  WRK-SKBT-SEL-STYMD
+                   IF    ( WRK-SKBT   =   "1" )
+                       MOVE    "01"        TO  WRK-SKBT-SEL-STYMD(7:2)
+                   END-IF
+               WHEN  ( SPA-Q01-STSRYYMD    NOT =   SPACE )
+                   MOVE    SPA-Q01-STSRYYMD
+                                           TO  WRK-SKBT-SEL-STYMD
+               WHEN    OTHER
+                   MOVE    ALL "0"         TO  WRK-SKBT-SEL-STYMD
+               END-EVALUATE
+      *
+               EVALUATE    TRUE
+               WHEN  ( WRK-SKBT-EDYMD     NOT =   SPACE )
+                   IF    ( WRK-SKBT   =   "1" )
+                       MOVE    WRK-SKBT-EDYMD  TO  WRK-YMD
+                       PERFORM 10011-GET-GETUMATU-SEC
+                       MOVE    LNK-DAY7-KOYOMI TO  WRK-SKBT-SEL-EDYMD
+                   ELSE
+                       MOVE    WRK-SKBT-EDYMD  TO  WRK-SKBT-SEL-EDYMD
+                   END-IF
+               WHEN  ( SPA-Q01-EDSRYYMD    NOT =   SPACE )
+                   MOVE    SPA-Q01-EDSRYYMD    TO  WRK-SKBT-SEL-EDYMD
+               WHEN    OTHER
+                   MOVE    ALL "9"             TO  WRK-SKBT-SEL-EDYMD
+               END-EVALUATE
+      *
+           END-EVALUATE
+      *
+           .
+       10012-SKBTYM-INIT-EXT.
+           EXIT.
+      *****************************************************************
       *    FROM¶çÊÔ½¸½èÍý
       *****************************************************************
        1001-FROM-EDIT-SEC              SECTION.
@@ -771,6 +811,16 @@
       *    ÃÏ°èÏ¢·È¾ðÊóÄó¶¡
            IF  ( SPA-Q01-GPTNUM-PUBLIC      =   "1" )
                PERFORM 1001-PTNUM-PUBLIC-JOKEN-SEC
+           END-IF
+      *
+      *    ²ð¸î
+           IF  ( SPA-Q01-GKAIGO              =   "1" )
+               IF    ( SPA-Q01-KAIGO-HOKEN-G NOT   =   SPACE )
+                   PERFORM 1001-PTCARE-HKNINF-JOKEN-SEC
+               END-IF
+               IF    ( SPA-Q01-KAIGO-NINTEI-G NOT   =   SPACE )
+                   PERFORM 1001-PTCARE-NINTEI-JOKEN-SEC
+               END-IF
            END-IF
       *
       *    Äã½êÆÀ
@@ -900,6 +950,21 @@
                MOVE    FLG-JOKEN      TO  FLG-JOKEN-AND
                PERFORM     1001-PTNUM-PUBLIC-SQL-EDIT-SEC
                MOVE    1               TO  FLG-JOKEN
+           END-IF
+      *
+           IF  ( SPA-Q01-GKAIGO        =   "1" )
+      *        ²ð¸îÊÝ¸±¾ðÊóÄó¶¡
+               IF    ( SPA-Q01-KAIGO-HOKEN-G  NOT  =   SPACE )
+                   MOVE    FLG-JOKEN   TO  FLG-JOKEN-AND
+                   PERFORM     1001-PTCARE-HOKEN-SQL-EDIT-SEC
+                   MOVE    1           TO  FLG-JOKEN
+               END-IF
+      *        ²ð¸îÇ§Äê¾ðÊóÄó¶¡
+               IF    ( SPA-Q01-KAIGO-NINTEI-G  NOT  =   SPACE )
+                   MOVE    FLG-JOKEN   TO  FLG-JOKEN-AND
+                   PERFORM     1001-PTCARE-NINTEI-SQL-EDIT-SEC
+                   MOVE    1           TO  FLG-JOKEN
+               END-IF
            END-IF
       *
       *    Äã½êÆÀ
@@ -1051,6 +1116,32 @@
       *
            .
        1001-PTNUM-PUBLIC-JOKEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²ð¸îÊÝ¸±¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       1001-PTCARE-HKNINF-JOKEN-SEC       SECTION.
+      *
+           STRING  ",TBL_PTCARE_HKNINF Q "  DELIMITED  BY  SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       1001-PTCARE-HKNINF-JOKEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²ð¸îÇ§Äê¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       1001-PTCARE-NINTEI-JOKEN-SEC        SECTION.
+      *
+           STRING  ",TBL_PTCARE_NINTEI R "  DELIMITED  BY  SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       1001-PTCARE-NINTEI-JOKEN-EXT.
            EXIT.
       *****************************************************************
       *    Äã½êÆÀ¾ò·ïÊÔ½¸½èÍý
@@ -1662,6 +1753,135 @@
       *
            .
        1001-PTNUM-PUBLIC-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²ð¸îÊÝ¸±¾ðÊó¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       1001-PTCARE-HOKEN-SQL-EDIT-SEC      SECTION.
+      *
+           MOVE    "Q"             TO  WRK-SQL-TBL-NAME
+           PERFORM 900-SQL-JOKEN-EDIT1-SEC
+      *
+           STRING  "(1=1)"             DELIMITED   BY  SIZE
+           INTO            WRK-SQL
+           WITH POINTER    WRK-SQL-PNT
+           END-STRING
+      *
+           EVALUATE    SPA-Q01-KHSKBT
+           WHEN    "1"
+           WHEN    "4"
+               STRING  "AND(Q.TEKSTYMD <= '"       DELIMITED   BY  SIZE
+                       WRK-EDKHYMD                 DELIMITED   BY  SPACE
+                       "' AND Q.TEKEDYMD >= '"     DELIMITED   BY  SIZE
+                       WRK-STKHYMD                 DELIMITED   BY  SPACE
+                       "')"                        DELIMITED   BY  SIZE
+               INTO            WRK-SQL
+               WITH POINTER    WRK-SQL-PNT
+               END-STRING
+           WHEN    "2"
+               STRING  "AND(Q.TEKSTYMD LIKE '"     DELIMITED   BY  SIZE
+                       SPA-Q01-STKHYM              DELIMITED   BY  SPACE
+                       "%')"                       DELIMITED   BY  SIZE
+               INTO        WRK-SQL
+               WITH POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "3"
+               STRING  "AND(Q.TEKEDYMD LIKE '"     DELIMITED   BY  SIZE
+                       SPA-Q01-STKHYM              DELIMITED   BY  SPACE
+                       "%')"                       DELIMITED   BY  SIZE
+               INTO        WRK-SQL
+               WITH POINTER WRK-SQL-PNT
+               END-STRING
+           END-EVALUATE
+      *
+           IF    ( SPA-Q01-KHHKNJANUM  NOT =       SPACE )
+               STRING  "AND(Q.HKNJANUM = '"        DELIMITED   BY  SIZE
+                       SPA-Q01-KHHKNJANUM          DELIMITED   BY  SPACE
+                       "')"                        DELIMITED   BY  SIZE
+               INTO        WRK-SQL
+               WITH POINTER WRK-SQL-PNT
+               END-STRING
+           END-IF
+      *
+           PERFORM 900-SQL-JOKEN-EDIT4-SEC
+      *
+           .
+       1001-PTCARE-HOKEN-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²ð¸îÇ§Äê¾ðÊó¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       1001-PTCARE-NINTEI-SQL-EDIT-SEC      SECTION.
+      *
+           MOVE    "R"             TO  WRK-SQL-TBL-NAME
+           PERFORM 900-SQL-JOKEN-EDIT1-SEC
+      *
+           STRING  "(1=1)"             DELIMITED   BY  SIZE
+           INTO            WRK-SQL
+           WITH POINTER    WRK-SQL-PNT
+           END-STRING
+      *
+           EVALUATE    SPA-Q01-KNSKBT
+           WHEN    "1"
+           WHEN    "4"
+               STRING  "AND(R.TEKSTYMD <= '"       DELIMITED   BY  SIZE
+                       WRK-EDKNYMD                 DELIMITED   BY  SPACE
+                       "' AND R.TEKEDYMD >= '"     DELIMITED   BY  SIZE
+                       WRK-STKNYMD                 DELIMITED   BY  SPACE
+                       "')"                        DELIMITED   BY  SIZE
+               INTO    WRK-SQL
+               WITH POINTER    WRK-SQL-PNT
+               END-STRING
+           WHEN    "2"
+               STRING  "AND(R.TEKSTYMD LIKE '"     DELIMITED   BY  SIZE
+                       SPA-Q01-STKNYM              DELIMITED   BY  SPACE
+                       "%')"                       DELIMITED   BY  SIZE
+               INTO    WRK-SQL
+               WITH POINTER WRK-SQL-PNT
+               END-STRING
+           WHEN    "3"
+               STRING  "AND(R.TEKEDYMD LIKE '"     DELIMITED   BY  SIZE
+                       SPA-Q01-STKNYM              DELIMITED   BY  SPACE
+                       "%')"                       DELIMITED   BY  SIZE
+               INTO    WRK-SQL
+               WITH POINTER WRK-SQL-PNT
+               END-STRING
+           END-EVALUATE
+      *
+           IF    ( SPA-Q01-KNJOTAI     NOT =       SPACE )
+               EVALUATE    SPA-Q01-KNJOTAI
+               WHEN    "1x"
+                   STRING  "AND(R.CAREJOTAICD LIKE '1%')"
+                                                   DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH POINTER WRK-SQL-PNT
+                   END-STRING
+               WHEN    "2x"
+                   STRING  "AND(R.CAREJOTAICD LIKE '2%')"
+                                                   DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH POINTER WRK-SQL-PNT
+                   END-STRING
+               WHEN    "xx"
+                   STRING  "AND(R.CAREJOTAICD BETWEEN '10' AND '29')"
+                                                   DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH POINTER WRK-SQL-PNT
+                   END-STRING
+               WHEN    OTHER
+                   STRING  "AND(R.CAREJOTAICD = '" DELIMITED   BY  SIZE
+                       SPA-Q01-KNJOTAI             DELIMITED   BY  SPACE
+                       "')"                        DELIMITED   BY  SIZE
+                   INTO    WRK-SQL
+                   WITH POINTER WRK-SQL-PNT
+                   END-STRING
+               END-EVALUATE
+           END-IF
+      *
+           PERFORM 900-SQL-JOKEN-EDIT4-SEC
+      *
+           .
+       1001-PTCARE-NINTEI-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    Äã½êÆÀ¼Ô¸¡º÷¾ò·ïÊÔ½¸½èÍý

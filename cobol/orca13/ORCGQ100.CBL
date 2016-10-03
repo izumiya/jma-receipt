@@ -633,7 +633,7 @@
                                        TO  SPA-Q02-Q100-EDKNS
       *        文字コード区分
                IF      SPA-GMN-Q100-CDKBN  =   SPACE
-                   MOVE    "0"                 TO  SPA-Q02-Q100-CDKBN
+                   MOVE    "1"                 TO  SPA-Q02-Q100-CDKBN
                ELSE
                    MOVE    SPA-GMN-Q100-CDKBN  TO  SPA-Q02-Q100-CDKBN
                END-IF
@@ -730,6 +730,9 @@
            MOVE    SPA-GMN-Q100-CDKBN-G    TO  Q100-CDKBN
            MOVE    SPA-GMN-Q100-CDKBN-STATE
                                            TO  Q100-CDKBN-STATE
+           IF    ( SPA-GMN-Q100-FILE       =   SPACE )
+               MOVE    WIDGET-INSENSITIVE  TO  Q100-CDKBN-STATE
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *

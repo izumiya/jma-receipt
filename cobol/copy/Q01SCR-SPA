@@ -474,6 +474,25 @@
                                13  SPA-GMN-Q01-JKNSRYACT     PIC X(01).
                                13  SPA-GMN-Q01-JKNSRYACTFL   PIC X(01).
                                13  SPA-GMN-Q01-JKNSRYACTMEI  PIC X(08).
+      *                拆割
+                       09  SPA-GMN-Q01-KAIGO-AREA.
+                           11  SPA-GMN-Q01-KHSKBT-G.
+                               13  SPA-GMN-Q01-KHSKBT        PIC X(01).
+                               13  SPA-GMN-Q01-KHSKBTFL      PIC X(01).
+                               13  SPA-GMN-Q01-KHSKBTMEI     PIC X(08).
+                           11  SPA-GMN-Q01-STKHYM            PIC X(10).
+                           11  SPA-GMN-Q01-EDKHYM            PIC X(10).
+                           11  SPA-GMN-Q01-KHHKNJANUM        PIC X(06).
+                           11  SPA-GMN-Q01-KNSKBT-G.
+                               13  SPA-GMN-Q01-KNSKBT        PIC X(01).
+                               13  SPA-GMN-Q01-KNSKBTFL      PIC X(01).
+                               13  SPA-GMN-Q01-KNSKBTMEI     PIC X(08).
+                           11  SPA-GMN-Q01-STKNYM            PIC X(10).
+                           11  SPA-GMN-Q01-EDKNYM            PIC X(10).
+                           11  SPA-GMN-Q01-KNJOTAI-G.
+                               13  SPA-GMN-Q01-KNJOTAI       PIC X(02).
+                               13  SPA-GMN-Q01-KNJOTAIFL     PIC X(01).
+                               13  SPA-GMN-Q01-KNJOTAIMEI    PIC X(16).
       *                事び界
                        09  SPA-GMN-Q01-NARABI-AREA.
                            11  SPA-GMN-Q01-KMKTBL.
@@ -538,6 +557,8 @@
                            11  SPA-NAI-Q01-TOKKICD-BF  PIC X(02).
       *                瘦副　给锐
                        09  SPA-NAI-Q01-HOKEN-AREA.
+                           11  SPA-NAI-Q01-JKNKOHNUM-OLD
+                                                       PIC X(01).
                            11  SPA-NAI-Q01-HKNEDYM     PIC X(06).
                            11  SPA-NAI-Q01-KOHEDYM     PIC X(06).
       *                陕叹　壳闻乖百
@@ -563,6 +584,12 @@
                                                        PIC X(09).
                            11  SPA-NAI-Q01-SRYVAL-OCC  OCCURS  5.
                                13  SPA-NAI-Q01-SRYVAL  PIC 9(05)V9(05).
+      *                拆割
+                       09  SPA-NAI-Q01-KAIGO-AREA.
+                           11  SPA-NAI-Q01-STKHYM          PIC X(08).
+                           11  SPA-NAI-Q01-EDKHYM          PIC X(08).
+                           11  SPA-NAI-Q01-STKNYM          PIC X(08).
+                           11  SPA-NAI-Q01-EDKNYM          PIC X(08).
       *                事び界
                        09  SPA-NAI-Q01-NARABI-AREA.
                            11  SPA-NAI-Q01-NARABI-DMY  PIC X(01).
@@ -840,6 +867,25 @@
                                13  SPA-GMN-Q01-JKNKOHNUML     PIC X(01).
                                13  SPA-GMN-Q01-JKNKOHNUMFLL   PIC X(01).
                                13  SPA-GMN-Q01-JKNKOHNUMMEIL  PIC X(08).
+      *                拆割
+                       09  SPA-GMN-Q01-KHSKBTLST-G.
+                           11  SPA-GMN-Q01-KHSKBTLST-MAX      PIC 9(05).
+                           11  SPA-GMN-Q01-KHSKBTLST          OCCURS 5.
+                               13  SPA-GMN-Q01-KHSKBTL        PIC X(01).
+                               13  SPA-GMN-Q01-KHSKBTFLL      PIC X(01).
+                               13  SPA-GMN-Q01-KHSKBTMEIL     PIC X(08).
+                       09  SPA-GMN-Q01-KNSKBTLST-G.
+                           11  SPA-GMN-Q01-KNSKBTLST-MAX      PIC 9(05).
+                           11  SPA-GMN-Q01-KNSKBTLST          OCCURS 5.
+                               13  SPA-GMN-Q01-KNSKBTL        PIC X(01).
+                               13  SPA-GMN-Q01-KNSKBTFLL      PIC X(01).
+                               13  SPA-GMN-Q01-KNSKBTMEIL     PIC X(08).
+                       09  SPA-GMN-Q01-KNJOTAILST-G.
+                           11  SPA-GMN-Q01-KNJOTAILST-MAX     PIC 9(05).
+                           11  SPA-GMN-Q01-KNJOTAILST         OCCURS 20.
+                               13  SPA-GMN-Q01-KNJOTAIL       PIC X(02).
+                               13  SPA-GMN-Q01-KNJOTAIFLL     PIC X(01).
+                               13  SPA-GMN-Q01-KNJOTAIMEIL    PIC X(16).
                        09  SPA-GMN-Q01-JKNBYOMEILST-G.
                            11  SPA-GMN-Q01-JKNBYOMEILST-MAX   PIC 9(05).
                            11  SPA-GMN-Q01-JKNBYOMEILST       OCCURS 5.
@@ -1224,9 +1270,10 @@
                            11  SPA-Q01-GXBYOMEI        PIC X(01).
                            11  SPA-Q01-GXSRYACT        PIC X(01).
                            11  SPA-Q01-GPTNUM-PUBLIC   PIC X(01).
+                           11  SPA-Q01-GKAIGO          PIC X(01).
                        09  SPA-Q01-GITEM-R REDEFINES   SPA-Q01-GITEM-G.
                            11  SPA-Q01-GTBL            PIC X(01)
-                                                       OCCURS  15.
+                                                       OCCURS  16.
                    07  SPA-Q01-AGE-CALC-KBN            PIC 9(01).
                    07  SPA-Q01-STSRYYMD                PIC X(08).
                    07  SPA-Q01-EDSRYYMD                PIC X(08).
@@ -1359,6 +1406,18 @@
                        09  SPA-Q01-RECECOM-G.
                            11  SPA-Q01-RECECOM         OCCURS  3
                                                        PIC X(50).
+      *            拆割
+                   07  SPA-Q01-KAIGO-AREA.
+                       09  SPA-Q01-KHSKBT              PIC X(01).
+                       09  SPA-Q01-KNSKBT              PIC X(01).
+                       09  SPA-Q01-KAIGO-HOKEN-G.
+                           11  SPA-Q01-STKHYM          PIC X(08).
+                           11  SPA-Q01-EDKHYM          PIC X(08).
+                           11  SPA-Q01-KHHKNJANUM      PIC X(06).
+                       09  SPA-Q01-KAIGO-NINTEI-G.
+                           11  SPA-Q01-STKNYM          PIC X(08).
+                           11  SPA-Q01-EDKNYM          PIC X(08).
+                           11  SPA-Q01-KNJOTAI         PIC X(02).
       *
       *            事び界
                    07  SPA-Q01-NARABI-AREA.
