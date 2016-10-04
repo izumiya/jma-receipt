@@ -111,6 +111,9 @@
                05  SPA-GMN-RIHAYMD-TBL.
                    07  SPA-GMN-RIHAYMD           PIC X(62)
                                                  OCCURS   10.
+      *H28.10  要介護状態
+               05  SPA-GMN-YOUKAIGO              PIC X(62).
+      *
       *        病名内容
                05  SPA-GMN-BYOMEITBL.
                    07  SPA-GMN-BYOMEI-TBL        OCCURS  100.

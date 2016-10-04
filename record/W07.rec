@@ -620,6 +620,13 @@ W07 {
           count int;
             item varchar(40)[10];
         };
+        GMNHYOKBN6_COMB {
+          GMNHYOKBN6 {
+            textdata varchar(40);
+          };
+          count int;
+            item varchar(40)[10];
+        };
         BGCOLORS {
           color varchar(16);
         };

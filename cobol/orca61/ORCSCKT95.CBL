@@ -98,6 +98,7 @@
            03  FLG-PTTOKKI         PIC 9(01).
            03  FLG-PTSAME          PIC 9(01).
            03  FLG-PTCONF          PIC 9(01).
+           03  FLG-PTCARE-NINTEI   PIC 9(01).
       *
            03  FLG-SYSKANRIOK      PIC 9(01).
            03  FLG-HKNCOMBICHK     PIC 9(01).
@@ -304,6 +305,8 @@
                05  WRK-CHKHKTBYO       PIC X(01)   OCCURS   4.
            03  WRK-CNT                 PIC 9(02).
       *
+           03  WRK-KAIGOMEI            PIC X(60).
+      *
       *    ¶Ø´÷£±
        01  WRK-TABOO-G.
            03  WRK-TABOO               PIC X(62)
@@ -472,6 +475,11 @@
       *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ë
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
+      *H28.10
+      *    ´µ¼Ô²ð¸îÇ§Äê¼Ô¾ðÊó¥Æ¡¼¥Ö¥ë
+       01  PTCARE-NINTEI-REC.
+           COPY    "CPPTCARE-NINTEI.INC".
+      *
       *
       *v4.8
       *    ¥Ñ¥é¥á¥¿¥Æ¡¼¥Ö¥ë
@@ -2101,6 +2109,9 @@
                PERFORM 110110-NNCHISYOU-SET-SEC
            END-IF
       *
+      *H28.10
+      *    Í×²ð¸îÂÐ¾Ý
+           PERFORM 110111-YOUKAIGO-SET-SEC
       *
            .
        1101-PTINF-HENSYU-EXT.
@@ -2268,6 +2279,96 @@
            .
        110110-NNCHISYOU-SET-EXT.
            EXIT.
+      *H28.10
+      *****************************************************************
+      *    Í×²ð¸îÂÐ¾ÝÊÔ½¸½èÍý
+      *****************************************************************
+       110111-YOUKAIGO-SET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  SPA-YOUKAIGO-ARI
+      *H28.10
+           MOVE    SPACE               TO  SPA-GMN-YOUKAIGO
+           MOVE    SPACE               TO  WRK-KAIGOMEI
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
+           INITIALIZE                  PTCARE-NINTEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCRNIN-PTID
+           MOVE    SPA-SRYYMD          TO  PTCRNIN-TEKSTYMD
+           MOVE    SPA-SRYYMD          TO  PTCRNIN-TEKEDYMD
+      *
+           MOVE    PTCARE-NINTEI-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key1"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key1"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCARE-NINTEI
+               INITIALIZE                  PTCARE-NINTEI-REC
+           END-IF
+           PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
+      *                   OR  (SPA-YOUKAIGO-ARI    NOT =   ZERO )
+      *H28.10
+      *        Í×²ð¸îÌ¾¾Î
+               EVALUATE    PTCRNIN-CAREJOTAICD
+               WHEN    "01"
+                   MOVE    "¼«Î©"          TO  WRK-KAIGOMEI
+               WHEN    "11"
+                   MOVE    "Í×»Ù±ç"        TO  WRK-KAIGOMEI
+               WHEN    "12"
+                   MOVE    "Í×»Ù±ç£±"      TO  WRK-KAIGOMEI
+               WHEN    "13"
+                   MOVE    "Í×»Ù±ç£²"      TO  WRK-KAIGOMEI
+               WHEN    "21"
+                   MOVE    "Í×²ð¸î£±"      TO  WRK-KAIGOMEI
+               WHEN    "22"
+                   MOVE    "Í×²ð¸î£²"      TO  WRK-KAIGOMEI
+               WHEN    "23"
+                   MOVE    "Í×²ð¸î£³"      TO  WRK-KAIGOMEI
+               WHEN    "24"
+                   MOVE    "Í×²ð¸î£´"      TO  WRK-KAIGOMEI
+               WHEN    "25"
+                   MOVE    "Í×²ð¸î£µ"      TO  WRK-KAIGOMEI
+               WHEN    OTHER
+                   MOVE    PTCRNIN-CAREJOTAICD TO  WRK-KAIGOMEI
+               END-EVALUATE
+      *
+      *        Í×²ð¸î¾õÂÖ
+               IF       PTCRNIN-CAREJOTAICD    =   "01"
+      *            ¼«Î©¡¡¤ÏÂÐ¾Ý³°
+                   CONTINUE
+               ELSE
+                   MOVE    1               TO  SPA-YOUKAIGO-ARI
+               END-IF
+      *
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key1"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key1"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    Í×²ð¸îÂÐ¾Ý
+           IF     (SPA-SRYYMD          >=  "20161001" )
+               CONTINUE
+           ELSE
+      *        H28/10¤Þ¤Ç¤Ï¤Ê¤·
+               MOVE    ZERO            TO  SPA-YOUKAIGO-ARI
+           END-IF
+      *
+           IF      WRK-KAIGOMEI    NOT =   SPACE
+               STRING  "Í×²ð¸î¾õÂÖ¡§"
+                       WRK-KAIGOMEI        DELIMITED  BY  SPACE
+                                       INTO      SPA-GMN-YOUKAIGO
+               END-STRING
+           END-IF
+           .
+       110111-YOUKAIGO-SET-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ¶Ø´÷¾ðÊóÀßÄê½èÍý
@@ -5529,6 +5630,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        900-HKNCOMBI-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    ´µ¼Ô²ð¸î¼ÔÇ§Äê¾ðÊó¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCARENINTEI-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-NINTEI
+               MOVE    MCPDATA-REC         TO  PTCARE-NINTEI-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-NINTEI
+               INITIALIZE                 PTCARE-NINTEI-REC
+           END-IF
+      *
+           .
+       930-PTCARENINTEI-READ-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ÅÀ¿ô¥Þ¥¹¥¿¡¼ÆÉ¹þ

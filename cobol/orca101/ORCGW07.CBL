@@ -133,6 +133,7 @@
       *                                     有無区分の追加
       *  04.08.01    NACL-多々納  16/06/10  セット展開区分追加
       *  04.08.01    NACL-太田    16/08/05  収納請求一覧初期表示追加
+      *  04.08.01    NACL-多々納  16/10/04  要介護情報表示区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -723,7 +724,7 @@
       *
       *                リハビリ・患者情報表示区分
                        09  SPA-GMN-GMNHYOKBN-AREA.
-                           11  SPA-GMN-GMNHYOKBN-TBL     OCCURS   5.
+                           11  SPA-GMN-GMNHYOKBN-TBL     OCCURS   6.
                                13  SPA-GMN-GMNHYOKBN-G.
                                    14  SPA-GMN-GMNHYOKBN     PIC X(01).
                                    14  SPA-GMN-GMNHYOKBN-F1  PIC X(01).
@@ -2113,7 +2114,10 @@
            MOVE    "感染症"            TO  SPA-GMN-GMNHYOKBN-LST (4)
            MOVE    "5"                 TO  SPA-GMN-GMNHYOKBNL (5)
            MOVE    "コメント"          TO  SPA-GMN-GMNHYOKBN-LST (5)
-           MOVE    5                   TO  SPA-GMN-GMNHYOKBN-MAX
+      *H28.10
+           MOVE    "6"                 TO  SPA-GMN-GMNHYOKBNL (6)
+           MOVE    "介護認定情報"      TO  SPA-GMN-GMNHYOKBN-LST (6)
+           MOVE    6                   TO  SPA-GMN-GMNHYOKBN-MAX
       *    入力スクロール背景行区分
            MOVE    "0 行毎"            TO  SPA-GMN-BGLINEKBN-LST (1)
            MOVE    "1 剤毎"            TO  SPA-GMN-BGLINEKBN-LST (2)
@@ -3512,11 +3516,22 @@
       *ver.4.7
       *    リハビリ・患者情報表示区分
            PERFORM VARYING     IDX     FROM   1   BY  1
-                   UNTIL       IDX     >   5
-               MOVE    SYS-1038-GMNHYOKBN (IDX)
+     ****          UNTIL       IDX     >   5
+                   UNTIL       IDX     >   6
+      *H28.10
+               IF      IDX             <=  5
+      *            リハビリ・患者情報・介護表示区分１〜５
+                   MOVE    SYS-1038-GMNHYOKBN (IDX)
                                            TO  SPA-NAI-GMNHYOKBN (IDX)
-               IF      SYS-1038-GMNHYOKBN (IDX)
-                                           =   SPACE
+               ELSE
+      *            リハビリ・患者情報・介護表示区分６
+                   MOVE    SYS-1038-GMNHYOKBN-6
+                                           TO  SPA-NAI-GMNHYOKBN (IDX)
+               END-IF
+      *******  IF      SYS-1038-GMNHYOKBN (IDX)
+      *        表示区分がすべて空白の時、初期設定
+               IF     (SYS-1038-GMNHYOKBN-G    =   SPACE )
+                  AND (SYS-1038-GMNHYOKBN-6    =   SPACE )
       *            初期設定
                    EVALUATE    IDX
                    WHEN    1
@@ -3529,6 +3544,8 @@
                        MOVE    "4"         TO  SPA-NAI-GMNHYOKBN (IDX)
                    WHEN    5
                        MOVE    "5"         TO  SPA-NAI-GMNHYOKBN (IDX)
+                   WHEN    6
+                       MOVE    "6"         TO  SPA-NAI-GMNHYOKBN (IDX)
                    END-EVALUATE
                END-IF
                MOVE    ZERO                TO  FLG-OK
@@ -3548,6 +3565,7 @@
                    MOVE    SPACE           TO  SPA-GMN-GMNHYOKBN-G (IDX)
                END-IF
            END-PERFORM
+      *
       *    入力スクロール背景色
            MOVE    SYS-1038-BGCOLORS       TO  SPA-GMN-BGCOLORS
            IF      SPA-GMN-BGCOLORS        =   SPACE
@@ -5529,6 +5547,7 @@
            MOVE    W07-GMNHYOKBN3      TO  SPA-GMN-GMNHYOKBN-G (3)
            MOVE    W07-GMNHYOKBN4      TO  SPA-GMN-GMNHYOKBN-G (4)
            MOVE    W07-GMNHYOKBN5      TO  SPA-GMN-GMNHYOKBN-G (5)
+           MOVE    W07-GMNHYOKBN6      TO  SPA-GMN-GMNHYOKBN-G (6)
            MOVE    W07-BGCOLORS        TO  SPA-GMN-BGCOLORS
            MOVE    W07-BGLINEKBN       TO  SPA-GMN-BGLINEKBN-G
            MOVE    W07-BGCOLORSDAY     TO  SPA-GMN-BGCOLORSDAY
@@ -8224,11 +8243,13 @@
        4108-GMNHYOKBN-CHK-SEC      SECTION.
       *
       *    空白を詰める
+      *H28.10  ５→６へ
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX             >=  5    )
+      ****         UNTIL      (IDX             >=  5    )
+                   UNTIL      (IDX             >=  6    )
                IF     (SPA-GMN-GMNHYOKBN-G (IDX)   =   SPACE )
                    PERFORM VARYING     IDY     FROM    IDX BY  1
-                           UNTIL      (IDY             >   5    )
+                           UNTIL      (IDY             >   6    )
                        IF     (IDY             NOT =   IDX )
                        AND    (SPA-GMN-GMNHYOKBN-G (IDY)
                                                NOT =   SPACE )
@@ -8237,14 +8258,14 @@
                                                               (IDX)
                            MOVE    SPACE       TO  SPA-GMN-GMNHYOKBN-G
                                                               (IDY)
-                           MOVE    5           TO  IDY
+                           MOVE    6           TO  IDY
                        END-IF
                    END-PERFORM
                END-IF
            END-PERFORM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX             >   5    )
+                   UNTIL      (IDX             >   6    )
                        OR     (SPA-ERRCD   NOT =   SPACE )
                MOVE    ZERO                TO  FLG-OK
                IF      SPA-GMN-GMNHYOKBN-G (IDX)   =   SPACE
@@ -8274,6 +8295,9 @@
                        MOVE    333             TO  SPA-GMN-CUR
                    WHEN    5
                        MOVE    334             TO  SPA-GMN-CUR
+      *H28.10
+                   WHEN    6
+                       MOVE    349             TO  SPA-GMN-CUR
                    END-EVALUATE
                    MOVE    "2023"          TO  SPA-ERRCD
                END-IF
@@ -10677,6 +10701,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NAI-GMNHYOKBN (3)   TO  SYS-1038-GMNHYOKBN (3)
            MOVE    SPA-NAI-GMNHYOKBN (4)   TO  SYS-1038-GMNHYOKBN (4)
            MOVE    SPA-NAI-GMNHYOKBN (5)   TO  SYS-1038-GMNHYOKBN (5)
+      *H28.10
+           MOVE    SPA-NAI-GMNHYOKBN (6)   TO  SYS-1038-GMNHYOKBN-6
       *
            IF      SPA-GMN-BGCOLORS        =   "#000000"
                MOVE    SPACE               TO  SYS-1038-BGCOLORS
@@ -11853,6 +11879,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-GMNHYOKBN-MAX
                                        TO  W07-GMNHYOKBN5-COUNT
+      *
+           MOVE    SPA-GMN-GMNHYOKBN-G(6)  TO  W07-GMNHYOKBN6
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-GMNHYOKBN-MAX
+               MOVE    SPA-GMN-GMNHYOKBN-LST (IDX)
+                                       TO  W07-GMNHYOKBN6-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-GMNHYOKBN-MAX
+                                       TO  W07-GMNHYOKBN6-COUNT
       *    入力スクロール背景色
            MOVE    SPA-GMN-BGCOLORS    TO  W07-BGCOLORS
       *    入力スクロール背景行区分
@@ -13267,6 +13302,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "GMNHYOKBN4"      TO   MCP-WIDGET
                WHEN    334
                    MOVE  "GMNHYOKBN5"      TO   MCP-WIDGET
+      *H28.10
+               WHEN    349
+                   MOVE  "GMNHYOKBN6"      TO   MCP-WIDGET
       *ver.4.7
                WHEN    335
                    MOVE  "BGCOLORSJ0"      TO   MCP-WIDGET
@@ -13690,6 +13728,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "GMNHYOKBN4"
                    MOVE    334             TO  SPA-GMN-CUR
                WHEN    "GMNHYOKBN5"
+      *H29.10      MOVE    320             TO  SPA-GMN-CUR
+                   MOVE    349             TO  SPA-GMN-CUR
+               WHEN    "GMNHYOKBN6"
                    MOVE    320             TO  SPA-GMN-CUR
       *ver.4.7
                WHEN    "SRYNYKNKNRKBN"

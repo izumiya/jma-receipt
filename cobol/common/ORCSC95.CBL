@@ -68,6 +68,7 @@
       *  04.08.00    NACL=Â¿¡¹Ç¼  15/12/25  HAORIÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/09/XX  £È£²£¸Ç¯£±£°·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/10/04  Í×²ð¸î¾õÂÖÉ½¼¨ÂÐ±þ
       *****************************************************************
       *
       *
@@ -322,6 +323,7 @@
                05  WRK-CHKHKTBYO       PIC X(01)   OCCURS   4.
            03  WRK-CNT                 PIC 9(02).
       *
+           03  WRK-KAIGOMEI            PIC X(60).
       *
       *    ¶Ø´÷£±
        01  WRK-TABOO-G.
@@ -2481,9 +2483,9 @@
            END-IF
       *H28.10
       *    Í×²ð¸îÂÐ¾Ý
-           IF     (SPA-SRYYMD          >=  "20161001" )
+      *    IF     (SPA-SRYYMD          >=  "20161001" )
                PERFORM 110111-YOUKAIGO-SET-SEC
-           END-IF
+      *    END-IF
       *
            .
        1101-PTINF-HENSYU-EXT.
@@ -2931,6 +2933,9 @@
        110111-YOUKAIGO-SET-SEC            SECTION.
       *
            MOVE    ZERO                TO  SPA-YOUKAIGO-ARI
+      *H28.10
+           MOVE    SPACE               TO  SPA-GMN-YOUKAIGO
+           MOVE    SPACE               TO  WRK-KAIGOMEI
       *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
            INITIALIZE                  PTCARE-NINTEI-REC
            MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
@@ -2952,7 +2957,31 @@
                INITIALIZE                  PTCARE-NINTEI-REC
            END-IF
            PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
-                          OR  (SPA-YOUKAIGO-ARI    NOT =   ZERO )
+      *                   OR  (SPA-YOUKAIGO-ARI    NOT =   ZERO )
+      *H28.10
+      *        Í×²ð¸îÌ¾¾Î
+               EVALUATE    PTCRNIN-CAREJOTAICD
+               WHEN    "01"
+                   MOVE    "¼«Î©"          TO  WRK-KAIGOMEI
+               WHEN    "11"
+                   MOVE    "Í×»Ù±ç"        TO  WRK-KAIGOMEI
+               WHEN    "12"
+                   MOVE    "Í×»Ù±ç£±"      TO  WRK-KAIGOMEI
+               WHEN    "13"
+                   MOVE    "Í×»Ù±ç£²"      TO  WRK-KAIGOMEI
+               WHEN    "21"
+                   MOVE    "Í×²ð¸î£±"      TO  WRK-KAIGOMEI
+               WHEN    "22"
+                   MOVE    "Í×²ð¸î£²"      TO  WRK-KAIGOMEI
+               WHEN    "23"
+                   MOVE    "Í×²ð¸î£³"      TO  WRK-KAIGOMEI
+               WHEN    "24"
+                   MOVE    "Í×²ð¸î£´"      TO  WRK-KAIGOMEI
+               WHEN    "25"
+                   MOVE    "Í×²ð¸î£µ"      TO  WRK-KAIGOMEI
+               WHEN    OTHER
+                   MOVE    PTCRNIN-CAREJOTAICD TO  WRK-KAIGOMEI
+               END-EVALUATE
       *
       *        Í×²ð¸î¾õÂÖ
                IF       PTCRNIN-CAREJOTAICD    =   "01"
@@ -2969,7 +2998,20 @@
            MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
            MOVE    "key1"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *    Í×²ð¸îÂÐ¾Ý
+           IF     (SPA-SRYYMD          >=  "20161001" )
+               CONTINUE
+           ELSE
+      *        H28/10¤Þ¤Ç¤Ï¤Ê¤·
+               MOVE    ZERO            TO  SPA-YOUKAIGO-ARI
+           END-IF
       *
+           IF      WRK-KAIGOMEI    NOT =   SPACE
+               STRING  "Í×²ð¸î¾õÂÖ¡§"
+                       WRK-KAIGOMEI        DELIMITED  BY  SPACE
+                                       INTO      SPA-GMN-YOUKAIGO
+               END-STRING
+           END-IF
            .
        110111-YOUKAIGO-SET-EXT.
            EXIT.
@@ -3975,6 +4017,9 @@
                    MOVE    WRK-SYO-YMD         TO  SPA-SYOYMD-HKN
                END-IF
            END-IF
+      *H28.10
+      *    Í×²ð¸îÂÐ¾Ý
+           PERFORM 110111-YOUKAIGO-SET-SEC
       *
       *    Æ±Æü½é¿Ç»»ÄêÆü
            IF      SPA-SRYYMD          >=  "20060401"

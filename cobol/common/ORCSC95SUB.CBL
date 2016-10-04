@@ -36,6 +36,7 @@
       * 04.08.00     NACL-多々納  14/12/XX  平成２７年１月改正対応
       * 04.08.00     NACL-多々納  15/03/XX  平成２７年４月改正対応
       * 04.08.00     NACL-多々納  16/08/XX  相互作用チェック区分追加
+      * 04.08.00     NACL-多々納  16/10/04  要介護状態表示対応
       *****************************************************************
       *
       *
@@ -75,6 +76,12 @@
            03  WRK-LINECNT-G.
                05  WRK-GLINECNT        PIC 9(02).
                05  WRK-NLINECNT        PIC 9(02).
+      *H28.10  リハビリ・患者情報・介護表示区分
+           03  WRK-GMNHYOKBN-G.
+               05  WRK-GMNHYOKBN-G2.
+                   07  WRK-GMNHYOKBN           PIC X(01)
+                                               OCCURS    5.
+               05  WRK-GMNHYOKBN-6             PIC X(01).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -672,8 +679,13 @@
                MOVE    SYS-1038-HAIKIKBN       TO  SPA-HAIKIKBN-FLG
       *        精神療法２０未満加算区分
                MOVE    SYS-1038-SEI20KSNKBN    TO  SPA-SEI20KSNKBN
-      *        リハビリ・患者情報表示区分
-               MOVE    SYS-1038-GMNHYOKBN-G    TO  SPA-GMNHYOKBN-G
+      *H28.10
+      *        リハビリ・患者情報・介護表示区分
+      ****     MOVE    SYS-1038-GMNHYOKBN-G    TO  SPA-GMNHYOKBN-G
+               MOVE    SYS-1038-GMNHYOKBN-G    TO  WRK-GMNHYOKBN-G2
+               MOVE    SYS-1038-GMNHYOKBN-6    TO  WRK-GMNHYOKBN-6
+               MOVE    WRK-GMNHYOKBN-G         TO  SPA-GMNHYOKBN-G
+      *
       *        入力スクロール背景色
                MOVE    SYS-1038-BGCOLORS       TO  SPA-BGCOLORS
       *        入力スクロール背景色
@@ -726,12 +738,15 @@
                MOVE    "0"                 TO  SPA-SEI20KSNKBN
            END-IF
       *    リハビリ・患者情報表示区分
-           IF      SYS-1038-GMNHYOKBN-G    =   SPACE
+           IF     (SYS-1038-GMNHYOKBN-G    =   SPACE )
+             AND  (SYS-1038-GMNHYOKBN-6    =   SPACE )
                MOVE    "1"                 TO  SPA-GMNHYOKBN (1)
                MOVE    "2"                 TO  SPA-GMNHYOKBN (2)
                MOVE    "3"                 TO  SPA-GMNHYOKBN (3)
                MOVE    "4"                 TO  SPA-GMNHYOKBN (4)
                MOVE    "5"                 TO  SPA-GMNHYOKBN (5)
+      *H28.10
+               MOVE    "6"                 TO  SPA-GMNHYOKBN (6)
            END-IF
       *    入力スクロール背景色
            IF      SPA-BGCOLORS        =   SPACE

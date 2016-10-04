@@ -122,13 +122,17 @@
                05  SYS-1038-PRVLAYOUT       PIC  X(01).
       *セット展開区分
                05  SYS-1038-SETALLKBN       PIC  X(01).
+      *H28.10
+      *リハビリ・患者情報・介護表示区分６
+               05  SYS-1038-GMNHYOKBN-6    PIC  X(01).
       *予備 
       ******   05                          PIC  X(488).
       ******   05  SYS-1038-YOBI           PIC  X(480).
       ****     05  SYS-1038-YOBI           PIC  X(454).
       ****     05  SYS-1038-YOBI           PIC  X(253).
       *****    05  SYS-1038-YOBI           PIC  X(213).
-               05  SYS-1038-YOBI           PIC  X(259).
+      ****     05  SYS-1038-YOBI           PIC  X(259).
+               05  SYS-1038-YOBI           PIC  X(258).
       *端末ＩＤ
            03  SYS-1038-TERMID          PIC  X(16).
       *オペーレータＩＤ
