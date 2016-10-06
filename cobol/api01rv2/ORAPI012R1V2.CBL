@@ -32,6 +32,7 @@
       * 04.07.00     NACL-多々納  14/05/13  介護情報他追加対応
       * 04.07.00     NACL-多々納  14/11/XX  初回最終来院日他追加対応
       * 04.07.00     NACL-多々納  15/01/XX  労災保険編集追加対応
+      * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先を追加対応
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -397,6 +398,28 @@
       *    コメント
            MOVE    PTINF-COMMENT-1     TO  PTRES-COMMENT-1
            MOVE    PTINF-COMMENT-2     TO  PTRES-COMMENT-2
+      *H28.10
+      *    勤務先情報
+           MOVE    PTINF-OFFICE-NAME   TO  PTMODRES-OFFICE-NAME
+           MOVE    PTINF-OFFICE-POST   TO  PTMODRES-OFFICE-ZIP-CODE
+           MOVE    PTINF-OFFICE-ADRS   TO  PTMODRES-OFFICE-ADDRESSES1
+           MOVE    PTINF-OFFICE-BANTI  TO  PTMODRES-OFFICE-ADDRESSES2
+           MOVE    PTINF-OFFICE-TEL    TO  PTMODRES-OFFICE-HPONE
+      *    連絡先情報
+           MOVE    PTINF-RENRAKU-NAME  TO  PTMODRES-RENRAKU-NAME
+           MOVE    PTINF-RENRAKU-ZOKUGARA
+                                       TO  PTMODRES-RENRAKU-ZOKUGARA
+           MOVE    PTINF-RENRAKU-POST  TO  PTMODRES-RENRAKU-ZIP-CODE
+           MOVE    PTINF-RENRAKU-ADRS  TO  PTMODRES-RENRAKU-ADDRESSES1
+           MOVE    PTINF-RENRAKU-BANTI TO  PTMODRES-RENRAKU-ADDRESSES2
+           MOVE    PTINF-RENRAKU-TEL1  TO  PTMODRES-RENRAKU-HPONE1
+           MOVE    PTINF-RENRAKU-TEL2  TO  PTMODRES-RENRAKU-HPONE2
+      *    帰省先
+           MOVE    PTINF-KISEI-NAME    TO  PTMODRES-KISEI-NAME
+           MOVE    PTINF-KISEI-POST    TO  PTMODRES-KISEI-ZIP-CODE
+           MOVE    PTINF-KISEI-ADRS    TO  PTMODRES-KISEI-ADDRESSES1
+           MOVE    PTINF-KISEI-BANTI   TO  PTMODRES-KISEI-ADDRESSES2
+           MOVE    PTINF-KISEI-TEL     TO  PTMODRES-KISEI-HPONE
       *
       *    保険種類変換処理
            PERFORM 200210-HKNCOMBI-HEN-SEC

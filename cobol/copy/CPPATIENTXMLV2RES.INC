@@ -25,6 +25,7 @@
       * 04.07.00     NACL-多々納  14/05/12  介護保険情報等追加
       * 04.07.00     NACL-多々納  14/11/XX  初回・最終来院日他追加
       * 04.07.00     NACL-多々納  15/01/XX  労災自賠責編集追加
+      * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先追加
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -69,6 +70,48 @@
                       06  PTRES-HOME-HPONE1        PIC X(15).
       *               自宅電話番号（昼）
                       06  PTRES-HOME-HPONE2        PIC X(15).
+      *H28.10
+      *           勤務先情報
+                  04  PTMODRES-OFFICE-INFO.
+      *               勤務先名
+                      06  PTMODRES-OFFICE-NAME        PIC X(50).
+      *               郵便番号
+                      06  PTMODRES-OFFICE-ZIP-CODE    PIC X(7).
+      *               住所
+                      06  PTMODRES-OFFICE-ADDRESSES1  PIC X(100).
+      *               番地番号
+                      06  PTMODRES-OFFICE-ADDRESSES2  PIC X(100).
+      *               電話番号
+                      06  PTMODRES-OFFICE-HPONE        PIC X(15).
+      *           連絡先情報
+                  04  PTMODRES-RENRAKU-INFO.
+      *               連絡先名
+                      06  PTMODRES-RENRAKU-NAME        PIC X(50).
+      *               連絡先続柄
+                      06  PTMODRES-RENRAKU-ZOKUGARA    PIC X(30).
+      *               郵便番号
+                      06  PTMODRES-RENRAKU-ZIP-CODE    PIC X(7).
+      *               住所
+                      06  PTMODRES-RENRAKU-ADDRESSES1  PIC X(100).
+      *               番地番号
+                      06  PTMODRES-RENRAKU-ADDRESSES2  PIC X(100).
+      *               電話番号　昼
+                      06  PTMODRES-RENRAKU-HPONE1      PIC X(15).
+      *               電話番号　夜
+                      06  PTMODRES-RENRAKU-HPONE2      PIC X(15).
+      *           帰省先情報
+                  04  PTMODRES-KISEI-INFO.
+      *               帰省先名
+                      06  PTMODRES-KISEI-NAME          PIC X(50).
+      *               郵便番号
+                      06  PTMODRES-KISEI-ZIP-CODE      PIC X(7).
+      *               住所
+                      06  PTMODRES-KISEI-ADDRESSES1    PIC X(100).
+      *               番地番号
+                      06  PTMODRES-KISEI-ADDRESSES2    PIC X(100).
+      *               電話番号
+                      06  PTMODRES-KISEI-HPONE         PIC X(15).
+      *
       *           禁忌１
                   04  PTRES-TABOO-1              PIC  X(200).
       *           禁忌２

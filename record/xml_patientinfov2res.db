@@ -24,6 +24,32 @@ xml_patientinfov2res {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
+#--- ∂–Ã≥¿Ë
+		WorkPlace_Information	{
+			WholeName		varchar(50);
+			Address_ZipCode		varchar(07);
+			WholeAddress1		varchar(100);
+			WholeAddress2		varchar(100);
+			PhoneNumber		varchar(15);
+        	};
+#--- œ¢ÕÌ¿Ë
+		Contact_Information	{
+			WholeName		varchar(50);
+			Relationship 		varchar(30);
+			Address_ZipCode		varchar(07);
+			WholeAddress1		varchar(100);
+			WholeAddress2		varchar(100);
+			PhoneNumber1		varchar(15);
+			PhoneNumber2		varchar(15);
+        	};
+#--- µ¢æ ¿Ë
+		Home2_Information	{
+			WholeName		varchar(50);
+			Address_ZipCode		varchar(07);
+			WholeAddress1		varchar(100);
+			WholeAddress2		varchar(100);
+			PhoneNumber		varchar(15);
+        	};
 		Contraindication1		varchar(200);
 		Contraindication2		varchar(200);
 		Allergy1			varchar(200);
