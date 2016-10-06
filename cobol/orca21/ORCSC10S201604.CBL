@@ -85,6 +85,7 @@
       * 04.08.00     NACL-多々納  16/03/XX  平成２８年４月改正対応
       * 04.08.00     NACL-多々納  16/08/XX  自賠責小児科外来診療料対応
       * 04.08.00     NACL-多々納  16/09/XX  平成２８年１０月改正対応
+      * 04.08.00     NACL-多々納  16/10/06  小児特例休日等変換対応
       *****************************************************************
       *
       *
@@ -3053,6 +3054,19 @@
                IF     (SPA-NENREI-YY       <   6  )
                   AND (SPA-JIKANTOKU-NYU   =   1  )
                    MOVE    5               TO  SPA-GAI-JIKANKBN
+               END-IF
+      *H28.10
+           ELSE
+      *        ６歳以上
+               IF     (SPA-NENREI-YY       >=  6  )
+                   EVALUATE    WRK-HZN-JIKANKBN
+      *                小児特例休日　を休日
+                       WHEN    "6"
+                           MOVE    2               TO  SPA-GAI-JIKANKBN
+      *                小児特例深夜　を深夜
+                       WHEN    "7"
+                           MOVE    3               TO  SPA-GAI-JIKANKBN
+                   END-EVALUATE
                END-IF
            END-IF
       *
