@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-多々納  13/08/01  受付ＩＤ追加対応
+      *  04.08.01    NACL-多々納  16/10/XX  保険組合せ番号追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -918,6 +919,12 @@
       *    出力領域保険情報編集処理
       *****************************************************************
        2002101-HKNHEN-TBL-SEC              SECTION.
+      *
+      *H28.10
+      *    保険組合せ番号
+           MOVE    ORCSAPIHKN-THKNCOMBI (IDH)
+                                   TO  ACPLSTRES-COMBINATION-NUMBER
+                                                                (IDX)
       *
       *    保険の種類
            MOVE    ORCSAPIHKN-HKNNUM (IDH)

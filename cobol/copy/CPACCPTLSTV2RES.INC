@@ -71,6 +71,8 @@
                           09  ACPLSTRES-SEX               PIC X(1).
       *               保険情報
                       07  ACPLSTRES-INSURANCE-INFO.
+      *                 保険組合せ番号
+                        09  ACPLSTRES-COMBINATION-NUMBER     PIC X(04).
       *                 保険の種類
                         09  ACPLSTRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *                 保険者番号
