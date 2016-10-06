@@ -1182,13 +1182,23 @@
                            MOVE    PTHKN-NUM       
                                TO  WRK-LF01-NUM      (IDX)
                        END-IF
-                       IF      PTHKN-HONKZKKBN =   "1"
-                           MOVE    "true"      
-                               TO  WRK-LF01-HONKZKKBN (IDX)
-                       ELSE
+      *H28.10
+      *                家族以外を本人とする（労災・自賠責対応）
+      ***              IF      PTHKN-HONKZKKBN =   "1"
+      *                    MOVE    "true"      
+      *                        TO  WRK-LF01-HONKZKKBN (IDX)
+      *                ELSE
+      *                    MOVE    "false"     
+      *                        TO  WRK-LF01-HONKZKKBN (IDX)
+      ***              END-IF
+                       IF      PTHKN-HONKZKKBN =   "2"
                            MOVE    "false"     
                                TO  WRK-LF01-HONKZKKBN (IDX)
+                       ELSE
+                           MOVE    "true"      
+                               TO  WRK-LF01-HONKZKKBN (IDX)
                        END-IF
+      *
                        MOVE    PTHKN-TEKSTYMD  TO  WRK-WYMD
                        PERFORM 500-HIZUKE-HENSYU-SEC
                        MOVE    WRK-HENYMD      
