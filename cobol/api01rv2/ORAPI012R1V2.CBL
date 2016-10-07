@@ -552,7 +552,7 @@
            END-IF
            MOVE    ZERO                TO  IDX
            PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
-                          OR  (IDX                 >=  10 )
+                          OR  (IDX                 >=  50 )
                ADD     1                   TO  IDX
       *        Í×²ð¸î¾õÂÖ
                MOVE    PTCRNIN-CAREJOTAICD TO

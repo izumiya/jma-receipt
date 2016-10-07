@@ -153,7 +153,7 @@ xml_patientinfov2res {
                 	Certification_Date		varchar(10);
                 	Certificate_StartDate		varchar(10);
                 	Certificate_ExpiredDate		varchar(10);
-	            	} [10];
+	            	} [50];
 		Community_Disease  {
 			Target_Disease			varchar(05);
 	            	} [4];

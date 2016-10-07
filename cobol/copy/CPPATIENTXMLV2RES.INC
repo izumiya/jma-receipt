@@ -265,7 +265,7 @@
       *                   有効終了日
                           07  PTRES-CARE-END-DATE          PIC X(10).
       *               要介護認定情報
-                      05  PTRES-CERTIFICATION-G    OCCURS   10.
+                      05  PTRES-CERTIFICATION-G    OCCURS   50.
       *                   要介護状態区分
                           07  PTRES-NEED-CARE-STATE-CODE   PIC X(02).
       *                   要介護状態名称
