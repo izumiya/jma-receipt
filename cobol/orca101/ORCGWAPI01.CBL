@@ -138,10 +138,10 @@
                05   FILLER             PIC X(10)   VALUE "パピプペポ".
                05   FILLER             PIC X(02)   VALUE "ヴ".
                05   FILLER             PIC X(10)   VALUE "ァィゥェォ".
-               05   FILLER             PIC X(08)   VALUE "ャュョッ".
+               05   FILLER             PIC X(10)   VALUE "ャュョヮッ".
            03  CONST-KATAKANA-R    REDEFINES   CONST-KATAKANA-G.
-               05   CONST-KATAKANA     PIC X(02)   OCCURS  85.
-           03  CONST-KATAKANA-MAX      PIC 9(05)   VALUE   85.
+               05   CONST-KATAKANA     PIC X(02)   OCCURS  86.
+           03  CONST-KATAKANA-MAX      PIC 9(05)   VALUE   86.
            03  CONST-GSRAUTH.
                05    FILLER            PIC X(10)   VALUE   "0 0 0     ".
                05    FILLER            PIC X(10)   VALUE   "     0000 ".
