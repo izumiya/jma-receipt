@@ -120,7 +120,7 @@
        01  CONST-AREA.
            03  CONST-USER-MAX          PIC 9(05)   VALUE 600.
            03  CONST-KATAKANA-G.
-               05   FILLER             PIC X(04)   VALUE "　ー".
+               05   FILLER             PIC X(08)   VALUE "　ー゛゜".
                05   FILLER             PIC X(10)   VALUE "アイウエオ".
                05   FILLER             PIC X(10)   VALUE "カキクケコ".
                05   FILLER             PIC X(10)   VALUE "サシスセソ".
@@ -137,9 +137,11 @@
                05   FILLER             PIC X(10)   VALUE "バビブベボ".
                05   FILLER             PIC X(10)   VALUE "パピプペポ".
                05   FILLER             PIC X(02)   VALUE "ヴ".
+               05   FILLER             PIC X(10)   VALUE "ァィゥェォ".
+               05   FILLER             PIC X(08)   VALUE "ャュョッ".
            03  CONST-KATAKANA-R    REDEFINES   CONST-KATAKANA-G.
-               05   CONST-KATAKANA     PIC X(02)   OCCURS  74.
-           03  CONST-KATAKANA-MAX      PIC 9(05)   VALUE   74.
+               05   CONST-KATAKANA     PIC X(02)   OCCURS  85.
+           03  CONST-KATAKANA-MAX      PIC 9(05)   VALUE   85.
            03  CONST-GSRAUTH.
                05    FILLER            PIC X(10)   VALUE   "0 0 0     ".
                05    FILLER            PIC X(10)   VALUE   "     0000 ".
