@@ -34,6 +34,7 @@
       *  03.05.00    NACL-多々納  07/05/09  グループ診療対応
       *
       *  04.08.01    NACL-藤原    16/02/23  傷病名欄記載対応
+      *  04.08.02    NACL-藤原    16/10/11  傷病名記載方法変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -521,17 +522,25 @@
                END-IF
       *
                PERFORM         UNTIL   FLG-PTBYOMEI    =   1
-                   IF    ( WRK-NYUINYMD        <=   PTBYO-SRYYMD )
-                   AND   ( WRK-TAIINYMD        >=   PTBYO-SRYYMD )
-                       INITIALIZE                      ORCSMKBYOMEIAREA
+                   IF      WRK-TAIINYMD        >=   PTBYO-SRYYMD
+                       IF      PTBYO-TENKIKBN       =   SPACE
+                           MOVE    1               TO  FLG-PTBYOMEI
+                       ELSE
+                           IF      WRK-NYUINYMD    <=   PTBYO-TENKIYMD
+                               MOVE    SMKBYO-BYOMEI   TO  HCN02-BYOMEI
+                               MOVE    1               TO  FLG-PTBYOMEI
+                           END-IF
+                       END-IF
+                   END-IF
+       *
+                   IF      FLG-PTBYOMEI        =   1
+                       INITIALIZE                  ORCSMKBYOMEIAREA
                        MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
                        MOVE    PTBYO-BYOMEI    TO  SMKBYO-BYOMEI
                        MOVE    PTBYO-HOSOKU-COMMENT
                                                TO  SMKBYO-HOSOKU-COMMENT
                        CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
                        MOVE    SMKBYO-BYOMEI   TO  HCN02-BYOMEI
-      *
-                       MOVE    1               TO  FLG-PTBYOMEI
                    ELSE
                        MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
                        MOVE    "key49"         TO  MCP-PATHNAME
