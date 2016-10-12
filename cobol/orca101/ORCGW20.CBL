@@ -5731,6 +5731,11 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
                END-IF
            END-IF
       *
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=  CONST-H260401 )
+            AND  ( SPA-NAI-W20-YKNCHOKACHK-G NOT =  SPACE )
+               PERFORM 4100-YKNCHOKAKBN-CMB-EDT-SEC
+           END-IF
+      *
            PERFORM 42011-RYOYOSANTEI-CHK-SEC
            IF    ( FLG-RYOYOSANTEI =   1 )
                IF    ( SPA-GMN-W20-SBT         =   "08" OR "09" )
@@ -10273,6 +10278,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
            END-PERFORM
       *
            IF    ( WRK-CMB-ITM     =   SPACE )
+            AND  ( SPA-NAI-W20-YKNCHOKACHK-G NOT =  SPACE )
                MOVE    SPA-GMN-W20-YKNCHOKAKBNL (1)
                                        TO  WRK-CMB-ITM
            END-IF
