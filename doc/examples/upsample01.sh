@@ -18,6 +18,7 @@ PARAMFILE=/tmp/userpgparam.txt
 #        ${10} 処理・帳票名
 #        ${11} プリンタ名
 #        ${12} 医療機関識別番号
+#        ${13} 伝票番号
 #-------------------------------------------#
 #
 
@@ -33,8 +34,9 @@ PARAMFILE=/tmp/userpgparam.txt
 	echo    "処理・帳票名："${10} >> $PARAMFILE
 	echo    "プリンタ名："${11} >> $PARAMFILE
 	echo    "医療機関識別番号："${12} >> $PARAMFILE
+	echo    "伝票番号："${13} >> $PARAMFILE
 
 #
-#       $DBSTUB -dir $LDDEFDIR/directory -bd xxxxxxxx XXXXXXXX -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12}
+#       $DBSTUB -dir $LDDEFDIR/directory -bd xxxxxxxx XXXXXXXX -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13}
 #        
 	exit
