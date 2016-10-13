@@ -179,6 +179,7 @@
            03  WRK-YKSTYMD.
                05  WRK-YKSTYM          PIC X(06).
                05  WRK-YKSTDD          PIC 9(02).
+           03  WRK-HZN-DD              PIC 9(02).
       *
       *    投薬日
        01  TBL-TOUYAKU-AREA.
@@ -920,10 +921,11 @@
                                MOVE    TNS-YUKOSTYMD
                                                      TO  WRK-YKSTYMD
       *                        月途中麻毒開始日
+                               PERFORM 6001110-TENSU-CHK-SEC
                                IF     (WRK-MADOKU-ST   =   ZERO )
                                   OR  (WRK-MADOKU-ST   >   WRK-YKSTDD)
                                    MOVE    WRK-YKSTDD
-                                                     TO   WRK-MADOKU-ST
+                                                   TO   WRK-MADOKU-ST
                                END-IF
                            ELSE
                                MOVE    01          TO   WRK-MADOKU-ST
@@ -955,6 +957,26 @@
       *
            .
        600111-SRYACT-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    月途中麻毒開始日処理
+      *****************************************************************
+       6001110-TENSU-CHK-SEC             SECTION.
+      *
+      *    １日の算定
+           MOVE    WRK-DD              TO  WRK-HZN-DD
+           MOVE    01                  TO  WRK-DD
+           MOVE    SRY-SRYCD (IDX2)    TO  TNS-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+      *
+           IF      TNS-MADOKUKBN       NOT =   ZERO
+      *        １日分が麻毒の時、１日から
+               MOVE    01              TO  WRK-YKSTDD
+           END-IF
+           MOVE    WRK-HZN-DD          TO  WRK-DD
+      *
+           .
+       6001110-TENSU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    入院・外泊の編集処理
