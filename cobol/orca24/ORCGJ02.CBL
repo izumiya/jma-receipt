@@ -75,6 +75,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/06/XX  Ãæ¿´ÀÅÌ®¡Ê¿¢Æþ·¿¥«¥Æ¡¼¥Æ¥ë¡ËÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/08/XX  »ý»²ÌôÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/10/XX  °ì³çÊÑ¹¹¹àÌÜ·å¿ôÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -629,13 +630,13 @@
                    07  WRK-DAY         PIC 9(03).
                    07  WRK-DAYDEL      PIC 9(01).
            03  WRK-IKKATU-TBL.
-               05  WRK-IKKATU-OCC          OCCURS   60.
-                   07  WRK-KAISUT          PIC X(60).
-                   07  WRK-DAYG            OCCURS   30.
-                       09  WRK-DAY1            PIC X(60).
-                       09  WRK-DAY2            PIC X(60).
+               05  WRK-IKKATU-OCC          OCCURS   99.
+                   07  WRK-KAISUT          PIC X(99).
+                   07  WRK-DAYG            OCCURS   99.
+                       09  WRK-DAY1            PIC X(99).
+                       09  WRK-DAY2            PIC X(99).
            03  WRK-KAISU-9              PIC 9(03).
-           03  WRK-DAYG-9               OCCURS   30.
+           03  WRK-DAYG-9               OCCURS   99.
                05  WRK-DAY1-9               PIC 9(02).
                05  WRK-DAY2-9               PIC 9(02).
            03  WRK-IKKATUDAY            PIC 9(02).
@@ -646,7 +647,7 @@
            03  IDW4                     PIC 9(04).
            03  IDW5                     PIC 9(04).
            03  IDW9                     PIC 9(04).
-           03  WRK-HZNSU              PIC X(60).
+           03  WRK-HZNSU              PIC X(99).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -5894,7 +5895,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  IDW9
       *
            PERFORM VARYING    IDW5     FROM    1   BY  1
-                   UNTIL     (IDW5     >   20  )  OR
+      **********   UNTIL     (IDW5     >   20  )  OR
+                   UNTIL     (IDW5     >   99  )  OR
                              (SPA-ERRCD    NOT =   SPACE )
       *
                EVALUATE    SPA-GMN-IKKATU(IDW5:1)
@@ -5972,7 +5974,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            PERFORM VARYING    IDW1     FROM    1   BY  1
-                   UNTIL     (IDW1     >   60  )  OR
+      ****         UNTIL     (IDW1     >   60  )  OR
+                   UNTIL     (IDW1     >   99  )  OR
                              (SPA-ERRCD    NOT =   SPACE ) OR
                             ((WRK-KAISUT(IDW1) =   SPACE )  AND
                              (WRK-DAY1  (IDW1 1) =   SPACE )  AND
@@ -5995,7 +5998,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-IF
                PERFORM VARYING    IDW2     FROM    1   BY  1
-                       UNTIL     (IDW2     >   30  )  OR
+     ***               UNTIL     (IDW2     >   30  )  OR
+                       UNTIL     (IDW2     >   99  )  OR
                              (SPA-ERRCD    NOT =   SPACE ) OR
                             ((WRK-DAY1  (IDW1 IDW2) =   SPACE )  AND
                              (WRK-DAY2  (IDW1 IDW2) =   SPACE ))

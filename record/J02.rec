@@ -227,7 +227,7 @@ J02 {
         item varchar(65)[40];
     };
     IKKATU {
-      textdata varchar(20);
+      textdata varchar(99);
     };
     NYUINMSG1 {
       style varchar(20);

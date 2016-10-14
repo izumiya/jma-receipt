@@ -84,7 +84,7 @@
                 04  J02-HHKNCOMBI-ITEM
                         PIC X(65)   OCCURS  40 TIMES.
               03  J02-IKKATU.
-                04  J02-VALUE   PIC X(20).
+                04  J02-VALUE   PIC X(99).
               03  J02-NYUINMSG1.
                 04  J02-NYUINMSG1-STYLE   PIC X(20).
                 04  J02-NYUINMSG1-VALUE   PIC X(50).

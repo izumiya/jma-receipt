@@ -91,7 +91,7 @@
       *H28.4
                        09  SPA-NAI-KEIFLG3           PIC 9(01).
       *
-                       09  SPA-GMN-IKKATU            PIC X(20).
+                       09  SPA-GMN-IKKATU            PIC X(99).
       *
       *        ø«Œ≈Õ˙ŒÚ∆‚Õ∆
                05  SPA-GMN-RRKTBL.
