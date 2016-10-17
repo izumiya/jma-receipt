@@ -5763,7 +5763,7 @@
       *
            END-PERFORM
       *
-           IF    (     IDX26               >   ZERO )
+           IF    (     IDX26               >   TCOMBI-MAX )
                IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
                    MOVE    IDX26   TO      TCOMBI-MAX
                    MOVE    WRK-HKNCOMBINUM
