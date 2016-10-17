@@ -148,7 +148,7 @@
       *
        01  CONST-AREA.
            03  CONST-SCRIPTID          PIC X(20)   VALUE   "ORCBQ02.sh".
-           03  CONST-PTINF-MAX         PIC 9(05)   VALUE   500.
+           03  CONST-PTINF-MAX         PIC 9(05)   VALUE   2000.
       *
       *****************************************************************
       *    ファイルレイアウト

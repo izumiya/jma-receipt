@@ -257,7 +257,7 @@
                VALUE   "ORCBQ01".
            03  CONST-BTPARA-SHELLID-LNK01          PIC X(08)
                VALUE   "ORCBQL01".
-           03  CONST-RECE-MAX      PIC 9(05)   VALUE 500.
+           03  CONST-RECE-MAX      PIC 9(05)   VALUE 2000.
            03  CONST-TOUKEI-MAX    PIC 9(05)   VALUE 9999.
            03  CONST-LINE-MAX      PIC 9(05)   VALUE 200.
       *
