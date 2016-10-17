@@ -1121,6 +1121,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM   VARYING   IDZ    FROM    1   BY  1
                           UNTIL  ( IDZ    >       100               )
                            OR    ( WRK-TCOMB2-TEKSTYMD(IDZ) = SPACE )
+                IF  WRK-TCOMB2-SYU-HKNKOHSBTKBN(IDZ)
+                                                = "4" OR "8" OR "9"
+                 ADD       1    TO  WRK-TCOMB2-MAX
+                 MOVE      WRK-TCOMB2-REC(IDZ)
+                                TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
+                ELSE
                  MOVE   ZERO    TO  FLG-TUUKA
                  IF  (WRK-TCOMB2-TEKSTYMD(IDZ)
                                          >= WRK-NYUSYO-TEKSTYMD(IDY3))
@@ -1139,22 +1145,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
-                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
-                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
+                   IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                    MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
-                  ELSE
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"            TO  LNK-DAY6-IRAI
-                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3)
-                                           TO  LNK-DAY6-KIJUN
-                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1              TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN TO
+                   ELSE
+                    INITIALIZE                  STS-AREA-DAY
+                    INITIALIZE                  LNK-DAY6-AREA
+                    MOVE    "61"            TO  LNK-DAY6-IRAI
+                    MOVE    WRK-NYUSYO-TEKEDYMD(IDY3)
+                                            TO  LNK-DAY6-KIJUN
+                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                    MOVE     1              TO  LNK-DAY6-ZOGEN
+                    CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
-                  END-IF
+                   END-IF
                  END-IF
                  IF  (WRK-TCOMB2-TEKSTYMD(IDZ)
                                          <  WRK-NYUSYO-TEKSTYMD(IDY3))
@@ -1167,22 +1173,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
-                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
-                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
+                   IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                    MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
-                  ELSE
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"            TO  LNK-DAY6-IRAI
-                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3)
-                                           TO  LNK-DAY6-KIJUN
-                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   MOVE    -1              TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN TO
+                   ELSE
+                    INITIALIZE                  STS-AREA-DAY
+                    INITIALIZE                  LNK-DAY6-AREA
+                    MOVE    "61"            TO  LNK-DAY6-IRAI
+                    MOVE    WRK-NYUSYO-TEKSTYMD(IDY3)
+                                            TO  LNK-DAY6-KIJUN
+                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                    MOVE    -1              TO  LNK-DAY6-ZOGEN
+                    CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
-                  END-IF
+                   END-IF
       *
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
@@ -1199,22 +1205,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
-                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
-                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
+                   IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                    MOVE    WRK-NYUSYO-TEKSTYMD(IDY3) TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
-                  ELSE
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"            TO  LNK-DAY6-IRAI
-                   MOVE    WRK-NYUSYO-TEKSTYMD(IDY3)
-                                           TO  LNK-DAY6-KIJUN
-                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   MOVE    -1              TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN TO
+                   ELSE
+                    INITIALIZE                  STS-AREA-DAY
+                    INITIALIZE                  LNK-DAY6-AREA
+                    MOVE    "61"            TO  LNK-DAY6-IRAI
+                    MOVE    WRK-NYUSYO-TEKSTYMD(IDY3)
+                                            TO  LNK-DAY6-KIJUN
+                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                    MOVE    -1              TO  LNK-DAY6-ZOGEN
+                    CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKEDYMD(WRK-TCOMB2-MAX)
-                  END-IF
+                   END-IF
       *
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
@@ -1227,28 +1233,29 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
-                  IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
-                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
+                   IF   WRK-NYUSYO-JKYSNUM(IDY3)(1:1) = "1"
+                    MOVE    WRK-NYUSYO-TEKEDYMD(IDY3) TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
-                  ELSE
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"            TO  LNK-DAY6-IRAI
-                   MOVE    WRK-NYUSYO-TEKEDYMD(IDY3)
-                                           TO  LNK-DAY6-KIJUN
-                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1              TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN TO
+                   ELSE
+                    INITIALIZE                  STS-AREA-DAY
+                    INITIALIZE                  LNK-DAY6-AREA
+                    MOVE    "61"            TO  LNK-DAY6-IRAI
+                    MOVE    WRK-NYUSYO-TEKEDYMD(IDY3)
+                                            TO  LNK-DAY6-KIJUN
+                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                    MOVE     1              TO  LNK-DAY6-ZOGEN
+                    CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+                    MOVE    LNK-DAY6-KEISAN TO
                                WRK-TCOMB3-TEKSTYMD(WRK-TCOMB2-MAX)
-                  END-IF
+                   END-IF
                  END-IF
                  IF   FLG-TUUKA  =  ZERO
                    ADD     1    TO  WRK-TCOMB2-MAX
                    MOVE    WRK-TCOMB2-REC(IDZ)
                                 TO  WRK-TCOMB3-REC(WRK-TCOMB2-MAX)
                  END-IF
+                END-IF
                END-PERFORM
       *
                MOVE     WRK-TCOMB3-AREA    TO  WRK-TCOMB2-AREA
