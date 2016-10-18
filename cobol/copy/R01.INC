@@ -24,7 +24,7 @@
                 04  R01-VALUE   PIC X(10).
               03  R01-RENNUM-STATE   PIC S9(09) BINARY.
               03  R01-RENNUM.
-                04  R01-VALUE   PIC S9(3).
+                04  R01-VALUE   PIC S9(4).
               03  R01-SRYYM-STATE   PIC S9(09) BINARY.
               03  R01-SRYYM.
                 04  R01-VALUE   PIC X(7).
@@ -41,7 +41,7 @@
                   05  R01-COUNT   PIC S9(9)   BINARY.
                   05  R01-ROW PIC S9(9)   BINARY.
                   05  R01-ROWATTR PIC S9(9)   BINARY.
-                  05  R01-ITEM        OCCURS  500 TIMES.
+                  05  R01-ITEM        OCCURS  2000 TIMES.
                     06  R01-TRENNUM  PIC X(4).
                     06  R01-TTSTPTNUMKBN  PIC X(2).
                     06  R01-TPTNUM   PIC X(20).
@@ -54,7 +54,7 @@
                     06  R01-TJBI     PIC X(4).
                     06  R01-TKOU     PIC X(4).
                     06  R01-TDAISAN  PIC X(4).
-                  05  R01-SELECT  PIC X       OCCURS  500 TIMES.
+                  05  R01-SELECT  PIC X       OCCURS  2000 TIMES.
               03  R01-SYOKBN-STYLE   PIC X(20).
               03  R01-SYOKBN         PIC X(68).
               03  R01-LABEL.
@@ -81,4 +81,4 @@
               03  R01-CREYMDH.
                 04  R01-VALUE   PIC X(13).
               03  R01-KENSU.
-                04  R01-VALUE   PIC X(7).
+                04  R01-VALUE   PIC X(9).

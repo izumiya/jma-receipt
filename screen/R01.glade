@@ -451,7 +451,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>True</editable>
-        <format>ZZZ</format>
+        <format>ZZZZ</format>
         <signal>
           <name>changed</name>
           <handler>entry_changed</handler>
@@ -720,7 +720,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>999/999</label>
+        <label>9999/9999</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>

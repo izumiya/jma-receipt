@@ -178,6 +178,7 @@
       *  04.08.04    NACL-藤原    16/05/20  情報削除から遷移時の共通スパ
       *                                     設定の修正
       *  04.08.05    NACL-藤原    16/08/24  持参薬対応
+      *  04.08.06    NACL-藤原    16/10/10  個別作成の最大を２０００に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -260,6 +261,10 @@
            03  FLG-TAISYO          PIC 9(01).
            03  FLG-4001-RSIIRYOKBN PIC X(01).
       *
+           03  FLG-END2            PIC 9(01).
+           03  FLG-SPASCR          PIC 9(01).
+           03  FLG-SPATMP          PIC 9(01).
+      *
       *    フラグ領域
        01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
@@ -289,8 +294,8 @@
       *    画面用ワーク（画面ＳＰＡにあわせる）
        01  WRK-GMN-SORT.
            03  WRK-GMN-TBL.
-               05  WRK-GMN-TBL-G           OCCURS   500.
-                   07  WRK-GMN-TRENNUM PIC 9(03).
+               05  WRK-GMN-TBL-G           OCCURS   2000.
+                   07  WRK-GMN-TRENNUM PIC 9(04).
                    07  WRK-GMN-TTSTPTNUMKBN
                                        PIC X(02).
                    07  WRK-GMN-TPTNUM  PIC X(20).
@@ -306,7 +311,7 @@
                    07  WRK-GMN-TDAISAN PIC X(04).
       * 
            03  WRK-NAI-TBL.
-               05  WRK-NAI-TBL-G           OCCURS   500.
+               05  WRK-NAI-TBL-G           OCCURS   2000.
                    07  WRK-NAI-TPTID       PIC 9(10).
                    07  WRK-NAI-TSRYYM      PIC 9(06).
                    07  WRK-NAI-TTAISYO     PIC 9(01).
@@ -317,7 +322,7 @@
        01  WRK-AREA.
            03  WRK-MOTOPG          PIC X(08).
            03  WRK-SELNO           PIC 9(03).
-           03  WRK-NUM             PIC ZZ9.
+           03  WRK-NUM             PIC ZZZ9.
            03  WRK-GMN-CUR         PIC 9(02).
            03  WRK-RECEERR         PIC X(200).
            03  WRK-RIDMSG          PIC X(200).
@@ -341,7 +346,7 @@
            03  WRK-ERRCD           PIC X(04).
       *
            03  WRK-KBNCD-X.
-               05  WRK-KBNCD-9     PIC 9(03).
+               05  WRK-KBNCD-9     PIC 9(04).
       * 
            03  WRK-PREFNUM         PIC 9(02).
       *
@@ -356,9 +361,9 @@
            03  WRK-KENSU-X         PIC X(10).
       *
            03  WRK-BTPARA-KENSU.
-               05  WRK-BTPARA-KENSU1   PIC ZZ9.
+               05  WRK-BTPARA-KENSU1   PIC ZZZ9.
                05  WRK-BTPARA-FL       PIC X(01).
-               05  WRK-BTPARA-KENSU2   PIC ZZ9.
+               05  WRK-BTPARA-KENSU2   PIC ZZZ9.
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
       *
@@ -370,6 +375,8 @@
            03  WRK-ACCT-SRYYM      PIC 9(06).
            03  WRK-ACCT-PTID       PIC 9(10).
            03  WRK-ACCT-NYUGAIKBN  PIC X(01).
+      *
+           03  WRK-FILEMEI         PIC X(20).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -426,7 +433,7 @@
            03  WRK-CONS-DAISANSYA-HKNNUM
                                    PIC X(03)   VALUE   "970". 
       *
-           03  WRK-CONS-LINE-MAX   PIC 9(03)   VALUE   500.
+           03  WRK-CONS-LINE-MAX   PIC 9(04)   VALUE   2000.
       *
       *    エラーファイルＩＤ
            03  WRK-CONS-FILE-ID    PIC X(08)   VALUE   "OR042ERR".
@@ -500,6 +507,10 @@
       *    レセプト電算
            COPY    "CPRECEDEN.INC".
       *
+      *    ＳＰＡ一時テーブル
+       01  SPATMP-REC.
+           COPY    "CPSPA-TMP.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -528,6 +539,7 @@
       *     
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+           COPY    "MCPDATA2.INC".
       *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
@@ -574,8 +586,11 @@
            INITIALIZE                  WRK-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
-           MOVE    SPA-FREE        TO  SPA-R01FREE
+      *****MOVE    SPA-FREE        TO  SPA-R01FREE
            MOVE    SPA-WORK        TO  SPA-R01KYOUTU
+      *
+      *    画面ＳＰＡ読込み
+           PERFORM 000-R01SPA-SET-SEC
       *
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
@@ -596,13 +611,120 @@
                PERFORM 500-SET-SCREEN
            END-IF
       *
+      *    画面ＳＰＡ書込み
+           IF      FLG-END2            =   ZERO
+               PERFORM 000-R01SPA-OUT-SEC
+           END-IF
+      *
            MOVE    SPA-R01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
-           MOVE    SPA-R01FREE     TO  SPA-FREE
+      *****MOVE    SPA-R01FREE     TO  SPA-FREE
       *
            .
            EXIT    PROGRAM
            .
+      *
+      *****************************************************************
+      *    画面ＳＰＡ読込
+      *****************************************************************
+       000-R01SPA-SET-SEC             SECTION.
+      *
+           INITIALIZE                      SPA-R01-AREA
+      *
+           MOVE    "SPAGMN"            TO  WRK-FILEMEI
+           PERFORM 000-SPATMP-SEL-SEC
+      *
+           MOVE    "SPANAI"            TO  WRK-FILEMEI
+           PERFORM 000-SPATMP-SEL-SEC
+           .
+       000-R01SPA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面ＳＰＡ読込
+      *****************************************************************
+       000-SPATMP-SEL-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SPASCR
+      *
+           INITIALIZE                      SPATMP-REC
+           MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
+           MOVE    "R01"               TO  SPATMP-GYOUMUID
+           MOVE    SPA-TERMID          TO  SPATMP-TERMID
+           MOVE    WRK-FILEMEI         TO  SPATMP-FILEMEI
+           MOVE    1                   TO  SPATMP-EDANUM
+      *
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-SPATMP-READ-SEC
+               IF      FLG-SPATMP          =   ZERO
+                   IF      WRK-FILEMEI         =   "SPAGMN"
+                       MOVE    SPATMP-DATA-REC     TO   SPA-R01-GMN
+                   ELSE
+                       MOVE    SPATMP-DATA-REC     TO   SPA-R01-NAI
+                   END-IF
+               END-IF
+           ELSE
+               INITIALIZE                  SPATMP-REC
+               MOVE    1               TO  FLG-SPATMP
+           END-IF
+      *
+           MOVE    "key"              TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-DBCLOSE-SEC
+           .
+       000-SPATMP-SEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面ＳＰＡ書込
+      *****************************************************************
+       000-R01SPA-OUT-SEC             SECTION.
+      *
+      *    一時保存テーブル削除処理
+           PERFORM 900-SPATMP-DBDELETE-SEC
+      *
+           MOVE    "SPAGMN"            TO  WRK-FILEMEI
+           PERFORM 000-SPATMP-OUT-SEC
+      *
+           MOVE    "SPANAI"            TO  WRK-FILEMEI
+           PERFORM 000-SPATMP-OUT-SEC
+      *
+           .
+       000-R01SPA-OUT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面ＳＰＡ書込
+      *****************************************************************
+       000-SPATMP-OUT-SEC                SECTION.
+      *
+           INITIALIZE                      SPATMP-REC
+           MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
+           MOVE    "R01"               TO  SPATMP-GYOUMUID
+           MOVE    SPA-TERMID          TO  SPATMP-TERMID
+           MOVE    WRK-FILEMEI         TO  SPATMP-FILEMEI
+           MOVE    1                   TO  SPATMP-EDANUM
+           IF      WRK-FILEMEI         =   "SPAGMN"
+               MOVE    SPA-R01-GMN         TO  SPATMP-DATA-REC
+           ELSE
+               MOVE    SPA-R01-NAI         TO  SPATMP-DATA-REC
+           END-IF
+      *
+           MOVE    SPATMP-REC          TO  MCPDATA2-REC
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-CALL-SEC
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "R01 SPATMP INSERT ERR:"  MCP-RC
+                           ",KEY:" SPATMP-KEY
+               MOVE    "9999"          TO  SPA-ERRCD
+           END-IF
+           .
+       000-SPATMP-OUT-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    初期　処理
       *****************************************************************
@@ -654,18 +776,21 @@
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
       *
+      *        画面ＳＰＡ読込み
+               PERFORM 000-R01SPA-SET-SEC
+      *
       *        元の画面へ戻す
                IF      SPA-MOTOPG      =   "XB01"
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
-                   MOVE    LNK-SCRSPA      TO  SPA-R01FREE
+      *****        MOVE    LNK-SCRSPA      TO  SPA-R01FREE
                    MOVE    SPA-WORK        TO  SPA-R01KYOUTU
                    GO  TO  300-SCREEN-EXT
                END-IF
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
       *
-               IF      WRK-MOTOPG(1:3)     =  "P97"  
+               IF      WRK-MOTOPG(1:3)     =  "P97"
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
-                   MOVE    LNK-SCRSPA      TO  SPA-R01FREE
+      *****        MOVE    LNK-SCRSPA      TO  SPA-R01FREE
                    MOVE    SPA-WORK        TO  SPA-R01KYOUTU
                    PERFORM 3101-U01SPASET-SEC
                    GO      TO      300-SCREEN-EXT
@@ -3018,6 +3143,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
       *
+      *    一時保存テーブル削除処理
+           MOVE    1                   TO  FLG-END2
+           PERFORM 900-SPATMP-DBDELETE-SEC
+      *
            INITIALIZE                  SPA-RID1-AREA
                                        SPA-RIDCD-AREA
            MOVE    ZERO            TO  SPA-R01-JOBCNT       
@@ -4212,6 +4341,16 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
 grpsys         MOVE    SPA-HOSPNUM         TO  SYS-2002-HOSPNUM
                MOVE    SYS-2002-REC        TO  MCPDATA-REC
                PERFORM 900-SYSKANRI-INV-SEC
+               IF      FLG-SYSKANRI        =   1
+                   INITIALIZE                  SYS-2002-REC
+                   MOVE    "2002"              TO  SYS-2002-KANRICD
+                   MOVE    "0001"              TO  SYS-2002-KBNCD
+                   MOVE    SPA-SYSYMD          TO  SYS-2002-STYUKYMD
+                                                   SYS-2002-EDYUKYMD
+grpsys             MOVE    SPA-HOSPNUM         TO  SYS-2002-HOSPNUM
+                   MOVE    SYS-2002-REC        TO  MCPDATA-REC
+                   PERFORM 900-SYSKANRI-INV-SEC
+               END-IF
                IF      FLG-SYSKANRI        =   ZERO
                    INITIALIZE                      SYS-2002-REC
                    MOVE    "2002"                  TO  SYS-2002-KANRICD
@@ -4926,7 +5065,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                                 TO  R99-MSG
                END-IF                                 
            ELSE                                        
-               IF      JOB-STOPFLG          =   ZERO                                        
+               IF      JOB-STOPFLG          =   ZERO
                    MOVE    WIDGET-NORMAL        TO  R99-B21-STATE
                END-IF
                MOVE    "B11"                TO  MCP-WIDGET
@@ -4952,7 +5091,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
-           MOVE    SPA-R01FREE         TO  LNK-SCRSPA
+      *****MOVE    SPA-R01FREE         TO  LNK-SCRSPA
       *
       *    画面移行用のパラメタ変更
            MOVE    "R01"               TO  SPA-MOTOPG
@@ -4981,7 +5120,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPACE               TO  LINKAREA
       *
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
-           MOVE    SPA-R01FREE         TO  LNK-SCRSPA
+      *****MOVE    SPA-R01FREE         TO  LNK-SCRSPA
       *
       *    画面移行用のパラメタ変更
            MOVE    "R01"               TO  SPA-MOTOPG
@@ -6214,6 +6353,84 @@ grpsys     PERFORM 900-DBFETCH-SEC
        900-SEIKYU-SKYKBN-CHECK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    一時保存テーブルＤＢＳＥＬＥＣＴ処理
+      *****************************************************************
+       900-SPATMP-DBSELECT-SEC                SECTION.
+      *
+           MOVE    SPATMP-REC          TO  MCPDATA2-REC
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 900-SPATMP-CALL-SEC
+      *
+           .
+       900-SPATMP-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一時保存テーブルＤＢＦＥＴＣＨ処理
+      *****************************************************************
+       900-SPATMP-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-SPATMP-CALL-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA2-REC    TO  SPATMP-REC
+               MOVE    ZERO            TO  FLG-SPATMP
+           ELSE
+               INITIALIZE                  SPATMP-REC
+               MOVE    1               TO  FLG-SPATMP
+           END-IF
+      *
+           .
+       900-SPATMP-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一時保存テーブルクローズ処理
+      *****************************************************************
+       900-SPATMP-DBCLOSE-SEC         SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           PERFORM 900-SPATMP-CALL-SEC
+      *
+           .
+       900-SPATMP-DBCLOSE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一時保存テーブル削除処理
+      *****************************************************************
+       900-SPATMP-DBDELETE-SEC         SECTION.
+      *
+           INITIALIZE                      SPATMP-REC
+           MOVE    "R01"               TO  SPATMP-GYOUMUID
+           MOVE    SPA-TERMID          TO  SPATMP-TERMID
+           MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
+      *
+           MOVE    SPATMP-REC          TO  MCPDATA2-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "del2"              TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-CALL-SEC
+      *
+           .
+       900-SPATMP-DBDELETE-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    一時保存テーブル検索処理
+      *****************************************************************
+       900-SPATMP-CALL-SEC                SECTION.
+      *
+           MOVE    "tbl_spa_tmp"       TO  MCP-TABLE
+           CALL    "ORCDBSPATMP"       USING   MCPAREA
+                                               MCPDATA2-REC
+                                               SPA-AREA
+      *
+           .
+       900-SPATMP-CALL-EXT.
+           EXIT.
       *
       *****************************************************************
       *    ジョブ管理ＤＢ制御処理
