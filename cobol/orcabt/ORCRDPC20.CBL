@@ -1084,6 +1084,7 @@
            03  WRK-FEDT-HOUKATU-FLG    PIC X(01).
            03  WRK-FEDT-PREV-TEN       PIC 9(08).
            03  WRK-FEDT-PREV-TEN50     PIC 9(08).
+           03  WRK-FEDT-PREV-TEN54     PIC 9(08).
            03  WRK-FEDT-PREV-TEN721    PIC 9(08).
            03  WRK-FEDT-KOUI-MEISAI.
              05  WRK-FEDT-KOUI-MEISAI1   PIC 9(01).
@@ -2628,6 +2629,7 @@
       *
            MOVE    ZERO                TO  WRK-FEDT-PREV-TEN
            MOVE    ZERO                TO  WRK-FEDT-PREV-TEN50
+           MOVE    ZERO                TO  WRK-FEDT-PREV-TEN54
            MOVE    ZERO                TO  WRK-FEDT-PREV-TEN721
            MOVE    "E"                 TO  WRK-FEDT-REC-FLG
            MOVE    ZERO                TO  WRK-FEDT-DEKIDAKA-SUM
@@ -2849,11 +2851,25 @@
                        MOVE WRK-FEDT-PREV-TEN721
                                        TO   WRK-FEDT-PREV-TEN
                    END-IF
-                   COMPUTE WRK-FEDT-DEKIDAKA-TEN
-                                       =   WRK-FEDT-PREV-TEN
-                                       *   TBL-KOUI-TEN (IDX)
-                                       /   100
-                                       +   0.5
+      *ÊÄËãÇ¯Îð²Ã»»ÂÐ±þ
+                   IF  (TBL-KOUI-SRYCD(IDX) =   "150231590"
+                                            OR  "150231690"
+                                            OR  "150265390"
+                                            OR  "150286690")
+                   AND (WRK-FEDT-PREV-TEN54 >   ZERO)
+                       COMPUTE WRK-FEDT-DEKIDAKA-TEN
+                                           =   WRK-FEDT-PREV-TEN54
+                                           *   TBL-KOUI-TEN (IDX)
+                                           /   100
+                                           +   0.5
+                       MOVE    ZERO        TO  WRK-FEDT-PREV-TEN54
+                   ELSE
+                       COMPUTE WRK-FEDT-DEKIDAKA-TEN
+                                           =   WRK-FEDT-PREV-TEN
+                                           *   TBL-KOUI-TEN (IDX)
+                                           /   100
+                                           +   0.5
+                   END-IF
       *--- AZU-MOD START 2015.10.20
       **             IF      WRK-FEDT-SRYKBN     NOT =  "50"
       **                 MOVE    ZERO        TO  WRK-FEDT-PREV-TEN
@@ -2972,8 +2988,13 @@
                            COMPUTE WRK-FEDT-PREV-TEN   =
                                    WRK-FEDT-PREV-TEN   +
                                    TBL-KOUI-TEN (IDX)
-                           MOVE TBL-KOUI-TEN (IDX)     TO  
+                           MOVE TBL-KOUI-TEN (IDX)     TO
                                                    WRK-FEDT-PREV-TEN50
+                       ELSE
+      *ÊÄËãÇ¯Îð²Ã»»ÂÐ±þ
+                           COMPUTE WRK-FEDT-PREV-TEN54 =
+                                   WRK-FEDT-PREV-TEN   +
+                                   TBL-KOUI-TEN (IDX)
                        END-IF
                    END-IF
                END-IF
