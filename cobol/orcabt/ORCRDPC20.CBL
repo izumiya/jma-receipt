@@ -107,6 +107,7 @@
       *              NACL-小豆沢  15/10/20  処置の出来高実績点数セット修正
       *
       *              NACL-小豆沢  16/07/05  平成２８年度対応
+      *              NACL-伊藤    16/10/18  閉麻計算見直し
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2967,9 +2968,13 @@
                                         /   100
                                         +   0.5
                    ELSE
-                       COMPUTE WRK-FEDT-PREV-TEN =  WRK-FEDT-PREV-TEN
-                                                 +  TBL-KOUI-TEN (IDX)
-                       MOVE TBL-KOUI-TEN (IDX) TO  WRK-FEDT-PREV-TEN50
+                       IF  TNS-MASUISKBKBN     NOT =   7
+                           COMPUTE WRK-FEDT-PREV-TEN   =
+                                   WRK-FEDT-PREV-TEN   +
+                                   TBL-KOUI-TEN (IDX)
+                           MOVE TBL-KOUI-TEN (IDX)     TO  
+                                                   WRK-FEDT-PREV-TEN50
+                       END-IF
                    END-IF
                END-IF
              END-IF
