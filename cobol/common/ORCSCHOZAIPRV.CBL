@@ -904,7 +904,7 @@
            PERFORM UNTIL      FLG-SRYACT   =   1
                PERFORM VARYING     IDX2    FROM    1   BY  1
                        UNTIL      (IDX2            >   5   )  OR
-                                  (FLG-MADOKU      =   1    )  OR
+      ************                (FLG-MADOKU      =   1    )  OR
                                   (SRY-SRYCD(IDX2) =   SPACE )
       *            ЬєКо
                    IF      SRY-SRYCD (IDX2)(1:1)   =   "6"
