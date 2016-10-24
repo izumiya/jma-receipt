@@ -163,7 +163,7 @@
                                                BGS100P-SRYYM
                                                BGS100P-NYUGAIKBN
                                                BGS100P-EDITKBN
-      *                                        BGS100P-ETCGETKBN
+                                               BGS100P-ETCGETKBN
            END-UNSTRING
       *
            MOVE    BGS100P-HOSPNUM     TO  SPA-HOSPNUM
