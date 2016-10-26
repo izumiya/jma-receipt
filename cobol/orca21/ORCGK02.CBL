@@ -2196,8 +2196,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-HKNCOMBINUM TO  WRK-MAE-HKNCOMBI
            MOVE    SPA-GMN-HKNCOMBINUM TO  SPA-HKNCOMBINUM
+      *H28.10      患者登録の診療科が同じとき、ドクターの変更
+           IF      SPA-GMN-SRYKA       =   SPA-SRYKA
+               MOVE    SPA-DRCD            TO  WRK-DRCD
+           ELSE
+               MOVE    "1"                 TO  WRK-DRCD1
+               MOVE    SPA-GMN-DRCD        TO  WRK-DRCD2
+           END-IF
            MOVE    SPA-GMN-SRYKA       TO  SPA-SRYKA
-           MOVE    SPA-DRCD            TO  WRK-DRCD
+      *****MOVE    SPA-DRCD            TO  WRK-DRCD
       *
            MOVE    SPA-GMN-PTNUM       TO  SPA-PTNUM
            MOVE    SPA-GMN-PTID        TO  SPA-PTID
@@ -2231,6 +2238,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-DRCD            TO  SPA-DRCD
            MOVE    WRK-MAE-HKNCOMBI    TO  SPA-GMN-HKNCOMBINUM
            MOVE    WRK-MAE-HKNCOMBI    TO  SPA-HKNCOMBINUM
+      *H28.10
+           IF      WRK-DRCD2       NOT =   SPA-GMN-DRCD
+      *        ドクター編集
+               MOVE    WRK-DRCD            TO  WRK-HZN-DRCD
+               PERFORM 30091-UDR-SETSYORI-SEC
+           END-IF
+      *
       *
       *    チェック用月内診療行為セット
            PERFORM                 320-SPA-CHKSET-SEC
