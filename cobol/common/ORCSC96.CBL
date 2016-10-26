@@ -3363,6 +3363,13 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K407"
+                   STRING  "·Ù¹ð¡ª"
+                           "Ï«ºÒ²Ã»»¤Ï»»Äê¤Ç¤­¤Þ¤»¤ó¡£"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *!!!
       *H28.9
                WHEN    "K511"
                    STRING  "·Ù¹ð¡ª"

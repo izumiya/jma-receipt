@@ -50,6 +50,7 @@
       * 04.06.00     NACL-多々納  10/07/01  残量廃棄自動算定対応
       * 04.08.00     NACL-多々納  13/02/XX  労災レセ電用点数登録対応
       * 04.07.00     NACL-多々納  14/03/XX  平成２６年４月改正対応
+      * 04.08.00     NACL-多々納  16/10/XX  労災四肢加算区分対応
       *****************************************************************
       *
       *
@@ -140,6 +141,8 @@
       *
            03  IDX-TUS             PIC 9(04).
            03  IDS                 PIC 9(04).
+      *
+           03  IDX-RKSN            PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -726,40 +729,9 @@
                GO      TO      100112-SYOEN-CHK-EXT
            END-IF
       *
-      *    １日に１回数のみチェック（Ｋ０２のみのチェック）
-      *    IF      (LNK-ORCSC-PG       =   "K02" )
-      *        労災の時、チェックをしない
-      *        AND (SPA-HKNKBN         =   ZERO  )
-      *        MOVE    ZERO            TO  WRK-DAY-CNT
-      *        MOVE    SPACE           TO  WRK-ERRCD2
-      *        PERFORM VARYING     IDX-TBL     FROM    1   BY  1
-      *                UNTIL      (IDX-TBL     >   TBL-SYOCHI-MAX) OR
-      *                           (WRK-ERRCD2  NOT =   SPACE)
-      *            SET     TBL-IDX             TO  IDX-TBL
-      *            MOVE    TBL-SRYCD (TBL-IDX) TO  WRK-SRYCD
-      *            PERFORM 3001-SANTEI-CHK-SEC
-      *            ADD     LNK-SC91-DAYCNT     TO  WRK-DAY-CNT
-      *            IF      WRK-DAY-CNT         >   1
-      ***********  IF    ((WRK-SRYCD           =   WRK-COM-INPUTCD
-      *                                                    (IDX-Z)) AND
-      *                   (LNK-SC91-DAYCNT     >   1              ))  OR
-      *                  ((WRK-SRYCD       NOT =   WRK-COM-INPUTCD
-      *                                                    (IDX-Z)) AND
-      ********************(LNK-SC91-DAYCNT     >   ZERO          ))
-      *                MOVE    "1022"          TO  WRK-ERRCD2
-      *                MOVE    IDX-Z           TO  WRK-IDX-ERR
-      *****************MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-      *            END-IF
-      *        END-PERFORM
-      *        IF      WRK-ERRCD2      NOT =   SPACE
-      *            GO      TO      100112-SYOEN-CHK-EXT
-      *        END-IF
-      **   END-IF
-      *
       *    労災でマッサージ等、器具等の時、日に３部位とする
            IF     (LNK-ORCSC-PG       =   "K02" ) AND
                  ((SPA-HKNKBN          =   1   )  AND
-      *********** (SPA-RSI-HKNKBN  NOT =   "5" ))  AND
                   (SPA-RSI-JUNKYO  NOT =   "1" ))  AND
                   (WRK-SYOCHI-KBN      =   "01" OR  "02"
       *        介達牽引
@@ -772,90 +744,6 @@
                    GO      TO      100112-SYOEN-CHK-EXT
                END-IF
            END-IF
-      *Ｈ２０．４から逓減廃止
-      *
-      *    労災の時、同一部位毎に逓減するので、対象外とする
-      *    IF     (SPA-HKNKBN          =   1   )
-      ****   AND  (SPA-RSI-HKNKBN  NOT =   "5" )
-      *      AND  (SPA-RSI-JUNKYO  NOT =   "1" )
-      *        GO      TO      100112-SYOEN-CHK-EXT
-      *    END-IF
-      *
-      *    当月に５回以上の時、逓減
-      *    （介達牽引のみ）
-      *    IF     (WRK-SYOCHI-KBN      =   "04")
-      *        CONTINUE
-      *    ELSE
-      *        消炎鎮痛等処置の回数集計（マッサージ以外）
-      *        IF     (SPA-NYUGAIKBN       =   "1" )  AND
-      *               (WRK-SYOCHI-KBN  NOT =   "01")  AND
-      *               (WRK-COM-NYU-KAI (IDX-Z)  >   ZERO )
-      *            COMPUTE LNK-ORCSC-SYOEN-CNT  =  LNK-ORCSC-SYOEN-CNT
-      *                                         +  WRK-COM-NYU-KAI
-      *                                                     (IDX-Z)
-      *        END-IF
-      *        GO      TO      100112-SYOEN-CHK-EXT
-      *    END-IF
-      *
-      *    急性発生１８０日以内の時、７回目から
-      *    IF      (LNK-ORCSC-KYUSEI-FLG   =   1   )  OR
-      *            (LNK-ORCSC-KYUSEI-180   >   SPA-SRYYMD)
-      *        MOVE    6                   TO  WRK-MAX-CNT
-      *    ELSE
-      *        MOVE    4                   TO  WRK-MAX-CNT
-      *    END-IF
-      *
-      *    IF     (SPA-NYUGAIKBN       =   "2"  )  AND
-      *           (LNK-ORCSC-SYOEN-CNT <   WRK-MAX-CNT )
-      *        GO      TO      100112-SYOEN-CHK-EXT
-      *    END-IF
-      *
-      *    IF     (SPA-NYUGAIKBN       =   "1" )  AND
-      *           (WRK-COM-NYU-KAI (IDX-Z)     >   ZERO )
-      *        IF     (WRK-COM-NYU-KAI (IDX-Z)  +  LNK-ORCSC-SYOEN-CNT)
-      *                                    <=  WRK-MAX-CNT
-      *            COMPUTE LNK-ORCSC-SYOEN-CNT  =  LNK-ORCSC-SYOEN-CNT
-      *                                         +  WRK-COM-NYU-KAI
-      *                                                     (IDX-Z)
-      *            GO      TO      100112-SYOEN-CHK-EXT
-      *        END-IF
-      *        今回入力時に逓減となる時
-      *        IF     (WRK-COM-NYU-KAI (IDX-Z) >   1  )  AND
-      *               (LNK-ORCSC-SYOEN-CNT     <   WRK-MAX-CNT )
-      *            COMPUTE LNK-ORCSC-SYOEN-CNT =   LNK-ORCSC-SYOEN-CNT
-      *                                        +   WRK-COM-NYU-KAI
-      *                                                         (IDX-Z)
-      *            MOVE    "140047670"         TO  WRK-SRYCD
-      *            IF      WRK-COM-INPUTCD (IDX-Z + 1) =   WRK-SRYCD
-      *                CONTINUE
-      *            ELSE
-      *                MOVE    "9014"          TO  WRK-ERRCD
-      *                MOVE    "1"             TO  WRK-COM-CUR
-      *                                                     (IDX-Z + 1)
-      *                GO      TO      100112-SYOEN-CHK-EXT
-      *            END-IF
-      *        END-IF
-      *        COMPUTE LNK-ORCSC-SYOEN-CNT =   LNK-ORCSC-SYOEN-CNT
-      *                                    +   WRK-COM-NYU-KAI
-      *                                                      (IDX-Z)
-      *    END-IF
-      *    IF     (SPA-NYUGAIKBN       =   "1" )  AND
-      *           (WRK-COM-NYU-KAI (IDX-Z) =   ZERO )  AND
-      *           (LNK-ORCSC-SYOEN-CNT <   WRK-MAX-CNT )
-      *        GO      TO      100112-SYOEN-CHK-EXT
-      *    END-IF
-      *
-      *    消炎鎮痛逓減
-      *    MOVE    IDX-Z               TO  IDX-S
-      *    MOVE    "140047670"         TO  WRK-SRYCD
-      *
-      *    IF      WRK-COM-INPUTCD (IDX-Z + 1) =   WRK-SRYCD
-      *        CONTINUE
-      *    ELSE
-      *        MOVE    ZERO            TO  FLG-ARI
-      *        PERFORM 1002-KASAN-SET-SEC
-      *        MOVE    IDX-S               TO  IDX-ZS2
-      *****END-IF
       *
            .
        100112-SYOEN-CHK-EXT.
@@ -1019,6 +907,43 @@
            MOVE    ZERO                 TO  FLG-ROUSAI
       *    労災用　区分番号
            IF      WRK-COM-CDKBN-KBN (IDX-ZS)   =   "J"
+      *H28.10
+      *    H28/10/1　から四肢加算区分で判定する
+               IF      SPA-SRYYMD           >=  "20161001"
+      *            四肢加算区分の判定
+                   EVALUATE    WRK-COM-SISIKSN (IDX-ZS)
+                   WHEN    "1"
+                       EVALUATE    SPA-RSI-SISIKBN
+                           WHEN    1
+      *                        １．５倍
+                               MOVE    "101400020"      TO  WRK-SRYCD
+                           WHEN    2
+      *                        ２倍
+                               MOVE    "101400010"      TO  WRK-SRYCD
+                       END-EVALUATE
+                       MOVE    1                    TO  FLG-ROUSAI
+      *            １．５倍のみ
+                   WHEN    "2"
+                       EVALUATE    SPA-RSI-SISIKBN
+                           WHEN    1
+                           WHEN    2
+      *                        １．５倍
+                               MOVE    "101400020"      TO  WRK-SRYCD
+                       END-EVALUATE
+                       MOVE    2               TO  FLG-ROUSAI
+      *            ２倍のみ
+                   WHEN    "3"
+                       EVALUATE    SPA-RSI-SISIKBN
+                           WHEN    1
+                           WHEN    2
+      *                        ２倍
+                               MOVE    "101400010"      TO  WRK-SRYCD
+                       END-EVALUATE
+                       MOVE    1               TO  FLG-ROUSAI
+                   END-EVALUATE
+      *
+               ELSE
+      *    H28/9/30 までは区分番号
                EVALUATE    WRK-COM-CDKBN-KBNNUM (IDX-ZS)
                                 ALSO WRK-COM-CDKBN-KBNNUM-EDA (IDX-ZS)
       *            創傷処置
@@ -1119,10 +1044,13 @@
                        END-EVALUATE
                        MOVE    2                    TO  FLG-ROUSAI
                END-EVALUATE
+      *
+               END-IF
            END-IF
       *
       *    既に他の労災加算が入力されている時は自動算定しない
            MOVE    ZERO                TO  FLG-ROU-ARI
+           MOVE    ZERO                TO  IDX-RKSN
            COMPUTE IDX-Z2              =   IDX-ZS      +   1
            PERFORM VARYING     IDX1    FROM    IDX-Z2    BY  1
                    UNTIL      (IDX1        >   SPA-MAX-LINE     ) OR
@@ -1133,6 +1061,7 @@
                                                    "099509901"
                    IF      WRK-COM-AUTOKBN (IDX1)  =   SPACE
                         MOVE    1                  TO  FLG-ROU-ARI
+                        MOVE    IDX1               TO  IDX-RKSN
                    END-IF
                END-IF
                IF     (WRK-COM-INPUTCD (IDX1)(1:1) =  "1" ) AND
@@ -1141,6 +1070,12 @@
                END-IF
            END-PERFORM
            IF      FLG-ROU-ARI         =   1
+      *H28.10
+      *    H28/10/1　から警告とする
+               IF      SPA-SRYYMD           >=  "20161001"
+      *            手技料の四肢加算区分チェック
+                   PERFORM 100131-RISIKASAN-CHK-SEC
+               ELSE
                EVALUATE    FLG-ROUSAI
       *            四肢加算なし
                    WHEN    ZERO
@@ -1157,6 +1092,7 @@
                            MOVE    "1"         TO  WRK-COM-CUR(IDX1 - 1)
                        END-IF
                END-EVALUATE
+               END-IF
                GO      TO      100113-RSIHKN-SYORI-EXT
            END-IF
       *
@@ -1202,6 +1138,48 @@
            MOVE    IDX-S               TO  IDX-Z
            .
        100113-RSIHKN-SYORI-EXT.
+           EXIT.
+      *H28.10
+      *****************************************************************
+      *    手技料の四肢加算区分チェック処理
+      *****************************************************************
+       100131-RISIKASAN-CHK-SEC        SECTION.
+      *
+      *
+           EVALUATE    WRK-COM-SISIKSN(IDX-ZS)
+               WHEN    "0"
+      *            不可
+                   IF      WRK-COM-INPUTCD (IDX-RKSN)  =   "101400020"
+                                                       OR  "101400010"
+                       MOVE    "K407"              TO  WRK-ERRCD
+                   END-IF
+               WHEN    "2"
+      *            １．５倍のみ
+                   IF      WRK-COM-INPUTCD (IDX-RKSN)  =   "101400010"
+                       MOVE    "K805"          TO  WRK-ERRCD
+                   END-IF
+               WHEN    "3"
+      *            ２倍のみ
+                   IF      WRK-COM-INPUTCD (IDX-RKSN)  =   "101400020"
+                       MOVE    "K806"          TO  WRK-ERRCD
+                   END-IF
+           END-EVALUATE
+      *
+           IF     WRK-ERRCD(1:1)      =   "K"
+               IF     (WRK-COM-KZMFLG (IDX-RKSN)   =   SPACE)
+               AND    (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    "1"             TO  WRK-COM-KZMFLG (IDX-RKSN)
+                   MOVE    "1"             TO  WRK-COM-CUR    (IDX-RKSN)
+               ELSE
+                   MOVE    SPACE           TO  WRK-ERRCD
+               END-IF
+           ELSE
+               IF      WRK-ERRCD       NOT =   SPACE
+                   MOVE    "1"             TO  WRK-COM-CUR    (IDX-RKSN)
+               END-IF
+           END-IF
+           .
+       100131-RISIKASAN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2477,6 +2455,9 @@
                    MOVE    ZERO                TO  WRK-RSI-TENSU-M
                END-IF
            END-IF
+      *TEST
+      *    DISPLAY "WRK-RSI-TENSUKEI:" WRK-RSI-TENSUKEI
+      *TEST
       *
       *    初診時ブラシング料時間外加算
            MOVE    ZERO                TO  WRK-TENSUKEI-G
