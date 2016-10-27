@@ -1148,7 +1148,7 @@
            MOVE    2               TO  SPA-GMN-SRYSTTENKIKBN-MAX
       *
            MOVE    "1"             TO  SPA-GMN-SRYSTTENKIKBNL    (1)
-           MOVE    "転帰日から１ヶ月経過後に初料診算定可能"
+           MOVE    "転帰日から１ヶ月経過後に初診料算定可能"
                                    TO  SPA-GMN-SRYSTTENKIKBNMEIL (1)
       *
            MOVE    "2"             TO  SPA-GMN-SRYSTTENKIKBNL    (2)
