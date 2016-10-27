@@ -288,6 +288,8 @@
       *    ©гне╧т╟ыл╬╬н
            03  WRK-SRYSYUMEI       PIC X(40).
       *
+           03  WRK-Z99-X.
+               05  WRK-Z99         PIC Z99.
            03  WRK-ZZZZ-X.
                05  WRK-ZZZZ        PIC ZZZ.
            03  WRK-ZZ-X.
@@ -3013,6 +3015,11 @@
                    MOVE    SPA-NAI-DAY-41 (IDX IDK)
                                            TO  WRK-ZZ
                    MOVE    WRK-ZZ-X        TO  SPA-GMN-TDAY-41 (IDG IDK)
+                   IF   SPA-NAI-DAY-41 (IDX IDK)  >=  100
+                       MOVE    SPA-NAI-DAY-41 (IDX IDK)
+                                           TO  WRK-Z99
+                       MOVE    WRK-Z99-X   TO  SPA-GMN-TDAY-41 (IDG IDK)
+                   END-IF
                END-PERFORM
       *
                EVALUATE     SPA-NAI-TZAISKBKBN-41 (IDX)
@@ -3580,12 +3587,22 @@
                    END-IF
                    MOVE    SPA-GMN-TMEISYO-41 (IDX)
                                                    TO  I41-TMEISYO(IDX)
+      **             DISPLAY "SPA-GMN-TMEISYO-41 (IDX) = "
+      **                      SPA-GMN-TMEISYO-41 (IDX)
                    MOVE    SPA-GMN-TTENSU-41  (IDX)
                                                    TO  I41-TTENSU (IDX)
                    PERFORM VARYING     IDY     FROM    1   BY  1
                            UNTIL       IDY     >   31
-                       MOVE    SPA-GMN-TDAY-41 (IDX IDY)(1:2)
+      **                 DISPLAY "IDY = " IDY
+      **                 DISPLAY "SPA-GMN-TDAY-41 (IDX IDY) = "
+      **                          SPA-GMN-TDAY-41 (IDX IDY)
+                       IF   SPA-GMN-TDAY-41 (IDX IDY)(3:1)  NOT =  SPACE
+                           MOVE    SPA-GMN-TDAY-41 (IDX IDY)(2:2)
                                                TO  I41-TDAY (IDX IDY)
+                       ELSE
+                           MOVE    SPA-GMN-TDAY-41 (IDX IDY)(1:2)
+                                               TO  I41-TDAY (IDX IDY)
+                       END-IF
                    END-PERFORM
                END-IF
       *
@@ -3622,8 +3639,8 @@
                END-EVALUATE
       *
                IF      SPA-GMN-DAY-41 (IDX)    >=  100
-                   MOVE    SPA-GMN-DAY-41 (IDX)    TO  WRK-ZZZZ
-                   MOVE    WRK-ZZZZ-X              TO  I41-DAY (IDX)
+                   MOVE    SPA-GMN-DAY-41 (IDX)    TO  WRK-Z99
+                   MOVE    WRK-Z99-X               TO  I41-DAY (IDX)
                ELSE
                    MOVE    SPA-GMN-DAY-41 (IDX)    TO  WRK-ZZ
                    MOVE    WRK-ZZ-X              TO  I41-DAY (IDX)
