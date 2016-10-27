@@ -501,14 +501,22 @@
                PERFORM 20011-PTNUM-CHK-SEC
            END-IF
       *    診療科コードチェック
-           IF     (WRK-SRYKA       NOT =   SPACE  )
-           AND    (WRK-ERRCD           =   SPACE  )
-               PERFORM 20011-SRYKA-CHK-SEC
+           IF     (WRK-SRYKA           =   SPACE
+                                       OR  "XX"  )
+               CONTINUE
+           ELSE
+               IF     (WRK-ERRCD           =   SPACE  )
+                   PERFORM 20011-SRYKA-CHK-SEC
+               END-IF
            END-IF
       *    ドクターコードチェック
-           IF     (WRK-DRCD        NOT =   SPACE  )
-           AND    (WRK-ERRCD           =   SPACE  )
-               PERFORM 20011-DRCD-CHK-SEC
+           IF     (WRK-DRCD            =   SPACE
+                                       OR  "@@@@@"  )
+               CONTINUE
+           ELSE
+               IF     (WRK-ERRCD           =   SPACE  )
+                   PERFORM 20011-DRCD-CHK-SEC
+               END-IF
            END-IF
       *
            .
