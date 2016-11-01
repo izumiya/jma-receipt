@@ -2146,6 +2146,8 @@
                        WHEN    "099209921"
       *                保険医療機関へ情報提供
                        WHEN    "099209922"
+      *H28.11          残薬指示プログラムオプション解除
+                       WHEN    "099209923"
                            MOVE    "98"            TO  SPA-COM-SRYKBN
                                                                   (IDX)
                            MOVE    "980"           TO  SPA-COM-SRYSYUKBN
