@@ -100,6 +100,8 @@
       *
            03  FLG-SYURYOU         PIC 9(01).
            03  FLG-MAX             PIC 9(01).
+      *H28.11
+           03  FLG-CHKERR          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1334,15 +1336,55 @@
                                                    TO  WRK-INPUTCD
                        MOVE    WRK-K023-CDSYU  (IDY)
                                                     TO  WRK-CDSYU
-                       PERFORM 410021-INPUTCD-INS-SEC
+      *H28.11
+      *                ÅÐÏ¿ºÑ¤ß¥Á¥§¥Ã¥¯
+                       PERFORM 410020-INPUTCD-MAECHK-SEC
+                       IF      FLG-CHKERR          =   ZERO
+                           PERFORM 410021-INPUTCD-INS-SEC
+                       END-IF
                    END-IF
                END-PERFORM
            END-PERFORM
-      *
       *    Ìá¤ë
            PERFORM 210-BACK
            .
        41002-KOUSIN-SYORI-EXT.
+           EXIT.
+      *
+      *H28.11
+      *****************************************************************
+      *    ÆþÎÏ¥³¡¼¥ÉÅÐÏ¿ºÑ¤ß¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       410020-INPUTCD-MAECHK-SEC          SECTION.
+      *
+           INITIALIZE                      INPUTCD-REC
+           MOVE    SPA-HOSPNUM         TO  ICD-HOSPNUM
+           MOVE    WRK-CDSYU           TO  ICD-CDSYU
+           MOVE    WRK-INPUTCD         TO  ICD-INPUTCD
+      *
+           MOVE    INPUTCD-REC         TO  MCPDATA-REC
+           MOVE    "tbl_inputcd"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_inputcd"       TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM                     930-INPUTCD-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-INPUTCD
+           END-IF
+           MOVE    "tbl_inputcd"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-INPUTCD         =   ZERO
+      *        ÅÐÏ¿ºÑ¤ß
+               MOVE    1                   TO  FLG-CHKERR
+           ELSE
+               MOVE    ZERO                TO  FLG-CHKERR
+           END-IF
+           .
+       410020-INPUTCD-MAECHK-EXT.
            EXIT.
       *
       *****************************************************************
