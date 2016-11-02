@@ -327,7 +327,7 @@
                        09  SPA-TUKI-SKYPRT         PIC  X(01).
                        09  SPA-TUKI-SRYPRT         PIC  X(01).
                    07  SPA-NAI-TBL.
-                       09  SPA-NAI-THSRYYM         PIC  X(06).
+                       09  SPA-NAI-THSRYYM         PIC  X(08).
                        09  SPA-NAI-TBLREC  OCCURS  500.
                            11  SPA-NAI-TBUNBEN     PIC  X(01).
                            11  SPA-NAI-THOJOKBN    PIC  X(01).
@@ -464,6 +464,7 @@
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
            03  WRK-NAI-SRYYM       PIC X(08).
+           03  WRK-SAVE-SRYYM      PIC X(08).
            03  WRK-PGNAME-G.
                05  WRK-PGNAME-OCC  OCCURS  3.
                    07  WRK-PGNAME  PIC X(20).
@@ -8514,7 +8515,7 @@
       *    排他制御解除処理
            PERFORM 990-LOCK-OUT-SEC
       *
-           MOVE    SPA-NAI-SRYYM       TO  WRK-NAI-SRYYM
+           MOVE    SPA-NAI-SRYYM       TO  WRK-SAVE-SRYYM
            MOVE    SPA-GMN-MODE        TO  WRK-GMN-MODE
            MOVE    SPA-GMN-SORTKBN     TO  WRK-GMN-SORTKBN
            MOVE    SPA-GMN-PTID        TO  WRK-GMN-PTID
@@ -8527,7 +8528,7 @@
       *
                MOVE    WRK-GMN-MODE    TO  S02-MODE
                MOVE    SPACE           TO  SPA-GMN-MODE
-               MOVE    WRK-NAI-SRYYM   TO  SPA-NAI-THSRYYM
+               MOVE    WRK-SAVE-SRYYM  TO  SPA-NAI-THSRYYM
                PERFORM 4106-MODE-CHK-SEC
            END-IF
       *
