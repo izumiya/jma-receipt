@@ -239,6 +239,9 @@
       *ver.4.8
       *時間外緊急院内チェック
                05  SPA-JGAIKEIKBN-FLG         PIC X(01).
+      *H28.11
+      *薬剤投与量チェック
+               05  SPA-TOUYOCHK-FLG           PIC X(01).
       *ver.4.8
       *患者情報表示
                05  SPA-POPUPKBN-G.

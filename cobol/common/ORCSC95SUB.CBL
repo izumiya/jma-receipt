@@ -469,6 +469,14 @@
                    MOVE    SYS-1008-JGAIKEIKBN-FLG
                                            TO  SPA-JGAIKEIKBN-FLG
                END-IF
+      *H28.11
+      *        ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯
+               IF      SYS-1008-TOUYOCHK-FLG   =   SPACE
+                   MOVE    "0"             TO  SPA-TOUYOCHK-FLG
+               ELSE
+                   MOVE    SYS-1008-TOUYOCHK-FLG
+                                           TO  SPA-TOUYOCHK-FLG
+               END-IF
            ELSE
                MOVE    ZERO                TO  SPA-INTERACT-KIKAN
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
@@ -503,6 +511,9 @@
                MOVE    "0"                 TO  SPA-TECHOKBN-FLG
       *        »þ´Ö³°¶ÛµÞ±¡Æâ¥Á¥§¥Ã¥¯
                MOVE    "1"                 TO  SPA-JGAIKEIKBN-FLG
+      *H28.11
+      *        ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯
+               MOVE    "0"                 TO  SPA-TOUYOCHK-FLG
            END-IF
       *    ¿Ç»¡ÎÁ¼«Æ°È¯À¸¤Ê¤·¤Ï¡¢»þ´Ö³°²Ã»»¤Ê¤·
            IF      SPA-INITAUTO-FLG    =   "0"
@@ -1434,6 +1445,14 @@
                    MOVE    SYS-1008-JGAIKEIKBN-FLG
                                            TO  SPA-JGAIKEIKBN-FLG
                END-IF
+      *H28.11
+      *        ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯
+               IF      SYS-1008-TOUYOCHK-FLG   =   SPACE
+                   MOVE    "0"             TO  SPA-TOUYOCHK-FLG
+               ELSE
+                   MOVE    SYS-1008-TOUYOCHK-FLG
+                                           TO  SPA-TOUYOCHK-FLG
+               END-IF
            ELSE
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
       *        ¸¡ÂÎ¸¡ºº²Ã»»¼«Æ°È¯À¸
@@ -1441,6 +1460,7 @@
                MOVE    "0"                 TO  SPA-TECHOKBN-FLG
       *        »þ´Ö³°¶ÛµÞ±¡Æâ¥Á¥§¥Ã¥¯
                MOVE    "1"                 TO  SPA-JGAIKEIKBN-FLG
+               MOVE    "0"                 TO  SPA-TOUYOCHK-FLG
            END-IF
       *
            .

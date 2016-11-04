@@ -30,6 +30,7 @@
       *  04.07.00    NACL-多々納  15/04/XX  一般・銘柄名処方毎の対応
       *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/11/XX  投薬投与量チェック区分対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2130,6 +2131,9 @@
            MOVE    SPA-NENREI-MM       TO  LNK-SC98-NENREI-MM
            MOVE    SPA-NENREI-DD       TO  LNK-SC98-NENREI-DD
            MOVE    SPA-YAKUZAI-AREA    TO  LNK-SC98-YAKUZAI-AREA
+      *H28.11
+      *    薬剤投与量チェック区分
+           MOVE    SPA-TOUYOCHK-FLG    TO  LNK-SC98-TOUYOCHK-FLG
            CALL    "ORCSC98"           USING
                                        SPA-AREA
                                        ORCSC98AREA
@@ -2154,6 +2158,9 @@
            MOVE    SPA-NENREI-MM       TO  LNK-SC98-NENREI-MM
            MOVE    SPA-NENREI-DD       TO  LNK-SC98-NENREI-DD
            MOVE    SPA-YAKUZAI-AREA    TO  LNK-SC98-YAKUZAI-AREA
+      *H28.11
+      *    薬剤投与量チェック区分
+           MOVE    SPA-TOUYOCHK-FLG    TO  LNK-SC98-TOUYOCHK-FLG
            CALL    "ORCSC98"           USING
                                        SPA-AREA
                                        ORCSC98AREA

@@ -313,6 +313,13 @@ W07 {
           count int;
             item varchar(30)[5];
         };
+        TOUYOCHK_COMBO {
+          TOUYOCHK {
+            textdata varchar(40);
+          };
+          count int;
+            item varchar(40)[5];
+        };
       };
       TAGNAME1 {
         state int;

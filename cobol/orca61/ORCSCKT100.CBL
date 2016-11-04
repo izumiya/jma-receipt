@@ -1993,6 +1993,9 @@
            MOVE    SPA-NENREI-YY       TO  LNK-SC98-NENREI-YY
            MOVE    SPA-NENREI-MM       TO  LNK-SC98-NENREI-MM
            MOVE    SPA-NENREI-DD       TO  LNK-SC98-NENREI-DD
+      *H28.11
+      *    ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬
+           MOVE    SPA-TOUYOCHK-FLG    TO  LNK-SC98-TOUYOCHK-FLG
            CALL    "ORCSC98"           USING
                                        SPA-AREA
                                        ORCSC98AREA
@@ -2016,6 +2019,9 @@
            MOVE    SPA-NENREI-MM       TO  LNK-SC98-NENREI-MM
            MOVE    SPA-NENREI-DD       TO  LNK-SC98-NENREI-DD
            MOVE    SPA-YAKUZAI-AREA    TO  LNK-SC98-YAKUZAI-AREA
+      *H28.11
+      *    ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬
+           MOVE    SPA-TOUYOCHK-FLG    TO  LNK-SC98-TOUYOCHK-FLG
            CALL    "ORCSC98"           USING
                                        SPA-AREA
                                        ORCSC98AREA

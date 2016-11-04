@@ -59,6 +59,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  14/12/XX  Ê¿À®£²£·Ç¯£±·î²þÀµÂÐ±þ
       * 04.08.00     NACL-Â¿¡¹Ç¼  16/08/XX  »ý»²ÌôÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  16/11/XX  ÅêÌôÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬ÂÐ±þ
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1488,9 +1489,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SYS-1008-SURYOZERO-FLG
                                            TO  SPA-SURYOZERO-FLG
                END-IF
+      *H28.11
+      *        ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯
+               IF      SYS-1008-TOUYOCHK-FLG   =   SPACE
+                   MOVE    "0"             TO  SPA-TOUYOCHK-FLG
+               ELSE
+                   MOVE    SYS-1008-TOUYOCHK-FLG
+                                           TO  SPA-TOUYOCHK-FLG
+               END-IF
            ELSE
                MOVE    ZERO                TO  SPA-JIKANTOKU-NYU
                MOVE    ZERO                TO  SPA-SURYOZERO-FLG
+               MOVE    "0"                 TO  SPA-TOUYOCHK-FLG
            END-IF
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷¡Ê¿ÇÎÅ¹Ô°Ù°ì³çÆþ¶â´ÉÍý¾ðÊó¡Ë
@@ -4594,6 +4604,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NAI-NENREI-YY   TO  LNK-SC98-NENREI-YY
            MOVE    SPA-NAI-NENREI-MM   TO  LNK-SC98-NENREI-MM
            MOVE    SPA-NAI-NENREI-DD   TO  LNK-SC98-NENREI-DD
+      *H28.11
+      *    ÌôºÞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬
+           MOVE    SPA-TOUYOCHK-FLG    TO  LNK-SC98-TOUYOCHK-FLG
            CALL    "ORCSC98"           USING
                                        SPA-AREA
                                        ORCSC98AREA

@@ -36,6 +36,9 @@
                    07  LNK-SC98-NENREI-YY     PIC 9(03).
                    07  LNK-SC98-NENREI-MM     PIC 9(02).
                    07  LNK-SC98-NENREI-DD     PIC 9(02).
+      *H28.11
+      *    薬剤投与量チェック区分
+           03  LNK-SC98-TOUYOCHK-FLG           PIC X(01).
       *
       *    月投与数量・回数テーブル
            03  LNK-SC98-YAKUZAI-AREA.

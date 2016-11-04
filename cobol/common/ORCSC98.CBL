@@ -30,6 +30,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/12/XX  ´µ¼Ô¶Ø´÷ÌôºÞÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/11/XX  ÅêÌôÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬ÂÐ±þ
       *****************************************************************
       *
       *
@@ -204,14 +205,16 @@
                END-IF
       *
       *        ºßÂð¡¦ÅêÌô¡¦Ãí¼Í¤Î¤ß
-               IF     (SPA-COM-SRYKBN (01)     =   "14"
+               IF    ((SPA-COM-SRYKBN (01)     =   "14"
                                                OR  "21"
                                                OR  "22"
                                                OR  "23"
                                                OR  "31"
                                                OR  "32"
                                                OR  "33" )
-               AND   (SPA-ERRCD                =   SPACE)
+      *H28.11    ¤¹¤Ù¤Æ¤Î¿ÇÎÅ¶èÊ¬
+                 OR   (LNK-SC98-TOUYOCHK-FLG   =   "1" ))
+               AND   ( SPA-ERRCD               =   SPACE )
       *            ÅÀ¿ôÉí²Ã¾ðÊó¤Î¥Á¥§¥Ã¥¯
                    PERFORM 200-TENSUPLUS-CHK-SEC
                END-IF
@@ -234,7 +237,15 @@
                      (SPA-COM-CHOKINISSU (IDX-Z)   >   ZERO) AND
                      (SPA-COM-CHOKINISSU (IDX-Z)   <   SPA-COM-KAISU
                                                           (IDX-Z))
-                   PERFORM 10012-CHOKI-ERR-SEC
+      *H28.11      ÅêÌô¤Î¤ß
+                   IF    ( SPA-COM-SRYKBN (01) =   "21"
+                                               OR  "22"
+                                               OR  "23"
+                                               OR  "31"
+                                               OR  "32"
+                                               OR  "33" )
+                       PERFORM 10012-CHOKI-ERR-SEC
+                   END-IF
                END-IF
            END-IF
       *    ÅêÍ¿ÎÌ

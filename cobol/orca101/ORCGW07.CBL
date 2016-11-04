@@ -134,6 +134,7 @@
       *  04.08.01    NACL-多々納  16/06/10  セット展開区分追加
       *  04.08.01    NACL-太田    16/08/05  収納請求一覧初期表示追加
       *  04.08.01    NACL-多々納  16/10/04  要介護情報表示区分追加
+      *  04.08.00    NACL-多々納  16/11/XX  投薬投与量チェック区分対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -389,6 +390,16 @@
                            11  SPA-GMN-JGAIKEIKBN-LIST     PIC X(30)
                                                            OCCURS  5.
                        09  SPA-JGAIKEIKBN-MAX              PIC 9(02).
+      *H28.8
+      *                薬剤投与量チェック区分
+                       09  SPA-GMN-TOUYOCHK-G.
+                           11  SPA-GMN-TOUYOCHK            PIC X(01).
+                           11  SPA-GMN-TOUYOCHK-F1         PIC X(01).
+                           11  SPA-GMN-TOUYOCHK-MEI        PIC X(38).
+                       09  SPA-GMN-TOUYOCHK-COMB.
+                           11  SPA-GMN-TOUYOCHK-LIST       PIC X(40)
+                                                           OCCURS  5.
+                       09  SPA-GMN-TOUYOCHK-MAX            PIC 9(02).
       *
                    07  SPA-GMN-PAGE2-AREA.
       *                カルテの病名対象
@@ -1862,6 +1873,14 @@
                                        TO  SPA-GMN-KINKCHK-LIST (2)
            MOVE    2                   TO  SPA-GMN-KINKCHK-MAX
       *
+      *H28.11
+      *    薬剤投与量チェック区分
+           MOVE    "0 在宅・投薬・注射を対象"
+                                       TO  SPA-GMN-TOUYOCHK-LIST (1)
+           MOVE    "1 すべてを対象"
+                                       TO  SPA-GMN-TOUYOCHK-LIST (2)
+           MOVE    2                   TO  SPA-GMN-TOUYOCHK-MAX
+      *
       *
       *    病名表示区分
            MOVE    "0 表示しない"      TO  SPA-GMN-BYOHYOKBN-LIST(1)
@@ -2634,6 +2653,9 @@
       *        相互作用チェック区分
                MOVE    SYS-1008-INTERACT-CHKKBN
                                            TO  SPA-GMN-KINKCHK
+      *H28.11  薬剤投与量チェック区分
+               MOVE    SYS-1008-TOUYOCHK-FLG
+                                           TO  SPA-GMN-TOUYOCHK
            END-IF
       *    チェック除外時間
            PERFORM VARYING     IDT     FROM    1   BY  1
@@ -3072,6 +3094,21 @@
                    MOVE    SPA-GMN-KINKCHK-LIST (1)
                                            TO  SPA-GMN-KINKCHK-G
            END-EVALUATE
+      *H28.11
+      *    薬剤投与量チェック区分
+           IF      SPA-GMN-TOUYOCHK     =   SPACE
+               MOVE    "0"              TO  SPA-GMN-TOUYOCHK
+           END-IF
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-TOUYOCHK-MAX
+               IF      SPA-GMN-TOUYOCHK
+                                       =   SPA-GMN-TOUYOCHK-LIST(IDY)
+                                                              (1:1)
+                   MOVE    SPA-GMN-TOUYOCHK-LIST(IDY)
+                                               TO SPA-GMN-TOUYOCHK-G
+                   MOVE    SPA-GMN-TOUYOCHK-MAX    TO  IDY
+               END-IF
+           END-PERFORM
       *
             MOVE    1                  TO  SPA-GMN-CUR
       *
@@ -5482,6 +5519,8 @@
       *H28.8
       *    相互作用チェック区分
            MOVE    W07-KINKCHK         TO  SPA-GMN-KINKCHK-G
+      *H28.11
+           MOVE    W07-TOUYOCHK        TO  SPA-GMN-TOUYOCHK-G
            MOVE    W07-GAIKANKBN       TO  SPA-GMN-GAIKANRIKBN-G
            MOVE    W07-GAIMOVE         TO  SPA-GMN-GAIMOVE-G
            MOVE    W07-SURYOZERO       TO  SPA-GMN-SURYOZERO-G
@@ -5765,6 +5804,11 @@
       *            時間外緊急院内チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4103-JGAIKEIKBN-CHK-SEC
+                   END-IF
+      *H28.11
+      *            薬剤投与量チェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4103-TOUYOCHK-CHK-SEC
                    END-IF
       *            包括入力チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -6916,7 +6960,8 @@
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-JGAIKEIKBN-MAX
+                   UNTIL      (IDX     >   SPA-JGAIKEIKBN-MAX )
+                          OR  (FLG-OK  =   1                  )
                IF      SPA-GMN-JGAIKEIKBN
                                       =   SPA-GMN-JGAIKEIKBN-LIST(IDX)
                                                                 (1:1)
@@ -6932,6 +6977,32 @@
       *
           .
        4103-JGAIKEIKBN-CHK-EXT.
+           EXIT.
+      *H28.11
+      *****************************************************************
+      *    薬剤投与量チェック処理
+      *****************************************************************
+       4103-TOUYOCHK-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-TOUYOCHK-MAX)
+                          OR  (FLG-OK  =   1                  )
+               IF      SPA-GMN-TOUYOCHK
+                                      =   SPA-GMN-TOUYOCHK-LIST(IDX)
+                                                                (1:1)
+                   MOVE    SPA-GMN-TOUYOCHK-LIST(IDX)
+                                          TO  SPA-GMN-TOUYOCHK-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    89              TO  SPA-GMN-CUR
+               MOVE    "0045"          TO  SPA-ERRCD
+           END-IF
+      *
+          .
+       4103-TOUYOCHK-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10520,10 +10591,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    前回保険組合せ相違チェック
            MOVE    SPA-GMN-ZENHKNCHK       TO  SYS-1008-ZENHKNCHK-FLG
       *    手帳加算確認チェック
-           MOVE    SPA-GMN-TECHOKBN       TO  SYS-1008-TECHOKBN-FLG
+           MOVE    SPA-GMN-TECHOKBN        TO  SYS-1008-TECHOKBN-FLG
       *v4.8
       *    時間外緊急院内チェック
-           MOVE    SPA-GMN-JGAIKEIKBN     TO  SYS-1008-JGAIKEIKBN-FLG
+           MOVE    SPA-GMN-JGAIKEIKBN      TO  SYS-1008-JGAIKEIKBN-FLG
+      *H28.11
+      *    薬剤投与量チェック区分
+           MOVE    SPA-GMN-TOUYOCHK        TO  SYS-1008-TOUYOCHK-FLG
       *
       *    時間外加算特例乳幼児
            MOVE    SPA-GMN-JIKANTOKU-NYU   TO
@@ -11412,6 +11486,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-JGAIKEIKBN-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-JGAIKEIKBN-MAX  TO  W07-JGAIKEIKBN-COUNT
+      *
+      *    薬剤投与量チェック区分
+           MOVE    SPA-GMN-TOUYOCHK-G  TO  W07-TOUYOCHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-TOUYOCHK-MAX
+               MOVE    SPA-GMN-TOUYOCHK-LIST (IDX)
+                                       TO  W07-TOUYOCHK-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-TOUYOCHK-MAX  TO  W07-TOUYOCHK-COUNT
       *
       *    包括入力
            MOVE    SPA-GMN-HOUKATU-G       TO  W07-HOUKATU
@@ -12706,6 +12789,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0044"
                    MOVE    "相互作用チェック区分エラー"
                                                        TO  SPA-ERRMSG
+      *H28.8
+               WHEN    "0045"
+                   MOVE    "薬剤投与量チェック区分エラー"
+                                                       TO  SPA-ERRMSG
       *        
                WHEN    "1001"
                    MOVE    "カルテの病名対象区分がありません。"
@@ -13163,6 +13250,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "TECHOKBN"        TO   MCP-WIDGET
                WHEN    88
                    MOVE  "JGAIKEIKBN"      TO   MCP-WIDGET
+               WHEN    89
+                   MOVE  "TOUYOCHK"      TO   MCP-WIDGET
                WHEN    84
                    MOVE  "HOUKATU"         TO   MCP-WIDGET
                WHEN    85
@@ -13636,6 +13725,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    88              TO  SPA-GMN-CUR
       *
                WHEN    "JGAIKEIKBN"
+      *********    MOVE    84              TO  SPA-GMN-CUR
+                   MOVE    89              TO  SPA-GMN-CUR
+               WHEN    "TOUYOCHK"
                    MOVE    84              TO  SPA-GMN-CUR
       *
                WHEN    "HOUKATU"
