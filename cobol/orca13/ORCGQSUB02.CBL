@@ -2972,8 +2972,10 @@
            MOVE    ZERO    TO      CNT-JOKEN
            PERFORM VARYING IDX1    FROM    1   BY  1
                UNTIL   (   IDX1    >   5 )
+               OR      ( SPA-Q01-KOHNUM-JKN    =   CONST-NOT )
       *
                IF  ( SPA-Q01-KOHNUM (IDX1) NOT =   SPACE )
+      *
                    COMPUTE CNT-JOKEN  =   CNT-JOKEN  +   1
       *
                    IF    ( CNT-JOKEN  =   1 )
@@ -2998,45 +3000,44 @@
                    PERFORM 900-STR-LEN-GET-SEC
                    MOVE    WRK-STR-LEN             TO  WRK-KIGO-LEN
       *
-                   IF    ( SPA-Q01-KOHNUM-JKN      =   CONST-NOT )
-                    AND  ( SPA-Q01-KOHNUM-G    NOT =   SPACE )
-                       CONTINUE
-                   ELSE
-                       IF    ( SPA-Q01-KOHNUM (IDX1)   =   "027" )
-                        AND  ( SPA-Q01-PAYKBN (IDX1)   =   "01" 
+                   IF    ( SPA-Q01-KOHNUM (IDX1)   =   "027" )
+                    AND  ( SPA-Q01-PAYKBN (IDX1)   =   "01" 
                                                         OR "02"
                                                         OR "03")
-                           STRING  "(("            DELIMITED   BY  SIZE
-                               WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
-                               ".KOHNUM ='"        DELIMITED   BY  SIZE
-                               SPA-Q01-KOHNUM (IDX1)(1: WRK-KIGO-LEN)
-                                                   DELIMITED   BY  SIZE
-                               "')AND("            DELIMITED   BY  SIZE
-                               WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
-                               ".PAYKBN ='"        DELIMITED   BY  SIZE
-                               SPA-Q01-PAYKBN (IDX1)
-                                                   DELIMITED   BY  SIZE
-                               "'))"               DELIMITED   BY  SIZE
-                           INTO    WRK-SQL
-                           WITH    POINTER WRK-SQL-PNT
-                           END-STRING
-                       ELSE
-                           STRING  "("             DELIMITED   BY  SIZE
-                               WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
-                               ".KOHNUM ='"        DELIMITED   BY  SIZE
-                               SPA-Q01-KOHNUM (IDX1)(1: WRK-KIGO-LEN)
-                                                   DELIMITED   BY  SIZE
-                               "')"                DELIMITED   BY  SIZE
-                           INTO    WRK-SQL
-                           WITH    POINTER WRK-SQL-PNT
-                           END-STRING
-                       END-IF
+                       STRING  "(("            DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".KOHNUM ='"        DELIMITED   BY  SIZE
+                           SPA-Q01-KOHNUM (IDX1)(1: WRK-KIGO-LEN)
+                                               DELIMITED   BY  SIZE
+                           "')AND("            DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".PAYKBN ='"        DELIMITED   BY  SIZE
+                           SPA-Q01-PAYKBN (IDX1)
+                                               DELIMITED   BY  SIZE
+                           "'))"               DELIMITED   BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+                       END-STRING
+                   ELSE
+                       STRING  "("             DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".KOHNUM ='"        DELIMITED   BY  SIZE
+                           SPA-Q01-KOHNUM (IDX1)(1: WRK-KIGO-LEN)
+                                               DELIMITED   BY  SIZE
+                           "')"                DELIMITED   BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+                       END-STRING
                    END-IF
                END-IF
            END-PERFORM
       *
            IF    ( SPA-Q01-KOHNUM-JKN          =   CONST-NOT )
             AND  ( SPA-Q01-KOHNUM-G        NOT =   SPACE )
+      *
+               COMPUTE CNT-JOKEN  =   CNT-JOKEN  +   1
+               PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
                STRING "(( "                    DELIMITED   BY  SIZE
                       WRK-SQL-TBL-NAME             DELIMITED   BY  SPACE
                       ".HOSPNUM,"                  DELIMITED   BY  SIZE
