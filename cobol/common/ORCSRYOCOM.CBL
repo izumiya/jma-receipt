@@ -1184,8 +1184,8 @@
       **                       LNK-RYOCOM-ADL-TEN-H22(IDX 3)
       **              DISPLAY "LNK-RYOCOM-ADL-TEN-H22(IDX 4) = "
       **                       LNK-RYOCOM-ADL-TEN-H22(IDX 4)
-      **              MOVE   LNK-RYOCOM-SRYCDTOTAL(IDX)
-      **                                   TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
+                    MOVE   LNK-RYOCOM-SRYCDTOTAL(IDX)
+                                         TO  LNK-RYOCOM-SRYCDTOTAL2(IDX)
       *             ＡＤＬａ　ベッド上の可動性
                     MOVE   LNK-RYOCOM-ADL-SRYCD-H22(IDX 1)
                                          TO  WRK-SRYCD-X
