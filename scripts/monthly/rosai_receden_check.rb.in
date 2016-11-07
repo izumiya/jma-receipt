@@ -1176,8 +1176,8 @@ class Receden_check < Receden_common
               if ( @check_level == "1" )
                 if zai["RECID"].value == "IY" && tbl_tensu["TENSIKIBETU"].to_i == 7
                 else
-                  if zai["TEN"].value.to_i == 0
-                    @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
+                  if zai["TEN"].value.strip.empty?
+                    @errors.push("33071",rece,zai,"TEN",nil,tbl_tensu["NAME"])
                   end
                 end
               end
