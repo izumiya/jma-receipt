@@ -35,6 +35,7 @@
       *  04.07.01    NACL-門脇    13/09/30  自賠責（第三者行為）対応
       *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
       *  04.08.00    NACL-多々納  14/08/01  一時ディレクトリ対応
+      *  04.08.00    NACL-多々納  16/11/XX  点滴薬剤計算オプション対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -102,6 +103,11 @@
            03  FLG-HKNCOMBICHK     PIC 9(01).
       *    労災金額％加算 
            03  FLG-KAGEN           PIC 9(01).
+      *H28.11
+      *    点滴点数編集 
+           03  FLG-TENTEKI         PIC 9(01).
+           03  FLG-TENTEKI-ARI     PIC 9(01).
+           03  FLG-HAIKI           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -138,6 +144,12 @@
            03  IDX-C               PIC 9(04).
       *
            03  IDX-END             PIC 9(02).
+      *H28.11
+      *    点滴点数編集 
+           03  IDX-T2              PIC 9(04).
+           03  IDX-T3              PIC 9(04).
+           03  IDX-TBL             PIC 9(04).
+           03  IDXA                PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -220,6 +232,16 @@
       *H24.9
            03  WRK-PARA-HKNNUM         PIC X(03).
            03  WRK-CHK-HKNCOMBI        PIC X(04).
+      *H28.11
+      *    点滴点数編集 
+           03  WRK-TENSU               PIC 9(07)V9(04).
+           03  WRK-ZAITEN-TEN          PIC 9(09).
+           03  WRK-HAIKI-SURYO         PIC 9(07)V9(05).
+           03  WRK-SURYO-9             PIC 9(07).
+           03  WRK-SURYO               PIC 9(07)V9(05).
+           03  WRK-SYOKEIS2            PIC 9(09)V9(06).
+           03  WRK-TENSU-KEI           PIC 9(08)V9(06).
+           03  WRK-TENSU-GOK           PIC 9(08)V9(06).
       *
       *    集計テーブル
        01  TBL-AREA.
@@ -237,6 +259,18 @@
                    07  TBL-RSI-ZAITEN          PIC S9(09).
                    07  TBL-RSI-OCC-3           OCCURS   31.
                        09  TBL-RSI-DAY         PIC 9(03).
+      *H28.11
+      *    点滴数量計用
+       01  TBL-TENTEKI-AREA.
+           03  TBL-TENTEKI-OCC         OCCURS   100.
+               05  TBL-TEN-SRYCD           PIC X(09).
+               05  TBL-TEN-TEN             PIC 9(07)V9(5).
+               05  TBL-TEN-DAY-AREA        OCCURS   31.
+                   07  TBL-TEN-DAY             PIC 9(03).
+                   07  TBL-TEN-SURYO           PIC 9(05)V9(05).
+       01  TBL-TENTEKI-AREA2.
+           03  TBL-TENTEKI2-DAY-AREA    OCCURS   31.
+               07  TBL-TEN2-TENSU          PIC S9(09).
       *
       *    保険テーブル
        01  TBL-HKNCOMBI-AREA.
@@ -267,6 +301,13 @@
                05  TBL-ALL-HKNCOMBINUM     PIC X(04).
                05  TBL-ALL-HKNNUM          PIC X(03).
       *
+      *H28.11
+      *    診療行為マスター
+       01  TBL-SRYACT-AREA.
+           02  TBL-SRYACT-REC         OCCURS  10.
+           COPY    "CPSRYACT.INC"     REPLACING
+                                     //SRY-// BY //TBL-SRY-//.
+      *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG         PIC X(22).
            03  WRK-HENYMD.
@@ -285,6 +326,8 @@
       *    プログラムオプションパラメタ
        01  PARA-AREA.
            03  PARA-HKNCOMBIKBN        PIC X(01).
+      *H28.11
+           03  PARA-TENTEKI            PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -435,6 +478,9 @@
            INITIALIZE                  TBL-RSI-AREA
            INITIALIZE                  TBL-HKNCOMBI-AREA
            INITIALIZE                  TBL-HEN-AREA
+      *    点滴数量計用
+           INITIALIZE                  TBL-TENTEKI-AREA
+           INITIALIZE                  TBL-TENTEKI-AREA2
       *
            ACCEPT  SYS-TIME            FROM    TIME
            MOVE    ZERO                TO  WRK-PAGE
@@ -482,6 +528,11 @@
            IF      ORCHC33-KBN         =   "2"
                MOVE    "0"             TO  PARA-HKNCOMBIKBN
            END-IF
+      *H28.11
+      *    点滴点数集計
+           MOVE    "TENTEKI"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-TENTEKI
       *
            .
        100-OPTION-SELECT-EXT.
@@ -868,6 +919,9 @@
            MOVE    ZERO                TO  WRK-TUK-SYOKUJI
            MOVE    ZERO                TO  WRK-TUK-JIHIKEI
            MOVE    ZERO                TO  WRK-TUK-RSI-MONEY
+      *    点滴数量計用
+           INITIALIZE                  TBL-TENTEKI-AREA
+           INITIALIZE                  TBL-TENTEKI-AREA2
       *
       *    診療会計マスターを編集
            INITIALIZE                      SRYACCT-REC 
@@ -918,6 +972,13 @@
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
            MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *!!!!
+      *H28.11
+      *    点滴薬剤日毎集計
+           IF      PARA-TENTEKI        =   "1"
+      *        点滴点数再計算
+               PERFORM 20019-TENTEKI-SAIKEI-SEC
+           END-IF
       *
            .
        2001-SYUKEI-SYORI-EXT.
@@ -1027,6 +1088,16 @@
                IF      FLG-GENTEN          =   1
                    COMPUTE WRK-ZAITEN      =   WRK-ZAITEN
                                            *   -1
+               END-IF
+           END-IF
+      *!!!!
+      *H28.11
+      *    点滴薬剤日毎集計
+           IF      PARA-TENTEKI        =   "1"
+               IF     (ACCT-SRYKBN     =   "33" )
+                 AND  (ACCT-ZAITEN     >   ZERO )
+                 AND  (ACCT-YKZTEN     >   ZERO )
+                   PERFORM 2001109-TENTEKI-SYORI-SEC
                END-IF
            END-IF
       *
@@ -1498,6 +1569,244 @@
        200139-HKNCOMBI-CHK-EXT.
            EXIT.
       *
+      *H28.11
+      *****************************************************************
+      *     点滴金額集計処理
+      *****************************************************************
+       2001109-TENTEKI-SYORI-SEC                SECTION.
+      *
+           INITIALIZE                  TBL-SRYACT-AREA
+           MOVE    ZERO                TO  IDX-T
+           MOVE    ZERO                TO  FLG-TENTEKI-ARI
+      *    診療行為マスター読み込み
+           INITIALIZE                      SRYACT-REC
+           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+      *    点数検索用日付編集
+           MOVE    ACCT-SRYYM          TO  WRK-SRYYMD(1:6)
+           MOVE    "01"                TO  WRK-SRYYMD(7:2)
+           PERFORM VARYING     IDX-D   FROM    1   BY  1
+                   UNTIL       IDX-D   >   31
+               IF      ACCT-DAY (1 IDX-D)  NOT =   ZERO
+                   MOVE    IDX-D           TO  WRK-SRYYMD(7:2)
+                   MOVE    31              TO  IDX-D
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-RAED-SEC
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           PERFORM   UNTIL     FLG-SRYACT      =   1
+               ADD     1                   TO  IDX-T
+               IF      IDX-T               <=  10
+                   MOVE    SRYACT-REC      TO  TBL-SRYACT-REC (IDX-T)
+               END-IF
+      *
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-RAED-SEC
+           END-PERFORM
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           PERFORM VARYING     IDX-T2  FROM    1   BY  1
+                   UNTIL      (IDX-T2      >   IDX-T  )
+               MOVE    TBL-SRYACT-REC (IDX-T2)     TO  SRYACT-REC
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL      (IDX2        >   5   )  OR
+                                  (SRY-SRYCD(IDX2) =   SPACE )
+      *            点滴・中心静脈薬剤
+                   IF     (SRY-SRYSYUKBN           =   "330"
+                                                   OR  "331"
+                                                   OR  "350"
+                                                   OR  "332"
+                                                   OR  "352")
+      *                薬剤
+                       IF     (SRY-SRYCD (IDX2)(1:1)   =   "6" )
+                           MOVE    1           TO  FLG-TENTEKI-ARI
+                           PERFORM 2001109-TBL-HENSYU-SEC
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *    集計点数（薬剤点数を除く）
+           IF      FLG-TENTEKI-ARI     =   1
+               COMPUTE WRK-ZAITEN          =   ACCT-ZAITEN
+                                           -   ACCT-YKZTEN
+           END-IF
+      *
+           .
+       2001109-TENTEKI-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル編集処理
+      *****************************************************************
+       2001109-TBL-HENSYU-SEC            SECTION.
+      *
+      *    同一コードチェック
+           MOVE    ZERO                TO  IDX-TBL
+           PERFORM VARYING IDX-T3      FROM    1   BY  1
+                   UNTIL  (IDX-T3      >   100 )
+                      OR  (IDX-TBL     >   ZERO)
+               IF      SRY-SRYCD (IDX2)    =   TBL-TEN-SRYCD (IDX-T3)
+                   MOVE    IDX-T3              TO  IDX-TBL
+               ELSE
+                   IF      TBL-TEN-SRYCD (IDX-T3)  =   SPACE
+                       MOVE    IDX-T3              TO  IDX-TBL
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF      IDX-TBL             =   ZERO
+      *        テーブルオーバー
+               GO      TO      2001109-TBL-HENSYU-EXT
+           END-IF
+      *
+           IF      TBL-TEN-SRYCD (IDX-TBL) =   SPACE
+               MOVE    SRY-SRYCD (IDX2)    TO  TBL-TEN-SRYCD (IDX-TBL)
+      *        点数マスタ
+               MOVE    SRY-SRYCD (IDX2)    TO  TNS-SRYCD
+               PERFORM 910-TENSU-READ-SEC
+               IF      FLG-TENSU           =   ZERO
+      *            点数
+                   MOVE    TNS-TEN         TO  TBL-TEN-TEN  (IDX-TBL)
+               END-IF
+           END-IF
+      *    数量集計
+           PERFORM VARYING     IDX-D   FROM    1   BY  1
+                   UNTIL       IDX-D   >   31
+               IF      ACCT-DAY (1 IDX-D)  >   ZERO
+                   ADD     ACCT-DAY (1 IDX-D)  TO  TBL-TEN-DAY
+                                                      (IDX-TBL IDX-D)
+      *            数量計算
+                   MOVE    ACCT-DAY (1 IDX-D)  TO  WRK-DAY
+                   PERFORM 2001109-SURYO-KEI-SEC
+      *            数量
+                   ADD     WRK-SURYO            TO  TBL-TEN-SURYO
+                                                      (IDX-TBL IDX-D)
+               END-IF
+           END-PERFORM
+      *
+           .
+       2001109-TBL-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    数量計算編集処理
+      *****************************************************************
+       2001109-SURYO-KEI-SEC           SECTION.
+      *
+      *    残量廃棄計算
+           MOVE    ZERO                TO  FLG-HAIKI
+           MOVE    ZERO                TO  WRK-SURYO
+           MOVE    ZERO                TO  WRK-HAIKI-SURYO
+      *
+           IF     (IDX2                <   5  )  AND
+                  (SRY-SRYCD (IDX2 + 1)    =   "099309901")
+               MOVE    1                   TO  FLG-HAIKI
+           END-IF
+           IF     (IDX2                =   5  )  AND
+                  (IDX-T2              <   IDX-T )
+               COMPUTE IDXA            =   IDX-T2   +   1
+               IF      TBL-SRY-SRYCD (IDXA  1)
+                                           =   "099309901"
+                   MOVE    1                   TO  FLG-HAIKI
+               END-IF
+           END-IF
+      *    数量
+           IF      FLG-HAIKI           =   ZERO
+               COMPUTE WRK-SURYO           =   SRY-SRYSURYO(IDX2)
+                                           *   WRK-DAY
+           ELSE
+               COMPUTE WRK-SURYO-9         =   SRY-SRYSURYO(IDX2)
+                                           +   0.99999
+               COMPUTE WRK-SURYO           =   WRK-SURYO-9
+                                           *   WRK-DAY
+      *        廃棄数量
+               COMPUTE WRK-HAIKI-SURYO =  (WRK-SURYO-9
+                                           -   SRY-SRYSURYO(IDX2))
+                                           *   WRK-DAY
+           END-IF
+      *
+           .
+       2001109-SURYO-KEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     点滴点数再計算処理
+      *****************************************************************
+       20019-TENTEKI-SAIKEI-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  IDX
+           PERFORM VARYING     IDX-D   FROM    1   BY  1
+                   UNTIL       IDX-D   >   31
+               MOVE    ZERO            TO  IDX
+               MOVE    ZERO            TO  WRK-TENSU-GOK
+               MOVE    ZERO            TO  WRK-ZAITEN-TEN
+               MOVE    ZERO                TO  FLG-TENTEKI
+               PERFORM VARYING     IDX3    FROM    1   BY  1
+                       UNTIL      (IDX3        >   100   )
+      *            コード点数編集処理
+                   PERFORM 2001-TBL-CHEK-SEC
+               END-PERFORM
+      *        点数計算
+               IF      FLG-TENTEKI         =   1
+                   IF      WRK-TENSU-GOK       <=  15
+                       MOVE    1               TO  WRK-SYOKEIS2
+                   ELSE
+                       COMPUTE WRK-SYOKEIS2    =  ((WRK-TENSU-GOK
+                                               -  15)
+                                               /    10 )
+                                               +   1
+                   END-IF
+                   COMPUTE WRK-TENSU           =   WRK-SYOKEIS2
+                                               +   0.99999
+                   MOVE    WRK-TENSU           TO  WRK-ZAITEN-TEN
+               END-IF
+      *
+               IF      WRK-ZAITEN-TEN  NOT =   ZERO
+      *            点数編集
+                   ADD     WRK-ZAITEN-TEN      TO  TBL-TEN2-TENSU(IDX-D)
+               END-IF
+           END-PERFORM
+           .
+       20019-TENTEKI-SAIKEI-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数編集処理
+      *****************************************************************
+       2001-TBL-CHEK-SEC            SECTION.
+      *
+           IF      TBL-TEN-SURYO (IDX3  IDX-D) >   ZERO
+               MOVE    1                   TO  FLG-TENTEKI
+               COMPUTE WRK-TENSU-KEI       =   TBL-TEN-TEN  (IDX3)
+                                           *   TBL-TEN-SURYO
+                                                         (IDX3 IDX-D)
+               COMPUTE WRK-TENSU-GOK       =   WRK-TENSU-GOK 
+                                           +   WRK-TENSU-KEI
+           END-IF
+      *
+           .
+       2001-TBL-CHEK-EXT.
+           EXIT.
+      *!!!!
+      *
+      *
       *****************************************************************
       *     印刷処理
       *****************************************************************
@@ -1543,6 +1852,14 @@
                            PERFORM 20023-RSI-TBLDAY-ADD-SEC
                        END-IF
                    END-PERFORM
+      *H28.11
+      *            点滴薬剤点数
+                   IF     (TBL-TEN2-TENSU (IDX)    >   ZERO )
+                     AND  (IDX1                    =   3    )
+                       ADD     TBL-TEN2-TENSU (IDX) TO  TBL-DAY-ZAITEN
+                                                             (IDX1)
+                   END-IF
+      *
                END-PERFORM
                IF     (FLG-ARI             =   1 )  OR
                       (LNK-ORCHCN33SUB-TEN(IDX)    NOT =   ZERO) OR
