@@ -179,6 +179,8 @@
       *  04.08.07    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.08    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.09    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3918,7 +3920,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE44-SRYKBN      NOT =  "11" AND "12"    ) AND
                  (RECE44-ZAITEN      =   ZERO                ) AND
-                 (RECE44-TOYAKUFLG   =   SPACE               ))
+                 (RECE44-TOYAKUFLG   =   SPACE               ) AND
+                 (RECE44-YKZKISAIFLG =   SPACE               ))
              OR ( RECE44-SAFLG   NOT =   SPACE                )
              OR ( RECE44-TOYAKUFLG   =   "2" OR "4"           )
              OR ( RECE44-ZAIKBN      =    1                   )

@@ -286,6 +286,8 @@
       *                                     残留法人等の負担者番号、受給者番号なし
       *  04.08.09    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.10    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5197,7 +5199,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE04-SRYKBN      NOT =  "11" AND "12"    ) AND
                  (RECE04-ZAITEN      =   ZERO                ) AND
-                 (RECE04-TOYAKUFLG   =   SPACE               ))
+                 (RECE04-TOYAKUFLG   =   SPACE               ) AND
+                 (RECE04-YKZKISAIFLG =   SPACE               ))
              OR ( RECE04-SAFLG   NOT =   SPACE                )
              OR ( RECE04-TOYAKUFLG   =   "2" OR "4"           )
              OR ( RECE04-ZAIKBN      =    1                   )

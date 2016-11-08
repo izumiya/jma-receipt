@@ -287,6 +287,8 @@
       *  04.08.12    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *  04.08.13    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.14    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -474,6 +476,7 @@
            03  FLG-KIN-OKIKAE                          PIC 9(01).
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-IRYORENKEI                          PIC 9(01).
+           03  FLG-YKZ-PRTKBN                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -3039,19 +3042,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     ( ACCT-SYUTEN1         =   ZERO       ) AND
                     ( ACCT-ZAIKAISU    NOT =   ZERO       ) AND
                     ( ACCT-JIHOKBN         =   SPACE      ))
-            OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                   "60" OR "64" OR "70" OR
-                                   "80"                   ) AND
-                    (ACCT-YKZTEN           =  ZERO        ) AND
-                    (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
-                    (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-            OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                   "60" OR "64" OR "70" OR
-                                   "80"                   ) AND
-                    (ACCT-YKZTEN           =  ZERO        ) AND
-                    (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
-                    (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
-                    (RECE82-SRYYM          <  "201204"    ))
             OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
             OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
             OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
@@ -3071,24 +3061,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      "099209721" OR "099209722" OR
                      "840000136" OR "840000140"            )
             OR     ( SRY-SRYCD(IDX2)       =  "099509901"  )
-                  COMPUTE   RECE84-MEISAISU    =  RECE84-MEISAISU
-                                               -  1
-                  MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
-                  COMPUTE   RECE84-SRYCDTOTAL  =  RECE84-SRYCDTOTAL
-                                               -  WRK-SRYCD
-                  IF ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-ZAITEN       NOT =  ZERO        ) AND
-                      (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-                     COMPUTE   RECE84-SURYOUTOTAL =  RECE84-SURYOUTOTAL
-                                                  -  SRY-SRYSURYO(IDX2)
-                  ELSE
-                     COMPUTE   RECE84-SURYOUTOTAL =  RECE84-SURYOUTOTAL
-                                                  -  1
-                  END-IF
+      *
+                  PERFORM   22021A-MEISAISU-HENSYU-SEC
+      *
             END-IF
       *
             IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
@@ -3127,19 +3102,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ( ACCT-SYUTEN1         =   ZERO       ) AND
                       ( ACCT-ZAIKAISU    NOT =   ZERO       ) AND
                       ( ACCT-JIHOKBN         =   SPACE      ))
-              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
-                      (RECE82-SRYYM          <  "201204"    ))
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
               OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
@@ -3361,7 +3323,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                END-IF
       *
+               IF   (ACCT-SRYKBN = "40" OR "50" OR "54" OR "60" OR
+                                   "64" OR "70" OR "80"           )
+               AND  (ACCT-YKZTEN =  ZERO                          )
+                 IF  ( SYS-200501-15-YKZ-PRTKBN  =  "0" )
+                 OR  ((SYS-200501-15-YKZ-PRTKBN  =  "1") AND
+                      (RECE82-SRYYM  <  "201204"       ))
+                   IF    SRY-SRYCD(IDX2)(1:1)  =  "6"
+                         MOVE   "1"    TO  RECE85-RECEDENFLG(IDX4)
+                         MOVE   "1"    TO  RECE85-RECEPTFLG(IDX4)
+                         MOVE    1     TO  FLG-YKZ-PRTKBN
+                         PERFORM   22021A-MEISAISU-HENSYU-SEC
+                   ELSE
+                     IF  FLG-YKZ-PRTKBN  =  1
+                       IF  ( ACCT-ZAITEN           =  ZERO  )
+                       AND ((SRY-SRYCD(IDX2)(1:1)  =  "8"  ) OR
+                            (SRY-SRYCD(IDX2)(1:3)  =  "008"))
+                         MOVE   "1"    TO  RECE85-RECEDENFLG(IDX4)
+                         MOVE   "1"    TO  RECE85-RECEPTFLG(IDX4)
+                         PERFORM   22021A-MEISAISU-HENSYU-SEC
+                       ELSE
+                         MOVE   ZERO   TO  FLG-YKZ-PRTKBN
+                       END-IF
+                     END-IF
+                   END-IF
+                 ELSE
+                   IF    SRY-SRYCD(IDX2)(1:1)  =  "6"
+                         MOVE   "1"    TO  RECE84-YKZKISAIFLG
+                   END-IF
+                 END-IF
+               END-IF
+      *
                IF     SRY-SRYCD(IDX2)  IS  NUMERIC
+               AND    FLG-YKZ-PRTKBN   =   ZERO
       *          IF  SRY-SRYCD(IDX2)(1:3) NOT = "001"
                    MOVE    SRY-SRYCD(IDX2)   TO  WRK-SRYCD
       *
@@ -4389,16 +4383,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE     3         TO    FLG-OSINKBN
                    END-IF
                  END-EVALUATE
-               END-IF
-      *
-               IF    ( SRY-SRYKBN = "40" OR "50" OR "54" OR
-                                    "60" OR "64" OR "70" OR
-                                    "80"                    )
-               AND   ( ACCT-YKZTEN       =     ZERO         )
-               AND   ( SYS-200501-15-YKZ-PRTKBN  =  "1"     )
-               AND   ( SRY-SRYCD(IDX2)(1:1)  =  "6"         )
-               AND   ( RECE82-SRYYM     >=    "201204"      )
-                     MOVE   "1"     TO  RECE84-YKZKISAIFLG
                END-IF
       *
                MOVE    ACCT-ZAIKBN  TO  RECE84-ZAIKBN
@@ -5946,6 +5930,31 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
       *
            .
        220219-ICHIBUCOM-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    明細数等の編集
+      *****************************************************************
+       22021A-MEISAISU-HENSYU-SEC                  SECTION.
+      *
+           COMPUTE   RECE84-MEISAISU    =  RECE84-MEISAISU
+                                        -  1
+           MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
+           COMPUTE   RECE84-SRYCDTOTAL  =  RECE84-SRYCDTOTAL
+                                        -  WRK-SRYCD
+           IF   (ACCT-SRYKBN = "40" OR "50" OR "54" OR "60" OR
+                               "64" OR "70" OR "80"           )
+           AND  (ACCT-YKZTEN =  ZERO                          )
+           AND  (SRY-SRYCD(IDX2)(1:1)  =  "6"                 )
+              COMPUTE   RECE84-SURYOUTOTAL =  RECE84-SURYOUTOTAL
+                                           -  SRY-SRYSURYO(IDX2)
+           ELSE
+              COMPUTE   RECE84-SURYOUTOTAL =  RECE84-SURYOUTOTAL
+                                           -  1
+           END-IF
+      *
+           .
+       22021A-MEISAISU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -8801,6 +8810,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE   ZERO   TO   WRK-SETCOM-JIDO2
            MOVE   ZERO   TO   FLG-KIN-OKIKAE
            MOVE   ZERO   TO   FLG-KIN-OKIKAE2
+           MOVE   ZERO   TO   FLG-YKZ-PRTKBN
            MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
       *
            .

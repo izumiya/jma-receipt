@@ -727,6 +727,8 @@
       *  04.08.26    NACL-門脇    16/09/15  リハビリマスタ追加対応
       *  04.08.27    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.28    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -961,6 +963,7 @@
            03  FLG-CYOFUKU-KOH                         PIC 9(01).
            03  FLG-IRYORENKEI                          PIC 9(01).
            03  FLG-CHECK-ARI                           PIC 9(01).
+           03  FLG-YKZ-PRTKBN                          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -7535,19 +7538,6 @@
                     ( ACCT-SYUTEN1         =   ZERO       ) AND
                     ( ACCT-ZAIKAISU    NOT =   ZERO       ) AND
                     ( ACCT-JIHOKBN         =   SPACE      ))
-            OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                   "60" OR "64" OR "70" OR
-                                   "80"                   ) AND
-                    (ACCT-YKZTEN           =  ZERO        ) AND
-                    (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
-                    (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-            OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                   "60" OR "64" OR "70" OR
-                                   "80"                   ) AND
-                    (ACCT-YKZTEN           =  ZERO        ) AND
-                    (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
-                    (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
-                    (RECE62-SRYYM          <  "201204"    ))
             OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
             OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
             OR     ( FLG-KIN-OKIKAE3   NOT =  ZERO         )
@@ -7568,24 +7558,9 @@
                      "099209711" OR "099209712" OR
                      "099209721" OR "099209722" OR
                      "840000136" OR "840000140"            )
-                  COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
-                                               -  1
-                  MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
-                  COMPUTE   RECE64-SRYCDTOTAL  =  RECE64-SRYCDTOTAL
-                                               -  WRK-SRYCD
-                  IF ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-ZAITEN       NOT =  ZERO        ) AND
-                      (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-                     COMPUTE   RECE64-SURYOUTOTAL =  RECE64-SURYOUTOTAL
-                                                  -  SRY-SRYSURYO(IDX2)
-                  ELSE
-                     COMPUTE   RECE64-SURYOUTOTAL =  RECE64-SURYOUTOTAL
-                                                  -  1
-                  END-IF
+      *
+                  PERFORM   2101216-MEISAISU-HENSYU-SEC
+      *
             END-IF
       *
             IF       SRY-SRYCD(IDX2)(1:7) = "0999901"
@@ -7659,19 +7634,6 @@
                       ( ACCT-SYUTEN1         =   ZERO       ) AND
                       ( ACCT-ZAIKAISU    NOT =   ZERO       ) AND
                       ( ACCT-JIHOKBN         =   SPACE      ))
-              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SYS-200501-15-YKZ-PRTKBN  =  "0"     ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
-              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
-                                     "60" OR "64" OR "70" OR
-                                     "80"                   ) AND
-                      (ACCT-YKZTEN           =  ZERO        ) AND
-                      (SYS-200501-15-YKZ-PRTKBN  =  "1"     ) AND
-                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ) AND
-                      (RECE62-SRYYM          <  "201204"    ))
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE3   NOT =  ZERO         )
@@ -7924,7 +7886,39 @@
                   END-IF
                END-IF
       *
+               IF   (ACCT-SRYKBN = "40" OR "50" OR "54" OR "60" OR
+                                   "64" OR "70" OR "80"           )
+               AND  (ACCT-YKZTEN =  ZERO                          )
+                 IF  ( SYS-200501-15-YKZ-PRTKBN  =  "0" )
+                 OR  ((SYS-200501-15-YKZ-PRTKBN  =  "1") AND
+                      (RECE62-SRYYM  <  "201204"       ))
+                   IF    SRY-SRYCD(IDX2)(1:1)  =  "6"
+                         MOVE   "1"    TO  RECE65-RECEDENFLG(IDX4)
+                         MOVE   "1"    TO  RECE65-RECEPTFLG(IDX4)
+                         MOVE    1     TO  FLG-YKZ-PRTKBN
+                         PERFORM   2101216-MEISAISU-HENSYU-SEC
+                   ELSE
+                     IF  FLG-YKZ-PRTKBN  =  1
+                       IF  ( ACCT-ZAITEN           =  ZERO  )
+                       AND ((SRY-SRYCD(IDX2)(1:1)  =  "8"  ) OR
+                            (SRY-SRYCD(IDX2)(1:3)  =  "008"))
+                         MOVE   "1"    TO  RECE65-RECEDENFLG(IDX4)
+                         MOVE   "1"    TO  RECE65-RECEPTFLG(IDX4)
+                         PERFORM   2101216-MEISAISU-HENSYU-SEC
+                       ELSE
+                         MOVE   ZERO   TO  FLG-YKZ-PRTKBN
+                       END-IF
+                     END-IF
+                   END-IF
+                 ELSE
+                   IF    SRY-SRYCD(IDX2)(1:1)  =  "6"
+                         MOVE   "1"    TO  RECE64-YKZKISAIFLG
+                   END-IF
+                 END-IF
+               END-IF
+      *
                IF     SRY-SRYCD(IDX2)  IS  NUMERIC
+               AND    FLG-YKZ-PRTKBN   =   ZERO
       *          IF  SRY-SRYCD(IDX2)(1:3) NOT = "001"
                    MOVE    SRY-SRYCD(IDX2)   TO  WRK-SRYCD
       *
@@ -8422,16 +8416,6 @@
                                                   (WRK-CHAR-N-CNT  /  2)
                      END-IF
                    END-IF
-               END-IF
-      *
-               IF    ( SRY-SRYKBN = "40" OR "50" OR "54" OR
-                                    "60" OR "64" OR "70" OR
-                                    "80"                    )
-               AND   ( ACCT-YKZTEN       =     ZERO         )
-               AND   ( SYS-200501-15-YKZ-PRTKBN  =  "1"     )
-               AND   ( SRY-SRYCD(IDX2)(1:1)  =  "6"         )
-               AND   ( RECE62-SRYYM     >=    "201204"      )
-                     MOVE   "1"     TO  RECE64-YKZKISAIFLG
                END-IF
       *
                MOVE    ACCT-ZAIKBN  TO  RECE64-ZAIKBN
@@ -9898,6 +9882,31 @@
       *
            .
        2101215-ICHIBUCOM-HENSYU3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    明細数等の編集
+      *****************************************************************
+       2101216-MEISAISU-HENSYU-SEC                 SECTION.
+      *
+           COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
+                                        -  1
+           MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
+           COMPUTE   RECE64-SRYCDTOTAL  =  RECE64-SRYCDTOTAL
+                                        -  WRK-SRYCD
+           IF   (ACCT-SRYKBN = "40" OR "50" OR "54" OR "60" OR
+                               "64" OR "70" OR "80"           )
+           AND  (ACCT-YKZTEN =  ZERO                          )
+           AND  (SRY-SRYCD(IDX2)(1:1)  =  "6"                 )
+              COMPUTE   RECE64-SURYOUTOTAL =  RECE64-SURYOUTOTAL
+                                           -  SRY-SRYSURYO(IDX2)
+           ELSE
+              COMPUTE   RECE64-SURYOUTOTAL =  RECE64-SURYOUTOTAL
+                                           -  1
+           END-IF
+      *
+           .
+       2101216-MEISAISU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -11642,6 +11651,7 @@
            MOVE   ZERO   TO   FLG-HENSYU-NG
            MOVE   ZERO   TO   FLG-HENSYU-NG2
            MOVE   ZERO   TO   FLG-HENSYU-ARI
+           MOVE   ZERO   TO   FLG-YKZ-PRTKBN
            MOVE   SPACE  TO   WRK-NYUSAI-SRYKBN
       *
            .

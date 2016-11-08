@@ -66,6 +66,8 @@
       *  04.08.04    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.05    NACL-門脇    16/02/05  医保レセプト「他保険にて診察料算定
       *                                     済」コメント不記載対応
+      *  04.08.06    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -695,10 +697,15 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
                      IF  (RECE05-SRYCD(IDZ)(1:1)  =   "8"  )  OR
                          (RECE05-SRYCD(IDZ)(1:3)  =   "008")
+                       IF   (RECE05-RECEPTFLG(IDZ)   =  "1")
+                       AND  (RECE05-RECEDENFLG(IDZ)  =  "1")
+                         CONTINUE
+                       ELSE
                          ADD       1                 TO  IDZ2
                          IF   IDZ2  <=  10
                             MOVE   RECE05-NAME(IDZ)  TO  WRK-COM(IDZ2)
                          END-IF
+                       END-IF
                      END-IF
       *
                   END-PERFORM

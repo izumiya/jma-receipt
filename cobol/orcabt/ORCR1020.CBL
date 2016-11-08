@@ -37,6 +37,8 @@
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.04    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -571,11 +573,15 @@ grpsys     COPY    "COMMON-SPA".
                                            =   SPACE )
                        IF    ( RECE130-SRYCD(IDZ)(1:1)     =   "8"   )
                        OR    ( RECE130-SRYCD(IDZ)(1:3)     =   "008" )
+                         IF    RECE130-RECEPTFLG(IDZ)   =  "1"
+                           CONTINUE
+                         ELSE
                            ADD     1               TO  IDZ2
                            IF      IDZ2            <=  10
                                MOVE   RECE130-NAME (IDZ)
                                                    TO  WRK-COM (IDZ2)
                            END-IF
+                         END-IF
                        END-IF
                    END-PERFORM
                    PERFORM  900-RECE130-READ-SEC

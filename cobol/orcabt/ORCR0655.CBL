@@ -53,6 +53,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.03    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.04    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.05    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -621,10 +623,15 @@
       *
                      IF  (RECE65-SRYCD(IDZ)(1:1)  =   "8"  )  OR
                          (RECE65-SRYCD(IDZ)(1:3)  =   "008")
+                       IF   (RECE65-RECEPTFLG(IDZ)   =  "1")
+                       AND  (RECE65-RECEDENFLG(IDZ)  =  "1")
+                         CONTINUE
+                       ELSE
                          ADD       1                 TO  IDZ2
                          IF   IDZ2  <=  10
                             MOVE   RECE65-NAME(IDZ)  TO  WRK-COM(IDZ2)
                          END-IF
+                       END-IF
                      END-IF
       *
                   END-PERFORM

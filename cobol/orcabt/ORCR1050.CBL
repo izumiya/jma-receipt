@@ -89,6 +89,8 @@
       *  04.08.07    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.08    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.09    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3710,7 +3712,9 @@
              OR ((FLG-COMMENT3       =    1                  ) AND
                  (RECE120-SRYKBN     NOT =  "11" AND "12"    ) AND
                  (RECE120-ZAITEN     =   ZERO                ) AND
-                 (RECE120-TOYAKUFLG  =   SPACE               ))
+                 (RECE120-TOYAKUFLG  =   SPACE               ) AND
+                 (RECE120-YKZKISAIFLG
+                                     =   SPACE               ))
              OR ( RECE120-SAFLG  NOT =   SPACE                )
              OR ( RECE120-TOYAKUFLG  =   "2" OR "4"           )
              OR ( RECE120-ZAIKBN     =    1                   )

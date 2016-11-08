@@ -44,6 +44,8 @@
       *  04.08.06    NACL-門脇    16/08/23  持参薬対応
       *  04.08.07    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.08    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
+      *                                     （記録）対応修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3096,7 +3098,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
               OR ((FLG-COMMENT3       =    1                  ) AND
                   (RECE84-SRYKBN      NOT =  "11"             ) AND
                   (RECE84-ZAITEN      =   ZERO                ) AND
-                  (RECE84-TOYAKUFLG   =   SPACE               ))
+                  (RECE84-TOYAKUFLG   =   SPACE               ) AND
+                  (RECE84-YKZKISAIFLG =   SPACE               ))
               OR ( RECE84-SAFLG   NOT =   SPACE                )
               OR ( RECE84-TOYAKUFLG   =   "2" OR "4"           )
               OR ( RECE84-ZAIKBN      =    1                   )
