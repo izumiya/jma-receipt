@@ -78,6 +78,17 @@ Q01 {
           count int;
             item varchar(12)[2];
         };
+        CMB_DRCD {
+          DRCD {
+        	textdata varchar(29);
+          };
+      	  count int;
+          item varchar(29)[99];
+    	};
+        LBLMSG01{
+      		textdata varchar(100);
+      		style varchar(20);
+		};
         CMB_SRYKA {
           SRYKA {
             textdata varchar(23);

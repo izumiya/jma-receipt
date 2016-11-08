@@ -35,6 +35,7 @@ tbl_srysrh {
 	EDSRYYMD			char(8),virtual;
 	STSRYYM				char(6),virtual;
 	EDSRYYM				char(6),virtual;
+	DRCD				  char(5),virtual;
 	SQL                             dbcode(15000),virtual;
 };
 
@@ -338,6 +339,7 @@ path	ins2_1 	{
        AND A.PTID      = B.PTID
        AND A.NYUGAIKBN = B.NYUGAIKBN
        AND A.SRYKA     = B.SRYKA
+       AND B.DRCD      LIKE :DRCD
        AND B.SRYYMD   >= :STSRYYMD
        AND B.SRYYMD   <= :EDSRYYMD
        AND A.ZAINUM in
@@ -641,6 +643,7 @@ path	ins4_1 	{
        AND A.PTID      = B.PTID
        AND A.NYUGAIKBN = B.NYUGAIKBN
        AND A.SRYKA     = B.SRYKA
+       AND B.DRCD      LIKE :DRCD
        AND B.SRYYMD   >= :STSRYYMD
        AND B.SRYYMD   <= :EDSRYYMD
        AND A.ZAINUM in

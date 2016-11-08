@@ -2415,6 +2415,10 @@
                        PERFORM 10011-SRYKA-SQL-EDIT-SEC
                    END-IF
       *
+                   IF    ( SPA-Q01-DRCD      NOT =   SPACE )
+                       PERFORM 10011-DRCD-SQL-EDIT-SEC
+                   END-IF
+      *
       *            ´µ¼Ô¸øÈñ¾ðÊó£Ó£Ñ£ÌÊÔ½¸½èÍý
                    MOVE    SPA-Q01-KOHNUM (IDXA)
                                            TO  WRK-KOHNUM
@@ -2494,6 +2498,10 @@
       *
            IF    ( SPA-Q01-SRYKA   NOT =   SPACE )
                PERFORM 10011-SRYKA-SQL-EDIT-SEC
+           END-IF
+      *
+           IF    ( SPA-Q01-DRCD      NOT =   SPACE )
+               PERFORM 10011-DRCD-SQL-EDIT-SEC
            END-IF
       *
            IF   ( SPA-Q01-GHKNINF   =   "1" )
@@ -3337,6 +3345,10 @@
       *
            IF    ( SPA-Q01-SRYKA   NOT =   SPACE )
                PERFORM 10011-SRYKA-SQL-EDIT-SEC
+           END-IF
+      *
+           IF    ( SPA-Q01-DRCD      NOT =   SPACE )
+               PERFORM 10011-DRCD-SQL-EDIT-SEC
            END-IF
       *
            MOVE    1                   TO  CNT-JOKEN
@@ -4205,6 +4217,28 @@
       *
            .
        10011-SRYKA-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥É¥¯¥¿¡¼ÊÔ½¸½èÍý
+      *****************************************************************
+       10011-DRCD-SQL-EDIT-SEC            SECTION.
+      *
+           MOVE    1                   TO  CNT-JOKEN
+      *
+           PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
+           STRING  WRK-SQL-TBL-NAME    DELIMITED BY SPACE
+                   ".DRCD ='"          DELIMITED BY SIZE
+                   SPA-Q01-DRCD        DELIMITED BY SIZE
+                       "'"             DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           PERFORM 900-SQL-JOKEN-EDIT3-SEC
+      *
+           .
+       10011-DRCD-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ¶èÊ¬ÊÔ½¸½èÍý

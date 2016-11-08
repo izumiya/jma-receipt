@@ -83,6 +83,8 @@
            03  SRYSRH-STSRYYM      PIC X(6).
       *½ªÎ»¿ÇÎÅ·î
            03  SRYSRH-EDSRYYM      PIC X(6).
+      *¥É¥¯¥¿¡¼
+           03  SRYSRH-DRCD         PIC X(5).
       *SQL
            03  SRYSRH-SQL          PIC X(15000).
 

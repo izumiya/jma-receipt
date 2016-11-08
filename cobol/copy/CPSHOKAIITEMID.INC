@@ -204,3 +204,4 @@
            03  SHKITEMID-STKNYM        PIC 9(05)   VALUE   179.
            03  SHKITEMID-EDKNYM        PIC 9(05)   VALUE   180.
            03  SHKITEMID-KNJOTAI       PIC 9(05)   VALUE   181.
+           03  SHKITEMID-DRCD          PIC 9(05)   VALUE   182.

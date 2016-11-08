@@ -110,6 +110,11 @@
                                                        PIC X(01).
                                13  SPA-GMN-Q01-NYUGAIKBNMEI
                                                        PIC X(10).
+      *                    •…•Ø•ø°º
+                           11  SPA-GMN-Q01-DRCD-G.
+                               13  SPA-GMN-Q01-DRCD      PIC X(04).
+                               13  SPA-GMN-Q01-DRCDFL    PIC X(01).
+                               13  SPA-GMN-Q01-DRCDMEI   PIC X(24).
       *                    ø«Œ≈≤ 
                            11  SPA-GMN-Q01-SRYKA-G.
                                13  SPA-GMN-Q01-SRYKA   PIC X(02).
@@ -557,8 +562,6 @@
                            11  SPA-NAI-Q01-TOKKICD-BF  PIC X(02).
       *                 ›∏±°°∏¯»Ò
                        09  SPA-NAI-Q01-HOKEN-AREA.
-                           11  SPA-NAI-Q01-JKNKOHNUM-OLD
-                                                       PIC X(01).
                            11  SPA-NAI-Q01-HKNEDYM     PIC X(06).
                            11  SPA-NAI-Q01-KOHEDYM     PIC X(06).
       *                …¬Ãæ°°ø«Œ≈π‘∞Ÿ
@@ -598,12 +601,18 @@
                        09  SPA-GMN-Q01-SELPATTERNLST-G.
                            11  SPA-GMN-Q01-SELPATTERNLST-MAX
                                                            PIC 9(05).
-                           11  SPA-GMN-Q01-SELPATTERNLST   OCCURS  50.
-                              13  SPA-GMN-Q01-SELPATTERNL  PIC X(02).
-                              13  SPA-GMN-Q01-SELPATTERNFLL
+                           11  SPA-GMN-Q01-SELPATTERNLST-OCC OCCURS  50.
+                               13  SPA-GMN-Q01-SELPATTERNLST.
+                                   15  SPA-GMN-Q01-SELPATTERNL
+                                                           PIC X(02).
+                                   15  SPA-GMN-Q01-SELPATTERNFLL
                                                            PIC X(01).
-                              13  SPA-GMN-Q01-SELPATTERNMEIL
+                                   15  SPA-GMN-Q01-SELPATTERNMEIL
                                                            PIC X(100).
+                               13  SPA-GMN-Q01-SELPATTERN-UIDL
+                                                              PIC X(36).
+                               13  SPA-GMN-Q01-SELPATTERN-TTLKBNL
+                                                              PIC X(01).
                        09  SPA-GMN-Q01-SEXLST-G.
                            11  SPA-GMN-Q01-SEXLST-MAX      PIC 9(05).
                            11  SPA-GMN-Q01-SEXLST          OCCURS  3.
@@ -619,6 +628,12 @@
                                                            PIC X(01).
                                13  SPA-GMN-Q01-NYUGAIKBNMEIL
                                                            PIC X(10).
+                       09  SPA-GMN-Q01-DRCDLST-G.
+                           11  SPA-GMN-Q01-DRCDLST-MAX       PIC 9(05).
+                           11  SPA-GMN-Q01-DRCDLST           OCCURS  99.
+                               13  SPA-GMN-Q01-DRCDL         PIC X(04).
+                               13  SPA-GMN-Q01-DRCDFLL       PIC X(01).
+                               13  SPA-GMN-Q01-DRCDMEIL      PIC X(24).
                        09  SPA-GMN-Q01-SRYKALST-G.
                            11  SPA-GMN-Q01-SRYKALST-MAX    PIC 9(05).
                            11  SPA-GMN-Q01-SRYKALST        OCCURS  50.
@@ -738,10 +753,12 @@
                                13  SPA-GMN-Q01-HKNNUMMEIL  PIC X(16).
                        09  SPA-GMN-Q01-KOHNUMLST-G.
                            11  SPA-GMN-Q01-KOHNUMLST-MAX   PIC 9(05).
-                           11  SPA-GMN-Q01-KOHNUMLST       OCCURS 150.
-                               13  SPA-GMN-Q01-KOHNUML     PIC X(03).
-                               13  SPA-GMN-Q01-PAYKBNL     PIC X(01).
-                               13  SPA-GMN-Q01-KOHNUMMEIL  PIC X(16).
+                           11  SPA-GMN-Q01-KOHNUMLST-OCC   OCCURS 150.
+                               13  SPA-GMN-Q01-KOHNUMLST.
+                                   15  SPA-GMN-Q01-KOHNUML    PIC X(03).
+                                   15  SPA-GMN-Q01-PAYKBNL    PIC X(01).
+                                   15  SPA-GMN-Q01-KOHNUMMEIL PIC X(16).
+                               13  SPA-GMN-Q01-KOHNUM-TYPEL   PIC X(1).
                        09  SPA-GMN-Q01-UTAGAIKBNLST-G.
                            11  SPA-GMN-Q01-UTAGAIKBNLST-MAX PIC 9(05).
                            11  SPA-GMN-Q01-UTAGAIKBNLST    OCCURS 3.
@@ -842,6 +859,27 @@
                                13  SPA-GMN-Q01-SRYSYUKBNL     PIC X(02).
                                13  SPA-GMN-Q01-SRYSYUKBNFLL   PIC X(01).
                                13  SPA-GMN-Q01-SRYSYUKBNMEIL  PIC X(20).
+                       09  SPA-GMN-Q01-SRYSYUKBN20LST-G.
+                           11  SPA-GMN-Q01-SRYSYUKBN20LST-MAX PIC 9(05).
+                           11  SPA-GMN-Q01-SRYSYUKBN20LST     OCCURS 10.
+                               13  SPA-GMN-Q01-SRYSYUKBN20L   PIC X(02).
+                               13  SPA-GMN-Q01-SRYSYUKBN20FLL PIC X(01).
+                               13  SPA-GMN-Q01-SRYSYUKBN20MEIL
+                                                              PIC X(20).
+                       09  SPA-GMN-Q01-SRYSYUKBN30LST-G.
+                           11  SPA-GMN-Q01-SRYSYUKBN30LST-MAX PIC 9(05).
+                           11  SPA-GMN-Q01-SRYSYUKBN30LST     OCCURS 10.
+                               13  SPA-GMN-Q01-SRYSYUKBN30L   PIC X(02).
+                               13  SPA-GMN-Q01-SRYSYUKBN30FLL PIC X(01).
+                               13  SPA-GMN-Q01-SRYSYUKBN30MEIL
+                                                              PIC X(20).
+                       09  SPA-GMN-Q01-SRYSYUKBN90LST-G.
+                           11  SPA-GMN-Q01-SRYSYUKBN90LST-MAX PIC 9(05).
+                           11  SPA-GMN-Q01-SRYSYUKBN90LST     OCCURS 10.
+                               13  SPA-GMN-Q01-SRYSYUKBN90L   PIC X(02).
+                               13  SPA-GMN-Q01-SRYSYUKBN90FLL PIC X(01).
+                               13  SPA-GMN-Q01-SRYSYUKBN90MEIL
+                                                              PIC X(20).
                        09  SPA-GMN-Q01-HOKATSUKBNLST-G.
                            11  SPA-GMN-Q01-HOKATSUKBNLST-MAX  PIC 9(05).
                            11  SPA-GMN-Q01-HOKATSUKBNLST      OCCURS 5.
@@ -898,14 +936,6 @@
                                13  SPA-GMN-Q01-JKNSRYACTL     PIC X(01).
                                13  SPA-GMN-Q01-JKNSRYACTFLL   PIC X(01).
                                13  SPA-GMN-Q01-JKNSRYACTMEIL  PIC X(08).
-      *            •≥•Û•‹•‹•√•Ø•πæ ÛŒŒ∞Ë° ∆‚…Ù°À
-                   07  SPA-NAI-Q01-COMMBO-AREA.
-                       09  SPA-NAI-Q01-SELPATTERNLST-G.
-                           11  SPA-NAI-Q01-SELPATTERN-OCC  OCCURS  50.
-                               13  SPA-NAI-Q01-SELPATTERN-UIDL
-                                                              PIC X(36).
-                               13  SPA-NAI-Q01-SELPATTERN-TTLKBNL
-                                                              PIC X(01).
       *    £—£∞£≤°¢£—£∞£≤£¡°¢£—£∞£≤£¬Õ—
            03  SPA-Q02.
                05  SPA-Q02-AREA.
@@ -1287,6 +1317,7 @@
                        09  SPA-Q01-SEX                 PIC X(01).
                        09  SPA-Q01-STLASTYMD           PIC X(08).
                        09  SPA-Q01-EDLASTYMD           PIC X(08).
+                       09  SPA-Q01-DRCD                  PIC X(05).
                        09  SPA-Q01-NYUGAIKBN           PIC X(1).
                        09  SPA-Q01-SRYKA               PIC X(2).
                        09  SPA-Q01-DEATH               PIC X(1).

@@ -1373,4 +1373,21 @@ path	key64	{
 	};
 };
 
-
+#FALSEの値はTRUEより小さいため、ドクターコードが一致した場合は先頭で返却される
+path	key65	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key65_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =  :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			AND   RENNUM      =   :RENNUM
+			AND   EDANUM      =   :EDANUM
+			AND   HKNCOMBINUM =   :HKNCOMBINUM
+			ORDER   BY    ( DRCD <> :DRCD ) 
+		;
+	};
+};

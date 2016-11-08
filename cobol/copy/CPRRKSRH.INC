@@ -33,6 +33,8 @@
             03  RRKSRH-NYUGAIKBN       PIC X(1).
       *ø«Œ≈≤ 
             03  RRKSRH-SRYKA           PIC X(2).
+      *•…•Ø•ø°º
+            03  RRKSRH-DRCD            PIC X(5).
       * ›∏±¡»πÁ§ª
             03  RRKSRH-HKNCOMBINUM     PIC 9(4).
       *ø«Œ≈∆¸

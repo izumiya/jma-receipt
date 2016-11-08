@@ -140,6 +140,7 @@
            03  IDX2                    PIC 9(05).
            03  IDXK                    PIC 9(05).
            03  IDXM                    PIC 9(05).
+           03  IDXR                    PIC 9(05).
            03  IDX-SRY                 PIC 9(05).
       *
            03  IDXD                    PIC 9(02).
@@ -150,6 +151,7 @@
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-SRYSRH              PIC 9(01).
            03  FLG-SRYACCT             PIC 9(01).
+           03  FLG-JYURRK              PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
            03  FLG-LOOPEND             PIC 9(01).
            03  FLG-END                 PIC 9(01).
@@ -159,10 +161,12 @@
            03  FLG-TARGET-SRYCD-G.
                05  FLG-TARGET-SRYCD    PIC 9(01)
                                        OCCURS  5.
+           03  FLG-TARGET-ACCT         PIC 9(01).
       *
        01  SEL-AREA.
            03  SEL-SRYKA                           PIC X(02).
            03  SEL-NYUGAIKBN                       PIC X(01).
+           03  SEL-DRCD                            PIC X(05).
            03  SEL-SRYKBN                          PIC X(02).
            03  SEL-SRYSYUKBN                       PIC X(03).
            03  SEL-STSRYYMD                        PIC X(08).
@@ -206,6 +210,7 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYM                       PIC X(06).
                05  WRK-SRYDD                       PIC 9(02).
+           03  WRK-RENNUM                          PIC 9(05).
       *
        01  COSNT-AREA.
            03  CONST-VALSURYO          PIC X(01) VALUE "1".
@@ -244,10 +249,15 @@
            03  CONST-KOHNUM-R          REDEFINES CONST-KOHNUM-VAL.
                05  CONST-KOHNUM        PIC X(03) OCCURS    22.
            03  CONST-KOHNUM-MAX        PIC 9(03) VALUE     22.
+           03  CONST-ACCT-OCC-MAX      PIC 9(03) VALUE     10.
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    受診履歴テーブル
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
       *    保険組合せ
        01  HKNCOMBI-REC.
@@ -447,6 +457,12 @@
                MOVE    "%"                 TO  SEL-NYUGAIKBN
            ELSE
                MOVE    SPA-Q01-NYUGAIKBN   TO  SEL-NYUGAIKBN
+           END-IF
+      *
+           IF    ( SPA-Q01-DRCD        =   SPACE )
+               MOVE    "%"                 TO  SEL-DRCD
+           ELSE
+               MOVE    SPA-Q01-DRCD        TO  SEL-DRCD
            END-IF
       *
            IF    ( SPA-Q01-SRYKBN       =   SPACE )
@@ -690,6 +706,7 @@
            OPEN    I-O     TMP01-FILE  TMP02-FILE
       *
            PERFORM 900-SRYSRH-KEY-SEL-SEC
+           DISPLAY "FLG-SRYSRH  = " FLG-SRYSRH
       *
            PERFORM UNTIL ( FLG-SRYSRH  NOT =   ZERO )
       *
@@ -919,22 +936,69 @@
        200111-SRYVAL-SUM-SEC           SECTION.
       *
            PERFORM 900-SRYACCT-KEY57-SEL-SEC
-           MOVE    ACCT-SRYYM      TO  WRK-SRYYMD
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               MOVE    IDXD        TO  WRK-SRYDD
-               IF    ( WRK-SRYYMD  >=  SEL-STSRYYMD )
-                AND  ( WRK-SRYYMD  <=  SEL-EDSRYYMD )
-                   COMPUTE WRK-ZAIKAISU
-                       =   WRK-ZAIKAISU
-                       +   ACCT-DAY (1 IDXD)
-                   MOVE    ACCT-DAY (1 IDXD)
-                                   TO  WRK-DAY (IDXD)
-               END-IF
-           END-PERFORM
+           IF    ( SPA-Q01-DRCD    NOT =   SPACE )
+               MOVE    ACCT-SRYYM      TO  WRK-SRYYMD
+               PERFORM VARYING IDXR    FROM    2   BY  1
+                       UNTIL ( IDXR    >   CONST-ACCT-OCC-MAX )
+                   PERFORM VARYING IDXD    FROM    1   BY  1
+                           UNTIL ( IDXD    >   31 )
+                       IF    ( ACCT-DAY (IDXR IDXD)    >   ZERO )
+                           PERFORM 2001111-SRYVAL-SUM-SEC
+                       END-IF
+                   END-PERFORM
+               END-PERFORM
+           ELSE
+               PERFORM VARYING IDXD    FROM    1   BY  1
+                       UNTIL ( IDXD    >   31 )
+                   MOVE    1           TO  IDXR
+                   PERFORM 2001111-SRYVAL-SUM-SEC
+               END-PERFORM
+           END-IF
       *
            .
        200111-SRYVAL-SUM-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為数値集計処理
+      *****************************************************************
+       2001111-SRYVAL-SUM-SEC          SECTION.
+      *
+           DISPLAY "SPA-Q01-DRCD=" SPA-Q01-DRCD
+      *
+           MOVE    ACCT-SRYYM      TO  WRK-SRYYMD
+           MOVE    IDXD            TO  WRK-SRYDD
+      *
+           MOVE    1               TO  FLG-TARGET-ACCT
+      *
+           IF    ( WRK-SRYYMD  >=  SEL-STSRYYMD )
+            AND  ( WRK-SRYYMD  <=  SEL-EDSRYYMD )
+               CONTINUE
+           ELSE
+               MOVE    ZERO        TO  FLG-TARGET-ACCT
+           END-IF
+      *
+           IF    ( SPA-Q01-DRCD     NOT =   SPACE )
+               COMPUTE WRK-RENNUM   =   IDXR   -   1
+               DISPLAY "WRK-RENNUM  = "  WRK-RENNUM
+               DISPLAY "WRK-SRYYMD  = "  WRK-SRYYMD
+               PERFORM 900-JYURRK-KEY65-SEL-SEC
+               DISPLAY "JYURRK-DRCD  = "  JYURRK-DRCD
+               DISPLAY "FLG-JYURRK  = " FLG-JYURRK
+               IF    ( SPA-Q01-DRCD NOT =   JYURRK-DRCD )
+                   MOVE    ZERO    TO  FLG-TARGET-ACCT
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-TARGET-ACCT =   1 )
+               COMPUTE WRK-ZAIKAISU
+                   =   WRK-ZAIKAISU
+                   +   ACCT-DAY (IDXR IDXD)
+               MOVE    ACCT-DAY (IDXR IDXD)
+                                   TO  WRK-DAY (IDXD)
+           END-IF
+      *
+           .
+       2001111-SRYVAL-SUM-EXT.
            EXIT.
       *****************************************************************
       *    診療行為数値検索より患者照会編集処理
@@ -1450,9 +1514,10 @@
            MOVE    SPA-TERMID      TO  RRKSRH-TERMID
            MOVE    SEL-NYUGAIKBN   TO  RRKSRH-NYUGAIKBN
            MOVE    SEL-SRYKA       TO  RRKSRH-SRYKA
+           MOVE    SEL-DRCD        TO  RRKSRH-DRCD
            MOVE    SEL-STSRYYMD    TO  RRKSRH-STSRYYMD
            MOVE    SEL-EDSRYYMD    TO  RRKSRH-EDSRYYMD
-           MOVE    SEL-UPYMD    TO  RRKSRH-CREYMD
+           MOVE    SEL-UPYMD       TO  RRKSRH-CREYMD
                                        RRKSRH-UPYMD
            MOVE    SEL-UPHMS    TO  RRKSRH-UPHMS
            MOVE    RRKSRH-REC      TO  MCPDATA-REC
@@ -1583,6 +1648,8 @@
            MOVE    SPA-TERMID      TO  SRYSRH-TERMID
            MOVE    SEL-NYUGAIKBN   TO  SRYSRH-NYUGAIKBN
            MOVE    SEL-SRYKA       TO  SRYSRH-SRYKA
+           MOVE    SEL-DRCD        TO  SRYSRH-DRCD
+           DISPLAY "SRYSRH-DRCD=" SRYSRH-DRCD
            MOVE    SEL-SRYKBN      TO  SRYSRH-SRYKBN
            MOVE    SEL-SRYSYUKBN   TO  SRYSRH-SRYSYUKBN
            MOVE    SEL-STSRYYMD    TO  SRYSRH-STSRYYMD
@@ -1808,6 +1875,40 @@
       *
            .
        900-TENSU-KEY34-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    受信履歴検索処理
+      *****************************************************************
+       900-JYURRK-KEY65-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-JYURRK
+      *
+           INITIALIZE                  JYURRK-REC
+           MOVE    ACCT-HOSPNUM    TO  JYURRK-HOSPNUM
+           MOVE    ACCT-PTID       TO  JYURRK-PTID
+           MOVE    ACCT-NYUGAIKBN  TO  JYURRK-NYUGAIKBN
+           MOVE    ACCT-SRYKA      TO  JYURRK-SRYKA
+           MOVE    WRK-SRYYMD      TO  JYURRK-SRYYMD
+           MOVE    WRK-RENNUM      TO  JYURRK-RENNUM
+           MOVE    1               TO  JYURRK-EDANUM
+           MOVE    ACCT-HKNCOMBI   TO  JYURRK-HKNCOMBINUM
+           MOVE    JYURRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"    TO  MCP-TABLE
+           MOVE    "key65"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  JYURRK-REC
+           ELSE
+               INITIALIZE              JYURRK-REC
+               MOVE    1           TO  FLG-JYURRK
+           END-IF
+      *
+           MOVE    "tbl_jyurrk"    TO  MCP-TABLE
+           MOVE    "key65"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-JYURRK-KEY65-SEL-EXT.
            EXIT.
       *****************************************************************
       *    診療行為数値検索チェックファイル読込処理

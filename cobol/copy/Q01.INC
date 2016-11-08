@@ -51,6 +51,12 @@
                     07  Q01-CMB-NYUGAIKBN-COUNT
                                                PIC S9(9)   BINARY.
                     07  Q01-CMB-NYUGAIKBN-ITEM PIC X(12)   OCCURS  2.
+                  06  Q01-CMB-DRCD.
+                    07  Q01-DRCD                 PIC X(29).
+                    07  Q01-CMB-DRCD-COUNT       PIC S9(9)   BINARY.
+                    07  Q01-CMB-DRCD-ITEM        PIC X(29)   OCCURS  99.
+                  06  Q01-LBLMSG01             PIC X(100).
+                  06  Q01-LBLMSG01-STYLE       PIC X(20).
                   06  Q01-CMB-SRYKA.
                     07  Q01-SRYKA              PIC X(23).
                     07  Q01-CMB-SRYKA-COUNT    PIC S9(9)   BINARY.

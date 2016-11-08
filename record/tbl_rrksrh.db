@@ -4,6 +4,7 @@ tbl_rrksrh {
 	PTID				number(10,0);
 	NYUGAIKBN			char(1);
 	SRYKA				char(2);
+	DRCD				char(5);
 	HKNCOMBINUM			number(4,0);
 	SRYYMD				char(8);
 	CREYMD				char(8);
@@ -43,6 +44,7 @@ path	ins1_1 	{
               PTID,
               NYUGAIKBN,
               SRYKA,
+              DRCD,
               HKNCOMBINUM,
               SRYYMD,
               CREYMD,
@@ -54,6 +56,7 @@ path	ins1_1 	{
                PTID,
                NYUGAIKBN,
                SRYKA,
+               DRCD,
                to_number(HKNCOMBINUM,'9999'),
                SRYYMD,
               :CREYMD,
@@ -63,6 +66,7 @@ path	ins1_1 	{
         WHERE HOSPNUM = :HOSPNUM
           AND NYUGAIKBN LIKE :NYUGAIKBN
           AND SRYKA LIKE :SRYKA
+          AND DRCD  LIKE :DRCD
           AND SRYYMD >= :STSRYYMD
           AND SRYYMD <= :EDSRYYMD
      ;
@@ -78,6 +82,7 @@ path	ins1_2 	{
               PTID,
               NYUGAIKBN,
               SRYKA,
+              DRCD,
               HKNCOMBINUM,
               SRYYMD,
               CREYMD,
@@ -89,6 +94,7 @@ path	ins1_2 	{
                A.PTID,
                '1',
                B.SRYKA,
+               '',
                to_number(B.HKNCOMBINUM,'9999'),
                A.SRYYMD,
               :CREYMD,
@@ -119,6 +125,7 @@ path crtv01	{
            TBL_HKNCOMBI.PTID,
            TBL_HKNCOMBI.HKNCOMBINUM,
            TBL_RRKSRH.NYUGAIKBN,
+           TBL_RRKSRH.DRCD,
            TBL_RRKSRH.SRYKA,
            TBL_RRKSRH.SRYYMD,
            TBL_PTHKNINF.HKNID,
