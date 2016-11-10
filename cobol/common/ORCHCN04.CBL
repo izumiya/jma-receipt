@@ -48,6 +48,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/07/30  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/10/08  ¥³¥á¥ó¥È¡¦¼«Èñ¥¼¥íÂÐ¾ÝÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  Æþ±¡ÎÁÌ¾¾ÎÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/11/XX  £Á£µÈÇ¥µ¥¤¥º¤ÎÍÍ¼°ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -69,7 +70,10 @@
       *
        WORKING-STORAGE             SECTION.
       *
+      *    ¿ÇÎÅÈñÌÀºÙ½ñ¡ÊA4)
            COPY    "HCN04.INC".
+      *    ¿ÇÎÅÈñÌÀºÙ½ñ¡ÊA5)
+           COPY    "HCN04A5.INC".
       *
       *     °õºþÍÑ¥Ç¡¼¥¿ Ì¾¾ÎÎÎ°è 
            COPY    "CPCOMMONPRT.INC".
@@ -327,6 +331,11 @@
       *
       *Ä¢É¼ÌÀºÙ¿ô
        01  LINE-MAX                    PIC 9(03)   VALUE   70.
+      *£Á£´ÌÀºÙ¿ô
+       01  LINE-MAXA4                  PIC 9(03)   VALUE   70.
+      *£Á£µÌÀºÙ¿ô
+       01  LINE-MAXA5                  PIC 9(03)   VALUE   31.
+      *
        01  CONST-H180401               PIC X(08)   VALUE "20060401".
        01  CONST-H201001               PIC X(08)   VALUE "20081001".
       *
@@ -371,6 +380,8 @@
                05  PARA-COM-HYOJI          PIC X(20)  OCCURS  5.
       *    ¼«ÈñÂÐ¾Ý
            03  PARA-JIHIKBN            PIC X(01).
+      *    ÍÍ¼°
+           03  PARA-FORM               PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(100).
@@ -636,6 +647,11 @@
            MOVE    "CHUI"              TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA            TO  PARA-CHUI
+      *H28.11
+      *    Ä¢É¼¥µ¥¤¥º
+           MOVE    "FORM"              TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-FORM
       *
       *H26.10
       *    ÂÐ¾Ý¥³¥á¥ó¥È¥³¡¼¥É
@@ -836,14 +852,30 @@
        400-PRINT-SEC                SECTION.
       *
       *    °õºþÍÑ¥Ç¡¼¥¿½ÐÎÏ
-           MOVE   HCN04            TO  PRT-REC
+      **** MOVE   HCN04            TO  PRT-REC
+      *H28.11
+      *    °õºþÍÑ¥Ç¡¼¥¿½ÐÎÏ
+           IF      PARA-FORM           =   "1"
+      *        A5
+               MOVE    HCN04A5             TO  PRT-REC
+           ELSE
+      *        A4
+               MOVE    HCN04               TO  PRT-REC
+           END-IF
            WRITE  PRT-REC
       *
            CLOSE                       PRT-FILE
       *
            INITIALIZE                 ORCSMKPRTAREA
            MOVE   "HC01.sh"           TO  MKPRT-ID
-           MOVE   "HCN04.red"         TO  MKPRT-DIA
+      *****MOVE   "HCN04.red"         TO  MKPRT-DIA
+           IF      PARA-FORM           =   "1"
+      *        A5
+               MOVE    "HCN04A5.red"       TO  MKPRT-DIA
+           ELSE
+      *        A4
+               MOVE    "HCN04.red"         TO  MKPRT-DIA
+           END-IF
            MOVE   SPACE               TO  MKPRT-DEF
       *****MOVE   HC01PARA            TO  MKPRT-DAT
            MOVE   ASGNPARA            TO  MKPRT-DAT
@@ -863,8 +895,18 @@
       *
            MOVE    ORCHCN04-PRTAREA    TO  ORCSPRTAREA
       *
-           MOVE    "HCN04.red"         TO  SPRT-PRTID
-           MOVE    HCN04               TO  SPRT-PRTDATA
+      **   MOVE    "HCN04.red"         TO  SPRT-PRTID
+      **   MOVE    HCN04               TO  SPRT-PRTDATA
+      *
+           IF      PARA-FORM           =   "1"
+      *        A5
+               MOVE    "HCN04A5.red"       TO  SPRT-PRTID
+               MOVE    HCN04A5             TO  SPRT-PRTDATA
+           ELSE
+      *        A4
+               MOVE    "HCN04.red"         TO  SPRT-PRTID
+               MOVE    HCN04               TO  SPRT-PRTDATA
+           END-IF
       *-----------------------------------------------------------------
            MOVE    "1"                 TO  SPRT-SITEKBN
       *    ¥«¥¹¥¿¥Þ¥¤¥º£Ð£Ç¤Î¾ì¹ç"2"¤ò¥»¥Ã¥È¤¹¤ë¤³¤È¡£
@@ -893,6 +935,14 @@
            MOVE    SPACE               TO  WRK-SRYMEI-OLD
            INITIALIZE                  TBL-MEISAI-AREA
            MOVE    ZERO                TO  IDX-H
+      *H28.11
+           IF      PARA-FORM           =   "1"
+      *        A5
+               MOVE    LINE-MAXA5          TO  LINE-MAX
+           ELSE
+      *        A4
+               MOVE    LINE-MAXA4          TO  LINE-MAX
+           END-IF
       *
            PERFORM VARYING IDX-SYU     FROM    1   BY  1
                    UNTIL   (IDX-SYU    >   10  )   OR
@@ -985,7 +1035,6 @@
            ELSE
                MOVE    ORCHCN04-SKYSTYMD   TO  ORCHCN03S03-SYUSTYMD
            END-IF
-
            IF      ORCHCN04-SKYEDYMD   =   SPACE
                MOVE    SYU-SKYEDYMD        TO  ORCHCN03S03-SYUEDYMD
            ELSE
@@ -2219,6 +2268,22 @@
       *****************************************************************
        400-PRINT-SYORI-SEC          SECTION.
       *
+           IF      PARA-FORM           =   "1"
+               PERFORM 400-A5-PRINT-SYORI-SEC
+           ELSE
+               PERFORM 400-A4-PRINT-SYORI-SEC
+           END-IF
+      *
+           .
+       400-PRINT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    °õºþ½èÍý¡Ê£Á£´¡Ë
+      *****************************************************************
+       400-A4-PRINT-SYORI-SEC           SECTION.
+      *
+      *
            COMPUTE ORCHCN04-PAGE       =   ORCHCN04-PAGE    +   1
       *
            IF    ( ORCHCN04-PRTKBN  =      "1" )
@@ -2241,7 +2306,7 @@
            END-IF
       *
            .
-       400-PRINT-SYORI-EXT.
+       400-A4-PRINT-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2400,6 +2465,192 @@
            .
        300-HCN04-HEN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    °õºþ½èÍý¡Ê£Á£µ¡Ë
+      *****************************************************************
+       400-A5-PRINT-SYORI-SEC           SECTION.
+      *
+      *
+           COMPUTE ORCHCN04-PAGE       =   ORCHCN04-PAGE    +   1
+      *
+           IF    ( ORCHCN04-PRTKBN  =      "1" )
+      *
+      *        Ä¢É¼ÊÔ½¸½èÍý
+               PERFORM 300-HCN04A5-HEN-SEC
+      *
+      *        Ä¢É¼°õºþ½èÍý
+               PERFORM 401-PRINT-SEC
+           ELSE
+      *
+      *        Ä¢É¼°õºþ³«»Ï½èÍý
+               PERFORM 400-SYOKI-PRINT-SEC
+      *
+      *        Ä¢É¼ÊÔ½¸½èÍý
+               PERFORM 300-HCN04A5-HEN-SEC
+      *
+      *        Ä¢É¼°õºþ½èÍý
+               PERFORM 400-PRINT-SEC
+           END-IF
+      *
+           .
+       400-A5-PRINT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¢É¼ÊÔ½¸½èÍý¡Ê£Á£µ¡Ë
+      *****************************************************************
+       300-HCN04A5-HEN-SEC             SECTION.
+      *
+           INITIALIZE                  HCN04A5
+      *
+           ADD     1                   TO  WRK-PAGE
+      *    ÊÇ
+           MOVE    WRK-PAGE            TO  WRK-ZZ9
+           MOVE    WRK-ZZ9             TO  HCN04A5-PAGE
+      *    ÅÁÉ¼ÈÖ¹æ
+           MOVE    WRK-HEAD-DENPNUM    TO  WRK-NO
+           MOVE    WRK-NO              TO  HCN04A5-NO
+      *    ¿ÇÎÅ²Ê
+           MOVE    WRK-HEAD-SRYKA-MEI  TO  HCN04A5-SRYKANAME
+      *    ´µ¼ÔÈÖ¹æ
+           MOVE    ORCHCN04-PTNUM      TO  HCN04A5-PTNUM
+      *
+      *    ¥«¥Ê»áÌ¾
+      *    ´µ¼ÔÌ¾¾Î
+           IF    ( ORCHCN04-NAME (31:) NOT =    SPACE )
+               MOVE    SPA-KANANAME    TO  HCN04A5-KANANAME
+               MOVE    ORCHCN04-NAME   TO  HCN04A5-NAME2
+           ELSE
+               MOVE    SPA-KANANAME    TO  HCN04A5-KANANAME
+               MOVE    ORCHCN04-NAME   TO  HCN04A5-NAME
+           END-IF
+      *
+           IF    ( PARA-KANANAME       =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  HCN04A5-KANANAME
+           END-IF
+      *
+      *    ÊÝ¸±¼ïÊÌ
+           MOVE    WRK-HEAD-HKNCOMBIMEI    TO  HCN04A5-HOKEN
+      *    ÉéÃ´³ä¹ç
+           MOVE    WRK-HEAD-FUTAN      TO  HCN04A5-FUTAN
+           MOVE    WRK-HEAD-FUTAN-MEI  TO  HCN04A5-FUTANLABEL
+      *    È¯¹ÔÆü
+           MOVE    WRK-HEAD-HAKYMD     TO  HCN04A5-HAKYMD
+      *    ÀÁµá³«»ÏÆü
+           MOVE    WRK-HEAD-NYUINSTRYMD    TO  HCN04A5-NYUINSTRYMD
+           MOVE    WRK-HEAD-NYUINENDYMD    TO  HCN04A5-NYUINENDYMD
+      *
+      *    ÉÂÅï
+           MOVE    WRK-ROOM            TO  HCN04A5-ROOM
+      *
+      *    °åÎÅµ¡´Ø½»½ê
+           MOVE    WRK-HOSPADRS        TO  HCN04A5-IRYOADRS
+           INSPECT HCN04A5-IRYOADRS    REPLACING ALL "  " BY "¡¡"
+      *    °åÎÅµ¡´ØÌ¾
+           MOVE    WRK-HOSPNAME        TO  HCN04A5-IRYOMEI
+           INSPECT HCN04A5-IRYOMEI     REPLACING ALL "  " BY "¡¡"
+      *    °åÎÅµ¡´Ø£Ô£Å£Ì
+           MOVE    WRK-HOSPTEL         TO  HCN04A5-IRYOTEL
+      *
+      *    ÎóÌ¾¡ÊÅÀ¿ôµ­ºÜ¡Ë
+           IF      PARA-GOKEITANI      =   "1"
+               MOVE    "¡¡ÅÀ¡¡¿ô¡¡"        TO  HCN04A5-LABEL2
+           ELSE
+               MOVE    "¡¡Ã±¡¡²Á¡¡"        TO  HCN04A5-LABEL2
+           END-IF
+           MOVE    "¡¡¡¡¹ç¡¡¡¡·×¡¡¡¡"  TO  HCN04A5-LABEL
+      *
+      *    ÌÀºÙÆâÍÆ
+           PERFORM VARYING     IDX3    FROM    1   BY  1
+                   UNTIL       IDX3    >   LINE-MAX
+               MOVE    TBL-H-SRYKBN (IDX3) TO  HCN04A5-SRYKBN (IDX3)
+               MOVE    TBL-H-SRYMEI (IDX3) TO  HCN04A5-SRYMEI (IDX3)
+               IF      TBL-H-KAISU  (IDX3) =   "---"
+                   MOVE    ALL "¡½"            TO  HCN04A5-KAISU2 (IDX3)
+                   MOVE    ALL "¡½"            TO  HCN04A5-KINGAKU2
+                                                                 (IDX3)
+               ELSE
+                   MOVE    TBL-H-KAISU  (IDX3) TO  HCN04A5-KAISU (IDX3)
+                   MOVE    TBL-H-TENSU  (IDX3) TO  HCN04A5-TENSU  (IDX3)
+                   MOVE    TBL-H-KINGAKU(IDX3) TO  HCN04A5-KINGAKU(IDX3)
+               END-IF
+      *        ÅÀ¿ôµ­ºÜ¤Ç±ß¤Î¤â¤Î
+               IF      PARA-GOKEITANI      =   "1"
+                   IF      TBL-H-EN  (IDX3)    =   "1"
+      *
+                       MOVE    SPACE           TO  HCN04A5-TENSU  (IDX3)
+                       STRING  TBL-H-TENSU2  (IDX3)
+                               "¡¡"
+                                           DELIMITED  BY  SIZE
+                                           INTO    HCN04A5-TENSU(IDX3)
+                       END-STRING
+                       MOVE    "±ß"           TO  HCN04A5-TENSU2(IDX3)
+      *
+                       MOVE    SPACE           TO  HCN04A5-KINGAKU(IDX3)
+                       STRING  TBL-H-KINGAKU2(IDX3)
+                               "¡¡"
+                                           DELIMITED  BY  SIZE
+                                           INTO    HCN04A5-KINGAKU(IDX3)
+                       END-STRING
+                       MOVE    "±ß"           TO  HCN04A5-KINGAKU2(IDX3)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *!!! IF      PARA-GOKEITANI      =   "1"
+      *        MOVE    CONS-LABEL2         TO  HCN04A5-LABEL2
+      *    ELSE
+      *        MOVE    CONS-LABEL1         TO  HCN04A5-LABEL2
+      *!!  END-IF
+      *H26.4
+      *    Ãí°Õ
+           IF      (SMCNDATE-YMD       >=  PARA-CHUI-YUKOSTYMD )
+              AND  (SMCNDATE-YMD       <=  PARA-CHUI-YUKOEDYMD )
+               MOVE    PARA-CHUI           TO  HCN04A5-CHUI
+           END-IF
+      *
+      *
+           EVALUATE   PARA-SHADE
+               WHEN    "0"
+      *            ÌÖ³Ý¤±¤Ê¤·
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L2 -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCN04A5-LOPTION
+                   END-STRING
+               WHEN    "1"
+      *            ÌÖ³Ý¤ÎÇ»¤µ£±
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L2  -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCN04A5-LOPTION
+                   END-STRING
+               WHEN    "2"
+      *            ÌÖ³Ý¤ÎÇ»¤µ£²
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L3 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCN04A5-LOPTION
+                   END-STRING
+               WHEN    OTHER
+      *            ÌÖ³ÝÇ»¤µ£³¡ÊÉ¸½à¡Ë
+                   STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                           " -L L1  -L L2 "
+                                               DELIMITED  BY  SIZE
+                           "MonpeLayerOut"     DELIMITED  BY  SIZE
+                                               INTO    HCN04A5-LOPTION
+                   END-STRING
+           END-EVALUATE
+           .
+       300-HCN04A5-HEN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *   Æþ±¡´ðËÜÎÁÊÔ½¸½èÍý
