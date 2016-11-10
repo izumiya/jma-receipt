@@ -50,6 +50,7 @@
       *  04.08.00    NACL-森脇     14/05/01  平成２６年４月改正
       *  04.08.01    NACL-森脇     14/07/22  一時ファイルディレクトリ設定
       *  04.08.02    NACL-森脇     14/11/07  公費と医保の併用（単独入力分）追加←中止
+      *  04.08.03    NACL-森脇     16/10/12  自賠責対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -101,9 +102,11 @@
       *        KIGO        公害の記号
       *----(平成２０年４月以降)----
       *        SKYKBN      請求区分    1:請求済、未請求、2:請求しない、3:未請求患者分
-      *        TEISYUTU    提出先区分  1:社保、2:国保、3:特別療養費、4:未請求設定、5:未請求解除、6:広域連合、
-      *                                7:労災、8:アフターケア、9:公害
-      *        HKNJANUM    保険者番号  国保と広域連合と労災と直接請求の時だけ使用、社保＆請求しない場合はオールゼロ
+      *        TEISYUTU    提出先区分  1:社保、2:国保、3:特別療養費、4:広域連合、
+      *                                5:労災、6:アフターケア、8:自賠責、9:公害
+      *                                A:未請求設定、B:未請求解除、
+      *        HKNJANUM    保険者番号  国保と広域連合と労災と自賠責と直接請求の時だけ使用
+      *                                社保＆請求しない場合はオールゼロ
       *        SYOKBN      処理区分    1:通常分、2:返戻分、3:オンライン返戻分、4:月遅れ分
       *        HKNJANUM2   保険者番号  広域の時と労災の時だけ使用、それ以外はオールゼロ
       *        NYUGAIKBN   入外区分    1:外来分、2:入院分
@@ -227,8 +230,8 @@
       *        JYUNBAN     出力順      0:患者カナ氏名順、1:患者番号順、2:点数順
       *----平成２０年４月以降------
       *        DENPPRTYM   請求日付
-      *        TEISYUTU    提出先区分  0:全部、1:社保、2:国保、3:特別療養費、4:広域連合、5:労災、6:アフターケア
-      *                                9:公害
+      *        TEISYUTU    提出先区分  0:全部、1:社保、2:国保、3:特別療養費、4:広域連合
+      *                                5:労災、6:アフターケア、8:自賠責、9:公害
       *        HKNJANUM    保険者番号  国保と広域連合の時だけ使用
       *        SYOKBN      処理区分    0:全部、1:通常分、2:返戻分、3:月遅れ分、4:請求しない
       *        NYUGAIKBN   入外区分    O:全部、1:入院分、2:外来分
@@ -462,12 +465,12 @@
                05  WRK-PRT1-FILLER1    PIC X(06).
                05  WRK-PRT1-DENPPRTYM  PIC X(16).
                05  WRK-PRT1-TITLE      PIC X(28).
-               05  WRK-PRT1-BUNRUI     PIC X(24).
-               05  WRK-PRT1-FILLER2    PIC X(03).
+               05  WRK-PRT1-BUNRUI     PIC X(28).
+               05  WRK-PRT1-FILLER2    PIC X(01).
                05  WRK-PRT1-PRTYMD     PIC X(09).
                05  WRK-PRT1-FILLER3    PIC X(02).
                05  WRK-PRT1-PRTTIME    PIC X(08).
-               05  WRK-PRT1-FILLER4    PIC X(06).
+               05  WRK-PRT1-FILLER4    PIC X(04).
                05  WRK-PRT1-PAGE       PIC X(04).
                05  WRK-PRT1-FILLER5    PIC X(02).
       *    保険者タイトル
@@ -520,7 +523,7 @@
            03  CSV-SKYYMHEN            PIC X(07).
            03  CSV-SYOKBNMEI           PIC X(10).
            03  CSV-NYUGAIMEI           PIC X(02).
-           03  CSV-TEISYUTUMEI         PIC X(12).
+           03  CSV-TEISYUTUMEI         PIC X(20).
            03  CSV-ZAIKBNMEI           PIC X(14).
            03  CSV-SYUBETUMEI          PIC X(30).
            03  CSV-KBNMEI              PIC X(30).
@@ -837,6 +840,7 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
                AND   ( WRK-PARA-HKNJANUM       =   SPACE )
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
@@ -851,6 +855,7 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
                MOVE    "key4"              TO  WRK-PATH-PATHNAME
@@ -863,6 +868,7 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
                MOVE    "key41"             TO  WRK-PATH-PATHNAME
@@ -875,6 +881,7 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "3" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
                MOVE    6                   TO  WRK-TEISYUTUSAKI-KBN
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
@@ -887,12 +894,29 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "2" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "3" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
                MOVE    3                   TO  WRK-TEISYUTUSAKI-KBN
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
                MOVE    "key77"             TO  WRK-PATH-PATHNAME
                PERFORM 210-SYUKEI-READ-SEC
            END-IF
+      *----(04.08.03)--ADD-START---
+      *    自賠責集計処理
+           IF        ( WRK-PARA-SYOKBN     NOT =   "4" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "1" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "2" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "3" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "9" )
+               MOVE    4                   TO  WRK-TEISYUTUSAKI-KBN
+               MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
+               MOVE    "key77"             TO  WRK-PATH-PATHNAME
+               PERFORM 210-SYUKEI-READ-SEC
+           END-IF
+      *----(04.08.03)--ADD-END-----
       *    公害集計処理
            IF        ( WRK-PARA-SYOKBN     NOT =   "4" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "1" )
@@ -901,6 +925,7 @@
                AND   ( WRK-PARA-TEISYUTU   NOT =   "4" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "5" )
                AND   ( WRK-PARA-TEISYUTU   NOT =   "6" )
+               AND   ( WRK-PARA-TEISYUTU   NOT =   "8" )
                MOVE    5                   TO  WRK-TEISYUTUSAKI-KBN
                MOVE    "tbl_seikyu"        TO  WRK-PATH-TABLE
                MOVE    "key60"             TO  WRK-PATH-PATHNAME
@@ -1125,13 +1150,16 @@
                PERFORM 220-IHO-KOKHO-SYUKEI-ATO-SEC
            END-IF
       *    広域連合集計処理
-           IF        ( WRK-TEISYUTU    =   "6" )
+           IF        ( WRK-TEISYUTU    =   "4" )
                OR    ( WRK-TEISYUTU    =   "3" )
                PERFORM 220-ROU-KOUIKI-SYUKEI-SEC
            END-IF
-      *    短期、傷病集計処理
-           IF        ( WRK-TEISYUTU    =   "7" )
-               MOVE    RECE10-HKNKBN       TO  WRK-HKNKBN
+      *----(04.08.03)--UPD-START---
+      *    短期、傷病集計処理、アフターケア集計処理、自賠責集計処理
+           IF     ( WRK-TEISYUTU       =   "6" )
+      *     IF        ( WRK-TEISYUTU    =   "5" )
+      *         OR    ( WRK-TEISYUTU    =   "6" )
+      *         OR    ( WRK-TEISYUTU    =   "8" )
                MOVE    "0"                 TO  WRK-HKNKBN
                MOVE    SPACE               TO  WRK-SYUBETUKBN
                MOVE    SPACE               TO  WRK-KBN
@@ -1142,18 +1170,20 @@
                MOVE    SPACE               TO  WRK-RYOYOHI
                PERFORM 240-PTINF-SYUKEI-SEC
            END-IF
-      *    アフターケア集計処理
-           IF        ( WRK-TEISYUTU    =   "8" )
+      *    短期、傷病集計処理、自賠責集計処理
+           IF        ( WRK-TEISYUTU    =   "5" )
+               OR    ( WRK-TEISYUTU    =   "8" )
                MOVE    "0"                 TO  WRK-HKNKBN
                MOVE    SPACE               TO  WRK-SYUBETUKBN
                MOVE    SPACE               TO  WRK-KBN
                MOVE    1                   TO  IDX
                MOVE    RECE10-FTNMONEY(1)  TO  WRK-TENSU
                MOVE    SPACE               TO  WRK-KIGO
-               MOVE    SPACE               TO  WRK-SHOKUJIFTN
-               MOVE    SPACE               TO  WRK-RYOYOHI
+               MOVE    RECE10-SHOKUJIFTN(1)    TO  WRK-SHOKUJIFTN
+               MOVE    RECE10-SHOKUJIRYOYOHI(1)    TO  WRK-RYOYOHI
                PERFORM 240-PTINF-SYUKEI-SEC
            END-IF
+      *----(04.08.03)--UPD-END-----
       *    公害集計処理
            IF        ( WRK-TEISYUTU    =   "9" )
                MOVE    "0"                 TO  WRK-HKNKBN
@@ -1987,11 +2017,11 @@
                WHEN    "2" ALSO    "1" ALSO    "9" ALSO    "18"
                WHEN    "3" ALSO    "1" ALSO    "9" ALSO    "18"
       *        特別療養費、広域連合後期高齢者一般・低所得
+               WHEN    "4" ALSO    "2" ALSO    "1" ALSO    "21"
                WHEN    "3" ALSO    "2" ALSO    "1" ALSO    "21"
-               WHEN    "6" ALSO    "2" ALSO    "1" ALSO    "21"
       *        特別療養費、広域連合後期高齢者７割
+               WHEN    "4" ALSO    "2" ALSO    "2" ALSO    "22"
                WHEN    "3" ALSO    "2" ALSO    "2" ALSO    "22"
-               WHEN    "6" ALSO    "2" ALSO    "2" ALSO    "22"
                    CONTINUE
       *        指定したレセ種別が正しくない場合は処理抜ける
                WHEN    OTHER
@@ -2103,7 +2133,7 @@
                IF     TOKEI-SKYKBN     =   "1"
                    EVALUATE    TOKEI-TEISYUTU
       *            広域分
-                   WHEN    "6"
+                   WHEN    "4"
       *                帳票編集<見出し>処理４
                        PERFORM 310-HEAD-HEN4-SEC
       *                帳票編集<明細>処理４
@@ -2114,7 +2144,7 @@
                            OR    ( TOKEI-HKNJANUM  NOT =  WRK-HKNJANUM )
                            OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
       *            短期、傷病分
-                   WHEN    "7"
+                   WHEN    "5"
       *                帳票編集<見出し>処理６
                        PERFORM 310-HEAD-HEN6-SEC
       *                帳票編集<明細>処理６
@@ -2125,7 +2155,7 @@
                            OR    ( TOKEI-HKNJANUM  NOT =  WRK-HKNJANUM )
                            OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
       *            アフターケア分
-                   WHEN    "8"
+                   WHEN    "6"
       *                帳票編集<見出し>処理５
                        PERFORM 310-HEAD-HEN5-SEC
       *                帳票編集<明細>処理５
@@ -2134,6 +2164,19 @@
                            OR    ( TOKEI-SKYKBN    NOT =  WRK-SKYKBN )
                            OR    ( TOKEI-TEISYUTU  NOT =  WRK-TEISYUTU )
                            OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
+      *----(04.08.03)--ADD-START---
+      *            自賠責分
+                   WHEN    "8"
+      *                帳票編集<見出し>処理７
+                       PERFORM 310-HEAD-HEN7-SEC
+      *                帳票編集<明細>処理７
+                       PERFORM 320-BODY-HEN7-SEC
+                           UNTIL ( FLG-TOKEI   =   1 )
+                           OR    ( TOKEI-SKYKBN    NOT =  WRK-SKYKBN )
+                           OR    ( TOKEI-TEISYUTU  NOT =  WRK-TEISYUTU )
+                           OR    ( TOKEI-HKNJANUM  NOT =  WRK-HKNJANUM )
+                           OR    ( TOKEI-SYOKBN    NOT =  WRK-SYOKBN )
+      *----(04.08.03)--ADD-END-----
                    WHEN    OTHER
       *                帳票編集<見出し>処理
                        PERFORM 310-HEAD-HEN-SEC
@@ -2299,9 +2342,9 @@
       *
       *    帳票クリア
            PERFORM 310-HEAD-SET-SEC
-           IF      TOKEI-TEISYUTU  =   "7"
-               MOVE    SPACE           TO  WRK-HKNJANUM
-           END-IF
+      *
+           MOVE    SPACE               TO  WRK-KEY
+           MOVE    TOKEI-SKYKBN        TO  WRK-SKYKBN 
       *
            .
        310-HEAD-HEN2-EXT.
@@ -2342,14 +2385,14 @@
       *
       *    分類セット
            EVALUATE    WRK-TEISYUTU    ALSO    WRK-SYOKBN
-               WHEN    "6"     ALSO    "1"
+               WHEN    "4"     ALSO    "1"
                    MOVE    "（広域分）"        TO  WRK-PRT1-BUNRUI
-               WHEN    "6"     ALSO    "2"
+               WHEN    "4"     ALSO    "2"
                    MOVE    "（広域返戻分）"    TO  WRK-PRT1-BUNRUI
-               WHEN    "6"     ALSO    "3"
+               WHEN    "4"     ALSO    "3"
                    MOVE    "（広域オンライン返戻分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "6"     ALSO    "4"
+               WHEN    "4"     ALSO    "4"
                    MOVE    "（広域月遅れ分）"  TO  WRK-PRT1-BUNRUI
            END-EVALUATE
       *
@@ -2410,14 +2453,17 @@
       *
       *    分類セット
            EVALUATE    WRK-TEISYUTU    ALSO    WRK-SYOKBN
-               WHEN    "8"     ALSO    "1"
+               WHEN    "6"     ALSO    "1"
                    MOVE    "（アフターケア分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "8"     ALSO    "2"
-                   MOVE    "（アフターケア返戻分）"
+               WHEN    "6"     ALSO    "2"
+                   MOVE    "（アフター返戻分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "8"     ALSO    "4"
-                   MOVE    "（アフターケア月遅れ分）"
+               WHEN    "6"     ALSO    "3"
+                   MOVE    "（アフターオンライン返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "6"     ALSO    "4"
+                   MOVE    "（アフター月遅れ分）"
                                                TO  WRK-PRT1-BUNRUI
            END-EVALUATE
       *
@@ -2459,23 +2505,29 @@
       *    分類セット
            EVALUATE    WRK-TEISYUTU    ALSO
                        WRK-SYOKAIFLG   ALSO  WRK-SYOKBN
-               WHEN    "7"     ALSO    "1"     ALSO    "1"
+               WHEN    "5"     ALSO    "1"     ALSO    "1"
                    MOVE    "（短期傷病初回分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "7"     ALSO    "1"     ALSO    "2"
-                   MOVE    "（短期傷病初回返戻分）"
+               WHEN    "5"     ALSO    "1"     ALSO    "2"
+                   MOVE    "（短傷初回返戻分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "7"     ALSO    "1"     ALSO    "4"
-                   MOVE    "（短期傷病初回月遅れ分）"
+               WHEN    "5"     ALSO    "1"     ALSO    "3"
+                   MOVE    "（短傷初回オンライン返戻分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "7"     ALSO    "2"     ALSO    "1"
+               WHEN    "5"     ALSO    "1"     ALSO    "4"
+                   MOVE    "（短傷初回月遅れ分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "5"     ALSO    "2"     ALSO    "1"
                    MOVE    "（短期傷病継続分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "7"     ALSO    "2"     ALSO    "2"
-                   MOVE    "（短期傷病継続返戻分）"
+               WHEN    "5"     ALSO    "2"     ALSO    "2"
+                   MOVE    "（短傷継続返戻分）"
                                                TO  WRK-PRT1-BUNRUI
-               WHEN    "7"     ALSO    "2"     ALSO    "4"
-                   MOVE    "（短期傷病継続月遅れ分）"
+               WHEN    "5"     ALSO    "2"     ALSO    "3"
+                   MOVE    "（短傷継続オンライン返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "5"     ALSO    "2"     ALSO    "4"
+                   MOVE    "（短傷継続月遅れ分）"
                                                TO  WRK-PRT1-BUNRUI
            END-EVALUATE
       *
@@ -2539,6 +2591,79 @@
        310-HEAD-HEN6-EXT.
            EXIT.
       *
+      *----(04.08.03)--ADD-START---
+      *****************************************************************
+      *    帳票編集<見出し>処理7
+      *****************************************************************
+       310-HEAD-HEN7-SEC            SECTION.
+      *
+      *    初期処理
+           PERFORM 310-HEAD-KEY-SET-SEC
+      *
+           MOVE    WRK-HKNJANUM(1:1)   TO  WRK-SYOKAIFLG
+      *
+      *    分類セット
+           EVALUATE    WRK-TEISYUTU    ALSO
+                       WRK-SYOKAIFLG   ALSO  WRK-SYOKBN
+               WHEN    "8"     ALSO    "1"     ALSO    "1"
+                   MOVE    "（自賠責新様式分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "1"     ALSO    "2"
+                   MOVE    "（自賠新返戻分）"  TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "1"     ALSO    "3"
+                   MOVE    "（自賠新オンライン返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "1"     ALSO    "4"
+                   MOVE    "（自賠新月遅れ分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "2"     ALSO    "1"
+                   MOVE    "（自賠責従来様式分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "2"     ALSO    "2"
+                   MOVE    "（自賠従来返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "2"     ALSO    "3"
+                   MOVE    "（自賠従来オンライン返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "2"     ALSO    "4"
+                   MOVE    "（自賠従来月遅れ分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "3"     ALSO    "1"
+                   MOVE    "（自賠責第三者行為分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "3"     ALSO    "2"
+                   MOVE    "（自賠第三返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "3"     ALSO    "3"
+                   MOVE    "（自賠第三オンライン返戻分）"
+                                               TO  WRK-PRT1-BUNRUI
+               WHEN    "8"     ALSO    "3"     ALSO    "4"
+                   MOVE    "（自賠第三月遅れ分）"
+                                               TO  WRK-PRT1-BUNRUI
+           END-EVALUATE
+      *
+           MOVE    WRK-TEISYUTU    TO  CSV-TEISYUTU
+           EVALUATE    WRK-SYOKBN
+               WHEN    "1"
+                   MOVE    "1"         TO  CSV-SYOKBN
+               WHEN    "2"
+               WHEN    "3"
+                   MOVE    "2"         TO  CSV-SYOKBN
+               WHEN    "4"
+                   MOVE    "3"         TO  CSV-SYOKBN
+           END-EVALUATE
+      *
+      *    医療機関名セット
+           PERFORM 310-HEAD-SYSKANRI-HEN-SEC
+      *
+      *    帳票クリア
+           PERFORM 310-HEAD-SET-SEC
+      *
+           .
+       310-HEAD-HEN7-EXT.
+           EXIT.
+      *
+      *----(04.08.03)--ADD-END-----
       *****************************************************************
       *    帳票編集<見出し>初期処理
       *****************************************************************
@@ -2740,6 +2865,34 @@
        320-BODY-HEN6-EXT.
            EXIT.
       *
+      *----(04.08.03)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>処理7
+      *****************************************************************
+       320-BODY-HEN7-SEC           SECTION.
+      *
+      *    入外区分見出し
+           IF      TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN
+               PERFORM 3201-NYUGAIKBN-BODY-HEN-SEC
+           END-IF
+      *
+      *    診療月見出し
+           IF      TOKEI-SRYYMFLG  NOT =   WRK-SRYYMFLG
+               PERFORM 3201-SRYYM-BODY-HEN-SEC
+           END-IF
+      *
+           MOVE    TOKEI-ZAIKBN    TO  WRK-ZAIKBN
+      *
+      *    患者情報
+           PERFORM 3202-BODY-SUB-HEN6-SEC
+      *
+      *    グループ合計セット
+           PERFORM 3203-BODY-HEN-END6-SEC
+      *
+           .
+       320-BODY-HEN7-EXT.
+           EXIT.
+      *----(04.08.03)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>セット処理
       *****************************************************************
@@ -2815,7 +2968,7 @@
        3201-BODY-HEN-STR2-SEC      SECTION.
       *
            EVALUATE    TOKEI-TEISYUTU
-               WHEN    "7"
+               WHEN    "5"
       *            短期傷病監督署見出し
                    IF    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM  )
                        PERFORM 3201-LABOR-SIO-BODY-HEN-SEC
@@ -2825,11 +2978,21 @@
                          ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
                        PERFORM 3201-ROUSAI-BODY-HEN-SEC
                    END-IF
-               WHEN    "8"
+               WHEN    "6"
+      *            アフターケア
                    IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
                        OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
-                       PERFORM 3201-AFTER-BODY-HEN-SEC
+                       PERFORM 3201-AFUTA-BODY-HEN-SEC
                    END-IF
+      *----(04.08.03)--ADD-START---
+               WHEN    "8"
+      *            自賠責
+                   IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
+                       OR    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM  )
+                       OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
+                       PERFORM 3201-JIBAI-BODY-HEN-SEC
+                   END-IF
+      *----(04.08.03)--ADD-END-----
                WHEN    OTHER
       *            提出先入外区分見出し
                    IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
@@ -2971,7 +3134,7 @@
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
-       3201-AFTER-BODY-HEN-SEC  SECTION.
+       3201-AFUTA-BODY-HEN-SEC     SECTION.
       *
            MOVE    SPACE           TO  CSV-HKNJANAME
                                        CSV-HKNJANUM
@@ -2980,15 +3143,12 @@
       *
            MOVE    SPACE           TO  WRK-PRT-LINE
       *
-           MOVE    "アフターケア分"    TO  WRK-PRT-LINE
-                                           CSV-HKNJANAME
+           MOVE    "＜アフターケア＞"  TO  WRK-PRT-LINE
       *
       *    見出し行セット
            PERFORM 320-BODY-SET-SEC
       *
            MOVE    TOKEI-TEISYUTU  TO  WRK-TEISYUTU
-           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
-      *
            MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
            MOVE    TOKEI-HKNJANUM2 TO  WRK-HKNJANUM2
            MOVE    TOKEI-NYUGAIKBN TO  WRK-NYUGAIKBN
@@ -2997,6 +3157,7 @@
            MOVE    SPACE           TO  WRK-HKNKBN
            MOVE    SPACE           TO  WRK-SYUBETUKBN
            MOVE    SPACE           TO  WRK-KBN
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
            EVALUATE    WRK-NYUGAIKBN
                WHEN    "1"
                    MOVE    "2"     TO  CSV-NYUGAIKBN
@@ -3005,7 +3166,7 @@
            END-EVALUATE
       *
            .
-       3201-AFTER-BODY-HEN-EXT.
+       3201-AFUTA-BODY-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3038,6 +3199,7 @@
            MOVE    SPACE           TO  WRK-HKNKBN
            MOVE    SPACE           TO  WRK-SYUBETUKBN
            MOVE    SPACE           TO  WRK-KBN
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
            EVALUATE    WRK-NYUGAIKBN
                WHEN    "1"
                    MOVE    "2"     TO  CSV-NYUGAIKBN
@@ -3048,7 +3210,57 @@
            .
        3201-ROUSAI-BODY-HEN-EXT.
            EXIT.
+      *----(04.08.03)--ADD-START---
+      *****************************************************************
+      *    帳票編集<明細行>処理
+      *****************************************************************
+       3201-JIBAI-BODY-HEN-SEC  SECTION.
       *
+           MOVE    SPACE           TO  WRK-PRT-LINE
+      *
+           EVALUATE    TOKEI-HKNJANUM(1:1)     ALSO    TOKEI-NYUGAIKBN
+               WHEN    "1"     ALSO    "1"
+                   MOVE    "＜自賠責新様式　外来＞"    TO  WRK-PRT-LINE
+               WHEN    "1"     ALSO    "2"
+                   MOVE    "＜自賠責新様式　入院＞"    TO  WRK-PRT-LINE
+               WHEN    "2"     ALSO    "1"
+                   MOVE    "＜自賠責従来様式　外来＞"  TO  WRK-PRT-LINE
+               WHEN    "2"     ALSO    "2"
+                   MOVE    "＜自賠責従来様式　入院＞"  TO  WRK-PRT-LINE
+               WHEN    "3"     ALSO    "1"
+                   MOVE    "＜自賠責第三者行為　外来＞"
+                                                       TO  WRK-PRT-LINE
+               WHEN    "3"     ALSO    "2"
+                   MOVE    "＜自賠責第三者行為　入院＞"
+                                                       TO  WRK-PRT-LINE
+           END-EVALUATE
+      *
+      *    見出し行セット
+           PERFORM 320-BODY-SET-SEC
+      *
+           MOVE    TOKEI-TEISYUTU  TO  WRK-TEISYUTU
+           MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
+           MOVE    TOKEI-HKNJANUM2 TO  WRK-HKNJANUM2
+           MOVE    TOKEI-NYUGAIKBN TO  WRK-NYUGAIKBN
+           MOVE    TOKEI-ZAIKBN    TO  WRK-ZAIKBN
+           MOVE    0               TO  WRK-SRYYMFLG
+           MOVE    SPACE           TO  WRK-HKNKBN
+           MOVE    SPACE           TO  WRK-SYUBETUKBN
+           MOVE    SPACE           TO  WRK-KBN
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
+           MOVE    SPACE           TO  CSV-HKNJANAME
+                                       CSV-HKNJANUM
+           EVALUATE    WRK-NYUGAIKBN
+               WHEN    "1"
+                   MOVE    "2"     TO  CSV-NYUGAIKBN
+               WHEN    "2"
+                   MOVE    "1"     TO  CSV-NYUGAIKBN
+           END-EVALUATE
+      *
+           .
+       3201-JIBAI-BODY-HEN-EXT.
+           EXIT.
+      *----(04.08.03)--ADD-END-----
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
@@ -3057,13 +3269,13 @@
            MOVE    SPACE           TO  WRK-PRT-LINE
       *
            EVALUATE    TOKEI-TEISYUTU  ALSO    TOKEI-NYUGAIKBN
-               WHEN    "4"     ALSO    "1"
+               WHEN    "A"     ALSO    "1"
                    MOVE    "＜未請求設定　外来＞"  TO  WRK-PRT-LINE
-               WHEN    "4"     ALSO    "2"
+               WHEN    "A"     ALSO    "2"
                    MOVE    "＜未請求設定　入院＞"  TO  WRK-PRT-LINE
-               WHEN    "5"     ALSO    "1"
+               WHEN    "B"     ALSO    "1"
                    MOVE    "＜未請求解除　外来＞"  TO  WRK-PRT-LINE
-               WHEN    "5"     ALSO    "2"
+               WHEN    "B"     ALSO    "2"
                    MOVE    "＜未請求解除　入院＞"  TO  WRK-PRT-LINE
            END-EVALUATE
       *
@@ -3077,7 +3289,7 @@
            MOVE    SPACE           TO  WRK-HKNKBN
            MOVE    SPACE           TO  WRK-SYUBETUKBN
            MOVE    SPACE           TO  WRK-KBN
-           MOVE    SPACE           TO  CSV-TEISYUTU
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
            EVALUATE    WRK-NYUGAIKBN
                WHEN    "1"
                    MOVE    "2"     TO  CSV-NYUGAIKBN
@@ -3109,9 +3321,9 @@
                    MOVE    "＜特別療養費　外来＞"    TO  WRK-PRT-LINE
                WHEN    "3"     ALSO    "2"
                    MOVE    "＜特別療養費　入院＞"    TO  WRK-PRT-LINE
-               WHEN    "6"     ALSO    "1"
+               WHEN    "4"     ALSO    "1"
                    MOVE    "＜広域　外来＞"          TO  WRK-PRT-LINE
-               WHEN    "6"     ALSO    "2"
+               WHEN    "4"     ALSO    "2"
                    MOVE    "＜広域　入院＞"          TO  WRK-PRT-LINE
                WHEN    "9"     ALSO    "1"
                    MOVE    "＜公害　外来＞"          TO  WRK-PRT-LINE
@@ -3556,10 +3768,10 @@
                WHEN    "3" ALSO    "1" ALSO    "9" ALSO    ANY
                    MOVE    "＊退職（６歳）"        TO  WRK-PRT-LINE
                WHEN    "3" ALSO    "2" ALSO    "1" ALSO    ANY
-               WHEN    "6" ALSO    "2" ALSO    "1" ALSO    ANY
+               WHEN    "4" ALSO    "2" ALSO    "1" ALSO    ANY
                    MOVE    "＊後期高齢者９割"      TO  WRK-PRT-LINE
                WHEN    "3" ALSO    "2" ALSO    "2" ALSO    ANY
-               WHEN    "6" ALSO    "2" ALSO    "2" ALSO    ANY
+               WHEN    "4" ALSO    "2" ALSO    "2" ALSO    ANY
                    MOVE    "＊後期高齢者７割"      TO  WRK-PRT-LINE
                WHEN    OTHER
                    GO  TO  3201-SYUBETU-BODY-HEN-ATO-EXT
@@ -3608,7 +3820,7 @@
       *    国保、特別療養費の場合は抜ける、公害も、後期高齢者も
            IF        ( WRK-TEISYUTU    =   "2" )
                OR    ( WRK-TEISYUTU    =   "3" )
-               OR    ( WRK-TEISYUTU    =   "6" )
+               OR    ( WRK-TEISYUTU    =   "4" )
                OR    ( WRK-TEISYUTU    =   "9" )
                MOVE    TOKEI-KBN       TO  WRK-KBN
                MOVE    SPACE           TO  CSV-KBN
@@ -3871,12 +4083,16 @@
                PERFORM 900-TOKEI-NEXT-SEC
            END-PERFORM
       *
-      *    患者情報セット
+      *    患者情報セット労災、アフターケア自賠責は対象外
            IF      IDX                 >   ZERO
+      *----(04.08.03)--UPD-START---
                IF    ( WRK-NYUGAIKBN       =   "2" )   AND
-                     ( WRK-TEISYUTU    NOT =   "7" )   AND
-                     ( WRK-TEISYUTU    NOT =   "8" )
+                     ( WRK-TEISYUTU    NOT =   "6" )
+      *               ( WRK-TEISYUTU    NOT =   "5" )   AND
+      *               ( WRK-TEISYUTU    NOT =   "6" )   AND
+      *               ( WRK-TEISYUTU    NOT =   "8" )
                    PERFORM 3202-BODY-NYUIN-SEC
+      *----(04.08.03)--UPD-END-----
                ELSE
                    MOVE    WRK-PRT4-AREA   TO  WRK-PRT-LINE
                    PERFORM 320-BODY-SET-SEC
@@ -3979,7 +4195,7 @@
            .
        3202-BODY-SUB-HEN6-EXT.
            EXIT.
-      *
+      *----(04.08.03)--UPD-START---
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
@@ -3990,10 +4206,13 @@
            MOVE    SPACE               TO  WRK-PRT4-FILLER2(IDX)
            MOVE    SPACE               TO  WRK-PRT4-FILLER5(IDX)
            MOVE    "日"                TO  WRK-PRT4-FILLER3(IDX)
-           IF    ( TOKEI-TEISYUTU      =   "7" )   OR
+      *----(04.08.03)--UPD-START---
+           IF    ( TOKEI-TEISYUTU      =   "5" )   OR
+                 ( TOKEI-TEISYUTU      =   "6" )   OR
                  ( TOKEI-TEISYUTU      =   "8" )   OR
                  ( TOKEI-TEISYUTU      =   "9" )
                MOVE    "円"                TO  WRK-PRT4-FILLER4(IDX)
+      *----(04.08.03)--UPD-END-----
            ELSE
                MOVE    "点"                TO  WRK-PRT4-FILLER4(IDX)
            END-IF
@@ -4131,17 +4350,28 @@
                WHEN    "3"
                    MOVE    "特別療養費"    TO  CSV-TEISYUTUMEI
                WHEN    "4"
-                   MOVE    "未請求設定"    TO  CSV-TEISYUTUMEI
-               WHEN    "5"
-                   MOVE    "未請求解除"    TO  CSV-TEISYUTUMEI
-               WHEN    "6"
                    MOVE    "広域連合"      TO  CSV-TEISYUTUMEI
-               WHEN    "7"
+               WHEN    "5"
                    MOVE    "短期傷病"      TO  CSV-TEISYUTUMEI
-               WHEN    "8"
+               WHEN    "6"
                    MOVE    "アフターケア"  TO  CSV-TEISYUTUMEI
+               WHEN    "8"
+                   EVALUATE    TOKEI-HKNJANUM(1:1)
+                   WHEN    "1"
+                       MOVE    "自賠責新様式"  TO  CSV-TEISYUTUMEI
+                   WHEN    "2"
+                       MOVE    "自賠責従来様式"
+                                               TO  CSV-TEISYUTUMEI
+                   WHEN    "3"
+                       MOVE    "自賠責第三者行為"
+                                               TO  CSV-TEISYUTUMEI
+                   END-EVALUATE
                WHEN    "9"
                    MOVE    "公害"          TO  CSV-TEISYUTUMEI
+               WHEN    "A"
+                   MOVE    "未請求設定"    TO  CSV-TEISYUTUMEI
+               WHEN    "B"
+                   MOVE    "未請求解除"    TO  CSV-TEISYUTUMEI
            END-EVALUATE
       *
            EVALUATE    CSV-NYUGAIKBN
@@ -4210,12 +4440,12 @@
                WHEN    "2" ALSO    "1" ALSO    "9"
                WHEN    "3" ALSO    "1" ALSO    "9"
                    MOVE    "退職（６歳）"  TO  CSV-SYUBETUMEI
+               WHEN    "4" ALSO    "2" ALSO    "1"
                WHEN    "3" ALSO    "2" ALSO    "1"
-               WHEN    "6" ALSO    "2" ALSO    "1"
                    MOVE    "後期高齢者９割"
                                            TO  CSV-SYUBETUMEI
+               WHEN    "4" ALSO    "2" ALSO    "2"
                WHEN    "3" ALSO    "2" ALSO    "2"
-               WHEN    "6" ALSO    "2" ALSO    "2"
                    MOVE    "後期高齢者７割"
                                            TO  CSV-SYUBETUMEI
            END-EVALUATE
@@ -4317,12 +4547,16 @@
                                            SUM-GOK-TENSU(3)
            MOVE    TOKEI-TEISYUTU      TO  SUM-GOK-TEISYUTU
       *
-      *    労災分は入院情報不要
+      *----(04.08.03)--UPD-START---
+      *    労災分などは入院情報不要
            IF    ( WRK-NYUGAIKBN       =   "2" )   AND
-                 ( TOKEI-TEISYUTU  NOT =   "7" )   AND
-                 ( TOKEI-TEISYUTU  NOT =   "8" )
+                 ( TOKEI-TEISYUTU  NOT =   "6" )
+      *           ( TOKEI-TEISYUTU  NOT =   "5" )   AND
+      *           ( TOKEI-TEISYUTU  NOT =   "6" )   AND
+      *           ( TOKEI-TEISYUTU  NOT =   "8" )
                PERFORM 3202-BODY-NYUIN-SEC
                MOVE    ZERO            TO  IDX
+      *----(04.08.03)--UPD-END-----
            ELSE
       *        患者情報セット
                IF      IDX             =   2
@@ -4370,10 +4604,13 @@
            MOVE    SPACE           TO  WRK-PRT3-FILLER1
            MOVE    "件"            TO  WRK-PRT3-FILLER2
            MOVE    "日"            TO  WRK-PRT3-FILLER3
-           IF    ( SUM-GOK-TEISYUTU    =   "7" )   OR
+      *----(04.08.03)--UPD-START---
+           IF    ( SUM-GOK-TEISYUTU    =   "5" )   OR
+                 ( SUM-GOK-TEISYUTU    =   "6" )   OR
                  ( SUM-GOK-TEISYUTU    =   "8" )   OR
                  ( SUM-GOK-TEISYUTU    =   "9" )
                MOVE    "円"            TO  WRK-PRT3-FILLER4
+      *----(04.08.03)--UPD-END-----
            ELSE
                MOVE    "点"            TO  WRK-PRT3-FILLER4
            END-IF
@@ -4633,7 +4870,7 @@
       *    国保、特別療養費は処理抜ける、公害も抜ける、後期高齢も抜ける
            IF        ( WRK-TEISYUTU    =   "2" )
                OR    ( WRK-TEISYUTU    =   "3" )
-               OR    ( WRK-TEISYUTU    =   "6" )
+               OR    ( WRK-TEISYUTU    =   "4" )
                OR    ( WRK-TEISYUTU    =   "9" )
                GO  TO  3203-HKNKBN-BODY-END-EXT
            END-IF
@@ -5110,9 +5347,9 @@
       *
            EVALUATE    SYUKA-MISEIKYU-FLG
                WHEN    "01"
-                   MOVE    "4"         TO  WRK-TEISYUTU
+                   MOVE    "A"         TO  WRK-TEISYUTU
                WHEN    "02"
-                   MOVE    "5"         TO  WRK-TEISYUTU
+                   MOVE    "B"         TO  WRK-TEISYUTU
            END-EVALUATE
       *
            MOVE    "3"             TO  WRK-SKYKBN
@@ -5283,6 +5520,7 @@
                        OR    ( WRK-PARA-TEISYUTU   =   "4" )
                        OR    ( WRK-PARA-TEISYUTU   =   "5" )
                        OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        OR    ( WRK-PARA-TEISYUTU   =   "9" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
@@ -5296,6 +5534,7 @@
                        OR    ( WRK-PARA-TEISYUTU   =   "4" )
                        OR    ( WRK-PARA-TEISYUTU   =   "5" )
                        OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        OR    ( WRK-PARA-TEISYUTU   =   "9" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
@@ -5307,16 +5546,18 @@
                        OR    ( WRK-PARA-TEISYUTU   =   "3" )
                        OR    ( WRK-PARA-TEISYUTU   =   "5" )
                        OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        OR    ( WRK-PARA-TEISYUTU   =   "9" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
-                   MOVE    "6"             TO  WRK-TEISYUTU
+                   MOVE    "4"             TO  WRK-TEISYUTU
       *        労災
                WHEN    "971"
                    IF        ( WRK-PARA-TEISYUTU   =   "1" )
                        OR    ( WRK-PARA-TEISYUTU   =   "2" )
                        OR    ( WRK-PARA-TEISYUTU   =   "3" )
                        OR    ( WRK-PARA-TEISYUTU   =   "4" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        OR    ( WRK-PARA-TEISYUTU   =   "9" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
@@ -5327,18 +5568,33 @@
                            IF        ( WRK-PARA-TEISYUTU   =   "6" )
                                GO  TO  900-SEIKYU-CHEK-EXT
                            ELSE
-                               MOVE    "7"             TO  WRK-TEISYUTU
+                               MOVE    "5"             TO  WRK-TEISYUTU
                            END-IF
       *                アフターケア
                        WHEN    "3"
                            IF        ( WRK-PARA-TEISYUTU   =   "5" )
                                GO  TO  900-SEIKYU-CHEK-EXT
                            ELSE
-                               MOVE    "8"             TO  WRK-TEISYUTU
+                               MOVE    "6"             TO  WRK-TEISYUTU
                            END-IF
                        WHEN    OTHER
                            GO  TO  900-SEIKYU-CHEK-EXT
                    END-EVALUATE
+      *----(04.08.03)--ADD-START---
+      *        自賠責
+               WHEN    "970"
+               WHEN    "973"
+                   IF        ( WRK-PARA-TEISYUTU   =   "1" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "2" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "3" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "4" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "5" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "9" )
+                       GO  TO  900-SEIKYU-CHEK-EXT
+                   END-IF
+                   MOVE    "8"             TO  WRK-TEISYUTU
+      *----(04.08.03)--ADD-END-----
       *        公害
                WHEN    "975"
                    IF        ( WRK-PARA-TEISYUTU   =   "1" )
@@ -5347,6 +5603,7 @@
                        OR    ( WRK-PARA-TEISYUTU   =   "4" )
                        OR    ( WRK-PARA-TEISYUTU   =   "5" )
                        OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
                    MOVE    "9"             TO  WRK-TEISYUTU
@@ -5356,6 +5613,7 @@
                        OR    ( WRK-PARA-TEISYUTU   =   "4" )
                        OR    ( WRK-PARA-TEISYUTU   =   "5" )
                        OR    ( WRK-PARA-TEISYUTU   =   "6" )
+                       OR    ( WRK-PARA-TEISYUTU   =   "8" )
                        OR    ( WRK-PARA-TEISYUTU   =   "9" )
                        GO  TO  900-SEIKYU-CHEK-EXT
                    END-IF
@@ -5429,37 +5687,8 @@
                MOVE    "00000000"      TO  WRK-HKNJANUM2
                MOVE    "4"             TO  WRK-SYOKBN
                MOVE    "1"             TO  WRK-ZAIKBN
-               IF      WRK-TEISYUTU    =   "7"
-      *            初回分
-                   IF      RECE10-SYOKAIFLG    =   "1"
-                       MOVE    RECE10-SYOCD    TO  WRK-HKNJANUM(1:5)
-                       MOVE    "000"           TO  WRK-HKNJANUM(6:3)
-      *            継続分
-                   ELSE
-                       MOVE    "99999"         TO  WRK-HKNJANUM(1:5)
-                       MOVE    "000"           TO  WRK-HKNJANUM(6:3)
-                   END-IF
-      *            短期、傷病区分
-                   MOVE    RECE10-HKNKBN   TO  WRK-HKNJANUM2(1:1)
-                   MOVE    "0000000"       TO  WRK-HKNJANUM2(2:7)
-               END-IF
-           ELSE
-      *        請求区分チェック（請求分）
-               MOVE    "1"             TO  WRK-SKYKBN
                EVALUATE    WRK-TEISYUTU
-      *            国保、特別療養費
-                   WHEN    "2"
-                   WHEN    "3"
-                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM
-                       MOVE    "00000000"          TO  WRK-HKNJANUM2
-      *            広域
-                   WHEN    "6"
-                       MOVE    RECE10-HKNJANUM-S(1:4)
-                                                   TO  WRK-HKNJANUM(1:4)
-                       MOVE    "0000"              TO  WRK-HKNJANUM(5:4)
-                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM2
-      *            短期、傷病
-                   WHEN    "7"
+                   WHEN    "5"
       *                初回分
                        IF      RECE10-SYOKAIFLG    =   "1"
                            MOVE    RECE10-SYOCD    TO  WRK-HKNJANUM(1:5)
@@ -5472,6 +5701,70 @@
       *                短期、傷病区分
                        MOVE    RECE10-HKNKBN   TO  WRK-HKNJANUM2(1:1)
                        MOVE    "0000000"       TO  WRK-HKNJANUM2(2:7)
+      *----(04.08.03)--ADD-START---
+      *            自賠責
+                   WHEN    "8"
+      *                新様式
+                       IF      RECE10-RECEKBN  =   "4"
+                           MOVE    "10000000"  TO  WRK-HKNJANUM
+                       END-IF
+      *                従来様式
+                       IF      RECE10-RECEKBN  =   "5"
+                           MOVE    "20000000"  TO  WRK-HKNJANUM
+                       END-IF
+      *                第三者行為
+                       IF      RECE10-RECEKBN  =   "6"
+                           MOVE    "30000000"  TO  WRK-HKNJANUM
+                       END-IF
+                       MOVE    "00000000"      TO  WRK-HKNJANUM2
+               END-EVALUATE
+      *----(04.08.03)--ADD-END-----
+           ELSE
+      *        請求区分チェック（請求分）
+               MOVE    "1"             TO  WRK-SKYKBN
+               EVALUATE    WRK-TEISYUTU
+      *            国保、特別療養費
+                   WHEN    "2"
+                   WHEN    "3"
+                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM
+                       MOVE    "00000000"          TO  WRK-HKNJANUM2
+      *            広域
+                   WHEN    "4"
+                       MOVE    RECE10-HKNJANUM-S(1:4)
+                                                   TO  WRK-HKNJANUM(1:4)
+                       MOVE    "0000"              TO  WRK-HKNJANUM(5:4)
+                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM2
+      *            短期、傷病
+                   WHEN    "5"
+      *                初回分
+                       IF      RECE10-SYOKAIFLG    =   "1"
+                           MOVE    RECE10-SYOCD    TO  WRK-HKNJANUM(1:5)
+                           MOVE    "000"           TO  WRK-HKNJANUM(6:3)
+      *                継続分
+                       ELSE
+                           MOVE    "99999"         TO  WRK-HKNJANUM(1:5)
+                           MOVE    "000"           TO  WRK-HKNJANUM(6:3)
+                       END-IF
+      *                短期、傷病区分
+                       MOVE    RECE10-HKNKBN   TO  WRK-HKNJANUM2(1:1)
+                       MOVE    "0000000"       TO  WRK-HKNJANUM2(2:7)
+      *----(04.08.03)--ADD-START---
+      *            自賠責
+                   WHEN    "8"
+      *                新様式
+                       IF      RECE10-RECEKBN  =   "4"
+                           MOVE    "10000000"  TO  WRK-HKNJANUM
+                       END-IF
+      *                従来様式
+                       IF      RECE10-RECEKBN  =   "5"
+                           MOVE    "20000000"  TO  WRK-HKNJANUM
+                       END-IF
+      *                第三者行為
+                       IF      RECE10-RECEKBN  =   "6"
+                           MOVE    "30000000"  TO  WRK-HKNJANUM
+                       END-IF
+                       MOVE    "00000000"      TO  WRK-HKNJANUM2
+      *----(04.08.03)--ADD-END-----
       *            社保
                    WHEN    "1"
       *                直接請求分
