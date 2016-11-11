@@ -997,7 +997,7 @@
                                 OR "964" OR "965" OR "966"
                                 OR "967" OR "968" OR "969"
                                 OR "976" OR "977" OR "978"
-                                OR "979" )
+                                OR "979" OR "953" )
                MOVE    "1"             TO  QSUB03-KOHNUM-TYPEL (IDXK)
            END-IF
       *

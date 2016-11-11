@@ -226,6 +226,7 @@
            03  CONST-KOHNUM-VAL.
                05                      PIC X(03) VALUE "950".
                05                      PIC X(03) VALUE "951".
+               05                      PIC X(03) VALUE "953".
                05                      PIC X(03) VALUE "954".
                05                      PIC X(03) VALUE "955".
                05                      PIC X(03) VALUE "956".
@@ -247,8 +248,8 @@
                05                      PIC X(03) VALUE "978".
                05                      PIC X(03) VALUE "979".
            03  CONST-KOHNUM-R          REDEFINES CONST-KOHNUM-VAL.
-               05  CONST-KOHNUM        PIC X(03) OCCURS    22.
-           03  CONST-KOHNUM-MAX        PIC 9(03) VALUE     22.
+               05  CONST-KOHNUM        PIC X(03) OCCURS    23.
+           03  CONST-KOHNUM-MAX        PIC 9(03) VALUE     23.
            03  CONST-ACCT-OCC-MAX      PIC 9(03) VALUE     10.
       *
       *****************************************************************
