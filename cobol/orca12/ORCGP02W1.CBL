@@ -7699,6 +7699,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            付曲办忍∈０１９∷∈Ｈ２８ˉ４から∷
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "019" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20160401"))
+      *H28.11
+      *            负驰∈边亩∈９５３∷∈Ｈ２７ˉ１から∷
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "953" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20150401"))
       *ver.4.7
       *        孟数给锐で惧嘎驰肋年滦据
                  OR  ( SPA-PTKOH-JYOGENKBN (IDX)   NOT =   SPACE )
