@@ -141,6 +141,14 @@
            03  WRK-INTYPE             PIC X(01).
       *
            03  WRK-MIDASI             PIC X(160).
+      *H28.11
+      *    空白削除
+           03  TBL-K062-COMMNT-AREA.
+               07  TBL-K062-COMMENT-TBL    OCCURS   50.
+                   09  TBL-K062-COMMENT        PIC X(80).
+                   09  TBL-K062-TENDYMDG       PIC X(10).
+                   09  TBL-K062-TENDYMD        PIC X(08).
+                   09  TBL-K062-INFLG          PIC X(01).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -1223,16 +1231,36 @@
        41012-COMMENT-CHK-SEC          SECTION.
       *
       *    空白削除
+      *    PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL       IDX     >   50
+      *        IF     (IDX                 <   50   )  AND
+      *               (SPA-K062-COMMENT(IDX)   =   SPACE )
+      *            MOVE    SPA-K062-COMMENT-TBL (IDX + 1)
+      *                                    TO  SPA-K062-COMMENT-TBL(IDX)
+      *            MOVE    SPACE           TO  SPA-K062-COMMENT-TBL
+      *                                                        (IDX + 1)
+      *        END-IF
+      **** END-PERFORM
+      *
+      *H28.11
+      *    空白削除
+           INITIALIZE                  TBL-K062-COMMNT-AREA
+           MOVE    ZERO                TO  IDX2
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   50
-               IF     (IDX                 <   50   )  AND
-                      (SPA-K062-COMMENT(IDX)   =   SPACE )
-                   MOVE    SPA-K062-COMMENT-TBL (IDX + 1)
-                                           TO  SPA-K062-COMMENT-TBL(IDX)
-                   MOVE    SPACE           TO  SPA-K062-COMMENT-TBL
-                                                               (IDX + 1)
+               IF     (SPA-K062-COMMENT(IDX)   NOT =   SPACE )
+                   ADD     1               TO  IDX2
+                   MOVE    SPA-K062-COMMENT-TBL (IDX)
+                                           TO  TBL-K062-COMMENT-TBL
+                                                                (IDX2)
                END-IF
            END-PERFORM
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   50
+               MOVE    TBL-K062-COMMENT-TBL (IDX)
+                                           TO  SPA-K062-COMMENT-TBL(IDX)
+           END-PERFORM
+      *
       *    全角チェック
            MOVE    ZERO                TO  IDX-ERR
            PERFORM VARYING     IDX     FROM    1   BY  1
