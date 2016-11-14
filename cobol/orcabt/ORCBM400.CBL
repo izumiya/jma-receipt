@@ -365,7 +365,7 @@
                END-IF
       *
                IF      FLG-JIBAI-PRT       =   1
-                   STRING  "該当患者の帳票データが存在しません"
+                   STRING  "該当患者のＰＤＦデータが存在しません"
                                                DELIMITED  BY  SIZE
                            "　患者番号＝"      DELIMITED  BY  SIZE
                            RECE10-PTNUM        DELIMITED  BY  SIZE

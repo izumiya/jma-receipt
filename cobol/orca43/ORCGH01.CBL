@@ -4090,7 +4090,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                            TO  H01-RECEDEN-CHK-MSG-VALUE
            ELSE
                IF      SPA-H01NAI-JIBAI-PDF-MSG    =   1
-                   MOVE    "ＰＤＦファイルがありません"
+                   MOVE    "ＰＤＦデータがありません"
                                            TO  H01-RECEDEN-CHK-MSG-VALUE
                END-IF
            END-IF
