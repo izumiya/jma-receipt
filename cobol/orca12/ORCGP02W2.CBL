@@ -138,6 +138,7 @@
       *  04.08.03    NACL-門脇    16/08/02  災害該当分のレセプト作成対応
       *                                     （非減免対象分と減免対象分の診療が
       *                                     混在する場合）
+      *  04.08.04    NACL-門脇    16/11/11  減額（円超）の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -604,7 +605,7 @@
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
                OR     (PTKOH-KOHNUM =
-                       "950" OR "951" OR "954" OR "955" OR
+                       "950" OR "951" OR "953" OR "954" OR "955" OR
                        "956" OR "957" OR "958" OR "959" OR
                        "976" OR "977" OR "978" OR "979"       )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )

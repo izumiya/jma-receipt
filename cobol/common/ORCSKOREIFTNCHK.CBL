@@ -62,6 +62,7 @@
       *
       *  04.07.01    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
+      *  04.08.01    NACL-ÌçÏÆ    16/11/11  ¸º³Û¡Ê±ßÄ¶¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -571,9 +572,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
            IF     SYU-KOH-HKNNUM(1) = "972"
                IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
@@ -609,9 +607,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
            IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
              CONTINUE
            ELSE
@@ -716,9 +711,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
            COMPUTE  WRK-FTNKEI = WRK-FTNKEI
                                + SYU-GRP-SGKMONEY
       *
@@ -795,10 +787,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *
            IF   LNK-KOREIFTNCHK-GENGAKUKBN   NOT =   ZERO
       *
-      ***      COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-      ***                          * 10
-      ***                          * WRK-KYURATE(IDX1)
-      ***                          / 100
                EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
                  WHEN        1
                    IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
@@ -841,6 +829,28 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                  WHEN        3
                  WHEN        4
                        MOVE   ZERO     TO   WRK-FTNKEI
+                 WHEN        5
+                   MOVE     WRK-FTNKEI   TO   WRK-FTNKEI-GENGAKU
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU +  5
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU /  10
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU *  10
+      *
+                   IF  WRK-FTNKEI > WRK-GENGAKU-KIN
+                     COMPUTE  WRK-FTNKEI     =
+                              WRK-GENGAKU-KIN
+                   END-IF
+      *
+                   IF  WRK-GENGAKU-KIN
+                                   <=  WRK-FTNKEI-GENGAKU
+                     MOVE   ZERO   TO   WRK-GENGAKU-KIN
+                   ELSE
+                     COMPUTE  WRK-GENGAKU-KIN   =
+                              WRK-GENGAKU-KIN   -
+                              WRK-FTNKEI-GENGAKU
+                   END-IF
                END-EVALUATE
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
@@ -876,6 +886,11 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                  WHEN        3
                  WHEN        4
                        MOVE   ZERO     TO   WRK-KINGAKU
+                 WHEN        5
+                   IF  WRK-KINGAKU > LNK-KOREIFTNCHK-GENGAKU-KIN
+                     COMPUTE  WRK-KINGAKU    =
+                              LNK-KOREIFTNCHK-GENGAKU-KIN
+                   END-IF
                END-EVALUATE
                COMPUTE  WRK-KINGAKU = WRK-KINGAKU +  5
                COMPUTE  WRK-KINGAKU = WRK-KINGAKU / 10
