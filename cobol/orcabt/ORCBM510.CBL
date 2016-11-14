@@ -56,6 +56,9 @@
       *  04.07.02    NACL-藤原    14/12/03  平成２６年１１月改正対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -124,6 +127,8 @@
            05  WRK-PARA-SHELLID        PIC X(08).
            05  WRK-PARA-HOSPNUM        PIC 9(02).
            05  WRK-PARA-HKNJANUM       PIC X(08).
+           05  WRK-PARA-STSRYYM        PIC 9(06).
+           05  WRK-PARA-EDSRYYM        PIC 9(06).
       *
       *    一時領域
        01  WRK-AREA.
@@ -345,8 +350,14 @@
                                                WRK-PARA-NYUGAIKBN
                                                WRK-PARA-HKNJANUM
                                                WRK-PARA-HOSPNUM
+                                               WRK-PARA-STSRYYM
+                                               WRK-PARA-EDSRYYM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-STSRYYM     ="  WRK-PARA-STSRYYM
+           DISPLAY "WRK-PARA-EDSRYYM     ="  WRK-PARA-EDSRYYM
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            INITIALIZE                  SGETTEMP-AREA
@@ -1258,6 +1269,15 @@ grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-END
                MOVE    MCPDATA-REC         TO  RECE10-REC
+      *
+               IF      WRK-PARA-STSRYYM    =   "999999"
+                   CONTINUE
+               ELSE
+                   IF    ( RECE10-SRYYM    <   WRK-PARA-STSRYYM )
+                   OR    ( RECE10-SRYYM    >   WRK-PARA-EDSRYYM )
+                       GO  TO  900-SEIKYU-READ-SEC
+                   END-IF
+               END-IF
       *
       *        未確定分をレセ電データに記録するか
                IF    (  SYS-200501-RECEDEN-DISASTER

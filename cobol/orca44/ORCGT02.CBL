@@ -36,6 +36,9 @@
       *
       *  04.08.01    NACL-藤原    16/01/18  地方公費処理スクリプトの存在
       *                                     チェック対応
+      *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1718,7 +1721,20 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    "F11:印刷しない"     TO  TID2-B11-LABEL
            MOVE    "F12:印刷する"       TO  TID2-B12-LABEL
            MOVE    "black"              TO  TID2-ID1MSG-STYLE
-                                            TID2-LABEL-STYLE
+           MOVE    "blue"               TO  TID2-LABEL-STYLE
+      *
+           IF      SPA-GMN-SRYYMKBN-MAX
+                                       >   ZERO
+               STRING   "　【"         DELIMITED  BY  SPACE
+                        SPA-NAI-SRYYMKBN-ST-PRT(SPA-NAI-SRYYMKBN-SELNUM)
+                                       DELIMITED  BY  SPACE
+                        "〜"           DELIMITED  BY  SPACE
+                        SPA-NAI-SRYYMKBN-ED-PRT(SPA-NAI-SRYYMKBN-SELNUM)
+                                       DELIMITED  BY  SPACE
+                        "】"           DELIMITED  BY  SPACE
+                                       INTO       TID2-LABEL
+               END-STRING
+           END-IF
       *
            MOVE    "B12"                TO  MCP-WIDGET
       *

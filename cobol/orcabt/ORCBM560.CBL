@@ -28,6 +28,9 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者        日付      内容
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -146,6 +149,9 @@
            05  WRK-PARA-SHELLID            PIC X(08).
            05  WRK-PARA-HOSPNUM            PIC 9(02).
            05  WRK-PARA-HKNJANUM           PIC X(08).
+           05  WRK-PARA-STSRYYM            PIC 9(06).
+           05  WRK-PARA-EDSRYYM            PIC 9(06).
+      *
            03  LNK-PARA-CHKERRFILE         PIC X(100).
       *
       *    一時領域
@@ -179,6 +185,12 @@
            03  WRK-ENDVALUE-X              PIC X(50).
            03  WRK-ENDVALUE-N              PIC X(50).
            03  WRK-LEN                     PIC 9(05).
+           03  WRK-SRYYM-PRT.
+               05  FILLER                  PIC X(02)   VALUE   "【".
+               05  WRK-STSRYYM-PRT         PIC X(16).
+               05  FILLER                  PIC X(02)   VALUE   "〜".
+               05  WRK-EDSRYYM-PRT         PIC X(16).
+               05  FILLER                  PIC X(02)   VALUE   "】".
       *
       *    エラーメッセージ
        01  WRK-ERR-AREA.
@@ -339,9 +351,14 @@
                                                WRK-PARA-HKNJANUM
                                                LNK-PARA-CHKERRFILE
                                                WRK-PARA-HOSPNUM
+                                               WRK-PARA-STSRYYM
+                                               WRK-PARA-EDSRYYM
                                                CHECKERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+      *
+           DISPLAY "WRK-PARA-STSRYYM     ="  WRK-PARA-STSRYYM
+           DISPLAY "WRK-PARA-EDSRYYM     ="  WRK-PARA-EDSRYYM
       *
            INITIALIZE                  SGETTEMP-AREA
            MOVE    CHECKERR        TO  SGETTEMP-BASENAMES (1)
@@ -409,6 +426,19 @@
            MOVE    WRK-ENDVALUE-X      TO  WRK-KANACHK-STR
            PERFORM 800-ZENKAKU-SEC
            MOVE    WRK-KANACHK-STR     TO  WRK-ENDVALUE-N
+      *
+           IF      WRK-PARA-STSRYYM    =   "999999"
+               CONTINUE
+           ELSE
+               MOVE    WRK-PARA-STSRYYM    TO  WRK-SYMD(1:6)
+               MOVE    "01"                TO  WRK-SYMD(7:2)
+               PERFORM 800-SEIWA-SEC
+               MOVE    WRK-EDTYMD3(1:16)   TO  WRK-STSRYYM-PRT
+               MOVE    WRK-PARA-EDSRYYM    TO  WRK-SYMD(1:6)
+               MOVE    "01"                TO  WRK-SYMD(7:2)
+               PERFORM 800-SEIWA-SEC
+               MOVE    WRK-EDTYMD3(1:16)   TO  WRK-EDSRYYM-PRT
+           END-IF
       *
            .
        100-INIT-EXT.
@@ -811,6 +841,12 @@
            IF      WRK-PARA-SYORIKBN   =   "1"
                MOVE    "個別作成"          TO  HCM74-MEMO1 (20:)
            END-IF      
+      *
+           IF      WRK-PARA-STSRYYM    =   "999999"
+               CONTINUE
+           ELSE
+               MOVE    WRK-SRYYM-PRT       TO  HCM74-MEMO3
+           END-IF
       *
            EVALUATE    WRK-PARA-HKNJANUM
                WHEN    "99999999"
@@ -1274,15 +1310,20 @@
            IF    ( WRK-SYMD            =   SPACE )
                CONTINUE
            ELSE
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY2-AREA
-               MOVE    "21"                TO  LNK-DAY2-IRAI
-               MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY2-AREA
-               IF    ( STS-DAY-RC1         =   ZERO )
-                   MOVE    LNK-DAY2-EDTYMD1    TO  WRK-EDTYMD1
-                   MOVE    LNK-DAY2-EDTYMD3    TO  WRK-EDTYMD3
+               IF    ( WRK-SYMD (1:6)      =   "000000"    OR
+                                               "999999" )
+                   CONTINUE
+               ELSE
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY2-AREA
+                   MOVE    "21"                TO  LNK-DAY2-IRAI
+                   MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
+                   CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                   LNK-DAY2-AREA
+                   IF    ( STS-DAY-RC1         =   ZERO )
+                       MOVE    LNK-DAY2-EDTYMD1    TO  WRK-EDTYMD1
+                       MOVE    LNK-DAY2-EDTYMD3    TO  WRK-EDTYMD3
+                   END-IF
                END-IF
                INSPECT WRK-EDTYMD3     REPLACING  ALL "  "  BY  "　"
            END-IF

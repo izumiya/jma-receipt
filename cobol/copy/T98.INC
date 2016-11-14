@@ -1,6 +1,4 @@
             02  T98.
-              03  T98-ID1CODE.
-                04  T98-VALUE   PIC X(4).
               03  T98-ID1MSG.
                 04  T98-VALUE   PIC X(80).
               03  T98-PRTKBN-COMBO.
@@ -18,3 +16,5 @@
               03  T98-B10-VISIBLE  PIC X(01).
               03  T98-B11-VISIBLE  PIC X(01).
               03  T98-B12-LABEL  PIC X(14).
+              03  T98-LABEL-STYLE  PIC X(20).
+              03  T98-LABEL        PIC X(40).

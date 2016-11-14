@@ -3,6 +3,7 @@ tbl_henrei_body	{
 	TEISYUTUSAKI		char(1);
 	TEISYUTUSAKI2		char(1);
 #---->  審査側が処理した年月(HIレコードの年月)
+	HOSPCD			char(7);
 	SYORIYM			char(6);
 	RECEIPT_NO		char(6);
 #---->  返戻レセ電は個人で複数件あるのでそのカウント
@@ -201,7 +202,7 @@ XXTEISYUTUSAKI                  char(1),virtual;
 };
 
 primary	{
-	HOSPNUM,TEISYUTUSAKI,TEISYUTUSAKI2,SYORIYM,RECEIPT_NO,PT_RENNUM;
+	HOSPNUM,TEISYUTUSAKI,TEISYUTUSAKI2,HOSPCD,SYORIYM,RECEIPT_NO,PT_RENNUM;
 };
 
 path    key             {
@@ -244,6 +245,7 @@ path    key3            {
                     AND   TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
+                    AND   HOSPCD          = :HOSPCD
                     AND   RECEIPT_NO      = :RECEIPT_NO
                     AND   SELECT_FLG      = 1 
                     ORDER BY PT_RENNUM
@@ -412,6 +414,7 @@ path    upd1    {
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
                     AND   RECEIPT_NO      = :RECEIPT_NO
+                    AND HOSPCD            = :HOSPCD
                 ;
         };
 };
@@ -422,6 +425,7 @@ path    del1    {
                     AND   TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
+                    AND   HOSPCD          = :HOSPCD
                 ;
         };
 };
@@ -435,6 +439,7 @@ path    key4            {
                     AND   TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
+                    AND   HOSPCD          = :HOSPCD
                     AND   PT_RENNUM       = 1
                 ORDER BY RECEIPT_NO
                 ;
@@ -450,6 +455,7 @@ path    key5            {
                     AND   TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
+                    AND   HOSPCD          = :HOSPCD
                     AND   RECEIPT_NO      = :RECEIPT_NO
                     AND   ERRCD           <> ''
                     AND   SUBSTRING(HENREI_INFO2,1,2) <> 'HG'
@@ -467,6 +473,7 @@ path    key6            {
                     AND   TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND   TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND   SYORIYM         = :SYORIYM
+                    AND   HOSPCD          = :HOSPCD
                     AND   SUBSTRING(HENREI_INFO2,1,2) = 'HG'
                 ;
         };

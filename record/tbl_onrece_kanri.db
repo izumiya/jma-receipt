@@ -1,6 +1,7 @@
 tbl_onrece_kanri   {
         HOSPNUM			number(2,0);
 	TEISYUTUSAKI		char(1);
+	HOSPCD			char(7);
 	SRYYM			char(6);
 	UCNT			number(3);
 	SCNT			number(3);
@@ -25,7 +26,7 @@ tbl_onrece_kanri   {
 };
 
 primary {
-        HOSPNUM,TEISYUTUSAKI,SRYYM,UCNT,SCNT,RENNUM;
+        HOSPNUM,TEISYUTUSAKI,HOSPCD,SRYYM,UCNT,SCNT,RENNUM;
 };
 
 path    key             {
@@ -39,6 +40,7 @@ path    key             {
                     AND	UCNT		= :UCNT
                     AND	SCNT		= :SCNT
                     AND	RENNUM		= :RENNUM
+                    AND HOSPCD          = :HOSPCD
                 ;
         };
 };
@@ -54,6 +56,7 @@ path    key1            {
                     AND	UCNT		= :UCNT
                     AND	SCNT		= :SCNT
                     AND	RENNUM		= 0
+                    AND HOSPCD          = :HOSPCD
                 ;
         };
 };
@@ -134,6 +137,7 @@ path    key7             {
                 WHERE	HOSPNUM		= :HOSPNUM
                     AND	TEISYUTUSAKI	= :TEISYUTUSAKI
                     AND	SRYYM		= :SRYYM
+                    AND HOSPCD          = :HOSPCD
                     AND	UCNT		= :UCNT
                 ;
         };
@@ -159,6 +163,23 @@ path    upd1    {
                     AND	UCNT		= :UCNT_V
                     AND	SCNT		= :SCNT_V
                     AND	RENNUM		= :RENNUM
+                    AND HOSPCD          = :HOSPCD
+                ;
+        };
+};
+
+path    key8             {
+        DBSELECT        {
+                DECLARE tbl_onrece_kanri_key8_csr CURSOR FOR
+                SELECT *
+                FROM tbl_onrece_kanri
+                WHERE	HOSPNUM		= :HOSPNUM
+                    AND	TEISYUTUSAKI	= :TEISYUTUSAKI
+                    AND	SRYYM		= :SRYYM
+                    AND HOSPCD          = :HOSPCD
+                    AND	UCNT		= :UCNT
+                    AND	SCNT		= :SCNT
+                    ORDER BY RENNUM DESC
                 ;
         };
 };

@@ -2,6 +2,7 @@ tbl_henrei_kanri	{
 	HOSPNUM			number(2,0);
 	TEISYUTUSAKI		char(1);
 	TEISYUTUSAKI2		char(1);
+	HOSPCD			char(7);
 #---->  審査側が処理した年月(HIレコードの年月)
 	SYORIYM			char(6);
 	RECV_TOTAL_CNT		number(5);
@@ -17,7 +18,7 @@ tbl_henrei_kanri	{
 };
 
 primary	{
-	HOSPNUM,TEISYUTUSAKI,TEISYUTUSAKI2,SYORIYM;
+	HOSPNUM,TEISYUTUSAKI,TEISYUTUSAKI2,HOSPCD,SYORIYM;
 };
 
 path    key             {
@@ -29,6 +30,7 @@ path    key             {
                     AND TEISYUTUSAKI    = :TEISYUTUSAKI
                     AND TEISYUTUSAKI2   = :TEISYUTUSAKI2
                     AND SYORIYM         = :SYORIYM
+                    AND HOSPCD          = :HOSPCD
                 ;
         };
 };
@@ -39,7 +41,7 @@ path    key2             {
                 SELECT *
                 FROM tbl_henrei_kanri
                 WHERE   HOSPNUM         = :HOSPNUM
-                ORDER BY SYORIYM DESC,TEISYUTUSAKI,TEISYUTUSAKI2
+                ORDER BY SYORIYM DESC,TEISYUTUSAKI,TEISYUTUSAKI2,HOSPCD
                 ;
         };
 };

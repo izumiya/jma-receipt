@@ -33,6 +33,8 @@ fi
 #        ${28} レセ電データチェックの有無
 #            1:チェックする
 #        ${29} 入外区分
+#        ${30}-  ${31}医療機関コード別の処理指定時
+#            該当診療年月の開始、終了
 #-------------------------------------------#
 
     if  [ ${24} -eq '6' ] || [ ${24} -eq '7' ]; then
@@ -57,6 +59,8 @@ fi
     echo "arg27 = [" ${27} "]" >>$LOG_FILE
     echo "arg28 = [" ${28} "]" >>$LOG_FILE
     echo "arg29 = [" ${29} "]" >>$LOG_FILE
+    echo "arg30 = [" ${30} "]" >>$LOG_FILE
+    echo "arg31 = [" ${31} "]" >>$LOG_FILE
     echo "hostname =  ["`hostname`  "]" >>$LOG_FILE
 
     rennum=0
@@ -151,7 +155,7 @@ fi
 
 #   レセ電ファイル作成
 
-    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM520 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${13},${17},${18},${19},${21},$fixedsize,${24},${23},${20} >> $LOG_FILE 2>&1
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM520 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${13},${17},${18},${19},${21},$fixedsize,${24},${23},${29},${30},${20} >> $LOG_FILE 2>&1
     if  [ -e ${MCP_TEMPDIR}/${20} ]; then
         echo "--- BM520 err file exist ---" >> $LOG_FILE 2>&1
         exit 
@@ -205,7 +209,7 @@ fi
     echo "--- receden check end   $(LANG=C date) ---" >>$LOG_FILE
 
         rennum=1
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM560 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${24},'1',${18},${19},${27},$(basename ${ERRFILE}),${23},${20} >> $LOG_FILE 2>&1
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM560 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${24},'1',${18},${19},${27},$(basename ${ERRFILE}),${23},${29},${30},${20} >> $LOG_FILE 2>&1
         if  [ -e ${MCP_TEMPDIR}/${20} ]; then
             echo "--- BM560 err file exist ---" >>$LOG_FILE
             exit 

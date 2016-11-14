@@ -30,6 +30,10 @@
       *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
       *                                     disaster s_disaster 1-10 追加
+      *
+      *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       ************************************************************
       *01  HENREI-BODY-REC.
            03  HENREI-B-HOSPNUM    PIC 9(2).
@@ -37,6 +41,7 @@
                                    PIC X(1).
            03  HENREI-B-TEISYUTUSAKI2
                                    PIC X(1).
+           03  HENREI-B-HOSPCD     PIC X(7).
            03  HENREI-B-SYORIYM    PIC X(6).
            03  HENREI-B-RECEIPT-NO PIC X(6).
            03  HENREI-B-PT-RENNUM  PIC 9(4).

@@ -19,6 +19,13 @@
                 04  T06-VALUE   PIC X(40).
               03  T06-SRYYM-H.
                 04  T06-VALUE   PIC X(7).
+              03  T06-SRYYMKBN-COMBO.
+                04  T06-SRYYMKBN-COM-VISIBLE  PIC X(01).
+                04  T06-SRYYMKBN.
+                  05  T06-VALUE    PIC X(18).
+                04  T06-SRYYMKBN-COUNT PIC S9(9)   BINARY.
+                04  T06-SRYYMKBN-ITEM
+                        PIC X(18)   OCCURS  10 TIMES.
               03  T06-SKYYMD-H.
                 04  T06-VALUE   PIC X(10).
               03  T06-HKNJANAME-STYLE    PIC X(20).

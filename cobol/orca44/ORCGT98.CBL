@@ -48,6 +48,9 @@
       *  04.08.02    NACL-藤原    14/08/28  ４．８ミドル対応
       *  04.08.03    NACL-藤原    15/08/07  医療情報連携基盤のクライアン
       *                                     ト保存対応
+      *  04.08.04    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -691,6 +694,26 @@
                                            TO  T98-PRTKBN-ITEM (IDX)
            END-PERFORM
            MOVE    SPA-GMN-T98-PRTKBN-MAX  TO  T98-PRTKBN-COUNT
+      *
+           MOVE    "blue"              TO  T98-LABEL-STYLE
+           IF      SPA-T01-PRTKBN      =   "6" OR  "7"
+               CONTINUE
+           ELSE 
+               IF      SPA-GMN-T06-SRYYMKBN-MAX
+                                       >   ZERO
+                   STRING   "【"               DELIMITED   BY  SPACE
+                            SPA-NAI-T06-SRYYMKBN-ST-PRT
+                                           (SPA-NAI-T06-SRYYMKBN-SELNUM)
+                                               DELIMITED   BY  SPACE
+                            "〜"               DELIMITED   BY  SPACE
+                            SPA-NAI-T06-SRYYMKBN-ED-PRT
+                                           (SPA-NAI-T06-SRYYMKBN-SELNUM)
+                                               DELIMITED   BY  SPACE
+                            "】"               DELIMITED   BY  SPACE
+                                               INTO        T98-LABEL
+                   END-STRING
+               END-IF
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *

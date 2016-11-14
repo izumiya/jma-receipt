@@ -33,8 +33,10 @@ T05 {
             column9 varchar(2);
             column10 varchar(2);
             column11 varchar(5);
+            column12 varchar(2);
           }[50];
           selectdata bool[50];
+          bgcolor varchar(16)[50];
       };
     };
     SELNAME1 {

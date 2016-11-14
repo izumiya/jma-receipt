@@ -29,6 +29,9 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -74,6 +77,8 @@
            03  FLG-END             PIC 9(01).
            03  FLG-HENREI-K        PIC 9(01).
            03  FLG-HENREI-B        PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
+      *
            03  FLG-HENREI-B-CHK    PIC 9(01).
       *
            03  FLG-KANRI-ROW       PIC 9(01).
@@ -117,6 +122,9 @@
                                    REPLACING   //HENREI-B-//
                                    BY          //CHK-HENREI-B-//.
       *
+           COPY    "CPSK1001.INC"  REPLACING   //SYS-1001-//
+                                   BY          //CHK-1001-//.
+      *
        01  WRK-HEN-AREA.
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
@@ -150,6 +158,7 @@
        01  HENREI-B-REC.
            COPY    "CPHENREI-BODY.INC".
       *
+           COPY    "CPSK1001.INC".
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
@@ -332,6 +341,80 @@
                MOVE    HENREI-K-CREYMD TO  WRK-SYMD
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG     TO  SPA-GMN-H03-K-TCREYMD   (IDX)
+               MOVE    HENREI-K-HOSPCD TO  SPA-NAI-H03-K-THOSPCD   (IDX)
+      *??
+           DISPLAY "HENREI-K-HOSPCD=" IDX "#" HENREI-K-HOSPCD "#"
+      *??
+               INITIALIZE                  SYS-1001-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-1001-HOSPNUM
+               MOVE    "1001"          TO  SYS-1001-KANRICD
+               MOVE    "*"             TO  SYS-1001-KBNCD
+               MOVE    HENREI-K-SYORIYM
+                                       TO  SYS-1001-STYUKYMD (1:6)
+               MOVE    "01"            TO  SYS-1001-STYUKYMD (7:2)
+               MOVE    SYS-1001-STYUKYMD
+                                       TO  SYS-1001-EDYUKYMD
+               MOVE    SYS-1001-REC    TO  MCPDATA-REC
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI    =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYS-1001-REC
+      *??
+           DISPLAY "SYS-1001-HOSPCD=" SYS-1001-HOSPCD "#"
+      *??
+                   IF      HENREI-K-HOSPCD NOT =   SPACE
+                       IF      SYS-1001-HOSPCD
+                                           NOT =   HENREI-K-HOSPCD
+                           MOVE    "旧"            TO
+                                             SPA-GMN-H03-K-THOSPCD (IDX)
+                       END-IF
+                   ELSE
+                       MOVE    SYS-1001-REC    TO  CHK-1001-REC
+      *
+                       INITIALIZE                  CHK-HENREI-B-REC
+                       MOVE    SPA-HOSPNUM     TO  CHK-HENREI-B-HOSPNUM
+                       MOVE    HENREI-K-SYORIYM
+                                               TO  CHK-HENREI-B-SYORIYM
+                       MOVE    HENREI-K-TEISYUTUSAKI
+                                               TO
+                                           CHK-HENREI-B-TEISYUTUSAKI
+                       MOVE    HENREI-K-TEISYUTUSAKI2
+                                               TO
+                                           CHK-HENREI-B-TEISYUTUSAKI2
+                       MOVE    HENREI-K-HOSPCD TO CHK-HENREI-B-HOSPCD
+                       MOVE    CHK-HENREI-B-REC
+                                               TO  MCPDATA-REC
+                       MOVE    "key4"          TO  WRK-MCP-PATHNAME
+                       PERFORM 900-HENREI-BODY-READ-SEC
+                       IF      FLG-HENREI-B-CHK    =   ZERO
+                           INITIALIZE                  SYS-1001-REC
+                           MOVE    SPA-HOSPNUM     TO  SYS-1001-HOSPNUM
+                           MOVE    "1001"          TO  SYS-1001-KANRICD
+                           MOVE    "*"             TO  SYS-1001-KBNCD
+                           MOVE    CHK-HENREI-B-SRYYM  TO
+                                               SYS-1001-STYUKYMD (1:6)
+                           MOVE    "01"            TO
+                                               SYS-1001-STYUKYMD (7:2)
+                           MOVE    SYS-1001-STYUKYMD
+                                                   TO  SYS-1001-EDYUKYMD
+                           MOVE    SYS-1001-REC    TO  MCPDATA-REC
+                           PERFORM 900-SYSKANRI-READ-SEC
+                           IF      FLG-SYSKANRI    =   ZERO
+                               MOVE    MCPDATA-REC     TO  SYS-1001-REC
+      *??
+           DISPLAY "BODY SYS-1001-HOSPCD=" SYS-1001-HOSPCD "#"
+      *??
+                               IF      SYS-1001-HOSPCD
+                                               NOT =   CHK-1001-HOSPCD
+                                   MOVE    "旧"            TO
+                                           SPA-GMN-H03-K-THOSPCD (IDX)
+                               END-IF
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+      *??
+           DISPLAY "THOSPCD=" SPA-GMN-H03-K-THOSPCD (IDX) "#"
+      *??
       *
                INITIALIZE                      CHK-HENREI-B-REC
                MOVE    SPA-HOSPNUM         TO  CHK-HENREI-B-HOSPNUM
@@ -340,18 +423,10 @@
                                            TO  CHK-HENREI-B-TEISYUTUSAKI
                MOVE    HENREI-K-TEISYUTUSAKI2
                                            TO CHK-HENREI-B-TEISYUTUSAKI2
+               MOVE    HENREI-K-HOSPCD     TO CHK-HENREI-B-HOSPCD
                MOVE    CHK-HENREI-B-REC    TO  MCPDATA-REC
-               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 900-DBSELECT-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-                   MOVE    "key6"              TO  MCP-PATHNAME
-                   PERFORM 900-HENREI-BODY-READ-SEC
-               END-IF
-               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-               MOVE    "key6"              TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               MOVE    "key6"              TO  WRK-MCP-PATHNAME
+               PERFORM 900-HENREI-BODY-READ-SEC
                IF      FLG-HENREI-B-CHK    =   ZERO
                    MOVE  CHK-HENREI-B-ERRCD    TO
                                        SPA-GMN-H03-K-TERRCD    (IDX)
@@ -467,6 +542,8 @@
                                        TO  HENREI-B-TEISYUTUSAKI
            MOVE    SPA-NAI-H03-K-TTEISYUTUSAKI2 (SPA-NAI-H03-SELNUM)
                                        TO  HENREI-B-TEISYUTUSAKI2
+           MOVE    SPA-NAI-H03-K-THOSPCD        (SPA-NAI-H03-SELNUM)
+                                       TO  HENREI-B-HOSPCD
            MOVE    HENREI-B-REC        TO  MCPDATA-REC
            MOVE    "tbl_henrei_body"   TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
@@ -509,17 +586,8 @@
                MOVE    HENREI-B-HR-MSG TO  SPA-GMN-H03-B-TERR      (IDX)
       *
                MOVE    HENREI-B-REC        TO  MCPDATA-REC
-               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
-               PERFORM 900-DBSELECT-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-                   MOVE    "key5"              TO  MCP-PATHNAME
-                   PERFORM 900-HENREI-BODY-READ-SEC
-               END-IF
-               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+               MOVE    "key5"              TO  WRK-MCP-PATHNAME
+               PERFORM 900-HENREI-BODY-READ-SEC
                IF      FLG-HENREI-B-CHK    =   ZERO
                    MOVE  CHK-HENREI-B-ERRCD    TO
                                            SPA-GMN-H03-B-TERRCD    (IDX)
@@ -689,6 +757,8 @@
                                            TO  H03-KANRI-TERRCD    (IDX)
                MOVE    SPA-GMN-H03-K-TCREYMD (IDX)
                                            TO  H03-KANRI-TCREYMD   (IDX)
+               MOVE    SPA-GMN-H03-K-THOSPCD   (IDX)
+                                           TO  H03-KANRI-THOSPCD   (IDX)
       *         
                IF      IDX                 =   SPA-GMN-H03-SELNUM
                    MOVE    "T"                 TO  H03-KANRI-LIST-SELECT
@@ -891,14 +961,28 @@
       *****************************************************************
        900-HENREI-BODY-READ-SEC        SECTION.
       *
-           PERFORM 900-DBFETCH-SEC
+           MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE  MCPDATA-REC           TO  CHK-HENREI-B-REC
-               MOVE  ZERO                  TO  FLG-HENREI-B-CHK
+               MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE  MCPDATA-REC           TO  CHK-HENREI-B-REC
+                   MOVE  ZERO                  TO  FLG-HENREI-B-CHK
+               ELSE
+                   INITIALIZE                      CHK-HENREI-B-REC
+                   MOVE  1                     TO  FLG-HENREI-B-CHK
+               END-IF
            ELSE
                INITIALIZE                      CHK-HENREI-B-REC
                MOVE  1                     TO  FLG-HENREI-B-CHK
            END-IF
+      *
+           MOVE    "tbl_henrei_body"   TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
            .
        900-HENREI-BODY-READ-EXT.
            EXIT.
@@ -920,6 +1004,35 @@
            END-IF
            .
        900-HENREI-BODY-READ-KEY4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    システム管理読込
+      *****************************************************************
+       900-SYSKANRI-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+               ELSE
+                   MOVE    1                   TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-SYSKANRI-READ-EXT.
            EXIT.
       *
       *****************************************************************

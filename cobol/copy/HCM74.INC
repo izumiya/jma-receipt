@@ -54,3 +54,5 @@
                         PIC X(8).
               03  HCM74-CSVDATA
                         PIC X(172).
+            02  HCM74-MEMO3
+                        PIC X(40).

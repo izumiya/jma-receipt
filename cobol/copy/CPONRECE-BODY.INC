@@ -25,11 +25,16 @@
       *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
       *                                     receipt_kbn 追加 
+      *
+      *  04.08.01    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
       ************************************************************
       *01  ONRECE-BODY-REC.
            03  ONRECE-B-HOSPNUM    PIC 9(2).
            03  ONRECE-B-TEISYUTUSAKI
                                    PIC X(1).
+           03  ONRECE-B-HOSPCD     PIC X(7).
            03  ONRECE-B-SRYYM      PIC X(6).
            03  ONRECE-B-UCNT       PIC 9(3).
            03  ONRECE-B-SCNT       PIC 9(3).

@@ -38,6 +38,14 @@ T06 {
     SRYYM_H {
       textdata varchar(7);
     };
+    SRYYMKBN_COMBO {
+      visible bool;
+      SRYYMKBN {
+        textdata varchar(18);
+      };
+      count int;
+        item varchar(18)[10];
+    };
     SKYYMD_H {
       textdata varchar(10);
     };

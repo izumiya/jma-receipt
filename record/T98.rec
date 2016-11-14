@@ -1,8 +1,5 @@
 T98 {
   fixed1 {
-    ID1CODE {
-      textdata varchar(4);
-    };
     ID1MSG {
       textdata varchar(80);
     };
@@ -28,6 +25,10 @@ T98 {
     };
     B12 {
       label varchar(14);
+    };
+    LABEL {
+      style varchar(20);
+      textdata varchar(40);
     };
   };
 };

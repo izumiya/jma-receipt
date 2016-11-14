@@ -28,8 +28,11 @@
                     06  T05-DATALST-TFLG2   PIC X(2).
                     06  T05-DATALST-TFLG4   PIC X(2).
                     06  T05-DATALST-TCNT    PIC X(5).
+                    06  T05-DATALST-THOSPCD PIC X(2).
                   05  T05-DATALST-SELECT
                           PIC X       OCCURS  50 TIMES.
+                  05  T05-DATALST-BGCOLOR
+                          PIC X(16)   OCCURS  50 TIMES.
               03  T05-SELNAME1.
                 04  T05-VALUE   PIC X(100).
               03  T05-SELNAME2.

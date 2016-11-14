@@ -20,7 +20,7 @@ TID2 {
     };
     LABEL {
       style varchar(20);
-      textdata varchar(80);
+      textdata varchar(120);
     };
   };
 };
