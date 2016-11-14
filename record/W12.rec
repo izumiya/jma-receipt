@@ -445,6 +445,13 @@ W12 {
           count int;
             item varchar(38)[5];
         };
+        JIBAI_PDF_COMBO {
+          JIBAI_PDF {
+            textdata varchar(20);
+          };
+          count int;
+            item varchar(20)[2];
+        };
         ROUPRTNM {
           textdata varchar(16);
         };

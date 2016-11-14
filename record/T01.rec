@@ -18,6 +18,9 @@ T01 {
     B10 {
       state int;
     };
+    B14 {
+      state int;
+    };
     B15 {
       state int;
     };
@@ -42,6 +45,14 @@ T01 {
     };
     B22 {
       state int;
+    };
+    SRYYMKBN_COMBO {
+      visible bool;
+      SRYYMKBN {
+        textdata varchar(18);
+      };
+      count int;
+        item varchar(18)[10];
     };
     SKYYMD {
       textdata varchar(10);

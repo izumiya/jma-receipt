@@ -84,6 +84,10 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    16/06/13  社保診療報酬請求書の災害該当
       *                                     分のまとめ対応
+      *  04.08.03    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
+      *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -121,6 +125,11 @@
                        09  SPA-GMN-F1L             PIC X(01).
                        09  SPA-GMN-RECEDEN-CHKMEIL PIC X(16).
                    07  SPA-GMN-RECEDEN-CHK-MAX     PIC 9(02).    
+                   07  SPA-GMN-SRYYMKBNLST         OCCURS  10.
+                       09  SPA-GMN-SRYYMKBNL       PIC X(02).
+                       09  SPA-GMN-F1L             PIC X(01).
+                       09  SPA-GMN-SRYYMKBNNML     PIC X(15).
+                   07  SPA-GMN-SRYYMKBN-MAX        PIC 9(02).
       *                                             
                    07  SPA-GMN-DATAKBN-G.
                        09  SPA-GMN-DATAKBN         PIC X(01).
@@ -147,6 +156,11 @@
                        09  SPA-GMN-RECEDEN-CHK     PIC X(01).
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-RECEDEN-CHKMEI  PIC X(14).
+      *
+                   07  SPA-GMN-SRYYMKBN-G.
+                       09  SPA-GMN-SRYYMKBN        PIC X(02).
+                       09  SPA-GMN-F1              PIC X(01).
+                       09  SPA-GMN-SRYYMKBNNM      PIC X(15).
       *                                             
                    07  SPA-GMN-SKYYM               PIC X(07).
                    07  SPA-GMN-SKYYMD              PIC X(10).
@@ -173,7 +187,7 @@
                    07  SPA-GMN-TITLE1              PIC X(90). 
       *
                05  SPA-NAIB-T01-AREA.
-                   07  SPA-NAI-WIDGET              PIC X(08). 
+                   07  SPA-NAI-WIDGET              PIC X(08).
                    07  SPA-NAI-SKYYM               PIC 9(06).
                    07  SPA-NAI-SKYYM-W             PIC 9(04).
                    07  SPA-NAI-SKYYMD              PIC 9(08).
@@ -188,18 +202,26 @@
                        09  SPA-NAI-RECEDEN-CHK1    PIC X(01).
                        09  SPA-NAI-RECEDEN-CHK2    PIC X(01).
                        09  SPA-NAI-RECEDEN-CHK3    PIC X(01).
-                   07  SPA-NAI-DIRECT-HKNJANUM-63  PIC X(08).                   
+                   07  SPA-NAI-DIRECT-HKNJANUM-63  PIC X(08).
       *
                    07  SPA-NAI-DIRECT-HKNJANUMLST  OCCURS  10.
                        09  SPA-NAI-DIRECT-HKNJANUM-63L
                                                    PIC X(08).
+                   07  SPA-NAI-SRYYMKBNLST         OCCURS  10.
+                       09  SPA-NAI-SRYYMKBN-ST     PIC 9(06).
+                       09  SPA-NAI-SRYYMKBN-ED     PIC 9(06).
+                       09  SPA-NAI-SRYYMKBN-ST-PRT PIC X(16).
+                       09  SPA-NAI-SRYYMKBN-ED-PRT PIC X(16).
+                       09  SPA-NAI-SRYYMKBN-ERR    PIC X(01).
+                   07  SPA-NAI-SRYYMKBN-SELNUM     PIC 9(02).
       *
-               05  SPA-STATE.             
+               05  SPA-STATE.
                    07  SPA-B06-STATE               PIC S9(09)  BINARY.
                    07  SPA-B07-STATE               PIC S9(09)  BINARY.
                    07  SPA-B08-STATE               PIC S9(09)  BINARY.
                    07  SPA-B09-STATE               PIC S9(09)  BINARY.
                    07  SPA-B10-STATE               PIC S9(09)  BINARY.
+                   07  SPA-B14-STATE               PIC S9(09)  BINARY.
                    07  SPA-B15-STATE               PIC S9(09)  BINARY.
                    07  SPA-B16-STATE               PIC S9(09)  BINARY.
                    07  SPA-B17-STATE               PIC S9(09)  BINARY.
@@ -276,6 +298,7 @@
                                                    PIC X(01).
                05  SPA-NAI-200501-DISASTER-SYAPRTKBN
                                                    PIC X(01).
+               05  SPA-NAI-200501-JIBAI-PDF        PIC X(01).
       *
                05  SPA-NAI-4100-KGISKYKBN          PIC X(02).
       *
@@ -299,6 +322,17 @@
       *
                05  SPA-NAI-1001-PREFNUM            PIC 9(02).
                05  SPA-NAI-1001-HOSPCD             PIC 9(07).
+      *
+               05  SPA-NAI-1001-T.
+                   07  SPA-NAI-1001-OCC            OCCURS  10.
+                       09  SPA-NAI-1001-TSTYUKYMD  PIC X(08).
+                       09  SPA-NAI-1001-TEDYUKYMD  PIC X(08).
+                       09  SPA-NAI-1001-THOSPCD    PIC 9(07).
+                       09  SPA-NAI-1001-TSTYUKYM   PIC X(06).
+                       09  SPA-NAI-1001-TEDYUKYM   PIC X(06).
+                       09  SPA-NAI-1001-TSTYUKYM-G PIC X(16).
+                       09  SPA-NAI-1001-TEDYUKYM-G PIC X(16).
+                   07  SPA-NAI-1001-MAX            PIC 9(02).
       *
       *    公費個別指定
            03  SPA-T02-AREA.
@@ -468,6 +502,7 @@
                        09  SPA-GMN-T05-TNAIYO      PIC X(100).
                        09  SPA-GMN-T05-TFLG4       PIC X(02).
                        09  SPA-GMN-T05-TCNT        PIC 9(05).
+                       09  SPA-GMN-T05-THOSPCD     PIC X(02).
                    07  SPA-GMN-T05-DATALST-MAX     PIC 9(02).
       *                                             
                    07  SPA-GMN-T05-KOUMOKU.
@@ -493,6 +528,8 @@
                        09  SPA-NAI-T05-TFLG3       PIC X(01).
                        09  SPA-NAI-T05-TFLG2       PIC X(01).
                        09  SPA-NAI-T05-TDB         PIC X(01).
+                       09  SPA-NAI-T05-THOSPCD     PIC X(07).
+                       09  SPA-NAI-T05-TSRYYM-B    PIC 9(6).
       *
            03  SPA-T99-AREA.
                05  SPA-SFILESV-AREA.

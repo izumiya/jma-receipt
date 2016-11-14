@@ -134,7 +134,8 @@
       *                                     様式追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
-      *  04.08.01    NACL-太田    16/02/02  レセプトプレビュー不具合対応
+      *  04.08.02    NACL-太田    16/02/02  レセプトプレビュー不具合対応
+      *  04.08.03    NACL-藤原    16/11/01  リアルタイムプレビュー時の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -732,6 +733,11 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  PRTKANRI-TBL-GROUP
 grpsys         MOVE    SPA-HOSPNUM     TO  PRTKANRI-HOSPNUM
+               IF      WRK-PARA-SHELLID    =   "RECEPTX"
+                   MOVE    "RECEPTX"       TO  PRTKANRI-TBL-KEY
+               ELSE
+                   MOVE    "RECEPT2"       TO  PRTKANRI-TBL-KEY
+               END-IF
                MOVE    PRTKANRI-REC    TO  MCPDATA-REC
                MOVE    "DBDELETE"      TO  MCP-FUNC
                IF      WRK-PARA-SYOKBN     =   "1"
@@ -739,7 +745,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  PRTKANRI-HOSPNUM
                    MOVE    "del12"         TO  MCP-PATHNAME
                ELSE
                    MOVE    "tbl_prtkanri"  TO  MCP-TABLE
-                   MOVE    "del13"         TO  MCP-PATHNAME
+                   MOVE    "del17"         TO  MCP-PATHNAME
                END-IF
 grpsys         PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC           NOT =   ZERO
@@ -761,6 +767,11 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  PRTDATA-TBL-GROUP
 grpsys         MOVE    SPA-HOSPNUM     TO  PRTDATA-HOSPNUM
+               IF      WRK-PARA-SHELLID    =   "RECEPTX"
+                   MOVE    "RECEPTX"       TO  PRTDATA-TBL-KEY
+               ELSE
+                   MOVE    "RECEPT2"       TO  PRTDATA-TBL-KEY
+               END-IF
                MOVE    PRTDATA-REC     TO  MCPDATA-REC
                MOVE    "DBDELETE"      TO  MCP-FUNC
                IF      WRK-PARA-SYOKBN     =   "1"
@@ -768,7 +779,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  PRTDATA-HOSPNUM
                    MOVE    "del12"         TO  MCP-PATHNAME
                ELSE
                    MOVE    "tbl_prtdata"   TO  MCP-TABLE
-                   MOVE    "del13"         TO  MCP-PATHNAME
+                   MOVE    "del17"         TO  MCP-PATHNAME
                END-IF
 grpsys         PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC           NOT =   ZERO

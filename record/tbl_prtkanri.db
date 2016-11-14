@@ -312,3 +312,30 @@ path	key14		{
 		;
 	};
 };
+
+path	del17	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_prtkanri
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   TBL_KEY        =   :TBL_KEY
+                    AND     SRYYM        =   '000000'
+                    AND     TBL_GROUP    <>  :TBL_GROUP
+                    AND     PRIORITY     =   :PRIORITY
+		;
+	};
+};
+
+path	key15		{ 	
+	DBSELECT	{
+		DECLARE tbl_prtkanri_key15_csr CURSOR FOR
+		SELECT distinct hospnum,tbl_key,tbl_group,priority,sryym
+		FROM tbl_prtkanri
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   TBL_KEY        =   :TBL_KEY
+                    AND     SRYYM        =   '000000'
+                    AND     TBL_GROUP    <>  :TBL_GROUP
+                    AND     PRIORITY     =   :PRIORITY
+		;
+	};
+};

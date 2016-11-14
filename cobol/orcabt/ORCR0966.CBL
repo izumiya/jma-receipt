@@ -69,6 +69,7 @@
       *  04.08.04    NACL-門脇    15/08/27  自賠責レセプトの請求金額欄端数処理
       *                                     対応
       *  04.08.05    NACL-門脇    16/04/15  平成２８年４月改正対応
+      *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -186,6 +187,7 @@
            03  FLG-OPECOM          PIC 9(01).
            03  FLG-RECE10          PIC 9(01).
            03  FLG-BTPARA          PIC 9(01).
+           03  FLG-JIBAI-PRT       PIC 9(01).
       *
            03  FLG-KUGIRI          PIC 9(01).
            03  FLG-SET             PIC 9(01).
@@ -204,6 +206,7 @@
            03  CNT-ZAIMEISAISU     PIC 9(03).
            03  CNT-PAGE            PIC 9(03).
            03  CNT-KENSU           PIC 9(03).
+           03  CNT-PDF             PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
@@ -518,6 +521,9 @@
       *    パラメタ
        01  BTPARA-REC.
            COPY    "CPBTPARA.INC".
+      *
+       01  JIBAI-PRT-REC.
+           COPY    "CPJIBAI-PRT.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -972,6 +978,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                    =   SPACE
                MOVE    ZERO            TO
                                        SYS-200501-INSPECT-CHARACTER-KBN
+           END-IF
+           IF      SYS-200501-JIBAI-PDF
+                                   =   SPACE
+               MOVE    "0"             TO  SYS-200501-JIBAI-PDF
            END-IF
       *
       *    パラメタＤＢ読み込み
@@ -2894,6 +2904,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *        レセプト明細管理ＤＢ
                PERFORM 3901-RECE08-INSERT-SEC
       *
+               PERFORM 3905-JIBAI-PRT-HENSYU-SEC
+      *
       *        レセプト帳票管理ファイル出力
                IF    ( FLG-ERR              =   ZERO     )
                AND   ( WRK-PARA-SHELLID NOT =  "RECEPTX" )
@@ -3325,6 +3337,77 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
+      *    自賠責ＰＤＦ作成処理
+      *****************************************************************
+       3905-JIBAI-PRT-HENSYU-SEC          SECTION.
+      *
+      *    ＰＤＦ作成しない又は点検用レセプトのとき
+           IF    ( WRK-PARA-PRTKBN NOT =   "1" )
+           OR    ( SYS-200501-JIBAI-PDF
+                                       =   "0" )
+               GO  TO  3905-JIBAI-PRT-HENSYU-EXT
+           END-IF
+      *
+      *    テスト患者、レセプト種別不明のとき更新しない
+           IF    ( RECE82-TSTPTNUMKBN  =   "1"  )
+           OR    ( RECE82-RECESYUBETU  =   ZERO )
+               GO  TO  3905-JIBAI-PRT-HENSYU-EXT
+           END-IF
+      *          
+           INITIALIZE                      JIBAI-PRT-REC
+           MOVE    RECE82-HOSPNUM      TO  JIBAI-PRT-HOSPNUM
+           MOVE    RECE82-SRYYM        TO  JIBAI-PRT-SRYYM
+           MOVE    RECE82-NYUGAIKBN    TO  JIBAI-PRT-NYUGAIKBN
+           MOVE    RECE82-PTID         TO  JIBAI-PRT-PTID
+           MOVE    ZERO                TO  JIBAI-PRT-RECEKA
+           MOVE    4                   TO  JIBAI-PRT-TEISYUTUSAKI
+           MOVE    RECE82-RECESYUBETU  TO  JIBAI-PRT-RECESYUBETU
+           MOVE    ZERO                TO  JIBAI-PRT-HKNJANUM
+           MOVE    ZERO                TO  JIBAI-PRT-HOJOKBN-KEY
+           MOVE    RECE82-HKNID        TO  JIBAI-PRT-KOHID-KEY
+           MOVE    RECE82-TEKSTYMD     TO  JIBAI-PRT-TEKSTYMD
+           MOVE    RECE08-RENNUM       TO  JIBAI-PRT-RENNUM
+           MOVE    RECE08-PRTDATA      TO  JIBAI-PRT-PRTDATA
+           MOVE    RECE08-FORMID       TO  JIBAI-PRT-FORMID
+           MOVE    RECE82-PTNUM        TO  JIBAI-PRT-PTNUM
+      *
+           MOVE    WRK-PARA-CREYMD     TO  JIBAI-PRT-CREYMD
+           MOVE    WRK-PARA-CREHMS (1:6)
+                                       TO  JIBAI-PRT-CREHMS
+           IF      WRK-PARA-RECEKBN    =   "8"
+               MOVE    "970"               TO  JIBAI-PRT-HKNNUM
+               MOVE    "6"                 TO  JIBAI-PRT-RECEKBN
+               MOVE    "rh1"               TO  JIBAI-PRT-PRTKBN
+           ELSE
+               MOVE    "973"               TO  JIBAI-PRT-HKNNUM
+               MOVE    "5"                 TO  JIBAI-PRT-RECEKBN
+               MOVE    "rj1"               TO  JIBAI-PRT-PRTKBN
+           END-IF
+      *
+           MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+           MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               ADD     1                   TO  CNT-PDF
+           ELSE
+               DISPLAY "ORCR0489 JIBAI-PRT MCP-RC= "  MCP-RC
+               IF      FLG-RECE10          =   1
+               MOVE    "ＰＤＦ帳票ＤＢに追加できませんでした"
+                                               TO  WRK-RECEERR
+               ELSE
+               MOVE    "ＰＤＦ帳票ＤＢに更新できませんでした"
+                                               TO  WRK-RECEERR
+               END-IF
+               PERFORM 900-DB-ERR-ABORT-SEC
+           END-IF
+            .
+       3905-JIBAI-PRT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    西暦日本語変換処理
       *****************************************************************
        31012-SEIWA-HEN-SEC        SECTION.
@@ -3531,6 +3614,30 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                    PERFORM 500-ERR-HENSYU-SEC
                    GO  TO  5001-DB-DELETE-EXT
                END-IF      
+      *        自賠責ＰＤＦ削除処理（一括分）
+               INITIALIZE                      JIBAI-PRT-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  JIBAI-PRT-HOSPNUM
+               MOVE    WRK-PARA-SRYYM      TO  JIBAI-PRT-SRYYM
+               MOVE    "1"                 TO  JIBAI-PRT-NYUGAIKBN
+               MOVE    4                   TO  JIBAI-PRT-TEISYUTUSAKI
+               IF      WRK-PARA-RECEKBN    =   "8"
+                   MOVE    "970"               TO  JIBAI-PRT-HKNNUM
+               ELSE
+                   MOVE    "973"               TO  JIBAI-PRT-HKNNUM
+               END-IF
+               MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+               MOVE    "del1"              TO  MCP-PATHNAME
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC           NOT =   ZERO
+                   DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
+                           " MCP-RC=" MCP-RC
+                   MOVE    "自賠責ＰＤＦ削除処理でエラーとなりました"
+                                           TO    WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+                   GO  TO  5001-DB-DELETE-EXT
+               END-IF      
       *        診療年月レセプト管理削除処理（一括分）
                INITIALIZE                  RECE07-REC
 grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE07-HOSPNUM
@@ -3683,6 +3790,35 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        GO  TO  5001-DB-DELETE-EXT
                    END-IF
       *
+      *            診療年月の自賠責ＰＤＦ削除処理
+                   INITIALIZE                  JIBAI-PRT-REC
+                   MOVE    WRK-PARA-HOSPNUM    TO  JIBAI-PRT-HOSPNUM
+                   MOVE    SYS-2002-PTID       TO  JIBAI-PRT-PTID
+                   MOVE    SYS-2002-SRYYM      TO  JIBAI-PRT-SRYYM
+                   MOVE    SYS-2002-NYUGAIKBN  TO  JIBAI-PRT-NYUGAIKBN
+                   MOVE    4                   TO
+                                               JIBAI-PRT-TEISYUTUSAKI
+                   IF      WRK-PARA-RECEKBN    =   "8"
+                       MOVE    "970"           TO  JIBAI-PRT-HKNNUM
+                   ELSE
+                       MOVE    "973"           TO  JIBAI-PRT-HKNNUM
+                   END-IF
+                   MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+                   MOVE    "del2"              TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                       DISPLAY "DBPATH=" MCP-TABLE " "
+                                                 MCP-PATHNAME
+                                       " MCP-RC=" MCP-RC
+                       MOVE
+                    "自賠責ＰＤＦ削除処理（個別分）でエラーとなりました"
+                                                 TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  5001-DB-DELETE-EXT
+                   END-IF
+      *
                    MOVE    "tbl_syskanri"      TO  MCP-TABLE
                    MOVE    "key2"              TO  MCP-PATHNAME
                    PERFORM 900-KANRIMST-NEXT-SEC
@@ -3708,6 +3844,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            CLOSE                       RECE88-FILE
            DISPLAY "*** ORCR0966 IN   "  CNT-RECE82
            DISPLAY "*** ORCR0966 PAGE "  CNT-OUT
+           DISPLAY "*** ORCR0966 PDF  "  CNT-PDF
            DISPLAY "*** ORCR0966 END ***"
       *
            IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"

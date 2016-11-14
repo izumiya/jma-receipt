@@ -6,6 +6,7 @@
               03  T01-B08-STATE   PIC S9(9)   BINARY.
               03  T01-B09-STATE   PIC S9(9)   BINARY.
               03  T01-B10-STATE   PIC S9(9)   BINARY.
+              03  T01-B14-STATE   PIC S9(9)   BINARY.
               03  T01-B15-STATE   PIC S9(9)   BINARY.
               03  T01-B16-STATE   PIC S9(9)   BINARY.
               03  T01-B17-STATE   PIC S9(9)   BINARY.
@@ -15,6 +16,13 @@
               03  T01-B20-STATE   PIC S9(9)   BINARY.
               03  T01-B21-STATE   PIC S9(9)   BINARY.
               03  T01-B22-STATE   PIC S9(9)   BINARY.
+              03  T01-SRYYMKBN-COMBO.
+                04  T01-SRYYMKBN-COM-VISIBLE  PIC X(01).
+                04  T01-SRYYMKBN.
+                  05  T01-VALUE    PIC X(18).
+                04  T01-SRYYMKBN-COUNT PIC S9(9)   BINARY.
+                04  T01-SRYYMKBN-ITEM
+                        PIC X(18)   OCCURS  10 TIMES.
               03  T01-SKYYMD.
                 04  T01-VALUE   PIC X(10).
               03  T01-HKNJANUM.

@@ -2659,3 +2659,23 @@ path	key86		{
 		;
 	};
 };
+
+path	key87	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key87_csr CURSOR FOR
+		SELECT a.*,b.recekbn
+		FROM tbl_seikyu_main a join tbl_seikyu_rsi b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
+                WHERE (      a.HOSPNUM      =   :HOSPNUM      )
+                  AND (      a.TEISYUTUSAKI =   :TEISYUTUSAKI )
+                  AND (      NYUGAIKBN   like   :NYUGAIKBN    )
+                  AND (   (( a.SRYYM       =   :SKYYM   )
+                       AND ( a.SKYKBN      <>  '0'      )
+                       AND (( a.SKYYM       =  '000000' ) OR ( a.SKYYM = :SKYYM )))
+                       OR (( a.SKYYM       =   :SKYYM   )
+                       AND ( a.SKYKBN      <>  '0'      )))
+                ORDER  BY  PTNUM,a.NYUGAIKBN,a.SRYYM,b.RECEKBN
+		;
+	};
+};
+
+

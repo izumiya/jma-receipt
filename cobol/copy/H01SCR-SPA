@@ -60,9 +60,12 @@
       *
       *  04.08.01    NACL-藤原    15/08/25  作成時間の表示追加
       *  04.08.02    NACL-藤原    15/09/14  返戻データ取込一覧対応
-      *
-      *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
+      *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *  04.08.04    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
+      *                                     データ等の作成対応
+      *                                      （１日からの変更のみ）
+      *  04.08.05    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -166,6 +169,8 @@
                                                 PIC 9(01).
                        09  SPA-H01NAI-RECEDEN-MSG
                                                 PIC 9(01).
+                       09  SPA-H01NAI-JIBAI-PDF-MSG
+                                                PIC 9(01).
                    07  SPA-H01NAI-KOUMOKU.
                        09  SPA-H01NAI-SKYYM     PIC 9(06). 
                        09  SPA-H01NAI-SKYYM-KOHSKY
@@ -217,6 +222,7 @@
                05  SPA-NAI-200501-ROURECEKBN   PIC X(01).
                05  SPA-NAI-200501-RECEDEN-DISASTER
                                                PIC X(01).
+               05  SPA-NAI-200501-JIBAI-PDF    PIC X(01).
       *
                05  SPA-NAI-4001-T.
                    07  SPA-NAI-4001-OCC            OCCURS  100.
@@ -317,6 +323,7 @@
                            11  SPA-GMN-H03-K-TTEISYUTUSAKI2
                                                        PIC X(2).
                            11  SPA-GMN-H03-K-TCNT      PIC 9(4).
+                           11  SPA-GMN-H03-K-THOSPCD   PIC X(2).
                            11  SPA-GMN-H03-K-TERRCD    PIC X(03).
                            11  SPA-GMN-H03-K-TCREYMD   PIC X(9).
                        09  SPA-GMN-H03-KANRI-MAX       PIC 9(03).
@@ -345,6 +352,7 @@
                                                        PIC X(01).
                            11  SPA-NAI-H03-K-TTEISYUTUSAKI2
                                                        PIC X(01).
+                           11  SPA-NAI-H03-K-THOSPCD   PIC X(07).
       *
                    07  SPA-NAI-H03-BODY-TBL.
                        09  SPA-NAI-H03-BODY-G      OCCURS  100.

@@ -850,6 +850,8 @@ DB_files = \
 	xml_contraindication_checkv2res.db \
 	xml_claim_receivev2req.db \
 	xml_claim_receivev2res.db \
+	tbl_jibai_prt.db \
+
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

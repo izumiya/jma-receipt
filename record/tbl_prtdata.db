@@ -179,3 +179,16 @@ path	upd1		{
 	};
 };
 
+path	del17	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_prtdata
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   TBL_KEY      =   :TBL_KEY
+                    AND     SRYYM        =   '000000'
+                    AND     TBL_GROUP    <>  :TBL_GROUP
+                    AND     PRIORITY     =   :PRIORITY
+		;
+	};
+};
+

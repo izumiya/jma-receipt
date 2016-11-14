@@ -198,4 +198,5 @@ db	{
 	tbl_list_doctor;
 	tbl_generic_class;
 	tbl_psychotropic;
+        tbl_jibai_prt;
 };

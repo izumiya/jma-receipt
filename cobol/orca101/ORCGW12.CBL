@@ -195,6 +195,7 @@
       *                                     レセプトの分割対応
       *  04.08.09    NACL-藤原    16/08/24  持参薬対応
       *  04.08.10    NACL-藤原    16/09/21  １５円以下薬剤のレセプト記載対応
+      *  04.08.11    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -714,6 +715,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-JIBAI-FRACTION-KBN2MEI
                                               PIC X(36).
+                       09  SPA-GMN-JIBAI-PDF-G.
+                           11  SPA-GMN-JIBAI-PDF
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-JIBAI-PDFMEI
+                                              PIC X(20).
                        09  SPA-GMN-ROUPRTNM   PIC X(16).              
                        09  SPA-GMN-JBAIPRTNM  PIC X(16).              
                        09  SPA-GMN-ROUPRTNM-NEXT
@@ -1774,6 +1781,15 @@
                                               PIC X(36).
                    07  SPA-GMN-JIBAI-FRACTION-KBN2-MAX
                                               PIC 9(02).   
+      *
+                   07  SPA-GMN-JIBAI-PDFLST   OCCURS  2.
+                       09  SPA-GMN-JIBAI-PDFL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-JIBAI-PDFMEIL
+                                              PIC X(20).
+                   07  SPA-GMN-JIBAI-PDF-MAX
+                                              PIC 9(02).
       *
                    07  SPA-GMN-HKN-RIREKILST       OCCURS  2.
                        09  SPA-GMN-HKN-RIREKIL
@@ -3259,6 +3275,14 @@
                                    TO  SPA-GMN-JIBAI-FRACTION-KBN2MEIL
                                                                      (3)
            MOVE    3               TO  SPA-GMN-JIBAI-FRACTION-KBN2-MAX 
+      *
+           MOVE    "0"             TO  SPA-GMN-JIBAI-PDFL  (1)
+           MOVE    "作成しない"    TO  SPA-GMN-JIBAI-PDFMEIL
+                                                           (1)
+           MOVE    "1"             TO  SPA-GMN-JIBAI-PDFL  (2)
+           MOVE    "作成する"      TO  SPA-GMN-JIBAI-PDFMEIL
+                                                           (2)
+           MOVE    2               TO  SPA-GMN-JIBAI-PDF-MAX
       *     
            MOVE    "0"                 TO  SPA-GMN-HKN-RIREKIL     (1)
            MOVE    "個人情報を記載する"
@@ -3869,6 +3893,19 @@
                    MOVE    SPA-GMN-JIBAI-FRACTION-KBN2LST (IDY)
                                        TO  SPA-GMN-JIBAI-FRACTION-KBN2-G
                    MOVE    SPA-GMN-JIBAI-FRACTION-KBN2-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SYS-200501-JIBAI-PDF
+                                       TO  SPA-GMN-JIBAI-PDF
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >   SPA-GMN-JIBAI-PDF-MAX
+               IF      SPA-GMN-JIBAI-PDF
+                               =   SPA-GMN-JIBAI-PDFL (IDY)
+                   MOVE    SPA-GMN-JIBAI-PDFLST (IDY)
+                                       TO  SPA-GMN-JIBAI-PDF-G
+                   MOVE    SPA-GMN-JIBAI-PDF-MAX
                                        TO  IDY
                END-IF
            END-PERFORM
@@ -5243,6 +5280,10 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO
                                        SPA-GMN-JIBAI-FRACTION-KBN2-G
            END-IF                                              
+           IF     SPA-GMN-JIBAI-PDF    =   SPACE
+               MOVE    SPA-GMN-JIBAI-PDFLST (1)
+                                           TO  SPA-GMN-JIBAI-PDF-G
+           END-IF
            IF     SPA-GMN-COMMENT-NYUINRYO-G   =   SPACE
                MOVE    SPA-GMN-COMMENT-NYUINRYOLST (2)
                                            TO
@@ -5591,6 +5632,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        TO  SPA-GMN-JIBAI-FRACTION-KBN1-G
            MOVE    W12-JIBAI-FRACTION-KBN2
                                        TO  SPA-GMN-JIBAI-FRACTION-KBN2-G
+           MOVE    W12-JIBAI-PDF       TO  SPA-GMN-JIBAI-PDF-G
            MOVE    W12-ROUPRTNM        TO  SPA-GMN-ROUPRTNM
            MOVE    W12-JBAIPRTNM       TO  SPA-GMN-JBAIPRTNM
            MOVE    W12-ROUPRTNM-NEXT   TO  SPA-GMN-ROUPRTNM-NEXT
@@ -5975,6 +6017,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4203-JIBAI-FRACTIONKBN2-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4211-JIBAI-PDF-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -9542,6 +9589,40 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    自賠責ＰＤＦファイル作成区分チェック
+      *****************************************************************
+       4211-JIBAI-PDF-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHK
+      *
+           IF      SPA-GMN-JIBAI-PDF-G
+                                   =   SPACE
+               MOVE    SPA-GMN-JIBAI-PDFLST (1)
+                                       TO  SPA-GMN-JIBAI-PDF-G
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-JIBAI-PDF-MAX
+                   IF      SPA-GMN-JIBAI-PDF
+                                   =   SPA-GMN-JIBAI-PDFL(IDY)
+                       MOVE    SPA-GMN-JIBAI-PDFLST (IDY)
+                                       TO  SPA-GMN-JIBAI-PDF-G
+                       MOVE    SPA-GMN-JIBAI-PDF-MAX
+                                       TO  IDY
+                       MOVE    1       TO  FLG-CHK
+                   END-IF
+               END-PERFORM
+      *     
+               IF      FLG-CHK         =   ZERO
+                   MOVE    315             TO  SPA-GMN-CUR
+                   MOVE    "0137"          TO  SPA-ERRCD
+               END-IF
+           END-IF     
+      *
+           .
+       4211-JIBAI-PDF-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    主科社保設定フラグチェック
       *****************************************************************
        4148-SYUKA-SYAHO-CHK-SEC   SECTION.
@@ -10282,6 +10363,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-JIBAI-FRACTION-KBN2
                                            TO
                                        SYS-200501-JIBAI-FRACTION-KBN (2)
+           MOVE    SPA-GMN-JIBAI-PDF       TO  SYS-200501-JIBAI-PDF
            MOVE    SPA-GMN-HKN-RIREKI      TO  SYS-200501-HKN-RIREKI-KBN
            MOVE    SPA-GMN-GENBUTU-ICHIBU  TO
                                        SYS-200501-GENBUTU-ICHIBU-KSIKBN
@@ -11531,6 +11613,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-JIBAI-FRACTION-KBN2-G
                                        TO  W12-JIBAI-FRACTION-KBN2
       *
+           MOVE    SPA-GMN-JIBAI-PDF-G TO  W12-JIBAI-PDF
+      *
            MOVE    SPA-GMN-HKN-RIREKI-G
                                        TO  W12-HKN-RIREKI
       *
@@ -11901,7 +11985,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-JIBAI-FRACTION-KBN2-MAX
                                        TO  W12-JIBAI-FRACTION-KBN2-COUNT
-      *     
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   SPA-GMN-JIBAI-PDF-MAX
+               MOVE    SPA-GMN-JIBAI-PDFLST (IDY)
+                                       TO  W12-JIBAI-PDFLST    (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-JIBAI-PDF-MAX
+                                       TO  W12-JIBAI-PDF-COUNT
+      *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECEDEN-CDRKBN-MAX
                MOVE    SPA-GMN-RECEDEN-CDRKBNLST (IDY)
@@ -12468,6 +12560,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0136"
                    MOVE    "１５円以下薬剤レセプト記載入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0137"
+                   MOVE    "自賠責ＰＤＦファイル作成入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12739,6 +12834,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    314
                     MOVE  "JIBAI_FRACTION_KBN2"
                                              TO   MCP-WIDGET
+                WHEN    315
+                    MOVE  "JIBAI_PDF"        TO   MCP-WIDGET
                 WHEN    202
                     MOVE  "ROUPRTNM"         TO   MCP-WIDGET
                 WHEN    203
@@ -12934,8 +13031,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    63
                     MOVE    2                TO  W12-PAGENO
                 WHEN    200 THRU    218
-                WHEN    313
-                WHEN    314
+                WHEN    313 THRU    315
                     MOVE    3                TO  W12-PAGENO
                 WHEN    100 THRU    121
                 WHEN    44
@@ -13145,6 +13241,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "JIBAI_FRACTION_KBN1"
                    MOVE    314         TO  SPA-GMN-CUR
                WHEN    "JIBAI_FRACTION_KBN2"
+                   MOVE    315         TO  SPA-GMN-CUR
+               WHEN    "JIBAI_PDF"
                    MOVE    202         TO  SPA-GMN-CUR
                WHEN    "ROUPRTNM"
                    MOVE    203         TO  SPA-GMN-CUR

@@ -490,7 +490,7 @@
         <class>GtkPandaEntry</class>
         <name>SKYYMD</name>
         <x>280</x>
-        <y>80</y>
+        <y>95</y>
         <width>120</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -644,6 +644,33 @@
       </widget>
       <widget>
         <class>GtkButton</class>
+        <name>B14</name>
+        <x>88</x>
+        <y>694</y>
+        <width>80</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <label>自賠責PDF</label>
+        <relief>GTK_RELIEF_NORMAL</relief>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <response_id>0</response_id>
+        <accelerator>
+          <modifiers>GDK_SHIFT_MASK</modifiers>
+          <key>GDK_F2</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
+      </widget>
+      <widget>
+        <class>GtkButton</class>
         <name>B15</name>
         <x>168</x>
         <y>694</y>
@@ -700,7 +727,7 @@
         <class>GtkLabel</class>
         <name>label600</name>
         <x>200</x>
-        <y>80</y>
+        <y>98</y>
         <width>70</width>
         <height>18</height>
         <sensitive>True</sensitive>
@@ -718,7 +745,7 @@
         <class>GtkLabel</class>
         <name>label1</name>
         <x>416</x>
-        <y>81</y>
+        <y>98</y>
         <width>250</width>
         <height>18</height>
         <sensitive>True</sensitive>
@@ -1958,6 +1985,47 @@
           <handler>send_event</handler>
           <data>CLICKED</data>
         </signal>
+      </widget>
+      <widget>
+        <class>GtkPandaCombo</class>
+        <name>SRYYMKBN_COMBO</name>
+        <x>280</x>
+        <y>66</y>
+        <width>165</width>
+        <height>24</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <items></items>
+        <case_sensitive>False</case_sensitive>
+        <use_arrows>True</use_arrows>
+        <loop_selection>False</loop_selection>
+        <widget>
+          <class>GtkPandaEntry</class>
+          <child_name>GtkPandaCombo:entry</child_name>
+          <name>SRYYMKBN</name>
+          <visible>True</visible>
+          <sensitive>True</sensitive>
+          <can_focus>True</can_focus>
+          <has_focus>False</has_focus>
+          <editable>True</editable>
+          <text_max_length>18</text_max_length>
+          <text>01 H25.10-H27.12**</text>
+          <input_mode>ASCII</input_mode>
+          <xim_enabled>False</xim_enabled>
+          <signal>
+            <name>changed</name>
+            <handler>entry_changed</handler>
+            <data>CHANGED</data>
+          </signal>
+          <signal>
+            <name>activate</name>
+            <handler>send_event</handler>
+            <data>ACTIVATE</data>
+          </signal>
+        </widget>
       </widget>
     </widget>
   </widget>

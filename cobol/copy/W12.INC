@@ -367,6 +367,12 @@
                     06  W12-JIBAI-FRACTION-KBN2-COUNT  PIC S9(9) BINARY.
                     06  W12-JIBAI-FRACTION-KBN2LST
                             PIC X(38)   OCCURS  5 TIMES.
+                  05  W12-JIBAI-PDF-COMBO.
+                    06  W12-JIBAI-PDF.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-JIBAI-PDF-COUNT  PIC S9(9) BINARY.
+                    06  W12-JIBAI-PDFLST
+                            PIC X(20)   OCCURS  2 TIMES.
                   05  W12-ROUPRTNM.
                     06  W12-VALUE   PIC X(16).
                   05  W12-ROUPRTNM-NEXT.

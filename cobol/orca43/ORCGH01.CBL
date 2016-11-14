@@ -110,6 +110,7 @@
       *  04.08.02    NACL-藤原    15/09/09  返戻取り込み済データ一覧対応
       *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -165,6 +166,7 @@
            03  FLG-PTKOHINF        PIC 9(01).
            03  FLG-LABOR-SIO       PIC 9(01).
            03  FLG-RECEDEN         PIC 9(01).
+           03  FLG-JIBAI-PRT       PIC 9(01).
       *
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-HENREI-B-CHK    pic 9(01).
@@ -284,6 +286,9 @@
       *
       *    レセプト電算
            COPY    "CPRECEDEN.INC".
+      *
+       01  JIBAI-PRT-REC.
+           COPY    "CPJIBAI-PRT.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -601,6 +606,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                                        =   SPACE
                MOVE    "0"             TO  SYS-200501-ROURECEKBN
            END-IF
+           IF      SYS-200501-JIBAI-PDF
+                                   =   SPACE
+               MOVE    "0"             TO  SYS-200501-JIBAI-PDF
+           END-IF
            MOVE    SYS-200501-KOUIKIRECEKBN
                                        TO  SPA-NAI-200501-KOUIKIRECEKBN
            MOVE    SYS-200501-RECEDEN-DISASTER
@@ -608,6 +617,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                                        SPA-NAI-200501-RECEDEN-DISASTER
            MOVE    SYS-200501-ROURECEKBN
                                        TO  SPA-NAI-200501-ROURECEKBN
+           MOVE    SYS-200501-JIBAI-PDF
+                                       TO  SPA-NAI-200501-JIBAI-PDF
       *
       *    レセプト編集区分情報（主科情報）
            MOVE    SPACE               TO  SYS-2009-REC
@@ -2314,12 +2325,29 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE10-SKYKBN-RECEDEN
                                        TO  SPA-H01NAI-SKYKBN-RECEDEN
       *
+      *    自賠責ＰＤＦファイル存在チェック
+           MOVE    ZERO                TO  SPA-H01NAI-JIBAI-PDF-MSG
+      *
+           IF    ( RECE10-TEISYUTUSAKI =   "4" )
+           AND   ( SPA-NAI-200501-JIBAI-PDF
+                                       =   "1" )
+               MOVE    SPACE               TO  JIBAI-PRT-REC
+               INITIALIZE                      JIBAI-PRT-REC
+               MOVE    RECE10-KEY          TO  JIBAI-PRT-KEY1
+               MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+               PERFORM 900-JIBAI-PRT-READ-SEC
+      *
+               IF      FLG-JIBAI-PRT       =   1
+                   MOVE    1               TO  SPA-H01NAI-JIBAI-PDF-MSG
+               END-IF
+           END-IF
+      *
       *    レセ電データ存在チェック
            MOVE    ZERO                TO  SPA-H01NAI-RECEDEN-MSG
       *    特別療養費、公害、自賠責はレセ電データに記録しない
            IF    ( RECE10-RECESYUBETU  =   "6666"      )
            OR    ( RECE10-TEISYUTUSAKI =   "5" OR  "4" )
-               CONTINUE
+             CONTINUE
            ELSE
       *      労災でアフターケア、公務災害はレセ電データに記録しない
              IF    ( RECE10-TEISYUTUSAKI =   "3"         )
@@ -4060,6 +4088,11 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            IF      SPA-H01NAI-RECEDEN-MSG  =   1
                MOVE    "レセ電データがありません"
                                            TO  H01-RECEDEN-CHK-MSG-VALUE
+           ELSE
+               IF      SPA-H01NAI-JIBAI-PDF-MSG    =   1
+                   MOVE    "ＰＤＦファイルがありません"
+                                           TO  H01-RECEDEN-CHK-MSG-VALUE
+               END-IF
            END-IF
       *
            PERFORM VARYING IDX FROM    1       BY  1
@@ -5408,6 +5441,36 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            .
        900-LABOR-SIO-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自賠責ＰＤＦ読込
+      *****************************************************************
+       900-JIBAI-PRT-READ-SEC          SECTION.
+      *
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-JIBAI-PRT
+                   MOVE    MCPDATA-REC         TO  JIBAI-PRT-REC
+               ELSE
+                   MOVE    1                   TO  FLG-JIBAI-PRT
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-JIBAI-PRT
+           END-IF
+      *
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-JIBAI-PRT-READ-EXT.
            EXIT.
       *
       *****************************************************************
