@@ -985,8 +985,8 @@
            03  FLG-SIPPU-COM                           PIC 9(01).
            03  FLG-SIPPU-ARI                           PIC 9(01).
            03  FLG-CHECK-ARI                           PIC 9(01).
+           03  FLG-CHECK-ARI2                          PIC 9(01).
            03  FLG-YKZ-PRTKBN                          PIC 9(01).
-           03  FLG-GENGAKU-HKNCOMBI-CHK                PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1073,7 +1073,6 @@
            03  IDX33                                   PIC 9(03).
            03  IDX34                                   PIC 9(03).
            03  IDX35                                   PIC 9(03).
-           03  IDX36                                   PIC 9(03).
            03  IDXA                                    PIC 9(01).
            03  IDXB                                    PIC 9(03).
            03  IDXX                                    PIC 9(02).
@@ -6094,19 +6093,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                 MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
             END-IF
-      *??
-            IF    WK-GENGAKUKBN  =  2  OR  5
-              PERFORM  21172-GENGAKU-HKNCOMBI-CHK-SEC
-              IF  FLG-GENGAKU-HKNCOMBI-CHK  =  1
-                DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
-                DISPLAY "公費併用の保険組み合わせ有"
       *
-                MOVE     ZERO    TO    WK-GENGAKUKBN
-      *
-                DISPLAY "@WK-GENGAKUKBN=" WK-GENGAKUKBN
-              END-IF
-            END-IF
-      *??
            END-IF
       *
       ***
@@ -6341,10 +6328,21 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
            END-PERFORM
       *
            MOVE     ZERO      TO  FLG-CHECK-ARI
+           MOVE     ZERO      TO  FLG-CHECK-ARI2
            IF   WK-GENGAKUKBN  NOT =  ZERO
               PERFORM  211711-GENGAKU-CHECK-SEC
               IF   FLG-CHECK-ARI  =  ZERO
-                MOVE   ZERO   TO  WK-GENGAKUKBN
+                  MOVE  ZERO  TO  WK-GENGAKUKBN
+              ELSE
+                IF   (FLG-CHECK-ARI2  =  1     )
+                AND  (WK-GENGAKUKBN   =  2 OR 5)
+                  DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
+                  DISPLAY "公費併用の保険組み合わせ有"
+      *
+                  MOVE  ZERO  TO  WK-GENGAKUKBN
+      *
+                  DISPLAY "@WK-GENGAKUKBN=" WK-GENGAKUKBN
+                END-IF
               END-IF
            END-IF
       *
@@ -6360,7 +6358,6 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
            PERFORM  VARYING  IDX35   FROM    1   BY  1
                      UNTIL  (IDX35                   >   10 )
                       OR    (RECE02-HKNCOMBI(IDX35)  =  ZERO)
-                      OR    (FLG-CHECK-ARI           =   1  )
              IF   RECE02-DAISANFLG(IDX35)   =   1
                CONTINUE
              ELSE
@@ -6380,11 +6377,21 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                  MOVE    "key41"            TO  MCP-PATHNAME
                  PERFORM  900-SYUNOU-READ-SEC
                  PERFORM  UNTIL  (FLG-SYUNOU      =  1)
-                           OR    (FLG-CHECK-ARI   =  1)
                    IF    SYU-DENPJTIKBN    NOT =  "3"
                      IF  (WK-CHECK-TEKSTYMD <= SYU-SRYYMD       )
                      AND (SYU-SRYYMD        <= WK-CHECK-TEKEDYMD)
                         MOVE   1   TO   FLG-CHECK-ARI
+      *??
+                        IF   (SYU-SYUHKNNUM   NOT =  SPACE)
+                        AND  (SYU-KOH1HKNNUM      =  SPACE)
+                        AND  (SYU-KOH2HKNNUM      =  SPACE)
+                        AND  (SYU-KOH3HKNNUM      =  SPACE)
+                        AND  (SYU-KOH4HKNNUM      =  SPACE)
+                          CONTINUE
+                        ELSE
+                          MOVE   1   TO   FLG-CHECK-ARI2
+                        END-IF
+      *??
                      END-IF
                    END-IF
                    MOVE    "tbl_syunou"     TO  MCP-TABLE
@@ -6400,43 +6407,6 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
       *
            .
        211711-GENGAKU-CHECK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    保険組み合わせチェック
-      *****************************************************************
-       21172-GENGAKU-HKNCOMBI-CHK-SEC      SECTION.
-      *
-           MOVE    ZERO    TO    FLG-GENGAKU-HKNCOMBI-CHK
-      *
-           PERFORM   VARYING   IDX36    FROM    1   BY  1
-                      UNTIL   (IDX36                     >  10  )
-                       OR     (RECE02-HKNCOMBI(IDX36)    =  ZERO)
-                       OR     (FLG-GENGAKU-HKNCOMBI-CHK  =  1   )
-      *
-             INITIALIZE                  HKNCOMBI-REC
-             MOVE    RECE02-HOSPNUM  TO  COMB-HOSPNUM
-             MOVE    RECE02-PTID     TO  COMB-PTID
-             MOVE    RECE02-HKNCOMBI(IDX36)
-                                     TO  COMB-HKNCOMBINUM
-             MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
-             PERFORM 900-HKNCOMBI-INV-SEC
-             IF      FLG-HKNCOMBI    =   ZERO
-               IF   (COMB-HKNNUM      NOT =  SPACE)
-               AND  (COMB-KOH1HKNNUM      =  SPACE)
-               AND  (COMB-KOH2HKNNUM      =  SPACE)
-               AND  (COMB-KOH3HKNNUM      =  SPACE)
-               AND  (COMB-KOH4HKNNUM      =  SPACE)
-                  CONTINUE
-               ELSE
-                  MOVE    1    TO    FLG-GENGAKU-HKNCOMBI-CHK
-               END-IF
-             END-IF
-      *
-           END-PERFORM
-      *
-           .
-       21172-GENGAKU-HKNCOMBI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -27368,6 +27338,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            PERFORM 900-CLOSE-SEC
       *
            MOVE     ZERO      TO  FLG-CHECK-ARI
+           MOVE     ZERO      TO  FLG-CHECK-ARI2
            IF   FLG-SAIGAI-TAISYO  =  1
               PERFORM  211711-GENGAKU-CHECK-SEC
               IF   FLG-CHECK-ARI  =  ZERO
