@@ -914,6 +914,8 @@
       *
                    07  SPA-GMN24-FTNMSG1             PIC X(16).
                    07  SPA-GMN24-FTNMSG2             PIC X(16).
+      *H28.9
+                   07  SPA-NAI24-FTNSYORI            PIC 9(01).
       *
                    07  SPA-GMN24-KOHFTNTBL2.
                        09  SPA-GMN24-FTNTBL2-OCC         OCCURS  300.
@@ -1279,7 +1281,6 @@
                05  SPA-GMN28-NNCHIKBN          PIC X(01).
       *    小児かかりつけ診療対象
                05  SPA-GMN28-SYOUNIKBN         PIC X(01).
-      *
       *
       *    P0201（未登録受付者一覧）
            03  SPA-P0201-AREA.
