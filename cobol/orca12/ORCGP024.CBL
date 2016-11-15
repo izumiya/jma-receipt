@@ -47,6 +47,7 @@
       *  04.07.00    NACL-多々納  14/06/04  公費負担額上限件数対応
       *  04.07.00    NACL-多々納  14/12/XX  難病等対応
       *  04.08.00    NACL-多々納  16/05/31  原爆一般対応
+      *  04.08.00    NACL-多々納  16/11/15  HAORI他対応
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -309,6 +310,7 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  IDX-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-P02SCRAREA
@@ -588,6 +590,7 @@
            IF      (SPA-GMN24-FTNSELNUM    =   ZERO )  AND
                    (SPA-MAE24-FTNSELNUM    =   ZERO )  AND
                    (SPA-FTN1-MAX           >   ZERO )
+      *
                PERFORM 3102-KOHFTN-HEN-SEC
            END-IF
            IF      (SPA-GMN24-FTNSELNUM    =   ZERO )  AND
@@ -596,7 +599,7 @@
                MOVE    1                   TO  SPA-NAI24-INIT2
            END-IF
       *    見出し変更
-           PERFORM 3101-KOH-MEISAI-SEC
+      *    PERFORM 3101-KOH-MEISAI-SEC
       *
            .
        310-SPASET-EXT.
@@ -609,6 +612,9 @@
       *
       *    特定の受給者番号編集
            MOVE    SPACE               TO  SPA-GMN24-JKYSNUM
+      *H28.11
+           MOVE    ZERO                TO  SPA-NAI24-FTNSYORI
+      *
            IF      SPA-GMN24-FTNSELNUM >   ZERO
                IF      (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "051" 
@@ -652,6 +658,8 @@
                                            >=   "20060401"  )
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      他一部負担有
+                   MOVE    1                    TO  SPA-NAI24-FTNSYORI
                ELSE
                    MOVE    "外来上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "入院上限額"         TO  SPA-GMN24-FTNMSG2
@@ -663,6 +671,8 @@
                                            >=   "20061001"  )
                    MOVE    "外来減額（％）"     TO  SPA-GMN24-FTNMSG1
                    MOVE    "入院減額（％）"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      ％減額
+                   MOVE    2                    TO  SPA-NAI24-FTNSYORI
                END-IF
                IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "961"   )  AND
@@ -687,6 +697,8 @@
                                            >=   "20061001"  )
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      他一部負担有
+                   MOVE    1                    TO  SPA-NAI24-FTNSYORI
                END-IF
       *H26.12
       *        難病・小児特定(H27.1から）名称
@@ -697,6 +709,8 @@
                                            >=   "20150101"  ))
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      他一部負担有
+                   MOVE    1                    TO  SPA-NAI24-FTNSYORI
                END-IF
       *H28.6
       *        原爆一般
@@ -706,6 +720,8 @@
                                            >=   "20160401"  )
                    MOVE    "外来負担（％）"     TO  SPA-GMN24-FTNMSG1
                    MOVE    "入院負担（％）"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      ％減額
+                   MOVE    2                    TO  SPA-NAI24-FTNSYORI
                END-IF
       *ver.4.7
       *        地方公費の設定
@@ -716,6 +732,8 @@
                WHEN    "2"
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+      *H28.11      他一部負担有
+                   MOVE    1                    TO  SPA-NAI24-FTNSYORI
                END-EVALUATE
            END-IF
       *
@@ -761,6 +779,28 @@
            MOVE    1                   TO  SPA-GMN24-FTNSELNUM
            MOVE    SPA-GMN24-FTNSELNUM TO  SPA-MAE24-FTNSELNUM
       *
+           INITIALIZE                  SPA-GMN24-KOHFTNTBL2
+           MOVE    1                   TO  SPA-NAI24-INIT2
+      *    見出し変更
+           PERFORM 3101-KOH-MEISAI-SEC
+      *    対象のデータをパラメタファイルより編集する
+           PERFORM 31022-KOHFTN-SPAHENSYU-SEC
+      *
+           IF      SPA-FTN2-MAX        =   ZERO
+               MOVE    ZERO                TO  SPA-GMN24-FTNSELNUM
+               MOVE    ZERO                TO  SPA-NAI24-FTNSELNUM
+               MOVE    ZERO                TO  SPA-MAE24-FTNSELNUM
+           END-IF
+      *
+           .
+       3102-KOHFTN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者公費負担編集定処理
+      *****************************************************************
+       31022-KOHFTN-SPAHENSYU-SEC          SECTION.
+      *
       *    対象のデータをパラメタファイルより編集する
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
@@ -784,8 +824,6 @@
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  WRK-PARA-EDANUM
            MOVE    SPACE               TO  LNK-PTKOHFTN-AREA
-           INITIALIZE                  SPA-GMN24-KOHFTNTBL2
-           MOVE    1                   TO  SPA-NAI24-INIT2
            PERFORM
                UNTIL   FLG-PARA            =   1
                MOVE    PARA-DATA-REC           TO  PTKOHFTN-REC
@@ -830,37 +868,35 @@
                MOVE    PTKOHFTN-TERMID(1:1)    TO  SPA-NAI24-TFTNETCKBN
                                                                   (IDX)
                IF     (PTKOHFTN-TERMID(1:1)    =   SPACE )
-                   IF     (SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-                                               =   "015"
-                                               OR  "016"
-                                               OR  "021"
-                                               OR  "038"    )
+      *H28.11  設定区分判定へ
+      *            IF     (SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+      *                                        =   "015"
+      *                                        OR  "016"
+      *                                        OR  "021"
+      *                                        OR  "038"    )
       *H26.12
       *                難病・小児特定（H26.1から）
-                     OR  ((SPA-NAI24-KOHNUM  (WRK-FTN1-IDX)
-                                               =   "052"
-                                               OR  "054"   )  AND
-                          (SPA-NAI24-TKOHSTYMD (WRK-FTN1-IDX)
-                                               >=  "20150101" ))
+      *              OR  ((SPA-NAI24-KOHNUM  (WRK-FTN1-IDX)
+      *                                        =   "052"
+      *                                        OR  "054"   )  AND
+      *                   (SPA-NAI24-TKOHSTYMD (WRK-FTN1-IDX)
+      *                                        >=  "20150101" ))
       ***            OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
       *                                        =   "281" ) AND
       ***                 (SPA-PREFNUM         =    07   ))
       *              地方公費の対象
-                     OR   (SPA-NAI24-TJYOGENKBN (WRK-FTN1-IDX)
-                                               =   "2"    )
+      *              OR   (SPA-NAI24-TJYOGENKBN (WRK-FTN1-IDX)
+      *********                                =   "2"    )
+      *H28.11
+      *            他一部負担あり
+                   IF      SPA-NAI24-FTNSYORI  =   1
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
            END-PERFORM
       *
-           IF      SPA-FTN2-MAX        =   ZERO
-               MOVE    ZERO                TO  SPA-GMN24-FTNSELNUM
-               MOVE    ZERO                TO  SPA-NAI24-FTNSELNUM
-               MOVE    ZERO                TO  SPA-MAE24-FTNSELNUM
-           END-IF
-      *
            .
-       3102-KOHFTN-HEN-EXT.
+       31022-KOHFTN-SPAHENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1076,6 +1112,10 @@
       *    他一部負担入力
                WHEN    "CLICKED"       ALSO    "BF4"
                    PERFORM 418-KOHFTN-P02K-SEC
+      *H28.11
+      *HAORI対応
+               WHEN    "CLICKED"       ALSO    "APIV3"
+                   PERFORM 2009-API-SYORI-SEC
       *
       *     以外はエラー
                WHEN    "CLICKED"       ALSO     ANY
@@ -1444,24 +1484,29 @@
            INITIALIZE                  SPA-GMN24-FTN-AREA2
       *    対象の公費であること
            IF      (SPA-NAI24-FTNSELNUM >   ZERO   )
-               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "015"
-                                           OR  "016"
-                                           OR  "021"
-                                           OR  "038"    )
+      *
+      *H28.9 設定区分判定へ
+      *        IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "015"
+      *                                    OR  "016"
+      *                                    OR  "021"
+      *                                    OR  "038"    )
       *H26.12
       *            難病・小児特定（H26.1から）
-                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "052"
-                                           OR  "054"   )  AND
-                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
-                                           >=  "20150101" ))
+      *          OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "052"
+      *                                    OR  "054"   )  AND
+      *               (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+      *                                    >=  "20150101" ))
       ***        OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "281" ) AND
       ***             (SPA-PREFNUM         =    07   ))
       *          地方公費の対象
-                 OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
-                                           =   "2"    )
+      *          OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
+      *                                    =   "2"    )
+      *H28.11
+      *        他一部負担あり
+               IF      SPA-NAI24-FTNSYORI  =   1
                    CONTINUE
                ELSE
                    MOVE    "2440"              TO  SPA-ERRCD
@@ -1616,25 +1661,29 @@
       *
       *    対象の公費であること
            IF      (SPA-NAI24-FTNSELNUM >   ZERO   )
-               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "015"
-                                           OR  "016"
-                                           OR  "021"
-                                           OR  "038"    )
+      *H28.9 設定区分判定へ
+      *        IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "015"
+      *                                    OR  "016"
+      *                                    OR  "021"
+      *                                    OR  "038"    )
       *H26.12
       *            難病・小児特定（H26.1から）
-                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "052"
-                                           OR  "054"   )  AND
-                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
-                                           >=  "20150101" ))
+      *          OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "052"
+      *                                    OR  "054"   )  AND
+      *               (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+      *                                    >=  "20150101" ))
       *
       **         OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "281" ) AND
       **              (SPA-PREFNUM         =    07   ))
       *            地方公費の対象分
-                 OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
-                                           =   "2"    )
+      *          OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
+      *****                                =   "2"    )
+      *H28.11
+      *        他一部負担あり
+               IF      SPA-NAI24-FTNSYORI  =   1
                    CONTINUE
                ELSE
                    MOVE    "2445"              TO  SPA-ERRCD
@@ -1714,7 +1763,7 @@
       *            負担累計
                    ADD     SPA-GMN24-TNYUJGNGAK (IDK)
                                                TO  SPA-P02K-TNYUJGNGAK
-                   IF      SPA-NAI24-TFTNETCKBN (IDX)
+                   IF      SPA-NAI24-TFTNETCKBN (IDK)
                                            NOT =   "0"
                        MOVE    "1"             TO  SPA-P02K-FTNRUIKBN
                    END-IF
@@ -1741,7 +1790,7 @@
       *                負担累計
                        ADD     SPA-GMN24-TNYUJGNGAK (IDK)
                                                TO  SPA-P02K-TNYUJGNGAK
-                       IF      SPA-NAI24-TFTNETCKBN (IDX)
+                       IF      SPA-NAI24-TFTNETCKBN (IDK)
                                                NOT =   "0"
                            MOVE    "1"         TO  SPA-P02K-FTNRUIKBN
                        END-IF
@@ -2547,6 +2596,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-GMN24-JKYSNUM
            MOVE    SPACE               TO  SPA-GMN24-FTNMSG1
            MOVE    SPACE               TO  SPA-GMN24-FTNMSG2
+           MOVE    ZERO                TO  SPA-NAI24-FTNSYORI
       *
            MOVE    ZERO                TO  WRK-FTN1-IDX
            IF      SPA-GMN24-FTNSELNUM =   ZERO
@@ -2578,98 +2628,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 3101-KOH-MEISAI-SEC
       *
       *    対象のデータをパラメタファイルより編集する
-           INITIALIZE                      PARA-REC
-           MOVE    "P02"               TO  PARA-GYOUMUID
-           MOVE    SPA-TERMID          TO  PARA-TERMID
-           MOVE    "PTKOHFTN"          TO  PARA-FILEMEI
+           PERFORM 31022-KOHFTN-SPAHENSYU-SEC
       *
-           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
-           MOVE    PARA-REC            TO  MCPDATA-REC
-           MOVE    "tbl_para"          TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_para"          TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
-               PERFORM 990-PARA-READ-SEC
-           ELSE
-               INITIALIZE                  PARA-REC
-               MOVE    1               TO  FLG-PARA
-           END-IF
-      *
-           MOVE    ZERO                TO  IDX
-           MOVE    ZERO                TO  WRK-PARA-EDANUM
-           MOVE    SPACE               TO  LNK-PTKOHFTN-AREA
-           PERFORM
-               UNTIL   FLG-PARA            =   1
-               MOVE    PARA-DATA-REC           TO  PTKOHFTN-REC
-      *        公費ＩＤの同じものを対象とする
-               IF      PTKOHFTN-KOHID      =   SPA-NAI24-KOHID
-                                                        (WRK-FTN1-IDX)
-                   ADD     1                   TO  IDX
-                   IF      IDX                 <=  MAX-KOHFTN
-                       MOVE    PARA-DATA-REC   TO  LNK-PTKOHFTN-REC
-                                                             (IDX)
-                       MOVE    IDX             TO  SPA-FTN2-MAX
-                   END-IF
-               END-IF
-      *
-               MOVE    PARA-EDANUM         TO  WRK-PARA-EDANUM
-      *
-               MOVE    "tbl_para"          TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
-               PERFORM 990-PARA-READ-SEC
-           END-PERFORM
-           MOVE    "tbl_para"          TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-      *    画面テーブルへ編集する
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-FTN2-MAX
-               MOVE    LNK-PTKOHFTN-REC (IDX)  TO  PTKOHFTN-REC
-      *
-               MOVE    PTKOHFTN-RENNUM     TO  SPA-NAI24-TRENNUM  (IDX)
-               MOVE    PTKOHFTN-TEKSTYMD   TO  SPA-NAI24-TFTNSTYMD(IDX)
-               MOVE    PTKOHFTN-TEKEDYMD   TO  SPA-NAI24-TFTNEDYMD (IDX)
-               MOVE    PTKOHFTN-GAIJGNGAK  TO  SPA-GMN24-TGAIJGNGAK(IDX)
-               MOVE    PTKOHFTN-NYUJGNGAK  TO  SPA-GMN24-TNYUJGNGAK(IDX)
-      *
-               MOVE    PTKOHFTN-TEKSTYMD   TO  WRK-SYMD
-               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
-               MOVE    WRK-HENYMD          TO  SPA-GMN24-TFTNSTYMD(IDX)
-               MOVE    PTKOHFTN-TEKEDYMD   TO  WRK-SYMD
-               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
-               MOVE    WRK-HENYMD          TO  SPA-GMN24-TFTNEDYMD(IDX)
-      *
-               MOVE    PTKOHFTN-TERMID(1:1)    TO  SPA-NAI24-TFTNETCKBN
-                                                                  (IDX)
-               IF     (PTKOHFTN-TERMID(1:1)    =   SPACE )
-                   IF     (SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-                                               =   "015"
-                                               OR  "016"
-                                               OR  "021"
-                                               OR  "038"    )
-      *H26.12
-      *              難病・小児特定（H26.1から）
-                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-                                               =   "052"
-                                               OR  "054"   )  AND
-                          (SPA-NAI24-TKOHSTYMD (WRK-FTN1-IDX)
-                                               >=  "20150101" ))
-      *
-      *ver.4.7
-      ****           OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-      **                                       =   "281" ) AND
-      ***                 (SPA-PREFNUM         =    07   ))
-      *              地方公費の対象
-                     OR   (SPA-NAI24-TJYOGENKBN (WRK-FTN1-IDX)
-                                               =   "2"    )
-                       PERFORM 31021-PTKOHFTNETC-HEN-SEC
-                   END-IF
-               END-IF
-      *
-           END-PERFORM
       *    １件もないとき、公費の内容を初期表示
            IF      SPA-FTN2-MAX        =   ZERO
                MOVE    SPA-GMN24-TKOHSTYMD (WRK-FTN1-IDX)
@@ -3853,8 +3813,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    WRK-Z7           TO  SPA-GMN24-GAIJGNGAK
       *        減額割合の時、１００まで
                IF     (SPA-NAI24-FTNSELNUM >   ZERO  )
-                 AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "960"   )
+      *H28.11    AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "960"   )
+                 AND  (SPA-NAI24-FTNSYORI  =   2       )
                    IF      SPA-NAI24-GAIJGNGAK  >=  ZERO
                                            AND  <=  100
                        CONTINUE
@@ -3890,8 +3851,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    WRK-Z7           TO  SPA-GMN24-NYUJGNGAK
       *        減額割合の時、１００まで
                IF     (SPA-NAI24-FTNSELNUM >   ZERO  )
-                 AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "960"   )
+      *H28.11    AND  (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "960"   )
+                 AND  (SPA-NAI24-FTNSYORI  =   2       )
                    IF      SPA-NAI24-NYUJGNGAK  >=  ZERO
                                            AND  <=  100
                        CONTINUE
@@ -4133,6 +4095,52 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        41093-KOHFTN-CHK-EXT.
+           EXIT.
+      *
+      *H28.11
+      *HAORI対応
+      *****************************************************************
+      *    HAORI　対応処理
+      *****************************************************************
+       2009-API-SYORI-SEC             SECTION.
+      *
+           EVALUATE    SPA-MCP-WIDGET
+           WHEN    "01"
+      *    見出し編集のみ
+      *        見出し変更
+               PERFORM 3101-KOH-MEISAI-SEC
+           WHEN    "02"
+      *    公費ＩＤ選択
+               INITIALIZE                  SPA-GMN24-KOHFTNTBL2
+               MOVE    1                   TO  SPA-NAI24-INIT2
+               MOVE    SPA-NAI24-FTNSELNUM TO  WRK-FTN1-IDX
+      *        見出し変更
+               PERFORM 3101-KOH-MEISAI-SEC
+      *        対象のデータをパラメタファイルより編集する
+               PERFORM 31022-KOHFTN-SPAHENSYU-SEC
+           WHEN    "03"
+      *    公費負担チェック
+      *        公費負担 開始日
+               PERFORM 41031-FTNSTYMD-SEC
+      *        公費負担 終了日
+               IF      SPA-ERRCD           =   SPACE
+      *           公費負担初期編集処理
+                  PERFORM 41031-FTNEDYMD-SEC
+               END-IF
+      *        公費負担 外来上限額
+               IF      SPA-ERRCD           =   SPACE
+                   PERFORM 41031-GAIJGNGAK-SEC
+               END-IF
+      *        公費負担 入院上限額
+               IF      SPA-ERRCD           =   SPACE
+                   PERFORM 41032-NYUJGNGAK-SEC
+               END-IF
+           WHEN    "04"
+      *    他一部負担選択
+               PERFORM 4181-P02K-SYORI-SEC
+           END-EVALUATE
+           .
+       2009-API-SYORI-EXT.
            EXIT.
       *
       *****************************************************************

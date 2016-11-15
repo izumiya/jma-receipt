@@ -59,6 +59,7 @@
       * 04.08.00     NACL-多々納  15/08/05  領収・明細　請求書不要対応
       * 04.08.00     NACL-多々納  15/11/XX  レセプト分割５０件他対応
       * 04.08.00     NACL-多々納  16/03/XX  平成２８年４月改正対応
+      * 04.08.00     NACL-多々納  16/11/XX  公費画面編集追加（P02H)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -456,6 +457,10 @@
                WHEN    "API"
       *            ＡＰＩ初期パラメタ、ＳＰＡ初期編集
                    PERFORM 300-APIP02-SET-SEC
+      *H28.11
+               WHEN    "GMKOH"
+      *            公費画面編集
+                   PERFORM 20011-P02W1-KOHSET-SEC
            END-EVALUATE
       *
       *
@@ -1467,7 +1472,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    お薬手帳　ＣＳＶ
            MOVE    "1 Ver.1.0"
                                        TO  SPA-GMN28-MNOTE-CSV-LST(1)
-           MOVE    1                   TO  SPA-GMN28-CSV-MAX
+      *H28.11 追加
+           MOVE    "2 Ver.2.1"
+                                       TO  SPA-GMN28-MNOTE-CSV-LST(2)
+           MOVE    2                   TO  SPA-GMN28-CSV-MAX
       *    情報提供同意有無
            MOVE    "0 同意しない"
                                        TO  SPA-GMN28-AGREEMENT-LST(1)
@@ -1500,6 +1508,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "25 要介護５"
                                        TO  SPA-GMN28-CAREJOTAI-LST (9)
            MOVE    9                   TO  SPA-GMN28-CAREJOTAI-MAX
+      *
            .
        1005-COMB-SET-EXT.
            EXIT.
@@ -3977,6 +3986,70 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "  "            TO  P02-P02-HKNJAADRS2(IDX:2)
                END-IF
            END-PERFORM
+      *H28.11
+      *    公費画面編集
+           PERFORM 20011-P02W1-KOHSET-SEC
+      *
+      *    公費種類を編集する
+           PERFORM 20011-HOKNUM-HEN-SEC
+      *
+      *    保険組合せ
+           MOVE    ZERO                TO  IDX2
+           MOVE    ZERO                TO  P02-HKNLIST-COUNT
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-HKNCOMBI-MAX
+               ADD     1                   TO  IDX2
+               MOVE    SPA-GMN-THKNCOMBINUM(IDX)
+                                           TO   P02-HKNCOBNUM (IDX2)
+               MOVE    SPA-GMN-THKNCOMBIMEI (IDX)
+                                           TO  P02-HKNCOBNAME (IDX2)
+      *
+               IF      SPA-GMN-THKNCOMBINUM (IDX)  =   SPA-GMN-SELNUM
+                   MOVE    "T"             TO  P02-HKNLIST-SELECT (IDX2)
+               ELSE
+                   MOVE    "F"             TO  P02-HKNLIST-SELECT (IDX2)
+               END-IF
+      *
+               ADD     1                   TO  IDX2
+               MOVE    SPA-GMN-TTEKSTYMD (IDX)
+                                           TO  P02-HKNCOBNAME (IDX2)
+               MOVE    "〜"                TO  P02-HKNCOBNAME (IDX2)
+                                                            (11:2)
+               MOVE    SPA-GMN-TTEKEDYMD (IDX)
+                                           TO  P02-HKNCOBNAME (IDX2)
+                                                            (14:)
+      *        非表示
+               EVALUATE    SPA-NAI-THYOJIKBN (IDX)
+               WHEN    "1"
+                   MOVE    "●非"          TO  P02-HKNCOBNUM (IDX2)
+               WHEN    "2"
+                   MOVE    "●入"          TO  P02-HKNCOBNUM (IDX2)
+               WHEN    "3"
+                   MOVE    "●外"          TO  P02-HKNCOBNUM (IDX2)
+               END-EVALUATE
+      *
+               MOVE    "F"             TO  P02-HKNLIST-SELECT (IDX2)
+           END-PERFORM
+           MOVE    IDX2                TO  P02-HKNLIST-COUNT
+      *
+           MOVE    SPA-GMN-SELNUM      TO  P02-P02-SELNUM
+      *
+      *    診療科
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-SRYKA-MAX
+               MOVE    SPA-GMN-SRYKA-LST (IDX)
+                                       TO  P02-SRYKA-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-SRYKA-MAX       TO  P02-SRYKA-COUNT
+           MOVE    SPA-GMN-SRYKA-G     TO  P02-P02-SRYKA
+           .
+       2001-P02W1-SET-EXT.
+           EXIT.
+      *H28.11
+      *****************************************************************
+      *    公費画面編集処理
+      *****************************************************************
+       20011-P02W1-KOHSET-SEC         SECTION.
       *
       *    公費情報１
            MOVE    SPA-GMN-KOHNUM-G (01)   TO  P02-P02-KOHNUM1
@@ -4045,60 +4118,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "F"                 TO  P02-BK3-VALUE
                MOVE    "未"                TO  P02-BK3-LABEL
            END-IF
-      *    公費種類を編集する
-           PERFORM 20011-HOKNUM-HEN-SEC
-      *
-      *    保険組合せ
-           MOVE    ZERO                TO  IDX2
-           MOVE    ZERO                TO  P02-HKNLIST-COUNT
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-HKNCOMBI-MAX
-               ADD     1                   TO  IDX2
-               MOVE    SPA-GMN-THKNCOMBINUM(IDX)
-                                           TO   P02-HKNCOBNUM (IDX2)
-               MOVE    SPA-GMN-THKNCOMBIMEI (IDX)
-                                           TO  P02-HKNCOBNAME (IDX2)
-      *
-               IF      SPA-GMN-THKNCOMBINUM (IDX)  =   SPA-GMN-SELNUM
-                   MOVE    "T"             TO  P02-HKNLIST-SELECT (IDX2)
-               ELSE
-                   MOVE    "F"             TO  P02-HKNLIST-SELECT (IDX2)
-               END-IF
-      *
-               ADD     1                   TO  IDX2
-               MOVE    SPA-GMN-TTEKSTYMD (IDX)
-                                           TO  P02-HKNCOBNAME (IDX2)
-               MOVE    "〜"                TO  P02-HKNCOBNAME (IDX2)
-                                                            (11:2)
-               MOVE    SPA-GMN-TTEKEDYMD (IDX)
-                                           TO  P02-HKNCOBNAME (IDX2)
-                                                            (14:)
-      *        非表示
-               EVALUATE    SPA-NAI-THYOJIKBN (IDX)
-               WHEN    "1"
-                   MOVE    "●非"          TO  P02-HKNCOBNUM (IDX2)
-               WHEN    "2"
-                   MOVE    "●入"          TO  P02-HKNCOBNUM (IDX2)
-               WHEN    "3"
-                   MOVE    "●外"          TO  P02-HKNCOBNUM (IDX2)
-               END-EVALUATE
-      *
-               MOVE    "F"             TO  P02-HKNLIST-SELECT (IDX2)
-           END-PERFORM
-           MOVE    IDX2                TO  P02-HKNLIST-COUNT
-      *
-           MOVE    SPA-GMN-SELNUM      TO  P02-P02-SELNUM
-      *
-      *    診療科
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-SRYKA-MAX
-               MOVE    SPA-GMN-SRYKA-LST (IDX)
-                                       TO  P02-SRYKA-ITEM (IDX)
-           END-PERFORM
-           MOVE    SPA-SRYKA-MAX       TO  P02-SRYKA-COUNT
-           MOVE    SPA-GMN-SRYKA-G     TO  P02-P02-SRYKA
            .
-       2001-P02W1-SET-EXT.
+       20011-P02W1-KOHSET-EXT.
            EXIT.
       *****************************************************************
       *    公費種類編集処理
@@ -5193,7 +5214,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    PERFORM 10025-PTNUMPUBLIC-SET-SEC
       *ver.4.7
       *    患者個別情報編集
-      *****PERFORM 10028-PTCONF-SET-SEC
+           PERFORM 10028-PTCONF-SET-SEC
       *
       *    患者労災情報編集
            PERFORM 10023-RSIPARA-SET-SEC

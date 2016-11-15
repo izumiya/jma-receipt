@@ -219,7 +219,9 @@
       *H26.8
            03  FLG-RJNCHK5             PIC 9(01).
       *H28.5
-           03  FLG-P027             PIC 9(01).
+           03  FLG-P027                PIC 9(01).
+      *H28.11
+           03  FLG-GYODEL              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -404,10 +406,16 @@
            03  WRK-KOKUHO-CHK          PIC 9(04).
       *!!!!
       *ver4/7
-           03  WRK-P02-KOHNUM-G        OCCURS   3.
-               05  WRK-P02-KOHNUM      PIC X(03).
-               05  WRK-P02-KOHNUM2     PIC X(01).
-               05  WRK-P02-KOHNUMMEI   PIC X(16).
+           03  WRK-P02-KOHNUM-AREA.
+               05  WRK-P02-KOHNUM-G        OCCURS   3.
+                   07  WRK-P02-KOHNUM      PIC X(03).
+                   07  WRK-P02-KOHNUM2     PIC X(01).
+                   07  WRK-P02-KOHNUMMEI   PIC X(16).
+           03  WRK-P02-KOHNUM-AREA2.
+               05  WRK-P02-KOHNUM-G2        OCCURS   3.
+                   07  WRK-P02-KOHNUM2      PIC X(03).
+                   07  WRK-P02-KOHNUM22     PIC X(01).
+                   07  WRK-P02-KOHNUMMEI2   PIC X(16).
       *H26.5
            03  WRK-HOJO-ERR            PIC X(01).
       *
@@ -814,6 +822,9 @@
            COPY    "CPORCSKANACHK2.INC".
       *
            COPY    "CPORCXKANACONV.INC".
+      *
+      *    画面編集パラメタ
+           COPY    "CPORCSP02.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -3422,25 +3433,57 @@
                   (P02-P02-KOHNUM1     NOT =   SPA-GMN-KOHNUM-G (1)) OR
                   (P02-P02-KTEKSTYMD1  NOT =   SPA-GMN-KTEKSTYMD(1)) OR
                   (P02-P02-KTEKEDYMD1  NOT =   SPA-GMN-KTEKEDYMD(1))
+      *H28.11  行追加のみは変更なしとする
+             IF     (P02-P02-FTNJANUM1(1:2)  =   "/A"
+                                             OR  "/a" )
+               AND  (P02-P02-KOHNUM1         =   SPA-GMN-KOHNUM-G(1))
+               AND  (P02-P02-KTEKSTYMD1      =   SPA-GMN-KTEKSTYMD(1))
+               AND  (P02-P02-KTEKEDYMD1      =   SPA-GMN-KTEKEDYMD(1))
+                 CONTINUE
+             ELSE
+      *
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (1)
       *        重複チェック
                MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (1)
+             END-IF
+      *
            END-IF
            IF     (P02-P02-FTNJANUM2   NOT =   SPA-GMN-FTNJANUM (2)) OR
                   (P02-P02-KOHNUM2     NOT =   SPA-GMN-KOHNUM-G (2)) OR
                   (P02-P02-KTEKSTYMD2  NOT =   SPA-GMN-KTEKSTYMD(2)) OR
                   (P02-P02-KTEKEDYMD2  NOT =   SPA-GMN-KTEKEDYMD(2))
+      *H28.11  行追加のみは変更なしとする
+             IF     (P02-P02-FTNJANUM2(1:2)  =   "/A"
+                                             OR  "/a" )
+               AND  (P02-P02-KOHNUM2        =   SPA-GMN-KOHNUM-G(2))
+               AND  (P02-P02-KTEKSTYMD2     =   SPA-GMN-KTEKSTYMD(2))
+               AND  (P02-P02-KTEKEDYMD2     =   SPA-GMN-KTEKEDYMD(2))
+               CONTINUE
+             ELSE
+      *
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (2)
       *        重複チェック
                MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (2)
+             END-IF
            END-IF
            IF     (P02-P02-FTNJANUM3   NOT =   SPA-GMN-FTNJANUM (3)) OR
                   (P02-P02-KOHNUM3     NOT =   SPA-GMN-KOHNUM-G (3)) OR
                   (P02-P02-KTEKSTYMD3  NOT =   SPA-GMN-KTEKSTYMD(3)) OR
                   (P02-P02-KTEKEDYMD3  NOT =   SPA-GMN-KTEKEDYMD(3))
+      *H28.11  行追加のみは変更なしとする
+             IF     (P02-P02-FTNJANUM3(1:2)  =   "/A"
+                                               OR  "/a" )
+               AND  (P02-P02-KOHNUM3         =   SPA-GMN-KOHNUM-G(3))
+               AND  (P02-P02-KTEKSTYMD3      =   SPA-GMN-KTEKSTYMD(3))
+               AND  (P02-P02-KTEKEDYMD3      =   SPA-GMN-KTEKEDYMD(3))
+               CONTINUE
+             ELSE
+      *
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (3)
       *        重複チェック
                MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (3)
+      *
+             END-IF
            END-IF
       *    負担者番号警告クリアする
            IF     (P02-P02-FTNJANUM1   NOT =   SPA-GMN-FTNJANUM (1))
@@ -3938,6 +3981,12 @@
                PERFORM 41023-PTKOH-SAI-SET-SEC
            END-IF
       **** END-IF
+      *H28.11
+           IF      FLG-GYODEL          =   1
+      *        空白行削除ありは画面編集
+               PERFORM 41024-PTKOH-GMN-SET-SEC
+           END-IF
+      *
       *ver.4.7
            IF     (FLG-KOH-ADD2        =   ZERO )
              AND  (FLG-KOH-DEL         =   ZERO )
@@ -4070,13 +4119,24 @@
       *
            MOVE    SPA-GMN-KOH-AREA    TO  WRK-GMN-KOH-AREA
            INITIALIZE                      SPA-GMN-KOH-AREA
+      *H28.11
+           MOVE    WRK-P02-KOHNUM-AREA TO  WRK-P02-KOHNUM-AREA2
+           INITIALIZE                      WRK-P02-KOHNUM-AREA
+           MOVE    ZERO                TO  FLG-GYODEL
            MOVE    ZERO                TO  IDX-K
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   3
-              IF      WRK-GMN-HOK-G (IDX)  NOT =   SPACE
+               IF      WRK-GMN-HOK-G (IDX) NOT =   SPACE
                    ADD     1               TO  IDX-K
                    MOVE    WRK-GMN-KOH-TBL (IDX)
                                            TO  SPA-GMN-KOH-TBL (IDX-K)
+                   MOVE    WRK-P02-KOHNUM-G2 (IDX)
+                                           TO  WRK-P02-KOHNUM-G(IDX-K)
+               END-IF
+      *H28.11
+      *        削除あり
+               IF      IDX-K           NOT =   IDX
+                   MOVE    1                   TO  FLG-GYODEL
                END-IF
            END-PERFORM
       *    最大を編集する
@@ -4119,6 +4179,22 @@
            .
       *
        41023-PTKOH-SAI-SET-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    公費画面編集処理
+      ****************************************************************
+       41024-PTKOH-GMN-SET-SEC      SECTION.
+      *
+      *    P02へ編集（P02H表示の為）
+           MOVE    "GMKOH"             TO  ORCSP02-SYORI
+           CALL    "ORCSP02"           USING   ORCSP02AREA
+                                               SPA-AREA
+                                               SPA-P02KYOUTU
+                                               SPA-P02SCRAREA
+                                               P02
+           .
+       41024-PTKOH-GMN-SET-EXT.
            EXIT.
       *
       ****************************************************************

@@ -1747,7 +1747,7 @@
                END-IF
            END-IF
       *
-          .
+           .
        4912-JKYSNUM-CHECK-EXT.
            EXIT.
       *****************************************************************
@@ -1788,11 +1788,18 @@
                ELSE
                    MOVE    SPA-NAI-KTEKEDYMD(IDX-K) TO  WRK-YMDS2
                END-IF
+      *        誕生日より前はゼロ
+               IF      WRK-YYS2           <   WRK-YYS1
+                   MOVE    ZERO           TO  WRK-NENREI-YY
+               ELSE
+      *
                COMPUTE   WRK-NENREI-YY    =   WRK-YYS2
                                           -   WRK-YYS1
                IF  WRK-YMDS1 (5:4)        >   WRK-YMDS2 (5:4)
                    COMPUTE WRK-NENREI-YY  =   WRK-NENREI-YY
                                           -   1
+               END-IF
+      *
                END-IF
       *
                IF  ( WRK-NENREI-YY         <   WRK-STYEAR )  OR
