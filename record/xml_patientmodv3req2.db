@@ -13,11 +13,11 @@ xml_patientmodv3req2 {
 	Patient_Information	{
 		Patient_ID		varchar(20);
 		WholeName		varchar(100);
-		WholeName_InKana	varchar(100);
+		WholeName_inKana	varchar(100);
 		BirthDate		varchar(10);
 		Sex			varchar(1);
         };
-#---    •ÛŒ¯î•ñ
+#---    Êİ¸±¾ğÊó
 	HealthInsurance_Information	{
 	    HealthInsurance_Info 	{
             	InsuranceProvider_Mode			varchar(6);
@@ -38,7 +38,7 @@ xml_patientmodv3req2 {
             	Rate_Class				varchar(01);
             	} [40];
         };
-#---    Œö”ïî•ñ
+#---    ¸øÈñ¾ğÊó
  	PublicInsurance_Information   {
             PublicInsurance_Info      {
                 PublicInsurance_Mode			varchar(6);

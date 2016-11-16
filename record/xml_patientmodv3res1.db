@@ -17,7 +17,7 @@ xml_patientmodv3res1 {
 	Patient_Information	{
 		Patient_ID		varchar(20);
 		WholeName		varchar(50);
-		WholeName_InKana	varchar(50);
+		WholeName_inKana	varchar(50);
 		BirthDate		varchar(10);
 		Sex			varchar(1);
 		HouseHolder_WholeName	varchar(50);
@@ -34,7 +34,7 @@ xml_patientmodv3res1 {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
-#--- ‹Î–±æ
+#--- ¶ĞÌ³Àè
 		WorkPlace_Information	{
 			WholeName		varchar(50);
 			Address_ZipCode		varchar(07);
@@ -42,7 +42,7 @@ xml_patientmodv3res1 {
 			WholeAddress2		varchar(100);
 			PhoneNumber		varchar(15);
         	};
-#--- ˜A—æ
+#--- Ï¢ÍíÀè
 		Contact_Information	{
 			WholeName		varchar(50);
 			Relationship 		varchar(30);
@@ -52,7 +52,7 @@ xml_patientmodv3res1 {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
-#--- ‹AÈæ
+#--- µ¢¾ÊÀè
 		Home2_Information	{
 			WholeName		varchar(50);
 			Address_ZipCode		varchar(07);
@@ -70,13 +70,13 @@ xml_patientmodv3res1 {
 		Comment2		varchar(100);
 		TestPatient_Flag	varchar(01);
 		Death_Flag		varchar(01);
-#---            Œ¸–Æ–—R
+#---            ¸ºÌÈ»öÍ³
 		Reduction_Reason	varchar(02);
 		Reduction_Reason_Name	varchar(20);
-#---            Š„ˆø—¦
+#---            ³ä°úÎ¨
 		Discount		varchar(02);
 		Discount_Name		varchar(14);
-#---            ó‘Ô‚P‚©‚ç‚R
+#---            ¾õÂÖ£±¤«¤é£³
 		Condition1		varchar(02);
 		Condition1_Name		varchar(20);
 		Condition2		varchar(02);
@@ -84,31 +84,31 @@ xml_patientmodv3res1 {
 		Condition3		varchar(02);
 		Condition3_Name		varchar(20);
     	};
-#---   “¯ˆêŠ³Òî•ñ
+#---   Æ±°ì´µ¼Ô¾ğÊó
 	Patient2_Information	{
 		Patient_ID		varchar(20);
 		WholeName		varchar(50);
-		WholeName_InKana	varchar(50);
+		WholeName_inKana	varchar(50);
 		BirthDate		varchar(10);
 		Sex			varchar(1);
 		WholeAddress1		varchar(100);
 		WholeAddress2		varchar(100);
         } [20];
-#---    ƒGƒ‰[ƒƒbƒZ[ƒW
+#---    ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸
 	Patient_Message_Information	{
 	Patient_Message_Info	{
 		Patient_Result		varchar(4);
 		Patient_Result_Message	varchar(200);
       	  } [50];
         };
-#---    ƒ[ƒjƒ“ƒOƒƒbƒZ[ƒW
+#---    ¥ï¡¼¥Ë¥ó¥°¥á¥Ã¥»¡¼¥¸
 	Patient_Warning_Information	{
 	Patient_Warning_Info	{
 		Patient_Warning		varchar(4);
 		Patient_Warning_Message	varchar(200);
           } [50];
         };
-#--- Šm”FƒƒbƒZ[ƒW
+#--- ³ÎÇ§¥á¥Ã¥»¡¼¥¸
 	Patient_Select_Information	{
         Patient_Select			varchar(4);
         Patient_Select_Message		varchar(100);

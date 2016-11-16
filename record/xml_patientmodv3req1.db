@@ -13,7 +13,7 @@ xml_patientmodv3req1 {
 	Continue_Mode		varchar(05);
 	Patient_Information	{
 		WholeName		varchar(50);
-		WholeName_InKana	varchar(50);
+		WholeName_inKana	varchar(50);
 		BirthDate		varchar(10);
 		Sex			varchar(1);
 		HouseHolder_WholeName	varchar(50);
@@ -30,7 +30,7 @@ xml_patientmodv3req1 {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
-#--- ‹Î–±æ
+#--- ¶ĞÌ³Àè
 		WorkPlace_Information	{
 			WholeName		varchar(50);
 			Address_ZipCode		varchar(07);
@@ -38,7 +38,7 @@ xml_patientmodv3req1 {
 			WholeAddress2		varchar(100);
 			PhoneNumber		varchar(15);
         	};
-#--- ˜A—æ
+#--- Ï¢ÍíÀè
 		Contact_Information	{
 			WholeName		varchar(50);
 			Relationship 		varchar(30);
@@ -48,7 +48,7 @@ xml_patientmodv3req1 {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
-#--- ‹AÈæ
+#--- µ¢¾ÊÀè
 		Home2_Information	{
 			WholeName		varchar(50);
 			Address_ZipCode		varchar(07);
@@ -66,16 +66,16 @@ xml_patientmodv3req1 {
 		Comment2		varchar(100);
 		TestPatient_Flag	varchar(01);
 		Death_Flag		varchar(01);
-#---            Œ¸–Æ–—R
+#---            ¸ºÌÈ»öÍ³
 		Reduction_Reason	varchar(02);
-#---            Š„ˆø—¦
+#---            ³ä°úÎ¨
 		Discount		varchar(02);
-#---            ó‘Ô‚P‚©‚ç‚R
+#---            ¾õÂÖ£±¤«¤é£³
 		Condition1		varchar(02);
 		Condition2		varchar(02);
 		Condition3		varchar(02);
         };
-#--- ‹Œ©—š—ğ“o˜^
+#--- µìÀ«ÍúÎòÅĞÏ¿
 	Former_Name_Mode		varchar(5);
     	};
 };
