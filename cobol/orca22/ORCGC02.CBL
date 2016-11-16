@@ -331,6 +331,8 @@
       *                                     合併症に係わる情報追加対応
       *  04.08.07    NACL-藤原    16/06/14  自院コード検索より戻ったときの
       *                                     移行病名の疑いフラグの表示をする
+      *  04.08.08    NACL-藤原    16/11/16  病名入力時の置換病名コードへ
+      *                                     変更した時の疾患区分の表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3789,6 +3791,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                    END-IF
       *
                    INITIALIZE                  SPA-C02-HAISI-AREA
+                   MOVE    SPACE       TO  SPA-GMN-C02-BYOMEI
                    PERFORM 41021-BYOMEICD-HENSYU-SEC
                    MOVE    34              TO  SPA-GMN-C02-CUR
                WHEN    "0104"
