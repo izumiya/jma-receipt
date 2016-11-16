@@ -3932,6 +3932,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                    END-IF
       * 
                    INITIALIZE                  SPA-C02-HAISI-AREA
+                   MOVE    SPACE       TO  SPA-GMN-C02-BYOMEI
                    PERFORM 41021-BYOMEICD-HENSYU-SEC
            END-EVALUATE
       *     
