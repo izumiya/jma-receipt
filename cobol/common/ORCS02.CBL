@@ -857,6 +857,8 @@
            03  WK-GENGAKU-TEN-TBL.
                05  WK-GENGAKU-TEN-OCC      OCCURS   100.
                  06  WK-GENGAKU-TEN        PIC  9(07).
+                 06  WK-GENGAKU-FTN        PIC  9(07).
+                 06  WK-GENGAKU-FTN-ENTANI PIC  9(07)V9(01).
       *
            03  WK-KOHININBARAI-KOHID       PIC  9(10).
            03  WK-KOHININBARAI-JKYSNUM     PIC  X(20).
@@ -4469,24 +4471,7 @@
                    MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
             END-IF
-      *??
-            IF    WK-GENGAKUKBN    =   2 OR 5
-              IF   (COMB-HKNNUM      NOT =  SPACE)
-              AND  (COMB-KOH1HKNNUM      =  SPACE)
-              AND  (COMB-KOH2HKNNUM      =  SPACE)
-              AND  (COMB-KOH3HKNNUM      =  SPACE)
-              AND  (COMB-KOH4HKNNUM      =  SPACE)
-                CONTINUE
-              ELSE
-                DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
-                DISPLAY "∏¯»Ò ªÕ—§Œ ›∏±¡»§ﬂπÁ§Ô§ª"
       *
-                MOVE     ZERO    TO    WK-GENGAKUKBN
-      *
-                DISPLAY "@WK-GENGAKUKBN=" WK-GENGAKUKBN
-              END-IF
-            END-IF
-      *??
             IF   (FLG-SAIGAI-TAISYO     =    1     )
             AND  (WK-GENGAKUKBN         =    3 OR 4)
             AND  (LNK-SYU-SRYYMD(1:6)  <=  "201202")
@@ -13901,6 +13886,23 @@
                  ADD     1                 TO  IDX14
                  IF   IDX14 <= 100
                    MOVE  SYU-TOTAL-HKNTEN  TO  WK-GENGAKU-TEN(IDX14)
+                   IF    SYU-YKZKENNUM  =   5
+                     IF   (SYU-SYUHKNNUM   NOT =  SPACE)
+                     AND  (SYU-KOH1HKNNUM      =  SPACE)
+                     AND  (SYU-KOH2HKNNUM      =  SPACE)
+                     AND  (SYU-KOH3HKNNUM      =  SPACE)
+                     AND  (SYU-KOH4HKNNUM      =  SPACE)
+                       MOVE  SYU-SYUCOMPFTN
+                                   TO  WK-GENGAKU-FTN(IDX14)
+                       MOVE  SYU-SYUCOMPFTN-ENTANI
+                                   TO  WK-GENGAKU-FTN-ENTANI(IDX14)
+                     ELSE
+                       MOVE  SYU-KOH-FTN
+                                   TO  WK-GENGAKU-FTN(IDX14)
+                       MOVE  SYU-KOH-FTN-ENTANI
+                                   TO  WK-GENGAKU-FTN-ENTANI(IDX14)
+                     END-IF
+                   END-IF
                  END-IF
              END-IF
       *
@@ -24809,138 +24811,14 @@
                                             100
                                   END-IF
                                 WHEN        2
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
-                                  PERFORM VARYING IDX14 FROM 1 BY 1
-                                           UNTIL  IDX14   >  100
-                                    COMPUTE  WK-GENGAKU-GAK8       =
-                                             WK-GENGAKU-TEN(IDX14) *
-                                             10                    *
-                                             WK-FUTANWARI
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-GENGAKU-GAK8 +  5
-                                    COMPUTE  WK-FTN      =
-                                             WK-GENGAKU-GAK8 /  10
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-FTN          *  10
-                                    COMPUTE  WK-GENGAKU-GAK8-ENTANI  =
-                                             WK-GENGAKU-TEN(IDX14)   *
-                                             10                      *
-                                             WK-FUTANWARI
-                                    ADD  WK-GENGAKU-GAK8
-                                             TO WK-GENGAKU-GAK9
-                                    ADD  WK-GENGAKU-GAK8-ENTANI
-                                             TO WK-GENGAKU-GAK9-ENTANI
-                                  END-PERFORM
-                                  IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
-                                    MOVE   ZERO  TO  WK-GENGAKU-KIN2
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2 =
-                                             WK-GENGAKU-KIN  -
-                                             WK-GENGAKU-GAK9
-                                  END-IF
-                                  IF  WK-GENGAKU-KIN
-                                             <= WK-GENGAKU-GAK9-ENTANI
-                                    MOVE   ZERO  TO
-                                                WK-GENGAKU-KIN2-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2-ENTANI =
-                                             WK-GENGAKU-KIN         -
-                                             WK-GENGAKU-GAK9-ENTANI
-                                  END-IF
-      *
-                                  IF  LNK-SYU-SYUCOMPFTN
-                                             < WK-GENGAKU-KIN2
-                                    MOVE   ZERO   TO   WK-GENGAKU-GAK
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-GAK      =
-                                             LNK-SYU-SYUCOMPFTN  -
-                                             WK-GENGAKU-KIN2
-                                  END-IF
-                                  IF  LNK-SYU-SYUCOMPFTN-ENTANI
-                                             < WK-GENGAKU-KIN2-ENTANI
-                                    MOVE   ZERO   TO
-                                             WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-GAK-ENTANI     =
-                                             LNK-SYU-SYUCOMPFTN-ENTANI -
-                                             WK-GENGAKU-KIN2-ENTANI
-                                  END-IF
-                                  IF  WK-MARUKO-FTN  < WK-GENGAKU-KIN2
-                                    MOVE   ZERO   TO   WK-MARUKO-FTN
-                                  ELSE
-                                    COMPUTE  WK-MARUKO-FTN  =
-                                             WK-MARUKO-FTN  -
-                                             WK-GENGAKU-KIN2
-                                  END-IF
+                                  PERFORM   23052-GENGAKU-ZAN1-SEC
                                 WHEN        3
                                 WHEN        4
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                                   MOVE  ZERO  TO  WK-MARUKO-FTN
                                 WHEN        5
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
-                                  PERFORM VARYING IDX14 FROM 1 BY 1
-                                           UNTIL  IDX14   >  100
-                                    COMPUTE  WK-GENGAKU-GAK8       =
-                                             WK-GENGAKU-TEN(IDX14) *
-                                             10                    *
-                                             WK-FUTANWARI
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-GENGAKU-GAK8 +  5
-                                    COMPUTE  WK-FTN      =
-                                             WK-GENGAKU-GAK8 /  10
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-FTN          *  10
-                                    COMPUTE  WK-GENGAKU-GAK8-ENTANI  =
-                                             WK-GENGAKU-TEN(IDX14)   *
-                                             10                      *
-                                             WK-FUTANWARI
-                                    ADD  WK-GENGAKU-GAK8
-                                             TO WK-GENGAKU-GAK9
-                                    ADD  WK-GENGAKU-GAK8-ENTANI
-                                             TO WK-GENGAKU-GAK9-ENTANI
-                                  END-PERFORM
-                                  IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
-                                    MOVE   ZERO  TO  WK-GENGAKU-KIN2
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2 =
-                                             WK-GENGAKU-KIN  -
-                                             WK-GENGAKU-GAK9
-                                  END-IF
-                                  IF  WK-GENGAKU-KIN
-                                             <= WK-GENGAKU-GAK9-ENTANI
-                                    MOVE   ZERO  TO
-                                                WK-GENGAKU-KIN2-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2-ENTANI =
-                                             WK-GENGAKU-KIN         -
-                                             WK-GENGAKU-GAK9-ENTANI
-                                  END-IF
-      *
-                                  IF  LNK-SYU-SYUCOMPFTN
-                                             < WK-GENGAKU-KIN2
-                                    MOVE   LNK-SYU-SYUCOMPFTN
-                                             TO   WK-GENGAKU-GAK
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2
-                                             TO   WK-GENGAKU-GAK
-                                  END-IF
-                                  IF  LNK-SYU-SYUCOMPFTN-ENTANI
-                                             < WK-GENGAKU-KIN2-ENTANI
-                                    MOVE   LNK-SYU-SYUCOMPFTN-ENTANI
-                                             TO   WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2-ENTANI
-                                             TO   WK-GENGAKU-GAK-ENTANI
-                                  END-IF
-                                  IF  WK-MARUKO-FTN  < WK-GENGAKU-KIN2
-                                    CONTINUE
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2
-                                             TO   WK-MARUKO-FTN
-                                  END-IF
+                                  PERFORM   23053-GENGAKU-ZAN2-SEC
                               END-EVALUATE
                               IF  WK-GENGAKUKBN  NOT =  ZERO
                                   MOVE  WK-GENGAKU-GAK
@@ -25181,138 +25059,14 @@
                                             100
                                   END-IF
                                 WHEN        2
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
-                                  PERFORM VARYING IDX14 FROM 1 BY 1
-                                           UNTIL  IDX14   >  100
-                                    COMPUTE  WK-GENGAKU-GAK8       =
-                                             WK-GENGAKU-TEN(IDX14) *
-                                             10                    *
-                                             WK-FUTANWARI
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-GENGAKU-GAK8 +  5
-                                    COMPUTE  WK-FTN      =
-                                             WK-GENGAKU-GAK8 /  10
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-FTN          *  10
-                                    COMPUTE  WK-GENGAKU-GAK8-ENTANI  =
-                                             WK-GENGAKU-TEN(IDX14)   *
-                                             10                      *
-                                             WK-FUTANWARI
-                                    ADD  WK-GENGAKU-GAK8
-                                             TO WK-GENGAKU-GAK9
-                                    ADD  WK-GENGAKU-GAK8-ENTANI
-                                             TO WK-GENGAKU-GAK9-ENTANI
-                                  END-PERFORM
-                                  IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
-                                    MOVE   ZERO  TO  WK-GENGAKU-KIN2
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2 =
-                                             WK-GENGAKU-KIN  -
-                                             WK-GENGAKU-GAK9
-                                  END-IF
-                                  IF  WK-GENGAKU-KIN
-                                             <= WK-GENGAKU-GAK9-ENTANI
-                                    MOVE   ZERO  TO
-                                                WK-GENGAKU-KIN2-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2-ENTANI =
-                                             WK-GENGAKU-KIN         -
-                                             WK-GENGAKU-GAK9-ENTANI
-                                  END-IF
-      *
-                                  IF  LNK-SYU-SYUCOMPFTN
-                                             < WK-GENGAKU-KIN2
-                                    MOVE   ZERO   TO   WK-GENGAKU-GAK
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-GAK      =
-                                             LNK-SYU-SYUCOMPFTN  -
-                                             WK-GENGAKU-KIN2
-                                  END-IF
-                                  IF  LNK-SYU-SYUCOMPFTN-ENTANI
-                                             < WK-GENGAKU-KIN2-ENTANI
-                                    MOVE   ZERO   TO
-                                             WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-GAK-ENTANI     =
-                                             LNK-SYU-SYUCOMPFTN-ENTANI -
-                                             WK-GENGAKU-KIN2-ENTANI
-                                  END-IF
-                                  IF  WK-MARUKO-FTN  < WK-GENGAKU-KIN2
-                                    MOVE   ZERO   TO   WK-MARUKO-FTN
-                                  ELSE
-                                    COMPUTE  WK-MARUKO-FTN  =
-                                             WK-MARUKO-FTN  -
-                                             WK-GENGAKU-KIN2
-                                  END-IF
+                                  PERFORM   23052-GENGAKU-ZAN1-SEC
                                 WHEN        3
                                 WHEN        4
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK
                                   MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
                                   MOVE  ZERO  TO  WK-MARUKO-FTN
                                 WHEN        5
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9
-                                  MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
-                                  PERFORM VARYING IDX14 FROM 1 BY 1
-                                           UNTIL  IDX14   >  100
-                                    COMPUTE  WK-GENGAKU-GAK8       =
-                                             WK-GENGAKU-TEN(IDX14) *
-                                             10                    *
-                                             WK-FUTANWARI
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-GENGAKU-GAK8 +  5
-                                    COMPUTE  WK-FTN      =
-                                             WK-GENGAKU-GAK8 /  10
-                                    COMPUTE  WK-GENGAKU-GAK8 =
-                                             WK-FTN          *  10
-                                    COMPUTE  WK-GENGAKU-GAK8-ENTANI  =
-                                             WK-GENGAKU-TEN(IDX14)   *
-                                             10                      *
-                                             WK-FUTANWARI
-                                    ADD  WK-GENGAKU-GAK8
-                                             TO WK-GENGAKU-GAK9
-                                    ADD  WK-GENGAKU-GAK8-ENTANI
-                                             TO WK-GENGAKU-GAK9-ENTANI
-                                  END-PERFORM
-                                  IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
-                                    MOVE   ZERO  TO  WK-GENGAKU-KIN2
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2 =
-                                             WK-GENGAKU-KIN  -
-                                             WK-GENGAKU-GAK9
-                                  END-IF
-                                  IF  WK-GENGAKU-KIN
-                                             <= WK-GENGAKU-GAK9-ENTANI
-                                    MOVE   ZERO  TO
-                                                WK-GENGAKU-KIN2-ENTANI
-                                  ELSE
-                                    COMPUTE  WK-GENGAKU-KIN2-ENTANI =
-                                             WK-GENGAKU-KIN         -
-                                             WK-GENGAKU-GAK9-ENTANI
-                                  END-IF
-      *
-                                  IF  LNK-SYU-SYUCOMPFTN
-                                             < WK-GENGAKU-KIN2
-                                    MOVE   LNK-SYU-SYUCOMPFTN
-                                             TO   WK-GENGAKU-GAK
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2
-                                             TO   WK-GENGAKU-GAK
-                                  END-IF
-                                  IF  LNK-SYU-SYUCOMPFTN-ENTANI
-                                             < WK-GENGAKU-KIN2-ENTANI
-                                    MOVE   LNK-SYU-SYUCOMPFTN-ENTANI
-                                             TO   WK-GENGAKU-GAK-ENTANI
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2-ENTANI
-                                             TO   WK-GENGAKU-GAK-ENTANI
-                                  END-IF
-                                  IF  WK-MARUKO-FTN  < WK-GENGAKU-KIN2
-                                    CONTINUE
-                                  ELSE
-                                    MOVE   WK-GENGAKU-KIN2
-                                             TO   WK-MARUKO-FTN
-                                  END-IF
+                                  PERFORM   23053-GENGAKU-ZAN2-SEC
                               END-EVALUATE
                               IF  WK-GENGAKUKBN  NOT =  ZERO
                                   MOVE  WK-GENGAKU-GAK
@@ -25707,6 +25461,116 @@
            .
       *
        23051-PTRSIINF-KENSAKU-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ∏∫Ã»ªƒ∑◊ªª£±                                            *
+      ******************************************************************
+       23052-GENGAKU-ZAN1-SEC           SECTION.
+      *
+           MOVE  ZERO  TO WK-GENGAKU-GAK9
+           MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
+           PERFORM VARYING IDX14 FROM 1 BY 1
+                    UNTIL  IDX14   >  100
+             COMPUTE  WK-GENGAKU-GAK8       =
+                      WK-GENGAKU-TEN(IDX14) *
+                      10                    *
+                      WK-FUTANWARI
+             COMPUTE  WK-GENGAKU-GAK8 = WK-GENGAKU-GAK8 +   5
+             COMPUTE  WK-GENGAKU-GAK8 = WK-GENGAKU-GAK8 /  10
+             COMPUTE  WK-GENGAKU-GAK8 = WK-GENGAKU-GAK8 *  10
+             COMPUTE  WK-GENGAKU-GAK8-ENTANI  =
+                      WK-GENGAKU-TEN(IDX14)   *
+                      10                      *
+                      WK-FUTANWARI
+             ADD  WK-GENGAKU-GAK8         TO  WK-GENGAKU-GAK9
+             ADD  WK-GENGAKU-GAK8-ENTANI  TO  WK-GENGAKU-GAK9-ENTANI
+           END-PERFORM
+      *
+           IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
+             MOVE   ZERO  TO  WK-GENGAKU-KIN2
+           ELSE
+             COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN
+                                      - WK-GENGAKU-GAK9
+           END-IF
+           IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9-ENTANI
+             MOVE   ZERO  TO  WK-GENGAKU-KIN2-ENTANI
+           ELSE
+             COMPUTE  WK-GENGAKU-KIN2-ENTANI = WK-GENGAKU-KIN
+                                             - WK-GENGAKU-GAK9-ENTANI
+           END-IF
+      *
+           IF  LNK-SYU-SYUCOMPFTN < WK-GENGAKU-KIN2
+             MOVE   ZERO  TO  WK-GENGAKU-GAK
+           ELSE
+             COMPUTE  WK-GENGAKU-GAK = LNK-SYU-SYUCOMPFTN
+                                     - WK-GENGAKU-KIN2
+           END-IF
+           IF  LNK-SYU-SYUCOMPFTN-ENTANI < WK-GENGAKU-KIN2-ENTANI
+             MOVE   ZERO  TO  WK-GENGAKU-GAK-ENTANI
+           ELSE
+             COMPUTE  WK-GENGAKU-GAK-ENTANI = LNK-SYU-SYUCOMPFTN-ENTANI
+                                            - WK-GENGAKU-KIN2-ENTANI
+           END-IF
+           IF  WK-MARUKO-FTN < WK-GENGAKU-KIN2
+             MOVE   ZERO  TO  WK-MARUKO-FTN
+           ELSE
+             COMPUTE  WK-MARUKO-FTN = WK-MARUKO-FTN
+                                    - WK-GENGAKU-KIN2
+           END-IF
+      *
+           .
+      *
+       23052-GENGAKU-ZAN1-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ∏∫Ã»ªƒ∑◊ªª£≤                                            *
+      ******************************************************************
+       23053-GENGAKU-ZAN2-SEC           SECTION.
+      *
+           MOVE  ZERO  TO WK-GENGAKU-GAK9
+           MOVE  ZERO  TO WK-GENGAKU-GAK9-ENTANI
+           PERFORM VARYING IDX14 FROM 1 BY 1
+                    UNTIL  IDX14   >  100
+             ADD  WK-GENGAKU-FTN(IDX14)   TO  WK-GENGAKU-GAK9
+             ADD  WK-GENGAKU-FTN-ENTANI(IDX14)
+                                          TO  WK-GENGAKU-GAK9-ENTANI
+           END-PERFORM
+      *
+           IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9
+             MOVE   ZERO  TO  WK-GENGAKU-KIN2
+           ELSE
+             COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN
+                                      - WK-GENGAKU-GAK9
+           END-IF
+           IF  WK-GENGAKU-KIN <= WK-GENGAKU-GAK9-ENTANI
+             MOVE   ZERO  TO  WK-GENGAKU-KIN2-ENTANI
+           ELSE
+             COMPUTE  WK-GENGAKU-KIN2-ENTANI = WK-GENGAKU-KIN
+                                             - WK-GENGAKU-GAK9-ENTANI
+           END-IF
+      *
+           IF  LNK-SYU-SYUCOMPFTN < WK-GENGAKU-KIN2
+             MOVE   LNK-SYU-SYUCOMPFTN      TO  WK-GENGAKU-GAK
+           ELSE
+             MOVE   WK-GENGAKU-KIN2         TO  WK-GENGAKU-GAK
+           END-IF
+           IF  LNK-SYU-SYUCOMPFTN-ENTANI < WK-GENGAKU-KIN2-ENTANI
+             MOVE   LNK-SYU-SYUCOMPFTN-ENTANI
+                                            TO  WK-GENGAKU-GAK-ENTANI
+           ELSE
+             MOVE   WK-GENGAKU-KIN2-ENTANI  TO  WK-GENGAKU-GAK-ENTANI
+           END-IF
+           IF  WK-MARUKO-FTN < WK-GENGAKU-KIN2
+             CONTINUE
+           ELSE
+             MOVE   WK-GENGAKU-KIN2         TO  WK-MARUKO-FTN
+           END-IF
+      *
+           .
+      *
+       23053-GENGAKU-ZAN2-EXT.
            EXIT.
       *
       ******************************************************************
@@ -27404,47 +27268,46 @@
                                   WK-GENGAKU-RITUX                    /
                                   100
                         END-IF
-      *??             WHEN        2
-      *??               IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2
-      *??                MOVE   ZERO   TO   WK-GENGAKU-GAK
-      *??               ELSE
-      *??                COMPUTE  WK-GENGAKU-GAK                =
-      *??                         LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
-      *??                         WK-GENGAKU-KIN2
-      *??               END-IF
-      *??               IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2-ENTANI
-      *??                MOVE   ZERO   TO   WK-GENGAKU-GAK-ENTANI
-      *??               ELSE
-      *??                COMPUTE  WK-GENGAKU-GAK-ENTANI               =
-      *??                         LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
-      *??                         WK-GENGAKU-KIN2-ENTANI
-      *??               END-IF
+                      WHEN        2
+                        IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                             < WK-GENGAKU-KIN2
+                         MOVE   ZERO   TO   WK-GENGAKU-GAK
+                        ELSE
+                         COMPUTE  WK-GENGAKU-GAK                =
+                                  LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
+                                  WK-GENGAKU-KIN2
+                        END-IF
+                        IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                             < WK-GENGAKU-KIN2-ENTANI
+                         MOVE   ZERO   TO   WK-GENGAKU-GAK-ENTANI
+                        ELSE
+                         COMPUTE  WK-GENGAKU-GAK-ENTANI               =
+                                  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
+                                  WK-GENGAKU-KIN2-ENTANI
+                        END-IF
                       WHEN        3
                       WHEN        4
                         MOVE  ZERO  TO  WK-GENGAKU-GAK
                         MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-      *??             WHEN        5
-      *??               IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2
-      *??                 MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                              TO   WK-GENGAKU-GAK
-      *??               ELSE
-      *??                 MOVE   WK-GENGAKU-KIN2
-      *??                              TO   WK-GENGAKU-GAK
-      *??               END-IF
-      *??               IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2-ENTANI
-      *??                 MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                              TO   WK-GENGAKU-GAK-ENTANI
-      *??               ELSE
-      *??                 MOVE   WK-GENGAKU-KIN2-ENTANI
-      *??                              TO   WK-GENGAKU-GAK-ENTANI
-      *??               END-IF
+                      WHEN        5
+                        IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                             < WK-GENGAKU-KIN2
+                          MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                       TO   WK-GENGAKU-GAK
+                        ELSE
+                          MOVE   WK-GENGAKU-KIN2
+                                       TO   WK-GENGAKU-GAK
+                        END-IF
+                        IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                             < WK-GENGAKU-KIN2-ENTANI
+                          MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                       TO   WK-GENGAKU-GAK-ENTANI
+                        ELSE
+                          MOVE   WK-GENGAKU-KIN2-ENTANI
+                                       TO   WK-GENGAKU-GAK-ENTANI
+                        END-IF
                     END-EVALUATE
-      *??           IF  WK-GENGAKUKBN  NOT =  ZERO
-                    IF  WK-GENGAKUKBN      =  "1" OR "3" OR "4"
+                    IF  WK-GENGAKUKBN  NOT =  ZERO
                         MOVE  WK-GENGAKU-GAK
                                TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                         MOVE  WK-GENGAKU-GAK-ENTANI
@@ -30966,47 +30829,46 @@
                                   WK-GENGAKU-RITUX                    /
                                   100
                         END-IF
-      *??             WHEN        2
-      *??               IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2
-      *??                MOVE   ZERO   TO   WK-GENGAKU-GAK
-      *??               ELSE
-      *??                COMPUTE  WK-GENGAKU-GAK                =
-      *??                         LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
-      *??                         WK-GENGAKU-KIN2
-      *??               END-IF
-      *??               IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2-ENTANI
-      *??                MOVE   ZERO   TO   WK-GENGAKU-GAK-ENTANI
-      *??               ELSE
-      *??                COMPUTE  WK-GENGAKU-GAK-ENTANI               =
-      *??                         LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
-      *??                         WK-GENGAKU-KIN2-ENTANI
-      *??               END-IF
+                      WHEN        2
+                        IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                             < WK-GENGAKU-KIN2
+                         MOVE   ZERO   TO   WK-GENGAKU-GAK
+                        ELSE
+                         COMPUTE  WK-GENGAKU-GAK                =
+                                  LNK-SYU-KOH-COMPFTN(KOH-IDX)  -
+                                  WK-GENGAKU-KIN2
+                        END-IF
+                        IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                             < WK-GENGAKU-KIN2-ENTANI
+                         MOVE   ZERO   TO   WK-GENGAKU-GAK-ENTANI
+                        ELSE
+                         COMPUTE  WK-GENGAKU-GAK-ENTANI               =
+                                  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX) -
+                                  WK-GENGAKU-KIN2-ENTANI
+                        END-IF
                       WHEN        3
                       WHEN        4
                         MOVE  ZERO  TO  WK-GENGAKU-GAK
                         MOVE  ZERO  TO  WK-GENGAKU-GAK-ENTANI
-      *??             WHEN        5
-      *??               IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2
-      *??                 MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)
-      *??                              TO   WK-GENGAKU-GAK
-      *??               ELSE
-      *??                 MOVE   WK-GENGAKU-KIN2
-      *??                              TO   WK-GENGAKU-GAK
-      *??               END-IF
-      *??               IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                                    < WK-GENGAKU-KIN2-ENTANI
-      *??                 MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-      *??                              TO   WK-GENGAKU-GAK-ENTANI
-      *??               ELSE
-      *??                 MOVE   WK-GENGAKU-KIN2-ENTANI
-      *??                              TO   WK-GENGAKU-GAK-ENTANI
-      *??               END-IF
+                      WHEN        5
+                        IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                             < WK-GENGAKU-KIN2
+                          MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                       TO   WK-GENGAKU-GAK
+                        ELSE
+                          MOVE   WK-GENGAKU-KIN2
+                                       TO   WK-GENGAKU-GAK
+                        END-IF
+                        IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                             < WK-GENGAKU-KIN2-ENTANI
+                          MOVE   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                       TO   WK-GENGAKU-GAK-ENTANI
+                        ELSE
+                          MOVE   WK-GENGAKU-KIN2-ENTANI
+                                       TO   WK-GENGAKU-GAK-ENTANI
+                        END-IF
                     END-EVALUATE
-      *??           IF  WK-GENGAKUKBN  NOT =  ZERO
-                    IF  WK-GENGAKUKBN      =  "1" OR "3" OR "4"
+                    IF  WK-GENGAKUKBN  NOT =  ZERO
                         MOVE  WK-GENGAKU-GAK
                                TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
                         MOVE  WK-GENGAKU-GAK-ENTANI

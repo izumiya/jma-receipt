@@ -985,8 +985,8 @@
            03  FLG-SIPPU-COM                           PIC 9(01).
            03  FLG-SIPPU-ARI                           PIC 9(01).
            03  FLG-CHECK-ARI                           PIC 9(01).
-           03  FLG-CHECK-ARI2                          PIC 9(01).
            03  FLG-YKZ-PRTKBN                          PIC 9(01).
+           03  FLG-GENGAKU5                            PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1634,8 +1634,7 @@
            03  WK-GENGAKU-KEISAN1              PIC  9(07).
            03  WK-GENGAKU-KEISAN2              PIC  9(07).
            03  WK-GENGAKU-KEISAN3              PIC  9(07).
-           03  WK-GENGAKU-KEISAN4              PIC  9(07).
-           03  WK-GENGAKU-KEISAN5              PIC  9(07).
+           03  WK-GENGAKU-KEISAN9              PIC  9(07).
       *
            03  WK-GENGAKU-YMD.
                05  WK-GENGAKU-YM               PIC  9(06).
@@ -3562,8 +3561,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *
            MOVE      ZERO       TO      WK-GENGAKU-KEISAN2
            MOVE      ZERO       TO      WK-GENGAKU-KEISAN3
-           MOVE      ZERO       TO      WK-GENGAKU-KEISAN4
-           MOVE      ZERO       TO      WK-GENGAKU-KEISAN5
+           MOVE      ZERO       TO      WK-GENGAKU-KEISAN9
+           MOVE      ZERO       TO      FLG-GENGAKU5
       *
            MOVE      SPACE      TO      WRK-TOKUSITU-TOKKI
            MOVE      SPACE      TO      WRK-TOKUSITU-TOKKI2
@@ -4346,21 +4345,21 @@ grpsys           PERFORM 900-DBSELECT-SEC
              ELSE
                IF  RECE02-GENGAKU < WK-GENGAKU-KEISAN3
       *          減額金額を計算
-      **>        COMPUTE WK-GENGAKU-KEISAN5  = WK-GENGAKU-KEISAN3
+      **>        COMPUTE WK-GENGAKU-KEISAN1  = WK-GENGAKU-KEISAN3
       **>                                    - RECE02-GENGAKU
-      **>        MOVE  WK-GENGAKU-KEISAN5  TO  RECE02-GENGAKU
+      **>        MOVE  WK-GENGAKU-KEISAN1  TO  RECE02-GENGAKU
       **>        IF  RECE02-GENGAKU > WK-GENGAKU-KEISAN2
       **>          MOVE  WK-GENGAKU-KEISAN2  TO  RECE02-GENGAKU
       **>        END-IF
       *
                  IF  RECE02-GENGAKU >= WK-GENGAKU-KEISAN2
-                   COMPUTE WK-GENGAKU-KEISAN5  = WK-GENGAKU-KEISAN3
+                   COMPUTE WK-GENGAKU-KEISAN1  = WK-GENGAKU-KEISAN3
                                                - RECE02-GENGAKU
                  ELSE
-                   COMPUTE WK-GENGAKU-KEISAN5  = WK-GENGAKU-KEISAN2
+                   COMPUTE WK-GENGAKU-KEISAN1  = WK-GENGAKU-KEISAN2
                                                - RECE02-GENGAKU
                  END-IF
-                 MOVE    WK-GENGAKU-KEISAN5  TO  RECE02-GENGAKU
+                 MOVE    WK-GENGAKU-KEISAN1  TO  RECE02-GENGAKU
                END-IF
              END-IF
            END-IF
@@ -6328,21 +6327,10 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
            END-PERFORM
       *
            MOVE     ZERO      TO  FLG-CHECK-ARI
-           MOVE     ZERO      TO  FLG-CHECK-ARI2
            IF   WK-GENGAKUKBN  NOT =  ZERO
               PERFORM  211711-GENGAKU-CHECK-SEC
               IF   FLG-CHECK-ARI  =  ZERO
                   MOVE  ZERO  TO  WK-GENGAKUKBN
-              ELSE
-                IF   (FLG-CHECK-ARI2  =  1     )
-                AND  (WK-GENGAKUKBN   =  2 OR 5)
-                  DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
-                  DISPLAY "公費併用の保険組み合わせ有"
-      *
-                  MOVE  ZERO  TO  WK-GENGAKUKBN
-      *
-                  DISPLAY "@WK-GENGAKUKBN=" WK-GENGAKUKBN
-                END-IF
               END-IF
            END-IF
       *
@@ -6358,6 +6346,7 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
            PERFORM  VARYING  IDX35   FROM    1   BY  1
                      UNTIL  (IDX35                   >   10 )
                       OR    (RECE02-HKNCOMBI(IDX35)  =  ZERO)
+                      OR    (FLG-CHECK-ARI           =   1  )
              IF   RECE02-DAISANFLG(IDX35)   =   1
                CONTINUE
              ELSE
@@ -6377,21 +6366,11 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                  MOVE    "key41"            TO  MCP-PATHNAME
                  PERFORM  900-SYUNOU-READ-SEC
                  PERFORM  UNTIL  (FLG-SYUNOU      =  1)
+                           OR    (FLG-CHECK-ARI   =  1)
                    IF    SYU-DENPJTIKBN    NOT =  "3"
                      IF  (WK-CHECK-TEKSTYMD <= SYU-SRYYMD       )
                      AND (SYU-SRYYMD        <= WK-CHECK-TEKEDYMD)
                         MOVE   1   TO   FLG-CHECK-ARI
-      *??
-                        IF   (SYU-SYUHKNNUM   NOT =  SPACE)
-                        AND  (SYU-KOH1HKNNUM      =  SPACE)
-                        AND  (SYU-KOH2HKNNUM      =  SPACE)
-                        AND  (SYU-KOH3HKNNUM      =  SPACE)
-                        AND  (SYU-KOH4HKNNUM      =  SPACE)
-                          CONTINUE
-                        ELSE
-                          MOVE   1   TO   FLG-CHECK-ARI2
-                        END-IF
-      *??
                      END-IF
                    END-IF
                    MOVE    "tbl_syunou"     TO  MCP-TABLE
@@ -17751,9 +17730,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           * 10
                                           * RECE02-KYURATE
                                           / 100
-      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 +  5
-      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 / 10
-      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 * 10
               ADD   WK-GENGAKU-KEISAN1  TO  WK-GENGAKU-KEISAN2
       *
               COMPUTE  WK-GENGAKU-KEISAN1 = SYU-TOTAL-HKNTEN
@@ -17764,6 +17740,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
               COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 / 10
               COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 * 10
               ADD   WK-GENGAKU-KEISAN1  TO  WK-GENGAKU-KEISAN3
+      *
+              IF   (SYU-SYUHKNNUM   NOT =  SPACE)
+              AND  (SYU-KOH1HKNNUM      =  SPACE)
+              AND  (SYU-KOH2HKNNUM      =  SPACE)
+              AND  (SYU-KOH3HKNNUM      =  SPACE)
+              AND  (SYU-KOH4HKNNUM      =  SPACE)
+                CONTINUE
+              ELSE
+                MOVE  1     TO   FLG-GENGAKU5
+              END-IF
            END-IF
       *
            IF    SYU-YKZKENNUM  NOT = ZERO
@@ -27338,7 +27324,6 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            PERFORM 900-CLOSE-SEC
       *
            MOVE     ZERO      TO  FLG-CHECK-ARI
-           MOVE     ZERO      TO  FLG-CHECK-ARI2
            IF   FLG-SAIGAI-TAISYO  =  1
               PERFORM  211711-GENGAKU-CHECK-SEC
               IF   FLG-CHECK-ARI  =  ZERO
@@ -27355,7 +27340,8 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
       *****************************************************************
        2120-GENGAKU-CYO-CHECK-SEC      SECTION.
       *
-           IF  WK-GENGAKUKBN   =   5
+           IF   (WK-GENGAKUKBN   =    5  )
+           AND  (FLG-GENGAKU5    =   ZERO)
       *
              IF      RECE02-ZAITAKU  =  "1" OR "2"
                IF      FLG-JYOGENKBN   =   1
@@ -27365,12 +27351,12 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                   ELSE
                     PERFORM  21098-SYUHKN-JYOHEN-SEC
                   END-IF
-                  MOVE   WRK-KINGAKU-GENBUTU3  TO  WK-GENGAKU-KEISAN4
+                  MOVE   WRK-KINGAKU-GENBUTU3  TO  WK-GENGAKU-KEISAN9
                END-IF
              END-IF
       *
-             IF   WK-GENGAKU-KEISAN4  NOT =  ZERO
-               IF   WK-GENGAKU-KEISAN4  <=  RECE02-GENGAKU
+             IF   WK-GENGAKU-KEISAN9  NOT =  ZERO
+               IF   WK-GENGAKU-KEISAN9  <=  RECE02-GENGAKU
                    MOVE    ZERO    TO   RECE02-GENMENKBN
                    MOVE    ZERO    TO   RECE02-GENGAKU
                    MOVE    ZERO    TO   RECE02-GENMEN-COM
@@ -27382,8 +27368,8 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                    MOVE    ZERO    TO   RECE02-GENMEN-COM
                    MOVE    ZERO    TO   WK-GENGAKUKBN
                  ELSE
-                   IF   WK-GENGAKU-KEISAN4  <  WK-GENGAKU-KEISAN3
-                     MOVE  WK-GENGAKU-KEISAN4
+                   IF   WK-GENGAKU-KEISAN9  <  WK-GENGAKU-KEISAN3
+                     MOVE  WK-GENGAKU-KEISAN9
                                    TO   WK-GENGAKU-KEISAN3
                    END-IF
                  END-IF
@@ -27397,6 +27383,22 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  END-IF
              END-IF
       *
+           END-IF
+      *
+           IF   (WK-GENGAKUKBN   =    5)
+           AND  (FLG-GENGAKU5    =    1)
+                 IF   RECE02-GENGAKU  >=  WK-GENGAKU-KEISAN3
+                   MOVE    ZERO    TO   RECE02-GENMENKBN
+                   MOVE    ZERO    TO   RECE02-GENGAKU
+                   MOVE    ZERO    TO   RECE02-GENMEN-COM
+                   MOVE    ZERO    TO   WK-GENGAKUKBN
+                 END-IF
+           END-IF
+      *
+           IF   (WK-GENGAKUKBN   =    2  OR  5)
+           AND  (FLG-GENGAKU5    =    1       )
+             DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
+             DISPLAY "公費併用の保険組み合わせ有"
            END-IF
       *
            .
