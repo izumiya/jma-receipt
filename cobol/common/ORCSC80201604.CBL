@@ -2752,7 +2752,7 @@
                                                -   1
                END-IF
       *        »»Äê³«»ÏÆüÌ¤Ëþ
-               IF     (WRK-YOUKG-YMD       >   WRK-SRYYMD)
+               IF     (WRK-YOUKG-YMD       >=  WRK-SRYYMD)
                    MOVE    "K815"              TO  SPA-ERRCD
                ELSE
                    IF     (WRK-MOKU-YM         >=   WRK-CHK-YM )
