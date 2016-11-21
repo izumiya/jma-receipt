@@ -5583,11 +5583,15 @@
                          AND  (WRK-COM-SRYKBN (IDX-Z)  =  "11"      )
                            ADD     1               TO  IDX-ZAI1
                            MOVE   IDX-Z            TO  IDX-SYU2
+      *H28.11              初診料算定とする
+                           MOVE    1               TO  LNK-ORCSC-SYOSIN2
                        END-IF
                        IF     (WRK-COM-INPUTCD(IDX-Z)  =  "099120001")
                          AND  (WRK-COM-SRYKBN (IDX-Z)  =  "12"      )
                            ADD     1               TO  IDX-ZAI2
                            MOVE   IDX-Z            TO  IDX-SYU2
+      *H28.11              ダミーも初診料算定なしとする
+                           MOVE    ZERO            TO  LNK-ORCSC-SYOSIN2
                        END-IF
                    END-IF
       *
