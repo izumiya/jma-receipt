@@ -32,6 +32,7 @@
       *  04.05.00    NACL-多々納 09/09/XX   表示コメントコード対応
       *  04.06.00    NACL-多々納 11/02/22   用法コメント対応
       *  04.07.00    NACL-多々納 12/11/02   薬剤毎のコメント対応
+      *  04.08.00    NACL-多々納 16/11/XX   用法コード数量追加
       *****************************************************************
       *
       *
@@ -60,6 +61,8 @@
            03  FLG-SYORI           PIC 9(01).
            03  FLG-YSET            PIC 9(01).
       *
+           03  FLG-INPUTCHI        PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -80,6 +83,9 @@
            03  IDX-JYU             PIC 9(04).
       *
            03  YOHO-MAX            PIC 9(04).
+      *
+           03  IDX-SST             PIC 9(04).
+           03  IDXS                PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -103,8 +109,17 @@
                    07  TBL-YCOMMENT-OCC         OCCURS   20.
                        09  TBL-YCOMMENT             PIC X(09).
                        09  TBL-YINPUTCOMENT         PIC X(80).
+      *H28.10          服用数値
+                       09  TBL-YCOM-CHK             PIC X(01).
+                       09  TBL-YCOM-SURYO-G.
+                           11  TBL-YCOM-SURYO       PIC 9(05)V9(5)
+                                                    OCCURS  5.
                05  WRK-YSRYCD              PIC X(09).
                05  WRK-YSRYCD-NAME         PIC X(80).
+      *H28.10  服用数値
+               05  WRK-YSRYCD-SURYO-G.
+                   07  WRK-YSRYCD-SURYO     PIC 9(05)V9(5)
+                                                   OCCURS  5.
                05  WRK-SRYKBN              PIC X(02).
                05  WRK-SRYSYUKBN           PIC X(03).
       *
@@ -113,12 +128,18 @@
                        09  WRK-YOHOU           PIC X(09).
                        09  WRK-YOHOU-NAME      PIC X(80).
                        09  WRK-YOHOU-KBN       PIC X(01).
+      *H28.10          服用数値
+                       09  WRK-YOHOU-SURYO-G.
+                           11  WRK-YOHOU-SURYO     PIC 9(05)V9(5)
+                                                   OCCURS  5.
       *        コメント
                05  TBL-COMMENT-G           OCCURS   20.
                    07  TBL-COMMENT             PIC X(09).
                    07  TBL-INPUTCOMENT         PIC X(80).
                    07  TBL-IDX-S               PIC 9(04).
                    07  TBL-IDXD                PIC 9(04).
+      *H28.10
+               05  TBL-CDCNT            PIC 9(04).
       *
            03  WRK-ZAITENKEI            PIC 9(07).
       *
@@ -136,6 +157,20 @@
            03  WRK-KAISU           PIC 9(05).
       *    プログラム名
            03  WRK-YAKJYO-PG       PIC X(20).
+      *H28.10
+           03  WRK-INPUTCHI-AREA.
+               05  WRK-INPUTCHI        PIC X(08)
+                                       OCCURS   5.
+           03  WRK-INPUTCHISURYO-AREA.
+               05  WRK-INPUTCHI-SURYO  PIC 9(5)V9(05)
+                                       OCCURS   5.
+           03  WRK-INPUTCHISURYO-AREA2.
+               05  WRK-INPUTCHI-SURYO2 PIC 9(5)V9(05)
+                                       OCCURS   5.
+      *
+           03  WRK-SSTKIJUNCD-AREA.
+               05  WRK-SSTKIJUNCD      PIC 9(04)
+                                       OCCURS 10.
       *
       *
       *****************************************************************
@@ -156,6 +191,8 @@
       *   日付変換サブ
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
+      *    数字変換領域
+           COPY    "CPORCSNUM.INC".
       *
       *    入院薬情報出力パラメタ
            COPY    "CPORCHCN30.INC".
@@ -206,29 +243,37 @@
       *TEST
       *    DISPLAY "ORCSHCN30-KBN:" ORCSHCN30-KBN
       *    DISPLAY "ORCHCN30-MAX:" ORCHCN30-MAX
-           PERFORM VARYING    IDX   FROM    1  BY  1
-                   UNTIL      IDX   >  ORCHCN30-MAX
-             DISPLAY "ORCHCN30-SRYCD:" ORCHCN30-SRYCD (IDX)
-                     ",ORCHCN30-ZAIKBN:" ORCHCN30-ZAIKBN (IDX)
-                     ",ORCHCN30-SURYO:" ORCHCN30-SURYO (IDX)
-                     ",ORCHCN30-YSRYCD:" ORCHCN30-YSRYCD (IDX)
-                        "," ORCHCN30-YSRYCD-NAME (IDX)
+      *    PERFORM VARYING    IDX   FROM    1  BY  1
+      *            UNTIL      IDX   >  ORCHCN30-MAX
+      *      DISPLAY "ORCHCN30-SRYCD:" ORCHCN30-SRYCD (IDX)
+      *              ",ORCHCN30-ZAIKBN:" ORCHCN30-ZAIKBN (IDX)
+      *              ",ORCHCN30-SURYO:" ORCHCN30-SURYO (IDX)
+      *              ",ORCHCN30-YSRYCD:" ORCHCN30-YSRYCD (IDX)
+      *                 "," ORCHCN30-YSRYCD-NAME (IDX)
       *              ",ORCHCN30-YOURYOU 1:" ORCHCN30-YOURYOU (IDX 1)
       *              ",2:" ORCHCN30-YOURYOU (IDX 2)
       *              ",3:" ORCHCN30-YOURYOU (IDX 3)
       *              ",4:" ORCHCN30-YOURYOU (IDX 4)
+      *              ",5:" ORCHCN30-YOURYOU (IDX 5)
       *              ",ORCHCN30-SRYKAISU:" ORCHCN30-SRYKAISU (IDX)
-             DISPLAY "ORCHCN30-YOHOU:" ORCHCN30-YOHOU (IDX 1)
-              "," ORCHCN30-YOHOU-NAME(IDX 1)
-             DISPLAY "ORCHCN30-COMMENT-CD:" ORCHCN30-COMMENT-CD (IDX 1)
-              "," ORCHCN30-COMMENT-MEI (IDX 1)
+      *     DISPLAY "ORCHCN30-INPUTSURYOU 1:" ORCHCN30-INPUTSURYOU
+      *                                             (IDX 1)
+      *           ",2:" ORCHCN30-INPUTSURYOU (IDX 2)
+      *           ",3:" ORCHCN30-INPUTSURYOU (IDX 3)
+      *           ",4:" ORCHCN30-INPUTSURYOU (IDX 4)
+      *           ",5:" ORCHCN30-INPUTSURYOU (IDX 5)
+      *      DISPLAY "ORCHCN30-YOHOU:" ORCHCN30-YOHOU (IDX 1)
+      *       "," ORCHCN30-YOHOU-NAME(IDX 1)
+      *      DISPLAY "ORCHCN30-COMMENT-CD:" ORCHCN30-COMMENT-CD (IDX 1)
+      *       "," ORCHCN30-COMMENT-MEI (IDX 1)
+      *        ",KBN:"  ORCHCN30-COMHENKBN  (IDX 1)
       *      DISPLAY "ORCHCN30-COMMENT-CD:" ORCHCN30-COMMENT-CD (IDX 2)
       *       "," ORCHCN30-COMMENT-MEI (IDX 2)
       *      DISPLAY "ORCHCN30-COMMENT-CD:" ORCHCN30-COMMENT-CD (IDX 3)
       *       "," ORCHCN30-COMMENT-MEI (IDX 3)
       *      DISPLAY "ORCHCN30-COMMENT-CD:" ORCHCN30-COMMENT-CD (IDX 4)
       *       "," ORCHCN30-COMMENT-MEI (IDX 4)
-           END-PERFORM 
+      *    END-PERFORM 
       *TEST
       *
       *    印刷処理へ
@@ -349,6 +394,8 @@
            END-IF
       *    用法編集
            IF      ORCSHCN30-SRYCD(IDT IDXA)(1:3)   =   "001"
+      *H28.10
+               ADD     1                   TO  TBL-CDCNT
                MOVE    ZERO                TO  FLG-YSET
       *        点数マスタを検索して、用法時点を判定する
                MOVE    ORCSHCN30-SRYCD(IDT IDXA)    TO  TNS-SRYCD
@@ -374,6 +421,13 @@
                                                    TO  WRK-YOHOU-NAME
                                                                (IDXY)
                        MOVE    FLG-YSET            TO  WRK-YOHOU-KBN
+                                                               (IDXY)
+      *H28.10          埋め込み数値変換
+                       MOVE    ORCSHCN30-INPUTCHI-G (IDT IDXA)
+                                                   TO  WRK-INPUTCHI-AREA
+                       PERFORM 200221-PTCOM-INPUTCHI-SEC
+                       MOVE    WRK-INPUTCHISURYO-AREA
+                                                   TO  WRK-YOHOU-SURYO-G
                                                                (IDXY)
                    END-IF
                END-IF
@@ -413,6 +467,8 @@
                                                OR  "0083"
                                                OR  "0084"
                                                OR  "0085" )
+      *H28.10
+               ADD     1                   TO  TBL-CDCNT
       *ver.4.7
                IF     (IDX-S                   >   ZERO  )
                   AND (IDXD                    <   20    )
@@ -455,11 +511,83 @@
                MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
                                                TO  TBL-YINPUTCOMENT
                                                           (IDX-S IDXD)
+      *H28.10  埋め込み数値変換
+               MOVE    ORCSHCN30-INPUTCHI-G (IDT IDXA)
+                                               TO  WRK-INPUTCHI-AREA
+               PERFORM 200221-PTCOM-INPUTCHI-SEC
+               MOVE    WRK-INPUTCHISURYO-AREA  TO  TBL-YCOM-SURYO-G
+                                                       (IDX-S IDXD)
            END-IF
       *
            .
        3001-TBLSET-EXT.
            EXIT.
+      *
+      *H28.11
+      *****************************************************************
+      *    コメントテーブル埋め込み数値変換編集処理
+      *****************************************************************
+       200221-PTCOM-INPUTCHI-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-SSTKIJUNCD-AREA
+           MOVE    1                   TO  IDXS
+      *    起床(5)を先頭へ移動する
+           PERFORM VARYING IDX-SST     FROM    1   BY  1
+                   UNTIL   IDX-SST     >   5
+               IF      IDX-SST             <   5
+                   ADD     1               TO  IDXS
+               ELSE
+                   MOVE    1               TO  IDXS
+               END-IF
+               MOVE    TNS-SSTKIJUNCD (IDX-SST)
+                                       TO  WRK-SSTKIJUNCD (IDXS)
+           END-PERFORM
+      *
+           MOVE    ZERO                TO  IDXS
+           INITIALIZE                  WRK-INPUTCHISURYO-AREA
+      *
+           PERFORM VARYING IDX-SST     FROM    1   BY  1
+                   UNTIL   IDX-SST     >   5
+              IF      WRK-SSTKIJUNCD (IDX-SST) NOT =   ZERO
+                   ADD     1                   TO  IDXS
+      *            数値変換
+                   INITIALIZE                      ORCSNUMAREA
+                   MOVE    WRK-INPUTCHI (IDXS)
+                                               TO  SNUM-INX
+                   CALL    "ORCSNUM"           USING
+                                               ORCSNUMAREA
+                   IF     (SNUM-RC         NOT =   ZERO  )   OR
+                          (SNUM-MINKBN     NOT =   SPACE ) 
+                       MOVE    ZERO            TO  WRK-INPUTCHI-SURYO
+                                                        (IDX-SST)
+                   ELSE
+                       MOVE    SNUM-OUTNUM     TO  WRK-INPUTCHI-SURYO
+                                                        (IDX-SST)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    起床を（５）へ
+           INITIALIZE                  WRK-INPUTCHISURYO-AREA2
+           MOVE    ZERO                TO  IDXS
+           PERFORM VARYING IDX-SST     FROM    1   BY  1
+                   UNTIL   IDX-SST     >   5
+               IF      IDX-SST             =   1
+                   MOVE    5               TO  IDXS
+               ELSE
+                   ADD     1               TO  IDXS
+               END-IF
+               MOVE    WRK-INPUTCHI-SURYO (IDX-SST)
+                                       TO  WRK-INPUTCHI-SURYO2 (IDXS)
+               IF      IDXS            =   5
+                   MOVE    ZERO            TO  IDXS
+               END-IF
+           END-PERFORM
+           MOVE    WRK-INPUTCHISURYO-AREA2 TO  WRK-INPUTCHISURYO-AREA
+           .
+       200221-PTCOM-INPUTCHI-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    薬情報パラメタ編集処理
       *****************************************************************
@@ -474,6 +602,9 @@
                    MOVE    WRK-YOHOU(IDXY)     TO  WRK-YSRYCD
                    MOVE    WRK-YOHOU-NAME(IDXY)
                                                TO  WRK-YSRYCD-NAME
+      *H28.11      服用数値
+                   MOVE    WRK-YOHOU-SURYO-G (IDXY)
+                                               TO  WRK-YSRYCD-SURYO-G
                    MOVE    SPACE               TO  WRK-YOHOU(IDXY)
                    MOVE    1                   TO  IDXY
                ELSE
@@ -533,6 +664,32 @@
                MOVE    WRK-YSRYCD          TO  ORCHCN30-YSRYCD(IDY)
                MOVE    WRK-YSRYCD-NAME     TO  ORCHCN30-YSRYCD-NAME(IDY)
                MOVE    WRK-KAISU           TO  ORCHCN30-KAISU (IDY)
+      *H28.10
+      *        用法コードの数量
+               MOVE    ZERO                TO  FLG-INPUTCHI
+               PERFORM VARYING     IDXC2   FROM    1   BY  1
+                       UNTIL      (IDXC2       >   10   )
+                              OR  (FLG-INPUTCHI    =   1  )
+                   IF     (TBL-YCOMMENT (IDX IDXC2)(1:3)   =   "001")
+                    AND   (TBL-YCOM-SURYO-G (IDX IDXC2)
+                                                       NOT =   ZERO)
+                        MOVE    TBL-YCOM-SURYO-G (IDX IDXC2)
+                                           TO  ORCHCN30-INPUTSURYOU-TBL
+                                                              (IDY)
+                        MOVE    1          TO  FLG-INPUTCHI
+                        MOVE    "1"        TO  TBL-YCOM-CHK (IDX IDXC2)
+                        MOVE    10         TO  IDXC2
+                   END-IF
+               END-PERFORM
+               IF     (TBL-CDCNT           =   1     )
+                 AND  (FLG-INPUTCHI        =   ZERO  )
+                 AND  (WRK-YSRYCD      NOT =   SPACE )
+      *            用法レコードが１件のみの時、数量を全部編集
+                   MOVE    WRK-YSRYCD-SURYO-G
+                                           TO  ORCHCN30-INPUTSURYOU-TBL
+                                                              (IDY)
+               END-IF
+      *
       *
                MOVE    ZERO                TO  IDXY2
                PERFORM VARYING     IDXY    FROM    1   BY  1
@@ -558,6 +715,10 @@
                                                             (IDY IDXD)
                    MOVE    TBL-YINPUTCOMENT (IDX IDXC)
                                                TO  ORCHCN30-COMMENT-MEI
+                                                            (IDY IDXD)
+      *H28.11      数量編集済み
+                   MOVE    TBL-YCOM-CHK (IDX IDXC)
+                                               TO  ORCHCN30-COMHENKBN
                                                             (IDY IDXD)
                  END-IF
                END-PERFORM

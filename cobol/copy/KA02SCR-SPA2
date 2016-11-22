@@ -51,11 +51,19 @@
                        11  SPA-WKSRY-KANZANCHI     PIC  9(05)V9(5).
                        11  SPA-WKSRY-KANZANTANINAME
                                                    PIC  X(08).
+      *H28.5
+                       11  SPA-WKSRY-GENE-NAME     PIC  X(80).
+      *
       *                用法コード用
                        11  SPA-WKSRY-KENTAICOMMENT PIC  X(01).
                        11  SPA-WKSRY-YSETKBN       PIC  9(01).
+      *H28.11          用法コード数量
+                       11  SPA-WKSRY-INPUTCHI-G.
+                           13  SPA-WKSRY-INPUTCHI  PIC  X(08)
+                                                   OCCURS   5.
       *
                        11  SPA-WKSRY-ERRKBN        PIC  9(01).
+      *
       *     帳票編集内容スパ領域
            03  SPA-KA02-PRT.
                05  SPA-PARA-ZAI-REC             OCCURS   100.
@@ -82,6 +90,10 @@
       *                    用法コード用
                            11  SPA-PARA-KENTAICOMMENT PIC  X(01).
                            11  SPA-PARA-YSETKBN       PIC  X(01).
+      *H28.11              用法コード数量
+                           11  SPA-PARA-INPUTCHI-G.
+                               13  SPA-PARA-INPUTCHI  PIC  X(08)
+                                                      OCCURS   5.
       *
                            11  SPA-PARA-ERRKBN        PIC  9(01).
       *

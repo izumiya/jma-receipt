@@ -4202,9 +4202,9 @@
                                                              (IDX1 IDX2)
       *H28.11
       *    ∆˛Œœ√Õ
-      *                    MOVE    SPA-WKSRY-INPUTCHI-G (IDX-W IDX-W2)
-      *                                    TO  ORCSCH30-INPUTCHI-AREA
-      *                                                      (IDX1 IDX2)
+                           MOVE    SPA-WKSRY-INPUTCHI-G (IDX-W IDX-W2)
+                                           TO  ORCSCH30-INPUTCHI-AREA
+                                                             (IDX1 IDX2)
                        END-IF
                    END-PERFORM
                END-IF

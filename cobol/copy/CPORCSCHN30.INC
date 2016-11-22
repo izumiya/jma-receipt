@@ -52,4 +52,8 @@
                        09  ORCSHCN30-SRYKAISU        PIC  9(03).
                        09  ORCSHCN30-ZAIKAISU        PIC  9(03).
                        09  ORCSHCN30-INPUTCOMENT     PIC  X(80).
+      *H28.11          用法コード数量
+                       09  ORCSHCN30-INPUTCHI-G.
+                           11  ORCSHCN30-INPUTCHI    PIC  X(08)
+                                                     OCCURS   5.
       *

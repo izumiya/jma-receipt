@@ -25,6 +25,7 @@
       *  01.00.01    NACL-多々納  05/11/09  処理区分 5 内容変更追加
       *  04.05.00    NACL-多々納  09/07/23  コメント追加
       *  04.05.00    NACL-多々納  09/10/XX  換算値数量追加
+      *  04.08.00    NACL-多々納  16/10/XX  用法コード数量追加
       ************************************************************
       *
        01  ORCSCH30AREA.
@@ -50,4 +51,7 @@
                        09  ORCSCH30-SRYKAISU        PIC  9(03).
                        09  ORCSCH30-ZAIKAISU        PIC  9(03).
                        09  ORCSCH30-INPUTCOMENT     PIC  X(80).
+                       09  ORCSCH30-INPUTCHI-AREA.
+                           11  ORCSCH30-INPUTCHI    PIC  X(08)
+                                                    OCCURS  5.
       *
