@@ -42,11 +42,11 @@
       *        ∞ÂŒ≈µ°¥ÿÃææŒ
                05  ORCSQRCSV62-HOSPNAME      PIC  X(120).
       *        ∞ÂŒ≈µ°¥ÿÕπ ÿ
-      *        05  ORCSQRCSV62-HOSPPOST      PIC  X(08).
+               05  ORCSQRCSV62-HOSPPOST      PIC  X(08).
       *        ∞ÂŒ≈µ°¥ÿΩªΩÍ
-      *        05  ORCSQRCSV62-HOSPADRS      PIC  X(100).
+               05  ORCSQRCSV62-HOSPADRS      PIC  X(800).
       *        ∞ÂŒ≈µ°¥ÿ≈≈œ√»÷πÊ
-      *        05  ORCSQRCSV62-HOSPTEL       PIC  X(13).
+               05  ORCSQRCSV62-HOSPTEL       PIC  X(13).
       *        ø«Œ≈≤ 
       *        05  ORCSQRCSV62-RECESRYKA     PIC  X(02).
       *        05  ORCSQRCSV62-SRYKANAME     PIC  X(40).

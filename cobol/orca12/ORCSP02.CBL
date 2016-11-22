@@ -60,6 +60,7 @@
       * 04.08.00     NACL-多々納  15/11/XX  レセプト分割５０件他対応
       * 04.08.00     NACL-多々納  16/03/XX  平成２８年４月改正対応
       * 04.08.00     NACL-多々納  16/11/XX  公費画面編集追加（P02H)対応
+      * 04.08.00     NACL-多々納  16/11/21  ＱＲコードver.2.1対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1468,7 +1469,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-GMN28-MNOTE-QRKBN-LST(1)
            MOVE    "1 出力する"
                                        TO  SPA-GMN28-MNOTE-QRKBN-LST(2)
-           MOVE    2                   TO  SPA-GMN28-QRKBN-MAX
+      *H28.11 追加
+           MOVE    "2 出力する（ＣＳＶ出力なし）"
+                                       TO  SPA-GMN28-MNOTE-QRKBN-LST(3)
+           MOVE    3                   TO  SPA-GMN28-QRKBN-MAX
       *    お薬手帳　ＣＳＶ
            MOVE    "1 Ver.1.0"
                                        TO  SPA-GMN28-MNOTE-CSV-LST(1)

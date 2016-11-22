@@ -4254,7 +4254,8 @@
       *ver.4.7
            MOVE    WRK-QRKBN           TO  ORCHCN62-QRKBN
       *    £Ã£Ó£Ö
-      *    MOVE    WRK-CSVKBN          TO  ORCHCN62-CSVKBN
+      *    ¥Ð¡¼¥¸¥ç¥ó
+           MOVE    WRK-CSVKBN          TO  ORCHCN62-CSVKBN
       *
            PERFORM 41041-ORCHC62-HENSYU-SEC
            IF      SPA-ERRCD           =   SPACE

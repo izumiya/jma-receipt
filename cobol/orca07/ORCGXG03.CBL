@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  16/11/21  ＱＲコードver.2.1対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -573,6 +574,9 @@
            EVALUATE    MNOTE-H-DATA-VERSION
            WHEN    "1"
                MOVE    "1.0"           TO  SPA-GMN-TDATA-VERSION
+                                                             (IDXL)
+           WHEN    "2"
+               MOVE    "2.1"           TO  SPA-GMN-TDATA-VERSION
                                                              (IDXL)
            END-EVALUATE
       *
@@ -2198,6 +2202,7 @@
            END-EVALUATE
       *
            MOVE    SPACE                TO  XGID1
+           INITIALIZE                       XGID1
            MOVE    SPA-XGIDCD           TO  XGID1-ID1CODE
            MOVE    WRK-XGIDMSG          TO  XGID1-ID1MSG
       *

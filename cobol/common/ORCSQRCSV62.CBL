@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-多々納  13/07/XX  電子版お薬手帳アプリ連携対応他
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
+      *  04.08.00    NACL-多々納  16/11/XX  ＱＲコードver.2.1対応
       *****************************************************************
       *
       *
@@ -83,6 +84,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-SP              PIC 9(01).
            03  FLG-SYORI           PIC 9(01).
+           03  FLG-PTINF           PIC 9(01).
       *
            03  FLG-NAI-TEN         PIC 9(01).
            03  FLG-YAKUZAI         PIC 9(01).
@@ -155,6 +157,10 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    患者マスタ
+       01  PTINF-REC.
+           COPY    "CPPTINF.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -222,9 +228,20 @@
       *
       *    ＤＢ検索処理
            PERFORM 1001-DBKENSAKU-SEC
-      *    共通情報出力
-           IF      ORCSQRCSV62-ERRCD   =   ZERO
-               PERFORM 100-HEAD-SYORI-SEC
+      *H28.11
+      *    バージョン判定
+           IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *    ver.2.1
+      *        共通情報出力
+               IF      ORCSQRCSV62-ERRCD   =   ZERO
+                   PERFORM 100-HEAD21-SYORI-SEC
+               END-IF
+           ELSE
+      *    ver.1.1
+      *        共通情報出力
+               IF      ORCSQRCSV62-ERRCD   =   ZERO
+                   PERFORM 100-HEAD-SYORI-SEC
+               END-IF
            END-IF
       *    薬剤情報出力
            IF      ORCSQRCSV62-ERRCD   =   ZERO
@@ -552,7 +569,15 @@
                MOVE    "501"               TO  TBL-QRCSV-DATA (1)
                MOVE    ORCSQRCSV62-BIKOU (IDX-B)
                                            TO  TBL-QRCSV-DATA (2)
-               MOVE    2                   TO  TBL-MAX
+      *H28.11
+               IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *            v.2.1
+                   MOVE    "1"                 TO  TBL-QRCSV-DATA (3)
+                   MOVE    3                   TO  TBL-MAX
+               ELSE
+      *           v.1.0
+                   MOVE    2                   TO  TBL-MAX
+               END-IF
                PERFORM 400-DATAOUT-SEC
            END-PERFORM
       *
@@ -702,7 +727,15 @@
       *
            MOVE    "1"                 TO  TBL-QRCSV-DATA (7)
            MOVE    SPACE               TO  TBL-QRCSV-DATA (8)
-           MOVE    8                   TO  TBL-MAX
+      *H28.11
+           IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *        v.2.1
+               MOVE    "1"                 TO  TBL-QRCSV-DATA (9)
+               MOVE    9                   TO  TBL-MAX
+           ELSE
+      *        v.1.0
+               MOVE    8                   TO  TBL-MAX
+           END-IF
            PERFORM 400-DATAOUT-SEC
            .
        20021-RP301-EXT.
@@ -718,7 +751,15 @@
            MOVE    WRK-H-RP2           TO  TBL-QRCSV-DATA (2)
            MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX2)
                                        TO  TBL-QRCSV-DATA (3)
-           MOVE    3                   TO  TBL-MAX
+      *H28.11
+           IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *        v.2.1
+               MOVE    "1"                 TO  TBL-QRCSV-DATA (4)
+               MOVE    4                   TO  TBL-MAX
+           ELSE
+      *        v.1.0
+               MOVE    3                   TO  TBL-MAX
+           END-IF
            PERFORM 400-DATAOUT-SEC
            .
        20022-RP311-EXT.
@@ -760,7 +801,15 @@
            ELSE
                MOVE    "1"                 TO  TBL-QRCSV-DATA (6)
            END-IF
-           MOVE    7                   TO  TBL-MAX
+      *H28.11
+           IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *        v.2.1
+               MOVE    "1"                 TO  TBL-QRCSV-DATA (8)
+               MOVE    8                   TO  TBL-MAX
+           ELSE
+      *        v.1.0
+               MOVE    7                   TO  TBL-MAX
+           END-IF
            PERFORM 400-DATAOUT-SEC
       *
            .
@@ -793,7 +842,15 @@
       *
            MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX3)
                                        TO  TBL-QRCSV-DATA (3)
-           MOVE    3                   TO  TBL-MAX
+      *H28.11
+           IF      ORCSQRCSV62-CSV-KBN =   "2"
+      *        v.2.1
+               MOVE    "1"                 TO  TBL-QRCSV-DATA (4)
+               MOVE    4                   TO  TBL-MAX
+           ELSE
+      *        v.1.0
+               MOVE    3                   TO  TBL-MAX
+           END-IF
            PERFORM 400-DATAOUT-SEC
            .
        20032-RP281-EXT.
@@ -832,6 +889,183 @@
            END-PERFORM
            .
        20031-SURYO-HEN-EXT.
+           EXIT.
+      *
+      *H28.11
+      *****************************************************************
+      *    共通情報出力処理(ver.2.1)
+      *****************************************************************
+       100-HEAD21-SYORI-SEC             SECTION.
+      *
+      *    患者情報
+           INITIALIZE                  PTINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF           =   1
+               INITIALIZE                  PTINF-REC
+           END-IF
+      *
+      *    バージョン情報
+           MOVE    SPACE               TO  TBL-QRCSV-AREA
+           MOVE    "JAHISTC04"         TO  TBL-QRCSV-DATA (1)
+           MOVE    "1"                 TO  TBL-QRCSV-DATA (2)
+           MOVE    2                   TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+      *
+      *    患者情報レコード
+           MOVE    SPACE               TO  TBL-QRCSV-AREA
+           MOVE    "1"                 TO  TBL-QRCSV-DATA (1)
+      *    患者氏名　拡張漢字変換
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    ORCSQRCSV62-NAME    TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           IF      KANACHK-OUT-INPUT(1:40)
+                                       =   ORCSQRCSV62-NAME
+      *        拡張漢字なし
+               MOVE    ORCSQRCSV62-NAME    TO  TBL-QRCSV-DATA (2)
+           ELSE
+      *        拡張漢字あり　カナ氏名
+               MOVE    ORCSQRCSV62-KANANAME
+                                           TO  TBL-QRCSV-DATA (2)
+           END-IF
+      *    性別
+           EVALUATE    ORCSQRCSV62-SEX
+               WHEN    "男"
+                   MOVE    "1"                 TO  TBL-QRCSV-DATA (3)
+               WHEN    "女"
+                   MOVE    "2"                 TO  TBL-QRCSV-DATA (3)
+           END-EVALUATE
+      *    患者生年月日
+           MOVE    ORCSQRCSV62-BIRTHDAY    TO  TBL-QRCSV-DATA (4)
+      *    自宅−郵便番号
+           MOVE    PTINF-HOME-POST     TO  TBL-QRCSV-DATA (5)
+      *    自宅−住所
+           STRING  PTINF-HOME-ADRS
+                   PTINF-HOME-BANTI    DELIMITED  BY  SPACE
+                                       INTO    TBL-QRCSV-DATA (6)
+           END-STRING
+      *    自宅−昼電話番号
+           IF      PTINF-HOME-TEL1     =   SPACE
+               MOVE    PTINF-HOME-TEL2     TO  TBL-QRCSV-DATA (7)
+           ELSE
+               MOVE    PTINF-HOME-TEL1     TO  TBL-QRCSV-DATA (7)
+           END-IF
+      *    緊急連絡先（連絡先−名称、昼電話番号）
+           STRING  PTINF-RENRAKU-NAME
+                   PTINF-RENRAKU-TEL1  DELIMITED  BY  SPACE
+                                       INTO    TBL-QRCSV-DATA (8)
+           END-STRING
+      *    カナ氏名
+           MOVE    ORCSQRCSV62-KANANAME    TO  TBL-QRCSV-DATA (11)
+           MOVE    11                      TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+      *    患者特記事項
+           IF     (PTINF-ALLERGY-1     =   SPACE )
+             AND  (PTINF-ALLERGY-2     =   SPACE )
+               CONTINUE
+           ELSE
+      *        アレルギーレコード
+               MOVE    SPACE                   TO  TBL-QRCSV-AREA
+               MOVE    "2"                     TO  TBL-QRCSV-DATA (1)
+               MOVE    "1"                     TO  TBL-QRCSV-DATA (2)
+               STRING  PTINF-ALLERGY-1
+                       PTINF-ALLERGY-2     DELIMITED  BY  SPACE
+                                           INTO    TBL-QRCSV-DATA (3)
+               END-STRING
+               MOVE    "1"                     TO  TBL-QRCSV-DATA (4)
+               MOVE    4                       TO  TBL-MAX
+               PERFORM 400-DATAOUT-SEC
+           END-IF
+      *
+           IF     (PTINF-TABOO-1       =   SPACE )
+             AND  (PTINF-TABOO-2       =   SPACE )
+               CONTINUE
+           ELSE
+      *        禁忌レコード
+               MOVE    SPACE                   TO  TBL-QRCSV-AREA
+               MOVE    "2"                     TO  TBL-QRCSV-DATA (1)
+               MOVE    "9"                     TO  TBL-QRCSV-DATA (2)
+               STRING  PTINF-TABOO-1
+                       PTINF-TABOO-2     DELIMITED  BY  SPACE
+                                           INTO    TBL-QRCSV-DATA (3)
+               END-STRING
+               MOVE    "1"                     TO  TBL-QRCSV-DATA (4)
+               MOVE    4                       TO  TBL-MAX
+               PERFORM 400-DATAOUT-SEC
+           END-IF
+      *
+      *    調剤年月日レコード
+           MOVE    SPACE                   TO  TBL-QRCSV-AREA
+           MOVE    "5"                     TO  TBL-QRCSV-DATA (1)
+           MOVE    ORCSQRCSV62-SRYYMD      TO  TBL-QRCSV-DATA (2)
+           MOVE    "1"                     TO  TBL-QRCSV-DATA (3)
+           MOVE    3                       TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+      *
+      *    医療機関コード
+           MOVE    SPACE                   TO  TBL-QRCSV-AREA
+           MOVE    "11"                    TO  TBL-QRCSV-DATA (1)
+           MOVE    ORCSQRCSV62-HOSPNAME    TO  TBL-QRCSV-DATA (2)
+           MOVE    ORCSQRCSV62-PREFNUM     TO  TBL-QRCSV-DATA (3)
+           MOVE    "1"                     TO  TBL-QRCSV-DATA (4)
+           MOVE    ORCSQRCSV62-HOSPCD      TO  TBL-QRCSV-DATA (5)
+           MOVE    ORCSQRCSV62-HOSPPOST    TO  TBL-QRCSV-DATA (6)
+           MOVE    ORCSQRCSV62-HOSPADRS    TO  TBL-QRCSV-DATA (7)
+           MOVE    ORCSQRCSV62-HOSPTEL     TO  TBL-QRCSV-DATA (8)
+           MOVE    "1"                     TO  TBL-QRCSV-DATA (9)
+           MOVE    9                       TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+      *
+      *    医師レコード
+           MOVE    SPACE               TO  TBL-QRCSV-AREA
+           MOVE    "15"                TO  TBL-QRCSV-DATA (1)
+      *    拡張漢字変換
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    ORCSQRCSV62-DR-NAME TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  TBL-QRCSV-DATA (2)
+           MOVE    ORCSQRCSV62-HOSPTEL TO  TBL-QRCSV-DATA (3)
+           MOVE    "1"                 TO  TBL-QRCSV-DATA (4)
+           MOVE    4                   TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+      *
+           .
+       100-HEAD21-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者マスター読み込み
+      *****************************************************************
+       900-PTINF-READ-SEC         SECTION.
+      *
+           MOVE    PTINF-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptinf"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PTINF-REC
+                   MOVE    ZERO            TO  FLG-PTINF
+               ELSE
+                   MOVE    1               TO  FLG-PTINF
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PTINF
+           END-IF
+           MOVE    "tbl_ptinf"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-PTINF-READ-EXT.
            EXIT.
       *
       *****************************************************************

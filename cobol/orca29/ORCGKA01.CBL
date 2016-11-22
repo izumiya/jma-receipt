@@ -38,6 +38,7 @@
       *  04.08.00    NACL-多々納  13/07/XX  院外投薬のみ対象対応
       *  04.07.00    NACL-多々納  13/08/01  手帳ＣＳＶ対応
       *  04.08.00    NACL-多々納  14/08/11  クライアント印刷変更
+      *  04.08.00    NACL-多々納  16/11/21  ＱＲコードver.2.1対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -216,6 +217,8 @@
       *                複数診療科・保険
                            11  SPA-NAI-GRP-DENPNUM   PIC  9(07).
                            11  SPA-NAI-GRP-RENNUM    PIC  9(01).
+      *                    地域包括診療加算あり
+                           11  SPA-NAI-RRK-CHIKI     PIC  X(01).
       *
                    07  SPA-NAI-SRYYMD          PIC X(08).
       *            画面受診履歴テーブル最大
@@ -251,6 +254,10 @@
                            11  SPA-WKSRY-KANZANCHI     PIC  9(05)V9(5).
                            11  SPA-WKSRY-KANZANTANINAME
                                                        PIC  X(08).
+      *H28.11
+                           11  SPA-WKSRY-INPUTCHI-G.
+                               13  SPA-WKSRY-INPUTCHI      PIC  X(08)
+                                                       OCCURS   5.
       *
                            11  SPA-WKSRY-ERRKBN        PIC  9(01).
       *
@@ -970,6 +977,20 @@
            PERFORM 970-PTCONF-READ-SEC
            IF      FLG-PTCONF          =   ZERO
                MOVE    PTCONF-CDATA(1:1)   TO  SPA-NAI-MNOTE-CSV
+           END-IF
+      *H28.11
+      *    ＱＲ出力設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEQR"           TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+      *        CSV出力なし
+               IF      PTCONF-CDATA(1:1)   =   "2"
+                   MOVE    SPACE           TO  SPA-NAI-MNOTE-CSV
+               END-IF
            END-IF
       *
       *    保険組合せ
@@ -1980,6 +2001,12 @@
            MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                        TO  SPA-WKSRY-INPUTCOMENT
                                                    (SPA-WKSRY-MAX IDX-W)
+      *H28.11
+      *    入力値
+           MOVE    LNK-WKSRY-INPUTCHI-G(IDX IDZ)
+                                       TO  SPA-WKSRY-INPUTCHI-G
+                                                   (SPA-WKSRY-MAX IDX-W)
+      *
            MOVE    LNK-WKSRY-SRYCD (IDX IDZ)
                                        TO  SPA-NAI-TSRYCD (IDG)
            MOVE    IDX-W               TO  SPA-NAI-TWNUM (IDG)
@@ -2294,6 +2321,7 @@
        310121-SURYO-HEN-SEC            SECTION.
       *
            MOVE    SPACE               TO  WRK-SURYO-X
+           MOVE    SPACE               TO  WRK-SURYO-J
            MOVE    WRK-SURYO-S1        TO  WRK-SURYO-Z1
       *
            MOVE    ZERO                TO  FLG-SP
@@ -4172,6 +4200,11 @@
                            MOVE    SPA-WKSRY-INPUTCOMENT (IDX-W IDX-W2)
                                            TO  ORCSCH30-INPUTCOMENT
                                                              (IDX1 IDX2)
+      *H28.11
+      *    入力値
+      *                    MOVE    SPA-WKSRY-INPUTCHI-G (IDX-W IDX-W2)
+      *                                    TO  ORCSCH30-INPUTCHI-AREA
+      *                                                      (IDX1 IDX2)
                        END-IF
                    END-PERFORM
                END-IF

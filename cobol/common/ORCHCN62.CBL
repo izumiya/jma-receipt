@@ -35,6 +35,7 @@
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.01    NACL-森脇    15/08/12  処方せん備考欄コメント表示
       *  04.08.02    NACL-森脇    15/09/14  注意事項・効能効果表示
+      *  04.08.00    NACL-多々納  16/11/XX  ＱＲコードver.2.1対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -188,6 +189,11 @@
            03  WRK-SHO-TANINAME    PIC X(20).
       *
            03  WRK-QRKBN           PIC X(01).
+      *H28.11
+      *    QR ver2.1 対応
+           03  WRK-QR-HOSPNAME     PIC X(120).
+           03  WRK-QR-HOSPPOST     PIC X(08).
+           03  WRK-QR-HOSPADRS     PIC X(800).
       *
        01  WRK-MEISAI-AREA.
            03  WRK-M-KETA              PIC 9(03).
@@ -1581,7 +1587,13 @@
            MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV62-PREFNUM
            MOVE    SYS-1001-HOSPCD     TO  ORCSQRCSV62-HOSPCD
            MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV62-HOSPSBT
-           MOVE    WRK-HOSPNAME        TO  ORCSQRCSV62-HOSPNAME
+      ***  MOVE    WRK-HOSPNAME        TO  ORCSQRCSV62-HOSPNAME
+           MOVE    WRK-QR-HOSPNAME     TO  ORCSQRCSV62-HOSPNAME
+      *H28.11
+      *    医療機関電話番号
+           MOVE    WRK-QR-HOSPPOST     TO  ORCSQRCSV62-HOSPPOST
+           MOVE    WRK-QR-HOSPADRS     TO  ORCSQRCSV62-HOSPADRS
+           MOVE    WRK-HOSPTEL         TO  ORCSQRCSV62-HOSPTEL
       *    ドクター
            MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV62-DR-KANANAME
            MOVE    SYS-1010-NAME       TO  ORCSQRCSV62-DR-NAME
@@ -1599,11 +1611,13 @@
       *    ファイル名組み立て項目
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV62-SYSTIME
       *
-           IF      ORCHCN62-CSVKBN     NOT =   SPACE
+      *H28.11 ＣＳＶ保存なし
+      *    バージョン（CSVKBN）使用の為、CVSなしの判断から外す
+      *    IF      ORCHCN62-CSVKBN     NOT =   SPACE
       *        ＣＳＶ保存ファイル名 
-               PERFORM 50034-QRCSVFILE-SEC
-               MOVE    WRK-CSV-FILE        TO  ORCSQRCSV62-CSV-FILENAME
-           END-IF
+      *        PERFORM 50034-QRCSVFILE-SEC
+      *        MOVE    WRK-CSV-FILE        TO  ORCSQRCSV62-CSV-FILENAME
+      **** END-IF
       *ver.4.7
            MOVE    ORCHCN62-CSVKBN     TO  ORCSQRCSV62-CSV-KBN
            MOVE    WRK-QRKBN           TO  ORCSQRCSV62-QR-KBN
@@ -2024,6 +2038,8 @@
            END-IF
       *
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+      *QR
+           MOVE    SYS-1001-HOSPNAME   TO  WRK-QR-HOSPNAME
       *
            .
        900-1001-READ-EXT.
@@ -2043,6 +2059,9 @@
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC        TO  SYS-1002-REC
+      *QR
+               MOVE    SYS-1002-POST       TO  WRK-QR-HOSPPOST
+               MOVE    SYS-1002-ADRS       TO  WRK-QR-HOSPADRS
            ELSE
                INITIALIZE                  SYS-1002-REC
            END-IF
@@ -2069,6 +2088,14 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1  TO  WRK-HOSPNAME
+      *QR
+               MOVE    SPACE           TO  WRK-QR-HOSPADRS
+               STRING  SYS-1901-HOSPNAME1
+                       SYS-1901-HOSPNAME2
+                       SYS-1901-HOSPNAME3
+                                       DELIMITED  BY  SPACE
+                                       INTO   WRK-QR-HOSPNAME
+               END-STRING
            ELSE
                INITIALIZE                  SYS-1901-REC
            END-IF
@@ -2093,6 +2120,23 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC        TO  SYS-1902-REC
                MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
+      *QR
+               IF      SYS-1902-POST   NOT =   SPACE
+                   MOVE    SYS-1902-POST   TO  WRK-QR-HOSPPOST
+               END-IF
+               IF    ( SYS-1902-ADRS1      =   SPACE )
+                 AND ( SYS-1902-ADRS2      =   SPACE )
+                 AND ( SYS-1902-ADRS3      =   SPACE )
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-QR-HOSPADRS
+                   STRING  SYS-1902-ADRS1
+                           SYS-1902-ADRS2
+                           SYS-1902-ADRS3
+                                       DELIMITED  BY  SPACE
+                                       INTO   WRK-QR-HOSPADRS
+                   END-STRING
+               END-IF
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF

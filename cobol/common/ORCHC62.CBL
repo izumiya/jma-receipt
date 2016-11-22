@@ -37,6 +37,7 @@
       *  04.08.01    NACL-森脇    15/08/12  処方せん備考欄コメント表示
       *  04.08.02    NACL-森脇    15/09/14  注意事項・効能効果表示
       *  04.08.00    NACL-多々納  16/07/XX  API(GINBEE)対応
+      *  04.08.00    NACL-多々納  16/11/XX  ＱＲコードver.2.1対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -185,6 +186,11 @@
            03  WRK-SHO-TANINAME    PIC X(20).
       *
            03  WRK-QRKBN           PIC X(01).
+      *H28.11
+      *    QR ver2.1 対応
+           03  WRK-QR-HOSPNAME     PIC X(120).
+           03  WRK-QR-HOSPPOST     PIC X(08).
+           03  WRK-QR-HOSPADRS     PIC X(800).
       *
       *H28.4
       *API
@@ -291,9 +297,11 @@
       ***  03  PARA-CSVDIR             PIC X(256).
       *H28.6
            03  PARA-API-DATA           PIC X(01).
+           03  PARA-API-CUSTOM-ID      PIC X(30).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
+           03  WRK-PARA2               PIC X(50).
       *
       *H28.6
       * API対応
@@ -477,6 +485,11 @@
                MOVE    WRK-PARA(1:1)   TO  PARA-API-DATA
            END-IF
       *
+      *    ＡＰＩカスタムＩＤ
+           MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA2           TO  PARA-API-CUSTOM-ID
+      *
       *****CSVファイル作成
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
@@ -517,6 +530,11 @@
                IF      ORCHC62-QRKBN       =   "1"
                    MOVE    "1"             TO  WRK-QRKBN
                END-IF
+      *H28.11
+      *        CSVなし
+               IF      ORCHC62-QRKBN       =   "2"
+                   MOVE    "2"             TO  WRK-QRKBN
+               END-IF
            END-IF
       *H28.6
       *    ginbee対応
@@ -548,6 +566,8 @@
       *        半角で１文字目を値とする
                MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
            END-IF
+      *    全桁
+           MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA2
       *
            .
        1001-OPTION-CALL-EXT.
@@ -596,7 +616,8 @@
       *
       *H24.9
       *    ＱＲ印刷
-           IF     (WRK-QRKBN           =   "1"  )
+           IF     (WRK-QRKBN           =   "1"
+                                       OR  "2"  )
               OR  (ORCHC62-CSVKBN  NOT =   SPACE )
                PERFORM 500-QR-SYORI-SEC
            END-IF
@@ -1531,7 +1552,13 @@
            MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV62-PREFNUM
            MOVE    SYS-1001-HOSPCD     TO  ORCSQRCSV62-HOSPCD
            MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV62-HOSPSBT
-           MOVE    WRK-HOSPNAME        TO  ORCSQRCSV62-HOSPNAME
+      ***  MOVE    WRK-HOSPNAME        TO  ORCSQRCSV62-HOSPNAME
+           MOVE    WRK-QR-HOSPNAME     TO  ORCSQRCSV62-HOSPNAME
+      *H28.11
+      *    医療機関電話番号
+           MOVE    WRK-QR-HOSPPOST     TO  ORCSQRCSV62-HOSPPOST
+           MOVE    WRK-QR-HOSPADRS     TO  ORCSQRCSV62-HOSPADRS
+           MOVE    WRK-HOSPTEL         TO  ORCSQRCSV62-HOSPTEL
       *    ドクター
            MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV62-DR-KANANAME
            MOVE    SYS-1010-NAME       TO  ORCSQRCSV62-DR-NAME
@@ -1550,6 +1577,8 @@
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV62-SYSTIME
       *
            IF      ORCHC62-CSVKBN  NOT =   SPACE
+      *H28.11      CSVなし
+              AND (WRK-QRKBN       NOT =   "2"   )
       *        ＣＳＶ保存ファイル名 
                PERFORM 50034-QRCSVFILE-SEC
                MOVE    WRK-CSV-FILE        TO  ORCSQRCSV62-CSV-FILENAME
@@ -1557,6 +1586,10 @@
       *
            MOVE    ORCHC62-CSVKBN      TO  ORCSQRCSV62-CSV-KBN
            MOVE    WRK-QRKBN           TO  ORCSQRCSV62-QR-KBN
+      *H28.11
+           IF      WRK-QRKBN           =   "2"
+               MOVE    "1"             TO  ORCSQRCSV62-QR-KBN
+           END-IF
            MOVE    ORCHC62-CNT         TO  ORCSQRCSV62-CNT
            MOVE    ORCHC62-PGKBN       TO  ORCSQRCSV62-PGKBN
       *
@@ -1567,7 +1600,8 @@
       *    ＱＲイメージ印刷
            IF     (ORCSQRCSV62-RET-COUNT   >   ZERO)
              AND  (ORCSQRCSV62-RET-COUNT   <=  12  )
-             AND  (WRK-QRKBN               =   "1"  )
+             AND  (WRK-QRKBN               =   "1"
+                                           OR  "2" )
              AND  (ORCHC62-PRTKBN          =   SPACE)
       *!API
              AND  (PARA-API-DATA           =   "0"  )
@@ -1805,9 +1839,12 @@
       *
       *    項目編集
            PERFORM 6001-API-HENSYU-SEC
+      *    カスタムＩＤ
+      *****MOVE    PARA-API-CUSTOM-ID  TO  RPMNOTE-CUSTOM-ID
       *
            INITIALIZE                      RPMAIN-AREA
            MOVE    "okusuri_techo"     TO  RPMAIN-ID
+      **** MOVE    PARA-API-CUSTOM-ID  TO  RPMAIN-CUSTOM-ID
            MOVE    "お薬手帳"          TO  RPMAIN-TITLE
            MOVE    "rp_medication_note"
                                        TO  MCP-TABLE
@@ -2139,6 +2176,8 @@
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
       *API
            MOVE    SYS-1001-HOSPNAME   TO  WRK-AP-HOSPNAME
+      *QR
+           MOVE    SYS-1001-HOSPNAME   TO  WRK-QR-HOSPNAME
       *
            .
        900-1001-READ-EXT.
@@ -2168,7 +2207,9 @@
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
       *API
            MOVE    SYS-1002-ADRS       TO  WRK-AP-HOSPADRS
-      *
+      *QR
+           MOVE    SYS-1002-POST       TO  WRK-QR-HOSPPOST
+           MOVE    SYS-1002-ADRS       TO  WRK-QR-HOSPADRS
            .
        900-1002-READ-EXT.
            EXIT.
@@ -2279,6 +2320,14 @@
                MOVE    SYS-1901-HOSPNAME1  TO  WRK-AP-HOSPNAME
                MOVE    SYS-1901-HOSPNAME2  TO  WRK-AP-HOSPNAME2
                MOVE    SYS-1901-HOSPNAME3  TO  WRK-AP-HOSPNAME3
+      *QR
+               MOVE    SPACE           TO  WRK-QR-HOSPADRS
+               STRING  SYS-1901-HOSPNAME1
+                       SYS-1901-HOSPNAME2
+                       SYS-1901-HOSPNAME3
+                                       DELIMITED  BY  SPACE
+                                       INTO   WRK-QR-HOSPNAME
+               END-STRING
            ELSE
                INITIALIZE                  SYS-1901-REC
            END-IF
@@ -2311,6 +2360,23 @@
                MOVE    SYS-1902-ADRS1  TO  WRK-AP-HOSPADRS
                MOVE    SYS-1902-ADRS2  TO  WRK-AP-HOSPADRS2
                MOVE    SYS-1902-ADRS3  TO  WRK-AP-HOSPADRS3
+      *QR
+               IF      SYS-1902-POST   NOT =   SPACE
+                   MOVE    SYS-1902-POST   TO  WRK-QR-HOSPPOST
+               END-IF
+               IF    ( SYS-1902-ADRS1      =   SPACE )
+                 AND ( SYS-1902-ADRS2      =   SPACE )
+                 AND ( SYS-1902-ADRS3      =   SPACE )
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-QR-HOSPADRS
+                   STRING  SYS-1902-ADRS1
+                           SYS-1902-ADRS2
+                           SYS-1902-ADRS3
+                                       DELIMITED  BY  SPACE
+                                       INTO   WRK-QR-HOSPADRS
+                   END-STRING
+               END-IF
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF
