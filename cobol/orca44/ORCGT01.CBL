@@ -1327,30 +1327,35 @@ grpsys                                         SPA-AREA
                                            WRK-1001-TSTYUKYMD (IDX)(7:2)
                END-IF
       *
-               PERFORM VARYING IDXX FROM    1   BY  1
-                       UNTIL   IDXX >       10
-                   IF      SPA-NAI-1001-THOSPCD (IDXX)
-                                           =   ZERO
-                       MOVE    WRK-1001-TSTYUKYMD (IDX)
+               IF    ( WRK-1001-TSTYUKYMD (IDX)
+                                       >   WRK-1001-TEDYUKYMD (IDX) )
+                   CONTINUE
+               ELSE
+                   PERFORM VARYING IDXX FROM    1   BY  1
+                           UNTIL   IDXX >       10
+                       IF      SPA-NAI-1001-THOSPCD (IDXX)
+                                               =   ZERO
+                           MOVE    WRK-1001-TSTYUKYMD (IDX)
                                            TO  SPA-NAI-1001-TSTYUKYMD
                                                                (IDXX)
-                       MOVE    WRK-1001-TEDYUKYMD (IDX)
+                           MOVE    WRK-1001-TEDYUKYMD (IDX)
                                            TO  SPA-NAI-1001-TEDYUKYMD
                                                                (IDXX)
-                       MOVE    WRK-1001-THOSPCD   (IDX)
+                           MOVE    WRK-1001-THOSPCD   (IDX)
                                            TO  SPA-NAI-1001-THOSPCD
                                                                (IDXX)
-                       MOVE    IDXX        TO  SPA-NAI-1001-MAX
-                   END-IF
-                   IF    ( WRK-1001-TSTYUKYMD (IDX)
+                           MOVE    IDXX        TO  SPA-NAI-1001-MAX
+                       END-IF
+                       IF    ( WRK-1001-TSTYUKYMD (IDX)
                                            =   SPA-NAI-1001-TSTYUKYMD
                                                                (IDXX) )
-                   AND   ( WRK-1001-TEDYUKYMD (IDX)
+                       AND   ( WRK-1001-TEDYUKYMD (IDX)
                                            =   SPA-NAI-1001-TEDYUKYMD
                                                                (IDXX) )
-                       MOVE    10          TO  IDXX
-                   END-IF
-               END-PERFORM
+                           MOVE    10          TO  IDXX
+                       END-IF
+                   END-PERFORM
+               END-IF
       *
                IF      WRK-STYUKYMD    NOT =   SPACE
                    PERFORM VARYING IDXX FROM    1   BY  1
