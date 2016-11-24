@@ -32,6 +32,7 @@
       *  04.06.00    NACL-多々納   11/02/28  用法コメント対応
       *  04.08.00    NACL-多々納   14/07/30  一時ディレクトリ対応
       *  04.08.01    NACL-森脇     14/08/11  画像イメージ作成機能追加
+      *  04.08.03    NACL-森脇     16/11/24  服用方法コード対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -858,6 +859,10 @@
                MOVE    TNS-NAME        TO  WRK-HENSYUDATA
                PERFORM 250-HENSYU-SYORI-SEC
            ELSE
+      *----(04.08.03)--ADD-START---
+               MOVE    ORCHCN30-YSRYCD(CNT-PARA)   TO  WRK-SRYCD
+               PERFORM 900-TENSU-READ-SEC
+      *----(04.08.03)--ADD-END-----
                MOVE    ORCHCN30-YSRYCD-NAME(CNT-PARA)
                                        TO  WRK-HENSYUDATA
                PERFORM 250-HENSYU-SYORI-SEC
@@ -1210,6 +1215,12 @@
                    UNTIL  (IDX-KBN2    >   10 )
                    OR     (ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN2)
                                        =   SPACE )
+      *----(04.08.03)--ADD-START---
+               IF    ( WRK-HENKBN-G    NOT =   SPACE ) AND
+                     ( ORCHCN30-COMHENKBN(CNT-PARA IDX-KBN2) =   "1" )
+                   COMPUTE IDX-KBN2    =   IDX-KBN2    +   1
+               END-IF
+      *----(04.08.03)--ADD-END-----
       *      コメント表示あり、または、用法コメント
            IF     (PARA-COMMENT        =   "1"   )
             OR    (ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN2)(1:3)
@@ -1288,6 +1299,17 @@
                    END-IF
                END-IF
            END-PERFORM
+      *----(04.08.03)--ADD-START---
+      *    エラー、 数量なくなれば処理抜ける
+           IF    ( FLG-KBN  =   1 ) OR
+                (( WRK-KAISU   NOT =   ZERO )  AND
+                 ( WRK-SURYO       =   ZERO ))
+               MOVE    ZERO            TO  WRK-HENKBN-G
+               GO  TO  240-KBN-SET-EXT
+           END-IF
+      *    帳票区分データ服用用法コード編集処理
+           PERFORM 241-KBN-INPUTSURYOU-SET-SEC
+      *----(04.08.03)--ADD-END-----
       *    エラーなら処理抜ける
            IF      FLG-KBN  =   1
                MOVE    ZERO            TO  WRK-HENKBN-G
@@ -1389,7 +1411,46 @@
            .
        240-KBN-SET-EXT.
            EXIT.
+      *----(04.08.03)--ADD-START---
+      *****************************************************************
+      *    帳票区分データ服用用法コード編集処理
+      *****************************************************************
+       241-KBN-INPUTSURYOU-SET-SEC SECTION.
       *
+           IF      WRK-HENKBN-G    NOT =   ZERO
+               GO  TO  241-KBN-INPUTSURYOU-SET-EXT
+           END-IF
+      *
+           MOVE    ZERO            TO  FLG-KBN
+           PERFORM VARYING IDX-KBN     FROM    1   BY  1
+                   UNTIL ( IDX-KBN     >   5 )
+                   OR    ( FLG-KBN     =   1 )
+      *        服用方法コードがあった場合
+               IF      ORCHCN30-INPUTSURYOU(CNT-PARA IDX-KBN)  >   ZERO
+      *            指定してない服用時点ならエラー
+                   IF    WRK-SSTKIJUNCD(IDX-KBN:1)     NOT  =   "1"
+                       MOVE    1               TO  FLG-KBN
+                   ELSE
+      *                服用方法コードの方が多い場合エラー
+                       IF      WRK-SURYO       <
+                               ORCHCN30-INPUTSURYOU(CNT-PARA IDX-KBN)
+                           MOVE    1               TO  FLG-KBN
+                       ELSE
+                           MOVE
+                               ORCHCN30-INPUTSURYOU(CNT-PARA IDX-KBN)
+                                               TO  WRK-HENKBN(IDX-KBN)
+      *                    服用方法コード使用分は計算にいれない
+                           COMPUTE WRK-SURYO   =   WRK-SURYO
+                           -   ORCHCN30-INPUTSURYOU(CNT-PARA IDX-KBN)
+                           COMPUTE WRK-KAISU   =   WRK-KAISU   -   1
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       241-KBN-INPUTSURYOU-SET-EXT.
+           EXIT.
+      *----(04.08.03)--ADD-END-----
       *****************************************************************
       *   帳票区分データ用量コード編集処理
       *****************************************************************
