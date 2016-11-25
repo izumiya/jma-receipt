@@ -19,6 +19,6 @@ xml_medicalv3req4 {
 #---     œ¢»÷
 		Sequential_Number		varchar(1);
 #--
-		Selectl_Answer		varchar(02);
+		Select_Answer		varchar(02);
 	};
 };
