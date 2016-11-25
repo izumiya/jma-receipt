@@ -1208,7 +1208,8 @@
                    OR     (ORCHC30-COMMENT-CD(CNT-PARA IDX-KBN2)
                                        =   SPACE )
       *----(04.08.03)--ADD-START---
-               IF    ( WRK-HENKBN-G    NOT =   SPACE ) AND
+               IF    ( WRK-HENKBN-G    NOT =   ZERO ) AND
+                     ( FLG-KBN         NOT =   2 ) AND
                      ( ORCHC30-COMHENKBN(CNT-PARA IDX-KBN2) =   "1" )
                    COMPUTE IDX-KBN2    =   IDX-KBN2    +   1
                END-IF
@@ -1358,6 +1359,7 @@
                                                +   1
                        MOVE    "£±"        TO  WRK-YKJ-KBN(IDX-KBN)
                        MOVE    "Êñ"        TO  WRK-TANINAME
+                       MOVE    2           TO  FLG-KBN
                    ELSE
                        IF      WRK-HENSURYO(4:)    NOT =   SPACE
                            MOVE    1               TO  FLG-KBN
