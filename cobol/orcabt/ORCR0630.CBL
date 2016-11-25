@@ -130,6 +130,7 @@
       *  04.08.04    NACL-門脇    16/03/15  生保まとめ分点欄記載修正
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.06    NACL-門脇    16/08/23  持参薬対応
+      *  04.08.07    NACL-門脇    16/11/12  徳島県地方公費対応
       *****************************************************************
       *
       *
@@ -4772,7 +4773,8 @@
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
       ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-                       MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+      ***              MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "10"
       ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)

@@ -14533,7 +14533,8 @@
                    MOVE    "4"     TO  WRK-CMB-ITM2
                WHEN    CONST-TOKUSHIMA
       *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
-                   MOVE    SPA-GMN-SYUKEIKBNLST (5)
+      *            MOVE    SPA-GMN-SYUKEIKBNLST (5)
+                   MOVE    SPA-GMN-SYUKEIKBNLST (4)
                                    TO  WRK-CMB-ITM
                    MOVE    "0"     TO  WRK-CMB-ITM2
                WHEN    OTHER

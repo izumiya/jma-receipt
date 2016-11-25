@@ -34676,6 +34676,7 @@
              COMPUTE  LNK-SYU-SKYMONEY  =
                       LNK-SYU-SKYMONEY  *   10
              ADD     WK-OITA-CYOFTN-KON  TO  LNK-SYU-SKYMONEY
+                                             WK-KNJFTNKIN
                                              WK-KNJFTNKIN-ENTANI
              MOVE    1                   TO  FLG-KOUGAKUCYO-OITA
            END-IF

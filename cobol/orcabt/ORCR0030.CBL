@@ -756,6 +756,7 @@
       *  04.08.34    NACL-ÌçÏÆ    16/11/07  £±£µ±ß°Ê²¼ÌôºÞ¤ÎÄó½ÐÍÑ¥ì¥»¥×¥Èµ­ºÜ
       *                                     ¡Êµ­Ï¿¡ËÂÐ±þ½¤Àµ
       *  04.08.35    NACL-ÌçÏÆ    16/11/11  ¸º³Û¡Ê±ßÄ¶¡Ë¤ÎÂÐ±þ
+      *  04.08.36    NACL-ÌçÏÆ    16/11/12  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5253,7 +5254,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
       ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
-                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "10"
       ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
@@ -26579,6 +26581,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF  (SYS-1001-PREFNUM          =   01  )
                   AND (RECE02-KOHNUM(KOHFTN-IDX) =  "183")
                     MOVE "1" TO  RECE02-EKF-TOTALTENFLG(KOHFTN-IDX + 1)
+                  END-IF
+                END-IF
+      *
+                IF    RECE02-SRYYM        >=  "201610"
+                  IF  (SYS-1001-PREFNUM          =   36  )
+                  AND (RECE02-KOHNUM(KOHFTN-IDX) =  "149")
+                    IF  RECE02-TOTALTEN(KOHFTN-IDX + 1) = ZERO
+                      MOVE SPACE TO RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                    END-IF
                   END-IF
                 END-IF
       *
