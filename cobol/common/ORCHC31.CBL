@@ -1292,24 +1292,26 @@
       *    エラー、 数量なくなれば処理抜ける
            IF    ( FLG-KBN  =   1 ) OR
                 (( WRK-KAISU   NOT =   ZERO )  AND
-                 ( WRK-SURYO       =   ZERO ))
+                 ( WRK-SURYO       =   ZERO )) OR
+                (( WRK-KAISU       =   ZERO )  AND
+                 ( WRK-SURYO   NOT =   ZERO ))
                MOVE    ZERO            TO  WRK-HENKBN-G
                GO  TO  240-KBN-SET-EXT
            END-IF
       *    帳票区分データ服用用法コード編集処理
            PERFORM 241-KBN-INPUTSURYOU-SET-SEC
       *----(04.08.03)--ADD-END-----
-      *    エラーなら処理抜ける
-           IF      FLG-KBN  =   1
+      *----(04.08.03)--UPD-START---
+      *    エラー、 数量なくなれば処理抜ける
+           IF    ( FLG-KBN  =   1 ) OR
+                (( WRK-KAISU   NOT =   ZERO )  AND
+                 ( WRK-SURYO       =   ZERO )) OR
+                (( WRK-KAISU       =   ZERO )  AND
+                 ( WRK-SURYO   NOT =   ZERO ))
                MOVE    ZERO            TO  WRK-HENKBN-G
                GO  TO  240-KBN-SET-EXT
            END-IF
-      *    数量なくなれば処理抜ける
-           IF    ( WRK-KAISU   NOT =   ZERO )  AND
-                 ( WRK-SURYO       =   ZERO )
-               MOVE    ZERO            TO  WRK-HENKBN-G
-               GO  TO  240-KBN-SET-EXT
-           END-IF
+      *----(04.08.03)--UPD-END-----
       *
       *    入力分をセット
            COMPUTE WRK-SURYO   =   WRK-SURYO   /   WRK-KAISU
