@@ -1221,7 +1221,7 @@
        20013-HENKIN-CHK-SEC         SECTION.
       *
            IF      MDCREQ-RE-MONEY     =   SPACE
-               MOVE    ZERO            TO  WRK-NYUKIN-OK
+               MOVE    ZERO            TO  WRK-HENKIN-OK
            ELSE
                INITIALIZE                      ORCSNUMAREA
                MOVE    MDCREQ-RE-MONEY     TO  SNUM-INX
