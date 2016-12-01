@@ -431,6 +431,7 @@
       *                                     ＋マル長の負担金計算対応
       *  04.08.09    NACL-門脇    16/10/18  設定額を助成する負担金計算修正
       *  04.08.10    NACL-門脇    16/11/11  減額（円超）の対応
+      *  04.08.11    NACL-門脇    16/11/12  徳島県地方公費対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1068,6 +1069,8 @@
       *
            03  WK-SYUNOU-GENBUTU70-FTNRATE
                                        PIC 9(03).
+      *
+           03  WK-TAIHI-COMPFTN-149    PIC 9(07).
       *
       *    公費の患者負担上限金額の退避用エリア
        01  HOKEN-MAX-AREA.
@@ -32936,7 +32939,7 @@
                END-IF
            END-IF
       *
-           IF    WK-CYOKI-ZAN-ENTANI  <=  WK-KNJFTNKIN-ENTANI
+           IF    WK-CYOKI-ZAN-ENTANI  <  WK-KNJFTNKIN-ENTANI
                MOVE   WK-CYOKI-ZAN-ENTANI   TO   WK-KNJFTNKIN-ENTANI
            END-IF
       *
@@ -33136,7 +33139,7 @@
                END-IF
            END-IF
       *
-           IF    WK-CYOKI-ZAN  <=  WK-KNJFTNKIN
+           IF    WK-CYOKI-ZAN  <  WK-KNJFTNKIN
                MOVE     ZERO            TO     FLG-HIKAKU
                MOVE     ZERO            TO     FLG-HIKAKU2
                MOVE     ZERO            TO     FLG-HIKAKU3
@@ -33593,7 +33596,7 @@
              END-IF
            END-IF
       *
-           IF   WK-CYOKI-ZAN-ENTANI  <=  WK-KNJFTNKIN-ENTANI
+           IF   WK-CYOKI-ZAN-ENTANI  <  WK-KNJFTNKIN-ENTANI
                MOVE   WK-CYOKI-ZAN-ENTANI TO  WK-KNJFTNKIN-ENTANI
            END-IF
       *
@@ -33749,7 +33752,7 @@
              END-IF
            END-IF
       *
-           IF    WK-CYOKI-ZAN  <=  WK-KNJFTNKIN
+           IF    WK-CYOKI-ZAN  <  WK-KNJFTNKIN
                MOVE     ZERO            TO     FLG-HIKAKU2
                MOVE     ZERO            TO     FLG-HIKAKU3
                MOVE     WK-CYOKI-ZAN    TO     WK-KNJFTNKIN
@@ -34356,6 +34359,114 @@
              MOVE  9999999                TO  LNK-SYU-JYO-HKNFTNMONEY
              MOVE  WK-JYOSEI-KOHIKIN3     TO  LNK-SYU-JYO-COMPFTN
              MOVE  WK-JYOSEI-KOHIKIN2     TO  LNK-SYU-JYO-COMPFTN-ENTANI
+      *
+           END-IF
+      *
+      ***
+      *
+           IF  (WK-1001-PREFNUM       =  36                    )
+           AND (COMB-HKNNUM       NOT = SPACE                  )
+           AND (COMB-KOH1HKNNUM(1:1)  = "0"                    )
+           AND (COMB-KOH1HKNNUM   NOT = "010"                  )
+           AND (COMB-KOH2HKNNUM       = "149"                  )
+           AND (COMB-KOH3HKNNUM       = SPACE OR "972" OR "974")
+           AND (COMB-KOH4HKNNUM       = SPACE                  )
+           AND (LNK-SYU-SRYYMD(1:6)  >= "201610"               )
+      *
+             MOVE    ZERO    TO   FLG-HIKAKU
+             MOVE    ZERO    TO   FLG-HIKAKU2
+             MOVE    ZERO    TO   FLG-HIKAKU3
+             MOVE    ZERO    TO   FLG-HIKAKU4
+             MOVE    ZERO    TO   WK-TAIHI-COMPFTN-149
+      *
+      *      請求額に加算
+             IF   COMB-KOH3HKNNUM  = "972" OR "974"
+               IF    LNK-SYU-SYUCOMPFTN-ENTANI  <
+                                           LNK-SYU-KOH1COMPFTN-ENTANI
+                 IF  WK-CYOKI-ZAN-ENTANI  <  LNK-SYU-SYUCOMPFTN-ENTANI
+                   ADD  WK-CYOKI-ZAN-ENTANI  TO  WK-KNJFTNKIN-ENTANI
+                   MOVE WK-CYOKI-ZAN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+                 ELSE
+                   ADD  LNK-SYU-SYUCOMPFTN-ENTANI
+                                             TO  WK-KNJFTNKIN-ENTANI
+                   MOVE LNK-SYU-SYUCOMPFTN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+                 END-IF
+               ELSE
+                 IF  WK-CYOKI-ZAN-ENTANI  <  LNK-SYU-KOH1COMPFTN-ENTANI
+                   ADD  WK-CYOKI-ZAN-ENTANI  TO  WK-KNJFTNKIN-ENTANI
+                   MOVE WK-CYOKI-ZAN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+                 ELSE
+                   ADD  LNK-SYU-KOH1COMPFTN-ENTANI
+                                             TO  WK-KNJFTNKIN-ENTANI
+                   MOVE LNK-SYU-KOH1COMPFTN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+                 END-IF
+               END-IF
+               IF    LNK-SYU-SYUCOMPFTN  <  LNK-SYU-KOH1COMPFTN
+                 IF  WK-CYOKI-ZAN  <  LNK-SYU-SYUCOMPFTN
+                   ADD  WK-CYOKI-ZAN         TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE WK-CYOKI-ZAN         TO  LNK-SYU-JYO-COMPFTN
+                 ELSE
+                   ADD  LNK-SYU-SYUCOMPFTN   TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE LNK-SYU-SYUCOMPFTN   TO  LNK-SYU-JYO-COMPFTN
+                 END-IF
+               ELSE
+                 IF  WK-CYOKI-ZAN  <  LNK-SYU-KOH1COMPFTN
+                   ADD  WK-CYOKI-ZAN         TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE WK-CYOKI-ZAN         TO  LNK-SYU-JYO-COMPFTN
+                 ELSE
+                   ADD  LNK-SYU-KOH1COMPFTN  TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE LNK-SYU-KOH1COMPFTN  TO  LNK-SYU-JYO-COMPFTN
+                 END-IF
+               END-IF
+      *
+               MOVE    1                     TO  FLG-HIKAKU
+               MOVE  LNK-SYU-KOH1COMPFTN     TO  WK-TAIHI-COMPFTN-149
+               IF  LNK-SYU-SYUCOMPFTN  <  WK-TAIHI-COMPFTN-149
+                   MOVE   ZERO               TO  FLG-HIKAKU
+                   MOVE   LNK-SYU-SYUCOMPFTN TO  WK-TAIHI-COMPFTN-149
+               END-IF
+               IF  WK-CYOKI-ZAN  <  WK-TAIHI-COMPFTN-149
+                   MOVE   ZERO               TO  FLG-HIKAKU
+                   MOVE   WK-CYOKI-ZAN       TO  WK-TAIHI-COMPFTN-149
+               END-IF
+             ELSE
+               IF    LNK-SYU-SYUCOMPFTN-ENTANI  <
+                                           LNK-SYU-KOH1COMPFTN-ENTANI
+                   ADD  LNK-SYU-SYUCOMPFTN-ENTANI
+                                             TO  WK-KNJFTNKIN-ENTANI
+                   MOVE LNK-SYU-SYUCOMPFTN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+               ELSE
+                   ADD  LNK-SYU-KOH1COMPFTN-ENTANI
+                                             TO  WK-KNJFTNKIN-ENTANI
+                   MOVE LNK-SYU-KOH1COMPFTN-ENTANI
+                                      TO  LNK-SYU-JYO-COMPFTN-ENTANI
+               END-IF
+               IF    LNK-SYU-SYUCOMPFTN  <  LNK-SYU-KOH1COMPFTN
+                   ADD  LNK-SYU-SYUCOMPFTN   TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE LNK-SYU-SYUCOMPFTN   TO  LNK-SYU-JYO-COMPFTN
+               ELSE
+                   ADD  LNK-SYU-KOH1COMPFTN  TO  WK-KNJFTNKIN
+                                                 LNK-SYU-SKYMONEY
+                   MOVE LNK-SYU-KOH1COMPFTN  TO  LNK-SYU-JYO-COMPFTN
+               END-IF
+      *
+               MOVE    1                     TO  FLG-HIKAKU
+               MOVE  LNK-SYU-KOH1COMPFTN     TO  WK-TAIHI-COMPFTN-149
+               IF  LNK-SYU-SYUCOMPFTN  <  WK-TAIHI-COMPFTN-149
+                   MOVE   ZERO               TO  FLG-HIKAKU
+                   MOVE   LNK-SYU-SYUCOMPFTN TO  WK-TAIHI-COMPFTN-149
+               END-IF
+             END-IF
       *
            END-IF
       *
