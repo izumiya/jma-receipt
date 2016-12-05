@@ -70,6 +70,9 @@
        01  CONS-ORCA-UID       PIC X(64)   VALUE
                    "267c5110-71b6-431e-baac-0989ab98a505".
       *
+       01  CONS-ORCA-UID2       PIC X(64)   VALUE
+                   "API+267c5110-71b6-431e-baac-0989ab98a505".
+      *
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -131,6 +134,7 @@
            PERFORM 100-INIT-SEC
       *
            IF      APIV3SUB01-TERMID   =    CONS-ORCA-UID
+                                       OR   CONS-ORCA-UID2
       *        全業務　強制処理終了
                PERFORM 400-ALL-CANCEL-SEC
            ELSE

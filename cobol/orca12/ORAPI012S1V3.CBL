@@ -72,6 +72,7 @@
            03  FLG-CONTKBN             PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
            03  FLG-ERR01               PIC 9(01).
+           03  FLG-KANA                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -193,6 +194,8 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
       *        処理モード
                05  WRK-PATIENT-MODE        PIC X(06).
       *        確認コード
@@ -583,7 +586,7 @@
                                        SPA-AREA
                                        ORAPIV3SUB01AREA
            IF      APIV3SUB01-ERRCD    NOT =   SPACE
-               MOVE    "60"                TO  WRK-ERRCD
+               MOVE    "81"                TO  WRK-ERRCD
                MOVE    APIV3SUB01-ERRMSG   TO  WRK-ERRMSG
            END-IF
       *    編集処理
@@ -839,6 +842,14 @@
                PERFORM 990-LOCK-OUT-SEC
       *        パラメタ削除処理
                PERFORM 2902-PARA-ALLDEL-SEC
+           END-IF
+      *
+           IF     (WRK-ERRCD               =   SPACE )
+             AND  (PTMODREQ-REQUEST-NUMBER NOT =   "01"  )
+      *        リクエスト０１以外は、同じ処理の続きであること
+               IF      WRK-PARA-SYORIPG    NOT =   "01"
+                   MOVE    "08"                TO  WRK-ERRCD
+               END-IF
            END-IF
            .
        2009-PARA-INIT-EXT.
@@ -1289,7 +1300,7 @@
                MOVE    "02"            TO  PTMODRES-RESPONSE-NUMBER
       *        患者番号判定
                IF     (WRK-PTNUM       NOT =   WRK-PARA-PTNUM )
-                   MOVE    "61"            TO  WRK-ERRCD
+                   MOVE    "22"            TO  WRK-ERRCD
                    MOVE    "01"            TO  PTMODRES-RESPONSE-NUMBER
                END-IF
            WHEN    OTHER
@@ -1320,7 +1331,7 @@
                        MOVE    ZERO            TO  FLG-CONTKBN
                    WHEN    OTHER
                        IF      WRK-ERRCD       =   SPACE
-                           MOVE    "72"        TO  WRK-ERRCD
+                           MOVE    "21"        TO  WRK-ERRCD
                        END-IF
                    END-EVALUATE
                END-IF
@@ -1333,7 +1344,7 @@
       *            二重登録疑いあり
                    MOVE    "S"             TO  WRK-ERRKBN
                    IF      WRK-ERRCD       =   SPACE
-                       MOVE    "48"            TO  WRK-ERRCD
+                       MOVE    "20"            TO  WRK-ERRCD
                    END-IF
       *            確認メッセージ
                    MOVE    "0101"              TO  PTMODRES-SELECT-CODE
@@ -1410,6 +1421,8 @@
                                        TO  WRK-SELECT-CODE
       *    継続区分
            MOVE    WRK-ENDKBN          TO  WRK-PARA-ENDKBN
+      *    処理ＰＧ
+           MOVE    "01"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
@@ -1575,6 +1588,11 @@
            MOVE    PTMODREQ-CONDITION-KBN(3)
                                        TO  SPA-GMN-CONDITION-CD(3)
       *
+      *    カナ氏名チェック（警告）
+           IF     (WRK-ERRCD           =   SPACE ) 
+           AND    (SPA-ERRCD           =   SPACE )
+               PERFORM 200211-KANANAME-KEICHK-SEC
+           END-IF
       *    生年月日
            IF     (WRK-ERRCD           =   SPACE ) 
            AND    (SPA-ERRCD           =   SPACE )
@@ -1838,6 +1856,40 @@
            EXIT.
       *
       ****************************************************************
+      *    カナ氏名チェック（警告）処理
+      ****************************************************************
+       200211-KANANAME-KEICHK-SEC           SECTION.
+      *
+           MOVE    SPA-GMN-KANANAME    TO  SPA-MAE-KANANAME
+      *    カタカナのみの判定
+           MOVE    ZERO                TO  FLG-KANA
+           PERFORM VARYING     IDX     FROM    1   BY  2
+                   UNTIL      (IDX     >=   50  )  OR
+                              (SPA-GMN-KANANAME(IDX:1) =  SPACE)
+               IF     (SPA-GMN-KANANAME (IDX:2)
+                                       =   "　" 
+                                       OR  "ー" 
+                                       OR  "−"  )  OR
+                      (SPA-GMN-KANANAME (IDX:2)
+                                       >=  "ァ"  AND
+                                       <=  "ヶ"   )  OR
+                      (SPA-GMN-KANANAME (IDX:2)
+                                       >=  "０"  AND
+                                       <=  "ｚ"   )
+                   CONTINUE
+               ELSE
+                   MOVE    1               TO  FLG-KANA
+               END-IF
+           END-PERFORM
+           IF      FLG-KANA            =   1
+               ADD     1                   TO  IDX-W
+               MOVE    "K4"                TO  WRK-KEICD(IDX-W)
+           END-IF
+           .
+       200211-KANANAME-KEICHK-EXT.
+           EXIT.
+      *
+      ****************************************************************
       *    生年月日チェック処理
       ****************************************************************
        200211-BIRTHDAY-CHK-SEC           SECTION.
@@ -1915,7 +1967,7 @@
            MOVE    SPA-GMN-POST        TO  WRK-MAE-POST
       *    郵便番号より、住所一覧を表示する
            PERFORM 200212-POST-SYORI-SEC
-           IF      WRK-ERRCD           =   "20"
+           IF      WRK-ERRCD           =   "P1"
                MOVE    SPACE               TO  WRK-ERRCD
                MOVE    "0131"              TO  SPA-ERRCD
                PERFORM 290-ERROR-HEN-SEC
@@ -1963,7 +2015,7 @@
       *        半角であること
                CONTINUE
            ELSE
-               MOVE    "20"                TO  WRK-ERRCD
+               MOVE    "P1"                TO  WRK-ERRCD
                GO      TO      200212-POST-SYORI-EXT
            END-IF
       *    郵便番号より、住所一覧を表示する
@@ -2411,7 +2463,7 @@
            MOVE    SPA-GMN21-OFFICE-POST  TO  WRK-MAE-POST
       *
            PERFORM 200212-POST-SYORI-SEC
-           IF      WRK-ERRCD           =   "20"
+           IF      WRK-ERRCD           =   "P1"
                MOVE    SPACE               TO  WRK-ERRCD
                MOVE    "2112"              TO  SPA-ERRCD
                PERFORM 290-ERROR-HEN-SEC
@@ -2564,7 +2616,7 @@
            MOVE    SPA-GMN21-RENRAKU-POST  TO  WRK-MAE-POST
       *
            PERFORM 200212-POST-SYORI-SEC
-           IF      WRK-ERRCD           =   "20"
+           IF      WRK-ERRCD           =   "P1"
                MOVE    SPACE               TO  WRK-ERRCD
                MOVE    "2111"          TO  SPA-ERRCD
                PERFORM 290-ERROR-HEN-SEC
@@ -2701,7 +2753,7 @@
       *
            MOVE    SPA-GMN21-KISEI-POST  TO  WRK-MAE-POST
            PERFORM 200212-POST-SYORI-SEC
-           IF      WRK-ERRCD           =   "20"
+           IF      WRK-ERRCD           =   "P1"
                MOVE    SPACE               TO  WRK-ERRCD
                MOVE    "2113"          TO  SPA-ERRCD
                PERFORM 290-ERROR-HEN-SEC
@@ -3077,7 +3129,7 @@
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "API PTINF INS ERR:" MCP-RC
                            ",KEY:" PTINF-KEY
-               MOVE    "90"             TO  WRK-ERRCD
+               MOVE    "44"             TO  WRK-ERRCD
            END-IF
       *
            .
@@ -3379,7 +3431,7 @@
       *
       *    患者番号判定
            IF     (SPA-PTNUM       NOT =   WRK-PARA-PTNUM )
-               MOVE    "61"                TO  WRK-ERRCD
+               MOVE    "22"                TO  WRK-ERRCD
                MOVE    "01"                TO  PTMODRES-RESPONSE-NUMBER
            END-IF
       *
@@ -3770,7 +3822,7 @@
                IF      WRK-SELECT-CODE     =   SPACE
                    MOVE    "0103"              TO  PTMODRES-SELECT-CODE
                    PERFORM 8902-SELECTMSG-SEC
-                   MOVE    "48"                TO  WRK-ERRCD
+                   MOVE    "20"                TO  WRK-ERRCD
                    MOVE    "S"                 TO  WRK-ERRKBN
                END-IF
            END-IF
@@ -3800,7 +3852,7 @@
                    MOVE    "73"            TO  WRK-ERRCD
                WHEN    OTHER
                    MOVE    "01"            TO  PTMODRES-RESPONSE-NUMBER
-                   MOVE    "72"            TO  WRK-ERRCD
+                   MOVE    "21"            TO  WRK-ERRCD
                END-EVALUATE
       *
            END-IF
@@ -3851,7 +3903,7 @@
       *        削除確認へ
                MOVE    "0113"              TO  PTMODRES-SELECT-CODE
                PERFORM 8902-SELECTMSG-SEC
-               MOVE    "48"                TO  WRK-ERRCD
+               MOVE    "20"                TO  WRK-ERRCD
                MOVE    "S"                 TO  WRK-ERRKBN
            END-IF
            .
@@ -4190,11 +4242,6 @@
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
-           WHEN    "19"
-               STRING  "前回と処理区分が違います。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
            WHEN    "10"
                MOVE    "患者番号に該当する患者が存在しません"
                                                TO  WRK-ERRMSG
@@ -4222,6 +4269,25 @@
            WHEN    "18"
                MOVE    "患者番号採番エラー"
                                                TO  WRK-ERRMSG
+           WHEN    "19"
+               STRING  "前回と処理区分が違います。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "20"
+               STRING  "選択項目があります。"
+                       "選択結果を返却してください。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "21"
+               STRING  "選択結果エラーです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "22"
+               MOVE    "前回と患者番号が違います。"
+                                               TO  WRK-ERRMSG
       *エラー
            WHEN    "P1"
            WHEN    "H1"
@@ -4240,23 +4306,15 @@
            WHEN    "43"
                MOVE    "患者番号登録済みエラー"
                                                TO  WRK-ERRMSG
+           WHEN    "44"
+               MOVE    "患者情報登録エラー"
+                                               TO  WRK-ERRMSG
       *    WHEN    "44"
       *        STRING  "新規登録は、初回接続から行って下さい。"
       *                                        DELIMITED  BY  SIZE
       *                                        INTO    WRK-ERRMSG
       *        END-STRING
-           WHEN    "49"
-               MOVE    "二重登録疑いの患者が存在します。"
-                                               TO  WRK-ERRMSG
-           WHEN    "48"
-               STRING  "選択項目があります。"
-                       "選択結果を返却してください。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "55"
-               MOVE    "登録処理をキャンセルしました。"
-                                               TO  WRK-ERRMSG
+      *                                        TO  WRK-ERRMSG
       *更新
            WHEN    "51"
                MOVE    "患者情報更新エラー"
@@ -4264,18 +4322,10 @@
            WHEN    "52"
                MOVE    "旧姓履歴登録エラー"
                                                TO  WRK-ERRMSG
-      ***  WHEN    "53"
-      *        MOVE    "更新区分エラー"
-      ***                                      TO  WRK-ERRMSG
-      *
-           WHEN    "60"
-               STRING  "解除対象がありません。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "61"
-               MOVE    "前回と患者番号が違います。"
+           WHEN    "55"
+               MOVE    "登録処理をキャンセルしました。"
                                                TO  WRK-ERRMSG
+      *
       *削除
            WHEN    "70"
                STRING  "送信内容と患者登録内容が一致しません。"
@@ -4285,11 +4335,6 @@
                END-STRING
            WHEN    "71"
                STRING  "削除の処理順が違います"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "72"
-               STRING  "選択結果エラーです。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
@@ -4307,6 +4352,11 @@
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
+           WHEN    "81"
+               STRING  "解除対象がありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
       *警告
            WHEN    "K1"
                STRING  "警告！自動採番の患者番号が最大値です。"
@@ -4317,6 +4367,12 @@
            WHEN    "K3"
                MOVE    "旧姓履歴を登録しました。"
                                                TO  WRK-ERRMSG
+           WHEN    "K4"
+               STRING  "警告！カナ氏名にカナ以外の文字があります。"
+                       "確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
       *共通エラー
            WHEN    "89"
       *        ORCSCOMMON のエラー
@@ -4346,7 +4402,6 @@
            WHEN    "90"
                MOVE    "他端末使用中"          TO  WRK-ERRMSG
            WHEN    "91"
-      ******   MOVE    "処理区分未設定"        TO  WRK-ERRMSG
                MOVE    "リクエスト番号不正"    TO  WRK-ERRMSG
            WHEN    "97"
                MOVE   "送信内容に誤りがあります。"

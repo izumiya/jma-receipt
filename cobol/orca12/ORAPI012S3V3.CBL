@@ -235,6 +235,8 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
       *        確認コード
                05  WRK-SELECT-CODE         PIC X(04).
       *        登録終了
@@ -664,7 +666,7 @@
                                        SPA-AREA
                                        ORAPIV3SUB01AREA
            IF      APIV3SUB01-ERRCD    NOT =   SPACE
-               MOVE    "71"                TO  WRK-ERRCD
+               MOVE    "81"                TO  WRK-ERRCD
                MOVE    APIV3SUB01-ERRMSG   TO  WRK-ERRMSG
            END-IF
            MOVE    9                   TO  FLG-SYORI
@@ -901,6 +903,14 @@
              AND  (PTMODREQ-REQUEST-NUMBER =   "01"  )
       *        リクエスト０１　は排他解除
                PERFORM 990-LOCK-OUT-SEC
+           END-IF
+      *
+           IF     (WRK-ERRCD               =   SPACE )
+             AND  (PTMODREQ-REQUEST-NUMBER NOT =   "01"  )
+      *        リクエスト０１以外は、同じ処理の続きであること
+               IF      WRK-PARA-SYORIPG    NOT =   "03"
+                   MOVE    "08"                TO  WRK-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -1283,7 +1293,7 @@
       *    患者番号判定
            IF     (FLG-SYORI       NOT =   1              )
              AND  (SPA-PTNUM       NOT =   WRK-PARA-PTNUM )
-               MOVE    "70"                TO  WRK-ERRCD
+               MOVE    "22"                TO  WRK-ERRCD
                MOVE    "01"                TO  PTMODRES-RESPONSE-NUMBER
            END-IF
       *
@@ -1325,7 +1335,7 @@
                        (PTMODREQ-SEX   NOT =    PTMODRES-SEX ))
                   OR  ((PTMODREQ-BIRTHDAY  NOT =   SPACE     )  AND
                        (PTMODREQ-BIRTHDAY  NOT =   PTMODRES-BIRTHDAY))
-                   MOVE    "75"            TO  WRK-ERRCD
+                   MOVE    "18"            TO  WRK-ERRCD
                    MOVE    "01"            TO  PTMODRES-RESPONSE-NUMBER
                END-IF
            END-IF
@@ -1432,6 +1442,8 @@
                                        TO  WRK-RESPONSE-NUMBER
            MOVE    PTMODRES-SELECT-CODE    TO  WRK-SELECT-CODE
            MOVE    WRK-ENDKBN          TO  WRK-PARA-ENDKBN
+      *    処理ＰＧ
+           MOVE    "03"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
@@ -2594,7 +2606,7 @@
       *        変更なし
                    MOVE    "0"                 TO  WRK-PTRSI-MODE (IDY)
                WHEN    OTHER
-                   MOVE    "19"                TO  WRK-ERRCD
+                   MOVE    "AP19"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
            END-EVALUATE
       *    労災区分
@@ -2627,7 +2639,7 @@
                                                                   (IDX)
                    MOVE    "970"           TO  WRK-PTRSI-HKNNUM   (IDY)
                WHEN    OTHER
-                   MOVE    "20"                TO  WRK-ERRCD
+                   MOVE    "AP20"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
            END-EVALUATE
            MOVE    PTMODRES-ACCIDENT-NAME (IDX)
@@ -2644,7 +2656,8 @@
                ELSE
                    MOVE    WRK-PTRSI-HKNNUM  (IDY)
                                                TO  WRK-ERR-NUM
-                   MOVE    "32"                TO  WRK-ERRCD
+      **           MOVE    "32"                TO  WRK-ERRCD
+                   MOVE    "AP32"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2679,7 +2692,7 @@
                CALL    "ORCSNUM"           USING
                                            ORCSNUMAREA
                IF      SNUM-RC         NOT =   ZERO
-                   MOVE    "21"                TO  WRK-ERRCD
+                   MOVE    "AP21"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    SNUM-OUTNUM         TO  WRK-PTRSI-HKNID(IDY)
@@ -2695,7 +2708,7 @@
                CALL    "ORCSNUM"           USING
                                            ORCSNUMAREA
                IF      SNUM-RC         NOT =   ZERO
-                   MOVE    "22"                TO  WRK-ERRCD
+                   MOVE    "AP22"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    SNUM-OUTNUM         TO  WRK-PTRSI-KOHID(IDY)
@@ -2707,13 +2720,13 @@
              AND  (WRK-PTRSI-KOHID(IDY)    =   ZERO )
       *        新規以外はエラー
                IF      WRK-PTRSI-MODE (IDY)    NOT =   "1"
-                   MOVE    "23"                TO  WRK-ERRCD
+                   MOVE    "AP23"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            ELSE
       *        新規はエラー
                IF      WRK-PTRSI-MODE (IDY)        =   "1"
-                   MOVE    "24"                TO  WRK-ERRCD
+                   MOVE    "AP24"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    PERFORM VARYING     IDH     FROM    1   BY  1
@@ -2732,7 +2745,7 @@
                        END-IF
                    END-PERFORM
                    IF      WRK-PTRSI-IDX  (IDY)    =   ZERO
-                       MOVE    "23"                TO  WRK-ERRCD
+                       MOVE    "AP23"              TO  SPA-ERRCD
                        PERFORM 290-ERROR-HEN-SEC
                   END-IF
                END-IF
@@ -2745,7 +2758,8 @@
                   AND (WRK-PTRSI-HKNNUM(IDY)   =   WRK-CHK-HKNNUM )
                    CONTINUE
                ELSE
-                   MOVE    "25"                TO  WRK-ERRCD
+      ***          MOVE    "25"                TO  WRK-ERRCD
+                   MOVE    "AP25"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2758,7 +2772,8 @@
                PERFORM 880-HALF-ZENCNG-SEC
                MOVE    WRK-ATO-INPUT       TO  WRK-PTRSI-COMMENT (IDY)
                IF      FLG-ERR             =   1
-                   MOVE    "35"                TO  WRK-ERRCD
+      ***          MOVE    "35"                TO  WRK-ERRCD
+                   MOVE    "AP35"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    WRK-PTRSI-COMMENT(IDY)
@@ -2776,7 +2791,7 @@
                PERFORM 880-HALF-ZENCNG-SEC
                MOVE    WRK-ATO-INPUT       TO  WRK-PTRSI-JIGYOUNAME(IDY)
                IF      FLG-ERR             =   1
-                   MOVE    "26"                TO  WRK-ERRCD
+                   MOVE    "AP26"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    WRK-PTRSI-JIGYOUNAME(IDY)
@@ -2794,7 +2809,7 @@
                PERFORM 880-HALF-ZENCNG-SEC
                MOVE    WRK-ATO-INPUT       TO  PTMODRES-CITYNAME(IDY)
                IF      FLG-ERR             =   1
-                   MOVE    "36"                TO  WRK-ERRCD
+                   MOVE    "AP36"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2807,7 +2822,7 @@
                PERFORM 880-HALF-ZENCNG-SEC
                MOVE    WRK-ATO-INPUT       TO  WRK-PTRSI-HOKENNAME(IDY)
                IF      FLG-ERR             =   1
-                   MOVE    "34"                TO  WRK-ERRCD
+                   MOVE    "AP34"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    WRK-PTRSI-HOKENNAME(IDY)
@@ -2822,7 +2837,7 @@
            IF      WRK-SYMD        NOT =   SPACE
                PERFORM 803-ORCSDAY-CHEK-SEC
                IF      FLG-DAYERR          =   1
-                   MOVE    "27"                TO  WRK-ERRCD
+                   MOVE    "AP27"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2833,7 +2848,7 @@
            IF      WRK-SYMD        NOT =   SPACE
                PERFORM 803-ORCSDAY-CHEK-SEC
                IF      FLG-DAYERR          =   1
-                   MOVE    "28"                TO  WRK-ERRCD
+                   MOVE    "AP28"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2843,7 +2858,7 @@
            IF      WRK-SYMD        NOT =   SPACE
                PERFORM 803-ORCSDAY-CHEK-SEC
                IF      FLG-DAYERR          =   1
-                   MOVE    "29"                TO  WRK-ERRCD
+                   MOVE    "AP29"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2857,7 +2872,7 @@
                MOVE    "01"                TO  WRK-SDD
                PERFORM 803-ORCSDAY-CHEK-SEC
                IF      FLG-DAYERR          =   1
-                   MOVE    "30"                TO  WRK-ERRCD
+                   MOVE    "AP30"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
            END-IF
@@ -2871,7 +2886,7 @@
                CALL    "ORCSNUM"           USING
                                            ORCSNUMAREA
                IF      SNUM-RC         NOT =   ZERO
-                   MOVE    "31"                TO  WRK-ERRCD
+                   MOVE    "AP31"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                ELSE
                    MOVE    SNUM-OUTNUM         TO  WRK-PTRSI-KAISU(IDY)
@@ -3334,7 +3349,7 @@
                    MOVE    "61"        TO  WRK-ERRCD
                WHEN    OTHER
                    MOVE    "03"        TO  PTMODRES-RESPONSE-NUMBER
-                   MOVE    "62"        TO  WRK-ERRCD
+                   MOVE    "21"        TO  WRK-ERRCD
                END-EVALUATE
            END-IF
            IF      WRK-ERRCD       NOT =   SPACE
@@ -3412,7 +3427,7 @@
            IF     (SPA-PIDCD       NOT =   SPACE )
       *        確認メッセージとする
                PERFORM 292-SELECT-HEN-SEC
-               MOVE    "60"                TO  WRK-ERRCD
+               MOVE    "20"                TO  WRK-ERRCD
                MOVE    "S"                 TO  WRK-ERRKBN
                MOVE    SPACE               TO  SPA-PIDCD
            END-IF
@@ -3625,11 +3640,23 @@
       ****************************************************************
        290-ERROR-HEN-SEC           SECTION.
       *
+      *    IF      WRK-ERRCD           =   SPACE
+      *        MOVE    "P1"                TO  WRK-ERRCD
+      *    END-IF
+      *    IF      WRK-ERRMSG          =   SPACE
+      *        PERFORM 890-ERRCD-MSG-SEC
+      *    END-IF
+      *
+           IF      WRK-ERRMSG          =   SPACE
+               IF      SPA-ERRCD(1:1)      =   "A"
+                   PERFORM 8901-PTERRCD-SETAPI-SEC
+                   MOVE    SPACE               TO  WRK-ERRCD
+               ELSE
+                   PERFORM 8901-PTERRCD-SET-SEC
+               END-IF
+           END-IF
            IF      WRK-ERRCD           =   SPACE
                MOVE    "P1"                TO  WRK-ERRCD
-           END-IF
-           IF      WRK-ERRMSG          =   SPACE
-               PERFORM 890-ERRCD-MSG-SEC
            END-IF
            ADD     1                   TO  IDX-ERR
            IF      IDX-ERR             <=  50
@@ -4117,62 +4144,25 @@
            WHEN    "17"
                MOVE    "生年月日暦日エラー"
                                                TO  WRK-ERRMSG
-           WHEN    "19"
-               MOVE    "保険処理区分が違います"
-                                               TO  WRK-ERRMSG
+           WHEN    "18"
+               STRING  "患者氏名・性別・生年月日が送信内容と違います。"
+                       "患者を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
            WHEN    "20"
-               MOVE    "労災保険区分が違います"
-                                               TO  WRK-ERRMSG
+               STRING  "選択項目があります。"
+                       "選択結果を返却してください。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
            WHEN    "21"
-               MOVE    "保険ＩＤエラー"
-                                               TO  WRK-ERRMSG
+               STRING  "選択結果エラーです。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
            WHEN    "22"
-               MOVE    "公費ＩＤエラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "24"
-               MOVE    "新規に保険ＩＤ・公費ＩＤは存在しません"
-                                               TO  WRK-ERRMSG
-           WHEN    "23"
-               MOVE    "保険ＩＤ・公費ＩＤが存在しません"
-                                               TO  WRK-ERRMSG
-           WHEN    "25"
-               MOVE    "保険区分の変更はできません。"
-                                               TO  WRK-ERRMSG
-           WHEN    "26"
-               MOVE    "事業所名全角エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "27"
-               MOVE    "傷病年月日暦日エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "28"
-               MOVE    "療養開始日暦日エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "29"
-               MOVE    "療養終了日暦日エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "30"
-               MOVE    "労災レセ回数記載基準年月暦日エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "31"
-               MOVE    "労災レセ回数記載回数数値エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "32"
-               MOVE    "保険番号マスタに登録がありません。"
-                                               TO  WRK-ERRMSG
-           WHEN    "33"
-               MOVE    "保険番号と保険区分が一致しません。"
-                                               TO  WRK-ERRMSG
-           WHEN    "34"
-               MOVE    "事業所名全角エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "35"
-               MOVE    "傷病の部位全角エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "36"
-               MOVE    "郡市区名全角エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "50"
-               MOVE    "保険・公費にエラーがあります。"
+               MOVE    "前回と患者番号が違います。"
                                                TO  WRK-ERRMSG
       *エラー
            WHEN    "P1"
@@ -4182,64 +4172,30 @@
            WHEN    "P2"
                PERFORM 8902-PTPIDCD-SET-SEC
       *更新
+           WHEN    "50"
+               MOVE    "保険・公費にエラーがあります。"
+                                               TO  WRK-ERRMSG
            WHEN    "51"
-               MOVE    "患者情報更新エラー"
+               MOVE    "患者番号更新エラー"
                                                TO  WRK-ERRMSG
            WHEN    "52"
                MOVE    "患者番号と患者ＩＤが一致しません。"
                                                TO  WRK-ERRMSG
       *
-           WHEN    "60"
-               STRING  "選択項目があります。"
-                       "選択結果を返却してください。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
            WHEN    "61"
                STRING  "保険公費情報の送信から行って下さい"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
-           WHEN    "62"
-               STRING  "選択結果エラーです。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-      *
-           WHEN    "70"
-               MOVE    "前回と患者番号が違います。"
-                                               TO  WRK-ERRMSG
-           WHEN    "71"
-               STRING  "解除対象がありません。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "72"
-               STRING  "選択結果エラーです。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "73"
-               STRING  "保険組合せが２００件以上存在します。"
-                       "３年前に終了となった保険組合せは返却しません"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "74"
-               STRING  "保険組合せが２００件以上存在します。"
-                       "２年前に終了となった保険組合せは返却しません"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
-           WHEN    "75"
-               STRING  "患者氏名・性別・生年月日が送信内容と違います。"
-                       "患者を確認して下さい。"
-                                               DELIMITED  BY  SIZE
-                                               INTO    WRK-ERRMSG
-               END-STRING
       *
            WHEN    "80"
-               STRING  "一時データ出力エラー"
+               STRING  "一時データ出力エラーです。"
+                       "強制終了して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "81"
+               STRING  "解除対象がありません。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
@@ -4292,6 +4248,96 @@
            END-EVALUATE
            .
        890-ERRCD-MSG-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者基本情報エラーメッセージ
+      *****************************************************************
+       8901-PTERRCD-SETAPI-SEC              SECTION.
+      *
+           EVALUATE    SPA-ERRCD
+           WHEN    "AP19"
+               MOVE    "保険処理区分が違います"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP20"
+               MOVE    "労災保険区分が違います"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP21"
+               MOVE    "保険ＩＤエラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP22"
+               MOVE    "公費ＩＤエラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP24"
+               MOVE    "新規に保険ＩＤ・公費ＩＤは存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP23"
+               MOVE    "保険ＩＤ・公費ＩＤが存在しません"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP25"
+               MOVE    "保険区分の変更はできません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP26"
+               MOVE    "事業所名全角エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP27"
+               MOVE    "傷病年月日暦日エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP28"
+               MOVE    "療養開始日暦日エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP29"
+               MOVE    "療養終了日暦日エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP30"
+               MOVE    "労災レセ回数記載基準年月暦日エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP31"
+               MOVE    "労災レセ回数記載回数数値エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP32"
+               MOVE    "保険番号マスタに登録がありません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP33"
+               MOVE    "保険番号と保険区分が一致しません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP34"
+               MOVE    "事業所名全角エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP35"
+               MOVE    "傷病の部位全角エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "AP36"
+               MOVE    "郡市区名全角エラー"
+                                               TO  WRK-ERRMSG
+      *
+           WHEN    "AP73"
+               STRING  "保険組合せが２００件以上存在します。"
+                       "３年前に終了となった保険組合せは返却しません"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "AP74"
+               STRING  "保険組合せが２００件以上存在します。"
+                       "２年前に終了となった保険組合せは返却しません"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "AP75"
+               STRING  "保険組合せが２００件以上存在します。"
+                       "１年前に終了となった保険組合せは返却しません"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "AP76"
+               STRING  "患者氏名・性別・生年月日が送信内容と違います。"
+                       "患者を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           END-EVALUATE
+            .
+       8901-PTERRCD-SETAPI-EXT.
            EXIT.
       *
       *****************************************************************

@@ -1973,6 +1973,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                MOVE    SMCNDATE-YMD        TO  SYS-1009-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYS-1009-UPHMS
+               MOVE    SPA-OPID            TO  SYS-1009-OPID
       *        患者番号採番  更新
                MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
                MOVE    SYS-1009-REC        TO  MCPDATA-REC
