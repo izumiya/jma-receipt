@@ -920,6 +920,7 @@
                MOVE    JYURRK-DRCD        TO   WRK-DRCD
                PERFORM 2002131-DRCD-CHK-SEC
            ELSE
+               MOVE    JYURRK-DRCD        TO   WRK-DRCD
                MOVE    VIS01RES-DR-NAME (IDX-H)
                                            TO  WRK-DRCD-NAME
            END-IF
