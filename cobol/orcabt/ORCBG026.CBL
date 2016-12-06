@@ -26,8 +26,8 @@
       *  16/02/12    NACL-森脇     新規作成
       *****************************************************************
       *  プログラム修正履歴
-      * Maj/Min/Rev  修正者       日付      内容
-      *  04.08.01    NACL-森脇    16/09/01  持参薬システム予約コード対象外
+      * Maj/Min/Rev  修正者        日付      内容
+      *  04.08.01    NACL-森脇     16/09/01  持参薬対象外
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -606,10 +606,12 @@
            END-IF
       *----(04.08.01)--ADD-END-----
       *
-      *    保険組合せ読み込み
-           PERFORM 900-HKNCOMBI-READ-SEC
-           IF      FLG-HKNCOMBI       =   1
-               GO  TO  230-MAIN-SRYACCT-EXT
+           IF      ACCT-HKNCOMBI   NOT =   9999
+      *        保険組合せ読み込み
+               PERFORM 900-HKNCOMBI-READ-SEC
+               IF      FLG-HKNCOMBI       =   1
+                   GO  TO  230-MAIN-SRYACCT-EXT
+               END-IF
            END-IF
       *
       *    院内チェック
@@ -748,6 +750,15 @@
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            PERFORM 900-TOKEI-READ-SEC
       *
+      *testdisplay-strat
+           IF    ( SRY-NYUGAIKBN   =   "1" )   AND
+                 ( SRY-SRYYM       =   "201610" )  AND
+                 ( WRK-SRYCD       =   "610454063" )
+               DISPLAY "****PTID*******" SRY-PTID
+               DISPLAY "******SURYO****" SRY-SRYSURYO(IDX-S)
+               DISPLAY "******KAISU****" ACCT-DAY (1 IDX-D)
+           END-IF
+      *testdisplay-end
            IF      FLG-TOKEI       =   1
                MOVE    TNS-TANINAME    TO  TOKEI-TANINAME
                MOVE    WRK-TANISU      TO  TOKEI-TANISU
