@@ -750,15 +750,6 @@
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            PERFORM 900-TOKEI-READ-SEC
       *
-      *testdisplay-strat
-           IF    ( SRY-NYUGAIKBN   =   "1" )   AND
-                 ( SRY-SRYYM       =   "201610" )  AND
-                 ( WRK-SRYCD       =   "610454063" )
-               DISPLAY "****PTID*******" SRY-PTID
-               DISPLAY "******SURYO****" SRY-SRYSURYO(IDX-S)
-               DISPLAY "******KAISU****" ACCT-DAY (1 IDX-D)
-           END-IF
-      *testdisplay-end
            IF      FLG-TOKEI       =   1
                MOVE    TNS-TANINAME    TO  TOKEI-TANINAME
                MOVE    WRK-TANISU      TO  TOKEI-TANISU
