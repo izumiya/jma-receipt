@@ -86,6 +86,7 @@
       *  04.08.01    NACL-多々納  15/06/16  診療科・保険組合せ件数対応
       *  04.08.01    NACL-多々納  16/01/XX  医師一覧遷移対応
       *  04.08.01    NACL-多々納  16/06/XX  API CLAIM対応
+      *  04.08.01    NACL-多々納  16/12/XX  受付順変更対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -276,6 +277,11 @@
            03  WRK-U02-HKNCOMB-ROW     PIC S9(09).
            03  FLG-GMN-INIT2           PIC 9(01).
       *
+      *H28.12
+           03  SORT-MAX                PIC 9(04).
+           03  WRK-IDY                 PIC 9(04).
+           03  WRK-IDX                 PIC 9(04).
+      *
       *    公費期限切れ表示用
        01  WRK-KOH-AREA.
            03  WRK-KEI-YM.
@@ -311,7 +317,11 @@
       *D        05  WRK-COMBO-SCODEMEIL               PIC X(18).  
       *
         01  WRK-SORT-TBL.
-            03  WRK-SORT-TBLO                         OCCURS   400.
+            03  WRK-SORT-TBL-AREA.
+              04  WRK-SORT-TBLO                         OCCURS   400.
+      *         SORTキー
+                05  WRK-SORT-NARABE                   PIC X(04).
+      *
                 05  WRK-SORT-TUKEID                   PIC 9(05).  
                 05  WRK-SORT-TYYKTIME                 PIC X(04).
                 05  WRK-SORT-TUKETIME                 PIC X(06).
@@ -320,11 +330,16 @@
                 05  WRK-SORT-TSRYKA                   PIC X(02).
                 05  WRK-SORT-TDRCD                    PIC X(04).
                 05  WRK-SORT-TSRYNAIYOCD              PIC X(02).
-                05  WRK-SORT-NARABE                   PIC X(04).
                 05  WRK-SORT-TKYYKTIME                PIC X(04).
                 05  WRK-SORT-TYYKID                   PIC X(02).
                 05  WRK-SORT-THKNCOMBI                PIC 9(04).
                 05  WRK-SORT-TSRFLG                   PIC X(02).
+      *H28.12
+                05  WRK-SORT-HENFLG                   PIC X(01).
+      *         SORTキー
+                05  WRK-SORT-NARABE-G.
+                    07  WRK-SORT-HYOJI                PIC X(04).
+                    07  WRK-SORT-TIME                 PIC X(04).
       *
            03  WORK-SORT                              PIC X(200).
       *
@@ -333,6 +348,16 @@
                05  WRK-U02Q-PTNUM              PIC X(20).
                05  WRK-U02Q-PTID               PIC 9(10).
                05  WRK-U02Q-HKNID              PIC 9(10).
+      *
+      *H28.12
+      *SORT 保存
+        01  WRK-SORT-TBL02-AREA.
+            03  WRK-SORT-TBL02                        OCCURS   400.
+                05  WRK-SORT2-DATA                    PIC X(200). 
+      *
+            03  WRK-SORT-KEY                PIC X(04).
+            03  WRK-SORT02-KEY              PIC X(08).
+            03  IDX-KEY                     PIC 9(04).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG                  PIC X(09).
@@ -1302,7 +1327,13 @@
       *
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  SPA-UKE-MAX
-           MOVE    1                   TO   FLG-GMN-INIT
+           MOVE    1                   TO  FLG-GMN-INIT
+      *H28.12
+           MOVE    ZERO                TO  SPA-NAI-UKEUP
+           MOVE    ZERO                TO  SPA-NAI-UPOK
+           MOVE    ZERO                TO  SPA-NAI-UPDOWN
+           MOVE    ZERO                TO  SPA-NAI-YYKARI
+      *
       *
            INITIALIZE                            WRK-SORT-TBL
                                                  SPA-GMN-TBL
@@ -1323,10 +1354,10 @@
                MOVE    1               TO  FLG-YYK
            END-IF
       *
-           IF      SPA-NAI-SYORI1      =   1
+      *    IF      SPA-NAI-SYORI1      =   1
       *        予約なし
-               MOVE    1               TO  FLG-YYK
-           END-IF
+      *        MOVE    1               TO  FLG-YYK
+      *    END-IF
       *
            PERFORM UNTIL     (FLG-YYK            =  1     )  OR
                              (IDX               >=  MAX-LINE   )
@@ -1344,6 +1375,8 @@
                    MOVE    YYK-KEYYYKTIME
                                          TO  WRK-SORT-TKYYKTIME (IDX)
                    MOVE    YYK-YYKID     TO  WRK-SORT-TYYKID   (IDX)
+      *
+                   ADD     1             TO  SORT-MAX
                END-IF
       *
                PERFORM 910-YOYAKU-READ-SEC
@@ -1353,16 +1386,34 @@
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *H28.12
+      *    予約存在チェック
+           IF       SORT-MAX           >   ZERO
+               MOVE    1               TO  SPA-NAI-YYKARI
+               MOVE    ZERO            TO  SPA-NAI-UPOK
+               IF      SPA-NAI-SYORI1      =   1
+      *            予約なし
+                   MOVE    ZERO                TO  SORT-MAX
+                   INITIALIZE                      WRK-SORT-TBL
+                   MOVE    1                   TO  SPA-NAI-UPOK
+               END-IF
+           ELSE
+      *        予約なし
+               MOVE    1               TO  SPA-NAI-UPOK
+           END-IF
+      *
       *    受付テーブル読み込み
            INITIALIZE                  UKETUKE-REC
            MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
            MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
            MOVE    UKETUKE-REC         TO  MCPDATA-REC
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+      **** MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key7"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "key3"              TO  MCP-PATHNAME
+     ******    MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    "key7"              TO  MCP-PATHNAME
                PERFORM 910-UKETUKE-READ-SEC
            ELSE
                INITIALIZE                  UKETUKE-REC
@@ -1384,6 +1435,9 @@
                END-IF
       *
                IF      FLG-UKE-OK          =   1
+      *
+                       ADD     1             TO  SORT-MAX
+      *
                        ADD     1             TO  IDX
                        IF  UKE-YYKTIME       >   ZERO
                            MOVE    UKE-YYKTIME
@@ -1407,6 +1461,19 @@
       *                送受信フラグ
                        MOVE    UKE-SRFLG     TO
                                              WRK-SORT-TSRFLG   (IDX)
+      *H28.12
+      *            受付順変更
+                   IF      UKE-KAKREN      =   "1"
+                       MOVE    "1"         TO  WRK-SORT-HENFLG (IDX)
+                   END-IF
+      *            受付順
+                   MOVE    UKE-UKETIME     TO  WRK-SORT-TIME   (IDX)
+                   IF      UKE-HYOJIJUN    =   ZERO
+                       MOVE    ALL "9"         TO  WRK-SORT-HYOJI (IDX)
+                   ELSE
+                       MOVE    UKE-HYOJIJUN    TO  WRK-SORT-HYOJI (IDX)
+                   END-IF
+      *
       *削除（患者氏名が未設定はありえない）
       *                患者氏名を患者マスタより
       *                IF     (UKE-PTID      NOT =   ZERO  )  AND
@@ -1433,16 +1500,31 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       **************** END-IF
                END-IF
       *
-               MOVE    "key3"              TO  MCP-PATHNAME
+      ****     MOVE    "key3"              TO  MCP-PATHNAME
+      *H28.12
+               MOVE    "key7"              TO  MCP-PATHNAME
                PERFORM 910-UKETUKE-READ-SEC
       *
            END-PERFORM
       *    カーソルクロース
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key7"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           PERFORM  31012-SORT-SEC
+      *    PERFORM  31012-SORT-SEC
+      *H28.12
+           IF      SORT-MAX            =   ZERO
+               MOVE    ZERO            TO  SPA-NAI-UPOK
+           ELSE
+               IF       SPA-NAI-UPOK       =   1
+      *            受付順変更順
+                   PERFORM  31012-SORT02-SEC
+               ELSE
+      *            予約・受付時間順
+                   PERFORM  31012-SORT-SEC
+               END-IF
+          END-IF
+      *
       *
            MOVE    ZERO            TO  IDX  SPA-UKE-MAX
            INITIALIZE              SPA-GMN-TBL
@@ -1475,6 +1557,10 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                                       TO  SPA-GMN-TKYYKTIME  (IDX)
                MOVE    WRK-SORT-TYYKID(IDX)
                                       TO  SPA-GMN-TYYKID     (IDX)
+      *H28.12
+               MOVE    WRK-SORT-HENFLG (IDX)
+                                      TO  SPA-GMN-THENFLG  (IDX)
+      *
       *        患者番号セット
                IF      SPA-GMN-TPTID(IDX)      =   ZERO   OR  SPACE
                    MOVE    SPACE               TO  SPA-GMN-TPTNUM(IDX)
@@ -1584,27 +1670,115 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    予約受付状況並べ替え
       *****************************************************************
        31012-SORT-SEC              SECTION.
-      *  
+      *
+      *H28.12
+      *    PERFORM VARYING IDX     FROM    1   BY  1
+      *            UNTIL   IDX     >=      MAX-LINE
+      *            OR      WRK-SORT-NARABE(IDX)   =   SPACE
+      *        COMPUTE IDY     =   IDX     +   1
+      *        PERFORM VARYING IDZ     FROM    IDY     BY  1
+      *                UNTIL   IDZ     >       MAX-LINE
+      *                OR      WRK-SORT-NARABE(IDZ)   =   SPACE
+      *            IF      WRK-SORT-NARABE (IDX)   >   
+      *                                    WRK-SORT-NARABE (IDZ)
+      *                MOVE    WRK-SORT-TBLO  (IDX)   TO  WORK-SORT
+      *                MOVE    WRK-SORT-TBLO  (IDZ)   TO  
+      *                                        WRK-SORT-TBLO (IDX)
+      *                MOVE    WORK-SORT               TO  
+      *                                        WRK-SORT-TBLO (IDZ)
+      *            END-IF
+      *        END-PERFORM
+      *    END-PERFORM
+      *H28.12
+      *    SORT変更
+           MOVE    SPACE           TO  WRK-SORT-TBL02-AREA
+      *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >=      MAX-LINE
-                   OR      WRK-SORT-NARABE(IDX)   =   SPACE
-               COMPUTE IDY     =   IDX     +   1
-               PERFORM VARYING IDZ     FROM    IDY     BY  1
+                       OR  IDX     >    SORT-MAX
+               MOVE    HIGH-VALUE          TO  WRK-SORT-KEY
+               MOVE    ZERO                TO  IDX-KEY
+               PERFORM VARYING IDZ     FROM    1       BY  1
                        UNTIL   IDZ     >       MAX-LINE
-                       OR      WRK-SORT-NARABE(IDZ)   =   SPACE
-                   IF      WRK-SORT-NARABE (IDX)   >   
-                                           WRK-SORT-NARABE (IDZ)
-                       MOVE    WRK-SORT-TBLO  (IDX)   TO  WORK-SORT
-                       MOVE    WRK-SORT-TBLO  (IDZ)   TO  
-                                               WRK-SORT-TBLO (IDX)
-                       MOVE    WORK-SORT               TO  
-                                               WRK-SORT-TBLO (IDZ)
-                   END-IF
+                       OR  IDX     >    SORT-MAX
+                   IF      WRK-SORT-NARABE (IDZ)   NOT =   SPACE
+                       IF      WRK-SORT-NARABE (IDZ)
+                                           <   WRK-SORT-KEY
+                           MOVE    WRK-SORT-NARABE (IDZ)
+                                               TO  WRK-SORT-KEY
+                           MOVE    IDZ             TO  IDX-KEY
+                        END-IF
+                    END-IF
                END-PERFORM
+               IF      IDX-KEY             =   ZERO
+                   MOVE    MAX-LINE        TO  IDX
+               ELSE
+                   MOVE    WRK-SORT-TBLO  (IDX-KEY)
+                                           TO  WRK-SORT-TBL02
+                                                        (IDX)
+                   MOVE    SPACE           TO  WRK-SORT-NARABE
+                                                        (IDX-KEY)
+               END-IF
+           END-PERFORM
+           MOVE    SPACE               TO  WRK-SORT-TBL-AREA
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >=      MAX-LINE
+                       OR  IDX     >    SORT-MAX
+               MOVE    WRK-SORT-TBL02(IDX)
+                                   TO  WRK-SORT-TBLO (IDX)
            END-PERFORM
            .
        31012-SORT-EXT.
            EXIT.
+      *
+      *H28.12
+      *****************************************************************
+      *    受付　受付順並べ替え
+      *****************************************************************
+       31012-SORT02-SEC              SECTION.
+      *
+           MOVE    SPACE           TO  WRK-SORT-TBL02-AREA
+      *
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >=      MAX-LINE
+                       OR  IDX     >    SORT-MAX
+               MOVE    HIGH-VALUE          TO  WRK-SORT02-KEY
+               MOVE    ZERO                TO  IDX-KEY
+               PERFORM VARYING IDZ     FROM    1       BY  1
+                       UNTIL   IDZ     >       MAX-LINE
+                           OR  IDX     >    SORT-MAX
+                   IF      WRK-SORT-NARABE-G(IDZ)   NOT =   SPACE
+                       IF      WRK-SORT-NARABE-G(IDZ)
+                                           <   WRK-SORT02-KEY
+                           MOVE    WRK-SORT-NARABE-G(IDZ)
+                                               TO  WRK-SORT02-KEY
+                           MOVE    IDZ             TO  IDX-KEY
+                        END-IF
+                    END-IF
+               END-PERFORM
+               IF      IDX-KEY             =   ZERO
+                   MOVE    MAX-LINE        TO  IDX
+               ELSE
+                   MOVE    WRK-SORT-TBLO  (IDX-KEY)
+                                           TO  WRK-SORT-TBL02
+                                                        (IDX)
+                   MOVE    SPACE           TO  WRK-SORT-NARABE
+                                                        (IDX-KEY)
+                   MOVE    SPACE           TO  WRK-SORT-NARABE-G
+                                                        (IDX-KEY)
+               END-IF
+           END-PERFORM
+           MOVE    SPACE               TO  WRK-SORT-TBL-AREA
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >=      MAX-LINE
+                       OR  IDX     >    SORT-MAX
+               MOVE    WRK-SORT-TBL02(IDX)
+                                   TO  WRK-SORT-TBLO (IDX)
+           END-PERFORM
+           .
+       31012-SORT02-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    最終受診日セット処理
       *****************************************************************
@@ -1922,19 +2096,15 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    PERFORM 230-MAEKPTNUM-SEC
       *    患者登録
                WHEN    "CLICKED"       ALSO    "B05"
-      *******  WHEN    "CLICKED"       ALSO    "B05S"
                    PERFORM 492-ORCGP01-SEC
       *    診療行為
                WHEN    "CLICKED"       ALSO    "B06"
-      *********WHEN    "CLICKED"       ALSO    "B06S"
                    PERFORM 493-ORCGK02-SEC
       *    病名登録
                WHEN    "CLICKED"       ALSO    "B07"
-      *********WHEN    "CLICKED"       ALSO    "B07S"
                    PERFORM 494-ORCGC02-SEC
       *    収納登録
                WHEN    "CLICKED"       ALSO    "B08"
-      ******   WHEN    "CLICKED"       ALSO    "B08S"
                    PERFORM 495-ORCGS02-SEC
       *    会計照会
                WHEN    "CLICKED"       ALSO    "B09S"
@@ -1979,6 +2149,11 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *        選択一覧へ
                WHEN    "CLICKED"       ALSO    "B08S"
                    PERFORM 4908-B08S-SYORI-SEC
+      *H28.12
+      *        受付順変更
+               WHEN    "CLICKED"       ALSO    "B03S"
+                   PERFORM 4905-B03S-SYORI-SEC
+      *
            END-EVALUATE
       *
            .
@@ -3060,6 +3235,16 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    MOVE    1                   TO  SPA-GMN-CUR
                END-IF
            END-IF
+      *
+      *H28.12
+           IF      (SPA-ERRCD          =   SPACE )  AND
+                   (SPA-GMN-SELNUM     >   ZERO  )
+               IF      SPA-NAI-UKEUP       =   1
+      *            受付順変更
+                   PERFORM 41042-SELNUM-UKEUPCHK-SEC
+                   GO      TO    4104-SELNUM-EXT
+                END-IF
+            END-IF
       *
            IF      (SPA-ERRCD          =   SPACE )  AND
                    (SPA-GMN-SELNUM     >   ZERO  )
@@ -4296,6 +4481,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                GO      TO      230-MAEKPTNUM-EXT
            END-IF
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO      TO      230-MAEKPTNUM-EXT
+           END-IF
+      *
            MOVE    SPA-LAST-PTNUM      TO  U02-PTNUM
            MOVE    SPA-LAST-PTNUM      TO  SPA-GMN-PTNUM
            MOVE    1                   TO  FLG-IN-PTNUM
@@ -4309,6 +4501,12 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    前（↑）編集処理
       *****************************************************************
        465-UP-SYORI-SEC             SECTION.
+      *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               PERFORM 4659-UKETUKE-UP-SYORI-SEC
+               GO      TO      465-UP-SYORI-EXT
+           END-IF
       *
            MOVE    ZERO                TO  FLG-TOUROKU
       *    入力チェック処理
@@ -4332,6 +4530,12 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    次（↑）編集処理
       *****************************************************************
        475-DOWN-SYORI-SEC             SECTION.
+      *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               PERFORM 4759-UKETUKE-DOWN-SYORI-SEC
+               GO      TO      475-DOWN-SYORI-EXT
+           END-IF
       *
            MOVE    ZERO                TO  FLG-TOUROKU
       *    入力チェック処理
@@ -4480,6 +4684,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        480-KENSAKU-SEC             SECTION.
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO       TO      480-KENSAKU-EXT
+           END-IF
+      *
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-U02             TO  LNK-SCRSPA
@@ -4513,6 +4724,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        490-UKEICHI-SEC             SECTION.
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO  TO  490-UKEICHI-EXT
+           END-IF
+      *
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-U02             TO  LNK-SCRSPA
@@ -4538,6 +4756,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    印刷のみ処理
       *****************************************************************
        495-PRINT-SEC             SECTION.
+      *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO      TO      495-PRINT-EXT
+           END-IF
       *
            MOVE    2                   TO  FLG-TOUROKU
       *    登録チェック処理
@@ -4626,6 +4851,13 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *    登録処理
       *****************************************************************
        490-TOUROKU-SEC              SECTION.
+      *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO      TO      490-TOUROKU-EXT
+           END-IF
       *
            MOVE    1                   TO  FLG-TOUROKU
       *    登録チェック処理
@@ -6001,6 +6233,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO  TO  491-SAKUJO-EXT
            END-IF
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO  TO  491-SAKUJO-EXT
+           END-IF
+      *
+      *
            IF  SPA-GMN-TUKETIME(SPA-GMN-SELNUM) =  SPACE
                MOVE    "0017"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-GMN-CUR
@@ -6159,6 +6399,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                GO  TO  492-ORCGP01-EXT
            END-IF
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO  TO  492-ORCGP01-EXT
+           END-IF
+      *
            IF      SPA-GMN-SELNUM      >   ZERO
       *
       *    選択番号チェック
@@ -6289,6 +6536,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                GO       TO      493-ORCGK02-EXT
            END-IF
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO       TO      493-ORCGK02-EXT
+           END-IF
+      *
            IF     (SPA-GMN-SELNUM      >   ZERO  )  AND
                   (SPA-GMN-PTID        =   ZERO  )
                MOVE    "0022"              TO  SPA-ERRCD
@@ -6367,6 +6621,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        494-ORCGC02-SEC              SECTION.
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO       TO      494-ORCGC02-EXT
+           END-IF
+      *
            IF     (SPA-GMN-SELNUM      >   ZERO  )  AND
                   (SPA-GMN-PTID        =   ZERO  )
                MOVE    "0022"              TO  SPA-ERRCD
@@ -6406,6 +6667,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        495-ORCGS02-SEC              SECTION.
       *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO       TO      495-ORCGS02-EXT
+           END-IF
+      *
            IF     (SPA-GMN-SELNUM      >   ZERO  )  AND
                   (SPA-GMN-PTID        =   ZERO  )
                MOVE    "0022"              TO  SPA-ERRCD
@@ -6444,6 +6712,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    会計照会へ
       *****************************************************************
        496-ORCGJ02-SEC              SECTION.
+      *
+      *H28.12
+           IF      SPA-NAI-UKEUP       =   1
+               MOVE    "0035"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-GMN-CUR
+               GO       TO      496-ORCGJ02-EXT
+           END-IF
       *
            IF     (SPA-GMN-SELNUM      >   ZERO  )  AND
                   (SPA-GMN-PTID        =   ZERO  )
@@ -6581,6 +6856,192 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        4908-UDR-SYORI-EXT.
            EXIT.
       *!!! 
+      *H28.12
+      *****************************************************************
+      *   受付順変更処理
+      *****************************************************************
+       4905-B03S-SYORI-SEC         SECTION.
+      *
+           IF     (SPA-GMN-PTNUM   NOT =   SPACE )
+               OR (SPA-GMN-NAME    NOT =   SPACE )
+               MOVE    "0034"              TO  SPA-ERRCD
+               GO      TO      4905-B03S-SYORI-EXT
+           END-IF
+      *
+           EVALUATE    SPA-NAI-UKEUP
+               WHEN    0
+                   MOVE    1               TO  SPA-NAI-UKEUP
+                   MOVE    1               TO  SPA-GMN-CUR
+               WHEN    1
+      *            受付順変更処理
+                   PERFORM 49041-UKETUKE-JUN-SEC
+                   MOVE    0               TO  SPA-NAI-UKEUP
+           END-EVALUATE
+           .
+       4905-B03S-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *   受付順更新処理
+      *****************************************************************
+       49041-UKETUKE-JUN-SEC         SECTION.
+      *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+      *
+           MOVE    ZERO                TO  IDY
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL  (IDX     >=      SPA-UKE-MAX )
+                      OR  (SPA-ERRCD   NOT =   SPACE  )
+               INITIALIZE                  UKETUKE-REC
+               MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+               MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+               MOVE    SPA-GMN-TUKEID(IDX)
+                                           TO  UKE-UKEID
+               PERFORM 900-UKETUKE-READ-SEC
+      *
+               IF      FLG-UKETUKE         =   ZERO
+                   IF      UKE-KAIKEITIME      =   ZERO
+                       ADD     1                   TO  IDY
+                       MOVE    IDY                 TO  UKE-HYOJIJUN
+      *                変更フラグ
+                       IF      SPA-GMN-THENFLG(IDX)    =   "1"
+                          MOVE    "1"              TO  UKE-KAKREN
+                       END-IF
+      *
+                       MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
+                       MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
+      *
+                       MOVE    SPA-OPID            TO  UKE-OPID
+      *
+                       MOVE    UKETUKE-REC         TO  MCPDATA-REC
+                       MOVE    "DBUPDATE"          TO  MCP-FUNC
+                       MOVE    "tbl_uketuke"       TO  MCP-TABLE
+                       MOVE    "key"               TO  MCP-PATHNAME
+grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                           MCPDATA-REC
+                                                           SPA-AREA
+                       IF      MCP-RC          NOT =   ZERO 
+                            MOVE    "1003"              TO  SPA-ERRCD
+                            DISPLAY "U02 UKETUKE UPD ERR:"  MCP-RC
+                                  ",KEY:" UKE-KEY
+                       END-IF
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF     SPA-ERRCD            =   SPACE
+      *        排他制御解除処理
+               PERFORM 990-LOCK-OUT-SEC
+      *
+               MOVE    ZERO            TO  SPA-GMN-SELNUM
+               MOVE    ZERO            TO  SPA-NAI-SELNUM
+      *        予約，受付編集
+               PERFORM 3101-UKETU-HEN-SEC
+               MOVE    1               TO  SPA-GMN-CUR
+           END-IF
+           .
+       49041-UKETUKE-JUN-EXT.
+           EXIT.
+      *****************************************************************
+      *   受付順選択チェック処理
+      *****************************************************************
+       41042-SELNUM-UKEUPCHK-SEC         SECTION.
+      *
+           MOVE    SPA-GMN-SELNUM          TO  SPA-NAI-SELNUM
+           MOVE    SPA-GMN-SELNUM          TO  IDX
+           IF      SPA-GMN-TPTID (IDX) NOT =  ZERO
+      *        排他制御処理
+               MOVE    SPA-GMN-TPTID  (IDX)  TO  SPA-GMN-PTID
+               PERFORM 990-LOCK-IN-SEC
+               IF      SPA-ERRCD       NOT =   SPACE
+                   MOVE    1                   TO  SPA-GMN-CUR
+               END-IF
+               MOVE    ZERO                TO  SPA-GMN-PTID
+           END-IF
+           .
+       41042-SELNUM-UKEUPCHK-EXT.
+           EXIT.
+      *****************************************************************
+      *   受付順変更処理（↑）
+      *****************************************************************
+       4659-UKETUKE-UP-SYORI-SEC         SECTION.
+      *
+      *    受付順変更
+           PERFORM 41042-SELNUM-UKEUPCHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4659-UKETUKE-UP-SYORI-EXT
+           END-IF
+      *
+           IF    (SPA-GMN-SELNUM         <=  1    )
+               GO      TO      4659-UKETUKE-UP-SYORI-EXT
+           END-IF
+      *
+           MOVE    SPA-GMN-SELNUM     TO  WRK-IDX
+      *                                   入替対象インデックス取得
+           COMPUTE     WRK-IDY        =   WRK-IDX  -   1
+      *
+           MOVE    SPA-GMN-TBLO (WRK-IDY) TO  WRK-SORT2-DATA (1)
+           MOVE    "1"                TO  SPA-GMN-THENFLG(WRK-IDX)
+           MOVE    SPA-GMN-TBLO (WRK-IDX)
+                                      TO  SPA-GMN-TBLO   (WRK-IDY)
+           MOVE    WRK-SORT2-DATA (1)
+                                      TO  SPA-GMN-TBLO   (WRK-IDX)
+           MOVE    WRK-IDX            TO  SPA-GMN-TNUM   (WRK-IDX)
+           MOVE    WRK-IDY            TO  SPA-GMN-TNUM   (WRK-IDY)
+      *
+           MOVE    1                  TO  SPA-NAI-UPDOWN
+      *
+           IF      SPA-GMN-SELNUM     >   1
+               COMPUTE SPA-GMN-SELNUM   =   SPA-GMN-SELNUM  -   1
+           END-IF
+           MOVE    SPA-GMN-SELNUM      TO  SPA-NAI-SELNUM
+      *
+           MOVE    63                  TO  SPA-GMN-CUR
+           .
+       4659-UKETUKE-UP-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *   受付順変更処理（↓）
+      *****************************************************************
+       4759-UKETUKE-DOWN-SYORI-SEC         SECTION.
+      *
+      *    受付順変更
+           PERFORM 41042-SELNUM-UKEUPCHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4759-UKETUKE-DOWN-SYORI-EXT
+           END-IF
+      *
+           IF      (SPA-GMN-SELNUM     >   ZERO )
+              AND  (SPA-GMN-SELNUM     <   SPA-UKE-MAX )
+                CONTINUE
+           ELSE
+               GO      TO      4759-UKETUKE-DOWN-SYORI-EXT
+           END-IF
+      *                                   入替対象インデックス取得
+           MOVE    SPA-GMN-SELNUM     TO  WRK-IDX
+           COMPUTE     WRK-IDY        =   WRK-IDX  +   1
+      *
+           MOVE    SPA-GMN-TBLO (WRK-IDY) TO  WRK-SORT2-DATA (1)
+           MOVE    "1"                TO  SPA-GMN-THENFLG(WRK-IDX)
+           MOVE    SPA-GMN-TBLO (WRK-IDX)
+                                      TO  SPA-GMN-TBLO   (WRK-IDY)
+           MOVE    WRK-SORT2-DATA (1)
+                                      TO  SPA-GMN-TBLO   (WRK-IDX)
+           MOVE    WRK-IDX            TO  SPA-GMN-TNUM   (WRK-IDX)
+           MOVE    WRK-IDY            TO  SPA-GMN-TNUM   (WRK-IDY)
+      *
+           MOVE    1                  TO  SPA-NAI-UPDOWN
+      *
+           COMPUTE SPA-GMN-SELNUM     =   SPA-GMN-SELNUM  +   1
+           MOVE    SPA-GMN-SELNUM      TO  SPA-NAI-SELNUM
+      *
+           MOVE    63                  TO  SPA-GMN-CUR
+           .
+       4759-UKETUKE-DOWN-SYORI-EXT.
+           EXIT.
+      *H28.12
       *
       *****************************************************************
       *    自画面編集処理
@@ -6850,6 +7311,19 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                           TO  WRK-TMM
                    MOVE    WRK-HENTIME    TO  U02-ULUKETUKETIME(IDX)
                END-IF
+      *
+      *H28.12
+               IF      SPA-GMN-THENFLG (IDX)   =   "1"
+                   IF     (SPA-NAI-SYORI1      =   0  )
+                      AND (SPA-NAI-UPOK        =   0  )
+                       MOVE    "**"       TO  U02-ULUKETUKETIME(IDX)
+                                                           (7:2)
+                   ELSE
+                       MOVE    "*"        TO  U02-ULUKETUKETIME(IDX)
+                                                           (8:1)
+                   END-IF
+               END-IF
+      *
                MOVE    SPA-GMN-TPTNUM     (IDX) TO  U02-ULPTNUM   (IDX)
                MOVE    SPA-GMN-TNAME      (IDX) TO  U02-ULNAME    (IDX)
                MOVE    SPA-GMN-TNENREI    (IDX) TO  U02-ULNENREI  (IDX)
@@ -6884,10 +7358,31 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    1
                    MOVE    "現在の受付状況"        TO  U02-LABEL-VALUE
                    MOVE    "black"                 TO  U02-LABEL-STYLE
+      *????        IF      SPA-NAI-YYKARI      =   1
+      *                MOVE    "現在の受付状況（予約あり）"
+      *                                            TO  U02-LABEL-VALUE
+      *????        END-IF
                WHEN    2
                    MOVE    "現在の予約状況"        TO  U02-LABEL-VALUE
                    MOVE    "black"                 TO  U02-LABEL-STYLE
            END-EVALUATE
+      *
+      *H28.12
+           IF      SPA-NAI-UPOK        =   1
+      *        受付のみ表示中
+               IF      SPA-NAI-UKEUP       =   1
+                   MOVE    "受付順更新"        TO  U02-B03S-LABEL
+                   MOVE    "＜受付順更新＞"    TO  U02-UPMSG-VALUE
+                   MOVE    "blue"              TO  U02-UPMSG-STYLE
+               ELSE
+                   MOVE    "受付順変更"        TO  U02-B03S-LABEL
+               END-IF
+               MOVE    WIDGET-NORMAL       TO  U02-B03S-STATE
+           ELSE
+               MOVE    SPACE               TO  U02-B03S-LABEL
+               MOVE    WIDGET-INSENSITIVE  TO  U02-B03S-STATE
+           END-IF
+      *H28.12
       *
       *    非活性処理
            PERFORM 510-GSRAUTH-SEC
@@ -7001,6 +7496,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "B05"        TO  MCP-WIDGET
                WHEN    62
                    MOVE    "B12"        TO  MCP-WIDGET
+               WHEN    63
+                   MOVE    "B03S"       TO  MCP-WIDGET
            END-EVALUATE
            .
       *
@@ -7274,6 +7771,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0033"
                    STRING  "予約が来院済みとなっています。"
                            "再度、選択をして下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+      *H28.12
+               WHEN    "0034"
+                   STRING  "患者が選択中です。"
+                           "受付順変更はできません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0035"
+                   STRING  "受付順変更中です。"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING

@@ -22,6 +22,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.04.00    NACL-多々納  07/02/19  ＱＲ受付対応
+      *  04.08.00    NACL-多々納  16/12/XX  受付順変更対応
       *****************************************************************
        01  SPA-U02.
            03  SPA-U02-AREA.
@@ -176,6 +177,9 @@
                            11  SPA-GMN-TRRKYMD         PIC X(09).
                            11  SPA-GMN-TNYUKBN         PIC X(01).
                            11  SPA-GMN-TSRFLG          PIC X(04).
+      *H28.12
+      *                    受付順変更
+                           11  SPA-GMN-THENFLG         PIC X(01).
                    07  SPA-UKE-MAX                     PIC 9(04).
       *
       *---- (01.00.03) LINE MOD START -------------------------------
@@ -183,8 +187,17 @@
       **       05  SPA-NAI-PTID      PIC X(10).
       *
                05  SPA-NAI-SELNUM                 PIC 9(04).
-      *       受付・予約
+      *        受付・予約
                05  SPA-NAI-SYORI1              PIC 9(01).
+      *H28.12
+      *        受付のみ表示中
+               05  SPA-NAI-UPOK                PIC 9(01).
+      *        予約あり
+               05  SPA-NAI-YYKARI              PIC 9(01).
+      *        受付順変更中
+               05  SPA-NAI-UKEUP               PIC 9(01).
+      *        変更あり
+               05   SPA-NAI-UPDOWN             PIC 9(01).
       *
                05  SPA-NAIB-AREA.
                    07  SPA-NAI-PTID                    PIC X(10).

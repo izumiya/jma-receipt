@@ -99,7 +99,7 @@ U02 {
           item {
             column1 varchar(4);
             column2 varchar(6);
-            column3 varchar(6);
+            column3 varchar(8);
             column4 varchar(20);
             column5 varchar(50);
             column6 varchar(2);
@@ -175,6 +175,14 @@ U02 {
     };
     B10S {
       state int;
+    };
+    B03S {
+      state int;
+      label varchar(10);
+    };
+    UPDMSG {
+      style varchar(20);
+      textdata varchar(20);
     };
   };
 };

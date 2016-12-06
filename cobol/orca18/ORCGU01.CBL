@@ -39,6 +39,7 @@
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.05.00    NACL-多々納  09/06/03  400行対応
       *  04.08.00    NACL-多々納  14/08/12  クライアント印刷対応
+      *  04.08.00    NACL-多々納  16/12/XX  受付順変更表示対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -91,6 +92,10 @@
                            13  SPA-GMN-UKEID       PIC 9(05).
       *                    送受信フラグ
                            13  SPA-GMN-SRFLG       PIC X(04).
+      *H28.12
+      *                    変更フラグ
+                           13  SPA-GMN-HENFLG      PIC X(01).
+      *
                    09  SPA-GMN-SELNUM          PIC 9(04) OCCURS  2.
                    09  SPA-GMN-MAX             PIC 9(03) OCCURS  2.
       *
@@ -229,6 +234,9 @@
                    07  SPA-WRK-UKEID       PIC 9(05).
       *            送受信フラグ
                    07  SPA-WRK-SRFLG       PIC X(04).
+      *H28.12
+      *            変更フラグ
+                   07  SPA-WRK-HENFLG      PIC X(01).
       *
       *   受付内容編集領域
         01  WORK-SORT-TBL.
@@ -248,6 +256,9 @@
                    07  WORK-SORT-UKEID        PIC 9(05).
       *            送受信フラグ
                    07  WORK-SORT-SRFLG        PIC X(02).
+      *H28.12
+      *            変更フラグ
+                   07  WORK-SORT-HENFLG       PIC X(01).
       *
       *    スパ領域 ワーク
            COPY    "COMMON-SPA"      REPLACING
@@ -540,10 +551,6 @@
       *        選択一覧
                WHEN    "CLICKED"       ALSO    "B09"
                    PERFORM 490-U012-SYORI-SEC
-      *保留!!!!!!!!!
-      *        担当医登録
-      *        WHEN    "CLICKED"       ALSO    "B06"
-      ******       PERFORM 460-UDR-SYORI-SEC
            END-EVALUATE
       *
            .
@@ -631,6 +638,9 @@
            COMPUTE     WRK-IDY        =   WRK-IDX  -   1
       *
            MOVE    SPA-GMN-TBL2(1)    TO  SPA-WRK-TBL
+      *H28.12
+           MOVE    "1"                TO  SPA-GMN-HENFLG(1 WRK-IDX)
+      *
            MOVE    SPA-GMN-TBLREC (1 WRK-IDX)
                                       TO  SPA-WRK-TBLREC (WRK-IDY)
            MOVE    SPA-GMN-TBLREC (1 WRK-IDY)
@@ -680,6 +690,9 @@
            COMPUTE     WRK-IDY        =   WRK-IDX  +   1
       *
            MOVE    SPA-GMN-TBL2  (1)  TO  SPA-WRK-TBL
+      *H28.12
+           MOVE    "1"                TO  SPA-GMN-HENFLG(1 WRK-IDX)
+      *
            MOVE    SPA-GMN-TBLREC(1 WRK-IDX)
                                       TO  SPA-WRK-TBLREC (WRK-IDY)
            MOVE    SPA-GMN-TBLREC(1 WRK-IDY)
@@ -1118,35 +1131,6 @@
        440-ATOGMN-EXT.
            EXIT.
       *
-      *!!!!!!!!!!!!!
-      *TEST
-      *****************************************************************
-      *    担当医登録　処理
-      *****************************************************************
-       460-UDR-SYORI-SEC             SECTION.
-      *
-      *
-           INITIALIZE                      SPA-U012-AREA
-      *
-           MOVE    "U01"               TO  SPA-U012-MOTOPG
-           MOVE    SPA-U01KYOUTU       TO  SPA-WORK
-           MOVE    SPACE               TO  LNK-KYOUTU
-      *
-           MOVE    "U01"               TO  SPA-MOTOPG
-           MOVE    "UDR"               TO  SPA-SAKIPG
-      *
-           MOVE    "CHANGE"            TO  MCP-PUTTYPE
-           MOVE    "UDR"               TO  MCP-WINDOW
-      *
-           PERFORM 900-PUT-WINDOW
-      *
-           MOVE    1                   TO  FLG-END
-      *
-           .
-       460-UDR-SYORI-EXT.
-           EXIT.
-      *!!!!!!!!!!!!!
-      *TEST
       *****************************************************************
       *    自画面編集処理
       *****************************************************************
@@ -1243,6 +1227,13 @@
       *        送受信フラグ
                MOVE    SPA-GMN-SRFLG(IDX IDY)
                                            TO  U01-SI-SRFLG (IDY)
+      *H28.12
+               IF      SPA-GMN-HENFLG (IDX IDY) =   "1"
+      *        変更済み
+                   MOVE    "*"           TO  U01-SI-UKETIME(IDY)
+                                                    (8:1)
+               END-IF
+      *
                MOVE    IDY                 TO  U01-SI-COUNT
       *
                IF      SPA-GMN-NO(IDX IDY) =   SPA-GMN-SELNUM(1)
@@ -1520,8 +1511,13 @@
            END-IF
       *    送受信フラグ
            MOVE    UKE-SRFLG           TO  WORK-SORT-SRFLG (IDX1 IDX4)
+      *H28.12
+      *    変更フラグ
+           IF      UKE-KAKREN (1:1)    =   "1"
+               MOVE    "1"             TO  WORK-SORT-HENFLG(IDX1 IDX4)
+           END-IF
       *
-           .  
+           .
       *
        50012-UKETUKE-SET-EXT.
            EXIT.
@@ -1913,7 +1909,12 @@
                WHEN    "03"
                    MOVE    "会待"          TO  SPA-GMN-SRFLG (IDX IDX2)
            END-EVALUATE
-           .         
+      *H28.12
+      *    変更フラグ
+           IF      WORK-SORT-HENFLG(IDX IDX3)  =   "1"
+               MOVE    "1"             TO  SPA-GMN-HENFLG(IDX IDX2)
+           END-IF
+           .
       *
        50021-SPA-HEN-EXT.
            EXIT.
@@ -1956,6 +1957,11 @@
                    IF      UKE-KAIKEITIME      =   ZERO
                        ADD     1                   TO  IDY
                        MOVE    IDY                 TO  UKE-HYOJIJUN
+      *H28.12
+      *                変更フラグ
+                       IF  SPA-GMN-HENFLG(1 IDX)   =   "1"
+                          MOVE    "1"            TO  UKE-KAKREN
+                       END-IF
       *
                        MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
                        MOVE    SMCNDATE-HMS        TO  UKE-UPHMS

@@ -41,7 +41,7 @@ U012 {
             column8 varchar(8);
             column9 varchar(24);
             column10 varchar(50);
-            column11 varchar(6);
+            column11 varchar(8);
             column12 varchar(6);
             column13 varchar(6);
           }[400];

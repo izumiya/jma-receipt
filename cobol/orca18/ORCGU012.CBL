@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-多々納  15/06/16  診療科表示件数対応
+      *  04.08.00    NACL-多々納  16/12/XX  受付順変更表示対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -132,6 +133,9 @@
                        09  SPA-NAI-DRCDADD         PIC X(01).
       *                送受信フラグ
                        09  SPA-NAI-SRFLG           PIC X(01).
+      *H28.12
+      *                変更フラグ
+                       09  SPA-GMN-HENFLG          PIC X(01).
                    07  SPA-GMN-MAX             PIC 9(03).
       *
       *    フラグ領域
@@ -234,6 +238,9 @@
                        09  WRK-NAI-DRCDADD         PIC X(01).
       *                送受信フラグ
                        09  WRK-NAI-SRFLG           PIC X(01).
+      *H28.12
+      *                変更フラグ
+                       09  WRK-NAI-HENFLG          PIC X(01).
       *    一覧表最大行数
        01  LINE-MAX                    PIC 9(03)   VALUE   400.
       *
@@ -1184,6 +1191,11 @@
            END-IF
       *    送受信フラグ
            MOVE    UKE-SRFLG           TO  SPA-NAI-SRFLG (IDX)
+      *H28.12
+      *    変更フラグ
+           IF      UKE-KAKREN (1:1)    =   "1"
+               MOVE    "1"                 TO  SPA-GMN-HENFLG(IDX)
+           END-IF
       *    時間編集
            MOVE    SPA-NAI-UKETIME(IDX)(1:2)
                                        TO  SPA-GMN-UKETIMEH(IDX)(2:2)
@@ -1694,6 +1706,12 @@
                                            TO  U012-LYYKTIME (IDX)
                MOVE    SPA-GMN-KAIKIMEH(IDX)
                                            TO  U012-LKAITIME (IDX)
+      *H28.12
+               IF      SPA-GMN-HENFLG (IDX)    =   "1"
+      *        変更済み
+                   MOVE    "*"             TO  U012-LUKETIME (IDX)
+                                                    (8:1)
+               END-IF
            END-PERFORM
            MOVE    SPA-GMN-MAX         TO  U012-LIST-COUNT
       *    次頁あり

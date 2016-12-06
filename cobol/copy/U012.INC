@@ -37,7 +37,7 @@
                     06  U012-LSRYNAIYOMEI PIC X(8).
                     06  U012-LDRCD      PIC X(24).
                     06  U012-LHKNCOMBI  PIC X(50).
-                    06  U012-LUKETIME    PIC X(6).
+                    06  U012-LUKETIME    PIC X(8).
                     06  U012-LYYKTIME    PIC X(6).
                     06  U012-LKAITIME    PIC X(6).
                   05  U012-LIST-SELECT

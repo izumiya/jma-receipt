@@ -92,7 +92,7 @@
                   05  U02-ITEM        OCCURS  400 TIMES.
                     07  U02-ULNUM         PIC X(4).
                     07  U02-ULYYKTIME     PIC X(6).
-                    07  U02-ULUKETUKETIME PIC X(6).
+                    07  U02-ULUKETUKETIME PIC X(8).
                     07  U02-ULPTNUM       PIC X(20).
                     07  U02-ULNAME        PIC X(50).
                     07  U02-ULSEX         PIC X(02).
@@ -150,3 +150,9 @@
                 04  U02-B09S-STATE   PIC S9(9)   BINARY.
               03  U02-B10S.
                 04  U02-B10S-STATE   PIC S9(9)   BINARY.
+              03  U02-B03S.
+                04  U02-B03S-STATE   PIC S9(9)   BINARY.
+                04  U02-B03S-LABEL   PIC X(10).
+              03  U02-UPDMSG.
+                04  U02-UPMSG-STYLE   PIC X(20).
+                04  U02-UPMSG-VALUE   PIC X(20).
