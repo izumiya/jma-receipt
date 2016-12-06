@@ -1232,11 +1232,16 @@
                       (SNUM-SEISUU         >   7     )   OR
                       (SNUM-SYOSUU         >   0     )
       *            整数７桁
-                   MOVE    "16"                TO  WRK-ERRCD
+                   MOVE    "14"                TO  WRK-ERRCD
                ELSE
-      *            設定あり
-                   MOVE    SNUM-OUTNUM         TO  WRK-HENKIN
-                   MOVE    1                   TO  WRK-HENKIN-OK
+                   IF      SNUM-OUTNUM         >   ZERO
+      *                マイナスのみ
+                       MOVE    "14"                TO  WRK-ERRCD
+                   ELSE
+      *                設定あり
+                       MOVE    SNUM-OUTNUM         TO  WRK-HENKIN
+                       MOVE    1                   TO  WRK-HENKIN-OK
+                   END-IF
                END-IF
                IF      WRK-HENKIN      NOT =   ZERO
                    IF      SPA-HKNCOMBINUM     =   "9999"
@@ -2846,6 +2851,11 @@
                MOVE     SPACE                  TO  WRK-ERRMSG
            WHEN    "15"
                STRING  "入金方法区分が存在しません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "14"
+               STRING  "返金額の数値エラーです。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
