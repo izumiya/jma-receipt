@@ -53,6 +53,8 @@ xml_medicalv3res4 {
 			Money_Outpatient		varchar(06);
             	} [4];
     	};
+#--- 院内・院外区分
+	Outside_Class		varchar(5);
 #--- 診療内容
 	Medical_Information  {
 		Medical_Info  {

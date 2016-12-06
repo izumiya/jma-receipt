@@ -79,6 +79,8 @@
       *                 憤が嗉坌
                         11  ORAPISUB2-PRSCRPT-AUTOKBN       PIC X(01).
       *
+      *        情陸情ま髑泔(1:情陸﹜2:情ま﹌
+               05  ORAPISUB2-INGAIKBN      PIC X(01).
       *    巨仿□嗉坌
            03  ORAPISUB2-ERRCD         PIC X(04).
            03  ORAPISUB2-ERRMSG        PIC X(100).

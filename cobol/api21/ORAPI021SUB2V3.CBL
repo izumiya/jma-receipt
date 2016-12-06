@@ -28,6 +28,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/12/XX  ±¡Æâ¡¦±¡³°¶èÊ¬ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -49,6 +50,9 @@
       *
            03  FLG-HENCHK              PIC 9(01).
            03  FLG-SP                  PIC 9(01).
+      *H28.12
+           03  FLG-INGAIKBN            PIC 9(01).
+           03  FLG-INGAIKBN-ARI        PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -229,6 +233,11 @@
            MOVE    ZERO                TO  IDY
            MOVE    ZERO                TO  IDZ
            MOVE    ZERO                TO  FLG-HENCHK
+      *H28.12
+      *    ÅêÌôÈ½Äê
+           MOVE    ZERO                TO  FLG-INGAIKBN
+           MOVE    ZERO                TO  FLG-INGAIKBN-ARI
+      *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   (IDX            >   LNK-WKSRYACT-MAX)
                        OR  (FLG-HENCHK NOT =   ZERO  )
@@ -252,12 +261,30 @@
                    IF      IDZ                 >   50
                        MOVE    1               TO  FLG-HENCHK
                    END-IF
-      *
                    IF      FLG-HENCHK          =   ZERO
                        PERFORM 2002342-WKSRYMEI-HEN-SEC
                    END-IF
+      *H28.12
+      *            ÅêÌô¤ÎÈ½Äê
+                   IF     (FLG-HENCHK          =   ZERO )
+                     AND  (LNK-WKSRY-SRYKBN(IDX)
+                                               =   "21"
+                                               OR  "22"
+                                               OR  "23" )
+      *             ÌôÉ¾°Ê³°
+                     AND  (LNK-WKSRY-ZAIKBN (IDX)
+                                           NOT =   1   )
+                       PERFORM 2002343-INGAI-CHK-SEC
+                   END-IF
+      *
                END-PERFORM
            END-PERFORM
+      *
+      *H28.12
+      *    ±¡Æâ¡¦±¡³°¶èÊ¬
+           IF      FLG-INGAIKBN-ARI    =   1
+               MOVE    FLG-INGAIKBN        TO  ORAPISUB2-INGAIKBN
+           END-IF
       *
            IF     (FLG-HENCHK          =   1     )
       *        ºÞ¿ô¥ª¡¼¥Ð¡¼
@@ -461,6 +488,48 @@
       *
            .
        2002342-WKSRYMEI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     ±¡Æâ¡¦±¡³°ÅêÌô¤ÎÈ½Äê
+      *****************************************************************
+       2002343-INGAI-CHK-SEC        SECTION.
+      *
+      *    ÄûÀµ¤Î»þ¡¢¿ÇÎÅ¼ïÊÌ¤¬Ì¤ÆþÎÏ¤Ç±¡³°¤ÎÌôºÞ¤¬¤¢¤Ã¤¿»þ
+           IF     (LNK-WKSRY-SRYSYUKBN (IDX)   =   SPACE
+                                               OR  "210"
+                                               OR  "220"
+                                               OR  "230"
+                                               OR  "290"
+                                               OR  "293"
+                                               OR  "296" )
+                MOVE    1                   TO  FLG-INGAIKBN-ARI
+                IF      LNK-WKSRY-ZAITENKEI (IDX)   =   ZERO
+      *            ºÞÅÀ¿ô¡á¥¼¥í¡¡±¡³°
+      *            ºÞÆâ¤ËÌôºÞ¤¬¤¢¤ë»þ¤Î¤ß
+                   IF     (LNK-WKSRY-SRYCD (IDX IDW)(1:1)
+                                               =   "6" )
+                       IF      FLG-INGAIKBN    =   ZERO
+                           MOVE    1               TO  FLG-INGAIKBN
+                       END-IF
+                   END-IF
+      *            ¥æ¡¼¥¶´ïºà¤Ç¡¢¶â³Û¡ä¥¼¥í¤Î»þ¡¢±¡³°¤È¤¹¤ë
+                   IF      FLG-INGAIKBN    =   ZERO
+                       IF     ( LNK-WKSRY-SRYCD (IDX IDW)(1:3)
+                                                   =   "059" )
+                           IF      TNS-TEN         >   ZERO
+                               MOVE    1           TO  FLG-INGAIKBN
+                           END-IF
+                       END-IF
+                   END-IF
+               ELSE
+      *            ºÞÅÀ¿ô¡â¥¼¥í¡¡±¡Æâ
+                   MOVE    2               TO  FLG-INGAIKBN
+               END-IF
+           END-IF
+      *
+           .
+       2002343-INGAI-CHK-EXT.
            EXIT.
       *
       *****************************************************************

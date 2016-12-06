@@ -514,6 +514,7 @@ RECORD_files = \
         patientmodv35.rec \
         patientmodv36.rec \
         patientmodv37.rec \
+	medicalmodv35.rec \
 
 DEF_files = \
 
@@ -863,6 +864,8 @@ DB_files = \
 	xml_patientmodv3res5.db \
 	xml_patientmodv3res6.db \
 	xml_patientmodv3res7.db \
+	xml_medicalv3req5.db \
+	xml_medicalv3res5.db \
 
 
 shell.db: shell.db.in

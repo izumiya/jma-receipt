@@ -10,6 +10,7 @@ bindapi	"medicalmodv32"	"OpenCOBOL"	"ORAPI021S2V3";
 bindapi	"medicalmodv33"	"OpenCOBOL"	"ORAPI021S3V3";
 bindapi	"medicalmodv34"	"OpenCOBOL"	"ORAPI021S4V3";
 bindapi	"claimreceivev2"	"OpenCOBOL"	"ORAPICLAIM21S1V2";
+bindapi	"medicalmodv35"	"OpenCOBOL"	"ORAPI021S5V3";
 
 multiplex_group	api21;
 
@@ -24,6 +25,7 @@ data	{
 		medicalmodv33;
 		medicalmodv34;
 		claimreceivev2;
+		medicalmodv35;
 	};
 };
 db "xml" {
@@ -43,6 +45,8 @@ db "xml2" {
  xml_medicalv3res4;
  xml_claim_receivev2req;
  xml_claim_receivev2res;
+ xml_medicalv3req5;
+ xml_medicalv3res5;
 };
 
 #include "orcadb.inc"

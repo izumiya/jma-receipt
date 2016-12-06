@@ -1382,6 +1382,17 @@
            MOVE    SPA-OLD-SRYKA       TO  SPA-SRYKA
       *    √Ê≈”•«°º•ø ‘Ω∏
            PERFORM 200212-WKSRYACT-HENSYU-SEC
+      *H28.12
+      *    ±°∆‚°¶±°≥∞∂Ë ¨
+           EVALUATE    ORAPISUB2-INGAIKBN
+               WHEN    "1"
+      *            ±°≥∞
+                   MOVE    "True"          TO  MDCRES-OUTSIDE-LASS
+               WHEN    "2"
+      *            ±°∆‚
+                   MOVE    "False"         TO  MDCRES-OUTSIDE-LASS
+           END-EVALUATE
+      *
       *    ø«Œ≈≤  ‘Ω∏
            MOVE    SPA-SRYKA           TO  MDCRES-APPOINT-DEP-CODE
            MOVE    SPA-DRCD            TO  MDCRES-APPOINT-DR-CODE

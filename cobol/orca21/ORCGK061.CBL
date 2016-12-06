@@ -31,6 +31,7 @@
       *  04.07.00    NACL-多々納  11/09/XX  精神科ケア開始日対応
       *  04.07.00    NACL-多々納  13/09/11  リハビリコメント削除対応
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/10/31  HAORI対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -208,6 +209,8 @@
        01  TBL-IKOU-MAX                PIC 9(02)   VALUE   5.
       *
       *算定履歴作成
+      *!!!! (変更時は　ORAPI021R5V3 も変更すること）
+      *
        01  TBL-RRK-SRYCD-G.
       *    心大血管疾患リハビリ開始日
            03  FILLER          PIC X(09)   VALUE  "099800111".
@@ -275,7 +278,7 @@
            03  FILLER          PIC X(09)   VALUE  SPACE.
       *    依存症集団療法開始日
            03  FILLER          PIC X(09)   VALUE  "099830103".
-           03  FILLER          PIC X(09)   VALUE  "099830104".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *    磁気による刺激法開始日
            03  FILLER          PIC X(09)   VALUE  "099400001".
            03  FILLER          PIC X(09)   VALUE  SPACE.
@@ -435,6 +438,7 @@
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  IDX-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA.
            MOVE    SPA-FREE        TO  SPA-K06
@@ -510,6 +514,15 @@
                WHEN    "KID1"
       *            確認画面より
                    PERFORM 30010-KID1-SET-SEC
+      *
+      *API
+              WHEN    "APIV3"
+      *           算定履歴一覧のみ編集 
+      *           初回判定
+                   PERFORM 3101-RRK-HENSYU-SEC
+      *            リハビリ開始登録
+                   PERFORM 3103-RRKLIST-INIT2-SEC
+                   MOVE    1             TO  FLG-END
       *
                WHEN    OTHER
                    PERFORM 310-SPASET-SEC
@@ -3127,7 +3140,7 @@
                MOVE    "1001"              TO  SPA-ERRCD
                DISPLAY "K061 INS SANTEIPLUS-KEY =>" SANTEIPLUS-KEY 
            END-IF
-          .
+           .
        45021-SANTEIPLUS-END-INS-EXT.
            EXIT.
       *****************************************************************

@@ -108,6 +108,9 @@
       *               ≥∞ÕË°›∏«ƒÍ≥€
                       11  MDCRES-MONEY-OUTPATIENT        PIC X(06).
       *
+      *        ±°∆‚±°≥∞∂Ë ¨° ≈ÍÃÙ§¢§Í§Œ§ﬂ°À
+               05  MDCRES-OUTSIDE-LASS        PIC X(05).
+      *
       *        ø«Œ≈∆‚Õ∆ ÷µ—
                05  MDCRES-MEDICAL-INF-G.
                  07  MDCRES-MDC-INFO          OCCURS   120.
