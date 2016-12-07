@@ -252,10 +252,10 @@ W07 {
         };
         BYOHYOKBN_COMB {
           BYOHYOKBN {
-            textdata varchar(12);
+            textdata varchar(40);
           };
           count int;
-            item varchar(12)[2];
+            item varchar(40)[5];
         };
         ZAIJUNKBN_COMB {
           ZAIJUNKBN {

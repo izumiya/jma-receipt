@@ -135,6 +135,7 @@
       *  04.08.01    NACL-ÂÀÅÄ    16/08/05  ¼ýÇ¼ÀÁµá°ìÍ÷½é´üÉ½¼¨ÄÉ²Ã
       *  04.08.01    NACL-Â¿¡¹Ç¼  16/10/04  Í×²ð¸î¾ðÊóÉ½¼¨¶èÊ¬ÄÉ²Ã
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/11/XX  ÅêÌôÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯¶èÊ¬ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  16/12/XX  ÉÂÌ¾É½¼¨¶èÊ¬¤ËÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -328,10 +329,11 @@
                        09  SPA-GMN-BYOHYOKBN-G.
                            11  SPA-GMN-BYOHYOKBN           PIC X(01).
                            11  SPA-GMN-BYOHYOKBN-F1        PIC X(01).
-                           11  SPA-GMN-BYOHYOKBN-MEI       PIC X(10).
+                           11  SPA-GMN-BYOHYOKBN-MEI       PIC X(38).
                        09  SPA-GMN-BYOHYOKBN-COMB.
-                           11  SPA-GMN-BYOHYOKBN-LIST      PIC X(12)
-                                                           OCCURS  2.
+                           11  SPA-GMN-BYOHYOKBN-LIST      PIC X(40)
+                                                           OCCURS  5.
+                       09  SPA-GMN-BYOHYOKBN-MAX           PIC 9(02).
       *                ºÞÅÐÏ¿½ç¶èÊ¬
                        09  SPA-GMN-ZAIJUNKBN-G.
                            11  SPA-GMN-ZAIJUNKBN           PIC X(01).
@@ -1885,6 +1887,10 @@
       *    ÉÂÌ¾É½¼¨¶èÊ¬
            MOVE    "0 É½¼¨¤·¤Ê¤¤"      TO  SPA-GMN-BYOHYOKBN-LIST(1)
            MOVE    "1 É½¼¨¤¹¤ë"        TO  SPA-GMN-BYOHYOKBN-LIST(2)
+      *H28.12
+           MOVE    "2 É½¼¨¤¹¤ë¡Ê¥ì¥»¥×¥ÈÉ½¼¨¤Î¤ß¡Ë"
+                                       TO  SPA-GMN-BYOHYOKBN-LIST(3)
+           MOVE    3                   TO  SPA-GMN-BYOHYOKBN-MAX
       *    ºÞÅÐÏ¿½ç¶èÊ¬
            MOVE    "0 ¿ÇÎÅ¶èÊ¬½ç"      TO  SPA-GMN-ZAIJUNKBN-LIST(1)
            MOVE    "1 ÆþÎÏ½ç"          TO  SPA-GMN-ZAIJUNKBN-LIST(2)
@@ -2983,17 +2989,28 @@
            IF     SPA-GMN-BYOHYOKBN   =   SPACE
                MOVE    "1"             TO  SPA-GMN-BYOHYOKBN
            END-IF
-           EVALUATE    SPA-GMN-BYOHYOKBN
-                WHEN    "0"
-                    MOVE    SPA-GMN-BYOHYOKBN-LIST(1)
-                                               TO  SPA-GMN-BYOHYOKBN-G
-                WHEN    "1"
-                    MOVE    SPA-GMN-BYOHYOKBN-LIST(2)
-                                               TO  SPA-GMN-BYOHYOKBN-G
-                WHEN    OTHER
-                    MOVE    SPA-GMN-BYOHYOKBN-LIST(2)
-                                               TO  SPA-GMN-BYOHYOKBN-G
-           END-EVALUATE
+      *H28.12
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-BYOHYOKBN-MAX
+               IF      SPA-GMN-BYOHYOKBN
+                                       =    SPA-GMN-BYOHYOKBN-LIST
+                                                    (IDX)(1:1)
+                   MOVE    SPA-GMN-BYOHYOKBN-LIST(IDX)
+                                       TO  SPA-GMN-BYOHYOKBN-G
+                   MOVE    SPA-GMN-BYOHYOKBN-MAX   TO  IDX
+               END-IF
+           END-PERFORM
+      ***  EVALUATE    SPA-GMN-BYOHYOKBN
+      *         WHEN    "0"
+      *             MOVE    SPA-GMN-BYOHYOKBN-LIST(1)
+      *                                        TO  SPA-GMN-BYOHYOKBN-G
+      *         WHEN    "1"
+      *             MOVE    SPA-GMN-BYOHYOKBN-LIST(2)
+      *                                        TO  SPA-GMN-BYOHYOKBN-G
+      *         WHEN    OTHER
+      *             MOVE    SPA-GMN-BYOHYOKBN-LIST(2)
+      *                                        TO  SPA-GMN-BYOHYOKBN-G
+      **** END-EVALUATE
       *    ºÞÅÐÏ¿½ç¶èÊ¬
            IF     SPA-GMN-ZAIJUNKBN   =   SPACE
                MOVE    "0"             TO  SPA-GMN-ZAIJUNKBN
@@ -7347,7 +7364,7 @@
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   2
+                   UNTIL       IDX     >   SPA-GMN-BYOHYOKBN-MAX
                IF      SPA-GMN-BYOHYOKBN
                                       =   SPA-GMN-BYOHYOKBN-LIST(IDX)
                                                                 (1:1)
@@ -11507,11 +11524,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ÉÂÌ¾É½¼¨¶èÊ¬
            MOVE    SPA-GMN-BYOHYOKBN-G TO  W07-BYOHYOKBN
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   2
+                   UNTIL       IDX     >   SPA-GMN-BYOHYOKBN-MAX
                MOVE    SPA-GMN-BYOHYOKBN-LIST (IDX)
                                        TO  W07-BYOHYOKBN-ITEM(IDX)
            END-PERFORM
-           MOVE    2                   TO  W07-BYOHYOKBN-COUNT
+           MOVE    SPA-GMN-BYOHYOKBN-MAX   TO  W07-BYOHYOKBN-COUNT
       *    ºÞÅÐÏ¿½ç¶èÊ¬
            MOVE    SPA-GMN-ZAIJUNKBN-G TO  W07-ZAIJUNKBN
            PERFORM VARYING     IDX     FROM    1   BY  1

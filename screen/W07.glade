@@ -1325,7 +1325,7 @@
             <name>ZAIJUNKBN_COMB</name>
             <x>656</x>
             <y>588</y>
-            <width>120</width>
+            <width>248</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -1363,7 +1363,7 @@
             <name>BYOHYOKBN_COMB</name>
             <x>656</x>
             <y>560</y>
-            <width>120</width>
+            <width>248</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -1380,7 +1380,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
-              <text_max_length>12</text_max_length>
+              <text_max_length>40</text_max_length>
               <text>1 表示する</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>

@@ -177,10 +177,10 @@
                             PIC X(12)   OCCURS  2 TIMES.
                   05  W07-BYOHYOKBN-COMB.
                     06  W07-BYOHYOKBN.
-                      07  W07-VALUE   PIC X(12).
+                      07  W07-VALUE   PIC X(40).
                     06  W07-BYOHYOKBN-COUNT   PIC S9(9)   BINARY.
                     06  W07-BYOHYOKBN-ITEM
-                            PIC X(12)   OCCURS  2 TIMES.
+                            PIC X(40)   OCCURS  5 TIMES.
                   05  W07-ZAIJUNKBN-COMB.
                     06  W07-ZAIJUNKBN.
                       07  W07-VALUE   PIC X(16).

@@ -35,6 +35,7 @@
       *  04.08.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *  04.08.00    NACL-多々納  14/05/28  一時ファイル変更
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
+      *  04.08.00    NACL-多々納  16/12/08  病名レセ非表示対応
       *****************************************************************
       *
       *
@@ -118,6 +119,8 @@
            03  FLG-CHK             PIC 9(01).
       *
            03  FLG-CHK-END          PIC 9(01).
+      *H28.12
+           03  FLG-BYONO           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -261,6 +264,8 @@
                        09  WRK-BYOMEI          PIC X(164).
                        09  WRK-UTAGAIFLG       PIC X(02).
                        09  WRK-MANSEIKBN       PIC X(02).
+      *                レセプト表示なし
+                       09  WRK-REZEFLG         PIC X(01).
                05  WRK-BYOMEI-HEN          PIC X(164).
                05  WRK-Z9                  PIC Z9.
                05  IDX-B                   PIC 9(04).
@@ -274,6 +279,15 @@
                05  WRK-B-SYMD               PIC X(10).
                05  WRK-B-H                  PIC X(02).
                05  WRK-B-EYMD               PIC X(10).
+      *H28.12
+      *    レセプト表示期間
+           03  WRK-BYOYMD.
+               05  WRK-BYOYYMM.
+                   07  WRK-BYO-YY          PIC 9(04).
+                   07  WRK-BYO-MM          PIC 9(02).
+               05  WRK-BYO-DD              PIC 9(02).
+           03  WRK-BYO-TUKI                PIC 9(03).
+      *
       *    診療年月日−１ヶ月
            03  WRK-SRYYMD-1.
                05  WRK-SRYYM-1.
@@ -2899,6 +2913,15 @@
                    END-STRING
                    MOVE    WRK-BYOMEI-HEN  TO  WRK-BYOMEI (IDX-B)
                END-IF
+      *H28.12
+      *        レセプト表示フラグ
+               IF      PTBYO-REZEFLG       =   "1"
+                   MOVE    "1"             TO  WRK-REZEFLG (IDX-B)
+               END-IF
+      *        レセプト表示月数
+               IF      PTBYO-REZEMM    NOT =   ZERO
+                   PERFORM 110123-BYOMEI-KIKAN-SEC
+               END-IF
       *
       *        内部
                MOVE    IDX-B               TO  SPA-NAI-BYOMEI-MAX
@@ -2940,6 +2963,13 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-B   )   OR
                               (SPA-BYOMEI-MAX  >=  100)
+      *H28.12
+      *      レセプト表示外の表示なし
+             IF     (SPA-BYOHYOKBN-FLG   =   "2" )
+               AND  (WRK-REZEFLG (IDX)   =   "1" )
+                 MOVE    1               TO  FLG-BYONO
+             ELSE
+      *        病名編集
                MOVE    ZERO            TO  FLG-BYOMEI-END
                MOVE    1               TO  IDX-B2
                PERFORM
@@ -2975,6 +3005,9 @@
                        MOVE    1           TO  FLG-BYOMEI-END
                    END-IF
                END-PERFORM
+      *H28.12
+             END-IF
+      *
       *!!
       *TEST
       *        期間編集
@@ -2999,6 +3032,17 @@
            IF      SPA-BYOMEI-MAX      >   100
                MOVE    100             TO  SPA-BYOMEI-MAX
            END-IF
+      *H28.12
+           IF      SPA-BYOMEI-MAX      <   100
+      *        レセプト表示なし
+               IF     (SPA-BYOHYOKBN-FLG   =   "2" )
+                 AND  (FLG-BYONO           =   1   )
+                   ADD     1               TO  SPA-BYOMEI-MAX
+                   MOVE    "＜非表示病名あり＞"
+                                           TO  SPA-GMN-BYOMEI
+                                                    (SPA-BYOMEI-MAX)
+               END-IF
+           END-IF
            .
        11012-BYOMEI-HENSYU-EXT.
            EXIT.
@@ -3016,6 +3060,32 @@
            MOVE    SMKBYO-BYOMEI       TO  WRK-BYOMEI-HEN
            .
        110121-ORCSMKBYOMEI-EXT.
+           EXIT.
+      *H28.12
+      *****************************************************************
+      *    レセプト表示月数チェック処理
+      *****************************************************************
+       110123-BYOMEI-KIKAN-SEC              SECTION.
+      *
+           MOVE    PTBYO-SRYYMD        TO  WRK-BYOYMD
+           COMPUTE WRK-BYO-TUKI        =   WRK-BYO-MM
+                                       +   PTBYO-REZEMM
+           IF      WRK-BYO-TUKI        <=  12
+               MOVE    WRK-BYO-TUKI        TO  WRK-BYO-MM
+           END-IF
+           PERFORM UNTIL    WRK-BYO-TUKI   <=  12
+               COMPUTE WRK-BYO-TUKI    =   WRK-BYO-TUKI
+                                       -   12
+               MOVE    WRK-BYO-TUKI        TO  WRK-BYO-MM
+               COMPUTE WRK-BYO-YY      =   WRK-BYO-YY
+                                       +   1
+           END-PERFORM
+      *    レセプト表示期間外
+           IF      WRK-BYOYYMM         <=  SPA-SRYYMD(1:6)
+               MOVE    "1"             TO  WRK-REZEFLG (IDX-B)
+           END-IF
+           .
+       110123-BYOMEI-KIKAN-EXT.
            EXIT.
       *
       *****************************************************************
