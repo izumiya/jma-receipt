@@ -757,6 +757,8 @@
       *                                     （記録）対応修正
       *  04.08.35    NACL-門脇    16/11/11  減額（円超）の対応
       *  04.08.36    NACL-門脇    16/11/12  徳島県地方公費対応
+      *  04.08.37    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
+      *                                     コメント記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2667,6 +2669,8 @@
            03  CONS-SINPESUR1-COMMENT PIC X(09) VALUE  "113015010".
       *    心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
            03  CONS-SINPESUR2-COMMENT PIC X(09) VALUE  "113015130".
+      *    心臓ペースメーカー指導管理料（イ以外）
+           03  CONS-SINPESUR3-COMMENT PIC X(09) VALUE  "113001610".
       *
       *    がん患者指導管理料（医師・看護師が心理的不安軽減のため面接）
            03  CONS-GANSIDO1-COMMENT PIC X(09)  VALUE  "113015310".
@@ -13323,6 +13327,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-GANSIDO2-COMMENT
                    MOVE   "2"   TO    RECE04-FLG-GANSIDO-COMMENT
+                END-IF
+              END-IF
+              IF   RECE02-SRYYM    >=     "201604"
+                IF   SRY-SRYCD(IDX2) =  CONS-SINPESUR3-COMMENT
+                   MOVE   "3"   TO    RECE04-FLG-SINPESUR-COMMENT
                 END-IF
               END-IF
            END-IF

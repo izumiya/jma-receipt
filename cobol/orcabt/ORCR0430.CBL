@@ -146,6 +146,8 @@
       *  04.08.06    NACL-門脇    16/05/18  乳幼児コメント自動記載条件修正
       *  04.08.07    NACL-門脇    16/09/27  在宅患者訪問リハビリテーション指導
       *                                     管理料の算定日コメント対応
+      *  04.08.08    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
+      *                                     コメント記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -729,8 +731,9 @@
       *
       *    心臓ペースメーカー指導管理料（遠隔モニタリング）
            03  CONS-SINPESU         PIC X(09) VALUE "113001510".
-      *    心臓ペースメーカー指導管理料（イ以外）
-           03  CONS-SINPESU2        PIC X(09) VALUE "113001610".
+      *    遠隔モニタリング加算
+           03  CONS-SINPESU2        PIC X(09) VALUE "113018070".
+      *
       *    認知療法・認知行動療法
            03  CONS-NINRYO          PIC X(09) VALUE "180033210".
       *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
@@ -5015,17 +5018,22 @@ grpsys       PERFORM  900-DBSELECT-SEC
       *****************************************************************
        2001-SINPESU-HANTEI-SEC          SECTION.
       *
-           IF     RECE44-FLG-SINPESU-COMMENT   =    "1"
+           IF   ((RECE41-SRYYM                 <  "201604") AND
+                 (RECE44-FLG-SINPESU-COMMENT   =  "1"     ))
+           OR   ((RECE41-SRYYM                >=  "201604") AND
+                 (RECE44-FLG-SINPESU-COMMENT   =  "1"     ) AND
+                 (RECE44-FLG-SINPESUR-COMMENT  =  "3"     ))
+            IF    RECE41-SRYYM  >=  "201604"
+             MOVE    ZERO                TO  FLG-SINPESU-COMMENT
+             MOVE    SPACE               TO  WRK-SINPESU-YMD
+             PERFORM   20011-SINPESU-CHECK-SEC
+            ELSE
              MOVE    ZERO                TO  FLG-SINPESU-COMMENT
              MOVE    SPACE               TO  WRK-SINPESU-YMD
              INITIALIZE                      SANTEI-REC
              MOVE    RECE41-HOSPNUM      TO  SANTEI-HOSPNUM
              MOVE    RECE41-PTID         TO  SANTEI-PTID
-             IF   RECE41-SRYYM    >=     "201604"
-               MOVE  CONS-SINPESU2       TO  SANTEI-SRYCD
-             ELSE
-               MOVE  CONS-SINPESU        TO  SANTEI-SRYCD
-             END-IF
+             MOVE    CONS-SINPESU        TO  SANTEI-SRYCD
              MOVE    ZERO                TO  SANTEI-NYUGAIKBN
              MOVE    ZERO                TO  SANTEI-SRYKA
              MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
@@ -5054,8 +5062,9 @@ grpsys       PERFORM  900-DBSELECT-SEC
              MOVE    "tbl_santei"        TO  MCP-TABLE
              MOVE    "key3"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
+            END-IF
       *
-             IF   WRK-SINPESU-YMD   NOT =  SPACE
+            IF    WRK-SINPESU-YMD   NOT =  SPACE
       *
                 INITIALIZE                WRK-JIDO-SETCOM-AREA
                 MOVE      "1"      TO     WRK-JIDO-SETCOMFLG
@@ -5136,7 +5145,7 @@ grpsys       PERFORM  900-DBSELECT-SEC
       *
                 PERFORM    200111-SRYACTINF-HENSYU-SEC
       *
-             END-IF
+            END-IF
            END-IF
       *
            .
@@ -5144,11 +5153,58 @@ grpsys       PERFORM  900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    遠隔モニタリング加算があるか判定
+      *****************************************************************
+       20011-SINPESU-CHECK-SEC          SECTION.
+      *
+           INITIALIZE                        SRYACT-REC
+           MOVE    RECE41-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    RECE41-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    RECE41-PTID           TO  SRY-PTID
+           MOVE    RECE41-SRYYM          TO  SRY-SRYYM
+           MOVE    CONS-SINPESU2         TO  SRY-SRYCD(1)
+           MOVE    CONS-SINPESU2         TO  SRY-SRYCD(2)
+           MOVE    CONS-SINPESU2         TO  SRY-SRYCD(3)
+           MOVE    CONS-SINPESU2         TO  SRY-SRYCD(4)
+           MOVE    CONS-SINPESU2         TO  SRY-SRYCD(5)
+           MOVE    SRYACT-REC            TO  MCPDATA-REC
+           MOVE    "tbl_sryact"          TO  MCP-TABLE
+           MOVE    "key23"               TO  MCP-PATHNAME
+           PERFORM  900-DBSELECT-SEC
+           IF       MCP-RC  =  ZERO
+             MOVE      "tbl_sryact"      TO  MCP-TABLE
+             MOVE      "key23"           TO  MCP-PATHNAME
+             PERFORM    900-SRYACT-READ-SEC
+             PERFORM  UNTIL   FLG-SRYACT           =   1
+                       OR     FLG-SINPESU-COMMENT  =   1
+      *
+               MOVE     SRY-SRYYM        TO  WRK-SINPESU-YMD(1:6)
+               MOVE     "01"             TO  WRK-SINPESU-YMD(7:2)
+               MOVE       1              TO  FLG-SINPESU-COMMENT
+      *
+               MOVE    "tbl_sryact"      TO  MCP-TABLE
+               MOVE    "key23"           TO  MCP-PATHNAME
+               PERFORM  900-SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_sryact"          TO  MCP-TABLE
+           MOVE    "key23"               TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+           .
+       20011-SINPESU-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    心臓ペースメーカー指導管理料（ロ）があるか判定
       *****************************************************************
        2001-SINPESUR-HANTEI-SEC          SECTION.
       *
-           IF     RECE44-FLG-SINPESUR-COMMENT   =    "1" OR "2"
+           IF   ((RECE41-SRYYM                  <    "201604"  ) AND
+                 (RECE44-FLG-SINPESUR-COMMENT   =    "1" OR "2"))
+           OR   ((RECE41-SRYYM                 >=    "201604"  ) AND
+                 (RECE44-FLG-SINPESUR-COMMENT   =    "1" OR "2") AND
+                 (RECE44-FLG-SINPESU-COMMENT    =     SPACE    ))
              MOVE    ZERO                TO  FLG-SINPESUR-COMMENT
              MOVE    SPACE               TO  WRK-SINPESUR-YMD
              INITIALIZE                      SANTEI-REC

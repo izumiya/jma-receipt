@@ -304,6 +304,8 @@
       *                                     管理料の算定日コメント対応
       *  04.08.14    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応修正
+      *  04.08.15    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
+      *                                     コメント記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1665,6 +1667,8 @@
            03  CONS-SINPESUR1-COMMENT PIC X(09) VALUE  "113015010".
       *    心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
            03  CONS-SINPESUR2-COMMENT PIC X(09) VALUE  "113015130".
+      *    心臓ペースメーカー指導管理料（イ以外）
+           03  CONS-SINPESUR3-COMMENT PIC X(09) VALUE  "113001610".
       *
       *    がん患者指導管理料（医師・看護師が心理的不安軽減のため面接）
            03  CONS-GANSIDO1-COMMENT PIC X(09)  VALUE  "113015310".
@@ -5278,6 +5282,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-GANSIDO2-COMMENT
                    MOVE   "2"   TO    RECE44-FLG-GANSIDO-COMMENT
+                END-IF
+              END-IF
+              IF   RECE41-SRYYM    >=     "201604"
+                IF   SRY-SRYCD(IDX2) =  CONS-SINPESUR3-COMMENT
+                   MOVE   "3"   TO    RECE44-FLG-SINPESUR-COMMENT
                 END-IF
               END-IF
            END-IF
