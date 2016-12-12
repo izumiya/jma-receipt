@@ -6892,7 +6892,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  IDY
            PERFORM VARYING IDX     FROM    1   BY  1
-                   UNTIL  (IDX     >=      SPA-UKE-MAX )
+                   UNTIL  (IDX     >      SPA-UKE-MAX )
                       OR  (SPA-ERRCD   NOT =   SPACE  )
                INITIALIZE                  UKETUKE-REC
                MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
@@ -6901,7 +6901,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  UKE-UKEID
                PERFORM 900-UKETUKE-READ-SEC
       *
-               IF      FLG-UKETUKE         =   ZERO
+               IF     (FLG-UKETUKE         =   ZERO )
+                 AND  (UKE-UKEID       NOT =   ZERO )
                    IF      UKE-KAIKEITIME      =   ZERO
                        ADD     1                   TO  IDY
                        MOVE    IDY                 TO  UKE-HYOJIJUN
