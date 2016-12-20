@@ -108,6 +108,8 @@
       *
       *              NACL-小豆沢  16/07/05  平成２８年度対応
       *              NACL-伊藤    16/10/18  閉麻計算見直し
+      *              NACL-小豆沢  16/12/20  外来の包括分は出来高実績点数
+      *                                     をゼロ点で記録する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4146,16 +4148,22 @@
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *出来高実績点数
-           MOVE    WRK-FEDT-DEKIDAKA-TEN
-                                       TO  WRK-NUM
-           MOVE    8                   TO  WRK-NAGASA
-           IF     (WRK-FEDT-DEKIDAKA-SUB   =  1)   OR
-                  (WRK-FEDT-DEKIDAKA-TEN   <  0)
-               MOVE    WRK-NUM-X (3:8) TO  WRK-DATA
-               MOVE    "-"             TO  WRK-DATA (1:1)
-               PERFORM 5004-MOJI-HENSYU-SEC
-           ELSE
+           IF      WRK-FEDT-HOUKATU-FLG   =    "6"
+               MOVE    0                   TO  WRK-NUM
+               MOVE    8                   TO  WRK-NAGASA
                PERFORM 5005-NUM-HENSYU-SEC
+           ELSE
+               MOVE    WRK-FEDT-DEKIDAKA-TEN
+                                           TO  WRK-NUM
+               MOVE    8                   TO  WRK-NAGASA
+               IF     (WRK-FEDT-DEKIDAKA-SUB   =  1)   OR
+                      (WRK-FEDT-DEKIDAKA-TEN   <  0)
+                   MOVE    WRK-NUM-X (3:8) TO  WRK-DATA
+                   MOVE    "-"             TO  WRK-DATA (1:1)
+                   PERFORM 5004-MOJI-HENSYU-SEC
+               ELSE
+                   PERFORM 5005-NUM-HENSYU-SEC
+               END-IF
            END-IF
       *--- AZU-MOD START 2016.07.05
       *出来高・包括フラグ
