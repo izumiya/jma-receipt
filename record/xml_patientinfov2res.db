@@ -160,9 +160,9 @@ xml_patientinfov2res {
     		};
 #-----> 	個人番号情報
 		Individual_Number  {
-			Id			varchar(10);
-			Number			varchar(20);
-			Description		varchar(100);
+			In_Id			varchar(10);
+			In_Number		varchar(20);
+			In_Description		varchar(100);
 	            	} [20];
     	};
    	};
