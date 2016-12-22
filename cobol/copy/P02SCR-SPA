@@ -1281,6 +1281,33 @@
                05  SPA-GMN28-NNCHIKBN          PIC X(01).
       *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÂÐ¾Ý
                05  SPA-GMN28-SYOUNIKBN         PIC X(01).
+      *H28.12
+      *        °åÎÅÅù£É£Ä¾ðÊó
+               05  SPA-GMN28-MYID-AREA.
+                   07  SPA-GMN28-MYLIST-G.
+                       09  SPA-GMN28-MYLIST-OCC OCCURS   20.
+                           11  SPA-GMN28-TMYNUM        PIC 9(02).
+                           11  SPA-GMN28-TMYIDKEY      PIC X(10).
+                           11  SPA-GMN28-TMYNUMBER     PIC X(20).
+                           11  SPA-GMN28-TMYDESCRIP    PIC X(100).
+                   07  SPA-GMN28-MYID-MAX          PIC 9(02).
+      *
+                   07  SPA-GMN28-MYSELNUM          PIC 9(02).
+                   07  SPA-MAE28-MYSELNUM          PIC 9(02).
+      *
+                   07  SPA-GMN28-MYID-ING.
+                       09  SPA-GMN28-MYIDKEY       PIC X(10).
+                       09  SPA-GMN28-MYNUMBER      PIC X(20).
+                       09  SPA-GMN28-MYDESCRIP     PIC X(100).
+      *H28.12
+      *        »ØÆ³ÎÁÅù¼«Æ°È¯À¸
+               05  SPA-GMN28-AUTO-G.
+                   07  SPA-GMN28-AUTO-OCC   OCCURS   3.
+                       09  SPA-GMN28-AUTOSRYCD     PIC X(09).
+                       09  SPA-GMN28-AUTONAME      PIC X(40).
+      *H28.12
+               05  SPA-GMN28-AUTOIDX               PIC 9(02).
+               05  SPA-NAI28-KEIFLG                PIC 9(01).
       *
       *    P0201¡ÊÌ¤ÅÐÏ¿¼õÉÕ¼Ô°ìÍ÷¡Ë
            03  SPA-P0201-AREA.
@@ -1804,6 +1831,9 @@
                05  SPA-P02Y1-NEXT                  PIC 9(04).
                05  SPA-P02Y1-PAGE                  PIC 9(04).
                05  SPA-P02Y1-GMN-CUR               PIC 9(03).
+      *H28.12
+               05  SPA-P02Y1-DATA                  PIC X(02).
+               05  SPA-P02Y1-MOTOPG                PIC X(08).
       *
                05  SPA-P02Y1-GMN-SELNUM-G.
                    07  SPA-P02Y1-GMN-SELNUM        PIC X(03)

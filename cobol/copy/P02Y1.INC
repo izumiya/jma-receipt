@@ -29,3 +29,11 @@
               03  P02Y1-NEXT.
                 04  P02Y1-NEXT-STYLE   PIC X(20).
                 04  P02Y1-NEXT-VALUE   PIC X(20).
+              03  P02Y1-B02.
+                04  P02Y1-B02-STATE PIC S9(9)   BINARY.
+              03  P02Y1-B03.
+                04  P02Y1-B03-STATE PIC S9(9)   BINARY.
+              03  P02Y1-B04.
+                04  P02Y1-B04-STATE PIC S9(9)   BINARY.
+              03  P02Y1-B05.
+                04  P02Y1-B05-STATE PIC S9(9)   BINARY.

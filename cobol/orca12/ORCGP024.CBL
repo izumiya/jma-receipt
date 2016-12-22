@@ -868,7 +868,7 @@
                MOVE    PTKOHFTN-TERMID(1:1)    TO  SPA-NAI24-TFTNETCKBN
                                                                   (IDX)
                IF     (PTKOHFTN-TERMID(1:1)    =   SPACE )
-      *H28.11  設定区分判定へ
+      *H28.11 設定区分判定へ
       *            IF     (SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
       *                                        =   "015"
       *                                        OR  "016"
@@ -1485,7 +1485,7 @@
       *    対象の公費であること
            IF      (SPA-NAI24-FTNSELNUM >   ZERO   )
       *
-      *H28.9 設定区分判定へ
+      *H28.11 設定区分判定へ
       *        IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "015"
       *                                    OR  "016"
@@ -1661,7 +1661,7 @@
       *
       *    対象の公費であること
            IF      (SPA-NAI24-FTNSELNUM >   ZERO   )
-      *H28.9 設定区分判定へ
+      *H28.11 設定区分判定へ
       *        IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
       *                                    =   "015"
       *                                    OR  "016"

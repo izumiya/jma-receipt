@@ -31,6 +31,8 @@
       * 04.07.00     NACL-多々納  12/12/19  患者レセプト分割対応
       * 04.07.00     NACL-多々納  13/07/XX  患者個別設定対応
       * 04.07.00     NACL-多々納  14/02/XX  患者介護情報追加対応
+      * 05.00.00     NACL-多々納  16/12/15  患者個人番号
+      *                                     お薬手帳管理・データ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -49,6 +51,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-YYK             PIC 9(01).
            03  FLG-PTSAME          PIC 9(01).
+           03  FLG-OKUKAN          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -301,6 +304,19 @@
       *    患者介護認定者情報テーブル
        01  PTCARE-NINTEI-REC.
            COPY    "CPPTCARE-NINTEI.INC".
+      *H28.12
+      *    患者個人番号テーブル
+       01  PTMYNUMBER-REC.
+           COPY    "CPPTMYNUMBER.INC".
+      *
+      *V5.0から
+      *    お薬手帳管理データ
+      *01  OKUSURIKANRI-REC.
+      *    COPY    "CPOKUSURIKANRI.INC".
+      *
+      *    お薬手帳薬剤データ
+      *01  OKUSURIDATA-REC.
+      *    COPY    "CPOKUSURIDATA.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1085,6 +1101,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
+      *    患者個人番号情報
+           INITIALIZE                      PTMYNUMBER-REC
+           MOVE    SPA-HOSPNUM         TO  PTMYNUM-HOSPNUM
+           MOVE    SPA-PTID            TO  PTMYNUM-PTID
+           MOVE    PTMYNUMBER-REC      TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
       *H26.5
       *    医療情報連携基盤データ(レセプト電算)
            INITIALIZE                      RECEDEN-REC
@@ -1114,7 +1141,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    同一患者識別テーブル
            PERFORM 2002-PTSAME-DELETE-SEC
-      *
       *
            .
        200-MAIN-SYORI-EXT.
@@ -1274,7 +1300,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        2002-PTSAME-DELETE-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    予約マスター読込処理

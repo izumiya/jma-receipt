@@ -1286,6 +1286,57 @@ P02 {
         P028_SYOUNIKBN {
           isactive bool;
         };
+        scrolledwindow7 { #GtkScrolledWindow
+          P028_MYLIST { #GtkPandaCList
+            count int;
+            row int;
+            selectdata bool[20];
+            fgcolor varchar(16)[20];
+            bgcolor varchar(16)[20];
+            item {
+              column1 varchar(2);
+              column2 varchar(10);
+              column3 varchar(20);
+              column4 varchar(100);
+            }[20];
+          };
+        };
+        BCMY1 { #GtkButton
+          state int;
+        };
+        BCMY2 { #GtkButton
+          state int;
+        };
+        P028_MYSELNUM { #GtkNumberEntry
+          numdata number(2);
+        };
+        P028_MYIDKEY { #GtkPandaEntry
+          textdata varchar(10);
+        };
+        P028_MY_NUMBER { #GtkPandaEntry
+          textdata varchar(20);
+        };
+        P028_MY_DESCRIP { #GtkPandaEntry
+          textdata varchar(100);
+        };
+        P028_AUTOSRYCD1 { #GtkPandaEntry
+          textdata varchar(9);
+        };
+        P028_AUTOSRYCD2 { #GtkPandaEntry
+          textdata varchar(9);
+        };
+        P028_AUTOSRYCD3 { #GtkPandaEntry
+          textdata varchar(9);
+        };
+        P028_AUTONAME1 { #GtkLabel
+          textdata varchar(40);
+        };
+        P028_AUTONAME2 { #GtkLabel
+          textdata varchar(40);
+        };
+        P028_AUTONAME3 { #GtkLabel
+          textdata varchar(40);
+        };
       };
     };
   };

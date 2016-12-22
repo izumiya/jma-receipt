@@ -59,8 +59,9 @@
       * 04.08.00     NACL-多々納  15/08/05  領収・明細　請求書不要対応
       * 04.08.00     NACL-多々納  15/11/XX  レセプト分割５０件他対応
       * 04.08.00     NACL-多々納  16/03/XX  平成２８年４月改正対応
-      * 04.08.00     NACL-多々納  16/11/XX  公費画面編集追加（P02H)対応
       * 04.08.00     NACL-多々納  16/11/21  ＱＲコードver.2.1対応
+      * 05.00.00     NACL-多々納  16/12/15  患者個人番号対応
+      * 05.00.00     NACL-多々納  16/12/XX  管理料等自動発生対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -95,6 +96,8 @@
            03  FLG-PTCONF          PIC 9(01).
            03  FLG-PTCARE-HKNINF   PIC 9(01).
            03  FLG-PTCARE-NINTEI   PIC 9(01).
+           03  FLG-PTMYNUMBER      PIC 9(01).
+           03  FLG-TENSU           PIC 9(01).
       *
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-HKNNUM          PIC 9(01).
@@ -104,6 +107,7 @@
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-KOUSIN          PIC 9(01).
+           03  FLG-TENSU-OK        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -171,6 +175,9 @@
       *
            03  WRK-P026-ROW1           PIC S9(09).
            03  WRK-P026-ROW2           PIC S9(09).
+      *
+           03  WRK-SRYCD-NAME          PIC X(80).
+           03  WRK-SRYCD               PIC X(09).
       *
       *   年齢表示
        01  WRK-NENREI-AREA.
@@ -386,6 +393,18 @@
       *    患者介護認定者情報テーブル
        01  PTCARE-NINTEI-REC.
            COPY    "CPPTCARE-NINTEI.INC".
+      *
+      *    患者個人番号テーブル
+       01  PTMYNUMBER-REC.
+           COPY    "CPPTMYNUMBER.INC".
+      *
+      *    点数マスタ−
+      *01  TENSU-REC.
+           COPY    "CPTENSU.INC".
+      *
+      *    点数マスタ−
+      *01  TNSWK-TENSU-REC.
+           COPY    "CPTENSUWK.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1726,6 +1745,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *    患者介護情報編集
            PERFORM 10028-PTCARE-SET-SEC
+      *H28.12
+      *    患者個人番号編集
+           PERFORM 10028-PTMYNUBER-SET-SEC
       *
       *    患者労災情報編集
            PERFORM 10023-RSIPARA-SET-SEC
@@ -2971,6 +2993,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            小児かかりつけ診療
                        MOVE    PTCONF-CDATA(1:1)
                                            TO  SPA-GMN28-SYOUNIKBN
+      *H28.12
+      *            指導料等自動算定
+                   WHEN    "JIDOSANTEI-1"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-GMN28-AUTOSRYCD(1)
+                   WHEN    "JIDOSANTEI-2"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-GMN28-AUTOSRYCD(2)
+                   WHEN    "JIDOSANTEI-3"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-GMN28-AUTOSRYCD(3)
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -3010,6 +3043,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-GMN28-JMAMRVER-LST (IDX)
                                            TO  SPA-GMN28-JMAMRVER-G
                    MOVE    SPA-GMN28-JMAMRVER-MAX  TO  IDX
+               END-IF
+           END-PERFORM
+      *
+      *H28.12
+      *    指導料等自動算定
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   3 )
+               IF      SPA-GMN28-AUTOSRYCD (IDX)   NOT =   SPACE
+                    MOVE    SPA-GMN28-AUTOSRYCD (IDX)
+                                               TO  WRK-SRYCD
+                    PERFORM 910-TENSU-READ-SEC
+                    MOVE    WRK-SRYCD-NAME     TO  SPA-GMN28-AUTONAME
+                                                             (IDX)
                END-IF
            END-PERFORM
            .
@@ -3171,6 +3217,56 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    IDX                 TO  SPA-GMN28-CRNIN-MAX
            .
        100281-PTCARENINTEI-HEN-EXT.
+           EXIT.
+      *
+      *H28.12
+      *****************************************************************
+      *    患者個人番号編集処理
+      *****************************************************************
+       10028-PTMYNUBER-SET-SEC           SECTION.
+      *
+      *    患者個人番号情報
+           MOVE    SPACE               TO  PTMYNUMBER-REC
+           INITIALIZE                  PTMYNUMBER-REC
+           MOVE    SPA-HOSPNUM         TO  PTMYNUM-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTMYNUM-PTID
+      *
+           MOVE    PTMYNUMBER-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTMYNUMBER-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTMYNUMBER
+               INITIALIZE                  PTMYNUMBER-REC
+           END-IF
+      *
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTMYNUMBER      =   1  )
+                          OR  (IDX                 >=  20 )
+               ADD     1                   TO  IDX
+               MOVE    IDX                 TO  SPA-GMN28-MYID-MAX
+               MOVE    IDX                 TO  SPA-GMN28-TMYNUM
+                                                             (IDX)
+               MOVE    PTMYNUM-ID-KEY      TO  SPA-GMN28-TMYIDKEY
+                                                             (IDX)
+               MOVE    PTMYNUM-MY-NUMBER   TO  SPA-GMN28-TMYNUMBER
+                                                             (IDX)
+               MOVE    PTMYNUM-DESCRIPTION TO  SPA-GMN28-TMYDESCRIP
+                                                             (IDX)
+      *
+               MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTMYNUMBER-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       10028-PTMYNUBER-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -5159,6 +5255,45 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    "F"                 TO  P02-P028-SYOUNIKBN
            END-IF
+      *H28.12
+      *    患者個人番号情報
+           PERFORM   VARYING     IDX     FROM   1   BY  1
+                     UNTIL     ( IDX     >   SPA-GMN28-MYID-MAX )
+               MOVE    SPA-GMN28-TMYNUM (IDX)  TO WRK-RENNUMZ2
+               MOVE    WRK-RENNUMZ2        TO  P02-P028-TMYNUM (IDX)
+               MOVE    SPA-GMN28-TMYIDKEY (IDX)
+                                           TO  P02-P028-TMYIDKEY
+                                                               (IDX)
+               MOVE    SPA-GMN28-TMYNUMBER (IDX)
+                                           TO  P02-P028-TMYNUMBER
+                                                               (IDX)
+               MOVE    SPA-GMN28-TMYDESCRIP(IDX)
+                                           TO  P02-P028-TMYDESCRIP
+                                                               (IDX)
+               IF      IDX             =   SPA-GMN28-MYSELNUM
+                   MOVE    "T"         TO  P02-P028-MYLIST-SELECT
+                                                              (IDX)
+               ELSE
+                   MOVE    "F"         TO  P02-P028-MYLIST-SELECT
+                                                              (IDX)
+               END-IF
+           END-PERFORM
+           MOVE    SPA-GMN28-MYID-MAX      TO  P02-P028-MYLIST-COUNT
+      *
+           MOVE    SPA-GMN28-MYSELNUM      TO  P02-P028-MYSELNUM
+      *
+           MOVE    SPA-GMN28-MYIDKEY       TO  P02-P028-MYIDKEY
+           MOVE    SPA-GMN28-MYNUMBER      TO  P02-P028-MY-NUMBER
+           MOVE    SPA-GMN28-MYDESCRIP     TO  P02-P028-MY-DESCRIP
+      *
+      *H28.12
+      *    指導料等自動算定
+           MOVE    SPA-GMN28-AUTOSRYCD(1)  TO  P02-P028-AUTOSRYCD1
+           MOVE    SPA-GMN28-AUTOSRYCD(2)  TO  P02-P028-AUTOSRYCD2
+           MOVE    SPA-GMN28-AUTOSRYCD(3)  TO  P02-P028-AUTOSRYCD3
+           MOVE    SPA-GMN28-AUTONAME (1)  TO  P02-P028-AUTONAME1 
+           MOVE    SPA-GMN28-AUTONAME (2)  TO  P02-P028-AUTONAME2 
+           MOVE    SPA-GMN28-AUTONAME (3)  TO  P02-P028-AUTONAME3 
            .
        2001-P028-SET-EXT.
            EXIT.
@@ -5626,6 +5761,98 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        930-PTCARENINTEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者個人番号情報データ読込処理
+      *****************************************************************
+       930-PTMYNUMBER-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTMYNUMBER
+               MOVE    MCPDATA-REC         TO  PTMYNUMBER-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTMYNUMBER
+               INITIALIZE                  PTMYNUMBER-REC
+           END-IF
+      *
+           .
+       930-PTMYNUMBER-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスタ読み込み
+      *****************************************************************
+       910-TENSU-READ-SEC         SECTION.
+      *
+      *
+           INITIALIZE                      TNS-TENSU-REC
+           MOVE    WRK-SRYCD           TO  TNS-SRYCD
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  TNS-YUKOSTYMD
+           MOVE    SPA-SYSYMD          TO  TNS-YUKOEDYMD
+      *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 9110-TENSU-READ-SEC
+           END-IF
+           MOVE    ZERO                TO  FLG-TENSU-OK
+           PERFORM UNTIL  (FLG-TENSU       =   1 ) OR
+                          (FLG-TENSU-OK    =   1 )
+               IF     (TNS-YUKOSTYMD       <=  SPA-SYSYMD ) AND
+                      (TNS-YUKOEDYMD       >=  SPA-SYSYMD )
+                   MOVE    1                   TO  FLG-TENSU-OK
+                   MOVE    1                   TO  FLG-TENSU
+               ELSE
+                   MOVE    2                   TO  FLG-TENSU-OK
+                   MOVE    TNS-TENSU-REC       TO  TNSWK-TENSU-REC
+               END-IF
+               IF      FLG-TENSU           =   ZERO
+                   MOVE    "tbl_tensu"         TO  MCP-TABLE
+                   MOVE    "key4"              TO  MCP-PATHNAME
+                   PERFORM 9110-TENSU-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    当日期間外
+           IF      FLG-TENSU-OK        =   2
+               MOVE    TNSWK-TENSU-REC     TO  TNS-TENSU-REC
+               STRING  "【期間外】"
+                      TNS-NAME
+                                       DELIMITED  BY  SPACE
+                                   INTO    WRK-SRYCD-NAME
+               END-STRING
+           ELSE
+               MOVE    TNS-NAME            TO  WRK-SRYCD-NAME
+           END-IF
+      *
+           .
+       910-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ読込処理
+      *****************************************************************
+       9110-TENSU-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+               MOVE    ZERO                TO  FLG-TENSU
+           ELSE
+               INITIALIZE                  TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+           .
+       9110-TENSU-READ-EXT.
            EXIT.
       *
       *****************************************************************

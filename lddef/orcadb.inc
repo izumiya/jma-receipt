@@ -199,4 +199,5 @@ db	{
 	tbl_generic_class;
 	tbl_psychotropic;
         tbl_jibai_prt;
+        tbl_ptmynumber;
 };

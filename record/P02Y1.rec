@@ -63,5 +63,17 @@ P02Y1 {
       style varchar(20);
       textdata varchar(20);
     };
+    B02 {
+      state int;
+    };
+    B03 {
+      state int;
+    };
+    B04 {
+      state int;
+    };
+    B05 {
+      state int;
+    };
   };
 };

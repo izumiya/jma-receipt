@@ -435,6 +435,12 @@
       *        Í×²ð¸îÂÐ¾Ý
                05  SPA-YOUKAIGO-ARI        PIC 9(01).
       *
+      *H28.12
+      *        »ØÆ³ÎÁÅù¼«Æ°»»Äê¥³¡¼¥É
+               05  SPA-AUTOSIDOU-G.
+                   07  SPA-AUTOSIDOU       PIC X(09)
+                                           OCCURS   3.
+      *
       *Æþ±¡ÍÑ¡Ê£Ë£°£²£Î¡Ë
                05  SPA-K02N-DATA-REC.
       *        Æþ±¡Æü

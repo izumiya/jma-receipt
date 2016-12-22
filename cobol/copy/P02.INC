@@ -939,10 +939,43 @@
                     06  P02-VALUE   PIC X.
                   05  P02-P028-SYOUNIKBN.
                     06  P02-VALUE   PIC X.
-
-
-
-
-
-
+                  05  P02-SCROLLEDWINDOW7.
+                    06  P02-P028-MYLIST.
+                      07  P02-P028-MYLIST-COUNT   PIC S9(9)   BINARY.
+                      07  P02-P028-MYLIST-ROW PIC S9(9)   BINARY.
+                      07  P02-P028-MYLIST-SELECT
+                              PIC X       OCCURS  20 TIMES.
+                      07  P02-P028-MYLIST-FGCOLOR
+                              PIC X(16)   OCCURS  20 TIMES.
+                      07  P02-P028-MYLIST-BGCOLOR
+                              PIC X(16)   OCCURS  20 TIMES.
+                      07  P02-ITEM        OCCURS  20 TIMES.
+                        08  P02-P028-TMYNUM PIC X(2).
+                        08  P02-P028-TMYIDKEY PIC X(10).
+                        08  P02-P028-TMYNUMBER    PIC X(20).
+                        08  P02-P028-TMYDESCRIP PIC X(100).
+                  05  P02-BCMY1.
+                    06  P02-STATE   PIC S9(9)   BINARY.
+                  05  P02-BCMY2.
+                    06  P02-STATE   PIC S9(9)   BINARY.
+                  05  P02-P028-MYSELNUM-G.
+                    06  P02-P028-MYSELNUM PIC 9(2).
+                  05  P02-P028-MYIDKEY.
+                    06  P02-TEXTDATA    PIC X(10).
+                  05  P02-P028-MY-NUMBER.
+                    06  P02-TEXTDATA    PIC X(20).
+                  05  P02-P028-MY-DESCRIP.
+                    06  P02-TEXTDATA    PIC X(100).
+                  05  P02-P028-AUTOSRYCD1.
+                    06  P02-TEXTDATA    PIC X(9).
+                  05  P02-P028-AUTOSRYCD2.
+                    06  P02-TEXTDATA    PIC X(9).
+                  05  P02-P028-AUTOSRYCD3.
+                    06  P02-TEXTDATA    PIC X(9).
+                  05  P02-P028-AUTONAME1.
+                    06  P02-TEXTDATA    PIC X(40).
+                  05  P02-P028-AUTONAME2.
+                    06  P02-TEXTDATA    PIC X(40).
+                  05  P02-P028-AUTONAME3.
+                    06  P02-TEXTDATA    PIC X(40).
 

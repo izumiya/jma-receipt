@@ -70,6 +70,7 @@
       *  04.08.00    NACL-多々納  16/09/XX  Ｈ２８年１０月改正対応
       *  04.08.00    NACL-多々納  16/10/04  要介護状態表示対応
       *  04.08.00    NACL-多々納  16/12/08  病名レセ非表示対応
+      *  04.08.00    NACL-多々納  16/12/XX  指導料等自動算定対応
       *****************************************************************
       *
       *
@@ -2923,6 +2924,18 @@
                    IF      PTCONF-CDATA(1:1)   =   "1"
                        MOVE    1               TO  SPA-SYOUNI-ARI
                    END-IF
+      *H28.12
+      *            指導料等自動算定
+                   WHEN    "JIDOSANTEI-1"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-AUTOSIDOU (1)
+                   WHEN    "JIDOSANTEI-2"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-AUTOSIDOU (2)
+                   WHEN    "JIDOSANTEI-3"
+                       MOVE    PTCONF-CDATA(1:9)
+                                           TO  SPA-AUTOSIDOU (3)
+      *
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME

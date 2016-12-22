@@ -54,6 +54,7 @@
       *  04.07.00    NACL-多々納  14/03/XX  地域包括診療対象疾病対応
       *  04.08.00    NACL-多々納  15/11/XX  APIV3(HAORI)対応
       *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
+      *  05.00.00    NACL-多々納  16/12/15  患者個人番号対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -103,6 +104,7 @@
            03  FLG-PTCONF          PIC 9(01).
            03  FLG-PTCARE-HKNINF   PIC 9(01).
            03  FLG-PTCARE-NINTEI   PIC 9(01).
+           03  FLG-PTMYNUMBER      PIC 9(01).
       *
            03  FLG-SYORI           PIC X(01).
            03  FLG-SYORI2          PIC X(01).
@@ -134,6 +136,9 @@
            03  IDX2                PIC 9(04).
            03  IDX5                PIC 9(04).
            03  IDH1                PIC 9(02).
+      *
+           03  IDH2                PIC 9(02).
+           03  IDH3                PIC 9(02).
       *
       *    一時領域
        01  WRK-AREA.
@@ -337,6 +342,10 @@
       *    患者介護認定者情報テーブル
        01  PTCARE-NINTEI-REC.
            COPY    "CPPTCARE-NINTEI.INC".
+      *H28.12
+      *    患者個人番号テーブル
+       01  PTMYNUMBER-REC.
+           COPY    "CPPTMYNUMBER.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -618,6 +627,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    患者介護認定者情報更新
            IF      SPA-ERRCD           =   SPACE
                PERFORM 2140-PTCARE-NINTEI-SYORI-SEC
+           END-IF
+      *H28.12
+      *    患者個人番号情報更新
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 2150-MYNUMBER-SYORI-SEC
            END-IF
       *
       *    レセプト作成管理マスタ更新
@@ -997,6 +1011,46 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 2111-PTCONF-DBSYORI-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+      *H28.12
+      *    指導料等自動算定
+           MOVE    ZERO                TO  IDH2
+           PERFORM VARYING     IDH1    FROM    1   BY  1
+                   UNTIL      (IDH1    >   3    )
+                          OR  (SPA-ERRCD   NOT =   SPACE )
+               IF      SPA-GMN28-AUTOSRYCD(IDH1)   =   SPACE
+                   CONTINUE
+               ELSE
+                   ADD     1               TO  IDH2
+                   MOVE    SPA-GMN28-AUTOSRYCD(IDH1)
+                                           TO  WRK-CONF-CDATA
+                   EVALUATE    IDH2
+                   WHEN    1
+                       MOVE    "JIDOSANTEI-1"      TO  WRK-CONF-CKEY
+                   WHEN    2
+                       MOVE    "JIDOSANTEI-2"      TO  WRK-CONF-CKEY
+                   WHEN    3
+                       MOVE    "JIDOSANTEI-3"      TO  WRK-CONF-CKEY
+                   END-EVALUATE
+                   PERFORM 2111-PTCONF-DBSYORI-SEC
+               END-IF
+           END-PERFORM
+           IF      IDH2                <   3
+               COMPUTE IDH3            =   IDH2    +   1
+               PERFORM VARYING     IDH1    FROM    IDH3  BY  1
+                       UNTIL      (IDH1    >   3    )
+                              OR  (SPA-ERRCD   NOT =   SPACE )
+                   MOVE    SPACE           TO  WRK-CONF-CDATA
+                   EVALUATE    IDH1
+                   WHEN    1
+                       MOVE    "JIDOSANTEI-1"      TO  WRK-CONF-CKEY
+                   WHEN    2
+                       MOVE    "JIDOSANTEI-2"      TO  WRK-CONF-CKEY
+                   WHEN    3
+                       MOVE    "JIDOSANTEI-3"      TO  WRK-CONF-CKEY
+                   END-EVALUATE
+                   PERFORM 2111-PTCONF-DBSYORI-SEC
+               END-PERFORM
            END-IF
            .
        211-PTCONF-SYORI-EXT.
@@ -2753,6 +2807,57 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        2140-PTCARE-NINTEI-SYORI-EXT.
            EXIT.
       *
+      *H28.12
+      *****************************************************************
+      *    患者個人番号情報更新処理
+      *****************************************************************
+       2150-MYNUMBER-SYORI-SEC         SECTION.
+      *
+      *    すべて削除
+           INITIALIZE                      PTMYNUMBER-REC
+           MOVE    SPA-HOSPNUM         TO  PTMYNUM-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTMYNUM-PTID
+           MOVE    PTMYNUMBER-REC      TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           PERFORM VARYING     IDX     FROM    1  BY  1
+                   UNTIL       IDX     >   SPA-GMN28-MYID-MAX
+               INITIALIZE                  PTMYNUMBER-REC
+               MOVE    SPA-HOSPNUM         TO  PTMYNUM-HOSPNUM
+               MOVE    SPA-GMN-PTID        TO  PTMYNUM-PTID
+               MOVE    SPA-GMN28-TMYIDKEY(IDX)
+                                           TO  PTMYNUM-ID-KEY
+               MOVE    SPA-GMN28-TMYNUMBER(IDX)
+                                           TO  PTMYNUM-MY-NUMBER
+               MOVE    SPA-GMN28-TMYDESCRIP(IDX)
+                                           TO  PTMYNUM-DESCRIPTION
+      *
+               MOVE    SMCNDATE-YMD        TO  PTMYNUM-CREYMD
+               MOVE    SMCNDATE-YMD        TO  PTMYNUM-UPYMD
+               MOVE    SMCNDATE-HMS        TO  PTMYNUM-UPHMS
+               MOVE    SPA-OPID            TO  PTMYNUM-OPID
+      *        追加
+               MOVE    PTMYNUMBER-REC      TO  MCPDATA-REC
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   DISPLAY "P029 PTMYNUMBER INS ERR:" MCP-RC
+                                   ",KEY:" PTMYNUM-KEY
+                   MOVE    "9000"              TO  SPA-ERRCD
+               END-IF
+           END-PERFORM
+           .
+       2150-MYNUMBER-SYORI-EXT.
+           EXIT.
       *
       *
       *****************************************************************

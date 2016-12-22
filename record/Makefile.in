@@ -866,6 +866,7 @@ DB_files = \
 	xml_patientmodv3res7.db \
 	xml_medicalv3req5.db \
 	xml_medicalv3res5.db \
+	tbl_ptmynumber.db \ 
 
 
 shell.db: shell.db.in

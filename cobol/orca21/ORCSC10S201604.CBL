@@ -86,6 +86,7 @@
       * 04.08.00     NACL-多々納  16/08/XX  自賠責小児科外来診療料対応
       * 04.08.00     NACL-多々納  16/09/XX  平成２８年１０月改正対応
       * 04.08.00     NACL-多々納  16/10/06  小児特例休日等変換対応
+      * 04.08.00     NACL-多々納  16/12/XX  指導料等自動算定対応
       *****************************************************************
       *
       *
@@ -3278,6 +3279,9 @@
       *        療養担当手当発生
                PERFORM 330123-RYOYOU-TEATE-SEC
            ELSE
+      *H28.12
+      *        指導料等自動算定処理
+               PERFORM 33014-AUTOSIDOU-SYORI-SEC
       *        指導料の自動発生
                MOVE    SPA-SRYKA           TO  WRK-SRYKA
                PERFORM 33012-SIDOU-SYORI-SEC
@@ -4473,7 +4477,7 @@
       *****************************************************************
       *    指導料初診日チェック処理（ORCSC10 と同様のチェック）
       *****************************************************************
-       330121-SIDOU-CHK-SEC               SECTION.
+       330121-SIDOU-CHK-SEC            SECTION.
       *
            MOVE    SPA-SYOYMD          TO  WRK-SYOYMD
            MOVE    ZERO                TO  FLG-SYOHEN
@@ -4712,6 +4716,31 @@
       *
            .
        330123-RYOYOU-TEATE-EXT.
+           EXIT.
+      *
+      *H28.12
+      *****************************************************************
+      *    指導料等自動算定処理
+      *****************************************************************
+       33014-AUTOSIDOU-SYORI-SEC         SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX         >   3   )
+               IF      SPA-AUTOSIDOU (IDX) NOT =   SPACE
+                   MOVE    SPA-AUTOSIDOU (IDX) TO  WRK-SRYCD
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
+                   IF      FLG-ADD             =   1
+                       MOVE    SPACE           TO  SPA-COM-HCHKFLG
+                                                   (SPA-GMN-IDX)
+                       MOVE    SPACE           TO  SPA-COM-HKEIFLG
+                                                   (SPA-GMN-IDX)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           .
+       33014-AUTOSIDOU-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
