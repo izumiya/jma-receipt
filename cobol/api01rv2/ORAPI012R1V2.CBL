@@ -33,6 +33,7 @@
       * 04.07.00     NACL-多々納  14/11/XX  初回最終来院日他追加対応
       * 04.07.00     NACL-多々納  15/01/XX  労災保険編集追加対応
       * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先を追加対応
+      * 04.08.00     NACL-多々納  16/12/22  患者個人番号追加対応
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -58,6 +59,7 @@
            03  FLG-JYURRK              PIC 9(01).
            03  FLG-PTRSIINF            PIC 9(01).
            03  FLG-LABOR-SIO           PIC 9(01).
+           03  FLG-PTMYNUMBER          PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
@@ -179,6 +181,10 @@
       *    労働基準監督署マスタ
        01  LABOR-SIO-REC.
            COPY    "CPLABOR-SIO.INC".
+      *
+      *    患者個人番号テーブル
+       01  PTMYNUMBER-REC.
+           COPY    "CPPTMYNUMBER.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -439,6 +445,9 @@
       *H26.11
       *    最終来院日他編集
            PERFORM 20023-LASTYMDHEN-SEC
+      *H26.12
+      *    患者個人番号編集
+           PERFORM 20023-PTMYNUMBER-HEN-SEC
       *
            .
        2002-PTINF-HENSYU-EXT.
@@ -732,6 +741,52 @@
       *
            .
        20023-LASTYMDHEN-EXT.
+           EXIT.
+      *H26.12
+      *****************************************************************
+      *    患者個人番号編集処理
+      *****************************************************************
+       20023-PTMYNUMBER-HEN-SEC       SECTION.
+      *
+      *    地域包括診療対象疾病検索
+           INITIALIZE                  PTMYNUMBER-REC
+           MOVE    SPA-HOSPNUM         TO  PTMYNUM-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTMYNUM-PTID
+      *
+           MOVE    PTMYNUMBER-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTMYNUMBER-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTMYNUMBER
+               INITIALIZE                  PTMYNUMBER-REC
+           END-IF
+      *
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTMYNUMBER      =   1  )
+                          OR  (IDX                 >=  20 )
+               ADD     1                   TO  IDX
+               MOVE    PTMYNUM-ID-KEY      TO  PTRES-ID-KEY
+                                                             (IDX)
+               MOVE    PTMYNUM-MY-NUMBER   TO  PTRES-MY-NUMBER
+                                                             (IDX)
+               MOVE    PTMYNUM-DESCRIPTION TO  PTRES-DESCRIPTION
+                                                             (IDX)
+      *
+               MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTMYNUMBER-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptmynumber"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       20023-PTMYNUMBER-HEN-EXT.
            EXIT.
       *
       *
@@ -1472,6 +1527,25 @@
            .
        900-SYSKANRI-KEY10-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    患者個人番号情報データ読込処理
+      *****************************************************************
+       930-PTMYNUMBER-READ-SEC         SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTMYNUMBER
+               MOVE    MCPDATA-REC         TO  PTMYNUMBER-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTMYNUMBER
+               INITIALIZE                  PTMYNUMBER-REC
+           END-IF
+      *
+           .
+       930-PTMYNUMBER-READ-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    テーブル検索処理

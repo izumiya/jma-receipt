@@ -281,4 +281,10 @@
                       05  PTRES-TARGET-DISEASE     PIC X(05)
                                                    OCCURS   4.
       *
+      *           患者個人番号情報
+                  04  PTRES-PTMYNUMBER-G.
+                      05  PTRES-PTMYNUMBER-TBL     OCCURS   20.
+                          07  PTRES-ID-KEY           PIC X(10).
+                          07  PTRES-MY-NUMBER        PIC X(20).
+                          07  PTRES-DESCRIPTION      PIC X(100).
       *
