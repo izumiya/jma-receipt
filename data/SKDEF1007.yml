@@ -1,0 +1,11 @@
+kanri_cd    : "1007"
+name        : "自動算定情報"
+class_cd    : "*"
+item_max    : 1
+item_list   :
+- item_no   : 1
+  item      : "SANTEI"
+  item_jp   : "自動算定テーブル"
+  type      : "x"
+  start     : 1
+  length    : 500
