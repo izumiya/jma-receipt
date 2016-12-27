@@ -575,6 +575,8 @@ FORM_files = \
 	      HCN68H28.red \
           HCN71.red \
           HCN04A5.red \
+          HCM03V05.red \
+
 
 all:   
 

@@ -89,7 +89,7 @@
       *
                        09  SPA-GMN-ORGPGNM03LST-G.
                            11  SPA-GMN-ORGPGNM03MEIL  PIC X(20)
-                                                   OCCURS  5.
+                                                   OCCURS  6.
                            11  SPA-GMN-ORGPGNM03-MAX
                                                    PIC 9(04).
       *                    Æþ±¡Ä¢É¼

@@ -83,7 +83,7 @@
                         08  W11-ORCAORGNM03-COUNT
                                                PIC S9(9)   BINARY.
                         08  W11-ORCAORGNM03LST PIC X(20)
-                                               OCCURS  5 TIMES.
+                                               OCCURS  6 TIMES.
                       07  W11-ORGNM04-COB.
                         08  W11-ORCAORGNM04.
                           09  W11-VALUE   PIC X(20).

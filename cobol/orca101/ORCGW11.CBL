@@ -71,6 +71,7 @@
       * 04.05.00     NACL-太田    09/09/04  分娩費用明細書追加
       * 04.07.00     NACL-太田    13/03/13  プログラム存在チェック追加
       * 04.08.00     NACL-太田    13/09/17  ＡＤＬ区分・医療区分評価票追加
+      * 04.08.01     NACL-森脇    16/12/16  請求書兼領収書５追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -551,7 +552,9 @@
            MOVE    "ORCHC03V03A5"      TO  SPA-GMN-ORGPGNM03MEIL(4)
       ***  MOVE    4                   TO  SPA-GMN-ORGPGNM03-MAX
            MOVE    "ORCHC03V04"        TO  SPA-GMN-ORGPGNM03MEIL(5)
-           MOVE    5                   TO  SPA-GMN-ORGPGNM03-MAX
+      *     MOVE    5                   TO  SPA-GMN-ORGPGNM03-MAX
+           MOVE    "ORCHC03V05"        TO  SPA-GMN-ORGPGNM03MEIL(6)
+           MOVE    6                   TO  SPA-GMN-ORGPGNM03-MAX
       *
       *    請求書兼領収書コンボ（入院）
            MOVE    "ORCHCN03"          TO  SPA-GMN-ORGPGNM03NMEIL(1)
@@ -4017,6 +4020,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
