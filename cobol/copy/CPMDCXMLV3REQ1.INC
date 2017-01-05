@@ -99,7 +99,7 @@
       *             ©гне╪Ойл╤Хй╛
                     09  MDCREQ-MDC-CLASS             PIC X(3).
       *             ©гне╪Ойлл╬╬н
-                    09  MDCREQ-MDC-CLASS-NAME        PIC X(50).
+                    09  MDCREQ-MDC-CLASS-NAME        PIC X(40).
       *             ©гне╔Ё║╪╔и
                     09  MDCREQ-PRSCRPT-CODE          PIC X(9).
       *             ©гнел╬╬н
