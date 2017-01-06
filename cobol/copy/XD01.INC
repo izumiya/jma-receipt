@@ -33,7 +33,7 @@
                   05  XD01-VALUE  PIC X(65).
                 04  XD01-HKNCOMBI-COUNT  PIC S9(9)   BINARY.
                 04  XD01-HKNCOMBI-ITEM
-                        PIC X(65)   OCCURS  15 TIMES.
+                        PIC X(65)   OCCURS  30 TIMES.
               03  XD01-DRCD-COMB.
                 04  XD01-DRCD.
                   05  XD01-VALUE  PIC X(35).
