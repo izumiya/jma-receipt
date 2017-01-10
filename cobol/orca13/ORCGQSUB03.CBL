@@ -118,8 +118,8 @@
       *****************************************************************
        LINKAGE                     SECTION.
       *
-           COPY    "COMMON-SPA".
            COPY    "CPQSUB03.INC".
+           COPY    "COMMON-SPA".
       *
        PROCEDURE                   DIVISION    USING
            QSUB03-LNK
@@ -147,7 +147,6 @@
                                    IDX-AREA
                                    WRK-AREA
                                    QSUB03-ITEM-LIST-AREA
-      *
       *
            .
        100-INIT-EXT.
@@ -428,7 +427,7 @@
       *
            INITIALIZE                      SYSKANRI-REC
            MOVE    "1005"              TO  SYS-KANRICD
-           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    QSUB03-BASEYMD      TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY2-SEL-SEC
       *
@@ -517,7 +516,7 @@
       *
            INITIALIZE                      SYSKANRI-REC
            MOVE    WRK-KANRICD         TO  SYS-KANRICD
-           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    QSUB03-BASEYMD      TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY2-SEL-SEC
       *
@@ -570,7 +569,7 @@
       *
            INITIALIZE                      SYSKANRI-REC
            MOVE    "1026"              TO  SYS-KANRICD
-           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    QSUB03-BASEYMD      TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY2-SEL-SEC
       *
@@ -892,7 +891,7 @@
            MOVE    "¼ÒÊÝ"          TO  QSUB03-HKNNUMMEIL(IDXL + 1)
            MOVE    "KOK"           TO  QSUB03-HKNNUML   (IDXL + 2)
            MOVE    "¹ñÊÝ"          TO  QSUB03-HKNNUMMEIL(IDXL + 2)
-           IF    ( SPA-SYSYMD          >=  CONST-H200401 )
+           IF    ( QSUB03-BASEYMD      >=  CONST-H200401 )
                MOVE    "KOU"       TO  QSUB03-HKNNUML   (IDXL + 3)
                MOVE    "¹­°è"      TO QSUB03-HKNNUMMEIL(IDXL + 3)
                COMPUTE IDXL    =   IDXL + 3
@@ -1320,6 +1319,12 @@
            MOVE    "9"             TO  QSUB03-JKNKOHNUML    (3)
            MOVE    "NOT"           TO  QSUB03-JKNKOHNUMMEIL (3)
       *
+           MOVE    2               TO  QSUB03-JKNHKNKOHLST-MAX
+           MOVE    "1"             TO  QSUB03-JKNHKNKOHL    (1)
+           MOVE    "AND"           TO  QSUB03-JKNHKNKOHMEIL (1)
+           MOVE    "2"             TO  QSUB03-JKNHKNKOHL    (2)
+           MOVE    "OR"            TO  QSUB03-JKNHKNKOHMEIL (2)
+      *
            MOVE    3               TO  QSUB03-JKNBYOMEILST-MAX
            MOVE    "1"             TO  QSUB03-JKNBYOMEIL    (1)
            MOVE    "AND"           TO  QSUB03-JKNBYOMEIMEIL (1)
@@ -1654,8 +1659,8 @@
            MOVE    ZERO                TO  FLG-HKNNUM
            INITIALIZE                  HKNNUM-REC
            MOVE    SPA-HOSPNUM          TO  HKN-HOSPNUM
-           MOVE    SPA-SYSYMD          TO  HKN-TEKSTYMD
-           MOVE    SPA-SYSYMD          TO  HKN-TEKEDYMD
+           MOVE    QSUB03-BASEYMD      TO  HKN-TEKSTYMD
+           MOVE    QSUB03-BASEYMD      TO  HKN-TEKEDYMD
            MOVE    HKNNUM-REC          TO  MCPDATA-REC
            MOVE    "tbl_hknnum"        TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME

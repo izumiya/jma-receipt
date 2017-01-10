@@ -17,6 +17,8 @@ bind	"Q99"		"OpenCOBOL"	"ORCGQ99";
 bind	"Q100"		"OpenCOBOL"	"ORCGQ100";
 bind	"QERR"		"OpenCOBOL"	"ORCGQERR";
 bind	"QID1"		"OpenCOBOL"	"ORCGQID1";
+bindapi "findv3"    "OpenCOBOL"	"ORCGQAPI01"; 
+bindapi "findinfv2" "OpenCOBOL"	"ORCGQAPI02"; 
 
 multiplex_group	orca13;
 
@@ -34,32 +36,55 @@ data	{
 		Q98;
 		Q99;
 		Q100;
-                QERR;
-                QID1;
+        QERR;
+        QID1;
+        findv3;
+        findinfv2;
 	};
 };
 
 db	{
-	tbl_syskanri;
-	tbl_byomei;
-	tbl_inputcd;
-	tbl_hkncombi;
-	tbl_hknnum;
-	tbl_adrs;
-	tbl_jyurrk;
-	tbl_srykarrk;
-	tbl_tensu;
-	tbl_userbyomei;
-	tbl_jobkanri;
-	tbl_ptnyuinrrk;
-	tbl_shoukaikanri;
-	tbl_shoukaidata;
-        tbl_file_info; 
-        tbl_ptsrh; 
-        tbl_ptinf; 
-        tbl_spa_tmp; 
-        tbl_ptnum_public; 
+  tbl_srysrh;
+  tbl_skysrh;
+  tbl_rrksrh;
+  tbl_ptsrh;
+  tbl_jobkanri;
+  tbl_shoukaikanri;
+  tbl_syskanri;
+  tbl_hknnum;
+  tbl_userbyomei;
+  tbl_adrs;
+  tbl_tensu;
+  tbl_inputcd;
+  tbl_byomei;
+  tbl_shoukaidata;
+  tbl_spa_tmp;
+  tbl_file_info;
+  tbl_ptnyuinrrk;
+  tbl_jyurrk;
+  tbl_srykarrk;
+  tbl_hkncombi;
+  tbl_ptinf;
+  tbl_ptnum_public;
+  tbl_sysuser;
+  tbl_sysbase;
+  tbl_passwd;
+  tbl_dbcatalog;
+  tbl_api_para;
+  tbl_pthkninf;
+  tbl_ptkohinf;
+  tbl_ptrsiinf;
 };
+
+db "xml2" {
+ xml_findv3req;
+ xml_findv3res;
+ xml_findinfv2req;
+ xml_findinfv2res;
+};
+
 
 /* #include "orcadb.inc" */
 #include "orcadbh.inc"
+
+

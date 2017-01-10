@@ -149,23 +149,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "Q01.INC".
-           COPY    "Q02.INC".
-           COPY    "Q02A.INC".
-           COPY    "Q02B.INC".
-           COPY    "Q03.INC".
-           COPY    "Q04.INC".
-           COPY    "Q96.INC".
-      *----(01.00.02) LINE ADD START ----------------------------------
-           COPY    "Q97.INC".
-      *----(01.00.02) LINE ADD END   ----------------------------------
-           COPY    "Q98.INC".
-           COPY    "Q99.INC".
-      *----(01.00.02) LINE ADD START ----------------------------------
-           COPY    "Q100.INC".
-      *----(01.00.02) LINE ADD END   ----------------------------------
-           COPY    "QERR.INC".
-           COPY    "QID1.INC".
+           COPY    "ORCA13SCRAREA.INC".
       *
        PROCEDURE                                 DIVISION    USING
                                                  MCPAREA

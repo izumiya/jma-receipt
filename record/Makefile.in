@@ -515,6 +515,8 @@ RECORD_files = \
         patientmodv36.rec \
         patientmodv37.rec \
 	medicalmodv35.rec \
+    findv3.rec \
+    findinfv2.rec \
 
 DEF_files = \
 
@@ -867,6 +869,11 @@ DB_files = \
 	xml_medicalv3req5.db \
 	xml_medicalv3res5.db \
 	tbl_ptmynumber.db \ 
+    push_find.db  \
+    xml_findv3req.db  \
+    xml_findv3res.db  \
+    xml_findinfv2req.db  \
+    xml_findinfv2res.db  \
 
 
 shell.db: shell.db.in

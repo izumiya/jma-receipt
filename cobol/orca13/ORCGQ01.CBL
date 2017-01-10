@@ -415,19 +415,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "Q01.INC".
-           COPY    "Q02.INC".
-           COPY    "Q02A.INC".
-           COPY    "Q02B.INC".
-           COPY    "Q03.INC".
-           COPY    "Q04.INC".
-           COPY    "Q96.INC".
-           COPY    "Q97.INC".
-           COPY    "Q98.INC".
-           COPY    "Q99.INC".
-           COPY    "Q100.INC".
-           COPY    "QERR.INC".
-           COPY    "QID1.INC".
+           COPY    "ORCA13SCRAREA.INC".
       *
        PROCEDURE                                 DIVISION    USING
                                                  MCPAREA
@@ -688,6 +676,7 @@
            INITIALIZE                  QSUB03-LNK
            MOVE    WRK-STYMD       TO  QSUB03-STSRYYMD
            MOVE    WRK-EDYMD       TO  QSUB03-EDSRYYMD
+           MOVE    SPA-SYSYMD      TO  QSUB03-BASEYMD
            CALL    "ORCGQSUB03"    USING   QSUB03-LNK
                                            SPA-AREA
       *
@@ -1012,6 +1001,7 @@
            MOVE    "1"             TO  QSUB03-REQUEST
            MOVE    WRK-STYMD       TO  QSUB03-STSRYYMD
            MOVE    WRK-EDYMD       TO  QSUB03-EDSRYYMD
+           MOVE    SPA-SYSYMD      TO  QSUB03-BASEYMD
            CALL    "ORCGQSUB03"    USING   QSUB03-LNK
                                            SPA-AREA
            PERFORM 3101-DRCDLST-SEC
@@ -3408,7 +3398,7 @@
                MOVE    SPA-GMN-Q01-DRCD   TO  WRK-CMB-CD
                PERFORM 4200-DRCDLST-CHK-SEC
                IF    ( WRK-CMB-ITM      =   SPACE )
-                   MOVE    "1034"       TO  SPA-ERRCD
+                   MOVE    "0162"       TO  SPA-ERRCD
                    MOVE    167          TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE    WRK-CMB-ITM  TO  SPA-GMN-Q01-DRCD-G
@@ -3709,7 +3699,7 @@
            END-EVALUATE
       *
            IF  ( WRK-PTNUM-KETA    NOT =   WRK-SYS-KETA )
-               MOVE    "0002"      TO  SPA-ERRCD
+               MOVE    "0211"      TO  SPA-ERRCD
            END-IF
       *
            .
@@ -3750,7 +3740,7 @@
       *
       *    パラメータ（IN）の患者番号桁数が設定された桁数を超えた場合
            IF  ( WRK-PTNUM-KETA        >   WRK-SYS-KETA )
-               MOVE    "0002"          TO  SPA-ERRCD
+               MOVE    "0211"          TO  SPA-ERRCD
                GO  TO                  41091-KETA-CNT-CHK2-EXT
            END-IF
       *
@@ -3760,7 +3750,7 @@
       *
            IF  ( WRK-ST                =   ZERO )  OR
                ( WRK-ST                >   20   )
-               MOVE    "0002"          TO  SPA-ERRCD
+               MOVE    "0211"          TO  SPA-ERRCD
                GO  TO                  41091-KETA-CNT-CHK2-EXT
            END-IF
       *
@@ -8056,10 +8046,13 @@
            EVALUATE    TRUE
            WHEN  ( SPA-Q01-SRYVALITEM  NOT =   SPACE )
                MOVE    "Q02B"          TO  SPA-Q01-SAKIPG
-           WHEN  ( SPA-Q01-TOTALTEN    NOT =   ZERO )
+               MOVE    "3"             TO  SPA-Q01-OUTKBN
+           WHEN  ( SPA-Q01-STTOTALTEN    NOT =   ZERO )
                MOVE    "Q02A"          TO  SPA-Q01-SAKIPG
+               MOVE    "2"             TO  SPA-Q01-OUTKBN
            WHEN    OTHER
                MOVE    "Q02"           TO  SPA-Q01-SAKIPG
+               MOVE    "1"             TO  SPA-Q01-OUTKBN
            END-EVALUATE
       *
            MOVE    "Q02"               TO  SPA-SAKIPG
@@ -8266,7 +8259,7 @@
                        MOVE    "1020"      TO  SPA-ERRCD
                        MOVE    1           TO  SPA-GMN-Q01-CUR
                    WHEN  ( SPA-GMN-Q01-DRCD-G      NOT =   SPACE )
-                       MOVE    "1035"      TO  SPA-ERRCD
+                       MOVE    "1034"      TO  SPA-ERRCD
                        MOVE    1           TO  SPA-GMN-Q01-CUR
                    END-EVALUATE
                END-IF
@@ -8703,7 +8696,7 @@
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-TOKKINAME
       *
            MOVE    SPA-GMN-Q01-TOTALTEN
-                                     TO  SPA-Q01-TOTALTEN
+                                     TO  SPA-Q01-STTOTALTEN
            MOVE    SPA-GMN-Q01-SAIGAIKBN   TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-SAIGAIKBN
@@ -8954,7 +8947,7 @@
                    ELSE
                        MOVE    2         TO  SPA-Q01-SORTKBN (IDXC)
                    END-IF
-               WHEN  ( SPA-Q01-TOTALTEN    >   ZERO )
+               WHEN  ( SPA-Q01-STTOTALTEN    >   ZERO )
       *
                    MOVE    SPA-GMN-Q01-TKMK   (IDXC)
                                          TO  PTSRH-DBSTR
@@ -9371,7 +9364,7 @@
       *
       *    該当（１２）
            IF  ( SPA-Q01-TOKKI-G          NOT =   SPACE )
-            OR ( SPA-Q01-TOTALTEN         NOT =   ZERO  )
+            OR ( SPA-Q01-STTOTALTEN       NOT =   ZERO  )
             OR ( SPA-Q01-SAIGAIKBN        NOT =   SPACE )
             OR ( SPA-Q01-TENKENRECE       NOT =   SPACE )
       *
@@ -11639,9 +11632,6 @@
            EVALUATE    SPA-ERRCD
            WHEN    "0001"
                MOVE    "入力に誤りがあります"    TO  SPA-ERRMSG
-           WHEN    "0002"
-               MOVE    "患者番号の桁数が違います" 
-                                       TO  SPA-ERRMSG
            WHEN    "0003"
                MOVE    "対象件数が２００件をオーバーしました" 
                                        TO  SPA-ERRMSG
@@ -11849,6 +11839,12 @@
            WHEN    "0161"
                MOVE    "介護認定要介護状態の入力に誤りがあります"
                                        TO  SPA-ERRMSG
+           WHEN    "0162"
+               MOVE    "ドクター入力に誤りがあります"
+                                       TO  SPA-ERRMSG
+           WHEN    "0211"
+               MOVE    "患者番号の桁数が違います" 
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "開始診療年月日＞終了診療年月日となっています"
                                        TO  SPA-ERRMSG
@@ -12015,9 +12011,6 @@
                MOVE    "介護認定の終了月を入力してください"
                                        TO  SPA-ERRMSG
            WHEN    "1034"
-               MOVE    "ドクター入力に誤りがあります"
-                                       TO  SPA-ERRMSG
-           WHEN    "1035"
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "ドクターの指定を行う場合、"
                                            DELIMITED BY SIZE

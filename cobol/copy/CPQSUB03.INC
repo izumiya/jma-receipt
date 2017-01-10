@@ -17,6 +17,7 @@
       ********************************************************************
        01  QSUB03-LNK.
            03  QSUB03-REQUEST                              PIC X(01).
+           03  QSUB03-BASEYMD                              PIC X(08).
            03  QSUB03-SRYYMD-G.
                05  QSUB03-STSRYYMD                         PIC X(08).
                05  QSUB03-EDSRYYMD                         PIC X(08).
@@ -284,6 +285,12 @@
                       09  QSUB03-JKNKOHNUML                PIC X(01).
                       09  QSUB03-JKNKOHNUMFLL              PIC X(01).
                       09  QSUB03-JKNKOHNUMMEIL             PIC X(08).
+              05  QSUB03-JKNHKNKOHLST-G.
+                  07  QSUB03-JKNHKNKOHLST-MAX              PIC 9(05).
+                  07  QSUB03-JKNHKNKOHLST                  OCCURS 5.
+                      09  QSUB03-JKNHKNKOHL                PIC X(01).
+                      09  QSUB03-JKNHKNKOHFLL              PIC X(01).
+                      09  QSUB03-JKNHKNKOHMEIL             PIC X(08).
       *   ²ð¸î
               05  QSUB03-KHSKBTLST-G.
                   07  QSUB03-KHSKBTLST-MAX                 PIC 9(05).

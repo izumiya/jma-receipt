@@ -87,4 +87,6 @@
            03  SRYSRH-DRCD         PIC X(5).
       *SQL
            03  SRYSRH-SQL          PIC X(15000).
+      *ÆüÉÕ¡Ü»þ¹ï
+           03  SRYSRH-YMDHMS       PIC X(14).
 

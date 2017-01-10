@@ -1277,10 +1277,12 @@
       *
            03  SPA-Q01KYOUTU.
       *
+               05  SPA-Q01-ERRMSG                      PIC X(100).
                05  SPA-Q01-CLIENT-SAVE                 PIC X(1).
       *
       *        Q01¢«¢ªQ02Á«°Ü¾ðÊó
                05  SPA-Q01-Q02-SENI-AREA.
+                   07  SPA-Q01-OUTKBN                  PIC X(1).
                    07  SPA-Q01-SAKIPG                  PIC X(10).
                    07  SPA-Q01-HYODAI                  PIC X(100).
                    07  SPA-Q01-GAITO-TBL.
@@ -1317,7 +1319,7 @@
                        09  SPA-Q01-SEX                 PIC X(01).
                        09  SPA-Q01-STLASTYMD           PIC X(08).
                        09  SPA-Q01-EDLASTYMD           PIC X(08).
-                       09  SPA-Q01-DRCD                  PIC X(05).
+                       09  SPA-Q01-DRCD                PIC X(05).
                        09  SPA-Q01-NYUGAIKBN           PIC X(1).
                        09  SPA-Q01-SRYKA               PIC X(2).
                        09  SPA-Q01-DEATH               PIC X(1).
@@ -1361,7 +1363,8 @@
                            11  SPA-Q01-TOKKICD         PIC X(02).
                            11  SPA-Q01-TOKKINAME       PIC X(12).
                        09  SPA-Q01-SAIGAIKBN           PIC X(01).
-                       09  SPA-Q01-TOTALTEN            PIC 9(07).
+                       09  SPA-Q01-STTOTALTEN          PIC 9(07).
+                       09  SPA-Q01-EDTOTALTEN          PIC 9(07).
                        09  SPA-Q01-TENKENRECE          PIC X(01).
       *            ÊÝ¸±¡¡¸øÈñ
                    07  SPA-Q01-HOKEN-AREA.
@@ -1428,7 +1431,7 @@
                            11  SPA-Q01-SRYCD           PIC X(09)
                                                        OCCURS  5.
                        09  SPA-Q01-SRYVAL-G.
-                           11  SPA-Q01-SRYVALITEM   PIC X(01).
+                           11  SPA-Q01-SRYVALITEM      PIC X(01).
                            11  SPA-Q01-SRYVAL-OCC      OCCURS  5.
                                13  SPA-Q01-SRYVAL      PIC X(20).
                                13  SPA-Q01-SRYVALNUM   PIC 9(05)V9(05).
@@ -1452,12 +1455,12 @@
       *
       *            ÊÂ¤Ó½ç
                    07  SPA-Q01-NARABI-AREA.
-                       09  SPA-Q01-SORTITEM-TBL.
-                           11  SPA-Q01-SORTITEM        PIC 9(01)
-                                                       OCCURS  3.
-                       09  SPA-Q01-SORTKBN-TBL.
-                           11  SPA-Q01-SORTKBN         PIC 9(01)
-                                                       OCCURS  3.
+                       09  SPA-Q01-SORTITEM-TBL        OCCURS  3.
+                           11  SPA-Q01-SORTITEM-G.
+                               13  SPA-Q01-SORTITEM    PIC 9(01).
+                       09  SPA-Q01-SORTKBN-TBL         OCCURS  3.
+                           11  SPA-Q01-SORTKBN-G.
+                               13  SPA-Q01-SORTKBN     PIC 9(01).
       *            NOT¸¡º÷¾ò·ï¥¨¥ê¥¢
                    07  SPA-Q01-NOT-AREA.
                        09  SPA-Q01-XSELECT             PIC X(01).

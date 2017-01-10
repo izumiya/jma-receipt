@@ -15,13 +15,18 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-       01  QSUB02-LNK.
-           03  QSUB02-IN-AREA.
-               05  QSUB02-YMD          PIC X(08).
-               05  QSUB02-HMS          PIC X(06).
-               05  QSUB02-LIMITCONTROL PIC 9(01).
-               05  QSUB02-LIMIT        PIC 9(08).
-               05  QSUB02-OFFSET       PIC 9(08).
-           03  QSUB02-OT-AREA.
-               05  QSUB02-SQL          PIC X(20000).
-               05  QSUB02-SQL-ORDER    PIC X(500).
+      *----------------------------------------------------------*
+      *    バッチジョブ制御パラメタ　   COPY (CPORSMONBATCH.INC)
+      *----------------------------------------------------------*
+      ************************************************************
+      *  コピー句修正履歴
+      * Maj/Min/Rev  修正者       日付      内容
+      ************************************************************
+       01  SMONBATCH-AREA.
+           03  SMONBATCH-MODE                  PIC X(10).
+           03  SMONBATCH-KEY.
+               05  SMONBATCH-OPID              PIC X(16).
+               05  SMONBATCH-TERMID            PIC X(64).
+               05  SMONBATCH-SHELLID           PIC X(08).
+           03  SMONBATCH-FOUND                 PIC 9(01).
+           03  SMONBATCH-RC                    PIC S9(9).

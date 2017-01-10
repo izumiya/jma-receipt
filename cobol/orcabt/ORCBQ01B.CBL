@@ -824,23 +824,30 @@
                MOVE    PTSRH-SRYCD     TO  CSV-SRYCD
                MOVE    PTSRH-SRYNAME   TO  CSV-SRYNAME
                MOVE    PTSRH-SRYKANANAME   TO  CSV-SRYKANANAME
-               IF    ( PTSRH-SURYO-EDIT    =   1 )
-                   PERFORM 8001-SRYSURYO-EDIT-SEC
-                   MOVE    WRK-SRYSURYOX
-                                   TO  CSV-SRYSURYO
-               END-IF
-      *
-               MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
-               MOVE    WRK-ZAIKAISUZ   TO  CSV-ZAIKAISU
-      *
-               PERFORM 8001-SURYOTOTAL-EDIT-SEC
-               MOVE    WRK-SURYOTOTALX TO  CSV-SURYOTOTAL
            END-IF
       *
-           MOVE    PTSRH-SRYYM(1:4)
-                                   TO  CSV-SRYYM (1:4)
-           MOVE    "/"             TO  CSV-SRYYM (5:1)
-           MOVE    PTSRH-SRYYM(5:2) TO  CSV-SRYYM (6:2)
+           IF    ( PTSRH-SURYO-EDIT    =   1 )
+               PERFORM 8001-SRYSURYO-EDIT-SEC
+               MOVE    WRK-SRYSURYOX
+                                   TO  CSV-SRYSURYO
+           ELSE
+               IF    ( PTSRH-SRYYM     =   "999999" )
+                   MOVE    "合計"  TO  CSV-SRYSURYO
+               END-IF
+           END-IF
+      *
+           MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
+           MOVE    WRK-ZAIKAISUZ   TO  CSV-ZAIKAISU
+      *
+           PERFORM 8001-SURYOTOTAL-EDIT-SEC
+           MOVE    WRK-SURYOTOTALX TO  CSV-SURYOTOTAL
+      *
+           IF    ( PTSRH-SRYYM     NOT =   "999999" )
+               MOVE    PTSRH-SRYYM(1:4)
+                                           TO  CSV-SRYYM (1:4)
+               MOVE    "/"                 TO  CSV-SRYYM (5:1)
+               MOVE    PTSRH-SRYYM(5:2)    TO  CSV-SRYYM (6:2)
+           END-IF
       *
            MOVE    ZERO            TO  IDXA
            MOVE    PTSRH-SRYYM     TO  WRK-SRYYM
@@ -948,10 +955,29 @@
                PERFORM 8001-PRT-EDIT-SEC
            END-IF
       *
-           MOVE    PTSRH-SRYYM     TO  WRK-SYMD
-           MOVE    "01"            TO  WRK-SYMD(7:2)
-           PERFORM 800-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG1    TO  HC28-SRYYM (CNT-LINE)
+           IF    ( PTSRH-SURYO-EDIT    =   1 )
+               PERFORM 8001-SRYSURYO-EDIT-SEC
+               MOVE    WRK-SRYSURYOX
+                                   TO  HC28-SRYSURYO (CNT-LINE)
+           ELSE
+               IF    ( PTSRH-SRYYM     =   "999999" )
+                   MOVE    "    合計"
+                                   TO  HC28-SRYSURYO (CNT-LINE)
+               END-IF
+           END-IF
+      *
+           MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
+           MOVE    WRK-ZAIKAISUZ   TO  HC28-ZAIKAISU (CNT-LINE)
+      *
+           PERFORM 8001-SURYOTOTAL-EDIT-SEC
+           MOVE    WRK-SURYOTOTALX TO  HC28-SURYOTOTAL (CNT-LINE)
+      *
+           IF    ( PTSRH-SRYYM     NOT =   "999999" )
+               MOVE    PTSRH-SRYYM TO  WRK-SYMD
+               MOVE    "01"        TO  WRK-SYMD(7:2)
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG1 TO HC28-SRYYM (CNT-LINE)
+           END-IF
       *
       *    備考
            INITIALIZE                  WRK-NISSU-DAY-G
@@ -1029,18 +1055,6 @@
               MOVE    PTSRH-SRYNAME
                                    TO  HC28-SRYNAME (CNT-LINE)
            END-IF
-      *
-           IF    ( PTSRH-SURYO-EDIT    =   1 )
-               PERFORM 8001-SRYSURYO-EDIT-SEC
-               MOVE    WRK-SRYSURYOX
-                                   TO  HC28-SRYSURYO (CNT-LINE)
-           END-IF
-      *
-           MOVE    PTSRH-ZAIKAISU  TO  WRK-ZAIKAISUZ
-           MOVE    WRK-ZAIKAISUZ   TO  HC28-ZAIKAISU (CNT-LINE)
-      *
-           PERFORM 8001-SURYOTOTAL-EDIT-SEC
-           MOVE    WRK-SURYOTOTALX TO  HC28-SURYOTOTAL (CNT-LINE)
       *
            .
        8001-PRT-EDIT-EXT.

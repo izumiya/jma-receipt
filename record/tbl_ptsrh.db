@@ -4,7 +4,7 @@ tbl_ptsrh {
 	PTID				number(10,0);
 	PTNUM				varchar(20);
 	KANANAME			varchar(100);
-	SEX				char(1);
+	SEX				    char(1);
 	BIRTHDAY			char(8);
 	JKYSNUM				varchar(20);
 	NYUGAIKBN			char(1); 
@@ -15,9 +15,10 @@ tbl_ptsrh {
 	SRYCD				char(9);
 	SRYNAME				varchar(100);
 	SRYKANANAME			varchar(100);
-	SRYSEQ				number(1,1);
-	MEMO				varchar(200);
+	SRYSEQ				number(1,0);
+	MEMO				varchar(30000);
 	DATAKBN				char(1);
+	SEQNUM				number(7,0);
 	CREYMD				char(8);
 	UPYMD				char(8);
 	UPHMS				char(6);
@@ -25,7 +26,7 @@ tbl_ptsrh {
 	SQL				dbcode(15000),virtual;
 	dbescapestring			varchar(500),virtual;
 	KENSU			    number(8,0),virtual;
-	VTEXT				varchar(20000),virtual;
+	VTEXT				varchar(1000),virtual;
 	VSTR1				varchar(64),virtual;
 	VSTR2				varchar(64),virtual;
 	VSTR3				varchar(64),virtual;
@@ -100,6 +101,7 @@ path	ins2 	{
 		SRYNAME,
 		SRYKANANAME,
 		SRYSEQ,
+		SEQNUM,
 		MEMO,
 		DATAKBN,
 		CREYMD,
@@ -124,6 +126,7 @@ path	ins2 	{
 		SRYNAME,
 		SRYKANANAME,
 		SRYSEQ,
+		SEQNUM,
 		MEMO,
                 :DATAKBN,
                 :CREYMD,
@@ -157,8 +160,8 @@ path	cnt 	{
 		WHERE	HOSPNUM    =    :HOSPNUM
 		AND     TERMID     =    :TERMID
 		AND     DATAKBN    =    :DATAKBN
-		AND     UPYMD      =    :UPYMD
-		AND     UPHMS      =    :UPHMS
+		AND     UPYMD      LIKE :UPYMD
+		AND     UPHMS      LIKE :UPHMS
 	;
 	};
 };
@@ -186,8 +189,8 @@ path	key2 	{
 	        WHERE	HOSPNUM    =    :HOSPNUM
 		AND     TERMID     =    :TERMID
 		AND     DATAKBN    =    :DATAKBN
-		AND     UPYMD      =    :UPYMD
-		AND     UPHMS      =    :UPHMS
+		AND     UPYMD      LIKE :UPYMD
+		AND     UPHMS      LIKE :UPHMS
  		;
 	};
 };
@@ -200,8 +203,8 @@ path	key3 	{
 	        WHERE	HOSPNUM    =    :HOSPNUM
 		AND     TERMID     =    :TERMID
 		AND     DATAKBN    =    :DATAKBN
-		AND     UPYMD      =    :UPYMD
-		AND     UPHMS      =    :UPHMS
+		AND     UPYMD      LIKE :UPYMD
+		AND     UPHMS      LIKE :UPHMS
         ORDER BY TOTALTEN
  		;
 	};
@@ -211,5 +214,53 @@ path	regexp_replace 	{
 	DBSELECT	{
 		DECLARE tbl_ptsrh_regexp_replace_csr CURSOR FOR
 		SELECT regexp_replace(:VTEXT,:VSTR1,:VSTR2,:VSTR3) as SQL;
+	};
+};
+
+path	upd1 	{
+	DBUPDATE	{
+		UPDATE  tbl_ptsrh
+         SET MEMO =  a.COUNT_DATA || SUBSTR(MEMO,31)
+         FROM (SELECT to_char(COUNT(PTID),'FM0000000000')||
+                     to_char(COUNT(DISTINCT PTID),'FM0000000000')||
+                     to_char(COUNT(DISTINCT to_char(PTID,'FM0000000000'|| SRYCD)),'FM0000000000') as COUNT_DATA
+               FROM     tbl_ptsrh
+               WHERE	  HOSPNUM    =    :HOSPNUM
+                AND     TERMID     =    :TERMID
+                AND     DATAKBN    =    '1'
+                AND     UPYMD      =    :UPYMD
+                AND     UPHMS      =    :UPHMS
+               ) a
+		WHERE	  HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    =    :DATAKBN
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+	;
+	};
+};
+
+path	upd2 	{
+	DBUPDATE	{
+		UPDATE  tbl_ptsrh
+		SET MEMO =  :MEMO
+		WHERE	  HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     PTID	     =    :PTID
+		AND     DATAKBN    =    :DATAKBN
+		AND     SEQNUM     =    :SEQNUM
+		AND     UPYMD      =    :UPYMD
+		AND     UPHMS      =    :UPHMS
+	;
+	};
+};
+
+path	del4 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptsrh
+		WHERE  HOSPNUM      =   :HOSPNUM
+		AND    UPYMD||UPHMS <   :VSTR1
+   ;
 	};
 };

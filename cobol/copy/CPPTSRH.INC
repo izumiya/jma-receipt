@@ -22,6 +22,9 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       ************************************************************
+      ************************************************************
+      *    MCPDATA-REC (50,000byte)に収まるようにすること!!!
+      ************************************************************
       *01  PTSRH-REC.
       *医療機関番号
            03  PTSRH-HOSPNUM      PIC 9(2).
@@ -59,23 +62,57 @@
            03  PTSRH-SRYSEQ       PIC 9(01).
       *メモ
            03  PTSRH-MEMO-G.
-               05  PTSRH-MEMO         PIC X(200).
-               05  PTSRH-MEMO-R       REDEFINES    PTSRH-MEMO.
-                   07  PTSRH-SRYYM              PIC X(06).
-                   07  PTSRH-SRYSURYO           PIC 9(05)V9(05).
-                   07  PTSRH-ZAIKAISU           PIC 9(05).
-                   07  PTSRH-SURYOTOTAL         PIC 9(07)V9(05).
-                   07  PTSRH-SRYYM-SRYSURYO     PIC 9(05)V9(05).
-                   07  PTSRH-SRYYM-ZAIKAISU     PIC 9(05).
-                   07  PTSRH-SRYYM-SURYOTOTAL   PIC 9(07)V9(05).
-                   07  PTSRH-SURYO-EDIT
-                                      PIC 9(01).
-                   07  PTSRH-DAY      PIC 9(03)
-                                      OCCURS  31.
-                   07  PTSRH-RENNUM   PIC 9(05).
-                   07  PTSRH-R1-FIL   PIC X(41).
+               05  PTSRH-MEMO         PIC X(30000).
+               05  PTSRH-MEMO-R1      REDEFINES    PTSRH-MEMO.
+                   07  PTSRH-SRYYM                 PIC X(06).
+                   07  PTSRH-FIRSTDAY              PIC 9(02).
+                   07  PTSRH-SRYSURYO              PIC 9(05)V9(05).
+                   07  PTSRH-ZAIKAISU              PIC 9(05).
+                   07  PTSRH-SURYOTOTAL            PIC 9(07)V9(05).
+                   07  PTSRH-SRYYM-SRYSURYO        PIC 9(05)V9(05).
+                   07  PTSRH-SRYYM-ZAIKAISU        PIC 9(05).
+                   07  PTSRH-SRYYM-SURYOTOTAL      PIC 9(07)V9(05).
+                   07  PTSRH-SURYO-EDIT            PIC 9(01).
+                   07  PTSRH-TANICD                PIC X(03).
+                   07  PTSRH-TANINAME              PIC X(12).
+                   07  PTSRH-DAY                   PIC 9(03)
+                                                   OCCURS  31.
+                   07  PTSRH-RENNUM                PIC 9(05).
+                   07  PTSRH-R1-FIL                PIC X(29824).
+               05  PTSRH-MEMO-R2            REDEFINES    PTSRH-MEMO.
+                   07  PTSRH-CNT-ALL        PIC 9(10).
+                   07  PTSRH-CNT-PTID       PIC 9(10).
+                   07  PTSRH-CNT-SRYCD      PIC 9(10).
+                   07  PTSRH-OUTKBN         PIC X(01).
+                   07  PTSRH-DBERR          PIC 9(01).
+                   07  PTSRH-ORDER          PIC X(500).
+                   07  PTSRH-R2-FIL   PIC X(29468).
+               05  PTSRH-MEMO-R3      REDEFINES    PTSRH-MEMO.
+                   07  PTSRH-HKNCOMBI       PIC X(04).
+                   07  PTSRH-HKNID          PIC 9(10).
+                   07  PTSRH-KOH-OCC        OCCURS 4.
+                       09  PTSRH-KOHNUM     PIC X(03).
+                       09  PTSRH-KOHID      PIC 9(10).
+                   07  PTSRH-TOKKI-OCC      OCCURS 5.
+                       09  PTSRH-TOKKI      PIC X(02).
+                       09  PTSRH-TOKKINM    PIC X(12).
+                   07  PTSRH-R3-FIL   PIC X(29864).
+               05  PTSRH-MEMO-R4      REDEFINES    PTSRH-MEMO.
+                   07  PTSRH-R4-SURYO-EDIT         PIC 9(01).
+      *DB格納時データ領域節約の為、数値項目も文字項目(X)で定義
+                   07  PTSRH-R4-KAISUTOTAL         PIC X(07).
+                   07  PTSRH-R4-SURYOTOTAL         PIC X(12).
+                   07  PTSRH-R4-TANICD             PIC X(03).
+                   07  PTSRH-R4-TANINAME           PIC X(12).
+                   07  PTSRH-R4-OCC                OCCURS 1000.
+                       09  PTSRH-R4-SRYYMD         PIC X(08).
+                       09  PTSRH-R4-SRYSURYO       PIC X(11).
+                       09  PTSRH-R4-ZAIKAISU       PIC X(03).
+                   07  PTSRH-R4-FIL                PIC X(7965).
       *データ区分
            03  PTSRH-DATAKBN      PIC X(1).
+      *連番
+           03  PTSRH-SEQNUM       PIC 9(07).
       *作成日
            03  PTSRH-CREYMD       PIC X(8).
       *更新日
@@ -92,7 +129,7 @@
       *件数
            03  PTSRH-KENSU        PIC 9(08).
       *テキスト（汎用）
-           03  PTSRH-VTEXT        PIC X(20000).
+           03  PTSRH-VTEXT        PIC X(1000).
       *文字列（汎用）
            03  PTSRH-VSTR-G.
                05  PTSRH-VSTR     PIC X(64) OCCURS 3.

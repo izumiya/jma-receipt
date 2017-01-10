@@ -51,5 +51,7 @@
            03  BQ01-LNKKBN             PIC X(01).
       *    SQL
            03  BQ01-SQL                PIC X(15000).
+      *    SQL ORDER
+           03  BQ01-SQL-ORDER          PIC X(500).
       *    SPA-Q01KYOUTU
            03  BQ01-Q01KYOUTU          PIC X(20000).

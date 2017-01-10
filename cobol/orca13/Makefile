@@ -14,6 +14,13 @@ SRCS = ORCGQ01.CBL \
        ORCGQ96.CBL \
        ORCGQ04.CBL \
        ORCGQSUB03.CBL \
+       ORCGQSUB04.CBL \
+       ORCGQAPI01.CBL \
+       ORCGQAPI01S01.CBL \
+       ORCGQAPI01S02.CBL \
+       ORCGQAPI01S99.CBL \
+       ORCGQAPI02.CBL \
+       ORCGQERRMSG.CBL \
 
 top_builddir = ../..
 include $(top_builddir)/cobol/Makefile.global

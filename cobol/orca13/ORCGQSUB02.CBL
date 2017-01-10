@@ -107,7 +107,7 @@
            03  WRK-SQL                             PIC X(20000).
            03  WRK-SQL-PNT                         PIC 9(06).
            03  WRK-PNT                             PIC 9(06).
-           03  WRK-SQL-ORDER                       PIC X(20000).
+           03  WRK-SQL-ORDER                       PIC X(500).
            03  WRK-SQL-ORDER-PNT                   PIC 9(06).
            03  WRK-NAME-SEQ                        PIC 9(01).
            03  WRK-KOHNUM                          PIC X(04).
@@ -174,6 +174,7 @@
            03  CONST-BUBUN         PIC X(01)   VALUE "2".
            03  CONST-KOUHOU        PIC X(01)   VALUE "3".
            03  CONST-KANZEN        PIC X(01)   VALUE "4".
+           03  CONST-LIKE           PIC X(01)   VALUE "L".
       *
       *    TBL°ìÍ÷
       *    A...TBL_PTINF
@@ -260,10 +261,10 @@
            WITH    POINTER   WRK-SQL-PNT
            END-STRING
       *
-           EVALUATE    TRUE
-           WHEN  ( SPA-Q01-SRYVALITEM  NOT =   SPACE )
+           EVALUATE    SPA-Q01-OUTKBN
+           WHEN  "3"
                CONTINUE
-           WHEN  ( SPA-Q01-TOTALTEN    NOT =   ZERO )
+           WHEN  "2"
                PERFORM 1002-GROUP-EDIT-SEC
            WHEN    OTHER
                PERFORM 1001-GROUP-EDIT-SEC
@@ -525,10 +526,10 @@
       *****************************************************************
        10011-JOKEN-INIT-SEC           SECTION.
       *
-           EVALUATE    TRUE
-           WHEN  ( SPA-Q01-SRYVALITEM  NOT =   SPACE )
+           EVALUATE    SPA-Q01-OUTKBN
+           WHEN    "3"
                PERFORM 100113-JOKEN-INIT-SEC
-           WHEN  ( SPA-Q01-TOTALTEN    NOT =   ZERO )
+           WHEN    "2"
                PERFORM 100112-JOKEN-INIT-SEC
            WHEN    OTHER
                PERFORM 100111-JOKEN-INIT-SEC
@@ -554,6 +555,7 @@
                          "SEX,"               DELIMITED    BY SIZE
                          "BIRTHDAY,"          DELIMITED    BY SIZE
                          "DATAKBN,"           DELIMITED    BY SIZE
+                         "SEQNUM,",            DELIMITED    BY SIZE
                          "CREYMD,"            DELIMITED    BY SIZE
                          "UPYMD,"             DELIMITED    BY SIZE
                          "UPHMS,"             DELIMITED    BY SIZE
@@ -568,6 +570,7 @@
                          "SEX,"               DELIMITED    BY SIZE
                          "BIRTHDAY,"          DELIMITED    BY SIZE
                          "'1',"               DELIMITED    BY SIZE
+                         "0,"                 DELIMITED    BY SIZE
                          "'"                  DELIMITED    BY SIZE
                          QSUB02-YMD           DELIMITED    BY SPACE
                          "',"                 DELIMITED    BY SIZE
@@ -646,6 +649,7 @@
                          "KOHNUM2,"           DELIMITED    BY SIZE
                          "TOTALTEN,"          DELIMITED    BY SIZE
                          "DATAKBN,"           DELIMITED    BY SIZE
+                         "SEQNUM,",           DELIMITED    BY SIZE
                          "CREYMD,"            DELIMITED    BY SIZE
                          "UPYMD,"             DELIMITED    BY SIZE
                          "UPHMS"              DELIMITED    BY SIZE
@@ -660,10 +664,11 @@
                          "BIRTHDAY,"          DELIMITED    BY SIZE
                          "NYUGAIKBN,"         DELIMITED    BY SIZE
                          "HKNNUM,"            DELIMITED    BY SIZE
-                         "KOHNUM1,"            DELIMITED    BY SIZE
-                         "KOHNUM2,"            DELIMITED    BY SIZE
+                         "KOHNUM1,"           DELIMITED    BY SIZE
+                         "KOHNUM2,"           DELIMITED    BY SIZE
                          "TOTALTEN,"          DELIMITED    BY SIZE
                          "'1',"               DELIMITED    BY SIZE
+                         "SEQNUM,",           DELIMITED    BY SIZE
                          "'"                  DELIMITED    BY SIZE
                          QSUB02-YMD           DELIMITED    BY SPACE
                          "',"                 DELIMITED    BY SIZE
@@ -689,6 +694,7 @@
                          "L.KOHNUM1,"         DELIMITED    BY SIZE
                          "L.KOHNUM2,"         DELIMITED    BY SIZE
                          "L.TOTALTEN,"        DELIMITED    BY SIZE
+                         "L.SEQNUM,"          DELIMITED    BY SIZE
                          "L.OID"              DELIMITED    BY SIZE
                INTO    WRK-SQL
                WITH    POINTER   WRK-SQL-PNT
@@ -1598,14 +1604,30 @@
       *
            END-IF
       *
-           IF    ( SPA-Q01-TOTALTEN    >   ZERO )
+           IF    ( SPA-Q01-STTOTALTEN    >   ZERO )
       *
                MOVE    1           TO  CNT-JOKEN
       *
                PERFORM 900-SQL-JOKEN-EDIT2-SEC
       *
                STRING  "L.TOTALTEN >= " DELIMITED BY SIZE
-                       SPA-Q01-TOTALTEN DELIMITED BY SIZE
+                       SPA-Q01-STTOTALTEN DELIMITED BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+      *
+               PERFORM 900-SQL-JOKEN-EDIT3-SEC
+      *
+           END-IF
+      *
+           IF    ( SPA-Q01-EDTOTALTEN    >   ZERO )
+      *
+               MOVE    1           TO  CNT-JOKEN
+      *
+               PERFORM 900-SQL-JOKEN-EDIT2-SEC
+      *
+               STRING  "L.TOTALTEN <= " DELIMITED BY SIZE
+                       SPA-Q01-EDTOTALTEN DELIMITED BY SIZE
                INTO    WRK-SQL
                WITH    POINTER WRK-SQL-PNT
                END-STRING
@@ -2201,6 +2223,16 @@
                            "("                     DELIMITED   BY  SIZE
                            WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
                            ".BYOMEI =    '"        DELIMITED   BY  SIZE
+                           SPA-Q01-BYOMEI (IDX1)   DELIMITED   BY  SPACE
+                           "')"                    DELIMITED   BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+                       END-STRING
+                   WHEN    CONST-LIKE
+                       STRING
+                           "("                     DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME        DELIMITED   BY  SPACE
+                           ".BYOMEI LIKE '"        DELIMITED   BY  SIZE
                            SPA-Q01-BYOMEI (IDX1)   DELIMITED   BY  SPACE
                            "')"                    DELIMITED   BY  SIZE
                        INTO    WRK-SQL
@@ -4725,6 +4757,7 @@
                    "KOHNUM1,"          DELIMITED   BY  SIZE
                    "KOHNUM2,"          DELIMITED   BY  SIZE
                    "TOTALTEN,"         DELIMITED   BY  SIZE
+                   "SEQNUM,"           DELIMITED   BY  SIZE
                    "OID"               DELIMITED   BY  SIZE
            INTO    WRK-SQL
            WITH    POINTER WRK-SQL-PNT
@@ -4746,8 +4779,8 @@
            MOVE    SPA-Q01-SORTKBN  (2)    TO  IDX-SRT2
            MOVE    SPA-Q01-SORTKBN  (3)    TO  IDX-SRT3
       *
-           EVALUATE    TRUE
-           WHEN  ( SPA-Q01-SRYVALITEM  NOT =   SPACE )
+           EVALUATE    SPA-Q01-OUTKBN
+           WHEN    "3"
       *
                STRING  " ORDER BY "                DELIMITED   BY  SIZE
                        CONST-SKMK-ITEM (IDX-SITM1) DELIMITED   BY  SPACE
@@ -4793,7 +4826,7 @@
                INTO    WRK-SQL-ORDER
                WITH    POINTER WRK-SQL-ORDER-PNT
                END-STRING
-           WHEN  ( SPA-Q01-TOTALTEN >  ZERO )
+           WHEN    "2"
       *
                STRING  " ORDER BY "                DELIMITED   BY  SIZE
                        CONST-TKMK-ITEM (IDX-SITM1) DELIMITED   BY  SPACE

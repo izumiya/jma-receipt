@@ -15,13 +15,11 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-       01  QSUB02-LNK.
-           03  QSUB02-IN-AREA.
-               05  QSUB02-YMD          PIC X(08).
-               05  QSUB02-HMS          PIC X(06).
-               05  QSUB02-LIMITCONTROL PIC 9(01).
-               05  QSUB02-LIMIT        PIC 9(08).
-               05  QSUB02-OFFSET       PIC 9(08).
-           03  QSUB02-OT-AREA.
-               05  QSUB02-SQL          PIC X(20000).
-               05  QSUB02-SQL-ORDER    PIC X(500).
+       01  XML-FINDINFV2REQ.
+         02  FINDINFREQ-CONTEXT                 PIC S9(9)   BINARY.
+         02  FINDINFREQ-OBJECT                  PIC X(8).
+         02  FINDINFREQ-MODE                    PIC S9(9)   BINARY.
+         02  FINDINFREQ-RECORDNAME              PIC X(128).
+         02  FINDINFREQ-FINDV2REQ.
+           03  FINDINFREQ-REQNUM                PIC X(2).
+           03  FINDINFREQ-BASEYMD               PIC X(10).

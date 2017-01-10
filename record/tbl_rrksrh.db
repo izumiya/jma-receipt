@@ -13,6 +13,7 @@ tbl_rrksrh {
 	STSRYYMD			char(8),virtual;
 	EDSRYYMD			char(8),virtual;
 	KOHNUM				char(3)[5],virtual;
+	YMDHMS				varchar(12),virtual;
 };
 
 path	all 	{
@@ -190,3 +191,12 @@ path	del2 	{
 	};
 };
 
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_rrksrh
+		WHERE  HOSPNUM      =   :HOSPNUM
+		AND    UPYMD||UPHMS <   :YMDHMS
+   ;
+	};
+};

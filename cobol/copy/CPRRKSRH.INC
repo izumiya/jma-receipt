@@ -53,4 +53,6 @@
       *公費の種類
             03  RRKSRH-KOHNUM-G.
                 05 RRKSRH-KOHNUM       PIC X(3) OCCURS 5.
+      *日付＋時刻
+            03  RRKSRH-YMDHMS          PIC X(14).
 

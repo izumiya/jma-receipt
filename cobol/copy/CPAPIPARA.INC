@@ -39,3 +39,7 @@
            03  APIPARA-PTNUM                 PIC X(20).
       *データ領域
            03  APIPARA-DATA-REC              PIC X(5000).
+      *更新年月日
+           03  APIPARA-UPYMD                 PIC X(08).
+      *更新時間
+           03  APIPARA-UPHMS                 PIC X(06).

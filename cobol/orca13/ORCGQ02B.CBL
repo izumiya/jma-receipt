@@ -118,7 +118,7 @@
            03  WRK-PTINF-BANTI-LEN                 PIC 9(05).
            03  WRK-SQL-PNT                         PIC 9(05).
            03  WRK-SQL                             PIC X(20000).
-           03  WRK-SQL-ORDER                       PIC X(20000).
+           03  WRK-SQL-ORDER                       PIC X(500).
            03  WRK-EDPTNUM                         PIC X(20).
            03  WRK-ZZZZ9                           PIC ZZZZ9.
            03  WRK-TOTAL                           PIC ZZZ,ZZZ,ZZ9.
@@ -255,7 +255,7 @@
            COPY    "CPHKNNUM.INC".
       *
       *    シェルテーブル
-           COPY    "CPSHELLTBL.INC".
+           COPY    "CPSHELLTBL500.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -310,6 +310,9 @@
       *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    バッチジョブ制御
+           COPY    "CPORCSMONBATCH.INC".
       *     
            COPY    "ORCA-DBMETA".
       *
@@ -325,19 +328,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "Q01.INC".
-           COPY    "Q02.INC".
-           COPY    "Q02A.INC".
-           COPY    "Q02B.INC".
-           COPY    "Q03.INC".
-           COPY    "Q04.INC".
-           COPY    "Q96.INC".
-           COPY    "Q97.INC".
-           COPY    "Q98.INC".
-           COPY    "Q99.INC".
-           COPY    "Q100.INC".
-           COPY    "QERR.INC".
-           COPY    "QID1.INC".
+           COPY    "ORCA13SCRAREA.INC".
       *
        PROCEDURE                                 DIVISION    USING
                                                  MCPAREA
@@ -869,6 +860,15 @@
                MOVE    1           TO  SPA-GMN-Q02-MODE
            ELSE
       *
+               INITIALIZE                  SMONBATCH-AREA
+               MOVE    "ORCBQ03"       TO  SMONBATCH-SHELLID
+               MOVE    SPA-TERMID      TO  SMONBATCH-TERMID
+               MOVE    SPA-OPID        TO  SMONBATCH-OPID
+               MOVE    "DEL"           TO  SMONBATCH-MODE
+               CALL    "ORCSMONBATCH"      USING
+                                           SMONBATCH-AREA
+                                           SPA-AREA
+      *
                INITIALIZE              UIDIO-AREA
                CALL    "orcuidset"     USING
                                        ST
@@ -893,6 +893,8 @@
                OPEN    OUTPUT              BQ01-FILE
                INITIALIZE                  BQ01
                MOVE    QSUB02-SQL      TO  BQ01-SQL
+               MOVE    QSUB02-SQL-ORDER
+                                       TO  BQ01-SQL-ORDER
                MOVE    SPA-Q01KYOUTU   TO  BQ01-Q01KYOUTU
                WRITE   BQ01
                CLOSE   BQ01-FILE
@@ -901,6 +903,11 @@
                INITIALIZE                  SHELLTBL
       *
                MOVE    CONST-SHELNAME3 TO  SHELLTBL-NAME
+               MOVE    SPA-HOSPNUM     TO  SHELLTBL-HOSPNUM
+               MOVE    "ORCBQ03"       TO  SHELLTBL-SHELLID
+               MOVE    1               TO  SHELLTBL-JOBID
+               MOVE    SPA-OPID        TO  SHELLTBL-RUN-OPID
+               MOVE    SPA-TERMID      TO  SHELLTBL-TERMID
       *
                MOVE    SPA-TERMID      TO  SHELLTBL-ARG1
                MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
@@ -908,6 +915,8 @@
                                        TO  SHELLTBL-ARG3
                MOVE    SMCNDATE-YMD    TO  SHELLTBL-ARG4
                MOVE    SMCNDATE-HMS    TO  SHELLTBL-ARG5
+               MOVE    SPA-OPID        TO  SHELLTBL-ARG6
+               MOVE    SPACE           TO  SHELLTBL-ARG7
                MOVE    SHELLTBL        TO  MCPDATA-REC
                MOVE    "SHELL"         TO  MCP-FUNC
                MOVE    "shell"         TO  MCP-TABLE
@@ -1007,13 +1016,27 @@
                IF    (  FLG-EDIT   =   1 )
                    PERFORM 31011-Q02-GMN-EDIT-SEC
                END-IF
+      *        数量
+               MOVE    PTSRH-SRYSURYO TO  SPA-GMN-Q02-TSRYSURYO
+                                                               (IDX-GMN)
+      *        数量編集フラグ
+               MOVE    PTSRH-SURYO-EDIT
+                                  TO  SPA-GMN-Q02-TSURYO-EDIT  (IDX-GMN)
+      *        回数
+               MOVE    PTSRH-ZAIKAISU      TO  SPA-GMN-Q02-TZAIKAISU
+                                                               (IDX-GMN)
+      *        合計
+               MOVE    PTSRH-SURYOTOTAL    TO SPA-GMN-Q02-TSURYOTOTAL
+                                                               (IDX-GMN)
       *
       *        診療年月
-               MOVE    PTSRH-SRYYM    TO   WRK-SYMD
-               MOVE    "01"           TO   WRK-SYMD(7:2)
-               PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-HENYMDG1(1:6)
-                                      TO   SPA-GMN-Q02-TSRYYM  (IDX-GMN)
+               IF    ( PTSRH-SRYYM         NOT =   "999999" )
+                   MOVE    PTSRH-SRYYM    TO   WRK-SYMD
+                   MOVE    "01"           TO   WRK-SYMD(7:2)
+                   PERFORM 800-SEIWA-HEN-SEC
+                   MOVE    WRK-HENYMDG1(1:6)
+                                  TO   SPA-GMN-Q02-TSRYYM  (IDX-GMN)
+               END-IF
       *        備考
                INITIALIZE  WRK-NISSU-AREA
                PERFORM VARYING IDXD    FROM    1   BY  1
@@ -1124,17 +1147,6 @@
            MOVE    PTSRH-SRYCD    TO  SPA-GMN-Q02-TSRYCD       (IDX-GMN)
       *    診療行為名称
            MOVE    PTSRH-SRYNAME  TO  SPA-GMN-Q02-TSRYNAME     (IDX-GMN)
-      *    数量
-           MOVE    PTSRH-SRYSURYO TO  SPA-GMN-Q02-TSRYSURYO    (IDX-GMN)
-      *    数量編集フラグ
-           MOVE    PTSRH-SURYO-EDIT
-                                  TO  SPA-GMN-Q02-TSURYO-EDIT  (IDX-GMN)
-      *    回数
-           MOVE    PTSRH-ZAIKAISU      TO  SPA-GMN-Q02-TZAIKAISU
-                                                               (IDX-GMN)
-      *    合計
-           MOVE    PTSRH-SURYOTOTAL    TO SPA-GMN-Q02-TSURYOTOTAL
-                                                               (IDX-GMN)
       *
            .
        31011-Q02-GMN-EDIT-EXT.
@@ -2410,62 +2422,60 @@
                MOVE    SPA-GMN-Q02-TSRYNAME (IDX1)
                                    TO  Q02B-KEKKALST-SRYNAME (IDX1)
       *
-               IF    (  SPA-GMN-Q02-TNO (IDX1) NOT =   SPACE )
-      *
-      *            数量
-                   IF    ( SPA-GMN-Q02-TSURYO-EDIT (IDX1)
+      *        数量
+               IF    ( SPA-GMN-Q02-TSURYO-EDIT (IDX1)
                                    =   1 )
-                       IF    ( SPA-GMN-Q02-TSRYSURYO (IDX1)
-                                   =   ZERO )
-                           MOVE    "   ***"
-                                   TO  Q02B-KEKKALST-SRYSURYO(IDX1)
-                       ELSE
-                           MOVE    SPA-GMN-Q02-TSRYSURYO (IDX1)
+                   IF    ( SPA-GMN-Q02-TSRYSURYO (IDX1)
+                                   NOT =   ZERO )
+                       MOVE    SPA-GMN-Q02-TSRYSURYO (IDX1)
                                    TO  WRK-SRYSURYOZ
-                           MOVE    WRK-SRYSURYOZ
+                       MOVE    WRK-SRYSURYOZ
                                    TO  Q02B-KEKKALST-SRYSURYO(IDX1)
-                           PERFORM VARYING IDXA    FROM    11  BY  -1
-                                   UNTIL ( IDXA    <   1 )
-                             OR   ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
-                                      NOT =   "0" )
-                               MOVE    SPACE
+                       PERFORM VARYING IDXA    FROM    11  BY  -1
+                               UNTIL ( IDXA    <   1 )
+                         OR   ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
+                                           NOT =   "0" )
+                           MOVE    SPACE
                                 TO   Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:)
-                           END-PERFORM
-                           IF    ( IDXA      >   0 )
-                             IF  ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
+                       END-PERFORM
+                       IF    ( IDXA      >   0 )
+                           IF  ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
                                               =   "." )
                                MOVE    SPACE
                                  TO Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
-                             END-IF
                            END-IF
                        END-IF
                    END-IF
+               ELSE
+                   IF    ( SPA-GMN-Q02-TSRYYM (IDX1)   =   SPACE )
+                     MOVE    "    合計" TO  Q02B-KEKKALST-SRYSURYO(IDX1)
+                   END-IF
+               END-IF
       *
-      *            回数
-                   MOVE    SPA-GMN-Q02-TZAIKAISU (IDX1)
+      *        回数
+               MOVE    SPA-GMN-Q02-TZAIKAISU (IDX1)
                                    TO  WRK-ZAIKAISUZ
-                   MOVE    WRK-ZAIKAISUZ
+               MOVE    WRK-ZAIKAISUZ
                                    TO  Q02B-KEKKALST-ZAIKAISU(IDX1)
       *
-      *            合計
-                   MOVE    SPA-GMN-Q02-TSURYOTOTAL (IDX1)
+      *        合計
+               MOVE    SPA-GMN-Q02-TSURYOTOTAL (IDX1)
                                    TO  WRK-SURYOTOTALZ
-                   MOVE    WRK-SURYOTOTALZ
+               MOVE    WRK-SURYOTOTALZ
                                    TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)
       *
-                   PERFORM VARYING IDXA    FROM    13  BY  -1
-                           UNTIL ( IDXA    <   1 )
-                            OR  ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                                           NOT =   "0" )
-                       MOVE    SPACE
+               PERFORM VARYING IDXA    FROM    13  BY  -1
+                       UNTIL ( IDXA    <   1 )
+                         OR  ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
+                                   NOT =   "0" )
+                   MOVE    SPACE
                            TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                   END-PERFORM
-                   IF    ( IDXA      >   0 )
-                       IF    ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
+               END-PERFORM
+               IF    ( IDXA      >   0 )
+                   IF    ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
                                       =   "." )
-                           MOVE    SPACE
+                       MOVE    SPACE
                                TO Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                       END-IF
                    END-IF
                END-IF
       *

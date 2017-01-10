@@ -23,43 +23,52 @@ LOG=/var/log/jma-receipt/"$2"orcb013_3.log
 #        $3  パラメータファイル名
 #        $4  処理日
 #        $5  処理時間
+#        $6  OPID
+#        $7  KARTE_UID (API Only)
+#        $8  Pushファイル名(API Only)
 #-------------------------------------------#
+
+MONPUSHEVENT="/usr/lib/panda/bin/monpushevent"
+RECFILE=push_find.db
+RECDIR=${RECORDDIR}
+if [ -e ${PATCHRECORDDIR}/${RECFILE} ]; then
+  RECDIR=${PATCHRECORDDIR}
+fi
+
+echo PUSHREC=${RECFILE}
 
 PARA_FILE_BASE=$3
 PARA_FILE_FULL=${MCP_TEMPDIR}/${PARA_FILE_BASE}
+PUSH_FILE_BASE=$8
+PUSH_FILE_FULL=${MCP_TEMPDIR}/${PUSH_FILE_BASE}
 
 cleanup(){
-echo "${PARA_FILE_FULL}" >> $LOG
+echo "${PARA_FILE_FULL}" >> ${LOG}
 ##      パラメータファイル削除
-        if  [ -e ${PARA_FILE_FULL} ]; then
+        if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
+        fi
+        if  [ "${MCP_WINDOW}" == "findv2" ]; then
+            rm  -rf ${MCP_TEMPDIR}
         fi
 }
 
-killtree(){
-  local children=$(pgrep -P $1 2>/dev/null)
-  for child in ${children} ; do
-    killtree ${child}
-  done
-  kill -9 $1
-}
+trap cleanup EXIT
 
-
-trap cleanup 0
-
-for p in $(pgrep -u orca -f "$0 $1" ) ; do
-  if [ $p -ne $$ ]; then
-    killtree $p
-  fi
-done
+if  [ "${MCP_WINDOW}" == "findv2" ]; then
+  [ -e "${PUSH_FILE_FULL}" ] && rm ${PUSH_FILE_FULL}
+fi
 
 n=1
 while [ $n -lt 3 ] ; do
     n=$(expr $n + 1)
-    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBQ03 -parameter "$1,$2,${PARA_FILE_BASE},$4,$5,"  > $LOG 2>&1
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBQ03 -parameter "$1,$2,${PARA_FILE_BASE},$4,$5,$6,$7,$8"  > ${LOG} 2>&1
     [ $? -eq 0 ] && break
     sleep 3
 done
 
+if  [ "${MCP_WINDOW}" == "findv2" ]; then
+  [ -e "${PUSH_FILE_FULL}" ] && [ -e "${MONPUSHEVENT}" ] && echo "push!!" &&  ${MONPUSHEVENT} ${RECDIR}/${RECFILE} ${PUSH_FILE_FULL}  >> ${LOG} 2>&1
+fi
         exit
 
