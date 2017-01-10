@@ -32,6 +32,7 @@
       *  04.07.01    NACL-藤原    14/03/24  スクリプト起動パスサーチ対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-森脇    16/11/29  チェックマスタCSV出力対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -320,6 +321,10 @@
                    MOVE    "DAILY"         TO  TOUKEICSV-H-TBL-KEY
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    TOUKEICSV-H-REC     TO  MCPDATA-REC
            MOVE    "tbl_toukeicsv_h"   TO  MCP-TABLE
@@ -528,6 +533,10 @@
                    MOVE    "DAILY"         TO  SHELLTBL-ARG2
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  SHELLTBL-ARG2
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  SHELLTBL-ARG2
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    SPA-GMN-TBL-GROUP   TO  SHELLTBL-ARG3
            MOVE    SPA-GMN-SHORI-RENNUM
@@ -800,6 +809,10 @@
                    MOVE    "DAILY"         TO  TOUKEICSV-H-TBL-KEY
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    SPA-GMN-TBL-GROUP   TO  TOUKEICSV-H-TBL-GROUP
            MOVE    SPA-GMN-RENNUM      TO  TOUKEICSV-H-RENNUM
@@ -847,6 +860,10 @@
                    MOVE    "DAILY"         TO  TOUKEICSV-H-TBL-KEY
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    SPA-GMN-TBL-GROUP   TO  TOUKEICSV-H-TBL-GROUP
            MOVE    SPA-GMN-RENNUM      TO  TOUKEICSV-H-RENNUM
@@ -870,6 +887,10 @@
                    MOVE    "DAILY"         TO  TOUKEICSV-H-TBL-KEY
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    SPA-GMN-TBL-GROUP   TO  TOUKEICSV-B-TBL-GROUP
            MOVE    SPA-GMN-RENNUM      TO  TOUKEICSV-B-RENNUM
@@ -942,6 +963,10 @@
                    MOVE    "DAILY"         TO  TOUKEICSV-H-TBL-KEY
                WHEN    "G01"
                    MOVE    "MONTHLY"       TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-START---
+               WHEN    "X91"
+                   MOVE    "CHKMST"        TO  TOUKEICSV-H-TBL-KEY
+      *----(04.08.02)--ADD-END-----
            END-EVALUATE 
            MOVE    SPA-GMN-TBL-GROUP   TO  TOUKEICSV-H-TBL-GROUP
            MOVE    SPA-GMN-RENNUM      TO  TOUKEICSV-H-RENNUM
@@ -1366,6 +1391,7 @@
            END-EVALUATE
       *
            MOVE    SPACE           TO  XGID1
+           INITIALIZE                  XGID1
            MOVE    SPA-XGIDCD      TO  XGID1-ID1CODE
            MOVE    WRK-XGIDMSG     TO  XGID1-ID1MSG
            MOVE    "B12"           TO  MCP-WIDGET

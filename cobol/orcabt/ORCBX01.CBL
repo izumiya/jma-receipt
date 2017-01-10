@@ -217,6 +217,7 @@
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  CNT-AREA
+           INITIALIZE                  TSS013-AREA
       *
            INITIALIZE                  RECEERR
       *
@@ -327,6 +328,8 @@
                MOVE    "1"             TO  WRK-TEKBYO-CHKKBN
            WHEN    "Z"
                MOVE    "2"             TO  WRK-TEKBYO-CHKKBN
+           WHEN    OTHER
+               MOVE    WRK-PARA-CHKKBN TO  WRK-TEKBYO-CHKKBN
            END-EVALUATE
       *
            .
@@ -367,9 +370,14 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           IF    ( WRK-PARA-CHKKBN     =   "Y" OR "Z" )
+           EVALUATE     WRK-PARA-CHKKBN
+           WHEN    "1"
+           WHEN    "2"
+               PERFORM 2002-TEKBYO-START-SEC
+           WHEN    "Y"
+           WHEN    "Z"
                PERFORM 2001-TEKBYO-START-SEC
-           END-IF
+           END-EVALUATE
       *
            INITIALIZE                      ORCHXLSTAREA
            MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
@@ -379,6 +387,8 @@
            MOVE    WRK-PARA-KJNYMD     TO  HXLST-KJNYMD
            MOVE    "2"                 TO  HXLST-PROCKBN
            MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
+           MOVE    TSS013-TEMP-NAME    TO  HXLST-TEMP-NAME
+           MOVE    TSS013-TEMP-KEY     TO  HXLST-TEMP-KEY
       *
            CALL    "ORCHXLST"          USING
                                        SPA-AREA
@@ -388,7 +398,7 @@
       *
            MOVE    1                   TO  FLG-END
       *
-           IF    ( WRK-PARA-CHKKBN     =   "Y" OR "Z" )
+           IF    ( WRK-PARA-CHKKBN     =   "1" OR "2" OR "Y" OR "Z" )
                PERFORM 2001-TEKBYO-END-SEC
            END-IF
       *
@@ -492,6 +502,47 @@
       *
            .
        2001-TEKBYO-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ一覧表開始処理
+      *****************************************************************
+       2002-TEKBYO-START-SEC           SECTION.
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBCREATE"         TO  SS013-FUNC
+           MOVE     WRK-TEKBYO-CHKKBN  TO  SS013-CHKKBN
+           MOVE     "2"                TO  SS013-CREATEKBN
+           MOVE     WRK-PARA-KJNYMD    TO  SS013-KJNYMD
+           CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+           MOVE     SS013-AREA         TO  TSS013-AREA
+      *
+           PERFORM 900-CHKSND-KEY23-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+      *
+               INITIALIZE                      SS013-AREA
+               MOVE     "DBINSERT"         TO  SS013-FUNC
+               MOVE     WRK-TEKBYO-CHKKBN  TO  SS013-CHKKBN
+               MOVE     CHKSND-SRYCD       TO  SS013-SRYCD
+               MOVE     WRK-PARA-KJNYMD    TO  SS013-KJNYMD
+               MOVE     TSS013-TEMP-NAME   TO  SS013-TEMP-NAME
+               MOVE     TSS013-TEMP-KEY    TO  SS013-TEMP-KEY
+               CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+      *
+               PERFORM 900-CHKSND-KEY23-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key23"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       2002-TEKBYO-START-EXT.
            EXIT.
       *****************************************************************
       *    適応病名マスタ一覧表開始処理

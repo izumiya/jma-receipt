@@ -260,7 +260,7 @@
         <can_focus>False</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>CSV出力</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
@@ -270,6 +270,11 @@
           <key>GDK_F10</key>
           <signal>clicked</signal>
         </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
       </widget>
       <widget>
         <class>GtkButton</class>

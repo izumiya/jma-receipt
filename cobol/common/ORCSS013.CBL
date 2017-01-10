@@ -221,6 +221,16 @@
       *
                    PERFORM 800-TMPSND-EDIT-SEC
       *
+               WHEN    "2"
+                   INITIALIZE                  CHKSND-REC
+                   MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
+                   MOVE    SS013-CHKKBN    TO  CHKSND-CHKKBN
+                   MOVE    SS013-SRYCD     TO  CHKSND-SRYCD
+                   MOVE    CHKSND-REC      TO  MCPDATA-REC
+                   MOVE    "tbl_chksnd"    TO  MCP-TABLE
+                   MOVE    "tmpkey"        TO  MCP-PATHNAME
+                   PERFORM 910-DBCREATE-SEC
+      *
                WHEN    "9"
       *
                    INITIALIZE                  CHKSND-REC

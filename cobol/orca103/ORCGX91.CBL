@@ -30,6 +30,7 @@
       *  02.00.06    NACL-森脇    06/03/20  プレビュー表示
       *  03.04.01    NACL-森脇    07/02/21  チェック区分追加
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
+      *  04.08.01    NACL-森脇    16/11/29  ＣＳＶ出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -435,6 +436,9 @@
       *
       *        元の画面へ戻す
                IF    (  SPA-MOTOPG     =   "XA01" OR "XB01" OR "XC01" )
+      *----(04.08.01)--ADD-START---
+                   OR ( SPA-MOTOPG     =   "XG01" )
+      *----(04.08.01)--ADD-END-----
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-X91
                    MOVE    SPA-WORK        TO  SPA-X01KYOUTU
@@ -742,6 +746,12 @@
                PERFORM 4101-GMN-SPA-SET-SEC
                MOVE    SPACE    TO  SPA-PRT-GROUP
                PERFORM 450-REPRINT-SEC
+      *----(04.08.01)--ADD-START---
+      *    CSV出力
+           WHEN    "CLICKED"       ALSO    "B10"
+               PERFORM 4101-GMN-SPA-SET-SEC
+               PERFORM 490-PUTCSV-SEC
+      *----(04.08.01)--ADD-END-----
       *    情報削除
            WHEN    "CLICKED"       ALSO    "B11"
                PERFORM 4101-GMN-SPA-SET-SEC
@@ -1457,6 +1467,35 @@
        210-BACK-SYORI-EXT.
            EXIT.
       *
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    ＣＳＶ出力画面へ
+      *****************************************************************
+       490-PUTCSV-SEC             SECTION.
+      *
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-KYOUTU          TO  LNK-COMMON
+           MOVE    SPA-X91             TO  LNK-SCRSPA
+      *
+      *    画面移行用のパラメタ変更
+           MOVE    "X91"               TO  SPA-MOTOPG
+           MOVE    "XG01"              TO  SPA-SAKIPG
+      *
+           MOVE    CONST-JOB-SHELLID   TO  SPA-JOB-SHELLID
+      *
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
+           MOVE   "XG01   "            TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       490-PUTCSV-EXT.
+           EXIT.
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    再印刷画面へ
       *****************************************************************
@@ -2188,13 +2227,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        45012-JOBID-UPD-EXT.
            EXIT.
-      *
       *****************************************************************
       *    処理確認処理
       *****************************************************************
        490-KAKUNIN-SEC            SECTION.
       *
            MOVE    SPACE               TO  X97
+           INITIALIZE                      X97
            MOVE    ZERO                TO  X97-COUNT
       *----(02.00.06)--ADD-START---
            MOVE    WIDGET-INSENSITIVE  TO  X97-B12-STATE
@@ -2646,6 +2685,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  XID1
+           INITIALIZE                      XID1
            MOVE    SPA-XIDCD           TO  XID1-ID1CODE
            MOVE    WRK-XIDMSG          TO  XID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
@@ -2677,6 +2717,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE               TO  XID2
+           INITIALIZE                      XID2
            MOVE    SPA-XIDCD           TO  XID2-ID1CODE
            MOVE    WRK-XIDMSG          TO  XID2-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET

@@ -30,6 +30,7 @@
       *  01.00.01    NACL-太田    04/03/01  一括印刷対応
       *  01.00.02    NACL-太田    05/02/04  フォーム変更
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
+      *  04.08.01    NACL-森脇    16/12/14  ＣＳＶ出力対応
       *****************************************************************
       *
       *
@@ -50,6 +51,13 @@
            SELECT  B01T-FILE       ASSIGN      ASS03
                                    ORGANIZATION    LINE  SEQUENTIAL
                                    FILE    STATUS  IS    STS-ASS03.
+      *
+      *----(04.08.01)--ADD-START---
+      *    CHKCSVデータ
+           SELECT  CHKCSV-FILE     ASSIGN     CHKCSVPARA
+                                   ORGANIZATION    LINE  SEQUENTIAL
+                                   FILE    STATUS  IS  STS-CHKCSV.
+      *----(04.08.01)--ADD-END-----
       *
       *    印刷用データ
            SELECT  PRT-FILE        ASSIGN  ASGNPARA
@@ -97,6 +105,50 @@
        01  B01T-REC.
            03  B01T-MSTSEQ             PIC 9(10).
       *
+      *----(04.08.01)--ADD-START---
+       FD  CHKCSV-FILE.
+       01  CHKCSV-REC.
+      *    診療コード（薬剤コード）
+           03  CHKCSV-SRYCD            PIC X(09).
+      *    診療行為名（薬剤名）
+           03  CHKCSV-NAME             PIC X(100).
+      *    診療コード（薬剤コード）
+           03  CHKCSV-SRYCD2           PIC X(09).
+      *    診療行為名（薬剤名）
+           03  CHKCSV-NAME2            PIC X(100).
+      *    入外区分
+           03  CHKCSV-NYUGAIKBN        PIC X(04).
+      *    入外別にチェック
+           03  CHKCSV-NYUGAIBNDKBN     PIC X(06).
+      *    グループ
+           03  CHKCSV-GRPID            PIC X(01).
+      *    日/月
+           03  CHKCSV-DMKBN            PIC X(02).
+      *    警告エラー
+           03  CHKCSV-KEIKOKU          PIC X(20).
+      *    チェックしない
+           03  CHKCSV-NASI             PIC X(20).
+      *    マスタ提供分
+           03  CHKCSV-DATAKBN          PIC X(20).
+      *    病名コード
+           03  CHKCSV-KEY-CD-G.
+               05  CHKCSV-KEY-CD-OCC       OCCURS  21.
+                   07  CHKCSV-KEY-CD       PIC X(07).
+                   07  CHKCSV-KEY-CDSEP    PIC X(01).
+      *    病名
+           03  CHKCSV-BYOMEI           PIC X(100).
+      *    補足コメント
+           03  CHKCSV-HOSOKU           PIC X(100).
+      *    病名一致条件
+           03  CHKCSV-COMPKBNMEI       PIC X(08).
+      *    補足コメント一致条件
+           03  CHKCSV-H-COMPKBNMEI     PIC X(08).
+      *    疑い病名の扱い
+           03  CHKCSV-UTAGAIKBNMEI     PIC X(18).
+      *    適用病名マスタ
+           03  CHKCSV-TEKIYO           PIC X(20).
+      *----(04.08.01)--ADD-END-----
+      *
       *    印刷用データ
        FD  PRT-FILE.
            COPY    "HCM44.INC".
@@ -111,6 +163,11 @@
       *
            COPY    "CPCOMMONDAT5.INC"  REPLACING
                                        //TEIKI01PARA// BY //ASS03//.
+      *
+      *----(04.08.01)--ADD-START---
+           COPY    "CPCOMMONDAT5.INC"  REPLACING
+                                       //TEIKI01// BY //CHKCSV//.
+      *----(04.08.01)--ADD-END-----
       *
       *     印刷用データ 名称領域 
            COPY    "CPCOMMONPRT.INC".
@@ -129,7 +186,9 @@
            03  CNT-SETCD               PIC 9(05).
            03  CNT-MSTSEQ              PIC 9(10).
            03  CNT-OTHER               PIC 9(10).
-      *
+      *----(04.08.01)--ADD-START---
+           03  CNT-CHKCSV              PIC 9(10).
+      *----(04.08.01)--ADD-END-----
       *
       *    フラグ領域
        01  STS-AREA.
@@ -137,6 +196,9 @@
            03  STS-ASS01               PIC X(02).
            03  STS-ASS02               PIC X(02).
            03  STS-ASS03               PIC X(02).
+      *----(04.08.01)--ADD-START---
+           03  STS-CHKCSV              PIC X(02).
+      *----(04.08.01)--ADD-END-----
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -179,6 +241,9 @@
            03  FLG-B01T                PIC 9(01).
            03  FLG-SET                 PIC 9(01).
            03  FLG-EDIT                PIC 9(01).
+      *----(04.08.01)--ADD-START---
+           03  FLG-CHKCSV              PIC 9(01).
+      *----(04.08.01)--ADD-END-----
       *
       *    添字領域
        01  IDX-AREA.
@@ -236,6 +301,30 @@
            03  WRK-EDSRYCD             PIC X(09).
            03  WRK-TEKBYOKBN           PIC X(01).
            03  WRK-DELIMITER           PIC X(02).
+      *----(04.08.01)--ADD-START---
+           03  WRK-CSV-TITLE           PIC X(40).
+      *
+      *    ＣＳＶデータ編集用
+           03  WRK-REC             PIC X(20000).
+           03  WRK-REC-LENGTH      PIC 9(05).
+           03  WRK-HENSYU-AREA.
+               05  WRK-DATA        PIC X(20000).
+               05  WRK-NUM         PIC -------------9.99999. 
+               05  WRK-NAGASA      PIC 9(04).
+               05  WRK-RECSTR      PIC 9(02). 
+               05  WRK-SYOSUU      PIC 9(01).
+               05  WRK-RECEND      PIC 9(01).
+      *
+      *    出力先ファイル名
+       01  WRK-TO-DATA-G.
+           03  WRK-TO-DATA.
+               05  WRK-TO-DATA-HOSPNUM PIC 9(02).
+               05  FILLER              PIC X(08)   VALUE   "chklist_".
+               05  WRK-TO-DATA-CHKKBN  PIC X(01).
+               05  FILLER              PIC X(01)   VALUE   "_".
+               05  WRK-TO-DATA-PRTYMD  PIC X(08).
+               05  FILLER              PIC X(04)   VALUE   ".csv".
+      *----(04.08.01)--ADD-END-----
       *
        01  KEY-AREA.
            03  KEY-TEKCD               PIC X(200).
@@ -421,6 +510,11 @@
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
       *
+      *----(04.08.01)--ADD-START---
+      *    統計ＣＳＶ制御サブ
+           COPY    "CPORCSTOUKEICSV.INC".
+      *----(04.08.01)--ADD-END-----
+      *
        01 UIDIO-AREA.
            03  C-RET                   PIC X(2).
            03  C-UID                   PIC X(36).
@@ -481,6 +575,12 @@
            MOVE    "XLSTB01T"          TO  ASS03-FILE-ID
            MOVE    C-UID               TO  ASS03-TERMID
       *
+      *----(04.08.01)--ADD-START---
+           MOVE    SPA-HOSPNUM     TO  CHKCSVPARA-HOSPNUM
+           MOVE    "CHECKCSV"      TO  CHKCSVPARA-FILE-ID
+           MOVE    C-UID           TO  CHKCSVPARA-TERMID
+      *----(04.08.01)--ADD-END-----
+      *
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
            IF    ( HXLST-RCD       NOT =   ZERO )
@@ -503,6 +603,14 @@
                                        TO  WRK-EDSRYCD
                END-IF
            END-IF
+      *
+      *----(04.08.01)--ADD-START---
+           OPEN    OUTPUT          CHKCSV-FILE
+           CLOSE                   CHKCSV-FILE
+      *
+           OPEN    OUTPUT          CHKCSV-FILE
+           MOVE    ZERO        TO  CNT-CHKCSV
+      *----(04.08.01)--ADD-END-----
       *
       *    明細編集処理
            EVALUATE    HXLST-CHKKBN
@@ -552,6 +660,23 @@
            END-IF
       *
            MOVE    CNT-OUT         TO  HXLST-OUT-CNT
+      *
+      *----(04.08.01)--ADD-START---
+           CLOSE                       CHKCSV-FILE
+      *
+      *    ＣＳＶファイルがあれば処理
+           IF      CNT-CHKCSV      >   0
+               PERFORM 430-CHKCSV-SYORI-SEC
+           END-IF
+      *
+           OPEN    OUTPUT          CHKCSV-FILE
+           CLOSE                   CHKCSV-FILE
+      *
+           MOVE    ZERO            TO  IF-RESULT
+           MOVE    CHKCSVPARA      TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
+      *----(04.08.01)--ADD-START---
       *
            .
        000-PROC-EXT.
@@ -954,10 +1079,13 @@
            PERFORM 2001-SRYCD-HEN-SEC
            MOVE    WRK-NAME-G         TO  B02-NAME2
       *
+      *----(04.08.01)--ADD-START---
+           PERFORM 420-CHKCSV-02-SET-SEC
+      *----(04.08.01)--ADD-END-----
+      *
            INSPECT B02-NAME1   REPLACING   ALL "  "    BY  "　"
       *
            MOVE    BODY-02            TO  HCM44-MOJI (IDX-LINE)
-      *
            PERFORM 2200-PAGE-FEED-CHK-SEC
       *
            PERFORM 900-CHKTRD-FET-SEC
@@ -1122,7 +1250,6 @@
        2101-MEISAI-CHKSND-SYORI-SEC    SECTION.
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
-      *
                PERFORM 21011-MEISAI-CHKSND-SYORI-SEC
       *
                PERFORM 900-CHKSND-FET-SEC
@@ -1155,6 +1282,15 @@
       *
            PERFORM 900-CHKSND-KEY2-SEL-SEC
       *
+      *----(04.08.01)--ADD-START---
+      *    チェックしない分だったら
+           IF      FLG-CHK002      =   1
+               MOVE    TCHKSND-REC     TO  CHKSND-REC
+               PERFORM 420-CSV-BODY-01-SET-SEC
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *----(04.08.01)--ADD-END-----
+      *
            PERFORM UNTIL ( FLG-CHK002  NOT =   ZERO )
       *
                EVALUATE    TRUE
@@ -1163,8 +1299,14 @@
                 AND  ( CHKSND-TERMID   =   HXLST-TEMP-NAME )
                 AND  ( CHKSND-OPID     =   HXLST-TEMP-KEY )
                    PERFORM 211-MEISAI-B01R-SEC
+      *----(04.08.01)--ADD-START---
+                   PERFORM 420-CSV-BODY-01-SET-SEC
+      *----(04.08.01)--ADD-END-----
                WHEN    OTHER
                    PERFORM 210-MEISAI-B01R-SEC
+      *----(04.08.01)--ADD-START---
+                   PERFORM 420-CSV-BODY-01-SET-SEC
+      *----(04.08.01)--ADD-END-----
                END-EVALUATE
       *
                PERFORM 900-CHKSND-KEY2-FET-SEC
@@ -1879,11 +2021,14 @@
            PERFORM 2001-SRYCD-HEN-SEC
            MOVE    WRK-NAME-G      TO  B04-NAME2
       *
+      *----(04.08.01)--ADD-START---
+           PERFORM 420-CHKCSV-04-SET-SEC
+      *----(04.08.01)--ADD-START---
+      *
            INSPECT B04-NAME1       REPLACING   ALL "  "  BY  "　"
       *
            MOVE    BODY-04         TO  HCM44-MOJI (IDX-LINE)
            PERFORM 2200-PAGE-FEED-CHK-SEC
-      *
            PERFORM 900-CHKMST-FET-SEC
       *
            .
@@ -2068,6 +2213,7 @@
       *
                INSPECT B03-LEFT    REPLACING   ALL "  "  BY  "　"
                MOVE    BODY-03 TO  HCM44-MOJI (IDX-LINE)
+      *
                PERFORM 2200-PAGE-FEED-CHK-SEC
                INITIALIZE          BODY-03
                MOVE    1       TO  WRK-PNT
@@ -2140,6 +2286,9 @@
                                    TO  WRK-TNS-SRYCD
                PERFORM 2001-SRYCD-HEN-SEC
                MOVE    WRK-NAME-G  TO  B03-NAME
+      *----(04.08.01)--ADD-START---
+               PERFORM 420-CHKCSV-03-SET-SEC
+      *----(04.08.01)--ADD-END-----
            END-IF
       *
            .
@@ -2478,6 +2627,884 @@
            .
        410-PRINT-SYORI-EXT.
            EXIT.
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    ＣＳＶBODY-01出力処理(HXLST-CHKKBN=1,2,6,Y,Z)
+      *****************************************************************
+       420-CSV-BODY-01-SET-SEC         SECTION.
+      *
+           IF    ( HXLST-PROCKBN   =   "1" )
+               GO  TO  420-CSV-BODY-01-SET-EXT
+           END-IF
+      *
+           IF      FLG-TARGET      NOT =   1
+               GO  TO  420-CSV-BODY-01-SET-EXT
+           END-IF
+      *
+           INITIALIZE                  CHKCSV-REC
+      *
+           MOVE    CHKSND-SRYCD    TO  CHKCSV-SRYCD
+           MOVE    CHKSND-SRYCD    TO  WRK-TNS-SRYCD
+           IF    ( CHKSND-SRYCD(1:1)   =   "S" OR "P" )
+               PERFORM 2001-INPUTCD-HEN-SEC
+           ELSE
+               PERFORM 2001-SRYCD-HEN-SEC
+           END-IF
+           MOVE    WRK-NAME        TO  CHKCSV-NAME
+      *
+           IF    ( HXLST-TEMP-NAME NOT =   SPACE )
+               AND  ( CHKSND-TERMID   =   HXLST-TEMP-NAME )
+               AND  ( CHKSND-OPID     =   HXLST-TEMP-KEY )
+               MOVE   "適応病名マスタ"    TO  CHKCSV-TEKIYO
+           END-IF
+      *
+           MOVE    CHKSND-GRPID    TO  CHKCSV-GRPID
+           MOVE    CHKSND-CD       TO  CHKCSV-KEY-CD-G
+           MOVE    CHKSND-BYOMEI   TO  CHKCSV-BYOMEI
+           MOVE    CHKSND-HOSOKU   TO  CHKCSV-HOSOKU
+      *
+           EVALUATE    TCHKSND-NYUGAIKBN
+               WHEN    "1"
+                   MOVE    "入院"        TO  CHKCSV-NYUGAIKBN
+               WHEN    "2"
+                   MOVE    "外来"        TO  CHKCSV-NYUGAIKBN
+               WHEN    "0"
+                   MOVE    "チェックしない" 
+                                         TO  CHKCSV-NASI
+           END-EVALUATE
+      *
+           EVALUATE    CHKSND-UTAGAIKBN
+               WHEN    "0"
+                   IF    ( SYS-1101-YBUTAGAIKBN    =   "2" )
+                       MOVE    "疑い病名を認めない"
+                                       TO  CHKCSV-UTAGAIKBNMEI
+                   END-IF
+               WHEN    "2"
+                   MOVE    "疑い病名を認めない"
+                                       TO  CHKCSV-UTAGAIKBNMEI
+           END-EVALUATE
+      *
+           EVALUATE    CHKSND-COMPKBN
+               WHEN    "1"
+                   MOVE    "部分一致"  TO  CHKCSV-COMPKBNMEI
+               WHEN    "2"
+                   MOVE    "完全一致"      TO  CHKCSV-COMPKBNMEI
+               WHEN    "3"
+                   MOVE    "前方一致"      TO  CHKCSV-COMPKBNMEI
+               WHEN    "4"
+                   MOVE    "後方一致"      TO  CHKCSV-COMPKBNMEI
+           END-EVALUATE
+      *
+           IF    ( CHKSND-CHKKBN      =   "1" OR "2" )
+            AND  ( CHKSND-HOSOKU  NOT =   SPACE )
+               EVALUATE    CHKSND-HOSOKU-COMPKBN
+               WHEN    "1"
+                   MOVE    "部分一致"      TO   CHKCSV-H-COMPKBNMEI
+               WHEN    "2"
+                   MOVE    "完全一致"      TO   CHKCSV-H-COMPKBNMEI
+               WHEN    "3"
+                   MOVE    "前方一致"      TO   CHKCSV-H-COMPKBNMEI
+               WHEN    "4"
+                   MOVE    "後方一致"      TO   CHKCSV-H-COMPKBNMEI
+               END-EVALUATE
+           END-IF
+      *
+           WRITE   CHKCSV-REC
+           COMPUTE CNT-CHKCSV      =   CNT-CHKCSV  +   1
+           .
+       420-CSV-BODY-01-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶBODY-02出力処理(HXLST-CHKKBN=7)
+      *****************************************************************
+       420-CHKCSV-02-SET-SEC       SECTION.
+      *
+           IF    ( HXLST-PROCKBN   =   "1" )
+               GO  TO  420-CHKCSV-02-SET-EXT
+           END-IF
+      *
+           INITIALIZE                  CHKCSV-REC
+      *
+           MOVE    CHKTRD-SRYCD    TO  CHKCSV-SRYCD
+           MOVE    CHKTRD-SRYCD    TO  WRK-TNS-SRYCD
+           PERFORM 2001-SRYCD-HEN-SEC
+           MOVE    WRK-NAME        TO  CHKCSV-NAME
+           MOVE    CHKTRD-CD       TO  CHKCSV-SRYCD2
+           MOVE    CHKTRD-CD       TO  WRK-TNS-SRYCD
+           PERFORM 2001-SRYCD-HEN-SEC
+           MOVE    WRK-NAME        TO  CHKCSV-NAME2
+      *
+           EVALUATE    CHKTRD-NYUGAIKBN
+               WHEN    "1"
+                   MOVE    "入院"      TO  CHKCSV-NYUGAIKBN
+               WHEN    "2"
+                   MOVE    "外来"      TO  CHKCSV-NYUGAIKBN
+           END-EVALUATE
+      *
+           IF      CHKTRD-NYUGAIBNDKBN =   "2"
+               MOVE    "する"      TO  CHKCSV-NYUGAIBNDKBN
+           ELSE
+               MOVE    "しない"    TO  CHKCSV-NYUGAIBNDKBN
+           END-IF
+      *
+           IF    ( CHKTRD-DAYMONTHKBN =   "0" )
+               MOVE    "日"        TO  CHKCSV-DMKBN
+           ELSE
+               MOVE    "月"        TO  CHKCSV-DMKBN
+           END-IF
+      *
+           WRITE   CHKCSV-REC
+           COMPUTE CNT-CHKCSV      =   CNT-CHKCSV  +   1
+           .
+       420-CHKCSV-02-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶBODY-03出力処理(HXLST-CHKKBN=8,9)
+      *****************************************************************
+       420-CHKCSV-03-SET-SEC       SECTION.
+      *
+           IF    ( HXLST-PROCKBN   =   "1" )
+               GO  TO  420-CHKCSV-03-SET-EXT
+           END-IF
+      *
+           INITIALIZE                  CHKCSV-REC
+      *
+           MOVE    WKCHK005-CD     TO  CHKCSV-KEY-CD-G
+           MOVE    WKCHK005-BYOMEI TO  CHKCSV-BYOMEI
+      *
+           EVALUATE    WKCHK005-COMPKBN
+               WHEN    "1"
+                   MOVE    "部分一致"  TO  CHKCSV-COMPKBNMEI
+               WHEN    "2"
+                   MOVE    "完全一致"  TO  CHKCSV-COMPKBNMEI
+               WHEN    "3"
+                   MOVE    "前方一致"  TO  CHKCSV-COMPKBNMEI
+               WHEN    "4"
+                   MOVE    "後方一致"  TO  CHKCSV-COMPKBNMEI
+           END-EVALUATE
+      *
+           IF    ( WRK-DMKBN (CNT-TEKCD)   =   "0" )
+               MOVE    "日"        TO  CHKCSV-DMKBN
+           ELSE
+               MOVE    "月"        TO  CHKCSV-DMKBN
+           END-IF
+      *
+           MOVE    WRK-TEKCD(CNT-TEKCD)
+                                   TO  CHKCSV-SRYCD
+           MOVE    WRK-TEKCD(CNT-TEKCD)
+                                   TO  WRK-TNS-SRYCD
+           PERFORM 2001-SRYCD-HEN-SEC
+           MOVE    WRK-NAME        TO  CHKCSV-NAME
+      *
+           WRITE   CHKCSV-REC
+           COMPUTE CNT-CHKCSV      =   CNT-CHKCSV  +   1
+           .
+       420-CHKCSV-03-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶBODY-04出力処理(HXLST-CHKKBN=4,5,A,B)
+      *****************************************************************
+       420-CHKCSV-04-SET-SEC     SECTION.
+      *
+           IF    ( HXLST-PROCKBN   =   "1" )
+               GO  TO  420-CHKCSV-04-SET-EXT
+           END-IF
+      *
+           INITIALIZE                  CHKCSV-REC
+      *
+           MOVE    CHK-SRYCD       TO  CHKCSV-SRYCD
+           MOVE    CHK-SRYCD       TO  WRK-TNS-SRYCD
+           PERFORM 2001-SRYCD-HEN-SEC
+           MOVE    WRK-NAME        TO  CHKCSV-NAME
+           MOVE    CHK-CD          TO  CHKCSV-SRYCD2
+           MOVE    CHK-CD          TO  WRK-TNS-SRYCD
+           PERFORM 2001-SRYCD-HEN-SEC
+           MOVE    WRK-NAME        TO  CHKCSV-NAME2
+      *
+           IF      CHK-NYUGAIBNDKBN    =  "1"
+               MOVE    "する"          TO  CHKCSV-NYUGAIBNDKBN
+           ELSE
+               MOVE    "しない"        TO  CHKCSV-NYUGAIBNDKBN
+           END-IF
+      *
+           EVALUATE    CHK-CHKERR
+               WHEN    "8"
+                   MOVE    "チェックしない"    TO  CHKCSV-NASI
+               WHEN    "9"
+                   MOVE    "警告"              TO  CHKCSV-KEIKOKU
+           END-EVALUATE
+      *
+           IF      CHK-DATAKBN     =   "1" 
+               MOVE    "マスタ提供分"  TO  CHKCSV-DATAKBN
+           END-IF
+      *
+           WRITE   CHKCSV-REC
+           COMPUTE CNT-CHKCSV      =   CNT-CHKCSV  +   1
+           .
+       420-CHKCSV-04-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶ見出し出力処理
+      *****************************************************************
+       430-CHKCSV-SYORI-SEC        SECTION.
+      *
+           IF      HXLST-PROCKBN   =   "1"
+               GO  TO  430-CHKCSV-SYORI-EXT
+           END-IF
+      *
+      *    タイトル
+           PERFORM 430-CHKCSV-TITLE-SET-SEC
+      *
+           OPEN    INPUT               CHKCSV-FILE
+      *
+      *    統計ファイル読み込み
+           INITIALIZE                  CHKCSV-REC
+           PERFORM 900-CHKCSV-READ-SEC
+      *
+           PERFORM UNTIL FLG-CHKCSV    =   1
+      *        内容
+               PERFORM 430-CHKCSV-BODY-SET-SEC
+      *        統計ファイル読み込み
+               PERFORM 900-CHKCSV-READ-SEC
+           END-PERFORM
+      *
+           CLOSE                       CHKCSV-FILE
+           .
+       430-CHKCSV-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶ見出し出力処理
+      *****************************************************************
+       430-CHKCSV-TITLE-SET-SEC    SECTION.
+      *
+           MOVE    SPA-HOSPNUM         TO  WRK-TO-DATA-HOSPNUM
+           MOVE    HXLST-CHKKBN        TO  WRK-TO-DATA-CHKKBN
+           MOVE    SPA-SYSYMD          TO  WRK-TO-DATA-PRTYMD
+      *
+           MOVE    SPACE               TO  WRK-CSV-TITLE
+           EVALUATE    HXLST-CHKKBN
+               WHEN    "1"
+                   MOVE    "【薬剤と病名】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "2"
+                   MOVE    "【診療行為と病名】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "4"
+                   MOVE    "【薬剤と併用禁忌】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "5"
+                   MOVE    "【診療行為の併用算定】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "6"
+                   MOVE    "【投与禁忌薬剤と病名】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "7"
+                   MOVE    "【診療行為どうしの算定漏れ】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "8"
+                   MOVE    "【病名と薬剤】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "9"
+                   MOVE    "【病名と診療行為】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "A"
+                   MOVE    "【診療行為の併用算定（同日内）】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "B"
+                   MOVE    "【診療行為の併用算定（同会計内）】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "Y"
+                   MOVE    "【適応病名（薬剤）】"
+                                       TO  WRK-CSV-TITLE
+               WHEN    "Z"
+                   MOVE    "【適応病名（診療行為）】"
+                                       TO  WRK-CSV-TITLE
+           END-EVALUATE
+      *
+           INITIALIZE                  WRK-REC
+           MOVE    WRK-CSV-TITLE   TO  WRK-REC
+           PERFORM 440-TOUKEICSV-SEC
+      *
+           INITIALIZE                  WRK-REC
+           EVALUATE    HXLST-CHKKBN
+               WHEN    "1"
+                   STRING  "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名,"           DELIMITED BY SIZE
+                           "チェックしない,"   DELIMITED BY SIZE
+                           "入外区分,"         DELIMITED BY SIZE
+                           "グループ,"         DELIMITED BY SIZE
+                           "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１,"   DELIMITED BY SIZE
+                           "病名一致条件,"     DELIMITED BY SIZE
+                           "疑い病名の扱い,"   DELIMITED BY SIZE
+                           "補足コメント,"     DELIMITED BY SIZE
+                           "補足コメント一致条件,"
+                                               DELIMITED BY SIZE
+                           "適応病名マスタ"    DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "2"
+                   STRING  "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "チェックしない,"   DELIMITED BY SIZE
+                           "入外区分,"         DELIMITED BY SIZE
+                           "グループ,"         DELIMITED BY SIZE
+                           "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１,"   DELIMITED BY SIZE
+                           "病名一致条件,"     DELIMITED BY SIZE
+                           "疑い病名の扱い,"   DELIMITED BY SIZE
+                           "補足コメント,"     DELIMITED BY SIZE
+                           "補足コメント一致条件,"
+                                               DELIMITED BY SIZE
+                           "適応病名マスタ"    DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+      *        3は廃止
+               WHEN    "4"
+                   STRING  "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名,"           DELIMITED BY SIZE
+                           "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名"            DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "5"
+                   STRING  "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "入外別にチェック," DELIMITED BY SIZE
+                           "警告エラー,"       DELIMITED BY SIZE
+                           "チェックしない,"   DELIMITED BY SIZE
+                           "マスタ提供分"      DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "6"
+                   STRING  "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名,"           DELIMITED BY SIZE
+                           "入外区分,"         DELIMITED BY SIZE
+                           "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１,"   DELIMITED BY SIZE
+                           "病名一致条件"      DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "7"
+                   STRING  "診療コード,"       DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "入外区分,"         DELIMITED BY SIZE
+                           "入外別にチェック," DELIMITED BY SIZE
+                           "診療コード,"       DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "日/月"             DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "8"
+                   STRING  "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１,"   DELIMITED BY SIZE
+                           "病名一致条件,"     DELIMITED BY SIZE
+                           "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名,"           DELIMITED BY SIZE
+                           "日/月"             DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "9"
+                   STRING  "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１,"   DELIMITED BY SIZE
+                           "病名一致条件,"     DELIMITED BY SIZE
+                           "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "日/月"             DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "A"
+               WHEN    "B"
+                   STRING  "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "入外別にチェック," DELIMITED BY SIZE
+                           "警告エラー,"       DELIMITED BY SIZE
+                           "チェックしない,"   DELIMITED BY SIZE
+                           "マスタ提供分"      DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "Y"
+                   STRING  "薬剤コード,"       DELIMITED BY SIZE
+                           "薬剤名,"           DELIMITED BY SIZE
+                           "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１"    DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+               WHEN    "Z"
+                   STRING  "診療行為コード,"   DELIMITED BY SIZE
+                           "診療行為名,"       DELIMITED BY SIZE
+                           "病名,"             DELIMITED BY SIZE
+                           "病名コード１,"     DELIMITED BY SIZE
+                           "病名コード２,"     DELIMITED BY SIZE
+                           "病名コード３,"     DELIMITED BY SIZE
+                           "病名コード４,"     DELIMITED BY SIZE
+                           "病名コード５,"     DELIMITED BY SIZE
+                           "病名コード６,"     DELIMITED BY SIZE
+                           "病名コード７,"     DELIMITED BY SIZE
+                           "病名コード８,"     DELIMITED BY SIZE
+                           "病名コード９,"     DELIMITED BY SIZE
+                           "病名コード１０,"   DELIMITED BY SIZE
+                           "病名コード１１,"   DELIMITED BY SIZE
+                           "病名コード１２,"   DELIMITED BY SIZE
+                           "病名コード１３,"   DELIMITED BY SIZE
+                           "病名コード１４,"   DELIMITED BY SIZE
+                           "病名コード１５,"   DELIMITED BY SIZE
+                           "病名コード１６,"   DELIMITED BY SIZE
+                           "病名コード１７,"   DELIMITED BY SIZE
+                           "病名コード１８,"   DELIMITED BY SIZE
+                           "病名コード１９,"   DELIMITED BY SIZE
+                           "病名コード２０,"   DELIMITED BY SIZE
+                           "病名コード２１"    DELIMITED BY SIZE
+                                         INTO  WRK-REC
+                   END-STRING
+           END-EVALUATE
+           PERFORM 440-TOUKEICSV-SEC
+           .
+       430-CHKCSV-TITLE-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＣＳＶ名称編集処理
+      *****************************************************************
+       430-CHKCSV-BODY-SET-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-REC
+           EVALUATE    HXLST-CHKKBN
+               WHEN    "7"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NYUGAIKBN    DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NYUGAIBNDKBN DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-SRYCD2       DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME2        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-DMKBN        DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "8"
+               WHEN    "9"
+                   STRING  CHKCSV-BYOMEI       DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (2)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (3)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (4)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (5)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (6)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (7)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (8)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (9)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (10)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (11)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (12)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (13)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (14)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (15)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (16)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (17)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (18)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (19)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (20)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (21)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-COMPKBNMEI   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-DMKBN        DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "4"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-SRYCD2       DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME2        DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "5"
+               WHEN    "A"
+               WHEN    "B"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-SRYCD2       DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME2        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NYUGAIBNDKBN DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEIKOKU      DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NASI         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-DATAKBN      DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "1"
+               WHEN    "2"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NASI         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NYUGAIKBN    DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-GRPID        DELIMITED  BY  SIZE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (2)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (3)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (4)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (5)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (6)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (7)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (8)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (9)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (10)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (11)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (12)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (13)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (14)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (15)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (16)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (17)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (18)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (19)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (20)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (21)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-COMPKBNMEI   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-UTAGAIKBNMEI DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-HOSOKU       DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-H-COMPKBNMEI DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-TEKIYO       DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "6"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NYUGAIKBN    DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (2)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (3)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (4)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (5)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (6)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (7)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (8)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (9)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (10)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (11)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (12)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (13)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (14)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (15)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (16)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (17)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (18)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (19)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (20)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (21)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-COMPKBNMEI   DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+               WHEN    "Y"
+               WHEN    "Z"
+                   STRING  CHKCSV-SRYCD        DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-NAME         DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (2)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (3)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (4)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (5)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (6)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (7)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (8)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (9)   DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (10)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (11)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (12)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (13)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (14)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (15)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (16)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (17)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (18)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (19)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (20)  DELIMITED  BY  SPACE
+                           ","                 DELIMITED  BY  SIZE
+                           CHKCSV-KEY-CD (21)  DELIMITED  BY  SPACE
+                           INTO                WRK-REC
+                   END-STRING
+           END-EVALUATE
+           PERFORM 440-TOUKEICSV-SEC
+           .
+       430-CHKCSV-BODY-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    統計ＣＳＶ出力処理
+      *****************************************************************
+       440-TOUKEICSV-SEC           SECTION.
+      *
+           MOVE    HXLST-PRTAREA       TO  ORCSPRTAREA
+      *
+           INITIALIZE                      ORCSTOUKEICSVAREA
+           MOVE    SPRT-MODE           TO  STOUKEICSV-MODE
+           MOVE    SPRT-TBL-KEY        TO  STOUKEICSV-TBL-KEY
+           MOVE    SPRT-RENNUM         TO  STOUKEICSV-RENNUM
+           MOVE    SPRT-TBL-GROUP      TO  STOUKEICSV-TBL-GROUP
+           MOVE    SPRT-SHORI-RENNUM   TO  STOUKEICSV-SHORI-RENNUM
+           MOVE    SPRT-SKYYMD         TO  STOUKEICSV-SRYYMD
+           MOVE    SPRT-SHELLID        TO  STOUKEICSV-SHELLID
+           MOVE    SPACE               TO  STOUKEICSV-NYUGAIKBN
+           MOVE    ZERO                TO  STOUKEICSV-PTID
+           MOVE    "/var/tmp/"         TO  STOUKEICSV-TO-FOLDER
+           MOVE    WRK-TO-DATA         TO  STOUKEICSV-TO-DATA
+           MOVE    "2"                 TO  STOUKEICSV-CODE-TYPE
+           MOVE    WRK-REC             TO  STOUKEICSV-CSVDATA
+           MOVE    SPACE               TO  STOUKEICSV-TITLE
+           STRING  "チェックマスタＣＳＶ"  DELIMITED BY SIZE
+                   WRK-CSV-TITLE           DELIMITED BY SPACE
+                                   INTO    STOUKEICSV-TITLE
+           END-STRING
+      *
+           CALL    "ORCSTOUKEICSV"         USING
+                                           ORCSTOUKEICSVAREA
+                                           SPA-AREA
+           .
+       440-TOUKEICSV-EXT.
+           EXIT.
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    終了　　処理
       *****************************************************************
@@ -3252,6 +4279,22 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
        900-B01T-READ-EXT.
            EXIT.
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    CHKCSVファイル順読込
+      *****************************************************************
+       900-CHKCSV-READ-SEC         SECTION.
+      *
+           READ    CHKCSV-FILE     NEXT
+               AT  END
+                   MOVE    1           TO  FLG-CHKCSV
+               NOT AT  END
+                   MOVE    ZERO        TO  FLG-CHKCSV
+           END-READ
+           .
+       900-CHKCSV-READ-EXT.
+           EXIT.
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
       *****************************************************************
