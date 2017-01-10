@@ -990,6 +990,7 @@
            PERFORM 800-TIME-SEC
            MOVE    WRK-TIME        TO  FINDRES-INFORMATION-TIME
       *
+           PERFORM 890-ERRCD-MSG-SEC
            IF    ( SPA-ERRCD       =   ZERO )
                MOVE    ZERO        TO  FINDRES-API-RESULT
            ELSE
