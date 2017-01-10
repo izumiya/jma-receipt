@@ -868,8 +868,8 @@ DB_files = \
 	xml_patientmodv3res7.db \
 	xml_medicalv3req5.db \
 	xml_medicalv3res5.db \
-	tbl_ptmynumber.db \ 
-    push_find.db  \
+	tbl_ptmynumber.db \
+    push_find.db \
     xml_findv3req.db  \
     xml_findv3res.db  \
     xml_findinfv2req.db  \
