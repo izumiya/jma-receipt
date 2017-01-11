@@ -3306,7 +3306,7 @@
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-GRPID        DELIMITED  BY  SIZE
                            ","                 DELIMITED  BY  SIZE
-                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
@@ -3368,7 +3368,7 @@
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-NYUGAIKBN    DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
-                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
@@ -3421,7 +3421,7 @@
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-NAME         DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
-                           CHKCSV-BYOMEI       DELIMITED  BY  SIZE
+                           CHKCSV-BYOMEI       DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
                            CHKCSV-KEY-CD (1)   DELIMITED  BY  SPACE
                            ","                 DELIMITED  BY  SIZE
