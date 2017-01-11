@@ -18,7 +18,7 @@ bind	"Q100"		"OpenCOBOL"	"ORCGQ100";
 bind	"QERR"		"OpenCOBOL"	"ORCGQERR";
 bind	"QID1"		"OpenCOBOL"	"ORCGQID1";
 bindapi "findv3"    "OpenCOBOL"	"ORCGQAPI01"; 
-bindapi "findinfv2" "OpenCOBOL"	"ORCGQAPI02"; 
+bindapi "findinfv3" "OpenCOBOL"	"ORCGQAPI02"; 
 
 multiplex_group	orca13;
 
@@ -39,7 +39,7 @@ data	{
         QERR;
         QID1;
         findv3;
-        findinfv2;
+        findinfv3;
 	};
 };
 
@@ -79,8 +79,8 @@ db	{
 db "xml2" {
  xml_findv3req;
  xml_findv3res;
- xml_findinfv2req;
- xml_findinfv2res;
+ xml_findinfv3req;
+ xml_findinfv3res;
 };
 
 

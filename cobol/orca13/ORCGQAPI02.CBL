@@ -76,7 +76,7 @@
                05  WRK-TIME-FL2        PIC X(01).
                05  WRK-TIME-SS         PIC 9(02).
       *
-           COPY    "CPFINDINFV2REQ.INC"  REPLACING
+           COPY    "CPFINDINFV3REQ.INC"  REPLACING
                                 //XML-//     BY  //TXML-//
                                 //FINDINFREQ-// BY  //TFINDINFREQ-//.
       *
@@ -96,9 +96,9 @@
            COPY    "CPQSUB03.INC".
       *
       *    API XML読み込み用定義体
-           COPY    "CPFINDINFV2REQ.INC".
+           COPY    "CPFINDINFV3REQ.INC".
       *    API XML書き込み用定義体
-           COPY    "CPFINDINFV2RES.INC".
+           COPY    "CPFINDINFV3RES.INC".
       *
       *    日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -171,8 +171,8 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                  XML-FINDINFV2REQ
-                                       XML-FINDINFV2RES
+           INITIALIZE                  XML-FINDINFV3REQ
+                                       XML-FINDINFV3RES
       *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
@@ -509,27 +509,27 @@
        900-XML-READ-SEC             SECTION.
       *
            IF    ( QAPI02-BODY     NOT =   LOW-VALUE )
-               DISPLAY "findinfv2 object is not low_value"
+               DISPLAY "findinfv3 object is not low_value"
            END-IF
       *
-           INITIALIZE                      XML-FINDINFV2REQ
+           INITIALIZE                      XML-FINDINFV3REQ
       * XML情報取り出し
-           MOVE    "xml_findinfv2req"     TO  MCP-TABLE
+           MOVE    "xml_findinfv3req"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    QAPI02-BODY         TO  FINDINFREQ-OBJECT
            MOVE    ZERO                TO  FINDINFREQ-MODE
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            CALL    "MONFUNC"           USING
                                        MCPAREA
-                                       XML-FINDINFV2REQ
+                                       XML-FINDINFV3REQ
            IF    ( MCP-RC              =   ZERO  OR  1 )
-               MOVE    "xml_findinfv2req" TO  MCP-TABLE
+               MOVE    "xml_findinfv3req" TO  MCP-TABLE
                MOVE    "key"           TO  MCP-PATHNAME
-               MOVE    "findinfv2req"     TO  FINDINFREQ-RECORDNAME
+               MOVE    "findinfv3req"     TO  FINDINFREQ-RECORDNAME
                MOVE    "XMLREAD"       TO  MCP-FUNC
                CALL    "MONFUNC"       USING
                                        MCPAREA
-                                       XML-FINDINFV2REQ
+                                       XML-FINDINFV3REQ
                IF    ( MCP-RC          =   ZERO  OR  1 )
                    CONTINUE
                ELSE
@@ -541,16 +541,16 @@
                MOVE   "0097"           TO  SPA-ERRCD
            END-IF
       *
-           MOVE    XML-FINDINFV2REQ       TO  TXML-FINDINFV2REQ
+           MOVE    XML-FINDINFV3REQ       TO  TXML-FINDINFV3REQ
       *
-           MOVE    "xml_findinfv2req"     TO  MCP-TABLE
+           MOVE    "xml_findinfv3req"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDINFV2REQ
+                                           XML-FINDINFV3REQ
       *
-           MOVE    TXML-FINDINFV2REQ      TO  XML-FINDINFV2REQ
+           MOVE    TXML-FINDINFV3REQ      TO  XML-FINDINFV3REQ
       *
            .
        900-XML-READ-EXT.
@@ -579,38 +579,38 @@
            END-IF
            MOVE    SPA-Q01-ERRMSG  TO  FINDINFRES-API-RESULT-MSG
       *
-           MOVE    "xml_findinfv2res"     TO  MCP-TABLE
+           MOVE    "xml_findinfv3res"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    1                   TO  FINDINFRES-MODE
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDINFV2RES
+                                           XML-FINDINFV3RES
            IF    ( MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLOPEN failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_findinfv2res"     TO  MCP-TABLE
+           MOVE    "xml_findinfv3res"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    "findinfv2res"         TO  FINDINFRES-RECORDNAME
+           MOVE    "findinfv3res"         TO  FINDINFRES-RECORDNAME
            MOVE    "XMLWRITE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDINFV2RES
+                                           XML-FINDINFV3RES
            IF     (MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLWRITE failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_findinfv2res"     TO  MCP-TABLE
+           MOVE    "xml_findinfv3res"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDINFV2RES
+                                           XML-FINDINFV3RES
            IF     (MCP-RC              =   ZERO  OR  1  )
                MOVE    FINDINFRES-OBJECT  TO  QAPI02-BODY
                MOVE    "application/xml"
