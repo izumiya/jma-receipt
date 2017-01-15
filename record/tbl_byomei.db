@@ -16,6 +16,8 @@ tbl_byomei {
 	BYOMEICHGCD			varchar(4);
 	ICD10_1   			varchar(5);
 	ICD10_2   			varchar(5);
+	ICD10_1_2   			varchar(5);
+	ICD10_2_2   			varchar(5);
 	SYUSAIYMD			varchar(8);
 	CHGYMD				varchar(8);
 	HAISIYMD			varchar(8);
