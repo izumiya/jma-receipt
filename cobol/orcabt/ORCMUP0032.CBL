@@ -31,6 +31,7 @@
       * 01.00.01     NACL-小豆沢  06/05/22  MONFUNC対応
       * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
       * 04.06.00     NACL-森脇    11/03/23  構造変更
+      * 05.00.00     NACL-伊藤    17/01/11  構造変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -59,7 +60,7 @@
       *
       *    入力：病名マスタ更新データ
        FD  IN-FILE.
-       01  IN-REC                      PIC X(50200).
+       01  IN-REC                      PIC X(2000).
       *
       *    出力：エラーファイル
        FD  ERR-FILE.
@@ -113,7 +114,6 @@ grpsys     COPY    "COMMON-SPA".
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
       *
-      *
        01  SYS-DATE.
            03  SYS-YY                  PIC 9(02).
            03  SYS-MM                  PIC 9(02).
@@ -154,6 +154,11 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-SYORIKBN            PIC X(01).
            03  FILLER                  PIC X(01)   VALUE   ",".
            03  WRK-BYOMEICD            PIC X(07).
+      *
+      *    旧マスタデータ退避領域
+       01  BYOWK-BYOMEI-REC-V02.
+           03  BYOWK-V02-AREA-01       PIC X(652).
+           03  BYOWK-V02-AREA-02       PIC X(94).
       *
        01  CONST-AREA.
            03  CONST-HOMEDIR           PIC X(28)  VALUE
@@ -609,23 +614,50 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        900-IN-KENSAKU-SEC          SECTION.
       *
-          READ    IN-FILE
-              AT  END
-                  MOVE    1               TO  FLG-IN
-              NOT AT  END
-                  MOVE    ZERO            TO  FLG-IN
-                  ADD     1               TO  CNT-IN
-          END-READ
+           READ    IN-FILE
+               AT  END
+                   MOVE    1                   TO  FLG-IN
+               NOT AT  END
+                   MOVE    ZERO                TO  FLG-IN
+                   ADD     1                   TO  CNT-IN
+           END-READ
       *
-          IF      FLG-IN           =   ZERO
-              MOVE    SPACE            TO  BYOMEIWK-REC
-              MOVE    IN-REC           TO  BYOMEIWK-REC
-          END-IF
-          
-      *
-          .
+           IF       FLG-IN             =   ZERO
+               PERFORM 900-IN-DATA-SET-SEC
+           END-IF
+           .
        900-IN-KENSAKU-EXT.
-          EXIT.
+           EXIT.
+      *
+      *****************************************************************
+      *    病名マスタ変更データ設定処理
+      *****************************************************************
+       900-IN-DATA-SET-SEC         SECTION.
+      *
+           IF      LNK-DBRVERSION (3:6)    <   "040800"
+               PERFORM 900-BYOWK-V02-SET
+           ELSE
+               MOVE    IN-REC              TO  BYOMEIWK-REC
+           END-IF
+           .
+       900-IN-DATA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    変更後レイアウト移送処理
+      *****************************************************************
+       900-BYOWK-V02-SET           SECTION.
+      *
+           MOVE    IN-REC              TO  BYOWK-BYOMEI-REC-V02
+      *
+           MOVE    BYOWK-V02-AREA-01   TO  BYOMEIWK-REC (1   : 652)
+      *ＩＣＤ１０−１−２
+      *ＩＣＤ１０−２−２
+           MOVE    SPACE               TO  BYOMEIWK-REC (653 : 10)
+           MOVE    BYOWK-V02-AREA-02   TO  BYOMEIWK-REC (663 :)
+           .
+       900-BYOWK-V02-EXT.
+           EXIT.
       *
       *****************************************************************
       *    病名マスター読込
@@ -706,4 +738,4 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
        900-ORCDBMAIN-EXT.
            EXIT.
-      *      
+      *

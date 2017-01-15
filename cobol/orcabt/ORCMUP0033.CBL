@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0031.
+       PROGRAM-ID.                 ORCMUP0033.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -30,6 +30,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-小豆沢  06/05/22  MONFUNC対応
       * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
+      * 04.06.00     NACL-森脇    11/03/23  構造変更
+      * 05.00.00     NACL-伊藤    17/01/11  構造変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -112,7 +114,6 @@ grpsys     COPY    "COMMON-SPA".
            03  IDX                     PIC 9(04).
            03  IDY                     PIC 9(04).
       *
-      *
        01  SYS-DATE.
            03  SYS-YY                  PIC 9(02).
            03  SYS-MM                  PIC 9(02).
@@ -131,7 +132,6 @@ grpsys     COPY    "COMMON-SPA".
       *
            03  WRK-ERRCD               PIC 9(01). 
            03  WRK-UPD-ERRCD           PIC 9(01). 
-      *
            03  WRK-IN                  PIC X(01). 
            03  WRK-HOMEDIR             PIC X(128).
       *
@@ -139,7 +139,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0031.CBL】".
+                                       "【PGID:ORCMUP0033.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -154,12 +154,6 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-SYORIKBN            PIC X(01).
            03  FILLER                  PIC X(01)   VALUE   ",".
            03  WRK-BYOMEICD            PIC X(07).
-      *
-      *    旧マスタデータ退避領域
-       01  BYOWK-BYOMEI-REC-V01.
-           03  BYOWK-V01-AREA-01       PIC X(623).
-           03  BYOWK-V01-AREA-02       PIC X(22).
-           03  BYOWK-V01-AREA-03       PIC X(94).
       *
        01  CONST-AREA.
            03  CONST-HOMEDIR           PIC X(28)  VALUE
@@ -179,11 +173,11 @@ grpsys     COPY    "COMMON-SPA".
       *    ファイル定義
       *****************************************************************
       *
+      *    病名マスタ
        01  BYOMEIWK-REC.
            03  BYOWK-SYORIKBN      PIC X(01).
            COPY    "CPBYOMEI.INC"      REPLACING   //BYO-//
                                               BY   //BYOWK-//.
-      *
       *    病名マスタ
        01  BYOMEI-REC.
            COPY    "CPBYOMEI.INC".
@@ -249,7 +243,7 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT           IN-FILE
            IF  STS-IN          NOT =   ZERO
                MOVE    1           TO  FLG-IN
-               DISPLAY "*(ORCMUP0031)* IN-FILE OPN STS["
+               DISPLAY "*(ORCMUP0033)* IN-FILE OPN STS["
                                        STS-IN "]"
            END-IF
       *
@@ -545,14 +539,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            OPEN    OUTPUT              ERR-FILE
            IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0031)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0033)* OUTFILE OPN STS[" STS-ERR "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT              PLF-FILE
            IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0031)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0033)* PLFFILE OPN STS[" STS-PLF "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
            ACCEPT  SYS-DATE            FROM    DATE
@@ -597,13 +591,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            END-IF
       *
-           DISPLAY "*(ORCMUP0031)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0031)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0031)*  UPDATE     CNT[" CNT-UPD "]"
-      **** DISPLAY "*(ORCMUP0031)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0031)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0031)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0031)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0033)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0033)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0033)*  UPDATE     CNT[" CNT-UPD "]"
+      **** DISPLAY "*(ORCMUP0033)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0033)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0033)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0033)* RC             [" LNK-RC "]"
       **** ACCEPT  WRK-IN
       *
            .
@@ -624,44 +618,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-READ
       *
            IF       FLG-IN             =   ZERO
-               PERFORM 900-IN-DATA-SET-SEC
-           END-IF
-           .
-       900-IN-KENSAKU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    病名マスタ変更データ設定処理
-      *****************************************************************
-       900-IN-DATA-SET-SEC         SECTION.
-      *
-           IF      LNK-DBRVERSION (3:6)    <   "040600"
-               PERFORM 900-BYOWK-V01-SET
-           ELSE
+               MOVE    SPACE               TO  BYOMEIWK-REC
                MOVE    IN-REC              TO  BYOMEIWK-REC
            END-IF
            .
-       900-IN-DATA-SET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    変更後レイアウト移送処理
-      *****************************************************************
-       900-BYOWK-V01-SET           SECTION.
-      *
-           MOVE    IN-REC              TO  BYOWK-BYOMEI-REC-V01
-      *
-           MOVE    BYOWK-V01-AREA-01   TO  BYOMEIWK-REC (1   : 623)
-      *難病外来コード
-           MOVE    ZERO                TO  BYOMEIWK-REC (624 : 2)
-           MOVE    BYOWK-V01-AREA-02   TO  BYOMEIWK-REC (626 : 22)
-      *ＩＣＤ１０−２
-      *ＩＣＤ１０−１−２
-      *ＩＣＤ１０−２−２
-           MOVE    SPACE               TO  BYOMEIWK-REC (648 : 15)
-           MOVE    BYOWK-V01-AREA-03   TO  BYOMEIWK-REC (663 :)
-           .
-       900-BYOWK-V01-EXT.
+       900-IN-KENSAKU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -743,4 +704,4 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
        900-ORCDBMAIN-EXT.
            EXIT.
-      *      
+      *
