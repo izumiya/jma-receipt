@@ -444,78 +444,6 @@
       *
        WORKING-STORAGE SECTION.
       *
-       01  KEISAN-AREA.
-           03  WK-KNJFTNKIN            PIC 9(10).
-           03  WK-KNJFTNKIN-ENTANI     PIC 9(08)V9(01).
-           03  WK-ENTANI               PIC 9(08).
-           03  WK-ENTANI2              PIC 9(08).
-           03  WK-CYOKI                PIC 9(08).
-           03  WK-CYOKI-ENTANI         PIC 9(08).
-           03  WK-CYOKI-ZAN            PIC 9(08).
-           03  WK-CYOKI-ZAN-ENTANI     PIC 9(08).
-           03  WK-ZENGAKU              PIC 9(10).
-           03  WK-ZENGAKU-SYU          PIC 9(10).
-           03  WK-ZENGAKU-YAK          PIC 9(10).
-           03  WK-FUTANWARI            PIC 9V99.
-           03  WK-SEIKYUGK             PIC 9(10).
-           03  WK-NYUKFTNRATE          PIC 9(03).
-           03  WK-NYUKFTNRATE019       PIC 9(03).
-           03  WK-NYUSKJJYOGAK         PIC 9(06).
-           03  WK-NYUSKJJYOGAK2        PIC 9(09).
-           03  WK-TOKUTEI-COMPFTN      PIC 9(08).
-           03  WK-TOKUTEI-COMPFTN2     PIC 9(08).
-           03  WK-TOKUTEI-COMPFTN3     PIC 9(08).
-           03  WK-TOKUTEI-COMPFTN4     PIC 9(08).
-           03  WK-HANGAKU-COMPFTN      PIC 9(07).
-           03  WK-HANGAKU-ENTANI       PIC 9(07)V9(01).
-           03  WK-GENMEN-KEISAN        PIC 9(07).
-           03  WK-GENMEN-KEISAN2       PIC 9(07).
-           03  WK-GENMEN-KEISAN3       PIC 9(07).
-           03  WK-JIHIGAKU             PIC 9(10).
-           03  WK-JIHIGAKU2            PIC 9(10).
-           03  WK-JIHIGAKU3            PIC 9(10).
-           03  WK-JIHIFTN              PIC 9V99.
-           03  WK-ZAN-JIRITU           PIC 9(08).
-           03  WK-KOH-GENDOGAKU        PIC 9(07).
-           03  WK-GEN70-GENDOGAKU      PIC 9(07).
-           03  WK-GEN70-GENDOGAKU2     PIC 9(07).
-           03  WK-SKYMONEY-ZEI         PIC 9(07).
-           03  WK-RSIETC-ZEITAISYO     PIC 9(07).
-           03  WK-SKJ-ZEITAISYO        PIC 9(07).
-           03  WK-KEISAN-JIBAI         PIC 9(07).
-           03  WK-SKJ-ZEI              PIC 9(07).
-           03  WK-SKJ-ZEIKEI           PIC 9(07).
-           03  WK-SKJ-ZEIKEI2          PIC 9(07).
-           03  WK-SKJ-ZEIKEIL          PIC 9(07).
-           03  WK-SKJ-ZEIKEI2L         PIC 9(07).
-           03  WK-GENBUTU-KOH1COMPFTN  PIC 9(07).
-           03  WK-GENBUTU-KOH2COMPFTN  PIC 9(07).
-           03  WK-GENBUTU-KOH3COMPFTN  PIC 9(07).
-           03  WK-GENBUTU-KOH4COMPFTN  PIC 9(07).
-           03  WK-GENBUTU-HKNKIN       PIC 9(10).
-           03  WK-GENBUTU-HKNKIN2      PIC 9(10).
-           03  WK-GENBUTU-HKNKIN3      PIC 9(10).
-           03  WK-SEIHO-GENDO          PIC 9(07).
-           03  WK-SEIHO-GENDO70        PIC 9(07).
-           03  WK-CYOKI-GENDO          PIC 9(07).
-           03  WK-CYOKI-GENDO2         PIC 9(07).
-           03  WK-KOH-GENDOGAKU-TOKU75 PIC 9(07).
-           03  WK-GEN70-GENDOGAKU-TOKU75
-                                       PIC 9(07).
-           03  WK-SEIHO-GENDO-TOKU75   PIC 9(07).
-           03  WK-SEIHO-GENDO70-TOKU75 PIC 9(07).
-           03  WK-CYOKI-GENDO-TOKU75   PIC 9(07).
-           03  WK-CYOKI-GENDO2-TOKU75  PIC 9(07).
-           03  WK-CYOKI-TOKU75         PIC 9(08).
-           03  WK-CYOKI-ENTANI-TOKU75  PIC 9(08).
-           03  WK-CYOKI-ZAN-XXX        PIC 9(08).
-           03  WK-DAY-KEISAN           PIC 9(08).
-           03  WK-S1                   PIC 9(03).
-           03  WK-S2                   PIC 9(03).
-           03  WK-S3                   PIC 9V99999.
-           03  WK-S4                   PIC 9V99.
-           03  WK-S5                   PIC 9V99.
-           03  WK-DAYCNT               PIC 9(03).
        01  FLG-AREA.
            03  FLG-SYUNOU              PIC 9(01).
            03  FLG-HKNNUM              PIC 9(01).
@@ -609,7 +537,127 @@
            03  FLG-ARI                 PIC 9(01).
            03  FLG-CYOKEIKBN-N         PIC 9(01).
       *
+      *    Åº¤¨»úÎÎ°è
+       01  IDX-AREA.
+           03  IDX                     PIC  9(02)  VALUE  ZERO.
+           03  IDX2                    PIC  9(02)  VALUE  ZERO.
+           03  IDX3                    PIC  9(02).
+           03  IDX4                    PIC  9(03).
+           03  IDX5                    PIC  9(03).
+           03  IDX6                    PIC  9(03).
+           03  IDX7                    PIC  9(03).
+           03  IDX8                    PIC  9(03).
+           03  IDX9                    PIC  9(03).
+           03  IDX10X                  PIC  X(02).
+           03  IDX10R                  REDEFINES    IDX10X.
+               05  IDX10               PIC  9(02).
+           03  IDX14                   PIC  9(03).
+           03  IDX15                   PIC  9(03).
+           03  IDX16                   PIC  9(03).
+           03  IDX17                   PIC  9(03).
+           03  IDX18                   PIC  9(03).
+           03  IDX19                   PIC  9(03).
+           03  IDX20                   PIC  9(03).
+           03  IDX21                   PIC  9(03).
+           03  IDX22                   PIC  9(02).
+           03  IDX23                   PIC  9(02).
+           03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
+           03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
+           03  IDY                     PIC  9(02)  VALUE  ZERO.
+           03  IDY2                    PIC  9(02).
+           03  IDZ                     PIC  9(02)  VALUE  ZERO.
+           03  HKNNYU-IDX              PIC  9(02)  VALUE  ZERO.
+           03  KOH-IDX                 PIC  9(02)  VALUE  ZERO.
+           03  KOH-IDX2                PIC  9(02)  VALUE  ZERO.
+           03  KOH-IDX3                PIC  9(02)  VALUE  ZERO.
+           03  KIRIKAE-IDX             PIC  9(02).
+           03  NYULIFE-IDX             PIC  9(02).
+           03  GEN-IDX                 PIC  9(02).
+           03  SYOTOKU-IDX             PIC  9(02).
+           03  CHECK-IDX               PIC  9(02).
+           03  CHECK-IDX2              PIC  9(02).
+           03  KOHFUKA-IDX             PIC  9(02).
+           03  KOHFUKA-IDX2            PIC  9(01).
+           03  IDX-CYO                 PIC  9(03).
+           03  RRK-IDX                 PIC  9(02).
+           03  RRK-IDX2                PIC  9(02).
+           03  RRK-IDX3                PIC  9(02).
+           03  RRK-IDX4                PIC  9(02).
+           03  RRK-IDX5                PIC  9(02).
+      *
        01  WRK-AREA.
+           03  WK-KNJFTNKIN            PIC 9(10).
+           03  WK-KNJFTNKIN-ENTANI     PIC 9(08)V9(01).
+           03  WK-ENTANI               PIC 9(08).
+           03  WK-ENTANI2              PIC 9(08).
+           03  WK-CYOKI                PIC 9(08).
+           03  WK-CYOKI-ENTANI         PIC 9(08).
+           03  WK-CYOKI-ZAN            PIC 9(08).
+           03  WK-CYOKI-ZAN-ENTANI     PIC 9(08).
+           03  WK-ZENGAKU              PIC 9(10).
+           03  WK-ZENGAKU-SYU          PIC 9(10).
+           03  WK-ZENGAKU-YAK          PIC 9(10).
+           03  WK-FUTANWARI            PIC 9V99.
+           03  WK-SEIKYUGK             PIC 9(10).
+           03  WK-NYUKFTNRATE          PIC 9(03).
+           03  WK-NYUKFTNRATE019       PIC 9(03).
+           03  WK-NYUSKJJYOGAK         PIC 9(06).
+           03  WK-NYUSKJJYOGAK2        PIC 9(09).
+           03  WK-TOKUTEI-COMPFTN      PIC 9(08).
+           03  WK-TOKUTEI-COMPFTN2     PIC 9(08).
+           03  WK-TOKUTEI-COMPFTN3     PIC 9(08).
+           03  WK-TOKUTEI-COMPFTN4     PIC 9(08).
+           03  WK-HANGAKU-COMPFTN      PIC 9(07).
+           03  WK-HANGAKU-ENTANI       PIC 9(07)V9(01).
+           03  WK-GENMEN-KEISAN        PIC 9(07).
+           03  WK-GENMEN-KEISAN2       PIC 9(07).
+           03  WK-GENMEN-KEISAN3       PIC 9(07).
+           03  WK-JIHIGAKU             PIC 9(10).
+           03  WK-JIHIGAKU2            PIC 9(10).
+           03  WK-JIHIGAKU3            PIC 9(10).
+           03  WK-JIHIFTN              PIC 9V99.
+           03  WK-ZAN-JIRITU           PIC 9(08).
+           03  WK-KOH-GENDOGAKU        PIC 9(07).
+           03  WK-GEN70-GENDOGAKU      PIC 9(07).
+           03  WK-GEN70-GENDOGAKU2     PIC 9(07).
+           03  WK-SKYMONEY-ZEI         PIC 9(07).
+           03  WK-RSIETC-ZEITAISYO     PIC 9(07).
+           03  WK-SKJ-ZEITAISYO        PIC 9(07).
+           03  WK-KEISAN-JIBAI         PIC 9(07).
+           03  WK-SKJ-ZEI              PIC 9(07).
+           03  WK-SKJ-ZEIKEI           PIC 9(07).
+           03  WK-SKJ-ZEIKEI2          PIC 9(07).
+           03  WK-SKJ-ZEIKEIL          PIC 9(07).
+           03  WK-SKJ-ZEIKEI2L         PIC 9(07).
+           03  WK-GENBUTU-KOH1COMPFTN  PIC 9(07).
+           03  WK-GENBUTU-KOH2COMPFTN  PIC 9(07).
+           03  WK-GENBUTU-KOH3COMPFTN  PIC 9(07).
+           03  WK-GENBUTU-KOH4COMPFTN  PIC 9(07).
+           03  WK-GENBUTU-HKNKIN       PIC 9(10).
+           03  WK-GENBUTU-HKNKIN2      PIC 9(10).
+           03  WK-GENBUTU-HKNKIN3      PIC 9(10).
+           03  WK-SEIHO-GENDO          PIC 9(07).
+           03  WK-SEIHO-GENDO70        PIC 9(07).
+           03  WK-CYOKI-GENDO          PIC 9(07).
+           03  WK-CYOKI-GENDO2         PIC 9(07).
+           03  WK-KOH-GENDOGAKU-TOKU75 PIC 9(07).
+           03  WK-GEN70-GENDOGAKU-TOKU75
+                                       PIC 9(07).
+           03  WK-SEIHO-GENDO-TOKU75   PIC 9(07).
+           03  WK-SEIHO-GENDO70-TOKU75 PIC 9(07).
+           03  WK-CYOKI-GENDO-TOKU75   PIC 9(07).
+           03  WK-CYOKI-GENDO2-TOKU75  PIC 9(07).
+           03  WK-CYOKI-TOKU75         PIC 9(08).
+           03  WK-CYOKI-ENTANI-TOKU75  PIC 9(08).
+           03  WK-CYOKI-ZAN-XXX        PIC 9(08).
+           03  WK-DAY-KEISAN           PIC 9(08).
+           03  WK-S1                   PIC 9(03).
+           03  WK-S2                   PIC 9(03).
+           03  WK-S3                   PIC 9V99999.
+           03  WK-S4                   PIC 9V99.
+           03  WK-S5                   PIC 9V99.
+           03  WK-DAYCNT               PIC 9(03).
+      *
            03  WK-PAYKBN               PIC X(02).
            03  WK-1001-JIHIPOSITION    PIC X(01).
            03  WK-1001-CHIHOUNUMKBN    PIC X(01).
@@ -1336,54 +1384,6 @@
                05  WRK-MMS2            PIC 9(02).
                05  WRK-DDS2            PIC 9(02).
       *
-      *    Åº¤¨»úÎÎ°è
-       01  IDX-AREA.
-           03  IDX                     PIC  9(02)  VALUE  ZERO.
-           03  IDX2                    PIC  9(02)  VALUE  ZERO.
-           03  IDX3                    PIC  9(02).
-           03  IDX4                    PIC  9(03).
-           03  IDX5                    PIC  9(03).
-           03  IDX6                    PIC  9(03).
-           03  IDX7                    PIC  9(03).
-           03  IDX8                    PIC  9(03).
-           03  IDX9                    PIC  9(03).
-           03  IDX10X                  PIC  X(02).
-           03  IDX10R                  REDEFINES    IDX10X.
-               05  IDX10               PIC  9(02).
-           03  IDX14                   PIC  9(03).
-           03  IDX15                   PIC  9(03).
-           03  IDX16                   PIC  9(03).
-           03  IDX17                   PIC  9(03).
-           03  IDX18                   PIC  9(03).
-           03  IDX19                   PIC  9(03).
-           03  IDX20                   PIC  9(03).
-           03  IDX21                   PIC  9(03).
-           03  IDX22                   PIC  9(02).
-           03  IDX23                   PIC  9(02).
-           03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
-           03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
-           03  IDY                     PIC  9(02)  VALUE  ZERO.
-           03  IDY2                    PIC  9(02).
-           03  IDZ                     PIC  9(02)  VALUE  ZERO.
-           03  HKNNYU-IDX              PIC  9(02)  VALUE  ZERO.
-           03  KOH-IDX                 PIC  9(02)  VALUE  ZERO.
-           03  KOH-IDX2                PIC  9(02)  VALUE  ZERO.
-           03  KOH-IDX3                PIC  9(02)  VALUE  ZERO.
-           03  KIRIKAE-IDX             PIC  9(02).
-           03  NYULIFE-IDX             PIC  9(02).
-           03  GEN-IDX                 PIC  9(02).
-           03  SYOTOKU-IDX             PIC  9(02).
-           03  CHECK-IDX               PIC  9(02).
-           03  CHECK-IDX2              PIC  9(02).
-           03  KOHFUKA-IDX             PIC  9(02).
-           03  KOHFUKA-IDX2            PIC  9(01).
-           03  IDX-CYO                 PIC  9(03).
-           03  RRK-IDX                 PIC  9(02).
-           03  RRK-IDX2                PIC  9(02).
-           03  RRK-IDX3                PIC  9(02).
-           03  RRK-IDX4                PIC  9(02).
-           03  RRK-IDX5                PIC  9(02).
-      *
       *    ¹âÎð¼Ô¤ÎÉéÃ´¾å¸Â»»Äê¥¨¥ê¥¢
        01  WK-SYUHKN-TAIHI-AREA.
            03  MAX-KIN-SYU-M           PIC 9(08).
@@ -1702,8 +1702,6 @@
        MAIN-RTN            SECTION.
        MAIN-000.
       **   MOVE    ZERO            TO  LNK-S02-RC.
-           MOVE    SPACE           TO  KEISAN-AREA.
-           INITIALIZE                  KEISAN-AREA.
            MOVE    SPACE           TO  WRK-AREA.
            INITIALIZE                  WRK-AREA.
            MOVE    ZERO            TO  LNK-SYU-RJN-FTN
@@ -4068,10 +4066,6 @@
       *
       *    ¸øÈñÃ±ÆÈ¤ÇÏ·¿ÍÊÝ¸±ÆþÎÏ¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
            IF      COMB-HKNNUM          =   SPACE
-           AND     COMB-KOH1HKNNUM  NOT =   SPACE
-           AND     COMB-KOH2HKNNUM      =   SPACE
-           AND     COMB-KOH3HKNNUM      =   SPACE
-           AND     COMB-KOH4HKNNUM      =   SPACE
                 IF   LNK-SYU-SRYYMD(1:6)  >=   "200804"
                      MOVE   "968"   TO  WK-KOHNUM
                 ELSE

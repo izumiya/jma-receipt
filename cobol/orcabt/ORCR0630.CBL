@@ -4722,7 +4722,8 @@
                           MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "36"
       ***                 MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-                          MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+                          MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "10"
       ***                 MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)

@@ -759,6 +759,7 @@
       *  04.08.36    NACL-ÌçÏÆ    16/11/12  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.37    NACL-ÌçÏÆ    16/12/07  ±ó³Ö¥â¥Ë¥¿¥ê¥ó¥°²Ã»»¤ÎÁ°²ó»»ÄêÇ¯·î
       *                                     ¥³¥á¥ó¥Èµ­ºÜ½¤Àµ
+      *  04.08.38    NACL-ÌçÏÆ    17/01/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5207,7 +5208,8 @@ grpsys           PERFORM 900-DBSELECT-SEC
                           MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "36"
       ***                 MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
-                          MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***                 MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+                          MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                           MOVE "0" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "10"
       ***                 MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
@@ -7430,6 +7432,17 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                              MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU4
                       END-IF
                    END-IF
+                   IF    RECE02-EKF-KAK32KBN-K(3)  =  "3"
+                      IF  (RECE02-KOHNUM(1)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(2)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(3)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(4)  = "972" OR "974")
+                             MOVE     4     TO   FLG-ZENKOKUKOHI-NISYU4
+                      END-IF
+                      IF   RECE02-HKNCOMBI(2)  =    ZERO
+                             MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU4
+                      END-IF
+                   END-IF
                    IF    RECE02-EKF-KAK41KBN-K(3)  =  "1"
                       MOVE       2          TO   FLG-ZENKOKUKOHI-NISYU5
                       IF   RECE02-HKNCOMBI(2)  =    ZERO
@@ -7580,6 +7593,17 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       OR  (RECE02-KOHNUM(3)  = "972" OR "974")
                       OR  (RECE02-KOHNUM(4)  = "972" OR "974")
                              MOVE     3     TO   FLG-ZENKOKUKOHI-NISYU4
+                      END-IF
+                      IF   RECE02-HKNCOMBI(2)  =    ZERO
+                             MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU4
+                      END-IF
+                   END-IF
+                   IF    RECE02-EKF-KAK32KBN-K(4)  =  "3"
+                      IF  (RECE02-KOHNUM(1)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(2)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(3)  = "972" OR "974")
+                      OR  (RECE02-KOHNUM(4)  = "972" OR "974")
+                             MOVE     4     TO   FLG-ZENKOKUKOHI-NISYU4
                       END-IF
                       IF   RECE02-HKNCOMBI(2)  =    ZERO
                              MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU4
@@ -9323,7 +9347,7 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  WHEN     "34"
                   IF  (RECE02-TEISYUTUSAKI   =   2 OR 6    )
                   AND (RECE02-SRYYM         >=  "200804"   )
-                    MOVE  "1"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
                   END-IF
                  WHEN     "38"
                   IF  (RECE02-TEISYUTUSAKI   =   2 OR 6    )
@@ -9373,6 +9397,27 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                  WHEN        "4"
                   IF   RECE02-TEISYUTUSAKI  =  6
                     MOVE  "2"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                  END-IF
+               END-EVALUATE
+             WHEN      "3"
+               EVALUATE  SYS-2010-KAK32-TAIKBN-K
+                 WHEN        "0"
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                 WHEN        "1"
+                  IF   RECE02-TEISYUTUSAKI  =  2 OR 6
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                  END-IF
+                 WHEN        "2"
+                  IF   RECE02-TEISYUTUSAKI  =  1
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                  END-IF
+                 WHEN        "3"
+                  IF   RECE02-TEISYUTUSAKI  =  2
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
+                  END-IF
+                 WHEN        "4"
+                  IF   RECE02-TEISYUTUSAKI  =  6
+                    MOVE  "3"  TO RECE02-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
                   END-IF
                END-EVALUATE
            END-EVALUATE
@@ -23816,13 +23861,33 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE     ZERO             TO WRK-CYOKI-KEISAN6
                     END-IF
       *
+                    IF   (RECE02-TEISYOTOKU  NOT =  SPACE)
+                    AND  (RECE02-ZAITAKU         =  "1"  )
+                    AND  (FLG-ZENKOKUKOHI-NISYU4 =   4   )
+                      IF  FLG-TOKU75 = 1 OR 2
+                       IF   4000  >  WRK-CYOKI-KEISAN5
+                         COMPUTE WRK-CYOKI-KEISAN6 = 4000
+                                                   - WRK-CYOKI-KEISAN5
+                       ELSE
+                         MOVE    ZERO             TO WRK-CYOKI-KEISAN6
+                       END-IF
+                      ELSE
+                       IF   8000  >  WRK-CYOKI-KEISAN5
+                         COMPUTE WRK-CYOKI-KEISAN6 = 8000
+                                                   - WRK-CYOKI-KEISAN5
+                       ELSE
+                         MOVE    ZERO             TO WRK-CYOKI-KEISAN6
+                       END-IF
+                      END-IF
+                    END-IF
+      *
                     IF  FLG-ZENKOKUKOHI-NISYU  =   2 OR 4
                       MOVE  FTN-KOH-XX7  TO  RECE02-ZAITAKU-SAIKEI2
                       IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
                       AND   WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
-                          IF   FLG-ZENKOKUKOHI-NISYU4  =  2 OR 3
+                          IF   FLG-ZENKOKUKOHI-NISYU4  =  2 OR 3 OR 4
                             IF  (FTN-KOH-XX7      > WRK-CYOKI-KEISAN6)
-                            AND (FLG-ZENKOKUKOHI-NISYU4  =  2        )
+                            AND (FLG-ZENKOKUKOHI-NISYU4  =  2 OR 4   )
                              MOVE WRK-CYOKI-KEISAN6
                                                 TO  WRK-CYOKI-KEISAN7
                              MOVE WRK-CYOKI-KEISAN6
@@ -23860,9 +23925,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  FLG-ZENKOKUKOHI-NISYU  =   ZERO
                       IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
                       AND   WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
-                        IF   FLG-ZENKOKUKOHI-NISYU4  =  2 OR 3
+                        IF   FLG-ZENKOKUKOHI-NISYU4  =  2 OR 3 OR 4
                             IF  (FTN-KOH-XX7      > WRK-CYOKI-KEISAN6)
-                            AND (FLG-ZENKOKUKOHI-NISYU4  =  2        )
+                            AND (FLG-ZENKOKUKOHI-NISYU4  =  2 OR 4   )
                              MOVE WRK-CYOKI-KEISAN6
                                                 TO  WRK-CYOKI-KEISAN7
                             ELSE

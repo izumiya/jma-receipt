@@ -10846,7 +10846,7 @@
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-HIROSHIMA )
-                   MOVE    "1"         TO  SPA-GMN-KAK32KBNK
+                   MOVE    "3"         TO  SPA-GMN-KAK32KBNK
                    MOVE    "1"         TO  SPA-GMN-KAK32TAIKBNK
                WHEN  ( SPA-PREFNUM     =   CONST-EHIME )
                    MOVE    "2"         TO  SPA-GMN-KAK32KBNK

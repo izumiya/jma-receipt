@@ -730,6 +730,7 @@
       *  04.08.28    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応修正
       *  04.08.29    NACL-門脇    16/11/11  減額（円超）の対応
+      *  04.08.30    NACL-門脇    17/01/05  広島県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5868,6 +5869,7 @@
              WHEN      "0"
                     MOVE SPACE TO RECE62-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
              WHEN      "1"
+             WHEN      "3"
                EVALUATE  SYS-2010-KAK32-TAIKBN-K
                  WHEN        "0"
                     MOVE  "1"  TO RECE62-EKF-KAK32KBN-K(KOHFTN-IDX + 1)
