@@ -59,6 +59,9 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
+      *----(04.08.01)--ADD-START---
+           03  FLG-CHKSND              PIC 9(01).
+      *----(04.08.01)--ADD-END-----
       *
       *    カウント領域
        01  CNT-AREA.
@@ -86,6 +89,11 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *----(04.08.01)--ADD-START--
+       01  CHKSND-REC.
+           COPY    "CPCHKSND.INC".
+      *----(04.08.01)--ADD-END----
+      *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
       *
@@ -105,6 +113,13 @@
       *    サブプロ用　領域
       *****************************************************************
       *
+      *----(04.08.01)--ADD-START--
+      *    一時チェックマスタ編集サブ
+           COPY    "CPORCSS013.INC".
+      *
+           COPY    "CPORCSS013.INC"    REPLACING
+                                       //SS013-// BY //TSS013-//.
+      *----(04.08.01)--ADD-END----
       *
       *    一覧印刷変換領域
            COPY    "CPORCHXLST.INC".
@@ -216,13 +231,11 @@
            MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
            PERFORM 800-ORCSJOB-SEC
       *
-      *----(04.08.01)--UPD-START---
-      *     INITIALIZE                  SGETTEMP-AREA
-      *     MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
-      *     CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
-      *     MOVE    SGETTEMP-FULLNAMES (1)
-      *                             TO  RECEERR
-      *----(04.08.01)--UPD-END-----
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                   TO  RECEERR
            .
        100-INIT-EXT.
            EXIT.
@@ -295,92 +308,107 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-      *     INITIALIZE                      ORCHXLSTAREA
-      *     MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
-      *     MOVE    WRK-PARA-SRYCD      TO  HXLST-SRYCD
-      *     MOVE    WRK-PARA-SRYCD-END  TO  HXLST-SRYCD-END
-      *     MOVE    "1"                 TO  HXLST-SRTKBN
-      *     MOVE    "2"                 TO  HXLST-PROCKBN
-      *     MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
-      *
-      *     CALL    "ORCHXLST"          USING
-      *                                 SPA-AREA
-      *                                 ORCHXLSTAREA
-      *
-      *     MOVE    HXLST-OUT-CNT       TO  CNT-JOB-UPDCNT
-      *
-           IF    ( WRK-PARA-CHKKBN     =   "1")    OR
-                 ( WRK-PARA-CHKKBN     =   "2")    OR
-                 ( WRK-PARA-CHKKBN     =   "4")    OR
-                 ( WRK-PARA-CHKKBN     =   "5")    OR
-                 ( WRK-PARA-CHKKBN     =   "6")    OR
-                 ( WRK-PARA-CHKKBN     =   "7")    OR
-                 ( WRK-PARA-CHKKBN     =   "8")    OR
-                 ( WRK-PARA-CHKKBN     =   "9")    OR
-                 ( WRK-PARA-CHKKBN     =   "A")    OR
-                 ( WRK-PARA-CHKKBN     =   "B")
-               MOVE    SPACE           TO  COMMAND-PARAM
-               STRING  LNK-PRTKANRI-RENNUM     DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-TBL-KEY    DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-TBL-GROUP  DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-SHORI-RENNUM
-                                               DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-SRYYM      DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-SKYYMD     DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-SHELLID    DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-PRIORITY   DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-TERMID     DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-OPID       DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-PRTNM      DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-JOBID          DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-SHELLID        DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-HOSPNUM        DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-CHKKBN         DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       "1"                     DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-SRYCD          DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       WRK-PARA-SRYCD-END      DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       RECEERR                 DELIMITED BY SPACE
-                       ","                     DELIMITED BY SIZE
-                       LNK-PRTKANRI-SKYYMD     DELIMITED BY SPACE
-                                       INTO    COMMAND-PARAM
-               END-STRING
-               CALL    "ORCBX01"           USING
-                                           COMMAND-PARAM
-           ELSE
-               INITIALIZE                  SGETTEMP-AREA
-               MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
-               CALL    "ORCSGETTEMP"       USING
-                                           SGETTEMP-AREA
-               MOVE    SGETTEMP-FULLNAMES (1)
-                                       TO  RECEERR
-               MOVE    0               TO  CNT-JOB-UPDCNT
+           IF    ( WRK-PARA-CHKKBN =   "Y" )   OR
+                 ( WRK-PARA-CHKKBN =   "Z" )
+               GO  TO  200-MAIN-EXT
            END-IF
       *
+           IF    ( WRK-PARA-CHKKBN =   "1" )   OR
+                 ( WRK-PARA-CHKKBN =   "2" )
+               PERFORM 2002-TEKBYO-START-SEC
+           END-IF
+      *
+           INITIALIZE                      ORCHXLSTAREA
+           MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
+           MOVE    WRK-PARA-SRYCD      TO  HXLST-SRYCD
+           MOVE    WRK-PARA-SRYCD-END  TO  HXLST-SRYCD-END
+           MOVE    LNK-PRTKANRI-SKYYMD TO  HXLST-KJNYMD
+           MOVE    "1"                 TO  HXLST-SRTKBN
+           MOVE    "2"                 TO  HXLST-PROCKBN
+           MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
+           MOVE    TSS013-TEMP-NAME    TO  HXLST-TEMP-NAME
+           MOVE    TSS013-TEMP-KEY     TO  HXLST-TEMP-KEY
+      *
+           CALL    "ORCHXLST"          USING
+                                       SPA-AREA
+                                       ORCHXLSTAREA
+      *
+           MOVE    HXLST-OUT-CNT       TO  CNT-JOB-UPDCNT
+      *
            MOVE    1                   TO  FLG-END
+      *
+           IF    ( WRK-PARA-CHKKBN     =   "1" OR "2" )
+               PERFORM 2001-TEKBYO-END-SEC
+           END-IF
       *
              .
        200-MAIN-EXT.
            EXIT.
       *
       *----(04.08.01)--UPD-END-----
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    適応病名マスタ一覧表開始処理
+      *****************************************************************
+       2002-TEKBYO-START-SEC           SECTION.
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBCREATE"         TO  SS013-FUNC
+           MOVE     WRK-PARA-CHKKBN    TO  SS013-CHKKBN
+           MOVE     "2"                TO  SS013-CREATEKBN
+           MOVE     LNK-PRTKANRI-SKYYMD
+                                       TO  SS013-KJNYMD
+           CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+           MOVE     SS013-AREA         TO  TSS013-AREA
+      *
+           PERFORM 900-CHKSND-KEY23-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+      *
+               INITIALIZE                      SS013-AREA
+               MOVE     "DBINSERT"         TO  SS013-FUNC
+               MOVE     WRK-PARA-CHKKBN    TO  SS013-CHKKBN
+               MOVE     CHKSND-SRYCD       TO  SS013-SRYCD
+               MOVE     LNK-PRTKANRI-SKYYMD
+                                           TO  SS013-KJNYMD
+               MOVE     TSS013-TEMP-NAME   TO  SS013-TEMP-NAME
+               MOVE     TSS013-TEMP-KEY    TO  SS013-TEMP-KEY
+               CALL     "ORCSS013"         USING
+                                           SS013-AREA
+                                           SPA-AREA
+      *
+               PERFORM 900-CHKSND-KEY23-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key23"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       2002-TEKBYO-START-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ一覧表終了処理
+      *****************************************************************
+       2001-TEKBYO-END-SEC             SECTION.
+      *
+           MOVE    "STM"       TO  SJOBKANRI-MODE
+           INITIALIZE              JOBKANRI-REC
+           PERFORM 800-ORCSJOB-SEC
+      *
+           INITIALIZE                      SS013-AREA
+           MOVE     "DBDROP"           TO  SS013-FUNC
+           CALL     "ORCSS013"         USING
+                                       SS013-AREA
+                                       SPA-AREA
+      *
+           .
+       2001-TEKBYO-END-EXT.
+           EXIT.
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    終了　　処理
       *****************************************************************
@@ -444,6 +472,143 @@
        500-ERR-HENSYU-EXT.
            EXIT.
       *
+      *----(04.08.01)--ADD-START---
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY23-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    WRK-PARA-CHKKBN     TO  CHKSND-CHKKBN
+           MOVE    "%"                 TO  CHKSND-SRYCD
+           MOVE    "0"                 TO  CHKSND-CDKBN
+           MOVE    LNK-PRTKANRI-SKYYMD TO  CHKSND-YUKOSTYMD
+                                           CHKSND-YUKOEDYMD
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY23-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY23-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY23-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理（FHETCHも行う)
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ検索処理（FHETCHは行わない)
+      *****************************************************************
+       911-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       911-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢクローズ処理
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC                 SECTION.
+      *
+           MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＤＥＬＥＴＥ処理
+      *****************************************************************
+       910-DBDELETE-SEC                 SECTION.
+      *
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＩＮＳＥＲＴ処理
+      *****************************************************************
+       910-DBINSERT-SEC                SECTION.
+      *
+           MOVE    "DBINSERT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN" USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
+           EXIT.
+      *----(04.08.01)--ADD-END-----
       *****************************************************************
       *    ジョブ管理サブ
       *****************************************************************
