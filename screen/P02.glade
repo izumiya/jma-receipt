@@ -12780,7 +12780,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label55</name>
-            <x>595</x>
+            <x>594</x>
             <y>524</y>
             <width>200</width>
             <height>24</height>
@@ -12799,7 +12799,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label56</name>
-            <x>600</x>
+            <x>596</x>
             <y>549</y>
             <width>24</width>
             <height>20</height>
@@ -12844,7 +12844,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label57</name>
-            <x>600</x>
+            <x>596</x>
             <y>573</y>
             <width>24</width>
             <height>20</height>
@@ -12915,7 +12915,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label58</name>
-            <x>600</x>
+            <x>596</x>
             <y>597</y>
             <width>24</width>
             <height>20</height>
