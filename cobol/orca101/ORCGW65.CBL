@@ -881,12 +881,19 @@
                            11  SPA-GMN-KAK31KBNFL         PIC X(01).
                            11  SPA-GMN-KAK31KBNMEIL       PIC X(78).
       *
-                   07  SPA-GMN-KAK32KBNLST-G.
-                       09  SPA-GMN-KAK32KBN-MAX           PIC 9(03).
-                       09  SPA-GMN-KAK32KBNLST            OCCURS 10.
-                           11  SPA-GMN-KAK32KBNL          PIC X(01).
-                           11  SPA-GMN-KAK32KBNFL         PIC X(01).
-                           11  SPA-GMN-KAK32KBNMEIL       PIC X(78).
+                   07  SPA-GMN-KAK32KBNKLST-G.
+                       09  SPA-GMN-KAK32KBNK-MAX           PIC 9(03).
+                       09  SPA-GMN-KAK32KBNKLST            OCCURS 10.
+                           11  SPA-GMN-KAK32KBNKL          PIC X(01).
+                           11  SPA-GMN-KAK32KBNKFL         PIC X(01).
+                           11  SPA-GMN-KAK32KBNKMEIL       PIC X(78).
+      *
+                   07  SPA-GMN-KAK32KBNYLST-G.
+                       09  SPA-GMN-KAK32KBNY-MAX           PIC 9(03).
+                       09  SPA-GMN-KAK32KBNYLST            OCCURS 10.
+                           11  SPA-GMN-KAK32KBNYL          PIC X(01).
+                           11  SPA-GMN-KAK32KBNYFL         PIC X(01).
+                           11  SPA-GMN-KAK32KBNYMEIL       PIC X(78).
       *
                    07  SPA-GMN-KAK40KBNLST-G.
                        09  SPA-GMN-KAK40KBN-MAX           PIC 9(03).
@@ -1696,7 +1703,10 @@
            PERFORM 3110-KAK31KBNLST-SEC
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥ÜÊÔ½¸½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
-           PERFORM 3110-KAK32KBNLST-SEC
+           PERFORM 3110-KAK32KBNKLST-SEC
+      *
+      *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥ÜÊÔ½¸½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
+           PERFORM 3110-KAK32KBNYLST-SEC
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û²Ã»»¥³¥ó¥ÜÊÔ½¸½èÍý
            PERFORM 3110-KAK40KBNLST-SEC
@@ -2278,47 +2288,84 @@
       *****************************************************************
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥ÜÊÔ½¸½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
       *****************************************************************
-       3110-KAK32KBNLST-SEC        SECTION.
+       3110-KAK32KBNKLST-SEC        SECTION.
       *
-           INITIALIZE                  SPA-GMN-KAK32KBNLST-G
+           INITIALIZE                  SPA-GMN-KAK32KBNKLST-G
       *
-           MOVE  "0"               TO  SPA-GMN-KAK32KBNL    (1)
+           MOVE  "0"               TO  SPA-GMN-KAK32KBNKL    (1)
            STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
                                        DELIMITED BY SIZE
                      "¡Ê·î¾å¸Â³Û¡Ý³ç¸ÌºÆ·Ç¡Ê¾å¡Ë¡Ë¤òÈæ³Ó"
                                        DELIMITED BY SIZE
-           INTO                        SPA-GMN-KAK32KBNMEIL (1)
+           INTO                        SPA-GMN-KAK32KBNKMEIL (1)
            END-STRING
       *
-           MOVE  "1"               TO  SPA-GMN-KAK32KBNL    (2)
+           MOVE  "1"               TO  SPA-GMN-KAK32KBNKL    (2)
            STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
                                        DELIMITED BY SIZE
                      "¡Ê·î¾å¸Â³Û¡Ý¸ø£±ÉéÃ´¶â¡Ë¤òÈæ³Ó"
                                        DELIMITED BY SIZE
-           INTO                        SPA-GMN-KAK32KBNMEIL (2)
+           INTO                        SPA-GMN-KAK32KBNKMEIL (2)
            END-STRING
       *
       *
-           MOVE  "2"               TO  SPA-GMN-KAK32KBNL    (3)
+           MOVE  "2"               TO  SPA-GMN-KAK32KBNKL    (3)
            STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
                                        DELIMITED BY SIZE
                      "¡Ê·î¾å¸Â³Û¡Ë¤òÈæ³Ó"
                                        DELIMITED BY SIZE
-           INTO                        SPA-GMN-KAK32KBNMEIL (3)
+           INTO                        SPA-GMN-KAK32KBNKMEIL (3)
            END-STRING
       *
-           MOVE  "3"               TO  SPA-GMN-KAK32KBNL    (4)
+           MOVE  "3"               TO  SPA-GMN-KAK32KBNKL    (4)
            STRING    "£±¤ÈÆ±ÍÍ¡Ê³°Íè¡Ü¹âÎð¡ÜÄã½ê¤Î¾ì¹ç¡¢"
                                        DELIMITED BY SIZE
                      "Äã½ê¤Î·î¾å¸Â³Û¤Ç·×»»¤ò¹Ô¤¦¡Ë"
                                        DELIMITED BY SIZE
-           INTO                        SPA-GMN-KAK32KBNMEIL (4)
+           INTO                        SPA-GMN-KAK32KBNKMEIL (4)
            END-STRING
       *
-           MOVE    4               TO  SPA-GMN-KAK32KBN-MAX
+           MOVE    4               TO  SPA-GMN-KAK32KBNK-MAX
       *
            .
-       3110-KAK32KBNLST-EXT.
+       3110-KAK32KBNKLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥ÜÊÔ½¸½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
+      *****************************************************************
+       3110-KAK32KBNYLST-SEC        SECTION.
+      *
+           INITIALIZE                  SPA-GMN-KAK32KBNYLST-G
+      *
+           MOVE  "0"               TO  SPA-GMN-KAK32KBNYL    (1)
+           STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
+                                       DELIMITED BY SIZE
+                     "¡Ê·î¾å¸Â³Û¡Ý³ç¸ÌºÆ·Ç¡Ê¾å¡Ë¡Ë¤òÈæ³Ó"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-KAK32KBNYMEIL (1)
+           END-STRING
+      *
+           MOVE  "1"               TO  SPA-GMN-KAK32KBNYL    (2)
+           STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
+                                       DELIMITED BY SIZE
+                     "¡Ê·î¾å¸Â³Û¡Ý¸ø£±ÉéÃ´¶â¡Ë¤òÈæ³Ó"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-KAK32KBNYMEIL (2)
+           END-STRING
+      *
+      *
+           MOVE  "2"               TO  SPA-GMN-KAK32KBNYL    (3)
+           STRING    "¡Ê¼ç¡ÜÃÏ¡ÜÄ¹¤Î¼çÊÝ¸±ÉéÃ´ÁêÅö³Û¡Ë¤È"
+                                       DELIMITED BY SIZE
+                     "¡Ê·î¾å¸Â³Û¡Ë¤òÈæ³Ó"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-KAK32KBNYMEIL (3)
+           END-STRING
+      *
+           MOVE    3               TO  SPA-GMN-KAK32KBNY-MAX
+      *
+           .
+       3110-KAK32KBNYLST-EXT.
            EXIT.
       *****************************************************************
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û²Ã»»¥³¥ó¥ÜÊÔ½¸½èÍý
@@ -6659,7 +6706,7 @@
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK31TAIKBNK-G
       *
            MOVE    SYS-2010-KAK32KBN-K TO  WRK-CMB-CD
-           PERFORM 4200-KAK32KBNLST-CHK-SEC
+           PERFORM 4200-KAK32KBNKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNK-G
       *
            MOVE    SYS-2010-KAK32-TAIKBN-K
@@ -6740,7 +6787,7 @@
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK31TAIKBNY-G
       *
            MOVE    SYS-2010-KAK32KBN-Y TO  WRK-CMB-CD
-           PERFORM 4200-KAK32KBNLST-CHK-SEC
+           PERFORM 4200-KAK32KBNYLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNY-G
       *
            MOVE    SYS-2010-KAK32-TAIKBN-Y
@@ -8514,7 +8561,7 @@
        4101-KAK32KBNK-CHK-SEC      SECTION.
       *
            MOVE    SPA-GMN-KAK32KBNK TO  WRK-CMB-CD
-           PERFORM 4200-KAK32KBNLST-CHK-SEC
+           PERFORM 4200-KAK32KBNKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNK-G
       *
            IF    ( SPA-GMN-KAK32KBNK   =   "0" )
@@ -8799,7 +8846,7 @@
        4101-KAK32KBNY-CHK-SEC      SECTION.
       *
            MOVE    SPA-GMN-KAK32KBNY TO  WRK-CMB-CD
-           PERFORM 4200-KAK32KBNLST-CHK-SEC
+           PERFORM 4200-KAK32KBNYLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNY-G
       *
            IF    ( SPA-GMN-KAK32KBNY   =   "0" )
@@ -10237,9 +10284,12 @@
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»
            MOVE    "0"             TO  WRK-CMB-CD
-           PERFORM 4200-KAK32KBNLST-CHK-SEC
+           PERFORM 4200-KAK32KBNKLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNK-G
-                                           SPA-GMN-KAK32KBNY-G
+      *
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-KAK32KBNYLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-KAK32KBNY-G
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û²Ã»»
            MOVE    "0"             TO  WRK-CMB-CD
@@ -11788,14 +11838,20 @@
            END-PERFORM
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»
-           MOVE    SPA-GMN-KAK32KBN-MAX
+           MOVE    SPA-GMN-KAK32KBNK-MAX
                                        TO  W65-KAK32KBNK-COUNT
-                                           W65-KAK32KBNY-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
-                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBN-MAX )
-               MOVE    SPA-GMN-KAK32KBNLST (IDX-CMB)
+                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBNK-MAX )
+               MOVE    SPA-GMN-KAK32KBNKLST (IDX-CMB)
                                        TO  W65-KAK32KBNK-ITEM (IDX-CMB)
-                                           W65-KAK32KBNY-ITEM (IDX-CMB)
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-KAK32KBNY-MAX
+                                       TO  W65-KAK32KBNY-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBNY-MAX )
+               MOVE    SPA-GMN-KAK32KBNYLST (IDX-CMB)
+                                       TO  W65-KAK32KBNY-ITEM (IDX-CMB)
            END-PERFORM
       *
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û²Ã»»
@@ -15602,18 +15658,18 @@
       *****************************************************************
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
       *****************************************************************
-       4200-KAK32KBNLST-CHK-SEC          SECTION.
+       4200-KAK32KBNKLST-CHK-SEC          SECTION.
       *
            INITIALIZE                  WRK-CMB-ITM-G
       *
            PERFORM VARYING IDX-CMB FROM    1   BY  1
-                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBN-MAX )
+                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBNK-MAX )
                     OR   ( WRK-CMB-ITM NOT =   SPACE )
       *
-               IF    ( SPA-GMN-KAK32KBNL (IDX-CMB)
+               IF    ( SPA-GMN-KAK32KBNKL (IDX-CMB)
                                        =   WRK-CMB-CD )
       *
-                   MOVE    SPA-GMN-KAK32KBNLST (IDX-CMB)
+                   MOVE    SPA-GMN-KAK32KBNKLST (IDX-CMB)
                                    TO  WRK-CMB-ITM
       *
                END-IF
@@ -15621,12 +15677,41 @@
            END-PERFORM
       *
            IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-KAK32KBNLST (1)
+               MOVE    SPA-GMN-KAK32KBNKLST (1)
                                    TO  WRK-CMB-ITM
            END-IF
       *
            .
-       4200-KAK32KBNLST-CHK-EXT.
+       4200-KAK32KBNKLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û·×»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý¡Ê¼ç¡ÜÁ´¡ÜÃÏ¡ÜÄ¹¡Ë
+      *****************************************************************
+       4200-KAK32KBNYLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-KAK32KBNY-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-KAK32KBNYL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-KAK32KBNYLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-KAK32KBNYLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-KAK32KBNYLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ÊÝ¸±Íó¤Î³ç¸ÌºÆ·Ç¡Ê²¼¡Ë¶â³Û²Ã»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
