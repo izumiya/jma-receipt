@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL−太田   05.02.08  ORCHXLSTに編集処理を移行
       *  03.05.00    NACL-太田    07/06/04  グループ診療対応
+      *  04.08.01    NACL-森脇    17/01/16  適応病名対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -215,12 +216,13 @@
            MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
            PERFORM 800-ORCSJOB-SEC
       *
-           INITIALIZE                  SGETTEMP-AREA
-           MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
-           CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
-           MOVE    SGETTEMP-FULLNAMES (1)
-                                   TO  RECEERR
-      *
+      *----(04.08.01)--UPD-START---
+      *     INITIALIZE                  SGETTEMP-AREA
+      *     MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
+      *     CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
+      *     MOVE    SGETTEMP-FULLNAMES (1)
+      *                             TO  RECEERR
+      *----(04.08.01)--UPD-END-----
            .
        100-INIT-EXT.
            EXIT.
@@ -287,24 +289,90 @@
            .
        110-ORCSPRTAREA-SET-EXT.
            EXIT.
+      *----(04.08.01)--UPD-START---
       *****************************************************************
       *    主　　処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           INITIALIZE                      ORCHXLSTAREA
-           MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
-           MOVE    WRK-PARA-SRYCD      TO  HXLST-SRYCD
-           MOVE    WRK-PARA-SRYCD-END  TO  HXLST-SRYCD-END
-           MOVE    "1"                 TO  HXLST-SRTKBN
-           MOVE    "2"                 TO  HXLST-PROCKBN
-           MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
+      *     INITIALIZE                      ORCHXLSTAREA
+      *     MOVE    WRK-PARA-CHKKBN     TO  HXLST-CHKKBN
+      *     MOVE    WRK-PARA-SRYCD      TO  HXLST-SRYCD
+      *     MOVE    WRK-PARA-SRYCD-END  TO  HXLST-SRYCD-END
+      *     MOVE    "1"                 TO  HXLST-SRTKBN
+      *     MOVE    "2"                 TO  HXLST-PROCKBN
+      *     MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
       *
-           CALL    "ORCHXLST"          USING
-                                       SPA-AREA
-                                       ORCHXLSTAREA
+      *     CALL    "ORCHXLST"          USING
+      *                                 SPA-AREA
+      *                                 ORCHXLSTAREA
       *
-           MOVE    HXLST-OUT-CNT       TO  CNT-JOB-UPDCNT
+      *     MOVE    HXLST-OUT-CNT       TO  CNT-JOB-UPDCNT
+      *
+           IF    ( WRK-PARA-CHKKBN     =   "1")    OR
+                 ( WRK-PARA-CHKKBN     =   "2")    OR
+                 ( WRK-PARA-CHKKBN     =   "4")    OR
+                 ( WRK-PARA-CHKKBN     =   "5")    OR
+                 ( WRK-PARA-CHKKBN     =   "6")    OR
+                 ( WRK-PARA-CHKKBN     =   "7")    OR
+                 ( WRK-PARA-CHKKBN     =   "8")    OR
+                 ( WRK-PARA-CHKKBN     =   "9")    OR
+                 ( WRK-PARA-CHKKBN     =   "A")    OR
+                 ( WRK-PARA-CHKKBN     =   "B")
+               MOVE    SPACE           TO  COMMAND-PARAM
+               STRING  LNK-PRTKANRI-RENNUM     DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-TBL-KEY    DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-TBL-GROUP  DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-SHORI-RENNUM
+                                               DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-SRYYM      DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-SKYYMD     DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-SHELLID    DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-PRIORITY   DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-TERMID     DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-OPID       DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-PRTNM      DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-JOBID          DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-SHELLID        DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-HOSPNUM        DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-CHKKBN         DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       "1"                     DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-SRYCD          DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       WRK-PARA-SRYCD-END      DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       RECEERR                 DELIMITED BY SPACE
+                       ","                     DELIMITED BY SIZE
+                       LNK-PRTKANRI-SKYYMD     DELIMITED BY SPACE
+                                       INTO    COMMAND-PARAM
+               END-STRING
+               CALL    "ORCBX01"           USING
+                                           COMMAND-PARAM
+           ELSE
+               INITIALIZE                  SGETTEMP-AREA
+               MOVE    RECEERR         TO  SGETTEMP-BASENAMES (1)
+               CALL    "ORCSGETTEMP"       USING
+                                           SGETTEMP-AREA
+               MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  RECEERR
+               MOVE    0               TO  CNT-JOB-UPDCNT
+           END-IF
       *
            MOVE    1                   TO  FLG-END
       *
@@ -312,6 +380,7 @@
        200-MAIN-EXT.
            EXIT.
       *
+      *----(04.08.01)--UPD-END-----
       *****************************************************************
       *    終了　　処理
       *****************************************************************
