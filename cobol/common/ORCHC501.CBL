@@ -36,6 +36,7 @@
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.06.00     NACL-多々納  11/02/22  用法コメント対応
       * 04.08.00     NACL-多々納  14/08/01  一時ディレクトリ対応
+      * 04.08.00     NACL-多々納  19/01/16  プログラムオプション対応
       *****************************************************************
       *
       *
@@ -257,6 +258,15 @@
       *    処方内容最大行
        01  WRK-IDX-MAX                 PIC 9(03)  VALUE   35.
       *
+      *H29.1
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-PAGECNT            PIC X(01).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(50).
+           03  WRK-PARA-MAX            PIC 9(03).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -321,6 +331,9 @@
       *    オンライン帳票名・出力先プリンタ名取得パラ
            COPY    "CPORCSPRTNM.INC".
       *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
+      *
       *v4.8
       *    一時ファイル名取得
            COPY    "CPORCSGETTEMP.INC".
@@ -360,6 +373,9 @@
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
+      *    プログラムオプション取込み
+           PERFORM 100-OPTION-SELECT-SEC
+      *
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
       *
@@ -375,6 +391,55 @@
        000-PROC-EXT.
            EXIT    PROGRAM
            .
+      *
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+           MOVE    ZERO                TO  WRK-PARA-MAX
+      *    剤表示
+           MOVE    "PAGECNT"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-PAGECNT
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHC501"          TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           MOVE    SPACE               TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+               IF      WRK-PARA-MAX        >   ZERO
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                               TO  WRK-PARA
+               END-IF
+           ELSE
+               IF      WRK-PARA-MAX        >   ZERO
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                               TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-PARA-MAX        TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
+               END-IF
+           END-IF
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -1076,7 +1141,10 @@
            COMPUTE IDX-MAX             =   WRK-IDX-MAX  -  1
       *
            IF      IDX-SMAX            >   ZERO
-               IF      IDX-LINE        >=   IDX-MAX
+               IF     (IDX-LINE        >=   IDX-MAX )
+      *H29.1
+      *            剤毎の編集
+                  OR  (PARA-PAGECNT    =    "1"     )
                    PERFORM 20022-PRINT-HEN-SEC
                END-IF
            END-IF
