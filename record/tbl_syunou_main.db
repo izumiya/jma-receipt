@@ -1925,3 +1925,34 @@ path	key95 	{
 		;
 	};
 };
+
+path	key96 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key96_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN    =   :NYUGAIKBN
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			ORDER   BY    PTID,DENPNUM
+		;
+	};
+};
+
+path	key97 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key97_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN    =   :NYUGAIKBN
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND ( SECMONEY  NOT IN (0,9)
+			 OR   ACCT_UPDKBN <>  '' )
+			ORDER   BY    PTID,DENPNUM
+		;
+	};
+};
+

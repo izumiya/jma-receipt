@@ -112,6 +112,8 @@
       *                                     ¥á¥Ã¥»¡¼¥¸ÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    14/07/31  Âè»°¼Ô¹Ô°Ù¤Î¸½ÊªµëÉÕÂÐ±þ
+      *  04.08.01    NACL-ÌçÏÆ    17/01/05  °ì³çºÆ·×»»³ºÅö¼Ô¤Î¥ê¥¹¥È¥¢¥Ã¥×
+      *                                     ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -409,7 +411,6 @@
            03  FLG-MEISAI-PRT      PIC 9(01).
            03  FLG-PARA            PIC 9(01).
            03  FLG-MISYORI         PIC 9(01).
-           03  FLG-MISYORI2        PIC 9(01).
            03  FLG-BUNBENCHK       PIC 9(01).
            03  FLG-ORCSNUMERR      PIC 9(01).
            03  FLG-GENBUTU         PIC 9(01).
@@ -2669,6 +2670,8 @@
                        MOVE      "2"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                     WHEN      4
                        MOVE      "4"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
+                    WHEN      7
+                       MOVE      "7"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                   END-EVALUATE
                  END-IF
                 END-IF
@@ -3160,7 +3163,6 @@
            MOVE    "ÀÁµá¼è¾Ã"          TO  S02-B03S-LABEL
       *
            MOVE    ZERO                TO  FLG-MISYORI
-           MOVE    ZERO                TO  FLG-MISYORI2
       *
            PERFORM VARYING     IDXL     FROM    1   BY  1
                    UNTIL     ( IDXL     >       SPA-GMN-MAX )
@@ -3219,22 +3221,29 @@
                    MOVE    "F"         TO  S02-SYULIST-SELECT (IDXL)
                END-IF
       *
-               IF    SPA-GMN-TNYUGAIKBN(IDXL)(3:2) = "¡ù"
+               IF    SPA-GMN-SIKIBETUFLG(IDXL)  =  "4"
                    MOVE     1          TO  FLG-MISYORI
                END-IF
-               EVALUATE  SPA-GMN-SIKIBETUFLG(IDXL)
-                 WHEN        "1"
-                   IF  FLG-MISYORI2   NOT =  4
-                     MOVE   1          TO  FLG-MISYORI2
-                   END-IF
-                 WHEN        "2"
-                   IF  FLG-MISYORI2   NOT =  4
-                     MOVE   2          TO  FLG-MISYORI2
-                   END-IF
-                 WHEN        "4"
-                   MOVE     4          TO  FLG-MISYORI2
-               END-EVALUATE
-      *
+               IF    SPA-GMN-SIKIBETUFLG(IDXL)  =  "1"
+                 IF  FLG-MISYORI  NOT =  1
+                   MOVE     2          TO  FLG-MISYORI
+                 END-IF
+               END-IF
+               IF    SPA-GMN-SIKIBETUFLG(IDXL)  =  "2"
+                 IF  FLG-MISYORI  NOT =  1 AND 2
+                   MOVE     3          TO  FLG-MISYORI
+                 END-IF
+               END-IF
+               IF    SPA-GMN-SIKIBETUFLG(IDXL)  =  "7"
+                 IF  FLG-MISYORI  NOT =  1 AND 2 AND 3
+                   MOVE     4          TO  FLG-MISYORI
+                 END-IF
+               END-IF
+               IF    SPA-GMN-TNYUGAIKBN(IDXL)(3:2)  =  "¡ù"
+                 IF  FLG-MISYORI  NOT =  1 AND 2 AND 3 AND 4
+                   MOVE     5          TO  FLG-MISYORI
+                 END-IF
+               END-IF
            END-PERFORM
       *
            MOVE    SPA-GMN-MAX                 TO  S02-SYULIST-COUNT
@@ -3242,25 +3251,27 @@
            MOVE    SPA-GMN-SELBAN              TO  WRK-SELBAN-W
            MOVE    WRK-SELBAN-W                TO  S02-SELNUM
       *
-           IF      FLG-MISYORI2   NOT =  ZERO
-             EVALUATE  FLG-MISYORI2
+           EVALUATE   FLG-MISYORI
                WHEN       1
+                 MOVE    "red"    TO    S02-LBLMSG-STYLE
+       MOVE "¡ú¡ú¡¡¡ÚÂè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤¡¡"
+                                  TO    S02-LBLMSG(1:56)
+       MOVE "¡ú¡ú"                TO    S02-LBLMSG(57:)
+               WHEN       2
                  MOVE    "red"    TO    S02-LBLMSG-STYLE
        MOVE "¡ú¡ú¡¡¡Ú£·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤¡¡"
                                   TO    S02-LBLMSG(1:56)
        MOVE "¡ú¡ú"                TO    S02-LBLMSG(57:)
-               WHEN       2
+               WHEN       3
                  MOVE    "red"    TO    S02-LBLMSG-STYLE
        MOVE "¡ú¡ú¡¡¡Ú¹âÎð¼Ô¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤¡¡¡ú¡ú"
                                   TO    S02-LBLMSG
                WHEN       4
                  MOVE    "red"    TO    S02-LBLMSG-STYLE
-       MOVE "¡ú¡ú¡¡¡ÚÂè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤¡¡"
+       MOVE "¡ú¡ú¡¡¡Ú³ºÅö¼Ô¥Á¥§¥Ã¥¯Ãê½ÐÊ¬¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤"
                                   TO    S02-LBLMSG(1:56)
-       MOVE "¡ú¡ú"                TO    S02-LBLMSG(57:)
-             END-EVALUATE
-           ELSE
-             IF    FLG-MISYORI    =      1
+       MOVE "¡¡¡ú"                TO    S02-LBLMSG(57:)
+               WHEN       5
                  MOVE    "blue"   TO    S02-LBLMSG-STYLE
                  MOVE    SPACE    TO    S02-LBLMSG
                  STRING  "¡ù¡¡ºÆ·×»»¤ò¹Ô¤Ã¤Æ¤¯¤À¤µ¤¤"
@@ -3269,8 +3280,7 @@
                                         DELIMITED BY SIZE
                  INTO    S02-LBLMSG
                  END-STRING
-             END-IF
-           END-IF
+           END-EVALUATE
       *
            MOVE    WIDGET-NORMAL       TO  S02-B06-STATE
                                            S02-B07-STATE
@@ -6305,8 +6315,10 @@
                        UNTIL  (IDX3                          >   15 )
                          OR   (LNK-ORCSSKS-DENPNUM-END(IDX3) =  ZERO)
                       ADD    1     TO   IDX6
-                      MOVE   LNK-ORCSSKS-DENPNUM-END(IDX3)
+                      IF    IDX6     <=  100
+                        MOVE   LNK-ORCSSKS-DENPNUM-END(IDX3)
                                    TO   WRK-DENPNUM-END(IDX6)
+                      END-IF
                   END-PERFORM
       *
                END-IF

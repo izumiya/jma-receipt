@@ -57,8 +57,6 @@
                05  SPA-GMN-PTLIST-SEL          PIC 9(05).
                05  SPA-GMN-PTLIST-OCC          OCCURS  101.
                    07  SPA-GMN-PTLIST-SRT-KEY.
-                       09  SPA-GMN-TSECMONEY   PIC 9(07).
-                       09  SPA-GMN-TKANANAME   PIC X(50).
                        09  SPA-GMN-TPTNUM      PIC X(20).
                    07  SPA-GMN-TPTID           PIC 9(10).
                    07  SPA-GMN-TNAME           PIC X(50).
@@ -66,6 +64,8 @@
                    07  SPA-GMN-TBIRHDAY        PIC X(10).
                    07  SPA-GMN-TAGE            PIC X(10).
                    07  SPA-GMN-TKBNMEI         PIC X(20).
+                   07  SPA-GMN-TSECMONEY       PIC 9(07).
+                   07  SPA-GMN-TKANANAME       PIC X(50).
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
@@ -76,6 +76,8 @@
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-PTLIST-ROW              PIC 9(01).
            03  FLG-LOOP-END                PIC 9(01).
+           03  FLG-ARI                     PIC 9(01).
+           03  FLG-MAX                     PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -268,71 +270,7 @@
       *
            MOVE    1                   TO  FLG-PTLIST-ROW
       *
-           PERFORM 900-SYUNOU-KEY84-SEL-SEC
-      *
-           MOVE    ZERO                TO  IDXL
-           PERFORM UNTIL ( FLG-SYUNOU  NOT  =   ZERO )
-                    OR   ( IDXL            >=   CONST-PTLIST-MAX )
-      *
-               COMPUTE IDXL = IDXL + 1
-      *
-               PERFORM 900-PTINF-KEY-SEL-SEC
-               PERFORM 900-PTNUM-KEY-SEL-SEC
-               PERFORM 800-ORCSAGECHK-SEC
-      *
-               MOVE    PTNUM-PTNUM     TO  SPA-GMN-TPTNUM   (IDXL)
-               MOVE    SYU-PTID        TO  SPA-GMN-TPTID    (IDXL)
-               MOVE    PTINF-NAME      TO  SPA-GMN-TNAME    (IDXL)
-               MOVE    PTINF-KANANAME  TO  SPA-GMN-TKANANAME(IDXL)
-      *
-               EVALUATE    PTINF-SEX
-               WHEN    "1"
-                   MOVE    "ÃË"        TO  SPA-GMN-TSEX     (IDXL)
-               WHEN    "2"
-                   MOVE    "½÷"        TO  SPA-GMN-TSEX     (IDXL)
-               END-EVALUATE
-      *
-               MOVE    PTINF-BIRTHDAY  TO  WRK-SYMD
-               PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-EDTYMD1     TO  SPA-GMN-TBIRHDAY (IDXL)
-      *
-               IF    ( AGECHK-NENREI2-YY   =   ZERO )
-                   MOVE    AGECHK-NENREI2-MM
-                                       TO  WRK-AGE
-                   MOVE    "¥ö·î"      TO  WRK-LBLAGE
-                   MOVE    WRK-AGE-G   TO  SPA-GMN-TAGE     (IDXL)
-               ELSE
-                   MOVE    AGECHK-NENREI2-YY
-                                       TO  WRK-AGE
-                   MOVE    "ºÍ"        TO  WRK-LBLAGE
-                   MOVE    WRK-AGE-G   TO  SPA-GMN-TAGE     (IDXL)
-               END-IF
-      *
-               MOVE    SYU-SECMONEY        TO  SPA-GMN-TSECMONEY(IDXL)
-               IF      SYU-SECMONEY    =   3
-                   MOVE     1              TO  SPA-GMN-TSECMONEY(IDXL)
-               END-IF
-               EVALUATE    TRUE
-               WHEN  ( SYU-SECMONEY    =   1 OR 3 )
-                   MOVE    "£·£°ºÐÌ¤Ëþ"    TO  SPA-GMN-TKBNMEI (IDXL)
-               WHEN  ( SYU-SECMONEY    =   2 )
-                   MOVE    "¹âÎð¼Ô"        TO  SPA-GMN-TKBNMEI (IDXL)
-               WHEN  ( SYU-SECMONEY    =   4 )
-                   MOVE    "Âè»°¼Ô¹Ô°Ù"    TO  SPA-GMN-TKBNMEI (IDXL)
-               WHEN  ( SYU-ACCT-UPDKBN NOT =   SPACE )
-                   MOVE    "¼ýÇ¼¹¹¿·Ì¤½èÍý"
-                                           TO  SPA-GMN-TKBNMEI (IDXL)
-               END-EVALUATE
-      *
-               PERFORM 900-SYUNOU-KEY84-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    IDXL                TO  SPA-GMN-PTLIST-MAX
-      *
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key84"             TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           PERFORM 3101-SPASET-HENSYU-SEC
       *
            COMPUTE IDXS    =   CONST-PTLIST-MAX +  1
       *
@@ -359,6 +297,150 @@
       *
            .
        310-SPASET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥¹¥Ñ½é´üÊÔ½¸½èÍý
+      *****************************************************************
+       3101-SPASET-HENSYU-SEC              SECTION.
+      *
+           MOVE   ZERO                         TO  SPA-GMN-PTLIST-MAX
+           MOVE   ZERO                         TO  FLG-MAX
+      *
+           INITIALIZE                              SYUNOU-REC
+           MOVE   SPA-HOSPNUM                  TO  SYU-HOSPNUM
+           MOVE   "2"                          TO  SYU-NYUGAIKBN
+           MOVE   SPA-S01-TUKI-SRYYM           TO  SYU-SRYYMD(1:6)
+           MOVE   "__"                         TO  SYU-SRYYMD(7:2)
+           MOVE   SYUNOU-REC                   TO  MCPDATA-REC
+           MOVE   "DBSELECT"                   TO  MCP-FUNC
+           MOVE   "tbl_syunou"                 TO  MCP-TABLE
+           MOVE   "key97"                      TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"               USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE      "tbl_syunou"            TO  MCP-TABLE
+             MOVE      "key97"                 TO  MCP-PATHNAME
+             PERFORM    900-SYUNOU-READ-SEC
+             PERFORM    UNTIL (FLG-SYUNOU  =  1)
+                         OR   (FLG-MAX     =  1)
+               IF  SYU-DENPJTIKBN  NOT = "3"
+                 MOVE     ZERO     TO  FLG-ARI
+                 PERFORM  VARYING  IDXL  FROM  1  BY  1
+                           UNTIL  (IDXL      >  CONST-PTLIST-MAX)
+                            OR    (SPA-GMN-TPTID(IDXL)  =  ZERO )
+                            OR    (FLG-ARI              =   1   )
+                   IF  SYU-PTID  =  SPA-GMN-TPTID(IDXL)
+                     MOVE    1     TO  FLG-ARI
+                     PERFORM  31012-SPASET-HENSYU3-SEC
+                   END-IF
+                 END-PERFORM
+                 IF    FLG-ARI   =  ZERO
+                   IF  IDXL  <=  CONST-PTLIST-MAX
+                     MOVE    IDXL  TO  SPA-GMN-PTLIST-MAX
+                     PERFORM  31011-SPASET-HENSYU2-SEC
+                     PERFORM  31012-SPASET-HENSYU3-SEC
+                   ELSE
+                     MOVE    1     TO  FLG-MAX
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_syunou"            TO  MCP-TABLE
+               MOVE    "key97"                 TO  MCP-PATHNAME
+               PERFORM  900-SYUNOU-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_syunou"            TO  MCP-TABLE
+           MOVE        "key97"                 TO  MCP-PATHNAME
+           PERFORM      910-DBCLOSECURSOR-SEC
+      *
+           .
+       3101-SPASET-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥¹¥Ñ½é´üÊÔ½¸½èÍý
+      *****************************************************************
+       31011-SPASET-HENSYU2-SEC              SECTION.
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+           PERFORM 900-PTNUM-KEY-SEL-SEC
+           PERFORM 800-ORCSAGECHK-SEC
+      *
+           MOVE    PTNUM-PTNUM     TO  SPA-GMN-TPTNUM   (IDXL)
+           MOVE    SYU-PTID        TO  SPA-GMN-TPTID    (IDXL)
+           MOVE    PTINF-NAME      TO  SPA-GMN-TNAME    (IDXL)
+           MOVE    PTINF-KANANAME  TO  SPA-GMN-TKANANAME(IDXL)
+      *
+           EVALUATE    PTINF-SEX
+             WHEN    "1"
+               MOVE    "ÃË"        TO  SPA-GMN-TSEX     (IDXL)
+             WHEN    "2"
+               MOVE    "½÷"        TO  SPA-GMN-TSEX     (IDXL)
+           END-EVALUATE
+      *
+           MOVE    PTINF-BIRTHDAY  TO  WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-EDTYMD1     TO  SPA-GMN-TBIRHDAY (IDXL)
+      *
+           IF    ( AGECHK-NENREI2-YY   =   ZERO )
+               MOVE    AGECHK-NENREI2-MM
+                                   TO  WRK-AGE
+               MOVE    "¥ö·î"      TO  WRK-LBLAGE
+               MOVE    WRK-AGE-G   TO  SPA-GMN-TAGE     (IDXL)
+           ELSE
+               MOVE    AGECHK-NENREI2-YY
+                                   TO  WRK-AGE
+               MOVE    "ºÍ"        TO  WRK-LBLAGE
+               MOVE    WRK-AGE-G   TO  SPA-GMN-TAGE     (IDXL)
+           END-IF
+      *
+           .
+       31011-SPASET-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥¹¥Ñ½é´üÊÔ½¸½èÍý
+      *****************************************************************
+       31012-SPASET-HENSYU3-SEC              SECTION.
+      *
+           IF    SYU-SECMONEY  =  4
+               MOVE    "Âè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ"
+                               TO  SPA-GMN-TKBNMEI(IDXL)
+               MOVE     1      TO  SPA-GMN-TSECMONEY(IDXL)
+           END-IF
+           IF    SYU-SECMONEY  =  1 OR 3
+             IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1
+               MOVE    "£·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ"
+                               TO  SPA-GMN-TKBNMEI(IDXL)
+               MOVE     2      TO  SPA-GMN-TSECMONEY(IDXL)
+             END-IF
+           END-IF
+           IF    SYU-SECMONEY  =  2
+             IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1 AND 2
+               MOVE    "¹âÎð¼Ô¸½ÊªµëÉÕ"
+                               TO  SPA-GMN-TKBNMEI(IDXL)
+               MOVE     3      TO  SPA-GMN-TSECMONEY(IDXL)
+             END-IF
+           END-IF
+           IF    SYU-SECMONEY  =  7
+             IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1 AND 2 AND 3
+               MOVE    "³ºÅö¼Ô¥Á¥§¥Ã¥¯Ãê½ÐÊ¬"
+                               TO  SPA-GMN-TKBNMEI(IDXL)
+               MOVE     4      TO  SPA-GMN-TSECMONEY(IDXL)
+             END-IF
+           END-IF
+           IF    SYU-ACCT-UPDKBN  NOT =  SPACE
+             IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1 AND 2 AND 3 AND 4
+               MOVE    "¼ýÇ¼¹¹¿·Ì¤½èÍý"
+                               TO  SPA-GMN-TKBNMEI(IDXL)
+               MOVE     5      TO  SPA-GMN-TSECMONEY(IDXL)
+             END-IF
+           END-IF
+      *
+           .
+       31012-SPASET-HENSYU3-EXT.
            EXIT.
       *
       *****************************************************************
@@ -696,6 +778,27 @@
            .
        800-SEIWA-HEN-EXT.
            EXIT.
+      *****************************************************************
+      *    ¼ýÇ¼¥Ç¡¼¥¿ÆÉ¹þ
+      *****************************************************************
+       900-SYUNOU-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYUNOU-REC
+               MOVE    ZERO            TO  FLG-SYUNOU
+           ELSE
+               INITIALIZE                  SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           .
+      *
+       900-SYUNOU-READ-EXT.
+           EXIT.
       **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý
       **************************************************************
@@ -740,8 +843,8 @@
                    MOVE    MCPDATA-REC     TO  SYUNOU-REC
       *
                    MOVE    1               TO  FLG-LOOP-END
-                   IF    ( SYU-SECMONEY    =   1 OR 2 OR 3 OR 4 )
-                     OR  ( SYU-ACCT-UPDKBN NOT = SPACE  )
+                   IF  (SYU-SECMONEY     NOT = ZERO AND 9)
+                   OR  (SYU-ACCT-UPDKBN  NOT = SPACE     )
                        CONTINUE
                    ELSE
                        MOVE    ZERO        TO  FLG-LOOP-END

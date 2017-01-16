@@ -22,8 +22,6 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      * 01.00.01     NACL-門脇    09/06/16  一括再計算順、一括再計算方法追加
-      * 01.00.02     NACL-門脇    12/03/09  現物給付計算フラグ追加
       ************************************************************
        01  LNK-ORCSSAIKEISAN-REC.
       *
@@ -47,11 +45,15 @@
            03  LNK-ORCSSKS-IKTGENKEIFLG    PIC  X(01).
       *一括再計算実施フラグ
            03  LNK-ORCSSKS-IKTJISSIFLG     PIC  X(01).
+      *一括再計算該当者チェックフラグ
+           03  LNK-ORCSSKS-IKTCHECKFLG     PIC  X(01).
       *
       *返却値
       *
            03  LNK-ORCSSKS-OUT-AREA.
+             04  LNK-ORCSSKS-OUT-OCC          OCCURS  15.
       *計算伝票番号
-               05  LNK-ORCSSKS-DENPNUM-END    PIC  9(07)
-                                           OCCURS  15.
+               05  LNK-ORCSSKS-DENPNUM-END    PIC  9(07).
+      *収納データ
+               05  LNK-ORCSSKS-SYUNOU-DATA    PIC  X(2500).
       *
