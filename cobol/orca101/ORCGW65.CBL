@@ -2307,7 +2307,15 @@
            INTO                        SPA-GMN-KAK32KBNMEIL (3)
            END-STRING
       *
-           MOVE    3               TO  SPA-GMN-KAK32KBN-MAX
+           MOVE  "3"               TO  SPA-GMN-KAK32KBNL    (4)
+           STRING    "１と同様（外来＋高齢＋低所の場合、"
+                                       DELIMITED BY SIZE
+                     "低所の月上限額で計算を行う）"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-KAK32KBNMEIL (4)
+           END-STRING
+      *
+           MOVE    4               TO  SPA-GMN-KAK32KBN-MAX
       *
            .
        3110-KAK32KBNLST-EXT.
