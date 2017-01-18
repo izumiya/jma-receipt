@@ -40,11 +40,11 @@
              05  LNK-ORCSSYUNOUCHK-OUT-OCC      OCCURS 10000.
       *患者ＩＤ
                07  LNK-ORCSSYUNOUCHK-PTID       PIC 9(10).
-      *一括再計算フラグ
+      *状態フラグ
       *　　０：【患者請求額の変更がある方】
       *　　８：【患者請求額の変更がない方】
       *　　９：【患者請求額の変更がない方】　※該当者チェック時に自動で一括再計算済
-               07  LNK-ORCSSYUNOUCHK-IKTFLG     PIC 9(01).
+               07  LNK-ORCSSYUNOUCHK-JTIFLG     PIC 9(01).
       *該当区分
       *　　１：第三者行為現物給付（通常診療分の優先計算該当）
       *　　２：７０歳未満現物給付（公費併用分の優先計算該当）

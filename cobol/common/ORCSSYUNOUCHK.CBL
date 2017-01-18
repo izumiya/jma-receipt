@@ -244,12 +244,12 @@
                                 TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
                  IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
                  ELSE
-                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
                  END-IF
                ELSE
-                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
                END-IF
                MOVE  WRK-GAITOKBN(IDX1)
                                 TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
