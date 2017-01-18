@@ -400,6 +400,8 @@
                05  SPA-HKN-ERR2            PIC  9(01).
       *入院料なし
                05  SPA-NYU-ERR             PIC  9(01).
+      *翌月入院料なし
+               05  SPA-NYU-ERR-2           PIC  9(01).
       *診療年月日末日
                05  SPA-SRYLST-DD           PIC  9(02).
       *

@@ -37,6 +37,9 @@
                05  ORCSCHKTCHK-HKTERR     PIC 9(01).
       *        入院料算定なし
                05  ORCSCHKTCHK-NYUERR     PIC 9(01).
+      *H29.1
+      *        翌月入院料算定なし
+               05  ORCSCHKTCHK-NYUERR-2     PIC 9(01).
       *    入院料包括情報
            03  ORCSCHKTCHK-NYUINAREA.
                05  ORCSCHKTCHK-NYUHKTCHK       PIC 9(01).

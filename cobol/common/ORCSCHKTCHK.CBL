@@ -41,6 +41,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/09/XX  Ã»´üÂÚºß¼ê½Ñ£³¡¡³°ÍèÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *                                     ÂÐ¾Ý¥Æ¡¼¥Ö¥ë£²£°£°¤Ø
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/01/17  Íâ·îÆþ±¡ÎÁ¥Á¥§¥Ã¥¯ÂÐ±þ
       *****************************************************************
       *
       *
@@ -149,6 +150,14 @@
                    07  WRK-ORCSC-KASN-TBL2     OCCURS   30.
       *                Êñ³çºÞ
                        09  WRK-ORCSC-HKTKBN        PIC 9(01).
+      *H29.1
+      *    Íâ·îÆþ±¡ÎÁ
+           03  WRK-N-SRYYM.
+               05  WRK-N-SRYYY         PIC 9(04).
+               05  WRK-N-SRYMM         PIC 9(02).
+           03  WRK-TANKI-DAY           PIC 9(02).
+           03  WRK-LST-DD              PIC 9(02).
+      *
       *    ¥Á¥§¥Ã¥¯ÍÑ
        01  WRK-TBL-AREA.
            03  WRK-KANRICD             PIC  X(03).
@@ -257,6 +266,10 @@
       *
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
            COPY    "CPORCSNYUINDAY.INC".
+      *
+      *   ÆüÉÕÊÑ´¹¥µ¥Ö
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
       *    ¿ÇÎÅ¹Ô°ÙÍÑ¶¦ÄÌ¥Ñ¥é¥á¥¿
            COPY    "K01COMMON-SPA".
@@ -2186,8 +2199,88 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                                               (IDX)
                END-IF
            END-PERFORM
+      *!!!
+      *H29.1
+      *    Æþ±¡Ä´ºÞÎÁ¤Î°Ù¡¢Íâ·î¤ÎÆþ±¡ÎÁÈ½Äê
+           MOVE    ZERO                TO  ORCSCHKTCHK-NYUERR-2
+           IF     (ORCSCHKTCHK-NYUERR      =   ZERO)
+              AND (ORCSCHKTCHK-NYUHKTCHK   =   1  )
+              PERFORM 5009-NEXTYMD-NYUINCHEK-SEC
+           END-IF
            .
        500-NYUIN-CHKSYORI-EXT.
+           EXIT.
+      *
+      *H29.1
+      *****************************************************************
+      *    Íâ·î¤ÎÆþ±¡ÎÁ¤ÎÈ½Äê½èÍý
+      *****************************************************************
+       5009-NEXTYMD-NYUINCHEK-SEC         SECTION.
+      *
+      *    ·îËöÆü¤òµá¤á¤ë
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    WRK-SRYYM           TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY7-AREA
+           IF      STS-DAY-RC1         =   ZERO
+               MOVE    LNK-DAY7-KOYOMI(7:2)    TO  WRK-LST-DD
+           ELSE
+               MOVE    31                  TO  WRK-LST-DD
+           END-IF
+           IF     (WRK-TANKI-DAY   NOT =   ZERO )
+             AND  (WRK-TANKI-DAY       =   WRK-LST-DD )
+               GO    TO   5009-NEXTYMD-NYUINCHEK-EXT
+           END-IF
+      *
+           MOVE    WRK-SRYYM           TO  WRK-N-SRYYM
+           IF      WRK-N-SRYMM         =   12
+               MOVE    1               TO  WRK-N-SRYMM
+               ADD     1               TO  WRK-N-SRYYY
+           ELSE
+               ADD     1               TO  WRK-N-SRYMM
+           END-IF
+      *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    SPA-PTID            TO  LNK-NYUINDAY-PTID
+           MOVE    WRK-N-SRYYM         TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+      *
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
+           MOVE    SPA-PTID            TO  NACCT-PTID
+           MOVE    WRK-N-SRYYM         TO  NACCT-SRYYM
+      *
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key39"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key39"             TO  MCP-PATHNAME
+               PERFORM 900-NYUINACCT-READ-SEC
+           ELSE
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    1               TO  FLG-NYUINACCT
+           END-IF
+      *    Æþ±¡ÎÁ»»Äê¤Ê¤·
+           IF      FLG-NYUINACCT       =   1
+               MOVE    1                   TO  ORCSCHKTCHK-NYUERR-2
+           ELSE
+               MOVE    ZERO                TO  ORCSCHKTCHK-NYUERR-2
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key39"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       5009-NEXTYMD-NYUINCHEK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2241,6 +2334,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                  AND ( LNK-NYUINDAY-TANKI2-KBN (IDX-D)
                                            NOT =   SPACE     )
                    MOVE    1               TO  NACCT-DAY (IDX-D)
+      *TEST
+      *H29.1
+                   MOVE    IDX-D           TO  WRK-TANKI-DAY
                END-IF
       *
                IF    ( NACCT-DAY (IDX-D)   NOT =   ZERO )

@@ -192,6 +192,8 @@
                            11  SPA-COM-KZMFLG9       PIC X(01).
       *                    Æþ±¡ÎÁÊ»ÍÑ·Ù¹ð
                            11  SPA-COM-KZMFLGNK      PIC X(01).
+      *                    Íâ·îÆþ±¡ÎÁ¤Ê¤··Ù¹ð
+                           11  SPA-COM-KZMFLGN2      PIC X(01).
       *
       *                ¼«Æ°È¯À¸ºÑ¥Õ¥é¥°
                        09  SPA-COM-AUTOFLG           PIC X(01).

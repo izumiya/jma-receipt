@@ -3434,6 +3434,15 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *!!!
+      *H29.1
+               WHEN    "K190"
+                   STRING  "警告！"
+                           "翌月の入院料算定がありません。"
+                           "翌月の入院調剤料は出来高で作成します。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"
