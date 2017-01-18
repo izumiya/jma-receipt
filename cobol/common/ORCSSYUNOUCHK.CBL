@@ -66,13 +66,7 @@
                05  WRK-GAITOKBN            PIC 9(02).
                05  WRK-SKYMONEY-FLG        PIC 9(01).
                05  WRK-TOTALTENKBN-A       PIC 9(01).
-               05  WRK-TOTALTENKBN-A1      PIC 9(01).
-               05  WRK-TOTALTENKBN-A2      PIC 9(01).
-               05  WRK-TOTALTENKBN-A3      PIC 9(01).
                05  WRK-TOTALTENKBN-B       PIC 9(01).
-               05  WRK-TOTALTENKBN-B1      PIC 9(01).
-               05  WRK-TOTALTENKBN-B2      PIC 9(01).
-               05  WRK-TOTALTENKBN-B3      PIC 9(01).
       *
            03  WRK-PTID-TABLE2.
              04  WRK-PTID-OCC2             OCCURS   10000.
@@ -80,13 +74,7 @@
                05  WRK-GAITOKBN2           PIC 9(02).
                05  WRK-SKYMONEY2-FLG       PIC 9(01).
                05  WRK-TOTALTENKBN2-A      PIC 9(01).
-               05  WRK-TOTALTENKBN2-A1     PIC 9(01).
-               05  WRK-TOTALTENKBN2-A2     PIC 9(01).
-               05  WRK-TOTALTENKBN2-A3     PIC 9(01).
                05  WRK-TOTALTENKBN2-B      PIC 9(01).
-               05  WRK-TOTALTENKBN2-B1     PIC 9(01).
-               05  WRK-TOTALTENKBN2-B2     PIC 9(01).
-               05  WRK-TOTALTENKBN2-B3     PIC 9(01).
       *
            03  WRK-PTID-TABLE3.
              04  WRK-PTID-OCC3             OCCURS   10000.
@@ -94,13 +82,7 @@
                05  WRK-GAITOKBN3           PIC 9(02).
                05  WRK-SKYMONEY3-FLG       PIC 9(01).
                05  WRK-TOTALTENKBN3-A      PIC 9(01).
-               05  WRK-TOTALTENKBN3-A1     PIC 9(01).
-               05  WRK-TOTALTENKBN3-A2     PIC 9(01).
-               05  WRK-TOTALTENKBN3-A3     PIC 9(01).
                05  WRK-TOTALTENKBN3-B      PIC 9(01).
-               05  WRK-TOTALTENKBN3-B1     PIC 9(01).
-               05  WRK-TOTALTENKBN3-B2     PIC 9(01).
-               05  WRK-TOTALTENKBN3-B3     PIC 9(01).
       *
            03  WRK-DENPNUM-END-TABLE.
              04  WRK-DENPNUM-END-OCC       OCCURS   100.
@@ -262,43 +244,11 @@
                                 TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
                  MOVE     9     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
-                 IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                   IF  WRK-TOTALTENKBN-B1(IDX1)  =  1
-                     MOVE   5   TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                   END-IF
-                 END-IF
-                 IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                   IF  WRK-TOTALTENKBN-B2(IDX1)  =  1
-                     MOVE   6   TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                   END-IF
-                 END-IF
-                 IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                   IF  WRK-TOTALTENKBN-B3(IDX1)  =  1
-                     MOVE   7   TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                   END-IF
-                 END-IF
                ELSE
                  MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
-                 MOVE  WRK-GAITOKBN(IDX1)
-                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                 IF  WRK-GAITOKBN(IDX1)  =  5
-                   IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                     IF  WRK-TOTALTENKBN-A1(IDX1)  =  1
-                       MOVE  5  TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                     END-IF
-                   END-IF
-                   IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                     IF  WRK-TOTALTENKBN-A2(IDX1)  =  1
-                       MOVE  6  TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                     END-IF
-                   END-IF
-                   IF    LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)  =  ZERO
-                     IF  WRK-TOTALTENKBN-A3(IDX1)  =  1
-                       MOVE  7  TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-                     END-IF
-                   END-IF
-                 END-IF
                END-IF
+               MOVE  WRK-GAITOKBN(IDX1)
+                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
       *
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
                    ADD    1     TO   IDX3
@@ -633,7 +583,6 @@
       *      患者請求額の変更がある方
              MOVE       1     TO    WRK-SKYMONEY-FLG(IDX1)
              MOVE       1     TO    WRK-TOTALTENKBN-A(IDX1)
-             PERFORM    3001-SYUNOU-DATA-CHECK2-SEC
            ELSE
       *      患者請求額の変更がない方（収納内部項目の変更あり）
              IF (SYU-TOTAL-HKNTEN      NOT = WRK-SYU-TOTAL-HKNTEN      )
@@ -679,98 +628,11 @@
              OR (SYU-SECMONEY          NOT = ZERO AND 9                )
              OR (SYU-ACCT-UPDKBN       NOT = SPACE                     )
                MOVE     1     TO    WRK-TOTALTENKBN-B(IDX1)
-               PERFORM  3002-SYUNOU-DATA-CHECK3-SEC
              END-IF
            END-IF
       *
            .
        300-SYUNOU-DATA-CHECK-EXT.
-           EXIT.
-      *
-      **************************************************************
-      *    収納データチェック
-      **************************************************************
-       3001-SYUNOU-DATA-CHECK2-SEC           SECTION.
-      *
-           IF  (SYU-TOTAL-HKNTEN      NOT = WRK-SYU-TOTAL-HKNTEN      )
-           OR  (SYU-RSISHOSHIN-MONEY  NOT = WRK-SYU-RSISHOSHIN-MONEY  )
-           OR  (SYU-RSISAISHIN-MONEY  NOT = WRK-SYU-RSISAISHIN-MONEY  )
-           OR  (SYU-RSISDO-MONEY      NOT = WRK-SYU-RSISDO-MONEY      )
-           OR  (SYU-RSIETC-MONEY      NOT = WRK-SYU-RSIETC-MONEY      )
-                 MOVE     1     TO    WRK-TOTALTENKBN-A1(IDX1)
-           ELSE
-            IF (SYU-HKNTEKMONEY       NOT = WRK-SYU-HKNTEKMONEY       )
-            OR (SYU-SYUCOMPFTN        NOT = WRK-SYU-SYUCOMPFTN        )
-            OR (SYU-SYUCOMPFTN-ENTANI NOT = WRK-SYU-SYUCOMPFTN-ENTANI )
-            OR (SYU-KOH-FTN           NOT = WRK-SYU-KOH-FTN           )
-            OR (SYU-KOH-FTN-ENTANI    NOT = WRK-SYU-KOH-FTN-ENTANI    )
-            OR (SYU-KOH1HKNFTNMONEY   NOT = WRK-SYU-KOH1HKNFTNMONEY   )
-            OR (SYU-KOH1COMPFTN       NOT = WRK-SYU-KOH1COMPFTN       )
-            OR (SYU-KOH1COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH1COMPFTN-ENTANI)
-            OR (SYU-KOH2HKNFTNMONEY   NOT = WRK-SYU-KOH2HKNFTNMONEY   )
-            OR (SYU-KOH2COMPFTN       NOT = WRK-SYU-KOH2COMPFTN       )
-            OR (SYU-KOH2COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH2COMPFTN-ENTANI)
-            OR (SYU-KOH3HKNFTNMONEY   NOT = WRK-SYU-KOH3HKNFTNMONEY   )
-            OR (SYU-KOH3COMPFTN       NOT = WRK-SYU-KOH3COMPFTN       )
-            OR (SYU-KOH3COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH3COMPFTN-ENTANI)
-            OR (SYU-KOH4HKNFTNMONEY   NOT = WRK-SYU-KOH4HKNFTNMONEY   )
-            OR (SYU-KOH4COMPFTN       NOT = WRK-SYU-KOH4COMPFTN       )
-            OR (SYU-KOH4COMPFTN-ENTANI
-                                       NOT = WRK-SYU-KOH4COMPFTN-ENTANI)
-                 MOVE     1     TO    WRK-TOTALTENKBN-A2(IDX1)
-            ELSE
-                 MOVE     1     TO    WRK-TOTALTENKBN-A3(IDX1)
-            END-IF
-           END-IF
-      *
-           .
-       3001-SYUNOU-DATA-CHECK2-EXT.
-           EXIT.
-      *
-      **************************************************************
-      *    収納データチェック
-      **************************************************************
-       3002-SYUNOU-DATA-CHECK3-SEC           SECTION.
-      *
-           IF  (SYU-TOTAL-HKNTEN      NOT = WRK-SYU-TOTAL-HKNTEN      )
-           OR  (SYU-RSISHOSHIN-MONEY  NOT = WRK-SYU-RSISHOSHIN-MONEY  )
-           OR  (SYU-RSISAISHIN-MONEY  NOT = WRK-SYU-RSISAISHIN-MONEY  )
-           OR  (SYU-RSISDO-MONEY      NOT = WRK-SYU-RSISDO-MONEY      )
-           OR  (SYU-RSIETC-MONEY      NOT = WRK-SYU-RSIETC-MONEY      )
-                 MOVE     1     TO    WRK-TOTALTENKBN-B1(IDX1)
-           ELSE
-            IF (SYU-HKNTEKMONEY       NOT = WRK-SYU-HKNTEKMONEY       )
-            OR (SYU-SYUCOMPFTN        NOT = WRK-SYU-SYUCOMPFTN        )
-            OR (SYU-SYUCOMPFTN-ENTANI NOT = WRK-SYU-SYUCOMPFTN-ENTANI )
-            OR (SYU-KOH-FTN           NOT = WRK-SYU-KOH-FTN           )
-            OR (SYU-KOH-FTN-ENTANI    NOT = WRK-SYU-KOH-FTN-ENTANI    )
-            OR (SYU-KOH1HKNFTNMONEY   NOT = WRK-SYU-KOH1HKNFTNMONEY   )
-            OR (SYU-KOH1COMPFTN       NOT = WRK-SYU-KOH1COMPFTN       )
-            OR (SYU-KOH1COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH1COMPFTN-ENTANI)
-            OR (SYU-KOH2HKNFTNMONEY   NOT = WRK-SYU-KOH2HKNFTNMONEY   )
-            OR (SYU-KOH2COMPFTN       NOT = WRK-SYU-KOH2COMPFTN       )
-            OR (SYU-KOH2COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH2COMPFTN-ENTANI)
-            OR (SYU-KOH3HKNFTNMONEY   NOT = WRK-SYU-KOH3HKNFTNMONEY   )
-            OR (SYU-KOH3COMPFTN       NOT = WRK-SYU-KOH3COMPFTN       )
-            OR (SYU-KOH3COMPFTN-ENTANI
-                                      NOT = WRK-SYU-KOH3COMPFTN-ENTANI)
-            OR (SYU-KOH4HKNFTNMONEY   NOT = WRK-SYU-KOH4HKNFTNMONEY   )
-            OR (SYU-KOH4COMPFTN       NOT = WRK-SYU-KOH4COMPFTN       )
-            OR (SYU-KOH4COMPFTN-ENTANI
-                                       NOT = WRK-SYU-KOH4COMPFTN-ENTANI)
-                 MOVE     1     TO    WRK-TOTALTENKBN-B2(IDX1)
-            ELSE
-                 MOVE     1     TO    WRK-TOTALTENKBN-B3(IDX1)
-            END-IF
-           END-IF
-      *
-           .
-       3002-SYUNOU-DATA-CHECK3-EXT.
            EXIT.
       *
       *****************************************************************
