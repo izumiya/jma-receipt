@@ -243,7 +243,11 @@
                MOVE  WRK-PTID(IDX1)
                                 TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                 MOVE     9     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                 ELSE
+                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
+                 END-IF
                ELSE
                  MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-IKTFLG(IDX2)
                END-IF
@@ -251,72 +255,55 @@
                                 TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
       *
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                   ADD    1     TO   IDX3
-                   MOVE   WRK-PTID(IDX1)
-                                TO   WRK-PTID2(IDX3)
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                 ELSE
+                   IF  WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                   END-IF
+                 END-IF
                ELSE
-                 IF  WRK-GAITOKBN(IDX1)  =  5
-                   ADD    1     TO   IDX4
-                   MOVE   WRK-PTID(IDX1)
-                                TO   WRK-PTID3(IDX4)
+                 IF    WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX4
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID3(IDX4)
                  END-IF
                END-IF
              END-IF
            END-PERFORM
       *
-      *    患者請求額の変更がない方（収納内部項目の変更あり）の一括再計算
-           INITIALIZE                  WRK-PTID-TABLE
-           MOVE  WRK-PTID-TABLE2  TO   WRK-PTID-TABLE
-           MOVE     ZERO          TO   FLG-SYORI-KBN
-           PERFORM  VARYING  IDX1  FROM  1  BY  1
-                     UNTIL  (IDX1            >  10000)
-                      OR    (WRK-PTID(IDX1)  =  ZERO )
-             PERFORM  100-IKATUSAIKEI-SEC
-           END-PERFORM
+           IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+      *      患者請求額の変更がない方：自動で一括再計算
+             INITIALIZE                  WRK-PTID-TABLE
+             MOVE  WRK-PTID-TABLE2  TO   WRK-PTID-TABLE
+             MOVE     ZERO          TO   FLG-SYORI-KBN
+             PERFORM  VARYING  IDX1  FROM  1  BY  1
+                       UNTIL  (IDX1            >  10000)
+                        OR    (WRK-PTID(IDX1)  =  ZERO )
+               PERFORM  100-IKATUSAIKEI-SEC
+             END-PERFORM
+           ELSE
+      *      患者請求額の変更がない方：該当者チェック抽出分の収納更新
+             INITIALIZE                  WRK-PTID-TABLE
+             MOVE  WRK-PTID-TABLE2  TO   WRK-PTID-TABLE
+             PERFORM  VARYING  IDX1  FROM  1  BY  1
+                       UNTIL  (IDX1            >  10000)
+                        OR    (WRK-PTID(IDX1)  =  ZERO )
+               PERFORM  400-SYUNOU-KOUSIN-SEC
+             END-PERFORM
+           END-IF
       *
-      *    該当者チェック抽出分の収納更新
-           INITIALIZE                  WRK-PTID-TABLE
-           MOVE  WRK-PTID-TABLE3  TO   WRK-PTID-TABLE
-           PERFORM  VARYING  IDX1  FROM  1  BY  1
-                     UNTIL  (IDX1            >  10000)
-                      OR    (WRK-PTID(IDX1)  =  ZERO )
-             INITIALIZE                              SYUNOU-REC
-             MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SYU-HOSPNUM
-             MOVE   LNK-ORCSSYUNOUCHK-NYUGAIKBN  TO  SYU-NYUGAIKBN
-             MOVE   WRK-PTID(IDX1)               TO  SYU-PTID
-             MOVE   LNK-ORCSSYUNOUCHK-SRYYM      TO  SYU-SRYYMD(1:6)
-             MOVE   "__"                         TO  SYU-SRYYMD(7:2)
-             MOVE   SYUNOU-REC                   TO  MCPDATA-REC
-             MOVE   "DBSELECT"                   TO  MCP-FUNC
-             MOVE   "tbl_syunou"                 TO  MCP-TABLE
-             MOVE   "key35"                      TO  MCP-PATHNAME
-             CALL   "ORCDBMAIN"               USING  MCPAREA
-                                                     MCPDATA-REC
-                                                     SPA-AREA
-             IF      MCP-RC  =  ZERO
-               MOVE      "tbl_syunou"            TO  MCP-TABLE
-               MOVE      "key35"                 TO  MCP-PATHNAME
-               PERFORM    900-SYUNOU-READ-SEC
-               PERFORM    UNTIL  FLG-SYUNOU  =  1
-                 IF  SYU-DENPJTIKBN  NOT = "3"
-                   MOVE     7                    TO  SYU-SECMONEY
-      *
-                   MOVE   SYUNOU-REC             TO  MCPDATA-REC
-                   MOVE  "DBUPDATE"              TO  MCP-FUNC
-                   MOVE  "tbl_syunou"            TO  MCP-TABLE
-                   MOVE  "key"                   TO  MCP-PATHNAME
-                   CALL  "ORCDBMAIN"          USING  MCPAREA
-                                                     MCPDATA-REC
-                                                     SPA-AREA
-                 END-IF
-                 MOVE    "tbl_syunou"            TO  MCP-TABLE
-                 MOVE    "key35"                 TO  MCP-PATHNAME
-                 PERFORM  900-SYUNOU-READ-SEC
-               END-PERFORM
-             END-IF
-             MOVE        "tbl_syunou"            TO  MCP-TABLE
-             MOVE        "key35"                 TO  MCP-PATHNAME
-             PERFORM      910-DB-CLOSE-SEC
+      *    患者請求額の変更がある方：該当者チェック抽出分の収納更新
+           INITIALIZE                    WRK-PTID-TABLE
+           MOVE    WRK-PTID-TABLE3  TO   WRK-PTID-TABLE
+           PERFORM    VARYING  IDX1  FROM  1  BY  1
+                       UNTIL  (IDX1            >  10000)
+                        OR    (WRK-PTID(IDX1)  =  ZERO )
+             PERFORM    400-SYUNOU-KOUSIN-SEC
            END-PERFORM
       *
            .
@@ -633,6 +620,53 @@
       *
            .
        300-SYUNOU-DATA-CHECK-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    収納データ更新
+      **************************************************************
+       400-SYUNOU-KOUSIN-SEC           SECTION.
+      *
+           INITIALIZE                              SYUNOU-REC
+           MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SYU-HOSPNUM
+           MOVE   LNK-ORCSSYUNOUCHK-NYUGAIKBN  TO  SYU-NYUGAIKBN
+           MOVE   WRK-PTID(IDX1)               TO  SYU-PTID
+           MOVE   LNK-ORCSSYUNOUCHK-SRYYM      TO  SYU-SRYYMD(1:6)
+           MOVE   "__"                         TO  SYU-SRYYMD(7:2)
+           MOVE   SYUNOU-REC                   TO  MCPDATA-REC
+           MOVE   "DBSELECT"                   TO  MCP-FUNC
+           MOVE   "tbl_syunou"                 TO  MCP-TABLE
+           MOVE   "key35"                      TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"               USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE      "tbl_syunou"            TO  MCP-TABLE
+             MOVE      "key35"                 TO  MCP-PATHNAME
+             PERFORM    900-SYUNOU-READ-SEC
+             PERFORM    UNTIL  FLG-SYUNOU  =  1
+               IF  SYU-DENPJTIKBN  NOT = "3"
+                 MOVE     7                    TO  SYU-SECMONEY
+      *
+                 MOVE   SYUNOU-REC             TO  MCPDATA-REC
+                 MOVE  "DBUPDATE"              TO  MCP-FUNC
+                 MOVE  "tbl_syunou"            TO  MCP-TABLE
+                 MOVE  "key"                   TO  MCP-PATHNAME
+                 CALL  "ORCDBMAIN"          USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               END-IF
+               MOVE    "tbl_syunou"            TO  MCP-TABLE
+               MOVE    "key35"                 TO  MCP-PATHNAME
+               PERFORM  900-SYUNOU-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_syunou"            TO  MCP-TABLE
+           MOVE        "key35"                 TO  MCP-PATHNAME
+           PERFORM      910-DB-CLOSE-SEC
+      *
+           .
+       400-SYUNOU-KOUSIN-EXT.
            EXIT.
       *
       *****************************************************************
