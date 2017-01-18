@@ -41,7 +41,7 @@
       *返却項目
            03  LNK-ORCHCN02SUB-HENKYAKU-AREA.
       *入院返却テーブル
-             04  LNK-ORCHCN02SUB-HENKYAKU-TABLE       OCCURS  10.
+             04  LNK-ORCHCN02SUB-HENKYAKU-TABLE       OCCURS  20.
       *入院料コード
                05  LNK-ORCHCN02SUB-SYUBETUCD          PIC  X(09).
       *入院料名称

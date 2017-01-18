@@ -732,7 +732,7 @@
            MOVE    ZERO      TO     KISAI-IDX
       *
            PERFORM    VARYING   MEISAI-IDX  FROM  1   BY   1
-              UNTIL   (MEISAI-IDX            >   10)     OR
+              UNTIL   (MEISAI-IDX            >   20)     OR
                       (LNK-ORCHCN02SUB-SYUBETUCD(MEISAI-IDX) = SPACE) OR
                       (KISAI-IDX             >=   3)                       
                IF   (LNK-ORCHCN02SUB-SYUBETUCD(MEISAI-IDX) NOT = SPACE)
@@ -756,7 +756,17 @@
                                   LNK-ORCHCN02SUB-NISSU(7)   +
                                   LNK-ORCHCN02SUB-NISSU(8)   +
                                   LNK-ORCHCN02SUB-NISSU(9)   +
-                                  LNK-ORCHCN02SUB-NISSU(10)
+                                  LNK-ORCHCN02SUB-NISSU(10)  +
+                                  LNK-ORCHCN02SUB-NISSU(11)   +
+                                  LNK-ORCHCN02SUB-NISSU(12)   +
+                                  LNK-ORCHCN02SUB-NISSU(13)   +
+                                  LNK-ORCHCN02SUB-NISSU(14)   +
+                                  LNK-ORCHCN02SUB-NISSU(15)   +
+                                  LNK-ORCHCN02SUB-NISSU(16)   +
+                                  LNK-ORCHCN02SUB-NISSU(17)   +
+                                  LNK-ORCHCN02SUB-NISSU(18)   +
+                                  LNK-ORCHCN02SUB-NISSU(19)   +
+                                  LNK-ORCHCN02SUB-NISSU(20)
            MOVE  WRK-Z5                    TO   HCN02-KIKAN
       *
            MOVE   LNK-ORCHCN02SUB-TKIKAN   TO   WRK-Z5
@@ -766,7 +776,7 @@
            MOVE      ZERO         TO      FLG-YOBI
            MOVE      ZERO         TO      WRK-YOBI-NISSU
            PERFORM   VARYING   IDX   FROM  MEISAI-IDX  BY  1
-             UNTIL  (IDX        >    10)    OR
+             UNTIL  (IDX        >    20)    OR
                     (LNK-ORCHCN02SUB-SYUBETUCD(IDX)   =   SPACE)
                 IF   LNK-ORCHCN02SUB-NISSU(IDX)    NOT =   ZERO
                      MOVE   1      TO     FLG-YOBI
