@@ -32,6 +32,7 @@
       * 04.07.00     NACL-多々納  11/10/31  同日再入院対応
       * 04.07.00     NACL-多々納  14/01/17  数量ゼロエラー対応
       * 04.08.00     NACL-多々納  14/07/17  一時ファイル対応
+      * 04.08.00     NACL-多々納  17/01/17  翌月入院料チェック対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -181,6 +182,13 @@
            03  WRK-MAX                 PIC  9(04).
       *
            03  LINE-MAX                PIC 9(04).
+      *H29.1
+      *    翌月入院料チェック
+           03  FLG-NEXTTUKI            PIC 9(01).
+           03  IDN1                    PIC 9(04).
+           03  IDN3                    PIC 9(04).
+           03  IDN4                    PIC 9(04).
+           03  WRK-KAISU               PIC 9(03).
       *
       *
            03  WRK-ERR-MEI             PIC X(80).
@@ -1395,6 +1403,8 @@
            IF      ORCSCHKTCHK-NYUERR  =   1
                MOVE    "0217"              TO  SPA-ERRCD
            END-IF
+      *    翌月入院料算定なし
+           MOVE    ORCSCHKTCHK-NYUERR-2    TO  SPA-NYU-ERR-2
            .
        20015-HKTCHK-INIT-EXT.
            EXIT.
@@ -1557,6 +1567,13 @@
                       (SPA-HKTSANTEI-08    =   1     )  OR
                       (SPA-NYUHKTCHK       =   1     )
                    PERFORM 5109-HKTSANTEI-CHK-SEC
+      *H29.1
+      *            投薬調剤料の翌月チェック
+                   IF     (SPA-KIDCD           =   SPACE )
+                      AND (SPA-K02N-TAIINYMD   =   "99999999")
+                      AND (SPA-NYU-ERR-2       =   1     )
+                       PERFORM 51092-NEXTCHOZAI-CHK-SEC
+                   END-IF
                END-IF
            END-IF
       *
@@ -1891,6 +1908,77 @@
            .
        51091-HKTSANTEI-DEL-EXT.
            EXIT.
+      *
+      *H29.1
+      *****************************************************************
+      *    投薬調剤料の翌月チェック処理
+      *****************************************************************
+       51092-NEXTCHOZAI-CHK-SEC             SECTION.
+      *
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-MAX-LINE   )
+                          OR ((SPA-GMN-INPUTCD(IDX) =   SPACE) AND
+                              (SPA-COM-INPUTCD(IDX) =   SPACE))
+                          OR  (SPA-ERRCD        NOT =   SPACE )
+      *
+      *        薬評・減点・持参薬対象外
+               IF     (SPA-COM-SRYKBN   (IDX)  =   "21"  )
+                AND   (SPA-COM-YAKUHYO  (IDX)  =   SPACE  )
+                AND   (SPA-COM-GENTEN   (IDX)  =   SPACE  )
+                AND   (SPA-COM-JISANYAKU(IDX)  =   SPACE  )
+                AND   (SPA-COM-HOUKATU-ZAI(IDX)    =   1  )
+                AND   (SPA-COM-SRYSYUKBN (IDX) NOT =   "214" )
+                   IF      SPA-COM-ZAIEND (IDX)    =   "1"
+                       PERFORM 51921-DAYCHEK-SEC
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    ZERO                TO  FLG-ERR
+               PERFORM 30010-KEIMSGSYORI-SEC
+           END-IF
+           .
+       51092-NEXTCHOZAI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    最終行に回数の入力があるかのチェック処理
+      *****************************************************************
+       51921-DAYCHEK-SEC             SECTION.
+      *
+           MOVE    SPA-COM-KAISU (IDX) TO  WRK-KAISU
+           IF      WRK-KAISU           =   ZERO
+               MOVE    1               TO  WRK-KAISU
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-NEXTTUKI
+      *    投薬で入院回数の時、回数集計
+           PERFORM VARYING     IDN1    FROM    1   BY  1
+                   UNTIL      (IDN1    >   31  )
+                           OR (FLG-NEXTTUKI    =   1 )
+               IF      SPA-COM-NYUINDAY (IDX IDN1) >   ZERO
+                   MOVE    IDN1                TO  IDN4
+                   PERFORM VARYING     IDN3    FROM    1   BY  1
+                           UNTIL      (IDN3    >   WRK-KAISU )
+                                   OR (FLG-NEXTTUKI    =   1 )
+      *                翌月あり
+                       IF      IDN4            >   SPA-SRYLST-DD
+                           MOVE    1               TO  FLG-NEXTTUKI
+                       END-IF
+                       ADD     1                   TO  IDN4
+                   END-PERFORM
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-NEXTTUKI        =   1
+               MOVE    "K190"              TO  SPA-ERRCD
+           END-IF
+           .
+       51921-DAYCHEK-EXT.
+           EXIT.
+      *H29.1
       *****************************************************************
       *    更新処理処理
       *****************************************************************
