@@ -571,7 +571,7 @@
              MOVE       1     TO    WRK-SKYMONEY-FLG(IDX1)
              MOVE       1     TO    WRK-TOTALTENKBN-A(IDX1)
            ELSE
-      *      患者請求額の変更がない方（収納内部項目の変更あり）
+      *      患者請求額の変更がない方（データ項目値が変更となる収納あり）
              IF (SYU-TOTAL-HKNTEN      NOT = WRK-SYU-TOTAL-HKNTEN      )
              OR (SYU-RSISHOSHIN-MONEY  NOT = WRK-SYU-RSISHOSHIN-MONEY  )
              OR (SYU-RSISAISHIN-MONEY  NOT = WRK-SYU-RSISAISHIN-MONEY  )
