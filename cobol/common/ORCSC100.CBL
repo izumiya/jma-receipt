@@ -912,6 +912,8 @@
                    MOVE    SPACE       TO  SPA-COM-HCHKFLG(IDX)
       *            入院料併用チェック
                    MOVE    SPACE       TO  SPA-COM-KZMFLGNK(IDX)
+      *H29.1       翌入院料チェック
+                   MOVE    SPACE       TO  SPA-COM-KZMFLGN2(IDX)
                    IF      WRK-NYU-KAI NOT =   SPA-COM-NYU-KAI (IDX)
                        MOVE    SPACE       TO  SPA-COM-TUKIJGNFLG (IDX)
                        MOVE    SPACE       TO  SPA-COM-TUKIJGNFLG1(IDX)
@@ -2109,8 +2111,20 @@
                MOVE    WRK-GMN-INPUTCD (IDX-Z) TO  WRK-HEN-INPUTCD
                MOVE    SPACE                   TO  WRK-GMN-INPUTCD
                                                             (IDX-Z)
-      *
-               STRING  WRK-HEN-INPUTCD         DELIMITED   BY  SPACE
+      *H29.1   最終桁決定
+               MOVE    ZERO                    TO  FLG-OK
+               MOVE    1                       TO  IDX-KAI2
+               PERFORM VARYING     IDX-KAI FROM    54  BY  -1
+                       UNTIL      (IDX-KAI     <   1   )   OR
+                                  (FLG-OK      =   1   )
+                   IF      WRK-HEN-INPUTCD(IDX-KAI:1)
+                                               NOT =   SPACE
+                       MOVE    1               TO  FLG-OK
+                       MOVE    IDX-KAI         TO  IDX-KAI2
+                   END-IF
+               END-PERFORM
+               STRING  WRK-HEN-INPUTCD(1:IDX-KAI2)
+                                               DELIMITED   BY  SIZE
                        "*"                     DELIMITED   BY  SIZE
                        WRK-KAISU-H             DELIMITED   BY  SPACE
                        INTO                    WRK-GMN-INPUTCD(IDX-Z)
@@ -3003,7 +3017,7 @@
            INITIALIZE                  ORCSC00AREA
            MOVE    "3"                 TO  LNK-ORCSC-KBN
            PERFORM 520-ALL-CHEK-SEC
-      *TEST
+      *
       *H26.10
       *    （減）の自動発生行は削除
            IF     (SPA-ERRCD       NOT =   SPACE )
@@ -3021,7 +3035,6 @@
       *        空白行をなくす
                PERFORM 420-SYOKYO-SEC
            END-IF
-      *TEST
       *
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD       NOT =   SPACE )
