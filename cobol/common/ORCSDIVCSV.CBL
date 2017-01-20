@@ -189,7 +189,8 @@
                    MOVE    IDY                 TO  WRK-PO-ED
                    MOVE    1                   TO  FLG-COMMA
                END-IF
-               IF      IDY                 =   WRK-REC-LEN
+               IF     (IDY                 =   WRK-REC-LEN)  AND
+                      (FLG-COMMA           =   0)
                    COMPUTE WRK-PO-ED           =   IDY +   1
                END-IF
       *        デリミタ(")存在するかどうか
