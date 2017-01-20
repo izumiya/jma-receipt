@@ -108,33 +108,33 @@ item_list   :
   item      : "JIBAI-SEIKYUKBN"
   item_jp   : "º´«Â¿’¿¡µ·∂Ë ¨"
   type      : "X"
-  start     : 101
+  start     : 102
   length    : 1
 - item_no   : 17
   item      : "KOMU-SEIKYUKBN"
   item_jp   : "∏¯Ã≥∫“≥≤¿¡µ·∂Ë ¨"
   type      : "X"
-  start     : 102
+  start     : 103
   length    : 1
 - item_no   : 18
   item      : "KYUGYO-PRTKBN"
   item_jp   : "µŸ∂»æ⁄Ã¿µ≠∫‹∂Ë ¨"
   type      : "X"
-  start     : 103
+  start     : 104
   length    : 1
 - item_no   : 19
   item      : "KOMURSITANKAKBN"
   item_jp   : "∏¯Ã≥∫“≥≤œ´∫“Ω‡µÚ≈¿øÙ√±≤¡∂Ë ¨"
   type      : "X"
-  start     : 104
+  start     : 105
   length    : 1
 - item_no   : 20
   item      : "KOMURSITANKA"
-  item_jp   : "∏¯Ã≥∫“≥≤œ´∫“Ω‡µÚ≈¿øÙ√±≤¡∂Ë ¨"
+  item_jp   : "∏¯Ã≥∫“≥≤œ´∫“Ω‡µÚ≈¿øÙ√±≤¡"
   type      : "9"
-  start     : 105
-  length    : 5
-  precision : 0
+  start     : 106
+  length    : 4
+  precision : 2
 - item_no   : 21
   item      : "SYUTENTANKA2"
   item_jp   : "º´«Â¿’° ∑Ú ›Ω‡µÚ°ÀµªΩ—≈¿√±≤¡°„∆˛±°°‰"

@@ -99,6 +99,7 @@
            03  IDX-STR                 PIC 9(05).
            03  IDX-KET                 PIC 9(05).
            03  IDX-GYO                 PIC 9(05).
+           03  IDX-SYO                 PIC 9(01).
       *
       *    パラメタ領域
        01  WRK-PARA.
@@ -126,6 +127,12 @@
                05  WRK-HENMEISAI       PIC X(110)  OCCURS  7.
       *
            03  WRK-CSVREC              PIC X(20000).
+      *
+           03  WRK-SUUJI-G.
+               05  WRK-SUUJI           PIC X(20).
+               05  WRK-SEISU           PIC X(10).
+               05  WRK-SYOSU           PIC X(09).
+               05  WRK-HENSUUJI        PIC X(20).
       *
            03  WRK-Z03                 PIC ZZ9.
       *
@@ -461,7 +468,6 @@
                                        ORCSSKDEFAREA
       *        設定内容がない場合はベタ打ち
                IF      ORCSSKDEF-ITEM-MAX  =   ZERO
-      *             MOVE    "（不明）"      TO  ORCSSKDEF-NAME
                    MOVE    "（システム定義未提供）"
                                            TO  ORCSSKDEF-NAME
                    MOVE    1               TO  ORCSSKDEF-ITEM-MAX
@@ -488,8 +494,29 @@
                                        TO  IDX-KET
                MOVE    ORCSSKDEF-ITEM-JP(IDX-MAX)
                                        TO  TOKEI-ITEM(IDX-MAX)
-               MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
-                                       TO  TOKEI-NAIYO(IDX-MAX)
+      *        小数点の場合
+               IF    ( ORCSSKDEF-TYPE(IDX-MAX) =   "9" )   AND
+                     ( ORCSSKDEF-PRECISION(IDX-MAX)    >   0 )
+                   MOVE    SPACE                   TO  WRK-SUUJI-G
+                   MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
+                                                   TO  WRK-SUUJI
+                   MOVE    ORCSSKDEF-PRECISION(IDX-MAX)
+                                                   TO  IDX-SYO
+                   COMPUTE IDX-STR =   IDX-KET -   IDX-SYO
+                   MOVE    WRK-SUUJI(1:IDX-STR)    TO  WRK-SEISU
+                   COMPUTE IDX-STR =   IDX-STR +   1
+                   MOVE    WRK-SUUJI(IDX-STR:IDX-SYO)
+                                                   TO  WRK-SYOSU
+                   STRING  WRK-SEISU       DELIMITED BY SPACE
+                           "."             DELIMITED BY SIZE
+                           WRK-SYOSU       DELIMITED BY SPACE
+                           INTO            WRK-HENSUUJI
+                   END-STRING
+                   MOVE    WRK-HENSUUJI    TO  TOKEI-NAIYO(IDX-MAX)
+               ELSE
+                   MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
+                                           TO  TOKEI-NAIYO(IDX-MAX)
+               END-IF
            END-PERFORM
       *
            WRITE   TOKEI-REC

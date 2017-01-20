@@ -125,31 +125,31 @@ item_list   :
   length    : 1
 - item_no   : 21
   item      : "GMNHYOKBN1"
-  item_jp   : "リハビリ・患者情報表示区分１"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分１"
   type      : "X"
   start     : 22
   length    : 1
 - item_no   : 22
   item      : "GMNHYOKBN2"
-  item_jp   : "リハビリ・患者情報表示区分２"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分２"
   type      : "X"
   start     : 23
   length    : 1
 - item_no   : 23
   item      : "GMNHYOKBN3"
-  item_jp   : "リハビリ・患者情報表示区分３"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分３"
   type      : "X"
   start     : 24
   length    : 1
 - item_no   : 24
   item      : "GMNHYOKBN4"
-  item_jp   : "リハビリ・患者情報表示区分４"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分４"
   type      : "X"
   start     : 25
   length    : 1
 - item_no   : 25
   item      : "GMNHYOKBN5"
-  item_jp   : "リハビリ・患者情報表示区分５"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分５"
   type      : "X"
   start     : 26
   length    : 1
@@ -251,7 +251,7 @@ item_list   :
   length    : 1
 - item_no   : 42
   item      : "GMNHYOKBN-6"
-  item_jp   : "リハビリ・患者情報・介護表示区分６"
+  item_jp   : "リハビリ・患者情報・介護状態表示区分６"
   type      : "X"
   start     : 238
   length    : 1
