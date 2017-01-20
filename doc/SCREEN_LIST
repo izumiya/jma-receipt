@@ -230,6 +230,7 @@ I49.glade	orca32	(I49)ｐカ入力
 I411.glade	orca32	(I411)入院会計照会−保険組合せ選択
 I4ERR.glade	orca32	(I4ERR)エラー情報
 I4ID1.glade	orca32	(I4ID1)確認画面
+I4ID2.glade	orca32	(I4ID2)確認画面
 
 O01.glade	orca33	(O01)患者請求−定期請求
 O02.glade	orca33	(O02)患者請求−個別指示
