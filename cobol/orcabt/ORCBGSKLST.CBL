@@ -58,7 +58,7 @@
                05  TOKEI-EDYUKYMD      PIC X(08).
            03  TOKEI-NAME              PIC X(40).
            03  TOKEI-MAX               PIC 9(03).
-           03  TOKEI-ITEM              PIC X(80)   OCCURS 500.
+           03  TOKEI-ITEM              PIC X(100)   OCCURS 500.
            03  TOKEI-NAIYO             PIC X(500)  OCCURS 500.
       *
       *    エラーファイル
@@ -84,7 +84,7 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-TOKEI               PIC 9(01).
-           03  FLG-OK                  PIC 9(01).
+           03  FLG-SYS0031             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -94,11 +94,11 @@
       *
       *    添字領域
        01  IDX-AREA.
-           03  IDX-PARA                PIC 9(05).
-           03  IDX-MAX                 PIC 9(05).
-           03  IDX-STR                 PIC 9(05).
-           03  IDX-KET                 PIC 9(05).
-           03  IDX-GYO                 PIC 9(05).
+           03  IDX-PARA                PIC 9(02).
+           03  IDX-MAX                 PIC 9(03).
+           03  IDX-STR                 PIC 9(03).
+           03  IDX-KET                 PIC 9(03).
+           03  IDX-GYO                 PIC 9(01).
            03  IDX-SYO                 PIC 9(01).
       *
       *    パラメタ領域
@@ -122,6 +122,7 @@
       *
            03  WRK-SYSYMD              PIC X(08).
            03  WRK-KANRICD             PIC X(04).
+           03  WRK-KBNCD               PIC 9(04).
            03  WRK-MEISAI              PIC X(600).
            03  WRK-HENMEISAI-G.
                05  WRK-HENMEISAI       PIC X(110)  OCCURS  7.
@@ -186,6 +187,8 @@
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
+      *    施設基準コード
+           COPY    "CPSK0031.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -420,10 +423,16 @@
            PERFORM 900-SYSKANRI-DBSELECT-SEC
       *
            PERFORM UNTIL   FLG-SYSKANRI    =   1
-               IF      SYS-KANRICD     >=  "1001"
-      *            システム管理定義取得サブチェック
-                   PERFORM 220-MAIN-SUBCHK-SEC
-               END-IF
+               EVALUATE    SYS-KANRICD
+                   WHEN    "0000"  THRU  "1000"
+                       CONTINUE
+                   WHEN    "1006"
+      *                施設基準チェック
+                       PERFORM 220-MAIN-SSTKJN-SEC
+                   WHEN    OTHER
+      *                システム管理定義取得サブチェック
+                       PERFORM 220-MAIN-SUBCHK-SEC
+               END-EVALUATE
       *        システム管理読み込み
                PERFORM 900-SYSKANRI-DBFETCH-SEC
            END-PERFORM
@@ -432,6 +441,72 @@
            PERFORM 900-SYSKANRI-DBCLOSE-SEC
            .
        210-MAIN-SYSKANRI-EXT.
+           EXIT.
+      *****************************************************************
+      *    施設基準チェック
+      *****************************************************************
+       220-MAIN-SSTKJN-SEC         SECTION.
+      *
+      *    項目をセットする
+           PERFORM VARYING IDX-MAX FROM    1   BY  1
+                   UNTIL ( IDX-MAX >   500 )
+               IF      SYS-KANRITBL(IDX-MAX:1) =   "1"
+      *            施設基準セット
+                   PERFORM 230-SSTKJN-SET-SEC
+               END-IF
+           END-PERFORM
+           .
+       220-MAIN-SSTKJN-EXT.
+           EXIT.
+      *****************************************************************
+      *    施設基準セット
+      *****************************************************************
+       230-SSTKJN-SET-SEC         SECTION.
+      *
+           MOVE   ZERO             TO  WRK-KBNCD
+           EVALUATE    SYS-KBNCD
+               WHEN    "1"
+                   MOVE    IDX-MAX     TO  WRK-KBNCD
+               WHEN    "2"
+                   COMPUTE WRK-KBNCD   =   IDX-MAX +   500
+               WHEN    "7"
+                   COMPUTE WRK-KBNCD   =   IDX-MAX +   3000
+               WHEN    "8"
+                   COMPUTE WRK-KBNCD   =   IDX-MAX +   3500
+               WHEN    "17"
+                   COMPUTE WRK-KBNCD   =   IDX-MAX +   8000
+           END-EVALUATE
+      *
+           INITIALIZE                  TOKEI-REC
+           MOVE    SYS-KANRICD     TO  TOKEI-KANRICD
+           MOVE    WRK-KBNCD       TO  TOKEI-KBNCD
+           MOVE    SYS-STYUKYMD    TO  TOKEI-STYUKYMD
+           MOVE    SYS-EDYUKYMD    TO  TOKEI-EDYUKYMD
+      *
+           PERFORM 900-TOKEI-READ-SEC
+      *    データがある場合は抜ける
+           IF      FLG-TOKEI       =   ZERO
+               GO  TO  230-SSTKJN-SET-EXT
+           END-IF
+      *
+           COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
+      *
+           MOVE    "施設基準情報コード"
+                                   TO  TOKEI-NAME
+           MOVE    1               TO  TOKEI-MAX
+           MOVE    "1"             TO  TOKEI-NAIYO(TOKEI-MAX)
+      *
+      *    システム管理マスタ検索（施設基準コード）
+           PERFORM 900-SYS0031-READ-SEC
+           STRING  WRK-KBNCD           DELIMITED   BY  SPACE
+                   "："                DELIMITED   BY  SIZE
+                   SYS-0031-SSTKIJUN   DELIMITED   BY  SPACE
+                   INTO                TOKEI-ITEM(1)
+           END-STRING
+      *
+           WRITE   TOKEI-REC
+           .
+       230-SSTKJN-SET-EXT.
            EXIT.
       *****************************************************************
       *    システム管理定義取得サブチェック
@@ -485,43 +560,53 @@
                                    TO  TOKEI-MAX
       *
       *    項目をセットする
-           PERFORM VARYING IDX-MAX     FROM    1   BY  1
-                   UNTIL ( IDX-MAX     >   500 )
-                   OR    ( IDX-MAX     >   ORCSSKDEF-ITEM-MAX )
-               MOVE    ORCSSKDEF-START(IDX-MAX)
-                                       TO  IDX-STR
-               MOVE    ORCSSKDEF-LENGTH(IDX-MAX)
-                                       TO  IDX-KET
-               MOVE    ORCSSKDEF-ITEM-JP(IDX-MAX)
-                                       TO  TOKEI-ITEM(IDX-MAX)
-      *        小数点の場合
-               IF    ( ORCSSKDEF-TYPE(IDX-MAX) =   "9" )   AND
-                     ( ORCSSKDEF-PRECISION(IDX-MAX)    >   0 )
-                   MOVE    SPACE                   TO  WRK-SUUJI-G
-                   MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
-                                                   TO  WRK-SUUJI
-                   MOVE    ORCSSKDEF-PRECISION(IDX-MAX)
-                                                   TO  IDX-SYO
-                   COMPUTE IDX-STR =   IDX-KET -   IDX-SYO
-                   MOVE    WRK-SUUJI(1:IDX-STR)    TO  WRK-SEISU
-                   COMPUTE IDX-STR =   IDX-STR +   1
-                   MOVE    WRK-SUUJI(IDX-STR:IDX-SYO)
-                                                   TO  WRK-SYOSU
-                   STRING  WRK-SEISU       DELIMITED BY SPACE
-                           "."             DELIMITED BY SIZE
-                           WRK-SYOSU       DELIMITED BY SPACE
-                           INTO            WRK-HENSUUJI
-                   END-STRING
-                   MOVE    WRK-HENSUUJI    TO  TOKEI-NAIYO(IDX-MAX)
-               ELSE
-                   MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
-                                           TO  TOKEI-NAIYO(IDX-MAX)
-               END-IF
+           PERFORM VARYING IDX-MAX FROM    1   BY  1
+                   UNTIL ( IDX-MAX >   500 )
+                   OR    ( IDX-MAX >   ORCSSKDEF-ITEM-MAX )
+               PERFORM 230-TOKEI-SET-SEC
            END-PERFORM
       *
            WRITE   TOKEI-REC
            .
        220-MAIN-SUBCHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理定義統計セット
+      *****************************************************************
+       230-TOKEI-SET-SEC           SECTION.
+      *
+           MOVE    ORCSSKDEF-START(IDX-MAX)
+                                   TO  IDX-STR
+           MOVE    ORCSSKDEF-LENGTH(IDX-MAX)
+                                   TO  IDX-KET
+           MOVE    ORCSSKDEF-ITEM-JP(IDX-MAX)
+                                   TO  TOKEI-ITEM(IDX-MAX)
+      *    小数点の場合
+           IF    ( ORCSSKDEF-TYPE(IDX-MAX) =   "9" )   AND
+                 ( ORCSSKDEF-PRECISION(IDX-MAX)    >   0 )
+               MOVE    SPACE           TO  WRK-SUUJI-G
+               MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
+                                       TO  WRK-SUUJI
+               MOVE    ORCSSKDEF-PRECISION(IDX-MAX)
+                                       TO  IDX-SYO
+               COMPUTE IDX-STR =   IDX-KET -   IDX-SYO
+               MOVE    WRK-SUUJI(1:IDX-STR)
+                                       TO  WRK-SEISU
+               COMPUTE IDX-STR =   IDX-STR +   1
+               MOVE    WRK-SUUJI(IDX-STR:IDX-SYO)
+                                       TO  WRK-SYOSU
+               STRING  WRK-SEISU       DELIMITED BY SPACE
+                       "."             DELIMITED BY SIZE
+                       WRK-SYOSU       DELIMITED BY SPACE
+                       INTO            WRK-HENSUUJI
+               END-STRING
+               MOVE    WRK-HENSUUJI    TO  TOKEI-NAIYO(IDX-MAX)
+           ELSE
+               MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
+                                       TO  TOKEI-NAIYO(IDX-MAX)
+           END-IF
+           .
+       230-TOKEI-SET-EXT.
            EXIT.
       *****************************************************************
       *    統計出力処理
@@ -544,10 +629,6 @@
                PERFORM 310-PRT-HEAD-SEC
                PERFORM UNTIL ( FLG-TOKEI   =   1  )
                        OR    ( TOKEI-KANRICD   NOT =   WRK-KANRICD )
-      *            ＣＳＶ区分コード見出し
-                   PERFORM 410-CSV-HEAD2-SEC
-      *            区分コード見出し
-                   PERFORM 310-PRT-HEAD2-SEC
       *            明細
                    PERFORM 320-PRT-MEISAI-SEC
       *            統計ファイル読み込み
@@ -579,6 +660,13 @@
            MOVE    WRK-PRT-SEN     TO  HCMSL80-MOJI(4)
       *
            MOVE    4               TO  CNT-LINE
+      *
+           IF       TOKEI-KANRICD  =   "1006"
+      *        ＣＳＶ区分コード見出し
+               PERFORM 410-CSV-HEAD2-SEC
+      *        区分コード見出し
+               PERFORM 310-PRT-HEAD2-SEC
+           END-IF
            .
        310-PRT-HEAD-EXT.
            EXIT.
@@ -587,42 +675,27 @@
       *****************************************************************
        310-PRT-HEAD2-SEC           SECTION.
       *
-           IF      CNT-LINE        >=  80
-      *        帳票編集処理
-               PERFORM 390-PRINT-OUT-SEC
-      *        見出し
-               PERFORM 310-PRT-HEAD-SEC
-           END-IF
-      *
-           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+      *    改ページチェック
+           PERFORM 380-KAIPAGE-CHK-SEC
       *
            IF      CNT-LINE    >   5
                MOVE    WRK-PRT-SEN     TO  HCMSL80-MOJI(CNT-LINE)
-      *
-               IF      CNT-LINE        >=  80
-      *            帳票編集処理
-                   PERFORM 390-PRINT-OUT-SEC
-      *            見出し
-                   PERFORM 310-PRT-HEAD-SEC
-               END-IF
-      *
-               COMPUTE CNT-LINE    =   CNT-LINE    +   1
+      *        改ページチェック
+               PERFORM 380-KAIPAGE-CHK-SEC
            END-IF
       *
-           MOVE    TOKEI-KBNCD     TO  WRK-PRT-KBNCD
+           IF       TOKEI-KANRICD  =   "1006"
+               MOVE    "*"             TO  WRK-PRT-KBNCD
+           ELSE
+               MOVE    TOKEI-KBNCD     TO  WRK-PRT-KBNCD
+           END-IF
            MOVE    TOKEI-STYUKYMD  TO  WRK-PRT-STYUKYMD
            MOVE    TOKEI-EDYUKYMD  TO  WRK-PRT-EDYUKYMD
       *
            MOVE    WRK-PRT-LINE3   TO  HCMSL80-MOJI(CNT-LINE)
       *
-           IF      CNT-LINE        >=  80
-      *        帳票編集処理
-               PERFORM 390-PRINT-OUT-SEC
-      *        見出し
-               PERFORM 310-PRT-HEAD-SEC
-           END-IF
-      *
-           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+      *    改ページチェック
+           PERFORM 380-KAIPAGE-CHK-SEC
            .
        310-PRT-HEAD2-EXT.
            EXIT.
@@ -631,57 +704,64 @@
       *****************************************************************
        320-PRT-MEISAI-SEC          SECTION.
       *
+           IF       TOKEI-KANRICD  NOT =   "1006"
+      *        ＣＳＶ区分コード見出し
+               PERFORM 410-CSV-HEAD2-SEC
+      *        区分コード見出し
+               PERFORM 310-PRT-HEAD2-SEC
+           END-IF
+      *
       *    項目をセットする
            PERFORM VARYING IDX-MAX     FROM    1   BY  1
                    UNTIL ( IDX-MAX     >   500 )
                    OR    ( IDX-MAX     >   TOKEI-MAX )
-      *
-               MOVE    SPACE           TO  WRK-MEISAI
-               IF      TOKEI-ITEM(IDX-MAX)(17:)
-                                       NOT =   SPACE
-                   STRING  TOKEI-ITEM(IDX-MAX) DELIMITED   BY  SPACE
-                           "："                DELIMITED   BY  SIZE
-                           TOKEI-NAIYO(IDX-MAX)
-                                               DELIMITED   BY  SPACE
-                           INTO                WRK-MEISAI
-                   END-STRING
-               ELSE
-                   MOVE    TOKEI-ITEM(IDX-MAX)
-                                           TO  WRK-MEISAI(1:16)
-                   MOVE    "："            TO  WRK-MEISAI(17:2)
-                   MOVE    TOKEI-NAIYO(IDX-MAX)
-                                           TO  WRK-MEISAI(19:)
-               END-IF
-      *
-      *        ＣＳＶ出力
-               PERFORM 420-CSV-MEISAI-SEC
-      *        帳票文字編集処理
-               PERFORM 330-HENSYU-SYORI-SEC
-      *
-               PERFORM VARYING IDX-STR     FROM    1   BY  1
-                       UNTIL   IDX-STR     >   IDX-GYO
-      *
-                   IF      CNT-LINE        >=  80
-      *                帳票編集処理
-                       PERFORM 390-PRINT-OUT-SEC
-      *                見出し
-                       PERFORM 310-PRT-HEAD-SEC
-                   END-IF
-      *
-                   COMPUTE CNT-LINE    =   CNT-LINE    +   1
-      *
-                   MOVE    WRK-HENMEISAI(IDX-STR)
-                                       TO  HCMSL80-MOJI(CNT-LINE)
-               END-PERFORM
-      *
+               PERFORM 330-MEISAI-HENSYU-SEC
            END-PERFORM
            .
        320-PRT-MEISAI-EXT.
            EXIT.
       *****************************************************************
+      *    明細
+      *****************************************************************
+       330-MEISAI-HENSYU-SEC       SECTION.
+      *
+           IF      TOKEI-ITEM(IDX-MAX)(17:)
+                                   NOT =   SPACE
+               MOVE    SPACE           TO  WRK-MEISAI
+               STRING  TOKEI-ITEM(IDX-MAX) DELIMITED   BY  SPACE
+                       "："                DELIMITED   BY  SIZE
+                       TOKEI-NAIYO(IDX-MAX)
+                                           DELIMITED   BY  SPACE
+                       INTO                WRK-MEISAI
+               END-STRING
+           ELSE
+               MOVE    SPACE           TO  WRK-MEISAI
+               MOVE    TOKEI-ITEM(IDX-MAX)
+                                       TO  WRK-MEISAI(1:16)
+               MOVE    "："            TO  WRK-MEISAI(17:2)
+               MOVE    TOKEI-NAIYO(IDX-MAX)
+                                       TO  WRK-MEISAI(19:)
+           END-IF
+      *
+      *    ＣＳＶ出力
+           PERFORM 420-CSV-MEISAI-SEC
+      *    帳票文字編集処理
+           PERFORM 340-HENSYU-SYORI-SEC
+      *
+           PERFORM VARYING IDX-STR     FROM    1   BY  1
+                   UNTIL   IDX-STR     >   IDX-GYO
+      *        改ページチェック
+               PERFORM 380-KAIPAGE-CHK-SEC
+               MOVE    WRK-HENMEISAI(IDX-STR)
+                                   TO  HCMSL80-MOJI(CNT-LINE)
+           END-PERFORM
+           .
+       330-MEISAI-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
       *    帳票文字編集処理
       *****************************************************************
-       330-HENSYU-SYORI-SEC        SECTION.
+       340-HENSYU-SYORI-SEC        SECTION.
       *
       *    初期値セット
            MOVE    1               TO  IDX-STR
@@ -717,7 +797,22 @@
                END-IF
            END-PERFORM
            .
-       330-HENSYU-SYORI-EXT.
+       340-HENSYU-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    改ページチェック
+      *****************************************************************
+       380-KAIPAGE-CHK-SEC         SECTION.
+      *
+           IF      CNT-LINE        >=  80
+      *        帳票編集処理
+               PERFORM 390-PRINT-OUT-SEC
+      *        見出し
+               PERFORM 310-PRT-HEAD-SEC
+           END-IF
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+           .
+       380-KAIPAGE-CHK-EXT.
            EXIT.
       *****************************************************************
       *    印刷処理
@@ -805,15 +900,26 @@
       *****************************************************************
       *    ＣＳＶ区分コード見出し編集
       *****************************************************************
-       410-CSV-HEAD2-SEC          SECTION.
+       410-CSV-HEAD2-SEC           SECTION.
       *
-           INITIALIZE                  WRK-CSVREC
-           STRING  "区分コード      "  DELIMITED  BY  SIZE
-                   "："                DELIMITED  BY  SIZE
-                   TOKEI-KBNCD         DELIMITED  BY  SIZE
-                   INTO                WRK-CSVREC
-           END-STRING
-           PERFORM 490-CSV-OUT-SEC
+      *    施設基準ならば
+           IF      TOKEI-KANRICD   =   "1006"
+               INITIALIZE                  WRK-CSVREC
+               STRING  "区分コード      "  DELIMITED  BY  SIZE
+                       "："                DELIMITED  BY  SIZE
+                       "*       "          DELIMITED  BY  SIZE
+                       INTO                WRK-CSVREC
+               END-STRING
+               PERFORM 490-CSV-OUT-SEC
+           ELSE
+               INITIALIZE                  WRK-CSVREC
+               STRING  "区分コード      "  DELIMITED  BY  SIZE
+                       "："                DELIMITED  BY  SIZE
+                       TOKEI-KBNCD         DELIMITED  BY  SIZE
+                       INTO                WRK-CSVREC
+               END-STRING
+               PERFORM 490-CSV-OUT-SEC
+           END-IF
       *
            INITIALIZE                  WRK-CSVREC
            STRING  "開始有効年月日  "  DELIMITED  BY  SIZE
@@ -1020,6 +1126,37 @@
            END-READ
            .
        900-TOKEI-NEXT-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索（施設基準コード）
+      *****************************************************************
+       900-SYS0031-READ-SEC       SECTION.
+      *
+           INITIALIZE                  SYS-0031-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-0031-HOSPNUM
+           MOVE    "0031"          TO  SYS-0031-KANRICD
+           MOVE    WRK-KBNCD       TO  SYS-0031-KBNCD
+           MOVE    WRK-SYSYMD      TO  SYS-0031-STYUKYMD
+                                       SYS-0031-EDYUKYMD
+           MOVE    SYS-0031-REC    TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-SYS0031
+               MOVE    MCPDATA-REC     TO  SYS-0031-REC
+           ELSE
+               MOVE    1               TO  FLG-SYS0031
+               INITIALIZE                  SYS-0031-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 900-DBCLOSECURSOR-SEC
+           .
+       900-SYS0031-READ-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索
