@@ -548,6 +548,16 @@
            03  WRK-TOKHIGAITO              PIC X(01).
            03  WRK-BUNBENRRKNUM            PIC 9(03).
       *
+      *    転科／転棟／転室時に異動日の食事会計を退避する項目
+      *    （入院日食事時間開始区分の判定による更新の為）
+           03  WRK-IDOBI-SKJ-SRYYMD.
+               05  WRK-IDOBI-SKJ-SRYYY9    PIC 9(04).
+               05  WRK-IDOBI-SKJ-SRYMM9    PIC 9(02).
+               05  WRK-IDOBI-SKJ-SRYDD9    PIC 9(02).
+           03  WRK-IDOBI-SKJ18             PIC 9(03).
+           03  WRK-IDOBI-SKJ19             PIC 9(03).
+           03  WRK-IDOBI-SKJ20             PIC 9(03).
+      *
       *    食堂加算判定領域
            03  WRK-SHOKUJI-ASA             PIC 9(01).
            03  WRK-SHOKUJI-HIRU            PIC 9(01).
@@ -1664,37 +1674,39 @@
       *
            INITIALIZE              SPA-GMN-I01-CMB-SKJKBN
       *
-           MOVE    "0"             TO  SPA-GMN-I01-SKJKBNL (1)
-           MOVE    "食なし"        TO  SPA-GMN-I01-SKJKBNMEIL (1)
+           MOVE    "A"             TO  SPA-GMN-I01-SKJKBNL (1)
+           MOVE    "変更無し"      TO  SPA-GMN-I01-SKJKBNMEIL (1)
       *
-           MOVE    "1"             TO  SPA-GMN-I01-SKJKBNL (2)
-           MOVE    "食あり"        TO  SPA-GMN-I01-SKJKBNMEIL (2)
+           MOVE    "0"             TO  SPA-GMN-I01-SKJKBNL (2)
+           MOVE    "食なし"        TO  SPA-GMN-I01-SKJKBNMEIL (2)
+      *
+           MOVE    "1"             TO  SPA-GMN-I01-SKJKBNL (3)
+           MOVE    "食あり"        TO  SPA-GMN-I01-SKJKBNMEIL (3)
       *
            IF     WRK-KJNYMD       <=  "20160331"
              IF    ( SYS-5000-SHOKUJIRYOYOCD
                                    =   CONST-SKJRYOYO2 )
-               MOVE    2           TO  SPA-GMN-I01-SKJKBN-CNT
-             ELSE
                MOVE    3           TO  SPA-GMN-I01-SKJKBN-CNT
-      *
-               MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (3)
-               MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (3)
-             END-IF
-           ELSE
-             IF    ( SYS-5000-SHOKUJIRYOYOCD
-                                     =   CONST-SKJRYOYO2 )
-               MOVE    3           TO  SPA-GMN-I01-SKJKBN-CNT
-      *
-               MOVE    "3"         TO  SPA-GMN-I01-SKJKBNL (3)
-               MOVE    "流動食"    TO  SPA-GMN-I01-SKJKBNMEIL (3)
              ELSE
                MOVE    4           TO  SPA-GMN-I01-SKJKBN-CNT
       *
-               MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (3)
-               MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (3)
+               MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (4)
+               MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (4)
+             END-IF
+           ELSE
+             IF    ( SYS-5000-SHOKUJIRYOYOCD
+                                   =   CONST-SKJRYOYO2 )
+               MOVE    4           TO  SPA-GMN-I01-SKJKBN-CNT
       *
                MOVE    "3"         TO  SPA-GMN-I01-SKJKBNL (4)
                MOVE    "流動食"    TO  SPA-GMN-I01-SKJKBNMEIL (4)
+             ELSE
+               MOVE    5           TO  SPA-GMN-I01-SKJKBN-CNT
+      *
+               MOVE    "2"         TO  SPA-GMN-I01-SKJKBNL (4)
+               MOVE    "特食"      TO  SPA-GMN-I01-SKJKBNMEIL (4)
+               MOVE    "3"         TO  SPA-GMN-I01-SKJKBNL (5)
+               MOVE    "流動食"    TO  SPA-GMN-I01-SKJKBNMEIL (5)
              END-IF
            END-IF
       *
@@ -3256,6 +3268,9 @@
       *    食事区分
            MOVE    PTNYUINRRK-SKJKBN
                                    TO  WRK-CMB-CD
+           IF      SPA-GMN-I01-SYORIKBN-CD  =  "08"
+               MOVE    "A"         TO  WRK-CMB-CD
+           END-IF
            PERFORM 4103-CMB-SKJKBN-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-SKJKBN
@@ -6752,10 +6767,18 @@
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-SKJKBN
            END-IF
       *
-           IF    ( SPA-GMN-I01-SKJKBN-CD   =   "0" )
-               MOVE    "0"         TO  SPA-GMN-I01-TIMEKBN-CD
+           IF  SPA-GMN-I01-SYORIKBN-CD  =   "01"
+             IF    ( SPA-GMN-I01-SKJKBN-CD   =   "0" )
+                 MOVE    "0"         TO  SPA-GMN-I01-TIMEKBN-CD
+             END-IF
            END-IF
       *
+           IF   SPA-GMN-I01-SYORIKBN-CD  =   "01"   AND
+                SPA-GMN-I01-SKJKBN-CD    =   "A"
+               MOVE    "1049"      TO  SPA-ERRCD
+               MOVE    21          TO  SPA-GMN-I01-CUR
+               GO  TO  4101-SKJKBN-CHK-EXT
+           END-IF
            .
       *
        4101-SKJKBN-CHK-EXT.
@@ -14129,7 +14152,7 @@
            INITIALIZE                          WRK-TENROOM-SKJ-TABLE
       *
            IF  SPA-NAI-I01-IDOYMD(1:6)  >= "200604"
-      *
+            IF  PTNYUINRRK-SKJKBN       =  "A"
       *      前月末日の食事会計取得
       *     （異動日の入院会計が存在しない場合、前月末の食事情報取得の為）
              MOVE    SPA-NAI-I01-IDOYMD(1:6)
@@ -14393,6 +14416,7 @@
                END-EVALUATE
                PERFORM 910-DBCLOSECURSOR-SEC
              END-PERFORM
+            END-IF
            ELSE
       *       ここから２００６年３月以前の食事退避処理
       *      （異動月分）
@@ -14777,6 +14801,77 @@
                WHEN   "3"
                       MOVE   3     TO  LNK-SCNYUACCT-SHOKUJIKBN
            END-EVALUATE
+      *    入院日と異動日が同日である場合、入院時にセットした
+      *    「入院日食事開始時間区分」以降が食事の更新対象となる為
+      *    該当日の朝食、昼食、夕食を更新後に戻せるように退避しておく
+           MOVE    ZERO               TO  WRK-IDOBI-SKJ18
+                                          WRK-IDOBI-SKJ19
+                                          WRK-IDOBI-SKJ20
+           IF   PTNYUINRRK-NYUINYMD   =   SPA-NAI-I01-IDOYMD
+              IF   PTNYUINRRK-TIMEKBN-IN   =   "1"
+      *            朝食からの算定時は処理をスルーする
+                   CONTINUE
+              ELSE
+                PERFORM   VARYING   IDX-SKJ-TAIHI  FROM  1 BY  1
+                  UNTIL   IDX-SKJ-TAIHI  >    3
+                  INITIALIZE                      NYUINACCT-REC
+                  MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+                  MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+                  MOVE    SPA-NAI-I01-IDOYMD(1:6)
+                                              TO  NACCT-SRYYM
+                  MOVE    SPA-NAI-I01-IDOYMD  TO  WRK-IDOBI-SKJ-SRYYMD
+      *
+                  EVALUATE   IDX-SKJ-TAIHI
+                      WHEN    1
+                          MOVE    "key30"     TO  MCP-PATHNAME
+                      WHEN    2
+                          MOVE    "key31"     TO  MCP-PATHNAME
+                      WHEN    3
+                          MOVE    "key32"     TO  MCP-PATHNAME
+                  END-EVALUATE
+                  PERFORM  910-NYUINACCT-SELECT-SEC
+                  EVALUATE   IDX-SKJ-TAIHI
+                      WHEN    1
+                          MOVE    "key30"     TO  MCP-PATHNAME
+                      WHEN    2
+                          MOVE    "key31"     TO  MCP-PATHNAME
+                      WHEN    3
+                          MOVE    "key32"     TO  MCP-PATHNAME
+                  END-EVALUATE
+                  PERFORM  910-NYUINACCT-READ-SEC
+                  IF      FLG-NYUINACCT        =   ZERO
+                    MOVE     MCPDATA-REC    TO  NYUINACCT-REC
+      *             異動日の食事を退避
+                    EVALUATE  IDX-SKJ-TAIHI
+                      WHEN  1
+                           MOVE   NACCT-DAY(WRK-IDOBI-SKJ-SRYDD9)
+                                         TO WRK-IDOBI-SKJ18
+                      WHEN  2
+                           MOVE   NACCT-DAY(WRK-IDOBI-SKJ-SRYDD9)
+                                         TO WRK-IDOBI-SKJ19
+                      WHEN  3
+                           MOVE   NACCT-DAY(WRK-IDOBI-SKJ-SRYDD9)
+                                         TO WRK-IDOBI-SKJ20
+                    END-EVALUATE
+                  END-IF
+      *           入院会計マスタクローズ
+                  MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                  EVALUATE   IDX-SKJ-TAIHI
+                      WHEN    1
+                          MOVE    "key30"     TO  MCP-PATHNAME
+                      WHEN    2
+                          MOVE    "key31"     TO  MCP-PATHNAME
+                      WHEN    3
+                          MOVE    "key32"     TO  MCP-PATHNAME
+                  END-EVALUATE
+                  PERFORM 910-DBCLOSECURSOR-SEC
+                END-PERFORM
+              END-IF
+           END-IF
+           DISPLAY "WRK-IDOBI-SKJ18 = " WRK-IDOBI-SKJ18
+           DISPLAY "WRK-IDOBI-SKJ19 = " WRK-IDOBI-SKJ19
+           DISPLAY "WRK-IDOBI-SKJ20 = " WRK-IDOBI-SKJ20
+      *
       *    食堂加算
            PERFORM     4801-BTUSEL-SEC
            IF   FLG-SYSKANRI           =    ZERO
@@ -14964,6 +15059,7 @@
       *
       *    入院会計作成後に退避データの食事区分を復元
            IF  SPA-NAI-I01-IDOYMD(1:6)  >= "200604"
+             IF  PTNYUINRRK-SKJKBN       =  "A"
       *       （異動月分）
                IF   WRK-TENROOM-SKJ-SRYYM(1)  NOT =   SPACE
                 PERFORM    VARYING  IDX-SKJ-TAIHI  FROM  1  BY  1
@@ -15122,6 +15218,116 @@
                    PERFORM 910-DBCLOSECURSOR-SEC
                END-PERFORM
                END-IF
+             ELSE
+      *        入院日と異動日が同日である場合、退避した食事を入院日食事
+      *        時間より前の部分について退避したデータより復元する
+               IF   PTNYUINRRK-NYUINYMD   =   SPA-NAI-I01-IDOYMD
+                  IF   PTNYUINRRK-TIMEKBN-IN   =   "1"
+      *             朝食からの算定時は処理をスルーする
+                    CONTINUE
+                  ELSE
+      *             入院日食事時間区分が0:食なし−朝食、昼食、夕食を戻す
+      *             入院日食事時間区分が2:昼から−朝食を戻す
+      *             入院日食事時間区分が3:夕から−朝食、昼食を戻す
+      *
+      *             朝食の戻し処理
+                    IF   PTNYUINRRK-TIMEKBN-IN   =   "0" OR "2" OR "3"
+                      INITIALIZE                      NYUINACCT-REC
+                      MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                      MOVE    PTNYUINRRK-PTID      TO  NACCT-PTID
+                      MOVE    WRK-IDOBI-SKJ-SRYYMD(1:6)
+                                                   TO  NACCT-SRYYM
+                      MOVE    "key30"              TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-SELECT-SEC
+                      MOVE    "key30"     TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-READ-SEC
+      *               食事を復元
+                      MOVE   WRK-IDOBI-SKJ18       TO  NACCT-DAY
+                                                 (WRK-IDOBI-SKJ-SRYDD9)
+      *               剤回数再セット
+                      MOVE  ZERO                   TO  NACCT-ZAIKAISU
+                      PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+                                 UNTIL     IDX-SKJ   >   31
+                         IF   NACCT-DAY(IDX-SKJ)   NOT =  0
+                             ADD   1        TO  NACCT-ZAIKAISU
+                         END-IF
+                      END-PERFORM
+                      MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+                      MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+                      MOVE     "key"              TO  MCP-PATHNAME
+                      PERFORM 910-DBUPDATE-SEC
+      *               入院会計マスタクローズ
+                      MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                      MOVE    "key30"             TO  MCP-PATHNAME
+                      PERFORM 910-DBCLOSECURSOR-SEC
+                    END-IF
+      *
+      *             昼食の戻し処理
+                    IF   PTNYUINRRK-TIMEKBN-IN   =   "0" OR "3"
+                      INITIALIZE                      NYUINACCT-REC
+                      MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                      MOVE    PTNYUINRRK-PTID      TO  NACCT-PTID
+                      MOVE    WRK-IDOBI-SKJ-SRYYMD(1:6)
+                                                   TO  NACCT-SRYYM
+                      MOVE    "key31"              TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-SELECT-SEC
+                      MOVE    "key31"     TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-READ-SEC
+      *               食事を復元
+                      MOVE   WRK-IDOBI-SKJ19       TO  NACCT-DAY
+                                                 (WRK-IDOBI-SKJ-SRYDD9)
+      *               剤回数再セット
+                      MOVE  ZERO                   TO  NACCT-ZAIKAISU
+                      PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+                                 UNTIL     IDX-SKJ   >   31
+                         IF   NACCT-DAY(IDX-SKJ)   NOT =  0
+                             ADD   1        TO  NACCT-ZAIKAISU
+                         END-IF
+                      END-PERFORM
+                      MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+                      MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+                      MOVE     "key"              TO  MCP-PATHNAME
+                      PERFORM 910-DBUPDATE-SEC
+      *               入院会計マスタクローズ
+                      MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                      MOVE    "key31"             TO  MCP-PATHNAME
+                      PERFORM 910-DBCLOSECURSOR-SEC
+                    END-IF
+      *
+      *             夕食の戻し処理
+                    IF   PTNYUINRRK-TIMEKBN-IN   =   "0"
+                      INITIALIZE                      NYUINACCT-REC
+                      MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                      MOVE    PTNYUINRRK-PTID      TO  NACCT-PTID
+                      MOVE    WRK-IDOBI-SKJ-SRYYMD(1:6)
+                                                   TO  NACCT-SRYYM
+                      MOVE    "key32"              TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-SELECT-SEC
+                      MOVE    "key32"     TO  MCP-PATHNAME
+                      PERFORM  910-NYUINACCT-READ-SEC
+      *               食事を復元
+                      MOVE   WRK-IDOBI-SKJ20       TO  NACCT-DAY
+                                                 (WRK-IDOBI-SKJ-SRYDD9)
+      *               剤回数再セット
+                      MOVE  ZERO                   TO  NACCT-ZAIKAISU
+                      PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
+                                 UNTIL     IDX-SKJ   >   31
+                         IF   NACCT-DAY(IDX-SKJ)   NOT =  0
+                             ADD   1        TO  NACCT-ZAIKAISU
+                         END-IF
+                      END-PERFORM
+                      MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+                      MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+                      MOVE     "key"              TO  MCP-PATHNAME
+                      PERFORM 910-DBUPDATE-SEC
+      *               入院会計マスタクローズ
+                      MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                      MOVE    "key32"             TO  MCP-PATHNAME
+                      PERFORM 910-DBCLOSECURSOR-SEC
+                    END-IF
+                  END-IF
+               END-IF
+             END-IF
            ELSE
       *       （異動月分）
                INITIALIZE                      NYUINACCT-REC
@@ -17506,6 +17712,8 @@
            MOVE    NRRK-RRKNUM     TO  WRK-BUNBENRRKNUM
            PERFORM 900-BUNBEN-KEY3-SEL-SEC
            IF    ( FLG-BUNBEN      =   ZERO )
+            AND  ( SPA-GMN-I01-BUNBEN-CD
+                                   =   "1" OR "2" )
                MOVE    "000000"    TO  BUNBEN-SKYYM
                INITIALIZE              BUNBEN-TEISYUTUBIKBN
                                        BUNBEN-SKYKBN
@@ -18741,8 +18949,8 @@
       *
                MOVE    WIDGET-INSENSITIVE
                                    TO  I01-B07-STT
-                                       I01-SKJKBN-STT
-                                       I01-SKJKBN-ITM-STT
+      **                                 I01-SKJKBN-STT
+      **                                 I01-SKJKBN-ITM-STT
                                        I01-TIMEKBN-STT
                                        I01-TIMEKBN-ITM-STT
                                        I01-NYUINYMD-STT
@@ -19589,6 +19797,9 @@
                                        TO  SPA-ERRMSG
            WHEN    "1048"
                MOVE    "入院会計を入力して下さい"
+                                       TO  SPA-ERRMSG
+           WHEN    "1049"
+               MOVE    "入院登録時は選択できない食事区分です"
                                        TO  SPA-ERRMSG
            WHEN    "2012"
                MOVE    "退院計算に必要な会計情報が作成されていません"
