@@ -67,6 +67,7 @@
                05  WRK-SKYMONEY-FLG        PIC 9(01).
                05  WRK-TOTALTENKBN-A       PIC 9(01).
                05  WRK-TOTALTENKBN-B       PIC 9(01).
+               05  WRK-CHKNGDATA           PIC 9(01).
       *
            03  WRK-PTID-TABLE2.
              04  WRK-PTID-OCC2             OCCURS   10000.
@@ -75,6 +76,7 @@
                05  WRK-SKYMONEY2-FLG       PIC 9(01).
                05  WRK-TOTALTENKBN2-A      PIC 9(01).
                05  WRK-TOTALTENKBN2-B      PIC 9(01).
+               05  WRK-CHKNGDATA2          PIC 9(01).
       *
            03  WRK-PTID-TABLE3.
              04  WRK-PTID-OCC3             OCCURS   10000.
@@ -83,6 +85,7 @@
                05  WRK-SKYMONEY3-FLG       PIC 9(01).
                05  WRK-TOTALTENKBN3-A      PIC 9(01).
                05  WRK-TOTALTENKBN3-B      PIC 9(01).
+               05  WRK-CHKNGDATA3          PIC 9(01).
       *
            03  WRK-DENPNUM-END-TABLE.
              04  WRK-DENPNUM-END-OCC       OCCURS   100.
@@ -234,45 +237,10 @@
            PERFORM  VARYING  IDX1  FROM  1  BY  1
                      UNTIL  (IDX1            >  10000)
                       OR    (WRK-PTID(IDX1)  =  ZERO )
-             IF  (WRK-GAITOKBN(IDX1)       =   5  )
-             AND (WRK-TOTALTENKBN-A(IDX1)  =  ZERO)
-             AND (WRK-TOTALTENKBN-B(IDX1)  =  ZERO)
-               CONTINUE
+             IF     WRK-CHKNGDATA(IDX1)  =  ZERO
+               PERFORM  500-HENKYAKU-SET-SEC
              ELSE
-               ADD        1     TO   IDX2
-               MOVE  WRK-PTID(IDX1)
-                                TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
-               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-                 ELSE
-                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-                 END-IF
-               ELSE
-                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-               END-IF
-               MOVE  WRK-GAITOKBN(IDX1)
-                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
-      *
-               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                     ADD    1     TO   IDX3
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID2(IDX3)
-                 ELSE
-                   IF  WRK-GAITOKBN(IDX1)  =  5
-                     ADD    1     TO   IDX3
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID2(IDX3)
-                   END-IF
-                 END-IF
-               ELSE
-                 IF    WRK-GAITOKBN(IDX1)  =  5
-                     ADD    1     TO   IDX4
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID3(IDX4)
-                 END-IF
-               END-IF
+               DISPLAY "CHKNGDATA:PTID=" WRK-PTID(IDX1)
              END-IF
            END-PERFORM
       *
@@ -514,6 +482,9 @@
                        PERFORM    300-SYUNOU-DATA-CHECK-SEC
                      END-IF
                    END-PERFORM
+                   IF    FLG-ARI2  =  ZERO
+                     MOVE      1     TO  WRK-CHKNGDATA(IDX1)
+                   END-IF
                  END-IF
                END-IF
       *
@@ -667,6 +638,57 @@
       *
            .
        400-SYUNOU-KOUSIN-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    返却値セット１
+      **************************************************************
+       500-HENKYAKU-SET-SEC           SECTION.
+      *
+           IF     WRK-GAITOKBN(IDX1)   NOT =  ZERO
+             IF  (WRK-TOTALTENKBN-A(IDX1)  =  ZERO)
+             AND (WRK-TOTALTENKBN-B(IDX1)  =  ZERO)
+               CONTINUE
+             ELSE
+               ADD        1     TO   IDX2
+               MOVE  WRK-PTID(IDX1)
+                                TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
+               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+                 ELSE
+                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+                 END-IF
+               ELSE
+                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+               END-IF
+               MOVE  WRK-GAITOKBN(IDX1)
+                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
+      *
+               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                 ELSE
+                   IF  WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                   END-IF
+                 END-IF
+               ELSE
+                 IF    WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX4
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID3(IDX4)
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+      *
+           .
+       500-HENKYAKU-SET-EXT.
            EXIT.
       *
       *****************************************************************
