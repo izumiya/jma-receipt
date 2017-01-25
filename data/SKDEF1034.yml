@@ -1,5 +1,5 @@
-kanri_cd    : "1031"
-name        : "出力先プリンタ名割り当て情報"
+kanri_cd    : "1034"
+name        : "出力先プリンタ名割り当て情報（入院） "
 class_cd    : "*"
 item_max    : 21
 item_list   :
@@ -11,7 +11,7 @@ item_list   :
   length    : 16
 - item_no   : 2
   item      : "PRTNM2"
-  item_jp   : "処方せん（院外）"
+  item_jp   : "退院証明書"
   type      : "X"
   start     : 17
   length    : 16
@@ -23,97 +23,97 @@ item_list   :
   length    : 16
 - item_no   : 4
   item      : "PRTNM4"
-  item_jp   : "診療報酬明細書（レセプト）"
+  item_jp   : "診療録（カルテ３号紙）"
   type      : "X"
   start     : 49
   length    : 16
 - item_no   : 5
   item      : "PRTNM5"
-  item_jp   : "総括表／保険請求書"
+  item_jp   : "診療録（カルテ３号紙）追記"
   type      : "X"
   start     : 65
   length    : 16
 - item_no   : 6
   item      : "PRTNM6"
-  item_jp   : "各種統計表"
+  item_jp   : "入院処方箋"
   type      : "X"
   start     : 81
   length    : 16
 - item_no   : 7
   item      : "PRTNM7"
-  item_jp   : "受付一覧"
+  item_jp   : "注射処方箋"
   type      : "X"
   start     : 97
   length    : 16
 - item_no   : 8
   item      : "PRTNM8"
-  item_jp   : "薬剤情報提供書"
+  item_jp   : "指示箋"
   type      : "X"
   start     : 113
   length    : 16
 - item_no   : 9
   item      : "PRTNM9"
-  item_jp   : "支払証明書（日別）"
+  item_jp   : "診療費明細書"
   type      : "X"
   start     : 129
   length    : 16
 - item_no   : 10
   item      : "PRTNM10"
-  item_jp   : "診療録（カルテ３号紙）"
+  item_jp   : "薬剤情報提供書"
   type      : "X"
   start     : 145
   length    : 16
 - item_no   : 11
   item      : "PRTNM11"
-  item_jp   : "データチェック"
+  item_jp   : "お薬手帳"
   type      : "X"
   start     : 161
   length    : 16
 - item_no   : 12
   item      : "PRTNM12"
-  item_jp   : "支払証明書（月別）"
+  item_jp   : "処方せん（退院時院外）"
   type      : "X"
   start     : 177
   length    : 16
 - item_no   : 13
   item      : "PRTNM13"
-  item_jp   : "診療録（カルテ３号紙）追記"
+  item_jp   : "分娩費用明細書"
   type      : "X"
   start     : 193
   length    : 16
 - item_no   : 14
   item      : "PRTNM14"
-  item_jp   : "診療費明細書"
+  item_jp   : "医療区分・ＡＤＬ区分評価票"
   type      : "X"
   start     : 209
   length    : 16
 - item_no   : 15
   item      : "PRTNM15"
-  item_jp   : "自費内訳明細書"
+  item_jp   : "帳票未設定"
   type      : "X"
   start     : 225
   length    : 16
 - item_no   : 16
   item      : "PRTNM16"
-  item_jp   : "お薬手帳"
+  item_jp   : "帳票未設定"
   type      : "X"
   start     : 241
   length    : 16
 - item_no   : 17
   item      : "PRTNM17"
-  item_jp   : "予約票"
+  item_jp   : "帳票未設定"
   type      : "X"
   start     : 257
   length    : 16
 - item_no   : 18
   item      : "PRTNM18"
-  item_jp   : "予約一覧"
+  item_jp   : "帳票未設定"
   type      : "X"
   start     : 273
   length    : 16
 - item_no   : 19
   item      : "PRTNM19"
-  item_jp   : "予約患者一覧"
+  item_jp   : "帳票未設定"
   type      : "X"
   start     : 289
   length    : 16
