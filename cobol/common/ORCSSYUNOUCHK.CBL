@@ -285,6 +285,8 @@
       **************************************************************
        100-IKATUSAIKEI-SEC           SECTION.
       *
+           MOVE   SPACE   TO  SPA-ERRCD
+      *
            MOVE   ZERO    TO  IDX2
            INITIALIZE         WRK-DENPNUM-END-TABLE
       *
