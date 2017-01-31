@@ -2061,9 +2061,12 @@
       *    自費の時、計を表示しない
            IF    ((WRK-JIHIMONEY       >   ZERO  )
       *        自賠責金額入力以外
-             AND (LNK-WKSRY-SRYKBN(01)(1:1)    =   "9" ))  OR
+             AND (LNK-WKSRY-SRYKBN(01)(1:1)    =   "9" ))
+      *H29.1  自費は金額ゼロも対象
+           OR    (LNK-WKSRY-SRYKBN(01)         =   "95"
+                                               OR  "96")
       *        回数入力がなく、入院回数入力がある時、入院回数のみ
-                 ((FLG-KAISUU-ARI      =   ZERO )  AND
+           OR    ((FLG-KAISUU-ARI      =   ZERO )  AND
                   (FLG-KAISUU-ARI2     =   1    ))
                MOVE    ZERO                TO  SPA-NAI-HKNTEN  (IDX-NAI)
                CONTINUE
