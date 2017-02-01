@@ -1028,7 +1028,7 @@
            IF      WRK-PAGEALL         =   1
       *
                PERFORM VARYING     IDX2    FROM    1   BY  1
-                       UNTIL       IDX2    >   LINE-MAX
+                       UNTIL       IDX2    >   LINE-MAX1
                    MOVE    TBL-H-SRYKBN (IDX IDX2)
                                           TO  HCM03V04-SRYKBN1 (IDX2)
                    MOVE    TBL-H-SRYMEI (IDX IDX2)
@@ -1075,7 +1075,7 @@
            ELSE
       *        £²ËçÌÜ
                PERFORM VARYING     IDX2    FROM    1   BY  1
-                       UNTIL       IDX2    >   LINE-MAX
+                       UNTIL       IDX2    >   LINE-MAX2
                    MOVE    TBL-H-SRYKBN (IDX IDX2)
                                           TO  HCM03V04-SRYKBN2 (IDX2)
                    MOVE    TBL-H-SRYMEI (IDX IDX2)
