@@ -741,22 +741,23 @@
              MOVE      "key18"                 TO  MCP-PATHNAME
              PERFORM    900-SYUMEI-READ-SEC
              PERFORM    UNTIL  FLG-SYUMEI  =  1
+               IF  SMEI-NYUHEN-YMD  =  SPACE
+                 DISPLAY "<SMEI> PTID=" SMEI-PTID
+                         " DENPNUM=" SMEI-DENPNUM
+                         " DENPEDANUM=" SMEI-DENPEDANUM
       *
-               DISPLAY "<SMEI> PTID=" SMEI-PTID " DENPNUM=" SMEI-DENPNUM
-                       " DENPEDANUM=" SMEI-DENPEDANUM
+                 MOVE   SMEI-CREYMD       TO  SMEI-NYUHEN-YMD
+                 MOVE   SMEI-CREYMD       TO  SMEI-DAILYKEY(1:8)
+                 MOVE   SMEI-CREHMS(1:4)  TO  SMEI-DAILYKEY(9:4)
       *
-               MOVE   SMEI-CREYMD       TO  SMEI-NYUHEN-YMD
-               MOVE   SMEI-CREYMD       TO  SMEI-DAILYKEY(1:8)
-               MOVE   SMEI-CREHMS(1:4)  TO  SMEI-DAILYKEY(9:4)
-      *
-               MOVE   SYUMEI-REC        TO  MCPDATA-REC
-               MOVE  "DBUPDATE"         TO  MCP-FUNC
-               MOVE  "tbl_syumei"       TO  MCP-TABLE
-               MOVE  "key"              TO  MCP-PATHNAME
-               CALL  "ORCDBMAIN"     USING  MCPAREA
-                                            MCPDATA-REC
-                                            SPA-AREA
-      *
+                 MOVE   SYUMEI-REC        TO  MCPDATA-REC
+                 MOVE  "DBUPDATE"         TO  MCP-FUNC
+                 MOVE  "tbl_syumei"       TO  MCP-TABLE
+                 MOVE  "key"              TO  MCP-PATHNAME
+                 CALL  "ORCDBMAIN"     USING  MCPAREA
+                                              MCPDATA-REC
+                                              SPA-AREA
+               END-IF
                MOVE    "tbl_syumei"            TO  MCP-TABLE
                MOVE    "key18"                 TO  MCP-PATHNAME
                PERFORM  900-SYUMEI-READ-SEC
