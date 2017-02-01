@@ -82,6 +82,7 @@
            03  FLG-PTINF               PIC 9(01).
            03  FLG-PTNUM               PIC 9(01).
            03  FLG-OK                  PIC 9(01).
+           03  FLG-SYSKANRI            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -184,6 +185,8 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    システム管理マスタ
+           COPY    "CPSK1001.INC".
       *    患者
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
@@ -300,6 +303,10 @@
            END-UNSTRING
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+           MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
+           PERFORM 900-SYS1001-READ-SEC
+           MOVE    SYS-1001-PREFNUM    TO  SPA-PREFNUM
+           MOVE    SYS-1001-HOSPSBT    TO  SPA-HOSPSBT
       *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
@@ -798,6 +805,39 @@
            PERFORM 900-DBCLOSECURSOR-SEC
            .
        900-PTNUM-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理医療機関情報読込
+      *****************************************************************
+       900-SYS1001-READ-SEC        SECTION.
+      *
+           INITIALIZE                  SYS-1001-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1001-HOSPNUM
+           MOVE    "1001"          TO  SYS-1001-KANRICD
+           MOVE    "*"             TO  SYS-1001-KBNCD
+           MOVE    WRK-PARA-SRYYM  TO  SYS-1001-STYUKYMD(1:6)
+           MOVE    "01"            TO  SYS-1001-STYUKYMD(7:2)
+           MOVE    WRK-PARA-SRYYM  TO  SYS-1001-EDYUKYMD(1:6)
+           MOVE    "01"            TO  SYS-1001-EDYUKYMD(7:2)
+           MOVE    SYS-1001-REC    TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-SYSKANRI
+               MOVE    MCPDATA-REC     TO  SYS-1001-REC
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  SYS-1001-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 900-DBCLOSECURSOR-SEC
+           .
+       900-SYS1001-READ-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢＳＥＬＥＣＴ処理

@@ -380,3 +380,15 @@ path	key17 	{
 	};
 };
 
+path	key18 	{
+	DBSELECT	{
+		DECLARE tbl_syumei_key18_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syumei
+			WHERE   HOSPNUM        =  :HOSPNUM
+			AND   NYUGAIKBN       =  :NYUGAIKBN
+			AND   NYUHEN_YMD      =  ''
+		;
+	};
+};
+

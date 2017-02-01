@@ -50,6 +50,7 @@
        01  FLG-AREA.
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-SYUNOU                  PIC 9(01).
+           03  FLG-SYUMEI                  PIC 9(01).
            03  FLG-ARI                     PIC 9(01).
            03  FLG-ARI2                    PIC 9(01).
            03  FLG-GENBUTU                 PIC 9(01).
@@ -65,8 +66,8 @@
                05  WRK-PTID                PIC 9(10).
                05  WRK-GAITOKBN            PIC 9(02).
                05  WRK-SKYMONEY-FLG        PIC 9(01).
-               05  WRK-TOTALTENKBN-A       PIC 9(01).
-               05  WRK-TOTALTENKBN-B       PIC 9(01).
+               05  WRK-TAISYOKBN-A         PIC 9(01).
+               05  WRK-TAISYOKBN-B         PIC 9(01).
                05  WRK-CHKNGDATA           PIC 9(01).
       *
            03  WRK-PTID-TABLE2.
@@ -74,8 +75,8 @@
                05  WRK-PTID2               PIC 9(10).
                05  WRK-GAITOKBN2           PIC 9(02).
                05  WRK-SKYMONEY2-FLG       PIC 9(01).
-               05  WRK-TOTALTENKBN2-A      PIC 9(01).
-               05  WRK-TOTALTENKBN2-B      PIC 9(01).
+               05  WRK-TAISYOKBN2-A        PIC 9(01).
+               05  WRK-TAISYOKBN2-B        PIC 9(01).
                05  WRK-CHKNGDATA2          PIC 9(01).
       *
            03  WRK-PTID-TABLE3.
@@ -83,8 +84,8 @@
                05  WRK-PTID3               PIC 9(10).
                05  WRK-GAITOKBN3           PIC 9(02).
                05  WRK-SKYMONEY3-FLG       PIC 9(01).
-               05  WRK-TOTALTENKBN3-A      PIC 9(01).
-               05  WRK-TOTALTENKBN3-B      PIC 9(01).
+               05  WRK-TAISYOKBN3-A        PIC 9(01).
+               05  WRK-TAISYOKBN3-B        PIC 9(01).
                05  WRK-CHKNGDATA3          PIC 9(01).
       *
            03  WRK-DENPNUM-END-TABLE.
@@ -102,6 +103,10 @@
       *    収納データ
        01  SYUNOU-REC.
            COPY    "CPSYUNOU.INC".
+      *
+      *    収納明細
+       01  SYUMEI-REC.
+           COPY    "CPSYUMEI.INC".
       *
       *    システム管理
            COPY    "CPSK1039.INC".
@@ -238,9 +243,10 @@
                      UNTIL  (IDX1            >  10000)
                       OR    (WRK-PTID(IDX1)  =  ZERO )
              IF     WRK-CHKNGDATA(IDX1)  =  ZERO
-               PERFORM  500-HENKYAKU-SET-SEC
+               PERFORM  200-HENKYAKU-SET-SEC
              ELSE
-               DISPLAY "CHKNGDATA:PTID=" WRK-PTID(IDX1)
+               DISPLAY "<CHKNG> PTID=" WRK-PTID(IDX1)
+      *****    PERFORM  201-HENKYAKU-SET2-SEC
              END-IF
            END-PERFORM
       *
@@ -261,7 +267,7 @@
              PERFORM  VARYING  IDX1  FROM  1  BY  1
                        UNTIL  (IDX1            >  10000)
                         OR    (WRK-PTID(IDX1)  =  ZERO )
-               PERFORM  400-SYUNOU-KOUSIN-SEC
+               PERFORM  300-SYUNOU-KOUSIN-SEC
              END-PERFORM
            END-IF
       *
@@ -271,8 +277,13 @@
            PERFORM    VARYING  IDX1  FROM  1  BY  1
                        UNTIL  (IDX1            >  10000)
                         OR    (WRK-PTID(IDX1)  =  ZERO )
-             PERFORM    400-SYUNOU-KOUSIN-SEC
+             PERFORM    300-SYUNOU-KOUSIN-SEC
            END-PERFORM
+      *
+      *****
+      *
+      *    収納明細更新（入返金日、日報キーの修復）
+           PERFORM      400-SYUMEI-KOUSIN-SEC
       *
            .
       *
@@ -355,7 +366,7 @@
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key89"        TO  WRK-IKT-PATHNAME
              END-IF
-             PERFORM  200-IKATUSAIKEI2-SEC
+             PERFORM  1001-IKATUSAIKEI2-SEC
       *      第三者行為診療分の計算
              IF     SYS-1039-IKTSORTKBN  =  "0" OR SPACE
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
@@ -364,7 +375,7 @@
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key91"        TO  WRK-IKT-PATHNAME
              END-IF
-             PERFORM  200-IKATUSAIKEI2-SEC
+             PERFORM  1001-IKATUSAIKEI2-SEC
            ELSE
       *      第三者行為診療分がない場合
              IF   FLG-GENBUTU = ZERO
@@ -384,7 +395,7 @@
                   MOVE    "key83"        TO  WRK-IKT-PATHNAME
                END-IF
              END-IF
-             PERFORM  200-IKATUSAIKEI2-SEC
+             PERFORM  1001-IKATUSAIKEI2-SEC
            END-IF
       *
            .
@@ -394,7 +405,7 @@
       **************************************************************
       *    一括再計算
       **************************************************************
-       200-IKATUSAIKEI2-SEC           SECTION.
+       1001-IKATUSAIKEI2-SEC           SECTION.
       *
            INITIALIZE                              SYUNOU-REC
            MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SYU-HOSPNUM
@@ -424,7 +435,7 @@
                    IF   FLG-SYORI-KBN  =  1
                      MOVE   WRK-SYUNOU-DATA(IDX3)
                                  TO  WRK-SYUNOU-REC
-                     PERFORM    300-SYUNOU-DATA-CHECK-SEC
+                     PERFORM    10011-SYUNOU-DATA-CHECK-SEC
                    END-IF
                  END-IF
                END-PERFORM
@@ -481,7 +492,7 @@
                        MOVE    1     TO  FLG-ARI2
                        MOVE   LNK-ORCSSKS-SYUNOU-DATA(IDX3)
                                      TO  WRK-SYUNOU-REC
-                       PERFORM    300-SYUNOU-DATA-CHECK-SEC
+                       PERFORM    10011-SYUNOU-DATA-CHECK-SEC
                      END-IF
                    END-PERFORM
                    IF    FLG-ARI2  =  ZERO
@@ -500,13 +511,13 @@
            PERFORM      910-DB-CLOSE-SEC
       *
            .
-       200-IKATUSAIKEI2-EXT.
+       1001-IKATUSAIKEI2-EXT.
            EXIT.
       *
       **************************************************************
       *    収納データチェック
       **************************************************************
-       300-SYUNOU-DATA-CHECK-SEC           SECTION.
+       10011-SYUNOU-DATA-CHECK-SEC           SECTION.
       *
            IF  (SYU-SECMONEY         =  1 OR 2 OR 3 OR 4)
            OR  (SYU-ACCT-UPDKBN  NOT =  SPACE           )
@@ -542,7 +553,7 @@
            IF   SYU-SKYMONEY  NOT =  WRK-SYU-SKYMONEY
       *      患者請求額の変更がある方
              MOVE       1     TO    WRK-SKYMONEY-FLG(IDX1)
-             MOVE       1     TO    WRK-TOTALTENKBN-A(IDX1)
+             MOVE       1     TO    WRK-TAISYOKBN-A(IDX1)
            ELSE
       *      患者請求額の変更がない方（データ項目値が変更となる収納あり）
              IF (SYU-TOTAL-HKNTEN      NOT = WRK-SYU-TOTAL-HKNTEN      )
@@ -587,18 +598,86 @@
       *
              OR (SYU-SECMONEY          NOT = ZERO AND 9                )
              OR (SYU-ACCT-UPDKBN       NOT = SPACE                     )
-               MOVE     1     TO    WRK-TOTALTENKBN-B(IDX1)
+               MOVE     1     TO    WRK-TAISYOKBN-B(IDX1)
              END-IF
            END-IF
       *
            .
-       300-SYUNOU-DATA-CHECK-EXT.
+       10011-SYUNOU-DATA-CHECK-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    返却値セット１
+      **************************************************************
+       200-HENKYAKU-SET-SEC           SECTION.
+      *
+           IF     WRK-GAITOKBN(IDX1)   NOT =  ZERO
+             IF  (WRK-TAISYOKBN-A(IDX1)    =  ZERO)
+             AND (WRK-TAISYOKBN-B(IDX1)    =  ZERO)
+               CONTINUE
+             ELSE
+               ADD        1     TO   IDX2
+               MOVE  WRK-PTID(IDX1)
+                                TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
+               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+      *****        MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+                 ELSE
+                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+      *****        MOVE   7     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+                 END-IF
+               ELSE
+                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+               END-IF
+               MOVE  WRK-GAITOKBN(IDX1)
+                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
+      *
+               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
+                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                 ELSE
+                   IF  WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX3
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID2(IDX3)
+                   END-IF
+                 END-IF
+               ELSE
+                 IF    WRK-GAITOKBN(IDX1)  =  5
+                     ADD    1     TO   IDX4
+                     MOVE   WRK-PTID(IDX1)
+                                  TO   WRK-PTID3(IDX4)
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+      *
+           .
+       200-HENKYAKU-SET-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    返却値セット２
+      **************************************************************
+       201-HENKYAKU-SET2-SEC           SECTION.
+      *
+           ADD        1     TO   IDX2
+           MOVE  WRK-PTID(IDX1)
+                            TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
+           MOVE       9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+           MOVE       6     TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
+      *
+           .
+       201-HENKYAKU-SET2-EXT.
            EXIT.
       *
       **************************************************************
       *    収納データ更新
       **************************************************************
-       400-SYUNOU-KOUSIN-SEC           SECTION.
+       300-SYUNOU-KOUSIN-SEC           SECTION.
       *
            INITIALIZE                              SYUNOU-REC
            MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SYU-HOSPNUM
@@ -639,58 +718,56 @@
            PERFORM      910-DB-CLOSE-SEC
       *
            .
-       400-SYUNOU-KOUSIN-EXT.
+       300-SYUNOU-KOUSIN-EXT.
            EXIT.
       *
       **************************************************************
-      *    返却値セット１
+      *    収納明細更新
       **************************************************************
-       500-HENKYAKU-SET-SEC           SECTION.
+       400-SYUMEI-KOUSIN-SEC           SECTION.
       *
-           IF     WRK-GAITOKBN(IDX1)   NOT =  ZERO
-             IF  (WRK-TOTALTENKBN-A(IDX1)  =  ZERO)
-             AND (WRK-TOTALTENKBN-B(IDX1)  =  ZERO)
-               CONTINUE
-             ELSE
-               ADD        1     TO   IDX2
-               MOVE  WRK-PTID(IDX1)
-                                TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
-               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-                 ELSE
-                   MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-                 END-IF
-               ELSE
-                 MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-               END-IF
-               MOVE  WRK-GAITOKBN(IDX1)
-                                TO   LNK-ORCSSYUNOUCHK-GAITOKBN(IDX2)
+           INITIALIZE                              SYUMEI-REC
+           MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SMEI-HOSPNUM
+           MOVE   LNK-ORCSSYUNOUCHK-NYUGAIKBN  TO  SMEI-NYUGAIKBN
+           MOVE   SYUMEI-REC                   TO  MCPDATA-REC
+           MOVE   "DBSELECT"                   TO  MCP-FUNC
+           MOVE   "tbl_syumei"                 TO  MCP-TABLE
+           MOVE   "key18"                      TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"               USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE      "tbl_syumei"            TO  MCP-TABLE
+             MOVE      "key18"                 TO  MCP-PATHNAME
+             PERFORM    900-SYUMEI-READ-SEC
+             PERFORM    UNTIL  FLG-SYUMEI  =  1
       *
-               IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
-                 IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                     ADD    1     TO   IDX3
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID2(IDX3)
-                 ELSE
-                   IF  WRK-GAITOKBN(IDX1)  =  5
-                     ADD    1     TO   IDX3
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID2(IDX3)
-                   END-IF
-                 END-IF
-               ELSE
-                 IF    WRK-GAITOKBN(IDX1)  =  5
-                     ADD    1     TO   IDX4
-                     MOVE   WRK-PTID(IDX1)
-                                  TO   WRK-PTID3(IDX4)
-                 END-IF
-               END-IF
-             END-IF
+               DISPLAY "<SMEI> PTID=" SMEI-PTID " DENPNUM=" SMEI-DENPNUM
+                       " DENPEDANUM=" SMEI-DENPEDANUM
+      *
+               MOVE   SMEI-CREYMD       TO  SMEI-NYUHEN-YMD
+               MOVE   SMEI-CREYMD       TO  SMEI-DAILYKEY(1:8)
+               MOVE   SMEI-CREHMS(1:4)  TO  SMEI-DAILYKEY(9:4)
+      *
+               MOVE   SYUMEI-REC        TO  MCPDATA-REC
+               MOVE  "DBUPDATE"         TO  MCP-FUNC
+               MOVE  "tbl_syumei"       TO  MCP-TABLE
+               MOVE  "key"              TO  MCP-PATHNAME
+               CALL  "ORCDBMAIN"     USING  MCPAREA
+                                            MCPDATA-REC
+                                            SPA-AREA
+      *
+               MOVE    "tbl_syumei"            TO  MCP-TABLE
+               MOVE    "key18"                 TO  MCP-PATHNAME
+               PERFORM  900-SYUMEI-READ-SEC
+             END-PERFORM
            END-IF
+           MOVE        "tbl_syumei"            TO  MCP-TABLE
+           MOVE        "key18"                 TO  MCP-PATHNAME
+           PERFORM      910-DB-CLOSE-SEC
       *
            .
-       500-HENKYAKU-SET-EXT.
+       400-SYUMEI-KOUSIN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -735,6 +812,28 @@
            .
       *
        900-SYUNOU-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    収納明細読込
+      *****************************************************************
+       900-SYUMEI-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYUMEI-REC
+               MOVE    ZERO            TO  FLG-SYUMEI
+           ELSE
+               INITIALIZE                  SYUMEI-REC
+               MOVE    1               TO  FLG-SYUMEI
+           END-IF
+      *
+           .
+      *
+       900-SYUMEI-READ-EXT.
            EXIT.
       *
       *****************************************************************
