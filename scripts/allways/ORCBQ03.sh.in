@@ -44,15 +44,15 @@ cleanup(){
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
-        if  [ "${MCP_WINDOW}" == "findv2" ]; then
+        if  [ "${MCP_WINDOW}" == "findv3" ]; then
             rm  -rf ${MCP_TEMPDIR}
         fi
 }
 
-trap cleanup 1 2 3 15 
+trap cleanup EXIT
 
 
-if  [ "${MCP_WINDOW}" == "findv2" ]; then
+if  [ "${MCP_WINDOW}" == "findv3" ]; then
   [ -e "${PUSH_FILE_FULL}" ] && rm ${PUSH_FILE_FULL}
 fi
 
@@ -64,7 +64,7 @@ while [ $n -lt 3 ] ; do
     sleep 3
 done
 
-if  [ "${MCP_WINDOW}" == "findv2" ]; then
+if  [ "${MCP_WINDOW}" == "findv3" ]; then
   [ -e "${PUSH_FILE_FULL}" ] && echo "push!!" &&  ${MONPUSHEVENT} ${RECDIR}/${RECFILE} ${PUSH_FILE_FULL}  
 fi
         exit
