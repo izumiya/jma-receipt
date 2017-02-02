@@ -388,6 +388,7 @@ path	key18 	{
 			WHERE   HOSPNUM        =  :HOSPNUM
 			AND   NYUGAIKBN       =  :NYUGAIKBN
 			AND   NYUHEN_YMD      =  ''
+			ORDER   BY   PTID,DENPNUM,DENPEDANUM
 		;
 	};
 };
