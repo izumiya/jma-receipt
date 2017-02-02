@@ -58,7 +58,7 @@
                05  TOKEI-EDYUKYMD      PIC X(08).
            03  TOKEI-NAME              PIC X(40).
            03  TOKEI-MAX               PIC 9(03).
-           03  TOKEI-ITEM              PIC X(100)   OCCURS 500.
+           03  TOKEI-ITEM              PIC X(100)  OCCURS 500.
            03  TOKEI-NAIYO             PIC X(500)  OCCURS 500.
       *
       *    エラーファイル
@@ -83,8 +83,8 @@
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-SYSKANRI2           PIC 9(01).
            03  FLG-TOKEI               PIC 9(01).
-           03  FLG-SYS0031             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -100,6 +100,7 @@
            03  IDX-KET                 PIC 9(03).
            03  IDX-GYO                 PIC 9(01).
            03  IDX-SYO                 PIC 9(01).
+           03  IDX-PRT                 PIC 9(03).
       *
       *    パラメタ領域
        01  WRK-PARA.
@@ -134,6 +135,9 @@
                05  WRK-SEISU           PIC X(10).
                05  WRK-SYOSU           PIC X(09).
                05  WRK-HENSUUJI        PIC X(20).
+      *
+           03  WRK-PRTPRO-G.
+               05  WRK-PRTPRO          PIC X(20)  OCCURS  12.
       *
            03  WRK-Z03                 PIC ZZ9.
       *
@@ -187,8 +191,15 @@
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
+      *
       *    施設基準コード
            COPY    "CPSK0031.INC".
+      *    帳票プログラム選択情報 
+           COPY    "CPSK1032.INC".
+      *    出力プリンタ情報（入院）
+           COPY    "CPSK1034.INC".
+      *    帳票プログラム選択情報（入院）
+           COPY    "CPSK1035.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -420,25 +431,35 @@
            MOVE    SPACE           TO  WRK-KANRICD
       *
       *    システム管理読み込み
-           PERFORM 900-SYSKANRI-DBSELECT-SEC
+           PERFORM 900-SYS-KEY29-DBSELECT-SEC
       *
            PERFORM UNTIL   FLG-SYSKANRI    =   1
                EVALUATE    SYS-KANRICD
                    WHEN    "0000"  THRU  "1000"
+      *                1000以下は対象外
                        CONTINUE
                    WHEN    "1006"
       *                施設基準チェック
                        PERFORM 220-MAIN-SSTKJN-SEC
+                   WHEN    "1031"
+      *                出力先プリンタチェック
+                       PERFORM 220-MAIN-PRTPRO-SEC
+                   WHEN    "1032"
+                   WHEN    "1034"
+                   WHEN    "1035"
+      *                出力先プリンタはまとめるので対象外
+                       CONTINUE
                    WHEN    OTHER
       *                システム管理定義取得サブチェック
                        PERFORM 220-MAIN-SUBCHK-SEC
                END-EVALUATE
+      *
       *        システム管理読み込み
-               PERFORM 900-SYSKANRI-DBFETCH-SEC
+               PERFORM 900-SYS-KEY29-DBFETCH-SEC
            END-PERFORM
       *
       *    システム管理読み込み
-           PERFORM 900-SYSKANRI-DBCLOSE-SEC
+           PERFORM 900-SYS-KEY29-DBCLOSE-SEC
            .
        210-MAIN-SYSKANRI-EXT.
            EXIT.
@@ -497,7 +518,21 @@
            MOVE    "1"             TO  TOKEI-NAIYO(TOKEI-MAX)
       *
       *    システム管理マスタ検索（施設基準コード）
-           PERFORM 900-SYS0031-READ-SEC
+           INITIALIZE                  SYS-0031-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-0031-HOSPNUM
+           MOVE    "0031"          TO  SYS-0031-KANRICD
+           MOVE    WRK-KBNCD       TO  SYS-0031-KBNCD
+           MOVE    WRK-SYSYMD      TO  SYS-0031-STYUKYMD
+                                       SYS-0031-EDYUKYMD
+           MOVE    SYS-0031-REC    TO  MCPDATA-REC
+           PERFORM 900-SYS-KEY10-DBREAD-SEC
+      *
+           IF      FLG-SYSKANRI2   =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-0031-REC
+           ELSE
+               INITIALIZE                  SYS-0031-REC
+           END-IF
+      *
            STRING  WRK-KBNCD           DELIMITED   BY  SPACE
                    "："                DELIMITED   BY  SIZE
                    SYS-0031-SSTKIJUN   DELIMITED   BY  SPACE
@@ -507,6 +542,224 @@
            WRITE   TOKEI-REC
            .
        230-SSTKJN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    出力先プリンタチェック
+      *****************************************************************
+       220-MAIN-PRTPRO-SEC         SECTION.
+      *
+      *    システム管理定義取得サブチェック
+           PERFORM 220-MAIN-SUBCHK-SEC
+      *
+      *    帳票プログラム選択情報 
+           PERFORM 230-PRTPRO-1032-SEC
+      *
+      *    出力先プリンタ情報（入院）
+           INITIALIZE                  SYS-1034-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1034-HOSPNUM
+           MOVE    "1034"          TO  SYS-1034-KANRICD
+           MOVE    SYS-KBNCD       TO  SYS-1034-KBNCD
+           MOVE    SYS-STYUKYMD    TO  SYS-1034-STYUKYMD
+           MOVE    SYS-EDYUKYMD    TO  SYS-1034-EDYUKYMD
+           MOVE    SYS-1034-REC    TO  MCPDATA-REC
+           PERFORM 900-SYS-KEY10-DBREAD-SEC
+      *
+           IF      FLG-SYSKANRI2   =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-1034-REC
+           ELSE
+               INITIALIZE                  SYS-1034-REC
+               GO  TO  220-MAIN-PRTPRO-EXT
+           END-IF
+      *
+      *    システム管理定義取得サブチェック
+           PERFORM 230-PRTPRO-1034-SEC
+      *
+      *    帳票プログラム選択情報 
+           PERFORM 230-PRTPRO-1035-SEC
+      *
+           .
+       220-MAIN-PRTPRO-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票プログラム選択情報 
+      *****************************************************************
+       230-PRTPRO-1032-SEC         SECTION.
+      *
+           MOVE    SPACE           TO  WRK-PRTPRO-G
+      *
+           INITIALIZE                  SYS-1032-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1032-HOSPNUM
+           MOVE    "1032"          TO  SYS-1032-KANRICD
+           MOVE    SYS-STYUKYMD    TO  SYS-1032-STYUKYMD
+           MOVE    SYS-EDYUKYMD    TO  SYS-1032-EDYUKYMD
+           MOVE    SYS-1032-REC    TO  MCPDATA-REC
+           PERFORM 900-SYS-KEY2-DBSELECT-SEC
+      *
+           PERFORM UNTIL   FLG-SYSKANRI2   =   1
+               MOVE    MCPDATA-REC     TO  SYS-1032-REC
+               IF    ( SYS-1032-KBNCD(1:5) =   "00000" )   OR
+                     ( SYS-1032-KBNCD(1:5) =   SYS-KBNCD )
+                   MOVE    SYS-1032-KBNCD(6:3) TO  IDX-PRT
+                   IF      SYS-1032-ORCAORGCHK =   "T"
+                       MOVE    SYS-1032-ORCAORGNM
+                                               TO  WRK-PRTPRO(IDX-PRT)
+                   END-IF
+                   IF      SYS-1032-ORCACSTCHK =   "T"
+                       MOVE    SYS-1032-ORCACSTNM
+                                               TO  WRK-PRTPRO(IDX-PRT)
+                   END-IF
+               END-IF
+               PERFORM 900-SYS-KEY2-DBFETCH-SEC
+           END-PERFORM
+      *
+           PERFORM 900-SYS-KEY2-DBCLOSE-SEC
+      *
+           PERFORM VARYING IDX-PRT FROM 1 BY 1
+                   UNTIL   IDX-PRT >   12
+               IF      WRK-PRTPRO(IDX-PRT) NOT =   SPACE
+                   EVALUATE    IDX-PRT
+                       WHEN    1
+                           MOVE   1            TO  IDX-MAX
+                       WHEN    2
+                           MOVE   2            TO  IDX-MAX
+                       WHEN    3
+                           MOVE   3            TO  IDX-MAX
+                       WHEN    4
+                           MOVE   8            TO  IDX-MAX
+                       WHEN    5
+                           MOVE   10           TO  IDX-MAX
+                       WHEN    6
+                           MOVE   9            TO  IDX-MAX
+                       WHEN   7
+                           MOVE   12           TO  IDX-MAX
+                       WHEN    8
+                           MOVE   14           TO  IDX-MAX
+                       WHEN    9
+                           MOVE   16           TO  IDX-MAX
+                       WHEN    10
+                           MOVE   17           TO  IDX-MAX
+                       WHEN    11
+                           MOVE   18           TO  IDX-MAX
+                       WHEN    12
+                           MOVE   19           TO  IDX-MAX
+                   END-EVALUATE
+                   MOVE    SPACE           TO  WRK-MEISAI
+                   STRING  TOKEI-NAIYO(IDX-MAX)
+                                               DELIMITED BY SPACE
+                           ":"                 DELIMITED BY SIZE
+                           WRK-PRTPRO(IDX-PRT) DELIMITED BY SPACE
+                           INTO                WRK-MEISAI
+                   END-STRING
+                   MOVE    SPACE           TO  TOKEI-NAIYO(IDX-MAX)
+                   MOVE    WRK-MEISAI      TO  TOKEI-NAIYO(IDX-MAX)
+               END-IF
+           END-PERFORM
+      *
+           REWRITE TOKEI-REC
+           .
+       230-PRTPRO-1032-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票プログラム選択情報 
+      *****************************************************************
+       230-PRTPRO-1034-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSSKDEFAREA
+           MOVE    "1034"          TO  ORCSSKDEF-KANRICD
+           CALL    "ORCSSKDEF"         USING
+                                       ORCSSKDEFAREA
+           MOVE     "1034"         TO  WRK-KANRICD
+      *
+           MOVE    TOKEI-MAX       TO  IDX-PRT
+           MOVE    SYS-1034-TBL    TO  WRK-MEISAI
+      *
+      *    項目をセットする
+           PERFORM VARYING IDX-MAX FROM    1   BY  1
+                   UNTIL ( IDX-MAX >   500 )
+                   OR    ( IDX-MAX >   ORCSSKDEF-ITEM-MAX )
+               PERFORM 230-TOKEI-SET-SEC
+           END-PERFORM
+      *
+           MOVE    IDX-PRT         TO  TOKEI-MAX
+      *
+           REWRITE TOKEI-REC
+           .
+       230-PRTPRO-1034-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票プログラム選択情報 
+      *****************************************************************
+       230-PRTPRO-1035-SEC         SECTION.
+      *
+           MOVE    SPACE           TO  WRK-PRTPRO-G
+      *
+           INITIALIZE                  SYS-1035-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-1035-HOSPNUM
+           MOVE    "1035"          TO  SYS-1035-KANRICD
+           MOVE    SYS-STYUKYMD    TO  SYS-1035-STYUKYMD
+           MOVE    SYS-EDYUKYMD    TO  SYS-1035-EDYUKYMD
+           MOVE    SYS-1035-REC    TO  MCPDATA-REC
+           PERFORM 900-SYS-KEY2-DBSELECT-SEC
+      *
+           PERFORM UNTIL   FLG-SYSKANRI2   =   1
+               MOVE    MCPDATA-REC     TO  SYS-1035-REC
+               IF    ( SYS-1035-KBNCD(1:5) =   "00000" )   OR
+                     ( SYS-1035-KBNCD(1:5) =   SYS-KBNCD )
+                   MOVE    SYS-1035-KBNCD(6:3) TO  IDX-PRT
+                   IF      SYS-1035-ORCAORGCHK =   "T"
+                       MOVE    SYS-1035-ORCAORGNM
+                                               TO  WRK-PRTPRO(IDX-PRT)
+                   END-IF
+                   IF      SYS-1035-ORCACSTCHK =   "T"
+                       MOVE    SYS-1035-ORCACSTNM
+                                               TO  WRK-PRTPRO(IDX-PRT)
+                   END-IF
+               END-IF
+               PERFORM 900-SYS-KEY2-DBFETCH-SEC
+           END-PERFORM
+      *
+           PERFORM 900-SYS-KEY2-DBCLOSE-SEC
+      *
+           PERFORM VARYING IDX-PRT FROM 1 BY 1
+                   UNTIL   IDX-PRT >   10
+               IF      WRK-PRTPRO(IDX-PRT) NOT =   SPACE
+                   EVALUATE    IDX-PRT
+                       WHEN    1
+                           MOVE   22           TO  IDX-MAX
+                       WHEN    2
+                           MOVE   23           TO  IDX-MAX
+                       WHEN    3
+                           MOVE   24           TO  IDX-MAX
+                       WHEN    4
+                           MOVE   25           TO  IDX-MAX
+                       WHEN    5
+                           MOVE   27           TO  IDX-MAX
+                       WHEN    6
+                           MOVE   28           TO  IDX-MAX
+                       WHEN   7
+                           MOVE   29           TO  IDX-MAX
+                       WHEN    8
+                           MOVE   30           TO  IDX-MAX
+                       WHEN    9
+                           MOVE   31           TO  IDX-MAX
+                       WHEN    10
+                           MOVE   32           TO  IDX-MAX
+                   END-EVALUATE
+                   MOVE    SPACE           TO  WRK-MEISAI
+                   STRING  TOKEI-NAIYO(IDX-MAX)
+                                               DELIMITED BY SPACE
+                           ":"                 DELIMITED BY SIZE
+                           WRK-PRTPRO(IDX-PRT) DELIMITED BY SPACE
+                           INTO                WRK-MEISAI
+                   END-STRING
+                   MOVE    SPACE           TO  TOKEI-NAIYO(IDX-MAX)
+                   MOVE    WRK-MEISAI      TO  TOKEI-NAIYO(IDX-MAX)
+               END-IF
+           END-PERFORM
+      *
+           REWRITE TOKEI-REC
+           .
+       230-PRTPRO-1035-EXT.
            EXIT.
       *****************************************************************
       *    システム管理定義取得サブチェック
@@ -531,16 +784,16 @@
            END-IF
       *
            IF      SYS-KANRICD     NOT =   WRK-KANRICD
-               INITIALIZE              ORCSSKDEFAREA
+               INITIALIZE                  ORCSSKDEFAREA
       *        2005のみ区分で構造が異なる
                IF    ( SYS-KANRICD     =   "2005" )    AND
                     (( SYS-KBNCD       =   "01" )  OR
                      ( SYS-KBNCD       =   "05" ))
                    MOVE    SYS-KBNCD   TO  ORCSSKDEF-KBNCD
                END-IF
-               MOVE    SYS-KANRICD TO  ORCSSKDEF-KANRICD
-               CALL    "ORCSSKDEF"     USING
-                                       ORCSSKDEFAREA
+               MOVE    SYS-KANRICD     TO  ORCSSKDEF-KANRICD
+               CALL    "ORCSSKDEF"         USING
+                                           ORCSSKDEFAREA
       *        設定内容がない場合はベタ打ち
                IF      ORCSSKDEF-ITEM-MAX  =   ZERO
                    MOVE    "（システム定義未提供）"
@@ -558,6 +811,8 @@
            MOVE    ORCSSKDEF-NAME  TO  TOKEI-NAME
            MOVE    ORCSSKDEF-ITEM-MAX
                                    TO  TOKEI-MAX
+           MOVE    SYS-KANRITBL    TO  WRK-MEISAI
+           MOVE    ZERO            TO  IDX-PRT
       *
       *    項目をセットする
            PERFORM VARYING IDX-MAX FROM    1   BY  1
@@ -575,17 +830,19 @@
       *****************************************************************
        230-TOKEI-SET-SEC           SECTION.
       *
+           COMPUTE IDX-PRT =   IDX-PRT +   1
+      *
            MOVE    ORCSSKDEF-START(IDX-MAX)
                                    TO  IDX-STR
            MOVE    ORCSSKDEF-LENGTH(IDX-MAX)
                                    TO  IDX-KET
            MOVE    ORCSSKDEF-ITEM-JP(IDX-MAX)
-                                   TO  TOKEI-ITEM(IDX-MAX)
+                                   TO  TOKEI-ITEM(IDX-PRT)
       *    小数点の場合
            IF    ( ORCSSKDEF-TYPE(IDX-MAX) =   "9" )   AND
                  ( ORCSSKDEF-PRECISION(IDX-MAX)    >   0 )
                MOVE    SPACE           TO  WRK-SUUJI-G
-               MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
+               MOVE    WRK-MEISAI(IDX-STR:IDX-KET)
                                        TO  WRK-SUUJI
                MOVE    ORCSSKDEF-PRECISION(IDX-MAX)
                                        TO  IDX-SYO
@@ -600,10 +857,10 @@
                        WRK-SYOSU       DELIMITED BY SPACE
                        INTO            WRK-HENSUUJI
                END-STRING
-               MOVE    WRK-HENSUUJI    TO  TOKEI-NAIYO(IDX-MAX)
+               MOVE    WRK-HENSUUJI    TO  TOKEI-NAIYO(IDX-PRT)
            ELSE
-               MOVE    SYS-KANRITBL(IDX-STR:IDX-KET)
-                                       TO  TOKEI-NAIYO(IDX-MAX)
+               MOVE    WRK-MEISAI(IDX-STR:IDX-KET)
+                                       TO  TOKEI-NAIYO(IDX-PRT)
            END-IF
            .
        230-TOKEI-SET-EXT.
@@ -724,6 +981,11 @@
       *    明細
       *****************************************************************
        330-MEISAI-HENSYU-SEC       SECTION.
+      *
+           IF     ( TOKEI-KANRICD  =   "1010" )    AND
+                  ( TOKEI-ITEM(IDX-MAX)    =   "業務処理権限−未使用" )
+               GO  TO  330-MEISAI-HENSYU-EXT
+           END-IF
       *
            IF      TOKEI-ITEM(IDX-MAX)(17:)
                                    NOT =   SPACE
@@ -1128,40 +1390,74 @@
        900-TOKEI-NEXT-EXT.
            EXIT.
       *****************************************************************
-      *    システム管理マスタ検索（施設基準コード）
+      *    システム管理マスタ検索
       *****************************************************************
-       900-SYS0031-READ-SEC       SECTION.
-      *
-           INITIALIZE                  SYS-0031-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-0031-HOSPNUM
-           MOVE    "0031"          TO  SYS-0031-KANRICD
-           MOVE    WRK-KBNCD       TO  SYS-0031-KBNCD
-           MOVE    WRK-SYSYMD      TO  SYS-0031-STYUKYMD
-                                       SYS-0031-EDYUKYMD
-           MOVE    SYS-0031-REC    TO  MCPDATA-REC
+       900-SYS-KEY10-DBREAD-SEC    SECTION.
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
            MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
       *
            IF      MCP-RC          =   ZERO
-               MOVE    ZERO            TO  FLG-SYS0031
-               MOVE    MCPDATA-REC     TO  SYS-0031-REC
+               MOVE    ZERO            TO  FLG-SYSKANRI2
            ELSE
-               MOVE    1               TO  FLG-SYS0031
-               INITIALIZE                  SYS-0031-REC
+               MOVE    1               TO  FLG-SYSKANRI2
            END-IF
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
            MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 900-DBCLOSECURSOR-SEC
            .
-       900-SYS0031-READ-EXT.
+       900-SYS-KEY10-DBREAD-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索
       *****************************************************************
-       900-SYSKANRI-DBSELECT-SEC   SECTION.
+       900-SYS-KEY2-DBSELECT-SEC   SECTION.
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-SYSKANRI2
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI2
+           END-IF
+           .
+       900-SYS-KEY2-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索
+      *****************************************************************
+       900-SYS-KEY2-DBFETCH-SEC    SECTION.
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-DBFETCH-SEC
+      *
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-SYSKANRI2
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI2
+           END-IF
+           .
+       900-SYS-KEY2-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索
+      *****************************************************************
+       900-SYS-KEY2-DBCLOSE-SEC    SECTION.
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-DBCLOSECURSOR-SEC
+           .
+       900-SYS-KEY2-DBCLOSE-EXT.
+      *****************************************************************
+      *    システム管理マスタ検索
+      *****************************************************************
+       900-SYS-KEY29-DBSELECT-SEC  SECTION.
       *
            INITIALIZE                  SYSKANRI-REC
            MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
@@ -1183,12 +1479,12 @@
                INITIALIZE                  SYSKANRI-REC
            END-IF
            .
-       900-SYSKANRI-DBSELECT-EXT.
+       900-SYS-KEY29-DBSELECT-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索
       *****************************************************************
-       900-SYSKANRI-DBFETCH-SEC    SECTION.
+       900-SYS-KEY29-DBFETCH-SEC   SECTION.
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
            MOVE    "key29"         TO  MCP-PATHNAME
@@ -1202,18 +1498,18 @@
                INITIALIZE                  SYSKANRI-REC
            END-IF
            .
-       900-SYSKANRI-DBFETCH-EXT.
+       900-SYS-KEY29-DBFETCH-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索
       *****************************************************************
-       900-SYSKANRI-DBCLOSE-SEC    SECTION.
+       900-SYS-KEY29-DBCLOSE-SEC   SECTION.
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
            MOVE    "key29"         TO  MCP-PATHNAME
            PERFORM 900-DBCLOSECURSOR-SEC
            .
-       900-SYSKANRI-DBCLOSE-EXT.
+       900-SYS-KEY29-DBCLOSE-EXT.
       *****************************************************************
       *    ＤＢＳＥＬＥＣＴ処理
       *****************************************************************
