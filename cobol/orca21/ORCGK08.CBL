@@ -1857,6 +1857,8 @@
            MOVE    ZERO                TO  WRK-SRYKAISUKEI
            MOVE    ZERO                TO  WRK-JIHIMONEY
            MOVE    ZERO                TO  WRK-JIHIMONEY-KEI
+      *H29.2
+           MOVE    ZERO                TO  FLG-KAISUU
            MOVE    ZERO                TO  FLG-KAISUU-ARI
            MOVE    ZERO                TO  FLG-KAISUU-ARI2
            MOVE    ZERO                TO  FLG-KAISUU-ARI3
@@ -2062,9 +2064,10 @@
            IF    ((WRK-JIHIMONEY       >   ZERO  )   AND
       *        自賠責金額入力以外
                  (LNK-WKSRY-SRYKBN(01)(1:1)    =   "9" ))
-      *H29.2  自費は金額ゼロも対象
-      *    OR    (LNK-WKSRY-SRYKBN(01)         =   "95"
-      *                                        OR  "96")
+      *H29.2  自費金額ゼロで回数表示済み
+           OR   ((LNK-WKSRY-SRYKBN(01)     =   "95"
+                                           OR  "96") AND
+                 (FLG-KAISUU               =   1   ))
       *        回数入力がなく、入院回数入力がある時、入院回数のみ
            OR    ((FLG-KAISUU-ARI      =   ZERO )  AND
                   (FLG-KAISUU-ARI2     =   1    ))
