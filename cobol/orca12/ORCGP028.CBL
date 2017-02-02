@@ -1903,6 +1903,8 @@
       *
            MOVE    WRK-SRYCD-NAME      TO  SPA-GMN28-AUTONAME
                                                              (IDX)
+           MOVE    WRK-SRYCD           TO  SPA-GMN28-AUTOSRYCD
+                                                             (IDX)
       *    小児科外来診療料・小児かかりつけ対象外検索
            SET     TBL-IDX             TO  1
            SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
@@ -2034,7 +2036,7 @@
       *****************************************************************
       *    入力コード処理
       *****************************************************************
-       4002110-INPUTCD-HEN-SEC                 SECTION.
+       4002110-INPUTCD-HEN-SEC         SECTION.
       *
            INITIALIZE                  INPUTCD-REC
            MOVE    SPACE               TO  INPUTCD-REC
