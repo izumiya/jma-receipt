@@ -237,7 +237,7 @@
                    07  WRK-SO-MEISAISU     PIC 9(02).
                    07  WRK-SO-HKNCOMBI-DAY PIC 9(03).
                    07  WRK-SO-SRYKBN       PIC X(02).
-                   07  WRK-SO-SRYCD        PIC X(09)  OCCURS 30.
+                   07  WRK-SO-SRYCD        PIC X(09)  OCCURS 51.
                    07  WRK-SO-SRYCDTOTAL   PIC 9(14).
                    07  WRK-SO-TEN          PIC 9(07).
                    07  WRK-SO-KAISU        PIC 9(02).
@@ -1684,7 +1684,7 @@
       *        点数マスタの読み込み
                PERFORM   VARYING   IDX2    FROM   1  BY   1
                          UNTIL (WRK-SO-SRYCD(IDX1 IDX2) = SPACE)
-                            OR (IDX2    >      30)
+                            OR (IDX2    >      50)
                    PERFORM    210-TENSU-KEISAN-SEC
                END-PERFORM
            END-PERFORM
@@ -1723,7 +1723,7 @@
                                      LNK-DPCNYUIN-MEISAISU(1 IDX2)
                      PERFORM   VARYING   IDX3   FROM   1   BY  1
                                UNTIL (WRK-SO-SRYCD(IDX1 IDX3) = SPACE)
-                                  OR (IDX3   >   30)
+                                  OR (IDX3   >   50)
                          MOVE   "SI"   TO
                                     LNK-DPCNYUIN-RECSKB(1 IDX2 IDX3)
       **                   IF    IDX3   =    1
@@ -1764,7 +1764,7 @@
                                      LNK-DPCNYUIN-MEISAISU(2 IDX2)
                      PERFORM   VARYING   IDX3   FROM   1   BY  1
                                UNTIL (WRK-SO-SRYCD(IDX1 IDX3) = SPACE)
-                                  OR (IDX3   >   30)
+                                  OR (IDX3   >   50)
                          MOVE   "SI"   TO   
                                     LNK-DPCNYUIN-RECSKB(2 IDX2 IDX3)
       **                   IF    IDX3   =    1
