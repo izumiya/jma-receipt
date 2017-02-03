@@ -37,7 +37,16 @@
            03  ORCHC04SUB-PARACOMKBN   PIC X(01).
       *    ÊÝ¸±³°ÂÐ¾Ý¡Ê£±¡§ÂÐ¾Ý¡Ë
            03  ORCHC04SUB-PARAJIHIKBN  PIC X(01).
+      *    APIÊÖµÑÍÑ
+           03  ORCHC04SUB-APIKBN       PIC X(01).
       *½ÐÎÏ
+           03  ORCHC04SUB-INFO-AREA.
+               05  ORCHC04SUB-SRYYMD           PIC X(08).
+               05  ORCHC04SUB-SRYYMDMEI        PIC X(22).
+               05  ORCHC04SUB-SRYKA            PIC X(02).
+               05  ORCHC04SUB-SRYKAMEI         PIC X(30).
+               05  ORCHC04SUB-HKNCOMBI         PIC X(04).
+               05  ORCHC04SUB-HKNCOMBIMEI      PIC X(40).
       *    °õºþÆâÍÆ
            03  ORCHC04SUB-LIST-AREA.
                05  ORCHC04SUB-HEN-G    OCCURS   800.

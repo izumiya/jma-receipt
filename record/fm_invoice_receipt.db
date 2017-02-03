@@ -71,6 +71,7 @@ fm_invoice_receipt {
       End_Flg          varchar(01);
     }[2000];
     Yen_Flg            varchar(1);
+    Statement_Caution  varchar(100);
   };
 };
 

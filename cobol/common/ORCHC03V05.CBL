@@ -309,6 +309,7 @@
            03  PARA-CHUI-YUKOEDYMD     PIC X(08).
            03  PARA-RCHUI              PIC X(100).
            03  PARA-MCHUI              PIC X(100).
+           03  PARA-API-DATA           PIC X(1).
       *
       *H26.10
       *    対象コメントコード
@@ -470,17 +471,23 @@
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
       *
-           IF    ( ORCHC03-PARAFLG     =   1 )
+           EVALUATE    TRUE
+           WHEN  ( PARA-API-DATA       =   "1" )
+      *
+               MOVE    "V5"        TO  ORCHC03-SIZE
+               CALL    "ORCHC03V03"    USING
+                                       SPA-AREA
+                                       ORCHC03AREA
+     *
+           WHEN  ( ORCHC03-PARAFLG     =   1 )
                PERFORM 203-PARA-SYUNOU-SEC
-           ELSE
-               IF      ORCHC03-HAKHOUFLG   =   ZERO
+           WHEN  ( ORCHC03-HAKHOUFLG   =   ZERO )
       *            対象の伝票番号分のみ
-                   PERFORM 201-ONLY-SYUNOU-SEC
-               ELSE
-      *            発行区分による
-                   PERFORM 202-KAKHOU-SYUNOU-SEC
-               END-IF
-           END-IF
+               PERFORM 201-ONLY-SYUNOU-SEC
+           WHEN    OTHER
+      *        発行区分による
+               PERFORM 202-KAKHOU-SYUNOU-SEC
+           END-EVALUATE
       *
            .
        000-PROC-EXT.
@@ -662,6 +669,7 @@
       *
            INITIALIZE                  PARA-AREA
            MOVE    "0"                 TO  PARA-HAKKOUBIKBN
+           MOVE    "0"                 TO  PARA-API-DATA
       *
       *    伝票発行日区分
            MOVE    "HAKKOUBIKBN"       TO  WRK-PARA-NAME
@@ -774,6 +782,13 @@
            MOVE    "MCHUI"             TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA            TO  PARA-MCHUI
+      *
+      *    APIDATA
+           MOVE    "API_DATA"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( PARA-API-DATA   =   "0" OR "1" )
+               MOVE    WRK-PARA        TO  PARA-API-DATA
+           END-IF
       *
       *H26.10
       *    対象コメントコード

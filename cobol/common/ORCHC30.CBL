@@ -2051,8 +2051,9 @@
                MOVE    YAKUJYO-MARK    TO  FMYAKUJO-MARK(CNT-KENSU)
                MOVE    YAKUJYO-CAUTION TO  FMYAKUJO-CAUTION(CNT-KENSU)
                IF      YAKUJYO-PHOTO   NOT =   SPACE
+                   MOVE    "2#"    TO  FMYAKUJO-IMAGE-ID(CNT-KENSU)
                    MOVE    ORCHC30-SRYCD(CNT-PARA)
-                                       TO  FMYAKUJO-IMAGE-ID(CNT-KENSU)
+                                   TO  FMYAKUJO-IMAGE-ID(CNT-KENSU)(3:)
                END-IF
            END-IF
       *

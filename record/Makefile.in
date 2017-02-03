@@ -511,7 +511,6 @@ RECORD_files = \
 	claimreceivev2.rec \
 	I4ID2.rec \
 	formdatagetv2.rec \
-	push_print001.db \
 	contraindicationcheckv2.rec \
 	patientmodv34.rec\
 	patientmodv35.rec\
@@ -529,6 +528,7 @@ RECORD_files = \
     stock1v2.rec \
 	okusurigetv2.rec \
 	okusuriputv2.rec \
+    imagegetv2.rec \
 
 DEF_files = \
 
@@ -960,6 +960,8 @@ DB_files = \
 	xml_okusurigetv2res.db \
 	xml_okusuriputv2req.db \
 	xml_okusuriputv2res.db \
+	push_print001.db \
+    xml_imagegetv2req.db \
 
 
 shell.db: shell.db.in

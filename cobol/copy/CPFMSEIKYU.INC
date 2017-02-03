@@ -124,8 +124,8 @@
       *       今回入金額
               05  FMSEIKYU-NYUKIN                      PIC X(08).
       *
-      *       注意書き
-              05  FMSEIKYU-CAUTION                     PIC X(100).
+      *       注意書き（請求書部分）
+              05  FMSEIKYU-SKY-CAUTION                 PIC X(100).
       *
       *       メモ
               05  FMSEIKYU-MEMO                        PIC X(80)
@@ -158,3 +158,4 @@
       *
       *       明細情報金額編集フラグ
               05  FMSEIKYU-YEN-FLG                     PIC X(1).
+              05  FMSEIKYU-SRY-CAUTION                 PIC X(100).

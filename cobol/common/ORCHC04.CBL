@@ -110,6 +110,8 @@
            03  FLG-LINE            PIC 9(01).
       *
            03  FLG-HIZUKECHK       PIC 9(01).
+      *API
+           03  FLG-NEXTPRT         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -204,7 +206,7 @@
            03  WRK-DENPNUM             PIC 9(07).
            03  WRK-GRP-DENPNUM         PIC 9(07).
            03  WRK-KINGAKU-X.
-               05  WRK-KINGAKU-Z1      PIC Z(8)9.
+               05  WRK-KINGAKU-Z1      PIC -(8)9.
       *
            03  WRK-SURYO           PIC 9(05)V9(05).
            03  WRK-SURYO-R         REDEFINES   WRK-SURYO.
@@ -956,10 +958,8 @@
       *H28.12
       *    GINGEEÂÐ±þ
            IF      PARA-API-DATA        =   "1"
-               IF      WRK-PAGE            >   PAGE-MAX
-                   CONTINUE
-               ELSE
-      *        £Á£Ð£ÉÁ÷¿®
+               IF      FLG-NEXTPRT          =   ZERO
+      *            £Á£Ð£ÉÁ÷¿®
                    PERFORM 700-API-SYORI-SEC
                END-IF
                INITIALIZE                  TBL-MEISAI-AREA
@@ -1738,6 +1738,10 @@
                MOVE    "1"             TO  ORCHC04SUB-PARAJIHIKBN
            END-IF
       *
+           IF      PARA-API-DATA       =   "1"
+               MOVE    "1"             TO  ORCHC04SUB-APIKBN
+           END-IF
+      *
            CALL    "ORCHC04SUB"        USING
                                        SPA-AREA
                                        ORCHC04SUBAREA
@@ -2103,8 +2107,10 @@
                ADD     1                   TO  WRK-PAGE
       *        ¥Æ¡¼¥Ö¥ëºÇÂç
                IF      WRK-PAGE            >   PAGE-MAX
+                   MOVE    1               TO  FLG-NEXTPRT
       *            Ä¢É¼°õºþ
                    PERFORM 400-PRINT-SYORI-SEC
+                   MOVE    ZERO             TO  FLG-NEXTPRT
                END-IF
       *
                MOVE    1                   TO  IDX-H
@@ -2224,6 +2230,10 @@
       *    ¼«ÈñÂÐ¾Ý¶èÊ¬
            IF      PARA-JIHIKBN        =   "1"
                MOVE    "1"             TO  ORCHC04SUB-PARAJIHIKBN
+           END-IF
+      *
+           IF      PARA-API-DATA       =   "1"
+               MOVE    "1"             TO  ORCHC04SUB-APIKBN
            END-IF
       *
            CALL    "ORCHC04SUB"        USING
@@ -2356,8 +2366,10 @@
                ADD     1                   TO  WRK-PAGE
       *        ¥Æ¡¼¥Ö¥ëºÇÂç
                IF      WRK-PAGE            >   PAGE-MAX2
+                   MOVE    1               TO  FLG-NEXTPRT
       *            Ä¢É¼°õºþ
                    PERFORM 400-PRINT-SYORI-SEC
+                   MOVE    ZERO             TO  FLG-NEXTPRT
                END-IF
       *
                MOVE    1                   TO  IDX-H

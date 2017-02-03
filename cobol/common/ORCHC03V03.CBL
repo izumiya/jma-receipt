@@ -109,6 +109,7 @@
            03  FLG-CHK             PIC 9(01).
            03  FLG-HIZUKECHK       PIC 9(01).
            03  FLG-JOIN            PIC 9(01).
+           03  FLG-EDIT            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -118,6 +119,7 @@
            03  IDX-S               PIC 9(04).
            03  IDX-MAX             PIC 9(04).
            03  IDXA                PIC 9(05).
+           03  IDXD                PIC 9(05).
            03  IDX-ACT             PIC 9(02).
            03  IDX-REN             PIC 9(04).
            03  IDX-JYU             PIC 9(04).
@@ -128,11 +130,14 @@
       *
            03  IDX2                PIC 9(02).
            03  IDX3                PIC 9(02).
-           03  IDXP                PIC 9(02).
+           03  IDXP                PIC 9(05).
            03  IDXM                PIC 9(02).
            03  IDK                 PIC 9(04).
            03  IDX2-1              PIC 9(01).
            03  IDX-MEMO            PIC 9(04).
+           03  IDXC                PIC 9(04).
+           03  IDX-CM              PIC 9(04).
+           03  IDX-API             PIC 9(05).
       *
       *    システム領域
        01  SYS-AREA.
@@ -249,6 +254,17 @@
                05  WRK-API-HOSPADRS    PIC X(120)
                                        OCCURS 3.
            03  WRK-SRYKIKANKBN         PIC X(01).
+           03  WRK-COMMNT.
+               05  WRK-COM-STR         PIC X(09).
+               05  WRK-COM-FIL         PIC X(01).
+               05  WRK-COM-END         PIC X(09).
+           03  WRK-API-GRPNUM          PIC 9(03).
+           03  WRK-API-GRPNUM-HEAD     PIC 9(03).
+           03  WRK-H-NAME.
+               05  WRK-H-NAME1             PIC X(74).
+               05  WRK-H-NAME2             PIC X(74).
+           03  WRK-KINGAKU-X.
+               05  WRK-KINGAKU-Z1      PIC -(8)9.
       *
        01  TAPI-AREA.
            03  TAPI-MEISAI-G.
@@ -275,6 +291,19 @@
            03  TPARA-CHUI               PIC X(100).
            03  TPARA-API-DATA           PIC X(1).
            03  TPARA-API-CUSTOM-ID      PIC X(20).
+      *    以下V5用
+           03  TPARA-GOKEITANI          PIC X(1).
+           03  TPARA-SYOKEI             PIC X(1).
+           03  TPARA-RCHUI              PIC X(100).
+           03  TPARA-MCHUI              PIC X(100).
+           03  TPARA-PARA-COM-HYOJI-G.
+               05  TPARA-COM-HYOJI      PIC X(20)  OCCURS  5.
+           03  TPARA-JIHIKBN            PIC X(01).
+      *
+       01  TBL-COM-HYOJI-AREA.
+           03  TBL-COM-HYOJI-OCC       OCCURS   5.
+               05  TBL-COM-STR             PIC X(09).
+               05  TBL-COM-END             PIC X(09).
       *
        01  CONST-AREA.
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
@@ -406,6 +435,8 @@
       *    画面色等
            COPY    "ENUM-VALUE".
       *
+      *    明細書作成サブ
+           COPY    "CPORCHC04SUB.INC".
       *
            COPY    "MCPAREA".
       *
@@ -433,6 +464,7 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  TBL-COM-HYOJI-AREA
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
@@ -691,6 +723,10 @@
                                            TO  WRK-SKYMONEY-TAX-SAI
            END-IF
       *---(03.05.01) LINE ADD  END   -----------------------------------
+      *
+           INITIALIZE                      SYUPARA03-AREA
+           MOVE    1                   TO  SYUPARA03-GRP-DENPNUM-MAX
+           MOVE    SYU-DENPNUM         TO  SYUPARA03-GRP-DENPNUM (1)
       *
       *    帳票印刷開始処理
            PERFORM 400-SYOKI-PRINT-SEC
@@ -1035,6 +1071,9 @@
            MOVE    "00000000"      TO  TPARA-CHUI-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-CHUI-YUKOEDYMD
            MOVE    "0"             TO  TPARA-API-DATA
+           MOVE    "0"             TO  TPARA-GOKEITANI
+           MOVE    "1"             TO  TPARA-SYOKEI
+           MOVE    "0"             TO  TPARA-JIHIKBN
       *
       *    診療科名
            MOVE    "SRYKA"         TO  WRK-PARA-NAME
@@ -1160,6 +1199,48 @@
                MOVE    WRK-PARA        TO  TPARA-API-CUSTOM-ID
            END-IF
       *
+      *    以下V5用
+      *    合計単位
+           MOVE    "GOKEITANI"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA            =   "0" OR "1" )
+               MOVE    WRK-PARA        TO  TPARA-GOKEITANI
+           END-IF
+      *    小計
+           MOVE    "SYOKEI"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA            =   "0" OR "1" )
+               MOVE    WRK-PARA        TO  TPARA-SYOKEI
+           END-IF
+      *    注意書き
+           MOVE    "RCHUI"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-RCHUI
+      *    注意書き
+           MOVE    "MCHUI"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-MCHUI
+           MOVE    "COM_HYOUJI_1"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-COM-HYOJI (1)
+           MOVE    "COM_HYOUJI_2"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-COM-HYOJI (2)
+           MOVE    "COM_HYOUJI_3"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-COM-HYOJI (3)
+           MOVE    "COM_HYOUJI_4"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-COM-HYOJI (4)
+           MOVE    "COM_HYOUJI_5"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-COM-HYOJI (5)
+           MOVE    "JIHIKBN"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  TPARA-JIHIKBN
+      *    コメント範囲編集
+           PERFORM 1001-COMHYOJI-HEN-SEC
+      *
            .
        100-OPTION-SELECT-EXT.
            EXIT.
@@ -1179,6 +1260,8 @@
                MOVE    "ORCHC03V02"    TO  ORCSPRGOPTION-PRGID
            WHEN    "A5"
                MOVE    "ORCHC03V03A5"  TO  ORCSPRGOPTION-PRGID
+           WHEN    "V5"
+               MOVE    "ORCHC03V05"    TO  ORCSPRGOPTION-PRGID
            WHEN    OTHER
                MOVE    "ORCHC03V03"    TO  ORCSPRGOPTION-PRGID
            END-EVALUATE
@@ -1203,6 +1286,8 @@
                MOVE    ORCSPRGOPTION-OT-PARA (1:80)
                                        TO  KANACHK-MAE-INPUT
            WHEN    "CHUI"
+           WHEN    "RCHUI"
+           WHEN    "MCHUI"
                MOVE    ORCSPRGOPTION-OT-PARA (1:100)
                                        TO  KANACHK-MAE-INPUT
            WHEN    "YUKOSTYMD"
@@ -1221,6 +1306,43 @@
       *
            .
        1001-OPTION-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象コメントコード編集処理
+      *****************************************************************
+       1001-COMHYOJI-HEN-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  TBL-COM-HYOJI-AREA
+           MOVE    ZERO                TO  IDX
+           PERFORM VARYING    IDXC     FROM    1   BY  1
+                   UNTIL      IDXC     >   5
+               MOVE    TPARA-COM-HYOJI (IDXC)   TO  WRK-COMMNT
+               PERFORM 10011-COMHYOJI-HENSYU-SEC
+           END-PERFORM
+           .
+       1001-COMHYOJI-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象コメントコード編集処理
+      *****************************************************************
+       10011-COMHYOJI-HENSYU-SEC                SECTION.
+      *
+           IF     (WRK-COM-STR(1:1)    =   "8"  )
+               OR (WRK-COM-STR(1:3)    =   "008")
+               ADD     1                   TO  IDX
+               MOVE    WRK-COM-STR         TO  TBL-COM-STR (IDX)
+               IF     (WRK-COM-END(1:1)    =   "8"  )
+                   OR (WRK-COM-END(1:3)    =   "008")
+                   MOVE    WRK-COM-END         TO  TBL-COM-END (IDX)
+               ELSE
+                   MOVE    WRK-COM-STR         TO  TBL-COM-END (IDX)
+               END-IF
+               IF      TBL-COM-STR (IDX)   >   TBL-COM-END (IDX)
+                   MOVE    WRK-COM-STR         TO  TBL-COM-END (IDX)
+               END-IF
+           END-IF
+           .
+       10011-COMHYOJI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1630,14 +1752,13 @@
       *
            IF    ( SMCNDATE-YMD        >=  TPARA-CHUI-YUKOSTYMD )
             AND  ( SMCNDATE-YMD        <=  TPARA-CHUI-YUKOEDYMD )
-               MOVE    TPARA-CHUI      TO  HC03-CHUI
+               MOVE    TPARA-CHUI          TO  HC03-CHUI
            END-IF
       *
            IF    ( ORCHC03-HAKKOFLG        =   4 )
                PERFORM 3001-TUKIBETU-HEN-SEC
            END-IF
       *
-           DISPLAY "TPARA-API-DATA=" TPARA-API-DATA
            IF    ( TPARA-API-DATA      =   "1" )
                PERFORM 2002-APIRES-HEN-SEC
            ELSE
@@ -1855,7 +1976,7 @@
       *
                MOVE   WRK-JIHIMEI (IDXA)
                                        TO  FMSEIKYU-JIHI-NAME (IDXA)
-               MOVE   HC03-JIHI   (IDX)
+               MOVE   HC03-JIHI   (IDXA)
                                        TO  FMSEIKYU-JIHI (IDXA)
       *
            END-PERFORM
@@ -1869,17 +1990,262 @@
            MOVE   HC03-ZENMISYU        TO  FMSEIKYU-SKYMONEY-LAST
            MOVE   HC03-GOUKEIGAK       TO  FMSEIKYU-SKYMONEY-TOTAL
            MOVE   HC03-KONNYUKIN       TO  FMSEIKYU-NYUKIN
-           MOVE   HC03-CHUI            TO  FMSEIKYU-CAUTION
            PERFORM VARYING IDXA FROM    1   BY  1
                    UNTIL ( IDXA >   10 )
                MOVE  HC03-MEMO (IDXA)
                                        TO  FMSEIKYU-MEMO (IDXA)
            END-PERFORM
       *
-           DISPLAY "FMSEIKYU-DATA!![" FMSEIKYU-DATA (1:100) "]"
+           IF    ( ORCHC03-SIZE        =   "V5" )
+      *
+               MOVE    ZERO            TO  WRK-API-GRPNUM
+      *
+               PERFORM VARYING IDXD    FROM    1   BY  1
+                       UNTIL ( IDXD    >   SYUPARA03-GRP-DENPNUM-MAX )
+      *
+                   INITIALIZE                  ORCHC04SUBAREA
+                   MOVE    SYUPARA03-GRP-DENPNUM (IDXD)
+                                       TO  ORCHC04SUB-DENPNUM
+                   MOVE    TPARA-GOKEITANI
+                                       TO  ORCHC04SUB-GOKEITANI
+                   MOVE    TPARA-SYOKEI
+                                       TO  ORCHC04SUB-PARAKBN
+                   IF    ( TBL-COM-STR (1) NOT =   SPACE )
+                       MOVE    "1"     TO  ORCHC04SUB-PARACOMKBN
+                   END-IF
+                   IF     ( TPARA-JIHIKBN  =   "1" )
+                       MOVE    "1"     TO  ORCHC04SUB-PARAJIHIKBN
+                   END-IF
+                   MOVE    "1"         TO  ORCHC04SUB-APIKBN
+      *
+                   CALL    "ORCHC04SUB"    USING
+                                           SPA-AREA
+                                           ORCHC04SUBAREA
+      *
+                   IF    ( ORCHC04SUB-TBL-MAX  >   ZERO )
+      *
+                       PERFORM 30050-COMMNT-CHK-SEC
+      *
+                       IF    ( IDX-API     <   2000 )
+                           IF    ( SYUPARA03-GRP-DENPNUM-MAX   >   1 )
+                            OR   ( WRK-SRYKIKANKBN             =   "2" )
+                               PERFORM 20021-EDIT-HEAD-SEC
+                           END-IF
+                       END-IF
+                       IF    ( IDX-API     <   2000 )
+                           PERFORM 20021-EDIT-MEISAI-SEC
+                       END-IF
+                   END-IF
+      *
+               END-PERFORM
+           END-IF
       *
            .
        2002-APIRES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    コメント判定追加処理
+      *****************************************************************
+       30050-COMMNT-CHK-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  IDX-CM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   ORCHC04SUB-TBL-MAX
+      *
+               MOVE    1                   TO  FLG-OK
+      *
+               IF     (ORCHC04SUB-SRYCD (IDX)(1:1) =   "8" )
+                  OR  (ORCHC04SUB-SRYCD (IDX)(1:3) =   "008")
+                   MOVE    ZERO                TO  FLG-OK
+                   PERFORM VARYING     IDXC    FROM    1   BY  1
+                           UNTIL      (IDXC    >   5 )
+                                OR    (TBL-COM-STR (IDXC)  =   SPACE)
+                                OR    (FLG-OK      =   1   )
+                       IF    (ORCHC04SUB-SRYCD (IDX)
+                                           >=  TBL-COM-STR (IDXC))
+                        AND  (ORCHC04SUB-SRYCD (IDX)
+                                           <=  TBL-COM-END (IDXC))
+                           MOVE    1           TO  FLG-OK
+                       END-IF
+                   END-PERFORM
+                   IF      FLG-OK              =   ZERO
+      *                対象外
+                       IF     (ORCHC04SUB-H-ZAIHEN(IDX)
+                                                   NOT =   "＊")
+                         AND  (ORCHC04SUB-H-TENSU  (IDX-CM)
+                                                       =   SPACE )
+                         AND  (ORCHC04SUB-H-KINGAKU(IDX-CM)
+                                                       =   SPACE )
+      *                    剤の最後
+                           MOVE    ORCHC04SUB-H-KAISU (IDX)
+                                               TO  ORCHC04SUB-H-KAISU
+                                                             (IDX-CM)
+                           MOVE    ORCHC04SUB-H-TENSU (IDX)
+                                               TO  ORCHC04SUB-H-TENSU
+                                                             (IDX-CM)
+                           MOVE    ORCHC04SUB-H-KINGAKU (IDX)
+                                               TO  ORCHC04SUB-H-KINGAKU
+                                                             (IDX-CM)
+                           MOVE    ORCHC04SUB-H-ENKBN (IDX)
+                                               TO  ORCHC04SUB-H-ENKBN
+                                                             (IDX-CM)
+                           MOVE    ORCHC04SUB-ZAIEND (IDX)
+                                               TO  ORCHC04SUB-ZAIEND
+                                                             (IDX-CM)
+                       END-IF
+                       IF     (ORCHC04SUB-H-ZAIHEN(IDX)
+                                                       =   "＊")
+                       AND    (ORCHC04SUB-ZAIEND(IDX)  =   SPACE)
+      *                    剤の先頭
+                           MOVE    ORCHC04SUB-H-SRYKBN (IDX)
+                                               TO  ORCHC04SUB-H-SRYKBN
+                                                             (IDX + 1)
+                           MOVE    ORCHC04SUB-H-ZAIHEN (IDX)
+                                               TO  ORCHC04SUB-H-ZAIHEN
+                                                             (IDX + 1)
+                       END-IF
+                       MOVE    "999999999"     TO ORCHC04SUB-SRYCD (IDX)
+                   END-IF
+               END-IF
+      *
+               IF      FLG-OK              =   1
+                   MOVE    IDX             TO  IDX-CM
+               END-IF
+           END-PERFORM
+           .
+       30050-COMMNT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細書行見出し編集処理
+      *****************************************************************
+       20021-EDIT-HEAD-SEC             SECTION.
+      *
+           COMPUTE IDX-API =   IDX-API +   1
+      *
+           MOVE    "1"                 TO  FMSEIKYU-GRPHEAD(IDX-API)
+      *
+           COMPUTE WRK-API-GRPNUM-HEAD
+               =   WRK-API-GRPNUM  +   1
+           MOVE    WRK-API-GRPNUM-HEAD TO  FMSEIKYU-GRPNUM (IDX-API)
+      *
+           MOVE    1                   TO  IDXP
+      *
+           IF    ( WRK-SRYKIKANKBN     =   "2" )
+            OR   ( WRK-STSRYYMDG   NOT =   WRK-EDSRYYMDG )
+               STRING  "〔"            DELIMITED BY SIZE
+                       ORCHC04SUB-SRYYMDMEI(17:6)
+                                       DELIMITED BY SIZE
+                       "〕"            DELIMITED BY SIZE
+               INTO    FMSEIKYU-SRYNAME-G(IDX-API)
+               WITH    POINTER    IDXP
+               END-STRING
+           END-IF
+      *
+           IF    ( TPARA-SRYKA             =   "1" )
+            AND  ( ORCHC04SUB-SRYKAMEI NOT =   SPACE )
+               STRING  "≪"            DELIMITED  BY  SIZE
+                       ORCHC04SUB-SRYKAMEI
+                                       DELIMITED  BY  SPACE
+                       "≫"            DELIMITED  BY  SIZE
+               INTO    FMSEIKYU-SRYNAME-G(IDX-API)
+               WITH    POINTER    IDXP
+               END-STRING
+           END-IF
+      *
+           IF    ( TPARA-HKNMEI                =   "1" )
+            AND  ( ORCHC04SUB-HKNCOMBIMEI  NOT =   SPACE )
+               STRING  "【"            DELIMITED  BY  SIZE
+                       ORCHC04SUB-HKNCOMBIMEI
+                                       DELIMITED  BY  SPACE
+                       "】"            DELIMITED  BY  SPACE
+               INTO    FMSEIKYU-SRYNAME-G(IDX-API)
+               WITH    POINTER    IDXP
+               END-STRING
+           END-IF
+      *
+           .
+       20021-EDIT-HEAD-EXT.
+           EXIT.
+      *****************************************************************
+      *    明細書剤部分編集処理
+      *****************************************************************
+       20021-EDIT-MEISAI-SEC           SECTION.
+      *
+           ADD     1                   TO  WRK-API-GRPNUM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   ORCHC04SUB-TBL-MAX )
+                        OR    (IDX-API     >=   2000 )
+             IF      ORCHC04SUB-SRYCD (IDX)    NOT =   "999999999"
+               ADD     1                   TO  IDX-API
+               MOVE    WRK-API-GRPNUM      TO  FMSEIKYU-GRPNUM(IDX-API)
+      *        名称＋数量編集
+               IF     (ORCHC04SUB-SURYO  (IDX) =   ZERO  )
+                 OR   (ORCHC04SUB-SRYKBN (IDX) =   "95"
+                                               OR  "96"  )
+      *            自費の数量記載なし
+                   MOVE    ORCHC04SUB-NAME (IDX)   TO  WRK-H-NAME
+               ELSE
+                   MOVE    SPACE                   TO  WRK-H-NAME
+                   STRING  ORCHC04SUB-NAME (IDX)
+                           "　　"
+                           ORCHC04SUB-H-ZEN-SURYO (IDX)
+                           DELIMITED  BY  SPACE
+                                           INTO   WRK-H-NAME
+                   END-STRING
+               END-IF
+      *        小計
+               IF      ORCHC04SUB-SRYKBN (IDX)     =   "XX"
+                   MOVE    "小計"          TO  FMSEIKYU-SRYNAME
+                                                     (IDX-API)
+               ELSE
+      *            名称
+                   MOVE    WRK-H-NAME      TO  FMSEIKYU-SRYNAME
+                                                     (IDX-API)
+               END-IF
+               MOVE    ORCHC04SUB-H-SRYKBN(IDX)
+                                           TO  FMSEIKYU-SRYKBN
+                                                     (IDX-API)
+      *        剤開始（＊）
+               MOVE    ORCHC04SUB-H-ZAIHEN (IDX)
+                                           TO  FMSEIKYU-ZAIHEN
+                                                     (IDX-API)
+      *        点数（単価）
+               MOVE    ORCHC04SUB-H-TENSU (IDX)
+                                           TO  FMSEIKYU-TENSU
+                                                     (IDX-API)
+      *        合計
+               IF    ( ORCHC04SUB-H-KINGAKU(IDX)
+                                       NOT =   SPACE )
+                   MOVE    FUNCTION NUMVAL(ORCHC04SUB-H-KINGAKU(IDX))
+                                           TO  WRK-KINGAKU-Z1
+                   MOVE    WRK-KINGAKU-X   TO  FMSEIKYU-TOTAL
+                                                     (IDX-API)
+               END-IF
+      *        円
+               MOVE    ORCHC04SUB-H-ENKBN (IDX)
+                                           TO  FMSEIKYU-TENSU-MARK
+                                                     (IDX-API)
+      *        回数
+               MOVE    ORCHC04SUB-H-KAISU (IDX)
+                                           TO  FMSEIKYU-KAISU
+                                                      (IDX-API)
+      *        剤終了
+               MOVE    ORCHC04SUB-ZAIEND (IDX)
+                                          TO  FMSEIKYU-ZAIEND(IDX-API)
+             END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SMCNDATE-YMD        >=  TPARA-CHUI-YUKOSTYMD )
+            AND  ( SMCNDATE-YMD        <=  TPARA-CHUI-YUKOEDYMD )
+               MOVE    TPARA-RCHUI        TO  FMSEIKYU-SKY-CAUTION
+               MOVE    TPARA-MCHUI        TO  FMSEIKYU-SRY-CAUTION
+           END-IF
+      *
+           .
+       20021-EDIT-MEISAI-EXT.
            EXIT.
       *****************************************************************
       *    帳票編集処理（HC03V01）
@@ -2187,6 +2553,22 @@
                                                          (IDX-SYU)
                END-IF
       *---(03.03.00) LINE ADD  END   -----------------------------------
+      *
+               INITIALIZE                  SYUPARA03-AREA
+               MOVE    1               TO  SYUPARA03-GRP-DENPNUM-MAX
+               MOVE    SYU-DENPNUM     TO  SYUPARA03-GRP-DENPNUM (1)
+               PERFORM VARYING IDXD    FROM    1   BY  1
+                       UNTIL ( IDXD    >    15   )
+                        OR   ( ORCHC03SUB-DOUJI-DENPNUM (IDX-SYU IDXD)
+                                           =   ZERO )
+      *
+                   COMPUTE SYUPARA03-GRP-DENPNUM-MAX
+                       =   IDXD    +   1
+      *
+                   MOVE    ORCHC03SUB-DOUJI-DENPNUM (IDX-SYU IDXD)
+                                   TO  SYUPARA03-GRP-DENPNUM (IDXD + 1)
+      *
+               END-PERFORM
       *
       *        帳票印刷開始処理
                PERFORM 400-SYOKI-PRINT-SEC
