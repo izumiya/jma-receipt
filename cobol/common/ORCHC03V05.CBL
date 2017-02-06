@@ -159,7 +159,7 @@
            03  WRK-NO                  PIC Z(7).
            03  WRK-Z7-G.
                05  WRK-FIL             PIC X(09).
-               05  WRK-Z7              PIC Z,ZZZ,ZZZ.
+      *         05  WRK-Z7              PIC Z,ZZZ,ZZZ.
            03  WRK-Z72-G.
                05  WRK-FIL2            PIC X(18).
            03  WRK-Z72                 PIC S9(07).
@@ -1019,73 +1019,73 @@
       *        ¿ÇÎÅ²Ê
                MOVE    SYU-HKNTEN (01)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(1)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(1)
       *        »ØÆ³²Ê
                MOVE    SYU-HKNTEN (02)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(2)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(2)
       *        ºßÂð²Ê
                MOVE    SYU-HKNTEN (03)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(3)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(3)
       *        ÅêÌô²Ê
                MOVE    SYU-HKNTEN (04)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(4)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(4)
       *        Ãí¼Í²Ê
                MOVE    SYU-HKNTEN (05)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(5)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(5)
       *        ½èÃÖ²Ê
                MOVE    SYU-HKNTEN (06)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(6)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(6)
       *        ¼ê½Ñ²Ê
                MOVE    SYU-HKNTEN (07)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(7)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(7)
       *        Ëã¿ì
                MOVE    SYU-HKNTEN (08)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(8)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(8)
       *        ¸¡ºº²Ê
                MOVE    SYU-HKNTEN (09)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(9)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(9)
       *        £ØÀþ²Ê
                MOVE    SYU-HKNTEN (10)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(10)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(10)
       *        ¥ê¥Ï¥Ó¥ê
                MOVE    SYU-HKNTEN (11)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(11)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(11)
       *        Àº¿À²ÊÀìÌç
                MOVE    SYU-HKNTEN (12)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(12)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(12)
       *        Êü¼ÍÀþ¼£ÎÅ
                MOVE    SYU-HKNTEN (13)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(13)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(13)
       *        ÉÂÍý¿ÇÃÇ
                MOVE    SYU-HKNTEN (14)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(14)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(14)
       *        Æþ±¡ÎÁ
                MOVE    SYU-HKNTEN (15)     TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-HKNRYO(15)
+               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(15)
       *        ¹ç·×ÅÀ¿ô
                MOVE    WRK-TOTAL-HKNTEN    TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z72-H           TO  HCM03V05-GOKTEN
+               MOVE    WRK-Z7-G            TO  HCM03V05-GOKTEN
            END-IF
       *
       *    ÊÝ¸±Å¬ÍÑÊ¬
            MOVE    WRK-HKNTEKMONEY     TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
-           MOVE    WRK-Z72-H           TO  HCM03V05-FTNKIN
+           MOVE    WRK-Z7-G            TO  HCM03V05-FTNKIN
       *
            IF    ( COMB-HKNNUM             =    "971"
                                            OR   "973" )
@@ -1110,42 +1110,42 @@
                                            +   SYU-KOH-FTN
                    MOVE    WRK-HKNTEKMONEY     TO  WRK-Z72
                    PERFORM 800-HENKAN-SEC
-                   MOVE    WRK-Z72-H           TO  HCM03V05-FTNKIN
+                   MOVE    WRK-Z7-G            TO  HCM03V05-FTNKIN
                END-IF
            END-IF
       *
       *    ¼«Èñ¹ç·×
            MOVE    WRK-GOK-JIHI        TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
-           MOVE    WRK-Z72-H           TO  HCM03V05-JIHI
+           MOVE    WRK-Z7-G            TO  HCM03V05-JIHI
       *    ¸øÈñ°ìÉôÉéÃ´¶â
            MOVE    WRK-KOH-FTN         TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
-           MOVE    WRK-Z72-H           TO  HCM03V05-KOUHI
+           MOVE    WRK-Z7-G            TO  HCM03V05-KOUHI
       *    Ä´À°¶â
            MOVE    WRK-CHOSEI          TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
-           MOVE    WRK-Z72-H           TO  HCM03V05-CHOSEI
+           MOVE    WRK-Z7-G            TO  HCM03V05-CHOSEI
       *    Á°²óÌ¤¼ý³Û·×»»
            MOVE    WRK-MISYUMONEY      TO  WRK-Z72
            PERFORM 810-HENKAN-SEC
-           MOVE    WRK-Z72-H9          TO  HCM03V05-ZENMISYU
+           MOVE    WRK-Z7-G            TO  HCM03V05-ZENMISYU
       *    º£²óÀÁµá³Û
            MOVE    WRK-SKYMONEY        TO  WRK-Z72
            PERFORM 810-HENKAN-SEC
-           MOVE    WRK-Z72-H9          TO  HCM03V05-KONSEIKYU
+           MOVE    WRK-Z7-G            TO  HCM03V05-KONSEIKYU
       *    ¹ç·×ÀÁµá³Û
            COMPUTE WRK-GOKTEN          =   WRK-SKYMONEY
                                        +   WRK-MISYUMONEY
            MOVE    WRK-GOKTEN          TO  WRK-Z72
            PERFORM 810-HENKAN-SEC
-           MOVE    WRK-Z72-H9          TO  HCM03V05-GOUKEIGAK
+           MOVE    WRK-Z7-G            TO  HCM03V05-GOUKEIGAK
       *    º£²óÆþ¶â³Û
            MOVE    WRK-NYUKIN          TO  WRK-Z72
            MOVE    1                   TO  FLG-HENPARA
            PERFORM 810-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HCM03V05-NYUKIN
-           MOVE    WRK-Z72-H9          TO  HCM03V05-KONNYUKIN
+           MOVE    WRK-Z7-G            TO  HCM03V05-KONNYUKIN
       *
       *    È¯¹Ô¶èÊ¬
            EVALUATE    ORCHC03-HAKKOFLG
@@ -2320,6 +2320,7 @@
                MOVE    WRK-Z72             TO  WRK-Z72-H
                MOVE    WRK-Z72-H           TO  KANACHK-MAE-INPUT
            END-IF
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-Z7-G
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
            IF      KANACHK-RC          =   ZERO
@@ -2343,6 +2344,7 @@
                MOVE    WRK-Z72             TO  WRK-Z72-H9
                MOVE    WRK-Z72-H9          TO  KANACHK-MAE-INPUT
            END-IF
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-Z7-G
       *    º¸¤º¤á
            IF      FLG-HENPARA         =   1
                MOVE    KANACHK-MAE-INPUT   TO  WRK-HENKAN-G
