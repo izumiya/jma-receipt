@@ -1921,6 +1921,11 @@
                IF      TNS-NYUGAITEKKBN    =   1
                    MOVE    "2851"          TO  SPA-ERRCD
                END-IF
+      *        労災コードはエラー
+               IF     (WRK-SRYCD (1:3)     =   "101")
+                   MOVE    "2851"          TO  SPA-ERRCD
+               END-IF
+      *
                IF     (FLG-TENSU-OK        =   2 )
                  AND  (SPA-ERRCD           =   SPACE )
       *            当日期間外

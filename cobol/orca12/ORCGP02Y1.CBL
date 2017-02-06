@@ -1665,6 +1665,10 @@
                IF     (TNS-SRYCD(1:1)      =   "1" )
                  AND  (TNS-SRYKBN          =   "13")
                    CONTINUE
+      *            Ï«ºÒ¥³¡¼¥É¤ÏÂÐ¾Ý³°
+                   IF      TNS-SRYCD(1:3)  =   "101"
+                       MOVE   1                TO  FLG-CHK
+                   END-IF
                ELSE
                    MOVE   1                TO  FLG-CHK
                END-IF
