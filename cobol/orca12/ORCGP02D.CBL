@@ -676,10 +676,11 @@
       *            労働基準監督署コード
                    MOVE    PTRSI-SYOCD         TO  SPA-GMN2D-SYOCD
                    MOVE    PTRSI-SYOCD         TO  SPA-NAI2D-MAE-SYOCD
-                   IF      PTRSI-SYOCD         =   SPACE
+      *H29.2       初期設定廃止
+      *            IF      PTRSI-SYOCD         =   SPACE
       *                労働基準監督署コード初期設定
-                       PERFORM 30011-SYOCD-INITSET-SEC
-                   END-IF
+      *                PERFORM 30011-SYOCD-INITSET-SEC
+      *****        END-IF
                    IF      SPA-GMN2D-SYOCD     NOT =   SPACE
       *                労働基準監督署名称編集
                        PERFORM 30012-SYOCD-HEN-SEC
@@ -2953,6 +2954,15 @@
                   AND (SPA-NAI2D-RYOSTYMD  NOT =   SPACE )
       *            傷病年月日・療養開始日の設定がある時
                    PERFORM 30011-SYOCD-INITSET-SEC
+      *H29.2
+      *            労働基準監督署コードが存在しないとき、複写中止
+                   IF      SPA-GMN2D-SYOCD     NOT =   SPACE
+                       PERFORM 30012-SYOCD-HEN-SEC
+                       IF     (FLG-LABOR-SIO       =   1   )
+                         AND  (SPA-NAI2D-RYOSTYMD  >=  "20080401" )
+                           MOVE    SPACE           TO  SPA-GMN2D-SYOCD
+                       END-IF
+                   END-IF
                END-IF
            END-IF
       *
@@ -2967,13 +2977,14 @@
                      AND ((FLG-TOUROKU         =   1      ) OR
                           (WRK-MCP-WIDGET      =   "SYOCD"))
                        MOVE    1                   TO  SPA-NAI2D-KEIFLG2
-                       MOVE    "K049"              TO  SPA-ERRCD
+      *H29.2           MOVE    "K049"              TO  SPA-ERRCD
+                       MOVE    "K052"              TO  SPA-ERRCD
                        MOVE    30                  TO  SPA-GMN2D-CUR
       *H25.7
-      *                職業安定所判定
-                       IF      SPA-GMN2D-SYOCD(3:1)    =   "3"
-                            MOVE    "K052"              TO  SPA-ERRCD
-                       END-IF
+      ****             職業安定所判定
+      *                IF      SPA-GMN2D-SYOCD(3:1)    =   "3"
+      *                     MOVE    "K052"              TO  SPA-ERRCD
+      *****            END-IF
                    END-IF
                END-IF
            END-IF
@@ -4323,15 +4334,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                INTO  SPA-ERRMSG
                    END-STRING
                WHEN    "K050"
-                   STRING  "警告！！"
-                           "労働基準監督署コードが未入力です。"
+                   STRING  "警告！"
+      *H29.2               "労働基準監督署コードが未入力です。"
                                                DELIMITED  BY  SIZE
+                           "管轄の労働基準監督署を確認し、該当する"
+                           "労働基準監督署コードを入力して下さい"
                                                INTO  SPA-ERRMSG
                    END-STRING
       *H25.7 
                WHEN    "K052"
-                   STRING  "警告！！"
-                           "労働基準監督署コードで再入力して下さい。"
+                   STRING  "警告！"
+      *H29.2               "労働基準監督署コードで再入力して下さい。"
+                           "管轄の労働基準監督署を確認し、該当する"
+                           "労働基準監督署コードを入力して下さい"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
