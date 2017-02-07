@@ -126,6 +126,8 @@
       *  04.08.01    NACL-門脇    13/01/22  日数回数テーブル１０回対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.04    NACL-門脇    17/02/07  労災保険登録時の労働基準監督
+      *                                     署コードの編集方法変更に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -314,6 +316,8 @@
            03  WRK-S3                                  PIC  9V99999.
            03  WRK-S4                                  PIC  9V99.
            03  WRK-S5                                  PIC  9V99.
+      *
+           03  WRK-PTRSI-CREYMD                        PIC  X(08).
       *
       *    手技点・薬剤等点数用領域
        01  TBL-TENSUG-JI.
@@ -911,6 +915,8 @@ grpsys        PERFORM 900-DBSELECT-SEC
                  MOVE   0.99999  TO  WRK-S3
            END-EVALUATE
       *
+           MOVE    SPACE                TO  WRK-PTRSI-CREYMD
+      *
            MOVE    SPACE                TO  RECE41-REC
            INITIALIZE                       RECE41-REC
       *
@@ -1061,6 +1067,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                         MOVE   PTRSI-JIBAISEIKBN
                                                 TO  RECE41-SEIKYUKBN
                         MOVE   PTRSI-SYOCD      TO  RECE41-SYOCD
+      *
+                        MOVE   PTRSI-CREYMD     TO  WRK-PTRSI-CREYMD
       *
                         IF     RECE41-SRYYM   >=  "201204"
       *                   現物給付対象とする
@@ -1307,7 +1315,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           IF    RECE41-SYOCD  =  SPACE
+           IF    RECE41-SYOCD            =   SPACE
+           AND   WRK-PTRSI-CREYMD(1:6)  <=  "201612"
              EVALUATE  RECE41-HKNKBN
                WHEN       "1"
                  MOVE    RECE41-KOFUNUM(1:5)
