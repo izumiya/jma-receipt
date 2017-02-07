@@ -76,6 +76,8 @@
       *                                     （コンパイル時のワーニング修正）
       *  04.08.04    NACL-門脇    15/09/16  自賠責（健保準拠）の点数単価
       *                                     入外別対応
+      *  04.08.05    NACL-門脇    17/02/07  労災保険登録時の労働基準監督
+      *                                     署コードの編集方法変更に伴う修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -247,6 +249,8 @@
                05  WRK-DAY-TBL         OCCURS  2.
                    07  WRK-DAY         PIC 9(03)
                                            OCCURS   31.
+      *
+           03  WRK-PTRSI-CREYMD        PIC X(08).
       *
        01  WRK-ERRMSG-AREA.
            03  WRK-RECEERR         PIC X(200).
@@ -1228,7 +1232,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
       *    編集処理
       *****************************************************************
        20011-FILE-HENSYU-SEC              SECTION.
-      *     
+      *
+           MOVE    SPACE               TO  WRK-PTRSI-CREYMD
+      *
            INITIALIZE                      WRK-RECE82-REC
            MOVE    SPA-HOSPNUM             TO  WRK-RECE82-HOSPNUM
            IF      WRK-PARA-SYOKBN     =   "1"
@@ -1402,6 +1408,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            MOVE   PTRSI-JIBAISEIKBN    TO  WRK-RECE82-SEIKYUKBN
            MOVE   PTRSI-SYOCD          TO  WRK-RECE82-SYOCD
       *
+           MOVE   PTRSI-CREYMD         TO  WRK-PTRSI-CREYMD
+      *
            IF     WRK-RECE82-SRYYM   >=  "201204"
       *      現物給付対象とする
              IF     PTRSI-DAISAN-GENBTKBN  =  "2"
@@ -1451,7 +1459,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
                MOVE    "0"               TO   WRK-RECE82-RSIIRYOKBN
            END-IF
       *
-           IF    WRK-RECE82-SYOCD  =  SPACE
+           IF    WRK-RECE82-SYOCD        =   SPACE
+           AND   WRK-PTRSI-CREYMD(1:6)  <=  "201612"
              EVALUATE  WRK-RECE82-HKNKBN
                WHEN       "1"
                  MOVE    WRK-RECE82-KOFUNUM(1:5)
