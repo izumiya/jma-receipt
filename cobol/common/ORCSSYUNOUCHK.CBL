@@ -245,8 +245,7 @@
              IF     WRK-CHKNGDATA(IDX1)  =  ZERO
                PERFORM  200-HENKYAKU-SET-SEC
              ELSE
-               DISPLAY "<CHKNG> PTID=" WRK-PTID(IDX1)
-      *****    PERFORM  201-HENKYAKU-SET2-SEC
+               PERFORM  201-HENKYAKU-SET2-SEC
              END-IF
            END-PERFORM
       *
@@ -621,11 +620,9 @@
                                 TO   LNK-ORCSSYUNOUCHK-PTID(IDX2)
                IF    WRK-SKYMONEY-FLG(IDX1)  =  ZERO
                  IF  LNK-ORCSSYUNOUCHK-OPTION1  =  "1"
-                   MOVE   9     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-      *****        MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-                 ELSE
                    MOVE   8     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
-      *****        MOVE   7     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
+                 ELSE
+                   MOVE   7     TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)
                  END-IF
                ELSE
                  MOVE    ZERO   TO   LNK-ORCSSYUNOUCHK-JTIFLG(IDX2)

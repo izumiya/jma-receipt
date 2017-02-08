@@ -140,14 +140,17 @@
            03  CONST-IKTFLG-0.
                05  FILLER              PIC X(28)   VALUE
                    "【患者請求額の変更がある方】".
-           03  CONST-IKTFLG-8.
+           03  CONST-IKTFLG-7.
                05  FILLER              PIC X(28)   VALUE
                    "【患者請求額の変更がない方】".
-           03  CONST-IKTFLG-9.
+           03  CONST-IKTFLG-8.
                05  FILLER              PIC X(28)   VALUE
                    "【患者請求額の変更がない方】".
                05  FILLER              PIC X(38)   VALUE
                    "※該当者チェック時に自動で一括再計算済".
+           03  CONST-IKTFLG-9.
+               05  FILLER              PIC X(36)   VALUE
+                   "【該当者チェックでエラーとなった方】".
            03  CONST-GAITOKBN-1.
                05  FILLER              PIC X(18)   VALUE
                    "第三者行為現物給付".
@@ -173,6 +176,11 @@
                    "該当者チェック抽出分".
                05  FILLER              PIC X(36)   VALUE
                    "（データ項目値が変更となる収納あり）".
+           03  CONST-GAITOKBN-6.
+               05  FILLER              PIC X(36)   VALUE
+                   "診療行為で訂正登録が必要な収納あり。".
+               05  FILLER              PIC X(24)   VALUE
+                   "訂正登録後に再チェック。".
       *
       *    プログラムオプションパラメタ
        01  TPARA-AREA.
@@ -531,6 +539,8 @@
            EVALUATE    TOKEI-IKTFLG
                WHEN    0
                    MOVE    CONST-IKTFLG-0  TO  HCMG008-IKTFLG
+               WHEN    7
+                   MOVE    CONST-IKTFLG-7  TO  HCMG008-IKTFLG
                WHEN    8
                    MOVE    CONST-IKTFLG-8  TO  HCMG008-IKTFLG
                WHEN    9
@@ -572,6 +582,9 @@
                                        TO  HCMG008-NAIYO(CNT-LINE)
                WHEN    5
                    MOVE    CONST-GAITOKBN-5
+                                       TO  HCMG008-NAIYO(CNT-LINE)
+               WHEN    6
+                   MOVE    CONST-GAITOKBN-6
                                        TO  HCMG008-NAIYO(CNT-LINE)
            END-EVALUATE
            .
