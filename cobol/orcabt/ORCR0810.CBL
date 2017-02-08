@@ -250,8 +250,6 @@
                    07  WRK-DAY         PIC 9(03)
                                            OCCURS   31.
       *
-           03  WRK-PTRSI-CREYMD        PIC X(08).
-      *
        01  WRK-ERRMSG-AREA.
            03  WRK-RECEERR         PIC X(200).
            03  WRK-ERRMSG          PIC X(300).
@@ -1233,8 +1231,6 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
       *****************************************************************
        20011-FILE-HENSYU-SEC              SECTION.
       *
-           MOVE    SPACE               TO  WRK-PTRSI-CREYMD
-      *
            INITIALIZE                      WRK-RECE82-REC
            MOVE    SPA-HOSPNUM             TO  WRK-RECE82-HOSPNUM
            IF      WRK-PARA-SYOKBN     =   "1"
@@ -1408,8 +1404,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            MOVE   PTRSI-JIBAISEIKBN    TO  WRK-RECE82-SEIKYUKBN
            MOVE   PTRSI-SYOCD          TO  WRK-RECE82-SYOCD
       *
-           MOVE   PTRSI-CREYMD         TO  WRK-PTRSI-CREYMD
-      *
            IF     WRK-RECE82-SRYYM   >=  "201204"
       *      現物給付対象とする
              IF     PTRSI-DAISAN-GENBTKBN  =  "2"
@@ -1460,7 +1454,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            END-IF
       *
            IF    WRK-RECE82-SYOCD        =   SPACE
-           AND   WRK-PTRSI-CREYMD(1:6)  <=  "201612"
+           AND   PTRSI-RYOSTYMD(1:6)    <=  "201403"
              EVALUATE  WRK-RECE82-HKNKBN
                WHEN       "1"
                  MOVE    WRK-RECE82-KOFUNUM(1:5)

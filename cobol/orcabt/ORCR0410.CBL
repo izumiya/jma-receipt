@@ -317,8 +317,6 @@
            03  WRK-S4                                  PIC  9V99.
            03  WRK-S5                                  PIC  9V99.
       *
-           03  WRK-PTRSI-CREYMD                        PIC  X(08).
-      *
       *    手技点・薬剤等点数用領域
        01  TBL-TENSUG-JI.
            03  TBL-TENSU-JI                            OCCURS   31.
@@ -915,8 +913,6 @@ grpsys        PERFORM 900-DBSELECT-SEC
                  MOVE   0.99999  TO  WRK-S3
            END-EVALUATE
       *
-           MOVE    SPACE                TO  WRK-PTRSI-CREYMD
-      *
            MOVE    SPACE                TO  RECE41-REC
            INITIALIZE                       RECE41-REC
       *
@@ -1067,8 +1063,6 @@ grpsys         PERFORM 900-DBSELECT-SEC
                         MOVE   PTRSI-JIBAISEIKBN
                                                 TO  RECE41-SEIKYUKBN
                         MOVE   PTRSI-SYOCD      TO  RECE41-SYOCD
-      *
-                        MOVE   PTRSI-CREYMD     TO  WRK-PTRSI-CREYMD
       *
                         IF     RECE41-SRYYM   >=  "201204"
       *                   現物給付対象とする
@@ -1316,7 +1310,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF    RECE41-SYOCD            =   SPACE
-           AND   WRK-PTRSI-CREYMD(1:6)  <=  "201612"
+           AND   PTRSI-RYOSTYMD(1:6)    <=  "201403"
              EVALUATE  RECE41-HKNKBN
                WHEN       "1"
                  MOVE    RECE41-KOFUNUM(1:5)
