@@ -999,6 +999,7 @@
            03  CONST-H039                      PIC X(03)   VALUE "039".
            03  CONST-H009                      PIC X(03)   VALUE "009".
            03  CONST-H2004                 PIC X(06)   VALUE "200804".
+           03  CONST-H2603                 PIC X(06)   VALUE "201403".
            03  CONST-H2507                 PIC X(06)   VALUE "201307".
            03  CONST-H2804                 PIC X(06)   VALUE "201604".
            03  CONST-TEMP                      PIC X(04)   VALUE "TEMP".
@@ -5060,6 +5061,8 @@
                                        TO  WRK-HKNID
                    PERFORM 900-PTRSIINF-KEY-SEL-SEC
                    IF    ( PTRSI-SYOCD     =   SPACE )
+                    AND  ( PTRSI-RYOSTYMD (1:6)
+                                          <= CONST-H2603 )
                        EVALUATE    PTRSI-HKNKBN
                        WHEN    "1"
                            MOVE  PTRSI-KOFUNUM(1:5)
