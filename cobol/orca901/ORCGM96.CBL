@@ -799,7 +799,8 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    PERFORM 210-BACK
       *        情報削除
                WHEN    "CLICKED"       ALSO    "B02"
-                   PERFORM 211-JYOUKYOU-SEC
+      **           PERFORM 211-JYOUKYOU-SEC
+                   MOVE   ZERO                 TO  SPA-NAI-CANCEL
                    PERFORM 201-DELETE-SEC
       *        キー取得
                WHEN    "CLICKED"       ALSO    "B05"
@@ -820,7 +821,8 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    PERFORM 211-JYOUKYOU-SEC
       *        更新
                WHEN    "CLICKED"       ALSO    "B12"
-                   PERFORM 211-JYOUKYOU-SEC
+      **           PERFORM 211-JYOUKYOU-SEC
+                   MOVE   ZERO                 TO  SPA-NAI-CANCEL
                    PERFORM 212-UPDATE-SEC
            END-EVALUATE.
       *
