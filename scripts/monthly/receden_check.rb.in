@@ -225,6 +225,10 @@ class Receden_check < Receden_common
       @errors.push("19282")
     end
   end
+  
+  def senin_tokurei?(rece)
+    rece.ho.any?{|ho|ho["HKNJANUM"].value[0,2] == '02' && !(ho["RIYU"].value.empty?)}
+  end
 
   def check_receipt(r)
 
@@ -296,7 +300,7 @@ class Receden_check < Receden_common
             @errors.push("31350",rece,re,"BIRTHDAY")
           end
           if ( rece.sbt.honkzk == HONNIN || rece.sbt.honkzk == KAZOKU )
-            if rece.age >= 70
+            if rece.age >= 70 && !(senin_tokurei?(rece))
               @errors.push("31380",rece,re,"BIRTHDAY")
             end
           end
