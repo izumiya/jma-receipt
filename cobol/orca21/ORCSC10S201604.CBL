@@ -87,6 +87,7 @@
       * 04.08.00     NACL-多々納  16/09/XX  平成２８年１０月改正対応
       * 04.08.00     NACL-多々納  16/10/06  小児特例休日等変換対応
       * 04.08.00     NACL-多々納  16/12/XX  指導料等自動算定対応
+      * 04.08.00     NACL-多々納  17/02/XX  在宅実績加算２削除対応
       *****************************************************************
       *
       *
@@ -5311,9 +5312,10 @@
                END-EVALUATE
       *        追加共通処理
                IF      WRK-SRYCD       NOT =   SPACE
-      *H29.1
+      *H29.2
       *            直下に実績加算２があればその下とする
                    PERFORM 33081-ZAIKANRI02-SET02-SEC
+      *
                    IF      WRK-IDX-IN3         =   ZERO
                        MOVE    WRK-IDX-IN          TO  IDX2
                        MOVE    WRK-IDX-IN          TO  SPA-GMN-IDX
