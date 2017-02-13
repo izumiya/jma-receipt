@@ -87,6 +87,7 @@
       * 04.08.00     NACL-多々納  16/09/XX  平成２８年１０月改正対応
       * 04.08.00     NACL-多々納  16/10/06  小児特例休日等変換対応
       * 04.08.00     NACL-多々納  16/12/XX  指導料等自動算定対応
+      * 04.08.00     NACL-多々納  17/02/XX  在宅実績加算２削除対応
       *****************************************************************
       *
       *
@@ -422,6 +423,11 @@
       *H28.4
            03  WRK-SYOUNI              PIC 9(04).
            03  WRK-SYOUNI-SUM          PIC 9(04).
+      *H29.2
+      *    在実績加算対応
+           03  WRK-IDX-IN3             PIC 9(04).
+           03  WRK-ZKS-GRP             PIC X(02).
+           03  WRK-ZKS-KBN             PIC X(01).
       *
       *    診察料テーブル
        01  TBL-SINSATU-AREA.
@@ -5306,8 +5312,17 @@
                END-EVALUATE
       *        追加共通処理
                IF      WRK-SRYCD       NOT =   SPACE
-                   MOVE    WRK-IDX-IN          TO  IDX2
-                   MOVE    WRK-IDX-IN          TO  SPA-GMN-IDX
+      *H29.2
+      *            直下に実績加算２があればその下とする
+                   PERFORM 33081-ZAIKANRI02-SET02-SEC
+      *
+                   IF      WRK-IDX-IN3         =   ZERO
+                       MOVE    WRK-IDX-IN          TO  IDX2
+                       MOVE    WRK-IDX-IN          TO  SPA-GMN-IDX
+                   ELSE
+                       MOVE    WRK-IDX-IN3         TO  IDX2
+                       MOVE    WRK-IDX-IN3         TO  SPA-GMN-IDX
+                   END-IF
                    MOVE    ZERO                TO  WRK-IDX-IN
                    PERFORM 33041-SRYCD-ADD-SEC
                END-IF
@@ -5319,6 +5334,33 @@
            END-IF
            .
        3308-ZAIKANRI02-SET-EXT.
+           EXIT.
+      *H29.2
+      *****************************************************************
+      *    実績加算等の判定処理
+      *****************************************************************
+       33081-ZAIKANRI02-SET02-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  WRK-IDX-IN3
+      *
+           SET     TBL-ZKSIDX          TO  1
+           SEARCH  TBL-ZISOKSN-OCC     VARYING   TBL-ZKSIDX
+              AT   END
+                   MOVE    SPACE                   TO  WRK-ZKS-KBN
+                   MOVE    SPACE                   TO  WRK-ZKS-GRP
+               WHEN   (TBL-ZKS-SRYCD (TBL-ZKSIDX)
+                                       =   SPA-COM-INPUTCD
+                                           (WRK-IDX-IN + 1))
+                   MOVE    TBL-ZKS-GRP (TBL-ZKSIDX) TO  WRK-ZKS-GRP
+                   MOVE    TBL-ZKS-KBN (TBL-ZKSIDX) TO  WRK-ZKS-KBN
+           END-SEARCH
+           IF     (WRK-ZKS-KBN         =   "3"     )
+              AND (SPA-COM-AUTOKBN(WRK-IDX-IN + 1)   =   SPACE)
+               COMPUTE WRK-IDX-IN3         =   WRK-IDX-IN
+                                           +   1
+           END-IF
+           .
+       33081-ZAIKANRI02-SET02-EXT.
            EXIT.
       *
       *****************************************************************
