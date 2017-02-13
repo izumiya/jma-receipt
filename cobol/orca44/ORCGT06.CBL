@@ -70,6 +70,8 @@
       *  04.08.05    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
+      *  04.08.06    NACL-藤原    17/02/13  医療機関コード変更時のレセ電
+      *                                     データ等の作成時のパラメタ修正
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -5028,15 +5030,15 @@
       *
            IF      SPA-GMN-T06-SRYYMKBN-MAX
                                    =   ZERO
-               MOVE    "999999"        TO  SHELLTBL-ARG29
                MOVE    "999999"        TO  SHELLTBL-ARG30
+               MOVE    "999999"        TO  SHELLTBL-ARG31
            ELSE
                MOVE    SPA-NAI-T06-SRYYMKBN-ST
                                            (SPA-NAI-T06-SRYYMKBN-SELNUM)
-                                       TO  SHELLTBL-ARG29
+                                       TO  SHELLTBL-ARG30
                MOVE    SPA-NAI-T06-SRYYMKBN-ED
                                            (SPA-NAI-T06-SRYYMKBN-SELNUM)
-                                       TO  SHELLTBL-ARG30
+                                       TO  SHELLTBL-ARG31
            END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
