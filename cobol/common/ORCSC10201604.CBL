@@ -4452,12 +4452,11 @@
            END-EVALUATE
       *
            MOVE    SPACE               TO  WRK-SRYCD
-      *H29.1
-      *    （在支診等以外）の加算は１回のみ
-      *    IF     (WRK-ZS-GRP(2:1)     =   "4"  )
-      *     AND   (WRK-COM-KSNAUTO (IDX-Z) =   "1" )
-      *        GO      TO      10016-ZATAKUKSN-AUTO-EXT
-      *****END-IF
+      *H29.2
+      *    実績加算２の自動算定は１回のみ
+           IF     (WRK-COM-KSNAUTO (IDX-Z) =   "1" )
+               GO      TO      10016-ZATAKUKSN-AUTO-EXT
+           END-IF
       *
       *
            PERFORM VARYING     IDX3    FROM    1   BY  1
@@ -4469,18 +4468,24 @@
                    MOVE    IDX-Z               TO  IDX-S
                    PERFORM 1100-KASAN-SET-SEC
                    IF      FLG-ADD         =   1
-      *H29.1
-      *               （在支診等以外）の加算は手入力分とする
-      *                IF     (WRK-ZS-GRP(2:1)     =   "4" )
-      *                    MOVE    "1"         TO  WRK-COM-KSNAUTO
-      *                                                 (IDX-Z)
-      *                    MOVE    SPACE       TO  WRK-COM-AUTOKBN
-      *                                                 (IDX-S)
-      *****            END-IF
+      *H29.2
+      *                実績加算２は手入力分とする
+                       IF      IDX3            =   3
+                           MOVE    "1"         TO  WRK-COM-KSNAUTO
+                                                        (IDX-Z)
+                           MOVE    SPACE       TO  WRK-COM-AUTOKBN
+                                                        (IDX-S)
+                       END-IF
       *
                        MOVE    3               TO  IDX3
                    END-IF
                ELSE
+      *H29.2
+      *            実績加算２は手入力分とする
+                   IF      IDX3            =   3
+                       MOVE    "1"         TO  WRK-COM-KSNAUTO
+                                                        (IDX-Z)
+                   END-IF
                    MOVE    3               TO  IDX3
                END-IF
            END-PERFORM

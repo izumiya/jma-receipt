@@ -702,8 +702,8 @@
                    END-IF
       *            前回編集時、自動作成分は編集しない
                    IF      FLG-ZENKAI          =   1
-                       IF      LNK-WKSRY-AUTOKBN(IDX IDY)    =   "2" OR
-                                                                 "3"
+                       IF      LNK-WKSRY-AUTOKBN(IDX IDY)    =   "2"
+                                                             OR  "3"
                                                              OR  "4"
                                                              OR  "6"
                            MOVE    1               TO  FLG-HEN-CHK
@@ -998,12 +998,11 @@
                                                              (IDX-1)
                        END-IF
                    END-IF
-      *H28.9
-      *            （在支診等以外）の加算は自動発生なし
-                   IF     (SPA-SRYYMD              >=  "20160401")
-                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
-                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
+      *H29.2
+      *            在宅加算２の訂正時自動発生対応
+                   IF     (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
                       AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
+                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
                        PERFORM 10026-ZAITAKU-AUTO-SEC
                    END-IF
       *
@@ -1278,7 +1277,7 @@
        10025-HAIKI-CHKI-EXT.
            EXIT.
       *
-      *H28.9
+      *H29.2
       *****************************************************************
       *    （在支診等以外）の加算処理
       *****************************************************************
@@ -1298,16 +1297,11 @@
                    MOVE    TBL-ZS-KBN2(TBL-ZSIDX)  TO  WRK-ZS-KBN2
            END-SEARCH
       *
-           IF      SPA-COM-DATAKBN(IDX-1) =  "1"
-      *        （在支診等以外）　自動発生なし
-               IF     (WRK-ZS-GRP(2:1)     =   "4" )
+           IF     (SPA-COM-DATAKBN(IDX-1) =  "1"  )
+              AND (WRK-ZS-GRP         NOT =   SPACE )
+      *        直下に自動発生分がない場合、自動発生なしとする
+               IF     (SPA-COM-AUTOKBN (IDX-1 + 1) =   SPACE)
                    MOVE    "1"             TO  SPA-COM-KSNAUTO(IDX-1)
-      *            直下の自動発生分は手入力とする
-                   IF     (SPA-COM-INPUTCD (IDX-1 + 1)(1:1)  =   "1")
-                      AND (SPA-COM-AUTOKBN (IDX-1 + 1)     =  "2"  )
-                        MOVE   SPACE           TO  SPA-COM-AUTOKBN
-                                                          (IDX-1 + 1)
-                   END-IF
                END-IF
            END-IF
            .
@@ -1880,8 +1874,11 @@
                                                    "210" OR
                                                    "220" OR
                                                    "230" OR
-                                                   "290" )  AND
-                  (LNK-WKSRY-SRYKBN    (IDX)   =   "21" OR "22"
+      *           頓服・外用（臨時投薬）追加
+                                                   "293" OR
+                                                   "296" OR
+                                                   "290" )
+            AND   (LNK-WKSRY-SRYKBN    (IDX)   =   "21" OR "22"
                                                OR  "23" )
       *        薬評以外
              AND  (LNK-WKSRY-ZAIKBN (IDX)  NOT =   1     )
@@ -4874,8 +4871,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
