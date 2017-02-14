@@ -3064,15 +3064,17 @@
                END-IF
       *H28.10
            ELSE
-      *        ６歳以上
+      *H29.2
+      *        ６歳以上で夜間・早朝算定可
                IF     (SPA-NENREI-YY       >=  6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2   )
                    EVALUATE    WRK-HZN-JIKANKBN
-      *                小児特例休日　を休日
+      *                小児特例夜間・休日・深夜
+                       WHEN    "5"
                        WHEN    "6"
-                           MOVE    2               TO  SPA-GAI-JIKANKBN
-      *                小児特例深夜　を深夜
                        WHEN    "7"
-                           MOVE    3               TO  SPA-GAI-JIKANKBN
+                           MOVE    8               TO  SPA-GAI-JIKANKBN
                    END-EVALUATE
                END-IF
            END-IF
