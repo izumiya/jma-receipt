@@ -1684,6 +1684,18 @@
                       AND (SPA-JIKANTOKU-NYU   =   1  )
                        MOVE    5               TO  WRK-JIKANKBN
                    END-IF
+      *H29.2
+               ELSE
+      *        小児科特例を６歳以上は夜間・早朝へ
+                   IF     (SPA-NENREI-YY       >=  6  )
+                    AND   (SPA-YAKANKBN        =   1  )
+                    AND   (SPA-HOSPSBT         =   2   )
+                       IF     (WRK-JIKANKBN        =   5
+                                                   OR  6
+                                                   OR  7  )
+                           MOVE    8           TO  WRK-JIKANKBN
+                       END-IF
+                   END-IF
                END-IF
                IF     (WRK-JIKANKBN        =   5
                                            OR  6
@@ -1775,6 +1787,18 @@
                    IF     (SPA-NENREI-YY       <   6  )
                       AND (SPA-JIKANTOKU-NYU   =   1  )
                        MOVE    5               TO  WRK-JIKANKBN
+                   END-IF
+      *H29.2
+               ELSE
+      *        小児科特例を６歳以上は夜間・早朝へ
+                   IF     (SPA-NENREI-YY       >=  6  )
+                    AND   (SPA-YAKANKBN        =   1  )
+                    AND   (SPA-HOSPSBT         =   2   )
+                       IF     (WRK-JIKANKBN        =   5
+                                                   OR  6
+                                                   OR  7  )
+                           MOVE    8           TO  WRK-JIKANKBN
+                       END-IF
                    END-IF
                END-IF
                IF     (WRK-JIKANKBN        =   5
