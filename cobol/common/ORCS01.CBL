@@ -480,6 +480,7 @@
       *  04.08.13    NACL-ÌçÏÆ    16/10/18  ÀßÄê³Û¤ò½õÀ®¤¹¤ëÉéÃ´¶â·×»»½¤Àµ
       *  04.08.14    NACL-ÌçÏÆ    16/11/11  ¸º³Û¡Ê±ßÄ¶¡Ë¤ÎÂÐ±þ
       *  04.08.15    NACL-ÌçÏÆ    16/11/12  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.16    NACL-ÌçÏÆ    17/02/10  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1135,10 +1136,11 @@
                  06  WK-CHECK2010X-HBTNUMIDX            PIC 9(01).
       *
            03  WK-GNBKEIKBN-K-TBL.
-               05  WK-GNBKEIKBN-K-OCC                   OCCURS   4.
+               05  WK-GNBKEIKBN-K-OCC                   OCCURS   5.
                  06  WK-GNBKEIKBN-K-KBN                 PIC 9(01).
                  06  WK-GNBKEIKBN-K-KIN                 PIC 9(09).
                  06  WK-GNBKEIKBN-K-KIN-EN              PIC 9(09).
+                 06  WK-GNBKEIKBN-K-FLG                 PIC 9(01).
       *
            03  WK-NYNSHOKAISU                           PIC 9(02).
       *
@@ -13799,6 +13801,22 @@
                END-IF
              END-PERFORM
       *
+             IF   (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"      )
+             AND  (COMB-KOH1HKNNUM   NOT =  "972" AND "974")
+             AND  (COMB-KOH2HKNNUM   NOT =  "972" AND "974")
+             AND  (COMB-KOH3HKNNUM   NOT =  "972" AND "974")
+             AND  (COMB-KOH4HKNNUM   NOT =  "972" AND "974")
+             AND  (LNK-SYU-SRYYMD(1:6)        >=  "201204" )
+                IF  (WK-2010-GNBKEIKBN-K-G(1)  NOT =  "2")
+                AND (WK-2010-GNBKEIKBN-K-G(2)  NOT =  "2")
+                AND (WK-2010-GNBKEIKBN-K-G(3)  NOT =  "2")
+                AND (WK-2010-GNBKEIKBN-K-G(4)  NOT =  "2")
+                AND (FLG-KEISAN-TAI2               =   1 )
+                       MOVE      5    TO   IDX19
+                       PERFORM   2202D-GNBKEIKBN-K-HENSYU-SEC
+                END-IF
+             END-IF
+      *
            END-IF.
       *
       *    ¸øÈñ£±¥«¥¦¥ó¥È
@@ -20440,6 +20458,9 @@
            OR ( SYU-KOH2HKNNUM     =  "972" OR "974"   )
            OR ( SYU-KOH3HKNNUM     =  "972" OR "974"   )
            OR ( SYU-KOH4HKNNUM     =  "972" OR "974"   )
+           OR ((IDX19                  =  5           ) AND
+               (SYU-KOH1HKNNUM     NOT =  SPACE       ) AND
+               (SYU-SKJ-FTNGAKU(3) NOT =  8           ))
                CONTINUE
            ELSE
                MOVE     ZERO       TO    WK-KEISAN-FTNRATE
@@ -20499,6 +20520,11 @@
                                   TO  WK-GNBKEIKBN-K-KIN(IDX19)
                ADD  WK-TOTAL-KINGAKU2-EN
                                   TO  WK-GNBKEIKBN-K-KIN-EN(IDX19)
+               IF  (IDX19                  =  5    )
+               AND (SYU-KOH1HKNNUM     NOT =  SPACE)
+               AND (SYU-SKJ-FTNGAKU(3)     =  8    )
+                    MOVE    1     TO  WK-GNBKEIKBN-K-FLG(IDX19)
+               END-IF
            END-IF
       *
            .
@@ -20875,6 +20901,28 @@
                 IF   WK-2010-KINJYOKBN-G(1) = "1"
                    MOVE    1    TO   FLG-RUIKEIYO
                 END-IF
+           END-IF
+      *
+           IF   (LNK-S01-KOUREI-ZAITAKU-KBN  =  "1"      )
+           AND  (COMB-KOH1HKNNUM   NOT =  "972" AND "974")
+           AND  (COMB-KOH2HKNNUM   NOT =  "972" AND "974")
+           AND  (COMB-KOH3HKNNUM   NOT =  "972" AND "974")
+           AND  (COMB-KOH4HKNNUM   NOT =  "972" AND "974")
+           AND  (LNK-SYU-SRYYMD(1:6)        >=  "201204" )
+              IF  (( WK-2010-GNBKEIKBN-K-G(1)  =  "2" ) AND
+                   ((MAX-KIN-KOHI1-D  NOT =  ZERO) OR
+                    (MAX-KIN-KOHI1-K  NOT =  ZERO)    ))
+              OR  (( WK-2010-GNBKEIKBN-K-G(2)  =  "2" ) AND
+                   ((MAX-KIN-KOHI2-D  NOT =  ZERO) OR
+                    (MAX-KIN-KOHI2-K  NOT =  ZERO)    ))
+              OR  (( WK-2010-GNBKEIKBN-K-G(3)  =  "2" ) AND
+                   ((MAX-KIN-KOHI3-D  NOT =  ZERO) OR
+                    (MAX-KIN-KOHI3-K  NOT =  ZERO)    ))
+              OR  (( WK-2010-GNBKEIKBN-K-G(4)  =  "2" ) AND
+                   ((MAX-KIN-KOHI4-D  NOT =  ZERO) OR
+                    (MAX-KIN-KOHI4-K  NOT =  ZERO)    ))
+                     MOVE    8    TO   LNK-SYU-SKJ-FTNGAKU(3)
+              END-IF
            END-IF
       *
            .
@@ -22701,9 +22749,6 @@
                END-EVALUATE
            END-IF.
       *
-      *    ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´ü¤ÎÃÏÊý¸øÈñ»Ä³ÛÃÖ¤­´¹¤¨
-           PERFORM   2308-ZANOKIKAE-HENSYU-SEC.
-      *
       *    ¼çÊÝ¸±ÉéÃ´¶â³Û¤Î±ßÃ±°Ì¡¡»Ä¶â³Û·×»»
            IF  (LNK-S01-KOUREI-ZAITAKU-KBN   =   "1")
            OR  (FLG-KOHININBARAI             =    1 )
@@ -22712,6 +22757,9 @@
            OR  (FLG-CYOKI-ARI          = 1 OR 2     )
                 PERFORM    2302-SYUENTANI-ZAN-KEISAN-SEC
            END-IF.
+      *
+      *    ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´ü¤ÎÃÏÊý¸øÈñ»Ä³ÛÃÖ¤­´¹¤¨
+           PERFORM   2308-ZANOKIKAE-HENSYU-SEC.
       *
       *    ÊÝ¸±¡¦¸øÈñËè¤Î´µ¼ÔÉéÃ´¶â³Û¤Î·×»»
            MOVE     ZERO     TO    WK-KOH-FTNRATE.
@@ -31133,6 +31181,38 @@
                  END-IF
               END-IF
            END-PERFORM
+      *
+           IF   WK-GNBKEIKBN-K-KBN(5)  NOT =  ZERO
+           AND  WK-GNBKEIKBN-K-FLG(5)      =   1
+              EVALUATE  WK-GNBKEIKBN-K-KBN(5)
+                WHEN       1
+                  MOVE    44400    TO    WK-HIKAKU-KINGAKU
+                WHEN       2
+                  MOVE    12000    TO    WK-HIKAKU-KINGAKU
+                WHEN       3
+                  MOVE     8000    TO    WK-HIKAKU-KINGAKU
+              END-EVALUATE
+              IF  WK-GNBKEIKBN-K-KIN(5) >  WK-HIKAKU-KINGAKU
+                  MOVE     ZERO    TO    ZAN-SYU-M
+              ELSE
+                  COMPUTE WK-TOTAL-KINGAKU3 =
+                          WK-HIKAKU-KINGAKU -
+                          WK-GNBKEIKBN-K-KIN(5)
+                  IF  WK-TOTAL-KINGAKU3 < ZAN-SYU-M
+                    MOVE  WK-TOTAL-KINGAKU3  TO  ZAN-SYU-M
+                  END-IF
+              END-IF
+              IF   WK-GNBKEIKBN-K-KIN-EN(5) >  WK-HIKAKU-KINGAKU
+                  MOVE     ZERO    TO    ZAN-SYU-M-ENTANI
+              ELSE
+                  COMPUTE WK-TOTAL-KINGAKU3 =
+                          WK-HIKAKU-KINGAKU -
+                          WK-GNBKEIKBN-K-KIN-EN(5)
+                  IF  WK-TOTAL-KINGAKU3 < ZAN-SYU-M-ENTANI
+                    MOVE  WK-TOTAL-KINGAKU3  TO  ZAN-SYU-M-ENTANI
+                  END-IF
+              END-IF
+           END-IF
       *
            .
       *
