@@ -28,9 +28,7 @@ ORCADATA_files = \
 	SKDEF5002.yml \
 	SKDEF1008.yml \
 	SKDEF1010.yml \
-	SKDEF1032.yml \
 	SKDEF1034.yml \
-	SKDEF1035.yml \
 
 all:   
 
