@@ -21,24 +21,26 @@ xml_receipt_printv3req {
 #---            ¼«ÇåÀÕ 06:¿·ÍÍ¼° 07:½¾ÍèÍÍ¼° 08:Âè»°¼Ô¹Ô°Ù
 #---            ¸ø³² 09)
 		Submission_Mode		varchar(2);
-		Submission_Information	{
+		Receipt_Information {
+			Submission_Information	{
 #---- $BO"HV(B
-			Submission_Position	varchar(05);
-			Detail_Information	{
+				Submission_Position	varchar(05);
+				Detail_Information	{
 #---- $BO"HV(B
-				Detail_Position	varchar(05);
+					Detail_Position	varchar(05);
 #---- $B0u:~;X<((B(Yes :$B0u:~(B $B$=$l0J30(B :$B0u:~$7$J$$(B)
-				Print_Instruct	varchar(05);
-				Submission_Identification	varchar(2);
+					Print_Instruct	varchar(05);
+					Submission_Identification	varchar(2);
 #---- $B<oJL%3!<%I(B
-				Submission_Code	varchar(10);
+					Submission_Code	varchar(10);
 #---- $B<oJL(B
-				Submission_Type	varchar(100);
+					Submission_Type	varchar(100);
 #---- $B7o?t(B
-				Count		varchar(05);
+					Count		varchar(05);
 #---- $BKg?t(B
-				Number_Of_Sheets	varchar(05);
-			} [36];
-		} [19];
+					Number_Of_Sheets	varchar(05);
+				} [36];
+			} [19];
+		};
 	};
 };

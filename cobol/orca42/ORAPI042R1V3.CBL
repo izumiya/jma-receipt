@@ -127,16 +127,6 @@
            03  WRK-TEMPDIR-ROOT        PIC X(1024).
       *
            03  WRK-SPA-TERMID          PIC X(64).
-      *
-       01  WRK-XML-AREA.
-           03  WRK-REGIST-YMD10        PIC X(10).
-           03  WRK-REGIST-TIME8        PIC X(08).
-      *
-           03  WRK-REGIST-YMD          PIC X(08).
-           03  WRK-REGIST-TIME.
-               05  WRK-REGIST-THH      PIC X(02).
-               05  WRK-REGIST-TMM      PIC X(02).
-               05  WRK-REGIST-TSS      PIC X(02).
       * 
            COPY    "MCPAREA"       REPLACING  //MCP//
                                    BY         //TAIHI-MCP//.
@@ -267,7 +257,6 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                      WRK-XML-AREA
            INITIALIZE                      XML-RECEIPT-MAKERES
       *
       *    更新日取得
@@ -1727,15 +1716,6 @@
       *    環境変数［MCP_TEMPDIR］を生成（MCP-TEMPDIRの値を設定）
            SET ENVIRONMENT "MCP_TEMPDIR"
                                    TO  MCP-TEMPDIR
-      *    環境変数［ORCA_UID］を生成（SPA-TERMID値を設定）
-           SET ENVIRONMENT "ORCA_UID"
-                                   TO  SPA-TERMID
-      *
-      *    一時ディレクトリ作成
-           CALL    "CBL_CREATE_DIR"    USING   MCP-TEMPDIR
-           IF    ( RETURN-CODE     NOT =   ZERO )
-               MOVE    "E80"               TO  WRK-ERRCD
-           END-IF
       *
            MOVE    WRK-SPA-TERMID  TO  SPA-TERMID
       *

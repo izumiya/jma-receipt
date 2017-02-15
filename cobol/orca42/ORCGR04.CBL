@@ -1870,6 +1870,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG25
            MOVE    SPA-R01-RECE07-RECEKBN
                                    TO  SHELLTBL-ARG26
+           IF      SPA-R01-JOB-PARAM
+                               NOT =   SPACE
+               MOVE    SPA-R01-JOB-PARAM   TO  SHELLTBL-ARG27
+           END-IF
       *     
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC

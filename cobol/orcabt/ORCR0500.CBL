@@ -137,6 +137,8 @@
       *  04.08.02    NACL-太田    16/02/02  レセプトプレビュー不具合対応
       *  04.08.03    NACL-藤原    16/11/01  リアルタイムプレビュー時の修正
       *  04.08.04    NACL-太田    16/11/30  PRT-RECをコピー句に変更
+      *
+      *  05.00.01    NACL-藤原    17/02/07  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -253,7 +255,8 @@ grpsys     COPY    "COMMON-SPA".
                05  WRK-PARA-PRTNM                PIC X(16).
                05  WRK-PARA-PRTKBN               PIC X(01). 
                05  WRK-PARA-RECEKBN              PIC X(01). 
-               05  WRK-PARA-HOSPNUM              PIC  9(02).
+               05  WRK-PARA-HOSPNUM              PIC 9(02).
+               05  WRK-PARA-JOB-PARAM            PIC X(10).
       *
            COPY    "CPORCSPRTLNK.INC".
       *
@@ -525,8 +528,11 @@ grpsys     COPY    "COMMON-SPA".
                                              WRK-PARA-RECEKBN
                                              WRK-PARA-HOSPNUM
                                              RECEERR
-           END-UNSTRING                                  
+                                             WRK-PARA-JOB-PARAM
+           END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+      *
+           DISPLAY "WRK-PARA-JOB-PARAM=" WRK-PARA-JOB-PARAM
       *
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAME
@@ -654,6 +660,20 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
       *
            OPEN    OUTPUT              PRT-FILE
       *
+           IF      STS-PRT             =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-RECEERR
+               STRING "ファイル ＯＰＥＮエラー  STS="
+                                               DELIMITED  BY  SIZE
+                       STS-PRT                 DELIMITED  BY  SIZE
+                                       INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+      *
            MOVE    "tbl_receprt"       TO  WRK-MCP-TABLE
            MOVE    "key12"             TO  WRK-MCP-PATHNAME
            PERFORM 900-RECEPRT-SELECT-SEC
@@ -704,7 +724,12 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
                    MOVE    "1"         TO  SHELLTBL-ARG4
                END-IF
                MOVE    SHELLTBL        TO  MCPDATA-REC
-               MOVE    "SHELL"         TO  MCP-FUNC
+               IF      WRK-PARA-JOB-PARAM
+                                       =   SPACE
+                   MOVE    "SHELL"         TO  MCP-FUNC
+               ELSE
+                   MOVE    "EXCOMMAND"     TO  MCP-FUNC
+               END-IF
                MOVE    "shell"         TO  MCP-TABLE
                MOVE    "daily"         TO  MCP-PATHNAME
 grpsys         PERFORM 900-ORCDBMAIN-SEC

@@ -5532,9 +5532,6 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        450-PRINT-SEC                SECTION.
       *
-      *??
-           DISPLAY "SPA-GMN-PRTJYUN=" SPA-GMN-PRTJYUN "#"
-      *??
       *    フラグ初期化
            MOVE    ZERO            TO  SPA-R01-JOBCNT       
                                        SPA-R01-STOPFLG    
@@ -5590,7 +5587,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  JOB-JOBID
            MOVE    WRK-CONS-JOB-SHELLID
                                    TO  JOB-SHELLID
-           MOVE    SPA-TERMID      TO  JOB-TERMID                        
+           MOVE    SPA-TERMID      TO  JOB-TERMID
            MOVE    SPA-R01-JOB-PARAM
                                    TO  JOB-PARAM
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
@@ -5956,6 +5953,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    "2"             TO  SHELLTBL-ARG27
            END-EVALUATE
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG30
+           IF      SPA-R01-JOB-PARAM
+                               NOT =   SPACE
+               MOVE    SPA-R01-JOB-PARAM   TO  SHELLTBL-ARG31
+           END-IF
       *     
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
@@ -6141,12 +6142,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        45011-RECEPRT-HENSYU-SEC         SECTION.
       *
-      *??
-           DISPLAY "SPA-NAI-SYUBETU=" IDW "#" IDX "#" IDY "#" 
-                      SPA-NAI-SYUBETU (IDW IDX IDY) "#"
-           DISPLAY "WRK-TEISYUTUSAKI=" WRK-TEISYUTUSAKI "#"
-                    WRK-PREFKBN "#"
-      *??
       *    印刷用パラメタ
            INITIALIZE                      WRK-RECE09-REC
                                            WRK-RECE09-STDATA

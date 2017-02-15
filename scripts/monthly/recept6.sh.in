@@ -35,19 +35,24 @@ fi
 #            0:削除しない、2:削除する
 #-------------------------------------------#
 
+        echo "window  ${MCP_WINDOW}"
+
+        if  [ "${MCP_WINDOW}" == "receiptmakev3" ]; then
+            mkdir -p  ${MCP_TEMPDIR}
+        fi
+
 cleanup(){
-echo "${PARA_FILE_FULL}" >> $LOG
 ##      パラメータファイル削除
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
-##      環境変数［ORCA_UID］が設定されていた場合、一時ディレクトリを削
-除
-        if  [ -n "${ORCA_UID}" ]; then
+##      MCP_WINDOW がAPI のとき、一時ディレクトリを削除
+        if  [ "${MCP_WINDOW}" == "receiptmakev3" ]; then
+            echo "remove!! ${MCP_TEMPDIR}"
             rm  -rf ${MCP_TEMPDIR}
         fi
 }
-trap cleanup 1 2 3 15
+trap cleanup EXIT
 
         if [ ${2} -eq  '1' ]; then
            LOG_FILE="/var/log/jma-receipt/${16}recept6a.log"

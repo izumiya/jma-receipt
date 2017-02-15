@@ -119,16 +119,7 @@
       *
            03  WRK-TEMPDIR-ROOT        PIC X(1024).
       *
-       01  WRK-XML-AREA.
-           03  WRK-REGIST-YMD10        PIC X(10).
-           03  WRK-REGIST-TIME8        PIC X(08).
-      *
-           03  WRK-REGIST-YMD          PIC X(08).
-           03  WRK-REGIST-TIME.
-               05  WRK-REGIST-THH      PIC X(02).
-               05  WRK-REGIST-TMM      PIC X(02).
-               05  WRK-REGIST-TSS      PIC X(02).
-           03  WRK-PTNUM               PIC X(20).
+           03  WRK-SPA-TERMID          PIC X(64).
       *
       *    チェック用
            03  WRK-CHK-TABLE-AREA.
@@ -267,7 +258,7 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                      WRK-XML-AREA
+      ***  INITIALIZE                      WRK-XML-AREA
            INITIALIZE                      XML-RECEIPT-PRINTRES
       *
       *    更新日取得
@@ -1186,6 +1177,9 @@
       *    レセプト印刷処理
       *****************************************************************
        2002-RECEIPT-PRINT-SEC     SECTION.
+      *??
+           DISPLAY "2002-RECEIPT-PRINT-SEC"
+      *??
       *
       *    ジョブ管理チェック処理
            PERFORM 800-JOBKANRI-CHK-SEC
@@ -1198,11 +1192,10 @@
                                           INTO    SPA-R01-JOB-PARAM
            END-STRING
       *
-      *****PERFORM 800-TEMPDIR-SEC
-      *****IF      WRK-ERRCD   NOT =   SPACE
-      *****    GO  TO  2002-RECEIPT-PRINT-EXT
-      *****END-IF
-      *
+           PERFORM 800-TEMPDIR-SEC
+           IF      WRK-ERRCD   NOT =   SPACE
+               GO  TO  2002-RECEIPT-PRINT-EXT
+           END-IF
       *
            MOVE    "RID3"          TO  SPA-MOTOPG
            MOVE    "NO"            TO  SPA-RID1-FLG
@@ -1284,6 +1277,9 @@
       *    レセプト（医保）印刷処理
       *****************************************************************
        800-ORCGR02-CALL-SEC                SECTION.
+      *??
+           DISPLAY "800 R02 IN =" SPA-TERMID "#" 
+      *??
       *
            MOVE    SPA-R01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -1294,6 +1290,9 @@
                                        SPAAREA
                                        LINKAREA
                                        SCRAREA
+      *??
+           DISPLAY "800 R02 OUT=" SPA-TERMID "#" 
+      *??
       *    画面ＳＰＡ読込み
            PERFORM 000-R02SPA-SET-SEC
       *
@@ -1337,6 +1336,9 @@
       *
            INITIALIZE                      SPA-SCR-REC
            MOVE    ZERO                TO  FLG-SPASCR
+      *??
+           DISPLAY "800 SPA IN =" SPA-TERMID "#" 
+      *??
       *
            INITIALIZE                      SPATMP-REC
            MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
@@ -1371,6 +1373,9 @@
       *    画面ＳＰＡ書込
       *****************************************************************
        000-R02SPA-OUT-SEC             SECTION.
+      *??
+           DISPLAY "800 SPA OUT=" SPA-TERMID "#" 
+      *??
       *
            INITIALIZE                      SPATMP-REC
            MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
@@ -1445,15 +1450,7 @@
       *****************************************************************
        800-TEMPDIR-SEC             SECTION.
       *
-      *    ＳＰＡ共通設定
-           INITIALIZE                  SYS-1010-REC
-           INITIALIZE                  ORCSCOMMONAREA
-           MOVE    "M00"           TO  ORCSCOMMON-PG
-           CALL    "ORCSCOMMON"        USING
-                                       MCPAREA
-                                       SPA-AREA
-                                       ORCSCOMMONAREA
-                                       SYS-1010-REC
+           MOVE    SPA-TERMID      TO  WRK-SPA-TERMID
       *
            INSPECT SPA-TERMID      REPLACING   ALL " " BY  "0"
            MOVE    SPACE           TO  SPA-TERMID (37:)
@@ -1472,16 +1469,9 @@
       *    環境変数［MCP_TEMPDIR］を生成（MCP-TEMPDIRの値を設定）
            SET ENVIRONMENT "MCP_TEMPDIR"
                                    TO  MCP-TEMPDIR
-      *    環境変数［ORCA_UID］を生成（SPA-TERMID値を設定）
-           SET ENVIRONMENT "ORCA_UID"
-                                   TO  SPA-TERMID
       *
-      *    一時ディレクトリ作成
-           CALL    "CBL_CREATE_DIR"    USING   MCP-TEMPDIR
-           IF    ( RETURN-CODE     NOT =   ZERO )
-               DISPLAY "RETURN-CODE="RETURN-CODE
-               MOVE    "E80"               TO  WRK-ERRCD
-           END-IF
+           MOVE    WRK-SPA-TERMID  TO  SPA-TERMID
+      *
            .
        800-TEMPDIR-EXT.
            EXIT.
