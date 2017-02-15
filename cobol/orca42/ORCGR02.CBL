@@ -157,6 +157,8 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    16/03/07  プリンタ設定の修正
       *  04.08.04    NACL-藤原    16/08/24  持参薬対応
+      *  04.08.05    NACL-藤原    17/02/14  編綴順指定時の特別療養費（国保）
+      *                                     のパラメタ設定の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6284,15 +6286,21 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      WRK-RECE09-PRTJYUN  =   "06"
                EVALUATE    WRK-TEISYUTUSAKI
                    WHEN    "2"
-                       MOVE    SPA-NAI-THKNJANUM (IDW IDX)
+                       IF    ( IDW             =   1  )
+                       AND   ( IDX             =   34 )
+                           MOVE    "%%%%%%%%"  TO  WRK-RECE09-HKNJANUM
+                       ELSE
+                           MOVE    SPA-NAI-THKNJANUM (IDW IDX)
                                                TO  WRK-RECE09-HKNJANUM
-                       MOVE    WRK-CHOUKI      TO  WRK-RECE09-CHOUKI
-                       MOVE    WRK-ZAITAKU     TO  WRK-RECE09-ZAITAKU
-                       MOVE    WRK-KOUGAKU     TO  WRK-RECE09-KOUGAKU
-                       IF      WRK-KOUGAKU     =   SPACE
+                           MOVE    WRK-CHOUKI  TO  WRK-RECE09-CHOUKI
+                           MOVE    WRK-ZAITAKU TO  WRK-RECE09-ZAITAKU
+                           MOVE    WRK-KOUGAKU TO  WRK-RECE09-KOUGAKU
+                           IF      WRK-KOUGAKU =   SPACE
                                MOVE  "A"       TO  WRK-RECE09-KOUGAKU
+                           END-IF
+                           MOVE    WRK-SRT-LAST
+                                               TO  WRK-RECE09-SRT-LAST
                        END-IF
-                       MOVE    WRK-SRT-LAST    TO  WRK-RECE09-SRT-LAST
                    WHEN    "1"
                        IF      SPA-R01-NYUGAIKBN   =   "2"
                            IF      IDX                 =   1
