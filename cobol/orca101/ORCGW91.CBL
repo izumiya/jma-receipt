@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  15/01/07  9103 処方せん連携基盤情報
       *  04.08.00    NACL-伊藤    15/08/19  GINBEE対応
+      *  05.00.00    NACL-森脇    17/02/03  傷病名称全記録追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -81,6 +82,9 @@
                05  SPA-GMN-CHKSYREC            PIC X(01).
                05  SPA-GMN-CHKJIHI             PIC X(01).
                05  SPA-GMN-CHKPTNUM            PIC X(01).
+      *----(05.00.00)--ADD-START---
+               05  SPA-GMN-CHKSYBYO            PIC X(01).
+      *----(05.00.00)--ADD-END-----
       *    見出し
            03  SPA-GMN-LABEL1                  PIC X(50).
            03  SPA-GMN-LABEL2                  PIC X(50).
@@ -296,6 +300,10 @@
                MOVE    SYS-9101-JIHI       TO  SPA-GMN-CHKJIHI
       *        患者番号記録
                MOVE    SYS-9101-PTNUM      TO  SPA-GMN-CHKPTNUM
+      *----(05.00.00)--ADD-START---
+      *        傷病名レコード記録
+               MOVE    SYS-9101-SYBYO      TO  SPA-GMN-CHKSYBYO
+      *----(05.00.00)--ADD-END-----
            END-IF
       *    連携基盤用データ作成初期
            IF      SPA-GMN-COOPBASE    =   SPACE
@@ -314,6 +322,12 @@
            IF      SPA-GMN-CHKPTNUM    =   SPACE
                MOVE    "F"             TO  SPA-GMN-CHKPTNUM
            END-IF
+      *----(05.00.00)--ADD-START---
+      *    傷病名レコード記録初期
+           IF      SPA-GMN-CHKSYBYO    =   SPACE
+               MOVE    "F"             TO  SPA-GMN-CHKSYBYO
+           END-IF
+      *----(05.00.00)--ADD-END-----
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    1                   TO  SPA-GMN-CUR
@@ -375,6 +389,10 @@
              IF      SPA-W01-KANRICD     NOT =   "9103"
                IF      SPA-GMN-CHKSYREC    =   "T"
                    MOVE    "F"                 TO  SPA-GMN-CHKSYREC
+      *----(05.00.00)--ADD-START---
+                   MOVE    "F"                 TO  SPA-GMN-CHKSYBYO
+                   MOVE    4                   TO  SPA-GMN-CUR
+      *----(05.00.00)--ADD-END-----
                ELSE
                    MOVE    "T"                 TO  SPA-GMN-CHKSYREC
                END-IF
@@ -399,6 +417,22 @@
                    MOVE    "T"                 TO  SPA-GMN-CHKPTNUM
                END-IF
              END-IF
+      *----(05.00.00)--ADD-START---
+      *    傷病名称全記録
+           WHEN    "CLICKED"       ALSO    "CHKSYBYO"
+      *    処方せんはなし
+             IF      SPA-W01-KANRICD     NOT =   "9103"
+               IF      SPA-GMN-CHKSYREC    =   "T"
+                   IF      SPA-GMN-CHKSYBYO    =   "T"
+                       MOVE    "F"                 TO  SPA-GMN-CHKSYBYO
+                   ELSE
+                       MOVE    "T"                 TO  SPA-GMN-CHKSYBYO
+                   END-IF
+               ELSE
+                   MOVE    "F"                 TO  SPA-GMN-CHKSYBYO
+               END-IF
+             END-IF
+      *----(05.00.00)--ADD-END-----
            END-EVALUATE
            .
       *
@@ -457,6 +491,9 @@
            MOVE    W91-CHKSYREC        TO  SPA-GMN-CHKSYREC
            MOVE    W91-CHKJIHI         TO  SPA-GMN-CHKJIHI
            MOVE    W91-CHKPTNUM        TO  SPA-GMN-CHKPTNUM
+      *----(05.00.00)--ADD-START---
+           MOVE    W91-CHKSYBYO        TO  SPA-GMN-CHKSYBYO
+      *----(05.00.00)--ADD-END-----
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -725,6 +762,9 @@
            MOVE    SPA-GMN-CHKSYREC        TO  SYS-9101-SYREC
            MOVE    SPA-GMN-CHKJIHI         TO  SYS-9101-JIHI
            MOVE    SPA-GMN-CHKPTNUM        TO  SYS-9101-PTNUM
+      *----(05.00.00)--ADD-START---
+           MOVE    SPA-GMN-CHKSYBYO        TO  SYS-9101-SYBYO
+      *----(05.00.00)--ADD-END-----
       *
            END-IF
       *
@@ -862,14 +902,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-CHKSYREC    TO  W91-CHKSYREC
            MOVE    SPA-GMN-CHKJIHI     TO  W91-CHKJIHI
            MOVE    SPA-GMN-CHKPTNUM    TO  W91-CHKPTNUM
+      *----(05.00.00)--ADD-START---
+           MOVE    SPA-GMN-CHKSYBYO    TO  W91-CHKSYBYO
+      *----(05.00.00)--ADD-END-----
            IF      SPA-W01-KANRICD         =   "9101"
                MOVE    WIDGET-NORMAL       TO  W91-CHKSYREC-STATE
                MOVE    WIDGET-NORMAL       TO  W91-CHKJIHI-STATE
                MOVE    WIDGET-NORMAL       TO  W91-CHKPTNUM-STATE
+      *----(05.00.00)--ADD-START---
+               MOVE    WIDGET-NORMAL       TO  W91-CHKSYBYO-STATE
+      *----(05.00.00)--ADD-END-----
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKSYREC-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKJIHI-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKPTNUM-STATE
+      *----(05.00.00)--ADD-START---
+               MOVE    WIDGET-INSENSITIVE  TO  W91-CHKSYBYO-STATE
+      *----(05.00.00)--ADD-END-----
            END-IF
       *
            MOVE    SPA-GMN-LABEL1      TO  W91-LABEL1
@@ -902,6 +951,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "CHKJIHI"           TO  MCP-WIDGET
                WHEN    05
                    MOVE    "CHKPTNUM"          TO  MCP-WIDGET
+      *----(05.00.00)--ADD-START---
+               WHEN    06
+                   MOVE    "CHKSYBYO"          TO  MCP-WIDGET
+      *----(05.00.00)--ADD-END-----
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -925,6 +978,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    90              TO  SPA-GMN-CUR
                    END-IF
                WHEN    "CHKSYREC"
+      *----(05.00.00)--ADD-START---
+                   MOVE    6               TO  SPA-GMN-CUR
+               WHEN    "CHKSYBYO"
+      *----(05.00.00)--ADD-END-----
                    MOVE    4               TO  SPA-GMN-CUR
                WHEN    "CHKJIHI"
                    MOVE    5               TO  SPA-GMN-CUR

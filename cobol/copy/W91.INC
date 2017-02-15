@@ -26,3 +26,6 @@
               04  W91-CHKPTNUM.
                 06  W91-CHKPTNUM-VALUE   PIC X.
                 06  W91-CHKPTNUM-STATE   PIC S9(9)   BINARY.
+              04  W91-CHKSYBYO.
+                06  W91-CHKSYBYO-VALUE   PIC X.
+                06  W91-CHKSYBYO-STATE   PIC S9(9)   BINARY.
