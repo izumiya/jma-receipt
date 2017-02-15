@@ -139,6 +139,7 @@
       *                                     （非減免対象分と減免対象分の診療が
       *                                     混在する場合）
       *  04.08.04    NACL-門脇    16/11/11  減額（円超）の対応
+      *  04.08.05    NACL-門脇    17/02/13  東京都地方公費組み合わせ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1440,8 +1441,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *           公費表中より生保を検索し、適用開始日順に
       *                                インデックス取得
                    INITIALIZE                WRK-IDXSRT-AREA
-                   IF  WRK-KCOMB-HKNNUM (IDX2)        =   "060"
-                                                      OR  "039"
+                   IF (WRK-KCOMB-HKNNUM (IDX2)        =   "060"
+                                                      OR  "039")
+                   OR (WRK-KCOMB-KOH4HKNNUM(IDX2) NOT =   SPACE)
                      CONTINUE
                    ELSE
                      MOVE    WRK-KCOMB-TEKSTYMD (IDX2)
@@ -1510,8 +1512,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF  (WRK-KCOMB-KOH1-HKNKOHSBTKBN(IDX2)  =   "5") OR
                        (WRK-KCOMB-KOH2-HKNKOHSBTKBN(IDX2)  =   "5") OR
                        (WRK-KCOMB-KOH3-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                       (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                       (WRK-KCOMB-HKNNUM(IDX2)             = SPACE)
+                       (WRK-KCOMB-HKNNUM(IDX2)             = SPACE) OR
+                       (WRK-KCOMB-KOH4HKNNUM(IDX2)     NOT = SPACE)
                        CONTINUE
                    ELSE
       *                公費表中より長期高額を検索し、
@@ -1809,103 +1811,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        570113-CHOKIIDX-SORT-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    主保険−長期高額　組合せ作成処理
-      *****************************************************************
-       570114-SYUHKN-CHO-SEC       SECTION.
-      *
-      *    [長期高額 開始日]≦[組合せ 開始日]
-           IF  WRK-KOH-TEKSTYMD(WRK-COMB-CHOIDX)
-                                    <=  WRK-KCOMB-TEKSTYMD (IDX2)
-               ADD     1                TO  WRK-RCOMB-MAX
-               MOVE    WRK-RCOMB-MAX    TO  IDX1
-               MOVE    WRK-KCOMB-REC (IDX2)
-                                        TO  WRK-RCOMB-REC  (IDX1)
-      *        [長期高額 終了日]＜[組合せ 終了日]
-               IF  WRK-KOH-TEKEDYMD(WRK-COMB-CHOIDX)
-                                    <   WRK-KCOMB-TEKEDYMD (IDX2)
-      *            ●[組合せ] 開始 <---> [長期高額] 終了日
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-CHOIDX)
-                                    TO  WRK-RCOMB-TEKEDYMD (IDX1)
-      *            ○組合せ元の開始日変更
-      *            長期高額　終了日の翌日取得
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-CHOIDX)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   PERFORM 4221-YMD-GET-SEC
-                   MOVE    WRK-SYMD TO  WRK-KCOMB-TEKSTYMD (IDX2)
-               ELSE
-      *            [組合せ 終了日]≦[長期高額 終了日]
-      *            ○組合せ元の開始日変更
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
-               END-IF
-               MOVE    WRK-COMB-CHOIDX     TO  WRK-COMB-IDX
-               PERFORM 5701121-KOH-IREKAE-SEC
-           ELSE
-      *        [組合せ 開始日]＜[長期高額 開始日]
-      *        長期高額　開始日の前日取得
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-CHOIDX)
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE    -1                  TO  LNK-DAY6-ZOGEN
-               PERFORM 4221-YMD-GET-SEC
-               MOVE    WRK-SYMD            TO  WRK-SYMD6
-      *
-      *        ●[組合せ] 開始 <---> [長期高額] 終了日の前日
-               ADD     1                 TO  WRK-RCOMB-MAX
-               MOVE    WRK-RCOMB-MAX     TO  IDX1
-               MOVE    WRK-KCOMB-REC (IDX2)
-                                         TO  WRK-RCOMB-REC    (IDX1)
-               MOVE    WRK-SYMD6    TO  WRK-RCOMB-TEKEDYMD    (IDX1)
-      *        ○組合せ元の開始日変更
-               MOVE    WRK-KOH-TEKSTYMD (WRK-COMB-CHOIDX)
-                                    TO  WRK-KCOMB-TEKSTYMD    (IDX2)
-      *        ●[長期高額] 開始 <---> [組合せ] 終了日
-               ADD     1                 TO  WRK-RCOMB-MAX
-               MOVE    WRK-RCOMB-MAX     TO  IDX1
-               MOVE    WRK-KCOMB-REC (IDX2)
-                                    TO  WRK-RCOMB-REC         (IDX1)
-               MOVE    WRK-KOH-TEKSTYMD   (WRK-COMB-CHOIDX)
-                                    TO  WRK-RCOMB-TEKSTYMD    (IDX1)
-               MOVE    WRK-COMB-CHOIDX     TO  WRK-COMB-IDX
-               PERFORM 5701121-KOH-IREKAE-SEC
-      *
-      *        [長期高額 終了日]＜[組合せ 終了日]
-               IF  WRK-KOH-TEKEDYMD(WRK-COMB-CHOIDX)
-                                    <   WRK-KCOMB-TEKEDYMD (IDX2)
-      *
-      *            ●[長期高額] 開始 <---> [長期高額] 終了日に変更
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-CHOIDX)
-                                    TO  WRK-RCOMB-TEKEDYMD    (IDX1)
-      *            長期高額　終了日の翌日取得
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    WRK-KOH-TEKEDYMD   (WRK-COMB-CHOIDX)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   PERFORM 4221-YMD-GET-SEC
-      *            ○組合せ元の開始日変更
-                   MOVE    WRK-SYMD  TO  WRK-KCOMB-TEKSTYMD (IDX2)
-               ELSE
-      *            ○組合せ元の開始日変更
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                     TO  WRK-KCOMB-TEKSTYMD (IDX2)
-               END-IF
-           END-IF
-      *
-           .
-       570114-SYUHKN-CHO-EXT.
-           EXIT.
       *****************************************************************
       *    患者負担内容セット処理
       *****************************************************************
@@ -3975,8 +3880,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                      END-IF
                    END-IF
                  END-PERFORM
-      *          上で作成した組合せに、補助公費を追加した組合せを作成する。
-      *          （全国公費＋地方公費＋補助公費）
+      *          上で作成した組合せに、補助公費又は省庁公費を追加した組合せを作成する。
+      *          （公費＋公費＋（補助公費又は省庁公費））
                  MOVE   WRK-RCOMB-MAX  TO   IDZ3
                  PERFORM     VARYING   IDZ   FROM  1   BY  1
                              UNTIL     IDZ   >     WRK-SRT-HJO-CNT
@@ -4031,13 +3936,39 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                      END-PERFORM
                    ELSE
                      EVALUATE  SPA-PREFNUM
+                      WHEN       13
+                        IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
+                                                 >=  "1" AND <=  "8"
+                         PERFORM   VARYING   IDZ2  FROM  1   BY  1
+                                    UNTIL    IDZ2    >   IDZ3
+                          IF  (WRK-RCOMB-KOH1HKNNUM(IDZ2) =
+                                          "021" OR "010" OR "011")
+                          AND (WRK-RCOMB-KOH2HKNNUM(IDZ2) = "193")
+                            IF WRK-RCOMB-KOH2HKNNUM(IDZ2) =
+                                         WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)
+                              CONTINUE
+                            ELSE
+                              IF (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX) =
+                                                                  SPACE)
+                              OR (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                              OR (WRK-KOH-GENHKNNUM2(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                              OR (WRK-KOH-GENHKNNUM3(WRK-COMB-HJOIDX) =
+                                             WRK-RCOMB-KOH2HKNNUM(IDZ2))
+                                 PERFORM 5701414-SYUKOH-HJO2-SEC
+                              END-IF
+                            END-IF
+                          END-IF
+                         END-PERFORM
+                        END-IF
                       WHEN       27
                         IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:1)
                                                  >=  "1" AND <=  "8"
                          PERFORM   VARYING   IDZ2  FROM  1   BY  1
                                     UNTIL    IDZ2    >   IDZ3
-                          IF  (WRK-RCOMB-KOH1HKNNUM(IDZ2) = "021"
-                                                         OR "010")
+                          IF  (WRK-RCOMB-KOH1HKNNUM(IDZ2) =
+                                          "021" OR "010" OR "011")
                           AND (WRK-RCOMB-KOH2HKNNUM(IDZ2) = "121")
                             IF WRK-RCOMB-KOH2HKNNUM(IDZ2) =
                                          WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)
@@ -4058,6 +3989,38 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                          END-PERFORM
                         END-IF
                      END-EVALUATE
+                   END-IF
+                 END-PERFORM
+      *          上で作成した組合せに、省庁公費を追加した組合せを作成する。
+      *          （公費＋公費＋補助公費＋省庁公費）
+                 MOVE   WRK-RCOMB-MAX  TO   IDZ3
+                 PERFORM     VARYING   IDZ   FROM  1   BY  1
+                             UNTIL     IDZ   >     WRK-SRT-HJO-CNT
+                   MOVE    WRK-SRT-HJO-IDX (IDZ)
+                                       TO   WRK-COMB-HJOIDX
+                   IF  WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)(1:2) =   "99"
+                     PERFORM   VARYING   IDZ2  FROM  1   BY  1
+                               UNTIL     IDZ2  >     IDZ3
+                       IF  (WRK-RCOMB-KOH1HKNNUM(IDZ2)  NOT = "027" AND
+                            WRK-RCOMB-KOH1HKNNUM(IDZ2)  NOT = SPACE AND
+                            WRK-RCOMB-KOH2HKNNUM(IDZ2)  NOT = SPACE AND
+                            WRK-RCOMB-KOH3HKNNUM(IDZ2)  NOT = SPACE)
+                         IF   WRK-RCOMB-KOH3HKNNUM(IDZ2)(1:2) = "99"
+                            CONTINUE
+                         ELSE
+                           IF (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX)
+                                    =                       SPACE) OR
+                              (WRK-KOH-GENHKNNUM1(WRK-COMB-HJOIDX)
+                                    =  WRK-RCOMB-KOH3HKNNUM(IDZ2)) OR
+                              (WRK-KOH-GENHKNNUM2(WRK-COMB-HJOIDX)
+                                    =  WRK-RCOMB-KOH3HKNNUM(IDZ2)) OR
+                              (WRK-KOH-GENHKNNUM3(WRK-COMB-HJOIDX)
+                                    =  WRK-RCOMB-KOH3HKNNUM(IDZ2))
+                               PERFORM 5701414-SYUKOH-HJO2-SEC
+                           END-IF
+                         END-IF
+                       END-IF
+                     END-PERFORM
                    END-IF
                  END-PERFORM
                ELSE
@@ -4162,8 +4125,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
              EVALUATE    WRK-FTN-FLG
              WHEN    "1"
-               IF  WRK-KCOMB-HKNNUM (IDX2)        =   "060"
-                                                  OR  "039"
+               IF (WRK-KCOMB-HKNNUM (IDX2)        =   "060"
+                                                  OR  "039")
+               OR (WRK-KCOMB-KOH4HKNNUM(IDX2) NOT =   SPACE)
                    CONTINUE
                ELSE
       *           公費表中より生保を検索し、適用開始日順に
@@ -4205,8 +4169,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  WRK-RCOMB-REC
                                                      (WRK-RCOMB-MAX)
                  IF  WRK-FTN-FLG           =   "3"
-                   IF  WRK-KCOMB-HKNNUM (IDX2)        =   "060"
-                                                      OR  "039"
+                   IF (WRK-KCOMB-HKNNUM (IDX2)        =   "060"
+                                                      OR  "039")
+                   OR (WRK-KCOMB-KOH4HKNNUM(IDX2) NOT =   SPACE)
                        CONTINUE
                    ELSE
       *                公費表中より生保を検索し、
@@ -4266,8 +4231,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF  (WRK-KCOMB-KOH1-HKNKOHSBTKBN(IDX2)  =   "5") OR
                    (WRK-KCOMB-KOH2-HKNKOHSBTKBN(IDX2)  =   "5") OR
                    (WRK-KCOMB-KOH3-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                   (WRK-KCOMB-KOH4-HKNKOHSBTKBN(IDX2)  =   "5") OR
-                   (WRK-KCOMB-HKNNUM(IDX2)             = SPACE)
+                   (WRK-KCOMB-HKNNUM(IDX2)             = SPACE) OR
+                   (WRK-KCOMB-KOH4HKNNUM(IDX2)     NOT = SPACE)
                    CONTINUE
                ELSE
       *          更生医療・小児特定・マル福がある場合、長期をつける
@@ -4291,14 +4256,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        "052" OR "079" OR "091" OR "054"            ) OR
                      ((WRK-KCOMB-KOH3HKNNUM(IDX2) >=  "100")  AND
                       (WRK-KCOMB-KOH3HKNNUM(IDX2) <=  "899")       ) OR
-                     ( WRK-KCOMB-KOH3HKNNUM(IDX2)(1:2)  =  "99"    )) OR
-                    (( WRK-KCOMB-KOH4HKNNUM(IDX2)  =
-                       "010" OR "011" OR "015" OR "016" OR "019" OR
-                       "020" OR "021" OR "024" OR "038" OR "051" OR
-                       "052" OR "079" OR "091" OR "054"            ) OR
-                     ((WRK-KCOMB-KOH4HKNNUM(IDX2) >=  "100")  AND
-                      (WRK-KCOMB-KOH4HKNNUM(IDX2) <=  "899")       ) OR
-                     ( WRK-KCOMB-KOH4HKNNUM(IDX2)(1:2)  =  "99"    ))   
+                     ( WRK-KCOMB-KOH3HKNNUM(IDX2)(1:2)  =  "99"    ))   
       *
                    IF ((WRK-KCOMB-KOH1HKNNUM(IDX2)  NOT =
                         "027" AND "010" AND "011" AND "015" AND
@@ -4317,13 +4275,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                         "016" AND "019" AND "020" AND "021" AND
                         "024" AND "038" AND "051" AND "052" AND
                         "079" AND "091" AND "054"               ) AND
-                       (WRK-KCOMB-KOH3HKNNUM(IDX2)(1:1) =  "0"  ))  OR
-                      ((WRK-KCOMB-KOH4HKNNUM(IDX2)  NOT =
-                        "027" AND "010" AND "011" AND "015" AND
-                        "016" AND "019" AND "020" AND "021" AND
-                        "024" AND "038" AND "051" AND "052" AND
-                        "079" AND "091" AND "054"               ) AND
-                       (WRK-KCOMB-KOH4HKNNUM(IDX2)(1:1) =  "0"  ))
+                       (WRK-KCOMB-KOH3HKNNUM(IDX2)(1:1) =  "0"  ))
                      CONTINUE
                    ELSE
       *              公費表中より長期高額を検索し、
