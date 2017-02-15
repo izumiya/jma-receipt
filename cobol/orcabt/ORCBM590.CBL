@@ -45,6 +45,7 @@
       *  04.08.07    NACL-伊藤    15.10.01  R1レコード編集
       *                                     地域連携IDなしは対象とし、
       *                                     同意なしは出力しない
+      *  05.00.00    NACL-森脇    17.02.09  傷病名称全記録
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -136,6 +137,10 @@
            03  IDZZ                    PIC 9(05).
            03  IDF                     PIC 9(05).
            03  IDF1                    PIC 9(05).
+      *----(05.00.00)--ADD-START---
+           03  IDX-B1                  PIC 9(05).
+           03  IDX-B2                  PIC 9(05).
+      *----(05.00.00)--ADD-END-----
       *
       *    一時領域
       *    パラメタエリア
@@ -205,6 +210,10 @@
                05  WRK-TAIINYMD        PIC X(07).
            03  WRK-RECESYUBETU         PIC X(04).
            03  WRK-PTNUM               PIC X(20).
+      *----(05.00.00)--ADD-START---
+           03  WRK-BYOMEICD-G.
+               05  WRK-BYOMEICD        PIC X(04)   OCCURS  20.
+      *----(05.00.00)--ADD-END-----
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
@@ -323,6 +332,11 @@
       *
       *    クライアント保存ＤＢ制御サブ
            COPY    "CPORCSFILESV.INC".
+      *
+      *----(05.00.00)--ADD-START---
+      *    病名検索
+           COPY    "CPORCSBYOMEI.INC".
+      *----(05.00.00)--ADD-END-----
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -1376,6 +1390,94 @@
        2002531-FIX-FTNKBN-EXT.
            EXIT.
       *
+      *----(05.00.00)--ADD-START---
+      *****************************************************************
+      *    病名編集処理
+      *****************************************************************
+       2002-BYOMEI-HENSYU-SEC      SECTION.
+      *
+           INITIALIZE                      ORCSDIVCSV-AREA
+           MOVE    RECEDEN-RECEDATA    TO  ORCSDIVCSV-REC
+           MOVE    8                   TO  ORCSDIVCSV-ELE-C
+           MOVE    ","                 TO  ORCSDIVCSV-DELI
+           MOVE    ZERO                TO  ORCSDIVCSV-DQ
+           CALL    "ORCSDIVCSV"            USING
+                                           ORCSDIVCSV-AREA
+      *    未コード化傷病名コードの場合は処理抜ける
+           IF      ORCSDIVCSV-RC       =   ZERO
+               IF      ORCSDIVCSV-D(2)     =   "0000999"
+                   GO  TO   2002-BYOMEI-HENSYU-EXT
+               ELSE
+                   MOVE    SPACE       TO  WRK-BYOMEICD-G
+                   MOVE    ORCSDIVCSV-D(5)
+                                       TO  WRK-BYOMEICD-G
+      *
+                   INITIALIZE              ORCSBYOMEIAREA
+                   MOVE    "2"         TO  LNK-BYO-SYORI
+      *
+                   MOVE    ZERO        TO  IDX-B2
+                   PERFORM VARYING IDX-B1  FROM    1   BY  1
+                           UNTIL ( IDX-B1  >       20 )
+                           OR    ( WRK-BYOMEICD(IDX-B1)    >=  "8000")
+                           OR    ( WRK-BYOMEICD(IDX-B1)    =   SPACE )
+                       COMPUTE IDX-B2  =   IDX-B2  +   1
+                       MOVE    SPACE   TO  LNK-BYO-TBYOMEICD(IDX-B2)
+                       STRING  "ZZZ"       DELIMITED BY SIZE
+                               WRK-BYOMEICD(IDX-B1)
+                                           DELIMITED BY SIZE
+                               INTO        LNK-BYO-TBYOMEICD(IDX-B2)
+                       END-STRING
+                   END-PERFORM
+      *
+                   COMPUTE IDX-B2  =   IDX-B2  +   1
+                   MOVE    ORCSDIVCSV-D(2)
+                                       TO  LNK-BYO-TBYOMEICD(IDX-B2)
+      *
+                   PERFORM VARYING IDX-B1  FROM    IDX-B1  BY  1
+                           UNTIL ( IDX-B1  >       20 )
+                           OR    ( WRK-BYOMEICD(IDX-B1)    >=  "9000")
+                           OR    ( WRK-BYOMEICD(IDX-B1)    =   SPACE )
+                       COMPUTE IDX-B2  =   IDX-B2  +   1
+                       MOVE    SPACE   TO  LNK-BYO-TBYOMEICD(IDX-B2)
+                       STRING  "ZZZ"       DELIMITED BY SIZE
+                               WRK-BYOMEICD(IDX-B1)
+                                           DELIMITED BY SIZE
+                               INTO        LNK-BYO-TBYOMEICD(IDX-B2)
+                       END-STRING
+                   END-PERFORM
+      *
+                   CALL    "ORCSBYOMEI"        USING
+                                               ORCSBYOMEIAREA
+                                               SPA-AREA
+      *            病名編集
+                   MOVE    LNK-BYO-BYOMEI  TO  ORCSDIVCSV-D(6)
+      *
+                   MOVE    SPACE           TO  WRK-REC
+                   STRING  ORCSDIVCSV-D(1)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(2)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(3)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(4)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(5)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(6)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(7)     DELIMITED   BY  SPACE
+                           ","                 DELIMITED   BY  SIZE
+                           ORCSDIVCSV-D(8)     DELIMITED   BY  SPACE
+                                                   INTO        WRK-REC
+                   END-STRING
+                   MOVE    WRK-REC         TO  RECEDEN-RECEDATA
+               END-IF
+           END-IF
+      *
+           .
+       2002-BYOMEI-HENSYU-EXT.
+           EXIT.
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    終了処理
       *****************************************************************
@@ -1887,7 +1989,12 @@
                        CONTINUE
                    WHEN    "SY"
                        IF      SYS-9101-SYREC      =   "T"
-                           CONTINUE
+      *----(05.00.00)--ADD-START---
+                           IF      SYS-9101-SYBYO      =   "T"
+                               PERFORM 2002-BYOMEI-HENSYU-SEC
+                           END-IF
+      *                     CONTINUE
+      *----(05.00.00)--ADD-END-----
                        ELSE
                            GO  TO  900-RENKEI-TMP-READ-SEC
                        END-IF

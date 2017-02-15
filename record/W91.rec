@@ -33,5 +33,9 @@ W91 {
       isactive bool;
       state int;
     };
+    CHKSYBYO {
+      isactive bool;
+      state int;
+    };
   };
 };

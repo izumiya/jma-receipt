@@ -47,8 +47,11 @@
                05  SYS-9101-JIHI        PIC X(01).
       *患者番号記録
                05  SYS-9101-PTNUM       PIC X(01).
+      *傷病名名称全記録
+               05  SYS-9101-SYBYO       PIC X(01).
       *予備
-               05  SYS-9101-YOBI        PIC X(296).
+               05  SYS-9101-YOBI        PIC X(295).
+      *         05  SYS-9101-YOBI        PIC X(296).
       *端末ＩＤ
            03  SYS-9101-TERMID          PIC  X(16).
       *オペーレータＩＤ
