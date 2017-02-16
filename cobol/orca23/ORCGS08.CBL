@@ -90,10 +90,11 @@
            03  WRK-NINPUFTN-MONEY          PIC 9(10).
            03  WRK-CREYMD                  PIC X(08).
            03  WRK-KYUSEINAME              PIC X(100).
+           03  WRK-GMN-SKYYM               PIC X(06).
            03  WRK-SKYYMD.
                05  WRK-SKYYM               PIC X(06).
                05  WRK-SKYDD               PIC X(02).
-           03  WRK-BUNBENKBN               PIC X(01).
+           03  WRK-GMN-BUNBENKBN           PIC X(01).
            03  WRK-STATE                   PIC S9(09).
            03  WRK-VISIBLE                 PIC X(01).
            03  WRK-LABEL-G.
@@ -114,6 +115,7 @@
        01  CONST-AREA.
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
            03  CONST-H270101               PIC X(08)   VALUE "20150101".
+           03  CONST-H2904                 PIC X(08)   VALUE "201704".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -331,6 +333,12 @@
                    MOVE    SPA-GMN-S09-HKNJANUM
                                    TO  SPA-NAI-HKNJANUM-S
                END-IF
+      *
+               PERFORM 3121-TEISYUTUSAKI-EDIT-SEC
+               MOVE    SPA-GMN-TEISYUTUSAKI    TO  WRK-CMB-CD
+               PERFORM 4200-TEISYUTUSAKILST-CHK-SEC
+               MOVE    WRK-CMB-ITM         TO  SPA-GMN-TEISYUTUSAKI-G
+      *
            END-IF
       *
            .
@@ -677,13 +685,31 @@
       *****************************************************************
        3121-TEISYUTUSAKI-EDIT-SEC              SECTION.
       *
-           IF    ( SPA-GMN-BUNBENKBN       =   "1" )
-                   MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
-           ELSE
-               IF    ( SPA-NAI-RECESAKI    =   "2" )
-                   MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
+           IF    ( SPA-NAI-SKYYM       NOT =   SPACE )
+               IF    ( SPA-NAI-SKYYM           >=   CONST-H2904 )
+                OR   ( SPA-NAI-SRYYMD (1:6)    >=   CONST-H2904 )
+                   EVALUATE    SPA-GMN-SYAKOK
+                   WHEN    "1"
+                       MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
+                   WHEN    "2"
+                       MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
+                   END-EVALUATE
                ELSE
-                   MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
+                   IF    ( SPA-GMN-BUNBENKBN       =   "1" )
+                           MOVE    "2"     TO   SPA-GMN-TEISYUTUSAKI
+                   ELSE
+      *
+                       IF    ( SPA-NAI-RECESAKI    =   "1" )
+                        AND  ( SPA-GMN-SYAKOK      =   "1" )
+                           MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
+                       END-IF
+      *
+                       IF    ( SPA-NAI-RECESAKI    =   "2" )
+                        AND  ( SPA-GMN-SYAKOK      =   "2" )
+                           MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
+                       END-IF
+      *
+                   END-IF
                END-IF
            END-IF
       *
@@ -1080,7 +1106,8 @@
       *****************************************************************
        4101-GMN-SPA-SET-SEC            SECTION.
       *
-           MOVE    SPA-GMN-BUNBENKBN-G TO  WRK-BUNBENKBN
+           MOVE    SPA-GMN-BUNBENKBN-G TO  WRK-GMN-BUNBENKBN
+           MOVE    SPA-GMN-SKYYM       TO  WRK-GMN-SKYYM
       *
            MOVE    S08-RIYOUKBN        TO  SPA-GMN-RIYOUKBN-G
            MOVE    S08-SKYYM           TO  SPA-GMN-SKYYM
@@ -1271,6 +1298,10 @@
                                        TO  SPA-NAI-SKYYM
                    MOVE    WRK-HENYMDG (1:6)
                                        TO  SPA-GMN-SKYYM
+                   IF    ( SPA-GMN-SKYYM   NOT =   WRK-GMN-SKYYM )
+                    AND  ( SPA-NAI-SKYYM      >=   CONST-H2904 )
+                       PERFORM 3121-TEISYUTUSAKI-EDIT-SEC
+                   END-IF
                END-IF
            END-IF
       *
@@ -1324,7 +1355,7 @@
                                        TO  SPA-GMN-BUNBENKBN-G
            END-IF
       *
-           IF    ( SPA-GMN-BUNBENKBN   NOT =   WRK-BUNBENKBN )
+           IF    ( SPA-GMN-BUNBENKBN   NOT =   WRK-GMN-BUNBENKBN )
                PERFORM 3121-TEISYUTUSAKI-EDIT-SEC
            END-IF
       *
@@ -1907,48 +1938,13 @@
                END-IF
            END-IF
       *
-           IF    ( SPA-ERRCD           =   SPACE )
-               IF    ( SPA-GMN-RIYOUKBN        =   "1" )
-                   IF    ( SPA-GMN-TEISYUTUSAKI    =   SPACE )
-                       MOVE    "1012"      TO  SPA-ERRCD
-                       MOVE    14          TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF    ( SPA-ERRCD           =   SPACE )
-               IF    ( SPA-GMN-BUNBENKBN   =   "1" )
-                   IF    ( SPA-GMN-TEISYUTUSAKI    =   "1" )
-                       MOVE    "1013"      TO  SPA-ERRCD
-                       MOVE    14          TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF    ( SPA-ERRCD           =   SPACE )
+           IF    ( SPA-ERRCD               =   SPACE )
                IF    ( SPA-GMN-RIYOUKBN    =   "1" )
-                   IF    ( SPA-GMN-BUNBENKBN   =   "2" )
-                    AND  ( SPA-NAI-RECESAKI    =   "1" )
-                    AND  ( SPA-GMN-SYAKOK      =   "1" )
-                       IF    ( SPA-GMN-TEISYUTUSAKI    =   "2" )
-                           MOVE    "1014"  TO  SPA-ERRCD
-                           MOVE    24      TO  SPA-GMN-CUR
-                       END-IF
+                   IF    ( SPA-NAI-SKYYM   NOT =   SPACE )
+                       PERFORM 4111-TEISYUTUSAKI-CHK-SEC
                    END-IF
                END-IF
-           END-IF
-      *
-           IF    ( SPA-ERRCD           =   SPACE )
-               IF    ( SPA-GMN-RIYOUKBN    =   "1" )
-                   IF    ( SPA-GMN-BUNBENKBN   =   "2" )
-                    AND  ( SPA-NAI-RECESAKI    =   "2" )
-                    AND  ( SPA-GMN-SYAKOK      =   "2" )
-                       IF    ( SPA-GMN-TEISYUTUSAKI    =   "1" )
-                           MOVE    "1015"  TO  SPA-ERRCD
-                           MOVE    7       TO  SPA-GMN-CUR
-                       END-IF
-                   END-IF
-               END-IF
+               
            END-IF
       *
            IF    ( SPA-GMN-BIRTHCNT    =   1 )
@@ -2048,6 +2044,67 @@
            .
       *
        411-KANREN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    関連チェック処理（提出先チェック）
+      *****************************************************************
+       4111-TEISYUTUSAKI-CHK-SEC              SECTION.
+      *
+           IF    ( SPA-NAI-SKYYM      >=   CONST-H2904 )
+               EVALUATE    SPA-GMN-SYAKOK
+               WHEN    "1"
+                   IF    ( SPA-GMN-TEISYUTUSAKI    =   "2" )
+                       MOVE    "1014"  TO  SPA-ERRCD
+                       MOVE    24      TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "2"
+                   IF    ( SPA-GMN-TEISYUTUSAKI    =   "1" )
+                       MOVE    "1015"  TO  SPA-ERRCD
+                       MOVE    24      TO  SPA-GMN-CUR
+                   END-IF
+               END-EVALUATE
+           ELSE
+               IF    ( SPA-ERRCD           =   SPACE )
+                   IF    ( SPA-GMN-TEISYUTUSAKI    =   SPACE )
+                       MOVE    "1012"  TO  SPA-ERRCD
+                       MOVE    24      TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-ERRCD           =   SPACE )
+                   IF    ( SPA-GMN-BUNBENKBN   =   "1" )
+                       IF    ( SPA-GMN-TEISYUTUSAKI    =   "1" )
+                           MOVE    "1013"      TO  SPA-ERRCD
+                           MOVE    24          TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-ERRCD           =   SPACE )
+                   IF    ( SPA-GMN-BUNBENKBN   =   "2" )
+                    AND  ( SPA-NAI-RECESAKI    =   "1" )
+                    AND  ( SPA-GMN-SYAKOK      =   "1" )
+                       IF    ( SPA-GMN-TEISYUTUSAKI    =   "2" )
+                           MOVE    "1014"  TO  SPA-ERRCD
+                           MOVE    24      TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
+      *
+                   IF    ( SPA-ERRCD           =   SPACE )
+                       IF    ( SPA-GMN-BUNBENKBN   =   "2" )
+                        AND  ( SPA-NAI-RECESAKI    =   "2" )
+                        AND  ( SPA-GMN-SYAKOK      =   "2" )
+                           IF    ( SPA-GMN-TEISYUTUSAKI    =   "1" )
+                               MOVE    "1015"  TO  SPA-ERRCD
+                               MOVE    24      TO  SPA-GMN-CUR
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       4111-TEISYUTUSAKI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    戻る　処理
