@@ -129,6 +129,7 @@
       *
        01  CONST-AREA.
            03  CONST-H270101           PIC X(08)   VALUE "20150101".
+           03  CONST-H2904             PIC X(08)   VALUE "201704".
       *
       *    項目IDコピー句
            COPY    "CPNCLAIMID.INC".
@@ -1522,52 +1523,37 @@
       *
            IF    ( ERRCD-ORDER             =   SPACE )
                IF    ( ITEM-RIYOUKBN       =   "1" )
-                   IF    ( ITEM-TEISYUTUSAKI   =   SPACE )
-                       EVALUATE ITEM-BUNBENKBN
-                       WHEN   "1"
-                           MOVE    "2" TO  ITEM-TEISYUTUSAKI
-                       WHEN   "2"
-                           MOVE    LNKBUNBEN-KANYUKBN
-                                       TO  ITEM-TEISYUTUSAKI
-                       END-EVALUATE
-                   END-IF
-                   IF    ( ITEM-TEISYUTUSAKI   =   SPACE )
-                       MOVE    "8032"      TO  ERRCD-ORDER
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF    ( ERRCD-ORDER         =   SPACE )
-               IF    ( ITEM-BUNBENKBN  =   "1" )
-                   IF    ( ITEM-TEISYUTUSAKI   =   "1" )
-                       MOVE    "8033"  TO  ERRCD-ORDER
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF    ( ERRCD-ORDER         =   SPACE )
-               IF    ( ITEM-RIYOUKBN   =   "1" )
-                   IF    ( ITEM-BUNBENKBN      =   "2" )
-                    AND  ( LNKBUNBEN-KANYUKBN  =   "1" )
-                    AND  ( ITEM-KANYUKBN       =   "1" )
-                       IF    ( ITEM-TEISYUTUSAKI   =   "2" )
-                           MOVE    "8034"  TO  ERRCD-ORDER
+                AND  ( ITEM-TEISYUTUSAKI   =   SPACE )
+                   IF    ( ITEM-SKYYM  NOT =   SPACE )
+                       IF    ( ITEM-SKYYM           >=   CONST-H2904 )
+                        OR   ( ITEM-NYUINYMD        >=   CONST-H2904 )
+                        OR   ( TRRK-TAIINYMD        >=   CONST-H2904 )
+                           EVALUATE    ITEM-KANYUKBN
+                           WHEN    "1"
+                               MOVE    "1"     TO  ITEM-TEISYUTUSAKI
+                           WHEN    "2"
+                               MOVE    "2"     TO  ITEM-TEISYUTUSAKI
+                           END-EVALUATE
+                       ELSE
+                           MOVE    "1"         TO  ITEM-TEISYUTUSAKI
+                           IF    ( ITEM-BUNBENKBN       =   "1" )
+                               MOVE    "2"     TO  ITEM-TEISYUTUSAKI
+                           ELSE
+                               MOVE    LNKBUNBEN-KANYUKBN
+                                               TO  ITEM-TEISYUTUSAKI
+                           END-IF
                        END-IF
                    END-IF
                END-IF
            END-IF
       *
-           IF    ( ERRCD-ORDER           =   SPACE )
-               IF    ( ITEM-RIYOUKBN    =   "1" )
-                   IF    ( ITEM-BUNBENKBN        =   "2" )
-                    AND  ( LNKBUNBEN-KANYUKBN    =   "2" )
-                    AND  ( ITEM-KANYUKBN         =   "2" )
-                       IF    ( ITEM-TEISYUTUSAKI =   "1" )
-                           MOVE    "8035"  TO  ERRCD-ORDER
-                       END-IF
+           IF    ( ERRCD-ORDER             =   SPACE )
+               IF    ( ITEM-RIYOUKBN       =   "1" )
+                   IF    ( ITEM-SKYYM  NOT =   SPACE )
+                       PERFORM 20021-TEISYUTUSAKI-CHK-SEC
                    END-IF
                END-IF
-           END-IF
+            END-IF
       *
            IF    ( ERRCD-ORDER           =   SPACE )
                IF    ( ITEM-NUM-ZAIWEEK  =   ZERO )
@@ -1745,6 +1731,62 @@
       *
            .
        2002-KANREN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    関連チェック処理（提出先チェック）
+      *****************************************************************
+       20021-TEISYUTUSAKI-CHK-SEC              SECTION.
+      *
+           IF    ( ITEM-SKYYM         >=   CONST-H2904 )
+               EVALUATE    ITEM-KANYUKBN
+               WHEN    "1"
+                   IF    ( ITEM-TEISYUTUSAKI    =   "2" )
+                       MOVE    "8034"  TO  ERRCD-ORDER
+                   END-IF
+               WHEN    "2"
+                   IF    ( ITEM-TEISYUTUSAKI    =   "1" )
+                       MOVE    "8035"  TO  ERRCD-ORDER
+                   END-IF
+               END-EVALUATE
+           ELSE
+      *
+               IF    ( ERRCD-ORDER           =   SPACE )
+                   IF    ( ITEM-BUNBENKBN        = "1" )
+                       IF    ( ITEM-TEISYUTUSAKI = "1" )
+                           MOVE    "8033"      TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( ERRCD-ORDER           =   SPACE )
+                   IF    ( ITEM-BUNBENKBN        = "2" )
+                    AND  ( LNKBUNBEN-KANYUKBN    = "1" )
+                    AND  ( ITEM-KANYUKBN         = "1" )
+                       IF    ( ITEM-TEISYUTUSAKI = "2" )
+                           MOVE    "8034"      TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( ERRCD-ORDER             =   SPACE )
+                   IF    ( ITEM-BUNBENKBN        = "2" )
+                    AND  ( LNKBUNBEN-KANYUKBN    = "2" )
+                    AND  ( ITEM-KANYUKBN         = "2" )
+                       IF    ( ITEM-TEISYUTUSAKI = "1" )
+                           MOVE    "8035"  TO  ERRCD-ORDER
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( ERRCD-ORDER           =   SPACE )
+               IF    ( ITEM-TEISYUTUSAKI   =   SPACE )
+                   MOVE    "8032"      TO  ERRCD-ORDER
+               END-IF
+           END-IF
+      *
+           .
+       20021-TEISYUTUSAKI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    オーダー情報再編成処理
@@ -1937,7 +1979,11 @@
            MOVE    TBBN-HOSPNUM            TO  BUNBEN-HOSPNUM
            MOVE    TBBN-PTID               TO  BUNBEN-PTID
            MOVE    TBBN-NYUGAIKBN          TO  BUNBEN-NYUGAIKBN
-           MOVE    ITEM-SKYYM              TO  BUNBEN-SKYYM
+           IF    ( ITEM-SKYYM              =   SPACE )
+               MOVE    "000000"            TO  BUNBEN-SKYYM
+           ELSE
+               MOVE    ITEM-SKYYM          TO  BUNBEN-SKYYM
+           END-IF
            MOVE    TBBN-RRKNUM             TO  BUNBEN-RRKNUM
            MOVE    TBBN-PTNUM              TO  BUNBEN-PTNUM
            MOVE    ITEM-TEISYUTUBIKBN      TO  BUNBEN-TEISYUTUBIKBN

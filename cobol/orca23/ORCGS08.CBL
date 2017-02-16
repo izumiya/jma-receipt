@@ -597,7 +597,7 @@
       *
            IF    ( BUNBEN-SKYYM        =   ZERO )
                MOVE    SPACE           TO  SPA-GMN-SKYYM
-               MOVE    ZERO            TO  SPA-NAI-SKYYM
+               MOVE    SPACE           TO  SPA-NAI-SKYYM
            ELSE
                MOVE    BUNBEN-SKYYM    TO  SPA-NAI-SKYYM
                MOVE    BUNBEN-SKYYM    TO  WRK-SYMD
@@ -685,30 +685,26 @@
       *****************************************************************
        3121-TEISYUTUSAKI-EDIT-SEC              SECTION.
       *
-           IF    ( SPA-NAI-SKYYM       NOT =   SPACE )
-               IF    ( SPA-NAI-SKYYM           >=   CONST-H2904 )
-                OR   ( SPA-NAI-SRYYMD (1:6)    >=   CONST-H2904 )
+           IF   (( SPA-NAI-SKYYM        NOT =   SPACE )
+             AND ( SPA-NAI-SKYYM           >=   CONST-H2904 ))
+             OR  ( SPA-NAI-SRYYMD (1:6)    >=   CONST-H2904 )
                    EVALUATE    SPA-GMN-SYAKOK
                    WHEN    "1"
                        MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
                    WHEN    "2"
                        MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
                    END-EVALUATE
+           ELSE
+               IF    ( SPA-GMN-BUNBENKBN       =   "1" )
+                       MOVE    "2"     TO   SPA-GMN-TEISYUTUSAKI
                ELSE
-                   IF    ( SPA-GMN-BUNBENKBN       =   "1" )
-                           MOVE    "2"     TO   SPA-GMN-TEISYUTUSAKI
-                   ELSE
       *
-                       IF    ( SPA-NAI-RECESAKI    =   "1" )
-                        AND  ( SPA-GMN-SYAKOK      =   "1" )
-                           MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
-                       END-IF
+                   IF    ( SPA-NAI-RECESAKI    =   "1" )
+                       MOVE    "1"     TO  SPA-GMN-TEISYUTUSAKI
+                   END-IF
       *
-                       IF    ( SPA-NAI-RECESAKI    =   "2" )
-                        AND  ( SPA-GMN-SYAKOK      =   "2" )
-                           MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
-                       END-IF
-      *
+                   IF    ( SPA-NAI-RECESAKI    =   "2" )
+                       MOVE    "2"     TO  SPA-GMN-TEISYUTUSAKI
                    END-IF
                END-IF
            END-IF
@@ -1270,7 +1266,7 @@
            IF    ( SPA-GMN-RIYOUKBN    =   "0" )
             OR   ( SPA-GMN-HKNJANUM    =   ZERO )
                MOVE    SPACE           TO  SPA-GMN-SKYYM
-               MOVE    ZERO            TO  SPA-NAI-SKYYM
+               MOVE    SPACE           TO  SPA-NAI-SKYYM
                MOVE    SPACE           TO  SPA-GMN-TEISYUTUBIKBN
                MOVE    "1"             TO  SPA-GMN-SKYKBN
            END-IF
@@ -1283,7 +1279,7 @@
       *****************************************************************
        4101-SKYYM-CHK-SEC              SECTION.
       *
-           MOVE    ZERO                TO  SPA-NAI-SKYYM
+           MOVE    SPACE               TO  SPA-NAI-SKYYM
       *
            IF    ( SPA-GMN-SKYYM       =   SPACE )
                CONTINUE
@@ -2161,7 +2157,11 @@
            MOVE    SPA-HOSPNUM             TO  BUNBEN-HOSPNUM
            MOVE    SPA-PTID                TO  BUNBEN-PTID
            MOVE    SPA-S08-NYUGAIKBN       TO  BUNBEN-NYUGAIKBN
-           MOVE    SPA-NAI-SKYYM           TO  BUNBEN-SKYYM
+           IF    ( SPA-NAI-SKYYM           =   SPACE )
+               MOVE    "000000"            TO  BUNBEN-SKYYM
+           ELSE
+               MOVE    SPA-NAI-SKYYM       TO  BUNBEN-SKYYM
+           END-IF
            MOVE    SPA-S08-RRKNUM          TO   BUNBEN-RRKNUM
            MOVE    SPA-GMN-PTNUM           TO   BUNBEN-PTNUM
            MOVE    SPA-GMN-TEISYUTUBIKBN   TO   BUNBEN-TEISYUTUBIKBN
