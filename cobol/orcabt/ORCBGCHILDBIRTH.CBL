@@ -46,6 +46,9 @@
       *  04.07.02    NACL-藤原    14/09/26  システム管理対象月設定
       *  04.07.03    NACL-藤原    15/08/18  医療機関編集情報への開設者名
       *                                     追加対応
+      *
+      *  04.08.01    NACL-藤原    17/02/15  直接支払制度の一部改正に伴う
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -531,9 +534,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            END-IF
       *
            IF    ( WRK-PARA-TEISYUTUBIKBN
-                                   =   "2" )
+                                   =   "2"      )
            AND   ( WRK-PARA-TEISYUTUSAKI
-                                   =   "1" )
+                                   =   "1"      )
+           AND   ( WRK-PARA-SKYYM  <   "201704" )
                MOVE    "２５日請求時は社保のみは設定できません" 
                                        TO  WRK-BUNBENERR
                PERFORM 500-ERR-HENSYU-SEC
@@ -627,13 +631,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
            END-IF
       *
-      *    社保分作成（２５日請求時は作成しない）
-           IF    ( WRK-PARA-TEISYUTUSAKI
-                                   =   "0" OR  "1" )
-           AND   ( WRK-PARA-TEISYUTUBIKBN
-                                   =   "1"         )
-               MOVE    "1"             TO  WRK-TEISYUTUSAKI
-               PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
+      *    社保分作成
+      *   （請求年月が２０１７年３月以前は２５日請求時は作成しない）
+           IF      WRK-PARA-TEISYUTUSAKI
+                                   =   "0" OR  "1"
+               IF    ( WRK-PARA-TEISYUTUBIKBN
+                                       =   "2"      )
+               AND   ( WRK-PARA-SKYYM  <   "201704" )
+                   CONTINUE
+               ELSE 
+                   MOVE    "1"             TO  WRK-TEISYUTUSAKI
+                   PERFORM 2001-TEISYUTUSAKI-HENSYU-SEC
+               END-IF
            END-IF
       *
            CLOSE   UPD-FILE
@@ -1626,7 +1635,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
                MOVE    WRK-TEISYUTUSAKI
                                        TO  WRK-DATA
            ELSE
-               MOVE    "3"             TO  WRK-DATA
+               IF      WRK-TEISYUTUSAKI    =   "2"
+                   MOVE    "3"             TO  WRK-DATA
+               ELSE
+                   MOVE    WRK-TEISYUTUSAKI
+                                           TO  WRK-DATA
+               END-IF
            END-IF 
            MOVE    1               TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
