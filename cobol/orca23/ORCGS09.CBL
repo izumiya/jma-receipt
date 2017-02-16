@@ -57,6 +57,7 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END                     PIC 9(01).
+           03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-BUNBEN                  PIC 9(01).
            03  FLG-HKNJAINF                PIC 9(01).
            03  FLG-HKNNUM                  PIC 9(01).
@@ -85,6 +86,9 @@
            03  WRK-STR                     PIC X(100).
            03  WRK-TMP                     PIC X(100).
       *
+       01  CONST-AREA.
+           03  CONST-H2904                 PIC X(08)   VALUE "201704".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -96,6 +100,10 @@
       *    保険番号情報
        01  HKNNUM-REC.
            COPY    "CPHKNNUM.INC".
+      *
+      *    入院履歴
+       01  PTNYUINRRK-REC.
+           COPY  "CPPTNYUINRRK.INC".
       *
       *    分娩管理
        01  BUNBEN-REC.
@@ -830,6 +838,7 @@
            END-IF
       *
            IF    (  SPA-ERRCD          =   SPACE )
+      *
                PERFORM 900-BUNBEN-KEY3-SEL-SEC
                IF    ( FLG-BUNBEN      =   ZERO )
       *
@@ -890,6 +899,30 @@
                MOVE    SPA-GMN-S09-HKNJANUM
                                    TO  BUNBEN-HKNJANUM-S
            END-IF
+      *
+      *    USE SPA-NAI-SRYYMD & SPA-NAI-RECESAKI IN SPA-S08 (SPA-S08FREE)
+           DISPLAY "SPA-NAI-SRYYMD  =" SPA-NAI-SRYYMD
+           DISPLAY "SPA-NAI-RECESAKI=" SPA-NAI-RECESAKI
+           IF   (( BUNBEN-SKYYM         NOT =   "000000" )
+             AND ( BUNBEN-SKYYM            >=   CONST-H2904 ))
+             OR  ( SPA-NAI-SRYYMD (1:6)    >=   CONST-H2904 )
+                   MOVE    BUNBEN-KANYUKBN
+                                       TO  BUNBEN-TEISYUTUSAKI
+           ELSE
+               IF    ( BUNBEN-BUNBENKBN    =   "1" )
+                       MOVE    "2"     TO  BUNBEN-TEISYUTUSAKI
+               ELSE
+      *
+                   IF    ( SPA-NAI-RECESAKI    =   "1" )
+                       MOVE    "1"     TO  BUNBEN-TEISYUTUSAKI
+                   END-IF
+      *
+                   IF    ( SPA-NAI-RECESAKI    =   "2" )
+                       MOVE    "2"     TO  BUNBEN-TEISYUTUSAKI
+                   END-IF
+               END-IF
+           END-IF
+           
       *
            .
       *
@@ -1268,6 +1301,33 @@
            .
       *
        900-BUNBEN-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY4-SEL-SEC     SECTION.
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    SPA-S08-RRKNUM      TO  PTNYUINRRK-RRKNUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY4-SEL-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
