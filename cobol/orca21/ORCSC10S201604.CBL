@@ -5356,10 +5356,14 @@
                    MOVE    TBL-ZKS-GRP (TBL-ZKSIDX) TO  WRK-ZKS-GRP
                    MOVE    TBL-ZKS-KBN (TBL-ZKSIDX) TO  WRK-ZKS-KBN
            END-SEARCH
-           IF     (WRK-ZKS-KBN         =   "3"     )
-              AND (SPA-COM-AUTOKBN(WRK-IDX-IN + 1)   =   SPACE)
-               COMPUTE WRK-IDX-IN3         =   WRK-IDX-IN
-                                           +   1
+           IF     (WRK-ZKS-KBN         =   SPACE   )
+              OR  (WRK-ZKS-GRP(1:1)    =   "2"     )
+               CONTINUE
+           ELSE
+               IF    (SPA-COM-AUTOKBN(WRK-IDX-IN + 1)   =   SPACE)
+                   COMPUTE WRK-IDX-IN3         =   WRK-IDX-IN
+                                               +   1
+               END-IF
            END-IF
            .
        33081-ZAIKANRI02-SET02-EXT.
