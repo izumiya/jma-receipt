@@ -4494,8 +4494,9 @@
                    PERFORM 1100-KASAN-SET-SEC
                    IF      FLG-ADD         =   1
       *H29.2
-      *                実績加算２は手入力分とする
-                       IF      IDX3            =   3
+      *                在医総管・特医総管の加算は手入力分とする
+                       IF      WRK-ZS-GRP(1:1)     =   "0"
+                                                   OR  "1"
                            MOVE    "1"         TO  WRK-COM-KSNAUTO
                                                         (IDX-Z)
                            MOVE    SPACE       TO  WRK-COM-AUTOKBN
@@ -4506,8 +4507,9 @@
                    END-IF
                ELSE
       *H29.2
-      *            実績加算２は手入力分とする
-                   IF      IDX3            =   3
+      *            在医総管・特医総管の加算は手入力分とする
+                   IF      WRK-ZS-GRP(1:1)     =   "0"
+                                               OR  "1"
                        MOVE    "1"         TO  WRK-COM-KSNAUTO
                                                         (IDX-Z)
                    END-IF
