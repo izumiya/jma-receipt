@@ -1001,7 +1001,8 @@
                    END-IF
       *H29.2
       *            在宅加算２の訂正時自動発生対応
-                   IF     (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
+                   IF     (SPA-SRYYMD              >=  "20160401")
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
                       AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
                       AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
                        PERFORM 10026-ZAITAKU-AUTO-SEC
