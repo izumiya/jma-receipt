@@ -105,9 +105,9 @@
            COPY    "CPORCSLNK.INC".
       *
       *    API XML読み込み用定義体
-           COPY    "CPOKUSURIPUTV2REQ.INC".
+           COPY    "CPOKUSURIGETV2REQ.INC".
       *    API XML書き込み用定義体
-           COPY    "CPOKUSURIPUTV2RES.INC".
+           COPY    "CPOKUSURIGETV2RES.INC".
       *ver.4.7
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
@@ -154,7 +154,7 @@
        000-MAIN-SEC                SECTION.
       *
            DISPLAY   "**********************"
-           DISPLAY   "* okusuriput start   *"
+           DISPLAY   "* okusuriget start   *"
            DISPLAY   "**********************"
       *
            INITIALIZE  FLG-AREA
@@ -178,7 +178,7 @@
            END-IF
       *
            DISPLAY   "**********************"
-           DISPLAY   "* okusuriput end     *"
+           DISPLAY   "* okusuriget end     *"
            DISPLAY   "**********************"
            .
        000-MAIN-EXIT.
@@ -190,7 +190,7 @@
        100-INIT-SEC                SECTION.
       *
            INITIALIZE  WRK-XML-AREA
-           INITIALIZE  XML-OKUSURIPUTRES
+           INITIALIZE  XML-OKUSURIGETRES
       *    更新日取得
            INITIALIZE  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
@@ -202,9 +202,9 @@
            MOVE    SMCNDATE-HMS        TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO
-                                       OKUSURIPUTRES-INFORMATION-DATE
+                                       OKUSURIGETRES-INFORMATION-DATE
            MOVE    WRK-HEN-TIME        TO
-                                       OKUSURIPUTRES-INFORMATION-TIME
+                                       OKUSURIGETRES-INFORMATION-TIME
       *
       *    医療機関識別番号セット 
            MOVE    "API"               TO  SPA-MOTOPG
@@ -240,7 +240,7 @@
                GO  TO  200-MAIN-EXT
            END-IF
       *
-           MOVE    ZERO                TO  OKUSURIPUTRES-API-RESULT
+           MOVE    ZERO                TO  OKUSURIGETRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
            MOVE    SPACE               TO  WRK-KEICD
       *
@@ -283,12 +283,12 @@
            END-IF
       * XML情報取り出し
            MOVE   "XMLOPEN"            TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2req"
+           MOVE    "xml_okusurigetv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST28-BODY       TO  APIREQ-OBJECT
            MOVE    ZERO                TO  APIREQ-MODE
-           MOVE    "okusuriputv2req"   TO  APIREQ-RECORDNAME
+           MOVE    "okusurigetv2req"   TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
                                            XML-APIREQ
                                            SPA-AREA
@@ -300,16 +300,16 @@
            END-IF
       *
            MOVE    "XMLREAD"           TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2req"
+           MOVE    "xml_okusurigetv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST28-BODY       TO  APIREQ-OBJECT
-           MOVE    "okusuriputv2req"   TO  APIREQ-RECORDNAME
+           MOVE    "okusurigetv2req"   TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
                                            XML-APIREQ
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
-               MOVE    XML-APIREQ          TO  XML-OKUSURIPUTREQ
+               MOVE    XML-APIREQ          TO  XML-OKUSURIGETREQ
                PERFORM 10001-XML-REMAKE-SEC
            ELSE
                DISPLAY "XMLREAD failure = " MCP-RC
@@ -317,7 +317,7 @@
            END-IF
       *
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2req"
+           MOVE    "xml_okusurigetv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST28-BODY       TO  APIREQ-OBJECT
@@ -345,13 +345,13 @@
                EVALUATE    FLG-SYORI
                    WHEN    1
                        MOVE    "処理終了"
-                                       TO  OKUSURIPUTRES-API-RESULT-MSG
+                                       TO  OKUSURIGETRES-API-RESULT-MSG
                END-EVALUATE
            ELSE
       *        エラー・警告メッセージ
                PERFORM 890-ERRCD-MSG-SEC
-               MOVE    WRK-ERRCD           TO  OKUSURIPUTRES-API-RESULT
-               MOVE    WRK-ERRMSG      TO  OKUSURIPUTRES-API-RESULT-MSG
+               MOVE    WRK-ERRCD           TO  OKUSURIGETRES-API-RESULT
+               MOVE    WRK-ERRMSG      TO  OKUSURIGETRES-API-RESULT-MSG
            END-IF
       *
            IF      APILST28-BODY   NOT =   LOW-VALUE
@@ -359,13 +359,13 @@
            END-IF
       *
            MOVE    "XMLOPEN"           TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2res"
+           MOVE    "xml_okusurigetv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    1                   TO  OKUSURIPUTRES-MODE
-           MOVE    "okusuriputv2res"   TO  OKUSURIPUTRES-RECORDNAME
+           MOVE    1                   TO  OKUSURIGETRES-MODE
+           MOVE    "okusurigetv2res"   TO  OKUSURIGETRES-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIPUTRES
+                                           XML-OKUSURIGETRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                CONTINUE
@@ -374,11 +374,11 @@
            END-IF
       *
            MOVE    "XMLWRITE"          TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2res"
+           MOVE    "xml_okusurigetv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIPUTRES
+                                           XML-OKUSURIGETRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                DISPLAY "XMLWRITE OK      = " MCP-RC
@@ -387,20 +387,20 @@
            END-IF
       *
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
-           MOVE    "xml_okusuriputv2res"
+           MOVE    "xml_okusurigetv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIPUTRES
+                                           XML-OKUSURIGETRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                DISPLAY "XMLCLOSE OK     = " MCP-RC
-               MOVE    OKUSURIPUTRES-OBJECT
+               MOVE    OKUSURIGETRES-OBJECT
                                            TO  APILST28-BODY 
                MOVE    "application/xml"   TO  APILST28-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "okusuriput xml write failure "
+               DISPLAY "okusuriget xml write failure "
            END-IF
           .
        300-MNOTEINFMAKE-EXT.
@@ -411,30 +411,30 @@
       *****************************************************************
        10001-XML-REMAKE-SEC        SECTION.
       *
-           IF      OKUSURIPUTREQ-PATIENTID
+           IF      OKUSURIGETREQ-PATIENTID
                                        =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIPUTREQ-PATIENTID
+               MOVE    SPACE               TO  OKUSURIGETREQ-PATIENTID
            END-IF
-           IF      OKUSURIPUTREQ-BASE-DATE
+           IF      OKUSURIGETREQ-BASE-DATE
                                        =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIPUTREQ-BASE-DATE
+               MOVE    SPACE               TO  OKUSURIGETREQ-BASE-DATE
            END-IF
-           IF      OKUSURIPUTREQ-RENNUM
+           IF      OKUSURIGETREQ-RENNUM
                                        =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIPUTREQ-RENNUM
+               MOVE    SPACE               TO  OKUSURIGETREQ-RENNUM
            END-IF
-           IF      OKUSURIPUTREQ-TBL-GROUP
+           IF      OKUSURIGETREQ-TBL-GROUP
                                        =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIPUTREQ-TBL-GROUP
+               MOVE    SPACE               TO  OKUSURIGETREQ-TBL-GROUP
            END-IF
-           IF      OKUSURIPUTREQ-TBL-UUID
+           IF      OKUSURIGETREQ-TBL-UUID
                                        =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIPUTREQ-TBL-UUID
+               MOVE    SPACE               TO  OKUSURIGETREQ-TBL-UUID
            END-IF
-           IF      OKUSURIPUTREQ-SHORI-RENNUM
+           IF      OKUSURIGETREQ-SHORI-RENNUM
                                        =   LOW-VALUE
                MOVE    SPACE               TO
-                                           OKUSURIPUTREQ-SHORI-RENNUM
+                                           OKUSURIGETREQ-SHORI-RENNUM
            END-IF
            .
        10001-XML-REMAKE-EXT.
@@ -466,13 +466,13 @@
        20010-INPUT-HEN-SEC         SECTION.
       *
       *    患者番号
-           MOVE    OKUSURIPUTREQ-PATIENTID
+           MOVE    OKUSURIGETREQ-PATIENTID
                                        TO  WRK-PTNUM
       *    基準日
-           MOVE    OKUSURIPUTREQ-BASE-DATE
-                                       TO  OKUSURIPUTRES-BASE-DATE
+           MOVE    OKUSURIGETREQ-BASE-DATE
+                                       TO  OKUSURIGETRES-BASE-DATE
       *    数字のみに編集
-           MOVE    OKUSURIPUTREQ-BASE-DATE
+           MOVE    OKUSURIGETREQ-BASE-DATE
                                        TO  WRK-HEN-DATE
            MOVE    SPACE               TO  WRK-HEN-TIME
            PERFORM 802-DAYHEN02-SEC
@@ -483,7 +483,7 @@
                MOVE    WRK-BASE-YMD        TO  WRK-SYMD
                MOVE    ZERO                TO  WRK-THMS
                PERFORM 801-DAYHEN01-SEC
-               MOVE    WRK-HEN-DATE        TO  OKUSURIPUTRES-BASE-DATE
+               MOVE    WRK-HEN-DATE        TO  OKUSURIGETRES-BASE-DATE
            END-IF
       *
       *    必須入力チェック
@@ -561,13 +561,13 @@
                           (IDX     >   10)
       *
                MOVE    MNOTE-H-RENNUM
-                                       TO  OKUSURIPUTRES-RENNUM (IDX)
+                                       TO  OKUSURIGETRES-RENNUM (IDX)
                MOVE    MNOTE-H-TBL-GROUP
-                                       TO  OKUSURIPUTRES-TBL-GROUP (IDX)
+                                       TO  OKUSURIGETRES-TBL-GROUP (IDX)
                MOVE    MNOTE-H-TBL-UUID
-                                       TO  OKUSURIPUTRES-TBL-UUID (IDX)
+                                       TO  OKUSURIGETRES-TBL-UUID (IDX)
                MOVE    MNOTE-H-SHORI-RENNUM
-                                   TO  OKUSURIPUTRES-SHORI-RENNUM (IDX)
+                                   TO  OKUSURIGETRES-SHORI-RENNUM (IDX)
       *
                PERFORM 900-MNOTE-H-KEY8-FET-SEC
            END-PERFORM
@@ -612,7 +612,7 @@
                END-IF
            END-PERFORM
       *
-           MOVE    WRK-XML             TO  OKUSURIPUTRES-CSV-DATA
+           MOVE    WRK-XML             TO  OKUSURIGETRES-CSV-DATA
       *
            MOVE    "tbl_mnote_b"       TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
@@ -626,14 +626,14 @@
       *****************************************************************
        200212-PTINF-HEN-SEC        SECTION.
       *
-           MOVE    WRK-PTNUM           TO  OKUSURIPUTRES-PTNUM
-           MOVE    PTINF-NAME          TO  OKUSURIPUTRES-NAME
-           MOVE    PTINF-KANANAME      TO  OKUSURIPUTRES-KANANAME
+           MOVE    WRK-PTNUM           TO  OKUSURIGETRES-PTNUM
+           MOVE    PTINF-NAME          TO  OKUSURIGETRES-NAME
+           MOVE    PTINF-KANANAME      TO  OKUSURIGETRES-KANANAME
            MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
            MOVE    ZERO                TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  OKUSURIPUTRES-BIRTHDAY
-           MOVE    PTINF-SEX           TO  OKUSURIPUTRES-SEX
+           MOVE    WRK-HEN-DATE        TO  OKUSURIGETRES-BIRTHDAY
+           MOVE    PTINF-SEX           TO  OKUSURIGETRES-SEX
            .
        200212-PTINF-HEN-EXT.
            EXIT.
@@ -759,13 +759,13 @@
            INITIALIZE  MNOTE-H-REC
            MOVE    SPA-HOSPNUM         TO  MNOTE-H-HOSPNUM
            MOVE    "MNOTE"             TO  MNOTE-H-TBL-KEY
-           MOVE    OKUSURIPUTREQ-RENNUM
+           MOVE    OKUSURIGETREQ-RENNUM
                                        TO  MNOTE-H-RENNUM
-           MOVE    OKUSURIPUTREQ-TBL-GROUP
+           MOVE    OKUSURIGETREQ-TBL-GROUP
                                        TO  MNOTE-H-TBL-GROUP
-           MOVE    OKUSURIPUTREQ-TBL-UUID
+           MOVE    OKUSURIGETREQ-TBL-UUID
                                        TO  MNOTE-H-TBL-UUID
-           MOVE    OKUSURIPUTREQ-SHORI-RENNUM
+           MOVE    OKUSURIGETREQ-SHORI-RENNUM
                                        TO  MNOTE-H-SHORI-RENNUM
       *
            MOVE    MNOTE-H-REC         TO  MCPDATA-REC

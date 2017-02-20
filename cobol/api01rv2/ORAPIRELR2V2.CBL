@@ -124,9 +124,9 @@
            COPY    "CPORCSDIVCSV.INC".
       *
       *    API XML読み込み用定義体
-           COPY    "CPOKUSURIGETV2REQ.INC".
+           COPY    "CPOKUSURIPUTV2REQ.INC".
       *    API XML書き込み用定義体
-           COPY    "CPOKUSURIGETV2RES.INC".
+           COPY    "CPOKUSURIPUTV2RES.INC".
       *ver.4.7
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
@@ -173,7 +173,7 @@
        000-MAIN-SEC                SECTION.
       *
            DISPLAY   "**********************"
-           DISPLAY   "* okusuriget start   *"
+           DISPLAY   "* okusuriput start   *"
            DISPLAY   "**********************"
       *
            INITIALIZE  FLG-AREA
@@ -193,11 +193,11 @@
                MOVE   404                  TO  APILST29-HTTPSTATUS
            ELSE
       *        返却領域編集
-               PERFORM 300-OKUSURIGETMAKE-SEC
+               PERFORM 300-OKUSURIPUTMAKE-SEC
            END-IF
       *
            DISPLAY   "**********************"
-           DISPLAY   "* okusuriget end     *"
+           DISPLAY   "* okusuriput end     *"
            DISPLAY   "**********************"
            .
        000-MAIN-EXIT.
@@ -209,7 +209,7 @@
        100-INIT-SEC                SECTION.
       *
            INITIALIZE  WRK-XML-AREA
-           INITIALIZE  XML-OKUSURIGETRES
+           INITIALIZE  XML-OKUSURIPUTRES
       *    更新日取得
            INITIALIZE  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
@@ -221,9 +221,9 @@
            MOVE    SMCNDATE-HMS        TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO
-                                       OKUSURIGETRES-INFORMATION-DATE
+                                       OKUSURIPUTRES-INFORMATION-DATE
            MOVE    WRK-HEN-TIME        TO
-                                       OKUSURIGETRES-INFORMATION-TIME
+                                       OKUSURIPUTRES-INFORMATION-TIME
       *
       *    医療機関識別番号セット
            MOVE    "API"               TO  SPA-MOTOPG
@@ -254,16 +254,15 @@
        200-MAIN-SEC                SECTION.
       *
       *    XML情報取り出し
-           PERFORM 2001-OKUSURIGETREAD-SEC
+           PERFORM 2001-OKUSURIPUTREAD-SEC
            IF      WRK-ERRCD       NOT =   SPACE
                GO  TO  200-MAIN-EXT
            END-IF
       *
-           MOVE    ZERO                TO  OKUSURIGETRES-API-RESULT
+           MOVE    ZERO                TO  OKUSURIPUTRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
            MOVE    SPACE               TO  WRK-KEICD
       *
-ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
            MOVE    ZERO                TO  FLG-SYORI
            EVALUATE    APILST29-CLASS
                WHEN    "01"
@@ -289,19 +288,19 @@ ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
       *****************************************************************
       *    XML情報から内容を取り出す
       *****************************************************************
-       2001-OKUSURIGETREAD-SEC     SECTION.
+       2001-OKUSURIPUTREAD-SEC     SECTION.
       *
            IF      APILST29-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
       * XML情報取り出し
            MOVE   "XMLOPEN"            TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2req"
+           MOVE    "xml_okusuriputv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST29-BODY       TO  APIREQ-OBJECT
            MOVE    ZERO                TO  APIREQ-MODE
-           MOVE    "okusurigetv2req"   TO  APIREQ-RECORDNAME
+           MOVE    "okusuriputv2req"   TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
                                            XML-APIREQ
                                            SPA-AREA
@@ -313,16 +312,16 @@ ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
            END-IF
       *
            MOVE    "XMLREAD"           TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2req"
+           MOVE    "xml_okusuriputv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST29-BODY       TO  APIREQ-OBJECT
-           MOVE    "okusurigetv2req"   TO  APIREQ-RECORDNAME
+           MOVE    "okusuriputv2req"   TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
                                            XML-APIREQ
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
-               MOVE    XML-APIREQ          TO  XML-OKUSURIGETREQ
+               MOVE    XML-APIREQ          TO  XML-OKUSURIPUTREQ
                PERFORM 20011-XML-REMAKE-SEC
            ELSE
                DISPLAY "XMLREAD failure = " MCP-RC
@@ -330,7 +329,7 @@ ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
            END-IF
       *
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2req"
+           MOVE    "xml_okusuriputv2req"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST29-BODY       TO  APIREQ-OBJECT
@@ -338,7 +337,7 @@ ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
                                            XML-APIREQ
                                            SPA-AREA
            .
-       2001-OKUSURIGETREAD-EXT.
+       2001-OKUSURIPUTREAD-EXT.
            EXIT.
       *
       *****************************************************************
@@ -346,10 +345,9 @@ ito        DISPLAY "APILST29-CLASS [ " APILST29-CLASS " ]"
       *****************************************************************
        20011-XML-REMAKE-SEC        SECTION.
       *
-           IF      OKUSURIGETREQ-CSV-DATA
+           IF      OKUSURIPUTREQ-CSV-DATA
                                        =   LOW-VALUE
-ito            DISPLAY "CSV-DATA LOW-VALUE"
-               MOVE    SPACE               TO  OKUSURIGETREQ-CSV-DATA
+               MOVE    SPACE               TO  OKUSURIPUTREQ-CSV-DATA
                MOVE    "01"                TO  WRK-ERRCD
            END-IF
            .
@@ -359,7 +357,7 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
       *****************************************************************
       *    XML情報書き込み処理
       *****************************************************************
-       300-OKUSURIGETMAKE-SEC      SECTION.
+       300-OKUSURIPUTMAKE-SEC      SECTION.
       *
       *    エラーメッセージ編集
            IF      WRK-ERRCD           =   SPACE
@@ -370,14 +368,14 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
                EVALUATE    FLG-SYORI
                    WHEN    1
                        MOVE    "処理終了"
-                                       TO  OKUSURIGETRES-API-RESULT-MSG
+                                       TO  OKUSURIPUTRES-API-RESULT-MSG
                END-EVALUATE
            ELSE
       *        エラー・警告メッセージ
                PERFORM 890-ERRCD-MSG-SEC
-               MOVE    WRK-ERRCD           TO  OKUSURIGETRES-API-RESULT
+               MOVE    WRK-ERRCD           TO  OKUSURIPUTRES-API-RESULT
                MOVE    WRK-ERRMSG
-                                       TO  OKUSURIGETRES-API-RESULT-MSG
+                                       TO  OKUSURIPUTRES-API-RESULT-MSG
            END-IF
       *
            IF      APILST29-BODY   NOT =   LOW-VALUE
@@ -385,13 +383,13 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
            END-IF
       *
            MOVE    "XMLOPEN"           TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2res"
+           MOVE    "xml_okusuriputv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    1                   TO  OKUSURIGETRES-MODE
-           MOVE    "okusurigetv2res"   TO  OKUSURIGETRES-RECORDNAME
+           MOVE    1                   TO  OKUSURIPUTRES-MODE
+           MOVE    "okusuriputv2res"   TO  OKUSURIPUTRES-RECORDNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIGETRES
+                                           XML-OKUSURIPUTRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                CONTINUE
@@ -400,11 +398,11 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
            END-IF
       *
            MOVE    "XMLWRITE"          TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2res"
+           MOVE    "xml_okusuriputv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIGETRES
+                                           XML-OKUSURIPUTRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                DISPLAY "XMLWRITE OK      = " MCP-RC
@@ -413,23 +411,23 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
            END-IF
       *
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
-           MOVE    "xml_okusurigetv2res"
+           MOVE    "xml_okusuriputv2res"
                                        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"     USING   MCPAREA
-                                           XML-OKUSURIGETRES
+                                           XML-OKUSURIPUTRES
                                            SPA-AREA
            IF     (MCP-RC              =   ZERO    OR  1)
                DISPLAY "XMLCLOSE OK     = " MCP-RC
-               MOVE    OKUSURIGETRES-OBJECT
+               MOVE    OKUSURIPUTRES-OBJECT
                                            TO  APILST29-BODY 
                MOVE    "application/xml"   TO  APILST29-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "okusuriget xml write failure "
+               DISPLAY "okusuriput xml write failure "
            END-IF
           .
-       300-OKUSURIGETMAKE-EXT.
+       300-OKUSURIPUTMAKE-EXT.
            EXIT.
       *
       *****************************************************************
@@ -437,11 +435,9 @@ ito            DISPLAY "CSV-DATA LOW-VALUE"
       *****************************************************************
        400-OKUSURI-TOROKU-SEC      SECTION.
       *
-ito        DISPLAY "400-OKUSURI DATA [ "
-           OKUSURIGETREQ-CSV-DATA (1:200) " ]"
-           IF      OKUSURIGETREQ-CSV-DATA
+           IF      OKUSURIPUTREQ-CSV-DATA
                                    NOT =   SPACE
-               MOVE    OKUSURIGETREQ-CSV-DATA
+               MOVE    OKUSURIPUTREQ-CSV-DATA
                                            TO  WRK-CSV-DATA
                PERFORM 4001-OKUSURI-KANRI-INS-SEC
            END-IF

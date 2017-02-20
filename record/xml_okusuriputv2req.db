@@ -4,11 +4,8 @@ xml_okusuriputv2req {
 	mode	int;
 	recordname	varchar(128);
 	okusuriputv2req {
-		Patient_ID		varchar(20);
-		Base_Date		varchar(10);
-		Rennum			varchar(04);
-		Tbl_Group		varchar(14);
-		Tbl_UUID		varchar(36);
-		Shori_Rennum		varchar(04);
+		Okusuri_Data	{
+			CsvData		varchar(10000);
+		};
 	};
 };

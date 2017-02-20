@@ -32,8 +32,8 @@ bindapi	"claimaccountv2"	"OpenCOBOL"	"ORAPICLAIMR2V2";
 bindapi	"formdatagetv2"	"OpenCOBOL"	"ORAPI001R1V2";
 bindapi	"contraindicationcheckv2"	"OpenCOBOL"	"ORAPI021R4V2";
 bindapi	"stock1v2"	"OpenCOBOL"	"ORAPI052R1V2";
-bindapi	"okusuriputv2"	"OpenCOBOL"	"ORAPIRELR1V2";
-bindapi	"okusurigetv2"	"OpenCOBOL"	"ORAPIRELR2V2";
+bindapi	"okusurigetv2"	"OpenCOBOL"	"ORAPIRELR1V2";
+bindapi	"okusuriputv2"	"OpenCOBOL"	"ORAPIRELR2V2";
 bindapi	"imagegetv2"	"OpenCOBOL"	"ORAPI000R2V2";
 
 multiplex_group	api01rv2;
@@ -70,8 +70,8 @@ data	{
 		formdatagetv2;
 		contraindicationcheckv2;
 		stock1v2;
-		okusuriputv2;
 		okusurigetv2;
+		okusuriputv2;
         imagegetv2;
 	};
 };
@@ -138,10 +138,10 @@ db "xml2" {
  xml_contraindication_checkv2res;
  xml_stock1v2req;
  xml_stock1v2res;
- xml_okusuriputv2req;
- xml_okusuriputv2res;
  xml_okusurigetv2req;
  xml_okusurigetv2res;
+ xml_okusuriputv2req;
+ xml_okusuriputv2res;
  xml_imagegetv2req;
 };
 

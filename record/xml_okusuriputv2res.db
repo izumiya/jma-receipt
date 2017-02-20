@@ -8,23 +8,5 @@ xml_okusuriputv2res {
 		Information_Time 		varchar(08);
 		Api_Result	     		varchar(04);
 		Api_Result_Message 		varchar(100);
-		Jma_Receipt_Version		varchar(64);
-		Base_Date			varchar(10);
-		Patient_Information{
-			Patient_ID			varchar(20);
-			WholeName			varchar(100);
-			WholeName_inKana		varchar(100);
-			BirthDate			varchar(10);
-			Sex				varchar(01);
-		};
-		Mnote_Information	{
-			Rennum				varchar(04);
-			Tbl_Group			varchar(14);
-			Tbl_UUID			varchar(36);
-			Shori_Rennum			varchar(04);
-		} [10];
-		Mnote_Data	{
-			CsvData				varchar(10000);
-		};
    	};
 };

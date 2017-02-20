@@ -24,6 +24,16 @@
            03  OKUSURIGETREQ-OBJECT          PIC X(8).
            03  OKUSURIGETREQ-MODE            PIC S9(9)   BINARY.
            03  OKUSURIGETREQ-RECORDNAME      PIC X(128).
-      *    お薬手帳データ
-           03  OKUSURIGETREQ-DATA.
-               05  OKUSURIGETREQ-CSV-DATA    PIC X(10000).
+           03  OKUSURIGETREQ-OKUSURIGETV2REQ.
+      *        患者番号
+               05  OKUSURIGETREQ-PATIENTID   PIC X(20).
+      *        基準日
+               05  OKUSURIGETREQ-BASE-DATE   PIC X(10).
+      *        連番
+               05  OKUSURIGETREQ-RENNUM      PIC X(04).
+      *        グループ
+               05  OKUSURIGETREQ-TBL-GROUP   PIC X(14).
+      *        UUID
+               05  OKUSURIGETREQ-TBL-UUID    PIC X(36).
+      *        処理内連番
+               05  OKUSURIGETREQ-SHORI-RENNUM    PIC X(04).
