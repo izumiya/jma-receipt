@@ -25,27 +25,28 @@ fm_karte_no1 {
 			Relationship    varchar(30);
 			Home_Address  {
 			  Address         varchar(100)[2];
-			  Zipcode         varchar(7);
+			  ZipCode         varchar(7);
 			  PhoneNumber     varchar(15);
 			  ContactNumber   varchar(15);
 			};
 			Contact_Address  {
-				Address         varchar(100)[2];
+				Name            varchar(50);
 				Relationship    varchar(30);
-				Zipcode         varchar(7);
+				Address         varchar(100)[2];
+				ZipCode         varchar(7);
 				PhoneNumber_Day varchar(15);
 				PhoneNumber_Night varchar(15);
 			};
 			Office_Address {
 				Name            varchar(50);
 				Address         varchar(100)[2];
-				Zipcode         varchar(7);
+				ZipCode         varchar(7);
 				PhoneNumber     varchar(15);
 			};
 			Permanent_Address {
 				Name            varchar(50);
 				Address         varchar(100)[2];
-				Zipcode         varchar(7);
+				ZipCode         varchar(7);
 				PhoneNumber     varchar(15);
 			};
 		};
@@ -74,6 +75,14 @@ fm_karte_no1 {
 				Certificate_ExpiredDate							varchar(10);
 				Certificate_GetDate									varchar(10);
 			};
+			PublicInsurance_Information		{
+					PublicInsurance_Class			varchar(03);
+					PublicInsurance_Name			varchar(20);
+					PublicInsurer_Number			varchar(08);
+					PublicInsuredPerson_Number	varchar(20);
+					Certificate_IssuedDate		varchar(10);
+					Certificate_ExpiredDate		varchar(10);
+			}[4];
 			Accident_Insurance_Information	{
 				Accident_Insurance_Class		varchar(01);
 				Accident_Insurance_Number 	varchar(14);
@@ -84,14 +93,6 @@ fm_karte_no1 {
 				Pref_Name										varchar(10);
 				City_Name										varchar(50);
 			};
-			PublicInsurance_Information		{
-					PublicInsurance_Class			varchar(03);
-					PublicInsurance_Name			varchar(20);
-					PublicInsurer_Number			varchar(08);
-					PublicInsuredPerson_Number	varchar(20);
-					Certificate_IssuedDate		varchar(10);
-					Certificate_ExpiredDate		varchar(10);
-			}[4];
 		};
 		Hospital	{
 			Name				varchar(60);

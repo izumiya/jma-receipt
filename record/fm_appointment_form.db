@@ -17,7 +17,7 @@ fm_appointment_form {
 		};
 		Hospital	{
 			Name						varchar(40)[2];
-			Zipcode         		varchar(7);
+			ZipCode         		varchar(7);
 			Address						varchar(40)[2];
 			PhoneNumber					varchar(15);
 		};

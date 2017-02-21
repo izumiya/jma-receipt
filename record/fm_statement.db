@@ -14,7 +14,7 @@ fm_statement {
     };
     Hospital  {
       Name                varchar(120)[3];
-      Zipcode             varchar(7);
+      ZipCode             varchar(7);
       Address             varchar(200)[3];
       PhoneNumber         varchar(15);
     };

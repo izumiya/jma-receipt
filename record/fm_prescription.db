@@ -63,7 +63,7 @@ fm_prescription {
 			Prefectures_Number  varchar(2);
 			Code								varchar(7);
 			Name								varchar(120)[3];
-			Zipcode         		varchar(7);
+			ZipCode         		varchar(7);
 			Address							varchar(200)[3];
 			PhoneNumber					varchar(15);
 		};

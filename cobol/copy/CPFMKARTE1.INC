@@ -52,8 +52,9 @@
                   09  FMKARTE1-HOME-TEL1        PIC X(15).
                   09  FMKARTE1-HOME-TEL2        PIC X(15).
                 07  FMKARTE1-RENRAKU-G.
-                  09  FMKARTE1-RENRAKU-ADRS     PIC X(100)  OCCURS  2.
+                  09  FMKARTE1-RENRAKU-NAME     PIC X(50).
                   09  FMKARTE1-RENRAKU-ZOKUGARA PIC X(30).
+                  09  FMKARTE1-RENRAKU-ADRS     PIC X(100)  OCCURS  2.
                   09  FMKARTE1-RENRAKU-POST     PIC X(7).
                   09  FMKARTE1-RENRAKU-TEL1     PIC X(15).
                   09  FMKARTE1-RENRAKU-TEL2     PIC X(15).
@@ -91,6 +92,13 @@
                   09  FMKARTE1-TEKSTYMD         PIC X(10).
                   09  FMKARTE1-TEKEDYMD         PIC X(10).
                   09  FMKARTE1-SKKGETYMD        PIC X(10).
+                07  FMKARTE1-KOHI-G              OCCURS  4.
+                  09  FMKARTE1-KOH-HKNNUM        PIC X(3).
+                  09  FMKARTE1-KOH-TANSEIDONAME  PIC X(20).
+                  09  FMKARTE1-KOH-FTNJANUM      PIC X(8).
+                  09  FMKARTE1-KOH-JKYSNUM       PIC X(20).
+                  09  FMKARTE1-KOH-TEKSTYMD      PIC X(10).
+                  09  FMKARTE1-KOH-TEKEDYMD      PIC X(10).
                 07  FMKARTE1-ROSAI-G.
                   09  FMKARTE1-RSI-HKNKBN        PIC X(1).
                   09  FMKARTE1-RSI-KOFUNUM       PIC X(14).
@@ -102,13 +110,6 @@
                   09  FMKARTE1-PREFNAME          PIC X(10).
       *           êÁë„ìcãÊÅAéDñyésìô
                   09  FMKARTE1-CITYNAME          PIC X(50).
-                07  FMKARTE1-KOHI-G              OCCURS  4.
-                  09  FMKARTE1-KOH-HKNNUM        PIC X(3).
-                  09  FMKARTE1-KOH-TANSEIDONAME  PIC X(20).
-                  09  FMKARTE1-KOH-FTNJANUM      PIC X(8).
-                  09  FMKARTE1-KOH-JKYSNUM       PIC X(20).
-                  09  FMKARTE1-KOH-TEKSTYMD      PIC X(10).
-                  09  FMKARTE1-KOH-TEKEDYMD      PIC X(10).
               05  FMKARTE1-HOSP-G.
                 07  FMKARTE1-HOSPNAME            PIC X(60).
               05  FMKARTE1-BYOMEI-G              OCCURS  1000.
