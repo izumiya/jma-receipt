@@ -23,7 +23,7 @@ xml_okusurigetv2res {
 			Shori_Rennum			varchar(04);
 		} [10];
 		Mnote_Data	{
-			CsvData				varchar(10000);
+			CsvData				varchar(30000);
 		};
    	};
 };

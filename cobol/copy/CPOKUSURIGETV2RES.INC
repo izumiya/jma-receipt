@@ -51,4 +51,4 @@
                  07  OKUSURIGETRES-SHORI-RENNUM      PIC X(04).
       *        お薬手帳データ
                05  OKUSURIGETRES-DATA.
-                   07  OKUSURIGETRES-CSV-DATA        PIC X(10000).
+                   07  OKUSURIGETRES-CSV-DATA        PIC X(30000).

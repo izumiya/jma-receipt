@@ -26,4 +26,4 @@
            03  OKUSURIPUTREQ-RECORDNAME      PIC X(128).
       *    お薬手帳データ
            03  OKUSURIPUTREQ-DATA.
-               05  OKUSURIPUTREQ-CSV-DATA    PIC X(10000).
+               05  OKUSURIPUTREQ-CSV-DATA    PIC X(30000).

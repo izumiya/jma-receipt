@@ -84,7 +84,7 @@
        01  WRK-XML-AREA.
            03  WRK-BASE-YMD            PIC X(08).
            03  WRK-PTNUM               PIC X(20).
-           03  WRK-XML                 PIC X(10000).
+           03  WRK-XML                 PIC X(30000).
            03  WRK-XML-LEN             PIC 9(05).
            03  WRK-XML-P               PIC 9(05).
       *

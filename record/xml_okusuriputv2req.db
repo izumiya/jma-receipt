@@ -5,7 +5,7 @@ xml_okusuriputv2req {
 	recordname	varchar(128);
 	okusuriputv2req {
 		Okusuri_Data	{
-			CsvData		varchar(10000);
+			CsvData		varchar(30000);
 		};
 	};
 };

@@ -80,9 +80,9 @@
            03  WRK-ERRMSG              PIC X(100).
            03  WRK-KEICD               PIC X(02).
       *    お薬手帳データ編集
-           03  WRK-CSV-DATA            PIC X(10000).
+           03  WRK-CSV-DATA            PIC X(30000).
            03  WRK-CSV-DATA-R          REDEFINES   WRK-CSV-DATA.
-               05  WRK-CSV-X           PIC X(01)   OCCURS 10000.
+               05  WRK-CSV-X           PIC X(01)   OCCURS 30000.
            03  WRK-ST                  PIC 9(06).
            03  WRK-LEN                 PIC 9(06).
            03  WRK-REC                 PIC X(1000).
@@ -93,20 +93,13 @@
            03  WRK-DATA-KEY            PIC 9(16).
            03  WRK-DATA-KEY-R          REDEFINES   WRK-DATA-KEY.
                05  WRK-DATA-KEY-1      PIC X(16).
-           03  WRK-RENNUM              PIC  9(03).
+           03  WRK-RENNUM              PIC 9(03).
       *
       *01  CNT-AREA.
       *    03  CNT-STR                 PIC 9(03).
       *
-       01  WRK-XML-AREA.
-           03  WRK-BASE-YMD            PIC X(08).
-           03  WRK-PTNUM               PIC X(20).
-           03  WRK-XML                 PIC X(10000).
-           03  WRK-XML-LEN             PIC 9(05).
-           03  WRK-XML-P               PIC 9(05).
-      *
        01  CONST-AREA.
-           03  CONST-DATA-MAX          PIC 9(06)  VALUE  10000.
+           03  CONST-DATA-MAX          PIC 9(06)  VALUE  30000.
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -208,7 +201,6 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE  WRK-XML-AREA
            INITIALIZE  XML-OKUSURIPUTRES
       *    更新日取得
            INITIALIZE  ORCSMCNDATEAREA
@@ -464,6 +456,10 @@
       *
            MOVE    WRK-RENNUM          TO  OKUKAN-RENNUM
            MOVE    WRK-DATA-KEY        TO  OKUKAN-DATA-KEY
+      *
+           MOVE    WRK-SYMD            TO  OKUKAN-CREYMD
+           MOVE    WRK-SYMD            TO  OKUKAN-UPYMD
+           MOVE    WRK-THMS            TO  OKUKAN-UPHMS
       *
            MOVE    OKUSURI-KANRI-REC   TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -732,6 +728,10 @@
                WHEN    OTHER
                    GO  TO  4003-OKUSURI-DATA-INS-EXT
            END-EVALUATE
+      *
+           MOVE    WRK-SYMD            TO  OKUDAT-CREYMD
+           MOVE    WRK-SYMD            TO  OKUDAT-UPYMD
+           MOVE    WRK-THMS            TO  OKUDAT-UPHMS
       *
            MOVE    OKUSURI-DATA-REC    TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
