@@ -386,6 +386,16 @@
            MOVE    "0"             TO  ITEM-TOKHIGAITOKBN
            MOVE    TRRK-NYUCALKBN  TO  ITEM-NACCTKBN
       *
+           IF    ( SODR-ORDERID    =   NORDERID-IDOBTUID
+                                    OR NORDERID-IDOBRMID )
+               MOVE    PTNYUINRRK-DRCD1
+                                   TO  ITEM-DRCD (1)
+               MOVE    PTNYUINRRK-DRCD2
+                                   TO  ITEM-DRCD (2)
+               MOVE    PTNYUINRRK-DRCD3
+                                   TO  ITEM-DRCD (3)
+           END-IF
+      *
            PERFORM VARYING IDX-ODR    FROM    1   BY  1
                    UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
       *
