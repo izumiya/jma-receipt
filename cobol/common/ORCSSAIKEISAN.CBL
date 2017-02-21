@@ -79,6 +79,7 @@
       *  04.08.02    NACL-門脇    16/03/24  平成２８年４月改正対応
       *  04.08.03    NACL-門脇    17/01/05  一括再計算該当者のリストアップ
       *                                     対応
+      *  04.08.04    NACL-門脇    17/02/21  初診算定条件追加
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -231,18 +232,21 @@
            03  FILLER          PIC X(09)   VALUE    "111700210".
            03  FILLER          PIC X(09)   VALUE    "111000110".
            03  FILLER          PIC X(09)   VALUE    "111700110".
-           03  FILLER          PIC X(09)   VALUE    "113003510".
-           03  FILLER          PIC X(09)   VALUE    "113003710".
-           03  FILLER          PIC X(09)   VALUE    "099110001".
            03  FILLER          PIC X(09)   VALUE    "111012510".
            03  FILLER          PIC X(09)   VALUE    "111012710".
+           03  FILLER          PIC X(09)   VALUE    "111011810".
+           03  FILLER          PIC X(09)   VALUE    "111012610".
+           03  FILLER          PIC X(09)   VALUE    "111012810".
+           03  FILLER          PIC X(09)   VALUE    "099110001".
+           03  FILLER          PIC X(09)   VALUE    "113003510".
+           03  FILLER          PIC X(09)   VALUE    "113003710".
            03  FILLER          PIC X(09)   VALUE    "113019710".
            03  FILLER          PIC X(09)   VALUE    "113019910".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS   11.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS   14.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE    11.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE    14.
       *
       *****************************************************************
       *    ファイルレイアウト
