@@ -4554,6 +4554,10 @@
       *H28.4
                        WHEN    "113019710"
                        WHEN    "113019910"
+      *H29.2           同一日２科目
+                       WHEN    "111011810"
+                       WHEN    "111012610"
+                       WHEN    "111012810"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
                END-PERFORM
