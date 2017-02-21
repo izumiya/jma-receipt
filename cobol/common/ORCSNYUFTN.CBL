@@ -179,6 +179,7 @@
       *  04.08.04    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
       *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
       *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
+      *  04.08.05    NACL-ÌçÏÆ    17/02/21  ½é¿Ç»»Äê¾ò·ïÄÉ²Ã
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -566,49 +567,38 @@
       *
       *    ½é¿ÇÎÁ»»Äê¥Õ¥é¥°ÍÑ¥Æ¡¼¥Ö¥ë
        01  TBL-SYOSIN-AREA.
-      *    ½é¿ÇÎÁ¡Ê°ìÈÌ¡¡¿ÇÎÅ½ê¡Ë
            03  FILLER          PIC X(09)   VALUE    "111003610".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡¿ÇÎÅ½ê¡Ë
            03  FILLER          PIC X(09)   VALUE    "111700210".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡ÉÂ±¡¡Ë
            03  FILLER          PIC X(09)   VALUE    "111000110".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡ÉÂ±¡¡Ë
            03  FILLER          PIC X(09)   VALUE    "111700110".
-      *    ½é¿ÇÎÁ¡Ê£Ä£Õ£Í£Í£Ù¡Ë
-           03  FILLER          PIC X(09)   VALUE    "099110001".
-      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
            03  FILLER          PIC X(09)   VALUE    "111012510".
-      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
            03  FILLER          PIC X(09)   VALUE    "111012710".
+           03  FILLER          PIC X(09)   VALUE    "111011810".
+           03  FILLER          PIC X(09)   VALUE    "111012610".
+           03  FILLER          PIC X(09)   VALUE    "111012810".
+           03  FILLER          PIC X(09)   VALUE    "099110001".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    7.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    10.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     7.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     10.
       *
       *    ½é¿ÇÎÁ»»Äê¥Õ¥é¥°ÍÑ¥Æ¡¼¥Ö¥ë¡ÊÊ¡²¬ÍÑ¡Ë
        01  TBL-SYOSIN2-AREA.
-      *    ½é¿ÇÎÁ¡Ê°ìÈÌ¡¡¿ÇÎÅ½ê¡Ë
            03  FILLER          PIC X(09)   VALUE    "111003610".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡¿ÇÎÅ½ê¡Ë
            03  FILLER          PIC X(09)   VALUE    "111700210".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡ÉÂ±¡¡Ë
            03  FILLER          PIC X(09)   VALUE    "111000110".
-      *    ½é¿ÇÎÁ¡ÊÏ·¿Í¡¡ÉÂ±¡¡Ë
            03  FILLER          PIC X(09)   VALUE    "111700110".
-      *    ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
-           03  FILLER          PIC X(09)   VALUE    "111011810".
-      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
            03  FILLER          PIC X(09)   VALUE    "111012510".
-      *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
-           03  FILLER          PIC X(09)   VALUE    "111012610".
-      *    ½é¿Ç¡ÊÂÅ·ëÎ¨£µ³ä°Ê²¼¡Ë
            03  FILLER          PIC X(09)   VALUE    "111012710".
+           03  FILLER          PIC X(09)   VALUE    "111011810".
+           03  FILLER          PIC X(09)   VALUE    "111012610".
+           03  FILLER          PIC X(09)   VALUE    "111012810".
       *
        01  TBL-SYOSIN2-R       REDEFINES   TBL-SYOSIN2-AREA.
-           03  TBL-SYOSIN2     PIC X(09)   OCCURS    8.
+           03  TBL-SYOSIN2     PIC X(09)   OCCURS    9.
       *
-       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     8.
+       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     9.
       *
       *    Ê¡²¬¸©¸øÈñ¤ÎµëÉÕÂÐ¾Ý³°È½ÄêÍÑ¤Î½é¿ÇÂàÈò¥Æ¡¼¥Ö¥ë
        01  TBL-FUKUOKA.
@@ -5620,6 +5610,7 @@ grpsys                                        SPA-AREA
       ***                          TO  TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
                               IF TBL-SYOSIN2(FUKU-IDX) = "111011810"
                                                       OR "111012610"
+                                                      OR "111012810"
                                  EVALUATE TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
                                    WHEN    0
                                      MOVE  2  TO
@@ -6467,6 +6458,7 @@ grpsys                            SPA-AREA
               END-IF
               IF      FLG-SRYACT          =   ZERO
                  IF   SRY-SRYCD(1)  =  "111011810" OR "111012610"
+                                                   OR "111012810"
                     CONTINUE
                  ELSE
                     COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =
