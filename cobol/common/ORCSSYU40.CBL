@@ -174,7 +174,7 @@
            03  FILLER              PIC X(13)   VALUE   "111012710 1 0".
       *H29.2
       *    初診料（同一日２科目・妥結率５割以下）
-           03  FILLER              PIC X(13)   VALUE   "111012810 1 0".
+           03  FILLER              PIC X(13)   VALUE   "111012810 110".
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       *****03  TBL-SINSATU-OCC         OCCURS  18    INDEXED  TBL-IDX.
