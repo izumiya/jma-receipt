@@ -43,13 +43,6 @@ fm_prescription {
 				Certificate_StartDate								varchar(10);
 				Certificate_ExpiredDate							varchar(10);
 			};
-			Accident_Insurance_Information	{
-				Accident_Insurance_Class		varchar(01);
-				Accident_Insurance_Number 	varchar(14);
-				Accident_StartDate					varchar(10);
-				Accident_ExpiredDate				varchar(10);
-				Disease_Date								varchar(10);
-			};
 			PublicInsurance_Information		{
 					PublicInsurance_Class			varchar(03);
 					PublicInsurance_Name			varchar(20);
@@ -58,6 +51,13 @@ fm_prescription {
 					Certificate_IssuedDate		varchar(10);
 					Certificate_ExpiredDate		varchar(10);
 			}[4];
+			Accident_Insurance_Information	{
+				Accident_Insurance_Class		varchar(01);
+				Accident_Insurance_Number 	varchar(14);
+				Accident_StartDate					varchar(10);
+				Accident_ExpiredDate				varchar(10);
+				Disease_Date								varchar(10);
+			};
 		};
 		Hospital	{
 			Prefectures_Number  varchar(2);

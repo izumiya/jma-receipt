@@ -68,12 +68,6 @@
                   09  FMSHOHO-HONKZKKBN        PIC X(1).
                   09  FMSHOHO-TEKSTYMD         PIC X(10).
                   09  FMSHOHO-TEKEDYMD         PIC X(10).
-                07  FMSHOHO-ROSAI-AREA.
-                  09  FMSHOHO-RSI-HKNKBN       PIC X(1).
-                  09  FMSHOHO-RSI-KOFUNUM      PIC X(14).
-                  09  FMSHOHO-RSI-RYOSTYMD     PIC X(10).
-                  09  FMSHOHO-RSI-RYOEDYMD     PIC X(10).
-                  09  FMSHOHO-RSI-SHOBYOYMD    PIC X(10).
                 07  FMSHOHO-KOHI-AREA          OCCURS  4.
                   09  FMSHOHO-KOH-HKNNUM        PIC X(3).
                   09  FMSHOHO-KOH-TANSEIDONAME  PIC X(20).
@@ -81,6 +75,12 @@
                   09  FMSHOHO-KOH-JKYSNUM       PIC X(20).
                   09  FMSHOHO-KOH-TEKSTYMD      PIC X(10).
                   09  FMSHOHO-KOH-TEKEDYMD      PIC X(10).
+                07  FMSHOHO-ROSAI-AREA.
+                  09  FMSHOHO-RSI-HKNKBN       PIC X(1).
+                  09  FMSHOHO-RSI-KOFUNUM      PIC X(14).
+                  09  FMSHOHO-RSI-RYOSTYMD     PIC X(10).
+                  09  FMSHOHO-RSI-RYOEDYMD     PIC X(10).
+                  09  FMSHOHO-RSI-SHOBYOYMD    PIC X(10).
               05  FMSHOHO-HOSP-AREA.
                 07  FMSHOHO-PREFNUM             PIC X(2).
                 07  FMSHOHO-HOSPCD              PIC X(7).
