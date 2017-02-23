@@ -583,7 +583,22 @@
       *****************************************************************
       *    診療期間より編集処理
       *****************************************************************
-       2101-SRYKIKAN-HEN-SEC           SECTION.
+       2101-SRYKIKAN-HEN-SEC          SECTION.
+      *
+      *    入金編集処理
+           PERFORM 220-NUKIN-HENSYU-SEC
+           IF    ( HCM31S01-BFKINGAKU (1)      >   ZERO )
+            OR   ( HCM31S01-KINGAKU (1)        >   ZERO )
+               PERFORM 21011-SRYKIKAN-HEN-SEC
+           END-IF
+      *
+           .
+       2101-SRYKIKAN-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療期間より編集処理
+      *****************************************************************
+       21011-SRYKIKAN-HEN-SEC          SECTION.
       *
            MOVE    ZERO            TO  IDX2
            MOVE    ZERO            TO  WRK-HKNTEN
@@ -658,9 +673,6 @@
       *----(03.04.01)--UPD-END-----
            END-IF
       *
-      *    入金編集処理
-           PERFORM 220-NUKIN-HENSYU-SEC
-      *
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1        >   WRK-HEN-MAX )
                     OR   ( IDX2    NOT =   ZERO )
@@ -683,7 +695,7 @@
       *
            IF    ( IDX2            =   ZERO )
                IF    ( WRK-HEN-MAX >=  CONST-HEN-MAX )
-                   GO  TO  2101-SRYKIKAN-HEN-EXT
+                   GO  TO  21011-SRYKIKAN-HEN-EXT
                END-IF
       *
                COMPUTE WRK-HEN-MAX =   WRK-HEN-MAX     +   1
@@ -757,7 +769,7 @@
            END-IF
       *
            .
-       2101-SRYKIKAN-HEN-EXT.
+       21011-SRYKIKAN-HEN-EXT.
            EXIT.
       *****************************************************************
       *    実日数編集処理
@@ -982,7 +994,6 @@
            END-IF
       *
            IF    ( ORCHCM31-KIKANKBN   =   "1"   )
-            AND  ( ORCHCM31-SUMKBN     =   "1"   )
             AND  ( WRK-GAKU (IDX4) =   ZERO )
                    MOVE    ZERO    TO  FLG-TAISYO
            END-IF

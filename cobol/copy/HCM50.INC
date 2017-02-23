@@ -23,7 +23,7 @@
                         PIC X(10).
             02  HCM50-NAIYO-TBL
                                         OCCURS 70 TIMES.
-              03  HCM50-SRYYMD
+              03  HCM50-SRYYMD-OLD
                         PIC X(12).
               03  HCM50-SRYKBN
                         PIC X(10).
@@ -53,3 +53,5 @@
                         PIC X(80)       OCCURS 2 TIMES.
             02  HCM50-IRYOADRS
                         PIC X(100)      OCCURS 2 TIMES.
+            02  HCM50-SRYYMD
+                        PIC X(22)       OCCURS 70 TIMES.
