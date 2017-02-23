@@ -352,6 +352,7 @@
                MOVE    ORCHCM31-NYUGAI     TO  ORCHCM50-NYUGAI
                CALL    WRK-PARA-PGNAME USING   SPA-AREA
                                                ORCSPRTAREA
+                                               ORCHCM31AREA
                                                ORCHCM50AREA
                MOVE    ORCHCM50-OT-CNT     TO  WRK-UPDCNT
            ELSE

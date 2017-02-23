@@ -180,6 +180,10 @@
                    END-IF
                END-EVALUATE
       *
+               IF    ( SMEI-NYUHEN-MONEY   =   ZERO )
+                   MOVE    ZERO        TO  FLG-TAISYO
+               END-IF
+      *
                IF    ( FLG-TAISYO      =   1 )
                    COMPUTE IDX1    =   IDX1    +   1
                    MOVE    SMEI-NYUHEN-YMD

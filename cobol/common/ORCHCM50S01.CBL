@@ -66,6 +66,8 @@
            03  FLG-HCM50SRY            PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-JYURRK              PIC 9(01).
+           03  FLG-PTNYUINRRK          PIC 9(01).
            03  FLG-LOOPEND             PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -74,10 +76,13 @@
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
+           03  IDXN                    PIC 9(05).
+           03  IDXZ                    PIC 9(05).
            03  IDX-NACCT               PIC 9(05).
            03  IDX-NSRY                PIC 9(05).
            03  IDX-SRY                 PIC 9(05).
            03  IDX-DAY                 PIC 9(05).
+           03  IDXE                    PIC 9(05).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -137,10 +142,23 @@
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
       *
+      *    ¼õ¿ÇÍúÎò¥Þ¥¹¥¿
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
+      *
+      *    Æþ±¡ÍúÎò
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
+      *
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
+      *
+           COPY    "CPORCHCM31S01.INC".
+      *
+      *    Æþ±¡ÀÁµá´ü´Ö¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSS006.INC".
       *
       *    Æþ±¡²ñ·×¼èÆÀ
            COPY    "CPORCHCM34S01.INC".
@@ -153,6 +171,7 @@
       *****************************************************************
        LINKAGE                         SECTION.
       *
+           COPY    "CPORCHCM31.INC".
            COPY    "CPORCHCM50S01.INC".
       *
            COPY    "COMMON-SPA".
@@ -160,7 +179,8 @@
       ******************************************************************
       *
        PROCEDURE                       DIVISION
-                                       USING   HCM50S01-AREA
+                                       USING   ORCHCM31AREA
+                                               HCM50S01-AREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -202,44 +222,60 @@
       *
            OPEN    I-O                 HCM50SRY-FILE
       *
-           IF    ( HCM50S01-NYUGAIKBN  NOT =   "2" )
-               PERFORM 2001-NYUIN-HEN-SEC
-           END-IF
+           PERFORM 900-SYUNOU-KEY65-SEL-SEC
       *
-           IF    ( HCM50S01-NYUGAIKBN  NOT =   "1" )
-               DISPLAY "2001-GAIRAI-HEN-SEC"
-               PERFORM 2001-GAIRAI-HEN-SEC
-           END-IF
+           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
+      *
+               IF    ( SYU-NYUGAIKBN   =   "1" )
+      *
+                   PERFORM 2001-NYUIN-SEC
+      *
+               ELSE
+                   PERFORM 20011-GAI-SRY-HEN-SEC
+               END-IF
+      *
+               PERFORM 900-SYUNOU-KEY65-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key65"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            CLOSE   HCM50SRY-FILE
       *
            .
        200-MAIN-EXT.
            EXIT.
-      *
       *****************************************************************
-      *    Æþ±¡¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
+      *    Æþ±¡ÊÔ½¸½èÍý
       *****************************************************************
-       2001-NYUIN-HEN-SEC              SECTION.
+       2001-NYUIN-SEC                    SECTION.
       *
-           PERFORM 900-SYUNOU-KEY49-SEL-SEC
+           PERFORM 900-PTNYUINRRK-KEY-SEL-SEC
       *
-           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
+           INITIALIZE                  SS006-AREA
+           MOVE    SYU-SKYSTYMD    TO  SS006-SKYSTYMD
+           MOVE    SYU-SKYEDYMD    TO  SS006-SKYEDYMD
+           IF    ( SYU-CREATEKBN       =   "1" )
+               IF    ( SYU-SKYEDYMD    =   PTNYUINRRK-TAIINYMD )
+                   MOVE    "1"     TO  SS006-SKYKBN
+               ELSE
+                   MOVE    "2"     TO  SS006-SKYKBN
+               END-IF
+           ELSE
+               MOVE    SYU-CREATEKBN   TO  SS006-SKYKBN
+           END-IF
       *
-               PERFORM 20011-NYU-NSRY-HEN-SEC
+           CALL    "ORCSS006"              USING
+                                           SS006-AREA
+                                           SPA-AREA
       *
-               PERFORM 20011-NYU-SRY-HEN-SEC
-      *
-               PERFORM 900-SYUNOU-KEY49-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key49"         TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           PERFORM 20011-NYU-NSRY-HEN-SEC
+           PERFORM 20011-NYU-SRY-HEN-SEC
       *
            .
-       2001-NYUIN-HEN-EXT.
+       2001-NYUIN-EXT.
            EXIT.
       *****************************************************************
       *    Æþ±¡¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
@@ -263,6 +299,10 @@
            MOVE    SYU-SKYEDYMD        TO  HCM34S01-SKYEDYMD
            MOVE    SYU-HKNCOMBINUM     TO  HCM34S01-HKNCOMBI
            MOVE    SYU-SYUHKNNUM       TO  HCM34S01-HKNNUM
+           MOVE    SS006-DOJITUFLG-ST  TO  HCM34S01-DOJITUFLG-ST
+           MOVE    SS006-TIMEKBN-ST    TO  HCM34S01-TIMEKBN-ST
+           MOVE    SS006-DOJITUFLG-ED  TO  HCM34S01-DOJITUFLG-ED
+           MOVE    SS006-TIMEKBN-ED    TO  HCM34S01-TIMEKBN-ED
       *
            IF    ( SYU-SYUHKNNUM       =   "971" )
                                        OR  "973"
@@ -287,6 +327,7 @@
       *
                            MOVE    SYU-SRYYMD      TO  WRK-SRYYMD
                            MOVE    SYU-SKYSTYMD    TO  WRK-STSRYYMD
+                           MOVE    SYU-SKYEDYMD    TO  WRK-EDSRYYMD
                            MOVE    "1"         TO  WRK-NYUGAIKBN
                            MOVE    HCM34S01-SRYCD (IDX-NACCT IDX-NSRY)
                                                TO  WRK-SRYCD
@@ -336,15 +377,19 @@
            MOVE    WRK-NYUGAIKBN       TO  HCM50SRY-NYUGAIKBN
            IF    ( WRK-NYUGAIKBN       =   "1" )
                IF    ( HCM50S01-SUMKBN =   "1" )
-                   MOVE    WRK-STSRYYM     TO  HCM50SRY-SRYYMD
+                   MOVE    WRK-STSRYYM     TO  HCM50SRY-SKYSTYMD
+                                               HCM50SRY-SKYEDYMD
                ELSE
-                   MOVE    WRK-STSRYYMD    TO  HCM50SRY-SRYYMD
+                   MOVE    WRK-STSRYYMD    TO  HCM50SRY-SKYSTYMD
+                   MOVE    WRK-EDSRYYMD    TO  HCM50SRY-SKYEDYMD
                END-IF
            ELSE
                IF    ( HCM50S01-SUMKBN =   "1" )
-                   MOVE    WRK-SRYYM       TO  HCM50SRY-SRYYMD
+                   MOVE    WRK-SRYYM       TO  HCM50SRY-SKYSTYMD
+                                               HCM50SRY-SKYEDYMD
                ELSE
-                   MOVE    WRK-SRYYMD      TO  HCM50SRY-SRYYMD
+                   MOVE    WRK-SRYYMD      TO  HCM50SRY-SKYSTYMD
+                                               HCM50SRY-SKYEDYMD
                END-IF
            END-IF
            MOVE    WRK-KANANAME        TO  HCM50SRY-KANANAME
@@ -362,6 +407,11 @@
       *    ¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
       *****************************************************************
        20011-NYU-SRY-HEN-SEC           SECTION.
+      *
+           MOVE    2                   TO  IDXN
+           IF    ( SS006-DOJITUFLG-ST  =   "1" )
+               MOVE    3               TO  IDXN
+           END-IF
       *
            MOVE    SYU-SKYSTYMD        TO  WRK-STSRYYMD
            MOVE    SYU-SKYEDYMD        TO  WRK-EDSRYYMD
@@ -385,6 +435,44 @@
       *
            .
        20011-NYU-SRY-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
+      *****************************************************************
+       20011-GAI-SRY-HEN-SEC           SECTION.
+      *
+           PERFORM 900-JYURRK-KEY47-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-JYURRK  NOT =   ZERO )
+      *
+               MOVE    SYU-SRYYMD      TO  WRK-STSRYYMD
+                                           WRK-EDSRYYMD
+               COMPUTE IDXN  = JYURRK-RENNUM   +   1
+      *
+               PERFORM VARYING IDXZ    FROM    1   BY  1
+                       UNTIL ( IDXZ    >   15 )
+      *
+                   IF    ( JYURRK-ZAINUM (IDXZ)  NOT =   ZERO)
+                       PERFORM 900-SRYACCT-KEY57-SEL-SEC
+                       IF    ( FLG-SRYACCT     =   ZERO )
+                        AND  ( ACCT-SRYKBN     =   "95" OR "96" )
+                        AND  ( ACCT-HKNCOMBI   NOT = "9999" )
+                        AND  ( ACCT-JIHOKBN    NOT = "1" )
+                           PERFORM 200111-SRY-HEN-SEC
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *
+               PERFORM 900-JYURRK-KEY47-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key47"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       20011-GAI-SRY-HEN-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
@@ -494,7 +582,7 @@
                    IF    ( WRK-SRYYMD  >=  WRK-STSRYYMD )
                     AND  ( WRK-SRYYMD  <=  WRK-EDSRYYMD )
       *
-                       IF    (  ACCT-DAY (1 IDX-DAY)   >   ZERO )
+                       IF    (  ACCT-DAY (IDXN IDX-DAY)   >   ZERO )
                            MOVE    SRY-SRYCD (IDX-SRY) TO  WRK-SRYCD
                            PERFORM 900-TENSU-KEY-SEL-SEC
                            MOVE    SRY-NYUGAIKBN   TO  WRK-NYUGAIKBN
@@ -511,12 +599,12 @@
                            IF    ( FLG-HCM50SRY    =   ZERO )
                                COMPUTE HCM50SRY-ZAIKAISU
                                =   HCM50SRY-ZAIKAISU
-                               +   ACCT-DAY (1 IDX-DAY)
+                               +   ACCT-DAY (IDXN IDX-DAY)
                                REWRITE HCM50SRY-REC
                            ELSE
                                PERFORM 200111-HCM50SRY-KEY-HEN-SEC
                                COMPUTE HCM50SRY-ZAIKAISU
-                                   =   ACCT-DAY (1 IDX-DAY)
+                                   =   ACCT-DAY (IDXN IDX-DAY)
                                MOVE    TNS-NAME    TO  HCM50SRY-NAME
                                WRITE   HCM50SRY-REC
                            END-IF
@@ -531,38 +619,11 @@
        200111-JIHISRY-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    ³°Íè¿ÇÎÅ¹Ô°ÙÊÔ½¸½èÍý
-      *****************************************************************
-       2001-GAIRAI-HEN-SEC             SECTION.
-      *
-           MOVE    HCM50S01-STYMD      TO  WRK-STSRYYMD
-           MOVE    HCM50S01-EDYMD      TO  WRK-EDSRYYMD
-           MOVE    "2"                 TO  WRK-NYUGAIKBN
-           PERFORM 900-SRYACCT-KEY49-SEL-SEC
-           DISPLAY "FLG-SRYACCT  =" FLG-SRYACCT 
-      *
-           PERFORM UNTIL ( FLG-SRYACCT NOT =   ZERO )
-      *
-               PERFORM 200111-SRY-HEN-SEC
-      *
-               PERFORM 900-SRYACCT-KEY49-FET-SEC
-           DISPLAY "FLG-SRYACCT  =" FLG-SRYACCT 
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key49"             TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       2001-GAIRAI-HEN-EXT.
-           EXIT.
-      *****************************************************************
       *    ½ªÎ»½èÍý
       *****************************************************************
        300-END-SEC                     SECTION.
       *
-           PERFORM 800-DISPLAY-SEC
+      *    PERFORM 800-DISPLAY-SEC
       *
            .
        300-END-EXT.
@@ -597,7 +658,8 @@
       *
                COMPUTE IDX0    =   IDX0    +   1
                DISPLAY IDX0 ":NYUGAIKBN " HCM50SRY-NYUGAIKBN
-               DISPLAY IDX0 ":SRYYMD    " HCM50SRY-SRYYMD
+               DISPLAY IDX0 ":SKYSTYMD  " HCM50SRY-SKYSTYMD
+               DISPLAY IDX0 ":SKYEDYMD  " HCM50SRY-SKYEDYMD
                DISPLAY IDX0 ":SRYKBN    " HCM50SRY-SRYKBN
                DISPLAY IDX0 ":TENTTLKBN " HCM50SRY-TENTTLKBN
                DISPLAY IDX0 ":KANANAME  " HCM50SRY-KANANAME
@@ -639,31 +701,38 @@
       *****************************************************************
       *    ¼ýÇ¼¸¡º÷½èÍý
       *****************************************************************
-       900-SYUNOU-KEY49-SEL-SEC        SECTION.
+       900-SYUNOU-KEY65-SEL-SEC        SECTION.
       *
            MOVE    ZERO            TO  FLG-SYUNOU
       *
            INITIALIZE                  SYUNOU-REC
            MOVE    HCM50S01-HOSPNUM TO  SYU-HOSPNUM
-           MOVE    "1"             TO  SYU-NYUGAIKBN
+           EVALUATE    ORCHCM31-NYUGAI
+               WHEN    "0"
+                   MOVE    "%"         TO  SYU-NYUGAIKBN
+               WHEN    "1"
+                   MOVE    "1"         TO  SYU-NYUGAIKBN
+               WHEN    "2"
+                   MOVE    "2"         TO  SYU-NYUGAIKBN
+           END-EVALUATE
            MOVE    HCM50S01-PTID   TO  SYU-PTID
            MOVE    HCM50S01-STYMD  TO  SYU-SKYSTYMD
            MOVE    HCM50S01-EDYMD  TO  SYU-SKYEDYMD
            MOVE    SYUNOU-REC      TO  MCPDATA-REC
            MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key49"         TO  MCP-PATHNAME
+           MOVE    "key65"         TO  MCP-PATHNAME
            PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-SYUNOU-KEY49-FET-SEC
+               PERFORM 900-SYUNOU-KEY65-FET-SEC
            END-IF
       *
            .
-       900-SYUNOU-KEY49-SEL-EXT.
+       900-SYUNOU-KEY65-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ¼ýÇ¼FETCH½èÍý
       *****************************************************************
-       900-SYUNOU-KEY49-FET-SEC        SECTION.
+       900-SYUNOU-KEY65-FET-SEC        SECTION.
       *
            MOVE    ZERO            TO  FLG-SYUNOU
            MOVE    ZERO            TO  FLG-LOOPEND
@@ -672,7 +741,7 @@
                     OR   ( FLG-LOOPEND NOT =   ZERO )
       *
                MOVE    "tbl_syunou"    TO  MCP-TABLE
-               MOVE    "key49"         TO  MCP-PATHNAME
+               MOVE    "key65"         TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
                    MOVE    MCPDATA-REC TO  SYUNOU-REC
@@ -683,6 +752,54 @@
                        MOVE    ZERO    TO  FLG-LOOPEND
                    END-IF
       *
+                   IF    ( ORCHCM31-DSPKBN     =   "3" )
+                        IF    ( SYU-SYUHKNNUM (1:2) =   "98" )
+                         OR   ( SYU-SYUHKNNUM       =   "971" )
+                         OR   ( SYU-SYUHKNNUM       =   "973" )
+                         OR   ( SYU-SYUHKNNUM       =   "975" )
+                            MOVE    ZERO    TO  FLG-LOOPEND
+                        END-IF
+                   END-IF
+      *
+                   IF    ( ORCHCM31-KIKANKBN   =   "1" )
+                       IF    ( ORCHCM31-SUMKBN =   "2" )
+                           IF    ( SYU-SRYYMD >=   ORCHCM31-STRSRYYMD )
+                            AND  ( SYU-SRYYMD <=   ORCHCM31-ENDSRYYMD )
+                               CONTINUE
+                           ELSE
+                               MOVE    ZERO    TO  FLG-LOOPEND
+                           END-IF
+                       END-IF
+                   END-IF
+      *
+                   IF    ( FLG-LOOPEND =    1 )
+                       INITIALIZE                  HCM31S01-AREA
+      *
+                       IF    ( ORCHCM31-SYORIKBN   =   "1" )
+                           MOVE    "1"         TO  HCM31S01-PROCKBN
+                       ELSE
+                           MOVE    "2"         TO  HCM31S01-PROCKBN
+                       END-IF
+      *
+                       MOVE    SYU-HOSPNUM     TO  HCM31S01-HOSPNUM
+                       MOVE    SYU-NYUGAIKBN   TO  HCM31S01-NYUGAIKBN
+                       MOVE    SYU-PTID        TO  HCM31S01-PTID
+                       MOVE    SYU-DENPNUM     TO  HCM31S01-DENPNUM
+                       MOVE    SYU-SRYYMD      TO  HCM31S01-SRYYMD
+                       MOVE    ORCHCM31-STRSRYYMD
+                                               TO  HCM31S01-STYMD
+                       MOVE    ORCHCM31-ENDSRYYMD
+                                               TO  HCM31S01-EDYMD
+                       MOVE    ORCHCM31-SUMKBN
+                                               TO  HCM31S01-SUMKBN
+                       CALL    "ORCHCM31S01"       USING
+                                                   HCM31S01-AREA
+                                                   SPA-AREA
+                       IF    ( HCM31S01-KINGAKU (1)        =   ZERO )
+                            MOVE    ZERO    TO  FLG-LOOPEND
+                       END-IF
+                   END-IF
+      *
                ELSE
                    MOVE    1           TO  FLG-SYUNOU
                    INITIALIZE              SYUNOU-REC
@@ -691,7 +808,7 @@
            END-PERFORM
       *
            .
-       900-SYUNOU-KEY49-FET-EXT.
+       900-SYUNOU-KEY65-FET-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ²ñ·×¸¡º÷½èÍý
@@ -877,6 +994,116 @@
       *
            .
        9001-TTNS-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼õ¿®ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-JYURRK-KEY47-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-JYURRK
+      *
+           INITIALIZE                      JYURRK-REC
+           MOVE    SYU-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SYU-PTID            TO  JYURRK-PTID
+           MOVE    SYU-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           MOVE    SYU-SRYYMD          TO  JYURRK-SRYYMD
+           MOVE    SYU-HKNCOMBINUM     TO  JYURRK-HKNCOMBINUM
+           MOVE    SYU-DENPNUM         TO  JYURRK-DENPNUM
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key47"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+           ELSE
+               MOVE    1               TO  FLG-JYURRK
+               INITIALIZE                  JYURRK-REC
+           END-IF
+      *
+           .
+       900-JYURRK-KEY47-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼õ¿®ÍúÎòFETCH½èÍý
+      *****************************************************************
+       900-JYURRK-KEY47-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-JYURRK
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key47"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+           ELSE
+               MOVE    1               TO  FLG-JYURRK
+               INITIALIZE                  JYURRK-REC
+           END-IF
+      *
+           .
+       900-JYURRK-KEY47-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¸¡º÷½èÍý
+      *****************************************************************
+       900-SRYACCT-KEY57-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SRYACCT
+      *
+           INITIALIZE                      SRYACCT-REC
+           MOVE    JYURRK-HOSPNUM      TO  ACCT-HOSPNUM
+           MOVE    JYURRK-PTID         TO  ACCT-PTID
+           MOVE    JYURRK-ZAINUM (IDXZ)
+                                       TO  ACCT-ZAINUM
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key57"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SRYACCT-REC
+           ELSE
+               MOVE    1               TO  FLG-SRYACCT
+               INITIALIZE                  SRYACCT-REC
+           END-IF
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key57"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SRYACCT-KEY57-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆþ±¡ÍúÎò¸¡º÷½èÍý
+      *****************************************************************
+       900-PTNYUINRRK-KEY-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SYU-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SYU-PTID            TO  PTNYUINRRK-PTID
+           MOVE    SYU-NYUIN-RRKNUM    TO  PTNYUINRRK-RRKNUM
+           MOVE    1                   TO  PTNYUINRRK-RRKEDANUM
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1                   TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷½èÍý(KEY10)

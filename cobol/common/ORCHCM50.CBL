@@ -104,7 +104,8 @@
       *
        01  KEY-AREA.
            03  KEY-NYUGAIKBN       PIC X(01).
-           03  KEY-SRYYMD          PIC X(08).
+           03  KEY-SKYSTYMD        PIC X(08).
+           03  KEY-SKYEDYMD        PIC X(08).
       *
       *    プログラムオプション
        01  PO-AREA.
@@ -180,11 +181,13 @@
       *
            COPY    "COMMON-SPA".
            COPY    "CPORCSPRT.INC".
+           COPY    "CPORCHCM31.INC".
            COPY    "CPORCHCM50.INC".
       *
        PROCEDURE                   DIVISION    USING
                                                SPA-AREA
                                                ORCSPRTAREA
+                                               ORCHCM31AREA
                                                ORCHCM50AREA.
       *
       *****************************************************************
@@ -383,7 +386,8 @@
            MOVE    ORCHCM50-STRSRYYMD  TO  HCM50S01-STYMD
            MOVE    ORCHCM50-ENDSRYYMD  TO  HCM50S01-EDYMD
            MOVE    HCM50F01            TO  HCM50S01-HCM50F01
-           CALL    "ORCHCM50S01"       USING   HCM50S01-AREA
+           CALL    "ORCHCM50S01"       USING   ORCHCM31AREA
+                                               HCM50S01-AREA
                                                SPA-AREA
       *
            .
@@ -431,7 +435,8 @@
            MOVE    WRK-HOSP-NAME (2)   TO  HCM50-IRYOMEI (2)
            MOVE    WRK-HOSP-TEL        TO  HCM50-IRYOTEL
       *
-           MOVE    HCM50SRY-SRYYMD     TO  KEY-SRYYMD
+           MOVE    HCM50SRY-SKYSTYMD   TO  KEY-SKYSTYMD
+           MOVE    HCM50SRY-SKYEDYMD   TO  KEY-SKYEDYMD
       *
            IF    ( ORCHCM50-SUMKBN =   "1" )
                MOVE    "診療月"        TO  HCM50-LBLSRYYMD
@@ -447,9 +452,13 @@
       *****************************************************************
        2001-BODY-SEC                   SECTION.
       *
-           IF   (  CNT-LINE       >=   1 )
-            AND (  KEY-SRYYMD  NOT =   HCM50SRY-SRYYMD )
-               MOVE    HCM50SRY-SRYYMD TO  KEY-SRYYMD
+           IF   (  CNT-LINE           >=   1 )
+            AND((  KEY-SKYSTYMD    NOT =   HCM50SRY-SKYSTYMD )
+              OR(  KEY-SKYEDYMD    NOT =   HCM50SRY-SKYEDYMD ))
+               MOVE    HCM50SRY-SKYSTYMD
+                                       TO  KEY-SKYSTYMD
+               MOVE    HCM50SRY-SKYEDYMD
+                                       TO  KEY-SKYEDYMD
                MOVE    ZERO            TO  CNT-MEISAI
                COMPUTE     CNT-LINE    =   CNT-LINE    +   1
            ELSE
@@ -469,16 +478,35 @@
       *
            IF    ( CNT-MEISAI      =   1 )
                IF    ( ORCHCM50-SUMKBN =   "1" )
-                   MOVE    HCM50SRY-SRYYMD     TO  WRK-SYMD
+                   MOVE    HCM50SRY-SKYSTYMD   TO  WRK-SYMD
                    MOVE    "01"                TO  WRK-SYMD (7:2)
                    PERFORM 800-SEIWA-HEN-SEC
                    MOVE    WRK-EDTYMD3 (11:6) TO  HCM50-SRYYMD
                                                            (CNT-LINE)
                ELSE
-                   MOVE    HCM50SRY-SRYYMD     TO  WRK-SYMD
-                   PERFORM 800-SEIWA-HEN-SEC
-                   MOVE    WRK-EDTYMD3 (11: ) TO  HCM50-SRYYMD
+                   IF    ( HCM50SRY-NYUGAIKBN  =   "1" )
+                       MOVE    HCM50SRY-SKYSTYMD  TO  WRK-SYMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-EDTYMD1 (5:2)  TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(1:2)
+                       MOVE    "月"               TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(3:2)
+                       MOVE    WRK-EDTYMD1 (8:2)  TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(5:2)
+                       MOVE    "日〜"             TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(7:4)
+                       MOVE    HCM50SRY-SKYEDYMD  TO  WRK-SYMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-EDTYMD1 (8:2)  TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(11:2)
+                       MOVE    "日"               TO  HCM50-SRYYMD
+                                                        (CNT-LINE)(13:2)
+                   ELSE
+                       MOVE    HCM50SRY-SKYSTYMD  TO  WRK-SYMD
+                       PERFORM 800-SEIWA-HEN-SEC
+                       MOVE    WRK-EDTYMD3 (11: ) TO  HCM50-SRYYMD
                                                            (CNT-LINE)
+                   END-IF
                END-IF
            END-IF
       *

@@ -25,7 +25,8 @@
        01  HCM50SRY-REC.
            03  HCM50SRY-ISM-KEY.
                05  HCM50SRY-NYUGAIKBN      PIC X(01).
-               05  HCM50SRY-SRYYMD         PIC X(08).
+               05  HCM50SRY-SKYSTYMD       PIC X(08).
+               05  HCM50SRY-SKYEDYMD       PIC X(08).
                05  HCM50SRY-SRYKBN         PIC X(02).
                05  HCM50SRY-SRYKBN2        PIC X(02).
                05  HCM50SRY-TENTTLKBN      PIC 9(03).
