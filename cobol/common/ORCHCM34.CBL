@@ -7118,9 +7118,7 @@
            PERFORM VARYING IDXT    FROM    1   BY  1
                    UNTIL ( IDXT    >   LNK-ORCSTEN3-MAX )
       *
-               COMPUTE WRK-MAXZAINUM = WRK-MAXZAINUM + 1
                PERFORM 2801-TENTEKI-ACCT-SEC
-               PERFORM 2801-TENTEKI-SRY-SEC
       *
            END-PERFORM
       *
@@ -7131,6 +7129,13 @@
       *    Æþ±¡ÅÀÅ©ºÞÊÔ½¸½èÍý
       *****************************************************************
        2801-TENTEKI-ACCT-SEC           SECTION.
+      *
+           COMPUTE WRK-MAXZAINUM = WRK-MAXZAINUM + 1
+      *
+           MOVE    ZERO              TO    WRK-RUIKEITOTAL
+                                           WRK-RUIKEITOTAL2
+      *
+           PERFORM 2801-TENTEKI-SRY-SEC
       *
            INITIALIZE                      HCM34ACCT-REC
       *
@@ -7165,7 +7170,7 @@
            INITIALIZE                      HCM34ACCT-DATPLUS
       *
            MOVE    WRK-RUIKEITOTAL     TO  HCM34ACCT-RUIKEITOTAL
-           MOVE    ZERO                TO  HCM34ACCT-RUIKEITOTAL2
+           MOVE    WRK-RUIKEITOTAL2    TO  HCM34ACCT-RUIKEITOTAL2
            MOVE    ZERO                TO  HCM34ACCT-JIHIMONEYTOTAL
            MOVE    LNK-ORCSTEN3-SRYCD (IDXT 1)
                                        TO  HCM34ACCT-SRT-SRYCD
@@ -7224,6 +7229,14 @@
                    MOVE    LNK-ORCSTEN3-COM (IDXT IDX30)
                                            TO  HCM34SRY-COMMENT (IDX31)
                END-IF
+      *
+               MOVE     HCM34SRY-SRYCD    (IDX31)
+                                           TO  WRK-SRYCD-9
+                                               WRK-CALCSRYCD-G
+               MOVE     HCM34SRY-SRYSURYO (IDX31)
+                                           TO  WRK-SURYO
+               PERFORM  2001111-RUIKEITOTAL-SEC
+      *
       *
                IF    ( IDX31           >=  5 )
                    WRITE   HCM34SRY-REC
