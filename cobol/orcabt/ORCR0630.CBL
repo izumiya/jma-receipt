@@ -131,6 +131,8 @@
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.06    NACL-門脇    16/08/23  持参薬対応
       *  04.08.07    NACL-門脇    16/11/12  徳島県地方公費対応
+      *  04.08.08    NACL-門脇    15/02/23  茨城県地方公費対応（システム管理
+      *                                     ２０１０のデフォルト設定修正）
       *****************************************************************
       *
       *
@@ -4768,7 +4770,6 @@
                  EVALUATE   WRK-PREFNUM
                    WHEN     "32"
                    WHEN     "13"
-                   WHEN     "08"
       ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
@@ -4785,6 +4786,12 @@
       ***              MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                   WHEN     "08"
+                     IF  RECE62-SRYYM  <=  "201002"
+      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
       ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
@@ -4804,6 +4811,12 @@
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE62-SYUKEI-TAIKBN(IDX11 2)
                  EVALUATE   WRK-PREFNUM
+                   WHEN     "08"
+                     IF  RECE62-SRYYM  <=  "201002"
+      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
       ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
