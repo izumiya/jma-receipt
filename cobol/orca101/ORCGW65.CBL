@@ -14578,7 +14578,7 @@
                EVALUATE    SPA-PREFNUM
                WHEN    CONST-TOKYO
       *        WHEN    CONST-KYOTO
-               WHEN    CONST-IBARAKI
+      *        WHEN    CONST-IBARAKI
                WHEN    CONST-SHIMANE
       *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
                    MOVE    SPA-GMN-SYUKEIKBNLST (5)

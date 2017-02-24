@@ -760,6 +760,8 @@
       *  04.08.37    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
       *  04.08.38    NACL-門脇    17/01/05  広島県地方公費対応
+      *  04.08.39    NACL-門脇    15/02/23  茨城県地方公費対応（システム管理
+      *                                     ２０１０のデフォルト設定修正）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5254,7 +5256,6 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  EVALUATE   SYS-1001-PREFNUM
                    WHEN     "32"
                    WHEN     "13"
-                   WHEN     "08"
       ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
@@ -5271,6 +5272,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
       ***              MOVE "1" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                   WHEN     "08"
+                     IF  RECE02-SRYYM  <=  "201002"
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
       ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
@@ -5290,6 +5297,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE02-SYUKEI-TAIKBN(IDX11 2)
                  EVALUATE   SYS-1001-PREFNUM
+                   WHEN     "08"
+                     IF  RECE02-SRYYM  <=  "201002"
+      ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "26"
                      IF  RECE02-SRYYM  <=  "201103"
       ***              MOVE "2" TO RECE02-SYUKEIKBN(IDX11 2)
