@@ -41,6 +41,9 @@
       *                                     チェック対応
       *
       *  04.09.01    NACL-藤原    16/11/18  Ｄｏｃｋｅｒ対応
+      *  04.09.02    NACL-藤原    17/02/24  レポジトリ名設定時は地方公費
+      *                                     処理スクリプトの存在チェック
+      *                                     を行わない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -441,6 +444,12 @@
        3101-SCRIPT-CHECK-SEC              SECTION.
       *
            MOVE    SPACE           TO  SPA-NAI-SHELLID-CHK (IDX)
+      *
+           IF    ( SPA-MW          =   SPA-GINBEE )
+           AND   ( SPA-GMN-NAME (IDX)
+                               NOT =   SPACE      )
+               GO  TO  3101-SCRIPT-CHECK-EXT
+           END-IF
       *
            IF    ( SPA-GMN-SHELLID  (IDX)  =   SPACE  )
            OR    ( SPA-GMN-SHORIMSG (IDX)  =   SPACE  )

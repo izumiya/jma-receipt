@@ -39,6 +39,10 @@
       *  04.08.02    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
+      *
+      *  04.09.01    NACL-藤原    17/02/24  レポジトリ名設定時は地方公費
+      *                                     処理スクリプトの存在チェック
+      *                                     を行わない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1377,7 +1381,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    UNTIL   IDX >       SPA-GMN-T02-SHELLID-MAX
                IF      SPA-GMN-T02-TSYORIFLG (IDX)
                                                =   "1"
-      *            ファイルデイレクトリ位置指定
+                 IF    ( SPA-MW      =   SPA-GINBEE )
+                 AND   ( SPA-NAI-T02-TNAME   (IDX)
+                                 NOT =   SPACE      )
+                   CONTINUE
+                 ELSE
+       *            ファイルデイレクトリ位置指定
                    MOVE    SPA-NAI-T02-TSHELLID (IDX)
                                            TO  WRK-SHELL-SHELL
                    INITIALIZE                  ORCSMKPASSAREA
@@ -1399,6 +1408,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                                    TO  WRK-CHK-SHORIMSG
                        END-IF
                    END-IF
+                 END-IF
                END-IF
            END-PERFORM
            .
