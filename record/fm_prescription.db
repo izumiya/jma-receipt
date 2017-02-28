@@ -7,7 +7,7 @@ fm_prescription {
 		Form_ID				varchar(30);
 		Custom_ID				varchar(30);
 		Printer					varchar(20);
-		Isuue_Class			varchar(01);
+		Order_Class			varchar(01);
  		Perform_Date		varchar(10);
 		IssuedDate			varchar(10);
 		Department_Code			varchar(02);
@@ -76,9 +76,9 @@ fm_prescription {
 		Check_Leftover_Class	varchar(1);
 		IncludingNarcotic_Flg	varchar(1);
 		IncludingUnchangeable_Flg	varchar(1);
-		Prescription	{
+		Rp	{
 			Medical_Class		varchar(2);
-			Amount				varchar(3);
+			Count				varchar(3);
 			Unit_Name			varchar(4);
 			Medication	{
 				Name				varchar(210);

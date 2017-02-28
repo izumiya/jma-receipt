@@ -40,8 +40,8 @@ fm_appointment_list {
 				BirthDate 			varchar(10);
 				Sex					    varchar(1);
 			};
-			Detail_Code				varchar(02);
-			Detail_Name				varchar(30);
+			Appointment_Code				varchar(02);
+			Appointment_Name				varchar(30);
 			Contact_Code			varchar(02);
 			Contact_Name			varchar(20);
 			Visit_Flg					varchar(01);

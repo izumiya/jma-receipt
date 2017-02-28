@@ -38,18 +38,11 @@
                                    ORGANIZATION    IS  SEQUENTIAL
                                    FILE    STATUS  IS  STS-META.
       *
-           SELECT  MTYPE-FILE      ASSIGN  MTYPEPARA
-                                   ORGANIZATION    IS  LINE SEQUENTIAL
-                                   FILE    STATUS  IS  STS-MTYPE.
-      *
        DATA                        DIVISION.
        FILE                        SECTION.
        FD  META-FILE.
            COPY    "MCPDATA2.INC"      REPLACING   //MCPDATA2//
                                        BY          //META//.
-      *
-       FD  MTYPE-FILE.
-       01  MTYPE-REC               PIC X(32).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -57,10 +50,7 @@
                                        BY          //META//.
       *
            COPY    "CPASGNPARA.INC"    REPLACING   //ASGN//
-                                       BY          //IMAGE//.
-      *
-           COPY    "CPASGNPARA.INC"    REPLACING   //ASGN//
-                                       BY          //MTYPE//.
+                                       BY          //ZIP//.
       *
       *    スパ領域
            COPY    "COMMON-SPA".
@@ -109,8 +99,7 @@
                05  WRK-SRYYMD-YM       PIC X(06).
                05  WRK-SRYYMD-DD       PIC 9(02).
            03  WRK-TEMPDIR-ROOT        PIC X(512).
-           03  WRK-MIME-TYPE           PIC X(32).
-           03  WRK-EXTENTION           PIC X(04).
+           03  WRK-EXTENTION           PIC X(10).
            03  WRK-SRYCD               PIC X(09).
       *
       *****************************************************************
@@ -139,6 +128,9 @@
       *    ファイル削除パラメタ
            COPY    "CPORCSFDEL.INC".
       *
+      *    ファイル存在チェック
+           COPY    "CPORCSACCESS.INC".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -146,6 +138,8 @@
            COPY    "CPMEDIMAGE.INC".
       *
            COPY    "CPSK1010.INC".
+      *
+           COPY    "CPSHELLTBL.INC".
       *
            COPY    "MCPDATA.INC".
            COPY    "MCPDATA2.INC".
@@ -250,6 +244,14 @@
            MOVE    SPACE                   TO  MCP-TEMPDIR
            ACCEPT  WRK-TEMPDIR-ROOT
                                FROM    ENVIRONMENT  "MCP_TEMPDIR_ROOT"
+           IF    ( WRK-TEMPDIR-ROOT    =   SPACE )
+               MOVE    "/tmp/jma-tempdir"  TO  WRK-TEMPDIR-ROOT
+               CALL    "SYSTEM"        USING
+                                       FUNCTION CONCATENATE (
+                                       "mkdir -p "
+                                       WRK-TEMPDIR-ROOT
+                                       )
+           END-IF
            STRING  WRK-TEMPDIR-ROOT    DELIMITED BY SPACE
                    "/"                 DELIMITED BY SIZE
                    SPA-TERMID          DELIMITED BY SPACE
@@ -304,16 +306,10 @@
                INTO    METAPARA
                END-STRING
       *
-               MOVE    SPACE           TO  IMAGEPARA
+               MOVE    SPACE           TO  ZIPPARA
                STRING  METAPARA            DELIMITED BY SPACE
-                       ".img"              DELIMITED BY SIZE
-               INTO    IMAGEPARA
-               END-STRING
-      *
-               MOVE    SPACE           TO  MTYPEPARA
-               STRING  METAPARA            DELIMITED BY SPACE
-                       ".txt"              DELIMITED BY SIZE
-               INTO    MTYPEPARA
+                       ".zip"              DELIMITED BY SIZE
+               INTO    ZIPPARA
                END-STRING
       *
                OPEN    OUTPUT  META-FILE
@@ -321,48 +317,35 @@
                WRITE   META-REC
                CLOSE   META-FILE
       *
-               CALL    "SYSTEM"    USING
-                                   FUNCTION    CONCATENATE(
-                                   "base64 -di "
-                                   FUNCTION TRIM (METAPARA)
-                                   " > "
-                                   FUNCTION TRIM (IMAGEPARA)
-                                   )
-                                   RETURNING   STS-SYSTEM
+               MOVE    SPACE           TO  SHELLTBL
+               INITIALIZE                  SHELLTBL
       *
-               IF    ( STS-SYSTEM  =   ZERO )
-                   CALL    "SYSTEM"    USING
-                                       FUNCTION  CONCATENATE(
-                                       "file -b --mime-type "
-                                       FUNCTION TRIM (IMAGEPARA)
-                                       " > "
-                                       FUNCTION TRIM (MTYPEPARA)
-                                       )
-                                       RETURNING   STS-SYSTEM
-               END-IF
+               MOVE    SPA-HOSPNUM     TO  SHELLTBL-HOSPNUM
+               MOVE    "convert_image.sh"
+                                       TO  SHELLTBL-NAME
+               MOVE    "API000R2"      TO  SHELLTBL-SHELLID
+               MOVE    1               TO  SHELLTBL-JOBID
+               MOVE    SPA-TERMID      TO  SHELLTBL-TERMID
       *
-               IF    ( STS-SYSTEM  NOT =   ZERO )
+               MOVE    WRK-SRYCD       TO  SHELLTBL-ARG1
+               MOVE    SHELLTBL        TO  MCPDATA-REC
+               MOVE    "EXCOMMAND"     TO  MCP-FUNC
+               MOVE    "shell"         TO  MCP-TABLE
+               MOVE    "allways"       TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+      *
+               INITIALIZE                  SACCESS-AREA
+               MOVE    ZIPPARA         TO  SACCESS-IN-FILENAME
+               CALL    "ORCSACCESS"        USING
+                                           SACCESS-AREA
+               IF    ( SACCESS-RC      NOT =   ZERO )
                    MOVE    "0004"      TO  WRK-ERRCD
                END-IF
            ELSE
-               MOVE    "0005"      TO  WRK-ERRCD
-           END-IF
-      *
-           IF    ( WRK-ERRCD           =   SPACE )
-               OPEN    INPUT       MTYPE-FILE
-               IF    ( STS-MTYPE       =   ZERO )
-                   READ    MTYPE-FILE
-                   NOT AT  END
-                       MOVE    MTYPE-REC   TO  WRK-MIME-TYPE
-                   END-READ
-               END-IF
-               CLOSE   MTYPE-FILE
-           END-IF
-      *
-           IF    ( WRK-ERRCD           =   SPACE )
-               IF    ( WRK-MIME-TYPE   =   SPACE )
-                   MOVE    "0006"      TO  WRK-ERRCD
-               END-IF
+                   MOVE    "0005"      TO  WRK-ERRCD
            END-IF
       *
            .
@@ -576,7 +559,7 @@
            INITIALIZE                      ORCA-BLOB
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "blob"              TO  MCP-TABLE
-           MOVE     IMAGEPARA          TO  ORCA-BLOB-FILE
+           MOVE     ZIPPARA            TO  ORCA-BLOB-FILE
       *
            MOVE    "BLOBIMPORT"        TO  MCP-FUNC
            MOVE    "blob"              TO  MCP-TABLE
@@ -587,7 +570,7 @@
       *
            IF    ( MCP-RC              =   ZERO )
                MOVE    ORCA-BLOB-OBJECT    TO  APILST30-BODY
-               MOVE    WRK-MIME-TYPE       TO  APILST30-CONTENT-TYPE
+               MOVE    "application/zip"   TO  APILST30-CONTENT-TYPE
       *
            ELSE
                DISPLAY "BLOBIMPORT failure = " MCP-RC
@@ -768,7 +751,7 @@
       *****************************************************************
        990-TERMINATE-SEC               SECTION.
       *
-      *     CALL "CBL_DELETE_DIR"   USING MCP-TEMPDIR
+           CALL "CBL_DELETE_DIR"   USING MCP-TEMPDIR
       *
            .
        990-TERMINATE-EXT.

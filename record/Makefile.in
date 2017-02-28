@@ -876,7 +876,7 @@ DB_files = \
 	xml_contraindication_checkv2req.db \
 	xml_contraindication_checkv2res.db \
 	fm_prescription.db \
-	fm_medichine_information.db \
+	fm_medicine_information.db \
 	xml_patientmodv3req4.db \
 	xml_patientmodv3res4.db \
 	fm_appointment_form.db \

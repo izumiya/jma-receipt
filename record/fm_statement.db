@@ -19,7 +19,7 @@ fm_statement {
       PhoneNumber         varchar(15);
     };
     Perform_Date          varchar(10);
-    Last_Perform_Date     varchar(10);
+    End_Perform_Date     varchar(10);
     IssuedDate            varchar(10);
     Department_Name       varchar(30);
     Insurance_Name        varchar(40);

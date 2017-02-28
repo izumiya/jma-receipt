@@ -29,10 +29,10 @@
       *
       *       患者番号
               05  FMSEIKYU-PTNUM                   PIC X(20).
-      *       患者カナ氏名
-              05  FMSEIKYU-KANANAME                PIC X(50).
       *       患者氏名
               05  FMSEIKYU-NAME                    PIC X(50).
+      *       患者カナ氏名
+              05  FMSEIKYU-KANANAME                PIC X(50).
       *
       *       医療機関情報
               05  FMSEIKYU-HOSP-AREA.

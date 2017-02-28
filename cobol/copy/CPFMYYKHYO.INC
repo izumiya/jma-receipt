@@ -34,12 +34,12 @@
                 07  FMYH-SEX                PIC X(1).
               05  FMYH-HOSP-AREA.
                 07  FMYH-HOSP-NAME-G.
-                  09  FMYH-HOSP-NAME        PIC X(40)
-                                            OCCURS   2.
+                  09  FMYH-HOSP-NAME        PIC X(120)
+                                            OCCURS   3.
                 07  FMYH-HOSP-POST          PIC X(7).
                 07  FMYH-HOSP-ADRS-G.
-                  09  FMYH-HOSP-ADRS        PIC X(40)
-                                            OCCURS   2.
+                  09  FMYH-HOSP-ADRS        PIC X(200)
+                                            OCCURS   3.
                 07  FMYH-HOSP-TEL           PIC X(15).
               05  FMYH-MEMO                 PIC X(100).
               05  FMYH-TBL                  OCCURS 50.

@@ -1897,7 +1897,9 @@
            MOVE    SYS-1031-PRTNM(3)   TO  FMSEIKYU-PRINTER
            MOVE    ORCHC03-MOTOID      TO  FMSEIKYU-MOTOID
            MOVE    HC03-KNJNO          TO  FMSEIKYU-PTNUM
-           MOVE    PTINF-KANANAME      TO  FMSEIKYU-KANANAME
+           IF    ( TPARA-KANANAME      =   "1" )
+               MOVE    PTINF-KANANAME  TO  FMSEIKYU-KANANAME
+           END-IF
            MOVE    SPA-NAME            TO  FMSEIKYU-NAME
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
@@ -2237,6 +2239,14 @@
              END-IF
       *
            END-PERFORM
+      *
+           IF    ( TPARA-GOKEITANI     =   "1" )
+      *        点数表示
+               MOVE    "0"                TO  FMSEIKYU-YEN-FLG
+           ELSE
+      *        単価表示
+               MOVE    "1"                TO  FMSEIKYU-YEN-FLG
+           END-IF
       *
            IF    ( SMCNDATE-YMD        >=  TPARA-CHUI-YUKOSTYMD )
             AND  ( SMCNDATE-YMD        <=  TPARA-CHUI-YUKOEDYMD )

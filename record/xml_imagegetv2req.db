@@ -4,6 +4,6 @@ xml_imagegetv2req{
   mode                             int;
   recordname                       varchar(128);
   imagegetv2req  {
-    Data_ID                        varchar(80);
+    Image_ID                       varchar(80);
   };
 };

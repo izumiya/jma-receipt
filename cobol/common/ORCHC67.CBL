@@ -30,6 +30,7 @@
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.00    NACL-多々納  16/02/03  プログラムオプションメモ対応
       *  04.08.00    NACL-多々納  16/10/19  API(GINBEE)対応
+      *  05.00.00    NACL-太田    17/02/26  API(GINBEE)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -110,6 +111,9 @@
                05  WRK-HOSPNAME1       PIC X(40).
                05  WRK-HOSPNAME2       PIC X(40).
            03  WRK-HOSPTEL             PIC X(15).
+      *
+           03  WRK-API-HOSPNAME        PIC X(120)  OCCURS 3.
+           03  WRK-API-HOSPADRS        PIC X(200)  OCCURS 3.
       *
            03  WRK-YYKYMD              PIC X(08).
            03  WRK-SYSYMD              PIC X(08).
@@ -439,7 +443,9 @@
       *
       *    医療機関編集情報
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+                                           WRK-API-HOSPNAME (1)
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
+                                           WRK-API-HOSPADRS (1)
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
       *    医療機関編集
            PERFORM 1010-HOSPHENSYU-SEC
@@ -866,11 +872,13 @@
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO  FMYH-BIRTHDAY
       *    医療機関名称
-           MOVE    WRK-HOSPNAME1       TO  FMYH-HOSP-NAME (1)
-           MOVE    WRK-HOSPNAME2       TO  FMYH-HOSP-NAME (2)
+           MOVE    WRK-API-HOSPNAME(1) TO  FMYH-HOSP-NAME (1)
+           MOVE    WRK-API-HOSPNAME(2) TO  FMYH-HOSP-NAME (2)
+           MOVE    WRK-API-HOSPNAME(3) TO  FMYH-HOSP-NAME (3)
       *    医療機関住所
-           MOVE    WRK-HOSPADRS1       TO  FMYH-HOSP-ADRS (1)
-           MOVE    WRK-HOSPADRS2       TO  FMYH-HOSP-ADRS (2)
+           MOVE    WRK-API-HOSPADRS(1) TO  FMYH-HOSP-ADRS (1)
+           MOVE    WRK-API-HOSPADRS(2) TO  FMYH-HOSP-ADRS (2)
+           MOVE    WRK-API-HOSPADRS(3) TO  FMYH-HOSP-ADRS (3)
       *
            MOVE    SYS-1002-POST       TO  FMYH-HOSP-POST
            MOVE    WRK-HOSPTEL         TO  FMYH-HOSP-TEL
@@ -1030,6 +1038,11 @@
                MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1  TO  WRK-HOSPNAME1
                MOVE    SYS-1901-HOSPNAME2  TO  WRK-HOSPNAME2
+      *
+               MOVE    SYS-1901-HOSPNAME1  TO  WRK-API-HOSPNAME(1)
+               MOVE    SYS-1901-HOSPNAME2  TO  WRK-API-HOSPNAME(2)
+               MOVE    SYS-1901-HOSPNAME3  TO  WRK-API-HOSPNAME(3)
+      *
            ELSE
                INITIALIZE                  SYS-1901-REC
            END-IF
@@ -1058,6 +1071,10 @@
                MOVE    SYS-1902-ADRS1      TO  WRK-HOSPADRS1
                MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
                MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
+      *
+               MOVE    SYS-1902-ADRS1      TO  WRK-API-HOSPADRS(1)
+               MOVE    SYS-1902-ADRS2      TO  WRK-API-HOSPADRS(2)
+               MOVE    SYS-1902-ADRS3      TO  WRK-API-HOSPADRS(3)
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF

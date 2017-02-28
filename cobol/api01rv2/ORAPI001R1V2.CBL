@@ -665,7 +665,6 @@
                MOVE    "xml_formdatagetv2req"
                                            TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
-               MOVE    "data"              TO  APIREQ-RECORDNAME
                MOVE    "XMLREAD"           TO  MCP-FUNC
                PERFORM 910-XMLREAD-SEC
                IF    ( MCP-RC              =   ZERO  OR  1 )

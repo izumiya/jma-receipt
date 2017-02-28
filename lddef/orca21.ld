@@ -79,7 +79,7 @@ db "xml2" {
  xml_medicalsetv2res;
  fm_medication_note;
  fm_prescription;
- fm_medichine_information;
+ fm_medicine_information;
  fm_appointment_form;
  fm_statement;
  fm_invoice_receipt;

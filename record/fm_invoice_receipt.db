@@ -4,14 +4,14 @@ fm_invoice_receipt {
   mode  int;
   recordname  varchar(128);
   data {
-    Form_ID            varchar(30);
+    Form_ID              varchar(30);
     Custom_ID            varchar(30);
     Printer              varchar(20);
-    Print_Order_Class    varchar(02);
+    Order_Class          varchar(02);
     Patient  {
       ID                 varchar(20);
-      KanaName           varchar(50);
       Name               varchar(50);
+      KanaName           varchar(50);
     };
     Hospital  {
       Name               varchar(120)[3];
@@ -23,7 +23,7 @@ fm_invoice_receipt {
     Period_Class         varchar(01);
     Perform_Month        varchar(07);
     Perform_Date         varchar(10);
-    Last_Perform_Date    varchar(10);
+    End_Perform_Date    varchar(10);
     IssuedDate           varchar(10);
     Department_Name      varchar(30);
     Insurance_Name       varchar(40);
@@ -38,8 +38,7 @@ fm_invoice_receipt {
     }[16];
     Total_Point          varchar(08);
     Ai_Money             varchar(08);
-    Label_Lsi_Total_Money
-                         varchar(20);
+    Label_Lsi_Total_Money    varchar(20);
     Lsi_Total_Money_In_Ai_Money varchar(08);
     Pi_Smoney            varchar(08);
     Total_Me_Money       varchar(08);

@@ -7,7 +7,7 @@ fm_medication_note {
 		Form_ID				varchar(30);
 		Custom_ID				varchar(30);
 		Printer					varchar(20);
-		Prescription_Date varchar(10);
+		Perform_Date   varchar(10);
 		Invoice_Number varchar(7);
 		Patient	{
 			ID	 				varchar(20);
@@ -26,10 +26,10 @@ fm_medication_note {
 			Code				varchar(5);
 			Name 				varchar(50);
 		};
-		Prescription	{
+		Rp	{
 			Medical_Class		varchar(2);
-			Amount				varchar(3);
-			Total_Amount_Flg    varchar(1);
+			Count				varchar(3);
+			Not_Countable_Flg    varchar(1);
 			Unit_Name			varchar(12);
 			Medication	{
 				Name				varchar(80);
