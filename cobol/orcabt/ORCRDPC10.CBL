@@ -144,6 +144,9 @@
       *              NACL-小豆沢  16/09/05  退院時処方（複数薬剤入力時）
       *                                     の記録修正
       *              NACL-伊藤    16/10/18  閉麻計算見直し
+      *  04.08.01    NACL-小豆沢  17/02/28  医保以外で特定入院料を算定した場合に
+      *                                     F-19（行為明細区分情報）２桁目の
+      *                                     入院料包括項目区分を暫定セットする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5713,6 +5716,12 @@
                   IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "2"
                      MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
                   END-IF
+      *--- AZU-ADD START 2017.02.28
+      *     （暫定）包括元となる入院料が判定できない場合は２をセットする
+                  IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)  NOT =  "1" AND "2"
+                     MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
+                  END-IF
+      *--- AZU-ADD END   2017.02.28
                ELSE
                   MOVE    ZERO             TO  WRK-FEDT-KOUI-MEISAI2
                   IF   WRK-TAIIN-SHOHOU    =    "1"
