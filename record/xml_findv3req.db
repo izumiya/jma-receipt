@@ -64,7 +64,7 @@ xml_findv3req{
         Last                       varchar(7);
       };
       Disaster_Class               varchar(1);
-      Inspection_Recept_Class      varchar(1);
+      Inspection_Receipt_Class      varchar(1);
     };
     HealthInsurance_Information{
       Certificate_Expired_Year_Month varchar(7);
