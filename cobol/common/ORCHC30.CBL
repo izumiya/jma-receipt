@@ -2244,7 +2244,7 @@
            MOVE    "okusuri_joho"  TO  RPMAIN-ID
            MOVE    PARA-API-CUSTOM-ID
                                    TO  RPMAIN-CUSTOM-ID
-           MOVE    "薬剤情報提供書" 
+           MOVE    "お薬情報" 
                                    TO  RPMAIN-TITLE
            MOVE    "fm_medicine_information"
                                    TO  MCP-TABLE
