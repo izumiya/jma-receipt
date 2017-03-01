@@ -74,6 +74,8 @@ db	{
   tbl_pthkninf;
   tbl_ptkohinf;
   tbl_ptrsiinf;
+  tbl_tsyrrk;
+  tbl_tnkrrk;
 };
 
 db "xml2" {
