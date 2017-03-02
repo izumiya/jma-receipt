@@ -2022,6 +2022,8 @@
            MOVE    PTINF-OFFICE-TEL    TO  FMKARTE1-OFFICE-TEL
       *Ï¢ÍíÀè
       *    Ì¾¾Î
+           MOVE    PTINF-RENRAKU-NAME
+                                       TO  FMKARTE1-RENRAKU-NAME
            MOVE    PTINF-RENRAKU-ZOKUGARA
                                        TO  FMKARTE1-RENRAKU-ZOKUGARA
            MOVE    PTINF-RENRAKU-POST  TO  FMKARTE1-RENRAKU-POST
