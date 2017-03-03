@@ -1,6 +1,7 @@
 patientgetv2 {
 		arguments {
 			id			varchar(20);
+			format 			varchar(20);
 		};
 		http_method			varchar(100);
 		content_type			varchar(100);

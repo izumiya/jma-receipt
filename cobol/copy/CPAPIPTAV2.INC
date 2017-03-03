@@ -23,6 +23,7 @@
             03  APIPTA-REQUEST.
               04  APIPTA-ARGUMENT.
                 05  APIPTA-PTNUM       PIC X(20).
+                05  APIPTA-FORMAT      PIC X(20).
               04  APIPTA-METHOD        PIC X(100).
               04  APIPTA-CONTENT-TYPE  PIC X(100).
               04  APIPTA-BODY          PIC X(8).
