@@ -46,6 +46,7 @@
       * 04.07.00     NACL-多々納  12/11/02  薬剤毎のコメント対応
       * 04.07.00     NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       * 04.08.00     NACL-多々納  16/10/XX  用法コード服用時点対応
+      * 04.08.00     NACL-多々納  17/02/XX  自費コード薬剤対応
       *****************************************************************
       *
       *
@@ -704,6 +705,9 @@
                                        OR  "21"
                                        OR  "22"
                                        OR  "23"
+      *H29.02
+                                       OR  "95"
+                                       OR  "96"
                MOVE    SRYACT-REC          TO  HZN-SRYACT-REC
                PERFORM
                    UNTIL   FLG-SRYACT      =   1
@@ -712,7 +716,7 @@
                                       (SRY-SRYCD (IDXA)   =   SPACE)
       *H26.10
                        MOVE    ZERO                TO  FLG-NO
-                       IF      SRY-SRYCD (IDXA)(1:1)      =   "6"
+                       IF     (SRY-SRYCD (IDXA)(1:1)      =   "6")
       *                    点数マスタを検索
                            MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
                            PERFORM 910-TENSU-READ-SEC
@@ -723,6 +727,22 @@
                                MOVE    1               TO  FLG-OK
                            END-IF
                        END-IF
+      *H29.2           自費薬剤のみ対象
+                       IF      SRY-SRYKBN          =   "95"
+                                                   OR  "96"
+                           IF     (SRY-SRYCD (IDXA)(1:3)   =   "095"
+                                                           OR  "096")
+      *                        点数マスタを検索
+                               MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+                               PERFORM 910-TENSU-READ-SEC
+                               IF      TNS-YKZKBN          =   ZERO
+                                   MOVE    1               TO  FLG-NO
+                               ELSE
+                                   MOVE    1               TO  FLG-OK
+                               END-IF
+                           END-IF
+                       END-IF
+      *
                        IF     (SRY-SRYCD (IDXA)    =   "630010002"
                                                    OR  "630010004"
       *H25.4               （減）対象外
@@ -895,6 +915,17 @@
                    END-IF
                END-IF
            END-IF
+      *H29.2
+      *    自費は院内とする
+           IF      WRK-SRYKBN          =   "95"
+                                       OR  "96"
+      *        院内
+               IF      FLG-INNAI           =   1
+                   MOVE    1               TO  FLG-HEN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HEN
+               END-IF
+           END-IF
       *
            MOVE    SPACE               TO  WRK-TBL-AREA
            INITIALIZE                      WRK-TBL-AREA
@@ -928,7 +959,9 @@
        20022-TBLSET-SEC         SECTION.
       *
       *    薬剤編集
-           IF      TBL-SRY-SRYCD (IDXA)(1:1)   =   "6"
+           IF     (TBL-SRY-SRYCD (IDXA)(1:1)   =   "6")
+             OR   (TBL-SRY-SRYCD (IDXA)(1:3)   =   "095"
+                                               OR  "096") 
                ADD     1               TO  IDX-S
                IF      IDX-S           >   99
                    DISPLAY "ORCSHC30 TBL OVER !!"
@@ -1355,6 +1388,10 @@
       *            在宅
                    WHEN    "14"
                        MOVE    "4"         TO  ORCHC30-ZAIKBN(IDY)
+      *H29.2       自費
+                   WHEN    "95"
+                   WHEN    "96"
+                       MOVE    "9"         TO  ORCHC30-ZAIKBN(IDY)
                END-EVALUATE
            END-PERFORM
       *
@@ -1425,7 +1462,10 @@
                IF     (WKSRY-SRYKBN        =   "21"  OR
                                                "22"  OR
                                                "23"  OR
-                                               "14"    )
+                                               "14"
+      *H29.2
+                                           OR  "95"
+                                           OR  "96"    )
       *            包括保険は対象外
                    IF    ((WRK-HKNCOMBINUM     =   "9999")
                    AND    (FLG-YKJOKUKBN       =   ZERO  ) )
@@ -1489,13 +1529,37 @@
                MOVE    ZERO            TO  FLG-NO
                IF     (WKSRY-SRYCD (IDXA)(1:1) =   "6" )
       *            点数マスタを検索
-                   MOVE    SRY-SRYCD (IDXA)    TO  TNS-SRYCD
+                   MOVE    WKSRY-SRYCD (IDXA)   TO  TNS-SRYCD
                    PERFORM 910-TENSU-READ-SEC
                    IF      TNS-TENSIKIBETU     =   7
       *                減点は対象外
                        MOVE    1               TO  FLG-NO
                    END-IF
                END-IF
+      *H29.2
+      *        自費コード
+               IF     WKSRY-SRYKBN         =   "95"
+                                           OR  "96"
+                   IF    (WKSRY-SRYCD (IDXA)(1:3) =   "095"
+                                                  OR  "096" )
+      *                点数マスタを検索
+                       MOVE    WKSRY-SRYCD (IDXA)  TO  TNS-SRYCD
+                       PERFORM 910-TENSU-READ-SEC
+                       IF      TNS-YKZKBN          =   ZERO
+      *                    対象外
+                           MOVE    1               TO  FLG-NO
+                       END-IF
+                   END-IF
+      *            薬剤・用法・コメントのみ対象
+                   IF     (WKSRY-SRYCD (IDXA)(1:1) =   "6"
+                                                   OR  "0"
+                                                   OR  "8" )
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-NO
+                   END-IF
+               END-IF
+      *
                IF     (WKSRY-SRYCD (IDXA)      =   "630010002" )
                  OR   (WKSRY-SRYCD (IDXA)(1:4)     =   "0086" )
       *          （減）は対象外
@@ -1539,6 +1603,14 @@
            IF      WKSRY-ZAIKAIKEI     >   ZERO
                MOVE    WKSRY-ZAITENKEI     TO  TBL-ACCT-ZAITEN
                MOVE    WKSRY-ZAIKAIKEI     TO  TBL-ACCT-KAISU
+           END-IF
+      *H29.2
+      *    自費
+           IF     (WKSRY-SRYKBN        =   "95"
+                                       OR  "96" )
+             AND  (WKSRY-JIHIMONEYTOTAL    >   ZERO )
+               MOVE    WKSRY-JIHIMONEYTOTAL    TO  TBL-ACCT-ZAITEN
+               MOVE    WKSRY-ZAIKAIKEI         TO  TBL-ACCT-KAISU
            END-IF
       *
            .
@@ -1588,7 +1660,10 @@
        3001-TBLSET-SEC         SECTION.
       *
       *    薬剤編集
-           IF      ORCSCH30-SRYCD(IDT IDXA)(1:1)   =   "6"
+           IF     (ORCSCH30-SRYCD(IDT IDXA)(1:1)   =   "6" )
+      *H29.2
+             OR   (ORCSCH30-SRYCD(IDT IDXA)(1:3)   =   "095"
+                                                   OR  "096")
                ADD     1               TO  IDX-S
                IF      IDX-S           >   99
                    DISPLAY "ORCSHC30 TBL OVER !!"

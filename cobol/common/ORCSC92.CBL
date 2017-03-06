@@ -3992,8 +3992,12 @@
            END-IF
       *H25.2
       *    自賠責特定コードの単位
-           IF     (SPA-COM-INPUTCD (IDX-T)(1:5)    =   "09593" )
-              AND (TNS-TANICD                   NOT =   ZERO   )
+      **** IF     (SPA-COM-INPUTCD (IDX-T)(1:5)    =   "09593" )
+      *H29.3   自費の薬剤のみ
+           IF     (SPA-COM-INPUTCD (IDX-T)(1:3)    =   "095"
+                                                   OR  "096" )
+              AND (TNS-TANICD              NOT =   ZERO   )
+              AND (TNS-YKZKBN              NOT =   ZERO   )
                PERFORM 3004-TANI-HENSYU-SEC
                MOVE    WRK-TANINAME        TO  SPA-GMN-TANINAME (IDX-T)
            END-IF

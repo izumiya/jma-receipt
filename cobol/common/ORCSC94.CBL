@@ -516,7 +516,8 @@
                                                AND SPACE ))
               OR ((SPA-COM-INPUTCD(IDX)(1:3)   =   "095" OR
                                                    "096") AND
-                  (SPA-COM-SURYO  (IDX)    NOT =   1    ))
+                  ((SPA-COM-SURYO  (IDX)   NOT =   1   )  OR
+                   (SPA-COM-YKZKBN (IDX)   NOT =   ZERO)))
       *        ÌôºÞ¡¦´ïºà¡¢¿ÇÎÅÎÅ¹Ô°Ù¡¦ÌóÂ«¥»¥Ã¥È¤Î»þ¡¢¿ôÎÌ¡á£±¤Ï¶õÇò
                MOVE    SPA-COM-SURYO (IDX)
                                            TO  WRK-SURYO
