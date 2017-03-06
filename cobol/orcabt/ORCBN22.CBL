@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者        日付      内容
       *  04.08.01    NACL-森脇     14/08/21  一時ファイルディレクトリ設定
+      *  05.00.00    NACL-森脇     17/03/06  自費薬剤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -412,13 +413,16 @@
                                        ORCSMKPASSAREA
            MOVE    MKPASS-OT-01    TO  FILE-NAME
       *
+      *----(05.00.00)--UPD-START---
       *    点数チェックサブプロ
            INITIALIZE                  SS004-AREA
            MOVE    WRK-PARA-KIKAN  TO  SS004-KIKAN
-           MOVE    "1"             TO  SS004-SRYCDKBN
+      *     MOVE    "1"             TO  SS004-SRYCDKBN
+           MOVE    "0"             TO  SS004-SRYCDKBN
            CALL    "ORCSS004"          USING
                                        SS004-AREA
                                        SPA-AREA
+      *----(05.00.00)--UPD-END-----
       *    中間ファイル名セット
            MOVE    SS004-FILENAME  TO  TNSCHK
            STRING  SS004-FILENAME      DELIMITED  BY  SPACE
@@ -745,6 +749,12 @@
                    MOVE    1           TO  FLG-OK
                NOT AT  END
                    MOVE    ZERO        TO  FLG-TNSCHK
+      *----(05.00.00)--ADD-START---
+                   EVALUATE    TNSCHK-SRYCD
+                   WHEN    "600000000" THRU    "699999999"
+                   WHEN    "095210001" THRU    "095279999"
+                   WHEN    "096210001" THRU    "096279999"
+      *----(05.00.00)--ADD-END-----
       *            薬剤区分をチェック
                    IF        ( TNSCHK-YKZKBN      =   "1" )
                        OR    ( TNSCHK-YKZKBN      =   "6" )
@@ -761,6 +771,11 @@
                    ELSE
                        MOVE    ZERO        TO  FLG-OK
                    END-IF
+      *----(05.00.00)--ADD-START---
+                   WHEN    OTHER
+                       MOVE    ZERO        TO  FLG-OK
+                   END-EVALUATE
+      *----(05.00.00)--ADD-END-----
                END-READ
            END-PERFORM
            .
@@ -934,13 +949,17 @@
       *
            INITIALIZE                  YAKUJYO-REC
       *
+      *----(05.00.00)--UPD-START---
            MOVE    "tbl_yakujyo"   TO  WRK-TABLE
            EVALUATE    WRK-PARA-SYU
-           WHEN    "1"
-               MOVE    "key5s"     TO  WRK-PATHNAME
-           WHEN    "2"
-               MOVE    "key5k"     TO  WRK-PATHNAME
+               WHEN    "1"
+      *             MOVE    "key5s"    TO  WRK-PATHNAME
+                   MOVE    "key5js"    TO  WRK-PATHNAME
+               WHEN    "2"
+      *             MOVE    "key5k"    TO  WRK-PATHNAME
+                   MOVE    "key5jk"    TO  WRK-PATHNAME
            END-EVALUATE
+      *----(05.00.00)--UPD-END-----
       *
            MOVE    SPA-HOSPNUM     TO  YAKUJYO-HOSPNUM
            MOVE    LNK-PRTKANRI-SKYYMD

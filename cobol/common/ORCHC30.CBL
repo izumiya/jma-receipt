@@ -59,6 +59,7 @@
       *  04.08.01    NACL-森脇     14/08/08  画像イメージ作成機能追加
       *  04.08.02    NACL-森脇     16/09/06  API(GINBEE)対応
       *  04.08.03    NACL-森脇     16/11/22  服用方法コード対応
+      *  05.00.00    NACL-森脇     17/03/06  自費薬剤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1147,6 +1148,23 @@
                            "回分"              DELIMITED  BY  SIZE
                            INTO                WRK-HENSYUDATA
                    END-STRING
+      *----(05.00.00)--ADD-START---
+               WHEN    9
+                   IF      TNS-YKZKBN  =   1
+                       STRING  KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "日分"          DELIMITED  BY  SIZE
+                               INTO            WRK-HENSYUDATA
+                       END-STRING
+                   END-IF
+                   IF      TNS-YKZKBN  =   6
+                       STRING  KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "回分"          DELIMITED  BY  SIZE
+                               INTO            WRK-HENSYUDATA
+                       END-STRING
+                   END-IF
+      *----(05.00.00)--ADD-END-----
            END-EVALUATE
            PERFORM 250-HENSYU-SYORI-SEC
       *

@@ -32,6 +32,7 @@
       *  04.01.01    NACL-森脇    08/01/16  文字数増
       *  04.08.01    NACL-森脇    14/07/30  一時ファイルディレクトリ設定
       *  04.08.02    NACL-森脇    14/08/08  画像イメージ作成機能追加
+      *  05.00.00    NACL-森脇    17/03/06  自費薬剤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -991,14 +992,17 @@ grpsys                                     SPA-AREA
            INITIALIZE                  YAKUJYO-REC
            INITIALIZE                  WRK-KEY-AREA
       *
+      *----(05.00.00)--UPD-START---
            MOVE    "tbl_yakujyo"   TO  WRK-TABLE
            EVALUATE    WRK-PARA-JYO
                WHEN    "1"
                    EVALUATE    WRK-PARA-SYU
                        WHEN    "1"
-                           MOVE    "key5s"         TO  WRK-PATHNAME
+      *                     MOVE    "key5s"        TO  WRK-PATHNAME
+                           MOVE    "key5js"        TO  WRK-PATHNAME
                        WHEN    "2"
-                           MOVE    "key5k"         TO  WRK-PATHNAME
+      *                     MOVE    "key5k"        TO  WRK-PATHNAME
+                           MOVE    "key5jk"        TO  WRK-PATHNAME
                    END-EVALUATE
                WHEN    "2"
                    EVALUATE    WRK-PARA-KBN
@@ -1010,9 +1014,11 @@ grpsys                                     SPA-AREA
                                                        TO  YAKUJYO-NAME
                            EVALUATE    WRK-PARA-SYU
                                WHEN    "1"
-                                   MOVE    "key2s"     TO  WRK-PATHNAME
+      *                             MOVE    "key2s"    TO  WRK-PATHNAME
+                                   MOVE    "key2js"    TO  WRK-PATHNAME
                                WHEN    "2"
-                                   MOVE    "key2k"     TO  WRK-PATHNAME
+      *                             MOVE    "key2k"    TO  WRK-PATHNAME
+                                   MOVE    "key2jk"    TO  WRK-PATHNAME
                            END-EVALUATE
                        WHEN    "2"
                            MOVE    9                   TO  WRK-MAX
@@ -1022,9 +1028,11 @@ grpsys                                     SPA-AREA
                                                        TO  YAKUJYO-SRYCD
                            EVALUATE    WRK-PARA-SYU
                                WHEN    "1"
-                                   MOVE    "key3s"     TO  WRK-PATHNAME
+      *                             MOVE    "key3s"    TO  WRK-PATHNAME
+                                   MOVE    "key3js"    TO  WRK-PATHNAME
                                WHEN    "2"
-                                   MOVE    "key3k"     TO  WRK-PATHNAME
+      *                             MOVE    "key3k"    TO  WRK-PATHNAME
+                                   MOVE    "key3jk"    TO  WRK-PATHNAME
                            END-EVALUATE
                        WHEN    "3"
                            MOVE    10                  TO  WRK-MAX
@@ -1034,19 +1042,24 @@ grpsys                                     SPA-AREA
                                                        TO  YAKUJYO-SRYCD
                            EVALUATE    WRK-PARA-SYU
                                WHEN    "1"
-                                   MOVE    "key4s" TO  WRK-PATHNAME
+      *                             MOVE    "key4s"    TO  WRK-PATHNAME
+                                   MOVE    "key4js"    TO  WRK-PATHNAME
                                WHEN    "2"
-                                   MOVE    "key4k" TO  WRK-PATHNAME
+      *                             MOVE    "key4k"    TO  WRK-PATHNAME
+                                   MOVE    "key4jk"    TO  WRK-PATHNAME
                            END-EVALUATE
                        WHEN    "4"
                            EVALUATE    WRK-PARA-SYU
                                WHEN    "1"
-                                   MOVE    "key5s" TO  WRK-PATHNAME
+      *                             MOVE    "key5s"    TO  WRK-PATHNAME
+                                   MOVE    "key5js"    TO  WRK-PATHNAME
                                WHEN    "2"
-                                   MOVE    "key5k" TO  WRK-PATHNAME
+      *                             MOVE    "key5k"    TO  WRK-PATHNAME
+                                   MOVE    "key5jk"    TO  WRK-PATHNAME
                            END-EVALUATE
                    END-EVALUATE
            END-EVALUATE
+      *----(05.00.00)--UPD-END-----
       *
            MOVE    WRK-PARA-HOSPNUM    TO  YAKUJYO-HOSPNUM
            MOVE    LNK-PRTKANRI-SKYYMD
