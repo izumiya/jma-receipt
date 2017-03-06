@@ -56,6 +56,7 @@
       * 04.03.02     NACL-森脇     08/12/04  薬剤情報複写機能追加
       * 04.07.01     NACL-森脇     14/04/02  画像表示方法変更
       * 04.08.01     NACL-森脇     14/08/07  画像イメージ作成機能追加
+      * 05.00.00     NACL-森脇     17/03/06  自費薬剤登録対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -706,8 +707,11 @@
                    MOVE    SPA-GMN-KENCD   TO  WRK-NAME
                    PERFORM 800-TENSULIST-SET-SEC
                ELSE
-                   IF    ( KANACHK-MAX     =   9 ) AND
-                         ( SPA-GMN-KENCD(1:1)  =   "6" )
+      *----(05.00.00)--UPD-START---
+      *             IF    ( KANACHK-MAX     =   9 ) AND
+      *                   ( SPA-GMN-KENCD(1:1)  =   "6" )
+                   IF    ( KANACHK-MAX     =   9 )
+      *----(05.00.00)--UPD-END-----
                        MOVE    SPA-GMN-KENCD   TO  WRK-SRYCD
                        PERFORM 900-TENSU-READ-SEC
                        IF      FLG-TENSU       =   ZERO
@@ -2350,6 +2354,12 @@ grpsys     CALL    "ORCDBMAIN"         USING
                MOVE    WIDGET-NORMAL       TO  N21-B11-STATE
            END-IF
       *
+      *----(05.00.00)--ADD-START---
+           IF        ( SPA-NAI-YAKKAKJNCD  =   SPACE )
+               MOVE    WIDGET-INSENSITIVE  TO  N21-B11-STATE
+           END-IF
+      *----(05.00.00)--ADD-END-----
+      *
       *    複写ボタン非活性
            IF        ( SPA-GMN-JYOTAIFLG   =   ZERO )
                MOVE    SPACE               TO  N21-JYOTAI
@@ -2641,14 +2651,27 @@ grpsys     CALL    "ORCDBMAIN"         USING
                                        ORCSADDSIGNAREA
            MOVE    SADDSIGN-STR    TO  TNS-NAME
                                        TNS-KANANAME
-           MOVE    "key5"          TO  WRK-TNSPATH
+      *----(05.00.00)--UPD-START---
+      *     MOVE    "key5"          TO  WRK-TNSPATH
+           MOVE    "key2"          TO  WRK-TNSPATH
+      *----(05.00.00)--UPD-END-----
            PERFORM 900-TENSU-SELECT-SEC
       *
       *    リストセット
            MOVE    ZERO            TO  IDX
            PERFORM UNTIL ( IDX     =    200 )
                    OR    ( FLG-TENSU    =   1 )
-               PERFORM 800-LIST-TENSU-SET-SEC
+      *----(05.00.00)--ADD-START---
+               EVALUATE    TNS-SRYCD
+                   WHEN    "600000000" THRU    "699999999"
+                   WHEN    "095210001" THRU    "095279999"
+                   WHEN    "096210001" THRU    "096279999"
+                       PERFORM 800-LIST-TENSU-SET-SEC
+               END-EVALUATE
+      *----(05.00.00)--ADD-END-----
+      *----(05.00.00)--UPD-START---
+      *         PERFORM 800-LIST-TENSU-SET-SEC
+      *----(05.00.00)--UPD-END-----
                PERFORM 900-TENSU-FETCH-SEC
            END-PERFORM
       *
@@ -2799,7 +2822,12 @@ grpsys     CALL    "ORCDBMAIN"         USING
                IF      MCP-RC          =   ZERO
                    MOVE    ZERO            TO  FLG-INPUTCD
                    MOVE    MCPDATA-REC     TO  INPUTCD-REC
-                   IF      ICD-SRYCD(1:1)  =   "6"
+      *----(05.00.00)--UPD-START---
+      *             IF      ICD-SRYCD(1:1)  =   "6"
+                   EVALUATE    ICD-SRYCD
+                   WHEN    "600000000" THRU    "699999999"
+                   WHEN    "095210001" THRU    "095279999"
+                   WHEN    "096210001" THRU    "096279999"
                        MOVE    1               TO  FLG-OK
       *                入力コード同一コードチェック
                        PERFORM VARYING IDY     FROM    1   BY  1
@@ -2809,7 +2837,8 @@ grpsys     CALL    "ORCDBMAIN"         USING
                                MOVE    ZERO        TO  FLG-OK
                            END-IF
                        END-PERFORM
-                   END-IF
+                   END-EVALUATE
+      *----(05.00.00)--UPD-END-----
                ELSE
                    MOVE    1               TO  FLG-INPUTCD
                    MOVE    1               TO  FLG-OK
@@ -2894,6 +2923,17 @@ grpsys     CALL    "ORCDBMAIN"         USING
       *    点数マスタ読み込み処理
       *****************************************************************
        900-TENSU-READ-SEC          SECTION.
+      *
+      *----(05.00.00)--ADD-START---
+           EVALUATE    WRK-SRYCD
+               WHEN    "600000000" THRU    "699999999"
+               WHEN    "095210001" THRU    "095279999"
+               WHEN    "096210001" THRU    "096279999"
+                   CONTINUE
+               WHEN    OTHER
+                   GO  TO  900-TENSU-READ-EXT
+           END-EVALUATE
+      *----(05.00.00)--ADD-END-----
       *
       *    点数マスタ読み込み
            INITIALIZE                  TNS-TENSU-REC
