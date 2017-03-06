@@ -96,5 +96,17 @@
               03  Z02-B09.
                 04  Z02-B09-STATE   PIC S9(9)   BINARY.
                 04  Z02-B09-LABEL   PIC X(10).
+              03  Z02-TANICD-COMBO.
+                04  Z02-TANICD-COUNT   PIC S9(9)   BINARY.
+                04  Z02-TANICD-ITEM
+                        PIC X(28)   OCCURS  200 TIMES.
+                04  Z02-TANICD.
+                  05  Z02-TEXTDATA    PIC X(28).
+              03  Z02-YKZKBN-COMBO.
+                04  Z02-YKZKBN-COUNT   PIC S9(9)   BINARY.
+                04  Z02-YKZKBN-ITEM
+                        PIC X(12)   OCCURS  5 TIMES.
+                04  Z02-YKZKBN.
+                  05  Z02-TEXTDATA    PIC X(12).
 
 

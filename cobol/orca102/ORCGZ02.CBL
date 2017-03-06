@@ -44,6 +44,7 @@
       *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
       *  04.07.00    NACL-多々納  12/08/21  ユーザ登録複写機能追加
       *  04.08.00    NACL-多々納  16/01/20  金額チェック追加他
+      *  04.08.00    NACL-多々納  17/03/XX  薬剤対応（単位追加）
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -134,6 +135,27 @@
       *
                05  SPA-GMN-JIHINAME1           PIC X(30).
                05  SPA-GMN-JIHINAME2           PIC X(30).
+      *H29.3
+      *        単位コード
+               05  SPA-GMN-TANICD-LST          OCCURS  200.
+                   07  SPA-GMN-TANICDL         PIC X(03).
+                   07  SPA-GMN-F1L             PIC X(01).
+                   07  SPA-GMN-TANICDMEIL      PIC X(24).
+               05  SPA-GMN-TANICD-MAX          PIC 9(04).
+               05  SPA-GMN-TANICD-G.
+                   07  SPA-GMN-TANICD          PIC X(03).
+                   07  SPA-GMN-F1              PIC X(01).
+                   07  SPA-GMN-TANICDMEI       PIC X(24).
+      *        薬剤区分
+               05  SPA-GMN-YKZKBN-LST          OCCURS  5.
+                   07  SPA-GMN-YKZKBNL         PIC X(01).
+                   07  SPA-GMN-F1L             PIC X(01).
+                   07  SPA-GMN-YKZKBNMEIL      PIC X(10).
+               05  SPA-GMN-YKZKBNMAX           PIC 9(02).
+               05  SPA-GMN-YKZKBN-G.
+                   07  SPA-GMN-YKZKBN          PIC X(01).
+                   07  SPA-GMN-F1              PIC X(01).
+                   07  SPA-GMN-YKZKBNMEI       PIC X(10).
       *
                05  SPA-GMN-CUR                 PIC 9(02).
       *
@@ -151,6 +173,9 @@
                05  SPA-NAI-KEIFLG1             PIC 9(01).
                05  SPA-NAI-KEIFLG2             PIC 9(01).
                05  SPA-NAI-KEIFLG3             PIC 9(01).
+      *H29.2
+      *        薬剤対象
+               05  SPA-NAI-YKZKBN              PIC X(01).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -229,6 +254,9 @@
                05  WRK-HMM         PIC 9(02).
                05  FILLER          PIC X(01)   VALUE   ".".
                05  WRK-HDD         PIC 9(02).
+      *
+      *    単位の項目順テーブル
+           COPY    "CMTANICD.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -511,6 +539,37 @@
            ELSE
                MOVE    1               TO  SPA-NAI-USERCD
            END-IF
+      *H29.2
+      *    薬剤対応
+           MOVE    SPACE               TO  SPA-NAI-YKZKBN
+           IF      (SPA-Z01-SRYCD(1:3) =   "095"
+                                       OR  "096" )
+               IF      (SPA-Z01-SRYCD(4:2) >=  "21"
+                                       AND <=  "27"  )
+                   MOVE    "1"             TO  SPA-NAI-YKZKBN
+              END-IF
+           END-IF
+           IF      SPA-NAI-YKZKBN      =   "1"
+      *        薬剤区分
+               MOVE    "1"                 TO  SPA-GMN-YKZKBNL(1)
+               MOVE    "内用薬"            TO  SPA-GMN-YKZKBNMEIL(1)
+               MOVE    "6"                 TO  SPA-GMN-YKZKBNL(2)
+               MOVE    "外用薬"            TO  SPA-GMN-YKZKBNMEIL(2)
+               MOVE    2                   TO  SPA-GMN-YKZKBNMAX
+           END-IF
+      *    単位コード
+           MOVE    ZERO                TO  SPA-GMN-TANICD-MAX
+           IF      SPA-NAI-YKZKBN      =   "1"
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       MTANI-MAX
+                   MOVE    MTANI-TANICD  (IDXX)
+                                       TO  SPA-GMN-TANICDL   (IDXX)
+                   MOVE    MTANI-TANINAME(IDXX)
+                                       TO  SPA-GMN-TANICDMEIL(IDXX)
+                   MOVE    IDXX        TO  SPA-GMN-TANICD-MAX
+               END-PERFORM
+           END-IF
+      *
       *
       *    点数マスタ読込み
            MOVE    SPACE               TO  TNS-TENSU-REC
@@ -596,6 +655,12 @@
       *        自賠責集計等取扱
                MOVE    TNS-NAMECHGKBN      TO  SPA-GMN-GAIJIBAIKBN
                MOVE    TNS-KANANAMECHGKBN  TO  SPA-GMN-NYUJIBAIKBN
+      *H29.3
+      *        薬剤区分
+               IF      SPA-NAI-YKZKBN      =   "1"
+                   MOVE  TNS-YKZKBN        TO  SPA-GMN-YKZKBN
+               END-IF
+               MOVE    TNS-TANICD          TO  SPA-GMN-TANICD
            ELSE
       *        初期設定
                MOVE    SPA-GMN-HKNTEKKBNLST (01)
@@ -633,6 +698,36 @@
       *!! 
       *    自費集計先
            PERFORM 3012-JIHINAME-HEN-SEC
+      *
+      *H29.3
+      *    薬剤区分
+           IF      SPA-NAI-YKZKBN      =   "1"
+               IF      SPA-GMN-YKZKBN      =   ZERO
+                   MOVE    SPACE               TO  SPA-GMN-YKZKBN-G
+               END-IF
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       SPA-GMN-YKZKBNMAX
+                   IF      SPA-GMN-YKZKBN      =   SPA-GMN-YKZKBNL
+                                                               (IDXX)
+                       MOVE    SPA-GMN-YKZKBN-LST (IDXX)
+                                                   TO  SPA-GMN-YKZKBN-G
+                       MOVE    SPA-GMN-YKZKBNMAX   TO  IDXX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    単位コード
+           IF      SPA-GMN-TANICD      NOT =   SPACE
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       SPA-GMN-TANICD-MAX
+                   IF      SPA-GMN-TANICD
+                                       =   SPA-GMN-TANICDL(IDXX)
+                       MOVE    SPA-GMN-TANICD-LST (IDXX)
+                                           TO  SPA-GMN-TANICD-G
+                       MOVE    SPA-GMN-TANICD-MAX
+                                           TO  IDXX
+                   END-IF
+               END-PERFORM
+           END-IF
       *
       *    点数マスタ付加情報検索
            IF      FLG-TENSU           =   ZERO
@@ -976,6 +1071,9 @@
            MOVE    Z02-GAIJIBAIKBN     TO  SPA-GMN-GAIJIBAIKBN-G
            MOVE    Z02-NYUJIBAIKBN     TO  SPA-GMN-NYUJIBAIKBN-G
       *
+           MOVE    Z02-TANICD          TO  SPA-GMN-TANICD-G
+           MOVE    Z02-YKZKBN          TO  SPA-GMN-YKZKBN-G
+      *
            .
        4101-GMN-SPA-SET-EXT.
            EXIT.
@@ -1017,6 +1115,17 @@
            IF      SPA-ERRCD           =   SPACE
                PERFORM 506-KINGAKU-CHK-SEC
            END-IF
+      *H29.3
+      *    単位コードチェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 506-TANICD-CHK-SEC
+           END-IF
+      *H29.3
+      *    薬剤区分チェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 506-YKZKBN-CHK-SEC
+           END-IF
+      *
       *    点数欄集計先チェック
            IF      SPA-ERRCD           =   SPACE
                PERFORM 506-GAITENTTLKBN-CHK-SEC
@@ -1162,6 +1271,75 @@
            .
       *
        506-KINGAKU-CHK-EXT.
+           EXIT.
+      *H29.2
+      *****************************************************************
+      *    単位コードチェック処理
+      *****************************************************************
+       506-TANICD-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           IF      SPA-GMN-TANICD      =   SPACE
+               MOVE    SPACE           TO  SPA-GMN-TANICD-G
+               MOVE    1               TO  FLG-OK
+           END-IF
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL  (IDXX    >       SPA-GMN-TANICD-MAX)
+                       OR (FLG-OK  =   1    )
+               IF      SPA-GMN-TANICD
+                                       =   SPA-GMN-TANICDL(IDXX)
+                   MOVE    SPA-GMN-TANICD-LST (IDXX)
+                                           TO  SPA-GMN-TANICD-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0013"              TO  SPA-ERRCD
+               MOVE    23                  TO  SPA-GMN-CUR
+           END-IF
+           .
+      *
+       506-TANICD-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    薬剤区分チェック処理
+      *****************************************************************
+       506-YKZKBN-CHK-SEC          SECTION.
+      *
+           IF      SPA-NAI-YKZKBN      =   "1"
+               MOVE    ZERO                TO  FLG-OK
+               IF      SPA-GMN-YKZKBN      =   ZERO
+                                           OR  SPACE
+                   MOVE    SPACE               TO  SPA-GMN-YKZKBN-G
+                   MOVE    1                   TO  FLG-OK
+               END-IF
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL  (IDXX    >       SPA-GMN-YKZKBNMAX)
+                           OR (FLG-OK  =   1   )
+                   IF      SPA-GMN-YKZKBN      =   SPA-GMN-YKZKBNL
+                                                               (IDXX)
+                       MOVE    SPA-GMN-YKZKBN-LST (IDXX)
+                                                   TO  SPA-GMN-YKZKBN-G
+                       MOVE    1                   TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "0014"              TO  SPA-ERRCD
+                   MOVE    24                  TO  SPA-GMN-CUR
+               END-IF
+      *        金額＝ゼロはエラー
+               IF     (SPA-GMN-YKZKBN  NOT =   SPACE )
+                AND   (SPA-ERRCD           =   SPACE )
+                   IF      SPA-GMN-TEN         =   ZERO
+                       MOVE    "0015"              TO  SPA-ERRCD
+                       MOVE    24                  TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           ELSE
+               MOVE    SPACE               TO  SPA-GMN-YKZKBN-G
+           END-IF
+           .
+       506-YKZKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    保険適用チェック処理
@@ -1549,6 +1727,22 @@
                    END-IF
       *            自費集計先
                    PERFORM 3012-JIHINAME-HEN-SEC
+      *H29.3
+      *            単位コード、薬剤区分
+                   MOVE    SPACE           TO  SPA-GMN-YKZKBN-G
+                   MOVE    SPACE           TO  SPA-GMN-TANICD-G
+                   IF      SPA-NAI-YKZKBN      =   "1"
+                       IF     (SPA-Z01-SRYCD(1:3)  =   "095"
+                                                   OR  "096" )
+                         AND  (SPA-Z01-SRYCD(4:2)  >=  "21"
+                                               AND <=  "27"  )
+                           IF      TNS-YKZKBN      NOT =   ZERO
+                               MOVE    TNS-YKZKBN  TO  SPA-GMN-YKZKBN
+                           END-IF
+                           MOVE    TNS-TANICD      TO  SPA-GMN-TANICD
+                           MOVE    TNS-TANINAME    TO  SPA-GMN-TANICDMEI
+                       END-IF
+                   END-IF
            END-EVALUATE
       *
            .
@@ -2380,6 +2574,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE   ZERO                 TO  TNS-NAMECHGKBN
                MOVE   ZERO                 TO  TNS-KANANAMECHGKBN
            END-IF
+      *H29.2
+      *    薬剤区分
+           IF      SPA-NAI-YKZKBN      =   "1"
+               IF      SPA-GMN-YKZKBN      =   SPACE
+                   MOVE    ZERO                TO  TNS-YKZKBN
+               ELSE
+                   MOVE    SPA-GMN-YKZKBN      TO  TNS-YKZKBN
+               END-IF
+           END-IF
+      *    単位コード
+           MOVE    SPA-GMN-TANICD      TO  TNS-TANICD
+           MOVE    SPA-GMN-TANICDMEI   TO  TNS-TANINAME
+      *
       *****MOVE  SPA-GMN-INPCHKKBN             TO  TNSP-INPCHKKBN
            .
        4121-KOUMOKUISO-EXT.
@@ -2533,6 +2740,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  Z02-NYUJIBAIKBN-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-GMN-NYUJIBAI-MAX   TO  Z02-NYUJIBAIKBN-COUNT
+      *H29.3
+      *    単位コード
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-TANICD-MAX
+               MOVE    SPA-GMN-TANICD-LST(IDX)
+                                           TO  Z02-TANICD-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-TANICD-MAX  TO  Z02-TANICD-COUNT
+           MOVE    SPA-GMN-TANICD-G    TO  Z02-TANICD
+      *    薬剤区分
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-YKZKBNMAX
+               MOVE    SPA-GMN-YKZKBN-LST(IDX)
+                                           TO  Z02-YKZKBN-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-YKZKBNMAX   TO  Z02-YKZKBN-COUNT
+           MOVE    SPA-GMN-YKZKBN-G    TO  Z02-YKZKBN
+      *
       *v47
       *    複写元コード
            MOVE    SPA-GMN-COPYCD      TO  Z02-COPYCD
@@ -2625,6 +2850,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "INPCHKKBN"         TO  MCP-WIDGET
                WHEN    22
                    MOVE    "COPYCD"            TO  MCP-WIDGET
+               WHEN    23
+                   MOVE    "TANICD"            TO  MCP-WIDGET
+               WHEN    24
+                   MOVE    "YKZKBN"            TO  MCP-WIDGET
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -2687,6 +2916,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                WHEN    "TEN      "
                    MOVE    15                  TO  SPA-GMN-CUR
+      *H29.3
+      *            単位へ
+                   IF      SPA-NAI-YKZKBN      =   "1"
+                       MOVE    23                  TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "TANICD"
+                   IF      SPA-NAI-YKZKBN      =   "1"
+                       MOVE    24                  TO  SPA-GMN-CUR
+                   ELSE
+                       MOVE    15                  TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "YKZKBN"
+                   MOVE    15                  TO  SPA-GMN-CUR
+      *
                WHEN    "HKNTEKKBN"
                    MOVE    16                  TO  SPA-GMN-CUR
                WHEN    "GAITENTTLKBN"
@@ -2763,6 +3006,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-STRING
                WHEN    "0012"
                    STRING  "金額は自費コードでのみ設定可能です。"
+                                                   DELIMITED BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0013"
+                   STRING  "単位コードがありません。"
+                                                   DELIMITED BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0014"
+                   STRING  "薬剤区分がありません。"
+                                                   DELIMITED BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0015"
+                   STRING  "薬剤区分は金額ゼロでは登録できません。"
                                                    DELIMITED BY  SIZE
                                                    INTO    SPA-ERRMSG
                    END-STRING
