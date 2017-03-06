@@ -1080,8 +1080,11 @@
                        PERFORM 410181-SRYYM-CHANGE-SEC
                        MOVE    1                    TO  SPA-GMN-CUR-41
                    ELSE
-                       MOVE    SPA-I40-SRYYMDW(1:6) TO  SPA-GMN-SRYYM
-                       MOVE    SPA-I40-SRYYMD(1:6)  TO  SPA-NAI-SRYYM
+      *                MOVE    SPA-I40-SRYYMDW(1:6) TO  SPA-GMN-SRYYM
+      *                MOVE    SPA-I40-SRYYMD(1:6)  TO  SPA-NAI-SRYYM
+      *H29.3
+                       MOVE    SPA-MAE-GMN-SRYYM    TO  SPA-GMN-SRYYM
+                       MOVE    SPA-MAE-NAI-SRYYM    TO  SPA-NAI-SRYYM
                        MOVE    1                    TO  SPA-GMN-CUR-41
                    END-IF
       *
@@ -4069,6 +4072,9 @@
            END-IF
       *
            MOVE    07                  TO  SPA-GMN-CUR-41
+      *H29.3
+           MOVE    SPA-GMN-SRYYM       TO  SPA-MAE-GMN-SRYYM
+           MOVE    SPA-NAI-SRYYM       TO  SPA-MAE-NAI-SRYYM
       *
            MOVE    I41-SRYYM           TO  SPA-GMN-SRYYM
       *
@@ -4122,8 +4128,11 @@
            IF      SPA-UPDFLG-41       =   "1"
                MOVE    SPA-NAI-SRYYM       TO  WRK-NAI-SRYYM
                MOVE    SPA-GMN-SRYYM       TO  WRK-GMN-SRYYM
-               MOVE    SPA-I40-SRYYMDW(1:6)    TO  SPA-GMN-SRYYM
-               MOVE    SPA-I40-SRYYMD(1:6)     TO  SPA-NAI-SRYYM
+      **       MOVE    SPA-I40-SRYYMDW(1:6)    TO  SPA-GMN-SRYYM
+      **       MOVE    SPA-I40-SRYYMD(1:6)     TO  SPA-NAI-SRYYM
+      *H29.3
+               MOVE    SPA-MAE-GMN-SRYYM    TO  SPA-GMN-SRYYM
+               MOVE    SPA-MAE-NAI-SRYYM    TO  SPA-NAI-SRYYM
                PERFORM 4901-NYUINACCT-UPD-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    GO      TO       410181-SRYYM-CHANGE-EXT
@@ -7955,7 +7964,7 @@
                MOVE    SPA-NAI-SRYYM           TO  NACCT-SRYYM
                MOVE    SPA-NAI-SRYKBN-41 (IDX) TO  NACCT-SRYKBN
                MOVE    SPA-NAI-ZAINUM-41 (IDX) TO  NACCT-ZAINUM
-      *
+     *
                MOVE    NYUINACCT-REC           TO  MCPDATA-REC
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key"                   TO  MCP-PATHNAME
