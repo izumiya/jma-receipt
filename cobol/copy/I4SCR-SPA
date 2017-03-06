@@ -81,6 +81,10 @@
                    07  SPA-NAI-YOBI-G.
                        09  SPA-NAI-YOBI                  PIC X(01)
                                                          OCCURS 31.
+      *H29.3
+      *    変更前年月
+                   07  SPA-MAE-GMN-SRYYM                 PIC X(06).
+                   07  SPA-MAE-NAI-SRYYM                 PIC X(06).
       *    更新フラグ
                05  SPA-UPDFLG-41                         PIC X(01).
                05  SPA-MAE-BANGO-41                      PIC 9(03).
