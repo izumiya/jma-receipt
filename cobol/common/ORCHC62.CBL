@@ -866,7 +866,8 @@
       *        ÅÀ¿ô¸¡º÷
                PERFORM 900-TENSU-READ-SEC
                MOVE    TNS-TANINAME        TO  WRK-SHO-TANINAME
-               MOVE    TNS-NAME            TO  WRK-SHO-NAME
+      ****     MOVE    TNS-NAME            TO  WRK-SHO-NAME
+               MOVE    TNS-FORMALNAME      TO  WRK-SHO-NAME
            END-IF
       *
            MOVE    ORCHC62-SRYCD(IDX-ZAI IDX-SRY)

@@ -92,6 +92,7 @@
       * 04.08.00     NACL-多々納  16/04/XX  地域包括診療編集対応
       *                                     備考続きを処方欄へ記載
       * 04.08.00     NACL-多々納  16/11/01  残薬確認プログラムオプション対応
+      * 04.08.00     NACL-多々納  17/03/07  商品名編集対応
       *****************************************************************
       *
       *
@@ -414,6 +415,9 @@
                05  WRK-ZANSIJI2            PIC X(01).
       *H28.11
                05  WRK-ZANSIJIDEL          PIC X(01).
+      *H29.3
+      *    単位名称保存
+           03  WRK-TANINAME-7          PIC X(24).
       *
       *ＱＲ対応
            03  WRK-FILE-CNT            PIC 9(02).
@@ -697,6 +701,8 @@
       *    残薬確認区分
            03  PARA-ZANYAKU01          PIC X(01).
            03  PARA-ZANYAKU02          PIC X(01).
+      *H29.3
+           03  PARA-SHOHIN             PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -999,6 +1005,11 @@
            MOVE    "ZANYAKU_2"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-ZANYAKU02
+      *H29.3
+      *    商品名区分
+           MOVE    "SHOHIN"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-SHOHIN
       *H28.2
       *    公費備考コメント編集
            PERFORM VARYING     IDP     FROM    1   BY  1
@@ -4117,6 +4128,14 @@
                                                    TO  WRK-TNS-NAME
                    END-IF
                END-IF
+      *H29.3
+      *        商品コード対応
+               IF     (PARA-SHOHIN         =   "1"  )
+                  AND (WRK-SRYCD(1:1)      =   "7"  )
+                  AND (IDXA                >   1    )
+                   PERFORM 310319-SHOHIN-HEN-SEC
+               END-IF
+      *
                MOVE    WRK-TNS-NAME        TO  WRK-QR-NAME
            END-IF
       *    内容編集
@@ -4132,6 +4151,28 @@
       *****END-IF
            .
        31032-TENSU-HENSYU-EXT.
+           EXIT.
+      *H29.3
+      *****************************************************************
+      *    商品コード対応名称編集処理
+      *****************************************************************
+       310319-SHOHIN-HEN-SEC         SECTION.
+      *
+           IF      WRK-SRY-SRYCD (IDXA - 1)(1:3) =   "058"
+      *        単位名称保存
+               MOVE    TNS-TANINAME        TO  WRK-TANINAME-7
+      *        １行前が商品コード
+               MOVE    WRK-SRY-SRYCD (IDXA - 1)  TO  TNS-SRYCD
+               PERFORM 910-TENSU-READ-SEC
+               IF      FLG-TENSU           =   ZERO
+                   MOVE    TNS-FORMALNAME      TO  WRK-TNS-NAME
+                   IF      TNS-TANINAME    =   SPACE
+                       MOVE    WRK-TANINAME-7  TO  TNS-TANINAME
+                   END-IF
+               END-IF
+           END-IF
+           .
+       310319-SHOHIN-HEN-EXT.
            EXIT.
       *****************************************************************
       *    用法名称編集処理
