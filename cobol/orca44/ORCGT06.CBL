@@ -72,6 +72,8 @@
       *                                      （１日からの変更のみ）
       *  04.08.06    NACL-藤原    17/02/13  医療機関コード変更時のレセ電
       *                                     データ等の作成時のパラメタ修正
+      *  04.08.07    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
+      *                                     期間コード変更月のときの対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -826,6 +828,30 @@
       *
       *    診療年月期間設定処理
            PERFORM 3105-SRYYMKBN-HENSYU-SEC
+      *
+      *    月途中変更の診療年月かチェック
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-T06-SRYYMKBN-MAX
+               IF      ( SPA-NAI-T06-SRYYMKBN-ST (IDX)
+                                   <=   SPA-NAI-T06-SRYYM-H )
+               AND     ( SPA-NAI-T06-SRYYMKBN-ED (IDX)
+                                   >=   SPA-NAI-T06-SRYYM-H )
+                   IF      SPA-NAI-T06-SRYYMKBN-ERR (IDX)
+                                       =   "1"
+                       MOVE    ZERO    TO  SPA-GMN-T06-SRYYMKBN-MAX
+                       PERFORM VARYING IDX FROM    1   BY  1
+                               UNTIL   IDX >       10
+                           INITIALIZE  SPA-GMN-T06-SRYYMKBNLST (IDX)
+                       END-PERFORM
+      *****************MOVE    "0051"          TO  SPA-ERRCD
+                       MOVE
+                   "月途中に医療機関コードが変更されている診療年月です"
+                                               TO  SPA-GMN-T06-TITLE3
+                   END-IF
+                   MOVE    SPA-GMN-T06-SRYYMKBN-MAX
+                                           TO  IDX
+               END-IF
+           END-PERFORM
       *
       *    管理情報編集処理
            PERFORM 3101-ONRECE-KANRI-HENSYU-SEC
@@ -1963,9 +1989,6 @@
                                        SPA-GMN-T06-TEISYUTUSAKI4-STATE
                    END-IF
       *
-      *            診療年月期間設定処理
-                   PERFORM 3105-SRYYMKBN-HENSYU-SEC
-      *
       *            管理情報編集処理
                    PERFORM 3101-ONRECE-KANRI-HENSYU-SEC
       *
@@ -1978,26 +2001,38 @@
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
-      *        月途中変更の診療年月かチェック
-               PERFORM VARYING IDX     FROM    1   BY  1
-                       UNTIL   IDX     >       SPA-GMN-T06-SRYYMKBN-MAX
-                   IF      ( SPA-NAI-T06-SRYYMKBN-ST (IDX)
-                                       <=   SPA-NAI-T06-SRYYM-H )
-                   AND     ( SPA-NAI-T06-SRYYMKBN-ED (IDX)
-                                       >=   SPA-NAI-T06-SRYYM-H )
-                       IF      SPA-NAI-T06-SRYYMKBN-ERR (IDX)
-                                           =   "1"
-                           MOVE    ZERO    TO  SPA-GMN-T06-SRYYMKBN-MAX
-                           PERFORM VARYING IDX FROM    1   BY  1
-                                   UNTIL   IDX >       10
-                               INITIALIZE  SPA-GMN-T06-SRYYMKBNLST (IDX)
-                           END-PERFORM
-                           MOVE    "0051"      TO  SPA-ERRCD
+                IF      SPA-NAI-T06-SRYYM-H
+                                   NOT =   SPA-NAI-T06-SRYYM-OLD
+      *            診療年月期間設定処理
+                   PERFORM 3105-SRYYMKBN-HENSYU-SEC
+      *
+                   MOVE    SPACE               TO  SPA-GMN-T06-TITLE3
+      *            月途中変更の診療年月かチェック
+                   PERFORM VARYING IDX FROM    1   BY  1
+                           UNTIL   IDX >       SPA-GMN-T06-SRYYMKBN-MAX
+                       IF      ( SPA-NAI-T06-SRYYMKBN-ST (IDX)
+                                           <=   SPA-NAI-T06-SRYYM-H )
+                       AND     ( SPA-NAI-T06-SRYYMKBN-ED (IDX)
+                                           >=   SPA-NAI-T06-SRYYM-H )
+                           IF      SPA-NAI-T06-SRYYMKBN-ERR (IDX)
+                                               =   "1"
+                               MOVE    ZERO        TO
+                                               SPA-GMN-T06-SRYYMKBN-MAX
+                               PERFORM VARYING IDX FROM    1   BY  1
+                                       UNTIL   IDX >       10
+                                   INITIALIZE
+                                       SPA-GMN-T06-SRYYMKBNLST (IDX)
+                               END-PERFORM
+                               MOVE    "0051"      TO  SPA-ERRCD
+                               MOVE
+                   "月途中に医療機関コードが変更されている診療年月です"
+                                               TO  SPA-GMN-T06-TITLE3
+                           END-IF
+                           MOVE    SPA-GMN-T06-SRYYMKBN-MAX
+                                                   TO  IDX
                        END-IF
-                       MOVE    SPA-GMN-T06-SRYYMKBN-MAX
-                                               TO  IDX
-                   END-IF
-               END-PERFORM
+                   END-PERFORM
+               END-IF
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE   OR  "0051"
@@ -5938,6 +5973,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SPA-GMN-T06-NAME        TO  T06-NAME
            MOVE    SPA-GMN-T06-SRYYM       TO  T06-SRYYM
            MOVE    SPA-GMN-T06-NYUGAIKBN   TO  T06-NYUGAIKBN
+           MOVE    "red"                   TO  T06-TITLE3-STYLE
+           MOVE    SPA-GMN-T06-TITLE3      TO  T06-TITLE3
       *
            MOVE    "blue"                  TO  T06-HKNJANAME-STYLE
            IF      SPA-GMN-T06-TEISYUTUSAKI1

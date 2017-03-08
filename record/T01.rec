@@ -198,6 +198,10 @@ T01 {
       style varchar(20);
       textdata varchar(90);
     };
+    TITLE2 {
+      style varchar(20);
+      textdata varchar(50);
+    };
     SYOKBN1 {
       state int;
       isactive bool;

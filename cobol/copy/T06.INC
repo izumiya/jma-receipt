@@ -7,6 +7,8 @@
               03  T06-TITLE1       PIC X(14).
               03  T06-TITLE2-STYLE PIC X(20).
               03  T06-TITLE2       PIC X(10).
+              03  T06-TITLE3-STYLE PIC X(20).
+              03  T06-TITLE3       PIC X(50).
               03  T06-SELNUM.
                 04  T06-VALUE   PIC S9(4).
               03  T06-SRYYM.
