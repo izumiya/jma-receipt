@@ -2027,6 +2027,25 @@
           </signal>
         </widget>
       </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>TITLE2</name>
+        <x>280</x>
+        <y>66</y>
+        <width>350</width>
+        <height>24</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>医療機関コードが月途中変更の月です</label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
+        <wrap>False</wrap>
+      </widget>
     </widget>
   </widget>
 </GTK-Interface>

@@ -204,6 +204,8 @@
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
       *  04.08.11    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.12    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
+      *                                     期間コード変更月のときの対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1506,6 +1508,31 @@ grpsys                                         SPA-AREA
       *
       *    診療年月期間設定処理
            PERFORM 3105-SRYYMKBN-HENSYU-SEC
+      *
+      *    月途中変更の診療年月かチェック
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-SRYYMKBN-MAX
+               IF      ( SPA-NAI-SRYYMKBN-ST (IDX)
+                                   <=   SPA-NAI-SKYYM )
+               AND     ( SPA-NAI-SRYYMKBN-ED (IDX)
+                                   >=   SPA-NAI-SKYYM )
+                   IF      SPA-NAI-SRYYMKBN-ERR (IDX)
+                                       =   "1"
+                       MOVE    ZERO    TO  SPA-GMN-SRYYMKBN-MAX
+                       PERFORM VARYING IDX FROM    1   BY  1
+                               UNTIL   IDX >       10
+                           INITIALIZE  SPA-GMN-SRYYMKBNLST (IDX)
+                       END-PERFORM
+      *****************MOVE    "0051"      TO  SPA-ERRCD
+      *
+                       MOVE
+                   "月途中に医療機関コードが変更されている診療年月です"
+                                           TO  SPA-GMN-TITLE2
+                   END-IF
+                   MOVE    SPA-GMN-SRYYMKBN-MAX
+                                           TO  IDX
+               END-IF
+           END-PERFORM
       *
       *    未実施の未請求解除データのチェック処理
            PERFORM 3101-SYUKA-CHECK-SEC
@@ -3351,6 +3378,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    SPACE           TO  SPA-GMN-TITLE
                                            SPA-GMN-TITLE1
+                                           SPA-GMN-TITLE2
                MOVE    1               TO  SPA-GMN-CUR
            ELSE
                IF      SPA-NAI-SKYYM  NOT =   WRK-SKYYM-OLD
@@ -3876,6 +3904,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                PERFORM 3105-SRYYMKBN-HENSYU-SEC
       *
       *        月途中変更の診療年月かチェック
+               MOVE    SPACE           TO  SPA-GMN-TITLE2
+      *
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL   IDX     >       SPA-GMN-SRYYMKBN-MAX
                    IF      ( SPA-NAI-SRYYMKBN-ST (IDX)
@@ -3890,6 +3920,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                                INITIALIZE  SPA-GMN-SRYYMKBNLST (IDX)
                            END-PERFORM
                            MOVE    "0051"      TO  SPA-ERRCD
+                           MOVE    2           TO  SPA-GMN-CUR
+      *
+                           MOVE
+                  "月途中に医療機関コードが変更されている診療年月です"
+                                               TO  SPA-GMN-TITLE2
                        END-IF
                        MOVE    SPA-GMN-SRYYMKBN-MAX
                                                TO  IDX
@@ -7069,9 +7104,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        490-KAKUNIN-SEC            SECTION.
       *
-      *??
-           DISPLAY "490-KAKUNIN-SEC"
-      *??
            MOVE    ZERO                TO  WRK-PRT-PAGE
                                            WRK-PRT-PAGE1
                                            WRK-PRT-PAGE2
@@ -7382,8 +7414,10 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-GMN-HKNJAMEI1   TO  T01-HKNJAMEI1
            MOVE    SPA-GMN-TITLE       TO  T01-TITLE-VALUE
            MOVE    SPA-GMN-TITLE1      TO  T01-TITLE1-VALUE
+           MOVE    SPA-GMN-TITLE2      TO  T01-TITLE2-VALUE
            MOVE   "red"                TO  T01-TITLE-STYLE
                                            T01-TITLE1-STYLE
+                                           T01-TITLE2-STYLE
       *
            MOVE    SPA-B06-STATE       TO  T01-B06-STATE
            MOVE    SPA-B07-STATE       TO  T01-B07-STATE

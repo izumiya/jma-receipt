@@ -88,6 +88,8 @@
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
       *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.05    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
+      *                                     期間コード変更月のときの対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -180,11 +182,12 @@
                        09  SPA-GMN-PRTKBN5-STYLE   PIC X(20).
                        09  SPA-GMN-PRTKBN5-VALUE   PIC X(04).
                    07  SPA-GMN-HKNJANUM            PIC X(08).
-                   07  SPA-GMN-HKNJAMEI            PIC X(50). 
+                   07  SPA-GMN-HKNJAMEI            PIC X(50).
                    07  SPA-GMN-HKNJANUM1           PIC X(08).
-                   07  SPA-GMN-HKNJAMEI1           PIC X(50). 
-                   07  SPA-GMN-TITLE               PIC X(108). 
-                   07  SPA-GMN-TITLE1              PIC X(90). 
+                   07  SPA-GMN-HKNJAMEI1           PIC X(50).
+                   07  SPA-GMN-TITLE               PIC X(108).
+                   07  SPA-GMN-TITLE1              PIC X(90).
+                   07  SPA-GMN-TITLE2              PIC X(50).
       *
                05  SPA-NAIB-T01-AREA.
                    07  SPA-NAI-WIDGET              PIC X(08).
