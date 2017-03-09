@@ -206,6 +206,7 @@
       *  04.08.11    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *  04.08.12    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
       *                                     期間コード変更月のときの対応
+      *  04.08.13    NACL-藤原    17/03/09  期間表示の設定の追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -7592,9 +7593,11 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF      SPA-GMN-SRYYMKBN-MAX
                                        =   ZERO
-               MOVE    "F"         TO  T01-SRYYMKBN-COM-VISIBLE
+               MOVE    "F"                 TO  T01-SRYYMKBN-COM-VISIBLE
+               MOVE    WIDGET-INSENSITIVE  TO  T01-SRYYMKBN-COM-STATE
            ELSE
-               MOVE    "T"         TO  T01-SRYYMKBN-COM-VISIBLE
+               MOVE    "T"                 TO  T01-SRYYMKBN-COM-VISIBLE
+               MOVE    WIDGET-NORMAL       TO  T01-SRYYMKBN-COM-STATE
                MOVE    SPA-GMN-SRYYMKBN-G
                                    TO  T01-SRYYMKBN
                PERFORM VARYING IDX FROM    1   BY  1

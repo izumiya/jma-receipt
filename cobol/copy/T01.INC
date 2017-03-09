@@ -17,6 +17,7 @@
               03  T01-B21-STATE   PIC S9(9)   BINARY.
               03  T01-B22-STATE   PIC S9(9)   BINARY.
               03  T01-SRYYMKBN-COMBO.
+                04  T01-SRYYMKBN-COM-STATE    PIC S9(9)   BINARY.
                 04  T01-SRYYMKBN-COM-VISIBLE  PIC X(01).
                 04  T01-SRYYMKBN.
                   05  T01-VALUE    PIC X(18).
