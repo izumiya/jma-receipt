@@ -74,6 +74,7 @@
       *                                     データ等の作成時のパラメタ修正
       *  04.08.07    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
       *                                     期間コード変更月のときの対応
+      *  04.08.08    NACL-藤原    17/03/09  期間表示の設定の追加
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -6039,9 +6040,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
       *
            IF      SPA-GMN-T06-SRYYMKBN-MAX
                                        =   ZERO
-               MOVE    "F"         TO  T06-SRYYMKBN-COM-VISIBLE
+               MOVE    "F"                 TO  T06-SRYYMKBN-COM-VISIBLE
+               MOVE    WIDGET-INSENSITIVE  TO  T06-SRYYMKBN-COM-STATE
            ELSE
-               MOVE    "T"         TO  T06-SRYYMKBN-COM-VISIBLE
+               MOVE    "T"                 TO  T06-SRYYMKBN-COM-VISIBLE
+               MOVE    WIDGET-NORMAL       TO  T06-SRYYMKBN-COM-STATE
                MOVE    SPA-GMN-T06-SRYYMKBN-G
                                    TO  T06-SRYYMKBN
                PERFORM VARYING IDX FROM    1   BY  1
