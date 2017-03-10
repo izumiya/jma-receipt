@@ -147,6 +147,10 @@
       *  04.08.01    NACL-小豆沢  17/02/28  医保以外で特定入院料を算定した場合に
       *                                     F-19（行為明細区分情報）２桁目の
       *                                     入院料包括項目区分を暫定セットする
+      *  05.00.00    NACL-小豆沢  17/03/06  未コード化特定器材コード廃止対応
+      *                                     平成２９年４月診療分から包括保険で
+      *                                     ０５９ｘｘｘｘｘｘの入力はエラーとする。
+      *                                     （点数がゼロ点以外の場合のみ）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2135,7 +2139,7 @@
                             MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
                          END-IF
                          IF  (TNS-CDKBN-KBNNUM      =  400)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  3)
+                             (TNS-CDKBN-KOUBAN      =  3)
                             MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
                          END-IF
                        END-IF
@@ -2769,6 +2773,30 @@
                        MOVE    RECE65-SRYCD (IDX)
                                                 TO  WRK-KIZAI-SRYCD
                        MOVE    "777770000"      TO  RECE65-SRYCD (IDX)
+                       IF      RECE65-SRYYM     >=  "201704"
+                           INITIALIZE                      TNS-TENSU-REC
+                           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+                           MOVE    WRK-KIZAI-SRYCD     TO  TNS-SRYCD
+                           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+                           PERFORM 900-TENSU-READ-SEC
+                           IF      FLG-TENSU     =   ZERO
+                             IF    TNS-TEN       =   ZERO
+                               CONTINUE
+                             ELSE
+                               STRING
+                                 "０５９で始まる「その他材料」コード"
+                                                    DELIMITED  BY  SIZE
+                                 "が使用されています　患者番号＝"
+                                                    DELIMITED  BY  SIZE
+                                 RECE62-PTNUM       DELIMITED  BY  SIZE
+                                              INTO  WRK-RECEERR
+                               END-STRING
+                               PERFORM 500-ERR-HENSYU-SEC
+                               MOVE   "tokutei-kizai err" TO  WRK-ERRMSG
+                               PERFORM 500-COBABORT-SEC
+                             END-IF
+                           END-IF
+                       END-IF
                    END-IF
       *
                    EVALUATE    RECE65-SRYCD (IDX) (1:1)
