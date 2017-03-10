@@ -2340,12 +2340,12 @@
       *
       *H28.6
       *    ginbee対応
-           IF     (SPA-MW              =   SPA-GINBEE )
-              AND (FLG-PTMEMOINF       =   ZERO       )
+      *    IF     (SPA-MW              =   SPA-GINBEE )
+      *       AND (FLG-PTMEMOINF       =   ZERO       )
       *        AIP CLAIM送信処理
-               PERFORM 49061-API-CLMAI-SEC
-               GO  TO  213-SOUSIN-EXT
-           END-IF
+      *        PERFORM 49061-API-CLMAI-SEC
+      *        GO  TO  213-SOUSIN-EXT
+      *    END-IF
       *
            IF      FLG-PTMEMOINF       =   ZERO
       *        ＣＬＡＩＭ接続チェック処理
@@ -2353,6 +2353,7 @@
                IF      FLG-CLAIM       =   1
       *            送信
                    PERFORM 4906-CLAIM-SOUSIN-SEC
+                   PERFORM 49061-API-CLMAI-SEC
                END-IF
            ELSE
                MOVE    "9000"              TO  SPA-ERRCD

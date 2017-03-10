@@ -4965,16 +4965,17 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *
            IF      FLG-CLAIM       =   1 
                PERFORM 4906-CLAIM-SOUSIN-SEC
+               PERFORM 49061-API-CLMAI-SEC
            END-IF
       *!!!!
       *H28.6
       *    ginbee対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-             AND  (SPA-ERRCD           =   SPACE     )
-             AND  (SPA-GMN-PTNUM   NOT =   SPACE     )
+      *    IF     (SPA-MW              =   SPA-GINBEE)
+      *      AND  (SPA-ERRCD           =   SPACE     )
+      *      AND  (SPA-GMN-PTNUM   NOT =   SPACE     )
       *        AIP CLAIM送信処理
-               PERFORM 49061-API-CLMAI-SEC
-           END-IF
+      *        PERFORM 49061-API-CLMAI-SEC
+      *    END-IF
       *
       *
       *    ユーザプログラム起動

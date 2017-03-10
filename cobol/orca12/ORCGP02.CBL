@@ -3072,16 +3072,17 @@
       *    £Ã£Ì£Á£É£ÍÁ÷¿®
            IF      SPA-FLG-CLAIM       =   1
                PERFORM 4906-CLAIM-SOUSIN-SEC
+               PERFORM 49061-API-CLMAI-SEC
            END-IF
       *!!!!
       *H28.6
       *    ginbeeÂÐ±þ
-           IF     (SPA-MW              =   SPA-GINBEE)
-             AND  (SPA-ERRCD           =   SPACE     )
-             AND  (SPA-GMN-PTNUM   NOT =   SPACE     )
+      *    IF     (SPA-MW              =   SPA-GINBEE)
+      *      AND  (SPA-ERRCD           =   SPACE     )
+      *      AND  (SPA-GMN-PTNUM   NOT =   SPACE     )
       *        AIP CLAIMÁ÷¿®½èÍý
-               PERFORM 49061-API-CLMAI-SEC
-           END-IF
+      *        PERFORM 49061-API-CLMAI-SEC
+      *    END-IF
       *
       *
       **** IF      SPA-MACHIPG         =   "U02"  OR  "K02" OR "Q02"
