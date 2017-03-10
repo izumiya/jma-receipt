@@ -136,6 +136,7 @@
       *  04.08.01    NACL-多々納  16/10/04  要介護情報表示区分追加
       *  04.08.00    NACL-多々納  16/11/XX  投薬投与量チェック区分対応
       *  04.08.00    NACL-多々納  16/12/XX  病名表示区分に追加対応
+      *  04.08.00    NACL-多々納  17/03/XX  訂正時の自動発生（処方料）追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -212,6 +213,16 @@
                            11  SPA-GMN-TEISEITOKU       PIC X(01).
                            11  SPA-GMN-TEISEIH1         PIC X(01).
                            11  SPA-GMN-TEISEITOKUMEI    PIC X(10).
+      *H29.3
+      *                訂正時の展開（処方料）
+                       09  SPA-GMN-TEISHOHOU-G.
+                           11  SPA-GMN-TEISHOHOU        PIC X(01).
+                           11  SPA-GMN-TEISHOH1         PIC X(01).
+                           11  SPA-GMN-TEISHOHOU-MEI    PIC X(10).
+                       09  SPA-GMN-TEISHOHOU-COMB.
+                           11  SPA-GMN-TEISHOHOU-LIST    PIC X(12)
+                                                         OCCURS  2.
+                       09  SPA-TEISHOHOU-MAX             PIC 9(02).
       *
       *                外来管理加算チェック
                        09  SPA-GMN-GAIKANRIKBN-G.
@@ -1882,6 +1893,13 @@
            MOVE    "1 すべてを対象"
                                        TO  SPA-GMN-TOUYOCHK-LIST (2)
            MOVE    2                   TO  SPA-GMN-TOUYOCHK-MAX
+      *H29.3
+      *    訂正時の展開（処方料）
+           MOVE    "0 展開しない"
+                                       TO  SPA-GMN-TEISHOHOU-LIST (1)
+           MOVE    "1 展開する"
+                                       TO  SPA-GMN-TEISHOHOU-LIST (2)
+           MOVE    2                   TO  SPA-TEISHOHOU-MAX
       *
       *
       *    病名表示区分
@@ -2611,6 +2629,10 @@
       *        訂正時の自動発生（入院）
                MOVE    SYS-1008-TEINYUAUTO-FLG
                                        TO  SPA-GMN-TEINYUAUTO
+      *H29.3
+      *        訂正時の自動発生（処方料）
+               MOVE    SYS-1008-TEISHOHOU-FLG
+                                       TO  SPA-GMN-TEISHOHOU
       *        病名からの自動発生
                MOVE    SYS-1008-BYOMEIAUTO-FLG
                                        TO  SPA-GMN-BYOMEIAUTO
@@ -2836,6 +2858,25 @@
       *    初期値は’０’とする
            IF      FLG-OK              =   ZERO
                MOVE    SPA-GMN-DATALST(01) TO SPA-GMN-TEISEITOKU-G
+           END-IF
+      *H29.3
+      *    訂正時の展開（処方料）
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-TEISHOHOU-MAX
+               IF      SPA-GMN-TEISHOHOU
+                                       =   SPA-GMN-TEISHOHOU-LIST(IDY)
+                                                        (1:1)
+                   MOVE    SPA-GMN-TEISHOHOU-LIST(IDY)
+                                           TO SPA-GMN-TEISHOHOU-G
+                   MOVE    1               TO  FLG-OK
+                   MOVE    SPA-TEISHOHOU-MAX   TO  IDY
+               END-IF
+           END-PERFORM
+      *    初期値は’０’とする
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-TEISHOHOU-LIST(01)
+                                           TO SPA-GMN-TEISHOHOU-G
            END-IF
       *
       *    包括まとめ
@@ -5504,6 +5545,8 @@
            MOVE    W07-TEISEITOKU      TO  SPA-GMN-TEISEITOKU-G
       *    訂正時の自動発生（入院）
            MOVE    W07-TEINYUAUTO      TO  SPA-GMN-TEINYUAUTO-G
+      *    訂正時の展開（処方料）
+           MOVE    W07-TEISHOHOU       TO  SPA-GMN-TEISHOHOU-G
       *    病名からの自動発生
            MOVE    W07-BYOMEIAUTO      TO  SPA-GMN-BYOMEIAUTO-G
       *    入院時初回加算の自動発生
@@ -5772,6 +5815,11 @@
       *            訂正時の自動発生（入院）
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4103-TEINYUAUTO-CHK-SEC
+                   END-IF
+      *H29.3
+      *            訂正時の展開（処方料）
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4103-TEISHOHOU-CHK-SEC
                    END-IF
       *            相互作用チェック期間
                    IF      SPA-ERRCD           =   SPACE
@@ -6671,6 +6719,33 @@
       *
            .
        4103-TEISEITOKU-CHK-EXT.
+           EXIT.
+      *H29.3
+      *****************************************************************
+      *    訂正時の展開（処方料）チェック処理
+      *****************************************************************
+       4103-TEISHOHOU-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+      *
+           PERFORM VARYING     IDY     FROM    1   BY  1
+                   UNTIL      (IDY     >   SPA-TEISHOHOU-MAX)
+                           OR (FLG-OK      =   1   )
+               IF      SPA-GMN-TEISHOHOU  =   SPA-GMN-TEISHOHOU-LIST
+                                                         (IDY)(1:1)
+                   MOVE    SPA-GMN-TEISHOHOU-LIST (IDY)
+                                           TO  SPA-GMN-TEISHOHOU-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-OK              =   ZERO
+               MOVE    "0046"              TO  SPA-ERRCD
+               MOVE    36                  TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4103-TEISHOHOU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    検体検査加算自動発生チェック処理
@@ -10629,6 +10704,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-TEISEIAUTO      TO  SYS-1008-TEISEIAUTO-FLG
       *    訂正時の自動発生（特定疾患処方管理）
            MOVE    SPA-GMN-TEISEITOKU      TO  SYS-1008-TEISEITOKU-FLG
+      *    訂正時の展開（処方料）
+           MOVE    SPA-GMN-TEISHOHOU       TO  SYS-1008-TEISHOHOU-FLG
       *    病名表示区分
            MOVE    SPA-GMN-BYOHYOKBN       TO  SYS-1008-BYOHYOKBN-FLG
       *    剤登録順区分
@@ -11412,6 +11489,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-TEISEITOKU-ITEM(IDY)
            END-PERFORM
            MOVE    SPA-GMN-DATA-MAX    TO  W07-TEISEITOKU-COUNT
+      *
+      *H29.3
+      *    訂正時の自動発生（特定疾患処方管理）
+           MOVE    SPA-GMN-TEISHOHOU-G    TO  W07-TEISHOHOU
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-TEISHOHOU-MAX
+               MOVE    SPA-GMN-TEISHOHOU-LIST(IDY)
+                                       TO  W07-TEISHOHOU-ITEM(IDY)
+           END-PERFORM
+           MOVE    SPA-TEISHOHOU-MAX   TO  W07-TEISHOHOU-COUNT
       *
            MOVE  SPA-GMN-LAST-KIKAN    TO  W07-LASTKIKAN
       *
@@ -12810,6 +12897,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0045"
                    MOVE    "薬剤投与量チェック区分エラー"
                                                        TO  SPA-ERRMSG
+      *H29.3
+               WHEN    "0046"
+                   MOVE    "訂正時の展開（処方料）区分エラー"
+                                                       TO  SPA-ERRMSG
       *        
                WHEN    "1001"
                    MOVE    "カルテの病名対象区分がありません。"
@@ -13256,6 +13347,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "SURYOZERO"       TO   MCP-WIDGET
                WHEN    34
                    MOVE  "CHOKICHK"        TO   MCP-WIDGET
+      *H29.3
+               WHEN    36
+                   MOVE  "TEISHOHOU"       TO   MCP-WIDGET
       *
                WHEN    81
                    MOVE  "CLEARCHK"        TO   MCP-WIDGET
@@ -13676,6 +13770,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "TEISEITOKU"
                    MOVE    20              TO  SPA-GMN-CUR
                WHEN    "TEINYUAUTO"
+      *********    MOVE    30              TO  SPA-GMN-CUR
+                   MOVE    36              TO  SPA-GMN-CUR
+      *H29.3
+               WHEN    "TEISHOHOU"
                    MOVE    30              TO  SPA-GMN-CUR
                WHEN    "KIKAN"
      ******        MOVE    31              TO  SPA-GMN-CUR

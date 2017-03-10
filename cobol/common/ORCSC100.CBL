@@ -2448,6 +2448,10 @@
            IF      SPA-GENECHG-KBN     =   1
                MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
            END-IF
+      *    後発品変更可（処方毎）有
+           IF      SPA-GENECHG-KBN     =   2
+               MOVE    "2"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z   >   WRK-MAX      )
                MOVE    WRK-GMN-INPUTCD(IDX-Z)
@@ -2534,6 +2538,11 @@
              OR  ((SPA-SRYKBN-CNT (09) >   ZERO      )  AND
                   (SPA-SRYYMD          >=  "20130701")  AND
                   (SPA-HKNKBN          =   1         ))
+      *!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      *H29.3 ???
+      *** 注加算チェック対応
+               OR (LNK-ORCSC-KBN       =   "2"  )
+      *
                CALL    "ORCSC10"       USING
                                        MCPAREA
                                        ORCSC00AREA

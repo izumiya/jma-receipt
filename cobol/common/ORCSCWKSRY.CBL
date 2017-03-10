@@ -49,6 +49,7 @@
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *  04.08.00    NACL-多々納  16/08/XX  持参薬対応
       *  04.08.00    NACL-多々納  17/02/XX  在宅実績加算２削除対応
+      *  04.08.00    NACL-多々納  17/03/XX  Ｈ２９年４月改正対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -252,6 +253,12 @@
            03  WRK-ZS-GRP                  PIC X(02).
            03  WRK-ZS-KBN                  PIC X(01).
            03  WRK-ZS-KBN2                 PIC X(01).
+      *
+           03  FLG-CHKAUTO                 PIC 9(01).
+           03  FLG-CHKEND                  PIC 9(01).
+           03  IDXZ                        PIC 9(04).
+           03  WRK-ZKS-GRP             PIC X(02).
+           03  WRK-ZKS-KBN             PIC X(01).
       *
       *TEST
       *    収納集計点数内容
@@ -793,6 +800,25 @@
                            MOVE    1               TO  FLG-AUTO-NASI
                        END-IF
                    END-IF
+      *!!!!
+      *H29.3
+      *            処方料を訂正時展開する
+                   IF     (SPA-SRYYMD              >=  "20160401")
+                     AND  (SPA-TEISHOHOU-FLG       =   "1"      )
+                     AND  (ORCSCWKSRY-SYORIFLG     =   ZERO     )
+                     AND  (LNK-WKSRY-AUTOKBN(IDX IDY)  =  "3"   )
+                     AND  (LNK-WKSRY-SRYSYUKBN(IDX)    =  "250"
+                                                       OR "260" )
+      *
+                       IF      LNK-WKSRY-SRYCD (IDX IDY)
+                                                  =   "120000110"
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO           TO  FLG-HEN-CHK
+                           MOVE    SPACE          TO  LNK-WKSRY-AUTOKBN
+                                                            (IDX IDY)
+                       END-IF
+                   END-IF
       *
                    IF      FLG-HEN-CHK         =   ZERO
                        PERFORM 10020-SPA-HEN-SEC
@@ -1299,15 +1325,59 @@
                    MOVE    TBL-ZS-KBN2(TBL-ZSIDX)  TO  WRK-ZS-KBN2
            END-SEARCH
       *
-           IF     (SPA-COM-DATAKBN(IDX-1) =  "1"  )
-              AND (WRK-ZS-GRP         NOT =   SPACE )
-      *        直下に自動発生分がない場合、自動発生なしとする
-               IF     (SPA-COM-AUTOKBN (IDX-1 + 1) =   SPACE)
+           IF     (WRK-ZS-GRP(1:1)        =   "0"
+                                          OR  "1" )
+      *
+               MOVE    ZERO              TO  FLG-CHKEND
+               MOVE    ZERO              TO  FLG-CHKAUTO
+               PERFORM VARYING     IDX   FROM    IDX-1   BY  1
+                       UNTIL      (IDX   >   SPA-MAX-LINE )
+                           OR   ((SPA-COM-INPUTCD(IDX) =   SPACE) AND
+                                 (SPA-GMN-INPUTCD(IDX) =   SPACE))
+                           OR   ( FLG-CHKEND           =    1   )
+                   IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "1"  )
+                      AND (SPA-COM-AUTOKBN(IDX)        =   "2"  )
+      *                在宅実績加算のチェック
+                       PERFORM 330811-ZISOKSN-CHK-SEC
+      *                在宅実績加算が自動発生分
+                       IF     (WRK-ZKS-GRP(1:1)    =   "0"
+                                                   OR  "1"    )
+                           MOVE    1               TO  FLG-CHKAUTO
+                       END-IF
+                   END-IF
+                   IF      SPA-COM-ZAIEND (IDX)     =   "1"
+                       MOVE    1                    TO  FLG-CHKEND
+                   END-IF
+               END-PERFORM
+               IF      FLG-CHKAUTO        =   1
+                   CONTINUE
+               ELSE
+      *            在宅実績加算が自動発生でない時自動発生なしとする
                    MOVE    "1"             TO  SPA-COM-KSNAUTO(IDX-1)
                END-IF
            END-IF
            .
        10026-ZAITAKU-AUTO-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅実績加算処理
+      *****************************************************************
+       330811-ZISOKSN-CHK-SEC         SECTION.
+      *
+           SET     TBL-ZKSIDX          TO  1
+           SEARCH  TBL-ZISOKSN-OCC     VARYING   TBL-ZKSIDX
+              AT   END
+                   MOVE    SPACE                   TO  WRK-ZKS-KBN
+                   MOVE    SPACE                   TO  WRK-ZKS-GRP
+              WHEN   (TBL-ZKS-SRYCD (TBL-ZKSIDX)
+                                       =   SPA-COM-INPUTCD
+                                                        (IDX))
+                   MOVE    TBL-ZKS-GRP (TBL-ZKSIDX) TO  WRK-ZKS-GRP
+                   MOVE    TBL-ZKS-KBN (TBL-ZKSIDX) TO  WRK-ZKS-KBN
+           END-SEARCH
+           .
+       330811-ZISOKSN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2112,8 +2182,8 @@
            END-IF
       *
       *    処方料・処方せん料は対象外とする
-           IF      LNK-WKSRY-SRYSYUKBN (IDX)  =   "250"  OR
-                                                  "820"
+           IF      LNK-WKSRY-SRYSYUKBN (IDX)  =   "250"
+                                              OR  "820"
                EVALUATE    LNK-WKSRY-SRYCD(IDX IDY)
       *            長期投与加算（処方せん）
                    WHEN    "120003270"

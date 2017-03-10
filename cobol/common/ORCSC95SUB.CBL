@@ -477,6 +477,18 @@
                    MOVE    SYS-1008-TOUYOCHK-FLG
                                            TO  SPA-TOUYOCHK-FLG
                END-IF
+      *H29.3
+      *        訂正時の展開（処方料）
+               IF      SYS-1008-TEISHOHOU-FLG   =   SPACE
+                   MOVE    "0"             TO  SPA-TEISHOHOU-FLG
+               ELSE
+                   MOVE    SYS-1008-TEISHOHOU-FLG
+                                           TO  SPA-TEISHOHOU-FLG
+               END-IF
+      *        平成２９年４月以降有効とする
+               IF      SPA-SRYYMD          <   "20160401"
+                   MOVE    "0"             TO  SPA-TEISHOHOU-FLG
+               END-IF
            ELSE
                MOVE    ZERO                TO  SPA-INTERACT-KIKAN
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
@@ -514,6 +526,9 @@
       *H28.11
       *        薬剤投与量チェック
                MOVE    "0"                 TO  SPA-TOUYOCHK-FLG
+      *H29.3
+      *        訂正時の展開（処方料）
+               MOVE    "0"                 TO  SPA-TEISHOHOU-FLG
            END-IF
       *    診察料自動発生なしは、時間外加算なし
            IF      SPA-INITAUTO-FLG    =   "0"
@@ -1453,6 +1468,18 @@
                    MOVE    SYS-1008-TOUYOCHK-FLG
                                            TO  SPA-TOUYOCHK-FLG
                END-IF
+      *H29.3
+      *        訂正時の展開（処方料）
+               IF      SYS-1008-TEISHOHOU-FLG   =   SPACE
+                   MOVE    "0"             TO  SPA-TEISHOHOU-FLG
+               ELSE
+                   MOVE    SYS-1008-TEISHOHOU-FLG
+                                           TO  SPA-TEISHOHOU-FLG
+               END-IF
+      *        平成２９年３月以降有効とする
+               IF      SPA-SRYYMD          <   "20160401"
+                   MOVE    "0"             TO  SPA-TEISHOHOU-FLG
+               END-IF
            ELSE
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
       *        検体検査加算自動発生
@@ -1461,6 +1488,9 @@
       *        時間外緊急院内チェック
                MOVE    "1"                 TO  SPA-JGAIKEIKBN-FLG
                MOVE    "0"                 TO  SPA-TOUYOCHK-FLG
+      *H29.3
+      *        訂正時の展開（処方料）
+               MOVE    "0"                 TO  SPA-TEISHOHOU-FLG
            END-IF
       *
            .

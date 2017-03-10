@@ -68,6 +68,7 @@
       *  04.08.00    NACL-多々納  16/04/2X  向精神薬逓減の内服逓減対応
       *  04.08.00    NACL-多々納  16/08/2X  認知症地域包括の投薬対応
       *                                     入院時持参薬対応
+      *  04.08.00    NACL-多々納  17/03/XX  処方料訂正展開対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -178,6 +179,13 @@
            03  FLG-TAZAI-ARI           PIC 9(01).
            03  FLG-NASI                PIC 9(01).
            03  FLG-ARI2                PIC 9(01).
+      *H29.3
+           03  FLG-SYOHOU2             PIC 9(01).
+           03  FLG-GENKSN2             PIC 9(01).
+           03  FLG-SYOHOUMD2           PIC 9(01).
+           03  FLG-TAZAI12             PIC 9(01).
+           03  FLG-250IN               PIC 9(01).
+           03  FLG-SGEM                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -243,6 +251,11 @@
            03  IDX-NINCHI          PIC 9(04).
            03  IDX-NINYK           PIC 9(04).
            03  IDX-NINYK2          PIC 9(04).
+      *H29.3
+           03  IDX-SYOHOU2         PIC 9(04).
+           03  IDX-SYOHOUMD2       PIC 9(04).
+           03  IDX-G2              PIC 9(04).
+           03  IDX-SGEM            PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -2542,6 +2555,14 @@
       *H28.4
            MOVE    ZERO                TO  FLG-GENERIC-NO
            MOVE    ZERO                TO  CNT-GENERIC
+      *#######
+      *H29.3
+           MOVE    ZERO                TO  IDX-SYOHOU2
+           MOVE    ZERO                TO  IDX-G2
+           MOVE    ZERO                TO  FLG-SYOHOU2
+           MOVE    ZERO                TO  FLG-GENKSN2
+           MOVE    ZERO                TO  FLG-SYOHOUMD2
+           MOVE    ZERO                TO  IDX-SYOHOUMD2
       *
            INITIALIZE                  WRK-HKNCOMBI-AREA
       *
@@ -2776,6 +2797,39 @@
                    MOVE    1                   TO  FLG-TAZAI2
                    MOVE    IDX                 TO  IDX-Z2
                END-IF
+      *#######
+      *H29.3
+      *        処方料入力チェック
+               EVALUATE    WRK-COM-INPUTCD (IDX)
+      *            処方料
+                   WHEN    "120001210"
+                   WHEN    "120002610"
+                   WHEN    CONS-TAZAI-SYOHOU
+                       IF     (IDX-SYOHOU      NOT =   ZERO )
+                         OR   (IDX-SYOHOU2     NOT =   ZERO )
+      *                    処方料・処方箋料は１件
+                           MOVE    "1021"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR(IDX)
+                       ELSE
+                           MOVE    IDX             TO  IDX-SYOHOU2
+                           MOVE    1               TO  FLG-SYOHOU2
+                       END-IF
+                   WHEN    CONS-GEN-KSN1
+                   WHEN    CONS-GEN-KSN2
+      *            外来後発医薬品使用体制加算
+                       MOVE    1                   TO  FLG-GENKSN2
+                       MOVE    IDX                 TO  IDX-G2
+                   WHEN    "120001310"
+      *            麻毒処方料麻毒加算
+                       MOVE    1                   TO  FLG-SYOHOUMD2
+                       MOVE    IDX                 TO  IDX-SYOHOUMD2
+                   WHEN    CONS-TEIHP-SYOHOU
+      *            処方料減算（低紹介率）
+                       MOVE    1                   TO  FLG-SGEM
+                       MOVE    IDX                 TO  IDX-SGEM
+               END-EVALUATE
+      *#######
+      *
       *        抗精神薬剤チェック編集
                IF     (WRK-CHK-SRYSYUKBN(1:2)  =   "21"
                                                OR  "22"
@@ -2818,13 +2872,13 @@
                END-IF
            END-IF
       *H28.4
-      *    保険毎の逓減計算（外用）
-           INITIALIZE                  WRK-HKNKEISP-G
+      *    保険毎の逓減計算（外用）（入力チェックの後へ）
+      *    INITIALIZE                  WRK-HKNKEISP-G
       *    湿布薬７０枚以上
-           IF      FLG-SIP70-ARI      =   1
+      *    IF      FLG-SIP70-ARI      =   1
       *        剤点数再計算
-               PERFORM 2009-SIP-SAIKEISAN-SEC
-           END-IF
+      *        PERFORM 2009-SIP-SAIKEISAN-SEC
+      *    END-IF
       *
       *H26.10
       *    抗精神薬剤投与チェック処理
@@ -2845,6 +2899,16 @@
       *    入力分のチェック
            IF      SPA-ERRCD           =   SPACE
                PERFORM 3003-CHEK-SYORI-SEC
+           END-IF
+      *H28.4
+      *    保険毎の逓減計算（外用）
+           INITIALIZE                  WRK-HKNKEISP-G
+           IF      SPA-ERRCD           =   SPACE
+      *        湿布薬７０枚以上
+               IF      FLG-SIP70-ARI      =   1
+      *            剤点数再計算
+                   PERFORM 2009-SIP-SAIKEISAN-SEC
+               END-IF
            END-IF
       *
            IF     (LNK-ORCSC-KIDCD     NOT =   SPACE )  OR
@@ -3216,11 +3280,13 @@
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    ))   OR
                   (IDX-SYOHOU      NOT =   ZERO )
+      *        院外投薬・処方箋料算定あり（処方料算定不可）
                MOVE    ZERO                TO  FLG-SYOHORYO
            ELSE
                IF     (FLG-NAIYAK          =   1    )  OR
                       (FLG-TONPUK          =   1    )  OR
                       (FLG-GAIYAK          =   1    )
+      *            院内投薬あり（処方料算定可）
                    MOVE    1               TO  FLG-SYOHORYO
                END-IF
            END-IF
@@ -3672,8 +3738,170 @@
                END-IF
            END-IF
       *
+      *H29.3
+      *    処方料の入力チェック
+           IF     (SPA-NYUGAIKBN       =   "2" )
+              AND (SPA-TEISHOHOU-FLG   =   "1" )
+               PERFORM 30032-SYOHOU-INCHK-SEC
+           END-IF
+      *
            .
        3003-CHEK-SYORI-EXT.
+           EXIT.
+      *
+      *H29.3
+      *****************************************************************
+      *   処方料の入力チェック処理
+      *****************************************************************
+       30032-SYOHOU-INCHK-SEC              SECTION.
+      *
+      *    処方料の入力チェック
+           IF     (FLG-SYOHOU2         =   1 )
+              AND (SPA-ERRCD           =   SPACE )
+      *        院内投薬なし（処方料不可）エラー
+               IF      FLG-SYOHORYO        =   ZERO
+                   MOVE    "0235"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR
+                                                   (IDX-SYOHOU2)
+               END-IF
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-250IN
+      *    処方せん料と投薬チェック
+           IF     (IDX-SYOHOU2     NOT =   ZERO )
+             AND  (SPA-ERRCD           =   SPACE)
+               EVALUATE    WRK-COM-INPUTCD (IDX-SYOHOU2)
+               WHEN    "120001210"
+      *        ７種類未満
+      *            ７種類以上、向精神薬多剤は警告
+                   IF    ( FLG-TAZAI-ARI       =   1     )
+                       MOVE    "K258"          TO  SPA-ERRCD
+                   ELSE
+                       IF    ((WRK-ZAICNT          >=  7    )
+                          AND (FLG-CHKCARKSN       =   ZERO ))
+                           MOVE    "K259"          TO  SPA-ERRCD
+                       END-IF
+                   END-IF
+      *
+               WHEN    "120002610"
+      *        ７種類以上
+      *            ７種類以上でも向精神薬多剤は警告
+                   IF    ((WRK-ZAICNT          >=  7    )
+                      AND (FLG-CHKCARKSN       =   ZERO ))
+                       IF    ( FLG-TAZAI-ARI       =   1     )
+                           MOVE    "K258"          TO  SPA-ERRCD
+                       END-IF
+                   ELSE
+      *                ７種類未満の時
+                       MOVE    "K261"          TO  SPA-ERRCD
+      *                地域包括診療算定時　逓減なし
+                       IF      FLG-CHKCARKSN       =   1
+                           MOVE    "K266"          TO  SPA-ERRCD
+                       END-IF
+                   END-IF
+      *
+               WHEN    CONS-TAZAI-SYOHOU
+      *            向精神薬多剤
+                   IF    ( FLG-TAZAI-ARI       =   ZERO    )
+                       MOVE    "K260"          TO  SPA-ERRCD
+                   END-IF
+               END-EVALUATE
+      *        湿布70枚以上
+               IF     (FLG-SIP70-ARI       =   1    )
+                   MOVE    "0244"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR
+                                                   (IDX-SYOHOU2)
+               END-IF
+      *
+               IF      SPA-ERRCD(1:1)      =   "K"
+                   IF     (WRK-COM-KZMFLG (IDX-SYOHOU2) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX           =   ZERO )
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SYOHOU2)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SYOHOU2)
+                       MOVE    IDX-SYOHOU2     TO  LNK-ORCSC-KEI-IDX
+                   ELSE
+                       MOVE    SPACE               TO  SPA-ERRCD
+                       MOVE    SPACE               TO  LNK-ORCSC-ERRMSG
+                   END-IF
+               END-IF
+      *        処方料入力あり
+               IF      SPA-ERRCD           =   SPACE
+                   EVALUATE    WRK-COM-INPUTCD (IDX-SYOHOU2)
+                   WHEN    CONS-TAZAI-SYOHOU
+      *                （向精神薬多剤投与）
+                       MOVE    1                   TO  SPA-PSYCHO-CHK
+                       MOVE    1                   TO  SPA-PSYCHO-OK
+                       MOVE    3                   TO  FLG-250IN
+                   WHEN    "120002610"
+      *               （７種類以上）
+                       MOVE    1                   TO  SPA-NAIFUKU-CHK
+                       MOVE    1                   TO  SPA-NAIFUKU-OK
+                       MOVE    1                   TO  SPA-PSYCHO-CHK
+                       MOVE    ZERO                TO  SPA-PSYCHO-OK
+                       MOVE    2                   TO  FLG-250IN
+                   WHEN    "120001210"
+      *                （その他）
+                       MOVE    1                   TO  FLG-250IN
+                       MOVE    1                   TO  SPA-PSYCHO-CHK
+                       MOVE    1                   TO  SPA-NAIFUKU-CHK
+                       MOVE    ZERO                TO  SPA-PSYCHO-OK
+                       MOVE    ZERO                TO  SPA-NAIFUKU-OK
+                   END-EVALUATE
+               END-IF
+           END-IF
+      *
+      *    処方料減算（低紹介率）入力チェック
+           IF     (FLG-SGEM            =   1     )
+              AND (SPA-ERRCD           =   SPACE )
+               IF     (FLG-250IN       NOT =   ZERO )
+                AND   (FLG-GEN30-N         =   1     )
+                AND   (FLG-GEN30-G         =   ZERO  )
+                   MOVE    1               TO  SPA-TEIGEN30-OK
+                   MOVE    1               TO  SPA-TEIGEN30-CHK
+               ELSE
+                   MOVE    "0243"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR
+                                                   (IDX-SGEM)
+               END-IF
+           END-IF
+      *
+      *    処方料麻毒加算の入力チェック
+           IF     (FLG-SYOHOUMD2       =   1 )
+              AND (SPA-ERRCD           =   SPACE )
+      *        処方料算定不可の時、エラーとする
+               IF     (FLG-SYOHORYO        =   ZERO )
+                  OR  (FLG-MADOKU          =   ZERO )
+                   MOVE    "0238"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR
+                                                   (IDX-SYOHOUMD2)
+               END-IF
+           END-IF
+      *    外来後発医薬品使用体制加算入力時、処方料があること
+           IF     (FLG-GENKSN2         =   1     )
+              AND (SPA-ERRCD           =   SPACE )
+               IF      FLG-SYOHORYO        =   ZERO
+                   MOVE    "0239"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-G2)
+      *            処方せん料もない時、警告とする
+                   IF      FLG-SYOHOSENN        =   ZERO
+                       MOVE    SPACE           TO  SPA-ERRCD
+                       MOVE    SPACE           TO  WRK-COM-CUR (IDX-G2)
+                       IF     (WRK-COM-KZMFLG (IDX-G2) =   SPACE) AND
+                              (LNK-ORCSC-KEI-IDX       =   ZERO )
+                           MOVE    "K262"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-G2)
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-G2)
+                           MOVE    IDX-G2          TO  LNK-ORCSC-KEI-IDX
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+           .
+       30032-SYOHOU-INCHK-EXT.
            EXIT.
       *
       *ver.4.7
@@ -4529,10 +4757,26 @@
                            END-IF
                        END-IF
                        ADD     1                   TO  IDN4
+      *TEST
+      *TEST
+      *      翌月あり
+      *                IF     (IDN4                >   WRK-MATU )
+      *                  AND  (WRK-KAISU           >=  IDN3     )
+      *                  AND  (WRK-COM-HOUKATU-FLG (IDX)   =   1 )
+      *                     MOVE    1                  TO  FLG-NEXTTUKI
+      *                END-IF
+      *TEST
                    END-PERFORM
                END-IF
            END-PERFORM
       *
+      *TEST
+      *TEST
+      *    翌月あり
+      *    IF      FLG-NEXTTUKI   =   1
+      *       AND  (SPA-NYU-ERR        =   2          )
+      *         MOVE    "XXXX"          TO  SPA-ERCD
+      *     END-IF
            .
        3009-NYUINKAISU-EXT.
            EXIT.
@@ -5065,7 +5309,6 @@
                GO      TO      3002-INNAI-SYORI-EXT
            END-IF
       *
-      *
       *H27.4
       *    低紹介率３０日以上投与（院内である時）
            IF     (SPA-TEIGEN30-CHK    =   ZERO )
@@ -5122,6 +5365,11 @@
       *H28.4
            OR    ((FLG-GEN30-PSY       =   1 )  AND
                   (WRK-ZAICNT-2        >=  7 ))
+      *????
+      *H29.3
+      *    処方料手入力
+           OR   ((FLG-250IN            =   2  )  AND
+                 (FLG-CHKCARKSN        =   ZERO ))
       *        内服の薬剤逓減有りチェック
                IF      SPA-NAIFUKU-CHK     =   ZERO
                    MOVE    1               TO  SPA-NAIFUKU-CHK
@@ -5132,6 +5380,11 @@
       *
       *           薬剤料逓減あり
                   IF    ( WRK-ZAICNT          >=  7 )
+      *????
+      *H29.3
+      *    処方料手入力
+                   OR   ( FLG-250IN            =   2  )
+      *????
       *            全内服薬
                        COMPUTE WRK-SANTEN-9    =   WRK-KEIKEI
                                            *   90
@@ -5266,6 +5519,10 @@
                    MOVE    CONS-TAZAI-SYOHOU   TO  WRK-SRYCD
                    MOVE    CONS-TAZAI-SYOHOU   TO  WRK-SRYCD2
                END-IF
+      *!!
+      *H29.3
+               IF      FLG-250IN           =   ZERO
+      *        処方料入力なし
       *
                PERFORM 3002-KASAN-SYORI-SEC
                IF      FLG-ERR             =   ZERO
@@ -5284,6 +5541,11 @@
                    MOVE    SPACE               TO  WRK-SRYCD2
                    PERFORM 30019-GEN30KSN-HENSYU-SEC
                END-IF
+      *!!
+               ELSE
+                   MOVE    1               TO  FLG-SYOHORYO
+               END-IF
+      *!!
       *H28.4
       *        外来後発医薬品使用体制加算（診療所）
                IF     (FLG-SYOHORYO        =   1 )
@@ -5425,7 +5687,7 @@
        30021-INNAI-TOKUTEI-SEC     SECTION.
       *
       *    特定疾患処方管理加算のチェック
-           IF     (FLG-SYOHORYO            =   1  )  AND
+           IF     (FLG-SYOHORYO        =   1  )  AND
                   (FLG-TOKUTEI         =   1  )
       *     長期投薬加算、特定疾患処方管理加算の入力が無い時
             AND   (FLG-TOKUSYO2            =   ZERO)
@@ -6018,6 +6280,10 @@
                    END-IF
       *H28.4
                    IF    ( WRK-ZAICNT          >=  7 )
+      *H29.3
+      *    処方料手入力
+                   OR   ( FLG-250IN            =   2  )
+      *????
                        CONTINUE
                    ELSE
                        IF      FLG-ARI2        =   ZERO
@@ -8265,8 +8531,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

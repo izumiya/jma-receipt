@@ -3444,6 +3444,85 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
       **
+      *!!!
+      *H29.3
+               WHEN    "K258"
+                   STRING  "警告！"
+                           "向精神薬多剤投与となります。"
+                           "処方料を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K259"
+                   STRING  "警告！"
+                           "内服薬剤が７種類以上です。"
+                           "処方料を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K260"
+                   STRING  "警告！"
+                           "向精神薬多剤投与ではありません。"
+                           "逓減ができません。"
+                           "処方料を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K261"
+                   STRING  "警告！"
+                           "内服薬剤が７種類以上ではありません。"
+                           "処方料を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0235"
+                   STRING  "院内投薬がありません。"
+                           "処方料の算定はできません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K266"
+                   STRING  "警告！"
+                           "地域包括診療の算定があります。"
+                           "逓減対象外です。"
+                           "処方料を確認して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0238"
+                   STRING  "処方料（麻・向・覚・毒）の算定は"
+                           "できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0239"
+                   STRING  "処方料が算定できません。"
+                           "外来後発医薬品使用体制加算は"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K262"
+                   STRING  "警告！"
+                           "処方料が算定できません。"
+                           "外来後発医薬品使用体制加算は"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0243"
+                   STRING  "処方料減算の対象ではありません。"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0244"
+                   STRING  "湿布薬が７０枚を超えています。"
+                           "処方料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      **
                WHEN    "K910"
                    STRING  "警告！"
                            "入院会計照会を確認して下さい。"

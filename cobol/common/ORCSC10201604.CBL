@@ -80,6 +80,8 @@
       * 04.08.00     NACL-多々納  15/04/15  退院日の保険組合せ判定追加
       * 04.08.00     NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       * 04.08.00     NACL-多々納  17/02/XX  在宅実績加算２削除対応
+      * 04.08.00     NACL-多々納  17/03/XX  Ｈ２９年４月改正対応
+      * 04.08.00     NACL-多々納  17/03/XX  注加算チェック対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -178,6 +180,8 @@
            03  FLG-KIJUNN          PIC 9(01).
            03  FLG-ERR             PIC 9(01).
       *
+           03  FLG-CHKEND          PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -230,6 +234,8 @@
            03  IDS                     PIC 9(04).
       *
            03  IDX3                    PIC 9(04).
+           03  IDX-TS                  PIC 9(04).
+           03  IDX-ST                  PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -1891,8 +1897,9 @@
                    MOVE    2                   TO  FLG-KIJUNN
                    MOVE    SPACE               TO  WRK-SRYCD
                    IF      WRK-COM-SRYKBN (IDX-Z)  =   "14"
-      *            施設基準不適合（在宅）
-                       MOVE    "114035470"         TO  WRK-SRYCD
+      *H29.3
+      *  H29/4 から    施設基準不適合（在宅）
+                       PERFORM 1001112-ZAISOUCHK-SEC
                    END-IF
                    IF      WRK-SRYCD       NOT =   SPACE
       *
@@ -1979,6 +1986,38 @@
       *
            .
        1001111-SSTKIJUN-CHK-EXT.
+           EXIT.
+      *
+      *H29.3
+      *****************************************************************
+      *    施設基準不適合（在宅）処理
+      *****************************************************************
+       1001112-ZAISOUCHK-SEC                  SECTION.
+      *
+      *    在宅時医学総合管理料等判定（在医総管・特医総管）
+           SET     TBL-ZSIDX           TO  1
+           SEARCH  TBL-ZISOSIN-OCC     VARYING   TBL-ZSIDX
+              AT   END
+                   MOVE    SPACE                   TO  WRK-ZS-KBN
+                   MOVE    SPACE                   TO  WRK-ZS-KBN2
+                   MOVE    SPACE                   TO  WRK-ZS-GRP
+               WHEN   (TBL-ZS-SRYCD (TBL-ZSIDX)
+                                           =   WRK-COM-INPUTCD (IDX-Z)) 
+                   MOVE    TBL-ZS-GRP (TBL-ZSIDX)  TO  WRK-ZS-GRP
+                   MOVE    TBL-ZS-KBN (TBL-ZSIDX)  TO  WRK-ZS-KBN
+                   MOVE    TBL-ZS-KBN2(TBL-ZSIDX)  TO  WRK-ZS-KBN2
+           END-SEARCH
+      *
+           EVALUATE    WRK-ZS-GRP(1:1)
+              WHEN    "0" 
+      *       在医総管(在支診等)
+                  MOVE    "114041870"      TO  WRK-SRYCD
+              WHEN    "1"
+      *           特医総管(在支診等)
+                  MOVE    "114041970"      TO  WRK-SRYCD
+           END-EVALUATE
+           .
+       1001112-ZAISOUCHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4483,6 +4522,11 @@
                GO      TO      10016-ZATAKUKSN-AUTO-EXT
            END-IF
       *
+      *    逓減コード判定
+           PERFORM 100161-KASAN-CHK02-SEC
+           IF      IDX-TS              =   ZERO
+               MOVE    IDX-Z           TO  IDX-TS
+           END-IF
       *
            PERFORM VARYING     IDX3    FROM    1   BY  1
                    UNTIL      (IDX3    >   3  )
@@ -4490,7 +4534,7 @@
                MOVE    WRK-ZAIKSN-SRYCD (IDX3) TO  WRK-SRYCD
                PERFORM 1110-KASAN-CHK-SEC
                IF      FLG-ARI         =   ZERO
-                   MOVE    IDX-Z               TO  IDX-S
+                   MOVE    IDX-TS              TO  IDX-S
                    PERFORM 1100-KASAN-SET-SEC
                    IF      FLG-ADD         =   1
       *H29.2
@@ -4518,6 +4562,25 @@
            END-PERFORM
            .
        10016-ZATAKUKSN-AUTO-EXT.
+           EXIT.
+      *****************************************************************
+      *    自動加算　存在チェック加処理
+      *****************************************************************
+       100161-KASAN-CHK02-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  IDX-TS
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL      (IDX1        >   SPA-MAX-LINE   )
+                       OR    ((WRK-GMN-INPUTCD (IDX1)  =   SPACE )
+                          AND (WRK-COM-INPUTCD (IDX1)  =   SPACE ))
+                       OR     (IDX-TS      >   ZERO )
+      *        %減算加算の後
+               IF      WRK-COM-SANFLG(IDX1)    =   2
+                   MOVE    IDX1                TO  IDX-TS
+               END-IF
+           END-PERFORM
+           .
+       100161-KASAN-CHK02-EXT.
            EXIT.
       *****************************************************************
       *   算定履歴検索処理
@@ -5415,10 +5478,10 @@
        200-ALL-SYORI-SEC               SECTION.
       *
       *!!! マスタ更新チェック
-           PERFORM 100119-KOUSINCHK-SEC
-           IF      SPA-ERRCD       NOT =   SPACE
-               GO      TO      200-ALL-SYORI-EXT
-           END-IF
+      *    PERFORM 100119-KOUSINCHK-SEC
+      *    IF      SPA-ERRCD       NOT =   SPACE
+      *        GO      TO      200-ALL-SYORI-EXT
+      *    END-IF
       *
       *
       *    重複チェック
@@ -5636,19 +5699,6 @@
                    END-IF
                END-IF
       *
-      *        注加算コードのチェック（すべての診区で行う）
-               IF      (WRK-COM-SRYKBN     (IDX-Z)
-                                           =   "95" OR  "96"
-                                                    OR  "99")   OR
-                       (WRK-COM-CHUKSNCD   (IDX-Z)
-                                           =   SPACE  OR  ZERO )  OR
-                       (WRK-COM-CHUKSNTUBAN(IDX-Z)
-                                           =   SPACE  OR  ZERO)
-                   CONTINUE
-               ELSE
-                   PERFORM 290-CHUKSNCHK-SEC
-               END-IF
-      *
       *        時間外加算チェック（診察、加算、時間加算のもの）
                IF     (WRK-COM-SRYKBN  (IDX-Z)     =   "11"  OR
                                                        "12"  OR
@@ -5682,6 +5732,33 @@
                       (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "000" ) AND
                       (WRK-COM-DATAKBN  (IDX-Z)    =   "1"   )
                     MOVE    1              TO  FLG-OUSIN
+               END-IF
+           END-PERFORM
+      *H29.3
+      *    注加算コードのチェック（すべての診区で行う）
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-MAX-LINE      )  OR
+                              (SPA-ERRCD           NOT =   SPACE )  OR
+                             ((WRK-GMN-INPUTCD (IDX-Z) =   SPACE ) AND
+                              (WRK-COM-INPUTCD (IDX-Z) =   SPACE ))
+               IF     (WRK-COM-HKNCOMBI(IDX-Z) =   "9999" )
+      *          治験減点分
+               OR     (WRK-COM-GENTEN (IDX-Z)  =   "1"    )
+               OR     (LNK-ORCSC-PG            =   "KT01" )
+                   CONTINUE
+               ELSE
+      *        注加算コードのチェック（すべての診区で行う）
+                   IF      (WRK-COM-SRYKBN     (IDX-Z)
+                                           =   "95" OR  "96"
+                                                    OR  "99")
+                       OR  (WRK-COM-CHUKSNCD   (IDX-Z)
+                                           =   SPACE  OR  ZERO )
+                       OR  (WRK-COM-CHUKSNTUBAN(IDX-Z)
+                                           =   SPACE  OR  ZERO)
+                       CONTINUE
+                   ELSE
+                       PERFORM 290-CHUKSNCHK-SEC
+                   END-IF
                END-IF
       *
            END-PERFORM
@@ -7736,20 +7813,33 @@
        290-CHUKSNCHK-SEC                SECTION.
       *
            MOVE    ZERO                TO  IDX-CHU
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX         >   SPA-MAX-LINE   )  OR
-                              (WRK-GMN-INPUTCD(IDX)    =   SPACE )
-               IF      IDX             NOT =   IDX-Z
+           MOVE    ZERO                TO  FLG-CHKEND
+           IF      WRK-COM-SRYKBN (IDX-Z)  =   "11"  OR  "12"
+               MOVE    1               TO  IDX-ST
+           ELSE
+               COMPUTE IDX-ST          =   IDX-Z
+                                       +   1
+      *        診察料以外は、剤内のチェックとする
+               IF      WRK-COM-ZAIEND (IDX-Z)   =   "1"
+                   MOVE    1               TO  FLG-CHKEND
+               END-IF
+           END-IF
+      *
+           PERFORM VARYING     IDX     FROM    IDX-ST  BY  1
+                   UNTIL      (IDX         >   SPA-MAX-LINE    )
+                         OR   (WRK-GMN-INPUTCD(IDX)    =   SPACE )
+                         OR   (FLG-CHKEND      =   1   )
+               IF     (IDX             NOT =   IDX-Z  )
       *                    注加算コード、通番が同じ時エラー
                    IF      (WRK-COM-SRYKBN (IDX)
                                            =   WRK-COM-SRYKBN
-                                                           (IDX-Z)) AND
+                                                          (IDX-Z)) AND
                            (WRK-COM-CHUKSNCD   (IDX)
                                            =   WRK-COM-CHUKSNCD
-                                                           (IDX-Z)) AND
+                                                          (IDX-Z)) AND
                            (WRK-COM-CHUKSNTUBAN(IDX)
                                            =   WRK-COM-CHUKSNTUBAN
-                                                             (IDX-Z))
+                                                            (IDX-Z))
                        MOVE    "0042"          TO  SPA-ERRCD
                        MOVE    IDX             TO  IDX-CHU
       *                同じコードで自動発生の場合はＯＫとする
@@ -7759,6 +7849,15 @@
                            MOVE    SPACE       TO  SPA-ERRCD
                            MOVE    ZERO        TO  IDX-CHU
                        END-IF
+                   END-IF
+               END-IF
+               IF      WRK-COM-SRYKBN (IDX-Z)  =   "11"  OR  "12"
+                   CONTINUE
+               ELSE
+      *            次の手技料までチェック
+                   IF      (WRK-COM-INPUTCD(IDX)(1:1)    =  "1")
+                       AND (WRK-COM-DATAKBN(IDX)         =  "1")
+                       MOVE    1                   TO  FLG-CHKEND
                    END-IF
                END-IF
       *        診察料以外は、剤内のチェックとする
@@ -7772,6 +7871,7 @@
                        IF      IDX                 >=  IDX-Z
                            MOVE    SPA-MAX-LINE        TO  IDX
                        END-IF
+                       MOVE    1                   TO  FLG-CHKEND
                    END-IF
                END-IF
            END-PERFORM

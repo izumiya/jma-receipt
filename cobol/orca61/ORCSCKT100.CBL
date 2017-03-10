@@ -1374,6 +1374,10 @@
            IF      SPA-GENECHG-KBN     =   1
                MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
            END-IF
+      *H29.3  後発品変更可（処方毎）有
+           IF      SPA-GENECHG-KBN     =   2
+               MOVE    "2"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z   >   WRK-MAX      )
                MOVE    WRK-GMN-INPUTCD(IDX-Z)
