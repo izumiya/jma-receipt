@@ -20,7 +20,7 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 月次帳票
-      *  コンポーネント名  : 在宅療養支援診療所・支援病院に係る報告書
+      *  コンポーネント名  : 訪問診療等の状況
       *  管理者            : 
       *  作成日付    作業者        記述
       *  17/03/07    NACL-森脇     新規作成
@@ -81,7 +81,6 @@
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-TOKEI               PIC 9(01).
-           03  FLG-SISETSU             PIC 9(01).
            03  FLG-SYUKEI              PIC 9(01).
       *
       *    カウント領域
@@ -136,9 +135,9 @@
       *
        01  WRK-PRT-AREA.
            03  WRK-PRT-LINE1-1.
-               05  FILLER              PIC X(35)   VALUE   SPACE.
-               05  FILLER              PIC X(40)   VALUE
-                   "在宅療養支援診療所・支援病院に係る報告書".
+               05  FILLER              PIC X(47)   VALUE   SPACE.
+               05  FILLER              PIC X(16)   VALUE
+                   "訪問診療等の状況".
            03  WRK-PRT-LINE1-2.
                05  FILLER              PIC X(20)   VALUE   SPACE.
                05  FILLER              PIC X(22)   VALUE
@@ -243,9 +242,6 @@
       *
       *    医療機関情報
            COPY    "CPSK1001.INC".
-      *
-      *    施設基準情報
-           COPY    "CPSK1006.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -419,9 +415,6 @@
       *    医療機関情報セット
            PERFORM 900-SYS1001-DBREAD-SEC
       *
-      *    施設基準情報セット
-           PERFORM 900-SYS1006-DBREAD-SEC
-      *
            .
        110-PARA-HENSYU-EXT.
            EXIT.
@@ -490,8 +483,7 @@
       *****************************************************************
        230-MAIN-SRYACCT-SEC           SECTION.
       *
-           IF    ( FLG-SISETSU =   1 ) AND
-                 ( SRY-SRYYM   =   WRK-PARA-KJNYM )
+           IF    ( SRY-SRYYM   =   WRK-PARA-KJNYM )
                IF    ( SRY-SRYKBN      NOT =   "11" ) AND
                      ( SRY-SRYKBN      NOT =   "12" ) AND
                      ( SRY-SRYKBN      NOT =   "14" )
@@ -546,6 +538,30 @@
                WHEN    "114017770"
                WHEN    "114022370"
                WHEN    "114022670"
+               WHEN    "114000470"
+               WHEN    "114000570"
+               WHEN    "114001970"
+               WHEN    "114002070"
+               WHEN    "114011670"
+               WHEN    "114011770"
+               WHEN    "114011970"
+               WHEN    "114012070"
+               WHEN    "114017570"
+               WHEN    "114017670"
+               WHEN    "114017870"
+               WHEN    "114017970"
+               WHEN    "114022470"
+               WHEN    "114022570"
+               WHEN    "114022770"
+               WHEN    "114022870"
+               WHEN    "114029270"
+               WHEN    "114029370"
+               WHEN    "114029470"
+               WHEN    "114029570"
+               WHEN    "114029970"
+               WHEN    "114030070"
+               WHEN    "114030170"
+               WHEN    "114030270"
                    MOVE    2           TO  FLG-SYUKEI
       *        訪問診療
                WHEN    "114001110"
@@ -602,8 +618,7 @@
                GO  TO  240-SRYCD-CHEK-EXT
            END-IF
       *
-           IF    ( FLG-SISETSU =   1 ) AND
-                 ( SRY-SRYYM   =   WRK-PARA-KJNYM )
+           IF    ( SRY-SRYYM   =   WRK-PARA-KJNYM )
                IF    ( FLG-SYUKEI      =   1 ) OR
                      ( FLG-SYUKEI      =   3 ) OR
                      ( FLG-SYUKEI      =   5 ) OR
@@ -938,31 +953,6 @@ grpsys                                     SPA-AREA
            END-IF
            .
        900-SYS1001-DBREAD-EXT.
-           EXIT.
-      *****************************************************************
-      *    施設基準検索
-      *****************************************************************
-       900-SYS1006-DBREAD-SEC      SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SISETSU
-      *
-           INITIALIZE                      SYS-1006-REC
-           MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
-           MOVE    "1006"              TO  SYS-1006-KANRICD
-           MOVE    "7"                 TO  SYS-1006-KBNCD
-           MOVE    LNK-PRTKANRI-SKYYMD TO  SYS-1006-STYUKYMD
-                                           SYS-1006-EDYUKYMD
-           MOVE    SYS-1006-REC        TO  MCPDATA-REC
-           PERFORM 900-SYSKANRI-DBREAD-SEC 
-           IF      FLG-SYSKANRI    =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1006-REC
-               IF    ( SYS-1006-SSTKIJUN(55)   =   "1" )   OR
-                     ( SYS-1006-SSTKIJUN(56)   =   "1" )
-                   MOVE    1               TO  FLG-SISETSU
-               END-IF
-           END-IF
-           .
-       900-SYS1006-DBREAD-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索
