@@ -88,6 +88,7 @@
       * 04.08.00     NACL-多々納  16/10/06  小児特例休日等変換対応
       * 04.08.00     NACL-多々納  16/12/XX  指導料等自動算定対応
       * 04.08.00     NACL-多々納  17/02/XX  在宅実績加算２削除対応
+      * 04.08.00     NACL-多々納  17/03/XX  平成２９年４月改正対応
       *****************************************************************
       *
       *
@@ -426,6 +427,9 @@
       *H29.2
       *    在実績加算対応
            03  WRK-IDX-IN3             PIC 9(04).
+           03  WRK-IDX-IN4             PIC 9(04).
+           03  FLG-CHKEND              PIC 9(01).
+           03  IDKS                    PIC 9(04).
            03  WRK-ZKS-GRP             PIC X(02).
            03  WRK-ZKS-KBN             PIC X(01).
       *
@@ -5343,30 +5347,55 @@
       *****************************************************************
        33081-ZAIKANRI02-SET02-SEC         SECTION.
       *
+      *H29.4 改正対応
            MOVE    ZERO                TO  WRK-IDX-IN3
+           COMPUTE WRK-IDX-IN4         =   WRK-IDX-IN   +  1
+      *
+           MOVE    ZERO                TO  FLG-CHKEND
+           PERFORM VARYING     IDKS    FROM    WRK-IDX-IN4   BY  1
+                   UNTIL      (IDKS        >   SPA-MAX-LINE )
+                         OR  ((SPA-COM-INPUTCD (IDKS)  =   SPACE ) AND
+                              (SPA-GMN-INPUTCD (IDKS)  =   SPACE ))
+                         OR   (FLG-CHKEND      =   1    )
+               IF     (SPA-COM-INPUTCD(IDKS)(1:1)  =   "1" )
+                 AND  (SPA-COM-DATAKBN(IDKS)       =   "2" )
+                   IF      SPA-COM-AUTOKBN (IDKS)  =   SPACE
+      *                在宅実績加算のチェック
+                       PERFORM 330811-ZISOKSN-CHK-SEC
+                       IF     (WRK-ZKS-GRP(1:1)    =   "0"
+                                                   OR  "1"    )
+                           MOVE    IDKS            TO  WRK-IDX-IN3
+                       END-IF
+                   ELSE
+                       MOVE    IDKS             TO  WRK-IDX-IN3
+                   END-IF
+               END-IF
+               IF      SPA-COM-ZAIEND (IDKS)    =   "1"
+                   MOVE    1                    TO  FLG-CHKEND
+               END-IF
+           END-PERFORM
+           .
+       33081-ZAIKANRI02-SET02-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅実績加算処理
+      *****************************************************************
+       330811-ZISOKSN-CHK-SEC         SECTION.
       *
            SET     TBL-ZKSIDX          TO  1
            SEARCH  TBL-ZISOKSN-OCC     VARYING   TBL-ZKSIDX
               AT   END
                    MOVE    SPACE                   TO  WRK-ZKS-KBN
                    MOVE    SPACE                   TO  WRK-ZKS-GRP
-               WHEN   (TBL-ZKS-SRYCD (TBL-ZKSIDX)
+              WHEN   (TBL-ZKS-SRYCD (TBL-ZKSIDX)
                                        =   SPA-COM-INPUTCD
-                                           (WRK-IDX-IN + 1))
+                                                        (IDKS))
                    MOVE    TBL-ZKS-GRP (TBL-ZKSIDX) TO  WRK-ZKS-GRP
                    MOVE    TBL-ZKS-KBN (TBL-ZKSIDX) TO  WRK-ZKS-KBN
            END-SEARCH
-           IF     (WRK-ZKS-KBN         =   SPACE   )
-              OR  (WRK-ZKS-GRP(1:1)    =   "2"     )
-               CONTINUE
-           ELSE
-               IF    (SPA-COM-AUTOKBN(WRK-IDX-IN + 1)   =   SPACE)
-                   COMPUTE WRK-IDX-IN3         =   WRK-IDX-IN
-                                               +   1
-               END-IF
-           END-IF
            .
-       33081-ZAIKANRI02-SET02-EXT.
+       330811-ZISOKSN-CHK-EXT.
            EXIT.
       *
       *****************************************************************

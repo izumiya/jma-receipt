@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  17/03/XX  後発品変更可（処方毎）対応
       *****************************************************************
       *
       *
@@ -313,6 +314,14 @@
                MOVE    1                   TO  FLG-IPNMEI
            END-IF
       *
+      *!!!!!!!!!!!!!!!
+      *    一般名変更可（剤）入力有
+           IF     (FLG-IPNMEI              =   ZERO )
+             AND  (ORCSCGENN-KOUHATU-IN    =   "2"  )
+      *        一般名記載
+               MOVE    3                   TO  FLG-IPNMEI
+           END-IF
+      *
            IF      ORCSCGENN-SYORIKBN2     =   "1"
       *       点数マスタ検索なし
                MOVE    ORCSCGENN-TNS-KOUHATUKBN (IDX)
@@ -342,6 +351,8 @@
                                            OR  7       )
       *        変更可の指定は、一般名
                IF       (ORCSCGENN-1030-KOUHATUKA    =   "1" )
+      *!!!!!
+                    OR  (FLG-IPNMEI            =   3 )
                    MOVE    1               TO  WRK-IPN-KISAIKBN
                END-IF
            END-IF
@@ -363,9 +374,16 @@
            END-IF
       *
       *    マスタ検索なし
-           IF      ORCSCGENN-SYORIKBN2 =   "1"
-      *        名称区分の編集
-               MOVE    WRK-IPN-KISAIKBN    TO  ORCSCGENN-NAME-KBN (IDX)
+           IF     (ORCSCGENN-SYORIKBN2 =   "1" )
+               IF     (WRK-IPN-KISAIKBN    =   1    )
+                 AND  (ORCSCGENN-HEN-NAME(IDX)  =   SPACE )
+      *            一般名名称編集処理
+                   PERFORM 20011-GENRICNAME-HEN-SEC
+               ELSE
+      *            名称区分の編集
+                   MOVE    WRK-IPN-KISAIKBN    TO  ORCSCGENN-NAME-KBN
+                                                               (IDX)
+               END-IF
            ELSE
       *        一般名名称編集処理
                PERFORM 20011-GENRICNAME-HEN-SEC
@@ -402,7 +420,7 @@
       *        一般名記載
                WHEN    1
                    MOVE    SPACE               TO  WRK-GENERICNAME
-                   STRING  "【般】"                DELIMITED  BY  SIZE
+                   STRING  "≪般≫"                DELIMITED  BY  SIZE
                            GENERIC-GENERICNAME     DELIMITED  BY  SPACE
                                                INTO    WRK-GENERICNAME
                    END-STRING
@@ -417,7 +435,7 @@
       *        処方名称を一般名称とする
                WHEN    3
                    MOVE    SPACE               TO  WRK-GENERICNAME
-                   STRING  "【般】"                DELIMITED  BY  SIZE
+                   STRING  "≪般≫"                DELIMITED  BY  SIZE
                            TNSP-SHONAME            DELIMITED  BY  SPACE
                                                INTO    WRK-GENERICNAME
                    END-STRING
@@ -479,8 +497,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

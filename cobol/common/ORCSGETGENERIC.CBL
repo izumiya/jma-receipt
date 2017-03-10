@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04/08/00    NACL-多々納  16/03/XX  後発品変更不可（処方）対応他
       *  04.08.00    NACL-多々納  16/03/XX  最低薬価テーブル対応
+      *  04.08.00    NACL-多々納  17/03/XX  後発品変更可（処方毎）対応
       *****************************************************************
       *
       *
@@ -54,9 +55,6 @@
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-GENERICPRICE    PIC 9(01).
-      *
-      *    後発医薬品変更不可
-           03  FLG-KOUHATU-FUKA        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -101,7 +99,9 @@
       *
       *
            03  WRK-SRYKA               PIC X(02).
-      *TEST
+      *
+           03  WRK-MCP-PATHNAME        PIC X(64).
+      *
        01  TBL-GENEINP-AREA.
       *    予約コードの剤
            03  TBL-GENINP-TBL1         OCCURS   40.
@@ -124,6 +124,7 @@
            03  IDX-G2                  PIC 9(04).
            03  IDX-JYU                 PIC 9(04).
            03  IDD                     PIC 9(02).
+           03  FLG-KOUHATU             PIC 9(01).
       *
       *    剤内容テーブル
        01  WRK-SRYACT-GRP-AREA.
@@ -406,6 +407,12 @@
              AND  (FLG-GENE-ARI        =   1      )
                MOVE    "1"             TO  ORCSGETGE-GENEFLG
            END-IF
+      *H29.3
+      *    剤に後発品変更可（処方）あり
+           IF     (FLG-ALLFUKA-ARI     =   0      )
+             AND  (FLG-GENE-ARI        =   2      )
+               MOVE    "2"             TO  ORCSGETGE-GENEFLG
+           END-IF
       *
            .
        20021-SRYACT-CHK-EXT.
@@ -515,9 +522,13 @@
       *
       *一般名称記載
            MOVE    TNSP-IPN-KISAIKBN   TO  WRK-IPN-KISAIKBN
+      *
       *    システム管理の変更可によって一般名記載とする
            IF     (WRK-IPN-KISAIKBN        =   ZERO    )
-             AND  (ORCSGETGE-KOUHATUKA     =   "1"     )
+             AND ((ORCSGETGE-KOUHATUKA     =   "1"   ) OR
+      *H29.3
+      *   後発品変更可（処方）あり
+                  (FLG-GENE-ARI            =   2     ))
              AND  (TNS-KOUHATUKBN          =   1
                                            OR  2
                                            OR  7       )
@@ -724,10 +735,22 @@
       *    予約コードの剤番号取得
            INITIALIZE                      TBL-GENEINP-AREA
            MOVE    ZERO                TO  IDX-G
+      *H29.3
+      *    後発品変更可（処方単位）
+           MOVE    "099209911"         TO  WRK-SRYCD
+           MOVE    2                   TO  FLG-ALLFUKA
+           PERFORM 20091-GENEINP-HEN-SEC
+      *
+           IF      IDX-G               =   ZERO
+      *!!
+      *!!!!後発品変更可（一般名記載）を優先。
+      *
       *    後発品変更不可（処方単位）
            MOVE    "099209910"         TO  WRK-SRYCD
            MOVE    1                   TO  FLG-ALLFUKA
            PERFORM 20091-GENEINP-HEN-SEC
+      *
+           END-IF
       *
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
@@ -767,10 +790,15 @@
                    END-IF
                END-PERFORM
                IF      FLG-GENENASI        =   ZERO
-      *            後発品変更不可（処方）なしの受診履歴あり
-                   MOVE    1               TO  FLG-ALLFUKA-ARI
+      *            後発品変更不可（処方）なしの受診履歴なし
+                   IF      FLG-ALLFUKA     =   1
+                       MOVE    1               TO  FLG-ALLFUKA-ARI
+                   END-IF
                ELSE
                    MOVE    1               TO  FLG-GENE-ARI
+                   IF      FLG-ALLFUKA     =   2
+                       MOVE    2           TO  FLG-GENE-ARI
+                   END-IF
                END-IF
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    "key63"             TO  MCP-PATHNAME
@@ -799,11 +827,16 @@
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key62"             TO  MCP-PATHNAME
+           IF      FLG-ALLFUKA         =   1
+               MOVE    "key62"             TO  WRK-MCP-PATHNAME
+           ELSE
+               MOVE    "key68"             TO  WRK-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key62"             TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-JYURRK
@@ -819,12 +852,12 @@
                    END-IF
                END-IF
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key62"             TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
       *
            END-PERFORM
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key62"             TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            .
        20091-GENEINP-HEN-EXT.
@@ -875,8 +908,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

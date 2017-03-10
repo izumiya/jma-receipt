@@ -285,6 +285,13 @@ W07 {
           count int;
             item varchar(12)[2];
         };
+        TEISHOHOU_COMB {
+          TEISHOHOU { #GtkPandaEntry
+            textdata varchar(12);
+          };
+          count int;
+          item varchar(12)[2];
+        };
         NYUKENSA_COMB {
           NYUKENSA {
             textdata varchar(12);

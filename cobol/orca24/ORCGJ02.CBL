@@ -1893,7 +1893,8 @@
                MOVE    SYSKANRI-REC        TO  SYS-1038-REC
       *H28.4   一般名表示
                IF      SYS-1038-GENERICFLG     =   "2"
-                   MOVE    "1"                 TO  SPA-GENERICFLG
+      *V5.0        MOVE    "1"                 TO  SPA-GENERICFLG
+                   MOVE    "0"                 TO  SPA-GENERICFLG
                END-IF
            END-IF
       *

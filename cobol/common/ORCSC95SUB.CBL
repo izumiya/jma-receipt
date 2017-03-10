@@ -709,7 +709,8 @@
                MOVE    SYS-1038-SETALLKBN      TO  SPA-SETALLKBN
       *H28.4   一般名表示
                IF      SYS-1038-GENERICFLG     =   "2"
-                   MOVE    "1"                 TO  SPA-GENERICFLG
+      *v5          MOVE    "1"                 TO  SPA-GENERICFLG
+                   MOVE    "0"                 TO  SPA-GENERICFLG
                END-IF
            END-IF
            IF      SPA-KAGRPFLG        =   SPACE
