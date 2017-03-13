@@ -354,8 +354,7 @@
            MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
            MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
            MOVE    "ORCBG028"          TO  JOB-PGID
-           MOVE    "ºßÂðÎÅÍÜ»Ù±ç¿ÇÎÅ½ê¡¦»Ù±çÉÂ±¡¤Ë·¸¤ëÊó¹ð½ñ"
-                                       TO  JOB-SHELLMSG
+           MOVE    "Ë¬Ìä¿ÇÎÅÅù¤Î¾õ¶·"  TO  JOB-SHELLMSG
            CALL    "ORCSJOB"               USING
                                            ORCSJOBKANRIAREA
                                            JOBKANRI-REC
@@ -789,8 +788,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            MOVE    "HCMSL80.red"       TO  SPRT-PRTID
-           MOVE    "ºßÂðÎÅÍÜ»Ù±ç¿ÇÎÅ½ê¡¦»Ù±çÉÂ±¡¤Ë·¸¤ëÊó¹ð½ñ"
-                                       TO  SPRT-TITLE
+           MOVE    "Ë¬Ìä¿ÇÎÅÅù¤Î¾õ¶·"  TO  SPRT-TITLE
            MOVE    HCMSL80             TO  SPRT-PRTDATA
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
@@ -875,7 +873,7 @@ grpsys                                     SPA-AREA
            CALL    "orcfiledel"        USING
                                        ORCSFDELAREA
       *
-           DISPLAY "*** ORCBG027 IN "      CNT-TOKEI
+           DISPLAY "*** ORCBG028 IN "      CNT-TOKEI
            DISPLAY "*** ORCBG028 END ***"
       *     
       *    ¥¹¥Æ¥Ã¥×´ÉÍý½ªÎ»½èÍý
