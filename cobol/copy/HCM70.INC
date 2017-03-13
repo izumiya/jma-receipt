@@ -94,3 +94,6 @@
                         PIC X(100).
             02  HCM70-TANJYOG2
                         PIC X(2).
+            02  HCM70-HEAD-G.
+              03  HCM70-HEAD
+                        PIC X(62)       OCCURS 2 TIMES.

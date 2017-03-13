@@ -47,6 +47,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -480,6 +481,13 @@
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-RECEKAISU       PIC ZZZ.
            03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
+      *
+       01  WRK-ERR-MSG-AREA.
+           03  WRK-ERR-MSG-1.
+               05  FILLER          PIC X(50)   VALUE
+               "★★０５９で始まる「その他材料コード」が使用されて". 
+               05  FILLER          PIC X(10)   VALUE
+               "います★★". 
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1422,7 +1430,17 @@
       *    労災基準監督署コード
            IF      RECE82-SYOKAIFLG    =   "1"
                MOVE   RECE82-SYOCD         TO  HCN67-SYOCD
-           END-IF     
+           END-IF
+      *??
+          MOVE 15 TO RECE82-ERR-ERRKBN
+      *
+      *    レセプト種別不明のときは原因を編集する
+           IF      CNT-PAGE            =   1
+               IF    ( RECE82-RECESYUBETU  =    ZERO )
+               OR    ( RECE82-ERR-ERRKBN   >    ZERO )
+                   PERFORM 3101-FUMEI-HENSYU-SEC
+               END-IF
+           END-IF
       *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN NOT =   "1"
@@ -1439,6 +1457,21 @@
       *
            .
        20021-HEAD-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト種別不明のとき不明の原因を編集処理
+      *****************************************************************
+       3101-FUMEI-HENSYU-SEC           SECTION.
+      *
+           EVALUATE    RECE82-ERR-ERRKBN
+               WHEN    15
+                   MOVE    WRK-ERR-MSG-1   TO   HCN67-HEAD (2)
+           END-EVALUATE
+           INSPECT HCN67-HEAD-G REPLACING  ALL "  "    BY  "　"
+      *
+           .
+       3101-FUMEI-HENSYU-EXT.
            EXIT.
       *     
       *****************************************************************
@@ -2991,13 +3024,17 @@
            MOVE    "00"                TO  RECE08-PREFNUM
            MOVE    RECE82-TEKSTYMD     TO  RECE08-TEKSTYMD
            MOVE    "3"                 TO  RECE08-TEISYUTUSAKI
-           IF      TBL-RECE-RENNUM (IDXY)  =   1                                 
-               MOVE    RECE82-RECESYUBETU  TO  RECE08-RECESYUBETU
-            ELSE
-               MOVE    RECE82-RECESYUBETU  TO  RECE08-RECESYUBETU
-               MOVE    "3"                 TO  RECE08-RECESYUBETU
-                                                            (4:1)
-           END-IF                                                         
+           IF      RECE82-ERR-ERRKBN   >    ZERO
+               MOVE    ZERO                TO  RECE08-RECESYUBETU
+           ELSE
+               IF      TBL-RECE-RENNUM (IDXY)  =   1
+                   MOVE    RECE82-RECESYUBETU  TO  RECE08-RECESYUBETU
+                ELSE
+                   MOVE    RECE82-RECESYUBETU  TO  RECE08-RECESYUBETU
+                   MOVE    "3"                 TO  RECE08-RECESYUBETU
+                                                                (4:1)
+               END-IF
+           END-IF
            MOVE    RECE82-PTNUM        TO  RECE08-PTNUM
            PERFORM VARYING IDX FROM    20  BY  -1
                    UNTIL   IDX <       1
@@ -3208,6 +3245,7 @@
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE82-TSTPTNUMKBN  =   "1"  )
            OR    ( RECE82-RECESYUBETU  =   ZERO )
+           OR    ( RECE82-ERR-ERRKBN   >   ZERO )
                GO  TO  3904-RECE10-HENSYU-EXT
            END-IF
       *          

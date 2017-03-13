@@ -33,6 +33,7 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応修正
+      *  04.08.03    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -975,6 +976,7 @@
                    OR  (   RECE41-RECESYUBETU  =   ZERO
                                                OR  7021
                                                OR  7051   )
+                   OR  (   RECE41-ERR-ERRKBN   >   ZERO   )
                    OR  (   RECE41-RSIIRYOKBN   =   "0"    )
                    OR  ((  RECE41-HKNKBN    = "1" OR "2" ) AND
                         (  RECE41-TOTALKIN  =  ZERO      ) AND

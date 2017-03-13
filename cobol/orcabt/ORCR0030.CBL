@@ -762,6 +762,8 @@
       *  04.08.38    NACL-門脇    17/01/05  広島県地方公費対応
       *  04.08.39    NACL-門脇    15/02/23  茨城県地方公費対応（システム管理
       *                                     ２０１０のデフォルト設定修正）
+      *  04.08.40    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
+      *                                     レセ電請求が不可となる事に伴う対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12576,6 +12578,20 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
       *
                PERFORM 2104414-SETCOM-HENSYU-SEC
+      *
+               IF    (RECE02-SRYYM         >=  "201704")
+               AND   (SRY-SRYCD(IDX2)(1:3)  =  "059"   )
+                 IF   (RECE02-RECESYUBETU  =
+                          "6666" OR "8888" OR "0000"      )
+                 OR   (RECE02-ERR-ERRKBN   >   ZERO       )
+                 OR   (SRY-SRYKBN          =  "95" OR "96")
+                 OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
+                       (ACCT-ZAITEN        =   ZERO )     )
+                   CONTINUE
+                 ELSE
+                   MOVE     15      TO  RECE02-ERR-ERRKBN
+                 END-IF
+               END-IF
       *
               END-IF
              END-IF  

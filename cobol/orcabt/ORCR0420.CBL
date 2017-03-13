@@ -306,6 +306,8 @@
       *                                     （記録）対応修正
       *  04.08.15    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
+      *  04.08.16    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
+      *                                     レセ電請求が不可となる事に伴う対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4468,6 +4470,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF  (ACCT-SRYKBN          =  "80"   )
                  AND (SRY-SRYCD(IDX2)(1:5) =  "09593")
                     MOVE     1      TO  RECE41-ORIGINALCDKBN
+                 END-IF
+               END-IF
+      *
+               IF    (RECE41-SRYYM         >=  "201704")
+               AND   (SRY-SRYCD(IDX2)(1:3)  =  "059"   )
+                 IF   (RECE41-HKNKBN   NOT =  "1" AND "2" )
+                 OR   (RECE41-RECESYUBETU  =  "0000"      )
+                 OR   (RECE41-ERR-ERRKBN   >   ZERO       )
+                 OR   (SRY-SRYKBN          =  "95" OR "96")
+                 OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
+                       (ACCT-ZAITEN        =   ZERO )     )
+                   CONTINUE
+                 ELSE
+                   MOVE     15      TO  RECE41-ERR-ERRKBN
                  END-IF
                END-IF
       *

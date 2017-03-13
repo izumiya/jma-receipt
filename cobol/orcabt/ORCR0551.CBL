@@ -56,6 +56,7 @@
       *                                     管理料の算定日コメント対応
       *  04.08.07    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
+      *  04.08.08   NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11124,6 +11125,7 @@
                    OR  (   RECE41-RECESYUBETU  =   ZERO
                                                OR  7021
                                                OR  7051   )
+                   OR  (   RECE41-ERR-ERRKBN   >   ZERO   )
                    OR  (   RECE41-RSIIRYOKBN   =   "0"    )
                    OR  ((  RECE41-HKNKBN    = "1" OR "2" ) AND
                         (  RECE41-TOTALKIN  =  ZERO      ) AND

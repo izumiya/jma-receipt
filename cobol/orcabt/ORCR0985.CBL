@@ -54,6 +54,7 @@
       *                                     マスタの対応
       *  04.08.07    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.08    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6511,6 +6512,7 @@
                    OR  (   RECE82-TSTPTNUMKBN  =   "1"    )
                    OR  (   RECE82-RECESYUBETU  =   ZERO
                                                OR  7061   )
+                   OR  (   RECE82-ERR-ERRKBN   >   ZERO   )
                    OR  (   RECE82-RSIIRYOKBN   =   "0"    )
                    OR  ((  RECE82-HKNKBN    = "1" OR "2" ) AND
                         (  RECE82-TOTALKIN        = ZERO ) AND

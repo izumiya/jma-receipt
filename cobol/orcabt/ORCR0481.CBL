@@ -113,6 +113,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -524,6 +525,13 @@
            03  WRK-KGK9            PIC ZZ,ZZZ,ZZ9.
            03  WRK-KGK2            PIC ZZ.
            03  WRK-RECEKAISU       PIC ZZZ.
+      *
+       01  WRK-ERR-MSG-AREA.
+           03  WRK-ERR-MSG-1.
+               05  FILLER          PIC X(50)   VALUE
+               "★★０５９で始まる「その他材料コード」が使用されて". 
+               05  FILLER          PIC X(10)   VALUE
+               "います★★". 
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1497,6 +1505,14 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE   RECE41-SYOCD         TO  HC21-SYOCD
            END-IF     
       *
+      *    レセプト種別不明のときは原因を編集する
+           IF      CNT-PAGE            =   1
+               IF    ( RECE41-RECESYUBETU  =    ZERO )
+               OR    ( RECE41-ERR-ERRKBN   >    ZERO )
+                   PERFORM 3101-FUMEI-HENSYU-SEC
+               END-IF
+           END-IF
+      *
       *    点検用レセプト作成時
            IF      WRK-PARA-PRTKBN NOT =   "1"
                IF      SYS-200501-INSPECT-CHARACTER-KBN
@@ -1512,6 +1528,21 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
            .
        310-HC101-HEAD-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト種別不明のとき不明の原因を編集処理
+      *****************************************************************
+       3101-FUMEI-HENSYU-SEC           SECTION.
+      *
+           EVALUATE    RECE41-ERR-ERRKBN
+               WHEN    15
+                   MOVE    WRK-ERR-MSG-1   TO   HC21-HEAD (2)
+           END-EVALUATE
+           INSPECT HC21-HEAD-G REPLACING   ALL "  "    BY  "　"
+      *
+           .
+       3101-FUMEI-HENSYU-EXT.
            EXIT.
       *     
       *****************************************************************
@@ -2719,8 +2750,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
            MOVE    RECE41-TEKSTYMD     TO  RECE08-TEKSTYMD
            MOVE    "3"                 TO  RECE08-TEISYUTUSAKI
       *****IF      RECE41-PTNUM        =   SPACE
-      *        MOVE    ZERO                TO  RECE08-RECESYUBETU
-      *    ELSE      
+           IF      RECE41-ERR-ERRKBN   >    ZERO
+               MOVE    ZERO                TO  RECE08-RECESYUBETU
+           ELSE
                IF      TBL-RECE-RENNUM (IDXY)  =   1                                 
                    MOVE    RECE41-RECESYUBETU  TO  RECE08-RECESYUBETU
                 ELSE
@@ -2728,7 +2760,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "3"                 TO  RECE08-RECESYUBETU
                                                                 (4:1)
                END-IF                                                         
-      *****END-IF    
+           END-IF
            MOVE    RECE41-PTNUM        TO  RECE08-PTNUM
            PERFORM VARYING IDX FROM    20  BY  -1
                    UNTIL   IDX <       1
@@ -2957,6 +2989,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE41-TSTPTNUMKBN  =   "1"  )
            OR    ( RECE41-RECESYUBETU  =   ZERO )
+           OR    ( RECE41-ERR-ERRKBN   >   ZERO )
                GO  TO  3904-RECE10-HENSYU-EXT
            END-IF
       *          

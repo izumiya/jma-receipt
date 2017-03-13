@@ -136,3 +136,6 @@
                         PIC X(100).
             02  HCN67V01-TANJYOG2
                         PIC X(2).
+            02  HCN67V01-HEAD-G.
+              03  HCN67V01-HEAD
+                        PIC X(62)       OCCURS 2 TIMES.

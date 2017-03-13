@@ -78,6 +78,8 @@
       *                                     入外別対応
       *  04.08.05    NACL-門脇    17/02/07  労災保険登録時の労働基準監督
       *                                     署コードの編集方法変更に伴う修正
+      *  04.08.06    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
+      *                                     レセ電請求が不可となる事に伴う対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -227,7 +229,7 @@
                05  WRK-ROUSAIKBN       PIC X(01).
                05  WRK-ERR-DAY         PIC 9(02).
                05  WRK-ERR-HKNCOMBINUM PIC 9(04).
-               05  WRK-ERR-ERRKBN      PIC 9(01).
+               05  WRK-ERR-ERRKBN      PIC 9(02).
                05  WRK-ERR-TEKSTYMD    PIC 9(08).
                05  WRK-ERR-TEKEDYMD    PIC 9(08).
       *
