@@ -12582,14 +12582,18 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                IF    (RECE02-SRYYM         >=  "201704")
                AND   (SRY-SRYCD(IDX2)(1:3)  =  "059"   )
                  IF   (RECE02-RECESYUBETU  =
-                          "6666" OR "8888" OR "0000"      )
+                                    "6666" OR "0000"      )
                  OR   (RECE02-ERR-ERRKBN   >   ZERO       )
                  OR   (SRY-SRYKBN          =  "95" OR "96")
-                 OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
-                       (ACCT-ZAITEN        =   ZERO )     )
+      ***        OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
+      ***              (ACCT-ZAITEN        =   ZERO )     )
+                 OR   ((WRK-PARA-PRTKBN
+                                       NOT =  "9"   ) AND
+                       (RECE02-RECESYUBETU =  "8888")     )
                    CONTINUE
                  ELSE
                    MOVE     15      TO  RECE02-ERR-ERRKBN
+                   DISPLAY "059 ERR:SRYCD=" SRY-SRYCD(IDX2)
                  END-IF
                END-IF
       *
