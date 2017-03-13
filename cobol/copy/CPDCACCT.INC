@@ -39,7 +39,7 @@
            03  DCACCT-HKNNUM           PIC X(03).
            03  DCACCT-KOHNUM           PIC X(03).
            03  DCACCT-KOHID            PIC 9(10).
-           03  DCACCT-HKNKBN           PIC X(01).
+           03  DCACCT-RSI-HKNKBN       PIC X(01).
            03  DCACCT-RECESYUBETU      PIC X(04).
            03  DCACCT-DAY              PIC 9(02).
            03  DCACCT-DAYCNT           PIC 9(03).

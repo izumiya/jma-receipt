@@ -832,6 +832,12 @@
            05 PIC  X(30)   VALUE   "食の入力があります            ".
            05 PIC  X(30)   VALUE   "                              ".
       *
+           05 PIC  X(06)   VALUE   "990037".
+           05 PIC  X(30)   VALUE   "平成２９年４月診療分以降は、特".
+           05 PIC  X(30)   VALUE   "定器材商品名コードを使用した診".
+           05 PIC  X(30)   VALUE   "療行為入力を行ってください    ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
@@ -839,10 +845,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  129.
+           05 ERRMES-OCC   OCCURS  130.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   129.
-
-
-
+         03  ERRMES-MAX                PIC 9(05)   VALUE   130.
