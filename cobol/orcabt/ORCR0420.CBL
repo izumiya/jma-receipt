@@ -4479,11 +4479,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  OR   (RECE41-RECESYUBETU  =  "0000"      )
                  OR   (RECE41-ERR-ERRKBN   >   ZERO       )
                  OR   (SRY-SRYKBN          =  "95" OR "96")
-                 OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
-                       (ACCT-ZAITEN        =   ZERO )     )
+      ***        OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
+      ***              (ACCT-ZAITEN        =   ZERO )     )
                    CONTINUE
                  ELSE
                    MOVE     15      TO  RECE41-ERR-ERRKBN
+                   DISPLAY "059 ERR:SRYCD=" SRY-SRYCD(IDX2)
                  END-IF
                END-IF
       *
