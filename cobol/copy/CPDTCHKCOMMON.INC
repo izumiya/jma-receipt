@@ -226,6 +226,12 @@
                05  TKZI-DAY-G.
                    07  TKZI-DAY                        PIC 9(01)
                                                        OCCURS 31.
+           03  TKZI-MICD-MAX                           PIC 9(05).
+           03  TKZI-MICD-OCC                           OCCURS 30.
+               05  TKZI-MICD-SRYCD                     PIC X(09).
+               05  TKZI-MICD-DAY-G.
+                   07  TKZI-MICD-DAY                   PIC 9(01)
+                                                       OCCURS 31.
       *
       *    チェックマスタ退避ワーク
          02  TCHK-AREA.

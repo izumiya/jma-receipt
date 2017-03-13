@@ -218,6 +218,7 @@
            03  WRK-HKNCOMBI                            PIC 9(04).
            03  WRK-INGAITEN                            PIC 9(07).
            03  WRK-ZAINUM                              PIC 9(08).
+           03  WRK-RSI-HKNKBN                          PIC X(01).
       *
        01  KEY-AREA.
            03  KEY-NYUGAIKBN                           PIC X(01).
@@ -874,6 +875,7 @@
            MOVE    DTCHK005-JIHOKBN    TO  DCACCT-JIHOKBN
            MOVE    DTCHK005-HKNCOMBI   TO  DCACCT-HKNCOMBI
            MOVE    COMB-HKNNUM         TO  DCACCT-HKNNUM
+           MOVE    WRK-RSI-HKNKBN      TO  DCACCT-RSI-HKNKBN
            MOVE    COMB-KOHHKNNUM (1)  TO  DCACCT-KOHNUM
            MOVE    COMB-KOHID  (1)     TO  DCACCT-KOHID
            MOVE    DTCHK005-ZAITEN     TO  DCACCT-ZAITEN
@@ -1020,6 +1022,7 @@
        220-HKNCOMBI-GET-SEC            SECTION.
       *
            INITIALIZE                  HKNCOMBI-REC
+                                       WRK-RSI-HKNKBN
       *
            PERFORM VARYING IDX-COMB    FROM    1   BY  1
                    UNTIL ( IDX-COMB    >   SDTCHK02-O-MAX )
@@ -1029,6 +1032,8 @@
                                   =    WRK-HKNCOMBI )
                    MOVE    LNK-HKNCOMBI-OCC (IDX-COMB)
                                   TO   HKNCOMBI-REC
+                   MOVE    SDTCHK02-O-RSI-HKNKBN  (IDX-COMB)
+                                  TO   WRK-RSI-HKNKBN
                END-IF
       *
            END-PERFORM
