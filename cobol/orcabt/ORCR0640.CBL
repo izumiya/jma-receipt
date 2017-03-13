@@ -731,6 +731,8 @@
       *                                     （記録）対応修正
       *  04.08.29    NACL-門脇    16/11/11  減額（円超）の対応
       *  04.08.30    NACL-門脇    17/01/05  広島県地方公費対応
+      *  04.08.31    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
+      *                                     レセ電請求が不可となる事に伴う対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8514,6 +8516,20 @@
                END-IF
       *
                PERFORM  2101214-SETCOM-HENSYU-SEC
+      *
+               IF    (RECE62-SRYYM         >=  "201704")
+               AND   (SRY-SRYCD(IDX2)(1:3)  =  "059"   )
+                 IF   (RECE62-RECESYUBETU  =
+                          "6666" OR "8888" OR "0000"      )
+                 OR   (RECE62-ERR-ERRKBN   >   ZERO       )
+                 OR   (SRY-SRYKBN          =  "95" OR "96")
+                 OR   ((WRK-PARA-PRTKBN    =  "1"   ) AND
+                       (ACCT-ZAITEN        =   ZERO )     )
+                   CONTINUE
+                 ELSE
+                   MOVE     15      TO  RECE62-ERR-ERRKBN
+                 END-IF
+               END-IF
       *
               END-IF
              END-IF

@@ -225,6 +225,7 @@
       *                                     記載修正
       *  04.08.10    NACL-門脇    16/09/28  自賠責（第三者行為）
       *                                     保険別請求チェック表の機能追加
+      *  04.08.11    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1221,6 +1222,9 @@
                    "残留法人等の負担者番号、受給者番号の入力が". 
                05  FILLER          PIC X(10)   VALUE
                    "ありません". 
+           03  WRK-ERR-MSG-17.
+               05  FILLER          PIC X(52)   VALUE
+               "０５９で始まる「その他材料コード」が使用されています". 
       *
            03  WRK-ERR-MSG-88.
                05  FILLER          PIC X(24)  VALUE
@@ -2351,14 +2355,25 @@
       *
            PERFORM         UNTIL   FLG-RECE02     =   1
       *        不明分があれば処理終了
-               IF      RECE02-RECESYUBETU  =   ZERO
-                   STRING   "レセプトが種別不明です　患者番号＝"
-                                               DELIMITED  BY  SIZE
-                            RECE02-PTNUM       DELIMITED  BY  SIZE
-                                               INTO  WRK-RECEERR
-                   END-STRING
+               IF    ( RECE02-RECESYUBETU  =   ZERO )
+               OR    ( RECE02-ERR-ERRKBN   =   15   )
+                   IF      RECE02-RECESYUBETU  =   ZERO
+                       STRING   "レセプトが種別不明です　患者番号＝"
+                                                   DELIMITED  BY  SIZE
+                                RECE02-PTNUM       DELIMITED  BY  SIZE
+                                                   INTO  WRK-RECEERR
+                       END-STRING
+                   ELSE
+                       STRING  "０５９で始まる「その他材料コード」"
+                                                   DELIMITED  BY  SIZE
+                               "が使用されています　患者番号＝"
+                                                   DELIMITED  BY  SIZE
+                                RECE02-PTNUM       DELIMITED  BY  SIZE
+                                                   INTO  WRK-RECEERR
+                       END-STRING
+                   END-IF
                    PERFORM 500-ERR-HENSYU-SEC
-                   STRING  "ORCR0150 "         DELIMITED   BY  SIZE
+                   STRING  "ORCR0105 "         DELIMITED   BY  SIZE
                            WRK-RECEERR         DELIMITED   BY  SPACE
                            LOW-VALUE           DELIMITED   BY  SIZE
                                                INTO    WRK-ERRMSG
@@ -3613,6 +3628,8 @@
                    MOVE    WRK-ERR-MSG-14  TO   HC06-HEAD4-G (5:)
                WHEN    14
                    MOVE    WRK-ERR-MSG-16  TO   HC06-HEAD4-G (5:)
+               WHEN    15
+                   MOVE    WRK-ERR-MSG-17  TO   HC06-HEAD4-G (5:)
                WHEN    88
                    MOVE    WRK-ERR-MSG-88  TO   HC06-HEAD4-G (5:)
            END-EVALUATE        

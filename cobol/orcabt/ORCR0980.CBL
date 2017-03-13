@@ -36,6 +36,7 @@
       *  04.08.03    NACL-ÌçÏÆ    16/08/23  »ý»²ÌôÂÐ±þ
       *  04.08.04    NACL-ÌçÏÆ    16/11/07  £±£µ±ß°Ê²¼ÌôºÞ¤ÎÄó½ÐÍÑ¥ì¥»¥×¥Èµ­ºÜ
       *                                     ¡Êµ­Ï¿¡ËÂÐ±þ½¤Àµ
+      *  04.08.05    NACL-Æ£¸¶    17/03/02  Ì¤¥³¡¼¥É²½ÆÃÄê´ïºà¥³¡¼¥ÉÇÑ»ßÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -908,6 +909,7 @@
                    OR  (   RECE82-TSTPTNUMKBN  =   "1"    )
                    OR  (   RECE82-RECESYUBETU  =   ZERO
                                                OR  7061   )
+                   OR  (   RECE82-ERR-ERRKBN   >   ZERO   )
                    OR  (   RECE82-RSIIRYOKBN   =   "0"    )
                    OR  ((  RECE82-HKNKBN    = "1" OR "2" ) AND
                         (  RECE82-TOTALKIN        = ZERO ) AND

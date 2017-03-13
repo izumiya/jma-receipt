@@ -92,3 +92,6 @@
                         PIC X(100).
             02  HCM21V06-TANJYOG2
                         PIC X(2).
+            02  HCM21V06-HEAD-G.
+              03  HCM21V06-HEAD
+                        PIC X(62)       OCCURS 2 TIMES.

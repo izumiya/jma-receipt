@@ -151,3 +151,6 @@
                         PIC X(14)       OCCURS 9 TIMES.
             02  HCN66V01-LOPTION
                         PIC X(100).
+            02  HCN66V01-HEAD-G.
+              03  HCN66V01-HEAD
+                        PIC X(62)       OCCURS 2 TIMES.
