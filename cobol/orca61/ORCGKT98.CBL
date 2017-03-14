@@ -2361,6 +2361,25 @@
                END-STRING
            END-IF
       *
+      *H29.3
+      *    ´ïºàÊÌÉ½¶èÊ¬ÊÔ½¸
+           IF     (TNS-SRYCD(1:1)      =   "7" )
+             AND  (TNS-CDKBN-BU        =   "01"
+                                       OR  "08" )
+               MOVE    SPACE               TO  SPA-KT98-GMN-NAME (IDX)
+               IF      TNS-CDKBN-BU        =   "01"
+                   STRING  "¡Úºß¡Û"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-KT98-GMN-NAME(IDX)
+                   END-STRING
+               ELSE
+                   STRING  "¡ÚÄ´¡Û"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-KT98-GMN-NAME(IDX)
+                   END-STRING
+               END-IF
+           END-IF
+      *
       *H24.6
       *    Ï«ºÒ¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
            IF      (TNS-SRYCD(1:3)     =   "101")

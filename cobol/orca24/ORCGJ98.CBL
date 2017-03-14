@@ -2369,6 +2369,25 @@
                       INTO                 SPA-J98-GMN-NAME(IDX)
                END-STRING
            END-IF
+      *
+      *H29.3
+      *    ¥Ô∫‡ Ã…Ω∂Ë ¨ ‘Ω∏
+           IF     (TNS-SRYCD(1:1)      =   "7" )
+             AND  (TNS-CDKBN-BU        =   "01"
+                                       OR  "08" )
+               MOVE    SPACE               TO  SPA-J98-GMN-NAME (IDX)
+               IF      TNS-CDKBN-BU        =   "01"
+                   STRING  "°⁄∫ﬂ°€"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-J98-GMN-NAME(IDX)
+                   END-STRING
+               ELSE
+                   STRING  "°⁄ƒ¥°€"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-J98-GMN-NAME(IDX)
+                   END-STRING
+               END-IF
+           END-IF
       *!!
       *!!
       *H24.6
