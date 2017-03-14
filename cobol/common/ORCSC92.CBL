@@ -5897,6 +5897,26 @@
                END-STRING
                MOVE    WRK-MEISYO          TO  TNS-NAME
            END-IF
+      *
+      *H29.3
+      *    器材別表区分編集
+           IF     (TNS-SRYCD(1:1)      =   "7" )
+             AND  (TNS-CDKBN-BU        =   "01"
+                                       OR  "08" )
+               MOVE    SPACE               TO  WRK-MEISYO
+               IF      TNS-CDKBN-BU        =   "01"
+                   STRING  "【在】"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 WRK-MEISYO
+                   END-STRING
+               ELSE
+                   STRING  "【調】"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 WRK-MEISYO
+                   END-STRING
+               END-IF
+               MOVE    WRK-MEISYO          TO  TNS-NAME
+           END-IF
       *!!
       *!
       *    附加情報の上限回数設定

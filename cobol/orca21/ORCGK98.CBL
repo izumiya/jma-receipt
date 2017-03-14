@@ -54,6 +54,7 @@
       *  04.07.00    NACL-多々納  12/07/09  労災等名称編集追加
       *  04.07.00    NACL-多々納  13/03/01  労災レセ電対応
       *  04.08.00    NACL-多々納  15/09/XX  セット内容展開対応他
+      *  04.08.00    NACL-多々納  16/05/XX  一般名検索・向精神薬記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2329,6 +2330,25 @@
                       TNS-NAME             DELIMITED   BY  SPACE
                       INTO                 SPA-K98-GMN-NAME(IDX)
                END-STRING
+           END-IF
+      *
+      *H29.3
+      *    器材別表区分編集
+           IF     (TNS-SRYCD(1:1)      =   "7" )
+             AND  (TNS-CDKBN-BU        =   "01"
+                                       OR  "08" )
+               MOVE    SPACE               TO  SPA-K98-GMN-NAME (IDX)
+               IF      TNS-CDKBN-BU        =   "01"
+                   STRING  "【在】"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-K98-GMN-NAME(IDX)
+                   END-STRING
+               ELSE
+                   STRING  "【調】"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-K98-GMN-NAME(IDX)
+                   END-STRING
+               END-IF
            END-IF
       *
       *H24.6
@@ -5759,6 +5779,7 @@
            .
        9201-GENERICPRICE-READ-EXT.
            EXIT.
+      *H24.4
       *H28.6
       *****************************************************************
       *    向精神薬成分コード検索処理
@@ -5796,7 +5817,6 @@
            .
        9102-PSYCHOTROPIC-READ-EXT.
            EXIT.
-      *H24.4
       *
       *****************************************************************
       *    入力コードマスター読込
