@@ -82,6 +82,9 @@
       *                                     登録時間を追加
       *
       *  04.08.01    NACL-藤原    16/03/02  入外区分による更新の修正
+      *  04.08.02    NACL-藤原    17/03/15  単独病名の病名コードのみ設定時の
+      *                                     取り込み修正
+      *                                     病名コード数の設定の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -581,9 +584,11 @@
       *    病名のみ設定のときコードチェック
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       6
-                   OR      LF04-SNDSPITBL-SPINAME2(IDX IDY) 
+                   OR   (  LF04-SNDSPITBL-SPINAME2(IDX IDY) 
                                                =   SPACE
-                   OR      FLG-BYOMEI-CHK      =   1
+                       AND LF04-SNDSPITBL-SPICOD2 (IDX IDY)
+                                               =   SPACE )
+                   OR   (  FLG-BYOMEI-CHK      =   1     )
       *
                DISPLAY " IDY="                     IDY
                DISPLAY " diagnosis dxItem code ="
@@ -1499,6 +1504,7 @@
       *    疾患コードがエラー又は未コード化傷病名コード以外のとき
            IF      FLG-BYOMEI-CHK      NOT =   1   AND 5   AND 6
                MOVE    ZERO                TO  IDZ
+                                               PTBYO-BYOMEICDSU
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       6
                        OR      WRK-TBYOMEICD (IDY) =   SPACE
@@ -1729,6 +1735,7 @@
       *    疾患コードがエラー又は未コード化傷病名コード以外のとき
            IF      FLG-BYOMEI-CHK      NOT =   1   AND 5 AND 6
                MOVE    ZERO                TO  IDZ
+                                               PTBYO-BYOMEICDSU
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       6
                        OR      WRK-TBYOMEICD (IDY) =   SPACE
