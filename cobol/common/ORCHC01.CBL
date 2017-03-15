@@ -631,16 +631,14 @@
                MOVE    SYS-1017-KARUTE-BYOMEI  TO  WRK-KARUTE-BYOMEI
            END-IF
       *H28.7
-      *API ginbee対応
+      *API 対応
       *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
            MOVE    "API_DATA"          TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            IF    ( WRK-PARA(1:1)       =   "1" )
                MOVE    WRK-PARA(1:1)       TO  PARA-API-DATA
            END-IF
-      *    ginbeeのみ対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-              AND (PARA-API-DATA       =   "1"       )
+           IF     (PARA-API-DATA       =   "1"       )
                CONTINUE
            ELSE
       *        API送信なし

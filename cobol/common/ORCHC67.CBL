@@ -333,16 +333,14 @@
                MOVE    "99999999"          TO  PARA-YUKOEDYMD
            END-IF
       *H28.10
-      *API ginbee対応
+      *API対応
       *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
            MOVE    "API_DATA"          TO  WRK-PARA-NAME
            MOVE    1                   TO  WRK-PARA-MAX
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:WRK-PARA-MAX)
                                        TO  PARA-API-DATA
-      *    ginbeeのみ対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-              AND (PARA-API-DATA       =   "1"       )
+           IF     (PARA-API-DATA       =   "1"       )
                CONTINUE
            ELSE
       *        API送信なし

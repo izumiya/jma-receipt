@@ -1185,19 +1185,17 @@
            MOVE    WRK-PARA        TO  TPARA-CHUI
       *
       *
-           IF    ( SPA-MW              =   SPA-GINBEE )
-      *        API_DATA
-               MOVE    "API_DATA"      TO  WRK-PARA-NAME
-               PERFORM 1001-OPTION-CALL-SEC
-               IF    ( WRK-PARA        =   "1" )
-                   MOVE    WRK-PARA    TO  TPARA-API-DATA
-               END-IF
-      *
-      *        API_CUSTOM_ID
-               MOVE    "API_CUSTOM_ID" TO  WRK-PARA-NAME
-               PERFORM 1001-OPTION-CALL-SEC
-               MOVE    WRK-PARA        TO  TPARA-API-CUSTOM-ID
+      *    API_DATA
+           MOVE    "API_DATA"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "1" )
+               MOVE    WRK-PARA    TO  TPARA-API-DATA
            END-IF
+      *
+      *    API_CUSTOM_ID
+           MOVE    "API_CUSTOM_ID" TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA        TO  TPARA-API-CUSTOM-ID
       *
       *    以下V5用
       *    合計単位

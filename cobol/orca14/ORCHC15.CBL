@@ -340,9 +340,7 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:WRK-PARA-MAX)
                                        TO  PARA-API-DATA
-      *    ginbeeのみ対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-              AND (PARA-API-DATA       =   "1"       )
+           IF     (PARA-API-DATA       =   "1"       )
                CONTINUE
            ELSE
       *        API送信なし

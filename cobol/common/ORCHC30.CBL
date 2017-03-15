@@ -479,9 +479,7 @@
            IF    ( WRK-PARA(1:1)       =   "1" )
                MOVE    WRK-PARA(1:1)       TO  PARA-API-DATA
            END-IF
-      *    ginbeeのみ対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-              AND (PARA-API-DATA       =   "1"       )
+           IF     (PARA-API-DATA       =   "1"       )
                CONTINUE
            ELSE
       *        API送信なし

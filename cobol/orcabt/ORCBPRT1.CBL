@@ -457,8 +457,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
                COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
       *
-               IF    ( SPA-MW              =   SPA-GINBEE )
-                AND  ( PRTKANRI-SHELLID    =   "API" )
+               IF    ( PRTKANRI-SHELLID    =   "API" )
                     IF    ( CNT-PUSH       <   CONST-PUSH-MAX )
                         PERFORM 20011-PUSH-FORM-SEC
                     END-IF

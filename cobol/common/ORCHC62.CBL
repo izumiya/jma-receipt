@@ -538,9 +538,7 @@
                END-IF
            END-IF
       *H28.6
-      *    ginbee対応
-           IF     (SPA-MW              =   SPA-GINBEE)
-              AND (PARA-API-DATA       =   "1"       )
+           IF     (PARA-API-DATA       =   "1"       )
                CONTINUE
            ELSE
       *        API送信なし
