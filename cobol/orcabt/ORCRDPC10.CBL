@@ -144,13 +144,14 @@
       *              NACL-小豆沢  16/09/05  退院時処方（複数薬剤入力時）
       *                                     の記録修正
       *              NACL-伊藤    16/10/18  閉麻計算見直し
-      *  04.08.01    NACL-小豆沢  17/02/28  医保以外で特定入院料を算定した場合に
-      *                                     F-19（行為明細区分情報）２桁目の
-      *                                     入院料包括項目区分を暫定セットする
       *  05.00.00    NACL-小豆沢  17/03/06  未コード化特定器材コード廃止対応
       *                                     平成２９年４月診療分から包括保険で
       *                                     ０５９ｘｘｘｘｘｘの入力はエラーとする。
       *                                     （点数がゼロ点以外の場合のみ）
+      *              NACL-小豆沢  17/03/16  医保以外で特定入院料を算定した場合に
+      *                                     入院会計から算定入院料を取得し、
+      *                                     F-19（行為明細区分情報）２桁目の
+      *                                     入院料包括項目区分を再セットする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -317,6 +318,8 @@
            03  FLG-TOKUTEINYUIN-SET    PIC 9(01).
            03  FLG-ETENSU1             PIC 9(01).
            03  FLG-ETENSU2             PIC 9(01).
+           03  FLG-NYUINACCT           PIC 9(01).
+           03  FLG-NYUINACT            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -599,6 +602,10 @@
       *    電子点数表の退避用
            03  WRK-ETENSU-TBL.
                05  WRK-ETENSU1-H-GROUP1        PIC X(07)  OCCURS  31.
+      *
+      *    医保以外の特定入院料算定判定用
+           03  WRK-IHO-IGAI-TOKNYUINCD-TBL.
+               05  WRK-IHO-IGAI-TOKNYUINCD     PIC X(09)  OCCURS  31.
       *
       *    医薬品・特定器材用テーブル
        01  TBL-ZAIW-AREA.
@@ -1298,6 +1305,14 @@
       *    電子点数表　包括・被包括マスター
        01  ETENSU2-REC.
            COPY    "CPETENSU2.INC".
+      *
+      *    入院診療会計マスタ−
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
+      *
+      *    入院診療行為マスター
+       01  NYUINACT-REC.
+           COPY    "CPNYUINACT.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -2064,6 +2079,9 @@
       *****************************************************************
        2001-NYUINRYO-GET-SEC           SECTION.
       *
+           INITIALIZE                      WRK-HOUKATU-TBL
+           INITIALIZE                      WRK-IHO-IGAI-TOKNYUINCD-TBL
+      *
            INITIALIZE                      ORCSDPCNYUIN-AREA
            MOVE    RECE62-HOSPNUM      TO  LNK-DPCNYUIN-HOSPNUM
            MOVE    RECE62-PTID         TO  LNK-DPCNYUIN-PTID
@@ -2098,48 +2116,28 @@
                                                TO  TNS-SRYCD
                        PERFORM 900-TENSU-READ-SEC
                        IF   TNS-CDKBN-KBN     =   "A"
-                         IF  (TNS-CDKBN-KBNNUM      =  300)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  2)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  3)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  301)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  4)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  302)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  303)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  303)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  2)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  305)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  307)   AND
-                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)
-                            MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
-                         END-IF
-                         IF  (TNS-CDKBN-KBNNUM      =  400)   AND
-                             (TNS-CDKBN-KOUBAN      =  3)
+                         IF ((TNS-CDKBN-KBNNUM      =  300)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  2))    OR
+                            ((TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  3))    OR
+                            ((TNS-CDKBN-KBNNUM      =  301)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  4))    OR
+                            ((TNS-CDKBN-KBNNUM      =  302)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  303)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  303)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  2))    OR
+                            ((TNS-CDKBN-KBNNUM      =  305)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  307)   AND
+                             (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                            ((TNS-CDKBN-KBNNUM      =  400)   AND
+                             (TNS-CDKBN-KOUBAN      =  3))
                             MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
                          END-IF
                        END-IF
@@ -2150,6 +2148,74 @@
                         MOVE   "1"    TO   WRK-HOUKATU-KBN(IDX)
                     END-IF
                 END-IF
+      *
+      *--- AZU-ADD START 2017.03.16
+      *         医保以外で特定入院料を算定している場合を考慮して
+      *         WRK-HOUKATU-KBN(IDX)が未セット日は入院会計を再取得
+      *         して再セット
+                IF    WRK-HOUKATU-KBN(IDX)          =   SPACE
+                   INITIALIZE                           NYUINACCT-REC
+                   MOVE  RECE62-HOSPNUM             TO  NACCT-HOSPNUM
+                   MOVE  RECE62-PTID                TO  NACCT-PTID
+                   MOVE  RECE62-SRYYM               TO  NACCT-SRYYM
+                   MOVE  "1"                        TO  NACCT-ZAISKBKBN
+                   MOVE  "tbl_nyuinacct"            TO  MCP-TABLE
+                   MOVE  "key35"                    TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT            =   ZERO
+                      MOVE    "tbl_nyuinacct"       TO  MCP-TABLE
+                      MOVE    "key35"               TO  MCP-PATHNAME
+                      PERFORM   910-NYUINACCT-READ-SEC
+                      PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                         IF   (NACCT-SRYKBN         =   "92")  AND
+                              (NACCT-DAY(IDX)       =   1)
+      *                     該当入院行為テーブルの読み込み
+                            PERFORM    210-NYUINACT-GET-SEC
+                            INITIALIZE                  TNS-TENSU-REC
+                            MOVE    NSRY-SRYCD(1)   TO  TNS-SRYCD
+                            PERFORM 900-TENSU-READ-SEC
+                            IF   TNS-CDKBN-KBN     =   "A"
+                              IF ((TNS-CDKBN-KBNNUM      =  300)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  301)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  301)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  2))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  301)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  3))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  301)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  4))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  302)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  303)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  303)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  2))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  305)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  307)   AND
+                                  (TNS-CDKBN-KBNNUM-EDA  =  ZERO)) OR
+                                 ((TNS-CDKBN-KBNNUM      =  400)   AND
+                                  (TNS-CDKBN-KOUBAN      =  3))
+                                     MOVE  "1" TO  WRK-HOUKATU-KBN(IDX)
+                              ELSE
+                                     MOVE  "2" TO  WRK-HOUKATU-KBN(IDX)
+                              END-IF
+                              MOVE  NSRY-SRYCD(1)   TO
+                                           WRK-IHO-IGAI-TOKNYUINCD(IDX)
+                            END-IF
+                         END-IF
+                         MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
+                         MOVE    "key35"           TO  MCP-PATHNAME
+                         PERFORM 910-NYUINACCT-READ-SEC
+                      END-PERFORM
+                   END-IF
+      *            入院会計クローズ
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key35"                 TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+                END-IF
+      *--- AZU-ADD END   2017.03.16
       *
       *         入院料の包括グループ番号取得
                 IF    LNK-DPCNYUIN-SRYCD(1 IDX 1)  NOT = SPACE
@@ -2279,6 +2345,44 @@
                     MOVE    "key"               TO  MCP-PATHNAME
                     PERFORM 900-CLOSE-SEC
                 END-IF
+      *
+      *--- AZU-ADD START 2017.03.16
+      *         特定入院料（医保以外で特定入院料算定時）の
+      *         包括グループ番号取得
+                IF   (LNK-DPCNYUIN-SRYCD(1 IDX 1)   = SPACE)  AND
+                     (LNK-DPCNYUIN-SRYCD(2 IDX 1)   = SPACE)  AND
+                     (LNK-NYUINDAY-TANKI-KBN(IDX)   = SPACE)  AND
+                     (WRK-IHO-IGAI-TOKNYUINCD(IDX)  NOT = SPACE)
+                    MOVE    SPACE           TO  ETENSU1-REC
+                    INITIALIZE                  ETENSU1-REC
+                    MOVE    WRK-IHO-IGAI-TOKNYUINCD(IDX)
+                                            TO  ETENSU1-SRYCD
+                    MOVE    RECE62-SRYYM    TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"            TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                            TO  ETENSU1-YUKOEDYMD
+                    MOVE    ETENSU1-REC     TO  MCPDATA-REC
+                    MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                    MOVE    "key"           TO  MCP-PATHNAME
+                    PERFORM 900-DBSELECT-SEC
+                    IF      MCP-RC              =   ZERO
+                        MOVE    "tbl_etensu_1"  TO  MCP-TABLE
+                        MOVE    "key"           TO  MCP-PATHNAME
+                        PERFORM 900-ETENSU1-READ-SEC
+                        IF   FLG-ETENSU1        =   ZERO
+                            MOVE  ETENSU1-H-GROUP(1)
+                                                TO  WRK-ETENSU1-H-GROUP1
+                                                                 (IDX)
+                        END-IF
+                    ELSE
+                        MOVE    1               TO  FLG-ETENSU1
+                        INITIALIZE                  ETENSU1-REC
+                    END-IF
+                    MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+                    MOVE    "key"               TO  MCP-PATHNAME
+                    PERFORM 900-CLOSE-SEC
+                END-IF
+      *--- AZU-ADD END   2017.03.16
       *
            END-PERFORM
       *--- AZU-ADD END   2016.07.04
@@ -5744,12 +5848,6 @@
                   IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)   =   "2"
                      MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
                   END-IF
-      *--- AZU-ADD START 2017.02.28
-      *     （暫定）包括元となる入院料が判定できない場合は２をセットする
-                  IF   WRK-HOUKATU-KBN(WRK-FEDT-DD)  NOT =  "1" AND "2"
-                     MOVE    2             TO  WRK-FEDT-KOUI-MEISAI2
-                  END-IF
-      *--- AZU-ADD END   2017.02.28
                ELSE
                   MOVE    ZERO             TO  WRK-FEDT-KOUI-MEISAI2
                   IF   WRK-TAIIN-SHOHOU    =    "1"
@@ -7490,6 +7588,105 @@
            END-IF
            .
        900-ETENSU2-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院会計マスター検索
+      *****************************************************************
+       910-NYUINACCT-SELECT-SEC        SECTION.
+      *
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-NYUINACCT
+           ELSE
+               MOVE    1                  TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       910-NYUINACCT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院会計マスター読込
+      *****************************************************************
+       910-NYUINACCT-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  NYUINACCT-REC
+               MOVE    ZERO               TO  FLG-NYUINACCT
+           ELSE
+               INITIALIZE                     NYUINACCT-REC
+               MOVE    1                  TO  FLG-NYUINACCT
+           END-IF
+      *
+           .
+       910-NYUINACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院診療行為取得
+      *****************************************************************
+       210-NYUINACT-GET-SEC            SECTION.
+      *
+           INITIALIZE                      NYUINACT-REC
+           MOVE    NACCT-HOSPNUM       TO  NSRY-HOSPNUM
+           MOVE    NACCT-NYUGAIKBN     TO  NSRY-NYUGAIKBN
+           MOVE    NACCT-PTID          TO  NSRY-PTID
+           MOVE    NACCT-SRYYM         TO  NSRY-SRYYM
+           MOVE    NACCT-ZAINUM        TO  NSRY-ZAINUM
+           MOVE    "tbl_nyuinact"      TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-NYUINACT-SELECT-SEC
+           IF      FLG-NYUINACT        =   ZERO
+               MOVE    "tbl_nyuinact"  TO  MCP-TABLE
+               MOVE    "key9"          TO  MCP-PATHNAME
+               PERFORM   910-NYUINACT-READ-SEC
+           END-IF
+      *
+      *    入院行為クローズ
+           MOVE     "tbl_nyuinact"     TO  MCP-TABLE
+           MOVE     "key9"             TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       210-NYUINACT-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院診療行為マスター検索
+      *****************************************************************
+       910-NYUINACT-SELECT-SEC        SECTION.
+      *
+           MOVE    NYUINACT-REC        TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-NYUINACT
+           ELSE
+               MOVE    1                  TO  FLG-NYUINACT
+           END-IF
+      *
+           .
+       910-NYUINACT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院診療行為マスター読込
+      *****************************************************************
+       910-NYUINACT-READ-SEC         SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  NYUINACT-REC
+               MOVE    ZERO                TO  FLG-NYUINACT
+           ELSE
+               INITIALIZE                      NYUINACT-REC
+               MOVE    1                   TO  FLG-NYUINACT
+           END-IF
+      *
+           .
+       910-NYUINACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
