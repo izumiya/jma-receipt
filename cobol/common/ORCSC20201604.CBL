@@ -5550,6 +5550,8 @@
       *        外来後発医薬品使用体制加算（診療所）
                IF     (FLG-SYOHORYO        =   1 )
                  AND  (SPA-HOSPSBT         =   2 )
+      *手入力があればなし
+                 AND   (FLG-GENKSN2        =   ZERO )
                    MOVE    CONS-GEN-KSN1       TO  WRK-SRYCD
                    MOVE    SPACE               TO  WRK-SRYCD2
                    PERFORM 3002-KASAN-SYORI-SEC
