@@ -2080,6 +2080,7 @@
        2001-NYUINRYO-GET-SEC           SECTION.
       *
            INITIALIZE                      WRK-HOUKATU-TBL
+           INITIALIZE                      WRK-ETENSU-TBL
            INITIALIZE                      WRK-IHO-IGAI-TOKNYUINCD-TBL
       *
            INITIALIZE                      ORCSDPCNYUIN-AREA
