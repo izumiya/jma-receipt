@@ -1359,6 +1359,7 @@
       *
            END-PERFORM
       *
+           MOVE    "特別療養費(注)"    TO  HCGS139N-LBLTOKUYO
            MOVE    "労　　災 （注）"   TO  HCGS139N-LBLROUSAI
            MOVE    "自 賠 責 （注）"   TO  HCGS139N-LBLJIBAI
            MOVE    "公　　害 （注）"   TO  HCGS139N-LBLKOUGAI
@@ -1366,17 +1367,14 @@
            IF    ( KEY-RECEKA          =   SPACE )
       *
                IF    ( BGS100P-ETCGETKBN   =   "0" )
+                   MOVE    "特別療養費" TO HCGS139N-LBLTOKUYO
                    MOVE    "労　　災"  TO  HCGS139N-LBLROUSAI
                    MOVE    "自 賠 責"  TO  HCGS139N-LBLJIBAI
                    MOVE    "公　　害"  TO  HCGS139N-LBLKOUGAI
                END-IF
       *
                MOVE    SPACE           TO  HCGS139N-ETCHKNMSG
-               STRING  "（注）件数は患者数"
-                                           DELIMITED BY SIZE
-                       "（複数保険使用の場合はその数）"
-                                           DELIMITED BY SIZE
-                       "の集計結果となります。実際のレセプト件数"
+               STRING  "（注）実際のレセプト件数"
                                            DELIMITED BY SIZE
                        "・日数と一致しない場合があります。"
                                            DELIMITED BY SIZE
@@ -1873,6 +1871,7 @@
       *
            END-PERFORM
       *
+           MOVE    "特別療養費(注)"    TO  HCGS139G-LBLTOKUYO
            MOVE    "労　　災 （注）"   TO  HCGS139G-LBLROUSAI
            MOVE    "自 賠 責 （注）"   TO  HCGS139G-LBLJIBAI
            MOVE    "公　　害 （注）"   TO  HCGS139G-LBLKOUGAI
@@ -1880,17 +1879,14 @@
            IF    ( KEY-RECEKA          =   SPACE )
       *
                IF    ( BGS100P-ETCGETKBN   =   "0" )
+                   MOVE    "特別療養費" TO HCGS139G-LBLTOKUYO
                    MOVE    "労　　災"  TO  HCGS139G-LBLROUSAI
                    MOVE    "自 賠 責"  TO  HCGS139G-LBLJIBAI
                    MOVE    "公　　害"  TO  HCGS139G-LBLKOUGAI
                END-IF
       *
                MOVE    SPACE           TO  HCGS139G-ETCHKNMSG
-               STRING  "（注）件数は患者数"
-                                           DELIMITED BY SIZE
-                       "（複数保険使用の場合はその数）"
-                                           DELIMITED BY SIZE
-                       "の集計結果となります。実際のレセプト件数"
+               STRING  "（注）実際のレセプト件数"
                                            DELIMITED BY SIZE
                        "・日数と一致しない場合があります。"
                                            DELIMITED BY SIZE

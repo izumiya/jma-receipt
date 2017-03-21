@@ -64,3 +64,5 @@
                         PIC X(50).
             02  HCGS139GV02-LOPTION
                         PIC X(500).
+            02  HCGS139GV02-LBLTOKUYO
+                        PIC X(20).

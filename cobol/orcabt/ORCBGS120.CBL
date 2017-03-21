@@ -59,13 +59,14 @@
            03  WRK-ERRMSG          PIC X(200).
            03  WRK-PARA-NAME       PIC X(25).
            03  WRK-PARA            PIC X(100).
+           03  WRK-SUBTITLE        PIC X(20).
       *
        01  CONST-AREA.
            03  CONST-H2204         PIC X(06)   VALUE "201004".
            03  CONST-SYAHO         PIC 9(02)   VALUE 1.
            03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
            03  CONST-KOUKI         PIC 9(02)   VALUE 3.
-           03  CONST-TOKUYOU       PIC 9(02)   VALUE 4.
+           03  CONST-TOKUYO        PIC 9(02)   VALUE 4.
            03  CONST-JIHI          PIC 9(02)   VALUE 5.
            03  CONST-CHIKEN        PIC 9(02)   VALUE 6.
            03  CONST-ROUSAI        PIC 9(02)   VALUE 7.
@@ -219,20 +220,38 @@
            MOVE    SGETTEMP-FULLNAMES (6)
                                        TO  BGS100P-ERRFNAME
       *
+           MOVE    SPACE               TO  WRK-SUBTITLE
            EVALUATE    BGS100P-FORMKBN
            WHEN    "1"
-               MOVE    "保険別請求チェック明細表（社保）"
-                                       TO  BGS100P-SHELLMSG
+               MOVE    "（社保）"      TO  BGS100P-SHELLMSG
            WHEN    "2"
-               MOVE    "保険別請求チェック明細表（国保）"
-                                       TO  BGS100P-SHELLMSG
+               MOVE    "（国保）"      TO  BGS100P-SHELLMSG
            WHEN    "3"
-               MOVE    "保険別請求チェック明細表（後期高齢者）"
+               MOVE    "（後期高齢者）"
+                                       TO  BGS100P-SHELLMSG
+           WHEN    "5"
+               MOVE    "（特別療養費）"
+                                       TO  BGS100P-SHELLMSG
+           WHEN    "7"
+               MOVE    "（労災）"
+                                       TO  BGS100P-SHELLMSG
+           WHEN    "8"
+               MOVE    "（自賠責）"
+                                       TO  BGS100P-SHELLMSG
+           WHEN    "9"
+               MOVE    "（公害）"
                                        TO  BGS100P-SHELLMSG
            WHEN    OTHER
-               MOVE    "保険別請求チェック明細表（標準帳票）"
+               MOVE    "（標準帳票）"
                                        TO  BGS100P-SHELLMSG
            END-EVALUATE
+      *
+           MOVE    SPACE               TO  BGS100P-SHELLMSG
+           STRING  "保険別請求チェック明細表"
+                                       DELIMITED BY SIZE
+                   WRK-SUBTITLE        DELIMITED BY SPACE
+           INTO    BGS100P-SHELLMSG
+           END-STRING
       *
            MOVE    "/var/tmp/"         TO  BGS100P-CSVDIR
       *
@@ -265,6 +284,7 @@
        1001-PARA-CHK-SEC               SECTION.
       *
            IF    ( BGS100P-FORMKBN = "0" OR "1" OR "2" OR "3"
+                                  OR "5"
                                   OR "7" OR "8" OR "9"
                                   OR "a" OR "A"
                                   OR "b" OR "B"  )
@@ -293,6 +313,7 @@
                MOVE    1           TO  BGS100P-SYAHO
                                        BGS100P-KOKUHO
                                        BGS100P-KOUKI
+                                       BGS100P-TOKUYO
                                        BGS100P-ROUSAI
                                        BGS100P-JIBAI
                                        BGS100P-KOUGAI
@@ -304,7 +325,8 @@
                                        BGS100P-KOUKI
            WHEN    "b"
            WHEN    "B"
-               MOVE    1           TO  BGS100P-ROUSAI
+               MOVE    1           TO  BGS100P-TOKUYO
+                                       BGS100P-ROUSAI
                                        BGS100P-JIBAI
                                        BGS100P-KOUGAI
                                        BGS100P-DAISAN
@@ -314,6 +336,8 @@
                MOVE    1           TO  BGS100P-KOKUHO
            WHEN    "3"
                MOVE    1           TO  BGS100P-KOUKI
+           WHEN    "5"
+               MOVE    1           TO  BGS100P-TOKUYO
            WHEN    "7"
                MOVE    1           TO  BGS100P-ROUSAI
            WHEN    "8"
@@ -395,116 +419,64 @@
       *    社保
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-SYAHO   =   1 )
-      *
-                   MOVE    CONST-SYAHO TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-SYAHO     TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    国保
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-KOKUHO  =   1 )
-      *
-                   MOVE    CONST-KOKUHO TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-KOKUHO    TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    後期高齢者
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-KOUKI   =   1 )
+                   MOVE    CONST-KOUKI     TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
+               END-IF
+           END-IF
       *
-                   MOVE    CONST-KOUKI TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+      *    特別療養費
+           IF    ( BGS100P-RC      =   ZERO )
+               IF    ( BGS100P-TOKUYO  =   1 )
+                   MOVE    CONST-TOKUYO    TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    労災
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-ROUSAI   =   1 )
-      *
-                   MOVE    CONST-ROUSAI
-                                       TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-ROUSAI    TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    自賠責
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-JIBAI   =   1 )
-      *
-                   MOVE    CONST-JIBAI
-                                       TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-JIBAI     TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    第三者行為
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-DAISAN  =   1 )
-      *
-                   MOVE    CONST-DAISAN
-                                       TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-DAISAN    TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
       *    公害
            IF    ( BGS100P-RC      =   ZERO )
                IF    ( BGS100P-KOUGAI  =   1 )
-      *
-                   MOVE    CONST-KOUGAI
-                                       TO  BGS100P-HOKEN
-      *
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
-                   CALL    "ORCBGS121" USING
-                                       BGS100P-AREA
-                                       SPA-AREA
-                   PERFORM 800-MCNDATE-SEC
-                   DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+                   MOVE    CONST-KOUGAI    TO  BGS100P-HOKEN
+                   PERFORM 2001-ORCBGS121-SEC
                END-IF
            END-IF
       *
@@ -523,6 +495,22 @@
        200-MAIN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    作表処理
+      *****************************************************************
+       2001-ORCBGS121-SEC                  SECTION.
+      *
+           PERFORM 800-MCNDATE-SEC
+           DISPLAY SMCNDATE-HMS "ST:ORCBGS121:" BGS100P-HOKEN
+           CALL    "ORCBGS121" USING
+                               BGS100P-AREA
+                               SPA-AREA
+           PERFORM 800-MCNDATE-SEC
+           DISPLAY SMCNDATE-HMS "ED:ORCBGS121:" BGS100P-HOKEN
+      *
+           .
+       2001-ORCBGS121-EXT.
+           EXIT.
       *****************************************************************
       *    終了　　処理
       *****************************************************************

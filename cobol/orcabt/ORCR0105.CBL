@@ -226,6 +226,8 @@
       *  04.08.10    NACL-門脇    16/09/28  自賠責（第三者行為）
       *                                     保険別請求チェック表の機能追加
       *  04.08.11    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
+      *  04.08.12    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
+      *                                     （公費請求書に関わる対応）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -9915,6 +9917,13 @@
                MOVE  RECE02-DAISAN-FTNMONEY
                                       TO  WRK-DAISAN-FTNMONEY
                MOVE  WRK-DAISAN-DATA  TO  RECE10-RESERVE-AREA(13:9)
+           END-IF
+      *
+      *    請求額情報（公費負担のうちレセプト請求しない地方公費分）を記録
+           IF    RECE02-SKYIRYO-KOHFTN-KOHSKY  NOT = ZERO
+               MOVE  RECE02-SKYIRYO-KOHFTN-KOHSKY
+                                      TO  WRK-DAISAN-FTNMONEY
+               MOVE  WRK-DAISAN-DATA  TO  RECE10-RESERVE-AREA(22:9)
            END-IF
       *
            IF      RECE02-SRYYM    >=  "201004"

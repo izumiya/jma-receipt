@@ -86,6 +86,10 @@
                    07  LNK-SKYGET-KOHETC-RYOYOHI        PIC 9(09).
                    07  LNK-SKYGET-KOHETC-SHOKUJIFTN     PIC 9(09).
       *
+      *  請求フラグ（レセプトと公費請求書の請求年月が異なる場合）
+      *  （０：同じ又は公費請求書なし　１：レセプトのみ　２：公費請求書のみ）
+               05  LNK-SKYGET-SEIKYUFLG                 PIC 9(01).
+      *
       *返却値２
            03  LNK-SKYGET-OUT2-AREA.
       *      (1)社保の自費分以下
