@@ -2679,3 +2679,117 @@ path	key87	{
 };
 
 
+path	key88	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key88_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE (      HOSPNUM     =    :HOSPNUM    )
+                  AND (      HKNNUM_S    <>   '060'       )
+                  AND (      HKNNUM_S    <>   '067'       )
+                  AND (      HKNNUM_S    <>   '068'       )
+                  AND (      HKNNUM_S    <>   '069'       )
+                  AND (      HKNNUM_S    <>   '039'       )
+                  AND (      HKNNUM_S    <>   '040'       )
+                  AND (      HKNNUM_S    <>   '975'       )
+                  AND (      HKNNUM_S    <>   '971'       ) 
+                  AND (      HKNNUM_S    <>   '973'       ) 
+                  AND (      HKNNUM_S    <>   '970'       ) 
+                  AND (      RECESYUBETU <>   '0000'      )
+                  AND (      NYUGAIKBN   LIKE    :NYUGAIKBN  )
+                  AND ((   (( SRYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+                   OR ( HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN) IN
+         (  SELECT      HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM_KEY,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN
+            FROM  tbl_kohsky
+            WHERE   (      HOSPNUM     =    1    )
+             AND    (   (( SRYYM       =      :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+         ))
+		;
+	};
+};
+
+
+path	key89	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key89_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE (      HOSPNUM     =   :HOSPNUM    )
+                  AND (      HKNNUM_S    =   '060'
+                        OR   HKNNUM_S    =   '067'       )
+                  AND (      RECESYUBETU <>  '0000'      )
+                  AND (      NYUGAIKBN   LIKE    :NYUGAIKBN  )
+                  AND ((   (( SRYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+                   OR ( HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN) IN
+         (  SELECT      HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM_KEY,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN
+            FROM  tbl_kohsky
+            WHERE   (      HOSPNUM     =    1    )
+             AND    (   (( SRYYM       =      :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+         ))
+		;
+	};
+};
+
+path	key90	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key90_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE (      HOSPNUM     =   :HOSPNUM    )
+                  AND (      HKNNUM_S    =   '039'       )
+                  AND (      RECESYUBETU <>  '0000'      )
+                  AND (      NYUGAIKBN   LIKE    :NYUGAIKBN  )
+                  AND ((   (( SRYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+                   OR ( HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN) IN
+         (  SELECT      HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM_KEY,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN
+            FROM  tbl_kohsky
+            WHERE   (      HOSPNUM     =    1    )
+             AND    (   (( SRYYM       =      :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )
+                       AND (( SKYYM      =    '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =    :SKYYM    )
+                       AND ( SKYKBN      <>   '0'       )))
+         ))
+		;
+	};
+};
+
+path	key91	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key91_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE (      HOSPNUM     =   :HOSPNUM    )
+                  AND ((     HKNNUM_S  LIKE  :HKNNUM_S  )
+                     OR(     HKNNUM_S  IN  ('040','068','069')))
+                  AND (      RECESYUBETU <>  '0000'      )
+                  AND (   (( SRYYM       =   :SKYYM    )
+                       AND ( SKYKBN      <>  '0'       )
+                       AND (( SKYYM      =   '000000'  ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =   :SKYYM    )
+                       AND ( SKYKBN      <>  '0'       )))
+                  AND (      NYUGAIKBN   LIKE   :NYUGAIKBN  )
+		;
+	};
+};
+

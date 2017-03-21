@@ -324,6 +324,10 @@
            02  WRK-SYOSIN-TBL    OCCURS   10.
               03 WRK-SYOSIN                PIC X(01).
       *
+       01  WRK-SYOSIN-DAY-TABLE.
+           02  WRK-SYOSIN-DAY-TBL          OCCURS 10.
+               03  WRK-SYOSIN-DAY          PIC X(01)  OCCURS  31.
+      *
        01  WRK-KAIKEING-TABLE.
            02  WRK-KAIKEING-TBL  OCCURS   10.
               03 WRK-KAIKEING              PIC 9(01).
@@ -797,6 +801,7 @@
                          WRK-NYUINDAY-TANKI-TABLE
                          WRK-NYUSANTEI-TABLE
                          WRK-SYOSIN-TABLE
+                         WRK-SYOSIN-DAY-TABLE
                          WRK-DOJITU-TABLE
                          WRK-DAYTEN-TABLE
                          WRK-NYUINDAY-TAIHI-TABLE
@@ -890,6 +895,8 @@
                                               TO  LNK-S02-KYUKYU
       *
                 MOVE     WRK-SYOSIN(IDX)      TO  LNK-S02-SYOSINFLG
+                MOVE     WRK-SYOSIN-DAY-TBL(IDX)
+                                        TO  LNK-S02-SYOSINFLG-DAY-TBL
       *
                 MOVE     WRK-JIBAI-SONOTA(IDX)
                                               TO  LNK-S02-SONOTA
@@ -1149,6 +1156,8 @@
                                               TO  LNK-S02-KYUKYU
       *
                 MOVE     WRK-SYOSIN(IDX)      TO  LNK-S02-SYOSINFLG
+                MOVE     WRK-SYOSIN-DAY-TBL(IDX)
+                                        TO  LNK-S02-SYOSINFLG-DAY-TBL
       *
                 MOVE     WRK-JIBAI-SONOTA(IDX)
                                               TO  LNK-S02-SONOTA
@@ -5891,9 +5900,7 @@ grpsys                                        SPA-AREA
                         PERFORM  DAISANSYA-HENSYU-SEC
                      END-IF
       *              初診料算定フラグ（地方公費用）のセット
-                     IF    WRK-SYOSIN(IDX)   =   SPACE
-                        PERFORM  SYOSINFLG-SET-SEC
-                     END-IF
+                     PERFORM     SYOSINFLG-SET-SEC
                END-EVALUATE
       *
                EVALUATE    ACCT-SRYKBN
@@ -6970,11 +6977,10 @@ grpsys                              SPA-AREA
       **************************************************************
        SYOSINFLG-SET-SEC          SECTION.
       *
-           IF  ACCT-SRYKBN  =   "11"  OR  "13"
+           IF  ACCT-SRYKBN  =   "11"
       *
                PERFORM   VARYING   IDX6   FROM    1   BY  1
                           UNTIL  ( IDX6    >   TBL-SYOSIN-MAX  )
-                           OR    ( WRK-SYOSIN(IDX)     =   "1" )
       *
                    INITIALIZE                        SRYACT-REC
                    MOVE    ACCT-HOSPNUM          TO   SRY-HOSPNUM
@@ -7000,7 +7006,13 @@ grpsys                                    SPA-AREA
                      MOVE    "key8"             TO   MCP-PATHNAME
                      PERFORM   SRYACT-READ-SEC
                      IF     FLG-SRYACT   =    ZERO
-                           MOVE    "1"          TO   WRK-SYOSIN(IDX)
+                       MOVE      "1"  TO  WRK-SYOSIN(IDX)
+                       PERFORM  VARYING  SYU-IDX  FROM  1  BY  1
+                                 UNTIL   SYU-IDX   >   31
+                         IF   TBL-ZAIKAISU(SYU-IDX) NOT = ZERO
+                           MOVE  "1"  TO  WRK-SYOSIN-DAY(IDX SYU-IDX)
+                         END-IF
+                       END-PERFORM
                      END-IF
                    END-IF
       *

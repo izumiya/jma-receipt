@@ -149,6 +149,7 @@
            03  CNT-JBIMEI          PIC 9(08).
            03  CNT-KGIMEI          PIC 9(08).
            03  CNT-DSNMEI          PIC 9(08).
+           03  CNT-TKYMEI          PIC 9(08).
            03  CNT-BGSMEI          PIC 9(08).
       *
        01  STS-AREA.
@@ -199,7 +200,7 @@
            03  CONST-SYAHO         PIC 9(02)   VALUE 1.
            03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
            03  CONST-KOUKI         PIC 9(02)   VALUE 3.
-           03  CONST-TOKUYOU       PIC 9(02)   VALUE 4.
+           03  CONST-TOKUYO        PIC 9(02)   VALUE 4.
            03  CONST-JIHI          PIC 9(02)   VALUE 5.
            03  CONST-CHIKEN        PIC 9(02)   VALUE 6.
            03  CONST-ROUSAI        PIC 9(02)   VALUE 7.
@@ -241,6 +242,10 @@
       *
            03  CONST-KOU-KOU9      PIC 9(02)   VALUE 1.
            03  CONST-KOU-KOU7      PIC 9(02)   VALUE 2.
+      *
+           03  CONST-TKY-H068      PIC 9(02)   VALUE 1.
+           03  CONST-TKY-H069      PIC 9(02)   VALUE 2.
+           03  CONST-TKY-H040      PIC 9(02)   VALUE 3.
       *
            03  CONST-RSI-TG        PIC 9(02)   VALUE 1.
            03  CONST-RSI-TT        PIC 9(02)   VALUE 2.
@@ -427,7 +432,7 @@
            IF    ( BGS100P-SYAHO   =   1 )
             OR   ( BGS100P-SOUKATU =   1 )
                MOVE    "tbl_seikyu"        TO  WRK-TABLE
-               MOVE    "key72"             TO  WRK-PATHNAME
+               MOVE    "key88"             TO  WRK-PATHNAME
                PERFORM 2001-SEIKYU-EDIT-SEC
            END-IF
       *
@@ -435,7 +440,7 @@
            IF    ( BGS100P-KOKUHO  =   1 )
             OR   ( BGS100P-SOUKATU =   1 )
                MOVE    "tbl_seikyu"        TO  WRK-TABLE
-               MOVE    "key73"             TO  WRK-PATHNAME
+               MOVE    "key89"             TO  WRK-PATHNAME
                PERFORM 2001-SEIKYU-EDIT-SEC
            END-IF
       *
@@ -443,7 +448,7 @@
            IF    ( BGS100P-KOUKI   =   1 )
             OR   ( BGS100P-SOUKATU =   1 )
                MOVE    "tbl_seikyu"        TO  WRK-TABLE
-               MOVE    "key74"             TO  WRK-PATHNAME
+               MOVE    "key90"             TO  WRK-PATHNAME
                PERFORM 2001-SEIKYU-EDIT-SEC
            END-IF
       *
@@ -543,6 +548,10 @@
                MOVE    CONST-KOKUHO    TO  WRK-HOKEN
            WHEN    "039"
                MOVE    CONST-KOUKI     TO  WRK-HOKEN
+           WHEN    "068"
+           WHEN    "069"
+           WHEN    "040"
+               MOVE    CONST-TOKUYO    TO  WRK-HOKEN
            WHEN    "971"
                MOVE    CONST-ROUSAI    TO  WRK-HOKEN
            WHEN    "973"
@@ -777,6 +786,10 @@
                MOVE    CONST-KOKUHO    TO  WRK-HOKEN
            WHEN    "039"
                MOVE    CONST-KOUKI     TO  WRK-HOKEN
+           WHEN    "068"
+           WHEN    "069"
+           WHEN    "040"
+               MOVE    CONST-TOKUYO    TO  WRK-HOKEN
            WHEN    "971"
                MOVE    CONST-ROUSAI    TO  WRK-HOKEN
            WHEN    "973"
@@ -825,6 +838,8 @@
            MOVE    BGSMEI-REC      TO  BGSSUM-AREA
            PERFORM 2100-SEIKYU-SUM-SEC
            MOVE    BGSSUM-AREA     TO  BGSMEI-REC
+           MOVE    LNK-SKYGET-SEIKYUFLG
+                                   TO  BGSMEI-SEIKYUFLG
       *
            COMPUTE CNT-BGSMEI = CNT-BGSMEI + 1
            MOVE    CNT-BGSMEI      TO  BGSMEI-SEQ
@@ -849,6 +864,8 @@
                    COMPUTE CNT-KGIMEI  =   CNT-KGIMEI  +   1
                WHEN    CONST-DAISAN
                    COMPUTE CNT-DSNMEI  =   CNT-DSNMEI  +   1
+               WHEN    CONST-TOKUYO
+                   COMPUTE CNT-TKYMEI  =   CNT-TKYMEI  +   1
                END-EVALUATE
            END-IF
       *
@@ -912,6 +929,8 @@
                PERFORM 9001-KOKUKO-HKNKBN-EDIT-SEC
            WHEN    CONST-KOUKI
                PERFORM 9001-KOUKI-HKNKBN-EDIT-SEC
+           WHEN    CONST-TOKUYO
+               PERFORM 9001-TOKUYO-HKNKBN-EDIT-SEC
            WHEN    CONST-ROUSAI
                PERFORM 9001-ROUSAI-HKNKBN-EDIT-SEC
            WHEN    CONST-JIBAI
@@ -924,16 +943,19 @@
            MOVE    WRK-SBTGRPID     TO  BGSMEI-SBTGRPID
            MOVE    WRK-SBTHKN       TO  BGSMEI-SBTHKN
       *
-           IF    ( WRK-SBTGRPID     =      CONST-SYA-KOU9TAN
-                                        OR CONST-SYA-KOU9HEI
-                                        OR CONST-KOK-IPNKOU9 )
+           EVALUATE    TRUE
+           WHEN  ( WRK-HOKEN        =      CONST-SYAHO )
+            AND  ( WRK-SBTGRPID     =      CONST-SYA-KOU9TAN
+                                      OR   CONST-SYA-KOU9HEI )
+           WHEN  ( WRK-HOKEN        =      CONST-KOKUHO )
+            AND  ( WRK-SBTGRPID     =      CONST-KOK-IPNKOU9 )
       *
                IF    ( RECE10-SRYYM    >=  CONST-H2605 )
                    COMPUTE WRK-SBTRATE  =  10 - RECE10-KYURATE
                ELSE
                    COMPUTE WRK-SBTRATE  =  1
                END-IF
-           END-IF
+           END-EVALUATE
       *
            MOVE    WRK-SBTKBN-G    TO  BGSMEI-SBTKBN-G
       *
@@ -947,7 +969,9 @@
       *
            IF    ( WRK-HOKEN       =   CONST-SYAHO
                                     OR CONST-KOKUHO
-                                    OR CONST-KOUKI )
+                                    OR CONST-KOUKI
+                                    OR CONST-TOKUYO
+                                                    )
                MOVE    RECE10-HKNJANUM-S
                                    TO  BGSMEI-HKNJANUM
            END-IF
@@ -959,6 +983,8 @@
                PERFORM 9001-KOKUKO-GROUPID-EDIT-SEC
            WHEN    CONST-KOUKI
                PERFORM 9001-KOUKI-GROUPID-EDIT-SEC
+           WHEN    CONST-TOKUYO
+               PERFORM 9001-TOKUYO-GROUPID-EDIT-SEC
            WHEN    CONST-ROUSAI
                PERFORM 9001-ROUSAI-GROUPID-EDIT-SEC
            WHEN    CONST-JIBAI
@@ -1064,7 +1090,9 @@
                    IF    ( BGS100P-ETCGETKBN =   "0" )
                     AND  ( BGSETC-HOKEN      =   CONST-ROUSAI
                                               OR CONST-JIBAI
-                                              OR CONST-KOUGAI )
+                                              OR CONST-KOUGAI
+                                              OR CONST-TOKUYO
+                                               )
                        CONTINUE
                    ELSE
       *
@@ -1142,7 +1170,7 @@
       *****************************************************************
        2002-ETC-SEIKYU-EDIT-SEC        SECTION.
       *
-           PERFORM 900-SEIKYU-KEY82-SEL-SEC
+           PERFORM 900-SEIKYU-KEY91-SEL-SEC
       *
            PERFORM UNTIL ( FLG-SEIKYU  NOT =   ZERO )
                     OR   ( BGS100P-RC  NOT =   ZERO )
@@ -1152,6 +1180,10 @@
       *
                    INITIALIZE                  ORCSSKYGETAREA
                    EVALUATE   RECE10-HKNNUM-S
+                   WHEN    "068"
+                   WHEN    "069"
+                   WHEN    "040"
+                       MOVE    "7"         TO  LNK-SKYGET-KBN
                    WHEN    "971"
                        MOVE    "3"         TO  LNK-SKYGET-KBN
                    WHEN    "973"
@@ -1192,12 +1224,12 @@
                    END-IF
                END-IF
       *
-               PERFORM 900-SEIKYU-KEY82-FET-SEC
+               PERFORM 900-SEIKYU-KEY91-FET-SEC
       *
            END-PERFORM
       *
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
-           MOVE    "key82"             TO  MCP-PATHNAME
+           MOVE    "key91"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -1211,6 +1243,10 @@
            INITIALIZE              BGSETC-REC
       *
            EVALUATE    RECE10-HKNNUM-S
+           WHEN    "068"
+           WHEN    "069"
+           WHEN    "040"
+               MOVE    CONST-TOKUYO    TO  WRK-HOKEN
            WHEN    "971"
                MOVE    CONST-ROUSAI    TO  WRK-HOKEN
            WHEN    "973"
@@ -1296,6 +1332,7 @@
            DISPLAY "CNT-KOUKOH   ["   CNT-KOUKOH "]"
            DISPLAY "CNT-KOUHKNJA ["   CNT-KOUHKNJA "]"
            DISPLAY "CNT-KOUMEI   ["   CNT-KOUMEI "]"
+           DISPLAY "CNT-TKYMEI   ["   CNT-TKYMEI "]"
            DISPLAY "CNT-RSIMEI   ["   CNT-RSIMEI "]"
            DISPLAY "CNT-JBIMEI   ["   CNT-JBIMEI "]"
            DISPLAY "CNT-KGIMEI   ["   CNT-KGIMEI "]"
@@ -1451,7 +1488,7 @@
       *****************************************************************
       *    ÀÁµá´ÉÍý¸¡º÷½èÍý
       *****************************************************************
-       900-SEIKYU-KEY82-SEL-SEC        SECTION.
+       900-SEIKYU-KEY91-SEL-SEC        SECTION.
       *
            MOVE    ZERO            TO  FLG-SEIKYU
       *
@@ -1468,10 +1505,11 @@
            MOVE    "97%"           TO  RECE10-HKNNUM-S
            MOVE    RECE10-REC      TO  MCPDATA-REC
            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-           MOVE    "key82"         TO  MCP-PATHNAME
+           MOVE    "key91"         TO  MCP-PATHNAME
            PERFORM 911-DBSELECT-SEC
+      *
            IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-SEIKYU-KEY82-FET-SEC
+               PERFORM 900-SEIKYU-KEY91-FET-SEC
            ELSE
                MOVE    1           TO  FLG-SEIKYU
                INITIALIZE              RECE10-REC
@@ -1479,12 +1517,12 @@
       *
            .
       *
-       900-SEIKYU-KEY82-SEL-EXT.
+       900-SEIKYU-KEY91-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ÀÁµá´ÉÍýFETCH½èÍý
       *****************************************************************
-       900-SEIKYU-KEY82-FET-SEC        SECTION.
+       900-SEIKYU-KEY91-FET-SEC        SECTION.
       *
            MOVE    ZERO            TO  FLG-SEIKYU
            MOVE    ZERO            TO  FLG-LOOPEND
@@ -1493,7 +1531,7 @@
                     OR   ( FLG-LOOPEND NOT =   ZERO )
       *
                MOVE    "tbl_seikyu"    TO  MCP-TABLE
-               MOVE    "key82"         TO  MCP-PATHNAME
+               MOVE    "key91"         TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
       *
@@ -1502,7 +1540,9 @@
                    MOVE    1           TO  FLG-LOOPEND
       *
                    IF    ( RECE10-HKNNUM-S
-                               =   "970" OR "971" OR "973" OR "975" )
+                               =   "970" OR "971" OR "973" OR "975"
+                                OR "068" OR "069" OR "040"
+                                 )
                        CONTINUE
                    ELSE
                        MOVE    ZERO    TO  FLG-LOOPEND
@@ -1530,7 +1570,7 @@
       *
            .
       *
-       900-SEIKYU-KEY82-FET-EXT.
+       900-SEIKYU-KEY91-FET-EXT.
            EXIT.
       *****************************************************************
       *    ´µ¼Ô¾ðÊó¼èÆÀ½èÍý
@@ -1885,6 +1925,19 @@
        9001-DAISAN-HKNKBN-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    ÆÃÊÌÎÅÍÜÈñÊÝ¸±¶èÊ¬ÊÔ½¸½èÍý
+      *****************************************************************
+       9001-TOKUYO-HKNKBN-EDIT-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-SBTKBN-G
+      *
+           PERFORM 9001-TOKUYO-GROUPID-EDIT-SEC
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
+      *
+           .
+       9001-TOKUYO-HKNKBN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    ¼ÒÊÝ¥°¥ë¡¼¥×£É£ÄÊÔ½¸½èÍý
       *****************************************************************
        9001-SYAHO-GROUPID-EDIT-SEC     SECTION.
@@ -2205,6 +2258,34 @@
            .
       *
        9001-DAISAN-GROUPID-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÆÃÊÌÎÅÍÜÈñ¥°¥ë¡¼¥×£É£ÄÊÔ½¸½èÍý
+      *****************************************************************
+       9001-TOKUYO-GROUPID-EDIT-SEC       SECTION.
+      *
+           MOVE   ZERO                 TO  WRK-GROUPID
+      *
+           EVALUATE    RECE10-RECESYUBETU
+           WHEN    "6666"
+               EVALUATE    RECE10-HKNNUM-S
+               WHEN    "068"
+                   MOVE    CONST-TKY-H068
+                                       TO  WRK-GROUPID
+               WHEN    "069"
+                   MOVE    CONST-TKY-H069
+                                       TO  WRK-GROUPID
+               WHEN    "040"
+                   MOVE    CONST-TKY-H040
+                                       TO  WRK-GROUPID
+               END-EVALUATE
+           WHEN    OTHER
+               DISPLAY "RECESBT[" RECE10-RECESYUBETU "]" RECE10-REC
+           END-EVALUATE
+      *
+           .
+      *
+       9001-TOKUYO-GROUPID-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)

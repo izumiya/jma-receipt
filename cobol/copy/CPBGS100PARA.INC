@@ -43,6 +43,7 @@
            03  BGS100P-SYAHO           PIC 9(01).
            03  BGS100P-KOKUHO          PIC 9(01).
            03  BGS100P-KOUKI           PIC 9(01).
+           03  BGS100P-TOKUYO          PIC 9(01).
            03  BGS100P-ROUSAI          PIC 9(01).
            03  BGS100P-JIBAI           PIC 9(01).
            03  BGS100P-DAISAN          PIC 9(01).

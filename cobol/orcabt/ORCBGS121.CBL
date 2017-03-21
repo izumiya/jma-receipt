@@ -129,7 +129,7 @@
            03  WRK-NYUGAIKBN       PIC X(01).
            03  WRK-NYUGAIKBNMEI    PIC X(04).
            03  WRK-PRTKBN.
-               05  WRK-PRTKBN9     PIC 9(01).
+               05  WRK-PRTKBNZ9    PIC Z9.
            03  WRK-PRTKBNMEI       PIC X(40).
            03  WRK-DATAKBN         PIC X(01).
            03  WRK-DATAKBNMEI      PIC X(50).
@@ -286,7 +286,7 @@
            03  CONST-SYAHO         PIC 9(02)   VALUE 1.
            03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
            03  CONST-KOUKI         PIC 9(02)   VALUE 3.
-           03  CONST-TOKUYOU       PIC 9(02)   VALUE 4.
+           03  CONST-TOKUYO        PIC 9(02)   VALUE 4.
            03  CONST-JIHI          PIC 9(02)   VALUE 5.
            03  CONST-CHIKEN        PIC 9(02)   VALUE 6.
            03  CONST-ROUSAI        PIC 9(02)   VALUE 7.
@@ -316,6 +316,10 @@
       *
            03  CONST-KOU-KOU9      PIC 9(02)   VALUE 1.
            03  CONST-KOU-KOU7      PIC 9(02)   VALUE 2.
+      *
+           03  CONST-TKY-H068      PIC 9(02)   VALUE 1.
+           03  CONST-TKY-H069      PIC 9(02)   VALUE 2.
+           03  CONST-TKY-H040      PIC 9(02)   VALUE 3.
       *
            03  CONST-RSI-TG        PIC 9(02)   VALUE 1.
            03  CONST-RSI-TT        PIC 9(02)   VALUE 2.
@@ -633,6 +637,9 @@
            WHEN    CONST-KOUKI
                MOVE    "° ∏Â¥¸π‚Œº‘°À"
                                        TO  HCGS121N-HKNNAME
+           WHEN    CONST-TOKUYO
+               MOVE    "° ∆√ ÃŒ≈Õ‹»Ò°À" 
+                                       TO  HCGS121N-HKNNAME
            WHEN    CONST-ROUSAI
                MOVE    "° œ´∫“°À"      TO  HCGS121N-HKNNAME
            WHEN    CONST-JIBAI
@@ -694,22 +701,29 @@
       *
                    PERFORM 2201-HKNKBNNAME-EDIT-SEC
       *
+                   EVALUATE    BGSMEI-SEIKYUFLG
+                   WHEN   1
+                       MOVE    "¢˛" TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                   WHEN   2
+                       MOVE    "°˛" TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                   END-EVALUATE
+      *
                    EVALUATE    WRK-HKNKBNNAME
                    WHEN "π‚∞Ï∏¯»Ò ªÕ—° £π°À"
                        MOVE    "π‚∞Ï∏¯»Ò ªÕ—(9)"
-                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)(3:)
                    WHEN "π‚∞Ï∏¯»Ò ªÕ—° £∏°À"
                        MOVE    "π‚∞Ï∏¯»Ò ªÕ—(8)"
-                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)(3:)
                    WHEN OTHER
                        MOVE    WRK-HKNKBNNAME
-                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)(3:)
                    END-EVALUATE
       *
                END-IF
       *
                IF   (  BGSMEI-HOKEN        =   CONST-SYAHO
-                   AND WRK-SBTGRPID         =   CONST-SYA-KOH )
+                   AND WRK-SBTGRPID        =   CONST-SYA-KOH )
                  OR (  BGSMEI-HOKEN        =   CONST-ROUSAI
                                             OR CONST-JIBAI
                                             OR CONST-KOUGAI
@@ -717,12 +731,14 @@
                                                             )
                    CONTINUE
                ELSE
-                   IF    ( BGSMEI-HKNNUM   =   "009" )
-                       MOVE    "01"
+                   IF    ( BGSMEI-HOKEN    NOT =   CONST-TOKUYO )
+                       IF    ( BGSMEI-HKNNUM   =   "009" )
+                           MOVE    "01"
                                    TO  HCGS121N-HBTNUM (CNT-LINE)
-                   ELSE
-                       MOVE    BGSMEI-HKNNUM (2:2)
+                       ELSE
+                           MOVE    BGSMEI-HKNNUM (2:2)
                                    TO  HCGS121N-HBTNUM (CNT-LINE)
+                       END-IF
                    END-IF
       *
                    MOVE    BGSMEI-HKNJANUM
@@ -769,6 +785,10 @@
            MOVE    BGSMEI-REC      TO  TBGSMEI-AREA
            MOVE    CNT-LINE        TO  IDXM
            PERFORM 2201-BODY-SEC
+           IF    ( BGSMEI-SEIKYUFLG    =    2 )
+               MOVE    SPACE       TO  HCGS121N-NISSU (CNT-LINE)
+                                       HCGS121N-TENSU (CNT-LINE)
+           END-IF
       *
            IF    ( WRK-SBTHKN     NOT =   CONST-HKNKBN2-TTL )
                PERFORM 2201-TOTAL-SUM-SEC
@@ -976,6 +996,18 @@
                    MOVE    "π‚£∑"
                                        TO  WRK-HKNKBNNAME
                END-EVALUATE
+           WHEN    CONST-TOKUYO
+               EVALUATE    WRK-SBTGRPID
+               WHEN    CONST-TKY-H068
+                   MOVE    "∆√Õ‹»Ò"
+                                       TO  WRK-HKNKBNNAME
+               WHEN    CONST-TKY-H069
+                   MOVE    "¬‡∆√Õ‹»Ò"
+                                       TO  WRK-HKNKBNNAME
+               WHEN    CONST-TKY-H040
+                   MOVE    "∏Â¥¸∆√Õ‹»Ò"
+                                       TO  WRK-HKNKBNNAME
+               END-EVALUATE
            WHEN    CONST-ROUSAI
                EVALUATE    WRK-SBTGRPID
                WHEN    CONST-RSI-TG
@@ -1152,7 +1184,7 @@
       *****************************************************************
        2001-HCGS121-CSV-SEC            SECTION.
       *
-           MOVE    BGS100P-HOKEN   TO  WRK-PRTKBN9
+           MOVE    BGS100P-HOKEN   TO  WRK-PRTKBNZ9
       *
            MOVE    SPACE           TO  WRK-PRTKBNMEI
            EVALUATE    BGS100P-HOKEN
@@ -1163,6 +1195,8 @@
            WHEN    CONST-KOUKI
                MOVE    "∏Â¥¸π‚Œº‘"
                                    TO  WRK-PRTKBNMEI
+           WHEN    CONST-TOKUYO
+               MOVE    "∆√ ÃŒ≈Õ‹»Ò" TO WRK-PRTKBNMEI
            WHEN    CONST-ROUSAI
                MOVE    "œ´∫“"      TO  WRK-PRTKBNMEI
            WHEN    CONST-JIBAI

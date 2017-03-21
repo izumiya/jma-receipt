@@ -21266,6 +21266,10 @@
                              IF   KOHI1-TBL(32)  >=  MAX-KAI-KOHI1-M
                                MOVE   "1"      TO    FLG-NG
                              ELSE
+                              IF  (WK-2010-SYOKEIKBN-N(1)      = "1"  )
+                              AND (LNK-S02-SYOSINFLG-DAY(IDX2) = SPACE)
+                               MOVE   "1"      TO    FLG-NG
+                              ELSE
                                MOVE   SPACE    TO    FLG-NG
                                IF   WK-2010-KAICNTKBN-N(1) = "1"
                                  MOVE  8       TO    KOHI1-TBL(IDX2)
@@ -21273,6 +21277,7 @@
                                  MOVE  9       TO    KOHI1-TBL(IDX2)
                                END-IF
                                ADD     1       TO    KOHI1-TBL(32)
+                              END-IF
                              END-IF
                           END-IF
                         ELSE
@@ -21360,6 +21365,10 @@
                              IF   KOHI2-TBL(32)  >=  MAX-KAI-KOHI2-M
                                MOVE   "1"      TO    FLG-NG
                              ELSE
+                              IF  (WK-2010-SYOKEIKBN-N(2)      = "1"  )
+                              AND (LNK-S02-SYOSINFLG-DAY(IDX2) = SPACE)
+                               MOVE   "1"      TO    FLG-NG
+                              ELSE
                                MOVE   SPACE    TO    FLG-NG
                                IF   WK-2010-KAICNTKBN-N(2) = "1"
                                  MOVE  8       TO    KOHI2-TBL(IDX2)
@@ -21367,6 +21376,7 @@
                                  MOVE  9       TO    KOHI2-TBL(IDX2)
                                END-IF
                                ADD     1       TO    KOHI2-TBL(32)
+                              END-IF
                              END-IF
                           END-IF
                         ELSE
@@ -21454,6 +21464,10 @@
                              IF   KOHI3-TBL(32)  >=  MAX-KAI-KOHI3-M
                                MOVE   "1"      TO    FLG-NG
                              ELSE
+                              IF  (WK-2010-SYOKEIKBN-N(3)      = "1"  )
+                              AND (LNK-S02-SYOSINFLG-DAY(IDX2) = SPACE)
+                               MOVE   "1"      TO    FLG-NG
+                              ELSE
                                MOVE   SPACE    TO    FLG-NG
                                IF   WK-2010-KAICNTKBN-N(3) = "1"
                                  MOVE  8       TO    KOHI3-TBL(IDX2)
@@ -21461,6 +21475,7 @@
                                  MOVE  9       TO    KOHI3-TBL(IDX2)
                                END-IF
                                ADD     1       TO    KOHI3-TBL(32)
+                              END-IF
                              END-IF
                           END-IF
                         ELSE
@@ -21548,6 +21563,10 @@
                              IF   KOHI4-TBL(32)  >=  MAX-KAI-KOHI4-M
                                MOVE   "1"      TO    FLG-NG
                              ELSE
+                              IF  (WK-2010-SYOKEIKBN-N(4)      = "1"  )
+                              AND (LNK-S02-SYOSINFLG-DAY(IDX2) = SPACE)
+                               MOVE   "1"      TO    FLG-NG
+                              ELSE
                                MOVE   SPACE    TO    FLG-NG
                                IF   WK-2010-KAICNTKBN-N(4) = "1"
                                  MOVE  8       TO    KOHI4-TBL(IDX2)
@@ -21555,6 +21574,7 @@
                                  MOVE  9       TO    KOHI4-TBL(IDX2)
                                END-IF
                                ADD     1       TO    KOHI4-TBL(32)
+                              END-IF
                              END-IF
                           END-IF
                         ELSE

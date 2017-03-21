@@ -73,6 +73,8 @@
       *
       *初診料算定フラグ（地方公費用）
            03  LNK-S02-SYOSINFLG           PIC  X(01).
+           03  LNK-S02-SYOSINFLG-DAY-TBL.
+              05  LNK-S02-SYOSINFLG-DAY    PIC  X(01)   OCCURS  31.
       *
       *船員保険（被保険者）＋通勤災害＋初診時
            03  LNK-S02-SENINFLG            PIC  X(01).
