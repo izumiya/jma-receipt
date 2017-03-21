@@ -1931,6 +1931,9 @@
       *****************************************************************
        30010-PARA-DBINSERT-SEC     SECTION.
       *
+           MOVE    SMCNDATE-YMD        TO  PARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PARA-UPHMS
+      *
            MOVE    PARA-REC            TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_para"          TO  MCP-TABLE
@@ -2473,6 +2476,9 @@
            MOVE    MDCRES-KARTE-UID    TO  APIPARA-KARTE-UID
            MOVE    WRK-PTNUM           TO  APIPARA-PTNUM
       *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
+      *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_api_para"      TO  MCP-TABLE
@@ -2524,6 +2530,9 @@
       *    ＳＰＡ一時保存テーブル追加
       *****************************************************************
        20081-SPATMP-INSERT-SEC                SECTION.
+      *
+           MOVE    SMCNDATE-YMD        TO  SPATMP-UPYMD
+           MOVE    SMCNDATE-HMS        TO  SPATMP-UPHMS
       *
            MOVE    SPATMP-REC          TO  MCPDATA2-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC

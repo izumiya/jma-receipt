@@ -177,7 +177,7 @@
       *****************************************************************
       *
       *    マシン日付取得サブ
-      **   COPY    "CPORCSMCNDATE.INC".
+           COPY    "CPORCSMCNDATE.INC".
       *
       *    COPY    "CPORCXKANACONV.INC".
       *
@@ -244,6 +244,11 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  ORAPISUB01-ERRCD
            INITIALIZE                  ORAPISUB01-INP-ERR-G
+      *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -1153,6 +1158,9 @@
            MOVE    WRK-EDABAN          TO  PARA-EDANUM
            MOVE    WKSRYACT-REC        TO  PARA-DATA-REC
       *
+           MOVE    SMCNDATE-YMD        TO  PARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PARA-UPHMS
+      *
            MOVE    PARA-REC            TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_para"          TO  MCP-TABLE
@@ -1190,7 +1198,7 @@
            MOVE    WRK-KAISU           TO  WKSRY-ZAIKAIKEI
            MOVE    WRK-ZAITENKEI       TO  WKSRY-ZAITENKEI
            MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
-          .
+           .
        2002121-WKSRYACT-HEN-EXT.
            EXIT.
       *****************************************************************
