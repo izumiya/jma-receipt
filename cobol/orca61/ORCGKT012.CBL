@@ -1581,6 +1581,16 @@
            MOVE    SPACE               TO  WRK-FUKA-INPUT
            MOVE    SPA-KT012NAI-RRKYMD(SPA-KT012-DOSELNUM)
                                        TO  WRK-SRYYMD
+      *H29.3
+      *    後発品変更可（処方）の対応
+           IF     (WRK-SRYYMD          >=  "20160401" )
+             AND  (SPA-KT012-GENERICFLG  =   "1"   )
+             AND  (SPA-KT012-SRYKBN    =   "00"
+                                       OR  "20"
+                                       OR  "29"
+                                       OR  "99" )
+               PERFORM 41012-KOUHATU-CHEK-SEC
+           END-IF
       *
       *    受診歴を検索する
            INITIALIZE                  JYURRK-KEY
@@ -1638,7 +1648,8 @@
       *    一般名対応
            IF     (WRK-SRYYMD              >=  "20160401" )
              AND  (SPA-KT012-GENERICFLG    =   "1"   )
-             AND  (WRK-FUKA-INPUT          =   SPACE )
+             AND  (WRK-FUKA-INPUT          =   SPACE
+                                           OR  "2"   )
              AND  (SPA-GMN-MAX2            >   ZERO  )
                PERFORM 30010-GENE-HEN-SEC
            END-IF
@@ -1653,6 +1664,119 @@
            .
        4101-JYURRK-HEN-EXT.
            EXIT.
+      *
+      *H29.3
+      *****************************************************************
+      *     後発品変更可（処方）の対応処理
+      *****************************************************************
+       41012-KOUHATU-CHEK-SEC           SECTION.
+      *
+      *    受診歴を検索する
+           INITIALIZE                  JYURRK-KEY
+           MOVE    SPA-KT012-HOSPNUM   TO  JYURRK-HOSPNUM
+           MOVE    SPA-KT012-PTID      TO  JYURRK-PTID
+           MOVE    SPA-KT012-NYUGAIKBN TO  JYURRK-NYUGAIKBN
+           MOVE    SPA-KT012NAI-RRK-SRYKA(SPA-KT012-DOSELNUM)
+                                       TO  JYURRK-SRYKA
+           MOVE    SPA-KT012NAI-RRKYMD(SPA-KT012-DOSELNUM)
+                                       TO  JYURRK-SRYYMD
+           MOVE    SPA-KT012NAI-RENNUM(SPA-KT012-DOSELNUM)
+                                       TO  JYURRK-RENNUM
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-OK2
+           PERFORM
+                   UNTIL    FLG-JYURRK     =   1
+               IF      SPA-KT012NAI-DOUJI-RENNUM (SPA-KT012-DOSELNUM)
+                                           =   JYURRK-DOUJI-RENNUM
+      *            診療区分の判定
+                   PERFORM VARYING     IDX-R   FROM    1   BY  1
+                           UNTIL      (IDG             >   MAX-LINE ) OR
+                                      (IDX-R           >   15  )
+                       IF      JYURRK-ZAINUM (IDX-R)   NOT =   ZERO
+                           PERFORM 41012-ZAINUM-CHK-SEC
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       41012-KOUHATU-CHEK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     診療行為検索処理処理
+      *****************************************************************
+       41012-ZAINUM-CHK-SEC           SECTION.
+      *
+           INITIALIZE                  SRYACT-REC
+           MOVE    JYURRK-HOSPNUM      TO  SRY-HOSPNUM
+           MOVE    JYURRK-NYUGAIKBN    TO  SRY-NYUGAIKBN
+           MOVE    SPA-KT012-PTID      TO  SRY-PTID
+           MOVE    JYURRK-SRYKA        TO  SRY-SRYKA
+           MOVE    JYURRK-SRYYMD(1:6)  TO  SRY-SRYYM
+           MOVE    JYURRK-ZAINUM(IDX-R)
+                                       TO  SRY-ZAINUM
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-READ-SEC
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           MOVE    ZERO                TO  WRK-ZAINUM
+           PERFORM
+                   UNTIL  (FLG-SRYACT      =   1   )
+                      OR  (WRK-FUKA-INPUT  NOT =   SPACE)
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX         >   5   )
+                              OR  (SRY-SRYCD (IDX) =   SPACE )
+                              OR  (WRK-FUKA-INPUT  NOT =   SPACE)
+                   EVALUATE    SRY-SRYCD (IDX)
+                       WHEN    "099209910"
+                           MOVE    "1"         TO  WRK-FUKA-INPUT
+                       WHEN    "099209911"
+                           MOVE    "2"         TO  WRK-FUKA-INPUT
+                   END-EVALUATE
+               END-PERFORM
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       41012-ZAINUM-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *     診察内容なし編集処理
       *****************************************************************
@@ -2081,9 +2205,13 @@
       *    後発医薬品への変更可署名(SYS-1030-KOUHATUKA)
            MOVE    SPA-KOUHATUKA       TO  ORCSCGENN-1030-KOUHATUKA
       *    後発品変更不可（処方毎）有
-      *    IF      WRK-FUKA-INPUT      =   "1"
-      *        MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
-      **   END-IF
+           IF      WRK-FUKA-INPUT      =   "1"
+               MOVE    "1"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
+      *    後発品変更可（処方毎）有
+           IF      WRK-FUKA-INPUT      =   "2"
+               MOVE    "2"             TO  ORCSCGENN-KOUHATU-IN
+           END-IF
            MOVE    ZERO                TO  IDX-Z
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-KOUI )
@@ -2429,6 +2557,11 @@
       *    後発品変更不可（処方単位）判定
            IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209910"
                MOVE    "1"                 TO  WRK-FUKA-INPUT
+           END-IF
+      *H29.3
+      *    後発品変更可（処方単位）判定
+           IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209911"
+               MOVE    "2"                 TO  WRK-FUKA-INPUT
            END-IF
       *
       *    診療コードより診療行為名称を取得
@@ -4028,10 +4161,12 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-KT012NAI-RRKYMD(SPA-KT012-DOSELNUM)
+                                       TO  TNSP-YUKOSTYMD
+           MOVE    SPA-KT012NAI-RRKYMD(SPA-KT012-DOSELNUM)
+                                       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-KT012-HOSPNUM   TO  TNSP-HOSPNUM
       *
-           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
            MOVE    "tbl_tensuplus"     TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME

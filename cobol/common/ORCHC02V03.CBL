@@ -4085,6 +4085,7 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
                    IF     (TNS-KOUHATUKBN          =   1
+                                                   OR  3
                                                    OR  7    )
       *H24.4         一般名記載以外
                      AND  (TNSP-IPN-KISAIKBN       =   ZERO
@@ -5957,6 +5958,7 @@
       *H27.4       変更可（処方単位）
                    OR (FLG-ALLKISAI            =   2      ))
                   AND (TNS-KOUHATUKBN          =   1  OR  2
+                                               OR  3
                                                OR  7       )
       *H27.4       変更不可（処方単位）
                    IF      FLG-ALLKISAI        =   1

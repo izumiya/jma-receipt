@@ -2238,6 +2238,17 @@
                                INTO        SPA-Z98-GMN-NAME(IDX)
                 END-STRING
            END-IF
+      *H29.3
+      *    後発医薬品再編集
+           IF     (TNS-SRYCD(1:1)      =   "6") AND
+                  (TNS-KOUHATUKBN      =   3  )
+                MOVE    SPACE              TO  SPA-Z98-GMN-NAME (IDX)
+                STRING  "【先無加】"  DELIMITED   BY  SIZE
+                        TNS-NAME      DELIMITED   BY  SIZE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+                END-STRING
+           END-IF
+      *
       *    薬価基準コード
            IF      TNS-SRYCD (1:1)     =   "6"
       *        一般名記載区分

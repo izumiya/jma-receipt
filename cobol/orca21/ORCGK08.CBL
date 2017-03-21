@@ -556,7 +556,7 @@
            03  WRK-SYO-TANINAME        PIC X(12).
       *
       *H24.4
-           03  WRK-KOUMEI              PIC X(02).
+           03  WRK-KOUMEI              PIC X(04).
            03  WRK-IPNMEI              PIC 9(01).
            03  IDG-Z                   PIC 9(04).
            03  IDG-X                   PIC 9(04).
@@ -2732,6 +2732,7 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
+                                       OR  3
                                        OR  7    )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -2951,6 +2952,7 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
+                                       OR  3
                                        OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -3162,7 +3164,7 @@
            MOVE    SPACE               TO  WRK-MEISYO
       *    後発医薬品再編集
             STRING  "【"
-                    WRK-KOUMEI         DELIMITED   BY  SIZE
+                    WRK-KOUMEI         DELIMITED   BY  SPACE
                     "】"               DELIMITED   BY  SIZE
                     TNS-NAME           DELIMITED   BY  SIZE
                                   INTO        WRK-MEISYO
@@ -3183,6 +3185,9 @@
                    MOVE    "後"            TO  WRK-KOUMEI
                WHEN    2
                    MOVE    "先"            TO  WRK-KOUMEI
+      *H29.4 から
+               WHEN    3
+                   MOVE    "加"            TO  WRK-KOUMEI
                WHEN    7
                    MOVE    "無"            TO  WRK-KOUMEI
            END-EVALUATE
@@ -3265,7 +3270,10 @@
       *    システム管理の変更可によってすべて一般名記載とする
            IF     (TNSP-IPN-KISAIKBN       =   0       )
       *?     AND  (SPA-KOUHATUKA           =   "1"     )
-             AND  (TNS-KOUHATUKBN          =   1  OR  2
+             AND  (TNS-KOUHATUKBN          =   1
+                                           OR  2
+      *H29.4
+                                           OR  3
                                            OR  7       )
       *H27.1
                IF       (SPA-KOUHATUKA           =   "1" )
