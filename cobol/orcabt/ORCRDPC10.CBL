@@ -152,6 +152,9 @@
       *                                     入院会計から算定入院料を取得し、
       *                                     F-19（行為明細区分情報）２桁目の
       *                                     入院料包括項目区分を再セットする
+      *              NACL-小豆沢  17/03/21  特定入院料を算定した保険以外で診療行為
+      *                                     入力がある日に、包括入力分の入院料が
+      *                                     Ｆファイルに誤って記録されていたのを修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4915,22 +4918,24 @@
                         PERFORM   VARYING   IDZ7  FROM  1  BY  1
                           UNTIL   (IDZ7     >   10)   OR
                                 (WRK-REC-LENGTH-XX(IDZ2 IDZ7)  =  ZERO)
-                           MOVE    WRK-REC-XX(IDZ2 IDZ7) 
+                           IF    WRK-TAIHI-RENNUM(IDZ1)  NOT =  ZERO
+                             MOVE    WRK-REC-XX(IDZ2 IDZ7) 
                                                TO   WRK-REC
-      *                    順序番号
-                           MOVE  WRK-TAIHI-RENNUM-X(IDZ1)
+      *                      順序番号
+                             MOVE  WRK-TAIHI-RENNUM-X(IDZ1)
                                                TO   WRK-REC(43:4)
-      *                    行為明細番号
-                           ADD   1             TO
+      *                      行為明細番号
+                             ADD   1             TO
                                           WRK-TAIHI-MEISAI-RENNUM(IDZ1)
-                           MOVE    WRK-TAIHI-MEISAI-RENNUM-X(IDZ1)
+                             MOVE    WRK-TAIHI-MEISAI-RENNUM-X(IDZ1)
                                                TO   WRK-REC(48:3)
       *
-                           MOVE    WRK-REC-LENGTH-XX(IDZ2 IDZ7)
+                             MOVE    WRK-REC-LENGTH-XX(IDZ2 IDZ7)
                                                TO  WRK-REC-LENGTH
-                           MOVE    WRK-FEDT-XX(IDZ2 IDZ7)
+                             MOVE    WRK-FEDT-XX(IDZ2 IDZ7)
                                                TO   WRK-FEDT-AREA
-                           PERFORM 5001-FILE-F-WRITE-SEC
+                             PERFORM 5001-FILE-F-WRITE-SEC
+                           END-IF
                         END-PERFORM
                      END-IF
                    END-IF
