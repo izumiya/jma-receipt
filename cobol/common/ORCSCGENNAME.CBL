@@ -348,6 +348,7 @@
            IF     (WRK-IPN-KISAIKBN        =   0       )
              AND  (WRK-KOUHATUKBN          =   1
                                            OR  2
+                                           OR  3
                                            OR  7       )
       *        変更可の指定は、一般名
                IF       (ORCSCGENN-1030-KOUHATUKA    =   "1" )

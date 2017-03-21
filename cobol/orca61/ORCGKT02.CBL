@@ -558,7 +558,7 @@
            03  WRK-SYO-TANINAME        PIC X(12).
       *
       *H24.4
-           03  WRK-KOUMEI              PIC X(02).
+           03  WRK-KOUMEI              PIC X(04).
            03  WRK-IPNMEI              PIC 9(01).
            03  IDG-Z                   PIC 9(04).
            03  IDG-X                   PIC 9(04).
@@ -2368,6 +2368,7 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
+                                       OR  3
                                        OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -2594,6 +2595,7 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
+                                       OR  3
                                        OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -2794,7 +2796,7 @@
            MOVE    SPACE               TO  WRK-MEISYO
       *    ∏Â»Ø∞ÂÃÙ… ∫∆ ‘Ω∏
             STRING  "°⁄"
-                    WRK-KOUMEI         DELIMITED   BY  SIZE
+                    WRK-KOUMEI         DELIMITED   BY  SPACE
                     "°€"               DELIMITED   BY  SIZE
                     TNS-NAME           DELIMITED   BY  SIZE
                                   INTO        WRK-MEISYO
@@ -2815,6 +2817,9 @@
                    MOVE    "∏Â"            TO  WRK-KOUMEI
                WHEN    2
                    MOVE    "¿Ë"            TO  WRK-KOUMEI
+      *H29.4
+               WHEN    3
+                   MOVE    "≤√"            TO  WRK-KOUMEI
                WHEN    7
                    MOVE    "Ãµ"            TO  WRK-KOUMEI
            END-EVALUATE
@@ -2897,6 +2902,7 @@
            IF     (TNSP-IPN-KISAIKBN       =   0       )
       *H27   AND  (SPA-KOUHATUKA           =   "1"     )
              AND  (TNS-KOUHATUKBN          =   1  OR  2
+                                           OR  3
                                            OR  7       )
       *H27.1
                IF       (SPA-KOUHATUKA           =   "1" )
@@ -6811,8 +6817,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

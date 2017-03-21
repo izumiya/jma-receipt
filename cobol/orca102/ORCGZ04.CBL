@@ -695,6 +695,17 @@
            MOVE    "先発医薬品のない後発医薬品である"
                                        TO  SPA-GMN-KOUHATUKBNMEIL (4)
            MOVE    4                   TO  SPA-GMN-KOUHATUKBN-MAX
+      *H29.3
+           IF      SPA-Z01-YUKOSTYMD   >=  "20170401"
+               MOVE    "3"                 TO  SPA-GMN-KOUHATUKBNL (4)
+               MOVE    "先発なし後発医薬品（加算対象）"
+                                           TO  SPA-GMN-KOUHATUKBNMEIL(4)
+               MOVE    "7"                 TO  SPA-GMN-KOUHATUKBNL (5)
+               MOVE    "先発なし後発医薬品（加算非対象）"
+                                           TO  SPA-GMN-KOUHATUKBNMEIL(5)
+               MOVE    5                   TO  SPA-GMN-KOUHATUKBN-MAX
+           END-IF
+      *
       *
            MOVE    "0"                 TO  SPA-GMN-ALLSURYOKBNL   (1)
            MOVE    "記載しない"        TO  SPA-GMN-ALLSURYOKBNMEIL(1)

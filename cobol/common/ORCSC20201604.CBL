@@ -69,6 +69,7 @@
       *  04.08.00    NACL-多々納  16/08/2X  認知症地域包括の投薬対応
       *                                     入院時持参薬対応
       *  04.08.00    NACL-多々納  17/03/XX  処方料訂正展開対応
+      *                                     一般名加算対象医薬品対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -163,6 +164,8 @@
            03  FLG-GENERIC-OK          PIC 9(01).
            03  FLG-GENERIC-NO          PIC 9(01).
            03  FLG-CHK-P               PIC 9(01).
+      *    一般名あり
+           03  FLG-GENERIC-OK12        PIC 9(01).
       *
       *サンプル薬対応
            03  FLG-SANPURU             PIC 9(01).
@@ -1522,7 +1525,8 @@
                    END-IF
                    IF      (FLG-CHK-P          =   1   )  AND
                            (WRK-COM-KOUHATUKBN (IDX-Z) =   "1"
-                                                       OR  "2" )
+                                                       OR  "2"
+                                                       OR  "3" )
       *ver.4.7         最低薬価を金額へ
                        MOVE    WRK-COM-GEN-PRICE(IDX-Z)
                                                TO  WRK-COM-KISOTEN
@@ -2552,6 +2556,8 @@
            MOVE    ZERO                TO  FLG-IPPANKSN
       *
            MOVE    ZERO                TO  FLG-GENERIC-OK
+      *H29.4
+           MOVE    ZERO                TO  FLG-GENERIC-OK12
       *H28.4
            MOVE    ZERO                TO  FLG-GENERIC-NO
            MOVE    ZERO                TO  CNT-GENERIC
@@ -2857,6 +2863,20 @@
                END-IF
       *
            END-PERFORM
+      *
+      *H29.4
+      *    一般名加算算定編集
+           IF      SPA-SRYYMD          >=  "20170401"
+               IF      (FLG-GENERIC-OK     =   1   )
+                   OR ((CNT-GENERIC        >=  2   )  AND
+                       (FLG-GENERIC-NO     =   ZERO))
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+           ELSE
+               IF      (FLG-GENERIC-OK     =   1   )
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+           END-IF
       *
       *H26.4
       *    外来のうがい薬のみのチェック
@@ -3581,7 +3601,8 @@
            IF     (IDX-SYOHOU      NOT =   ZERO )
              AND  (FLG-IPPANKSN        =   ZERO )
              AND  (SPA-ERRCD           =   SPACE)
-             AND  (FLG-GENERIC-OK      =   1    )
+      ***    AND  (FLG-GENERIC-OK      =   1    )
+             AND  (FLG-GENERIC-OK12    =   1    )
       *        処方せん料の入力があり、一般名加算対象
                IF     (WRK-COM-KZMFLG2 (IDX-SYOHOU) =   SPACE) AND
                       (LNK-ORCSC-KEI-IDX       =   ZERO )
@@ -3601,7 +3622,8 @@
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    ))
       *     一般名加算と院外投薬あり
-               IF      FLG-GENERIC-OK      =   ZERO
+      ***      IF     (FLG-GENERIC-OK      =   ZERO )
+               IF     (FLG-GENERIC-OK12    =   ZERO )
       *            一般名加算投薬なし
                    IF     (WRK-COM-KZMFLG (IDX-IP) =   SPACE) AND
                           (LNK-ORCSC-KEI-IDX       =   ZERO )
@@ -3615,20 +3637,36 @@
       *H28.4
                ELSE
       *            加算のチェック
-                   IF     (FLG-GENERIC-NO      =   1 )
-                      OR  (CNT-GENERIC         <   2 )
+      *            IF     (FLG-GENERIC-NO      =   1 )
+      *               OR  (CNT-GENERIC         <   2 )
       *                一般名表示なし有
-                       IF      WRK-COM-INPUTCD (IDX-IP)
-                                              NOT =   "120003570"
-                           MOVE    "K222"          TO  SPA-ERRCD
-                       END-IF
-                   ELSE
+      *                IF      WRK-COM-INPUTCD (IDX-IP)
+      *                                       NOT =   "120003570"
+      *                    MOVE    "K222"          TO  SPA-ERRCD
+      *                END-IF
+      *            ELSE
       *                すべて一般名
+      *                IF      WRK-COM-INPUTCD (IDX-IP)
+      *                                       NOT =   "120004270"
+      *                    MOVE    "K223"          TO  SPA-ERRCD
+      *                END-IF
+      **           END-IF
+      *H29.4
+                   IF     (FLG-GENERIC-NO      =   ZERO )
+                      AND (CNT-GENERIC         >=  2    )
+      *                一般名加算１
                        IF      WRK-COM-INPUTCD (IDX-IP)
                                               NOT =   "120004270"
                            MOVE    "K223"          TO  SPA-ERRCD
                        END-IF
+                   ELSE
+      *                一般名加算２
+                       IF      WRK-COM-INPUTCD (IDX-IP)
+                                              NOT =   "120003570"
+                           MOVE    "K222"          TO  SPA-ERRCD
+                       END-IF
                    END-IF
+      *
                    IF     (SPA-ERRCD          NOT =   SPACE)
                        IF     (WRK-COM-KZMFLG (IDX-IP) =   SPACE)
                          AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
@@ -4201,6 +4239,15 @@
                        END-IF
                        IF      (WRK-COM-KOUHATUKBN (IDX) =   "1"
                                                          OR  "2" )
+                           ADD     1               TO  CNT-GENERIC
+                           IF      (FLG-CHK-P      =   ZERO)
+                               MOVE    1           TO  FLG-GENERIC-NO
+                           END-IF
+                       END-IF
+      *H29.3
+      *H29.4から       先発なし後発医薬品（加算対象）判定
+                       IF      (WRK-COM-KOUHATUKBN (IDX) =   "3" )
+                          AND  (SPA-SRYYMD         >=   "20170401")
                            ADD     1               TO  CNT-GENERIC
                            IF      (FLG-CHK-P      =   ZERO)
                                MOVE    1           TO  FLG-GENERIC-NO
@@ -5139,9 +5186,9 @@
       *
       *処方せん料の次に別剤として追加。加算での追加はできない
       *H24.4
-      *     一般名記載加算
            IF     (FLG-ERR             =   ZERO )
              AND  (FLG-GENERIC-OK      =   1    )
+             AND  (SPA-SRYYMD          <   "20170401")
                IF     (FLG-GENERIC-NO      =   1 )
                   OR  (CNT-GENERIC         <   2 )
       *            一般名表示なし有
@@ -5152,6 +5199,7 @@
                    MOVE    "120004270"         TO  WRK-SRYCD
                    MOVE    "120003570"         TO  WRK-SRYCD2
                END-IF
+      *
                PERFORM 3002-KASAN-SYORI-SEC
                IF      FLG-ERR             =   ZERO
                    MOVE    "820"           TO  LNK-ORCSC-SRYSYUKBN
@@ -5160,6 +5208,36 @@
                                                          (02 IDXS)
                END-IF
            END-IF
+      *
+      *H29.4 から
+           IF     (FLG-ERR             =   ZERO )
+            AND   (SPA-SRYYMD          >=  "20170401")
+               MOVE    SPACE               TO  WRK-SRYCD
+               MOVE    SPACE               TO  WRK-SRYCD2
+      *        一般名加算１算定
+               IF     (FLG-GENERIC-NO      =   ZERO )
+                  AND (CNT-GENERIC         >=  2    )
+      *            一般名加算１対象がすべて一般名
+                   MOVE    "120004270"         TO  WRK-SRYCD
+                   MOVE    "120003570"         TO  WRK-SRYCD2
+               ELSE
+                   IF      FLG-GENERIC-OK      =   1
+      *                後発品が１つ以上一般名
+                       MOVE    "120003570"         TO  WRK-SRYCD
+                       MOVE    "120004270"         TO  WRK-SRYCD2
+                   END-IF
+               END-IF
+               IF      WRK-SRYCD       NOT =   SPACE
+                   PERFORM 3002-KASAN-SYORI-SEC
+                   IF      FLG-ERR             =   ZERO
+                       MOVE    "820"           TO  LNK-ORCSC-SRYSYUKBN
+                                                         (02 IDXS)
+                       MOVE    "80"            TO  LNK-ORCSC-SRYKBN
+                                                         (02 IDXS)
+                   END-IF
+               END-IF
+           END-IF
+      *
            .
        30011-SYOHOUSEN-SYORI-EXT.
            EXIT.

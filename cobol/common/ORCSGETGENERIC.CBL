@@ -531,6 +531,7 @@
                   (FLG-GENE-ARI            =   2     ))
              AND  (TNS-KOUHATUKBN          =   1
                                            OR  2
+                                           OR  3
                                            OR  7       )
       *
       *H28.2
@@ -623,7 +624,8 @@
            IF     (WRK-IPN-KISAIKBN    =   1
                                        OR  3  )
              AND  (TNS-KOUHATUKBN      =   1
-                                       OR  2  )
+                                       OR  2
+                                       OR  3  )
                MOVE    "1"             TO  WRK-GENERIC-KBN
            END-IF
            .
