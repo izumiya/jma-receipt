@@ -577,13 +577,8 @@
       *
            MOVE    PTINF-HOME-TEL1 TO  FINDRES-TEL (IDXL)
       *
-           IF    ( PTINF-HOME-POST     NOT =   SPACE )
-               MOVE    PTINF-HOME-POST (1:3)
-                                   TO  FINDRES-ZIPCODE (IDXL)(1:3)
-               MOVE    "-"         TO  FINDRES-ZIPCODE (IDXL)(4:1)
-               MOVE    PTINF-HOME-POST (4:)
-                                   TO  FINDRES-ZIPCODE (IDXL)(5:)
-           END-IF
+           MOVE    PTINF-HOME-POST
+                                   TO  FINDRES-ZIPCODE (IDXL)
       *
            MOVE    PTINF-HOME-ADRS TO  FINDRES-ADD1 (IDXL)
       *
