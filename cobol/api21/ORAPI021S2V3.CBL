@@ -259,6 +259,8 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
                05  WRK-SELECT-CODE         PIC X(04).
       *        処理区分
                05  WRK-PARA-MODE           PIC X(03).
@@ -4141,6 +4143,13 @@
                MOVE    "08"                TO  WRK-ERRCD
            END-IF
       *
+           IF     (WRK-ERRCD               =   SPACE )
+      *        診療行為登録の処理の続きであること
+               IF      WRK-PARA-SYORIPG    NOT =   "01"
+                   MOVE    "08"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
            .
        2008-SPATMP-SEL-EXT.
            EXIT.
@@ -4182,6 +4191,7 @@
       *    ＳＰＡ一時保存テーブル追加
       *****************************************************************
        20081-SPATMP-INSERT-SEC                SECTION.
+      *
       *
            MOVE    SPATMP-REC          TO  MCPDATA2-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -4245,6 +4255,8 @@
            MOVE    SPACE               TO  WRK-APIV3DATA-AREA
            MOVE    MDCRES-RESPONSE-NUMBER
                                        TO  WRK-RESPONSE-NUMBER
+      *    処理ＰＧ
+           MOVE    "01"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-DENPNUM         TO  WRK-PARA-DENPNUM
            MOVE    WRK-SYORI-MODE      TO  WRK-PARA-MODE
@@ -4253,6 +4265,9 @@
       *
            MOVE    MDCRES-KARTE-UID    TO  APIPARA-KARTE-UID
            MOVE    WRK-PTNUM           TO  APIPARA-PTNUM
+      *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -4816,8 +4831,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

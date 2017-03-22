@@ -23,7 +23,7 @@
       *  コンポーネント名  : 診療行為　リハビリ開始日・コメント登録
       *  管理者            :
       *  作成日付    作業者        記述
-      *  16/12/06    NACL−多々納　新規作成
+      *  16/10/XX    NACL−多々納　新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
@@ -557,6 +557,11 @@
                MOVE   "99"             TO  WRK-ERRCD
                GO  TO         100-INIT-EXT
            END-IF
+      *    XML情報取り出し
+           PERFORM 1000-APTXMLREAD-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO  TO         100-INIT-EXT
+           END-IF
       *    ＳＰＡ共通設定
            INITIALIZE                  SYS-1010-REC
            INITIALIZE                  ORCSCOMMONAREA
@@ -579,11 +584,6 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-      *    XML情報取り出し
-           PERFORM 1000-RGTXMLREAD-SEC
-           IF      WRK-ERRCD       NOT =   SPACE
-               GO      TO      200-MAIN-EXT
-           END-IF
       *
            MOVE    ZERO                TO  MDCRES-API-RESULT
            MOVE    SPACE               TO  WRK-ERRCD
@@ -609,8 +609,8 @@
                MOVE    2                   TO  FLG-SYORI
            WHEN    "03"
                MOVE    3                   TO  FLG-SYORI
-           WHEN    "05"
-               MOVE    5                   TO  FLG-SYORI
+     ***   WHEN    "05"
+     ***       MOVE    5                   TO  FLG-SYORI
            WHEN    "99"
       *        強制処理終了
                PERFORM 2099-CANCEL-SEC
@@ -680,7 +680,11 @@
            INITIALIZE                  ORAPIV3SUB01AREA
            MOVE    "9"                 TO  APIV3SUB01-SYORI
            IF      MDCREQ-ORCA-UID     NOT =   SPACE
-               MOVE    SPA-TERMID          TO  APIV3SUB01-TERMID
+      *        API+UIDコードをTERMID
+               STRING  "API+"
+                       MDCREQ-ORCA-UID     DELIMITED  BY  SPACE
+                                           INTO    APIV3SUB01-TERMID
+               END-STRING
            END-IF
            MOVE    MDCREQ-KARTE-UID    TO  APIV3SUB01-KARTE-UID
            MOVE    "AP21"              TO  APIV3SUB01-API-GYOUMUID
@@ -707,7 +711,7 @@
       *****************************************************************
       *    XML情報から内容を取り出す
       *****************************************************************
-       1000-RGTXMLREAD-SEC   SECTION.
+       1000-APTXMLREAD-SEC   SECTION.
       *
            IF      APILST08-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
@@ -730,7 +734,7 @@
            ELSE
                DISPLAY "!!!XMLOPEN failure = " MCP-RC
                MOVE    "97"             TO  WRK-ERRCD
-               GO      TO      1000-RGTXMLREAD-EXT
+               GO      TO      1000-APTXMLREAD-EXT
            END-IF
       *
       *
@@ -764,7 +768,7 @@
            END-IF
       *
            .
-       1000-RGTXMLREAD-EXT.
+       1000-APTXMLREAD-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1143,7 +1147,9 @@
                PERFORM 20013-RIHA-SANTEI-HENSYU-SEC
            END-IF
       *
-           IF      WRK-ERRCD       NOT =   SPACE
+           IF      WRK-ERRCD           =   SPACE
+               MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
+           ELSE
                MOVE    "01"            TO  MDCRES-RESPONSE-NUMBER
                IF      FLG-SYORIEND    =   1
                    MOVE    MDCREQ-ORCA-UID   TO  MDCRES-ORCA-UID
@@ -1311,6 +1317,9 @@
            MOVE    "05"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
+      *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -1519,6 +1528,14 @@
       *
            MOVE    ZERO                TO  IDX-ERR
       *
+      *    レスポンス番号チェック
+           IF      WRK-RESPONSE-NUMBER =   "02"
+               CONTINUE
+           ELSE
+               MOVE    "09"                TO  WRK-ERRCD
+               GO      TO      2002-SYORI-02-EXT
+           END-IF
+      *
       *    患者番号判定
            PERFORM 20011-PTINF-INITCHK-SEC
       *
@@ -1561,13 +1578,13 @@
                    PERFORM 2900-SYORI-END-SEC
                END-IF
            ELSE
+               IF     (MDCRES-RESPONSE-NUMBER  =   SPACE )
+                   MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
+               END-IF
                IF      FLG-CANSEL      =   ZERO
       *            SPA再編集
                    PERFORM 2901-PARA-INS-SEC
                    PERFORM 2008-SPATMP-INS-SEC
-               END-IF
-               IF     (MDCRES-RESPONSE-NUMBER  =   SPACE )
-                   MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
                END-IF
            END-IF
       *
@@ -2512,13 +2529,13 @@
                    PERFORM 2900-SYORI-END-SEC
                END-IF
            ELSE
+               IF     (MDCRES-RESPONSE-NUMBER  =   SPACE )
+                   MOVE    "03"            TO  MDCRES-RESPONSE-NUMBER
+               END-IF
                IF      FLG-CANSEL      =   ZERO
       *            SPA再編集
                    PERFORM 2901-PARA-INS-SEC
                    PERFORM 2008-SPATMP-INS-SEC
-               END-IF
-               IF     (MDCRES-RESPONSE-NUMBER  =   SPACE )
-                   MOVE    "03"            TO  MDCRES-RESPONSE-NUMBER
                END-IF
            END-IF
       *
@@ -3669,10 +3686,10 @@
       *
       *    排他制御処理
            MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
-           MOVE    "P02"               TO  SPA-MOTOPG
+           MOVE    "K02"               TO  SPA-MOTOPG
                                            MCP-WINDOW
            MOVE    1                   TO  SLOCK-MODE
-           MOVE    PTINF-PTID          TO  SLOCK-PTID
+           MOVE    SPA-PTID            TO  SLOCK-PTID
       *    電子カルテキー
            MOVE    MDCREQ-KARTE-UID    TO  SLOCK-KARTE-UID
       *    API+オルカＵＩＤ をTERMID
@@ -3698,7 +3715,7 @@
        990-LOCK-OUT-SEC         SECTION.
       *
       *    排他制御解除処理
-           MOVE    "P02"               TO  SPA-MOTOPG
+           MOVE    "K02"               TO  SPA-MOTOPG
                                            MCP-WINDOW
            MOVE    ZERO                TO  SLOCK-PTID
            MOVE    3                   TO  SLOCK-MODE

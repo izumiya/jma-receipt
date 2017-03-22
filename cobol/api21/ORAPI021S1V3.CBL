@@ -174,6 +174,8 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
       *
       *処理最大行
        01  MAX-LINE-VALUE          PIC 9(04)   VALUE   400.
@@ -537,10 +539,11 @@
       *    入力項目チェック処理
            IF      WRK-ERRCD           =   SPACE
                PERFORM 2001-INPUT-CHK-SEC
-           END-IF
-           IF      WRK-ERRCD       NOT =   SPACE
+           ELSE
       *        編集処理
                PERFORM 20010-INPUT-HEN-SEC
+           END-IF
+           IF      WRK-ERRCD       NOT =   SPACE
                MOVE    SPACE               TO  WRK-KEICD-G
       *        API処理登録
                IF     (WRK-ORCA-UID    NOT =   SPACE )
@@ -2472,10 +2475,15 @@
            MOVE    SPACE               TO  WRK-APIV3DATA-REC
            MOVE    MDCRES-RESPONSE-NUMBER
                                        TO  WRK-RESPONSE-NUMBER
+      *    処理ＰＧ
+           MOVE    "01"                TO  WRK-PARA-SYORIPG
+      *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
            MOVE    MDCRES-KARTE-UID    TO  APIPARA-KARTE-UID
            MOVE    WRK-PTNUM           TO  APIPARA-PTNUM
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
