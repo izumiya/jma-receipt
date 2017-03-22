@@ -696,7 +696,7 @@
                                        TO  SPA-GMN-KOUHATUKBNMEIL (4)
            MOVE    4                   TO  SPA-GMN-KOUHATUKBN-MAX
       *H29.3
-           IF      SPA-Z01-YUKOSTYMD   >=  "20170401"
+           IF      SPA-Z01-YUKOSTYMD   >=  "20170317"
                MOVE    "3"                 TO  SPA-GMN-KOUHATUKBNL (4)
                MOVE    "先発なし後発医薬品（加算対象）"
                                            TO  SPA-GMN-KOUHATUKBNMEIL(4)
