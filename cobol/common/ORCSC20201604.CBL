@@ -2866,7 +2866,7 @@
       *
       *H29.4
       *    一般名加算算定編集
-           IF      SPA-SRYYMD          >=  "20170401"
+           IF      SPA-SRYYMD          >=  "20170317"
                IF      (FLG-GENERIC-OK     =   1   )
                    OR ((CNT-GENERIC        >=  2   )  AND
                        (FLG-GENERIC-NO     =   ZERO))
@@ -4247,7 +4247,7 @@
       *H29.3
       *H29.4から       先発なし後発医薬品（加算対象）判定
                        IF      (WRK-COM-KOUHATUKBN (IDX) =   "3" )
-                          AND  (SPA-SRYYMD         >=   "20170401")
+                          AND  (SPA-SRYYMD         >=   "20170317")
                            ADD     1               TO  CNT-GENERIC
                            IF      (FLG-CHK-P      =   ZERO)
                                MOVE    1           TO  FLG-GENERIC-NO
@@ -5188,7 +5188,7 @@
       *H24.4
            IF     (FLG-ERR             =   ZERO )
              AND  (FLG-GENERIC-OK      =   1    )
-             AND  (SPA-SRYYMD          <   "20170401")
+             AND  (SPA-SRYYMD          <   "20170317")
                IF     (FLG-GENERIC-NO      =   1 )
                   OR  (CNT-GENERIC         <   2 )
       *            一般名表示なし有
@@ -5211,7 +5211,7 @@
       *
       *H29.4 から
            IF     (FLG-ERR             =   ZERO )
-            AND   (SPA-SRYYMD          >=  "20170401")
+            AND   (SPA-SRYYMD          >=  "20170317")
                MOVE    SPACE               TO  WRK-SRYCD
                MOVE    SPACE               TO  WRK-SRYCD2
       *        一般名加算１算定
