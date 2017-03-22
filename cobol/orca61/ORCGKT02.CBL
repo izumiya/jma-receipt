@@ -6551,8 +6551,10 @@
       *****************************************************************
        910-TENSU-READ-SEC         SECTION.
       *
-           MOVE    SPA-SRYYMD          TO  TNS-YUKOSTYMD
-           MOVE    SPA-SRYYMD          TO  TNS-YUKOEDYMD
+      *    MOVE    SPA-SRYYMD          TO  TNS-YUKOSTYMD
+      *    MOVE    SPA-SRYYMD          TO  TNS-YUKOEDYMD
+           MOVE    SPA-NAI-SRYYMD      TO  TNS-YUKOSTYMD
+           MOVE    SPA-NAI-SRYYMD      TO  TNS-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
@@ -6822,8 +6824,10 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
-           MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
+      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
+           MOVE    SPA-NAI-SRYYMD      TO  TNSP-YUKOSTYMD
+           MOVE    SPA-NAI-SRYYMD      TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
