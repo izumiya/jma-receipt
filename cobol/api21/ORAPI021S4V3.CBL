@@ -179,6 +179,9 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
+      *
                05  WRK-SELECT-CODE         PIC X(04).
       *        処理区分
                05  WRK-PARA-MODE           PIC X(03).
@@ -1868,6 +1871,8 @@
            MOVE    SPACE               TO  WRK-APIV3DATA-REC
            MOVE    MDCRES-RESPONSE-NUMBER
                                        TO  WRK-RESPONSE-NUMBER
+      *    処理ＰＧ
+           MOVE    "01"                TO  WRK-PARA-SYORIPG
            MOVE    WRK-DENPNUM         TO  WRK-PARA-DENPNUM
            MOVE    WRK-SYORI-MODE      TO  WRK-PARA-MODE
            MOVE    MDCRES-SELECT-CODE
@@ -1947,6 +1952,15 @@
                MOVE    "08"                TO  WRK-ERRCD
            END-IF
       *
+      *
+           IF     (WRK-ERRCD               =   SPACE )
+             AND  (MDCREQ-REQUEST-NUMBER   NOT =   "01"  )
+      *        リクエスト０１以外は、同じ処理の続きであること
+      *        診療行為登録の処理の続きであること
+               IF      WRK-PARA-SYORIPG    NOT =   "01"
+                   MOVE    "08"                TO  WRK-ERRCD
+               END-IF
+           END-IF
       *
            .
        2009-PARA-INIT-EXT.

@@ -1147,7 +1147,9 @@
                PERFORM 20013-RIHA-SANTEI-HENSYU-SEC
            END-IF
       *
-           IF      WRK-ERRCD       NOT =   SPACE
+           IF      WRK-ERRCD           =   SPACE
+               MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
+           ELSE
                MOVE    "01"            TO  MDCRES-RESPONSE-NUMBER
                IF      FLG-SYORIEND    =   1
                    MOVE    MDCREQ-ORCA-UID   TO  MDCRES-ORCA-UID

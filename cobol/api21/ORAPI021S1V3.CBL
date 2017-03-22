@@ -174,6 +174,8 @@
            03  WRK-APIV3DATA-REC.
       *        レスポンス番号
                05  WRK-RESPONSE-NUMBER     PIC X(02).
+      *        処理ＰＧ
+               05  WRK-PARA-SYORIPG        PIC X(02).
       *
       *処理最大行
        01  MAX-LINE-VALUE          PIC 9(04)   VALUE   400.
@@ -2473,6 +2475,9 @@
            MOVE    SPACE               TO  WRK-APIV3DATA-REC
            MOVE    MDCRES-RESPONSE-NUMBER
                                        TO  WRK-RESPONSE-NUMBER
+      *    処理ＰＧ
+           MOVE    "01"                TO  WRK-PARA-SYORIPG
+      *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
            MOVE    MDCRES-KARTE-UID    TO  APIPARA-KARTE-UID
