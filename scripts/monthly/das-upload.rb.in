@@ -20,7 +20,13 @@ module OrcaDAS
 
     def http_request(url, http_method, header, body, config)
       parsed_url = URI.parse(url)
-      http = Net::HTTP.new(parsed_url.host, parsed_url.port)
+      proxy = ENV["HTTP_PROXY"] || ENV["http_proxy"]
+      if proxy
+        uri = URI.parse(proxy)
+        http = Net::HTTP::Proxy(uri.host,uri.port).new(parsed_url.host, parsed_url.port)
+      else
+        http = Net::HTTP.new(parsed_url.host, parsed_url.port)
+      end
       http.read_timeout = http.open_timeout = config["TimeOut"] || 30
       
       case parsed_url.scheme
