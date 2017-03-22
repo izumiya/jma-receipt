@@ -2248,6 +2248,15 @@
                                INTO        SPA-Z98-GMN-NAME(IDX)
                 END-STRING
            END-IF
+      *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
+           IF     (TNS-SRYCD(1:1)      =   "6") AND
+                  (TNS-KOUHATUKBN      =   4  )
+                MOVE    SPACE              TO  SPA-Z98-GMN-NAME (IDX)
+                STRING  "¡Ú²Ã¡Û"      DELIMITED   BY  SIZE
+                        TNS-NAME      DELIMITED   BY  SIZE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+                END-STRING
+           END-IF
       *
       *    Ìô²Á´ð½à¥³¡¼¥É
            IF      TNS-SRYCD (1:1)     =   "6"

@@ -5959,6 +5959,7 @@
                    OR (FLG-ALLKISAI            =   2      ))
                   AND (TNS-KOUHATUKBN          =   1  OR  2
                                                OR  3
+                                               OR  4
                                                OR  7       )
       *H27.4       変更不可（処方単位）
                    IF      FLG-ALLKISAI        =   1
