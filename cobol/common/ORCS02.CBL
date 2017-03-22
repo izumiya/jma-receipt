@@ -31109,6 +31109,7 @@
       *    ÉéÃ´¶â³Û¤Î·×»»
       *
            IF     LNK-SYU-SYUHKNNUM     NOT =   SPACE
+             COMPUTE    WK-FUTANWARI =  WK-KOH-FTNRATE  /  100
              COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
                         WK-ZENGAKU   *  WK-FUTANWARI
              COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
