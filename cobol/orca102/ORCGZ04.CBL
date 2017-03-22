@@ -700,10 +700,13 @@
                MOVE    "3"                 TO  SPA-GMN-KOUHATUKBNL (4)
                MOVE    "先発なし後発医薬品（加算対象）"
                                            TO  SPA-GMN-KOUHATUKBNMEIL(4)
-               MOVE    "7"                 TO  SPA-GMN-KOUHATUKBNL (5)
-               MOVE    "先発なし後発医薬品（加算非対象）"
+               MOVE    "4"                 TO  SPA-GMN-KOUHATUKBNL (5)
+               MOVE    "後発医薬品でない（加算対象）"
                                            TO  SPA-GMN-KOUHATUKBNMEIL(5)
-               MOVE    5                   TO  SPA-GMN-KOUHATUKBN-MAX
+               MOVE    "7"                 TO  SPA-GMN-KOUHATUKBNL (6)
+               MOVE    "先発なし後発医薬品（加算非対象）"
+                                           TO  SPA-GMN-KOUHATUKBNMEIL(6)
+               MOVE    6                   TO  SPA-GMN-KOUHATUKBN-MAX
            END-IF
       *
       *

@@ -4232,7 +4232,8 @@
                IF     (TNS-SRYCD(1:1)      =   "6"  )
                  AND ((TNS-KOUHATUKBN      =   1  OR  2
       *29.3    先発なし後発医薬品（加算対象）追加
-                                           OR  3    )  OR
+                                           OR  3
+                                           OR  4    )  OR
                       (TNSP-IPN-KISAIKBN   =   3    )  OR
                       (TNSP-IPN-KISAIKBN   =   1    ))
       *            後発品・後発のある先発品の最低薬価
@@ -4534,6 +4535,16 @@
       *H29.3
                WHEN    3
       *            先発品のない後発品（加算対象）
+                   MOVE    SPACE                TO  WRK-MEISYO
+                   STRING      "【"             DELIMITED   BY  SIZE
+                               WRK-PSY-MEI      DELIMITED   BY  SPACE
+                               WRK-MSG1         DELIMITED   BY  SPACE
+                               "加】"           DELIMITED   BY  SIZE
+                               TNS-NAME         DELIMITED   BY  SIZE
+                               INTO             WRK-MEISYO
+                   END-STRING
+               WHEN    4
+      *            後発医薬品でない（加算対象）
                    MOVE    SPACE                TO  WRK-MEISYO
                    STRING      "【"             DELIMITED   BY  SIZE
                                WRK-PSY-MEI      DELIMITED   BY  SPACE

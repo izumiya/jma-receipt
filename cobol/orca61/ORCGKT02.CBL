@@ -2369,6 +2369,7 @@
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
                                        OR  3
+                                       OR  4
                                        OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -2596,6 +2597,7 @@
                   (TNS-KOUHATUKBN      =   1
                                        OR  2
                                        OR  3
+                                       OR  4
                                        OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
@@ -2820,6 +2822,8 @@
       *H29.4
                WHEN    3
                    MOVE    "²Ã"            TO  WRK-KOUMEI
+               WHEN    4
+                   MOVE    "²Ã"            TO  WRK-KOUMEI
                WHEN    7
                    MOVE    "Ìµ"            TO  WRK-KOUMEI
            END-EVALUATE
@@ -2903,6 +2907,7 @@
       *H27   AND  (SPA-KOUHATUKA           =   "1"     )
              AND  (TNS-KOUHATUKBN          =   1  OR  2
                                            OR  3
+                                           OR  4
                                            OR  7       )
       *H27.1
                IF       (SPA-KOUHATUKA           =   "1" )

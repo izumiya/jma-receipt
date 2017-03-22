@@ -1526,7 +1526,8 @@
                    IF      (FLG-CHK-P          =   1   )  AND
                            (WRK-COM-KOUHATUKBN (IDX-Z) =   "1"
                                                        OR  "2"
-                                                       OR  "3" )
+                                                       OR  "3"
+                                                       OR  "4" )
       *ver.4.7         ºÇÄãÌô²Á¤ò¶â³Û¤Ø
                        MOVE    WRK-COM-GEN-PRICE(IDX-Z)
                                                TO  WRK-COM-KISOTEN
@@ -4246,7 +4247,8 @@
                        END-IF
       *H29.3
       *H29.4¤«¤é       ÀèÈ¯¤Ê¤·¸åÈ¯°åÌôÉÊ¡Ê²Ã»»ÂÐ¾Ý¡ËÈ½Äê
-                       IF      (WRK-COM-KOUHATUKBN (IDX) =   "3" )
+                       IF      (WRK-COM-KOUHATUKBN (IDX) =   "3"
+                                                         OR  "4"  )
                           AND  (SPA-SRYYMD         >=   "20170317")
                            ADD     1               TO  CNT-GENERIC
                            IF      (FLG-CHK-P      =   ZERO)
