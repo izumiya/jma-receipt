@@ -108,6 +108,9 @@
       *
       *              NACL-小豆沢  16/07/05  平成２８年度対応
       *              NACL-伊藤    16/10/18  閉麻計算見直し
+      *              NACL-小豆沢  16/12/20  外来の包括分は出来高実績点数
+      *                                     をゼロ点で記録する
+      *              NACL-門脇    17/03/22  後発品変更可（処方単位）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -804,6 +807,9 @@
        01  WRK-GEN10-RECE04-REC.
            COPY    "CPRCF004.INC" REPLACING  //RECE04//
                                    BY        //WRK-GEN10//.
+       01  WRK-GEN11-RECE04-REC.
+           COPY    "CPRCF004.INC" REPLACING  //RECE04//
+                                   BY        //WRK-GEN11//.
       *
        01  WRK-CONS-AREA.
       *    日計表レコード記載の条件点数
@@ -1782,6 +1788,7 @@
       *
       *    後発品変更負荷処方単位情報
            INITIALIZE                      WRK-GEN10-RECE04-REC
+           INITIALIZE                      WRK-GEN11-RECE04-REC
            INITIALIZE                      RECE04-REC
            MOVE    RECE02-KEY          TO  RECE04-KEY1
       *
@@ -1823,7 +1830,7 @@
                OR     ( FLG-RECE04           =   1           )
                OR     ( RECE02-KEY       NOT =   RECE04-KEY1 )
       **AZU
-             IF     ( RECE04-SRYKBN       =  "11"   OR   "12")
+             IF       RECE04-SRYKBN  =  "11" OR "12" OR "98"
                  CONTINUE
              ELSE
       *
@@ -1931,13 +1938,14 @@
                          OR      ( FLG-END           =   1     )
       *
       *         入院料はコメントのみ対象とする
-                IF    ( RECE04-SRYKBN               >=  "90"      )
+                IF    ( RECE04-SRYKBN               >=  "90"        )
                 AND   ( RECE05-SRYCD (IDX) (1:1) NOT =   "8"   AND
                         RECE05-SRYCD (IDX) (1:3) NOT =   "008" AND
                         RECE05-SRYCD (IDX)       NOT =  "190128310" AND
                         RECE05-SRYCD (IDX)       NOT =  "190128410" AND
                         RECE05-SRYCD (IDX)       NOT =  "190128570" AND
-                        RECE05-SRYCD (IDX)       NOT =  "099209910")
+                        RECE05-SRYCD (IDX)       NOT =  "099209910" AND
+                        RECE05-SRYCD (IDX)       NOT =  "099209911" )
                  CONTINUE
                 ELSE
       *
@@ -1985,6 +1993,9 @@
                            END-IF
                            IF    RECE05-SRYCD(IDX)  =  "099209910"
                                MOVE RECE04-REC TO WRK-GEN10-RECE04-REC
+                           END-IF
+                           IF    RECE05-SRYCD(IDX)  =  "099209911"
+                               MOVE RECE04-REC TO WRK-GEN11-RECE04-REC
                            END-IF
                        WHEN    "1"
                            PERFORM 200711-KOUI-TAIHI-SEC
@@ -3570,18 +3581,17 @@
       *
            IF     (TNS-SRYCD(1:1)      =   "6" )
       *        システム管理の変更可によって一般名記載とする
-               IF     (TNSP-IPN-KISAIKBN       =   ZERO    )
-                  AND (SYS-1030-KOUHATUKA      =   "1"     )
-                  AND (TNS-KOUHATUKBN          =   1  OR  2
-                                               OR  7       )
+               IF    ( TNSP-IPN-KISAIKBN       =   ZERO   )
+               AND   ((SYS-1030-KOUHATUKA      =   "1"   ) OR
+                      (WRK-GEN11-KAISU(1 IDXX) >   ZERO  ))
+               AND   ( TNS-KOUHATUKBN  =  1  OR  2  OR  7 )
                    MOVE    1               TO  TNSP-IPN-KISAIKBN
+                   IF   WRK-GEN10-KAISU(1 IDXX)  >  ZERO
+                      MOVE    ZERO         TO  TNSP-IPN-KISAIKBN
+                   END-IF
                END-IF
            END-IF
       *
-           IF      WRK-GEN10-KAISU (1 IDXX)
-                                       >   ZERO
-               MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
-           END-IF
       *    システム予約により銘柄名へ変更か調べる
            PERFORM 200722-SRYACCT-CHECK-SEC
       *
@@ -4146,16 +4156,22 @@
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC
       *出来高実績点数
-           MOVE    WRK-FEDT-DEKIDAKA-TEN
-                                       TO  WRK-NUM
-           MOVE    8                   TO  WRK-NAGASA
-           IF     (WRK-FEDT-DEKIDAKA-SUB   =  1)   OR
-                  (WRK-FEDT-DEKIDAKA-TEN   <  0)
-               MOVE    WRK-NUM-X (3:8) TO  WRK-DATA
-               MOVE    "-"             TO  WRK-DATA (1:1)
-               PERFORM 5004-MOJI-HENSYU-SEC
-           ELSE
+           IF      WRK-FEDT-HOUKATU-FLG   =    "6"
+               MOVE    0                   TO  WRK-NUM
+               MOVE    8                   TO  WRK-NAGASA
                PERFORM 5005-NUM-HENSYU-SEC
+           ELSE
+               MOVE    WRK-FEDT-DEKIDAKA-TEN
+                                           TO  WRK-NUM
+               MOVE    8                   TO  WRK-NAGASA
+               IF     (WRK-FEDT-DEKIDAKA-SUB   =  1)   OR
+                      (WRK-FEDT-DEKIDAKA-TEN   <  0)
+                   MOVE    WRK-NUM-X (3:8) TO  WRK-DATA
+                   MOVE    "-"             TO  WRK-DATA (1:1)
+                   PERFORM 5004-MOJI-HENSYU-SEC
+               ELSE
+                   PERFORM 5005-NUM-HENSYU-SEC
+               END-IF
            END-IF
       *--- AZU-MOD START 2016.07.05
       *出来高・包括フラグ

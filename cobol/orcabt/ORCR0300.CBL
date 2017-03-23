@@ -444,6 +444,8 @@
       *  04.08.09    NACL-門脇    16/08/18  法別５１の一部負担金の記録修正
       *  04.08.10    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.11    NACL-門脇    17/03/22  医療情報連携
+      *                                     後発品変更可（処方単位）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1357,6 +1359,9 @@ grpsys     COPY    "COMMON-SPA".
        01  WRK-TAIHI-R41G10-REC.
            COPY    "CPRCF0041.INC" REPLACING  //RECE041//
                                    BY         //WRK-R41G10//.
+       01  WRK-TAIHI-R41G11-REC.
+           COPY    "CPRCF0041.INC" REPLACING  //RECE041//
+                                   BY         //WRK-R41G11//.
       *
       *    画像診断用退避エリア
       *    撮影料退避
@@ -8661,10 +8666,12 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *
       *****************************************************************
       *    後発変更不可対応（該当レコードを退避）処理
+      *    後発変更可対応  （該当レコードを退避）処理
       *****************************************************************
        8900-SYSTEM-RESERVE-98-SEC  SECTION.
       *                                        
            INITIALIZE                      WRK-TAIHI-R41G10-REC
+           INITIALIZE                      WRK-TAIHI-R41G11-REC
            INITIALIZE                      RECE041-REC
            MOVE    RECE02-KEY          TO  RECE041-KEY1
            MOVE    "98"                TO  RECE041-SRYKBN
@@ -8686,6 +8693,10 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                      ( RECE041-SRYCDTOTAL  =   99209910 )
                    MOVE    RECE041-REC TO  WRK-TAIHI-R41G10-REC
                END-IF
+               IF    ( RECE041-SRYKBN      =   "98"     )  AND
+                     ( RECE041-SRYCDTOTAL  =   99209911 )
+                   MOVE    RECE041-REC TO  WRK-TAIHI-R41G11-REC
+               END-IF
       *
                PERFORM 990-RECE041-NEXT-SEC
            END-PERFORM
@@ -8695,11 +8706,13 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *
       *****************************************************************
       *    後発変更不可対応（編集）処理
+      *    後発変更可対応  （編集）処理
       *****************************************************************
        8901-YKZ-HENSYU-SEC         SECTION.
       *
-      *    099209910の入力なし（通常処理）
+      *    099209910と099209911の入力なし（通常処理）
            IF      WRK-R41G10-SRYCDTOTAL   =   ZERO
+           AND     WRK-R41G11-SRYCDTOTAL   =   ZERO
                PERFORM 89012-YKZ-HENSYU-SEC
                PERFORM 20072-ZAI-HENSYU-SEC
                GO  TO  8901-YKZ-HENSYU-EXT
@@ -8726,14 +8739,14 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            END-IF
       *
       *    部分的に該当の場合
-      *    該当する日
+      *    銘柄名
            MOVE    RECE041-REC         TO  WRK-TAIHI-RECE041-REC
            PERFORM 89014-YKZ-HENSYU-SEC
            IF      RECE041-ZAIKAISU    >   ZERO
                PERFORM 20072-ZAI-HENSYU-SEC
            END-IF
            MOVE    WRK-TAIHI-RECE041-REC   TO  RECE041-REC
-      *    該当しない日
+      *    一般名
            MOVE    RECE041-SRYKBN      TO  WRK-SRYKBN
            PERFORM 89013-YKZ-HENSYU-SEC
            IF      RECE041-ZAIKAISU    >   ZERO
@@ -8747,6 +8760,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
       *
       *****************************************************************
       *    後発変更不可対応（日別該当チェック）処理
+      *    後発変更可対応  （日別該当チェック）処理
       *****************************************************************
        89011-YKZ-HENSYU-SEC        SECTION.
       *
@@ -8755,6 +8769,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                    UNTIL   IDV     >       31
                IF      RECE041-KAISU (1 IDV)   >   ZERO
                    IF      WRK-R41G10-KAISU (1 IDV)    >   ZERO
+                   OR      WRK-R41G11-KAISU (1 IDV)    >   ZERO
                        CONTINUE
                    ELSE
                        MOVE    9                   TO  FLG-HENKOFUKA
@@ -8771,6 +8786,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                    UNTIL   IDV     >       31
                IF      RECE041-KAISU (1 IDV)   >   ZERO
                    IF      WRK-R41G10-KAISU (1 IDV)    =   ZERO
+                   AND     WRK-R41G11-KAISU (1 IDV)    =   ZERO
                        CONTINUE
                    ELSE
                        MOVE    9                   TO  FLG-HENKOFUKA
@@ -8803,36 +8819,58 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    後発変更不可対応（該当しない日のため回数を０にする）処理
+      *    後発変更不可対応（一般名の回数）処理
+      *    後発変更可対応  （一般名の回数）処理
       *****************************************************************
        89013-YKZ-HENSYU-SEC        SECTION.
       *
            PERFORM VARYING IDV     FROM    1   BY  1
                    UNTIL   IDV     >       31
+             IF    WRK-R41G10-SRYCDTOTAL  NOT =  ZERO
                IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
                       (WRK-R41G10-KAISU (1 IDV)  >   ZERO)
                    COMPUTE RECE041-ZAIKAISU    =
                            RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
                    MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
                END-IF
+             END-IF
+             IF    WRK-R41G11-SRYCDTOTAL  NOT =  ZERO
+               IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
+                      (WRK-R41G11-KAISU (1 IDV)  =   ZERO)
+                   COMPUTE RECE041-ZAIKAISU    =
+                           RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
+                   MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
+               END-IF
+             END-IF
            END-PERFORM
            .  
        89013-YKZ-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
-      *    後発変更不可対応（該当する日のため回数を０にする）処理
+      *    後発変更不可対応（銘柄名の回数）処理
+      *    後発変更可対応  （銘柄名の回数）処理
       *****************************************************************
        89014-YKZ-HENSYU-SEC        SECTION.
       *
            PERFORM VARYING IDV     FROM    1   BY  1
                    UNTIL   IDV     >       31
+             IF    WRK-R41G10-SRYCDTOTAL  NOT =  ZERO
                IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
                       (WRK-R41G10-KAISU (1 IDV)  =   ZERO)
                    COMPUTE RECE041-ZAIKAISU    =
                            RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
                    MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
                END-IF
+             END-IF
+             IF    WRK-R41G11-SRYCDTOTAL  NOT =  ZERO
+               IF     (RECE041-KAISU (1 IDV)     >   ZERO)   AND
+                      (WRK-R41G11-KAISU (1 IDV)  >   ZERO)
+                   COMPUTE RECE041-ZAIKAISU    =
+                           RECE041-ZAIKAISU    -   RECE041-KAISU (1 IDV)
+                   MOVE    ZERO                TO  RECE041-KAISU (1 IDV)
+               END-IF
+             END-IF
            END-PERFORM
            .  
        89014-YKZ-HENSYU-EXT.
