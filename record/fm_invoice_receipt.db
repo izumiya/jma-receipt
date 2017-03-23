@@ -23,7 +23,7 @@ fm_invoice_receipt {
     Period_Class         varchar(01);
     Perform_Month        varchar(07);
     Perform_Date         varchar(10);
-    End_Perform_Date    varchar(10);
+    Perform_End_Date     varchar(10);
     IssuedDate           varchar(10);
     Department_Name      varchar(30);
     Insurance_Name       varchar(40);
