@@ -1391,3 +1391,75 @@ path	key65	{
 		;
 	};
 };
+
+path	key66	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key66_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =  :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   UPYMD       >=  :UPYMD
+			ORDER   BY      SRYYMD,
+					DENPNUM,
+			                EDANUM
+		;
+	};
+};
+
+path	key67	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key67_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   SRYKA       =   :SRYKA
+                        AND  (SRYYMD      >=  :SRYYMD
+                        AND   SRYYMD      <=  :UPSRYYMD)
+			AND   HKNCOMBINUM <>  '9999'
+                        AND   EDANUM      =    1
+			ORDER   BY      SRYYMD,
+					DENPNUM
+		;
+	};
+};
+path	key68	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key68_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk a,tbl_sryact b
+			WHERE   a.HOSPNUM    =   :HOSPNUM
+			AND   a.PTID        =   :PTID
+			AND   a.NYUGAIKBN   =   :NYUGAIKBN
+			AND   a.SRYKA       =   :SRYKA
+                        AND   a.HOSPNUM     =   b.HOSPNUM
+			AND   a.PTID        =   b.PTID
+			AND   a.NYUGAIKBN   =   b.NYUGAIKBN
+			AND   a.SRYKA       =   b.SRYKA
+                        AND   b.SRYYM       =   :UPHMS
+                        AND  (b.SRYCD1      =   '099209911')
+                        AND ((b.ZAINUM      =   a.ZAINUM1 )
+                        OR   (b.ZAINUM     =   a.ZAINUM2 )
+                        OR   (b.ZAINUM     =   a.ZAINUM3 )
+                        OR   (b.ZAINUM     =   a.ZAINUM4 )
+                        OR   (b.ZAINUM     =   a.ZAINUM5 )
+                        OR   (b.ZAINUM     =   a.ZAINUM6 )
+                        OR   (b.ZAINUM     =   a.ZAINUM7 )
+                        OR   (b.ZAINUM     =   a.ZAINUM8 )
+                        OR   (b.ZAINUM     =   a.ZAINUM9 )
+                        OR   (b.ZAINUM    =   a.ZAINUM10)
+                        OR   (b.ZAINUM    =   a.ZAINUM11)
+                        OR   (b.ZAINUM    =   a.ZAINUM12)
+                        OR   (b.ZAINUM    =   a.ZAINUM13)
+                        OR   (b.ZAINUM    =   a.ZAINUM14)
+                        OR   (b.ZAINUM    =   a.ZAINUM15))
+			ORDER   BY        a.SRYYMD,
+                                          a.RENNUM,
+                                          a.DOUJI_RENNUM,
+			                  a.EDANUM
+		;
+	};
+};
+
