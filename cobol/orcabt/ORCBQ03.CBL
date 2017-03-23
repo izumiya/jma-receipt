@@ -739,6 +739,7 @@
            IF   ( SEL-SKYSRH       =   1 )
                PERFORM 900-SKYSRH-DEL1-SEC
                IF   ( SPA-Q01-STTOTALTEN >   ZERO )
+                OR  ( SPA-Q01-EDTOTALTEN >   ZERO )
                    PERFORM 2001-SYUNOU-GET-SEC
                END-IF
                PERFORM 900-SKYSRH-INS1-SEC
@@ -1805,6 +1806,16 @@
                        MOVE    ZERO        TO  FLG-LOOPEND
                    END-EVALUATE
       *
+                   IF   ( SPA-Q01-STTOTALTEN   NOT =   ZERO )
+                    AND ( SPA-Q01-STTOTALTEN   >   SYU-TOTAL-HKNTEN )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
+                   IF   ( SPA-Q01-EDTOTALTEN   NOT =   ZERO )
+                    AND ( SPA-Q01-EDTOTALTEN   <   SYU-TOTAL-HKNTEN )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
                ELSE
                    MOVE    1       TO  FLG-SYUNOU
                    INITIALIZE          SYUNOU-REC
@@ -1890,6 +1901,13 @@
                                    TO  SKYSRH-EDSRYYM
            MOVE    SPA-Q01-STTOTALTEN
                                    TO  SKYSRH-TOTALTEN
+           IF    ( SPA-Q01-EDTOTALTEN
+                                   >   ZERO )
+               MOVE    SPA-Q01-EDTOTALTEN
+                                   TO  SKYSRH-TOTALTEN-MAX
+           ELSE
+               MOVE    99999999    TO  SKYSRH-TOTALTEN-MAX
+           END-IF
            IF    ( SPA-Q01-TOKKICD NOT =   SPACE )
                MOVE    SPA-Q01-TOKKICD
                                    TO  SKYSRH-TOKKI (1)

@@ -323,7 +323,7 @@
                MOVE    "下限点数の入力に誤りがあります。"
                                        TO  SPA-Q01-ERRMSG
            WHEN    "0174"
-               MOVE    "下限点数の入力に誤りがあります。"
+               MOVE    "上限点数の入力に誤りがあります。"
                                        TO  SPA-Q01-ERRMSG
            WHEN    "0175"
                MOVE    "保険者番号検索区分の入力に誤りがあります。"
@@ -745,7 +745,10 @@
                INTO  SPA-Q01-ERRMSG
                END-STRING
            WHEN    "1049"
-               MOVE    "検索条件処理に失敗しました。"
+               MOVE    "検索処理に失敗しました。"
+                                       TO  SPA-Q01-ERRMSG
+           WHEN    "1050"
+               MOVE    "下限点数＞上限点数となっています。"
                                        TO  SPA-Q01-ERRMSG
            WHEN    "4001"      THRU    "4010"
                MOVE    "更新処理に失敗しました。"

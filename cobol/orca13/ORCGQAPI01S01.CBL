@@ -3650,10 +3650,19 @@
            END-IF
       *
            IF    ( SPA-ERRCD               = SPACE )
-               IF    ( FINDREQ-OUTKBN        = "2" )
-                AND (( SPA-Q01-STTOTALTEN  =   ZERO )
-                   OR( SPA-Q01-EDTOTALTEN  =   ZERO ))
-                   MOVE    "1037"      TO  SPA-ERRCD
+               IF    ( FINDREQ-OUTKBN      = "2" )
+                   IF    ( SPA-Q01-STTOTALTEN  =   ZERO )
+                    AND  ( SPA-Q01-EDTOTALTEN  =   ZERO )
+                       MOVE    "1037"      TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD               = SPACE )
+               IF    ( SPA-Q01-STTOTALTEN  NOT =   ZERO )
+                AND  ( SPA-Q01-EDTOTALTEN  NOT =   ZERO )
+                AND  ( SPA-Q01-STTOTALTEN  > SPA-Q01-EDTOTALTEN )
+                   MOVE    "1050"      TO  SPA-ERRCD
                END-IF
            END-IF
       *
