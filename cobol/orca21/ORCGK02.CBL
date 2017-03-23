@@ -13185,8 +13185,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                TO  SPA-COM-PAGE (WRK-IDX)
                MOVE    ZERO                TO  SPA-COM-GYOU (WRK-IDX)
       *********MOVE    SPACE               TO  SPA-COM-IN3  (WRK-IDX)
+      *H29.3  （減）（精減）の自動コメントは対象外
+               IF     ( SPA-COM-INPUTCD(WRK-IDX)   =   "820000047"
+                                                   OR  "820000166")
+                 AND  ( SPA-COM-AUTOKBN(WRK-IDX)   =   "3"        )
+                    MOVE    1               TO  FLG-TAISYO
+               ELSE
+                    MOVE    ZERO            TO  FLG-TAISYO
+               END-IF
       *        画面表示外のものに頁、行位置を設定する
-               IF      SPA-COM-SET    (WRK-IDX)  =   SPACE
+               IF     (SPA-COM-SET  (WRK-IDX)  =   SPACE )
+                AND   (FLG-TAISYO            =   ZERO  )
                    ADD     1                 TO  IDX
       *ページなし
       ****         IF      IDX               >   MAX-GMN
