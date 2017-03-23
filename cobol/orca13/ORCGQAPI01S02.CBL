@@ -614,6 +614,12 @@
            PERFORM 800-DATE-SEC
            MOVE    WRK-DATE        TO  FINDRES-BIRTHDAY (IDXL)
       *
+           IF    ( PTSRH-NYUGAIKBN =   "1" )
+               MOVE    "I"         TO  FINDRES-NYUGAIKBN (IDXL)
+           ELSE
+               MOVE    "O"         TO  FINDRES-NYUGAIKBN (IDXL)
+           END-IF
+      *
            IF    ( PTSRH-HKNID     NOT =   ZERO )
                PERFORM 200312-HOKEN-EDIT-SEC
            END-IF

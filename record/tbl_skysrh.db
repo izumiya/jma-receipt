@@ -43,7 +43,8 @@ tbl_skysrh {
 	UPHMS			    char(6);
 	STSRYYM				varchar(6),virtual;
 	EDSRYYM				varchar(6),virtual;
-	YMDHMS				varchar(12),virtual;
+	YMDHMS				varchar(14),virtual;
+	TOTALTEN_MAX	    number(10,0),virtual;
 };
 
 primary	{
@@ -131,6 +132,7 @@ path	ins1 	{
 		AND	SRYYM	 <=     :EDSRYYM
 		AND	HKNNUM   NOT IN ('971','973' )  
 		AND	SKYIRYO_TOTALTEN >=     :TOTALTEN
+		AND	SKYIRYO_TOTALTEN <=     :TOTALTEN_MAX
 		AND  (( :TOKKI1   IN (:TOKKI2,TOKKI1,TOKKI2,TOKKI3,TOKKI4,TOKKI5 ))
 		  OR  ( :TOKKINM1 IN (:TOKKINM2,TOKKINM1,TOKKINM2,TOKKINM3,TOKKINM4,TOKKINM5)))
 		AND	SKYKBN_RECEDEN LIKE :SKYKBN_RECEDEN

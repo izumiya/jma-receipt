@@ -87,3 +87,5 @@
            03  SKYSRH-EDSRYYM          PIC X(6).
       *    日付＋時刻
            03  SKYSRH-YMDHMS           PIC X(14).
+      *    保険点数上限
+           03  SKYSRH-TOTALTEN-MAX     PIC 9(10).
