@@ -388,11 +388,11 @@
       *
       *    １年前をセット
            MOVE    WRK-PARA-KJNYM      TO  WRK-SYMD(1:6)
-           IF      WRK-SMM     =   1
-               MOVE    12              TO  WRK-SMM
+           IF      WRK-SMM     =   12
+               MOVE    1               TO  WRK-SMM
            ELSE
                COMPUTE WRK-SYY =   WRK-SYY - 1
-               COMPUTE WRK-SMM =   WRK-SMM - 1
+               COMPUTE WRK-SMM =   WRK-SMM + 1
            END-IF
            MOVE    "01"                TO  WRK-SYMD(7:2)
            PERFORM 800-SEIWA-HEN-SEC
