@@ -1996,7 +1996,9 @@
                                        TO  FMSEIKYU-MEMO (IDXA)
            END-PERFORM
       *
-           IF    ( ORCHC03-SIZE        =   "V5" )
+           IF    ( ORCHC03-SIZE    NOT =   "V5" )
+               MOVE    HC03-CHUI       TO  FMSEIKYU-SKY-CAUTION
+           ELSE
       *
                MOVE    ZERO            TO  WRK-API-GRPNUM
       *
