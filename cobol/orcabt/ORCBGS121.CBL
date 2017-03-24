@@ -701,13 +701,6 @@
       *
                    PERFORM 2201-HKNKBNNAME-EDIT-SEC
       *
-                   EVALUATE    BGSMEI-SEIKYUFLG
-                   WHEN   1
-                       MOVE    "" TO  HCGS121N-HKNKBNNAME(CNT-LINE)
-                   WHEN   2
-                       MOVE    "〓" TO  HCGS121N-HKNKBNNAME(CNT-LINE)
-                   END-EVALUATE
-      *
                    EVALUATE    WRK-HKNKBNNAME
                    WHEN "光办给锐驶脱∈９∷"
                        MOVE    "光办给锐驶脱(9)"
@@ -751,6 +744,13 @@
                                    TO  HCGS121N-HKNJANAME (CNT-LINE)
                    END-IF
                END-IF
+      *
+               EVALUATE    BGSMEI-SEIKYUFLG
+               WHEN   1
+                    MOVE    "" TO  HCGS121N-HKNKBNNAME(CNT-LINE)(1:2)
+               WHEN   2
+                    MOVE    "〓" TO  HCGS121N-HKNKBNNAME(CNT-LINE)(1:2)
+               END-EVALUATE
       *
                IF    ( PTNUM-PTNUM (11:)   =   SPACE )
                    MOVE    PTNUM-PTNUM
