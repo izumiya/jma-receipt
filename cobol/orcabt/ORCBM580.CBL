@@ -46,6 +46,7 @@
       *                                     地域連携IDなしは対象とし、
       *                                     同意なしは出力しない
       *  05.00.00    NACL-森脇    17.02.09  傷病名称全記録
+      *  04.08.08    NACL-藤原    17/03/24  入院のファイル名修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1542,20 +1543,36 @@
            IF      WRK-PARA-TEISYUTUSAKI   =   "1"
                EVALUATE    WRK-PARA-NYUGAIKBN
                  WHEN    "1"
-                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
-                           "RECEIPTCS2"        DELIMITED  BY  SIZE
-                           LNK-PRTKANRI-TBL-GROUP
-                                               DELIMITED  BY  SIZE
-                           ".UKE"              DELIMITED  BY  SIZE
-                                               INTO  SFILESV-FOR-DATA(1)
-                   END-STRING
-                   STRING  "RECEIPTCS2"        DELIMITED  BY  SIZE
-                           LNK-PRTKANRI-TBL-GROUP
-                                               DELIMITED  BY  SIZE
-                           ".UKE"              DELIMITED  BY  SIZE
-                                               INTO  SFILESV-TO-DATA (1)
-                   END-STRING
-               WHEN    "2"
+                   IF      WRK-PARA-PRTKBN   =   "7"
+                       STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                               "RECEIPTCS2"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                             INTO  SFILESV-FOR-DATA(1)
+                       END-STRING
+                       STRING  "RECEIPTCS2"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                             INTO  SFILESV-TO-DATA (1)
+                       END-STRING
+                   ELSE
+                       STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                               "RECEIPTCS3"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                             INTO  SFILESV-FOR-DATA(1)
+                       END-STRING
+                       STRING  "RECEIPTCS3"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                             INTO  SFILESV-TO-DATA (1)
+                       END-STRING
+                   END-IF
+                 WHEN    "2"
                    STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
                            "RECEIPTCS1"        DELIMITED  BY  SIZE
                            LNK-PRTKANRI-TBL-GROUP
@@ -1573,19 +1590,35 @@
            ELSE
                EVALUATE    WRK-PARA-NYUGAIKBN
                  WHEN    "1"
-                   STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
-                           "RECEIPTCK2"        DELIMITED  BY  SIZE
-                           LNK-PRTKANRI-TBL-GROUP
-                                               DELIMITED  BY  SIZE
-                           ".UKE"              DELIMITED  BY  SIZE
+                   IF      WRK-PARA-PRTKBN   =   "7"
+                       STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                               "RECEIPTCK2"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
                                                INTO  SFILESV-FOR-DATA(1)
-                   END-STRING
-                   STRING  "RECEIPTCK2"        DELIMITED  BY  SIZE
-                           LNK-PRTKANRI-TBL-GROUP
-                                               DELIMITED  BY  SIZE
-                           ".UKE"              DELIMITED  BY  SIZE
+                       END-STRING
+                       STRING  "RECEIPTCK2"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
                                                INTO  SFILESV-TO-DATA (1)
-                   END-STRING
+                       END-STRING
+                   ELSE
+                       STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
+                               "RECEIPTCK3"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-FOR-DATA(1)
+                       END-STRING
+                       STRING  "RECEIPTCK3"        DELIMITED  BY  SIZE
+                               LNK-PRTKANRI-TBL-GROUP
+                                                   DELIMITED  BY  SIZE
+                               ".UKE"              DELIMITED  BY  SIZE
+                                               INTO  SFILESV-TO-DATA (1)
+                       END-STRING
+                   END-IF
                  WHEN    "2"
                    STRING  WRK-PARA-HOSPNUM    DELIMITED  BY  SIZE
                            "RECEIPTCK1"        DELIMITED  BY  SIZE
