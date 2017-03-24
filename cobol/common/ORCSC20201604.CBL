@@ -166,6 +166,7 @@
            03  FLG-CHK-P               PIC 9(01).
       *    一般名あり
            03  FLG-GENERIC-OK12        PIC 9(01).
+           03  FLG-GENERIC-NO2          PIC 9(01).
       *
       *サンプル薬対応
            03  FLG-SANPURU             PIC 9(01).
@@ -532,6 +533,8 @@
       *
       *
            03  CNT-GENERIC             PIC 9(02).
+      *
+           03  CNT-GENERIC2            PIC 9(02).
       *
       *H28.9
       *    認知症地域包括　投薬チェック
@@ -2563,6 +2566,9 @@
            MOVE    ZERO                TO  FLG-GENERIC-NO
            MOVE    ZERO                TO  CNT-GENERIC
       *#######
+           MOVE    ZERO                TO  FLG-GENERIC-NO2
+           MOVE    ZERO                TO  CNT-GENERIC2
+      *#######
       *H29.3
            MOVE    ZERO                TO  IDX-SYOHOU2
            MOVE    ZERO                TO  IDX-G2
@@ -3653,8 +3659,11 @@
       *                END-IF
       **           END-IF
       *H29.4
-                   IF     (FLG-GENERIC-NO      =   ZERO )
-                      AND (CNT-GENERIC         >=  2    )
+                   IF    ((FLG-GENERIC-NO      =   ZERO )
+                      AND (CNT-GENERIC         >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (FLG-GENERIC-NO2     =   ZERO )
+                      AND (CNT-GENERIC2        >=  2    ))
       *                一般名加算１
                        IF      WRK-COM-INPUTCD (IDX-IP)
                                               NOT =   "120004270"
@@ -4241,8 +4250,10 @@
                        IF      (WRK-COM-KOUHATUKBN (IDX) =   "1"
                                                          OR  "2" )
                            ADD     1               TO  CNT-GENERIC
+                           ADD     1               TO  CNT-GENERIC2
                            IF      (FLG-CHK-P      =   ZERO)
                                MOVE    1           TO  FLG-GENERIC-NO
+                               MOVE    1           TO  FLG-GENERIC-NO2
                            END-IF
                        END-IF
       *H29.3
@@ -5223,10 +5234,20 @@
                    MOVE    "120004270"         TO  WRK-SRYCD
                    MOVE    "120003570"         TO  WRK-SRYCD2
                ELSE
+      *!!!
+      *            ４月１日までは、1,2のみ一般名でも加算１
+                   IF     (SPA-SRYYMD          <   "20170401")
+                     AND  (CNT-GENERIC2        >=  2         )
+                     AND  (FLG-GENERIC-NO2     =   ZERO      )
+                       MOVE    "120004270"         TO  WRK-SRYCD
+                       MOVE    "120003570"         TO  WRK-SRYCD2
+                   ELSE
+      *
                    IF      FLG-GENERIC-OK      =   1
       *                後発品が１つ以上一般名
                        MOVE    "120003570"         TO  WRK-SRYCD
                        MOVE    "120004270"         TO  WRK-SRYCD2
+                   END-IF
                    END-IF
                END-IF
                IF      WRK-SRYCD       NOT =   SPACE
