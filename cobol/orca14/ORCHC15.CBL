@@ -1116,7 +1116,7 @@
                END-PERFORM
            END-IF
       *    ドクター
-           MOVE    ORCHC15-DRCD        TO  FMYPL-DR-CODE
+           MOVE    ORCHC15-DRCD-G        TO  FMYPL-DR-CODE
            IF      ORCHC15-DRCD        =   "9999"
                MOVE    ORCHC15-DRCD-NAME   TO  FMYPL-DR-NAME
            ELSE
