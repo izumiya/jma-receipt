@@ -4263,6 +4263,8 @@
                            IF      (FLG-CHK-P      =   ZERO)
                                MOVE    1           TO  FLG-GENERIC-NO
                                MOVE    1           TO  FLG-GENERIC-NO2
+                           ELSE
+                               ADD     1           TO  CNT-GENERIC3
                            END-IF
                        END-IF
       *H29.3
@@ -5257,7 +5259,7 @@
                    END-IF
                END-IF
                IF      WRK-SRYCD           =   SPACE
-                   IF      FLG-GENERIC-OK      =   1
+                   IF      FLG-GENERIC-OK12    =   1
       *                後発品が１つ以上一般名
                        MOVE    "120003570"         TO  WRK-SRYCD
                        MOVE    "120004270"         TO  WRK-SRYCD2
