@@ -535,6 +535,7 @@
            03  CNT-GENERIC             PIC 9(02).
       *
            03  CNT-GENERIC2            PIC 9(02).
+           03  CNT-GENERIC3            PIC 9(02).
       *
       *H28.9
       *    認知症地域包括　投薬チェック
@@ -2568,6 +2569,7 @@
       *#######
            MOVE    ZERO                TO  FLG-GENERIC-NO2
            MOVE    ZERO                TO  CNT-GENERIC2
+           MOVE    ZERO                TO  CNT-GENERIC3
       *#######
       *H29.3
            MOVE    ZERO                TO  IDX-SYOHOU2
@@ -2877,6 +2879,11 @@
                IF      (FLG-GENERIC-OK     =   1   )
                    OR ((CNT-GENERIC        >=  2   )  AND
                        (FLG-GENERIC-NO     =   ZERO))
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+      *        4/1までは、３，４で２つ以上あれば対象
+               IF      (SPA-SRYYMD         <   "20170401")
+                   AND (CNT-GENERIC3       >=  2    )
                    MOVE    1               TO  FLG-GENERIC-OK12
                END-IF
            ELSE
@@ -3664,6 +3671,8 @@
                    OR    ((SPA-SRYYMD          <   "20170401")
                       AND (FLG-GENERIC-NO2     =   ZERO )
                       AND (CNT-GENERIC2        >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (CNT-GENERIC3        >=  2    ))
       *                一般名加算１
                        IF      WRK-COM-INPUTCD (IDX-IP)
                                               NOT =   "120004270"
@@ -4264,6 +4273,8 @@
                            ADD     1               TO  CNT-GENERIC
                            IF      (FLG-CHK-P      =   ZERO)
                                MOVE    1           TO  FLG-GENERIC-NO
+                           ELSE
+                               ADD     1           TO  CNT-GENERIC3
                            END-IF
                        END-IF
                END-EVALUATE
@@ -5235,20 +5246,24 @@
                    MOVE    "120003570"         TO  WRK-SRYCD2
                ELSE
       *!!!
-      *            ４月１日までは、1,2のみ一般名でも加算１
-                   IF     (SPA-SRYYMD          <   "20170401")
-                     AND  (CNT-GENERIC2        >=  2         )
-                     AND  (FLG-GENERIC-NO2     =   ZERO      )
+      *        ４月１日までは、1,2のみ一般名でも加算１
+               IF     (SPA-SRYYMD          <   "20170401")
+                   IF    ((CNT-GENERIC2        >=  2         )
+                      AND (FLG-GENERIC-NO2     =   ZERO      ))
+      *            3,4が２件以上、一般名であれば加算１
+                   OR     (CNT-GENERIC3        >=  2         )
                        MOVE    "120004270"         TO  WRK-SRYCD
                        MOVE    "120003570"         TO  WRK-SRYCD2
-                   ELSE
-      *
+                   END-IF
+               END-IF
+               IF      WRK-SRYCD           =   SPACE
                    IF      FLG-GENERIC-OK      =   1
       *                後発品が１つ以上一般名
                        MOVE    "120003570"         TO  WRK-SRYCD
                        MOVE    "120004270"         TO  WRK-SRYCD2
                    END-IF
-                   END-IF
+               END-IF
+      *
                END-IF
                IF      WRK-SRYCD       NOT =   SPACE
                    PERFORM 3002-KASAN-SYORI-SEC
