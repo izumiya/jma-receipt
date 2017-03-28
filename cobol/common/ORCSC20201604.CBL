@@ -3670,9 +3670,11 @@
                    IF    ((FLG-GENERIC-NO      =   ZERO )
                       AND (CNT-GENERIC         >=  2    ))
                    OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
                       AND (FLG-GENERIC-NO2     =   ZERO )
                       AND (CNT-GENERIC2        >=  2    ))
                    OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
                       AND (FLG-GENERIC-NO2    =   ZERO  )
                       AND (CNT-GENERIC3        >=  2    ))
       *                ∞Ï»ÃÃæ≤√ªª£±
