@@ -2883,6 +2883,7 @@
                END-IF
       *        4/1までは、３，４で２つ以上あれば対象
                IF      (SPA-SRYYMD         <   "20170401")
+                   AND (FLG-GENERIC-NO2    =   ZERO )
                    AND (CNT-GENERIC3       >=  2    )
                    MOVE    1               TO  FLG-GENERIC-OK12
                END-IF
@@ -3672,6 +3673,7 @@
                       AND (FLG-GENERIC-NO2     =   ZERO )
                       AND (CNT-GENERIC2        >=  2    ))
                    OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (FLG-GENERIC-NO2    =   ZERO  )
                       AND (CNT-GENERIC3        >=  2    ))
       *                一般名加算１
                        IF      WRK-COM-INPUTCD (IDX-IP)
@@ -5253,7 +5255,8 @@
                    IF    ((CNT-GENERIC2        >=  2         )
                       AND (FLG-GENERIC-NO2     =   ZERO      ))
       *            3,4が２件以上、一般名であれば加算１
-                   OR     (CNT-GENERIC3        >=  2         )
+                   OR    ((CNT-GENERIC3        >=  2         )
+                      AND (FLG-GENERIC-NO2     =   ZERO      ))
                        MOVE    "120004270"         TO  WRK-SRYCD
                        MOVE    "120003570"         TO  WRK-SRYCD2
                    END-IF
