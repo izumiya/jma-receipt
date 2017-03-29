@@ -155,6 +155,10 @@
       *              NACL-小豆沢  17/03/21  特定入院料を算定した保険以外で診療行為
       *                                     入力がある日に、包括入力分の入院料が
       *                                     Ｆファイルに誤って記録されていたのを修正
+      *              NACL-小豆沢  17/03/29  上記３月２１日の修正と同様の入力パターン
+      *                                     で算定入院料が短期滞在の場合に包括入力分
+      *                                     の入院料がＥファイルとＦファイルに誤って
+      *                                     記録されていたのを修正（入院料未算定日）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -486,9 +490,9 @@
       *    結核
            03  KEKIDX                  PIC 9(01).
       *
-           03  IDX1                    PIC 9(01).
-           03  IDX2                    PIC 9(01).
-           03  IDX3                    PIC 9(01).
+           03  IDX1                    PIC 9(02).
+           03  IDX2                    PIC 9(02).
+           03  IDX3                    PIC 9(02).
       *
       *    摘要レコード編集用
            03  WRK-ZAIWMAX             PIC 9(03).
@@ -3585,7 +3589,7 @@
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
       *    順序番号
-                   ADD     1           TO  WRK-RENNUM
+      ****             ADD     1           TO  WRK-RENNUM
       *    行為明細番号リセット
                    MOVE    ZERO        TO  WRK-MEISAI-RENNUM
                    MOVE    IDXX        TO  WRK-FEDT-DD
@@ -3674,8 +3678,8 @@
                                IF   LNK-NYUINDAY-TANKI2-KBN(IDXX) =
                                                             "1" OR "2"
       ****                         ADD       1     TO   WRK-RENNUM
-                               IF     (IDX               =  1)
-                                AND   (WRK-FEDT-1ST-FLG  =  ZERO)
+                                  IF     (IDX               =  1)  AND
+                                         (WRK-FEDT-1ST-FLG  =  ZERO)
                                       MOVE    1    TO   WRK-FEDT-1ST-FLG
                                       MOVE    "92"  TO  RECE641-SRYKBN
                                       IF     FLG-TOKUTEINYUIN-SET  =  0
@@ -3700,6 +3704,11 @@
                        END-EVALUATE
                      END-IF
                    END-PERFORM
+      *
+      *--- AZU-ADD START 2017.03.29
+      *            一度セットした日は再セットを行わないよう区分を初期化
+                   MOVE   SPACE  TO  LNK-NYUINDAY-TANKI2-KBN(IDXX)
+      *--- AZU-ADD END 2017.03.29
       *
            END-PERFORM
            .
@@ -4918,11 +4927,11 @@
                         PERFORM   VARYING   IDZ7  FROM  1  BY  1
                           UNTIL   (IDZ7     >   10)   OR
                                 (WRK-REC-LENGTH-XX(IDZ2 IDZ7)  =  ZERO)
-                           IF    WRK-TAIHI-RENNUM(IDZ1)  NOT =  ZERO
+                           IF    WRK-TAIHI-RENNUM(IDZ2)  NOT =  ZERO
                              MOVE    WRK-REC-XX(IDZ2 IDZ7) 
                                                TO   WRK-REC
       *                      順序番号
-                             MOVE  WRK-TAIHI-RENNUM-X(IDZ1)
+                             MOVE  WRK-TAIHI-RENNUM-X(IDZ2)
                                                TO   WRK-REC(43:4)
       *                      行為明細番号
                              ADD   1             TO
@@ -5587,7 +5596,10 @@
            PERFORM 5004-MOJI-HENSYU-SEC
       *順序番号
       *AZU-ADD START 2015.6.10
-           MOVE  WRK-RENNUM            TO  WRK-TAIHI-RENNUM(IDZ1)
+           IF    (IDZ2        NOT =   ZERO)   AND
+                 (WRK-RENNUM  NOT =   ZERO)
+               MOVE  WRK-RENNUM        TO  WRK-TAIHI-RENNUM(IDZ2)
+           END-IF
       *AZU-ADD END 2015.6.10
            MOVE    WRK-RENNUM          TO  WRK-DATA
            MOVE    4                   TO  WRK-NAGASA
