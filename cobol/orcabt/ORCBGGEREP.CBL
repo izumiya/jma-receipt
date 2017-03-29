@@ -30,6 +30,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者        日付      内容
+      *  04.08.00    NACL-多々納  17/03/XX   Ｈ２９年３月１７日以降対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -95,6 +96,9 @@
            03  FLG-ZAIEND              PIC 9(01).
            03  FLG-CHK                 PIC 9(01).
            03  FLG-OK                  PIC 9(01).
+      *    一般名あり
+           03  FLG-GENERIC-OK12        PIC 9(01).
+           03  FLG-GENERIC-NO2          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -203,6 +207,10 @@
            03  WRK-CHK-SRYSYUKBN       PIC X(03).
            03  WRK-GENECHG-KBN         PIC X(01).
            03  CNT-GENERIC             PIC 9(02).
+      *
+           03  CNT-GENERIC2            PIC 9(02).
+           03  CNT-GENERIC3            PIC 9(02).
+      *
            03  WRK-HKNCOMBI            PIC X(04).
            03  WRK-MEISYO              PIC X(80).
       *
@@ -1314,6 +1322,11 @@
       *H28.4
            MOVE    ZERO                TO  FLG-GENERIC-NO
            MOVE    ZERO                TO  CNT-GENERIC
+      *#######
+           MOVE    ZERO                TO  FLG-GENERIC-NO2
+           MOVE    ZERO                TO  CNT-GENERIC2
+           MOVE    ZERO                TO  CNT-GENERIC3
+           MOVE    ZERO                TO  FLG-GENERIC-OK12
       *
            MOVE    400                 TO  SPA-MAX-LINE
       *
@@ -1325,6 +1338,9 @@
                               (SPA-COM-INPUTCD(IDX) =   SPACE))
                IF      SPA-COM-INPUTCD (IDX)   =  "099209910"
                    MOVE    "1"                 TO  WRK-GENECHG-KBN
+               END-IF
+               IF      SPA-COM-INPUTCD (IDX)   =  "099209911"
+                   MOVE    "2"                 TO  WRK-GENECHG-KBN
                END-IF
            END-PERFORM
       *
@@ -1373,8 +1389,16 @@
                                                    "233"  )
                    CONTINUE
                ELSE
+                   IF      SPA-SRYYMD          >=  "20170317"
+      *
+      *            処方内容チェク
+                   PERFORM 3000-SYOHOU02-CHK-SEC
+      *
+                   ELSE
       *            処方内容チェク
                    PERFORM 3000-SYOHOU-CHK-SEC
+      *
+                   END-IF
                END-IF
       *
       *H24.4　改正
@@ -1394,11 +1418,38 @@
                END-IF
       *
            END-PERFORM
+      *
+      *H29.4
+      *    一般名加算算定編集
+           IF      SPA-SRYYMD          >=  "20170317"
+               IF      (FLG-GENERIC-OK     =   1   )
+                   OR ((CNT-GENERIC        >=  2   )  AND
+                       (FLG-GENERIC-NO     =   ZERO))
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+      *        4/1までは、３，４で２つ以上あれば対象
+               IF      (SPA-SRYYMD         <   "20170401")
+                   AND (FLG-GENERIC-NO2    =   ZERO )
+                   AND (CNT-GENERIC3       >=  2    )
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+           ELSE
+               IF      (FLG-GENERIC-OK     =   1   )
+                   MOVE    1               TO  FLG-GENERIC-OK12
+               END-IF
+           END-IF
+      *
            MOVE    ZERO            TO  FLG-ERRKBN
       *    一般名加算の対象チェック
            IF    ((FLG-NAIYAK2         =   1    )  OR
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    ))
+            IF      SPA-SRYYMD          >=  "20170317"
+      *H29.3.17　以降
+               PERFORM 30002-KSNCHK-SEC
+      *
+            ELSE
+      *H29.3.17以前
       *     加算入力あり
             IF     (FLG-IPPANKSN        =   1   )
       *     一般名加算と院外投薬あり
@@ -1438,6 +1489,8 @@
              END-IF
            END-IF
       *
+           END-IF
+      *
            IF      WRK-PARA-SYORIKBN   =   "1"
       *        全件表示
                CONTINUE
@@ -1451,6 +1504,67 @@
            PERFORM 20020-PRINT-SYORI-SEC
            .
        3000-JIDOU-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   診療種別区分変換処理
+      *****************************************************************
+        30002-KSNCHK-SEC              SECTION.
+      *
+      *     加算入力あり
+            IF     (FLG-IPPANKSN        =   1   )
+      *     一般名加算と院外投薬あり
+               IF      FLG-GENERIC-OK12     =   ZERO
+      *            一般名加算投薬なし
+                   MOVE    1                   TO  FLG-ERRKBN
+               ELSE
+      *H29.4
+                   IF    ((FLG-GENERIC-NO      =   ZERO )
+                      AND (CNT-GENERIC         >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
+                      AND (FLG-GENERIC-NO2     =   ZERO )
+                      AND (CNT-GENERIC2        >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
+                      AND (FLG-GENERIC-NO2    =   ZERO  )
+                      AND (CNT-GENERIC3        >=  2    ))
+      *                一般名加算１
+                       IF      SPA-COM-INPUTCD (IDX-IP)
+                                              NOT =   "120004270"
+                           MOVE    3                   TO  FLG-ERRKBN
+                       END-IF
+                   ELSE
+      *                一般名加算２
+                       IF      SPA-COM-INPUTCD (IDX-IP)
+                                              NOT =   "120003570"
+                           MOVE    2                   TO  FLG-ERRKBN
+                       END-IF
+                   END-IF
+               END-IF
+           ELSE
+      *        加算入力なし
+               IF      FLG-GENERIC-OK      =   1
+                   IF    ((FLG-GENERIC-NO      =   ZERO )
+                      AND (CNT-GENERIC         >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
+                      AND (FLG-GENERIC-NO2     =   ZERO )
+                      AND (CNT-GENERIC2        >=  2    ))
+                   OR    ((SPA-SRYYMD          <   "20170401")
+                      AND (SPA-SRYYMD          >=  "20170317")
+                      AND (FLG-GENERIC-NO2    =   ZERO  )
+                      AND (CNT-GENERIC3        >=  2    ))
+      *                一般名加算１
+                       MOVE    3               TO  FLG-ERRKBN
+                   ELSE
+      *                加算１
+                       MOVE    2               TO  FLG-ERRKBN
+                   END-IF
+               END-IF
+           END-IF
+           .
+        30002-KSNCHK-SEC-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1512,6 +1626,8 @@
       *                院外処方　一般名記載判定
                        MOVE    ZERO                TO  FLG-CHK-P
                        IF     (SPA-COM-IPN-KISAIKBN (IDX)  =   1  )
+      *H27.4               後発品変更可
+                         OR   (WRK-GENECHG-KBN             =   "2" )
       *
                            MOVE    1                   TO  FLG-CHK-P
       *H27.4               後発品変更不可
@@ -1550,6 +1666,87 @@
            END-IF
            .
        3000-SYOHOU-CHK-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *   処方内容チェク処理（2017/3/17から）
+      *****************************************************************
+       3000-SYOHOU02-CHK-SEC              SECTION.
+      *
+           IF      SPA-COM-INPUTCD(IDX)(1:1)   =   "6"
+      *
+      ****     MOVE    SPA-COM-KISOTEN(IDX)    TO  WRK-KEI-KISOTEN
+      *
+               EVALUATE    WRK-CHK-SRYSYUKBN
+      *平成２４年４月
+                   WHEN    "212"
+                   WHEN    "222"
+                   WHEN    "232"
+                   WHEN    "292"
+                   WHEN    "295"
+                   WHEN    "298"
+      *                院外処方　一般名記載判定
+                       MOVE    ZERO                TO  FLG-CHK-P
+                       IF     (SPA-COM-IPN-KISAIKBN (IDX)  =   1  )
+      *H27.4               後発品変更可
+                         OR   (WRK-GENECHG-KBN             =   "2" )
+      *
+                           MOVE    1                   TO  FLG-CHK-P
+      *H27.4               後発品変更不可
+                           IF      WRK-GENECHG-KBN     =   "1"
+                              MOVE    ZERO                TO  FLG-CHK-P
+                           END-IF
+      *
+                           IF      (SPA-COM-INPUTCD (IDX + 1)
+                                                   =   "099209907"
+                                                   OR  "099209903"  )
+      *                        銘柄名記載、後発品変更不可
+                               MOVE    ZERO                TO  FLG-CHK-P
+                           END-IF
+                       END-IF
+                       IF     ( SPA-COM-INPUTCD (IDX + 1)
+                                                   =   "099209908"  )
+      *                 一般名記載あり
+                           MOVE    1                   TO  FLG-CHK-P
+                       END-IF
+      *H28.4           後発品　一般名記載有無件数
+                       IF      (FLG-CHK-P          =   1   )  AND
+                               (SPA-COM-KOUHATUKBN (IDX) =   "1"
+                                                         OR  "2" )
+                           MOVE    1               TO  FLG-GENERIC-OK
+                       END-IF
+                       IF      (SPA-COM-KOUHATUKBN (IDX) =   "1"
+                                                         OR  "2" )
+                           ADD     1               TO  CNT-GENERIC
+                           ADD     1               TO  CNT-GENERIC2
+                           IF      (FLG-CHK-P      =   ZERO)
+                               MOVE    1           TO  FLG-GENERIC-NO
+                               MOVE    1           TO  FLG-GENERIC-NO2
+                           ELSE
+                               ADD     1           TO  CNT-GENERIC3
+                           MOVE    "1"             TO  SPA-COM-YOBI1
+                                                          (IDX)(1:1)
+                           END-IF
+                       END-IF
+      *H29.3
+      *H29.4から       先発なし後発医薬品（加算対象）判定
+                       IF      (SPA-COM-KOUHATUKBN (IDX) =   "3"
+                                                         OR  "4"  )
+                          AND  (SPA-SRYYMD         >=   "20170317")
+                           ADD     1               TO  CNT-GENERIC
+                           IF      (FLG-CHK-P      =   ZERO)
+                               MOVE    1           TO  FLG-GENERIC-NO
+                           ELSE
+                               ADD     1           TO  CNT-GENERIC3
+                           MOVE    "1"             TO  SPA-COM-YOBI1
+                                                          (IDX)(1:1)
+                           END-IF
+                       END-IF
+               END-EVALUATE
+           END-IF
+           .
+       3000-SYOHOU02-CHK-EXT.
            EXIT.
       *
       *
@@ -1623,7 +1820,7 @@
       *名称の☆削除
       *    名称
                IF     (SPA-COM-INPUTCD (IDX)(1:1)    =   "6"   )
-                 AND  (SPA-COM-YOBI1 (IDX)(7:1)  NOT =   SPACE )
+                 AND  (SPA-COM-PSY-CLASS(IDX)    NOT =   SPACE )
                  AND  (SPA-GMN-MEISYO(IDX)(1:2)  =   "☆"      )
                    MOVE    SPA-GMN-MEISYO(IDX)(3:)   TO  WRK-MEISYO
                    MOVE    WRK-MEISYO            TO  SPA-GMN-MEISYO(IDX)
