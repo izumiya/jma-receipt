@@ -31,6 +31,7 @@
       *  04.08.02    NACL-藤原    15/12/22  公費単独の医療保険との組合せ
       *                                     を５にする
       *  04.08.03    NACL-藤原    16/04/28  申出があるときは４にする
+      *  04.08.04    NACL-藤原    17/03/30  入院年月日を履歴から取得する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -89,6 +90,7 @@
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-PTINF           PIC 9(01).
            03  FLG-PTTOKKI         PIC 9(01).
+           03  FLG-PTNYUINRRK    PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
       *
@@ -170,6 +172,11 @@
                                    BY         //WRK-ERR-FILE-NM//.
       *
        01  WRK-SGETTEMP-TEMPDIR    PIC X(1024).
+      *
+      *    ワーク入院履歴
+       01  WRK-PTNRRK-REC.
+           COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                       BY         //WRK-PTNRRK-//.
       *
        01  CSV-HEAD-01.
            03  FILLER                  PIC X(10)   VALUE
@@ -1123,6 +1130,8 @@
            END-IF
            MOVE    WRK-PTNUM       TO  B01-PTNUM
       *
+      *    入院情報の履歴取得処理
+           PERFORM 200411-NYUINYMD-HENSYU-SEC
            MOVE    PTNYUINRRK-NYUINYMD
                                    TO  B01-NYUINYMD
       *
@@ -1141,6 +1150,49 @@
            ADD     1               TO  CNT-OUT
            .
        20041-BODY-PRINT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院情報の履歴取得処理
+      *****************************************************************
+       200411-NYUINYMD-HENSYU-SEC                SECTION.
+      *
+           MOVE    PTNYUINRRK-REC  TO  WRK-PTNRRK-REC
+      *
+      *    初回番号が同じ入院履歴から先頭の入院年月日を取得
+           INITIALIZE                  PTNYUINRRK-REC
+           MOVE    WRK-PTNRRK-HOSPNUM
+                                   TO  PTNYUINRRK-HOSPNUM
+           MOVE    WRK-PTNRRK-PTID TO  PTNYUINRRK-PTID
+           MOVE    WRK-PTNRRK-SHONUM
+                                   TO  PTNYUINRRK-SHONUM
+           MOVE    LNK-PRTKANRI-SRYYM
+                                   TO  PTNYUINRRK-NYUINYMD(1:6)
+           MOVE    "31"            TO  PTNYUINRRK-NYUINYMD(7:2)
+           MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+           MOVE    "key51"         TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               PERFORM 900-PTNYUINRRK-KEY51-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+           MOVE    "key51"         TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF      FLG-PTNYUINRRK  =   ZERO
+      *        入院年月日
+               MOVE    PTNYUINRRK-NYUINYMD  TO  WRK-PTNRRK-NYUINYMD
+           END-IF
+      *
+           MOVE    WRK-PTNRRK-REC TO  PTNYUINRRK-REC
+           .
+       200411-NYUINYMD-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1762,6 +1814,38 @@
       *
            .
        900-PTTOKKI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴読込
+      *****************************************************************
+       900-PTNYUINRRK-KEY51-READ-SEC    SECTION.
+      *    
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key51"              TO  MCP-PATHNAME
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO                 TO  FLG-PTNYUINRRK
+               MOVE    MCPDATA-REC          TO  PTNYUINRRK-REC
+               IF      PTNYUINRRK-JTIKBN    =   "5"
+                   IF      PTNYUINRRK-TAINRELKBN
+                                               =   "1"
+                       CONTINUE
+                   ELSE
+                       GO  TO  900-PTNYUINRRK-KEY51-READ-SEC
+                   END-IF
+               END-IF
+               IF     PTNYUINRRK-NYUINCHUKBN
+                                            =   "1"
+                   CONTINUE
+               ELSE
+                   GO  TO  900-PTNYUINRRK-KEY51-READ-SEC
+               END-IF
+           ELSE
+               MOVE    1                    TO  FLG-PTNYUINRRK
+           END-IF
+           .
+       900-PTNYUINRRK-KEY51-READ-EXT.
            EXIT.
       *
       *****************************************************************
