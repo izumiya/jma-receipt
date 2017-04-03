@@ -38,6 +38,8 @@ xml_visitptlst01v2res {
 	                	PublicInsuredPerson_Number	varchar(20);
 	            	} [4];
         	};
-       	} [500];
+		Update_Date			varchar(10);
+		Update_Time 			varchar(8);
+       	} [1000];
    	};
 };

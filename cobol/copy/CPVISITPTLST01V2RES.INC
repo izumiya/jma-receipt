@@ -43,7 +43,7 @@
       *       来院日付
               03  VIS01RES-VISIT-DATE          PIC X(10).
       *       受診履歴情報
-              03  VIS01RES-MEDICAL-INF     OCCURS   500.
+              03  VIS01RES-MEDICAL-INF     OCCURS   1000.
       *           患者情報
                   05  VIS01RES-PATIENT-INFOMATION.
       *               患者番号
@@ -93,4 +93,8 @@
                       09  VIS01RES-PROVIDER-NUMBER         PIC X(08).
       *               受給者番号
                       09  VIS01RES-RECIPIENT-NUMBER        PIC X(20).
+      *           更新日
+                  05  VIS01RES-UPDATE-DATE         PIC X(10).
+      *           更新時間
+                  05  VIS01RES-UPDATE-TIME         PIC X(08).
       *
