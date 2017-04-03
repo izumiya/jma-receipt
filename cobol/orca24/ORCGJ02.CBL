@@ -236,6 +236,8 @@
            03  FLG-JYURRK-OK       PIC 9(01).
            03  FLG-SANTEIDATA      PIC 9(01).
       *
+           03  FLG-HAORI           PIC 9(01).
+      *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-ERR             PIC 9(06).
@@ -955,6 +957,12 @@
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
            EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
+      *HAORI対応
+               WHEN    "API"           ALSO    ANY
+                   PERFORM 300-HAORI-SYORI-SEC
+      *            画面表示なし
+                   MOVE    1                   TO  FLG-END
+      *
                WHEN    "LINK"          ALSO    ANY
                    PERFORM 100-INIT-SEC
       *    画面遷移
@@ -3136,6 +3144,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    後発品変更不可（処方）あり
            IF      ORCSGETGE-GENEFLG   =   "1"
                MOVE    "1"             TO  SPA-NAI-GENEFLG (IDX)
+           END-IF
+      *    後発品変更可（処方）あり
+           IF      ORCSGETGE-GENEFLG   =   "2"
+               MOVE    "2"             TO  SPA-NAI-GENEFLG (IDX)
            END-IF
            .
        31012-GENERIC-EXT.
@@ -11369,10 +11381,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                               (SPA-ERRCD   NOT =   SPACE )
                PERFORM 49011-JYURRK-PARAUPD-SEC
            END-PERFORM
-      *TEST
-           DISPLAY "49011-JYURRK-UPD-SEC"
-                     ",SPA-SYUNOU-KOUSIN:" SPA-SYUNOU-KOUSIN
-      *TEST
       *D   収納変更時、再計算
       *    IF      SPA-SYUNOU-KOUSIN   =   1
       *        PERFORM 49012-SYUNOU-SAIKEISAN-SEC
@@ -11903,9 +11911,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    収納マスタの更新処理
       *****************************************************************
        490113-SYUNOU-UPD-SEC           SECTION.
-      *TEST
-           DISPLAY "490113-SYUNOU-UPD-SEC"
-      *TEST
       *
       *    包括入力の時対象外
            IF      SPA-RRK-HKNCOMBI(IDX)   =   "9999"
@@ -12022,6 +12027,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "tbl_syunou"        TO  MCP-TABLE
            MOVE    "key28"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *HAORI
+      *H29.2
+           IF      FLG-HAORI           =   1
+               GO    TO  49012-SYUNOU-SAIKEISAN-EXT
+           END-IF
       *
            IF     (SPA-ERRCD           =   SPACE) AND
                   (SPA-J025-MAX        >   ZERO )
@@ -14505,6 +14515,88 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        800-DAILYKEY-EXT.
            EXIT.
       *
+      *H29.2
+      *****************************************************************
+      *    HAORI対応処理
+      *****************************************************************
+       300-HAORI-SYORI-SEC             SECTION.
+      *
+           EVALUATE    MCP-EVENT
+               WHEN    "INIT"
+      *            初期編集
+                   PERFORM 3001-HAORI-INIT-SYORI-SEC
+               WHEN    "UPD"
+      *            保険組合せ一括変更処理
+                   PERFORM 3001-HORI-UPD-SYORI-SEC
+           END-EVALUATE
+           .
+       300-HAORI-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （HAORI）初期編集処理
+      *****************************************************************
+       3001-HAORI-INIT-SYORI-SEC          SECTION.
+      *
+      *     診療年月の末日算定
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM       TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI(7:2)    TO  SPA-SRYMATU
+      *
+      *    年齢計算（算定月の１日の年齢）
+           MOVE    SPA-NAI-SRYYM       TO  WRK-YMDS2(1:6)
+           MOVE    01                  TO  WRK-DDS2
+           PERFORM 30101-NENREI-SET-SEC
+      *    該当月で６歳になる時、年齢フラグを立てる
+           IF     (SPA-NAI-NENREI-YY   =   05  )  AND
+                  (SPA-NAI-NENREI-MM   =   11  )  AND
+                  (WRK-YMDS1(5:2)      =   WRK-YMDS2(5:2))
+               MOVE    1                   TO  SPA-FLG-NENREI
+           END-IF
+      *
+      *    Ｈ１４．１０時点で７０歳未満の時
+           IF     (SPA-NAI-SRYYM       >=  "200210"   )  AND
+                  (SPA-BIRTHDAY        >=  "19321001" )
+               MOVE    75                  TO  WRK-ROU-NEN
+           ELSE
+               MOVE    70                  TO  WRK-ROU-NEN
+           END-IF
+      *    該当月１日が７５歳以上の時、老人とする
+           IF      SPA-NAI-NENREI-YY   >=  WRK-ROU-NEN
+               MOVE    1                   TO  SPA-J02-ROUJIN
+           ELSE
+               MOVE    ZERO                TO  SPA-J02-ROUJIN
+           END-IF
+      *    入院期間
+           IF      SPA-BEDSU           >   ZERO
+               PERFORM 410101-NYUINRRK-CHK-SEC
+           END-IF
+           .
+       3001-HAORI-INIT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    （HAORI）保険一括変更処理
+      *****************************************************************
+       3001-HORI-UPD-SYORI-SEC          SECTION.
+      *
+           MOVE    1               TO  FLG-HAORI
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+           IF      SPA-NYUGAIKBN       =   "2"
+               PERFORM 49012-SYUNOU-SAIKEISAN-SEC
+           END-IF
+           .
+       3001-HORI-UPD-SYORI-EXT.
+           EXIT.
+      *
+      *
       *****************************************************************
       *    自画面編集処理
       *****************************************************************
@@ -15391,8 +15483,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOSTYMD
+           MOVE    WRK-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

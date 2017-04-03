@@ -529,6 +529,7 @@ RECORD_files = \
 	okusurigetv2.rec \
 	okusuriputv2.rec \
     imagegetv2.rec \
+	medicalmodv36.rec \
 
 DEF_files = \
 
@@ -962,6 +963,8 @@ DB_files = \
 	xml_okusuriputv2res.db \
 	push_print001.db \
     xml_imagegetv2req.db \
+	xml_medicalv3req6.db \
+	xml_medicalv3res6.db \
 
 
 shell.db: shell.db.in

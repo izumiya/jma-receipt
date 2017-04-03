@@ -327,16 +327,6 @@
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (COMB-DELKBN         =   SPACE     ) AND
                       (COMB-HYOJIKBN   NOT =   "1"       )
-      *ver.4.7     IF      ORCSAPIHKN-KBN2     =   "1"
-      *                新規登録時すべて
-      *                MOVE    1                   TO  FLG-CHK-OK
-      *            ELSE
-      *                当日有効
-      *                IF     (SPA-SYSYMD      >=  COMB-TEKSTYMD ) AND
-      *                       (SPA-SYSYMD      <=  COMB-TEKEDYMD )
-      *                    MOVE    1               TO  FLG-CHK-OK
-      *                END-IF
-      *****        END-IF
                    EVALUATE    ORCSAPIHKN-KBN2
                    WHEN    "1"
       *                新規登録時すべて
@@ -393,16 +383,6 @@
                                ( IDH-MAX       >=  90)
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (PTHKN-SAKJOKBN      =   SPACE )
-      *ver.4.7     IF      ORCSAPIHKN-KBN2     =   "1"
-      *                新規登録時すべて
-      *                MOVE    1                   TO  FLG-CHK-OK
-      *            ELSE
-      *                当日有効であること
-      *                IF     (PTHKN-TEKSTYMD    <=  SPA-SYSYMD )  AND
-      *                       (PTHKN-TEKEDYMD    >=  SPA-SYSYMD )
-      *                    MOVE    1               TO  FLG-CHK-OK
-      *                END-IF
-      *****        END-IF
                    EVALUATE    ORCSAPIHKN-KBN2
                    WHEN    "1"
       *                新規登録時すべて
@@ -459,16 +439,6 @@
                                ( IDK-MAX       >=  90)
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (PTKOH-SAKJOKBN      =   SPACE )
-      *ver.4.7**   IF      ORCSAPIHKN-KBN2     =   "1"
-      *                新規登録時すべて
-      *                MOVE    1                   TO  FLG-CHK-OK
-      *            ELSE
-      *                当日有効であること
-      *                IF     (PTKOH-TEKSTYMD    <=  SPA-SYSYMD )  AND
-      *                       (PTKOH-TEKEDYMD    >=  SPA-SYSYMD )
-      *                    MOVE    1               TO  FLG-CHK-OK
-      *                END-IF
-      *******      END-IF
                    EVALUATE    ORCSAPIHKN-KBN2
                    WHEN    "1"
       *                新規登録時すべて
@@ -949,8 +919,9 @@
       *
            MOVE    ZERO                TO  IDX-TBL
            MOVE    ZERO                TO  FLG-COMBIOK
-           IF      IDX-MAX             >   20
-      *        ２０件以上は、最後から編集
+           IF     (IDX-MAX             >   20 )
+             AND  (ORCSAPIHKN-KBN3 NOT =   "1" )
+      *        ２０件以上は、最後から編集（２０件までの時）
                MOVE    20                  TO  IDXH
                PERFORM VARYING     IDX     FROM    IDX-MAX BY  -1
                        UNTIL      (IDX     <   1       )
@@ -970,7 +941,8 @@
                MOVE    1                   TO  IDXH
                PERFORM VARYING     IDX      FROM    1   BY  1
                        UNTIL      (IDX     >   IDX-MAX )
-                              OR  (IDXH    >   20      )
+      *H29.1                  OR  (IDXH    >   20      )
+                              OR  (IDXH    >   200     )
                    IF      TBL-COMB-HKNCOMBINUM (IDX) NOT =   SPACE
                        PERFORM 2901-HKNCOMBI-HEN-SEC
                        IF      TBL-COMB-HKNCOMBINUM (IDX) 
@@ -1057,6 +1029,29 @@
       *    継続区分
            MOVE    TBL-COMB-CONTKBN (IDX)
                                        TO  ORCSAPIHKN-CONTKBN (IDXH)
+      *H29.1
+      *    保険組合せ負担割合
+           MOVE    TBL-COMB-GAI-KFTNRATE (IDX)
+                                       TO  ORCSAPIHKN-COMB-RATEG(IDXH)
+           MOVE    TBL-COMB-NYU-KFTNRATE(IDX)
+                                       TO  ORCSAPIHKN-COMB-RATEN(IDXH)
+      *    有効期間
+           MOVE    TBL-COMB-TEKSTYMD (IDX) TO  WRK-SYMD
+           PERFORM 800-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE       TO  ORCSAPIHKN-COMB-TEKSTYMD(IDXH)
+           MOVE    TBL-COMB-TEKEDYMD (IDX) TO  WRK-SYMD
+           PERFORM 800-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE       TO  ORCSAPIHKN-COMB-TEKEDYMD(IDXH)
+      *
+           MOVE    TBL-COMB-TEKSTYMD (IDX)
+                                      TO  ORCSAPIHKN-COMBN-TEKSTYMD
+                                                                (IDXH)
+           MOVE    TBL-COMB-TEKEDYMD (IDX)
+                                      TO  ORCSAPIHKN-COMBN-TEKEDYMD
+                                                                (IDXH)
+      *    非表示区分
+           MOVE    TBL-COMB-HYOJIKBN (IDX)
+                                       TO  ORCSAPIHKN-HYOJIKBN (IDXH)
       *
       *    保険情報
            PERFORM VARYING     IDH     FROM    1   BY  1

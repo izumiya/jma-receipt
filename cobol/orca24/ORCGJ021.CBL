@@ -38,6 +38,7 @@
       * 04.08.00     NACL-多々納  13/01/15  診療回数テーブル１０対応
       * 04.08.00     NACL-多々納  14/01/08  第三者行為対応
       * 04.08.00     NACL-多々納  15/06/04  削除分対応
+      * 04.08.00     NACL-多々納  17/02/XX  HAORI対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -306,6 +307,12 @@
            MOVE    ZERO            TO  FLG-END
       *
            EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
+      *HAORI対応
+               WHEN    "API"           ALSO    ANY
+                   PERFORM 300-HAORI-SYORI-SEC
+      *            画面表示なし
+                   MOVE    1                   TO  FLG-END
+      *
                WHEN    "LINK"          ALSO    ANY
                    PERFORM 100-INIT-SEC
       *    画面遷移
@@ -1957,6 +1964,7 @@
                PERFORM 300314-SANTEI-UPD-SEC
            END-IF
       *
+      *
            IF     (SPA-J021-DAY1       =   SPA-J021-STDAY )  AND
                   (SPA-J021-DAY2       =   SPA-J021-ENDAY )  AND
                   (SPA-ERRCD           =   SPACE )
@@ -2042,6 +2050,7 @@
       *
                    MOVE    SMCNDATE-YMD        TO  JYURRK-UPYMD
                    MOVE    SMCNDATE-HMS        TO  JYURRK-UPHMS
+                   MOVE    SPA-OPID            TO  JYURRK-OPID
       *
                    MOVE    JYURRK-REC          TO  MCPDATA-REC
                    MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -2185,6 +2194,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
                    MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
                    MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+                   MOVE    SPA-OPID            TO  ACCT-OPID
       *
                    MOVE    SRYACCT-REC         TO  MCPDATA-REC
                    MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -2232,6 +2242,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
            MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+           MOVE    SPA-OPID            TO  ACCT-OPID
       *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -2505,6 +2516,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMCNDATE-YMD        TO  ACCT-CREYMD
            MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
            MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+           MOVE    SPA-OPID            TO  ACCT-OPID
       *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2558,6 +2570,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    SMCNDATE-YMD        TO  PTCOM-CREYMD
                            MOVE    SMCNDATE-YMD        TO  PTCOM-UPYMD
                            MOVE    SMCNDATE-HMS        TO  PTCOM-UPHMS
+                           MOVE    SPA-OPID            TO  PTCOM-OPID
       *
                            MOVE    PTCOM-REC           TO  MCPDATA-REC
                            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2580,6 +2593,7 @@ grpsys                     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-YMD        TO  SRY-CREYMD
                MOVE    SMCNDATE-YMD        TO  SRY-UPYMD
                MOVE    SMCNDATE-HMS        TO  SRY-UPHMS
+               MOVE    SPA-OPID            TO  SRY-OPID
       *
                MOVE    SRYACT-REC          TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2633,6 +2647,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-YMD        TO  ACCTP-CREYMD
                MOVE    SMCNDATE-YMD        TO  ACCTP-UPYMD
                MOVE    SMCNDATE-HMS        TO  ACCTP-UPHMS
+               MOVE    SPA-OPID            TO  ACCTP-OPID
       *
                MOVE    SRYACCTPLUS-REC     TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2683,6 +2698,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SMCNDATE-YMD        TO  PTINF-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTINF-UPHMS
+           MOVE    SPA-OPID            TO  PTINF-OPID
       *
            MOVE    PTINF-REC           TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -2785,6 +2801,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
            MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+           MOVE    SPA-OPID            TO  ACCT-OPID
       *
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -2894,6 +2911,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
            MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
+           MOVE    SPA-OPID            TO  SYU-OPID
       *
            MOVE    SYUNOU-REC          TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -3105,6 +3123,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
                    MOVE    SMCNDATE-YMD        TO  ACCT-UPYMD
                    MOVE    SMCNDATE-HMS        TO  ACCT-UPHMS
+                   MOVE    SPA-OPID            TO  ACCT-OPID
       *
                    MOVE    SRYACCT-REC         TO  MCPDATA-REC
                    MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -3203,6 +3222,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                    MOVE    SMCNDATE-YMD        TO  SANTEI-UPYMD
                    MOVE    SMCNDATE-HMS        TO  SANTEI-UPHMS
+                   MOVE    SPA-OPID            TO  SANTEI-OPID
       *
                    MOVE    SANTEI-REC          TO  MCPDATA-REC
                    MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -3292,6 +3312,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-YMD        TO  SANTEI-CREYMD
                MOVE    SMCNDATE-YMD        TO  SANTEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SANTEI-UPHMS
+               MOVE    SPA-OPID            TO  SANTEI-OPID
       *
                MOVE    SANTEI-REC          TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -3320,6 +3341,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-PERFORM
                MOVE    SMCNDATE-YMD        TO  SANTEI-UPYMD
                MOVE    SMCNDATE-HMS        TO  SANTEI-UPHMS
+               MOVE    SPA-OPID            TO  SANTEI-OPID
       *
                MOVE    SANTEI-REC          TO  MCPDATA-REC
                MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -3483,6 +3505,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SMCNDATE-YMD        TO  RECECOM-CREYMD
                MOVE    SMCNDATE-YMD        TO  RECECOM-UPYMD
                MOVE    SMCNDATE-HMS        TO  RECECOM-UPHMS
+               MOVE    SPA-OPID            TO  RECECOM-OPID
       *
                MOVE    RECECOM-REC         TO  MCPDATA-REC
                MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -3534,6 +3557,95 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        210-BACK-EXT.
+           EXIT.
+      *
+      *H29.2
+      *****************************************************************
+      *    HAORI対応処理
+      *****************************************************************
+       300-HAORI-SYORI-SEC             SECTION.
+      *
+           EVALUATE    MCP-EVENT
+               WHEN    "INIT"
+      *            初期設定
+                   INITIALIZE                  SPA-J021-AREA
+      *            保険組合せ
+                   PERFORM 3101-HKNCOMBI-HEN-SEC
+               WHEN    "CHK"
+      *            チェック
+                   MOVE    1                   TO  FLG-KOUSIN
+      *            入力チェック処理
+                   PERFORM 220-INPUT-CHK-SEC
+               WHEN    "UPD"
+      *            保険組合せ一括変更処理
+                   PERFORM 3001-HORI-UPD-SYORI-SEC
+           END-EVALUATE
+           .
+      *
+       300-HAORI-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   （HAORI）保険組合せ一括変更処理
+      *****************************************************************
+       3001-HORI-UPD-SYORI-SEC              SECTION.
+      *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+      *
+      *    保険組合検索
+           MOVE    SPACE               TO  HKNCOMBI-REC
+           INITIALIZE                  HKNCOMBI-REC
+           MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  COMB-PTID
+           MOVE    SPA-J021-ATO-HKNCOMBI
+                                       TO  COMB-HKNCOMBINUM
+      *
+           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-HKNCOMBI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-HKNCOMBI
+               INITIALIZE                  HKNCOMBI-REC
+           END-IF
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-HKNCOMBI        =   1
+               MOVE    "0003"              TO  SPA-ERRCD
+           END-IF
+      *    負担率
+           IF      SPA-ERRCD           =   SPACE
+      *        保険算定年齢チェック等
+               MOVE    COMB-GAI-KFTNRATE   TO  WRK-PTFTNRATE
+               INITIALIZE                  ORCSAGECHKAREA
+               MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+               MOVE    SPA-GMN-PTID        TO  AGECHK-PTID
+               MOVE    SPA-NAI-SRYYM       TO  AGECHK-SRYYMD(1:6)
+               MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
+               MOVE    SPA-BIRTHDAY        TO  AGECHK-BIRTHDAY
+               MOVE    SPA-J021-ATO-HKNCOMBI
+                                           TO  AGECHK-HKNCOMBINUM
+               MOVE    SPA-NYUGAIKBN       TO  AGECHK-NYUGAIKBN
+               CALL    "ORCSAGECHK"        USING
+                                           ORCSAGECHKAREA
+                                           SPA-AREA
+               IF      AGECHK-RC           =   ZERO
+                   MOVE    AGECHK-FTNRATE      TO  WRK-PTFTNRATE
+               END-IF
+      *
+      *        更新処理
+               PERFORM 30032-DB-KOUSIN-SEC
+           END-IF
+           .
+       3001-HORI-UPD-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
