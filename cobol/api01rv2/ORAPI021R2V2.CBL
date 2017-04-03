@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.08.00     NACL-多々納  17/04/04  最大件数を1000へ
       *
       *****************************************************************
       *
@@ -205,6 +206,8 @@
            COPY    "CPPTKOHINF.INC".
       *
            COPY    "MCPDATA.INC".
+      *
+           COPY    "MCPDATA3.INC".
       *
            COPY    "ORCA-BLOB".
       *****************************************************************
@@ -467,7 +470,8 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    1                   TO  VIS01RES-MODE
            MOVE    "visitptlst01res"   TO  VIS01RES-RECORDNAME
-           CALL    "ORCDBMAIN"         USING
+      *****CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST01RES
                                        SPA-AREA
@@ -481,7 +485,8 @@
            MOVE    "xml_visitptlst01v2res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "visitptlst01res"   TO  VIS01RES-RECORDNAME
-           CALL    "ORCDBMAIN"         USING
+      **** CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST01RES
                                        SPA-AREA
@@ -494,7 +499,8 @@
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            MOVE    "xml_visitptlst01v2res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING
+      **** CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST01RES
                                        SPA-AREA
@@ -534,7 +540,8 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    1                   TO  VIS02RES-MODE
            MOVE    "visitptlst02res"   TO  VIS02RES-RECORDNAME
-           CALL    "ORCDBMAIN"         USING
+     ****  CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST02RES
                                        SPA-AREA
@@ -548,7 +555,8 @@
            MOVE    "xml_visitptlst02v2res" TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "visitptlst02res"   TO  VIS02RES-RECORDNAME
-           CALL    "ORCDBMAIN"         USING
+      **** CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST02RES
                                        SPA-AREA
@@ -561,7 +569,8 @@
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            MOVE    "xml_visitptlst02v2res" TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING
+      *****CALL    "ORCDBMAIN"         USING
+           CALL    "ORCDBAPIV3"        USING
                                        MCPAREA
                                        XML-VISITPTLST02RES
                                        SPA-AREA
@@ -768,7 +777,8 @@
       *
                IF      FLG-CHK             =   ZERO
                    ADD     1               TO  TBL-MAX
-                   IF      TBL-MAX         >   500
+      *H29.4       IF      TBL-MAX         >   500
+                   IF      TBL-MAX         >   1000
                        MOVE    "12"            TO  WRK-ERRCD
                    ELSE
       *                明細項目編集
@@ -844,6 +854,13 @@
            MOVE    JYURRK-HKNCOMBINUM  TO  VIS01RES-COMBINATION-NUMBER
                                                                (IDX)
            PERFORM 200214-HKNCOMBI-HEN-SEC
+      *H29.4
+      *    更新日
+           MOVE    JYURRK-UPYMD        TO  WRK-SYMD
+           MOVE    JYURRK-UPHMS        TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  VIS01RES-UPDATE-DATE(IDX)
+           MOVE    WRK-HEN-TIME        TO  VIS01RES-UPDATE-TIME(IDX)
            .
        20021-JYURRK-HENSYU-EXT.
            EXIT.
@@ -1203,7 +1220,8 @@
                MOVE    "診療科コード誤り"
                                                TO  WRK-ERRMSG
            WHEN    "12"
-               MOVE    "対象が５００件以上存在します。"
+      *        MOVE    "対象が５００件以上存在します。"
+               MOVE    "対象が１０００件以上存在します。"
                                                TO  WRK-ERRMSG
            WHEN    "13"
                MOVE    "対象がありません"
