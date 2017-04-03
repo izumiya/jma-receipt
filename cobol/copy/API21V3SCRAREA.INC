@@ -35,3 +35,6 @@
       *ORAPI021S5V3
            COPY    "CPAPILSTV2.INC"    REPLACING
                                        //APILST-// BY //APILST08-//.
+      *ORAPI021S6V3
+           COPY    "CPAPILSTV2.INC"    REPLACING
+                                       //APILST-// BY //APILST09-//.

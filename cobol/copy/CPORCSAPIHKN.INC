@@ -22,15 +22,19 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  14/11/12  確認日付他追加
+      * 04.08.00     NACL-多々納  17/01/XX  処理区分３、保険組合せ情報追加
       ************************************************************
        01  ORCSAPIHKNAREA.
       *入力
-      *処理区分
+      *処理区分（１：自動選択する）
            03  ORCSAPIHKN-KBN              PIC  X(01).
       *診療科（前回受診履歴より）
            03  ORCSAPIHKN-SRYKA            PIC  X(02).
-      *処理区分２（１：患者登録時（すべて）、２：年月範囲）
+      *処理区分２（１：患者登録時（すべて）、２：年月範囲、以外：当日）
            03  ORCSAPIHKN-KBN2             PIC  X(01).
+      *H29.1
+      *処理区分３（１：対象２００件まで）
+           03  ORCSAPIHKN-KBN3             PIC  X(01).
       *保険情報
            03  ORCSAPIHKN-IN-HKNAREA.
       *        保険種類
@@ -62,9 +66,20 @@
                05  ORCSAPIHKN-OT-HKNCOMBI      PIC X(04).
       *有効保険一覧
            03  ORCSAPIHKN-HKNCOMBI-AREA.
-               05  ORCSAPIHKN-HKNCOMBI-TBL     OCCURS   20.
+               05  ORCSAPIHKN-HKNCOMBI-TBL     OCCURS   200.
       *            保険組合せ
                    07  ORCSAPIHKN-THKNCOMBI        PIC  X(04).
+      *H29.1
+      *            保険組合せ負担割合（外来）
+                   07  ORCSAPIHKN-COMB-RATEG       PIC  9(03).
+      *            保険組合せ負担割合（入院）
+                   07  ORCSAPIHKN-COMB-RATEN       PIC  9(03).
+      *            保険組合せ有効期間
+                   07  ORCSAPIHKN-COMB-TEKSTYMD    PIC  X(10).
+                   07  ORCSAPIHKN-COMB-TEKEDYMD    PIC  X(10).
+                   07  ORCSAPIHKN-COMBN-TEKSTYMD   PIC  X(08).
+                   07  ORCSAPIHKN-COMBN-TEKEDYMD   PIC  X(08).
+      *
       *            保険種別
                    07  ORCSAPIHKN-HKNNUM           PIC  X(03).
       *            保険種別名称
@@ -123,6 +138,8 @@
                            11  ORCSAPIHKN-MONEY-OUTPATIENT PIC X(06).
       *                    公費ＩＤ
                            11  ORCSAPIHKN-NAI-KOHID        PIC 9(10).
+      *        対象保険組合せ件数
+               05  ORCSAPIHKN-OT-MAX           PIC 9(04).
       *エラーコード
            03  ORCSAPIHKN-ERRCD                    PIC 9(01).
       *
