@@ -57,6 +57,11 @@
                       07  ACPLSTRES-CLAIM-INFO         PIC X(1).
       *               会計時間
                       07  ACPLSTRES-ACCOUNT-TIME       PIC X(8).
+      *H29.4
+      *               予約時間
+                      07  ACPLSTRES-APPOINT-TIME       PIC X(8).
+      *               予約ID
+                      07  ACPLSTRES-APPOINT-ID         PIC X(2).
       *               患者情報
                       07  ACPLSTRES-PATIENT-INFOMATION.
       *                   患者番号

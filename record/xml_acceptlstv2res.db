@@ -20,6 +20,8 @@ xml_acceptlstv2res {
 		Medical_Information		varchar(2);
         	Claim_Infometion		varchar(1);
         	Account_Time			varchar(8);
+		Appointment_Time		varchar(8);
+		Appointment_Id			varchar(2);
 		Patient_Information {
 		Patient_ID			varchar(20);
 		WholeName			varchar(100);

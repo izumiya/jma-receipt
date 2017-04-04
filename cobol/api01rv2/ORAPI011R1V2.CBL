@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-多々納  13/08/01  受付ＩＤ追加対応
       *  04.08.01    NACL-多々納  16/10/XX  保険組合せ番号追加対応
+      *  04.08.01    NACL-多々納  17/04/XX  予約ＩＤ追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -142,7 +143,7 @@
       *
       *    API XML読み込み用定義体
            COPY    "CPACCPTLSTV2REQ.INC".
-      *    API XML読み込み用定義体
+      *    API XML送信用定義体
            COPY    "CPACCPTLSTV2RES.INC".
       *
       *    保険組合せセット領域
@@ -836,6 +837,19 @@
            END-IF
       *    送受信フラグ
            MOVE    UKE-SRFLG           TO  ACPLSTRES-CLAIM-INFO (IDX)
+      *H29.4
+      *    予約情報
+           IF      UKE-YYKTIME     NOT =   ZERO
+      *        予約時間
+               MOVE    UKE-YYKTIME         TO  WRK-THMS
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-TIME        TO  ACPLSTRES-APPOINT-TIME
+                                                                (IDX)
+      *        予約ＩＤ
+               MOVE    UKE-YYKID           TO  ACPLSTRES-APPOINT-ID
+                                                                (IDX)
+           END-IF
+      *
       *
            IF      UKE-PTID            =   ZERO
       *        新規患者
