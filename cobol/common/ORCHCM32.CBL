@@ -624,9 +624,13 @@
       *
       *    入金編集処理
            PERFORM 220-NUKIN-HENSYU-SEC
-           IF    ( HCM31S01-BFKINGAKU (1)      >   ZERO )
-            OR   ( HCM31S01-KINGAKU (1)        >   ZERO )
-               PERFORM 21011-SRYKIKAN-HEN-SEC
+           IF    ( ORCHCM31-DSPKBN =   "1" OR "4" )
+                   PERFORM 21011-SRYKIKAN-HEN-SEC
+           ELSE
+               IF    ( HCM31S01-BFKINGAKU (1)      >   ZERO )
+                OR   ( HCM31S01-KINGAKU (1)        >   ZERO )
+                   PERFORM 21011-SRYKIKAN-HEN-SEC
+               END-IF
            END-IF
       *
            .
@@ -1025,12 +1029,8 @@
            END-IF
       *
            IF    ( ORCHCM31-KIKANKBN   =   "1"   )
-            AND  ( ORCHCM31-DSPKBN     =   "2"   )
-            AND  ( WRK-GAKU (IDX4) =   ZERO )
-                   MOVE    ZERO    TO  FLG-TAISYO
-           END-IF
-      *
-           IF    ( ORCHCM31-KIKANKBN   =   "1"   )
+      *      AND  ( ORCHCM31-DSPKBN     =   "1" OR "2" OR "3"  )
+            AND  ( ORCHCM31-DSPKBN     =   "2" OR "3"  )
             AND  ( WRK-GAKU (IDX4) =   ZERO )
                    MOVE    ZERO    TO  FLG-TAISYO
            END-IF
@@ -1133,7 +1133,7 @@
            MOVE    WRK-HENYMDG(11:6)   TO  HCM32N-SRYYYMM2(CNT-LINE)
       *
            IF    ( ORCHCM31-KIKANKBN   =   "1"   )
-            AND  ( ORCHCM31-DSPKBN     =   "1" OR "3" )
+            AND  ( ORCHCM31-DSPKBN     =   "1" OR "3" OR "4" )
       *
       *        保険点数
                IF      WRK-MON-TENSU   NOT =   ZERO
@@ -1207,7 +1207,7 @@
        240-GOKEI-HEN-SEC               SECTION.
       *
            IF    ( ORCHCM31-KIKANKBN   =   "1"   )
-            AND  ( ORCHCM31-DSPKBN     =   "1" OR "3"  )
+            AND  ( ORCHCM31-DSPKBN     =   "1" OR "3" OR "4" )
       *
                MOVE    WRK-GHKNTEN     TO  WRK-Z7
                MOVE    WRK-Z7          TO  HCM32N-GHKNTEN
