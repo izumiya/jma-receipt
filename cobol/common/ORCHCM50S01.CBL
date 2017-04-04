@@ -773,6 +773,9 @@
                    END-IF
       *
                    IF    ( FLG-LOOPEND =    1 )
+      *             AND  ( ORCHCM31-DSPKBN     =   "1" OR "2" OR "3" )
+                    AND  ( ORCHCM31-DSPKBN     =   "2" OR "3" )
+      *
                        INITIALIZE                  HCM31S01-AREA
       *
                        IF    ( ORCHCM31-SYORIKBN   =   "1" )
